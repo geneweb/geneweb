@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.34 1999-10-26 22:35:41 ddr Exp $ *)
+(* $Id: relation.ml,v 2.35 1999-10-27 13:14:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -75,7 +75,7 @@ value print_menu conf base p =
     return ()
   in
   let is = index_of_sex p.sex in
-  do cheader conf title;
+  do header conf title;
      tag "form" "method=get action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=em value=R>\n";
@@ -772,7 +772,7 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list)) =
 
 value print_main_relationship conf base long p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  do cheader conf title;
+  do header conf title;
      match p_getenv conf.env "spouse" with
      [ Some "on" -> conf.senv := conf.senv @ [("spouse", "on")]
      | _ -> () ];

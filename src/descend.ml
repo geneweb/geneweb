@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.33 1999-10-26 22:35:36 ddr Exp $ *)
+(* $Id: descend.ml,v 2.34 1999-10-27 13:14:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -145,7 +145,7 @@ value descendants_title conf base p h =
 
 value afficher_menu_descendants conf base p =
   let niveau_effectif = min (limit_desc conf) (level_max base p) in
-  do cheader conf (descendants_title conf base p);
+  do header conf (descendants_title conf base p);
      tag "center" begin
        print_choice conf base p niveau_effectif;
      end;

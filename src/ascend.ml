@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.56 1999-10-26 22:35:31 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.57 1999-10-27 13:14:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -157,7 +157,7 @@ value afficher_menu_ascendants conf base p =
     Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
       (transl_decline conf "of" (txt_fun raw_access conf base p))
   in
-  do cheader conf title;
+  do header conf title;
      tag "center" begin
        print_choice conf base p niveau_effectif;
        html_p conf;
