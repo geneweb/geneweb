@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.5 2001-12-06 11:56:06 ddr Exp $ *)
+(* $Id: select.ml,v 4.6 2001-12-19 00:42:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -242,6 +242,7 @@ value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
   loop iper
 ;
 
+(*
 value select_descendants_all
   base per_tab fam_tab no_spouses_parents aflag dflag =
   for i = 0 to base.data.persons.len - 1 do {
@@ -250,6 +251,48 @@ value select_descendants_all
         (Adef.iper_of_int i)
     else ()
   }
+;
+*)
+
+value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
+  let new_mark = let r = ref 0 in fun () -> do { incr r; r.val } in
+  let tab = Array.create base.data.persons.len (new_mark ()) in
+  let anc_mark = new_mark () in
+  let anclist =
+    loop [] ip where rec loop list ip =
+      if tab.(Adef.int_of_iper ip) = anc_mark then list
+      else do {
+        tab.(Adef.int_of_iper ip) := anc_mark;
+        match (aoi base ip).parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let list = loop list cpl.father in
+            loop list cpl.mother
+        | None ->
+            [ip :: list] ]
+      }
+  in
+  let des_mark = new_mark () in
+  List.iter
+    (fun ip ->
+       loop ip where rec loop ip =
+         if tab.(Adef.int_of_iper ip) = des_mark then ()
+         else do {
+           let u = uoi base ip in
+           for i = 0 to Array.length u.family - 1 do {
+             let ifam = u.family.(i) in
+             fam_tab.(Adef.int_of_ifam ifam) :=
+               fam_tab.(Adef.int_of_ifam ifam) lor 1;
+             let des = doi base ifam in
+             for i = 0 to Array.length des.children - 1 do {
+               loop des.children.(i);
+             };
+           };
+           tab.(Adef.int_of_iper ip) := des_mark;
+           per_tab.(Adef.int_of_iper ip) :=
+             per_tab.(Adef.int_of_iper ip) lor 1;
+         })
+    anclist
 ;
 
 value select_surname base per_tab fam_tab no_spouses_parents surname =
@@ -317,8 +360,13 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
         else ()
       in
       do {
+(*
         select_ancestors base per_tab fam_tab False 1 iadper;
         select_descendants_all base per_tab fam_tab no_spouses_parents 1 2;
+*)
+        select_descendants_ancestors base per_tab fam_tab no_spouses_parents
+          iadper;
+(**)
         (fun i ->
            let fl = per_tab.(Adef.int_of_iper i) in
            fl < 4 && fl > 0,

@@ -49,6 +49,10 @@ GeneWeb version 4.04
     in the first name field, with the real first name part enclosed with
     double quotes.
 
+* GeneWeb uncompiler (gwu)
+  - [19 Dec 01] Rewritten option -ad (somebody's ancestors' descendants):
+    now much faster and using much less memory.
+
 * GeneWeb databases Transfer Program (gwtp)
   - [27 Oct 01] In the executable "ged2gwb" is installed in the
     directory corresponding to the option -etc of gwtp, the users can
