@@ -1727,6 +1727,7 @@ es: siguiente hermano/siguiente hermana/siguiente hermano(a)
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 it: seguente fratello/seguente sorella/seguente fratello o sorella
 pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
+se: n&auml;sta syskon
 
     no anniversary
 de: kein Jahrestag
@@ -2133,6 +2134,7 @@ es: anterior hermano/anterior hermana/anterior hermano(a)
 fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
 it: precedente fratello/precedente sorella/precedente fratello o sorella
 pt: precedente irm&atilde;o/precedente irm&atilde;/precedente irm&atilde;(o)
+se: f&ouml;reg&aring;ende syskon
 
     private
 de: privat
@@ -2618,7 +2620,7 @@ fr: les %d derniers d&eacute;c&egrave;s
 it: le ultime %d morto
 nl: de laatste %d overlijden
 pt: os %d mortes m&aacute;s recentes
-se: de senaste %d d&ouml;d
+se: de senaste %d d&ouml;dsfallen
 
     the parents
 de: die Eltern

@@ -34,9 +34,12 @@ GeneWeb Version 1.11
   - [Jan 16, 99] Changed text "Date" into "Date (d/m/y)" in english version
     to be sure there is no ambiguity.
   - [Jan 16, 99] Added declined forms.
-  - [Jan 16, 99] Fixed typo in German version (Markus Mottl).
+  - [Jan 16, 99] Fixed typos in German version (Markus Mottl).
 
 * Documentation
+--- [Jan 20, 99] Added documentation for:
+      * how to put links to GeneWeb databases.
+      * how to customize welcome pages.
 --- [Jan 11, 99] Started Swedish version (Lars Gustavsson).
 
 GeneWeb Version 1.10
