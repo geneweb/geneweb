@@ -33,10 +33,10 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 <table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w">Toegang als <em>tovenaar</em></a><br>
-(wachtwoord)</td>
+<td align=center>Toegang als <a href="%sw=w"><em>tovenaar</em></a><br>
+(wachtwoord)<br></td>
 
-%y%z<td align=center><a href="%sw=f">Toegang als <em>vriend</em></a><br>
+%y%z<td align=center>Toegang als <a href="%sw=f"><em>vriend</em></a><br>
 (wachtwoord)</td>
 
 %z%y</tr></table>

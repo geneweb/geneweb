@@ -36,14 +36,14 @@ z. Zt. %n Personen.%o<br>
 <tr>
 
 <td align=center><a href="%sw=w"><em>Wizard</em></a>-Zugang<br>
-(Passwort).</td>
+(Passwort).<br></td>
 
 %y%z<td align=center><a href="%sw=f"><em>Freund</em></a>-Zugang<br>
 (Passwort).</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>
@@ -60,7 +60,7 @@ z. Zt. %n Personen.%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-Zum Benutzen dieser Datenbank kannst du hier suchen:<br><br>
+Zum Benutzen dieser Datenbank kannst du hier suchen:<br><p>
 
 <ul>
 
@@ -89,12 +89,12 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>nach einem Titel</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(ex: roi, duke...)
+<font color=#2f6400><b>nach einem Titel</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>am Ort:</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>am Ort:</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
@@ -126,27 +126,26 @@ Suche</b></font></a>.
 
 %w<p>
 
-<center>Du kannst<br><br>
+<center>Du kannst<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">eine Familie hinzuf&uuml;gen</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">die Notizen &auml;ndern</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>Du kannst zugreifen auf<br><br>
+<center>Du kannst zugreifen auf<br><p>
 
 <table border=0>
 <tr>

@@ -35,14 +35,14 @@ personas.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
 <tr>
 
 <td align=center><a href="%sw=w">Entrada <em>brujo</em></a><br>
-(contrase&ntilde;a)</td>
+(contrase&ntilde;a)<br></td>
 
 %y%z<td align=center><a href="%sw=f">Entrada <em>amigo</em></a><br>
 (contrase&ntilde;a)</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>

@@ -36,7 +36,7 @@ actuellement %n personnes.%o<br>
 <tr>
 
 <td align=center>acc&egrave;s <a href="%sw=w"><em>sorcier</em></a><br>
-(mot de passe).</td>
+(mot de passe).<br></td>
 
 %y%z<td align=center>acc&egrave;s <a href="%sw=f"><em>ami</em></a><br>
 (mot de passe).</td>

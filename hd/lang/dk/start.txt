@@ -35,14 +35,14 @@ Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 <tr>
 
 <td align=center><a href="%sw=w"><em>Opdaterings</em></a> adgang<br>
-(adgangsord)</td>
+(adgangsord)<br></td>
 
 %y%z<td align=center><a href="%sw=f"><em>Betroet</em></a> adgang<br>
 (adgangsord)</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>
@@ -59,7 +59,7 @@ Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-For at navigere i denne database kan du søge:<br><br>
+For at navigere i denne database kan du søge:<br><p>
 
 <ul>
 
@@ -88,12 +88,12 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>titel (nob.)</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(Eks.: adelsmand, greve, konge...)
+<font color=#2f6400><b>titel (nob.)</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(Eks.: adelsmand, greve, konge...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>navn (nob.)</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>navn (nob.)</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (Eks.: von Klingenberg, Griffenfeld, af Danmark...)
 </td><td>
 <input type=submit value="Ok">
@@ -127,27 +127,26 @@ søgning</b></font></a>.
 
 %w<p>
 
-<center>Du kan:<br><br>
+<center>Du kan:<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">tilføje en familie</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">ændre noterne</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>Du kan også fremkalde:<br><br>
+<center>Du kan også fremkalde:<br><p>
 
 <table border=0>
 <tr>

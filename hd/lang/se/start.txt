@@ -35,14 +35,14 @@ Databasen <font color=#2f6400><b>"%t"</b></font> inneh&aring;ller nu
 <tr>
 
 <td align=center><a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br>
-(passord)</td>
+(passord)<br></td>
 
 %y%z<td align=center><a href="%sw=f"><em>V&auml;nners</em></a>
 tilltr&auml;de<br> (passord)</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>

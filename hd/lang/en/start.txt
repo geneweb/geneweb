@@ -35,14 +35,14 @@ The data base <font color=#2f6400><b>"%t"</b></font> now holds %n persons.%o<br>
 <tr>
 
 <td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
-(password)</td>
+(password)<br></td>
 
 %y%z<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
 (password)</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>
@@ -59,7 +59,7 @@ The data base <font color=#2f6400><b>"%t"</b></font> now holds %n persons.%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-To navigate in this data base, you can do your search:<br><br>
+To navigate in this data base, you can do your search:<br><p>
 
 <ul>
 
@@ -88,12 +88,12 @@ To navigate in this data base, you can do your search:<br><br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>by title</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(ex: roi, duke...)
+<font color=#2f6400><b>by title</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>place</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>place</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
@@ -127,27 +127,26 @@ request</b></font></a>.
 
 %w<p>
 
-<center>You can<br><br>
+<center>You can<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">add a family</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">modify the notes</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>You can also consult<br><br>
+<center>You can also consult<br><p>
 
 <table border=0>
 <tr>

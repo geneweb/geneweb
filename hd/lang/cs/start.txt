@@ -35,14 +35,14 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 <tr>
 
 <td align=center><a href="%sw=w">{<em>Wizard</em></a> access<br>
-(password)}</td>
+(password)}<br></td>
 
 %y%z<td align=center><a href="%sw=f">{<em>Friend</em></a> access<br>
 (password)}</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>
@@ -59,7 +59,7 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><br>
+{To navigate in this data base, you can do your search}:<br><p>
 
 
 
@@ -90,12 +90,12 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>podle titulu</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(ex: roi, duke...)
+<font color=#2f6400><b>podle titulu</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>místa</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>místa</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
@@ -106,21 +106,17 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 
 <form method=GET action="%f">
 %h
-<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
-<font color=#2f6400><b>{by the list}</b></font> {of all}<br>
+<font color=#2f6400><b>{by the list}</b></font> {of all}
 <select name=m>
 <option value="N" selected>pøíjmení
 <option value="P">køestní jména
 </select>
-</td><td>...</td><td align=center>
-seøazená podle<br>
+seøazená podle
 <select name=tri>
 <option value="A" selected>abecedy
 <option value="F">èetnosti
 </select>
-</td><td>
 <input type=submit VALUE="Ok">
-</td></tr></table>
 </form>
 
 <li><font color=#2f6400><b>{by the}</b></font>
@@ -131,27 +127,26 @@ dotaz</b></font></a>.
 
 %w<p>
 
-<center>{You can}<br><br>
+<center>{You can}<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">{add a family}</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">{modify the notes}</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>{You can also consult}<br><br>
+<center>{You can also consult}<br><p>
 
 <table border=0>
 <tr>
