@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.22 1999-08-01 08:50:14 ddr Exp $ *)
+(* $Id: family.ml,v 2.23 1999-08-02 10:16:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -360,13 +360,15 @@ value family_m conf base =
               do conf.cancel_links := False; return
               Some.surname_print conf base Some.surname_not_found n
           | _ ->
-              let pl = find_all conf base n in
-              match pl with
-              [ [] ->
-                  do conf.cancel_links := False; return
-                  Some.surname_print conf base inconnu n
-              | [p] -> person_selected conf base p
-              | pl -> precisez conf base n pl ] ]
+              if n = "" then inconnu conf n
+              else
+                let pl = find_all conf base n in
+                match pl with
+                [ [] ->
+                    do conf.cancel_links := False; return
+                    Some.surname_print conf base inconnu n
+                | [p] -> person_selected conf base p
+                | pl -> precisez conf base n pl ] ]
       | (_, Some i) ->
           relation_print conf base (base.data.persons.get (int_of_string i))
       | _ -> () ]
