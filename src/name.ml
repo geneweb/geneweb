@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 3.2 2000-03-16 19:39:00 ddr Exp $ *)
+(* $Id: name.ml,v 3.3 2000-07-07 13:50:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Name.lower *)
@@ -138,7 +138,7 @@ value roman_number s i =
     else if s.[i] == ' ' then Some i
     else
       match s.[i] with
-      [ 'i' | 'v' | 'x' -> loop (i + 1)
+      [ 'i' | 'v' | 'x' | 'l' -> loop (i + 1)
       | _ -> None ]
   in
   if i == 0 || s.[i-1] == ' ' then loop i else None
