@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.1 2001-04-17 21:56:51 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.2 2001-04-25 21:32:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open MLast;
@@ -15,39 +15,38 @@ value not_impl name x =
 
 value trace =
   ["cftransl"; "transl"; "transl_nth"; "transl_decline"; "transl_decline2";
-    "ftransl"; "ftransl_nth"]
+   "ftransl"; "ftransl_nth"]
 ;
 
 value rec expr e =
   match e with
   [ <:expr< $lid:f$ $_$ $str:s$ >> when List.mem f trace ->
       Printf.printf "%s\n" s
-  | <:expr< $lid:f$ $_$ ($lid:g$ $_$ $str:s$ $_$) >> when
-    List.mem f trace && List.mem g trace ->
+  | <:expr< $lid:f$ $_$ ($lid:g$ $_$ $str:s$ $_$) >>
+    when List.mem f trace && List.mem g trace ->
       Printf.printf "%s\n" s
   | <:expr< $lid:x$ >> when List.mem x trace ->
       Stdpp.raise_with_loc (MLast.loc_of_expr e) (Failure "Bad source")
   | <:expr< let $rec:_$ $list:pel$ in $e$ >> ->
-      do binding_list pel; expr e; return ()
+      do { binding_list pel; expr e; () }
   | <:expr< fun [ $list:pel$ ] >> -> List.iter fun_binding pel
   | <:expr< match $e$ with [ $list:pel$ ] >> ->
-      do expr e; List.iter fun_binding pel; return ()
+      do { expr e; List.iter fun_binding pel; () }
   | <:expr< try $e$ with [ $list:pel$ ] >> ->
-      do expr e; List.iter fun_binding pel; return ()
+      do { expr e; List.iter fun_binding pel; () }
   | <:expr< do { $list:el$ } >> -> List.iter expr el
   | <:expr< if $e1$ then $e2$ else $e3$ >> ->
-      do expr e1; expr e2; expr e3; return ()
-  | <:expr< for $_$ = $_$ $to:_$ $_$ do { $list:el$ } >> ->
-      List.iter expr el
+      do { expr e1; expr e2; expr e3; () }
+  | <:expr< for $_$ = $_$ $to:_$ $_$ do { $list:el$ } >> -> List.iter expr el
   | <:expr< while $_$ do { $list:el$ } >> -> List.iter expr el
   | <:expr< let module $m$ = $me$ in $e$ >> -> expr e
   | <:expr< ($list:el$) >> -> List.iter expr el
   | <:expr< ($e$:$_$) >> -> expr e
   | <:expr< [| $list:el$ |] >> -> List.iter expr el
-  | <:expr< $x$ $y$ >> -> do expr x; expr y; return ()
+  | <:expr< $x$ $y$ >> -> do { expr x; expr y; () }
   | <:expr< { $list:fel$ } >> -> List.iter (fun (_, e) -> expr e) fel
   | <:expr< { ($e$) with $list:fel$ } >> ->
-      do expr e; List.iter (fun (_, e) -> expr e) fel; return ()
+      do { expr e; List.iter (fun (_, e) -> expr e) fel; () }
   | <:expr< $_$ := $_$ >> -> ()
   | <:expr< $_$.($_$) >> -> ()
   | <:expr< $_$.[$_$] >> -> ()
@@ -64,14 +63,13 @@ and binding (p, e) =
   match p with
   [ <:patt< $lid:s$ >> when List.mem s trace -> ()
   | _ -> expr e ]
-and fun_binding (p, _, e) = expr e
-;
+and fun_binding (p, _, e) = expr e;
 
 value rec module_expr =
   fun
   [ <:module_expr< $_$ . $_$ >> -> ()
   | <:module_expr< $me1$ $me2$ >> ->
-      do module_expr me1; module_expr me2; return ()
+      do { module_expr me1; module_expr me2; () }
   | <:module_expr< struct $list:sil$ end >> -> List.iter str_item sil
   | x -> not_impl "module_expr" x ]
 and str_item =
@@ -86,6 +84,6 @@ and str_item =
   | x -> not_impl "str_item" x ]
 ;
 
-value f (ast, loc) = do str_item ast; flush stdout; return ();
+value f (ast, loc) = do { str_item ast; flush stdout; () };
 
 Pcaml.print_implem.val := List.iter f;
