@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.186 2004-02-02 11:47:54 ddr Exp $
+# $Id: lexicon.txt,v 4.187 2004-02-02 12:08:16 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2268,8 +2268,10 @@ bg: рамка
 da: ramme
 de: Rand
 en: border
+es: borde
 fr: bordure
 he:  освшъ
+it: bordo
 no: ramme         
 pl: granica 
 pt: borda
@@ -2743,8 +2745,10 @@ da: farve
 de: Farbe
 en: colour
 en-us: color
+es: color 
 fr: couleur
 he:  цбт
+it: colore
 no: farge         
 pl: kolor
 pt: cфr
@@ -5886,8 +5890,11 @@ bg: не се споменава
 da: andet
 de: nicht erv&auml;hnt
 en: no mention
+es: sin informaci&oacute;n
 fr: pas de mention
+it: senza menzione
 pl: bez wzmianki
+pt: sem informa&ccedil;&atilde;o
 sv: inte n&auml;mnd
 
     no sexes check
@@ -6030,8 +6037,11 @@ zh: ±ёЧў
 da: noter &aelig;ndret
 de: ge&auml;nderte Notizen
 en: notes modified
+es: notas modificadas
 fr: notes modifi&eacute;es
+it: note modificate
 pl: uwagi zmodyfikowane
+pt: notas modificadas
 sv: noteringar modifierade
 
     nth
