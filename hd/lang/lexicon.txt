@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.179 2004-01-07 06:33:22 ddr Exp $
+# $Id: lexicon.txt,v 4.180 2004-01-08 10:25:16 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -5800,6 +5800,7 @@ sv: notering/noteringar
 zh: ±¸×¢
 
     notes modified
+da: noter &aelig;ndret
 en: notes modified
 fr: notes modifi&eacute;es
 
