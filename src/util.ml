@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.46 2002-03-18 12:29:20 ddr Exp $ *)
+(* $Id: util.ml,v 4.47 2002-04-13 08:51:20 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -153,7 +153,7 @@ value gen_decline2 conf wt s1 s2 =
         match wt.[i] with
         [ '%' when i + 1 < len ->
             match string_of wt.[i + 1] with
-            [ Some s -> (s, i + 1)
+            [ Some s -> (nominative s, i + 1)
             | None -> ("%", i) ]
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
             let c = wt.[i + 1] in
@@ -166,6 +166,7 @@ value gen_decline2 conf wt s1 s2 =
               if j + 2 < len && wt.[j + 1] = '%' then
                 match string_of wt.[j + 2] with
                 [ Some s ->
+                    let s = nominative s in
                     let s =
                       if start_with_vowel s then String.make 1 wt.[j - 1] ^ s
                       else String.sub wt (i + 1) (j - i - 2) ^ " " ^ s
