@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.124 2000-07-05 08:34:45 ddr Exp $
+# $Id: lexicon.txt,v 3.125 2000-07-05 09:00:14 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5237,6 +5237,7 @@ se: som b&ouml;rjar med
     statistics
 en: statistics
 fr: statistiques
+se: statistik
 
     surname alias
 af: van alias
@@ -5473,6 +5474,7 @@ se: den %s generationen
     the %d who lived the longest
 en: the %d who lived the longest
 fr: les %d personnes ayant v&eacute;cu le plus longtemps
+se: de 30 som har levt l&auml;ngst
 
     the anniversary
 af: die herdenking
