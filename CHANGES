@@ -2,8 +2,9 @@ GeneWeb Version 2.01
 --------------------
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [Mar 11, 99] Fixed bug, treatment of accents worked bad in gedcom files
-    with ascii charset (resulting problems in "a" umlaut, for example).
+  - [Mar 11, 99] Fixed horrible bug: treatment of accents worked bad for
+    gedcom files with ascii charset (resulting problems in "a" umlaut, for
+    example).
   - [Mar 10, 99] The option "-no_efn" is now the default.
 
 * Lexicon (lexicon.txt) and Welcome files (xx/start.txt)
