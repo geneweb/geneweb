@@ -13,14 +13,15 @@ GeneWeb Version 2.05
     various encodings). Anyway, code is smaller.
 
 * GeneWeb daemon/CGI (gwd)
-  - [Jun 14, 99] Tried to make charset iso-8859-2 work.
-  - [Jun 14, 99] Fixed Name.lower to reflect Ansel encoding and changing
-    "oslash" into "o".
   - [Jul 9, 99] Changed request syntax for cousins: "v1=#" instead of "v=#"
     and ability to ask for "v1=#;v2=#" for uncles and nephews...
   - [Jul 2, 99] Added "access_by_key" in "base.gwf" files to generate accesses
     by keys, allowing to update the data base without disturbing the users
     accessing it.
+
+* GeneWeb compiler (gwc)
+  - [Jul 20, 99] Translated into English some variables and functions whose
+    names where in French or in mixed French-English.
 
 GeneWeb Version 2.04
 --------------------
