@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.11 2000-01-11 14:10:04 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.12 2000-01-15 00:48:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -26,7 +26,7 @@ type dist =
 
 value infinity = 1000;
 
-value threshold = ref 15;
+value threshold = ref 10;
 
 value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 
