@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.9 1999-11-02 10:28:36 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.10 1999-11-02 13:17:44 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -55,7 +55,9 @@ attualmente %n persone.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-Per traversare in questa base di dati, potete fare la vostra ricerca:<br><p>
+
+Per spostarvi in questa base di dati, potete fare la vostra
+ricerca:<br><p>
 
 <li>
 
@@ -84,11 +86,11 @@ Per traversare in questa base di dati, potete fare la vostra ricerca:<br><p>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>per titolo</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
-(ex: roi, duke...)<br>
+(es: re, duca...)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b>luogo</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(ex: de France, of Sax...)
+(es: di Francia, di Savoia...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
@@ -98,7 +100,7 @@ Per traversare in questa base di dati, potete fare la vostra ricerca:<br><p>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>per la lista</b></font> de tutti i
+<font color=#2f6400><b>per la lista</b></font> di tutti i
 <select name=m>
 <option value="N" selected>cognomi
 <option value="P">nomi
@@ -146,7 +148,7 @@ avanzata</b></font></a>.
 <tr>
 <td valign=up>
 <ul>
-<li>le <a href="%sm=AN">compleanni</a>
+<li>i <a href="%sm=AN">compleanni</a>
 <li>gli <a href="%sm=AD">anniversari delle persone decedute</a>
 <li>gli <a href="%sm=AM">anniversari di matrimonio</a>%I|wf
 <li>le <a href="%sm=LB;k=10">ultime nascite</a>%E
@@ -157,7 +159,7 @@ avanzata</b></font></a>.
 <li>le <a href="%sm=LD;k=10">ultime nascite</a>%E%Ih
 <li>la <a href="%sm=HIST;k=10">storia degli aggiornamenti</a>%E
 <li>i <a href="%sm=CAL">calendarii</a>
-<li>la <a href="%sm=FORUM">tribuna della base di dati</a>}
+<li>la <a href="%sm=FORUM">tribuna della base di dati</a>
 </ul>
 </td>
 </tr>
