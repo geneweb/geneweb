@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.49 2005-02-03 16:19:34 ddr Exp $ *)
+(* $Id: family.ml,v 4.50 2005-02-04 20:18:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -647,7 +647,6 @@ value treat_request_on_possibly_locked_base conf bfile log =
       do {
         if Gutil.utf_8_db.val then ()
         else do {
-          Name.utf_8.val := False;
           Hashtbl.clear conf.lexicon;
           let fname = Filename.concat "lang" "lexicon.txt" in
           Gutil.input_lexicon conf.lang conf.lexicon

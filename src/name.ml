@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.12 2005-02-04 10:33:01 ddr Exp $ *)
+(* $Id: name.ml,v 4.13 2005-02-04 20:18:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -28,7 +28,7 @@ module Buff =
   end
 ;
 
-value utf_8 = ref True;
+value utf_8_db = ref True;
 
 (* Name.lower *)
 
@@ -50,7 +50,7 @@ value unaccent_iso_8859_1 =
 value lower s =
   copy False 0 0 where rec copy special i len =
     if i == String.length s then Buff.get len
-    else if not utf_8.val || Char.code s.[i] < 0x80 then
+    else if not utf_8_db.val || Char.code s.[i] < 0x80 then
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
         ->

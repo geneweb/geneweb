@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.14 2005-02-03 16:19:36 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.15 2005-02-04 20:18:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -175,20 +175,6 @@ value rindex s c =
     if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
 ;
 
-value utf_8_of_iso_8859_1 str =
-  loop 0 0 where rec loop i len =
-    if i = String.length str then Buff.get len
-    else
-      let c = str.[i] in
-      if Char.code c < 0x80 then loop (i + 1) (Buff.store len c)
-      else if Char.code c < 0xC0 then
-        let len = Buff.store len (Char.chr 0xC2) in
-        loop (i + 1) (Buff.store len c)
-      else 
-        let len = Buff.store len (Char.chr 0xC3) in
-        loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
-;
-
 value line_cnt = ref 0;
 
 value input_line0 ic =
@@ -205,7 +191,7 @@ value input_a_line (ic, encoding) =
   let line = input_line0 ic in
    match encoding with
    [ E_utf_8 -> line
-   | E_iso_8859_1 -> utf_8_of_iso_8859_1 line ]
+   | E_iso_8859_1 -> Gutil.utf_8_of_iso_8859_1 line ]
 ;
 
 value rec input_real_line ic =
