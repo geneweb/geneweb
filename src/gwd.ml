@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.27 2002-02-17 09:48:52 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.28 2002-02-23 09:28:19 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -960,7 +960,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          {day = tm.Unix.tm_mday; month = succ tm.Unix.tm_mon;
           year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
        today_wd = tm.Unix.tm_wday;
-       time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec)}
+       time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
+       ctime = utm}
     in
     (conf, sleep, if not ok then Some (passwd, uauth) else None)
   }
