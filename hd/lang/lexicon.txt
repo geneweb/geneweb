@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.43 1999-05-20 17:21:20 ddr Exp $
+# $Id: lexicon.txt,v 2.44 1999-05-24 16:39:06 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1774,7 +1774,7 @@ pt: foto suprimida
 se: foto borttaget
 
     image received
-dk: billede gemt
+dk: billede indsat
 en: image received
 fr: image re&ccedil;ue
 he:  התמונה התקבלה
@@ -3009,7 +3009,7 @@ pt: ver a continua&ccedil;&atilde;o
 se: se vidare
 
     send
-dk: send
+dk: inds&aelig;t
 en: send
 fr: envoyer
 he:  שלח
