@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.16 2001-12-10 14:07:32 ddr Exp $ *)
+(* $Id: util.ml,v 4.17 2001-12-18 15:58:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1570,11 +1570,18 @@ value create_topological_sort conf base =
           | None ->
               let _ = base.data.ascends.array () in
               let _ = base.data.couples.array () in
-              let oc = open_out_bin tstab_file in
               let tstab = Consang.topological_sort base in
               do {
-                Marshal.to_channel oc tstab [Marshal.No_sharing];
-                close_out oc;
+                match
+                  try Some (open_out_bin tstab_file) with
+                  [ Sys_error _ -> None ]
+                with
+                [ Some oc ->
+                    do {
+                      Marshal.to_channel oc tstab [Marshal.No_sharing];
+                      close_out oc;
+                    }
+                | None -> () ];
                 tstab
               } ]
       | Refuse ->
