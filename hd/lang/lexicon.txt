@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.146 2000-07-21 13:35:39 ddr Exp $
+# $Id: lexicon.txt,v 3.147 2000-07-23 18:50:07 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -33,7 +33,7 @@ es: de:Alem&aacute;n/cs:Checo/cn:Chino/dk:Dan&eacute;s/es:Espa&ntilde;ol/eo:Espe
 fi: af:afrikaani/cn:kiina/cs:tsekki/de:saksa/dk:tanska/en:englanti/eo:esperanto/es:espanja/fi:suomi/fr:ranska/he:heprea/is:islanti/it:italia/lv:latvia/nl:hollanti/no:norja/pt:portugali/ru:ven&auml;j&auml;/se:ruotsi
 fr: af:afrikaans/cn:chinois/cs:tch&egrave;que/de:allemand/dk:danois/en:anglais/eo:esp&eacute;ranto/es:espagnol/fi:finlandais/fr:fran&ccedil;ais/he:h&eacute;breu/is:islandais/it:italien/lv:letton/nl:n&eacute;erlandais/no:norv&eacute;gien/pt:portugais/ru:russe/se:su&eacute;dois
 lv: cn:Ноnieрu/cs:Иehu/dk:Dвтu/nl:Holandieрu/en:Angпu/eo:Esperanto/fi:Somu/fr:Franиu/de:Vвcu/he:Ebreju/is:Islandieры/it:Itвпu/lv:Latvieрu/no:Norvзмu/pt:Portugвпu/es:Spвтu/ru:Krievu/se:Zviedru
-se: cn:kinesiska/cs:tjeckiska/dk:danska/en:engelska/eo:esperanto/fi:finska/fr:franska/de:tyska/he:hebreiska/it:italienska/nl:hollдndska/no:norska/pt:portugisiska/es:spanska/se:svenska
+se: af:afrikaans/cn:kinesiska/cs:tjeckiska/dk:danska/en:engelska/eo:esperanto/fi:finska/fr:franska/de:tyska/he:hebreiska/is:isl&auml;ndska/it:italienska/lv:litauiska/nl:holl&auml;ndska/no:norska/pt:portugisiska/es:spanska/ru:ryska/se:svenska
 
      to see the first branch
 af:  om die eerste staak te sien
@@ -173,7 +173,7 @@ nl: neven en nichten %s generaties verwijderd
 no: %smenninger
 pt: primos em %s grau
 ru: %s кузены
-se: %s kusiner
+se: %sm&auml;nningar
 
     %t already has parents
 af: %t het reeds ouers
@@ -411,7 +411,7 @@ nl: n
 no: nth (degree)
 pt: nth
 ru: nth (degree)
-se: nth
+se: nth (degree)
 
     , it is
 af: , dit is
@@ -510,7 +510,7 @@ nl: <em>Sosa nummer</em> ten opzichte van %t
 no: <em>Sosa nummer</em> i forhold til %t
 pt: <em>n&uacute;mero Sosa</em> em rela&ccedil;&atilde;o a %t
 ru: <em>Sosa номер</em> относительно %t
-se: <em>annummer</em> relativ till %t
+se: <em>annummer</em> med %t som proband (Kekules system)
 
     M/F
 af: M/V
@@ -588,7 +588,7 @@ nl: een neef in de %s generatie/een nicht in de %s generatie
 no: %smenning
 pt: um primo %s/uma prima %s/um(a) primo(a) %s
 ru: %s-ий кузен/%s-я кузина
-se: en %s kusin
+se: %sm&auml;nning
 
     a 2nd cousin
 af: 'n kleinneef/'n kleinniggie
@@ -1126,7 +1126,7 @@ nl: leeftijd bij overlijden:
 no: alder
 pt: com a idade de
 ru: в возрасте
-se: &aring;lder:
+se: livsl&auml;ngd:
 
     alias
 af: alias
@@ -2058,7 +2058,7 @@ nl: neven en nichten
 no: s&oslash;skenbarn og flermenninger
 pt: primos
 ru: кузены
-se: kusiner
+se: kusiner och flerm&auml;nningar
 
     create
 af: skep
@@ -3040,7 +3040,7 @@ nl: beeld verwijderd
 no: bildet er fjernet
 pt: imagem suprimida
 ru: картинка удалена
-se: foto borttaget
+se: bilden borttagen
 
     image received
 af: prent ontvang
@@ -3060,7 +3060,7 @@ nl: beeld ontvangen
 no: bildet er mottatt
 pt: imagem recebida
 ru: картинка получена
-se: foto mottaget
+se: bilden mottagen
 
     image/images
 af: prent/prente
@@ -3080,7 +3080,7 @@ nl: beeld
 no: bilde
 pt: imagem/imagens
 ru: картинку
-se: foto
+se: bild/bilder
 
     in (month year)
 af: in
@@ -3887,7 +3887,7 @@ nl: navigatie met %t als proband
 no: navigering med %t som Sosa referanse
 pt: navega&ccedil;a&atilde;o com %t como a refer&ecirc;ncia Sosa
 ru: навигация с %t как ссылка Sosa
-se: navigering med %t som annummer referens
+se: navigering med %t som proband (Kekules system)
 
     nephews and nieces
 af: broers- en susterskinders
@@ -4117,6 +4117,7 @@ it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/2
 lv: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 no: n/to/tre/fir/fem/seks/syv/&aring;tte/ni/ti/elleve/tolv/tretten/fjorten/femten/seksten/sшtten/atten/nitten/tyve/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
+se: n/tv&aring;/tre/fyra/fem/sex/sju/&aring;tta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
 
     nth (feminine)
 es: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
@@ -4218,7 +4219,7 @@ nl: van
 no: til
 pt: de
 ru: :g:
-se: till
+se: f&ouml;r
 
     of (same or greater generation level)
 af: van
