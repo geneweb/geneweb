@@ -90,6 +90,12 @@ GeneWeb version 2.05
     "a.gwf".
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [Aug 5, 99] Updated Portuguese phrases (Yves Guignard)
+  - [Aug 5, 99] Updated Norwegian phrases (Brunjulf Langballe)
+  - [Aug 3, 99] Updated Danish phrases (Hans Albeck)
+  - [Aug 3, 99] Updated Dutch phrases (Joris Esch)
+  - [Aug 3, 99] Updated German phrases (Markus Mottl)
+  - [Aug 2, 99] Updated Italian phrases (Daniel Hirschkoff)
   - [Jul 23, 99] Updated Swedish phrases (Lars Gustavsson)
   - [Jul 23, 99] Added Czech (Hanus Adler).
   - [Jul 17, 99] In welcome pages, simplified the text "it is a first

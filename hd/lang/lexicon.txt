@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.102 1999-08-05 10:10:05 ddr Exp $
+# $Id: lexicon.txt,v 2.103 1999-08-05 10:30:50 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -402,6 +402,7 @@ fr: un beau-fr&egrave;re/une belle-soeur
 it: un cognato/una cognata
 nl: een schoonbroer/een schoonzus
 no: svoger/svigerinne
+pt: um cunhado /uma cunhada
 se: en sv&aring;ger/en sv&auml;gerska
 
     a brother/a sister/a sibling
@@ -563,6 +564,7 @@ fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
 it: un nipote (dello sposo)/una nipote (dello sposo)
 nl: een neef/een nicht
 no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
+pt: um sobrinho/uma sobrinha
 se: en nev&ouml; (makens/makans nev&ouml;)/en niece (makens/makans niece)
 
     a nephew/a niece
@@ -589,6 +591,7 @@ fr: un beau-fils/une belle-fille
 it: un genero/una nuora
 nl: schoonzoon/schoondochter
 no: svigers&oslash;nn/svigerdatter
+pt: um genro/uma nora
 se: en m&aring;g/en sv&auml;rdotter
 
     a son/a daughter/a child
@@ -659,6 +662,7 @@ fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
 it: padre adottivo/madre adottiva/genitori adottivi
 nl: stiefvader/stiefmoeder/stiefouders
 no: adoptivfar/adoptivmor/adoptivforeldre
+pt: pai adoptivo/m&atilde;e adoptiva/pais adoptivos
 se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
@@ -670,6 +674,7 @@ fr: fils adoptif/fille adoptive/enfant adoptif
 it: figlio adottivo/figlia adottiva/figlio addotivo
 nl: geadopteerde zoon/geadopteerde dochter/adoptiekind
 no: adoptivs&oslash;nn/adoptivdatter/adoptivbarn
+pt: filho adoptivo/filha adoptiva/filho adoptivo
 se: adoptivson/adoptivdotter/adoptivbarn
 
     advanced request
@@ -833,6 +838,7 @@ fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
 it: uno zio (marito della zia)/una zia (moglie dello zio)
 nl: een oom/een tante
 no: onkel (tantes mann)/tante (onkels kone)
+pt: um tio/uma tia
 se: en farbror (fasters make)/en faster (farbrors maka)/en morbror (mosters make)/en moster (morbrors maka)
 
     an uncle/an aunt
@@ -981,6 +987,7 @@ fr: retour
 it: torna indietro
 nl: terug
 no: tilbake
+pt: back
 se: tillbaka
 
     baptism
@@ -1855,6 +1862,7 @@ es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
 it: padrino/madrina/padrini
 no: gudfar/gudmor/gudforeldre
+pt: padrinho/madrinha/padrinhos
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
@@ -1865,6 +1873,7 @@ es: fahijado/fahijada/fahihado(a)
 fr: filleul/filleule/filleul(e)
 it: figlioccio/figlioccia/figlioccio
 no: guds&oslash;nn/guddatter/gudbarn
+pt: afilhado/afilhada/afilhados
 se: gudson/guddotter/gudbarn
 
     grand-parents
@@ -3307,6 +3316,7 @@ fr: fils reconnu/fille reconnue/enfant reconnu
 it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 nl: aanvaarde zoon/aanvaarde dochter/aanvaar kind
 no: bekreftet s&oslash;nn/bekreftet datter/bekreftet barn
+pt: filho reconhecido/filha reconhecida/filhos reconhecidos
 se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
@@ -3326,6 +3336,7 @@ fr: relation/relations
 it: parentela
 nl: relatie/relaties
 no: slektskap/slektskap
+pt: rela&ccedil;a&atilde;o/rela&ccedil;&otilde;es
 se: relation/relationer
 
     relationship
@@ -3395,6 +3406,7 @@ es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
 it: parentele per matrimonio
 no: slektskap gjennom gifte
+pt: rela&ccedil;&otilde;es por casamento
 se: sl&auml;ktskap genom &auml;ktenskap
 
     see
@@ -3876,6 +3888,7 @@ es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
 it: il suocero/la suocera
 no: svigerfaren/svigermoren
+pt: o sogro/a sogra
 se: sv&auml;rfadern/sv&auml;rmodern
 
     the father/the mother/a parent
@@ -4038,6 +4051,7 @@ fr: l'&eacute;poux/l'&eacute;pouse
 it: lo sposo/la sposa
 nl: echtgenoot
 no: maken
+pt: o marido/a esposa
 se: maken/makan
 
     the whole list
@@ -4079,6 +4093,7 @@ fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 nl: gebruik "%s" om een familie toe te voegen
 no: for &aring; tilf&oslash;ye et barn til en familie, bruk "%s"
+pt: para acrescentar um filho a uma familia utilizar "%s"
 se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
     to the %s generation
