@@ -1,6 +1,6 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.19 2002-03-11 17:56:55 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: ascend.ml,v 4.20 2002-03-11 18:12:18 ddr Exp $ *)
+(* Copyright (c) 2002 INRIA *)
 
 open Config;
 open Def;
@@ -19,20 +19,20 @@ value limit_by_tree conf =
   | None -> 7 ]
 ;
 
-value niveau_max_ascendance conf base ip =
+value max_ancestor_level conf base ip =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
-  let rec loop niveau ip =
+  let rec loop level ip =
     if mark.(Adef.int_of_iper ip) then ()
     else do {
       mark.(Adef.int_of_iper ip) := True;
-      x.val := max x.val niveau;
+      x.val := max x.val level;
       match (aget conf base ip).parents with
       [ Some ifam ->
           let cpl = coi base ifam in
-          do { loop (succ niveau) cpl.father; loop (succ niveau) cpl.mother }
+          do { loop (succ level) cpl.father; loop (succ level) cpl.mother }
       | _ -> () ]
     }
   in
@@ -63,7 +63,7 @@ value text_level conf =
         (transl_nth conf "nth (generation)" i) ]
 ;
 
-value print_choice conf base p niveau_effectif =
+value print_choice conf base p effective_level =
   tag "form" "method=get action=\"%s\"" conf.command begin
     Util.hidden_env conf;
     Wserver.wprint "\n";
@@ -71,16 +71,16 @@ value print_choice conf base p niveau_effectif =
     wprint_hidden_person conf base "" p;
     tag "center" begin
       tag "select" "name=v" begin
-        let rec boucle i =
-          if i > niveau_effectif + 1 then ()
+        let rec loop i =
+          if i > effective_level + 1 then ()
           else do {
             Wserver.wprint "  <option value=%d%s> %s\n" i
               (if i == 0 then " selected" else "")
               (capitale (text_to conf i));
-            boucle (succ i)
+            loop (succ i)
           }
         in
-        boucle 1;
+        loop 1;
       end;
       Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
@@ -102,7 +102,7 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<input type=radio name=t value=T> %s\n"
             (capitale (transl conf "tree"));
           let limit = limit_by_tree conf in
-          if niveau_effectif < limit then ()
+          if effective_level < limit then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum") limit
               (transl_nth conf "generation/generations" 1);
@@ -120,7 +120,7 @@ value print_choice conf base p niveau_effectif =
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl_nth conf "list/list (ancestors)" 1));
-          if niveau_effectif < limit_by_list conf then ()
+          if effective_level < limit_by_list conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
               (limit_by_list conf)
@@ -128,7 +128,7 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=H> %s\n"
             (capitale (transl conf "horizontally"));
-          if niveau_effectif < limit_by_list conf then ()
+          if effective_level < limit_by_list conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
               (limit_by_list conf)
@@ -168,8 +168,8 @@ value print_choice conf base p niveau_effectif =
   end
 ;
 
-value afficher_menu_ascendants conf base p =
-  let niveau_effectif = niveau_max_ascendance conf base p.cle_index in
+value display_ancestor_menu conf base p =
+  let effective_level = max_ancestor_level conf base p.cle_index in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
     Wserver.wprint "%s"
@@ -180,7 +180,7 @@ value afficher_menu_ascendants conf base p =
   do {
     header conf title;
     tag "center" begin
-      print_choice conf base p niveau_effectif;
+      print_choice conf base p effective_level;
       html_p conf;
       Wserver.wprint
         (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
@@ -202,17 +202,17 @@ value afficher_menu_ascendants conf base p =
   }
 ;
 
-value afficher_ancetre conf base p =
+value display_ancestor conf base p =
   do {
     Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "%s" (Date.short_dates_text conf base p)
   }
 ;
 
-value afficher_ascendants_jusqu_a conf base niveau_max p =
-  let niveau_max = min (limit_by_list conf) niveau_max in
-  let rec boucle niveau ip =
-    if niveau < niveau_max then
+value display_ancestors_upto conf base max_level p =
+  let max_level = min (limit_by_list conf) max_level in
+  let rec loop level ip =
+    if level < max_level then
       let x = aget conf base ip in
       match x.parents with
       [ Some ifam ->
@@ -225,16 +225,16 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
             tag "ul" begin
               if know_fath then do {
                 Wserver.wprint "<li type=square> ";
-                afficher_ancetre conf base pere;
+                display_ancestor conf base pere;
                 Wserver.wprint "\n";
-                boucle (succ niveau) cpl.father
+                loop (succ level) cpl.father
               }
               else ();
               if know_moth then do {
                 Wserver.wprint "<li type=circle> ";
-                afficher_ancetre conf base mere;
+                display_ancestor conf base mere;
                 Wserver.wprint "\n";
-                boucle (succ niveau) cpl.mother
+                loop (succ level) cpl.mother
               }
               else ();
             end
@@ -251,14 +251,8 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
   in
   do {
     header conf title;
-(*
-    tag "nobr" begin
-*)
-      Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
-      boucle 1 p.cle_index;
-(*
-    end;
-*)
+    Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
+    loop 1 p.cle_index;
     trailer conf
   }
 ;
@@ -379,19 +373,19 @@ value will_print =
   | _ -> False ]
 ;
 
-value afficher_ascendants_numerotation conf base niveau_max p =
+value display_ancestors_with_numbers conf base max_level p =
   let mark = Array.create base.data.persons.len Num.zero in
   let cnt = ref 0 in
-  let rec generation niveau gpl =
-    if niveau <= niveau_max then do {
+  let rec generation level gpl =
+    if level <= max_level then do {
       html_li conf;
       Wserver.wprint "%s %d\n"
-        (capitale (transl_nth conf "generation/generations" 0)) niveau;
+        (capitale (transl_nth conf "generation/generations" 0)) level;
       tag "ul" begin
         List.iter (print_generation_person conf base cnt) gpl;
       end;
       let gpl = next_generation conf base mark gpl in
-      if List.exists will_print gpl then generation (niveau + 1) gpl else ()
+      if List.exists will_print gpl then generation (level + 1) gpl else ()
     }
     else ()
   in
@@ -405,7 +399,7 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
+    Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
     tag "ul" begin
       mark.(Adef.int_of_iper p.cle_index) := Num.one;
       generation 1 [GP_person Num.one p.cle_index None];
@@ -893,27 +887,27 @@ value print_notes conf base all_gp ws =
   | _ -> () ]
 ;
 
-value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
+value display_ancestors_with_numbers_long conf base max_level ws wn p =
   let only = p_getenv conf.env "only" = Some "on" in
   let mark = Array.create base.data.persons.len Num.zero in
-  let rec get_generations niveau gpll gpl =
+  let rec get_generations level gpll gpl =
     let gpll = [gpl :: gpll] in
-    if niveau < niveau_max then
+    if level < max_level then
       let next_gpl = next_generation conf base mark gpl in
       if List.exists will_print next_gpl then
-        get_generations (niveau + 1) gpll next_gpl
+        get_generations (level + 1) gpll next_gpl
       else gpll
     else gpll
   in
-  let rec generation niveau all_gp =
+  let rec generation level all_gp =
     fun
     [ [gpl :: gpll] ->
         do {
-          if not only || niveau = niveau_max then do {
+          if not only || level = max_level then do {
             tag "h3" begin
               Wserver.wprint "<em>%s %d</em>\n"
                 (capitale (transl_nth conf "generation/generations" 0))
-                niveau;
+                level;
             end;
             List.iter
               (print_generation_person_long conf base ws wn all_gp
@@ -923,7 +917,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
             html_br conf
           }
           else ();
-          generation (niveau + 1) all_gp gpll
+          generation (level + 1) all_gp gpll
         }
     | [] -> () ]
   in
@@ -937,7 +931,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
   do {
     header conf title;
     if only then ()
-    else Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
+    else Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
     mark.(Adef.int_of_iper p.cle_index) := Num.one;
     let gpll1 = get_generations 1 [] [GP_person Num.one p.cle_index None] in
     let gpll = List.rev gpll1 in
@@ -988,11 +982,11 @@ value print_ancestors_same_time_descendants conf base p a =
   in
   let mark = Array.create base.data.persons.len Num.zero in
   let cnt = ref 0 in
-  let rec generation niveau gpl =
+  let rec generation level gpl =
     if List.exists will_print gpl then do {
       html_li conf;
       Wserver.wprint "%s %d\n"
-        (capitale (transl_nth conf "generation/generations" 0)) niveau;
+        (capitale (transl_nth conf "generation/generations" 0)) level;
       tag "ul" begin
         List.iter
           (fun gp ->
@@ -1001,7 +995,7 @@ value print_ancestors_same_time_descendants conf base p a =
           gpl;
       end;
       let gpl = next_generation conf base mark gpl in
-      generation (niveau + 1) gpl
+      generation (level + 1) gpl
     }
     else ()
   in
@@ -1029,13 +1023,13 @@ value print_ancestors_same_time_descendants conf base p a =
   }
 ;
 
-value afficher_ascendants_niveau conf base niveau_max p =
+value display_ancestors_level conf base max_level p =
   let mark = Array.create base.data.persons.len Num.zero in
   let cnt = ref 0 in
-  let rec generation niveau gpl =
+  let rec generation level gpl =
     do {
       for i = 0 to base.data.persons.len - 1 do { mark.(i) := Num.zero };
-      if niveau < niveau_max then
+      if level < max_level then
         let gpl =
           List.map
             (fun gp ->
@@ -1067,10 +1061,10 @@ value afficher_ascendants_niveau conf base niveau_max p =
                | _ -> [gp :: gpl] ])
             gpl []
         in
-        generation (niveau + 1) gpl
+        generation (level + 1) gpl
       else do {
         html_li conf;
-        Wserver.wprint "%s\n" (capitale (text_level conf niveau_max));
+        Wserver.wprint "%s\n" (capitale (text_level conf max_level));
         tag "ul" begin
           List.iter (print_generation_person conf base cnt) gpl;
         end
@@ -1080,7 +1074,7 @@ value afficher_ascendants_niveau conf base niveau_max p =
   let title h =
     if h then
       Wserver.wprint "%s %d\n"
-        (capitale (transl_nth conf "generation/generations" 0)) niveau_max
+        (capitale (transl_nth conf "generation/generations" 0)) max_level
     else
       Wserver.wprint "%s"
         (capitale
@@ -1205,10 +1199,10 @@ value print_missing_ancestors conf base v spouses_included p =
   let after = p_getint conf.env "after" in
   let before = p_getint conf.env "before" in
   let mark = Array.create base.data.persons.len Num.zero in
-  let rec generation niveau gpl =
-    if niveau > v + 1 then ()
+  let rec generation level gpl =
+    if level > v + 1 then ()
     else if gpl <> [] then do {
-      let title = ref (Some niveau) in
+      let title = ref (Some level) in
       let gpl_to_print =
         List.fold_left
           (fun gpl gp ->
@@ -1234,7 +1228,7 @@ value print_missing_ancestors conf base v spouses_included p =
         gpl_to_print;
       if title.val = None then Wserver.wprint "</ul>\n" else ();
       let gpl = next_generation conf base mark gpl in
-      generation (niveau + 1) gpl
+      generation (level + 1) gpl
     }
     else ()
   in
@@ -1421,14 +1415,14 @@ value print_alphabetic_missing conf base spouses_included (surname, list) =
 
 value print_missing_ancestors_alphabetically conf base v spouses_included p =
   let mark = Array.create base.data.persons.len Num.zero in
-  let rec generation list niveau gpl =
-    if niveau > v then list
+  let rec generation list level gpl =
+    if level > v then list
     else if gpl <> [] then
       let list =
         List.fold_left (add_missing conf base spouses_included) list gpl
       in
       let gpl = next_generation conf base mark gpl in
-      generation list (niveau + 1) gpl
+      generation list (level + 1) gpl
     else list
   in
   let title h =
@@ -1889,15 +1883,9 @@ value print_horizontally conf base max_level p =
     print_link_to_welcome conf True;
     Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
     Wserver.wprint "<p>\n";
-(*
-    tag "nobr" begin
-*)
-      let suff13 = "&nbsp;&nbsp;&nbsp;" in
-      let suff2 = "--&nbsp;" in
-      loop 0 suff13 suff2 suff13 p.cle_index;
-(*
-    end;
-*)
+    let suff13 = "&nbsp;&nbsp;&nbsp;" in
+    let suff2 = "--&nbsp;" in
+    loop 0 suff13 suff2 suff13 p.cle_index;
     trailer conf
   }
 ;
@@ -2149,11 +2137,11 @@ value print_surnames_list conf base v p =
 
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
-  [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
+  [ (Some "L", Some v) -> display_ancestors_upto conf base v p
   | (Some "N", Some v) ->
       if p_getenv conf.env "only" = Some "on" then
-        afficher_ascendants_niveau conf base v p
-      else afficher_ascendants_numerotation conf base v p
+        display_ancestors_level conf base v p
+      else display_ancestors_with_numbers conf base v p
   | (Some "G", Some v) ->
       let ws =
         match p_getenv conf.env "siblings" with
@@ -2165,7 +2153,7 @@ value print conf base p =
         [ Some "on" -> True
         | _ -> False ]
       in
-      afficher_ascendants_numerotation_long conf base v ws wn p
+      display_ancestors_with_numbers_long conf base v ws wn p
   | (Some "M", Some v) ->
       let al =
         match p_getenv conf.env "al" with
@@ -2189,7 +2177,7 @@ value print conf base p =
       | (_, Some v) ->
           print_ancestors_same_time_descendants conf base p
             (pget conf base (Adef.iper_of_int v))
-      | _ -> afficher_menu_ascendants conf base p ]
+      | _ -> display_ancestor_menu conf base p ]
   | (Some "F", Some v) -> print_surnames_list conf base v p
-  | _ -> afficher_menu_ascendants conf base p ]
+  | _ -> display_ancestor_menu conf base p ]
 ;
