@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.16 2002-02-04 18:36:59 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.17 2002-02-14 10:19:37 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -129,74 +129,6 @@ value macro env =
       [ Not_found -> "%" ^ String.make 1 c ] ]
 ;
 
-value skip_lang s =
-  loop where rec loop i =
-    if i = String.length s then None
-    else
-      match s.[i] with
-      [ 'a'..'z' | '-' -> loop (i + 1)
-      | _ -> Some i ]
-;
-
-value inline_translate ic env lang =
-  let s =
-    loop 0 (input_char ic) where rec loop len c =
-      if c = ']' then Buff.get len
-      else loop (Buff.store len c) (input_char ic)
-  in
-  let lang = lang ^ ":" in
-  let derived_lang =
-    match Gutil.lindex lang '-' with
-    [ Some i -> String.sub lang 0 i ^ ":"
-    | _ -> "" ]
-  in
-  let rec loop alt_version bol i =
-    if i = String.length s then
-      match alt_version with
-      [ Some s -> s
-      | None -> ".........." ]
-    else if bol then
-      match skip_lang s i with
-      [ Some j when s.[j] = ':' ->
-          let curr_lang = String.sub s i (j + 1 - i) in
-          if curr_lang = lang || curr_lang = derived_lang ||
-             curr_lang = "en:" then
-            let (s, i) =
-              let j = if s.[j + 1] = ' ' then j + 1 else j in
-              let rec loop len j =
-                if j = String.length s then (Buff.get len, j)
-                else if s.[j] = '\n' then
-                  if j + 1 < String.length s && s.[j + 1] = ' ' then
-                    let j =
-                      loop (j + 1) where rec loop j =
-                        if j < String.length s && s.[j] = ' ' then
-                          loop (j + 1)
-                        else j
-                    in
-                    loop (Buff.store len '\n') j
-                  else (Buff.get len, j)
-                else if s.[j] == '%' then
-                  loop (Buff.mstore len (macro env s.[j + 1])) (j + 2)
-                else loop (Buff.store len s.[j]) (j + 1)
-              in
-              loop 0 (j + 1)
-            in
-            if curr_lang = lang then s
-            else
-              let alt_version =
-                if curr_lang = derived_lang then Some s
-                else if alt_version = None then
-                  let s = if s = "" then s else "[" ^ s ^ "]" in Some s
-                else alt_version
-              in
-              loop alt_version True i
-          else loop alt_version (s.[i] = '\n') (i + 1)
-      | _ -> loop alt_version (s.[i] = '\n') (i + 1) ]
-    else loop alt_version (s.[i] = '\n') (i + 1)
-  in
-  loop None True 0
-;
-
 value get_variable ic =
   loop 0 where rec loop len =
     match input_char ic with
@@ -250,7 +182,13 @@ value copy_template genv (varenv, filenv) env fname =
         | '[' ->
             let s =
               let c = input_char ic in
-              if c = '\n' then inline_translate ic env lang
+              if c = '\n' then
+                let s =
+                  loop 0 (input_char ic) where rec loop len c =
+                    if c = ']' then Buff.get len
+                    else loop (Buff.store len c) (input_char ic)
+                in
+                Translate.inline lang '%' (macro env) s
               else "[" ^ String.make 1 c
             in
             print_string s

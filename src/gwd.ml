@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.25 2002-02-02 05:17:28 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.26 2002-02-14 10:19:40 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -344,7 +344,10 @@ value print_renamed conf new_n =
   in
   match Util.open_etc_file "renamed" with
   [ Some ic ->
-      do { Util.html conf; Util.copy_from_etc env conf.indep_command ic; }
+      do {
+        Util.html conf;
+        Util.copy_from_etc env conf.lang conf.indep_command ic;
+      }
   | None ->
       let title _ = Wserver.wprint "%s -&gt; %s" conf.bname new_n in
       do {
@@ -383,7 +386,8 @@ value print_redirected conf from request new_addr =
     match Util.open_etc_file "redirect" with
     [ Some ic ->
         do {
-          Util.html conf; Util.copy_from_etc env conf.indep_command ic;
+          Util.html conf;
+          Util.copy_from_etc env conf.lang conf.indep_command ic;
         }
     | None ->
         let title _ = Wserver.wprint "Address changed" in
@@ -456,7 +460,10 @@ value general_welcome conf =
   match Util.open_etc_file "index" with
   [ Some ic ->
       let env = [('w', fun _ -> Util.link_to_referer conf)] in
-      do { Util.html conf; Util.copy_from_etc env conf.indep_command ic; }
+      do {
+        Util.html conf;
+        Util.copy_from_etc env conf.lang conf.indep_command ic;
+      }
   | None -> propose_base conf ]
 ;
 
