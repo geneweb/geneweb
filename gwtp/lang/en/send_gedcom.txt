@@ -1,0 +1,21 @@
+<head><title>Gwtp - upload %b</title></head>
+<body>
+<h1 align=center>Gwtp - upload %b</h1>
+<form method=POST action="%s" enctype="multipart/form-data">
+<input type=hidden name=m value=SEND_GEDCOM>
+<input type=hidden name=b value=%b>
+<input type=hidden name=t value=%t>
+
+<div align=right>
+<a href="%s?m=UPG;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=UPG;b=%b;t=%t;lang=fr">Français</a>
+</div><p>
+
+Select your GEDCOM file:<br><p>
+
+<input type=file name=gedcom size=60><br><p>
+
+<p>
+
+<input type=submit value=Send>
+</form>
