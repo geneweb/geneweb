@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.20 2000-04-05 12:16:35 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.21 2000-04-23 07:38:53 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -164,13 +164,13 @@ Suche</b></font></a>.
 <li>die <a href="%sm=AN">Geburtstage</a>
 <li>die <a href="%sm=AD">Jahrestage der verstorbenen Personen</a>
 <li>die <a href="%sm=AM">Hochzeitstage</a>%I|wf
-<li>die <a href="%sm=LB">letzten Geburten</a>%E
+<li>die <a href="%sm=LB;k=%m">letzten Geburten</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>die <a href="%sm=LD">letzten Ableben</a>
-<li>die <a href="%sm=LM">letzten Heiraten</a>%E%Ih
+<li>die <a href="%sm=LD;k=%m">letzten Ableben</a>
+<li>die <a href="%sm=LM;k=%m">letzten Heiraten</a>%E%Ih
 <li>die <a href="%sm=HIST;k=10">Chronik der Aktualisierungen</a>%E
 <li>den <a href="%sm=CAL">Kalender</a>
 <li>das <a href="%sm=FORUM">Datenbankforum</a>

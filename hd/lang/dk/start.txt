@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.28 2000-04-05 12:16:35 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.29 2000-04-23 07:38:54 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -171,13 +171,13 @@ søgning</b></font></a>.
 <li><a href="%sm=AN">&aring;rsdage for f&oslash;dsler</a>
 <li><a href="%sm=AD">&aring;rsdage for d&oslash;de personer</a>
 <li><a href="%sm=AM">&aring;rsdage for bryllupper</a>%I|wf
-<li><a href="%sm=LB">seneste f&oslash;dsler</a>%E
+<li><a href="%sm=LB;k=%m">seneste f&oslash;dsler</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li><a href="%sm=LD">seneste d&oslash;dsfald</a>
-<li><a href="%sm=LM">seneste bryllupper</a>%E%Ih
+<li><a href="%sm=LD;k=%m">seneste d&oslash;dsfald</a>
+<li><a href="%sm=LM;k=%m">seneste bryllupper</a>%E%Ih
 <li><a href="%sm=HIST;k=10">opdateringers historie</a>%E
 <li><a href="%sm=CAL">kalendere</a>
 <li><a href="%sm=FORUM">database-forum</a>

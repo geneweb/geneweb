@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.25 2000-04-05 12:16:37 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.26 2000-04-23 07:38:56 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -164,13 +164,13 @@ color=%i><b>erityishaulla</b></font></a>.
 <li><a href="%sm=AN">syntym‰p‰ivi‰</a>
 <li><a href="%sm=AD">vainajien muistop&auml;ivi&auml</a>
 <li><a href="%sm=AM">h‰‰p‰ivi‰</a>%I|wf
-<li><a href="%sm=LB">viime syntym&auml;t</a>%E
+<li><a href="%sm=LB;k=%m">viime syntym&auml;t</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li><a href="%sm=LD">viime kuolemat</a>
-<li><a href="%sm=LM">viime naimisiinmenot</a>%E%Ih
+<li><a href="%sm=LD;k=%m">viime kuolemat</a>
+<li><a href="%sm=LM;k=%m">viime naimisiinmenot</a>%E%Ih
 <li><a href="%sm=HIST;k=10">p&auml;ivityshistorian</a>%E
 <li><a href="%sm=CAL">eri kalenterit</a>
 <li><a href="%sm=FORUM">tietokantafoorumin</a>

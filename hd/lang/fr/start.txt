@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.26 2000-04-05 12:16:37 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.27 2000-04-23 07:38:56 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -173,13 +173,13 @@ par
 <li>les <a href="%sm=AD">anniversaires des personnes
 d&eacute;c&eacute;d&eacute;es</a>
 <li>les <a href="%sm=AM">anniversaires de mariage</a>%I|wf
-<li>les <a href="%sm=LB">derni&egrave;res naissances</a>%E
+<li>les <a href="%sm=LB;k=%m">derni&egrave;res naissances</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>les <a href="%sm=LD">derniers d&eacute;c&egrave;s</a>
-<li>les <a href="%sm=LM">derniers mariages</a>%E%Ih
+<li>les <a href="%sm=LD;k=%m">derniers d&eacute;c&egrave;s</a>
+<li>les <a href="%sm=LM;k=%m">derniers mariages</a>%E%Ih
 <li>l'<a href="%sm=HIST;k=10">historique des mises-&agrave;-jour</a>%E
 <li>les <a href="%sm=CAL">calendriers</a>
 <li>le <a href="%sm=FORUM">forum de la base de donn&eacute;es</a>

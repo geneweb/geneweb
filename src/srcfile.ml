@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.14 2000-04-16 21:30:48 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.15 2000-04-23 07:38:59 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -254,6 +254,12 @@ value rec copy_from_channel conf base ic =
           | 'j' -> include_hed_trl conf ".hed"
           | 'k' -> Wserver.wprint "%s" conf.indep_command
           | 'l' -> Wserver.wprint "%s" conf.lang
+          | 'm' ->
+              Wserver.wprint "%d"
+                (try
+                   int_of_string (List.assoc "latest_event" conf.base_env)
+                 with
+                 [ Not_found | Failure _ -> 20 ])
           | 'n' ->
               Num.print (fun x -> Wserver.wprint "%s" x)
                 (transl conf "(thousand separator)")

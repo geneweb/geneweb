@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.23 2000-04-05 12:16:36 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.24 2000-04-23 07:38:54 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -171,13 +171,13 @@ request</b></font></a>.
 <li>the <a href="%sm=AN">birthday anniversaries</a>
 <li>the <a href="%sm=AD">death anniversaries</a>
 <li>the <a href="%sm=AM">marriage anniversaries</a>%I|wf
-<li>the <a href="%sm=LB">latest births</a>%E
+<li>the <a href="%sm=LB;k=%m">latest births</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>the <a href="%sm=LD">latest deaths</a>
-<li>the <a href="%sm=LM">latest marriages</a>%E%Ih
+<li>the <a href="%sm=LD;k=%m">latest deaths</a>
+<li>the <a href="%sm=LM;k=%m">latest marriages</a>%E%Ih
 <li>the <a href="%sm=HIST;k=10">history of updates</a>%E
 <li>the <a href="%sm=CAL">calendars</a>
 <li>the <a href="%sm=FORUM">data base forum</a>

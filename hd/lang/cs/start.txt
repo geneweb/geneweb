@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.19 2000-04-05 12:16:35 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.20 2000-04-23 07:38:53 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -164,13 +164,13 @@ dotaz</b></font></a>.
 <li>{the} <a href="%sm=AN">výroèí narozenin</a>
 <li>{the} <a href="%sm=AD">výroèí úmrtí</a>
 <li>{the} <a href="%sm=AM">výroèí sòatkù</a>%I|wf
-<li>{the} <a href="%sm=LB">nedávná narození</a>%E
+<li>{the} <a href="%sm=LB;k=%m">nedávná narození</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>{the} <a href="%sm=LD">nedávná úmrtí</a>
-<li>{the <a href="%sm=LM">latest marriages</a>}%E%Ih
+<li>{the} <a href="%sm=LD;k=%m">nedávná úmrtí</a>
+<li>{the <a href="%sm=LM;k=%m">latest marriages</a>}%E%Ih
 <li>{the} <a href="%sm=HIST;k=10">{history of updates}</a>%E
 <li>{the} <a href="%sm=CAL">{calendars}</a>
 <li>{the} <a href="%sm=FORUM">{data base forum}</a>

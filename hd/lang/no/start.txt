@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.21 2000-04-05 12:16:40 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.22 2000-04-23 07:38:57 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -166,13 +166,13 @@ s&oslash;king</b></font></a>.
 <li><a href="%sm=AN">f&oslash;dselsdager</a>
 <li><a href="%sm=AD">&aring;rsdager for d&oslash;de personer</a>
 <li><a href="%sm=AM">bryllupsdager</a>%I|wf
-<li><a href="%sm=LB">sist f&oslash;dte</a>%E
+<li><a href="%sm=LB;k=%m">sist f&oslash;dte</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li><a href="%sm=LD">sist d&oslash;de</a>
-<li>{the <a href="%sm=LM">latest marriages</a>}%E%Ih
+<li><a href="%sm=LD;k=%m">sist d&oslash;de</a>
+<li>{the <a href="%sm=LM;k=%m">latest marriages</a>}%E%Ih
 <li><a href="%sm=HIST;k=10">oppdateringshistorie</a>%E
 <li><a href="%sm=CAL">kalendere</a>
 <li><a href="%sm=FORUM">database forum</a>
