@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.110 1999-08-08 23:40:49 ddr Exp $
+# $Id: lexicon.txt,v 2.111 1999-08-10 08:24:35 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1863,6 +1863,7 @@ en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
 it: padrino/madrina/padrini
+nl: peter/meter
 no: gudfar/gudmor/gudforeldre
 pt: padrinho/madrinha/padrinhos
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
@@ -3891,6 +3892,7 @@ en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
 it: il suocero/la suocera
+nl: de schoonvader/de schoonmoeder
 no: svigerfaren/svigermoren
 pt: o sogro/a sogra
 se: sv&auml;rfadern/sv&auml;rmodern
