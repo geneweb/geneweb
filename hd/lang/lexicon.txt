@@ -1629,6 +1629,14 @@ nl: naam "%s.%d %s" is al gebruikt door %tdit persoon%t
 pt: apelido "%s.%d %s" j&aacute; utilizado por %testa persona%t
 se: namn "%s.%d %s" anv&auml;nds redan av %tdenna person%t
 
+    navigation with %t as Sosa reference
+de: Navigation mit %t als Referenz Sosa
+en: navigation with %t as Sosa reference
+es: navegaci&oacute;n con %t como referencia de Sosa
+fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
+it: percorso con %t come riferimento Sosa
+pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
+
     no anniversary
 de: kein Jahrestag
 en: no anniversary

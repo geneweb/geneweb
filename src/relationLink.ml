@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.2 1998-11-04 13:52:33 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.3 1998-12-02 15:46:36 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -104,6 +104,8 @@ value leq = ref (fun []);
 module Pq =
   Pqueue.Make (struct type t = int; value leq x y = leq.val x y; end)
 ;
+
+value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 
 value make_dist_tab base ia maxlev =
   if maxlev <= threshold.val then
@@ -339,19 +341,28 @@ value print_relation conf base ip1 ip2 =
         let b2 = find_first_branch base dist ip l2 ip2 Neutre in
         Some (ip, (poi base ip).sexe, dist, b1, b2, 1, 1)
     | _ ->
-        match
-          (p_getenv conf.env "b1", p_getenv conf.env "b2",
-           p_getint conf.env "c1", p_getint conf.env "c2")
-        with
-        [ (Some b1str, Some b2str, Some c1, Some c2) ->
+        match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
+        [ (Some b1str, Some b2str) ->
             let n1 = Num.of_string b1str in
             let n2 = Num.of_string b2str in
             match (branch_of_num base ip1 n1, branch_of_num base ip2 n2) with
             [ ([(ia1, sa1) :: b1], [(ia2, sa2) :: b2]) ->
                 if ia1 == ia2 then
+                  let c1 =
+                    match p_getint conf.env "c1" with
+                    [ Some n -> n
+                    | None -> 0 ]
+                  in
+                  let c2 =
+                    match p_getint conf.env "c2" with
+                    [ Some n -> n
+                    | None -> 0 ]
+                  in
                   let dist =
-                    let maxlev = max (List.length b1) (List.length b2) + 1 in
-                    make_dist_tab base ia1 maxlev
+                    if c1 > 0 || c2 > 0 then
+                      let maxlev = max (List.length b1) (List.length b2) + 1 in
+                      make_dist_tab base ia1 maxlev
+                    else phony_dist_tab
                   in
                   Some (ia1, sa1, dist, Some b1, Some b2, c1, c2)
                 else None
@@ -361,13 +372,17 @@ value print_relation conf base ip1 ip2 =
   match params with
   [ Some (ip, sp, dist, Some b1, Some b2, c1, c2) ->
       let pb1 =
-         if c1 == 1 then None else find_prev_branch base dist ip sp b1
+        if c1 <= 1 then None else find_prev_branch base dist ip sp b1
       in
-      let nb1 = find_next_branch base dist ip sp b1 in
+      let nb1 =
+        if c1 == 0 then None else find_next_branch base dist ip sp b1
+      in
       let pb2 =
-        if c2 == 1 then None else find_prev_branch base dist ip sp b2
+        if c2 <= 1 then None else find_prev_branch base dist ip sp b2
       in
-      let nb2 = find_next_branch base dist ip sp b2 in
+      let nb2 =
+        if c2 == 0 then None else find_next_branch base dist ip sp b2
+      in
       let title _ =
         do Wserver.wprint "Lien de parent&eacute;";
            match (pb1, nb1) with
