@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.10 2000-05-18 01:07:09 ddr Exp $ *)
+(* $Id: place.ml,v 3.11 2000-07-19 12:40:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -28,7 +28,12 @@ value fold_place inverted s =
     if String.length s > 0 && s.[String.length s - 1] == ')' then
       match Gutil.rindex s '(' with
       [ Some i when i < String.length s - 2 ->
-          (i, [String.sub s (i + 1) (String.length s - i - 2)])
+          let j =
+            loop (i - 1) where rec loop i =
+              if i >= 0 && s.[i] = ' ' then loop (i - 1)
+              else (i + 1)
+          in
+          (j, [String.sub s (i + 1) (String.length s - i - 2)])
       | _ -> (String.length s, []) ]
     else (String.length s, [])
   in
@@ -159,6 +164,16 @@ value print_html_places_surnames conf base =
                (fun (_, _, sn1) (_, _, sn2) ->
                   Iobase.name_key sn1 <= Iobase.name_key sn2)
                snl
+           in
+           let snl =
+             List.fold_right
+               (fun (len, p, sn) ->
+                  fun
+                  [ [(len1, p1, sn1) :: snl] ->
+                      if sn = sn1 then [(len + len1, p, sn) :: snl]
+                      else [(len, p, sn); (len1, p1, sn1) :: snl]
+                  | [] -> [(len, p, sn)] ])
+               snl []
            in
            List.iter
              (fun (len, p, sn) ->
