@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.9 1998-12-16 17:36:40 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.10 1998-12-18 10:29:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -72,21 +72,13 @@ value rec print_one_branch conf base ipl1 =
       [ [(ip1, _) :: ipl1] -> (Some ip1, ipl1)
       | [] -> (None, []) ]
     in
-    do tag "tr" begin
-         stag "td" "align=center" begin
-           match ip1 with
-           [ Some ip1 -> Wserver.wprint "|"
-           | None -> () ];
-         end;
-         Wserver.wprint "\n";
-       end;
-       tag "tr" begin
-         tag "td" "align=center" begin
-           match ip1 with
-           [ Some ip1 -> print_someone conf base ip1
-           | None -> () ];
-         end;
-       end;
+    do match ip1 with
+       [ Some ip1 -> Wserver.wprint "|<br>\n"
+       | None -> () ];
+       match ip1 with
+       [ Some ip1 ->
+           do print_someone conf base ip1; Wserver.wprint "<br>\n"; return ()
+       | None -> () ];
     return print_one_branch conf base ipl1
 ;
 
@@ -230,15 +222,6 @@ value rec next_branch_same_len base dist backward missing ia sa ipl =
     | None -> next_branch_same_len base dist True missing ia sa ipl ]
 ;
 
-(*
-value text_of_sex =
-  fun
-  [ Masculine -> "Masculine"
-  | Feminine -> "Feminine"
-  | Neuter -> "Neuter" ]
-;
-*)
-
 value find_next_branch base dist ia sa ipl =
   loop ia sa ipl where rec loop ia1 sa1 ipl =
     match next_branch_same_len base dist True 0 ia1 sa1 ipl with
@@ -292,45 +275,40 @@ value print_sign conf sign ip sp i1 i2 b1 b2 c1 c2 =
   return ()
 ;
 
-value print_prev_next conf base ip sp i1 i2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
-  tag "tr" begin
-    if b1 <> [] then
-      tag "td" begin
-        Wserver.wprint "<br>\n";
-        match pb1 with
-        [ Some b1 ->
-            let sign = "&lt;&lt;" in
-            print_sign conf sign ip sp i1 i2 b1 b2 (c1 - 1) c2
-        | _ -> () ];
-        match (pb1, nb1) with
-        [ (None, None) -> ()
-        | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c1 ];
-        match nb1 with
-        [ Some b1 ->
-            let sign = "&gt;&gt;" in
-            print_sign conf sign ip sp i1 i2 b1 b2 (c1 + 1) c2
-        | _ -> () ];
-      end
-    else ();
-    if b2 <> [] then
-      tag "td" begin
-        Wserver.wprint "<br>\n";
-        match pb2 with
-        [ Some b2 ->
-            let sign = "&lt;&lt;" in
-            print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 - 1)
-        | _ -> () ];
-        match (pb2, nb2) with
-        [ (None, None) -> ()
-        | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c2 ];
-        match nb2 with
-        [ Some b2 ->
-            let sign = "&gt;&gt;" in
-            print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 + 1)
-        | _ -> () ];
-      end
-    else ();
-  end
+value print_prev_next_1 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
+  do Wserver.wprint "<br>\n";
+     match pb with
+     [ Some b1 ->
+         let sign = "&lt;&lt;" in
+         print_sign conf sign ip sp i1 i2 b1 b2 (c1 - 1) c2
+     | _ -> () ];
+     match (pb, nb) with
+     [ (None, None) -> ()
+     | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c1 ];
+     match nb with
+     [ Some b1 ->
+         let sign = "&gt;&gt;" in
+         print_sign conf sign ip sp i1 i2 b1 b2 (c1 + 1) c2
+     | _ -> () ];
+  return ()
+;
+
+value print_prev_next_2 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
+  do Wserver.wprint "<br>\n";
+     match pb with
+     [ Some b2 ->
+         let sign = "&lt;&lt;" in
+         print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 - 1)
+     | _ -> () ];
+     match (pb, nb) with
+     [ (None, None) -> ()
+     | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c2 ];
+     match nb with
+     [ Some b2 ->
+         let sign = "&gt;&gt;" in
+         print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 + 1)
+     | _ -> () ];
+  return ()
 ;
 
 value print_other_parent_if_same conf base ip b1 b2 =
@@ -424,17 +402,20 @@ value print_relation conf base ip1 ip2 =
         return ()
       in
       do header_no_page_title conf title;
-         tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
-           if b1 = [] || b2 = [] then
-             let b = if b1 = [] then b2 else b1 in
-             do tag "tr" begin
-                  stag "td" "align=center" begin
-                    print_someone conf base ip;
-                  end;
-                end;
+         if b1 = [] || b2 = [] then
+           let b = if b1 = [] then b2 else b1 in
+           do tag "center" begin
+                print_someone conf base ip;
+                Wserver.wprint "<br>\n";
                 print_one_branch conf base b;
-             return ()
-           else
+              end;
+              if b1 <> [] then
+                print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 nb1
+              else
+                print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb2 nb2;
+           return ()
+         else
+           tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
              do tag "tr" begin
                   stag "td" "colspan=2 align=center" begin
                     print_someone conf base ip;
@@ -455,8 +436,21 @@ value print_relation conf base ip1 ip2 =
                 end;
                 print_both_branches conf base b1 b2;
              return ();
-           print_prev_next conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2;
-         end;
+             tag "tr" begin
+               if b1 <> [] then
+                 tag "td" begin
+                   print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
+                     pb1 nb1;
+                 end
+               else ();
+               if b2 <> [] then
+                 tag "td" begin
+                   print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
+                     pb2 nb2;
+                 end
+               else ();
+             end;
+           end;
          trailer conf;
       return ()
   | _ ->
