@@ -27,7 +27,8 @@ GeneWeb version 3.12
     %father_age_at_birth; and %mother_age_at_birth;
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
-  - [19 Feb 01] Updated Estonian version entries of lexicon (Hanno Kuus)
+  - [19 Feb 01] Updated several lexicon entries in Estonian (Hanno
+    Kuus)
   - [16 Feb 01] In all welcome pages, suppressed the text "or surname" in
     the first choice of the first case. But it goes on searching up by
     surname, if no complete name is found.
