@@ -29,6 +29,7 @@ GeneWeb Version 1.11
     y) was interpreted as "x|y" (x or y) 2. did not accept "d/m/y..y".
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Feb 3, 99] No more message "Not implemented SUBM".
   - [Feb 1, 99] Accept now "BET x AND" as "AFT x" and "BET AND x" as "BEF x".
   - [Feb 1, 99] Fixed bug: date intervals did not work (generating "maybe").
 
