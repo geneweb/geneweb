@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: gwb2ged.htm,v 1.1 2002-01-13 23:35:14 ddr Exp $ -->
+  <title>
+[
+de: GEDCOM-Datei extrahieren
+en: Extract a GEDCOM file
+es: Extracci&oacute;n de un fichero GEDCOM
+fr: Extraction d'un fichier GEDCOM
+lv: Izveidot GEDCOM datni
+sv: Exportera en GEDCOM-fil
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>Gwb2ged:<br>[
+de: GEDCOM-Datei extrahieren
+en: Extract a GEDCOM file
+es: Extracci&oacute;n de un fichero GEDCOM
+fr: Extraction d'un fichier gedcom
+lv: Izveidot GEDCOM datni
+sv: Exportera en GEDCOM-fil
+]</font></h1></center>
+
+<form method=GET action="gwb2ged">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+[
+de: W&auml;hle deine Datenbank:
+en: Select your database:
+es: Seleccione Ud. su base de datos :
+fr: S&eacute;lectionnez votre base de donn&eacute;es:
+lv: Izvçlieties datu bâzi:
+sv: Välj din databas:
+]
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>- [
+de: keine Datenbank vorhanden
+en: there is no database at present
+es: actualmente ninguna base de datos existente
+fr: il n'y a aucune base de donn&eacute;es actuellement
+lv: nav nevienas datu bâzes
+sv: det finns ingen databas för tillfället
+]</tr></td>}
+
+</table></dl>
+
+<p>
+
+[
+de: Gib den Namen ein, den du deiner GEDCOM-Datei geben m&ouml;chtest.
+    Falls du nichts eingibst, verwenden wir den Namen deiner Datenbank,
+    gefolgt von der Endung 
+en: Enter the name you want to give to your GEDCOM file. If you write
+    nothing, it will be the name of the database ended by the suffix
+es: Entre Ud el nombre que desea dar a su fichero GEDCOM.
+    Si Ud no mete nada, el nombre utilizado ser&aacute; el nombre de la
+    base seguida del sufijo
+fr: Entrez le nom que vous voulez donner &agrave; votre fichier GEDCOM.
+    Si vous ne mettez rien, ce sera le nom de la base suivi du suffixe
+lv: Ierakstiet Jûsu izvçlçto GEDCOM datnes nosaukumu. Ja Jûs to
+    neierakstîsiet datne tiks nosaukta tâdâ paðâ vârdâ, kâ datu bâze ar
+    paplaðinâjumu
+sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
+    någonting, kommer det att bli samma namn som databasen avslutat med
+] "<tt>.ged</tt>".
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+[
+de: W&auml;hle die gew&uuml;nschten Optionen:
+en: Select the options you want:
+es: Seleccione Ud. las opciones deseadas:
+fr: S&eacute;lectionnez les options que vous d&eacute;sirez:
+lv: Ivçlçties nepiecieðamos izveides parametrus:
+sv: Välj de optioner du vill ha:
+]
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td>
+<input type=radio name=charset value=ASCII checked>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Kodiere die Zeichen in ASCII.
+en: Encode the characters in ASCII.
+es: Codificar los car&aacute;cteres en ASCII.
+fr: Coder les caract&egrave;res en ASCII.
+lv: Burti ASCII kodçjumâ.
+sv: Koda tecknen i ASCII.
+]</td>
+</tr>
+
+<tr><td>
+<input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Kodiere die Zeichen in ANSEL.
+en: Encode the characters in ANSEL.
+es: Codificar los car&aacute;cteres en ANSEL.
+fr: Coder les caract&egrave;res en ANSEL.
+lv: Burti ANSEL kodçjumâ.
+sv: Koda tecknen i ANSEL.
+]</td>
+</tr>
+
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: W&auml;hrend der Operation sparsam mit dem Speicher umgehen
+    (ist aber langsamer).
+en: Save the memory space during the operation (but it will be slower).
+es: Economizar el espacio-memoria durante la operaci&oacute;n
+    (pero esta sera mas lenta).
+fr: &Eacute;conomiser l'espace m&eacute;moire pendant l'op&eacute;ration
+    (mais ce sera plus lent).
+lv: Darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
+sv: Spara minne under operationen (men det kommer att gå saktare).
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>[
+de: Nur die Vorfahren ausw&auml;hlen von...
+en: Extract only the ancestors of...
+es: Extraer solamente los antepasados de...
+fr: N'extraire que les anc&ecirc;tres de...
+lv: Izmantot tikai...
+sv: Exportera endast anorna till...
+]</td></tr>
+
+<tr><td>[
+de: Vorname
+en: First name
+es: Nombre
+fr: Pr&eacute;nom
+lv: Vârds
+sv: Förnamn
+]</td>
+<td><input name="a1" size=30 maxlength=200></td>
+
+<td>N[
+de: r
+en: um
+es: &uacute;m
+fr: um
+lv: r
+sv: ummer
+]</td>
+<td><input name="a2" size=5 maxlength=8></td>
+</tr>
+
+<tr><td>[
+de: Nachname
+en: Surname
+es: Apellido
+fr: Nom
+lv: Uzvârds
+sv: Efternamn
+]</td>
+<td colspan=3><input name="a3" size=40 maxlength=200></td>
+</tr>
+
+[
+de: 
+en: 
+es: 
+fr: 
+lv: <tr><td>&nbsp;</td><td colspan=3>...vecâkus</td></tr>
+sv: 
+]</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>[
+de: Nur die Nachkommen ausw&auml;hlen von...
+en: Extract only the descendants of...
+es: Extraer solamente los descendientes de...
+fr: N'extraire que les descendants de...
+lv: Izmantot tikai...
+]</td>
+</tr>
+
+<tr><td>[
+de: Vorname
+en: First name
+es: Nombre
+fr: Pr&eacute;nom
+lv: Vârds
+]</td>
+<td><input name="d1" size=30 maxlength=200></td>
+
+<td>[
+de: Nr
+en: Num
+es: N&uacute;m
+fr: Num
+lv: Nr
+]</td>
+<td><input name="d2" size=5 maxlength=8></td></tr>
+
+<tr><td>[
+de: Nachname
+en: Surname
+es: Apellido
+fr: Nom
+lv: Uzvârds
+]
+</td>
+<td colspan=3><input name="d3" size=40 maxlength=200></td>
+
+</tr>
+</table></dl>
+
+<dl><dt><dd>[
+de: Falls du oben beide Optionen gew&auml;hlt hast, wird die Schnittmenge
+    extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
+    einen und Nachkommen des anderen sind.
+en: If you use both above options, the intersection is assumed:
+    persons <em>at the same time</em> ancestors of the one and descendants
+    of the other.
+es: Si Ud. utiliza las dos opciones indicadas m&aacute;s arriba, la
+    intercepci&oacute;n de estas ser&aacute; la que contar&aacute;:
+    personas <em>al mismo tiempo</em>
+    antepasados del uno y descendientes del otro.
+fr: Si vous utilisez les deux options ci-dessus, c'est
+    l'intersection qui comptera: personnes <em>&agrave; la fois</em>
+    anc&ecirc;tres de l'un et descendants de l'autre.
+lv: Ja Jûs lietosiet abus iepriekðçjos parametrus, tiek izmantota
+    pârklâðanâs: t.i. personas, kas <em>vienlaicîgi </em> ir vienam
+    senèi un otram pçcteèi.
+sv: Om du väljer de båda valen ovan, kommer
+    överlappning att antas: personer <em>som samtidigt</em> är
+    anor av den ena och ättlingar av den andra.
+]</dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke diesen Knopf:
+en: Then push this button:
+es: Finalmente apoye en el bot&oacute;n:
+fr: Puis appuyez sur ce bouton:
+lv: Tad nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+de: Extrahieren
+en: Extract
+es: Extraer
+fr: Extraire
+lv: Extract
+sv: Exportera
+]">
+
+</form>
