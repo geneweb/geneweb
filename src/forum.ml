@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.34 2004-03-03 10:29:36 ddr Exp $ *)
+(* $Id: forum.ml,v 4.35 2004-04-17 03:08:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -11,6 +11,7 @@ type message =
   { m_time : string;
     m_ident : string;
     m_wizard : string;
+    m_friend : string;
     m_email : string;
     m_access : string;
     m_subject : string;
@@ -182,6 +183,7 @@ value print_headers conf =
                 let (_, s) = get_var ic "From:" s in
                 let (ident, s) = get_var ic "Ident:" s in
                 let (wizard, s) = get_var ic "Wizard:" s in
+                let (_, s) = get_var ic "Friend:" s in
                 let (_, s) = get_var ic "Email:" s in
                 let (access, s) = get_var ic "Access:" s in
                 let (subject, s) = get_var ic "Subject:" s in
@@ -293,6 +295,7 @@ value get_message conf pos =
             let (_, s) = get_var ic "From:" s in
             let (ident, s) = get_var ic "Ident:" s in
             let (wizard, s) = get_var ic "Wizard:" s in
+            let (friend, s) = get_var ic "Friend:" s in
             let (email, s) = get_var ic "Email:" s in
             let (access, s) = get_var ic "Access:" s in
             let (subject, s) = get_var ic "Subject:" s in
@@ -308,8 +311,8 @@ value get_message conf pos =
             if ident <> "" then
               let m =
                 {m_time = time; m_ident = ident; m_wizard = wizard;
-                 m_email = email; m_access = access; m_subject = subject;
-                 m_mess = mess}
+                 m_friend = friend; m_email = email; m_access = access;
+                 m_subject = subject; m_mess = mess}
               in
               Some (m, ic_len - pos_in ic, ic_len)
             else None
@@ -548,6 +551,9 @@ value forum_add conf base ident comm =
         if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
         then
           fprintf oc "Wizard: %s\n" conf.user
+        else ();
+        if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
+          fprintf oc "Friend: %s\n" conf.user
         else ();
         if email <> "" then fprintf oc "Email: %s\n" email else ();
         fprintf oc "Access: %s\n" access;
