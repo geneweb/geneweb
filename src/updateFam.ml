@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.30 2002-03-06 12:21:24 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.31 2002-10-21 10:57:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -189,45 +189,45 @@ value eval_create_variable c =
   fun
   [ "birth_year" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
+      [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _, _)) ->
           string_of_int y
       | _ -> "" ]
   | "birth_month" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
+      [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _, _))
         when m <> 0 ->
           string_of_int m
       | _ -> "" ]
   | "birth_day" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _))
+      [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _, _))
         when d <> 0 ->
           string_of_int d
       | _ -> "" ]
   | "birth_place" ->
       match c with
-      [ Update.Create _ (Some (_, pl, _, _)) -> quote_escaped pl
+      [ Update.Create _ (Some (_, pl, _, _, _)) -> quote_escaped pl
       | _ -> "" ]
   | "death_year" ->
       match c with
-      [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
+      [ Update.Create _ (Some (_, _, _, Some (Dgreg {year = y} _), _)) ->
           string_of_int y
       | _ -> "" ]
   | "death_month" ->
       match c with
-      [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
+      [ Update.Create _ (Some (_, _, _, Some (Dgreg {month = m} _), _))
         when m <> 0 ->
           string_of_int m
       | _ -> "" ]
   | "death_day" ->
       match c with
-      [ Update.Create _ (Some (_, _, Some (Dgreg {day = d} _), _))
+      [ Update.Create _ (Some (_, _, _, Some (Dgreg {day = d} _), _))
         when d <> 0 ->
           string_of_int d
       | _ -> "" ]
   | "death_place" ->
       match c with
-      [ Update.Create _ (Some (_, _, _, pl)) -> quote_escaped pl
+      [ Update.Create _ (Some (_, _, _, _, pl)) -> quote_escaped pl
       | _ -> "" ]
   | s -> ">%" ^ s ^ "???" ]
 ;

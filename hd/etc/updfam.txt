@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.20 2002-10-10 14:56:12 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.21 2002-10-21 10:57:16 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -30,10 +30,10 @@
           [year/month/day]1
           <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
           [year/month/day]0
-          <input name=xvar_yyyy size=5 maxlength=5 value="%xdate.year;">
+          <input name=xvar_yyyy size=5 maxlength=6 value="%xdate.year;">
         %else;
           [year/month/day]0
-          <input name=xvar_yyyy size=5 maxlength=5 value="%xdate.year;">
+          <input name=xvar_yyyy size=5 maxlength=6 value="%xdate.year;">
           [year/month/day]1
           <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
           [year/month/day]2
@@ -62,7 +62,7 @@
       </td>
       <td>[*precision]0
         <select name=xvar_prec>
-          <option%if;(xdate.prec = "") selected%end;>-
+          <option value=-%if;(xdate.prec = "") selected%end;>-
           <option value=sure%if;(xdate.prec = "sure") selected%end;
               >[*exact]0
           <option value=about%if;(xdate.prec = "about") selected%end;
