@@ -91,4 +91,4 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 </form>
 %i<p>
 
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+<font size=-1><a href="%sm=LEX">Lexique</a></font>
