@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.19 2002-01-13 04:59:40 ddr Exp $ *)
+(* $Id: setup.ml,v 4.20 2002-01-13 12:03:09 ddr Exp $ *)
 
 open Printf;
 
@@ -571,6 +571,7 @@ value print_file conf bname =
         (* temporary try the old files location; can be suppressed
            when all files are grouped in the "lang" directory together *)
         let fname = Filename.concat (Filename.concat dir conf.lang) bname in
+let _ = do { eprintf "file: %s\n" fname; flush stderr; } in
         try Some (open_in fname) with [ Sys_error _ -> None ] ]
   in
   match ic_opt with

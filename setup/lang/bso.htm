@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>[
+de: Datenbank anlegen
+en: Creation of a database
+es: Creaci&oacute;n de una base de datos
+fr: Cr&eacute;ation d'une base de donn&eacute;es
+lv: Datu bâzes izveidoðana
+sv: Skapa en databas
+]</title></head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Datenbank anlegen
+en: Creation of a database
+es: Creaci&oacute;n de una base de datos
+fr: Cr&eacute;ation d'une base de donn&eacute;es
+lv: Datu bâzes izveidoðana
+sv: Skapa en databas
+]</font></h1></center>
+
+<p><p>
+<ul>
+
+$v{<li>
+
+[
+de: <b>Warnung:</b> In deinem 
+    <a href="gwsetup?lang=$l;v=list.htm">Verzeichnis</a>
+    existiert bereits eine Datenbank mit dem Namen "$o".
+    Wenn du den "Ok"-Knopf dr&uuml;ckst, wird sie gel&ouml;scht.
+en: Warning: there already exists a database with the name "$o" in your
+    <a href="gwsetup?lang=$l;v=list.htm">directory</a>. If you push the button
+    "Ok" below, it will be erased.
+es: Atenci&oacute;n: una base llamada "$o" ya existe en su 
+    <a href="gwsetup?lang=$l;v=list.htm">carpeta</a>. 
+    Si Ud apoya en el bot&oacute;n "Ok" la base inicial sera borrada
+fr: <b>Attention</b>: il existe d&eacute;j&agrave; une base de nom
+    "$o" dans votre <a
+    href="gwsetup?lang=$l;v=list.htm">r&eacute;pertoire</a>. Si vous
+    appuyez sur le bouton "Ok" ci-dessous, cela va l'effacer.
+lv: Brîdinâjums: ðâda datubâze "$o" jau eksistç Jûsu 
+    <a href="gwsetup?lang=$l;v=list.htm">katalogâ</a>. Ja Jûs nospiedîsiet
+    podziòu "Ok" zemâk, datu bâze tiks dzçsta.
+sv: Varning: det existerar redan en databas med namnet "$o" i din
+    <a href="gwsetup?lang=$l;v=list.htm">katalog</a>. Om du trycker på knappen
+    "OK" nedan, kommer den att bli raderad.
+]<p>
+
+[
+de: Falls du diese Funktion gerade schonmal ausgef&uuml;hrt hattest, dann
+    war diese Datenbank wahrscheinlich das Ergebnis und daher kann dieser
+    Fehler hier ignoriert werden. Andernfalls kehre auf die vorherige Seite
+    zur&uuml;ck und w&auml;hle einen anderen Namen f&uuml;r deine Datenbank.
+en: If you just made this, it is probably its result, and therefore it is
+    not important. Else, return to the previous page and choose another
+    name for your database.
+es: Si Ud viene de realizar esta operaci&oacute;n, debe probablemente
+    tratarse de su resultado, entoces !no pasa nada!. Si no, regrese 
+    ha la posici&oacute;n anterior y escoja otro nombre para su base.
+fr: Si vous venez d&eacute;j&agrave; de faire cette manipulation, il
+    s'agit probablement de son r&eacute;sultat, ce n'est donc pas
+    grave. Sinon, revenez en arri&egrave;re et choisissez un autre nom
+    pour votre base.
+lv: Ja Jûs tikai tikko esat to izveidojuði, tâ varbût ir izveides
+    rezultâts, un tad tam nav nozîmes. Citâdi, atgriezieties uz
+    iepriekðçjo lapu un izvçlieties citu datu bâzes nosaukumu.
+sv: Om du precis gjorde detta, har databasen blivit raderad nu.
+    Annars, återvänd till föregående sida och välj ett annat
+    namn för din databas.
+]<p>}
+
+<li>
+
+[
+de: Wir legen nun eine Datenbank mit dem Namen "$o" an. 
+    Beachte: Je nach Fall kann diese Operation nur ein Augenzwinkern
+    lang dauern, oder aber wenige Sekunden oder sogar einige Minuten
+    ben&ouml;tigen. Bitte habe Geduld.
+en: We are going to create a database named "$o". Remark: this operation
+    can answer in the twinkling of a eye or take some tenths of seconds or
+    some minutes, depending on the cases. Be patient.
+es: Vamos a crear una base que tiene por nombre "$o". 
+    Remarca: esta operaci&oacute;n puede efectuarse inmediatamente o tomar unas
+    decenas de segundos o algunos minutos, en funci&oacute;n del caso. 
+    Tenga paciencia. 
+fr: Nous allons cr&eacute;er une base de nom "$o". Remarque: cette
+    op&eacute;ration peut s'effectuer en un clin d'oeil ou prendre
+    quelques dizaines de secondes ou quelques minutes, suivant les
+    cas. Soyez patient.
+lv: Tiks izveidota datu bâze "$o". Piezîme: ði darbîba var ilgt vienu
+    acumirkli vai daþus desmitus sekunþu vai minûðu atkarîbâ no
+    aptâkïiem. Esiet pacietîgs.
+sv: Vi ska nu skapa en databas benämnd "$o". Obs: denna operation
+    kan gå blixtsnabbt eller ta tiotalet sekunder eller
+    flera minuter, beroende på fallet. Ha tålamod.
+]
+
+<p>
+
+[
+de: Dr&uuml;cke den Knopf, um die Datenbank anzulegen
+en: Push the button below to create you database
+es: Apoye en el bot&oacute;n inferior para crear su base de datos
+fr: Appuyez sur le bouton ci-dessous pour cr&eacute;er votre base de
+    donn&eacute;es
+lv: Nospiediet zemâk esoðo podziòu, lai izveidotu datu bâzi
+sv: Tryck på knappen nedan för att skapa din databas
+]$v{[
+de:  und die alte Datenbank "$o" im Zielverzeichnis zu l&ouml;schen
+en: , and overwrite the previous database "$o" of the target directory
+es:  y destruir  la base "$o" de la carpeta de llegada
+fr:  et &eacute;craser la base "$o" du r&eacute;pertoire d'arriv&eacute;e
+lv: , un dzçstu iepriekðçjo datu bâzi "$o" katalogâ
+sv:  och radera den föregående databasen "$o" från målkatalogen
+]}:
+
+<p>
+
+<form method=POST action="$d">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+[
+de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
+    der folgenden Kommandos:
+en: For information, this operation corresponds to the following commands:
+es: Por informaci&oacute;n, esta operaci&oacute;n corresponde a los comandos 
+    siguientes: 
+fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
+    des commandes suivantes:
+lv: Informâcijai: Ðî darbîba atbilst sekojoðâm komandâm:
+sv: Denna operation motsvarar de följande kommandona:
+]
+
+<pre>
+     $$ cd $w
+     $$ $c$p &gt; comm.log
+</pre>
+
+[
+de: Hierbei wird ein Verzeichnis namens "$o.gwb" angelegt.
+en: This builds a directory named "$o.gwb".
+es: Esto crear&aacute; una carpeta de nombre "$o.gwb".
+fr: Cela fabriquera un r&eacute;pertoire de nom "$o.gwb".
+lv: Tâs rezultâtâ tiks izveidots katalogs "$o.gwb".
+sv: Detta skapar en katalog benämnd "$o.gwb".
+]
+
+</ul>
