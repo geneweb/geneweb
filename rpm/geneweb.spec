@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.7 1999-09-03 12:22:10 ddr Exp $
+# $Id: geneweb.spec,v 1.8 1999-09-03 13:40:06 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -117,6 +117,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
       rm -rf /home/geneweb/gw-VERSION/$i
       mv $i /home/geneweb/gw-VERSION/.
     done
+    rm -f *.lck
     echo
     echo "Warning: the following data bases:"
     for i in $*; do
