@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [05 Jan 04] Now, when database notes are modified, an intermediate
+    page is displayed with a link to the "notes" page, instead of the
+    "notes" page itself (to be consistent with other updates pages).
   - [05 Jan 04] Added database configuration variable "show_consang":
     when set to "no" the possible consanguinity is not displayed in
     personal pages. Added also variable "fast_alphabetic": when set

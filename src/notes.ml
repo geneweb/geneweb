@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.5 2003-07-07 06:30:56 ddr Exp $ *)
+(* $Id: notes.ml,v 4.6 2004-01-05 14:38:08 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -46,6 +46,19 @@ value print_mod conf base =
   }
 ;
 
+value print_ok conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "notes modified"))
+  in
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>" (commd conf)
+      (capitale (transl_nth conf "note/notes" 1));
+    trailer conf
+  }
+;
+
 value print_mod_ok conf base =
   let s =
     match p_getenv conf.env "notes" with
@@ -60,7 +73,7 @@ value print_mod_ok conf base =
   let old_notes = base.data.bnotes.nread 0 in
   try
     if digest <> Iovalue.digest old_notes then Update.error_digest conf base
-    else do { base.func.commit_notes s; print conf base }
+    else do { base.func.commit_notes s; print_ok conf base }
   with
   [ Update.ModErr -> () ]
 ;
