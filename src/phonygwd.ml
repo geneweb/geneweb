@@ -1,4 +1,4 @@
-(* $Id: phonygwd.ml,v 1.2 1998-09-24 12:57:30 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 1.3 1999-01-06 12:14:59 ddr Exp $ *)
 
 open Unix;
 
@@ -58,7 +58,7 @@ value main () =
        return exit 1
      else ();
      close_in (open_in fname.val);
-     Wserver.f port_selected.val 0 (Some 4) None connection;
+     Wserver.f port_selected.val 0 (Some 4) connection;
   return ()
 ;
 

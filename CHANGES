@@ -2,6 +2,9 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [06/01/99] Deleted Unix option "-robot_xcl": worked bad, did not detect
+    robots, detected robots when there are not, too complicated to fix.
+    (The normal HTTP robot exclusion remains.)
   - [28/12/98] Changed http requests to hold no accents.
   - [19/12/98] Fixed bug quotes disappearing in field "first name aliases"
     in form Update/Person (if the value holds quotes).

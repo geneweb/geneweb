@@ -1,12 +1,12 @@
-(* $Id: wserver.mli,v 1.2 1998-09-24 12:57:33 ddr Exp $ *)
+(* $Id: wserver.mli,v 1.3 1999-01-06 12:15:01 ddr Exp $ *)
 
 (* module [Wserver]: elementary web service *)
 
 value f :
-  int -> int -> option int -> option (int * int) ->
+  int -> int -> option int ->
     ((Unix.sockaddr * list string) -> string -> unit) -> unit
 ;
-   (* [Wserver.f port tmout maxc robot_xcl g] starts an elementary httpd
+   (* [Wserver.f port tmout maxc g] starts an elementary httpd
        server at port [port] in the current machine. The port number is any
        number greater than 1024 (to create a client < 1024, you must be
        root). At each connection, the function [g] is called:
@@ -15,10 +15,7 @@ value f :
        the string request itself (extracted from [request]). The function
        [g] has [tmout] seconds to answer some text on standard output.
        If [maxc] is [Some n], maximum [n] clients can be treated at the
-       same time; [None] means no limit. See the example below.
-       If [robot_xcl] is [Some (cnt, sec)], robots attacks are excluded,
-       i.e. connexions calling more than [cnt] request in [sec] consecutive
-       seconds; if [None], no robot exclusion. *)
+       same time; [None] means no limit. See the example below. *)
 
 value wprint : format 'a out_channel unit -> 'a;
     (* To be called to print page contents. *)
