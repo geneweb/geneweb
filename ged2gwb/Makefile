@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.4 2000-05-03 09:50:37 ddr Exp $
+# $Id: Makefile,v 3.5 2000-06-08 19:52:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -14,6 +14,7 @@ out:: ged2gwb.out
 opt:: ged2gwb.opt
 	$(RM) ged2gwb
 	cp ged2gwb.opt ged2gwb
+	$(STRIP) ged2gwb
 
 clean::
 	$(RM) ged2gwb
