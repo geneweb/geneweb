@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.15 1999-04-29 19:55:42 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.16 1999-05-18 23:34:21 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -706,11 +706,12 @@ value treat_indi_notes gen rl =
   let notes =
     List.fold_left
       (fun s (lab, n) ->
+         let spc = String.length n > 0 && n.[0] == ' ' in
          let n = strip_spaces n in
          if s = "" then n
          else if lab = "CONT" || lab = "NOTE" then s ^ "<br>\n" ^ n
          else if n = "" then s
-         else s ^ "\n" ^ n)
+         else s ^ (if spc then "\n" else "") ^ n)
       "" lines
   in
   add_string gen (strip_newlines notes)

@@ -38,6 +38,13 @@ GeneWeb Intermediate version 2.02-1
   - [May 7, 99] Fixed bug visible in Danish: the AE ligature ("&aelig;")
     was incorrectly capitalized.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [May 19, 99] Better catenation of continuation (CONC) notes.
+
+* GeneWeb to Gedcom (gwb2ged)
+  - [May 19, 99] Fold notes lines at 255 characters (required by GEDCOM
+    standard).
+
 * Documentation
   - [May 13, 99] Updated Swedish documentation (Lars Gustavsson).
 
