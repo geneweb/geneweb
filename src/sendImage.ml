@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 3.5 2001-01-29 15:33:26 ddr Exp $ *)
+(* $Id: sendImage.ml,v 3.6 2001-03-10 15:04:27 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -8,6 +8,19 @@ open Def;
 
 value incorrect conf =
   do incorrect_request conf; return raise Update.ModErr
+;
+
+value incorrect_content_type conf base p s =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do rheader conf title;
+     print_link_to_welcome conf True;
+     Wserver.wprint "<p>\n<font size=-1><em>";
+     Wserver.wprint "Error: incorrect image content type: %s" s;
+     Wserver.wprint "</em></font>\n<p>\n";
+     Wserver.wprint "<ul><li>%s</ul>\n"
+       (referenced_person_title_text conf base p);
+     trailer conf;
+  return raise Update.ModErr
 ;
 
 value raw_get conf key =
@@ -174,7 +187,7 @@ value effective_send_ok conf base p file =
     [ "image/gif" -> ".gif"
     | "image/jpeg" | "image/pjpeg" -> ".jpg"
     | "image/x-png" -> ".png"
-    | _ -> incorrect conf ]
+    | s -> incorrect_content_type conf base p s ]
   in
   let bfname = default_image_name base p in
   let bfdir =

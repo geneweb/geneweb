@@ -1,10 +1,12 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
-GeneWeb Version 3.12
+GeneWeb Version 4.00
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [10 Mar 01] When sending an image with wrong content type, display
+    that content type in an error page.
   - [20 Feb 01] Added option '-images_dir': works like '-images_url' but
     the parameter is a directory (absolute or relative to the -hd directory),
     where the images are supposed to be. This has been added to be able to
