@@ -2,11 +2,13 @@ GeneWeb Version 1.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
---- [Jan 20, 99] Added display of latest deaths.
---- [Jan 19, 99] Added direct links to siblings.
+  - [Jan 24, 99] Added default photo names: not necessary to specify a
+    photo for someone, a default name is searched.
+  - [Jan 20, 99] Added display of latest deaths.
+  - [Jan 19, 99] Added direct links to siblings.
   - [Jan 18, 99] Family comment now displayed like dates (=> possible
     visibility by password restriction).
---- [Jan 18, 99] In notes and sources, the string "%s" is replaced by the
+  - [Jan 18, 99] In notes and sources, the string "%s" is replaced by the
     name of the base in the same context. For example, in a source field,
     if "John Smith" is in the same database, it is possible to record it
     as:
@@ -26,23 +28,28 @@ GeneWeb Version 1.11
     only in lowercase form; "<BR>" did not work.
 
 * Gedcom to GeneWeb and GeneWeb to Gedcom (ged2gwb, gwb2ged)
-  - [Jan 18, 99] When there several names (several records "1 NAME") for
+  - [Jan 18, 99] When there are several names (several records "1 NAME") for
     someone in Gedcom, the other become "aliases" (and vice versa for
     gwb2ged).
 
 * Lexicon file (lexicon.txt)
-  - [Jan 16, 99] Changed text "Date" into "Date (d/m/y)" in english version
-    to be sure there is no ambiguity.
+  - [Jan 16, 99] For update forms, changed text "Date" into "Date (d/m/y)"
+    in english version to be sure there is no ambiguity.
   - [Jan 16, 99] Added declined forms.
   - [Jan 16, 99] Fixed typos in German version (Markus Mottl).
 
 * Documentation
---- [Jan 22, 99] Added a few lines for "How to merge two families" in the
+  - [Jan 24, 99] Added doc for default photo name (new feature) in directions
+    for use, page "modifications", section 5.4 ("modify a person"),
+    paragraph "Photo".
+  - [Jan 24, 99] Fixed typo; was indicated "image" instead of "images" as
+    directory name in this paragraph.
+  - [Jan 22, 99] Added a few lines for "How to merge two families" in the
     page "modifications".
---- [Jan 20, 99] Added documentation for:
+  - [Jan 20, 99] Added documentation for:
       * how to put links to GeneWeb databases.
       * how to customize welcome pages.
---- [Jan 11, 99] Started Swedish version (Lars Gustavsson).
+  -[Jan 11, 99] Started Swedish version (Lars Gustavsson).
 
 GeneWeb Version 1.10
 --------------------

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.22 1999-01-19 10:17:10 ddr Exp $ *)
+(* $Id: perso.ml,v 1.23 1999-01-24 14:17:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -65,6 +65,12 @@ value next_sibling base p a =
           else Some (poi base fam.children.(i+1))
         else loop (i + 1)
   | None -> None ]
+;
+
+value default_photo_name base p =
+  let f = (Name.lower (sou base p.first_name)) in
+  let s = (Name.lower (sou base p.surname)) in
+  f ^ "." ^ string_of_int p.occ ^ "." ^ s
 ;
 
 value
@@ -746,11 +752,26 @@ value print conf base p =
        (commd conf);
      Wserver.wprint "</a>\n";
      if age_autorise conf base p then
+       let photo_txt = capitale (transl conf "photo") in
        match sou base p.photo with
-       [ "" -> ()
+       [ "" ->
+           let s = default_photo_name base p in
+           let f =
+             let f =
+               List.fold_right Filename.concat
+                 [Util.base_dir.val; "images"; conf.bname] s
+             in
+             if Sys.file_exists (f ^ ".gif") then Some (s ^ ".gif")
+             else if Sys.file_exists (f ^ ".jpg") then Some (s ^ ".jpg")
+             else None
+           in
+           match f with
+           [ Some f ->
+               Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\"><p>\n"
+                 (commd conf) (Util.code_varenv f) photo_txt
+           | None -> () ]
        | s ->
            let http = "http://" in
-           let photo_txt = capitale (transl conf "photo") in
            if String.length s > String.length http &&
               String.sub s 0 (String.length http) = http then
              Wserver.wprint "<img src=\"%s\" alt=\"%s\"><p>\n" s photo_txt
@@ -864,6 +885,9 @@ value print conf base p =
               (Gutil.person_misc_names base p);
             Wserver.wprint "</ol>\n";
          return ()
+     | Some "photo" ->
+         Wserver.wprint "<p>Default photo name = \"%s\"\n"
+           (default_photo_name base p)
      | Some "tstab_val" ->
          let tstab = Util.create_topological_sort conf base in
          Wserver.wprint "<p>Tstab val = %d\n"

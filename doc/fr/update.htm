@@ -841,9 +841,36 @@ rel&eacute;gu&eacute;s en plus petit, en dessous.
 &agrave; la personne et qui sera affich&eacute; dans sa fiche
 personnelle. Ce peut &ecirc;tre une adresse URL (commen&ccedil;ant par
 "http://...") ou juste un nom de fichier, que le syst&egrave;me
-cherchera dans le r&eacute;pertoire "image", sous-r&eacute;pertoire
+cherchera dans le r&eacute;pertoire "images", sous-r&eacute;pertoire
 "base" (o&ugrave; "base" est le nom de la base) au moment de
 l'affichage.
+
+<p>
+
+Si vous ne pr&eacute;cisez pas de nom de fichier, il y a un nom par
+d&eacute;faut.
+
+<p>
+
+Ce nom est constitu&eacute;: du pr&eacute;nom, d'un point, du
+num&eacute;ro, d'un autre point, du nom de famille, tout en
+minuscules, sans accents et tous les caract&egrave;res qui ne sont pas
+des lettres ou des espaces sont convertis en espaces.
+
+<p>
+
+Exemple, la personne nomm&eacute;e "Anne-C&eacute;cile Dupont de
+Nemours" aura pour nom de photo par d&eacute;faut:
+
+<pre>
+   anne cecile.0.dupont de nemours
+</pre>
+
+<p>
+
+<em>GeneWeb</em> cherchera un fichier portant ce nom suivi de ".gif"
+ou de ".jpg" dans le r&eacute;pertoire des images de la base
+cit&eacute; ci-dessus.
 
 </ul>
 
