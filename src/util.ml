@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.24 2002-01-10 19:46:10 ddr Exp $ *)
+(* $Id: util.ml,v 4.25 2002-01-20 13:37:15 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1712,6 +1712,12 @@ value image_and_size conf base p image_size =
               else None ]
         else None ]
   else None
+;
+
+value has_image conf base p =
+  if age_autorise conf base p then
+    p.image <> Adef.istr_of_int 0 || auto_image_file conf base p <> None
+  else False
 ;
 
 value only_printable s =

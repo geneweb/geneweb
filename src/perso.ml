@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.26 2002-01-16 12:07:20 ddr Exp $ *)
+(* $Id: perso.ml,v 4.27 2002-01-20 13:37:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -989,13 +989,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "has_death_place" -> p_auth && sou base p.death_place <> ""
   | "has_families" -> Array.length u.family > 0
   | "has_first_names_aliases" -> p.first_names_aliases <> []
-  | "has_image" ->
-      match get_env "image" env with
-      [ Vimage x ->
-          match x with
-          [ Some (_, Some (Some _)) | Some (_, None) -> True
-          | _ -> False ]
-      | _ -> False ]
+  | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces base p
   | "has_nobility_titles" -> p_auth && p.titles <> []
   | "has_notes" -> p_auth && sou base p.notes <> ""

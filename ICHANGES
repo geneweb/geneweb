@@ -15,6 +15,10 @@ GeneWeb Version 4.05
 * All executables
   - [10 Jan 02] No more statically linked by default.
 
+* Template files
+  - [20 Jan 02] Fixed bug in perso.txt: has_image worked only for the
+    current person.
+
 GeneWeb Version 4.04
 --------------------
 
