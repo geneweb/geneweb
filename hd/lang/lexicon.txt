@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.29 2001-07-14 09:08:34 ddr Exp $
+# $Id: lexicon.txt,v 4.30 2001-07-18 08:58:00 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7376,6 +7376,7 @@ sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 en: undefined sex for %t
 fr: sexe ind&eacute;fini pour %t
 no: udefinert kjønn for %t
+sv: odefinierat kön för %t
 
     unknown person
 af: onbekende persoon
