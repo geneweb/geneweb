@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.8 2000-11-01 12:36:55 ddr Exp $ *)
+(* $Id: title.ml,v 3.9 2000-11-01 13:38:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -97,7 +97,8 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
       [ (Some (d11, d12), Some (d21, d22)) ->
           if not (strictement_avant_dmy d21 d12) then True
           else if not (strictement_avant_dmy d11 d22) then False
-          else not (strictement_avant_dmy d21 d11)
+          else if strictement_apres_dmy d21 d11 then True
+          else strictement_apres_dmy d22 d12
       | _ ->
           match
             (date_interval conf base AddSpouse x1,
