@@ -1,4 +1,5 @@
-(* $Id: num.ml,v 1.3 1998-12-13 11:56:44 ddr Exp $ *)
+(* $Id: num.ml,v 1.4 1999-02-02 10:24:23 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 type t = array int;
 

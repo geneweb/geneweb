@@ -1,5 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.13 1999-01-08 15:20:57 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.14 1999-02-02 10:24:29 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;

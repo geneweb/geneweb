@@ -1,4 +1,5 @@
-(* $Id: phonygwd.ml,v 1.3 1999-01-06 12:14:59 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 1.4 1999-02-02 10:24:26 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Unix;
 

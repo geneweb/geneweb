@@ -1,4 +1,5 @@
-(* $Id: date.mli,v 1.1 1998-09-24 16:51:58 ddr Exp $ *)
+(* $Id: date.mli,v 1.2 1999-02-02 10:24:04 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 value string_of_ondate : Config.config -> Def.date -> string;
 value string_of_date : Config.config -> Def.date -> string;

@@ -1,15 +1,5 @@
-(***********************************************************************)
-(*                                                                     *)
-(*                           The V6 Engine                             *)
-(*                                                                     *)
-(*          Francois Rouaix, projet Cristal, INRIA Rocquencourt        *)
-(*                                                                     *)
-(*  Copyright 1996 Institut National de Recherche en Informatique et   *)
-(*  Automatique.  Distributed only by permission.                      *)
-(*                                                                     *)
-(***********************************************************************)
-
-(* $Id: base64.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: base64.ml,v 1.2 1999-02-02 10:23:59 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 (* For basic credentials only *)
 (* Encoding is [A-Z][a-z][0-9]+/= *)

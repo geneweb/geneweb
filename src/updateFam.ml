@@ -1,5 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.11 1999-01-11 15:05:30 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.12 1999-02-02 10:24:35 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;

@@ -1,5 +1,6 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.27 1999-01-12 12:35:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.28 1999-02-02 10:24:12 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
@@ -142,6 +143,7 @@ value input_lexicon lang =
              let k = input_line ic in
              loop (input_line ic) where rec loop line =
                if String.length line < 4 then ()
+               else if line.[0] == '#' then ()
                else
                  do if String.sub line 0 4 = pref then
                       Hashtbl.add t (String.sub k 4 (String.length k - 4))

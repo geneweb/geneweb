@@ -1,3 +1,5 @@
+# Copyright (c) 1999 INRIA
+
      !charset
 cn: gb2312
 de: iso-8859-1
