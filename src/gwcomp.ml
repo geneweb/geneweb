@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.5 2002-11-14 04:15:34 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.6 2003-02-12 10:12:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -29,7 +29,7 @@ value copy_decode s i1 i2 =
   in
   let rec loop_copy t i j =
     if i >= i2 then t
-    else if i == i2 - 1 then do { t.[j] := s.[i]; t }
+    else if i == i2 - 1 && s.[i] <> '_' then do { t.[j] := s.[i]; t }
     else do {
       let (c, i) =
         match s.[i] with

@@ -12,6 +12,12 @@ GeneWeb version 4.10
     "private" messages.
   - [06 Jan 03] In welcome page, added wizard's name (when named).
 
+* GeneWeb uncompiler (gwu)
+  - [12 Feb 03] Fixed bug: exporting bad format when places containing
+    just spaces.
+  - [11 Feb 03] Added option -maxlev to specify a maximum number of
+    generations (descendants only) to export.
+
 * GeneWeb databases Transfer Program (gwtp)
   - [03 Jan 03] Fixed bug: when wizard notes, the "send database" did
     not work.

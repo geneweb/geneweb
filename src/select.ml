@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.7 2001-12-20 19:58:17 ddr Exp $ *)
+(* $Id: select.ml,v 4.8 2003-02-12 10:12:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -204,7 +204,9 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
   }
 ;
 
-value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
+value select_descendants
+  base per_tab fam_tab no_spouses_parents flag iper maxlev
+=
   let mark = Array.create base.data.families.len False in
   let select_family ifam cpl =
     let i = Adef.int_of_ifam ifam in
@@ -216,30 +218,32 @@ value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
       per_tab.(i) := per_tab.(i) lor flag
     }
   in
-  let rec loop iper =
-    let i = Adef.int_of_iper iper in
-    do {
-      per_tab.(i) := per_tab.(i) lor flag;
-      Array.iter
-        (fun ifam ->
-           let i = Adef.int_of_ifam ifam in
-           if mark.(i) then ()
-           else do {
-             let cpl = coi base ifam in
-             mark.(i) := True;
-             select_family ifam cpl;
-             if not no_spouses_parents then
-               let sp = spouse iper cpl in
-               match (aoi base sp).parents with
-               [ Some ifam -> select_family ifam (coi base ifam)
-               | None -> () ]
-             else ();
-             Array.iter loop (doi base ifam).children
-           })
-        (uoi base iper).family
-    }
+  let rec loop lev iper =
+    if maxlev >= 0 && lev > maxlev then ()
+    else
+      let i = Adef.int_of_iper iper in
+      do {
+        per_tab.(i) := per_tab.(i) lor flag;
+        Array.iter
+          (fun ifam ->
+             let i = Adef.int_of_ifam ifam in
+             if mark.(i) then ()
+             else do {
+               let cpl = coi base ifam in
+               mark.(i) := True;
+               select_family ifam cpl;
+               if not no_spouses_parents then
+                 let sp = spouse iper cpl in
+                 match (aoi base sp).parents with
+                 [ Some ifam -> select_family ifam (coi base ifam)
+                 | None -> () ]
+               else ();
+               Array.iter (loop (succ lev)) (doi base ifam).children
+             })
+          (uoi base iper).family
+      }
   in
-  loop iper
+  loop 0 iper
 ;
 
 value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
@@ -328,7 +332,7 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
 ;
 
 value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
-    censor with_siblings =
+    censor with_siblings maxlev =
   let tm = Unix.localtime (Unix.time ()) in
   let threshold = 1900 + tm.Unix.tm_year - censor in
   match (anc, desc, ancdesc) with
@@ -374,7 +378,7 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
       | (None, Some idper) ->
           do {
             select_descendants base per_tab fam_tab no_spouses_parents 1
-              idper;
+              idper maxlev;
             (fun i -> per_tab.(Adef.int_of_iper i) == 1,
              fun i -> fam_tab.(Adef.int_of_ifam i) == 1)
           }
@@ -382,7 +386,7 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
           do {
             select_ancestors base per_tab fam_tab False 1 iaper;
             select_descendants base per_tab fam_tab no_spouses_parents 2
-              idper;
+              idper maxlev;
             (fun i -> per_tab.(Adef.int_of_iper i) == 3,
              fun i -> fam_tab.(Adef.int_of_ifam i) == 3)
           }
@@ -401,10 +405,11 @@ value select_surnames base surnames no_spouses_parents =
 ;
 
 value functions
-    base anc desc surnames ancdesc no_spouses_parents censor with_siblings =
+    base anc desc surnames ancdesc no_spouses_parents censor with_siblings
+    maxlev =
   let (per_sel1, fam_sel1) =
     select_ancestors_descendants base anc desc ancdesc no_spouses_parents
-      censor with_siblings
+      censor with_siblings maxlev
   in
   let (per_sel2, fam_sel2) =
     select_surnames base surnames no_spouses_parents

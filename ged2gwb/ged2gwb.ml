@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.37 2002-11-14 11:09:05 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.38 2003-02-12 10:12:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1599,7 +1599,7 @@ value add_indi gen r =
         in
         let p =
           match find_field "PLAC" r.rsons with
-          [ Some r -> r.rval
+          [ Some r -> strip_spaces r.rval
           | _ -> "" ]
         in
         (d, p, source gen r)
@@ -1620,7 +1620,7 @@ value add_indi gen r =
         in
         let p =
           match find_field "PLAC" r.rsons with
-          [ Some r -> r.rval
+          [ Some r -> strip_spaces r.rval
           | _ -> "" ]
         in
         (Adef.codate_of_od d, p, source gen r)
@@ -1643,7 +1643,7 @@ value add_indi gen r =
           in
           let p =
             match find_field "PLAC" r.rsons with
-            [ Some r -> r.rval
+            [ Some r -> strip_spaces r.rval
             | _ -> "" ]
           in
           (d, p, source gen r)
@@ -1664,7 +1664,7 @@ value add_indi gen r =
             in
             let p =
               match find_field "PLAC" r.rsons with
-              [ Some r -> r.rval
+              [ Some r -> strip_spaces r.rval
               | _ -> "" ]
             in
             (Buried (Adef.codate_of_od d), p, source gen r)
@@ -1684,7 +1684,7 @@ value add_indi gen r =
             in
             let p =
               match find_field "PLAC" r.rsons with
-              [ Some r -> r.rval
+              [ Some r -> strip_spaces r.rval
               | _ -> "" ]
             in
             (Cremated (Adef.codate_of_od d), p, source gen r)
@@ -1823,7 +1823,7 @@ value add_fam_norm gen r adop_list =
                 if String.uncapitalize r.rval = "unmarried" then
                   (NotMarried, "")
                 else
-                  let p = r.rval in
+                  let p = strip_spaces r.rval in
                   loop rl where rec loop =
                     fun
                     [ [r :: rl] ->
