@@ -5,9 +5,6 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [29 Jul 00] In personal pages, added a <br> before the possible image,
-    because of sometimes problems with the left and up arrows on the right
-    which are sometimes not clickable.
   - [26 Jul 00] Fixed detail in Wserver: closed socket before callback
     in order to allow the callback to fork processes without being blocked    
   - [25 Jul 00] Restructured Wserver to be cleaner and to save memory
