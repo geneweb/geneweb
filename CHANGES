@@ -17,6 +17,8 @@ GeneWeb version 2.03
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 7, 99] No more (stupid) abbreviation for "Number" in update forms:
+    Did not work for many languages.
   - [Jun 3, 99] Added ability to use a new predefined term "+before" in the
     lexicon to specify the complement is before a verb (e.g. in German:
     "send" "image" is translated into "senden +before" "Bild", which gives
