@@ -27,5 +27,12 @@ is a "friend".
 </ul>
 
 <p>
+
+Other configuration parameters exist, but as they may have an
+influence on the performances of the server computer, ask the GeneWeb
+site administrator if you want to change them. Be aware of the fact
+that your resquest may not be accepted.
+
+<p>
 <input type=submit value=Update>
 </form>
