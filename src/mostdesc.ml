@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 4.4 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 4.5 2004-10-21 16:04:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Gutil;
@@ -63,7 +63,9 @@ value most_desc base p =
          value leq x y = id.(Adef.int_of_iper x) > id.(Adef.int_of_iper y);
        end)
   in
+(*
   let _ = base.data.persons.array () in
+*)
   let _ = base.data.descends.array () in
   let _ = base.data.unions.array () in
   let tab = Array.create base.data.persons.len Num.zero in
