@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.24 1999-08-05 06:22:02 ddr Exp $ *)
+(* $Id: descend.ml,v 2.25 1999-08-19 09:32:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -173,12 +173,12 @@ value afficher_marie conf base first fam p spouse =
      in
      Wserver.wprint (fcapitale format)
        (fun _ ->
-          if auth then Perso.print_marriage_text conf base True fam else ());
+          if auth then Perso.print_marriage_text conf base False fam else ());
      stag "strong" begin
        afficher_personne_referencee conf base spouse;
      end;
-     Date.afficher_dates conf base spouse;
-     if age_autorise conf base p && age_autorise conf base spouse then
+     if auth then Perso.print_dates conf base False spouse else ();
+     if auth then
        match fam.divorce with
        [ NotDivorced -> ()
        | Divorced cod ->
@@ -202,7 +202,8 @@ value print_child conf base levt boucle niveau_max niveau compte ix =
          afficher_prenom_de_personne_referencee conf base x
        else afficher_personne_referencee conf base x;
      end;
-     Date.afficher_dates conf base x;
+     if age_autorise conf base x then Perso.print_dates conf base False x
+     else ();
      if levt.(Adef.int_of_iper x.cle_index) < niveau then
        Wserver.wprint "<em>, %s</em>"
          (transl conf "see further")
@@ -225,8 +226,7 @@ value print_child conf base levt boucle niveau_max niveau compte ix =
                 let c = spouse x (coi base ifam) in
                 let c = poi base c in
                 do if connais base c then
-                     do afficher_marie conf base first fam x
-                          c;
+                     do afficher_marie conf base first fam x c;
                         Wserver.wprint ".";
                         html_br conf;
                      return ()
@@ -287,7 +287,8 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
      stag "strong" begin
        afficher_personne_referencee conf base p;
      end;
-     Date.afficher_dates conf base p;
+     if age_autorise conf base p then Perso.print_dates conf base False p
+     else ();
      Wserver.wprint ".";
      html_br conf;
      boucle 1 p;
