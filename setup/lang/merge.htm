@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: merge.htm,v 1.1 2002-01-14 07:21:39 ddr Exp $ -->
+  <title>[
+en: Merging databases
+fr: Fusion de bases de donn&eacute;es
+sv: Sammanslagning av databaser
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+en: Merging databases
+fr: Fusion de bases de donn&eacute;es
+sv: Sammanslagning av databaser
+]</font></h1></center>
+
+<form method=GET action="merge">
+<input type=hidden name=lang value=$l>
+
+[
+en: All your databases to be merged must be first under
+    <b><font color=#2f6400>GeneWeb</font></b>.
+fr: Il faut d'abord que toutes vos bases &agrave; fusionner soient sous
+    <b><font color=#2f6400>GeneWeb</font></b>.
+sv: Alla databaser som ska slås samman måste finnas under
+    <b><font color=#2f6400>GeneWeb</font></b>.
+]
+
+<p>
+
+[
+en: If it is not the case, if, for example, some of them are just GEDCOM
+    files or GeneWeb source files, return to the <a
+    href="gwsetup?lang=$l;v=main.htm">main menu</a> to create them under
+    <b><font color=#2f6400>GeneWeb</font></b>, then go back to this page.
+fr: Si ce n'est pas le cas, si, par exemple, certaines d'entre elles sont
+    sous forme GEDCOM ou fichiers source GeneWeb, revenez au <a
+    href="gwsetup?lang=$l;v=main.htm">menu principal</a> pour les
+    cr&eacute;er sous <b><font color=#2f6400>GeneWeb</font></b>, puis
+    revenez &agrave; cette page.
+sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM
+    filer eller GeneWeb källfiler, gå tilbaka till <a
+    href = "gwsetup?lang=$l;v=main.htm">huvudmenyn</a> för att skapa dem
+    under <b><font color=#2f6400>GeneWeb</font></b>, gå sedan tillbaka
+    till denna sida.
+]
+
+<p>
+
+[
+en: Once done, select the databases you want to merge by pushing their
+    associated buttons:
+fr: Une fois fait, s&eacute;lectionnez les bases que vous voulez fusionner
+    en cliquant sur leur bouton associ&eacute;:
+sv: När du är klar, välj de databaser du vill slå samman genom att klicka
+    i deras knappar:
+]
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr align=left>
+<td><a href="http://$m:2317/$a">$a</a></td>
+<td><input type=checkbox name="$a" value="on_"></td>
+</tr>|
+<tr align=left><td>- [
+en: there is no database at present
+fr: il n'y a aucune base de donn&eacute;es actuellement
+sv: det finns ingen databas för närvarande
+]</tr></td>}
+</table></dl>
+
+<p>
+
+[
+en: Indicate the name you want to give to your resulting database:
+fr: Indiquez le nom que vous voulez donner &agrave; votre base de
+    donn&eacute;es r&eacute;sultante:
+sv: Skriv namnet du vill ge din databas:
+]
+
+<p>
+
+<input name=o size=30>
+
+<p>
+
+[
+en: Then push this button:
+fr: Puis appuyez sur ce bouton:
+sv: Tryck sedan denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+en: Merge
+fr: Fusionner
+sv: Slåsamman
+]">
+
+</form>
+
+<p>
+
+[
+en: Remark: merging consists on simple concatenation of the databases. There
+    is no research for identical persons. After merging, you therefore have
+    to research the possible doubled persons or families and merge them.
+    See the <a href="file://$f/doc/$l/update.htm#MrgP">documentation</a>.
+fr: Remarque: la fusion consiste en la simple concat&eacute;nation des
+    bases de donn&eacute;es. Il n'y a pas de recherche de personnes
+    identiques. Apr&egrave;s la fusion, il faudra donc rechercher les
+    &eacute;ventuelles personnes et familles en double et les fusionner.
+    Voir la <a href="file://$f/doc/$l/update.htm#MrgP">documentation</a>.
+sv: Obs: sammanslagningen lägger helt enkelt ihop databaserna. Det
+    är ingen kontroll av identiska personer. Efter sammanslagningen, måste
+    du därför undersöka möjligheten att det finns dubbla personer eller
+    familjer och slå ihop dem.
+    Se <a href = "file://$f/doc/$l/update.htm#MrgP">dokumentationen</a>.
+]
