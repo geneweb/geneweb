@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.23 2001-01-06 09:55:59 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.24 2001-02-13 00:23:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -719,63 +719,51 @@ value print_person conf base p =
   return ()
 ;
 
-value merge_call conf =
-  do Wserver.wprint "<input type=hidden name=m value=MRG_MOD_IND_OK>\n";
-     match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
-     [ (Some i1, Some i2) ->
-         do Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
-            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
-         return ()
-     | _ -> () ];
-     match p_getint conf.env "i2" with
-     [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
-     | _ -> () ];
-  return ()
-;
-
-value print_mod1 conf base p digest =
+value print_update_ind conf base p digest =
   let title _ =
     match p_getenv conf.env "m" with
-    [ Some "MRG_MOD_IND_OK" ->
+    [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") ->
         let s = transl_nth conf "person/persons" 1 in
         Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
           (Adef.int_of_iper p.cle_index)
-    | _ ->
+    | Some ("MOD_IND" | "MOD_IND_OK") ->
         let s = transl_nth conf "person/persons" 0 in
         Wserver.wprint "%s # %d" (capitale (transl_decline conf "modify" s))
-          (Adef.int_of_iper p.cle_index) ]
+          (Adef.int_of_iper p.cle_index)
+    | Some ("ADD_IND" | "ADD_IND_OK") ->
+        let s = transl_nth conf "person/persons" 0 in
+        Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
+    | _ -> incorrect_request conf ]
   in
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
        Util.hidden_env conf;
-       match p_getenv conf.env "m" with
-       [ Some "MRG_MOD_IND_OK" -> merge_call conf
-       | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_IND_OK>\n" ];
+       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-       Wserver.wprint "\n";
-       print_person conf base p;
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
-;
-
-value print_add1 conf base p =
-  let title _ =
-    let s = transl_nth conf "person/persons" 0 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
-  in
-  do header conf title;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=m value=ADD_IND_OK>\n";
+       match p_getenv conf.env "m" with
+       [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") ->
+           do match p_getint conf.env "i2" with
+              [ Some i2 ->
+                  Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
+              | _ -> () ];
+              match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
+              [ (Some i1, Some i2) ->
+                  do Wserver.wprint
+                       "<input type=hidden name=ini1 value=%d>\n" i1;
+                     Wserver.wprint
+                       "<input type=hidden name=ini2 value=%d>\n" i2;
+                  return ()
+              | _ -> () ];
+              Wserver.wprint
+                "<input type=hidden name=m value=MRG_MOD_IND_OK>\n";
+           return ()
+       | Some ("MOD_IND" | "MOD_IND_OK") ->
+           Wserver.wprint "<input type=hidden name=m value=MOD_IND_OK>\n"
+       | Some ("ADD_IND" | "ADD_IND_OK") ->
+           Wserver.wprint "<input type=hidden name=m value=ADD_IND_OK>\n"
+       | _ -> assert False ];
        print_person conf base p;
        Wserver.wprint "\n";
        html_p conf;
@@ -821,14 +809,15 @@ value print_add conf base =
      notes = ""; psources = "";
      cle_index = bogus_person_index}
   in
-  print_add1 conf base p
+  print_update_ind conf base p ""
 ;
 
 value print_mod conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let p = base.data.persons.get i in
-      print_mod1 conf base (string_person_of base p) (Update.digest_person p)
+      let digest = Update.digest_person p in
+      print_update_ind conf base (string_person_of base p) digest
   | _ -> incorrect_request conf ]
 ;
 
