@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.33 2001-02-16 11:53:39 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.34 2001-02-16 16:17:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -782,7 +782,9 @@ type ast = Templ.ast ==
   | Atransl of bool and string and char
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
-  | Aforeach of string and list string and list ast ]
+  | Aforeach of string and list string and list ast
+  | Adefine of string and string and list ast and list ast
+  | Aapply of string and ast_expr ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -794,6 +796,8 @@ and ast_expr = Templ.ast_expr ==
 
 type env =
   [ Estring of string
+  | Efun of string and list ast
+  | Eval of ast_expr
   | Enone ]
 ;
 
@@ -813,7 +817,7 @@ value extract_var sini s =
   else ""
 ;
 
-value eval_variable conf base env p =
+value rec eval_variable conf base env p =
   fun
   [ ["bapt"; s] -> VVdate (Adef.od_of_codate p.baptism) s
   | ["birth"; s] -> VVdate (Adef.od_of_codate p.birth) s
@@ -836,7 +840,10 @@ value eval_variable conf base env p =
   | [s] ->
       let v = extract_var "cvar_" s in
       if v <> "" then VVcvar v else VVgen s
-  | _ -> VVnone ]
+  | [s :: sl] ->
+      match get_env s env with
+      [ Eval (Evar s []) -> eval_variable conf base env p [s :: sl]
+      | _ -> VVnone ] ]
 ;
 
 (* string values *)
@@ -1079,7 +1086,15 @@ value rec eval_ast conf base env p =
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> eval_if conf base env p e alt ale
-  | Aforeach s sl al -> eval_foreach conf base env p s sl al ]
+  | Aforeach s sl al -> eval_foreach conf base env p s sl al
+  | Adefine f x al alk -> eval_define conf base env p f x al alk
+  | Aapply f v -> eval_apply conf base env p f v ]
+and eval_define conf base env p f x al alk =
+  List.iter (eval_ast conf base [(f, Efun x al) :: env] p) alk
+and eval_apply conf base env p f v =
+  match get_env f env with
+  [ Efun x al -> List.iter (eval_ast conf base [(x, Eval v) :: env] p) al
+  | _ -> Wserver.wprint ">%%%s???" f ]
 and eval_if conf base env p e alt ale =
   let al = if eval_bool_value conf base env p e then alt else ale in
   List.iter (eval_ast conf base env p) al
