@@ -1,11 +1,12 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.11 1999-12-07 13:44:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.12 1999-12-17 00:19:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 
+value green_color = "#2f6400";
 value selected_addr = ref None;
 value selected_port = ref 2317;
 value redirected_addr = ref None;
@@ -565,6 +566,9 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      cgi = cgi;
      command = command;
      indep_command = (if cgi then command else "geneweb") ^ "?";
+     highlight =
+       try List.assoc "highlight_color" base_env with
+       [ Not_found -> green_color ];
      lang = if lang = "" then default_lang else lang;
      default_lang = default_lang;
      can_send_image =

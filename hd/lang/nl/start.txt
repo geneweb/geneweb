@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.11 1999-12-16 23:45:58 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.12 1999-12-17 00:19:31 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Genealogische<br>databank</font></h1>
+<h1><font color=%i>Genealogische<br>databank</font></h1>
 </td>
 </tr>
 </table>
@@ -28,7 +28,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Deze databank <font color=#2f6400><b>"%t"</b></font> bevat nu %n
+Deze databank <font color=%i><b>"%t"</b></font> bevat nu %n
 personen.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
@@ -66,7 +66,7 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>op naam</b></font>
+<font color=%i><b>op naam</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -87,11 +87,11 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><p>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>op titel</b></font>%INl<br>%E
+<font color=%i><b>op titel</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>plaats</b></font>%INl<br>%E
+<font color=%i><b>plaats</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -103,7 +103,7 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><p>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>via de lijst</b></font> van alle
+<font color=%i><b>via de lijst</b></font> van alle
 <select name=m>
 <option value="N" selected>familienamen
 <option value="P">voornamen
@@ -118,8 +118,8 @@ volgens
 
 <li>
 
-<font color=#2f6400><b>via een</b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>gedetailleerde
+<font color=%i><b>via een</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>gedetailleerde
 opzoeking</b></font></a>.
 
 </ul>

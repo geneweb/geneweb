@@ -1,8 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <title>[*advanced request]</title>
   <!-- copyright (c) INRIA -->
+  <meta name="ROBOTS" content="NONE">
+  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <title>[*advanced request]</title>
 </head>
 <body%b>
 <h1>[*advanced request]</h1>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.6 1999-12-16 23:45:49 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.7 1999-12-17 00:19:24 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>利大社惇</font></h1>
+<h1><font color=%i>利大社惇</font></h1>
 </td>
 </tr>
 </table>

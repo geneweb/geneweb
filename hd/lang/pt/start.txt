@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.14 1999-12-16 23:46:00 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.15 1999-12-17 00:19:33 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Base de Dados<br>Geneol&oacute;gica</font></h1>
+<h1><font color=%i>Base de Dados<br>Geneol&oacute;gica</font></h1>
 </td>
 </tr>
 </table>
@@ -28,7 +28,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-A base de dados <font color=#2f6400><b>"%t"</b></font> cont&eacute;m
+A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
 actualmente %n pessoas.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
@@ -65,7 +65,7 @@ Para consultar esta base de dados, pode procurar:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>por pessoa</b></font>
+<font color=%i><b>por pessoa</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -86,11 +86,11 @@ Para consultar esta base de dados, pode procurar:<br><p>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>por t&iacute;tulo</b></font>%INl<br>%E
+<font color=%i><b>por t&iacute;tulo</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>lugar</b></font>%INl<br>%E
+<font color=%i><b>lugar</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -102,7 +102,7 @@ Para consultar esta base de dados, pode procurar:<br><p>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>pela lista</b></font> de todos os
+<font color=%i><b>pela lista</b></font> de todos os
 <select name=m>
 <option value="N" selected>apelidos
 <option value="P">nomes pr&oacute;prios
@@ -117,8 +117,8 @@ por
 
 <li>
 
-<font color=#2f6400><b>por</b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>pesquisa
+<font color=%i><b>por</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>pesquisa
 complexa</b></font></a>.
 
 </ul>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.4 1999-11-30 15:35:06 ddr Exp $ *)
+(* $Id: perso.ml,v 3.5 1999-12-17 00:19:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -370,7 +370,7 @@ value print_parents conf base p =
       let fath = poi base ifath in
       let moth = poi base imoth in
       do Wserver.wprint "<h3>%s</h3>\n<ul>\n"
-           (std_color (capitale (nominative (transl conf "parents"))));
+           (std_color conf (capitale (nominative (transl conf "parents"))));
          html_li conf;
          Wserver.wprint "%s" (referenced_person_title_text conf base fath);
          Date.afficher_dates_courtes conf base fath;
@@ -495,7 +495,7 @@ value print_families conf base p a u =
   [ [] -> ()
   | faml ->
       do Wserver.wprint "<h3>%s</h3>\n<ul>"
-           (std_color
+           (std_color conf
               (capitale (transl_nth conf "marriage/marriages" 1) ^ " " ^
                transl conf "and" ^ " " ^ transl_nth conf "child/children" 1));
          List.iter (print_family conf base p a) faml;
@@ -508,7 +508,7 @@ value print_notes conf base p =
   [ "" -> ()
   | notes ->
       do Wserver.wprint "<h3>%s</h3>\n"
-           (std_color
+           (std_color conf
               (capitale (nominative (transl_nth conf "note/notes" 1))));
          tag "ul" begin
            html_li conf;
@@ -637,7 +637,7 @@ value print_relations conf base p =
   [ ([], [], False) -> ()
   | (rl, cl, _) ->
       do Wserver.wprint "<h3>%s</h3>\n"
-           (std_color (capitale (transl_nth conf "relation/relations" 1)));
+           (std_color conf (capitale (transl_nth conf "relation/relations" 1)));
          tag "ul" begin
            List.iter (print_relation conf base) rl;
            List.iter (print_related conf base p) cl;
@@ -798,7 +798,7 @@ value print_sosa conf base open_area a =
 value print_compute_link conf base p mode text =
   Wserver.wprint "<a href=\"%s%s%s\"><b>%s</b></a>"
     (commd conf) (if mode <> "" then "m=" ^ mode ^ ";" else "")
-    (acces conf base p) (std_color (capitale text))
+    (acces conf base p) (std_color conf (capitale text))
 ;
 
 value print_linked_first_name_and_surname conf base p =

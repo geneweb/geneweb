@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.22 1999-12-16 17:29:56 ddr Exp $ *)
+(* $Id: relation.ml,v 3.23 1999-12-17 00:19:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -739,7 +739,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
            s (transl_nth conf "the spouse" (1 - index_of_sex p2.sex))
        else s
      in
-     let s1 = "<strong>" ^ std_color s ^ "</strong>" in     
+     let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in     
      let s2 = gen_person_title_text raw_access conf base p2 in
      let s =
        if x1 < x2 then transl_decline2 conf "%1 of %2" s1 s2
