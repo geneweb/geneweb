@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 4.3 2004-12-14 09:30:13 ddr Exp $ *)
+(* $Id: iovalue.ml,v 4.4 2005-01-08 20:59:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -85,6 +85,22 @@ type out_funs 'a =
     output : 'a -> string -> int -> int -> unit }
 ;
 
+value size_32 = ref 0;
+value size_64 = ref 0;
+
+value gen_output_block_header ofuns oc tag size =
+  do {
+    if tag < 16 && size < 8 then
+      ofuns.output_byte oc (<<PREFIX_SMALL_BLOCK>> + tag + size lsl 4)
+    else do {
+      ofuns.output_byte oc <<CODE_BLOCK32>>;
+      ofuns.output_binary_int oc (tag + size lsl 10);
+    };
+    size_32.val := size_32.val + 1 + size;
+    size_64.val := size_64.val + 1 + size;
+  }
+;
+
 value rec output_loop ofuns oc x =
   if not (Obj.is_block x) then
     if Obj.magic x >= 0 && Obj.magic x < 0x40 then
@@ -117,17 +133,13 @@ value rec output_loop ofuns oc x =
         ofuns.output_binary_int oc len;
       };
       ofuns.output oc (Obj.magic x) 0 len;
+      size_32.val := size_32.val + 1 + (len + 4) / 4;
+      size_64.val := size_64.val + 1 + (len + 8) / 8;
     }
     else if Obj.tag x == float_tag then
       failwith "Iovalue.output: floats not implemented"
     else do {
-      if Obj.tag x < 16 && Obj.size x < 8 then
-        ofuns.output_byte oc
-          (<<PREFIX_SMALL_BLOCK>> + Obj.tag x + Obj.size x lsl 4)
-      else do {
-        ofuns.output_byte oc <<CODE_BLOCK32>>;
-        ofuns.output_binary_int oc (Obj.tag x + Obj.size x lsl 10);
-      };
+      gen_output_block_header ofuns oc (Obj.tag x) (Obj.size x);
       for i = 0 to Obj.size x - 1 do {
         output_loop ofuns oc (Obj.field x i);
       };
@@ -142,6 +154,7 @@ value out_channel_funs =
 
 value output oc x = output_loop out_channel_funs oc (Obj.repr x);
 value gen_output ofuns i x = output_loop ofuns i (Obj.repr x);
+value output_block_header = gen_output_block_header out_channel_funs;
 
 (* Size *)
 

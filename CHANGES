@@ -7,6 +7,11 @@ GeneWeb version 4.11
     in base configuration file (base.gwf), the alphabetical order was done
     before the vars substitutions.
 
+* GeneWeb compiler (gwc), Gedcom to GeneWeb (ged2gwb)
+* GeneWeb databases Transfer Program (gwtp)
+  - [08 Jan 05] Fixed bug: gwc and ged2gwb created databases which could
+    not be uploaded by gwtp.
+
 GeneWeb version 4.10
 --------------------
 
