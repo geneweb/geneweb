@@ -9,5 +9,5 @@ in the navigation.
    Under MacOS X, launch "gwsetup" in a Terminal.
 
 But if you prefer to know the basic commands of GeneWeb, and are used
-to the interactive commands (MSdos, Xterm...), go to the directory "gw"
+to the interactive commands (MSdos, shell), go to the directory "gw"
 and read the file README.txt. It is another way to start.
