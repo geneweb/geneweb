@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.156 2000-09-01 07:16:59 ddr Exp $
+# $Id: lexicon.txt,v 3.157 2000-09-04 13:32:46 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2911,7 +2911,7 @@ fi: lapset
 fr: dont
 he:    òí éìãéí
 is: börn
-it: con
+it: da cui
 lv: bçrni:
 nl: hier uit
 no: barn
