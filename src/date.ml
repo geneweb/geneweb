@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.18 1999-09-30 01:06:20 ddr Exp $ *)
+(* $Id: date.ml,v 2.19 1999-09-30 13:01:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -319,11 +319,11 @@ value print_some_calendar conf date n month_name n_months var =
        end;
        Wserver.wprint "\n";
        tag "td" begin
-         Wserver.wprint "<input name=yyyy_%s size=5 maxlength=5 value=%d>\n"
+         Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>\n"
            var date.year;
        end;
        tag "td" "align=center" begin
-         tag "select" "name=mm_%s" var begin
+         tag "select" "name=m%s" var begin
            for i = 1 to n_months do
              Wserver.wprint "<option value=%d%s> %s\n" i
                (if date.month = i then " selected" else "")
@@ -332,11 +332,11 @@ value print_some_calendar conf date n month_name n_months var =
          end;
        end;
        tag "td" begin
-         Wserver.wprint "<input name=dd_%s size=2 maxlength=2 value=%d>\n"
+         Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>\n"
            var date.day;
        end;
        tag "td" begin
-         Wserver.wprint "<input type=submit name=t_%s value=Ok>\n" var;
+         Wserver.wprint "<input type=submit name=t%s value=Ok>\n" var;
        end;
      end;
   return ()
@@ -361,12 +361,12 @@ value print_calendar conf base =
   let date =
     List.fold_left
       (fun d (var, conv) ->
-         match p_getenv conf.env ("t_" ^ var) with
+         match p_getenv conf.env ("t" ^ var) with
          [ Some _ ->
              match
-               (p_getint conf.env ("yyyy_" ^ var),
-                p_getint conf.env ("mm_" ^ var),
-                p_getint conf.env ("dd_" ^ var))
+               (p_getint conf.env ("y" ^ var),
+                p_getint conf.env ("m" ^ var),
+                p_getint conf.env ("d" ^ var))
              with
              [ (Some yyyy, Some mm, Some dd) ->
                  conv
