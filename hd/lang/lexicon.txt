@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.189 2000-11-22 15:08:51 ddr Exp $
+# $Id: lexicon.txt,v 3.190 2000-11-23 09:57:25 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -286,6 +286,7 @@ en: %t's sex is not coherent with his/her relations
 eo: la sekso de %t ne koheras kun siaj rilatoj
 es: el género de %t es incoherente con sus relaciones
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
+no: %ts kjønn er uforenlig med forbindelsene hans/hennes
 pt: o sexo de %t não é coerente com suas relações
 se: %ts kön stämmer inte överens med sina relationer
 
