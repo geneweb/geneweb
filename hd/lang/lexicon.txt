@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.109 2000-06-14 07:12:17 ddr Exp $
+# $Id: lexicon.txt,v 3.110 2000-06-14 18:26:23 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -468,6 +468,7 @@ he: <em> осфш Sosa </em> бйзс м- %t
 is: <em>Sosa nъmer</em> tengt %t
 nl: <em>Sosa nummer</em> ten opzichte van %t
 no: <em>Sosa nummer</em> i forhold til %t
+pt: <em>n&uacute;mero Sosa</em> em rela&ccedil;&atilde;o a %t
 ru: <em>Sosa номер</em> относительно %t
 se: <em>annummer</em> relativ till %t
 
@@ -2175,6 +2176,7 @@ dk: forlovet
 en: engaged
 fr: fianc&eacute;s
 nl: verloofd
+pt: Noivos
 se: f&ouml;rlovad
 
     engaged%t to
@@ -2183,6 +2185,7 @@ dk: forlovet%t med
 en: engaged%t to
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 nl: verloofd%t met
+pt: noivo%t de/noiva%t de
 se: f&ouml;rlovad%t med
 
     error
@@ -2535,6 +2538,7 @@ fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   аб зешв/ ан зешвъ/ дешйн зешвйн
 nl: pleegvader/pleegmoeder/pleegouders
 no: fosterfar/fostermor/fosterforeldre
+pt: pai adoptivo/m&atilde;e adoptiva/pais adoptivos
 ru: приемный отец/приемная мать/приемный родитель
 se: fosterfar/fostermor/fosterf&ouml;r&auml;ldrar
 
@@ -2548,6 +2552,7 @@ fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacut
 he:  бп зешв/ бъ зешвъ/ ймг зешв
 nl: pleegzoon/pleegdochter/pleegkind
 no: fosters&oslash;nn/fosterdatter/fosterbarn
+pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 ru: приемный сын/приемная дочь/приемный ребенок
 se: fosterson/fosterdotter/fosterbarn
 
@@ -2760,6 +2765,7 @@ en: horizontally
 fi: vaakasuoraan
 fr: horizontalement
 nl: horizontaal
+pt: horizontalmente
 se: horisontellt
 
     husband/wife
@@ -2794,7 +2800,7 @@ is: ef titlar
 it: se titoli
 nl: als titels
 no: hvis titler
-pt: sem t&iacute;tulos
+pt: se t&iacute;tulos
 ru: если титул
 se: om titlar
 
@@ -2849,7 +2855,7 @@ is: mynd
 it: immagine
 nl: beeld
 no: bilde
-pt: imagem
+pt: imagem/imagens
 ru: картинку
 se: foto
 
@@ -3290,6 +3296,7 @@ en: male line/female line
 fi: miespuoleinen linja/naispuoleinen linja
 fr: ligne agnatique/ligne cognatique
 nl: mannelijke lijn/vrouwelijke lijn
+pt: linha masculina (agnat&iacute;cia)/linha feminina (cogn&aacute;tica)
 se: manliga linjen/kvinnliga linjen
 
     marriage of %t after his/her death
@@ -3805,7 +3812,7 @@ is: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./
 it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/20o/21o/22o/23o/24o/25o/26o/27o/28o/29o/30o/31o/32o/33o/34o/35o/36o/37o/38o/39o/40o/41o/42o/43o/44o/45o/46o/47o/48o/49o/50o/51o/52o/53o/54o/55o/56o/57o/58o/59o/60o/61o/62o/63o/64o/65o/66o/67o/68o/69o/70o/71o/72o/73o/74o/75o/76o/77o/78o/79o/80o/81o/82o/83o/84o/85o/86o/87o/88o/89o/90o/91o/92o/93o/94o/95o/96o/97o/98o/99o
 nl: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 no: n./f&oslash;rste/andre/tredje/fjerde/femte/sjette/syvende/&aring;ttende/niende/tiende/ellevte/tolvte/trettende/fjortende/femtende/sekstende/s&oslash;ttende/attende/nittende/tyvende/21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99./100./101./102./103./104./105./106./107./108./109./110./111./112./113./114./115./116./117./118./119./120./121./122./123./124./125./126./127./128./129./130.
-pt: n-&eacute;simo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11mo/12mo/13mo/14mo/15mo/16mo/17mo/18mo/19mo/20mo/21mo/22mo/23mo/24mo/25mo/26mo/27mo/28mo/29mo/30mo/31mo/32mo/33mo/34mo/35mo/36mo/37mo/38mo/39mo/40mo/41mo/42mo/43mo/44mo/45mo/46mo/47mo/48mo/49mo/50mo/51mo/52mo/53mo/54mo/55mo/56mo/57mo/58mo/59mo/60mo/61mo/62mo/63mo/64mo/65mo/66mo/67mo/68mo/69mo/70mo/71mo/72mo/73mo/74mo/75mo/76mo/77mo/78mo/79mo/80mo/81mo/82mo/83mo/84mo/85mo/86mo/87mo/88mo/89mo/90mo/91mo/92mo/93mo/94mo/95mo/96mo/97mo/98mo/99mo
+pt: n-&eacute;simo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14rto/15to/16to/17mo/18vo/19no/20mo/21ro/22ndo/23ro/24rto/25to/26to/27mo/28vo/29no/30mo/31ro/32ndo/33ro/34rto/35to/36to/37mo/38vo/39no/40mo/41ro/42ndo/43ro/44rto/45to/46to/47mo/48vo/49no/50mo/51ro/52ndo/53ro/54rto/55to/56to/57mo/58vo/59no/60mo/61ro/62ndo/63ro/64rto/65to/66to/67mo/68vo/69no/70mo/71ro/72ndo/73ro/74rto/75to/76to/77mo/78vo/79no/80mo/81ro/82ndo/83ro/84rto/85to/86to/87mo/88vo/89no/90mo/91ro/92ndo/93ro/94rto/95to/96to/97mo/98vo/99no
 ru: 1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
 se: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
 
@@ -4720,6 +4727,7 @@ dk: separeret
 en: separated
 fr: s&eacute;par&eacute;s
 nl: gescheiden
+pt: separados
 se: separerat
 
     several answers
@@ -4787,6 +4795,7 @@ fr: chemin le plus court
 it: legame piщ diretto
 nl: kortste weg
 no: korteste gren
+pt: caminho mais curto
 ru: кратчайший путь
 se: kortaste v&auml;gen
 
@@ -5043,6 +5052,7 @@ dk: efternavnsoversigt
 en: surnames list
 fr: liste &eacute;clair
 nl: bijnamen lijst
+pt: lista de apelidos
 se: efternamns lista
 
     switch
