@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.22 1999-10-06 08:47:55 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.23 1999-10-27 11:14:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -525,7 +525,7 @@ value input bname =
   let commit_patches () =
     let fname = Filename.concat bname "patches" in
     do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
-       try Sys.rename fname (fname ^ "~") with _ -> ();
+       try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
     return
     let oc9 = open_out_bin fname in
     do output_value_no_sharing oc9 patches;
