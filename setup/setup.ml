@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.15 2000-09-21 09:30:44 ddr Exp $ *)
+(* $Id: setup.ml,v 3.16 2000-09-22 13:30:21 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -516,7 +516,10 @@ value gwc_or_ged2gwb out_name_of_in_name conf =
   else print_file conf "bso.htm"
 ;
 
-value gwc_check conf = gwc_or_ged2gwb out_name_of_gw conf;
+value gwc_check conf =
+  let conf = {(conf) with env = [("f", "on") :: conf.env]} in
+  gwc_or_ged2gwb out_name_of_gw conf
+;
 
 value ged2gwb_check conf =
   let conf = {(conf) with env = [("f", "on") :: conf.env]} in
