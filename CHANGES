@@ -2,15 +2,16 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [09/01/99] Changed some explanations in the "README.txt" and "ALIRE.txt"
+    of the distribution.
   - [08/01/99] Changed term "consanguinity" into "relationship" in
     relationship computing (because confusion with the usual meaning of
     the term "consanguinity").
-  - [08/01/99] Changed term "consanguinity" into "relationship" in relationship
-    computing.
   - [06/01/99] Deleted Unix option "-robot_xcl": worked bad, did not detect
     robots, detected robots when there are not, too complicated to fix.
     (The normal HTTP robot exclusion remains.)
-  - [28/12/98] Changed http requests to hold no accents.
+  - [28/12/98] Changed some http requests to hold no accents (should be
+    continued...)
   - [19/12/98] Fixed bug quotes disappearing in field "first name aliases"
     in form Update/Person (if the value holds quotes).
   - [18/12/98] No more HTML "table" used in relationship links with
@@ -38,7 +39,8 @@ GeneWeb Version 1.10
   - [11/12/98] Fixed and completed Dutch version (thanks to Joris Esch).
 
 * Welcome files (xx/start.txt)
---- [06/01/99, 08/01/99] Wizard and Friend accesses by navigator password.
+--- [06/01/99, 08/01/99] Wizard and Friend accesses by navigator password
+    (except in CGI mode).
   - [04/01/99, 09/01/99] (de) Fixed some typo (thanks to Markus Mottl).
   - [11/12/98, 04/01/99] (nl) Fixed and completed (thanks to Joris Esch).
 
@@ -46,6 +48,7 @@ GeneWeb Version 1.10
   - [12/12/98] Added option "-mem" to save memory space, but slower.
 
 * Documentation
+  - [09/01/99] Changed link to "LICENCE" which did not always work.
 --- [04/01/99] Added dutch version (thanks to Joris Esch).
 
 GeneWeb Version 1.09

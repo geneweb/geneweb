@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.11 1999-01-08 10:22:56 roglo Exp $ *)
+(* $Id: srcfile.ml,v 1.12 1999-01-09 12:07:59 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -151,7 +151,7 @@ value rec copy_from_channel conf base ic =
       | '%' ->
           let c = input_char ic in
           if not echo.val then
-            if c == 'w' || c == 'x' || c == 'y' || c == 'z' then
+            if c == 'w' || c == 'x' || c == 'y' || c == 'z' || c == 'i' then
               echo.val := True
             else ()
           else
@@ -174,6 +174,7 @@ value rec copy_from_channel conf base ic =
                    if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
                 return ()
             | 'h' -> hidden_env conf
+            | 'i' -> if conf.cgi then () else echo.val := False
             | 'l' -> Wserver.wprint "%s" conf.lang
             | 'n' -> Wserver.wprint "%d" (base.data.persons.len)
             | 'q' ->
@@ -193,9 +194,10 @@ value rec copy_from_channel conf base ic =
             | 'x' ->
                 if conf.wizard || conf.friend then () else echo.val := False
             | 'y' ->
-                if not conf.wizard then () else echo.val := False
+                if not conf.wizard && not conf.cgi then ()
+                else echo.val := False
             | 'z' ->
-                if not conf.wizard && not conf.friend then ()
+                if not conf.wizard && not conf.friend && not conf.cgi then ()
                 else echo.val := False
             | c -> Wserver.wprint "%%%c" c ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];

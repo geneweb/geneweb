@@ -1,18 +1,18 @@
 GeneWeb 1.10
 
-Pour demarrer avec GeneWeb, lancez votre navigateur Web.
+Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
-Si vous avez installe GeneWeb, par exemple dans le repertoire
-- /home/dupont/geneweb          sous Unix
-- C:\home\dupont\geneweb"       sous Windows 95/NT
-ouvrez la location:
-     file:/home/dupont/geneweb/doc/index.htm
+Si vous etes sous Windows NT/95/98:
+   Double-cliquez sur le fichier "index.htm" du repertoire "doc"
+   de la distribution de GeneWeb, et suivez les instructions.
 
-Une solution plus simple, sous Windows 95/98/NT, sans avoir besoin de
-lancer préalablement le navigateur, est de double-cliquer sur le
-fichier "index.htm" du répertoire "doc".
-
-Suivez les instructions.
+Si vous etes sous Unix:
+   Lancez votre navigateur Web.
+   Si vous avez installe GeneWeb, par exemple dans
+        /home/dupont/geneweb
+   ouvrez la location:
+        file:/home/dupont/geneweb/doc/index.htm
+   et suivez les instructions.
 
      -----------------
 
@@ -27,5 +27,5 @@ Remarques, suggestions, questions, rapports d'anomalie a:
 	daniel.de_rauglaudre@inria.fr
 	http://cristal.inria.fr/~ddr/
 
-Veuillez preciser le numero de version above et le systeme sur lequel
-vous tournez (Linux, Windows NT ou Windows 95/98).
+Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
+vous tournez (Unix, Windows NT ou Windows 95/98).

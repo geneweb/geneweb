@@ -77,6 +77,13 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 %y%z<li> Acc&egrave;s <a href="%sw=f"><em>ami</em></a> (mot de passe).
 %z%y</ul>
 
-%y<p>
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Mot de passe, pour acc&egrave;s <em>ami</em> ou
+<em>sorcier</em>:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>
