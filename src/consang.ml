@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 4.3 2001-04-19 12:34:56 ddr Exp $ *)
+(* $Id: consang.ml,v 4.4 2001-06-08 14:33:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -70,7 +70,7 @@ value topological_sort base =
           let ifath = Adef.int_of_iper cpl.father in
           let imoth = Adef.int_of_iper cpl.mother in
           do {
-            tab.(ifath) := tab.(ifath) + 1; tab.(imoth) := tab.(imoth) + 1;
+            tab.(ifath) := tab.(ifath) + 1; tab.(imoth) := tab.(imoth) + 1
           }
       | _ -> () ]
     };
@@ -176,7 +176,7 @@ value relationship_and_links base ri b ip1 ip2 =
         tu.inserted := yes_inserted;
         tu.elim_ancestors := False;
         tu.anc_stat1 := MaybeAnc;
-        tu.anc_stat2 := MaybeAnc;
+        tu.anc_stat2 := MaybeAnc
       }
     in
     let qi = ref (min tstab.(i1) tstab.(i2)) in
@@ -192,16 +192,15 @@ value relationship_and_links base ri b ip1 ip2 =
         if qmax.val < 0 then do {
           for i = qi.val to v - 1 do { ri.queue.(i) := [] };
           qmax.val := v;
-          ri.queue.(v) := [u];
+          ri.queue.(v) := [u]
         }
         else do {
           if v > qmax.val then do {
-            for i = qmax.val + 1 to v do { ri.queue.(i) := [] };
-            qmax.val := v;
+            for i = qmax.val + 1 to v do { ri.queue.(i) := [] }; qmax.val := v
           }
           else ();
-          ri.queue.(v) := [u :: ri.queue.(v)];
-        };
+          ri.queue.(v) := [u :: ri.queue.(v)]
+        }
       }
     in
     let relationship = ref 0.0 in
@@ -215,11 +214,11 @@ value relationship_and_links base ri b ip1 ip2 =
         let p1 = half u.weight1 in
         let p2 = half u.weight2 in
         if u.anc_stat1 = IsAnc && ty.anc_stat1 <> IsAnc then do {
-          ty.anc_stat1 := IsAnc; incr nb_anc1; ()
+          ty.anc_stat1 := IsAnc; incr nb_anc1
         }
         else ();
         if u.anc_stat2 = IsAnc && ty.anc_stat2 <> IsAnc then do {
-          ty.anc_stat2 := IsAnc; incr nb_anc2; ()
+          ty.anc_stat2 := IsAnc; incr nb_anc2
         }
         else ();
         ty.weight1 := ty.weight1 +. p1;
@@ -230,9 +229,9 @@ value relationship_and_links base ri b ip1 ip2 =
           ty.lens1 :=
             List.fold_left (insert_branch_len ip_from) ty.lens1 u.lens1;
           ty.lens2 :=
-            List.fold_left (insert_branch_len ip_from) ty.lens2 u.lens2;
+            List.fold_left (insert_branch_len ip_from) ty.lens2 u.lens2
         }
-        else ();
+        else ()
       }
     in
     let treat_ancestor u =
@@ -246,7 +245,7 @@ value relationship_and_links base ri b ip1 ip2 =
         if tu.anc_stat2 == IsAnc then decr nb_anc2 else ();
         relationship.val := relationship.val +. contribution;
         if b && contribution <> 0.0 && not tu.elim_ancestors then do {
-          tops.val := [u :: tops.val]; tu.elim_ancestors := True; ()
+          tops.val := [u :: tops.val]; tu.elim_ancestors := True
         }
         else ();
         match a.parents with
@@ -256,9 +255,9 @@ value relationship_and_links base ri b ip1 ip2 =
               treat_parent (Adef.iper_of_int u) tu
                 (Adef.int_of_iper cpl.father);
               treat_parent (Adef.iper_of_int u) tu
-                (Adef.int_of_iper cpl.mother);
+                (Adef.int_of_iper cpl.mother)
             }
-        | _ -> () ];
+        | _ -> () ]
       }
     in
     insert i1;
