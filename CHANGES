@@ -15,7 +15,7 @@ GeneWeb version 3.03
     with a timeout of 1800 seconds (half an hour), i.e. if you do nothing
     during half an hour, the login password is unactivated; this limit time is
     changeable by a new gwd option "-login_tmout". Note: this system does
-    *not* use cookies.
+    not use cookies.
   - [12 Mar 00] In ancestors page, added male and female lines.
   - [11 Mar 00] In personal pages, the images defined by external URL (i.e.
     accomodated in other Web sites) are now reduced as are local images.

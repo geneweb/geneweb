@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.9 2000-03-16 10:58:01 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.10 2000-03-19 16:19:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -324,7 +324,7 @@ value effective_mod conf base sfam scpl sdes =
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
-    [ Some s -> s
+    [ Some s -> strip_spaces s
     | None -> "" ]
   in
   let nfam =
