@@ -9,10 +9,6 @@ GeneWeb Version 3.08
   - [22 Aug 00] Added test: no more display "age at death" if negative
     (because of erroneous dates).
 
-* Gedcom to GeneWeb (ged2gwb)
-  - [26 Aug 00] If -epn (which is default) and -ls, tries now to lowercase
-    the public names.
-
 GeneWeb Version 3.07
 --------------------
 
