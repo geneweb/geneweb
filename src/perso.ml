@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.80 2001-02-14 19:48:49 ddr Exp $ *)
+(* $Id: perso.ml,v 3.81 2001-02-15 06:22:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -248,7 +248,9 @@ type ast = Templ.ast ==
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
+  | Eequal of ast_expr and ast_expr
   | Enot of ast_expr
+  | Estr of string
   | Evar of string and list string ]
 ;
 
@@ -1081,12 +1083,16 @@ value print_wid_hei conf base env fname =
 ;
 
 value eval_bool_value conf base env =
-  eval where rec eval =
+  let rec bool_eval =
     fun
-    [ Eor e1 e2 -> eval e1 || eval e2
-    | Eand e1 e2 -> eval e1 && eval e2
-    | Enot e -> not (eval e)
+    [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
+    | Eand e1 e2 -> bool_eval e1 && bool_eval e2
+    | Eequal e1 e2 -> do Wserver.wprint "=???"; return False
+    | Enot e -> not (bool_eval e)
+    | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
     | Evar s sl -> eval_bool_variable conf base env [s :: sl] ]
+  in
+  bool_eval
 ;
 
 value make_ep base ip =

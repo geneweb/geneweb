@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.29 2001-02-14 19:48:49 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.30 2001-02-15 06:22:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -786,7 +786,9 @@ type ast = Templ.ast ==
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
+  | Eequal of ast_expr and ast_expr
   | Enot of ast_expr
+  | Estr of string
   | Evar of string and list string ]
 ;
 
@@ -808,18 +810,25 @@ value eval_variable conf base env p =
   [ ["bapt"; s] -> VVdate (Adef.od_of_codate p.baptism) s
   | ["birth"; s] -> VVdate (Adef.od_of_codate p.birth) s
   | [s] -> VVind s
+  | [] -> VVind ""
   | _ -> VVnone ]
 ;
 
-value start_with s sini =
-  String.length s > String.length sini &&
-  String.sub s 0 (String.length sini) = sini
+value extract_var sini s =
+  let len = String.length sini in
+  if String.length s > len && String.sub s 0 (String.length sini) = sini then
+    String.sub s len (String.length s - len)
+  else ""
 ;
 
 value eval_person_bool_variable conf base env p =
   fun 
   [ "adding" ->
       List.mem (p_getenv conf.env "m") [Some "ADD_IND"; Some "ADD_IND_OK"]
+  | "has_aliases" -> p.aliases <> []
+  | "has_first_names_aliases" -> p.first_names_aliases <> []
+  | "has_qualifiers" -> p.qualifiers <> []
+  | "has_surnames_aliases" -> p.surnames_aliases <> []
   | "is_female" -> p.sex = Female
   | "is_male" -> p.sex = Male
   | "modifying" ->
@@ -828,8 +837,8 @@ value eval_person_bool_variable conf base env p =
       List.mem (p_getenv conf.env "m")
         [Some "MRG_IND_OK"; Some "MRG_MOD_IND_OK"]
   | s ->
-      if start_with s "evar_" then
-        let v = String.sub s 5 (String.length s - 5) in
+      let v = extract_var "evar_" s in
+      if v <> "" then
         match p_getenv conf.env v with
         [ Some "" | None -> False
         | _ -> True ]
@@ -873,29 +882,51 @@ value eval_bool_variable conf base env p sl =
 ;
 
 value eval_bool_value conf base env p =
-  eval where rec eval =
+  let rec bool_eval =
     fun
-    [ Eor e1 e2 -> eval e1 || eval e2
-    | Eand e1 e2 -> eval e1 && eval e2
-    | Enot e -> not (eval e)
+    [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
+    | Eand e1 e2 -> bool_eval e1 && bool_eval e2
+    | Eequal e1 e2 -> string_eval e1 = string_eval e2
+    | Enot e -> not (bool_eval e)
+    | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
     | Evar s sl -> eval_bool_variable conf base env p [s :: sl] ]
+  and string_eval =
+    fun
+    [ Estr s -> s
+    | Evar s [] ->
+        let v = extract_var "cvar_" s in
+        if v <> "" then try List.assoc v conf.base_env with [ Not_found -> "" ]
+        else do Wserver.wprint "%s???" s; return ""
+    | Evar s _ -> do Wserver.wprint "%s???" s; return ""
+    | _ -> do Wserver.wprint "val???"; return "" ]
+  in
+  bool_eval
+;
+
+value print_string_env var env =
+   match get_env var env with
+   [ Estring x -> Wserver.wprint "%s" x
+   | _ -> () ]
 ;
 
 value print_person_variable conf base env p =
   fun
-  [ "digest" ->
-      match get_env "digest" env with
-      [ Estring x -> Wserver.wprint "%s" x
-      | _ -> () ]
+  [ "bapt_place" -> Wserver.wprint "%s" (quote_escaped p.baptism_place)
+  | "bapt_src" -> Wserver.wprint "%s" (quote_escaped p.baptism_src)
+  | "birth_place" -> Wserver.wprint "%s" (quote_escaped p.birth_place)
+  | "birth_src" -> Wserver.wprint "%s" (quote_escaped p.birth_src)
+  | "cnt" -> print_string_env "cnt" env
+  | "digest" -> print_string_env "digest" env
   | "first_name" -> Wserver.wprint "%s" (quote_escaped p.first_name)
   | "image" -> Wserver.wprint "%s" (quote_escaped p.image)
   | "index" -> Wserver.wprint "%d" (Adef.int_of_iper p.cle_index)
+  | "item" -> print_string_env "item" env
   | "occ" -> if p.occ <> 0 then Wserver.wprint "%d" p.occ else ()
   | "public_name" -> Wserver.wprint "%s" (quote_escaped p.public_name)
   | "surname" -> Wserver.wprint "%s" (quote_escaped p.surname)
   | s ->
-      if start_with s "evar_" then
-        let v = String.sub s 5 (String.length s - 5) in
+      let v = extract_var "evar_" s in
+      if v <> "" then
         match p_getenv conf.env v with
         [ Some vv -> Wserver.wprint "%s" (quote_escaped vv)
         | _ -> () ]
@@ -984,10 +1015,43 @@ value rec eval_ast conf base env p =
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> eval_if conf base env p e alt ale
-  | Aforeach s sl al -> Wserver.wprint "Aforeach &#034;%s&#034;" s ]
+  | Aforeach s sl al -> eval_foreach conf base env p s sl al ]
 and eval_if conf base env p e alt ale =
   let al = if eval_bool_value conf base env p e then alt else ale in
   List.iter (eval_ast conf base env p) al
+and eval_foreach conf base env p s sl al =
+  let (sl, s) =
+    let sl = List.rev [s :: sl] in
+    (List.rev (List.tl sl), List.hd sl)
+  in
+  match eval_variable conf base env p sl with
+  [ VVind "" -> eval_simple_foreach conf base env p al s
+  | VVind _ ->
+      do Wserver.wprint "foreach ";
+         List.iter (fun s -> Wserver.wprint "%s." s) sl;
+         Wserver.wprint "%s???" s;
+      return ()
+  | VVdate _ _ | VVnone -> () ]
+and eval_simple_foreach conf base env p al s =
+  let list =
+    match s with
+    [ "alias" -> Some p.aliases
+    | "first_name_alias" -> Some p.first_names_aliases
+    | "qualifier" -> Some p.qualifiers
+    | "surname_alias" -> Some p.surnames_aliases
+    | _ -> None ]
+  in
+  match list with
+  [ Some list -> eval_foreach_string conf base env p al list
+  | None -> Wserver.wprint "foreach %s???" s ]
+and eval_foreach_string conf base env p al list =
+  let _ = List.fold_left
+    (fun cnt nn ->
+       let env = [("item", Estring nn) :: env] in
+       let env = [("cnt", Estring (string_of_int cnt)) :: env] in
+       do List.iter (eval_ast conf base env p) al; return cnt + 1)
+    0 list
+  in ()
 ;
 
 value interp_templ conf base p digest astl =
