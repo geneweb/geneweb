@@ -1,11 +1,13 @@
-# $Id: Makefile,v 2.4 1999-04-07 09:54:42 ddr Exp $
+# $Id: Makefile,v 2.5 1999-04-15 10:38:27 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver
 GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo mk_consang.cmo
-GWD_OBJS=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo gwd.cmo
+GWD_OBJS1=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
+GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo gwd.cmo
+GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2)
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo select.cmo gwu.cmo
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
@@ -44,7 +46,9 @@ gwd.out: $(GWD_OBJS)
 	$(OCAMLC) -custom unix.cma $(CAMLP4D)/gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) unix.cmxa $(CAMLP4D)/gramlib.cmxa $(GWD_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
+	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
+	$(OCAMLOPT) unix.cmxa $(CAMLP4D)/gramlib.cmxa x1.cmxa x2.cmxa gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
