@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.254 2001-03-14 17:18:58 ddr Exp $
+# $Id: lexicon.txt,v 3.255 2001-03-14 17:26:11 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4849,6 +4849,7 @@ se: namn
 af: %s is reeds gebruik deur %t
 br: nome %s j&aacute; utilizado por %testa pessoa%t
 cs: jméno %s u¾ má tato %tosoba%t
+ct: nom %s ja utilitzat per %taquesta persona%t
 de: Name %s wird schon bei %tdieser Person%t benutzt
 dk: navn %s er allerede anvendt af %tdenne person%t
 en: name %s already used by %tthis person%t
@@ -5460,6 +5461,7 @@ se: den
 
     on (weekday day month year)
 af:
+br:
 cn:
 cs:
 ct:
