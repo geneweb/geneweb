@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.4 2001-08-24 04:54:09 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.5 2005-03-02 13:05:19 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -44,7 +44,6 @@ value html_table_struct indi_txt vbar_txt phony d t =
     | Ghost _ -> False
     | Nothing -> True ]
   in
-  let jlast = Array.length t.table.(0) - 1 in
   let elem_txt =
     fun
     [ Elem e -> TDstring (indi_txt d.dag.(int_of_idag e))

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.64 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: relation.ml,v 4.65 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -74,7 +74,6 @@ value print_menu conf base p =
       Wserver.wprint " %s..." (transl_nth conf "and" 0)
     }
   in
-  let is = index_of_sex p.sex in
   let u = uget conf base p.cle_index in
   do {
     header conf title;
@@ -134,7 +133,6 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
         end;
         Array.iter
           (fun ifam ->
-             let fam = foi base ifam in
              let cpl = coi base ifam in
              let c = spouse p.cle_index cpl in
              let c = pget conf base c in

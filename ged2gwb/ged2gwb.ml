@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.53 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.54 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2472,7 +2472,6 @@ value kill_parents base ip =
 ;
 
 value effective_del_fam base fam cpl des =
-  let ifam = fam.fam_index in
   do {
     kill_family base fam (father cpl);
     kill_family base fam (mother cpl);
@@ -2581,7 +2580,7 @@ value finish_base base =
   let unions = base.data.unions.array () in
   let families = base.data.families.array () in
   let descends = base.data.descends.array () in
-  let strings = base.data.strings.array () in
+  let _ = base.data.strings.array () in
   do {
     for i = 0 to Array.length descends - 1 do {
       let des = descends.(i) in

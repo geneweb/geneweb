@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.54 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.55 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -78,7 +78,7 @@ value obsolete version var new_var r =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value rec eval_var conf base env ((fam, cpl, des) as fcd) loc =
+value rec eval_var conf base env (fam, cpl, des) loc =
   fun
   [ ["child" :: sl] ->
         let k =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.19 2005-02-20 14:34:36 ddr Exp $ *)
+(* $Id: alln.ml,v 4.20 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -511,11 +511,6 @@ value print_short conf base is_surnames =
   let _ =
     if String.length ini < 2 then let _ = base.data.strings.array () in ()
     else ()
-  in
-  let all =
-    match p_getenv conf.env "o" with
-    [ Some "A" -> True
-    | _ -> False ]
   in
   let list =
     let (list, sorted) = select_names conf base is_surnames ini in
