@@ -1,9 +1,9 @@
-(* $Id: iolight.ml,v 4.8 2005-02-13 10:45:51 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.9 2005-02-14 18:19:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 
-value magic_gwb = "GnWb001y";
+value magic_gwb = "GnWb0020";
 
 value check_magic =
   let b = String.create (String.length magic_gwb) in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.34 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: descend.ml,v 4.35 2005-02-14 18:19:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -395,34 +395,38 @@ value display_descendants_upto conf base max_level p line =
   do {
     header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
-    Wserver.wprint "%s.<br>\n" (capitale (text_to conf max_level));
+    tag "p" begin
+      Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
+    end;
     if line = Neuter then ()
     else
       Wserver.wprint "%s.<br>\n"
         (capitale
            (transl_nth conf "male line/female line"
               (if line = Male then 0 else 1)));
-    html_p conf;
-    stag "strong" begin
-      Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    end;
-    if authorized_age conf base p then Date.print_dates conf base p else ();
-    let occu = sou base p.occupation in
-    if authorized_age conf base p && occu <> "" then Wserver.wprint ", %s" occu
-    else ();
-    Wserver.wprint ".";
-    html_br conf;
-    loop 1 p (uget conf base p.cle_index);
-    if count.val > 1 then do {
-      html_p conf;
-      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) count.val
-        (nominative (transl_nth_def conf "person/persons" 2 1));
-      if max_level > 1 then
-        Wserver.wprint " (%s)" (transl conf "spouses not included")
+    tag "p" begin
+      stag "strong" begin
+        Wserver.wprint "\n%s" (referenced_person_text conf base p);
+      end;
+      if authorized_age conf base p then Date.print_dates conf base p else ();
+      let occu = sou base p.occupation in
+      if authorized_age conf base p && occu <> "" then
+        Wserver.wprint ", %s" occu
       else ();
-      Wserver.wprint ".\n"
-    }
-    else ();
+      Wserver.wprint ".";
+      html_br conf;
+      loop 1 p (uget conf base p.cle_index);
+      if count.val > 1 then do {
+        html_p conf;
+        Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) count.val
+          (nominative (transl_nth_def conf "person/persons" 2 1));
+        if max_level > 1 then
+          Wserver.wprint " (%s)" (transl conf "spouses not included")
+        else ();
+        Wserver.wprint ".\n"
+      }
+      else ();
+    end;
     trailer conf
   }
 ;

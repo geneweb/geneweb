@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.16 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: alln.ml,v 4.17 2005-02-14 18:19:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -226,24 +226,27 @@ value print_alphabetic_all conf base is_surnames ini list len =
     tag "p" begin
       List.iter
         (fun (ini_k, _) ->
-           stagn "a" "href=\"#%s\"" ini_k begin
-             Wserver.wprint "%s" (String.capitalize ini_k);
+           let ini = capitalize_if_not_utf8 ini_k in
+           stagn "a" "href=\"#%s\"" ini begin
+             Wserver.wprint "%s" (Gutil.tr '_' ' ' ini);
            end)
       list;
     end;
     tag "ul" begin
       List.iter
         (fun (ini_k, l) ->
+           let ini = capitalize_if_not_utf8 ini_k in
            tag "li" begin
              stagn "a" "id=\"%s\"" ini_k begin
-               Wserver.wprint "%s" (String.capitalize ini_k);
+               Wserver.wprint "%s" (Gutil.tr '_' ' ' ini);
              end;
              tag "ul" begin
                List.iter
                  (fun (s, cnt) ->
                     stagn "li" begin
                       let href =
-                        "m=" ^ mode ^ ";v=" ^ code_varenv (Name.lower s)
+                        "m=" ^ mode ^ ";v=" ^
+                        code_varenv (lower_if_not_utf8 s) ^ ";t=A"
                       in
                       wprint_geneweb_link conf href
                         (alphab_string conf base is_surnames s);
