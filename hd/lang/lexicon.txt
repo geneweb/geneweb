@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.74 2002-03-06 08:39:51 ddr Exp $
+# $Id: lexicon.txt,v 4.75 2002-03-06 09:29:40 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -3630,10 +3630,10 @@ af: ident/e-pos/onderwerp
 ca: ident/email/tema
 cs: ident/email/pøedmìt (osoba?)
 da: ident/email/emne
-de: ident/E-Mail/Betreff
+de: Name/E-Mail/Betreff
 en: ident/e-mail/subject
 eo: ident/email/objekto
-es: ident/Email/asunto
+es: Nombre/Email/asunto
 et: ident/email/teema
 fi: ident/email/kohde
 fr: nom/courriel/sujet
@@ -5922,7 +5922,7 @@ da: sl&aelig;gtskaber ved gifterm&aring;l
 de: Heiratsbeziehungen
 en: relationships by marriage
 eo: ligoj per edzigxo
-es: parentescos pol&iacute;tico
+es: parentescos pol&iacute;ticos
 et: sugulus abielu kaudu
 fi: sukulaisuus avioliiton kautta
 fr: liens de parent&eacute; par alliance
@@ -7554,7 +7554,9 @@ sv: anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
     user/password/cancel
 da: bruger/adgangskode/annuller
+de: Benutzer/Passwort/Abbruch
 en: user/password/cancel
+es: usuario/contrase&ntilde;a/cancelar
 fr: utilisateur/mot de passe/annuler
 pl: u¿ytkownik/has³o/anuluj
 
