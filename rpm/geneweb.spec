@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.5 1999-09-01 21:32:58 ddr Exp $
+# $Id: geneweb.spec,v 1.6 1999-09-02 12:38:18 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -21,7 +21,8 @@ Summary: Genealogy software with a Web interface
 Name: geneweb
 Version: VERSION
 Release: RELEASE
-Copyright: INRIA (GPL)
+Copyright: GPL
+Vendor: INRIA
 Group: Applications
 Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-VERSION.tar.gz
 Source1: geneweb-initrc-VERSION.sh
@@ -39,10 +40,9 @@ GeneWeb is a genealogy software with a Web interface.
 It uses very efficient techniques of relationship and consanguinity computing.
 
 %description -l fr
-GeneWeb est un logiciel de généalogie doté d'une interface Web,
-utilisable aussi bien sur un ordinateur non connecté au réseau qu'en
-service Web. Il utilise des techniques de calcul de parenté et de
-consanguinité très efficaces.
+GeneWeb est un logiciel de généalogie doté d'une interface Web.
+Il utilise des techniques de calcul de parenté et de consanguinité
+très efficaces.
 
 # *********** BUILDING .RPM *************
 # Now come the header lines that describe how to build the application
