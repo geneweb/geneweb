@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.8 2001-12-20 19:58:15 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.9 2001-12-27 10:46:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -292,10 +292,9 @@ value effective_merge_ind conf base p1 p2 =
       for i = 0 to Array.length u2.family - 1 do {
         let ifam = u2.family.(i) in
         let cpl = coi base ifam in
-        match p2.sex with
-        [ Male -> cpl.father := p1.cle_index
-        | Female -> cpl.mother := p1.cle_index
-        | Neuter -> assert False ];
+        if p2.cle_index = cpl.father then cpl.father := p1.cle_index
+        else if p2.cle_index = cpl.mother then cpl.mother := p2.cle_index
+        else assert False;
         base.func.patch_couple ifam cpl;
       };
       let u1 = uoi base p1.cle_index in
@@ -305,6 +304,7 @@ value effective_merge_ind conf base p1 p2 =
       base.func.patch_union p2.cle_index u2;
     }
     else ();
+    if p2.sex <> Neuter then p1.sex := p2.sex else ();
     if p1.birth = Adef.codate_None then p1.birth := p2.birth else ();
     if p1.birth_place = Adef.istr_of_int 0 then
       p1.birth_place := p2.birth_place
