@@ -1,29 +1,37 @@
-(* $Id: name.ml,v 4.1 2001-04-18 12:05:29 ddr Exp $ *)
+(* $Id: name.ml,v 4.2 2001-05-03 10:55:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
+
+module Buff =
+  struct
+    value buff = ref (String.create 80);
+    value store len x =
+      do {
+        if len >= String.length buff.val then
+          buff.val := buff.val ^ String.create (String.length buff.val)
+        else ();
+        buff.val.[len] := x;
+        succ len
+      }
+    ;
+    value mstore len s =
+      add_rec len 0 where rec add_rec len i =
+        if i == String.length s then len
+        else add_rec (store len s.[i]) (succ i)
+    ;
+    value get len = String.sub buff.val 0 len;
+  end
+;
 
 (* Name.lower *)
 
 value lower s =
-  let rec name_len special i len =
-    if i == String.length s then len
-    else
-      match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' ->
-          name_len 0 (i + 1) (len + special + 1)
-      | _ ->
-          if len == 0 then name_len 0 (i + 1) 0
-          else name_len 1 (i + 1) len ]
-  in
-  let s' = String.create (name_len 0 0 0) in
-  let rec copy special i i' =
-    if i == String.length s then s'
+  copy False 0 0 where rec copy special i len =
+    if i == String.length s then Buff.get len
     else
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
         ->
-          let i' =
-            if special then do { s'.[i'] := ' '; i' + 1 } else i'
-          in
+          let len = if special then Buff.store len ' ' else len in
           let c =
             match Char.lowercase c with
             [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
@@ -38,12 +46,9 @@ value lower s =
             | 'þ' -> 'p'
             | c -> c ]
           in
-          do { s'.[i'] := c; copy False (i + 1) (i' + 1) }
+          copy False (i + 1) (Buff.store len c)
       | c ->
-          if i' == 0 then copy False (i + 1) 0
-          else copy True (i + 1) i' ]
-  in
-  copy False 0 0
+          copy (len <> 0) (i + 1) len ]
 ;
 
 (* Name.abbrev *)
@@ -75,61 +80,27 @@ value rec search_abbrev s i =
 ;
 
 value abbrev s =
-  let rec name_len can_start_abbrev i i' =
-    if i >= String.length s then i'
+  copy True 0 0 where rec copy can_start_abbrev i len =
+    if i >= String.length s then Buff.get len
     else
       match s.[i] with
-      [ ' ' -> name_len True (i + 1) (i' + 1)
+      [ ' ' -> copy True (i + 1) (Buff.store len ' ')
       | c ->
           if can_start_abbrev then
             match search_abbrev s i abbrev_list with
-            [ None -> name_len False (i + 1) (i' + 1)
-            | Some (n, Some a) -> name_len False (i + n) (i' + String.length a)
-            | Some (n, None) -> name_len True (i + n + 1) i' ]
-          else name_len False (i + 1) (i' + 1) ]
-  in
-  let len = name_len True 0 0 in
-  if len == String.length s then s
-  else
-    let s' = String.make len '@' in
-    let rec copy can_start_abbrev i i' =
-      if i >= String.length s then s'
-      else
-        match s.[i] with
-        [ ' ' -> do { s'.[i'] := ' '; copy True (i + 1) (i' + 1) }
-        | c ->
-            if can_start_abbrev then
-              match search_abbrev s i abbrev_list with
-              [ None -> do { s'.[i'] := c; copy False (i + 1) (i' + 1) }
-              | Some (n, Some a) ->
-                  do {
-                    String.blit a 0 s' i' (String.length a);
-                    copy False (i + n) (i' + String.length a)
-                  }
-              | Some (n, None) -> copy True (i + n + 1) i' ]
-            else do { s'.[i'] := c; copy False (i + 1) (i' + 1) } ]
-    in
-    copy True 0 0
+            [ None -> copy False (i + 1) (Buff.store len c)
+            | Some (n, Some a) -> copy False (i + n) (Buff.mstore len a)
+            | Some (n, None) -> copy True (i + n + 1) len ]
+          else copy False (i + 1) (Buff.store len c) ]
 ;
 
 (* Name.strip *)
 
 value strip s =
-  let rec name_len i len =
-    if i == String.length s then len
-    else if s.[i] == ' ' then name_len (i + 1) len
-    else name_len (i + 1) (len + 1)
-  in
-  let len = name_len 0 0 in
-  if len == String.length s then s
-  else
-    let s' = String.create len in
-    let rec copy i i' =
-      if i == String.length s then s'
-      else if s.[i] == ' ' then copy (i + 1) i'
-      else do { s'.[i'] := s.[i]; copy (i + 1) (i' + 1) }
-    in
-    copy 0 0
+  copy 0 0 where rec copy i len =
+    if i == String.length s then Buff.get len
+    else if s.[i] == ' ' then copy (i + 1) len
+    else copy (i + 1) (Buff.store len s.[i])
 ;
 
 (* Name.crush *)
@@ -147,52 +118,30 @@ value roman_number s i =
 ;
 
 value crush s =
-  let rec name_len i len first_vowel =
-    if i == String.length s then len
-    else if s.[i] == ' ' then name_len (i + 1) len True
-    else
-      match roman_number s i with
-      [ Some j -> name_len j (len + j - i) True
-      | _ ->
-          match s.[i] with
-          [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' ->
-              if first_vowel then name_len (i + 1) (len + 1) False
-              else name_len (i + 1) len False
-          | 'h' -> name_len (i + 1) len first_vowel
-          | 's' when i == String.length s - 1 || s.[i + 1] == ' ' ->
-              name_len (i + 1) len False
-          | c ->
-              if i > 0 && s.[i-1] == c then name_len (i + 1) len False
-              else name_len (i + 1) (len + 1) False ] ]
-  in
-  let len = name_len 0 0 True in
-  let s' = String.create len in
-  let rec copy i i' first_vowel =
-    if i == String.length s then s'
-    else if s.[i] == ' ' then copy (i + 1) i' True
+  copy 0 0 True where rec copy i len first_vowel =
+    if i == String.length s then Buff.get len
+    else if s.[i] == ' ' then copy (i + 1) len True
     else
       match roman_number s i with
       [ Some j ->
-          do {
-            for k = i to j - 1 do { s'.[k+i'-i] := s.[k] };
-            copy j (i' + j - i) True
-          }
+          loop i len where rec loop i len =
+            if i = j then copy j len True
+            else loop (i + 1) (Buff.store len s.[i])
       | _ ->
           match s.[i] with
           [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' ->
-              if first_vowel then do {
-                s'.[i'] := 'e'; copy (i + 1) (i' + 1) False
-              }
-              else copy (i + 1) i' False
+              let len = if first_vowel then Buff.store len 'e' else len in
+              copy (i + 1) len False
           | 'h' ->
-              do {
-                if i > 0 && s.[i-1] == 'p' then s'.[i'-1] := 'f' else ();
-                copy (i + 1) i' first_vowel
-              }
+              let len =
+                if i > 0 && s.[i-1] == 'p' then Buff.store (len - 1) 'f'
+                else len
+              in
+              copy (i + 1) len first_vowel
           | 's' when i == String.length s - 1 || s.[i + 1] == ' ' ->
-              copy (i + 1) i' False          
+              copy (i + 1) len False          
           | c ->
-              if i > 0 && s.[i-1] == c then copy (i + 1) i' False
+              if i > 0 && s.[i-1] == c then copy (i + 1) len False
               else
                 let c =
                   match c with
@@ -200,9 +149,7 @@ value crush s =
                   | 'z' -> 's'
                   | c -> c ]
                 in
-                do { s'.[i'] := c; copy (i + 1) (i' + 1) False } ] ]
-  in
-  copy 0 0 True
+                copy (i + 1) (Buff.store len c) False ] ]
 ;
 
 (* strip_lower *)
