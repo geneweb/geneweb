@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.6 1999-04-07 11:49:44 ddr Exp $ *)
+(* $Id: relation.ml,v 2.7 1999-04-07 19:22:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -323,13 +323,8 @@ value print_propose_upto conf base p1 p2 rl =
   | _ -> () ]
 ;
 
-value print_main_relationship conf base p1 p2 =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  if p1.cle_index == p2.cle_index then
-    do header conf title; conf.senv := [];
-       Wserver.wprint "%s\n" (capitale (transl conf "it is the same person!"));
-       trailer conf;
-    return ()
+value compute_relationship conf base p1 p2 =
+  if p1.cle_index == p2.cle_index then None
   else
     let _ = base.data.ascends.array () in
     let _ = base.data.couples.array () in
@@ -338,18 +333,7 @@ value print_main_relationship conf base p1 p2 =
     let (relationship, ancestors) =
       Consang.relationship_and_links base tab True p1.cle_index p2.cle_index
     in
-    if ancestors = [] then
-      do header conf title;
-         conf.senv := [];
-         Wserver.wprint
-           (fcapitale
-              (ftransl conf
-                 "no known relationship link between %t and %t"))
-           (fun _ -> afficher_personne_titre_referencee conf base p1)
-           (fun _ -> afficher_personne_titre_referencee conf base p2);
-         Wserver.wprint "\n";
-         trailer conf;
-      return ()
+    if ancestors = [] then None
     else
       let total =
         List.fold_left
@@ -394,41 +378,64 @@ value print_main_relationship conf base p1 p2 =
              | _ -> [(len1, len2, [sol]) :: l] ])
           [] rl                 
       in
-      let a1 = aoi base p1.cle_index in
-      let a2 = aoi base p2.cle_index in
-      do header conf title; conf.senv := [];
-         let _ =
-           List.fold_left
-             (fun i sol ->
-                do print_solution conf base i p1 p2 sol; return succ i)
-             1 rl
-         in
-         ();
-         Wserver.wprint "\n";
-         html_p conf;
-         Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
-         wprint_num conf total;
-         Wserver.wprint "</em> %s\n"
-           (transl_nth conf "relationship link/relationship links"
-              (if Num.eq total Num.one then 0 else 1));
-         if
-           age_autorise conf base p1 && age_autorise conf base p2 &&
-           a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1)
-         then
-           do html_p conf;
-              Wserver.wprint "<em>%s: "
-                (capitale (transl conf "relationship"));
-              print_decimal_num conf
-                (round_2_dec
-                   (Adef.float_of_fix
-                      (Adef.fix_of_float relationship) *. 100.0));
-              Wserver.wprint "%%</em>";
-              html_p conf;
+      Some (rl, total, relationship)
+;
+
+value print_main_relationship conf base p1 p2 =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
+  let rel = compute_relationship conf base p1 p2 in
+  do conf.senv := [];
+     header conf title;
+     match rel with
+     [ None ->
+         if p1.cle_index == p2.cle_index then
+           Wserver.wprint "%s\n"
+             (capitale (transl conf "it is the same person!"))
+         else
+           do Wserver.wprint
+                (fcapitale
+                   (ftransl conf
+                      "no known relationship link between %t and %t"))
+                (fun _ -> afficher_personne_titre_referencee conf base p1)
+                (fun _ -> afficher_personne_titre_referencee conf base p2);
+              Wserver.wprint "\n";
            return ()
-         else ();
-         print_propose_upto conf base p1 p2 rl;
-         trailer conf;
-      return ()
+     | Some (rl, total, relationship) ->
+         let a1 = aoi base p1.cle_index in
+         let a2 = aoi base p2.cle_index in
+         do let _ =
+              List.fold_left
+                (fun i sol ->
+                   do print_solution conf base i p1 p2 sol; return succ i)
+                1 rl
+            in
+            ();
+            Wserver.wprint "\n";
+            html_p conf;
+            Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
+            wprint_num conf total;
+            Wserver.wprint "</em> %s\n"
+              (transl_nth conf "relationship link/relationship links"
+                 (if Num.eq total Num.one then 0 else 1));
+            if
+              age_autorise conf base p1 && age_autorise conf base p2 &&
+              a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1)
+            then
+              do html_p conf;
+                 Wserver.wprint "<em>%s: "
+                   (capitale (transl conf "relationship"));
+                 print_decimal_num conf
+                   (round_2_dec
+                      (Adef.float_of_fix
+                         (Adef.fix_of_float relationship) *. 100.0));
+                 Wserver.wprint "%%</em>";
+                 html_p conf;
+              return ()
+            else ();
+            print_propose_upto conf base p1 p2 rl;
+         return () ];
+     trailer conf;
+  return ()
 ;
 
 value print_base_loop conf base =
