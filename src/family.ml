@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.40 2000-11-08 21:36:52 ddr Exp $ *)
+(* $Id: family.ml,v 3.41 2000-11-21 16:13:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -272,17 +272,17 @@ value precisez conf base n pl =
              match spouses with
              [ [] -> ()
              | [h :: hl] ->
-                 do Wserver.wprint ", <em>%s "
-                      (transl_nth conf "spouse" (index_of_sex p.sex));
-                    afficher_personne_titre conf base h;
-                    List.iter
-                      (fun h ->
-                         do Wserver.wprint ", %s\n" (transl conf "and");
-                            afficher_personne_titre conf base h;
-                         return ())
-                      hl;
-                    Wserver.wprint "</em>\n";
-                 return () ];
+                 let s =
+                   List.fold_left
+                     (fun s h ->
+                        s ^ ", " ^ transl conf "and" ^ "\n" ^
+                        person_title_text conf base h)
+                     (person_title_text conf base h) hl
+                 in
+                 Wserver.wprint ", <em>%s</em>\n"
+                   (transl_decline2 conf
+                      "%1 of (same or greater generation level) %2"
+                      (transl_nth conf "spouse" (index_of_sex p.sex)) s) ];
           return ())
        ptll;
      Wserver.wprint "</ul>\n";
