@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.3 1998-09-08 09:13:26 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.4 1998-09-08 10:19:12 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -211,26 +211,20 @@ value propose_base conf =
 ;
 
 value unauth typ =
-  let oc = log_oc () in
   do Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" typ;
      nl (); nl ();
      Wserver.wprint "<head><title>%s access failed</title></head>\n" typ;
      Wserver.wprint "<body><h1>%s access failed</h1></body>\n" typ;
-     Printf.fprintf oc "Ask for authenticate %s\n" typ;
-     flush_log oc;
   return ()
 ;
 
 value match_auth sauth uauth =
   if sauth = "" then True
-(*
-  else if sauth.[0] = ':' then
-    match lindex uauth ':' with
-    [ Some i -> sauth = String.sub uauth i (String.length uauth - i)
-    | None -> sauth = uauth ]
-*)
-  else uauth = sauth
+  else
+    match lindex sauth ':' with
+    [ Some _ -> sauth = uauth
+    | None -> ":" ^ sauth = uauth ]
 ;
 
 value connection_accepted cgi (addr, request) str env =
@@ -285,26 +279,43 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     try List.assoc "friend_passwd" base_env with
     [ Not_found -> friend_passwd.val ]
   in
-  let (ok, wizard) =
-    if not cgi && passwd = "w" then
-      if real_wizard_passwd = "" then (True, True)
-      else
-        let auth = Wserver.extract_param "authorization: " '\r' request in
-        if auth = "" then (False, False)
+  let (ok, wizard, friend) =
+    if not cgi then
+      if passwd = "w" then
+        if real_wizard_passwd = "" then (True, True, real_friend_passwd = "")
         else
-          let uauth =
-            let i = String.length "Basic " in
-            Base64.decode (String.sub auth i (String.length auth - i))
-          in
-          if match_auth real_wizard_passwd uauth then (True, True)
-          else (False, False)
-    else (True, passwd = real_wizard_passwd)
+          let auth = Wserver.extract_param "authorization: " '\r' request in
+          if auth = "" then (False, False, False)
+          else
+            let uauth =
+              let i = String.length "Basic " in
+              Base64.decode (String.sub auth i (String.length auth - i))
+            in
+            if match_auth real_wizard_passwd uauth then
+               (True, True, False)
+            else (False, False, False)
+      else if passwd = "f" then
+        if real_friend_passwd = "" then (True, False, True)
+        else
+          let auth = Wserver.extract_param "authorization: " '\r' request in
+          if auth = "" then (False, False, False)
+          else
+            let uauth =
+              let i = String.length "Basic " in
+              Base64.decode (String.sub auth i (String.length auth - i))
+            in
+            if match_auth real_friend_passwd uauth then
+               (True, False, True)
+            else (False, False, False)
+      else (True, passwd = real_wizard_passwd, passwd = real_friend_passwd)
+    else (True, passwd = real_wizard_passwd, passwd = real_friend_passwd)
   in
-  if not ok then unauth "Wizard"
+  if not ok then
+    unauth (if passwd = "w" then "Wizard" else "Friend")
   else
   let conf =
     {wizard = wizard;
-     friend = passwd = real_friend_passwd;
+     friend = friend;
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;
