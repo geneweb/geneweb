@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.11 2001-11-06 12:03:21 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.12 2001-11-08 12:03:43 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -627,6 +627,17 @@ value ged2gwb b =
   let r = Sys.command comm in ()
 ;
 
+value move_gedcom_to_old b =
+  do {
+    let dir = Filename.concat gwtp_tmp.val "ged" in
+    try Unix.mkdir dir 0o775 with [ Unix.Unix_error _ _ _ -> () ];
+    let fname_old = Filename.concat dir (b ^ ".ged") in
+    try Sys.remove fname_old with [ Sys_error _ -> () ];
+    let fname = Filename.concat gwtp_tmp.val (b ^ ".ged") in
+    Sys.rename fname fname_old;
+  }
+;
+
 value send_gedcom_file str env b tok f fname =
   let fname = filename_basename fname in
   if Filename.check_suffix fname ".ged" || Filename.check_suffix fname ".GED"
@@ -652,6 +663,7 @@ value send_gedcom_file str env b tok f fname =
     printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
       (cgi_script_name ()) b tok;
     flush stdout;
+    move_gedcom_to_old b;
     printf "</pre>\n";
     printf_link_to_main b tok;
     printf "</body>\n";

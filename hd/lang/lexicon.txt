@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.48 2001-11-01 10:20:01 ddr Exp $
+# $Id: lexicon.txt,v 4.49 2001-11-08 12:03:44 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4529,25 +4529,25 @@ pt: mensagem adicionada
 ru: äğ÷âşíåïğ õğğ÷üåïêå
 sv: meddelande inlagt
 
-    message/previous message/next message
-ca: missatge/missate anterior/missate següent
-da: meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
-de: Nachricht/vorherige Nachricht/n&auml;chste Nachricht
-en: message/previous message/next message
-eo: mesagxo:a:+n/antaùa mesagxo/sekvanta mesagxo
-es: mensaje/mansaje anterior/mensaje siguiente
-et: teade/eelmine teade/järgmine teade
-fi: viesti/edellinen viesti/seuraava viesti
-fr: message/message pr&eacute;c&eacute;dent/message suivant
-he:  äåãòä / äåãòä ÷åãîú / äåãòä äáàä
-it: messaggio/messaggio precedente/messaggio seguente
-lv: ziòa/iepriekğçjâ ziòa/nâkoğâ ziòa
-nl: bericht/vorig bericht/volgend bericht
-no: melding/forrige melding/neste melding
-pl: wiadomo¶æ/poprzednia wiadomo¶æ/nastêpna wiadomo¶æ
-pt: mensagem/mensagem anterior/mensagem seguinte
-ru: õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/õíåäèáüåå õğğ÷üåïêå
-sv: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
+    message/previous message/previous messages/next message
+ca: missatge/missate anterior//missate anterior/missate següent
+da: meddelelse/foreg&aring;ende meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
+de: Nachricht/vorherige Nachricht/vorherige Nachricht/n&auml;chste Nachricht
+en: message/previous message/previous messages/next message
+eo: mesagxo:a:+n/antaùa mesagxo/antaùa mesagxo/sekvanta mesagxo
+es: mensaje/mansaje anterior/mansaje anterior/mensaje siguiente
+et: teade/eelmine teade/eelmine teade/järgmine teade
+fi: viesti/edellinen viesti/edellinen viesti/seuraava viesti
+fr: message/message pr&eacute;c&eacute;dent/messages pr&eacute;c&eacute;dents/message suivant
+he:  äåãòä / äåãòä ÷åãîú / äåãòä ÷åãîú / äåãòä äáàä
+it: messaggio/messaggio precedente/messaggio precedente/messaggio seguente
+lv: ziòa/iepriekğçjâ ziòa/iepriekğçjâ ziòa/nâkoğâ ziòa
+nl: bericht/vorig bericht/vorig bericht/volgend bericht
+no: melding/forrige melding/forrige melding/neste melding
+pl: wiadomo¶æ/poprzednia wiadomo¶æ/poprzednia wiadomo¶æ/nastêpna wiadomo¶æ
+pt: mensagem/mensagem anterior/mensagem anterior/mensagem seguinte
+ru: õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/õíåäèáüåå õğğ÷üåïêå
+sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     missing ancestors
 af: ontbrekende voorsate

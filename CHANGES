@@ -2,6 +2,8 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [08 Nov 01] In data base forum, display 100 headers and a link to
+    the previous messages, instead of all headers.
   - [20 Oct 01] In the updates forms, the order "year/month/day" in
     the dates now depends on the language. This is indicated in a new
     entry in the lexicon, "<tt>dates in form</tt>" which is
