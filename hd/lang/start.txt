@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.66 2004-12-30 21:20:05 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.67 2004-12-31 10:22:42 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -302,7 +302,7 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
 
 <tr align="left"><td align="center">
-<table border="0" cellspacing="0" cellpadding="0"><tr><td>
+<table border="0" cellspacing="0" cellpadding="0"><tr><td align="left">
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 bg: Можете да използвате тази база от данни за търсене:
