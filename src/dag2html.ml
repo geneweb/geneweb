@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.29 2000-01-05 21:24:50 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.30 2000-01-09 07:35:45 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -65,13 +65,10 @@ value print_table print_newline print_elem print_span t =
       print_elem t.table.(i).(j).elem;
     done;
     print_newline ();
-    if i < Array.length t.table - 1 then
-      do for j = 0 to Array.length t.table.(i) - 1 do
-           print_span i j t.table.(i).(j).span;
-         done;
-         print_newline ();
-      return ()
-    else ();
+    for j = 0 to Array.length t.table.(i) - 1 do
+      print_span i j t.table.(i).(j).span;
+    done;
+    print_newline ();
   done
 ;
 
@@ -1124,11 +1121,13 @@ value try_fall2_right t i j =
           else loop (i - 1)
       in
       let j2 =
+        let x = t.table.(i).(j).span in
         loop (j + 1) where rec loop j2 =
           if j2 = Array.length t.table.(i) then j2
-          else if t.table.(i).(j2).span = t.table.(i).(j).span then
-            loop (j2 + 1)
-          else j2
+          else
+            match t.table.(i).(j2) with
+            [ {elem = Ghost _; span = y} when y = x -> loop (j2 + 1)
+            | _ -> j2 ]
       in
       let separated2 =
         loop (i + 1) where rec loop i =
@@ -1161,11 +1160,13 @@ value try_fall2_left t i j =
           else loop (i - 1)
       in
       let j1 =
+        let x = t.table.(i).(j).span in
         loop (j - 1) where rec loop j1 =
           if j1 < 0 then j1
-          else if t.table.(i).(j1).span = t.table.(i).(j).span then
-            loop (j1 - 1)
-          else j1
+          else
+            match t.table.(i).(j1) with
+            [ {elem = Ghost _; span = y} when y = x -> loop (j1 - 1)
+            | _ -> j1 ]
       in
       let separated2 =
         loop (i + 1) where rec loop i =
