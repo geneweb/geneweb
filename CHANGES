@@ -4,11 +4,10 @@ GeneWeb Version 2.01
 * GeneWeb Daemon/CGI (gwd)
   - [Mar 17, 99] Added an optional automatic choice for the "death state" in
     "modify person" forms. Makes the updating simpler to use.
-  - [Mar 16, 99] The presence of images in pages does not block any
+  - [Mar 16-19, 99] The presence of images in pages does not block any
     more the display of the text. For example, in welcome pages, the text
     does not wait for the displaying of the flags to be displayed, which
-    is much more comfortable. (This applies only for local images and of
-    type GIF, not JPEG.)
+    is much more comfortable. (This applies only for local images).
   - [Mar 14, 99] In anniversaries, in the list of months, the selected
     month is now the current month, not always January.
 
