@@ -1,12 +1,74 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.23 2004-08-06 01:04:40 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.24 2004-08-09 11:35:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
+(*
 open Check;
+*)
 open Gutil;
 open Gwcomp;
 open Printf;
+
+type gen_min_person 'person 'string =
+  { m_first_name : mutable 'string;
+    m_surname : mutable 'string;
+    m_occ : mutable int;
+    m_rparents : mutable list (gen_relation 'person 'string);
+    m_related : mutable list iper;
+    m_sex : mutable sex;
+    m_notes : mutable 'string }
+;
+
+type min_person = gen_min_person iper istr;
+
+type cbase =
+  { c_persons : mutable array min_person;
+    c_ascends : mutable array ascend;
+    c_unions : mutable array union;
+    c_couples : mutable array couple;
+    c_descends : mutable array descend;
+    c_strings : mutable array string;
+    c_bnotes : notes }
+;
+
+type gen =
+  { g_strings : mutable Hashtbl.t string istr;
+    g_names : mutable Hashtbl.t int iper;
+    g_local_names : mutable Hashtbl.t (int * int) iper;
+    g_pcnt : mutable int;
+    g_fcnt : mutable int;
+    g_scnt : mutable int;
+    g_base : cbase;
+    g_def : mutable array bool;
+    g_separate : mutable bool;
+    g_shift : mutable int;
+    g_errored : mutable bool;
+    g_per_index : out_channel;
+    g_per : out_channel;
+    g_fam_index : out_channel;
+    g_fam : out_channel }
+;
+
+value check_error gen = gen.g_errored := True;
+
+value set_error base gen x =
+  do {
+    printf "\nError: ";
+    Check.print_base_error stdout base x;
+    check_error gen;
+  }
+;
+
+value set_warning base =
+  fun
+  [ UndefinedSex _ -> ()
+  | x ->
+      do {
+        printf "\nWarning: ";
+        Check.print_base_warning stdout base x;
+      } ]
+;
 
 value default_source = ref "";
 
@@ -251,6 +313,9 @@ value insert_undefined gen key =
             let h = person_hash key.pk_first_name key.pk_surname in
             Hashtbl.add gen.g_local_names (h, occ) (Adef.iper_of_int i)
           else ();
+          seek_out gen.g_per_index (Iovalue.sizeof_long * i);
+          output_binary_int gen.g_per_index (pos_out gen.g_per);
+          output_char gen.g_per 'U';
           (x, Adef.iper_of_int i)
         } ]
   in
@@ -271,15 +336,9 @@ value insert_undefined gen key =
            | n -> "." ^ string_of_int n ])
           (p_surname gen.g_base x);
         gen.g_def.(Adef.int_of_iper ip) := True;
-        Check.error gen
+        check_error gen
       }
       else ()
-    else ();
-    if not gen.g_errored then do {
-      seek_out gen.g_per_index (Iovalue.sizeof_long * Adef.int_of_iper ip);
-      output_binary_int gen.g_per_index (pos_out gen.g_per);
-      output_char gen.g_per 'U';
-    }
     else ();
     (x, ip)
   }
@@ -340,7 +399,7 @@ value insert_person gen so =
       x.birth := Adef.codate_None;
       x.death := DontKnowIfDead;
 *)
-      Check.error gen
+      check_error gen
     }
     else gen.g_def.(Adef.int_of_iper ip) := True;
     if not gen.g_errored then
@@ -359,7 +418,7 @@ value insert_person gen so =
            | n -> "." ^ string_of_int n ])
           (p_surname gen.g_base x);
         gen.g_def.(Adef.int_of_iper ip) := True;
-        Check.error gen
+        check_error gen
       }
       else ()
     else ();
@@ -433,7 +492,7 @@ because this persons still exists as child of
         x.birth := Adef.codate_None;
         x.death := DontKnowIfDead;
 *)
-        Check.error gen
+        check_error gen
       }
   | _ -> () ]
 ;
@@ -444,7 +503,7 @@ value notice_sex gen p s =
   else do {
     printf "\nInconcistency about the sex of\n  %s %s\n"
       (p_first_name gen.g_base p) (p_surname gen.g_base p);
-    Check.error gen
+    check_error gen
   }
 ;
 
@@ -527,7 +586,7 @@ value insert_notes fname gen key str =
         printf "Notes already defined for \"%s%s %s\"\n"
           key.pk_first_name (if occ == 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
-        Check.error gen
+        check_error gen
       }
       else p.m_notes := unique_string gen str
   | None ->
@@ -579,7 +638,7 @@ value insert_relations fname gen sb sex rl =
       (sou gen.g_base p.m_first_name)
       (if p.m_occ == 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
-    Check.error gen
+    check_error gen
   }
   else do {
     notice_sex gen p sex;
@@ -691,7 +750,7 @@ value families_cache fam_index_ic fam_ic len =
    get = get_fun; len = len; clear_array = fun _ -> ()}
 ;
 
-value empty_base : Check.cbase =
+value empty_base : cbase =
   {c_persons = [| |]; c_ascends = [| |]; c_unions = [| |];
    c_couples = [| |]; c_descends = [| |]; c_strings = [| |];
    c_bnotes = {nread = fun _ -> ""; norigin_file = ""}}
@@ -802,7 +861,9 @@ value link gwo_list =
     close_out gen.g_fam;
     let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
     if do_check.val && gen.g_pcnt > 0 then do {
-      Check.check_base base gen pr_stats.val; flush stdout;
+      Check.check_base base (set_error base gen) (set_warning base)
+        (fun i -> gen.g_def.(i)) pr_stats.val;
+      flush stdout;
     }
     else ();
     if not gen.g_errored then

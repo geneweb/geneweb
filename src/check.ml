@@ -1,51 +1,9 @@
-(* $Id: check.ml,v 4.12 2004-08-05 19:41:04 ddr Exp $ *)
+(* $Id: check.ml,v 4.13 2004-08-09 11:34:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 open Printf;
-
-type gen_min_person 'person 'string =
-  { m_first_name : mutable 'string;
-    m_surname : mutable 'string;
-    m_occ : mutable int;
-    m_rparents : mutable list (gen_relation 'person 'string);
-    m_related : mutable list iper;
-    m_sex : mutable sex;
-    m_notes : mutable 'string }
-;
-
-type min_person = gen_min_person iper istr;
-
-type cbase =
-  { c_persons : mutable array min_person;
-    c_ascends : mutable array ascend;
-    c_unions : mutable array union;
-    c_couples : mutable array couple;
-    c_descends : mutable array descend;
-    c_strings : mutable array string;
-    c_bnotes : notes }
-;
-
-type gen =
-  { g_strings : mutable Hashtbl.t string istr;
-    g_names : mutable Hashtbl.t int iper;
-    g_local_names : mutable Hashtbl.t (int * int) iper;
-    g_pcnt : mutable int;
-    g_fcnt : mutable int;
-    g_scnt : mutable int;
-    g_base : cbase;
-    g_def : mutable array bool;
-    g_separate : mutable bool;
-    g_shift : mutable int;
-    g_errored : mutable bool;
-    g_per_index : out_channel;
-    g_per : out_channel;
-    g_fam_index : out_channel;
-    g_fam : out_channel }
-;
-
-value error gen = gen.g_errored := True;
 
 value feminin =
   fun
@@ -54,94 +12,87 @@ value feminin =
   | Neuter -> "(e)" ]
 ;
 
-value print_base_error base =
+(* Printing check errors *)
+
+value print_base_error oc base =
   fun
   [ AlreadyDefined p ->
-      printf "%s\nis defined several times\n" (designation base p)
+      fprintf oc "%s\nis defined several times\n" (designation base p)
   | OwnAncestor p ->
-      printf "%s\nis his/her own ancestor\n" (designation base p)
+      fprintf oc "%s\nis his/her own ancestor\n" (designation base p)
   | BadSexOfMarriedPerson p ->
-      printf "%s\n  bad sex\n" (designation base p) ]
+      fprintf oc "%s\n  bad sex for a married person\n" (designation base p) ]
 ;
 
-value print_base_warning base =
+value print_base_warning oc base =
   fun
   [ BirthAfterDeath p ->
-      printf "%s\n  born after his/her death\n" (designation base p)
+      fprintf oc "%s\n  born after his/her death\n" (designation base p)
   | IncoherentSex p fixed not_fixed ->
       do {
-        printf "%s\n  sex not coherent with relations"
+        fprintf oc "%s\n  sex not coherent with relations"
           (designation base p);
         if fixed > 0 then
           if not_fixed > 0 then
-            printf " (fixed in %d of the %d cases)" fixed (fixed + not_fixed)
+            fprintf oc " (fixed in %d of the %d cases)" fixed
+              (fixed + not_fixed)
           else
-            printf " (fixed)"
+            fprintf oc " (fixed)"
         else ();
-        printf "\n";
+        fprintf oc "\n";
       }
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
-      printf "changed order of children of %s and %s\n"
+      fprintf oc "Changed order of children of %s and %s\n"
         (designation base (poi base (father cpl)))
         (designation base (poi base (mother cpl)))
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = coi base ifam in
       do {
-        printf
-          "the following children of\n  %s\nand\n  %s\nare not in order:\n"
+        fprintf oc
+          "The following children of\n  %s\nand\n  %s\nare not in order:\n"
           (designation base (poi base (father cpl)))
           (designation base (poi base (mother cpl)));
-        printf "- %s\n" (designation base elder);
-        printf "- %s\n" (designation base x);
+        fprintf oc "- %s\n" (designation base elder);
+        fprintf oc "- %s\n" (designation base x)
       }
   | DeadTooEarlyToBeFather father child ->
       do {
-        printf "%s\n" (designation base child);
-        printf
+        fprintf oc "%s\n" (designation base child);
+        fprintf oc
           "  is born more than 2 years after the death of his/her father\n";
-        printf "%s\n" (designation base father);
+        fprintf oc "%s\n" (designation base father)
       }
   | MarriageDateAfterDeath p ->
       do {
-        printf "%s\n" (designation base p);
-        printf "married after his/her death\n";
+        fprintf oc "%s\n" (designation base p);
+        fprintf oc "married after his/her death\n"
       }
   | MarriageDateBeforeBirth p ->
       do {
-        printf "%s\n" (designation base p);
-        printf "married before his/her birth\n";
+        fprintf oc "%s\n" (designation base p);
+        fprintf oc "married before his/her birth\n"
       }
   | MotherDeadAfterChildBirth mother child ->
-      printf "%s\n  is born after the death of his/her mother\n%s\n"
+      fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"
         (designation base child) (designation base mother)
   | ParentBornAfterChild parent child ->
-      printf "%s born after his/her child %s\n"
+      fprintf oc "%s born after his/her child %s\n"
         (designation base parent) (designation base child)
   | ParentTooYoung p a ->
-      printf "%s was parent at age of %d\n" (designation base p)
+      fprintf oc "%s was parent at age of %d\n" (designation base p)
         (year_of a)
   | TitleDatesError p t ->
       do {
-        printf "%s\n" (designation base p);
-        printf "has incorrect title dates as:\n";
-        printf "  %s %s\n" (sou base t.t_ident) (sou base t.t_place);
+        fprintf oc "%s\n" (designation base p);
+        fprintf oc "has incorrect title dates as:\n";
+        fprintf oc "  %s %s\n" (sou base t.t_ident) (sou base t.t_place)
       }
-  | UndefinedSex p ->
+  | UndefinedSex _ ->
       ()
   | YoungForMarriage p a ->
-      printf "%s married at age %d\n" (designation base p) (year_of a) ]
+      fprintf oc "%s married at age %d\n" (designation base p) (year_of a) ]
 ;      
-
-value set_error base gen x =
-  do { printf "\nError: "; print_base_error base x; error gen; }
-;
-
-value set_warning base =
-  fun
-  [ UndefinedSex _ -> ()
-  | x -> do { printf "\nWarning: "; print_base_warning base x; } ]
-;
 
 type stats =
   { men : mutable int;
@@ -230,10 +181,32 @@ value update_stats base current_year s p =
   }
 ;
 
-(* the parameter "gen" should disapear while changing along the functions
-   called by check_base which should use now "base" instead of "gen" *)
+value check_base_aux base error warning =
+  do {
+    Printf.eprintf "check persons\n";
+    ConsangAll.start_progr_bar ();
+    for i = 0 to base.data.persons.len - 1 do {
+      ConsangAll.run_progr_bar i (base.data.persons.len - 1);
+      let p = base.data.persons.get i in check_person base error warning p
+    };
+    ConsangAll.finish_progr_bar ();
+    Printf.eprintf "check families\n";
+    ConsangAll.start_progr_bar ();
+    for i = 0 to base.data.families.len - 1 do {
+      ConsangAll.run_progr_bar i (base.data.families.len - 1);
+      let fam = base.data.families.get i in
+      if is_deleted_family fam then ()
+      else
+        let cpl = base.data.couples.get i in
+        let des = base.data.descends.get i in
+        check_family base error warning fam cpl des
+    };
+    ConsangAll.finish_progr_bar ();
+    check_noloop base error;
+  }
+;
 
-value check_base base gen pr_stats =
+value check_base base error warning def pr_stats =
   let s =
     let y = (1000, base.data.persons.get 0) in
     let o = (0, base.data.persons.get 0) in
@@ -243,10 +216,10 @@ value check_base base gen pr_stats =
   in
   let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
   do {
-    Gutil.check_base base (set_error base gen) (set_warning base);
+    check_base_aux base error warning;
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
-      if not gen.g_def.(i) then
+      if not (def i) then
         printf "Undefined: %s\n" (designation base p)
       else ();
       if pr_stats then update_stats base current_year s p else ();
