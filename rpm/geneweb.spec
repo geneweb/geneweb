@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.11 1999-09-05 16:55:13 ddr Exp $
+# $Id: geneweb.spec,v 1.12 1999-09-06 12:42:33 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -20,7 +20,7 @@
 Summary: Genealogy software with a Web interface
 Name: geneweb
 Version: 2.06
-Release: 4
+Release: 5
 Copyright: GPL
 Vendor: INRIA
 Group: Applications
@@ -107,7 +107,7 @@ rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version} /etc/rc.d/*/*gwd
 # then it automatically unpacks all the files and symlinks from the archive.
 # Finally it runs the %post script, in which I start the service.
 %pre
-/usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" geneweb
+/usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" -g root geneweb
 
 %post
 # Sure, all the files are already owned by geneweb, but the directories ain't.
@@ -450,6 +450,10 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %doc doc/*
 
 %changelog
+* Sun Sep 6 1999 Daniel de Rauglaudre
+Version 2.06-5
+- Set root as default group for user geneweb
+
 * Sun Sep 5 1999 Daniel de Rauglaudre
 Version 2.06-4
 Deleted option -r in useradd (Redhat specific)
