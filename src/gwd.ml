@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.18 1998-12-05 13:29:46 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.19 1998-12-09 10:51:23 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -585,7 +585,13 @@ Type control C to stop the service
 ;
 
 value geneweb_cgi str addr =
-  connection True (ADDR_UNIX addr, []) str
+  let add v x request =
+    try [v ^ ": " ^ Sys.getenv x :: request] with [ Not_found -> request ]
+  in
+  let request = [] in
+  let request = add "user-agent" "HTTP_USER_AGENT" request in
+  let request = add "referer" "HTTP_REFERER" request in
+  connection True (ADDR_UNIX addr, request) str
 ;
 
 value read_input len =
@@ -733,8 +739,10 @@ value main () =
       else query
     in
     let addr =
-      try Sys.getenv "REMOTE_ADDR" with
-      [ Not_found -> "" ]
+      try Sys.getenv "REMOTE_HOST" with
+      [ Not_found ->
+          try Sys.getenv "REMOTE_ADDR" with
+          [ Not_found -> "" ] ]
     in
     let script =
       try Sys.getenv "SCRIPT_NAME" with

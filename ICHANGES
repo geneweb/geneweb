@@ -29,6 +29,7 @@ GeneWeb Version 1.09
   - Hidden options in requests:
        ";opt=from" in personal pages, gives the .gw origin file (if any)
        ";opt=misc" in personal pages, gives the list of miscellaneous names
+  - More complete traces in CGI mode
 
 * ged2gwb:
   - Display message "Strange input" giving the line number instead of character
