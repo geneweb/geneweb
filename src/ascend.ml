@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.11 1999-04-20 12:52:40 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.12 1999-04-20 18:04:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -465,6 +465,26 @@ value print_marriage_long conf base all_gp auth p ifam =
   return ()
 ;
 
+value person_has_notes base p =
+  sou base p.notes <> "" || sou base p.psources <> "" ||
+  sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
+  sou base p.death_src <> "" || sou base p.burial_src <> "" ||
+  List.exists
+    (fun ifam ->
+       let fam = foi base ifam in
+       sou base fam.marriage_src <> "" || sou base fam.marriage_src <> "")
+    (Array.to_list p.family)
+;
+ 
+value has_notes conf base =
+  List.exists
+    (fun
+     [ GP_person _ ip _ ->
+         let p = poi base ip in
+         age_autorise conf base p && person_has_notes base p
+     | _ -> False ])
+;
+
 value print_generation_person_long conf base all_gp last_generation gp =
   match gp with
   [ GP_person n ip ifamo ->
@@ -526,7 +546,7 @@ value print_generation_person_long conf base all_gp last_generation gp =
                  return ()
              | _ -> () ]
          | None -> () ];
-         if age_autorise conf base p && sou base p.notes <> "" then
+         if age_autorise conf base p && person_has_notes base p then
            do Wserver.wprint "[%s "
                 (capitale (transl_nth conf "note/notes" 1));
               stag "strong" begin
@@ -600,22 +620,13 @@ value print_generation_person_long conf base all_gp last_generation gp =
       return ()
   | _ -> () ]
 ;
- 
-value has_notes conf base =
-  List.exists
-    (fun
-     [ GP_person _ ip _ ->
-         let p = poi base ip in
-         age_autorise conf base p && sou base p.notes <> ""
-     | _ -> False ])
-;
 
 value print_notes conf base =
   fun
   [ GP_person n ip _ ->
       let p = poi base ip in
-      let notes = sou base p.notes in
-      if age_autorise conf base p && notes <> "" then
+      if age_autorise conf base p && person_has_notes base p then
+        let notes = sou base p.notes in
         do Wserver.wprint "<dt>\n";
            stag "strong" begin
              stag "a" "name=\"notes-%s\"" (Num.to_string n) begin
@@ -625,7 +636,9 @@ value print_notes conf base =
              end;
            end;
            Wserver.wprint ": \n<dd>\n";
-           Wserver.wprint "%s<br>\n" (coa conf notes);
+           Perso.copy_string_with_macros conf (coa conf notes);
+           Perso.print_sources conf base (notes <> "") p;
+           Wserver.wprint "<p>\n";
         return ()
       else ()
   | _ -> () ]
