@@ -154,6 +154,7 @@ murdered
 name
 name "%s.%d %s" already used by %tthis person%t
 navigation with %t as Sosa reference
+next sibling
 no anniversary
 no birthday
 no known relationship link between %t and %t
@@ -190,6 +191,7 @@ person/persons
 persons having the same name
 photo
 place
+previous sibling
 private
 probable loop in base
 public
@@ -233,7 +235,8 @@ the grandchildren
 the grandparents
 the great-grandchildren
 the great-grandparents
-the last %d births
+the latest %d births
+the latest %d deaths
 the parents
 the whole list
 title/titles
