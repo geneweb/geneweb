@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.37 2002-09-19 15:13:49 ddr Exp $ *)
+(* $Id: perso.ml,v 4.38 2002-09-19 15:34:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -525,18 +525,18 @@ value print_image_url conf base env p p_auth =
   else ()
 ;
 
-(*
+(* obsolete; should be removed one day *)
+
 value print_married_to conf base env p p_auth =
   fun
   [ Vfam fam (_, ispouse) des ->
-      let spouse = pget conf base ispouse in
-      let auth = p_auth && authorized_age conf base spouse in
-      let format = relation_txt conf p.sex fam in
-      Wserver.wprint (fcapitale format)
-        (fun _ -> if auth then print_marriage_text conf base fam else ())
+     let spouse = pget conf base ispouse in
+     let auth = p_auth && authorized_age conf base spouse in
+     let format = relation_txt conf p.sex fam in
+     Wserver.wprint (fcapitale format)
+       (fun _ -> if auth then print_marriage_text conf base fam else ())
   | _ -> () ]
 ;
-*)
 
 value print_misc_names conf base env p p_auth =
   if p_auth then
@@ -568,9 +568,9 @@ value obsolete_list = ref [];
 value obsolete var new_var =
   if List.mem var obsolete_list.val then ()
   else ifdef UNIX then do {
-    Printf.eprintf "\
-*** <W> perso.txt: variable \"%%%s;\" obsolete; use rather \"%%%s;\"
-" var new_var;
+    Printf.eprintf "*** <W> perso.txt: variable \"%%%s;\" obsolete%s"
+      var
+      (if new_var = "" then "" else "; use rather \"" ^ new_var ^ "%%%s;\"");
     flush stderr;
     obsolete_list.val := [var :: obsolete_list.val]
   }
@@ -883,9 +883,11 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "image_txt" -> Wserver.wprint "%s" (default_image_name base p)
   | "image_url" -> print_image_url conf base env p p_auth
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
-(*
-  | "married_to" -> print_married_to conf base env p p_auth efam
-*)
+  | "married_to" ->
+      do {
+        obsolete "married_to" "";
+        print_married_to conf base env p p_auth efam
+      }
   | "misc_names" -> print_misc_names conf base env p p_auth
   | "mother_age_at_birth" ->
       print_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
