@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.26 1999-08-12 19:37:34 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.27 1999-08-13 02:44:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -241,7 +241,7 @@ value print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf ^ new_req
   in
   let env = [('o', conf.bname); ('n', new_n); ('l', link)] in
-  try Util.copy_from_file env "renamed" with
+  try Util.copy_etc_file env "renamed" with
   [ Sys_error _ ->
       let  title _ =
         Wserver.wprint "%s -&gt; %s" conf.bname new_n
@@ -263,7 +263,7 @@ value print_redirected conf new_addr =
     "http://" ^ new_addr ^ req
   in
   let env = [('l', link)] in
-  try Util.copy_from_file env "redirect" with
+  try Util.copy_etc_file env "redirect" with
   [ Sys_error _ ->
       let  title _ = Wserver.wprint "Address changed" in
       do Util.header conf title;

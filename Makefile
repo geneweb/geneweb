@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.17 1999-08-04 04:24:55 ddr Exp $
+# $Id: Makefile,v 2.18 1999-08-13 02:44:56 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -68,6 +68,8 @@ classical_distrib:
 	done
 	mkdir distribution/images
 	cp hd/images/*.gif distribution/images/.
+	mkdir distribution/etc
+	cp hd/etc/* distribution/etc/.
 
 clean::
 	cd wserver; $(MAKE) clean

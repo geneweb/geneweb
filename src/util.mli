@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.26 1999-08-12 19:37:35 ddr Exp $ *)
+(* $Id: util.mli,v 2.27 1999-08-13 02:44:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -68,7 +68,7 @@ value capitale : string -> string;
 value header_no_page_title : config -> (bool -> unit) -> unit;
 value header : config -> (bool -> unit) -> unit;
 value trailer : config -> unit;
-value copy_from_file : list (char * string) -> string -> unit;
+value copy_etc_file : list (char * string) -> string -> unit;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;

@@ -2,9 +2,6 @@ GeneWeb version 2.06
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Aug 12, 99] Added files "robot.txt", "renamed.txt" and "redirect.txt"
-    to be able to configurate the messages in cases (respectively) of: robot
-    exclusion, data base renaming, site redirection.
   - [Aug 8, 99] Added option "-redirect" to say to the users that the
     GeneWeb service has been redirected to some other address.
 
