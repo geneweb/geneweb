@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.6 1999-04-02 07:22:34 ddr Exp $
+# $Id: lexicon.txt,v 2.7 1999-04-02 12:35:32 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1598,6 +1598,7 @@ fr: image
 he:  ъоерд
 it: foto
 nl: foto
+no: bilde
 pt: foto
 se: foto
 
@@ -1609,12 +1610,14 @@ es: foto borrada
 fr: image supprim&eacute;e
 it: foto cancellata
 nl: foto verwijderd
+no: bildet er fjernet
 pt: foto suprimida
 se: foto borttaget
 
     image received
 en: image received
 fr: image re&ccedil;ue
+no: bildet er mottatt
 se: foto mottaget
 
     in (month year)
@@ -2189,6 +2192,7 @@ es: no casados
 fr: non mari&eacute;s
 nl: niet gehuwd
 pt: n&atilde;o casados
+no: ugift
 se: inte gift
 
     note/notes
