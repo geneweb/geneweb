@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.11 1998-12-02 15:46:35 ddr Exp $ *)
+(* $Id: perso.ml,v 1.12 1998-12-02 20:48:56 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -551,8 +551,22 @@ value find_sosa conf base a p =
 ;
 *)
 
+value find_sosa_optim conf base a p =
+  if a == p then Some Num.one
+  else
+    let has_children =
+      List.exists
+        (fun ifam ->
+           let fam = foi base ifam in
+           Array.length fam.children > 0)
+        (Array.to_list a.family)
+    in
+    if has_children then find_sosa conf base a p
+    else None
+;
+
 value print_sosa conf base a p =
-  match find_sosa conf base a p with
+  match find_sosa_optim conf base a p with
   [ Some n ->
       do Wserver.wprint "<em>Sosa:\n";
          stag "a" "href=\"%sm=RL;i1=%d;i2=%d;b1=1;b2=%s\""

@@ -149,6 +149,7 @@ more than %d answers
 murdered
 name
 name "%s.%d %s" already used by %tthis person%t
+navigation with %t as Sosa reference
 no anniversary
 no birthday
 no known relationship link between %t and %t
@@ -196,7 +197,6 @@ see above
 see further
 several answers
 sex
-shared by
 should be of sex feminine
 should be of sex masculine
 son/daughter/child
