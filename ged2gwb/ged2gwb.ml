@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.15 1998-11-20 19:11:08 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.16 1998-11-20 20:39:53 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1181,7 +1181,7 @@ value make_arrays in_file =
        | [: `_ :] ->
              do Printf.printf "File \"%s\", line %d:\n" in_file
                   (line_cnt.val + 1);
-                Printf.printf "Strange input\n";
+                Printf.printf "Strange input.\n";
                 flush stdout;
                 let _ : string = get_to_eoln 0 strm in ();
              return loop ()
@@ -1363,6 +1363,51 @@ value check_parents_children base =
   return ()
 ;
 
+value kill_family base fam ip =
+  let p = poi base ip in
+  let l =
+    List.fold_right
+      (fun ifam ifaml ->
+         if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
+      (Array.to_list p.family) []
+  in
+  p.family := Array.of_list l
+;
+
+value kill_parents base ip =
+  let a = aoi base ip in
+  a.parents := None
+;
+
+value effective_del_fam base fam cpl =
+  let ifam = fam.fam_index in
+  do kill_family base fam cpl.father;
+     kill_family base fam cpl.mother;
+     Array.iter (kill_parents base) fam.children;
+     cpl.father := Adef.iper_of_int (-1);
+     cpl.mother := Adef.iper_of_int (-1);
+     fam.children := [| |];
+     fam.fam_index := Adef.ifam_of_int (-1);
+  return ()
+;
+
+value check_parents_sex base =
+  for i = 0 to base.couples.len - 1 do
+    let cpl = base.couples.get i in
+    let fath = poi base cpl.father in
+    let moth = poi base cpl.mother in
+    if fath.sexe <> Masculin || moth.sexe <> Feminin then
+      do Printf.printf "Bad sex for parents\n";
+         Printf.printf "- father: %s\n" (denomination base fath);
+         Printf.printf "- mother: %s\n" (denomination base moth);
+         Printf.printf "=> family deleted\n\n";
+         flush stdout;
+         effective_del_fam base (base.families.get i) cpl;
+      return ()
+    else ();
+  done
+;
+
 value neg_year =
   fun
   [ Da (OrYear y2) y -> Da (OrYear (- abs y2)) (- abs y)
@@ -1456,6 +1501,7 @@ value finish_base base =
          return ()
        else ();
      done;
+     check_parents_sex base;
      check_parents_children base;
      if try_negative_dates.val then negative_dates base else ();
      check_base base
