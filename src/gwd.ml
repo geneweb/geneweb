@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.52 2002-12-30 18:40:04 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.53 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -36,7 +36,7 @@ value trace_failed_passwd = ref False;
 
 value log_oc () =
   if log_file.val <> "" then
-    try open_out_gen log_flags 0o644 log_file.val with
+    try Secure.open_out_gen log_flags 0o644 log_file.val with
     [ Sys_error _ -> do { log_file.val := ""; stderr } ]
   else stderr
 ;
@@ -129,7 +129,7 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
 ;
 
 value copy_file fname =
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do {
         try
@@ -149,7 +149,7 @@ value http answer =
 ;
 
 value refuse_log from cgi =
-  let oc = open_out_gen log_flags 0o644 "refuse_log" in
+  let oc = Secure.open_out_gen log_flags 0o644 "refuse_log" in
   do {
     let tm = Unix.localtime (Unix.time ()) in
     fprintf_date oc tm;
@@ -214,7 +214,7 @@ value input_lexicon lang =
   let t = Hashtbl.create 501 in
   try
     let ic =
-      open_in
+      Secure.open_in
         (Util.search_in_lang_path (Filename.concat "lang" "lexicon.txt"))
     in
     let derived_lang =
@@ -271,7 +271,7 @@ value alias_lang lang =
     let fname =
       Util.search_in_lang_path (Filename.concat "lang" "alias_lg.txt")
     in
-    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         let lang =
           try
@@ -312,7 +312,7 @@ value strip_trailing_spaces s =
 
 value read_base_env cgi bname =
   let fname = Util.base_path [] (bname ^ ".gwf") in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
         loop [] where rec loop env =
@@ -501,7 +501,7 @@ value match_auth_file auth_file uauth =
   if auth_file = "" then False
   else
     let auth_file = Util.base_path [] auth_file in
-    match try Some (open_in auth_file) with [ Sys_error _ -> None ] with
+    match try Some (Secure.open_in auth_file) with [ Sys_error _ -> None ] with
     [ Some ic ->
         try
           let rec loop () =
@@ -547,7 +547,7 @@ value compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
 
 value get_actlog check_from utm from_addr base_password =
   let fname = Srcfile.adm_file "actlog" in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let tmout = float_of_int login_timeout.val in
       let rec loop changed r list =
@@ -593,7 +593,7 @@ value get_actlog check_from utm from_addr base_password =
 
 value set_actlog list =
   let fname = Srcfile.adm_file "actlog" in
-  match try Some (open_out fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_out fname) with [ Sys_error _ -> None ] with
   [ Some oc ->
       do {
         List.iter
@@ -1027,7 +1027,9 @@ value auth_err request auth_file =
   else
     let auth = Wserver.extract_param "authorization: " '\r' request in
     if auth <> "" then
-      match try Some (open_in auth_file) with [ Sys_error _ -> None ] with
+      match
+        try Some (Secure.open_in auth_file) with [ Sys_error _ -> None ]
+      with
       [ Some ic ->
           let auth =
             let i = String.length "Basic " in
@@ -1156,7 +1158,7 @@ value match_strings regexp s =
 
 value excluded from =
   let efname = chop_extension Sys.argv.(0) ^ ".xcl" in
-  match try Some (open_in efname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in efname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let rec loop () =
         match try Some (input_line ic) with [ End_of_file -> None ] with
@@ -1393,7 +1395,7 @@ value read_input len =
 ;
 
 value arg_parse_in_file fname speclist anonfun errmsg =
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let list =
         let list = ref [] in

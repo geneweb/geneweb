@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.7 2002-12-30 18:40:06 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.8 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -15,7 +15,7 @@ value wzfile wddir wz =
 
 value read_wizfile fname =
   let fname = Util.base_path [] fname in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       loop [] where rec loop data =
         match try Some (input_line ic) with [ End_of_file -> None ] with
@@ -33,7 +33,7 @@ value read_wizfile fname =
 ;
 
 value read_wizard_notes fname =
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       loop 0 where rec loop len =
         match try Some (input_char ic) with [ End_of_file -> None ] with
@@ -46,7 +46,7 @@ value write_wizard_notes fname nn =
   if nn = "" then
     try Sys.remove fname with [ Sys_error _ -> () ]
   else
-    match try Some (open_out fname) with [ Sys_error _ -> None ] with
+    match try Some (Secure.open_out fname) with [ Sys_error _ -> None ] with
     [ Some oc ->
         do {
           output_string oc nn;

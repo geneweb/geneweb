@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.5 2002-07-15 08:34:24 ddr Exp $ *)
+(* $Id: image.ml,v 4.6 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -21,7 +21,7 @@ value content cgi t len fname =
 ;
 
 value print_image_type cgi fname itype =
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let buf = String.create 1024 in
       let len = in_channel_length ic in

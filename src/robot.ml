@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.10 2002-02-14 10:19:40 ddr Exp $ *)
+(* $Id: robot.ml,v 4.11 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -77,7 +77,7 @@ value output_excl oc xcl =
 value robot_excl () =
   let fname = Srcfile.adm_file "robot" in
   let xcl =
-    match try Some (open_in_bin fname) with _ -> None with
+    match try Some (Secure.open_in_bin fname) with _ -> None with
     [ Some ic ->
         let v =
           try input_excl ic with _ ->
@@ -189,7 +189,9 @@ value check oc tm from max_call sec cgi suicide =
         } ]
   in
   do {
-    match try Some (open_out_bin fname) with [ Sys_error _ -> None ] with
+    match
+      try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ]
+    with
     [ Some oc -> do { output_excl oc xcl; close_out oc; }
     | None -> () ];
     if refused then robot_error cgi from max_call sec else ()
