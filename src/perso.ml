@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.56 2004-07-18 14:26:38 ddr Exp $ *)
+(* $Id: perso.ml,v 4.57 2004-08-10 12:07:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1498,23 +1498,50 @@ and print_foreach_witness conf base env al =
         (Array.to_list fam.witnesses)
   | _ -> () ]
 and print_foreach_witness_relation conf base env al (p, _, _, _) =
+  let list =
+    let list = ref [] in
+    do {
+      make_list p.related where rec make_list =
+        fun
+        [ [ic :: icl] ->
+            do {
+              let c = pget conf base ic in
+              if c.sex = Male then
+                Array.iter
+                  (fun ifam ->
+                     let fam = foi base ifam in
+                     if array_memq p.cle_index fam.witnesses then
+                       list.val := [(ifam, fam) :: list.val]
+                     else ())
+                  (uget conf base ic).family
+              else ();
+              make_list icl
+            }
+        | [] -> () ];
+      list.val
+    }
+  in
+  let list =
+    List.sort
+      (fun (_, fam1) (_, fam2) ->
+	 match
+	   (Adef.od_of_codate fam1.marriage, Adef.od_of_codate fam2.marriage)
+	 with
+	 [ (Some d1, Some d2) ->
+	     if strictly_before d1 d2 then -1
+	     else if strictly_before d2 d1 then 1
+	     else 0
+	 | _ -> 0 ])
+      list
+  in
   List.iter
-    (fun ic ->
-       let c = pget conf base ic in
-       if c.sex = Male then
-         Array.iter
-           (fun ifam ->
-              let fam = foi base ifam in
-              if array_memq p.cle_index fam.witnesses then
-                let cpl = coi base ifam in
-                let des = doi base ifam in
-                let cpl = ((father cpl), (mother cpl)) in
-                let env = [("fam", Vfam fam cpl des) :: env] in
-                List.iter (print_ast conf base env) al
-              else ())
-           (uget conf base ic).family
-       else ())
-    p.related
+    (fun (ifam, fam) ->
+       let cpl = coi base ifam in
+       let des = doi base ifam in
+       let cpl = ((father cpl), (mother cpl)) in
+       let env = [("fam", Vfam fam cpl des) :: env] in
+       List.iter (print_ast conf base env) al)
+    list
 ;
 
 value interp_templ conf base p astl =
