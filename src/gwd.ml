@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.66 2000-12-28 23:27:13 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.67 2000-12-30 14:43:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -291,12 +291,27 @@ value print_renamed conf new_n =
       return () ]
 ;
 
-value print_redirected conf new_addr =
-  let link () =
+value log_redirect conf request =
+  let referer = Wserver.extract_param "referer: " '\n' request in
+  lock_wait Srcfile.adm_file "gwd.lck" with
+  [ Accept ->
+      let oc = log_oc () in
+      do let tm = Unix.localtime (Unix.time ()) in
+         fprintf_date oc tm;
+         Printf.fprintf oc "\n";
+         Printf.fprintf oc "  Referer: %s\n" referer;
+         flush_log oc;
+      return ()
+  | Refuse -> () ]
+;
+
+value print_redirected conf request new_addr =
+  let link =
     let req = Util.get_request_string conf in
     "http://" ^ new_addr ^ req
   in
-  let env = [('l', link)] in
+  let env = [('l', fun _ -> link)] in
+  do log_redirect conf request; return
   match Util.open_etc_file "redirect" with
   [ Some ic ->
       do Util.html conf;
@@ -308,7 +323,6 @@ value print_redirected conf new_addr =
          Wserver.wprint "Use the following address:\n<p>\n";
          tag "ul" begin
            Util.html_li conf;
-           let link = link () in
            stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
            Wserver.wprint "\n";
          end;
@@ -888,7 +902,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
     make_conf cgi from (addr, request) script_name contents env
   in
   match redirected_addr.val with
-  [ Some addr -> print_redirected conf addr
+  [ Some addr -> print_redirected conf request addr
   | None ->
       let (auth_err, auth) =
         if conf.auth_file = "" then (False, "")
