@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.19 1999-04-16 18:35:07 ddr Exp $
+# $Id: lexicon.txt,v 2.20 1999-04-18 20:54:00 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2712,6 +2712,18 @@ nl: verwantschap/verwantschappen
 no: slektslinje/slektslinjer
 pt: grau de parentesco/graus de parentesco
 se: sl&auml;ktl&auml;nk/sl&auml;ktl&auml;nkar
+
+    see
+de: siehe
+en: see
+eo: vidu
+es: ver
+fr: voir
+it: vedi
+nl: zie
+no: se
+pt: ver
+se: se
 
     see above
 de: siehe oben
