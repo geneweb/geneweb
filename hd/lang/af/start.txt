@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.14 2000-06-20 13:47:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.15 2000-06-21 22:19:34 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogie/Familiekunde - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -170,19 +170,20 @@ navraag</b></font></a>.
 <tr>
 <td valign=up>
 <ul>
-<li>die <a href="%sm=AN">verjaarsdae</a>
-<li>die <a href="%sm=AD">sterfdagherdenkinge</a>
-<li>die <a href="%sm=AM">huwelikherdenkinge</a>%I|wf
-<li>die <a href="%sm=LB;k=%m">laaste geboortes</a>%E
+<li><a href="%sm=AN">[birthdays]</a>
+<li><a href="%sm=AD">[anniversaries of death]</a>
+<li><a href="%sm=AM">[anniversaries of marriage]</a>%I|wf
+<li><a href="%sm=LB;k=%m">[the latest %d births](%m)</a>
+<li><a href="%sm=OA;k=%m;lim=150">[the %d oldest perhaps still alive](%m)</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>die <a href="%sm=LD;k=%m">laaste sterftes</a>
-<li>die <a href="%sm=LM;k=%m">laaste huwelike</a>%E%Ih
-<li>die <a href="%sm=HIST;k=10">bywerkingsverloop</a>%E
-<li>die <a href="%sm=CAL">kalenders</a>
-<li>die <a href="%sm=FORUM">databasis forum</a>
+<li><a href="%sm=LD;k=%m">[the latest %d deaths](%m)</a>
+<li><a href="%sm=LM;k=%m">[the latest %d marriages](%m)</a>%E%Ih
+<li><a href="%sm=HIST;k=10">[history of updates]</a>%E
+<li><a href="%sm=CAL">[calendar/calendars]1</a>
+<li><a href="%sm=FORUM">[data base forum]</a>
 </ul>
 </td>
 </tr>
