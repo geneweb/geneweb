@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.24 1999-08-08 11:25:26 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.25 1999-08-08 12:11:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -824,12 +824,13 @@ Type control C to stop the service
           else ();
           flush stderr;
           if daemon.val then
-            if Unix.fork () = 0 then ()
+            if Unix.fork () = 0 then
+              do Unix.close Unix.stdin;
+                 null_reopen [Unix.O_WRONLY] Unix.stdout;
+                 null_reopen [Unix.O_WRONLY] Unix.stderr;
+              return ()
             else exit 0
           else ();
-          Unix.close Unix.stdin;
-          null_reopen [Unix.O_WRONLY] Unix.stdout;
-          null_reopen [Unix.O_WRONLY] Unix.stderr;
           try
             do Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755;
                if uid.val <> None then
