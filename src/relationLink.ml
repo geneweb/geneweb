@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.15 2004-12-26 21:48:28 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.16 2004-12-28 03:59:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -215,7 +215,7 @@ value print_someone_and_spouse conf base info in_tab ip n ipl =
   let (s, d, spo) = spouse_text conf base n ip ipl in
   do {
     if in_tab && (info.bd > 0 || info.td_prop <> "") then
-      Wserver.wprint "<table border=%d><tr><td align=center%s>" info.bd
+      Wserver.wprint "<table border=\"%d\"><tr><td align=\"center\"%s>" info.bd
         info.td_prop
     else ();
     Wserver.wprint "%s\n" (someone_text conf base ip);
@@ -249,21 +249,21 @@ value rec print_both_branches conf base info pl1 pl2 =
       [ [(p2, _) :: pl2] -> (Some p2, pl2)
       | [] -> (None, []) ]
     in
-    tag "tr" "align=left" begin
-      stag "td" "align=center" begin
+    tag "tr" "align=\"left\"" begin
+      stag "td" "align=\"center\"" begin
         match p1 with
         [ Some p1 -> Wserver.wprint "|"
         | None -> Wserver.wprint "&nbsp;" ];
       end;
       stag "td" begin Wserver.wprint "&nbsp;"; end;
-      stag "td" "align=center" begin
+      stag "td" "align=\"center\"" begin
         match p2 with
         [ Some p2 -> Wserver.wprint "|"
         | None -> Wserver.wprint "&nbsp;" ];
       end;
       Wserver.wprint "\n";
     end;
-    tag "tr" "align=left" begin
+    tag "tr" "align=\"left\"" begin
       tag "td" "valign=\"top\" align=\"center\"" begin
         match p1 with
         [ Some p1 ->
@@ -438,7 +438,7 @@ value other_parent_text_if_same conf base info =
 value print_someone_and_other_parent_if_same conf base info =
   do {
     if info.bd > 0 || info.td_prop <> "" then
-      Wserver.wprint "<table border=%d><tr><td align=center%s>"
+      Wserver.wprint "<table border=\"%d\"><tr><td align=\"center\"%s>"
         info.bd info.td_prop
     else ();
     Wserver.wprint "%s\n" (someone_text conf base info.ip);
@@ -483,23 +483,24 @@ value print_one_branch_no_table conf base info =
 value print_one_branch_with_table conf base info =
   let b = if info.b1 = [] then info.b2 else info.b1 in
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
-  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
+  tag "table"
+    "border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\""
     conf.border
   begin
     tag "tr" begin
-      tag "td" "align=center" begin
+      tag "td" "align=\"center\"" begin
         print_someone_and_spouse conf base info True info.ip sp b;
       end;
       list_iter_hd_tl
         (fun (ip1, _) ipl1 ->
            do {
              tag "tr" begin
-               tag "td" "align=center" begin
+               tag "td" "align=\"center\"" begin
                  Wserver.wprint "|";
                end;
              end;
              tag "tr" begin
-               tag "td" "align=center" begin
+               tag "td" "align=\"center\"" begin
                  print_someone_and_spouse conf base info True ip1 sp ipl1;
                end;
              end;
@@ -537,28 +538,29 @@ value print_two_branches_with_pre conf base info =
 ;
 
 value print_two_branches_with_table conf base info =
-  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
+  tag "table"
+    "border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\""
     conf.border
   begin
-    tag "tr" "align=left" begin
-      stag "td" "colspan=3 align=center" begin
+    tag "tr" "align=\"left\"" begin
+      stag "td" "colspan=\"3\" align=\"center\"" begin
         print_someone_and_other_parent_if_same conf base info;
       end;
     end;
-    tag "tr" "align=left" begin
-      stag "td" "colspan=3 align=center" begin Wserver.wprint "|"; end;
+    tag "tr" "align=\"left\"" begin
+      stag "td" "colspan=\"3\" align=\"center\"" begin Wserver.wprint "|"; end;
     end;
-    tag "tr" "align=left" begin
-      stag "td" "align=right" begin
-        Wserver.wprint "<hr style=\"margin-left:50%%\">";
+    tag "tr" "align=\"left\"" begin
+      stag "td" "align=\"right\"" begin
+        Wserver.wprint "<hr style=\"margin-left:50%%\"%s>" xhs;
       end;
       Wserver.wprint "\n";
       stag "td" begin
-        Wserver.wprint "<hr>";
+        Wserver.wprint "<hr%s>" xhs;
       end;
       Wserver.wprint "\n";
-      stag "td" "align=left" begin
-        Wserver.wprint "<hr style=\"margin-right:50%%\">";
+      stag "td" "align=\"left\"" begin
+        Wserver.wprint "<hr style=\"margin-right:50%%\"%s>" xhs;
       end;
       Wserver.wprint "\n";
     end;
@@ -566,7 +568,7 @@ value print_two_branches_with_table conf base info =
     if not conf.cancel_links &&
        (info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
         info.nb2 <> None) then
-      tag "tr" "align=left" begin
+      tag "tr" "align=\"left\"" begin
         tag "td" begin
           if info.pb1 <> None || info.nb1 <> None then do {
             html_br conf; print_prev_next_1 conf base info info.pb1 info.nb1
