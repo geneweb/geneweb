@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.13 2000-06-21 23:28:54 ddr Exp $ *)
+(* $Id: descend.ml,v 3.14 2000-06-23 20:16:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -132,6 +132,7 @@ value print_choice conf base p niveau_effectif =
             (capitale (transl conf "index of the descendants"));
           Wserver.wprint "<input type=radio name=t value=C> - %s<br>\n"
             (capitale (transl conf "index of the spouses (non descendants)"));
+          Wserver.wprint "<input type=radio name=t value=A> d'Aboville<br>\n";
         end;
       end;
       tag "tr" begin
@@ -1198,9 +1199,60 @@ value print_tree conf base gv p =
   return ()
 ;
 
+value print_aboville conf base max_level p =
+  let max_level = min (limit_desc conf) max_level in
+  do Util.header conf (descendants_title conf base p);
+     print_link_to_welcome conf True;
+     Wserver.wprint "%s.<br><p>" (capitale (text_to conf max_level));
+     loop_ind 0 "" p where rec loop_ind lev lab p =
+       do Wserver.wprint "<tt>%s</tt>\n" lab;
+          Wserver.wprint "%s%s\n"
+            (referenced_person_title_text conf base p)
+            (Date.short_dates_text conf base p);
+       return
+       let u = uoi base p.cle_index in
+       do if lev < max_level then
+            for i = 0 to Array.length u.family - 1 do
+              let cpl = coi base u.family.(i) in
+              let spouse = poi base (Gutil.spouse p.cle_index cpl) in
+              let mdate =
+                if age_autorise conf base p && age_autorise conf base spouse
+                then
+                  let fam = foi base u.family.(i) in
+                  match Adef.od_of_codate fam.marriage with
+                  [ Some (Dgreg d _) ->
+                      "<font size=-2><em>" ^ Date.year_text d ^ "</em></font>"
+                  | _ -> "" ]
+                else ""
+              in
+              Wserver.wprint "&amp;%s %s%s\n" mdate
+                (referenced_person_title_text conf base spouse)
+                (Date.short_dates_text conf base spouse);
+            done
+          else ();
+          Wserver.wprint "<br>\n";
+       return
+       if lev < max_level then
+         loop_fam 1 0 where rec loop_fam cnt_chil i =
+           if i == Array.length u.family then ()
+           else
+             let des = doi base u.family.(i) in
+             loop_chil cnt_chil 0 where rec loop_chil cnt_chil j =
+               if j == Array.length des.children then
+                 loop_fam cnt_chil (i + 1)
+               else
+                 do loop_ind (lev + 1) (lab ^ string_of_int cnt_chil ^ ".")
+                      (poi base des.children.(j));
+                 return loop_chil (cnt_chil + 1) (j + 1)
+       else ();
+     Util.trailer conf;
+  return ()
+;
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
-  [ (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p
+  [ (Some "A", Some v) -> print_aboville conf base v p
+  | (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p
   | (Some "S", Some v) -> afficher_descendants_niveau conf base v p
   | (Some "H", Some v) -> afficher_descendants_table conf base v p
   | (Some "N", Some v) -> afficher_descendants_numerotation conf base v p
