@@ -23,25 +23,26 @@ Langue par défaut:
 <option value=""%edefault_lang=;><tt>-</tt>
 <option value="af"%edefault_lang=af;>Afrikaans
 <option value="ct"%edefault_lang=ct;>Catalan
-<option value="cn"%edefault_lang=cn;>Chinese
-<option value="cs"%edefault_lang=cs;>Czech
-<option value="dk"%edefault_lang=dk;>Danish
-<option value="nl"%edefault_lang=nl;>Dutch
-<option value="en"%edefault_lang=en;>English
+<option value="cn"%edefault_lang=cn;>Chinois
+<option value="cs"%edefault_lang=cs;>Tchèque
+<option value="dk"%edefault_lang=dk;>Danois
+<option value="nl"%edefault_lang=nl;>Néerlandais
+<option value="en"%edefault_lang=en;>Anglais
 <option value="eo"%edefault_lang=eo;>Esperanto
 <option value="et"%edefault_lang=et;>Estonien
-<option value="fi"%edefault_lang=fi;>Finnish
-<option value="fr"%edefault_lang=fr;>French
-<option value="de"%edefault_lang=de;>German
-<option value="he"%edefault_lang=he;>Hebrew
-<option value="is"%edefault_lang=is;>Icelandic
-<option value="it"%edefault_lang=it;>Italian
-<option value="lv"%edefault_lang=lv;>Latvian
-<option value="no"%edefault_lang=no;>Norwegian
-<option value="pt"%edefault_lang=pt;>Portuguese
-<option value="es"%edefault_lang=es;>Spanish
-<option value="ru"%edefault_lang=ru;>Russian
-<option value="se"%edefault_lang=se;>Swedish
+<option value="fi"%edefault_lang=fi;>Finlandais
+<option value="fr"%edefault_lang=fr;>Français
+<option value="de"%edefault_lang=de;>Allemand
+<option value="he"%edefault_lang=he;>Hébreu
+<option value="is"%edefault_lang=is;>Islandais
+<option value="it"%edefault_lang=it;>Italien
+<option value="lv"%edefault_lang=lv;>Letton
+<option value="no"%edefault_lang=no;>Norvégien
+<option value="pl"%edefault_lang=pl;>Polonais
+<option value="pt"%edefault_lang=pt;>Portugais
+<option value="es"%edefault_lang=es;>Espagnol
+<option value="ru"%edefault_lang=ru;>Russe
+<option value="se"%edefault_lang=se;>Suédois
 </select>
 <br>
 

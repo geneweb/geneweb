@@ -34,6 +34,7 @@ Default language:
 <option value="it"%edefault_lang=it;>Italian
 <option value="lv"%edefault_lang=lv;>Latvian
 <option value="no"%edefault_lang=no;>Norwegian
+<option value="pl"%edefault_lang=pl;>Polish
 <option value="pt"%edefault_lang=pt;>Portuguese
 <option value="es"%edefault_lang=es;>Spanish
 <option value="ru"%edefault_lang=ru;>Russian
