@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.38 2001-01-31 01:36:04 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.39 2001-01-31 23:09:38 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -525,6 +525,14 @@ value down_it t i k y =
   return ()
 ;
 
+(* equilibrate:
+   in the last line, for all elem A, make fall all As, which are located at
+   its right side above, to its line,
+                             A             |
+   i.e. transform all        . into        |
+                      A.......      A......A
+*)
+
 value equilibrate t =
   let ilast = Array.length t.table - 1 in
   let last = t.table.(ilast) in
@@ -552,6 +560,10 @@ value equilibrate t =
   loop 0
 ;
 
+(* group_elem:
+   transform all x y into x x
+                 A A      A A *)
+
 value group_elem t =
   for i = 0 to Array.length t.table - 2 do
     for j = 1 to Array.length t.table.(0) - 1 do
@@ -572,6 +584,11 @@ value group_elem t =
     done;
   done
 ;
+
+(* group_ghost:
+                 x  x       x  x           |a |a      |a |a
+   transform all |a |b into |a |a and all  x  y  into x  x
+                 y  z       y  y           A  A       A  A  *)
 
 value group_ghost t =
   for i = 0 to Array.length t.table - 2 do
@@ -594,6 +611,10 @@ value group_ghost t =
   done
 ;
 
+(* group_children:
+   transform all A A into A A
+                 x y      x x *)
+
 value group_children t =
   for i = 0 to Array.length t.table - 1 do
     let line = t.table.(i) in
@@ -605,6 +626,12 @@ value group_children t =
     done;
   done
 ;
+
+(* group_span_by_common_children:
+   in the last line, transform all
+     A B into A B
+     x y      x x
+   if A and B have common children *)
 
 value group_span_by_common_children d t =
   let module O = struct type t = idag; value compare = compare; end in
