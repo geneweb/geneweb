@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.61 2005-01-19 02:42:06 ddr Exp $ *)
+(* $Id: relation.ml,v 4.62 2005-01-20 14:20:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -87,11 +87,9 @@ value print_menu conf base p =
       tag "ul" begin
         tag "li" begin
           xtag "input" "type=\"hidden\" name=\"m\" value=\"NG\"";
-          tag "label" begin
-            xtag "input" "\
+          xtag "input" "\
 type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
-            xtag "input" "name=\"n\" size=\"40\" maxlength=\"200\"";
-          end;
+          xtag "input" "name=\"n\" size=\"40\" maxlength=\"200\"";
           tag "ul" begin
             tag "li" begin
               tag "label" begin
