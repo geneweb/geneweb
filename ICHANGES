@@ -5,6 +5,7 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Jun 04] Added "history of updates" in wizards notes.
   - [24 May 04] Display the wizards notes by last modification, and a
     link has been added for alphabetic order.
   - [13 May 04] Added index files snames.inx, snames.dat, fnames.inx
