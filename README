@@ -20,6 +20,7 @@ CONTENTS:
 	LICENCE		licence notice
 	Makefile	main Makefile
 	README		this file
+	INSTALL		installation file
 	doc		users' html documentation
 	etc		additional files for distribution
 	ged2gwb		converter GEDCOM -> GeneWeb
