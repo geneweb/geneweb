@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD><TITLE>GeneWeb - Underhåll</TITLE>
+<HTML><HEAD><TITLE>GeneWeb - UnderhÃ¥ll</TITLE>
 <META content="text/html; charset=windows-1252" http-equiv=Content-Type>
 <META content="MSHTML 5.00.2014.210" name=GENERATOR>
 </HEAD>
@@ -11,13 +11,13 @@
 height=108 src="../images/gwlogo.png" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>GeneWeb - Underhåll</font></h1>
+<h1><font color=#2f6400>GeneWeb - UnderhÃ¥ll</font></h1>
 </td>
 </tr>
 </table>
 </font>
 <br><br>
-<P>Denna sida beskriver vissa viktiga "tricks" för underhållet av din databas. 
+<P>Denna sida beskriver vissa viktiga "tricks" fÃ¶r underhÃ¥llet av din databas. 
 </P>
 <UL>
   <LI><A 
@@ -25,88 +25,88 @@ height=108 src="../images/gwlogo.png" align=left border=0 alt=GeneWeb></a>
   Rensa upp. 
   <LI><A 
   href="maint.htm#Rena">2.</A> 
-  Ändra namn. 
+  Ã„ndra namn. 
   <LI><A 
   href="maint.htm#Save">3.</A> 
-  Säkerhetskopiera. </LI></UL>
+  SÃ¤kerhetskopiera. </LI></UL>
 
-Om du använder <b><a href="gwsetup.htm">gwsetup</a></b>, kan du göra
-dessa operationer med det. Nedanstående metod använder DOS-fönster.
+Om du anvÃ¤nder <b><a href="gwsetup.htm">gwsetup</a></b>, kan du gÃ¶ra
+dessa operationer med det. NedanstÃ¥ende metod anvÃ¤nder DOS-fÃ¶nster.
 <HR>
 <H3><font color=#2f6400><A name=Clea>1. Rensa upp</A> </font></H3>
-<P>När du modifierar din databas med din webbläsare, kan vissa små problem 
-uppträda: </P>
+<P>NÃ¤r du modifierar din databas med din webblÃ¤sare, kan vissa smÃ¥ problem 
+upptrÃ¤da: </P>
 <UL>
   <P>
-  <LI>Om du gjorde många uppdateringar, blir åtkomsten till databasen gradvis 
-  slöare. 
+  <LI>Om du gjorde mÃ¥nga uppdateringar, blir Ã¥tkomsten till databasen gradvis 
+  slÃ¶are. 
   <P></P>
-  <LI>Om du lägger till nya familjer eller du modifierar personer, visas 
-  blodsbandet inte längre eller kan vara inkorrekt. 
+  <LI>Om du lÃ¤gger till nya familjer eller du modifierar personer, visas 
+  blodsbandet inte lÃ¤ngre eller kan vara inkorrekt. 
   <P></P>
-  <LI>Om du tar bort personer och familjer, återhämtas inte ockuperat utrymme: 
-  således när du tar bort en person, visar välkomst sidan alltid samma antal 
+  <LI>Om du tar bort personer och familjer, Ã¥terhÃ¤mtas inte ockuperat utrymme: 
+  sÃ¥ledes nÃ¤r du tar bort en person, visar vÃ¤lkomst sidan alltid samma antal 
   personer. </LI></UL>
 <P>Databasen ska sedan helst rensas. </P>
 <UL>
-  <LI>Den första resningen kan göras med kommandot "consang" vilket omberäknar 
-  blodsbanden för alla i databasen och återställer den ursprungliga åtkomst 
-  hastigheten. Om din databas heter "foo", starta ett DOS fönster (se sidan 
+  <LI>Den fÃ¶rsta resningen kan gÃ¶ras med kommandot "consang" vilket omberÃ¤knar 
+  blodsbanden fÃ¶r alla i databasen och Ã¥terstÃ¤ller den ursprungliga Ã¥tkomst 
+  hastigheten. Om din databas heter "foo", starta ett DOS fÃ¶nster (se sidan 
   "Hur man <A 
   href="start.htm">kommer 
-  igång</A> med GeneWeb") och skriv: </LI></UL><PRE>     	consang foo</PRE>
+  igÃ¥ng</A> med GeneWeb") och skriv: </LI></UL><PRE>     	consang foo</PRE>
 <DIR>
-<P>Detta kommando kan ta några sekunder eller minuter, beroende på storleken av 
-databasen. En räknare visas... Notera att under denna operation, är 
-uppdateringen stoppad: om du trycker "Ok" på en sida, kommer ett meddelande tala 
-om för dig att försöka igen. </P>
-<P>Under Unix (under Windows, fungerar det inte alltid, jag vet inte varför), 
+<P>Detta kommando kan ta nÃ¥gra sekunder eller minuter, beroende pÃ¥ storleken av 
+databasen. En rÃ¤knare visas... Notera att under denna operation, Ã¤r 
+uppdateringen stoppad: om du trycker "Ok" pÃ¥ en sida, kommer ett meddelande tala 
+om fÃ¶r dig att fÃ¶rsÃ¶ka igen. </P>
+<P>Under Unix (under Windows, fungerar det inte alltid, jag vet inte varfÃ¶r), 
 kan du stoppa detta kommando vid vilken tidpunkt som helst, genom att trycka 
-"Control-C" i DOS fönstret. Beräkningen av blodsbanden blir inte färdig men 
+"Control-C" i DOS fÃ¶nstret. BerÃ¤kningen av blodsbanden blir inte fÃ¤rdig men 
 databasen blir upprensad. Du kommer att kunna starta "consang" igen senare, den 
-kommer att återuppta beräkningarna där den stoppades (förutom om du har gjort 
-ändringar i familjer, i vilket fall den kommer att starta om från början). 
+kommer att Ã¥teruppta berÃ¤kningarna dÃ¤r den stoppades (fÃ¶rutom om du har gjort 
+Ã¤ndringar i familjer, i vilket fall den kommer att starta om frÃ¥n bÃ¶rjan). 
 </P></DIR>
 <UL>
-  <LI>Ett bättre sätt att rensa upp databaser består i att använda "gwu" and 
-  "gwc". Upprensningen skapar en alldeles ny databas där det utrymme som bestod 
-  av borttagna personer och familjer har återtagits. I ett DOS fönster, skriv 
-  för databasen "foo": </LI></UL><PRE>	     gwu foo &gt; foo.gw</PRE>
+  <LI>Ett bÃ¤ttre sÃ¤tt att rensa upp databaser bestÃ¥r i att anvÃ¤nda "gwu" and 
+  "gwc". Upprensningen skapar en alldeles ny databas dÃ¤r det utrymme som bestod 
+  av borttagna personer och familjer har Ã¥tertagits. I ett DOS fÃ¶nster, skriv 
+  fÃ¶r databasen "foo": </LI></UL><PRE>	     gwu foo &gt; foo.gw</PRE>
 <DIR>
 <P>och sedan: </P></DIR><PRE>	     gwc foo.gw -o bar
 </PRE>
 <DIR>
-<P>Det är rekommenderat att inte skapa en databas med samma namn, därför att om 
-"gwu" eller "gwc" inte fungerade bra, riskerar du att förlora allting. Här 
+<P>Det Ã¤r rekommenderat att inte skapa en databas med samma namn, dÃ¤rfÃ¶r att om 
+"gwu" eller "gwc" inte fungerade bra, riskerar du att fÃ¶rlora allting. HÃ¤r 
 kallade vi den "bar". </P>
-<P>Kontrollera att "bar" är korrekt och om den är det, radera databasen "foo" 
-(genom att radera katalogen "foo.gwb"), döp sedan om "bar" till "foo" (genom att 
-döpa om "bar.gwb" till "foo.gwb "). Se hur man gör det i det kommande kapitlet. 
+<P>Kontrollera att "bar" Ã¤r korrekt och om den Ã¤r det, radera databasen "foo" 
+(genom att radera katalogen "foo.gwb"), dÃ¶p sedan om "bar" till "foo" (genom att 
+dÃ¶pa om "bar.gwb" till "foo.gwb "). Se hur man gÃ¶r det i det kommande kapitlet. 
 </P>
-<P>Efter anrop till "gwc", finns det filer kvar med filändelsen ".gwo". Du kan 
-ta bort dem. Radera även filerna ".gw", förutom om du vill spara dem som 
-säkerhetskopior.</P>
-<P>Om du vill att blodsbandsberäkningen skall fungera, är det också nödvändigt 
-att köra "consang" igen på den nya databasen. </P></DIR>
+<P>Efter anrop till "gwc", finns det filer kvar med filÃ¤ndelsen ".gwo". Du kan 
+ta bort dem. Radera Ã¤ven filerna ".gw", fÃ¶rutom om du vill spara dem som 
+sÃ¤kerhetskopior.</P>
+<P>Om du vill att blodsbandsberÃ¤kningen skall fungera, Ã¤r det ocksÃ¥ nÃ¶dvÃ¤ndigt 
+att kÃ¶ra "consang" igen pÃ¥ den nya databasen. </P></DIR>
 <DIR></DIR>
 <HR>
-<H3><font color=#2f6400><A name=Rena>2. Ändra namn</A></font></H3>
-<P>Databaserna i <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> är kataloger med filändelsen ".gwb". Om du 
-helt enkelt ändrar namnet för katalogen "bar.gwb" till "foo.gwb", kommer din 
+<H3><font color=#2f6400><A name=Rena>2. Ã„ndra namn</A></font></H3>
+<P>Databaserna i <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> Ã¤r kataloger med filÃ¤ndelsen ".gwb". Om du 
+helt enkelt Ã¤ndrar namnet fÃ¶r katalogen "bar.gwb" till "foo.gwb", kommer din 
 databas vilken hette "bar" nu att heta "foo". </P>
-<P>För att göra detta, har du att välja mellan ett fönster med ikoner, om ditt 
-system har ett sådant eller ett DOS fönster. </P>
+<P>FÃ¶r att gÃ¶ra detta, har du att vÃ¤lja mellan ett fÃ¶nster med ikoner, om ditt 
+system har ett sÃ¥dant eller ett DOS fÃ¶nster. </P>
 <P>
 <UL>
-  <LI>Med ett ikonfönster, för att ändra "bar.gwb" till "foo.gwb": 
+  <LI>Med ett ikonfÃ¶nster, fÃ¶r att Ã¤ndra "bar.gwb" till "foo.gwb": 
   <P>
   <UL>
-    <LI>Öppna ett fönster för katalogen med din databas. 
+    <LI>Ã–ppna ett fÃ¶nster fÃ¶r katalogen med din databas. 
     <LI>Radera "foo.gwb", om den existerar. 
-    <LI>Döp om "bar.gwb" till "foo.gwb".</LI></UL></LI></UL>
+    <LI>DÃ¶p om "bar.gwb" till "foo.gwb".</LI></UL></LI></UL>
 <P>
 <UL>
-  <LI>Med ett DOS fönster: 
+  <LI>Med ett DOS fÃ¶nster: 
   <P>
   <UL>
     <LI>Under Unix: <PRE>    rm -rf foo.gwb
@@ -118,39 +118,39 @@ system har ett sådant eller ett DOS fönster. </P>
 </PRE></LI></UL></LI></UL>
 <UL></UL>
 <HR>
-<H3><font color=#2f6400><A name=Save>3. Säkerhetskopiera</A> </font></H3>
-<P>Datorer är inte helt pålitliga maskiner. Det är viktigt att göra 
-säkerhetskopior av dina data ibland, genom att kopiera dem till ett annat media 
+<H3><font color=#2f6400><A name=Save>3. SÃ¤kerhetskopiera</A> </font></H3>
+<P>Datorer Ã¤r inte helt pÃ¥litliga maskiner. Det Ã¤r viktigt att gÃ¶ra 
+sÃ¤kerhetskopior av dina data ibland, genom att kopiera dem till ett annat media 
 (disketter till exempel). </P>
-<P>Det kan också vara intressant att spara mellanliggande versioner för att 
-återvända till senare. </P>
-<P>För att säkerhetskopiera databasen "foo", gör du helt enkelt en kopia av 
-katalogen "foo.gwb" till ett annat medium (eller någon annanstans på disken om 
+<P>Det kan ocksÃ¥ vara intressant att spara mellanliggande versioner fÃ¶r att 
+Ã¥tervÃ¤nda till senare. </P>
+<P>FÃ¶r att sÃ¤kerhetskopiera databasen "foo", gÃ¶r du helt enkelt en kopia av 
+katalogen "foo.gwb" till ett annat medium (eller nÃ¥gon annanstans pÃ¥ disken om 
 du helt enkelt vill spara den som en mellanliggande version). </P>
-<P>Men det finns ett smartare sätt att göra en säkerhetskopia: spara din databas 
-som en källfil. För databasen "foo", skriv i ett DOS fönster: </P><PRE>     gwu foo &gt; foo.gw</PRE>
-<P>Kopiera filen "foo.gw" till det andra mediet eller någon annanstans på 
-disken. Du kan också ge filen ett annat namn (men alltid med filändelsen ".gw") 
-för arkivering. </P>
-<P>Säkerhetskopian som ".gw" filen har flera fördelar: </P>
+<P>Men det finns ett smartare sÃ¤tt att gÃ¶ra en sÃ¤kerhetskopia: spara din databas 
+som en kÃ¤llfil. FÃ¶r databasen "foo", skriv i ett DOS fÃ¶nster: </P><PRE>     gwu foo &gt; foo.gw</PRE>
+<P>Kopiera filen "foo.gw" till det andra mediet eller nÃ¥gon annanstans pÃ¥ 
+disken. Du kan ocksÃ¥ ge filen ett annat namn (men alltid med filÃ¤ndelsen ".gw") 
+fÃ¶r arkivering. </P>
+<P>SÃ¤kerhetskopian som ".gw" filen har flera fÃ¶rdelar: </P>
 <DIR></DIR>
 <UL>
   <P>
-  <LI>Det är enklare, eftersom det är endast en fil, medan databasen är en hel 
+  <LI>Det Ã¤r enklare, eftersom det Ã¤r endast en fil, medan databasen Ã¤r en hel 
   katalog. 
   <P></P>
-  <LI>Storleken är mindre. 
+  <LI>Storleken Ã¤r mindre. 
   <P></P>
-  <LI>Man kan återskapa den med vilken annan "gwc", och även använda en framtida 
+  <LI>Man kan Ã¥terskapa den med vilken annan "gwc", och Ã¤ven anvÃ¤nda en framtida 
   version av <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>. 
   <P></P>
-  <LI>Eftersom det är en text, är den läsbar med en editor (Word, Emacs, osv.), 
-  det kan vara användbart. En genealogi mjukvara om 3 århundraden kan återskapa 
+  <LI>Eftersom det Ã¤r en text, Ã¤r den lÃ¤sbar med en editor (Word, Emacs, osv.), 
+  det kan vara anvÃ¤ndbart. En genealogi mjukvara om 3 Ã¥rhundraden kan Ã¥terskapa 
   din databas. 
   <P></P>
-  <LI>Man kan göra jämförelser mellan olika säkerhetskopierade versioner och den 
+  <LI>Man kan gÃ¶ra jÃ¤mfÃ¶relser mellan olika sÃ¤kerhetskopierade versioner och den 
   nuvarande versionen. </LI></UL>
-<P>För att återskapa databasen "foo" från filen "foo.gw", skriv: </P><PRE>     gwc foo.gw -o foo</PRE>
+<P>FÃ¶r att Ã¥terskapa databasen "foo" frÃ¥n filen "foo.gw", skriv: </P><PRE>     gwc foo.gw -o foo</PRE>
 
 <p><hr><br>
 <center>Tillbaka till <A href="diruse.htm">bruksanvisningen</center>

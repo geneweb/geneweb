@@ -90,43 +90,43 @@ i denna ordning: </P>
 
 <li><strong>Villkor.</strong><br>
 
-Villkor startar med "<font size=+1><tt>%I</tt></font>" följt av
+Villkor startar med "<font size=+1><tt>%I</tt></font>" fÃ¶ljt av
 ett boolskt uttryck (sant eller falskt) och slutar med "<font
-size=+1><tt>%E</tt></font>". Texten mellan dessa två makron visas
-endast om det boolska uttrycket är sant. Det boolska uttrycket
-är antingen:
+size=+1><tt>%E</tt></font>". Texten mellan dessa tvÃ¥ makron visas
+endast om det boolska uttrycket Ã¤r sant. Det boolska uttrycket
+Ã¤r antingen:
 
 <ul>
 
-<li>"<font size=+1><tt>f</tt></font>" : vi är "friend"
+<li>"<font size=+1><tt>f</tt></font>" : vi Ã¤r "friend"
 
-<li>"<font size=+1><tt>w</tt></font>" : vi är "wizard"
+<li>"<font size=+1><tt>w</tt></font>" : vi Ã¤r "wizard"
 
-<li>"<font size=+1><tt>j</tt></font>" : vi är "wizard" men bara "friend"
+<li>"<font size=+1><tt>j</tt></font>" : vi Ã¤r "wizard" men bara "friend"
 (se vidare <a href="start.htm#Cnf">filen a.gwf</a>, "wizard_just_friend")
 
-<li>"<font size=+1><tt>c</tt></font>" : vi är i CGI mod
+<li>"<font size=+1><tt>c</tt></font>" : vi Ã¤r i CGI mod
 
 <li>"<font size=+1><tt>h</tt></font>" : det finns en historie fil
 
-<li>"<font size=+1><tt>l</tt></font>" : webbläsaren klarar inte tabeller
+<li>"<font size=+1><tt>l</tt></font>" : webblÃ¤saren klarar inte tabeller
 
-<li>"<font size=+1><tt>n</tt></font>" : det finns noteringar för databasen
+<li>"<font size=+1><tt>n</tt></font>" : det finns noteringar fÃ¶r databasen
 
-<li>"<font size=+1><tt>t</tt></font>" : det är en sökning efter titlar
+<li>"<font size=+1><tt>t</tt></font>" : det Ã¤r en sÃ¶kning efter titlar
 
-<li>"<font size=+1><tt>z</tt></font>" : det är en person vald som proband för navigering enligt Kekules system (se makro "<font size=+1><tt>%u</tt></font>")
+<li>"<font size=+1><tt>z</tt></font>" : det Ã¤r en person vald som proband fÃ¶r navigering enligt Kekules system (se makro "<font size=+1><tt>%u</tt></font>")
 
 <li>"<font size=+1><tt>a</tt></font>" : det finns en <a
-href="access.htm#DBA">global åtkomst restriktion</a> för databasen
+href="access.htm#DBA">global Ã¥tkomst restriktion</a> fÃ¶r databasen
 
-<li>"<font size=+1><tt>N</tt></font>" : negering av det följande uttrycket
+<li>"<font size=+1><tt>N</tt></font>" : negering av det fÃ¶ljande uttrycket
 
-<li>"<font size=+1><tt>|</tt></font>" : logiskt "eller" mellan de två
-följande uttrycken
+<li>"<font size=+1><tt>|</tt></font>" : logiskt "eller" mellan de tvÃ¥
+fÃ¶ljande uttrycken
 
-<li>"<font size=+1><tt>&amp;</tt></font>" : logiskt "och" mellan de två
-följande uttrycken
+<li>"<font size=+1><tt>&amp;</tt></font>" : logiskt "och" mellan de tvÃ¥
+fÃ¶ljande uttrycken
 
 </ul>
 
@@ -134,10 +134,10 @@ Exempel:
 
 <ul>
 
-<li> visa texten om det är en sökning efter titel: <font
+<li> visa texten om det Ã¤r en sÃ¶kning efter titel: <font
 size=+1><tt>%It...%E</tt></font>
 
-<li> visa texten om vi varken är "wizard" eller "friend": <font
+<li> visa texten om vi varken Ã¤r "wizard" eller "friend": <font
 size=+1><tt>%I&amp;NwNf...%E</tt></font>
 
 </ul>
@@ -151,7 +151,7 @@ size=+1><tt>%I&amp;NwNf...%E</tt></font>
 <LI>"<TT>%h</TT>": variabler beroende p&aring; sammanhanget (se nedan) p&aring; formen "&lt;input type=hidden name=var value=val&gt;". </LI>
 <LI>"<TT>%l</TT>": spr&aring;k. </LI>
 <LI>"<TT>%n</TT>": antal personer i databasen. </LI>
-<LI>"<TT>%u</TT>": person vald som proband för navigering enligt Kekules system. </LI>
+<LI>"<TT>%u</TT>": person vald som proband fÃ¶r navigering enligt Kekules system. </LI>
 <LI>"<TT>%%</TT>": endast ett "%". </LI>
 <LI>"<TT>%[</TT>": "[". </LI>
 <LI>"<TT>%]</TT>": "]". </LI></UL>
@@ -162,7 +162,7 @@ size=+1><tt>%I&amp;NwNf...%E</tt></font>
 <UL>
 <LI>b: i CGI mod, databasens namn. </LI>
 <LI>lang: spr&aring;k. </LI>
-<LI>iz: nummer för personen vald som proband för navigering enligt Kekules system. </LI></UL>
+<LI>iz: nummer fÃ¶r personen vald som proband fÃ¶r navigering enligt Kekules system. </LI></UL>
 
 <P>Det <STRONG>konditionella</STRONG> kan inte &ouml;verlappa: man kan inte s&auml;tta en "<TT>%w... %w</TT>" inuti en "<TT>%i... %i</TT>". </P>
 <HR>
@@ -194,18 +194,18 @@ skriva "&lt;body%b&gt;". </LI>
 
 <hr>
 <H3><font color=#2f6400><A NAME="All">Alla sidor</A></font></H3>
-Alla sidor, välkomstsidan inkluderad, kan modifieras på tre ställen:
+Alla sidor, vÃ¤lkomstsidan inkluderad, kan modifieras pÃ¥ tre stÃ¤llen:
 <ul>
-<li> Du kan lägga till en fil benämnd <b>dbas.hed</b> (om "dbas är namnet på din databas),
-vilken kommer att sättas in på alla sidornas huvuden (mellan &lt;head&gt; och &lt;/head&gt;). Det tillåter dig, till exempel, att göra "style sheets". Filen ska läggas i katalogen
-"lang" och/eller om du vill ha annorlunda utseende för språket "xy", även i
+<li> Du kan lÃ¤gga till en fil benÃ¤mnd <b>dbas.hed</b> (om "dbas Ã¤r namnet pÃ¥ din databas),
+vilken kommer att sÃ¤ttas in pÃ¥ alla sidornas huvuden (mellan &lt;head&gt; och &lt;/head&gt;). Det tillÃ¥ter dig, till exempel, att gÃ¶ra "style sheets". Filen ska lÃ¤ggas i katalogen
+"lang" och/eller om du vill ha annorlunda utseende fÃ¶r sprÃ¥ket "xy", Ã¤ven i
 katalogen "lang/xy".
-<li> På samma sätt, kan du lägga till en fil benämnd <b>dbas.trl</b>, som kommer
-att sättas in på alla sidor efter GeneWeb copyright raden.
-<li> Till sist, kan du sätta variabeln <tt>body_prop</tt> i filen <b>dbas.gwf</b>, den
-kommer att sättas in i taggen "&lt;body&gt;" på alla sidor. Den är användbar för
-att sätta en bakgrundsbild eller för att ändra färgerna på texten. Se denna
-<a href="start.htm#Cnf">del</a> av kapitlet "Hur man kommer igång med GeneWeb".
+<li> PÃ¥ samma sÃ¤tt, kan du lÃ¤gga till en fil benÃ¤mnd <b>dbas.trl</b>, som kommer
+att sÃ¤ttas in pÃ¥ alla sidor efter GeneWeb copyright raden.
+<li> Till sist, kan du sÃ¤tta variabeln <tt>body_prop</tt> i filen <b>dbas.gwf</b>, den
+kommer att sÃ¤ttas in i taggen "&lt;body&gt;" pÃ¥ alla sidor. Den Ã¤r anvÃ¤ndbar fÃ¶r
+att sÃ¤tta en bakgrundsbild eller fÃ¶r att Ã¤ndra fÃ¤rgerna pÃ¥ texten. Se denna
+<a href="start.htm#Cnf">del</a> av kapitlet "Hur man kommer igÃ¥ng med GeneWeb".
 </ul>
 
 <p><hr><br>

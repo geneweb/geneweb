@@ -1,6 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
               "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>CDrom</title></head>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>CDrom</title>
+</head>
 <body background="../images/gwback.jpg">
 <table border=0 width="100%">
 <tr>
@@ -23,12 +26,12 @@ distribuer votre base de donn&eacute;es directement utilisable.
 <p>
 
 Ce chapitre vous explique les &eacute;tapes minimums pour y arriver. Cette
-installation a l'avantage que l'utilisateur n'aura rien à installer
+installation a l'avantage que l'utilisateur n'aura rien Ã  installer
 sur son disque dur, ni le logiciel, ni la base de donn&eacute;es.
 
 <p>
 
-Voici les op&eacute;rations à faire:
+Voici les op&eacute;rations Ã  faire:
 
 <p>
 
@@ -44,7 +47,7 @@ gwc la recr&eacute;e).
 
 <font size=-1>Remarque: cette &eacute;tape n'est pas absolument obligatoire
 mais vous permet de distribuer une base de donn&eacute;es optimis&eacute;e en
-m&eacute;moire et en vitesse d'accès. Cependant, si votre base de donn&eacute;es
+m&eacute;moire et en vitesse d'accÃ¨s. Cependant, si votre base de donn&eacute;es
 vient d'un fichier GEDCOM ou d'un fichier source <font
 color=#2f6400><b>GeneWeb</b></font> et que vous n'avez pas fait de
 modifications dedans, elle est inutile.</font>
@@ -60,18 +63,18 @@ consang.
 <p>
 
 <font size=-1>Remarque: &eacute;tape facultative aussi. Si vous ne la faites
-pas, les calculs de parent&eacute; fonctionneront quand même mais les
+pas, les calculs de parent&eacute; fonctionneront quand mÃªme mais les
 consanguinit&eacute;s ne s'afficheront pas.</font>
 
 <p>
 
 <li> Entrez dans votre base et faites un calcul de parent&eacute; quelconque,
-par exemple entre un père et son fils.
+par exemple entre un pÃ¨re et son fils.
 
 <p>
 
-<font size=-1>Remarque: c'est encore une &eacute;tape facultative destin&eacute;e à
-optimiser l'accès à la base. En effet, le premier calcul de parent&eacute;
+<font size=-1>Remarque: c'est encore une &eacute;tape facultative destin&eacute;e Ã 
+optimiser l'accÃ¨s Ã  la base. En effet, le premier calcul de parent&eacute;
 fabrique un fichier (de nom tstab) dans la base de donn&eacute;es qui permet
 aux calculs de parent&eacute; suivants d'aller plus vite. Si ce fichier n'a
 pas &eacute;t&eacute; cr&eacute;&eacute;, ce ne sera plus possible dans le CDrom et les calculs de
@@ -97,7 +100,7 @@ installation: Windows, MacOS X, Unix...).
 configuration. Si vous en avez un qui vous convient, utilisez-le,
 sinon cr&eacute;ez-le. Le fichier de configuration est un fichier texte se
 terminant par ".gwf". Si votre base s'appelle "xyz", c'est le fichier
-"xyz.gwf". S'il y a d&eacute;jà un fichier de configuration, il se trouve
+"xyz.gwf". S'il y a d&eacute;jÃ  un fichier de configuration, il se trouve
 &eacute;galement dans le r&eacute;pertoire des bases.
 
 <p>
@@ -112,17 +115,17 @@ la ligne:
 <p>
 
 <font size=-1>Remarque: cette op&eacute;ration est facultative mais elle
-permet d'&eacute;viter que cela propose une "mise à jour" dans les pages
-personnelles, mise à jour qui, de toutes façons, ne fonctionnerait pas
+permet d'&eacute;viter que cela propose une "mise Ã  jour" dans les pages
+personnelles, mise Ã  jour qui, de toutes faÃ§ons, ne fonctionnerait pas
 sur un support non inscriptible.  Attention: si vous cr&eacute;ez le fichier
 de configuration, faites en sorte qu'il n'ait pas l'extension .txt
-comme certains systèmes font malheureusement automatiquement:
-l'extension doit être .gwf et rien d'autre.</font>
+comme certains systÃ¨mes font malheureusement automatiquement:
+l'extension doit Ãªtre .gwf et rien d'autre.</font>
 
 <p>
 
 <li> Copiez l'ex&eacute;cutable "gwd" dans le r&eacute;pertoire destination. Sur
-certains systèmes, il porte l'extension ".exe". Attention: il peut y
+certains systÃ¨mes, il porte l'extension ".exe". Attention: il peut y
 avoir plusieurs fichiers qui s'appellent "gwd" dans votre installation
 <font color=#2f6400><b>GeneWeb</b></font>. Il s'agit ici d'un fichier
 assez gros (plus de 1Mo). Il se trouve g&eacute;n&eacute;ralement dans un r&eacute;pertoire
@@ -131,7 +134,7 @@ qui s'appelle "gw".
 <p>
 
 <li> Copiez dans le r&eacute;pertoire destination les r&eacute;pertoires "lang",
-"etc" et "images" qui doivent se trouver dans le même r&eacute;pertoire où
+"etc" et "images" qui doivent se trouver dans le mÃªme r&eacute;pertoire oÃ¹
 vous avez trouv&eacute; l'ex&eacute;cutable gwd.
 
 <p>
@@ -145,7 +148,7 @@ pages.</font>
 
 <li> Dans le r&eacute;pertoire "lang" du r&eacute;pertoire destination, &eacute;ditez le
 fichier nomm&eacute; "start.txt" et supprimez le groupe de lignes qui
-contiennent les liens pour accès "magicien". Elles commencent par
+contiennent les liens pour accÃ¨s "magicien". Elles commencent par
 quelque chose comme:
 
 <pre>
@@ -157,7 +160,7 @@ quelque chose comme:
 et finissent par:
 
 <pre>
-   pl: &lt;a href="%sw=w"&gt;&lt;em&gt;"Wizard"&lt;/em&gt;&lt;/a&gt; dostêp&lt;br&gt; (has³o)
+   pl: &lt;a href="%sw=w"&gt;&lt;em&gt;"Wizard"&lt;/em&gt;&lt;/a&gt; dostÃªp&lt;br&gt; (hasÂ³o)
    pt: Entrada &lt;a href="%sw=w"&gt;&lt;em&gt;feiticeiro&lt;/em&gt;&lt;/a&gt;&lt;br&gt; (palavra chave)
    sv: &lt;a href="%sw=w"&gt;&lt;em&gt;Uppdaterings&lt;/em&gt;&lt;/a&gt; tilltr&auml;de&lt;br&gt; (passord)
    ]&lt;br&gt;&lt;/td&gt;
@@ -166,18 +169,18 @@ et finissent par:
 <p>
 
 <font size=-1>Cette &eacute;tape n'est pas obligatoire mais &eacute;vite que la page
-d'accueil propose un accès magicien qui, de toutes façons, ne servirait
-à rien.</font>
+d'accueil propose un accÃ¨s magicien qui, de toutes faÃ§ons, ne servirait
+Ã  rien.</font>
 
 <p>
 
-<li><b>&EACUTE;tape importante</b>. L'ex&eacute;cutable gwd fabrique des fichiers
-dans son r&eacute;pertoire courant. S'il ne peut pas le faire, ça peut
-bloquer son fonctionnement (en particulier sous Windows, ça le
+<li><b>&Eacute;tape importante</b>. L'ex&eacute;cutable gwd fabrique des fichiers
+dans son r&eacute;pertoire courant. S'il ne peut pas le faire, Ã§a peut
+bloquer son fonctionnement (en particulier sous Windows, Ã§a le
 bloquera certainement). Il faut donc lui indiquer une option pour
 qu'il utilise le disque dur (note: ces fichiers ne sont pas gros, sont
 temporaires et les d&eacute;truire volontairement ou involontairement pendant
-ou après visite ne perturbera pas le fonctionnement de gwd).
+ou aprÃ¨s visite ne perturbera pas le fonctionnement de gwd).
 
 <p>
 
@@ -201,9 +204,9 @@ r&eacute;pertoire "images", sous-r&eacute;pertoire portant le nom de votre base
 
 <p>
 
-<li> Après toutes ces &eacute;tapes, vous disposez d'une installation
-minimum, obligeant l'utilisateur à lancer lui-même gwd et à ouvrir
-l'adresse URL pour acc&eacute;der à la base. Vous pouvez am&eacute;liorer cela en
+<li> AprÃ¨s toutes ces &eacute;tapes, vous disposez d'une installation
+minimum, obligeant l'utilisateur Ã  lancer lui-mÃªme gwd et Ã  ouvrir
+l'adresse URL pour acc&eacute;der Ã  la base. Vous pouvez am&eacute;liorer cela en
 fournissant des fichiers HTML et/ou des scripts (shell, batch) qui
 lanceront tout cela tout seul. Vous pouvez aussi mettre plusieurs
 bases de donn&eacute;es, d'autres fichiers HTML, etc, etc.
@@ -213,19 +216,19 @@ bases de donn&eacute;es, d'autres fichiers HTML, etc, etc.
 <font size=-1>
 
 Ne me demandez pas comment on fait un CDrom qui lance tout
-automatiquement quand on l'insère sur son support: ça doit pouvoir se
+automatiquement quand on l'insÃ¨re sur son support: Ã§a doit pouvoir se
 faire mais je ne sais pas comment.
 
 <p>
 
 Remarque: si vous voulez que votre base de donn&eacute;es soit lisible sur
-d'autres Systèmes d'Exploitation (Windows, MacOS X, Unix) que vous
+d'autres SystÃ¨mes d'Exploitation (Windows, MacOS X, Unix) que vous
 utilisez, vous pouvez cr&eacute;er un r&eacute;pertoire par SE et y mettre la
-version de gwd pour ce SE-là. Bien sûr il vous faudra avoir t&eacute;l&eacute;charg&eacute;
+version de gwd pour ce SE-lÃ . Bien sÃ»r il vous faudra avoir t&eacute;l&eacute;charg&eacute;
 toutes les versions de <font color=#2f6400><b>GeneWeb</b></font> des
 SE que vous voulez rendre disponibles. Il faut &eacute;galement revoir
 l'installation des fichiers gwd.arg et en particulier leur indiquer le
-chemin d'accès aux fichiers système et à la base (options -hd et -bd
+chemin d'accÃ¨s aux fichiers systÃ¨me et Ã  la base (options -hd et -bd
 de gwd).
 
 </font>
@@ -235,9 +238,9 @@ de gwd).
 <li>Avant de graver votre disque, faites un test. Pour cela, rendez le
 r&eacute;pertoire destination non inscriptible ainsi que tous ses
 sous-r&eacute;pertoires et fichiers. Puis lancez la commande gwd (par
-double-clic si votre système le permet ou par une commande
+double-clic si votre systÃ¨me le permet ou par une commande
 int&eacute;ractive). Ouvez dans votre navigateur l'adresse
-http://127.0.0.1:2317/xyz (si la base s'appelle xyz) et v&eacute;rifiez si ça
+http://127.0.0.1:2317/xyz (si la base s'appelle xyz) et v&eacute;rifiez si Ã§a
 fonctionne.
 
 <p>

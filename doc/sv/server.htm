@@ -23,9 +23,9 @@ adressen: "http://computer:2317/base" anv&auml;ndas f&ouml;r externa personer. <
 &auml;r direkt anslutna till Internet. </P>
 
 <P>Om du anv&auml;nder en Internetleverant&ouml;r &auml;r din dator inte synlig. I detta fallet, finns
-det ingen l&ouml;sning. Det &auml;r Internetleverantörens ansvar att installera
+det ingen l&ouml;sning. Det &auml;r InternetleverantÃ¶rens ansvar att installera
 <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>. Vid denna tidpunkt (februari 2000) har bara en
-Internetleveratör installerat den. </P>
+InternetleveratÃ¶r installerat den. </P>
 <P>S&aring;ledes, det f&ouml;ljande g&auml;ller bara de som har en direkt anslutning till Internet. </P>
 
 <P>Om du k&ouml;r under Unix eller Windows NT (allts&aring; inte Windows 95/98), m&aring;ste du ange
@@ -39,7 +39,7 @@ installation i "CGI". </P>
 <H3><font color=#2f6400>Installation i "service" </font></H3>
 
 I denna mod beh&ouml;ver du inte ha en webbserver installerad p&aring; din dator. Gwd <EM>&auml;r</EM>
-en webbserver i sig sj&auml;lvt. Den enda skillnaden mot andra servers &auml;r att den bara betjänar
+en webbserver i sig sj&auml;lvt. Den enda skillnaden mot andra servers &auml;r att den bara betjÃ¤nar
 genealogi.
 
 <UL>
@@ -60,11 +60,11 @@ nummer med kommandot "ps" och d&ouml;da den med kommandot "kill". </UL>
 
 <UL>
 
-<LI>Om du k&ouml;r Windows NT, m&aring;ste du installera "gwd" som en "service" genom att använda programmet "srvany.exe", du måste vara inloggad som
-Administrator. Från Windows NT Ressource Kit behöver du: "srvany.exe",
-"instsrv.exe", kanske "srvinstw.exe" och "delsrv.exe" också. Kopiera först
-"srvany.exe" till en katalog på din dator (t.ex. C:\GeneWeb) och installera
-det som en "service" (ett trevligare verktyg för det, är det grafiska
+<LI>Om du k&ouml;r Windows NT, m&aring;ste du installera "gwd" som en "service" genom att anvÃ¤nda programmet "srvany.exe", du mÃ¥ste vara inloggad som
+Administrator. FrÃ¥n Windows NT Ressource Kit behÃ¶ver du: "srvany.exe",
+"instsrv.exe", kanske "srvinstw.exe" och "delsrv.exe" ocksÃ¥. Kopiera fÃ¶rst
+"srvany.exe" till en katalog pÃ¥ din dator (t.ex. C:\GeneWeb) och installera
+det som en "service" (ett trevligare verktyg fÃ¶r det, Ã¤r det grafiska
 programmet "srvinstw.exe"):
 
 <PRE>
@@ -73,16 +73,16 @@ programmet "srvinstw.exe"):
 
 
 I "Services" i "Control Panel", klicka "GeneWebServer" och klicka sedan
-"Startup" för att välja "Automatic" eller "Manual". I "Log On As" rutan,
-välj kontot där servicen ska starta, fylla i det rätta passordet (detta
-måste göras för att komma åt nätverket). <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> kommer att starta genom att specifiera de följande register värdena
+"Startup" fÃ¶r att vÃ¤lja "Automatic" eller "Manual". I "Log On As" rutan,
+vÃ¤lj kontot dÃ¤r servicen ska starta, fylla i det rÃ¤tta passordet (detta
+mÃ¥ste gÃ¶ras fÃ¶r att komma Ã¥t nÃ¤tverket). <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> kommer att starta genom att specifiera de fÃ¶ljande register vÃ¤rdena
 med "regedt32":
 
 <PRE>
 1. Under HKLM\System\CurrentControlSet\Services\GeneWebServer skapa
-   en nytt värde "Parameters"
+   en nytt vÃ¤rde "Parameters"
    
-2. Skapa där två nya Värden (skriv REG_SZ) Application and AppDirectory, t.ex.
+2. Skapa dÃ¤r tvÃ¥ nya VÃ¤rden (skriv REG_SZ) Application and AppDirectory, t.ex.
    Application: REG_SZ: C:\GeneWeb\gw\gwd.exe
    AppDirectory: REG_SZ: C:\GeneWeb\gw
 </PRE>
@@ -90,7 +90,7 @@ med "regedt32":
 Nu kan du kontrollera <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> servicen
 i "Control Panel" -> "Services" -> "GeneWebServer" "Startup"/"Stop" eller genom
 att skriva "net start GeneWebServer" eller "net stop GeneWebServer" vid
-kommando prompten. För att ta bort GeneWebServer, stoppa den och skriv
+kommando prompten. FÃ¶r att ta bort GeneWebServer, stoppa den och skriv
 "delsrv GeneWebServer" eller "instsrv GeneWebServer remove".
 </ul>
 
