@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.5 2000-05-23 07:19:01 ddr Exp $ *)
+(* $Id: def.mli,v 3.6 2000-09-10 13:25:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type iper = Adef.iper;
@@ -102,13 +102,13 @@ type gen_person 'person 'string =
     cle_index : mutable iper }
 ;
 
-type gen_ascend =
-  { parents : mutable option ifam;
+type gen_ascend 'family =
+  { parents : mutable option 'family;
     consang : mutable Adef.fix }
 ;
 
-type gen_union =
-  { family : mutable array ifam }
+type gen_union 'family =
+  { family : mutable array 'family }
 ;
 
 (* family *)
@@ -138,8 +138,8 @@ type gen_descend 'person =
 (* data base *)
 
 type person = gen_person iper istr;
-type ascend = gen_ascend;
-type union = gen_union;
+type ascend = gen_ascend ifam;
+type union = gen_union ifam;
 
 type family = gen_family iper istr;
 type couple = gen_couple iper;
