@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.8 2001-11-24 17:58:45 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.9 2001-11-28 14:57:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -484,6 +484,10 @@ value accept_connection tmout max_clients callback s =
             with exc ->
               try do { print_err_exc exc; flush stderr; }
               with _ -> ();
+            try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
+            try Unix.shutdown Unix.stdout Unix.SHUTDOWN_SEND with _ -> ();
+            try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
+            try Unix.shutdown Unix.stdin Unix.SHUTDOWN_RECEIVE with _ -> ();
             exit 0
           }
       | Some id ->
