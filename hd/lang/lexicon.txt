@@ -167,7 +167,7 @@ es: nth/nth (feminine)
 fr: nth (degre)
 it: nth (degre)
 nl: n
-pt: nth 
+pt: nth
 se: nth
 
     , it is
@@ -1514,7 +1514,7 @@ en: max %d generations
 es: maximum %d generaci&oacute;ns
 fr: max %d g&eacute;n&eacute;rations
 nl: maximaal %d generaties
-pt: maximum %d geraç&otilde;es 
+pt: maximum %d geraç&otilde;es
 se: maximalt %d generationer
 
     maybe in (year)
