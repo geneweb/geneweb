@@ -13,7 +13,7 @@ GeneWeb version 2.06
     by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
   - [Aug 14..21, 99] Added ability to put notes for the data base itself (for
-    a general introduction, for example).
+    a general introduction).
   - [Aug 14, 99] Fixed bug: send image in cgi mode under Windows did not
     work.
   - [Aug 13..21, 99] In notes, URLs and Email addresses are now clickable.
