@@ -1,6 +1,13 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
+GeneWeb Version 2.06
+--------------------
+
+* GeneWeb daemon/CGI (gwd)
+  - [Aug 7, 99] Fixed bad behavior: in welcome pages, proposed "wizard" to
+    to wizards when the flag "wizard_just_friend" was set.
+
 GeneWeb Version 2.05
 --------------------
 
