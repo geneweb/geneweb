@@ -25,15 +25,31 @@ Wenn das nicht funktioniert, bitte mir mitteilen.
 
 <h4>Unter Windows funktioniert &uuml;berhaupt nichts!</h4>
  
-Ein h&auml;ufiges Problem ist, dass dein Web-Browser, wenn eine Webadresse
- eingegeben wird (http://...), eine Verbindung zum Netzwerk aufzubauen versucht
- und aufgibt, wenn die Modemverbindung getrennt ist. Das ist ein Fehler von
-Windows, denn da die Adresse "localhost" heisst, sollte es nicht versuchen,
-eine Verbindung aufzubauen: "localhost" hei&szlig;t "dein eigener Rechner".
- 
+Zuerst solltest du folgendes kontrollieren: L&auml;uft das Programm "gwsetup" noch,
+welches du gerade gestartet hast? Denn damit alles funktioniert, muss gwsetup
+laufen. Wenn dieses Programm in einem Fenster gelaufen ist, und du hast dieses
+Fenster geschlossen, so kann das nicht funktionieren. Wenn dies dein Problem
+ist, so starte gwsetup nochmals mit Doppelklick, gib nochmal deine bevorzugte
+Sprache ein, aber schliesse diesmal das Fenster nicht!
+
+<p>
+
+Das gleiche Problem gibt es betreffs des Programms gwd, welches den Zugriff auf deine
+Datenbank erlaubt: du startest es durch Doppelklick und darfst es nicht anhalten, 
+w&auml;hrend du in deiner Datenbank navigierst.
+
+<p>
+
+Andererseits ist ein h&auml;ufiges Problem, dass dein Web-Browser, wenn eine 
+Webadresse eingegeben wird (http://...), eine Verbindung zum Netzwerk
+aufzubauen versucht und aufgibt, wenn die Modemverbindung getrennt ist. Das 
+ist ein Fehler von Windows, denn da die Adresse "localhost" hei&szlig;t, sollte es 
+nicht versuchen, eine Verbindung aufzubauen: "localhost" hei&szlig;t "dein 
+eigener Rechner".
+
 <p>
  
-Das h&auml;ngt damit zusammen, dass von deinem Internet-Provider eine automatische
+Das h&auml;ngt damit zusammen, dass zu deinem Internet-Provider eine automatische
 Verbindung installiert wurde. Diese automatische Verbindung ist verantwortlich
 f&uuml;r dieses Ph&auml;nomen. Eine L&ouml;sung ist daher,
 diese abzustellen. Suche in einem Menu, welches "Einstellungen" oder
@@ -86,8 +102,7 @@ einen Vater oder nur eine Mutter in der GEDCOM-Datei gibt,
 fügt <font color=#2f6400><b>GeneWeb</b></font> 
 automatisch das andere Elternteil hinzu, indem es ihr oder ihm ein Fragezeichen
 als Vor- und Zunamen gibt. Die Differnz resultiert aus genau diesen
-fehlenden Elternteilen
-(die aber existiert haben).
+fehlenden Elternteilen (die aber existiert haben).
 
 
 <h4>Wenn man Verwandtschaftsbeziehungen anzeigt, fehlen einige.</h4>
@@ -146,7 +161,7 @@ oder die Angabe ist "unbekannt".
 Wenn diese Person mit <font color=#2f6400><b>GeneWeb</b></font> hinzugef&uuml;gt
 wurde und es wurde nicht angegeben, ob er/sie am Leben oder tot ist, oder wenn
 deine Datenbank aus einer GEDCOM-Datei stammt (die Angabe "noch lebende Person" 
-wurde nicht eingeplant im Standard GEDCOM 5.5), verwendet <font color=#2f6400><b>GeneWeb</b></font>
+existiert nicht im Standard GEDCOM 5.5), verwendet <font color=#2f6400><b>GeneWeb</b></font>
 den folgenden Algorithmus:
  
 <ul>
@@ -180,7 +195,7 @@ konsequent verloren.
  
 Es ist manchmal - durch Hacken - m&ouml;glich, ihnen Notizen zu geben oder
 sie zu verbinden, aber Vorsicht: beim ersten Aufr&auml;umen der Datenbank
-verschwinden dies Notizen und die Verbindungen: Es ist daher angeraten, dies
+verschwinden diese Notizen und die Verbindungen: Es ist daher angeraten, dies
 nicht zu tun.
  
 <p>
@@ -288,6 +303,24 @@ so etwas zu programmieren, entsprechend der Tatsache, dass <font color=#2f6400><
 auf pures HTML limitiert ist: JavaScript sollte verwendet werden, was aber meinen
 Prinzipien wiederspricht (siehe die Frage zum Familien-Aktualisierungsformular).
  
+<p>
+
+<h4>Wenn ich eine Suche mit Ort/Nachname durchf&uuml;hre und wenn das Resultat
+mehrere Personen zu einem Nachnamen ergibt, ist nur die erste anklickbar</h4>
+
+Das stimmt. In einer ersten Version habe ich einen Link zu dem Nachnamen selbst
+gemacht und nicht zu einer Person, aber wenn mehrere Personen zu dem Nachnamen
+geh&ouml;ren, wei&szlig; man nicht, wer davon zu diesem Ort geh&ouml;rt und es ist
+schwer, diesen zu finden.
+
+<p>
+
+Die erste Person anzugeben ist wesentlich mehr "informativ". Ja, das ist
+unvollst&auml;ndig, und richtig w&auml;re, eine Liste aller Personen zu haben,
+die zu diesem Ort geh&ouml;ren, aber das h&auml;tte vorausgesetzt, dass ich
+noch einige weitere Dinge programmiere, und es h&auml;tte den Nachteil, dass
+die Suche wesentlich mehr Speicher verbrauchen w&uuml;rde.
+
 <p>                                                                                                                                                             
 <hr>
 <br>
