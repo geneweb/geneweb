@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.16 2001-04-05 15:49:43 ddr Exp $
+# $Id: lexicon.txt,v 4.17 2001-04-13 17:55:59 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -342,6 +342,7 @@ fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 he:  äîéï ùì %t ìà îúàéí ìéçñéå/ìéçñéä
 is: kyn %t er ekki í samræmi viğ skyldleika
 it: il sesso di %t non e' coerente con le sue relazioni
+lv: personas %t neatbilst viòa/viòas attiecîbâm
 nl: het geslacht van %t klopt niet met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
 pl: %t: jego/jej p³eæ nie odpowiada jego/jej zwi¹zkom
@@ -2071,6 +2072,7 @@ fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 he:  àá àôùøé/ àí àôùøéú/ äåøéí àôùøééí
 is: sennilegur fağir/sennileg móğir/sennilegir foreldrar
 it: padre presunto/madre presunta/genitori presunti
+lv: iespeejamais tçvs/iespçjamâ mâte/iespçjamie vecâki
 nl: kandidaat vader/kandidaat moeder/kandidaat ouders
 no: mulig far/mulig mor/mulige foreldre
 pt: suposto pai/suposta m&atilde;e/supostos pais
@@ -2092,6 +2094,7 @@ fr: fils possible/fille possible/enfant possible
 he:  áï àôùøé/ áú àôùøéú/ éìã àôùø
 is: sennilega sonur/sennilega dóttir/sennilega barn
 it: figlio presunto/figlia presunta/figlio presunto
+lv: iespçjamais dçls/iespçjamâ meita/iespçjamais bçrns
 nl: kandidaat zoon/kandidaat dochter/kandidaat kind
 no: mulig s&oslash;nn/mulig datter/mulig barn
 pt: suposto filho/suposta filha/supostos filhos
@@ -2746,6 +2749,7 @@ es: no agrupar las ramas comunes
 et: ära grupeeri ühiseid harusid
 fr: ne pas regrouper les branches communes
 he:  ìà ìùìá òğôé îùôçä îùåúôéí
+lv: negrupçt kopçjos zarus kopâ
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
 pt: não reagrupar os ramos comuns
@@ -3597,6 +3601,7 @@ fr: nom/courriel/sujet
 he: ident/email/ ğåùà
 is: ident/email/um
 it: ident/email/oggetto
+lv: ident/e-pasts/subjekts
 nl: ident/email/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
@@ -3618,6 +3623,7 @@ fr: si titres
 he:  àí áòì(ú) úåàø
 is: ef titlar
 it: se titoli
+lv: ja tituli
 nl: als titels
 no: hvis titler
 pl: jeœli z tytu³em
@@ -4059,6 +4065,7 @@ fr: jour julien
 he:  éåí éåìéàğé
 is: julian dagur
 it: giorno julian
+lv: pçc Jûlija kalendâra
 nl: juliaanse dag
 no: juliansk dag
 pl: dzieñ w kalendarzu juliañskim
@@ -4217,6 +4224,7 @@ fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  îòâì áîàâø äğúåğéí: %s  öàöà(ä) ìàöîå/ìàöîä
 it: loop nel data-base: %s e' antenato di se stesso
+lv: cilpa datu bâzç: %s ir viòa/viòas pağas secis
 nl: kring in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
 pl: pêtla w bazie: %s jest swoim w³asnym przodkiem
@@ -4238,6 +4246,7 @@ fr: titre principal
 he:   úåàø øàùéú
 is: ağal titill
 it: titolo principale
+lv: galvenais tituls
 nl: voornaamste titel
 no: hovedtitel
 pl: g³ówny tytu³
@@ -4490,6 +4499,7 @@ fr: message ajout&eacute;
 he:  äåñôä äåãòä
 is: skilaboğum bætt viğ
 it: messaggio aggiunto
+lv: ziòa pievienota
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
 pl: wiadomoœæ zosta³a dodana
@@ -4507,6 +4517,7 @@ et: teade/eelmine teade/järgmine teade
 fi: viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/message suivant
 he:  äåãòä / äåãòä ÷åãîú / äåãòä äáàä
+lv: ziòa/iepriekğçjâ ziòa/nâkoğâ ziòa
 nl: bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/neste melding
 pl: wiadomoœæ/poprzednia wiadomoœæ/nastêpna wiadomoœæ
@@ -4849,6 +4860,7 @@ es: sin comprobacion de sexo
 et: ära kontrolli sugude sobivust
 fr: pas de v&eacute;rification des sexes
 he:  áìé ìååãà îéï
+lv: nav pâbaudîts dzimums
 nl: geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
 pt: não verificar os sexos
