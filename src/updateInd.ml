@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.24 2001-02-13 00:23:45 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.25 2001-02-14 01:42:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -719,7 +719,7 @@ value print_person conf base p =
   return ()
 ;
 
-value print_update_ind conf base p digest =
+value print_update_ind_aux conf base p digest =
   let title _ =
     match p_getenv conf.env "m" with
     [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") ->
@@ -733,7 +733,7 @@ value print_update_ind conf base p digest =
     | Some ("ADD_IND" | "ADD_IND_OK") ->
         let s = transl_nth conf "person/persons" 0 in
         Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
-    | _ -> incorrect_request conf ]
+    | _ -> assert False ]
   in
   do header conf title;
      Wserver.wprint "\n";
@@ -772,6 +772,56 @@ value print_update_ind conf base p digest =
      Wserver.wprint "\n";
      trailer conf;
   return ()
+;
+
+(* Interpretation of template file 'updind.txt' *)
+
+type ast = Templ.ast ==
+  [ Atext of string
+  | Avar of string and list string
+  | Atransl of bool and string and char
+  | Awid_hei of string
+  | Aif of ast_expr and list ast and list ast
+  | Aforeach of string and list string and list ast ]
+and ast_expr = Templ.ast_expr ==
+  [ Eor of ast_expr and ast_expr
+  | Eand of ast_expr and ast_expr
+  | Enot of ast_expr
+  | Evar of string and list string ]
+;
+
+type env =
+  [ Eind of gen_person Update.key string
+  | Estring of string ]
+;
+
+value rec eval_ast conf base env =
+  fun
+  [ Atext s -> Wserver.wprint "%s" s
+  | Atransl upp s n -> Wserver.wprint "Atransl"
+  | Avar s sl -> Wserver.wprint "Avar"
+  | Awid_hei s -> Wserver.wprint "Awid_hei"
+  | Aif e alt ale -> Wserver.wprint "Aif"
+  | Aforeach s sl al -> Wserver.wprint "Aforeach" ]
+;
+
+value interp_templ conf base p digest astl =
+  let env = [("p", Eind p); ("digest", Estring digest)] in
+  List.iter (eval_ast conf base env) astl
+;
+
+value print_update_ind conf base p digest =
+  match p_getenv conf.env "m" with
+  [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK")
+  | Some ("MOD_IND" | "MOD_IND_OK")
+  | Some ("ADD_IND" | "ADD_IND_OK") ->
+      do if p_getenv conf.env "opt" = Some "new" then
+           let astl = Templ.input conf base "updind" in
+           do html conf; interp_templ conf base p digest astl; return ()
+         else ();
+      return
+      print_update_ind_aux conf base p digest
+  | _ -> incorrect_request conf ]
 ;
 
 value print_del1 conf base p =
