@@ -24,14 +24,17 @@ consanguinités.
 <input type=hidden name=lang value=$l>
 
 Pour un nettoyage en profondeur, s&eacute;lectionnez votre base de
-donn&eacute;es:
+donn&eacute;es en cliquant sur le bouton associ&eacute;:
 
 <p>
 
 <dl><dd><table border=1 cellspacing=0 cellpadding=1>
 
-$b{<tr><td><input type=radio name=anon
-value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+$b{
+<tr>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
 <tr><td>il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
 
 </table></dl>
