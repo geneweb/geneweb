@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.17 2000-10-12 07:42:10 ddr Exp $ *)
+(* $Id: update.ml,v 3.18 2000-10-24 15:47:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -182,9 +182,9 @@ value print_error conf base =
   [ AlreadyDefined p ->
       Wserver.wprint
         (fcapitale
-           (ftransl conf "name \"%s.%d %s\" already used by %tthis person%t"))
-        (p_first_name base p) p.occ
-        (p_surname base p)
+           (ftransl conf "name %s already used by %tthis person%t"))
+        ("\"" ^ p_first_name base p ^ "." ^ string_of_int p.occ ^ " " ^
+         p_surname base p ^ "\"")
         (fun _ ->
            Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
         (fun _ -> Wserver.wprint "</a>.")
@@ -661,23 +661,96 @@ value print_simple_person conf base var (first_name, surname, occ, create) =
   end
 ;
 
-value print_create_conflict conf base p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  let n =
-    find_free_occ base (p_first_name base p) (p_surname base p) 0
+type person_type =
+  [ R_father of int
+  | R_mother of int
+  | Father
+  | Mother
+  | Witness of int
+  | Child of int ]
+;
+
+value field_of_ptyp ptyp =
+  match ptyp with
+  [ R_father pos -> "r" ^ string_of_int pos ^ "_fath_"
+  | R_mother pos -> "r" ^ string_of_int pos ^ "_moth_"
+  | Father -> "him_"
+  | Mother -> "her_"
+  | Witness pos -> "witn" ^ string_of_int pos ^ "_"
+  | Child pos -> "ch" ^ string_of_int pos ^ "_" ]
+;
+
+value text_of_ptyp conf ptyp =
+  match ptyp with
+  [ R_father pos ->
+      (transl_nth conf "relation/relations" 0) ^ " " ^ string_of_int pos
+       ^ " - " ^ (transl_nth conf "father/mother" 0)
+  | R_mother pos ->
+      (transl_nth conf "relation/relations" 0) ^ " " ^ string_of_int pos
+       ^ " - " ^ (transl_nth conf "father/mother" 1)
+  | Father -> transl_nth conf "him/her" 0
+  | Mother -> transl_nth conf "him/her" 1
+  | Witness pos ->
+      (transl_nth conf "witness/witnesses" 0) ^ " " ^ string_of_int pos
+  | Child pos ->
+      (transl_nth conf "child/children" 0) ^ " " ^ string_of_int pos ]
+;
+
+value print_create_conflict conf base p ptyp =
+  let var = field_of_ptyp ptyp in
+  let text = text_of_ptyp conf ptyp in
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "error"))
   in
   do rheader conf title;
-     print_error conf base (AlreadyDefined p);
-     html_p conf;
-     Wserver.wprint "<ul>\n";
-     html_li conf;
-     Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number")) n;
-     html_li conf;
-     Wserver.wprint "%s\n"
-       (capitale (transl conf "or use \"link\" instead of \"create\""));
-     Wserver.wprint "</ul>\n";
+      Wserver.wprint
+       (fcapitale
+          (ftransl conf "name %s already used by %tthis person%t"))
+       ("\"" ^ p_first_name base p ^ "." ^ string_of_int p.occ ^ " " ^
+        p_surname base p ^ "\" (" ^ text ^ ")")
+       (fun _ ->
+          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+       (fun _ -> Wserver.wprint "</a>.");
+      html_p conf;
+  return
+  let free_n =
+    find_free_occ base (p_first_name base p) (p_surname base p) 0
+  in
+  do html_p conf;
+     tag "form" "method=POST action=\"%s\"" conf.command begin
+       List.iter
+         (fun (x, v) ->
+            Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+              (quote_escaped (decode_varenv v)))
+         (conf.henv @ conf.env);
+       Wserver.wprint "<input type=hidden name=field value=\"%s\">\n" var;
+       Wserver.wprint "<input type=hidden name=free_occ value=\"%d\">\n"
+         free_n;
+       tag "ul" begin
+         html_li conf;
+         Wserver.wprint "%s: %d. \n"
+           (capitale (transl conf "first free number")) free_n;
+         Wserver.wprint
+           (fcapitale (ftransl conf "click on \"%s\""))
+           (transl conf "create");
+         Wserver.wprint "%s." (transl conf " to try again with this number");
+         html_li conf;
+         Wserver.wprint "%s " (capitale (transl conf "or"));
+         Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+         Wserver.wprint "%s %s." (transl conf "and")
+           (transl conf "change it (the number) yourself");
+         html_li conf;
+         Wserver.wprint "%s " (capitale (transl conf "or"));
+         Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+         Wserver.wprint "%s %s." (transl conf "and")
+           (transl conf "use \"link\" instead of \"create\"");
+       end;
+       Wserver.wprint "<input type=submit name=create value=\"%s\">\n"
+         (capitale (transl conf "create"));
+       Wserver.wprint "<input type=submit name=return value=\"%s\">\n"
+         (capitale (transl conf "back"));
+     end;
      print_same_name conf base p;
-     print_return conf;
      trailer conf;
   return raise ModErr
 ;
@@ -690,7 +763,7 @@ value add_misc_names_for_new_persons base new_persons =
     new_persons
 ;
 
-value insert_person conf base src new_persons (f, s, o, create) =
+value insert_person conf base src new_persons (field, (f, s, o, create)) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
@@ -705,7 +778,7 @@ value insert_person conf base src new_persons (f, s, o, create) =
             else raise Not_found
         else
           let ip = person_ht_find_unique base f s o in
-          print_create_conflict conf base (poi base ip)
+          print_create_conflict conf base (poi base ip) field
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
@@ -959,4 +1032,56 @@ value print conf base p =
      Wserver.wprint "<br>\n";
      trailer conf;
   return ()
+;
+
+value rec update_conf_env field p occ o_env n_env =
+  let get_name (n, v) = n in
+  match o_env with
+  [ [] -> n_env
+  | [ head :: rest ] ->
+    let name = get_name head in
+    if (name = field ^ "p") then
+      update_conf_env field p occ rest [ (name, p) :: n_env ]
+    else if (name = field ^ "occ") then
+      update_conf_env field p occ rest [ (name, occ) :: n_env ]  
+    else if (name = "link" || name = "create" ||
+             name = "free_occ" || name = "field" || name = "link_occ") then
+      update_conf_env field p occ rest  n_env  
+    else update_conf_env field p occ rest [ head :: n_env ] ]
+;
+  
+value update_conf_create conf =
+  let field =
+    match p_getenv conf.env "field" with
+    [ Some f -> f
+    | _ -> "" ]
+  in
+  let occ =
+    match p_getenv conf.env "free_occ" with
+    [ Some occ -> occ
+    | _ -> "" ]
+  in
+  { (conf) with env = update_conf_env field "create" occ conf.env [] } 
+;
+
+value update_conf_link conf =
+  let field =
+    match p_getenv conf.env "field" with
+    [ Some f -> f
+    | _ -> "" ]
+  in
+  let occ =
+    match p_getenv conf.env "link_occ" with
+    [ Some occ -> occ
+    | _ -> "" ]
+  in
+  { (conf) with env = update_conf_env field "link" occ conf.env [] } 
+;
+
+value update_conf conf =
+  match p_getenv conf.env "link" with
+  [ Some _ -> update_conf_link conf
+  | None -> match p_getenv conf.env "create" with
+            [ Some _ -> update_conf_create conf
+            | None -> conf ] ]
 ;

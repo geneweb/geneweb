@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.18 2000-10-20 18:00:34 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.19 2000-10-24 15:47:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -318,6 +318,36 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
+value enrich_witness i key =
+  (Update.Witness (i + 1), key) 
+;
+
+value enrich_family sfam =
+  { marriage = sfam.marriage;
+    marriage_place = sfam.marriage_place;
+    marriage_src = sfam.marriage_src;
+    witnesses = Array.mapi enrich_witness sfam.witnesses;
+    relation = sfam.relation;
+    divorce = sfam.divorce;
+    comment = sfam.comment;
+    origin_file = sfam.origin_file;
+    fsources = sfam.fsources;
+    fam_index = sfam.fam_index }
+;
+
+value enrich_couple scpl =
+  { father = (Update.Father, scpl.father);
+    mother = (Update.Mother, scpl.mother) }
+;
+
+value enrich_child i key =
+  (Update.Child (i + 1), key) 
+;
+
+value enrich_descend sdes =
+  { children = Array.mapi enrich_child sdes.children }
+;
+
 value effective_mod conf base sfam scpl sdes =
   let fi = sfam.fam_index in
   let ofam = foi base fi in
@@ -329,15 +359,17 @@ value effective_mod conf base sfam scpl sdes =
     [ Some s -> strip_spaces s
     | None -> "" ]
   in
+  let ncpl =
+    map_couple_p (Update.insert_person conf base psrc created_p)
+      (enrich_couple scpl)
+  in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) sfam
-  in
-  let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p) scpl
+      (Update.insert_string conf base) (enrich_family sfam)
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    map_descend_p (Update.insert_person conf base psrc created_p)
+      (enrich_descend sdes)
   in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
@@ -429,15 +461,17 @@ value effective_add conf base sfam scpl sdes =
     [ Some s -> strip_spaces s
     | None -> "" ]
   in
+  let ncpl =
+    map_couple_p (Update.insert_person conf base psrc created_p)
+      (enrich_couple scpl)
+  in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) sfam
-  in
-  let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p) scpl
+      (Update.insert_string conf base) (enrich_family sfam)
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    map_descend_p (Update.insert_person conf base psrc created_p)
+      (enrich_descend sdes)
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base ncpl.father in
@@ -674,7 +708,8 @@ value delete_topological_sort conf base =
   try Sys.remove tstab_file with [ Sys_error _ -> () ]
 ;
 
-value print_add conf base =
+value print_add o_conf base =
+  let conf = Update.update_conf o_conf in
   let bfile = Filename.concat Util.base_dir.val conf.bname in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
@@ -682,7 +717,7 @@ value print_add conf base =
         let (sfam, scpl, sdes, ext) = reconstitute_family conf in
         let redisp =
           match p_getenv conf.env "return" with
-          [ Some "on" -> True
+          [ Some _ -> True
           | _ -> False ]
         in
         if ext || redisp then
@@ -756,7 +791,7 @@ value print_mod_aux conf base callback =
         let (sfam, scpl, sdes, ext) = reconstitute_family conf in
         let redisp =
           match p_getenv conf.env "return" with
-          [ Some "on" -> True
+          [ Some _ -> True
           | _ -> False ]
         in
         let digest =
@@ -775,7 +810,8 @@ value print_mod_aux conf base callback =
   | Refuse -> Update.error_locked conf base ]
 ;
 
-value print_mod conf base =
+value print_mod o_conf base =
+  let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
     let (fam, cpl, des) = effective_mod conf base sfam scpl sdes in
     let wl = all_checks_family conf base fam cpl des in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.13 2000-10-12 07:42:11 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.14 2000-10-24 15:47:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -311,26 +311,6 @@ value strip_person p =
   return ()
 ;
 
-value print_try_again conf var n =
-  do Wserver.wprint "%s " (transl conf "click");
-     Wserver.wprint "<a href=\n\"%s" (commd conf);
-     let _ = List.fold_left
-       (fun first (v, x) ->
-          do Wserver.wprint "%s" (if first then "" else ";");
-             Wserver.wprint "%s=" v;
-             if v = var then Wserver.wprint "%d" n
-             else Wserver.wprint "%s" x;
-          return False)
-       True conf.env
-     in ();
-     Wserver.wprint "\">%s</a>" (transl conf "here");
-     Wserver.wprint "%s.\n"
-        (transl conf
-           " \
-to try again with this number, or do \"back\" and change it yourself");
-  return ()
-;
-
 value print_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do rheader conf title;
@@ -344,10 +324,27 @@ value print_conflict conf base p =
        html_li conf;
        Wserver.wprint "%s: %d.\n"
          (capitale (transl conf "first free number")) free_n;
-       print_try_again conf "occ" free_n;
+       Wserver.wprint "%s " (capitale (transl conf "click"));
+       Wserver.wprint "<a href=\n\"%s" (commd conf);
+       let _ = List.fold_left
+         (fun first (v, x) ->
+            do Wserver.wprint "%s" (if first then "" else ";");
+               Wserver.wprint "%s=" v;
+               if v = "occ" then Wserver.wprint "%d" free_n
+               else Wserver.wprint "%s" x;
+            return False)
+         True conf.env
+       in ();
+       Wserver.wprint "\">%s</a>" (transl conf "here");
+       Wserver.wprint "%s.\n" (transl conf " to try again with this number");
+       html_li conf;
+       Wserver.wprint "%s " (capitale (transl conf "or"));
+       Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+       Wserver.wprint "%s %s." (transl conf "and")
+         (transl conf "change it (the number) yourself");
      end;
-     Update.print_same_name conf base p;
      Update.print_return conf;
+     Update.print_same_name conf base p;
      trailer conf;
   return raise Update.ModErr
 ;
@@ -460,6 +457,60 @@ value update_relation_parents base op np =
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
+value rec enrich_relation pos lrel =
+  let enrich_rel pos rel =
+    let prefix = "r" ^ string_of_int pos in
+    let r_fath_typ = Update.R_father pos in
+    let r_moth_typ = Update.R_mother pos in
+    { r_type = rel.r_type;
+      r_fath = match rel.r_fath with
+               [ Some key -> Some (r_fath_typ, key)
+               | None -> None ];
+      r_moth = match rel.r_moth with
+               [ Some key -> Some (r_moth_typ, key)
+               | None -> None ];
+      r_sources = rel.r_sources }
+  in
+  match lrel with
+  [ [] -> []
+  | [ head :: lrest ] ->
+      [ enrich_rel pos head :: enrich_relation (pos + 1) lrest ]
+  ]
+;
+
+value enrich_person sp =
+  { first_name = sp.first_name;
+    surname = sp.surname;
+    occ = sp.occ;
+    image = sp.image;
+    aliases = sp.aliases;
+    first_names_aliases = sp.first_names_aliases;
+    surnames_aliases = sp.surnames_aliases;
+    public_name = sp.public_name;
+    qualifiers = sp.qualifiers;
+    titles = sp.titles;
+    rparents = enrich_relation 1 sp.rparents;
+    related = sp.related;
+    occupation = sp.occupation;
+    sex = sp.sex;
+    access = sp.access;
+    birth = sp.birth;
+    birth_place = sp.birth_place;
+    birth_src = sp.birth_src;
+    baptism = sp.baptism;
+    baptism_place = sp.baptism_place;
+    baptism_src = sp.baptism_src;
+    death = sp.death;
+    death_place = sp.death_place;
+    death_src = sp.death_src;
+    burial = sp.burial;
+    burial_place = sp.burial_place;
+    burial_src = sp.burial_src;
+    notes = sp.notes;
+    psources = sp.psources;
+    cle_index = sp.cle_index }
+;
+
 value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
@@ -484,7 +535,7 @@ value effective_mod conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) sp
+      (Update.insert_string conf base) (enrich_person sp)
   in
   do np.related := op.related; return
   let op_misc_names = person_misc_names base op in
@@ -508,7 +559,7 @@ value effective_add conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) sp
+      (Update.insert_string conf base) (enrich_person sp)
   in
   let na = {parents = None; consang = Adef.fix (-1)} in
   let nu = {family = [| |]} in
@@ -648,7 +699,8 @@ value print_del_ok conf base wl =
   return ()
 ;
 
-value print_add conf base =
+value print_add o_conf base =
+  let conf = Update.update_conf o_conf in
   let bfile = Filename.concat Util.base_dir.val conf.bname in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
@@ -656,7 +708,7 @@ value print_add conf base =
         let (sp, ext) = reconstitute_person conf in
         let redisp =
           match p_getenv conf.env "return" with
-          [ Some "on" -> True
+          [ Some _ -> True
           | _ -> False ]
         in
         if ext || redisp then UpdateInd.print_add1 conf base sp
@@ -704,7 +756,7 @@ value print_mod_aux conf base callback =
         let (p, ext) = reconstitute_person conf in
         let redisp =
           match p_getenv conf.env "return" with
-          [ Some "on" -> True
+          [ Some _ -> True
           | _ -> False ]
         in
         let digest = Update.digest_person (poi base p.cle_index) in
@@ -721,7 +773,8 @@ value print_mod_aux conf base callback =
   | Refuse -> Update.error_locked conf base ]
 ;
 
-value print_mod conf base =
+value print_mod o_conf base =
+  let conf = Update.update_conf o_conf in
   let callback sp =
     let p = effective_mod conf base sp in
     let u = uoi base p.cle_index in
