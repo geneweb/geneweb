@@ -1,5 +1,5 @@
-(* $Id: ansel.ml,v 4.3 2002-01-20 19:55:41 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: ansel.ml,v 4.4 2004-12-14 09:30:10 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 value no_accent =
   fun

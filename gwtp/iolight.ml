@@ -1,5 +1,5 @@
-(* $Id: iolight.ml,v 4.4 2002-01-30 11:49:45 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: iolight.ml,v 4.5 2004-12-14 09:30:09 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 

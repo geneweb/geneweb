@@ -1,6 +1,6 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.38 2004-07-16 16:17:53 ddr Exp $ *)
-(* Copyright (c) 2002 INRIA *)
+(* $Id: ascend.ml,v 4.39 2004-12-14 09:30:10 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
 open Def;

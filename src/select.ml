@@ -1,5 +1,5 @@
-(* $Id: select.ml,v 4.10 2004-11-09 12:40:53 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: select.ml,v 4.11 2004-12-14 09:30:17 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;

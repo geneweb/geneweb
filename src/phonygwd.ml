@@ -1,5 +1,5 @@
-(* $Id: phonygwd.ml,v 4.3 2002-12-31 08:38:07 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: phonygwd.ml,v 4.4 2004-12-14 09:30:15 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 value port_selected = ref 2317;
 value fname = ref "";

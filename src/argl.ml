@@ -1,5 +1,5 @@
-(* $Id: argl.ml,v 4.6 2004-11-21 02:41:38 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: argl.ml,v 4.7 2004-12-14 09:30:10 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Printf;
 

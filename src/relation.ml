@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.49 2004-11-09 12:33:49 ddr Exp $ *)
-(* Copyright (c) 2002 INRIA *)
+(* $Id: relation.ml,v 4.50 2004-12-14 09:30:17 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;

@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.17 2004-07-16 16:17:57 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: place.ml,v 4.18 2004-12-14 09:30:15 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;

@@ -1,5 +1,5 @@
-(* $Id: check.ml,v 4.14 2004-08-20 08:52:07 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: check.ml,v 4.15 2004-12-14 09:30:11 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
