@@ -5,7 +5,7 @@ GeneWeb version 4.07
   - [11 Apr 02] Added Slovenian (Mitja Iskric).
 
 * GeneWeb server or CGI (gwd)
-  - [06 Apr 02] Fixed bug: in fast merge, sources were sometimes lost.
+  - [23 Apr 02] Fixed bugs: in fast merge, some fields were sometimes lost.
   - [18 Mar 02] Had to remove the cookie system added in previous version
     because it introduced a bug: the system of global authorization file
     (variable "auth_file" of the configuration file) did not work any
