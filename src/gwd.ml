@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.48 1999-10-08 10:19:53 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.49 1999-10-09 16:50:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -61,7 +61,13 @@ value log oc tm conf from gauth request s =
   do let tm = Unix.localtime tm in
      fprintf_date oc tm;
      Printf.fprintf oc " (%d)" (Unix.getpid ());
-     Printf.fprintf oc " %s\n" s;
+     output_char oc ' ';
+     loop 0 where rec loop i =
+       if i < String.length s then
+         if i > 1000 then Printf.fprintf oc "..."
+         else do output_char oc s.[i]; return loop (i + 1)
+       else ();
+     output_char oc '\n';
      Printf.fprintf oc "  From: %s\n" from;
      if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
      if conf.user <> "" then Printf.fprintf oc "  User: %s\n" conf.user
@@ -597,8 +603,11 @@ value log_and_robot_check conf auth from request str =
         let oc = log_oc () in
         do try
              do match robot_xcl.val with
-                [ Some (cnt, sec) -> Robot.check oc tm from cnt sec conf.cgi
-                | None -> () ];
+                [ Some (cnt, sec) ->
+                    let s = "suicide" in
+                    let suicide = Util.p_getenv conf.env s <> None in
+                    Robot.check oc tm from cnt sec conf.cgi suicide
+                | _ -> () ];
                 if conf.cgi && log_file.val = "" then ()
                 else log oc tm conf from auth request str;
              return ()

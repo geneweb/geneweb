@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.36 1999-10-09 16:48:15 ddr Exp $ *)
+(* $Id: family.ml,v 2.37 1999-10-09 16:49:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -75,10 +75,10 @@ value compact_list conf base xl =
              Adef.date_of_cdate d1 strictement_avant d2
          | (_, Death _ d1, _, Death _ d2) ->
              Adef.date_of_cdate d1 strictement_avant Adef.date_of_cdate d2
-         | (Some _, _, _, _) -> True
-         | (_, Death _ _, _, _) -> True
-         | (_, _, Some _, _) -> False
-         | (_, _, _, Death _ _) -> False
+         | (Some _, _, _, _) -> False
+         | (_, Death _ _, _, _) -> False
+         | (_, _, Some _, _) -> True
+         | (_, _, _, Death _ _) -> True
          | _ ->
              let c =
                alphabetique (p_surname base p1) (p_surname base p2)
