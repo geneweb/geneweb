@@ -115,11 +115,11 @@ function WorkOnBrowser() {
 
 <p><blink><strong><font color=red>[
 en: Maintenance! Wizard rights
-    temporarily suspended... wait for some minutes to recover the ability
-    to make inline updates. Thank you.
+    temporarily suspended... wait for about some tens of minutes to recover
+    the ability to make inline updates. Thank you.
 fr: Maintenance! les droits des magiciens sont momentanément suspendus...
-    attendez quelques minutes pour retrouver la possibilité de faire
-    des mises à jour en ligne. Merci.
+    attendez quelques dizaines de minutes pour retrouver la possibilité de
+    faire des mises à jour en ligne. Merci.
 ]</font></strong></blink>
 
 <p>
