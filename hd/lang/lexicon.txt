@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.209 2004-11-18 09:31:03 ddr Exp $
+# $Id: lexicon.txt,v 4.210 2004-12-14 09:21:06 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7772,6 +7772,7 @@ de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
+pt: o %d mais velho casal talvez ainda vivo e noivado
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
 
     the %d oldest perhaps still alive

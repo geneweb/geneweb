@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.22 2004-11-21 02:41:38 ddr Exp $
+# $Id: Makefile,v 4.23 2004-12-14 09:20:08 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -99,7 +99,7 @@ i18n: pr_transl.cmo always
 always:
 
 depend:
-	unset LANG LC_ALL; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
+	export LC_ALL=C; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
 	mv .depend.new .depend
 
 include .depend
