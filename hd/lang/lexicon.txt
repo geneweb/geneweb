@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.114 2002-11-18 11:00:24 ddr Exp $
+# $Id: lexicon.txt,v 4.115 2002-11-18 11:08:00 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -157,7 +157,7 @@ sv:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer
 
     %1 of %2
 af: %1 van %2
-bg: %1 на %2
+bg: %1 на :a:%2
 ca: %1 d[e']%2
 cs: %1 :g:%2
 da: %1 til %2
@@ -182,7 +182,7 @@ sv: %1 till %2
 
     %1 of (same or greater generation level) %2
 af: %1 van %2
-bg: %1 на %2
+bg: %1 на :a:%2
 ca: %1 d[e']%2
 cs: %1 :g:%2
 da: %1 til %2
@@ -7689,7 +7689,7 @@ sv: f&ouml;r&auml;ldrarna
 
     the spouse
 af: die eggenoot/die eggenote
-bg: съпруга/съпругата
+bg: съпругът:a:--а/съпругата
 ca: el marit/la muller
 cs: manѕel/manѕelka
 da: &aelig;gtef&aelig;llen
