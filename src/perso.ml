@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.61 2000-10-23 14:11:58 ddr Exp $ *)
+(* $Id: perso.ml,v 3.62 2000-10-24 15:47:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -2089,15 +2089,16 @@ value print_transl conf base env upp s c =
     [ '0'..'9' ->
         let n = Char.code c - Char.code '0' in
         match split_at_coloncolon s with
-        [ None -> transl_nth conf s n
-        | Some (s1, s2) -> transl_decline conf s1 (transl_nth conf s2 n) ]
+        [ None -> Util.transl_nth conf s n
+        | Some (s1, s2) ->
+            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
     | 'n' ->
         let n =
           match get_env "p" env with
           [ Eind p _ _ -> 1 - index_of_sex p.sex
           | _ -> 2 ]
         in
-        transl_nth conf s n
+        Util.transl_nth conf s n
     | 's' ->
         let n =
           match get_env "child" env with
@@ -2107,15 +2108,15 @@ value print_transl conf base env upp s c =
               [ Eind p _ _ -> index_of_sex p.sex
               | _ -> 2 ] ]
         in
-        transl_nth conf s n
+        Util.transl_nth conf s n
     | 'w' ->
         let n =
           match get_env "fam" env with
           [ Efam fam _ _ -> if Array.length fam.witnesses = 1 then 0 else 1
           | _ -> 0 ]
         in
-        transl_nth conf s n
-    | _ -> transl conf s ^ String.make 1 c ]
+        Util.transl_nth conf s n
+    | _ -> Util.transl conf s ^ String.make 1 c ]
   in
   Wserver.wprint "%s" (if upp then capitale r else r)
 ;

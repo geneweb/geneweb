@@ -1,7 +1,7 @@
  !languages
  to see the first branch
  to see the first relationship link
- to try again with this number, or do "back" and change it yourself
+ to try again with this number
 %1 of %2
 %1 of (same or greater generation level) %2
 %d years ago
@@ -91,10 +91,12 @@ candidate son/candidate daughter/candidate child
 cannot access base
 cannot change sex of a married person
 change children's names
+change it (the number) yourself
 changed order of children
 child/children
 children's names changed
 click
+click on "%s"
 comment
 comment added
 consanguinity
@@ -193,7 +195,7 @@ months old
 more than %d answers
 murdered
 name
-name "%s.%d %s" already used by %tthis person%t
+name %s already used by %tthis person%t
 navigation with %t as Sosa reference
 nephews and nieces
 next sibling
@@ -226,7 +228,6 @@ one year old
 only the generation selected
 optional
 or
-or use "link" instead of "create"
 parents
 person added
 person deleted
@@ -321,6 +322,7 @@ unknown person
 unspecified
 up to
 update
+use "link" instead of "create"
 warnings
 with
 witness at marriage of %s and %s

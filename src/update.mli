@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 3.6 2000-09-12 23:35:13 ddr Exp $ *)
+(* $Id: update.mli,v 3.7 2000-10-24 15:47:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -13,8 +13,18 @@ value find_free_occ : base -> string -> string -> int -> int;
 value infer_death : config -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 
+type person_type =
+  [ R_father of int
+  | R_mother of int
+  | Father
+  | Mother
+  | Witness of int
+  | Child of int ]
+;
+
 value insert_person :
-  config -> base -> string -> ref (list person) -> key -> Adef.iper
+  config -> base -> string -> ref (list person) ->
+  (person_type * key) -> Adef.iper
 ;
 value insert_string : config -> base -> string -> Adef.istr;
 value add_misc_names_for_new_persons : base -> list person -> unit;
@@ -43,3 +53,5 @@ value print_src : config -> string -> string -> unit;
 value print_someone : config -> base -> person -> unit;
 
 value print : config -> base -> person -> unit;
+
+value update_conf : config -> config;
