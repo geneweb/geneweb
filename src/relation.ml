@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.30 1999-08-04 14:44:18 ddr Exp $ *)
+(* $Id: relation.ml,v 2.31 1999-09-18 03:44:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -44,6 +44,21 @@ value print_with_child_relation conf base p ip =
           | _ -> () ];
        return ())
     c.rparents
+;
+
+value print_with_witness conf base p fam ip =
+  let w = poi base ip in
+  do html_li conf;
+     Wserver.wprint "<input type=radio name=select value=%d>\n"
+       (Adef.int_of_iper ip);
+     Wserver.wprint "%s:\n" (transl_nth conf "witness/witnesses" 0);
+     Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
+       (Adef.int_of_iper p.cle_index) (Adef.int_of_iper ip);
+     afficher_personne_sans_titre conf base w;
+     Wserver.wprint "</a>";
+     afficher_titre conf base w;
+     Wserver.wprint "\n";
+  return ()
 ;
 
 value print_menu conf base p =
@@ -124,6 +139,11 @@ value print_menu conf base p =
               return ())
            p.rparents;
          List.iter (print_with_child_relation conf base p) p.rchildren;
+         Array.iter
+           (fun ifam ->
+              let fam = foi base ifam in
+              Array.iter (print_with_witness conf base p ifam) fam.witnesses)
+           p.family;
        end;
        html_p conf;
        Wserver.wprint "%s\n" (capitale (transl conf "long display"));

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.19 1999-09-17 18:14:54 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.20 1999-09-18 03:43:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -388,7 +388,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done m =
      Array.iter
        (fun ip ->
           let p = poi base ip in
-          do Printf.fprintf oc "witn";
+          do Printf.fprintf oc "wit";
              match p.sex with
              [ Male -> Printf.fprintf oc " m"
              | Female -> Printf.fprintf oc " f"
