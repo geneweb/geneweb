@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.35 2000-05-10 17:56:09 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.36 2000-05-14 09:40:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -474,7 +474,7 @@ value set_actlog list =
   return ()
 ;
 
-value get_login utm str =
+value get_token utm str =
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
       let (list, r, changed) = get_actlog utm str in
@@ -495,7 +495,7 @@ value random_self_init () =
   Random.init seed
 ;
 
-value set_login utm from_addr base_file acc =
+value set_token utm from_addr base_file acc =
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
       do random_self_init (); return
@@ -503,7 +503,7 @@ value set_login utm from_addr base_file acc =
       let (x, xx) =
         let base = from_addr ^ "/" ^ base_file ^ "_" in
         loop 50 where rec loop ntimes =
-          if ntimes = 0 then failwith "set_login"
+          if ntimes = 0 then failwith "set_token"
           else
             let x = mkpasswd () in
             let xx = base ^ x in
@@ -548,7 +548,7 @@ value make_conf cgi from_addr (addr, request) str env =
         let access_type =
           match passwd with
           [ "" | "w" | "f" -> ATnone
-          | _ -> get_login utm (from_addr ^ "/" ^ base_passwd) ]
+          | _ -> get_token utm (from_addr ^ "/" ^ base_passwd) ]
         in
         (passwd, env, access_type)
     in
@@ -643,11 +643,11 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     match access_type with
     [ ATset ->
         if wizard then
-          let pwd_id = set_login utm from_addr base_file 'w' in
+          let pwd_id = set_token utm from_addr base_file 'w' in
           if cgi then (command, pwd_id)
           else (base_file ^ "_" ^ pwd_id, "")
         else if friend then
-          let pwd_id = set_login utm from_addr base_file 'f' in
+          let pwd_id = set_token utm from_addr base_file 'f' in
           if cgi then (command, pwd_id)
           else (base_file ^ "_" ^ pwd_id, "")
         else if cgi then (command, "")
