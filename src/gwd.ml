@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.51 2000-07-25 15:46:16 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.52 2000-07-26 13:32:31 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -65,7 +65,7 @@ value log oc tm conf from gauth request script_name contents =
      Printf.fprintf oc " %s?" script_name;
      loop 0 where rec loop i =
        if i < String.length contents then
-         if i > 1000 then Printf.fprintf oc "..."
+         if i > 1500 then Printf.fprintf oc "..."
          else do output_char oc contents.[i]; return loop (i + 1)
        else ();
      output_char oc '\n';
