@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.6 2000-03-23 15:35:55 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.7 2000-04-28 00:26:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -278,9 +278,13 @@ value get_burial l =
 ;              
 
 value cut_space x =
-  if String.length x > 0 && x.[0] == ' ' then
-    String.sub x 1 (String.length x - 1)
-  else x
+  let len = String.length x in
+  if len = 0 then x
+  else
+    let start = if x.[0] == ' ' then 1 else 0 in
+    let stop = if x.[len - 1] == ' ' then len - 1 else len in
+    if start == 0 && stop == len then x
+    else String.sub x start (stop - start)
 ;
 
 value get_field lab l =

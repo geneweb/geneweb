@@ -15,9 +15,14 @@ GeneWeb Version 3.04
     showing the default value and indicating (to smart people) the way to
     change it in the URL.
 
-* GeneWeb compiler (gwc) and uncompiler (gwu)
+* GeneWeb compiler (gwc)
+  - [28 Apr 00] Cut possible trailing spaces in some input fields
+
+* GeneWeb uncompiler (gwu)
   - [02 Apr 00] Fixed problem in gwu: families could be written several
     times if phony spouses with several marriages.
+
+* GeneWeb compiler (gwc) and uncompiler (gwu)
   - [02 Apr 00] Added some missing "quote_escaped" in UpdateInd.ml (bug
     about quotes)
   - [30 Mar 00] In latest births, skip a line after future births if any.
