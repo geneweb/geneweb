@@ -2,6 +2,9 @@ GeneWeb version 3.06
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [17 Jun 00] In update family form, added a button close to the family
+    sources: when selected, the family sources text is automatically put 
+    (as default value) in future family sources fields.
   - [16 Jun 00] Added feature: in relationship computing, when option
     "shortest path" is selected, it is displayed together with a link
     to see the next shortest path.

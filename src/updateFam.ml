@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.12 2000-06-03 21:08:07 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.13 2000-06-17 14:51:31 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -8,6 +8,12 @@ open Util;
 open Config;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
+
+value default_source conf =
+  match p_getenv conf.env "dsrc" with
+  [ Some s -> s
+  | None -> "" ]
+;
 
 value person_key base ip =
   let p = poi base ip in
@@ -413,7 +419,7 @@ value print_source conf base field =
   let p_field =
     match p_getenv conf.env "psrc" with
     [ Some s -> s
-    | None -> "" ]
+    | None -> default_source conf ]
   in
   do tag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
@@ -440,6 +446,9 @@ value print_source conf base field =
            Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
              (if field = "" then ""
               else " value=\"" ^ quote_escaped field ^ "\"");
+           Wserver.wprint "<input type=checkbox name=rdsrc value=on%s>\n"
+             (match p_getenv conf.env "rdsrc" with
+              [ Some "on" -> " checked" | _ -> "" ]);
          end;
        end;
      end;
@@ -621,7 +630,7 @@ value print_add conf base =
     {marriage = Adef.codate_None; marriage_place = "";
      marriage_src = ""; witnesses = [| |]; relation = Married;
      divorce = NotDivorced;
-     comment = ""; origin_file = ""; fsources = "";
+     comment = ""; origin_file = ""; fsources = default_source conf;
      fam_index = bogus_family_index}
   and cpl =
     {father = fath; mother = moth}
@@ -639,7 +648,7 @@ value print_add_parents conf base =
         {marriage = Adef.codate_None; marriage_place = "";
          marriage_src = ""; witnesses = [| |]; relation = Married;
          divorce = NotDivorced;
-         comment = ""; origin_file = ""; fsources = "";
+         comment = ""; origin_file = ""; fsources = default_source conf;
          fam_index = bogus_family_index}
       and cpl =
         {father = ("", sou base p.surname, 0, Update.Create Neuter None);

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.23 2000-05-02 02:38:21 ddr Exp $ *)
+(* $Id: family.ml,v 3.24 2000-06-17 14:51:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -546,27 +546,32 @@ value print_no_index conf base =
 ;
 
 value senv_vars =
-  ["em"; "ei"; "ep"; "en"; "eoc"; "long"; "marr"; "spouse"; "shortest"; "cgl";
-   "iz"; "nz"; "pz"; "ocz"]
+  ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "long"; "marr"; "spouse";
+   "shortest"; "cgl"; "iz"; "nz"; "pz"; "ocz"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x senv_vars);
 
-value extract_sosa_henv conf base =
-  match find_person_in_env conf base "z" with
-  [ Some p ->
-      let x =
-        let first_name = p_first_name base p in
-        let surname = p_surname base p in
-        if conf.access_by_key && not (first_name = "?" || surname = "?") then
-          [("pz", code_varenv (Name.lower first_name));
-           ("nz", code_varenv (Name.lower surname));
-           ("ocz", string_of_int p.occ)]
-        else
-          [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
-      in
-      conf.henv := conf.henv @ x
-  | None -> () ]
+value extract_henv conf base =
+  do match find_person_in_env conf base "z" with
+     [ Some p ->
+         let x =
+           let first_name = p_first_name base p in
+           let surname = p_surname base p in
+           if conf.access_by_key && not (first_name = "?" || surname = "?")
+           then
+             [("pz", code_varenv (Name.lower first_name));
+              ("nz", code_varenv (Name.lower surname));
+              ("ocz", string_of_int p.occ)]
+           else
+             [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
+         in
+         conf.henv := conf.henv @ x
+     | None -> () ];
+     match p_getenv conf.env "dsrc" with
+     [ Some "" | None -> ()
+     | Some s -> conf.henv := conf.henv @ [("dsrc", code_varenv s)] ];
+  return ()
 ;
 
 value set_owner conf =
@@ -590,7 +595,7 @@ value family conf base =
         do Image.print conf base; return None
     | _ ->
         do set_owner conf;
-           extract_sosa_henv conf base;
+           extract_henv conf base;
            make_senv conf base;
         return
         if only_special_env conf.env then
