@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.40 2001-09-24 09:25:43 ddr Exp $
+# $Id: lexicon.txt,v 4.41 2001-10-01 12:50:40 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -45,7 +45,7 @@ it: af=africano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo
 lv: cs=Èehu/da=Dâòu/de=Vâcu/en=Angïu/eo=Esperanto/es=Spâòu/fi=Somu/fr=Franèu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/nl=Holandieğu/no=Norvçìu/pt=Portugâïu/pt-br=Brasil-Portugâïu/ru=Krievu/sv=Zviedru/zh=Íînieğu
 nl: af=Afrikaans/cs=Tsjechisch/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/nl=Nederlands/no=Noors/pt=Portugees/pt-br=Brasil-Portugees/ru=Russisch/sv=Zweeds/zh=Chinees
 no: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/pt-br=Brasil-portugisisk/ru=russisk/sv=svensk/zh=kinesisk
-pl: af=afrikaans/ca=kataloñski/cs=czeski/da=duñski/de=niemiecki/en=angielski/eo=esperanto/es=hiszpañski/et=estoñski/fi=fiñski/fr=francuski/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/nl=niderlandzki/no=norweski/pl=polski/pt=portugalski/ru=rosyjski/sv=szwedzki/zh=chiñski
+pl: af=afrikaans/ca=kataloñski/cs=czeski/da=duñski/de=niemiecki/en=angielski/eo=esperanto/es=hiszpañski/et=estoñski/fi=fiñski/fr=francuski/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/nl=niderlandzki/no=norweski/pl=polski/pt=portugalski/pt-br=portugalski (Brazylia)/ru=rosyjski/sv=szwedzki/zh=chiñski
 pt: af=Afrikaans/ca=Catal&atilde;/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
 pt-br: af=Afrikaner/ca=Catal&atilde;o/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
 sv: af=afrikaans/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ru=ryska/sv=svenska/zh=kinesiska
@@ -68,7 +68,7 @@ it:  per vedere il primo
 lv:  skatît pirmo zaru
 nl:  om de eerste tak te zien
 no:  for &aring; se den f&oslash;rste
-pl:  aby zobaczyæ pierwsz¹ liniê (ga³¹Ÿ)
+pl:  aby zobaczyæ pierwsz± liniê (ga³±¼)
 pt:  para ver o primeiro ramo
 ru:  ÷òîáû óâèäåòü ïåğâóş âåòêó
 sv:  f&ouml;r att se den f&ouml;rsta
@@ -91,7 +91,7 @@ it:  per vedere il primo
 lv:  skatît pirmo attiecîbu saiti
 nl:  om de eerste te zien
 no:  for &aring; se den f&oslash;rste
-pl:  aby zobaczyæ pierwsz¹ liniê pokrewieñstwa
+pl:  aby zobaczyæ pierwsz± liniê pokrewieñstwa
 pt:  para ver o primeiro link
 ru:  ÷òîáû óâèäåòü ïåğâóş ñâÿçü îòíîøåíèÿ
 sv:  f&ouml;r att se den f&ouml;rsta
@@ -276,7 +276,7 @@ it: alcune date dei titoli di %t sono incorrette: %t
 lv: %t ir nekorekti datumi: %t
 nl: %t de data voor titels zijn niet correct
 no: %t har feil titeldato %t
-pl: %t ma wpisane nieprawid³owe daty noszenia tytu³u
+pl: %t ma wpisane nieprawid³owe daty u¿ywania tytu³u
 pt: as datas de um t&iacute;tulo de %t n&atilde;o est&atilde;o correctas
 pt-br: as datas de um t&iacute;tulo de %t n&atilde;o est&atilde;o corretas
 ru: %t èìååò íåïğàâèëüíîå íàçâàíèå äàòû: %t
@@ -300,7 +300,7 @@ it: %t sarebbe nato dopo la morte di sua madre %t
 lv: %t dzimis pçc viòa/viòas mâtes nâves %t
 nl: %t zou geboren zijn na de dood van zijn/haar moeder %t
 no: %t er f&oslash;dt etter sin mors d&oslash;d %t
-pl: %t urodzi³ siê/urodzi³a siê po œmierci swojej matki: %t
+pl: %t urodzi³ siê/urodzi³a siê po ¶mierci swojej matki: %t
 pt: %t nasceu depois do &oacute;bito da m&atilde;e
 ru: %t ğîäèëñÿ ïîñëå ñìåğòè åãî/åå ìàòåğè %t
 sv: %t &auml;r f&ouml;dd efter att sin egen mor dog %t
@@ -323,7 +323,7 @@ it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 lv: %t ir dzimis vairâk kâ 2 gadus pçc sava tçva nâves %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 no: %t er f&oslash;dt mer enn 2 &aring;r etter sin fars d&oslash;d %t
-pl: %t urodzi³ siê/urodzi³a siê ponad 2 lata po œmierci swojego ojca: %t
+pl: %t urodzi³ siê/urodzi³a siê ponad 2 lata po ¶mierci swojego ojca: %t
 pt: %t nasceu mais de 2 anos depois do &oacute;bito do pai
 ru: %t ğîäèëñÿ áîëåå, ÷åì ÷åğåç 2 ãîäà ïîñëå ñìåğòè åãî/åå îòöà %t
 sv: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
@@ -345,7 +345,7 @@ it: il sesso di %t non e' coerente con le sue relazioni
 lv: personas %t neatbilst viòa/viòas attiecîbâm
 nl: het geslacht van %t klopt niet met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
-pl: %t: jego/jej p³eæ nie odpowiada jego/jej zwi¹zkom
+pl: %t: jego/jej p³eæ nie odpowiada jego/jej zwi±zkom
 pt: o sexo de %t não é coerente com suas rela&ccedil;&otilde;es
 sv: %ts kön stämmer inte överens med sina relationer
 
@@ -427,6 +427,7 @@ fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
 nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
+pl: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 pt: Tishrei/Cheshvan/Kislev/Adar/Tevet/Shevat/Adar I/Adar II/Nissan/Iyar/Sivan/Tamuz/Av/Elul
 sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
@@ -448,7 +449,7 @@ it: gennaio/febbraio/marzo/aprile/maggio/giugno/luglio/agosto/settembre/ottobre/
 lv: janvâris/februâris/marts/aprîlis/maijs/jûnijs/jûlijs/augusts/septembris/oktobris/novembris/decembris
 nl: januari/februari/maart/april/mei/juni/juli/augustus/september/oktober/november/december
 no: januar/februar/mars/april/mai/juni/juli/august/september/oktober/november/desember
-pl: stycznia/lutego/marca/kwietnia/maja/czerwca/lipca/sierpnia/wrzeœnia/paŸdziernika/listopada/grudnia
+pl: I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII
 pt: Janeiro/Fevereiro/Mar&ccedil;o/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
 ru: ÿíâàğÿ/ôåâğàëÿ/ìàğòà/àïğåëÿ/ìàÿ/èşíÿ/èşëÿ/àâãóñòà/ñåíòÿáğÿ/îêòÿáğÿ/íîÿáğÿ/äåêàáğÿ
 sv: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
@@ -496,7 +497,7 @@ it: domenica/luned&igrave;/marted&igrave;/mercoled&igrave;/gioved&igrave;/venerd
 lv: svçtdiena/pirmdiena/otrdiena/treğdiena/ceturdiena/piekdiena/sesdiena
 nl: zondag/maandag/dinsdag/woensdag/donderdag/vrijdag/zaterdag
 no: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
-pl: niedziela:a:-ê/poniedzia³ek/wtorek/œroda:a:-ê/czwartek/pi¹tek/sobota:a:-ê
+pl: niedziela:a:-ê/poniedzia³ek/wtorek/¶roda:a:-ê/czwartek/pi±tek/sobota:a:-ê
 pt: domingo/segunda-feira/ter&ccedil;a-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
 ru: âîñêğåñåíüå/ïîíåäåëüíèê/âòîğíèê/ñğåäà/÷åòâåğã/ïÿòíèöà
 sv: s&ouml;ndag/m&aring;ndag/tisdag/onsdag/torsdag/fredag/l&ouml;rdag
@@ -635,7 +636,7 @@ it: <em>Numero Sosa</em> relativo a %t
 lv: <em>SOSA pakâpe</em> attiecîbâ pret %t
 nl: <em>Sosa nummer</em> ten opzichte van %t
 no: <em>Sosa nummer</em> i forhold til %t
-pl: <em>numer "Sosa"</em>, odnosz¹cy siê do: %t
+pl: <em>numer "Sosa"</em>, odnosz±cy siê do: %t
 pt: <em>n&uacute;mero Sosa</em> em rela&ccedil;&atilde;o a %t
 ru: <em>Sosa íîìåğ</em> îòíîñèòåëüíî %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
@@ -727,7 +728,7 @@ it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
 lv: %s brâlçns/mâsîca
 nl: een neef in de %s generatie/een nicht in de %s generatie
 no: %smenning
-pl: kuzyn w %s-tym stopniu/kuzynka w %s-tym stopniu
+pl: kuzyn %s-tego stopnia/kuzynka %s-tego stopnia
 pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
 ru: %s-èé êóçåí/%s-ÿ êóçèíà
 sv: %sm&auml;nning
@@ -750,7 +751,7 @@ it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
 lv: otrais brâlçns/mâsîca
 nl: een neef in de tweede generatie/een nicht in de tweede generatie
 no: tremenning	
-pl: kuzyn/kuzynka w drugim stopniu
+pl: kuzyn/kuzynka drugiego stopnia
 pt: um primo em 2&ordm; grau/uma prima em 2&ordm; grau/um(a) primo(a) em 2&ordm; grau
 ru: òğîşğîäíûé áğàò/òğîşğîäíàÿ ñåñòğà
 sv: en syssling
@@ -773,7 +774,7 @@ it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
 lv: treğais brâlçns/mâsîca
 nl: een neef in de derde generatie/een nicht in de derde generatie
 no: firmenning
-pl: kuzyn/kuzynka w trzecim stopniu
+pl: kuzyn/kuzynka trzeciego stopnia
 pt: um primo em 3&ordm; grau/uma prima em 3&ordm; grau/um(a) primo(a) em 3&ordm; grau
 ru: òğîşğîäíûé êóçåí/òğîşğîäíàÿ êóçèíà
 sv: en brylling
@@ -980,7 +981,7 @@ it: un pronipote/una pronipote
 lv: brâïa/mâsas mazdçls/mazmeita
 nl: een achterneef/een achternicht
 no: grandnev&oslash;/grandniese
-pl: wnuk/wnuczka brata lub siostry
+pl: wnuk brata lub siostry/wnuczka brata lub siostry
 pt: um sobrinho-neto/uma sobrinha-neta
 ru: âíó÷àòûé ïëåìÿííèê/âíó÷àòàÿ ïëåìÿííèöà
 sv: en gammel-nev&ouml;/en gammel-niece
@@ -1003,7 +1004,7 @@ it: un prozio/una prozia
 lv: vectçva/vecmamas brâlis/mâsa
 nl: een oudoom/een oudtante
 no: en grandonkel/en grandtante
-pl: brat/siostra dziadka lub babki
+pl: brat dziadka lub babki/siostra dziadka lub babki
 pt: um tio-av&ocirc;/uma tia-av&oacute;
 ru: äÿäÿ ğîäèòåëÿ/òåòÿ ğîäèòåëÿ
 sv: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
@@ -1282,7 +1283,7 @@ it: dopo
 lv: pçc
 nl: na
 no: etter
-pl: po up³ywie
+pl: po
 pt: depois de
 ru: ïîñëå
 sv: efter
@@ -1377,7 +1378,7 @@ it: non deceduto/non deceduta/non deceduto(a)
 lv: dzîvs
 nl: niet overleden
 no: ikke d&oslash;d
-pl: osoba ¿yj¹ca
+pl: osoba ¿yj±ca
 pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
 ru: æèâîé
 sv: lever
@@ -1632,7 +1633,7 @@ it: anniversari delle persone decedute
 lv: mirğanas piemiòas dienas
 nl: verjaardag van overleden mensen
 no: &aring;rsdager for avd&oslash;de personer
-pl: rocznice urodzin i œmierci osób nie¿yj¹cych
+pl: rocznice urodzin i ¶mierci osób nie¿yj±cych
 pt: anivers&aacute;rios das pessoas falecidas
 ru: ãîäîâùèíû ñìåğòè
 sv: &aring;rsdagar f&ouml;r avlidna personer
@@ -1656,7 +1657,7 @@ it: anniversari di matrimonio
 lv: kâzu dienas
 nl: huwelijksverjaardag
 no: bryllupsdager
-pl: rocznice œlubów
+pl: rocznice ¶lubów
 pt: anivers&aacute;rios de casamento
 ru: ãîäîâùèíû áğàêà
 sv: br&ouml;llopsdagar
@@ -1703,7 +1704,7 @@ it: nello stesso tempo
 lv: vienlaicîgi
 nl: terzeldertijd
 no: samtidig
-pl: równoczeœnie
+pl: zarazem
 pt: ao mesmo tempo
 ru: â òî æå ñàìîå âğåìÿ
 sv: samtidigt
@@ -1820,7 +1821,7 @@ it: prima del
 lv: pirms
 nl: voor
 no: f&oslash;r
-pl: przed up³ywem
+pl: przed
 pt: antes de
 ru: äî
 sv: f&ouml;re
@@ -1843,7 +1844,7 @@ it: inizio
 lv: sâkums (begin)
 nl: begin
 no: start
-pl: pocz¹tek
+pl: pocz±tek
 pt: come&ccedil;o
 ru: íà÷èíàÿ ñ
 sv: b&ouml;rjar
@@ -2053,7 +2054,7 @@ it: annullare i links
 lv: nerâdît GeneWeb saites
 nl: geen GeneWeb links
 no: uten GeneWeb koblinger
-pl: pomiñ ³¹cza GeneWeb
+pl: pomiñ ³±cza GeneWeb
 pt: cancelar os links Geneweb
 ru: áåç GeneWeb ññûëîê
 sv: inga GeneWeb l&auml;nkar
@@ -2076,6 +2077,7 @@ it: padre presunto/madre presunta/genitori presunti
 lv: iespeejamais tçvs/iespçjamâ mâte/iespçjamie vecâki
 nl: kandidaat vader/kandidaat moeder/kandidaat ouders
 no: mulig far/mulig mor/mulige foreldre
+pl: prawdopodobny ojciec/prawdopodobna matka/prawdopodobni rodzice
 pt: suposto pai/suposta m&atilde;e/supostos pais
 ru: âîçìîæíûé îòåö/âîçìîæíàÿ ìàòü/âîçìîæíûå ğîäèòåëè
 sv: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
@@ -2098,6 +2100,7 @@ it: figlio presunto/figlia presunta/figlio presunto
 lv: iespçjamais dçls/iespçjamâ meita/iespçjamais bçrns
 nl: kandidaat zoon/kandidaat dochter/kandidaat kind
 no: mulig s&oslash;nn/mulig datter/mulig barn
+pl: prawdopodobny syn/prawdopodobna córka/prawdopodobne dzieci
 pt: suposto filho/suposta filha/supostos filhos
 ru: âîçìîæíûé ñûí/âîçìîæíàÿ äî÷ü/âîçìîæíûé ğåáåíîê
 sv: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
@@ -2144,7 +2147,7 @@ it: non si pu&ograve; cambiare il sesso di una persona sposata
 lv: precçtai personai nevar mainît dzimumu
 nl: kan het geslacht van een gehuwd persoon niet veranderen
 no: kan ikke endre kj&oslash;nn til en gift person
-pl: zmiana p³ci osoby pozostaj¹cej w zwi¹zku ma³¿eñskim jest niemo¿liwa
+pl: zmiana p³ci osoby pozostaj±cej w zwi±zku ma³¿eñskim jest niemo¿liwa
 pt: n&atilde;o se pode modificar o sexo de uma pessoa casada
 ru: íåëüÿ èçìåíèòü ïîë ñóïğóãà
 sv: kan inte &auml;ndra k&ouml;n p&aring; en gift person
@@ -2213,7 +2216,7 @@ it: ordine dei figli cambiato
 lv: mainît bçrnu secîbu
 nl: de volgorde der kinderen veranderd
 no: rekkef&oslash;lgen er endret for barna til
-pl: kolejnoœæ dzieci zosta³a zmieniona
+pl: kolejno¶æ dzieci zosta³a zmieniona
 pt: mudar a ordem dos filhos
 ru: èçìåíÿşùèé ïîğÿäîê äåòåé
 sv: &auml;ndrade ordningen f&ouml;r barnen
@@ -2653,7 +2656,7 @@ it: morto giovane
 lv: miris jauns
 nl: jong gestorven
 no: d&oslash;d ung
-pl: zm. m³odo
+pl: zm.m³odo
 pt: morreu jovem
 ru: óìåğ â äåòñòâå
 sv: dog ung
@@ -2695,6 +2698,7 @@ it: visualizzare per segmenti/larghezza del segmento/superposizione/larghezza to
 lv: râdît pa loksnçm/loksnes platums/pârklâjums/kopçjais platums
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
+pl: wy¶wietl w segmentach/szeroko¶æ segmentu/szeroko¶æ pokrywania siê/szeroko¶æ ca³kowita
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
@@ -2758,6 +2762,7 @@ it: non ragruppare i rami comuni
 lv: negrupçt kopçjos zarus kopâ
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
+pl: nie grupuj wspólnych linii razem
 pt: não reagrupar os ramos comuns
 sv: gruppera inte ihop de gemensamma anlinjerna
 
@@ -2867,7 +2872,7 @@ it: errore
 lv: kïûda
 nl: fout
 no: feil
-pl: b³¹d
+pl: b³±d
 pt: erro
 ru: îøèáêà
 sv: fel
@@ -3147,7 +3152,7 @@ it: alias del nome
 lv: iesaukas vârds
 nl: alias voor voornaam
 no: alias fornavn
-pl: inne imiê
+pl: alias imienia
 pt: alias do nome
 pt-br: apelido do prenome
 ru: èìÿ îò÷åñòâî
@@ -3244,7 +3249,7 @@ it: per il primo nome in ordine alfabetico
 lv: pa vârdiem alfabçtiskâ kârtîbâ
 nl: dit geeft de voornamen in alfabetische volgorde
 no: alfabetisk p&aring; fornavn
-pl: aby zobaczyæ imiona w porz¹dku alfabetycznym
+pl: aby zobaczyæ imiona w porz±dku alfabetycznym
 pt: para obter os nomes pr&oacute;prios por ordem alfab&eacute;tica
 pt-br: para obter os prenomes por ordem alfab&eacute;tica
 ru: ÷òîáû óïîğÿäî÷èòü èìåíà ïî àëôàâèòó
@@ -3268,6 +3273,7 @@ it: padre adottivo/madre adottiva/genitori adottivi
 lv: audşu tçvs/mâte/vecâki
 nl: pleegvader/pleegmoeder/pleegouders
 no: fosterfar/fostermor/fosterforeldre
+pl: opiekun/opiekunka/opiekunowie
 pt: pai adoptivo/m&atilde;e adoptiva/pais adoptivos
 pt-br: pai de cria&ccedil;&atilde;o/m&atilde;e de cria&ccedil;&atilde;o/pais de cria&ccedil;&atilde;o
 ru: ïğèåìíûé îòåö/ïğèåìíàÿ ìàòü/ïğèåìíûé ğîäèòåëü
@@ -3291,6 +3297,7 @@ it: figlio allevato/figlia allevato/bambino allevato
 lv: audşu dçls/meita/bçrns
 nl: pleegzoon/pleegdochter/pleegkind
 no: fosters&oslash;nn/fosterdatter/fosterbarn
+pl: wychowanek/wychowanica/wychowankowie
 pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 pt-br: filho de cria&ccedil;&atilde;o/filha de cria&ccedil;&atilde;o/filho(a) de cria&ccedil;&atilde;o
 ru: ïğèåìíûé ñûí/ïğèåìíàÿ äî÷ü/ïğèåìíûé ğåáåíîê
@@ -3360,7 +3367,7 @@ it: figlioccio/figlioccia/figlioccio
 lv: krustdçls/krustmeita/krustbçrns
 nl: peetzoon/peetdochter/petekind
 no: guds&oslash;nn/guddatter/gudbarn
-pl: chrzeœniak/chrzeœniaczka/chrzeœniak
+pl: chrze¶niak/chrze¶niaczka/chrze¶niak
 pt: afilhado/afilhada/afilhado(a)
 ru: êğåñòíèê/êğåñòíèöà/êğåñòíèê
 sv: gudson/guddotter/gudbarn
@@ -3590,7 +3597,7 @@ it: marito/moglie
 lv: vîrs/sieva
 nl: echtgenoot/echtgenote
 no: mann/hustru
-pl: m¹¿/¿ona
+pl: m±¿/¿ona
 pt: marido/esposa
 ru: ìóæ/æåíà
 sv: make/maka
@@ -3634,7 +3641,7 @@ it: se titoli
 lv: ja ir tituli
 nl: als titels
 no: hvis titler
-pl: jeœli z tytu³em
+pl: je¶li z tytu³em
 pt: se t&iacute;tulos
 ru: åñëè òèòóë
 sv: om titlar
@@ -3680,7 +3687,7 @@ it: immagine ricevuta
 lv: attçls saòemts
 nl: beeld ontvangen
 no: bildet er mottatt
-pl: ilustracja zosta³a do³¹czona
+pl: ilustracja zosta³a do³±czona
 pt: imagem recebida
 ru: êàğòèíêà ïîëó÷åíà
 sv: bilden mottagen
@@ -3726,7 +3733,7 @@ it: in
 lv: mçnesî
 nl: in
 no: i
-pl: w ci¹gu miesi¹ca
+pl: w
 pt: em
 ru: â
 sv: i
@@ -3774,7 +3781,7 @@ it: includere i coniugi mancanti
 lv: ieskaitot iztrûkstoğos dzîvesbiedrus
 nl: ontbrekende echtgenoten tonen
 no: inkluder ukjente maker
-pl: poka¿ brakuj¹cych ma³¿onków
+pl: poka¿ brakuj±cych ma³¿onków
 pt: incluir os c&ocirc;njugues que faltam
 ru: âêëş÷àÿ ïîòåğÿííûõ ñóïğóãîâ
 sv: inkludera makar som saknas
@@ -3891,7 +3898,7 @@ it: infatti,
 lv: patieğâm,
 nl: immers:
 no: felles forfedre,
-pl: œciœlej bior¹c,
+pl: ¶ci¶lej bior±c,
 pt: com efeito,
 ru: íà ñàìîì äåëå,
 sv: faktiskt,
@@ -3937,7 +3944,7 @@ it: indice dei coniugi (non discendenti)
 lv: dzîvesbiedru saraksts (bez pçcnâcçjiem)
 nl: index van echtgenoten (geen nakomelingen)
 no: ektefelleindeks
-pl: lista ma³¿onków (nie bêd¹cych potomkami)
+pl: lista ma³¿onków (nie bêd±cych potomkami)
 pt: &iacute;ndice dos c&ocirc;njuges (n&atilde;o descendentes)
 ru: èíäåêñ ñóïğóãîâ (íå ïîòîìêîâ)
 sv: f&ouml;rteckning &ouml;ver makarna (icke &auml;ttlingar)
@@ -4006,7 +4013,7 @@ it: &egrave; veramente un genitore molto giovane
 lv: ir ïoti jauns vecâks
 nl: is een jonge ouder
 no: er en sv&aelig;rt ung far/mor
-pl: jest bardzo m³odym ojcem/jest bardzo m³od¹ matk¹
+pl: jest bardzo m³odym ojcem/jest bardzo m³od± matk±
 pt: &eacute; um pai demasiado jovem
 pt-br: &eacute; um pai jovem demais
 ru: î÷åíü ìîëîäûå ğîäèòåëè
@@ -4030,7 +4037,7 @@ it: sarebbe nato/a dopo i suoi figli
 lv: ir dzimis(usi) pçc saviem bçrniem
 nl: wordt geboren na zijn/haar kind
 no: er f&oslash;dt etter sitt barn
-pl: jest urodzony/urodzona póŸniej ni¿ swoje dziecko
+pl: jest urodzony/urodzona pó¼niej ni¿ swoje dziecko
 pt: nasceu depois do seu filho
 ru: ğîæäåí ïîñëå åãî/åå ğåáåíêà
 sv: &auml;r f&ouml;dd efter sitt barn
@@ -4099,7 +4106,7 @@ it: ucciso/uccisa/ucciso(a)
 lv: nogalinâts(a) (negadîjumâ)
 nl: gesneuveld
 no: falt
-pl: zgin¹³/zginê³a
+pl: zgin±³/zginê³a
 pt: morto/morta/morto(a)
 ru: óáèò â /óáèòà â
 sv: stupat
@@ -4122,7 +4129,7 @@ it: meno di un mese
 lv: mazâk kâ vienu mçnesi vecs(a)
 nl: minder dan een maand oud
 no: mindre enn en m&aring;ned gammel
-pl: m³odszy ni¿ 1 miesi¹c/m³odsza ni¿ 1 miesi¹c
+pl: m³odszy ni¿ 1 miesi±c/m³odsza ni¿ 1 miesi±c
 pt: menos de um m&ecirc;s
 ru: ìåíåå ÷åì ìåñÿ÷íûé/ìåíåå ÷åì ìåñÿ÷íàÿ
 sv: mindre &auml;n en m&aring;nad
@@ -4302,7 +4309,7 @@ it: matrimonio di %t dopo la sua morte
 lv: %t kâzas pçc viòa(s) nâves
 nl: huwelijk van %t na zijn/haar dood
 no: ekteskap med %t etter ektefellens d&oslash;d
-pl: ma³¿eñstwo z %t po œmierci
+pl: ma³¿eñstwo z %t po ¶mierci
 pt: casamento de %t depois da sua morte
 ru: áğàê %t ïîñëå åãî/åå ñìåğòè
 sv: &auml;ktenskap med %t f&ouml;re makens/makans d&ouml;d
@@ -4348,7 +4355,7 @@ it: matrimonio/matrimoni
 lv: ìimene
 nl: huwelijk/huwelijken
 no: ekteskap/ekteskap
-pl: œlub/œluby
+pl: ¶lub/¶luby
 pt: casamento/casamentos
 ru: áğàê/áğàêè
 sv: &auml;ktenskap/&auml;ktenskap
@@ -4395,7 +4402,7 @@ it: sposato(a) all'et&agrave; di %t
 lv: precçjies %t gadu vecumâ
 nl: gehuwd op de leeftijd van %t
 no: gift %t &aring;r gammel
-pl: o¿eni³ siê w wieku %t lat/wysz³a za m¹¿ w wieku %t lat
+pl: o¿eni³ siê w wieku %t lat/wysz³a za m±¿ w wieku %t lat
 pt: casado com a idade de %t
 ru: â áğàêå ñ %t ëåò
 sv: gift vid %t &aring;lder
@@ -4418,7 +4425,7 @@ it: sposato%t con/sposata%t con
 lv: precîbu %t precçjies ar /precîbu %t precçjusies ar
 nl: gehuwd%t met
 no: gift%t med
-pl: ¿ona (œlub: %t):/m¹¿ (œlub: %t):
+pl: ¿ona (¶lub: %t):/m±¿ (¶lub: %t):
 pt: casado%t com/casada%t com
 ru: â áğàêå ñ%t
 sv: gift%t med
@@ -4510,7 +4517,7 @@ it: messaggio aggiunto
 lv: ziòa pievienota
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
-pl: wiadomoœæ zosta³a dodana
+pl: wiadomo¶æ zosta³a dodana
 pt: mensagem adicionada
 ru: äğ÷âşíåïğ õğğ÷üåïêå
 sv: meddelande inlagt
@@ -4530,7 +4537,7 @@ it: messaggio/messaggio precedente/messaggio seguente
 lv: ziòa/iepriekğçjâ ziòa/nâkoğâ ziòa
 nl: bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/neste melding
-pl: wiadomoœæ/poprzednia wiadomoœæ/nastêpna wiadomoœæ
+pl: wiadomo¶æ/poprzednia wiadomo¶æ/nastêpna wiadomo¶æ
 pt: mensagem/mensagem anterior/mensagem seguinte
 ru: õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/õíåäèáüåå õğğ÷üåïêå
 sv: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
@@ -4553,7 +4560,7 @@ it: antenati mancanti
 lv: bez tâlakiem senèiem
 nl: ontbrekende voorouders
 no: manglende forfedre
-pl: brakuj¹cy przodkowie
+pl: brakuj±cy przodkowie
 pt: ascendentes que faltam
 ru: ïîòåğÿííûå ïğåäêè
 sv: anor som saknas
@@ -4719,7 +4726,7 @@ it: percorso con %t come riferimento Sosa
 lv: meklçt senèus -&gt; %t pçc Sosa pakâpes
 nl: navigatie met %t als proband
 no: navigering med %t som Sosa referanse
-pl: nawigacja z numerami "Sosa" odnosz¹cymi siê do osoby: %t
+pl: nawigacja z numerami "Sosa" odnosz±cymi siê do osoby: %t
 pt: navega&ccedil;&atilde;o com %t como a refer&ecirc;ncia Sosa
 ru: íàâèãàöèÿ ñ %t êàê ññûëêà Sosa
 sv: navigering med %t som proband (Kekules system)
@@ -4834,7 +4841,7 @@ it: nessun legame di parentela conosciuto tra %s e %s
 lv: nav radniecîbas saiğu starp %s un %s
 nl: er is geen bekende verwantschap tussen %s en %s
 no: ikke kjent slektskap mellom %s og %s
-pl: nie s¹ znane ¿adne wiêzy pokrewieñstwa pomiêdzy osobami: %s i %s
+pl: nie s± znane ¿adne wiêzy pokrewieñstwa pomiêdzy osobami: %s i %s
 pt: nenhum grau de parentesco conhecido entre %s e %s
 ru: íåèçâåñòíî î ğîäñòâåííûõ ñâÿçÿõ ìåæäó %s è %s
 sv: ingen k&auml;nd sl&auml;ktskap emellan %s och %s
@@ -4857,7 +4864,7 @@ it: nessuna risposta
 lv: nav atbilstîbas (nav precçjuğies?)
 nl: niets gevonden
 no: ingen treff
-pl: brak pasuj¹cej odpowiedzi
+pl: brak pasuj±cej odpowiedzi
 pt: nenhuma resposta
 ru: íåò ñîâïàäåíèé
 sv: inga tr&auml;ffar
@@ -4876,6 +4883,7 @@ it: senza verifica del sesso
 lv: nepâbaudît dzimumus
 nl: geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
+pl: ta sama p³eæ
 pt: não verificar os sexos
 sv: ingen kontroll av könen
 
@@ -4920,7 +4928,7 @@ it: non trovato
 lv: nav atrodams
 nl: niet gevonden
 no: ikke funnet
-pl: nie zosta³ znaleziony/nie zosta³a znaleziona/nie zosta³o znalezione/nie zosta³y znalezione
+pl: nie znaleziono:
 pt: n&atilde;o encontrado
 ru: íå íàéäåí
 sv: hittar inte
@@ -4943,7 +4951,7 @@ it: non sposati
 lv: nav precçjuğies
 nl: niet gehuwd
 no: ugift
-pl: bez œlubu
+pl: bez ¶lubu
 pt: n&atilde;o casados
 ru: íå â áğàêå
 sv: ogifta
@@ -5224,7 +5232,7 @@ it: un mese
 lv: vienu mçnesi vecs
 nl: een maand oud
 no: en m&aring;ned gammel
-pl: w wieku 1 miesi¹ca
+pl: w wieku 1 miesi±ca
 pt: um m&ecirc;s
 ru: ìåñÿ÷íûé
 sv: en m&aring;nad
@@ -5525,7 +5533,7 @@ it: precisione
 lv: precizitâte
 nl: precisie
 no: n&oslash;yaktighet
-pl: dok³adnoœæ
+pl: dok³adno¶æ
 pt: precis&atilde;o
 ru: òî÷íî
 sv: precision
@@ -5686,7 +5694,7 @@ it: padre avente riconosciuto/madre avente
 lv: atzîts tçvs/mâte/vecâki (?)
 nl: erkennende vader/erkennende moeder/erkennende ouders
 no: bekreftet far/bekreftet mor/bekreftede foreldre
-pl: uznaj¹cy ojciec/uznaj¹ca matka/uznaj¹cy rodzice
+pl: uznaj±cy ojciec/uznaj±ca matka/uznaj±cy rodzice
 pt: pai que o reconheceu/m&atilde;e que o reconheceu/pais que o reconheceram
 ru: ïğèçíàííûé îòåö/ïğèçíàííàÿ ìàòü/ïğèçíàíûé ğîäèòåëü
 sv: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
@@ -5802,7 +5810,7 @@ it: legame%t con
 lv: %t attiecîbas ar
 nl: verbonden%t met
 no: forbindelse%t med
-pl: pokrewieñstwo%t z:
+pl: zwi±zek%t z:
 pt: relacionado%t com/relacionada%t com
 pt-br: junto%t com
 ru: ïğèõîäèòñÿ%t
@@ -5919,7 +5927,7 @@ it: mandare
 lv: sûtît
 nl: zenden +before
 no: send
-pl: wyœlij :a:
+pl: do³±cz :a:
 pt: enviar
 ru: ïîñëàòü
 sv: skicka
@@ -5963,7 +5971,7 @@ it: parecchie risposte
 lv: vairâkas atbildes
 nl: meerdere antwoorden
 no: flere svar
-pl: wiêcej ni¿ jedna odpowiedŸ
+pl: wiêcej ni¿ jedna odpowied¼
 pt: v&aacute;rias respostas
 ru: íåñêîëüêî îòâåòîâ
 sv: flera svar
@@ -6055,7 +6063,7 @@ it: dovrebbe essere di sesso femminile
 lv: jâbût sievietei
 nl: moet vrouwelijk zijn
 no: kj&oslash;nn skulle v&aelig;rt kvinne
-pl: powinna byæ kobiet¹
+pl: powinna byæ kobiet±
 pt: teria que ser de sexo feminino
 ru: äîëæíà áûòü æåíùèíîé
 sv: borde vara kvinna
@@ -6078,7 +6086,7 @@ it: dovrebbe essere di sesso maschile
 lv: jâbût vîrietim
 nl: moet mannelijk zijn
 no: kj&oslash;nn skulle v&aelig;rt mann
-pl: powinien byæ mê¿czyzn¹
+pl: powinna byæ mê¿czyzn±
 pt: teria que ser de sexo masculino
 ru: äîëæåí áûòü ìóæ÷èíîé
 sv: borde vara man
@@ -6147,7 +6155,7 @@ it: sorgente/sorgenti
 lv: avots/avoti (pirmsâkums?)
 nl: bron/bronnen
 no: kilde/kilder
-pl: Ÿród³o/Ÿród³a
+pl: ¼ród³o/¼ród³a
 pt: fonte/fontes
 ru: èñòî÷íèê/èñòî÷íèêè
 sv: k&auml;lla/k&auml;llor
@@ -6240,7 +6248,7 @@ it: partendo da
 lv: sâkot ar
 nl: beginnend met
 no: som starter med
-pl: zaczynaj¹c od:
+pl: zaczynaj±c od:
 pt: come&ccedil;ando com
 ru: íà÷èíàşòñÿ ñ
 sv: som b&ouml;rjar med
@@ -6285,7 +6293,7 @@ it: alias del cognome
 lv: otrs uzvârds
 nl: alias voor familienaam
 no: alias for etternavn
-pl: inne nazwisko
+pl: alias nazwiska
 pt: alias do apelido
 pt-br: apelido do sobrenome
 ru: íîâàÿ:a:--óş ôàìèëèÿ:a:-ş
@@ -6404,7 +6412,7 @@ it: scambiare
 lv: pârslçgt(?)
 nl: verander
 no: bytt rekkef&oslash;lge
-pl: zmieñ kolejnoœæ
+pl: zmieñ kolejno¶æ
 pt: inverter
 ru: ïåğåêëş÷èòü
 sv: byt ordning
@@ -6427,7 +6435,7 @@ it: scambio fatto
 lv: pârslçgğana izpildîta
 nl: veranderd
 no: rekkef&oslash;lgen er endret
-pl: kolejnoœæ zosta³a zmieniona
+pl: kolejno¶æ zosta³a zmieniona
 pt: invers&atilde;o efectuada
 pt-br: invers&atilde;o feita
 ru: ïåğåêëş÷åíèå çàâåğøåíî
@@ -6451,7 +6459,7 @@ it: scambiare l'ordine delle famiglie seguenti
 lv: pârslçgt sekojoğo ìimeòu secîbu (?)
 nl: verwissel de volgorde van de volgende gezinnen
 no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
-pl: czy zmieniæ kolejnoœæ nastepuj¹cych ma³¿eñstw lub zwi¹zków?
+pl: czy zmieniæ kolejno¶æ nastepuj±cych ma³¿eñstw lub zwi±zków?
 pt: inverter a ordem das fam&iacute;lias seguintes
 ru: èçìåíèòü ïîğÿäîê ñëåäóşùèõ ñåìåé
 sv: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
@@ -6520,7 +6528,7 @@ it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
 no: de %d eldste som muligens lever
-pl: %d najstarszych osób prawdopodobnie ¿yj¹cych
+pl: %d najstarszych osób (prawdopodobnie) ¿yj±cych
 pt: os %d mais velhos talvez ainda vivos
 sv: de %d &auml;ldsta som kanske lever
 
@@ -6634,7 +6642,7 @@ it: l'anniversario di matrimonio
 lv: kâzu diena
 nl: huwelijksverjaardag
 no: bryllupsdagen
-pl: rocznica œlubu
+pl: rocznica ¶lubu
 pt: o anivers&aacute;rio de casamento
 ru: ãîäîâùèíà áğàêà
 sv: br&ouml;llopsdagen
@@ -6657,7 +6665,7 @@ it: la base &egrave; cambiata; fate "back", "reload" e rifate la scheda
 lv: datu bâzç ir veiktas izmaiòas; nospiediet "back", "reload", un aizpildiet formu
 nl: de informatie is veranderd; klik "back", "reload" en vul de details in
 no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet p&aring; nytt
-pl: w bazie zosta³y dokonane zmiany; kliknij "wstecz" i "odœwie¿", a nastêpnie powtórnie wprowadŸ dane
+pl: w bazie zosta³y dokonane zmiany; kliknij "wstecz" i "od¶wie¿", a nastêpnie ponownie wprowad¼ dane
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formul&aacute;rio
 ru: áàçà èçìåíèëàñü; íàæìèòå "íàçàä", "ïåğå÷èòàòü" è çàïîëíèòå ñíîâà ôîğìó
 sv: databasen har &auml;ndrats; g&aring; tillbaka, klicka uppdatera och fyll i formul&auml;ret igen
@@ -6749,7 +6757,7 @@ it: il suocero/la suocera
 lv: vîratçvs/sievastçvs/vîramâte/sievasmâte
 nl: de schoonvader/de schoonmoeder
 no: svigerfaren/svigermoren
-pl: teœæ/teœciowa
+pl: te¶æ/te¶ciowa
 pt: o sogro/a sogra
 ru: ñâåêîğ-òåñòü/ñâåêğîâü-òåùà
 sv: sv&auml;rfadern/sv&auml;rmodern
@@ -6796,7 +6804,7 @@ it: l'archivio &egrave; temporaneamente locked: prego prova ancora. Se ancora no
 lv: datne pagaidâm ir slçgta: lûdzu mçìiniet vçlreiz
 nl: de informatie is tijdelijk ontoegankelijk: probeer later
 no: filen er midlertidig stengt: vent og pr&oslash;v igjen
-pl: plik jest chwilowo niedostepny; spróbuj póŸniej, ewentualnie chwilê odczekaj
+pl: plik jest chwilowo niedostêpny; spróbuj pó¼niej, ewentualnie chwilê odczekaj
 pt: a base est&aacute; temporariamente inacess&iacute;vel: por favor tente novamente. Se n&atilde;o funcionar, espere um momento
 ru: ôàéë âğåìåííî çàáëîêèğîâàí: ïîæàëóéñòà ïîïûòàéòåñü ñíîâà
 sv: filen &auml;r tempor&auml;rt l&aring;st: f&ouml;rs&ouml;k igen. Om det &auml;nd&aring; inte fungerar, v&auml;nta ett tag innan n&auml;sta f&ouml;rs&ouml;k
@@ -6819,7 +6827,7 @@ it: i seguenti figli di %t and %t non sono in ordine d'et&agrave;
 lv: %t un %t sekojoğais bçrns nav secîbâ
 nl: de volgende kinderen van %t en %t staan niet in volgorde
 no: f&oslash;lgende barn av %t og %t er ikke i kronologisk rekkef&oslash;lge
-pl: nastepuj¹ce dzieci (rodzice: %t i %t) nie s¹ u³o¿one w porz¹dku chronologicznym
+pl: nastepuj±ce dzieci (rodzice: %t i %t) nie s± u³o¿one w porz±dku chronologicznym
 pt: os seguintes filhos de %t e %t n&atilde;o est&atilde;o apresentados em ordem
 ru: ñëåäóşùèå äåòè %t è %t - èäóò íå ïî ïîğÿäêó
 sv: de f&ouml;ljande barnen till %t och %t &auml;r inte i kronologiskordning
@@ -6934,7 +6942,7 @@ it: le ultime %d nascite
 lv: pçdçjie %d dzimuğie
 nl: de laatste %d geboorten
 no: de siste %d f&oslash;dte
-pl: %d osób ostatnio urodzonych
+pl: %d ostatnich narodzin
 pt: os %d nascimentos mais recentes
 ru: %d ïîñëåäíèõ ğîæäåíèé
 sv: de senaste %d f&ouml;dslarna
@@ -6957,7 +6965,7 @@ it: le ultime %d mortio
 lv: pçdçjie %d miruğie
 nl: de %d recentste overlijdens
 no: de siste %d d&oslash;de
-pl: %d osób ostatnio zmar³ych
+pl: %d ostatnich zgonów
 pt: os %d &oacute;bitos mais recentes
 ru: %d ïîñëåäíèõ ñìåğòåé
 sv: de senaste %d d&ouml;dsfallen
@@ -6980,7 +6988,7 @@ it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
 nl: de %d jongste huwelijken
 no: de %d sist gifte
-pl: %d ostatnich œlubów
+pl: %d ostatnich ¶lubów
 pt: os %d casamentos mais recentes
 sv: de senaste %d äktenskapen
 
@@ -7025,7 +7033,7 @@ it: lo sposo/la sposa
 lv: laulâtais
 nl: echtgenoot
 no: maken
-pl: m¹¿/¿ona
+pl: m±¿/¿ona
 pt: o marido/a esposa
 ru: ìóæ/æåíà
 sv: maken/makan
@@ -7324,7 +7332,7 @@ it: totale
 lv: kopâ
 nl: totaal
 no: totalt
-pl: ³¹cznie
+pl: ³±cznie
 pt: total
 ru: âñåãî
 sv: totalt
@@ -7388,6 +7396,7 @@ he:  äîéï ùì %t ìà îåâãø
 it: sesso indefinito per %t
 nl: onbepaald geslacht voor %t
 no: udefinert kjønn for %t
+pl: %t ma nieokre¶lon± p³eæ
 pt: sexo indefinido para %t
 sv: odefinierat kön för %t
 
@@ -7432,7 +7441,7 @@ it: non specificato
 lv: nenoteikts
 nl: onduidelijk
 no: uspesifisert
-pl: nieokreœlone
+pl: nieokre¶lone
 pt: n&atilde;o especificado
 ru: íåîïğåäåëåííûé
 sv: ospecificerad
@@ -7573,7 +7582,7 @@ it: testimone al matrimonio di %s e %s
 lv: liecinieks %s un %s laulîbâs
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
-pl: œwiadek ma³¿eñstwa pomiêdzy osobami: %s i %s
+pl: ¶wiadek ma³¿eñstwa pomiêdzy osobami: %s i %s
 pt: testemunha do casamento de %s e %s
 ru: ñâèäåòåëü â áğàêå %s è %s
 sv: vittne vid &auml;ktenskap mellan %s och %s
@@ -7596,7 +7605,7 @@ it: testimone/testimone
 lv: liecinieks:a:-u/liecinieki
 nl: getuige/getuigen
 no: forlover/forlovere
-pl: œwiadek:a:--ka/œwiadkowie
+pl: ¶wiadek:a:--ka/¶wiadkowie
 pt: testemunha/testemunhas
 ru: ñâèäåòåëü:g:-ÿ:a:-ÿ/ñâèäåòåëè
 sv: vittne/vittnen
@@ -7642,7 +7651,7 @@ it: anno/mese/giorno
 lv: gads/mçnesis/diena
 nl: jaar/maand/dag
 no: &aring;r/m&aring;ned/dag
-pl: rok/miesi¹c/dzieñ
+pl: rok/miesi±c/dzieñ
 pt: ano/m&ecirc;s/dia
 ru: ãîä/ìåñÿö/äåíü
 sv: &aring;r/m&aring;nad/dag

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.14 2001-09-09 12:45:54 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.15 2001-10-01 12:53:22 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -86,7 +86,7 @@ it: Potete scegliere un'altra lingua fra le seguenti:
 lv: Jûs variet apskatît datu bâzi arî citâs sekojoğâs valodâs:
 no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
     f&oslash;lgende:
-pl: Mo¿esz wybraæ inny jêzyk spoœród nastêpuj¹cych:
+pl: Mo¿esz wybraæ inny jêzyk spo¶ród nastêpuj±cych:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em></font>
 
@@ -125,7 +125,7 @@ lv: Datu bâze <font color=%i><b>"%t"</b></font> patreiz satur %n personas.
 nl: Deze databank <font color=%i><b>"%t"</b></font> bevat nu %n personen.
 no: Databasen <font color=%i><b>"%t"</b></font> inneholder n&aring; %n
     personer.
-pl: Baza danych <font color=%i><b>"%t"</b></font> zawiera obecnie osób:%n.
+pl: Baza danych <font color=%i><b>"%t"</b></font> zawiera obecnie osób: %n.
 pt: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     actualmente %n pessoas.
 pt-br: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
@@ -277,7 +277,7 @@ it: per persona
 lv: personas
 nl: op naam
 no: etter person
-pl: znaleŸæ osobê
+pl: znale¼æ osobê:
 pt: por pessoa
 ru: ïî ÷åëîâåêó
 sv: efter person
@@ -320,7 +320,7 @@ it: per titolo
 lv: tituls
 nl: op titel
 no: etter titel
-pl: znaleŸæ:
+pl: znale¼æ: tytu³
 pt: por t&iacute;tulo
 ru: ïî òèòóëó
 sv: efter titel
@@ -463,7 +463,7 @@ it: alfabetico
 lv: alfabçtiskâ kârtîbâ
 nl: alfabet
 no: alfabetisk
-pl: w porz¹dku alfabetycznym
+pl: w porz±dku alfabetycznym
 pt: ordem alfab&eacute;tica
 ru: ïî àëôàâèòó
 sv: bokstavsordning
@@ -487,7 +487,7 @@ it: di frequenza
 lv: pçc sastopamîbas
 nl: aantal
 no: etter frekvens
-pl: wed³ug czêstoœci wystêpowania
+pl: wed³ug czêsto¶ci wystêpowania
 pt: frequ&ecirc;ncia
 ru: ïî ÷àñòîòå
 sv: frekvensordning
@@ -620,7 +620,7 @@ it: Si pu&ograve;
 lv: Izmaiòu veikğana:
 nl: U kan:
 no: Du kan
-pl: Mo¿esz
+pl: Mo¿esz:
 pt: Pode
 ru: Âû ìîæåòå
 sv: Du kan
@@ -708,7 +708,7 @@ it: Si pu&ograve; anche consultare
 lv: Informâcija par:
 nl: U kan de volgende zaken bekijken:
 no: Du kan ogs&aring; sl&aring; opp
-pl: Mo¿esz tak¿e obejrzeæ
+pl: Mo¿esz tak¿e obejrzeæ:
 pt: Tamb&eacute;m pode consultar
 ru: Âû ìîæåòå òàêæå îáğàòèòüñÿ ê
 sv: Du kan ocks&aring; konsultera
@@ -813,8 +813,8 @@ lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
 no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
     oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%sescache=0">herfra</a>.
-pl: Je¿eli twoja przegl¹darka nie odœwie¿a automatycznie zmienionych stron 
-    (zmuszaj¹c ciê do ich rêcznego odœwie¿ania), kliknij <a
+pl: Je¿eli twoja przegl±darka nie od¶wie¿a automatycznie zmienionych stron 
+    (zmuszaj±c ciê do ich rêcznego od¶wie¿ania), kliknij <a
     href="%sescache=0">tutaj</a>.
 pt: Se o seu <i>browser</i> n&atilde;o actualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
