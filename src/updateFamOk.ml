@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.4 1998-10-14 17:03:50 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.5 1998-11-28 13:28:49 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -241,9 +241,7 @@ value strip_children pl =
 ;
 
 value strip_family fam =
-  do fam.children := strip_children fam.children;
-     if Array.length fam.children <> 0 then fam.comment := "" else ();
-  return ()
+  fam.children := strip_children fam.children
 ;
 
 value print_err_parents conf base p =

@@ -24,6 +24,9 @@ GeneWeb Version 1.09
        base?em=R;ep=jack;en=nicholson;eoc=3&m=NG&n=somebody&t=PN
      to be somewhat independant from the index of "jack nicholson" in
      the base.
+  - Hidden options in requests:
+       ";opt=from" in personal pages, gives the .gw origin file (if any)
+       ";opt=misc" in personal pages, gives the list of miscellaneous names
 
 * ged2gwb:
   - Display message "Strange input" giving the line number instead of character
@@ -31,6 +34,8 @@ GeneWeb Version 1.09
 
 * added program "mostdesc" (not distributed in executable versions) computing
   the "most descendants from someone".
+
+* changed "pauillac" into "cristal" in addresses.
 
 GeneWeb Version 1.08
 --------------------

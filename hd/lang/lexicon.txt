@@ -111,6 +111,7 @@ eo: 1a de %m %y/%da de %m %y/%m %y/%y
 es: 1 %m %y/%d %m %y/%m %y/%y
 fr: 1er %m %y/%d %m %y/%m %y/%y
 it: 1o %m %y/%d %m %y/%m %y/%y
+nl: 1 %m %y/%d %m %y/%m %y/%y
 pt: 1a de %m %y/%da de %m %y/%m %y/%y
 se: 1 %m %y/%d %m %y/%m %y/%y
 

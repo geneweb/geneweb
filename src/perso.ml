@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.8 1998-11-27 20:09:46 ddr Exp $ *)
+(* $Id: perso.ml,v 1.9 1998-11-28 13:28:48 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -410,11 +410,11 @@ value print_family conf base p a ifam =
        return ();
      Wserver.wprint "\n";
      if conf.wizard then
-       match p_getenv conf.henv "from" with
-       [ Some _ ->
+       match p_getenv conf.henv "opt" with
+       [ Some "from" ->
            let n = sou base fam.origin_file in
            if n = "" then () else Wserver.wprint "<em>(%s)</em><br>\n" n
-       | None -> () ]
+       | _ -> () ]
      else ();
   return ()
 ;
@@ -663,8 +663,8 @@ value print conf base p =
          (commd conf) (acces conf base p) (capitale (transl conf "update"))
      else ();
      if age_autorise conf base p then print_sources conf base p else ();
-     match p_getenv conf.env "misc" with
-     [ Some "x" ->
+     match p_getenv conf.env "opt" with
+     [ Some "misc" ->
          do Wserver.wprint "<ol>";
             Wserver.wprint "\n<li>%s\n"
               (Name.lower (sou base p.first_name ^ " " ^ sou base p.surname));

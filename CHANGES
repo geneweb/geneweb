@@ -5,7 +5,8 @@ GeneWeb Version 1.09
   - Precisions of dates now apply not only for years, but for complete
     date. E.g. "maybe on september 1815" or "after september 23, 1815".
   - In dates, added case "between": between year and another year.
-  - Structure of databases have been changed for that.
+  - Structure of databases have been changed for these two above points.
+  - Area "comment" in families is now kept even if there are children.
 
 * Gedcom to GeneWeb (ged2gwb)
   - Delete of duplicated FAMS which sometimes happen in erroneous Gedcoms.

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.13 1998-11-28 09:46:43 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.14 1998-11-28 13:28:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -305,7 +305,12 @@ value connection_accepted cgi (addr, request) str env =
     (command, base_file, passwd, env)
   in
   let (lang, env) = extract_assoc "lang" env in
-  let (from, env) = extract_assoc "from" env in
+  let (from, env) =
+    match extract_assoc "opt" env with
+    [ ("from", env) -> ("from", env)
+    | ("", env) -> ("", env)
+    | (x, env) -> ("", [("opt", x) :: env]) ]
+  in
 let (threshold_test, env) = extract_assoc "th" env in
 do if threshold_test <> "" then RelationLink.threshold.val := int_of_string threshold_test else (); return
   let (sleep, env) =
@@ -381,7 +386,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
         else if passwd = "" then [("b", base_file)]
         else [("b", base_file ^ "_" ^ passwd)]) @
        (if lang = "" then [] else [("lang", lang)]) @
-       (if from = "" then [] else [("from", from)]);
+       (if from = "" then [] else [("opt", from)]);
      base_env = base_env;
      request = request;
      lexicon = lexicon;
