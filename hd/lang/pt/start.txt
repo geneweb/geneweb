@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.24 2000-03-31 15:13:34 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.25 2000-04-05 12:16:41 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -123,6 +123,7 @@ por
 <font color=%i><b>por [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
 - [death] <input type=checkbox name=de value=on>
+- [marriage/marriages]0 <input type=checkbox name=ma value=on>
 - <input type=submit value="Ok">
 </form>
 

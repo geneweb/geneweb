@@ -7,7 +7,7 @@ GeneWeb version 3.04
   - [03 Apr 00] In ancestor page, added horizontal displaying.
   - [02 Apr 00] In surname page, added ability to click on a branch number
     to display only that one.
-  - [27 Mar 00] Added displaying of places/surnames from welcome page.
+  - [27 Mar, 05 Apr 00] Added displaying of places/surnames from welcome page.
 
 * Gedcom to GeneWeb (ged2gwb)
   - [31 Mar 00] Do not enter any more GIVN as public name if equal to first
