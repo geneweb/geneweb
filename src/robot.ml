@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.15 1999-10-11 21:52:24 ddr Exp $ *)
+(* $Id: robot.ml,v 1.16 1999-10-12 15:58:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -112,7 +112,7 @@ value check oc tm from max_call sec cgi suicide =
           if suicide || cnt > max_call then
             do Printf.fprintf oc "--- %s is a robot" from;
                if suicide then
-                 Printf.fprintf oc " (called the hidden \"suicide\" request)\n"
+                 Printf.fprintf oc " (called the \"suicide\" request)\n"
                else
                  Printf.fprintf oc
                    " (%d > %d connections in %g <= %d seconds)\n" cnt

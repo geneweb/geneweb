@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.37 1999-10-09 16:49:33 ddr Exp $ *)
+(* $Id: family.ml,v 2.38 1999-10-12 15:58:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -533,6 +533,7 @@ value print_no_index conf base =
          Wserver.wprint "%s" link;
        end;
      end;
+     print_link_to_welcome conf False;
      trailer conf;
   return ()
 ;
