@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.14 2003-02-04 13:21:15 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.15 2003-11-28 10:17:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -108,7 +108,7 @@ value nb_days_in_month =
   fun m a ->
     if m == 2 && leap_year a then 29
     else if m >= 1 && m <= 12 then tb.(m - 1)
-    else 31
+    else 0
 ;
 
 value common_prec p1 p2 =
