@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.32 2004-09-09 08:40:21 ddr Exp $ *)
+(* $Id: update.ml,v 4.33 2004-11-05 07:55:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -11,40 +11,6 @@ exception ModErr;
 type create_info = (option date * string * death * option date * string);
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
-
-value rec find_free_occ base f s i =
-(*
-  match
-    try Some (person_ht_find_unique base f s i) with [ Not_found -> None ]
-  with
-  [ Some _ -> find_free_occ base f s (i + 1)
-  | None -> i ]
-*)
-  let first_name = nominative f in
-  let surname = nominative s in
-  let ipl = base.func.persons_of_name (f ^ " " ^ s) in
-  let first_name = Name.lower f in
-  let surname = Name.lower s in
-  let list_occ =
-    loop [] ipl where rec loop list =
-      fun
-      [ [ip :: ipl] ->
-          let p = poi base ip in
-          if not (List.mem p.occ list) &&
-             first_name = Name.lower (p_first_name base p) &&
-             surname = Name.lower (p_surname base p) then
-            loop [p.occ :: list] ipl
-          else loop list ipl
-      | [] -> list ]
-  in
-  let list_occ = List.sort compare list_occ in
-  loop 0 list_occ where rec loop cnt1 =
-    fun
-    [ [cnt2 :: list] ->
-        if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
-    | [] -> cnt1 ]
-(**)
-;
 
 value has_children base u =
   List.exists

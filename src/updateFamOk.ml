@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.36 2004-07-21 07:22:21 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.37 2004-11-05 07:55:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -237,7 +237,7 @@ value print_err_parents conf base p =
     tag "ul" begin
       html_li conf;
       Wserver.wprint "%s: %d" (capitale (transl conf "first free number"))
-        (Update.find_free_occ base (p_first_name base p) (p_surname base p)
+        (Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
            0);
     end;
     Update.print_return conf;

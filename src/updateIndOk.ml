@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.16 2004-07-17 09:14:29 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.17 2004-11-05 07:55:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -322,7 +322,7 @@ value print_conflict conf base p =
     Update.print_error conf base (AlreadyDefined p);
     html_p conf;
     let free_n =
-      Update.find_free_occ base (p_first_name base p) (p_surname base p) 0
+      Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
     in
     tag "ul" begin
       html_li conf;

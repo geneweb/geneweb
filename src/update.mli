@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 4.5 2002-10-21 10:57:19 ddr Exp $ *)
+(* $Id: update.mli,v 4.6 2004-11-05 07:55:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -9,7 +9,6 @@ type create_info = (option date * string * death * option date * string);
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
-value find_free_occ : base -> string -> string -> int -> int;
 value infer_death : config -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.24 2004-09-30 12:15:06 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.25 2004-11-05 07:55:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1099,4 +1099,30 @@ value sort_person_list base pl =
              if c == 0 then p1.occ > p2.occ else c > 0
            else c > 0 ])
     pl
+;
+
+value find_free_occ base f s i =
+  let first_name = nominative f in
+  let surname = nominative s in
+  let ipl = base.func.persons_of_name (f ^ " " ^ s) in
+  let first_name = Name.lower f in
+  let surname = Name.lower s in
+  let list_occ =
+    loop [] ipl where rec loop list =
+      fun
+      [ [ip :: ipl] ->
+          let p = poi base ip in
+          if not (List.mem p.occ list) &&
+             first_name = Name.lower (p_first_name base p) &&
+             surname = Name.lower (p_surname base p) then
+            loop [p.occ :: list] ipl
+          else loop list ipl
+      | [] -> list ]
+  in
+  let list_occ = List.sort compare list_occ in
+  loop 0 list_occ where rec loop cnt1 =
+    fun
+    [ [cnt2 :: list] ->
+        if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
+    | [] -> cnt1 ]
 ;
