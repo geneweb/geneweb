@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.11 2001-02-18 13:20:28 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.12 2001-02-18 15:44:51 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -91,6 +91,10 @@
 <input type=hidden name=i value="%index;">
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
   %if;evar_i2;<input type=hidden name=i2 value="%evar_i2;">%end;%nl;
+  %if;(evar_ini1 and evar_ini2);
+    <input type=hidden name=ini1 value="%evar_ini1;">
+    <input type=hidden name=ini2 value="%evar_ini2;">
+  %end;
   <input type=hidden name=m value=MRG_MOD_IND_OK>
 %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
   <input type=hidden name=m value=MOD_IND_OK>
@@ -140,7 +144,7 @@
     <tr>
     <td>[*qualifier]0</td>
     <td>
-    <input name="qualifier%cnt;" size=30 value="%item;">
+    <input name="qualifier%cnt;" size=30 value="%qualifier;">
     <td>[*insert::qualifier]0</td>
     <td><input type=checkbox name="add_qualifier%cnt;" value=on></td>
     </tr>
@@ -159,7 +163,7 @@
     <tr>
     <td>[*alias]0</td>
     <td>
-    <input name="alias%cnt;" size=30 value="%item;">
+    <input name="alias%cnt;" size=30 value="%alias;">
     <td>[*insert::alias]0</td>
     <td><input type=checkbox name="add_alias%cnt;" value=on></td>
     </tr>
@@ -179,7 +183,7 @@
     <tr>
     <td>[*first name alias]0</td>
     <td>
-    <input name="first_name_alias%cnt;" size=30 value="%item;">
+    <input name="first_name_alias%cnt;" size=30 value="%first_name_alias;">
     <td>[*insert::first name alias]0</td>
     <td><input type=checkbox name="add_first_name_alias%cnt;" value=on></td>
     </tr>
@@ -198,7 +202,7 @@
     <tr>
     <td>[*surname alias]0</td>
     <td>
-    <input name="surname_alias%cnt;" size=30 value="%item;">
+    <input name="surname_alias%cnt;" size=30 value="%surname_alias;">
     <td>[*insert::first name alias]0</td>
     <td><input type=checkbox name="add_surname_alias%cnt;" value=on></td>
     </tr>
