@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.32 1999-07-02 13:57:51 ddr Exp $ *)
+(* $Id: setup.ml,v 1.33 1999-07-02 17:22:59 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -540,7 +540,7 @@ value gwu_or_gwb2ged_check suffix conf =
   let out_file = Filename.concat ".." out_file in
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_miss.htm"
-  else print_file conf "base_in.htm"
+  else print_file conf "bsi.htm"
 ;
 
 value gwu = gwu_or_gwb2ged_check ".gw";
@@ -554,7 +554,7 @@ value gwb2ged_or_gwu_1 ok_file conf =
      flush stderr;
   return
   if rc = 1 then print_file conf "warnings.htm"
-  else if rc > 1 then print_file conf "base_in_err.htm"
+  else if rc > 1 then print_file conf "bsi_err.htm"
   else
     let conf =
       conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
@@ -562,7 +562,7 @@ value gwb2ged_or_gwu_1 ok_file conf =
     print_file conf ok_file
 ;
 
-value gwb2ged_1 = gwb2ged_or_gwu_1 "gwb2ged_ok.htm";
+value gwb2ged_1 = gwb2ged_or_gwu_1 "gw2gd_ok.htm";
 value gwu_1 = gwb2ged_or_gwu_1 "gwu_ok.htm";
 
 value consang_check conf =
@@ -572,7 +572,7 @@ value consang_check conf =
     | None -> "" ]
   in
   if in_f = "" then print_file conf "err_miss.htm"
-  else print_file conf "base_in.htm"
+  else print_file conf "bsi.htm"
 ;
 
 value has_gwu dir =
@@ -620,9 +620,9 @@ value recover conf =
   let conf = conf_with_env conf "anon" init_dir in
   let dest_dir = Sys.getcwd () in
   if init_dir = "" then print_file conf "err_miss.htm"
-  else if init_dir = dest_dir then print_file conf "err_same_dir.htm"
+  else if init_dir = dest_dir then print_file conf "err_smdr.htm"
   else if not (Sys.file_exists init_dir) then
-    print_file conf "err_no_such_dir.htm"
+    print_file conf "err_ndir.htm"
   else if
     (ifdef UNIX then
        try
@@ -632,8 +632,8 @@ value recover conf =
        [ Unix.Unix_error _ _ _ -> False ]
      else False)
   then
-    print_file conf "err_same_dir.htm"
-  else if not dir_has_gwu then print_file conf "err_not_gw.htm"
+    print_file conf "err_smdr.htm"
+  else if not dir_has_gwu then print_file conf "err_ngw.htm"
   else print_file conf "recover1.htm"
 ;
 
@@ -768,7 +768,7 @@ value cleanup conf =
     | None -> "" ]
   in
   if in_base = "" then print_file conf "err_miss.htm"
-  else print_file conf "cleanup_1.htm"
+  else print_file conf "cleanup1.htm"
 ;
 
 value cleanup_1 conf =
@@ -806,20 +806,20 @@ value cleanup_1 conf =
      return
      if rc = 1 then print_file conf "warnings.htm"
      else if rc > 1 then print_file conf "cleanup_err.htm"
-     else print_file conf "cleanup_ok.htm";
+     else print_file conf "clean_ok.htm";
   return ()
 ;  
 
 value rec check_new_names conf l1 l2 =
   match (l1, l2) with
   [ ([(k, v) :: l], [x :: m]) ->
-      if k <> x then do print_file conf "err_outdated.htm"; return raise Exit
+      if k <> x then do print_file conf "err_outd.htm"; return raise Exit
       else if not (good_name v) then
         let conf = {(conf) with env = [("o", v) :: conf.env]} in
         do print_file conf "err_name.htm"; return raise Exit
       else check_new_names conf l m
   | ([], []) -> ()
-  | _ -> do print_file conf "err_outdated.htm"; return raise Exit ]
+  | _ -> do print_file conf "err_outd.htm"; return raise Exit ]
 ;
 
 value rec check_rename_conflict conf =
@@ -827,7 +827,7 @@ value rec check_rename_conflict conf =
   [ [x :: l] ->
       if List.mem x l then
         let conf = {(conf) with env = [("o", x) :: conf.env]} in
-        do print_file conf "err_conflict.htm"; return raise Exit
+        do print_file conf "err_cnfl.htm"; return raise Exit
       else check_rename_conflict conf l
   | [] -> () ]
 ;
@@ -849,7 +849,7 @@ value rename conf =
             if k <> v then Sys.rename ("_" ^ k ^ ".gwb") (v ^ ".gwb")
             else ())
          rename_list;
-       print_file conf "rename_ok.htm";
+       print_file conf "ren_ok.htm";
     return ()
   with
   [ Exit -> () ]
@@ -863,7 +863,7 @@ value delete_1 conf =
   do List.iter
        (fun (k, v) -> if v = "del" then rm_base (k ^ ".gwb") else ())
        conf.env;
-     print_file conf "delete_ok.htm";
+     print_file conf "del_ok.htm";
   return ()
 ;
 
@@ -1073,7 +1073,7 @@ value exec_command_in conf ok_file =
      flush stderr;
   return
   if rc = 1 then print_file conf "warnings.htm"
-  else if rc > 1 then print_file conf "base_in_err.htm"
+  else if rc > 1 then print_file conf "bsi_err.htm"
   else print_file conf ok_file
 ;
 
@@ -1118,7 +1118,7 @@ value setup_comm conf =
   | "consang" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> consang_check conf
-      | _ -> exec_command_in conf "consang_ok.htm" ]
+      | _ -> exec_command_in conf "consg_ok.htm" ]
   | "gwf" -> gwf conf
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
@@ -1172,7 +1172,7 @@ value setup (addr, req) str =
            saddr s;
          flush stderr;
       return
-      print_file conf "err_access.htm"
+      print_file conf "err_acc.htm"
   | _ ->
       if conf.comm = "" then print_file conf "welcome.htm"
       else setup_comm conf comm ]
