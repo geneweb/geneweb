@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.24 2000-08-08 13:26:46 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.25 2000-08-08 14:21:15 ddr Exp $ *)
 
 open Printf;
 
@@ -388,10 +388,10 @@ value gwtp_upload str env b tok =
 value gwtp_download str env b tok =
   let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
   do printf "content-type: text/html\r\n\r\n";
-     copy_template [('b', b); ('t', tok)] "recv";
      if Sys.file_exists bdir then
        let dh = Unix.opendir bdir in
-       do printf "<ul>\n";
+       do copy_template [('b', b); ('t', tok)] "recv";
+          printf "<ul>\n";
           try
             while True do
               match Unix.readdir dh with
@@ -405,7 +405,11 @@ value gwtp_download str env b tok =
           printf "</ul>\n";
        return ()
      else
-       printf "<p>Your data base does not exist or is empty.\n";
+       printf "
+<head><title>Gwtp - download %s</title></head>
+<body>
+<h1 align=center>Gwtp - download %s</h1>
+<p>Your data base does not exist or is empty.\n" b b;
      printf_link_to_main b tok;
      printf "</body>\n";
   return ()
