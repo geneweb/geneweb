@@ -1,7 +1,7 @@
-# $Id: Makefile.inc,v 4.2 2001-09-08 19:03:59 ddr Exp $
+# $Id: Makefile.inc,v 4.3 2001-12-17 12:55:25 ddr Exp $
 
 TOP=..
-CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
+CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh pa_ifdef.cmo
 CAMLP4F=-DUNIX
 CAMLP4D=`camlp4 -where`
 LIBUNIX=-cclib -lunix
