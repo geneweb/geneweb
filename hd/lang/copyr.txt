@@ -1,4 +1,4 @@
 
-<p><hr><font size=-1><em>(c) Copyright INRIA 1998 -
+<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/">
 GeneWeb %v</a></em></font><br>
