@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.25 2000-01-02 03:36:43 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.26 2000-01-02 16:04:37 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -32,6 +32,30 @@ value new_span_id =
 value new_ghost_id =
   let i = ref 0 in fun () -> do incr i; return ghost_id_of_int i.val
 ;
+
+(* testing *)
+
+(*
+value map_dag f d =
+  let a =
+    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
+  in
+  {dag = a}
+;
+
+value tag_dag d =
+  let c = ref 'A' in
+  map_dag
+    (fun v ->
+       let v = c.val in
+       do c.val :=
+            if c.val = 'Z' then 'a'
+            else if c.val = 'z' then '1'
+            else Char.chr (Char.code c.val + 1);
+       return String.make 1 v)
+    d
+;
+*)
 
 (* print *)
 
@@ -1079,7 +1103,7 @@ value try_fall2_right t i j =
       in
       let j2 =
         loop (j + 1) where rec loop j2 =
-          if j = Array.length t.table.(i) then j2
+          if j2 = Array.length t.table.(i) then j2
           else if t.table.(i).(j2).span = t.table.(i).(j).span then
             loop (j2 + 1)
           else j2
@@ -1116,7 +1140,7 @@ value try_fall2_left t i j =
       in
       let j1 =
         loop (j - 1) where rec loop j1 =
-          if j < 0 then j1
+          if j1 < 0 then j1
           else if t.table.(i).(j1).span = t.table.(i).(j).span then
             loop (j1 - 1)
           else j1
@@ -1207,28 +1231,6 @@ value invert_table t =
      done;
   return t'
 ;
-
-(*
-value map_dag f d =
-  let a =
-    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
-  in
-  {dag = a}
-;
-
-value tag_dag d =
-  let c = ref 'A' in
-  map_dag
-    (fun v ->
-       let v = c.val in
-       do c.val :=
-            if c.val = 'Z' then 'a'
-            else if c.val = 'z' then '1'
-            else Char.chr (Char.code c.val + 1);
-       return String.make 1 v)
-    d
-;
-*)
 
 (* main *)
 

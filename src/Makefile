@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.7 1999-12-20 09:03:14 ddr Exp $
+# $Id: Makefile,v 3.8 2000-01-02 16:04:36 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -45,7 +45,7 @@ consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
 
 gwd.out: $(GWD_OBJS)
-	$(OCAMLC) -custom unix.cma $(CAMLP4D)/gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
+	$(OCAMLC) -custom $(OCAMLD) unix.cma $(CAMLP4D)/gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
