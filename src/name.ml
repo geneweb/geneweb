@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.0 2001-03-16 19:34:51 ddr Exp $ *)
+(* $Id: name.ml,v 4.1 2001-04-18 12:05:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Name.lower *)
@@ -22,7 +22,7 @@ value lower s =
       [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
         ->
           let i' =
-            if special then do s'.[i'] := ' '; return i' + 1 else i'
+            if special then do { s'.[i'] := ' '; i' + 1 } else i'
           in
           let c =
             match Char.lowercase c with
@@ -38,7 +38,7 @@ value lower s =
             | 'þ' -> 'p'
             | c -> c ]
           in
-          do s'.[i'] := c; return copy False (i + 1) (i' + 1)
+          do { s'.[i'] := c; copy False (i + 1) (i' + 1) }
       | c ->
           if i' == 0 then copy False (i + 1) 0
           else copy True (i + 1) i' ]
@@ -96,16 +96,18 @@ value abbrev s =
       if i >= String.length s then s'
       else
         match s.[i] with
-        [ ' ' -> do s'.[i'] := ' '; return copy True (i + 1) (i' + 1)
+        [ ' ' -> do { s'.[i'] := ' '; copy True (i + 1) (i' + 1) }
         | c ->
             if can_start_abbrev then
               match search_abbrev s i abbrev_list with
-              [ None -> do s'.[i'] := c; return copy False (i + 1) (i' + 1)
+              [ None -> do { s'.[i'] := c; copy False (i + 1) (i' + 1) }
               | Some (n, Some a) ->
-                  do String.blit a 0 s' i' (String.length a); return
-                  copy False (i + n) (i' + String.length a)
+                  do {
+                    String.blit a 0 s' i' (String.length a);
+                    copy False (i + n) (i' + String.length a)
+                  }
               | Some (n, None) -> copy True (i + n + 1) i' ]
-            else do s'.[i'] := c; return copy False (i + 1) (i' + 1) ]
+            else do { s'.[i'] := c; copy False (i + 1) (i' + 1) } ]
     in
     copy True 0 0
 ;
@@ -125,7 +127,7 @@ value strip s =
     let rec copy i i' =
       if i == String.length s then s'
       else if s.[i] == ' ' then copy (i + 1) i'
-      else do s'.[i'] := s.[i]; return copy (i + 1) (i' + 1)
+      else do { s'.[i'] := s.[i]; copy (i + 1) (i' + 1) }
     in
     copy 0 0
 ;
@@ -171,17 +173,22 @@ value crush s =
     else
       match roman_number s i with
       [ Some j ->
-          do for k = i to j - 1 do s'.[k+i'-i] := s.[k]; done; return
-          copy j (i' + j - i) True
+          do {
+            for k = i to j - 1 do { s'.[k+i'-i] := s.[k] };
+            copy j (i' + j - i) True
+          }
       | _ ->
           match s.[i] with
           [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' ->
-              if first_vowel then
-                do s'.[i'] := 'e'; return copy (i + 1) (i' + 1) False
+              if first_vowel then do {
+                s'.[i'] := 'e'; copy (i + 1) (i' + 1) False
+              }
               else copy (i + 1) i' False
           | 'h' ->
-              do if i > 0 && s.[i-1] == 'p' then s'.[i'-1] := 'f' else ();
-              return copy (i + 1) i' first_vowel
+              do {
+                if i > 0 && s.[i-1] == 'p' then s'.[i'-1] := 'f' else ();
+                copy (i + 1) i' first_vowel
+              }
           | 's' when i == String.length s - 1 || s.[i + 1] == ' ' ->
               copy (i + 1) i' False          
           | c ->
@@ -193,7 +200,7 @@ value crush s =
                   | 'z' -> 's'
                   | c -> c ]
                 in
-                do s'.[i'] := c; return copy (i + 1) (i' + 1) False ] ]
+                do { s'.[i'] := c; copy (i + 1) (i' + 1) False } ] ]
   in
   copy 0 0 True
 ;

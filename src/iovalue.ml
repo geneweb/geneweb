@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 4.0 2001-03-16 19:34:47 ddr Exp $ *)
+(* $Id: iovalue.ml,v 4.1 2001-04-18 12:05:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -29,7 +29,7 @@ value rec input_loop ifuns ic =
   else if code >= <<PREFIX_SMALL_STRING>> then
     let len = code land 0x1F in
     let s = String.create len in
-    do ifuns.input ic s 0 len; return Obj.magic s
+    do { ifuns.input ic s 0 len; Obj.magic s }
   else
     match code with
     [ <<CODE_INT8>> -> Obj.magic (sign_extend (ifuns.input_byte ic))
@@ -48,22 +48,24 @@ value rec input_loop ifuns ic =
     | <<CODE_STRING8>> ->
         let len = ifuns.input_byte ic in
         let s = String.create len in
-        do ifuns.input ic s 0 len; return Obj.magic s
+        do { ifuns.input ic s 0 len; Obj.magic s }
     | <<CODE_STRING32>> ->
         let len = ifuns.input_binary_int ic in
         let s = String.create len in
-        do ifuns.input ic s 0 len; return Obj.magic s
+        do { ifuns.input ic s 0 len; Obj.magic s }
     | code -> failwith (Printf.sprintf "input bad code 0x%x" code) ]
 and input_block ifuns ic tag size =
   let v =
     if tag == 0 then Obj.magic (Array.create size (Obj.magic 0))
     else Obj.new_block tag size
   in
-  do for i = 0 to size - 1 do
-       let x = input_loop ifuns ic in
-       Obj.set_field v i (Obj.magic x);
-     done;
-  return v
+  do {
+    for i = 0 to size - 1 do {
+      let x = input_loop ifuns ic in
+      Obj.set_field v i (Obj.magic x);
+    };
+    v
+  }
 ;
 
 value input_int ifuns ic =
@@ -108,48 +110,49 @@ value rec output_loop ofuns oc x =
   if not (Obj.is_block x) then
     if Obj.magic x >= 0 && Obj.magic x < 0x40 then
       ofuns.output_byte oc (<<PREFIX_SMALL_INT>> + Obj.magic x)
-    else if Obj.magic x >= -128 && Obj.magic x < 128 then
-      do ofuns.output_byte oc <<CODE_INT8>>;
-         ofuns.output_byte oc (Obj.magic x);
-      return ()
-    else if Obj.magic x >= -32768 && Obj.magic x < 32768 then
-      do ofuns.output_byte oc <<CODE_INT16>>;
-         ofuns.output_byte oc (Obj.magic x lsr 8);
-         ofuns.output_byte oc (Obj.magic x);
-      return ()
-    else
-      do ofuns.output_byte oc <<CODE_INT32>>; return
-      ofuns.output_binary_int oc (Obj.magic x)
+    else if Obj.magic x >= -128 && Obj.magic x < 128 then do {
+      ofuns.output_byte oc <<CODE_INT8>>;
+      ofuns.output_byte oc (Obj.magic x);
+    }
+    else if Obj.magic x >= -32768 && Obj.magic x < 32768 then do {
+      ofuns.output_byte oc <<CODE_INT16>>;
+      ofuns.output_byte oc (Obj.magic x lsr 8);
+      ofuns.output_byte oc (Obj.magic x);
+    }
+    else do {
+      ofuns.output_byte oc <<CODE_INT32>>;
+      ofuns.output_binary_int oc (Obj.magic x);
+    }
   else
     if Obj.tag x == fun_tag then failwith "Iovalue.output <fun>"
-    else if Obj.tag x == string_tag then
+    else if Obj.tag x == string_tag then do {
       let len = String.length (Obj.magic x) in
-      do if len < 0x20 then
-           ofuns.output_byte oc (<<PREFIX_SMALL_STRING>> + len)
-         else if len < 0x100 then
-           do ofuns.output_byte oc <<CODE_STRING8>>;
-              ofuns.output_byte oc len;
-           return ()
-         else
-           do ofuns.output_byte oc <<CODE_STRING32>>;
-              ofuns.output_binary_int oc len;
-           return ();
-         ofuns.output oc (Obj.magic x) 0 len;
-      return ()
+      if len < 0x20 then
+        ofuns.output_byte oc (<<PREFIX_SMALL_STRING>> + len)
+      else if len < 0x100 then do {
+        ofuns.output_byte oc <<CODE_STRING8>>;
+        ofuns.output_byte oc len;
+      }
+      else do {
+        ofuns.output_byte oc <<CODE_STRING32>>;
+        ofuns.output_binary_int oc len;
+      };
+      ofuns.output oc (Obj.magic x) 0 len;
+    }
     else if Obj.tag x == float_tag then
       failwith "Iovalue.output: floats not implemented"
-    else
-      do if Obj.tag x < 16 && Obj.size x < 8 then
-           ofuns.output_byte oc
-             (<<PREFIX_SMALL_BLOCK>> + Obj.tag x + Obj.size x lsl 4)
-         else
-           do ofuns.output_byte oc <<CODE_BLOCK32>>;
-              ofuns.output_binary_int oc (Obj.tag x + Obj.size x lsl 10);
-           return ();
-         for i = 0 to Obj.size x - 1 do
-           output_loop ofuns oc (Obj.field x i);
-         done;
-      return ()
+    else do {
+      if Obj.tag x < 16 && Obj.size x < 8 then
+        ofuns.output_byte oc
+          (<<PREFIX_SMALL_BLOCK>> + Obj.tag x + Obj.size x lsl 4)
+      else do {
+        ofuns.output_byte oc <<CODE_BLOCK32>>;
+        ofuns.output_binary_int oc (Obj.tag x + Obj.size x lsl 10);
+      };
+      for i = 0 to Obj.size x - 1 do {
+        output_loop ofuns oc (Obj.field x i);
+      };
+    }
 ;
 
 value out_channel_funs =
@@ -172,34 +175,36 @@ value size_funs =
 value size = ref 0;
 
 value size v =
-  do size.val := 0;
-     gen_output size_funs size v;
-  return size.val;
+  do { size.val := 0; gen_output size_funs size v; size.val }
+;
 
 (* Digest *)
 
 value dbuf = ref (String.create 256);
 value dlen = ref 0;
 value dput_char c =
-  do if dlen.val = String.length dbuf.val then
-       let nlen = 2 * dlen.val in
-       let ndbuf = String.create nlen in
-       do String.blit dbuf.val 0 ndbuf 0 dlen.val; dbuf.val := ndbuf; return ()
-     else ();
-     dbuf.val.[dlen.val] := c;
-     incr dlen;
-  return ()
+  do {
+    if dlen.val = String.length dbuf.val then do {
+      let nlen = 2 * dlen.val in
+      let ndbuf = String.create nlen in
+      String.blit dbuf.val 0 ndbuf 0 dlen.val; dbuf.val := ndbuf;
+    }
+    else ();
+    dbuf.val.[dlen.val] := c;
+    incr dlen;
+  }
 ;
 value rec dput_int i =
   if i == 0 then ()
-  else
-    do dput_char (Char.chr (Char.code '0' + i mod 10)); return
-    dput_int (i / 10)
+  else do {
+    dput_char (Char.chr (Char.code '0' + i mod 10));
+    dput_int (i / 10);
+  }
 ;
 value dput_string s =
-  for i = 0 to String.length s - 1 do
+  for i = 0 to String.length s - 1 do {
     dput_char s.[i];
-  done
+  }
 ;
 
 value hexchar i =
@@ -209,36 +214,40 @@ value hexchar i =
 
 value string_code s =
   let r = String.create (String.length s * 2) in
-  do for i = 0 to String.length s - 1 do
-       r.[2*i] := hexchar (Char.code s.[i] / 16);
-       r.[2*i+1] := hexchar (Char.code s.[i] mod 16);
-     done;
-  return r
+  do {
+    for i = 0 to String.length s - 1 do {
+      r.[2*i] := hexchar (Char.code s.[i] / 16);
+      r.[2*i+1] := hexchar (Char.code s.[i] mod 16);
+    };
+    r
+  }
 ;
 
 value rec digest_loop v =
   if not (Obj.is_block v) then
     let n = (Obj.magic v : int) in
-    do dput_char 'I'; dput_int n; return ()
+    do { dput_char 'I'; dput_int n }
   else if Obj.size v == 0 then
-    do dput_char 'T'; dput_int (Obj.tag v); return ()
-  else if Obj.tag v == string_tag then
+    do { dput_char 'T'; dput_int (Obj.tag v) }
+  else if Obj.tag v == string_tag then do {
     let s = (Obj.magic v : string) in
-    do dput_char 'S'; dput_int (String.length s);
-       dput_char '/'; dput_string s;
-    return ()
-  else
-    do dput_char 'O'; dput_int (Obj.tag v);
-       dput_char '/'; dput_int (Obj.size v);
-       digest_fields v 0;
-    return ()
+    dput_char 'S'; dput_int (String.length s);
+    dput_char '/'; dput_string s;
+  }
+  else do {
+    dput_char 'O'; dput_int (Obj.tag v);
+    dput_char '/'; dput_int (Obj.size v);
+    digest_fields v 0;
+  }
 and digest_fields v i =
   if i == Obj.size v then ()
-  else do digest_loop (Obj.field v i); return digest_fields v (i + 1)
+  else do { digest_loop (Obj.field v i); digest_fields v (i + 1) }
 ;
 
 value digest v =
-  do dlen.val := 0;
-     digest_loop (Obj.repr v);
-  return string_code (Digest.substring dbuf.val 0 dlen.val)
+  do {
+    dlen.val := 0;
+    digest_loop (Obj.repr v);
+    string_code (Digest.substring dbuf.val 0 dlen.val)
+  }
 ;
