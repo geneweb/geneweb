@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.12 2001-05-01 18:39:11 ddr Exp $ *)
+(* $Id: perso.ml,v 4.13 2001-05-02 09:04:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -871,14 +871,11 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
 ;
 
 value simple_person_text conf base p p_auth =
-  person_text conf base p
-(*
   if p_auth then
     match main_title base p with
     [ Some t -> titled_person_text conf base p t
     | None -> person_text conf base p ]
   else person_text conf base p
-*)
 ;
 
 value print_simple_person_text conf base (p, _, _, p_auth) =
