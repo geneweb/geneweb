@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.23 2000-11-25 18:53:34 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: updateFamOk.ml,v 3.24 2001-01-06 09:55:59 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Config;
 open Def;

@@ -1,5 +1,5 @@
-(* $Id: merge.mli,v 3.1 2000-01-10 02:14:39 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: merge.mli,v 3.2 2001-01-06 09:55:57 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Config;

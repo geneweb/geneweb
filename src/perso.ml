@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.70 2000-12-28 23:27:13 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: perso.ml,v 3.71 2001-01-06 09:55:58 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
@@ -563,7 +563,7 @@ value print_copyright conf base env =
   | None ->
       do html_p conf;
          Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright INRIA 2000 -
+<hr><font size=-1><em>(c) Copyright 2001 INRIA -
 GeneWeb %s</em></font>" Version.txt;
          html_br conf;
       return () ]

@@ -1,6 +1,6 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 1.55 2000-12-14 14:37:04 ddr Exp $ *)
-(* (c) Copyright INRIA 2000 *)
+(* $Id: gwtp.ml,v 1.56 2001-01-06 09:55:34 ddr Exp $ *)
+(* (c) Copyright 2001 INRIA *)
 
 open Printf;
 

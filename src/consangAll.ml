@@ -1,5 +1,5 @@
-(* $Id: consangAll.ml,v 3.5 2000-11-22 03:01:03 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: consangAll.ml,v 3.6 2001-01-06 09:55:53 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;

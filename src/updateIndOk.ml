@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.19 2000-11-18 16:54:11 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: updateIndOk.ml,v 3.20 2001-01-06 09:55:59 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Config;
 open Def;

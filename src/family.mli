@@ -1,4 +1,4 @@
-(* $Id: family.mli,v 3.1 2000-01-10 02:14:38 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: family.mli,v 3.2 2001-01-06 09:55:54 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 value family : Config.config -> Def.base -> option (int * int * string);

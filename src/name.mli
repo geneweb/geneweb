@@ -1,5 +1,5 @@
-(* $Id: name.mli,v 3.2 2000-08-30 08:58:35 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: name.mli,v 3.3 2001-01-06 09:55:57 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 value lower : string -> string;
   (* Name.lower:
