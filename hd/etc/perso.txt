@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.14 2001-01-18 14:10:22 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.15 2001-01-20 10:20:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -61,7 +61,13 @@
     <em><strong>%alias;</strong></em><br>
   %end;
   %if;has_nobility_titles;
-    <em>%nobility_titles;</em><br>
+    <em>
+    %foreach;nobility_title;
+      %if;not is_first;,
+      %end;
+      %nobility_title;
+    %end;
+    </em><br>
   %end;
   %if;(has_public_name or has_qualifiers)
     <em>(%if;cancel_links;%first_name; %surname;

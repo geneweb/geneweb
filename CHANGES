@@ -2,11 +2,11 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [14 Jan 00] Complicated trees (ancestors, descendants, relationships) now
+  - [14 Jan 01] Complicated trees (ancestors, descendants, relationships) now
     work with browsers without tables (like Lynx).
-  - [13 Jan 00] Fixed bug: when merging families, the marriage witnesses
+  - [13 Jan 01] Fixed bug: when merging families, the marriage witnesses
     disappeared.
-  - [10 Jan 00] In relationship computing, changed translation of the
+  - [10 Jan 01] In relationship computing, changed translation of the
     phrase "of a cousin". Indeed, in the context, it should display "of a
     cousin(male) or a cousin(female)". In English there is just one word,
     "cousin" for male cousins and female cousins, but not in many other
@@ -22,6 +22,12 @@ GeneWeb version 3.11
   - [19 Dec 00] In update page, changed "add family" into "add
     marriage" because, despite the warning at end of this page, many
     people are mistaken by thinking it was "add a child in a family".
+
+* Template (etc/perso.txt)
+  - [20 Jan 01] In personal page template file (etc/perso.txt), the macro
+    "%nobility_titles;" has been decomposed into "%foreach;nobility_title;"
+    and "%nobility_title;", allowing to display the nobility titles
+    differently (e.g. in a list <ul>..</ul>).
 
 * GeneWeb to Gedcom (gwb2ged)
   - [18 Jan 01] Fixed problem for names with declinations: they were

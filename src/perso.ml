@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.71 2001-01-06 09:55:58 ddr Exp $ *)
+(* $Id: perso.ml,v 3.72 2001-01-20 10:20:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -122,8 +122,7 @@ value name_equiv n1 n2 =
   n1 = n2 || n1 = Tmain && n2 = Tnone || n1 = Tnone && n2 = Tmain
 ;
 
-value print_titles conf base cap and_txt p =
-  let titles = p.titles in
+value nobility_titles_list conf p =
   let titles =
     List.fold_right
       (fun t l ->
@@ -142,21 +141,25 @@ value print_titles conf base cap and_txt p =
              [(t.t_nth, t.t_name, t.t_ident, t.t_place,
                [(t_date_start, t_date_end)]) ::
               l] ])
-      titles []
+      p.titles []
   in
-  let titles =
-    List.fold_right
-      (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
-         match l with
-         [ [(nth, name, title, places, dates) :: rl]
-           when
-             not conf.is_rtl &&
-             nth = t_nth && name_equiv name t_name && title = t_ident &&
-             dates = t_dates ->
-             [(nth, name, title, [t_place :: places], dates) :: rl]
-         | _ -> [(t_nth, t_name, t_ident, [t_place], t_dates) :: l] ])
-      titles []
-  in
+  List.fold_right
+    (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
+       match l with
+       [ [(nth, name, title, places, dates) :: rl]
+         when
+           not conf.is_rtl &&
+           nth = t_nth && name_equiv name t_name && title = t_ident &&
+           dates = t_dates ->
+           [(nth, name, title, [t_place :: places], dates) :: rl]
+       | _ -> [(t_nth, t_name, t_ident, [t_place], t_dates) :: l] ])
+    titles []
+;
+
+(* obsolete; should be removed one day *)
+
+value print_titles conf base cap and_txt p =
+  let titles = nobility_titles_list conf p in
   list_iter_first
     (fun first t ->
        do if not first then Wserver.wprint "," else ();
@@ -429,7 +432,11 @@ type env =
   | Estring of string
   | Esosa of Lazy.t (option (Num.t * person))
   | Eimage of Lazy.t (option (string * option (option (int * int))))
+  | Etitle of title_item
   | Enone ]
+and title_item =
+  (int * gen_title_name istr * istr * list istr *
+   list (option date * option date))
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Enone ];
@@ -687,6 +694,12 @@ value print_married_to conf base env p p_auth =
   | _ -> () ]
 ;
 
+value print_nobility_title conf base env p p_auth =
+  match get_env "nobility_title" env with
+  [ Etitle t when p_auth -> print_title conf base (transl conf "and") p t
+  | _ -> () ]
+;
+
 value print_nobility_titles conf base env p p_auth =
   if p_auth then print_titles conf base True (transl conf "and") p else ()
 ;
@@ -938,6 +951,7 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
   | "married_to" -> print_married_to conf base env p p_auth efam
   | "nl" -> Wserver.wprint "\n"
+  | "nobility_title" -> print_nobility_title conf base env p p_auth
   | "nobility_titles" -> print_nobility_titles conf base env p p_auth
   | "notes" -> print_notes conf base env p p_auth
   | "occupation" -> print_occupation conf base env p p_auth
@@ -1267,6 +1281,7 @@ and eval_simple_foreach conf base env al ep efam =
   | "child" -> eval_foreach_child conf base env al efam
   | "family" -> eval_foreach_family conf base env al ep
   | "first_name_alias" -> eval_foreach_first_name_alias conf base env al ep
+  | "nobility_title" -> eval_foreach_nobility_title conf base env al ep
   | "qualifier" -> eval_foreach_qualifier conf base env al ep
   | "related" -> eval_foreach_related conf base env al ep
   | "relation" -> eval_foreach_relation conf base env al ep
@@ -1331,6 +1346,16 @@ and eval_foreach_first_name_alias conf base env al (p, _, _, p_auth) =
          let env = [("first_name_alias", Estring (sou base s)) :: env] in
          List.iter (eval_ast conf base env) al)
       p.first_names_aliases
+  else ()
+and eval_foreach_nobility_title conf base env al (p, _, _, p_auth) =
+  if p_auth then
+    let titles = nobility_titles_list conf p in
+    list_iter_first
+      (fun first x ->
+         let env = [("nobility_title", Etitle x) :: env] in
+         let env = [("first", Ebool first) :: env] in
+         List.iter (eval_ast conf base env) al)
+      titles
   else ()
 and eval_foreach_qualifier conf base env al (p, _, _, _) =
   list_iter_first
