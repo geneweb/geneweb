@@ -9,10 +9,10 @@ iobase.cmi: def.cmi
 merge.cmi: config.cmi def.cmi 
 perso.cmi: config.cmi def.cmi 
 srcfile.cmi: config.cmi def.cmi 
-update.cmi: adef.cmi config.cmi def.cmi gutil.cmi 
 updateFam.cmi: config.cmi def.cmi update.cmi 
 updateInd.cmi: config.cmi def.cmi update.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi update.cmi 
+update.cmi: adef.cmi config.cmi def.cmi gutil.cmi 
 util.cmi: config.cmi def.cmi num.cmi 
 adef.cmo: adef.cmi 
 adef.cmx: adef.cmi 
@@ -28,14 +28,14 @@ ascend.cmo: adef.cmi buff.cmo config.cmi dag.cmo date.cmi def.cmi gutil.cmi \
     num.cmi perso.cmi util.cmi ../wserver/wserver.cmi 
 ascend.cmx: adef.cmx buff.cmx config.cmi dag.cmx date.cmx def.cmi gutil.cmx \
     num.cmx perso.cmx util.cmx ../wserver/wserver.cmx 
-birthDeath.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi pqueue.cmi \
-    util.cmi ../wserver/wserver.cmi 
-birthDeath.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx pqueue.cmx \
-    util.cmx ../wserver/wserver.cmx 
 birthday.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
     ../wserver/wserver.cmi 
 birthday.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx 
+birthDeath.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi pqueue.cmi \
+    util.cmi ../wserver/wserver.cmi 
+birthDeath.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx pqueue.cmx \
+    util.cmx ../wserver/wserver.cmx 
 calendar.cmo: def.cmi 
 calendar.cmx: def.cmi 
 changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi \
@@ -46,20 +46,20 @@ changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx \
     ../wserver/wserver.cmx 
 check.cmo: adef.cmi def.cmi gutil.cmi mhashtbl.cmo 
 check.cmx: adef.cmx def.cmi gutil.cmx mhashtbl.cmx 
-consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi 
-consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx pqueue.cmx consang.cmi 
 consangAll.cmo: adef.cmi consang.cmi def.cmi gutil.cmi 
 consangAll.cmx: adef.cmx consang.cmx def.cmi gutil.cmx 
+consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi 
+consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx pqueue.cmx consang.cmi 
 cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx birthday.cmx config.cmi date.cmx def.cmi gutil.cmx \
     num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
+dag2html.cmo: dag2html.cmi 
+dag2html.cmx: dag2html.cmi 
 dag.cmo: config.cmi dag2html.cmi date.cmi def.cmi gutil.cmi num.cmi util.cmi \
     ../wserver/wserver.cmi 
 dag.cmx: config.cmi dag2html.cmx date.cmx def.cmi gutil.cmx num.cmx util.cmx \
     ../wserver/wserver.cmx 
-dag2html.cmo: dag2html.cmi 
-dag2html.cmx: dag2html.cmi 
 date.cmo: adef.cmi calendar.cmo config.cmi def.cmi gutil.cmi num.cmi util.cmi \
     ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx num.cmx util.cmx \
@@ -124,10 +124,6 @@ iovalue.cmo: iovalue.cmi
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
-merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi util.cmi \
-    ../wserver/wserver.cmi merge.cmi 
-merge.cmx: adef.cmx config.cmi def.cmi gutil.cmx util.cmx \
-    ../wserver/wserver.cmx merge.cmi 
 mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi mergeFamOk.cmo \
     util.cmi ../wserver/wserver.cmi 
 mergeFam.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx mergeFamOk.cmx \
@@ -148,6 +144,10 @@ mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi merge.cmi \
 mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
     mergeInd.cmx update.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
+merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi util.cmi \
+    ../wserver/wserver.cmi merge.cmi 
+merge.cmx: adef.cmx config.cmi def.cmi gutil.cmx util.cmx \
+    ../wserver/wserver.cmx merge.cmi 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo iobase.cmi lock.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx iobase.cmx lock.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi iobase.cmi \
@@ -172,14 +172,14 @@ place.cmx: adef.cmx config.cmi def.cmi gutil.cmx iobase.cmx util.cmx \
     ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
-relation.cmo: adef.cmi config.cmi consang.cmi dag.cmo dag2html.cmi def.cmi \
-    gutil.cmi num.cmi relationLink.cmo util.cmi ../wserver/wserver.cmi 
-relation.cmx: adef.cmx config.cmi consang.cmx dag.cmx dag2html.cmx def.cmi \
-    gutil.cmx num.cmx relationLink.cmx util.cmx ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi dag.cmo date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
 relationLink.cmx: adef.cmx config.cmi dag.cmx date.cmx def.cmi gutil.cmx \
     num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
+relation.cmo: adef.cmi config.cmi consang.cmi dag.cmo dag2html.cmi def.cmi \
+    gutil.cmi num.cmi relationLink.cmo util.cmi ../wserver/wserver.cmi 
+relation.cmx: adef.cmx config.cmi consang.cmx dag.cmx dag2html.cmx def.cmi \
+    gutil.cmx num.cmx relationLink.cmx util.cmx ../wserver/wserver.cmx 
 robot.cmo: srcfile.cmi util.cmi ../wserver/wserver.cmi 
 robot.cmx: srcfile.cmx util.cmx ../wserver/wserver.cmx 
 select.cmo: adef.cmi def.cmi gutil.cmi name.cmi 
@@ -200,10 +200,6 @@ title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
-update.cmo: adef.cmi calendar.cmo config.cmi date.cmi def.cmi gutil.cmi \
-    iovalue.cmi name.cmi util.cmi ../wserver/wserver.cmi update.cmi 
-update.cmx: adef.cmx calendar.cmx config.cmi date.cmx def.cmi gutil.cmx \
-    iovalue.cmx name.cmx util.cmx ../wserver/wserver.cmx update.cmi 
 updateFam.cmo: adef.cmi config.cmi def.cmi gutil.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi updateFam.cmi 
 updateFam.cmx: adef.cmx config.cmi def.cmi gutil.cmx update.cmx util.cmx \
@@ -222,6 +218,10 @@ updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     lock.cmx name.cmx update.cmx updateInd.cmx util.cmx \
     ../wserver/wserver.cmx updateIndOk.cmi 
+update.cmo: adef.cmi calendar.cmo config.cmi date.cmi def.cmi gutil.cmi \
+    iovalue.cmi name.cmi util.cmi ../wserver/wserver.cmi update.cmi 
+update.cmx: adef.cmx calendar.cmx config.cmi date.cmx def.cmi gutil.cmx \
+    iovalue.cmx name.cmx util.cmx ../wserver/wserver.cmx update.cmi 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
     iobase.cmi lock.cmi name.cmi num.cmi version.cmo ../wserver/wserver.cmi \
     util.cmi 
@@ -231,8 +231,8 @@ util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx \
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
 alln.cmo alln.cmx: pa_html.cmo
 ascend.cmo ascend.cmx: def.syn.cmo pa_html.cmo
-birthDeath.cmo birthDeath.cmx: def.syn.cmo pa_html.cmo
 birthday.cmo birthday.cmx: pa_html.cmo
+birthDeath.cmo birthDeath.cmx: def.syn.cmo pa_html.cmo
 changeChildren.cmo changeChildren.cmx: pa_lock.cmo pa_html.cmo
 cousins.cmo cousins.cmx: pa_html.cmo
 date.cmo date.cmx: pa_html.cmo
@@ -243,24 +243,24 @@ gwc.cmo gwc.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
 history.cmo history.cmx: pa_html.cmo
 iovalue.cmo iovalue.cmx: q_codes.cmo
-merge.cmo merge.cmx: pa_html.cmo
 mergeFam.cmo mergeFam.cmx: pa_html.cmo
 mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
 mergeInd.cmo mergeInd.cmx: pa_html.cmo
 mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
+merge.cmo merge.cmx: pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 notes.cmo notes.cmx: pa_html.cmo
 perso.cmo perso.cmx: pa_html.cmo
 place.cmo place.cmx: pa_html.cmo
-relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
+relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_lock.cmo pa_html.cmo
 some.cmo some.cmx: def.syn.cmo pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 title.cmo title.cmx: def.syn.cmo pa_html.cmo
-update.cmo update.cmx: pa_html.cmo
 updateFam.cmo updateFam.cmx: pa_html.cmo
 updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo pa_html.cmo
 updateInd.cmo updateInd.cmx: pa_html.cmo
 updateIndOk.cmo updateIndOk.cmx: pa_lock.cmo pa_html.cmo
+update.cmo update.cmx: pa_html.cmo
 util.cmo util.cmx: pa_lock.cmo pa_html.cmo
