@@ -4,6 +4,7 @@ de: Willkommen zu GeneWeb $q
 en: Welcome to GeneWeb $q
 es: Bienvenido a GeneWeb $q
 fr: Bienvenue dans GeneWeb $q
+it: Benvenuti su GeneWeb $q
 lv: Sveicinaati GeneWeb $q Ghenealoghijas datu baazee
 sv: VÑlkommen till GeneWeb $q
 ]
@@ -12,6 +13,7 @@ sv: VÑlkommen till GeneWeb $q
 de: Nimm deinen Webbrowser und îffne eine der folgenden Adressen:
 en: Go to your Web browser and open one of the following addresses:
 fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
+it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
 ]
        http://127.0.0.1:$z/
        http://localhost:$z/
@@ -22,6 +24,8 @@ de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses
 en: Warning: for this program to work, you must not close this window!
 fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette
     fenetre!
+it: Attenzione! Per poter navigare nella base, non dovete chiudere questa
+    finestra!
 lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
 sv: Varning: fîr att det hÑr programmet ska fungera, fÜr du inte stÑnga
     detta fînster!
@@ -36,14 +40,18 @@ en: If none of theses addresses work, you may have to configure, in your
     browser, options like "work off-line" or "do not use the proxy for
     local addresses" or "do not connect to Internet for the address
     'localhost'".
-es: Si esto no funciona, es posible que Ud. haya configurado en su 
-    explorador algunas opciones de tipo "trabajar fuera de conecci¢n" 
-    o "no utilizar un proxy con las direcciones locales" o "no conectarse 
+es: Si esto no funciona, es posible que Ud. haya configurado en su
+    explorador algunas opciones de tipo "trabajar fuera de conecci¢n"
+    o "no utilizar un proxy con las direcciones locales" o "no conectarse
     al internet con la direcci¢n 'localhost'".
 fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez Ö
     configurer dans votre navigateur des options du genre "travailler hors
     connexion" ou "ne pas utiliser de proxy pour les adresses locales" ou
     "ne pas se connecter sur internet pour l'adresse 'localhost'".
+it: Se nessuno dei due indirizzi funziona, forse egrave; a causa del fatto
+    che avete configurato nel vostro navigatore un'opzione del genere
+    "lavorare off-line" oppure "non utilizzare il proxy per gli indirizzi
+    locali" o "non collegarsi ad internet per l'indirizzo "localhost".
 lv: Ja pie iepriekshmineetajiem nosaciijumiem Juus nevariet pieklhuut pie
     GeneWeb, Jums iespeejams jaaiestaada savaa Interneta caurluukprogramaa
     sekojo˝i noraadiijumi: "work off-line" vai "do not use the proxy for local
@@ -53,39 +61,4 @@ sv: Om det inte fungerar, kanske du mÜste stÑlla in din webblÑsare
     med optioner som "arbeta off-line" eller "anvÑnd inte en proxyserver
     fîr lokala adresser" eller "anslut inte till Internet fîr adressen
     'localhost'".
-]
-
-[
-de: Wenn du trotz all dieser Anstrengungen keinen Zugriff bekommst,
-    versuche es mit der klassischen Methode, die Dokumentation 
-    anzuschauen. Dazu beende dieses Programm, indem du Control-C 
-    (bzw. Strg-C) in diesem Fenster drÅckst, dann in das Verzeichnis
-    "gw" wechselst und die folgende Datei îffnest:
-en: If despite your efforts, it still does not answer, try the classical
-    procedure by looking at the documentation. For that, stop this program
-    by typing "control-c" in this window, go to the directory "gw" and
-    open the file:
-es: Si a pesar de todos sus esfuerzos, el problema no se resuelve, trate 
-    con  el mÇtodo cl†sico indicado en la documentaci¢n. Para ello salga 
-    del programa escribiendo en el teclado "control-c" (en la ventana que 
-    se hab°a abierto al lanzar el programa), vaya luego a la carpeta "gw" 
-    y habra el fichero:
-fr: Si malgrÇ vos efforts, cela ne rÇpond toujours pas, essayez la procÇdure
-    classique en regardant la documentation. Pour cela arràtez ce programme
-    en tapant "control-c" dans cette fenàtre, allez dans le rÇpertoire "gw"
-    et ouvrez le fichier:
-lv: Ja tomeer tas viss neliidz, meeghiniet kaa parasts skatiit programmas
-    aprakstu: izejiet no shiis programas nospiezhot "ctr-c" pie aktiiva
-    shii loga, aizejiet uz katalogu "gw" un atveriet datni:
-sv: Om det ÑndÜ inte fungerar fast du fîrsîkt pÜ olika sÑtt, fîrsîk med det
-    klassiska att titta i dokumentationen. Fîr att gîra det, stoppa fîrst
-    det hÑr programmet genom att trycka "control-c" i detta fînster, gÜ
-    sedan till katalogen "gw" och îppna filen:
-]
-     INSTALL.htm
-
-[
-en: But you risk to meet the same problem a little bit further...
-fr: Mais... vous risquez de vous retrouver confrontÇ au meme problàme un
-    peu plus loin...
 ]
