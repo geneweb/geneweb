@@ -5,8 +5,7 @@ off-line or as a Web service.
 
 This is the version 1.06.
 
-To compile, you need the Objective Caml compiler, the preprocessor Camlp4,
-and a C compiler.
+To compile, you need the Objective Caml compiler, and the preprocessor Camlp4.
 
 Objective Caml can be found at address:
    http://caml.inria.fr/ocaml/
@@ -40,10 +39,14 @@ copyright notice remains attached.
 
 INSTALLATION:
 
-See the file INSTALL for installation instructions.
+You can compile on Unix or Windows NT machines. See the file INSTALL
+for installation instructions.
 
 BUG REPORTS AND USER FEEDBACK:
 
 Send your bug reports by E-mail to:
 
-          daniel.de_rauglaudre@inria.fr
+	daniel.de_rauglaudre@inria.fr
+
+GeneWeb's home page is at:
+	http://pauillac.inria.fr/~ddr/GeneWeb/
