@@ -1,8 +1,9 @@
-# $Id: a.gwf,v 1.1 1999-04-20 20:13:57 ddr Exp $
+# $Id: a.gwf,v 1.2 1999-06-19 11:33:17 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
 # body_prop=bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900
+# body_prop=bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000
 # body_prop=bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066
 # body_prop=bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633
 # body_prop=bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300
