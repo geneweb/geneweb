@@ -83,7 +83,7 @@ To navigate in this data base, you can do your search:<br><br>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -100,7 +100,7 @@ To navigate in this data base, you can do your search:<br><br>
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

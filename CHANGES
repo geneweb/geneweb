@@ -71,6 +71,11 @@ Thanks to Emmanuelle Visseaux.
     included in the note (what does not respect the standard, shame on
     me).
 
+* Base configuration files (base.gwf)
+  - [Oct 29, 99] Added a variable "propose_titles" (yes by défault). When
+    set to "no", the search by (nobility) titles is not proposed in the
+    welcome page.
+
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [Oct 26, 99] Changed several Portuguese translations (Oscar Filipe de
     Oliveira Barroso).

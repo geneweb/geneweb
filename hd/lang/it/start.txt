@@ -83,7 +83,7 @@ attualmente %n persone.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -100,7 +100,7 @@ attualmente %n persone.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

@@ -83,7 +83,7 @@ Til að lóðsa þig í gegnum gagnagrunninn getur þú leitað:<br><br>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -100,7 +100,7 @@ Til að lóðsa þig í gegnum gagnagrunninn getur þú leitað:<br><br>
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

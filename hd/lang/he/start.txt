@@ -48,7 +48,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -57,7 +57,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <INPUT TYPE=submit value="חפס">
 </FORM>
 
-<li>
+%T<li>
 
 <FORM method=GET action="%f">
 %h כל

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.0 1999-10-29 10:31:36 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.1 1999-10-29 18:04:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -165,7 +165,8 @@ value rec copy_from_channel conf base ic =
           let c = input_char ic in
           if not echo.val then
             match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' -> echo.val := True
+            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' | 'T' ->
+                echo.val := True
             | _ -> () ]
           else
             match c with
@@ -222,6 +223,10 @@ value rec copy_from_channel conf base ic =
             | 'r' -> copy_from_file conf base (input_line ic)
             | 's' -> Wserver.wprint "%s" (commd conf)
             | 't' -> Wserver.wprint "%s" conf.bname
+            | 'T' ->
+                 match p_getenv conf.base_env "propose_titles" with
+                 [ Some "no" -> echo.val := False
+                 | _ -> () ]
             | 'u' ->
                 match Util.find_person_in_env conf base "z" with
                 [ Some _ -> ()

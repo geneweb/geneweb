@@ -84,7 +84,7 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><br>
 </form>
 
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -101,7 +101,7 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><br>
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h
