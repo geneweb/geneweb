@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.5 1998-10-01 15:10:49 ddr Exp $ *)
+(* $Id: update.ml,v 1.6 1998-10-15 09:45:44 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -87,12 +87,23 @@ value update_misc_names_of_family base p =
 ;
 
 value print_someone conf base p =
-  Wserver.wprint "<strong>%s%s %s</strong>" (coa conf (sou base p.first_name))
+  Wserver.wprint "%s%s %s" (coa conf (sou base p.first_name))
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
     (coa conf (sou base p.surname))
 ;
 
 value print_first_name conf base p =
+  Wserver.wprint "%s%s" (coa conf (sou base p.first_name))
+    (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+;
+
+value print_someone_strong conf base p =
+  Wserver.wprint "<strong>%s%s %s</strong>" (coa conf (sou base p.first_name))
+    (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+    (coa conf (sou base p.surname))
+;
+
+value print_first_name_strong conf base p =
   Wserver.wprint "<strong>%s%s</strong>" (coa conf (sou base p.first_name))
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
@@ -127,7 +138,7 @@ value print_error conf base =
            Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
         (fun _ -> Wserver.wprint "</a>.")
   | OwnAncestor p ->
-      do print_someone conf base p;
+      do print_someone_strong conf base p;
          Wserver.wprint "\n%s"
            (transl conf "would be his/her own ancestor");
       return ()
@@ -156,7 +167,7 @@ value print_warning conf base =
   [ BirthAfterDeath p ->
       Wserver.wprint (ftransl conf "%t died before his/her birth")
         (fun _ ->
-           do print_someone conf base p;
+           do print_someone_strong conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
   | ChangedOrderOfChildren fam before ->
@@ -178,8 +189,8 @@ value print_warning conf base =
                 let p = poi base ip in
                 do Wserver.wprint "<li>\n";
                    if p.surname = fath.surname then
-                     print_first_name_ref conf base p
-                   else print_someone_ref conf base p;
+                     print_first_name conf base p
+                   else print_someone conf base p;
                    Date.afficher_dates_courtes conf base p;
                    Wserver.wprint "\n";
                 return ())
@@ -208,15 +219,15 @@ value print_warning conf base =
            (fcapitale
                (ftransl conf
                   "the following children of %t and %t are not in order"))
-           (fun _ -> print_someone conf base (poi base cpl.father))
-           (fun _ -> print_someone conf base (poi base cpl.mother));
+           (fun _ -> print_someone_strong conf base (poi base cpl.father))
+           (fun _ -> print_someone_strong conf base (poi base cpl.mother));
          Wserver.wprint ":\n";
          Wserver.wprint "<ul>";
          Wserver.wprint "\n<li>\n";
-         print_first_name conf base elder;
+         print_first_name_strong conf base elder;
          Date.afficher_dates_courtes conf base elder;
          Wserver.wprint "\n<li>\n";
-         print_first_name conf base x;
+         print_first_name_strong conf base x;
          Date.afficher_dates_courtes conf base x;
          Wserver.wprint "</ul>";
       return ()
@@ -225,46 +236,46 @@ value print_warning conf base =
         (ftransl conf
     "%t is born more than 2 years after the death of his/her father %t")
         (fun _ ->
-           do print_someone conf base child;
+           do print_someone_strong conf base child;
               Date.afficher_dates_courtes conf base child;
            return ())
         (fun _ ->
-           do print_someone conf base father;
+           do print_someone_strong conf base father;
               Date.afficher_dates_courtes conf base father;
            return ())
   | MarriageDateAfterDeath p ->
       Wserver.wprint
         (fcapitale (ftransl conf "marriage of %t after his/her death"))
         (fun _ ->
-           do print_someone conf base p;
+           do print_someone_strong conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
   | MarriageDateBeforeBirth p ->
       Wserver.wprint
         (fcapitale (ftransl conf "marriage of %t before his/her birth"))
         (fun _ ->
-           do print_someone conf base p;
+           do print_someone_strong conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
   | MotherDeadAfterChildBirth mother child ->
       Wserver.wprint
         (ftransl conf "%t is born after the death of his/her mother %t")
         (fun _ ->
-           do print_someone conf base child;
+           do print_someone_strong conf base child;
               Date.afficher_dates_courtes conf base child;
            return ())
         (fun _ ->
-           do print_someone conf base mother;
+           do print_someone_strong conf base mother;
               Date.afficher_dates_courtes conf base mother;
            return ())
   | ParentBornAfterChild p c ->
-      do print_someone conf base p;
+      do print_someone_strong conf base p;
          Wserver.wprint "\n%s\n"
            (transl conf "is born after his/her child");
-         print_someone conf base c;
+         print_someone_strong conf base c;
       return ()
   | ParentTooYoung p a ->
-      do print_someone conf base p;
+      do print_someone_strong conf base p;
          Wserver.wprint "\n%s\n" (transl conf "is a very young parent");
          Wserver.wprint "(";
          Date.print_age conf a;
@@ -274,7 +285,7 @@ value print_warning conf base =
       Wserver.wprint
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
         (fun _ ->
-           do print_someone conf base p;
+           do print_someone_strong conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
         (fun _ ->
@@ -288,7 +299,7 @@ value print_warning conf base =
               [ Some d -> string_of_int (annee d)
               | _ -> "" ]))
   | YoungForMarriage p a ->
-      do print_someone conf base p;
+      do print_someone_strong conf base p;
          Wserver.wprint "\n";
          Wserver.wprint (ftransl conf "married at age %t")
            (fun _ -> Date.print_age conf a);
