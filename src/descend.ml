@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 1.9 1999-02-12 12:37:01 ddr Exp $ *)
+(* $Id: descend.ml,v 2.1 1999-03-08 11:18:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;

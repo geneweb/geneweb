@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 1.4 1999-02-12 12:36:59 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 2.1 1999-03-08 11:18:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;

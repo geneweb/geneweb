@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.15 1999-03-04 12:36:52 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.1 1999-03-08 11:18:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;

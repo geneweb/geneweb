@@ -1,4 +1,4 @@
-(* $Id: family.mli,v 1.2 1999-02-02 10:24:08 ddr Exp $ *)
+(* $Id: family.mli,v 2.1 1999-03-08 11:18:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value family : Config.config -> Def.base -> unit;

@@ -1,4 +1,4 @@
-(* $Id: lock.ml,v 1.3 1999-02-02 10:24:17 ddr Exp $ *)
+(* $Id: lock.ml,v 2.1 1999-03-08 11:18:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];

@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 1.5 1999-02-13 21:55:09 ddr Exp $ *)
+(* $Id: wserver.mli,v 2.1 1999-03-08 11:19:45 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
