@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.48 2000-01-10 02:14:23 ddr Exp $
+# $Id: lexicon.txt,v 3.49 2000-01-13 13:10:24 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2844,6 +2844,22 @@ no: liste
 pt: lista
 se: lista
 
+    living
+de: nicht verstorben
+dk: ikke d&oslash;d
+en: living
+eo: no morta
+es: no fallecido/no fallecida/no fallecido(a)
+fi: ei kuollut
+fr: vivant/vivante/vivant(e)
+he:  ìà îú
+is: ekki látin(n)
+it: non deceduto/non deceduta/non deceduto(a)
+nl: niet overleden
+no: ikke d&oslash;d
+pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
+se: inte d&ouml;d
+
     long display
 cs: dlouhý seznam
 de: Lange Ansicht
@@ -3267,22 +3283,6 @@ nl: niets gevonden
 no: ingen treff
 pt: nenhuma resposta
 se: inga tr&auml;ffar
-
-    not dead
-de: nicht verstorben
-dk: ikke d&oslash;d
-en: not dead
-eo: no morta
-es: no fallecido/no fallecida/no fallecido(a)
-fi: ei kuollut
-fr: non d&eacute;c&eacute;d&eacute;/non d&eacute;c&eacute;d&eacute;e/non d&eacute;c&eacute;d&eacute;(e)
-he:  ìà îú
-is: ekki látin(n)
-it: non deceduto/non deceduta/non deceduto(a)
-nl: niet overleden
-no: ikke d&oslash;d
-pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
-se: inte d&ouml;d
 
     not divorced
 cs: nerozveden/nerozvedená
