@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 3.1 1999-11-10 08:44:28 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 3.2 1999-12-04 06:10:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Gutil;
@@ -60,7 +60,8 @@ value most_desc base p =
        end)
   in
   let _ = base.data.persons.array () in
-  let _ = base.data.families.array () in
+  let _ = base.data.descends.array () in
+  let _ = base.data.unions.array () in
   let tab = Array.create base.data.persons.len Num.zero in
   let entered = Array.create base.data.persons.len False in
   let q = ref Pq.empty in
