@@ -5,6 +5,7 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [16 Mar 00] Added "zur" as particle.
   - [16 Mar 00] Improved the inferring of origin_file field when updating
     a family. Now searches also among other marriages.
   - [05 Mar 00] Changed images request, because it was possible to display

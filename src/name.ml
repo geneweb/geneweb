@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 3.1 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: name.ml,v 3.2 2000-03-16 19:39:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Name.lower *)
@@ -51,7 +51,8 @@ value lower s =
 value abbrev_list =
   [("a", None); ("af", None); ("d", None); ("de", None); ("di", None);
    ("ier", Some "i"); ("of", None); ("saint", Some "st");
-   ("sainte", Some "ste"); ("van", None); ("von", None); ("zu", None)]
+   ("sainte", Some "ste"); ("van", None); ("von", None); ("zu", None);
+   ("zur", None)]
 ;
 
 value rec is_word s i p ip =
