@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.13 2005-02-12 02:34:32 ddr Exp $ *)
+(* $Id: alln.ml,v 4.14 2005-02-13 10:45:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -132,7 +132,7 @@ value new_name_key base s =
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 ;
 
-value name_key_if_not_utf8 base s =
+value name_key_compatible base s =
   if Gutil.utf_8_db.val then new_name_key base s else Iobase.name_key s
 ;
 
@@ -186,7 +186,7 @@ value print_alphabetic_big conf base is_surnames ini list len =
       List.iter
         (fun (ini_k, _) ->
            stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
-	     (Util.code_varenv ini_k)
+             (Util.code_varenv ini_k)
            begin
              Wserver.wprint "%s" (tr '_' "&nbsp;" (displayify ini_k));
            end)
@@ -336,11 +336,23 @@ value select_names conf base is_surnames ini =
     [ Some istr ->
         loop istr [] where rec loop istr list =
           let s = nominative (sou base istr) in
-          let k = name_key_if_not_utf8 base s in
+          let k = name_key_compatible base s in
           if string_start_with ini k then
             let list =
               if s <> "?" then
                 let my_list = iii.find istr in
+                let my_list =
+                  List.fold_left
+                    (fun l ip ->
+                       if base.func.is_patched_person ip then
+                         let p = poi base ip in
+                         let isn =
+                           if is_surnames then p.surname else p.first_name
+                         in
+                         if isn = istr then [ip :: l] else l
+                       else [ip :: l])
+                    [] my_list
+                in
                 let my_list =
                   if conf.use_restrict then
                     List.fold_left
@@ -349,7 +361,7 @@ value select_names conf base is_surnames ini =
                          else [ip :: l])
                       [] my_list
                   else my_list
-                in
+                in 
                 let cnt = List.length my_list in
                 if cnt = 0 then list
                 else

@@ -1,10 +1,5 @@
 NOT FIXED
 
-[11 Feb 2005] Bug in version 5.00-exp
-  Surnames and first names by alphabetic order do not work for deleted or
-  renamed persons (the index is not updated). This bug probably still existed
-  in previous versions. Urgency 4/5.
-
 [08 Feb 2005] Since version 5.00-exp
   Some variables in perso.txt do not work in all cases. Due to rewritting of
   code to make it cleaner. Cases to be checked. Urgency 3/5.
@@ -16,6 +11,10 @@ NOT FIXED
   experimented, it is just supposed. Urgency 1/5.
 
 FIXED
+
+[13 Feb 2005] Bug found in version 5.00-exp; existed probably before
+  Surnames and first names by alphabetic order do not work for deleted or
+  renamed persons (the index is not updated).
 
 [12 Feb 2005] Bug appeared in version 4.10
   gwc do not set the sex of isolated "relation" (godparents, etc.) Due
