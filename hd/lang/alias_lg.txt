@@ -1,2 +1,4 @@
+ca=ct
 sv=se
 zh=cn
+pt-br=br
