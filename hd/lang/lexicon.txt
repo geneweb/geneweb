@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.188 2000-11-21 15:58:15 ddr Exp $
+# $Id: lexicon.txt,v 3.189 2000-11-22 15:08:51 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -284,6 +284,7 @@ de: %t's Geschlecht stimmt nicht überein mit ihren/seinen Beziehungen
 dk: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
 en: %t's sex is not coherent with his/her relations
 eo: la sekso de %t ne koheras kun siaj rilatoj
+es: el gיnero de %t es incoherente con sus relaciones
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 pt: o sexo de %t nדo י coerente com suas relaחץes
 se: %ts kצn stהmmer inte צverens med sina relationer
@@ -2408,6 +2409,7 @@ de: verlobt
 dk: forlovet
 en: engaged
 eo: gefiancxigintaj
+es: comprometidos
 fi: kihloissa
 fr: fianc&eacute;s
 he:  מאורסים
@@ -2423,6 +2425,7 @@ de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
 eo: fiancxigita%t kun/fiancxinigita%t kun
+es: comprometido%t con/comprometida%t con
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 he:   התארס  %t עם/ התארסה  %t עם
@@ -2779,6 +2782,7 @@ de: Pflegevater/Pflegemutter/Pflegeeltern
 dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
 eo: nutrinta patro/nutrinta patrino/nutrintaj gepatroj
+es: padre adoptivo/madre adoptiva/padres adoptivos
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   אב חורג/ אם חורגת/ הורים חורגים
@@ -2795,6 +2799,7 @@ de: Pflegesohn/Pflegetochter/Pflegekind
 dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
 eo: nutrita filo/nutrita filino/nutrita ido
+es: hijo adoptivo/hija adoptiva
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 he:  בן חורג/ בת חורגת/ ילד חורג
@@ -3026,6 +3031,7 @@ de: horizontal
 dk: vandret
 en: horizontally
 eo: horizontale
+es: horizontal
 fi: vaakasuoraan
 fr: horizontalement
 he:  אופקי
@@ -3577,6 +3583,7 @@ de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
 dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
 eo: estas masxo en la datenbazo: %s estas sia propra avo
+es: bucle en la base de datos: %s es su propio ancestro
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 nl: loop in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
@@ -3803,6 +3810,7 @@ de: Nachricht hinzugefügt
 dk: meddelelse tilf&oslash;jet
 en: message added
 eo: almetita mesagxo
+es: mensaje agregado
 fr: message ajout&eacute;
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
@@ -3814,6 +3822,7 @@ de: Nachricht/nהchste Nachricht
 dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
 eo: mesagxo/sekvanta mesagxo
+es: mensaje/siguiente mensaje
 fr: message/message suivant
 nl: bericht/volgend bericht
 no: melding/neste melding
@@ -4537,6 +4546,7 @@ de: optional
 dk: efter behag
 en: optional
 eo: nedeviga
+es: opcional
 fi: valittavissa
 fr: facultatif
 he:  על פי בחירה
@@ -4735,6 +4745,7 @@ de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
 eo: precizeco
+es: precisiףn
 fi: tarkennus
 fr: pr&eacute;cision
 he:  דייוק
@@ -4852,6 +4863,7 @@ de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
 eo: agnoskita filo/agnoskita filino/agnoskita ido
+es: hijo reconocido/hija reconocida/hijos reconocidos
 fi: tunnustettu poika/tunnustettu tyt&auml;r/tunnustettu lapsi
 fr: fils reconnu/fille reconnue/enfant reconnu
 he:  בן ידוע/ בת ידועה/ ילד ידוע
@@ -4870,6 +4882,7 @@ de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 eo: agnoskinta patro/agnoskinta patrino/agnoskintaj gepatroj
+es: padre reconocido/madre reconocida/padres reconocidos
 fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 he:   אב מכיר / אם מכירה / הורים מכירים
@@ -5086,6 +5099,7 @@ de: getrennt lebend
 dk: separeret
 en: separated
 eo: apartigitaj
+es: separados
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
 he:  נפרדו
@@ -5162,6 +5176,7 @@ de: k&uuml;rzester Pfad
 dk: korteste vej
 en: shortest path
 eo: vojo plej mallonga
+es: atajo
 fi: lyhin polku
 fr: chemin le plus court
 he:   קשר הכי קרוב  
@@ -5358,6 +5373,7 @@ de: Statistiken
 dk: statistikker
 en: statistics
 eo: statistikoj
+es: estadםsticas
 fi: tilastotietoja
 fr: statistiques
 he:  נתונים סטטיסטים
@@ -5373,6 +5389,7 @@ de: Betreff
 dk: emne
 en: subject
 eo: objekto
+es: asunto
 fr: sujet
 nl: onderwerp
 no: emne
@@ -5465,6 +5482,7 @@ de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
 eo: listo de la familiaj nomoj
+es: lista de apellidos
 fi: sukunimiluettelo
 fr: liste &eacute;clair
 he:  רשימת שמות משפחה
