@@ -3,9 +3,11 @@ GeneWeb version 4.05
 
 * GeneWeb server or CGI (gwd)
   - [24 Feb 02] Fixed problem of wizard and friend connections under
-    CGI mode: in some kind of internet connections, the origin internet
+    CGI mode which sometimes did not work. Technical features: it was due
+    to the fact that in kind of internet connections, the origin internet
     address can change for the same user, resulting on no more wizard or
     friend connection. Now the origin internet address is no more checked,
+    only the given token is.
     only the given token is.
   - [24 Feb 02] Fixed the problem of "disconnection" when (typically)
     inserting children in a family. Seemed to happen more and more often
