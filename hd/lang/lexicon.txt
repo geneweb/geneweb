@@ -1636,6 +1636,7 @@ es: navegaci&oacute;n con %t como referencia de Sosa
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
 it: percorso con %t come riferimento Sosa
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
+se: navigering med %t som Sosa referens
 
     no anniversary
 de: kein Jahrestag
@@ -2031,8 +2032,13 @@ pt: privado
 se: privat
 
     probable loop in base
+de: wahrscheinliche Schleife in der Datenbank: jemand ist his/her eigener Vorfahr
 en: probable loop in database: someone being his/her own ancestor
+es: bucle probable en base de datos: alguien es su propio antepasado
 fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
+it: ciclo probabile nella base di dati: qualcuno &egrave; il suo proprio antenato
+pt: la&ccedil;o prov&aacute;vel na base de dados: algu&eacute;m &eacute; his/her pr&oacute;prio antepassado
+se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r hans/hennes egen sl&auml;kting
 
     public
 de: &ouml;ffentlich
@@ -2139,17 +2145,6 @@ it: sesso
 nl: geslacht
 pt: sexo
 se: k&ouml;n
-
-    shared by
-de: geteilt mit
-en: shared by
-eo: dividita por
-es: compartidos por
-fr: port&eacute;s par
-it: condiviso da
-nl: gedeeld door
-pt: compartidos por
-se: delad med
 
     should be of sex feminine
 de: m&uuml;&szlig;te weiblichen Geschlechts sein
