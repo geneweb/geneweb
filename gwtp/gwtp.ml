@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.17 2002-02-14 10:19:37 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.18 2003-01-05 17:45:55 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -604,6 +604,10 @@ value copy_temp b =
       if Sys.file_exists old_forum then
         sys_copy old_forum (Filename.concat bdir "forum")
       else ();
+      let old_wiznotes = Filename.concat dir_old_gwb "wiznotes" in
+      if Sys.file_exists old_wiznotes then
+        Sys.rename old_wiznotes (Filename.concat bdir "wiznotes")
+      else ()
     }
     else ();
     Sys.rename bdir dir_gwb;

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.53 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.54 2003-01-05 17:42:17 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1488,11 +1488,9 @@ value main () =
       " [options] where options are:"
     in
     let speclist =
-      [("-hd",
-        Arg.String (fun x -> Util.lang_path.val := [x :: Util.lang_path.val]),
+      [("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
-       ("-dd",
-        Arg.String (fun x -> Util.doc_path.val := [x :: Util.doc_path.val]),
+       ("-dd", Arg.String Util.add_doc_path,
         "<dir>\n       Directory where the documentation is installed.");
        ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
         "<dir>\n       Directory where the databases are installed.");
@@ -1589,9 +1587,9 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
       in
       Util.images_url.val := "file://" ^ slashify abs_dir
     else ();
-    if Util.doc_path.val = [] then
-      Util.doc_path.val :=
-        List.map (fun d -> Filename.concat d "doc") Util.lang_path.val
+    if Secure.doc_path () = [] then
+      List.iter (fun d -> Util.add_doc_path (Filename.concat d "doc"))
+        (List.rev (Secure.lang_path ()))
     else ();
     if Util.cnt_dir.val = "" then Util.cnt_dir.val := Util.base_dir.val
     else ();
