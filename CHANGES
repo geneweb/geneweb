@@ -2,6 +2,8 @@ GeneWeb Version 2.01
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Mar 17, 99] Added an optional automatic choice for the "death state" in
+    "modify person" forms. Makes the updating simpler to use.
   - [Mar 16, 99] The presence of images in pages does not block any
     more the display of the text. For example, in welcome pages, the text
     does not wait for the displaying of the flags to be displayed, which
@@ -19,6 +21,11 @@ GeneWeb Version 2.01
 
 * Lexicon (lexicon.txt) and Welcome files (xx/start.txt)
   - [Mar 10, 99] Some changes in Italian version (by Raffaele Sena).
+
+* Documentation
+  - [Mar 17, 99] Changed documentation for the "automatic choice" for the
+    "death state", file "update.htm", section 5.4 "modify a person",
+    paragraph "Death".
 
 GeneWeb Version 2.00
 --------------------

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.1 1999-03-08 11:19:17 ddr Exp $ *)
+(* $Id: update.ml,v 2.2 1999-03-17 14:11:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -20,6 +20,16 @@ value rec find_free_occ base f s i =
   with
   [ Some _ -> find_free_occ base f s (i + 1)
   | None -> i ]
+;
+
+value death_supposition conf birth =
+  match birth with
+  [ Some d ->
+      let a = Gutil.annee (Gutil.temps_ecoule d conf.today) in
+      if a > 120 then DeadDontKnowWhen
+      else if a <= 80 then NotDead
+      else DontKnowIfDead
+  | None -> DontKnowIfDead ]
 ;
 
 value print_same_name conf base p =
