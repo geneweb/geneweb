@@ -9,7 +9,7 @@ extensible. But it cannot be visible in browsers like Lynx which does
 not treat tables. Moreover the lines cannot cross: to resolve this
 problem, nodes are sometimes duplicated.
 
-This is the version 1.01.
+This is the version 1.02.
 
 To compile, you need the Objective Caml compiler, and the preprocessor
 Camlp4.
@@ -51,6 +51,3 @@ http://pauillac.inria.fr/~ddr/
 BUG REPORTS AND USER FEEDBACK:
 
 Send your bug reports by E-mail to the author above.
-
-The home page of dag2html is at:
-	http://pauillac.inria.fr/~ddr/dag2html/
