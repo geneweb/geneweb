@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo *)
-(* $Id: birth.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
+(* $Id: birth.ml,v 1.2 1998-10-12 13:26:55 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -67,21 +67,21 @@ value print conf base =
     Wserver.wprint (fcapitale (ftransl conf "the last %d births")) len.val
   in
   do header conf title;
-     Wserver.wprint "<ul>\n";
      for i = 0 to Array.length tab - 1 do
        match tab.(i) with
        [ Some (p, d) ->
-           do Wserver.wprint "<p><li><strong>\n";
-              afficher_personne_referencee conf base p;
-              Wserver.wprint "</strong>,\n";
-              Wserver.wprint "%s <em>%s</em>.\n"
-                (transl_nth conf "born" (index_of_sex p.sexe))
-                (Date.string_of_ondate conf d);
-              Wserver.wprint "<p>\n";
+           do if i > 0 then Wserver.wprint "<p>\n" else ();
+              tag "ul" begin
+                Wserver.wprint "<li><strong>\n";
+                afficher_personne_referencee conf base p;
+                Wserver.wprint "</strong>,\n";
+                Wserver.wprint "%s <em>%s</em>.\n"
+                  (transl_nth conf "born" (index_of_sex p.sexe))
+                  (Date.string_of_ondate conf d);
+              end;
            return ()
        | None -> () ];
      done;
-     Wserver.wprint "</ul>\n";
      trailer conf;
   return ()
 ;
