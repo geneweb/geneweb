@@ -37,6 +37,12 @@ GeneWeb version 4.08
     selection "include spouses" was not reported when trying the
     next path.
 
+* Lexicon (lang/lexicon.txt)
+  - [25 Nov 02] Changed entries "the father-in-law/the mother-in-law" and
+    "a son-in-law/a daughter-in-law": now the entries can have 4 values
+    to separate the cases when they are 1/ "of a man" 2/ "of a woman",
+    some languages (e.g. Bulgarian) making the distinction.
+
 * Gedcom to GeneWeb (ged2gwb) and GeneWeb to Gedcom (gwb2ged)
   - [14 Nov 02] Fixed bug: relation date and place of unmaried persons
     were not imported.
