@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.18 1999-07-29 18:39:59 ddr Exp $ *)
+(* $Id: update.ml,v 2.19 1999-07-29 19:05:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -740,8 +740,6 @@ value print_family_stuff conf base p a =
          Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a>\n"
            (commd conf) (Adef.int_of_iper p.cle_index)
            (capitale (transl_decline conf "add" s));
-         Wserver.wprint "<em>= %s</em>\n"
-           (transl conf "creation of a new family");
       return ();
   end
 ;
@@ -820,8 +818,6 @@ value print conf base p =
               Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a>\n"
                 (commd conf) (Adef.int_of_iper p.cle_index)
                 (capitale (transl_decline conf "add" s));
-              Wserver.wprint "<em>= %s</em>\n"
-                (transl conf "creation of a new family");
               Wserver.wprint "</ul>\n";
            return () ];
      Wserver.wprint "\n";
@@ -834,6 +830,15 @@ value print conf base p =
          Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
        end;
      end;
+     if Array.length p.family > 0 then
+       do Wserver.wprint
+            (fcapitale (ftransl conf "to add a child to a family, use \"%s\""))
+            (capitale
+               (transl_decline conf "modify"
+                  (transl_nth conf "family/families" 0)));
+          Wserver.wprint ".\n";
+       return ()
+     else ();
      trailer conf;
   return ()
 ;
