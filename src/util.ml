@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.100 2004-12-26 21:48:28 ddr Exp $ *)
+(* $Id: util.ml,v 4.101 2004-12-27 14:29:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1094,7 +1094,12 @@ value include_hed_trl conf base_opt suff =
         [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
         | None -> "" ]
       in
-      copy_from_etc [('p', pref); ('s', suff); ('t', fun _ -> commd conf)]
+      copy_from_etc
+        [('p', pref); ('s', suff); ('t', fun _ -> commd conf);
+         ('/',
+          fun _ ->
+            try List.assoc "xhtml_slash" conf.base_env with
+            [ Not_found -> "" ])]
         conf.lang conf.indep_command ic
   | None -> () ]
 ;
@@ -1382,7 +1387,10 @@ value gen_trailer with_logo conf =
           else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>"
         in
         if not conf.setup_link then s
-        else s ^ " - " ^ setup_link conf)]
+        else s ^ " - " ^ setup_link conf);
+     ('/',
+      fun _ ->
+        try List.assoc "xhtml_slash" conf.base_env with [ Not_found -> "" ])]
   in
   do {
     if not with_logo then ()

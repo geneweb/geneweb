@@ -1,5 +1,5 @@
 
-<p><hr><div style="font-size: 80%%"><em>[
+<hr%/><div style="font-size: 80%%"><em>[
 de: Seite angezeigt von
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
 en: Page displayed by

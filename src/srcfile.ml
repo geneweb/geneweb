@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.24 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.25 2004-12-27 14:29:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -265,6 +265,7 @@ value macro conf base =
       else ""
   | 'v' -> Version.txt
   | 'w' -> let s = Util.link_to_referer conf in if s = "" then "&nbsp;" else s
+  | '/' -> try List.assoc "xhtml_slash" conf.base_env with [ Not_found -> "" ]
   | c -> "%" ^ String.make 1 c ]
 ;
 

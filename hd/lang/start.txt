@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.62 2004-12-27 06:45:18 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.63 2004-12-27 14:29:56 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -30,9 +30,9 @@ ru: Genealogy
 sl: Genealogija - Druѕinsko drevo
 sv: Genealogi
 ] - %t</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=%e">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <meta name="ROBOTS" content="NONE">
+  <meta http-equiv="Content-Type" content="text/html; charset=%e"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="ROBOTS" content="NONE"%/>
   <style type="text/css"><!--
     span.highlight { color: %i; font-weight: bold }
   --></style>
@@ -40,20 +40,21 @@ sv: Genealogi
 <body%b>
 
 <div style="text-align: center">
-<table border=0 width="100%%">
-<tr align=left>
-<td rowspan=2 style="width: 20%%">
-<a href="http://www.geneweb.org/"><img width=96
-height=108 src="%o/gwlogo.png" style="align: %L; border: 0" alt=GeneWeb></a>
+<table border="0" width="100%%">
+<tr align="left">
+<td rowspan="2" style="width: 20%%">
+<a href="http://www.geneweb.org/"><img width="96" height="108"
+ src="%o/gwlogo.png" style="align: %L; border: 0" alt="GeneWeb"%/></a>
 </td>
-%I&wNf<td align=%R
-valign=top><em>([wizard/wizards/friend/friends]0%U)</em></td>
-%E%I&fNw<td align=%R
-valign=top><em>([wizard/wizards/friend/friends]2)</em></td>
-%E<td align=%R valign=top style="width: 16px">%w</td>
+%I&wNf<td align="%R"
+valign="top"><em>([wizard/wizards/friend/friends]0%U)</em></td>
+%E%I&fNw<td align="%R"
+valign="top"><em>([wizard/wizards/friend/friends]2)</em></td>
+%E<td align="%R" valign="top" style="width: 16px">%w</td>
 </tr><tr>
-<td align=center colspan=%I|&wNf&fNw2%E%I&|Nwf|Nfw1%E>
-<table border=0><tr align=center><td align=center><h1><span style="color: %i">[
+<td align="center" colspan="%I|&wNf&fNw2%E%I&|Nwf|Nfw1%E">
+<table border="0">
+<tr align="center"><td align="center"><h1><span style="color: %i">[
 af: Genealogiese databasis
 bg: Родословна база от данни
 br: Bon roadoщ genealogiezh
@@ -80,12 +81,12 @@ ru: Генеaлогическая база данных
 sl: Genealo№ka baza podatkov
 sv: Genealogisk databas
 zh: НшВзјТЖЧ
-]</span></h1></table>
+]</span></h1></td></tr></table>
 </td>
 </tr>
 </table>
 
-<br>
+<br%/>
 
 <span style="font-size: 80%%"><em>[
 af: Taalvoorkeur/Language preference:
@@ -115,13 +116,13 @@ sl: Lahko izberete drug jezik:
 sv: Du kan vдlja ett annat sprеk bland de fцljande:
 ]</em></span>
 
-<br>
+<br%/>
 
 %rversion
 
-%Vmotd;<p>
+%Vmotd;
 
-[
+<p>[
 af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
 bg: Базата от данни <span class="highlight">"%t"</span> в момента съдържа
     сведения за %n души.
@@ -167,102 +168,102 @@ sl: Baza podatkov <span class="highlight">"%t"</span> vsebuje %n oseb.
 sv: Databasen <span class="highlight">"%t"</span> inneh&aring;ller nu
     %n personer.
 zh: ПЦУР %n ИЛФЪКэѕЭївЦРЎЈ
-]%In<br>
+]%In<br%/>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
-%I&|pwizard_passwd_file;pwizard_descr_file;|wo<br>
+%I&|pwizard_passwd_file;pwizard_descr_file;|wo<br%/>
 (<a href="%sm=WIZNOTES">[wizard/wizards/friend/friends]1/[note/notes]1</a>)%E
-%E
+%E</p>
 
-%I&NwNj<br><p>
+%I&NwNj<br%/><p>
 
-%I&NcNa<table border=0 width="70%">
-<tr align=left>
+%I&NcNa<table border="0" width="70%">
+<tr align="left">
 
-<td align=center>[
-af: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br>
+<td align="center">[
+af: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
     (password)
 bg: Достъп като
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (парола)
 br: mont e-barzh evel
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (ger-tremen)
 ca: acc&eacute;s
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (clau)
 cs: <a href="%sw=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
-    pшнstup<br> (heslo)
-da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
-de: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br>
+    pшнstup<br%/> (heslo)
+da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
+de: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br%/>
     (Passwort)
-en: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br>
+en: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
     (password)
-eo: <a href="%sw=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br>
+eo: <a href="%sw=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (pasvorto)
-es: <a href="%sw=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br>
+es: <a href="%sw=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (contrase&ntilde;a)
 et: Ligipддs
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br> (parool)
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
 fi: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
-    kirjautuminen<br> (salasana)
+    kirjautuminen<br%/> (salasana)
 fr: acc&egrave;s
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (mot de passe).
 he: лрйсд  <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>
-is: <a href="%sw=w"><em>Uppfжrslu</em></a> aрgangur<br> (aрgangsorр)
-it: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br>
+is: <a href="%sw=w"><em>Uppfжrslu</em></a> aрgangur<br%/> (aрgangsorр)
+it: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
     (password)
-lv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br>
+lv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
     (password)
 nl: Toegang als
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (wachtwoord)
-no: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br>
+no: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br%/>
     (passord)
-pl: <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostкp<br>
+pl: <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostкp<br%/>
     (hasіo)
-pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (palavra chave)
 ro: Acces pentru
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (parola)
 sl: Urejanje kot
     <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a>
     (geslo)
 sv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
-    tilltr&auml;de<br> (passord)
-]<br></td>
+    tilltr&auml;de<br%/> (passord)
+]<br%/></td>
 
-%INf<td align=center>[
-af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
-bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br> (парола)
-br: mont e-barzh evel <a href="%sw=f"><em>mignon</em></a><br> (ger-tremen)
-ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
-cs: <a href="%sw=f">{<em>"Friend"</em></a> pшнstup<br> (heslo)
-da: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
-de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br> (Passwort)
-en: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
-eo: <a href="%sw=f">Aliro <em>amiko</em></a><br> (pasvorto)
-es: <a href="%sw=f">Entrada <em>amigo</em></a><br> (contrase&ntilde;a)
-et: Ligipддs <a href="%sw=f"><em>sхbrana</em></a><br> (parool)
-fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br> (salasana)
-fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br> (mot de passe).
+%INf<td align="center">[
+af: <a href="%sw=f"><em>Vriend</em></a> toegang<br%/> (password)
+bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br%/> (парола)
+br: mont e-barzh evel <a href="%sw=f"><em>mignon</em></a><br%/> (ger-tremen)
+ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br%/> (clau)
+cs: <a href="%sw=f">{<em>"Friend"</em></a> pшнstup<br%/> (heslo)
+da: <a href="%sw=f"><em>Betroet adgang</em></a><br%/> (adgangskode)
+de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br%/> (Passwort)
+en: <a href="%sw=f"><em>Friend</em></a> access<br%/> (password)
+eo: <a href="%sw=f">Aliro <em>amiko</em></a><br%/> (pasvorto)
+es: <a href="%sw=f">Entrada <em>amigo</em></a><br%/> (contrase&ntilde;a)
+et: Ligipддs <a href="%sw=f"><em>sхbrana</em></a><br%/> (parool)
+fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br%/> (salasana)
+fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br%/> (mot de passe).
 he: лрйсд<a href="%sw=f"><em> ойезсъ </em></a>
-is: <a href="%sw=f"><em>Vina</em></a> aрgangur<br> (aрgangsorр)
-it: <a href="%sw=f"><em>amico</em></a> access<br> (password)
-lv: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
-nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br> (wachtwoord)
-no: <a href="%sw=f"><em>Venners</em></a> adgang<br> (passord)
-pl: <a href="%sw=f"><em>"Friend"</em></a> dostкp<br> (hasіo)
-pt: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
-ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br> (parola)
-sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br> (geslo)
-sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br> (passord)
+is: <a href="%sw=f"><em>Vina</em></a> aрgangur<br%/> (aрgangsorр)
+it: <a href="%sw=f"><em>amico</em></a> access<br%/> (password)
+lv: <a href="%sw=f"><em>Friend</em></a> access<br%/> (password)
+nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br%/> (wachtwoord)
+no: <a href="%sw=f"><em>Venners</em></a> adgang<br%/> (passord)
+pl: <a href="%sw=f"><em>"Friend"</em></a> dostкp<br%/> (hasіo)
+pt: Entrada <a href="%sw=f"><em>amigo</em></a><br%/> (palavra chave)
+ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br%/> (parola)
+sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br%/> (geslo)
+sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
 ]</td>
 
-%E</tr></table>%E%I|ca<table border=0>
-<tr align=left><td align=center>
-<form method=POST action="%f">
+%E</tr></table>%E%I|ca<table border="0">
+<tr align="left"><td align="center">
+<form method="post" action="%f">
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
@@ -290,19 +291,18 @@ ro: Parola, pentru acces de <em>amic</em> sau <em>magician</em>:
 sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
     tilltr&auml;de:
 ]
-<input name=w type=password size=10 maxlength=200>
-<input type=submit value="Ok">
+<input name="w" type="password" size="10" maxlength="200"%/>
+<input type="submit" value="Ok"%/>
 </form>
 </td></tr>
 </table>
 
-%E%E<br><p>
+%E%E
 
-<table border=0 cellspacing=0 cellpadding=0 style="width: 100%%">
+<table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
 
-<tr align=left><td>
-<table style="margin-left: auto; margin-right: auto" border=0
- cellspacing=0 cellpadding=0><tr><td>
+<tr align="left"><td>
+<table style="margin:auto" border="0" cellspacing="0" cellpadding="0"><tr><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 bg: Можете да използвате тази база от данни за търсене:
@@ -331,14 +331,15 @@ ru: Чтобы найти в этой базе данных, Вы можете искать:
 sl: Da bi pregledali va№o bazo podatkov, lahko i№иete:
 sv: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 zh:
-]<br><p>
+]<br%/>
 
 <ul>
 
 <li>
 
-<form method=GET action="%f"><p>
-%h<input type=hidden name=m value=NG>
+<form method="get" action="%f">
+<p>
+%h<input type="hidden" name="m" value="NG"%/>
 <span class="highlight">[
 af: per persoon
 bg: по име на човек
@@ -367,25 +368,27 @@ sl: osebo:
 sv: efter person
 zh: ЛСЛчЈє
 ]</span>
-<input name=n size=40 maxlength=200>
-<input type=submit value="Ok">
-<br>
+<input name="n" size="40" maxlength="200"%/>
+<input type="submit" value="Ok"%/>
+</p>
 <ul>
-<li> <input type=radio name=t value=PN checked>
+<li> <input type="radio" name="t" value="PN" checked="checked"%/>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>%Iz
-[or] [<em>Sosa number</em> relative to %t](<br>%a)%E
-<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
-<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+[or] [<em>Sosa number</em> relative to %t](<br%/>%a)%E</li>
+<li> <input type="radio" name="t" value="P"%/>
+<em>[first name/first names]</em></li>
+<li> <input type="radio" name="t" value="N"%/>
+<em>[surname/surnames]</em></li>
 </ul>
-</form>
+</form></li>
 
 %Ispropose_titles;<li>
 
-<form method=GET action="%f"><p>
-<table border=0 cellpadding=0 cellspacing=0><tr><td>
-%h<input type=hidden name=m value=TT>
+<form method="get" action="%f">
+<table border="0" cellpadding="0" cellspacing="0"><tr><td>
+%h<input type="hidden" name="m" value="TT"%/>
 <span class="highlight">[
 af: by title
 bg: по титла
@@ -413,24 +416,24 @@ ru: по титулу
 sl: naziv:
 sv: efter titel
 zh: ёщѕЭГыПО
-]</span>%INl<br>%E
-<input name=t size=14 maxlength=200>%INl<br>%E
-(<a href="%sm=TT;t=">[all the titles]</a>)<br>
+]</span>%INl<br%/>%E
+<input name="t" size="14" maxlength="200"%/>%INl<br%/>%E
+(<a href="%sm=TT;t=">[all the titles]</a>)<br%/>
 </td><td>...</td><td>
 <span class="highlight">[estate]0[
 da:  (dom&aelig;ne, sl&aelig;gt)
 en:
-]</span>%INl<br>%E
-<input name=p size=25 maxlength=200>%INl<br>%E
+]</span>%INl<br%/>%E
+<input name="p" size="25" maxlength="200"%/>%INl<br%/>%E
 (<a href="%sm=TT;p=*">[all the estates]</a>)
 </td><td>
-<input type=submit value="Ok">
+<input type="submit" value="Ok"%/>
 </td></tr></table>
-</form>
+</form></li>
 
 %E<li>
 
-<form method=GET action="%f"><p>
+<form method="get" action="%f"><p>
 %h
 [
 af: <span class="highlight">in die lys </span>van alle
@@ -460,8 +463,8 @@ sl: <span class="highlight">seznam</span> vseh
 sv: <span class="highlight">efter listan</span> av alla
 zh: ПФКѕЛщµД
 ]
-<select name=m>
-<option value="N" selected>[
+<select name="m">
+<option value="N" selected="selected">[
 af: vanne
 bg: фамилни имена
 br: anvioщ-familh
@@ -489,7 +492,7 @@ ru: фамилий
 sl: priimkov
 sv: efternamn
 zh: РХ
-]
+]</option>
 <option value="P">[
 af: voorname
 bg: собствени имена
@@ -518,7 +521,7 @@ ru: имён
 sl: osebnih imen
 sv: f&ouml;rnamn
 zh: Гы
-]
+]</option>
 </select>
 [
 af: volgens
@@ -548,8 +551,8 @@ sl: po
 sv: sorterade i
 zh: ёщѕЭ
 ]
-<select name=tri>
-<option value="A" selected>[
+<select name="tri">
+<option value="A" selected="selected">[
 af: alfabeties volgorde
 bg: азбучен ред
 br: urzh al lizherenneg
@@ -576,7 +579,7 @@ ru: по алфавиту
 sl: abecednem redu
 sv: bokstavsordning
 zh: ЧЦДёРт
-]
+]</option>
 <option value="F">[
 af: frekwensie
 bg: честота на срещане
@@ -604,19 +607,19 @@ ru: по частоте
 sl: pogostosti
 sv: frekvensordning
 zh: ·ГОКґОКэ
-]
+]</option>
 </select>
 [
 en:
 et: jдrgi
 ]
-<input type=submit value="Ok">
-</form>
+<input type="submit" value="Ok"%/></p>
+</form></li>
 
 %Ispropose_place_surnames;<li>
 
-<form method=GET action="%s">
-%h<input type=hidden name=m value=PS>
+<form method="get" action="%s">
+%h<input type="hidden" name="m" value="PS"%/>
 <font color="%i"><b>[
 af: by
 bg: по
@@ -642,10 +645,10 @@ ro: cu
 sl: 
 sv: efter
 ] [place] / [surname/surnames]0</b></font>
-- [birth] <input type=checkbox name=bi value=on checked>
-- [death] <input type=checkbox name=de value=on>
-- [marriage/marriages]0 <input type=checkbox name=ma value=on>
-- <input type=submit value="Ok">
+- [birth] <input type="checkbox" name="bi" value="on" checked="checked"%/>
+- [death] <input type="checkbox" name="de" value="on"%/>
+- [marriage/marriages]0 <input type="checkbox" name="ma" value="on"%/>
+- <input type="submit" value="Ok"%/>
 </form>
 
 %E%INshide_advanced_request;<li>
@@ -729,9 +732,9 @@ sv: <span class="highlight">genom</span>
 </ul>
 </td></tr></table>
 
-%Iw<p>
-<table border=0 cellspacing=0 cellpadding=0
- style="margin-left: auto; margin-right: auto; text-align: center">
+%Iw
+<table border="0" cellspacing="0" cellpadding="0"
+ style="margin:auto; text-align: center">
 <tr><td>[
 af: Jy kan
 bg: Можете още
@@ -761,8 +764,8 @@ sv: Du kan
 zh:
 ]
 
-<table border=0 cellspacing=0 cellpadding=0>
-<tr><td><p>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr><td>
 <ul>
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
@@ -791,10 +794,10 @@ ru: добавить семью
 sl: dodate druѕino
 sv: l&auml;gga till en familj
 zh: ФцјУјТНҐјЗВј
-]</a>
+]</a></li>
 %INl</ul>
 </td>
-<td align=left>
+<td align="left">
 <ul>%E
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
@@ -822,17 +825,16 @@ ro: modifica nota
 ru: изменить заметку
 sl: spremenite zapiske
 sv: &auml;ndra noteringar
-]</a>
+]</a></li>
 </ul>
 </td>
 </tr>
 </table>
 </td></tr></table>
 
-%E<p>
+%E
 
-<table border=0
- style="margin-left: auto; margin-right: auto; text-align: center">
+<table border="0" style="margin:auto;text-align:center">
 <tr><td>
 [
 af: Jy kan ook kyk na
@@ -863,30 +865,28 @@ sv: Du kan ocks&aring; konsultera
 zh:
 ]
 
-<table border=0>
-<tr align=left>
-<td valign=top><p>
+<table border="0">
+<tr align="left">
+<td valign="top">
 <ul>
-<li><a href="%sm=AN">[birthdays]</a>
-<li><a href="%sm=AD">[anniversaries of dead people]</a>
-<li><a href="%sm=AM">[anniversaries of marriage]</a>
-<li><a href="%sm=STAT">[statistics]</a>
+<li><a href="%sm=AN">[birthdays]</a></li>
+<li><a href="%sm=AD">[anniversaries of dead people]</a></li>
+<li><a href="%sm=AM">[anniversaries of marriage]</a></li>
+<li><a href="%sm=STAT">[statistics]</a></li>
 </ul>
 </td>
-<td valign=top><p>
+<td valign="top">
 <ul>%Ih
-<li><a href="%sm=HIST;k=10">[history of updates]</a>%E
-<li><a href="%sm=CAL">[calendar/calendars]1</a>
-<li><a href="%sm=FORUM">[database forum]</a>
+<li><a href="%sm=HIST;k=10">[history of updates]</a></li>%E
+<li><a href="%sm=CAL">[calendar/calendars]1</a></li>
+<li><a href="%sm=FORUM">[database forum]</a></li>
 </ul>
 </td>
 </tr>
 </table>
 </td></tr></table>
 
-<p>
-
-<table border=0 style="margin-left: auto; margin-right: auto"><tr><td>
+<table border="0" style="margin:auto"><tr><td>
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
@@ -926,9 +926,7 @@ zh: ТСѕ­УР %q ґО·ГОККэѕЭївЈ¬ЖдЦР %c ґО·ГОК±ѕЦчТіЈ¬ ЧФґУ %dЎЈ
 
 </td></tr></table>
 
-<p>
-
-<table border=0 style="margin-left: auto; margin-right: auto"><tr><td>
+<table border="0" style="margin:auto"><tr><td>
 [
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
@@ -1011,7 +1009,7 @@ sv: Om din webblдsare inte automatiskt uppdaterar de modifierade sidorna
 </td></tr>
 </table>
 
-<br>
+<br%/>
 
 <p style="text-align: right">
 <span style="font-size: 80%%"><em><a href="%sm=LEX">[
@@ -1038,6 +1036,6 @@ sv: lexikon
 zh: ±ѕХѕК№УГµДКхУп
 ]</a></em></span></p>
 
-<br>
+<br%/>
 
 </div>
