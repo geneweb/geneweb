@@ -1,11 +1,14 @@
 
 Bienvenue dans GeneWeb $q
 
-Allez dans votre navigateur Web et ouvrez l'adresse:
+Pour demarrer, ouvrez le fichier "start.htm" de votre installation GeneWeb.
+
+Si vous ne le trouvez pas, allez dans votre navigateur Web et ouvrez 
+l'adresse:
        http://127.0.0.1:$z/
 
 Attention: pour que cela fonctionne, vous ne devez pas d‚truire cette
-fenˆtre!
+fenˆtre! Par contre, si elle vous gene, vous pouvez l'iconifier.
 
 Si cela ne fonctionne pas, il se peut que vous ayez … configurer dans
 votre navigateur des options du genre "travailler hors connexion" ou

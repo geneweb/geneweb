@@ -1,10 +1,13 @@
 
 Welcome to GeneWeb $q
 
-Go to your Web browser and open the address:
-       http://localhost:$z/
+To start, open the file "start.htm" of your GeneWeb installation.
+
+If you don't find it, go to your Web browser and open the address:
+       http://127.0.0.1:$z/
 
 Warning: for this program to work, you must not delete this window!
+But you can iconify it.
 
 If it does not work, you may have to configurate, in your browser,
 options like "work off-line" or "do not use the proxy for local

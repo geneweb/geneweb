@@ -2,7 +2,7 @@
 Willkommen zu GeneWeb $q
 
 Greife mit deinem Webbrowser auf folgende Adresse zu:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 Falls das nicht funktioniert, muﬂt du eventuell in deinem Webbrowser
 einige Optionen Ñndern, wie zum Beispiel "Offline arbeiten" oder

@@ -2,7 +2,7 @@
 V„lkommen till GeneWeb $q
 
 Starta din webbl„sare och ”ppna adressen:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 Varning: f”r att det h„r programmet ska fungera, f†r du inte st„nga
 detta f”nster!
