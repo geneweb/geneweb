@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.9 2000-04-30 12:23:17 ddr Exp $ *)
+(* $Id: place.ml,v 3.10 2000-05-18 01:07:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -64,12 +64,18 @@ value get_all conf base =
          else
            let p = base.data.persons.get i in
            let pl_bi = if add_birth then p.birth_place else empty in
+           let pl_bp = if add_birth then p.baptism_place else empty in
            let pl_de = if add_death then p.death_place else empty in
-           do if pl_bi == empty && pl_de == empty || not (fast_auth_age conf p)
+           let pl_bu = if add_death then p.burial_place else empty in
+           do if pl_bi == empty && pl_bp == empty
+              && pl_de == empty && pl_bu == empty
+              || not (fast_auth_age conf p)
               then ()
               else
                 do if pl_bi != empty then ht_add pl_bi p else ();
+                   if pl_bp != empty then ht_add pl_bp p else ();
                    if pl_de != empty then ht_add pl_de p else ();
+                   if pl_bu != empty then ht_add pl_bu p else ();
                 return ();
            return loop (i + 1)
      else ();
