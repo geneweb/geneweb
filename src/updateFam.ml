@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.16 2000-11-18 09:52:01 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.17 2000-11-25 18:53:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -529,6 +529,7 @@ value print_del1 conf base fam =
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
        Util.hidden_env conf;

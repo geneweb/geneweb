@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.22 2000-11-18 09:52:00 ddr Exp $ *)
+(* $Id: update.ml,v 3.23 2000-11-25 18:53:33 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -947,7 +947,8 @@ value print conf base p =
   let a = aoi base p.cle_index in
   let u = uoi base p.cle_index in
   do header conf title;
-     tag "table" "border=%d width=\"95%%\"" conf.border begin
+     print_link_to_welcome conf True;
+     tag "table" "border=%d width=\"90%%\"" conf.border begin
        tag "tr" begin
          tag "th" "align=left" begin
            Wserver.wprint "%s<br>&nbsp;\n"
