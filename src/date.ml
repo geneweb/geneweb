@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.6 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: date.ml,v 3.7 2000-01-15 18:55:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -575,9 +575,11 @@ value print_calendar conf base =
          print_some_calendar conf (Calendar.hebrew_of_gregorian date) 3
            hebrew_month_name 13 "h";
        end;
-       Wserver.wprint "<br><p>%s: %d\n"
-         (capitale (transl_nth conf "year/month/day" 2))
-         (Calendar.sdn_of_gregorian date);
+       Wserver.wprint "<br><p>%s: " (capitale (transl conf "julian day"));
+       Num.print (fun x -> Wserver.wprint "%s" x)
+         (transl conf "(thousand separator)")
+         (Num.of_int (Calendar.sdn_of_gregorian date));
+       Wserver.wprint "\n";
      end;
      trailer conf;
   return ()

@@ -44,6 +44,13 @@ GeneWeb version 3.02
   - [Dec 10, 99] In tree displays with several branches, the option
     "add spouses" did not work. Fixed.
 
+* GeneWeb compiler (gwc)
+  - [Jan 15, 00] Fixed bug: did not recognize forster parents
+
+* GeneWeb uncompiler (gwu)
+  - [Jan 15, 00] Fixed small bug: used to save notes for relations even
+    if no notes were defined.
+
 * GeneWeb uncompiler (gwu) and GeneWeb to gedcom (gwb2ged)
   - [Dec 13, 99] Fixed bug: the option '-s' (extraction of a surname)
     also selected children with different surnames.
@@ -53,6 +60,8 @@ GeneWeb version 3.02
     to the persons having no source data.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [Jan 15, 00] Added "Julian day" for calendar page (and its value
+    is now displayed with a thousand separator).
   - [Jan 13, 00] (detail) Changed phrase "not dead" into "living"
   - [Dec 18, 99] Fixed and completed some Norwegian phrases (Brynjulf
     Langballe)
