@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.6 2000-04-06 08:06:23 ddr Exp $ *)
+(* $Id: setup.ml,v 3.7 2000-04-09 01:17:35 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -813,7 +813,9 @@ value cleanup_1 conf =
   let c = Filename.concat "." "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
   do Printf.eprintf "$ %s\n" c; flush stderr; return
   let _ = Sys.command c in
-  do ifdef UNIX  then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
+  do Printf.eprintf "$ mkdir old\n";
+     try Unix.mkdir "old" 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+     ifdef UNIX  then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
      else
        do Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
           Printf.eprintf "$ rmdir old\\%s\n" in_base_dir;

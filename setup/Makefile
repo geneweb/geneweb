@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.1 1999-12-19 09:14:15 ddr Exp $
+# $Id: Makefile,v 3.2 2000-04-09 01:17:35 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -36,7 +36,6 @@ wrappers:
 test_dir:
 	mkdir test
 	mkdir test/gw
-	mkdir test/gw/old
 	cd test/gw; ln -s ../../gwsetup gwsetup
 	cd test/gw; ln -s ../.. setup
 	cd test/gw; ln -s ../../../doc .
