@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.23 2003-12-10 12:19:10 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.24 2004-07-16 16:17:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -266,7 +266,7 @@ value propose_merge_ind conf base branches p1 p2 =
 value reparent_ind base p1 p2 =
   let a1 = aoi base p1.cle_index in
   let a2 = aoi base p2.cle_index in
-  match (a1.parents, a2.parents) with
+  match (parents a1, parents a2) with
   [ (None, Some ifam) ->
       let des = doi base ifam in
       do {
@@ -276,7 +276,7 @@ value reparent_ind base p1 p2 =
           else replace (i + 1)
         in
         replace 0;
-        a1.parents := Some ifam;
+        set_parents a1 (Some ifam);
         a1.consang := Adef.fix (-1);
         base.func.patch_ascend p1.cle_index a1;
         base.func.patch_descend ifam des;
@@ -292,8 +292,8 @@ value effective_merge_ind conf base p1 p2 =
       for i = 0 to Array.length u2.family - 1 do {
         let ifam = u2.family.(i) in
         let cpl = coi base ifam in
-        if p2.cle_index = cpl.father then cpl.father := p1.cle_index
-        else if p2.cle_index = cpl.mother then cpl.mother := p1.cle_index
+        if p2.cle_index = (father cpl) then set_father cpl p1.cle_index
+        else if p2.cle_index = (mother cpl) then set_mother cpl p1.cle_index
         else assert False;
         base.func.patch_couple ifam cpl;
       };
@@ -401,7 +401,7 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
     for i = 0 to Array.length des2.children - 1 do {
       let ip = des2.children.(i) in
       let a = aoi base ip in
-      a.parents := Some fam1.fam_index;
+      set_parents a (Some fam1.fam_index);
       base.func.patch_ascend ip a;
     };
     des2.children := [| |];
@@ -458,30 +458,30 @@ value rec try_merge conf base branches ip1 ip2 changes_done =
   let a2 = aoi base ip2 in
   let ok_so_far = True in
   let (ok_so_far, changes_done) =
-    match (a1.parents, a2.parents) with
+    match (parents a1, parents a2) with
     [ (Some ifam1, Some ifam2) when ifam1 <> ifam2 ->
         let branches = [(ip1, ip2) :: branches] in
         let cpl1 = coi base ifam1 in
         let cpl2 = coi base ifam2 in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            if cpl1.father = cpl2.father then (True, changes_done)
+            if (father cpl1) = (father cpl2) then (True, changes_done)
             else
-              try_merge conf base branches cpl1.father cpl2.father
+              try_merge conf base branches (father cpl1) (father cpl2)
                 changes_done
           else (False, changes_done)
         in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            if cpl1.mother = cpl2.mother then (True, changes_done)
+            if (mother cpl1) = (mother cpl2) then (True, changes_done)
             else
-              try_merge conf base branches cpl1.mother cpl2.mother
+              try_merge conf base branches (mother cpl1) (mother cpl2)
                 changes_done
           else (False, changes_done)
         in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            merge_fam conf base branches ifam1 ifam2 cpl1.father cpl1.mother
+            merge_fam conf base branches ifam1 ifam2 (father cpl1) (mother cpl1)
               changes_done
           else (False, changes_done)
         in
@@ -510,9 +510,9 @@ value is_ancestor base ip1 ip2 =
     else if ip = ip1 then True
     else do {
       visited.(Adef.int_of_iper ip) := True;
-      match (aoi base ip).parents with
+      match parents (aoi base ip) with
       [ Some ifam ->
-          let cpl = coi base ifam in loop cpl.father || loop cpl.mother
+          let cpl = coi base ifam in loop (father cpl) || loop (mother cpl)
       | None -> False ]
     }
   in
@@ -592,12 +592,12 @@ value print conf base =
 
 value rec kill_ancestors conf base included_self p nb_ind nb_fam =
   do {
-    match (aoi base p.cle_index).parents with
+    match parents (aoi base p.cle_index) with
     [ Some ifam ->
         let cpl = coi base ifam in
         do {
-          kill_ancestors conf base True (poi base cpl.father) nb_ind nb_fam;
-          kill_ancestors conf base True (poi base cpl.mother) nb_ind nb_fam;
+          kill_ancestors conf base True (poi base (father cpl)) nb_ind nb_fam;
+          kill_ancestors conf base True (poi base (mother cpl)) nb_ind nb_fam;
           UpdateFamOk.effective_del conf base (foi base ifam);
           incr nb_fam;
         }

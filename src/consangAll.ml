@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.4 2002-03-11 19:02:55 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.5 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -87,7 +87,7 @@ value compute base from_scratch quiet =
       let a = base.data.ascends.get i in
       if from_scratch then a.consang := no_consang
       else
-        match a.parents with
+        match parents a with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := a.consang
         | None -> () ];
       if a.consang == no_consang then incr cnt else ()
@@ -108,17 +108,17 @@ value compute base from_scratch quiet =
       for i = 0 to base.data.ascends.len - 1 do {
         let a = base.data.ascends.get i in
         if a.consang == no_consang then
-          match a.parents with
+          match parents a with
           [ Some ifam ->
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
               if pconsang == no_consang then
                 let cpl = coi base ifam in
-                let fath = aoi base cpl.father in
-                let moth = aoi base cpl.mother in
+                let fath = aoi base (father cpl) in
+                let moth = aoi base (mother cpl) in
                 if fath.consang != no_consang &&
                    moth.consang != no_consang then
                    do {
-                  let consang = relationship base tab cpl.father cpl.mother in
+                  let consang = relationship base tab (father cpl) (mother cpl) in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
                   a.consang := Adef.fix_of_float consang;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.12 2003-11-26 10:35:31 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.13 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -57,7 +57,7 @@ value no_family gen =
      marriage_src = empty; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; comment = empty; origin_file = empty;
      fsources = empty; fam_index = Adef.ifam_of_int 0}
-  and cpl = {father = Adef.iper_of_int 0; mother = Adef.iper_of_int 0}
+  and cpl = parent (Adef.iper_of_int 0) (Adef.iper_of_int 0)
   and des = {children = [| |]} in
   (fam, cpl, des)
 ;
@@ -78,7 +78,7 @@ value make_person gen p n occ i =
      burial_place = empty_string; burial_src = empty_string;
      notes = empty_string; psources = empty_string;
      cle_index = Adef.iper_of_int i}
-  and a = {parents = None; consang = Adef.fix (-1)}
+  and a = no_parents ()
   and u = {family = [| |]} in
   (p, a, u)
 ;
@@ -391,11 +391,11 @@ value insert_somebody gen =
 ;
 
 value verif_parents_non_deja_definis gen x pere mere =
-  match (aoi gen.g_base x.cle_index).parents with
+  match parents (aoi gen.g_base x.cle_index) with
   [ Some ifam ->
       let cpl = coi gen.g_base ifam in
-      let p = cpl.father in
-      let m = cpl.mother in
+      let p = (father cpl) in
+      let m = (mother cpl) in
       do {
         printf "
 I cannot add \"%s\", child of
@@ -427,8 +427,8 @@ value notice_sex gen p s =
 ;
 
 value insert_family gen co fath_sex moth_sex witl fo deo =
-  let pere = insert_somebody gen co.father in
-  let mere = insert_somebody gen co.mother in
+  let pere = insert_somebody gen (father co) in
+  let mere = insert_somebody gen (mother co) in
   let witl =
     List.map
       (fun (wit, sex) ->
@@ -464,7 +464,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
        divorce = fo.divorce; comment = comment;
        origin_file = unique_string gen fo.origin_file; fsources = fsources;
        fam_index = Adef.ifam_of_int gen.g_fcnt}
-    and cpl = {father = pere.cle_index; mother = mere.cle_index}
+    and cpl = parent pere.cle_index mere.cle_index
     and des = {children = children} in
     let fath_uni = uoi gen.g_base pere.cle_index in
     let moth_uni = uoi gen.g_base mere.cle_index in
@@ -482,7 +482,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          let a = aoi gen.g_base ix in
          do {
            verif_parents_non_deja_definis gen x pere mere;
-           a.parents := Some fam.fam_index;
+           set_parents a (Some fam.fam_index);
            ()
          })
       children;

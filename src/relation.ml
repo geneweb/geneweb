@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.46 2004-01-24 07:39:18 ddr Exp $ *)
+(* $Id: relation.ml,v 4.47 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -294,8 +294,8 @@ value add_missing_parents_of_siblings conf base indl =
                     match ind.di_val with
                     [ Some ip ->
                         let ip =
-                          match (aget conf base ip).parents with
-                          [ Some ifam -> (coi base ifam).father
+                          match parents (aget conf base ip) with
+                          [ Some ifam -> father (coi base ifam)
                           | None -> assert False ]
                         in
                         if List.mem ip ipl then ipl else [ip :: ipl]
@@ -470,7 +470,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
         let cpl = coi base ifam in
         mark_fam.(Adef.int_of_ifam ifam) := True;
         let result =
-          [(cpl.father, Parent, ifam); (cpl.mother, Parent, ifam)]
+          [((father cpl), Parent, ifam); ((mother cpl), Parent, ifam)]
         in
         let result =
           result @
@@ -489,7 +489,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (doi base fam).children) children)
-              (Array.to_list (uget conf base cpl.father).family) []
+              (Array.to_list (uget conf base (father cpl)).family) []
         in
         let result =
           result @
@@ -502,7 +502,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (doi base fam).children) children)
-              (Array.to_list (uget conf base cpl.mother).family) []
+              (Array.to_list (uget conf base (mother cpl)).family) []
         in
         result
       }
@@ -518,14 +518,14 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                List.fold_right
                  (fun child children -> [(child, Child, ifam) :: children])
                  (Array.to_list (doi base ifam).children)
-                 [(cpl.father, Mate, ifam); (cpl.mother, Mate, ifam)] @
+                 [((father cpl), Mate, ifam); ((mother cpl), Mate, ifam)] @
                  nb
              })
           (Array.to_list (uget conf base iper).family) []
       in
       let result =
         result @
-          (match (aget conf base iper).parents with
+          (match parents (aget conf base iper) with
            [ Some ifam -> parse_fam ifam
            | _ -> [] ])
       in

@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Jul 04] Added code to prepare a possible version allowing to
+    manipulate any kinds of DAGs, not only the ones where people have
+    only two parents, for genealogy of other kinds than humans and animals.
   - [12 Jul 04] In families forms, added shortcut for created persons:
     when the birth place starts with "b/", the date and place are set
     to the baptism instead of birth. Added also "~year" as equivalent
