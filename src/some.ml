@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.28 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: some.ml,v 4.29 2005-01-03 07:34:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -72,7 +72,7 @@ value print_elem conf base is_surname (p, xl) =
   list_iter_first
     (fun first x ->
        do {
-         if not first then html_li conf else ();
+         if not first then Wserver.wprint "</li>\n<li>\n  " else ();
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
@@ -119,7 +119,6 @@ value first_name_print_list conf base xl liste =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    html_p conf;
     print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
       (print_elem conf base True) liste;
     trailer conf;
@@ -349,22 +348,23 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
     header conf title;
     print_link_to_welcome conf True;
     if br = None then do {
-      html_p conf;
-      Wserver.wprint "<em style=\"font-size:80%%\">\n";
-      Wserver.wprint "%s " (capitale (transl conf "click"));
-      Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-        (code_varenv fx) (transl conf "here");
-      Wserver.wprint "%s"
-        (transl conf "for the first names by alphabetic order");
-      Wserver.wprint ".</em>\n";
-      html_p conf;
+      tag "p" begin
+        Wserver.wprint "<em style=\"font-size:80%%\">\n";
+        Wserver.wprint "%s " (capitale (transl conf "click"));
+        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+          (code_varenv fx) (transl conf "here");
+        Wserver.wprint "%s"
+          (transl conf "for the first names by alphabetic order");
+        Wserver.wprint ".</em>\n";
+      end;
     }
     else ();
-    Wserver.wprint "<table border=\"0\"><tr><td style=\"white-space:nowrap\">\n";
+    Wserver.wprint
+      "<table border=\"%d\"><tr><td style=\"white-space:nowrap\">\n"
+      conf.border;
     if len > 1 && br = None then do {
-      Wserver.wprint "%s: %d" (capitale (transl conf "number of branches"))
+      Wserver.wprint "%s: %d\n" (capitale (transl conf "number of branches"))
         len;
-      html_p conf;
       Wserver.wprint "<dl>\n";
     }
     else ();
@@ -374,13 +374,12 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
            do {
              if len > 1 && br = None then do {
                Wserver.wprint "\n";
-               stag "dt" begin
+               stagn "dt" begin
                  stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
                      (Util.code_varenv fx) n begin
                    Wserver.wprint "%d." n;
                  end;
                end;
-               Wserver.wprint "\n";
              }
              else ();
              if br = None || br = Some n then
@@ -466,7 +465,6 @@ value print_family_alphabetic x conf base liste =
       do {
         header conf title;
         print_link_to_welcome conf True;
-        html_p conf;
         print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
           (print_elem conf base False) liste;
         trailer conf;

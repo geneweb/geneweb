@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.106 2005-01-02 15:56:32 ddr Exp $ *)
+(* $Id: util.ml,v 4.107 2005-01-03 07:34:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1439,10 +1439,22 @@ value is_number t =
   | _ -> False ]
 ;
 
+value hexa_string s =
+  let s' = String.create (2 * String.length s) in
+  do {
+    for i = 0 to String.length s - 1 do {
+      s'.[2*i] := "0123456789ABCDEF".[Char.code s.[i] / 16];
+      s'.[2*i+1] := "0123456789ABCDEF".[Char.code s.[i] mod 16];
+    };
+    s'
+  }
+;
+
 value print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   do {
-    if len > menu_threshold then
+    if len > menu_threshold then do {
+      Wserver.wprint "<p>\n";
       let _ =
         List.fold_left
           (fun last e ->
@@ -1454,13 +1466,15 @@ value print_alphab_list conf crit print_elem liste =
              in
              do {
                if not same_than_last then
-                 Wserver.wprint "<a href=\"#%s\">%s</a>\n" t t
+                 Wserver.wprint "<a href=\"#i%s\">%s</a>\n" (hexa_string t) t
                else ();
                Some t
              })
           None liste
       in
-      ()
+      ();
+      Wserver.wprint "</p>\n";
+    }
     else ();
     Wserver.wprint "<ul>\n";
     let _ =
@@ -1476,25 +1490,26 @@ value print_alphab_list conf crit print_elem liste =
              if len > menu_threshold || is_number t then do {
                match last with
                [ Some _ ->
-                   if not same_than_last then Wserver.wprint "  </ul>\n"
+                   if not same_than_last then Wserver.wprint "</ul>\n</li>\n"
                    else ()
                | _ -> () ];
                if not same_than_last then do {
-                 html_li conf;
-                 Wserver.wprint "<a name=\"%s\">%s</a>\n" t t;
-                 Wserver.wprint "  <ul>\n";
+                 Wserver.wprint "<li>\n";
+                 Wserver.wprint "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
+                 Wserver.wprint "<ul>\n";
                }
                else ();
              }
              else ();
-             html_li conf;
+             Wserver.wprint "<li>\n  ";
              print_elem e;
+             Wserver.wprint "</li>\n";
              Some t
            })
         None liste
     in
     ();
-    if len > menu_threshold then Wserver.wprint "  </ul>\n" else ();
+    if len > menu_threshold then Wserver.wprint "</ul>\n</li>\n" else ();
     Wserver.wprint "</ul>\n";
   }
 ;
@@ -2287,9 +2302,9 @@ value print_selection_bullet conf =
           "" conf.env
       in
       do {
-        Wserver.wprint "<a name=\"%s\" href=\"%s%s%s%s\">" txt (commd conf) req
+        Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\">" txt (commd conf) req
           (if sel then ";u=" ^ txt else "")
-          (if sel || List.mem_assoc "u" conf.env then "#" ^ txt else "");
+          (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
         Wserver.wprint "%s"
           (if sel then bullet_sel_txt else bullet_unsel_txt);
         Wserver.wprint "</a>\n";
