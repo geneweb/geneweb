@@ -1,4 +1,4 @@
-(* $Id: phonygwd.ml,v 2.3 1999-08-05 12:38:31 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 2.4 1999-08-06 02:22:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value port_selected = ref 2317;
@@ -57,7 +57,7 @@ value main () =
        return exit 1
      else ();
      close_in (open_in fname.val);
-     Wserver.f port_selected.val 0 (Some 4) (None, None) None connection;
+     Wserver.f port_selected.val 0 (Some 4) (None, None) connection;
   return ()
 ;
 

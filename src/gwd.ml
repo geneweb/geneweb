@@ -1,5 +1,5 @@
-(* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.19 1999-08-05 12:38:30 ddr Exp $ *)
+(* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
+(* $Id: gwd.ml,v 2.20 1999-08-06 02:22:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -47,24 +47,26 @@ value extract_boundary content_type =
   List.assoc "boundary" e
 ;
 
-value log from request s =
+value fprintf_date oc tm =
+  Printf.fprintf oc "%4d/%02d/%02d %02d:%02d:%02d"
+    (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
+    tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
+;
+
+value log oc tm from request s =
   let content_type = Wserver.extract_param "content-type: " '\n' request in
 (*
   let s = if is_multipart_form content_type then "(multipart form)" else s in
 *)
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
-  let oc = log_oc () in
-  do let tm = Unix.localtime (Unix.time ()) in
-     Printf.fprintf oc "%02d/%02d/%4d %02d:%02d:%02d" tm.Unix.tm_mday
-       (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour
-       tm.Unix.tm_min tm.Unix.tm_sec;
+  do let tm = Unix.localtime tm in
+     fprintf_date oc tm;
      Printf.fprintf oc " (%d)" (Unix.getpid ());
      Printf.fprintf oc " %s\n" s;
      Printf.fprintf oc "  From: %s\n" from;
      Printf.fprintf oc "  Agent: %s\n" user_agent;
      if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
-     flush_log oc;
   return ()
 ;
 
@@ -89,10 +91,8 @@ value copy_file fname =
 value refuse_log from cgi =
   let oc = open_out_gen log_flags 0o644 "refuse_log" in
   do let tm = Unix.localtime (Unix.time ()) in
-     Printf.fprintf oc "%02d/%02d/%4d %02d:%02d:%02d" tm.Unix.tm_mday
-       (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour
-       tm.Unix.tm_min tm.Unix.tm_sec;
-      Printf.fprintf oc " excluded: %s\n" from;
+     fprintf_date oc tm;
+     Printf.fprintf oc " excluded: %s\n" from;
      close_out oc;
      if not cgi then
        do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); return ()
@@ -106,9 +106,7 @@ value refuse_log from cgi =
 value only_log from cgi =
   let oc = log_oc () in
   do let tm = Unix.localtime (Unix.time ()) in
-     Printf.fprintf oc "%02d/%02d/%4d %02d:%02d:%02d" tm.Unix.tm_mday
-       (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour
-       tm.Unix.tm_min tm.Unix.tm_sec;
+     fprintf_date oc tm;
      Printf.fprintf oc " Connection refused from %s (only %s)\n"
        from only_address.val;
      flush_log oc;
@@ -125,9 +123,7 @@ value only_log from cgi =
 value refuse_auth from auth =
   let oc = log_oc () in
   do let tm = Unix.localtime (Unix.time ()) in
-     Printf.fprintf oc "%02d/%02d/%4d %02d:%02d:%02d" tm.Unix.tm_mday
-       (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour
-       tm.Unix.tm_min tm.Unix.tm_sec;
+     fprintf_date oc tm;
      Printf.fprintf oc " Access failed from %s = %s\n" from auth;
      flush_log oc;
      Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
@@ -712,6 +708,26 @@ value build_env request str =
     (str, Util.create_env query_string)
 ;
 
+value log_and_robot_check cgi from request str =
+  if cgi && log_file.val = "" && robot_xcl.val = None then ()
+  else
+    let tm = Unix.time () in
+    lock_wait Srcfile.adm_file "gwd.lck" with
+    [ Accept ->
+        let oc = log_oc () in
+        do try
+             do match robot_xcl.val with
+                [ Some (cnt, sec) -> Robot.check oc tm from cnt sec
+                | None -> () ];
+                if cgi && log_file.val = "" then ()
+                else log oc tm from request str;
+             return ()
+           with e -> do flush_log oc; return raise e;
+           flush_log oc;
+        return ()
+    | Refuse -> () ]
+;
+
 value connection cgi (addr, request) str =
   let from =
     match addr with
@@ -735,8 +751,7 @@ value connection cgi (addr, request) str =
             let (str, env) = build_env request str in
             if image_request cgi str env then ()
             else
-              do if cgi && log_file.val = "" then ()
-                 else log from request str;
+              do log_and_robot_check cgi from request str;
                  connection_accepted cgi (addr, request) str env;
               return ()
           with
@@ -776,7 +791,7 @@ Type control C to stop the service
   return
   Wserver.f selected_port.val tmout
     (ifdef UNIX then max_clients.val else None) (uid.val, gid.val)
-    robot_xcl.val (connection False)
+    (connection False)
 ;
 
 value geneweb_cgi str addr =
@@ -855,7 +870,7 @@ GEXTEND G
           (int_of_string cnt, int_of_string sec) ] ];
 END;
 
-value robot_exclude s =
+value robot_exclude_arg s =
   try
     robot_xcl.val :=
       Some (G.Entry.parse robot_xcl_arg (G.parsable (Stream.of_string s)))
@@ -903,6 +918,9 @@ value main () =
      ("-log", Arg.String (fun x -> log_file.val := x),
       "<file>
        Redirect log trace to this file.");
+     ("-robot_xcl", Arg.String robot_exclude_arg,
+      "<cnt>,<sec>
+       Exclude connections when more than <cnt> requests in <sec> seconds.");
      ("-nolock", Arg.Set Lock.no_lock_flag,
       "
        Do not lock files before writing.") ::
@@ -911,9 +929,6 @@ value main () =
          "<num>
        Max number of clients treated at the same time (default: no limit)
        (not cgi).");
-        ("-robot_xcl", Arg.String robot_exclude,
-         "<cnt>,<sec>
-       Exclude connections when more than <cnt> requests in <sec> seconds.");
         ("-setuid", Arg.Int (fun x -> uid.val := Some x),
          "<num>
        Set user id, for example to use port < 1024 as simple user.");

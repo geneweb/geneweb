@@ -16,7 +16,8 @@ GeneWeb Version 2.05
     various encodings). Anyway, code is smaller.
 
 * GeneWeb daemon/CGI (gwd)
-  - [Aug 5, 99] Reinstalled the system of robot exclusion (had been deleted
+  - [Aug 6, 99] Dates in traces are now yyyy/mm/dd instead of dd/mm/yyyy
+  - [Aug 5, 99] Restored the system of robot exclusion (had been deleted
     in version 1.10).
   - [Aug 3, 99] Increased speed of clicking on "ancestors" by pre-loading the
     arrays "ascends" and "couples". [Aug 5, 99] Idem with "descendants" by
