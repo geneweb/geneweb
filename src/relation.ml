@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.66 2005-03-12 20:23:41 ddr Exp $ *)
+(* $Id: relation.ml,v 4.67 2005-03-14 22:54:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -49,14 +49,16 @@ value print_with_related conf base p ip =
 value print_with_witness conf base p fam ip =
   let w = pget conf base ip in
   if is_hidden w then ()
-  else do {
-    html_li conf;
-    xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
-      (Adef.int_of_iper ip);
-    Wserver.wprint "(%s)\n"
-      (nominative (transl_nth conf "witness/witnesses" 0));
-    Wserver.wprint "%s\n" (person_title_text conf base w)
-  }
+  else
+    tag "li" begin
+      tag "label" begin
+        xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
+          (Adef.int_of_iper ip);
+        Wserver.wprint "(%s)\n"
+          (nominative (transl_nth conf "witness/witnesses" 0));
+        Wserver.wprint "%s\n" (person_title_text conf base w);
+      end;
+    end
 ;
 
 value print_menu conf base p =
