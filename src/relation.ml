@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.31 2000-01-02 01:21:41 ddr Exp $ *)
+(* $Id: relation.ml,v 3.32 2000-01-02 03:36:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -417,6 +417,28 @@ return ();
       ([], 0) (List.rev path)
   in
   let d = {dag = Array.of_list (List.rev nl)} in
+(*
+  do Array.iter
+       (fun n ->
+          if n.chil <> [] then
+            do match n.valu with
+               [ Dag.Left ip ->
+                   Printf.eprintf "\no %s\n" (denomination base (poi base ip))
+               | Dag.Right c -> Printf.eprintf "\no %d\n" c ];
+               List.iter
+                 (fun i ->
+                    let n = d.dag.(int_of_idag i) in
+                    match n.valu with
+                    [ Dag.Left ip ->
+                        Printf.eprintf "- %s\n"
+                          (denomination base (poi base ip))
+                    | Dag.Right c -> Printf.eprintf "- %d\n" c ])
+                 n.chil;
+            return ()
+          else ())
+       d.dag;
+  return
+*)
   let set =
     List.fold_left
       (fun set n ->
