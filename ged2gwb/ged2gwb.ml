@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.37 1999-02-14 17:19:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.38 1999-02-24 08:54:17 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1669,7 +1669,7 @@ value output_command_line bname =
 value out_file = ref "a";
 value speclist =
   [("-o", Arg.String (fun s -> out_file.val := s), "<file>
-       Output data base (defaut: \"a\").");
+       Output data base (default: \"a\").");
    ("-lf", Arg.Set lowercase_first_names, "   - Lowercase first names -
        Force lowercase first names keeping only their initials as uppercase
        characters.");
