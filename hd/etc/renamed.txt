@@ -11,10 +11,10 @@ The database "%o" has been renamed "%e".
 Please use now:
 <br>
 La base de données "%o" est renommée "%e".
-Utilizzate:
+Utiliser maintenant:
 <br>
 La base di dati "%o" ha cambiato nome "%e".
-Utiliser maintenant:<p>
+Utilizzate:<p>
 <ul>
 <li>
 <a href="%l">%l</a>
