@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 1.5 1999-08-20 12:46:18 ddr Exp $
+# $Id: a.gwf,v 1.6 1999-08-20 13:06:29 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -68,10 +68,10 @@ auth_file=
 access_by_key=no
 
 # Maximum level when displaying ancestors
-max_anc_level=
+max_anc_level=8
 
 # Maximum_level when displaying descendants
-max_desc_level=
+max_desc_level=12
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.48 1999-08-20 12:46:19 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.49 1999-08-20 13:06:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -10,7 +10,7 @@ open Util;
 value limit_by_list conf =
   match p_getint conf.base_env "max_anc_level" with
   [ Some x -> max 1 x
-  | None -> 200 ]
+  | None -> 8 ]
 ;
 value limit_by_tree = 5;
 
