@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.44 2003-12-15 09:38:29 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.45 2003-12-15 09:55:51 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -38,12 +38,16 @@ sv: Genealogi
 <center>
 <table border=0 width="100%">
 <tr align=left>
-<td>
+<td rowspan=2>
 <a href="http://pauillac.inria.fr/~ddr/GeneWeb/"><img width=96
 height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 </td>
+%I&wNf<td align=%R valign=top><em>([wizard/wizards/friend]0%U)</em></td>
+%E%I&fNw<td align=%R valign=top><em>([wizard/wizards/friend]2)</em></td>
+%E<td align=%R valign=top>%w</td>
+</tr><tr>
 <td align=%L>
-<table><tr align=left><td align=center><h1><font color=%i>[
+<table border=0><tr align=left><td align=center><h1><font color=%i>[
 af: Genealogiese databasis
 bg: Родословна база от данни
 ca: Base de dades geneal&ograve;gica
@@ -71,9 +75,6 @@ sv: Genealogisk databas
 zh: НшВзјТЖЧ
 ]</font></h1></table>
 </td>
-%I&wNf<td align=%R valign=top><em>([wizard/wizards/friend]0%U)</em></td>
-%E%I&fNw<td align=%R valign=top><em>([wizard/wizards/friend]2)</em></td>
-%E<td align=%R valign=top>%w</td>
 </tr>
 </table>
 
