@@ -32,6 +32,7 @@ a great-grandfather/a great-grandmother/a great-grandparent
 a great-grandson/a great-granddaughter/a great-grandchild
 a great-nephew/a great-niece
 a great-uncle/a great-aunt
+a half-brother/a half-sister/a half-sibling
 a nephew/a niece
 a son/a daughter/a child
 about (date)
@@ -134,7 +135,6 @@ is born after his/her child
 it is the same person!
 killed (in action)
 less than one month old
-less than one year old
 link
 link between
 list
@@ -191,6 +191,7 @@ person modified
 person/persons
 persons having the same name
 photo
+photo deleted
 photo received
 place
 previous sibling
