@@ -2,6 +2,7 @@ GeneWeb Version 1.12
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 12, 99] Improved displaying in Hebrew language.
   - [Feb 8, 99] Fixed bug in CGI mode under Windows: images (flags e.g.) 
     were often truncated.
 
