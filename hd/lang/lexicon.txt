@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.98 2000-05-15 05:40:38 ddr Exp $
+# $Id: lexicon.txt,v 3.99 2000-05-15 15:01:51 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2169,10 +2169,12 @@ ru: êîí÷àÿ
 se: slutar
 
     engaged
+dk: forlovet
 en: engaged
 fr: fianc&eacute;/fianc&eacute;s
 
     engaged%t to
+dk: forlovet%t med
 en: engaged%t to
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 
@@ -2826,7 +2828,7 @@ se: foto mottaget
 af: prent/prente
 cs: obrázek
 de: Bild
-dk: billede
+dk: billede/billeder
 en: image/images
 es: imagen
 fi: kuva
