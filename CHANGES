@@ -9,6 +9,9 @@ GeneWeb version 3.08
     of a data base from a GeneWeb source file.
 
 * GeneWeb Service/CGI (gwd)
+  - [25 Sep 00] When wizard or friend access failure, now display the
+    page without the priviliged access (instead of just saying "access
+    failure").
   - [21 Sep 00] When modifying a person, forbid now to let his/her
     first name or surname as just "?", because it can cause problems
     of linking these persons after a data base cleanup.

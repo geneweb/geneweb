@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.59 2000-09-22 14:37:31 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.60 2000-09-25 01:46:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -399,13 +399,26 @@ value general_welcome conf =
   | None -> propose_base conf ]
 ;
 
-value unauth bname typ =
+value unauth conf typ =
   do Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
-     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ bname;
+     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
      Util.nl (); Util.nl ();
-     Wserver.wprint "<head><title>%s %s access failed</title></head>\n"
-       typ bname;
-     Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ bname;
+     let url =
+       conf.bname ^ "?" ^
+       List.fold_left
+         (fun s (k, v) ->
+            if s = "" then k ^ "=" ^ v else s ^ "&" ^ k ^ "=" ^ v)
+         "" conf.env
+     in
+     Wserver.wprint "\
+<head>
+<title>%s %s access failed</title>
+<meta http-equiv=\"REFRESH\" content=\"1;URL=%s\">
+</head>
+"
+       typ conf.bname url;
+     Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ
+       conf.bname;
   return ()
 ;
 
@@ -798,7 +811,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      today_wd = tm.Unix.tm_wday;
      time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec)}
   in
-  (conf, sleep, if not ok then Some (passwd, uauth, base_file) else None)
+  (conf, sleep, if not ok then Some (passwd, uauth) else None)
 ;
 
 value log_and_robot_check conf auth from request script_name contents =
@@ -897,7 +910,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
               if x = "" then "GeneWeb service" else "data base " ^ conf.bname
             in
             refuse_auth conf from auth auth_type
-      | (_, _, Some (passwd, uauth, base_file)) ->
+      | (_, _, Some (passwd, uauth)) ->
           if is_robot from then
             Robot.robot_error cgi from 0 0
           else
@@ -906,12 +919,12 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                [ Accept ->
                    let oc = log_oc () in
                    do log_passwd_failed passwd uauth oc tm from request
-                        base_file;
+                        conf.bname;
                       flush_log oc;
                    return ()
                | Refuse ->
                    () ];
-               unauth base_file (if passwd = "w" then "Wizard" else "Friend");
+               unauth conf (if passwd = "w" then "Wizard" else "Friend");
             return ()
       | _ ->
           let mode = Util.p_getenv conf.env "m" in
