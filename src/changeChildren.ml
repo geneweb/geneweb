@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.7 2003-12-10 12:19:10 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.8 2004-01-06 17:24:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -215,9 +215,7 @@ value rename_image_file conf base p (nfn, nsn, noc) =
   match auto_image_file conf base p with
   [ Some old_f ->
       let s = default_image_name_of_key nfn nsn noc in
-      let f =
-        Filename.concat (base_path ["images"] (conf.bname ^ ".gwb")) s
-      in
+      let f = Filename.concat (base_path ["images"] conf.bname) s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
       in
@@ -246,11 +244,10 @@ value change_child conf base parent_surname ip =
   in
   if new_first_name = "" then
     error_person conf base p (transl conf "first name missing")
-  else
-    if
+  else if
     new_first_name <> p_first_name base p ||
-    new_surname <> p_surname base p || new_occ <> p.occ then
-    do {
+    new_surname <> p_surname base p || new_occ <> p.occ
+  then do {
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = person_ht_find_all base key in
     check_conflict conf base p key new_occ ipl;
