@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.41 2000-05-02 17:15:45 doligez Exp $ *)
+(* $Id: util.ml,v 3.42 2000-05-14 18:07:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -670,8 +670,15 @@ value rec copy_from_etc env imcom ic =
     match exc with [ End_of_file -> () | exc -> raise exc ]
 ;
 
+value images_url = ref "";
+
+value image_prefix conf =
+  if images_url.val <> "" then images_url.val
+  else conf.indep_command ^ "m=IM;v="
+;
+
 value default_body_prop conf =
-  "background=\"" ^ conf.indep_command ^ "m=IM;v=/gwback.jpg\""
+  "background=\"" ^ image_prefix conf ^ "/gwback.jpg\""
 ;
 
 value body_prop conf =
@@ -861,9 +868,9 @@ value gen_trailer with_logo conf =
   do if not with_logo then ()
      else
         Wserver.wprint "<p>
-<img src=\"%sm=IM;v=/gwlogo.gif\"
+<img src=\"%s/gwlogo.gif\"
 alt=... width=64 height=72 align=right>\n<br>\n"
-          conf.indep_command;
+          (image_prefix conf);
      match open_etc_file "copyr" with
      [ Some ic -> copy_from_etc env conf.indep_command ic
      | None ->
@@ -1167,8 +1174,8 @@ value print_link_to_welcome conf right_aligned =
       | None -> "" ]
     in
     do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-       Wserver.wprint "<img src=\"%sm=IM;v=/%s\"%s alt=\"^^\"%s>"
-         conf.indep_command fname wid_hei
+       Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>"
+         (image_prefix conf) fname wid_hei
          (if right_aligned then " align=" ^ dir else "");
        Wserver.wprint "</a>\n";
     return ()

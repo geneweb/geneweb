@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.36 2000-05-14 09:40:03 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.37 2000-05-14 18:07:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1197,6 +1197,9 @@ value main () =
      ("-cgi", Arg.Set cgi,
       "
        Force cgi mode.");
+     ("-images_url", Arg.String (fun x -> Util.images_url.val := x),
+      "<url>
+       URL for GeneWeb images (default: gwd send them)");
      ("-a", Arg.String (fun x -> selected_addr.val := Some x),
       "<address>
        Select a specific address (default = any address of this computer)");
