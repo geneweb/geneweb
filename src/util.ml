@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.11 2001-10-15 13:22:52 ddr Exp $ *)
+(* $Id: util.ml,v 4.12 2001-11-14 10:02:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -218,6 +218,7 @@ value fast_auth_age conf p =
     | _ -> False ]
 ;
 
+(*
 value nobr_level = ref 0;
 value enter_nobr () =
   do {
@@ -231,6 +232,7 @@ value exit_nobr () =
     if nobr_level.val == 0 then Wserver.wprint "</nobr>" else ();
   }
 ;
+*)
 
 value start_with_vowel s =
   if String.length s > 0 then

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.2 2001-06-28 17:05:27 ddr Exp $ *)
+(* $Id: some.ml,v 4.3 2001-11-14 10:02:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -323,7 +323,9 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
       html_p conf;
     }
     else ();
+(*
     Wserver.wprint "<nobr>\n";
+*)
     if len > 1 && br = None then do {
       Wserver.wprint "%s: %d" (capitale (transl conf "number of branches"))
         len;
@@ -366,7 +368,9 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
         1 ancestors
     in
     if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
+(*
     Wserver.wprint "</nobr>\n";
+*)
     trailer conf;
   }
 ;

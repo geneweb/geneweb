@@ -2,6 +2,9 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Nov 01] Suppressed the <nobr> tag used in several displayings,
+    because it is not html standard. Its effect was to ask not to cut
+    too large lines.
   - [08 Nov 01] In data base forum, display 100 headers and a link to
     the previous messages, instead of all headers.
   - [20 Oct 01] In the updates forms, the order "year/month/day" in
