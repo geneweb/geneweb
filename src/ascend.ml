@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.23 2000-04-06 09:11:28 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.24 2000-05-06 11:51:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -135,6 +135,9 @@ value print_choice conf base p niveau_effectif =
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
               (limit_by_list conf)
               (transl_nth conf "generation/generations" 1);
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=F> %s\n"
+            (capitale (transl conf "flash list"));
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
@@ -1731,6 +1734,151 @@ value print_male_female_line male conf base v p =
 value print_male_line = print_male_female_line True;
 value print_female_line = print_male_female_line False;
 
+(* Flash list *)
+
+value get_date_place conf base auth_for_all_anc p =
+  if auth_for_all_anc || age_autorise conf base p then
+    let d1 =
+      match Adef.od_of_codate p.birth with
+      [ None -> Adef.od_of_codate p.baptism
+      | x -> x ]
+    in
+    let d2 =
+      match p.death with
+      [ Death _ cd -> Some (Adef.date_of_cdate cd)
+      | _ ->
+          match p.burial with
+          [ Buried cod -> Adef.od_of_codate cod
+          | Cremated cod -> Adef.od_of_codate cod
+          | _ -> None ] ]
+    in
+    let auth_for_all_anc =
+      if auth_for_all_anc then True
+      else
+        match d2 with
+        [ Some (Dgreg d _)
+          when (temps_ecoule d conf.today).year > nb_year_for_public -> True
+        | _ -> False ]
+    in
+    let pl =
+      let pl = "" in
+      let pl = if pl <> "" then pl else sou base p.birth_place in
+      let pl = if pl <> "" then pl else sou base p.baptism_place in
+      let pl = if pl <> "" then pl else sou base p.death_place in
+      let pl = if pl <> "" then pl else sou base p.burial_place in
+      let pl =
+        if pl <> "" then pl
+        else
+          List.fold_left
+            (fun pl ifam ->
+               if pl <> "" then pl
+               else sou base (foi base ifam).marriage_place)
+            pl (Array.to_list (uoi base p.cle_index).family)
+      in
+      pl
+    in
+    ((d1, d2, pl), auth_for_all_anc)
+  else ((None, None, ""), False)
+;
+
+value merge_date_place conf base surn ((d1, d2, pl), auth) p =
+  let ((pd1, pd2, ppl), auth) = get_date_place conf base auth p in
+  let nd1 =
+    if pd1 <> None then pd1
+    else if p.surname = surn then
+      if pd2 <> None then pd2 else d1
+    else None
+  in
+  let nd2 =
+    if p.surname = surn then
+      if d2 <> None then d2
+      else if d1 <> None then d1
+      else if pd1 <> None then pd2 else pd1
+    else
+      if pd2 <> None then pd2
+      else if pd1 <> None then pd1
+      else d1
+  in
+  let pl =
+    if ppl <> "" then ppl
+    else if p.surname = surn then pl
+    else ""
+  in
+  ((nd1, nd2, pl), auth)
+;
+
+value build_flash_list conf base v p =
+  let ht = Hashtbl.create 701 in
+  let mark = Array.create base.data.persons.len False in
+  let auth = conf.wizard || conf.friend in
+  do loop 0 (Num.one) p p.surname (get_date_place conf base auth p)
+     where rec loop lev sosa p surn dp =
+       if lev = v then ()
+       else if mark.(Adef.int_of_iper p.cle_index) then ()
+       else
+         do mark.(Adef.int_of_iper p.cle_index) := True; return
+         match (aoi base p.cle_index).parents with
+         [ Some ifam ->
+             let cpl = coi base ifam in
+             let sosa = Num.twice sosa in
+             let fath = poi base cpl.father in
+             let dp1 = merge_date_place conf base surn dp fath in
+             do loop (lev + 1) sosa fath fath.surname dp1; return
+             let sosa = Num.inc sosa 1 in
+             let moth = poi base cpl.mother in
+             let dp2 = merge_date_place conf base surn dp moth in
+             do loop (lev + 1) sosa moth moth.surname dp2; return ()
+         | None -> Hashtbl.add ht surn (fst dp, sosa) ];
+  return
+  let list = ref [] in
+  do Hashtbl.iter
+       (fun i dp ->
+          let surn = sou base i in
+          if surn <> "?" then list.val := [(surn, dp) :: list.val]
+          else ())
+       ht;
+  return
+  Sort.list (fun (s1, _) (s2, _) -> Gutil.alphabetique s1 s2 <= 0) list.val
+;
+
+value print_flash_list conf base v p =
+  let title h =
+     do if not h then Wserver.wprint "%s<br>" (person_text conf base p)
+        else ();
+        Wserver.wprint "%s" (capitale (transl conf "flash list"));
+     return ()
+  in
+  let list = build_flash_list conf base v p in
+  do Util.header conf title;
+     Util.print_link_to_welcome conf True;
+     tag "ul" begin
+       List.iter
+         (fun (surn, ((d1, d2, pl), sosa)) ->
+            let d2 = if d2 = d1 then None else d2 in
+            do Wserver.wprint "<li>\n";
+               wprint_geneweb_link conf
+                 ("m=DAG;" ^ acces_n conf base "1" p ^ ";s1=" ^
+                  Num.to_string sosa)
+                 (surname_end surn ^ surname_begin surn);
+               Wserver.wprint "; %s;" pl;
+               if d1 <> None || d2 <> None then Wserver.wprint " " else ();
+               match d1 with
+               [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
+               | Some (Dtext s) -> Wserver.wprint "%s" s
+               | None -> () ];
+               if d1 <> None || d2 <> None then Wserver.wprint "-" else ();
+               match d2 with
+               [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
+               | Some (Dtext s) -> Wserver.wprint "%s" s
+               | None -> () ];
+               Wserver.wprint "\n";
+            return ())
+         list;
+     end;
+     Util.trailer conf;
+  return ()
+;
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
@@ -1773,5 +1921,6 @@ value print conf base p =
           print_ancestors_same_time_descendants conf base p
             (base.data.persons.get v)
       | _ -> afficher_menu_ascendants conf base p ]
+  | (Some "F", Some v) -> print_flash_list conf base v p
   | _ -> afficher_menu_ascendants conf base p ]
 ;
