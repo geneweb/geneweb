@@ -206,4 +206,4 @@ updateFam.cmo updateFam.cmx: pa_html.cmo
 updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo pa_html.cmo
 updateInd.cmo updateInd.cmx: pa_html.cmo
 updateIndOk.cmo updateIndOk.cmx: pa_lock.cmo pa_html.cmo
-util.cmo util.cmx: pa_lock.cmo
+util.cmo util.cmx: pa_lock.cmo pa_html.cmo

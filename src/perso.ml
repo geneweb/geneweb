@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.31 1999-02-14 06:38:24 ddr Exp $ *)
+(* $Id: perso.ml,v 1.32 1999-02-14 19:31:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -70,14 +70,13 @@ value next_sibling base p a =
 
 value
   print_title conf base and_txt p a first (nth, name, title, places, dates) =
-  do if not first then Wserver.wprint "," else ();
-     Wserver.wprint "\n<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n" (commd conf)
+  do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n" (commd conf)
        (code_varenv (sou base title))
        (code_varenv (sou base (List.hd places)));
      let tit = coa conf (sou base title) in
-     html_name conf (if first then capitale tit else tit);
+     Wserver.wprint "%s" (if first then capitale tit else tit);
      Wserver.wprint " ";
-     html_name conf (coa conf (sou base (List.hd places)));
+     Wserver.wprint "%s" (coa conf (sou base (List.hd places)));
      Wserver.wprint "</a>";
      let rec loop places =
        do match places with
@@ -90,7 +89,7 @@ value
            do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n"
                 (commd conf) (code_varenv (sou base title))
                 (code_varenv (sou base place));
-              html_name conf (coa conf (sou base place));
+              Wserver.wprint "%s" (coa conf (sou base place));
               Wserver.wprint "</a>";
            return loop places
        | _ -> () ]
@@ -152,6 +151,7 @@ value print_titles conf base and_txt p a =
          match l with
          [ [(nth, name, title, place, dates) :: rl]
            when
+             not conf.is_rtl &&
              nth = t.t_nth && name_equiv name t.t_name && title = t.t_title &&
              place = t.t_place ->
              [(nth, name, title, place,
@@ -169,6 +169,7 @@ value print_titles conf base and_txt p a =
          match l with
          [ [(nth, name, title, places, dates) :: rl]
            when
+             not conf.is_rtl &&
              nth = t_nth && name_equiv name t_name && title = t_title &&
              dates = t_dates ->
              [(nth, name, title, [t_place :: places], dates) :: rl]
@@ -178,10 +179,15 @@ value print_titles conf base and_txt p a =
   let _ =
     List.fold_left
       (fun first t ->
-         do print_title conf base and_txt p a first t; return False)
+         do if not first then Wserver.wprint "," else ();
+            Wserver.wprint "\n";
+            html_ltr conf begin
+              print_title conf base and_txt p a first t;
+            end;
+         return False)
       True titles
   in
-  ()
+  if titles <> [] then Wserver.wprint "\n" else ()
 ;
 
 value print_dates conf base p =
@@ -211,7 +217,9 @@ value print_dates conf base p =
               else () ];
           if birth_place <> "" then
             do Wserver.wprint " - "; return
-            html_name conf (coa conf birth_place)
+            html_ltr conf begin
+              Wserver.wprint "%s" (coa conf birth_place);
+            end
           else ();
           match (Adef.od_of_codate p.birth, birth_place) with
           [ (None, "") -> ()
@@ -411,7 +419,9 @@ value print_family conf base p a ifam =
                [ "" -> ()
                | s ->
                    do Wserver.wprint " - ";
-                      html_name conf (coa conf s);
+                      html_ltr conf begin
+                        Wserver.wprint "%s" (coa conf s);
+                      end;
                    return () ];
                match (marriage, marriage_place) with
                [ (None, "") -> ()
@@ -723,11 +733,12 @@ value print conf base p =
     [ (n, [nn :: _]) when n <> "" ->
         if h then Wserver.wprint "%s %s" (coa conf n) (coa conf (sou base nn))
         else
-          do html_name conf (coa conf n);
-             Wserver.wprint " <em>";
-             html_name conf (coa conf (sou base nn));
-             Wserver.wprint "</em>";
-          return ()
+          html_ltr conf begin
+            Wserver.wprint "%s" (coa conf n);
+            Wserver.wprint " <em>";
+            Wserver.wprint "%s" (coa conf (sou base nn));
+            Wserver.wprint "</em>";
+          end
     | (n, []) when n <> "" ->
         Wserver.wprint "%s %s" (coa conf n) (coa conf (sou base p.surname))
     | (_, [nn :: _]) ->
@@ -743,18 +754,19 @@ value print conf base p =
             (coa conf (sou base p.first_name))
             (coa conf (sou base p.surname))
         else
-          do stag "a" "href=\"%sm=P;v=%s\"" (commd conf)
-               (code_varenv (Name.lower (sou base p.first_name)))
-             begin
-               html_name conf (coa conf (sou base p.first_name));
-             end;
-             Wserver.wprint " ";
-             stag "a" "href=\"%sm=N;v=%s\"" (commd conf)
-               (code_varenv (Name.lower (sou base p.surname)))
-             begin
-               html_name conf (coa conf (sou base p.surname));
-             end;
-          return () ]
+          html_ltr conf begin
+            stag "a" "href=\"%sm=P;v=%s\"" (commd conf)
+              (code_varenv (Name.lower (sou base p.first_name)))
+            begin
+              Wserver.wprint "%s" (coa conf (sou base p.first_name));
+            end;
+            Wserver.wprint " ";
+            stag "a" "href=\"%sm=N;v=%s\"" (commd conf)
+              (code_varenv (Name.lower (sou base p.surname)))
+            begin
+              Wserver.wprint "%s" (coa conf (sou base p.surname));
+            end;
+          end ]
   in
   let a = aoi base p.cle_index in
   do header conf title;
@@ -848,15 +860,17 @@ value print conf base p =
      match (sou base p.public_name, p.nick_names) with
      [ ("", []) -> ()
      | _ ->
-         do Wserver.wprint "<em>(<a href=\"%sm=P;v=%s\">" (commd conf)
-              (code_varenv (sou base p.first_name));
-            html_name conf (coa conf (sou base p.first_name));
-            Wserver.wprint "</a> ";
-            Wserver.wprint " ";
-            Wserver.wprint "<a href=\"%sm=N;v=%s\">" (commd conf)
-              (code_varenv (sou base p.surname));
-            html_name conf (coa conf (sou base p.surname));
-            Wserver.wprint "</a>)</em>\n";
+         do html_ltr conf begin
+              Wserver.wprint "<em>(<a href=\"%sm=P;v=%s\">" (commd conf)
+                (code_varenv (sou base p.first_name));
+              Wserver.wprint "%s" (coa conf (sou base p.first_name));
+              Wserver.wprint "</a> ";
+              Wserver.wprint " ";
+              Wserver.wprint "<a href=\"%sm=N;v=%s\">" (commd conf)
+                (code_varenv (sou base p.surname));
+              Wserver.wprint "%s" (coa conf (sou base p.surname));
+              Wserver.wprint "</a>)</em>\n";
+            end;
             html_br conf;
          return () ];
      List.iter
@@ -886,7 +900,11 @@ value print conf base p =
      [ "" -> ()
      | s ->
          if age_autorise conf base p then
-           do stag "em" begin html_name conf (capitale (coa conf s)); end;
+           do stag "em" begin
+                html_ltr conf begin
+                  Wserver.wprint "%s" (capitale (coa conf s));
+                end;
+              end;
               html_br conf;
            return ()
          else () ];

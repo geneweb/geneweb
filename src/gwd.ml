@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.31 1999-02-13 21:55:05 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.32 1999-02-14 19:31:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -341,9 +341,6 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     [ Not_found -> default_lang.val ]
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  let charset =
-    try Hashtbl.find lexicon " !charset" with [ Not_found -> "iso-8859-1" ]
-  in
   let real_wizard_passwd =
     try List.assoc "wizard_passwd" base_env with
     [ Not_found -> wizard_passwd.val ]
@@ -411,7 +408,10 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      base_env = base_env;
      request = request;
      lexicon = lexicon;
-     charset = charset;
+     charset =
+       try Hashtbl.find lexicon " !charset" with [ Not_found -> "iso-8859-1" ];
+     is_rtl =
+       try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ];
      today =
        {day = tm.Unix.tm_mday;
         month = succ tm.Unix.tm_mon;
