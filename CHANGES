@@ -22,10 +22,6 @@ The new version number (4.00) is in honour of:
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
-  - [03 Feb 01] Removed the "advanced request". I received too much
-    messages about it, it works too bad and it make the server work too
-    much. Moreover it is a "data base feature" and I am not interested in
-    data bases.
   - [28 Feb 01] In surname displaying, if several surnames match,
     everybody is displayed with his/her surname. Previously, the surname
     of the people having the first surname of the list was not displayed.
@@ -68,6 +64,10 @@ The new version number (4.00) is in honour of:
     in the "traces of the last command" of gwsetup.
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [07 Mar 01] The "advanced request" which works too bad, is no more
+    proposed in welcome pages. To have it again, you have to set the
+    variable "hide_advanced_request" to "no" in the base configuration
+    file.
   - [01 Mar 01] For translators: in "person/persons" phrase, it is now
     possible to add a third field to say how to translate "persons" when
     it is after a number (e.g. 50 persons). Example with Estonian.

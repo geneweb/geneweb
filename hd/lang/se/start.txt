@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.51 2001-03-03 18:50:20 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.52 2001-03-07 10:13:27 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -134,11 +134,11 @@ sorterade i
 - <input type=submit value="Ok">
 </form>
 
-<!--<li>
+%INshide_advanced_request;<li>
 
 <font color=%i><b>genom</b></font>
 <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
-s&ouml;kning</b></font></a>.-->
+s&ouml;kning</b></font></a>.%E
 
 </ul>
 </td></tr></table></center>
