@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.25 2002-03-06 12:21:23 ddr Exp $ *)
+(* $Id: relation.ml,v 4.26 2002-03-10 16:24:20 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -874,7 +874,7 @@ value print_link_name conf base n p1 p2 sol =
       let sp2 = pp2 <> None in
       if x2 == 0 then
         if sp1 && x1 == 1 then
-          (parent_in_law_label conf ini_p2.sex, False, sp2)
+          (parent_in_law_label conf p2.sex, False, sp2)
         else
           let info = ((info, x1), fun r -> r.Consang.lens1) in
           (ancestor_label conf base info x1 p2.sex, sp1, sp2)
