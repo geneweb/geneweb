@@ -163,10 +163,10 @@ notes.cmo: config.cmi def.cmi gutil.cmi util.cmi ../wserver/wserver.cmi
 notes.cmx: config.cmi def.cmi gutil.cmx util.cmx ../wserver/wserver.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-perso.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi name.cmi \
-    num.cmi util.cmi version.cmo ../wserver/wserver.cmi perso.cmi 
-perso.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx \
-    num.cmx util.cmx version.cmx ../wserver/wserver.cmx perso.cmi 
+perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
+    templ.cmo util.cmi version.cmo ../wserver/wserver.cmi perso.cmi 
+perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
+    templ.cmx util.cmx version.cmx ../wserver/wserver.cmx perso.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 place.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi util.cmi \
@@ -201,6 +201,8 @@ srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi history.cmi \
     lock.cmi num.cmi util.cmi version.cmo ../wserver/wserver.cmi srcfile.cmi 
 srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
     lock.cmx num.cmx util.cmx version.cmx ../wserver/wserver.cmx srcfile.cmi 
+templ.cmo: buff.cmo config.cmi util.cmi ../wserver/wserver.cmi 
+templ.cmx: buff.cmx config.cmi util.cmx ../wserver/wserver.cmx 
 title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
@@ -265,6 +267,7 @@ relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_lock.cmo pa_html.cmo
 some.cmo some.cmx: def.syn.cmo pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
+templ.cmo templ.cmx: pa_html.cmo
 title.cmo title.cmx: def.syn.cmo pa_html.cmo
 updateFam.cmo updateFam.cmx: pa_html.cmo
 updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo pa_html.cmo
