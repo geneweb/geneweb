@@ -2,13 +2,17 @@ GeneWeb Version 2.01
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Mar 16, 99] Presence of images no more blocking the display of the
-    text. E.g. in welcome pages, the flags are displayed after the text.
-    (Work only for GIF images, not JPEG).
+  - [Mar 16, 99] The presence of images in pages does not block any
+    more the display of the text. For example, in welcome pages, the text
+    does not wait for the displaying of the flags to be displayed, which
+    is much more comfortable. (This applies only for local images and of
+    type GIF, not JPEG.)
   - [Mar 14, 99] In anniversaries, in the list of months, the selected
     month is now the current month, not always January.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Mar 16, 99] Did not work for gedcom files with white spaces in the
+    beginning of the lines. Fixed.
   - [Mar 11, 99] Fixed horrible bug: treatment of accents worked bad for
     gedcom files with ascii charset (resulting problems in "a" umlaut, for
     example).
