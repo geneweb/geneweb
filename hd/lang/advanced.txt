@@ -5,7 +5,7 @@
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
   <title>[*advanced request]</title>
-</head>
+%j</head>
 <body%b>
 <h1>[*advanced request]</h1>
 

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.10 2000-02-15 16:54:59 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.11 2000-02-19 13:21:35 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -35,6 +35,7 @@ value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
 value no_public_if_titles = ref False;
 value first_names_brackets = ref None;
+value untreated_in_notes = ref False;
 value force = ref False;
 value default_source = ref "";
 
@@ -980,7 +981,7 @@ value indi_lab =
   [ "ADOP" | "ASSO" | "BAPM" | "BIRT" | "BURI" | "CHR" | "CREM" | "DEAT"
   | "FAMC" | "FAMS" | "NAME" | "NOTE" | "OBJE" | "OCCU" | "SEX" | "SOUR"
   | "TITL" -> True
-  | c -> do if List.mem c glop.val then () else do glop.val := [c :: glop.val]; Printf.eprintf "unused %s\n" c; flush stderr; return (); return
+  | c -> do if List.mem c glop.val then () else do glop.val := [c :: glop.val]; Printf.eprintf "untreated tag %s -> in notes\n" c; flush stderr; return (); return
       False ]
 ;
 
@@ -1278,15 +1279,17 @@ value add_indi gen r =
     if s = "" then default_source.val else s
   in
   let ext_notes =
-    let remain_tags =
-      List.fold_left
-        (fun list r -> if indi_lab r.rlab then list else [r :: list])
-        [] r.rsons
-    in
-    if remain_tags = [] then ""
-    else
-      let s = if notes = "" then "" else "\n" in
-      s ^ html_text_of_tags (List.rev remain_tags)
+    if untreated_in_notes.val then
+      let remain_tags =
+        List.fold_left
+          (fun list r -> if indi_lab r.rlab then list else [r :: list])
+          [] r.rsons
+      in
+      if remain_tags = [] then ""
+      else
+        let s = if notes = "" then "" else "\n" in
+        s ^ html_text_of_tags (List.rev remain_tags)
+    else ""
   in
   let person =
     {first_name = add_string gen first_name; surname = add_string gen surname;
@@ -1397,7 +1400,10 @@ value add_fam_norm gen r =
     | None -> "" ]
   in
   let empty = add_string gen "" in
-  let fsources = source gen r in
+  let fsources =
+    let s = source gen r in
+    if s = "" then default_source.val else s
+  in
   let fam =
     {marriage = Adef.codate_of_od marr;
      marriage_place = add_string gen marr_place;
@@ -2102,10 +2108,14 @@ value speclist =
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year"
       );
+   ("-uin", Arg.Set untreated_in_notes,
+    " \
+- Untreated in notes -
+       Put untreated GEDCOM tags in notes");
    ("-ds", Arg.String (fun s -> default_source.val := s),
     " \
 - Default source -
-       Set the source field for persons without source data");
+       Set the source field for persons and families without source data");
    ("-dates_dm", Arg.Unit (fun () -> month_number_dates.val := DayMonthDates),
     "\n       Interpret months-numbered dates as day/month/year");
    ("-dates_md", Arg.Unit (fun () -> month_number_dates.val := MonthDayDates),
