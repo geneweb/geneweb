@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 4.3 2005-02-27 09:34:26 ddr Exp $ *)
+(* $Id: calendar.ml,v 4.4 2005-02-27 16:41:53 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.
@@ -577,8 +577,7 @@ value affmoph i date_JJD leap_year first_moon_day_found month_day moon_day
       NotYetFound (first_moon_day_found, month_day + 1, moon_day)
 ;
 
-value moon_phase_of_sdn jd =
-  let date = gregorian_of_sdn Sure jd in
+value moon_phase_of_gregorian date =
   let pi314 = 3.141592653589793 in
   let tabm =
     [| 0.041; 0.126; 0.203; 0.288;
@@ -672,4 +671,10 @@ value moon_phase_of_sdn jd =
         | Found x -> x ]
       else
         loop (ii + 1) k leap_year first_moon_day_found month_day moon_day
+;
+
+value moon_phase_of_sdn jd =
+  let date = gregorian_of_sdn Sure jd in
+  if date.year < -4000 || date.year > 2500 then None
+  else Some (moon_phase_of_gregorian date)
 ;
