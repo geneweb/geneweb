@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.137 1999-10-03 21:54:27 ddr Exp $
+# $Id: lexicon.txt,v 2.138 1999-10-04 16:52:26 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1171,6 +1171,7 @@ de: Kalender
 dk: kalender/kalendere
 en: calendar/calendars
 fr: calendrier/calendriers
+nl: kalender/kalenders
 se: kalender
 
     cancel GeneWeb links
@@ -1922,6 +1923,7 @@ de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
+nl: gregoriaans/juliaans/frans/hebreeuws
 se: gregoriansk/juliansk/fransk/hebreisk
 
     happy birthday to you!
@@ -3249,6 +3251,7 @@ de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
 fr: pr&eacute;cision
+nl: precisie
 se: precision
 
     previous sibling
@@ -3355,6 +3358,7 @@ dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 no: bekreftet far/bekreftet mor/bekreftede foreldre
+nl: recognizing father/recognizing mother/erkennende ouders
 pt: pai que o reconhoceu/m&atilde;e que o reconhoceu/pais que o reconheceram
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
@@ -3783,6 +3787,7 @@ de: Text
 dk: tekst
 en: text
 fr: texte
+nl: tekst
 se: text
 
     the %d first names
@@ -4061,7 +4066,7 @@ es: las %d muertes m&aacute;s recientes
 fr: les %d derniers d&eacute;c&egrave;s
 he:  %d המתים האחרונים
 it: le ultime %d morto
-nl: de laatste %d overlijden
+nl: de %d meest recente overlijdens
 no: de siste %d d&oslash;de
 pt: os %d mortes m&aacute;s recentes
 se: de senaste %d d&ouml;dsfallen
@@ -4428,6 +4433,7 @@ de: Jahr/Monat/Tag
 dk: &aring;r/m&aring;ned/dag
 en: year/month/day
 fr: ann&eacute;e/mois/jour
+nl: jaar/maand/dag
 se: &aring;r/m&aring;nad/dag
 
     years old
