@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.29 2000-05-07 12:33:32 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.30 2000-05-08 08:58:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -137,7 +137,7 @@ value print_choice conf base p niveau_effectif =
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=F> %s\n"
-            (capitale (transl conf "surname list"));
+            (capitale (transl conf "surnames list"));
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
@@ -1734,7 +1734,7 @@ value print_male_female_line male conf base v p =
 value print_male_line = print_male_female_line True;
 value print_female_line = print_male_female_line False;
 
-(* Flash list *)
+(* Surnames list *)
 
 value get_date_place conf base auth_for_all_anc p =
   if auth_for_all_anc || age_autorise conf base p then
@@ -1817,7 +1817,7 @@ value merge_date_place conf base surn ((d1, d2, pl), auth) p =
   ((nd1, nd2, pl), auth)
 ;
 
-value build_surname_list conf base v p =
+value build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark = Array.create base.data.persons.len 5 in
   let auth = conf.wizard || conf.friend in
@@ -1860,14 +1860,14 @@ value build_surname_list conf base v p =
   Sort.list (fun (s1, _) (s2, _) -> Gutil.alphabetique s1 s2 <= 0) list.val
 ;
 
-value print_surname_list conf base v p =
+value print_surnames_list conf base v p =
   let title h =
      do if not h then Wserver.wprint "%s<br>" (person_text conf base p)
         else ();
-        Wserver.wprint "- %s -" (capitale (transl conf "surname list"));
+        Wserver.wprint "- %s -" (capitale (transl conf "surnames list"));
      return ()
   in
-  let list = build_surname_list conf base v p in
+  let list = build_surnames_list conf base v p in
   let with_tab =
     not (Util.browser_doesnt_have_tables conf) &&
     p_getenv conf.env "tab" = Some "on"
@@ -1973,6 +1973,6 @@ value print conf base p =
           print_ancestors_same_time_descendants conf base p
             (base.data.persons.get v)
       | _ -> afficher_menu_ascendants conf base p ]
-  | (Some "F", Some v) -> print_surname_list conf base v p
+  | (Some "F", Some v) -> print_surnames_list conf base v p
   | _ -> afficher_menu_ascendants conf base p ]
 ;
