@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.25 2000-05-06 14:50:06 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.26 2000-05-06 17:13:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1743,6 +1743,16 @@ value get_date_place conf base auth_for_all_anc p =
       [ None -> Adef.od_of_codate p.baptism
       | x -> x ]
     in
+    let d1 =
+      if d1 <> None then d1
+      else
+        List.fold_left
+          (fun d ifam ->
+             if d <> None then d
+             else Adef.od_of_codate (foi base ifam).marriage)
+          d1 (Array.to_list (uoi base p.cle_index).family)
+      
+    in
     let d2 =
       match p.death with
       [ Death _ cd -> Some (Adef.date_of_cdate cd)
@@ -1809,32 +1819,41 @@ value merge_date_place conf base surn ((d1, d2, pl), auth) p =
 
 value build_flash_list conf base v p =
   let ht = Hashtbl.create 701 in
-  let mark = Array.create base.data.persons.len False in
+  let mark = Array.create base.data.persons.len 5 in
   let auth = conf.wizard || conf.friend in
   do loop 0 (Num.one) p p.surname (get_date_place conf base auth p)
      where rec loop lev sosa p surn dp =
        if lev = v then ()
-       else if mark.(Adef.int_of_iper p.cle_index) then ()
+       else if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
        else
-         do mark.(Adef.int_of_iper p.cle_index) := True; return
-         match (aoi base p.cle_index).parents with
-         [ Some ifam ->
-             let cpl = coi base ifam in
-             let sosa = Num.twice sosa in
-             let fath = poi base cpl.father in
-             let dp1 = merge_date_place conf base surn dp fath in
-             do loop (lev + 1) sosa fath fath.surname dp1; return
-             let sosa = Num.inc sosa 1 in
-             let moth = poi base cpl.mother in
-             let dp2 = merge_date_place conf base surn dp moth in
-             do loop (lev + 1) sosa moth moth.surname dp2; return ()
-         | None -> Hashtbl.add ht surn (fst dp, sosa) ];
+         do mark.(Adef.int_of_iper p.cle_index) :=
+              mark.(Adef.int_of_iper p.cle_index) - 1;
+            match (aoi base p.cle_index).parents with
+            [ Some ifam ->
+                let cpl = coi base ifam in
+                let sosa = Num.twice sosa in
+                let fath = poi base cpl.father in
+                let dp1 = merge_date_place conf base surn dp fath in
+                do loop (lev + 1) sosa fath fath.surname dp1; return
+                let sosa = Num.inc sosa 1 in
+                let moth = poi base cpl.mother in
+                let dp2 = merge_date_place conf base surn dp moth in
+                do loop (lev + 1) sosa moth moth.surname dp2; return ()
+            | None ->
+                let r =
+                  try Hashtbl.find ht surn with
+                  [ Not_found ->
+                      let r = ref (fst dp, []) in
+                      do Hashtbl.add ht surn r; return r ]
+                in
+                r.val := (fst r.val, [sosa :: snd r.val]) ];
+         return ();
   return
   let list = ref [] in
   do Hashtbl.iter
        (fun i dp ->
           let surn = sou base i in
-          if surn <> "?" then list.val := [(surn, dp) :: list.val]
+          if surn <> "?" then list.val := [(surn, dp.val) :: list.val]
           else ())
        ht;
   return
@@ -1853,20 +1872,37 @@ value print_flash_list conf base v p =
      Util.print_link_to_welcome conf True;
      tag "ul" begin
        List.iter
-         (fun (surn, ((d1, d2, pl), sosa)) ->
+         (fun (surn, ((d1, d2, pl), sosa_list)) ->
             let d2 = if d2 = d1 then None else d2 in
             do Wserver.wprint "<li>\n";
+               let (str, _) =
+                 List.fold_right
+                   (fun sosa (str, n) ->
+                      let str =
+                        str ^ ";s" ^ string_of_int n ^ "=" ^
+                        Num.to_string sosa
+                      in
+                      (str, n + 1))
+                   sosa_list ("", 1)
+               in
                wprint_geneweb_link conf
-                 ("m=DAG;" ^ acces_n conf base "1" p ^ ";s1=" ^
-                  Num.to_string sosa)
+                 ("m=DAG;" ^ acces conf base p ^ str)
                  (surname_end surn ^ surname_begin surn);
+               if conf.cancel_links then ()
+               else
+                 let comm =
+                   match List.length sosa_list with
+                   [ 1 -> ""
+                   | n -> " (" ^ string_of_int n ^ ")" ]
+                 in
+                 Wserver.wprint "%s" comm;
                Wserver.wprint "; %s;" pl;
                if d1 <> None || d2 <> None then Wserver.wprint " " else ();
                match d1 with
                [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
                | Some (Dtext s) -> Wserver.wprint "%s" s
                | None -> () ];
-               if d1 <> None || d2 <> None then Wserver.wprint "-" else ();
+               if d1 <> None && d2 <> None then Wserver.wprint "-" else ();
                match d2 with
                [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
                | Some (Dtext s) -> Wserver.wprint "%s" s

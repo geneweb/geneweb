@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.18 2000-03-12 20:23:44 ddr Exp $ *)
+(* $Id: dag.ml,v 3.19 2000-05-06 17:13:40 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -34,9 +34,11 @@ value tag_dag d =
 (* input dag *)
 
 value get_dag_elems conf base =
+  let common_p = Util.find_person_in_env conf base "" in
   loop Pset.empty 1 where rec loop set i =
     let s = string_of_int i in
     let po = Util.find_person_in_env conf base s in
+    let po = match po with [ None -> common_p | x -> x ] in
     let so = Util.p_getenv conf.env ("s" ^ s) in
     match (po, so) with
     [ (Some p, Some s) ->
