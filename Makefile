@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.32 1999-10-26 00:05:27 ddr Exp $
+# $Id: Makefile,v 2.33 1999-10-27 21:07:52 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -84,7 +84,7 @@ classical_distrib:
 		cp hd/lang/$$dir/start.txt distribution/lang/$$dir/.; \
 	done
 	mkdir distribution/images
-	cp hd/images/*.jpg distribution/images/.
+	cp hd/images/*.jpg hd/images/gwlogo.gif distribution/images/.
 	mkdir distribution/etc
 	cp hd/etc/*.txt distribution/etc/.
 
