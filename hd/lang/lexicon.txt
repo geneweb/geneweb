@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.260 2001-03-15 11:58:34 ddr Exp $
+# $Id: lexicon.txt,v 3.261 2001-03-16 16:23:27 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -50,7 +50,7 @@ nl: af=Afrikaans/br=Brasil-Portugees/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederl
 no: af=afrikaans/br=Brasil-portugisisk/cn=kinesisk/cs=tjekkisk/ct=katalansk/dk=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 pl: af=afrikaans/cn=chiñski/cs=czeski/ct=kataloñski/dk=duñski/nl=niderlandzki/en=angielski/eo=esperanto/et=estoñski/fi=fiñski/fr=francuski/de=niemiecki/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/no=norweski/pl=polski/pt=portugalski/es=hiszpañski/ru=rosyjski/se=szwedzki
 pt: af=Afrikaans/br=Portugu&ecirc;s-do-Brasil/cn=Chin&ecirc;s/cs=Checo/ct=Catal&atilde;/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;s/en=Ingl&ecirc;s/eo=Esperanto/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
-se: af=afrikaans/br=Brasil-portugisiska/cn=kinesiska/cs=tjeckiska/ct=katalanska/de=tyska/dk=danska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/ru=ryska/se=svenska
+se: af=afrikaans/br=brasiliansk-portugisiska/cn=kinesiska/cs=tjeckiska/ct=katalanska/de=tyska/dk=danska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/ru=ryska/se=svenska
 
      to see the first branch
 af:  om die eerste staak te sien
