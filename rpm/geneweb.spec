@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.9 2000-07-12 12:56:15 ddr Exp $
+# $Id: geneweb.spec,v 3.10 2000-07-12 14:26:46 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -197,7 +197,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/LISEZMOI.txt
 /home/geneweb/gw/gw/README.txt
 /home/geneweb/gw/gw/a.gwf
-/home/geneweb/gw/gw/consang
 /home/geneweb/gw/gw/doc/CREDITS.htm
 /home/geneweb/gw/gw/doc/LICENSE.htm
 /home/geneweb/gw/gw/doc/de/access.htm
