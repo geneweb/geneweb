@@ -48,7 +48,7 @@ lieu <INPUT NAME=p size=25 maxlength=200> =&gt;
 <FORM method=GET action="%f">
 %hTous les
 <SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Noms
+   <OPTION VALUE="N" SELECTED> Patronymes
    <OPTION VALUE="P"> Pr&eacute;noms
 </SELECT>
 par
