@@ -1,3 +1,9 @@
+GeneWeb Version 1.07
+--------------------
+
+* gwd:
+  - fixed bug, could not find file "start.txt" in -hd directory.
+
 GeneWeb Version 1.06
 --------------------
 

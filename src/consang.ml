@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 1.1.1.1 1998-09-01 14:32:05 ddr Exp $ *)
+(* $Id: consang.ml,v 1.2 1998-09-04 06:48:26 ddr Exp $ *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
@@ -187,7 +187,7 @@ value compute_all_consang base from_scratch =
   let running = ref True in
   let tab = make_relationship_table base in
   let cnt = ref 0 in
-  let most = ref (base.ascends.get 0) in
+  let most = ref None in
   do for i = 0 to base.ascends.len - 1 do
        let a = base.ascends.get i in
        do if from_scratch then a.consang := no_consang else (); return
@@ -213,12 +213,16 @@ value compute_all_consang base from_scratch =
                       flush stderr;
                       decr cnt;
                       a.consang := Adef.fix_of_float consang;
-                      if a.consang > most.val.consang then
-                        do Printf.eprintf "\nMax consanguinity %g for %s... "
-                             consang (denomination base (poi base ip));
-                           flush stderr;
-                        return most.val := a
-                      else ();
+                      match most.val with
+                      [ Some m ->
+                          if a.consang > m.consang then
+                            do Printf.eprintf
+                                 "\nMax consanguinity %g for %s... "
+                                 consang (denomination base (poi base ip));
+                               flush stderr;
+                            return most.val := Some a
+                          else ()
+                      | None -> most.val := Some a ];
                    return ();
                  done
                else running.val := True
