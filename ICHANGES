@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 2.08
 --------------------
 
+* Consanguinity computing (consang)
+  - [Oct 6, 99] Improved it to save memory.
+
 GeneWeb Version 2.07
 --------------------
 
