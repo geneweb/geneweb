@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.54 1999-06-07 16:57:14 ddr Exp $
+# $Id: lexicon.txt,v 2.55 1999-06-08 14:11:54 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2962,7 +2962,7 @@ pt: apelido
 se: publikt namn
 
     qualifier
-de: Spitzname
+de: Beiname
 dk: tilnavn
 en: qualifier
 eo: kromnomo
