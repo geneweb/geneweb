@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.45 2000-07-12 18:35:51 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.46 2000-07-17 09:29:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -854,7 +854,8 @@ value conf_and_connection cgi from (addr, request) str env =
     else auth_err request conf.auth_file
   in
   match (cgi, auth_err, passwd_err) with
-  [ (True, True, _) -> if is_robot from then () else no_access conf
+  [ (True, True, _) ->
+      if is_robot from then () else no_access conf
   | (_, True, _) ->
       if is_robot from then () else
       let auth_type =
@@ -866,17 +867,20 @@ value conf_and_connection cgi from (addr, request) str env =
       in
       refuse_auth conf from auth auth_type
   | (_, _, Some (passwd, uauth, base_file)) ->
-      if is_robot from then () else
-      let tm = Unix.time () in
-      do lock_wait Srcfile.adm_file "gwd.lck" with
-         [ Accept ->
-             let oc = log_oc () in
-             do log_passwd_failed passwd uauth oc tm from request base_file;
-                flush_log oc;
-             return ()
-         | Refuse -> () ];
-         unauth base_file (if passwd = "w" then "Wizard" else "Friend");
-      return ()
+      if is_robot from then
+        ()
+      else
+        let tm = Unix.time () in
+        do lock_wait Srcfile.adm_file "gwd.lck" with
+           [ Accept ->
+               let oc = log_oc () in
+               do log_passwd_failed passwd uauth oc tm from request base_file;
+                  flush_log oc;
+               return ()
+           | Refuse ->
+               () ];
+           unauth base_file (if passwd = "w" then "Wizard" else "Friend");
+        return ()
   | _ ->
       let mode = Util.p_getenv conf.env "m" in
       do if mode <> Some "IM" then
