@@ -7,6 +7,8 @@ GeneWeb Version 1.09
   - Added "wizard_just_friend" in .cnf files (see example etc/a.cnf) to
     suspend the powers of wizards.
   - [detail] Added text "Parents of" in displaying missing ancestors.
+  - Added ability to write "I" instead of "Ier" (french form).
+    Ex: "Charles I" or "Charles Ier" are both accepted.
 
 * gwc, consang:
   - Fixed accents displaying in traces and error messages.
