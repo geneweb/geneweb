@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.17 1999-07-22 22:30:25 ddr Exp $ *)
+(* $Id: descend.ml,v 2.18 1999-08-03 05:14:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -96,6 +96,8 @@ value print_choice conf base p niveau_effectif =
       in
       boucle 0;
     end;
+    Wserver.wprint "<input type=submit value=\"Ok\">\n";
+    html_br conf;
     tag "ul" begin
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L checked> %s\n"
@@ -120,8 +122,6 @@ value print_choice conf base p niveau_effectif =
       Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
     end;
     html_p conf;      
-    Wserver.wprint "<input type=submit value=\"Ok\">";
-    html_br conf;
   end
 ;
 
