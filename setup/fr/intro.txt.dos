@@ -4,13 +4,13 @@ Bienvenue dans GeneWeb $q
 Allez dans votre navigateur Web et ouvrez l'adresse:
        http://localhost:$z/
 
-Si cela ne fonctionne pas, il se peut que vous ayez à configurer dans
+Si cela ne fonctionne pas, il se peut que vous ayez … configurer dans
 votre navigateur des options du genre "travailler hors connexion" ou
 "ne pas utiliser de proxy pour les adresses locales" ou "ne pas se
 connecter sur internet pour l'adresse 'localhost'".
 
-Si malgré vos efforts, cela ne répond toujours pas, essayez la procédure
-classique en regardant la documentation. Pour cela arrêtez ce programme
-en tapant "control-c" dans cette fenêtre, allez dans le répertoire "gw"
+Si malgr‚ vos efforts, cela ne r‚pond toujours pas, essayez la proc‚dure
+classique en regardant la documentation. Pour cela arrˆtez ce programme
+en tapant "control-c" dans cette fenˆtre, allez dans le r‚pertoire "gw"
 et ouvrez le fichier:
    INSTALL.htm
