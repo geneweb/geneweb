@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.3 1999-11-23 12:25:07 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.4 1999-11-23 18:02:36 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title></head>
   <meta name="ROBOTS" content="NONE">
@@ -16,7 +16,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Sukututkimustietokanta</font></h1>
+<h1><font color=#2f6400>Sukutietokanta</font></h1>
 </td>
 </tr>
 </table>
