@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.2 1999-11-19 10:02:27 ddr Exp $ *)
+(* $Id: doc.ml,v 3.3 2000-05-03 13:18:51 ddr Exp $ *)
 
 open Config;
 
@@ -62,13 +62,6 @@ value copy conf pref_doc pref_img s =
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 
-value has_dotslash s =
-  loop 0 where rec loop i =
-    if i == String.length s then False
-    else if start_with s i "./" then True
-    else loop (i + 1)
-;
-
 value print conf =
   let v =
     match Util.p_getenv conf.env "v" with
@@ -76,7 +69,7 @@ value print conf =
     | None -> "" ]
   in
   let v = if v = "" then "index.htm" else v in
-  if Filename.is_implicit v && not (has_dotslash v) then
+  if Filename.is_implicit v then
     let v =
       if Filename.check_suffix v ".htm" then v
       else v ^ ".htm"
