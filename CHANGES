@@ -37,6 +37,8 @@ GeneWeb version 4.04
     directory (e.g. "C:\") did not work.
 
 * GeneWeb to Gedcom (gwb2ged)
+  - [06 Dec 01] Fixed bug (also in "gwu"): the option -s supposed to
+    select surnames did not work: the whole database was selected.
   - [09 Nov 01] If a person has a "first name alias" containing the
     "first name", he is exported in the gedcom as the first name alias
     in the first name field, with the real first name part enclosed with
