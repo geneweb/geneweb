@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.113 2002-11-14 13:08:55 ddr Exp $
+# $Id: lexicon.txt,v 4.114 2002-11-18 11:00:24 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -55,7 +55,7 @@ he: rtl
 
      !languages
 af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/nl=Nederlands/no=Noorweegs/pl=Pools/pt=Portugees/pt-br=Portugees-in-Braziliл/ru=Russies/sv=Sweeds/zh=Chinees
-bg: af=бурски/bg=български/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/nl=холандски/no=норвежки/pl=полски/pt=португалски/pt-br=бразилско-португалски/ru=руски/sl=словенски/sv=шведски/zh=китайски
+bg: af=бурски/bg=български/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/pl=полски/pt=португалски/pt-br=бразилско-португалски/ru=руски/sl=словенски/sv=шведски/zh=китайски
 ca: af=africа/ca=catalа/cs=xec/da=danиs/de=alemany/en=anglиs/eo=esperanto/es=castellа/et=estу/fi=finlandиs/fr=francиs/he=hebreu/is=islandиs/it=italiа/lv=letу/nl=holandиs/no=norueg/pl=polac/pt=portuguиs/pt-br=brasiler/ru=rus/sl=eslovи/sv=suec/zh=Xinиs
 cs: af=afrikбn№tina/bg=bulhar№tina/cs=иe№tina/da=dбn№tina/de=nмmиina/en=angliиtina/eo=esperanto/es=№panмl№tina/fi=fin№tina/fr=francouz№tina/he=hebrej№tina/is=island№tina/it=ital№tina/lv=loty№№tina/nl=holand№tina/no=nor№tina/pt=portugal№tina/pt-br=brasil№tina/ru=ru№tina/sv=№vйd№tina/zh=инn№tina
 da: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
@@ -383,7 +383,7 @@ sv: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     %t's sex is not coherent with his/her relations
 af: %t se geslag stem nie ooreen met sy/haar verwantskap nie
-bg: полът на %t не се съгласува с посочените отношения
+bg: полът на %t не се съгласува с посочените взаимоотношения
 ca: el sexe de %t no йs coherent amb les seves relacions
 cs: pohlavн %t se neshoduje s jeho/jejнmi vztahy
 da: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
@@ -658,7 +658,7 @@ sv: , &auml;r det
 
     2nd cousins
 af: kleinneef/kleinniggie
-bg: втори братовчеди/втори братовчедки
+bg: втори братовчеди
 ca: cosins de segon grau
 cs: bratraneci/sestшenice z druhйho kolena
 da: f&aelig;tre og kusiner af 2. grad
@@ -683,7 +683,7 @@ sv: sysslingar
 
     3rd cousins
 af: agterkleinneef/agterkleinniggie
-bg: трети братовчеди/трети братовчедки
+bg: трети братовчеди
 ca: cosins de 3er grau
 cs: bratraneci/sestшenice z tшetнho kolena
 da: f&aelig;tre og kusiner af 3. grad
@@ -1308,7 +1308,7 @@ sv: l&auml;gg till
 
     adoptive father/adoptive mother/adoptive parents
 af: aangenome vader/angenome moeder/aangenome ouers
-bg: осиновители
+bg: осиновител/осиновителка/осиновители
 ca: pare adoptiu/mare adoptiva/pares adoptius
 cs: adoptivnн otec/adoptivnн matka/adoptivnн rodiиe
 da: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
@@ -2273,7 +2273,7 @@ sv: inga GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
 af: moontlike vader/moontlike moeder/moontlike ouers
-bg: възможен баща/възможна майка/възможен родител
+bg: възможен баща/възможна майка/възможни родители
 ca: possible pare/possible mare/possibles pares
 cs: pravdмpodobnэ otec/pravdмpodobnб matka/pravdмpodobnн rodiиe
 da: mulig fader/mulig moder/mulige for&aelig;ldre
@@ -3582,7 +3582,7 @@ sv: f&ouml;r f&ouml;rnamnen i bokstavsordning
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
-bg: настойник/настойница
+bg: настойник/настойница/настойници
 ca: pare adoptiu/mare adoptiva/pares adoptius
 cs: pмstoun/pмstounka/pмstouni
 da: plejefader/plejemoder/plejefor&aelig;ldre
@@ -3659,7 +3659,7 @@ sv: generation/generationer
 
     godfather/godmother/godparents
 af: peetpa/peetma/peetouers
-bg: кръстник/кръстница/кръстник или кръстница
+bg: кръстник/кръстница/кръстници
 ca: padrн/padrina/padrins
 cs: kmotr/kmotra/kmotr a kmotra
 da: gudfader/gudmoder/gudfader og gudmoder
@@ -5371,7 +5371,7 @@ sv: ingen f&ouml;delsedag
 
     no known relationship link between %s and %s
 af: geen bekende verwantskap tussen %s en %s
-bg: няма данни за такова родство между %s и %s
+bg: няма данни за родство между %s и %s
 ca: cap lligam de parentesc conegut entre %s i %s
 cs: ѕбdnэ znбmэ vztah mezi :i:%s a :i:%s
 da: intet kendt sl&aelig;gtskab mellem %s og %s
@@ -6276,7 +6276,7 @@ sv: smeknamn
 
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
-bg: признат син/призната дъщеря/признато дете
+bg: припознат син/припозната дъщеря/припознато дете
 ca: fill reconegut/filla reconeguda/fills reconeguts
 cs: uznanэ syn/uznanб dcera/uznanй dнtм
 da: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
@@ -6301,7 +6301,7 @@ sv: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
 af: erkennende vader/erkennende moeder/erkennende ouders
-bg: признат за баща/призната за майка/признат за родител
+bg: припознал баща/припознала майка/припознали родители
 ca: pare reconegut/mare reconeguda/pares reconeguts
 cs: uznanэ otec/uznanб matka/uznanн rodiиe
 da: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
@@ -6326,7 +6326,7 @@ sv: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
     relation/relations
 af: verwant/verwante
-bg: отношение/отношения
+bg: взаимоотношение/взаимоотношения
 ca: relaciу/relacions
 cs: vztah/vztahy
 da: forbindelse/forbindelser
@@ -7689,7 +7689,7 @@ sv: f&ouml;r&auml;ldrarna
 
     the spouse
 af: die eggenoot/die eggenote
-bg: съпруг/съпруга
+bg: съпруга/съпругата
 ca: el marit/la muller
 cs: manѕel/manѕelka
 da: &aelig;gtef&aelig;llen
