@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.11 2001-04-15 05:40:56 ddr Exp $ *)
+(* $Id: relation.ml,v 4.12 2001-04-21 16:03:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -542,7 +542,11 @@ value print_shortest_path conf base p1 p2 =
                   | None -> 0 ]
                 in
                 let u = uoi base p.cle_index in
-                loop [u.family.(n) :: list] (i + 1)
+                let list =
+                  if n < Array.length u.family then [u.family.(n) :: list]
+                  else list
+                in
+                loop list (i + 1)
             | None -> list ] ]
     in
     let title _ =
