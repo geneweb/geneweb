@@ -62,7 +62,7 @@ sorteret efter
 </ul>
 
 <a href="%sm=AN">&Aring;rsdage for f&oslash;dsler</a>.<br>
-<a href="%sm=AD">&Aring;rsdage for d&oslash;dsfald</a>.<br>
+<a href="%sm=AD">&Aring;rsdage for d&oslash;de personer</a>.<br>
 <a href="%sm=AM">&Aring;rsdage for bryllupper</a>.<br>%x
 De <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>.<br>
 De <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>.<br>%x
