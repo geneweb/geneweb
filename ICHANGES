@@ -5,8 +5,10 @@ GeneWeb Version 3.12
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [12 Feb 01] In list of all persons sharing same title, the "tree" link
+    is proposed also for browser without tables.
   - [09 Feb 01] Request "m=N;o=i;v=xxx" now display all possible surnames
-    in title, except just xxx.
+    in title, not xxx.
   - [07 Feb 01] Fixed problem in dag2html. Had to add functions
     (shorten_too_long and bottom_adjust) to shorten too long branches
     which may appear in the algorithm.

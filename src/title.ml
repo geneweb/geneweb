@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.11 2001-01-06 09:55:58 ddr Exp $ *)
+(* $Id: title.ml,v 3.12 2001-02-12 03:39:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -345,31 +345,29 @@ value print_title_place_list conf base t p list =
        [] list
      in ();
      Wserver.wprint "</ul>\n";
-     if browser_doesnt_have_tables conf then ()
-     else
-       let (list, _) =
-         List.fold_left
-           (fun (list, n) (p, _) ->
-              let list =
-                if List.mem_assq p list then list else [(p, n) :: list]
-              in
-              (list, n + 1))
-           ([], 1) list
-       in
-       match List.rev list with
-       [ [_; _ :: _] as list ->
-           do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
-              let _ = List.fold_left
-                (fun i (p, n) ->
-                   do Wserver.wprint ";i%d=%d;t%d=%d" i
-                        (Adef.int_of_iper p.cle_index) i n;
-                   return i + 1)
-                1 list
-              in ();
-              Wserver.wprint ";lim=6\">%s</a>\n"
-                (capitale (transl conf "tree"));
-           return ()
-       | _ -> () ];
+     let (list, _) =
+       List.fold_left
+         (fun (list, n) (p, _) ->
+            let list =
+              if List.mem_assq p list then list else [(p, n) :: list]
+            in
+            (list, n + 1))
+         ([], 1) list
+     in
+     match List.rev list with
+     [ [_; _ :: _] as list ->
+         do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+            let _ = List.fold_left
+              (fun i (p, n) ->
+                 do Wserver.wprint ";i%d=%d;t%d=%d" i
+                      (Adef.int_of_iper p.cle_index) i n;
+                 return i + 1)
+              1 list
+            in ();
+            Wserver.wprint ";lim=6\">%s</a>\n"
+              (capitale (transl conf "tree"));
+         return ()
+     | _ -> () ];
      trailer conf;
   return ()
 ;
