@@ -2,6 +2,7 @@ GeneWeb Version 2.01
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Mar 23, 99] Added display of number of accesses in traces.
   - [Mar 17, 99] Added an optional automatic choice for the "death state" in
     "modify person" forms. Makes the updating simpler to use.
   - [Mar 16-19, 99] The presence of images in pages does not block any

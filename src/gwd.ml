@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.3 1999-03-22 17:55:09 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.4 1999-03-23 21:15:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -228,12 +228,24 @@ value print_renamed conf new_n =
   return ()
 ;
 
+value log_count =
+  fun
+  [ Some (welcome_cnt, request_cnt, start_date) ->
+      let oc = log_oc () in
+      do Printf.fprintf oc "  #accesses %d (#welcome %d) since %s\n"
+           (welcome_cnt + request_cnt) welcome_cnt start_date;
+         flush_log oc;
+      return ()
+  | None -> () ]
+;
+
 value start_with_base conf bname =
   let bfile = Filename.concat Util.base_dir.val bname in
   match try Left (Iobase.input bfile) with e -> Right e with
   [ Left base ->
-      do Family.family conf base;
-         Wserver.wflush ();
+      let r = Family.family conf base in
+      do Wserver.wflush ();
+         log_count r;
       return ()
   | Right e ->
       let transl conf w =
