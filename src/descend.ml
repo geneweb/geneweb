@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.6 2000-01-25 09:58:23 ddr Exp $ *)
+(* $Id: descend.ml,v 3.7 2000-03-11 08:41:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -170,7 +170,7 @@ value afficher_marie conf base first fam p spouse =
   let is = index_of_sex p.sex in
   let auth = age_autorise conf base p && age_autorise conf base spouse in
   do let format =
-       if fam.not_married && auth then ftransl conf "relationship%t to"
+       if fam.not_married then ftransl conf "relationship%t to"
        else ftransl_nth conf "married%t to" is
      in
      Wserver.wprint (fcapitale format)
