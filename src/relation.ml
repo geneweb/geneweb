@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.21 1999-12-15 21:58:25 ddr Exp $ *)
+(* $Id: relation.ml,v 3.22 1999-12-16 17:29:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -720,10 +720,12 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
          in
          (s, sp1, sp2)
        else
-         (descendant_label conf (x1 - x2) p1 ^ " " ^
-            transl_decline conf "of (same or greater generation level)"
-              (brother_label conf x2 Male),
-          sp1, sp2)
+         let s =
+           transl_decline2 conf "%1 of (same or greater generation level) %2"
+             (descendant_label conf (x1 - x2) p1)
+             (brother_label conf x2 Male)
+         in
+         (s, sp1, sp2)
      in
      let s =
        if sp1 then

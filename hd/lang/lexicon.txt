@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.36 1999-12-16 17:14:23 ddr Exp $
+# $Id: lexicon.txt,v 3.37 1999-12-16 17:29:52 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -578,7 +578,7 @@ dk: en bedstefader/en bedstemoder/en bedstefor&aelig;lder
 en: a grandfather/a grandmother/a grandparent
 eo: avo/avino/geavo
 es: un abuelo/una abuela/un(a) abuelo(a)
-fi: isois&auml;/iso&auml;iti/isovanhempi 
+fi: isois&auml;/iso&auml;iti/isovanhempi:g:--man
 fr: un grand-p&egrave;re/une grand-m&egrave;re/un grand-parent
 he:    סבא/ סבתא
 is: afi/amma/afi og amma
@@ -612,7 +612,7 @@ dk: en oldefader/en oldemoder/en oldefor&aelig;lder
 en: a great-grandfather/a great-grandmother/a great-grandparent
 eo: praevo/praevino/gepraevo
 es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
-fi: iso-isois&auml;/iso-iso&auml;iti/iso-isovanhempi
+fi: iso-isois&auml;/iso-iso&auml;iti/iso-isovanhempi:g:--man
 fr: un arri&egrave;re-grand-p&egrave;re/une arri&egrave;re-grand-m&egrave;re/un arri&egrave;re-grand-parent
 he:   רב-סבא/ רב-סבתא
 is: langafi/langamma/langafi og langamma
