@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.2 2001-04-21 13:50:56 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.3 2001-09-16 13:53:11 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -40,15 +40,16 @@ value print_send_image conf base p =
         let fn = p_first_name base p in
         let sn = p_surname base p in
         Wserver.wprint ": ";
-        Wserver.wprint "%s.%d %s" fn p.occ sn;
-      };
+        Wserver.wprint "%s.%d %s" fn p.occ sn
+      }
     }
   in
   let digest = Update.digest_person p in
   do {
     header conf title;
     tag "form" "method=POST action=\"%s\" enctype=\"multipart/form-data\""
-        conf.command begin
+      conf.command
+    begin
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=SND_IMAGE_OK>\n";
       Wserver.wprint "<input type=hidden name=i value=%d>\n"
@@ -62,7 +63,7 @@ value print_send_image conf base p =
       Wserver.wprint "<p>\n";
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -94,8 +95,8 @@ value print_delete_image conf base p =
           if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index else p.occ
         in
         Wserver.wprint ": ";
-        Wserver.wprint "%s.%d %s" fn occ sn;
-      };
+        Wserver.wprint "%s.%d %s" fn occ sn
+      }
     }
   in
   do {
@@ -111,7 +112,7 @@ value print_delete_image conf base p =
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;
     Wserver.wprint "\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -140,13 +141,13 @@ value print_sent conf base p =
       afficher_personne_referencee conf base p;
       Wserver.wprint "\n";
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
 value write_file fname content =
   let oc = open_out_bin fname in
-  do { output_string oc content; flush oc; close_out oc; }
+  do { output_string oc content; flush oc; close_out oc }
 ;
 
 value move_file_to_old conf typ fname bfname =
@@ -155,18 +156,20 @@ value move_file_to_old conf typ fname bfname =
   in
   if Sys.file_exists (Filename.concat old_dir bfname ^ ".gif") ||
      Sys.file_exists (Filename.concat old_dir bfname ^ ".jpg") ||
-     Sys.file_exists (Filename.concat old_dir bfname ^ ".png") then
+     Sys.file_exists (Filename.concat old_dir bfname ^ ".png")
+  then
     try Sys.remove (fname ^ typ) with [ Sys_error _ -> () ]
   else do {
     try Unix.mkdir old_dir 0o777 with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rename (fname ^ typ) (Filename.concat old_dir bfname ^ typ) with
-    [ Unix.Unix_error _ _ _ -> () ];
+    [ Unix.Unix_error _ _ _ -> () ]
   }
 ;
 
 value normal_image_type s =
   if String.length s > 10 && Char.code s.[0] = 0xff &&
-     Char.code s.[1] = 0xd8 && String.sub s 6 4 = "JFIF" then
+     Char.code s.[1] = 0xd8 && String.sub s 6 4 = "JFIF"
+  then
     ".jpg"
   else if String.length s > 4 && String.sub s 0 4 = "\137PNG" then ".png"
   else if String.length s > 4 && String.sub s 0 4 = "GIF8" then ".gif"
@@ -260,13 +263,13 @@ value effective_send_ok conf base p file =
     write_file (fname ^ typ) content;
     let key = (sou base p.first_name, sou base p.surname, p.occ) in
     History.record conf base key "si";
-    print_sent conf base p;
+    print_sent conf base p
   }
 ;
 
 value print_send_ok conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
+  lock Iobase.lock_file bfile with
   [ Accept ->
       try
         let ip =
@@ -276,7 +279,8 @@ value print_send_ok conf base =
         let p = base.data.persons.get ip in
         let digest = Update.digest_person p in
         if digest = raw_get conf "digest" then
-          let file = raw_get conf "file" in effective_send_ok conf base p file
+          let file = raw_get conf "file" in
+          effective_send_ok conf base p file
         else Update.error_digest conf base
       with
       [ Update.ModErr -> () ]
@@ -296,7 +300,7 @@ value print_deleted conf base p =
       afficher_personne_referencee conf base p;
       Wserver.wprint "\n";
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -313,13 +317,13 @@ value effective_delete_ok conf base p =
     else incorrect conf;
     let key = (sou base p.first_name, sou base p.surname, p.occ) in
     History.record conf base key "di";
-    print_deleted conf base p;
+    print_deleted conf base p
   }
 ;
 
 value print_del_ok conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
+  lock Iobase.lock_file bfile with
   [ Accept ->
       try
         match p_getint conf.env "i" with
