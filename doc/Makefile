@@ -1,3 +1,5 @@
+RM=/bin/rm -f
+
 all out opt: LICENSE.htm
 
 clean:
