@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.19 1999-09-30 13:01:42 ddr Exp $ *)
+(* $Id: date.ml,v 2.20 1999-10-01 06:24:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -319,21 +319,27 @@ value print_some_calendar conf date n month_name n_months var =
        end;
        Wserver.wprint "\n";
        tag "td" begin
-         Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>\n"
+         Wserver.wprint "<input type=submit name=y%s1 value=\"&lt;\">" var;
+         Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>"
            var date.year;
+         Wserver.wprint "<input type=submit name=y%s2 value=\"&gt;\">\n" var;
        end;
        tag "td" "align=center" begin
-         tag "select" "name=m%s" var begin
+         Wserver.wprint "<input type=submit name=m%s1 value=\"&lt;\">" var;
+         stag "select" "name=m%s" var begin
            for i = 1 to n_months do
              Wserver.wprint "<option value=%d%s> %s\n" i
                (if date.month = i then " selected" else "")
                (month_name conf (i - 1));
            done;
          end;
+         Wserver.wprint "<input type=submit name=m%s2 value=\"&gt;\">" var;
        end;
        tag "td" begin
-         Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>\n"
+         Wserver.wprint "<input type=submit name=d%s1 value=\"&lt;\">" var;
+         Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>"
            var date.day;
+         Wserver.wprint "<input type=submit name=d%s2 value=\"&gt;\">\n" var;
        end;
        tag "td" begin
          Wserver.wprint "<input type=submit name=t%s value=Ok>\n" var;
@@ -358,26 +364,57 @@ value print_calendar conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl_nth conf "calendar/calendars" 1))
   in
+  let getint v =
+    match p_getint conf.env v with
+    [ Some x -> x
+    | _ -> 0 ]
+  in
   let date =
     List.fold_left
       (fun d (var, conv) ->
+         let yy = getint ("y" ^ var) in
+         let mm = getint ("m" ^ var) in
+         let dd = getint ("d" ^ var) in
          match p_getenv conf.env ("t" ^ var) with
          [ Some _ ->
+             conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+         | None ->
              match
-               (p_getint conf.env ("y" ^ var),
-                p_getint conf.env ("m" ^ var),
-                p_getint conf.env ("d" ^ var))
+               (p_getenv conf.env ("y" ^ var ^ "1"),
+                p_getenv conf.env ("y" ^ var ^ "2"),
+                p_getenv conf.env ("m" ^ var ^ "1"),
+                p_getenv conf.env ("m" ^ var ^ "2"),
+                p_getenv conf.env ("d" ^ var ^ "1"),
+                p_getenv conf.env ("d" ^ var ^ "2"))
              with
-             [ (Some yyyy, Some mm, Some dd) ->
-                 conv
-                   {day = dd; month = mm; year = yyyy; prec = Sure; delta = 0}
-             | _ -> d ]
-         | None -> d ])
+             [ (Some _, _, _, _, _, _) ->
+                 let yy = yy - 1 in
+                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             | (_, Some _, _, _, _, _) ->
+                 let yy = yy + 1 in
+                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             | (_, _, Some _, _, _, _) ->
+                 let mm = mm - 1 in
+                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             | (_, _, _, Some _, _, _) ->
+                 let mm = mm + 1 in
+                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             | (_, _, _, _, Some _, _) ->
+                 let dd = dd - 1 in
+                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             | (_, _, _, _, _, Some _) ->
+                 let dd = dd + 1 in
+                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             | _ -> d ] ])
       conf.today
-      [("g", fun x -> x);
-       ("j", Calendar.gregorian_of_julian);
-       ("f", Calendar.gregorian_of_french);
-       ("h", Calendar.gregorian_of_hebrew)]
+      [("g",
+        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_gregorian x));
+       ("j",
+        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_julian x));
+       ("f",
+        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_french x));
+       ("h",
+        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_hebrew x))]
   in
   do header conf title;
      tag "form" "method=GET action=\"%s\"" conf.command begin
