@@ -1,11 +1,6 @@
-<HTML>
-<HEAD>
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<META NAME="Generator" CONTENT="Microsoft Word 97">
-<TITLE>GeneWeb - Problem</TITLE>
-<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+<HEAD><TITLE>GeneWeb - Problem</TITLE>
 </HEAD>
-<BODY LINK="#0000ff" VLINK="#800080">
+<BODY>
 
 <H1>GeneWeb - Problem</H1>
 <P>H&auml;r &auml;r n&aring;gra &aring;terkommande problem med "gwd": </P>
@@ -13,51 +8,62 @@
 <P>D&aring;... </P>
 <H4>Meddelandet "socket failed"</H4>
 <P>Under Windows, om detta meddelande dyker upp i DOS f&ouml;nstret och du inte kan ansluta dig med din webbl&auml;sare till den specificerade adressen, d&aring; kanske Internet protokollet (TCP/IP) inte &auml;r installerat p&aring; din dator. </P>
+
 <P>Om s&aring; &auml;r fallet, installera den. Den finns under "Control Panel", ikonen "Network". </P>
 <P>&Aring;terstarta "gwd" efter&aring;t och f&ouml;rs&ouml;k igen.</P>
+
+
 <H4>F&ouml;rs&ouml;ker ansluta till n&auml;tverket</H4>
 
 <UL>
-<LI>N&auml;r du skriver in adressen i din webbl&auml;sare, t.ex.: </LI></UL>
+<LI>N&auml;r du skriver in adressen i din webbl&auml;sare, t.ex.:
 
 <PRE>
-&#9;     http://localhost:2317/svensson</PRE><DIR>
-<DIR>
+     http://localhost:2317/svensson
+</PRE>
 
-<P>Svarar webbl&auml;saren att du m&aring;ste ansluta dig till n&auml;tverket och att det inte g&aring;r att arbeta nedkopplad. </P>
-<P>Detta problem intr&auml;ffar med en del versioner av Internet Explorer. </P></DIR>
-</DIR>
+Svarar webbl&auml;saren att du m&aring;ste ansluta dig till n&auml;tverket och att det inte g&aring;r att arbeta nedkopplad.
 
+<P>
+
+Detta problem intr&auml;ffar med en del versioner av Internet Explorer.
+</ul>
 
 <UL>
-<LI>Vi fick fr&aring;n <EM>GeneWeb</EM> anv&auml;ndare (tack) dessa l&ouml;sningar: </LI>
+<LI>Vi fick fr&aring;n <EM>GeneWeb</EM> anv&auml;ndare (tack) dessa l&ouml;sningar:
 
-<UL>
-<LI>Under Internet Explorer, v&auml;lj menyn "Display", "Internet options". Sedan, i menyn "Connection", klicka i "do not use proxy for local addresses". </LI>
-<LI>[Version 3.02] Under Internet Explorer, v&auml;lj menyn "Display", "Options", "Connection". G&aring; sedan till "Proxyserver" och v&auml;lj "Setup", l&auml;gg till under "Exceptions" och "Proxyserver not to be used for adresser beginning with" adresserna som ges n&auml;r du startar gwd.exe. Till exempel (notera semikolonen mellan namnen): </LI></UL>
-</UL>
+<p>
+
+<UL><LI> Under Internet Explorer, v&auml;lj menyn "Display", "Internet options". Sedan, i menyn "Connection", klicka i "do not use proxy for local addresses".</ul>
+
+<p>
+
+<ul><LI> [Version 3.02] Under Internet Explorer, v&auml;lj menyn "Display", "Options", "Connection". G&aring; sedan till "Proxyserver" och v&auml;lj "Setup", l&auml;gg till under "Exceptions" och "Proxyserver not to be used for adresser beginning with" adresserna som ges n&auml;r du startar gwd.exe. Till exempel (notera semikolonen mellan namnen):
 
 <PRE>
-&#9;     127.0.0.1;localhost;computer</PRE><DIR>
-<DIR>
+     127.0.0.1;localhost;computer
+</PRE>
+</ul>
 
-<P>Om det inte fungerar b&auml;ttre, f&ouml;resl&aring;r vi att du anv&auml;nder en annan webbl&auml;sare, t.ex. Netscape (som &auml;r gratis). </P></DIR>
-</DIR>
+Om det inte fungerar b&auml;ttre, f&ouml;resl&aring;r vi att du anv&auml;nder en annan webbl&auml;sare, t.ex. Netscape (som &auml;r gratis).
+</ul>
 
 <H4>Kan inte komma &aring;t filen "start.txt"</H4>
 
 <UL>
-<LI>Ett annat &aring;terkommande problem &auml;r meddelandet: "Cannot access file start.txt". </LI>
-<LI>Om du anv&auml;nder <EM>GeneWeb</EM> under Windows, kanske du packade upp arkivet med "pkunzip". Det &auml;r viktigt att g&ouml;ra det med optionerna "-e -d" </LI></UL>
+<LI>Ett annat &aring;terkommande problem &auml;r meddelandet: "Cannot access file start.txt".</ul>
+
+<ul><LI>Om du anv&auml;nder <EM>GeneWeb</EM> under Windows, kanske du packade upp arkivet med "pkunzip". Det &auml;r viktigt att g&ouml;ra det med optionerna "-e -d":
 
 <PRE>
-&#9;     pkunzip -e -d geneweb.zip</PRE><DIR>
-<DIR>
+     pkunzip -e -d geneweb.zip
+</PRE>
 
 <P>Om du inte packade upp med dessa optioner, g&ouml;r om det med dem.</P></DIR>
 </DIR>
 
 <P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
-<P><HR></P>
-<FONT SIZE=2><EM><P>&copy; Copyright INRIA 1999 - GeneWeb</P></FONT></EM></BODY>
-</HTML>
+
+<p><hr><font size=-1><em>&copy;Copyright INRIA 1999 - GeneWeb</em></font><br>
+
+</body>

@@ -1,11 +1,6 @@
-<HTML>
-<HEAD>
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<META NAME="Generator" CONTENT="Microsoft Word 97">
-<TITLE>GeneWeb - Modifiering av sidor</TITLE>
-<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+<HEAD><TITLE>GeneWeb - Modifiering av sidor</TITLE>
 </HEAD>
-<BODY LINK="#0000ff" VLINK="#800080">
+<BODY>
 
 <H1>GeneWeb - Modifiering av sidor</H1>
 <P>Denna del visar hur man modifierar v&auml;lkomst sidan och g&ouml;ra associerade sidor. Det &auml;r skrivet f&ouml;r personer som redan har anv&auml;nt <EM>GeneWeb</EM> och som vill g&aring; in p&aring; detaljer. </P>
@@ -38,7 +33,8 @@
 <LI>"lg" = nuvarande spr&aring;k. </LI></UL>
 
 <P>Filen "hdir/lang/lg/start.txt" ing&aring;r. F&ouml;r att skapa den modifierade filen, &auml;r det enklast att starta fr&aring;n en kopia av filen "start.txt" som du sedan kan &auml;ndra som du vill. Om presentationen av filen "start.txt" inte passar dig kan du ocks&aring; &auml;ndra den direkt. </P>
-<P>En varning: fr&aring;n en version av <EM>GeneWeb</EM> till n&auml;sta kan filen "start.txt" ha f&ouml;rb&auml;ttrats. Om du installerar en ny version och vill dra nytta av f&ouml;rb&auml;ttringarna, titta i filen "start.txt" f&ouml;r att se var den har &auml;ndrats och kopiera in dessa &auml;ndringar in din modifierade fil. </P>
+<P>En varning: fr&aring;n en version av <EM>GeneWeb</EM> till n&auml;sta kan filen "start.txt" ha f&ouml;rb&auml;ttrats. Om du installerar en ny version och vill dra nytta av f&ouml;rb&auml;ttringarna, titta i filen "start.txt" f&ouml;r att se var den har &auml;ndrats och kopiera in dessa &auml;ndringar i din modifierade fil. </P>
+
 <H4>Makro<A NAME="Mac">s</A></H4>
 <P>Som sades tidigare, v&auml;lkomst sidan &auml;r inte i ren HTML kod. Den inneh&aring;ller "makros". Det &auml;r sekvenser som b&ouml;rjar med ett tecken "%" f&ouml;ljt av en bokstav. Exempel: "%s", "%x", etc. </P>
 <P>Dessa makros bytts ut mot v&auml;rden vilka beror p&aring; sammanhanget: namnet p&aring; databasen, spr&aring;ket, antal personer i databasen, etc. </P>
@@ -73,7 +69,7 @@
 </STRONG><LI>"<TT>%w... %w</TT>": visning om "wizard". </LI>
 <LI>"<TT>%x... %x</TT>": visning om "wizard" eller "friend". </LI>
 <LI>"<TT>%y... %y</TT>": visning om "server" mod (ej CGI) och inte "wizard". </LI>
-<LI>"<TT>%z... %z</TT>": visning om "server" mod (not CGI) och varken "wizard" eller "friend". </LI>
+<LI>"<TT>%z... %z</TT>": visning om "server" mod (ej CGI) och varken "wizard" eller "friend". </LI>
 <LI>"<TT>%i... %i</TT>": visning om i CGI mod. </LI></UL>
 
 <STRONG><LI>Andra. </LI>
@@ -99,27 +95,28 @@
 <P>Det <STRONG>konditionella</STRONG> kan inte &ouml;verlappa: man kan inte s&auml;tta en "<TT>%w... %w</TT>" inuti en "<TT>%i... %i</TT>". </P>
 <H4><A NAME="Ass">Associerade sidor</A></H4>
 <P>P&aring; din anpassade v&auml;lkomst sida kan du s&auml;tta in l&auml;nkar till associerade filer som kommer att behandlas av <EM>GeneWeb</EM> p&aring; samma s&auml;tt: makrona kommer att bli transformerade. </P>
-<P>Till exempel, om du vill skapa en speciell sida f&ouml;r en k&auml;nd person fr&aring;n din databas, skapa en fil ben&auml;mnd "famous.txt" och i katalogen "bdir/lang/lg" eller i katalogen "bdir/lang" (se f&ouml;rsta delen). </P>
+<P>Till exempel, om du vill skapa en speciell sida f&ouml;r en k&auml;nd person fr&aring;n din databas, skapa en fil ben&auml;mnd "famous.txt" i katalogen "bdir/lang/lg" eller i katalogen "bdir/lang" (se f&ouml;rsta delen). </P>
 <P>F&ouml;rfr&aring;gningarna till "famous.txt" &auml;r: "m=H;v=famous". P&aring; v&auml;lkomst sidan, skriver du: </P>
 <PRE>
    &lt;a href="%sm=H;v=famous"&gt;K&auml;nda&lt;/a&gt; personer i min
    databas.</PRE>
-<P>I "famous.txt", kan du l&auml;gga in l&auml;nkar till personer i din databas, oberoende fr&aring;n hans namn och fr&aring;n sammanhanget, anv&auml;ndandes makros. </P>
-<P>De riktigt intressanta makron &auml;r: </P>
+<P>I "famous.txt", kan du l&auml;gga in l&auml;nkar till personer i din databas, oberoende fr&aring;n deras namn och av sammanhanget, genom att anv&auml;nda makros. </P>
+<P>De riktigt intressanta makrona &auml;r: </P>
 
 <UL>
-<LI>"<TT>%b</TT>" du kan s&auml;tta in en tag "&lt;body&gt;" genom att skriva "&lt;body%b&gt;". </LI>
-<LI>"<TT>%s</TT>" du kan anv&auml;nda i l&auml;nkar. </LI></UL>
+<LI>"<TT>%b</TT>" kan du anv&auml;nda att s&auml;tta in en tag "&lt;body&gt;" genom att skriva "&lt;body%b&gt;". </LI>
+<LI>"<TT>%s</TT>" kan du anv&auml;nda i l&auml;nkar. </LI></UL>
 
 <P>Exempel p&aring; mening i "famous.txt": </P>
 <PRE>
    Se min kusin &lt;a href="%sp=louis;n=de+bourbon;oc=5"&gt;
    Ludvig XIV&lt;/a&gt; och min
    &lt;a href="%em=R;ep=bertil;en=svensson;m=NG;n=louis+xiv;t=PN"&gt;
-   sl&auml;ktskaps l&auml;nk&lt;/a&gt; med honom.</PRE>
+   sl&auml;ktskapsl&auml;nk&lt;/a&gt; med honom.</PRE>
 <P>Se ocks&aring; hur du g&ouml;r korrekta <A HREF="links.htm">l&auml;nkar</A> till <EM>GeneWeb</EM> sidor. </P>
-<P>Notera att "avancerad f&ouml;rfr&aring;gan" fungerar som en associerad fil ben&auml;mnd "advanced.txt". </P>
+<P>Notera att "avancerad s&ouml;kning" fungerar som en associerad fil ben&auml;mnd "advanced.txt". </P>
 <P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
-<P><HR></P>
-<FONT SIZE=2><EM><P>&copy; Copyright INRIA 1999 - GeneWeb</P></FONT></EM></BODY>
-</HTML>
+
+<p><hr><font size=-1><em>&copy;Copyright INRIA 1999 - GeneWeb</em></font><br>
+
+</body>
