@@ -1,6 +1,10 @@
 GeneWeb Version 1.12
 --------------------
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [Feb 6, 99] Accept dates with "/" (20/11/1993) although it is not
+    correct Gedcom standard 5.5. Interpreted as day/month/year.
+
 GeneWeb Version 1.11
 --------------------
 
