@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.15 2002-01-23 11:52:41 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.16 2002-03-05 16:29:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -754,7 +754,7 @@ value print_add o_conf base =
                   | _ -> (scpl.father, "af") ]
             | _ -> (scpl.father, "af") ]
           in
-          base.func.commit_patches ();
+          Util.commit_patches conf base;
           History.record conf base (fn, sn, occ) act;
           Update.delete_topological_sort conf base;
           print_add_ok conf base wl cpl des
@@ -784,7 +784,7 @@ value print_del conf base =
           do {
             if not (is_deleted_family fam) then do {
               effective_del conf base fam;
-              base.func.commit_patches ();
+              Util.commit_patches conf base;
               History.record conf base k "df";
               Update.delete_topological_sort conf base
             }
@@ -831,7 +831,7 @@ value print_mod o_conf base =
       | _ -> scpl.father ]
     in
     do {
-      base.func.commit_patches ();
+      Util.commit_patches conf base;
       History.record conf base (fn, sn, occ) "mf";
       Update.delete_topological_sort conf base;
       print_mod_ok conf base wl cpl des
@@ -852,7 +852,7 @@ value print_inv conf base =
           try
             do {
               effective_inv conf base p.cle_index u (Adef.ifam_of_int ifam);
-              base.func.commit_patches ();
+              Util.commit_patches conf base;
               History.record conf base k "if";
               print_inv_ok conf base p
             }

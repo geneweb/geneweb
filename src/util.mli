@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.10 2002-02-23 14:05:07 ddr Exp $ *)
+(* $Id: util.mli,v 4.11 2002-03-05 16:29:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -11,6 +11,9 @@ value cnt_dir : ref string;
 value images_url : ref string;
 value image_prefix : config -> string;
 value base_path : list string -> string -> string;
+
+value escache_value : config -> string;
+value commit_patches : config -> base -> unit;
 
 value secure : string -> string;
 
@@ -31,11 +34,6 @@ value hidden_env : config -> unit;
 value age_autorise : config -> base -> person -> bool;
 value is_old_person : config -> person -> bool;
 value fast_auth_age : config -> person -> bool;
-
-(*
-value enter_nobr : unit -> unit;
-value exit_nobr : unit -> unit;
-*)
 
 value start_with_vowel : string -> bool;
 value connais : base -> person -> bool;

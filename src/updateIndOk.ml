@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.8 2002-02-26 09:19:38 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.9 2002-03-05 16:29:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -699,7 +699,7 @@ value print_add o_conf base =
               let wl = all_checks_person conf base p a u in
               let k = (sp.first_name, sp.surname, sp.occ) in
               do {
-                base.func.commit_patches ();
+                Util.commit_patches conf base;
                 History.record conf base k "ap";
                 print_add_ok conf base wl p;
               } ]
@@ -720,7 +720,7 @@ value print_del conf base =
           do {
             effective_del conf base p;
             base.func.patch_person p.cle_index p;
-            base.func.commit_patches ();
+            Util.commit_patches conf base;
             History.record conf base k "dp";
             print_del_ok conf base [];
           }
@@ -764,7 +764,7 @@ value print_mod o_conf base =
       Update.update_misc_names_of_family base p u;
       let wl = all_checks_person conf base p (aoi base p.cle_index) u in
       let k = (sp.first_name, sp.surname, sp.occ) in
-      base.func.commit_patches ();
+      Util.commit_patches conf base;
       History.record conf base k "mp";
       let quest_string = Adef.istr_of_int 1 in
       if p.surname <> quest_string && p.first_name <> quest_string
