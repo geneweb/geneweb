@@ -35,16 +35,39 @@ signalez-le moi.
 
 <h4>&Agrave; l'affichage des liens de parent&eacute;, il en manque.</h4>
 
-<font color=#2f6400><b>GeneWeb</b></font> n'affiche pas les liens tels que la personne de
-droite (resp. de gauche) descend d'une des personnes de la branche de
-gauche (resp. de droite).
+Pour &eacute;viter que la liste des liens de parent&eacute; ne soit trop
+grande, <font color=#2f6400><b>GeneWeb</b></font> en supprime &agrave;
+l'affichage. Pour cela, il utilise la m&eacute;thode suivante: quand
+un lien de parent&eacute; avec un anc&ecirc;tre commun est
+trouv&eacute;, tous les anc&ecirc;tres de cet anc&ecirc;tre sont
+&eacute;limin&eacute;s de la recherche.
 
 <p>
 
-Car ces liens de parent&eacute;-l&agrave; deviennent rapidement
-tellement nombreux que &ccedil;a en devient illisible. Ce sont des
-liens r&eacute;els pourtant, et ils sont tout de m&ecirc;me
-comptabilis&eacute;s dans le calcul de la consanguinit&eacute;.
+Une des cons&eacute;quences de cet &eacute;lagage est que si on fait
+un calcul de parent&eacute; avec un anc&ecirc;tre, celui-ci ne sera
+affich&eacute; que comme anc&ecirc;tre, alors qu'il peut parfois
+&ecirc;tre aussi un cousin.
+
+<p>
+
+Par exemple, si mon p&egrave;re et ma m&egrave;re sont cousins, et que
+je cherche mes liens de parent&eacute; avec ma m&egrave;re, cela
+indiquera juste que je suis son fils et pas que je suis fils de son
+cousin, m&ecirc;me si ce lien de parent&eacute; existe vraiment.
+
+<p>
+
+L'&eacute;lagage est n&eacute;cessaire: sans lui, pour les familles un
+peu "entrem&ecirc;l&eacute;es", l'affichage devient rapidement envahi
+de liens de parent&eacute;s dans tous les sens, et finalement
+incompr&eacute;hensible (je l'ai test&eacute;).
+
+<p>
+
+Les liens non affich&eacute;s sont des liens r&eacute;els pourtant, et
+ils sont tout de m&ecirc;me comptabilis&eacute;s dans le calcul de la
+consanguinit&eacute;.
 
 <p>
 
