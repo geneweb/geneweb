@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.44 2001-01-27 21:40:09 ddr Exp $ *)
+(* $Id: dag.ml,v 3.45 2001-01-30 04:47:39 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -464,13 +464,13 @@ value table_strip_troublemakers hts =
   done
 ;
 
-value print_next_pos conf pos1 pos2 =
+value print_next_pos conf pos1 pos2 tcol =
   let doit = p_getenv conf.env "notab" = Some "on" in
   if doit then
     let dpos =
       match p_getint conf.env "dpos" with
       [ Some dpos -> dpos
-      | None -> 80 ]
+      | None -> 78 ]
     in
     let pos1 =
       match pos1 with
@@ -491,10 +491,13 @@ value print_next_pos conf pos1 pos2 =
         conf.env []
     in
     do Wserver.wprint "<div align=right>\n";
-       Wserver.wprint "<a href=\"%s" (commd conf);
-       List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-       Wserver.wprint "pos1=%d;pos2=%d" (pos2 - 10) (pos2 + dpos);
-       Wserver.wprint "\">&gt;&gt;</a>\n";
+       if pos2 >= tcol then Wserver.wprint "&nbsp;"
+       else
+         do Wserver.wprint "<a href=\"%s" (commd conf);
+            List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+            Wserver.wprint "pos1=%d;pos2=%d" (pos2 - 10) (pos2 - 10 + dpos);
+            Wserver.wprint "\">&gt;&gt;</a>\n";
+         return ();
        Wserver.wprint "</div>\n";
     return ()
   else ()
@@ -549,7 +552,7 @@ return
 *)
   let pos1 = p_getint conf.env "pos1" in
   let pos2 = p_getint conf.env "pos2" in
-  do print_next_pos conf pos1 pos2;
+  do print_next_pos conf pos1 pos2 (Array.fold_left \+ 0 colsz);
      Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
        let (stra, max_row) =
@@ -642,6 +645,14 @@ return
 (* main *)
 
 value print_html_table conf hts =
+  do if Util.p_getenv conf.env "notab" <> Some "on" then
+       do Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
+          List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
+          Wserver.wprint "notab=on;pos2=78";
+          Wserver.wprint "\"><tt>//</tt></a></div>\n";
+       return ()
+     else ();
+  return
   if Util.p_getenv conf.env "notab" = Some "on"
   || Util.p_getenv conf.env "pos2" <> None
   || browser_doesnt_have_tables conf then
