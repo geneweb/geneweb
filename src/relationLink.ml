@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.13 2000-03-05 17:15:07 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.14 2000-04-11 02:08:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -208,7 +208,9 @@ value spouse_text conf base end_sp ip ipl =
 ;
 
 value print_someone conf base ip =
-  Wserver.wprint "%s\n" (someone_text conf base ip)
+  do Wserver.wprint "%s\n" (someone_text conf base ip);
+     Dag.print_image conf base (poi base ip);
+  return ()
 ;
 
 value print_spouse conf base n ip ipl =
@@ -217,6 +219,7 @@ value print_spouse conf base n ip ipl =
     do Wserver.wprint "&amp;%s" d;
        html_br conf;
        Wserver.wprint "%s\n" s;
+       Dag.print_image conf base (poi base ip);
     return ()
   else ()
 ;
@@ -349,6 +352,8 @@ value sign_text conf base sign info b1 b2 c1 c2 =
   ^ ";c1=" ^ string_of_int c1 ^ ";c2=" ^ string_of_int c2
   ^ (match p_getenv conf.env "spouse" with
      [ Some "on" -> ";spouse=on" | _ -> "" ])
+  ^ (match p_getenv conf.env "image" with
+     [ Some "on" -> ";image=on" | _ -> "" ])
   ^ include_marr conf base "3" ^ include_marr conf base "4"
   ^ "\">" ^ sign ^ "</a>"
 ;

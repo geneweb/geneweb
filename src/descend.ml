@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.7 2000-03-11 08:41:22 ddr Exp $ *)
+(* $Id: descend.ml,v 3.8 2000-04-11 02:08:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -109,14 +109,18 @@ value print_choice conf base p niveau_effectif =
             (capitale (transl conf "list"));
           if browser_doesnt_have_tables conf then ()
           else
-            Wserver.wprint "<input type=radio name=t value=T> %s\n"
-              (capitale (transl conf "tree"));
-            if niveau_effectif <= limit_by_tree conf then ()
-            else
-              Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
-                (limit_by_tree conf)
-                (transl_nth conf "generation/generations" 1);
-          Wserver.wprint "<br>\n";
+            do Wserver.wprint "<input type=radio name=t value=T> %s\n"
+                 (capitale (transl conf "tree"));
+               if niveau_effectif <= limit_by_tree conf then ()
+               else
+                 Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+                   (limit_by_tree conf)
+                   (transl_nth conf "generation/generations" 1);
+               Wserver.wprint "<br>\n";
+               Wserver.wprint
+                 "- %s <input type=checkbox name=image value=on><br>\n"
+                 (capitale (transl_nth conf "image/images" 1));
+            return ();
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
         end;
@@ -1100,12 +1104,12 @@ value print_tree conf base gv p =
              else if auth then txt ^ short_dates_text gv conf base p
              else txt
            in
-           stag "td" "colspan=%d align=center valign=top" (2 * ncol - 1)
+           tag "td" "colspan=%d align=center valign=top" (2 * ncol - 1)
            begin
-             Wserver.wprint "%s" txt;
+             Wserver.wprint "%s\n" txt;
+             Dag.print_image conf base p;
            end
-       | None -> Wserver.wprint "<td>&nbsp;</td>" ];
-       Wserver.wprint "\n";
+       | None -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
   let print_spouses v first po =

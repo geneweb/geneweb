@@ -5,6 +5,8 @@ GeneWeb version 3.04
   - [06 Apr 00] Added Afrikaans (Louis Kruger).
 
 * GeneWeb Service/CGI (gwd)
+  - [11 Mar 00] Added optional displaying of images in descendants by tree
+    and in relationship trees.
   - [03 Apr 00] In ancestor page, added horizontal displaying.
   - [02 Apr 00] In surname page, added ability to click on a branch number
     to display only that one.
