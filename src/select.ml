@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 3.1 1999-11-10 08:44:33 ddr Exp $ *)
+(* $Id: select.ml,v 3.2 1999-12-13 21:06:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -63,7 +63,13 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
            per_tab.(Adef.int_of_iper cpl.father) := True;
            per_tab.(Adef.int_of_iper cpl.mother) := True;
            Array.iter
-             (fun ic -> per_tab.(Adef.int_of_iper ic) := True)
+             (fun ic ->
+                let p = poi base ic in
+                if not per_tab.(Adef.int_of_iper ic) &&
+                  Name.strip_lower (sou base p.surname) = surname
+                then
+                  per_tab.(Adef.int_of_iper ic) := True
+                else ())
              des.children;
            if no_spouses_parents then ()
            else
