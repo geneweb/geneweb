@@ -6,18 +6,19 @@ They are freely distributed at addresses:
      http://caml.inria.fr/ocaml/
      http://caml.inria.fr/camlp4/
 
-1- If your platform has no native-code Ocaml compiler (the command ocaml.opt
-   is not installed), edit the file "tools/Makefile.inc" and change
-     OCAMLC=ocamlc.opt
+1- If the command ocamlc.opt is not installed, edit the file
+   "tools/Makefile.inc" and change:
+       OCAMLC=ocamlc.opt
    into
-     OCAMLC=ocamlc
+       OCAMLC=ocamlc
 
 2- From the top directory, do:
       make
    This creates executables for the Objective Caml interpretor.
 
 3- If your platform is supported by the native-code Ocaml compiler, you
-   can build the native-code programs. Do:
+   can build the native-code programs (this is recommended, executables
+   are much faster). Do:
       make opt
 
 4- Do:
