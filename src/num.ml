@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 4.0 2001-03-16 19:34:52 ddr Exp $ *)
+(* $Id: num.ml,v 4.1 2001-04-19 12:34:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type t = array int;
@@ -157,9 +157,11 @@ value print f sep x =
     let _ =
       List.fold_left
         (fun n d ->
-           do f (string_of_int d);
-              if n > 0 && n mod 3 = 0 then f sep else ();
-           return n - 1)
+           do {
+             f (string_of_int d);
+             if n > 0 && n mod 3 = 0 then f sep else ();
+             n - 1;
+           })
         (List.length digits - 1) digits
     in ()
 ;
@@ -172,7 +174,7 @@ value to_string x =
   let s = String.create (List.length digits) in
   let _ =
     List.fold_left
-       (fun i d -> do s.[i] := Char.chr (Char.code '0' + d); return (i + 1))
+       (fun i d -> do { s.[i] := Char.chr (Char.code '0' + d); (i + 1) })
        0 digits
   in
   s
