@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.14 1999-09-21 05:42:19 ddr Exp $
+# $Id: geneweb.spec,v 1.15 1999-09-21 20:15:12 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -109,6 +109,7 @@ rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version} /etc/rc.d/*/*gwd
 %pre
 /usr/sbin/groupadd geneweb
 /usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" geneweb
+chmod a+rx /home/geneweb
 
 %post
 # Sure, all the files are already owned by geneweb, but the directories ain't.
@@ -188,6 +189,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/README.txt
 /home/geneweb/gw/gw/a.gwf
 /home/geneweb/gw/gw/consang
+/home/geneweb/gw/gw/doc/CREDITS.htm
 /home/geneweb/gw/gw/doc/LICENSE.htm
 /home/geneweb/gw/gw/doc/de/consang.htm
 /home/geneweb/gw/gw/doc/de/diruse.htm
