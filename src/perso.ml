@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.47 2003-03-06 15:57:40 ddr Exp $ *)
+(* $Id: perso.ml,v 4.48 2003-04-01 12:19:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -656,7 +656,9 @@ value string_of_prefix_no_templ conf base env =
       (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
       conf.henv []
   in
-  do { conf.henv := henv; commd conf }
+  let c = conf.command ^ "?" in
+  List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
+    (henv @ conf.senv)
 ;
 
 value string_of_qualifier conf base env p p_auth =
