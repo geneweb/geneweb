@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.8 2005-02-27 09:34:26 ddr Exp $
+# $Id: lex_utf8.txt,v 1.9 2005-02-27 19:23:29 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5577,9 +5577,9 @@ ru: месяцы
 sl: mesecev star/mesecev stara
 sv: m&aring;nader
 
-    moon day/new moon/first quarter/full moon/last quarter
-en: moon day/new moon/first quarter/full moon/last quarter
-fr: jour lunaire/nouvelle lune/premier quartier/pleine lune/dernier quartier
+    moon age/new moon/first quarter/full moon/last quarter
+en: moon age/new moon/first quarter/full moon/last quarter
+fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
 
     more than %d answers
 af: meer as %d antwoorde

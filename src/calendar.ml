@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 4.4 2005-02-27 16:41:53 ddr Exp $ *)
+(* $Id: calendar.ml,v 4.5 2005-02-27 19:23:29 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.
@@ -464,15 +464,15 @@ value gregorian_of_hebrew = conv gregorian_of_sdn 12 sdn_of_hebrew 13;
 value hebrew_of_gregorian = conv hebrew_of_sdn 13 sdn_of_gregorian 12;
 
 (* Moon phases *)
-(* Borrowed from
+(* Borrowed from G.Satre of CNRS's program found at:
    http://portail.imcce.fr/fr/ephemerides/astronomie/Promenade/pages4/441.html
-   Program initially written in JavaScript; converted into OCaml with
-   code cleaning and transforming for interface jdn/moon-day: but I did
-   not understand everything and the code could perhaps be improved *)
+   Program written in JavaScript; converted into OCaml with code cleaning
+   and transforming for interface jdn/moon-day: but I did not understand
+   everything and the code could perhaps be improved *)
 
 type found 'a 'b = [ Found of 'a | NotYetFound of 'b ];
-type moon_day =
-  [ OrdinaryMoonDay
+type moon_phase =
+  [ NoPhase
   | NewMoon of int and int
   | FirstQuarter of int and int
   | FullMoon of int and int
@@ -508,7 +508,7 @@ value is_leap_year year =
   else False
 ;
 
-value init_moon_day month day leap_year =
+value init_moon_age month day leap_year =
   let nbdays =
     if month == 2 then
       if not leap_year then 28 else 29
@@ -520,7 +520,7 @@ value init_moon_day month day leap_year =
   nbdays - day + 2
 ;
 
-value testmon i date first_moon_day_found date_JJD month_day moon_day =
+value testmon i date first_moon_age_found date_JJD month_day moon_age =
   let d = float date.year /. 100.0 in
   let tetus = 32.23 *. (d -. 18.30) *. (d -. 18.30) -. 15.0 in
   let tetuj = tetus /. 86400.0 in
@@ -528,17 +528,17 @@ value testmon i date first_moon_day_found date_JJD month_day moon_day =
   let (day, month, year) = jjdate date_JJD in
   let leap_year = is_leap_year year in
   let inside_month = month == date.month in
-  let (month_day, moon_day) =
+  let (month_day, moon_age) =
     if i == 0 && (date.month > month || month == 12 && date.month == 1) &&
-       not first_moon_day_found
+       not first_moon_age_found
     then
-      (1, init_moon_day month day leap_year)
-    else (month_day, moon_day)
+      (1, init_moon_age month day leap_year)
+    else (month_day, moon_age)
   in
-  (inside_month, date_JJD, leap_year, month_day, moon_day)
+  (inside_month, date_JJD, leap_year, month_day, moon_age)
 ;
 
-value affmoph i date_JJD leap_year first_moon_day_found month_day moon_day
+value affmoph i date_JJD leap_year first_moon_age_found month_day moon_age
       date =
   let tabjm = [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |] in
   let (day, month, year) = jjdate date_JJD in
@@ -557,24 +557,24 @@ value affmoph i date_JJD leap_year first_moon_day_found month_day moon_day
     else
       (day, hh)
   in
-  loop month_day moon_day where rec loop month_day moon_day =
+  loop month_day moon_age where rec loop month_day moon_age =
     if month_day < day then
-      if month_day = date.day then Found (OrdinaryMoonDay, moon_day)
-      else loop (month_day + 1) (moon_day + 1)
+      if month_day = date.day then Found (NoPhase, moon_age)
+      else loop (month_day + 1) (moon_age + 1)
     else if month_day = date.day then
       let r =
         match i with
         [ 0 -> (NewMoon hh mm, 1)
-        | 1 -> (FirstQuarter hh mm, moon_day)
-        | 2 -> (FullMoon hh mm, moon_day)
-        | _ -> (LastQuarter hh mm, moon_day) ]
+        | 1 -> (FirstQuarter hh mm, moon_age)
+        | 2 -> (FullMoon hh mm, moon_age)
+        | _ -> (LastQuarter hh mm, moon_age) ]
       in
       Found r
     else
-      let (moon_day, first_moon_day_found) =
-        if i == 0 then (2, True) else (moon_day + 1, first_moon_day_found)
+      let (moon_age, first_moon_age_found) =
+        if i == 0 then (2, True) else (moon_age + 1, first_moon_age_found)
       in
-      NotYetFound (first_moon_day_found, month_day + 1, moon_day)
+      NotYetFound (first_moon_age_found, month_day + 1, moon_age)
 ;
 
 value moon_phase_of_gregorian date =
@@ -596,7 +596,7 @@ value moon_phase_of_gregorian date =
   in
   let rad = pi314 /. 180.0 in
   loop 0 ini_k False False 0 0
-  where rec loop ii prev_k leap_year first_moon_day_found month_day moon_day =
+  where rec loop ii prev_k leap_year first_moon_age_found month_day moon_age =
     if ii >= 12 then
       let nbdays =
         if date.month == 2 then
@@ -606,10 +606,10 @@ value moon_phase_of_gregorian date =
           else
             if date.month land 1 !=0 then 30 else 31
       in
-      loop month_day moon_day where rec loop month_day moon_day =
+      loop month_day moon_age where rec loop month_day moon_age =
         if month_day <= nbdays then
-          if month_day == date.day then (OrdinaryMoonDay, moon_day)
-          else loop (month_day + 1) (moon_day + 1)
+          if month_day == date.day then (NoPhase, moon_age)
+          else loop (month_day + 1) (moon_age + 1)
         else failwith "moon_phase"
     else
       let k = prev_k +. 0.25 in
@@ -659,18 +659,18 @@ value moon_phase_of_gregorian date =
           if i == 1 then j +. 0.0028 -. 0.0004 *. cos m +. 0.0003 *. cos mp
           else j -. 0.0028 +. 0.0004 *. cos m -. 0.0003 *. cos mp
       in
-      let (inside_month, date_JJD, leap_year, month_day, moon_day) =
-        testmon i date first_moon_day_found date_JJD month_day moon_day
+      let (inside_month, date_JJD, leap_year, month_day, moon_age) =
+        testmon i date first_moon_age_found date_JJD month_day moon_age
       in
       if inside_month then
-        match affmoph i date_JJD leap_year first_moon_day_found month_day
-              moon_day date
+        match affmoph i date_JJD leap_year first_moon_age_found month_day
+              moon_age date
         with
-        [ NotYetFound (first_moon_day_found, month_day, moon_day) ->
-            loop (ii + 1) k leap_year first_moon_day_found month_day moon_day
+        [ NotYetFound (first_moon_age_found, month_day, moon_age) ->
+            loop (ii + 1) k leap_year first_moon_age_found month_day moon_age
         | Found x -> x ]
       else
-        loop (ii + 1) k leap_year first_moon_day_found month_day moon_day
+        loop (ii + 1) k leap_year first_moon_age_found month_day moon_age
 ;
 
 value moon_phase_of_sdn jd =
