@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.16 1999-12-21 13:14:08 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.17 1999-12-21 14:32:53 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -66,6 +66,12 @@ value print_char_table d t =
 ;
 
 value print_html_table print print_indi phony border d t =
+  let phony =
+    fun
+    [ Elem e -> phony d.dag.(int_of_idag e)
+    | Ghost _ -> False
+    | Nothing -> True ]
+  in
   let jlast = Array.length t.table.(0) - 1 in
   let print_elem =
     fun
@@ -243,7 +249,9 @@ let next_l = min next_l next_j in
                      do print "<td>&nbsp</td>\n";
                         print "<td colspan=";
                         print (string_of_int colspan);
-                        print " align=center>|</td>\n";
+                        print " align=center>";
+                        print (ph "|");
+                        print "</td>\n";
                         print "<td>&nbsp;</td>\n";
                      return ()
                    else if l = j then
