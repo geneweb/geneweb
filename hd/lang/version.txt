@@ -22,7 +22,3 @@
 <td align=center><a href="%glang=se"><font size=-1>se</font></a></td>
 </tr>
 </table>
-
-<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>

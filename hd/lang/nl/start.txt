@@ -3,6 +3,8 @@
 <head><title>Genealogie - %t</title></head>
 <body%b><h1>Genealogie</h1>
 
+%rversion
+
 <p>
 
 Deze verzameling heeft nu %n personen.
@@ -79,4 +81,4 @@ Deze paginas zijn %c maal bezocht.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

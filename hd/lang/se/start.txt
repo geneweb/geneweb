@@ -4,6 +4,10 @@
 <body%b>
 <h1>Genealogi</h1>
 
+%rversion
+
+<p>
+
 Databasen innehåller nu %n personer.
 
 <ul>
@@ -77,4 +81,4 @@ tillträde:</font>
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

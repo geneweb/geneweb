@@ -4,6 +4,10 @@
 <body%b>
 <h1>G&eacute;n&eacute;alogie</h1>
 
+%rversion
+
+<p>
+
 La base contient actuellement %n personnes.
 
 <ul>
@@ -77,4 +81,4 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>
