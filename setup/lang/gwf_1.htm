@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwf_1.htm,v 1.2 2002-01-14 07:21:39 ddr Exp $ -->
+  <!-- $Id: gwf_1.htm,v 1.3 2002-01-17 06:15:53 ddr Exp $ -->
   <title>[
 de: Parameter "$a"
 en: Parameters "$a"
@@ -202,7 +202,7 @@ sv: Detta gäller inte bara för välkomstsidan utan för alla visade sidor
 <tr align=left>
 <td colspan=3>
 <input type=radio name=proposed_body_prop value="" checked>
-<input name=body_prop value="$B" size=55><br>
+<input name=body_prop value="$Vbody_prop;" size=55><br>
 </td>
 </tr>
 
@@ -816,20 +816,20 @@ sv: Om det är "-", kommer det förvalda språket för kommandot "gwd" att gälla.
 <tr align=left>
 <td align=center>
 <select name=default_lang>
-<option value=$L{}>-
-<option value=$L{af}>[
+<option value=""$Edefault_lang=;>-
+<option value="af"$Edefault_lang=af;>[
 de: Afrikaans
 en: Afrikaans
 fr: afrikaans
 sv: afrikaans
 ]
-<option value=$L{ca}>[
+<option value="ca"$Edefault_lang=ca;>[
 en: Catalan
 es: Catalán
 fr: catalan
 sv: katalanska
 ]
-<option value=$L{cs}>[
+<option value="cs"$Edefault_lang=cs;>[
 de: Tschechisch
 en: Czech
 es: Checo
@@ -837,7 +837,7 @@ fr: tch&egrave;que
 lv: Èehu
 sv: tjeckiska
 ]
-<option value=$L{da}>[
+<option value="da"$Edefault_lang=da;>[
 de: D&auml;nish
 en: Danish
 es: Dan&eacute;s
@@ -845,7 +845,7 @@ fr: danois
 lv: Dâòu
 sv: danska
 ]
-<option value=$L{de}>[
+<option value="de"$Edefault_lang=de;>[
 de: Deutsch
 en: German
 es: Alem&aacute;n
@@ -853,7 +853,7 @@ fr: allemand
 lv: Vâcu
 sv: tyska
 ]
-<option value=$L{en}>[
+<option value="en"$Edefault_lang=en;>[
 de: Englisch
 en: English
 es: Ingl&eacute;s
@@ -861,7 +861,7 @@ fr: anglais
 lv: Angïu
 sv: engelska
 ]
-<option value=$L{eo}>[
+<option value="eo"$Edefault_lang=eo;>[
 de: Esperanto
 en: Esperanto
 es: Esperanto
@@ -869,7 +869,7 @@ fr: esp&eacute;ranto
 lv: Esperanto
 sv: esperanto
 ]
-<option value=$L{es}>[
+<option value="es"$Edefault_lang=es;>[
 de: Spanisch
 en: Spanish
 es: Espa&ntilde;ol
@@ -877,20 +877,20 @@ fr: espagnol
 lv: Spâòu
 sv: spanska
 ]
-<option value=$L{et}>[
+<option value="et"$Edefault_lang=et;>[
 de: Estnisch
 en: Estonian
 fr: estonien
 sv: estniska
 ]
-<option value=$L{fi}>[
+<option value="fi"$Edefault_lang=fi;>[
 de: Finnisch
 en: Finnish
 fr: finnois
 lv: Somu
 sv: finska
 ]
-<option value=$L{fr}>[
+<option value="fr"$Edefault_lang=fr;>[
 de: Franz&ouml;sisch
 en: French
 es: Franc&eacute;s
@@ -898,7 +898,7 @@ fr: fran&ccedil;ais
 lv: Franèu
 sv: franska
 ]
-<option value=$L{he}>[
+<option value="he"$Edefault_lang=he;>[
 de: Hebr&auml;isch
 en: Hebrew
 es: Hebreo
@@ -906,14 +906,14 @@ fr: h&eacute;breu
 lv: Ebreju
 sv: hebreiska
 ]
-<option value=$L{is}>[
+<option value="is"$Edefault_lang=is;>[
 de: Isl&auml;ndisch
 en: Icelandic
 fr: islandais
 lv: Islandieðû
 sv: isländska
 ]
-<option value=$L{it}>[
+<option value="it"$Edefault_lang=it;>[
 de: Italienisch
 en: Italian
 es: Italiano
@@ -921,14 +921,14 @@ fr: italien
 lv: Itâïu
 sv: italienska
 ]
-<option value=$L{lv}>[
+<option value="lv"$Edefault_lang=lv;>[
 de: Litauisch
 en: Latvian
 fr: letton
 lv: Latvieðu
 sv: litauiska
 ]
-<option value=$L{nl}>[
+<option value="nl"$Edefault_lang=nl;>[
 de: Holl&auml;ndisch
 en: Dutch
 es: N&eacute;erlandes
@@ -936,7 +936,7 @@ fr: n&eacute;erlandais
 lv: Holandieðu
 sv: holländska
 ]
-<option value=$L{no}>[
+<option value="no"$Edefault_lang=no;>[
 de: Norwegisch
 en: Norwegian
 es: Noruego
@@ -944,13 +944,13 @@ fr: norv&eacute;gien
 lv: Norvçìu
 sv: norska
 ]
-<option value=$L{pl}>[
+<option value="pl"$Edefault_lang=pl;>[
 de: Polnisch
 en: Polish
 fr: polonais
 sv: polska
 ]
-<option value=$L{pt}>[
+<option value="pt"$Edefault_lang=pt;>[
 de: Portugiesisch
 en: Portuguese
 es: Portug&eacute;s
@@ -958,7 +958,7 @@ fr: portugais
 lv: Portugâïu
 sv: portugisiska
 ]
-<option value=$L{pt-br}>[
+<option value="pt-br"$Edefault_lang=pt-br;>[
 de: Brasil-Portugiesisch
 en: Brazilian-Portuguese
 es: Portug&eacute;s-del-Brasil
@@ -966,14 +966,14 @@ fr: portugais-du-Br&eacute;sil
 lv: Brasil-Portugâïu
 sv: brasiliansk-portugisiska
 ]
-<option value=$L{ru}>[
+<option value="ru"$Edefault_lang=ru;>[
 de: Russisch
 en: Russian
 fr: russe
 lv: Krievu
 sv: ryska
 ]
-<option value=$L{sv}>[
+<option value="sv"$Edefault_lang=sv;>[
 de: Schwedisch
 en: Swedish
 es: Sueco
@@ -981,7 +981,7 @@ fr: su&eacute;dois
 lv: Zviedru
 sv: svenska
 ]
-<option value=$L{zh}>[
+<option value="zh"$Edefault_lang=zh;>[
 de: Chinesisch
 en: Chinese
 es: Chino
@@ -993,6 +993,58 @@ sv: kinesiska
 </td>
 </tr>
 </table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left><td><strong>- history -</strong></td></tr>
+<tr align=left>
+<td>[
+en: History of updates
+fr: Historique des mises &agrave; jour
+]
+
+<tr align=left>
+<td align=center>
+<input type=radio name=history value=yes$Chistory=yes;>[
+de: Ja
+en: Yes
+es: si
+fr: oui
+lv: Yes
+sv: Yes
+]
+<input type=radio name=history value=no$Chistory=no;>[
+de: Nein
+en: No
+es: no
+fr: non
+lv: Nç
+sv: No 
+]
+</tr>
+</table></dl>
+
+<p>
+
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left><td><strong>- images_path -</strong></td></tr>
+<tr align=left>
+<td>[
+en: Images path
+fr: Chemin d'acc&egrave;s aux images
+]</td>
+</tr>
+
+<tr align=left>
+<td align=center><input name=images_path value="$Vimages_path;"
+size=50></td>
+</tr>
+
+</table></dl>
+
 
 <dl><dt><dd><table border=1>
 <tr align=left>
@@ -1051,7 +1103,8 @@ sv:  Om den lämnas tom, är alla en "friend".
 </tr>
 
 <tr align=left>
-<td align=center><input name=friend_passwd value="$F" size=30></td>
+<td align=center><input name=friend_passwd value="$Vfriend_passwd;"
+size=30></td>
 </tr>
 </table></dl>
 
@@ -1097,7 +1150,8 @@ sv: Om den lämnas tom, är alla en "wizard".
 </tr>
 
 <tr align=left>
-<td align=center><input name=wizard_passwd value="$W" size=30></td>
+<td align=center><input name=wizard_passwd value="$Vwizard_passwd;"
+size=30></td>
 </tr>
 </table></dl>
 
@@ -1158,7 +1212,7 @@ sv: Det kan vara användbart lokalt, när man vill sätta in en bild av någon,
 
 <tr align=left>
 <td align=center>
-<input type=radio name=can_send_image value=$I[yes]>[
+<input type=radio name=can_send_image value=yes$Ccan_send_image=yes;>[
 de: Ja
 en: Yes
 es: si
@@ -1167,7 +1221,7 @@ lv: Jâ
 sv: Yes
 ]
 
-<input type=radio name=can_send_image value=$I[no]>[
+<input type=radio name=can_send_image value=no$Ccan_send_image=no;>[
 de: Nein
 en: No
 es: no
@@ -1247,7 +1301,7 @@ sv: Detta kan vara användbart, temporärt, när du gör en upprensning av din
 
 <tr align=left>
 <td align=center>
-<input type=radio name=wizard_just_friend value=$J[yes]>[
+<input type=radio name=wizard_just_friend value=yes$Cwizard_just_friend=yes;>[
 de: Ja
 en: Yes
 es: si
@@ -1256,7 +1310,7 @@ lv: Yes
 sv: Yes
 ]
 
-<input type=radio name=wizard_just_friend value=$J[no]>[
+<input type=radio name=wizard_just_friend value=no$Cwizard_just_friend=no;>[
 de: Nein
 en: No
 es: no
@@ -1340,7 +1394,7 @@ sv: Om den är tom, har databasen inte blivit omdöpt.
 </tr>
 
 <tr align=left>
-<td align=center><input name=renamed value="$R" size=30></td>
+<td align=center><input name=renamed value="$Vrenamed;" size=30></td>
 </tr>
 </table></dl>
 
@@ -1368,7 +1422,7 @@ sv: Om du vill att en text ska synas längst ner på varje sida, skriv den här.
 <tr align=left>
 <td>
 
-<textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
+<textarea name=trailer rows=3 cols=60 wrap=virtual>$Ftrailer;</textarea>
 </td>
 </tr>
 </table></dl>
