@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.38 2000-11-02 10:31:28 ddr Exp $ *)
+(* $Id: family.ml,v 3.39 2000-11-08 12:28:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -174,9 +174,11 @@ value find_all conf base an =
   let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
-      match Util.branch_of_sosa base p.cle_index n with
-      [ Some [(ip, _) :: _] -> [poi base ip]
-      | _ -> [] ]
+      if n <> Num.zero then
+        match Util.branch_of_sosa base p.cle_index n with
+        [ Some [(ip, _) :: _] -> [poi base ip]
+        | _ -> [] ]
+      else []
   | _ ->
       let ipl = person_ht_find_all base an in
       let (an, ipl) =
