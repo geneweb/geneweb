@@ -18,8 +18,14 @@ INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
       make distrib
 
    This creates a directory "distribution" where all executables programs
-   and documentation are copied. Read the file README.txt in this directory
-   and follow the instructions.
+   and documentation are copied.
+
+   Move this directory to another place, or rename it. Read the file
+   README.txt in this directory and follow the instructions.
+
+   The reason why it is better to move this directory is that "make clean"
+   deletes it, and another "make distrib" scratches it. If you created
+   genealogic databases inside, they would be deleted.
 
 
 INSTALLATIONS INSTRUCTIONS IN WINDOWS NT/95/98
@@ -36,7 +42,9 @@ You need:
 - The preprocessor Camlp4 (binaries are not distributed, you need to
   download the sources and compile it).
 
-In directory tools, move the file Makefile.inc as another name, and move
-the file Makefile.inc.win as Makefile.inc.
+In directory tools, move the file Makefile.inc as another name, and
+move the file Makefile.inc.win as Makefile.inc. Edit it and possibly
+change "CAMLP4D" and "LIBUNIX" to point file where the corresponding
+Ocaml and Camlp4 files or directories are installed.
 
 Then follow the same instructions above than for the Unix installation.
