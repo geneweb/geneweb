@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.4 2001-03-23 20:17:11 ddr Exp $
+# $Id: lexicon.txt,v 4.5 2001-03-24 22:54:47 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -961,6 +961,7 @@ pl: prawnuk/prawnuczka/prawnuki
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
 ru: праправнук/праправнучка/праправнук
 se: en son(dotter)-son(dotter) son/en son(dotter)-son(dotter) dotter/ett barnbarns barn
+se: en sonsonson/en sonsondotter/ett barnbarns barn/en sondotterson/en sondotterdotter/ett barnbarns barn/en dottersonson/en dottersondotter/ett barnbarns barn/en dotterdotterson/en dotterdotterdotter/ett barnbarns barn
 
     a great-nephew/a great-niece
 af: 'n agterneef/'n agterniggie

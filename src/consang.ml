@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 4.0 2001-03-16 19:34:29 ddr Exp $ *)
+(* $Id: consang.ml,v 4.1 2001-03-24 22:54:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -14,14 +14,19 @@ type anc_stat = [ MaybeAnc | IsAnc ];
         to prune displayed relationships
    - anc_stat1, anc_stat2
         optimization to answer faster when ancestors list is exhausted
+   - lens1, lens2:
+        the third parameter (list iper) of the list has been added to
+        be able to reconstitute the branch in case of the sex of the
+        persons in the branch is important to display the relationship
+        text
 *)
 
 type relationship =
   { weight1 : mutable float;
     weight2 : mutable float;
     relationship : mutable float;
-    lens1 : mutable list (int * int);
-    lens2 : mutable list (int * int);
+    lens1 : mutable list (int * int * list iper);
+    lens2 : mutable list (int * int * list iper);
     inserted : mutable int;
     elim_ancestors : mutable bool;
     anc_stat1 : mutable anc_stat;
@@ -122,16 +127,16 @@ value make_relationship_info base tstab =
   {tstab = tstab; reltab = tab; queue = [| |]}
 ;
 
-value rec insert_branch_len_rec (len, n) =
+value rec insert_branch_len_rec ((len, n, ip) as x) =
   fun
-  [ [] -> [(len, n)]
-  | [(len1, n1) :: lens] ->
-      if len == len1 then [(len1, n + n1) :: lens]
-      else [(len1, n1) :: insert_branch_len_rec (len, n) lens] ]
+  [ [] -> [(len, n, [ip])]
+  | [((len1, n1, ipl1) as y) :: lens] ->
+      if len == len1 then [(len1, n + n1, [ip :: ipl1]) :: lens]
+      else [y :: insert_branch_len_rec x lens] ]
 ;
 
-value rec insert_branch_len lens (len, n) =
-  insert_branch_len_rec (succ len, n) lens
+value rec insert_branch_len ip lens (len, n, ipl) =
+  insert_branch_len_rec (succ len, n, ip) lens
 ;
 
 value consang_of p =
@@ -188,7 +193,7 @@ value relationship_and_links base ri b ip1 ip2 =
     let nb_anc1 = ref 1 in
     let nb_anc2 = ref 1 in
     let tops = ref [] in
-    let treat_parent u y =
+    let treat_parent ip_from u y =
       do if reltab.(y).inserted <> yes_inserted then insert y else (); return
       let ty = reltab.(y) in
       let p1 = half u.weight1 in
@@ -204,8 +209,10 @@ value relationship_and_links base ri b ip1 ip2 =
          ty.relationship := ty.relationship +. p1 *. p2;
          if u.elim_ancestors then ty.elim_ancestors := True else ();
          if b && not ty.elim_ancestors then
-           do ty.lens1 := List.fold_left insert_branch_len ty.lens1 u.lens1;
-              ty.lens2 := List.fold_left insert_branch_len ty.lens2 u.lens2;
+           do ty.lens1 :=
+                List.fold_left (insert_branch_len ip_from) ty.lens1 u.lens1;
+              ty.lens2 :=
+                List.fold_left (insert_branch_len ip_from) ty.lens2 u.lens2;
            return ()
          else ();
       return ()
@@ -228,8 +235,10 @@ value relationship_and_links base ri b ip1 ip2 =
          match a.parents with
          [ Some ifam ->
              let cpl = coi base ifam in
-             do treat_parent tu (Adef.int_of_iper cpl.father);
-                treat_parent tu (Adef.int_of_iper cpl.mother);
+             do treat_parent (Adef.iper_of_int u) tu
+                  (Adef.int_of_iper cpl.father);
+                treat_parent (Adef.iper_of_int u) tu
+                   (Adef.int_of_iper cpl.mother);
              return ()
          | _ -> () ];
       return ()
@@ -238,8 +247,8 @@ value relationship_and_links base ri b ip1 ip2 =
        insert i2;
        reltab.(i1).weight1 := 1.0;
        reltab.(i2).weight2 := 1.0;
-       reltab.(i1).lens1 := [(0, 1)];
-       reltab.(i2).lens2 := [(0, 1)];
+       reltab.(i1).lens1 := [(0, 1, [])];
+       reltab.(i2).lens2 := [(0, 1, [])];
        reltab.(i1).anc_stat1 := IsAnc;
        reltab.(i2).anc_stat2 := IsAnc;
        while qi.val <= qmax.val && nb_anc1.val > 0 && nb_anc2.val > 0 do

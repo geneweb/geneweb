@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.3 2001-03-24 05:18:49 ddr Exp $ *)
+(* $Id: relation.ml,v 4.4 2001-03-24 22:54:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -639,43 +639,67 @@ value nb_fields s =
     else loop cnt (i + 1)
 ;
 
-value descendant_label conf base x anc p =
+value rec belongs_to_branch ip dist =
+  fun
+  [ [(n, _, ipl) :: lens] ->
+      if n = dist && List.memq ip ipl then True
+      else belongs_to_branch ip dist lens
+  | [] -> False ]
+;
+
+value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
+  let (anc, _) = List.hd list in
+  loop anc.cle_index x where rec loop ip dist =
+    if dist <= len1 then []
+    else
+      let lens = proj reltab.(Adef.int_of_iper ip) in
+      loop1 (Array.to_list (uoi base ip).family)
+      where rec loop1 =
+        fun
+        [ [ifam :: ifaml] ->
+            loop2 (Array.to_list (doi base ifam).children)
+            where rec loop2 =
+              fun
+              [ [ipc :: ipl] ->
+                  if belongs_to_branch ipc dist lens then
+                    let dist = dist - 1 in
+                    if dist <= len2 then [ipc :: loop ipc dist]
+                    else loop ipc dist
+                  else loop2 ipl
+              | [] -> loop1 ifaml ]
+        | [] -> [] ]
+;
+
+value descendant_label conf base info x p =
   let is = index_of_sex p.sex in
   match x with
   [ 1 -> transl_nth conf "a son/a daughter/a child" is
   | 2 ->
       let txt = transl conf "a grandson/a granddaughter/a grandchild" in
-      if nb_fields txt = 6 then
-        match anc with
-        [ Some anc ->
-            let n =
-              match (aoi base p.cle_index).parents with
-              [ Some ifam ->
-                  let glop =
-                    fun
-                    [ Some ifam ->
-                        let cpl = coi base ifam in
-                        [cpl.father; cpl.mother]
-                    | None -> [] ]
-                  in
-                  let cpl = coi base ifam in
-                  let fath_side = glop (aoi base cpl.father).parents in
-                  let moth_side = glop (aoi base cpl.mother).parents in
-                  if List.mem anc.cle_index fath_side then 0
-                  else if List.mem anc.cle_index moth_side then 3
-                  else 0
-              | None -> 0 ]
-            in
-            nth_field txt (is + n)
-        | None ->
-            let sm = nth_field txt is in
-            let sf = nth_field txt (is + 3) in
-            if sm = sf then sm
-            else sm ^ " " ^ transl conf "or" ^ " " ^ sf ]
-      else nth_field txt is
+      let is =
+        if nb_fields txt = 6 then
+          let info = (info, fun r -> r.Consang.lens2) in
+          match get_piece_of_branch conf base info (1, 1) with
+          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 3
+          | _ -> (* must be a bug *) is ]
+        else is
+      in
+      nth_field txt is
   | 3 ->
-      transl_nth conf
-        "a great-grandson/a great-granddaughter/a great-grandchild" is
+      let txt =
+        transl conf "a great-grandson/a great-granddaughter/a great-grandchild"
+      in
+      let is =
+        if nb_fields txt = 12 then
+          let info = (info, fun r -> r.Consang.lens2) in
+          match get_piece_of_branch conf base info (1, 2) with
+          [ [ip1; ip2] ->
+              let is = if (poi base ip1).sex = Male then is else is + 6 in
+              if (poi base ip2).sex = Male then is else is + 3
+          | _ -> (* must be a bug *) is ]
+        else is
+      in
+      nth_field txt is
   | n ->
       transl_nth conf "a descendant" is ^ " " ^
         Printf.sprintf (ftransl conf "of the %s generation")
@@ -703,6 +727,9 @@ value brother_in_law_label conf sex =
   let is = index_of_sex sex in
   transl_nth conf "a brother-in-law/a sister-in-law" is
 ;
+
+(* uncle_label: should be changed to use get_piece_of_branch and not
+   this parameter 'side' (which is old method) *)
 
 value uncle_label conf x p side =
   let is = index_of_sex p.sex in
@@ -761,11 +788,13 @@ value uncle_relation_side base p1 p2 x2 =
   | None -> Neuter ]
 ;
 
-value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
+value print_link conf base info n p1 p2 pp1 pp2 x1 x2 =
+(*
   let (p1, pp1, x1, p2, pp2, x2) =
     if p1.sex <> Neuter then (p1, pp1, x1, p2, pp2, x2)
     else (p2, pp2, x2, p1, pp1, x1)
   in
+*)
   do Wserver.wprint "%s" (person_title_text conf base p1);
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
@@ -783,7 +812,8 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
        else if x2 == 0 then
          if sp1 && x1 == 1 then
            (child_in_law_label conf ini_p1.sex, False, sp2)
-         else (descendant_label conf base x1 (Some p2) p1, sp1, sp2)
+         else
+           (descendant_label conf base (info, x1) x1 p1, sp1, sp2)
        else if x1 == x2 then
          if x1 == 1 && not (same_parents base p1 p2) then
            (half_brother_label conf p1.sex, sp1, sp2)
@@ -812,16 +842,17 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
          let s =
            let sm = brother_label conf x2 Male in
            let sf = brother_label conf x2 Female in
-           let d = descendant_label conf base (x1 - x2) None p1 in
-           if sm = sf then
-             transl_decline2 conf
-               "%1 of (same or greater generation level) %2" d sm
-           else
-             transl_decline2 conf
-               "%1 of (same or greater generation level) %2" d sm ^ " " ^
-             transl conf "or" ^ " " ^
-             transl_decline2 conf
-               "%1 of (same or greater generation level) %2" "" sf
+           let d = descendant_label conf base (info, x1) (x1 - x2) p1 in
+           let s =
+             if sm = sf then sm
+             else
+               let info = ((info, x1), fun r -> r.Consang.lens2) in
+               match get_piece_of_branch conf base info (x1 - x2, x1 - x2) with
+               [ [ip1] -> if (poi base ip1).sex = Male then sm else sf
+               | _ -> (* must be a bug *) sm ]
+           in
+           transl_decline2 conf "%1 of (same or greater generation level) %2"
+             d s
          in
          (s, sp1, sp2)
      in
@@ -994,8 +1025,8 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   return ()
 ;
 
-value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list)) =
-  do print_link conf base n p2 p1 pp2 pp1 x2 x1;
+value print_solution conf base reltab long n p1 p2 (pp1, pp2, (x1, x2, list)) =
+  do print_link conf base (reltab, list) n p2 p1 pp2 pp1 x2 x1;
      if x1 == 0 || x2 == 0 then
        print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
      else print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list;
@@ -1129,8 +1160,7 @@ value print_propose_upto conf base p1 p2 rl =
   | _ -> () ]
 ;
 
-value compute_simple_relationship conf base tstab p1 p2 =
-  let tab = Consang.make_relationship_info base tstab in
+value compute_simple_relationship conf base tab p1 p2 =
   let (relationship, ancestors) =
     Consang.relationship_and_links base tab True p1.cle_index p2.cle_index
   in
@@ -1141,10 +1171,10 @@ value compute_simple_relationship conf base tstab p1 p2 =
         (fun n i ->
            let u = tab.Consang.reltab.(i) in
            List.fold_left
-             (fun n (_, n1) ->
+             (fun n (_, n1, _) ->
                 let n1 = Num.of_int n1 in
                 List.fold_left
-                  (fun n (_, n2) -> Num.add n (Num.mul n1 n2)) n
+                  (fun n (_, n2, _) -> Num.add n (Num.mul n1 n2)) n
                   u.Consang.lens1)
              n u.Consang.lens2)
         Num.zero ancestors
@@ -1155,10 +1185,11 @@ value compute_simple_relationship conf base tstab p1 p2 =
            let u = tab.Consang.reltab.(i) in
            let p = base.data.persons.get i in
            List.fold_left
-             (fun rl (len1, n1) ->
+             (fun rl (len1, n1, _) ->
                 List.fold_left
-                  (fun rl (len2, n2) -> [(len1, len2, (p, n1 * n2)) :: rl]) rl
-                  u.Consang.lens2)
+                  (fun rl (len2, n2, _) ->
+                     [(len1, len2, (p, n1 * n2)) :: rl])
+                  rl u.Consang.lens2)
              rl u.Consang.lens1)
         [] ancestors
     in
@@ -1214,7 +1245,8 @@ value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 =
     (fun p1 sl ->
        List.fold_right
          (fun p2 sl ->
-            let sol = compute_simple_relationship conf base tstab p1 p2 in
+            let tab = Consang.make_relationship_info base tstab in
+            let sol = compute_simple_relationship conf base tab p1 p2 in
             match sol with
             [ Some (rl, total, _) ->
                 let s = List.map (fun r -> (f_sp1 p1, f_sp2 p2, r)) rl in
@@ -1233,7 +1265,8 @@ value compute_relationship conf base by_marr p1 p2 =
     let _ = base.data.ascends.array () in
     let _ = base.data.couples.array () in
     let tstab = Util.create_topological_sort conf base in
-    let sol = compute_simple_relationship conf base tstab p1 p2 in
+    let tab = Consang.make_relationship_info base tstab in
+    let sol = compute_simple_relationship conf base tab p1 p2 in
     let sol_by_marr =
       if by_marr then
         let spl1 = known_spouses_list base p1 p2 in
@@ -1270,7 +1303,7 @@ value compute_relationship conf base by_marr p1 p2 =
            (merge_relations rl1 rl, Num.add total1 total))
         all_sol ([], Num.zero)
     in
-    if sl = [] then None else Some (sl, total, rel)
+    if sl = [] then None else Some (sl, total, rel, tab.Consang.reltab)
 ;
 
 value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
@@ -1338,7 +1371,7 @@ value print_main_relationship conf base long p1 p2 rel =
                 (cftransl conf "no known relationship link between %s and %s"
                    [gen_person_title_text reference raw_access conf base p1;
                     gen_person_title_text reference raw_access conf base p2]))
-     | Some (rl, total, relationship) ->
+     | Some (rl, total, relationship, reltab) ->
          let a1 = aoi base p1.cle_index in
          let a2 = aoi base p2.cle_index in
          let all_by_marr =
@@ -1351,7 +1384,7 @@ value print_main_relationship conf base long p1 p2 rel =
          do let _ =
               List.fold_left
                 (fun i sol ->
-                   do print_solution conf base long i p1 p2 sol;
+                   do print_solution conf base reltab long i p1 p2 sol;
                       if long then print_path conf base i p1 p2 sol else ();
                    return succ i)
                 1 rl
