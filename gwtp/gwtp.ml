@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.8 2001-10-30 19:40:22 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.9 2001-10-31 09:36:30 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -621,7 +621,7 @@ value ged2gwb b =
   let comm =
     Filename.concat gwtp_etc.val "ged2gwb" ^ " " ^
     Filename.concat gwtp_tmp.val (b ^ ".ged") ^ " -f -o " ^
-    Filename.concat gwtp_dst.val b ^ " > " ^
+    Filename.concat gwtp_tmp.val b ^ " > " ^
     Filename.concat gwtp_tmp.val (b ^ ".log")
   in
   let r = Sys.command comm in ()
@@ -631,7 +631,6 @@ value send_gedcom_file str env b tok f fname =
   let fname = filename_basename fname in
   if Filename.check_suffix fname ".ged" || Filename.check_suffix fname ".GED"
   then do {
-    let lockf = Filename.concat gwtp_tmp.val (b ^ ".lck") in
     printf "content-type: text/html";
     crlf ();
     crlf ();
@@ -642,22 +641,16 @@ value send_gedcom_file str env b tok f fname =
 <pre>
 ";
     flush stdout;
-    lock lockf with
-    [ Accept ->
-        do {
-          make_gedcom_file env b;
-          printf "\nGedcom file transfered.\n";
-          flush stdout;
-          ged2gwb b;
-          printf "Data base \"%s\" updated.\n" b;
-          printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
-            (cgi_script_name ()) b tok;
-        }
-    | Refuse ->
-        do {
-          printf "Data base is already being transfered.<br>\n";
-          printf "Please try again later.\n";
-        } ];
+    make_gedcom_file env b;
+    printf "\nGedcom file transfered.\n";
+    flush stdout;
+    ged2gwb b;
+    printf "New data base created.\n";
+    flush stdout;
+    copy_temp b;
+    printf "Data base \"%s\" updated.\n" b;
+    printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
+      (cgi_script_name ()) b tok;
     flush stdout;
     printf "</pre>\n";
     printf_link_to_main b tok;
