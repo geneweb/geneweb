@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.31 2002-10-21 10:57:19 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.32 2002-10-21 18:57:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -189,8 +189,14 @@ value eval_create_variable c =
   fun
   [ "birth_year" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _, _)) ->
-          string_of_int y
+      [ Update.Create _
+        (Some (Some (Dgreg {year = y; prec = p} _), _, _, _, _)) ->
+          let s = string_of_int y in
+          match p with
+          [ Maybe -> "?" ^ s
+          | Before -> "<" ^ s
+          | After -> ">" ^ s
+          | _ -> s ]
       | _ -> "" ]
   | "birth_month" ->
       match c with
@@ -210,8 +216,19 @@ value eval_create_variable c =
       | _ -> "" ]
   | "death_year" ->
       match c with
-      [ Update.Create _ (Some (_, _, _, Some (Dgreg {year = y} _), _)) ->
-          string_of_int y
+      [ Update.Create _
+        (Some (_, _, _, Some (Dgreg {year = y; prec = p} _), _)) ->
+          let s = string_of_int y in
+          match p with
+          [ Maybe -> "?" ^ s
+          | Before -> "<" ^ s
+          | After -> ">" ^ s
+          | _ -> s ]
+      | Update.Create _ (Some (_, _, death, None, _)) ->
+          match death with
+          [ DeadDontKnowWhen -> "+"
+          | NotDead -> "="
+          | _ -> "" ]
       | _ -> "" ]
   | "death_month" ->
       match c with
