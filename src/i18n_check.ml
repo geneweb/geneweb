@@ -1,5 +1,5 @@
-(* $Id: i18n_check.ml,v 3.1 2000-01-10 02:14:39 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: i18n_check.ml,v 3.2 2001-01-06 09:55:57 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 value usage () =
   do Printf.eprintf "Usage: i18n_check lang lexicon\n";

@@ -1,5 +1,5 @@
-(* $Id: base64.ml,v 3.1 2000-01-10 02:14:37 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: base64.ml,v 3.2 2001-01-06 09:55:53 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 (* For basic credentials only *)
 (* Encoding is [A-Z][a-z][0-9]+/= *)

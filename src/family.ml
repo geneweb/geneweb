@@ -1,6 +1,6 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.42 2000-12-28 23:27:12 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: family.ml,v 3.43 2001-01-06 09:55:54 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;

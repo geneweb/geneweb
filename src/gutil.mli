@@ -1,5 +1,5 @@
-(* $Id: gutil.mli,v 3.9 2000-11-11 12:50:49 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: gutil.mli,v 3.10 2001-01-06 09:55:54 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Def;
 

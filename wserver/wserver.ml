@@ -1,5 +1,5 @@
-(* $Id: wserver.ml,v 3.16 2000-11-04 09:46:04 ddr Exp $ *)
-(* Copyright (c) INRIA *)
+(* $Id: wserver.ml,v 3.17 2001-01-06 09:56:00 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";

@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.24 2000-12-19 15:42:11 ddr Exp $ *)
-(* Copyright (c) 2000 INRIA *)
+(* $Id: update.ml,v 3.25 2001-01-06 09:55:59 ddr Exp $ *)
+(* Copyright (c) 2001 INRIA *)
 
 open Config;
 open Def;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.19 2000-11-07 05:25:24 ddr Exp $ *)
+(* $Id: setup.ml,v 3.20 2001-01-06 09:55:34 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -110,7 +110,7 @@ value trailer conf =
  width=64 height=72 align=right>\n<br>\n"
          (slashify (Sys.getcwd ()));
      Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright INRIA 2000 -
+<hr><font size=-1><em>(c) Copyright 2001 INRIA -
 GeneWeb %s</em></font>" Version.txt;
      Wserver.wprint "<br>";
      Wserver.wprint "</body>\n";
