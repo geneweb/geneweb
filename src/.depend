@@ -73,17 +73,19 @@ family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birthDeath.cmo \
     date.cmi def.cmi descend.cmo doc.cmo forum.cmo gutil.cmi history.cmi \
     merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo \
     name.cmi notes.cmo num.cmi perso.cmi relation.cmo relationLink.cmo \
-    sendImage.cmo some.cmo srcfile.cmi title.cmo tree.cmo update.cmi \
-    updateFam.cmi updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
+    sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
+    updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
     ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     birthday.cmx changeChildren.cmx config.cmi cousins.cmx dag2html.cmx \
     date.cmx def.cmi descend.cmx doc.cmx forum.cmx gutil.cmx history.cmx \
     merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx mergeIndOk.cmx \
     name.cmx notes.cmx num.cmx perso.cmx relation.cmx relationLink.cmx \
-    sendImage.cmx some.cmx srcfile.cmx title.cmx tree.cmx update.cmx \
-    updateFam.cmx updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+    sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
+    updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx family.cmi 
+fhashtbl.cmo: iovalue.cmi 
+fhashtbl.cmx: iovalue.cmx 
 forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
@@ -194,10 +196,6 @@ title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
-tree.cmo: config.cmi date.cmi def.cmi gutil.cmi num.cmi util.cmi \
-    ../wserver/wserver.cmi 
-tree.cmx: config.cmi date.cmx def.cmi gutil.cmx num.cmx util.cmx \
-    ../wserver/wserver.cmx 
 update.cmo: adef.cmi calendar.cmo config.cmi date.cmi def.cmi gutil.cmi \
     iovalue.cmi name.cmi util.cmi ../wserver/wserver.cmi update.cmi 
 update.cmx: adef.cmx calendar.cmx config.cmi date.cmx def.cmi gutil.cmx \
@@ -255,7 +253,6 @@ sendImage.cmo sendImage.cmx: pa_lock.cmo pa_html.cmo
 some.cmo some.cmx: def.syn.cmo pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 title.cmo title.cmx: def.syn.cmo pa_html.cmo
-tree.cmo tree.cmx: pa_html.cmo
 update.cmo update.cmx: pa_html.cmo
 updateFam.cmo updateFam.cmx: pa_html.cmo
 updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo pa_html.cmo
