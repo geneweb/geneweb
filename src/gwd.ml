@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.82 2001-03-14 20:48:32 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.83 2001-03-15 14:54:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1241,9 +1241,10 @@ value geneweb_cgi addr script_name contents =
     try [v ^ ": " ^ Sys.getenv x :: request] with [ Not_found -> request ]
   in
   let request = [] in
-  let request = add "user-agent" "HTTP_USER_AGENT" request in
-  let request = add "referer" "HTTP_REFERER" request in
   let request = add "content-type" "CONTENT_TYPE" request in
+  let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
+  let request = add "referer" "HTTP_REFERER" request in
+  let request = add "user-agent" "HTTP_USER_AGENT" request in
   connection True (Unix.ADDR_UNIX addr, request) script_name contents
 ;
 
