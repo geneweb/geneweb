@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.3 2000-05-03 13:18:51 ddr Exp $ *)
+(* $Id: doc.ml,v 3.4 2000-05-03 13:44:52 ddr Exp $ *)
 
 open Config;
 
@@ -62,6 +62,29 @@ value copy conf pref_doc pref_img s =
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 
+value url_dirname name =
+  try
+    match String.rindex name '/' with
+    [ 0 -> "/"
+    | n -> String.sub name 0 n ]
+  with [ Not_found -> "." ]
+;
+
+value url_is_relative n = String.length n < 1 || n.[0] <> '/';
+
+value url_is_implicit n =
+  url_is_relative n
+  && (String.length n < 2 || String.sub n 0 2 <> "./")
+  && (String.length n < 3 || String.sub n 0 3 <> "../")
+;
+
+value mac_name_of_url_name s =
+  loop 0 0 where rec loop i len =
+    if i == String.length s then Buff.get len
+    else if s.[i] == '/' then loop (Buff.store len ':') (i + 1)
+    else loop (Buff.store len s.[i]) (i + 1)
+;
+
 value print conf =
   let v =
     match Util.p_getenv conf.env "v" with
@@ -69,7 +92,9 @@ value print conf =
     | None -> "" ]
   in
   let v = if v = "" then "index.htm" else v in
-  if Filename.is_implicit v then
+  if url_is_implicit v then
+    let vdir = url_dirname v in
+    let v = if Sys.os_type = "MacOS" then mac_name_of_url_name v else v in
     let v =
       if Filename.check_suffix v ".htm" then v
       else v ^ ".htm"
@@ -89,7 +114,7 @@ value print conf =
           return Buff.get len.val
         in
         let pref_doc =
-          let dir = Filename.dirname v ^ "/" in
+          let dir = url_dirname vdir ^ "/" in
           let dir = if dir = "./" then "" else dir in
           conf.indep_command ^ "m=DOC;v=" ^ dir
         in
