@@ -40,6 +40,9 @@ GeneWeb version 2.06
     its specific global restricted access. See the template file "a.gwf".
     Works only in server (not cgi) mode.
 
+* Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [Aug 29, 99] Updated some Dutch phrases (Joris Esch).
+
 * Documentation
   - [Aug 19, 99] Added new chapter "the access restrictions to data bases"
     about wizards, friends, global access restrictions, robots, black list.
