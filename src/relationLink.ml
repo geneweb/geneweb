@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.2 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.3 1999-04-17 14:18:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -167,15 +167,63 @@ value has_td_width_percent conf =
   String.lowercase user_agent <> "mozilla/1"
 ;
 
-value print_someone conf base ip =
-  let p = poi base ip in
-  do afficher_personne_titre_referencee conf base p;
-     Date.afficher_dates_courtes conf base p;
-     Wserver.wprint "\n";
+value has_no_tables conf =
+  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  String.lowercase user_agent = "lynx"
+;
+
+value text_size txt =
+  let rec normal len i =
+    if i = String.length txt then len
+    else if txt.[i] = '<' then in_tag len (i + 1)
+    else if txt.[i] = '&' then in_char (len + 1) (i + 1)
+    else normal (len + 1) (i + 1)
+  and in_tag len i =
+    if i = String.length txt then len
+    else if txt.[i] = '>' then normal len (i + 1)
+    else in_tag len (i + 1)
+  and in_char len i =
+    if i = String.length txt then len
+    else if txt.[i] = ';' then normal len (i + 1)
+    else in_char len (i + 1)
+  in
+  normal 0 0
+;
+
+value print_pre_center sz txt =
+  do for i = 1 to (sz - text_size txt) / 2 do Wserver.wprint " "; done;
+     Wserver.wprint "%s\n" txt;
   return ()
 ;
 
-value print_spouse conf base ip ipl =
+value print_pre_left sz txt =
+  let tsz = text_size txt in
+  do if tsz < sz / 2 - 1 then
+       for i = 2 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done
+     else ();
+     Wserver.wprint " %s\n" txt;
+  return ()
+;
+
+value print_pre_right sz txt =
+  let tsz = text_size txt in
+  do if tsz < sz / 2 - 1 then
+       do for i = 1 to sz / 2 do Wserver.wprint " "; done;
+          for i = 1 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done;
+       return ()
+     else
+       for i = 1 to sz - text_size txt - 1 do Wserver.wprint " "; done;
+     Wserver.wprint " %s\n" txt;
+  return ()
+;
+
+value someone_text conf base ip =
+  let p = poi base ip in
+  referenced_person_title_text conf base p ^
+  Date.short_dates_text conf base p
+;
+
+value spouse_text conf base ip ipl =
   match (ipl, p_getenv conf.env "opt") with
   [ ([(ips, _) :: _], Some "spouse") ->
       let a = aoi base ips in
@@ -186,12 +234,23 @@ value print_spouse conf base ip ipl =
             if ip = c.father then c.mother
             else c.father
           in
-          do Wserver.wprint "&amp;";
-             html_br conf;
-             print_someone conf base sp;
-          return ()
-      | _ -> () ]
-  | _ -> () ]
+          someone_text conf base sp
+      | _ -> "" ]
+  | _ -> "" ]
+;
+
+value print_someone conf base ip =
+  Wserver.wprint "%s\n" (someone_text conf base ip)
+;
+
+value print_spouse conf base ip ipl =
+  let s = spouse_text conf base ip ipl in
+  if s <> "" then
+    do Wserver.wprint "&amp;";
+       html_br conf;
+       Wserver.wprint "%s\n" s;
+    return ()
+  else ()
 ;
 
 value rec print_both_branches conf base pl1 pl2 =
@@ -245,6 +304,47 @@ value rec print_both_branches conf base pl1 pl2 =
     return print_both_branches conf base pl1 pl2
 ;
 
+value rec print_both_branches_pre conf base sz pl1 pl2 =
+  if pl1 = [] && pl2 = [] then ()
+  else
+    let (p1, pl1) =
+      match pl1 with
+      [ [(p1, _) :: pl1] -> (Some p1, pl1)
+      | [] -> (None, []) ]
+    in
+    let (p2, pl2) =
+      match pl2 with
+      [ [(p2, _) :: pl2] -> (Some p2, pl2)
+      | [] -> (None, []) ]
+    in
+    do let s1 =
+         match p1 with
+         [ Some p1 -> "|"
+         | None -> " " ]
+       in
+       let s2 =
+         match p2 with
+         [ Some p2 -> "|"
+         | None -> " " ]
+       in
+       print_pre_center sz (s1 ^ String.make (sz / 2) ' ' ^ s2);
+       match p1 with
+       [ Some p1 ->
+           do print_pre_left sz (someone_text conf base p1);
+              let s = spouse_text conf base p1 pl1 in
+              if s <> "" then print_pre_left sz ("&amp; " ^ s) else ();
+           return ()
+       | None -> () ];
+       match p2 with
+       [ Some p2 ->
+           do print_pre_right sz (someone_text conf base p2);
+              let s = spouse_text conf base p2 pl2 in
+              if s <> "" then print_pre_right sz ("&amp; " ^ s) else ();
+           return ()
+       | None -> () ];
+    return print_both_branches_pre conf base sz pl1 pl2
+;
+
 value rec print_one_branch conf base ipl1 =
   if ipl1 = [] then ()
   else
@@ -266,52 +366,66 @@ value rec print_one_branch conf base ipl1 =
     return print_one_branch conf base ipl1
 ;
 
-value print_sign conf sign ip sp i1 i2 b1 b2 c1 c2 =
-  do Wserver.wprint "<a href=\"%sm=RL;i1=%d;i2=%d" (commd conf)
-       (Adef.int_of_iper i1) (Adef.int_of_iper i2);
-     Wserver.wprint ";b1=%s" (Num.to_string (sosa_of_branch [(ip, sp) :: b1]));
-     Wserver.wprint ";b2=%s" (Num.to_string (sosa_of_branch [(ip, sp) :: b2]));
-     Wserver.wprint ";c1=%d;c2=%d" c1 c2;
-     Wserver.wprint "\">%s</a>" sign;
-     Wserver.wprint "\n";
-  return ()
+value sign_text conf sign ip sp i1 i2 b1 b2 c1 c2 =
+  "<a href=\"" ^ commd conf ^ "m=RL;i1=" ^ string_of_int (Adef.int_of_iper i1)
+  ^ ";i2=" ^ string_of_int (Adef.int_of_iper i2)
+  ^ ";b1=" ^ Num.to_string (sosa_of_branch [(ip, sp) :: b1])
+  ^ ";b2=" ^ Num.to_string (sosa_of_branch [(ip, sp) :: b2])
+  ^ ";c1=" ^ string_of_int c1 ^ ";c2=" ^ string_of_int c2
+  ^ "\">" ^ sign ^ "</a>"
+;
+
+value prev_next_1_text conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
+  let s =
+    match pb with
+    [ Some b1 ->
+       let sign = "&lt;&lt;" in
+       sign_text conf sign ip sp i1 i2 b1 b2 (c1 - 1) c2 ^ " "
+    | _ -> "" ]
+  in
+  let s =
+    match (pb, nb) with
+    [ (None, None) -> s
+    | _ -> s ^ "<font size=-1>" ^ string_of_int c1 ^ "</font>" ]
+  in
+  match nb with
+  [ Some b1 ->
+      let sign = "&gt;&gt;" in
+      s ^ " " ^ sign_text conf sign ip sp i1 i2 b1 b2 (c1 + 1) c2
+  | _ -> s ]
+;
+
+value prev_next_2_text conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
+  let s =
+    match pb with
+    [ Some b2 ->
+       let sign = "&lt;&lt;" in
+       sign_text conf sign ip sp i1 i2 b1 b2 c1 (c2 - 1) ^ " "
+    | _ -> "" ]
+  in
+  let s =
+    match (pb, nb) with
+    [ (None, None) -> s
+    | _ -> s ^ "<font size=-1>" ^ string_of_int c2 ^ "</font>" ]
+  in
+  match nb with
+  [ Some b2 ->
+     let sign = "&gt;&gt;" in
+     s ^ " " ^ sign_text conf sign ip sp i1 i2 b1 b2 c1 (c2 + 1)
+  | _ -> s ]
 ;
 
 value print_prev_next_1 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
-  do match pb with
-     [ Some b1 ->
-         let sign = "&lt;&lt;" in
-         print_sign conf sign ip sp i1 i2 b1 b2 (c1 - 1) c2
-     | _ -> () ];
-     match (pb, nb) with
-     [ (None, None) -> ()
-     | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c1 ];
-     match nb with
-     [ Some b1 ->
-         let sign = "&gt;&gt;" in
-         print_sign conf sign ip sp i1 i2 b1 b2 (c1 + 1) c2
-     | _ -> () ];
-  return ()
+  Wserver.wprint "%s\n"
+    (prev_next_1_text conf base ip sp i1 i2 b1 b2 c1 c2 pb nb)
 ;
 
 value print_prev_next_2 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
-  do match pb with
-     [ Some b2 ->
-         let sign = "&lt;&lt;" in
-         print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 - 1)
-     | _ -> () ];
-     match (pb, nb) with
-     [ (None, None) -> ()
-     | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c2 ];
-     match nb with
-     [ Some b2 ->
-         let sign = "&gt;&gt;" in
-         print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 + 1)
-     | _ -> () ];
-  return ()
+  Wserver.wprint "%s\n"
+    (prev_next_2_text conf base ip sp i1 i2 b1 b2 c1 c2 pb nb)
 ;
 
-value print_other_parent_if_same conf base ip b1 b2 =
+value other_parent_text_if_same conf base ip b1 b2 =
   match (b1, b2) with
   [ ([(sib1, _) :: _], [(sib2, _) :: _]) ->
       match ((aoi base sib1).parents, (aoi base sib2).parents) with
@@ -327,13 +441,75 @@ value print_other_parent_if_same conf base ip b1 b2 =
               else None
           in
           match other_parent with
-          [ Some ip ->
-              do Wserver.wprint "&amp;\n";
-                 print_someone conf base ip;
-              return ()
-          | _ -> () ]
-      | _ -> () ]
-  | _ -> () ]
+          [ Some ip -> "&amp; " ^ someone_text conf base ip
+          | _ -> "" ]
+      | _ -> "" ]
+  | _ -> "" ]
+;
+
+value print_other_parent_if_same conf base ip b1 b2 =
+  Wserver.wprint "%s" (other_parent_text_if_same conf base ip b1 b2)
+;
+
+value print_with_pre conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
+  let sz = 79 in
+  tag "pre" begin
+    print_pre_center sz (someone_text conf base ip);
+    let s = other_parent_text_if_same conf base ip b1 b2 in
+    if s <> "" then print_pre_center sz s else ();
+    print_pre_center sz "|";
+    print_pre_center sz (String.make (sz / 2) '_');
+    print_both_branches_pre conf base sz b1 b2;
+    if b1 <> [] || b2 <> [] then Wserver.wprint "\n" else ();
+    if b1 <> [] then
+      let s = prev_next_1_text conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 nb1 in
+      print_pre_left sz s
+    else ();
+    if b2 <> [] then
+      let s = prev_next_2_text conf base ip sp ip1 ip2 b1 b2 c1 c2 pb2 nb2 in
+      print_pre_right sz s
+    else ();
+  end
+;
+
+value print_with_table conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
+  tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+    tag "tr" begin
+      stag "td" "colspan=2 align=center" begin
+        print_someone conf base ip;
+        print_other_parent_if_same conf base ip b1 b2;
+      end;
+    end;
+    tag "tr" begin
+      stag "td" "colspan=2 align=center" begin
+        Wserver.wprint "|";
+      end;
+    end;
+    tag "tr" begin
+      stag "td" "colspan=2 align=center" begin
+        Wserver.wprint "<hr size=1 noshade%s>"
+          (if has_td_width_percent conf then " width=\"50%\""
+           else "");
+      end;
+    end;
+    print_both_branches conf base b1 b2;
+    tag "tr" begin
+      if b1 <> [] then
+        tag "td" begin
+          do html_br conf; return
+          print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
+            pb1 nb1;
+        end
+      else ();
+      if b2 <> [] then
+        tag "td" begin
+          do html_br conf; return
+          print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
+            pb2 nb2;
+        end
+      else ();
+    end;
+  end
 ;
 
 value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
@@ -364,45 +540,10 @@ value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
           else
             print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb2 nb2;
        return ()
+     else if has_no_tables conf then
+       print_with_pre conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2
      else
-       tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
-         do tag "tr" begin
-              stag "td" "colspan=2 align=center" begin
-                print_someone conf base ip;
-                print_other_parent_if_same conf base ip b1 b2;
-              end;
-            end;
-            tag "tr" begin
-              stag "td" "colspan=2 align=center" begin
-                Wserver.wprint "|";
-              end;
-            end;
-            tag "tr" begin
-              stag "td" "colspan=2 align=center" begin
-                Wserver.wprint "<hr size=1 noshade%s>"
-                  (if has_td_width_percent conf then " width=\"50%\""
-                   else "");
-              end;
-            end;
-            print_both_branches conf base b1 b2;
-         return ();
-         tag "tr" begin
-           if b1 <> [] then
-             tag "td" begin
-               do html_br conf; return
-               print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
-                 pb1 nb1;
-             end
-           else ();
-           if b2 <> [] then
-             tag "td" begin
-               do html_br conf; return
-               print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
-                 pb2 nb2;
-             end
-           else ();
-         end;
-       end;
+       print_with_table conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2;
      trailer conf;
   return ()
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.6 1999-04-16 18:35:07 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.7 1999-04-17 14:18:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -811,8 +811,8 @@ value print_missing_ancestors conf base v spouses_included p =
      | None -> () ];
      Wserver.wprint ".\n";
      if not spouses_included then
-       do html_br conf; return
-       Wserver.wprint "%s %s:\n" (capitale (transl conf "parents"))
+       do html_br conf; html_br conf;return
+       Wserver.wprint "%s %s...\n" (capitale (transl conf "parents"))
          (transl_decline conf "of" "")
      else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;

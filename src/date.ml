@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.2 1999-04-06 21:18:35 ddr Exp $ *)
+(* $Id: date.ml,v 2.3 1999-04-17 14:18:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -176,44 +176,50 @@ value afficher_dates conf base p =
   else ()
 ;
 
+value year_text d =
+  let s =
+    match d.prec with
+    [ Before -> "/"
+    | About | Maybe | OrYear _ | YearInt _ -> "ca&nbsp;"
+    | _ -> "" ]
+  in
+  let s = s ^ string_of_int (annee d) in
+  match d.prec with
+  [ After -> s ^ "/"
+  | _ -> s ]
+;
+
 value display_year d =
-  do match d.prec with
-     [ Before -> Wserver.wprint "/"
-     | About | Maybe | OrYear _ | YearInt _ -> Wserver.wprint "ca&nbsp;"
-     | _ -> () ];
-     Wserver.wprint "%d" (annee d);
-     match d.prec with
-     [ After -> Wserver.wprint "/"
-     | _ -> () ];
-  return ()
+  Wserver.wprint "%s" (year_text d)
+;
+
+value short_dates_text conf base p =
+  if age_autorise conf base p then
+    let s =
+      match (Adef.od_of_codate p.birth, p.death) with
+      [ (Some _, DontKnowIfDead) -> "*"
+      | _ -> "" ]
+    in
+    let s =
+      match Adef.od_of_codate p.birth with
+      [ Some d -> s ^ year_text d
+      | _ -> s ]
+    in
+    let s =
+      match (Adef.od_of_codate p.birth, p.death) with
+      [ (Some _, Death _ _ | NotDead) -> s ^ "-"
+      | (_, Death _ _ | DeadDontKnowWhen | DeadYoung) -> s ^ "+"
+      | _ -> s ]
+    in
+    let s =
+      match p.death with
+      [ Death _ d -> s ^ year_text (Adef.date_of_cdate d)
+      | _ -> s ]
+    in
+    if s <> "" then " <em>" ^ s ^ "</em>" else s
+  else ""
 ;
 
 value afficher_dates_courtes conf base p =
-  if age_autorise conf base p then
-    let something =
-      match (Adef.od_of_codate p.birth, p.death) with
-      [ (Some _, _) | (_, Death _ _ | DeadDontKnowWhen) -> True
-      | _ -> False ]
-    in
-    if something then
-      do Wserver.wprint " <em>";
-         match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some _, DontKnowIfDead) -> Wserver.wprint "*"
-         | _ -> () ];
-         match Adef.od_of_codate p.birth with
-         [ Some d -> display_year d
-         | _ -> () ];
-         match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some _, Death _ _ | NotDead) -> Wserver.wprint "-"
-         | (_, Death _ _ | DeadDontKnowWhen | DeadYoung) -> Wserver.wprint "+"
-         | _ -> () ];
-         match p.death with
-         [ Death _ d ->
-             let d = Adef.date_of_cdate d in
-             display_year d
-         | _ -> () ];
-         Wserver.wprint "</em>";
-      return ()
-    else ()
-  else ()
+  Wserver.wprint "%s" (short_dates_text conf base p)
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.9 1999-04-11 01:12:09 ddr Exp $ *)
+(* $Id: relation.ml,v 2.10 1999-04-17 14:18:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -396,8 +396,12 @@ value print_main_relationship conf base p1 p2 rel =
                 (fcapitale
                    (ftransl conf
                       "no known relationship link between %t and %t"))
-                (fun _ -> afficher_personne_titre_referencee conf base p1)
-                (fun _ -> afficher_personne_titre_referencee conf base p2);
+                (fun _ ->
+                   Wserver.wprint "%s"
+                     (referenced_person_title_text conf base p1))
+                (fun _ ->
+                   Wserver.wprint "%s"
+                     (referenced_person_title_text conf base p2));
               Wserver.wprint "\n";
            return ()
      | Some (rl, total, relationship) ->

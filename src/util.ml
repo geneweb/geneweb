@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.11 1999-04-11 10:13:34 ddr Exp $ *)
+(* $Id: util.ml,v 2.12 1999-04-17 14:18:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -224,15 +224,6 @@ value person_text_without_surname conf base p =
   coa conf s
 ;
 
-value afficher_personne conf base p =
-  Wserver.wprint "%s" (person_text conf base p)
-;
-
-value afficher_personne_referencee conf base p =
-  Wserver.wprint "<a href=\"%s%s\">\n%s</a>" (commd conf) (acces conf base p)
-    (person_text conf base p)
-;
-
 value afficher_nom_titre_reference conf base p s =
   match p.nick_names with
   [ [] ->
@@ -241,11 +232,6 @@ value afficher_nom_titre_reference conf base p s =
   | [nn :: _] ->
       Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
         (acces conf base p) (coa conf s) (coa conf (sou base nn)) ]
-;
-
-value afficher_prenom_de_personne_referencee conf base p =
-  Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf) (acces conf base p)
-    (person_text_without_surname conf base p)
 ;
 
 value afficher_prenom_de_personne conf base p =
@@ -287,26 +273,25 @@ value titled_person_text conf base p t =
     | _ -> person_text conf base p ]
 ;
 
-value afficher_un_titre conf base p t =
+value one_title_text conf base p t =
   let place = sou base t.t_place in
-  do Wserver.wprint ", <em>%s" (coa conf (sou base t.t_ident));
-     if place = "" then () else Wserver.wprint " %s" (coa conf place);
-     Wserver.wprint "</em>";
-  return ()
+  let s = coa conf (sou base t.t_ident) in
+  let s = if place = "" then s else s ^ " " ^ coa conf place in
+  ", <em>" ^ s ^ "</em>"
 ;
 
-value afficher_personne_titre_referencee conf base p =
+value reference conf base p s =
+  "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
+;
+
+value referenced_person_title_text conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
     match main_title base p with
     [ Some t ->
-        do stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-             Wserver.wprint "%s" (titled_person_text conf base p t);
-           end;
-           afficher_un_titre conf base p t;
-        return ()
-    | None -> afficher_personne_referencee conf base p ]
-  else
-    afficher_personne_referencee conf base p
+        reference conf base p (titled_person_text conf base p t) ^
+        one_title_text conf base p t
+    | None -> reference conf base p (person_text conf base p) ]
+  else reference conf base p (person_text conf base p)
 ;
 
 value afficher_personne_un_titre conf base p t =
@@ -317,7 +302,7 @@ value afficher_personne_un_titre conf base p t =
      else
        match t.t_name with
        [ Tname s -> Wserver.wprint "%s" (coa conf (sou base s))
-       | _ -> afficher_personne conf base p ];
+       | _ -> Wserver.wprint "%s" (person_text conf base p) ];
      Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_ident))
        (coa conf (sou base t.t_place));
   return ()
@@ -327,8 +312,8 @@ value afficher_personne_titre conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
     match main_title base p with
     [ Some t -> afficher_personne_un_titre conf base p t
-    | None -> afficher_personne conf base p ]
-  else afficher_personne conf base p
+    | None -> Wserver.wprint "%s" (person_text conf base p) ]
+  else Wserver.wprint "%s" (person_text conf base p)
 ;
 
 value afficher_personne_sans_titre conf base p =
@@ -342,15 +327,15 @@ value afficher_personne_sans_titre conf base p =
                Wserver.wprint "%s <em>%s</em>" (coa conf (sou base s))
                  (coa conf (sou base nn))
            | (Tname s, _) -> Wserver.wprint "%s" (coa conf (sou base s))
-           | _ -> afficher_personne conf base p ];
+           | _ -> Wserver.wprint "%s" (person_text conf base p) ];
       return ()
-  | None -> afficher_personne conf base p ]
+  | None -> Wserver.wprint "%s" (person_text conf base p) ]
 ;
 
 value afficher_titre conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
     match main_title base p with
-    [ Some t -> afficher_un_titre conf base p t
+    [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
     | None -> () ]
   else ()
 ;
@@ -1039,4 +1024,23 @@ value auto_image_file conf base p =
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else None
+;
+
+(* Deprecated *)
+
+value afficher_personne conf base p =
+  Wserver.wprint "%s" (person_text conf base p)
+;
+
+value afficher_prenom_de_personne_referencee conf base p =
+  Wserver.wprint "%s"
+    (reference conf base p (person_text_without_surname conf base p))
+;
+
+value afficher_personne_referencee conf base p =
+  Wserver.wprint "%s" (reference conf base p (person_text conf base p))
+;
+
+value afficher_personne_titre_referencee conf base p =
+  Wserver.wprint "%s" (referenced_person_title_text conf base p)
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.6 1999-04-11 01:12:09 ddr Exp $ *)
+(* $Id: family.ml,v 2.7 1999-04-17 14:18:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -157,7 +157,10 @@ value precisez conf base n pl =
                     begin
                       Wserver.wprint "%s" (titled_person_text conf base p t);
                     end;
-                    List.iter (afficher_un_titre conf base p) tl;
+                    List.iter
+                      (fun t ->
+                         Wserver.wprint "%s" (one_title_text conf base p t))
+                      tl;
                  return () ];
              Date.afficher_dates_courtes conf base p;
              match p.sex with
