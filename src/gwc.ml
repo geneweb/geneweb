@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.0 2001-03-16 19:34:40 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.1 2001-04-04 12:31:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -305,8 +305,10 @@ value insert_person gen so =
            (gen.g_base.data.ascends.array ()).(gen.g_pcnt) := a;
            (gen.g_base.data.unions.array ()).(gen.g_pcnt) := u;
            gen.g_pcnt := gen.g_pcnt + 1;
-           let h = person_hash so.first_name so.surname in
-           Mhashtbl.add gen.g_local_names (h, occ) x.cle_index;
+           if so.first_name <> "?" && so.surname <> "?" then
+             let h = person_hash so.first_name so.surname in
+             Mhashtbl.add gen.g_local_names (h, occ) x.cle_index
+           else ();
         return x ]
   in
   do if gen.g_def.(Adef.int_of_iper x.cle_index) then
