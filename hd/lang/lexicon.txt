@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.11 2001-03-26 21:04:52 ddr Exp $
+# $Id: lexicon.txt,v 4.12 2001-03-27 04:43:00 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -937,7 +937,7 @@ no: oldefar/oldemor/en av oldeforeldrene
 pl: pradziadek/prababka/pradziadkowie
 pt: um bisav&ocirc;/uma bisav&oacute;/um(a) bisav&ocirc;(&oacute;)
 ru: прапрадед/прапрабабка/прапрапрародитель
-se: en gammel-farf&ouml;r&auml;lder/en gammel-morf&ouml;r&auml;lder/en gammel-far(mor)f&ouml;r&auml;lder
+se: en gammel-farfar/en gammel-farmor/en gammel-farf&ouml;r&auml;lder/en gammel-morfar/en gammel-mormor/en gammel-morf&ouml;r&auml;lder
 
     a great-grandson/a great-granddaughter/a great-grandchild
 af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
@@ -3374,7 +3374,7 @@ no: besteforeldre
 pl: dziadkowie
 pt: av&oacute;s
 ru: прародители
-se: far(mor)f&ouml;r&auml;ldrar
+se: farf&ouml;r&auml;ldrar/morf&ouml;r&auml;ldrar
 
     great-grand-parents
 af: oorgrootouers
@@ -3397,7 +3397,7 @@ no: oldeforeldre
 pl: pradziadkowie
 pt: bisav&oacute;s
 ru: прапрародители
-se: gammel-far(mor)f&ouml;r&auml;ldrar
+se: gammel-farf&ouml;r&auml;ldrar/gammel-morf&ouml;r&auml;ldrar
 
     gregorian/julian/french/hebrew
 af: gregoriaans/juliaans/frans/hebreeus
