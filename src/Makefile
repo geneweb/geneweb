@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.8 2001-09-08 18:43:51 ddr Exp $
+# $Id: Makefile,v 4.9 2001-09-08 19:03:58 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -35,48 +35,48 @@ clean::
 	$(RM) gwc consang gwd gwu
 
 gwc.out: $(GWC_OBJS)
-	$(OCAMLC) $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out
 
 gwc.opt: $(GWC_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(GWC_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(GWC_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc.opt
 
 consang.out: $(CONSANG_OBJS)
-	$(OCAMLC) -ccopt -static unix.cma $(LIBUNIX) $(CONSANG_OBJS) -o consang.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(CONSANG_OBJS) -o consang.out
 
 consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
 
 gwd.out: $(GWD_OBJS)
-	$(OCAMLC) -ccopt -static $(OCAMLD) unix.cma $(CAMLP4D)/gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
+	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma $(CAMLP4D)/gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
 	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(CAMLP4D)/gramlib.cmxa x1.cmxa x2.cmxa gwd.cmx $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(CAMLP4D)/gramlib.cmxa x1.cmxa x2.cmxa gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
-	$(OCAMLC) -ccopt -static unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
 
 gwu.opt: $(GWU_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(LIBUNIX) $(GWU_OBJS:.cmo=.cmx) -o gwu.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(GWU_OBJS:.cmo=.cmx) -o gwu.opt
 
 phonygwd.out: $(PHONYGWD_OBJS)
-	$(OCAMLC) -ccopt -static unix.cma $(LIBUNIX) $(PHONYGWD_OBJS) -o phonygwd.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(PHONYGWD_OBJS) -o phonygwd.out
 
 mostdesc.out: $(MOSTDESC_OBJS)
-	$(OCAMLC) -ccopt -static unix.cma $(LIBUNIX) $(MOSTDESC_OBJS) -o mostdesc.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(MOSTDESC_OBJS) -o mostdesc.out
 
 mostdesc.opt: $(MOSTDESC_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(LIBUNIX) $(MOSTDESC_OBJS:.cmo=.cmx) -o mostdesc.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(MOSTDESC_OBJS:.cmo=.cmx) -o mostdesc.opt
 
 fpla.out: $(FPLA_OBJS)
-	$(OCAMLC) -ccopt -static unix.cma $(LIBUNIX) $(FPLA_OBJS) -o fpla.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(FPLA_OBJS) -o fpla.out
 
 fpla.opt: $(FPLA_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(LIBUNIX) $(FPLA_OBJS:.cmo=.cmx) -o fpla.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(FPLA_OBJS:.cmo=.cmx) -o fpla.opt
 
 restrict.opt: $(RESTRICT_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(LIBUNIX) $(RESTRICT_OBJS:.cmo=.cmx) -o restrict.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(RESTRICT_OBJS:.cmo=.cmx) -o restrict.opt
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out
