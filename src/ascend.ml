@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.29 2003-11-07 15:57:05 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.30 2003-11-09 01:40:13 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1734,7 +1734,8 @@ value print_tree_with_table conf base gv p =
         stag "td" "%s" (align po) begin
           let txt =
             match po with
-            [ Cell _ Right _ _ | Cell _ Center _ _ -> "<hr noshade size=1>"
+            [ Cell _ Right _ _ | Cell _ Center _ _ ->
+                "<hr noshade size=1 width=\"100%\">"
             | _ -> "&nbsp;" ]
           in
           Wserver.wprint "%s" txt;

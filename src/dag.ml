@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.12 2003-11-06 18:47:55 ddr Exp $ *)
+(* $Id: dag.ml,v 4.13 2003-11-09 01:40:13 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -182,7 +182,7 @@ value print_table conf hts =
               match align with
               [ LeftA -> Wserver.wprint " width=\"50%%\" align=left"
               | RightA -> Wserver.wprint " width=\"50%%\" align=right"
-              | _ -> () ];
+              | _ -> Wserver.wprint " width=\"100%%\"" ];
               Wserver.wprint ">"
             } ];
         Wserver.wprint "</td>\n"
