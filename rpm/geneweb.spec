@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 4.4 2002-02-27 19:02:58 ddr Exp $
+# $Id: geneweb.spec,v 4.5 2003-01-02 11:52:18 ddr Exp $
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
@@ -67,12 +67,18 @@ chmod a+rx /home/geneweb
 
 %post
 chown -R geneweb.geneweb /home/geneweb/gw
+# SuSE compatibility
+if (test -e "/etc/SuSE-release") ; then
+  ln -s /etc/rc.d/init.d/gwd /etc/init.d/gwd
+fi
+#end
 chkconfig --add gwd
 /etc/rc.d/init.d/gwd start
 
 %preun
 /etc/rc.d/init.d/gwd stop
 chkconfig --del gwd
+rm -f /etc/init.d/gwd
 
 %postun
 # cd /home/geneweb/gw/gw
