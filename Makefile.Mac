@@ -1,4 +1,4 @@
-# $Id: Makefile.Mac,v 3.2 2000-05-02 16:52:49 doligez Exp $
+# $Id: Makefile.Mac,v 4.0 2001-03-16 19:01:35 ddr Exp $
 
 # include tools/Makefile.inc
 
