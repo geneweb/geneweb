@@ -110,6 +110,7 @@ GeneWeb version 3.08
   - [03 Sep 00] In FAQ, changed the text about the question of missing
     relationship links.
   - Added entries in the FAQ about:
+    * [27 Sep 00] the message "probable loop in the data base",
     * [08 Sep 00] the research by place/surname, where only one person
       by surname is displayed,
     * [03 Sep 00] the fact that sometimes, under Windows, it does not
