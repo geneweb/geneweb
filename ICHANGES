@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 4.04
 --------------------
 
+* Compilation
+  - [07 Sep 01] All executables are now compiled static (no dynamic library)
+
 GeneWeb Version 4.03
 --------------------
 

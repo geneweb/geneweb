@@ -2,9 +2,9 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb data bases Transfer Program (gwtp)
-  - [06 Sep 01] Separated the option -tmp into -tmp, -log (for the log) and
-    -etc (for passwd, default.gwf and lang files). Coded by Christian
-    Perrier.
+  - [06 Sep 01] Separated the option -tmp into -log (for the log),
+    -etc (for passwd, default.gwf and lang directories) and -tmp (the
+    rest). Code written by Christian Perrier.
 
 GeneWeb version 4.03
 --------------------
