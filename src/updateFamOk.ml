@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.28 2001-02-13 14:13:39 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.29 2001-02-28 19:07:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -365,7 +365,7 @@ value effective_mod conf base sfam scpl sdes =
      base.func.patch_family fi nfam;
      base.func.patch_couple fi ncpl;
      base.func.patch_descend fi ndes;
-     if ncpl.father != ocpl.father then
+     if ncpl.father != ocpl.father && ncpl.father != ocpl.mother then
        let ofath_u = uoi base ocpl.father in
        do ofath_u.family := family_exclude ofath_u.family ofam.fam_index;
           nfath_u.family := Array.append nfath_u.family [| fi |];
@@ -373,7 +373,7 @@ value effective_mod conf base sfam scpl sdes =
           base.func.patch_union ncpl.father nfath_u;
        return ()
      else ();
-     if ncpl.mother != ocpl.mother then
+     if ncpl.mother != ocpl.mother && ncpl.mother != ocpl.father then
        let omoth_u = uoi base ocpl.mother in
        do omoth_u.family := family_exclude omoth_u.family ofam.fam_index;
           nmoth_u.family := Array.append nmoth_u.family [| fi |];
