@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.3 2005-03-01 17:45:16 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.4 2005-03-01 19:09:51 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -181,10 +181,17 @@ EXTEND
       | -> None ] ]
   ;
   expr: LEVEL "top"
-    [ [ "IFDEF"; i = uident; "THEN"; e1 = expr; "ELSE"; e2 = expr; "END" ->
-          if is_defined i then e1 else e2
+    [ [ "IFDEF"; idl = LIST1 id_then_expr SEP "ELSIFDEF"; "ELSE";
+        e2 = expr; "END" ->
+          loop idl where rec loop =
+            fun
+            [ [(i, e) :: idl] -> if is_defined i then e else loop idl
+            | [] -> e2 ]
       | "IFNDEF"; i = uident; "THEN"; e1 = expr; "ELSE"; e2 = expr; "END" ->
           if is_defined i then e2 else e1 ] ]
+  ;
+  id_then_expr:
+    [ [ i = uident; "THEN"; e = expr -> (i, e) ] ]
   ;
   expr: LEVEL "simple"
     [ [ LIDENT "__FILE__" -> <:expr< $str:Pcaml.input_file.val$ >> ] ]
