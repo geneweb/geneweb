@@ -10,7 +10,7 @@ GeneWeb Version 3.04
     version.
 
 * GeneWeb daemon/CGI (gwd) and welcome files (lang/*/start.txt)
-  - [23 Apr 00] Added macro %m = value of "latest_event" of base.gwb and
+  - [23 Apr 00] Added macro %m = value of "latest_event" of base.gwf and
     put links "m=LB;k=%m" "m=LD;k=%m" "m=LM;k=%m" in welcome pages, so
     showing the default value and indicating (to smart people) the way to
     change it in the URL.
