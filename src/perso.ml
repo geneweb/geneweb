@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.51 2000-10-16 02:58:08 ddr Exp $ *)
+(* $Id: perso.ml,v 3.52 2000-10-17 04:15:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1137,16 +1137,10 @@ end;
 value open_templ conf dir name =
   if dir = "" then
     let fname =
-      List.fold_right Filename.concat [base_dir.val; "etc"; conf.bname]
+      List.fold_right Filename.concat [lang_dir.val; "etc"]
         (name ^ ".txt")
     in
-    if Sys.file_exists fname then Some (open_in fname)
-    else
-      let fname =
-        List.fold_right Filename.concat [lang_dir.val; "etc"]
-          (name ^ ".txt")
-      in
-      try Some (open_in fname) with [ Sys_error _ -> None ]
+    try Some (open_in fname) with [ Sys_error _ -> None ]
   else
     let dir = Filename.basename dir in
     let fname =
@@ -2436,6 +2430,31 @@ value print_ok conf base p =
     [ Some "off" -> None
     | Some x -> Some x
     | None -> Some "" ]
+  in
+  let config_templ =
+    try
+      let s = List.assoc "template" conf.base_env in
+      loop [] 0 0 where rec loop list i len =
+        if i == String.length s then
+          if len == 0 then List.rev list
+          else List.rev [Buff.get len :: list]
+        else if s.[i] = ',' then
+          loop [Buff.get len :: list] (i + 1) 0
+        else
+          loop list (i + 1) (Buff.store len s.[i])
+    with
+    [ Not_found -> ["*"] ]
+  in
+  let templ =
+    match templ with
+    [ Some x ->
+        if List.mem "*" config_templ then templ
+        else if List.mem x config_templ then templ
+        else
+          match config_templ with
+          [ [] -> Some ""
+          | [x :: _] -> Some x ]
+    | None -> None ]
   in
   match templ with
   [ None -> Classic.print_ok conf base p
