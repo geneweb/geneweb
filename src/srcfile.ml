@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.22 2000-06-21 21:13:08 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.23 2000-06-22 20:19:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -147,7 +147,7 @@ value extract_date d =
   [ Stdpp.Exc_located _ (Stream.Error _ | Token.Error _) -> None ]
 ;
 
-value string_of_date conf =
+value string_of_start_date conf =
   let r = count conf in
   match extract_date r.start_date with
   [ Some (d, m, y) ->
@@ -180,7 +180,8 @@ value macro conf base =
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int r.welcome_cnt)
-  | 'd' -> string_of_date conf
+  | 'd' -> string_of_start_date conf
+  | 'D' -> (count conf).start_date
   | 'e' -> conf.charset
   | 'f' -> conf.command
   | 'g' ->
