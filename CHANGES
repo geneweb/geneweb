@@ -35,8 +35,9 @@ GeneWeb version 3.12
 
 * Setup program (gwsetup)
   - [20 Feb 01] Added option -lang: if provided in parameter, the lang
-    name is not asked the user. Changed all "localhost:" into
-    "127.0.0.1:" which always work on Windows.
+    name is not asked the user. Changed all "http://localhost:" into
+    "http://127.0.0.1:" which always work on Windows and in all OSes.
+    Changed all "file://localhost/..." into just "file://..."
 
 GeneWeb version 3.11
 --------------------
