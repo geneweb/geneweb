@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.0 2001-03-16 19:34:41 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.1 2001-04-19 12:34:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -6,20 +6,13 @@ open Gutil;
 
 value magic_gwo = "GnWo000m";
 
-type key =
-  { pk_first_name : string;
-    pk_surname : string;
-    pk_occ : int }
-;
+type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
-type somebody =
-  [ Undefined of key
-  | Defined of gen_person iper string ]
-;
+type somebody = [ Undefined of key | Defined of gen_person iper string ];
 
 type syntax_o =
-  [ Family of gen_couple somebody and sex and sex and list (somebody * sex) and
-      gen_family (gen_person iper string) string and
+  [ Family of gen_couple somebody and sex and sex and
+      list (somebody * sex) and gen_family (gen_person iper string) string and
       gen_descend (gen_person iper string)
   | Notes of key and string
   | Relations of somebody and sex and list (gen_relation somebody string)
@@ -34,14 +27,16 @@ value copy_decode s i1 i2 =
       else loop (len + 1) (i + 1)
   in
   let rec loop_copy t i j =
-    if i < i2 then
+    if i < i2 then do {
       let (c, i) =
         match s.[i] with
         [ '_' -> (' ', i)
         | '\\' -> (s.[i + 1], i + 1)
         | x -> (x, i) ]
       in
-      do t.[j] := c; return loop_copy t (succ i) (succ j)
+      t.[j] := c;
+      loop_copy t (succ i) (succ j)
+    }
     else t
   in
   loop_copy (String.create len) i1 0
@@ -62,15 +57,18 @@ value fields str =
 value date_of_string s i =
   let champ i =
     let (neg, i) =
-      if i < String.length s && s.[i] == '-' then (True, i + 1) else (False, i)
+      if i < String.length s && s.[i] == '-' then (True, i + 1)
+      else (False, i)
     in
-    loop i 0 where rec loop i n =
+    let rec loop i n =
       if i == String.length s then (if neg then - n else n, i)
       else
         match s.[i] with
         [ '0'..'9' as c ->
             loop (succ i) (10 * n + Char.code c - Char.code '0')
         | _ -> (if neg then - n else n, i) ]
+    in
+    loop i 0
   in
   let skip_slash i =
     if i < String.length s && s.[i] == '/' then Some (succ i) else None
@@ -85,8 +83,7 @@ value date_of_string s i =
   in
   let (undefined, year, i) =
     let (year, j) = champ i in
-    if j = i + 1 && s.[i] == '0' then (True, year, j)
-    else (False, year, j)
+    if j = i + 1 && s.[i] == '0' then (True, year, j) else (False, year, j)
   in
   let error () = failwith ("date_of_string " ^ s) in
   let date =
@@ -99,8 +96,7 @@ value date_of_string s i =
             let day = month in
             let month = year in
             let (year, i) = champ i in
-            if year == 0 then
-              if i == String.length s then None else error ()
+            if year == 0 then if i == String.length s then None else error ()
             else if month < 1 || month > 13 then error ()
             else if day < 1 || day > 31 then error ()
             else
@@ -138,7 +134,8 @@ value date_of_string s i =
         else if s.[i] == '|' then
           let (y2, i) = champ (succ i) in
           Some (Dgreg {(d) with prec = OrYear y2} cal, i)
-        else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
+        else if
+          i + 1 < String.length s && s.[i] == '.' && s.[i + 1] == '.' then
           let (y2, i) = champ (i + 2) in
           Some (Dgreg {(d) with prec = YearInt y2} cal, i)
         else Some (dt, i)
@@ -183,7 +180,7 @@ value input_a_line ic =
       String.sub line 0 (String.length line - 1)
     else line
   in
-  do incr line_cnt; return line
+  do { incr line_cnt; line }
 ;
 
 value rec input_real_line ic =
@@ -199,8 +196,7 @@ value get_optional_birthdate l =
       else
         match x.[i] with
         [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
-            let d = date_of_string x i in
-            (Some d, l')
+            let d = date_of_string x i in (Some d, l')
         | _ -> (None, l) ]
   | _ -> (None, l) ]
 ;
@@ -213,8 +209,7 @@ value get_optional_baptdate l =
         let i = succ i in
         match x.[i] with
         [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
-            let d = date_of_string x i in
-            (Some d, l')
+            let d = date_of_string x i in (Some d, l')
         | _ -> (None, l) ]
       else (None, l)
   | _ -> (None, l) ]
@@ -283,8 +278,7 @@ value cut_space x =
   else
     let start = if x.[0] == ' ' then 1 else 0 in
     let stop = if x.[len - 1] == ' ' then len - 1 else len in
-    if start == 0 && stop == len then x
-    else String.sub x start (stop - start)
+    if start == 0 && stop == len then x else String.sub x start (stop - start)
 ;
 
 value get_field lab l =
@@ -302,8 +296,7 @@ value get_optional_sexe =
 
 value make_int str x =
   loop False 0 where rec loop found n i =
-    if i == String.length x then
-      if found then n else raise Not_found
+    if i == String.length x then if found then n else raise Not_found
     else
       match x.[i] with
       [ '0'..'9' as c ->
@@ -315,8 +308,8 @@ value get_fst_name str l =
   match l with
   [ [x :: l'] ->
       match x.[0] with
-      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '[' | '0'..'9' | '?'
-      | ' ' ->
+      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '[' | '0'..'9' | '?' |
+        ' ' ->
           let x = cut_space x in
           let (x, occ) =
             match rindex x '.' with
@@ -385,10 +378,12 @@ value get_pub_name str l =
 value get_image str l =
   match l with
   [ ["#image" | "#photo"; x :: l'] ->
-      do for i = 0 to String.length x - 1 do
-           if x.[i] == ' ' then x.[i] := '_' else ();
-         done;
-      return (x, l')
+      do {
+        for i = 0 to String.length x - 1 do {
+          if x.[i] == ' ' then x.[i] := '_' else ()
+        };
+        (x, l')
+      }
   | _ -> ("", l) ]
 ;
 
@@ -417,7 +412,7 @@ value scan_title t =
       if i < String.length t then
         match t.[i] with
         [ ':' -> (s, i + 1)
-        | '\\' -> loop (s ^ String.make 1 t.[i+1]) (i + 2)
+        | '\\' -> loop (s ^ String.make 1 t.[i + 1]) (i + 2)
         | c -> loop (s ^ String.make 1 c) (i + 1) ]
       else (s, i)
   in
@@ -434,7 +429,7 @@ value scan_title t =
   in
   let (title, i) =
     let (s, i) = next_field i in
-    if t.[i-1] <> ':' then failwith t else (s, i)
+    if t.[i - 1] <> ':' then failwith t else (s, i)
   in
   let (place, i) = next_field i in
   let (date_start, i) =
@@ -446,15 +441,13 @@ value scan_title t =
     (if d = "" then None else date_of_string d 0, i)
   in
   let (nth, i) =
-    let (d, i) = next_field i in
-    (if d = "" then 0 else int_of_string d, i)
+    let (d, i) = next_field i in (if d = "" then 0 else int_of_string d, i)
   in
   if i <> String.length t then failwith t
   else
     {t_name = name; t_ident = title; t_place = place;
      t_date_start = Adef.codate_of_od date_start;
-     t_date_end = Adef.codate_of_od date_end;
-     t_nth = nth}
+     t_date_end = Adef.codate_of_od date_end; t_nth = nth}
 ;
 
 value rec get_titles str l =
@@ -477,7 +470,8 @@ value get_mar_date str =
         [ '+' ->
             (if String.length x > 1 then
                Adef.codate_of_od (date_of_string x 1)
-             else Adef.codate_None, l)
+             else Adef.codate_None,
+             l)
         | _ -> failwith str ]
       in
       let (relation, l) =
@@ -515,89 +509,88 @@ value read_line ic =
 ;
 
 value create_person () =
-  {first_name = ""; surname = ""; occ = 0; image = "";
-   public_name = ""; qualifiers = []; aliases = [];
-   first_names_aliases = []; surnames_aliases = [];
-   titles = []; rparents = []; related = [];
-   occupation = ""; sex = Neuter; access = IfTitles;
-   birth = Adef.codate_None; birth_place = ""; birth_src = "";
-   baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
-   death = DontKnowIfDead; death_place = ""; death_src = "";
-   burial = UnknownBurial; burial_place = ""; burial_src = "";
-   notes = ""; psources = ""; cle_index = Adef.iper_of_int (-1)}
+  {first_name = ""; surname = ""; occ = 0; image = ""; public_name = "";
+   qualifiers = []; aliases = []; first_names_aliases = [];
+   surnames_aliases = []; titles = []; rparents = []; related = [];
+   occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.codate_None;
+   birth_place = ""; birth_src = ""; baptism = Adef.codate_None;
+   baptism_place = ""; baptism_src = ""; death = DontKnowIfDead;
+   death_place = ""; death_src = ""; burial = UnknownBurial;
+   burial_place = ""; burial_src = ""; notes = ""; psources = "";
+   cle_index = Adef.iper_of_int (-1)}
 ;
 
 value bogus_def p n o = p = "?" || n = "?";
 
 value set_infos str u l =
   let (nl, l) = get_fst_names_aliases str l in
-  do u.first_names_aliases := nl; return
-  let (nl, l) = get_surnames_aliases str l in
-  do u.surnames_aliases := nl; return
-  let (n, l) = get_pub_name str l in
-  do u.public_name := n; return
-  let (n, l) = get_image str l in
-  do u.image := n; return
-  let (nl, l) = get_qualifiers str l in
-  do u.qualifiers := nl; return
-  let (nl, l) = get_aliases str l in
-  do u.aliases := nl; return
-  let (tl, l) = get_titles str l in
-  do u.titles := tl; return
-  let (n, l) = get_access str l in
-  do u.access := n; return
-  let (n, l) = get_occu str l in
-  do u.occupation := n; return
-  let (n, l) = get_sources str l in
-  do if n <> "" then u.psources := n else (); return
-  let (naissance, l) = get_optional_birthdate l in
-  let (birth_place, l) = get_field "#bp" l in
-  let (birth_src, l) = get_field "#bs" l in
-  let (baptism, l) = get_optional_baptdate l in
-  let (baptism_place, l) =
-    let (pp, l) = get_field "#pp" l in
-    if pp = "" then get_field "#bp" l else (pp, l)
-  in
-  let (bapt_src, l) = get_field "#ps" l in
-  let (mort, l) = get_optional_deathdate l in
-  let (death_place, l) = get_field "#dp" l in
-  let (death_src, l) = get_field "#ds" l in
-  let mort =
-    match (naissance, mort) with
-    [ (None, _) | (_, Some _) | (Some None, _) ->
-        match mort with
-        [ Some m -> m
-        | None -> DontKnowIfDead ]
-    | (Some _, None) -> NotDead ]
-  in
-  let naissance =
-    match naissance with
-    [ None -> Adef.codate_None
-    | Some x -> Adef.codate_of_od x ]
-  in
-  let baptism =
-    match baptism with
-    [ None -> Adef.codate_None
-    | Some x -> Adef.codate_of_od x ]
-  in
-  do u.birth := naissance;
-     if birth_place <> "" then u.birth_place := birth_place else ();
-     u.birth_src := birth_src;
-     u.baptism := baptism;
-     u.baptism_place := baptism_place;
-     u.baptism_src := bapt_src;
-     u.death := mort;
-     u.death_place := death_place;
-     u.death_src := death_src;
-  return
-  let (burial, l) = get_burial l in
-  do u.burial := burial; return
-  let (burial_place, l) = get_field "#rp" l in
-  let (burial_src, l) = get_field "#rs" l in
-  do u.burial_place := burial_place;
-     u.burial_src := burial_src;
-  return
-  l
+  do {
+    u.first_names_aliases := nl;
+    let (nl, l) = get_surnames_aliases str l in
+    u.surnames_aliases := nl;
+    let (n, l) = get_pub_name str l in
+    u.public_name := n;
+    let (n, l) = get_image str l in
+    u.image := n;
+    let (nl, l) = get_qualifiers str l in
+    u.qualifiers := nl;
+    let (nl, l) = get_aliases str l in
+    u.aliases := nl;
+    let (tl, l) = get_titles str l in
+    u.titles := tl;
+    let (n, l) = get_access str l in
+    u.access := n;
+    let (n, l) = get_occu str l in
+    u.occupation := n;
+    let (n, l) = get_sources str l in
+    if n <> "" then u.psources := n else ();
+    let (naissance, l) = get_optional_birthdate l in
+    let (birth_place, l) = get_field "#bp" l in
+    let (birth_src, l) = get_field "#bs" l in
+    let (baptism, l) = get_optional_baptdate l in
+    let (baptism_place, l) =
+      let (pp, l) = get_field "#pp" l in
+      if pp = "" then get_field "#bp" l else (pp, l)
+    in
+    let (bapt_src, l) = get_field "#ps" l in
+    let (mort, l) = get_optional_deathdate l in
+    let (death_place, l) = get_field "#dp" l in
+    let (death_src, l) = get_field "#ds" l in
+    let mort =
+      match (naissance, mort) with
+      [ (None, _) | (_, Some _) | (Some None, _) ->
+          match mort with
+          [ Some m -> m
+          | None -> DontKnowIfDead ]
+      | (Some _, None) -> NotDead ]
+    in
+    let naissance =
+      match naissance with
+      [ None -> Adef.codate_None
+      | Some x -> Adef.codate_of_od x ]
+    in
+    let baptism =
+      match baptism with
+      [ None -> Adef.codate_None
+      | Some x -> Adef.codate_of_od x ]
+    in
+    u.birth := naissance;
+    if birth_place <> "" then u.birth_place := birth_place else ();
+    u.birth_src := birth_src;
+    u.baptism := baptism;
+    u.baptism_place := baptism_place;
+    u.baptism_src := bapt_src;
+    u.death := mort;
+    u.death_place := death_place;
+    u.death_src := death_src;
+    let (burial, l) = get_burial l in
+    u.burial := burial;
+    let (burial_place, l) = get_field "#rp" l in
+    let (burial_src, l) = get_field "#rs" l in
+    u.burial_place := burial_place;
+    u.burial_src := burial_src;
+    l
+  }
 ;
 
 value parse_parent str l =
@@ -614,33 +607,39 @@ value parse_parent str l =
   if not defined then
     let key = {pk_first_name = pp; pk_surname = np; pk_occ = op} in
     (Undefined key, np, l)
-  else
+  else do {
     let u = create_person () in
-    do u.surname := np; u.first_name := pp; u.occ := op; return
+    u.surname := np;
+    u.first_name := pp;
+    u.occ := op;
     let l = set_infos str u l in
     (Defined u, np, l)
+  }
 ;
 
 value parse_child str surname csrc cbp l =
   let u = create_person () in
   let (prenom, occ, l) = get_fst_name str l in
-  do u.first_name := prenom; u.occ := occ; return
-  let (nom, l) =
-    match l with
-    [ ["?" :: _] -> get_name str l
-    | [x :: l'] ->
-        match x.[0] with
-        [ '<' | '>' | '!' | '~' | '?' | '-' | '0'..'9' | '{' | '#' ->
-            (surname, l)
-        | '(' | '[' -> (if prenom = "" then "" else surname, l)
-        | _ -> get_name str l ]
-    | _ -> (surname, []) ]
-  in
-  do u.surname := nom;
-     u.psources := csrc;
-     u.birth_place := cbp;
-  return
-  let l = set_infos str u l in (u, l)
+  do {
+    u.first_name := prenom;
+    u.occ := occ;
+    let (nom, l) =
+      match l with
+      [ ["?" :: _] -> get_name str l
+      | [x :: l'] ->
+          match x.[0] with
+          [ '<' | '>' | '!' | '~' | '?' | '-' | '0'..'9' | '{' | '#' ->
+              (surname, l)
+          | '(' | '[' -> (if prenom = "" then "" else surname, l)
+          | _ -> get_name str l ]
+      | _ -> (surname, []) ]
+    in
+    u.surname := nom;
+    u.psources := csrc;
+    u.birth_place := cbp;
+    let l = set_infos str u l in
+    (u, l)
+  }
 ;
 
 value get_relation str =
@@ -655,7 +654,7 @@ value get_relation str =
         | "fost" | "fost:" -> FosterParent
         | _ -> failwith str ]
       in
-      if String.length x = 5 && x.[4] = ':' then
+      if String.length x = 5 && x.[4] = ':' then do {
         let (fk, _, l) = parse_parent str l in
         let l =
           match l with
@@ -663,18 +662,23 @@ value get_relation str =
           | _ -> failwith str ]
         in
         let (mk, _, l) = parse_parent str l in
-        do if l <> [] then failwith str else (); return
+        if l <> [] then failwith str else ();
         {r_type = rtyp; r_fath = Some fk; r_moth = Some mk; r_sources = ""}
+      }
       else
         match l with
         [ ["fath:" :: l] ->
             let (fk, _, l) = parse_parent str l in
-            do if l <> [] then failwith str else (); return
-            {r_type = rtyp; r_fath = Some fk; r_moth = None; r_sources = ""}
+            do {
+              if l <> [] then failwith str else ();
+              {r_type = rtyp; r_fath = Some fk; r_moth = None; r_sources = ""}
+            }
         | ["moth:" :: l] ->
             let (mk, _, l) = parse_parent str l in
-            do if l <> [] then failwith str else (); return
-            {r_type = rtyp; r_fath = None; r_moth = Some mk; r_sources = ""}
+            do {
+              if l <> [] then failwith str else ();
+              {r_type = rtyp; r_fath = None; r_moth = Some mk; r_sources = ""}
+            }
         | _ -> failwith str ]
   | _ -> failwith str ]
 ;
@@ -682,10 +686,12 @@ value get_relation str =
 value read_notes ic =
   let notes =
     try
-      loop (input_a_line ic) where rec loop =
+      let rec loop =
         fun
         [ "end notes" -> ""
         | l -> l ^ "\n" ^ loop (input_a_line ic) ]
+      in
+      loop (input_a_line ic)
     with
     [ End_of_file -> failwith "end of file" ]
   in
@@ -701,92 +707,94 @@ value read_family ic fname =
       in
       let (relation, fath_sex, moth_sex) = relation_ss in
       let (cle_mere, _, l) = parse_parent str l in
-      do if l <> [] then failwith str else (); return
-      let line = read_line ic in
-      let (witn, line) =
-        loop line where rec loop =
-          fun
-          [ Some (str, [("wit" | "wit:") :: l]) ->
-              let (sex, l) =
-                match l with
-                [ ["m:" :: l] -> (Male, l)
-                | ["f:" :: l] -> (Female, l)
-                | l -> (Neuter, l) ]
+      do {
+        if l <> [] then failwith str else ();
+        let line = read_line ic in
+        let (witn, line) =
+          loop line where rec loop =
+            fun
+            [ Some (str, ["wit" | "wit:" :: l]) ->
+                let (sex, l) =
+                  match l with
+                  [ ["m:" :: l] -> (Male, l)
+                  | ["f:" :: l] -> (Female, l)
+                  | l -> (Neuter, l) ]
+                in
+                let (wk, _, l) = parse_parent str l in
+                do {
+                  if l <> [] then failwith str else ();
+                  let (witn, line) = loop (read_line ic) in
+                  ([(wk, sex) :: witn], line)
+                }
+            | line -> ([], line) ]
+        in
+        let (fsrc, line) =
+          match line with
+          [ Some (str, ["src"; x]) -> (cut_space x, read_line ic)
+          | Some (str, ["src" :: _]) -> failwith str
+          | _ -> ("", line) ]
+        in
+        let (csrc, line) =
+          match line with
+          [ Some (str, ["csrc"; x]) -> (cut_space x, read_line ic)
+          | Some (str, ["csrc" :: _]) -> failwith str
+          | _ -> ("", line) ]
+        in
+        let (cbp, line) =
+          match line with
+          [ Some (str, ["cbp"; x]) -> (cut_space x, read_line ic)
+          | Some (str, ["cbp" :: _]) -> failwith str
+          | _ -> ("", line) ]
+        in
+        let co = {father = cle_pere; mother = cle_mere} in
+        let (comm, line) =
+          match line with
+          [ Some (str, ["comm" :: _]) ->
+              let comm = String.sub str 5 (String.length str - 5) in
+              (comm, read_line ic)
+          | _ -> ("", line) ]
+        in
+        match line with
+        [ Some (_, ["beg"]) ->
+            let cles_enfants =
+              let rec loop children =
+                match read_line ic with
+                [ Some (str, ["-" :: l]) ->
+                    let (sex, l) = get_optional_sexe l in
+                    let (child, l) = parse_child str surname csrc cbp l in
+                    do {
+                      child.sex := sex;
+                      if l <> [] then failwith str
+                      else loop [child :: children]
+                    }
+                | Some (str, ["end"]) -> children
+                | Some (str, _) -> failwith str
+                | _ -> failwith "eof" ]
               in
-              let (wk, _, l) = parse_parent str l in
-              do if l <> [] then failwith str else (); return
-              let (witn, line) = loop (read_line ic) in
-              ([(wk, sex) :: witn], line)
-          | line -> ([], line) ]
-      in
-      let (fsrc, line) =
-        match line with
-        [ Some (str, ["src"; x]) -> (cut_space x, read_line ic)
-        | Some (str, ["src" :: _]) -> failwith str
-        | _ -> ("", line) ]
-      in
-      let (csrc, line) =
-        match line with
-        [ Some (str, ["csrc"; x]) -> (cut_space x, read_line ic)
-        | Some (str, ["csrc" :: _]) -> failwith str
-        | _ -> ("", line) ]
-      in
-      let (cbp, line) =
-        match line with
-        [ Some (str, ["cbp"; x]) -> (cut_space x, read_line ic)
-        | Some (str, ["cbp" :: _]) -> failwith str
-        | _ -> ("", line) ]
-      in
-      let co = {father = cle_pere; mother = cle_mere} in
-      let (comm, line) =
-        match line with
-        [ Some (str, ["comm" :: _]) ->
-            let comm = String.sub str 5 (String.length str - 5) in
-            (comm, read_line ic)
-        | _ -> ("", line) ]
-      in
-      match line with
-      [ Some (_, ["beg"]) ->
-          let cles_enfants =
-            let rec loop children =
-              match read_line ic with
-              [ Some (str, ["-" :: l]) ->
-                  let (sex, l) = get_optional_sexe l in
-                  let (child, l) = parse_child str surname csrc cbp l in
-                  do child.sex := sex; return
-                  if l <> [] then failwith str
-                  else loop [child :: children]
-              | Some (str, ["end"]) -> children
-              | Some (str, _) -> failwith str
-              | _ -> failwith "eof" ]
+              List.rev (loop [])
             in
-            List.rev (loop [])
-          in
-          let fo =
-            {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src; witnesses = [| |];
-             relation = relation;
-             divorce = divorce;
-             comment = comm; origin_file = fname;
-             fsources = fsrc;
-             fam_index = Adef.ifam_of_int (-1)}
-          in
-          let deo = {children = Array.of_list cles_enfants} in
-          Some (Family co fath_sex moth_sex witn fo deo, read_line ic)
-      | line ->
-          let fo =
-            {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src; witnesses = [| |];
-             relation = relation;
-             divorce = divorce; comment = comm;
-             origin_file = fname; fsources = fsrc;
-             fam_index = Adef.ifam_of_int (-1)}
-          in
-          let deo = {children = [||]} in
-          Some (Family co fath_sex moth_sex witn fo deo, line) ]
+            let fo =
+              {marriage = marriage; marriage_place = marr_place;
+               marriage_src = marr_src; witnesses = [| |];
+               relation = relation; divorce = divorce; comment = comm;
+               origin_file = fname; fsources = fsrc;
+               fam_index = Adef.ifam_of_int (-1)}
+            in
+            let deo = {children = Array.of_list cles_enfants} in
+            Some (Family co fath_sex moth_sex witn fo deo, read_line ic)
+        | line ->
+            let fo =
+              {marriage = marriage; marriage_place = marr_place;
+               marriage_src = marr_src; witnesses = [| |];
+               relation = relation; divorce = divorce; comment = comm;
+               origin_file = fname; fsources = fsrc;
+               fam_index = Adef.ifam_of_int (-1)}
+            in
+            let deo = {children = [| |]} in
+            Some (Family co fath_sex moth_sex witn fo deo, line) ]
+      }
   | Some (str, ["notes"]) ->
-      let notes = read_notes ic in
-      Some (Bnotes notes, read_line ic)
+      let notes = read_notes ic in Some (Bnotes notes, read_line ic)
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in
@@ -796,9 +804,7 @@ value read_family ic fname =
         [ Some (_, ["beg"]) ->
             let notes = read_notes ic in
             let key =
-              {pk_first_name = first_name;
-               pk_surname = surname;
-               pk_occ = occ}
+              {pk_first_name = first_name; pk_surname = surname; pk_occ = occ}
             in
             Some (Notes key notes, read_line ic)
         | Some (str, _) -> failwith str
@@ -817,11 +823,13 @@ value read_family ic fname =
         [ Some (_, ["beg"]) ->
             let rl =
               try
-                loop (input_a_line ic) where rec loop =
+                let rec loop =
                   fun
                   [ "end" -> []
                   | x ->
                       [get_relation x (fields x) :: loop (input_a_line ic)] ]
+                in
+                loop (input_a_line ic)
               with
               [ End_of_file -> failwith "missing end rel" ]
             in
@@ -834,26 +842,29 @@ value read_family ic fname =
 
 value comp_families x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
-  do line_cnt.val := 0; return
-  let oc = open_out_bin out_file in
-  do try
-       let ic = open_in x in
-       do output_string oc magic_gwo;
-          output_value oc (x : string);
-       return
-       let rec loop line =
-         match read_family ic x line with
-         [ Some (family, line) ->
-             do output_value oc (family : syntax_o); return loop line
-         | None -> () ]
-       in
-       do loop (read_line ic);
-          close_in ic;
-       return ()
-     with e ->
-       do close_out oc;
-          try Sys.remove out_file with [ Sys_error _ -> () ];
-       return raise e;
-     close_out oc;
-  return ()
+  do {
+    line_cnt.val := 0;
+    let oc = open_out_bin out_file in
+    try
+      let ic = open_in x in
+      do {
+        output_string oc magic_gwo;
+        output_value oc (x : string);
+        let rec loop line =
+          match read_family ic x line with
+          [ Some (family, line) ->
+              do { output_value oc (family : syntax_o); loop line }
+          | None -> () ]
+        in
+        loop (read_line ic);
+        close_in ic;
+      }
+    with e ->
+      do {
+        close_out oc;
+        try Sys.remove out_file with [ Sys_error _ -> () ];
+        raise e
+      };
+    close_out oc;
+  }
 ;
