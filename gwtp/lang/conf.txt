@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.5 2002-07-15 09:47:04 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.6 2002-11-12 12:32:36 ddr Exp $ -->
   <title>Gwtp - [
 en: configuration
 fr: configuration
@@ -50,6 +50,10 @@ it: Lingua standard:
 en: Afrikaans
 fr: Afrikaans
 it: Afrikaans
+]
+<option value="bg"%edefault_lang=bg;>[
+en: Bulgarian
+fr: Bulgare
 ]
 <option value="ca"%edefault_lang=ca;>[
 en: Catalan
