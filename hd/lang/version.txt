@@ -20,6 +20,8 @@
 <img src="%gm=IM;v=/l-fr.jpg" width=36 height=22 alt=fr></a>
 <a href="%glang=he">
 <img src="%gm=IM;v=/l-he.jpg" width=36 height=22 alt=he></a>
+<a href="%glang=is">
+<img src="%gm=IM;v=/l-is.jpg" width=36 height=22 alt=is></a>
 <a href="%glang=it">
 <img src="%gm=IM;v=/l-it.jpg" width=36 height=22 alt=it></a>
 <a href="%glang=nl">
