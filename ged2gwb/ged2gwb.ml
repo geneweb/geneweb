@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.8 2000-02-05 16:08:51 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.9 2000-02-06 00:52:46 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -46,18 +46,6 @@ value in_file = ref "";
 value print_location pos =
   Printf.fprintf log_oc.val "File \"%s\", line %d:\n" in_file.val pos
 ;
-
-(*
-value buff = ref (String.create 80);
-value store len x =
-  do if len >= String.length buff.val then
-       buff.val := buff.val ^ String.create (String.length buff.val)
-     else ();
-     buff.val.[len] := x;
-  return succ len
-;
-value get_buff len = String.sub buff.val 0 len;
-*)
 
 value rec skip_eol =
   parser [ [: `'\n' | '\r'; _ = skip_eol :] -> () | [: :] -> () ]
