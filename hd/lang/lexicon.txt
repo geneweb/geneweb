@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.138 1999-10-04 16:52:26 ddr Exp $
+# $Id: lexicon.txt,v 2.139 1999-10-04 16:59:47 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -4403,15 +4403,15 @@ no: med
 pt: com
 se: med
 
+    witness at marriage of %s and %s
+en: witness at marriage of %s and %s
+fr: t&eacute;moin au mariage de %s et de %s
+
     witness/witnesses
 dk: vidne/vidner
 en: witness/witnesses
 fr: t&eacute;moin/t&eacute;moins
 se: vittne/vittnen
-
-    witness at marriage of %s and %s
-en: witness at marriage of %s and %s
-fr: t&eacute;moin au mariage de %s et de %s
 
     would be his/her own ancestor
 cs: byl by svùj vlastní pøedek
