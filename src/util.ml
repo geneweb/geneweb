@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.6 1999-04-05 23:42:30 ddr Exp $ *)
+(* $Id: util.ml,v 2.7 1999-04-06 08:11:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -253,16 +253,6 @@ value afficher_prenom_de_personne conf base p =
 ;
 
 value main_title =
-  let val =
-    fun
-    [ "empereur" | "impératrice" -> 6
-    | "roi" | "reine" -> 5
-    | "prince" | "princesse" -> 4
-    | "duc" | "duchesse" -> 3
-    | "comte" | "comtesse" -> 2
-    | "vicomte" | "vicomtesse" -> 1
-    | _ -> 0 ]
-  in
   fun base p ->
     let rec loop r =
       fun
@@ -271,10 +261,7 @@ value main_title =
           if x.t_name == Tmain then Some x
           else
             match r with
-            [ Some t ->
-                if val (sou base x.t_ident) > val (sou base t.t_ident) then
-                  loop (Some x) l
-                else loop r l
+            [ Some t -> loop r l
             | None -> loop (Some x) l ] ]
     in
     loop None p.titles

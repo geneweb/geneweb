@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.5 1999-04-05 23:42:28 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.6 1999-04-06 08:11:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -156,6 +156,36 @@ value print_title oc base t =
   return ()
 ;
 
+(* main_title = backward compatibility (installed version 2.01);
+   should be removed one day... *)
+value main_title =
+  let val =
+    fun
+    [ "empereur" | "impératrice" -> 6
+    | "roi" | "reine" -> 5
+    | "prince" | "princesse" -> 4
+    | "duc" | "duchesse" -> 3
+    | "comte" | "comtesse" -> 2
+    | "vicomte" | "vicomtesse" -> 1
+    | _ -> 0 ]
+  in
+  fun base p ->
+    let rec loop r =
+      fun
+      [ [] -> r
+      | [x :: l] ->
+          if x.t_name == Tmain then Some x
+          else
+            match r with
+            [ Some t ->
+                if val (sou base x.t_ident) > val (sou base t.t_ident) then
+                  loop (Some x) l
+                else loop r l
+            | None -> loop (Some x) l ] ]
+    in
+    loop None p.titles
+;
+
 value print_infos oc base is_child print_sources p =
   do List.iter (print_first_name_alias oc base) p.first_names_aliases;
      List.iter (print_surname_alias oc base) p.surnames_aliases;
@@ -166,6 +196,14 @@ value print_infos oc base is_child print_sources p =
      print_if_no_empty oc base "#image" p.image;
      List.iter (print_nick_name oc base) p.nick_names;
      List.iter (print_alias oc base) p.aliases;
+(* backward compatibility (installed version 2.01) *)
+     match p.titles with
+     [ [_] | [] -> ()
+     | [t0 :: _] ->
+         match main_title base p with
+         [ Some t -> if t = t0 then () else t.t_name := Tmain
+         | _ -> () ] ];
+(**)
      List.iter (print_title oc base) p.titles;
      match p.access with
      [ IfTitles -> ()
