@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.5 2001-09-16 14:16:53 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.6 2001-09-16 14:41:35 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -77,6 +77,13 @@ value print_send_image conf base p =
       Wserver.wprint "\
 <input type=file name=file size=50 maxlength=250 accept=\"image/*\">
 ";
+      match p_getint conf.base_env "max_images_size" with
+      [ Some len ->
+          do {
+            Wserver.wprint "<p>\n";
+            Wserver.wprint "(maximum authorized size = %d bytes)\n" len
+          }
+      | None -> () ];
       Wserver.wprint "<p>\n";
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;

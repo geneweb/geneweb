@@ -2,6 +2,9 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Sep 01] Added variable "max_images_size" in base configuration
+    files (base.gwf) to limit the size of the images which can be sent
+    by the "send image" link.
   - [13 Sep 01] Fixed bug: dates added in "family" forms were not
     completely checked ("31th of September" was accepted, for example).
 
