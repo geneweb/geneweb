@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.16 1998-11-20 20:39:53 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.17 1998-11-25 18:45:45 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -22,6 +22,13 @@ value try_negative_dates = ref False;
 value set_not_dead = ref False;
 
 (* Reading input *)
+
+value line_cnt = ref 0;
+value in_file = ref "";
+
+value print_location () =
+  Printf.printf "File \"%s\", line %d:\n" in_file.val (line_cnt.val + 1)
+;
 
 value buff = ref (String.create 80);
 value store len x =
@@ -269,7 +276,8 @@ value date_of_field d =
           Some (Da Maybe (Grammar.Entry.parse find_year (Stream.of_string d)))
         with
         [ Stdpp.Exc_located loc e ->
-            do Printf.printf "Can't decode date %s\n" d;
+            do print_location ();
+               Printf.printf "Can't decode date %s\n" d;
                flush stdout;
             return None ] ]
 ;
@@ -290,9 +298,6 @@ type gen =
    g_hstr : Hashtbl.t string Adef.istr;
    g_hnot : Hashtbl.t string record;
    g_hnam : Hashtbl.t string (ref int);
-(*
-   g_all : Hashtbl.t string unit;
-*)
    g_fnot : mutable list (iper * list record)}
 ;
 
@@ -387,12 +392,6 @@ value phony_per gen =
 ;
 
 value this_year = 1998;
-
-(*
-value exists gen x =
-  try do Hashtbl.find gen.g_all x; return True with [ Not_found -> False ]
-;
-*)
 
 value make_title gen (title, place) =
   {t_name = Tnone;
@@ -608,7 +607,8 @@ value decode_date_interval s =
     | TDend d2 -> (None, Some (date_of_sd  d2)) ]
   with
   [ Stdpp.Exc_located _ _ | Not_found ->
-      do Printf.printf "Can't decode date %s\n" s;
+      do print_location ();
+         Printf.printf "Can't decode date %s\n" s;
          flush stdout;
       return (None, None) ]
 ;
@@ -1137,9 +1137,6 @@ value make_arrays in_file =
      g_hstr = Hashtbl.create 3001;
      g_hnot = Hashtbl.create 3001;
      g_hnam = Hashtbl.create 3001;
-(*
-     g_all = Hashtbl.create 3001;
-*)
      g_fnot = []}
   in
   let ic =
@@ -1152,7 +1149,7 @@ value make_arrays in_file =
         in
         open_in f ]
   in
-  let line_cnt = ref 0 in
+  do line_cnt.val := 0; return
   let strm =
     Stream.from
       (fun i ->
@@ -1179,8 +1176,7 @@ value make_arrays in_file =
               do let _ : string = get_to_eoln 0 strm in (); return
               loop ()
        | [: `_ :] ->
-             do Printf.printf "File \"%s\", line %d:\n" in_file
-                  (line_cnt.val + 1);
+             do print_location ();
                 Printf.printf "Strange input.\n";
                 flush stdout;
                 let _ : string = get_to_eoln 0 strm in ();
@@ -1511,9 +1507,23 @@ value finish_base base =
   return ()
 ;
 
+value output_command_line bname =
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname
+    else bname ^ ".gwb"
+  in
+  let oc = open_out (Filename.concat bdir "command.txt") in
+  do Printf.fprintf oc "%s" Sys.argv.(0);
+     for i = 1 to Array.length Sys.argv - 1 do
+       Printf.fprintf oc " %s" Sys.argv.(i);
+     done;
+     Printf.fprintf oc "\n";
+     close_out oc;
+  return ()
+;
+
 (* Main *)
 
-value in_file = ref "";
 value out_file = ref "a";
 value speclist =
   [("-o", Arg.String (fun s -> out_file.val := s), "<file>
@@ -1554,21 +1564,6 @@ value speclist =
        empty fields DEAT");
    ("-ta", Arg.Set titles_aurejac, "
        [This option is ad hoc; please do not use it]")]
-;
-
-value output_command_line bname =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname
-    else bname ^ ".gwb"
-  in
-  let oc = open_out (Filename.concat bdir "command.txt") in
-  do Printf.fprintf oc "%s" Sys.argv.(0);
-     for i = 1 to Array.length Sys.argv - 1 do
-       Printf.fprintf oc " %s" Sys.argv.(i);
-     done;
-     Printf.fprintf oc "\n";
-     close_out oc;
-  return ()
 ;
 
 value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
