@@ -1,0 +1,17 @@
+[H[2J
+Bienvenue dans GeneWeb
+
+Allez dans votre navigateur et ouvrez l'adresse:
+       http://localhost:2318/fr
+
+Si cela ne fonctionne pas, il se peut que vous ayez a configurer dans
+votre navigateur des options du genre "travailler hors connexion" ou
+"ne pas utiliser de proxy pour les adresses locales" ou "ne pas se
+connecter sur internet pour l'adresse 'localhost'".
+
+Si malgre vos efforts, cela ne repond toujours pas, essayez la procedure
+classique en regardant la documentation. Pour cela arretez ce programme
+en tapant "control-c" dans cette fenetre, allez dans le repertoire "gw"
+et ouvrez le fichier:
+   INSTALL.htm
+
