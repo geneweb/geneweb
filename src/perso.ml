@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.67 2000-12-19 15:42:10 ddr Exp $ *)
+(* $Id: perso.ml,v 3.68 2000-12-27 10:50:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -485,6 +485,12 @@ value eval_variable conf base env sl =
             let ep = make_ep ip in
             loop ep efam sl
         | _ -> None ]
+    | ["witness" :: sl] ->
+        match get_env "witness" env with
+        [ Eind p a u ->
+            let ep = (p, a, u, age_autorise conf base p) in
+            loop ep efam sl
+        | _ -> None ]
     | [] -> Some ((p, a, u, p_auth), efam, "")
     | [s] -> Some ((p, a, u, p_auth), efam, s)
     | _ -> None ]
@@ -873,15 +879,6 @@ value print_surname_key conf base env p p_auth =
   Wserver.wprint "%s" (code_varenv (Name.lower (p_surname base p)))
 ;
 
-value print_witness conf base env =
-  match get_env "witness" env with
-  [ Eind p _ _ ->
-      do Wserver.wprint "%s" (referenced_person_title_text conf base p);
-         Date.afficher_dates_courtes conf base p;
-      return ()
-  | _ -> () ]
-;
-
 value print_witness_relation conf base env =
   fun
   [ Efam _ cpl _ ->
@@ -969,7 +966,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "surname_key" -> print_surname_key conf base env p p_auth
   | "title" -> Wserver.wprint "%s" (person_title conf base p)
   | "witness_relation" -> print_witness_relation conf base env efam
-  | "witness" -> print_witness conf base env
   | v -> Wserver.wprint "%%%s;" v ]
 ;
 
