@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.38 1999-09-02 05:19:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.39 1999-09-11 10:49:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -55,7 +55,7 @@ value fprintf_date oc tm =
     tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 ;
 
-value log oc tm from auth request s =
+value log oc tm conf from gauth request s =
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   do let tm = Unix.localtime tm in
@@ -63,7 +63,9 @@ value log oc tm from auth request s =
      Printf.fprintf oc " (%d)" (Unix.getpid ());
      Printf.fprintf oc " %s\n" s;
      Printf.fprintf oc "  From: %s\n" from;
-     if auth <> "" then Printf.fprintf oc "  User: %s\n" auth else ();
+     if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
+     if conf.user <> "" then Printf.fprintf oc "  User: %s\n" conf.user
+     else ();
      Printf.fprintf oc "  Agent: %s\n" user_agent;
      if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
   return ()
@@ -371,16 +373,35 @@ value unauth bname typ =
   return ()
 ;
 
-value match_auth sauth uauth =
-  if sauth = "" then True
+value match_auth_file auth_file uauth =
+  if auth_file = "" then False
   else
-    match lindex sauth ':' with
-    [ Some _ -> sauth = uauth
-    | None ->
-        match lindex uauth ':' with
-        [ Some i ->
-            sauth = String.sub uauth (i + 1) (String.length uauth - i - 1)
-        | None -> sauth = uauth ] ]
+    let auth_file = Filename.concat Util.base_dir.val auth_file in
+    match try Some (open_in auth_file) with [ Sys_error _ -> None ] with
+    [ Some ic ->
+        try
+          loop () where rec loop () =
+            let sauth = input_line ic in
+            if uauth = sauth then do close_in ic; return True
+            else loop ()
+        with
+        [ End_of_file -> do close_in ic; return False ]
+    | None -> False ]
+;
+
+value match_simple_passwd sauth uauth =
+  match lindex sauth ':' with
+  [ Some _ -> sauth = uauth
+  | None ->
+      match lindex uauth ':' with
+      [ Some i ->
+          sauth = String.sub uauth (i + 1) (String.length uauth - i - 1)
+      | None -> sauth = uauth ] ]
+;
+
+value match_auth passwd auth_file uauth =
+  if passwd <> "" && match_simple_passwd passwd uauth then True
+  else match_auth_file auth_file uauth
 ;
 
 value make_conf cgi (addr, request) str env =
@@ -440,9 +461,17 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     try List.assoc "wizard_passwd" base_env with
     [ Not_found -> wizard_passwd.val ]
   in
+  let wizard_passwd_file =
+    try List.assoc "wizard_passwd_file" base_env with
+    [ Not_found -> "" ]
+  in
   let friend_passwd =
     try List.assoc "friend_passwd" base_env with
     [ Not_found -> friend_passwd.val ]
+  in
+  let friend_passwd_file =
+    try List.assoc "friend_passwd_file" base_env with
+    [ Not_found -> "" ]
   in
   let wizard_just_friend =
     try List.assoc "wizard_just_friend" base_env = "yes" with
@@ -457,18 +486,27 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
         Base64.decode (String.sub auth i (String.length auth - i))
      else ""
   in
-  let (ok, wizard, friend) =
+  let (ok, wizard, friend, user) =
     if not cgi then
       if passwd = "w" then
-        if wizard_passwd = "" then (True, True, friend_passwd = "")
-        else if match_auth wizard_passwd uauth then (True, True, False)
-        else (False, False, False)
+        if wizard_passwd = "" && wizard_passwd_file = "" then
+          (True, True, friend_passwd = "", "")
+        else if match_auth wizard_passwd wizard_passwd_file uauth then
+          (True, True, False, uauth)
+        else (False, False, False, "")
       else if passwd = "f" then
-        if friend_passwd = "" then (True, False, True)
-        else if match_auth friend_passwd uauth then (True, False, True)
-        else (False, False, False)
-      else (True, passwd = wizard_passwd, passwd = friend_passwd)
-    else (True, passwd = wizard_passwd, passwd = friend_passwd)
+        if friend_passwd = "" && friend_passwd_file = "" then
+          (True, False, True, "")
+        else if match_auth friend_passwd friend_passwd_file uauth then
+          (True, False, True, uauth)
+        else (False, False, False, "")
+      else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
+    else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
+  in
+  let user =
+    match lindex user ':' with
+    [ Some i -> String.sub user 0 i
+    | None -> "" ]
   in
   let cancel_links =
     match Util.p_getenv env "cgl" with
@@ -479,6 +517,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     {wizard = wizard && not wizard_just_friend;
      friend = friend || wizard_just_friend && wizard;
      just_friend_wizard = wizard && wizard_just_friend;
+     user = user;
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;
@@ -536,8 +575,8 @@ use \"can_send_image\".\n"
   (conf, sleep, if not ok then Some (passwd, uauth, base_file) else None)
 ;
 
-value log_and_robot_check cgi auth from request str =
-  if cgi && log_file.val = "" && robot_xcl.val = None then ()
+value log_and_robot_check conf auth from request str =
+  if conf.cgi && log_file.val = "" && robot_xcl.val = None then ()
   else
     let tm = Unix.time () in
     lock_wait Srcfile.adm_file "gwd.lck" with
@@ -545,10 +584,10 @@ value log_and_robot_check cgi auth from request str =
         let oc = log_oc () in
         do try
              do match robot_xcl.val with
-                [ Some (cnt, sec) -> Robot.check oc tm from cnt sec cgi
+                [ Some (cnt, sec) -> Robot.check oc tm from cnt sec conf.cgi
                 | None -> () ];
-                if cgi && log_file.val = "" then ()
-                else log oc tm from auth request str;
+                if conf.cgi && log_file.val = "" then ()
+                else log oc tm conf from auth request str;
              return ()
            with e -> do flush_log oc; return raise e;
            flush_log oc;
@@ -606,7 +645,7 @@ value conf_and_connection cgi from (addr, request) str env =
          unauth base_file (if passwd = "w" then "Wizard" else "Friend");
       return ()
   | _ ->
-      do log_and_robot_check cgi auth from request str;
+      do log_and_robot_check conf auth from request str;
          if conf.bname = "" then
            match Util.p_getenv conf.env "m" with
            [ Some "DOC" -> Doc.print conf
