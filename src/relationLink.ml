@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.14 2004-12-26 13:29:23 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.15 2004-12-26 21:48:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -465,7 +465,7 @@ value rec list_iter_hd_tl f =
 value print_one_branch_no_table conf base info =
   let b = if info.b1 = [] then info.b2 else info.b1 in
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
-  tag "center" begin
+  tag "div" "style=\"text-align:center\"" begin
     print_someone_and_spouse conf base info False info.ip sp b;
     html_br conf;
     list_iter_hd_tl
@@ -600,7 +600,7 @@ value print_relation_path conf base info =
        (info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
         info.nb2 <> None) then
        do {
-      html_br conf;
+      html_p conf;
       if info.pb1 <> None || info.nb1 <> None then
         print_prev_next_1 conf base info info.pb1 info.nb1
       else ();
