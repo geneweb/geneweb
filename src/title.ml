@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.8 1999-09-16 09:31:50 ddr Exp $ *)
+(* $Id: title.ml,v 2.9 1999-10-25 22:10:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -284,7 +284,9 @@ value give_access_someone conf base (x, t) list =
      Wserver.wprint "\n";
      Date.afficher_dates_courtes conf base x;
      if t.t_nth <> 0 then
-       Wserver.wprint " (%s)" (transl_nth conf "nth" t.t_nth)
+       Wserver.wprint " (%s)"
+         (if t.t_nth >= 100 then string_of_int t.t_nth
+          else transl_nth conf "nth" t.t_nth)
      else ();
      if List.memq x list then Wserver.wprint "</em>"
      else Wserver.wprint "</a>";

@@ -5,6 +5,8 @@ GeneWeb Version 2.08
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Oct 25, 99] Modified the treatment of nth (overflowing after 100)
+    to display the number itself (better than just "n-th").
   - [Oct 25, 99] Commented the loading of the whole persons and families
     arrays in "descend.ml": supposed to make things go faster but consumming
     13M in my data base when clicking on "descendants" for anybody.
