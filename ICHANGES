@@ -10,6 +10,10 @@ GeneWeb Version 4.10
     correctly and the button "OK" resulted in bad request.
   - [30 Jan 03] Added option -min_disp_req
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [12 Feb 03] Fixed problem with places containing only spaces: now
+    replaced with empty strings.
+
 GeneWeb Version 4.09
 --------------------
 

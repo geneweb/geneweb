@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.13 2002-10-22 13:18:24 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.14 2003-02-12 10:12:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -80,21 +80,24 @@ value starting_char s =
 
 value gen_correct_string no_colon s =
   let s = strip_spaces s in
-  loop 0 0 where rec loop i len =
-    if i == String.length s then Buff.get len
-    else if len == 0 && not (starting_char s) then loop i (Buff.store len '_')
-    else
-      match s.[i] with
-      [ ' ' | '\n' | '\t' ->
-          if i == String.length s - 1 then Buff.get len
-          else loop (i + 1) (Buff.store len '_')
-      | '_' | '\\' -> loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
-      | ':' when no_colon ->
-          let len = Buff.store len '\\' in
-          loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
-      | c ->
-          let c = if is_printable c then c else '_' in
-          loop (i + 1) (Buff.store len c) ]
+  if s = "" then "_"
+  else
+    loop 0 0 where rec loop i len =
+      if i == String.length s then Buff.get len
+      else if len == 0 && not (starting_char s) then
+        loop i (Buff.store len '_')
+      else
+        match s.[i] with
+        [ ' ' | '\n' | '\t' ->
+            if i == String.length s - 1 then Buff.get len
+            else loop (i + 1) (Buff.store len '_')
+        | '_' | '\\' -> loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+        | ':' when no_colon ->
+            let len = Buff.store len '\\' in
+            loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+        | c ->
+            let c = if is_printable c then c else '_' in
+            loop (i + 1) (Buff.store len c) ]
 ;
 
 value s_correct_string = gen_correct_string False;
@@ -950,6 +953,7 @@ value no_spouses_parents = ref False;
 value no_notes = ref False;
 value censor = ref 0;
 value with_siblings = ref False;
+value maxlev = ref (-1);
 
 value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
   let to_separate = separate base in
@@ -970,7 +974,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
   in
   let ((per_sel, fam_sel) as sel) =
     Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
-      censor.val with_siblings.val
+      censor.val with_siblings.val maxlev.val
   in
   let fam_done = Array.create base.data.families.len False in
   let mark = Array.create base.data.persons.len False in
@@ -1097,6 +1101,8 @@ value speclist =
     "\"<1st_name>\" [num] \"<surname>\" : select ancestors with siblings");
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
+   ("-maxlev", Arg.Int (fun i -> maxlev.val := i),
+    "\"<level>\" : maximum level of generations of descendants");
    ("-nsp", Arg.Set no_spouses_parents,
     ": no spouses' parents (for options -s and -d)");
    ("-nn", Arg.Set no_notes, ": no (database) notes");
