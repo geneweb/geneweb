@@ -2,6 +2,7 @@ GeneWeb Version 2.01
 --------------------
 
 * General
+  - [Apr 2, 99] Added Norvegian language.
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)

@@ -18,6 +18,8 @@
 <img src="%gm=IM;v=l-it.gif" width=40 height=25 alt=it></a></td>
 <td><a href="%glang=nl">
 <img src="%gm=IM;v=l-nl.gif" width=40 height=25 alt=nl></a></td>
+<td><a href="%glang=no">
+<img src="%gm=IM;v=l-no.gif" width=40 height=25 alt=no></a></td>
 <td><a href="%glang=pt">
 <img src="%gm=IM;v=l-pt.gif" width=40 height=25 alt=pt></a></td>
 <td><a href="%glang=se">
@@ -33,6 +35,7 @@
 <td align=center><font size=-1>he</font></td>
 <td align=center><font size=-1>it</font></td>
 <td align=center><font size=-1>nl</font></td>
+<td align=center><font size=-1>no</font></td>
 <td align=center><font size=-1>pt</font></td>
 <td align=center><font size=-1>se</font></td>
 </tr>
