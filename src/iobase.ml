@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.9 1998-12-05 13:29:47 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.10 1998-12-05 13:50:05 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -823,6 +823,7 @@ do Printf.eprintf "*** ok\n"; flush stderr; return
        remove_file (Filename.concat bname "strings.inx");
        Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
        remove_file (Filename.concat bname "patches");
+       remove_file (Filename.concat bname "tstab");
     return ()
   with e ->
     do try close_out oc with _ -> ();
