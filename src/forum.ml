@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.11 2001-11-08 12:03:47 ddr Exp $ *)
+(* $Id: forum.ml,v 4.12 2001-11-08 12:10:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -119,8 +119,8 @@ value print_headers conf =
                  tag "tr" begin
                    tag "td" "colspan=4" begin
                      Wserver.wprint
-                       "<a href=\"%sm=FORUM;from=%d;len=%d\">%s</a>\n"
-                          (commd conf) (ic_len - pos) max_header_mess
+                       "<a href=\"%sm=FORUM;len=%d;from=%d\">%s</a>\n"
+                          (commd conf) max_header_mess (ic_len - pos)
                           (message_txt conf 2);
                    end;
                 end;
