@@ -5,6 +5,7 @@ GeneWeb version 3.11
   - [31 Jan 01] Added Estonian (Hanno Kuus)
 
 * GeneWeb server or CGI (gwd)
+  - [01 Feb 01] In descendants display, added the occupation.
   - [30 Jan 01] Added a way to be able to print trees which are too
     wide for printers. In tree displaying, a link is proposed in the upper
     right corner of the page. When clicking on it, a page is proposed for
