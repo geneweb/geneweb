@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.6 1999-11-01 23:19:45 ddr Exp $ *)
+(* $Id: util.ml,v 3.7 1999-11-06 22:11:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1012,8 +1012,8 @@ value print_link_to_welcome conf right_aligned =
       | None -> "" ]
     in
     do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-       Wserver.wprint "<img src=\"%sm=IM;v=/%s\"%s alt=\"^^\"%s>"
-         (commd conf) fname wid_hei
+       Wserver.wprint "<img src=\"%s?m=IM;v=/%s\"%s alt=\"^^\"%s>"
+         (if conf.cgi then conf.command else "geneweb") fname wid_hei
          (if right_aligned then " align=" ^ dir else "");
        Wserver.wprint "</a>\n";
     return ()

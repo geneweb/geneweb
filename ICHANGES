@@ -5,6 +5,7 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Nov 6, 99] The URL for the "up" image now independent from the data base
   - [Nov 5, 99] Red display title for not found persons.
   - [Nov 5, 99] Lengthened the height of the data base notes area.
 
