@@ -127,9 +127,9 @@ mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
     name.cmx num.cmx pqueue.cmx 
 name.cmo: name.cmi 
 name.cmx: name.cmi 
-notes.cmo: config.cmi def.cmi gutil.cmi perso.cmi srcfile.cmi util.cmi \
+notes.cmo: config.cmi def.cmi gutil.cmi srcfile.cmi util.cmi \
     ../wserver/wserver.cmi 
-notes.cmx: config.cmi def.cmi gutil.cmx perso.cmx srcfile.cmx util.cmx \
+notes.cmx: config.cmi def.cmi gutil.cmx srcfile.cmx util.cmx \
     ../wserver/wserver.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
