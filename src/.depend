@@ -48,8 +48,8 @@ check.cmo: adef.cmi def.cmi gutil.cmi mhashtbl.cmo
 check.cmx: adef.cmx def.cmi gutil.cmx mhashtbl.cmx 
 consangAll.cmo: adef.cmi consang.cmi def.cmi gutil.cmi 
 consangAll.cmx: adef.cmx consang.cmx def.cmi gutil.cmx 
-consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi 
-consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx pqueue.cmx consang.cmi 
+consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi consang.cmi 
+consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx consang.cmi 
 cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx birthday.cmx config.cmi date.cmx def.cmi gutil.cmx \
@@ -133,11 +133,11 @@ mergeFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi merge.cmi \
 mergeFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
     update.cmx updateFam.cmx updateFamOk.cmx util.cmx ../wserver/wserver.cmx 
 mergeInd.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi history.cmi \
-    merge.cmi mergeFam.cmo updateFamOk.cmo updateIndOk.cmi util.cmi \
-    ../wserver/wserver.cmi 
+    iobase.cmi lock.cmi merge.cmi mergeFam.cmo update.cmi updateFamOk.cmo \
+    updateIndOk.cmi util.cmi ../wserver/wserver.cmi 
 mergeInd.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
-    merge.cmx mergeFam.cmx updateFamOk.cmx updateIndOk.cmx util.cmx \
-    ../wserver/wserver.cmx 
+    iobase.cmx lock.cmx merge.cmx mergeFam.cmx update.cmx updateFamOk.cmx \
+    updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
 mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi merge.cmi \
     mergeInd.cmo update.cmi updateInd.cmi updateIndOk.cmi util.cmi \
     ../wserver/wserver.cmi 
@@ -249,7 +249,7 @@ history.cmo history.cmx: pa_html.cmo
 iovalue.cmo iovalue.cmx: q_codes.cmo
 mergeFam.cmo mergeFam.cmx: pa_html.cmo
 mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
-mergeInd.cmo mergeInd.cmx: pa_html.cmo
+mergeInd.cmo mergeInd.cmx: pa_html.cmo pa_lock.cmo
 mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
 merge.cmo merge.cmx: pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
