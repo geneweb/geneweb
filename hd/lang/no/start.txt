@@ -72,7 +72,8 @@ sortert
 <a href="%sm=AD">&Aring;rsdager for d&oslash;de personer</a>.<br>
 <a href="%sm=AM">Bryllupsdager</a>.<br>%x
 <a href="%sm=LB;k=10">Sist f&oslash;dte</a>.<br>
-<a href="%sm=LD;k=10">Sist d&oslash;de</a>.<br>%x
+<a href="%sm=LD;k=10">Sist d&oslash;de</a>.<br>%x<br>
+<a href="%sm=CAL">[*calendar/calendars]1</a>.
 <p>
 Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.24 1999-09-16 15:01:15 ddr Exp $ *)
+(* $Id: update.ml,v 2.25 1999-09-21 16:55:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -533,7 +533,8 @@ value print_date conf base lab var d =
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
-           Wserver.wprint "%s\n" (capitale (transl conf "calendar"));
+           Wserver.wprint "%s\n"
+             (capitale (transl_nth conf "calendar/calendars" 0));
            tag "select" "name=%s_cal" var begin
              Wserver.wprint "<option value=G%s>%s\n"
                (match d with
