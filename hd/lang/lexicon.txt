@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.207 2004-11-08 13:47:38 ddr Exp $
+# $Id: lexicon.txt,v 4.208 2004-11-15 10:35:23 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7767,12 +7767,13 @@ sl: %d lastnih imen
 sv: de %d f&ouml;rnamnen
 
     the %d oldest couples perhaps still alive and engaged
+bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
 en: the %d oldest couples perhaps still alive and engaged
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
-bg: най-старите %d евентуално живи лица
+bg: най-старите %d евентуално още живи лица
 br: ar %d den koshaс bev c'hoazh marteze
 ca: les %d persones mйs grans, potser encara vives
 cs: %d nejstar№нch snad je№tм ѕijнcнch osob
@@ -8314,7 +8315,7 @@ sv: de senaste %d d&ouml;dsfallen
 
     the latest %d marriages
 af: die laaste %d huwelike
-bg: последните %d бракове
+bg: последните %d брака
 br: ar %d euredoщ diwezhaс
 ca: els %d matrimonis mйs recents
 cs: poslednнch %d svateb
