@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.0 2001-03-16 19:34:58 ddr Exp $ *)
+(* $Id: relation.ml,v 4.1 2001-03-17 09:35:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1477,7 +1477,7 @@ value print conf base p =
           in
           match
             try Left (compute_relationship conf base by_marr p1 p) with
-            [ Consang.TopologicalSortError ip -> Right ip ]
+            [ Consang.TopologicalSortError p -> Right p ]
           with
           [ Left rel -> print_main_relationship conf base long p1 p rel
           | Right p -> print_base_loop conf base p ] ]
