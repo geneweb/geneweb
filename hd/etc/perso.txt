@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.17 2002-10-10 14:56:12 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.18 2003-01-07 12:15:42 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -255,7 +255,7 @@
       %child_name;%nl;
     %else;
       <li type=disc>
-      %if;(cancel_links or child_is_restricted);%child.child_name;
+      %if;(cancel_links or child.is_restricted);%child.child_name;
       %else;
         <a href="%prefix;%child.access;">%child.child_name;</a>
       %end;
