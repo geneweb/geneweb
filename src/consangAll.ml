@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 3.2 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: consangAll.ml,v 3.3 2000-03-22 04:14:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -25,10 +25,22 @@ value relationship base tab ip1 ip2 =
 
 value trace quiet cnt max_cnt =
   do if quiet then
-       let cnt = max_cnt - cnt in
-       let already_disp = cnt * 60 / max_cnt in
-       let to_disp = (cnt + 1) * 60 / max_cnt in
-       for i = already_disp + 1 to to_disp do Printf.eprintf "#"; done
+       let x = max_cnt - cnt in
+       let already_disp = x * 60 / max_cnt in
+       let to_disp = (x + 1) * 60 / max_cnt in
+       do for i = already_disp + 1 to to_disp do Printf.eprintf "#"; done;
+          let already_disp = x * 1200 / max_cnt in
+          let to_disp = (x + 1) * 1200 / max_cnt in
+          if cnt = 1 then Printf.eprintf " \008"
+          else if to_disp > already_disp then
+            match to_disp mod 4 with
+            [ 0 -> Printf.eprintf "|\008"
+            | 1 -> Printf.eprintf "/\008"
+            | 2 -> Printf.eprintf "-\008"
+            | 3 -> Printf.eprintf "\\\008"
+            | x -> failwith (string_of_int x) ]
+          else ();
+       return ()
      else Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
      flush stderr;
   return ()
