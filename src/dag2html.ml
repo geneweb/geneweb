@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.43 2001-02-01 18:38:49 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.44 2001-02-07 01:29:20 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -1079,6 +1079,19 @@ value do_fall2_left t i1 i2 j1 j2 =
   do fall2_cool_left t i1 i2 i3 j1 j2; return t
 ;
 
+value do_shorten_too_long t i1 j1 j2 =
+  do for i = i1 to Array.length t.table - 2 do
+       for j = j1 to j2 - 1 do
+         t.table.(i).(j) := t.table.(i + 1).(j);
+       done;
+     done;
+     let i = Array.length t.table - 1 in
+     for j = j1 to j2 - 1 do
+       t.table.(i).(j) := {elem = Nothing; span = new_span_id ()};
+     done;
+  return t
+;
+
 value try_fall2_right t i j =
   match t.table.(i).(j).elem with
   [ Ghost _ ->
@@ -1157,6 +1170,54 @@ value try_fall2_left t i j =
   | _ -> None ]
 ;
 
+value try_shorten_too_long t i j =
+  match t.table.(i).(j).elem with
+  [ Ghost _ ->
+      let j2 =
+        let x = t.table.(i).(j).span in
+        loop (j + 1) where rec loop j2 =
+          if j2 = Array.length t.table.(i) then j2
+          else
+            match t.table.(i).(j2) with
+            [ {elem = Ghost _; span = y} when y = x -> loop (j2 + 1)
+            | _ -> j2 ]
+      in
+      let i1 =
+        loop (i + 1) where rec loop i =
+          if i = Array.length t.table then i
+          else
+            match t.table.(i).(j).elem with
+            [ Elem _ -> loop (i + 1)
+            | _ -> i ]
+      in
+      let i2 =
+        loop i1 where rec loop i =
+          if i = Array.length t.table then i
+          else
+            match t.table.(i).(j).elem with
+            [ Nothing -> loop (i + 1)
+            | _ -> i ]
+      in
+      let separated_left =
+        loop i where rec loop i =
+          if i = i2 then True
+          else if j > 0
+               && t.table.(i).(j).span = t.table.(i).(j - 1).span then False
+          else loop (i + 1)
+      in
+      let separated_right =
+        loop i where rec loop i =
+          if i = i2 then True
+          else if j2 < Array.length t.table.(i) - 1
+               && t.table.(i).(j2).span = t.table.(i).(j2 + 1).span then False
+          else loop (i + 1)
+      in
+      if not separated_left || not separated_right then None
+      else if i2 < Array.length t.table then None
+      else Some (do_shorten_too_long t i j j2)
+  | _ -> None ]
+;
+
 value fall2_right t =
   loop_i (Array.length t.table - 1) t where rec loop_i i t =
     if i <= 0 then t
@@ -1181,6 +1242,23 @@ value fall2_left t =
           | None -> loop_j (j + 1) t ]
 ;
 
+value shorten_too_long t =
+  loop_i (Array.length t.table - 1) t where rec loop_i i t =
+    if i <= 0 then t
+    else
+      loop_j 1 t where rec loop_j j t =
+        if j >= Array.length t.table.(i) then loop_i (i - 1) t
+        else
+          match try_shorten_too_long t i j with
+          [ Some t -> loop_i (Array.length t.table - 1) t
+          | None -> loop_j (j + 1) t ]
+  
+;
+
+(* top_adjust:
+   deletes all empty rows that might have appeared on top of the table
+   after the falls *)
+
 value top_adjust t =
   let di =
     loop 0 where rec loop i =
@@ -1198,6 +1276,27 @@ value top_adjust t =
          t.table.(i) := t.table.(i + di);
        done;
     return {table = Array.sub t.table 0 (Array.length t.table - di)}
+  else t
+;
+
+(* bottom_adjust:
+   deletes all empty rows that might have appeared on bottom of the table
+   after the falls *)
+
+value bottom_adjust t =
+  let last_i =
+    loop (Array.length t.table - 1) where rec loop i =
+      if i < 0 then i
+      else
+        let rec loop_j j =
+          if j = Array.length t.table.(i) then loop (i - 1)
+          else if t.table.(i).(j).elem <> Nothing then i
+          else loop_j (j + 1)
+        in
+        loop_j 0
+  in
+  if last_i < Array.length t.table - 1 then
+    {table = Array.sub t.table 0 (last_i + 1)}
   else t
 ;
 
@@ -1241,7 +1340,9 @@ value table_of_dag phony no_optim invert no_group d =
   let _ = fall () t in
   let t = fall2_right t in
   let t = fall2_left t in
+  let t = shorten_too_long t in
   let t = top_adjust t in
+  let t = bottom_adjust t in
   t
 ;
 
