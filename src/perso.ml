@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 4.4 2001-03-31 04:46:00 ddr Exp $ *)
+(* $Id: perso.ml,v 4.5 2001-04-12 06:48:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1144,7 +1144,12 @@ value eval_bool_value conf base env =
     [ Estr s -> s
     | Eint s -> s
     | Evar s sl ->
-        try try_eval_gen_variable conf base env s with
+        try
+          match eval_variable conf base env [s :: sl] with
+          [ Some (env, ep, efam, s) when s <> "" ->
+              try_eval_gen_variable conf base env s
+          | _ -> raise Not_found ]
+        with
         [ Not_found -> do Wserver.wprint ">%%%s???" s; return "" ]
     | x -> do Wserver.wprint "val???"; return "" ]
   in
