@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.16 2005-02-05 11:36:30 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.17 2005-02-13 13:35:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -176,6 +176,7 @@ value rindex s c =
 ;
 
 value line_cnt = ref 0;
+value no_fail = ref False;
 
 value input_line0 ic =
   let line = input_line ic in
@@ -712,7 +713,12 @@ value read_notes ic =
   strip_all_trailing_spaces notes
 ;
 
-type read_family 'a = [ F_some of 'a | F_enc_utf_8 | F_none ];
+type read_family 'a =
+  [ F_some of 'a
+  | F_enc_utf_8
+  | F_none
+  | F_fail of string ]
+;
 
 value read_family ic fname =
   fun
@@ -857,6 +863,12 @@ value read_family ic fname =
   | None -> F_none ]
 ;
 
+value read_family_1 ic fname line =
+  if no_fail.val then
+    try read_family ic fname line with [ Failure str -> F_fail str ]
+  else read_family ic fname line
+;
+
 value comp_families x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
   do {
@@ -868,12 +880,19 @@ value comp_families x =
         output_string oc magic_gwo;
         output_value oc (x : string);
         let rec loop line encoding =
-          match read_family (ic, encoding) x line with
+          match read_family_1 (ic, encoding) x line with
           [ F_some (family, line) ->
               do { output_value oc (family : syntax_o); loop line encoding }
           | F_enc_utf_8 ->
               loop (read_line (ic, E_utf_8)) E_utf_8
-          | F_none -> () ]
+          | F_none -> ()
+          | F_fail str ->
+              do {
+                Printf.printf "File \"%s\", line %d:\n" x line_cnt.val;
+                Printf.printf "Error: %s\n" str;
+                flush stdout;
+                loop (read_line (ic, encoding)) encoding
+              } ]
         in
         loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1;
         close_in ic;
