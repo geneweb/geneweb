@@ -1,5 +1,5 @@
-(* $Id: wserver.mli,v 4.5 2002-02-23 20:10:08 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: wserver.mli,v 4.6 2002-02-24 12:43:42 ddr Exp $ *)
+(* Copyright (c) 2002 INRIA *)
 
 (* module [Wserver]: elementary web service *)
 
@@ -55,24 +55,29 @@ value sock_out : ref string;
 value noproc : ref bool;
 
 value bufferize : ref bool;
-    (* Bufferize the output; write done only when wflush is called *)
+    (* Bufferize the wprints; write done only when wflush is called *)
 value buffer_contents : unit -> string;
     (* Return the buffer contents and clear it *)
 value keep_alive_condition : list string -> bool;
-    (* This function is a hack added because of a bug in windows clients
-       which seem to fail when there is a disconnection from the server (me)
+    (* This function is a hack added because of a problem in clients
+       which seem to fail when there is a disconnection from the server
        even if the answer header contains the "connection: close".
-       Seem to happen for requests sent with the method POST. If
-       [keep_alive_condition request] answers True (i.e. the method is
-       POST and the client has a "keep-alive" in its header, the returned
-       header MUST contain the "content-length" field (else the client and
-       server would wait each other).
-       To be able to compute the body size, don't send the header, set
-       the above [bufferize], get the contents by [buffer_contents], reset
-       the [bufferize], send the header, with a content-length field, and
-       send the contents. *)
-value fucking_timeout : ref float;
-    (* Timeout of the final read due to the above bug. *)
+         The problem seems to happen for the requests sent by some clients
+       (Web navigators) with the method POST. After the answer, the client
+       sends two more bytes probably to say "OK, you don't want any more
+       requests" (I have not checked the HTTP manual). Some clients under
+       Windows fail when the server (me) does not read these two extra
+       bytes.
+         In this situation, the client must know the end of the answer. For
+       that, the server must give the size of the sent HTML in its header.
+       In HTTP/1.1, it may be possible to make it work using the [chunked]
+       transfer encoding which has also its way to specify the end of the
+       answer: this may be implemented one day in the present library module.
+         Call [keep_alive_condition request] to see if the request is in
+       this case, and if yes, bufferize your HTML output and mandatorily
+       send the content-length field in the header. You can use the above
+       variable [bufferize] and function [buffer_contents] for this
+       bufferization. *)
 
 (* Example:
 

@@ -1,5 +1,5 @@
-(* $Id: wserver.ml,v 4.13 2002-02-23 20:10:08 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: wserver.ml,v 4.14 2002-02-24 12:43:42 ddr Exp $ *)
+(* Copyright (c) 2002 INRIA *)
 
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
@@ -486,25 +486,26 @@ value wait_and_compact s =
   else ()
 ;
 
-value fucking_timeout = ref 5.0;
-
-value wait_client_close fd =
+value skip_possible_remaining_chars fd =
   do {
     let x = Unix.getpid () in
+    let b = "..." in
     try
-      let b = String.create 50 in
       loop () where rec loop () =
-        match Unix.select [fd] [] [] fucking_timeout.val with
+        match Unix.select [fd] [] [] 5.0 with
         [ ([_], [], []) ->
             let len = Unix.read fd b 0 (String.length b) in
             do {
-              Printf.eprintf "epilog (%d): read %d chars after end\n" x len;
-              flush stderr;
-              if len = 0 then () else loop ()
+              if len > 0 then do {
+                Printf.eprintf "epilog (%d): read %d chars after end: \"%s\"\n"
+                  x len (String.escaped (String.sub b 0 len));
+                flush stderr;
+              }
+              else ();
+              if len = String.length b then loop () else ()
             }
         | _ ->
-            Printf.eprintf "epilog (%d): timeout %gs happened\n" x
-              fucking_timeout.val ]
+            Printf.eprintf "epilog (%d): nothing to read\n" x ]
     with
     [ Unix.Unix_error Unix.ECONNRESET _ _ ->
         Printf.eprintf "epilog (%d): disconnection\n" x ];
@@ -546,7 +547,7 @@ value accept_connection tmout max_clients callback s =
               try Unix.close t with _ -> ();
 *)
               let keep_alive = treat_connection tmout callback addr t in
-              if keep_alive then wait_client_close t else ()
+              if keep_alive then skip_possible_remaining_chars t else ()
             }
             with exc ->
               try do { print_err_exc exc; flush stderr; }
@@ -618,7 +619,7 @@ value accept_connection tmout max_clients callback s =
       in
       let cleanup () =
         do {
-          if keep_alive then wait_client_close t else ();
+          if keep_alive then skip_possible_remaining_chars t else ();
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
           try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
           try Unix.close t with _ -> ();
