@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.22 2003-12-04 20:30:56 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.23 2003-12-10 12:19:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -563,9 +563,11 @@ value print conf base =
       else if is_ancestor base p2.cle_index p1.cle_index then
         error_loop conf base p1
       else
+(*
         let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
         lock (Iobase.lock_file bfile) with
         [ Accept ->
+*)
             let (ok, changes_done) =
               try_merge conf base [] p1.cle_index p2.cle_index False
             in
@@ -580,7 +582,9 @@ value print conf base =
               }
               else ();
             }
+(*
         | Refuse -> Update.error_locked conf base ]
+*)
   | _ -> not_found_or_incorrect conf ]
 ;
 
@@ -626,21 +630,14 @@ value print_kill_ancestors conf base =
       [ Some p ->
           let key = (sou base p.first_name, sou base p.surname, p.occ) in
           let bfile = Util.base_path [] (conf.bname ^ ".lck") in
-(*
-          lock (Iobase.lock_file bfile) with
-          [ Accept ->
-*)
-              let nb_ind = ref 0 in
-              let nb_fam = ref 0 in
-              do {
-                kill_ancestors conf base False p nb_ind nb_fam;
-                Util.commit_patches conf base;
-                History.record conf base key "ka";
-                print_killed conf base p nb_ind.val nb_fam.val;
-              }
-(*
-          | Refuse -> Update.error_locked conf base ]
-*)
+          let nb_ind = ref 0 in
+          let nb_fam = ref 0 in
+          do {
+            kill_ancestors conf base False p nb_ind nb_fam;
+            Util.commit_patches conf base;
+            History.record conf base key "ka";
+            print_killed conf base p nb_ind.val nb_fam.val;
+          }
       | None -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;

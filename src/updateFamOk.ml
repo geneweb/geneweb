@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.22 2003-12-04 20:30:56 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: updateFamOk.ml,v 4.23 2003-12-10 12:19:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -725,126 +725,102 @@ value forbidden_disconnected conf sfam scpl sdes =
 
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock Iobase.lock_file bfile with
-  [ Accept ->
-*)
-      try
-        let (sfam, scpl, sdes, ext) = reconstitute_family conf in
-        let redisp =
-          match p_getenv conf.env "return" with
-          [ Some _ -> True
-          | _ -> False ]
-        in
-        let digest =
-          match p_getint conf.env "ip" with
-          [ Some ip ->
-              string_of_int (Array.length (base.data.unions.get ip).family)
-          | None -> "" ]
-        in
-        let sdigest = raw_get conf "digest" in
-        if digest <> "" && sdigest <> "" && digest <> sdigest then
-          Update.error_digest conf base
-        else if ext || redisp then
-          UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
-        else if forbidden_disconnected conf sfam scpl sdes then
-          print_error_disconnected conf
-        else do {
-          strip_family sfam sdes;
-          let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
-          let wl = all_checks_family conf base fam cpl des in
-          let ((fn, sn, occ, _, _), act) =
-            match p_getint conf.env "ip" with
-            [ Some i ->
-                if Adef.int_of_iper cpl.mother = i then (scpl.mother, "af")
-                else
-                  let a = base.data.ascends.get i in
-                  match a.parents with
-                  [ Some x when x = fam.fam_index ->
-                      let p = base.data.persons.get i in
-                      let key =
-                        (sou base p.first_name, sou base p.surname, p.occ,
-                         Update.Link, "")
-                      in
-                      (key, "aa")
-                  | _ -> (scpl.father, "af") ]
-            | _ -> (scpl.father, "af") ]
-          in
-          Util.commit_patches conf base;
-          History.record conf base (fn, sn, occ) act;
-          Update.delete_topological_sort conf base;
-          print_add_ok conf base wl cpl des
-        }
-      with
-      [ Update.ModErr -> () ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  try
+    let (sfam, scpl, sdes, ext) = reconstitute_family conf in
+    let redisp =
+      match p_getenv conf.env "return" with
+      [ Some _ -> True
+      | _ -> False ]
+    in
+    let digest =
+      match p_getint conf.env "ip" with
+      [ Some ip ->
+          string_of_int (Array.length (base.data.unions.get ip).family)
+      | None -> "" ]
+    in
+    let sdigest = raw_get conf "digest" in
+    if digest <> "" && sdigest <> "" && digest <> sdigest then
+      Update.error_digest conf base
+    else if ext || redisp then
+      UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
+    else if forbidden_disconnected conf sfam scpl sdes then
+      print_error_disconnected conf
+    else do {
+      strip_family sfam sdes;
+      let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
+      let wl = all_checks_family conf base fam cpl des in
+      let ((fn, sn, occ, _, _), act) =
+        match p_getint conf.env "ip" with
+        [ Some i ->
+            if Adef.int_of_iper cpl.mother = i then (scpl.mother, "af")
+            else
+              let a = base.data.ascends.get i in
+              match a.parents with
+              [ Some x when x = fam.fam_index ->
+                  let p = base.data.persons.get i in
+                  let key =
+                    (sou base p.first_name, sou base p.surname, p.occ,
+                     Update.Link, "")
+                  in
+                  (key, "aa")
+              | _ -> (scpl.father, "af") ]
+        | _ -> (scpl.father, "af") ]
+      in
+      Util.commit_patches conf base;
+      History.record conf base (fn, sn, occ) act;
+      Update.delete_topological_sort conf base;
+      print_add_ok conf base wl cpl des
+    }
+  with
+  [ Update.ModErr -> () ]
 ;
 
 value print_del conf base =
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock Iobase.lock_file bfile with
-  [ Accept ->
-*)
-      match p_getint conf.env "i" with
-      [ Some i ->
-          let fam = foi base (Adef.ifam_of_int i) in
-          let k =
-            let cpl = coi base (Adef.ifam_of_int i) in
-            let ip =
-              match p_getint conf.env "ip" with
-              [ Some i when Adef.int_of_iper cpl.mother = i -> cpl.mother
-              | _ -> cpl.father ]
-            in
-            let p = poi base ip in
-            (sou base p.first_name, sou base p.surname, p.occ)
-          in
-          do {
-            if not (is_deleted_family fam) then do {
-              effective_del conf base fam;
-              Util.commit_patches conf base;
-              History.record conf base k "df";
-              Update.delete_topological_sort conf base
-            }
-            else ();
-            print_del_ok conf base []
-          }
-      | _ -> incorrect_request conf ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  match p_getint conf.env "i" with
+  [ Some i ->
+      let fam = foi base (Adef.ifam_of_int i) in
+      let k =
+        let cpl = coi base (Adef.ifam_of_int i) in
+        let ip =
+          match p_getint conf.env "ip" with
+          [ Some i when Adef.int_of_iper cpl.mother = i -> cpl.mother
+          | _ -> cpl.father ]
+        in
+        let p = poi base ip in
+        (sou base p.first_name, sou base p.surname, p.occ)
+      in
+      do {
+        if not (is_deleted_family fam) then do {
+          effective_del conf base fam;
+          Util.commit_patches conf base;
+          History.record conf base k "df";
+          Update.delete_topological_sort conf base
+        }
+        else ();
+        print_del_ok conf base []
+      }
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_aux conf base callback =
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock Iobase.lock_file bfile with
-  [ Accept ->
-*)
-      try
-        let (sfam, scpl, sdes, ext) = reconstitute_family conf in
-        let redisp =
-          match p_getenv conf.env "return" with
-          [ Some _ -> True
-          | _ -> False ]
-        in
-        let digest =
-          Update.digest_family (foi base sfam.fam_index)
-            (coi base sfam.fam_index) (doi base sfam.fam_index)
-        in
-        if digest = raw_get conf "digest" then
-          if ext || redisp then
-            UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
-          else do { strip_family sfam sdes; callback sfam scpl sdes }
-        else Update.error_digest conf base
-      with
-      [ Update.ModErr -> () ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  try
+    let (sfam, scpl, sdes, ext) = reconstitute_family conf in
+    let redisp =
+      match p_getenv conf.env "return" with
+      [ Some _ -> True
+      | _ -> False ]
+    in
+    let digest =
+      Update.digest_family (foi base sfam.fam_index)
+        (coi base sfam.fam_index) (doi base sfam.fam_index)
+    in
+    if digest = raw_get conf "digest" then
+      if ext || redisp then
+        UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
+      else do { strip_family sfam sdes; callback sfam scpl sdes }
+    else Update.error_digest conf base
+  with
+  [ Update.ModErr -> () ]
 ;
 
 value print_mod o_conf base =
@@ -868,27 +844,19 @@ value print_mod o_conf base =
 ;
 
 value print_inv conf base =
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock Iobase.lock_file bfile with
-  [ Accept ->
-*)
-      match (p_getint conf.env "i", p_getint conf.env "f") with
-      [ (Some ip, Some ifam) ->
-          let p = base.data.persons.get ip in
-          let u = base.data.unions.get ip in
-          let k = (sou base p.first_name, sou base p.surname, p.occ) in
-          try
-            do {
-              effective_inv conf base p.cle_index u (Adef.ifam_of_int ifam);
-              Util.commit_patches conf base;
-              History.record conf base k "if";
-              print_inv_ok conf base p
-            }
-          with
-          [ Update.ModErr -> () ]
-      | _ -> incorrect_request conf ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  match (p_getint conf.env "i", p_getint conf.env "f") with
+  [ (Some ip, Some ifam) ->
+      let p = base.data.persons.get ip in
+      let u = base.data.unions.get ip in
+      let k = (sou base p.first_name, sou base p.surname, p.occ) in
+      try
+        do {
+          effective_inv conf base p.cle_index u (Adef.ifam_of_int ifam);
+          Util.commit_patches conf base;
+          History.record conf base k "if";
+          print_inv_ok conf base p
+        }
+      with
+      [ Update.ModErr -> () ]
+  | _ -> incorrect_request conf ]
 ;
