@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.15 1998-12-05 13:29:53 ddr Exp $ *)
+(* $Id: util.ml,v 1.16 1998-12-15 22:04:44 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -459,7 +459,7 @@ value index_of_sex =
   | Neutre -> 2 ]
 ;
 
-value header conf title =
+value header_no_page_title conf title =
   do html conf;
      Wserver.wprint "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
@@ -473,6 +473,11 @@ value header conf title =
      Wserver.wprint "<body%s>\n"
        (try " " ^ List.assoc "body_prop" conf.base_env with
         [ Not_found -> "" ]);
+  return ()
+;
+
+value header conf title =
+  do header_no_page_title conf title;
      Wserver.wprint "<h1>";
      title False;
      Wserver.wprint "</h1>\n";

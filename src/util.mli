@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.6 1998-12-09 15:13:43 ddr Exp $ *)
+(* $Id: util.mli,v 1.7 1998-12-15 22:04:45 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -44,6 +44,7 @@ value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
 value capitale : string -> string;
 
+value header_no_page_title : config -> (bool -> unit) -> unit;
 value header : config -> (bool -> unit) -> unit;
 value trailer : config -> unit;
 
