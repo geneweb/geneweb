@@ -12,6 +12,10 @@ Added doc for databases maintenance.
 * gwc:
   - display "+" for dead people even if not known date
 
+* ged2gwb:
+  - fixed bug displaying "Uncaught exception: Stream.Error("get to eoln")" when
+    the gedcom file did not end with a newline
+
 GeneWeb Version 1.07
 --------------------
 
