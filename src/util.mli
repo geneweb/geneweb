@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.0 2001-03-16 19:35:11 ddr Exp $ *)
+(* $Id: util.mli,v 4.1 2001-11-14 10:02:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -29,8 +29,10 @@ value hidden_env : config -> unit;
 value age_autorise : config -> base -> person -> bool;
 value fast_auth_age : config -> person -> bool;
 
+(*
 value enter_nobr : unit -> unit;
 value exit_nobr : unit -> unit;
+*)
 
 value start_with_vowel : string -> bool;
 value connais : base -> person -> bool;
@@ -94,9 +96,6 @@ value of_course_died : config -> person -> bool;
 
 value surname_begin : string -> string;
 value surname_end : string -> string;
-
-value enter_nobr : unit -> unit;
-value exit_nobr : unit -> unit;
 
 value preciser_homonyme : config -> base -> person -> unit;
 
