@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 1.1 2001-06-13 19:50:27 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 1.2 2002-01-20 13:09:38 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -80,7 +80,7 @@
     <em>(%first_name; %surname_alias;)</em><br>
   %end;
   %foreach;first_name_alias;
-    <em>- %first_name_alias; %surname; -</em>
+    <em>%first_name_alias;</em>
   %end;
   </td></tr>
   </table>
@@ -101,9 +101,9 @@
 %if;has_image;
   <table border=%border; width="90%%">
   <tr><td>
-   <a href="%image_url;"><img
-    src="%image_url;"%image_size; border=0
-    alt="[image/images]0"></a>
+   <a href="%image_url;">
+   <img src="%image_url;"%image_size; border=1 alt="[image/images]0">
+   </a>
 %end;
 %if;(has_occupation or has_birth_date or has_birth_place or
      has_baptism_date or has_baptism_place or is_dead or is_buried or
@@ -942,6 +942,7 @@
             %end;
            %end;
           %end;
+
         %elseif;(child_cnt=1)
          <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
          <td width=1 align=center valign=bottom><b>|</b></td>
@@ -1217,6 +1218,7 @@
                   %end;
                  %end;
                %end;
+
               %else;
                <td width=5 align=center valign=middle></td>
                <td width=1 align=center valign=middle><b>|</b></td>
@@ -1289,7 +1291,7 @@
                      <td width=5 align=center valign=middle></td>
                      <td width=1></td>
                      <td></td> 
-                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
                      <td width=5 align=center valign=middle></td>
                      <td width=1></td>
                      <td></td> 
@@ -2213,7 +2215,7 @@
     </ul>
   </td>
   %if;wizard;
-    <td align=center>
+    <td align=left>
       <li><a href="%prefix;m=U;%access;"><b><font
       color=%highlight;>[*update]</font></b></a></li>
     </td>
@@ -2222,9 +2224,7 @@
   </table>
 %end;
 
-<img src="%image_prefix;/gwlogo.gif"
- alt=... width=64 height=72 align=right>
-<br>
+<img src="%image_prefix;/gwlogo.gif" alt=... width=64 height=72 align=right>
 %copyright;
 %base_trailer;
 </body>
