@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.21 1999-09-29 13:58:33 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.22 1999-10-10 20:30:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -55,7 +55,7 @@ value print_date oc =
       do print_date_dmy oc (Calendar.hebrew_of_gregorian d);
          Printf.fprintf oc "H";
       return ()
-  | Dtext t -> Printf.printf "0(%s)" (spaces_to_underscore t) ]
+  | Dtext t -> Printf.fprintf oc "0(%s)" (spaces_to_underscore t) ]
 ;
 
 value print_date_option oc =

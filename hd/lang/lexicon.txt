@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.145 1999-10-09 10:49:46 ddr Exp $
+# $Id: lexicon.txt,v 2.146 1999-10-10 20:30:02 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -358,7 +358,7 @@ es: un primo de %s grado/una prima de %s grado/un(a) primo(a)de %s grado
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
 he:  בן-דוד לדרגה  %s/ בת-דוד לדרגה  %s
 it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
-nl: een neef %s generaties verwijderd/een nicht %s generaties verwijderd
+nl: een neef in de %s generatie/een nicht in de %s generatie
 no: %smenning
 pt: um primo %s/uma prima %s/um(a) primo(a) %s
 se: en %s kusin
@@ -373,7 +373,7 @@ es: un primo nacido de primos hermanos/una prima nacida de primos hermanos/un(a)
 fr: un cousin issu de germains/une cousine issue de germains/un(e) cousin(e) issu(e) de germains
 he:  בן-דוד שני/ בת-דוד שניה
 it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
-nl: een neef 2de generaties verwijderd/een nicht 2de generaties verwijderd
+nl: een neef in de tweede generatie/een nicht in de tweede generatie
 no: tremenning	
 pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
 se: en syssling
@@ -388,7 +388,7 @@ es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
 he:  בן-דוד שלישי/ בת-דוד שלישית
 it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
-nl: een neef 3de generaties verwijderd/een nicht 3de generaties verwijderd
+nl: een neef in de derde generatie/een nicht in de derde generatie
 no: firmenning
 pt: um primo 3ro/uma prima 3ro/um(a) primo(a) 3ro
 se: en brylling
@@ -3691,7 +3691,7 @@ es: comenzando con
 fr: commen&ccedil;ant par
 he:  להתחיל מ-
 it: partendo da
-nl: begint met
+nl: beginnend met
 no: som starter med
 pt: come&ccedil;ando com
 se: som b&ouml;rjar med

@@ -5,6 +5,9 @@ GeneWeb Version 2.08
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Oct 9, 99] Added a "suicide" variable: if exists in the request,
+    the sender go the the robot black list... by setting a hidden URL with
+    that in pages, I can detect them... ha ha ha.
   - [Oct 9, 99] Fixed bug in "family.ml": for the page "specify" the
     normal chronological order sometimes did not work correctly.
   - [Oct 6, 99] When displaying ascend tree in Lynx, changed disposition
