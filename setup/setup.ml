@@ -1,8 +1,8 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.27 1999-05-17 20:13:09 ddr Exp $ *)
+(* $Id: setup.ml,v 1.28 1999-06-02 02:59:47 ddr Exp $ *)
 
 value port = 2316;
-value default_lang = "en";
+value default_lang = ref "en";
 value setup_dir = "setup";
 value charset = "iso-8859-1";
 
@@ -1145,13 +1145,15 @@ value setup (addr, req) str =
   let conf =
     let env = create_env env_str in
     if env = [] && (comm = "" || String.length comm = 2) then
-      let lang = if comm = "" then default_lang else String.lowercase comm in
+      let lang =
+        if comm = "" then default_lang.val else String.lowercase comm
+      in
       {lang = lang; comm = ""; env = env; request = req}
     else
       let (lang, env) =
         match p_getenv env "lang" with
         [ Some x -> (x, list_remove_assoc "lang" env)
-        | _ -> (default_lang, env) ]
+        | _ -> (default_lang.val, env) ]
       in
       {lang = lang; comm = comm; env = env; request = req}
   in
@@ -1217,10 +1219,11 @@ value intro () =
      copy_text "" "intro.txt";
      let lang =
        let x = input_line stdin in
-       if x = "" then default_lang else x
+       if x = "" then default_lang.val else x
      in
      do copy_text lang (Filename.concat lang "intro.txt");
         set_gwd_default_language_if_absent lang;
+        default_lang.val := lang;
      return ();
      Printf.printf "\n";
      flush stdout;
