@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.3 2002-12-10 05:24:47 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.4 2002-12-10 08:40:37 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -54,9 +54,9 @@ value write_wizard_notes fname nn =
 ;
 
 value print_main conf base wizfile =
+  let wiztxt = Gutil.nominative (transl_nth conf "wizard/wizards/friend" 1) in
   let title _ =
-    Wserver.wprint "%s - %s"
-      (capitale (Gutil.nominative (transl_nth conf "wizard/friend" 0)))
+    Wserver.wprint "%s - %s" (capitale wiztxt)
       (Gutil.nominative (transl_nth conf "note/notes" 1))
   in
   let wizdata = read_wizfile wizfile in
@@ -88,7 +88,8 @@ value print_main conf base wizfile =
              else
                Wserver.wprint "%s" wz))
      wizdata;
-    Wserver.wprint "\n";
+    html_p conf;
+    Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
     trailer conf;
   }
 ;
@@ -100,7 +101,13 @@ value print_wizard conf base wz =
     header conf title;
     print_link_to_welcome conf False;
     html_p conf;
-    Wserver.wprint "%s\n" (string_with_macros conf [] s);
+    tag "table" "border=0" begin
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "%s\n" (string_with_macros conf [] s);
+        end;
+      end;
+    end;
     if conf.wizard && conf.user = wz then
       do {
         html_p conf;

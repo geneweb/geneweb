@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.37 2002-12-09 22:42:42 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.38 2002-12-10 08:40:36 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -71,8 +71,8 @@ sv: Genealogisk<br>databas
 zh: 网络家谱
 ]</font></h1></table>
 </td>
-%I&wNf<td align=%R valign=top><em>([wizard/friend]0)</em></td>
-%E%I&fNw<td align=%R valign=top><em>([wizard/friend]1)</em></td>
+%I&wNf<td align=%R valign=top><em>([wizard/wizards/friend]0)</em></td>
+%E%I&fNw<td align=%R valign=top><em>([wizard/wizards/friend]2)</em></td>
 %E<td align=%R valign=top>%w</td>
 </tr>
 </table>
@@ -154,7 +154,7 @@ zh: 现有 %n 人在数据库中。
 ]%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 %I&|pwizard_passwd_file;pwizard_descr_file;|wo<br>
-(<a href="%sm=WIZNOTES">[wizard/friend]0/[note/notes]1</a>)%E
+(<a href="%sm=WIZNOTES">[wizard/wizards/friend]1/[note/notes]1</a>)%E
 %E
 
 %I&NwNj<br><p>
