@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.42 2000-05-14 18:07:36 ddr Exp $ *)
+(* $Id: util.ml,v 3.43 2000-05-14 18:19:46 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -10,6 +10,7 @@ value lang_dir = ref Filename.current_dir_name;
 value base_dir = ref Filename.current_dir_name;
 value doc_dir = ref "";
 value cnt_dir = ref "";
+value images_url = ref "";
 
 value secure s =
   let rec need_code i =
@@ -654,6 +655,10 @@ value rec copy_from_etc env imcom ic =
               [ '%' -> Wserver.wprint "%%"
               | 'k' -> Wserver.wprint "%s" imcom
               | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
+              | 'o' ->
+                  Wserver.wprint "%s"
+                    (if images_url.val <> "" then images_url.val
+                     else imcom ^ "m=IM;v=")
               | 'r' ->
                   let name = input_line ic in
                   match open_etc_file name with
@@ -669,8 +674,6 @@ value rec copy_from_etc env imcom ic =
     do close_in ic; return
     match exc with [ End_of_file -> () | exc -> raise exc ]
 ;
-
-value images_url = ref "";
 
 value image_prefix conf =
   if images_url.val <> "" then images_url.val
