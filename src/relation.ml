@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.41 2003-11-27 15:18:37 ddr Exp $ *)
+(* $Id: relation.ml,v 4.42 2003-11-27 15:34:05 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -405,6 +405,11 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
     [ None | Some ("0" | "") -> ""
     | Some x -> ";bd=" ^ x ]
   in
+  let color =
+    match p_getenv conf.env "color" with
+    [ None -> ""
+    | Some x -> ";color=" ^ x ]
+  in
   let (sl, _) =
     List.fold_left
       (fun (sl, i) ifam ->
@@ -417,7 +422,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
      string_of_int (Adef.int_of_iper ip1); ";i=";
      string_of_int (Adef.int_of_iper ip2);
      if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";
-     if conf.cancel_links then ";cgl=on" else ""; bd; ";et=S" :: sl]
+     if conf.cancel_links then ";cgl=on" else ""; bd; color; ";et=S" :: sl]
   in
   String.concat "" sl
 ;
