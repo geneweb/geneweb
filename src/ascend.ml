@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.28 1999-06-28 20:25:01 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.29 1999-06-30 23:04:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -165,8 +165,7 @@ value afficher_menu_ascendants conf base p =
        (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
        (fun _ ->
           do conf.henv := list_remove_assoc "iz" conf.henv;
-             stag "a" "href=\"%siz=%d;i=%d\"" (commd conf)
-               (Adef.int_of_iper p.cle_index)
+             stag "a" "href=\"%siz=%d\"" (commd conf)
                (Adef.int_of_iper p.cle_index)
              begin
                afficher_personne_sans_titre conf base p;

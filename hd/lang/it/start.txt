@@ -25,8 +25,9 @@ Ricerca: <input name=n size=40 maxlength=200>
 Per:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-<em>Nome</em> e <em>cognome</em> o <em>appellativo pubblico</em> o
-<em>alias</em>.
+<em>Nome</em> e <em>cognome</em> o <em>appellativo pubblico</em>
+o <em>alias</em>%u,
+o %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P> <em>Nome</em>.
 <li> <input type=radio name=t value=N> <em>Cognome</em>.
 </ul>

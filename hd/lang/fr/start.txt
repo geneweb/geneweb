@@ -26,7 +26,8 @@ Il s'agit:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Soit de <em>pr&eacute;nom</em> et <em>nom</em>,
-soit de <em>nom public</em>, soit d'<em>alias</em>.
+soit de <em>nom public</em>, soit d'<em>alias</em>%u,
+soit d'un <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%u.
 <li> <input type=radio name=t value=P> D'un <em>pr&eacute;nom</em>.
 <li> <input type=radio name=t value=N> D'un <em>nom</em>.
 </ul>

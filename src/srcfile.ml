@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.5 1999-06-29 22:24:22 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.6 1999-06-30 23:04:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -155,12 +155,18 @@ value rec copy_from_channel conf base ic =
           let c = input_char ic in
           if not echo.val then
             match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'i' -> echo.val := True
+            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'u' -> echo.val := True
             | _ -> () ]
           else
             match c with
             [ '%' -> Wserver.wprint "%%"
             | '[' | ']' -> Wserver.wprint "%c" c
+            | 'a' ->
+                match Util.find_person_in_env conf base "z" with
+                [ Some ip ->
+                    Wserver.wprint "%s"
+                      (referenced_person_title_text conf base ip)
+                | None -> () ]
             | 'b' ->
                 let s =
                   try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
@@ -201,6 +207,10 @@ value rec copy_from_channel conf base ic =
                      conf.henv;
                 return ()
             | 't' -> Wserver.wprint "%s" conf.bname
+            | 'u' ->
+                match Util.find_person_in_env conf base "z" with
+                [ Some _ -> ()
+                | None -> echo.val := False ]
             | 'v' -> Wserver.wprint "%s" Version.txt
             | 'w' -> if conf.wizard then () else echo.val := False
             | 'x' ->

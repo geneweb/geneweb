@@ -27,7 +27,8 @@ Se trata:
 <li> <input type=radio name=t value=PN checked>
 De <em>un nombre</em> y de <em>un apellido</em>,
 o de <em>un nombre publico</em>,
-o de <em>un alias</em>.
+o de <em>un alias</em>%u,
+o de <em>n&uacute;mero Sosa</em> respecto a %a%u.
 <li> <input type=radio name=t value=P>
 De un <em>nombre</em>.
 <li> <input type=radio name=t value=N>

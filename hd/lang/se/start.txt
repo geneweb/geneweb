@@ -23,7 +23,8 @@ Namntyp för sökningen:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Antingen <em>förnamn</em> och <em>efternamn</em>
-eller <em>publiktnamn</em> eller <em>alias</em>.
+eller <em>publiktnamn</em> eller <em>alias</em>%u,
+eller %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P> Ett <em>f&ouml;rnamn</em>.
 <li> <input type=radio name=t value=N> Ett <em>efternamn</em>.
 </ul>

@@ -27,7 +27,8 @@ Es handelt sich:
 <li> <input type=radio name=t value=PN checked>
 Um einen <em>Vornamen mit Nachnamen</em>
 oder einen <em>&ouml;ffentlichen Namen</em>
-oder einen <em>Alias</em>.
+oder einen <em>Alias</em>%u,
+oder %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P>
 Um einen <em>Vornamen</em>.
 <li> <input type=radio name=t value=N>

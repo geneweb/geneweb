@@ -23,7 +23,8 @@ De keuze is:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Of <em>voornaam</em> en <em>familienaam</em>,
-of <em>publieke naam</em>, of <em>alias</em>.
+of <em>publieke naam</em>, of <em>alias</em>%u,
+of %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P> Een <em>voornaam</em>.
 <li> <input type=radio name=t value=N> Een <em>familienaam</em>.
 </ul>
