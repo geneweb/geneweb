@@ -40,6 +40,10 @@ GeneWeb Intermediate version 2.02-1
   - [May 7, 99] Fixed bug visible in Danish: the AE ligature ("&aelig;")
     was incorrectly capitalized.
 
+* Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
+  - [May 31, 99] Corrected and completed Spanish sentences in lexicon
+    and Spanish welcome page (Luis Castro Guzman).
+
 * Gedcom to GeneWeb (ged2gwb)
   - [May 19, 99] Better catenation of continuation (CONC) notes. In particular
     fixes the bug which sometimes added spaces inside words.
@@ -51,10 +55,6 @@ GeneWeb Intermediate version 2.02-1
 * Consanguinity computing (consang)
   - [May 23, 99] Does not restart from scratch when changes: compute
     only what's necessary.
-
-* Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
-  - [May 31, 99] Corrected and completed Spanish sentences in lexicon
-    and Spanish welcome page (Luis Castro Guzman).
 
 * Documentation
   - [May 13..31, 99] Updated Swedish documentation (Lars Gustavsson).
