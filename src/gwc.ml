@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.16 2001-02-10 22:05:37 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.17 2001-02-12 12:53:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -418,7 +418,7 @@ value notice_sex gen p s =
     return Check.error gen
 ;
 
-value insert_family gen co witl fo deo =
+value insert_family gen co fath_sex moth_sex witl fo deo =
   let pere = insert_somebody gen co.father in
   let mere = insert_somebody gen co.mother in
   let witl =
@@ -464,11 +464,8 @@ value insert_family gen co witl fo deo =
      gen.g_fcnt := gen.g_fcnt + 1;
      fath_uni.family := Array.append fath_uni.family [| fam.fam_index |];
      moth_uni.family := Array.append moth_uni.family [| fam.fam_index |];
-     if fo.relation <> NoSexesCheck then
-       do notice_sex gen pere Male;
-          notice_sex gen mere Female;
-       return ()
-     else ();
+     notice_sex gen pere fath_sex;
+     notice_sex gen mere moth_sex;
      Array.iter
        (fun ix ->
           let x = poi gen.g_base ix in
@@ -554,7 +551,7 @@ value insert_relations fname gen sb sex rl =
 
 value insert_syntax fname gen =
   fun
-  [ Family cpl witl fam des -> insert_family gen cpl witl fam des
+  [ Family cpl fs ms witl fam des -> insert_family gen cpl fs ms witl fam des
   | Notes key str -> insert_notes fname gen key str
   | Relations sb sex rl -> insert_relations fname gen sb sex rl
   | Bnotes str -> insert_bnotes fname gen str ]
