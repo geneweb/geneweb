@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.92 2000-05-07 05:55:17 ddr Exp $
+# $Id: lexicon.txt,v 3.93 2000-05-07 14:02:27 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1816,6 +1816,7 @@ se: kommentar
     comment added
 af: kommentaar bygevoeg
 de: Kommentar hinzugef&uuml;gt
+dk: kommentar tilf&oslash;jet
 en: comment added
 fi: huomautus lis&auml;tty
 fr: commentaire ajout&eacute;
