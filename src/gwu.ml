@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.24 2000-06-29 14:21:45 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.25 2000-06-30 12:25:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -628,6 +628,12 @@ value is_isolated base p =
   | None -> Array.length (uoi base p.cle_index).family = 0 ]
 ;
 
+value is_definition_for_parent base p =
+  match (aoi base p.cle_index).parents with
+  [ Some _ -> False
+  | None -> True ]
+;
+
 value get_isolated_related base mark m list =
   let concat_isolated p_relation ip list =
     let p = poi base ip in
@@ -641,10 +647,14 @@ value get_isolated_related base mark m list =
     else list
   in
   let list =
-    List.fold_right (concat_isolated m.m_fath) m.m_fath.related list
+    if is_definition_for_parent base m.m_fath then
+      List.fold_right (concat_isolated m.m_fath) m.m_fath.related list
+    else list
   in
   let list =
-    List.fold_right (concat_isolated m.m_moth) m.m_moth.related list
+    if is_definition_for_parent base m.m_moth then
+      List.fold_right (concat_isolated m.m_moth) m.m_moth.related list
+    else list
   in
   let list =
     List.fold_right
