@@ -5,6 +5,8 @@ GeneWeb Version 4.05
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [30 Jan 02] Added a system of restricted access more strict than
+    hide_private_names (code by Ludovic Ledieu). In test.
   - [26 Jan 02] The "calendars" page shows the time (of the server machine).
   - [20 Jan 02] Use of dates order (according to the language) in calendars
     page.
@@ -16,6 +18,9 @@ GeneWeb Version 4.05
 * GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
   - [10 Jan 02] Warranty that the index (istr) number of the empty string
     is 0 and of the string "?" is 1.
+
+* GeneWeb databases Transfer Program (gwtp)
+  - [30 Jan 02] Grouped the two languages en and fr in common templates.
 
 * All executables
   - [10 Jan 02] No more statically linked by default.
