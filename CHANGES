@@ -11,6 +11,9 @@ GeneWeb version 3.04
   - [31 Mar 00] Do not enter any more GIVN as public name if equal to first
     name nor SURN as surname alias if equal to surname.
 
+* GeneWeb uncompiler (gwu) and GeneWeb to gedcom (gwb2ged)
+  - [04 Apr 00] Added option "-nn" not to save data base notes.
+
 * Base configuration files (base.gwf)
   - [31 Mar 00] Added variable "places_inverted" (default no) to specify that
     places are ordered more-general-less-general (e.g. "USA, New York"

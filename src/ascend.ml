@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.20 2000-04-03 19:47:37 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.21 2000-04-04 02:58:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1682,9 +1682,11 @@ value print_horizontally conf base max_level p =
      print_link_to_welcome conf True;
      Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
      Wserver.wprint "<p>\n";
-     let suff13 = "&nbsp;&nbsp;&nbsp;" in
-     let suff2 = "--&nbsp;" in
-     loop 0 suff13 suff2 suff13 p.cle_index;
+     tag "nobr" begin
+       let suff13 = "&nbsp;&nbsp;&nbsp;" in
+       let suff2 = "--&nbsp;" in
+       loop 0 suff13 suff2 suff13 p.cle_index;
+     end;
      trailer conf;
   return ()
 ;
