@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.21 2004-12-14 13:47:46 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.22 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -349,15 +349,15 @@ value copy_what_necessary t oc =
     let i = ref 0 in
     Stream.from
       (fun _ ->
-	 do {
+         do {
            if i.val >= len.val then do {
              len.val := Unix.read t buff 0 (String.length buff);
-	     i.val := 0;
-	     if len.val > 0 then output oc buff 0 len.val else ();
+             i.val := 0;
+             if len.val > 0 then output oc buff 0 len.val else ();
            }
-	   else ();
+           else ();
            if len.val == 0 then None
-	   else do { incr i; Some buff.[i.val - 1] }
+           else do { incr i; Some buff.[i.val - 1] }
          })
   in
   let _ = get_request_and_content strm in

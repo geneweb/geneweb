@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.30 2005-02-11 00:53:34 ddr Exp $ *)
+(* $Id: some.ml,v 4.31 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -89,17 +89,17 @@ value print_elem conf base is_surname (p, xl) =
 value first_name_print_list conf base xl liste =
   let liste =
     let l =
-      Sort.list
+      List.sort
         (fun x1 x2 ->
            match alphabetic (p_surname base x1) (p_surname base x2) with
            [ 0 ->
                match
                  (Adef.od_of_codate x1.birth, Adef.od_of_codate x2.birth)
                with
-               [ (Some d1, Some d2) -> d1 strictly_after d2
-               | (Some d1, _) -> False
-               | _ -> True ]
-           | n -> n > 0 ])
+               [ (Some d1, Some d2) -> if d1 strictly_after d2 then -1 else 1
+               | (Some d1, _) -> 1
+               | _ -> -1 ]
+           | n -> n  ])
         liste
     in
     List.fold_left
@@ -324,16 +324,16 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
           match (Adef.od_of_codate p1.birth,
                  Adef.od_of_codate p2.birth) with
           [ (Some d1, Some d2) ->
-              d2 strictly_after d1
-          | (_, None) -> True
-          | (None, _) -> False ]
+              if d2 strictly_after d1 then -1 else 1
+          | (_, None) -> -1
+          | (None, _) -> 1 ]
         in
-        Sort.list born_before pl
+        List.sort born_before pl
     | _ ->
-        Sort.list
-        (fun p1 p2 ->
-           alphabetic (p_first_name base p1) (p_first_name base p2) <= 0)
-        pl ]
+        List.sort
+          (fun p1 p2 ->
+             alphabetic (p_first_name base p1) (p_first_name base p2))
+          pl ]
   in
   let len = List.length ancestors in
   if len == 0 then not_found_fun conf x
@@ -453,13 +453,13 @@ value print_family_alphabetic x conf base liste =
   in
   let liste =
     let l =
-      Sort.list
+      List.sort
         (fun x1 x2 ->
            match
-             alphabetic (p_first_name base x1) (p_first_name base x2)
+             alphabetic (p_first_name base x2) (p_first_name base x1)
            with
-           [ 0 -> x1.occ > x2.occ
-           | n -> n > 0 ])
+           [ 0 -> compare x1.occ x2.occ
+           | n -> n ])
         liste
     in
     List.fold_left
@@ -577,7 +577,9 @@ value surname_print conf base not_found_fun x =
       in
       print_family_alphabetic x conf base pl
   | _ -> 
-      let strl = Sort.list (fun (_, len1) (_, len2) -> len1 >= len2) strl in
+      let strl =
+        List.sort (fun (_, len1) (_, len2) -> compare len2 len1) strl
+      in
       let strl = List.map fst strl in
       let iperl = select_ancestors conf base name_inj iperl in
       let pl = List.map (pget conf base) iperl in

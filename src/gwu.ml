@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.31 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.32 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -333,7 +333,7 @@ value common_children proj base children =
     in
     if List.mem "" list then None
     else
-      let list = Sort.list (fun s1 s2 -> s1 <= s2) list in
+      let list = List.sort compare list in
       let (src_max, n_max, _, _) =
         List.fold_left
           (fun (src_max, n_max, prev_src, n) src ->

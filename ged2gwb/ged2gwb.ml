@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.50 2005-02-13 10:45:51 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.51 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2036,11 +2036,11 @@ value rec sortable_by_date proj =
 
 value sort_by_date proj list =
   if sortable_by_date proj list then
-    Sort.list
+    List.sort
       (fun e1 e2 ->
          match (proj e1, proj e2) with
-         [ (Some d1, Some d2) -> not (strictly_after d1 d2)
-         | _ -> False ])
+         [ (Some d1, Some d2) -> if not (strictly_after d1 d2) then -1 else 1
+         | _ -> 1 ])
       list
   else list
 ;

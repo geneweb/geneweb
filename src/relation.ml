@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.63 2005-02-05 12:36:04 ddr Exp $ *)
+(* $Id: relation.ml,v 4.64 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1375,11 +1375,11 @@ value compute_simple_relationship conf base tstab p1 p2 =
         [] ancestors
     in
     let rl =
-      Sort.list
+      List.sort
         (fun (len11, len12, _) (len21, len22, _) ->
-           if len11 + len12 > len21 + len22 then True
-           else if len11 + len12 < len21 + len22 then False
-           else len11 >= len21)
+           if len11 + len12 > len21 + len22 then -1
+           else if len11 + len12 < len21 + len22 then 1
+           else compare len21 len11)
         rl
     in
     let rl =
@@ -1408,17 +1408,17 @@ value known_spouses_list conf base p excl_p =
 ;
 
 value merge_relations rl1 rl2 =
-  Sort.merge
+  List.merge
     (fun (po11, po12, (l11, l12, _), _) (po21, po22, (l21, l22, _), _) ->
-       if l11 + l12 < l21 + l22 then True
-       else if l11 + l12 > l21 + l22 then False
-       else if l11 < l21 then True
-       else if l11 > l21 then False
-       else if po11 = None && po12 = None then True
-       else if po21 = None && po22 = None then False
-       else if po11 = None || po21 = None then True
-       else if po21 = None || po22 = None then False
-       else True)
+       if l11 + l12 < l21 + l22 then -1
+       else if l11 + l12 > l21 + l22 then 1
+       else if l11 < l21 then -1
+       else if l11 > l21 then 1
+       else if po11 = None && po12 = None then -1
+       else if po21 = None && po22 = None then 1
+       else if po11 = None || po21 = None then -1
+       else if po21 = None || po22 = None then 1
+       else -1)
     rl1 rl2
 ;
 

@@ -1,36 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.19 2004-12-20 13:32:03 ddr Exp $ *)
+(* $Id: place.ml,v 4.20 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
-
-value remove_trailing_space s =
-  loop (String.length s) where rec loop i =
-    if i = 0 then ""
-    else if ' ' = s.[i - 1] then loop (i - 1)
-    else String.sub s 0 i
-;
-
-value correct_start_point s =
-  let iend = String.length s in
-  let rec loop i =
-    if i = iend then s
-    else
-      let c = s.[i] in
-      match c with
-      [ 'a'..'z' | ''' | ' ' | '\224'..'\246' | '\248'..'\254' -> loop (i + 1)
-      | _ ->
-          if i = 0 then s
-          else
-            let prefix = remove_trailing_space (String.sub s 0 i) in
-            let rest = String.sub s i (iend - i) in
-            rest ^ " (" ^ prefix ^ ")" ]
-  in
-  loop 0
-;
 
 value fold_place inverted s =
   let rec loop iend list i ibeg =
@@ -63,7 +38,6 @@ value fold_place inverted s =
     else (String.length s, [])
   in
   let list = rest @ loop iend [] 0 0 in
-  let list = List.map correct_start_point list in
   if inverted then List.rev list else list
 ;
 
@@ -153,13 +127,7 @@ value get_all conf base =
          else ())
       ht;
     let list =
-      Sort.list
-        (fun (s1, _, _) (s2, _, _) ->
-           let s1_l = List.map Name.lower s1 in
-           let s2_l = List.map Name.lower s2 in
-           if s1_l = s2_l then s1 <= s2 
-           else s1_l <= s2_l)
-        list.val
+      List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list.val
     in
     (list, len.val)
   }
@@ -218,10 +186,7 @@ value print_html_places_surnames conf base =
                 snl
             in
             let snl =
-              Sort.list
-                (fun (_, _, sn1) (_, _, sn2) ->
-                   Iobase.name_key sn1 <= Iobase.name_key sn2)
-                snl
+              List.sort (fun (_, _, sn1) (_, _, sn2) -> compare sn1 sn2) snl
             in
             let snl =
               List.fold_right
@@ -262,15 +227,7 @@ value print_all_places_surnames_short conf list =
          (s, len, ip) )
       list
   in
-  let list =
-    Sort.list
-      (fun (s1, _, _) (s2, _, _) ->
-         let s1_l = Name.lower s1 in
-         let s2_l = Name.lower s2 in
-         if s1_l = s2_l then s1 <= s2 
-         else s1_l <= s2_l)
-      list
-  in
+  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
   let list =
     List.fold_left
       (fun list (p, len, ip) ->
@@ -317,15 +274,7 @@ value print_all_places_surnames_long conf base list =
          | _ -> [(pl, [(len, ip)]) :: list] ])
       [] list
   in
-  let list =
-    Sort.list
-      (fun (pl1, _) (pl2, _) ->
-         let pl1_l = List.map Name.lower pl1 in
-         let pl2_l = List.map Name.lower pl2 in
-         if pl1_l = pl2_l then pl1 <= pl2
-         else pl1_l <= pl2_l)
-      list
-  in
+  let list = List.sort (fun (pl1, _) (pl2, _) -> compare pl1 pl2) list in
   let title _ =
     Wserver.wprint "%s / %s" (capitale (transl conf "place"))
       (capitale (transl_nth conf "surname/surnames" 0))

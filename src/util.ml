@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.117 2005-02-13 19:15:37 ddr Exp $ *)
+(* $Id: util.ml,v 4.118 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2260,7 +2260,7 @@ value update_wf_trace conf fname =
     in
     loop False [] r
   in
-  write_wf_trace fname (Sort.list \> wt)
+  write_wf_trace fname (List.sort (fun x y -> compare y x) wt)
 ;
 
 value commit_patches conf base =
