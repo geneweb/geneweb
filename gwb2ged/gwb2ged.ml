@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.22 2001-01-18 11:05:02 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.23 2001-02-04 19:50:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -550,6 +550,7 @@ value find_person base p1 po p2 =
 value surnames = ref [];
 value no_spouses_parents = ref False;
 value censor = ref 0;
+value with_siblings = ref False;
 
 value gwb2ged base ifile ofile anc desc mem =
   let anc =
@@ -574,7 +575,7 @@ value gwb2ged base ifile ofile anc desc mem =
   let oc = if ofile = "" then stdout else open_out ofile in
   let ((per_sel, fam_sel) as sel) =
     Select.functions base anc desc surnames.val None no_spouses_parents.val
-      censor.val False
+      censor.val with_siblings.val
   in
   do ged_header base oc ifile ofile;
      flush oc;
@@ -649,6 +650,14 @@ value speclist =
     Arg.String
       (fun s -> do desc_1st.val := s; return arg_state.val := ASwaitDescOcc),
     "\"<1st_name>\" [num] \"<surname>\": select descendants of");
+   ("-aws",
+    Arg.String
+      (fun s ->
+         do anc_1st.val := s;
+            arg_state.val := ASwaitAncOcc;
+            with_siblings.val := True;
+         return ()),
+    "\"<1st_name>\" [num] \"<surname>\" : select ancestors with siblings");
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.38 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.39 2001-02-04 19:50:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1039,7 +1039,8 @@ value speclist =
     "\"<1st_name>\" [num] \"<surname>\" : select descendants of...");
    ("-ad",
     Arg.String
-      (fun s -> do ancdesc_1st.val := s; return arg_state.val := ASwaitAncdescOcc),
+      (fun s ->
+         do ancdesc_1st.val := s; return arg_state.val := ASwaitAncdescOcc),
     "\"<1st_name>\" [num] \"<surname>\" : select ancestors of...
     and all their descendants (has no effect if -a and/or -d used,
     option -nsp is forced).");

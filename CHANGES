@@ -78,6 +78,10 @@ GeneWeb version 3.11
     created empty data bases.
 
 * GeneWeb to Gedcom (gwb2ged)
+  - [04 Feb 00] Added option "-aws" (Ancestors With Siblings), the same
+    option than for the command "gwu", extracting somebody's ancestors,
+    together with their siblings, siblings' spouses and siblings' spouses'
+    parents.
   - [18 Jan 01] Fixed problem for names with declinations: they were
     exported with all their declinations; now just the 'nominative'
     form is exported.
