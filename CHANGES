@@ -6,6 +6,8 @@ GeneWeb version 3.01
     not appear...
 
 * GeneWeb Service/CGI (gwd)
+  - [Nov 10, 99] Added relationship computing by shortest path (Louis
+    Granboulan).
   - [Nov 10, 99] Added foster parents.
   - [Nov 10, 99] Changed structure of data bases for internal optimizations.
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.2 1999-11-10 08:44:19 ddr Exp $ *)
+(* $Id: family.ml,v 3.3 1999-11-10 21:24:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -267,6 +267,9 @@ value set_senv conf vm vi =
      | _ -> () ];
      match p_getenv conf.env "spouse" with
      [ Some "on" -> conf.senv := conf.senv @ [("spouse", "on")]
+     | _ -> () ];
+     match p_getenv conf.env "shortest" with
+     [ Some "on" -> conf.senv := conf.senv @ [("shortest", "on")]
      | _ -> () ];
      match p_getenv conf.env "cgl" with
      [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]

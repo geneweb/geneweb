@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.2 1999-11-10 08:44:31 ddr Exp $ *)
+(* $Id: relation.ml,v 3.3 1999-11-10 21:24:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -170,6 +170,14 @@ value print_menu conf base p =
                (capitale (transl conf "relationships by marriage"));
              Wserver.wprint "<input type=checkbox name=marr value=on><br>\n";
              Wserver.wprint "%s\n"
+               (capitale (transl conf "shortest path"));
+             Wserver.wprint
+               "<input type=checkbox name=shortest value=on><br>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "colspan=2 align=center" begin
+             Wserver.wprint "%s\n"
                (capitale (transl conf "cancel GeneWeb links"));
              Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
            end;
@@ -183,6 +191,334 @@ value print_menu conf base p =
      end;
      trailer conf;
   return ()
+;
+
+(* find shortest path :
+ * parents, siblings, mates and children are at distance 1.
+ *)
+type famlink = [ Self | Parent | Sibling | HalfSibling | Mate | Child ];
+
+value print_relation_path_list conf base path =
+  do Wserver.wprint "<P>%s :\n"
+       (capitale (transl conf "shortest path"));
+     Wserver.wprint "<ol>\n";
+     List.iter
+       (fun (ip, fl) ->
+          let p = poi base ip in
+          let is = index_of_sex p.sex in
+          let link = match fl with
+             [ Self ->    ""
+             | Parent ->  (transl_nth conf "the father/the mother/a parent" is)
+             | Sibling -> (transl_nth conf "a brother/a sister/a sibling" is)
+             | HalfSibling -> (transl_nth conf
+                            "a half-brother/a half-sister/a half-sibling" is)
+             | Mate ->    (transl_nth conf "the spouse" is)
+             | Child ->   (transl_nth conf "a son/a daughter/a child" is) ]
+          in
+          do html_li conf;
+             afficher_personne_sans_titre conf base p;
+             if link = "" then () else
+             Wserver.wprint " <em>%s %s %s</em>"
+               (transl conf "is") link (transl_nth conf "of" 0);
+          return ())
+       path;
+     Wserver.wprint "</ol>\n";
+  return ()
+;
+
+value print_relation_path_table_seprow conf base path i width =
+  do tag "tr" begin
+       for j = 0 to width do
+        let (next_is_sibling, ip, iq) = try
+          let (ip, fl, _, _) =
+            List.find (fun (_,_,nx,ny) -> nx == succ j && ny == i) path in
+          let (iq, _, _, _) =
+            List.find (fun (_,_,nx,ny) -> nx == j && ny == i) path in
+          (fl == Sibling || fl == HalfSibling, Some ip, Some iq)
+        with [ Not_found -> (False, None, None) ]
+        in
+        if next_is_sibling then
+        tag "td" "align=center colspan=3" begin
+          match (ip, iq) with
+          [ (Some ip, Some iq) ->
+            let a = aoi base ip in
+            let b = aoi base iq in
+            match (a.parents, b.parents) with
+            [ (Some ifa, Some ifb) ->
+              let ca = coi base ifa in
+              let cb = coi base ifb in
+              if ca.father = cb.father && ca.mother = cb.mother then
+              let p = poi base ca.father in
+              let q = poi base ca.mother in
+              do
+                afficher_personne_referencee conf base p;
+                Wserver.wprint " &amp; ";
+                afficher_personne_referencee conf base q;
+              return ()
+              else
+              if ca.father = cb.father then
+              let p = poi base ca.father in
+                afficher_personne_referencee conf base p
+              else
+              let q = poi base ca.mother in
+                afficher_personne_referencee conf base q
+            (* TODO : trouver les parents communs *)
+            | (_, _) -> Wserver.wprint "[siblings, adoption]" ]
+          | (_, _) -> () (* n'arrive jamais... *) ];
+        end
+        else
+        let prev_is_sibling = try
+          let (_, fl, _, _) =
+            List.find (fun (_,_,nx,ny) -> nx == j && ny == i) path in
+          fl == Sibling || fl == HalfSibling
+        with [ Not_found -> False ]
+        in
+        if prev_is_sibling then
+         if j == width then () else
+         tag "td" "align=center" begin Wserver.wprint "&nbsp;"; end
+        else
+        do
+         tag "td" "align=center" begin
+           let child = try
+             let (_, fl, _, _) =
+               List.find (fun (_,_,nx,ny) -> nx == j && ny == i) path in
+             fl == Child
+           with [ Not_found -> False ]
+           in
+           let parent = try
+             let (_, fl, _, _) =
+               List.find (fun (_,_,nx,ny) -> nx == j && ny == pred i) path in
+             fl == Parent
+           with [ Not_found -> False ]
+           in
+           if child || parent then Wserver.wprint "|"
+           else Wserver.wprint "&nbsp;";
+         end;
+         if j == width then () else
+         tag "td" "align=center" begin Wserver.wprint "&nbsp;"; end;
+        return ();
+       done;
+     end;
+  return ()
+;
+
+value print_relation_path_table_mainrow conf base path i width =
+  do tag "tr" begin
+       for j = 0 to width do
+         let _ = try
+           let (ip, fl, _, _) =
+             List.find (fun (_, _, nx, ny) -> nx == j && ny == i) path
+           in
+           let p = poi base ip in
+           do if j == 0 then () else
+              tag "td" "align=center width=20" begin
+                if fl == Mate then Wserver.wprint "&amp"
+                else Wserver.wprint "&nbsp;";
+              end;
+              tag "td" "align=center" begin
+                afficher_personne_referencee conf base p;
+                Date.afficher_dates_courtes conf base p;
+                Wserver.wprint "\n";
+              end;
+           return True
+         with
+         [ Not_found ->
+           do if j == 0 then () else
+              tag "td" "align=center" begin Wserver.wprint "&nbsp;"; end;
+              tag "td" "align=center" begin Wserver.wprint "&nbsp;"; end;
+           return False ]
+         in ();
+       done;
+     end;
+  return ()
+;
+
+value print_relation_path_table conf base path =
+  do Wserver.wprint "<P>%s :\n"
+       (capitale (transl conf "shortest path"));
+     let (width, hmin, hmax, _, path) = List.fold_left
+       (fun (x, a, b, y, p) (ip, fl) ->
+         let ny = match fl with [Parent -> pred y |Child -> succ y | _ -> y ] in
+         let nx = match fl with [Sibling -> succ x |HalfSibling -> succ x
+                                |Mate -> succ x | _ -> x ] in
+         let np = [ (ip, fl, nx, ny) :: p] in
+         (nx, min a ny, max b ny, ny, np))
+       (0,0,0,0,[]) (List.rev path)
+     in
+     do Wserver.wprint "<table border=%d>\n" conf.border;
+        for i = hmin to hmax do
+          print_relation_path_table_seprow conf base path i width;
+          print_relation_path_table_mainrow conf base path i width;
+        done;
+        Wserver.wprint "</table>\n";
+     return ();
+  return ()
+;
+
+value print_relation_path conf base path =
+  if path == [] then () else
+  do print_relation_path_list conf base path;
+     print_relation_path_table conf base path;
+  return ()
+;
+
+type node = [ NotVisited | Visited of (bool * iper * famlink) ];
+exception FoundLink;
+exception Bug;
+
+value print_relation_with_alliance conf base ip1 ip2 =
+  let title _ = Wserver.wprint "%s"
+                (capitale (transl conf "relationship")) in
+  let mark_per = Array.create base.data.persons.len NotVisited in
+  let mark_fam = Array.create base.data.families.len False in
+  let parse_fam ifam =
+    if mark_fam.(Adef.int_of_ifam ifam) then [] else
+    let cpl = coi base ifam in
+    do mark_fam.(Adef.int_of_ifam ifam) := True; return
+    let result = [(cpl.father, Parent) :: [(cpl.mother, Parent)]]
+    in
+    let result = result
+    @ List.fold_right
+      (fun child children -> [ (child, Sibling) :: children ] )
+      (Array.to_list (doi base ifam).children) []
+    in
+    let result = result
+    @ List.fold_right
+      (fun fam children ->
+        if ifam = fam then children else
+        List.fold_right
+          (fun child children -> [ (child, HalfSibling) :: children ] )
+          (Array.to_list (doi base fam).children) children)
+      (Array.to_list (uoi base cpl.father).family) []
+    in
+    let result = result
+    @ List.fold_right
+      (fun fam children ->
+        if ifam = fam then children else
+        List.fold_right
+          (fun child children -> [ (child, HalfSibling) :: children ] )
+          (Array.to_list (doi base fam).children) children)
+      (Array.to_list (uoi base cpl.mother).family) []
+    in
+    result
+  in
+  let neighbours iper =
+    (* husbands, wives and children *)
+    let result =
+    List.fold_right
+      (fun ifam nb ->
+        if mark_fam.(Adef.int_of_ifam ifam) then nb else
+        let cpl = coi base ifam in
+        do mark_fam.(Adef.int_of_ifam ifam) := True; return
+        List.fold_right
+          (fun child children -> [ (child, Child) :: children ])
+          (Array.to_list (doi base ifam).children)
+          [ (cpl.father, Mate) :: [(cpl.mother, Mate)]] @ nb)
+      (Array.to_list (uoi base iper).family) []
+    in
+    (* parents and (half-)siblings *)
+    let result = result @
+    match (aoi base iper).parents with
+    [ Some ifam -> parse_fam ifam
+    | _ -> [] ]
+    in
+    (* TODO : adoptive parents and (half-)siblings
+    let result = result @
+    List.fold_right
+      (fun (ifam, pedigree) nb -> parse_fam ifam @ nb)
+      (poi base iper).adopted []
+    in
+    *)
+    result
+  in
+  let rec make_path path vertex =
+    match (List.hd path) with
+    [ (iper, Self) -> path
+    | (iper, _) -> match mark_per.(Adef.int_of_iper vertex) with
+      [ NotVisited -> raise Bug
+      | Visited (s, v, f) -> make_path [(vertex, f) :: path] v ] ]
+  in
+  let merge_path p1 p2 =
+    let swap_order el =
+      match el with
+      [ (iper, Parent) -> (iper, Child)
+      | (iper, Child) -> (iper, Parent)
+      | _ -> el ]
+    in
+    List.map2
+    (fun (ip1, fl1) (ip2, fl2) -> swap_order (ip1, fl2))
+    (List.rev (List.tl (List.rev p1))) (List.tl p1)
+    @ (List.rev p2)
+  in
+  let one_step_further source queue =
+    List.fold_right
+     (fun vertex newvertexlist ->
+       List.fold_right
+        (fun (iper, fl) result ->
+          match mark_per.(Adef.int_of_iper iper) with
+          [ NotVisited ->
+            do mark_per.(Adef.int_of_iper iper) := Visited (source, vertex, fl);
+            return [ iper :: result ]
+          | Visited (s, v, f) ->
+            if s == source then result else
+            let p1 = make_path [(iper, fl)] vertex in
+            let p2 = make_path [(iper, f)] v in
+            let path = if source
+              then merge_path p2 p1
+              else merge_path p1 p2
+            in
+            do print_relation_path conf base path;
+            return raise FoundLink
+          ])
+        (neighbours vertex) newvertexlist
+      )
+      queue []
+  in
+(* première version : alternance
+  let rec width_search queue1 visited1 queue2 visited2 =
+    let queue1 = one_step_further True  queue1 in
+    if queue1 == [] then True else
+    let queue2 = one_step_further False queue2 in
+    if queue2 == [] then True else
+    width_search queue1 queue2
+  in *)
+(* seconde version : équilibrage *)
+  let rec width_search queue1 visited1 queue2 visited2 =
+    if queue1 == [] || queue2 == [] then True else
+    if visited1 > visited2 then
+      let visited2 = visited2 + (List.length queue2) in
+      let queue2 = one_step_further False queue2 in
+      width_search queue1 visited1 queue2 visited2
+    else
+      let visited1 = visited1 + (List.length queue1) in
+      let queue1 = one_step_further True  queue1 in
+      width_search queue1 visited1 queue2 visited2
+  in
+  do header conf title;
+     mark_per.(Adef.int_of_iper ip1) := Visited (True,  ip1, Self);
+     mark_per.(Adef.int_of_iper ip2) := Visited (False, ip2, Self);
+     if try width_search [ip1] 0 [ip2] 0 with
+        [ FoundLink -> False ]
+     then Wserver.wprint "XXX" else ();
+     trailer conf;
+  return ()
+;
+
+value print_shortest_path conf base p1 p2 =
+  if p1.cle_index = p2.cle_index then
+    let title _ =
+      Wserver.wprint "%s" (capitale (transl conf "relationship"))
+    in
+    do header conf title;
+       Wserver.wprint "%s\n" (capitale (transl conf "it is the same person!"));
+       trailer conf;
+    return ()
+  else
+    let _ = base.data.ascends.array () in
+    let _ = base.data.unions.array () in
+    let _ = base.data.couples.array () in
+    let _ = base.data.descends.array () in
+    print_relation_with_alliance conf base p1.cle_index p2.cle_index
 ;
 
 value parents_label conf =
@@ -843,21 +1179,28 @@ value print_base_loop conf base =
 value print conf base p =
   fun
   [ Some p1 ->
-      let long =
-        match p_getenv conf.env "long" with
+      let is_shortest =
+        match p_getenv conf.env "shortest" with
         [ Some "on" -> True
         | _ -> False ]
       in
-      let by_marr =
-        match p_getenv conf.env "marr" with
-        [ Some "on" -> True
-        | _ -> False ]
-      in
-      match
-        try Some (compute_relationship conf base by_marr p1 p) with
-        [ Consang.TopologicalSortError -> None ]
-      with
-      [ Some rel -> print_main_relationship conf base long p1 p rel
-      | None -> print_base_loop conf base ]
+      if is_shortest then print_shortest_path conf base p1 p
+      else
+        let long =
+          match p_getenv conf.env "long" with
+          [ Some "on" -> True
+          | _ -> False ]
+        in
+        let by_marr =
+          match p_getenv conf.env "marr" with
+          [ Some "on" -> True
+          | _ -> False ]
+        in
+        match
+          try Some (compute_relationship conf base by_marr p1 p) with
+          [ Consang.TopologicalSortError -> None ]
+        with
+        [ Some rel -> print_main_relationship conf base long p1 p rel
+        | None -> print_base_loop conf base ]
   | None -> print_menu conf base p ]
 ;
