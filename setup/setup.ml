@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.49 2004-07-01 14:00:25 ddr Exp $ *)
+(* $Id: setup.ml,v 4.50 2004-08-27 11:57:42 ddr Exp $ *)
 
 open Printf;
 
@@ -119,18 +119,21 @@ value abs_setup_dir () =
 
 value trailer conf =
   do {
-    Wserver.wprint "<p>\n";
+    Wserver.wprint "<p />\n";
     if conf.comm = "" then ()
     else
       Wserver.wprint "
-<img src=\"images/gwlogo.png\" width=64 height=72 align=right alt=logo>
-<br>
+<img src=\"images/gwlogo.png\" width=\"64\" height=\"72\" align=\"right\" alt=\"logo\" />
+<br />
 ";
     Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2003 INRIA -
+<hr><font size=\"-1\"><em>(c) Copyright 2003 INRIA -
 GeneWeb %s</em></font>" Version.txt;
-    Wserver.wprint "<br>";
-    Wserver.wprint "</body>\n"
+    Wserver.wprint "<br />";
+    
+    (* finish the html page *)
+    Wserver.wprint "</body>\n";
+    Wserver.wprint "</html>\n";
   }
 ;
 

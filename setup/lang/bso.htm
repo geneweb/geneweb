@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: bso.htm,v 1.11 2003-11-12 17:25:20 ddr Exp $ -->
+  <!-- $Id: bso.htm,v 1.12 2004-08-27 11:57:42 ddr Exp $ -->
   <title>[
 de: Datenbank anlegen
 en: Creation of a database
 es: Creaci&oacute;n de una base de datos
+fi: Tietokannan luonti
 fr: Cr&eacute;ation d'une base de donn&eacute;es
 it: Creazione di una base di dati
 lv: Datu bâzes izveidoðana
@@ -20,13 +21,14 @@ sv: Skapa en databas
 de: Datenbank anlegen
 en: Creation of a database
 es: Creaci&oacute;n de una base de datos
+fi: Tietokannan luonti
 fr: Cr&eacute;ation d'une base de donn&eacute;es
 it: Creazione di una base di dati
 lv: Datu bâzes izveidoðana
 sv: Skapa en databas
 ]</font></h1></center>
 
-<p><p>
+<p /><p />
 <ul>
 
 %v{<li>
@@ -36,12 +38,15 @@ de: <b>Warnung:</b> In deinem
     <a href="gwsetup?lang=%l;v=list.htm">Verzeichnis</a>
     existiert bereits eine Datenbank mit dem Namen "%o".
     Wenn du den "Ok"-Knopf dr&uuml;ckst, wird sie gel&ouml;scht.
-en: Warning: there already exists a database with the name "%o" in your
+en: <b>Warning</b>: there already exists a database with the name "%o" in your
     <a href="gwsetup?lang=%l;v=list.htm">directory</a>. If you push the button
     "Ok" below, it will be erased.
-es: Atenci&oacute;n: una base llamada "%o" ya existe en su 
+es: <b>Atenci&oacute;n</b>: una base llamada "%o" ya existe en su
     <a href="gwsetup?lang=%l;v=list.htm">carpeta</a>. 
     Si Ud apoya en el bot&oacute;n "Ok" la base inicial sera borrada
+fi: <b>Varoitus</b>: tietokanta nimellä "%o" on jo luotuna
+    <a href="gwsetup?lang=%l;v=list.htm">hakemistossa</a>. Mikäli painat
+    "Ok" -nappia alla, olemassa oleva tietokanta tuhoutuu.
 fr: <b>Attention</b>: il existe d&eacute;j&agrave; une base de nom
     "%o" dans votre <a
     href="gwsetup?lang=%l;v=list.htm">r&eacute;pertoire</a>. Si vous
@@ -50,13 +55,13 @@ it: <b>Attenzione</b>: esiste una base di dati chiamata
     "%o" nella <a
     href="gwsetup?lang=%l;v=list.htm">directory</a>. Se cliccate
     sul bottone "Ok" qui sotto, essa sar&agrave; cancellata.
-lv: Brîdinâjums: ðâda datubâze "%o" jau eksistç Jûsu
+lv: <b>Brîdinâjums</b>: ðâda datubâze "%o" jau eksistç Jûsu
     <a href="gwsetup?lang=%l;v=list.htm">katalogâ</a>. Ja Jûs nospiedîsiet
     podziòu "Ok" zemâk, datu bâze tiks dzçsta.
-sv: Varning: det existerar redan en databas med namnet "%o" i din
+sv: <b>Varning</b>: det existerar redan en databas med namnet "%o" i din
     <a href="gwsetup?lang=%l;v=list.htm">katalog</a>. Om du trycker på knappen
     "OK" nedan, kommer den att bli raderad.
-]<p>
+]<p />
 
 [
 de: Falls du diese Funktion gerade schonmal ausgef&uuml;hrt hattest, dann
@@ -69,6 +74,9 @@ en: If you just made this, it is probably its result, and therefore it is
 es: Si Ud viene de realizar esta operaci&oacute;n, debe probablemente
     tratarse de su resultado, entoces !no pasa nada!. Si no, regrese 
     ha la posici&oacute;n anterior y escoja otro nombre para su base.
+fi: Jos juuri teit tietokannan, tämä on todennäköisesti tulos siitä ja siksi
+    ei ole tärkeä. Muutoin, palaa edelliselle sivulle ja valitse toinen
+    nimi tietokannalle.
 fr: Si vous venez d&eacute;j&agrave; de faire cette manipulation, il
     s'agit probablement de son r&eacute;sultat, ce n'est donc pas
     grave. Sinon, revenez en arri&egrave;re et choisissez un autre nom
@@ -82,7 +90,7 @@ lv: Ja Jûs tikai tikko esat to izveidojuði, tâ varbût ir izveides
 sv: Om du precis gjorde detta, har databasen blivit raderad nu.
     Annars, återvänd till föregående sida och välj ett annat
     namn för din databas.
-]<p>}
+]<p />}
 
 <li>
 
@@ -98,6 +106,8 @@ es: Vamos a crear una base que tiene por nombre "%o".
     Remarca: esta operaci&oacute;n puede efectuarse inmediatamente o tomar unas
     decenas de segundos o algunos minutos, en funci&oacute;n del caso. 
     Tenga paciencia. 
+fi: Luomme tietokannan nimeltä "%o". Huomautus: tämä toiminto voi kestää
+    hetken, riippuen tapauksesta. Ole kärsivällinen.
 fr: Nous allons cr&eacute;er une base de nom "%o". Remarque: cette
     op&eacute;ration peut s'effectuer en un clin d'oeil ou prendre
     quelques dizaines de secondes ou quelques minutes, suivant les
@@ -113,38 +123,40 @@ sv: Vi ska nu skapa en databas benämnd "%o". Obs: denna operation
     flera minuter, beroende på fallet. Ha tålamod.
 ]
 
-<p>
+<p />
 
 [
 de: Dr&uuml;cke den Knopf, um die Datenbank anzulegen
 en: Push the button below to create you database
 es: Apoye en el bot&oacute;n inferior para crear su base de datos
+fi: Paina nappia alla luodaksesi tietokannan
 fr: Appuyez sur le bouton ci-dessous pour cr&eacute;er votre base de
     donn&eacute;es
 it: Cliccate sul bottone qui sotto per creare la vostra base di dati
 lv: Nospiediet zemâk esoðo podziòu, lai izveidotu datu bâzi
 sv: Tryck på knappen nedan för att skapa din databas
-]%v{<br><blink><font color=red>[
+]%v{<br /><blink><font color=red>[
 de:  und die alte Datenbank "%o" im Zielverzeichnis zu l&ouml;schen
 en: , and overwrite the previous database "%o" of the target directory
 es:  y destruir  la base "%o" de la carpeta de llegada
+fi: , ja ylikirjoita tietokanta "%o" kohdehakemistosta
 fr:  et &eacute;craser la base "%o" du r&eacute;pertoire d'arriv&eacute;e
 it:  e cancellare la base "%o" dalla directory di arrivo
 lv: , un dzçstu iepriekðçjo datu bâzi "%o" katalogâ
 sv:  och radera den föregående databasen "%o" från målkatalogen
 ]</font></blink>}:
 
-<p>
+<p />
 
-<form method=POST action="%d">
+<form method="post" action="%d">
 %h
 <dl><dt><dd>
-<input type=submit value="Ok">
-<input type=submit name=cancel value="[cancel]">
+<input type="submit" value="Ok" />
+<input type="submit" name="cancel" value="[cancel]" />
 </dl>
 </form>
 
-<p>
+<p />
 
 [
 de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
@@ -152,6 +164,7 @@ de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
 en: For information, this operation corresponds to the following commands:
 es: Por informaci&oacute;n, esta operaci&oacute;n corresponde a los comandos 
     siguientes: 
+fi: Tiedoksi, tämä toiminto vastaa seuraavia komentoja:
 fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
     des commandes suivantes:
 it: Per informazione, questa operazione corrisponde ai seguenti comandi:
@@ -168,6 +181,7 @@ sv: Denna operation motsvarar de följande kommandona:
 de: Hierbei wird ein Verzeichnis namens "%o.gwb" angelegt.
 en: This builds a directory named "%o.gwb".
 es: Esto crear&aacute; una carpeta de nombre "%o.gwb".
+fi: Tämä luo hakemiston nimeltä "%o.gwb".
 fr: Cela fabriquera un r&eacute;pertoire de nom "%o.gwb".
 it: Verr&agrave; creata una directory chiamata "%o.gwb".
 lv: Tâs rezultâtâ tiks izveidots katalogs "%o.gwb".
