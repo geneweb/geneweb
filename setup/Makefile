@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.2 2001-09-07 15:31:44 ddr Exp $
+# $Id: Makefile,v 4.3 2001-09-08 19:03:58 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -53,10 +53,10 @@ test_dir:
 	cd test/gw; echo "127.0.0.1" > only.txt
 
 setup.out: $(OBJS)
-	$(OCAMLC) -ccopt -static unix.cma $(LIBUNIX) $(OBJS) -o setup.out
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(OBJS) -o setup.out
 
 setup.opt: $(OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -ccopt -static unix.cmxa $(LIBUNIX) $(OBJS:.cmo=.cmx) -o setup.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(OBJS:.cmo=.cmx) -o setup.opt
 
 depend:
 	TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend
