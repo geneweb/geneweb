@@ -1,10 +1,10 @@
-(* $Id: gwb2ged.ml,v 2.12 1999-07-02 14:26:55 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.13 1999-07-15 08:52:34 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
 open Gutil;
 
-value ascii = ref False;
+value ascii = ref True;
 
 value ged_month =
   fun
@@ -59,7 +59,7 @@ value ged_header base oc ifile ofile =
 ;
 
 value encode s =
-  if ascii.val then Ansel.to_iso_8859_1 s else s
+  if ascii.val then s else Ansel.of_iso_8859_1 s
 ;
 
 value ged_1st_name base p =
@@ -466,9 +466,17 @@ If both options -a and -d are used, intersection is assumed.
 Options are:";
 
 value speclist =
-  [("-ascii",
-    Arg.Unit (fun () -> do ascii.val := True; return arg_state.val := ASnone),
-    ": ASCII output, instead of ANSEL");
+  [("-charset",
+    Arg.String
+      (fun x ->
+         do arg_state.val := ASnone; return
+         match x with
+         [ "ASCII" -> ascii.val := True
+         | "ANSEL" -> ascii.val := False
+         | _ -> raise (Arg.Bad "bad -charset value") ]),
+    "[ASCII|ANSEL]:
+     Set charset. Default is ASCII. Warning: value ANSEL works correctly only
+     on iso-8859-1 encoded data bases.");
    ("-o",
     Arg.String (fun x -> do  ofile.val := x; return arg_state.val := ASnone),
     "<ged>: output file name (default: a.ged)");
