@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.9 2001-01-06 09:55:57 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.10 2001-03-07 03:13:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -455,6 +455,45 @@ do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return 
   do r.array := array; r.get := gen_get; return r
 ;
 
+value is_restricted bname cleanup_ref =
+  let ic_opt_opt = ref None in
+  fun ip ->
+    let ic_opt =
+      match ic_opt_opt.val with
+      [ Some x -> x
+      | None ->
+          let fname = Filename.concat bname "restrict" in
+          let ic_opt =
+            match try Some (open_in fname) with [ Sys_error _ -> None ] with
+            [ Some ic ->
+                let cleanup = cleanup_ref.val in
+                do cleanup_ref.val :=
+                     fun () -> do close_in ic; return cleanup ();
+                return Some ic
+            | None -> None ]
+          in
+          do ic_opt_opt.val := Some ic_opt; return ic_opt ]
+    in
+    match ic_opt with
+    [ Some ic ->
+        try
+          let c =
+            do seek_in ic
+                (output_value_header_size + 1 + Iovalue.sizeof_long +
+                 Adef.int_of_iper ip);
+            return input_char ic
+          in
+          let v = Iovalue.input_int ic (* can raise Not_found *) in
+          if v = 0 then Left False
+          else if v = 1 then Left True
+          else raise Not_found
+        with
+        [ End_of_file -> Right True
+        | Not_found ->
+            do Printf.eprintf "bad bool\n"; flush stderr; return Left False ]
+    | None -> Right False ]
+;
+
 value input bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname
@@ -529,9 +568,10 @@ value input bname =
     make_cached ic ic_acc shift strings_array_pos patches.p_string strings_len
       strings_cache "strings"
   in
-  let cleanup () =
-    do close_in ic; close_in ic_acc; close_in ic2; return ()
+  let cleanup_ref =
+    ref (fun () -> do close_in ic; close_in ic_acc; close_in ic2; return ())
   in
+  let cleanup () = cleanup_ref.val () in
   let commit_patches () =
     let fname = Filename.concat bname "patches" in
     do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
@@ -663,6 +703,7 @@ value input bname =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
           patches.p_person, "first_name");
+     is_restricted = is_restricted bname cleanup_ref;
      patch_person = patch_person;
      patch_ascend = patch_ascend;
      patch_union = patch_union;
@@ -1051,6 +1092,7 @@ do Printf.eprintf "*** create first name index\n"; flush stderr; return
             return ()
           else ();
        return raise e;
+     remove_file (Filename.concat bname "restrict");
      remove_file (Filename.concat bname "base");
      Sys.rename tmp_fname (Filename.concat bname "base");
      remove_file (Filename.concat bname "base.acc");

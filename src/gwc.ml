@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.17 2001-02-12 12:53:09 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.18 2001-03-07 03:13:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -607,6 +607,7 @@ value empty_base : Def.base =
     index_of_string = fun [];
     persons_of_surname = no_istr_iper_index;
     persons_of_first_name = no_istr_iper_index;
+    is_restricted = fun [];
     patch_person = fun [];
     patch_ascend = fun [];
     patch_union = fun [];
@@ -669,6 +670,7 @@ value linked_base gen : Def.base =
      index_of_string = fun [];
      persons_of_surname = no_istr_iper_index;
      persons_of_first_name = no_istr_iper_index;
+     is_restricted = fun [];
      patch_person = fun [];
      patch_ascend = fun [];
      patch_union = fun [];

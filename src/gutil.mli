@@ -1,9 +1,7 @@
-(* $Id: gutil.mli,v 3.10 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: gutil.mli,v 3.11 2001-03-07 03:13:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
-
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value poi : base -> iper -> person;
 value aoi : base -> iper -> ascend;

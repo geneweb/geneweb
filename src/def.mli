@@ -1,5 +1,7 @@
-(* $Id: def.mli,v 3.11 2001-02-10 22:05:36 ddr Exp $ *)
+(* $Id: def.mli,v 3.12 2001-03-07 03:13:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
+
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;
@@ -183,6 +185,7 @@ type base_func =
     index_of_string : string -> istr;
     persons_of_surname : istr_iper_index;
     persons_of_first_name : istr_iper_index;
+    is_restricted : iper -> choice bool bool;
     patch_person : iper -> person -> unit;
     patch_ascend : iper -> ascend -> unit;
     patch_union : iper -> union -> unit;
