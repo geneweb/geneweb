@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.41 1999-09-16 09:31:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.42 1999-09-16 17:50:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -333,12 +333,13 @@ value start_with_base conf bname =
 do Wserver.wprint "
 <p>
 <table border=2><tr><td>
-The service is not available for this data base for some minutes. Please
-try again a little bit later. Thank you for your patience.
+The service is not available for this data base for some minutes. I'm
+installing a new version; I am trying to recover the access as soon as
+possible... Thank you for your patience.
 <p>
 Le service n'est pas disponible sur cette base de donn&eacute;es pendant
-quelques minutes. R&eacute;essayez un peu plus tard. Merci de votre
-patience.
+quelques minutes. J'installe une nouvelle version; je m'efforce de remettre
+l'acc&egrave;s le plus t&ocirc;t possible... Merci de votre patience.
 </td></tr></table>
 <p>\n";
 return

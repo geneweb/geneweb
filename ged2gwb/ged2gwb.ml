@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.36 1999-09-16 15:09:59 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.37 1999-09-16 17:50:48 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -394,14 +394,14 @@ value make_date n1 n2 n3 =
 EXTEND
   GLOBAL: date_value date_range;
   date_value:
-    [ [ (d, cal) = date; EOI -> Dgreg d cal
-      | dr = date_range ->
+    [ [ dr = date_range ->
           match dr with
           [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
           | End (d, cal) -> Dgreg {(d) with prec = Before} cal
           | BeginEnd (d1, cal) (d2, _) ->
               Dgreg {(d1) with prec = YearInt d2.year} cal ]
-      | d = date_approximated; EOI -> d ] ]
+      | d = date_approximated; EOI -> d
+      | (d, cal) = date; EOI -> Dgreg d cal ] ]
   ;
   date_range:
     [ [ ID "BEF"; dt = date; EOI -> End dt

@@ -15,6 +15,8 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
+  - [Sep 16, 99] Advanced search with baptism date and place did not work:
+    fixed.
   - [Sep 16, 99] Changed the order of dates in modifications forms into:
     year/month/day and these fields are now labelled.
   - [Sep 15..16, 99] Added calendars for dates (Gregorian, Julian, French
