@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.32 2001-01-08 22:05:30 ddr Exp $ *)
+(* $Id: dag.ml,v 3.33 2001-01-08 23:34:14 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -413,9 +413,29 @@ value try_add_vbar stra_row stra_row_max hts i col =
   else ""
 ;
 
+value strip_newlines s =
+  loop 0 0 where rec loop len i =
+    if i = String.length s then Buff.get len
+    else if start_with s i "<br>" then loop len (i + 4)
+    else if s.[i] = '\n' then loop (Buff.store len ' ') (i + 1)
+    else loop (Buff.store len s.[i]) (i + 1)
+;
+
+value table_strip_newlines hts =
+  for i = 0 to Array.length hts - 1 do
+    for j = 0 to Array.length hts.(i) - 1 do
+      match hts.(i).(j) with
+      [ (colspan, align, TDstring s) ->
+          hts.(i).(j) := (colspan, align, TDstring (strip_newlines s))
+      | _ -> () ];
+    done;
+  done
+;
+
 (* Main print table algorithm with <pre> *)
 
 value print_table_pre conf hts =
+  do table_strip_newlines hts; return
   let ncol =
     let hts0 = hts.(0) in
     loop 0 0 where rec loop ncol j =
