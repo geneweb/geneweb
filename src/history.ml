@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.5 2000-06-03 21:08:03 ddr Exp $ *)
+(* $Id: history.ml,v 3.6 2000-06-16 08:58:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -113,7 +113,7 @@ value print_history_line conf base line i =
   match line_fields conf base line with
   [ Some (time, user, action, p) ->
       do if i = 0 then Wserver.wprint "<dl>\n" else ();
-         Wserver.wprint "<dt><tt>%s</tt>\n" time;
+         Wserver.wprint "<dt>* <tt>%s</tt>\n" time;
          Wserver.wprint "(%s)\n" action;
          if user <> "" then Wserver.wprint "<em>%s</em>" user else ();
          Wserver.wprint "\n<dd>";
