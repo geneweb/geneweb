@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.84 2002-03-22 17:49:34 ddr Exp $
+# $Id: lexicon.txt,v 4.85 2002-03-27 09:37:33 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -51,10 +51,10 @@ af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es
 ca: af=africà/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/sv=suec/zh=Xinès
 cs: af=afrikán¹tina/cs=èe¹tina/da=dán¹tina/de=nìmèina/en=angliètina/eo=esperanto/es=¹panìl¹tina/fi=fin¹tina/fr=francouz¹tina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/nl=holand¹tina/no=nor¹tina/pt=portugal¹tina/pt-br=brasil¹tina/ru=ru¹tina/sv=¹véd¹tina/zh=èín¹tina
 da: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ru=russisk/sv=svensk/zh=kinesisk
-de: af=Afrikaans/cs=Tschechisch/da=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/nl=Holl&auml;ndisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ru=Russisch/sv=Schwedisch/zh=Chinesisch
+de: af=Afrikaans/ca=Katalanisch/cs=Tschechisch/da=D&auml;nisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/nl=Holl&auml;ndisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ru=Russisch/sv=Schwedisch/zh=Chinesisch
 en: af=Afrikaans/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ru=Russian/sv=Swedish/zh=Chinese
 eo: en=anglo/eo=esperanto/fr=franco
-es: ca=Catalán/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/fr=Franc&eacute;s/he=Hebreo/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/pt-br=Portug&eacute;s-del-Brasil/sv=Sueco/zh=Chino
+es: af=Afrikaans/ca=Catalán/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/et=Estonio/fi=Fin&eacute;s/fr=Franc&eacute;s/he=Hebreo/is=Island&eacute;s/it=Italiano/lv=Lituano/nl=Neerland&eacute;s/no=Noruego/pl=Polaco/pt=Portug&eacute;s/pt-br=Portug&eacute;s de Brasil/ru=Ruso/sv=Sueco/zh=Chino
 et: af=afrikaani/ca=katalaani/cs=t¨ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/sv=rootsi/zh=hiina
 fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/pt-br=Brasilian-portugali/ru=ven&auml;j&auml;/sv=ruotsi/zh=kiina
 fr: af=afrikaans/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finnois/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ru=russe/sv=su&eacute;dois/zh=chinois
@@ -1502,7 +1502,7 @@ af: 'n voorsaat
 ca: un avantpassat
 cs: pøedek
 da: en forfader
-de: ein:d:+em Vorfahre/eine:d:+r Vorfahrin
+de: ein:d:+em Vorfahre:d:+n/eine:d:+r Vorfahrin
 en: an ancestor
 eo: prapatro/prapatrino
 es: un ancestro
