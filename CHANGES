@@ -8,6 +8,7 @@ GeneWeb Version 1.07
   - fixed bug, missing ancestors were printed in reverse order
   - fixed bug, could not find file "start.txt" in -hd directory.
   - used flags for languages selection instead of tables
+  - better displaying of dates for the miscellaneous languages
 
 * ged2gwb:
   - does not stop any more when bad GEDCOM line found => warning and goes on.

@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.5 1998-09-24 12:57:31 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.6 1998-09-24 16:52:01 ddr Exp $ *)
 
 open Unix;
 
@@ -402,30 +402,37 @@ value cleanup_sons () =
      pids.val
 ;
 
-value accept_connection tmout max_clients robot_excluder callback s =
-  do match max_clients with
-     [ Some m ->
-         do if List.length pids.val >= m then
+value wait_available max_clients s =
+  match max_clients with
+  [ Some m ->
+      do if List.length pids.val >= m then
+(*
 let tm = Unix.localtime (Unix.time ()) in
 do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "%d clients running; waiting...\n" m; flush Pervasives.stderr; return
-              let (pid, _) = Unix.wait () in
+*)
+           let (pid, _) = Unix.wait () in
+(*
 let tm = Unix.localtime (Unix.time ()) in
 do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "ok: place for another client\n"; flush Pervasives.stderr; return
-              pids.val := list_remove pid pids.val
-            else ();
-            if pids.val <> [] then cleanup_sons () else ();
-            let stop_verbose = ref False in
-            while pids.val <> [] && select [s] [] [] 15.0 = ([], [], []) do
-              cleanup_sons ();
-              if pids.val <> [] && not stop_verbose.val then
-                do stop_verbose.val := True; return
-                let tm = Unix.localtime (Unix.time ()) in
+*)
+           pids.val := list_remove pid pids.val
+         else ();
+         if pids.val <> [] then cleanup_sons () else ();
+         let stop_verbose = ref False in
+         while pids.val <> [] && select [s] [] [] 15.0 = ([], [], []) do
+           cleanup_sons ();
+           if pids.val <> [] && not stop_verbose.val then
+             do stop_verbose.val := True; return
+             let tm = Unix.localtime (Unix.time ()) in
 do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val); flush Pervasives.stderr; return ()
-              else ();
-            done;
-         return ()
-     | None -> () ];
-  return
+           else ();
+         done;
+     return ()
+  | None -> () ]
+;
+
+value accept_connection tmout max_clients robot_excluder callback s =
+  do wait_available max_clients s; return
   let (t, addr) = accept s in
   do setsockopt t SO_KEEPALIVE True; return
   if is_robot robot_excluder addr then robot_error t else

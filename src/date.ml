@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.1.1.1 1998-09-01 14:32:06 ddr Exp $ *)
+(* $Id: date.ml,v 1.2 1998-09-24 16:51:57 ddr Exp $ *)
 
 open Def;
 open Util;
@@ -6,33 +6,69 @@ open Gutil;
 
 value nbsp = "&nbsp;";
 
+value code_date conf encoding d m y =
+  loop 0 where rec loop i =
+    if i = String.length encoding then ""
+    else
+      let (s, i) =
+        match encoding.[i] with
+        [ '%' when i + 1 < String.length encoding ->
+            let s =
+              match encoding.[i+1] with
+              [ 'd' -> string_of_int d
+              | 'm' -> transl_nth conf "(month)" (m - 1)
+              | 'y' -> string_of_int y
+              | c -> "%" ^ String.make 1 c ]
+            in
+            (s, i + 1)
+        | ' ' -> (nbsp, i)
+        | c -> (String.make 1 c, i) ]
+      in
+      s ^ loop (i + 1)
+;
+
 value string_of_ondate conf d =
   match d with
-  [ Djma d m y ->
+  [ Djma 1 m y ->
+      let encoding = transl_nth conf "(date)" 0 in
       transl conf "on (day month year)" ^ nbsp ^
-      transl_nth conf "(day)" (d - 1) ^ nbsp ^
-      transl_nth conf "(month)" (m - 1) ^ nbsp ^ string_of_int y
+      code_date conf encoding 0 m y
+  | Djma d m y ->
+      let encoding = transl_nth conf "(date)" 1 in
+      transl conf "on (day month year)" ^ nbsp ^
+      code_date conf encoding d m y
   | Dma m y ->
+      let encoding = transl_nth conf "(date)" 2 in
       transl conf "in (month year)" ^ nbsp ^
-      transl_nth conf "(month)" (m - 1) ^ nbsp ^ string_of_int y
-  | Da Sure y -> transl conf "in (year)" ^ nbsp ^ string_of_int y
-  | Da About y -> transl conf "about (year)" ^ nbsp ^ string_of_int y
-  | Da Maybe y -> transl conf "maybe in (year)" ^ nbsp ^ string_of_int y
-  | Da Before y -> transl conf "before (year)" ^ nbsp ^ string_of_int y
-  | Da After y -> transl conf "after (year)" ^ nbsp ^ string_of_int y
-  | Da (OrYear z) y ->
-      transl conf "in (year)" ^ nbsp ^ string_of_int y ^ nbsp ^
-      transl conf "or" ^ nbsp ^ string_of_int z ]
+      code_date conf encoding 0 m y
+  | Da p y ->
+      let encoding = transl_nth conf "(date)" 3 in
+      let sy = code_date conf encoding 0 0 y in
+      match p with
+      [ Sure -> transl conf "in (year)" ^ nbsp ^ sy
+      | About -> transl conf "about (year)" ^ nbsp ^ sy
+      | Maybe -> transl conf "maybe in (year)" ^ nbsp ^ sy
+      | Before -> transl conf "before (year)" ^ nbsp ^ sy
+      | After -> transl conf "after (year)" ^ nbsp ^ sy
+      | OrYear z ->
+          transl conf "in (year)" ^ nbsp ^ sy ^ " " ^
+          transl conf "or" ^ " " ^ code_date conf encoding 0 0 z ] ]
 ;
 
 value string_of_date conf d =
   match d with
-  [ Djma d m y ->
-      transl_nth conf "(day)" (d - 1) ^ " " ^
-      transl_nth conf "(month)" (m - 1) ^ " " ^ string_of_int y
+  [ Djma 1 m y ->
+      let encoding = transl_nth conf "(date)" 0 in
+      code_date conf encoding 0 m y
+  | Djma d m y ->
+      let encoding = transl_nth conf "(date)" 1 in
+      code_date conf encoding d m y
   | Dma m y ->
-      transl_nth conf "(month)" (m - 1) ^ " " ^ string_of_int y
-  | Da Sure y -> string_of_int y
+      let encoding = transl_nth conf "(date)" 2 in
+      code_date conf encoding 0 m y
+  | Da Sure y ->
+      let encoding = transl_nth conf "(date)" 3 in
+      code_date conf encoding 0 0 y
   | Da _ _ -> "..." ]
 ;
 
