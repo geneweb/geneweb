@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.20 2000-10-20 18:00:33 ddr Exp $
+# $Id: a.gwf,v 3.21 2000-10-25 02:34:54 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -125,7 +125,19 @@ places_inverted=no
 # been renamed:
 #renamed=newname
 
-# Template to be used (applies to personal pages):
+# Templates.
+#
+# For the moment, there is a template only for the "personal page",
+# which is named "perso.txt". The standard template is located in the
+# etc directory. Other templates can be added in sub directories of
+# the etc directory: e.g. etc/foo/perso.txt, etc/bar/perso.txt, and so on.
+#
+# The "template" variable tells which templates are allowed for this
+# data base and gives the default template. It is a list of directories
+# separated by commas. Empty directory means "the standard template".
+# Star means "any template". The first of the list gives the default
+# template # to be used. Examples:
+#
 # template=*       any template allowed; default = standard one
 # template=foo,*   any template allowed; default = foo
 # template=foo,bar only foo and bar templates allowed
@@ -133,6 +145,8 @@ places_inverted=no
 # template=,foo    only foo and standard template allowed; default = standard
 # template=        only standard template allowed
 # template=foo     only foo template allowed
-# Default is template=*
-# The used template can be changed in URLs by adding ";templ=foo".
-#template=*
+#
+# Default is template=database-name,*
+# The template to be used can be changed by adding ";templ=foo" in the URL
+#
+#template=a,*
