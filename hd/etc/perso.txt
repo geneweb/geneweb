@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.15 2002-09-23 10:05:00 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.16 2002-09-23 14:49:50 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -207,7 +207,7 @@
       %else;%apply;married_to_with_date(on_marriage_date)
       %end;
     %else;
-      %if;(on_marriage_date = "")%apply;married_to_with_place("")
+      %if;(on_marriage_date = "")%apply;married_to_with_place(marriage_place)
       %else;
         %apply;married_to_with_date_and_place(on_marriage_date,marriage_place)
       %end;
