@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.4 2000-05-03 13:44:52 ddr Exp $ *)
+(* $Id: doc.ml,v 3.5 2000-05-03 13:55:26 ddr Exp $ *)
 
 open Config;
 
@@ -93,13 +93,12 @@ value print conf =
   in
   let v = if v = "" then "index.htm" else v in
   if url_is_implicit v then
-    let vdir = url_dirname v in
-    let v = if Sys.os_type = "MacOS" then mac_name_of_url_name v else v in
-    let v =
+    let fname = if Sys.os_type = "MacOS" then mac_name_of_url_name v else v in
+    let fname =
       if Filename.check_suffix v ".htm" then v
       else v ^ ".htm"
     in 
-    let fname = Filename.concat Util.doc_dir.val v in
+    let fname = Filename.concat Util.doc_dir.val fname in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do Util.html conf; return
@@ -114,7 +113,7 @@ value print conf =
           return Buff.get len.val
         in
         let pref_doc =
-          let dir = url_dirname vdir ^ "/" in
+          let dir = url_dirname v  ^ "/" in
           let dir = if dir = "./" then "" else dir in
           conf.indep_command ^ "m=DOC;v=" ^ dir
         in
