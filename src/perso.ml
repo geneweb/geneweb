@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.2 1999-03-16 18:37:16 ddr Exp $ *)
+(* $Id: perso.ml,v 2.3 1999-03-18 18:06:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -884,7 +884,7 @@ value print conf base p =
      if age_autorise conf base p then
        List.iter
          (fun n ->
-            do Wserver.wprint "<em>(%s)</em>\n" (coa conf (sou base n));
+            do Wserver.wprint "<em>(%s...)</em>\n" (coa conf (sou base n));
                html_br conf;
             return ())
          p.first_names_aliases
