@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.14 2002-10-02 11:55:57 ddr Exp $ *)
+(* $Id: some.ml,v 4.15 2002-10-02 15:12:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -198,139 +198,139 @@ value she_has_children_with_her_name conf base wife husband children =
 
 value max_lev = 3;
 
-value rec print_branch conf base first_lev psn lev name p =
-  do {
-    let image_sel_txt = "<tt>o</tt>" in
-    let image_unsel_txt = "<tt>+</tt>" in
-    let image_nosel_txt = "<tt>o</tt>" in
-    let print_image_select conf =
-      fun
-      [ Some (ifam, sel) ->
-          let ifam_txt = string_of_int (Adef.int_of_ifam ifam) in
-          let req =
-            List.fold_left
-              (fun req (k, v) ->
-                 if not sel && k = "u" && v = ifam_txt then req
-                 else
-                   let s = k ^ "=" ^ v in
-                   if req = "" then s else req ^ ";" ^ s)
-              "" conf.env
-          in
-          do {
-            stag "a" "name=%s" ifam_txt begin
-              stag "a"
-                "href=\"%s%s%s%s\"" (commd conf) req
-                  (if sel then ";u=" ^ ifam_txt else "")
-                  (if sel || List.mem_assoc "u" conf.env then "#" ^ ifam_txt
-                   else "")
-              begin
-                Wserver.wprint "%s"
-                  (if sel then image_sel_txt else image_unsel_txt);
-              end;
+value print_branch conf base is_first_lev psn lev name p =
+  let image_sel_txt = "<tt>o</tt>" in
+  let image_unsel_txt = "<tt>+</tt>" in
+  let image_nosel_txt = "<tt>o</tt>" in
+  let print_image_select conf =
+    fun
+    [ Some (txt, sel) ->
+        let req =
+          List.fold_left
+            (fun req (k, v) ->
+               if not sel && k = "u" && v = txt then req
+               else
+                 let s = k ^ "=" ^ v in
+                 if req = "" then s else req ^ ";" ^ s)
+            "" conf.env
+        in
+        do {
+          stag "a" "name=%s" txt begin
+            stag "a"
+              "href=\"%s%s%s%s\"" (commd conf) req
+                (if sel then ";u=" ^ txt else "")
+                (if sel || List.mem_assoc "u" conf.env then "#" ^ txt
+                 else "")
+            begin
+              Wserver.wprint "%s"
+                (if sel then image_sel_txt else image_unsel_txt);
             end;
-            Wserver.wprint "\n";
-          }
-      | None -> Wserver.wprint "%s\n" image_nosel_txt ]
-    in
-    let unsel_list =
-      List.fold_left
-        (fun sl (k, v) ->
-           try
-             if k = "u" then [int_of_string v :: sl]
-             else sl
-           with
-           [ Failure _ -> sl ])
-        [] conf.env
-    in
-    let u = uget conf base p.cle_index in
-    let family_list =
-      List.map
-        (fun ifam ->
-           let fam = foi base ifam in
-           let des = doi base ifam in
-           let c = spouse p.cle_index (coi base ifam) in
-           let el = des.children in
-           let c = pget conf base c in
-           let down =
-             p.sex = Male &&
-             (Name.crush_lower (p_surname base p) =
-                Name.crush_lower name ||
-              first_lev) &&
-             Array.length des.children <> 0 ||
-             p.sex = Female &&
-             she_has_children_with_her_name conf base p c el
-           in
-           let sel = not (List.memq (Adef.int_of_ifam ifam) unsel_list) in
-           (fam, des, c, if down then Some (ifam, sel) else None))
-        (Array.to_list u.family)
-    in
-    let select =
-      match family_list with
-      [ [(_, _, _, select) :: _] -> select
-      | _ -> None ]
-    in
-    if lev == 0 then () else Wserver.wprint "<dd>\n";
-    print_image_select conf select;
-    Wserver.wprint "<strong>";
-    Wserver.wprint "%s"
-      (Util.reference conf base p
-         (if conf.hide_names && not (fast_auth_age conf p) then "x"
-          else if not psn && p_surname base p = name then
-            person_text_without_surname conf base p
-          else person_text conf base p));
-    Wserver.wprint "</strong>";
-    Wserver.wprint "%s" (Date.short_dates_text conf base p);
-    Wserver.wprint "\n";
-    if Array.length u.family == 0 then ()
-    else
-      let _ =
-        List.fold_left
-          (fun first (fam, des, c, select) ->
-             do {
-               if not first then do {
-                 Wserver.wprint "</dd>\n<dd>\n";
-                 print_image_select conf select;
-                 Wserver.wprint "<em>";
-                 Wserver.wprint "%s"
-                   (if conf.hide_names && not (fast_auth_age conf p) then "x"
-                    else if p_surname base p = name then
-                      person_text_without_surname conf base p
-                    else person_text conf base p);
-                 Wserver.wprint "</em>";
-                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                 Wserver.wprint "\n";
-               }
-               else ();
-               Wserver.wprint "  &amp;";
-               Wserver.wprint "%s"
-                 (Date.short_marriage_date_text conf base fam p c);
-               Wserver.wprint " <strong>";
-               Wserver.wprint "%s"
-                 (reference conf base c
-                    (if conf.hide_names && not (fast_auth_age conf c) then "x"
-                     else person_text conf base c));
-               Wserver.wprint "</strong>";
-               Wserver.wprint "%s" (Date.short_dates_text conf base c);
-               Wserver.wprint "\n";
-               match select with
-               [ Some (_, True) ->
-                   do {
-                     Wserver.wprint "<dl><dt>\n";
-                     List.iter
-                       (fun e ->
-                          print_branch conf base False psn (succ lev) name
-                            (pget conf base e))
-                       (Array.to_list des.children);
-                     Wserver.wprint "</dt></dl>\n";
-                     False
-                   }
-               | Some (_, False) | None -> False ]
-             })
-          True family_list
+          end;
+          Wserver.wprint "\n";
+        }
+    | None -> Wserver.wprint "%s\n" image_nosel_txt ]
+  in
+  let unsel_list =
+    List.fold_left
+      (fun sl (k, v) ->
+         try
+           if k = "u" then [int_of_string v :: sl]
+           else sl
+         with
+         [ Failure _ -> sl ])
+      [] conf.env
+  in
+  loop is_first_lev lev p where rec loop is_first_lev lev p =
+    do {
+      let u = uget conf base p.cle_index in
+      let family_list =
+        List.map
+          (fun ifam ->
+             let fam = foi base ifam in
+             let des = doi base ifam in
+             let c = spouse p.cle_index (coi base ifam) in
+             let el = des.children in
+             let c = pget conf base c in
+             let down =
+               p.sex = Male &&
+               (Name.crush_lower (p_surname base p) =
+                  Name.crush_lower name ||
+                is_first_lev) &&
+               Array.length des.children <> 0 ||
+               p.sex = Female &&
+               she_has_children_with_her_name conf base p c el
+             in
+             let i = Adef.int_of_ifam ifam in
+             let sel = not (List.memq i unsel_list) in
+             (fam, des, c, if down then Some (string_of_int i, sel) else None))
+          (Array.to_list u.family)
       in
-      ();
-    if lev == 0 then () else Wserver.wprint "</dd>\n";
-  }
+      let select =
+        match family_list with
+        [ [(_, _, _, select) :: _] -> select
+        | _ -> None ]
+      in
+      if lev == 0 then () else Wserver.wprint "<dd>\n";
+      print_image_select conf select;
+      Wserver.wprint "<strong>";
+      Wserver.wprint "%s"
+        (Util.reference conf base p
+           (if conf.hide_names && not (fast_auth_age conf p) then "x"
+            else if not psn && p_surname base p = name then
+              person_text_without_surname conf base p
+            else person_text conf base p));
+      Wserver.wprint "</strong>";
+      Wserver.wprint "%s" (Date.short_dates_text conf base p);
+      Wserver.wprint "\n";
+      if Array.length u.family == 0 then ()
+      else
+        let _ =
+          List.fold_left
+            (fun first (fam, des, c, select) ->
+               do {
+                 if not first then do {
+                   Wserver.wprint "</dd>\n<dd>\n";
+                   print_image_select conf select;
+                   Wserver.wprint "<em>";
+                   Wserver.wprint "%s"
+                     (if conf.hide_names && not (fast_auth_age conf p) then "x"
+                      else if p_surname base p = name then
+                        person_text_without_surname conf base p
+                      else person_text conf base p);
+                   Wserver.wprint "</em>";
+                   Wserver.wprint "%s" (Date.short_dates_text conf base p);
+                   Wserver.wprint "\n";
+                 }
+                 else ();
+                 Wserver.wprint "  &amp;";
+                 Wserver.wprint "%s"
+                   (Date.short_marriage_date_text conf base fam p c);
+                 Wserver.wprint " <strong>";
+                 Wserver.wprint "%s"
+                   (reference conf base c
+                      (if conf.hide_names && not (fast_auth_age conf c) then
+                         "x"
+                       else person_text conf base c));
+                 Wserver.wprint "</strong>";
+                 Wserver.wprint "%s" (Date.short_dates_text conf base c);
+                 Wserver.wprint "\n";
+                 match select with
+                 [ Some (_, True) ->
+                     do {
+                       Wserver.wprint "<dl><dt>\n";
+                       List.iter
+                         (fun e -> loop False (succ lev) (pget conf base e))
+                         (Array.to_list des.children);
+                       Wserver.wprint "</dt></dl>\n";
+                       False
+                     }
+                 | Some (_, False) | None -> False ]
+               })
+            True family_list
+        in
+        ();
+      if lev == 0 then () else Wserver.wprint "</dd>\n";
+    }
 ;
 
 value print_by_branch x conf base not_found_fun (pl, homonymes) =
