@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.9 1998-11-06 17:57:27 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.10 1998-12-11 15:11:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -44,6 +44,7 @@ value get_nth conf key cnt =
 value rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
   [ Some s ->
+      let s = only_printable s in
       let (sl, ext) = reconstitute_string_list conf var ext (cnt + 1) in
       match get_nth conf ("add_" ^ var) cnt with
       [ Some "on" -> ([s; "" :: sl], True)
@@ -74,7 +75,7 @@ value rec reconstitute_titles conf ext cnt =
         match (get_nth conf "t_main_title" cnt, t_name) with
         [ (Some "on", _) -> Tmain
         | (_, "") -> Tnone
-        | (_, _) -> Tname t_name ]
+        | (_, _) -> Tname (only_printable t_name) ]
       in
       let t_date_start =
         Update.reconstitute_date conf ("t_date_start" ^ string_of_int cnt)
@@ -88,7 +89,8 @@ value rec reconstitute_titles conf ext cnt =
         | _ -> 0 ]
       in
       let t =
-        {t_name = t_name; t_title = t_title; t_place = t_place;
+        {t_name = t_name; t_title = only_printable t_title;
+         t_place = only_printable t_place;
          t_date_start = Adef.codate_of_od t_date_start;
          t_date_end = Adef.codate_of_od t_date_end;
          t_nth = t_nth}
@@ -146,14 +148,14 @@ value reconstitute_person conf =
       try int_of_string (strip_spaces (get conf "occ")) with
       [ Failure _ -> 0 ]
   in
-  let photo = get conf "photo" in
+  let photo = only_printable (get conf "photo") in
   let (first_names_aliases, ext) =
     reconstitute_string_list conf "first_name_alias" ext 0
   in
   let (surnames_aliases, ext) =
     reconstitute_string_list conf "surname_alias" ext 0
   in
-  let public_name = get conf "public_name" in
+  let public_name = only_printable (get conf "public_name") in
   let (nicknames, ext) = reconstitute_string_list conf "nickname" ext 0 in
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
@@ -164,7 +166,7 @@ value reconstitute_person conf =
     | Some "Private" -> Private
     | _ -> IfTitles ]
   in
-  let occupation = strip_spaces (get conf "occu") in
+  let occupation = only_printable (get conf "occu") in
   let sex =
     match p_getenv conf.env "sex" with
     [ Some "M" -> Masculin
@@ -173,9 +175,9 @@ value reconstitute_person conf =
   in
   let public = False in
   let birth = Adef.codate_of_od (Update.reconstitute_date conf "birth") in
-  let birth_place = get conf "birth_place" in
+  let birth_place = only_printable (get conf "birth_place") in
   let bapt = Adef.codate_of_od (Update.reconstitute_date conf "bapt") in
-  let bapt_place = get conf "bapt_place" in
+  let bapt_place = only_printable (get conf "bapt_place") in
   let death = reconstitute_death conf in
   let death_place =
     match death with
@@ -185,7 +187,7 @@ value reconstitute_person conf =
   let burial = reconstitute_burial conf in
   let burial_place =
     match burial with
-    [ Buried _ | Cremated _ -> get conf "burial_place"
+    [ Buried _ | Cremated _ -> only_printable (get conf "burial_place")
     | _ -> "" ]
   in
   let death =
@@ -194,7 +196,7 @@ value reconstitute_person conf =
     | _ -> death ]
   in
   let notes = strip_spaces (strip_controls_m (get conf "notes")) in
-  let psources = strip_spaces (get conf "src") in
+  let psources = only_printable (get conf "src") in
   let p =
     {first_name = first_name; surname = surname; occ = occ;
      photo = photo;
@@ -205,13 +207,13 @@ value reconstitute_person conf =
      occupation = occupation;
      sexe = sex; access = access;
      birth = birth; birth_place = birth_place;
-     birth_src = get conf "birth_src";
+     birth_src = only_printable (get conf "birth_src");
      baptism = bapt; baptism_place = bapt_place;
-     baptism_src = get conf "bapt_src";
+     baptism_src = only_printable (get conf "bapt_src");
      death = death; death_place = death_place;
-     death_src = get conf "death_src";
+     death_src = only_printable (get conf "death_src");
      burial = burial; burial_place = burial_place;
-     burial_src = get conf "burial_src";
+     burial_src = only_printable (get conf "burial_src");
      family = [| |]; notes = notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in

@@ -4,6 +4,10 @@ Internal Changes
 GeneWeb Version 1.10
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [11/12/98] Fixed bugs: newlines at end of fields displayed as newlines
+    by "gwu", resulting of future syntax errors in "gwc"
+
 GeneWeb Version 1.09
 --------------------
 
