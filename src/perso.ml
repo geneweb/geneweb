@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.1 1999-03-08 11:19:03 ddr Exp $ *)
+(* $Id: perso.ml,v 2.2 1999-03-16 18:37:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -784,11 +784,18 @@ value print conf base p =
            [ Some f ->
                let s = Unix.stat f in
                let b = Filename.basename f in
-               do Wserver.wprint "<img src=\"%sm=IM;v=%s;d=%d\" alt=\"%s\">"
+               let wid_hei =
+                 match image_size f with
+                 [ Some (wid, hei) ->
+                     " width=" ^ string_of_int wid ^ " height=" ^
+                     string_of_int hei
+                 | None -> "" ]
+               in
+               do Wserver.wprint "<img src=\"%sm=IM;v=%s;d=%d\"%s alt=\"%s\">"
                     (commd conf) (Util.code_varenv b)
                     (int_of_float
                        (mod_float s.Unix.st_mtime (float_of_int max_int)))
-                    photo_txt;
+                    wid_hei photo_txt;
                   html_p conf;
                return ()
            | None -> () ]
@@ -800,16 +807,17 @@ value print conf base p =
                 html_p conf;
              return ()
            else if Filename.is_implicit s then
-             let fname1 =
-               List.fold_right Filename.concat
-                 [Util.base_dir.val; "images"; conf.bname] s
-             in
-             let fname2 =
-               List.fold_right Filename.concat [Util.base_dir.val; "images"] s
-             in
-             if Sys.file_exists fname1 || Sys.file_exists fname2 then
-               do Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\">"
-                    (commd conf) s photo_txt;
+             let fname = Util.image_file_name conf.bname s in
+             if Sys.file_exists fname then
+               let wid_hei =
+                 match image_size fname with
+                 [ Some (wid, hei) ->
+                     " width=" ^ string_of_int wid ^ " height=" ^
+                     string_of_int hei
+                 | None -> "" ]
+               in
+               do Wserver.wprint "<img src=\"%sm=IM;v=%s\"%s alt=\"%s\">"
+                    (commd conf) s wid_hei photo_txt;
                   html_p conf;
                return ()
              else ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.1 1999-03-08 11:19:31 ddr Exp $ *)
+(* $Id: util.ml,v 2.2 1999-03-16 18:37:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -498,15 +498,16 @@ value plus_decl s =
 ;
 
 value transl_decline conf w s =
+  let s1 = if s = "" then "" else " " ^ s in
   let wt = transl conf w in
   if wt.[String.length wt - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then nth_field wt 1 ^ s
-    else nth_field wt 0 ^ " " ^ s
+    else nth_field wt 0 ^ s1
   else
     match plus_decl wt with
     [ Some (start, decl) ->
         start ^ (if s = "" then "" else " " ^ decline conf decl s)
-    | None -> wt ^ " " ^ s ]
+    | None -> wt ^ s1 ]
 ;
 
 value ftransl conf (s : format 'a 'b 'c) : format 'a 'b 'c =
@@ -765,11 +766,54 @@ value commd_no_params conf =
     "" conf.henv
 ;
 
+value image_file_name bname str =
+  let fname1 =
+    List.fold_right Filename.concat [base_dir.val; "images"; bname] str
+  in
+  let fname2 =
+    List.fold_right Filename.concat [base_dir.val; "images"] str
+  in
+  let fname3 =
+    List.fold_right Filename.concat [lang_dir.val; "images"] str
+  in
+  if Sys.file_exists fname1 then fname1
+  else if Sys.file_exists fname2 then fname2
+  else fname3
+;
+
+value image_size fname =
+  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let r =
+        try
+          let magic =
+            let s = String.create 4 in
+            do really_input ic s 0 4; return s
+          in
+          if magic = "GIF8" then
+            do seek_in ic 6; return
+            let wid = let x = input_byte ic in input_byte ic * 256 + x in
+            let hei = let x = input_byte ic in input_byte ic * 256 + x in
+            Some (wid, hei)
+          else None
+        with
+        [ Sys_error _ | End_of_file -> None ]
+      in
+      do close_in ic; return r
+  | None -> None ]
+;
+
 value print_link_to_welcome conf right_aligned =
   let dir = if conf.is_rtl then "left" else "right" in
+  let wid_hei =
+    match image_size (image_file_name conf.bname "up.gif") with
+    [ Some (wid, hei) ->
+        " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
+    | None -> "" ]
+  in
   do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\"%s>"
-       (commd conf) (if right_aligned then " align=" ^ dir else "");
+     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\"%s alt=\"^^\"%s>"
+       (commd conf) wid_hei (if right_aligned then " align=" ^ dir else "");
      Wserver.wprint "</a>\n";
   return ()
 ;

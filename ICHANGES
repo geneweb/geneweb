@@ -1,10 +1,12 @@
-Internal Changes
-****************
+Internal and very small Changes
+*******************************
 
 GeneWeb Version 2.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Mar 16, 99] Deleted display of trailing space in some links like in
+    "Modify" in page "update" for example.
   - [Mar 14, 99] Cleaned up some generated HTML code.
   - [Mar 10, 99] Inlined "List.remove_assoc" in order to be compilable
     by Ocaml and Camlp4 2.01 as well.

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.1 1999-03-08 11:18:42 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.2 1999-03-16 18:37:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -464,20 +464,7 @@ value content_image cgi t len =
 ;
 
 value print_image cgi bname str t =
-  let fname =
-    let fname1 =
-      List.fold_right Filename.concat [Util.base_dir.val; "images"; bname] str
-    in
-    let fname2 =
-      List.fold_right Filename.concat [Util.lang_dir.val; "images"] str
-    in
-    let fname3 =
-      List.fold_right Filename.concat [Util.base_dir.val; "images"] str
-    in
-    if Sys.file_exists fname1 then fname1
-    else if Sys.file_exists fname2 then fname2
-    else fname3
-  in
+  let fname = Util.image_file_name bname str in
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do try
