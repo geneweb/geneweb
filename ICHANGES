@@ -4,7 +4,8 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.05
 --------------------
 
-* Distribution
+* General
+  - [08 Jun 00] Strip executables.
   - [07 May 00] The files CHANGES and LICENSE now end with .txt.
 
 * Gwsetup program

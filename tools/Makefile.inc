@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 3.1 2000-01-10 02:14:42 ddr Exp $
+# $Id: Makefile.inc,v 3.2 2000-06-08 19:52:10 ddr Exp $
 
 CAMLP4_COMM=../tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
 CAMLP4F=-DUNIX
@@ -8,6 +8,7 @@ OCAMLC=ocamlc.opt
 OCAMLOPT=ocamlopt.opt
 OCAMLI=
 OCAMLD=
+STRIP=strip
 RM=/bin/rm -f
 EXE=
 

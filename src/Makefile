@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.12 2000-05-03 09:50:40 ddr Exp $
+# $Id: Makefile,v 3.13 2000-06-08 19:52:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -28,6 +28,7 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
 	cp consang.opt consang
 	cp gwd.opt gwd
 	cp gwu.opt gwu
+	$(STRIP) gwc consang gwd gwu
 
 clean::
 	$(RM) gwc consang gwd gwu

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.2 2000-04-09 01:17:35 ddr Exp $
+# $Id: Makefile,v 3.3 2000-06-08 19:52:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -14,6 +14,7 @@ out:: setup.out
 opt:: setup.opt
 	$(RM) gwsetup
 	cp setup.opt gwsetup
+	$(STRIP) gwsetup
 
 clean::
 	$(RM) gwsetup *.bat
