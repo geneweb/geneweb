@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.23 1999-04-28 16:53:00 ddr Exp $ *)
+(* $Id: perso.ml,v 2.24 1999-04-29 21:01:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -831,10 +831,11 @@ value print conf base p =
                      string_of_int hei
                  | None -> "" ]
                in
-               do Wserver.wprint "<img src=\"%sm=IM;v=%s;d=%d\"%s alt=\"%s\">"
-                    (commd conf) (Util.code_varenv b)
+               do Wserver.wprint "<img src=\"%sm=IM;d=%d;v=/%s\"%s alt=\"%s\">"
+                    (commd conf)
                     (int_of_float
                        (mod_float s.Unix.st_mtime (float_of_int max_int)))
+                    (Util.code_varenv b)
                     wid_hei image_txt;
                   html_p conf;
                return ()
@@ -856,7 +857,7 @@ value print conf base p =
                      string_of_int hei
                  | None -> "" ]
                in
-               do Wserver.wprint "<img src=\"%sm=IM;v=%s\"%s alt=\"%s\">"
+               do Wserver.wprint "<img src=\"%sm=IM;v=/%s\"%s alt=\"%s\">"
                     (commd conf) s wid_hei image_txt;
                   html_p conf;
                return ()

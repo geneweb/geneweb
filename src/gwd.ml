@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.9 1999-04-29 19:55:54 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.10 1999-04-29 21:01:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -564,9 +564,16 @@ value image_request cgi str env =
   in
   match (Util.p_getenv env "m", Util.p_getenv env "v") with
   [ (Some "IM", Some fname) ->
+      let fname =
+        if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
+        else fname
+      in
       do if Filename.is_implicit fname then
            if Filename.check_suffix fname ".jpg"
            || Filename.check_suffix fname ".JPG" then
+             print_image cgi bname fname "jpeg"
+           else if Filename.check_suffix fname ".jpeg"
+           || Filename.check_suffix fname ".JPEG" then
              print_image cgi bname fname "jpeg"
            else if Filename.check_suffix fname ".gif"
            || Filename.check_suffix fname ".GIF" then
