@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.227 2001-02-11 18:40:14 ddr Exp $
+# $Id: lexicon.txt,v 3.228 2001-02-11 18:58:53 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2593,6 +2593,7 @@ ru: исчез/исчезла
 se: f&ouml;rsvunnen
 
     display by slices/slice width/overlap/total width
+ct: visualitzar per seccions/llargada de la secciу/encavalcament/llargada total
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 dk: vis ved delte sider/sidebredde/overlapning/total bredde
 en: display by slices/slice width/overlap/total width
@@ -2646,6 +2647,7 @@ ru: в разводе
 se: skilda
 
     don't group the common branches together
+ct: no reagrupar les branques comunes
 de: gemeinsame Zweige nicht zusammenfassen
 dk: sl&aring; ikke f&aelig;lles anelinier sammen
 en: don't group the common branches together
@@ -4623,6 +4625,7 @@ ru: нет совпадений
 se: inga tr&auml;ffar
 
     no sexes check
+ct: no verificar els sexes
 en: no sexes check
 fr: pas de v&eacute;rification des sexes
 
