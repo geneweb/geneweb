@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.231 2001-02-13 12:10:40 ddr Exp $
+# $Id: lexicon.txt,v 3.232 2001-02-14 02:47:08 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -5255,7 +5255,7 @@ ct: persona/persones
 de: Person/Personen
 dk: person/personer
 en: person/persons
-eo: persono:a:+n/personoj
+eo: persono:a:+n/personoj:a:+n
 es: persona/personas
 et: isik/isikud
 fi: henkil&ouml;/henkil&ouml;&auml

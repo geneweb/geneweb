@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.25 2001-02-14 01:42:14 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.26 2001-02-14 02:47:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -791,23 +791,170 @@ and ast_expr = Templ.ast_expr ==
 ;
 
 type env =
-  [ Eind of gen_person Update.key string
-  | Estring of string ]
+  [ Estring of string ]
 ;
 
-value rec eval_ast conf base env =
+type variable_value =
+  [ VVind of string
+  | VVdate of option date and string
+  | VVnone ]
+;
+
+value eval_variable conf base env p =
+  fun
+  [ ["bapt"; s] -> VVdate (Adef.od_of_codate p.baptism) s
+  | ["birth"; s] -> VVdate (Adef.od_of_codate p.birth) s
+  | [s] -> VVind s
+  | _ -> VVnone ]
+;
+
+
+value eval_person_bool_variable conf base env p =
+  fun 
+  [ v -> do Wserver.wprint "%%%s;" v; return True ]
+;
+
+value is_calendar cal =
+  fun
+  [ Some (Dgreg _ x) -> x = cal
+  | _ -> False ]
+;
+
+value is_precision cond =
+  fun
+  [ Some (Dgreg {prec = x} _) -> cond x
+  | _ -> False ]
+;
+
+value eval_date_bool_variable conf base env od =
+  fun
+  [ "gregorian_cal" -> is_calendar Dgregorian od
+  | "julian_cal" -> is_calendar Djulian od
+  | "french_cal" -> is_calendar Dfrench od
+  | "hebrew_cal" -> is_calendar Dhebrew od
+  | "no_prec" -> od = None
+  | "sure_prec" -> is_precision (fun [ Sure -> True | _ -> False ]) od
+  | "about_prec" -> is_precision (fun [ About -> True | _ -> False ]) od
+  | "maybe_prec" -> is_precision (fun [ Maybe -> True | _ -> False ]) od
+  | "before_prec" -> is_precision (fun [ Before -> True | _ -> False ]) od
+  | "after_prec" -> is_precision (fun [ After -> True | _ -> False ]) od
+  | "oryear_prec" -> is_precision (fun [ OrYear _ -> True | _ -> False ]) od
+  | "yearint_prec" -> is_precision (fun [ YearInt _ -> True | _ -> False ]) od
+  | s -> do Wserver.wprint "%%%s;" s; return False ]
+;
+
+value eval_bool_variable conf base env p sl =
+  match eval_variable conf base env p sl with
+  [ VVind s -> eval_person_bool_variable conf base env p s
+  | VVdate od s -> eval_date_bool_variable conf base env od s
+  | VVnone -> False ]
+;
+
+value eval_bool_value conf base env p =
+  eval where rec eval =
+    fun
+    [ Eor e1 e2 -> eval e1 || eval e2
+    | Eand e1 e2 -> eval e1 && eval e2
+    | Enot e -> not (eval e)
+    | Evar s sl -> eval_bool_variable conf base env p [s :: sl] ]
+;
+
+value print_person_variable conf base env p =
+  fun
+  [ s -> Wserver.wprint "%%%s;" s ]
+;
+
+value print_date_field proj =
+  fun
+  [ Some d  ->
+      let d =
+        match d with
+        [ Dgreg d Dgregorian -> Some d
+        | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
+        | Dgreg d Dfrench -> Some (Calendar.french_of_gregorian d)
+        | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
+        | _ -> None ]
+      in
+      match d with
+      [ Some d -> Wserver.wprint "%d" (proj d)
+      | None -> () ]
+  | None -> () ]
+;
+
+value print_date_text =
+  fun
+  [ Some (Dtext s) -> Wserver.wprint "%s" s
+  | _ -> () ]
+;
+
+value print_date_variable conf base env od =
+  fun
+  [ "day" -> print_date_field (fun d -> d.day) od
+  | "month" -> print_date_field (fun d -> d.month) od
+  | "text" -> print_date_text od
+  | "year" -> print_date_field (fun d -> d.year) od
+  | "oryear" ->
+      match od with
+      [ Some (Dgreg {prec = OrYear y} _) -> Wserver.wprint "%d" y
+      | Some (Dgreg {prec = YearInt y} _) -> Wserver.wprint "%d" y
+      | _ -> () ]
+  | v -> Wserver.wprint "%%%s;" v ]
+;
+
+value print_variable conf base env p sl =
+  match eval_variable conf base env p sl with
+  [ VVind s -> print_person_variable conf base env p s
+  | VVdate od s -> print_date_variable conf base env od s
+  | VVnone ->
+      do list_iter_first
+           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
+           sl;
+         Wserver.wprint "???";
+      return () ]
+;
+
+value split_at_coloncolon s =
+  loop 0 where rec loop i =
+    if i >= String.length s - 1 then None
+    else
+      match (s.[i], s.[i+1]) with
+      [ (':', ':') ->
+          let s1 = String.sub s 0 i in
+          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
+          Some (s1, s2)
+      | _ -> loop (i + 1) ]
+;
+
+value print_transl conf base env upp s c =
+  let r =
+    match c with
+    [ '0'..'9' ->
+        let n = Char.code c - Char.code '0' in
+        match split_at_coloncolon s with
+        [ None -> nominative (Util.transl_nth conf s n)
+        | Some (s1, s2) ->
+            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
+    | _ -> nominative (Util.transl conf s) ^ String.make 1 c ]
+  in
+  Wserver.wprint "%s" (if upp then capitale r else r)
+;
+
+value rec eval_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n -> Wserver.wprint "Atransl"
-  | Avar s sl -> Wserver.wprint "Avar"
+  | Atransl upp s n -> print_transl conf base env upp s n
+  | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
-  | Aif e alt ale -> Wserver.wprint "Aif"
+  | Aif e alt ale -> eval_if conf base env p e alt ale
   | Aforeach s sl al -> Wserver.wprint "Aforeach" ]
+and eval_if conf base env p e alt ale =
+  let al = if eval_bool_value conf base env p e then alt else ale in
+  List.iter (eval_ast conf base env p) al
 ;
 
 value interp_templ conf base p digest astl =
-  let env = [("p", Eind p); ("digest", Estring digest)] in
-  List.iter (eval_ast conf base env) astl
+  let env = [("digest", Estring digest)] in
+  List.iter (eval_ast conf base env p) astl
 ;
 
 value print_update_ind conf base p digest =
