@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: merge.htm,v 1.2 2002-03-05 09:07:57 ddr Exp $ -->
+  <!-- $Id: merge.htm,v 1.3 2002-06-18 10:49:03 ddr Exp $ -->
   <title>[
 de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases de donn&eacute;es
+it: Fusione di basi di dati
 sv: Sammanslagning av databaser
 ]</title>
 </head>
@@ -17,6 +18,7 @@ sv: Sammanslagning av databaser
 de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases de donn&eacute;es
+it: Fusione di basi di dati
 sv: Sammanslagning av databaser
 ]</font></h1></center>
 
@@ -30,6 +32,8 @@ de: Alle Datenbanken, die zusammengef&uuml;hrt werden sollen,
 en: All your databases to be merged must be first under
     <b><font color=#2f6400>GeneWeb</font></b>.
 fr: Il faut d'abord que toutes vos bases &agrave; fusionner soient sous
+    <b><font color=#2f6400>GeneWeb</font></b>.
+it: Prima bisogna che tutte le basi da fondere assieme siano al formato
     <b><font color=#2f6400>GeneWeb</font></b>.
 sv: Alla databaser som ska slås samman måste finnas under
     <b><font color=#2f6400>GeneWeb</font></b>.
@@ -52,6 +56,11 @@ fr: Si ce n'est pas le cas, si, par exemple, certaines d'entre elles sont
     href="gwsetup?lang=$l;v=main.htm">menu principal</a> pour les
     cr&eacute;er sous <b><font color=#2f6400>GeneWeb</font></b>, puis
     revenez &agrave; cette page.
+it: Se non &egrave; il caso e certune, ad esempio, sono
+    al formato GEDCOM o file sorgente  GeneWeb, tornate al <a
+    href="gwsetup?lang=$l;v=main.htm">menu principale</a> per crearle
+    sotto <b><font color=#2f6400>GeneWeb</font></b>, poi
+    ritornate a questa pagina.
 sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM
     filer eller GeneWeb källfiler, gå tilbaka till <a
     href = "gwsetup?lang=$l;v=main.htm">huvudmenyn</a> för att skapa dem
@@ -68,6 +77,8 @@ en: Once done, select the databases you want to merge by pushing their
     associated buttons:
 fr: Une fois fait, s&eacute;lectionnez les bases que vous voulez fusionner
     en cliquant sur leur bouton associ&eacute;:
+it: Una volta fatto ci&ograve;, selezionate le basi che volete fondere
+    cliccando sul loro bottone associato:
 sv: När du är klar, välj de databaser du vill slå samman genom att klicka
     i deras knappar:
 ]
@@ -84,6 +95,7 @@ $b{
 de: keine Datenbank vorhanden
 en: there is no database at present
 fr: il n'y a aucune base de donn&eacute;es actuellement
+it: attualmente non esiste nessuna base di dati
 sv: det finns ingen databas för närvarande
 ]</tr></td>}
 </table></dl>
@@ -96,6 +108,8 @@ de: Gib den Namen ein, den du deiner resultierenden Datenbank geben
 en: Indicate the name you want to give to your resulting database:
 fr: Indiquez le nom que vous voulez donner &agrave; votre base de
     donn&eacute;es r&eacute;sultante:
+it: Indicate il nome che volete dare alla base di
+    dati risultante:
 sv: Skriv namnet du vill ge din databas:
 ]
 
@@ -109,6 +123,7 @@ sv: Skriv namnet du vill ge din databas:
 de: Dann dr&uuml;cke diesen Knopf:
 en: Then push this button:
 fr: Puis appuyez sur ce bouton:
+it: Poi cliccate su questo bottone:
 sv: Tryck sedan denna knapp:
 ]
 
@@ -118,6 +133,7 @@ sv: Tryck sedan denna knapp:
 de: Zusammenf&uuml;hren
 en: Merge
 fr: Fusionner
+it: Fondere
 sv: Slåsamman
 ]">
 
@@ -142,6 +158,11 @@ fr: Remarque: la fusion consiste en la simple concat&eacute;nation des
     identiques. Apr&egrave;s la fusion, il faudra donc rechercher les
     &eacute;ventuelles personnes et familles en double et les fusionner.
     Voir la <a href="file://$f/doc/$l/update.htm#MrgP">documentation</a>.
+it: Nota: la fusione consiste in una semplice concatenazione delle
+    basi di dati. Non viene effettuata nessuna ricerca di persone identiche.
+    Dopo la fusione, bisogner&agrave; ricercare le eventuali
+    persone o famiglie doppie e fonderle.
+    Vedi la <a href="file://$f/doc/$l/update.htm#MrgP">documentazione</a>.
 sv: Obs: sammanslagningen lägger helt enkelt ihop databaserna. Det
     är ingen kontroll av identiska personer. Efter sammanslagningen, måste
     du därför undersöka möjligheten att det finns dubbla personer eller
