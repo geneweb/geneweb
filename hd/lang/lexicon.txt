@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.166 2000-11-02 18:50:40 ddr Exp $
+# $Id: lexicon.txt,v 3.167 2000-11-04 20:00:02 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2006,24 +2006,6 @@ pt: coment&aacute;rio
 ru: комментарий
 se: kommentar
 
-    comment added
-af: kommentaar bygevoeg
-de: Kommentar hinzugef&uuml;gt
-dk: kommentar tilf&oslash;jet
-en: comment added
-eo: komento aldonita
-fi: huomautus lis&auml;tty
-fr: commentaire ajout&eacute;
-he:   дтшд делрсд
-it: commento aggiuntivo
-lv: piebilde pievienota
-nl: commentaar toegevoegd
-is: athugasemd bжtt viр
-no: kommentar er tilfшyd
-pt: coment&aacute;rio acrescentado
-ru: комментарий добавлен
-se: kommentar tillagd
-
     consanguinity
 af: bloedverwantskap
 cs: pokrevenstvн
@@ -3788,6 +3770,14 @@ no: er sl&aring;tt sammen
 pt: fus&atilde;o terminada
 ru: объединение завершено
 se: sammanslagning klar
+
+    message/next message
+en: message/next message
+fr: message/message suivant
+
+    message added
+en: message added
+fr: message ajout&eacute;
 
     missing ancestors
 af: ontbrekende voorsate

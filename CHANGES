@@ -2,12 +2,12 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [04 Nov 00] Improved forum displaying.
   - [04 Nov 00] Fixed bug: when merging two persons, the possible notes
     of the second person could disappear.
   - [03 Nov 00] In tree display, when "images" is selected,
     also display spouses' images.
-  - [02 Nov 00] Added "subject" in forum (preparing a future change
-    in forum displaying).
+  - [02 Nov 00] Added "subject" in forum.
   - [02 Nov 00] Now display French republican years in roman digits.
   - [01 Nov 00] In nobility title display, added a link to display the
     tree of their relationship links. The tree contains only six persons
