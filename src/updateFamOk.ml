@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.29 1999-09-26 16:18:12 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.30 1999-09-29 13:58:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -25,7 +25,7 @@ value getn conf var key =
   | None -> failwith (var ^ "_" ^ key ^ " unbound") ]
 ;
 
-value reconstitute_parent conf var =
+value reconstitute_somebody conf var =
   let first_name = strip_spaces (getn conf var "fn") in
   let surname = strip_spaces (getn conf var "sn") in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
@@ -36,8 +36,6 @@ value reconstitute_parent conf var =
   in
   (first_name, surname, occ, create)
 ;
-
-value reconstitute_witness = reconstitute_parent;
 
 value reconstitute_child conf var default_surname =
   let first_name = getn conf var "fn" in
@@ -63,8 +61,8 @@ value reconstitute_child conf var default_surname =
 
 value reconstitute_family conf =
   let ext = False in
-  let father = reconstitute_parent conf "his" in
-  let mother = reconstitute_parent conf "her" in
+  let father = reconstitute_somebody conf "his" in
+  let mother = reconstitute_somebody conf "her" in
   let not_married =
     match p_getenv conf.env "not_married" with
     [ Some "true" -> True
@@ -75,7 +73,7 @@ value reconstitute_family conf =
   let (witnesses, ext) =
     loop 1 ext where rec loop i ext =
       match
-        try Some (reconstitute_witness conf ("witn" ^ string_of_int i)) with
+        try Some (reconstitute_somebody conf ("witn" ^ string_of_int i)) with
         [ Failure _ -> None ]
       with
       [ Some c ->
@@ -219,13 +217,6 @@ value family_exclude pfams efam =
   Array.of_list pfaml
 ;
 
-value array_memq x a =
-  loop 0 where rec loop i =
-    if i == Array.length a then False
-    else if x == a.(i) then True
-    else loop (i + 1)
-;
-
 value infer_origin_file conf base ncpl nfam =
   let afath = aoi base ncpl.father in
   let amoth = aoi base ncpl.mother in
@@ -336,6 +327,42 @@ value effective_mod conf base sfam scpl =
   return (nfam, ncpl)
 ;
 
+value list_filter p =
+  find [] where rec find accu =
+    fun
+    [ [] -> List.rev accu
+    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
+;
+
+value update_related_witnesses base ofam_witn nfam_witn ncpl =
+  let mod_ippl = [] in
+  let mod_ippl =
+    List.fold_left
+      (fun ippl ip ->
+         if List.memq ip ofam_witn then ippl
+         else
+           let p = poi base ip in
+           if not (List.mem ncpl.father p.related) then
+             do p.related := [ncpl.father :: p.related]; return
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
+      mod_ippl nfam_witn
+  in
+  let mod_ippl =
+    List.fold_left
+      (fun ippl ip ->
+         if List.memq ip nfam_witn then ippl
+         else
+           let p = poi base ip in
+           if List.mem ncpl.father p.related then
+             do p.related := list_filter (\<> ncpl.father) p.related; return
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
+      mod_ippl ofam_witn
+  in
+  List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
+;
+
 value effective_add conf base sfam scpl =
   let fi = Adef.ifam_of_int (base.data.families.len) in
   let created_p = ref [] in
@@ -377,6 +404,7 @@ value effective_add conf base sfam scpl =
        nfam.children;
      Update.add_misc_names_for_new_persons base created_p.val;
      Update.update_misc_names_of_family base nfath;
+     update_related_witnesses base [] (Array.to_list nfam.witnesses) ncpl;
   return (nfam, ncpl)
 ;
 

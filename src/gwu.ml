@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.20 1999-09-18 03:43:56 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.21 1999-09-29 13:58:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -352,7 +352,7 @@ value empty_family base m =
   array_forall (bogus_person base) m.m_chil
 ;
 
-value print_witness oc base mark p =
+value print_witness oc base mark p notes_pl_p =
   let a = aoi base p.cle_index in
   do Printf.fprintf oc "%s %s%s"
        (correct_string base p.surname)
@@ -363,12 +363,15 @@ value print_witness oc base mark p =
        do mark.(Adef.int_of_iper p.cle_index) := True;
           if has_infos base p then print_infos oc base False True p
           else Printf.fprintf oc " 0";
+          match sou base p.notes with
+          [ "" -> ()
+          | _ -> notes_pl_p.val := [p :: notes_pl_p.val] ];
        return ()
      else ();
   return ()
 ;
 
-value print_family oc base mark (per_sel, fam_sel) fam_done m =
+value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
   let fam = m.m_fam in
   do Printf.fprintf oc "fam ";
      print_parent oc base mark fam_sel fam m.m_fath;
@@ -394,7 +397,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done m =
              | Female -> Printf.fprintf oc " f"
              | _ -> () ];
              Printf.fprintf oc ": ";
-             print_witness oc base mark p;
+             print_witness oc base mark p notes_pl_p;
              Printf.fprintf oc "\n";
           return ())
        fam.witnesses;
@@ -454,7 +457,7 @@ value get_persons_with_notes base m list =
 value print_notes_for_person oc base p =
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
-  if surn <> "?" || fnam <> "?" then
+  if surn <> "?" && fnam <> "?" then
     do Printf.fprintf oc "\n";
        Printf.fprintf oc "notes %s %s%s\n" surn fnam
          (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
@@ -473,8 +476,8 @@ value rec list_memf f x =
 
 value eq_key p1 p2 = p1.cle_index == p2.cle_index;
 
-value print_notes oc base ml per_sel =
-  let pl = List.fold_right (get_persons_with_notes base) ml [] in
+value print_notes oc base ml per_sel pl =
+  let pl = List.fold_right (get_persons_with_notes base) ml pl in
   let pl =
     List.fold_right
       (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl])
@@ -714,10 +717,12 @@ value gwu base out_dir out_oc src_oc_list anc desc =
                   ifaml []
               in
               if ml <> [] then
+                let notes_pl_p = ref [] in
                 do if not first.val then Printf.fprintf oc "\n" else ();
                    first.val := False;
-                   List.iter (print_family oc base mark sel fam_done) ml;
-                   print_notes oc base ml per_sel;
+                   List.iter
+                     (print_family oc base mark sel fam_done notes_pl_p) ml;
+                   print_notes oc base ml per_sel notes_pl_p.val;
                    print_relations oc base mark per_sel ml;
                 return ()
               else ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.27 1999-09-28 20:11:30 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.28 1999-09-29 13:58:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -394,12 +394,21 @@ value rename_image_file conf base op sp =
 value rparents_of p =
   List.fold_left
     (fun ipl r ->
-        match (r.r_fath, r.r_moth) with
+       match (r.r_fath, r.r_moth) with
        [ (Some ip1, Some ip2) -> [ip1; ip2 :: ipl]
        | (Some ip, _) -> [ip :: ipl]
         | (_, Some ip) -> [ip :: ipl]
        | _ -> ipl ])
     [] p.rparents
+;
+
+value is_witness_at_marriage base ip p =
+do Printf.eprintf "cherche si %s est temoin au mariage de %s\n" (denomination base (poi base ip)) (denomination base p); flush stderr; return
+  List.exists
+    (fun ifam ->
+       let fam = foi base ifam in
+       array_memq ip fam.witnesses)
+    (Array.to_list p.family)
 ;
 
 value update_relation_parents base op np =
@@ -422,9 +431,11 @@ value update_relation_parents base op np =
   let mod_ippl =
     List.fold_left
       (fun ippl ip ->
-         if List.mem ip np_rparents then ippl
+         let p = poi base ip in
+         if List.mem ip np_rparents
+         || np.sex = Male && is_witness_at_marriage base ip np then
+           ippl
          else
-           let p = poi base ip in
            if List.mem pi p.related then
              do p.related := list_filter (\<> pi) p.related; return
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]

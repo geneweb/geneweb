@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.50 1999-09-28 20:11:25 ddr Exp $ *)
+(* $Id: perso.ml,v 2.51 1999-09-29 13:58:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -597,20 +597,40 @@ value print_rchild conf base c r =
   return ()
 ;
 
-value print_rchildren conf base p ic =
+value print_witness_at_marriage conf base cpl =
+  do html_li conf;
+     Wserver.wprint
+       (fcapitale (ftransl conf "witness at marriage of %s and %s"))
+       (referenced_person_title_text conf base (poi base cpl.father))
+       (referenced_person_title_text conf base (poi base cpl.mother));
+     Wserver.wprint "\n";
+  return ()
+;
+
+value print_related conf base p ic =
   let c = poi base ic in
-  List.iter
-    (fun r ->
-       do match r.r_fath with
-          [ Some ip ->
-              if ip = p.cle_index then print_rchild conf base c r else ()
-          | None -> () ];
-          match r.r_moth with
-          [ Some ip ->
-              if ip = p.cle_index then print_rchild conf base c r else ()
-          | None -> () ];
-       return ())
-    c.rparents
+  do List.iter
+       (fun r ->
+          do match r.r_fath with
+             [ Some ip ->
+                 if ip = p.cle_index then print_rchild conf base c r else ()
+             | None -> () ];
+             match r.r_moth with
+             [ Some ip ->
+                 if ip = p.cle_index then print_rchild conf base c r else ()
+             | None -> () ];
+          return ())
+       c.rparents;
+     if c.sex = Male then
+       List.iter
+         (fun ifam ->
+            let fam = foi base ifam in
+            if array_memq p.cle_index fam.witnesses then
+              print_witness_at_marriage conf base (coi base ifam)
+            else ())
+         (Array.to_list c.family)
+     else ();
+  return ()
 ;
 
 value print_fwitnesses conf base p nfam n ifam =
@@ -647,7 +667,7 @@ value print_relations conf base p =
            (capitale (transl_nth conf "relation/relations" 1));
          tag "ul" begin
            List.iter (print_relation conf base) rl;
-           List.iter (print_rchildren conf base p) cl;
+           List.iter (print_related conf base p) cl;
            Array.iteri (print_fwitnesses conf base p (Array.length p.family))
              p.family;
          end;

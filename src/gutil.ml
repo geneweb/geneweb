@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.27 1999-09-28 20:11:21 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.28 1999-09-29 13:58:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -18,6 +18,13 @@ value lindex s c =
   pos 0 where rec pos i =
     if i == String.length s then None
     else if s.[i] == c then Some i else pos (i + 1)
+;
+
+value array_memq x a =
+  loop 0 where rec loop i =
+    if i == Array.length a then False
+    else if x == a.(i) then True
+    else loop (i + 1)
 ;
 
 value string_sub s i len =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.29 1999-09-28 20:11:22 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.30 1999-09-29 13:58:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -164,7 +164,7 @@ value add_person_by_name gen first_name surname occ iper =
   Mhashtbl.add gen.g_names key iper
 ;
 
-value insert_undefined_parent gen key =
+value insert_undefined gen key =
   let occ = key.pk_occ + gen.g_shift in
   let x =
     try
@@ -305,9 +305,9 @@ value insert_person gen so =
   return x
 ;
 
-value insert_parent gen =
+value insert_somebody gen =
   fun
-  [ Undefined key -> insert_undefined_parent gen key
+  [ Undefined key -> insert_undefined gen key
   | Defined so -> insert_person gen so ]
 ;
 
@@ -346,13 +346,17 @@ value notice_sex gen p s =
 ;
 
 value insert_family gen co witl fo =
-  let pere = insert_parent gen co.father in
-  let mere = insert_parent gen co.mother in
+  let pere = insert_somebody gen co.father in
+  let mere = insert_somebody gen co.mother in
   let witl =
     List.map
       (fun (wit, sex) ->
-         let p = insert_parent gen wit in
-         do notice_sex gen p sex; return p.cle_index)
+         let p = insert_somebody gen wit in
+         do notice_sex gen p sex;
+            if not (List.mem pere.cle_index p.related) then
+              p.related := [pere.cle_index :: p.related]
+            else ();
+         return p.cle_index)
       witl
   in
   let children =
@@ -438,7 +442,7 @@ value map_option f =
 ;
 
 value insert_relation_parent gen p s k =
-  let par = insert_parent gen k in
+  let par = insert_somebody gen k in
   do if not (List.mem p.cle_index par.related) then
        par.related := [p.cle_index :: par.related]
      else ();
