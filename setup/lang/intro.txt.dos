@@ -16,8 +16,8 @@ fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
        http://localhost:$z/
 
 [
-en: Warning: for this program to work, you must not delete this window!
-fr: Attention: pour que cela fonctionne, vous ne devez pas detruire cette
+en: Warning: for this program to work, you must not close this window!
+fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette
     fenetre!
 lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
 sv: Varning: f”r att det h„r programmet ska fungera, f†r du inte st„nga

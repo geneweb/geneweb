@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.30 2002-01-21 15:28:50 ddr Exp $ *)
+(* $Id: setup.ml,v 4.31 2002-01-21 15:46:35 ddr Exp $ *)
 
 open Printf;
 
@@ -1667,7 +1667,7 @@ value intro () =
         else (default_gwd_lang, default_setup_lang)
       else do {
         let (gwd_lang, setup_lang) =
-          if String.length lang_param.val <> 2 then do {
+          if String.length lang_param.val < 2 then do {
             copy_text "" "intro.txt";
             let x = String.lowercase (input_line stdin) in
             if String.length x < 2 then
