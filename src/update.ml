@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.6 2000-03-08 14:35:34 ddr Exp $ *)
+(* $Id: update.ml,v 3.7 2000-03-09 20:06:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -8,7 +8,8 @@ open Gutil;
 open Util;
 
 exception ModErr;
-type create = [ Create of sex and option date | Link ];
+type create_info = (option date * string * option date * string);
+type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create);
 
 value rec find_free_occ base f s i =
@@ -693,7 +694,7 @@ value insert_person conf base src new_persons (f, s, o, create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
-  [ Create sex birth ->
+  [ Create sex info ->
       try
         if f = "?" || s = "?" then
           if o <= 0 || o >= base.data.persons.len then raise Not_found
@@ -709,8 +710,20 @@ value insert_person conf base src new_persons (f, s, o, create) =
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int (base.data.persons.len) in
-          let death = infer_death conf birth in
           let empty_string = insert_string conf base "" in
+          let (birth, birth_place) =
+            match info with
+            [ Some (b, bpl, _, _) -> (b, bpl)
+            | None -> (None, "") ]
+          in
+          let (death, death_place) =
+            match info with
+            [ Some (_, _, Some d, dpl) ->
+                (Death Unspecified (Adef.cdate_of_date d), dpl)
+            | Some (_, _, None, dpl) when dpl <> "" ->
+                (DeadDontKnowWhen, dpl)
+            | _ -> (infer_death conf birth, "") ]
+          in
           let p =
             {first_name = insert_string conf base f;
              surname = insert_string conf base s;
@@ -721,11 +734,13 @@ value insert_person conf base src new_persons (f, s, o, create) =
              rparents = []; related = [];
              occupation = empty_string;
              sex = sex; access = IfTitles;
-             birth = Adef.codate_of_od birth; birth_place = empty_string;
+             birth = Adef.codate_of_od birth;
+             birth_place = insert_string conf base birth_place;
              birth_src = empty_string;
              baptism = Adef.codate_None; baptism_place = empty_string;
              baptism_src = empty_string;
-             death = death; death_place = empty_string;
+             death = death;
+             death_place = insert_string conf base death_place;
              death_src = empty_string;
              burial = UnknownBurial; burial_place = empty_string;
              burial_src = empty_string;

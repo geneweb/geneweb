@@ -1,11 +1,12 @@
-(* $Id: update.mli,v 3.2 2000-01-10 02:14:42 ddr Exp $ *)
+(* $Id: update.mli,v 3.3 2000-03-09 20:06:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Config;
 
 exception ModErr;
-type create = [ Create of sex and option date | Link ];
+type create_info = (option date * string * option date * string);
+type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create);
 
 value find_free_occ : base -> string -> string -> int -> int;
