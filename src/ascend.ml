@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.25 2002-10-26 01:22:42 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.26 2002-10-26 12:07:31 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -435,9 +435,8 @@ value print_person_long_info conf base auth link p =
     if link = None && List.length p.titles > 0 &&
        (p.access <> Private || conf.friend || conf.wizard) then
        do {
-      Wserver.wprint ", <em>";
-      Perso.print_titles conf base False (transl_nth conf "and" 0) p;
-      Wserver.wprint "</em>"
+      Wserver.wprint ", <em>%s</em>"
+        (Perso.string_of_titles conf base False (transl_nth conf "and" 0) p)
     }
     else ();
     if auth then Date.print_dates conf base p else ();

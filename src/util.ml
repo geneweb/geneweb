@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.55 2002-10-26 01:22:43 ddr Exp $ *)
+(* $Id: util.ml,v 4.56 2002-10-26 12:07:34 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1497,16 +1497,17 @@ value my_string_of_float f =
   Printf.sprintf "%.6g" f
 ;
 
-value print_decimal_num conf f =
+value string_of_decimal_num conf f =
   let s = my_string_of_float f in
+  let b = Buffer.create 20 in
   let rec loop i =
-    if i == String.length s then ()
+    if i == String.length s then Buffer.contents b
     else do {
       match s.[i] with
       [ '.' ->
-         if i == String.length s - 1 then ()
-         else Wserver.wprint "%s" (transl conf "(decimal separator)")
-      | x -> Wserver.wprint "%c" x ];
+          if i == String.length s - 1 then ()
+          else Buffer.add_string b (transl conf "(decimal separator)")
+      | x -> Buffer.add_char b x ];
       loop (i + 1)
     }
   in

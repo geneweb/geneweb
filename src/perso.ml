@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.42 2002-10-26 08:20:07 ddr Exp $ *)
+(* $Id: perso.ml,v 4.43 2002-10-26 12:07:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -31,21 +31,22 @@ value string_of_marriage_text conf base fam =
   | _ -> s ^ ", " ^ string_with_macros conf [] marriage_place ^ "," ]
 ;
 
-value print_title conf base and_txt p (nth, name, title, places, dates) =
+value string_of_title conf base and_txt p (nth, name, title, places, dates) =
   let href =
     "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
       code_varenv (sou base (List.hd places))
   in
   let (tit, est) = (sou base title, sou base (List.hd places)) in
   let s = tit ^ " " ^ est in
+  let b = Buffer.create 50 in
   do {
-    wprint_geneweb_link conf href s;
+    Buffer.add_string b (geneweb_link conf href s);
     let rec loop places =
       do {
         match places with
         [ [] -> ()
-        | [_] -> Wserver.wprint "\n%s " and_txt
-        | _ -> Wserver.wprint ",\n" ];
+        | [_] -> Printf.bprintf b "\n%s " and_txt
+        | _ -> Buffer.add_string b ",\n" ];
         match places with
         [ [place :: places] ->
             let href =
@@ -53,7 +54,10 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
                 code_varenv (sou base place)
             in
             let est = sou base place in
-            do { wprint_geneweb_link conf href est; loop places }
+            do {
+              Buffer.add_string b (geneweb_link conf href est);
+              loop places
+            }
         | _ -> () ]
       }
     in
@@ -65,10 +69,10 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
       | (_, [(Some _, _) :: _], _) -> authorized_age conf base p
       | _ -> False ]
     in
-    if paren then Wserver.wprint "\n(" else ();
+    if paren then Buffer.add_string b "\n(" else ();
     let first =
       if nth > 0 then do {
-        Wserver.wprint "%s"
+        Buffer.add_string b
           (if nth >= 100 then string_of_int nth
            else transl_nth conf "nth" nth);
         False
@@ -79,8 +83,8 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
       match name with
       [ Tname n ->
           do {
-            if not first then Wserver.wprint " ," else ();
-            Wserver.wprint "%s" (sou base n);
+            if not first then Buffer.add_string b " ," else ();
+            Buffer.add_string b (sou base n);
             False
           }
       | _ -> first ]
@@ -90,17 +94,17 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
         List.fold_left
           (fun first (date_start, date_end) ->
              do {
-               if not first then Wserver.wprint ",\n" else ();
+               if not first then Buffer.add_string b ",\n" else ();
                match date_start with
-               [ Some d -> Wserver.wprint "%s" (Date.string_of_date conf d)
+               [ Some d -> Buffer.add_string b (Date.string_of_date conf d)
                | None -> () ];
                match date_end with
                [ Some (Dgreg d _) ->
-                   if d.month <> 0 then Wserver.wprint " - "
-                   else Wserver.wprint "-"
+                   if d.month <> 0 then Buffer.add_string b " - "
+                   else Buffer.add_string b "-"
                | _ -> () ];
                match date_end with
-               [ Some d -> Wserver.wprint "%s" (Date.string_of_date conf d)
+               [ Some d -> Buffer.add_string b (Date.string_of_date conf d)
                | None -> () ];
                False
              })
@@ -108,7 +112,8 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
       in
       ()
     else ();
-    if paren then Wserver.wprint ")" else ()
+    if paren then Buffer.add_string b ")" else ();
+    Buffer.contents b
   }
 ;
 
@@ -150,16 +155,13 @@ value nobility_titles_list conf p =
 
 (* obsolete; should be removed one day *)
 
-value print_titles conf base cap and_txt p =
+value string_of_titles conf base cap and_txt p =
   let titles = nobility_titles_list conf p in
-  list_iter_first
-    (fun first t ->
-       do {
-         if not first then Wserver.wprint "," else ();
-         Wserver.wprint "\n";
-         print_title conf base and_txt p t
-       })
-    titles
+  List.fold_left
+    (fun s t ->
+       s ^ (if s = "" then "" else ",") ^ "\n" ^
+       string_of_title conf base and_txt p t)
+    "" titles
 ;
 
 (* Version matching the Sosa number of the "ancestor" pages *)
@@ -403,13 +405,12 @@ value string_of_comment conf base env p p_auth =
   | _ -> "" ]
 ;
 
-value print_consanguinity conf base env a p_auth =
-  if p_auth then do {
-    print_decimal_num conf
-      (round_2_dec (Adef.float_of_fix a.consang *. 100.0));
-    Wserver.wprint "%%"
-  }
-  else ()
+value string_of_consanguinity conf base env a p_auth =
+  if p_auth then
+    string_of_decimal_num conf
+      (round_2_dec (Adef.float_of_fix a.consang *. 100.0)) ^
+    "%"
+  else ""
 ;
 
 value string_of_death_age conf base env p p_auth =
@@ -541,10 +542,11 @@ value string_of_misc_names conf base env p p_auth =
   else ""
 ;
 
-value print_nobility_title conf base env p p_auth =
+value string_of_nobility_title conf base env p p_auth =
   match get_env "nobility_title" env with
-  [ Vtitle t when p_auth -> print_title conf base (transl_nth conf "and" 0) p t
-  | _ -> () ]
+  [ Vtitle t when p_auth ->
+      string_of_title conf base (transl_nth conf "and" 0) p t
+  | _ -> "" ]
 ;
 
 value obsolete_list = ref [];
@@ -561,10 +563,10 @@ value obsolete var new_var =
   else ()
 ;
 
-value print_nobility_titles conf base env p p_auth =
+value string_of_nobility_titles conf base env p p_auth =
   let () = obsolete "nobility_titles" "nobility_title" in
-  if p_auth then print_titles conf base True (transl_nth conf "and" 0) p
-  else ()
+  if p_auth then string_of_titles conf base True (transl_nth conf "and" 0) p
+  else ""
 ;
 
 value string_of_notes conf base env p p_auth =
@@ -686,15 +688,19 @@ value string_of_relation_type conf base env =
   | _ -> "" ]
 ;
 
-value print_sosa conf base env a a_auth =
+value string_of_sosa conf base env a a_auth =
   match get_env "sosa" env with
   [ Vsosa x ->
       match x with
       [ Some (n, p) ->
-          Num.print (fun x -> Wserver.wprint "%s" x)
-            (transl conf "(thousand separator)") n
-      | None -> () ]
-  | _ -> () ]
+          let b = Buffer.create 25 in
+          do {
+            Num.print (fun x -> Buffer.add_string b x)
+              (transl conf "(thousand separator)") n;
+            Buffer.contents b
+          }
+      | None -> "" ]
+  | _ -> "" ]
 ;
 
 value string_of_sosa_link conf base env a a_auth =
@@ -775,6 +781,7 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
       else if force_surname then person_text conf base p
       else person_text_without_surname conf base p
   | "comment" -> string_of_comment conf base env p p_auth efam
+  | "consanguinity" -> string_of_consanguinity conf base env a p_auth
   | "count" ->
       let () = obsolete "count" "child_cnt" in
       eval_int_env "child_cnt" env
@@ -835,6 +842,8 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
           match get_env "p" env with
           [ Vind _ _ u -> string_of_int (Array.length u.family)
           | _ -> "" ] ]
+  | "nobility_title" -> string_of_nobility_title conf base env p p_auth
+  | "nobility_titles" -> string_of_nobility_titles conf base env p p_auth
   | "notes" -> string_of_notes conf base env p p_auth
   | "occupation" -> string_of_occupation conf base env p p_auth
   | "on_baptism_date" -> string_of_on_baptism_date conf base env p p_auth
@@ -858,6 +867,7 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
   | "referer" -> string_of_referer conf base env
   | "relation_type" -> string_of_relation_type conf base env
   | "related_type" -> string_of_related_type conf base env
+  | "sosa" -> string_of_sosa conf base env p p_auth
   | "sosa_link" -> string_of_sosa_link conf base env p p_auth
   | "sosa_ref" -> string_of_sosa_ref conf base env p p_auth
   | "source" -> string_of_source conf base env p
@@ -879,15 +889,6 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
       else raise Not_found ]
 ;
 
-value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
-  fun
-  [ "consanguinity" -> print_consanguinity conf base env a p_auth
-  | "nobility_title" -> print_nobility_title conf base env p p_auth
-  | "nobility_titles" -> print_nobility_titles conf base env p p_auth
-  | "sosa" -> print_sosa conf base env p p_auth
-  | s -> Wserver.wprint "%s" (try_eval_gen_variable conf base env ep efam s) ]
-;
-
 value print_simple_person_text conf base (p, _, _, p_auth) =
   Wserver.wprint "%s" (simple_person_text conf base p p_auth)
 ;
@@ -896,7 +897,9 @@ value print_variable conf base env sl =
   match eval_variable conf base env sl with
   [ VVsome (env, ep, efam, "") -> print_simple_person_text conf base ep
   | VVsome (env, ep, efam, s) ->
-      try print_simple_variable conf base env ep efam s with
+      try
+        Wserver.wprint "%s" (try_eval_gen_variable conf base env ep efam s)
+      with
       [ Not_found -> Templ.print_variable conf base s ]
   | VVcvar s ->
       Wserver.wprint "%s" (eval_base_env_variable conf s)

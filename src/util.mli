@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.18 2002-10-26 01:22:43 ddr Exp $ *)
+(* $Id: util.mli,v 4.19 2002-10-26 12:07:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -136,7 +136,7 @@ value relation_txt :
 
 value incorrect_request : config -> unit;
 
-value print_decimal_num : config -> float -> unit;
+value string_of_decimal_num : config -> float -> string;
 
 value find_person_in_env : config -> base -> string -> option person;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.29 2002-09-12 07:21:40 ddr Exp $ *)
+(* $Id: relation.ml,v 4.30 2002-10-26 12:07:33 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1520,10 +1520,11 @@ value print_main_relationship conf base long p1 p2 rel =
           then do {
             html_p conf;
             Wserver.wprint "<em>%s: " (capitale (transl conf "relationship"));
-            print_decimal_num conf
-              (round_2_dec
-                 (Adef.float_of_fix (Adef.fix_of_float relationship) *.
-                    100.0));
+            Wserver.wprint "%s"
+              (string_of_decimal_num conf
+                 (round_2_dec
+                    (Adef.float_of_fix (Adef.fix_of_float relationship) *.
+                       100.0)));
             Wserver.wprint "%%</em>";
             html_p conf
           }
