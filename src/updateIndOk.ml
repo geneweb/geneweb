@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.16 1999-07-22 04:32:30 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.17 1999-07-22 14:34:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -266,7 +266,7 @@ value print_conflict conf base p =
      html_p conf;
   return
   let free_n =
-    Update.find_free_occ base (sou base p.first_name) (sou base p.surname) 0
+    Update.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
   do tag "ul" begin
        html_li conf;
@@ -300,7 +300,7 @@ value check_conflict conf base sp ipl =
     (fun ip ->
        let p1 = poi base ip in
        if p1.cle_index <> sp.cle_index
-       && Name.strip_lower (sou base p1.first_name ^ " " ^ sou base p1.surname)
+       && Name.strip_lower (p_first_name base p1 ^ " " ^ p_surname base p1)
           = name
        && p1.occ = sp.occ then
          print_conflict conf base p1
@@ -334,8 +334,8 @@ value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
-  let ofn = sou base op.first_name in
-  let osn = sou base op.surname in
+  let ofn = p_first_name base op in
+  let osn = p_surname base op in
   do if Name.strip_lower ofn = Name.strip_lower sp.first_name
      && Name.strip_lower osn = Name.strip_lower sp.surname
      && op.occ == sp.occ then ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 2.2 1999-07-15 08:52:51 ddr Exp $ *)
+(* $Id: merge.ml,v 2.3 1999-07-22 14:34:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,9 +8,9 @@ open Gutil;
 open Util;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (sou base p.first_name)
+  Wserver.wprint "%s%s %s" (p_first_name base p)
     (if p.occ == 0 then ""else "." ^ string_of_int p.occ)
-    (sou base p.surname)
+    (p_surname base p)
 ;
 
 value print conf base p =

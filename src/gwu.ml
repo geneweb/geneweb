@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.10 1999-07-15 08:52:48 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.11 1999-07-22 14:34:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -57,8 +57,7 @@ value starting_char s =
   | _ -> False ]
 ;
 
-value correct_string base is =
-  let s = sou base is in
+value s_correct_string s =
   loop 0 0 where rec loop i len =
     if i == String.length s then get_buff len
     else
@@ -69,6 +68,8 @@ value correct_string base is =
         loop (i + 1) (store (store len '\\') s.[i])
       else loop (i + 1) (store len s.[i])
 ;
+
+value correct_string base is = s_correct_string (sou base is);
 
 value has_infos_not_dates base p =
   p.first_names_aliases <> [] || p.surnames_aliases <> [] ||
@@ -224,7 +225,7 @@ value print_infos oc base is_child print_sources p =
            [ Death _ _ | DeadYoung | DeadDontKnowWhen -> Printf.fprintf oc " 0"
            | DontKnowIfDead
              when not is_child && not (has_infos_not_dates base p) &&
-             sou base p.first_name <> "?" && sou base p.surname <> "?" ->
+             p_first_name base p <> "?" && p_surname base p <> "?" ->
                Printf.fprintf oc " 0"
            | _ -> () ] ];
      print_if_no_empty oc base "#bp" p.birth_place;
@@ -265,10 +266,10 @@ value print_infos oc base is_child print_sources p =
 
 value print_parent oc base ml fam_sel fam p =
   let a = aoi base p.cle_index in
-  do Printf.fprintf oc "%s %s%s" (correct_string base p.surname)
-       (correct_string base p.first_name)
-       (if p.occ == 0 || sou base p.first_name = "?"
-        || sou base p.surname = "?" then ""
+  do Printf.fprintf oc "%s %s%s" (s_correct_string (p_surname base p))
+       (s_correct_string (p_first_name base p))
+       (if p.occ == 0 || p_first_name base p = "?"
+        || p_surname base p = "?" then ""
         else "." ^ string_of_int p.occ);
   return
   let has_printed_parents =
@@ -288,9 +289,9 @@ value print_parent oc base ml fam_sel fam p =
       | [] -> assert False ]
   in
   let pr = not has_printed_parents && first_parent_definition in
-  if pr (* && sou base p.first_name <> "?" *) then
+  if pr (* && p_first_name base p <> "?" *) then
     if has_infos base p then print_infos oc base False True p
-    else if sou base p.first_name <> "?" && sou base p.surname <> "?" then
+    else if p_first_name base p <> "?" && p_surname base p <> "?" then
       Printf.fprintf oc " 0"
     else ()
   else ()
@@ -302,12 +303,12 @@ value print_child oc base fam_surname print_sources p =
      [ Male -> Printf.fprintf oc " h"
      | Female -> Printf.fprintf oc " f"
      | _ -> () ];
-     Printf.fprintf oc " %s" (correct_string base p.first_name);
-     if p.occ == 0 || sou base p.first_name = "?" || sou base p.surname = "?"
+     Printf.fprintf oc " %s" (s_correct_string (p_first_name base p));
+     if p.occ == 0 || p_first_name base p = "?" || p_surname base p = "?"
      then ()
      else Printf.fprintf oc ".%d" p.occ;
      if p.surname <> fam_surname then
-       Printf.fprintf oc " %s" (correct_string base p.surname)
+       Printf.fprintf oc " %s" (s_correct_string (p_surname base p))
      else ();
      print_infos oc base True print_sources p;
      Printf.fprintf oc "\n";
@@ -315,7 +316,7 @@ value print_child oc base fam_surname print_sources p =
 ;
 
 value bogus_person base p =
-  sou base p.first_name = "?" && sou base p.surname = "?"
+  p_first_name base p = "?" && p_surname base p = "?"
 ;
 
 value common_children_sources base children =
@@ -413,8 +414,8 @@ value get_persons_with_notes base m list =
 ;
 
 value print_notes_for_person oc base p =
-  let surn = correct_string base p.surname in
-  let fnam = correct_string base p.first_name in
+  let surn = s_correct_string (p_surname base p) in
+  let fnam = s_correct_string (p_first_name base p) in
   if surn <> "?" || fnam <> "?" then
     do Printf.fprintf oc "\n";
        Printf.fprintf oc "notes %s %s%s\n" surn fnam

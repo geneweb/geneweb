@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.3 1999-07-15 08:52:56 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.4 1999-07-22 14:34:15 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -23,8 +23,8 @@ value print_send_image conf base p =
          (capitale (transl_decline conf "send" (transl conf "image")));
        if h then ()
        else
-         let fn = sou base p.first_name in
-         let sn = sou base p.surname in
+         let fn = p_first_name base p in
+         let sn = p_surname base p in
          let occ =
          if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
            else p.occ
@@ -74,8 +74,8 @@ value print_delete_image conf base p =
          (capitale (transl_decline conf "delete" (transl conf "image")));
        if h then ()
        else
-         let fn = sou base p.first_name in
-         let sn = sou base p.surname in
+         let fn = p_first_name base p in
+         let sn = p_surname base p in
          let occ =
          if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
            else p.occ

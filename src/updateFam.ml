@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.7 1999-07-18 06:42:56 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.8 1999-07-22 14:34:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -14,8 +14,8 @@ type str_indi = (string * string * int * create);
 
 value person_key base ip =
   let p = poi base ip in
-  let first_name = sou base p.first_name in
-  let surname = sou base p.surname in
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
   let occ =
     if first_name = "?" || surname = "?" then Adef.int_of_iper ip else p.occ
   in
@@ -510,11 +510,11 @@ value print_add_parents conf base =
          marriage_src = ""; not_married = False;
          divorce = NotDivorced;
          children =
-           [| (sou base p.first_name, sou base p.surname, p.occ, Link) |];
+           [| (p_first_name base p, p_surname base p, p.occ, Link) |];
          comment = ""; origin_file = ""; fsources = "";
          fam_index = bogus_family_index}
       and cpl =
-        {father = ("", sou base p.surname, 0, Create Neuter None);
+        {father = ("", p_surname base p, 0, Create Neuter None);
          mother = ("", "", 0, Create Neuter None)}
       in
       print_add1 conf base fam cpl True

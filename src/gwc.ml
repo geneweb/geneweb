@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.19 1999-07-20 03:54:31 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.20 1999-07-22 14:34:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -148,8 +148,8 @@ value find_person_by_name gen first_name surname occ =
     [ [] -> raise Not_found
     | [ip :: ipl] ->
         let p = poi gen.g_base ip in
-        if Name.strip_lower (sou gen.g_base p.first_name) = first_name
-        && Name.strip_lower (sou gen.g_base p.surname) = surname
+        if Name.strip_lower (p_first_name gen.g_base p) = first_name
+        && Name.strip_lower (p_surname gen.g_base p) = surname
         && p.occ == occ
         then ip
         else loop ipl ]
@@ -188,19 +188,19 @@ value insert_undefined_parent gen key =
         return x ]
   in
   do if not gen.g_errored then
-       if sou gen.g_base x.first_name <> key.pk_first_name ||
-          sou gen.g_base x.surname <> key.pk_surname then
+       if p_first_name gen.g_base x <> key.pk_first_name ||
+          p_surname gen.g_base x <> key.pk_surname then
          do Printf.printf "\nPerson defined with two spellings:\n";
             Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
               (match x.occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
               key.pk_surname;
-            Printf.printf "  \"%s%s %s\"\n" (sou gen.g_base x.first_name)
+            Printf.printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (sou gen.g_base x.surname);
+              (p_surname gen.g_base x);
             gen.g_def.(Adef.int_of_iper x.cle_index) := True;
          return Check.error gen
        else ()
@@ -240,22 +240,22 @@ value insert_person gen so =
              [ 0 -> ""
              | n -> "." ^ string_of_int n ])
             so.surname;
-          if sou gen.g_base x.first_name <> so.first_name ||
-             sou gen.g_base x.surname <> so.surname then
+          if p_first_name gen.g_base x <> so.first_name ||
+             p_surname gen.g_base x <> so.surname then
             Printf.printf "as name: \"%s%s %s\"\n"
-              (sou gen.g_base x.first_name)
+              (p_first_name gen.g_base x)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (sou gen.g_base x.surname)
+              (p_surname gen.g_base x)
           else ();
           x.birth := Adef.codate_None;
           x.death := DontKnowIfDead;
        return Check.error gen
      else gen.g_def.(Adef.int_of_iper x.cle_index) := True;
      if not gen.g_errored then
-       if sou gen.g_base x.first_name <> so.first_name ||
-          sou gen.g_base x.surname <> so.surname then
+       if p_first_name gen.g_base x <> so.first_name ||
+          p_surname gen.g_base x <> so.surname then
          do Printf.printf "\nPerson defined with two spellings:\n";
             Printf.printf "  \"%s%s %s\"\n" so.first_name
               (match x.occ with
@@ -263,11 +263,11 @@ value insert_person gen so =
                | n -> "." ^ string_of_int n ])
               so.surname;
             Printf.printf "  \"%s%s %s\"\n"
-              (sou gen.g_base x.first_name)
+              (p_first_name gen.g_base x)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (sou gen.g_base x.surname);
+              (p_surname gen.g_base x);
             gen.g_def.(Adef.int_of_iper x.cle_index) := True;
          return Check.error gen
        else ()
@@ -338,7 +338,7 @@ value notice_sex gen p s =
   else if p.sex == s || s == Neuter then ()
   else
     do Printf.printf "\nInconcistency about the sex of\n  %s %s\n"
-         (sou gen.g_base p.first_name) (sou gen.g_base p.surname);
+         (p_first_name gen.g_base p) (p_surname gen.g_base p);
     return Check.error gen
 ;
 

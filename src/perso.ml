@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.34 1999-07-15 08:52:54 ddr Exp $ *)
+(* $Id: perso.ml,v 2.35 1999-07-22 14:34:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -429,8 +429,7 @@ value print_child conf base age_auth ip =
     match a.parents with
     [ None -> False
     | Some ifam ->
-        sou base (poi base (coi base ifam).father).surname <>
-          sou base p.surname ]
+        p_surname base (poi base (coi base ifam).father) <> p_surname base p ]
   in
   do Wserver.wprint "\n";
      html_li conf;
@@ -769,12 +768,12 @@ value print_ancestors_descends_cousins conf base p a =
 
 value print_linked_first_name_and_surname conf base p =
   do wprint_geneweb_link conf
-       ("m=P;v=" ^ code_varenv (Name.lower (sou base p.first_name)))
-       (sou base p.first_name);
+       ("m=P;v=" ^ code_varenv (Name.lower (p_first_name base p)))
+       (p_first_name base p);
      Wserver.wprint " ";
      wprint_geneweb_link conf
-       ("m=N;v=" ^ code_varenv (Name.lower (sou base p.surname)))
-       (sou base p.surname);
+       ("m=N;v=" ^ code_varenv (Name.lower (p_surname base p)))
+       (p_surname base p);
   return ()
 ;
 
@@ -792,17 +791,17 @@ value print conf base p =
              Wserver.wprint "</em>";
           return ()
     | (n, []) when n <> "" ->
-        Wserver.wprint "%s %s" n (sou base p.surname)
+        Wserver.wprint "%s %s" n (p_surname base p)
     | (_, [nn :: _]) ->
         if h then
-          Wserver.wprint "%s %s" (sou base p.first_name)
+          Wserver.wprint "%s %s" (p_first_name base p)
             (sou base nn)
         else
-          Wserver.wprint "%s <em>%s</em>" (sou base p.first_name)
+          Wserver.wprint "%s <em>%s</em>" (p_first_name base p)
             (sou base nn)
     | (_, []) ->
         if h then
-          Wserver.wprint "%s %s" (sou base p.first_name) (sou base p.surname)
+          Wserver.wprint "%s %s" (p_first_name base p) (p_surname base p)
         else print_linked_first_name_and_surname conf base p ]
   in
   let a = aoi base p.cle_index in
@@ -867,7 +866,7 @@ value print conf base p =
               return ())
            nnl
      | (_, [_ :: nnl]) ->
-         let n = sou base p.first_name in
+         let n = p_first_name base p in
          List.iter
            (fun nn ->
               do Wserver.wprint "%s <em>%s</em>" n (sou base nn);
@@ -901,7 +900,7 @@ value print conf base p =
      List.iter
        (fun n ->
           do Wserver.wprint "<em>(%s %s)</em>\n"
-               (sou base p.first_name) (sou base n);
+               (p_first_name base p) (sou base n);
              html_br conf;
           return ())
        p.surnames_aliases;
@@ -960,7 +959,7 @@ value print conf base p =
          tag "ol" begin
            html_li conf;
            Wserver.wprint "%s\n"
-             (Name.lower (sou base p.first_name ^ " " ^ sou base p.surname));
+             (Name.lower (p_first_name base p ^ " " ^ p_surname base p));
            List.iter
              (fun x ->
                 do Wserver.wprint "\n";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.11 1999-07-18 06:42:55 ddr Exp $ *)
+(* $Id: update.ml,v 2.12 1999-07-22 14:34:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -36,8 +36,8 @@ value infer_death conf birth =
 ;
 
 value print_same_name conf base p =
-  let f = sou base p.first_name in
-  let s = sou base p.surname in
+  let f = p_first_name base p in
+  let s = p_surname base p in
   let ipl = Gutil.person_ht_find_all base (f ^ " " ^ s) in
   let f = Name.strip_lower f in
   let s = Name.strip_lower s in
@@ -45,8 +45,8 @@ value print_same_name conf base p =
     List.fold_left
       (fun pl ip ->
          let p = poi base ip in
-         if Name.strip_lower (sou base p.first_name) = f
-         && Name.strip_lower (sou base p.surname) = s then
+         if Name.strip_lower (p_first_name base p) = f
+         && Name.strip_lower (p_surname base p) = s then
            [p :: pl]
          else pl)
       [] ipl
@@ -65,8 +65,8 @@ value print_same_name conf base p =
                    stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
                    begin
                      Wserver.wprint "%s.%d %s"
-                       (sou base p.first_name) p.occ
-                       (sou base p.surname);
+                       (p_first_name base p) p.occ
+                       (p_surname base p);
                    end;
                 return ())
              pl;
@@ -102,24 +102,24 @@ value update_misc_names_of_family base p =
 ;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (sou base p.first_name)
+  Wserver.wprint "%s%s %s" (p_first_name base p)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
-    (sou base p.surname)
+    (p_surname base p)
 ;
 
 value print_first_name conf base p =
-  Wserver.wprint "%s%s" (sou base p.first_name)
+  Wserver.wprint "%s%s" (p_first_name base p)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
 
 value print_someone_strong conf base p =
-  Wserver.wprint "<strong>%s%s %s</strong>" (sou base p.first_name)
+  Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
-    (sou base p.surname)
+    (p_surname base p)
 ;
 
 value print_first_name_strong conf base p =
-  Wserver.wprint "<strong>%s%s</strong>" (sou base p.first_name)
+  Wserver.wprint "<strong>%s%s</strong>" (p_first_name base p)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
 
@@ -147,8 +147,8 @@ value print_error conf base =
       Wserver.wprint
         (fcapitale
            (ftransl conf "name \"%s.%d %s\" already used by %tthis person%t"))
-        (sou base p.first_name) p.occ
-        (sou base p.surname)
+        (p_first_name base p) p.occ
+        (p_surname base p)
         (fun _ ->
            Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
         (fun _ -> Wserver.wprint "</a>.")
@@ -165,15 +165,15 @@ value print_error conf base =
 value print_someone_ref conf base p =
   Wserver.wprint "<a href=\"%s%s\">\n%s%s %s</a>"
     (commd conf) (acces conf base p)
-    (sou base p.first_name)
+    (p_first_name base p)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
-    (sou base p.surname)
+    (p_surname base p)
 ;
 
 value print_first_name_ref conf base p =
   Wserver.wprint "<a href=\"%s%s\">\n%s%s</a>"
     (commd conf) (acces conf base p)
-    (sou base p.first_name)
+    (p_first_name base p)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
 
@@ -507,9 +507,9 @@ value print_date conf base lab var d =
 ;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (sou base p.first_name)
+  Wserver.wprint "%s%s %s" (p_first_name base p)
     (if p.occ == 0 then ""else "." ^ string_of_int p.occ)
-    (sou base p.surname)
+    (p_surname base p)
 ;
 
 value print_family_stuff conf base p a =
@@ -564,7 +564,7 @@ value print_family_stuff conf base p a =
          return Some fi)
       None (Array.to_list p.family)
     in ();
-    if (sou base p.first_name = "?" || sou base p.surname = "?")
+    if (p_first_name base p = "?" || p_surname base p = "?")
     && (Array.length p.family <> 0 || a.parents <> None) then ()
     else
       let s = transl_nth conf "family/families" 0 in
@@ -582,8 +582,8 @@ value print conf base p =
     do Wserver.wprint "%s" (capitale (transl conf "update"));
        if h then ()
        else
-         let fn = sou base p.first_name in
-         let sn = sou base p.surname in
+         let fn = p_first_name base p in
+         let sn = p_surname base p in
          let occ =
            if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
            else p.occ
@@ -643,7 +643,7 @@ value print conf base p =
      match a.parents with
      [ Some _ -> ()
      | None ->
-         if sou base p.first_name = "?" || sou base p.surname = "?" then ()
+         if p_first_name base p = "?" || p_surname base p = "?" then ()
          else
            do Wserver.wprint "<ul>\n";
               html_li conf;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.19 1999-07-18 06:42:55 ddr Exp $ *)
+(* $Id: relation.ml,v 2.20 1999-07-22 14:34:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -15,8 +15,8 @@ value print_menu conf base p =
        if h then
          match sou base p.public_name with
          [ "" ->
-             Wserver.wprint "%s %s" (sou base p.first_name)
-               (sou base p.surname)
+             Wserver.wprint "%s %s" (p_first_name base p)
+               (p_surname base p)
          | n -> Wserver.wprint "%s" n ]
        else Wserver.wprint "%s" (person_text conf base p);
        Wserver.wprint " %s..." (transl conf "and");
@@ -59,7 +59,7 @@ value print_menu conf base p =
               let cpl = coi base ifam in
               let c = spouse p cpl in
               let c = poi base c in
-              if sou base c.first_name <> "?" || sou base c.surname <> "?" then
+              if p_first_name base c <> "?" || p_surname base c <> "?" then
                 do html_li conf;
                    Wserver.wprint "<input type=radio name=select value=%d>\n"
                      (Adef.int_of_iper c.cle_index);

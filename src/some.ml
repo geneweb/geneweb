@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.10 1999-07-16 21:01:06 ddr Exp $ *)
+(* $Id: some.ml,v 2.11 1999-07-22 14:34:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -105,7 +105,7 @@ value first_name_print_list conf base xl liste =
     let l =
       Sort.list
         (fun x1 x2 ->
-           match alphabetique (sou base x1.surname) (sou base x2.surname) with
+           match alphabetique (p_surname base x1) (p_surname base x2) with
            [ 0 ->
                match
                  (Adef.od_of_codate x1.birth, Adef.od_of_codate x2.birth)
@@ -118,7 +118,7 @@ value first_name_print_list conf base xl liste =
     in
     List.fold_left
       (fun l x ->
-         let px = sou base x.surname in
+         let px = p_surname base x in
          match l with
          [ [(p, l1) :: l] when alphabetique px p == 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
@@ -189,13 +189,13 @@ value first_name_print conf base x =
 ;
 
 value she_has_children_with_her_name base wife husband children =
-  let wife_surname = Name.strip_lower (sou base wife.surname) in
-  if Name.strip_lower (sou base husband.surname) = wife_surname then
+  let wife_surname = Name.strip_lower (p_surname base wife) in
+  if Name.strip_lower (p_surname base husband) = wife_surname then
     False
   else
     List.exists
       (fun c ->
-         Name.strip_lower (sou base (poi base c).surname) = wife_surname)
+         Name.strip_lower (p_surname base (poi base c)) = wife_surname)
       (Array.to_list children)
 ;
 
@@ -216,7 +216,7 @@ value max_lev = 3;
 value rec print_branch conf base lev name p =
   do if lev == 0 then html_br conf else html_li conf;
      Wserver.wprint "<strong>";
-     if sou base p.surname = name then
+     if p_surname base p = name then
        afficher_prenom_de_personne_referencee conf base p
      else afficher_personne_referencee conf base p;
      Wserver.wprint "</strong>";
@@ -235,7 +235,7 @@ value rec print_branch conf base lev name p =
          do if need_br then html_br conf else ();
             if not first then
               do Wserver.wprint "<em>";
-                 if sou base p.surname = name then
+                 if p_surname base p = name then
                    afficher_prenom_de_personne conf base p
                  else afficher_personne conf base p;
                  Wserver.wprint "</em>";
@@ -253,7 +253,7 @@ value rec print_branch conf base lev name p =
          return
          let down =
            p.sex = Male &&
-           (Name.crush_lower (sou base p.surname) = Name.crush_lower name
+           (Name.crush_lower (p_surname base p) = Name.crush_lower name
             || lev == 0) &&
            Array.length el <> 0 ||
            p.sex = Female && she_has_children_with_her_name base p c el
@@ -275,7 +275,7 @@ value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
   let ancestors =
     Sort.list
       (fun p1 p2 ->
-         alphabetique (sou base p1.first_name) (sou base p2.first_name) <= 0)
+         alphabetique (p_first_name base p1) (p_first_name base p2) <= 0)
       l
   in
   let len = List.length ancestors in
@@ -335,7 +335,7 @@ value print_family_alphabetic x conf base liste =
       Sort.list
         (fun x1 x2 ->
            match
-             alphabetique (sou base x1.first_name) (sou base x2.first_name)
+             alphabetique (p_first_name base x1) (p_first_name base x2)
            with
            [ 0 -> x1.occ > x2.occ
            | n -> n > 0 ])
@@ -343,7 +343,7 @@ value print_family_alphabetic x conf base liste =
     in
     List.fold_left
       (fun l x ->
-         let px = sou base x.first_name in
+         let px = p_first_name base x in
          match l with
          [ [(p, l1) :: l] when alphabetique px p == 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])

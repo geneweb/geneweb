@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.10 1999-07-15 08:53:01 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.11 1999-07-22 14:34:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -21,8 +21,8 @@ value string_title_of base t =
 ;
 
 value string_person_of base p =
-  let first_name = sou base p.first_name in
-  let surname = sou base p.surname in
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
   let occ =
     if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
     else p.occ
