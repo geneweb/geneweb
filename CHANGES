@@ -1,5 +1,11 @@
 GeneWeb version 3.03
 --------------------
+
+* GeneWeb Service/CGI (gwd)
+  - [Jan 18, 00] Fixed bug: when selecting no data base, the default page
+    asks for a data base name, but in CGI mode when entering a data base,
+    it did not work (incorrect URL).
+
 GeneWeb version 3.02
 --------------------
 
