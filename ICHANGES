@@ -4,6 +4,10 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.05
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [20 Jan 02] Use of dates order (according to the language) in calendars
+    page.
+
 * GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
   - [10 Jan 02] Warranty that the index (istr) number of the empty string
     is 0 and of the string "?" is 1.
