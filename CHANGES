@@ -2,6 +2,9 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [18 Dec 01] Fixed bug: in a read-only device (e.g. a CD-ROM), the
+    relationship computing did not work if it has not been initialized
+    before.
   - [17 Dec 01] In cousins displaying, added button to include the
     spouses (code written by Ludovic Ledieu).
   - [01 Dec 01] Fixed problem in case of changing a person's name, if

@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.18 2001-11-27 12:10:32 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.19 2001-12-18 15:58:17 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -155,7 +155,7 @@ eo: <a href="%sw=w">Aliro <em>sorcxisto</em></a><br> (pasvorto)
 es: <a href="%sw=w">Entrada <em>brujo</em></a><br> (contrase&ntilde;a)
 et: Ligipääs <a href="%sw=w"><em>teadmamehena</em></a><br> (parool)
 fi: <a href="%sw=w"><em>Velho</em></a> kirjautuminen<br> (salasana)
-fr: acc&egrave;s <a href="%sw=w"><em>sorcier</em></a><br> (mot de passe).
+fr: acc&egrave;s <a href="%sw=w"><em>magicien</em></a><br> (mot de passe).
 he: ëğéñä  <a href="%sw=w"><em> ëâàåï </em></a>
 is: <a href="%sw=w"><em>Wizard</em></a> ağgangur<br> (ağgangsorğ)
 it: <a href="%sw=w"><em>Wizard</em></a> access<br> (parola d'accesso)
@@ -204,7 +204,7 @@ eo: Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
 es: Contrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
 et: Parool, <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
 fi: Salasana <em>Valittu</em> tai <em>Velho</em> kirjautumiseen:
-fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>sorcier</em>:
+fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>magicien</em>:
 he: ñéñîä ìëğéñä <em> îéåçñú  </em> àå <em>ëâàåï</em>
 is: Ağgangsorğ, fyrir <em>vin</em> eğa <em>wizard</em> ağgang:
 it: Parola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:

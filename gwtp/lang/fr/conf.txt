@@ -15,7 +15,7 @@
 <table>
 <tr><td>Mot de passe ami:
 <td><input name=friend_passwd value="%vfriend_passwd;"><br>
-<tr><td>Mot de passe sorcier:
+<tr><td>Mot de passe magicien:
 <td><input name=wizard_passwd value="%vwizard_passwd;"><br>
 </table>
 Langue par défaut:
@@ -73,7 +73,7 @@ Cacher les noms privés:
 
 <p>
 
-Sorciers seulement amis (pour mises à jour temporaires):
+Magiciens seulement amis (pour mises à jour temporaires):
 <input type=radio name=wizard_just_friend
  value=yes%cwizard_just_friend=yes;>oui
 <input type=radio name=wizard_just_friend
@@ -93,7 +93,7 @@ Remarques:
 <li>Si vous voulez que tout le monde soit "ami", effacez le mot de
 passe ami.
 
-<li>Choisissez un mot de passe "sorcier" non vide et pas trop simple.
+<li>Choisissez un mot de passe "magicien" non vide et pas trop simple.
 
 <li>Cela n'est pas vérifié: vous prenez vos responsabilités.
 

@@ -113,7 +113,7 @@ function WorkOnBrowser() {
 en: Maintenance! Wizard rights
     temporarily suspended... wait for some minutes to recover the ability
     to make inline updates. Thank you.
-fr: Maintenance! les droits des sorciers sont momentanément suspendus...
+fr: Maintenance! les droits des magiciens sont momentanément suspendus...
     attendez quelques minutes pour retrouver la possibilité de faire
     des mises à jour en ligne. Merci.
 ]</font></strong></blink>%E
