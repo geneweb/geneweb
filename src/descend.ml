@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.27 1999-08-20 12:46:23 ddr Exp $ *)
+(* $Id: descend.ml,v 2.28 1999-08-20 13:06:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -10,7 +10,7 @@ open Util;
 value limit_desc conf =
   match p_getint conf.base_env "max_desc_level" with
   [ Some x -> max 1 x
-  | None -> 200 ]
+  | None -> 12 ]
 ;
 value limit_by_tree = 4;
 
