@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.30 1999-02-13 21:55:06 ddr Exp $ *)
+(* $Id: perso.ml,v 1.31 1999-02-14 06:38:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -770,14 +770,19 @@ value print conf base p =
                List.fold_right Filename.concat
                  [Util.base_dir.val; "images"; conf.bname] s
              in
-             if Sys.file_exists (f ^ ".gif") then Some (s ^ ".gif")
-             else if Sys.file_exists (f ^ ".jpg") then Some (s ^ ".jpg")
+             if Sys.file_exists (f ^ ".gif") then
+               Some (s ^ ".gif", Unix.stat (f ^ ".gif"))
+             else if Sys.file_exists (f ^ ".jpg") then
+               Some (s ^ ".jpg", Unix.stat (f ^ ".jpg"))
              else None
            in
            match f with
-           [ Some f ->
-               do Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\">"
-                    (commd conf) (Util.code_varenv f) photo_txt;
+           [ Some (f, s) ->
+               do Wserver.wprint "<img src=\"%sm=IM;v=%s;d=%d\" alt=\"%s\">"
+                    (commd conf) (Util.code_varenv f)
+                    (int_of_float
+                       (mod_float s.Unix.st_mtime (float_of_int max_int)))
+                    photo_txt;
                   html_p conf;
                return ()
            | None -> () ]
