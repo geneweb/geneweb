@@ -9,6 +9,7 @@ GeneWeb version 3.01
     not appear...
 
 * GeneWeb Service/CGI (gwd)
+  - [Nov 26, 99] Faster computation of list of all titles and all places
   - [Nov 26, 99] Fixed a problem of sometimes displaying of a message
     "document contains no data" from the browser when computing relationship.
   - [Nov 19, 99] Added ability of customization of the page displayed when
