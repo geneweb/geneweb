@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.18 2002-01-13 20:31:03 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.19 2002-01-14 11:49:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2673,6 +2673,6 @@ try main () with e ->
   do {
     fprintf log_oc.val "Uncaught exception: %s\n"
       (Printexc.to_string e);
-    close_out log_oc.val;
+    if log_oc.val != stdout then close_out log_oc.val else ();
     exit 2
   };
