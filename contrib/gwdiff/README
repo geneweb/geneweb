@@ -1,0 +1,39 @@
+OVERVIEW:
+
+gwdiff will help you to target differences between two GeneWeb databases. So
+far it can only compare the descendants of a person you have found in both
+data bases (Spouses and their parents are compared too).
+
+USAGE:
+
+Your cousin has just sent you a new GEDCOM file, import it to GeneWeb (data
+base b1). You want to update your data base (b2) according to b1 data base.
+Now, find a person defined in both data bases (ex.: Jean DUPONT). In base b1,
+it is "Jean.0 DUPONT"; in base b2, it is "Jean.3 DUPONT". Run the following
+command:
+
+ gwdiff -d1 Jean 0 DUPONT -d2 Jean 3 DUPONT b1 b2
+
+So far, the checks include:
+ - first name: value from b1 has to be found in b2 (first name or first name
+    aliases)
+ - surname: value from b1 has to be found in b2 (surname or surname aliases)
+ - birth date
+ - birth place: if it is set in b1, it has to be set in b2 (whatever the value)
+ - death status
+ - death date
+ - death place: if it is set in b1, it has to be set in b2 (whatever the value)
+ - occupation: if it is set in b1, it has to be set in b2 (whatever the value)
+ - marriage date
+ - marriage place: if it is set in b1, it has to be set in b2 (whatever the
+    value)
+ - divorce date
+ - spouses
+ - parents of spouses
+ - children
+
+BUG REPORTS AND USER FEEDBACK:
+
+Send your bug reports by E-mail to:
+
+   Ludovic LEDIEU: lledieu@free.fr
