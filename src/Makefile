@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.26 2005-03-01 04:18:04 ddr Exp $
+# $Id: Makefile,v 4.27 2005-03-01 19:09:51 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -95,6 +95,9 @@ i18n_check.out: i18n_check.cmo
 i18n: pr_transl.cmo always
 	if test -f i18n; then mv i18n i18n.bak; fi
 	export LC_ALL=C; OBJS=`(grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; (for i in $$OBJS; do echo $$i 1>&2; camlp4r pa_ifdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done; grep -h "\[" ../hd/etc/*.txt ../hd/lang/start.txt ../hd/lang/advanced.txt | grep -v "%\[" | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//") | sort | uniq | grep -v '^$$' > i18n
+
+ppdef:
+	$(MAKE) ppdef.cmo CAMLP4F= PPDEF=
 
 always:
 
