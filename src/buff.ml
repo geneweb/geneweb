@@ -1,4 +1,4 @@
-(* $Id: buff.ml,v 4.1 2001-04-18 12:36:34 ddr Exp $ *)
+(* $Id: buff.ml,v 4.2 2005-02-09 22:04:33 ddr Exp $ *)
 
 value buff = ref (String.create 80);
 
@@ -15,6 +15,13 @@ value store len x =
 value mstore len s =
   add_rec len 0 where rec add_rec len i =
     if i == String.length s then len else add_rec (store len s.[i]) (succ i)
+;
+
+value gstore len s si slen =
+  let iend = si + slen in
+  add_rec len si where rec add_rec len i =
+    if i == iend || i == String.length s then len
+    else add_rec (store len s.[i]) (succ i)
 ;
 
 value get len = String.sub buff.val 0 len;
