@@ -1,5 +1,10 @@
-(* $Id: wserver.ml,v 3.0 1999-10-29 10:31:50 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.1 1999-12-19 09:14:15 ddr Exp $ *)
 (* Copyright (c) INRIA *)
+
+ifdef WIN95 then
+value sock_in = ref "wserver.sin";
+ifdef WIN95 then
+value sock_out = ref "wserver.sou";
 
 value wserver_oc =
   do set_binary_mode_out stdout True; return ref stdout
@@ -426,7 +431,7 @@ value accept_connection tmout max_clients callback s =
         do Unix.close t; Printf.eprintf "Fork failed\n"; flush stderr;
         return () ]
   else
-    do let oc = open_out_bin "gwd.sin" in
+    do let oc = open_out_bin sock_in.val in
        let cleanup () = try close_out oc with _ -> () in
        do try copy_what_necessary t oc with
           [ Unix.Unix_error _ _ _ -> ()
@@ -450,7 +455,7 @@ value accept_connection tmout max_clients callback s =
       return ()
     in
     do try
-         let ic = open_in_bin "gwd.sou" in
+         let ic = open_in_bin sock_out.val in
          let cleanup () = try close_in ic with _ -> () in
          do try
               loop () where rec loop () =
@@ -474,14 +479,20 @@ value accept_connection tmout max_clients callback s =
 ;
 
 value f addr_opt port tmout max_clients (uid, gid) g =
-  match try Some (Sys.getenv "WSERVER") with [ Not_found -> None ] with
+  match
+    ifdef WIN95 then
+      try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
+    else None
+  with
   [ Some s ->
-      let addr = sockaddr_of_string s in
-      let ic = open_in_bin "gwd.sin" in
-      let oc = open_out_bin "gwd.sou" in
-      do wserver_oc.val := oc;
-         treat_connection tmout g addr ic;
-      return exit 0
+      ifdef WIN95 then
+        let addr = sockaddr_of_string s in
+        let ic = open_in_bin sock_in.val in
+        let oc = open_out_bin sock_out.val in
+        do wserver_oc.val := oc;
+           treat_connection tmout g addr ic;
+        return exit 0
+      else ()
   | None ->
       let addr =
         match addr_opt with

@@ -1,11 +1,13 @@
-# $Id: Makefile,v 3.0 1999-10-29 10:29:41 ddr Exp $
+# $Id: Makefile,v 3.1 1999-12-19 09:14:15 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver -I ../src
 OBJS=../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo setup.cmo
 
-all:: setup.out
+all:: out
+
+out:: setup.out
 	$(RM) gwsetup
 	cp setup.out gwsetup
 

@@ -6,6 +6,9 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 19, 99] Added option -wd to specify a (writable) directory for
+    socket communication (required for Windows) and data bases access
+    count. Useful when GeneWeb and data bases are in a CDrom.
   - [Dec 17, 99] Added <meta http-equiv...> in headers of all generated
     pages to be compatible with all browsers.
   - [Dec 16, 99] Fixed bug: the ";opt=no_index" did not work correctly
