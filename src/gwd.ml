@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.28 1999-02-02 10:24:12 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.29 1999-02-11 09:34:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -671,7 +671,7 @@ value main () =
        "); > 1024 for normal users.");
      ("-wizard", Arg.String (fun x -> wizard_passwd.val := x),
       "<passwd>
-       Set a wizard passord: access to all dates and updating.");
+       Set a wizard password: access to all dates and updating.");
      ("-friend", Arg.String (fun x -> friend_passwd.val := x),
       "<passwd>
        Set a friend password: access to all dates.");

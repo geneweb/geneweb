@@ -75,13 +75,30 @@ Exemple, si vous tapez:
 vous devez voir quelque chose du genre:
 
 <pre>
-     Usage: gwd [args]
-       -hd dir: directory where the directory lang is installed
-       -cgi query addr: called from a cgi-bin
-       -p #: port number; greater than 1024 for normal users
-       -wizard passwd: access to all dates and base updating
-       -friend passwd: access to all dates
-       -only address: only inet address accepted
+     Usage: gwd [options] where options are:
+       -hd &lt;dir&gt;
+	    Directory where the directory lang is installed.
+       -bd dir&gt;
+	    Directory where the databases are installed.
+       -cgi 
+	    Force cgi mode.
+       -p &lt;number&gt;
+	    Select a port number (default = 2317); &gt; 1024 for normal users.
+       -wizard &lt;passwd&gt;
+	    Set a wizard passord: access to all dates and updating.
+       -friend &lt;passwd&gt;
+	    Set a friend password: access to all dates.
+       -lang &lt;lang&gt;
+	    Set a default language (default: fr).
+       -only &lt;address&gt;
+	    Only inet address accepted.
+       -auth &lt;file&gt;
+	    Authorization file to restrict access. The file must hold lines
+	    of the form "user:password".
+       -log &lt;file&gt;
+	    Redirect log trace to this file.
+       -nolock 
+	    Do not lock files before writing.
 </pre>
 
 <p>
@@ -268,8 +285,9 @@ donn&eacute;es.
 Pendant ce temps, vous pouvez constater que chaque fois que vous
 cliquez sur un bouton ou un lien, une trace apparait dans la
 fen&ecirc;tre int&eacute;ractive. Quand vous ferez fonctionner votre
-serveur <em>GeneWeb</em> sur le r&eacute;seau, vous pourrez ainsi voir
-les requ&ecirc;tes qui seront faites sur votre base.
+<a href="server.htm">serveur</a> <em>GeneWeb</em> sur le
+r&eacute;seau, vous pourrez ainsi voir les requ&ecirc;tes qui seront
+faites sur votre base.
 
 <p>
 

@@ -72,13 +72,30 @@ For example, if you type:
 
 you must see something like this:
 <pre>
-     Usage: gwd [args]
-       -hd dir: directory where the directory lang is installed
-       -cgi query addr: called from a cgi-bin
-       -p #: port number; greater than 1024 for normal users
-       -wizard passwd: access to all dates and base updating
-       -friend passwd: access to all dates
-       -only address: only inet address accepted
+     Usage: gwd [options] where options are:
+       -hd &lt;dir&gt;
+	    Directory where the directory lang is installed.
+       -bd dir&gt;
+	    Directory where the databases are installed.
+       -cgi 
+	    Force cgi mode.
+       -p &lt;number&gt;
+	    Select a port number (default = 2317); &gt; 1024 for normal users.
+       -wizard &lt;passwd&gt;
+	    Set a wizard passord: access to all dates and updating.
+       -friend &lt;passwd&gt;
+	    Set a friend password: access to all dates.
+       -lang &lt;lang&gt;
+	    Set a default language (default: fr).
+       -only &lt;address&gt;
+	    Only inet address accepted.
+       -auth &lt;file&gt;
+	    Authorization file to restrict access. The file must hold lines
+	    of the form "user:password".
+       -log &lt;file&gt;
+	    Redirect log trace to this file.
+       -nolock 
+	    Do not lock files before writing.
 </pre>
 
 <p>
@@ -226,11 +243,11 @@ than French. See <a href="#Cnf">further</a>).
 <ul>
 <li>
 If you started from a GEDCOM file ("ged2gwb"), you must see at the beginning
-the number of persons of you base.
+the number of persons of your base.
 
 <p>
 
-From there, you can consult as a classical Web service, clicking on
+From there, you can consult it as a classical Web service, clicking on
 links and buttons, fill areas, etc. Hint: in a first stage, click on
 "Ok" after "All surnames by alphabetic order", then in the new page
 which appears: "the whole list". Select a surname, then a person, etc,
@@ -257,8 +274,8 @@ href="update.htm">modifications</a> in the database.
 
 Meanwhile, you can notice that each time you click on a button or a
 link, a trace appears on the interactive window. When you make your
-<em>GeneWeb</em> server work on the network, you see the requests sent
-to your base by this way.
+<em>GeneWeb</em> <a href="server.htm">server</a> work on the network,
+you see the requests sent to your base by this way.
 
 <p>
 
@@ -347,10 +364,10 @@ type:
 
 <p>
 
-Saving in different files different versions of your base, you can see
-the differences, using a command to compare text files, if you have
-some. This is particularly interesting if somebody has done modifications
-on your base and you want to know which ones.
+Saving your base in different versions and in different files, you can
+see the differences using a program to compare text files. This is
+particularly interesting if somebody has done modifications of your
+base and you want to know which they are.
 
 <p>
 
@@ -474,8 +491,8 @@ welcome page for this language: the file is named "start.txt".
 You can change this welcome page for a given database. For the
 database "smith" in the language "xx", just make a copy of the file
 "start.txt" in the directory "xx" naming it "smith.txt". Then edit
-your file "smith.txt" and make adaptations you want. You can do that
-or not for each language.
+your file "smith.txt" and make adaptations you want. If you want, you
+can do that for each language.
 
 <p>
 
