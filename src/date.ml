@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.19 2000-11-02 10:31:26 ddr Exp $ *)
+(* $Id: date.ml,v 3.20 2000-12-28 08:00:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -305,11 +305,14 @@ value get_birth_death_date p =
 value short_dates_text conf base p =
   if age_autorise conf base p then
     let (birth_date, death_date, _) = get_birth_death_date p in
+(*
     let s =
       match (birth_date, p.death) with
       [ (Some _, DontKnowIfDead) -> "*"
       | _ -> "" ]
     in
+*)
+    let s = "" in
     let s =
       match birth_date with
       [ Some (Dgreg d _) -> s ^ year_text d
