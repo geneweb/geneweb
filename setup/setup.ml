@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.51 2004-12-14 09:53:17 ddr Exp $ *)
+(* $Id: setup.ml,v 4.52 2004-12-14 13:46:48 ddr Exp $ *)
 
 open Printf;
 
@@ -1475,14 +1475,16 @@ value end_with s x =
 
 value print_typed_file conf typ fname =
   let ic_opt =
-    try Some (open_in fname) with
+    try Some (open_in_bin fname) with
     [ Sys_error _ -> None ]
   in
   match ic_opt with
   [ Some ic ->
       do {
         Wserver.http "";
-        Wserver.wprint "Content-type: %s; charset=%s" typ (charset conf);
+        Wserver.wprint "Content-type: %s" typ;
+        nl ();
+        Wserver.wprint "Content-length: %d" (in_channel_length ic);
         nl (); nl ();
 	try
           while True do {
