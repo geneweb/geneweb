@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.3 2001-12-20 19:58:14 ddr Exp $ *)
+(* $Id: date.ml,v 4.4 2002-01-11 22:15:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -333,6 +333,10 @@ value short_marriage_date_text conf base fam p1 p2 =
   else ""
 ;
 
+value print_place conf pl =
+  Util.copy_string_with_macros conf [] pl
+;
+
 value print_dates conf base p =
   let cap s = ", " ^ s in
   let is = index_of_sex p.sex in
@@ -349,7 +353,7 @@ value print_dates conf base p =
         if birth_place <> "" then
           Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
         else () ];
-    if birth_place <> "" then Wserver.wprint "%s" birth_place else ();
+    if birth_place <> "" then print_place conf birth_place else ();
     let baptism = Adef.od_of_codate p.baptism in
     let baptism_place = sou base p.baptism_place in
     match baptism with
@@ -364,7 +368,7 @@ value print_dates conf base p =
           Wserver.wprint "%s\n-&nbsp;"
             (cap (transl_nth conf "baptized" is))
         else () ];
-    if baptism_place <> "" then Wserver.wprint "%s" baptism_place else ();
+    if baptism_place <> "" then print_place conf baptism_place else ();
     let death_place = sou base p.death_place in
     match p.death with
     [ Death dr d ->
@@ -397,8 +401,7 @@ value print_dates conf base p =
             }
             else () ]
     | DontKnowIfDead | NotDead -> () ];
-    if death_place <> "" then do { Wserver.wprint "%s" death_place; }
-    else ();
+    if death_place <> "" then print_place conf death_place else ();
     let burial_date_place cod =
       let place = sou base p.burial_place in
       do {
@@ -409,7 +412,7 @@ value print_dates conf base p =
                if place <> "" then Wserver.wprint ",\n" else ();
              }
          | None -> if place <> "" then Wserver.wprint " -&nbsp;" else () ];
-         if place <> "" then Wserver.wprint "%s" place else ();
+         if place <> "" then print_place conf place else ();
       }
     in
     match p.burial with
