@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.21 2002-03-11 17:50:43 ddr Exp $ *)
+(* $Id: family.ml,v 4.22 2002-03-11 17:56:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -275,7 +275,7 @@ value precisez conf base n pl =
                       Wserver.wprint "%s" (one_title_text conf base p t))
                    tl;
                } ];
-           Date.afficher_dates_courtes conf base p;
+           Wserver.wprint "%s" (Date.short_dates_text conf base p);
            if authorized_age conf base p then
              match p.first_names_aliases with
              [ [] -> ()

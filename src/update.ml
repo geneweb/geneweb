@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.20 2002-03-06 12:21:23 ddr Exp $ *)
+(* $Id: update.ml,v 4.21 2002-03-11 17:57:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -222,7 +222,7 @@ value print_warning conf base =
         (fun _ ->
            do {
              print_someone_strong conf base p;
-             Date.afficher_dates_courtes conf base p
+             Wserver.wprint "%s" (Date.short_dates_text conf base p)
            })
   | IncoherentSex p _ _ ->
       Wserver.wprint
@@ -252,7 +252,7 @@ value print_warning conf base =
                  html_li conf;
                  if p.surname = fath.surname then print_first_name conf base p
                  else print_someone conf base p;
-                 Date.afficher_dates_courtes conf base p;
+                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
                  Wserver.wprint "\n"
                })
             before;
@@ -269,7 +269,7 @@ value print_warning conf base =
                  if p.surname = fath.surname then
                    print_first_name_ref conf base p
                  else print_someone_ref conf base p;
-                 Date.afficher_dates_courtes conf base p;
+                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
                  Wserver.wprint "\n"
                })
             des.children;
@@ -289,11 +289,11 @@ value print_warning conf base =
         Wserver.wprint "<ul>\n";
         html_li conf;
         print_first_name_strong conf base elder;
-        Date.afficher_dates_courtes conf base elder;
+        Wserver.wprint "%s" (Date.short_dates_text conf base elder);
         Wserver.wprint "\n";
         html_li conf;
         print_first_name_strong conf base x;
-        Date.afficher_dates_courtes conf base x;
+        Wserver.wprint "%s" (Date.short_dates_text conf base x);
         Wserver.wprint "</ul>"
       }
   | DeadTooEarlyToBeFather father child ->
@@ -303,12 +303,12 @@ value print_warning conf base =
         (fun _ ->
            do {
              print_someone_strong conf base child;
-             Date.afficher_dates_courtes conf base child
+             Wserver.wprint "%s" (Date.short_dates_text conf base child)
            })
         (fun _ ->
            do {
              print_someone_strong conf base father;
-             Date.afficher_dates_courtes conf base father
+             Wserver.wprint "%s" (Date.short_dates_text conf base father)
            })
   | MarriageDateAfterDeath p ->
       Wserver.wprint
@@ -316,7 +316,7 @@ value print_warning conf base =
         (fun _ ->
            do {
              print_someone_strong conf base p;
-             Date.afficher_dates_courtes conf base p
+             Wserver.wprint "%s" (Date.short_dates_text conf base p)
            })
   | MarriageDateBeforeBirth p ->
       Wserver.wprint
@@ -324,7 +324,7 @@ value print_warning conf base =
         (fun _ ->
            do {
              print_someone_strong conf base p;
-             Date.afficher_dates_courtes conf base p
+             Wserver.wprint "%s" (Date.short_dates_text conf base p)
            })
   | MotherDeadAfterChildBirth mother child ->
       Wserver.wprint
@@ -332,12 +332,12 @@ value print_warning conf base =
         (fun _ ->
            do {
              print_someone_strong conf base child;
-             Date.afficher_dates_courtes conf base child
+             Wserver.wprint "%s" (Date.short_dates_text conf base child)
            })
         (fun _ ->
            do {
              print_someone_strong conf base mother;
-             Date.afficher_dates_courtes conf base mother
+             Wserver.wprint "%s" (Date.short_dates_text conf base mother)
            })
   | ParentBornAfterChild p c ->
       do {
@@ -359,7 +359,7 @@ value print_warning conf base =
         (fun _ ->
            do {
              print_someone_strong conf base p;
-             Date.afficher_dates_courtes conf base p
+             Wserver.wprint "%s" (Date.short_dates_text conf base p)
            })
         (fun _ ->
            Wserver.wprint "<strong>%s %s</strong> <em>%s-%s</em>"

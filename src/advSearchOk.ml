@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 4.5 2002-03-11 17:50:40 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 4.6 2002-03-11 17:56:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -210,7 +210,7 @@ value print_result conf base max_answers (list, len) =
            do {
              html_li conf;
              Wserver.wprint "\n%s" (referenced_person_text conf base p);
-             Date.afficher_dates_courtes conf base p;
+             Wserver.wprint "%s" (Date.short_dates_text conf base p);
            })
         list;
       if len > max_answers then do { html_li conf; Wserver.wprint "...\n"; }

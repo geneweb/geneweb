@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.17 2002-03-11 17:50:44 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.18 2002-03-11 17:56:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -247,11 +247,11 @@ value propose_merge_ind conf base branches p1 p2 =
                tag "tr" "align=left" begin
                  tag "td" begin
                    Wserver.wprint "\n%s" (referenced_person_text conf base p1);
-                   Date.afficher_dates_courtes conf base p1;
+                   Wserver.wprint "%s" (Date.short_dates_text conf base p1);
                  end;
                  tag "td" begin
                    Wserver.wprint "\n%s" (referenced_person_text conf base p2);
-                   Date.afficher_dates_courtes conf base p2;
+                   Wserver.wprint "%s" (Date.short_dates_text conf base p2);
                  end;
                end;
              })

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.9 2002-02-25 13:06:00 ddr Exp $ *)
+(* $Id: some.ml,v 4.10 2002-03-11 17:57:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -78,7 +78,7 @@ value print_elem conf base is_surname (p, xl) =
            Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
          else Wserver.wprint "%s" p;
          Wserver.wprint "</a>";
-         Date.afficher_dates_courtes conf base x;
+         Wserver.wprint "%s" (Date.short_dates_text conf base x);
          Wserver.wprint " <em>";
          preciser_homonyme conf base x;
          Wserver.wprint "</em>\n";
@@ -213,7 +213,7 @@ value rec print_branch conf base first_lev psn lev name p =
             person_text_without_surname conf base p
           else person_text conf base p));
     Wserver.wprint "</strong>";
-    Date.afficher_dates_courtes conf base p;
+    Wserver.wprint "%s" (Date.short_dates_text conf base p);
     Wserver.wprint "\n";
     let u = uget conf base p.cle_index in
     if Array.length u.family == 0 then ()
@@ -236,7 +236,7 @@ value rec print_branch conf base first_lev psn lev name p =
                       person_text_without_surname conf base p
                     else person_text conf base p);
                  Wserver.wprint "</em>";
-                 Date.afficher_dates_courtes conf base p;
+                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
                  Wserver.wprint "\n";
                }
                else ();
@@ -248,7 +248,7 @@ value rec print_branch conf base first_lev psn lev name p =
                     (if conf.hide_names && not (fast_auth_age conf c) then "x"
                      else person_text conf base c));
                Wserver.wprint "</strong>";
-               Date.afficher_dates_courtes conf base c;
+               Wserver.wprint "%s" (Date.short_dates_text conf base c);
                Wserver.wprint "\n";
                let down =
                  p.sex = Male &&
