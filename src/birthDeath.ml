@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.12 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.13 2004-11-06 05:38:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -74,12 +74,13 @@ value select conf base get_date find_oldest =
   loop Q.empty 0 0
 ;
 
-value select_family conf base get_date =
+value select_family conf base get_date find_oldest =
   let module QF =
     Pqueue.Make
       (struct
          type t = (Def.family * Def.dmy * Def.calendar);
-         value leq (_, x, _) (_, y, _) = before_date y x;
+         value leq (_, x, _) (_, y, _) =
+	   if find_oldest then before_date x y else before_date y x;
        end)
   in
   let n =
@@ -98,17 +99,16 @@ value select_family conf base get_date =
       in
       loop [] q
     else
-      let p = base.data.families.get i in
+      let fam = base.data.families.get i in
       let (q, len) =
-        if Gutil.is_deleted_family p then (q, len)
-        else if p.relation == Married then
-          match get_date p with
+        if Gutil.is_deleted_family fam then (q, len)
+        else
+          match get_date fam with
           [ Some (Dgreg d cal) ->
-              let e = (p, d, cal) in
+              let e = (fam, d, cal) in
               if len < n then (QF.add e q, len + 1)
               else (snd (QF.take (QF.add e q)), len)
           | _ -> (q, len) ]
-        else (q, len)
       in
       loop q len (i + 1)
   in
@@ -305,13 +305,7 @@ value print_longest_lived conf base =
   }
 ;
 
-value print_marriage conf base =
-  let (list, len) =
-    select_family conf base (fun fam -> Adef.od_of_codate fam.marriage)
-  in
-  let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the latest %d marriages")) len
-  in
+value print_marr_or_eng conf base title list len =
   do {
     header conf title;
     print_link_to_welcome conf True;
@@ -340,12 +334,14 @@ value print_marriage conf base =
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
              Wserver.wprint "\n%s"
-               (referenced_person_text conf base (pget conf base (father cpl)));
+               (referenced_person_text conf base
+                  (pget conf base (father cpl)));
              Wserver.wprint "</strong>\n";
              Wserver.wprint "%s" (transl_nth conf "and" 0);
              Wserver.wprint "<strong>\n";
              Wserver.wprint "\n%s"
-               (referenced_person_text conf base (pget conf base (mother cpl)));
+               (referenced_person_text conf base
+                  (pget conf base (mother cpl)));
              Wserver.wprint "</strong>,\n";
              if future then
                Wserver.wprint "<em>%s</em>.\n"
@@ -367,6 +363,44 @@ value print_marriage conf base =
   }
 ;
 
+value print_marriage conf base =
+  let (list, len) =
+    select_family conf base
+      (fun fam ->
+         if fam.relation == Married then Adef.od_of_codate fam.marriage
+         else None)
+      False
+  in
+  let title _ =
+    Wserver.wprint (fcapitale (ftransl conf "the latest %d marriages")) len
+  in
+  print_marr_or_eng conf base title list len
+;
+
+value print_oldest_engagements conf base =
+  let (list, len) =
+    select_family conf base
+      (fun fam ->
+         if fam.relation == Engaged then
+           let cpl = coi base fam.fam_index in
+           let husb = poi base (father cpl) in
+           let wife = poi base (mother cpl) in
+           match (husb.death, wife.death) with
+           [ (NotDead | DontKnowIfDead, NotDead | DontKnowIfDead) ->
+               Adef.od_of_codate fam.marriage
+           | _ -> None ]
+         else None)
+      True
+  in
+  let title _ =
+    Wserver.wprint
+     (fcapitale
+       (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
+     len
+  in
+  print_marr_or_eng conf base title list len
+;
+
 value print_statistics conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "statistics")) in
   let n =
@@ -386,6 +420,11 @@ value print_statistics conf base =
         Wserver.wprint "</a>\n";
         Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
         Wserver.wprint (ftransl conf "the latest %d marriages") n;
+        Wserver.wprint "</a>\n";
+        Wserver.wprint "<li><a href=\"%sm=OE;k=%d\">" (commd conf) n;
+        Wserver.wprint
+          (ftransl conf
+             "the %d oldest couples perhaps still alive and engaged") n;
         Wserver.wprint "</a>\n";
         Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
         Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;

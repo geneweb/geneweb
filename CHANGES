@@ -6,6 +6,8 @@ GeneWeb version 4.10
     Bertrand Yeurc'h).
 
 * GeneWeb server or CGI (gwd)
+  - [06 Nov 04] In statistics, added displaying of oldest couples perhaps
+    still alive and engaged.
   - [06 Jan 04] Fixed bug: when changing a child's name using "change
     children's names", the possible image was not renamed, causing
     its disparition.

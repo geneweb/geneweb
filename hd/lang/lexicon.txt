@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.202 2004-09-30 12:15:03 ddr Exp $
+# $Id: lexicon.txt,v 4.203 2004-11-06 05:38:31 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7788,6 +7788,10 @@ ro: %d cei mai batrini posibil mai in viata
 ru: %d ñàìûõ ñòàğûõ åùå æèâóùèõ
 sl: %d najstarej¹ih, morda ¹e ¾iveèih
 sv: de %d &auml;ldsta som kanske lever
+
+    the %d oldest couples perhaps still alive and engaged
+en: the %d oldest couples perhaps still alive and engaged
+fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 
     the %d surnames
 af: die %d vanne
