@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.28 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.29 1999-08-14 12:17:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1009,6 +1009,7 @@ value main () =
           try int_of_string (Sys.getenv "CONTENT_LENGTH") with
           [ Not_found -> -1 ]
         in
+        do set_binary_mode_in stdin True; return
         read_input len
       else query
     in
