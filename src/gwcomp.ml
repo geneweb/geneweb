@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.3 2002-04-22 11:39:43 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.4 2002-10-22 13:18:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -382,6 +382,7 @@ value get_image str l =
   match l with
   [ ["#image" | "#photo"; x :: l'] ->
       do {
+        let x = cut_space x in
         for i = 0 to String.length x - 1 do {
           if x.[i] == ' ' then x.[i] := '_' else ()
         };

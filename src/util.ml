@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.53 2002-10-21 10:57:20 ddr Exp $ *)
+(* $Id: util.ml,v 4.54 2002-10-22 13:18:25 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -440,6 +440,8 @@ value authorized_age conf base p =
         let a = time_gone_by d conf.today in a.year > conf.private_years
     | (_, _, _, Some (Dgreg d _)) ->
         let a = time_gone_by d conf.today in a.year > conf.private_years
+    | (None, None, DontKnowIfDead, None) ->
+        p.access <> Private && conf.public_if_no_date
     | _ ->
         let u = uoi base p.cle_index in
         let rec loop i =
@@ -467,6 +469,8 @@ value is_old_person conf p =
       let a = time_gone_by d conf.today in a.year > conf.private_years
   | (_, _, _, Some (Dgreg d _)) ->
       let a = time_gone_by d conf.today in a.year > conf.private_years
+  | (None, None, DontKnowIfDead, None) ->
+      p.access <> Private && conf.public_if_no_date
   | _ -> False ]
 ;
 
