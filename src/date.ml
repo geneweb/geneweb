@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.17 2003-12-07 20:07:40 ddr Exp $ *)
+(* $Id: date.ml,v 4.18 2003-12-23 19:21:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -475,35 +475,53 @@ value french_month_name conf n = capitale (nominative (french_month conf n));
 value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 
 value print_year date var =
-  tag "td" begin
-    Wserver.wprint "<input type=submit name=y%s1 value=\"&lt;\">" var;
-    Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>" var
-      date.year;
-    Wserver.wprint "<input type=submit name=y%s2 value=\"&gt;\">\n" var;
-  end
+  do {
+    tag "td" begin
+      Wserver.wprint "<input type=submit name=y%s1 value=\" &lt; \">" var;
+    end;
+    tag "td" begin
+      Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>" var
+        date.year;
+    end;
+    tag "td" begin
+      Wserver.wprint "<input type=submit name=y%s2 value=\" &gt; \">\n" var;
+    end
+  }
 ;
 
 value print_month conf date month_name n_months var =
-  tag "td" "align=center" begin
-    Wserver.wprint "<input type=submit name=m%s1 value=\"&lt;\">" var;
-    stag "select" "name=m%s" var begin
-      for i = 1 to n_months do {
-        Wserver.wprint "<option value=%d%s> %s\n" i
-          (if date.month = i then " selected" else "")
-          (month_name conf (i - 1))
-      };
+  do {
+    tag "td" begin
+      Wserver.wprint "<input type=submit name=m%s1 value=\" &lt; \">" var;
     end;
-    Wserver.wprint "<input type=submit name=m%s2 value=\"&gt;\">" var;
-  end
+    tag "td" "align=center" begin
+      tag "select" "name=m%s" var begin
+        for i = 1 to n_months do {
+          Wserver.wprint "<option value=%d%s> %s\n" i
+            (if date.month = i then " selected" else "")
+            (month_name conf (i - 1))
+        };
+      end;
+    end;
+    tag "td" begin
+      Wserver.wprint "<input type=submit name=m%s2 value=\" &gt; \">" var;
+    end
+  }
 ;
 
 value print_day date var =
-  tag "td" begin
-    Wserver.wprint "<input type=submit name=d%s1 value=\"&lt;\">" var;
-    Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>" var
-      date.day;
-    Wserver.wprint "<input type=submit name=d%s2 value=\"&gt;\">\n" var;
-  end
+  do {
+    tag "td" begin
+      Wserver.wprint "<input type=submit name=d%s1 value=\" &lt; \">" var;
+    end;
+    tag "td" begin
+      Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>" var
+        date.day;
+    end;
+    tag "td" begin
+      Wserver.wprint "<input type=submit name=d%s2 value=\" &gt; \">\n" var;
+    end
+  }
 ;
 
 value print_some_calendar conf order date n month_name n_months var =
@@ -526,7 +544,7 @@ value print_some_calendar conf order date n month_name n_months var =
         print_day date var;
       };
       tag "td" begin
-        Wserver.wprint "<input type=submit name=t%s value=\"=\">\n" var;
+        Wserver.wprint "<input type=submit name=t%s value=\" = \">\n" var;
       end;
     end;
   }
@@ -538,7 +556,7 @@ value print_calendar_head conf order =
     Wserver.wprint "\n";
     if order = "ddmmyy" then
       for i = 2 downto 0 do {
-        tag "th align=center" begin
+        tag "th align=center colspan=3" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end
       }
