@@ -164,7 +164,7 @@ eftir
 <li><a href="%sm=LD;k=10">síğustu andlát</a>%x%j
 <li><a href="%sm=HIST;k=10">uppfærslusögu</a>%j
 <li><a href="%sm=CAL">dagatöl</a>
-<li><a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> umræğur</a>
+<li><a href="%sm=FORUM">gagnagrunnurinn umræğur</a>
 </ul>
 </td>
 </tr>

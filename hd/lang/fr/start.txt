@@ -167,7 +167,7 @@ d&eacute;c&eacute;d&eacute;es</a>
 <li>les <a href="%sm=LD;k=10">derniers d&eacute;c&egrave;s</a>%x%j
 <li>l'<a href="%sm=HIST;k=10">historique des mises-&agrave;-jour</a>%j
 <li>les <a href="%sm=CAL">calendriers</a>
-<li>le <a href="%sm=FORUM">forum <font color=#2f6400><b>GeneWeb</b></font></a>
+<li>le <a href="%sm=FORUM">forum de la base de donn&eacute;es</a>
 </ul>
 </td>
 </tr>

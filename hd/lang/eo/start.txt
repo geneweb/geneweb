@@ -164,7 +164,7 @@ progresata</b></font></a>.
 <li>la <a href="%sm=LD;k=10">lastaj mortoj</a>%x%j
 <li>la <a href="%sm=HIST;k=10">historio de la gxisdatigoj</a>%j
 <li>la <a href="%sm=CAL">kalendaroj</a>
-<li>la <a href="%sm=FORUM">forumo <font color=#2f6400><b>GeneWeb</b></font></a>
+<li>la <a href="%sm=FORUM">datenbazforumo</a>
 </ul>
 </td>
 </tr>

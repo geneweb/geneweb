@@ -168,7 +168,7 @@ complexa</b></font></a>.
 <li>as <a href="%sm=LD;k=10">mortes mais recentes</a>%x%j
 <li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&aacute;o</a>%j
 <li>os <a href="%sm=CAL">calend&aacute;rios</a>
-<li>o <a href="%sm=FORUM">forum <font color=#2f6400><b>GeneWeb</b></font></a>
+<li>o <a href="%sm=FORUM">forum de a base de dados</a>
 </ul>
 </td>
 </tr>
