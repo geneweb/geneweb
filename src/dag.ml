@@ -1,10 +1,12 @@
-(* $Id: dag.ml,v 3.4 1999-12-04 06:10:00 ddr Exp $ *)
+(* $Id: dag.ml,v 3.5 1999-12-10 02:35:51 ddr Exp $ *)
 
 open Dag2html;
 open Def;
 open Config;
 open Gutil;
 open Printf;
+
+module Pset = Set.Make (struct type t = iper; value compare = compare; end);
 
 (* testing *)
 
@@ -31,25 +33,20 @@ value tag_dag d =
 (* input dag *)
 
 value get_dag_elems conf base =
-  let module O = struct type t = iper; value compare = compare; end in
-  let module S = Set.Make O in
-  let set =
-    loop S.empty 1 where rec loop set i =
-      let s = string_of_int i in
-      let po = Util.find_person_in_env conf base s in
-      let so = Util.p_getenv conf.env ("s" ^ s) in
-      match (po, so) with
-      [ (Some p, Some s) ->
-          let set =
-            match Util.branch_of_sosa base p.cle_index (Num.of_string s) with
-            [ Some ipsl ->
-                List.fold_left (fun set (ip, _) -> S.add ip set) set ipsl
-            | None -> set ]
-          in
-          loop set (i + 1)
-      | _ -> set ]
-  in
-  S.elements set
+  loop Pset.empty 1 where rec loop set i =
+    let s = string_of_int i in
+    let po = Util.find_person_in_env conf base s in
+    let so = Util.p_getenv conf.env ("s" ^ s) in
+    match (po, so) with
+    [ (Some p, Some s) ->
+        let set =
+          match Util.branch_of_sosa base p.cle_index (Num.of_string s) with
+          [ Some ipsl ->
+              List.fold_left (fun set (ip, _) -> Pset.add ip set) set ipsl
+          | None -> set ]
+        in
+        loop set (i + 1)
+    | _ -> set ]
 ;
 
 value make_dag base list =
@@ -103,7 +100,7 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
 
 (* main *)
 
-value print_dag conf base d =
+value print_dag conf base set d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
@@ -112,13 +109,49 @@ value print_dag conf base d =
     [ Some "on" -> True
     | _ -> False ]
   in
+  let spouse_on =
+    match Util.p_getenv conf.env "spouse" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
   let d = if invert then invert_dag d else d in
   let t = table_of_dag False d in
   let t = if invert then invert_table t else t in
-  let print_indi ip =
+  let print_indi n =
+    let ip = n.valu in
     let p = poi base ip in
     do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
        Wserver.wprint "%s" (Date.short_dates_text conf base p);
+       if spouse_on && n.chil <> [] then
+         let spouses =
+           List.fold_left
+             (fun list id ->
+                let cip = d.dag.(int_of_idag id).valu in
+                match (aoi base cip).parents with
+                [ Some ifam ->
+                    let cpl = coi base ifam in
+                    let ips = Util.spouse ip cpl in
+                    if List.mem_assoc ips list then list
+                    else [(ips, ifam) :: list]
+                | None -> list ])
+             [] n.chil
+         in
+         List.iter
+           (fun (ips, ifam) ->
+              if Pset.mem ips set then ()
+              else
+                let ps = poi base ips in
+                let d =
+                  Date.short_marriage_date_text conf base (foi base ifam)
+                    p ps
+                in
+                do Wserver.wprint "<br>\n&amp;%s " d;
+                   Wserver.wprint "%s"
+                     (Util.referenced_person_title_text conf base ps);
+                   Wserver.wprint "%s" (Date.short_dates_text conf base ps);
+                return ())
+           spouses
+       else ();
     return ()
   in
 (*
@@ -132,6 +165,7 @@ do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; retur
 ;
 
 value print conf base =
-  let d = make_dag base (get_dag_elems conf base) in
-  print_dag conf base d
+  let set = get_dag_elems conf base in
+  let d = make_dag base (Pset.elements set) in
+  print_dag conf base set d
 ;

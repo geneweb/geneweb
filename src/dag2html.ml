@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.12 1999-12-06 20:54:13 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.13 1999-12-10 02:35:51 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -69,7 +69,7 @@ value print_html_table print print_indi border d t =
   let jlast = Array.length t.table.(0) - 1 in
   let print_elem =
     fun
-    [ Elem e -> print_indi d.dag.(int_of_idag e).valu
+    [ Elem e -> print_indi d.dag.(int_of_idag e)
     | Ghost _ -> print "|"
     | Nothing -> print "&nbsp;" ]
   in
