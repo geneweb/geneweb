@@ -24,6 +24,10 @@ GeneWeb version 3.01
 * Gedcom to GeneWeb (ged2gwb)
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [Nov 18, 99] Prints a space before the slash preceeding the surname
+    in the NAME tag.
+
 * Documentation
   - [Nov 10, 99] Updated German version (Thomas Omerzu).
 
