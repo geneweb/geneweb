@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.32 2002-11-25 13:10:09 ddr Exp $ *)
+(* $Id: relation.ml,v 4.33 2002-11-28 10:06:40 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -698,11 +698,11 @@ value parents_label conf base info =
           (transl_nth conf "nth (generation)" n) ]
 ;
 
-value parent_in_law_label conf sex_child sex_parent =
+value parent_in_law_label conf child_sex parent_sex =
   let txt = transl conf "the father-in-law/the mother-in-law" in
-  let is = index_of_sex sex_parent in
+  let is = index_of_sex parent_sex in
   if nb_fields txt = 2 then nth_field txt is
-  else nth_field txt (2 * index_of_sex sex_child + is)
+  else nth_field txt (2 * index_of_sex child_sex + is)
 ;
 
 value ancestor_label conf base info x sex =
@@ -801,9 +801,11 @@ value half_brother_label conf sex =
   transl_nth conf "a half-brother/a half-sister/a half-sibling" is
 ;
 
-value brother_in_law_label conf sex =
-  let is = index_of_sex sex in
-  transl_nth conf "a brother-in-law/a sister-in-law" is
+value brother_in_law_label conf brother_sex self_sex =
+  let txt = transl conf "a brother-in-law/a sister-in-law" in
+  let is = index_of_sex brother_sex in
+  if nb_fields txt = 2 then nth_field txt is
+  else nth_field txt (2 * index_of_sex self_sex + is)
 ;
 
 value uncle_label conf base info x p =
@@ -891,7 +893,7 @@ value print_link_name conf base n p1 p2 sol =
         if x2 == 1 && not (same_parents conf base p2 p1) then
           (half_brother_label conf p2.sex, sp1, sp2)
         else if x2 == 1 && (sp2 || sp1) && p2.sex <> Neuter then
-          (brother_in_law_label conf ini_p2.sex, False, False)
+          (brother_in_law_label conf ini_p2.sex ini_p1.sex, False, False)
         else (brother_label conf x1 p2.sex, sp1, sp2)
       else if x2 == 1 then
         (uncle_label conf base (info, x1) (x1 - x2) p2, sp1, sp2)
