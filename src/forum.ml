@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.44 2005-02-19 17:57:38 ddr Exp $ *)
+(* $Id: forum.ml,v 4.45 2005-02-20 06:39:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -449,7 +449,9 @@ value print_one_forum_message conf m pos next_pos forum_length =
       loop True 0 0 where rec loop last_was_eoln len i =
         if i = String.length m.m_mess then Buff.get len
         else if m.m_mess.[i] = '\n' && last_was_eoln then
-          loop False (Buff.mstore len "<p>\n") (i + 1)
+          loop False
+            (Buff.mstore len (sprintf "<br%s><br%s>\n" conf.xhs conf.xhs))
+            (i + 1)
         else
           loop (m.m_mess.[i] = '\n') (Buff.store len m.m_mess.[i]) (i + 1)
     in
@@ -461,17 +463,15 @@ value print_one_forum_message conf m pos next_pos forum_length =
       passwd_in_file conf
     then
       let s = message_txt conf 0 in
-      do {
-        Wserver.wprint "<p>\n";
-        tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+      tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+        tag "p" begin
           Util.hidden_env conf;
-          Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"FORUM_DEL\">\n";
-          Wserver.wprint "<input type=\"hidden\" name=\"p\" value=\"%d\">\n" pos;
-          Wserver.wprint "<input type=\"submit\" value=\"%s\">\n"
-            (capitale
-               (transl_decline conf "delete" (message_txt conf 0)));
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"FORUM_DEL\"";
+          xtag "input" "type=\"hidden\" name=\"p\" value=\"%d\"" pos;
+          xtag "input" "type=\"submit\" value=\"%s\""
+            (capitale (transl_decline conf "delete" (message_txt conf 0)));
         end;
-      }
+      end
     else ();
     trailer conf;
   }
@@ -505,7 +505,7 @@ value print_var conf var name opt def_value =
     end;
     Wserver.wprint "\n";
     stag "td" begin
-      Wserver.wprint "<input name=\"%s\" size=\"40\" maxlength=\"200\" value=\"%s\">\n"
+      xtag "input" "name=\"%s\" size=\"40\" maxlength=\"200\" value=\"%s\""
         var def_value;
     end;
     Wserver.wprint "\n";
@@ -521,28 +521,32 @@ value print_add conf base =
     header conf title;
     print_link_to_welcome conf True;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"FORUM_ADD_OK\">\n";
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"FORUM_ADD_OK\"";
+      end;
       tag "table" "border=\"%d\"" conf.border begin
         print_var conf "Ident" (capitale (header_txt conf 0)) False
           (if conf.username = "" then conf.user else conf.username);
         print_var conf "Email" (capitale (header_txt conf 1)) True "";
         print_var conf "Subject" (capitale (header_txt conf 2)) False "";
       end;
-      html_p conf;
-      Wserver.wprint "%s<br>\n"
-        (capitale (Gutil.nominative (message_txt conf 0)));
-      stag "textarea" "name=\"Text\" rows=\"15\" cols=\"70\" wrap=\"soft\""
-      begin end;
-      Wserver.wprint "\n<br>\n";
-      if conf.wizard || conf.friend then
-        do {
-          Wserver.wprint "<input type=\"submit\" name=\"publ_acc\" value=\"%s\">\n"
-            (transl conf "public");
-          Wserver.wprint "<input type=\"submit\" name=\"priv_acc\" value=\"%s\">\n"
-            (transl conf "private");
-        }
-      else Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      tag "p" begin
+        Wserver.wprint "%s"
+          (capitale (Gutil.nominative (message_txt conf 0)));
+        xtag "br";
+        stag "textarea" "name=\"Text\" rows=\"15\" cols=\"70\"" begin end;
+        Wserver.wprint "\n";
+        xtag "br";
+        if conf.wizard || conf.friend then
+          do {
+            xtag "input" "type=\"submit\" name=\"publ_acc\" value=\"%s\""
+              (transl conf "public");
+            xtag "input" "type=\"submit\" name=\"priv_acc\" value=\"%s\""
+              (transl conf "private");
+          }
+        else xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
     trailer conf;
   }
