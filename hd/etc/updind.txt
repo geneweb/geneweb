@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.19 2004-12-30 21:20:05 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.20 2005-01-18 02:18:50 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <title>%nn;
@@ -56,24 +56,31 @@ function changeDeath()
   <td>xlab</td>
   <td>
     %if;([ !dates order]0 = "ddmmyy");
-      [year/month/day]2
-      <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
-      [year/month/day]1
-      <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
-      [year/month/day]0
-      <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
+      <label>[year/month/day]2
+      <input name="xvar_dd" size="2" maxlength="2"%sp;
+       value="%xdt.day;"xcond%/></label>
+      <label>[year/month/day]1
+      <input name="xvar_mm" size="2" maxlength="2"%sp;
+       value="%xdt.month;"xcond%/></label>
+      <label>[year/month/day]0
+      <input name="xvar_yyyy" size="5" maxlength="6"%sp;
+       value="%xdt.year;"xcond%/></label>
     %else;
-      [year/month/day]0
-      <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
-      [year/month/day]1
-      <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
-      [year/month/day]2
-      <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
+      <label>[year/month/day]0
+      <input name="xvar_yyyy" size="5" maxlength="6"%sp;
+       value="%xdt.year;"xcond%/></label>
+      <label>[year/month/day]1
+      <input name="xvar_mm" size="2" maxlength="2"%sp;
+       value="%xdt.month;"xcond%/></label>
+      <label>[year/month/day]2
+      <input name="xvar_dd" size="2" maxlength="2"%sp;
+       value="%xdt.day;"xcond%/></label>
     %end;
   </td>
   <td>
-  ...[or]0 [text]0
-  <input name="xvar_text" size="15" maxlength="30" value="%xdt.text;"xcond%/>
+  ...<label>[or]0 [text]0
+  <input name="xvar_text" size="15" maxlength="30"%sp;
+   value="%xdt.text;"xcond%/></label>
   </td>
   </tr>
   </table>
@@ -117,9 +124,9 @@ function changeDeath()
 %define;source(xx)
   <table border="1">
   <tr>
-  <td>[*source/sources]0</td>
+  <td><label for="xx_src">[*source/sources]0</label></td>
   <td>
-  <input name="xx_src" size="40" maxlength="200" value="%xx_src;"
+  <input name="xx_src" size="40" maxlength="200" value="%xx_src;" id="xx_src"
    onfocus='
      sourceIfData
        (document.forms%[0].xx_src, document.forms%[0].xx_place,
@@ -159,37 +166,40 @@ function changeDeath()
 
 <table border="1">
 <tr>
-<td>[*first name/first names]0</td>
+<td><label for="first_name">[*first name/first names]0</label></td>
 <td>
-<input name="first_name" size="30" maxlength="200" value="%first_name;"%/></td>
-<td>[*number]0</td>
+<input name="first_name" size="30" maxlength="200" value="%first_name;"%sp;
+ id="first_name"%/></td>
+<td><label for="occ">[*number]0</label></td>
 <td>
-<input name="occ" size="5" maxlength="8" value="%occ;"%/></td>
+<input name="occ" size="5" maxlength="8" value="%occ;" id="occ"%/></td>
 </tr>
 <tr>
-<td>[*surname/surnames]0</td>
+<td><label for="surname">[*surname/surnames]0</label></td>
 <td>
-<input name="surname" size="40" maxlength="200" value="%surname;"%/></td>
+<input name="surname" size="40" maxlength="200" value="%surname;"%sp;
+ id="surname"%/></td>
 <td>[*sex]</td>
 <td>
-<input type="radio" name="sex" value="M"%if;is_male;%sp;
- checked="checked"%end;%/>[M/F]0
-<input type="radio" name="sex" value="F"%if;is_female;%sp;
- checked="checked"%end;%/>[M/F]1
-<input type="radio" name="sex"%nn;
- value="N"%if;not(is_male or is_female); checked="checked"%end;%/>?
+<input type="radio" name="sex" value="M" id="sexM"%if;is_male;%sp;
+ checked="checked"%end;%/><label for="sexM">[M/F]0</label>
+<input type="radio" name="sex" value="F" id="sexF"%if;is_female;%sp;
+ checked="checked"%end;%/><label for="sexF">[M/F]1</label>
+<input type="radio" name="sex" value="N" id="sexU"%nn;
+ %if;not(is_male or is_female); checked="checked"%end;%/><label%sp;
+ for="sexU">?</label>
 </td>
 </tr>
 <tr>
-<td>[*public name]</td>
+<td><label for="public_name">[*public name]</label></td>
 <td colspan="3">
-<input name="public_name" size="40" value="%public_name;"%/>
+<input name="public_name" size="40" value="%public_name;" id="public_name"%/>
 </td>
 </tr>
 <tr>
-<td>[*image/images]0</td>
+<td><label for="image">[*image/images]0</label></td>
 <td colspan="3">
-<input name="image" size="50" value="%image;"%/>
+<input name="image" size="50" value="%image;" id="image"%/>
 </td>
 </tr>
 </table>
@@ -200,55 +210,66 @@ function changeDeath()
 %if;has_qualifiers;
   %foreach;qualifier;
     <tr>
-    <td>[*qualifier]0</td>
-    <td><input name="qualifier%cnt;" size="30" value="%qualifier;"%/></td>
-    <td>[*insert::qualifier]</td>
-    <td><input type="checkbox" name="add_qualifier%cnt;" value="on"%/></td>
+    <td><label for="qualifier%cnt;">[*qualifier]0</label></td>
+    <td><input name="qualifier%cnt;" size="30" value="%qualifier;"%sp;
+     id="qualifier%cnt;"%/></td>
+    <td><label for="add_qualifier%cnt;">[*insert::qualifier]</label></td>
+    <td><input type="checkbox" name="add_qualifier%cnt;" value="on"%sp;
+     id="add_qualifier%cnt;"%/></td>
     </tr>
   %end;
 %elseif;(cvar_propose_qualifier != "no");
   <tr>
-  <td>[*qualifier]0</td>
-  <td><input name="qualifier0" size="30" value=""%/></td>
-  <td>[*insert::qualifier]</td>
-  <td><input type="checkbox" name="add_qualifier0" value="on"%/></td>
+  <td><label for="qualifier0">[*qualifier]0</label></td>
+  <td><input name="qualifier0" size="30" value="" id="qualifier0"%/></td>
+  <td><label for="add_qualifier0">[*insert::qualifier]</label></td>
+  <td><input type="checkbox" name="add_qualifier0" value="on"%sp;
+   id="add_qualifier0"%/></td>
   </tr>
 %end;
 %if;has_aliases;
   %foreach;alias;
     <tr>
-    <td>[*alias]0</td>
-    <td><input name="alias%cnt;" size="30" value="%alias;"%/></td>
-    <td>[*insert::alias]</td>
-    <td><input type="checkbox" name="add_alias%cnt;" value="on"%/></td>
+    <td><label for="alias%cnt;">[*alias]0</label></td>
+    <td><input name="alias%cnt;" size="30" value="%alias;"%sp;
+     id="alias%cnt;"%/></td>
+    <td><label for="add_alias%cnt;">[*insert::alias]</label></td>
+    <td><input type="checkbox" name="add_alias%cnt;" value="on"%sp;
+     id="add_alias%cnt;"%/></td>
     </tr>
   %end;
 %elseif;(cvar_propose_alias != "no");
   <tr>
-  <td>[*alias]0</td>
-  <td><input name="alias0" size="30" value=""%/></td>
-  <td>[*insert::alias]</td>
-  <td><input type="checkbox" name="add_alias0" value="on"%/></td>
+  <td><label for="alias0">[*alias]0</label></td>
+  <td><input name="alias0" size="30" value="" id="alias0"%/></td>
+  <td><label for="add_alias0">[*insert::alias]</label></td>
+  <td><input type="checkbox" name="add_alias0" value="on"%sp;
+   id="add_alias0"%/></td>
   </tr>
 %end;
 %if;has_first_names_aliases;
   %foreach;first_name_alias;
     <tr>
-    <td>[*first name alias]0</td>
+    <td><label for="first_name_alias%cnt;">[*first name alias]0</label></td>
     <td>
-    <input name="first_name_alias%cnt;" size="30" value="%first_name_alias;"%/>
+    <input name="first_name_alias%cnt;" size="30"%sp;
+     value="%first_name_alias;" id="first_name_alias%cnt;"%/>
     </td>
-    <td>[*insert::first name alias]</td>
+    <td><label="add_first_name_alias%cnt;">[*insert::first name alias]%nn;
+     </label></td>
     <td><input type="checkbox" name="add_first_name_alias%cnt;"%sp;
-    value="on"%/></td>
+    value="on" id="add_first_name_alias%cnt;"%/></td>
     </tr>
   %end;
 %else;
   <tr>
-  <td>[*first name alias]0</td>
-  <td><input name="first_name_alias0" size="30" value=""%/></td>
-  <td>[*insert::first name alias]</td>
-  <td><input type="checkbox" name="add_first_name_alias0" value="on"%/></td>
+  <td><label for="first_name_alias0">[*first name alias]0</label></td>
+  <td><input name="first_name_alias0" size="30" value=""%sp;
+   id="first_name_alias0"%/></td>
+  <td><label for="add_first_name_alias0">[*insert::first name alias]%nn;
+   </label></td>
+  <td><input type="checkbox" name="add_first_name_alias0" value="on"%sp;
+   id="add_first_name_alias0"%/></td>
   </tr>
 %end;
 %if;has_surnames_aliases;
@@ -264,10 +285,12 @@ function changeDeath()
   %end;
 %else;
   <tr>
-  <td>[*surname alias]0</td>
-  <td><input name="surname_alias0" size="30" value=""%/></td>
-  <td>[*insert::surname alias]</td>
-  <td><input type="checkbox" name="add_surname_alias0" value="on"%/></td>
+  <td><label for="surname_alias0">[*surname alias]0</label></td>
+  <td><input name="surname_alias0" size="30" value=""%sp;
+   id="surname_alias0"%/></td>
+  <td><label for="add_surname_alias0">[*insert::surname alias]</label></td>
+  <td><input type="checkbox" name="add_surname_alias0" value="on"%sp;
+   id="add_surname_alias0"%/></td>
   </tr>
 %end;
 </table>
@@ -277,9 +300,10 @@ function changeDeath()
 <table border="1">
 <tr>
 <td>[*born]2...</td>
-<td>[*place]</td>
+<td><label for="birth_place">[*place]</label></td>
 <td>
-<input name="birth_place" size="40" maxlength="200" value="%birth_place;"%/>
+<input name="birth_place" size="40" maxlength="200" value="%birth_place;"%sp;
+ id="birth_place"%/>
 </td>
 </tr>
 </table>
@@ -293,9 +317,10 @@ function changeDeath()
 <table border="1">
 <tr>
 <td>[*baptized]2...</td>
-<td>[*place]</td>
+<td><label for="bapt_place">[*place]</label></td>
 <td>
-<input name="bapt_place" size="40" maxlength="200" value="%bapt_place;"%/>
+<input name="bapt_place" size="40" maxlength="200" value="%bapt_place;"%sp;
+ id="bapt_place"%/>
 </td>
 </tr>
 </table>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.59 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: relation.ml,v 4.60 2005-01-18 02:18:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -15,11 +15,13 @@ value print_with_relation text conf base p r is =
       let c = pget conf base ic in
       if is_hidden c then ()
       else
-        tag "li" begin        
-          xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
-            (Adef.int_of_iper ic);
-          Wserver.wprint "(%s)\n" (text conf r.r_type is);
-          Wserver.wprint "%s\n" (person_title_text conf base c);
+        tag "li" begin
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
+              (Adef.int_of_iper ic);
+            Wserver.wprint "(%s)\n" (text conf r.r_type is);
+            Wserver.wprint "%s\n" (person_title_text conf base c);
+          end;
         end
   | None -> () ]
 ;
@@ -85,41 +87,49 @@ value print_menu conf base p =
       tag "ul" begin
         tag "li" begin
           xtag "input" "type=\"hidden\" name=\"m\" value=\"NG\"";
-          xtag "input" "\
+          tag "label" begin
+            xtag "input" "\
 type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
-          xtag "input" "name=\"n\" size=\"40\" maxlength=\"200\"";
+            xtag "input" "name=\"n\" size=\"40\" maxlength=\"200\"";
+          end;
           tag "ul" begin
             tag "li" begin
-              xtag "input"
-                "type=\"radio\" name=\"t\" value=\"PN\" checked=\"checked\"";
-              Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
-                (transl_nth conf "first name/first names" 0)
-                (transl_nth conf "surname/surnames" 0) (transl conf "or")
-                (transl conf "public name") (transl conf "or")
-                (nominative (transl conf "alias"));
-              match Util.find_sosa_ref conf base with
-              [ Some p ->
-                  do {
-                    Wserver.wprint "%s " (transl conf "or");
-                    Wserver.wprint
-                      (ftransl conf "<em>Sosa number</em> relative to %t")
-                      (fun _ ->
-                         Wserver.wprint "%s"
-                           (referenced_person_title_text conf base p))
-                  }
-              | None -> () ];
-            end;
-            stagn "li" begin
-              xtag "input" "type=\"radio\" name=\"t\" value=\"P\"";
-              stag "em" begin
-                Wserver.wprint "%s"
-                  (transl_nth conf "first name/first names" 0);
+              tag "label" begin
+                xtag "input"
+                  "type=\"radio\" name=\"t\" value=\"PN\" checked=\"checked\"";
+                Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
+                  (transl_nth conf "first name/first names" 0)
+                  (transl_nth conf "surname/surnames" 0) (transl conf "or")
+                  (transl conf "public name") (transl conf "or")
+                  (nominative (transl conf "alias"));
+                match Util.find_sosa_ref conf base with
+                [ Some p ->
+                    do {
+                      Wserver.wprint "%s " (transl conf "or");
+                      Wserver.wprint
+                        (ftransl conf "<em>Sosa number</em> relative to %t")
+                        (fun _ ->
+                           Wserver.wprint "%s"
+                             (referenced_person_title_text conf base p))
+                    }
+                | None -> () ];
               end;
             end;
             stagn "li" begin
-              xtag "input" "type=\"radio\" name=\"t\" value=\"N\"";
-              stag "em" begin
-                Wserver.wprint "%s" (transl_nth conf "surname/surnames" 0);
+              stag "label" begin
+                xtag "input" "type=\"radio\" name=\"t\" value=\"P\"";
+                stag "em" begin
+                  Wserver.wprint "%s"
+                    (transl_nth conf "first name/first names" 0);
+                end;
+              end;
+            end;
+            stagn "li" begin
+              stag "label" begin
+                xtag "input" "type=\"radio\" name=\"t\" value=\"N\"";
+                stag "em" begin
+                  Wserver.wprint "%s" (transl_nth conf "surname/surnames" 0);
+                end;
               end;
             end;
           end;
@@ -134,9 +144,11 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
                 && not (is_hidden c)
              then
                tag "li" begin
-                 xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
-                   (Adef.int_of_iper c.cle_index);
-                 Wserver.wprint "%s\n" (person_title_text conf base c);
+                 tag "label" begin
+                   xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
+                     (Adef.int_of_iper c.cle_index);
+                   Wserver.wprint "%s\n" (person_title_text conf base c);
+                 end;
                end
              else ())
           u.family;

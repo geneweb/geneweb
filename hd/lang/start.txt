@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.68 2004-12-31 10:44:19 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.69 2005-01-18 02:18:50 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -342,7 +342,7 @@ zh:
 <form method="get" action="%f">
 <p>
 %h<input type="hidden" name="m" value="NG"%/>
-<span class="highlight">[
+<label><span class="highlight">[
 af: per persoon
 bg: ïî èìå íà ÷îâåê
 br: dre anv-den
@@ -370,19 +370,20 @@ sl: osebo:
 sv: efter person
 zh: ËÑË÷£º
 ]</span>
-<input name="n" size="40" maxlength="200"%/>
+<input name="n" size="40" maxlength="200"%/></label>
 <input type="submit" value="Ok"%/>
 </p>
 <ul>
-<li> <input type="radio" name="t" value="PN" checked="checked"%/>
+<li>
+<label><input type="radio" name="t" value="PN" checked="checked" id="tPN"%/>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>%Iz
-[or] [<em>Sosa number</em> relative to %t](<br%/>%a)%E</li>
-<li> <input type="radio" name="t" value="P"%/>
-<em>[first name/first names]</em></li>
-<li> <input type="radio" name="t" value="N"%/>
-<em>[surname/surnames]</em></li>
+[or] [<em>Sosa number</em> relative to %t](<br%/>%a)%E</label></li>
+<li> <label><input type="radio" name="t" value="P" id="tP"%/>
+<em>[first name/first names]</em></label></li>
+<li> <label><input type="radio" name="t" value="N" id="tN"%/>
+<em>[surname/surnames]</em></label></li>
 </ul>
 </form></li>
 
@@ -391,7 +392,7 @@ zh: ËÑË÷£º
 <form method="get" action="%f">
 <table border="0" cellpadding="0" cellspacing="0"><tr><td>
 %h<input type="hidden" name="m" value="TT"%/>
-<span class="highlight">[
+<label><span class="highlight">[
 af: by title
 bg: ïî òèòëà
 br: dre ditl
@@ -419,14 +420,14 @@ sl: naziv:
 sv: efter titel
 zh: ¸ù¾İÃûÏÎ
 ]</span>%INl<br%/>%E
-<input name="t" size="14" maxlength="200"%/>%INl<br%/>%E
+<input name="t" size="14" maxlength="200"%/></label>%INl<br%/>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br%/>
 </td><td>...</td><td>
-<span class="highlight">[estate]0[
+<label><span class="highlight">[estate]0[
 da:  (dom&aelig;ne, sl&aelig;gt)
 en:
 ]</span>%INl<br%/>%E
-<input name="p" size="25" maxlength="200"%/>%INl<br%/>%E
+<input name="p" size="25" maxlength="200"%/></label>%INl<br%/>%E
 (<a href="%sm=TT;p=*">[all the estates]</a>)
 </td><td>
 <input type="submit" value="Ok"%/>
