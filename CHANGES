@@ -1,6 +1,10 @@
 GeneWeb version 3.12
 --------------------
 
+* Installation<
+  - [20 Fev 01] Added an "installer" for the Windows version (therefore
+    an installation normally easier).
+
 * Languages
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
