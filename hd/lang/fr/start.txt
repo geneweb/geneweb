@@ -73,7 +73,8 @@ Les <a href="%sm=AD">anniversaires des personnes
 d&eacute;c&eacute;d&eacute;es</a>.<br>
 Les <a href="%sm=AM">anniversaires de mariage</a>.<br>%x
 Les <a href="%sm=LB;k=10">derni&egrave;res naissances</a>.<br>
-Les <a href="%sm=LD;k=10">derniers d&eacute;c&egrave;s</a>.%x<br>
+Les <a href="%sm=LD;k=10">derniers d&eacute;c&egrave;s</a>.%x%j<br>
+<a href="%sm=HIST;k=10">[*updates history]</a>.%j<br>
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 
 <p>

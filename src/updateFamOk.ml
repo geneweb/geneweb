@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.27 1999-09-24 05:59:32 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.28 1999-09-24 11:55:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -571,7 +571,11 @@ value print_add conf base =
           do strip_family sfam; return
           let (fam, cpl) = effective_add conf base sfam scpl in
           let wl = all_checks_family conf base fam cpl in
-          let (fn, sn, occ, _) = scpl.father in
+          let (fn, sn, occ, _) =
+            match p_getint conf.env "i" with
+            [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
+            | _ -> scpl.father ]
+          in
           do base.func.commit_patches ();
              History.record conf base (fn, sn, occ) "af";
              delete_topological_sort conf base;
@@ -591,7 +595,12 @@ value print_del conf base =
           let fam = foi base (Adef.ifam_of_int i) in
           let k =
             let cpl = coi base (Adef.ifam_of_int i) in
-            let p = poi base cpl.father in
+            let ip =
+              match p_getint conf.env "ip" with
+              [ Some i when Adef.int_of_iper cpl.mother = i -> cpl.mother
+              | _ -> cpl.father ]
+            in
+            let p = poi base ip in
             (sou base p.first_name, sou base p.surname, p.occ)
           in
           do if not (is_deleted_family fam) then

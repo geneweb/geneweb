@@ -68,7 +68,8 @@ sorterade i
 <a href="%sm=AD">Årsdagar f&ouml;r d&ouml;da personer</a>.<br>
 <a href="%sm=AM">Br&ouml;llopsdagar</a>.<br>%x
 De <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>.<br>
-De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.%x<br>
+De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.%x%j<br>
+<a href="%sm=HIST;k=10">[*updates history]</a>.%j<br>
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 <p>
 Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.2 1999-09-24 05:59:31 ddr Exp $ *)
+(* $Id: history.ml,v 2.3 1999-09-24 11:55:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -7,7 +7,9 @@ open Def;
 open Util;
 open Gutil;
 
-value history_file_name conf =
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
+
+value file_name conf =
   let bname =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
@@ -28,7 +30,7 @@ value record conf base (fn, sn, occ) action =
     | _ -> False ]
   in
   if do_it then
-    let fname = history_file_name conf in
+    let fname = file_name conf in
     let oc = open_out_gen ext_flags 0o644 fname in
     let (hh, mm, ss) = conf.time in
     do Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d %s %s.%d %s\n"
@@ -69,9 +71,21 @@ value action_text conf =
   | "mf" ->
       let s = transl_nth conf "family/families" 0 in
       transl_decline conf "modify" s
+  | "df" ->
+      let s = transl_nth conf "family/families" 0 in
+      transl_decline conf "delete" s
+  | "sf" ->
+      let s = transl_nth conf "family/families" 0 in
+      transl_decline conf "switch" s
+  | "ap" ->
+      let s = transl_nth conf "person/persons" 0 in
+      transl_decline conf "add" s
   | "mp" ->
       let s = transl_nth conf "person/persons" 0 in
       transl_decline conf "modify" s
+  | "dp" ->
+      let s = transl_nth conf "person/persons" 0 in
+      transl_decline conf "delete" s
   | x -> x ]
 ;
 
@@ -82,11 +96,12 @@ value line_fields conf base line =
     let time = String.sub line 0 19 in
     let action = action_text conf (String.sub line 20 2) in
     let key = String.sub line 23 (String.length line - 23) in
-    match person_ht_find_all base key with
-    [ [ip] -> Some (time, action, poi base ip)
-    | _ ->
-do Printf.eprintf "--> key %s\n" key; flush stderr; return
-        None ]
+    let p =
+      match person_ht_find_all base key with
+      [ [ip] -> Right (poi base ip)
+      | _ -> Left key ]
+    in
+    Some (time, action, p)
   else None
 ;
 
@@ -96,10 +111,15 @@ value print_history_line conf base line i =
       do if i = 0 then Wserver.wprint "<dl>\n" else ();
          html_li conf;
          Wserver.wprint "<dt><tt>%s</tt>\n" time;
-         Wserver.wprint "(%s)\n" action;
-         html_br conf;
-         Wserver.wprint "<dd>%s" (referenced_person_title_text conf base p);
-         Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+         Wserver.wprint "(%s)\n<dd>" action;
+         match p with
+         [ Left key -> Wserver.wprint "%s" key
+         | Right p ->
+             do Wserver.wprint "%s"
+                  (referenced_person_title_text conf base p);
+                Wserver.wprint "%s" (Date.short_dates_text conf base p);
+             return () ];
+         Wserver.wprint "\n";
       return i + 1
   | None -> i ]
 ;
@@ -127,7 +147,12 @@ value print_history conf base ic =
             loop pos i
 	| _ -> (pos, i) ]
   in
-  if n > 0 then Wserver.wprint "</dl>\n" else ()
+  do if n > 0 then Wserver.wprint "</dl>\n" else ();
+     if pos > 0 then
+       Wserver.wprint "<a href=\"%sm=HIST;k=%d;pos=%d\">&gt;&gt;</a>\n"
+         (commd conf) k pos
+     else ();
+  return ()
 ;
 
 value print conf base =
@@ -135,7 +160,7 @@ value print conf base =
     Wserver.wprint "%s" (capitale (transl conf "updates history"))
   in
   do header conf title;
-     let fname = history_file_name conf in
+     let fname = file_name conf in
      match try Some (open_in fname) with [ Sys_error _ -> None ] with
      [ Some ic ->
          do print_history conf base ic;

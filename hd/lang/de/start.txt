@@ -71,7 +71,8 @@ Die <a href="%sm=AN">Geburtstage</a>.<br>
 Die <a href="%sm=AD">Jahrestage der verstorbenen Personen</a>.<br>
 Die <a href="%sm=AM">Hochzeitstage</a>.<br>%x
 Die <a href="%sm=LB;k=10">letzten Geburten</a>.<br>
-Die <a href="%sm=LD;k=10">letzten Ableben</a>.%x<br>
+Die <a href="%sm=LD;k=10">letzten Ableben</a>.%x%j<br>
+<a href="%sm=HIST;k=10">[*updates history]</a>.%j<br>
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 
 <p>
