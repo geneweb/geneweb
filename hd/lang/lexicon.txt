@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.5 2001-03-24 22:54:47 ddr Exp $
+# $Id: lexicon.txt,v 4.6 2001-03-25 01:44:54 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -1032,29 +1032,6 @@ pt: um meio-irm&atilde;o/uma meia-irm&atilde;/um(a) meio(a) irm&atilde;o(&atilde
 ru: ïîëóğîäíîé áğàò/ïîëóğîäíàÿ ñåñòğà/ïîëóğîäíîé áğàò
 se: en halvbror/en halvsyster/ett halvsyskon
 
-    a nephew (spouse's nephew)/a niece (spouse's niece)
-af: 'n neef van die eggenoot/'n niggie van die eggenoot
-cs: synovec (parnerùv synovec)/neteø (partnerova neteø)
-ct: un nebot polític/una neboda política
-de: ein Neffe (des Ehegatten)/eine Nichte (des Ehegatten)
-dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
-en: a nephew (spouse's nephew)/a niece (spouse's niece)
-eo: nevo (de edz(in)o)/nevino (de edz(in)o)
-es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
-et: venna- või õepoeg (abikaasa venna- või õepoeg)/venna- või õetütar (abikaasa venna- või õetütar)
-fi: veljen tai sisaren poika (puolison veljen tai sisaren poika)/veljen tai sisaren tyt&auml;r (puolison veljen tai sisaren tyt&auml;r)
-fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
-he:  àçééï (ùì áï åà áú äæåâ)/ àçééğéú (ùì áï åà áú äæåâ))
-is: frændi/frændi
-it: un nipote (dello sposo)/una nipote (dello sposo)
-lv: a nephew (spouse's nephew)/a niece (spouse's niece)
-nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
-no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
-pl: bratanek lub siostrzeniec (ma³¿onka/ma³¿onki)/bratanica lub siostrzenica (ma³¿onka/ma³¿onki)
-pt: um sobrinho (por afinidade)/uma sobrinha (por afinidade)
-ru: ïëåìÿííèê ñóïğóãà/ïëåìÿííèöà ñóïğóãà
-se: en nev&ouml; (gem&aring;lens nev&ouml;)/en niece (gem&aring;lens niece)
-
     a nephew/a niece
 af: 'n broerskind/'n susterskind
 cs: synovec/neteø
@@ -1520,29 +1497,6 @@ pl: przodek
 pt: um antepassado/uma antepassada
 ru: ïğåäîê
 se: en ana
-
-    an uncle (aunt's husband)/an aunt (uncle's wife)
-af: 'n oom (tante se man)/'n tante (oom se vrou)
-cs: strıc (man¾el tety)/teta (man¾elka strıce)
-ct: un oncle polític/una tia política
-de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
-dk: en onkel (tantes mand)/en tante (onkels hustru)
-en: an uncle (aunt's husband)/an aunt (uncle's wife)
-eo: onklo (edzo de onklino)/onklino (edzino de onklo)
-es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
-et: onu (tädimees)/tädi (onunaine)
-fi: set&auml;:g:--d&auml;n/t&auml;ti:g:--din
-fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
-he:  ãåã (áòì äãåãä)/ ãåãä (àùú äãåã)
-is: frændi/frænka
-it: uno zio (marito della zia)/una zia (moglie dello zio)
-lv: onkulis (tantes vîrs)/tante (onkuïa sieva)
-nl: een oom/een tante
-no: onkel (tantes mann)/tante (onkels kone)
-pl: stryj lub wuj/ciotka
-pt: um tio (por afinidade)/uma tia (por afinidade)
-ru: ìóæ òåòè/æåíà äÿäè
-se: en farbror (fasters make)/en faster (farbrors maka)/en morbror (mosters make)/en moster (morbrors maka)
 
     an uncle/an aunt
 af: 'n oom/'n tante
