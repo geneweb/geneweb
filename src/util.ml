@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.74 2000-10-29 15:02:20 ddr Exp $ *)
+(* $Id: util.ml,v 3.75 2000-11-08 12:28:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1400,6 +1400,7 @@ value create_topological_sort conf base =
 ;
 
 value branch_of_sosa base ip n =
+  do if Num.eq n Num.zero then invalid_arg "branch_of_sosa" else (); return
   let rec expand bl n =
     if Num.eq n Num.one then bl else expand [Num.even n :: bl] (Num.half n)
   in

@@ -1,8 +1,14 @@
 GeneWeb version 3.10
 --------------------
 
+* GeneWeb server or CGI (gwd)
+4  - [08 Nov 00] Fixed bug: when giving 0 as Sosa number, it did not
+    answer (infinite loop in gwd).
+
 * GeneWeb data bases Transfer Program (gwtp)
-  - [07 Nov 00] Added "body_prop" among configurable variables (conf.txt).
+  - [07 Nov 00] Added "body_prop" (text added inside the tag "body" in
+    generated pages, what allows to change the background, for example)
+    among configurable variables (conf.txt).
 
 * Installation under Linux rpm
   - [07 Nov 00] Put logs for gwsetup and gwd on /var/log.
