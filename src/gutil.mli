@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 3.6 2000-10-29 15:02:18 ddr Exp $ *)
+(* $Id: gutil.mli,v 3.7 2000-11-02 10:31:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -36,6 +36,7 @@ value strictement_apres_dmy : dmy -> dmy -> bool;
 value strictement_avant : date -> date -> bool;
 value strictement_apres : date -> date -> bool;
 value date_of_death : death -> option date;
+value roman_of_arabian : int -> string;
 
 value denomination : base -> person -> string;
 

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.15 2000-10-29 15:02:17 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.16 2000-11-02 10:31:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -502,6 +502,26 @@ value date_of_death =
   fun
   [ Death _ cd -> Some (Adef.date_of_cdate cd)
   | _ -> None ]
+;
+
+value roman_of_arabian n =
+  let build one five ten =
+    fun
+    [ 0 -> ""
+    | 1 -> one
+    | 2 -> one ^ one
+    | 3 -> one ^ one ^ one
+    | 4 -> one ^ five
+    | 5 -> five
+    | 6 -> five ^ one
+    | 7 -> five ^ one ^ one
+    | 8 -> five ^ one ^ one ^ one
+    | _ -> one ^ ten ]
+  in
+  build "M" "M" "M" (n / 1000 mod 10) ^
+  build "C" "D" "M" (n / 100 mod 10) ^
+  build "X" "L" "C" (n / 10 mod 10) ^
+  build "I" "V" "X" (n mod 10)
 ;
 
 value child_born_after_his_parent base error warning x iparent =

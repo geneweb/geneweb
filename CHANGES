@@ -2,6 +2,9 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [02 Nov 00] Added "subject" in forum header (preparing a future change
+    of forum displaying).
+  - [02 Nov 00] Now display French republican years in roman digits.
   - [01 Nov 00] In nobility title display, added a link to display the
     tree of their relationship links. The tree contains only six persons
     at the same time (and a link for the next ones).

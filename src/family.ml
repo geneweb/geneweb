@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.37 2000-10-30 16:21:01 ddr Exp $ *)
+(* $Id: family.ml,v 3.38 2000-11-02 10:31:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -147,26 +147,6 @@ value try_find_with_one_first_name conf base n =
       in
       pl
   | None -> [] ]
-;
-
-value roman_of_arabian n =
-  let build one five ten =
-    fun
-    [ 0 -> ""
-    | 1 -> one
-    | 2 -> one ^ one
-    | 3 -> one ^ one ^ one
-    | 4 -> one ^ five
-    | 5 -> five
-    | 6 -> five ^ one
-    | 7 -> five ^ one ^ one
-    | 8 -> five ^ one ^ one ^ one
-    | _ -> one ^ ten ]
-  in
-  build "M" "M" "M" (n / 1000 mod 10) ^
-  build "C" "D" "M" (n / 100 mod 10) ^
-  build "X" "L" "C" (n / 10 mod 10) ^
-  build "I" "V" "X" (n mod 10)
 ;
 
 value name_with_roman_number str =
