@@ -33,13 +33,13 @@ COPYRIGHT:
 
 All files marked in this distribution are copyright 1998 Institut
 National de Recherche en Informatique et Automatique (INRIA) and
-distributed under the conditions stated in file LICENSE. They can be
+distributed under the conditions stated in file LICENCE. They can be
 freely redistributed for non-commercial purposes, provided the
 copyright notice remains attached.
 
 INSTALLATION:
 
-You can compile on Unix or Windows NT machines. See the file INSTALL
+You can compile on Unix or Windows NT/95 machines. See the file INSTALL
 for installation instructions.
 
 BUG REPORTS AND USER FEEDBACK:
