@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.24 1999-04-29 21:01:31 ddr Exp $ *)
+(* $Id: perso.ml,v 2.25 1999-05-10 15:46:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -447,8 +447,7 @@ value print_marriage_text conf base in_perso fam =
        | _ -> Wserver.wprint "<em>" ]
      else ();
      match marriage with
-     [ Some d ->
-         Wserver.wprint "%s" (Date.string_of_ondate conf d)
+     [ Some d -> Wserver.wprint "%s" (Date.string_of_ondate conf d)
      | _ -> () ];
      match marriage_place with
      [ "" -> ()
@@ -471,17 +470,17 @@ value print_family conf base p a ifam =
   let auth = age_autorise conf base p && age_autorise conf base spouse in
   do Wserver.wprint "\n";
      html_li conf;
-     if fam.not_married && auth then
-       Wserver.wprint "%s" (capitale (transl conf "with"))
-     else
-       Wserver.wprint
-         (fcapitale (ftransl_nth conf "married%t to" is))
-         (fun _ ->
-            if auth then
-              do Wserver.wprint "\n";
-                 print_marriage_text conf base True fam;
-              return ()
-            else ());
+     let format =
+       if fam.not_married && auth then ftransl conf "relationship%t to"
+       else ftransl_nth conf "married%t to" is
+     in
+     Wserver.wprint (fcapitale format)
+       (fun _ ->
+          if auth then
+            do Wserver.wprint "\n";
+               print_marriage_text conf base True fam;
+            return ()
+          else ());
      Wserver.wprint "\n";
      afficher_personne_titre_referencee conf base (poi base ispouse);
      Date.afficher_dates_courtes conf base (poi base ispouse);
@@ -513,8 +512,7 @@ value print_family conf base p a ifam =
          List.for_all (fun ip -> age_autorise conf base (poi base ip))
            (Array.to_list children)
        in
-       do if fam.not_married && auth then ()
-          else Wserver.wprint ", %s" (transl conf "having as children");
+       do Wserver.wprint ", %s" (transl conf "having as children");
           Wserver.wprint "\n";
           tag "ul" begin
             Array.iter (print_child conf base age_auth) children;

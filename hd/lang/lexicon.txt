@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.36 1999-05-08 21:26:12 ddr Exp $
+# $Id: lexicon.txt,v 2.37 1999-05-10 15:45:54 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2924,6 +2924,10 @@ nl: verwantschap
 no: slektskap
 pt: parentesco
 se: sl&auml;ktskap
+
+    relationship%t to
+en: relationship%t to
+fr: relation%t avec
 
     relationship computing
 cn: œ‡πÿ≤È—Ø
