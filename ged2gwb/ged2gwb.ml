@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.26 2002-02-16 18:49:41 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.27 2002-02-26 04:32:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -590,14 +590,7 @@ value recover_date cal =
 EXTEND
   GLOBAL: date_value date_interval date_value_recover;
   date_value:
-    [ [ dr = date_range; EOI ->
-          match dr with
-          [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
-          | End (d, cal) -> Dgreg {(d) with prec = Before} cal
-          | BeginEnd (d1, cal) (d2, _) ->
-              Dgreg {(d1) with prec = YearInt d2.year} cal ]
-      | (d, cal) = date; EOI -> Dgreg d cal
-      | s = TEXT -> Dtext s ] ]
+    [ [ d = date_or_text; EOI -> d ] ]
   ;
   date_value_recover:
     [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_value ->
@@ -621,7 +614,13 @@ EXTEND
       | dt = date_or_text; EOI -> Begin dt ] ]
   ;
   date_or_text:
-    [ [ (d, cal) = date -> Dgreg d cal
+    [ [ dr = date_range ->
+          match dr with
+          [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
+          | End (d, cal) -> Dgreg {(d) with prec = Before} cal
+          | BeginEnd (d1, cal) (d2, _) ->
+              Dgreg {(d1) with prec = YearInt d2.year} cal ]
+      | (d, cal) = date -> Dgreg d cal
       | s = TEXT -> Dtext s ] ]
   ;
   date_range:
