@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 1.15 1999-02-18 11:38:55 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.16 1999-03-07 11:25:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -30,15 +30,13 @@ value getn conf var key =
   | None -> failwith (var ^ "_" ^ key ^ " unbound") ]
 ;
 
-value reconstitute_person conf var =
+value reconstitute_parent conf var =
   let first_name = strip_spaces (getn conf var "first_name") in
   let surname = strip_spaces (getn conf var "surname") in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
-    [ "create" -> UpdateFam.Create Neuter
-    | "create_M" -> UpdateFam.Create Masculine
-    | "create_F" -> UpdateFam.Create Feminine
+    [ "create" -> UpdateFam.Create Neuter None
     | _ -> UpdateFam.Link ]
   in
   (first_name, surname, occ, create)
@@ -51,11 +49,16 @@ value reconstitute_child conf var default_surname =
     if surname = "" then default_surname else surname
   in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
+  let birth = Update.reconstitute_date conf var in
+  let sex =
+    match p_getenv conf.env (var ^ "_sex") with
+    [ Some "M" -> Masculine
+    | Some "F" -> Feminine
+    | _ -> Neuter ]
+  in
   let create =
     match getn conf var "p" with
-    [ "create" -> UpdateFam.Create Neuter
-    | "create_M" -> UpdateFam.Create Masculine
-    | "create_F" -> UpdateFam.Create Feminine
+    [ "create" -> UpdateFam.Create sex birth
     | _ -> UpdateFam.Link ]
   in
   (first_name, surname, occ, create)
@@ -63,8 +66,8 @@ value reconstitute_child conf var default_surname =
 
 value reconstitute_family conf =
   let ext = False in
-  let father = reconstitute_person conf "his" in
-  let mother = reconstitute_person conf "her" in
+  let father = reconstitute_parent conf "his" in
+  let mother = reconstitute_parent conf "her" in
   let marriage = Update.reconstitute_date conf "marriage" in
   let marriage_place = strip_spaces (get conf "marriage_place") in
   let divorce =
@@ -86,15 +89,18 @@ value reconstitute_family conf =
       with
       [ Some c ->
           let (children, ext) = loop (i + 1) ext in
-          match p_getenv conf.env ("add_child" ^ string_of_int i) with
+          match p_getenv conf.env ("ins_child" ^ string_of_int i) with
           [ Some "on" ->
-              ([c; ("", "", 0, UpdateFam.Create Neuter) :: children], True)
+              let new_child = ("", "", 0, UpdateFam.Create Neuter None) in
+              ([c; new_child :: children], True)
           | _ -> ([c :: children ], ext) ]
       | None -> ([], ext) ]
   in
   let (children, ext) =
-    match p_getenv conf.env "add_child0" with
-    [ Some "on" -> ([("", "", 0, UpdateFam.Create Neuter) :: children], True)
+    match p_getenv conf.env "ins_child0" with
+    [ Some "on" ->
+        let new_child = ("", "", 0, UpdateFam.Create Neuter None) in
+        ([new_child :: children], True)
     | _ -> (children, ext) ]
   in
   let comment = strip_spaces (get conf "comment") in
@@ -164,7 +170,7 @@ value insert_person conf base (f, s, o, create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
-  [ UpdateFam.Create sex ->
+  [ UpdateFam.Create sex birth ->
       try
         if f = "?" || s = "?" then
           if o <= 0 || o >= base.data.persons.len then raise Not_found
@@ -181,6 +187,15 @@ value insert_person conf base (f, s, o, create) =
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int (base.data.persons.len) in
+          let death =
+            match birth with
+            [ Some d ->
+                let a = annee (temps_ecoule d conf.today) in
+                if a > 120 then DeadDontKnowWhen
+                else if a <= 80 then NotDead
+                else DontKnowIfDead
+            | None -> DontKnowIfDead ]
+          in
           let empty_string = Update.insert_string conf base "" in
           let p =
             {first_name = Update.insert_string conf base f;
@@ -191,11 +206,11 @@ value insert_person conf base (f, s, o, create) =
              nick_names = []; aliases = []; titles = [];
              occupation = empty_string;
              sex = sex; access = IfTitles;
-             birth = Adef.codate_None; birth_place = empty_string;
+             birth = Adef.codate_of_od birth; birth_place = empty_string;
              birth_src = empty_string;
              baptism = Adef.codate_None; baptism_place = empty_string;
              baptism_src = empty_string;
-             death = DontKnowIfDead; death_place = empty_string;
+             death = death; death_place = empty_string;
              death_src = empty_string;
              burial = UnknownBurial; burial_place = empty_string;
              burial_src = empty_string;
