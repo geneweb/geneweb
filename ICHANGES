@@ -4,6 +4,10 @@ Internal, very small, or not visible changes
 GeneWeb Intermediate Version 2.02-1
 -----------------------------------
 
+* Setup program
+  - [May 11, 99] Give up the second command of base recovery when the first
+    one returns an error code.
+
 * Compilation
   - [May 8, 99] Added "make opt" case in "setup" to build optimized versions.
 

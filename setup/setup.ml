@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.23 1999-05-10 17:21:45 ddr Exp $ *)
+(* $Id: setup.ml,v 1.24 1999-05-11 21:29:08 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -671,37 +671,44 @@ value recover_2 conf =
   let out_file = if out_file = "" then in_file else out_file in
   let conf = conf_with_env conf "o" out_file in
   let dir = Sys.getcwd () in
-  do try
+  let rc =
+    try
        do Printf.eprintf "$ cd %s\n" init_dir;
           flush stderr;
           Sys.chdir init_dir;
-          let c =
-            Filename.concat "." old_to_src ^ " " ^ in_file ^ o_opt ^
-            Filename.concat dir tmp
-          in
-          do Printf.eprintf "$ %s\n" c;
-             flush stderr;
-             let _ = Sys.command c in ();
-          return ();
-       return ()
+       return
+       let c =
+         Filename.concat "." old_to_src ^ " " ^ in_file ^ o_opt ^
+         Filename.concat dir tmp
+       in
+       do Printf.eprintf "$ %s\n" c;
+          flush stderr;
+       return
+       Sys.command c
      with
-     [ e -> do Sys.chdir dir; return raise e ];
-     Printf.eprintf "$ cd %s\n" dir;
-     flush stderr;
-     Sys.chdir dir;
-     let c =
-       Filename.concat "." src_to_new ^ " " ^ tmp ^ " -o " ^ out_file ^
-       " > " ^ "comm.log"
-     in
-     do Printf.eprintf "$ %s\n" c;
-        flush stderr;
-     return
-     let rc = Sys.command c in
-     let rc = ifdef WIN95 then infer_rc conf rc else rc in
-     do Printf.eprintf "\n";
-        flush stderr;
-     return
-     if rc = 1 then print_file conf "warnings.html"
+     [ e -> do Sys.chdir dir; return raise e ]
+  in
+  let rc =
+    if rc = 0 then
+      do Printf.eprintf "$ cd %s\n" dir;
+         flush stderr;
+         Sys.chdir dir;
+      return
+      let c =
+        Filename.concat "." src_to_new ^ " " ^ tmp ^ " -o " ^ out_file ^
+        " > " ^ "comm.log"
+      in
+      do Printf.eprintf "$ %s\n" c;
+         flush stderr;
+      return
+      let rc = Sys.command c in
+      let rc = ifdef WIN95 then infer_rc conf rc else rc in
+      do Printf.eprintf "\n";
+         flush stderr;
+      return rc
+     else rc
+  in
+  do if rc = 1 then print_file conf "warnings.html"
      else if rc > 1 then print_file conf "recover_err.html"
      else print_file conf "base_out_ok.html";
   return ()
@@ -750,7 +757,7 @@ value cleanup_1 conf =
   let _ = Sys.command c in
   do ifdef UNIX  then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
      else
-       do Printf.eprintf "$ del old\\%s*.*\n" in_base_dir;
+       do Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
           Printf.eprintf "$ rmdir old\\%s\n" in_base_dir;
        return ();
      flush stderr;
