@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.7 1999-10-31 15:48:44 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.8 1999-11-01 23:29:44 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -16,11 +16,10 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Base di dati<br>{genealogical}</font></h1>
+<h1><font color=#2f6400>Base di dati<br>genealogica</font></h1>
 </td>
 </tr>
 </table>
-
 <br>
 
 %rversion
@@ -36,16 +35,16 @@ attualmente %n persone.%In<br>
 %I&NcNa<table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w">{<em>Wizard</em></a> access<br>
-(password)}<br></td>
+<td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
+(parola d'accesso)<br></td>
 
-%INf<td align=center><a href="%sw=f">{<em>Friend</em></a> access<br>
-(password)}</td>
+%INf<td align=center><a href="%sw=f"><em>amiko</em></a> access<br>
+(parola d'accesso)</td>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%h{Password, for <em>friend</em> or <em>wizard</em> access</em>}:
+%hParola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -56,9 +55,7 @@ attualmente %n persone.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><p>
-
-<ul>
+Per traversare in questa base di dati, potete fare la vostra ricerca:<br><p>
 
 <li>
 
