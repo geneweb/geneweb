@@ -1,47 +1,49 @@
 GeneWeb Version 1.09
 --------------------
 
-* Precisions on dates now apply not only for years. So you can use things like:
-      "maybe on september 1815"
-      "after september 23, 1815"
-  and added case "between year and year".
-  (structure of databases have been changed for that).
+* Inside databases
+  - Precisions of dates now apply not only for years, but for complete
+    date. E.g. "maybe on september 1815" or "after september 23, 1815".
+  - In dates, added case "between": between year and another year.
+  - Structure of databases have been changed for that.
 
-* gwd:
-  - Added error message in relationship computing when loop in database.
-  - Fixed still several bugs (accents) due to new ANSEL encoding
-  - [detail] Added text "Parents of" in displaying missing ancestors.
+* Gedcom to GeneWeb (ged2gwb)
+  - Delete of duplicated FAMS which sometimes happen in erroneous Gedcoms.
+  - Delete families from GEDCOM when parents dont have the good sex.
+  - Added displaying of line number when syntax errors and unrecognized dates.
+  - Get sources if defined by pointer (but just the 1st line).
+  - Added option "-no_nd" (no negative dates), not to interpret years preceded
+    by a minus sign as negative dates.
+
+* Gedcom from and to GeneWeb (ged2gwb, gwb2ged)
+  - The <em>GeneWeb</em> fields "public name", "surname alias" and
+    "photo" are now loaded from and saved to Gedcom resp. as: "2 GIVN",
+    "2 SURN" and "1 OBJE (newline) 2 FILE".
+
+* GeneWeb daemon/CGI (gwd)
+  - Added error message in relationship computing when loop in
+    database (someone being his/her own ancestor).
   - In "search", added ability to write "I" instead of "Ier" (french form).
     Ex: "Charles I" or "Charles Ier" are both accepted.
   - Added ability to add ";opt=no_index" at end of requests to get an
-    equivalent link independant from the persons' index number.
+    equivalent link independant from the persons' index number (useful to
+    put direct links in Web pages).
+  - Added text "Parents of" in top of pages of missing ancestors.
+  - Fixed still several bugs (accents) due to new ANSEL encoding.
 
-* base.cnf:
-  - Added "wizard_just_friend" to suspend the powers of wizards.
-  - Added ability to define "renamed" to specify that a database has been
-    renamed.
+* Base configuration files (xxx.cnf)
+  - Added variable "wizard_just_friend" to suspend the powers of
+    "wizards" (e.g. for maintenance): when set to "yes", they become
+    simple "friends" (default: "no").
+  - Variable "renamed" can be used to specify that a database has been
+    renamed. Generates a page giving the good URL to use.
 
-* gwc, consang:
+* GeneWeb compiler and Consanguinity computing (gwc, consang)
   - Fixed accents displaying in traces and error messages.
 
-* ged2gwb, gwb2ged:
-  - Added save and restore of the GeneWeb fields
-       public name
-       surname alias
-       photo
-    into the Gedcom fields, resp.
-       2 GIVN ...
-       2 SURN ...
-       1 OBJE
-         2 FILE ...
-
-* ged2gwb:
-  - Delete of duplicated FAMS which sometimes happen in erroneous Gedcoms.
-  - Delete families from GEDCOM when parents dont have the good sex.
-  - Added displaying of line number when syntax errors and unrecognized dates
-  - Get sources if pointer (but just the 1st line)
-  - Added option "-no_nd" (no negative dates), not to interpret years preceded
-    by a minus sign as negative dates
+* Documentation (directory doc)
+  - Added 2 cases in FAQ.
+  - Many small changes.
 
 GeneWeb Version 1.08
 --------------------
