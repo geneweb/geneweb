@@ -1,4 +1,4 @@
-GeneWeb 4.04
+GeneWeb 4.05
 
 If you are under Windows:
    Double-click on the file "index.htm" of the directory "doc",
