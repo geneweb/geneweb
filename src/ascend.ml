@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.4 1999-11-23 13:28:16 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.5 1999-12-17 20:49:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1571,7 +1571,7 @@ value print_tree_with_table conf base gv p =
   end
 ;
 
-value print_tree conf base v p =
+value print_normal_tree conf base v p =
   let title _ =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
       (person_text_no_html conf base p)
@@ -1581,6 +1581,26 @@ value print_tree conf base v p =
      else print_tree_with_table conf base v p;
      trailer conf;
   return ()
+;
+
+value print_tree conf base v p =
+  match p_getenv conf.env "dag" with
+  [ Some "on" ->
+      let set =
+        loop Dag.Pset.empty v p.cle_index where rec loop set lev ip =
+          let set = Dag.Pset.add ip set in
+          if lev <= 1 then set
+          else
+            match (aoi base ip).parents with
+            [ Some ifam ->
+                let cpl = coi base ifam in
+                let set = loop set (lev - 1) cpl.mother in
+                loop set (lev - 1) cpl.father
+            | None -> set ]
+      in
+      let d = Dag.make_dag base (Dag.Pset.elements set) in
+      Dag.gen_print_dag conf base False True set [] d
+  | _ -> print_normal_tree conf base v p ]
 ;
 
 value print conf base p =
