@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.16 2002-03-05 16:29:58 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.17 2002-03-11 17:50:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -188,7 +188,7 @@ value print_err_parents conf base p =
     rheader conf title;
     Wserver.wprint "\n";
     Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
-      (fun _ -> afficher_personne_referencee conf base p);
+      (fun _ -> Wserver.wprint "\n%s" (referenced_person_text conf base p));
     Wserver.wprint "\n";
     html_p conf;
     tag "ul" begin
@@ -207,7 +207,7 @@ value print_err_father_sex conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n%s\n" (transl conf "should be male");
     Update.print_return conf;
     trailer conf;
@@ -219,7 +219,7 @@ value print_err_mother_sex conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n%s\n" (transl conf "should be female");
     Update.print_return conf;
     trailer conf;
@@ -612,10 +612,12 @@ value print_family conf base wl cpl des =
     | None -> () ];
     Wserver.wprint "<ul>\n";
     html_li conf;
-    afficher_personne_referencee conf base (poi base cpl.father);
+    Wserver.wprint "\n%s"
+      (referenced_person_text conf base (poi base cpl.father));
     Wserver.wprint "\n";
     html_li conf;
-    afficher_personne_referencee conf base (poi base cpl.mother);
+    Wserver.wprint "\n%s"
+      (referenced_person_text conf base (poi base cpl.mother));
     Wserver.wprint "</ul>\n";
     if des.children <> [| |] then do {
       html_p conf;
@@ -624,7 +626,8 @@ value print_family conf base wl cpl des =
         (fun ip ->
            do {
              html_li conf;
-             afficher_personne_referencee conf base (poi base ip);
+             Wserver.wprint "\n%s"
+               (referenced_person_text conf base (poi base ip));
              Wserver.wprint "\n"
            })
         des.children;
@@ -685,7 +688,7 @@ value print_inv_ok conf base p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n";
     trailer conf
   }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.10 2002-03-11 17:24:49 ddr Exp $ *)
+(* $Id: descend.ml,v 4.11 2002-03-11 17:50:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -218,8 +218,9 @@ value
     html_li conf;
     stag "strong" begin
       if not always_surname && s_appelle_comme_son_pere conf base ix then
-        afficher_prenom_de_personne_referencee conf base x
-      else afficher_personne_referencee conf base x;
+        Wserver.wprint "%s"
+          (referenced_person_text_without_surname conf base x)
+      else Wserver.wprint "\n%s" (referenced_person_text conf base x);
     end;
     if auth then Date.print_dates conf base x else ();
     let occu = sou base x.occupation in
@@ -323,7 +324,9 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
            (transl_nth conf "male line/female line"
               (if line = Male then 0 else 1)));
     html_p conf;
-    stag "strong" begin afficher_personne_referencee conf base p; end;
+    stag "strong" begin
+      Wserver.wprint "\n%s" (referenced_person_text conf base p);
+    end;
     if authorized_age conf base p then Date.print_dates conf base p else ();
     let occu = sou base p.occupation in
     if authorized_age conf base p && occu <> "" then Wserver.wprint ", %s" occu
@@ -408,7 +411,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
          String.sub (p_surname base p) (initiale (p_surname base p)) 1)
       (fun (p, c) ->
          do {
-           afficher_personne_titre_referencee conf base p;
+           Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
            Date.afficher_dates_courtes conf base p;
            if not (is_hidden p) && c > 1 then
              Wserver.wprint " <em>(%d)</em>" c
@@ -520,8 +523,9 @@ value print_child conf base p1 p2 e =
     stag "strong" begin
       if p1.sex == Male && e.surname == p1.surname ||
          p2.sex == Male && e.surname == p2.surname then
-        afficher_prenom_de_personne_referencee conf base e
-      else afficher_personne_referencee conf base e;
+        Wserver.wprint "%s"
+          (referenced_person_text_without_surname conf base e)
+      else Wserver.wprint "\n%s" (referenced_person_text conf base e);
     end;
     Date.afficher_dates_courtes conf base e
   }
@@ -531,8 +535,8 @@ value print_repeat_child conf base p1 p2 e =
   stag "em" begin
     if p1.sex == Male && e.surname == p1.surname ||
        p2.sex == Male && e.surname == p2.surname then
-      afficher_prenom_de_personne conf base e
-    else afficher_personne conf base e;
+      Wserver.wprint "%s" (person_text_without_surname conf base e)
+    else Wserver.wprint "%s" (person_text conf base e);
   end
 ;
 
@@ -545,7 +549,9 @@ value afficher_spouse conf base marks paths fam p c =
     Wserver.wprint "\n&amp;";
     afficher_date_mariage conf base fam p c;
     Wserver.wprint " ";
-    stag "strong" begin afficher_personne_referencee conf base c; end;
+    stag "strong" begin
+      Wserver.wprint "\n%s" (referenced_person_text conf base c);
+    end;
     if marks.(Adef.int_of_iper c.cle_index) then
       Wserver.wprint " (<tt><b>%s</b></tt>)" (label_of_path paths c)
     else Date.afficher_dates_courtes conf base c
@@ -646,7 +652,7 @@ value print_family conf base marks paths max_lev lev p =
            let c = pget conf base c in
            do {
              stag "strong" begin
-               afficher_personne_referencee conf base p;
+               Wserver.wprint "\n%s" (referenced_person_text conf base p);
              end;
              afficher_spouse conf base marks paths fam p c;
              Wserver.wprint "<ol start=%d>\n" (succ cnt);
@@ -954,7 +960,7 @@ value afficher_index_spouses conf base niveau_max ancetre =
 
 value print_someone conf base p =
   do {
-    afficher_personne_titre_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
     Date.afficher_dates_courtes conf base p;
     Wserver.wprint "\n"
   }

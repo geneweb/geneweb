@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.17 2002-03-11 17:24:45 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.18 2002-03-11 17:50:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -204,7 +204,7 @@ value afficher_menu_ascendants conf base p =
 
 value afficher_ancetre conf base p =
   do {
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Date.afficher_dates_courtes conf base p
   }
 ;
@@ -327,7 +327,7 @@ value print_generation_person conf base cnt gp =
         html_li conf;
         Num.print wpr (transl conf "(thousand separator)") n;
         Wserver.wprint " -\n";
-        afficher_personne_titre_referencee conf base p;
+        Wserver.wprint "%s" (referenced_person_title_text conf base p);
         Date.afficher_dates_courtes conf base p;
         Wserver.wprint "\n";
         incr cnt
@@ -632,8 +632,9 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
           Wserver.wprint "<li>\n";
           stag "strong" begin
             if pc.surname = (pget conf base cpl.father).surname then
-              afficher_prenom_de_personne_referencee conf base pc
-            else afficher_personne_referencee conf base pc;
+              Wserver.wprint "%s"
+                (referenced_person_text_without_surname conf base pc)
+            else Wserver.wprint "\n%s" (referenced_person_text conf base pc);
           end;
           print_person_long_info conf base auth n pc;
           Wserver.wprint ".\n";
@@ -709,7 +710,9 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
           end;
         end;
         Wserver.wprint ":\n";
-        stag "strong" begin afficher_personne_referencee conf base p; end;
+        stag "strong" begin
+          Wserver.wprint "\n%s" (referenced_person_text conf base p);
+        end;
         print_person_long_info conf base (authorized_age conf base p) None p;
         Wserver.wprint ".\n";
         match (aget conf base ip).parents with
@@ -1137,7 +1140,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
                (person_title_text conf base (pget conf base conj) ^
                   Date.short_dates_text conf base (pget conf base conj)))
         else do {
-          afficher_personne_titre_referencee conf base p;
+          Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
           Date.afficher_dates_courtes conf base p
         };
         Wserver.wprint "\n"
@@ -1368,7 +1371,7 @@ value print_spouses conf base p u =
        else do {
          Wserver.wprint "\n&amp;%s\n"
            (Date.short_marriage_date_text conf base fam p sp);
-         afficher_personne_titre conf base sp;
+         Wserver.wprint "%s" (person_title_text conf base sp);
          Date.afficher_dates_courtes conf base sp
        })
     u.family

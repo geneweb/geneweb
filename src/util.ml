@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.42 2002-03-11 17:24:57 ddr Exp $ *)
+(* $Id: util.ml,v 4.43 2002-03-11 17:50:46 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -732,6 +732,14 @@ value referenced_person_title_text =
 ;
 
 value person_title_text = gen_person_title_text no_reference std_access;
+
+value referenced_person_text conf base p =
+  reference conf base p (person_text conf base p)
+;
+
+value referenced_person_text_without_surname conf base p =
+  reference conf base p (person_text_without_surname conf base p)
+;
 
 value gen_person_text_without_title p_access conf base p =
   match main_title base p with
@@ -2046,31 +2054,4 @@ value commit_patches conf base =
         conf.henv
     ;
   }
-;
-
-(* Deprecated *)
-
-value afficher_personne conf base p =
-  Wserver.wprint "%s" (person_text conf base p)
-;
-
-value afficher_prenom_de_personne conf base p =
-  Wserver.wprint "%s" (person_text_without_surname conf base p)
-;
-
-value afficher_prenom_de_personne_referencee conf base p =
-  Wserver.wprint "%s"
-    (reference conf base p (person_text_without_surname conf base p))
-;
-
-value afficher_personne_referencee conf base p =
-  Wserver.wprint "\n%s" (reference conf base p (person_text conf base p))
-;
-
-value afficher_personne_titre conf base p =
-  Wserver.wprint "%s" (person_title_text conf base p)
-;
-
-value afficher_personne_titre_referencee conf base p =
-  Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
 ;

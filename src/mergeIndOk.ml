@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 4.7 2002-03-06 12:21:21 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.8 2002-03-11 17:50:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -105,7 +105,7 @@ value print_mod_merge_ok conf base wl p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n";
     Update.print_warnings conf base wl;
     match (p_getint conf.env "ini1", p_getint conf.env "ini2") with

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.5 2002-03-06 12:21:18 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.6 2002-03-11 17:50:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -148,7 +148,7 @@ value print_birth conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base p;
+             Wserver.wprint "\n%s" (referenced_person_text conf base p);
              Wserver.wprint "</strong>,\n";
              if future then
                Wserver.wprint "<em>%s</em>.\n"
@@ -197,7 +197,7 @@ value print_death conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base p;
+             Wserver.wprint "\n%s" (referenced_person_text conf base p);
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>"
                (transl_nth conf "died" (index_of_sex p.sex))
@@ -252,7 +252,7 @@ value print_oldest_alive conf base =
          do {
            Wserver.wprint "<li>\n";
            Wserver.wprint "<strong>\n";
-           afficher_personne_referencee conf base p;
+           Wserver.wprint "\n%s" (referenced_person_text conf base p);
            Wserver.wprint "</strong>,\n";
            Wserver.wprint "%s <em>%s</em>"
              (transl_nth conf "born" (index_of_sex p.sex))
@@ -297,7 +297,7 @@ value print_longest_lived conf base =
          do {
            Wserver.wprint "<li>\n";
            Wserver.wprint "<strong>\n";
-           afficher_personne_referencee conf base p;
+           Wserver.wprint "\n%s" (referenced_person_text conf base p);
            Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
            Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
            Wserver.wprint ".\n";
@@ -342,13 +342,13 @@ value print_marriage conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base
-               (pget conf base cpl.father);
+             Wserver.wprint "\n%s"
+               (referenced_person_text conf base (pget conf base cpl.father));
              Wserver.wprint "</strong>\n";
              Wserver.wprint "%s" (transl_nth conf "and" 0);
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base
-               (pget conf base cpl.mother);
+             Wserver.wprint "\n%s"
+               (referenced_person_text conf base (pget conf base cpl.mother));
              Wserver.wprint "</strong>,\n";
              if future then
                Wserver.wprint "<em>%s</em>.\n"
