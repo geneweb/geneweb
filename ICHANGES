@@ -5,6 +5,7 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [18 Oct 02] One space too many when displaying French Revolution dates.
   - [14 Oct 02] Fixed problem of displaying consanguinities: sometimes
     displayed a lot of digits (too much precision).
   - [04 Oct 02] When entering a complete name (first name + surname), if
