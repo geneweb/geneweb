@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.30 1999-07-14 11:50:54 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.31 1999-07-15 08:52:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -388,7 +388,7 @@ value print_person_long_info conf base auth link p =
   do List.iter
        (fun a ->
           Wserver.wprint ", %s <em>%s</em>" (transl conf "alias")
-            (coa conf (sou base a)))
+            (sou base a))
        p.aliases;
      if link = None && List.length p.titles > 0 &&
        (p.access <> Private || conf.friend || conf.wizard)
@@ -401,7 +401,7 @@ value print_person_long_info conf base auth link p =
      if auth then Perso.print_dates conf base False p else ();
      let occu = sou base p.occupation in
      if auth && link = None && occu <> "" then
-       Wserver.wprint ", %s" (coa conf occu)
+       Wserver.wprint ", %s" occu
      else ();
      match link with
      [ Some n ->
@@ -419,7 +419,7 @@ value title_reference conf base t =
   "<em>" ^
   geneweb_link conf
     ("m=TT;sm=S;t=" ^ code_varenv ident ^ ";p=" ^ code_varenv place)
-    (coa conf s) ^
+    s ^
   "</em>"
 ;
 
@@ -734,7 +734,7 @@ value print_notes conf base =
              end;
            end;
            Wserver.wprint ": \n<dd>\n";
-           Perso.copy_string_with_macros conf (coa conf notes);
+           Perso.copy_string_with_macros conf notes;
            Perso.print_sources conf base (notes <> "") p;
            Wserver.wprint "<p>\n";
         return ()
@@ -1226,7 +1226,7 @@ value print_someone_missing conf base begin_surname spouses_incl (mt, mtl, p) =
 ;
 
 value print_alphabetic_missing conf base spouses_included (surname, list) =
-  do Wserver.wprint "%s " (coa conf (surname_end surname));
+  do Wserver.wprint "%s " (surname_end surname);
      match list with
      [ [e] ->
          print_someone_missing conf base (surname_begin surname)

@@ -1,21 +1,11 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 2.4 1999-06-07 18:45:19 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 2.5 1999-07-15 08:52:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
-
-value f_coa conf s =
-  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
-  else s
-;
-
-value f_aoc conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
 
 value print_child_person conf base p =
   let first_name = sou base p.first_name in
@@ -31,7 +21,7 @@ value print_child_person conf base p =
       tag "td" "colspan=3" begin
         Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
         Wserver.wprint " value=\"%s\">"
-          (quote_escaped (f_coa conf first_name));
+          (quote_escaped first_name);
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
@@ -51,7 +41,7 @@ value print_child_person conf base p =
       tag "td" "colspan=5" begin
         Wserver.wprint
           "<input name=%s_surname size=40 maxlength=200 value=\"%s\">"
-          var (f_coa conf surname);
+          var surname;
       end;
     end;
     Wserver.wprint "\n";
@@ -239,13 +229,13 @@ value change_child conf base parent_surname ip =
   let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
-    [ Some x -> only_printable (f_aoc conf x)
+    [ Some x -> only_printable x
     | _ -> sou base p.first_name ]
   in
   let new_surname =
     match p_getenv conf.env (var ^ "_surname") with
     [ Some x ->
-        let x = only_printable (f_aoc conf x) in
+        let x = only_printable x in
         if x = "" then parent_surname else x
     | _ -> sou base p.surname ]
   in

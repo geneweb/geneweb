@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.9 1999-05-28 16:19:24 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.10 1999-07-15 08:52:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -58,7 +58,7 @@ value starting_char s =
 ;
 
 value correct_string base is =
-  let s = Ansel.to_iso_8859_1 (sou base is) in
+  let s = sou base is in
   loop 0 0 where rec loop i len =
     if i == String.length s then get_buff len
     else
@@ -371,7 +371,7 @@ value print_family oc base ml (per_sel, fam_sel) fam_done m =
      in
      do match fam.comment with
         [ txt when sou base txt <> "" ->
-            Printf.fprintf oc "comm %s\n" (Ansel.to_iso_8859_1 (sou base txt))
+            Printf.fprintf oc "comm %s\n" (sou base txt)
         | _ -> () ];
      return
      match Array.length m.m_chil with
@@ -420,7 +420,7 @@ value print_notes_for_person oc base p =
        Printf.fprintf oc "notes %s %s%s\n" surn fnam
          (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
        Printf.fprintf oc "beg\n";
-       Printf.fprintf oc "%s\n" (Ansel.to_iso_8859_1 (sou base p.notes));
+       Printf.fprintf oc "%s\n" (sou base p.notes);
        Printf.fprintf oc "end notes\n";
     return ()
   else ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.5 1999-06-25 12:48:07 ddr Exp $ *)
+(* $Id: alln.ml,v 2.6 1999-07-15 08:52:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -71,9 +71,8 @@ value combine_by_count list =
 
 value alphab_string conf is_surname s =
   if is_surname then
-    let s = coa conf s in
     surname_end s ^ surname_begin s
-  else coa conf s
+  else s
 ;
 
 (* print *)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.12 1999-07-14 11:50:54 ddr Exp $ *)
+(* $Id: relation.ml,v 2.13 1999-07-15 08:52:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -15,9 +15,9 @@ value print_menu conf base p =
        if h then
          match sou base p.public_name with
          [ "" ->
-             Wserver.wprint "%s %s" (coa conf (sou base p.first_name))
-               (coa conf (sou base p.surname))
-         | n -> Wserver.wprint "%s" (coa conf n) ]
+             Wserver.wprint "%s %s" (sou base p.first_name)
+               (sou base p.surname)
+         | n -> Wserver.wprint "%s" n ]
        else Wserver.wprint "%s" (person_text conf base p);
        Wserver.wprint " %s..." (transl conf "and");
     return ()

@@ -1,16 +1,11 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.11 1999-05-23 09:52:00 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.12 1999-07-15 08:53:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
-
-value f_aoc conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
 
 value raw_get conf key =
   match p_getenv conf.env key with
@@ -20,13 +15,13 @@ value raw_get conf key =
 
 value get conf key =
   match p_getenv conf.env key with
-  [ Some v -> f_aoc conf v
+  [ Some v -> v
   | None -> failwith (key ^ " unbound") ]
 ;
 
 value get_nth conf key cnt =
   match p_getenv conf.env (key ^ string_of_int cnt) with
-  [ Some v -> Some (f_aoc conf v)
+  [ Some v -> Some v
   | None -> None ]
 ;
 

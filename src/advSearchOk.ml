@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.3 1999-04-13 13:37:53 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.4 1999-07-15 08:52:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -65,11 +65,6 @@ value name_incl x y =
   string_incl x y
 ;
 
-value f_aoc conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
-
 value advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
@@ -78,7 +73,7 @@ value advanced_search conf base max_answers =
     [ Not_found ->
         let v =
           match p_getenv conf.env x with
-          [ Some v -> f_aoc conf v
+          [ Some v -> v
           | None -> "" ]
         in
         do Hashtbl.add hs x v; return v ]

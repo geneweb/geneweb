@@ -1,16 +1,11 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.10 1999-05-29 17:38:41 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.11 1999-07-15 08:53:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
-
-value f_aoc conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
 
 value raw_get conf key =
   match p_getenv conf.env key with
@@ -20,13 +15,13 @@ value raw_get conf key =
 
 value get conf key =
   match p_getenv conf.env key with
-  [ Some v -> f_aoc conf v
+  [ Some v -> v
   | None -> failwith (key ^ " unbound") ]
 ;
 
 value getn conf var key =
   match p_getenv conf.env (var ^ "_" ^ key) with
-  [ Some v -> f_aoc conf v
+  [ Some v -> v
   | None -> failwith (var ^ "_" ^ key ^ " unbound") ]
 ;
 
@@ -147,7 +142,7 @@ value print_err_unknown conf base (f, s, o) =
   in
   do header conf title;
      Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
-       (capitale (transl conf "unknown person")) (coa conf f) o (coa conf s);
+       (capitale (transl conf "unknown person")) f o s;
      trailer conf;
   return ()
 ;

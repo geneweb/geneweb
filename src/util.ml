@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.25 1999-07-14 11:50:55 ddr Exp $ *)
+(* $Id: util.ml,v 2.26 1999-07-15 08:53:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -26,44 +26,6 @@ value html_li conf =
      Wserver.wprint "\n";
   return ()
 ;
-
-value ansel_to_ascii s =
-  let len =
-    loop 0 0 where rec loop i len =
-      if i == String.length s then len
-      else
-        if Char.code s.[i] >= 128 then loop (i + 1) len
-        else loop (i + 1) (len + 1)
-  in
-  if len == String.length s then s
-  else
-    let s' = String.create len in
-    loop 0 0 where rec loop i i' =
-      if i == String.length s then s'
-      else
-        if Char.code s.[i] >= 128 then loop (i + 1) i'
-        else do s'.[i'] := s.[i]; return loop (i + 1) (i' + 1)
-;
-
-value charset_of_ansel conf s =
-  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
-  else if conf.charset = "iso-8859-2" then s
-  else if s = "" then s
-  else if String.length s = 2 then
-    if Char.code s.[0] >= 128 then s else ansel_to_ascii s
-  else if String.length s >= 4 then
-    if Char.code s.[0] >= 128 && Char.code s.[2] >= 128 then s
-    else ansel_to_ascii s
-  else ansel_to_ascii s
-;
-
-value ansel_of_charset conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
-
-value coa = charset_of_ansel;
-value aoc = ansel_of_charset;
 
 value nl () = Wserver.wprint "\r\n";
 
@@ -209,7 +171,7 @@ value person_text conf base p =
     | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
     | (n, []) -> n ]
   in
-  coa conf (beg ^ " " ^ sou base p.surname)
+  beg ^ " " ^ sou base p.surname
 ;
 
 value person_text_no_html conf base p =
@@ -220,29 +182,26 @@ value person_text_no_html conf base p =
     | (n, [nn :: _]) -> n ^ " " ^ sou base nn
     | (n, []) -> n ]
   in
-  coa conf (beg ^ " " ^ sou base p.surname)
+  beg ^ " " ^ sou base p.surname
 ;
 
 value person_text_without_surname conf base p =
-  let s =
-    match (sou base p.public_name, p.nick_names) with
-    [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
-    | (n, []) when n <> "" -> n
-    | (_, [nn :: _]) ->
-        sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
-    | (_, []) -> sou base p.first_name ]
-  in
-  coa conf s
+  match (sou base p.public_name, p.nick_names) with
+  [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
+  | (n, []) when n <> "" -> n
+  | (_, [nn :: _]) ->
+      sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
+  | (_, []) -> sou base p.first_name ]
 ;
 
 value afficher_nom_titre_reference conf base p s =
   match p.nick_names with
   [ [] ->
       Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-        (acces conf base p) (coa conf s)
+        (acces conf base p) s
   | [nn :: _] ->
       Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-        (acces conf base p) (coa conf s) (coa conf (sou base nn)) ]
+        (acces conf base p) s (sou base nn) ]
 ;
 
 value main_title base p =
@@ -266,24 +225,24 @@ value titled_person_text conf base p t =
      Name.strip_lower (sou base p.surname)
   then
     match (t.t_name, p.nick_names) with
-    [ (Tname n, []) -> coa conf (sou base n)
+    [ (Tname n, []) -> sou base n
     | (Tname n, [nn :: _]) ->
-        coa conf (sou base n) ^ " <em>" ^ coa conf (sou base nn) ^ "</em>"
+        sou base n ^ " <em>" ^ sou base nn ^ "</em>"
     | _ -> person_text_without_surname conf base p ]
   else
     match t.t_name with
     [ Tname s ->
-        let s = coa conf (sou base s) in
+        let s = sou base s in
         match p.nick_names with
         [ [] -> s
-        | [nn :: _] -> s ^ " <em>" ^ coa conf (sou base nn) ^ "</em>" ]
+        | [nn :: _] -> s ^ " <em>" ^ sou base nn ^ "</em>" ]
     | _ -> person_text conf base p ]
 ;
 
 value one_title_text conf base p t =
   let place = sou base t.t_place in
-  let s = coa conf (sou base t.t_ident) in
-  let s = if place = "" then s else s ^ " " ^ coa conf place in
+  let s = sou base t.t_ident in
+  let s = if place = "" then s else s ^ " " ^ place in
   ", <em>" ^ s ^ "</em>"
 ;
 
@@ -314,14 +273,14 @@ value referenced_person_title_text conf base p =
 value afficher_personne_un_titre conf base p t =
   do if t.t_place = p.surname then
        match t.t_name with
-       [ Tname n -> Wserver.wprint "%s" (coa conf (sou base n))
+       [ Tname n -> Wserver.wprint "%s" (sou base n)
        | _ -> Wserver.wprint "%s" (person_text_without_surname conf base p) ]
      else
        match t.t_name with
-       [ Tname s -> Wserver.wprint "%s" (coa conf (sou base s))
+       [ Tname s -> Wserver.wprint "%s" (sou base s)
        | _ -> Wserver.wprint "%s" (person_text conf base p) ];
-     Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_ident))
-       (coa conf (sou base t.t_place));
+     Wserver.wprint ", <em>%s %s</em>" (sou base t.t_ident)
+       (sou base t.t_place);
   return ()
 ;
 
@@ -341,9 +300,9 @@ value afficher_personne_sans_titre conf base p =
          else
            match (t.t_name, p.nick_names) with
            [ (Tname s, [nn :: _]) ->
-               Wserver.wprint "%s <em>%s</em>" (coa conf (sou base s))
-                 (coa conf (sou base nn))
-           | (Tname s, _) -> Wserver.wprint "%s" (coa conf (sou base s))
+               Wserver.wprint "%s <em>%s</em>" (sou base s)
+                 (sou base nn)
+           | (Tname s, _) -> Wserver.wprint "%s" (sou base s)
            | _ -> Wserver.wprint "%s" (person_text conf base p) ];
       return ()
   | None -> Wserver.wprint "%s" (person_text conf base p) ]
@@ -714,8 +673,8 @@ value print_parent conf base p a =
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
         (transl_decline conf "of (same or greater generation level)"
-         (coa conf (sou base a.first_name)))
-        (if p.surname <> a.surname then " " ^ coa conf (sou base a.surname)
+         (sou base a.first_name))
+        (if p.surname <> a.surname then " " ^ sou base a.surname
          else "") ]
 ;
 
@@ -729,13 +688,12 @@ value preciser_homonyme conf base p =
   let is = index_of_sex p.sex in
   match (p.public_name, p.nick_names) with
   [ (n, [nn :: _]) when sou base n <> ""->
-      Wserver.wprint "%s <em>%s</em>" (coa conf (sou base n))
-        (coa conf (sou base nn))
+      Wserver.wprint "%s <em>%s</em>" (sou base n)
+        (sou base nn)
   | (_, [nn :: _]) ->
-      Wserver.wprint "%s <em>%s</em>" (coa conf (sou base p.first_name))
-        (coa conf (sou base nn))
+      Wserver.wprint "%s <em>%s</em>" (sou base p.first_name) (sou base nn)
   | (n, []) when sou base n <> "" ->
-      Wserver.wprint "%s" (coa conf (sou base n))
+      Wserver.wprint "%s" (sou base n)
   | (_, []) ->
       let a = aoi base p.cle_index in
       match a.parents with
@@ -754,10 +712,9 @@ value preciser_homonyme conf base p =
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
                 Wserver.wprint "%s %s%s" (transl_nth conf "father/mother" is)
-                  (transl_decline conf "of"
-                     (coa conf (sou base enfant.first_name)))
+                  (transl_decline conf "of" (sou base enfant.first_name))
                   (if p.surname <> enfant.surname then
-                     " " ^ coa conf (sou base enfant.surname)
+                     " " ^ (sou base enfant.surname)
                    else "")
               else
                 let conjoint = poi base conjoint in
@@ -766,8 +723,8 @@ value preciser_homonyme conf base p =
                   Wserver.wprint "%s %s %s"
                     (transl_nth conf "husband/wife" is)
                     (transl_decline conf "of"
-                       (coa conf (sou base conjoint.first_name)))
-                    (coa conf (sou base conjoint.surname))
+                       (sou base conjoint.first_name))
+                    (sou base conjoint.surname)
                 else loop (i + 1)
             else Wserver.wprint "..."
           in

@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 2.1 1999-03-08 11:18:56 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 2.2 1999-07-15 08:52:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Gutil;
@@ -39,8 +39,8 @@ value print_result base tab =
            (fun i ->
               let p = base.data.persons.get i in
               do Printf.printf "- %s.%d %s\n"
-                   (Ansel.to_iso_8859_1 (sou base p.first_name)) p.occ
-                   (Ansel.to_iso_8859_1 (sou base p.surname));
+                   (sou base p.first_name) p.occ
+                   (sou base p.surname);
                  flush stdout;
               return ())
            m_list.val;

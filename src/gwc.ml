@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.14 1999-05-23 09:51:59 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.15 1999-07-15 08:52:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -235,19 +235,19 @@ value insert_person gen so =
   in
   do if gen.g_def.(Adef.int_of_iper x.cle_index) then
        do Printf.printf "\nPerson already defined: \"%s%s %s\"\n"
-            (Ansel.to_iso_8859_1 so.first_name)
+            so.first_name
             (match x.occ with
              [ 0 -> ""
              | n -> "." ^ string_of_int n ])
-            (Ansel.to_iso_8859_1 so.surname);
+            so.surname;
           if sou gen.g_base x.first_name <> so.first_name ||
              sou gen.g_base x.surname <> so.surname then
             Printf.printf "as name: \"%s%s %s\"\n"
-              (Ansel.to_iso_8859_1 (sou gen.g_base x.first_name))
+              (sou gen.g_base x.first_name)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (Ansel.to_iso_8859_1 (sou gen.g_base x.surname))
+              (sou gen.g_base x.surname)
           else ();
           x.birth := Adef.codate_None;
           x.death := DontKnowIfDead;
@@ -257,17 +257,17 @@ value insert_person gen so =
        if sou gen.g_base x.first_name <> so.first_name ||
           sou gen.g_base x.surname <> so.surname then
          do Printf.printf "\nPerson defined with two spellings:\n";
-            Printf.printf "  \"%s%s %s\"\n" (Ansel.to_iso_8859_1 so.first_name)
+            Printf.printf "  \"%s%s %s\"\n" so.first_name
               (match x.occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (Ansel.to_iso_8859_1 so.surname);
+              so.surname;
             Printf.printf "  \"%s%s %s\"\n"
-              (Ansel.to_iso_8859_1 (sou gen.g_base x.first_name))
+              (sou gen.g_base x.first_name)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (Ansel.to_iso_8859_1 (sou gen.g_base x.surname));
+              (sou gen.g_base x.surname);
             gen.g_def.(Adef.int_of_iper x.cle_index) := True;
          return Check.error gen
        else ()
