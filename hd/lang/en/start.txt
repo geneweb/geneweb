@@ -72,8 +72,8 @@ The <a href="%sm=AN">birthday anniversaries</a>.<br>
 The <a href="%sm=AD">death anniversaries</a>.<br>
 The <a href="%sm=AM">marriage anniversaries</a>.<br>%x
 The <a href="%sm=LB;k=10">latest births</a>.<br>
-The <a href="%sm=LD;k=10">latest deaths</a>.%x%j<br>
-<a href="%sm=HIST;k=10">[*history of updates]</a>.%j<br>
+The <a href="%sm=LD;k=10">latest deaths</a>.<br>%x%j
+<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 <p>
 There has been %q accesses, %c of them to this page, since %d.
