@@ -12,9 +12,9 @@ ascend.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     srcfile.cmi util.cmi ../wserver/wserver.cmi 
 ascend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
     srcfile.cmx util.cmx ../wserver/wserver.cmx 
-birth.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
+birthDeath.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
     ../wserver/wserver.cmi 
-birth.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
+birthDeath.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx 
 birthday.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi srcfile.cmi \
     util.cmi ../wserver/wserver.cmi 
@@ -38,15 +38,15 @@ descend.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
     ../wserver/wserver.cmi 
 descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx 
-family.cmo: adef.cmi advSearchOk.cmo alln.cmo ansel.cmo ascend.cmo birth.cmo \
-    birthday.cmo config.cmi cousins.cmo date.cmi def.cmi descend.cmo \
-    gutil.cmi merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo \
+family.cmo: adef.cmi advSearchOk.cmo alln.cmo ansel.cmo ascend.cmo \
+    birthDeath.cmo birthday.cmo config.cmi cousins.cmo date.cmi def.cmi \
+    descend.cmo gutil.cmi merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo \
     mergeIndOk.cmo name.cmi perso.cmi relation.cmo relationLink.cmo some.cmo \
     srcfile.cmi title.cmo update.cmi updateFam.cmi updateFamOk.cmo \
     updateInd.cmi updateIndOk.cmi util.cmi ../wserver/wserver.cmi family.cmi 
-family.cmx: adef.cmx advSearchOk.cmx alln.cmx ansel.cmx ascend.cmx birth.cmx \
-    birthday.cmx config.cmi cousins.cmx date.cmx def.cmi descend.cmx \
-    gutil.cmx merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx \
+family.cmx: adef.cmx advSearchOk.cmx alln.cmx ansel.cmx ascend.cmx \
+    birthDeath.cmx birthday.cmx config.cmi cousins.cmx date.cmx def.cmi \
+    descend.cmx gutil.cmx merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx \
     mergeIndOk.cmx name.cmx perso.cmx relation.cmx relationLink.cmx some.cmx \
     srcfile.cmx title.cmx update.cmx updateFam.cmx updateFamOk.cmx \
     updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx family.cmi 
@@ -97,9 +97,9 @@ mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx merge.cmx srcfile.cmx \
 mk_consang.cmo: argl.cmo consang.cmi def.cmi iobase.cmi 
 mk_consang.cmx: argl.cmx consang.cmx def.cmi iobase.cmx 
 mostdesc.cmo: adef.cmi ansel.cmo argl.cmo consang.cmi def.cmi gutil.cmi \
-    iobase.cmi num.cmi pqueue.cmi 
+    iobase.cmi name.cmi num.cmi pqueue.cmi 
 mostdesc.cmx: adef.cmx ansel.cmx argl.cmx consang.cmx def.cmi gutil.cmx \
-    iobase.cmx num.cmx pqueue.cmx 
+    iobase.cmx name.cmx num.cmx pqueue.cmx 
 name.cmo: name.cmi 
 name.cmx: name.cmi 
 num.cmo: num.cmi 
@@ -174,7 +174,7 @@ util.cmi: config.cmi def.cmi num.cmi
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
 alln.cmo alln.cmx: pa_html.cmo
 ascend.cmo ascend.cmx: def.syn.cmo pa_html.cmo
-birth.cmo birth.cmx: def.syn.cmo pa_html.cmo
+birthDeath.cmo birthDeath.cmx: def.syn.cmo pa_html.cmo
 birthday.cmo birthday.cmx: pa_html.cmo
 cousins.cmo cousins.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo

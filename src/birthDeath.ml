@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birth.ml,v 1.6 1998-12-16 17:36:22 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 1.1 1999-01-20 09:26:55 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -39,7 +39,7 @@ value insert conf tab len p d =
         else loop imid imax
 ;
 
-value print conf base =
+value select conf base get_date =
   let n =
     match p_getint conf.env "k" with
     [ Some x -> x
@@ -51,7 +51,7 @@ value print conf base =
   do for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
        if age_autorise conf base p then
-         match Adef.od_of_codate p.birth with
+         match get_date p with
          [ Some d ->
              if d.day != 0 && d.month != 0 then
                do insert conf tab len.val p d;
@@ -61,9 +61,13 @@ value print conf base =
          | _ -> () ]
        else ();
      done;
-  return
+  return (tab, len.val)
+;
+
+value print_birth conf base =
+  let (tab, len) = select conf base (fun p -> Adef.od_of_codate p.birth) in
   let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the last %d births")) len.val
+    Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
   in
   do header conf title;
      for i = 0 to Array.length tab - 1 do
@@ -75,6 +79,35 @@ value print conf base =
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>.\n"
                (transl_nth conf "born" (index_of_sex p.sex))
+               (Date.string_of_ondate conf d);
+           end
+       | None -> () ];
+     done;
+     trailer conf;
+  return ()
+;
+
+value get_death p =
+  match p.death with
+  [ Death _ cd -> Some (Adef.date_of_cdate cd)
+  | _ -> None ]
+;
+
+value print_death conf base =
+  let (tab, len) = select conf base get_death in
+  let title _ =
+    Wserver.wprint (fcapitale (ftransl conf "the latest %d deaths")) len
+  in
+  do header conf title;
+     for i = 0 to Array.length tab - 1 do
+       match tab.(i) with
+       [ Some (p, d) ->
+           tag "ul" begin
+             Wserver.wprint "<li><strong>\n";
+             afficher_personne_referencee conf base p;
+             Wserver.wprint "</strong>,\n";
+             Wserver.wprint "%s <em>%s</em>.\n"
+               (transl_nth conf "died" (index_of_sex p.sex))
                (Date.string_of_ondate conf d);
            end
        | None -> () ];

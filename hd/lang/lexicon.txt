@@ -2598,9 +2598,9 @@ nl: de overgrootouders
 pt: os bisavos
 se: gammel-far(mor)f&ouml;r&auml;ldrarna
 
-    the last %d births
+    the latest %d births
 de: die letzen %d Geburten
-en: the last %d births
+en: the latest %d births
 eo: la finaj %d naskigxoj
 es: los %d nacimientos m&aacute;s recientes
 fr: les %d derni&egrave;res naissances
@@ -2608,6 +2608,17 @@ it: le ultime %d nascite
 nl: de laatste %d geboorten
 pt: os %d nascimentos m&aacute;s recentes
 se: de senaste %d f&ouml;dslarna
+
+    the latest %d deaths
+de: die letzen %d T&ouml;de
+en: the latest %d deaths
+eo: la finaj %d mortoj
+es: las %d muertes m&aacute;s recientes
+fr: les %d derniers d&eacute;c&egrave;s
+it: le ultime %d morto
+nl: de laatste %d overlijden
+pt: os %d mortes m&aacute;s recentes
+se: de senaste %d d&ouml;d
 
     the parents
 de: die Eltern

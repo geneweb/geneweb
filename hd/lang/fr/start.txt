@@ -61,12 +61,11 @@ par
 
 </ul>
 
-Les <a href="%sm=AN">anniversaires</a>%x
-et les <a href="%sm=B;k=10">derni&egrave;res naissances</a>%x...
-<br>
-Les <a href="%sm=AD">anniversaires des personnes d&eacute;c&eacute;d&eacute;es</a>.
-<br>
-Et les <a href="%sm=AM">anniversaires de mariage</a>.
+Les <a href="%sm=AN">anniversaires</a>.<br>%x
+Les <a href="%sm=LB;k=10">derni&egrave;res naissances</a>.<br>
+Les <a href="%sm=LD;k=10">derniers d&eacute;c&egrave;s</a>.<br>%x
+Les <a href="%sm=AD">anniversaires des personnes d&eacute;c&eacute;d&eacute;es</a>.<br>
+Les <a href="%sm=AM">anniversaires de mariage</a>.
 <p>
 Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 
