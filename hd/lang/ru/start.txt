@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: start.txt,v 1.1 2000-01-23 10:28:57 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <title>Genealogy - %t</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <meta name="ROBOTS" content="NONE">
+%j</head>
+<body%b>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<table><tr><td align=center><h1><font color=%i>Генеологическая<br>
+база данных</font></h1></table>
+</td>
+</tr>
+</table>
+
+<br>
+
+%rversion
+
+<p>
+
+База данных <font color=%i><b>"%t"</b></font> сейчас содержит %n
+человек.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
+(password)<br></td>
+
+%INf<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
+(password)</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hPassword, for <em>friend</em> or <em>wizard</em> access:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+Чтобы найти в этой базе данных, Вы можете искать:<br><p>
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+<font color=%i><b>по человеку</b></font>
+<input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>Imia</em> <em>Familiia</em>
+[or] <em>Имя</em>
+[or] <em>Фамилия</em>
+[or] <em>Familiia</em>%Iz
+[or] <em>Sosa номер</em> relative to %a%E
+<li> <input type=radio name=t value=P> <em>Imia</em>
+<li> <input type=radio name=t value=N> <em>Familiia</em>
+</ul>
+</form>
+
+%It<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=%i><b>по титулу</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
+</td><td>...</td><td>
+<font color=%i><b>месту</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;p=*">[all the places]</a>)
+</td><td>
+<input type=submit value="Ok">
+</td></tr></table>
+</form>
+
+%E<li>
+
+<form method=GET action="%f">
+%h
+<font color=%i><b>по списку</b></font>  всех
+<select name=m>
+<option value="N" selected>фамилий
+<option value="P">имён
+</select>
+упорядоченных
+<select name=tri>
+<option value="A" selected>по алфавиту
+<option value="F">по частоте
+</select>
+<input type=submit value="Ok">
+</form>
+
+<li>
+
+<font color=%i><b>через</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>расширенный запрос</b></font></a>.
+
+</ul>
+
+%Iw<p>
+
+<center>Вы можете<br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">добавить семью</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+<li><a href="%sm=MOD_NOTES">изменить заметку</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>Вы можете также обратиться к<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">годовщины дней рождений</a>
+<li><a href="%sm=AD">годовщины смертей</a>
+<li><a href="%sm=AM">годовщины брака</a>%I|wf
+<li><a href="%sm=LB;k=10">самые последние рождения</a>%E
+</ul>
+</td>
+<td valign=up>
+<ul>%I|wf
+<li><a href="%sm=LD;k=10">самые последние смерти</a>%E%Ih
+<li><a href="%sm=HIST;k=10">история коррекций</a>%E
+<li><a href="%sm=CAL">календари</a>
+<li><a href="%sm=FORUM">форум базы данных</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+Всего было %q обращений, из них %c к этой странице, начиная с %d.
+%Il<p>%E
+
+</td></tr>
+
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
+
+</table>
+</center>
