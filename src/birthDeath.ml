@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 2.1 1999-03-08 11:18:24 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 2.2 1999-04-19 15:49:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -15,7 +15,14 @@ value insert_at tab len i p d =
 
 value before d =
   fun
-  [ Some (_, d1) -> d1 strictement_avant d
+  [ Some (_, d1) ->
+      if d1.year < d.year then True
+      else if d1.year > d.year then False
+      else if d1.month < d.month then True
+      else if d1.month > d.month then False
+      else if d1.day < d.day then True
+      else if d1.day > d.day then False
+      else True
   | _ -> assert False ]
 ;
 
@@ -54,11 +61,9 @@ value select conf base get_date =
        if age_autorise conf base p then
          match get_date p with
          [ Some d ->
-             if d.day != 0 && d.month != 0 then
-               do insert conf tab len.val p d;
-                  if len.val == Array.length tab then () else incr len;
-               return ()
-             else ()
+             do insert conf tab len.val p d;
+                if len.val == Array.length tab then () else incr len;
+             return ()
          | _ -> () ]
        else ();
      done;
