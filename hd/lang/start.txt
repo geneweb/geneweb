@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.54 2004-05-05 09:39:13 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.55 2004-05-18 09:14:33 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -741,7 +741,7 @@ he:  éù àôùøåú
 is: Şú getur
 it: Si pu&ograve;
 lv: Izmaiòu veikğana:
-nl: U kan:
+nl: U kunt:
 no: Du kan
 pl: Mo¿esz:
 pt: Pode
@@ -841,7 +841,7 @@ he: àôùø âí ìäøàåú
 is: Şú getur einnig athugağ
 it: Si pu&ograve; anche consultare
 lv: Informâcija par:
-nl: U kan de volgende zaken bekijken:
+nl: U kunt de volgende zaken bekijken:
 no: Du kan ogs&aring; sl&aring; opp
 pl: Mo¿esz tak¿e obejrzeæ:
 pt: Tamb&eacute;m pode consultar
