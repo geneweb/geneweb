@@ -5,6 +5,9 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [17 Dec 01] Added request variables "by=", "bm=" and "bd=" in displaying
+    of the latest birthdays and death days to specify resp. a year, a month
+    and a day before.
   - [05 Dec 01] Fixed bug: when merging a person with family with a
     person with neuter sex, failed (assertion error).
   - [27 Sep 01] Added "%image_txt;" as variable in perso.txt. Return the

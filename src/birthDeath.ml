@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.2 2001-06-12 15:50:42 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.3 2001-12-07 16:39:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -7,7 +7,7 @@ open Gutil;
 open Util;
 open Config;
 
-value before_date (_, d, _) (_, d1, _) =
+value before_date d d1 =
   if d1.year < d.year then True
   else if d1.year > d.year then False
   else if d1.month < d.month then True
@@ -24,7 +24,7 @@ value select conf base get_date find_oldest =
     Pqueue.Make
       (struct
          type t = (Def.person * Def.dmy * Def.calendar);
-         value leq x y =
+         value leq (_, x, _) (_, y, _) =
            if find_oldest then before_date x y else before_date y x
          ;
        end)
@@ -37,6 +37,22 @@ value select conf base get_date find_oldest =
         [ Not_found | Failure _ -> 20 ] ]
   in
   let n = min (max 0 n) base.data.persons.len in
+  let ref_date =
+    match p_getint conf.env "by" with
+    [ Some by ->
+        let bm =
+          match p_getint conf.env "bm" with
+          [ Some x -> x
+          | None -> -1 ]
+        in
+        let bd =
+          match p_getint conf.env "bd" with
+          [ Some x -> x
+          | None -> -1 ]
+        in
+        {day = bd; month = bm; year = by; prec = Sure; delta = 0}
+    | None -> {(conf.today) with year = 9999} ]
+  in
   let rec loop q len i =
     if i = base.data.persons.len then
       let rec loop list q =
@@ -48,9 +64,11 @@ value select conf base get_date find_oldest =
       let p = base.data.persons.get i in
       match get_date p with
       [ Some (Dgreg d cal) ->
-          let e = (p, d, cal) in
-          if len < n then loop (Q.add e q) (len + 1) (i + 1)
-          else loop (snd (Q.take (Q.add e q))) len (i + 1)
+          if before_date d ref_date then loop q len (i + 1)
+          else
+            let e = (p, d, cal) in
+            if len < n then loop (Q.add e q) (len + 1) (i + 1)
+            else loop (snd (Q.take (Q.add e q))) len (i + 1)
       | _ -> loop q len (i + 1) ]
   in
   loop Q.empty 0 0
@@ -61,9 +79,8 @@ value select_family conf base get_date =
     Pqueue.Make
       (struct
          type t = (Def.family * Def.dmy * Def.calendar);
-         value leq x y = before_date y x;
-       end
-       )
+         value leq (_, x, _) (_, y, _) = before_date y x;
+       end)
   in
   let n =
     match p_getint conf.env "k" with
