@@ -51,8 +51,8 @@ case "$1" in
 	echo
         touch /var/log/gwd.log /var/log/gwsetup.log
         chown geneweb /var/log/gwd.log /var/log/gwsetup.log
-	$hd/gwd -log /var/log/gwd.log -daemon
-	$hd/gwsetup -daemon 2>> /var/log/gwsetup.log
+	$hd/gwd -log /var/log/gwd.log -daemon -hd $hd
+	$hd/gwsetup -daemon -gd $hd 2>> /var/log/gwsetup.log
 	touch /var/lock/subsys/gwd
 	;;
   *)

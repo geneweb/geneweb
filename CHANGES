@@ -1,6 +1,10 @@
 GeneWeb version 4.01
 --------------------
 
+* Installation
+  - [18 Mar 01] Fixed bug in Linux rpm package: the 'restart' of
+    gwd did not work; it worked only by using 'stop' and 'start'.
+
 * Languages
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
