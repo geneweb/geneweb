@@ -26,7 +26,7 @@ GeneWeb version 2.05
   - [Aug 3, 99] Added ancestor displaying (and navigating) by tree.
   - [Aug 3, 99] In relationship by branches, found a solution to
     display the vertical bars correctly aligned relative to the
-    horizontal bars (works at least with Netscape, Kfm).
+    horizontal bars (works at least with Netscape, IE, Kfm).
   - [Aug 2, 99] In relationship displaying, can make the difference in
     the lexicon between father's and mother's side (used in Swedish, where
     there are different words for "uncle", "aunt", "great-uncle" and
