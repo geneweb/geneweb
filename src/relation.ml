@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.30 2000-01-01 09:46:18 ddr Exp $ *)
+(* $Id: relation.ml,v 3.31 2000-01-02 01:21:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -369,28 +369,6 @@ value print_relation_path_table conf base path =
 ;
 
 open Dag2html;
-
-(*
-value print_only_dag conf base d =
-  let t = table_of_dag False d in
-  let print_indi n =
-    match n.valu with
-    [ Left ip ->
-        let p = poi base ip in
-        do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
-           Wserver.wprint "%s" (Date.short_dates_text conf base p);
-        return ()
-    | Right _ -> Wserver.wprint "&nbsp;" ]
-  in
-  let phony n =
-    match n.valu with
-    [ Left _ -> False
-    | Right _ -> True ]
-  in
-  print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
-    conf.border d t
-;
-*)
 
 value print_relation_path_dag conf base path =
   let (nl, _) =
