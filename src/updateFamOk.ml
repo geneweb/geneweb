@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.26 2003-12-23 11:56:05 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.27 2003-12-23 15:08:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -597,12 +597,65 @@ value effective_del conf base fam =
   }
 ;
 
-value all_checks_family conf base fam cpl des =
+value array_forall2 f a1 a2 =
+  if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
+  else
+    loop 0 where rec loop i =
+      if i == Array.length a1 then True
+      else if f a1.(i) a2.(i) then loop (i + 1)
+      else False
+;
+
+value array_exists f a =
+  loop 0 where rec loop i =
+    if i = Array.length a then False
+    else if f a.(i) then True
+    else loop (i + 1)
+;
+
+value is_a_link =
+  fun
+  [ (_, _, _, Update.Link, _) -> True
+  | _ -> False ]
+;
+
+value is_created_or_already_child ochil_arr nchil schil =
+  not (is_a_link schil) || array_memq nchil ochil_arr
+;
+
+(* need_check_noloop: optimization
+     The no-loop check being a big work on large databases, this
+   optimization tests if this is really necessary or not. It is not
+   necessary if:
+   1/ either both parents are created,
+   2/ or all children are created,
+   3/ or the new family have the same parents than the old one *and*
+      all linked (not created) new children were already children.
+*)
+
+value need_check_noloop (scpl, sdes, onfs) =
+  if (is_a_link scpl.father || is_a_link scpl.mother) &&
+     array_exists is_a_link sdes.children
+  then
+    match onfs with
+    [ Some ((ofath, omoth, ochil), (nfath, nmoth, nchil)) ->
+        nfath != ofath || omoth != nmoth ||
+        not
+          (array_forall2 (is_created_or_already_child ochil) nchil
+	     sdes.children)
+    | None -> True ]
+  else False
+;
+
+value all_checks_family conf base fam cpl des scdo =
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
   do {
-    Gutil.check_noloop_for_person_list base error [cpl.father; cpl.mother];
+    if need_check_noloop scdo then
+let _ = do { Printf.eprintf "..... need no loop check\n"; flush stderr } in
+      Gutil.check_noloop_for_person_list base error [cpl.father; cpl.mother]
+    else ();
     Gutil.check_family base error warning fam cpl des;
     List.rev wl.val
   }
@@ -749,7 +802,7 @@ value print_add o_conf base =
     else do {
       strip_family sfam sdes;
       let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
-      let wl = all_checks_family conf base fam cpl des in
+      let wl = all_checks_family conf base fam cpl des (scpl, sdes, None) in
       let ((fn, sn, occ, _, _), act) =
         match p_getint conf.env "ip" with
         [ Some i ->
@@ -824,11 +877,20 @@ value print_mod_aux conf base callback =
   [ Update.ModErr -> () ]
 ;
 
+value family_structure conf base ifam =
+  let cpl = coi base ifam in
+  let des = doi base ifam in
+  (cpl.father, cpl.mother, des.children)
+;
+
 value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
+    let ofs = family_structure conf base sfam.fam_index in
     let (fam, cpl, des) = effective_mod conf base sfam scpl sdes in
-    let wl = all_checks_family conf base fam cpl des in
+    let nfs = (cpl.father, cpl.mother, des.children) in
+    let onfs = Some (ofs, nfs) in
+    let wl = all_checks_family conf base fam cpl des (scpl, sdes, onfs) in
     let (fn, sn, occ, _, _) =
       match p_getint conf.env "ip" with
       [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
