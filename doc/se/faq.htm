@@ -18,6 +18,12 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </font>
 <br><br>
 
+<H4>Vid första användandet av GeneWeb, får jag meddelandet: Cannot access file 
+"start.txt".</H4>
+
+<P>Titta på sidan: "Några återkommande <A href="problem.htm">problem</A>". 
+Om det inte fungerar bättre, var snäll och meddela mig. </P>
+
 <H4>Mitt genealogiprogram visar mig att databasen innehåller 3.000 personer, 
 men GeneWeb visar: 3.050 personer. Varför denna skillnad?</H4>
 
@@ -26,12 +32,6 @@ lagrade i par. När bara fadern eller modern finns i GEDCOM-filen,
 lägger <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> till den förälder som fattas 
 och sätter frågetecken som för- och efternamn.
 Skillnaden är dessa saknade (men har existerat) föräldrar. </P>
-
-<H4>Vid första användandet av GeneWeb, får jag meddelandet: Cannot access file 
-"start.txt".</H4>
-
-<P>Titta på sidan: "Några återkommande <A href="problem.htm">problem</A>". 
-Om det inte fungerar bättre, var snäll och meddela mig. </P>
 
 <H4>När man gör släktberäkning fattas vissa anlinjer.</H4>
 
@@ -48,6 +48,69 @@ en användare (user) med väldigt få rättigheter (vanligast användare
 "nobody" under Unix). Den kanske inte går att köra "gwd" då. Kontrollera
 åtkomsträttigheterna för "gwd" och alla <FONT COLOR=#2f6400><B>GeneWeb</B>
 </FONT> filerna!
+
+<H4>Varför visas inte åldern för personer som är äldre än 80 år? Varför
+finns de inte med i statistiken för de äldsta pesonerna?</H4>
+<P>I <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> har levnadsstatus tre nivåer:
+"lever", "död" och "vet ej". Åldern visas bara för "lever" personer. Om
+ålern inte visas, är anledningen antingen att personen är död (utan ett
+dödsdatum) eller dödsstatusen är markerad "vet ej".
+<p>
+Om du lade till denna person med <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>
+och du inte specificerade om personen levde eller var död eller om din
+databas kommer från en GEDCOM-fil (indikationen "fortfarande levande person"
+finns inte i standard GEDCOM 5.5), använder <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>
+följande algoritm:
+<ul>
+<li> om personen är yngre än 80 år, är personen indikerad "lever"
+<li> om personen är äldre än 120 år, är personen indikerad "död"
+<li> mellan 80 och 120 år, är personen indikerad "vet ej"
+</ul>
+Du måste rätta till dessa indikeringar om de är felaktiga.
+
+<H4>De personer som har ? (frågetecken) som förnamn och/eller efternamn
+verkar ha en specifik status. Vilken då och varför?</H4>
+Dessa personer anses av <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> som
+"återvänds personer" ("dead-ends"): om de är barn, kan de inte vara gifta,
+om de är gifta, kan de inte ha föräldrar. De kan inte heller ha associerade
+noteringar.
+<p>
+Och om de är gifta, är de inte exporterade i GEDCOM-filen och deras personliga
+information (om någon) kommer att bli förlorad.
+<p>
+Det är ibland möjligt, genom ett hack, att ge dem noteringar, men akta: vid
+den första upprensningen av databasen, kommer dessa noteringar att försvinna:
+det är därför inte något man bör göra.
+<p>
+<H4>Skulle du kunna förbättra "avancerad sökning"?</H4>
+"Avancerad sökning" är ett hack jag programmerade, men som inte är klart.
+<FONT COLOR=#2f6400><B>GeneWeb</B></FONT> använder inte ett riktigt databas
+system, om en förbättring ska göras av den här delen måste hela databas
+systemet skrivas om, vilket jag inte planerar att göra därför det är ett
+så stort arbete.
+<p>
+Om, en dag, <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> använder ett äkta
+databas system (det är en av de möjliga inriktningarna), kommer denna avancerade
+sökning att skrivas om och bli mycket mer kraftfull och enklare att använda.
+<H4>Vad är konventionen för korta datum?</H4>
+<pre>
+     Svensson 1935-1950 = född i 1935, död i 1950
+     Svensson 1935-     = född i 1935, inte död (lever)
+     Svensson 1935 +    = född i 1935, okänt dödsdatum
+     Svensson *1935     = född i 1935, okänt om död eller levande
+     Svensson +1950     = död i 1950, okänt födelsedatum
+
+        /1935        = före 1935
+        1935/        = efter 1935
+        ca 1935      = cirka 1935
+                       kanske i 1935
+        1935/1938    = i 1935 eller i 1938
+                       mellan 1935 och 1938
+</pre>
+
+Denna konvention refererrar inte till någon specifik "standard". Om du vet
+någon bättre, mera känd, mer standard konvention, tveka inte att berätta för
+mig. Tack.
 
 <p><hr><br>
 <center>Tillbaka till <A href="diruse.htm">bruksanvisningen</A></center>

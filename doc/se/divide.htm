@@ -38,16 +38,12 @@ Starta ett DOS fönster och skriv:
 
 Det kan hända att gwc visar fel meddelanden därför att personer är definierade både
 i "bar.gw", "svensson.gw" och "foo.gw". För att rätta till det, har
-gwc en option "-sh" för att flytta numren för personerna för att undvika konflikter. Försök med: 
-
+gwc en option "-sep" för att automatiskt flytta numren för personerna för att
+undvika konflikter. Försök med:
 
 <pre>
-     gwc bar.gw -sh 10 svensson.gw -sh 10 foo.gw -o mbas
+     gwc bar.gw -sep svensson.gw foo.gw -o mbas
 </pre>
-
-Om värdet 10 inte löser problemet, försök med 20, 30 eller 100...
-
-<br>
 
 Se också <a href="merge.htm">slå ihop databaser</a>.
 
