@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.5 2002-03-11 19:02:59 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.6 2002-10-06 15:42:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -25,6 +25,7 @@ value spouse : iper -> couple -> iper;
 value person_ht_add : base -> string -> iper -> unit;
 value person_ht_find_all : base -> string -> list iper;
 value person_ht_find_unique : base -> string -> string -> int -> iper;
+value person_of_key : base -> string -> option iper;
 value person_misc_names : base -> person -> list string;
 value find_same_name : base -> person -> list person;
 

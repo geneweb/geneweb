@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.9 2002-04-09 00:13:09 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.10 2002-10-06 15:42:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -397,7 +397,7 @@ value find_num s i =
           else Some (int_of_string (String.sub s start (i - start)), i) ]
 ;
 
-value get_unique base s =
+value person_of_key base s =
   match lindex s '.' with
   [ Some i ->
       match find_num s (i + 1) with
@@ -411,7 +411,7 @@ value get_unique base s =
 ;
 
 value person_ht_find_all base s =
-  match get_unique base s with
+  match person_of_key base s with
   [ Some p -> [p]
   | _ ->
       let ipl = base.func.persons_of_name s in
