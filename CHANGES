@@ -8,7 +8,7 @@ GeneWeb version 2.06
 
 * GeneWeb Service/CGI (gwd)
   - [Aug 19, 99] Fixed bug: the "back" button which appears after error
-    in update used to forget the language.
+    in update used to forget the selected language.
   - [Aug 19, 99] Added more informations (places) in descendants display
     by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
@@ -27,6 +27,9 @@ GeneWeb version 2.06
     GeneWeb service has been redirected to some other address.
 
 * Base configuration files (base.gwf)
+  - [Aug 20, 99] Added new variables "max_anc_level" and "max_desc_level"
+    to specify the maximum level of generations that can be displayed in
+    ancestors and descendants displaying.
   - [Aug 18, 99] Added a new variable "auth_file" in data bases configuration
     files (files ending with ".gwf") overriding the possible authorization
     file set by option "-auth" of gwd. Therefore now, each data base can have

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.47 1999-08-14 09:26:37 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.48 1999-08-20 12:46:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -7,7 +7,11 @@ open Def;
 open Gutil;
 open Util;
 
-value limit_by_list = 8;
+value limit_by_list conf =
+  match p_getint conf.base_env "max_anc_level" with
+  [ Some x -> max 1 x
+  | None -> 200 ]
+;
 value limit_by_tree = 5;
 
 value niveau_max_ascendance base ip =
@@ -106,10 +110,11 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L> %s\n"
         (capitale (transl conf "list"));
-      if niveau_effectif <= limit_by_list then ()
+      if niveau_effectif <= limit_by_list conf then ()
       else
         do Wserver.wprint "(";
-           Wserver.wprint (ftransl conf "max %d generations") limit_by_list;
+           Wserver.wprint (ftransl conf "max %d generations")
+             (limit_by_list conf);
            Wserver.wprint ")\n";
         return ();
       html_li conf;
@@ -182,7 +187,7 @@ value afficher_ancetre conf base x p =
 ;
 
 value afficher_ascendants_jusqu_a conf base niveau_max p =
-  let niveau_max = min limit_by_list niveau_max in
+  let niveau_max = min (limit_by_list conf)  niveau_max in
   let rec boucle niveau ip =
     if niveau < niveau_max then
       let x = aoi base ip in

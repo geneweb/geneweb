@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.26 1999-08-19 12:32:33 ddr Exp $ *)
+(* $Id: descend.ml,v 2.27 1999-08-20 12:46:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -7,7 +7,11 @@ open Def;
 open Gutil;
 open Util;
 
-value limit_desc = 12;
+value limit_desc conf =
+  match p_getint conf.base_env "max_desc_level" with
+  [ Some x -> max 1 x
+  | None -> 200 ]
+;
 value limit_by_tree = 4;
 
 value infini = 10000;
@@ -149,7 +153,7 @@ value descendants_title conf base p h =
 ;
 
 value afficher_menu_descendants conf base p =
-  let niveau_effectif = min limit_desc (level_max base p) in
+  let niveau_effectif = min (limit_desc conf) (level_max base p) in
   do header conf (descendants_title conf base p);
      print_choice conf base p niveau_effectif;
      trailer conf;
@@ -240,7 +244,7 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
 ;
 
 value afficher_descendants_jusqu_a conf base niveau_max p =
-  let niveau_max = min limit_desc niveau_max in
+  let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max p in
   let compte = ref 0 in
   let rec boucle niveau p =
@@ -310,7 +314,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
 ;
 
 value afficher_descendants_niveau conf base niveau_max ancetre =
-  let niveau_max = min limit_desc niveau_max in
+  let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max ancetre in
   let rec get_level niveau p list =
     List.fold_left
@@ -664,7 +668,7 @@ value print_families conf base marks paths max_lev =
 ;
 
 value afficher_descendants_numerotation conf base niveau_max ancetre =
-  let niveau_max = min limit_desc niveau_max in
+  let niveau_max = min (limit_desc conf) niveau_max in
   let title h =
     if h then descendants_title conf base ancetre h
     else
@@ -819,7 +823,7 @@ value trier_et_afficher conf base paths precision liste =
 ;
 
 value afficher_index_descendants conf base niveau_max ancetre =
-  let niveau_max = min limit_desc niveau_max in
+  let niveau_max = min (limit_desc conf) niveau_max in
   let title h =
     let txt = capitale (transl conf "index of the descendants") in
     if not h then
@@ -851,7 +855,7 @@ value afficher_index_descendants conf base niveau_max ancetre =
 ;
 
 value afficher_index_spouses conf base niveau_max ancetre =
-  let niveau_max = min limit_desc niveau_max in
+  let niveau_max = min (limit_desc conf) niveau_max in
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl conf "index of the spouses (non descendants)"))
@@ -924,7 +928,7 @@ value rec print_table_person conf base max_lev ip =
 
 value afficher_descendants_table conf base max_lev a =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "descendants")) in
-  let max_lev = min limit_desc max_lev in
+  let max_lev = min (limit_desc conf) max_lev in
   do header conf title;
      print_table_person conf base max_lev a.cle_index;
      trailer conf;
