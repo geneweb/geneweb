@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.9 1999-05-01 11:45:49 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.10 1999-05-06 19:26:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -115,13 +115,13 @@ value reconstitute_death conf birth death_place burial burial_place =
       | _ -> DeadDontKnowWhen ] ]
 ;
 
-value reconstitute_burial conf =
+value reconstitute_burial conf burial_place =
   let d = Update.reconstitute_date conf "burial" in
   match p_getenv conf.env "burial" with
   [ Some "UnknownBurial" | None ->
-      match d with
-      [ Some _ -> Buried (Adef.codate_of_od d)
-      | _ -> UnknownBurial ]
+      match (d, burial_place) with
+      [ (None, "") -> UnknownBurial
+      | _ -> Buried (Adef.codate_of_od d) ]
   | Some "Buried" -> Buried (Adef.codate_of_od d)
   | Some "Cremated" -> Cremated (Adef.codate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x) ]
@@ -174,12 +174,8 @@ value reconstitute_person conf =
   let birth_place = only_printable (get conf "birth_place") in
   let bapt = Adef.codate_of_od (Update.reconstitute_date conf "bapt") in
   let bapt_place = only_printable (get conf "bapt_place") in
-  let burial = reconstitute_burial conf in
-  let burial_place =
-    match burial with
-    [ Buried _ | Cremated _ -> only_printable (get conf "burial_place")
-    | _ -> "" ]
-  in
+  let burial_place = only_printable (get conf "burial_place") in
+  let burial = reconstitute_burial conf burial_place in
   let death_place = get conf "death_place" in
   let death = reconstitute_death conf birth death_place burial burial_place in
   let death_place =

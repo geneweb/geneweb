@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.9 1999-05-03 17:35:23 ddr Exp $
+# $Id: Makefile,v 2.10 1999-05-06 19:26:42 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -20,7 +20,7 @@ opt::
 	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
 
-distrib_setup: distrib
+distrib: classical_distrib
 	mkdir t
 	mv distribution t/gw
 	mv t distribution
@@ -29,13 +29,13 @@ distrib_setup: distrib
 	mkdir distribution/gw/old
 	mkdir distribution/gw/setup
 	cp setup/intro.txt distribution/gw/setup/.
-	for i in fr; do \
+	for i in fr en; do \
 	  mkdir distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.html distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \
 	done
 
-distrib:
+classical_distrib:
 	$(RM) -rf distribution
 	mkdir distribution
 	cp CHANGES LICENSE distribution/.

@@ -15,6 +15,8 @@ GeneWeb Intermediate Version 2.01-2
   - [Apr 22, 99] Added Danish language (by Hans Albeck).
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 6, 99] Fixed bad behavior: in "modify person" form, a person was
+    not considered as "buried", if the only area filled was "burial place".
   - [May 4, 99] Added button "include missing spouses" for missing ancestors.
   - [May 4, 99] Suppressed trace log count in CGI mode in not redirected
     in a file (option "-log"). Seemed to be incorrectly displayed in the
