@@ -20,24 +20,28 @@ consanguinités.
 
 <p>
 
-Pour un nettoyage en profondeur, appliquez les op&eacute;rations suivantes:
+<form mode=GET action="cleanup">
+<input type=hidden name=lang value=$l>
+
+Pour un nettoyage en profondeur, s&eacute;lectionnez votre base de
+donn&eacute;es:
 
 <p>
 
-<ul>
+<dl><dd><table border=1 cellspacing=0 cellpadding=1>
 
-<li><a href="setup?lang=$l;v=rename.html">Renommez</a> votre base de
-donn&eacute;es. Cela servira en plus de sauvegarde.
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
 
-<li><a href="setup?lang=$l;v=gwu.html">Extrayez</a> un fichier source
-<em>GeneWeb</em> de votre base de donn&eacute;es.
-
-<li><a href="setup?lang=$l;v=gwc.html">Reconstruisez</a> votre base
-de donn&eacute;es &agrave; partir de ce fichier source.
-
-</ul>
+</table></dl>
 
 <p>
 
-Ou vous pouvez revenir au <a href="setup?lang=$l;v=main.html">menu
-principal</a>.
+Puis appuyez sur ce bouton:
+
+<p>
+
+<dl><dd><input type=submit value="Nettoyage"></dl>
+
+</form>

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 1999-05-03 07:09:35 ddr Exp $
+# $Id: Makefile,v 1.4 1999-05-03 17:35:24 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -19,10 +19,11 @@ clean::
 test:
 	mkdir test
 	mkdir test/gw
+	mkdir test/gw/old
 	cd test; ln -s ../setup .
 	cd test; ln -s ../gwd .
-	cd test/gw; ln -s ../../../doc .
 	cd test/gw; ln -s ../.. setup
+	cd test/gw; ln -s ../../../doc .
 	cd test/gw; ln -s ../../../src/gwc .
 	cd test/gw; ln -s ../../../src/gwd .
 	cd test/gw; ln -s ../../../src/gwu .

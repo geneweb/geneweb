@@ -14,4 +14,3 @@ classique en regardant la documentation. Pour cela arretez ce programme
 en tapant "control-c" dans cette fenetre, allez dans le repertoire "gw"
 et ouvrez le fichier:
    INSTALL.htm
-

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.9 1999-05-03 13:41:08 ddr Exp $ *)
+(* $Id: setup.ml,v 1.10 1999-05-03 17:35:24 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -627,6 +627,75 @@ value recover_2 conf =
   return ()
 ;
 
+value rm_base dir =
+  match try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ] with
+  [ Some dh ->
+      let list = ref [] in
+      do try
+           while True do
+             let file = Unix.readdir dh in
+             if file = "." || file = ".." then ()
+             else list.val := [file :: list.val];
+           done
+         with
+         [ End_of_file -> () ];
+         Unix.closedir dh;
+         List.iter (fun file -> Unix.unlink (Filename.concat dir file))
+           list.val;
+         Unix.rmdir dir;
+      return ()
+  | _ -> () ]
+;
+
+value cleanup conf =
+  let in_base =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  if in_base = "" then print_file conf "err_missing.html"
+  else print_file conf "cleanup_1.html"
+;
+
+value cleanup_1 conf =
+  let in_base =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let in_base_dir = in_base ^ ".gwb" in
+  do Printf.eprintf "$ cd %s\n" (Sys.getcwd ()); flush stderr; return
+  let c = Filename.concat "." "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
+  do Printf.eprintf "$ %s\n" c; flush stderr; return
+  let _ = Sys.command c in
+  do ifdef UNIX  then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
+     else
+       do Printf.eprintf "$ del old\\%s*.*\n" in_base_dir;
+          Printf.eprintf "$ rmdir old\\%s\n" in_base_dir;
+       return ();
+     flush stderr;
+     rm_base (Filename.concat "old" in_base_dir);
+     ifdef UNIX then Printf.eprintf "$ mv %s old/.\n" in_base_dir
+     else Printf.eprintf "$ move %s old\\.\n" in_base_dir;
+     flush stderr;
+     Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
+  return
+  let c =
+    Filename.concat "." "gwc" ^ " tmp.gw -o " ^ in_base ^ " > comm.log "
+  in
+  do Printf.eprintf "$ %s\n" c;
+     flush stderr;
+     let rc = Sys.command c in
+     let rc = ifdef WIN95 then infer_rc conf rc else rc in
+     do Printf.eprintf "\n";
+        flush stderr;
+     return
+     if rc = 1 then print_file conf "warnings.html"
+     else if rc > 1 then print_file conf "cleanup_err.html"
+     else print_file conf "cleanup_ok.html";
+  return ()
+;  
+
 value exec_command_out conf =
   let rc =
     exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
@@ -669,6 +738,8 @@ value setup_comm conf =
   | "recover" -> recover conf
   | "recover_1" -> recover_1 conf
   | "recover_2" -> recover_2 conf
+  | "cleanup" -> cleanup conf
+  | "cleanup_1" -> cleanup_1 conf
   | "gwc" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwc_check conf
@@ -759,6 +830,8 @@ value intro () =
        if x = "" then default_lang else x
      in
      copy_text lang (Filename.concat lang "intro.txt");
+     Printf.printf "\n";
+     flush stdout;
   return ()
 ;
 
