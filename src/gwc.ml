@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.1 1999-11-10 08:44:21 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.2 1999-12-09 18:03:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -682,8 +682,7 @@ value speclist =
   [("-c", Arg.Set just_comp, "Only compiling");
    ("-o", Arg.String (fun s -> out_file.val := s),
     "<file> Output data base (default: a.gwb)");
-   ("-f", Arg.Set force,
-    "\n       Remove data base if already existing");
+   ("-f", Arg.Set force, " Remove data base if already existing");
    ("-stats", Arg.Set pr_stats, "Print statistics");
    ("-nc", Arg.Clear do_check, "No consistency check");
    ("-cg", Arg.Set do_consang, "Compute consanguinity");
