@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.30 1999-02-13 21:55:08 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: util.ml,v 1.31 1999-02-14 19:31:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,13 +9,8 @@ open Gutil;
 value lang_dir = ref ".";
 value base_dir = ref ".";
 
-value is_rtl conf =
-  try Hashtbl.find conf.lexicon " !dir" = "rtl" with
-  [ Not_found -> False ]
-;
-
 value hack_for_hebrew conf =
-  if is_rtl conf then Wserver.wprint "<!-- -->" else ()
+  if conf.is_rtl then Wserver.wprint "<!-- -->" else ()
 ;
 
 value html_br conf =
@@ -37,15 +32,6 @@ value html_li conf =
      hack_for_hebrew conf;
      Wserver.wprint "\n";
   return ()
-;
-
-value html_name_text conf s =
-  if is_rtl conf then "<span dir=ltr>" ^ s ^ "</span>" else s
-;
-
-value html_name conf s =
-  if is_rtl conf then Wserver.wprint "<span dir=ltr>%s</span>" s
-  else Wserver.wprint "%s" s
 ;
 
 value ansel_to_ascii s =
@@ -219,7 +205,7 @@ value person_text conf base p =
     | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
     | (n, []) -> n ]
   in
-  html_name_text conf (coa conf (beg ^ " " ^ sou base p.surname))
+  coa conf (beg ^ " " ^ sou base p.surname)
 ;
 
 value person_text_no_html conf base p =
@@ -242,7 +228,7 @@ value person_text_without_surname conf base p =
         sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
     | (_, []) -> sou base p.first_name ]
   in
-  html_name_text conf (coa conf s)
+  coa conf s
 ;
 
 value afficher_personne conf base p =
@@ -301,26 +287,30 @@ value most_prestigious base =
 ;
 
 value afficher_personne_un_titre_referencee conf base p t =
-  do if Name.strip_lower (sou base t.t_place) =
-        Name.strip_lower (sou base p.surname)
-     then
-       match (t.t_name, p.nick_names) with
-       [ (Tname n, []) ->
-           Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-             (acces conf base p) (coa conf (sou base n))
-       | (Tname n, [nn :: _]) ->
-           Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-             (acces conf base p) (coa conf (sou base n))
-             (coa conf (sou base nn))
-       | _ -> afficher_prenom_de_personne_referencee conf base p ]
-     else
-       match t.t_name with
-       [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
-       | _ -> afficher_personne_referencee conf base p ];
+  do html_ltr conf begin
+       if Name.strip_lower (sou base t.t_place) =
+          Name.strip_lower (sou base p.surname)
+       then
+         match (t.t_name, p.nick_names) with
+         [ (Tname n, []) ->
+             Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
+               (acces conf base p) (coa conf (sou base n))
+         | (Tname n, [nn :: _]) ->
+             Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
+               (acces conf base p) (coa conf (sou base n))
+               (coa conf (sou base nn))
+         | _ -> afficher_prenom_de_personne_referencee conf base p ]
+       else
+         match t.t_name with
+         [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
+         | _ -> afficher_personne_referencee conf base p ];
+     end;
      Wserver.wprint ", <em>";
-     html_name conf (coa conf (sou base t.t_title));
-     Wserver.wprint " ";
-     html_name conf (coa conf (sou base t.t_place));
+     html_ltr conf begin
+       Wserver.wprint "%s" (coa conf (sou base t.t_title));
+       Wserver.wprint " ";
+       Wserver.wprint "%s" (coa conf (sou base t.t_place));
+     end;
      Wserver.wprint "</em>";
   return ()
 ;
@@ -787,12 +777,7 @@ value commd_no_params conf =
 ;
 
 value print_link_to_welcome conf right_aligned =
-  let dir =
-    try
-      if Hashtbl.find conf.lexicon " !dir" = "rtl" then "left"
-      else "right" with
-    [ Not_found -> "right" ]
-  in
+  let dir = if conf.is_rtl then "left" else "right" in
   do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
      Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\"%s>"
        (commd conf) (if right_aligned then " align=" ^ dir else "");

@@ -8,6 +8,9 @@ GeneWeb Version 1.12
     were often truncated.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Feb 14, 99] Assumed wrongly that all families were defined after
+    individuals, because it is often the case in Gedcom files. But this is
+    not mandatory in definition Gedcom 5.5. Fixed.
   - [Feb 6, 99] Accept dates with "/" (20/11/1993) although it is not
     standard Gedcom 5.5. Interpreted as day/month/year.
 
