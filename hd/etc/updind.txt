@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.8 2001-02-17 22:44:11 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.9 2001-02-18 00:26:40 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -436,6 +436,102 @@
 %end;
 
 <h4>[*title/titles]1</h4>
+
+%define;insert_title;xx;
+  <table border=1>
+  <tr>
+  <td>
+  [*insert]0
+  <input name=ins_titlexx_n size=1 maxlength=1 value=1>
+  [title/titles]0
+  <input type=checkbox name=ins_titlexx value=on>
+  </td>
+  </tr>
+  </table>
+%end;
+%define;one_title;xx;
+value print_title conf base t cnt =
+  <table border=1>
+    <tr>
+      <td>
+        Wserver.wprint "%s\n"
+          (capitale (nominative (transl_nth conf "title/titles" 0)));
+      </td>
+      <td>
+        Wserver.wprint "<input name=t_ident%d size=15%s>" cnt
+          (match t with
+           [ Some {t_ident = n} -> " value=\"" ^ quote_escaped n ^ "\""
+           | _ -> "" ]);
+      </td>
+      <td>
+        Wserver.wprint "%s\n" (capitale (transl conf "estate"));
+      </td>
+      <td colspan=2>
+        Wserver.wprint "<input name=t_place%d size=30%s>" cnt
+          (match t with
+           [ Some {t_place = n} -> " value=\"" ^ quote_escaped n ^ "\""
+         | _ -> "" ]);
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Wserver.wprint "%s" (capitale (transl conf "name"));
+      </td>
+      <td>
+        Wserver.wprint "<input name=t_name%d size=20%s>" cnt
+          (match t with
+           [ Some {t_name = Tname n} -> " value=\"" ^ quote_escaped n ^ "\""
+           | _ -> "" ]);
+      </td>
+      <td>
+        Wserver.wprint "%s" (capitale (transl_nth conf "nth" 0));
+      </td>
+      <td>
+        Wserver.wprint "<input name=t_nth%d size=3%s>"
+          cnt
+          (match t with
+           [ Some {t_nth = n} when n <> 0 -> " value=" ^ string_of_int n
+           | _ -> "" ]);
+      </td>
+      <td>
+        Wserver.wprint
+          "%s <input type=checkbox name=t_main_title%d%s value=on>"
+          (capitale (transl conf "main title")) cnt
+          (match t with
+           [ Some {t_name = Tmain} -> " checked"
+           | _ -> "" ]);
+      </td>
+    </tr>
+  </table>
+  %apply;dateu;([*begin]0, t_date_startxx, title.t_date_start);
+  Update.print_date conf base (capitale (transl conf "begin"))
+    ("t_date_start" ^ string_of_int cnt)
+    (match t with
+     [ Some t -> Adef.od_of_codate t.t_date_start
+     | _ -> None ]);
+  Wserver.wprint "\n";
+  Update.print_date conf base (capitale (transl conf "end"))
+    ("t_date_end" ^ string_of_int cnt)
+    (match t with
+     [ Some t -> Adef.od_of_codate t.t_date_end
+     | _ -> None ]);
+%end
+
+%apply;insert_title;"0";
+<p>
+%if;has_titles;
+  %foreach;title;
+    %apply;one_title;cnt;
+    <p>
+    %apply;insert_title;cnt;
+    <p>
+  %end;
+%else;
+  %apply;one_title;"1";
+  <p>
+  %apply;insert_title;"1";
+  <p>
+%end;
 
 <p>
 <input type=submit value=Ok>
