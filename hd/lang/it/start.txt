@@ -164,8 +164,7 @@ avanzata</b></font></a>.
 <li>le <a href="%sm=LD;k=10">ultime nascite</a>%x%j
 <li>{the <a href="%sm=HIST;k=10">history of updates}</a>%j
 <li>{the <a href="%sm=CAL">calendars}</a>
-<li>{the <a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font>
-forum}</a>
+<li>{the <a href="%sm=FORUM">data base forum</a>}
 </ul>
 </td>
 </tr>

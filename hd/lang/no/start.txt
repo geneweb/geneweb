@@ -167,7 +167,7 @@ s&oslash;king</b></font></a>.
 <li><a href="%sm=LD;k=10">sist d&oslash;de</a>%x%j
 <li><a href="%sm=HIST;k=10">oppdateringshistorie</a>%j
 <li><a href="%sm=CAL">kalendere</a>
-<li><a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> forum</a>
+<li><a href="%sm=FORUM">database forum</a>
 </ul>
 </td>
 </tr>

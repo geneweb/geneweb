@@ -165,7 +165,7 @@ opzoeking</b></font></a>.
 <li>de <a href="%sm=LD;k=10">laatste overlijdens</a>%x%j
 <li>de <a href="%sm=HIST;k=10">lijst van wijzigingen</a>%j
 <li>de <a href="%sm=CAL">kalenders</a>
-<li>de <a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> forum</a>
+<li>de <a href="%sm=FORUM">databank forum</a>
 </ul>
 </td>
 </tr>

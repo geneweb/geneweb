@@ -163,8 +163,7 @@ Suche</b></font></a>.
 <li>die <a href="%sm=LD;k=10">letzten Ableben</a>%x%j
 <li>die <a href="%sm=HIST;k=10">Chronik der Aktualisierungen</a>%j
 <li>den <a href="%sm=CAL">Kalender</a>
-<li>das <a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font>
-Forum</a>
+<li>das <a href="%sm=FORUM">Datenbankforum</a>
 </ul>
 </td>
 </tr>
