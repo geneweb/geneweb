@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.21 1999-04-20 19:48:20 ddr Exp $
+# $Id: lexicon.txt,v 2.22 1999-04-20 20:41:27 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1866,6 +1866,7 @@ se: lista
     long display
 en: long display
 fr: affichage long
+se: l&aring;ng listning
 
     main title
 de: Haupttitel
