@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.1.1.1 1998-09-01 14:32:13 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.2 1998-09-18 15:25:38 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -205,14 +205,14 @@ value ged_famc base (per_sel, fam_sel) oc asc =
   match asc.parents with
   [ Some ifam ->
       if fam_sel ifam then
-        Printf.fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam)
+        Printf.fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam + 1)
       else ()
   | None -> () ]
 ;
 
 value ged_fams base (per_sel, fam_sel) oc ifam =
   if fam_sel ifam then
-    Printf.fprintf oc "1 FAMS @F%d@\n" (Adef.int_of_ifam ifam)
+    Printf.fprintf oc "1 FAMS @F%d@\n" (Adef.int_of_ifam ifam + 1)
   else ()
 ;
 
@@ -276,7 +276,7 @@ value ged_divorce base oc fam =
 
 value ged_child base (per_sel, fam_sel) oc chil =
   if per_sel chil then
-    Printf.fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper chil)
+    Printf.fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper chil + 1)
   else ()
 ;
 
@@ -308,7 +308,7 @@ value ged_ind_record base sel oc i =
   let per = base.persons.get i in
   let asc = base.ascends.get i in
   if has_personal_infos base per asc then
-    do Printf.fprintf oc "0 @I%d@ INDI\n" i;
+    do Printf.fprintf oc "0 @I%d@ INDI\n" (i + 1);
        ged_name base oc per;
        ged_sex base oc per;
        ged_ind_ev_str base oc per;
@@ -326,18 +326,18 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
   if is_deleted_family fam then ()
   else
     let cpl = base.couples.get i in
-    do Printf.fprintf oc "0 @F%d@ FAM\n" i;
+    do Printf.fprintf oc "0 @F%d@ FAM\n" (i + 1);
        ged_marriage base oc fam;
        ged_divorce base oc fam;
        if has_personal_infos base (poi base cpl.father) (aoi base cpl.father)
        && per_sel cpl.father
        then
-         Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper cpl.father)
+         Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper cpl.father + 1)
        else ();
        if has_personal_infos base (poi base cpl.mother) (aoi base cpl.mother)
        && per_sel cpl.mother
        then
-         Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper cpl.mother)
+         Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper cpl.mother + 1)
        else ();
        Array.iter (ged_child base sel oc) fam.children;
        ged_fsource base oc fam;
