@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.47 2003-12-16 12:46:18 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.48 2003-12-16 13:09:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -68,7 +68,7 @@ nl: Genealogische databank
 no: Genealogisk database
 pl: Genealogiczna baza danych
 pt: Base de Dados Geneal&oacute;gica
-ro: Basa de date  genealogice
+ro: Basa de date genealogice
 ru: Генеaлогическая база данных
 sl: Genealo№ka baza podatkov
 sv: Genealogisk databas
