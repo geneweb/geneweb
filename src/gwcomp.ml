@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.16 1999-09-18 03:43:54 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.17 1999-09-28 20:11:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -538,7 +538,7 @@ value create_person () =
   {first_name = ""; surname = ""; occ = 0; image = "";
    public_name = ""; nick_names = []; aliases = [];
    first_names_aliases = []; surnames_aliases = [];
-   titles = []; rparents = []; rchildren = [];
+   titles = []; rparents = []; related = [];
    occupation = ""; sex = Neuter; access = IfTitles;
    birth = Adef.codate_None; birth_place = ""; birth_src = "";
    baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.28 1999-09-28 16:30:04 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.29 1999-09-28 20:11:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -64,7 +64,7 @@ value make_person gen p n occ i =
      occ = occ; image = empty_string;
      first_names_aliases = []; surnames_aliases = [];
      public_name = empty_string; nick_names = [];
-     aliases = []; titles = []; rparents = []; rchildren = [];
+     aliases = []; titles = []; rparents = []; related = [];
      occupation = empty_string;
      sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty_string;
@@ -439,8 +439,8 @@ value map_option f =
 
 value insert_relation_parent gen p s k =
   let par = insert_parent gen k in
-  do if not (List.mem p.cle_index par.rchildren) then
-       par.rchildren := [p.cle_index :: par.rchildren]
+  do if not (List.mem p.cle_index par.related) then
+       par.related := [p.cle_index :: par.related]
      else ();
      if par.sex = Neuter then par.sex := s else ();
   return par.cle_index

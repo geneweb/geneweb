@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.39 1999-09-28 16:29:59 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.40 1999-09-28 20:11:19 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -614,7 +614,7 @@ value unknown_per gen i =
   let p =
     {first_name = what; surname = what; occ = i; public_name = empty;
      image = empty; nick_names = []; aliases = []; first_names_aliases = [];
-     surnames_aliases = []; titles = []; rparents = []; rchildren = [];
+     surnames_aliases = []; titles = []; rparents = []; related = [];
      occupation = empty; sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty; birth_src = empty;
      baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
@@ -949,8 +949,8 @@ value adop_parent gen ip r =
   match gen.g_per.arr.(Adef.int_of_iper i) with
   [ Left _ -> None
   | Right p ->
-      do if List.memq ip p.rchildren then ()
-         else p.rchildren := [ip :: p.rchildren];
+      do if List.memq ip p.related then ()
+         else p.related := [ip :: p.related];
       return Some p.cle_index ]
 ;
 
@@ -1241,7 +1241,7 @@ value add_indi gen r =
        else [];
      surnames_aliases =
        if surname_alias <> "" then [add_string gen surname_alias] else [];
-     titles = titles; rparents = rparents; rchildren = [];
+     titles = titles; rparents = rparents; related = [];
      occupation = add_string gen occupation;
      sex = sex;
      access =
@@ -1551,8 +1551,8 @@ value pass2 gen fname =
        (fun (ipp, ip) ->
           match gen.g_per.arr.(Adef.int_of_iper ipp) with
           [ Right p ->
-              if List.memq ip p.rchildren then ()
-              else p.rchildren := [ip :: p.rchildren]
+              if List.memq ip p.related then ()
+              else p.related := [ip :: p.related]
           | _ -> () ])
        gen.g_godp;
      close_in ic;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.26 1999-09-23 22:19:13 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.27 1999-09-28 20:11:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -251,7 +251,7 @@ value reconstitute_person conf =
      public_name = public_name;
      nick_names = nicknames; aliases = aliases; titles = titles;
      rparents = rparents; occupation = occupation;
-     rchildren = []; sex = sex; access = access;
+     related = []; sex = sex; access = access;
      birth = Adef.codate_of_od birth; birth_place = birth_place;
      birth_src = only_printable (get conf "birth_src");
      baptism = bapt; baptism_place = bapt_place;
@@ -413,8 +413,8 @@ value update_relation_parents base op np =
          if List.mem ip op_rparents then ippl
          else
            let p = poi base ip in
-           if not (List.mem pi p.rchildren) then
-             do p.rchildren := [pi :: p.rchildren]; return
+           if not (List.mem pi p.related) then
+             do p.related := [pi :: p.related]; return
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl np_rparents
@@ -425,8 +425,8 @@ value update_relation_parents base op np =
          if List.mem ip np_rparents then ippl
          else
            let p = poi base ip in
-           if List.mem pi p.rchildren then
-             do p.rchildren := list_filter (\<> pi) p.rchildren; return
+           if List.mem pi p.related then
+             do p.related := list_filter (\<> pi) p.related; return
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl op_rparents
@@ -459,7 +459,7 @@ value effective_mod conf base sp =
       (Update.insert_string conf base) sp
   in
   do np.family := op.family;
-     np.rchildren := op.rchildren;
+     np.related := op.related;
   return
   let op_misc_names = person_misc_names base op in
   let np_misc_names = person_misc_names base np in
@@ -528,7 +528,7 @@ value effective_del conf base p =
      p.surnames_aliases := [];
      p.titles := [];
      p.rparents := [];
-     p.rchildren := [];
+     p.related := [];
      p.occupation := empty;
      p.access := IfTitles;
      p.birth := Adef.codate_None;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.17 1999-09-14 22:34:01 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.18 1999-09-28 20:11:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -788,7 +788,7 @@ value print_add conf base =
     {first_name = ""; surname = ""; occ = 0; image = "";
      first_names_aliases = []; surnames_aliases = [];
      public_name = ""; nick_names = []; aliases = [];
-     titles = []; rparents = []; rchildren = []; occupation = "";
+     titles = []; rparents = []; related = []; occupation = "";
      sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = ""; birth_src = "";
      baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";

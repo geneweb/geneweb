@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.49 1999-09-18 03:43:57 ddr Exp $ *)
+(* $Id: perso.ml,v 2.50 1999-09-28 20:11:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -640,7 +640,7 @@ value print_relations conf base p =
       (fun ifam -> (foi base ifam).witnesses <> [| |])
       (Array.to_list p.family)
   in
-  match (p.rparents, p.rchildren, has_marriage_witnesses) with
+  match (p.rparents, p.related, has_marriage_witnesses) with
   [ ([], [], False) -> ()
   | (rl, cl, _) ->
       do Wserver.wprint "<h3>%s</h3>\n"

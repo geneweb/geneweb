@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 2.8 1999-09-25 08:28:12 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 2.9 1999-09-28 20:11:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -63,7 +63,7 @@ value reconstitute conf base p1 p2 =
    titles = list (map_title_strings (sou base)) (fun p -> p.titles);
    rparents =
      list (map_relation_ps (sorp base) (sou base)) (fun p -> p.rparents);
-   rchildren = [];
+   related = [];
    occupation = field "occupation" (fun p -> sou base p.occupation) (\= "");
    sex = field "sex" (fun p -> p.sex) (\= Neuter);
    access = field "access" (fun p -> p.access) (\= IfTitles);
