@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.0 2001-03-16 19:34:49 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.1 2001-03-18 16:57:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -212,7 +212,8 @@ value compatible_ind base p1 p2 =
   compatible_strings p1.death_place p2.death_place &&
   compatible_burials p1.burial p2.burial &&
   compatible_strings p1.burial_place p2.burial_place &&
-  compatible_strings p1.notes p2.notes
+  compatible_strings p1.notes p2.notes &&
+  compatible_strings p1.psources p2.psources
 ;
 
 value compatible_fam base fam1 fam2 =
@@ -220,7 +221,8 @@ value compatible_fam base fam1 fam2 =
   compatible_strings fam1.marriage_place fam2.marriage_place &&
   Array.length fam2.witnesses = 0 &&
   compatible_relation_kinds fam1.relation fam2.relation &&
-  compatible_divorces fam1.divorce fam2.divorce
+  compatible_divorces fam1.divorce fam2.divorce &&
+  compatible_strings fam1.fsources fam2.fsources
 ;
 
 value propose_merge_ind conf base branches p1 p2 =
