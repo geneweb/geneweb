@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.10 1999-12-02 05:30:45 ddr Exp $ *)
+(* $Id: relation.ml,v 3.11 1999-12-02 15:14:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -898,13 +898,14 @@ value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list)) =
 
 open RelationLink;
 
-value print_list_for_dag conf base maxlen a p rl =
-  let dist = make_dist_tab conf base a.cle_index maxlen in
-  let _ = List.fold_left
-    (fun cnt (_, _, (x1, x2, _)) ->
-       let x = max x1 x2 in
-       let b = find_first_branch base dist a.cle_index x p.cle_index Neuter in
-       let cnt =
+value dag_item conf base dist x p list cnt =
+  if x = 0 then cnt
+  else
+    List.fold_left
+      (fun cnt (a, _) ->
+         let b =
+           find_first_branch base dist a.cle_index x p.cle_index Neuter
+         in
          loop cnt b
          where rec loop cnt =
            fun
@@ -915,13 +916,29 @@ value print_list_for_dag conf base maxlen a p rl =
                return
                let b = find_next_branch base dist a.cle_index a.sex b in
                loop (cnt + 1) b
-           | None ->  cnt ]
-       in cnt)
-    1 rl
-  in ()
+           | None ->  cnt ])
+      cnt list
 ;
 
-value print_propose_upto conf base total p1 p2 rl =
+value print_list_for_dag conf base p1 p2 rl =
+  match rl with
+  [ [(None, None, (x1, x2, _)) :: _] when x1 == 0 || x2 == 0 ->
+       do Wserver.wprint "<p>\n";
+          Wserver.wprint "<a href=\"%sm=DAG" (commd conf);
+          let dist = phony_dist_tab in
+          let _ = List.fold_left
+            (fun cnt (_, _, (x1, x2, list)) ->
+               let cnt = dag_item conf base dist x1 p1 list cnt in
+               let cnt = dag_item conf base dist x2 p2 list cnt in
+               cnt)
+            1 rl
+          in ();
+          Wserver.wprint "\">%s</a>\n" (capitale (transl conf "tree"));
+       return ()
+  | _ -> () ]
+;
+
+value print_propose_upto conf base p1 p2 rl =
   match rl with
   [ [(None, None, (x1, x2, _)) :: _] when x1 == 0 || x2 == 0 ->
       let maxlen =
@@ -940,13 +957,6 @@ value print_propose_upto conf base total p1 p2 rl =
            (acces conf base p) (acces_n conf base "1" a) maxlen;
          Wserver.wprint "%s</a>" (transl conf "here");
          Wserver.wprint ".</em></font>\n";
-         if Num.gt total Num.one && Num.gt (Num.of_int 33) total then
-           do Wserver.wprint "<p>\n";
-              Wserver.wprint "<a href=\"%sm=DAG" (commd conf);
-              print_list_for_dag conf base maxlen a p rl;
-              Wserver.wprint "\">%s</a>\n" (capitale (transl conf "tree"));
-           return ()
-         else ();
       return ()
   | _ -> () ]
 ;
@@ -1190,7 +1200,10 @@ value print_main_relationship conf base long p1 p2 rel =
                  html_p conf;
               return ()
             else ();
-            print_propose_upto conf base total p1 p2 rl;
+            print_propose_upto conf base p1 p2 rl;
+            if Num.gt total Num.one && Num.gt (Num.of_int 33) total then
+              print_list_for_dag conf base p1 p2 rl
+            else ();
          return () ];
      trailer conf;
   return ()
