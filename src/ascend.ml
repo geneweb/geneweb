@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.51 2001-01-09 09:28:41 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.52 2001-01-11 20:51:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1869,110 +1869,6 @@ value print_tree_with_table conf base gv p =
   end
 ;
 
-(*
-value print_tree_with_table_old conf base gv p =
-  let gv = min (limit_by_tree conf) gv in
-  let next_gen pol =
-    List.fold_right
-      (fun po list ->
-         match po with
-         [ Some p ->
-             match (aoi base p.cle_index).parents with
-             [ Some ifam ->
-                 let cpl = coi base ifam in
-                 let fath =
-                   let p = poi base cpl.father in
-                   if connais base p then Some p else None
-                 in
-                 let moth =
-                   let p = poi base cpl.mother in
-                   if connais base p then Some p else None
-                 in
-                 [fath; moth :: list]
-             | _ -> [None; None :: list] ]
-         | None -> [None; None :: list] ])
-      pol []
-  in
-  let gen =
-    loop (gv - 1) [Some p] [] where rec loop i gen list =
-      if i == 0 then [gen :: list]
-      else loop (i - 1) (next_gen gen) [gen :: list]
-  in
-  let down_reference p s =
-    if conf.cancel_links then s
-    else reference conf base p s
-  in
-  let colspan = fun [ 1 -> "" | n -> " colspan=" ^ string_of_int n ] in
-  let print_ancestor gen n first po =
-    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
-       else ();
-       stag "td" "align=center%s" (colspan n) begin
-         let txt =
-           match po with
-           [ Some p ->
-               let txt = person_title_text conf base p in
-               let txt =
-                 if List.length gen = 1 then down_reference p txt
-                 else tree_reference gv conf base p txt
-               in
-               txt ^ Date.short_dates_text conf base p
-           | _ -> "&nbsp;" ]
-         in
-         Wserver.wprint "%s" txt;
-         match po with
-         [ Some p -> Dag.print_image conf base p
-         | _ -> () ];
-       end;
-       Wserver.wprint "\n";
-    return ()
-  in
-  let print_vertical_bars n cs =
-    for i = 1 to n do
-      stag "td" "align=center%s" (colspan cs) begin Wserver.wprint "|"; end;
-      Wserver.wprint "\n";
-      if i < n then Wserver.wprint "<td>&nbsp;</td>\n" else ();
-    done
-  in
-  let print_horizontal_line n cs =
-    for i = 1 to n do
-      stag "td" "align=right%s" (colspan cs) begin
-        Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=right>";
-      end;
-      Wserver.wprint "\n";
-      Wserver.wprint "<td><hr noshade size=1></td>\n";
-      stag "td" "align=left%s" (colspan cs) begin
-        Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=left>";
-      end;
-      Wserver.wprint "\n";
-      if i < n then Wserver.wprint "<td>&nbsp;</td>\n" else ();
-    done
-  in
-  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
-    conf.border
-  begin
-    let _ =
-      List.fold_left
-        (fun cs gen ->
-           do if cs > 1 then
-                let n = List.length gen in
-                do tag "tr" begin print_vertical_bars (2 * n) (cs - 1); end;
-                   tag "tr" begin print_horizontal_line n (cs - 1); end;
-                   tag "tr" begin print_vertical_bars n (2 * cs - 1); end;
-                return ()
-              else ();
-              tag "tr" begin
-                list_iter_first
-                  (fun first po -> print_ancestor gen (2 * cs - 1) first po)
-                  gen;
-              end;
-           return 2 * cs)
-        1 gen
-    in
-    ();
-  end
-;
-*)
-
 value print_normal_tree conf base v p =
   let title _ =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
@@ -1989,6 +1885,7 @@ value print_normal_tree conf base v p =
 ;
 
 value print_tree conf base v p =
+  let v = min (limit_by_tree conf) v in
   if p_getenv conf.env "dag" = Some "on"
   || browser_doesnt_have_tables conf then
     let set =
