@@ -12,6 +12,9 @@ GeneWeb Version 2.01
     month is now the current month, not always January.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Mar 20, 99] Added options for dates where months are represented by
+    numbers: -dates_dm when day before month and -dates_md when month
+    before day.
   - [Mar 16, 99] Did not work for gedcom files with white spaces in the
     beginning of the lines. Fixed.
   - [Mar 11, 99] Fixed horrible bug: treatment of accents worked bad for

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.5 1999-03-16 20:12:42 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.6 1999-03-20 19:12:57 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -13,6 +13,11 @@ type record =
     rpos : int }
 ;
 
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
+type month_number_dates =
+  [ MonthDayDates | DayMonthDates | NoMonthNumberDates | MonthNumberHappened ]
+;
+
 value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
@@ -22,6 +27,7 @@ value ansel_option = ref None;
 value ansel_characters = ref True;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
+value month_number_dates = ref NoMonthNumberDates;
 value set_not_dead = ref False;
 
 (* Reading input *)
@@ -108,16 +114,31 @@ and get_lev_list l n =
 
 (* Error *)
 
-value bad_dates = ref [];
+value bad_dates_warned = ref False;
 
 value print_bad_date pos d =
-  if List.mem d bad_dates.val then ()
+  if bad_dates_warned.val then ()
   else
-    do bad_dates.val := [d :: bad_dates.val];
+    do bad_dates_warned.val := True;
        print_location pos;
        Printf.printf "Can't decode date %s\n" d;
        flush stdout;
     return ()
+;
+
+value warning_month_number_dates () =
+  if month_number_dates.val = MonthNumberHappened then
+    do Printf.printf "
+  Warning: the file holds dates with numbered months (like: 12/05/1912).
+
+  GEDCOM standard *requires* that months in dates be identifiers. The
+  correct form for this example would be 12 MAY 1912 or 5 DEC 1912.
+
+  Consider restarting with option \"-dates_dm\" or \"-dates_md\".
+  Use option -help to see what they do.\n\n";
+       flush stdout;
+    return ()
+  else ()
 ;
 
 (* Decoding fields *)
@@ -294,7 +315,7 @@ EXTEND
   ;
   simple_date:
     [[ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ];
-       n2 = OPT [ i = int -> abs i | m = month -> m ]; LIST0 [ "." | "/" ];
+       n2 = OPT gen_month; LIST0 [ "." | "/" ];
        n3 = OPT int; LIST0 "." ->
          let n3 =
            if no_negative_dates.val then
@@ -305,8 +326,24 @@ EXTEND
          in
          match (n1, n2, n3) with
          [ (Some d, Some m, Some y) ->
+	     let (d, m) =
+               match m with
+               [ Right m -> (d, m)
+               | Left m ->
+            	   match month_number_dates.val with
+            	   [ DayMonthDates -> (d, m)
+            	   | MonthDayDates -> (m, d)
+            	   | _ ->
+                       do month_number_dates.val := MonthNumberHappened; return
+                       (0, 0) ] ]
+             in
              Some {day = d; month = m; year = y; prec = Sure}
          | (None, Some m, Some y) ->
+	     let m =
+               match m with
+               [ Right m -> m
+               | Left m -> m ]
+             in
              Some {day = 0; month = m; year = y; prec = Sure}
          | (None, None, Some y) ->
              Some {day = 0; month = 0; year = y; prec = Sure}
@@ -318,6 +355,9 @@ EXTEND
     [[ ID "ABT" -> About | ID "ENV" -> About
      | ID "BEF" -> Before | ID "AFT" -> After
      | ID "EST" -> Maybe | -> Sure ]];
+  gen_month:
+    [[ i = int -> Left (abs i) | m = month -> Right m ]]
+  ;
   month:
     [[ ID "JAN" -> 1 | ID "FEB" -> 2 | ID "MAR" -> 3
      | ID "APR" -> 4 | ID "MAY" -> 5 | ID "JUN" -> 6
@@ -353,7 +393,6 @@ value date_of_field pos d =
 
 (* Creating base *)
 
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 type tab 'a = {arr : mutable array 'a; tlen : mutable int};
 
 type gen =
@@ -1383,8 +1422,8 @@ value make_arrays in_file =
      pass2 gen fname;
      Printf.eprintf "*** pass 3 (fam)\n"; flush stderr;
      pass3 gen fname;
-     check_undefined gen;
      close_in gen.g_ic;
+     check_undefined gen;
   return
   (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str)
 ;
@@ -1746,6 +1785,12 @@ value speclist =
        Set negative dates when inconsistency (e.g. birth after death)");
    ("-no_nd", Arg.Set no_negative_dates, "  - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year");
+   ("-dates_dm", Arg.Unit (fun () -> month_number_dates.val := DayMonthDates),
+    "
+       Interpret months-numbered dates as day/month/year");
+   ("-dates_md", Arg.Unit (fun () -> month_number_dates.val := MonthDayDates),
+    "
+       Interpret months-numbered dates as month/day/year");
    ("-ansel", Arg.Unit (fun () -> ansel_option.val := Some True),
        "  - ANSEL encoding -
        Force ANSEL encoding, overriding the possible setting in GEDCOM.");
@@ -1774,6 +1819,7 @@ value main () =
   do finish_base base;
      Iobase.output out_file.val base;
      output_command_line out_file.val;
+     warning_month_number_dates ();
   return ()
 ;
 
