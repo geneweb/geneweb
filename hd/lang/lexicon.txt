@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.139 1999-10-04 16:59:47 ddr Exp $
+# $Id: lexicon.txt,v 2.140 1999-10-05 08:12:06 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2004,6 +2004,7 @@ se: hans maka/hennes make
 dk: opdateringers historie
 en: history of updates
 fr: historique des mises-&agrave;-jour
+nl: lijst van wijzigingen
 se: uppdateringarnas historia
 
     husband/wife
@@ -3358,7 +3359,7 @@ dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 no: bekreftet far/bekreftet mor/bekreftede foreldre
-nl: recognizing father/recognizing mother/erkennende ouders
+nl: erkennende vader/erkennende moeder/erkennende ouders
 pt: pai que o reconhoceu/m&atilde;e que o reconhoceu/pais que o reconheceram
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
@@ -4406,11 +4407,13 @@ se: med
     witness at marriage of %s and %s
 en: witness at marriage of %s and %s
 fr: t&eacute;moin au mariage de %s et de %s
+nl: getuige bij het huwelijk van %s en %s
 
     witness/witnesses
 dk: vidne/vidner
 en: witness/witnesses
 fr: t&eacute;moin/t&eacute;moins
+nl: getuige/getuigen
 se: vittne/vittnen
 
     would be his/her own ancestor
