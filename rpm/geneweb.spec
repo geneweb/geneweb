@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.9 1999-09-04 16:00:33 ddr Exp $
+# $Id: geneweb.spec,v 1.10 1999-09-05 04:50:10 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -19,8 +19,8 @@
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
-Version: VERSION
-Release: RELEASE
+Version: 2.06
+Release: 4
 Copyright: GPL
 Vendor: INRIA
 Group: Applications
@@ -31,18 +31,31 @@ Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
 # Requires: ld-linux.so.2 libc.so.6 libm.so.6 libncurses.so.4 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
 
 Prefix: /usr
+Summary(de): eine genealogische Software mit einem Web-Interface
 Summary(fr): un logiciel de généalogie doté d'une interface Web
 Summary(nl): een genealogisch programma met een www-interface
 Summary(se): ett genealogi program med ett webbinterface
 
 %description
-GeneWeb is a genealogy software with a Web interface. 
-It uses very efficient techniques of relationship and consanguinity computing.
+GeneWeb is a genealogy software with a Web interface. It can be used
+off-line or as a Web service.
+
+%description -l de
+GeneWeb ist eine genealogische Software mit einem Web-Interface.
+Sie kann off-line oder als ein Web-Service genutzt werden.
 
 %description -l fr
-GeneWeb est un logiciel de généalogie doté d'une interface Web.
-Il utilise des techniques de calcul de parenté et de consanguinité
-très efficaces.
+GeneWeb est un logiciel de généalogie doté d'une interface Web. Il
+peut être utilisé non connecté au réseau ou comme un service Web.
+
+%description -l nl
+GeneWeb is een genealogisch programma met een www-interface, dat kan
+gebruikt worden op computers met of zonder permanente verbinding met
+het Internet.
+
+%description -l se
+GeneWeb är ett genealogi program med ett webbinterface. Det kan användas 
+nedkopplad eller som en webbtjänst.
 
 # *********** BUILDING .RPM *************
 # Now come the header lines that describe how to build the application
