@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.6 2001-03-26 16:56:01 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.7 2001-03-28 12:32:26 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -42,7 +42,7 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 <td align=%L>
 <table><tr><td align=center><h1><font color=%i>[
 af: Genealogiese<br>databasis
-br: Base de Dados Geneal&oacute;gica
+br: Base de Dados<br>Geneal&oacute;gica
 cn: ÍøÂç¼ÒÆ×
 cs: Genealogická databáze
 ct: Base de dades<br>geneal&ograve;gica
