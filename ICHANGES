@@ -5,6 +5,8 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Nov 19, 99] Fixed bug: redirected service and renamed service messages
+    did not work in cgi mode
   - [Nov 13, 99] Added some checks of access tables out of bounds
   - [Nov 13, 99] Added link to welcome page in case of not found
   - [Nov 9, 99] Chop suffix ".gwb" if the base name has it in URL

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.12 1999-11-19 00:25:00 ddr Exp $ *)
+(* $Id: util.ml,v 3.13 1999-11-19 10:02:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -528,8 +528,7 @@ value index_of_sex =
 ;
 
 value default_body_prop conf =
-  "background=\"" ^ (if conf.cgi then conf.command else "geneweb") ^
-  "?m=IM;v=/gwback.jpg\""
+  "background=\"" ^ conf.indep_command ^ "m=IM;v=/gwback.jpg\""
 ;
 
 value body_prop conf =
@@ -578,7 +577,22 @@ value rheader conf title =
   return ()
 ;
 
-value rec copy_from_channel env ic =
+value open_etc_file fname =
+  let fname1 =
+    List.fold_right Filename.concat [base_dir.val; "etc"]
+      (Filename.basename fname ^ ".txt")
+  in
+  let fname2 =
+    List.fold_right Filename.concat [lang_dir.val; "etc"]
+      (Filename.basename fname ^ ".txt")
+  in
+  try Some (open_in fname1) with
+  [ Sys_error _ ->
+      try Some (open_in fname2) with
+      [ Sys_error _ -> None ] ]
+;
+
+value rec copy_from_channel env imcom ic =
   try
     while True do
       match input_char ic with
@@ -586,12 +600,14 @@ value rec copy_from_channel env ic =
           let c = input_char ic in
           match c with
           [ '%' -> Wserver.wprint "%%"
+          | 'k' -> Wserver.wprint "%s" imcom
           | 'r' ->
               let name = input_line ic in
-              try copy_etc_file env name with
-              [ Sys_error _ ->
-                   Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>"
-                     name ]
+              match open_etc_file name with
+              [ Some ic -> copy_from_channel env imcom ic
+              | None ->
+                  Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>"
+                    name ]
           | 'v' -> Wserver.wprint "%s" Version.txt
           | c ->
               try Wserver.wprint "%s" (List.assoc c env) with
@@ -600,19 +616,6 @@ value rec copy_from_channel env ic =
     done
   with
   [ End_of_file -> close_in ic ]
-and copy_etc_file env fname =
-  let fname1 =
-    List.fold_right Filename.concat [base_dir.val; "etc"]
-      (Filename.basename fname ^ ".txt")
-  in
-  let fname =
-    if Sys.file_exists fname1 then fname1
-    else
-      List.fold_right Filename.concat [lang_dir.val; "etc"]
-        (Filename.basename fname ^ ".txt")
-  in
-  let ic = open_in fname in
-  copy_from_channel env ic
 ;
 
 value start_with s i p =
@@ -706,21 +709,21 @@ value copy_string_with_macros conf s =
 ;
 
 value gen_trailer with_logo conf =
-  let action = if conf.cgi then conf.command else "geneweb" in
   let env =
     [('s', commd conf);
      ('d',
       if conf.cancel_links then ""
-      else " - <a href=\"" ^ action ^ "?m=DOC\">DOC</a>")]
+      else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
   in
   do if not with_logo then ()
      else
         Wserver.wprint "<p>
-<img src=\"%s?m=IM;v=/gwlogo.gif\"
+<img src=\"%sm=IM;v=/gwlogo.gif\"
 alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
-          action;
-     try copy_etc_file env "copyr" with
-     [ Sys_error _ ->
+          conf.indep_command;
+     match open_etc_file "copyr" with
+     [ Some ic -> copy_from_channel env conf.indep_command ic
+     | None ->
          do html_p conf;
             Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright INRIA 1999 -
@@ -732,13 +735,13 @@ GeneWeb %s</em></font>" Version.txt;
          (conf.bname ^ ".trl")
      in
      match try Some (open_in trl_fname) with [ Sys_error _ -> None ] with
-     [ Some ic -> copy_from_channel [] ic
+     [ Some ic -> copy_from_channel [] conf.indep_command ic
      | None ->
          let trl_fname =
            List.fold_right Filename.concat [base_dir.val; "lang"]
              (conf.bname ^ ".trl")
          in
-         try copy_from_channel [] (open_in trl_fname) with
+         try copy_from_channel [] conf.indep_command (open_in trl_fname) with
          [ Sys_error _ -> () ] ];
      Wserver.wprint "</body>\n";
   return ()
@@ -1017,8 +1020,8 @@ value print_link_to_welcome conf right_aligned =
       | None -> "" ]
     in
     do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-       Wserver.wprint "<img src=\"%s?m=IM;v=/%s\"%s alt=\"^^\"%s>"
-         (if conf.cgi then conf.command else "geneweb") fname wid_hei
+       Wserver.wprint "<img src=\"%sm=IM;v=/%s\"%s alt=\"^^\"%s>"
+         conf.indep_command fname wid_hei
          (if right_aligned then " align=" ^ dir else "");
        Wserver.wprint "</a>\n";
     return ()

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.7 1999-11-19 00:25:00 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.8 1999-11-19 10:02:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -266,8 +266,12 @@ value print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf ^ new_req
   in
   let env = [('o', conf.bname); ('n', new_n); ('l', link)] in
-  try Util.copy_etc_file env "renamed" with
-  [ Sys_error _ ->
+  match Util.open_etc_file "renamed" with
+  [ Some ic ->
+      do Util.html conf;
+         Util.copy_from_channel env conf.indep_command ic;
+      return ()
+  | None ->
       let  title _ =
         Wserver.wprint "%s -&gt; %s" conf.bname new_n
       in
@@ -288,8 +292,12 @@ value print_redirected conf new_addr =
     "http://" ^ new_addr ^ req
   in
   let env = [('l', link)] in
-  try Util.copy_etc_file env "redirect" with
-  [ Sys_error _ ->
+  match Util.open_etc_file "redirect" with
+  [ Some ic ->
+      do Util.html conf;
+         Util.copy_from_channel env conf.indep_command ic;
+      return ()
+  | None ->      
       let  title _ = Wserver.wprint "Address changed" in
       do Util.header conf title;
          Wserver.wprint "Use the following address:\n<p>\n";
@@ -372,8 +380,12 @@ value propose_base conf =
 ;
 
 value general_welcome conf =
-  try Util.copy_etc_file [] "index" with
-  [ Sys_error _ -> propose_base conf ]
+  match Util.open_etc_file "index" with
+  [ Some ic ->
+      do Util.html conf;
+         Util.copy_from_channel [] conf.indep_command ic;
+      return ()
+  | None -> propose_base conf ]
 ;
 
 value unauth bname typ =
@@ -551,6 +563,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      user = user;
      cgi = cgi;
      command = command;
+     indep_command = (if cgi then command else "geneweb") ^ "?";
      lang = if lang = "" then default_lang else lang;
      default_lang = default_lang;
      can_send_image =

@@ -3,7 +3,7 @@
   <meta name="ROBOTS" content="NONE">
   <title>%o -&gt; %n</title>
 </head>
-<body>
+<body background="%km=IM;v=/gwback.jpg">
 <h1>%o -&gt; %n</h1>
 
 The database "%o" has been renamed "%n".
@@ -16,6 +16,10 @@ Utiliser maintenant:
 <li>
 <a href="%l">%l</a>
 </ul>
+<p>
+<img src="%km=IM;v=/gwlogo.gif"
+alt=GeneWeb width=64 height=72 align=right>
+<br>
 
 <p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/">

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.6 1999-10-31 09:43:44 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.7 1999-11-19 10:02:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -244,9 +244,7 @@ value rec copy_from_channel conf base ic =
                  if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
               return ()
           | 'h' -> hidden_env conf
-          | 'k' ->
-              Wserver.wprint "%s?"
-                (if conf.cgi then conf.command else "geneweb")
+          | 'k' -> Wserver.wprint "%s" conf.indep_command
           | 'l' -> Wserver.wprint "%s" conf.lang
           | 'n' ->
               Num.print (fun x -> Wserver.wprint "%s" x)

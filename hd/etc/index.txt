@@ -3,7 +3,7 @@
   <meta name="ROBOTS" content="NONE">
   <title>Base</title>
 </head>
-<body background="?m=IM;v=/gwback.jpg">
+<body background="%km=IM;v=/gwback.jpg">
 <center><h1><font color=#2f6400>Base</font></h1></center>
 <ul>
 <li>
@@ -12,7 +12,7 @@
 <input type=submit value="Ok">
 </ul>
 <p>
-<img src="?m=IM;v=/gwlogo.gif"
+<img src="%km=IM;v=/gwlogo.gif"
 alt=GeneWeb width=64 height=72 align=right>
 <br>
 
