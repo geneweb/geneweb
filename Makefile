@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 1998-10-29 14:40:57 ddr Exp $
+# $Id: Makefile,v 1.7 1999-01-09 10:37:58 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -30,9 +30,10 @@ distrib:
 	cp etc/README.txt distribution/.
 	mkdir distribution/doc
 	cp doc/index.htm distribution/doc/.
-	mkdir distribution/doc/fr distribution/doc/en
-	cp doc/fr/*.htm distribution/doc/fr/.
-	cp doc/en/*.htm distribution/doc/en/.
+	for i in fr en nl; do \
+	  mkdir distribution/doc/$$i; \
+	  cp doc/$$i/*.htm distribution/doc/$$i/.; \
+	done
 	mkdir distribution/lang
 	cp etc/a.cnf distribution/.
 	cp hd/lang/*.txt distribution/lang/.
