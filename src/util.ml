@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.84 2004-03-03 04:49:44 ddr Exp $ *)
+(* $Id: util.ml,v 4.85 2004-03-22 21:26:14 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -784,7 +784,7 @@ value surname_begin n =
   else
     let i =
       strip_spaces i where rec strip_spaces i =
-        if n.[i - 1] == ' ' then strip_spaces (pred i) else i
+        if i >= 1 && n.[i - 1] == ' ' then strip_spaces (pred i) else i
     in
     " (" ^ String.sub n 0 i ^ ")"
 ;
