@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.0 1999-10-29 10:31:11 ddr Exp $ *)
+(* $Id: forum.ml,v 3.1 1999-12-16 22:12:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -40,8 +40,9 @@ value print_forum conf base =
           in
           do if ident <> "" then
                do Wserver.wprint "<p>\n";
-                  Wserver.wprint "<strong>%s</strong>\n" ident;
+                  Wserver.wprint "<strong>%s</strong>\n" (secure ident);
                   if email <> "" then
+                    let email = secure email in
                     Wserver.wprint " <a href=\"mailto:%s\">%s</a>\n"
                       email email
                   else ();
@@ -50,7 +51,7 @@ value print_forum conf base =
                   List.iter
                     (fun s ->
                        do if s = "" then Wserver.wprint "<p>"
-                          else copy_string_with_macros conf s;
+                          else copy_string_with_macros conf (secure s);
                           Wserver.wprint "\n";
                        return ())
                     mess;

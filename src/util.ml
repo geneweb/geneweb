@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.20 1999-12-15 19:58:08 ddr Exp $ *)
+(* $Id: util.ml,v 3.21 1999-12-16 22:12:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,6 +9,28 @@ open Gutil;
 value lang_dir = ref ".";
 value base_dir = ref ".";
 value doc_dir = ref "";
+
+value secure s =
+  let rec need_code i =
+    if i < String.length s then
+      match s.[i] with
+      [ '<' | '>' -> True
+      | _ -> need_code (i + 1) ]
+    else False
+  in
+  if need_code 0 then
+    loop 0 0 where rec loop i len =
+      if i = String.length s then Buff.get len
+      else
+        let (len, next_i) =
+          match s.[i] with
+          [ '<' -> (Buff.mstore len "&lt;", i + 1)
+          | '>' -> (Buff.mstore len "&gt;", i + 1)
+          | c -> (Buff.store len c, i + 1) ]
+        in
+        loop next_i len
+  else s
+;
 
 value html_br conf =
   do Wserver.wprint "<br>";
