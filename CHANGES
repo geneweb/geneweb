@@ -6,7 +6,7 @@ GeneWeb Version 2.02
 
 * GeneWeb Daemon/CGI (gwd)
   - [Apr 26, 99] Fixed upload of "jpeg" files which sometimes did not work
-    with Windows.
+    with Windows (message: "incorrect request")
   - [Apr 25, 99] Added space before "+" in short dates.
 
 * Lexicon (lexicon.txt)
