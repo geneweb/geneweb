@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.14 2000-06-19 17:42:04 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.15 2000-06-21 21:13:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -19,23 +19,16 @@ value before_date (_, d, _) (_, d1, _) =
   else True
 ;
 
-module Q =
-  Pqueue.Make
-    (struct
-       type t = (Def.person * Def.dmy * Def.calendar);
-       value leq x y = before_date y x;
-     end)
-;
-
-module QF =
-  Pqueue.Make
-    (struct
-       type t = (Def.family * Def.dmy * Def.calendar);
-       value leq x y = before_date y x;
-     end)
-;
-
-value select conf base get_date =
+value select conf base get_date find_oldest =
+  let module Q =
+    Pqueue.Make
+      (struct
+         type t = (Def.person * Def.dmy * Def.calendar);
+         value leq x y =
+           if find_oldest then before_date x y
+           else before_date y x;
+       end)
+  in
   let n =
     match p_getint conf.env "k" with
     [ Some x -> x
@@ -62,6 +55,13 @@ value select conf base get_date =
 ;
 
 value select_family conf base get_date =
+  let module QF =
+    Pqueue.Make
+      (struct
+         type t = (Def.family * Def.dmy * Def.calendar);
+         value leq x y = before_date y x;
+       end)
+  in
   let n =
     match p_getint conf.env "k" with
     [ Some x -> x
@@ -93,7 +93,9 @@ value select_family conf base get_date =
 ;
 
 value print_birth conf base =
-  let (list, len) = select conf base (fun p -> Adef.od_of_codate p.birth) in
+  let (list, len) =
+    select conf base (fun p -> Adef.od_of_codate p.birth) False
+  in
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
   in
@@ -144,7 +146,7 @@ value get_death p =
 ;
 
 value print_death conf base =
-  let (list, len) = select conf base get_death in
+  let (list, len) = select conf base get_death False in
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d deaths")) len
   in
@@ -182,6 +184,64 @@ value print_death conf base =
                  else ()
              | _ -> () ];
              Wserver.wprint "\n";
+          return month_txt)
+       "" list
+     in ();
+     Wserver.wprint "</ul>\n</ul>\n";
+     trailer conf;
+  return ()
+;
+
+value print_oldest_alive conf base =
+  let limit =
+    match p_getint conf.env "lim" with
+    [ Some x -> x
+    | None -> 150 ]
+  in
+  let get_oldest_alive p =
+    match p.death with
+    [ NotDead -> Adef.od_of_codate p.birth
+    | DontKnowIfDead ->
+        match Adef.od_of_codate p.birth with
+        [ Some (Dgreg d _) as x when conf.today.year - d.year <= limit -> x
+        | _ -> None ]
+    | _ -> None ]
+  in
+  let (list, len) = select conf base get_oldest_alive True in
+  let title _ =
+    Wserver.wprint
+      (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
+  in
+  do header conf title;
+     Wserver.wprint "<ul>\n";
+     let _ = List.fold_left
+       (fun last_month_txt (p, d, cal) ->
+          let month_txt =
+            let d = {(d) with day = 0} in
+            capitale (Date.string_of_date conf (Dgreg d cal))
+          in
+          do if month_txt <> last_month_txt then
+               do if last_month_txt = "" then ()
+                  else Wserver.wprint "</ul>\n";
+                  Wserver.wprint "<li>%s\n" month_txt;
+                  Wserver.wprint "<ul>\n";
+               return ()
+             else ();
+             Wserver.wprint "<li>\n";
+             Wserver.wprint "<strong>\n";
+             afficher_personne_referencee conf base p;
+             Wserver.wprint "</strong>,\n";
+             Wserver.wprint "%s <em>%s</em>"
+               (transl_nth conf "born" (index_of_sex p.sex))
+               (Date.string_of_ondate conf (Dgreg d cal));
+             if p.death = NotDead && d.prec = Sure then
+               let a = temps_ecoule d conf.today in
+               do Wserver.wprint " <em>(";
+                  Date.print_age conf a;
+                  Wserver.wprint ")</em>";
+               return ()
+             else ();
+             Wserver.wprint ".\n";
           return month_txt)
        "" list
      in ();

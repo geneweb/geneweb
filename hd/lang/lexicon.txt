@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.114 2000-06-20 13:47:14 ddr Exp $
+# $Id: lexicon.txt,v 3.115 2000-06-21 21:13:00 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2048,6 +2048,25 @@ pt: cremado/cremada/cremado(a)
 ru: кремирован/кремирована
 se: kremerad
 
+    data base forum
+af: forum
+de: Datenbankforum
+dk: forum
+en: data base forum
+eo: forumo
+es: foro
+fi: foorumi
+fr: forum de la base de donn&eacute;es
+he:   гйеп
+is: umrжрur
+it: tribuna
+lv: forums
+nl: forum
+no: forum
+pt: forum
+ru: форум
+se: forum
+
     date
 af: datum
 cs: datum
@@ -2646,25 +2665,6 @@ no: alfabetisk p&aring; fornavn
 pt: para obter os nomes pr&oacute;prios por ordem alfab&eacute;tica
 ru: чтобы упорядочить имена по алфавиту
 se: f&ouml;r f&ouml;rnamnen i bokstavsordning
-
-    forum
-af: forum
-de: Forum
-dk: forum
-en: forum
-eo: forumo
-es: foro
-fi: foorumi
-fr: forum
-he:   гйеп
-is: umrжрur
-it: tribuna
-lv: forums
-nl: forum
-no: forum
-pt: forum
-ru: форум
-se: forum
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
@@ -5413,6 +5413,10 @@ no: de %d fornavnene
 pt: os %d nomes
 ru: %d имён
 se: de %d f&ouml;rnamnen
+
+    the %d oldest perhaps still alive
+en: the %d oldest perhaps still alive
+fr: les %d plus anciens peut-&ecirc;tre encore vivants
 
     the %d surnames
 af: die %d vanne

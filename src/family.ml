@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.27 2000-06-20 21:19:57 ddr Exp $ *)
+(* $Id: family.ml,v 3.28 2000-06-21 21:13:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -433,6 +433,8 @@ value family_m conf base =
           relation_print conf base (base.data.persons.get (int_of_string i))
       | _ -> () ]
   | Some "NOTES" -> Notes.print conf base
+  | Some "OA" when conf.wizard || conf.friend ->
+      BirthDeath.print_oldest_alive conf base
   | Some "P" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.first_name_print conf base v
@@ -515,6 +517,7 @@ value print_no_index conf base =
       [ [] -> []
       | [("opt", "no_index") :: l] -> loop l
       | [("escache", _) :: l] -> loop l
+      | [("dsrc", _) :: l] -> loop l
       | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
       | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
       | [(k, v) :: l] when String.length k == 2 && k.[0] == 'i' ->

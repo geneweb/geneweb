@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.39 2000-06-20 13:47:21 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.40 2000-06-21 21:13:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -173,20 +173,20 @@ par
 <tr>
 <td valign=up>
 <ul>
-<li>les <a href="%sm=AN">anniversaires</a>
-<li>les <a href="%sm=AD">anniversaires des personnes
-d&eacute;c&eacute;d&eacute;es</a>
-<li>les <a href="%sm=AM">anniversaires de mariage</a>%I|wf
-<li>les <a href="%sm=LB;k=%m">derni&egrave;res naissances</a>%E
+<li><a href="%sm=AN">[birthdays]</a>
+<li><a href="%sm=AD">[anniversaries of death]</a>
+<li><a href="%sm=AM">[anniversaries of marriage]</a>%I|wf
+<li><a href="%sm=LB;k=%m">[the latest %d births](%m)</a>
+<li><a href="%sm=OA;k=%m;lim=150">[the %d oldest perhaps still alive](%m)</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>les <a href="%sm=LD;k=%m">derniers d&eacute;c&egrave;s</a>
-<li>les <a href="%sm=LM;k=%m">derniers mariages</a>%E%Ih
-<li>l'<a href="%sm=HIST;k=10">historique des mises-&agrave;-jour</a>%E
-<li>les <a href="%sm=CAL">calendriers</a>
-<li>le <a href="%sm=FORUM">forum de la base de donn&eacute;es</a>
+<li><a href="%sm=LD;k=%m">[the latest %d deaths](%m)</a>
+<li><a href="%sm=LM;k=%m">[the latest %d marriages](%m)</a>%E%Ih
+<li><a href="%sm=HIST;k=10">[history of updates]</a>%E
+<li><a href="%sm=CAL">[calendar/calendars]1</a>
+<li><a href="%sm=FORUM">[data base forum]</a>
 </ul>
 </td>
 </tr>
