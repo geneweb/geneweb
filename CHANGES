@@ -4,11 +4,12 @@ GeneWeb Version 1.09
 * gwd:
   - Added error message in relationship computing when loop in database.
   - Fixed still several bugs (accents) due to new ANSEL encoding
-  - Added "wizard_just_friend" in .cnf files (see example etc/a.cnf) to
-    suspend the powers of wizards.
   - [detail] Added text "Parents of" in displaying missing ancestors.
   - Added ability to write "I" instead of "Ier" (french form).
     Ex: "Charles I" or "Charles Ier" are both accepted.
+
+* a.cnf:
+  - Added "wizard_just_friend" in .cnf files to suspend the powers of wizards.
 
 * gwc, consang:
   - Fixed accents displaying in traces and error messages.
