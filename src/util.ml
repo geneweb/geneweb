@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.46 1999-08-21 19:40:44 ddr Exp $ *)
+(* $Id: util.ml,v 2.47 1999-08-30 12:44:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -661,30 +661,36 @@ value email_addr s i =
 ;
 
 value copy_string_with_macros conf s =
-  loop False 0 where rec loop in_atag i =
+  loop False False 0 where rec loop in_tag in_atag i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
         do Wserver.wprint "%s?" conf.command;
            List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
              conf.henv;
-        return loop in_atag (i + 2)
+        return loop in_tag in_atag (i + 2)
       else if in_atag then
         let in_atag = not (start_with s i "</a>") in
-        do Wserver.wprint "%c" s.[i]; return loop in_atag (i + 1)
+        do Wserver.wprint "%c" s.[i]; return loop in_tag in_atag (i + 1)
+      else if in_tag then
+        let in_tag = not (start_with s i ">") in
+        do Wserver.wprint "%c" s.[i]; return loop in_tag in_atag (i + 1)
       else
         match http_string s i with
         [ Some j ->
             let x = String.sub s i (j - i) in
-            do Wserver.wprint "<a href=%s>%s</a>" x x; return loop False j
+            do Wserver.wprint "<a href=%s>%s</a>" x x; return
+            loop in_tag False j
         | None ->
             match email_addr s i with
             [ Some j ->
                 let x = String.sub s i (j - i) in
                 do Wserver.wprint "<a href=\"mailto:%s\">%s</a>" x x; return
-                loop False j
+                loop False False j
             | None ->
                 let in_atag = start_with s i "<a href=" in
-                do Wserver.wprint "%c" s.[i]; return loop in_atag (i + 1) ] ]
+                let in_tag = start_with s i "<" in
+                do Wserver.wprint "%c" s.[i]; return
+                loop in_tag in_atag (i + 1) ] ]
     else ()
 ;
 
