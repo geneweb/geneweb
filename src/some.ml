@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.5 1998-09-30 14:04:45 ddr Exp $ *)
+(* $Id: some.ml,v 1.6 1998-10-06 12:06:55 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -151,8 +151,9 @@ value select_first_name conf base n list =
                (commd conf)
                (if conf.senv = "" then "" else "e=" ^ conf.senv ^ ";")
                (code_varenv sstr);
-             Wserver.wprint "%s" (List.hd strl);
-             List.iter (fun s -> Wserver.wprint ", %s" s) (List.tl strl);
+             Wserver.wprint "%s" (coa conf (List.hd strl));
+             List.iter (fun s -> Wserver.wprint ", %s" (coa conf s))
+               (List.tl strl);
              Wserver.wprint "</a>\n";
           return ())
        list;
