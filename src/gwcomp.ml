@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.14 1999-01-23 03:15:23 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.15 1999-01-26 13:23:58 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -25,7 +25,7 @@ value copy_decode s i1 i2 =
   let len =
     loop 0 i1 where rec loop len i =
       if i == i2 then len
-      else if s.[i] == '\\' then loop len (i + 1)
+      else if s.[i] == '\\' then loop (len + 1) (i + 2)
       else loop (len + 1) (i + 1)
   in
   let rec loop_copy t i j =

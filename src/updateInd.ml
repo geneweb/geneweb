@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.12 1999-01-11 15:05:31 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.13 1999-01-26 13:24:00 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -231,7 +231,7 @@ value print_death_type conf base p =
     Wserver.wprint "%s\n" (capitale (transl_nth conf "not dead" 2));
     Wserver.wprint "<option value=DontKnowIfDead%s>"
       (match p.death with [ DontKnowIfDead -> " selected" | _ -> "" ]);
-    Wserver.wprint "%s\n" (capitale (transl conf "dont know"));
+    Wserver.wprint "%s\n" (capitale (transl conf "don't know"));
     Wserver.wprint "<option value=Death%s>"
       (match p.death with
        [ Death _ _ | DeadDontKnowWhen -> " selected"
