@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.33 2002-02-17 09:48:53 ddr Exp $ *)
+(* $Id: util.ml,v 4.34 2002-02-23 14:05:06 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -266,6 +266,29 @@ value html_li conf = do { Wserver.wprint "<li>"; Wserver.wprint "\n"; };
 
 value nl () = Wserver.wprint "\013\010";
 
+value week_day_txt =
+  let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
+  fun i ->
+    let i = if i < 0 || i >= Array.length txt then 0 else i in
+    txt.(i)
+;
+value month_txt =
+  let txt =
+    [| "Jan"; "Feb"; "Mar"; "Apr"; "May"; "Jun"; "Jul"; "Aug"; "Sep"; "Oct";
+       "Nov"; "Dec" |]
+  in
+  fun i ->
+    let i = if i < 0 || i >= Array.length txt then 0 else i in
+    txt.(i)
+;
+
+value string_of_ctime conf =
+  let lt = Unix.gmtime conf.ctime in
+  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
+    (week_day_txt lt.Unix.tm_wday) lt.Unix.tm_mday (month_txt lt.Unix.tm_mon)
+    (1900 + lt.Unix.tm_year) lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
+;
+
 value html conf =
   let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
   do {
@@ -275,8 +298,9 @@ value html conf =
       nl ();
     }
     else ();
-    Wserver.wprint "Content-type: text/html; charset=%s" charset;
-    nl ();
+    let date = string_of_ctime conf;
+    Wserver.wprint "Date: %s" date; nl ();
+    Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
   }
 ;
 
