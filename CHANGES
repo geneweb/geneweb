@@ -4,6 +4,8 @@ GeneWeb Version 1.07
 * Added some stuff to allow chinese like languages.
 * Started chinese translation
 
+* Added source field for birth, baptism, death, burial, marriage.
+
 * gwd:
   - fixed bug, missing ancestors were printed in reverse order
   - fixed bug, could not find file "start.txt" in -hd directory.
@@ -19,6 +21,9 @@ GeneWeb Version 1.07
 * gwb2ged:
   - start now pointers with 1 instead of 0 because some softwares seem not
     to accept @I0@ and @F0@.
+
+* gwu:
+  - added option -d to select descendants like in gwb2ged
 
 GeneWeb Version 1.06
 --------------------

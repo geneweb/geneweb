@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.2 1998-09-18 15:25:38 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.3 1998-09-29 12:22:31 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -95,7 +95,7 @@ value ged_date oc =
       return () ]
 ;
 
-value ged_ev_detail oc n d pl =
+value ged_ev_detail oc n d pl src =
   do match (d, pl) with
      [ (None, "") -> Printf.fprintf oc " Y"
      | _ -> () ];
@@ -109,49 +109,56 @@ value ged_ev_detail oc n d pl =
      | None -> () ];
      if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n pl
      else ();
+     if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n src
+     else ();
   return ()
 ;
 
 value ged_ind_ev_str base oc per =
-  do match (Adef.od_of_codate per.birth, sou base per.birth_place) with
+  do let pl = sou base per.birth_place in
+     let src = sou base per.birth_src in
+     match (Adef.od_of_codate per.birth, pl) with
      [ (None, "") -> ()
      | (None, pl) ->
          do Printf.fprintf oc "1 BIRT";
-            ged_ev_detail oc 2 None pl;
+            ged_ev_detail oc 2 None pl src;
          return ()
      | (od, pl) ->
          do Printf.fprintf oc "1 BIRT";
-            ged_ev_detail oc 2 od pl;
+            ged_ev_detail oc 2 od pl src;
          return () ];
-     let pl = sou base per.death_place in
-     match (Adef.od_of_codate per.baptism, sou base per.baptism_place) with
+     let pl = sou base per.baptism_place in
+     let src = sou base per.baptism_src in
+     match (Adef.od_of_codate per.baptism, pl) with
      [ (None, "") -> ()
      | (od, pl) ->
          do Printf.fprintf oc "1 BAPM";
-            ged_ev_detail oc 2 od pl;
+            ged_ev_detail oc 2 od pl src;
          return () ];
      let pl = sou base per.death_place in
+     let src = sou base per.death_src in
      match per.death with
      [ NotDead -> ()
      | Death dr cd ->
          do Printf.fprintf oc "1 DEAT";
-            ged_ev_detail oc 2 (Some (Adef.date_of_cdate cd)) pl;
+            ged_ev_detail oc 2 (Some (Adef.date_of_cdate cd)) pl src;
          return ()
      | DeadYoung | DeadDontKnowWhen ->
          do Printf.fprintf oc "1 DEAT";
-            ged_ev_detail oc 2 None pl;
+            ged_ev_detail oc 2 None pl src;
          return ()
      | DontKnowIfDead -> Printf.fprintf oc "1 DEAT\n" ];
      let pl = sou base per.burial_place in
+     let src = sou base per.burial_src in
      match per.burial with
      [ UnknownBurial -> ()
      | Buried cod ->
          do Printf.fprintf oc "1 BURI";
-            ged_ev_detail oc 2 (Adef.od_of_codate cod) pl;
+            ged_ev_detail oc 2 (Adef.od_of_codate cod) pl src;
          return ()
      | Cremated cod ->
          do Printf.fprintf oc "1 CREM";
-            ged_ev_detail oc 2 (Adef.od_of_codate cod) pl;
+            ged_ev_detail oc 2 (Adef.od_of_codate cod) pl src;
          return () ];
   return ()
 ;
@@ -260,7 +267,7 @@ value ged_marriage base oc fam =
   [ (None, "") -> ()
   | (d, pl) ->
       do Printf.fprintf oc "1 MARR";
-         ged_ev_detail oc 2 d pl;
+         ged_ev_detail oc 2 d pl (sou base fam.marriage_src);
       return () ]
 ;
 
@@ -270,7 +277,7 @@ value ged_divorce base oc fam =
   | Divorced cd ->
       let d = Adef.od_of_codate cd in
       do Printf.fprintf oc "1 DIV";
-         ged_ev_detail oc 2 d "";
+         ged_ev_detail oc 2 d "" "";
       return () ]
 ;
 

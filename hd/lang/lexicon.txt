@@ -1954,12 +1954,12 @@ it: figlio/figlia/figlio(a)
 nl: zoon/dochter/kind
 se: son/dotter/barn
 
-    sources
-de: Quellen
-en: sources
-es: fuentes
-fr: sources
-nl: bronnen
+    source/sources
+de: Quelle/Quellen
+en: source/sources
+es: fuente/fuentes
+fr: source/sources
+nl: bronne/bronnen
 se: k&auml;llor
 
     specify

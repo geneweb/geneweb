@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.2 1998-09-08 09:13:25 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.3 1998-09-29 12:22:36 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -47,6 +47,7 @@ value no_family gen =
   let empty = unique_string gen "" in
   let fam =
     {marriage = Adef.codate_None; marriage_place = empty;
+     marriage_src = empty;
      divorce = NotDivorced; children = [| |]; comment = empty;
      origin_file = empty; fsources = empty; fam_index = Adef.ifam_of_int 0}
   and cpl =
@@ -65,9 +66,13 @@ value faire_personne gen p n occ i =
      aliases = []; titles = []; occupation = empty_string;
      sexe = Neutre; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty_string;
+     birth_src = empty_string;
      baptism = Adef.codate_None; baptism_place = empty_string;
+     baptism_src = empty_string;
      death = DontKnowIfDead; death_place = empty_string;
+     death_src = empty_string;
      burial = UnknownBurial; burial_place = empty_string;
+     burial_src = empty_string;
      family = [| |]; notes = empty_string;
      psources = empty_string; cle_index = Adef.iper_of_int i}
   and a =
@@ -268,12 +273,16 @@ value insert_person gen so =
      if not gen.g_errored then
        do x.birth := so.birth;
           x.birth_place := unique_string gen so.birth_place;
+          x.birth_src := unique_string gen so.birth_src;
           x.baptism := so.baptism;
           x.baptism_place := unique_string gen so.baptism_place;
+          x.baptism_src := unique_string gen so.baptism_src;
           x.death := so.death;
           x.death_place := unique_string gen so.death_place;
+          x.death_src := unique_string gen so.death_src;
           x.burial := so.burial;
           x.burial_place := unique_string gen so.burial_place;
+          x.burial_src := unique_string gen so.burial_src;
           x.first_names_aliases :=
             List.map (unique_string gen) so.first_names_aliases;
           x.surnames_aliases :=
@@ -347,6 +356,7 @@ value insere_famille gen co fo =
   let fam =
     {marriage = fo.marriage;
      marriage_place = unique_string gen fo.marriage_place;
+     marriage_src = unique_string gen fo.marriage_src;
      children = children; divorce = fo.divorce;
      comment = comment; origin_file = unique_string gen fo.origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int gen.g_fcnt}

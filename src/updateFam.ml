@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.2 1998-09-29 12:22:44 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -133,6 +133,7 @@ value print_marriage conf base fam =
        Update.print_date conf base (capitale (transl conf "date")) "marriage"
          (Adef.od_of_codate fam.marriage);
      end;
+     Update.print_src conf "marr_src" fam.marriage_src;
   return ()
 ;
 
@@ -230,9 +231,9 @@ value print_comment conf base fam =
   return ()
 ;
 
-value print_sources conf base field =
+value print_source conf base field =
   do tag "h4" begin
-       Wserver.wprint "%s" (capitale (transl conf "sources"));
+       Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
      end;
      Wserver.wprint "\n";
      tag "table" "border=1" begin
@@ -261,7 +262,7 @@ value print_family conf base fam cpl force_children_surnames =
      Wserver.wprint "\n";
      print_children conf base fam cpl force_children_surnames;
      Wserver.wprint "\n";
-     print_sources conf base fam.fsources;
+     print_source conf base fam.fsources;
   return ()
 ;
 
@@ -384,6 +385,7 @@ value print_add conf base =
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
+     marriage_src = "";
      divorce = NotDivorced; children = [| |];
      comment = ""; origin_file = ""; fsources = "";
      fam_index = bogus_family_index}
@@ -399,6 +401,7 @@ value print_add_parents conf base =
       let p = base.persons.get i in
       let fam =
         {marriage = Adef.codate_None; marriage_place = "";
+         marriage_src = "";
          divorce = NotDivorced;
          children =
            [| (sou base p.first_name, sou base p.surname, p.occ, Link) |];

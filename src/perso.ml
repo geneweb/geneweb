@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.3 1998-09-25 09:46:34 ddr Exp $ *)
+(* $Id: perso.ml,v 1.4 1998-09-29 12:22:41 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -449,28 +449,54 @@ value print_notes conf base p =
       else () ]
 ;
 
+value print_not_empty_src conf base first txt isrc =
+  let src = sou base isrc in
+  if src = "" then ()
+  else
+    do if first.val then
+         do Wserver.wprint "<p>\n";
+            Wserver.wprint "<font size=-1><em>%s:</em></font>\n"
+              (capitale (transl_nth conf "source/sources" 1));
+         return ()
+       else ();
+       Wserver.wprint "<br>-\n";
+       first.val := False;
+       Wserver.wprint "<font size=-1><em>%s: %s</em></font>\n" (txt ()) src;
+    return ()
+;
+
 value print_sources conf base p =
   let first = ref True in
-  do let sources = sou base p.psources in
-     if sources = "" then ()
-     else
-       do first.val := False; return
-       Wserver.wprint "<p><font size=-1><em>%s: %s</em></font>\n"
-         (capitale (transl conf "sources")) sources;
+  do print_not_empty_src conf base first
+       (fun () -> transl_nth conf "person/persons" 0)
+       p.psources;
+     print_not_empty_src conf base first
+       (fun () -> transl_nth conf "birth" 0)
+       p.birth_src;
+     print_not_empty_src conf base first
+       (fun () -> transl_nth conf "baptism" 0)
+       p.baptism_src;
+     print_not_empty_src conf base first
+       (fun () -> transl_nth conf "death" 0)
+       p.death_src;
+     print_not_empty_src conf base first
+       (fun () -> transl_nth conf "burial" 0)
+       p.burial_src;
      for i = 0 to Array.length p.family - 1 do
        let fam = foi base p.family.(i) in
-       let sources = sou base fam.fsources in
-       if sources = "" then ()
-       else
-         do Wserver.wprint "%s" (if first.val then "<p>" else "<br>");
-            first.val := False;
-            Wserver.wprint "<font size=-1><em>%s %s%s: %s</em></font>\n"
-              (capitale (transl conf "sources"))
-              (transl_nth conf "marriage/marriages" 0)
-              (if Array.length p.family == 1 then ""
-               else " " ^ string_of_int (i + 1))
-              sources;
-         return ();
+       do print_not_empty_src conf base first
+            (fun () ->
+               transl_nth conf "marriage/marriages" 0 ^
+               (if Array.length p.family == 1 then ""
+                else " " ^ string_of_int (i + 1)))
+            fam.marriage_src;
+          print_not_empty_src conf base first
+            (fun () ->
+               transl_nth conf "family/families" 0 ^
+               (if Array.length p.family == 1 then ""
+                else " " ^ string_of_int (i + 1)))
+            fam.fsources;
+       return ();
      done;
   return ()
 ;
