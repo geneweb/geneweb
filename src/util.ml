@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.37 1999-07-28 07:48:45 ddr Exp $ *)
+(* $Id: util.ml,v 2.38 1999-07-30 07:25:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -161,7 +161,7 @@ value start_with_vowel s =
 ;
 
 value connais base p =
-  p_first_name base p <> "?" || p_surname base p <> "?"
+  sou base p.first_name <> "?" || sou base p.surname <> "?"
 ;
 
 value acces_pur conf base x =
@@ -709,9 +709,9 @@ value print_parent conf base p a =
          else "") ]
 ;
 
-value spouse p fam =
-  if p.cle_index == fam.father then fam.mother
-  else if p.cle_index == fam.mother then fam.father
+value spouse p cpl =
+  if p.cle_index == cpl.father then cpl.mother
+  else if p.cle_index == cpl.mother then cpl.father
   else invalid_arg "spouse"
 ;
 
