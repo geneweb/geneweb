@@ -5,7 +5,12 @@ GeneWeb Intermediate Version 2.01-2
 -----------------------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [Apr 1, 99] Fixed behavior in updating persons form for burial.
+  - [May 2, 99] Fixed small uncomfortable feature: when a new couple was
+    added with new (created) persons, then modified to add existing
+    children, the field "origin_file" was not updated for the family.
+    The result is when using "gwu -odir" this new family was displayed
+    on standard output instead of saved in the origin file of a child.
+  - [May 1, 99] Fixed behavior in updating persons form for burial.
   - [Apr 28, 99] Fixed fragile part of code that reads the lexicon. Raised
     'Invalid_argument "String.sub"' if the lexicon held lines interpreted
     as keys but of string length < 4. The lexicon should not, but if it
@@ -15,6 +20,14 @@ GeneWeb Intermediate Version 2.01-2
   - [Apr 24, 99] Dont print "+" in short dates for died person if there is
     no death date and if the person is older than 120 years, as it was
     done in 2.01 for long dates displaying.
+
+* GeneWeb compiler (gwc)
+  GeneWeb uncompiler (gwu)
+  Consanguinity computing (consang)
+  GeneWeb to Gedcom (gwb2ged)
+  - [May 2, 99] Changed return code in case of errors found. Now 2. Error
+    messages on stdout instead of stderr. Had to be changed for the new
+    "setup" program.
 
 GeneWeb Version 2.01
 --------------------

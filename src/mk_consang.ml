@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 2.3 1999-03-26 08:14:10 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 2.4 1999-05-03 07:10:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value fname = ref "";
@@ -32,10 +32,10 @@ value main () =
       return ()
     with
     [ Consang.TopologicalSortError ->
-        do Printf.eprintf "
+        do Printf.printf "
 Error: probable loop in database (persons being their own ancestors).\n";
-           flush stderr;
-        return () ]
+           flush stdout;
+        return exit 2 ]
   in
   lock (Iobase.lock_file fname.val) with
   [ Accept -> f ()
@@ -49,8 +49,8 @@ Error: probable loop in database (persons being their own ancestors).\n";
              flush stderr;
           return f ()
       | Refuse ->
-          do Printf.eprintf "\nSorry. Impossible to lock base.\n";
-             flush stderr;
+          do Printf.printf "\nSorry. Impossible to lock base.\n";
+             flush stdout;
           return exit 2 ] ]
 ;
 

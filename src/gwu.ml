@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.7 1999-04-22 19:23:24 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.8 1999-05-03 07:10:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -494,13 +494,13 @@ value connected_families base fam_sel fam cpl =
 value find_person base p1 po p2 =
   try Gutil.person_ht_find_unique base p1 p2 po with
   [ Not_found ->
-      do Printf.eprintf "Not found: %s%s %s\n"
+      do Printf.printf "Not found: %s%s %s\n"
            p1 (if po == 0 then "" else " " ^ string_of_int po) p2;
-         flush stderr;
+         flush stdout;
       return exit 2 ]
 ;
 
-value gwu base out_dir src_oc_list anc desc =
+value gwu base out_dir out_oc src_oc_list anc desc =
   let anc =
     match anc with
     [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
@@ -525,8 +525,8 @@ value gwu base out_dir src_oc_list anc desc =
              [ Not_found ->
                  let fname = sou base fam.origin_file in
                  let oc =
-                   if out_dir = "" then stdout
-                   else if fname = "" then stdout
+                   if out_dir = "" then out_oc
+                   else if fname = "" then out_oc
                    else open_out (Filename.concat out_dir fname)
                  in
                  let x = (oc, ref True) in
@@ -562,6 +562,7 @@ value gwu base out_dir src_oc_list anc desc =
 ;
 
 value in_file = ref "";
+value out_file = ref "";
 value out_dir = ref "";
 value anc_1st = ref "";
 value anc_occ = ref 0;
@@ -577,8 +578,10 @@ value arg_state = ref ASnone;
 value mem = ref False;
 
 value speclist =
-  [("-odir", Arg.String (fun s -> out_dir.val := s),
-   "<dir>   create files in this directories (else all on stdout)");
+  [("-o", Arg.String (fun s -> out_file.val := s),
+   "<file>    output file name (else stdout)");
+   ("-odir", Arg.String (fun s -> out_dir.val := s),
+   "<dir>  create files from original name in directory (else on -o file)");
    ("-mem", Arg.Set mem,
    "        save memory space, but slower");
    ("-a",
@@ -622,18 +625,18 @@ Options are:";
 value main () =
   do Argl.parse speclist anon_fun errmsg;
      if in_file.val = "" then
-       do Printf.eprintf "Missing base\n";
-          Printf.eprintf "Use option -help for usage\n";
-          flush stderr;
+       do Printf.printf "Missing base\n";
+          Printf.printf "Use option -help for usage\n";
+          flush stdout;
        return exit 2
      else ();
   return
   let anc =
     if anc_1st.val <> "" then
       if anc_2nd.val = "" then
-        do Printf.eprintf "Misused option -a\n";
-           Printf.eprintf "Use option -help for usage\n";
-           flush stderr;
+        do Printf.printf "Misused option -a\n";
+           Printf.printf "Use option -help for usage\n";
+           flush stdout;
         return exit 2
       else Some (anc_1st.val, anc_occ.val, anc_2nd.val)
     else None
@@ -641,9 +644,9 @@ value main () =
   let desc =
     if desc_1st.val <> "" then
       if desc_2nd.val = "" then
-        do Printf.eprintf "Misused option -d\n";
-           Printf.eprintf "Use option -help for usage\n";
-           flush stderr;
+        do Printf.printf "Misused option -d\n";
+           Printf.printf "Use option -help for usage\n";
+           flush stdout;
         return exit 2
       else Some (desc_1st.val, desc_occ.val, desc_2nd.val)
     else None
@@ -660,12 +663,15 @@ value main () =
      else ();
   return
   let oc_list = ref [] in
-  do gwu base out_dir.val src_oc_list anc desc;
+  let out_oc =
+    if out_file.val = "" then stdout else open_out out_file.val
+  in
+  do gwu base out_dir.val out_oc src_oc_list anc desc;
      List.iter
-       (fun (src, (oc, _)) ->
-          do flush oc; return
-          if oc != stdout then close_out oc else ())
+       (fun (src, (oc, _)) -> do flush oc; close_out oc; return ())
        src_oc_list.val;
+     flush out_oc;
+     if out_file.val = "" then () else close_out out_oc;
   return ()
 ;
 

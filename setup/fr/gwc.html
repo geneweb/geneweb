@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Importation d'un fichier source GeneWeb</title></head>
+
+<body>
+
+<h1>Importation d'un fichier source GeneWeb</h1>
+
+<form mode=GET action="gwc">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Entrez:
+
+<ul><li>Le nom complet de votre fichier source GeneWeb (se terminant
+par ".gw"); vous pouvez utiliser le bouton de navigation pour le
+rechercher sur votre ordinateur.
+
+<p>
+
+<input name=anon type=file size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Le nom que vous voulez donner &agrave; votre base de
+donn&eacute;es <em>GeneWeb</em>. Si vous ne mettez rien, il sera
+d&eacute;duit du nom du fichier source GeneWeb.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+S&eacute;lectionnez les options que vous d&eacute;sirez:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=stats value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Afficher quelques statistiques &agrave; la fin (elles seront visibles
+dans les traces).</td> </tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=nc value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Ne pas v&eacute;rifier la coh&eacute;rence des donn&eacute;es.</td> </tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=cg value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Terminer par le pr&eacute;calcul de consanguinit&eacute;.</td> </tr>
+
+</table></dl></dd>
+
+<p>
+
+Puis cliquez sur "Ok".
+
+<p>
+
+<input type=submit value="Ok">
+</form>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.10 1999-04-29 21:01:28 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.11 1999-05-03 07:10:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -538,7 +538,7 @@ value link gwo_list =
      if not gen.g_errored then
        if do_consang.val then Consang.compute_all_consang base False False
        else ()
-     else exit 1;
+     else exit 2;
   return base
 ;
 

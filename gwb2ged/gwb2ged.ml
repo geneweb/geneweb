@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.6 1999-04-29 19:55:44 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.7 1999-05-03 07:10:47 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -394,9 +394,9 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
 value find_person base p1 po p2 =
   try Gutil.person_ht_find_unique base p1 p2 po with
   [ Not_found ->
-      do Printf.eprintf "Not found: %s%s %s\n"
+      do Printf.printf "Not found: %s%s %s\n"
            p1 (if po == 0 then "" else " " ^ string_of_int po) p2;
-         flush stderr;
+         flush stdout;
       return exit 2 ]
 ;
 
@@ -508,9 +508,9 @@ value main () =
   let anc =
     if anc_1st.val <> "" then
       if anc_2nd.val = "" then
-        do Printf.eprintf "Misused option -a\n";
-           Printf.eprintf "Use option -help for usage\n";
-           flush stderr;
+        do Printf.printf "Misused option -a\n";
+           Printf.printf "Use option -help for usage\n";
+           flush stdout;
         return exit 2
       else Some (anc_1st.val, anc_occ.val, anc_2nd.val)
     else None
@@ -518,18 +518,18 @@ value main () =
   let desc =
     if desc_1st.val <> "" then
       if desc_2nd.val = "" then
-        do Printf.eprintf "Misused option -d\n";
-           Printf.eprintf "Use option -help for usage\n";
-           flush stderr;
+        do Printf.printf "Misused option -d\n";
+           Printf.printf "Use option -help for usage\n";
+           flush stdout;
         return exit 2
       else Some (desc_1st.val, desc_occ.val, desc_2nd.val)
     else None
   in
   do if ofile.val = "-" then ofile.val := "" else ();
      if ifile.val = "" then
-        do Printf.eprintf "Missing base name\n";
-           Printf.eprintf "Use option -help for usage\n";
-           flush stderr;
+        do Printf.printf "Missing base name\n";
+           Printf.printf "Use option -help for usage\n";
+           flush stdout;
         return exit 2
      else ();
      match
@@ -537,8 +537,8 @@ value main () =
      with
      [ Some base -> gwb2ged base ifile.val ofile.val anc desc mem.val
      | None ->
-         do Printf.eprintf "Can't open base %s\n" ifile.val;
-            flush stderr;
+         do Printf.printf "Can't open base %s\n" ifile.val;
+            flush stdout;
          return exit 0 ];
   return ()
 ;

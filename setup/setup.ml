@@ -1,9 +1,9 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.7 1999-05-01 19:03:12 ddr Exp $ *)
+(* $Id: setup.ml,v 1.8 1999-05-03 07:09:35 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
-value setup_dir = ref "setup";
+value setup_dir = "setup";
 
 value buff = ref (String.create 80);
 value store len x =
@@ -115,29 +115,67 @@ value create_env s =
   List.map (separate 0) (get_assoc 0 0)
 ;
 
+value numbered_key k =
+  if k = "" then None
+  else
+    match k.[String.length k - 1] with
+    [ '1'..'9' as c -> Some (String.sub k 0 (String.length k - 1), c)
+    | _ -> None ]
+;
+
 value parameters =
-  List.fold_left
-    (fun comm (k, s) ->
-       let k = strip_spaces (decode_varenv k) in
-       let s = strip_spaces (decode_varenv s) in
-       match k with
-       [ "opt" -> comm
-       | "anon" -> comm ^ " " ^ s
-       | _ ->
-           match s with
-           [ "" | "none" -> comm
-           | "on" -> comm ^ " -" ^ k
-           | _ ->
-               if s.[0] = '_' then comm ^ " -" ^ k ^ s
-               else if s.[String.length s - 1] = '_' then comm ^ " -" ^ s ^ k
-               else comm ^ " -" ^ k ^ " " ^ s ] ])
-    ""
+  loop "" where rec loop comm =
+    fun
+    [ [(k, s) :: env] ->
+        let k = strip_spaces (decode_varenv k) in
+        let s = strip_spaces (decode_varenv s) in
+        if k = "" || s = "" then loop comm env
+        else if k = "opt" then loop comm env
+        else if k = "anon" then loop (comm ^ " " ^ s) env
+        else
+          match numbered_key k with
+          [ Some (k, '1') ->
+              let (s, env) =
+                loop ("\"" ^ s ^ "\"") env where rec loop s =
+                  fun
+                  [ ([(k1, s1) :: env] as genv) ->
+                      match numbered_key k1 with
+                      [ Some (k1, _) when k1 = k ->
+                          let s1 = strip_spaces (decode_varenv s1) in
+                          let s =
+                            if s1 = "" then s else s ^ " \"" ^ s1 ^ "\""
+                          in
+                          loop s env
+                      | _ -> (s, genv) ]
+                  | [] -> (s, []) ]
+              in
+              loop (comm ^ " -" ^ k ^ " " ^ s) env
+          | Some _ -> loop comm env
+          | None ->
+              if s = "none" then loop comm env
+              else if s = "on" then loop (comm ^ " -" ^ k) env
+              else if s.[0] = '_' then loop (comm ^ " -" ^ k ^ s) env
+              else if s.[String.length s - 1] = '_' then
+                loop (comm ^ " -" ^ s ^ k) env
+              else loop (comm ^ " -" ^ k ^ " " ^ s) env ]
+    | [] -> comm ]
 ;
 
 type config =
   { lang : string;
     comm : string;
     env : list (string * string) }
+;
+
+value rec list_replace k v =
+  fun
+  [ [] -> [(k, v)]
+  | [(k1, v1) :: env] when k1 = k -> [(k1, v) :: env]
+  | [kv :: env] -> [kv :: list_replace k v env] ]
+;
+
+value conf_with_env conf k v =
+  {(conf) with env = list_replace k v conf.env}
 ;
 
 value rec copy_from_stream conf print strm =
@@ -166,7 +204,7 @@ value rec copy_from_stream conf print strm =
                         return ())
                    conf.env;
               return ()
-          | 'g' -> print (Filename.concat "." "gwd")
+          | 'g' -> print_log conf print strm
           | 'h' ->
               do print "<input type=hidden name=lang value=";
                  print conf.lang;
@@ -187,6 +225,7 @@ value rec copy_from_stream conf print strm =
           | 'l' -> print conf.lang
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
+          | 'u' -> print (Filename.dirname (Sys.getcwd ()))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
               print_if_exists conf print (out ^ ".gwb") strm
@@ -199,6 +238,25 @@ value rec copy_from_stream conf print strm =
     done
   with
   [ Stream.Failure -> () ]
+and print_log conf print strm =
+  match Stream.next strm with
+  [ '{' ->
+      let s =
+        loop 0 where rec loop len =
+          match Stream.next strm with
+          [ '}' -> get_buff len
+          | c -> loop (store len c) ]
+      in
+      let comm_log = "comm.log" in
+      if Sys.file_exists comm_log then
+        let ic = open_in comm_log in
+        do if in_channel_length ic = 0 then
+             copy_from_stream conf print (Stream.of_string s)
+           else copy_from_stream conf print (Stream.of_channel ic);
+           close_in ic;
+        return ()
+      else copy_from_stream conf print (Stream.of_string s)
+  | _ -> () ]
 and print_if_exists conf print fname strm =
   match Stream.next strm with
   [ '{' ->
@@ -227,8 +285,8 @@ and for_all_db conf print dir strm =
           [ '}' -> get_buff len
           | c -> loop (store len c) ]
       in
-      let dh = Unix.opendir dir in
       let list = ref [] in
+      let dh = Unix.opendir dir in
       do try
            while True do
              let e = Unix.readdir dh in
@@ -243,7 +301,7 @@ and for_all_db conf print dir strm =
            List.iter
              (fun e ->
                 let db = Filename.chop_suffix e ".gwb" in
-                let conf = {(conf) with env = [("anon", db) :: conf.env]} in
+                let conf = conf_with_env conf "anon" db in
                 do copy_from_stream conf print (Stream.of_string s_exist);
                    print "\n";
                 return ())
@@ -257,7 +315,7 @@ and for_all_db conf print dir strm =
 ;
 
 value print_file conf fname =
-  let dir = setup_dir.val in
+  let dir = setup_dir in
   let fname = Filename.concat (Filename.concat dir conf.lang) fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -293,25 +351,24 @@ value good_name s =
       | _ -> False ]
 ;
 
-value setup_gen conf =
-  match p_getenv conf.env "m" with
-  [ Some "H" ->
-      match p_getenv conf.env "v" with
-      [ Some fname -> print_file conf fname
-      | _ -> error "request needs \"v\" parameter" ]
-  | _ -> error "unknown mode" ]
+value out_name_of_ged in_file =
+  let f = Filename.basename in_file in
+  if Filename.check_suffix f ".ged" then Filename.chop_suffix f ".ged"
+  else if Filename.check_suffix f ".GED" then Filename.chop_suffix f ".GED"
+  else f
 ;
 
-value out_check conf =
-  let out =
-    match p_getenv conf.env "o" with
-    [ Some f -> strip_spaces f
-    | _ -> "" ]
-  in
-  if out = "" then print_file conf "missing.html"
-  else if not (good_name out) then print_file conf "incorrect.html"
-  else if Sys.file_exists (out ^ ".gwb") then print_file conf "conflict.html"
-  else print_file conf "create.html"
+value out_name_of_gw in_file =
+  let f = Filename.basename in_file in
+  if Filename.check_suffix f ".gw" then Filename.chop_suffix f ".gw"
+  else if Filename.check_suffix f ".GW" then Filename.chop_suffix f ".GW"
+  else f
+;
+
+value setup_gen conf =
+  match p_getenv conf.env "v" with
+  [ Some fname -> print_file conf fname
+  | _ -> error "request needs \"v\" parameter" ]
 ;
 
 value simple_check conf =
@@ -320,36 +377,74 @@ value simple_check conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let out =
+  let out_file =
     match p_getenv conf.env "o" with
     [ Some f -> strip_spaces f
     | _ -> "" ]
   in
+  let out_file =
+    if ged = "" then out_file
+    else if out_file = "" then out_name_of_ged ged
+    else out_file
+  in
   let conf =
-    if ged = "" then {(conf) with comm = "gwc"}
-     else {(conf) with comm = "ged2gwb"}
+    {comm = if ged = "" then "gwc" else "ged2gwb";
+     env = list_replace "o" out_file conf.env;
+     lang = conf.lang}
   in
   if ged <> "" && not (Sys.file_exists ged) then print_file conf "unknown.html"
-  else if out = "" then print_file conf "missing.html"
-  else if not (good_name out) then print_file conf "incorrect.html"
-  else if Sys.file_exists (out ^ ".gwb") then print_file conf "conflict.html"
-  else print_file conf "create.html"
+  else if out_file = "" then print_file conf "err_missing.html"
+  else if not (good_name out_file) then print_file conf "err_name.html"
+  else print_file conf "base_out.html"
 ;
 
-value gwc_check conf =
-  out_check conf
-;
-
-value ged2gwb_check conf =
-  let ged =
+value gwc_or_ged2gwb_check out_name_of_in_name conf =
+  let in_file =
     match p_getenv conf.env "anon" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  if ged = "" then print_file conf "missing_ged.html"
-  else if not (Sys.file_exists ged) then print_file conf "unknown.html"
-  else out_check conf
+  let out_file =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | _ -> "" ]
+  in
+  let out_file =
+    if out_file = "" then out_name_of_in_name in_file else out_file
+  in
+  let conf = conf_with_env conf "o" out_file in
+  if in_file = "" then print_file conf "err_missing.html"
+  else if not (Sys.file_exists in_file) then print_file conf "unknown.html"
+  else if not (good_name out_file) then print_file conf "err_name.html"
+  else print_file conf "base_out.html"
 ;
+
+value gwc_check = gwc_or_ged2gwb_check out_name_of_gw;
+value ged2gwb_check = gwc_or_ged2gwb_check out_name_of_ged;
+
+value gwu_or_gwb2ged_check suffix conf =
+  let in_file =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let out_file =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let out_file =
+    if out_file = "" then in_file ^ suffix
+    else if Filename.check_suffix out_file suffix then out_file
+    else out_file ^ suffix
+  in
+  let conf = conf_with_env conf "o" out_file in
+  if in_file = "" then print_file conf "err_missing.html"
+  else print_file conf "base_in.html"
+;
+
+value gwu_check = gwu_or_gwb2ged_check ".gw";
+value gwb2ged_check = gwu_or_gwb2ged_check ".ged";
 
 value consang_check conf =
   let in_f =
@@ -357,15 +452,15 @@ value consang_check conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  if in_f = "" then print_file conf "missing_gwb.html"
-  else print_file conf "input.html"
+  if in_f = "" then print_file conf "err_missing.html"
+  else print_file conf "base_in.html"
 ;
 
 value exec_f comm =
-  let s = comm ^ " > comm.log" in
-  do Printf.eprintf "> cd %s\n" (Sys.getcwd ());
+  let s = comm ^ " > " ^ "comm.log" in
+  do Printf.eprintf "$ cd %s\n" (Sys.getcwd ());
      flush stderr;
-     Printf.eprintf "> %s\n" s;
+     Printf.eprintf "$ %s\n" s;
      flush stderr;
   return
   Sys.command s
@@ -377,16 +472,23 @@ value recover conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
+  let init_dir =
+    if Sys.file_exists (Filename.concat init_dir ".") then init_dir
+    else Filename.dirname init_dir
+  in
+  let conf = conf_with_env conf "anon" init_dir in
   let dest_dir = Sys.getcwd () in
-  if init_dir = "" then print_file conf "error_missing_dir.html"
-  else if init_dir = dest_dir then print_file conf "error_same_dir.html"
+  if init_dir = "" then print_file conf "err_missing.html"
+  else if init_dir = dest_dir then print_file conf "err_same_dir.html"
   else if
-    (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino =
-    (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+    (ifdef UNIX then
+       (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino =
+       (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+     else False)
   then
-    print_file conf "error_same_dir.html"
+    print_file conf "err_same_dir.html"
   else if not (Sys.file_exists init_dir) then
-    print_file conf "error_no_such_directory.html"
+    print_file conf "err_no_such_directory.html"
   else
     let dh = Unix.opendir init_dir in
     let gwu_found =
@@ -403,25 +505,25 @@ value recover conf =
        | Exit -> True ]
     in
     do Unix.closedir dh;
-       if not gwu_found then print_file conf "error_not_a_gw_dir.html"
+       if not gwu_found then print_file conf "err_not_gw.html"
        else print_file conf "recover_1.html";
     return ()
 ;
 
 value recover_1 conf =
-  let in_base =
+  let in_file =
     match p_getenv conf.env "i" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let out_base =
+  let out_file =
     match p_getenv conf.env "o" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let out_base = if out_base = "" then in_base else out_base in
-  let conf = {(conf) with env = [("o", out_base) :: conf.env]} in
-  if in_base = "" then print_file conf "not_applicable.html"
+  let out_file = if out_file = "" then in_file else out_file in
+  let conf = conf_with_env conf "o" out_file in
+  if in_file = "" then print_file conf "err_not_appl.html"
   else print_file conf "recover_2.html"
 ;
 
@@ -431,42 +533,42 @@ value recover_2 conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let in_base =
+  let in_file =
     match p_getenv conf.env "i" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let out_base =
+  let out_file =
     match p_getenv conf.env "o" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let out_base = if out_base = "" then in_base else out_base in
-  let conf = {(conf) with env = [("o", out_base) :: conf.env]} in
+  let out_file = if out_file = "" then in_file else out_file in
+  let conf = conf_with_env conf "o" out_file in
   let dir = Sys.getcwd () in
   do try
-       do Printf.eprintf "> cd %s\n" init_dir;
+       do Printf.eprintf "$ cd %s\n" init_dir;
           flush stderr;
           Sys.chdir init_dir;
           let c =
-            Filename.concat "." "gwu" ^ " " ^ in_base ^ " > " ^
+            Filename.concat "." "gwu" ^ " " ^ in_file ^ " > " ^
             Filename.concat dir "tmp.gw"
           in
-          do Printf.eprintf "> %s\n" c;
+          do Printf.eprintf "$ %s\n" c;
              flush stderr;
              let _ = Sys.command c in ();
           return ();
        return ()
      with
      [ e -> do Sys.chdir dir; return raise e ];
-     Printf.eprintf "> cd %s\n" dir;
+     Printf.eprintf "$ cd %s\n" dir;
      flush stderr;
      Sys.chdir dir;
      let c =
-       Filename.concat "." "gwc tmp.gw -o " ^ out_base ^
-       " > comm.log"
+       Filename.concat "." "gwc tmp.gw -o " ^ out_file ^
+       " > " ^ "comm.log"
      in
-     do Printf.eprintf "> %s\n" c;
+     do Printf.eprintf "$ %s\n" c;
         flush stderr;
         let _ = Sys.command c in ();
      return ();
@@ -476,19 +578,30 @@ value recover_2 conf =
   return ()
 ;
 
+ifdef WIN95 then
+value infer_rc conf rc =
+  if rc > 0 then rc
+  else
+    match p_getenv conf.env "o" with
+    [ Some out_file ->
+        if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
+    | _ -> 0 ]
+;
+
 value exec_command_out conf =
   let rc =
     exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
   in
+  let rc = ifdef WIN95 then infer_rc conf rc else rc in
   do Printf.eprintf "\n";
      flush stderr;
   return
   if rc = 1 then print_file conf "warnings.html"
-  else if rc > 1 then print_file conf "error.html"
-  else print_file conf "created.html"
+  else if rc > 1 then print_file conf "base_out_err.html"
+  else print_file conf "base_out_ok.html"
 ;
 
-value exec_command_in conf =
+value exec_command_in conf ok_file =
   let rc =
     exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
   in
@@ -496,8 +609,8 @@ value exec_command_in conf =
      flush stderr;
   return
   if rc = 1 then print_file conf "warnings.html"
-  else if rc > 1 then print_file conf "error.html"
-  else print_file conf "input_ok.html"
+  else if rc > 1 then print_file conf "base_in_err.html"
+  else print_file conf ok_file
 ;
 
 value has_gwb_directories dh =
@@ -521,18 +634,37 @@ value setup_comm conf =
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwc_check conf
       | _ -> exec_command_out conf ]
+  | "gwu" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> gwu_check conf
+      | _ -> exec_command_in conf "gwu_ok.html" ]
   | "ged2gwb" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> ged2gwb_check conf
       | _ -> exec_command_out conf ]
+  | "gwb2ged" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> gwb2ged_check conf
+      | _ -> exec_command_in conf "gwb2ged_ok.html" ]
   | "consang" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> consang_check conf
-      | _ -> exec_command_in conf ]
+      | _ -> exec_command_in conf "consang_ok.html" ]
   | x -> error ("bad command: \"" ^ x ^ "\"") ]
 ;
 
+value string_of_sockaddr =
+  fun
+  [ Unix.ADDR_UNIX s -> "ADDR_UNIX \"" ^ s ^ "\""
+  | Unix.ADDR_INET a _ -> "ADDR_INET \"" ^ Unix.string_of_inet_addr a ^ "\"" ]
+;
+
 value setup (addr, req) str =
+(*
+  do Printf.eprintf "request from %s\n" (string_of_sockaddr addr);
+     flush stderr;
+  return
+*)
   let (comm, env_str) =
     try
       let i = String.index str '?' in
@@ -545,7 +677,7 @@ value setup (addr, req) str =
   if env = [] && (comm = "" || String.length comm = 2) then
     let lang = if comm = "" then default_lang else String.uncapitalize comm in
     let conf = {lang = lang; comm = ""; env = env} in
-    print_file conf "index.html"
+    print_file conf "welcome.html"
   else
     let (lang, env) =
       match p_getenv env "lang" with
@@ -562,7 +694,7 @@ value wrap_setup a b =
 ;
 
 value copy_text lang fname =
-  let dir = setup_dir.val in
+  let dir = setup_dir in
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -580,10 +712,8 @@ value copy_text lang fname =
       return () ]
 ;
 
-value root_dir = ref "gw";
-
 value intro () =
-  do Sys.chdir root_dir.val;
+  do Sys.chdir "gw";
      copy_text "" "intro.txt";
      let lang =
        let x = input_line stdin in

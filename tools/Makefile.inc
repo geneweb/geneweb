@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 2.1 1999-03-08 11:19:35 ddr Exp $
+# $Id: Makefile.inc,v 2.2 1999-05-03 07:10:48 ddr Exp $
 
 CAMLP4_COMM=../tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
 CAMLP4F=-DUNIX
@@ -14,7 +14,7 @@ all::
 opt::
 
 clean::
-	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.obj *.lck *.bak *~ .#*
+	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.a *.obj *.lib *.lck *.bak *~ .#*
 
 .SUFFIXES: .ml .cmo .mli .cmi .cmx
 

@@ -1,38 +1,42 @@
-# $Id: Makefile,v 1.2 1999-05-01 09:35:05 ddr Exp $
+# $Id: Makefile,v 1.3 1999-05-03 07:09:35 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver -I ../src
 OBJS=../wserver/wserver.cmo ../src/version.cmo setup.cmo
 
-all:: setup.out gw
-	$(RM) setup
+all:: setup.out gwd.out
+	$(RM) setup gwd
 	cp setup.out setup
+	cp gwd.out gwd
 
-opt:: setup.opt gw
-	$(RM) setup
-	cp setup.opt setup
+opt:: all
 
 clean::
-	$(RM) setup
-	$(RM) -rf gw
+	$(RM) setup gwd
+	$(RM) -rf test
 
-gw:
-	mkdir gw
-	cd gw; ln -s ../../doc .
-	cd gw; ln -s .. setup
-	cd gw; ln -s ../../src/gwc .
-	cd gw; ln -s ../../src/gwd .
-	cd gw; ln -s ../../src/consang .
-	cd gw; ln -s ../../hd/lang .
-	cd gw; ln -s ../../hd/images .
-	cd gw; ln -s ../../ged2gwb/ged2gwb .
+test:
+	mkdir test
+	mkdir test/gw
+	cd test; ln -s ../setup .
+	cd test; ln -s ../gwd .
+	cd test/gw; ln -s ../../../doc .
+	cd test/gw; ln -s ../.. setup
+	cd test/gw; ln -s ../../../src/gwc .
+	cd test/gw; ln -s ../../../src/gwd .
+	cd test/gw; ln -s ../../../src/gwu .
+	cd test/gw; ln -s ../../../src/consang .
+	cd test/gw; ln -s ../../../hd/lang .
+	cd test/gw; ln -s ../../../hd/images .
+	cd test/gw; ln -s ../../../ged2gwb/ged2gwb .
+	cd test/gw; ln -s ../../../gwb2ged/gwb2ged .
 
 setup.out: $(OBJS)
-	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(CAMLP4D)/gramlib.cma $(OBJS) -o setup.out
+	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(OBJS) -o setup.out
 
-setup.opt: $(OBJS:.cmo=.cmx)
-	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(CAMLP4D)/gramlib.cmxa $(OBJS:.cmo=.cmx) -o setup.opt
+gwd.out: gwd.cmo
+	$(OCAMLC) -custom unix.cma $(LIBUNIX) gwd.cmo -o gwd.out
 
 depend:
 	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend

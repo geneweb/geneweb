@@ -1,7 +1,7 @@
 
 Bienvenue dans GeneWeb
 
-Allez dans votre navigateur et ouvrez l'adresse:
+Allez dans votre navigateur Web et ouvrez l'adresse:
        http://localhost:$z/fr
 
 Si cela ne fonctionne pas, il se peut que vous ayez a configurer dans
