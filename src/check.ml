@@ -1,9 +1,20 @@
-(* $Id: check.ml,v 4.9 2004-08-05 09:53:09 ddr Exp $ *)
+(* $Id: check.ml,v 4.10 2004-08-05 11:19:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 open Printf;
+
+type cbase =
+  { c_persons : mutable array person;
+    c_ascends : mutable array ascend;
+    c_unions : mutable array union;
+    c_families : mutable array family;
+    c_couples : mutable array couple;
+    c_descends : mutable array descend;
+    c_strings : mutable array string;
+    c_bnotes : notes }
+;
 
 type gen =
   { g_strings : mutable Hashtbl.t string istr;
@@ -12,7 +23,7 @@ type gen =
     g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
-    g_base : base_data;
+    g_base : cbase;
     g_def : mutable array bool;
     g_separate : mutable bool;
     g_shift : mutable int;
