@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.5 2001-09-15 07:12:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.6 2001-10-27 20:03:01 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -590,8 +590,6 @@ value copy_temp b =
   }
 ;
 
-(* Actions *)
-
 value printf_link_to_main b tok =
   do {
     printf "<p><hr><div align=right>\n";
@@ -599,6 +597,124 @@ value printf_link_to_main b tok =
       (cgi_script_name ()) b tok;
   }
 ;
+
+(* Upload from GEDCOM *)
+
+value make_gedcom_file env b =
+  let fname = Filename.concat gwtp_tmp.val (b ^ ".ged") in
+  let oc = open_out fname in
+  do {
+    let contents = List.assoc "gedcom" env in
+    let i =
+      if lowercase_start_with contents "content-type: " then
+        String.index contents '\n'
+      else 0
+    in
+    let j = String.index_from contents (i + 1) '\n' in
+    let len = String.length contents - j - 3 in
+    output_string oc (String.sub contents (j + 1) len);
+    close_out oc;
+  }
+;
+
+value ged2gwb b =
+  let comm =
+    Filename.concat gwtp_etc.val "ged2gwb" ^ " " ^
+    Filename.concat gwtp_tmp.val (b ^ ".ged") ^ " -f -o " ^
+    Filename.concat gwtp_dst.val b ^ " > " ^
+    Filename.concat gwtp_tmp.val (b ^ ".log")
+  in
+  let r = Sys.command comm in ()
+;
+
+value send_gedcom_file str env b tok f fname =
+  let fname = filename_basename fname in
+  let lockf = Filename.concat gwtp_tmp.val (b ^ ".lck") in
+  do {
+    printf "content-type: text/html";
+    crlf ();
+    crlf ();
+    printf "\
+<head><title>Gwtp...</title></head>
+<body>
+<h1 align=center>Gwtp...</h1>
+<pre>
+";
+    flush stdout;
+    lock lockf with
+    [ Accept ->
+        do {
+          make_gedcom_file env b;
+          printf "\nGedcom file transfered.\n";
+          flush stdout;
+          ged2gwb b;
+          printf "Data base \"%s\" updated.\n" b;
+          printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
+            (cgi_script_name ()) b tok;
+        }
+    | Refuse ->
+        do {
+          printf "Data base is already being transfered.<br>\n";
+          printf "Please try again later.\n";
+        } ];
+    flush stdout;
+    printf "</pre>\n";
+    printf_link_to_main b tok;
+    printf "</body>\n";
+    flush stdout;
+  }
+;
+
+value gwtp_send_gedcom str env b t =
+  match (HttpEnv.getenv env "gedcom", HttpEnv.getenv env "gedcom_name") with
+  [ (Some f, Some fname) ->
+      send_gedcom_file str env b t f (HttpEnv.decode fname)
+  | (Some f, None) ->
+      gwtp_error "Sorry, your browser seems not be able to send files."
+  | _ -> gwtp_invalid_request str env ]
+;
+
+value gwtp_upload_gedcom str env b tok =
+  let bcnf = Filename.concat gwtp_dst.val (b ^ ".gwf") in
+  if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
+  else do {
+    printf "content-type: text/html";
+    crlf ();
+    crlf ();
+    copy_template env ([], [])
+      [('s', cgi_script_name ()); ('b', b); ('t', tok)] "send_gedcom";
+    printf_link_to_main b tok;
+    printf "</body>\n";
+  }
+;
+
+value gwtp_print_log str env b tok =
+  do {
+    printf "content-type: text/html";
+    crlf ();
+    crlf ();
+    printf "\
+<head><title>Gwtp - %s</title></head>
+<body>
+<h1 align=center>Gwtp - %s</h1>
+" b b;
+    let fname = Filename.concat gwtp_tmp.val (b ^ ".log") in
+    let ic = open_in fname in
+    printf "<pre>\n";
+    try
+      while True do {
+        output_char stdout (input_char ic);
+      }
+    with
+    [ End_of_file -> () ];
+    printf "</pre>\n";
+    close_in ic;
+    printf_link_to_main b tok;
+    printf "</body>\n";
+  }  
+;
+
+(* Actions *)
 
 value send_file str env b tok f fname =
   let fname = filename_basename fname in
@@ -843,8 +959,17 @@ value gwtp_main str env b tok =
 <ul>
 " b b;
     if config_exists then do {
-      printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">Upload</a>\n" gwtp_comm b
-        tok;
+      if Sys.file_exists (Filename.concat gwtp_etc.val "ged2gwb") then do {
+        printf "<li>Upload from\n<ul>\n";
+        printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">data base files</a>\n"
+          gwtp_comm b tok;
+        printf "<li><a href=\"%s?m=UPG;b=%s;t=%s\">gedcom</a>\n"
+          gwtp_comm b tok;
+        printf "</ul>\n";
+      }
+      else
+        printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">Upload</a>\n" gwtp_comm b
+          tok;
       printf "<li><a href=\"%s?m=DNL;b=%s;t=%s\">Download</a>\n" gwtp_comm b
         tok;
     }
@@ -946,10 +1071,13 @@ value gwtp () =
     | Some "MAIN" -> gwtp_logged from str env gwtp_main
     | Some "UPL" -> gwtp_logged from str env gwtp_upload
     | Some "DNL" -> gwtp_logged from str env gwtp_download
+    | Some "UPG" -> gwtp_logged from str env gwtp_upload_gedcom
     | Some "CNF" -> gwtp_logged from str env gwtp_config
     | Some "SEND" -> gwtp_logged from str env gwtp_send
+    | Some "SEND_GEDCOM" -> gwtp_logged from str env gwtp_send_gedcom
     | Some "RECV" -> gwtp_logged from str env gwtp_receive
     | Some "SCNF" -> gwtp_logged from str env gwtp_setconf
+    | Some "LOG" -> gwtp_logged from str env gwtp_print_log
     | Some _ -> gwtp_invalid_request str env
     | None -> gwtp_login str env ];
     flush stdout;

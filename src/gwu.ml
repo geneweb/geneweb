@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.5 2001-10-20 10:58:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.6 2001-10-27 20:03:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -894,7 +894,7 @@ value mark_one_connex_component base mark ifam =
   && (only_file.val = "" || only_file.val = origin_file) then
     set_mark ToSeparate
   else do {
-    Printf.eprintf "group of size %d not included (%s)\n" len origin_file;
+    Printf.eprintf "%s: group of size %d not included\n" origin_file len;
     let cpl = coi base ifam in
     Printf.eprintf "    %s + %s\n" (denomination base (poi base cpl.father))
       (denomination base (poi base cpl.mother));

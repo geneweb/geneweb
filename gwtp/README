@@ -65,3 +65,12 @@ If you want to set default configuration variables values, create a
 file named 'default.gwf' in the directory $tmp holding the default
 variables bindings you want (e.g. can_send_image=no). This file
 will be copied at the beginning of the user configuration file.
+
+
+Sending gedcom files
+
+By default, the cgi does not allow to send gedcom files: people have
+to send the contents of their data base. But if you add the executable
+"ged2gwb" in the directory corresponding to the option -etc of gwtp,
+(by default, same than -tmp), a link to send gedcoms is proposed in
+the main menu.
