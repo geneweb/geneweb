@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.20 2003-11-27 11:40:51 ddr Exp $ *)
+(* $Id: descend.ml,v 4.21 2003-11-28 20:22:48 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -129,6 +129,16 @@ value print_choice conf base p effective_level =
           Wserver.wprint
             "- %s <input name=bd size=1 maxlength=2 value=0><br>\n"
             (capitale (transl conf "border"));
+          Wserver.wprint "\
+<table><tr><td>- %s</td>
+<td><input type=radio name=color value=\"\" checked></td>\n"
+              (capitale (transl conf "color"));
+          List.iter
+            (fun c ->
+               Wserver.wprint "\
+<td bgcolor=%s><input type=radio name=color value=%s></td>\n" c c)
+            ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
+          Wserver.wprint "</tr></table>\n";
         end;
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
@@ -1007,6 +1017,14 @@ value display_descendant_with_table conf base max_lev a =
 value make_tree_hts conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
+  let td_prop =
+    match Util.p_getenv conf.env "td" with
+    [ Some x -> " " ^ x
+    | _ ->
+        match Util.p_getenv conf.env "color" with
+	[ None | Some "" -> ""
+        | Some x -> " bgcolor=" ^ x ] ]
+  in
   let rec nb_column n v u =
     if v == 0 then n + 1
     else if Array.length u.family = 0 then n + 1
@@ -1136,9 +1154,10 @@ value make_tree_hts conf base gv p =
             if auth then txt ^ Date.short_dates_text conf base p else txt
           in
           let txt =
-            if bd > 0 then
+            if bd > 0 || td_prop <> "" then
               Printf.sprintf
-                "<table border=%d><tr><td>%s</td></tr></table>" bd txt
+                "<table border=%d><tr><td align=center%s>%s</td></tr></table>"
+                bd td_prop txt
             else txt
           in
           let txt = txt ^ Dag.image_txt conf base p in
@@ -1179,9 +1198,10 @@ value make_tree_hts conf base gv p =
                   "&nbsp;" ^ txt ^ Dag.image_txt conf base sp
               in
               let s =
-                if bd > 0 then
+                if bd > 0 || td_prop <> "" then
                   Printf.sprintf
-                    "<table border=%d><tr><td>%s</td></tr></table>" bd s
+                    "<table border=%d><tr>\
+                     <td align=center%s>%s</td></tr></table>" bd td_prop s
                 else s
               in
               (2 * ncol - 1, CenterA, TDstring s)
