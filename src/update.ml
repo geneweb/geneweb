@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.23 2002-10-21 10:57:18 ddr Exp $ *)
+(* $Id: update.ml,v 4.24 2002-10-23 02:39:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -473,11 +473,13 @@ value reconstitute_date_dmy conf var =
     let y = get var "yyyy" conf.env in
     let prec = p_getenv conf.env (var ^ "_prec") in
     let len = String.length y in
-    if len > 0 then
-      match y.[0] with
-      [ '?' -> (Some "maybe", String.sub y 1 (len - 1))
-      | '<' -> (Some "before", String.sub y 1 (len - 1))
-      | '>' -> (Some "after", String.sub y 1 (len - 1))
+    if len > 1 then
+      match (y.[0], y.[len-1]) with
+      [ ('?', _) -> (Some "maybe", String.sub y 1 (len - 1))
+      | ('/', '/') -> (Some "about", String.sub y 1 (len - 2))
+      | ('<', _) | ('/', _) -> (Some "before", String.sub y 1 (len - 1))
+      | ('>', _) -> (Some "after", String.sub y 1 (len - 1))
+      | (_, '/') -> (Some "after", String.sub y 0 (len - 1))
       | _ -> (prec, y) ]
     else (prec, y)
   in
