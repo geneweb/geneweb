@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.5 2001-05-05 13:27:14 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.6 2001-05-05 15:28:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2284,8 +2284,10 @@ value finish_base base =
     check_base base
       (fun x ->
          do { print_base_error base x; Printf.fprintf log_oc.val "\n" })
-      (fun x ->
-         do { print_base_warning base x; Printf.fprintf log_oc.val "\n" });
+      (fun
+       [ UndefinedSex _ -> ()
+       | x ->
+           do { print_base_warning base x; Printf.fprintf log_oc.val "\n" } ]);
     flush log_oc.val;
   }
 ;

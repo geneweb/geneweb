@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 4.2 2001-05-05 13:27:14 ddr Exp $ *)
+(* $Id: check.ml,v 4.3 2001-05-05 15:28:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -101,8 +101,10 @@ value set_error base gen x =
   do { Printf.printf "\nError: "; print_base_error base x; error gen; }
 ;
 
-value set_warning base x =
-  do { Printf.printf "\nWarning: "; print_base_warning base x; }
+value set_warning base =
+  fun
+  [ UndefinedSex _ -> ()
+  | x -> do { Printf.printf "\nWarning: "; print_base_warning base x; } ]
 ;
 
 type stats =
