@@ -19,6 +19,9 @@ GeneWeb Version 3.09
     by shortest path to get a function returning the result instead of
     displaying it and raising a "Found" exception.
 
+* GeneWeb uncompiler (gwu)
+  - [02 Nov 00] Filter tabulations.
+
 * Consanguinity computing (consang)
   - [28 Oct 00] Put constants in progress bar (option -q) to have a more
     readable code.
