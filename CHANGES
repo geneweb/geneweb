@@ -2,6 +2,8 @@ GeneWeb version 4.06
 --------------------
 
 * Installation
+  - [08 Mar 02] In MacOS X version, there is no more need to do extra
+    manipulation after installation to make the command GeneWeb work.
   - [06 Mar 02] In Windows version with installer, it is now possible to
     specify the database directory.
 
