@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.22 2000-06-26 09:25:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.23 2000-07-21 07:27:55 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -12,7 +12,8 @@ type record =
     rval : string;
     rcont : string;
     rsons : list record;
-    rpos : int }
+    rpos : int;
+    rused : mutable bool }
 ;
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -138,7 +139,7 @@ value rec get_lev n =
       {rlab = rlab;
        rval = ascii_of_string rval;
        rcont = ascii_of_string rcont;
-       rsons = List.rev l; rpos = line_cnt.val}
+       rsons = List.rev l; rpos = line_cnt.val; rused = False}
 and parse_address n r1 =
   parser
   [ [: r2 = get_ident 0; r3 = get_to_eoln 0 ? "get to eoln";
@@ -275,14 +276,17 @@ value parse_name =
 
 value rec find_field lab =
   fun
-  [ [r :: rl] -> if r.rlab = lab then Some r else find_field lab rl
+  [ [r :: rl] ->
+      if r.rlab = lab then do r.rused := True; return Some r
+      else find_field lab rl
   | [] -> None ]
 ;
 
 value rec find_all_fields lab =
   fun
   [ [r :: rl] ->
-      if r.rlab = lab then [r :: find_all_fields lab rl]
+      if r.rlab = lab then
+        do r.rused := True; return [r :: find_all_fields lab rl]
       else find_all_fields lab rl
   | [] -> [] ]
 ;
@@ -796,7 +800,7 @@ value get_lev0 =
       let rval = ascii_of_string rval in
       let rcont = ascii_of_string r3 in
       {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
-       rpos = line_cnt.val}
+       rpos = line_cnt.val; rused = False}
 ;
 
 value find_notes_record gen addr =
@@ -833,6 +837,7 @@ value extract_notes gen rl =
     (fun r lines ->
        List.fold_right
          (fun r lines ->
+            do r.rused := True; return
             if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] == '@' then
               let addr = extract_addr r.rval in
               match find_notes_record gen addr with
@@ -1360,6 +1365,20 @@ value add_indi gen r =
          [ Some r -> forward_adop gen i r.rval (find_field "ADOP" r.rsons)
          | _ -> () ]
      | _ -> () ];
+     r.rused := True;
+(*
+     let rec all_used r =
+       if not r.rused then False else List.for_all all_used r.rsons
+     in
+     let rec print_record lev r =
+       if all_used r then ()
+       else
+         do Printf.eprintf "%d %s %s %s\n" lev r.rlab r.rval r.rcont; return
+         List.iter (fun r -> print_record (lev + 1) r) r.rsons
+     in
+     print_record 0 r;
+     flush stderr;
+*)
   return ()
 ;
 

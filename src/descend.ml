@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.15 2000-07-20 13:40:38 ddr Exp $ *)
+(* $Id: descend.ml,v 3.16 2000-07-21 07:28:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -107,7 +107,7 @@ value print_choice conf base p niveau_effectif =
       tag "tr" begin
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
-            (capitale (transl conf "list (descendants)"));
+            (capitale (transl_nth conf "list/list (ancestors)" 0));
           if browser_doesnt_have_tables conf then ()
           else
             do Wserver.wprint "<input type=radio name=t value=T> %s\n"

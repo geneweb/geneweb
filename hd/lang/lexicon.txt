@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.144 2000-07-20 14:32:56 ddr Exp $
+# $Id: lexicon.txt,v 3.145 2000-07-21 07:27:56 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3479,7 +3479,7 @@ pt: rela&ccedil;&atilde;o entre
 ru: связь между
 se: sl&auml;ktskap emellan
 
-    list
+    list/list (ancestors)
 af: lys
 cs: seznam
 de: Liste
@@ -3497,27 +3497,7 @@ nl: lijst
 no: liste
 pt: lista
 ru: список
-se: lista
-
-    list (descendants)
-af: lys
-cs: seznam
-de: Liste
-dk: liste
-en: list
-eo: tabelo
-es: lista
-fi: lista
-fr: liste
-he:  шщйод
-is: listi
-it: lista
-lv: saraksts
-nl: lijst
-no: liste
-pt: lista
-ru: список
-se: anlista
+se: lista/anlista
 
     long display
 af: uitgebreide weergawe

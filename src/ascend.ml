@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.38 2000-07-12 13:21:45 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.39 2000-07-21 07:27:59 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -121,7 +121,7 @@ value print_choice conf base p niveau_effectif =
         end;
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
-            (capitale (transl conf "list"));
+            (capitale (transl_nth conf "list/list (ancestors)" 1));
           if niveau_effectif <= limit_by_list conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
