@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.3 1999-04-17 14:18:05 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.4 1999-06-30 19:55:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -21,6 +21,10 @@ value threshold = ref 15;
 
 value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 
+value tsort_leq tstab x y =
+  if tstab.(x) = tstab.(y) then x >= y else tstab.(x) < tstab.(y)
+;
+
 value make_dist_tab conf base ia maxlev =
   if maxlev <= threshold.val then phony_dist_tab
   else
@@ -31,7 +35,7 @@ value make_dist_tab conf base ia maxlev =
       Pqueue.Make
         (struct
            type t = int;
-           value leq x y = not (Consang.tsort_leq tstab x y);
+           value leq x y = not (tsort_leq tstab x y);
          end)
     in
     let default = {dmin = infinity; dmax = 0; mark = False} in
