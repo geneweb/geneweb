@@ -1,10 +1,6 @@
-NOT FIXED
+There is no known bugs.
 
-[08 Feb 2005] Since version 5.00-exp
-  Some variables in perso.txt do not work in all cases. Due to rewritting of
-  code to make it cleaner. Cases to be checked. Urgency 3/5.
-
-FIXED
+FIXED BUGS
 
 [13 Feb 2005] Bug found in version 5.00-exp; existed probably before
   Surnames and first names by alphabetic order do not work for deleted or
