@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.46 2000-10-29 15:02:16 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.47 2000-11-13 20:48:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -170,8 +170,10 @@ value afficher_menu_ascendants conf base p =
   let niveau_effectif = niveau_max_ascendance base p.cle_index in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (capitale (transl conf "ancestors"))
+            (txt_fun raw_access conf base p)))
   in
   do header conf title;
      tag "center" begin
@@ -234,8 +236,10 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
   in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+            (txt_fun raw_access conf base p)))
   in
   do header conf title;
      tag "nobr" begin
@@ -378,8 +382,10 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+            (txt_fun raw_access conf base p)))
   in
   do header conf title;
      print_link_to_welcome conf True;
@@ -398,12 +404,18 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   return ()
 ;
 
+value link_long_txt conf n =
+  let s =
+    let r = ref "" in
+    let print s = r.val := r.val ^ s in
+    do Num.print print (transl conf "(thousand separator)") n; return
+    r.val
+  in
+  "<strong><a href=\"#" ^ Num.to_string n ^ "\">" ^ s ^ "</a></strong>"
+;
+
 value print_link_long conf n =
-  stag "strong" begin
-    stag "a" "href=\"#%s\"" (Num.to_string n) begin
-      Num.print wpr (transl conf "(thousand separator)") n;
-    end;
-  end
+  Wserver.wprint "%s" (link_long_txt conf n)
 ;
 
 value print_person_long_info conf base auth link p =
@@ -472,30 +484,22 @@ value print_persons_parents conf base all_gp p =
   match a.parents with
   [ Some ifam ->
       let cpl = coi base ifam in
-      let print ip =
+      let string ip =
         let p = poi base ip in        
         let link = get_link all_gp ip in
-        do Wserver.wprint "%s"
-              (strong_referenced_person_title_text conf base p);
-           Wserver.wprint "%s" (Date.short_dates_text conf base p);
-           match link with
-           [ Some n ->
-               do Wserver.wprint "\n(";
-                  Wserver.wprint "%s " (transl conf "see");
-                  print_link_long conf n;
-                  Wserver.wprint ")";
-               return ()
-           | None -> () ];
-        return ()
+        strong_referenced_person_title_text conf base p ^
+        Date.short_dates_text conf base p ^
+        (match link with
+         [ Some n ->
+             "\n(" ^ transl conf "see" ^ " " ^ link_long_txt conf n ^ ")"
+         | None -> "" ])
       in
-      do Wserver.wprint ", %s"
-           (transl_nth conf "son/daughter/child" (index_of_sex p.sex));
-         Wserver.wprint " %s\n"
-           (transl_decline conf "of (same or greater generation level)" "");
-         print cpl.father;
-         Wserver.wprint "\n%s\n" (transl conf "and");
-         print cpl.mother;
-      return ()
+      Wserver.wprint ", %s\n"
+        (transl_decline2 conf
+           "%1 of (same or greater generation level) %2"
+           (transl_nth conf "son/daughter/child" (index_of_sex p.sex))
+           (string cpl.father ^ "\n" ^ transl conf "and" ^ "\n" ^
+            string cpl.mother))
   | None -> () ]
 ;
 
@@ -913,8 +917,10 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
   in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+            (txt_fun raw_access conf base p)))
   in
   do header conf title;
      Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
@@ -993,9 +999,13 @@ value print_ancestors_same_time_descendants conf base p a =
         (capitale (transl conf "ancestors"))
         (transl conf "up to")
     else
-      Wserver.wprint "%s %s %s %s" (capitale (transl conf "ancestors"))
-        (transl_decline conf "of" (gen_person_text raw_access conf base p))
-        (transl conf "up to") (person_text conf base a)
+      do Wserver.wprint "%s\n"
+           (capitale
+              (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+                 (gen_person_text raw_access conf base p)));
+         Wserver.wprint "%s %s" (transl conf "up to")
+           (person_text conf base a);
+      return ()
   in
   do header conf title;
      conf.senv := [];
@@ -1061,8 +1071,10 @@ value afficher_ascendants_niveau conf base niveau_max p =
       Wserver.wprint "%s %d\n"
         (capitale (transl_nth conf "generation/generations" 0)) niveau_max
     else
-      Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_decline conf "of" (gen_person_text raw_access conf base p))
+      Wserver.wprint "%s"
+        (capitale
+           (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+              (gen_person_text raw_access conf base p)))
   in
   do header conf title;
      tag "ul" begin
@@ -1108,13 +1120,12 @@ value print_generation_missing_persons conf base title sp_incl gp =
                [ Male -> (0, cpl.mother)
                | _ -> (1, cpl.father) ]
              in
-             do wprint_geneweb_link conf (acces conf base p)
-                  (capitale
-                     (transl_nth conf "husband/wife" parent_name_index));
-                Wserver.wprint " %s\n" (transl_decline conf "of" "");
-                afficher_personne_titre conf base (poi base conj);
-                Date.afficher_dates_courtes conf base (poi base conj);
-             return ()
+             Wserver.wprint "%s"
+               (transl_decline2 conf "%1 of %2"
+                  (geneweb_link conf (acces conf base p)
+                     (transl_nth conf "husband/wife" parent_name_index))
+                  (person_title_text conf base (poi base conj) ^
+                   Date.short_dates_text conf base (poi base conj)))
            else
              do afficher_personne_titre_referencee conf base p;
                 Date.afficher_dates_courtes conf base p;
@@ -1134,13 +1145,14 @@ value print_generation_missing_persons conf base title sp_incl gp =
            Wserver.wprint "-";
            Wserver.wprint "%d" (Num.modl n2 10);
            Wserver.wprint " -\n";
-           if sp_incl then
-             Wserver.wprint "%s %s" (capitale (transl conf "parents"))
-               (transl_decline conf "of" "")
-           else ();
-           afficher_personne_titre_referencee conf base p;
-           Date.afficher_dates_courtes conf base p;
-           Wserver.wprint "\n";
+           let s =
+             referenced_person_title_text conf base p ^
+             Date.short_dates_text conf base p
+           in
+           Wserver.wprint "%s\n"
+             (if sp_incl then
+                transl_decline2 conf "%1 of %2" (transl conf "parents") s
+              else s);
         return ()
   | _ -> () ]
 ;
@@ -1216,8 +1228,10 @@ value print_missing_ancestors conf base v spouses_included p =
   in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "missing ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (transl conf "missing ancestors")
+            (txt_fun raw_access conf base p)))
   in
   do header conf title;
      Wserver.wprint "%s" (capitale (text_to conf v));
@@ -1230,8 +1244,9 @@ value print_missing_ancestors conf base v spouses_included p =
      Wserver.wprint ".\n";
      if not spouses_included then
        do html_br conf; html_br conf; return
-       Wserver.wprint "%s %s...\n" (capitale (transl conf "parents"))
-         (transl_decline conf "of" "")
+       Wserver.wprint "%s\n"
+         (capitale
+            (transl_decline2 conf "%1 of %2" (transl conf "parents") "..."))
      else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
      tag "ul" begin
@@ -1320,13 +1335,15 @@ value print_missing_type conf =
   fun
   [ A_person -> ()
   | A_surname_of_husband_of x ->
-      Wserver.wprint "%s %s %s"
-        (transl_nth conf "surname/surnames" 0)
-        (transl_decline conf "of" (transl_nth conf "husband/wife" 0)) x
+      Wserver.wprint "%s %s"
+        (transl_decline2 conf "%1 of %2" (transl_nth conf "surname/surnames" 0)
+           (transl_nth conf "husband/wife" 0))
+        x
   | A_surname_of_wife_of x ->
-      Wserver.wprint "%s %s %s"
-        (transl_nth conf "surname/surnames" 0)
-        (transl_decline conf "of" (transl_nth conf "husband/wife" 1)) x
+      Wserver.wprint "%s %s"
+        (transl_decline2 conf "%1 of %2" (transl_nth conf "surname/surnames" 0)
+           (transl_nth conf "husband/wife" 1))
+        x
   | A_husband_of ->
       Wserver.wprint "%s" (transl_nth conf "husband/wife" 0) 
   | A_wife_of ->
@@ -1407,8 +1424,10 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "missing ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (transl conf "missing ancestors")
+         (txt_fun raw_access conf base p)))
   in
   let after = p_getint conf.env "after" in
   let before = p_getint conf.env "before" in
@@ -1495,8 +1514,9 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
         Wserver.wprint ".\n";
         if not spouses_included then
           do html_br conf; html_br conf; return
-          Wserver.wprint "%s %s...\n" (capitale (transl conf "parents"))
-            (transl_decline conf "of" "")
+          Wserver.wprint "%s\n"
+            (capitale
+               (transl_decline2 conf "%1 of %2" (transl conf "parents") "..."))
         else ();  
         tag "ul" begin
           let _ = List.fold_left
@@ -2000,8 +2020,10 @@ value htree_reference gv conf base p s =
 value print_horizontally conf base max_level p =
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-      (transl_decline conf "of" (txt_fun raw_access conf base p))
+    Wserver.wprint "%s"
+      (capitale
+         (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+            (txt_fun raw_access conf base p)))
   in
   let max_level = min (limit_by_list conf) max_level in
   let suff1 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" in

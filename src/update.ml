@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.20 2000-11-11 15:42:17 ddr Exp $ *)
+(* $Id: update.ml,v 3.21 2000-11-13 20:48:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -206,11 +206,15 @@ value print_someone_ref conf base p =
     (p_surname base p)
 ;
 
+value someone_ref_text conf base p =
+  "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
+  p_first_name base p ^
+  (if p.occ = 0 then "" else "." ^ string_of_int p.occ) ^ " " ^
+  p_surname base p ^ "</a>"
+;
+
 value print_first_name_ref conf base p =
-  Wserver.wprint "<a href=\"%s%s\">\n%s%s</a>"
-    (commd conf) (acces conf base p)
-    (p_first_name base p)
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+  Wserver.wprint "%s" (someone_ref_text conf base p)
 ;
 
 value print_warning conf base =
@@ -232,10 +236,10 @@ value print_warning conf base =
       let moth = poi base cpl.mother in
       do Wserver.wprint "%s\n"
            (capitale (transl conf "changed order of children"));
-         Wserver.wprint "%s\n" (transl_decline conf "of" "");
-         print_someone_ref conf base fath;
-         Wserver.wprint "\n%s\n" (transl conf "and");
-         print_someone_ref conf base moth;
+         Wserver.wprint "-&gt;\n";
+         Wserver.wprint "%s"
+           (someone_ref_text conf base fath ^ "\n" ^ transl conf "and" ^
+            someone_ref_text conf base moth ^ "\n");
          Wserver.wprint "\n<ul>\n";
          html_li conf;
          Wserver.wprint "%s:\n" (capitale (transl conf "before"));

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.182 2000-11-13 13:01:10 ddr Exp $
+# $Id: lexicon.txt,v 3.183 2000-11-13 20:48:24 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -4278,46 +4278,6 @@ no: yrke
 pt: ocupa&ccedil;&atilde;o
 ru: חאםÿעטו
 se: yrke
-
-    of
-af: van
-cs: :g:
-de: von :d:
-dk: til
-en: of
-eo: de
-es: de
-fi: :g:
-fr: de/d'
-he:    של
-is: &nbsp;
-it: di/d'
-lv: -&gt;
-nl: van
-no: til
-pt: de
-ru: :g:
-se: f&ouml;r
-
-    of (same or greater generation level)
-af: van
-cs: :g:
-de: von :d:
-dk: til
-en: of
-eo: de
-es: de
-fi: :g:
-fr: de/d'
-he:    של
-is: &nbsp;
-it: di/d'
-lv: -&gt;
-nl: van
-no: av
-pt: de
-ru: :g:
-se: till
 
     of the %s generation
 af: uit die %s geslag

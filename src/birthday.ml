@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.13 2000-11-06 10:37:08 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.14 2000-11-13 20:48:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -136,7 +136,7 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
                       Wserver.wprint "%s"
                         (transl conf "of the disappearance") ];
                   Wserver.wprint "</em>\n";
-                  Wserver.wprint "%s " (transl_decline conf "of" "");
+                  Wserver.wprint "-&gt; ";
                   Wserver.wprint "%s" (txt_of conf base p);
                   Wserver.wprint "\n<em>%s %d" (transl conf "in (year)") a;
                   Wserver.wprint " (";
@@ -187,13 +187,15 @@ value print_birth_day conf base day_name verb wd dt list =
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no birthday")) day_name
   | _ ->
-      do Wserver.wprint "%s, %s%s %s %s:\n"
-           (capitale day_name)
+      do Wserver.wprint "%s,\n" (capitale day_name);
+         Wserver.wprint "%s%s\n"
            (std_color conf
               ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
                Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
-           verb (transl conf "the birthday")
-           (transl_decline conf "of" "");
+           verb;
+         Wserver.wprint "%s\n"
+           (transl_decline2 conf "%1 of %2" (transl conf "the birthday")
+            "...");
          afficher_liste_anniversaires conf base False dt list;
       return () ]
 ;
@@ -325,13 +327,15 @@ value print_marriage_day conf base day_name verb wd dt list =
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
-      do Wserver.wprint "%s, %s%s %s %s:\n"
-           (capitale day_name)
+      do Wserver.wprint "%s,\n" (capitale day_name);
+         Wserver.wprint "%s%s\n"
            (std_color conf
               ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
                Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
-           verb (transl conf "the anniversary of marriage")
-           (transl_decline conf "of" "");
+           verb;
+         Wserver.wprint "%s\n"
+           (transl_decline2 conf "%1 of %2"
+              (transl conf "the anniversary of marriage") "...");
          print_anniversaries_of_marriage conf base dt.year list;
       return () ]
 ;
