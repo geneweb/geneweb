@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.8 2000-05-16 17:21:13 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.9 2000-06-05 09:47:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -571,7 +571,7 @@ value birth_before_death base warning p =
   | _ -> () ]
 ;
 
-value titles_while_living base warning p t =
+value titles_after_birth base warning p t =
   let t_date_start = Adef.od_of_codate t.t_date_start in
   let t_date_end = Adef.od_of_codate t.t_date_end in
   do match (t_date_start, t_date_end) with
@@ -590,23 +590,6 @@ value titles_while_living base warning p t =
             match t_date_end with
             [ Some d ->
                 if strictement_apres d1 d then
-                  warning (TitleDatesError p t)
-                else ()
-            | None -> () ];
-         return ()
-     | _ -> () ];
-     match p.death with
-     [ Death _ d1 ->
-         let d1 = Adef.date_of_cdate d1 in
-         do match t_date_start with
-            [ Some d ->
-                if strictement_apres d d1 then
-                  warning (TitleDatesError p t)
-                else ()
-            | None -> () ];
-            match t_date_end with
-            [ Some d ->
-                if strictement_apres d d1 then
                   warning (TitleDatesError p t)
                 else ()
             | None -> () ];
@@ -718,7 +701,7 @@ value check_family base error warning fam cpl des =
 
 value check_person base error warning p =
   do birth_before_death base warning p;
-     List.iter (titles_while_living base warning p) p.titles;
+     List.iter (titles_after_birth base warning p) p.titles;
   return ()
 ;
 
