@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.33 2004-02-23 09:53:50 ddr Exp $ *)
+(* $Id: forum.ml,v 4.34 2004-03-03 10:29:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -494,7 +494,8 @@ value print_add conf base =
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
       tag "table" "border=%d" conf.border begin
-        print_var conf "Ident" (capitale (header_txt conf 0)) False conf.user;
+        print_var conf "Ident" (capitale (header_txt conf 0)) False
+          (if conf.username = "" then conf.user else conf.username);
         print_var conf "Email" (capitale (header_txt conf 1)) True "";
         print_var conf "Subject" (capitale (header_txt conf 2)) False "";
       end;

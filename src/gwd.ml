@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.61 2003-12-04 20:30:56 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.62 2004-03-03 10:29:36 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -463,31 +463,46 @@ value unauth_server conf passwd =
 ;
 
 value match_auth_file auth_file uauth =
-  if auth_file = "" then False
+  if auth_file = "" then None
   else
     let auth_file = Util.base_path [] auth_file in
     match try Some (Secure.open_in auth_file) with [ Sys_error _ -> None ] with
     [ Some ic ->
         try
           let rec loop () =
-            let sauth = input_line ic in
-            let sauth =
+            let line = input_line ic in
+            let sauth = line in
+            let (sauth, i) =
               try
                 let i = String.index sauth ':' in
                 let i =
                   try String.index_from sauth (i + 1) ':' with
                   [ Not_found -> String.length sauth ]
                 in
-                String.sub sauth 0 i
+                (String.sub sauth 0 i, i)
               with
-              [ Not_found -> uauth ^ "a" (* <> auth *) ]
+              [ Not_found -> (uauth ^ "a" (* <> auth *), String.length sauth) ]
             in
-            if uauth = sauth then do { close_in ic; True } else loop ()
+            if uauth = sauth then
+              do {
+                close_in ic;
+                let username =
+                  if i = String.length line then ""
+                  else
+                    try
+                      let j = String.index_from line (i + 1) ':' in
+                      String.sub line (i + 1) (j - i - 1)
+                    with
+                    [ Not_found -> "" ]
+                in
+                Some username
+              }
+            else loop ()
           in
           loop ()
         with
-        [ End_of_file -> do { close_in ic; False } ]
-    | None -> False ]
+        [ End_of_file -> do { close_in ic; None } ]
+    | None -> None ]
 ;
 
 value match_simple_passwd sauth uauth =
@@ -501,7 +516,7 @@ value match_simple_passwd sauth uauth =
 ;
 
 value match_auth passwd auth_file uauth =
-  if passwd <> "" && match_simple_passwd passwd uauth then True
+  if passwd <> "" && match_simple_passwd passwd uauth then Some ""
   else match_auth_file auth_file uauth
 ;
 
@@ -810,35 +825,40 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         Base64.decode (String.sub auth i (String.length auth - i))
     in
     let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-    let (ok, wizard, friend) =
+    let (ok, wizard, friend, username) =
       match access_type with
-      [ ATwizard user -> (True, True, False)
-      | ATfriend user -> (True, False, True)
-      | ATnormal -> (True, False, False)
+      [ ATwizard user -> (True, True, False, "")
+      | ATfriend user -> (True, False, True, "")
+      | ATnormal -> (True, False, False, "")
       | ATnone | ATset ->
           if not cgi && (passwd = "w" || passwd = "f") then
             if passwd = "w" then
               if wizard_passwd = "" && wizard_passwd_file = "" then
-                (True, True, friend_passwd = "")
-              else if match_auth wizard_passwd wizard_passwd_file uauth then
-                (True, True, False)
-              else (False, False, False)
+                (True, True, friend_passwd = "", "")
+              else
+	        match match_auth wizard_passwd wizard_passwd_file uauth with
+                [ Some username -> (True, True, False, username)
+                | None -> (False, False, False, "") ]
             else if passwd = "f" then
               if friend_passwd = "" && friend_passwd_file = "" then
-                (True, False, True)
-              else if match_auth friend_passwd friend_passwd_file uauth then
-                (True, False, True)
-              else (False, False, False)
+                (True, False, True, "")
+              else
+	        match match_auth friend_passwd friend_passwd_file uauth with
+	        [ Some _ -> (True, False, True, "")
+	        | None -> (False, False, False, "") ]
             else assert False
           else if wizard_passwd = "" && wizard_passwd_file = "" then
-            (True, True, friend_passwd = "")
-          else if match_auth wizard_passwd wizard_passwd_file uauth then
-            (True, True, False)
-          else if friend_passwd = "" && friend_passwd_file = "" then
-            (True, False, True)
-          else if match_auth friend_passwd friend_passwd_file uauth then
-            (True, False, True)
-          else (True, False, False) ]
+            (True, True, friend_passwd = "", "")
+          else
+	     match match_auth wizard_passwd wizard_passwd_file uauth with
+	     [ Some username -> (True, True, False, username)
+	     | _ ->
+          	if friend_passwd = "" && friend_passwd_file = "" then
+          	  (True, False, True, "")
+          	else
+	          match match_auth friend_passwd friend_passwd_file uauth with
+          	  [ Some _ -> (True, False, True, "")
+	          | None -> (True, False, False, "") ] ] ]
     in
     let user =
       match lindex uauth ':' with
@@ -882,7 +902,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       {from = from_addr;
        wizard = wizard && not wizard_just_friend;
        friend = friend || wizard_just_friend && wizard;
-       just_friend_wizard = wizard && wizard_just_friend; user = user;
+       just_friend_wizard = wizard && wizard_just_friend;
+       user = user; username = username;
        passwd = passwd1; cgi = cgi; command = command;
        indep_command = (if cgi then command else "geneweb") ^ "?";
        highlight =
