@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.41 2000-11-26 15:05:09 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.42 2000-11-27 10:33:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -17,7 +17,7 @@
 height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<table><tr><td align=center><h1><font color=%i>Genealogická<br>databáze</font></h1></table>
+<table><tr><td align=center><h1><font color=%i>Genealogická databáze</font></h1></table>
 </td>
 <td align=right valign=top>%w</td>
 </tr>
@@ -128,13 +128,12 @@ seøazená podle
 <font color=%i><b>podle [place] / [surname/surnames]</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
 - [death] <input type=checkbox name=de value=on>
-- [marriage/marriages]0 <input type=checkbox name=ma value=on>
+- [marriage/marriages] <input type=checkbox name=ma value=on>
 - <input type=submit value="Ok">
 </form>
 
 <li><font color=%i><b>lze také zadat</b></font>
-<a href="%sm=H;v=advanced"><font color=%i><b>roz¹íøený
-dotaz</b></font></a>.
+<a href="%sm=H;v=advanced"><font color=%i><b>[advanced request]</b></font></a>.
 
 </ul>
 </td></tr></table></center>
@@ -160,7 +159,7 @@ dotaz</b></font></a>.
 
 %E<br><p>
 
-<center>Lze se také podívat na<br><p>
+<center>Lze také zobrazit<br><p>
 
 <table border=0>
 <tr>
