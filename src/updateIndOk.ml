@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.3 2001-04-20 12:49:09 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.4 2001-05-09 12:14:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -188,6 +188,20 @@ value reconstitute_burial conf burial_place =
   | Some x -> failwith ("bad burial type " ^ x) ]
 ;
 
+value only_printable_or_nl s =
+  let s = strip_spaces s in
+  let s' = String.create (String.length s) in
+  do {
+    for i = 0 to String.length s - 1 do {
+      s'.[i] :=
+        match s.[i] with
+        [ ' '..'~' | '\160'..'\255' | '\n' -> s.[i]
+        | _ -> ' ' ]
+    };
+    s'
+  }
+;
+
 value reconstitute_person conf =
   let ext = False in
   let cle_index =
@@ -248,7 +262,7 @@ value reconstitute_person conf =
   in
   let notes =
     if first_name = "?" || surname = "?" then ""
-    else strip_spaces (strip_controls_m (get conf "notes"))
+    else only_printable_or_nl (strip_controls_m (get conf "notes"))
   in
   let psources = only_printable (get conf "src") in
   let p =
@@ -266,7 +280,7 @@ value reconstitute_person conf =
      death_src = only_printable (get conf "death_src"); burial = burial;
      burial_place = burial_place;
      burial_src = only_printable (get conf "burial_src");
-     notes = only_printable notes; psources = psources;
+     notes = notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in
   (p, ext)
