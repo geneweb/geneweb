@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.4 1999-07-15 08:52:57 ddr Exp $ *)
+(* $Id: title.ml,v 2.5 1999-07-20 12:13:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -118,6 +118,12 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
               | (Some _, None) -> True
               | (None, Some _) -> False
               | (None, None) -> True ] ] ] ]
+;
+
+value compare_title_order conf base (x1, t1) (x2, t2) =
+  if t1.t_nth == 0 || t2.t_nth == 0 then
+    compare_title_dates conf base (x1, t1) (x2, t2)
+  else t1.t_nth <= t2.t_nth
 ;
 
 value my_alphabetique n1 n2 =
@@ -366,7 +372,7 @@ value print_all_with_place_list conf base p list =
 
 value print_title_place conf base t p =
   let (l, t, p) = select_title_place conf base t p in
-  let list = Sort.list (compare_title_dates conf base) l in
+  let list = Sort.list (compare_title_order conf base) l in
   print_title_place_list conf base t p list
 ;
 
