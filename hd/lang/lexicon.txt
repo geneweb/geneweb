@@ -919,7 +919,7 @@ se: kremerad
 
     date
 de: Datum
-en: date
+en: date (d/m/y)
 eo: dato
 es: fecha
 fr: date
