@@ -2,8 +2,8 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [09/01/99] Changed some explanations in the "README.txt" and "ALIRE.txt"
-    of the distribution.
+  - [09/01/99] Fixed bug in CGI mode: images in directory "images/base"
+    were sometimes not found.
   - [08/01/99] Changed term "consanguinity" into "relationship" in
     relationship computing (because confusion with the usual meaning of
     the term "consanguinity").
