@@ -11,7 +11,7 @@ pt: iso-8859-1
 se: iso-8859-1
 
      to see the first branch
-de: , um den Ersten zu sehen
+de: , um den ersten zu sehen
 en:  to see the first one
 es:  para ver la primera
 fr:  pour voir la premi&egrave;re
@@ -21,7 +21,7 @@ pt:  para ver a primeira
 se:  f&ouml;r att se den f&ouml;rsta
 
      to see the first relationship link
-de: , um die Erste zu sehen
+de: , um die erste zu sehen
 en:  to see the first one
 es:  para ver el primero
 fr:  pour voir le premier
@@ -359,7 +359,7 @@ pt: um bisavô/uma bisavó/um(a) bisavô(ó)
 se: en gammel-farf&ouml;r&auml;lder/en gammel-morf&ouml;r&auml;lder/en gammel-far(mor)f&ouml;r&auml;lder
 
     a great-grandson/a great-granddaughter/a great-grandchild
-de: ein Urenkel/eine Urenkenlin/ein Urenkelkind
+de: ein Urenkel/eine Urenkelin/ein Urenkelkind
 en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/gepranepo
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
@@ -2121,7 +2121,7 @@ pt: privado
 se: privat
 
     probable loop in base
-de: wahrscheinliche Schleife in der Datenbank: jemand ist his/her eigener Vorfahr
+de: wahrscheinliche Schleife in der Datenbank: jemand ist sein/ihre eigene(r) Vorfahr(in)
 en: probable loop in database: someone being his/her own ancestor
 es: bucle probable en base de datos: alguien es su propio antepasado
 fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
@@ -2456,7 +2456,7 @@ pt: o anivers&aacute;rio de casamento
 se: br&ouml;llopsdagen
 
     the base has changed; do "back", "reload", and refill the form
-de: die Datei wurde ver&aacute;ndert; machen Sie bitte "back", "reload" und f&uuml;llen Sie das Formular neu aus
+de: die Datei wurde ver&auml;ndert; dr&uuml;cken Sie bitte "back", "reload" und f&uuml;llen Sie das Formular neu aus
 en: the base has changed; do "back", "reload", and refill the form
 es: la base ha cambiado: hacer "back", "reload" y llenar el formulario de nuevo
 fr: la base a chang&eacute;: faire "back", "reload", et refaire le formulaire
@@ -2510,7 +2510,7 @@ pt: o pai/a m&atilde;e/um pai
 se: fadern/modern/en f&ouml;r&auml;lder
 
     the file is temporarily locked: please try again
-de: die Datei ist z.Z. gesch&uuml;tzt: versuchen Sie es bitte noch mal
+de: die Datei ist z.Z. gesch&uuml;tzt: versuchen Sie es bitte nochmals
 en: the file is temporarily locked: please try again. If it still does not work, wait a while before trying again
 es: la base est&aacute; temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar
 fr: le fichier est temporairement verrouill&eacute: essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de r&eacute;essayer
