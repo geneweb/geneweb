@@ -5,6 +5,7 @@ GeneWeb Version 4.06
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [08 Mar 02] Added option -trace_failed_passwd.
   - [05 Mar 02] Changed implementation of the bug fix about the
     "disconnection" when inserting children: removed the bufferization.
     A simpler solution was just to shutdown "SEND" the socket, read
