@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.2 1999-03-16 18:37:18 ddr Exp $ *)
+(* $Id: util.mli,v 2.3 1999-03-30 10:46:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -100,6 +100,6 @@ value image_file_name : string -> string -> string;
 value print_link_to_welcome : config -> bool -> unit;
 value image_size : string -> option (int * int);
 
-value default_photo_name_of_key : string -> string -> int -> string;
-value default_photo_name : base -> base_person -> string;
-value auto_photo_file : config -> base -> base_person -> option string;
+value default_image_name_of_key : string -> string -> int -> string;
+value default_image_name : base -> base_person -> string;
+value auto_image_file : config -> base -> base_person -> option string;

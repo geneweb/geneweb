@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.2 1999-03-25 20:25:37 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.3 1999-03-30 10:46:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -338,9 +338,9 @@ value get_pub_name str l =
   | _ -> ("", l) ]
 ;
 
-value get_photo str l =
+value get_image str l =
   match l with
-  [ ["#photo"; x :: l'] ->
+  [ ["#image" | "#photo"; x :: l'] ->
       do for i = 0 to String.length x - 1 do
            if x.[i] == ' ' then x.[i] := '_' else ();
          done;
@@ -496,7 +496,7 @@ value lire_ligne ic =
 ;
 
 value create_person () =
-  {first_name = ""; surname = ""; occ = 0; photo = "";
+  {first_name = ""; surname = ""; occ = 0; image = "";
    public_name = ""; nick_names = []; aliases = [];
    first_names_aliases = []; surnames_aliases = [];
    titles = []; occupation = ""; sex = Neuter; access = IfTitles;
@@ -517,8 +517,8 @@ value set_infos str u l =
   do u.surnames_aliases := nl; return
   let (n, l) = get_pub_name str l in
   do u.public_name := n; return
-  let (n, l) = get_photo str l in
-  do u.photo := n; return
+  let (n, l) = get_image str l in
+  do u.image := n; return
   let (nl, l) = get_nick_names str l in
   do u.nick_names := nl; return
   let (nl, l) = get_aliases str l in

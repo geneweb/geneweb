@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.4 1999-03-25 20:25:32 ddr Exp $
+# $Id: lexicon.txt,v 2.5 1999-03-30 10:46:04 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1467,6 +1467,33 @@ nl: als titels
 pt: si t&iacute;tulos
 se: om titlar
 
+    image
+de: Foto
+en: image
+es: foto
+fr: image
+he:  תמונה
+it: foto
+nl: foto
+pt: foto
+se: foto
+
+    image deleted
+de: Foto gel&ouml;scht
+en: image deleted
+eo: foto malkonstruita
+es: foto borrada
+fr: image supprim&eacute;e
+it: foto cancellata
+nl: foto verwijderd
+pt: foto suprimida
+se: foto borttaget
+
+    image received
+en: image received
+fr: image re&ccedil;ue
+se: foto mottaget
+
     in (month year)
 cn: ׃Ú
 de: im
@@ -2325,33 +2352,6 @@ he:  אנשים עם אותו השם
 nl: personen met dezelfde naam
 pt: pessoas com o mesmo apelido
 se: personer som har samma namn
-
-    photo
-de: Foto
-en: photo
-es: foto
-fr: photo
-he:  תמונה
-it: foto
-nl: foto
-pt: foto
-se: foto
-
-    photo deleted
-de: Foto gel&ouml;scht
-en: photo deleted
-eo: foto malkonstruita
-es: foto borrada
-fr: photo supprim&eacute;e
-it: foto cancellata
-nl: foto verwijderd
-pt: foto suprimida
-se: foto borttaget
-
-    photo received
-en: photo received
-fr: photo re&ccedil;ue
-se: foto mottaget
 
     place
 de: Ort

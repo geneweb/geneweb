@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.5 1999-03-24 16:31:11 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.6 1999-03-30 10:46:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -407,9 +407,19 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;
-     can_send_photo =
-       try List.assoc "can_send_photo" base_env = "yes" with
-       [ Not_found -> False ];
+     can_send_image =
+       try List.assoc "can_send_image" base_env = "yes" with
+       [ Not_found ->
+           try
+             let r = List.assoc "can_send_photo" base_env = "yes" in
+             do Printf.eprintf "\
+*** File \"%s.cnf\": \"can_send_photo\" is deprecated; \
+use \"can_send_image\".\n"
+                  base_file;
+                flush stderr;
+             return r
+           with
+           [ Not_found -> False ] ];
      bname = base_file;
      env = env;
      senv = [];

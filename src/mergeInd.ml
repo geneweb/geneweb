@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 2.1 1999-03-08 11:18:53 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 2.2 1999-03-30 10:46:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -54,8 +54,8 @@ value print_differences conf base branches p1 p2 =
       (fun p -> sou base p.surname);
     string_field False (transl conf "number") "number"
       (fun p -> string_of_int p.occ);
-    string_field True (transl conf "photo") "photo"
-      (fun p -> sou base p.photo);
+    string_field True (transl conf "image") "image"
+      (fun p -> sou base p.image);
     string_field True (transl conf "public name") "public_name"
       (fun p -> sou base p.public_name);
     string_field True (transl conf "occupation") "occupation"

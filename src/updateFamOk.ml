@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.3 1999-03-25 20:25:42 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.4 1999-03-30 10:46:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -204,7 +204,7 @@ value insert_person conf base (f, s, o, create) =
           let p =
             {first_name = Update.insert_string conf base f;
              surname = Update.insert_string conf base s;
-             occ = o; photo = empty_string;
+             occ = o; image = empty_string;
              first_names_aliases = []; surnames_aliases = [];
              public_name = empty_string;
              nick_names = []; aliases = []; titles = [];

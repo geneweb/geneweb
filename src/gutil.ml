@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.4 1999-03-25 20:25:34 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.5 1999-03-30 10:46:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -677,7 +677,7 @@ value map_title_strings f t =
 
 value map_person_strings f p =
   {first_name = f p.first_name; surname = f p.surname; occ = p.occ;
-   photo = f p.photo; first_names_aliases = List.map f p.first_names_aliases;
+   image = f p.image; first_names_aliases = List.map f p.first_names_aliases;
    surnames_aliases = List.map f p.surnames_aliases;
    public_name = f p.public_name;
    nick_names = List.map f p.nick_names;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.7 1999-03-26 19:53:28 ddr Exp $ *)
+(* $Id: perso.ml,v 2.8 1999-03-30 10:46:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -784,10 +784,10 @@ value print conf base p =
      print_sosa_if_any conf base p;
      print_link_to_welcome conf True;
      if age_autorise conf base p then
-       let photo_txt = capitale (transl conf "photo") in
-       match sou base p.photo with
+       let image_txt = capitale (transl conf "image") in
+       match sou base p.image with
        [ "" ->
-           match auto_photo_file conf base p with
+           match auto_image_file conf base p with
            [ Some f ->
                let s = Unix.stat f in
                let b = Filename.basename f in
@@ -802,7 +802,7 @@ value print conf base p =
                     (commd conf) (Util.code_varenv b)
                     (int_of_float
                        (mod_float s.Unix.st_mtime (float_of_int max_int)))
-                    wid_hei photo_txt;
+                    wid_hei image_txt;
                   html_p conf;
                return ()
            | None -> () ]
@@ -810,7 +810,7 @@ value print conf base p =
            let http = "http://" in
            if String.length s > String.length http &&
               String.sub s 0 (String.length http) = http then
-             do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" s photo_txt;
+             do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" s image_txt;
                 html_p conf;
              return ()
            else if Filename.is_implicit s then
@@ -824,7 +824,7 @@ value print conf base p =
                  | None -> "" ]
                in
                do Wserver.wprint "<img src=\"%sm=IM;v=%s\"%s alt=\"%s\">"
-                    (commd conf) s wid_hei photo_txt;
+                    (commd conf) s wid_hei image_txt;
                   html_p conf;
                return ()
              else ()
@@ -948,10 +948,10 @@ value print conf base p =
                 return ())
              (Gutil.person_misc_names base p);
          end
-     | Some "photo" ->
+     | Some "image" ->
          do html_p conf; return
-         Wserver.wprint "Default photo name = \"%s\"\n"
-           (default_photo_name base p)
+         Wserver.wprint "Default image name = \"%s\"\n"
+           (default_image_name base p)
      | Some "tstab_val" ->
          let tstab = Util.create_topological_sort conf base in
          do html_p conf; return

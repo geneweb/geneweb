@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.2 1999-03-25 20:25:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.3 1999-03-30 10:46:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -163,7 +163,7 @@ value print_infos oc base is_child print_sources p =
      [ s when sou base s <> "" ->
          Printf.fprintf oc " (%s)" (correct_string base s)
      | _ -> () ];
-     print_if_no_empty oc base "#photo" p.photo;
+     print_if_no_empty oc base "#image" p.image;
      List.iter (print_nick_name oc base) p.nick_names;
      List.iter (print_alias oc base) p.aliases;
      List.iter (print_title oc base) p.titles;

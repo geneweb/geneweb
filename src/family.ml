@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.2 1999-03-23 21:15:45 ddr Exp $ *)
+(* $Id: family.ml,v 2.3 1999-03-30 10:46:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -259,10 +259,10 @@ value family_m conf base =
       UpdateInd.print_del conf base
   | Some "DEL_IND_OK" when conf.wizard ->
       UpdateIndOk.print_del conf base
-  | Some "DEL_PHOTO" when conf.wizard && conf.can_send_photo ->
-      SendPhoto.print_del conf base
-  | Some "DEL_PHOTO_OK" when conf.wizard && conf.can_send_photo ->
-      SendPhoto.print_del_ok conf base
+  | Some "DEL_IMAGE" when conf.wizard && conf.can_send_image ->
+      SendImage.print_del conf base
+  | Some "DEL_IMAGE_OK" when conf.wizard && conf.can_send_image ->
+      SendImage.print_del_ok conf base
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
@@ -336,10 +336,10 @@ value family_m conf base =
          trailer conf;
       return ()
   | Some "RL" -> RelationLink.print conf base
-  | Some "SND_PHOTO" when conf.wizard && conf.can_send_photo ->
-      SendPhoto.print conf base
-  | Some "SND_PHOTO_OK" when conf.wizard && conf.can_send_photo ->
-      SendPhoto.print_send_ok conf base
+  | Some "SND_IMAGE" when conf.wizard && conf.can_send_image ->
+      SendImage.print conf base
+  | Some "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->
+      SendImage.print_send_ok conf base
   | Some "SWI_FAM" when conf.wizard ->
       UpdateFam.print_swi conf base
   | Some "SWI_FAM_OK" when conf.wizard ->

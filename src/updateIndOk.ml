@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.2 1999-03-17 14:11:31 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.3 1999-03-30 10:46:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -153,7 +153,7 @@ value reconstitute_person conf =
       try int_of_string (strip_spaces (get conf "occ")) with
       [ Failure _ -> 0 ]
   in
-  let photo = only_printable (get conf "photo") in
+  let image = only_printable (get conf "image") in
   let (first_names_aliases, ext) =
     reconstitute_string_list conf "first_name_alias" ext 0
   in
@@ -205,7 +205,7 @@ value reconstitute_person conf =
   let psources = only_printable (get conf "src") in
   let p =
     {first_name = first_name; surname = surname; occ = occ;
-     photo = photo;
+     image = image;
      first_names_aliases = first_names_aliases;
      surnames_aliases = surnames_aliases;
      public_name = public_name;
@@ -332,10 +332,10 @@ value check_sex_married conf base sp op =
   else ()
 ;
 
-value rename_photo_file conf base op sp =
-  match auto_photo_file conf base op with
+value rename_image_file conf base op sp =
+  match auto_image_file conf base op with
   [ Some old_f ->
-      let s = default_photo_name_of_key sp.first_name sp.surname sp.occ in
+      let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
       let f =
         List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
       in
@@ -360,7 +360,7 @@ value effective_mod conf base sp =
        let ipl = person_ht_find_all base key in
        do check_conflict conf base sp ipl;
           person_ht_add base key pi;
-          rename_photo_file conf base op sp;
+          rename_image_file conf base op sp;
        return ();
      check_sex_married conf base sp op;
   return
@@ -420,7 +420,7 @@ value effective_del conf base p =
      p.first_name := none;
      p.surname := none;
      p.occ := 0;
-     p.photo := empty;
+     p.image := empty;
      p.public_name := empty;
      p.nick_names := [];
      p.aliases := [];

@@ -1,6 +1,9 @@
 GeneWeb Version 2.01
 --------------------
 
+* General
+  - [Mar 30, 99] Changed term "photo" into "image".
+
 * GeneWeb Daemon/CGI (gwd)
   - [Mar 25, 99] Added the "unmarried" case for couples.
   - [Mar 23, 99] Added display of number of accesses in traces.

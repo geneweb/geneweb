@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.2 1999-03-17 14:11:29 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.3 1999-03-30 10:46:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -103,14 +103,14 @@ value print_public_name conf base p =
   end
 ;
 
-value print_photo conf base p =
+value print_image conf base p =
   tag "tr" begin
     tag "td" begin
-      Wserver.wprint "%s" (capitale (transl conf "photo"));
+      Wserver.wprint "%s" (capitale (transl conf "image"));
     end;
     tag "td" "colspan=3" begin
-      Wserver.wprint "<input name=photo size=50";
-      if p.photo <> "" then Wserver.wprint " value=\"%s\"" (f_coa conf p.photo)
+      Wserver.wprint "<input name=image size=50";
+      if p.image <> "" then Wserver.wprint " value=\"%s\"" (f_coa conf p.image)
       else ();
       Wserver.wprint ">";
     end;
@@ -511,7 +511,7 @@ value print_person conf base p =
        Wserver.wprint "\n";
        print_public_name conf base p;
        Wserver.wprint "\n";
-       print_photo conf base p;
+       print_image conf base p;
      end;
      Wserver.wprint "\n";
      html_br conf;
@@ -698,7 +698,7 @@ value print_del1 conf base p =
 
 value print_add conf base =
   let p =
-    {first_name = ""; surname = ""; occ = 0; photo = "";
+    {first_name = ""; surname = ""; occ = 0; image = "";
      first_names_aliases = []; surnames_aliases = [];
      public_name = ""; nick_names = []; aliases = [];
      titles = []; occupation = "";

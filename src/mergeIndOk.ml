@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 2.1 1999-03-08 11:18:54 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 2.2 1999-03-30 10:46:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -42,7 +42,7 @@ value reconstitute conf base p1 p2 =
    surname = field "surname" (fun p -> sou base p.surname)
         (fun x -> x = "" || x = "?");
    occ = field "number" (fun p -> p.occ) (\= 0);
-   photo = field "photo" (fun p -> sou base p.photo) (\= "");
+   image = field "image" (fun p -> sou base p.image) (\= "");
    public_name = field "public_name" (fun p -> sou base p.public_name) (\= "");
    nick_names = list (sou base) (fun p -> p.nick_names);
    aliases = list (sou base) (fun p -> p.aliases);
