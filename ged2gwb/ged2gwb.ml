@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.9 2000-02-06 00:52:46 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.10 2000-02-15 16:54:59 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -977,8 +977,8 @@ value glop = ref [];
 
 value indi_lab =
   fun
-  [ "ASSO" | "BAPM" | "BIRT" | "BURI" | "CHR" | "CREM" | "DEAT" | "FAMC"
-  | "FAMS" | "NAME" | "NOTE" | "OBJE" | "OCCU" | "SEX" | "SOUR"
+  [ "ADOP" | "ASSO" | "BAPM" | "BIRT" | "BURI" | "CHR" | "CREM" | "DEAT"
+  | "FAMC" | "FAMS" | "NAME" | "NOTE" | "OBJE" | "OCCU" | "SEX" | "SOUR"
   | "TITL" -> True
   | c -> do if List.mem c glop.val then () else do glop.val := [c :: glop.val]; Printf.eprintf "unused %s\n" c; flush stderr; return (); return
       False ]
