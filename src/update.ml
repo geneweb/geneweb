@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.22 2002-03-11 19:03:03 ddr Exp $ *)
+(* $Id: update.ml,v 4.23 2002-10-21 10:57:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -8,7 +8,7 @@ open Gutil;
 open Util;
 
 exception ModErr;
-type create_info = (option date * string * option date * string);
+type create_info = (option date * string * death * option date * string);
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
@@ -464,11 +464,27 @@ value bad_date conf d =
   }
 ;
 
+value int_of_field s =
+  try Some (int_of_string (strip_spaces s)) with [ Failure _ -> None ]
+;
+
 value reconstitute_date_dmy conf var =
-  match get_number var "yyyy" conf.env with
+  let (prec, y) =
+    let y = get var "yyyy" conf.env in
+    let prec = p_getenv conf.env (var ^ "_prec") in
+    let len = String.length y in
+    if len > 0 then
+      match y.[0] with
+      [ '?' -> (Some "maybe", String.sub y 1 (len - 1))
+      | '<' -> (Some "before", String.sub y 1 (len - 1))
+      | '>' -> (Some "after", String.sub y 1 (len - 1))
+      | _ -> (prec, y) ]
+    else (prec, y)
+  in
+  match int_of_field y with
   [ Some y ->
       let prec =
-        match p_getenv conf.env (var ^ "_prec") with
+        match prec with
         [ Some "about" -> About
         | Some "maybe" -> Maybe
         | Some "before" -> Before
@@ -762,14 +778,17 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           let empty_string = insert_string base "" in
           let (birth, birth_place) =
             match info with
-            [ Some (b, bpl, _, _) -> (b, bpl)
+            [ Some (b, bpl, _, _, _) -> (b, bpl)
             | None -> (None, "") ]
           in
           let (death, death_place) =
             match info with
-            [ Some (_, _, Some d, dpl) ->
+            [ Some (_, _, _, Some d, dpl) ->
                 (Death Unspecified (Adef.cdate_of_date d), dpl)
-            | Some (_, _, None, dpl) when dpl <> "" -> (DeadDontKnowWhen, dpl)
+            | Some (_, _, _, None, dpl) when dpl <> "" ->
+                (DeadDontKnowWhen, dpl)
+            | Some (_, _, (DeadDontKnowWhen | NotDead as dead), None, dpl) ->
+                (dead, dpl)
             | _ -> (infer_death conf birth, "") ]
           in
           let p =

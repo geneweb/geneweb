@@ -2,6 +2,10 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - <li>[21 Oct 02] In families forms, added shortcuts for created
+    persons' dates: one can write "?", ">", "<" before the year to specify
+    "perhaps", "after" and "before". And in the "death" field, one can
+     write "+" and "=" to specify "died don't know when" and "alive".
   - [10 Oct 02] The GeneWeb logo in bottom of pages is now clickable
     and return to the database welcome page.
   - [02 Oct 02] In displaying by surname, added ability to mask

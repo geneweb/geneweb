@@ -1,11 +1,11 @@
-(* $Id: update.mli,v 4.4 2002-01-30 11:49:52 ddr Exp $ *)
+(* $Id: update.mli,v 4.5 2002-10-21 10:57:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Config;
 
 exception ModErr;
-type create_info = (option date * string * option date * string);
+type create_info = (option date * string * death * option date * string);
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 

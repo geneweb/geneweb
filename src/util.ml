@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.52 2002-10-16 17:54:01 ddr Exp $ *)
+(* $Id: util.ml,v 4.53 2002-10-21 10:57:20 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -404,7 +404,9 @@ value p_getenv env label =
 
 value p_getint env label =
   match p_getenv env label with
-  [ Some s -> try Some (int_of_string (strip_spaces s)) with _ -> None
+  [ Some s ->
+      try Some (int_of_string (strip_spaces s)) with
+      [ Failure _ -> None ]
   | None -> None ]
 ;
 
