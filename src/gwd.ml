@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.31 1999-08-17 11:39:21 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.32 1999-08-18 05:10:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -55,7 +55,7 @@ value fprintf_date oc tm =
     tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 ;
 
-value log oc tm from request s =
+value log oc tm from auth request s =
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   do let tm = Unix.localtime tm in
@@ -63,6 +63,7 @@ value log oc tm from request s =
      Printf.fprintf oc " (%d)" (Unix.getpid ());
      Printf.fprintf oc " %s\n" s;
      Printf.fprintf oc "  From: %s\n" from;
+     if auth <> "" then Printf.fprintf oc "  User: %s\n" auth else ();
      Printf.fprintf oc "  Agent: %s\n" user_agent;
      if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
   return ()
@@ -132,17 +133,22 @@ value only_log from cgi =
   return ()
 ;
 
-value refuse_auth from auth =
+value refuse_auth from auth auth_type =
   let oc = log_oc () in
   do let tm = Unix.localtime (Unix.time ()) in
      fprintf_date oc tm;
-     Printf.fprintf oc " Access failed from %s = %s\n" from auth;
+     Printf.fprintf oc " Access failed\n";
+     Printf.fprintf oc "  From: %s\n" from;
+     Printf.fprintf oc "  Basic realm: %s\n" auth_type;
+     Printf.fprintf oc "  Response: %s\n" auth;
      flush_log oc;
      Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
-     Wserver.wprint "WWW-Authenticate: Basic realm=\"Private\"";
+     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
      nl (); nl ();
      Wserver.wprint "<head><title>Access failed</title></head>\n";
-     Wserver.wprint "<body><h1>Access failed</h1></body>\n";
+     Wserver.wprint "<body><h1>Access failed</h1>\n";
+     Wserver.wprint "<ul><li>%s</ul>\n" auth_type;
+     Wserver.wprint "</body>\n";
   return ()
 ;
 
@@ -450,8 +456,6 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
       else (True, passwd = wizard_passwd, passwd = friend_passwd)
     else (True, passwd = wizard_passwd, passwd = friend_passwd)
   in
-  if not ok then Left (passwd, uauth, base_file)
-  else
   let cancel_links =
     match Util.p_getenv env "cgl" with
     [ Some "on" -> True
@@ -501,7 +505,13 @@ use \"can_send_image\".\n"
        try Hashtbl.find lexicon " !charset" with [ Not_found -> "iso-8859-1" ];
      is_rtl =
        try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ];
-     auth_file = auth_file.val;
+     auth_file =
+       try
+         let x = List.assoc "auth_file" base_env in
+         if x = "" then auth_file.val
+         else Filename.concat Util.base_dir.val x
+       with 
+       [ Not_found -> auth_file.val ];
      today =
        {day = tm.Unix.tm_mday;
         month = succ tm.Unix.tm_mon;
@@ -509,10 +519,10 @@ use \"can_send_image\".\n"
         prec = Sure};
      today_wd = tm.Unix.tm_wday}
   in
-  Right (conf, sleep)
+  (conf, sleep, if not ok then Some (passwd, uauth, base_file) else None)
 ;
 
-value log_and_robot_check cgi from request str =
+value log_and_robot_check cgi auth from request str =
   if cgi && log_file.val = "" && robot_xcl.val = None then ()
   else
     let tm = Unix.time () in
@@ -524,7 +534,7 @@ value log_and_robot_check cgi from request str =
                 [ Some (cnt, sec) -> Robot.check oc tm from cnt sec cgi
                 | None -> () ];
                 if cgi && log_file.val = "" then ()
-                else log oc tm from request str;
+                else log oc tm from auth request str;
              return ()
            with e -> do flush_log oc; return raise e;
            flush_log oc;
@@ -532,9 +542,45 @@ value log_and_robot_check cgi from request str =
     | Refuse -> () ]
 ;
 
+value auth_err request auth_file =
+  if auth_file = "" then (False, "")
+  else
+    let auth = Wserver.extract_param "authorization: " '\r' request in
+    if auth <> "" then
+      match try Some (open_in auth_file) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          let auth =
+            let i = String.length "Basic " in
+            Base64.decode (String.sub auth i (String.length auth - i))
+          in
+          try
+            loop () where rec loop () =
+              if auth = input_line ic then do close_in ic; return (False, auth)
+              else loop ()
+          with
+          [ End_of_file -> do close_in ic; return (True, auth) ]
+      | _ -> (True, "(auth file '" ^ auth_file ^ "' not found)") ]
+    else (True, "(authorization not provided)")
+;
+
 value conf_and_connection cgi from (addr, request) str env =
-  match make_conf cgi (addr, request) str env with
-  [ Left (passwd, uauth, base_file) ->
+  let (conf, sleep, passwd_err) = make_conf cgi (addr, request) str env in
+  let (auth_err, auth) =
+    if cgi then (False, "")
+    else if conf.auth_file = "" then (False, "")
+    else auth_err request conf.auth_file
+  in
+  match (auth_err, passwd_err) with
+  [ (True, _) ->
+      let auth_type =
+        let x =
+          try List.assoc "auth_file" conf.base_env with
+          [ Not_found -> "" ]
+        in
+        if x = "" then "GeneWeb service" else "data base " ^ conf.bname
+      in
+      refuse_auth from auth auth_type
+  | (_, Some (passwd, uauth, base_file)) ->
       let tm = Unix.time () in
       do lock_wait Srcfile.adm_file "gwd.lck" with
          [ Accept ->
@@ -545,8 +591,8 @@ value conf_and_connection cgi from (addr, request) str env =
          | Refuse -> () ];
          unauth base_file (if passwd = "w" then "Wizard" else "Friend");
       return ()
-  | Right (conf, sleep) ->
-      do log_and_robot_check cgi from request str;
+  | _ ->
+      do log_and_robot_check cgi auth from request str;
          if conf.bname = "" then propose_base conf
          else
            match redirected_addr.val with
@@ -664,27 +710,6 @@ value image_request cgi str env =
   | _ -> False ]
 ;
 
-value check_auth request =
-  if auth_file.val = "" then None
-  else
-    match try Some (open_in auth_file.val) with [ Sys_error _ -> None ] with
-    [ Some ic ->
-        let auth = Wserver.extract_param "authorization: " '\r' request in
-        let auth =
-          if auth <> "" then
-            let i = String.length "Basic " in
-            Base64.decode (String.sub auth i (String.length auth - i))
-          else auth
-        in
-        try
-          loop () where rec loop () =
-            if auth = input_line ic then do close_in ic; return None
-            else loop ()
-        with
-        [ End_of_file -> do close_in ic; return Some auth ]
-    | _ -> None ]
-;
-
 value extract_multipart boundary str =
   let rec skip_nl i =
     if i < String.length str && str.[i] == '\r' then skip_nl (i + 1)
@@ -785,21 +810,17 @@ value connection cgi (addr, request) str =
   in
   if excluded from then refuse_log from cgi
   else
-    let check = if cgi then None else check_auth request in
-    match check with
-    [ Some auth -> refuse_auth from auth
-    | _ ->
-        let accept =
-          if only_address.val = "" then True else only_address.val = from
-        in
-        if not accept then only_log from cgi
-        else
-          try
-            let (str, env) = build_env request str in
-            if image_request cgi str env then ()
-            else conf_and_connection cgi from (addr, request) str env
-          with
-          [ Exit -> () ] ]
+    let accept =
+      if only_address.val = "" then True else only_address.val = from
+    in
+    if not accept then only_log from cgi
+    else
+      try
+        let (str, env) = build_env request str in
+        if image_request cgi str env then ()
+        else conf_and_connection cgi from (addr, request) str env
+      with
+      [ Exit -> () ]
 ;
 
 value tmout = 120;
