@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.118 2002-11-25 12:13:33 ddr Exp $
+# $Id: lexicon.txt,v 4.119 2002-11-25 12:27:59 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -1083,7 +1083,7 @@ sv: en gammel-nev&ouml;/en gammel-niece
 
     a great-uncle/a great-aunt
 af: 'n grootoom/'n groottante
-bg: вуйчо или чичо на родител/вуйна или леля на родител
+bg: чичо на родител/леля на родител/вуйчо на родител/леля на родител
 ca: un oncle avi/una tia аvia
 cs: prastrэc/prateta
 da: en grandonkel/en grandtante
@@ -1309,7 +1309,7 @@ sv: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
 af: aangenome seun/aangenome dogter/aangenome kind
-bg: осиновен сын/осиновена дъщеря/осиновено дете
+bg: осиновен син/осиновена дъщеря/осиновено дете
 ca: fill adoptiu/filla adoptiva/fill(a) adoptiu(iva)
 cs: adoptivnн syn/adoptivnн dcera/adoptivnн dнtм
 da: adoptivs&oslash;n/adoptivdatter/adoptivbarn
@@ -1639,7 +1639,7 @@ sv: en ana
 
     an uncle/an aunt
 af: 'n oom/'n tante
-bg: вуйчо или чичо/вуйна или леля
+bg: чичо/леля/вуйчо/леля
 ca: un oncle/una tia
 cs: strэc/teta
 da: en onkel/en tante
@@ -2123,7 +2123,7 @@ zh: іцЙъ
 
     branch/branches
 af: tak/takke
-bg: роден/родена
+bg: клон/клонове
 ca: branca/branques
 cs: vмtev/vмtve
 da: gren/grene
@@ -2148,7 +2148,7 @@ sv: anlinje/anlinjer
 
     burial
 af: begrawe
-bg: роден/родена
+bg: погребение
 ca: enterrament
 cs: pohшeb
 da: begravelse
@@ -2851,7 +2851,7 @@ zh: єуґъ
 
     died
 af: oorlede
-bg: умрял/умряла
+bg: починал/починала
 ca: mort/morta/mort(a)
 cs: zemшel/zemшela/zemшeli
 da: d&oslash;d
@@ -2877,7 +2877,7 @@ zh: ЛА
 
     died young
 af: jonk oorlede
-bg: умира невръстен/умира невръстна
+bg: починал невръстен/починала невръстна
 ca: mort jove/morta jove/mort(a) jove
 cs: zemшel mladэ/zemшela mladб/zemшeli mladн
 da: d&oslash;d som ung
@@ -7288,7 +7288,7 @@ sv: databasen har &auml;ndrats; g&aring; tillbaka, klicka uppdatera och fyll i f
 
     the birthday
 af: die verjaarsdag
-bg: рожденият ден
+bg: рожденият:a:рождения ден
 ca: l'aniversari
 cs: narozeniny
 da: f&oslash;dselsdagen
@@ -7689,7 +7689,7 @@ sv: maken/makan
 
     the whole list
 af: die hele lys
-bg: целия списък
+bg: целият:a:целия списък
 ca: tot el llistat
 cs: kompletnн seznam
 da: hele listen
@@ -8039,7 +8039,7 @@ sv: trдd
 
     uncles and aunts
 af: ooms en tantes
-bg: вуйчовци, вуйни, чичовци и лели
+bg: вуйчовци, чичовци и лели
 ca: oncles i ties
 cs: strэcovй a tety
 da: onkler og tanter
@@ -8112,7 +8112,7 @@ sv: ok&auml;nd person
 
     unspecified
 af: nie gemeld nie
-bg: неуточнен
+bg: неуточнено
 ca: no especificat
 cs: nespecifikovбno
 da: uspecificeret
