@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.10 1999-05-06 19:26:42 ddr Exp $
+# $Id: Makefile,v 2.11 1999-05-09 09:16:33 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -34,6 +34,7 @@ distrib: classical_distrib
 	  cp setup/$$i/*.html distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \
 	done
+	echo "127.0.0.1" > distribution/gw/only.txt
 
 classical_distrib:
 	$(RM) -rf distribution
