@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.25 2001-02-23 08:31:17 ddr Exp $ *)
+(* $Id: setup.ml,v 3.26 2001-02-23 10:07:58 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -291,7 +291,7 @@ value rec copy_from_stream conf print strm =
           [ '/' -> ifdef UNIX then print "/" else print "\\"
           | 'a' -> print (strip_spaces (s_getenv conf.env "anon"))
           | 'b' -> for_all conf print (all_db ".") strm
-          | 'c' -> print (Filename.concat "." conf.comm)
+          | 'c' -> print (Filename.concat setup_dir.val conf.comm)
           | 'd' -> print conf.comm
           | 'e' ->
               do print "lang=";
@@ -333,14 +333,20 @@ value rec copy_from_stream conf print strm =
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt
-          | 'r' -> print_specific_file conf print "gwd.arg" strm
+          | 'r' ->
+              print_specific_file conf print
+                (Filename.concat setup_dir.val "gwd.arg") strm
           | 's' -> for_all conf print (selected conf.env) strm
           | 't' -> print_if conf print (ifdef UNIX then False else True) strm
-          | 'u' -> print (Filename.dirname (Sys.getcwd ()))
+          | 'u' ->
+              print
+                (Filename.dirname
+                   (Filename.concat (Sys.getcwd ()) setup_dir.val))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
               print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
           | 'w' -> print (slashify (Sys.getcwd ()))
+          | 'x' -> print setup_dir.val
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port.val)
           | '$' -> print "$"
@@ -550,7 +556,7 @@ value infer_rc conf rc =
 
 value gwc conf =
   let rc =
-    exec_f (Filename.concat "." "gwc" ^ parameters conf.env)
+    exec_f (Filename.concat setup_dir.val "gwc" ^ parameters conf.env)
   in
   let rc = ifdef WIN95 then infer_rc conf rc else rc in
   do let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
@@ -580,7 +586,9 @@ value gwu_or_gwb2ged_check suffix conf =
       out_file
     else out_file ^ suffix
   in
+(*
   let out_file = Filename.concat ".." out_file in
+*)
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_miss.htm"
   else print_file conf "bsi.htm"
@@ -591,7 +599,7 @@ value gwb2ged = gwu_or_gwb2ged_check ".ged";
 
 value gwb2ged_or_gwu_1 ok_file conf =
   let rc =
-    exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
+    exec_f (Filename.concat setup_dir.val conf.comm ^ parameters conf.env)
   in
   do Printf.eprintf "\n";
      flush stderr;
@@ -768,8 +776,8 @@ value recover_2 conf =
          Sys.chdir dir;
       return
       let c =
-        Filename.concat "." src_to_new ^ " " ^ tmp ^ " -f -o " ^ out_file ^
-        " > " ^ "comm.log"
+        Filename.concat setup_dir.val src_to_new ^ " " ^ tmp ^ " -f -o " ^
+        out_file ^ " > " ^ "comm.log"
       in
       do Printf.eprintf "$ %s\n" c;
          flush stderr;
@@ -825,7 +833,7 @@ value cleanup_1 conf =
   in
   let in_base_dir = in_base ^ ".gwb" in
   do Printf.eprintf "$ cd %s\n" (Sys.getcwd ()); flush stderr; return
-  let c = Filename.concat "." "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
+  let c = Filename.concat setup_dir.val "gwu" ^ " " ^ in_base ^ " -o tmp.gw" in
   do Printf.eprintf "$ %s\n" c; flush stderr; return
   let _ = Sys.command c in
   do Printf.eprintf "$ mkdir old\n";
@@ -843,7 +851,8 @@ value cleanup_1 conf =
      Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
   return
   let c =
-    Filename.concat "." "gwc" ^ " tmp.gw -o " ^ in_base ^ " > comm.log "
+    Filename.concat setup_dir.val "gwc" ^ " tmp.gw -o " ^ in_base ^
+    " > comm.log "
   in
   do Printf.eprintf "$ %s\n" c;
      flush stderr;
@@ -945,7 +954,9 @@ value merge_1 conf =
       fun
       [ [] -> 0
       | [b :: bases] ->
-           let c = Filename.concat "." "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw" in
+           let c =
+             Filename.concat setup_dir.val "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw"
+           in
            do Printf.eprintf "$ %s\n" c;
               flush stderr;
            return
@@ -956,7 +967,7 @@ value merge_1 conf =
     if rc <> 0 then rc
     else
       let c =
-        Filename.concat "." "gwc" ^
+        Filename.concat setup_dir.val "gwc" ^
         List.fold_left
           (fun s b ->
              if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
@@ -997,7 +1008,7 @@ value read_base_env bname =
 ;
 
 value read_gwd_arg () =
-  let fname = "gwd.arg" in
+  let fname = Filename.concat setup_dir.val "gwd.arg" in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let list =
@@ -1099,7 +1110,8 @@ value gwf_1 conf =
      return ();
      let trl = s_getenv conf.env "trailer" in
      let trl_file =  Filename.concat "lang" (in_base ^ ".trl") in
-     do try
+     do try Unix.mkdir "lang" 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+        try
           if trl = "" then Sys.remove trl_file
           else
             let oc = open_out trl_file in
@@ -1135,7 +1147,7 @@ value gwd conf =
 ;
 
 value gwd_1 conf =
-  let oc = open_out "gwd.arg" in
+  let oc = open_out (Filename.concat setup_dir.val "gwd.arg") in
   let print_param k =
     match p_getenv conf.env k with
     [ Some v when v <> "" -> Printf.fprintf oc "-%s\n%s\n" k v
@@ -1152,8 +1164,7 @@ value gwd_1 conf =
      print_param "only";
      print_param "auth";
      match p_getenv conf.env "log" with
-     [ Some v when v <> "" ->
-         Printf.fprintf oc "-log\n%s\n" (Filename.concat ".." v)
+     [ Some v when v <> "" -> Printf.fprintf oc "-log\n%s\n" v
      | _ -> () ];
      match p_getenv conf.env "nolock" with
      [ Some "on" -> Printf.fprintf oc "-nolock\n"
@@ -1169,9 +1180,9 @@ value gwd_1 conf =
   return ()
 ;
 
-value exec_command_out conf =
+value ged2gwb conf =
   let rc =
-    exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
+    exec_f (Filename.concat setup_dir.val conf.comm ^ parameters conf.env)
   in
   let rc = ifdef WIN95 then infer_rc conf rc else rc in
   do Printf.eprintf "\n";
@@ -1181,9 +1192,9 @@ value exec_command_out conf =
   else print_file conf "bso_ok.htm"
 ;
 
-value exec_command_in conf ok_file =
+value consang conf ok_file =
   let rc =
-    exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
+    exec_f (Filename.concat setup_dir.val conf.comm ^ parameters conf.env)
   in
   do Printf.eprintf "\n";
      flush stderr;
@@ -1227,7 +1238,7 @@ value setup_comm conf =
   | "ged2gwb" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> ged2gwb_check conf
-      | _ -> exec_command_out conf ]
+      | _ -> ged2gwb conf ]
   | "gwb2ged" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwb2ged conf
@@ -1235,7 +1246,7 @@ value setup_comm conf =
   | "consang" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> consang_check conf
-      | _ -> exec_command_in conf "consg_ok.htm" ]
+      | _ -> consang conf "consg_ok.htm" ]
   | "gwf" -> gwf conf
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
@@ -1317,7 +1328,8 @@ value copy_text lang fname =
 
 value set_gwd_default_language_if_absent lang =
   let env = read_gwd_arg () in
-  match try Some (open_out "gwd.arg") with [ Sys_error _ -> None ] with
+  let fname = Filename.concat setup_dir.val "gwd.arg" in
+  match try Some (open_out fname) with [ Sys_error _ -> None ] with
   [ Some oc ->
       let lang_found = ref False in
       do List.iter
