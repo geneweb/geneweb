@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.76 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.77 2005-02-13 19:15:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -926,9 +926,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
            (if from = "" then [] else [("opt", from)]);
        base_env = base_env; request = request; lexicon = lexicon;
        xhs =
-         match p_getenv  base_env "doctype" with
-         [ Some "xhtml-1.1" -> " /"
-         | _ -> "" ];
+         match p_getenv base_env "doctype" with
+         [ Some "html-4.01" -> ""
+         | _ -> " /" ];
        charset = "utf-8";
        is_rtl = is_rtl;
        left = if is_rtl then "right" else "left";
