@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 3.3 2000-05-23 07:19:03 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 3.4 2000-06-03 21:08:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -55,7 +55,7 @@ value print_differences conf base branches fam1 fam2 =
     else ()
   in
   tag "form" "method=POST action=\"%s\"" conf.command begin
-    Srcfile.hidden_env conf;
+    Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=MRG_FAM_OK>\n";
     Wserver.wprint "<input type=hidden name=f1 value=%d>\n"
       (Adef.int_of_ifam fam1.fam_index);

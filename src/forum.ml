@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.4 2000-02-01 18:58:08 ddr Exp $ *)
+(* $Id: forum.ml,v 3.5 2000-06-03 21:08:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -70,7 +70,7 @@ value print conf base =
   do header conf title;
      print_link_to_welcome conf True;
      tag "form" "method=get action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=FORUM_ADD>\n";
        Wserver.wprint "<input type=submit value=\"%s\">\n"
          (capitale (transl_decline conf "add" (transl conf "comment")));
@@ -104,7 +104,7 @@ value print_add conf base =
   do header conf title;
      print_link_to_welcome conf True;
      tag "form" "method=post action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
        tag "table" "border=%d" conf.border begin
          print_var conf "Ident" False conf.user;

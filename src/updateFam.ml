@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.11 2000-05-23 07:19:04 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.12 2000-06-03 21:08:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -494,7 +494,7 @@ value print_mod1 conf base fam cpl des digest =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        match p_getenv conf.env "m" with
        [ Some "MRG_MOD_FAM_OK" -> merge_call conf
        | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n" ];
@@ -522,7 +522,7 @@ value print_del1 conf base fam =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
          (Adef.int_of_ifam fam.fam_index);
        match p_getenv conf.env "ip" with
@@ -559,7 +559,7 @@ value print_swi1 conf base p fam1 fam2 =
      end;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
          (Adef.int_of_iper p.cle_index);
        Wserver.wprint "<input type=hidden name=f value=%d>\n\n"
@@ -582,7 +582,7 @@ value print_add1 conf base fam cpl des force_children_surnames =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        match p_getenv conf.env "i" with
        [ Some ip -> Wserver.wprint "<input type=hidden name=i value=%s>\n" ip
        | None -> () ];

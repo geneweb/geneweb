@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.35 2000-05-24 09:12:06 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.36 2000-06-03 21:08:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -68,7 +68,7 @@ value text_level conf =
 
 value print_choice conf base p niveau_effectif =
   tag "form" "method=get action=\"%s\"" conf.command begin
-    Srcfile.hidden_env conf;
+    Util.hidden_env conf;
     Wserver.wprint "\n";
     Wserver.wprint "<input type=hidden name=m value=A>\n";
     wprint_hidden_person conf base "" p;

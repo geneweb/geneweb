@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 3.2 2000-03-08 14:35:34 ddr Exp $ *)
+(* $Id: sendImage.ml,v 3.3 2000-06-03 21:08:06 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -37,7 +37,7 @@ value print_send_image conf base p =
        "method=POST action=\"%s\" enctype=\"multipart/form-data\""
        conf.command
      begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=SND_IMAGE_OK>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);
@@ -89,7 +89,7 @@ value print_delete_image conf base p =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=DEL_IMAGE_OK>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
          (Adef.int_of_iper p.cle_index);

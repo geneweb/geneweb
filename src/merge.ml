@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 3.1 2000-01-10 02:14:39 ddr Exp $ *)
+(* $Id: merge.ml,v 3.2 2000-06-03 21:08:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -23,7 +23,7 @@ value print conf base p =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=GET action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=MRG_IND>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);
