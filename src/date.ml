@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.23 2001-02-04 07:21:40 ddr Exp $ *)
+(* $Id: date.ml,v 3.24 2001-02-05 10:47:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -24,7 +24,6 @@ value code_date conf encoding d m y =
               | c -> "%" ^ String.make 1 c ]
             in
             (s, i + 1)
-        | ' ' -> (nbsp, i)
         | c -> (String.make 1 c, i) ]
       in
       s ^ loop (i + 1)
@@ -82,7 +81,7 @@ value code_hebrew_date conf d m y =
   s ^ (if s = "" then "" else " ") ^ " " ^ string_of_int y
 ;
 
-value string_of_on_prec_dmy conf sy d =
+value string_of_on_prec_dmy_aux conf sy d =
   match d.prec with
   [ Sure ->
       if d.day = 0 && d.month = 0 then
@@ -119,6 +118,18 @@ value string_of_on_prec_dmy conf sy d =
       transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
       nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
+;
+
+value replace_spaces_by_nbsp s =
+  loop 0 0 where rec loop i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = ' ' then loop (i + 1) (Buff.mstore len "&nbsp;")
+    else loop (i + 1) (Buff.store len s.[i])
+;
+
+value string_of_on_prec_dmy conf sy d =
+  let r = string_of_on_prec_dmy_aux conf sy d in
+  replace_spaces_by_nbsp r
 ;
 
 value string_of_on_dmy conf d =

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.218 2001-02-04 07:21:39 ddr Exp $
+# $Id: lexicon.txt,v 3.219 2001-02-05 10:47:34 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -395,7 +395,7 @@ dk: januar/februar/marts/april/maj/juni/juli/august/september/oktober/november/d
 en: January/February/March/April/May/June/July/August/September/October/November/December
 eo: januaro/februaro/marto/aprilo/majo/junio/julio/auxgusto/septembro/oktobro/novembro/decembro
 es: enero/febrero/marzo/abril/mayo/junio/julio/agosto/septiembre/octubre/noviembre/diciembre
-et: jaanuar:i:+il/veebruar:i:+il/mהrts:i:+il/aprill:i:+il/mai:i:+l/juuni:i:+l/juuli:i:+l/august:i:+il/september:i:--ril/oktoober:i:--ril/november:i:--ril/detsember:i:--ril
+et: jaanuar:i:+il:s:+is:p:+i/veebruar:i:+il:s:+is:p:+i/m&auml;rts:i:+il:s:+is:p:+i/aprill:i:+il:s:+is:p:+i/mai:i:+l:s:+s:p:+d/juuni:i:+l:s:+s:p:+t/juuli:i:+l:s:+s:p:+t/august:i:+il:s:+is:p:+it/september:i:--ril:s:--ris:p:--rit/oktoober:i:--ril:s:--ris:p:--rit/november:i:--ril:s:--ris:p:--rit/detsember:i:--ril:s:--ris:p:--rit
 fi: tammikuu/helmikuu/maaliskuu/huhtikuu/toukokuu/kes&auml;kuu/hein&auml;kuu/elokuu/syyskuu/lokakuu/marraskuu/joulukuu
 fr: janvier/f&eacute;vrier/mars/avril/mai/juin/juillet/ao&ucirc;t/septembre/octobre/novembre/d&eacute;cembre
 he:  ינואר/ פברואר/ מרץ/ אפריל/ מאי/ יוני/ יולי/ אוגוסט/ ספטמבר/ אוקטובר/ נובמבר/ דצמבר
@@ -3371,7 +3371,7 @@ dk: i
 en: in
 eo: en
 es: en
-et: 
+et: :s:
 fi:  
 fr: en
 he:   ב-
