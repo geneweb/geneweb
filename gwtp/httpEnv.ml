@@ -1,4 +1,4 @@
-(* $Id: httpEnv.ml,v 1.3 2000-07-26 01:39:33 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 1.4 2000-08-05 12:42:38 ddr Exp $ *)
 
 open Printf;
 
@@ -135,4 +135,61 @@ value make content_type str =
     (str, env)
   else
     (str, create_env str)
+;
+
+value hexa_val conf =
+  match conf with
+  [ '0'..'9' -> Char.code conf - Char.code '0'
+  | 'a'..'f' -> Char.code conf - Char.code 'a' + 10
+  | 'A'..'F' -> Char.code conf - Char.code 'A' + 10
+  | _ -> 0 ]
+;
+
+value decode s =
+  let rec need_decode i =
+    if i < String.length s then
+      match s.[i] with
+      [ '%' | '+' -> True
+      | _ -> need_decode (succ i) ]
+    else False
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i =
+        match s.[i] with
+        [ '%' when i + 2 < String.length s -> i + 3
+        | _ -> succ i ]
+      in
+      compute_len i (succ i1)
+    else i1
+  in
+  let rec copy_decode_in s1 i i1 =
+    if i < String.length s then
+      let i =
+        match s.[i] with
+        [ '%' when i + 2 < String.length s ->
+            let v = hexa_val s.[i + 1] * 16 + hexa_val s.[i + 2] in
+            do s1.[i1] := Char.chr v; return i + 3
+        | '+' -> do s1.[i1] := ' '; return succ i
+        | x -> do s1.[i1] := x; return succ i ]
+      in
+      copy_decode_in s1 i (succ i1)
+    else s1
+  in
+  let rec strip_heading_and_trailing_spaces s =
+    if String.length s > 0 then
+      if s.[0] == ' ' then
+        strip_heading_and_trailing_spaces
+          (String.sub s 1 (String.length s - 1))
+      else if s.[String.length s - 1] == ' ' then
+        strip_heading_and_trailing_spaces
+          (String.sub s 0 (String.length s - 1))
+      else s
+    else s
+  in
+  if need_decode 0 then
+    let len = compute_len 0 0 in
+    let s1 = String.create len in
+    strip_heading_and_trailing_spaces (copy_decode_in s1 0 0)
+  else s
 ;
