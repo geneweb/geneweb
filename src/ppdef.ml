@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.4 2005-03-01 19:09:51 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.5 2005-03-02 09:52:29 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -29,9 +29,9 @@ value loc = Grammar.loc_of_token_interval 0 0;
 value subst mloc env =
   loop where rec loop =
     fun
-    [ <:expr< let $opt:rf$ $list:pel$ in $e$ >> ->
+    [ MLast.ExLet _ rf pel e ->
         let pel = List.map (fun (p, e) -> (p, loop e)) pel in
-        <:expr< let $opt:rf$ $list:pel$ in $loop e$ >>
+        MLast.ExLet loc rf pel (loop e)
     | <:expr< if $e1$ then $e2$ else $e3$ >> ->
          <:expr< if $loop e1$ then $loop e2$ else $loop e3$ >>
     | <:expr< $e1$ $e2$ >> -> <:expr< $loop e1$ $loop e2$ >>
