@@ -5,6 +5,8 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [07 Nov 02] The option -images_url did not apply in pages from the
+    "DOC" link. Fixed.
   - [26 Oct 02] Some cleanup in src/perso.ml, using more strings than
     prints.
   - [18 Oct 02] One space too many when displaying French Revolution

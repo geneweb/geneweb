@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 4.3 2002-10-31 14:48:36 ddr Exp $ *)
+(* $Id: doc.ml,v 4.4 2002-11-07 09:42:55 ddr Exp $ *)
 
 open Config;
 
@@ -137,7 +137,10 @@ value print conf =
             let dir = if dir = "./" then "" else dir in
             conf.indep_command ^ "m=DOC;v=" ^ dir
           in
-          let pref_img = conf.indep_command ^ "m=IM;v=/" in
+          let pref_img =
+            if Util.images_url.val <> "" then Util.images_url.val ^ "/"
+            else conf.indep_command ^ "m=IM;v=/"
+          in
           copy conf pref_doc pref_img s
         }
     | None -> Util.incorrect_request conf ]
