@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.0 2001-03-16 19:34:21 ddr Exp $
+# $Id: Makefile,v 4.1 2001-04-22 18:55:22 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -16,7 +16,7 @@ RESTRICT_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cm
 
 all:: out
 
-out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
+out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out
 	$(RM) gwc consang gwd gwu
 	cp gwc.out gwc
 	cp consang.out consang

@@ -1,4 +1,4 @@
-(* $Id: httpEnv.ml,v 4.0 2001-03-16 19:32:22 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 4.1 2001-04-22 18:55:22 ddr Exp $ *)
 
 open Printf;
 
@@ -36,9 +36,9 @@ value decode s =
         match s.[i] with
         [ '%' when i + 2 < String.length s ->
             let v = hexa_val s.[i + 1] * 16 + hexa_val s.[i + 2] in
-            do s1.[i1] := Char.chr v; return i + 3
-        | '+' -> do s1.[i1] := ' '; return succ i
-        | x -> do s1.[i1] := x; return succ i ]
+            do { s1.[i1] := Char.chr v; i + 3 }
+        | '+' -> do { s1.[i1] := ' '; succ i }
+        | x -> do { s1.[i1] := x; succ i } ]
       in
       copy_decode_in s1 i (succ i1)
     else s1
@@ -68,9 +68,9 @@ value hexa_digit x =
 
 value special =
   fun
-  [ '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' |
-    '{' | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' |
-    ':' | '@' | '=' | '&' ->
+  [ '\000'..'\031' | '\127'..'ÿ' | '<' | '>' | '"' | '#' | '%' | '{' | '}' |
+    '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' | ':' | '@' |
+    '=' | '&' ->
       True
   | _ -> False ]
 ;
@@ -93,14 +93,15 @@ value encode s =
     if i < String.length s then
       let i1 =
         match s.[i] with
-        [ ' ' -> do s1.[i1] := '+'; return succ i1
+        [ ' ' -> do { s1.[i1] := '+'; succ i1 }
         | c ->
-            if special c then
-              do s1.[i1] := '%';
-                 s1.[i1 + 1] := hexa_digit (Char.code c / 16);
-                 s1.[i1 + 2] := hexa_digit (Char.code c mod 16);
-              return i1 + 3
-            else do s1.[i1] := c; return succ i1 ]
+            if special c then do {
+              s1.[i1] := '%';
+              s1.[i1 + 1] := hexa_digit (Char.code c / 16);
+              s1.[i1 + 2] := hexa_digit (Char.code c mod 16);
+              i1 + 3
+            }
+            else do { s1.[i1] := c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
     else s1
@@ -113,8 +114,7 @@ value encode s =
 (* Env from a string *)
 
 value rec skip_spaces s i =
-  if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1)
-  else i
+  if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1) else i
 ;
 
 value create_env s =
@@ -144,25 +144,23 @@ value getenv env label =
 value is_multipart_form =
   let s = "multipart/form-data" in
   fun content_type ->
-    loop 0 where rec loop i =
+    let rec loop i =
       if i >= String.length content_type then False
       else if i >= String.length s then True
       else if content_type.[i] == Char.lowercase s.[i] then loop (i + 1)
       else False
+    in
+    loop 0
 ;
 
 value extract_boundary content_type =
-  let e = create_env content_type in
-  List.assoc "boundary" e
+  let e = create_env content_type in List.assoc "boundary" e
 ;
 
 value strip_quotes s =
-  let i0 =
-    if String.length s > 0 && s.[0] == '"' then 1 else 0
-  in
+  let i0 = if String.length s > 0 && s.[0] == '"' then 1 else 0 in
   let i1 =
-    if String.length s > 0
-    && s.[String.length s - 1] == '"' then
+    if String.length s > 0 && s.[String.length s - 1] == '"' then
       String.length s - 1
     else String.length s
   in
@@ -177,10 +175,12 @@ value extract_multipart boundary str =
   in
   let next_line i =
     let i = skip_nl i in
-    loop "" i where rec loop s i =
+    let rec loop s i =
       if i == String.length str || str.[i] == '\n' || str.[i] == '\r' then
         (s, i)
       else loop (s ^ String.make 1 str.[i]) (i + 1)
+    in
+    loop "" i
   in
   let boundary = "--" ^ boundary in
   let rec loop list i =
@@ -199,10 +199,11 @@ value extract_multipart boundary str =
             let i1 =
               loop i where rec loop i =
                 if i < String.length str then
-                  if i > String.length boundary
-                  && String.sub str (i - String.length boundary)
-                       (String.length boundary) = boundary
-                  then i - String.length boundary
+                  if i > String.length boundary &&
+                     String.sub str (i - String.length boundary)
+                       (String.length boundary) =
+                       boundary then
+                    i - String.length boundary
                   else loop (i + 1)
                 else i
             in
@@ -215,8 +216,7 @@ value extract_multipart boundary str =
             let var = strip_quotes var in
             let (s, i) = next_line i in
             if s = "" then
-              let (s, i) = next_line i in
-              loop [(var, s, True) :: list] i
+              let (s, i) = next_line i in loop [(var, s, True) :: list] i
             else loop list i
         | _ -> loop list i ]
       else if s = boundary ^ "--" then list
@@ -227,8 +227,7 @@ value extract_multipart boundary str =
     List.fold_left
       (fun (str, env, sep) (v, x, b) ->
          let (str, sep) =
-           if b then (str ^ sep ^ v ^ "=" ^ x, ";")
-           else (str, sep)
+           if b then (str ^ sep ^ v ^ "=" ^ x, ";") else (str, sep)
          in
          (str, [(v, x) :: env], sep))
       ("", [], "") env
@@ -239,8 +238,6 @@ value extract_multipart boundary str =
 value make content_type str =
   if is_multipart_form content_type then
     let boundary = extract_boundary content_type in
-    let (str, env) = extract_multipart boundary str in
-    (str, env)
-  else
-    (str, create_env str)
+    let (str, env) = extract_multipart boundary str in (str, env)
+  else (str, create_env str)
 ;
