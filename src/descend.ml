@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.35 2005-02-14 18:19:23 ddr Exp $ *)
+(* $Id: descend.ml,v 4.36 2005-02-15 01:32:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -293,8 +293,7 @@ value
     always_surname x =
   let ix = x.cle_index in
   let ux = uget conf base ix in
-  do {
-    html_li conf;
+  tag "li" begin
     stag "strong" begin
       if not always_surname && named_like_father conf base ix then
         Wserver.wprint "%s"
@@ -330,8 +329,8 @@ value
       else ();
       loop (succ level) x ux
     }
-    else Wserver.wprint "\n"
-  }
+    else Wserver.wprint "\n";
+  end
 ;
 
 value display_descendants_upto conf base max_level p line =
@@ -373,7 +372,8 @@ value display_descendants_upto conf base max_level p line =
                  Wserver.wprint ", <em>%s</em>"
                    (transl conf "having as children")
                else Wserver.wprint ".";
-               html_br conf
+               Wserver.wprint "\n";
+               if level = 1 then Wserver.wprint "</p>\n" else ();
              }
              else ();
              if children <> [] then do {
@@ -404,29 +404,29 @@ value display_descendants_upto conf base max_level p line =
         (capitale
            (transl_nth conf "male line/female line"
               (if line = Male then 0 else 1)));
-    tag "p" begin
-      stag "strong" begin
-        Wserver.wprint "\n%s" (referenced_person_text conf base p);
-      end;
-      if authorized_age conf base p then Date.print_dates conf base p else ();
-      let occu = sou base p.occupation in
-      if authorized_age conf base p && occu <> "" then
-        Wserver.wprint ", %s" occu
-      else ();
-      Wserver.wprint ".";
-      html_br conf;
-      loop 1 p (uget conf base p.cle_index);
-      if count.val > 1 then do {
-        html_p conf;
+    Wserver.wprint "<p>\n";
+    stag "strong" begin
+      Wserver.wprint "\n%s" (referenced_person_text conf base p);
+    end;
+    if authorized_age conf base p then Date.print_dates conf base p else ();
+    let occu = sou base p.occupation in
+    if authorized_age conf base p && occu <> "" then
+      Wserver.wprint ", %s" occu
+    else ();
+    Wserver.wprint ".\n";
+    xtag "br";
+    loop 1 p (uget conf base p.cle_index);
+    if count.val > 1 then do {
+      tag "p" begin
         Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) count.val
           (nominative (transl_nth_def conf "person/persons" 2 1));
         if max_level > 1 then
           Wserver.wprint " (%s)" (transl conf "spouses not included")
         else ();
-        Wserver.wprint ".\n"
-      }
-      else ();
-    end;
+        Wserver.wprint ".\n";
+      end
+    }
+    else ();
     trailer conf
   }
 ;
