@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.65 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: relation.ml,v 4.66 2005-03-12 20:23:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -479,14 +479,14 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
       let excl_faml = Array.to_list u.family @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
-    Wserver.wprint "<p>\n";
     let hts =
       html_table_of_relation_path_dag conf base elem_txt vbar_txt path
     in
     Dag.print_html_table conf hts;
-    Wserver.wprint "<p>\n";
-    Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
-      (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml])
+    tag "p" begin
+      Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
+        (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml]);
+    end
   }
 ;
 

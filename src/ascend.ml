@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.54 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.55 2005-03-12 20:23:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1849,7 +1849,8 @@ value print_tree_with_table conf base gv p =
         stag "td" "%s" (align po) begin
           let txt =
             match po with
-            [ Cell _ Right _ _ | Cell _ Center _ _ -> "<hr>"
+            [ Cell _ Right _ _ | Cell _ Center _ _ ->
+               sprintf "<hr%s>" conf.xhs
             | _ -> "&nbsp;" ]
           in
           Wserver.wprint "%s" txt;
@@ -1861,9 +1862,15 @@ value print_tree_with_table conf base gv p =
         let txt =
           match po with
           [ Empty -> "&nbsp;"
-          | Cell _ (Left | Right) _ _ -> "<hr style=\"width:50%\" dir=\"ltr\">"
+          | Cell _ Left _ _ ->
+              sprintf "<hr style=\"width:50%%;margin-%s:auto\"%s>" conf.left
+                conf.xhs
+          | Cell _ Right _ _ ->
+              sprintf "<hr style=\"width:50%%;margin-%s:auto\"%s>" conf.right
+                conf.xhs
           | Cell _ Alone _ _ -> "|"
-          | Cell _ Center _ _ -> "<hr noshade size=\"1\">" ]
+          | Cell _ Center _ _ ->
+              sprintf "<hr noshade size=\"1\"%s>" conf.xhs ]
         in
         Wserver.wprint "%s" txt;
       end;
