@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.27 2004-12-31 10:22:42 ddr Exp $ *)
+(* $Id: date.ml,v 4.28 2005-01-02 10:37:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -475,105 +475,98 @@ value julian_month_name = gregorian_month_name;
 value french_month_name conf n = capitale (nominative (french_month conf n));
 value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 
-value print_year date var =
+value print_year conf date var =
   do {
-    stag "td" begin
-      Wserver.wprint "<input type=\"submit\" name=\"y%s1\" value=\" &lt; \">" var;
+    stagn "td" begin
+      xtag "input" "type=\"submit\" name=\"y%s1\" value=\" &lt; \"" var;
     end;
-    Wserver.wprint "\n";
-    stag "td" begin
-      Wserver.wprint "<input name=\"y%s\" size=\"5\" maxlength=\"5\" value=\"%d\">" var
+    stagn "td" begin
+      xtag "input" "name=\"y%s\" size=\"5\" maxlength=\"5\" value=\"%d\"" var
         date.year;
     end;
-    Wserver.wprint "\n";
-    stag "td" begin
-      Wserver.wprint "<input type=\"submit\" name=\"y%s2\" value=\" &gt; \">" var;
+    stagn "td" begin
+      xtag "input" "type=\"submit\" name=\"y%s2\" value=\" &gt; \"" var;
     end;
-    Wserver.wprint "\n";
   }
 ;
 
 value print_month conf date month_name n_months var =
   do {
-    stag "td" begin
-      Wserver.wprint "<input type=\"submit\" name=\"m%s1\" value=\" &lt; \">" var;
+    stagn "td" begin
+      xtag "input" "type=\"submit\" name=\"m%s1\" value=\" &lt; \"" var;
     end;
-    Wserver.wprint "\n";
     tag "td" "align=\"center\"" begin
       tag "select" "name=\"m%s\"" var begin
         for i = 1 to n_months do {
-          Wserver.wprint "<option value=%d%s> %s\n" i
-            (if date.month = i then " selected" else "")
-            (month_name conf (i - 1))
+          stagn "option" "value=\"%d\"%s" i
+            (if date.month = i then " selected=\"selected\"" else "")
+          begin
+            Wserver.wprint "%s" (month_name conf (i - 1));
+          end
         };
       end;
     end;
-    stag "td" begin
-      Wserver.wprint "<input type=submit name=m%s2 value=\" &gt; \">" var;
+    stagn "td" begin
+      xtag "input" "type=\"submit\" name=\"m%s2\" value=\" &gt; \"" var;
     end;
-    Wserver.wprint "\n";
   }
 ;
 
-value print_day date var =
+value print_day conf date var =
   do {
-    stag "td" begin
-      Wserver.wprint "<input type=submit name=d%s1 value=\" &lt; \">" var;
+    stagn "td" begin
+      xtag "input" "type=\"submit\" name=\"d%s1\" value=\" &lt; \"" var;
     end;
-    Wserver.wprint "\n";
-    stag "td" begin
-      Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>" var
+    stagn "td" begin
+      xtag "input" "name=\"d%s\" size=\"2\" maxlength=\"2\" value=\"%d\"" var
         date.day;
     end;
-    Wserver.wprint "\n";
-    stag "td" begin
-      Wserver.wprint "<input type=submit name=d%s2 value=\" &gt; \">" var;
+    stagn "td" begin
+      xtag "input" "type=\"submit\" name=\"d%s2\" value=\" &gt; \"" var;
     end;
-    Wserver.wprint "\n";
   }
 ;
 
 value print_some_calendar conf order date n month_name n_months var =
   do {
     Wserver.wprint "\n";
-    tag "tr" "align=left" begin
+    tag "tr" "align=\"left\"" begin
       stag "th" begin
         Wserver.wprint "%s"
           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
       end;
       Wserver.wprint "\n";
       if order = "ddmmyy" then do {
-        print_day date var;
+        print_day conf date var;
         print_month conf date month_name n_months var;
-        print_year date var;
+        print_year conf date var;
       }
       else do {
-        print_year date var;
+        print_year conf date var;
         print_month conf date month_name n_months var;
-        print_day date var;
+        print_day conf date var;
       };
-      stag "td" begin
-        Wserver.wprint "<input type=submit name=t%s value=\" = \">" var;
+      stagn "td" begin
+        xtag "input" "type=\"submit\" name=\"t%s\" value=\" = \"" var;
       end;
-      Wserver.wprint "\n";
     end;
   }
 ;
 
 value print_calendar_head conf order =
-  tag "tr" "align=left" begin
+  tag "tr" "align=\"left\"" begin
     stag "td" begin Wserver.wprint "&nbsp;"; end;
     Wserver.wprint "\n";
     if order = "ddmmyy" then
       for i = 2 downto 0 do {
-        stag "th" "align=center colspan=3" begin
+        stag "th" "align=\"center\" colspan=\"3\"" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end;
         Wserver.wprint "\n";
       }
     else
       for i = 0 to 2 do {
-        stag "th" "align=center" begin
+        stag "th" "align=\"center\"" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end;
         Wserver.wprint "\n";
@@ -657,7 +650,7 @@ value print_calendar conf base =
     tag "table" begin
       stag "tbody" begin
         stag "tr" begin
-          tag "td" "align=left" begin
+          tag "td" "align=\"left\"" begin
             Wserver.wprint "- %s -"
               (capitale (nominative (transl_nth conf "(week day)" wday)));
             if date = conf.today then
@@ -668,20 +661,21 @@ value print_calendar conf base =
           end;
         end;
         stag "tr" begin
-          stag "td" "align=left" begin
+          stag "td" "align=\"left\"" begin
             Wserver.wprint "&nbsp;";
           end;
         end;
         stag "tr" begin
-          tag "td" "align=center" begin
+          tag "td" "align=\"center\"" begin
             tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-              html_p conf;
-              List.iter
-                (fun (k, v) ->
-                   Wserver.wprint "<input type=hidden name=%s value=%s>\n" k
-                     (quote_escaped (decode_varenv v)))
-                conf.henv;
-              Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
+              tag "p" begin
+                List.iter
+                  (fun (k, v) ->
+                     xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" k
+                       (quote_escaped (decode_varenv v)))
+                  conf.henv;
+                xtag "input" "type=\"hidden\" name=\"m\" value=\"CAL\"";
+              end;
               let order = transl conf " !dates order" in
               tag "table" "border=\"1\"" begin
                 print_calendar_head conf order;
