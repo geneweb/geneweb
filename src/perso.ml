@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.20 2001-11-05 13:55:17 ddr Exp $ *)
+(* $Id: perso.ml,v 4.21 2001-11-06 12:03:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1184,8 +1184,9 @@ value eval_bool_value conf base env =
     | Evar s sl ->
         try
           match eval_variable conf base env [s :: sl] with
-          [ VVsome (env, ep, efam, s) when s <> "" ->
-              try_eval_gen_variable conf base env ep s
+          [ VVsome (env, ((p, _, _, p_auth) as ep), efam, s) ->
+              if s <> "" then try_eval_gen_variable conf base env ep s
+              else simple_person_text conf base p p_auth
           | VVcvar s -> eval_base_env_variable conf s
           | _ -> raise Not_found ]
         with

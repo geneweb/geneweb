@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.10 2001-11-05 13:55:16 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.11 2001-11-06 12:03:21 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -792,7 +792,7 @@ value gwtp_receive str env b tok =
 ;
 
 value acceptable_tags =
-  ["!--"; "a"; "br"; "em"; "font"; "hr"; "i"; "img"; "li"; "ol"; "p";
+  ["!--"; "a"; "b"; "br"; "em"; "font"; "hr"; "i"; "img"; "li"; "ol"; "p";
    "table"; "td"; "tr"; "ul"]
 ;
 
