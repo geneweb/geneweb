@@ -2,11 +2,23 @@
 <HTML><HEAD><TITLE>GeneWeb - Komma igång</TITLE>
 <META content="text/html; charset=windows-1252" http-equiv=Content-Type>
 <META content="MSHTML 5.00.2014.210" name=GENERATOR>
-<!-- $Id: start.htm,v 3.2 1999-11-02 10:32:50 ddr Exp $ -->
+<!-- $Id: start.htm,v 3.3 1999-11-02 18:59:33 ddr Exp $ -->
 </HEAD>
-<BODY>
-<H1>GeneWeb - Komma igång</H1>
-<P>Denna sida innehåller en introduktion till <EM>GeneWeb</EM> med en 
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Komma igång</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
+<P>Denna sida innehåller en introduktion till <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> med en 
 kortfattad beskrivning av kommandon och filer som behövs för att starta. </P>
 <UL>
   <LI><A 
@@ -22,11 +34,11 @@ kortfattad beskrivning av kommandon och filer som behövs för att starta. </P>
   <LI><A href="#Lng">Katalogen "lang" - underkataloger</A> </LI></UL>
 
 <H4><A name=Int>Introduktion</A> </H4>
-<P>För att konfigurera och starta <EM>GeneWeb</EM>, måste du använda ett DOS 
+<P>För att konfigurera och starta <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, måste du använda ett DOS 
 fönster. Under Unix, starta ett xterm. Under Windows 95/98/NT, klicka på 
 "Start", "Programs" och "Command Prompt". </P>
 <P>I detta fönster, skriv in kommandot för att gå till den katalog där du 
-installerade <EM>GeneWeb</EM>: </P>
+installerade <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>: </P>
 <UL>
   <LI>Under Unix, om du har installerat det till exempel i 
   "/home/svensson/geneweb": </LI></UL><PRE>     	cd /home/svensson/geneweb
@@ -36,7 +48,7 @@ installerade <EM>GeneWeb</EM>: </P>
   </LI></UL><PRE>     	cd c:\program\geneweb
 </PRE>Gå sedan till underkatalogen gw, genoim att skriva: <PRE>     	cd gw
 </PRE>
-<P>Alla <EM>GeneWeb</EM> kommandon kan startas med optionen -help som visar 
+<P>Alla <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> kommandon kan startas med optionen -help som visar 
 olika möjliga optioner, med en kort förklaring.
 <P>
 
@@ -85,20 +97,20 @@ genom att avsluta kommandot med "&gt;&nbsp;fil". Exempel: </P><PRE>     gwd -hel
 
 <P>
 
-För att använda <EM>GeneWeb</EM>, måste du skapa en databas. Du kan göra det 
+För att använda <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, måste du skapa en databas. Du kan göra det 
 antingen med kommandot "gwc", eller med "ged2gwb", (se nedan). </P>
 <P>Kommandot "gwc", i dess enklaste utförande, skapar en tom databas i 
-<EM>GeneWeb</EM>, som du kan fylla. </P>
+<FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, som du kan fylla. </P>
 <P>Du måste ge ett namn till din databas. Använd helst inte mer än 8 tecken. 
 </P>
 <P>Till exempel, om du vill kalla den "svensson", skriv: </P><PRE>     gwc -o svensson</PRE>
 <H4><A name=Ged>Kommandot ged2gwb</A> </H4>
-<P>Ett annat sätt att skapa en <EM>GeneWeb</EM> databas är att starta från en 
+<P>Ett annat sätt att skapa en <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> databas är att starta från en 
 GEDCOM-fil. </P>
 <P>Kommandot "ged2gwb" låter dig konvertera en GEDCOM-fil till en 
-<EM>GeneWeb</EM> databas. </P>
+<FONT COLOR=#2f6400><B>GeneWeb</B></FONT> databas. </P>
 <P>Det enklaste sättet är att först kopiera din GEDCOM-fil till katalogen där du 
-installerade <EM>GeneWeb</EM>. Gör det på vanligt vis, antingen i ett DOS 
+installerade <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>. Gör det på vanligt vis, antingen i ett DOS 
 fönster eller genom att flytta ikoner. </P>
 <P>Om din GEDCOM-fil har namn, till exempel, "foo.ged" och du vill skapa en 
 databas benämnd "svensson", skriv: </P><PRE>     ged2gwb foo.ged -o svensson</PRE>
@@ -107,12 +119,12 @@ GEDCOM-filen. Ignorera dessa fel till att börja med: din databas kommer att
 skapas ändå. Om allt är Ok, ska kommandot avslutas med: </P><PRE>     *** Ok</PRE>
 <H4>K<A name=Gee>ommandot gwb2ged</A> </H4>
 <P>Innan vi fortsätter, låt oss notera att med det omvända kommandot, "gwb2ged", 
-kan man återuppbygga en GEDCOM-fil från en <EM>GeneWeb</EM> bas. </P>
+kan man återuppbygga en GEDCOM-fil från en <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> bas. </P>
 <H4><A name=Gwd>Kommandot gwd</A> </H4>
 <P>När du har skapat en databas, med en av kommandona "gwc" eller "ged2gwb", kan 
 du konsultera och utöka den. </P>
 <P>Alltid i DOS fönstret, skriv: </P><PRE>     gwd</PRE>
-<P>Kommandot startar <EM>GeneWeb</EM> "demonen". Kommandot måste visa:
+<P>Kommandot startar <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> "demonen". Kommandot måste visa:
 </P>
 <PRE>
      GeneWeb (version) - Copyright (c) INRIA 1999
@@ -127,14 +139,14 @@ du konsultera och utöka den. </P>
 <P>Notera att du inte ser prompten i DOS fönstret. Detta program väntar på 
 förfrågningar som du kommer att sända till den från din webbläsare. När den tar 
 emot en förfrågan behandlas den och sedan väntar programmet igen. När du är klar 
-med att använda <EM>GeneWeb</EM>, kan du stoppa den genom att trycka "Control-C" 
+med att använda <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, kan du stoppa den genom att trycka "Control-C" 
 i DOS fönstret. </P>
 <P>Nu kan du verkligen starta. Eftersom du tittar på denna dokumentation, 
 använder du en webbläsare. Starta ett nytt fönster i denna webbläsare och öppna 
 den följande adressen. Byt ut "svensson" mot namnet för din databas. Varning: 
 skriv inte in det kompletta namnet (som "c:\program\geneweb\svensson" eller 
 "/home/geneweb/svensson"), bara "svensson". </P><PRE>     http://localhost:2317/svensson</PRE>
-<P>Du ska nu se <EM>GeneWeb</EM>s välkomstsida på franska. </P>
+<P>Du ska nu se <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>s välkomstsida på franska. </P>
 <P>[Om det inte fungerar, klicka <A 
 href="problem.htm">här</A>] </P>
 <P>Välj ett annat språk (t ex engelska), på flaggorna högst upp på sidan. (Det 
@@ -201,7 +213,7 @@ olikheter genom att använda ett program för att jämföra textfiler. Detta är
 speciellt intressant om någon har gjort modifieringar i din databas och du vill 
 veta vem. </P>
 <P>Det finns också en metod för att återskapa din databas när du använder en 
-annan version av <EM>GeneWeb</EM>, i det fallet den inre representationen av 
+annan version av <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, i det fallet den inre representationen av 
 databasen har ändrats. </P>
 <P>För att återskapa din databas, måste du använda kommandot "gwc". Den lagrade 
 filen måste ha filändelsen ".gw". För att skapa en databas benämnd "svensson" 

@@ -1,10 +1,22 @@
 <HEAD><TITLE>GeneWeb - Modifiering av sidor</TITLE>
-<!-- $Id: pcustom.htm,v 3.2 1999-11-02 10:32:48 ddr Exp $ -->
+<!-- $Id: pcustom.htm,v 3.3 1999-11-02 18:59:31 ddr Exp $ -->
 </HEAD>
-<BODY>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Modifiering av sidor</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-<H1>GeneWeb - Modifiering av sidor</H1>
-<P>Denna sida beskriver hur man modifierar v&auml;lkomstsidan och g&ouml;ra associerade sidor. Det &auml;r skrivet f&ouml;r personer som redan har anv&auml;nt <EM>GeneWeb</EM> och som vill g&aring; in p&aring; detaljer. </P>
+<P>Denna sida beskriver hur man modifierar v&auml;lkomstsidan och g&ouml;ra associerade sidor. Det &auml;r skrivet f&ouml;r personer som redan har anv&auml;nt <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> och som vill g&aring; in p&aring; detaljer. </P>
 
 <UL>
 <LI><A HREF="#Wel">V&auml;lkomstsidan</A> </LI>
@@ -12,9 +24,9 @@
 <LI><A HREF="#Ass">Associerade sidor</A> </LI></UL>
 
 <H4><A NAME="Wel">V&auml;lkomstsidan</A></H4>
-<P>V&auml;lkomstsidan &auml;r uppbyggd fr&aring;n en textfil, "start.txt" som ing&aring;r i <EM>GeneWeb</EM>. Det &auml;r m&ouml;jligt att modifiera denna fil och/eller g&ouml;ra en speciell version f&ouml;r en databas. </P>
+<P>V&auml;lkomstsidan &auml;r uppbyggd fr&aring;n en textfil, "start.txt" som ing&aring;r i <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>. Det &auml;r m&ouml;jligt att modifiera denna fil och/eller g&ouml;ra en speciell version f&ouml;r en databas. </P>
 <P>Denna fil inneh&aring;ller HTML kod mixat med "makros" (se n&auml;sta del). Om du vill skapa eller &auml;ndra en s&aring;dan fil, anv&auml;nd inte en HTML editor, utan en normal texteditor. </P>
-<P>F&ouml;r att skapa v&auml;lkomstsidan f&ouml;r databasen "foo", kommer <EM>GeneWeb</EM> att leta efter f&ouml;ljande filer, i denna ordning: </P>
+<P>F&ouml;r att skapa v&auml;lkomstsidan f&ouml;r databasen "foo", kommer <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> att leta efter f&ouml;ljande filer, i denna ordning: </P>
 
 <UL>
 <LI>bdir/lang/lg/foo.txt </LI>
@@ -34,7 +46,7 @@
 <LI>"lg" = nuvarande spr&aring;k. </LI></UL>
 
 <P>Filen "hdir/lang/lg/start.txt" ing&aring;r. F&ouml;r att skapa den modifierade filen, &auml;r det enklast att starta fr&aring;n en kopia av filen "start.txt" som du sedan kan &auml;ndra som du vill. Om presentationen av filen "start.txt" inte passar dig kan du ocks&aring; &auml;ndra den direkt. </P>
-<P>En varning: fr&aring;n en version av <EM>GeneWeb</EM> till n&auml;sta kan filen "start.txt" ha f&ouml;rb&auml;ttrats. Om du installerar en ny version och vill dra nytta av f&ouml;rb&auml;ttringarna, titta i filen "start.txt" f&ouml;r att se var den har &auml;ndrats och kopiera in dessa &auml;ndringar i din modifierade fil. </P>
+<P>En varning: fr&aring;n en version av <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> till n&auml;sta kan filen "start.txt" ha f&ouml;rb&auml;ttrats. Om du installerar en ny version och vill dra nytta av f&ouml;rb&auml;ttringarna, titta i filen "start.txt" f&ouml;r att se var den har &auml;ndrats och kopiera in dessa &auml;ndringar i din modifierade fil. </P>
 
 <H4>Makro<A NAME="Mac">s</A></H4>
 <P>Som sades tidigare, v&auml;lkomstsidan &auml;r inte i ren HTML kod. Den inneh&aring;ller "makros". Det &auml;r sekvenser som b&ouml;rjar med ett tecken "%" f&ouml;ljt av en bokstav. Exempel: "%s", "%x", etc. </P>
@@ -144,7 +156,7 @@ size=+1><tt>%I&amp;NwNf...%E</tt></font>
 
 <P>Det <STRONG>konditionella</STRONG> kan inte &ouml;verlappa: man kan inte s&auml;tta en "<TT>%w... %w</TT>" inuti en "<TT>%i... %i</TT>". </P>
 <H4><A NAME="Ass">Associerade sidor</A></H4>
-<P>P&aring; din anpassade v&auml;lkomstsida kan du s&auml;tta in l&auml;nkar till associerade filer som kommer att behandlas av <EM>GeneWeb</EM> p&aring; samma s&auml;tt: makrona kommer att bli transformerade. </P>
+<P>P&aring; din anpassade v&auml;lkomstsida kan du s&auml;tta in l&auml;nkar till associerade filer som kommer att behandlas av <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> p&aring; samma s&auml;tt: makrona kommer att bli transformerade. </P>
 <P>Till exempel, om du vill skapa en speciell sida f&ouml;r en k&auml;nd person fr&aring;n din databas, skapa en fil ben&auml;mnd "famous.txt" i katalogen "bdir/lang/lg" eller i katalogen "bdir/lang" (se f&ouml;rsta delen). </P>
 <P>F&ouml;rfr&aring;gningarna till "famous.txt" &auml;r: "m=H;v=famous". P&aring; v&auml;lkomstsidan, skriver du: </P>
 <PRE>
@@ -163,7 +175,7 @@ size=+1><tt>%I&amp;NwNf...%E</tt></font>
    Ludvig XIV&lt;/a&gt; och min
    &lt;a href="%em=R;ep=bertil;en=svensson;m=NG;n=louis+xiv;t=PN"&gt;
    sl&auml;ktskapsl&auml;nk&lt;/a&gt; med honom.</PRE>
-<P>Se ocks&aring; hur du g&ouml;r korrekta <A HREF="links.htm">l&auml;nkar</A> till <EM>GeneWeb</EM> sidor. </P>
+<P>Se ocks&aring; hur du g&ouml;r korrekta <A HREF="links.htm">l&auml;nkar</A> till <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> sidor. </P>
 <P>Notera att "avancerad s&ouml;kning" fungerar som en associerad fil ben&auml;mnd "advanced.txt". </P>
 <P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
 
