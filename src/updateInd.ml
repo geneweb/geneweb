@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.12 1999-07-26 07:02:00 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.13 1999-07-28 09:02:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -450,11 +450,11 @@ value print_add_relation conf base cnt =
   return ()
 ;
 
-value print_relation_type conf base r cnt =
+value print_relation_type conf base r var =
   tag "table" "border=1" begin
     tag "tr" begin
       tag "td" begin
-        tag "select" "name=r_type%d" cnt begin
+        tag "select" "name=%s_type" var begin
           Wserver.wprint "<option value=Undef%s> -\n"
             (match r with
              [ Some {r_fath = None; r_moth = None} -> " selected"
@@ -465,7 +465,8 @@ value print_relation_type conf base r cnt =
              [ Some {r_fath = None; r_moth = None} -> ""
              | Some {r_type = Adoption} -> " selected"
              | _ -> "" ]);
-          Wserver.wprint "%s\n" (capitale (relation_type_text conf Adoption 2));
+          Wserver.wprint "%s\n"
+            (capitale (relation_type_text conf Adoption 2));
           Wserver.wprint "<option value=Recognition%s>"
             (match r with
              [ Some {r_type = Recognition} -> " selected" | _ -> "" ]);
@@ -477,15 +478,17 @@ value print_relation_type conf base r cnt =
           Wserver.wprint "%s\n"
             (capitale (relation_type_text conf CandidateParent 2));
           Wserver.wprint "<option value=GodParent%s>"
-            (match r with [ Some {r_type = GodParent} -> " selected" | _ -> "" ]);
-          Wserver.wprint "%s\n" (capitale (relation_type_text conf GodParent 2));
+            (match r with
+             [ Some {r_type = GodParent} -> " selected" | _ -> "" ]);
+          Wserver.wprint "%s\n"
+            (capitale (relation_type_text conf GodParent 2));
         end;
       end;
     end;
   end
 ;
 
-value print_linked_person conf base r proj var cnt =
+value print_linked_person conf base r proj var =
   let (fn, sn, occ) =
     match r with
     [ Some r -> match proj r with [ Some x -> x | None -> ("", "", 0) ]
@@ -499,15 +502,15 @@ value print_linked_person conf base r proj var cnt =
       end;
       tag "td" begin
         Wserver.wprint
-          "<input name=\"%s_fn%d\" size=30 maxlength=200 value=\"%s\">"
-          var cnt (quote_escaped fn);
+          "<input name=\"%s_fn\" size=30 maxlength=200 value=\"%s\">"
+          var (quote_escaped fn);
       end;
       tag "td" begin
         let s = capitale (transl conf "number") in
         Wserver.wprint "%s" s;
       end;
       tag "td" begin
-        Wserver.wprint "<input name=%s_occ%d size=5 maxlength=8" var cnt;
+        Wserver.wprint "<input name=%s_occ size=5 maxlength=8" var;
         if occ <> 0 then Wserver.wprint " value=%d" occ else ();
         Wserver.wprint ">";
       end;
@@ -520,17 +523,18 @@ value print_linked_person conf base r proj var cnt =
       end;
       tag "td" "colspan=3" begin
         Wserver.wprint
-          "<input name=\"%s_sn%d\" size=40 maxlength=200 value=\"%s\">"
-          var cnt (quote_escaped sn);
+          "<input name=\"%s_sn\" size=40 maxlength=200 value=\"%s\">"
+          var (quote_escaped sn);
       end;
     end;
   end
 ;
 
 value print_relation conf base r cnt =
-  do print_relation_type conf base r cnt;
-     print_linked_person conf base r (fun r -> r.r_fath) "r_fath" cnt;
-     print_linked_person conf base r (fun r -> r.r_moth) "r_moth" cnt;
+  let rcnt = "r" ^ string_of_int cnt in
+  do print_relation_type conf base r rcnt;
+     print_linked_person conf base r (fun r -> r.r_fath) (rcnt ^ "_fath");
+     print_linked_person conf base r (fun r -> r.r_moth) (rcnt ^ "_moth");
      html_p conf;
      print_add_relation conf base cnt;
   return ()
