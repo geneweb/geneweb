@@ -5,6 +5,9 @@ GeneWeb Version 4.05
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [24 Feb 02] Added <table><tr><td nowrap> in display by surname, to
+    avoid that the lines be folded. Replaced the <nobr> I had suppressed
+    some time ago because it was not standard.
   - [26 Jan 02] The "calendars" page shows the time (of the server machine).
   - [20 Jan 02] Use of dates order (according to the language) in calendars
     page.
