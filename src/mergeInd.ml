@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.18 2002-03-11 17:56:58 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.19 2002-04-06 09:09:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -309,17 +309,29 @@ value effective_merge_ind conf base p1 p2 =
     if p1.birth_place = Adef.istr_of_int 0 then
       p1.birth_place := p2.birth_place
     else ();
+    if p1.birth_src = Adef.istr_of_int 0 then
+      p1.birth_src := p2.birth_src
+    else ();
     if p1.baptism = Adef.codate_None then p1.baptism := p2.baptism else ();
     if p1.baptism_place = Adef.istr_of_int 0 then
       p1.baptism_place := p2.baptism_place
+    else ();
+    if p1.baptism_src = Adef.istr_of_int 0 then
+      p1.baptism_src := p2.baptism_src
     else ();
     if p1.death = DontKnowIfDead then p1.death := p2.death else ();
     if p1.death_place = Adef.istr_of_int 0 then
       p1.death_place := p2.death_place
     else ();
+    if p1.death_src = Adef.istr_of_int 0 then
+      p1.death_src := p2.death_src
+    else ();
     if p1.burial = UnknownBurial then p1.burial := p2.burial else ();
     if p1.burial_place = Adef.istr_of_int 0 then
       p1.burial_place := p2.burial_place
+    else ();
+    if p1.burial_src = Adef.istr_of_int 0 then
+      p1.burial_src := p2.burial_src
     else ();
     if p1.notes = Adef.istr_of_int 0 then p1.notes := p2.notes else ();
     UpdateIndOk.effective_del conf base p2;
