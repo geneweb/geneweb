@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.7 1998-12-19 12:36:04 roglo Exp $ *)
+(* $Id: cousins.ml,v 1.8 1999-01-11 14:35:55 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -166,7 +166,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
                       else
                         do Wserver.wprint "%s %s "
                              (capitale (transl_nth conf "child/children" 1))
-                             (transl_nth conf "of" 0);
+                             (transl_concat conf "of" "");
                            afficher_personne_titre conf base p;
                            Wserver.wprint ":";
                         return ();

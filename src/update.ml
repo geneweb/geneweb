@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.10 1998-12-16 17:36:43 ddr Exp $ *)
+(* $Id: update.ml,v 1.11 1999-01-11 14:35:59 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -176,7 +176,7 @@ value print_warning conf base =
       let moth = poi base cpl.mother in
       do Wserver.wprint "%s\n"
            (capitale (transl conf "changed order of children"));
-         Wserver.wprint "%s\n" (transl_nth conf "of" 0);
+         Wserver.wprint "%s\n" (transl_concat conf "of" "");
          print_someone_ref conf base fath;
          Wserver.wprint "\n%s\n" (transl conf "and");
          print_someone_ref conf base moth;
@@ -498,7 +498,8 @@ value print_family_stuff conf base p a =
                           (commd conf) (Adef.int_of_ifam prev_fi)
                           (Adef.int_of_ifam fi)
                         begin
-                          Wserver.wprint "%s" (capitale (transl conf "merge"));
+                          Wserver.wprint "%s"
+                            (capitale (transl_concat conf "merge" ""));
                         end;
                         Wserver.wprint "\n";
                      return ()
@@ -510,17 +511,17 @@ value print_family_stuff conf base p a =
          do Wserver.wprint "\n<li>\n";
             Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d\">" (commd conf)
               (Adef.int_of_ifam fi);
-            Wserver.wprint "%s / %s</a>\n"
-              (capitale (transl conf "modify"))
-              (capitale (transl_nth conf "family/families" 0));
+            let s = transl_nth conf "family/families" 0 in
+            Wserver.wprint "%s</a>\n"
+              (capitale (transl_concat conf "modify" s));
             Wserver.wprint "\n<em>%s</em>\n" (transl conf "with");
             print_someone conf base (poi base c);
             Wserver.wprint "\n<li>\n";
             Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d\">" (commd conf)
               (Adef.int_of_ifam fi);
-            Wserver.wprint "%s / %s</a>\n"
-              (capitale (transl conf "delete"))
-              (capitale (transl_nth conf "family/families" 0));
+            let s = transl_nth conf "family/families" 0 in
+            Wserver.wprint "%s</a>\n"
+              (capitale (transl_concat conf "delete" s));
             Wserver.wprint "\n<em>%s</em>\n" (transl conf "with");
             print_someone conf base (poi base c);
          return Some fi)
@@ -529,11 +530,11 @@ value print_family_stuff conf base p a =
     if (sou base p.first_name = "?" || sou base p.surname = "?")
     && (Array.length p.family <> 0 || a.parents <> None) then ()
     else
+      let s = transl_nth conf "family/families" 0 in
       do Wserver.wprint "\n<li>\n";
-         Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s / %s</a>\n"
+         Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a>\n"
            (commd conf) (Adef.int_of_iper p.cle_index)
-           (capitale (transl conf "add"))
-           (capitale (transl_nth conf "family/families" 0));
+           (capitale (transl_concat conf "add" s));
       return ();
   end
 ;
@@ -560,11 +561,11 @@ value print conf base p =
      Wserver.wprint "\n<li>\n";
      Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>\n" (commd conf)
        (Adef.int_of_iper p.cle_index)
-       (capitale (transl conf "modify"));
+       (capitale (transl_concat conf "modify" ""));
      Wserver.wprint "\n<li>\n";
      Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>\n"
        (commd conf) (Adef.int_of_iper p.cle_index)
-       (capitale (transl conf "delete"));
+       (capitale (transl_concat conf "delete" ""));
      Wserver.wprint "</ul>\n";
      Wserver.wprint "\n";
      print_family_stuff conf base p a;
@@ -575,10 +576,10 @@ value print conf base p =
          else
            do Wserver.wprint "<ul>";
               Wserver.wprint "\n<li>\n";
-              Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s / %s</a>\n"
+              let s = transl conf "parents" in              
+              Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a>\n"
                 (commd conf) (Adef.int_of_iper p.cle_index)
-                (capitale (transl conf "add"))
-                (capitale (transl conf "parents"));
+                (capitale (transl_concat conf "add" s));
               Wserver.wprint "</ul>\n";
            return () ];
      Wserver.wprint "\n";
@@ -588,7 +589,7 @@ value print conf base p =
        stag "a" "href=\"%sm=MRG;i=%d\"" (commd conf)
          (Adef.int_of_iper p.cle_index)
        begin
-         Wserver.wprint "%s" (capitale (transl conf "merge"));
+         Wserver.wprint "%s" (capitale (transl_concat conf "merge" ""));
        end;
      end;
      trailer conf;

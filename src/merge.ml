@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 1.2 1998-09-30 14:04:42 ddr Exp $ *)
+(* $Id: merge.ml,v 1.3 1999-01-11 14:35:55 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -14,7 +14,7 @@ value print_someone conf base p =
 
 value print conf base p =
   let title h =
-    do Wserver.wprint "%s" (capitale (transl conf "merge"));
+    do Wserver.wprint "%s" (capitale (transl_concat conf "merge" ""));
        if h then ()
        else do Wserver.wprint ": "; print_someone conf base p; return ();
     return ()

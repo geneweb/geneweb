@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 1.4 1998-12-16 17:36:34 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 1.5 1999-01-11 14:35:56 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -39,8 +39,8 @@ value reconstitute conf base fam1 fam2 =
 
 value print_merge1 conf base fam fam2 digest =
   let title _ =
-    Wserver.wprint "%s / %s # %d" (capitale (transl conf "merge"))
-      (capitale (transl_nth conf "family/families" 1))
+    let s = transl_nth conf "family/families" 1 in
+    Wserver.wprint "%s # %d" (capitale (transl_concat conf "merge" s))
       (Adef.int_of_ifam fam.fam_index)
   in
   let cpl =

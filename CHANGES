@@ -1,6 +1,17 @@
 GeneWeb Version 1.11
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [11/01/99] Display accusative form (for some languages). E.g.:
+      * in German: "x ist ein Sohn von einem Cousin von y"
+	  ("einem" instead of the inkorrect "ein").
+      * in Esperanto: "aldoni personon"
+          ("personon" instead of the incorrect "persono")
+
+* Lexicon file (lexicon.txt)
+  - [11/01/99] Added accusative forms.
+  - [11/01/99] Fixed typo in German version (Markus Mottl).
+
 * Documentation
 --- [11/01/99] Started Swedish version (Lars Gustavsson).
 

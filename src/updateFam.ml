@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.9 1998-12-16 17:36:44 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.10 1999-01-11 14:36:00 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -172,9 +172,9 @@ value print_add_child conf base cnt =
     tag "tr" begin
       let var = "add_child" ^ string_of_int cnt in
       tag "td" begin
-        Wserver.wprint "%s / %s <input type=checkbox name=%s>"
-          (capitale (transl conf "insert"))
-          (capitale (transl_nth conf "child/children" 0))
+        let s = transl_nth conf "child/children" 0 in
+        Wserver.wprint "%s <input type=checkbox name=%s>"
+          (capitale (transl_concat conf "insert" s))
           var;
       end;
     end;
@@ -290,12 +290,12 @@ value print_mod1 conf base fam cpl digest =
   let title _ =
     match p_getenv conf.env "m" with
     [ Some "MRG_MOD_FAM_OK" ->
-        Wserver.wprint "%s / %s # %d" (capitale (transl conf "merge"))
-          (capitale (transl_nth conf "family/families" 1))
+        let s = transl_nth conf "family/families" 1 in
+        Wserver.wprint "%s # %d" (capitale (transl_concat conf "merge" s))
           (Adef.int_of_ifam fam.fam_index)
     | _ ->
-        Wserver.wprint "%s / %s # %d" (capitale (transl conf "modify"))
-          (capitale (transl_nth conf "family/families" 0))
+        let s = transl_nth conf "family/families" 0 in
+        Wserver.wprint "%s # %d" (capitale (transl_concat conf "modify" s))
           (Adef.int_of_ifam fam.fam_index) ]
   in
   do header conf title;
@@ -319,8 +319,8 @@ value print_mod1 conf base fam cpl digest =
 
 value print_del1 conf base fam =
   let title _ =
-    Wserver.wprint "%s / %s" (capitale (transl conf "delete"))
-      (capitale (transl_nth conf "family/families" 0))
+    let s = transl_nth conf "family/families" 0 in
+    Wserver.wprint "%s" (capitale (transl_concat conf "delete" s))
   in
   do header conf title;
      Wserver.wprint "\n";
@@ -376,8 +376,8 @@ value print_swi1 conf base p fam1 fam2 =
 
 value print_add1 conf base fam cpl force_children_surnames =
   let title _ =
-    Wserver.wprint "%s / %s" (capitale (transl conf "add"))
-      (capitale (transl_nth conf "family/families" 0))
+    let s = transl_nth conf "family/families" 0 in
+    Wserver.wprint "%s" (capitale (transl_concat conf "add" s))
   in
   do header conf title;
      Wserver.wprint "\n";

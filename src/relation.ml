@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.14 1999-01-08 17:04:13 ddr Exp $ *)
+(* $Id: relation.ml,v 1.15 1999-01-11 14:35:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -167,7 +167,7 @@ value print_link conf base n p1 p2 x1 x2 =
           Wserver.wprint " %s"
             (transl_concat conf "of" (brother_label conf x2 Masculine));
        return ();
-     Wserver.wprint "</strong>\n%s " (transl_nth conf "of" 0);
+     Wserver.wprint "</strong>\n%s " (transl_concat conf "of" "");
      afficher_personne_sans_titre conf base p2;
      afficher_titre conf base p2;
      Wserver.wprint ".\n";
@@ -253,11 +253,11 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
     | _ -> parents_label conf x ]
   in
   do Wserver.wprint "<ul>\n";
-     Wserver.wprint "<li> %s %s\n" (lab x1) (transl_nth conf "of" 0);
+     Wserver.wprint "<li> %s %s\n" (lab x1) (transl_concat conf "of" "");
      afficher_personne_sans_titre conf base p1;
      afficher_titre conf base p1;
      Wserver.wprint "\n";
-     Wserver.wprint "<li> %s %s\n" (lab x2) (transl_nth conf "of" 0);
+     Wserver.wprint "<li> %s %s\n" (lab x2) (transl_concat conf "of" "");
      afficher_personne_sans_titre conf base p2;
      afficher_titre conf base p2;
      Wserver.wprint "\n";
@@ -282,7 +282,7 @@ value print_propose_upto conf base p1 p2 rl =
       let (p, a) = if x1 == 0 then (p2, p1) else (p1, p2) in
       do Wserver.wprint "<p>\n<font size=-1><em>%s %s</em>\n"
            (capitale (transl conf "ancestors"))
-           (transl_nth conf "of" 0);
+           (transl_concat conf "of" "");
          afficher_personne_titre conf base p;
          Wserver.wprint " <em>%s</em>\n" (transl conf "up to");
          afficher_personne_titre conf base a;
