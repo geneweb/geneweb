@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.7 1998-09-29 16:12:18 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.8 1998-10-16 11:56:17 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -627,7 +627,8 @@ value main () =
               try max_clients.val := Some (int_of_string x) with _ ->
                 raise (Arg.Bad "number expected after -max_clients")),
          "<num>
-       Max number of clients treated at the same time (default 4) (not cgi).");
+       Max number of clients treated at the same time (default: no limit)
+       (not cgi).");
         ("-robot_xcl", Arg.String robot_exclude,
          "<cnt>,<sec>
        Exclude connections when more than <cnt> requests in <sec> seconds.")]

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.7 1998-09-29 16:12:11 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.8 1998-10-16 11:55:40 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -42,7 +42,8 @@ value rec skip_eol =
 value rec get_to_eoln len =
   parser
   [ [: `'\n' | '\r'; _ = skip_eol :] -> get_buff len
-  | [: `c; s :] -> get_to_eoln (store len c) s ]
+  | [: `c; s :] -> get_to_eoln (store len c) s
+  | [: :] -> get_buff len ]
 ;
 
 value rec get_ident len =
