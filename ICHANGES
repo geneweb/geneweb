@@ -5,6 +5,10 @@ GeneWeb Version 3.12
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [20 Feb 01] Added option '-images_dir': works like '-images_url' but
+    the parameter is a directory relative to the current directory, where
+    the images are supposed to be. This has been added to be able to
+    add file:// accesses to images in Windows version.
   - [14 Feb 01] Fixed problem in lexicon: declinations were missing, e.g.
     combinations "merge persons" or "switch families" did not work in
     Esperanto.

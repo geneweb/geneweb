@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.75 2001-01-29 15:33:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.76 2001-02-20 22:26:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1274,6 +1274,21 @@ value robot_exclude_arg s =
       return exit 2 ]
 ;
 
+value slashify s =
+  let s1 = String.copy s in
+  do for i = 0 to String.length s - 1 do
+       s1.[i] :=
+         match s.[i] with
+         [ '\\' -> '/'
+         | x -> x ];
+     done;
+  return s1
+;
+
+value set_image_url_from_dir x =
+  Util.images_url.val := "file://" ^ slashify (Sys.getcwd ()) ^ "/" ^ x
+;
+
 value available_languages =
   ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
    "pt"; "se"]
@@ -1316,6 +1331,9 @@ value main () =
      ("-images_url", Arg.String (fun x -> Util.images_url.val := x),
       "<url>
        URL for GeneWeb images (default: gwd send them)");
+     ("-images_dir", Arg.String set_image_url_from_dir,
+      "<dir>
+       Same than previous but directory name relative to current");
      ("-a", Arg.String (fun x -> selected_addr.val := Some x),
       "<address>
        Select a specific address (default = any address of this computer)");
