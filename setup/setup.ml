@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.8 2001-07-17 09:50:20 ddr Exp $ *)
+(* $Id: setup.ml,v 4.9 2001-07-17 11:07:10 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -280,7 +280,10 @@ value parse_upto lim =
     | [: `c; a = loop (store len c) :] -> a ]
 ;
 
-value is_directory x = (Unix.stat x).Unix.st_kind = Unix.S_DIR;
+value is_directory x =
+  try (Unix.lstat x).Unix.st_kind = Unix.S_DIR with
+  [ Unix.Unix_error _ _ _ -> False ]
+;
 
 value rec copy_from_stream conf print strm =
   try
