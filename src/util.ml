@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.112 2005-02-03 16:19:45 ddr Exp $ *)
+(* $Id: util.ml,v 4.113 2005-02-04 10:33:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2049,16 +2049,18 @@ value has_image conf base p =
 
 value only_printable s =
   let s = strip_spaces s in
-  let s' = String.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
-      s'.[i] :=
-        match s.[i] with
-        [ ' '..'~' | '\160'..'\255' -> s.[i]
-        | _ -> ' ' ]
-    };
-    s'
-  }
+  if Gutil.utf_8_db.val then s
+  else
+    let s' = String.create (String.length s) in
+    do {
+      for i = 0 to String.length s - 1 do {
+        s'.[i] :=
+          match s.[i] with
+          [ ' '..'~' | '\160'..'\255' -> s.[i]
+          | _ -> ' ' ]
+      };
+      s'
+    }
 ;
 
 value relation_type_text conf t n =
