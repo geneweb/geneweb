@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.4 2001-04-05 18:07:42 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.5 2001-04-06 07:24:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -398,7 +398,8 @@ value inline_translate conf base ic =
             else
               let alt_version =
                 if curr_lang = derived_lang then Some s
-                else if alt_version = None then Some ("[" ^ s ^ "]")
+                else if alt_version = None then
+                  let s = if s = "" then s else "[" ^ s ^ "]" in Some s
                 else alt_version
               in
               loop alt_version True i
