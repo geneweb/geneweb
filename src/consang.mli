@@ -1,4 +1,4 @@
-(* $Id: consang.mli,v 3.4 2000-11-22 03:01:03 ddr Exp $ *)
+(* $Id: consang.mli,v 3.5 2000-11-23 18:40:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -17,7 +17,11 @@ type relationship =
     anc_stat2 : mutable anc_stat }
 ;
 
-type relationship_info = { tstab : array int; reltab : array relationship };
+type relationship_info =
+  { tstab : array int;
+    reltab : array relationship;
+    queue : mutable array (list int) }
+;
 
 exception TopologicalSortError of person;
 value topological_sort : base -> array int;
