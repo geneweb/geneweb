@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 4.3 2001-07-11 13:46:08 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.4 2001-11-26 10:40:21 ddr Exp $ *)
 
 open Printf
 
@@ -19,10 +19,10 @@ let rec skip_to_same_line ic line_ref =
   if line = line_ref then ()
   else skip_to_same_line ic line_ref
 
-let rec get_all_versions ic =
+let rec get_all_versions first ic =
   let line = try input_line_cnt ic with End_of_file -> "" in
   if line = "" then []
-  else if String.length line < 3 then begin
+  else if first && String.length line < 3 then begin
     eprintf "small line %d: \"%s\"\n" !linenum (String.escaped line);
     flush stderr;
     []
@@ -31,8 +31,12 @@ let rec get_all_versions ic =
     try
       let i = String.index line ':' in
       let lang = String.sub line 0 i in
+      if first && String.length line > i+1 && line.[i+1] <> ' ' then begin
+        eprintf "space missing after colon in line %d:\n%s\n" !linenum line;
+        flush stderr;
+      end;
       let transl = String.sub line (i + 1) (String.length line - i - 1) in
-      (lang, transl) :: get_all_versions ic
+      (lang, transl) :: get_all_versions first ic
     with Not_found ->
       []
 
@@ -52,7 +56,7 @@ let check first lang =
     while true do
       let line = input_line ic_i18n in
       skip_to_same_line ic_lex ("    " ^ line);
-      let list = get_all_versions ic_lex in
+      let list = get_all_versions first ic_lex in
       if first && Sort.list compare_assoc list <> list then begin
 	eprintf "Misordered for:\n   \"%s\"\n" line;
 	flush stderr;
