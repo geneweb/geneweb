@@ -2,6 +2,8 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [26 Oct 00] In forum, added "<table>..</table>" around messages
+    to prevent unterminated tags to perturbate the other messages.
   - [24 Oct 00] In family updating, when there is a name conflict while
     creating a person, now proposes to try again with the first free number
     Lightly changed the interface for the same situation in person updating.

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.35 2000-10-17 13:21:10 ddr Exp $ *)
+(* $Id: family.ml,v 3.36 2000-10-26 12:12:14 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -527,10 +527,8 @@ value family_m conf base =
       | _ -> inconnu_au_bataillon conf ] ]
 ;
 
-value print_no_index conf base =
-  let scratch s =
-    code_varenv (Name.lower (sou base s))
-  in
+value url_no_index conf base =
+  let scratch s = code_varenv (Name.lower (sou base s)) in
   let get_person v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
@@ -599,33 +597,35 @@ value print_no_index conf base =
     in          
     loop conf.env
   in
-  let link =
-    let addr =
-      let pref =
-        let s = Util.get_request_string conf in
-        match rindex s '?' with
-        [ Some i -> String.sub s 0 i
-        | None -> s ]
-      in
-      Util.get_server_string conf ^ pref
+  let addr =
+    let pref =
+      let s = Util.get_request_string conf in
+      match rindex s '?' with
+      [ Some i -> String.sub s 0 i
+      | None -> s ]
     in
-    let suff =
-      List.fold_right
-        (fun (x, v) s ->
-           let sep = if s = "" then "" else ";" in
-           x ^ "=" ^ v ^ sep ^ s)
-        [("lang", conf.lang) :: env] ""
-    in
-    let suff =
-      if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff
-    in
-    "http://" ^ addr ^ "?" ^ suff
+    Util.get_server_string conf ^ pref
   in
+  let suff =
+    List.fold_right
+      (fun (x, v) s ->
+         let sep = if s = "" then "" else ";" in
+         x ^ "=" ^ v ^ sep ^ s)
+      [("lang", conf.lang) :: env] ""
+  in
+  let suff =
+    if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff
+  in
+  addr ^ "?" ^ suff
+;
+
+value print_no_index conf base =
   let title _ = Wserver.wprint "Link to use" in
+  let link = url_no_index conf base in
   do header conf title;
      tag "ul" begin
        html_li conf;
-       tag "a" "href=\"%s\"" link begin
+       tag "a" "href=\"http://%s\"" link begin
          Wserver.wprint "%s" link;
        end;
      end;
