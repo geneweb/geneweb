@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.9 2001-01-06 09:55:58 ddr Exp $ *)
+(* $Id: some.ml,v 3.10 2001-02-08 23:17:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -356,6 +356,17 @@ value print_by_branch x conf base not_found_fun (ipl, homonymes) =
 ;
 
 value print_family_alphabetic x conf base liste =
+  let homonymes =
+    let list =
+      List.fold_left
+        (fun list p ->
+           if List.memq p.surname list then list
+           else [p.surname :: list])
+        [] liste
+    in
+    let list = List.map (fun s -> sou base s) list in
+    List.sort compare list
+  in
   let liste =
     let l =
       Sort.list
@@ -378,7 +389,17 @@ value print_family_alphabetic x conf base liste =
   match liste with
   [ [] -> surname_not_found conf x
   | _ ->
-      let title _ = Wserver.wprint "%s" x in
+      let title h =
+        let access x =
+          if h || List.length homonymes = 1 then x
+          else
+            geneweb_link conf ("m=N;o=i;v=" ^ code_varenv (Name.lower x)) x
+        in
+        do Wserver.wprint "%s" (access (List.hd homonymes));
+           List.iter (fun x -> Wserver.wprint ", %s" (access x))
+             (List.tl homonymes);
+        return ()
+      in
       do header conf title;
          print_link_to_welcome conf True;
          print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
