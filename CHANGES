@@ -13,6 +13,9 @@ GeneWeb version 4.05
     places/surnames pages, in descendants and in ancestors pages.
 
 * Setup program (gwsetup)
+  - [30 Jan 02] Fixed bug: if the access path to the commands
+    (conversions from and to gedcoms or source files, initialisation of
+    consanguinity) contained spaces, these commands failed.
   - [21 Jan 02] In "parameters of the data base", added the ability
     to configurate other useful variables: history, images_path,
     hide_advanced_request, and so on.
