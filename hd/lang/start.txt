@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.3 2001-03-26 14:14:37 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.4 2001-03-26 16:03:19 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -15,6 +15,10 @@ es: Genealogía
 et: Genealoogia
 fi: Genealogia
 fr: G&eacute;n&eacute;alogie
+he: úåìãåú
+is: Ættfræği
+it: Genealogia
+lv: Genealogy
 se: Genealogi
 ] - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -27,9 +31,9 @@ se: Genealogi
 <tr>
 <td>
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
-height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 </td>
-<td align=left>
+<td align=%L>
 <table><tr><td align=center><h1><font color=%i>[
 af: Genealogiese<br>databasis
 cn: ÍøÂç¼ÒÆ×
@@ -43,10 +47,14 @@ es: Base de datos<br>geneal&oacute;gica
 et: Genealoogiline<br>andmebaas
 fi: Sukutietokanta
 fr: Base de donn&eacute;es<br>g&eacute;n&eacute;alogique
+he: îàâø îéãò <br> úåìãåúé
+is: Ættfræği<br>gagnagrunnur
+it: Base di dati<br>genealogica
+lv: Ciltsrakstu<br>datu bâze
 se: Genealogisk<br>databas
 ]</font></h1></table>
 </td>
-<td align=right valign=top>%w</td>
+<td align=%R valign=top>%w</td>
 </tr>
 </table>
 
@@ -64,6 +72,7 @@ eo: Vi povas elekti alian lingvon inter la sekvantajn:
 et: Võid valida ka mõne muu keele järgnevatest:
 fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
+lv: Jûs variet apskatît datu bâzi arî citâs sekojoğâs valodâs:
 se: Du kan välja ett annat språk bland de följande:
 ]</em></font>
 
@@ -94,6 +103,12 @@ fi: Tietokannassa <font color=%i><b>"%t"</b></font> on nyt %n
     henkil&ouml;&auml.
 fr: La base de donn&eacute;es <font color=%i><b>"%t"</b></font> contient
     actuellement %n personnes.
+he: áîàâø äîéãò <font color=%i><b>"%t"</b></font> éù %n àğùéí.
+is: Gagnagrunnurinn <font color=%i><b>"%t"</b></font> er nú meğ %n
+    einstaklinga skráğa.
+it: La base di dati <font color=%i><b>"%t"</b></font> contiene
+    attualmente %n persone.
+lv: Datu bâze <font color=%i><b>"%t"</b></font> patreiz satur %n personas.
 se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
     %n personer.
 ]%In<br>
@@ -116,6 +131,10 @@ es: <a href="%sw=w">Entrada <em>brujo</em></a><br> (contrase&ntilde;a)
 et: Ligipääs <a href="%sw=w"><em>teadmamehena</em></a><br> (parool)
 fi: <a href="%sw=w"><em>Velho</em></a> kirjautuminen<br> (salasana)
 fr: acc&egrave;s <a href="%sw=w"><em>sorcier</em></a><br> (mot de passe).
+he: ëğéñä  <a href="%sw=w"><em> ëâàåï </em></a>
+is: <a href="%sw=w"><em>Wizard</em></a> ağgangur<br> (ağgangsorğ)
+it: <a href="%sw=w"><em>Wizard</em></a> access<br> (parola d'accesso)
+lv: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
 se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
 
@@ -131,6 +150,10 @@ es: <a href="%sw=f">Entrada <em>amigo</em></a><br> (contrase&ntilde;a)
 et: Ligipääs <a href="%sw=f"><em>sõbrana</em></a><br> (parool)
 fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br> (salasana)
 fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br> (mot de passe).
+he: ëğéñä<a href="%sw=f"><em> îéåçñú </em></a>
+is: <a href="%sw=f"><em>Vina</em></a> ağgangur<br> (ağgangsorğ)
+it: <a href="%sw=f"><em>amiko</em></a> access<br> (parola d'accesso)
+lv: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
 se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
 
@@ -149,6 +172,10 @@ es: Contrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
 et: Parool, <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
 fi: Salasana <em>Valittu</em> tai <em>Velho</em> kirjautumiseen:
 fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>sorcier</em>:
+he: ñéñîä ìëğéñä <em> îéåçñú  </em> àå <em>ëâàåï</em>
+is: Ağgangsorğ, fyrir <em>vin</em> eğa <em>wizard</em> ağgang:
+it: Parola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:
+lv: Password, for <em>friend</em> or <em>wizard</em> access:
 se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
     tilltr&auml;de:
 ]
@@ -178,6 +205,10 @@ et: Navigeeri andmebaasis:
 fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
 fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
        votre recherche:
+he: ğååè áîàâø îéãä òì-éãé çéôåñ:
+is: Í şessum gagnagrunni getur şú leitağ:
+it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
+lv: Jûs variet meklçt ğinî datu bâzç:
 se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 ]<br><p>
 
@@ -200,6 +231,10 @@ es: por persona
 et: isik
 fi: henkil&ouml;n mukaan
 fr: par personne
+he: ìôé ùí àå æäåú
+is: eftir nafni
+it: per persona
+lv: personas
 se: efter person
 ]</b></font>
 <input name=n size=40 maxlength=200>
@@ -234,6 +269,10 @@ es: por t&iacute;tulo
 et: tiitel
 fi: arvonimen mukaan
 fr: par titre
+he: ìôé úàø
+is: eftir titli
+it: per titolo
+lv: tituls
 se: efter titel
 ]</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
@@ -264,6 +303,10 @@ es: <font color=%i><b>por la lista</b></font> de todos los
 et: <font color=%i><b>loendis</b></font> kõik
 fi: <font color=%i><b>listasta</b></font> kaikki
 fr: <font color=%i><b>par la liste</b></font> de tous les
+he: <font color=%i><b>øùéîä</b></font> ùì ëì ùîåú
+is: <font color=%i><b>eftir lista</b></font> yfir öll
+it: <font color=%i><b>per la lista</b></font> di tutti i
+lv: <font color=%i><b>visus</b></font>
 se: <font color=%i><b>efter listan</b></font> av alla
 ]
 <select name=m>
@@ -280,6 +323,10 @@ es: apellidos
 et: perekonnanimed
 fi: sukunimet
 fr: patronymes
+he:   äîùôçä
+is: eftirnöfn
+it: cognomi
+lv: uzvârdus
 se: efternamn
 ]
 <option value="P">[
@@ -295,6 +342,10 @@ es: nombres
 et: eesnimed
 fi: etunimet
 fr: pr&eacute;noms
+he:   äôøèééí
+is: fornöfn
+it: nomi
+lv: vârdus
 se: f&ouml;rnamn
 ]
 </select>
@@ -311,6 +362,10 @@ es: por
 et: järjestatud
 fi: lajiteltuina
 fr: par
+he: ìôé
+is: eftir
+it: in ordine
+lv:
 se: sorterade i
 ]
 <select name=tri>
@@ -327,6 +382,10 @@ es: orden alfab&eacute;tico
 et: tähestiku
 fi: aakkosj&auml;rjestykseen
 fr: ordre alphab&eacute;tique
+he:  ñãø äàìó-áéú
+is: stafrófsröğ
+it: alfabetico
+lv: alfabçtiskâ kârtîbâ
 se: bokstavsordning
 ]
 <option value="F">[
@@ -342,6 +401,10 @@ es: frecuencia
 et: sageduse
 fi: m&auml;&auml;r&auml;j&auml;rjestykseen
 fr: fr&eacute;quence
+he:  äùëéçåú
+is: tíğni
+it: di frequenza
+lv: pçc sastopamîbas
 se: frekvensordning
 ]
 </select>
@@ -368,6 +431,9 @@ es: por
 et:
 fi:
 fr: par
+is: eftir
+it: per
+lv:
 se: efter
 ] [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
@@ -410,6 +476,18 @@ fi: <a href="%sm=H;v=advanced"><font color=%i><b>erityishaulla</b></font></a>.
 fr: <font color=%i><b> par la</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>requ&ecirc;te
         &eacute;volu&eacute;e</b></font></a>.
+he: <font color=%i><b>ò"é </b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>
+       á÷ùä îú÷ãîú</b></font></a>.
+is: <font color=%i><b>eftir </b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>frekari
+       óskum</b></font></a>.
+it: <font color=%i><b>per la</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>richiesta
+       avanzata</b></font></a>.
+lv: <font color=%i><b>meklçt pçc</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>citiem
+       parametriem</b></font></a>.
 se: <font color=%i><b>genom</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
        s&ouml;kning</b></font></a>.
@@ -432,6 +510,10 @@ es: Puede
 et: Täiendamine:
 fi: Taikka
 fr: Vous pouvez
+he:  éù àôùøåú 
+is: Şú getur
+it: Si pu&ograve;
+lv: Izmaiòu veikğana:
 se: Du kan
 ]<br><p>
 
@@ -452,6 +534,10 @@ es: agregar una familia
 et: lisa pere
 fi: lis&auml;&auml; perhe
 fr: ajouter une famille
+he:  ìäåñéó îùôçä
+is: bætt viğ fjölskyldu
+it: aggiungere una famiglia
+lv: pievienot ìimeni
 se: l&auml;gga till en familj
 ]</a>
 %INl</ul>
@@ -470,6 +556,10 @@ es: modificar las notas
 et: muuda märkusi andmebaasi kohta
 fi: muokkaa lis&auml;tietoja
 fr: modifier les notes
+he:  ìòãëï àú ääòøåú
+is: breytt athugasemdum
+it: modificare le note
+lv: labot piezîmes
 se: &auml;ndra noteringar
 ]</a>
 </ul>
@@ -493,6 +583,10 @@ es: Puede consultar
 et: Vaata lisaks:
 fi: Voit my&ouml;s katsoa
 fr: Vous pouvez également consulter
+he: àôùø âí ìäøàåú
+is: Şú getur einnig athugağ
+it: Si pu&ograve; anche consultare
+lv: Informâcija par:
 se: Du kan ocks&aring; konsultera
 ]<br><p>
 
@@ -536,6 +630,11 @@ et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda,
 fi: T&auml;h&auml;n menness&auml %q tapahtumaa, joista %c t&auml;lle
     sivulle %d j&auml;lkeen.
 fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
+he: äéå %q ëğéñåú, ëåìì %c ëğéñåú ìòîåã æä, îàæ %d.
+is: Şağ hafa veriğ %q heimsóknir, %c af şeim á şessa síğu, síğan %d.
+it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
+lv: Kopğ %D datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuği ğinî
+    lappusç. 
 se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 ]
@@ -573,6 +672,10 @@ fr: Si votre navigateur ne met pas &agrave; jour automatiquement les pages
     modifi&eacute;es (vous obligeant &agrave; faire "actualiser la page"),
     essayez la navigation &agrave; partir de <a href="%sescache=0">ce
     lien</a>.
+lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
+    veiktajâm izmaiòâm (tâdçjâdi radot Jums nepiecieğamîbu "pârlâdçt
+    tekoğo dokumentu"), tad pamçìiniet uzklikğíinât <a
+    href="%sescache=0">ğeit</a>.
 se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%sescache=0">härifrån</a>.
@@ -584,7 +687,6 @@ se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 <br>
 
 <p align=right><font size=-1><em><a href="%sm=LEX">[
-af: lexicon
 cn: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
 cs: lexikon
 ct: L&egrave;xic
@@ -592,10 +694,9 @@ de: Lexikon
 dk: leksikon
 en: lexicon
 eo: leksikono
-es: lexicon
-et: lexicon
 fi: Sanasto
 fr: lexique
+he: ì÷ñé÷åï 
 se: lexikon
 ]</a></em></font></p>
 
