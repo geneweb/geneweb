@@ -6,7 +6,6 @@
 </head>
 <body%b>
 
-<div dir=rtl lang=iw> 
 <h1>תולדות</h1>
 
 %rversion

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.24 1999-01-19 08:35:15 ddr Exp $ *)
+(* $Id: util.ml,v 1.25 1999-01-28 14:53:11 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -507,9 +507,15 @@ value header_no_page_title conf title =
      title True;
      Wserver.wprint "</title>\n";
      Wserver.wprint "</head>\n";
-     Wserver.wprint "<body%s>\n"
-       (try " " ^ List.assoc "body_prop" conf.base_env with
-        [ Not_found -> "" ]);
+     let s =
+       try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+       [ Not_found -> "" ]
+     in
+     let s =
+       try s ^ " " ^ List.assoc "body_prop" conf.base_env with
+       [ Not_found -> s ]
+     in
+     Wserver.wprint "<body%s>\n" s;
   return ()
 ;
 
