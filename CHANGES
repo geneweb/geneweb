@@ -1,9 +1,12 @@
 GeneWeb version 3.12
 --------------------
 
-* Installation<
-  - [20 Fev 01] Added an "installer" for the Windows version (therefore
-    an installation normally easier).
+* Installation
+  - [23 Fev 01] Windows version: added an "installer" (therefore
+    an installation normally easier). The data bases are put in
+    a directory different from the program, therefore not deleted when
+    the program is uninstalled, and can be directly usable if another
+    version is installed.
 
 * Languages
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
