@@ -162,10 +162,10 @@ phonygwd.cmo: argl.cmo ../wserver/wserver.cmi
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
-relation.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi num.cmi \
-    relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
-relation.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx num.cmx \
-    relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
+relation.cmo: adef.cmi config.cmi consang.cmi date.cmi def.cmi gutil.cmi \
+    num.cmi relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
+relation.cmx: adef.cmx config.cmi consang.cmx date.cmx def.cmi gutil.cmx \
+    num.cmx relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     pqueue.cmi util.cmi ../wserver/wserver.cmi 
 relationLink.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
@@ -218,10 +218,12 @@ updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     lock.cmx name.cmx update.cmx updateInd.cmx util.cmx \
     ../wserver/wserver.cmx updateIndOk.cmi 
-util.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi iobase.cmi \
-    lock.cmo name.cmi num.cmi version.cmo ../wserver/wserver.cmi util.cmi 
-util.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx iobase.cmx \
-    lock.cmx name.cmx num.cmx version.cmx ../wserver/wserver.cmx util.cmi 
+util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
+    iobase.cmi lock.cmo name.cmi num.cmi version.cmo ../wserver/wserver.cmi \
+    util.cmi 
+util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx \
+    iobase.cmx lock.cmx name.cmx num.cmx version.cmx ../wserver/wserver.cmx \
+    util.cmi 
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
 alln.cmo alln.cmx: pa_html.cmo
 ascend.cmo ascend.cmx: def.syn.cmo pa_html.cmo
