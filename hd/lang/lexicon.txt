@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.73 2000-03-10 11:08:45 ddr Exp $
+# $Id: lexicon.txt,v 3.74 2000-03-12 20:23:43 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3078,6 +3078,10 @@ no: hovedtitel
 pt: t&iacute;tulo principal
 ru: главный заголовок
 se: huvudtitel
+
+    male line/female line
+en: male line/female line
+fr: ligne agnatique/ligne cognatique
 
     marriage of %t after his/her death
 cs: sтatek s %t po svй smrti

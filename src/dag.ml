@@ -1,9 +1,10 @@
-(* $Id: dag.ml,v 3.17 2000-01-09 07:35:45 ddr Exp $ *)
+(* $Id: dag.ml,v 3.18 2000-03-12 20:23:44 ddr Exp $ *)
 
 open Dag2html;
 open Def;
 open Config;
 open Gutil;
+open Util;
 open Printf;
 
 module Pset = Set.Make (struct type t = iper; value compare = compare; end);
@@ -106,6 +107,50 @@ do List.iter (fun id -> let p = poi base nodes.(int_of_idag id) in Printf.eprint
   {dag = nodes}
 ;
 
+value print_image_normal conf base p fname width height =
+  let image_txt = capitale (transl_nth conf "image/images" 0) in
+  let s = Unix.stat fname in
+  let b = acces conf base p in
+  let k = default_image_name base p in
+  do Wserver.wprint "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k;
+     Wserver.wprint "\
+<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
+        (commd conf)
+        (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+        b k width height image_txt;
+     Wserver.wprint "</a>\n";
+  return ()
+;
+
+value print_image_url conf base url height =
+  let image_txt = capitale (transl_nth conf "image/images" 0) in
+  do Wserver.wprint "<a href=\"%s\">" url;
+     Wserver.wprint "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url
+        height image_txt;
+     Wserver.wprint "</a>\n";
+  return ()
+;
+
+value print_image conf base p =
+  match p_getenv conf.env "image" with
+  [ Some "on" ->
+      match image_and_size conf base p (limited_image_size 100 75) with
+      [ Some (f, Some (wid, hei)) ->
+          do Wserver.wprint "<br>\n";
+             Wserver.wprint "<center><table border=0><tr><td>\n";
+             print_image_normal conf base p f wid hei;
+             Wserver.wprint "</table></center>\n";
+          return ()
+      | Some (url, None) ->
+          do Wserver.wprint "<br>\n";
+             Wserver.wprint "<center><table border=0><tr><td>\n";
+             print_image_url conf base url 75;
+             Wserver.wprint "</table></center>\n";
+          return ()
+      | _ -> () ]
+  | _ -> () ]
+;
+
 (* main *)
 
 value print_only_dag conf base spouse_on invert set spl d =
@@ -157,6 +202,7 @@ value print_only_dag conf base spouse_on invert set spl d =
                      Wserver.wprint "%s" (Date.short_dates_text conf base ps);
                   return ())
              spouses;
+           print_image conf base p;
         return ()
     | Right _ -> Wserver.wprint "&nbsp;" ]
   in
