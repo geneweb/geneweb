@@ -61,10 +61,10 @@ dag.cmo: buff.cmo config.cmi dag2html.cmi date.cmi def.cmi gutil.cmi num.cmi \
     util.cmi ../wserver/wserver.cmi dag.cmi 
 dag.cmx: buff.cmx config.cmi dag2html.cmx date.cmx def.cmi gutil.cmx num.cmx \
     util.cmx ../wserver/wserver.cmx dag.cmi 
-date.cmo: adef.cmi calendar.cmo config.cmi def.cmi gutil.cmi num.cmi util.cmi \
-    ../wserver/wserver.cmi date.cmi 
-date.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx num.cmx util.cmx \
-    ../wserver/wserver.cmx date.cmi 
+date.cmo: adef.cmi buff.cmo calendar.cmo config.cmi def.cmi gutil.cmi num.cmi \
+    util.cmi ../wserver/wserver.cmi date.cmi 
+date.cmx: adef.cmx buff.cmx calendar.cmx config.cmi def.cmi gutil.cmx num.cmx \
+    util.cmx ../wserver/wserver.cmx date.cmi 
 descend.cmo: adef.cmi config.cmi dag.cmi dag2html.cmi date.cmi def.cmi \
     gutil.cmi perso.cmi util.cmi ../wserver/wserver.cmi 
 descend.cmx: adef.cmx config.cmi dag.cmx dag2html.cmx date.cmx def.cmi \
