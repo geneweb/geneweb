@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.1 2001-03-18 18:11:20 ddr Exp $
+# $Id: a.gwf,v 4.2 2001-05-05 10:44:17 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -46,7 +46,6 @@ wizard_passwd=
 
 # Alternative way for wizard entry: authorization file.
 # The file must hold lines of the form "user:password".
-# Works only in server (not cgi) mode.
 wizard_passwd_file=
 
 # Wizard loosing his powers, becoming just a "friend"
