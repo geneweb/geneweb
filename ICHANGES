@@ -100,6 +100,10 @@ GeneWeb Version 4.10
     correctly and the button "OK" resulted in bad request.
   - [30 Jan 03] Added option -min_disp_req
 
+* GeneWeb compiler (gwc)
+  - [05 Aug 04] Save memory in creating database by saving "persons"
+    data in files.
+
 * GeneWeb uncompiler (gwu)
   - [04 May 04] Fixed small bug displaying in reverse order isolated
     persons with relations, resulting no fixpoint when doing gwc/gwu.

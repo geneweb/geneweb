@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.23 2004-07-16 16:17:55 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.24 2004-08-05 14:01:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1234,7 +1234,9 @@ value main () =
     let _ = base.data.ascends.array () in
     let _ = base.data.strings.array () in
     if not mem.val then
+(*
       let _ = base.data.persons.array () in
+*)
       let _ = base.data.families.array () in
       let _ = base.data.couples.array () in
       let _ = base.data.unions.array () in
