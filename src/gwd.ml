@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.54 2003-01-05 17:42:17 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.55 2003-01-08 12:48:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1395,7 +1395,7 @@ value read_input len =
 ;
 
 value arg_parse_in_file fname speclist anonfun errmsg =
-  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let list =
         let list = ref [] in
