@@ -1,7 +1,7 @@
 <head><title>Gwtp - upload %b</title></head>
 <body>
 <h1 align=center>Gwtp - upload %b</h1>
-<form method=POST action=gwtp enctype="multipart/form-data">
+<form method=POST action="%s" enctype="multipart/form-data">
 <input type=hidden name=m value=SEND>
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>

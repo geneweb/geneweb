@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.37 2000-08-18 18:40:07 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.38 2000-08-22 12:09:32 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -7,6 +7,15 @@ value gwtp_tmp = ref (Filename.concat ".." "gwtp_tmp");
 value gwtp_dst = ref (Filename.concat ".." "gwtp_dst");
 value gw_site = ref "";
 value token_tmout = ref 900.0;
+
+value filename_basename str =
+  loop (String.length str - 1) where rec loop i =
+    if i < 0 then str
+    else
+      match str.[i] with
+      [ 'A'..'Z' | 'a'..'z' | '-' | '~' | '.' -> loop (i - 1)
+      | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
+;
 
 (* Get CGI contents *)
 
@@ -29,6 +38,11 @@ value read_input len =
 value cgi_content_type () =
   try Sys.getenv "CONTENT_TYPE" with
   [ Not_found -> "" ]
+;
+
+value cgi_script_name () =
+  try filename_basename (Sys.getenv "SCRIPT_NAME") with
+  [ Not_found -> "gwtp" ]
 ;
 
 value cgi_content () =
@@ -109,15 +123,6 @@ value quote_escaped s =
 value log_open () = 
   let fname = Filename.concat gwtp_tmp.val "gwtp.log" in
   open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname
-;
-
-value filename_basename str =
-  loop (String.length str - 1) where rec loop i =
-    if i < 0 then str
-    else
-      match str.[i] with
-      [ 'A'..'Z' | 'a'..'z' | '-' | '~' | '.' -> loop (i - 1)
-      | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
 ;
 
 value copy_template env fname =
@@ -423,8 +428,8 @@ value copy_temp b =
 
 value printf_link_to_main b tok =
   do printf "<p><hr><div align=right>\n";
-     printf "<a href=\"gwtp?m=MAIN;b=%s;t=%s\">main page</a></div>\n"
-       b tok;
+     printf "<a href=\"%s?m=MAIN;b=%s;t=%s\">main page</a></div>\n"
+       (cgi_script_name ()) b tok;
   return ()
 ;
 
@@ -507,7 +512,7 @@ value gwtp_setconf str env b tok =
 
 value gwtp_upload str env b tok =
   do printf "content-type: text/html"; crlf (); crlf ();
-     copy_template [('b', b); ('t', tok)] "send";
+     copy_template [('s', cgi_script_name ()); ('b', b); ('t', tok)] "send";
      printf_link_to_main b tok;
      printf "</body>\n";
   return ()
@@ -527,8 +532,8 @@ value gwtp_download str env b tok =
               if st.Unix.st_kind == Unix.S_REG
               && f.[String.length f - 1] <> '~' then
                 do printf "<li><tt>";
-                   printf "<a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
-                     b tok f f;
+                   printf "<a href=\"%s?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
+                     (cgi_script_name ()) b tok f f;
                    let sz = string_of_int st.Unix.st_size in
                    printf "%t%s bytes"
                      (fun oc ->
@@ -558,8 +563,8 @@ value gwtp_config str env b tok =
   let (wizpw, fripw) = get_base_conf b in
   do printf "content-type: text/html"; crlf (); crlf ();
      copy_template
-       [('b', b); ('t', tok); ('w', quote_escaped wizpw);
-        ('f', quote_escaped fripw)]
+       [('s', cgi_script_name ()); ('b', b); ('t', tok);
+        ('w', quote_escaped wizpw); ('f', quote_escaped fripw)]
        "conf";
      printf_link_to_main b tok;
      printf "</body>\n";
@@ -567,14 +572,17 @@ value gwtp_config str env b tok =
 ;
 
 value gwtp_main str env b tok =
+  let gwtp_comm = cgi_script_name () in
   do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Gwtp - %s</title></head>\n<body>
 <h1 align=center>Gwtp - %s</h1>
 <ul>\n" b b;
-     printf "<li><a href=\"gwtp?m=UPL;b=%s;t=%s\">Upload</a>\n" b tok;
-     printf "<li><a href=\"gwtp?m=DNL;b=%s;t=%s\">Download</a>\n" b tok;
-     printf "<li><a href=\"gwtp?m=CNF;b=%s;t=%s\">Configuration</a>\n" b tok;
+     printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">Upload</a>\n" gwtp_comm b tok;
+     printf "<li><a href=\"%s?m=DNL;b=%s;t=%s\">Download</a>\n" gwtp_comm b
+       tok;
+     printf "<li><a href=\"%s?m=CNF;b=%s;t=%s\">Configuration</a>\n" gwtp_comm
+       b tok;
      printf "</ul>\n";
      if gw_site.val <> "" then
        do printf "<p>\n<ul>\n";
@@ -591,14 +599,14 @@ value gwtp_login str env =
      printf "\
 <head><title>Gwtp</title></head>\n<body>
 <h1>Gwtp</h1>
-<form method=POST action=gwtp>
+<form method=POST action=%s>
 <input type=hidden name=m value=LOGIN>
 Data base: <input name=b><br>
 Password: <input name=p type=password><br>
 <input type=submit value=Login>
 </form>
 </body>
-";
+" (cgi_script_name ());
   return ()
 ;
 
@@ -644,7 +652,7 @@ value log oc_log str =
   do fprintf oc_log "%4d-%02d-%02d %02d:%02d:%02d"
        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
-     fprintf oc_log " gwtp?%s\n" str;
+     fprintf oc_log " %s?%s\n" (cgi_script_name ()) str;
      if from <> "" then fprintf oc_log "  From: %s\n" from else ();
      if user_agent <> "" then
        fprintf oc_log "  Agent: %s\n" user_agent

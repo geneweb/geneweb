@@ -1,6 +1,11 @@
 GeneWeb version 3.08
 --------------------
 
+* GeneWeb Transfer Program (gwtp)
+  - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
+    be gwtp.cgi, for example). Fixed also the distribution: template files
+    used by gwtp (3 files ending with .txt) were not installed.
+
 * Documentation:
   - [21 Aug 00] Added an entry in the FAQ about people having "?" (question
     mark) as first name and/or surname.
