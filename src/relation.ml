@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.45 2000-06-20 21:19:58 ddr Exp $ *)
+(* $Id: relation.ml,v 3.46 2000-06-21 21:13:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -394,6 +394,8 @@ value print_relation_path_table conf base path =
 
 open Dag2html;
 
+value special_henv = ["dsrc"; "escache"];
+
 value print_relation_path_dag conf base path excl_faml =
   let (nl, _) =
     List.fold_left
@@ -485,7 +487,11 @@ return ();
      Dag.print_only_dag conf base spouse_on invert set [] d;
      Wserver.wprint "<p>\n";
      Wserver.wprint "<a href=\"%s" (commd conf);
-     List.iter (fun (v, k) -> Wserver.wprint "%s=%s;" v k) conf.env;
+     List.iter
+       (fun (k, v) ->
+          if List.mem k special_henv then ()
+          else Wserver.wprint "%s=%s;" k v)
+       conf.env;
      Wserver.wprint "ef%d=%d\">&gt;&gt</a>\n"
        (List.length excl_faml - 1) (Adef.int_of_ifam (List.hd excl_faml));
   return ()

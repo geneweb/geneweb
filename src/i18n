@@ -1,3 +1,4 @@
+ !languages
  to see the first branch
  to see the first relationship link
  to try again with this number, or do "back" and change it yourself
@@ -101,6 +102,7 @@ cousins
 cousins (general term)
 create
 cremated
+data base forum
 date
 days old
 death
@@ -132,7 +134,6 @@ first name missing
 first name not found
 first name/first names
 for the first names by alphabetic order
-forum
 foster father/foster mother/foster parents
 foster son/foster daughter/foster child
 generation/generations
@@ -276,6 +277,7 @@ switch done
 switch the order of the following families
 text
 the %d first names
+the %d oldest perhaps still alive
 the %d surnames
 the %s generation
 the anniversary

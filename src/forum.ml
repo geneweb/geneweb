@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.5 2000-06-03 21:08:03 ddr Exp $ *)
+(* $Id: forum.ml,v 3.6 2000-06-21 21:13:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -66,7 +66,9 @@ value print_forum conf base =
 ;
 
 value print conf base =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "forum")) in
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "data base forum"))
+  in
   do header conf title;
      print_link_to_welcome conf True;
      tag "form" "method=get action=\"%s\"" conf.command begin
@@ -183,7 +185,7 @@ value print_add_ok conf base =
          header conf title;
          print_link_to_welcome conf True;
          Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n"
-           (commd conf) (capitale (transl conf "forum"));
+           (commd conf) (capitale (transl conf "data base forum"));
          trailer conf;
       return ()
     with

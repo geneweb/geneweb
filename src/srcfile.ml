@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.21 2000-06-20 13:47:25 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.22 2000-06-21 21:13:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -147,18 +147,71 @@ value extract_date d =
   [ Stdpp.Exc_located _ (Stream.Error _ | Token.Error _) -> None ]
 ;
 
-value print_date conf =
+value string_of_date conf =
   let r = count conf in
   match extract_date r.start_date with
   [ Some (d, m, y) ->
       let d =
         Dgreg {day = d; month = m; year = y; prec = Sure; delta = 0} Dgregorian
       in
-      Wserver.wprint "%s" (Date.string_of_date conf d)
-  | _ -> Wserver.wprint "%s" r.start_date ]
+      Date.string_of_date conf d
+  | _ -> r.start_date ]
 ;
 
-value rec src_translate conf nom ic =
+value string_of_num sep num =
+  let len = ref 0 in
+  do Num.print (fun x -> len.val := Buff.mstore len.val x) sep num; return
+  Buff.get len.val
+;
+
+value macro conf base =
+  fun
+  [ 'a' ->
+      match Util.find_person_in_env conf base "z" with
+      [ Some ip -> referenced_person_title_text conf base ip
+      | None -> "" ]
+  | 'b' ->
+      let s =
+        try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+        [ Not_found -> "" ]
+      in
+      s ^ " " ^ body_prop conf
+  | 'c' ->
+      let r = count conf in
+      string_of_num (transl conf "(thousand separator)")
+        (Num.of_int r.welcome_cnt)
+  | 'd' -> string_of_date conf
+  | 'e' -> conf.charset
+  | 'f' -> conf.command
+  | 'g' ->
+      conf.command ^ "?" ^ (if conf.cgi then "b=" ^ conf.bname ^ ";" else "")
+  | 'i' -> conf.highlight
+  | 'k' -> conf.indep_command
+  | 'l' -> conf.lang
+  | 'm' ->
+      try
+        let s = List.assoc "latest_event" conf.base_env in
+        if s = "" then "20" else s
+      with
+      [ Not_found -> "20" ]
+  | 'n' ->
+      string_of_num (transl conf "(thousand separator)")
+        (Num.of_int base.data.persons.len)
+  | 'o' -> image_prefix conf
+  | 'q' ->
+      let r = count conf in
+      string_of_num (transl conf "(thousand separator)")
+        (Num.of_int (r.welcome_cnt + r.request_cnt))
+  | 's' -> commd conf
+  | 't' -> conf.bname
+  | 'v' -> Version.txt
+  | 'w' ->
+      let s = Util.link_to_referer conf in
+      if s = "" then "&nbsp;" else s
+  | c -> "%" ^ String.make 1 c ]
+;
+
+value rec src_translate conf base nom ic =
   let (upp, s) =
     loop 0 (input_char ic) where rec loop len c =
       if c = ']' then
@@ -174,10 +227,29 @@ value rec src_translate conf nom ic =
     | c -> (0, String.make 1 c) ]
   in
   let r =
-    if c = "[" then Util.transl_decline conf s (src_translate conf False ic)
+    if c = "[" then
+      Util.transl_decline conf s (src_translate conf base False ic)
     else
       let r = Util.transl_nth conf s n in
-      (if nom then Gutil.nominative r else r) ^ c
+      match Gutil.lindex r '%' with
+      [ Some i when r.[i+1] == 'd' && c = "(" ->
+          let sa =
+            loop 0 where rec loop len =
+              let c = input_char ic in
+              if c == ')' then Buff.get len
+              else
+                let len =
+                  if c == '%' then
+                    let c = input_char ic in
+                    Buff.mstore len (macro conf base c)
+                  else Buff.store len c
+                in
+                loop len
+          in
+          String.sub r 0 i ^ sa ^
+          String.sub r (i + 2) (String.length r - i - 2)
+      | _ ->
+          (if nom then Gutil.nominative r else r) ^ c ]
   in
   if upp then capitale r else r
 ;
@@ -239,7 +311,7 @@ value rec copy_from_channel conf base ic =
     while True do
       match input_char ic with
       [ '[' ->
-          let s = src_translate conf True ic in
+          let s = src_translate conf base True ic in
           if not echo.val then () else Wserver.wprint "%s" s
       | '<' when no_tables && echo.val ->
           let c = input_char ic in
@@ -267,55 +339,9 @@ value rec copy_from_channel conf base ic =
           | _ when not echo.val -> ()
           | '%' -> Wserver.wprint "%%"
           | '[' | ']' -> Wserver.wprint "%c" c
-          | 'a' ->
-              match Util.find_person_in_env conf base "z" with
-              [ Some ip ->
-                  Wserver.wprint "%s"
-                    (referenced_person_title_text conf base ip)
-              | None -> () ]
-          | 'b' ->
-              let s =
-                try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
-                [ Not_found -> "" ]
-              in
-              let s = s ^ " " ^ body_prop conf in
-              Wserver.wprint "%s" s
-          | 'c' ->
-              let r = count conf in
-              Num.print (fun x -> Wserver.wprint "%s" x)
-                (transl conf "(thousand separator)")
-                (Num.of_int r.welcome_cnt)
-          | 'd' -> print_date conf
-          | 'e' -> Wserver.wprint "%s" conf.charset
-          | 'f' -> Wserver.wprint "%s" conf.command
-          | 'g' ->
-              do Wserver.wprint "%s?" conf.command;
-                 if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
-              return ()
           | 'h' -> hidden_env conf
-          | 'i' -> Wserver.wprint "%s" conf.highlight
           | 'j' -> include_hed_trl conf ".hed"
-          | 'k' -> Wserver.wprint "%s" conf.indep_command
-          | 'l' -> Wserver.wprint "%s" conf.lang
-          | 'm' ->
-              Wserver.wprint "%d"
-                (try
-                   int_of_string (List.assoc "latest_event" conf.base_env)
-                 with
-                 [ Not_found | Failure _ -> 20 ])
-          | 'n' ->
-              Num.print (fun x -> Wserver.wprint "%s" x)
-                (transl conf "(thousand separator)")
-                (Num.of_int base.data.persons.len)
-          | 'o' -> Wserver.wprint "%s" (image_prefix conf)
-          | 'q' ->
-              let r = count conf in
-              Num.print (fun x -> Wserver.wprint "%s" x)
-                (transl conf "(thousand separator)")
-                (Num.of_int (r.welcome_cnt + r.request_cnt))
           | 'r' -> copy_from_file conf base (input_line ic)
-          | 's' -> Wserver.wprint "%s" (commd conf)
-          | 't' -> Wserver.wprint "%s" conf.bname
           | 'u' ->
               let lang =
                 let c = String.create 2 in
@@ -324,11 +350,7 @@ value rec copy_from_channel conf base ic =
                 return c
               in
               Wserver.wprint "%s" (language_name conf lang)
-          | 'v' -> Wserver.wprint "%s" Version.txt
-          | 'w' ->
-              let s = Util.link_to_referer conf in
-              Wserver.wprint "%s" (if s = "" then "&nbsp;" else s)
-          | c -> Wserver.wprint "%%%c" c ]
+          | c -> Wserver.wprint "%s" (macro conf base c) ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];
     done
   with
