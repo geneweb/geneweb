@@ -81,8 +81,44 @@ tuer avec la commande "kill".
 
 <p>
 
-<ul><li> Si vous &ecirc;tres sous Windows NT, il faut installer <b>Gwd</b> en
-"service". Demandez &agrave; votre administrateur syst&egrave;me.
+</ul>
+
+<ul><li> Si vous &ecirc;tes sous Windows NT, vous pouvez installer
+"gwd" en "service" en utilisant l'utilitaire "srvany.exe", en
+&eacute;tant connect&eacute; en tant qu'administrateur. &Agrave;
+partir de Windows NT Ressource Kit, vous avez besoin de: srvany.exe,
+instsrv.exe, peut-&ecirc;tre srvinstw.exe et delsrv.exe, too. D'abord,
+copiez srvany.exe dans un r&eacute;pertoire (dossier) de votre
+ordinateur (par exemple C:\GeneWeb) et installez-le en service (un
+utilitaire graphique sympa pour &ccedil;a est srvinstw.exe):
+
+<PRE>      instsrv GeneWebServer c:\GeneWeb\srvany.exe
+</PRE>
+
+Dans Services dans le panneau de configuration, cliquez GeneWebServer,
+puis sur Startup et choisissez Automatique ou Manuel. Dans la boite
+"se connecter comme", choisissez le compte sous lequel le service sera
+lanc&eacute; et son mot de passe (c'est n&eacute;cessaire pour avoir
+acc&egrave;s au r&eacute;seau). <font
+color=#2f6400><b>GeneWeb</b></font> sera lanc&eacute; en
+pr&eacute;sisant les cl&eacute;s "registry" avec regedt32:
+
+<PRE>
+1. sous HKLM\System\CurrentControlSet\Services\GeneWebServer cr&eacute;ez
+   une nouvelle cl&eacute; "Parameters"
+   
+2. cr&eacute;ez l&agrave; deux nouvelles valeurs (type REG_SZ) Application et
+   AppDirectory, par exemple:
+   Application: REG_SZ: C:\GeneWeb\gw\gwd.exe
+   AppDirectory: REG_SZ: C:\GeneWeb\gw
+</PRE>
+
+Maintenant, vous pouvez contr&ocirc;ler le service GeneWeb dans le
+panneau de configuration -&gt; Services -&gt; GeneWebServer
+"Startup"/"Stop" ou en tapant "net start GeneWebServer" ou "net stop
+GeneWebServer" &agrave; l'invite de commandes. Pour enlever
+GeneWebServer, l'arr&ecirc;ter et taper "delsrv GeneWebServer" ou
+"instsrv GeneWebServer remove".
 
 </ul>
 
