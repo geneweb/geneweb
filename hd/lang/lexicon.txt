@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.145 2000-07-21 07:27:56 ddr Exp $
+# $Id: lexicon.txt,v 3.146 2000-07-21 13:35:39 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3497,7 +3497,7 @@ nl: lijst
 no: liste
 pt: lista
 ru: список
-se: lista/anlista
+se: lista/tr&auml;dlista
 
     long display
 af: uitgebreide weergawe
