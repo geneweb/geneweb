@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.23 2004-05-13 09:49:14 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.24 2004-05-13 13:35:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -350,7 +350,7 @@ let ab1 = Gc.allocated_bytes () in
             let bt : IstrTree.t int = input_value ic_inx in
 let ab2 = Gc.allocated_bytes () in
 Printf.eprintf "*** new database created by version >= 4.10\n";
-Printf.eprintf "*** using index '%s' allocating here %.0f bytes\n"
+Printf.eprintf "*** using index '%s' allocating here only %.0f bytes\n"
   names_inx (ab2 -. ab1);
 flush stderr;
             close_in ic_inx;
