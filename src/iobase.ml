@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.7 1998-11-30 20:26:30 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.8 1998-12-01 23:03:46 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -140,10 +140,56 @@ value index_of_string strings ic start_pos hash_len string_patches s =
 
 value name_key s =
   let i = initiale s in
-  Name.lower (if i == 0 then s else String.sub s i (String.length s - i))
+  let s =
+    if i == 0 then s
+    else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
+  in
+  Name.lower s
 ;
 
+(**)
+value initial s =
+  loop 0 where rec loop i =
+    if i == String.length s then 0
+    else
+      match s.[i] with
+      [ 'A'..'Z' -> i
+      | _ -> loop (succ i) ]
+;
+
+value compare_names s1 s2 =
+  let compare_aux e1 e2 =
+    loop where rec loop i1 i2 =
+      if i1 == e1 && i2 == e2 then 0
+      else if i1 == e1 then -1
+      else if i2 == e2 then 1
+      else
+        let c1 = Char.lowercase s1.[i1] in
+        let c2 = Char.lowercase s2.[i2] in
+        if Char.code c1 > 127 then loop (i1 + 1) i2
+        else if Char.code c2 > 127 then loop i1 (i2 + 1)
+        else
+          match (c1, c2) with
+          [ ('a'..'z', 'a'..'z') ->
+              if c1 < c2 then -1
+              else if c1 > c2 then 1
+              else loop (i1 + 1) (i2 + 1)
+          | ('a'..'z', _) -> 1
+          | (_, 'a'..'z') -> -1
+          | _ -> loop (i1 + 1) (i2 + 1) ]
+  in
+  if s1 = s2 then 0
+  else
+    let i1 = initial s1 in
+    let i2 = initial s2 in
+    match compare_aux (String.length s1) (String.length s2) i1 i2 with
+    [ 0 -> compare_aux i1 i2 0 0
+    | x -> x ]
+;
+(*
 value compare_names s1 s2 = compare (name_key s1) (name_key s2);
+*)
+
 value compare_istr = ref (fun []);
 value compare_istr_fun base is1 is2 =
   if is1 == is2 then 0
