@@ -23,9 +23,9 @@ GeneWeb Version 2.01
   - [Mar 10, 99] Some changes in Italian version (by Raffaele Sena).
 
 * Documentation
-  - [Mar 17, 99] Changed documentation for the "automatic choice" for the
-    "death state", file "update.htm", section 5.4 "modify a person",
-    paragraph "Death".
+  - [Mar 17, 99] Changed documentation for the new feature "automatic choice"
+    for the "death state" (see above), file "update.htm", section 5.4 "modify
+    a person", paragraph "Death".
 
 GeneWeb Version 2.00
 --------------------
