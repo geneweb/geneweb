@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.21 2001-01-06 09:55:34 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.22 2001-01-18 11:05:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -136,8 +136,9 @@ value string_of_list =
 ;
 
 value ged_name base oc per =
-  do Printf.fprintf oc "1 NAME %s /%s/\n" (encode (ged_1st_name base per))
-       (encode (sou base per.surname));
+  do Printf.fprintf oc "1 NAME %s /%s/\n"
+       (encode (Gutil.nominative (ged_1st_name base per)))
+       (encode (Gutil.nominative (sou base per.surname)));
      let n = sou base per.public_name in
      if n <> "" then Printf.fprintf oc "2 GIVN %s\n" (encode n) else ();
      match per.qualifiers with
