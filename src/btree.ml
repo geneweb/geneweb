@@ -1,4 +1,4 @@
-(* $Id: btree.ml,v 4.0 2001-03-16 19:34:27 ddr Exp $ *)
+(* $Id: btree.ml,v 4.1 2001-04-18 13:42:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 module type OrderedType = sig type t = 'a; value compare : t -> t -> int; end;
@@ -103,7 +103,7 @@ module Make (Ord : OrderedType) =
     value rec iter f =
       fun
       [ Empty -> ()
-      | Node l v d r _ -> do iter f l; f v d; return iter f r ]
+      | Node l v d r _ -> do { iter f l; f v d; iter f r } ]
     ;
     value rec map f =
       fun
