@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.5 2001-06-14 19:55:11 ddr Exp $ *)
+(* $Id: templ.ml,v 4.6 2001-06-15 04:34:25 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -440,6 +440,14 @@ value split_at_coloncolon s =
       | _ -> loop (i + 1) ]
 ;
 
+value rec skip_spaces_and_newlines s i =
+  if i = String.length s then i
+  else
+    match s.[i] with
+    [ ' ' | '\n' | '\r' -> skip_spaces_and_newlines s (i + 1)
+    | _ -> i ]
+;
+
 value eval_transl conf base env upp s c =
   let r =
     match c with
@@ -451,9 +459,11 @@ value eval_transl conf base env upp s c =
             let s2 =
               try
                 if String.length s2 > 0 && s2.[0] = '|' then
-                  let i = String.rindex s2 '|' in
-                  let s3 = String.sub s2 1 (i - 1) in
-                  let s4 = String.sub s2 (i + 1) (String.length s2 - i - 1) in
+                  let i = 1 in
+                  let j = String.rindex s2 '|' in
+                  let k = skip_spaces_and_newlines s2 (j + 1) in
+                  let s3 = String.sub s2 i (j - i) in
+                  let s4 = String.sub s2 k (String.length s2 - k) in
                   s3 ^ Util.transl_nth conf s4 n
                 else raise Not_found
               with

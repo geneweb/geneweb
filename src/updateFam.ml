@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.10 2001-06-14 19:55:11 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.11 2001-06-15 04:34:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -332,7 +332,7 @@ value print_marriage conf base fam =
     end;
     Update.print_date conf base (capitale (transl conf "date")) "marriage"
       (Adef.od_of_codate fam.marriage);
-    Update.print_src conf "marr_src" fam.marriage_src
+    Update.print_src conf "marriage_src" fam.marriage_src
   }
 ;
 
@@ -653,6 +653,7 @@ value try_eval_gen_variable conf base env ((fam, cpl, des) as fcd) =
   | "mrel" -> eval_relation_kind fam.relation
   | "marriage_place" -> quote_escaped fam.marriage_place
   | "marriage_src" -> quote_escaped fam.marriage_src
+  | "fsources" -> quote_escaped fam.fsources
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -876,7 +877,7 @@ value interp_templ conf base fcd digest astl =
 
 value print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
-  [ Some ("ADD_FAM" | "ADD_PAR" | "MOD_FAM") ->
+  [ Some ("ADD_FAM" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK") ->
       let astl = Templ.input conf base "updfam" in
       do { html conf; interp_templ conf base fcd digest astl }
   | _ -> incorrect_request conf ]
@@ -932,6 +933,15 @@ value print_mod1 conf base fam cpl des digest =
     end;
     Wserver.wprint "\n";
     trailer conf
+  }
+;
+
+value print_mod1 conf base fam cpl des digest =
+  do {
+    if p_getenv conf.env "updfam" = Some "on" then
+      print_update_fam conf base (fam, cpl, des) digest
+    else ();
+    print_mod1 conf base fam cpl des digest
   }
 ;
 
@@ -1022,6 +1032,15 @@ value print_add1 conf base fam cpl des force_children_surnames =
   }
 ;
 
+value print_add1 conf base fam cpl des force_children_surnames =
+  do {
+    if p_getenv conf.env "updfam" = Some "on" then
+      print_update_fam conf base (fam, cpl, des) ""
+    else ();
+    print_add1 conf base fam cpl des force_children_surnames
+  }
+;
+
 value print_add conf base =
   let (fath, moth) =
     match p_getint conf.env "ip" with
@@ -1051,12 +1070,7 @@ value print_add conf base =
      fam_index = bogus_family_index}
   and cpl = {father = fath; mother = moth}
   and des = {children = [| |]} in
-  do {
-    if p_getenv conf.env "updfam" = Some "on" then
-      print_update_fam conf base (fam, cpl, des) ""
-    else ();
-    print_add1 conf base fam cpl des False
-  }
+  print_add1 conf base fam cpl des False
 ;
 
 value print_add_parents conf base =
@@ -1076,12 +1090,7 @@ value print_add_parents conf base =
            [| (sou base p.first_name, sou base p.surname, p.occ, Update.Link,
                "") |]}
       in
-      do {
-        if p_getenv conf.env "updfam" = Some "on" then
-          print_update_fam conf base (fam, cpl, des) ""
-        else ();
-        print_add1 conf base fam cpl des True
-      }
+      print_add1 conf base fam cpl des True
   | _ -> incorrect_request conf ]
 ;
 
@@ -1093,12 +1102,7 @@ value print_mod conf base =
       let des = doi base (Adef.ifam_of_int i) in
       let (sfam, scpl, sdes) = string_family_of base fam cpl des in
       let digest = Update.digest_family fam cpl des in
-      do {
-        if p_getenv conf.env "updfam" = Some "on" then
-          print_update_fam conf base (sfam, scpl, sdes) digest
-        else ();
-        print_mod1 conf base sfam scpl sdes digest
-      }
+      print_mod1 conf base sfam scpl sdes digest
   | _ -> incorrect_request conf ]
 ;
 
