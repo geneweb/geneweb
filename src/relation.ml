@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.20 1999-12-15 19:58:06 ddr Exp $ *)
+(* $Id: relation.ml,v 3.21 1999-12-15 21:58:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -858,37 +858,25 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   in
   do tag "ul" begin
        html_li conf;
-       Wserver.wprint "%s " (lab x1);
-       let s =
-         transl_decline conf "of"
-           (gen_person_text_without_title raw_access conf base p1)
-       in
+       let s = gen_person_title_text raw_access conf base p1 in
        let s =
          if pp1 = None then s
          else
-           transl_decline conf "of (same or greater generation level)"
-             (transl_nth conf "the spouse" (1 - index_of_sex p1.sex)) ^
-             " " ^ s
+           transl_decline2 conf "%1 of (same or greater generation level) %2"
+             (transl_nth conf "the spouse" (1 - index_of_sex p1.sex)) s
        in
-       Wserver.wprint "%s" s;
-       afficher_titre conf base p1;
-       Wserver.wprint "\n";
+       let s = transl_decline2 conf "%1 of %2" (lab x1) s in
+       Wserver.wprint "%s\n" s;
        html_li conf;
-       Wserver.wprint "%s " (lab x2);
-       let s =
-         transl_decline conf "of"
-           (gen_person_text_without_title raw_access conf base p2)
-       in
+       let s = gen_person_title_text raw_access conf base p2 in
        let s =
          if pp2 = None then s
          else
-           transl_decline conf "of (same or greater generation level)"
-             (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)) ^
-             " " ^ s
+           transl_decline2 conf "%1 of (same or greater generation level) %2"
+             (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)) s
        in
-       Wserver.wprint "%s" s;
-       afficher_titre conf base p2;
-       Wserver.wprint "\n";
+       let s = transl_decline2 conf "%1 of %2" (lab x2) s in
+       Wserver.wprint "%s\n" s;
      end;
      Wserver.wprint "</ul>\n";
   return ()
