@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.3 1999-10-30 23:05:51 ddr Exp $ *)
+(* $Id: util.ml,v 3.4 1999-10-30 23:14:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -526,7 +526,8 @@ value index_of_sex =
 ;
 
 value default_body_prop conf =
-  "background=\"" ^ conf.command ^ "?m=IM;v=/gwback.jpg\""
+  "background=\"" ^ (if conf.cgi then conf.command else "geneweb") ^
+  "?m=IM;v=/gwback.jpg\""
 ;
 
 value body_prop conf =
