@@ -41,6 +41,12 @@ Images path:
 
 <p>
 
+Propose search by titles in welcome page:
+<input type=radio name=propose_titles value=yes%cpropose_titles=yes;>yes
+<input type=radio name=propose_titles value=no%cpropose_titles=no;>no
+
+<p>
+
 Advice:
 
 <ul>
