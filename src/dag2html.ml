@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.20 1999-12-21 21:23:32 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.21 1999-12-24 03:15:23 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -1077,9 +1077,9 @@ value try_fall2_right t i j =
           else if t.table.(i).(j).span = t.table.(i).(j + 1).span then False
           else loop (i + 1)
       in
-      if not separated1 || not separated2 then None
-      else Some (do_fall2_right t i1 (i + 1) j)
-  | _ -> None ]
+      if not separated1 || not separated2 then t
+      else do_fall2_right t i1 (i + 1) j
+  | _ -> t ]
 ;
 
 value try_fall2_left t i j =
@@ -1106,21 +1106,20 @@ value try_fall2_left t i j =
           else if t.table.(i).(j - 1).span = t.table.(i).(j).span then False
           else loop (i + 1)
       in
-      if not separated1 || not separated2 then None
-      else Some (do_fall2_left t i1 (i + 1) j)
-  | _ -> None ]
+      if not separated1 || not separated2 then t
+      else do_fall2_left t i1 (i + 1) j
+  | _ -> t ]
 ;
 
 value fall2_right t =
   loop_i (Array.length t.table - 1) t where rec loop_i i t =
     if i <= 0 then t
     else
-      loop_j 0 t where rec loop_j j t =
-        if j >= Array.length t.table.(i) - 1 then loop_i (i - 1) t
+      loop_j (Array.length t.table.(i) - 2) t where rec loop_j j t =
+        if j < 0 then loop_i (i - 1) t
         else
-          match try_fall2_right t i j with
-          [ Some t -> loop_i (Array.length t.table - 1) t
-          | None -> loop_j (j + 1) t ]
+          let t = try_fall2_right t i j in
+          loop_j (j - 1) t
 ;
 
 value fall2_left t =
@@ -1130,9 +1129,8 @@ value fall2_left t =
       loop_j 1 t where rec loop_j j t =
         if j >= Array.length t.table.(i) then loop_i (i - 1) t
         else
-          match try_fall2_left t i j with
-          [ Some t -> loop_i (Array.length t.table - 1) t
-          | None -> loop_j (j + 1) t ]
+          let t = try_fall2_left t i j in
+          loop_j (j + 1) t
 ;
 
 (*

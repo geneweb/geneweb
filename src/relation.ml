@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.27 1999-12-21 14:32:56 ddr Exp $ *)
+(* $Id: relation.ml,v 3.28 1999-12-24 03:15:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -405,11 +405,18 @@ value print_relation_path_dag conf base path =
              match fl with
              [ Parent ->
                  do n.pare := [idag_of_int (cnt + 1) :: n.pare];
-                    n1.chil := [idag_of_int cnt :: n1.chil];
+                    n1.chil := [idag_of_int cnt];
                  return ([n1; n :: nl], cnt + 1)
              | Child ->
                  do n.chil := [idag_of_int (cnt + 1) :: n.chil];
-                    n1.pare := [idag_of_int cnt :: n1.pare];
+                    n1.pare := [idag_of_int cnt];
+(*
+do match nl with
+   [ [({valu = Right _} as n2); n3 :: nl] ->
+       do n2.pare := []; n.chil := [idag_of_int (cnt + 1)]; n3.chil := n.chil; n1.pare := [idag_of_int (cnt - 2) :: n1.pare]; return ()
+   | _ -> () ];
+return ();
+*)
                  return ([n1; n :: nl], cnt + 1)
              | Sibling | HalfSibling ->
                  match (aoi base ip).parents with
