@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.85 2004-03-22 21:26:14 ddr Exp $ *)
+(* $Id: util.ml,v 4.86 2004-05-05 11:07:15 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -606,7 +606,10 @@ value acces_n conf base n x =
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
       (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
-  else "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper x.cle_index)
+  else
+    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper x.cle_index) ^
+    (if conf.wizard && x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ
+     else "")
 ;
 
 value acces conf base x = acces_n conf base "" x;

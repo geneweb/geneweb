@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [05 May 04] In URLs referencing somebody with his internal number
+    (i=...), added ";oc=n", n being his occurrence number (only if
+    wizard and n different from 0): useful for updates.
   - [22 Mar 04] Fixed bug: surnames by alphabetic order failed when
     surname starting with a space (case not expected).
   - [03 Mar 04] Added new optional field in wizard and friend password
