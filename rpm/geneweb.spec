@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.18 1999-10-04 10:20:39 ddr Exp $
+# $Id: geneweb.spec,v 1.19 1999-10-04 10:24:00 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -559,6 +559,10 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %doc doc/*
 
 %changelog
+* Mon Oct  4 1999 Daniel de Rauglaudre
+Version 2.07-2
+- added RPM_BUILD_ROOT to %install the package in /tmp
+
 * Sun Sep 6 1999 Daniel de Rauglaudre
 Version 2.06-5
 - updated file list
