@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.18 2000-01-15 19:07:51 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.19 2000-02-14 14:39:47 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -91,9 +91,9 @@ eller <em>Sosa-nummer</em>, refererende til %a%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=%i><b>navn (nob.)</b></font>%INl<br>%E
+<font color=%i><b>[estate]</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(<a href="%sm=TT;p=*">[all the places]</a>)
+(<a href="%sm=TT;p=*">[all the estates]</a>)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>

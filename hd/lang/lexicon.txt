@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.63 2000-02-04 11:58:48 ddr Exp $
+# $Id: lexicon.txt,v 3.64 2000-02-14 14:39:44 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -992,15 +992,15 @@ pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
 ru: æèâîé
 se: lever
 
-    all the places
+    all the estates
 cs: v¹echna místa
 de: alle Orte
 dk: alle navne
-en: all the places
+en: all the estates
 eo: cxiuj lokoj
 es: todos los lugares
 fi: kaikki paikat
-fr: tous les lieux
+fr: tous les domaines
 he:   ëì äî÷åîåú
 is: alla staği
 it: tutti i luogi
@@ -2069,6 +2069,24 @@ no: feil
 pt: erro
 ru: îøèáêà
 se: fel
+
+    estate
+cs: místo
+de: Ort
+dk: navn (nob.)
+en: estate
+eo: loko
+es: lugar
+fi: paikka
+fr: domaine
+he:   î÷åí
+is: stağur
+it: luogo
+nl: plaats
+no: sted
+pt: lugar
+ru: ìåñòî
+se: plats
 
     exact
 cs: pøesnì

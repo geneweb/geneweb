@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.3 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: title.ml,v 3.4 2000-02-14 14:39:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -444,7 +444,7 @@ value print_all_titles conf base =
 
 value print_all_places conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "all the places"))
+    Wserver.wprint "%s" (capitale (transl conf "all the estates"))
   in
   let list =
     let l = select_all_places conf base in

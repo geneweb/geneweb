@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.7 2000-01-21 12:01:22 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.8 2000-02-14 14:39:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -361,7 +361,7 @@ value print_title conf base t cnt =
               | _ -> "" ]);
          end;
          tag "td" begin
-           Wserver.wprint "%s\n" (capitale (transl conf "place"));
+           Wserver.wprint "%s\n" (capitale (transl conf "estate"));
          end;
          tag "td" "colspan=2" begin
            Wserver.wprint "<input name=t_place%d size=30%s>" cnt
