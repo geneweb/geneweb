@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.17 2000-08-05 09:53:44 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.18 2000-08-05 10:04:08 ddr Exp $ *)
 
 open Printf;
 
@@ -301,9 +301,9 @@ value copy_temp b =
 
 (* Actions *)
 
-value print_return_to_main b tok =
+value printf_link_to_main b tok =
   do printf "<p><hr><div align=right>\n";
-     printf "Return to <a href=\"gwtp?m=MAIN;b=%s;t=%s\">main page</a></div>\n"
+     printf "<a href=\"gwtp?m=MAIN;b=%s;t=%s\">main page</a></div>\n"
        b tok;
   return ()
 ;
@@ -322,7 +322,7 @@ value send_file str env b tok f fname =
        printf "Data base \"%s\" updated.\n" b;
        flush stdout;
        printf "</pre>\n";
-       print_return_to_main b tok;
+       printf_link_to_main b tok;
        printf "</body>\n";
     return ()
   else gwtp_error "Bad \"base\" file selection"
@@ -349,7 +349,7 @@ value gwtp_receive str env b tok =
             with [ End_of_file -> () ];
             close_in ic;
          return ();
-         print_return_to_main b tok;
+         printf_link_to_main b tok;
       return ()
   | _ -> gwtp_invalid_request str env ]
 ;
@@ -357,7 +357,7 @@ value gwtp_receive str env b tok =
 value gwtp_upload str env b tok =
   do printf "content-type: text/html\r\n\r\n";
      copy_template [('b', b); ('t', tok)] "send";
-     print_return_to_main b tok;
+     printf_link_to_main b tok;
      printf "</body>\n";
   return ()
 ;
@@ -383,7 +383,7 @@ value gwtp_download str env b tok =
        return ()
      else
        printf "<p>Your data base does not exist or is empty.\n";
-     print_return_to_main b tok;
+     printf_link_to_main b tok;
      printf "</body>\n";
   return ()
 ;
@@ -424,6 +424,21 @@ Password: <input name=p type=password><br>
 ;
 
 (* Wrappers *)
+
+(*
+value gwtp_redirect_to_main str env b tok =
+  do printf "content-type: text/html\r\n\r\n";
+     printf "<head>\n";
+     printf "\
+<meta http-equiv=\"REFRESH\"
+ content=\"0;URL=gwtp?m=MAIN&b=%s&t=%s\">\n" b tok;
+     printf "</head>\n";
+     printf "<body>\n";
+     printf_link_to_main b tok;
+     printf "</body>\n";
+  return ()
+;
+*)
 
 value gwtp_check_login str env gwtp_fun =
   match (HttpEnv.getenv env "b", HttpEnv.getenv env "p") with
