@@ -3,6 +3,7 @@
 <head>
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
+  <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
 <h1>Genealogy</h1>
