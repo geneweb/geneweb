@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.44 1999-09-17 12:42:32 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.45 1999-09-23 13:44:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -576,7 +576,8 @@ use \"can_send_image\".\n"
         year = tm.Unix.tm_year + 1900;
         prec = Sure;
         delta = 0};
-     today_wd = tm.Unix.tm_wday}
+     today_wd = tm.Unix.tm_wday;
+     time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec)}
   in
   (conf, sleep, if not ok then Some (passwd, uauth, base_file) else None)
 ;
