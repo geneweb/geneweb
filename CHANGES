@@ -42,6 +42,10 @@ GeneWeb Version 1.11
     someone in Gedcom, the other become "aliases" (and vice versa for
     gwb2ged).
 
+* GeneWeb uncompiler (gwu)
+  - [Feb 4, 99] Notes for persons having "?" no more saved (these
+    persons are supposed to be deadends and this made "gwc" fail).
+
 * Lexicon file (lexicon.txt)
   - [Feb 3, 99] Some changes in Swedish translation (Lars Gustavsson).
   - [Jan 28, 99] Added section "!dir" for languages written right to left.
