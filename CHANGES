@@ -32,6 +32,14 @@ GeneWeb version 4.01
   - [13 Mar 01] Fixed problem in displaying "anniversaries month"
     in Estonian: the month appeared with all its declinations.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [23 Mar 01] Added option -udi x-y (Undefined Death Interval): the
+    persons whose death part is undefined:
+    - if before x years, are considered as alive
+    - if after y years are considered as death
+    - between x and y, their death value is "don't know if death"
+    Default x is 80, y is 120.
+
 * Lexicon (lang/lexicon.txt)
   - [14 Mar 01] Added the ability to add "derived" languages,
     i.e. languages where most of the phrases are the same than some other
