@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.5 2001-06-07 08:40:20 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.6 2001-06-30 11:20:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -466,7 +466,8 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
           else ();
           do {
             seek_in ic array_pos;
-            let t = apply_patches (input_value ic) patches r.len in
+            let v = input_value ic in
+            let t = apply_patches v patches r.len in
             tab.val := Some t;
             t
           }
