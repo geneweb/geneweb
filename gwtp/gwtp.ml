@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.39 2000-08-22 13:59:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.40 2000-09-03 03:51:59 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -199,27 +199,30 @@ value gwtp_invalid_request str env = gwtp_error "Invalid request";
 
 value get_base_conf b =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
-  let ic = open_in fname in
   let wizpw = ref "" in
   let fripw = ref "" in
-  do try
-       while True do
-         let line =
-           let line = input_line ic in
-           if String.length line > 0 && line.[String.length line - 1] = '\r'
-           then String.sub line 0 (String.length line - 1)
-           else line
-         in
-         if lowercase_start_with line "wizard_passwd=" then
-           let len = String.length "wizard_passwd=" in
-           wizpw.val := String.sub line len (String.length line - len)
-         else if lowercase_start_with line "friend_passwd=" then
-           let len = String.length "friend_passwd=" in
-           fripw.val := String.sub line len (String.length line - len)
-         else ();
-       done
-     with
-     [ End_of_file -> close_in ic ];
+  do match try Some (open_in fname) with [ Sys_error _ -> None ] with
+     [ Some ic ->
+         try
+           while True do
+             let line =
+               let line = input_line ic in
+               if String.length line > 0
+               && line.[String.length line - 1] = '\r' then
+                 String.sub line 0 (String.length line - 1)
+               else line
+             in
+             if lowercase_start_with line "wizard_passwd=" then
+               let len = String.length "wizard_passwd=" in
+               wizpw.val := String.sub line len (String.length line - len)
+             else if lowercase_start_with line "friend_passwd=" then
+               let len = String.length "friend_passwd=" in
+               fripw.val := String.sub line len (String.length line - len)
+             else ();
+           done
+         with
+         [ End_of_file -> close_in ic ]
+     | None -> () ];
   return (wizpw.val, fripw.val)
 ;
 
@@ -227,36 +230,39 @@ value set_base_conf b (wizpw, fripw) =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
   let fname_out = Filename.concat gwtp_dst.val (b ^ "1.gwf" ) in
   let fname_saved = fname ^ "~" in
-  let ic = open_in fname in
-  let oc = open_out fname_out in
   let wizpw_ok = ref False in
   let fripw_ok = ref False in
-  do try
-       while True do
-         let line = input_line ic in
-         let line_out =
-           if lowercase_start_with line "wizard_passwd=" then
-             do wizpw_ok.val := True; return
-             "wizard_passwd=" ^ wizpw
-           else if lowercase_start_with line "friend_passwd=" then
-             do fripw_ok.val := True; return
-             "friend_passwd=" ^ fripw
-           else
-             line
-         in
-         fprintf oc "%s\n" line_out;
-       done
-     with
-     [ End_of_file -> close_in ic ];
+  let oc = open_out fname_out in
+  do match try Some (open_in fname) with [ Sys_error _ -> None ] with
+     [ Some ic ->
+         try
+           while True do
+             let line = input_line ic in
+             let line_out =
+               if lowercase_start_with line "wizard_passwd=" then
+                 do wizpw_ok.val := True; return
+                 "wizard_passwd=" ^ wizpw
+               else if lowercase_start_with line "friend_passwd=" then
+                 do fripw_ok.val := True; return
+                 "friend_passwd=" ^ fripw
+               else
+                 line
+             in
+             fprintf oc "%s\n" line_out;
+           done
+         with
+         [ End_of_file -> close_in ic ]
+     | None -> () ];
      if not wizpw_ok.val then fprintf oc "wizard_passwd=%s\n" wizpw else ();
      if not fripw_ok.val then fprintf oc "friend_passwd=%s\n" fripw else ();
      close_out oc;
      try Sys.remove fname_saved with [ Sys_error _ -> () ];
      let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-     do Sys.rename bdir (bdir ^ "~");
-        Sys.rename fname fname_saved;
+     let b_ex = Sys.file_exists bdir in
+     do if b_ex then Sys.rename bdir (bdir ^ "~") else ();
+        if Sys.file_exists fname then Sys.rename fname fname_saved else ();
         Sys.rename fname_out fname;
-        Sys.rename (bdir ^ "~") bdir;
+        if b_ex then Sys.rename (bdir ^ "~") bdir else ();
      return ();
   return ()
 ;
@@ -513,17 +519,25 @@ value gwtp_setconf str env b tok =
 ;
 
 value gwtp_upload str env b tok =
-  do printf "content-type: text/html"; crlf (); crlf ();
-     copy_template [('s', cgi_script_name ()); ('b', b); ('t', tok)] "send";
-     printf_link_to_main b tok;
-     printf "</body>\n";
-  return ()
+  let bcnf = Filename.concat gwtp_dst.val (b ^ ".gwf") in
+  if not (Sys.file_exists bcnf) then
+    gwtp_error "no configuration file"
+  else
+    do printf "content-type: text/html"; crlf (); crlf ();
+       copy_template [('s', cgi_script_name ()); ('b', b); ('t', tok)] "send";
+       printf_link_to_main b tok;
+       printf "</body>\n";
+    return ()
 ;
 
 value gwtp_download str env b tok =
+  let bcnf = Filename.concat gwtp_dst.val (b ^ ".gwf") in
   let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-  do printf "content-type: text/html"; crlf (); crlf ();
-     if Sys.file_exists bdir then
+  if not (Sys.file_exists bcnf) then
+    gwtp_error "no configuration file"
+  else
+    do printf "content-type: text/html"; crlf (); crlf ();
+       if Sys.file_exists bdir then
        let dh = Unix.opendir bdir in
        do copy_template [('b', b); ('t', tok)] "recv";
           printf "<ul>\n";
@@ -575,14 +589,19 @@ value gwtp_config str env b tok =
 
 value gwtp_main str env b tok =
   let gwtp_comm = cgi_script_name () in
+  let bcnf = Filename.concat gwtp_dst.val (b ^ ".gwf") in
   do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Gwtp - %s</title></head>\n<body>
 <h1 align=center>Gwtp - %s</h1>
 <ul>\n" b b;
-     printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">Upload</a>\n" gwtp_comm b tok;
-     printf "<li><a href=\"%s?m=DNL;b=%s;t=%s\">Download</a>\n" gwtp_comm b
-       tok;
+     if (Sys.file_exists bcnf) then
+       do printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">Upload</a>\n"
+            gwtp_comm b tok;
+          printf "<li><a href=\"%s?m=DNL;b=%s;t=%s\">Download</a>\n"
+            gwtp_comm b tok;
+       return ()
+     else ();
      printf "<li><a href=\"%s?m=CNF;b=%s;t=%s\">Configuration</a>\n" gwtp_comm
        b tok;
      printf "</ul>\n";
