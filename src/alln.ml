@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.10 2005-02-10 06:49:32 ddr Exp $ *)
+(* $Id: alln.ml,v 4.11 2005-02-11 00:53:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -149,8 +149,8 @@ value print_alphabetic_big conf base is_surnames ini list len =
       List.iter
         (fun (ini_k, _) ->
            stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
-	     (Util.code_varenv ini_k)
-	   begin
+             (Util.code_varenv ini_k)
+           begin
              Wserver.wprint "%s" (displayify ini_k);
            end)
         list;
@@ -232,7 +232,7 @@ value print_alphabetic_small conf base is_surnames ini list len =
         List.iter
           (fun (_, s, cnt) ->
              stagn "li" begin
-               stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+               stag "a" "href=\"%sm=%s;v=%s;t=A\"" (commd conf) mode
                  (code_varenv (lower_if_not_utf8 s))
                begin
                  Wserver.wprint "%s" (alphab_string conf is_surnames s);

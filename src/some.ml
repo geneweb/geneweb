@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.29 2005-01-03 07:34:33 ddr Exp $ *)
+(* $Id: some.ml,v 4.30 2005-02-11 00:53:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -160,15 +160,37 @@ value rec merge_insert ((sstr, (strl, iperl)) as x) =
   | [] -> [x] ]
 ;
 
+value persons_of_absolute_first_name conf base x =
+  let istrl = base.func.strings_of_fsname x in
+  List.fold_right
+    (fun istr l ->
+       let str = sou base istr in
+       if str = x then
+         let iperl = base.func.persons_of_first_name.find istr in
+         let iperl =
+           List.fold_left
+             (fun iperl iper ->
+                if (pget conf base iper).first_name = istr then [iper :: iperl]
+                else iperl)
+             [] iperl
+         in
+         if iperl = [] then l else [(str, istr, iperl) :: l]
+       else l)
+    istrl []
+;
+
 value first_name_print conf base x =
   let (list, _) =
-    if x = "" then ([], fun [])
+    if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_first_name conf base x, fun [])
+    else if x = "" then ([], fun [])
     else
       persons_of_fsname conf base base.func.persons_of_first_name.find
         (fun x -> x.first_name) x
   in
   let list =
-    List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl))) list
+    List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl)))
+      list
   in
   let list = List.fold_right merge_insert list [] in
   match list with
@@ -506,9 +528,30 @@ value select_ancestors conf base name_inj ipl =
     [] ipl
 ;
 
+value persons_of_absolute_surname conf base x =
+  let istrl = base.func.strings_of_fsname x in
+  List.fold_right
+    (fun istr l ->
+       let str = sou base istr in
+       if str = x then
+         let iperl = base.func.persons_of_surname.find istr in
+         let iperl =
+           List.fold_left
+             (fun iperl iper ->
+                if (pget conf base iper).surname = istr then [iper :: iperl]
+                else iperl)
+             [] iperl
+         in
+         if iperl = [] then l else [(str, istr, iperl) :: l]
+       else l)
+    istrl []
+;
+
 value surname_print conf base not_found_fun x =
   let (l, name_inj) =
-    if x = "" then ([], fun [])
+    if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_surname conf base x, fun x -> x)
+    else if x = "" then ([], fun [])
     else
       persons_of_fsname conf base base.func.persons_of_surname.find
         (fun x -> x.surname) x
