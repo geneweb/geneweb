@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.18 1999-09-16 15:01:05 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.19 1999-10-05 10:33:45 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -39,14 +39,17 @@ value encode s =
   if ascii.val then s else Ansel.of_iso_8859_1 s
 ;
 
-value next_space_overflows s len i =
-  if s.[i] = ' ' then
-    loop (len + 1) (i + 1) where rec loop len i =
-      if i >= String.length s then False
-      else if len >= 255 then True
-      else if s.[i] = ' ' then False
-      else loop (len + 1) (i + 1)
-  else False
+value max_len = 78;
+
+value next_char_pair_overflows s len i =
+  loop False (len + 1) (i + 1) where rec loop prec_was_space len i =
+    if len < max_len then
+      if i < String.length s then
+        match s.[i] with
+        [ ' ' | '\n' -> loop True (len + 1) (i + 1)
+        | _ -> if prec_was_space then loop False (len + 1) (i + 1) else False ]
+      else False
+    else True
 ;
 
 value br = "<br>";
@@ -54,6 +57,7 @@ value br = "<br>";
 value rec display_note_aux oc s len i =
   if i == String.length s then Printf.fprintf oc "\n"
   else
+    let c = if s.[i] = '\n' then ' ' else s.[i] in
     if i <= String.length s - String.length br
     && String.lowercase (String.sub s i (String.length br)) = br then
       do Printf.fprintf oc "\n2 CONT "; return
@@ -63,13 +67,11 @@ value rec display_note_aux oc s len i =
         else i
       in
       display_note_aux oc s (String.length "2 CONT ") i
-    else if s.[i] == '\n' || len = 255 || next_space_overflows s len i then
-      do Printf.fprintf oc "\n2 CONC ";
-         Printf.fprintf oc "%c" (if s.[i] == '\n' then ' ' else s.[i]);
-      return
+    else if len == max_len || c <> ' ' && next_char_pair_overflows s len i then
+      do Printf.fprintf oc "\n2 CONC %c" c; return
       display_note_aux oc s (String.length "2 CONC ") (i + 1)
     else
-      do output_char oc s.[i]; return
+      do output_char oc c; return
       display_note_aux oc s (len + 1) (i + 1)
 ;
 
