@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.31 2000-05-03 14:44:14 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.32 2000-05-08 20:00:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -209,27 +209,27 @@ value rec cut_at_equal i s =
   else cut_at_equal (succ i) s
 ;
 
-value read_base_env cgi bname =
-  let fname =
-    let f = Filename.concat Util.base_dir.val bname ^ ".gwf" in
-    if Sys.file_exists f then f
-    else
-      let f = Filename.concat Util.base_dir.val bname ^ ".cnf" in
-      do if not cgi && Sys.file_exists f then
-           do Printf.eprintf "\
-*** Name for config file \"%s.cnf\" is deprecated; \
-rename it as \"%s.gwf\".\n" bname bname;
-              flush stderr;
-           return ()
-         else ();
-      return f
+value strip_trailing_spaces s =
+  let len =
+    loop (String.length s) where rec loop len =
+      if len = 0 then 0
+      else
+        match s.[len - 1] with
+        [ ' ' | '\010' | '\013' | '\t' -> loop (len - 1)
+        | _ -> len ]
   in
+  String.sub s 0 len
+;
+
+value read_base_env cgi bname =
+  let fname = Filename.concat Util.base_dir.val bname ^ ".gwf" in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
         loop [] where rec loop env =
           match try Some (input_line ic) with [ End_of_file -> None ] with
           [ Some s ->
+              let s = strip_trailing_spaces s in
               if s = "" || s.[0] = '#' then loop env
               else loop [cut_at_equal 0 s :: env]
           | None ->
