@@ -9,6 +9,9 @@ GeneWeb version 4.03
     versions using hyperlinks.
 
 * GeneWeb server or CGI (gwd)
+  - [16 Aug 01] Fixed bug in update family form: when updating a family
+    with one witness, the form for a second (possible) witness displayed
+    wrong things.
   - [24 Jul 01] Fixed bug in update family form: when updating a family
     whose marriage date was in French Revolution calendar, this calendar
     was not selected in the menu.
