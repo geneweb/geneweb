@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.56 2000-08-28 09:26:55 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.57 2000-09-01 12:50:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -93,7 +93,7 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
      fprintf_date oc tm;
      Printf.fprintf oc " (%d)" (Unix.getpid ());
      Printf.fprintf oc " %s_%s" base_file passwd;
-     Printf.fprintf oc " => failed \"%s\"\n" uauth;
+     Printf.fprintf oc " => failed\n";
      Printf.fprintf oc "  From: %s\n" from;
      Printf.fprintf oc "  Agent: %s\n" user_agent;
      if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
