@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.21 2003-12-08 20:46:17 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.22 2003-12-09 08:32:49 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -1124,7 +1124,10 @@ value gwtp_main str env b tok =
 <ul>
 " b b;
     if config_exists then do {
-      if Sys.file_exists (Filename.concat gwtp_etc.val "ged2gwb") then do {
+      if no_upload.val then ()
+      else if
+        Sys.file_exists (Filename.concat gwtp_etc.val "ged2gwb")
+      then do {
         printf "<li>Upload from\n<ul>\n";
         printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">database files</a>\n"
           gwtp_comm b tok;
