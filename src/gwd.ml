@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.55 2000-08-25 04:04:15 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.56 2000-08-28 09:26:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -12,6 +12,7 @@ value selected_port = ref 2317;
 value redirected_addr = ref None;
 value wizard_passwd = ref "";
 value friend_passwd = ref "";
+value wizard_just_friend = ref False;
 value only_address = ref "";
 value cgi = ref False;
 value default_lang = ref "fr";
@@ -634,8 +635,10 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     [ Not_found -> "" ]
   in
   let wizard_just_friend =
-    try List.assoc "wizard_just_friend" base_env = "yes" with
-    [ Not_found -> False ]
+    if wizard_just_friend.val then True
+    else
+      try List.assoc "wizard_just_friend" base_env = "yes" with
+      [ Not_found -> False ]
   in
   let passwd1 =
     let auth = Wserver.extract_param "authorization: " '\r' request in
@@ -1252,6 +1255,9 @@ value main () =
      ("-friend", Arg.String (fun x -> friend_passwd.val := x),
       "<passwd>
        Set a friend password: access to all dates.");
+     ("-wjf", Arg.Set wizard_just_friend,
+      "
+       Wizard just friend (permanently)");
      ("-lang", Arg.String (fun x -> default_lang.val := x),
       "<lang>
        Set a default language (default: fr).");
