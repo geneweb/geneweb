@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.9 1999-05-11 21:08:31 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.10 1999-05-18 23:34:23 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -205,7 +205,7 @@ value ged_title base oc per tit =
             Printf.fprintf oc "\n";
          return ()
      | (None, Some sd) ->
-         do Printf.fprintf oc "2 DATE BEF ";
+         do Printf.fprintf oc "2 DATE BET AND ";
             ged_date oc sd;
             Printf.fprintf oc "\n";
          return ()
@@ -264,7 +264,7 @@ value ged_multimedia_link base oc per =
 
 value br = "<br>";
 
-value rec display_note oc s i =
+value rec display_note oc s len i =
   if i == String.length s then Printf.fprintf oc "\n"
   else
     if i <= String.length s - String.length br
@@ -275,13 +275,15 @@ value rec display_note oc s i =
         if i < String.length s && s.[i] == '\n' then i + 1
         else i
       in
-      display_note oc s i
-    else if s.[i] == '\n' then
-      do Printf.fprintf oc "\n2 CONC "; return
-      display_note oc s (i + 1)
+      display_note oc s (String.length "2 CONT ") i
+    else if s.[i] == '\n' || len = 255 then
+      do Printf.fprintf oc "\n2 CONC ";
+         Printf.fprintf oc "%c" (if s.[i] == '\n' then ' ' else s.[i]);
+      return
+      display_note oc s (String.length "2 CONC ") (i + 1)
     else
       do output_char oc s.[i]; return
-      display_note oc s (i + 1)
+      display_note oc s (len + 1) (i + 1)
 ;
 
 value ged_note base oc per =
@@ -289,7 +291,7 @@ value ged_note base oc per =
   [ "" -> ()
   | s ->
       do Printf.fprintf oc "1 NOTE ";
-         display_note oc (encode s) 0;
+         display_note oc (encode s) (String.length "1 NOTE ") 0;
       return () ]
 ;
 
