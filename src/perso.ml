@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.59 2000-10-22 01:06:13 ddr Exp $ *)
+(* $Id: perso.ml,v 3.60 2000-10-22 09:52:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1895,7 +1895,7 @@ value print_variable conf base env sl =
   | Some (ep, efam, s) -> print_simple_variable conf base env ep efam s
   | None ->
       do iter_first
-           (fun first s -> Wserver.wprint "%s%s" s (if first then "" else "."))
+           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
            sl;
          Wserver.wprint "???";
       return () ]
@@ -2076,14 +2076,15 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
 
 value eval_bool_variable conf base env sl =
   match eval_variable conf base env sl with
-  [ Some (ep, efam, s) when s <> "" ->
-      eval_simple_bool_variable conf base env ep efam s
-  | _ ->
+  [ Some (ep, efam, "") ->
       do iter_first
-           (fun first s -> Wserver.wprint "%s%s" s (if first then "" else "."))
+           (fun first s ->
+              Wserver.wprint "%s%s" (if first then "" else ".") s)
            sl;
          Wserver.wprint "???";
-      return False ]
+      return False
+  | Some (ep, efam, s) -> eval_simple_bool_variable conf base env ep efam s
+  | None -> False ]
 ;
 
 value split_at_coloncolon s =
@@ -2175,11 +2176,12 @@ and eval_foreach conf base env s sl al =
   in
   match eval_variable conf base env sl with
   [ Some (ep, efam, "") -> eval_simple_foreach conf base env al ep efam s
-  | _ ->
+  | Some (ep, efam, _) ->
       do Wserver.wprint "foreach ";
          List.iter (fun s -> Wserver.wprint "%s." s) sl;
          Wserver.wprint "%s???" s;
-      return () ]
+      return ()
+  | None -> () ]
 and eval_simple_foreach conf base env al ep efam =
   fun
   [ "alias" -> eval_foreach_alias conf base env al ep
