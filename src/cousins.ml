@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.5 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.6 2002-01-20 06:19:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -160,11 +160,10 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
       if first then
         Wserver.wprint "%s"
           (gen_person_title_text reference std_access conf base p2)
-      else
-        Wserver.wprint "<br>%s" (person_title_text conf base p2);
+      else Wserver.wprint "<br>%s" (person_title_text conf base p2);
       Wserver.wprint "%s & %s%s" (Date.short_dates_text conf base p2)
         (gen_person_title_text (reference_sp sp) std_access conf base sp)
-        (Date.short_dates_text conf base sp);
+        (Date.short_dates_text conf base sp)
     }
   in
   if match p_getenv conf.env "csp" with
@@ -214,7 +213,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    "%1 of (same or greater generation level) %2"
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
-               ;
+               in
                Wserver.wprint "%s" (capitale s);
                Wserver.wprint ":"
              };
@@ -225,7 +224,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
              List.map
                (fun ip -> (ip, ia_asex, [(p.cle_index, p.sex) :: rev_br]))
                (children_of base u)
-           ;
+           in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
              children
          }
@@ -251,7 +250,7 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
               [gen_person_title_text no_reference raw_access conf base a]))
     }
     else ();
-    let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib;
+    let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
     print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
     True
   }
@@ -272,14 +271,14 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
           let some =
             match Util.branch_of_sosa conf base p.cle_index sosa with
             [ Some ([(ia, _) :: _] as br) ->
-                print_cousins_side_of conf base max_cnt (pget conf base ia)
-                  p br lev1 lev2 ||
+                print_cousins_side_of conf base max_cnt (pget conf base ia) p
+                  br lev1 lev2 ||
                 some
             | _ -> some ]
           in
           loop (Num.inc sosa 1) some
         else some
-    ;
+    in
     if some then ()
     else do {
       html_li conf; Wserver.wprint "%s\n" (capitale (transl conf "no match"))
@@ -378,7 +377,8 @@ value sosa_of_persons conf base =
     fun
     [ [] -> n
     | [ip :: list] ->
-        loop (if (pget conf base ip).sex = Male then 2 * n else 2 * n + 1) list ]
+        loop (if (pget conf base ip).sex = Male then 2 * n else 2 * n + 1)
+          list ]
 ;
 
 value print_anniv conf base p level =

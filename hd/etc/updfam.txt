@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.18 2001-12-24 11:46:35 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.19 2002-01-20 06:19:23 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -24,7 +24,7 @@
     <tr>
       <td>xlab</td>
       <td>
-        %if;([ !dates in forms]0 = "ddmmyy");
+        %if;([ !dates order]0 = "ddmmyy");
           [year/month/day]2
           <input name=xvar_dd size=2 maxlength=2 value="%xdate.day;">
           [year/month/day]1
@@ -95,7 +95,7 @@
 
 %define;small_date(kind,xvar,xx,verbose)
   <td>
-    %if;([ !dates in forms]0 = "ddmmyy");
+    %if;([ !dates order]0 = "ddmmyy");
       <input name=xvar_dd size=2 maxlength=2 value="%xx.create.kind_day;">/
       <input name=xvar_mm size=2 maxlength=2 value="%xx.create.kind_month;">/
       <input name=xvar_yyyy size=5 maxlength=5 value="%xx.create.kind_year;">
