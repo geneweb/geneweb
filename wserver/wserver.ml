@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.1 2001-04-18 08:54:26 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.2 2001-04-22 03:31:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -419,12 +419,12 @@ value wait_available max_clients s =
         if List.length pids.val >= m then
 (*
 let tm = Unix.localtime (Unix.time ()) in
-do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "%d clients running; waiting...\n" m; flush stderr; return
+let _ = do { Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "%d clients running; waiting...\n" m; flush stderr; } in
 *)
           let (pid, _) = Unix.wait () in
 (*
 let tm = Unix.localtime (Unix.time ()) in
-do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "ok: place for another client\n"; flush stderr; return
+let _ = do { Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "ok: place for another client\n"; flush stderr; } in
 *)
           pids.val := list_remove pid pids.val
         else ();

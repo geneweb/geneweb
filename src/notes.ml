@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.0 2001-03-16 19:34:52 ddr Exp $ *)
+(* $Id: notes.ml,v 4.1 2001-04-22 03:31:15 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -9,17 +9,17 @@ open Util;
 value print conf base =
   let title _ =
     Wserver.wprint "%s - %s"
-      (capitale (nominative (transl_nth conf "note/notes" 1)))
-      conf.bname
+      (capitale (nominative (transl_nth conf "note/notes" 1))) conf.bname
   in
   let s = base.data.bnotes.nread 0 in
-  do header_no_page_title conf title;
-     print_link_to_welcome conf False;
-     html_p conf;
-     copy_string_with_macros conf [] s;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+  do {
+    header_no_page_title conf title;
+    print_link_to_welcome conf False;
+    html_p conf;
+    copy_string_with_macros conf [] s;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
 ;
 
 value print_mod conf base =
@@ -29,21 +29,20 @@ value print_mod conf base =
       conf.bname
   in
   let s = base.data.bnotes.nread 0 in
-  do header conf title;
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
-       stag "textarea" "name=notes rows=30 cols=70 wrap=virtual" begin
-         if s <> "" then
-           Wserver.wprint "%s" (quote_escaped s)
-         else ();
-       end;
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
+      stag "textarea" "name=notes rows=30 cols=70 wrap=virtual" begin
+        if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
+      end;
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    trailer conf;
+  }
 ;
 
 value print_mod_ok conf base =
@@ -52,6 +51,5 @@ value print_mod_ok conf base =
     [ Some v -> strip_spaces (strip_controls_m v)
     | None -> failwith "notes unbound" ]
   in
-  do base.func.commit_notes s; return
-  print conf base
+  do { base.func.commit_notes s; print conf base }
 ;

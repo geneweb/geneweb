@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.0 2001-03-16 19:35:02 ddr Exp $ *)
+(* $Id: some.ml,v 4.1 2001-04-22 03:31:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -8,13 +8,10 @@ open Config;
 open Util;
 
 value not_found conf txt x =
-  let title _ =
-    Wserver.wprint "%s: \"%s\"" (capitale txt) x
-  in
-  do rheader conf title;
-     print_link_to_welcome conf False;
-     trailer conf;
-  return ()
+  let title _ = Wserver.wprint "%s: \"%s\"" (capitale txt) x in
+  do {
+    rheader conf title; print_link_to_welcome conf False; trailer conf;
+  }
 ;
 
 value first_name_not_found conf =
@@ -32,8 +29,8 @@ value persons_of_fsname base find proj x =
     List.fold_right
       (fun istr l ->
          let str = nominative (sou base istr) in
-         if Name.crush_lower str = x
-         || List.mem x (List.map Name.crush_lower (surnames_pieces str)) then
+         if Name.crush_lower str = x ||
+            List.mem x (List.map Name.crush_lower (surnames_pieces str)) then
            let iperl = find istr in
            let iperl =
              List.fold_left
@@ -62,7 +59,7 @@ value persons_of_fsname base find proj x =
            (fun (str, istr, iperl) l ->
               if x = Name.strip_lower str then [(str, istr, iperl) :: l]
               else l)
-            l [],
+           l [],
          Name.strip_lower)
       else (l1, name_inj)
     in
@@ -72,31 +69,21 @@ value persons_of_fsname base find proj x =
 ;
 
 value print_elem conf base is_surname (p, xl) =
-  match xl with
-  [ (* [x] ->
-      do Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
+  list_iter_first
+    (fun first x ->
+       do {
+         if not first then html_li conf else ();
+         Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
          else Wserver.wprint "%s" p;
-         Wserver.wprint "</a>\n";
+         Wserver.wprint "</a>";
          Date.afficher_dates_courtes conf base x;
-      return ()
-  | *) _ ->
-      list_iter_first
-        (fun first x ->
-           do if not first then html_li conf else ();
-              Wserver.wprint "<a href=\"%s%s\">" (commd conf)
-                (acces conf base x);
-              if is_surname then
-                Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
-              else Wserver.wprint "%s" p;
-              Wserver.wprint "</a>";
-              Date.afficher_dates_courtes conf base x;
-              Wserver.wprint " <em>";
-              preciser_homonyme conf base x;
-              Wserver.wprint "</em>\n";
-           return ())
-          xl ]
+         Wserver.wprint " <em>";
+         preciser_homonyme conf base x;
+         Wserver.wprint "</em>\n";
+       })
+    xl
 ;
 
 value first_name_print_list conf base xl liste =
@@ -124,16 +111,18 @@ value first_name_print_list conf base xl liste =
       [] l
   in
   let title _ =
-    do Wserver.wprint "%s" (List.hd xl);
-       List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl xl);
-    return ()
+    do {
+      Wserver.wprint "%s" (List.hd xl);
+      List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl xl);
+    }
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
-       (print_elem conf base True) liste;
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
+      (print_elem conf base True) liste;
+    trailer conf;
+  }
 ;
 
 value select_first_name conf base n list =
@@ -142,23 +131,24 @@ value select_first_name conf base n list =
       (capitale (transl_nth conf "first name/first names" 0)) n
       (transl conf "specify")
   in
-  do header conf title;
-     Wserver.wprint "<ul>";
-     List.iter
-       (fun (sstr, (strl, _)) ->
-          do Wserver.wprint "\n";
-             html_li conf;
-             Wserver.wprint "<a href=\"%sm=P;v=%s\">"
-               (commd conf) (code_varenv sstr);
-             Wserver.wprint "%s" (List.hd strl);
-             List.iter (fun s -> Wserver.wprint ", %s" s)
-               (List.tl strl);
-             Wserver.wprint "</a>\n";
-          return ())
-       list;
-     Wserver.wprint "</ul>\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "<ul>";
+    List.iter
+      (fun (sstr, (strl, _)) ->
+         do {
+           Wserver.wprint "\n";
+           html_li conf;
+           Wserver.wprint "<a href=\"%sm=P;v=%s\">" (commd conf)
+             (code_varenv sstr);
+           Wserver.wprint "%s" (List.hd strl);
+           List.iter (fun s -> Wserver.wprint ", %s" s) (List.tl strl);
+           Wserver.wprint "</a>\n";
+         })
+      list;
+    Wserver.wprint "</ul>\n";
+    trailer conf;
+  }
 ;
 
 value rec merge_insert ((sstr, (strl, iperl)) as x) =
@@ -176,8 +166,7 @@ value first_name_print conf base x =
       (fun x -> x.first_name) x
   in
   let list =
-    List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl)))
-      list
+    List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl))) list
   in
   let list = List.fold_right merge_insert list [] in
   match list with
@@ -189,12 +178,10 @@ value first_name_print conf base x =
 
 value she_has_children_with_her_name base wife husband children =
   let wife_surname = Name.strip_lower (p_surname base wife) in
-  if Name.strip_lower (p_surname base husband) = wife_surname then
-    False
+  if Name.strip_lower (p_surname base husband) = wife_surname then False
   else
     List.exists
-      (fun c ->
-         Name.strip_lower (p_surname base (poi base c)) = wife_surname)
+      (fun c -> Name.strip_lower (p_surname base (poi base c)) = wife_surname)
       (Array.to_list children)
 ;
 
@@ -205,63 +192,69 @@ value afficher_date_mariage conf base fam p c =
 value max_lev = 3;
 
 value rec print_branch conf base first_lev psn lev name p =
-  do if lev == 0 then () else html_li conf;
-     Wserver.wprint "<strong>";
-     if not psn && p_surname base p = name then
-       afficher_prenom_de_personne_referencee conf base p
-     else afficher_personne_referencee conf base p;
-     Wserver.wprint "</strong>";
-     Date.afficher_dates_courtes conf base p;
-     Wserver.wprint "\n";
-  return
-  let u = uoi base p.cle_index in
-  if Array.length u.family == 0 then ()
-  else
-    let _ = List.fold_left
-      (fun (first, need_br) ifam ->
-         let fam = foi base ifam in
-         let des = doi base ifam in
-         let c = spouse p.cle_index (coi base ifam) in
-         let el = des.children in
-         let c = poi base c in
-         do if need_br then html_br conf else ();
-            if not first then
-              do Wserver.wprint "<em>";
+  do {
+    if lev == 0 then () else html_li conf;
+    Wserver.wprint "<strong>";
+    if not psn && p_surname base p = name then
+      afficher_prenom_de_personne_referencee conf base p
+    else afficher_personne_referencee conf base p;
+    Wserver.wprint "</strong>";
+    Date.afficher_dates_courtes conf base p;
+    Wserver.wprint "\n";
+    let u = uoi base p.cle_index in
+    if Array.length u.family == 0 then ()
+    else
+      let _ =
+        List.fold_left
+          (fun (first, need_br) ifam ->
+             let fam = foi base ifam in
+             let des = doi base ifam in
+             let c = spouse p.cle_index (coi base ifam) in
+             let el = des.children in
+             let c = poi base c in
+             do {
+               if need_br then html_br conf else ();
+               if not first then do {
+                 Wserver.wprint "<em>";
                  if p_surname base p = name then
                    afficher_prenom_de_personne conf base p
                  else afficher_personne conf base p;
                  Wserver.wprint "</em>";
                  Date.afficher_dates_courtes conf base p;
                  Wserver.wprint "\n";
-              return ()
-            else ();
-            Wserver.wprint "  &amp;";
-            afficher_date_mariage conf base fam p c;
-            Wserver.wprint " <strong>";
-            afficher_personne_referencee conf base c;
-            Wserver.wprint "</strong>";
-            Date.afficher_dates_courtes conf base c;
-            Wserver.wprint "\n";
-         return
-         let down =
-           p.sex = Male &&
-           (Name.crush_lower (p_surname base p) = Name.crush_lower name
-            || first_lev) &&
-           Array.length el <> 0 ||
-           p.sex = Female && she_has_children_with_her_name base p c el
-         in
-         if down then
-           do Wserver.wprint "<ul>\n";
-              List.iter
-                (fun e ->
-                   print_branch conf base False psn (succ lev) name
-                     (poi base e))
-                (Array.to_list el);
-              Wserver.wprint "</ul>\n";
-           return (False, not down)
-         else (False, not down))
-      (True, False) (Array.to_list u.family)
-    in ()
+               }
+               else ();
+               Wserver.wprint "  &amp;";
+               afficher_date_mariage conf base fam p c;
+               Wserver.wprint " <strong>";
+               afficher_personne_referencee conf base c;
+               Wserver.wprint "</strong>";
+               Date.afficher_dates_courtes conf base c;
+               Wserver.wprint "\n";
+               let down =
+                 p.sex = Male &&
+                 (Name.crush_lower (p_surname base p) =
+                    Name.crush_lower name ||
+                  first_lev) &&
+                 Array.length el <> 0 ||
+                 p.sex = Female && she_has_children_with_her_name base p c el
+               in
+               if down then do {
+                 Wserver.wprint "<ul>\n";
+                 List.iter
+                   (fun e ->
+                      print_branch conf base False psn (succ lev) name
+                        (poi base e))
+                   (Array.to_list el);
+                 Wserver.wprint "</ul>\n";
+                 (False, not down)
+               }
+               else (False, not down)
+             })
+          (True, False) (Array.to_list u.family)
+      in
+      ()
+  }
 ;
 
 value print_by_branch x conf base not_found_fun (ipl, homonymes) =
@@ -274,7 +267,7 @@ value print_by_branch x conf base not_found_fun (ipl, homonymes) =
   in
   let len = List.length ancestors in
   if len == 0 then not_found_fun conf x
-  else
+  else do {
     let fx = x in
     let x =
       match homonymes with
@@ -291,76 +284,74 @@ value print_by_branch x conf base not_found_fun (ipl, homonymes) =
     let title h =
       let access x =
         if h || List.length homonymes = 1 then x
-        else
-          geneweb_link conf ("m=N;v=" ^ code_varenv (Name.lower x))
-            x
+        else geneweb_link conf ("m=N;v=" ^ code_varenv (Name.lower x)) x
       in
-      do Wserver.wprint "%s" (access (List.hd homonymes));
-         List.iter (fun x -> Wserver.wprint ", %s" (access x))
-           (List.tl homonymes);
-      return ()
+      do {
+        Wserver.wprint "%s" (access (List.hd homonymes));
+        List.iter (fun x -> Wserver.wprint ", %s" (access x))
+          (List.tl homonymes);
+      }
     in
     let br = p_getint conf.env "br" in
-    do header conf title;
-       print_link_to_welcome conf True;
-       if br = None then
-         do Wserver.wprint "<font size=-1><em>\n";
-            Wserver.wprint "%s " (capitale (transl conf "click"));
-            Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-              (code_varenv fx) (transl conf "here");
-            Wserver.wprint "%s"
-              (transl conf "for the first names by alphabetic order");
-            Wserver.wprint ".</em></font>\n";
-            html_p conf;
-         return ()
-       else ();
-       Wserver.wprint "<nobr>\n";
-       if len > 1 && br = None then
-         do Wserver.wprint "%s: %d"
-             (capitale (transl conf "number of branches")) len;
-            html_p conf;
-            Wserver.wprint "<dl>\n";
-         return ()
-       else ();
-       let _ = List.fold_left
-         (fun n p ->
-            do if len > 1 && br = None then
-                 do Wserver.wprint "<dt>";
-                    stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
-                      (Util.code_varenv fx) n
-                    begin
-                      Wserver.wprint "%d." n;
-                    end;
-                    Wserver.wprint "\n<dd>\n";
-                 return ()
-               else ();
-               if br = None || br = Some n then
-                 match (aoi base p.cle_index).parents with
-                 [ Some ifam ->
-                     let cpl = coi base ifam in
-                     do let href =
-                          Util.acces conf base (poi base cpl.father)
-                        in
-                        wprint_geneweb_link conf href "&lt;&lt";
-                        Wserver.wprint "\n&amp;\n";
-                        let href =
-                          Util.acces conf base (poi base cpl.mother)
-                        in
-                        wprint_geneweb_link conf href "&lt;&lt";
-                        Wserver.wprint "\n";
-                        tag "ul" begin
-                          print_branch conf base True psn 1 x p;
-                        end;
-                     return ()
-                 | None -> print_branch conf base True psn 0 x p ]
-               else ();
-            return n + 1)
-         1 ancestors
-       in ();
-       if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
-       Wserver.wprint "</nobr>\n";
-       trailer conf;
-    return ()
+    header conf title;
+    print_link_to_welcome conf True;
+    if br = None then do {
+      Wserver.wprint "<font size=-1><em>\n";
+      Wserver.wprint "%s " (capitale (transl conf "click"));
+      Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+        (code_varenv fx) (transl conf "here");
+      Wserver.wprint "%s"
+        (transl conf "for the first names by alphabetic order");
+      Wserver.wprint ".</em></font>\n";
+      html_p conf;
+    }
+    else ();
+    Wserver.wprint "<nobr>\n";
+    if len > 1 && br = None then do {
+      Wserver.wprint "%s: %d" (capitale (transl conf "number of branches"))
+        len;
+      html_p conf;
+      Wserver.wprint "<dl>\n";
+    }
+    else ();
+    let _ =
+      List.fold_left
+        (fun n p ->
+           do {
+             if len > 1 && br = None then do {
+               Wserver.wprint "<dt>";
+               stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                   (Util.code_varenv fx) n begin
+                 Wserver.wprint "%d." n;
+               end;
+               Wserver.wprint "\n<dd>\n";
+             }
+             else ();
+             if br = None || br = Some n then
+               match (aoi base p.cle_index).parents with
+               [ Some ifam ->
+                   let cpl = coi base ifam in
+                   do {
+                     let href = Util.acces conf base (poi base cpl.father) in
+                     wprint_geneweb_link conf href "&lt;&lt";
+                     Wserver.wprint "\n&amp;\n";
+                     let href = Util.acces conf base (poi base cpl.mother) in
+                     wprint_geneweb_link conf href "&lt;&lt";
+                     Wserver.wprint "\n";
+                     tag "ul" begin
+                       print_branch conf base True psn 1 x p;
+                     end;
+                   }
+               | None -> print_branch conf base True psn 0 x p ]
+             else ();
+             n + 1
+           })
+        1 ancestors
+    in
+    if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
+    Wserver.wprint "</nobr>\n";
+    trailer conf;
+  }
 ;
 
 value print_family_alphabetic x conf base liste =
@@ -368,12 +359,10 @@ value print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-           if List.memq p.surname list then list
-           else [p.surname :: list])
+           if List.memq p.surname list then list else [p.surname :: list])
         [] liste
     in
-    let list = List.map (fun s -> sou base s) list in
-    List.sort compare list
+    let list = List.map (fun s -> sou base s) list in List.sort compare list
   in
   let liste =
     let l =
@@ -400,20 +389,21 @@ value print_family_alphabetic x conf base liste =
       let title h =
         let access x =
           if h || List.length homonymes = 1 then x
-          else
-            geneweb_link conf ("m=N;o=i;v=" ^ code_varenv (Name.lower x)) x
+          else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv (Name.lower x)) x
         in
-        do Wserver.wprint "%s" (access (List.hd homonymes));
-           List.iter (fun x -> Wserver.wprint ", %s" (access x))
-             (List.tl homonymes);
-        return ()
+        do {
+          Wserver.wprint "%s" (access (List.hd homonymes));
+          List.iter (fun x -> Wserver.wprint ", %s" (access x))
+            (List.tl homonymes);
+        }
       in
-      do header conf title;
-         print_link_to_welcome conf True;
-         print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
-           (print_elem conf base False) liste;
-         trailer conf;
-      return () ]
+      do {
+        header conf title;
+        print_link_to_welcome conf True;
+        print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
+          (print_elem conf base False) liste;
+        trailer conf;
+      } ]
 ;
 
 value has_at_least_2_children_with_surname base des surname =
@@ -422,8 +412,7 @@ value has_at_least_2_children_with_surname base des surname =
     else
       let p = poi base des.children.(i) in
       if p.surname == surname then
-        if cnt == 1 then True
-        else loop (cnt + 1) (i + 1)
+        if cnt == 1 then True else loop (cnt + 1) (i + 1)
       else loop cnt (i + 1)
 ;
 
@@ -439,13 +428,13 @@ value select_ancestors base name_inj ipl =
            let fath = poi base cpl.father in
            let moth = poi base cpl.mother in
            let s = str_inj p.surname in
-           if str_inj fath.surname <> s && str_inj moth.surname <> s
-           && not (List.memq ip ipl) then
+           if str_inj fath.surname <> s && str_inj moth.surname <> s &&
+              not (List.memq ip ipl) then
              if List.memq cpl.father ipl then ipl
              else if
                has_at_least_2_children_with_surname base (doi base ifam)
-                 p.surname
-             then [cpl.father :: ipl]
+                 p.surname then
+               [cpl.father :: ipl]
              else [ip :: ipl]
            else ipl
        | _ -> [ip :: ipl] ])
@@ -459,7 +448,7 @@ value surname_print conf base not_found_fun x =
   in
   let (iperl, strl) =
     List.fold_right
-      (fun (str, istr, iperl1) (iperl, strl)  ->
+      (fun (str, istr, iperl1) (iperl, strl) ->
          let len = List.length iperl1 in
          (iperl1 @ iperl, [(str, len) :: strl]))
       l ([], [])
