@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.23 2004-12-28 15:13:02 ddr Exp $ *)
+(* $Id: templ.ml,v 4.24 2004-12-29 01:16:17 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -454,6 +454,29 @@ value rec skip_spaces_and_newlines s i =
     | _ -> i ]
 ;
 
+value not_impl func x =
+  let desc =
+    if Obj.is_block (Obj.repr x) then
+      "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
+    else "int_val = " ^ string_of_int (Obj.magic x)
+  in
+  "Templ." ^ func ^ ": not impl " ^ desc
+;
+
+value eval_variable =
+  fun
+  [ "sp" -> " "
+  | "/" -> Util.xhs
+  | s -> "%%%" ^ s ^ "???" ]
+;
+
+value eval_ast =
+  fun
+  [ Atext s -> s
+  | Avar s [] -> eval_variable s
+  | x -> not_impl "eval_ast" x ]
+;
+
 value eval_transl_lexicon conf upp s c =
   let r =
     let nth = try Some (int_of_string c) with [ Failure _ -> None ] in
@@ -471,7 +494,12 @@ value eval_transl_lexicon conf upp s c =
             let i = 1 in
             let j = String.rindex s2 '|' in
             let k = skip_spaces_and_newlines s2 (j + 1) in
-            let s3 = String.sub s2 i (j - i) in
+            let s3 =
+              let s = String.sub s2 i (j - i) in
+              let astl = parse_templ conf (Stream.of_string s) in
+              let astl = strip_newlines_after_variables astl in
+              List.fold_left (fun s a -> s ^ eval_ast a) "" astl
+            in
             let s4 = String.sub s2 k (String.length s2 - k) in
             let s5 =
               match nth with

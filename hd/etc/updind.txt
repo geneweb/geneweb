@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.17 2004-12-28 15:12:52 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.18 2004-12-29 01:16:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <title>%nn;
@@ -487,8 +487,8 @@ function changeDeath()
   <table border="1">
   <tr>
   <td>
-  [*insert::|<input name="ins_titlexx_n" size="1" maxlength="1"
-   value="1"></input> | title/titles]
+  [*insert::|<input name="ins_titlexx_n" size="1" maxlength="1"%sp;
+   value="1"%/> | title/titles]
   <input type="checkbox" name="ins_titlexx" value="on"%/>
   </td>
   </tr>
