@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.2 2000-01-10 02:14:42 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.3 2000-01-12 10:24:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -293,6 +293,11 @@ value print_comment conf base fam =
 ;
 
 value print_source conf base field =
+  let p_field =
+    match p_getenv conf.env "psrc" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   do tag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
      end;
@@ -300,11 +305,24 @@ value print_source conf base field =
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
+           Wserver.wprint "%s"
+             (capitale (transl_nth conf "person/persons" 1));
+         end;
+         tag "td" begin
+           Wserver.wprint "<input name=psrc size=50 maxlength=200%s>\n"
+             (if p_field = "" then ""
+              else " value=\"" ^ quote_escaped p_field ^ "\"");
+         end;
+       end;
+       tag "tr" begin
+         tag "td" begin
+           Wserver.wprint "%s"
+             (capitale (transl_nth conf "family/families" 0));
+         end;
+         tag "td" begin
            Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
-             (match field with
-              [ s when s <> "" ->
-                  " value=\"" ^ quote_escaped s ^ "\""
-              | _ -> "" ]);
+             (if field = "" then ""
+              else " value=\"" ^ quote_escaped field ^ "\"");
          end;
        end;
      end;
