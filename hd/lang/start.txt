@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.38 2002-12-10 08:40:36 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.39 2002-12-23 10:29:24 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -91,6 +91,7 @@ en: You can select another displaying language among the following ones:
 eo: Vi povas elekti alian lingvon inter la sekvantajn:
 es: Puede seleccionar uno de los idiomas siguientes:
 et: Võid valida ka mõne muu keele järgnevatest:
+fi: Voit valita jonkin muun kielen allaolevista:
 fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 it: Potete scegliere un'altra lingua fra le seguenti:
