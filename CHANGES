@@ -8,6 +8,12 @@ GeneWeb version 4.05
     places/surnames pages, in descendants and in ancestors pages.
 
 * Setup program (gwsetup)
+  - [14 Jan 02] Big cleanup in this program: now all templates files
+    are grouped together for all languages, which saves 250 files in the
+    distribution! This has other advantages: 1/ easier to maintain 2/
+    easier to add new languages 3/ easier to extend 4/ exactly same look
+    for all languages 5/ easier to see which sentences are missing in a
+    language .
   - [13 Jan 02] Proposes now both addresses localhost and 127.0.0.1.
     (sometimes just one of them work and not the other).
 
