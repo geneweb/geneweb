@@ -1,4 +1,4 @@
-GeneWeb 4.08
+GeneWeb 4.09
 
 Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
@@ -21,7 +21,7 @@ changements par rapport aux versions precedentes.
 
      -----------------
 
-GeneWeb est copyright INRIA 2002.
+GeneWeb est copyright INRIA 2003.
 
 Remarques, suggestions, questions, rapports d'anomalie a:
 	daniel.de_rauglaudre@inria.fr

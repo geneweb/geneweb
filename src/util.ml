@@ -1,10 +1,20 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.69 2002-12-26 14:26:24 ddr Exp $ *)
+(* $Id: util.ml,v 4.70 2002-12-30 18:40:05 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
 open Config;
 open Gutil;
+
+value open_in fname =
+  if String.contains fname '\000' then raise (Sys_error "")
+  else Pervasives.open_in fname
+;
+
+value open_in_bin fname =
+  if String.contains fname '\000' then raise (Sys_error "")
+  else Pervasives.open_in_bin fname
+;
 
 value sharelib =
   List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
@@ -1366,7 +1376,7 @@ alt=... width=64 height=72 align=right border=0></a>
         do {
           html_p conf;
           Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2002 INRIA -
+<hr><font size=-1><em>(c) Copyright 2003 INRIA -
 GeneWeb %s</em></font>" Version.txt;
           html_br conf;
           ()

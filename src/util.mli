@@ -1,8 +1,11 @@
-(* $Id: util.mli,v 4.25 2002-12-26 14:26:26 ddr Exp $ *)
+(* $Id: util.mli,v 4.26 2002-12-30 18:40:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Config;
+
+value open_in : string -> in_channel;
+value open_in_bin : string -> in_channel;
 
 value lang_path : ref (list string);
 value doc_path: ref (list string);

@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 4.4 2002-11-07 09:42:55 ddr Exp $ *)
+(* $Id: doc.ml,v 4.5 2002-12-30 18:40:04 ddr Exp $ *)
 
 open Config;
 
@@ -46,11 +46,22 @@ value url_dirname name =
   [ Not_found -> "." ]
 ;
 
+value string_contains s ss =
+  let sslen = String.length ss in
+  let mlen = String.length s - sslen in
+  loop 0 where rec loop i =
+    if i >= mlen then False
+    else if String.sub s i sslen = ss then True
+    else loop (i + 1)
+;
+
 value url_is_relative n = String.length n < 1 || n.[0] <> '/';
 
 value url_is_implicit n =
-  url_is_relative n && (String.length n < 2 || String.sub n 0 2 <> "./") &&
-  (String.length n < 3 || String.sub n 0 3 <> "../")
+  url_is_relative n && not (string_contains n "./") &&
+  not (string_contains n "../") && not (string_contains n ".\\") &&
+  not (string_contains n "..\\") && not (string_contains n ":") &&
+  not (string_contains n "::")
 ;
 
 value copy conf pref_doc pref_img s =
@@ -112,7 +123,7 @@ value print conf =
       if Filename.check_suffix fname ".htm" then fname else fname ^ ".htm"
     in
     let fname = Util.search_in_doc_path fname in
-    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    match try Some (Util.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do {
           Util.html conf;

@@ -13,4 +13,4 @@ it: Pagina visualizzata da
 sl: Strani ustvarjene z:
     <a href="http://cristal.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
 ]
-(c) Copyright 2002 INRIA %d</em></font><br>
+(c) Copyright 2003 INRIA %d</em></font><br>

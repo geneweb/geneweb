@@ -2,6 +2,8 @@ GeneWeb version 4.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [30 Dec 02] Fixed security hole existing since a long time. People
+    are invited to download this new version.
   - [26 Dec 02] Changed the filtering of HTML tags: in version 4.08, the
     principle was changed so that some tags were accepted and all other
     ones refused. Return to previous behaviour (some tags are refused,
