@@ -1,6 +1,6 @@
-GeneWeb 3.07
+GeneWeb 3.08
 
-If you are under Windows NT/95/98:
+If you are under Windows:
    Double-click on the file "index.htm" of the directory "doc",
    and follow the instructions.
 
