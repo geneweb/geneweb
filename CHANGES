@@ -40,7 +40,7 @@ GeneWeb version 2.06
     its specific global restricted access. See the template file "a.gwf".
     Works only in server (not cgi) mode.
 
-* Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+* Lexicon (lang/lexicon.txt)
   - [Aug 29, 99] Updated some Dutch phrases (Joris Esch).
 
 * Documentation

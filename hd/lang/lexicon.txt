@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.113 1999-08-29 14:20:13 ddr Exp $
+# $Id: lexicon.txt,v 2.114 1999-08-29 16:17:55 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1273,7 +1273,7 @@ it: figlio/figli
 nl: kind/kinderen
 no: barn/barn
 pt: filho/filhos
-se: barn/barnen
+se: barn/barn
 
     children's names changed
 cs: jména dìtí zmìnìna
