@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.32 1999-08-18 05:10:32 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.33 1999-08-18 17:55:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -973,6 +973,9 @@ value main () =
     [("-hd", Arg.String (fun x -> Util.lang_dir.val := x),
       "<dir>
        Directory where the directory lang is installed.");
+     ("-dd", Arg.String (fun x -> Util.doc_dir.val := x),
+      "dir>
+       Directory where the documentation is installed.");
      ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
       "dir>
        Directory where the databases are installed.");
@@ -1032,6 +1035,9 @@ value main () =
   do arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg")
        speclist anonfun usage;
      Argl.parse speclist anonfun usage;
+     if Util.doc_dir.val = "" then
+       Util.doc_dir.val := Filename.concat Util.lang_dir.val "doc"
+     else ();
   return
   let (query, cgi) =
     try (Sys.getenv "QUERY_STRING", True) with
