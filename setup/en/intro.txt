@@ -4,6 +4,8 @@ Welcome to GeneWeb $q
 Go to your Web browser and open the address:
        http://localhost:$z/
 
+Warning: for this program to work, you must not delete this window!
+
 If it does not work, you may have to configurate, in your browser,
 options like "work off-line" or "do not use the proxy for local
 addresses" or "do not connect to Internet for the address

@@ -4,6 +4,9 @@ Bienvenue dans GeneWeb $q
 Allez dans votre navigateur Web et ouvrez l'adresse:
        http://localhost:$z/
 
+Attention: pour que cela fonctionne, vous ne devez pas détruire cette
+fenêtre!
+
 Si cela ne fonctionne pas, il se peut que vous ayez à configurer dans
 votre navigateur des options du genre "travailler hors connexion" ou
 "ne pas utiliser de proxy pour les adresses locales" ou "ne pas se
