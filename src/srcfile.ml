@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.27 2000-09-18 17:07:44 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.28 2000-10-28 19:45:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -78,6 +78,61 @@ value write_counter conf r =
       ()
 ;
 
+value std_date () =
+  let tm = Unix.localtime (Unix.time ()) in
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (tm.Unix.tm_year + 1900)
+    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+    tm.Unix.tm_sec
+;
+
+value read_wizard_trace fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let r = ref [] in
+      do try while True do r.val := [input_line ic :: r.val]; done with
+         [ End_of_file -> close_in ic ];
+      return List.rev r.val
+  | None -> [] ]
+;
+
+value write_wizard_trace fname wt =
+  let oc = open_out fname in
+  do List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
+     close_out oc;
+  return ()
+;
+
+value set_wizard_trace conf =
+  if conf.wizard && conf.user <> "" then
+    let wpf =
+      try List.assoc "wizard_passwd_file" conf.base_env with
+      [ Not_found -> "" ]
+    in
+    if wpf <> "" then
+      let fname = adm_file (conf.bname ^ "_w.txt") in
+      let dt = std_date () in
+      let wt =
+        let r = read_wizard_trace fname in
+        let dtlen = String.length dt in
+        loop False [] r where rec loop found r =
+          fun
+          [ [x :: l] ->
+              if String.length x > dtlen + 2 then
+                let u =
+                  String.sub x (dtlen + 1) (String.length x - dtlen - 1)
+                in
+                if u = conf.user then loop True [(dt, u) :: r] l
+                else loop found [(String.sub x 0 dtlen, u) :: r] l
+              else loop found r l
+          | [] ->
+              if found then List.rev r
+              else Sort.list \> [(dt, conf.user) :: r] ]
+      in
+      write_wizard_trace fname wt
+    else ()
+  else ()
+;
+
 value incr_welcome_counter conf =
   let lname = cnt conf ".lck" in
   lock_wait lname with
@@ -88,6 +143,7 @@ value incr_welcome_counter conf =
          else if conf.friend then r.friend_cnt := r.friend_cnt + 1
          else r.normal_cnt := r.normal_cnt + 1;
          write_counter conf r;
+         set_wizard_trace conf;
       return Some (r.welcome_cnt, r.request_cnt, r.start_date)
   | Refuse -> None ]
 ;
@@ -102,6 +158,7 @@ value incr_request_counter conf =
          else if conf.friend then r.friend_cnt := r.friend_cnt + 1
          else r.normal_cnt := r.normal_cnt + 1;
          write_counter conf r;
+         set_wizard_trace conf;
       return Some (r.welcome_cnt, r.request_cnt, r.start_date)
   | Refuse -> None ]
 ;
