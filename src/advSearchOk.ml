@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 3.4 2001-01-06 09:55:52 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 3.5 2001-03-04 08:36:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -127,23 +127,12 @@ value advanced_search conf base max_answers =
   let list = ref [] in
   let len = ref 0 in
   let test_person p u =
-    if test "first_name" (fun x -> name_eq x (p_first_name base p))
-    && test "surname" (fun x -> name_eq x (p_surname base p))
-    && test "sex"
+    if test "sex"
          (fun              
           [ "M" -> p.sex = Male
           | "F" -> p.sex = Female
           | _ -> True ])
-    && test "married"
-         (fun              
-          [ "Y" -> u.family <> [| |]
-          | "N" -> u.family = [| |]
-          | _ -> True ])
-    && test_auth p "birth_place"
-         (fun x -> name_incl x (sou base p.birth_place))
     && test_date p "birth" (fun () -> Adef.od_of_codate p.birth)
-    && test_auth p "bapt_place"
-         (fun x -> name_incl x (sou base p.baptism_place))
     && test_date p "bapt" (fun () -> Adef.od_of_codate p.baptism)
     && test_auth p "death"
          (fun d ->
@@ -153,21 +142,32 @@ value advanced_search conf base max_answers =
             | ("NotDead", NotDead) -> True
             | ("NotDead", _) -> False
             | _ -> True ])
-    && test_auth p "death_place"
-         (fun x -> name_incl x (sou base p.death_place))
     && test_date p "death"
          (fun () ->
             match p.death with
             [ Death _ cd -> Some (Adef.date_of_cdate cd)
             | _ -> None ])
-    && test_auth p "burial_place"
-          (fun x -> name_incl x (sou base p.burial_place))
     && test_date p "burial"
          (fun () ->
             match p.burial with
             [ Buried cod -> Adef.od_of_codate cod
             | Cremated cod -> Adef.od_of_codate cod
             | _ -> None ])
+    && test "first_name" (fun x -> name_eq x (p_first_name base p))
+    && test "surname" (fun x -> name_eq x (p_surname base p))
+    && test "married"
+         (fun              
+          [ "Y" -> u.family <> [| |]
+          | "N" -> u.family = [| |]
+          | _ -> True ])
+    && test_auth p "birth_place"
+         (fun x -> name_incl x (sou base p.birth_place))
+    && test_auth p "bapt_place"
+         (fun x -> name_incl x (sou base p.baptism_place))
+    && test_auth p "death_place"
+         (fun x -> name_incl x (sou base p.death_place))
+    && test_auth p "burial_place"
+          (fun x -> name_incl x (sou base p.burial_place))
     && test_auth p "occu" (fun x -> name_incl x (sou base p.occupation))
     then
       do list.val := [p :: list.val];
