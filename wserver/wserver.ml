@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.7 2000-05-02 02:38:22 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.8 2000-05-02 17:10:32 doligez Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -120,7 +120,7 @@ value encode s =
 value nl () =
   do wflush ();
      let _ =
-        Unix.write (Unix.descr_of_out_channel wserver_oc.val) "\r\n" 0 2 in
+        Unix.write (Unix.descr_of_out_channel wserver_oc.val) "\015\010" 0 2 in
      ();
   return ()
 ;
@@ -221,10 +221,10 @@ value get_buff len = String.sub buff.val 0 len;
 value get_request strm =
   let rec loop len =
     parser
-    [ [: `'\n'; s :] ->
+    [ [: `'\010'; s :] ->
         if len == 0 then []
         else let str = get_buff len in [str :: loop 0 s]
-    | [: `'\r'; s :] -> loop len s
+    | [: `'\013'; s :] -> loop len s
     | [: `c; s :] -> loop (store len c) s
     | [: :] -> if len == 0 then [] else [get_buff len] ]
   in
@@ -425,7 +425,7 @@ value accept_connection tmout max_clients callback s =
     let cleanup () =
       do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
-	 try Unix.close t with _ -> ();
+         try Unix.close t with _ -> ();
       return ()
     in
     let ic = Unix.in_channel_of_descr t in
