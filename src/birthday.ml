@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.16 2005-01-01 23:04:23 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.17 2005-01-02 21:27:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -10,13 +10,11 @@ open Gutil;
 type date_event = [ DeBirth | DeDeath of death_reason ];
 
 value print_anniversary_day conf base dead_people liste =
-  do {
-    Wserver.wprint "<ul>\n";
+  tag "ul" begin
     List.iter
       (fun (p, a, date_event, txt_of) ->
          let is = index_of_sex p.sex in
-         do {
-           html_li conf;
+         tag "li" begin
            Wserver.wprint "%s\n" (txt_of conf base p);
            if not dead_people then Wserver.wprint " <em>%d</em>\n" a
            else
@@ -32,10 +30,9 @@ value print_anniversary_day conf base dead_people liste =
              in
              Wserver.wprint ", <em>%s %s %d</em>\n" txt
                (transl conf "in (year)") a;
-         })
+         end)
       liste;
-    Wserver.wprint "</ul>\n";
-  }
+  end
 ;
 
 value gen_print conf base mois f_scan dead_people =
@@ -104,13 +101,14 @@ value gen_print conf base mois f_scan dead_people =
     Wserver.wprint "<ul>\n";
     for j = 1 to 31 do {
       if tab.(pred j) <> [] then do {
-        html_li conf;
-        Wserver.wprint "%d\n" j;
-        let liste =
-          Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2)
-            tab.(pred j)
-        in
-        print_anniversary_day conf base dead_people liste;
+        tag "li" begin
+          Wserver.wprint "%d\n" j;
+          let liste =
+            Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2)
+              tab.(pred j)
+          in
+          print_anniversary_day conf base dead_people liste;
+        end
       }
       else ()
     };

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.219 2005-01-02 14:43:15 ddr Exp $
+# $Id: lexicon.txt,v 4.220 2005-01-02 21:27:17 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -5907,7 +5907,7 @@ sv: inga tr&auml;ffar
 bg: не се споменава
 br: meneg ebet
 ca: no esmentat
-cs: bez zmГ­nky
+cs: bez zmнnky
 da: andet
 de: nicht erv&auml;hnt
 en: no mention
