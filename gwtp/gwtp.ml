@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.35 2000-08-18 13:18:25 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.36 2000-08-18 13:28:53 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -517,10 +517,16 @@ value gwtp_download str env b tok =
               let st = Unix.stat (Filename.concat bdir f) in
               if st.Unix.st_kind == Unix.S_REG
               && f.[String.length f - 1] <> '~' then
-                do printf
-                     "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
+                do printf "<li><tt>";
+                   printf "<a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
                      b tok f f;
-                   printf " - %d bytes\n" st.Unix.st_size;
+                   let sz = string_of_int st.Unix.st_size in
+                   printf "%t%s bytes"
+                     (fun oc ->
+                        for i = 1 to 25 - String.length sz - String.length f
+                        do fprintf oc "&nbsp;"; done)
+                     sz;
+                   printf "</tt>\n";
                 return ()
               else ();
             done
