@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.31 2000-11-09 12:40:05 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.32 2000-12-28 23:27:14 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -423,7 +423,7 @@ value rec copy_from_channel conf base ic mode =
           | '%' -> Wserver.wprint "%%"
           | '[' | ']' -> Wserver.wprint "%c" c
           | 'h' -> hidden_env conf
-          | 'j' -> include_hed_trl conf ".hed"
+          | 'j' -> include_hed_trl conf (Some base) ".hed"
           | 'r' -> copy_from_file conf base (input_line ic) mode
           | 'u' ->
               let lang =

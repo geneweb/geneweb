@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.65 2000-11-05 10:17:25 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.66 2000-12-28 23:27:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -256,7 +256,7 @@ value read_base_env cgi bname =
 ;
 
 value print_renamed conf new_n =
-  let link =
+  let link () =
     let req = Util.get_request_string conf in
     let new_req =
       let len = String.length conf.bname in
@@ -269,7 +269,7 @@ value print_renamed conf new_n =
     in
     "http://" ^ Util.get_server_string conf ^ new_req
   in
-  let env = [('o', conf.bname); ('n', new_n); ('l', link)] in
+  let env = [('o', fun _ -> conf.bname); ('n', fun _ -> new_n); ('l', link)] in
   match Util.open_etc_file "renamed" with
   [ Some ic ->
       do Util.html conf;
@@ -280,6 +280,7 @@ value print_renamed conf new_n =
         Wserver.wprint "%s -&gt; %s" conf.bname new_n
       in
       do Util.header conf title;
+         let link = link () in
          tag "ul" begin
            Util.html_li conf;
            tag "a" "href=\"%s\"" link begin
@@ -291,7 +292,7 @@ value print_renamed conf new_n =
 ;
 
 value print_redirected conf new_addr =
-  let link =
+  let link () =
     let req = Util.get_request_string conf in
     "http://" ^ new_addr ^ req
   in
@@ -307,6 +308,7 @@ value print_redirected conf new_addr =
          Wserver.wprint "Use the following address:\n<p>\n";
          tag "ul" begin
            Util.html_li conf;
+           let link = link () in
            stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
            Wserver.wprint "\n";
          end;
@@ -390,7 +392,7 @@ value propose_base conf =
 value general_welcome conf =
   match Util.open_etc_file "index" with
   [ Some ic ->
-      let env = [('w', Util.link_to_referer conf)] in
+      let env = [('w', fun _ -> Util.link_to_referer conf)] in
       do Util.html conf;
          Util.copy_from_etc env conf.indep_command ic;
       return ()

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.41 2000-11-21 16:13:08 ddr Exp $ *)
+(* $Id: family.ml,v 3.42 2000-12-28 23:27:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -512,98 +512,6 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> person_selected conf base p
       | _ -> inconnu_au_bataillon conf ] ]
-;
-
-value url_no_index conf base =
-  let scratch s = code_varenv (Name.lower (sou base s)) in
-  let get_person v =
-    match try Some (int_of_string v) with [ Failure _ -> None ] with
-    [ Some i ->
-        if i >= 0 && i < base.data.persons.len then
-          let p = base.data.persons.get i in
-          let f = scratch p.first_name in
-          let s = scratch p.surname in
-          let oc = string_of_int p.occ in
-          Some (f, s, oc)
-        else None
-    | None -> None ]
-  in
-  let get_family v =
-    match try Some (int_of_string v) with [ Failure _ -> None ] with
-    [ Some i ->
-        if i >= 0 && i < base.data.families.len then
-          if is_deleted_family (base.data.families.get i) then None
-          else
-            let cpl = base.data.couples.get i in
-            let p = poi base cpl.father in
-            let f = scratch p.first_name in
-            let s = scratch p.surname in
-            if f = "" || s = "" then None
-            else
-              let oc = string_of_int p.occ in
-              let u = uoi base cpl.father in
-              let n =
-                loop 0 where rec loop k =
-                  if u.family.(k) == Adef.ifam_of_int i then string_of_int k
-                  else loop (k + 1)
-              in
-              Some (f, s, oc, n)
-        else None
-    | None -> None ]
-  in
-  let env =
-    let rec loop =
-      fun
-      [ [] -> []
-      | [("opt", "no_index") :: l] -> loop l
-      | [("escache", _) :: l] -> loop l
-      | [("dsrc", _) :: l] -> loop l
-      | [("templ", _) :: l] -> loop l
-      | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
-      | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
-      | [(k, v) :: l] when String.length k == 2 && k.[0] == 'i' ->
-          let c = String.make 1 k.[1] in new_env k v (fun x -> x ^ c) l
-      | [(k, v) :: l]
-        when String.length k > 2 && k.[0] == 'e' && k.[1] == 'f' ->
-          new_fam_env k v (fun x -> x ^ k) l
-      | [kv :: l] -> [kv :: loop l] ]
-    and new_env k v c l =
-      match get_person v with
-      [ Some (f, s, oc) ->
-          if oc = "0" then [(c "p", f); (c "n", s) :: loop l]
-          else [(c "p", f); (c "n", s); (c "oc", oc) :: loop l]
-      | None -> [(k, v) :: loop l] ]
-    and new_fam_env k v c l =
-      match get_family v with
-      [ Some (f, s, oc, n) ->
-          let l = loop l in
-          let l = if n = "0" then l else [(c "f", n) :: l] in
-          if oc = "0" then [(c "p", f); (c "n", s) :: l]
-          else [(c "p", f); (c "n", s); (c "oc", oc) :: l]
-      | None -> [(k, v) :: loop l] ]
-    in          
-    loop conf.env
-  in
-  let addr =
-    let pref =
-      let s = Util.get_request_string conf in
-      match rindex s '?' with
-      [ Some i -> String.sub s 0 i
-      | None -> s ]
-    in
-    Util.get_server_string conf ^ pref
-  in
-  let suff =
-    List.fold_right
-      (fun (x, v) s ->
-         let sep = if s = "" then "" else ";" in
-         x ^ "=" ^ v ^ sep ^ s)
-      [("lang", conf.lang) :: env] ""
-  in
-  let suff =
-    if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff
-  in
-  addr ^ "?" ^ suff
 ;
 
 value print_no_index conf base =
