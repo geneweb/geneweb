@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.6 1998-12-16 17:36:26 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.7 1998-12-19 12:36:04 roglo Exp $ *)
 
 open Def;
 open Gutil;
@@ -136,9 +136,9 @@ value cnt = ref 0;
 value give_access conf base ia_asex p1 b1 p2 b2 =
   do stag "a" "href=\"%sm=RL;i1=%d;b1=%s;i2=%d;b2=%s\"" (commd conf)
        (Adef.int_of_iper p1.cle_index)
-       (Num.to_string (RelationLink.sosa_of_branch [ia_asex :: b1]))
+       (Num.to_string (Util.sosa_of_branch [ia_asex :: b1]))
        (Adef.int_of_iper p2.cle_index)
-       (Num.to_string (RelationLink.sosa_of_branch [ia_asex :: b2]))
+       (Num.to_string (Util.sosa_of_branch [ia_asex :: b2]))
      begin
        afficher_personne_sans_titre conf base p2;
      end;
@@ -217,7 +217,7 @@ value print_cousins_lev conf base p lev =
       loop first_sosa False where rec loop sosa some =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
           let some =
-            match RelationLink.branch_of_sosa base p.cle_index sosa with
+            match Util.branch_of_sosa base p.cle_index sosa with
             [ Some ([(ia, _) :: _] as br) ->
                 print_cousins_side_of conf base (poi base ia) p br lev ||
                 some

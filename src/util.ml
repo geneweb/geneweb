@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.18 1998-12-16 17:36:48 ddr Exp $ *)
+(* $Id: util.ml,v 1.19 1998-12-19 12:36:10 roglo Exp $ *)
 
 open Def;
 open Config;
@@ -811,4 +811,35 @@ value create_topological_sort conf base =
           let _ = base.data.ascends.array () in
           let _ = base.data.couples.array () in
           Consang.topological_sort base ] ]
+;
+
+value branch_of_sosa base ip n =
+  let rec expand bl n =
+    if Num.eq n Num.one then bl else expand [Num.even n :: bl] (Num.half n)
+  in
+  let rec loop ipl ip sp =
+    fun
+    [ [] -> Some [(ip, sp) :: ipl]
+    | [goto_fath :: nl] ->
+        match (aoi base ip).parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            if goto_fath then loop [(ip, sp) :: ipl] cpl.father Masculine nl
+            else loop [(ip, sp) :: ipl] cpl.mother Feminine nl
+        | _ -> None ] ]
+  in
+  loop [] ip (poi base ip).sex (expand [] n)
+;
+
+value sosa_of_branch ipl =
+  do if ipl = [] then failwith "sosa_of_branch" else (); return
+  let ipl = List.tl (List.rev ipl) in
+  List.fold_left
+    (fun b (ip, sp) ->
+       let b = Num.twice b in
+       match sp with
+       [ Masculine -> b
+       | Feminine -> Num.inc b 1
+       | Neuter -> assert False ])
+    Num.one ipl
 ;

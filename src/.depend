@@ -27,9 +27,9 @@ consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi
 consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx pqueue.cmx consang.cmi 
 consang.cmi: def.cmi 
 cousins.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
-    relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
+    srcfile.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
-    relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
+    srcfile.cmx util.cmx ../wserver/wserver.cmx 
 date.cmo: adef.cmi def.cmi gutil.cmi util.cmi ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx def.cmi gutil.cmx util.cmx ../wserver/wserver.cmx date.cmi 
 date.cmi: config.cmi def.cmi 
@@ -167,10 +167,10 @@ updateIndOk.cmx: adef.cmx ansel.cmx config.cmi def.cmi gutil.cmx iobase.cmx \
     updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi 
 util.cmo: adef.cmi ansel.cmo config.cmi consang.cmi def.cmi gutil.cmi \
-    iobase.cmi name.cmi ../wserver/wserver.cmi util.cmi 
+    iobase.cmi name.cmi num.cmi ../wserver/wserver.cmi util.cmi 
 util.cmx: adef.cmx ansel.cmx config.cmi consang.cmx def.cmi gutil.cmx \
-    iobase.cmx name.cmx ../wserver/wserver.cmx util.cmi 
-util.cmi: config.cmi def.cmi 
+    iobase.cmx name.cmx num.cmx ../wserver/wserver.cmx util.cmi 
+util.cmi: config.cmi def.cmi num.cmi 
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
 alln.cmo alln.cmx: pa_html.cmo
 ascend.cmo ascend.cmx: def.syn.cmo pa_html.cmo
