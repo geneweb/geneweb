@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.9 1999-07-15 17:13:22 ddr Exp $ *)
+(* $Id: some.ml,v 2.10 1999-07-16 21:01:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -270,7 +270,7 @@ value rec print_branch conf base lev name p =
     in ()
 ;
 
-value rec print_by_branch x conf base (ipl, homonymes) =
+value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
   let l = List.map (poi base) ipl in
   let ancestors =
     Sort.list
@@ -279,7 +279,7 @@ value rec print_by_branch x conf base (ipl, homonymes) =
       l
   in
   let len = List.length ancestors in
-  if len == 0 then surname_not_found conf x
+  if len == 0 then not_found_fun conf x
   else
     let x =
       match homonymes with
@@ -397,7 +397,7 @@ value select_ancestors base name_inj ipl =
     [] ipl
 ;
 
-value surname_print conf base x =
+value surname_print conf base not_found_fun x =
   let (l, name_inj) =
     persons_of_fsname base base.func.persons_of_surname.find
       (fun x -> x.surname) x
@@ -416,5 +416,5 @@ value surname_print conf base x =
       print_family_alphabetic x conf base liste
   | _ ->
       let iperl = select_ancestors base name_inj iperl in
-      print_by_branch x conf base (iperl, strl) ]
+      print_by_branch x conf base not_found_fun (iperl, strl) ]
 ;

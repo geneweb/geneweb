@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.15 1999-07-15 22:22:43 ddr Exp $ *)
+(* $Id: family.ml,v 2.16 1999-07-16 21:01:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -342,7 +342,7 @@ value family_m conf base =
       UpdateIndOk.print_mod conf base
   | Some "N" ->
       match p_getenv conf.env "v" with
-      [ Some v -> Some.surname_print conf base v
+      [ Some v -> Some.surname_print conf base Some.surname_not_found v
       | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
       match p_getenv conf.env "n" with
@@ -354,11 +354,11 @@ value family_m conf base =
               Some.first_name_print conf base an
           | Some "N" ->
               do conf.cancel_links := False; return
-              Some.surname_print conf base an
+              Some.surname_print conf base Some.surname_not_found an
           | _ ->
               let pl = find_all conf base an in
               match pl with
-              [ [] -> inconnu conf n
+              [ [] -> Some.surname_print conf base inconnu an
               | [p] -> person_selected conf base p
               | pl -> precisez conf base n pl ] ]
       | None -> () ]

@@ -17,6 +17,8 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jul 17, 99] Added automatic search by surname in welcome page when
+    search by full name fails (no need to select "it is a surname").
   - [Jul 16, 99] Added a "back" button in case of update error (useful
     for browsers which loose the data in the forms when navigating).
   - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
