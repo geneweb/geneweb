@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.20 1998-11-26 12:42:36 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.21 1998-11-26 20:12:40 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -8,7 +8,8 @@ type record =
   { rlab : string;
     rval : string;
     rcont : string;
-    rsons : list record }
+    rsons : list record;
+    rpos : int }
 ;
 
 value titles_aurejac = ref False;
@@ -19,15 +20,16 @@ value extract_public_names = ref True;
 value ansel_option = ref None;
 value ansel_characters = ref True;
 value try_negative_dates = ref False;
+value no_negative_dates = ref False;
 value set_not_dead = ref False;
 
 (* Reading input *)
 
-value line_cnt = ref 0;
+value line_cnt = ref 1;
 value in_file = ref "";
 
-value print_location () =
-  Printf.printf "File \"%s\", line %d:\n" in_file.val (line_cnt.val + 1)
+value print_location pos =
+  Printf.printf "File \"%s\", line %d:\n" in_file.val pos
 ;
 
 value buff = ref (String.create 80);
@@ -89,11 +91,26 @@ value rec get_lev n =
          if ansel_characters.val then rval else Ansel.of_iso_8859_1 rval;
        rcont =
          if ansel_characters.val then rcont else Ansel.of_iso_8859_1 rcont;
-       rsons = List.rev l} ]
+       rsons = List.rev l;
+       rpos = line_cnt.val} ]
 and get_lev_list l n =
   parser
   [ [: x = get_lev n; s :] -> get_lev_list [x :: l] n s
   | [: :] -> l ]
+;
+
+(* Error *)
+
+value bad_dates = ref [];
+
+value print_bad_date pos d =
+  if List.mem d bad_dates.val then ()
+  else
+    do bad_dates.val := [d :: bad_dates.val];
+       print_location pos;
+       Printf.printf "Can't decode date %s\n" d;
+       flush stdout;
+    return ()
 ;
 
 (* Decoding fields *)
@@ -240,8 +257,16 @@ EXTEND
     [[ p = prec; (n1, n2, n3) = simple_date; EOI -> (p, n1, n2, n3) ]];
   simple_date:
     [[ LIST0 "."; n1 = OPT int; LIST0 ".";
-       n2 = OPT [ i = int -> i | m = month -> m ]; LIST0 ".";
-       n3 = OPT int; LIST0 "." -> (n1, n2, n3) ]];
+       n2 = OPT [ i = int -> abs i | m = month -> m ]; LIST0 ".";
+       n3 = OPT int; LIST0 "." ->
+         let n3 =
+           if no_negative_dates.val then
+             match n3 with
+             [ Some n3 -> Some (abs n3)
+             | None -> None ]
+           else n3
+         in
+         (n1, n2, n3) ]];
   title_date:
     [[ LIDENT "BET"; _ = prec; d1 = simple_date;
        LIDENT "AND"; _ = prec; d2 = simple_date ->
@@ -262,7 +287,7 @@ EXTEND
      | "-"; i = INT -> - int_of_string i ]];
 END;
 
-value date_of_field d =
+value date_of_field pos d =
   if d = "" then None
   else
     let s = Stream.of_string (String.uppercase d) in
@@ -282,10 +307,7 @@ value date_of_field d =
           Some (Da Maybe (Grammar.Entry.parse find_year (Stream.of_string d)))
         with
         [ Stdpp.Exc_located loc e ->
-            do print_location ();
-               Printf.printf "Can't decode date %s\n" d;
-               flush stdout;
-            return None ] ]
+            do print_bad_date pos d; return None ] ]
 ;
 
 (* Creating base *)
@@ -511,7 +533,8 @@ value get_lev0 =
       let rcont =
         if ansel_characters.val then r3 else Ansel.of_iso_8859_1 r3
       in
-      {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l} ]
+      {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
+       rpos = line_cnt.val} ]
 ;
 
 value find_notes_record gen addr =
@@ -542,7 +565,7 @@ value extract_notes gen rl =
                   let l = List.map (fun r -> (r.rlab, r.rval)) r.rsons in
                   [("NOTE", r.rcont) :: l @ lines]
               | None ->
-                  do print_location ();
+                  do print_location r.rpos;
                      Printf.printf "Note %s not found\n" r.rval;
                      flush stdout;
                   return lines ]
@@ -593,7 +616,7 @@ value source gen r =
         match find_sources_record gen r.rval with
         [ Some v -> v.rcont
         | None ->
-            do print_location ();
+            do print_location r.rpos;
                Printf.printf "Source %s not found\n" r.rval;
                flush stdout;
             return "" ]
@@ -644,7 +667,7 @@ value date_of_sd =
   | _ -> raise Not_found ]
 ;
 
-value decode_date_interval s =
+value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
     match Grammar.Entry.parse title_date strm with
@@ -653,17 +676,14 @@ value decode_date_interval s =
     | TDend d2 -> (None, Some (date_of_sd  d2)) ]
   with
   [ Stdpp.Exc_located _ _ | Not_found ->
-      do print_location ();
-         Printf.printf "Can't decode date %s\n" s;
-         flush stdout;
-      return (None, None) ]
+      do print_bad_date pos s; return (None, None) ]
 ;
 
 value treat_indi_title gen public_name r =
   let (title, place, nth) = decode_title r.rval in
   let (date_start, date_end) =
     match find_field "DATE" r.rsons with
-    [ Some r -> decode_date_interval r.rval
+    [ Some r -> decode_date_interval r.rpos r.rval
     | None -> (None, None) ]
   in
   let name =
@@ -795,7 +815,7 @@ value add_indi gen r =
     [ Some r ->
         let d =
           match find_field "DATE" r.rsons with
-          [ Some r -> date_of_field r.rval
+          [ Some r -> date_of_field r.rpos r.rval
           | _ -> None ]
         in
         let p =
@@ -816,7 +836,7 @@ value add_indi gen r =
     [ Some r ->
         let d =
           match find_field "DATE" r.rsons with
-          [ Some r -> date_of_field r.rval
+          [ Some r -> date_of_field r.rpos r.rval
           | _ -> None ]
         in
         let p =
@@ -838,7 +858,7 @@ value add_indi gen r =
           let d =
             match find_field "DATE" r.rsons with
             [ Some r ->
-                match date_of_field r.rval with
+                match date_of_field r.rpos r.rval with
                 [ Some d -> Death Unspecified (Adef.cdate_of_date d)
                 | None -> DeadDontKnowWhen ]
             | _ -> DeadDontKnowWhen ]
@@ -867,7 +887,7 @@ value add_indi gen r =
           else
             let d =
               match find_field "DATE" r.rsons with
-              [ Some r -> date_of_field r.rval
+              [ Some r -> date_of_field r.rpos r.rval
               | _ -> None ]
             in
             let p =
@@ -887,7 +907,7 @@ value add_indi gen r =
           else
             let d =
               match find_field "DATE" r.rsons with
-              [ Some r -> date_of_field r.rval
+              [ Some r -> date_of_field r.rpos r.rval
               | _ -> None ]
             in
             let p =
@@ -979,7 +999,7 @@ value add_fam gen r =
     [ Some r ->
         let d =
           match find_field "DATE" r.rsons with
-          [ Some r -> date_of_field r.rval
+          [ Some r -> date_of_field r.rpos r.rval
           | _ -> None ]
         in
         let p =
@@ -994,7 +1014,7 @@ value add_fam gen r =
     match find_field "DIV" r.rsons with
     [ Some r ->
         match find_field "DATE" r.rsons with
-        [ Some d -> Divorced (Adef.codate_of_od (date_of_field r.rval))
+        [ Some d -> Divorced (Adef.codate_of_od (date_of_field r.rpos r.rval))
         | _ ->
             match find_field "PLAC" r.rsons with
             [ Some _ -> NotDivorced
@@ -1191,7 +1211,7 @@ value pass2 gen fname =
                do let _ : string = get_to_eoln 0 strm in (); return
                loop ()
            | [: `_ :] ->
-               do print_location ();
+               do print_location line_cnt.val;
                   Printf.printf "Strange input.\n";
                   flush stdout;
                   let _ : string = get_to_eoln 0 strm in ();
@@ -1577,6 +1597,8 @@ value speclist =
        Cancels the previous option.");
    ("-tnd", Arg.Set try_negative_dates, "  - Try negative dates -
        Set negative dates when inconsistency (e.g. birth after death)");
+   ("-no_nd", Arg.Set no_negative_dates, "  - No negative dates -
+       Don't interpret a year preceded by a minus sign as a negative year");
    ("-ansel", Arg.Unit (fun () -> ansel_option.val := Some True),
        "  - ANSEL encoding -
        Force ANSEL encoding, overriding the possible setting in GEDCOM.");
