@@ -15,7 +15,8 @@ GeneWeb Version 1.10
     Stream.Failure").
 
 * Lexicon file (lexicon.txt)
-  - [15/12/98] Completed some languages (Espagnol, Italian).
+  - [15/12/98] Added some missing phrases in some languages (Espagnol,
+    Italian).
   - [11/12/98] Fixed bug and completed Dutch version (thanks to Joris Esch).
 
 * Dutch welcome file (nl/start.txt)
