@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: family.ml,v 1.2 1998-09-30 14:04:42 ddr Exp $ *)
+(* $Id: family.ml,v 1.3 1998-11-20 19:11:10 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -179,13 +179,43 @@ value precisez conf base n pl =
   return ()
 ;
 
+(* Get the "special" environement;
+     old system: "e=..." where ... is the coded environment
+     new system: "em=mode;ei=n"
+   The old system is kept by compatibility. *)
+
+value get_senv conf base =
+  let get x = try Some (List.assoc x conf.env) with [ Not_found -> None ] in
+  match (get "em", get "ei", get "ep", get "en", get "eoc") with
+  [ (Some vm, Some vi, _, _, _) ->
+      do conf.senv := "e=" ^ code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
+      [("m", vm); ("i", vi)]
+  | (Some vm, None, Some vp, Some vn, voco) ->
+      let voc =
+        match voco with
+        [ Some voc -> try int_of_string voc with [ Failure _ -> 0 ]
+        | None -> 0 ]
+      in
+      let ip =
+        try person_ht_find_unique base vp vn voc with
+        [ Not_found -> do incorrect_request conf; return raise Exit ]
+      in
+      let vi = string_of_int (Adef.int_of_iper ip) in
+      do conf.senv := "e=" ^ code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
+      [("m", vm); ("i", vi)]
+  | _ ->
+      do conf.senv :=
+           match
+             try Some (List.assoc "e" conf.env) with [ Not_found -> None ]
+           with
+           [ Some s -> s
+           | _ -> "" ];
+      return
+      Util.create_env (decode_varenv conf.senv) ]
+;
+
 value family_m conf base =
-  do conf.senv :=
-       match try Some (List.assoc "e" conf.env) with _ -> None with
-       [ Some s -> s
-       | _ -> "" ];
-  return
-  let senv = Util.create_env (decode_varenv conf.senv) in
+  let senv = get_senv conf base in
   match p_getenv conf.env "m" with
   [ Some "A" ->
       match find_person_in_env conf base "" with

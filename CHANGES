@@ -10,6 +10,17 @@ GeneWeb Version 1.09
 
 * gwc, consang:
   - Fixed accents displaying in traces and error messages.
+  - Change in request syntax "relation... with..." to allow to specify
+    explicit first names and surnames instead of i=.
+    Ex:
+     old syntax (still compatible)
+       base?e=m%3DR%3Bi%3D31440&m=NG&n=somebody&t=PN
+     new syntax:
+       base?em=R;ei=31440&m=NG&n=somebody&t=PN
+     and ability to write in a direct link:
+       base?em=R;ep=jack;en=nicholson;eoc=3&m=NG&n=somebody&t=PN
+     to be somewhat independant from the index of "jack nicholson" in
+     the base.
 
 * ged2gwb, gwb2ged:
   - Added save and restore of the GeneWeb fields
@@ -21,6 +32,10 @@ GeneWeb Version 1.09
        2 SURN ...
        1 OBJE
          2 FILE ...
+
+* ged2gwb:
+  - Automatic delete of dupplicate FAMS which sometimes happen in erroneous
+    Gedcoms.
 
 GeneWeb Version 1.08
 --------------------

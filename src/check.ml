@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 1.2 1998-11-04 13:52:32 ddr Exp $ *)
+(* $Id: check.ml,v 1.3 1998-11-20 19:11:09 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -39,8 +39,7 @@ value print_base_error base =
   | OwnAncestor p ->
       Printf.printf "%s\nis his/her own ancestor\n" (denomination base p)
   | BadSexOfMarriedPerson p ->
-      Printf.printf "%s\n  bad sex (this error should not have occurred)\n"
-        (denomination base p) ]
+      Printf.printf "%s\n  bad sex\n" (denomination base p) ]
 ;
 
 value print_base_warning base =
