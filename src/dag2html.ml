@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.37 2001-01-30 14:17:11 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.38 2001-01-31 01:36:04 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -906,7 +906,11 @@ value tablify no_optim no_group d =
     else
       let t = {table = Array.append t.table [| Array.of_list new_row |]} in
       let t =
-        if no_group then t
+        if no_group then
+          let _ = group_elem t in
+          let _ = group_ghost t in
+          let _ = group_children t in
+          t
         else
           let _ = if no_optim then () else equilibrate t in
           let _ = group_elem t in
