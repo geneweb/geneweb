@@ -1,10 +1,10 @@
-(* $Id: util.ml,v 1.2 1998-09-02 11:46:24 ddr Exp $ *)
+(* $Id: util.ml,v 1.3 1998-09-04 06:48:27 ddr Exp $ *)
 
 open Def;
 open Config;
 open Gutil;
 
-value version = "1.06";
+value version = "1.07";
 
 value lang_dir = ref ".";
 value base_dir = ref ".";

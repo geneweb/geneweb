@@ -4,6 +4,12 @@ Internal Changes
 GeneWeb Version 1.06
 --------------------
 
+* consang:
+  - fixed bug: raised error for empty databases
+
+GeneWeb Version 1.06
+--------------------
+
 * Restructuration (perestroika) for distribution of sources.
 
 * Some changes for compilation with version 2.00 of Ocaml and Camlp4.
