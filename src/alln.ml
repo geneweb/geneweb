@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.2 1999-06-25 08:50:19 ddr Exp $ *)
+(* $Id: alln.ml,v 2.3 1999-06-25 09:26:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -115,14 +115,25 @@ value print_alphabetic_big conf base is_surnames ini list len =
        list;
      html_p conf;
      Wserver.wprint "%s:\n" (capitale (transl conf "the whole list"));
-     stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
-       Wserver.wprint "%s" ((transl conf "long display"));
+     tag "ul" begin
+       html_li conf;
+       stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
+         Wserver.wprint "%s" (transl conf "long display");
+       end;
+       Wserver.wprint "\n";
+       html_li conf;
+       stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
+         Wserver.wprint "%s" (transl conf "short display");
+       end;
+       Wserver.wprint "\n";
+       html_li conf;
+       stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
+       begin
+         Wserver.wprint "%s + %s" (transl conf "short display")
+          (transl conf "cancel GeneWeb links");
+       end;
+       Wserver.wprint "\n";
      end;
-     Wserver.wprint ",\n";
-     stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
-       Wserver.wprint "%s" ((transl conf "short display"));
-     end;
-     Wserver.wprint ".\n";
      trailer conf;
   return ()
 ;
@@ -151,12 +162,11 @@ value print_alphabetic_all conf base is_surnames ini list len =
                  List.iter
                    (fun (s, cnt) ->
                       do html_li conf;
-                         stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
-                           (code_varenv (Name.lower s))
-                         begin
-                           Wserver.wprint "%s" 
-                             (alphab_string conf is_surnames s);
-                         end;
+                         let href =
+                           "m=" ^ mode ^ ";v=" ^ code_varenv (Name.lower s)
+                         in
+                         wprint_geneweb_link conf href
+                           (alphab_string conf is_surnames s);
                          Wserver.wprint " (%d)\n" cnt;
                       return ())
                    l;
@@ -347,16 +357,17 @@ value print_alphabetic_short conf base is_surnames ini list len =
              let _ =
                List.fold_left
                  (fun first (s, cnt) ->
-                    do if first then () else Wserver.wprint ",\n";
-                       stag "a" "href=\"%sm=%s;v=%s\"%s"
-                         (commd conf) mode (code_varenv (Name.lower s))
-                         (if first && need_ref then "name=" ^ ini_k ^ " "
-                          else "")
-                       begin
-                         Wserver.wprint "%s" 
-                           (alphab_string conf is_surnames s);
-                       end;
+                    do if first then
+                         if need_ref then Wserver.wprint "<a name=%s>" ini_k
+                         else ()
+                       else Wserver.wprint ",\n";
+                       let href =
+                         "m=" ^ mode ^ ";v=" ^ code_varenv (Name.lower s)
+                       in
+                       wprint_geneweb_link conf href
+                         (alphab_string conf is_surnames s);
                        Wserver.wprint "(%d)" cnt;
+                       if first && need_ref then Wserver.wprint "</a>" else ();
                     return False)
                  True l
              in ();
