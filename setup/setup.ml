@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.20 2001-01-06 09:55:34 ddr Exp $ *)
+(* $Id: setup.ml,v 3.21 2001-01-22 14:29:25 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -268,6 +268,11 @@ value all_db dir =
   return list.val
 ;
 
+value selected env =
+  List.fold_right (fun (k, v) env -> if v = "on_" then [k :: env] else env)
+    env []
+;
+
 value parse_upto lim =
   loop 0 where rec loop len =
     parser
@@ -326,6 +331,7 @@ value rec copy_from_stream conf print strm =
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt
           | 'r' -> print_specific_file conf print "gwd.arg" strm
+          | 's' -> for_all conf print (selected conf.env) strm
           | 't' -> print_if conf print (ifdef UNIX then False else True) strm
           | 'u' -> print (Filename.dirname (Sys.getcwd ()))
           | 'v' ->
@@ -382,18 +388,21 @@ and for_all conf print list strm =
   [ '{' ->
       let s_exist = parse_upto '|' strm in
       let s_empty = parse_upto '}' strm in
+      let eol =
+        match strm with parser [ [: `'\\' :] -> False | [: :] -> True ]
+      in
       if list <> [] then
         List.iter
           (fun db ->
              let conf = conf_with_env conf "anon" db in
              do copy_from_stream conf print (Stream.of_string s_exist);
-                print "\n";
+                if eol then print "\n" else ();
              return ())
           list
-       else
-         do copy_from_stream conf print (Stream.of_string s_empty);
-            print "\n";
-         return ()
+      else
+        do copy_from_stream conf print (Stream.of_string s_empty);
+           if eol then print "\n" else ();
+        return ()
   | _ -> () ]
 ;
 
@@ -767,7 +776,7 @@ value recover_2 conf =
       do Printf.eprintf "\n";
          flush stderr;
       return rc
-     else rc
+    else rc
   in
   do if rc > 1 then
        do Sys.chdir dir; return print_file conf "err_reco.htm"
@@ -902,6 +911,61 @@ value delete_1 conf =
        conf.env;
      print_file conf "del_ok.htm";
   return ()
+;
+
+value merge conf =
+  let out_file =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | _ -> "" ]
+  in
+  let bases = selected conf.env in
+  if out_file = "" || List.length bases < 2 then print_file conf "err_miss.htm"
+  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else print_file conf "merge_1.htm"
+;
+
+value merge_1 conf =
+  let out_file =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | _ -> "" ]
+  in
+  let bases = selected conf.env in
+  let dir = Sys.getcwd () in
+  do Printf.eprintf "$ cd %s\n" dir;
+     flush stderr;
+     Sys.chdir dir;
+  return
+  let rc =
+    loop bases where rec loop =
+      fun
+      [ [] -> 0
+      | [b :: bases] ->
+           let c = Filename.concat "." "gwu" ^ " " ^ b ^ " -o " ^ b ^ ".gw" in
+           do Printf.eprintf "$ %s\n" c;
+              flush stderr;
+           return
+           let r = Sys.command c in
+           if r = 0 then loop bases else r ]
+  in
+  let rc =
+    if rc <> 0 then rc
+    else
+      let c =
+        Filename.concat "." "gwc" ^
+        List.fold_left
+          (fun s b ->
+             if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
+          "" bases ^
+        " -f -o " ^ out_file ^ " > comm.log"
+      in
+      do Printf.eprintf "$ %s\n" c;
+         flush stderr;
+      return Sys.command c
+  in
+  if rc > 1 then print_file conf "bso_err.htm"
+  else print_file conf "bso_ok.htm"
 ;
 
 value rec cut_at_equal s =
@@ -1147,6 +1211,8 @@ value setup_comm conf =
   | "rename" -> rename conf
   | "delete" -> delete conf
   | "delete_1" -> delete_1 conf
+  | "merge" -> merge conf
+  | "merge_1" -> merge_1 conf
   | "gwc" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwc_check conf

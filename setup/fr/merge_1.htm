@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>Fusion de bases de donn&eacute;es</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>
+Fusion de bases  de donn&eacute;es
+</font></h1></center>
+
+<p><p>
+
+<form mode=GET action="merge_1">
+<input type=hidden name=lang value=$l>
+</form>
+
+<p>
+
+<ul>
+
+$v{<li><b>Attention</b>: il existe d&eacute;j&agrave; une base de nom "$o" dans
+votre <a
+href="gwsetup?lang=$l;v=list.htm">r&eacute;pertoire</a>. Si vous
+appuyez sur le bouton "Ok" ci-dessous, cela va l'effacer.<p>
+
+Si vous venez d&eacute;j&agrave; de faire cette manipulation, il
+s'agit probablement de son r&eacute;sultat, ce n'est donc pas
+grave. Sinon, revenez en arri&egrave;re et choisissez un autre nom
+pour votre base.<p>}
+
+<li>Nous allonc cr&eacute;er une base de nom "$o" &agrave; partir des bases
+suivantes:
+
+<ul>
+$s{<li>$a</b>|}
+</ul>
+
+<p>
+
+Remarque: cette op&eacute;ration peut s'effectuer en un clin d'oeil ou
+prendre quelques dizaines de secondes ou quelques minutes, suivant les
+cas. Soyez patient.
+
+<p>
+
+Appuyez sur le bouton ci-dessous pour cr&eacute;er votre base de
+donn&eacute;es$v{ et &eacute;craser la base "$o" du r&eacute;pertoire
+d'arriv&eacute;e}:
+
+<p>
+
+<form mode=GET action="merge_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+</ul>
+
+<p>
+
+Pour information, cette op&eacute;ration correspond &agrave; la suite
+des commandes suivantes:
+
+<pre>
+     $$ cd $w
+$s{     $$ .$/gwu $a -o $a.gw|}     $$ .$/gwc $s{-sep $a.gw |}\-f -o $o
+</pre>

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>Fusion de bases de donn&eacute;es</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>
+Fusion de bases de donn&eacute;es
+</font></h1></center>
+
+<form mode=GET action="merge">
+<input type=hidden name=lang value=$l>
+
+Il faut d'abord que toutes vos bases &agrave; fusionner soient sous
+<b><font color=#2f6400>GeneWeb</font></b>.
+
+<p>
+
+Si ce n'est pas le cas, si, par exemple, certaines d'entre elles sont
+sous forme GEDCOM ou fichiers source GeneWeb, revenez au <a
+href="gwsetup?lang=$l;v=main.htm">menu principal</a> pour les
+cr&eacute;er sous <b><font color=#2f6400>GeneWeb</font></b>, puis
+revenez &agrave; cette page.
+
+<p>
+
+Une fois fait, s&eacute;lectionnez les bases que vous voulez fusionner
+en cliquant sur leur bouton associ&eacute;:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+<td><input type=checkbox name="$a" value="on_"></td>
+</tr>|
+<tr><td>- il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
+</table></dl>
+
+<p>
+
+Indiquez le nom que vous voulez donner &agrave; votre base de
+donn&eacute;es r&eacute;sultante:
+
+<p>
+
+<input name=o size=30>
+
+<p>
+
+Puis appuyez sur ce bouton:
+
+<p>
+
+<input type=submit value="Fusionner">
+
+</form>
+
+<p>
+
+Remarque: la fusion consiste en la simple concat&eacute;nation des
+bases de donn&eacute;es. Il n'y a pas de recherche de personnes
+identiques. Apr&egrave;s la fusion, il faudra donc rechercher les
+&eacute;ventuelles personnes et familles en double et les fusionner.
+Voir la <a href="file://$w/doc/$l/update.htm#MrgP">documentation</a>.
+
