@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.1 2000-07-24 23:36:10 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.2 2000-07-25 13:23:03 ddr Exp $ *)
 
 open Printf;
 
@@ -47,15 +47,58 @@ value server_extract str =
 ;
 *)
 
+value html_escaped s =
+  let s = String.escaped s in
+  loop 0 0 where rec loop i len =
+    if i == String.length s then Buff.get len
+    else
+      let len =
+        match s.[i] with
+        [ '<' -> Buff.mstore len "&lt;"
+        | '>' -> Buff.mstore len "&gt;"
+        | x -> Buff.store len x ]
+      in
+      loop (i + 1) len
+;
+
+value lowercase_start_with s s_ini =
+  let len = String.length s_ini in
+  String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
+;
+
 value gwtp_send (str, env) =
   do printf "content-type: text/html\r\n\r\n";
      printf "%s<p>\n" (String.escaped str);
      printf "Environnement:\n";
      printf "<ul>\n";
-     List.iter (fun (k, v) -> printf "<li>%s = %s\n" k v) env;
+     List.iter
+        (fun (k, v) ->
+           let v =
+             if String.length v > 40 then String.sub v 0 40 ^ "..."
+             else v
+           in
+           printf "<li>%s = %s\n" k (html_escaped v))
+        env;
      printf "</ul>\n";
      printf "Fin.\n";
-  return ()
+     flush stdout;
+  return
+  try
+    let oc = open_out (Filename.concat "tmp" (List.assoc "file_name" env)) in
+    let (ctype, contents) =
+      let s = List.assoc "file" env in
+      let i =
+        if lowercase_start_with s "content-type: " then String.index s '\n'
+        else 0
+      in
+      let j = String.index_from s (i + 1) '\n' in
+      (String.sub s 0 i, String.sub s (j + 1) (String.length s - j - 3))
+    in
+    do output oc contents 0 (String.length contents);
+       close_out oc;
+    return ()
+  with
+  [ Not_found -> () ]
 ;
 
 value gwtp () =
