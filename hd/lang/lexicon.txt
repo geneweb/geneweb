@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.63 1999-06-29 09:51:05 ddr Exp $
+# $Id: lexicon.txt,v 2.64 1999-06-29 13:36:26 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3105,6 +3105,7 @@ en: short display
 es: presentaci&oacute;n corta
 fr: affichage court
 pt: short display
+se: kort rapport
 
     should be female
 de: m&uuml;&szlig;te weiblichen Geschlechts sein
@@ -3142,6 +3143,7 @@ eo: gefratoj
 es: hermanos y hermanas
 fr: fr&egrave;res et soeurs
 pt: irm&atilde;os e irm&atilde;s
+se: syskon
 
     son/daughter/child
 de: Sohn/Tochter/Kind
