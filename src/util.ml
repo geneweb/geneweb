@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.45 2002-03-11 19:03:04 ddr Exp $ *)
+(* $Id: util.ml,v 4.46 2002-03-18 12:29:20 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -304,13 +304,6 @@ value html conf =
     Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
     Wserver.wprint "Connection: close"; nl ();
     Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
-    match conf.set_cookie with
-    [ Some (k, v) ->
-        do {
-          Wserver.wprint "Set-cookie: %s=%s" k v;
-          nl ()
-        }
-    | None -> () ];
   }
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.42 2002-03-13 12:06:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.43 2002-03-18 12:29:19 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -506,7 +506,6 @@ value unauth_cgi conf passwd =
   in
   let message_txt i = Util.transl_nth conf "user/password/cancel" i in
   do {
-    conf.set_cookie := Some (conf.bname ^ "_" ^ passwd, "");
     Util.header conf title;
     Wserver.wprint "<div align=center><table border=0><tr><td>\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
@@ -824,16 +823,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         in
         let access_type =
           match passwd with
-          [ "" -> ATnone
-          | "w" | "f" ->
-              if cgi then
-                let cookie = Wserver.extract_param "cookie: " '\n' request in
-                let cookenv = Util.create_env cookie in
-                let k = base_file ^ "_" ^ passwd in
-                let v = try List.assoc k cookenv with [ Not_found -> "" ] in
-                if v = "" then ATnone
-                else get_token False utm from_addr (base_file ^ "_" ^ v)
-              else ATnone
+          [ "" | "w" | "f" -> ATnone
           | _ -> get_token True utm from_addr base_passwd ]
         in
         (passwd, env, access_type)
@@ -894,21 +884,11 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         [ Not_found -> False ]
     in
     let passwd1 =
-      if cgi then
-        match (Util.p_getenv env "log_uid", Util.p_getenv env "log_pwd") with
-        [ (Some uid, Some pwd) -> uid ^ ":" ^ pwd
-        | _ -> "" ]
+      let auth = Wserver.extract_param "authorization: " '\r' request in
+      if auth = "" then ""
       else
-        let auth = Wserver.extract_param "authorization: " '\r' request in
-        if auth = "" then ""
-        else
-          let i = String.length "Basic " in
-          Base64.decode (String.sub auth i (String.length auth - i))
-    in
-    let passwd =
-      match Util.p_getenv env "log_cnl" with
-      [ Some "" | None -> passwd
-      | Some _ -> "" ]
+        let i = String.length "Basic " in
+        Base64.decode (String.sub auth i (String.length auth - i))
     in
     let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
     let (ok, wizard, friend) =
@@ -917,7 +897,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       | ATfriend user -> (True, False, True)
       | ATnormal -> (True, False, False)
       | ATnone | ATset ->
-          if passwd = "w" || passwd = "f" then
+          if not cgi && (passwd = "w" || passwd = "f") then
             if passwd = "w" then
               if wizard_passwd = "" && wizard_passwd_file = "" then
                 (True, True, friend_passwd = "")
@@ -952,34 +932,22 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
           | ATfriend user -> user
           | _ -> "" ] ]
     in
-    let (command, passwd, set_cookie) =
+    let (command, passwd) =
       match access_type with
-      [ ATnone | ATset ->
-          if cgi then
-            let has_accepted_cookie =
-              Wserver.extract_param "cookie: " '\n' request <> ""
-            in
-            if passwd = "" then (command, "", None)
-            else if wizard then
-              let pwd_id = set_token utm from_addr base_file 'w' user in
-              if has_accepted_cookie then
-                (command, passwd, Some (base_file ^ "_w", pwd_id))
-              else
-                (command, pwd_id, None)
-            else if friend then
-              let pwd_id = set_token utm from_addr base_file 'f' user in
-              if has_accepted_cookie then
-                (command, passwd, Some (base_file ^ "_f", pwd_id))
-              else
-                (command, pwd_id, None)
-            else (command, passwd, None)
-          else if passwd = "" then (base_file, "", None)
-          else (base_file ^ "_" ^ passwd, passwd, None)
-      | ATnormal -> if cgi then (command, "", None) else (base_file, "", None)
+      [ ATset ->
+          if wizard then
+            let pwd_id = set_token utm from_addr base_file 'w' user in
+            if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+          else if friend then
+            let pwd_id = set_token utm from_addr base_file 'f' user in
+            if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+          else if cgi then (command, "")
+          else (base_file, "")
+      | ATnormal -> if cgi then (command, "") else (base_file, "")
       | _ ->
-          if cgi then (command, passwd, None)
-          else if passwd = "" then (base_file, "", None)
-          else (base_file ^ "_" ^ passwd, passwd, None) ]
+          if cgi then (command, passwd)
+          else if passwd = "" then (base_file, "")
+          else (base_file ^ "_" ^ passwd, passwd) ]
     in
     let passwd1 =
       match lindex passwd1 ':' with
@@ -1010,7 +978,6 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          [ Not_found -> False ];
        cancel_links = cancel_links;
        setup_link = setup_link.val;
-       set_cookie = set_cookie;
        access_by_key =
          try List.assoc "access_by_key" base_env = "yes" with
          [ Not_found -> False ];
