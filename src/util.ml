@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.31 2000-02-03 15:07:49 ddr Exp $ *)
+(* $Id: util.ml,v 3.32 2000-02-13 19:37:50 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -333,22 +333,6 @@ value referenced_person_title_text =
 ;
 
 value person_title_text = gen_person_title_text std_access;
-
-(*
-value afficher_personne_un_titre conf base p t =
-  do if t.t_place = p.surname then
-       match t.t_name with
-       [ Tname n -> Wserver.wprint "%s" (sou base n)
-       | _ -> Wserver.wprint "%s" (person_text_without_surname conf base p) ]
-     else
-       match t.t_name with
-       [ Tname s -> Wserver.wprint "%s" (sou base s)
-       | _ -> Wserver.wprint "%s" (person_text conf base p) ];
-     Wserver.wprint ", <em>%s %s</em>" (sou base t.t_ident)
-       (sou base t.t_place);
-  return ()
-;
-*)
 
 value gen_person_text_without_title p_access conf base p =
   match main_title base p with
