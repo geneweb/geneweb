@@ -1,12 +1,14 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.41 2005-01-21 10:12:59 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.42 2005-02-03 09:59:13 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <title>%nn;
-    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")[*add::family/families]0
-    %elseif;(evar_m = "ADD_PAR")[*add::family/families]0
+    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
+      [*add::family/families]0%nn;
+    %elseif;(evar_m = "ADD_PAR")[*add::family/families]0%nn;
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
       [*modify::family/families]0 # %evar_i;
     %elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or

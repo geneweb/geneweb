@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.38 2005-01-22 20:11:41 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.39 2005-02-03 09:59:12 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -13,6 +13,7 @@
     %end;
   </title>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta name="ROBOTS" content="NONE"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
