@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.8 1999-03-25 20:25:28 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.9 1999-03-30 10:46:01 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -477,7 +477,7 @@ value unknown_per gen i =
      surname = what;
      occ = i;
      public_name = empty;
-     photo = empty;
+     image = empty;
      nick_names = []; aliases = []; first_names_aliases = [];
      surnames_aliases = [];
      titles = []; occupation = empty;
@@ -877,7 +877,7 @@ value add_indi gen r =
     | Some {rval = "F"} -> Feminine
     | _ -> Neuter ]
   in
-  let photo =
+  let image =
     match find_field "OBJE" r.rsons with
     [ Some r ->
         match find_field "FILE" r.rsons with
@@ -1043,7 +1043,7 @@ value add_indi gen r =
      surname = add_string gen surname;
      occ = occ;
      public_name = add_string gen public_name;
-     photo = add_string gen photo;
+     image = add_string gen image;
      nick_names = if nick_name <> "" then [add_string gen nick_name] else [];
      aliases = List.map (add_string gen) aliases;
      first_names_aliases =

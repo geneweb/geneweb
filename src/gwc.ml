@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.5 1999-03-27 02:19:20 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.6 1999-03-30 10:46:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -61,7 +61,7 @@ value faire_personne gen p n occ i =
   let empty_string = unique_string gen "" in
   let p =
     {first_name = unique_string gen p; surname = unique_string gen n;
-     occ = occ; photo = empty_string;
+     occ = occ; image = empty_string;
      first_names_aliases = []; surnames_aliases = [];
      public_name = empty_string; nick_names = [];
      aliases = []; titles = []; occupation = empty_string;
@@ -289,7 +289,7 @@ value insert_person gen so =
           x.surnames_aliases :=
             List.map (unique_string gen) so.surnames_aliases;
           x.public_name := unique_string gen so.public_name;
-          x.photo := unique_string gen so.photo;
+          x.image := unique_string gen so.image;
           x.nick_names := List.map (unique_string gen) so.nick_names;
           x.aliases := List.map (unique_string gen) so.aliases;
           x.titles := List.map (title_unique_string gen) so.titles;

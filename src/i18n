@@ -119,6 +119,9 @@ him/her
 his wife/her husband
 husband/wife
 if titles
+image
+image deleted
+image received
 in (month year)
 in (year)
 incompatible sexes
@@ -141,6 +144,7 @@ main title
 marriage of %t after his/her death
 marriage of %t before his/her birth
 marriage/marriages
+married
 married at age %t
 married%t to
 max %d generations
@@ -163,6 +167,7 @@ no match
 not dead
 not divorced
 not found
+not married
 note/notes
 nth
 nth (generation)
@@ -190,9 +195,6 @@ person deleted
 person modified
 person/persons
 persons having the same name
-photo
-photo deleted
-photo received
 place
 previous sibling
 private

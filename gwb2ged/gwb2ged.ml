@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.2 1999-03-25 20:25:30 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.3 1999-03-30 10:46:02 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -254,7 +254,7 @@ value ged_psource base oc per =
 ;
 
 value ged_multimedia_link base oc per =
-  match sou base per.photo with
+  match sou base per.image with
   [ "" -> ()
   | s ->
       do Printf.fprintf oc "1 OBJE\n";

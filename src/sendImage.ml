@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendPhoto.ml,v 2.1 1999-03-08 11:19:12 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.1 1999-03-30 10:46:16 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -15,12 +15,12 @@ value raw_get conf key =
   [ Not_found -> incorrect conf ]
 ;
 
-(* Send photo form *)
+(* Send image form *)
 
-value print_send_photo conf base p =
+value print_send_image conf base p =
   let title h =
     do Wserver.wprint "%s"
-         (capitale (transl_decline conf "send" (transl conf "photo")));
+         (capitale (transl_decline conf "send" (transl conf "image")));
        if h then ()
        else
          let fn = sou base p.first_name in
@@ -41,7 +41,7 @@ value print_send_photo conf base p =
        conf.command
      begin
        Srcfile.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=m value=SND_PHOTO_OK>\n";
+       Wserver.wprint "<input type=hidden name=m value=SND_IMAGE_OK>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);
        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
@@ -61,17 +61,17 @@ value print conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
       let p = base.data.persons.get ip in
-      if sou base p.photo <> "" then incorrect_request conf
-      else print_send_photo conf base p
+      if sou base p.image <> "" then incorrect_request conf
+      else print_send_image conf base p
   | _ -> incorrect_request conf ]
 ;
 
-(* Delete photo form *)
+(* Delete image form *)
 
-value print_delete_photo conf base p =
+value print_delete_image conf base p =
   let title h =
     do Wserver.wprint "%s"
-         (capitale (transl_decline conf "delete" (transl conf "photo")));
+         (capitale (transl_decline conf "delete" (transl conf "image")));
        if h then ()
        else
          let fn = sou base p.first_name in
@@ -89,7 +89,7 @@ value print_delete_photo conf base p =
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=m value=DEL_PHOTO_OK>\n";
+       Wserver.wprint "<input type=hidden name=m value=DEL_IMAGE_OK>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
          (Adef.int_of_iper p.cle_index);
        Wserver.wprint "\n";
@@ -105,19 +105,19 @@ value print_del conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
       let p = base.data.persons.get ip in
-      if sou base p.photo <> "" then incorrect_request conf
+      if sou base p.image <> "" then incorrect_request conf
       else
-        match auto_photo_file conf base p with
-        [ Some _ -> print_delete_photo conf base p
+        match auto_image_file conf base p with
+        [ Some _ -> print_delete_image conf base p
         | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;
 
-(* Send photo form validated *)
+(* Send image form validated *)
 
 value print_sent conf base p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "photo received"))
+    Wserver.wprint "%s" (capitale (transl conf "image received"))
   in
   do header conf title;
      tag "ul" begin
@@ -184,7 +184,7 @@ value effective_send_ok conf base p file =
     | "image/jpeg" -> ".jpg"
     | _ -> incorrect conf ]
   in
-  let bfname = default_photo_name base p in
+  let bfname = default_image_name base p in
   let fname =
     List.fold_right Filename.concat [Util.base_dir.val; "images"; conf.bname]
       bfname
@@ -225,11 +225,11 @@ value print_send_ok conf base =
   | Refuse -> Update.error_locked conf base ]
 ;
 
-(* Delete photo form validated *)
+(* Delete image form validated *)
 
 value print_deleted conf base p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "photo deleted"))
+    Wserver.wprint "%s" (capitale (transl conf "image deleted"))
   in
   do header conf title;
      tag "ul" begin
@@ -242,7 +242,7 @@ value print_deleted conf base p =
 ;
 
 value effective_delete_ok conf base p =
-  let bfname = default_photo_name base p in
+  let bfname = default_image_name base p in
   let fname =
     List.fold_right Filename.concat [Util.base_dir.val; "images"; conf.bname]
       bfname
