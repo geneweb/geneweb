@@ -16,16 +16,17 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
+  - [Sep 17, 99] Can use now special characters for wizard/friend passwords
+    in CGI mode (before, it worked only in service mode).
   - [Sep 16, 99] Advanced search with baptism date and place did not work:
     fixed.
   - [Sep 16, 99] Changed the order of dates in modifications forms into:
     year/month/day and these fields are now labelled.
   - [Sep 15..16, 99] Added calendars for dates (Gregorian, Julian, French
     Republic, Hebrew).
-  - [Sep 11, 99] Added ability to specify an authorization file for wizards
-    and for friends: several users and passwords can be defined. The file
-    name has to be given in the "base.gwf" file. Works only in service mode
-    (not CGI).
+  - [Sep 11..17, 99] Now, several users and passwords can be defined for
+    "wizard" and "friend" access, by specifying authorization file names in
+    the "base.gwf" file.
   - [Sep 8, 99] Fixed bug: in descendant displaying, if the person has
     quotes in his name, the displaying was sometimes wrong.
   - [Sep 8, 99] In "DOC" links, in the bottom of the pages, the links
