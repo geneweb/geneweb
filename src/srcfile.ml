@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.3 1999-04-29 19:55:55 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.4 1999-05-18 17:48:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -185,7 +185,10 @@ value rec copy_from_channel conf base ic =
             | 'h' -> hidden_env conf
             | 'i' -> if conf.cgi then () else echo.val := False
             | 'l' -> Wserver.wprint "%s" conf.lang
-            | 'n' -> Wserver.wprint "%d" (base.data.persons.len)
+            | 'n' ->
+                Num.print (fun x -> Wserver.wprint "%s" x)
+                  (transl conf "(thousand separator)")
+                  (Num.of_int base.data.persons.len)
             | 'q' ->
                 let (wc, rc, d) = count conf in
                 Num.print (fun x -> Wserver.wprint "%s" x)

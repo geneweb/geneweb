@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.41 1999-05-18 06:38:26 ddr Exp $
+# $Id: lexicon.txt,v 2.42 1999-05-18 17:48:06 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1028,6 +1028,7 @@ se: begravd
     cancel GeneWeb links
 en: cancel GeneWeb links
 fr: annuler les liens GeneWeb
+se: utan GeneWeb l&auml;nkar
 
     cannot access base
 de: Datenbank nicht erreichbar
