@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.1 2001-04-20 08:24:19 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.2 2001-04-20 11:54:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -25,24 +25,26 @@ value string_person_of base p =
 
 (* Interpretation of template file 'updind.txt' *)
 
-type ast = Templ.ast ==
-  [ Atext of string
-  | Avar of string and list string
-  | Atransl of bool and string and char
-  | Awid_hei of string
-  | Aif of ast_expr and list ast and list ast
-  | Aforeach of string and list string and list ast
-  | Adefine of string and list string and list ast and list ast
-  | Aapply of string and list ast_expr ]
-and ast_expr = Templ.ast_expr ==
-  [ Eor of ast_expr and ast_expr
-  | Eand of ast_expr and ast_expr
-  | Eop of string and ast_expr and ast_expr
-  | Enot of ast_expr
-  | Estr of string
-  | Eint of string
-  | Evar of string and list string
-  | Etransl of bool and string and char ]
+type ast =
+  Templ.ast ==
+    [ Atext of string
+    | Avar of string and list string
+    | Atransl of bool and string and char
+    | Awid_hei of string
+    | Aif of ast_expr and list ast and list ast
+    | Aforeach of string and list string and list ast
+    | Adefine of string and list string and list ast and list ast
+    | Aapply of string and list ast_expr ]
+and ast_expr =
+  Templ.ast_expr ==
+    [ Eor of ast_expr and ast_expr
+    | Eand of ast_expr and ast_expr
+    | Eop of string and ast_expr and ast_expr
+    | Enot of ast_expr
+    | Estr of string
+    | Eint of string
+    | Evar of string and list string
+    | Etransl of bool and string and char ]
 ;
 
 type env =
@@ -131,8 +133,7 @@ value rec eval_variable conf base env p =
       VVdate d s
   | [] -> VVgen ""
   | [s] ->
-      let v = extract_var "cvar_" s in
-      if v <> "" then VVcvar v else VVgen s
+      let v = extract_var "cvar_" s in if v <> "" then VVcvar v else VVgen s
   | [s :: sl] -> VVnone ]
 ;
 
@@ -143,15 +144,15 @@ value eval_base_env_variable conf v =
 ;
 
 value eval_string_env var env =
-   match get_env var env with
-   [ Vstring x -> quote_escaped x
-   | _ -> "" ]
+  match get_env var env with
+  [ Vstring x -> quote_escaped x
+  | _ -> "" ]
 ;
 
 value eval_int_env var env =
-   match get_env var env with
-   [ Vint x -> string_of_int x
-   | _ -> "" ]
+  match get_env var env with
+  [ Vint x -> string_of_int x
+  | _ -> "" ]
 ;
 
 value try_eval_gen_variable conf base env p =
@@ -190,7 +191,7 @@ value try_eval_gen_variable conf base env p =
 
 value eval_date_field =
   fun
-  [ Some d  ->
+  [ Some d ->
       match d with
       [ Dgreg d Dgregorian -> Some d
       | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
@@ -277,7 +278,7 @@ value split_at_coloncolon s =
   loop 0 where rec loop i =
     if i >= String.length s - 1 then None
     else
-      match (s.[i], s.[i+1]) with
+      match (s.[i], s.[i + 1]) with
       [ (':', ':') ->
           let s1 = String.sub s 0 i in
           let s2 = String.sub s (i + 2) (String.length s - i - 2) in
@@ -318,7 +319,7 @@ value is_death_reason dr =
 ;
 
 value eval_gen_bool_variable conf base env p =
-  fun 
+  fun
   [ "acc_if_titles" -> p.access = IfTitles
   | "acc_private" -> p.access = Private
   | "acc_public" -> p.access = Public
@@ -349,7 +350,7 @@ value eval_gen_bool_variable conf base env p =
         match p_getenv conf.env v with
         [ Some "" | None -> False
         | _ -> True ]
-      else do Wserver.wprint ">%%%s???" s; return False ]
+      else do { Wserver.wprint ">%%%s???" s; False } ]
 ;
 
 value is_calendar cal =
@@ -378,7 +379,7 @@ value eval_date_bool_variable conf base env od =
   | "prec_after" -> is_precision (fun [ After -> True | _ -> False ]) od
   | "prec_oryear" -> is_precision (fun [ OrYear _ -> True | _ -> False ]) od
   | "prec_yearint" -> is_precision (fun [ YearInt _ -> True | _ -> False ]) od
-  | s -> do Wserver.wprint ">%%%s???" s; return False ]
+  | s -> do { Wserver.wprint ">%%%s???" s; False } ]
 ;
 
 value is_relation_type rt =
@@ -387,14 +388,16 @@ value is_relation_type rt =
   | _ -> False ]
 ;
 
-value eval_relation_person_bool_variable conf base env
-  (fn, sn, oc, create, var)
-=
+value
+  eval_relation_person_bool_variable conf base env (fn, sn, oc, create, var) =
   fun
-  [ ["create"] -> match create with [ Update.Create _ _ -> True | _ -> False ]
+  [ ["create"] ->
+      match create with
+      [ Update.Create _ _ -> True
+      | _ -> False ]
   | ["link"] -> create = Update.Link
-  | [s] -> do Wserver.wprint ">%%%s???" s; return False
-  | _ -> do Wserver.wprint ">???"; return False ]
+  | [s] -> do { Wserver.wprint ">%%%s???" s; False }
+  | _ -> do { Wserver.wprint ">???"; False } ]
 ;
 
 value eval_relation_bool_variable conf base env r =
@@ -402,12 +405,12 @@ value eval_relation_bool_variable conf base env r =
   [ ["r_father" :: sl] ->
       match r with
       [ Some {r_fath = Some x} ->
-         eval_relation_person_bool_variable conf base env x sl
+          eval_relation_person_bool_variable conf base env x sl
       | _ -> False ]
   | ["r_mother" :: sl] ->
       match r with
       [ Some {r_moth = Some x} ->
-         eval_relation_person_bool_variable conf base env x sl
+          eval_relation_person_bool_variable conf base env x sl
       | _ -> False ]
   | ["rt_adoption"] -> is_relation_type Adoption r
   | ["rt_candidate_parent"] -> is_relation_type CandidateParent r
@@ -418,8 +421,8 @@ value eval_relation_bool_variable conf base env r =
   | ["rt_foster_parent"] -> is_relation_type FosterParent r
   | ["rt_godparent"] -> is_relation_type GodParent r
   | ["rt_regognition"] -> is_relation_type Recognition r
-  | [s] -> do Wserver.wprint ">%%%s???" s; return False
-  | _ -> do Wserver.wprint ">???"; return False ]
+  | [s] -> do { Wserver.wprint ">%%%s???" s; False }
+  | _ -> do { Wserver.wprint ">???"; False } ]
 ;
 
 value eval_title_bool_variable conf base env t =
@@ -428,7 +431,7 @@ value eval_title_bool_variable conf base env t =
       match t with
       [ Some {t_name = Tmain} -> True
       | _ -> False ]
-  | _ -> do Wserver.wprint ">???"; return False ]
+  | _ -> do { Wserver.wprint ">???"; False } ]
 ;
 
 value eval_bool_variable conf base env p s sl =
@@ -437,8 +440,8 @@ value eval_bool_variable conf base env p s sl =
   | VVdate od s -> eval_date_bool_variable conf base env od s
   | VVrelation r sl -> eval_relation_bool_variable conf base env r sl
   | VVtitle t sl -> eval_title_bool_variable conf base env t sl
-  | VVcvar _ -> do Wserver.wprint ">%%%s???" s; return False
-  | VVnone -> do Wserver.wprint ">%%%s???" s; return False ]
+  | VVcvar _ -> do { Wserver.wprint ">%%%s???" s; False }
+  | VVnone -> do { Wserver.wprint ">%%%s???" s; False } ]
 ;
 
 value eval_bool_value conf base env p =
@@ -450,12 +453,12 @@ value eval_bool_value conf base env p =
         match op with
         [ "=" -> string_eval e1 = string_eval e2
         | "!=" -> string_eval e1 <> string_eval e2
-        | _ -> do Wserver.wprint "op %s???" op; return False ]
+        | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
     | Evar s sl -> eval_bool_variable conf base env p s sl
-    | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
-    | Eint s -> do Wserver.wprint "\"%s\"???" s; return False
-    | Etransl _ s _ -> do Wserver.wprint "[%s]???" s; return False ]
+    | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
   and string_eval =
     fun
     [ Estr s -> s
@@ -465,12 +468,12 @@ value eval_bool_value conf base env p =
           [ VVgen s -> try_eval_gen_variable conf base env p s
           | VVdate od s -> eval_date_variable conf base env od s
           | VVcvar s -> eval_base_env_variable conf s
-          | VVrelation _ _ -> do Wserver.wprint ">%%%s???" s; return ""
-          | VVtitle _ _ -> do Wserver.wprint ">%%%s???" s; return ""
-          | VVnone -> do Wserver.wprint ">%%%s???" s; return "" ]
+          | VVrelation _ _ -> do { Wserver.wprint ">%%%s???" s; "" }
+          | VVtitle _ _ -> do { Wserver.wprint ">%%%s???" s; "" }
+          | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
-        [ Not_found -> do Wserver.wprint ">%%%s???" s; return "" ]
-    | x -> do Wserver.wprint "val???"; return "" ]
+        [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
+    | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval
 ;
@@ -491,28 +494,30 @@ value print_variable conf base env p sl =
   | VVtitle t sl ->
       Wserver.wprint "%s" (eval_title_variable conf base env p t sl)
   | VVnone ->
-      do Wserver.wprint ">%%";
-         list_iter_first
-           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
-           sl;
-         Wserver.wprint "???";
-      return () ]
+      do {
+        Wserver.wprint ">%%";
+        list_iter_first
+          (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
+          sl;
+        Wserver.wprint "???";
+      } ]
 ;
 
 value subst_text x v s =
   if String.length x = 0 then s
   else
-    loop 0 0 0 where rec loop len i i_ok =
+    let rec loop len i i_ok =
       if i = String.length s then
         if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
         else Buff.get len
       else if s.[i] = x.[i_ok] then
-        if i_ok = String.length x - 1 then
-          loop (Buff.mstore len v) (i + 1) 0
+        if i_ok = String.length x - 1 then loop (Buff.mstore len v) (i + 1) 0
         else loop len (i + 1) (i_ok + 1)
       else if i_ok > 0 then
         loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
       else loop (Buff.store len s.[i]) (i + 1) 0
+    in
+    loop 0 0 0
 ;
 
 value rec subst sf =
@@ -526,8 +531,7 @@ value rec subst sf =
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
   | Aapply f el -> Aapply (sf f) (substel sf el) ]
-and substl sf al =
-  List.map (subst sf) al
+and substl sf al = List.map (subst sf) al
 and subste sf =
   fun
   [ Eor e1 e2 -> Eor (subste sf e1) (subste sf e2)
@@ -538,9 +542,7 @@ and subste sf =
   | Eint s -> Eint s
   | Evar s sl -> Evar (sf s) (List.map sf sl)
   | Etransl upp s c -> Etransl upp s c ]
-and substel sf el =
-  List.map (subste sf) el
-;
+and substel sf el = List.map (subste sf) el;
 
 value rec print_ast conf base env p =
   fun
@@ -576,55 +578,56 @@ and print_if conf base env p e alt ale =
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env p s sl al =
   let (sl, s) =
-    let sl = List.rev [s :: sl] in
-    (List.rev (List.tl sl), List.hd sl)
+    let sl = List.rev [s :: sl] in (List.rev (List.tl sl), List.hd sl)
   in
   match eval_variable conf base env p sl with
   [ VVgen "" -> print_simple_foreach conf base env p al s
   | VVgen _ ->
-      do Wserver.wprint "foreach ";
-         List.iter (fun s -> Wserver.wprint "%s." s) sl;
-         Wserver.wprint "%s???" s;
-      return ()
+      do {
+        Wserver.wprint "foreach ";
+        List.iter (fun s -> Wserver.wprint "%s." s) sl;
+        Wserver.wprint "%s???" s;
+      }
   | VVcvar _ | VVdate _ _ | VVrelation _ _ | VVtitle _ _ | VVnone -> () ]
 and print_simple_foreach conf base env p al s =
   match s with
-  [ "alias" ->
-      print_foreach_string conf base env p al p.aliases s
+  [ "alias" -> print_foreach_string conf base env p al p.aliases s
   | "first_name_alias" ->
       print_foreach_string conf base env p al p.first_names_aliases s
-  | "qualifier" ->
-      print_foreach_string conf base env p al p.qualifiers s
+  | "qualifier" -> print_foreach_string conf base env p al p.qualifiers s
   | "surname_alias" ->
       print_foreach_string conf base env p al p.surnames_aliases s
-  | "relation" ->
-      print_foreach_relation conf base env p al p.rparents
-  | "title" ->
-      print_foreach_title conf base env p al p.titles
-  | _ ->
-      Wserver.wprint "foreach %s???" s ]
+  | "relation" -> print_foreach_relation conf base env p al p.rparents
+  | "title" -> print_foreach_title conf base env p al p.titles
+  | _ -> Wserver.wprint "foreach %s???" s ]
 and print_foreach_string conf base env p al list lab =
-  let _ = List.fold_left
-    (fun cnt nn ->
-       let env = [(lab, Vstring nn) :: env] in
-       let env = [("cnt", Vint cnt) :: env] in
-       do List.iter (print_ast conf base env p) al; return cnt + 1)
-    0 list
-  in ()
+  let _ =
+    List.fold_left
+      (fun cnt nn ->
+         let env = [(lab, Vstring nn) :: env] in
+         let env = [("cnt", Vint cnt) :: env] in
+         do { List.iter (print_ast conf base env p) al; cnt + 1 })
+      0 list
+  in
+  ()
 and print_foreach_relation conf base env p al list =
-  let _ = List.fold_left
-    (fun cnt nn ->
-       let env = [("cnt", Vint cnt) :: env] in
-       do List.iter (print_ast conf base env p) al; return cnt + 1)
-    1 list
-  in ()
+  let _ =
+    List.fold_left
+      (fun cnt nn ->
+         let env = [("cnt", Vint cnt) :: env] in
+         do { List.iter (print_ast conf base env p) al; cnt + 1 })
+      1 list
+  in
+  ()
 and print_foreach_title conf base env p al list =
-  let _ = List.fold_left
-    (fun cnt nn ->
-       let env = [("cnt", Vint cnt) :: env] in
-       do List.iter (print_ast conf base env p) al; return cnt + 1)
-    1 list
-  in ()
+  let _ =
+    List.fold_left
+      (fun cnt nn ->
+         let env = [("cnt", Vint cnt) :: env] in
+         do { List.iter (print_ast conf base env p) al; cnt + 1 })
+      1 list
+  in
+  ()
 ;
 
 value interp_templ conf base p digest astl =
@@ -634,16 +637,10 @@ value interp_templ conf base p digest astl =
 
 value print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
-  [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK")
-  | Some ("MOD_IND" | "MOD_IND_OK")
-  | Some ("ADD_IND" | "ADD_IND_OK") ->
-(*
-      if p_getenv conf.env "opt" = Some "old" then
-        print_update_ind_aux conf base p digest
-      else
-*)
-        let astl = Templ.input conf base "updind" in
-        do html conf; interp_templ conf base p digest astl; return ()
+  [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
+    Some ("ADD_IND" | "ADD_IND_OK") ->
+      let astl = Templ.input conf base "updind" in
+      do { html conf; interp_templ conf base p digest astl }
   | _ -> incorrect_request conf ]
 ;
 
@@ -652,35 +649,34 @@ value print_del1 conf base p =
     let s = transl_nth conf "person/persons" 0 in
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
-  do header conf title;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=m value=DEL_IND_OK>\n";
-       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
-         (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=m value=DEL_IND_OK>\n";
+      Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+        (Adef.int_of_iper p.cle_index);
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
 ;
 
 value print_add conf base =
   let p =
     {first_name = ""; surname = ""; occ = 0; image = "";
-     first_names_aliases = []; surnames_aliases = [];
-     public_name = ""; qualifiers = []; aliases = [];
-     titles = []; rparents = []; related = []; occupation = "";
-     sex = Neuter; access = IfTitles;
+     first_names_aliases = []; surnames_aliases = []; public_name = "";
+     qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
+     occupation = ""; sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = ""; birth_src = "";
      baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
      death = DontKnowIfDead; death_place = ""; death_src = "";
-     burial = UnknownBurial; burial_place = ""; burial_src = "";
-     notes = ""; psources = "";
-     cle_index = bogus_person_index}
+     burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
+     psources = ""; cle_index = bogus_person_index}
   in
   print_update_ind conf base p ""
 ;
