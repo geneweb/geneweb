@@ -1,9 +1,7 @@
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<META NAME="Generator" CONTENT="Microsoft Word 97">
 <TITLE>GeneWeb - Ändringar</TITLE>
-<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
 </HEAD>
 <BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#d6bfaf">
 
@@ -29,7 +27,8 @@
 <LI><A HREF="#DelF">5.3.</A> Ta bort en Familj. </LI>
 <LI><A HREF="#ModP">5.4.</A> Modifiera en Person. </LI>
 <LI><A HREF="#DelP">5.5.</A> Ta bort en Person. </LI>
-<LI><A HREF="#SndP">5.6.</A> Skicka ett foto. </LI></UL>
+<LI><A HREF="#SndP">5.6.</A> Skicka ett foto. </LI>
+<LI><A HREF="#DelPh">5.7.</A> Ta bort ett foto. </LI></UL>
 
 <LI><A HREF="#MrgP">6.</A> Hur man sl&aring;rsamman tv&aring; personer. </LI>
 <LI><A HREF="#MrgF">7.</A> Hur man sl&aring;rsamman tv&aring; familjer. </LI>
@@ -67,6 +66,7 @@
 <LI>Familjer hold simple familjer: far, mor, barn, datum och place of possible marriage och skild. Notera att om en person &auml;r gift flera g&aring;nger, kommer det att vara s&aring; m&aring;nga "familjer" som det &auml;r gifterm&aring;l. </LI></UL>
 
 <P>Uppdateringarna av databasen &auml;r simply och exclusively uppdateringar av "personer" och "familjer": l&auml;gga till, modifiera eller ta bort. </P>
+
 <H4><A NAME="MAJ">3.</A> R&auml;ttigheter att uppdatera </H4>
 <P>Om du f&ouml;rst&aring;r de tidigare kapitlen kan du forts&auml;tta. </P>
 <P>F&ouml;r att komma &aring;t uppdateringarna, kan du: </P>
@@ -101,7 +101,8 @@
 <UL>
 
 <UL>
-<LI><A HREF="#Sndp">Skicka ett foto</A></LI></UL>
+<LI><A HREF="#SndP">Skicka ett foto</A></LI>
+<LI><A HREF="#DelPh">Ta bort ett foto</A></LI></UL>
 </UL>
 
 <OL START=2>
@@ -240,7 +241,7 @@
 <P>This means that if you notice that you made mistakes after having validated the formul&auml;r, do not do "L&auml;gg till/Familj" again, but "Modifiera/Familj"! </P>
 <P>Report to the following paragraph to see how to fill the formul&auml;r. </P>
 <H4><A NAME="ModF">5.2.</A> Modifiera en Familj </H4>
-<P>You see this formul&auml;r from a personal record, after having clicked on "Update", then "Modifiera/Familj". This formul&auml;r is prefilled by the "f&ouml;rnamn", the "efternamn" och the "number" of the father, the mother och barnetren, as well as all the possible data relative to this familj. </P>
+<P>You see this formul&auml;r from a personal record, after having clicked on "Update", then "Modifiera/Familj". This formul&auml;r is prefilled by the "f&ouml;rnamn", "efternamn" och "nummer" för fadern, modern och barnen, as well as all the possible data relative to this familj. </P>
 <P>This formul&auml;r behaves like "L&auml;gg till/Familj" of the previous section (except that there is no creation of a new familj). What follows is therefore valid for the formul&auml;r "L&auml;gg till/Familj". </P>
 <STRONG><P>Filling</P>
 </STRONG><P>Alla f&auml;lt (f&ouml;r i fyllda eller inte) kan fyllas i, raderas eller modifieras. N&auml;r du &auml;r f&auml;rdig filling, erasing och modifying all you judge necessary, go to the end of the formul&auml;r och commit the formul&auml;r by clicking on "Ok". </P>
@@ -266,7 +267,9 @@
 <DIR>
 <DIR>
 
-<P>Here, what is different from "Link", you must write the accents, uppercases och lowecases correctly: personen will be created with the spelling you write there. </P></DIR>
+<P>Here, what is different from "Link", you must write the accents, uppercases och lowecases correctly: personen will be created with the spelling you write there. 
+<P>
+You can enter the child's sex and his day of birth. For his other personal data, you will have to do "update" later from his personal page.</P></DIR>
 </DIR>
 </DIR>
 </DIR>
@@ -365,6 +368,7 @@
 <P>The formul&auml;r only holds the button "Ok" to allow you to do it really. You can still give up. </P>
 <P>Om du klickar i "Ok", kommer en ny sida upp med rubriken "Familj bort tagen". </P>
 <P>The familj is removed from the databas: the father, the mother och barnetren scatter. However none of them is deleted: just the father och the mother are no more married, they have no more these barnren (they may have other ones from other marriages, which are persisting), barnetren have no more f&ouml;r&auml;ldrar. </P>
+
 <H4><A NAME="ModP">5.4.</A> Modifiera en Person </H4>
 <P>Du ser detta formul&auml;r med rubrik "Modifiera/Person" fr&aring;n en personlig sida, efter att ha klickat p&aring; "Uppdatera", och sedan "Modifiera". Formul&auml;ret &auml;r f&ouml;r i fyllt med alla data om personen. </P>
 <STRONG><P>I fyllnad</P>
@@ -469,12 +473,38 @@
 <UL>
 <STRONG><LI>Efternamns alias</STRONG> kan anv&auml;ndas som ett alternativt efternamn, om du vill ha en annan version av namnet, t. ex. Med en annan stavning. Dess anv&auml;ndning &auml;r inte frekvent. </LI>
 <STRONG><LI>F&ouml;dd</STRONG> tilll&aring;ter indicate datum och platser f&ouml;r f&ouml;delse och dop. Inga speciella problem. </LI>
-<STRONG><LI>D&ouml;d</STRONG> allows att indicate information f&ouml;r d&ouml;den. Valet &auml;r oftast "Vet ej". </LI>
+<STRONG><LI>D&ouml;d</STRONG> allows att indicate information f&ouml;r d&ouml;den.
+No particular problem except the notion of "automatic choice" which we
+explain here.
 
-<UL>
-<LI>If personen is still alive, select "Not dead". It is important because the system displays, in his personal record, his age computed from his birth date och today's date. och if the birth date is complete (day, month, year), personen will be displayed in the birthdays lists. </LI>
-<LI>Om personen &auml;r d&ouml;d, v&auml;lj "D&ouml;d" och skriv in datum, plats och d&ouml;dorsak, och datum, plats f&ouml;r begravningen eller kremeriing. </LI>
-<LI>Om du inte vet om personen &auml;r d&ouml;d eller inte, l&aring;t det st&aring; som det &auml;r. </LI></UL>
+<p>
+
+The "automatic choice" is present when the selection of the first menu
+of the "death" area displays a "-". It indicates that one does not know
+if the person is dead or not.
+
+<p>
+
+In this case, if you do not indicate any death date nor place, the
+system chooses for you the fact that the person is dead or not,
+according to his birth date: if he is less than 80 years old, it
+decides "not dead", between 81 and 120 years old, it decides "don't
+know", and more than 120 years old, it decides "dead".
+
+<p>
+
+If this automatic choice does not fit, you can select yourself the good
+choice in this first menu, instead of the displayed "-".
+
+<p>
+
+Notice that the age of the persons whose death is "don't know" is not
+displayed in their personal page nor in the anniversaries. Therefore, if
+a person is between 81 and 120 years old and is not dead, select "not dead".
+
+</ul>
+
+<ul>
 
 <STRONG><LI>Yrke</STRONG> holds the profession. If you want to put a nobility title, use rather f&auml;ltets "title" below. </LI>
 <STRONG><LI>Titel</STRONG> holds a nobility title. There may be several of them. To have a formul&auml;r with other places for the titles, click on one eller several "Infoga/Titel", go to end of formul&auml;r och do "Ok". </LI><DIR>
@@ -562,16 +592,22 @@
 </DIR>
 
 <H4><A NAME="DelP">5.5.</A> Ta bort en Person </H4>
-<P>Du ser this formul&auml;r, titled "Delete/Person" from a personal record, after having clicked on "Update", then "Delete/Person". </P>
+<P>Du ser detta formul&auml;r, benamnt "Delete/Person" fran en personlig sida, efter att ha klickat pa "Uppdatera" och sedan "Ta bort/Person". </P>
 <P>The formul&auml;r only holds the button "Ok" to allow you to do it really. You can still give up. </P>
 <P>If you do "Ok", a new sida appears with the the title "Person deleted". </P>
 <P>The person is not exactly deleted. His personal data is erased (included his f&ouml;rnamn och efternamn) as well as his connection with his f&ouml;r&auml;ldrar. </P>
 <P>But an "entity person" is subsisting, linked to his possible spouse och barnren. </P>
+
 <H4><A NAME="SndP">5.6.</A> Skicka ett foto </H4>
 <P>Du ser this formul&auml;r, ben&auml;mnd "Skicka foto" from a personal record, after having clicked on "Update", then "Skicka foto", but only if the databas &auml;garen ger <A HREF="start.htm#Cnf">beh&ouml;righet</A> till det. </P>
 <P>Du kan skicka (upload) en "gif" eller "jpeg" fil which will be associated to the person. This file is recorded in the site. If this person already had a photo, yours replaces it. </P>
 <P>Viktigt: f&auml;ltet "Foto" f&ouml;r personen m&aring;ste vara tomt, otherwise this field is taken for the photo, not the photo you sent. Om detta f&auml;lt &auml;r fyllt g&ouml;r "Uppdatera" och "Modifiera person" f&ouml;r att radera det.</P>
-<P>&nbsp;</P>
+
+<H4><A NAME="DelPh">5.7.</A> Ta bort ett foto </H4>
+You see this form, titled "Delete photo" from a personal record, after having clicked on "Update", then "Delete photo", but only if the data base owner gave the <A HREF="start.htm#Cnf">beh&ouml;righet</A> for that. 
+
+If you click on "Ok", the photo associated with the person is deleted.
+
 <H4><A NAME="MrgP">6.</A> Hur man sl&aring;r ihop tv&aring; personer </H4>
 <P>Denn del beskriver hur man sl&aring;r ihop tv&aring; <STRONG>personer</STRONG> i en databas, om du har lagrat samma person tv&aring; g&aring;nger. </P>
 <P>Notera: vi pratar inte h&auml;r om hur man sl&aring;r ihop tv&aring; <STRONG>databaser</STRONG>: this is treated <A HREF="merge.htm">elsewhere</A>: it is not possible to do it on line (this chapter relates only to on line updates). </P>
