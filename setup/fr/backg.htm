@@ -3,23 +3,31 @@
 <!-- (c) Copyright INRIA 1999 - GeneWeb -->
 <head><title>Image de fond</title></head>
 
-<body>
 
-<h1>Image de fond</h1>
+<body background="file://$w/images/gwback.jpg">
 
-Pour indiquer une image de fond pour la base "$o", il faut la mettre
-sous la forme (en rempla&ccedil;ant "<tt>toto.jpg</tt>" par le vrai
-nom de votre fichier image:
+<center><h1><font color=#2f6400>Fond d'&eacute;cran</h1></font></center>
+<p>
+<p>
+<ul><li>Pour <b>indiquer une image de fond</b> pour la base "$o", il faut la mettre
+sous la forme suivante: 
+<p>
 
 <pre>
      background="gwd$t{.exe}?m=IM;b=$o;v=/toto.jpg"
 </pre>
+en rempla&ccedil;ant "<tt>toto.jpg</tt>" par le vrai
+nom de votre fichier image.
+
 
 <p>
 
-Mettez ce fichier image dans le r&eacute;pertoire (que vous devrez
-&eacute;ventuellement cr&eacute;er):
+<li>Mettez ce fichier image dans le r&eacute;pertoire
 
 <pre>
      gw$/images$/$o
 </pre>
+
+<p>que vous devrez
+&eacute;ventuellement cr&eacute;er.
+</ul>
