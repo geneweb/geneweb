@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: iovalue.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
 
 value string_tag = Obj.tag (Obj.repr "a");
 value float_tag = Obj.tag (Obj.repr 3.5);

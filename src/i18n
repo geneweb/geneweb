@@ -1,0 +1,254 @@
+ to see the first branch
+ to see the first relationship link
+ to try again with this number, or do "back" and change it yourself
+%d years ago
+%t already has parents
+%t died before his/her birth
+%t has incorrect title dates: %t
+%t is born after the death of his/her mother %t
+%t is born more than 2 years after the death of his/her father %t
+(day)
+(decimal separator)
+(month)
+(thousand separator)
+(week day)
+*nth (cousin)*
+, it is
+, it will be
+M/F
+Sosa numbers
+a %s cousin
+a 2nd cousin
+a 3rd cousin
+a brother/a sister/a sibling
+a cousin
+a descendant
+a grandfather/a grandmother/a grandparent
+a grandson/a granddaughter/a grandchild
+a great-grandfather/a great-grandmother/a great-grandparent
+a great-grandson/a great-granddaughter/a great-grandchild
+a great-nephew/a great-niece
+a great-uncle/a great-aunt
+a nephew/a niece
+a son/a daughter/a child
+about (year)
+access
+add
+advanced request
+after
+after (year)
+age
+alias
+all the places
+all the titles
+allied%t (euphemism for married or... not) to
+alphabetic order
+also
+an ancestor
+an uncle/an aunt
+ancestors
+ancestors (some)
+and
+anniversaries
+anniversaries of dead
+anniversaries of marriage
+are
+at the same time
+baptism
+baptized
+before
+before (year)
+begin
+birth
+birthdays
+born
+branch/branches
+burial
+buried
+cannot access base
+cannot change sex of a married person
+changed order of children
+child/children
+click
+comment
+consanguinity
+continue merging
+create
+cremated
+date
+days old
+dead young
+death
+death age:
+delete
+descendants
+died
+disappeared
+divorce
+divorced
+dont know
+end
+error
+exact
+executed (legally killed)
+families with encoding
+family added
+family deleted
+family modified
+family/families
+father/mother
+first free number
+first name alias
+first name missing
+first name not found
+first name/first names
+for the first names by alphabetic order
+generation
+grand-parents
+great-grand-parents
+happy birthday to you!
+having as children
+here
+him/her
+his wife/her husband
+husband/wife
+if titles
+in (month year)
+in (year)
+incompatible sexes
+incorrect date
+incorrect request
+indeed,
+index of the descendants
+index of the spouses (non descendants)
+insert
+is
+is a very young parent
+is born after his/her child
+it is the same person!
+killed (in action)
+less than one month old
+less than one year old
+link
+link between
+list
+main title
+marriage of %t after his/her death
+marriage of %t before his/her birth
+marriage/marriages
+married at age %t
+max %d generations
+maybe in (year)
+merge
+merge done
+missing ancestors
+modify
+months old
+more than %d answers
+murdered
+name
+name "%s.%d %s" already used by %tthis person%t
+no anniversary
+no birthday
+no known relationship link between %t and %t
+no match
+not dead
+not divorced
+not found
+note/notes
+nth
+nth (generation)
+number
+number of branches
+occupation
+of
+of the %s generation
+of the birth
+of the death
+of the disappearance
+of the execution
+of the murder
+on (day month year)
+one day old
+one month old
+one year old
+only the generation selected
+or
+or use "link" instead of "create"
+parents
+person added
+person deleted
+person modified
+person/persons
+persons having the same name
+photo
+place
+private
+public
+public name
+qualifier
+relationship
+relationship computing
+relationship link/relationship links
+see above
+see further
+several answers
+sex
+shared by
+should be of sex feminine
+should be of sex masculine
+son/daughter/child
+sources
+specify
+spouse
+spouses not included
+starting with
+surname alias
+surname missing
+surname not found
+surname/surnames
+switch
+switch done
+switch the order of the following families
+the %d first names
+the %d surnames
+the %s generation
+the anniversary
+the anniversary of marriage
+the base has changed; do "back", "reload", and refill the form
+the birthday
+the children
+the day after tomorrow
+the father/the mother/a parent
+the file is temporarily locked: please try again
+the following children of %t and %t are not in order
+the grandchildren
+the grandparents
+the great-grandchildren
+the great-grandparents
+the last %d births
+the parents
+the whole list
+title/titles
+to the %s generation
+to the children
+to the grandchildren
+to the grandparents
+to the great-grandchildren
+to the great-grandparents
+to the parents
+today
+tomorrow
+total
+unknown person
+unspecified
+up to
+update
+warnings
+with
+would be his/her own ancestor
+year
+year precision
+years old
+you must first merge
+you must first merge the 2 families

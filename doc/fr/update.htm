@@ -1,0 +1,1217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Modifications</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Modifications</h1>
+
+Cette partie vous indique comment faire des modifications dans une
+base de donn&eacute;es en utilisant votre navigateur. Si le
+propri&eacute;taire de la base de donn&eacute;es a mis un mot de
+passe, vous devrez le rentrer dans la page d'accueil pour avoir
+acc&egrave;s &agrave; ces diff&eacute;rentes possiblilit&eacute;s de
+mises &agrave; jour.
+
+<p>
+
+Avant d'entrer dans le vif du sujet, il est important de comprendre
+les notions de base: premi&egrave;rement, la notion de
+"pr&eacute;nom", "nom", "num&eacute;ro", et deuxi&egrave;mement, les
+notions de "personnes" et de "familles". Cela vous permettra de
+comprendre les sections suivantes sur les mises &agrave; jour.
+
+<ul>
+
+<li> <a href="#FSO">1.</a> Pr&eacute;noms, noms, num&eacute;ros.
+
+<li> <a href="#PF">2.</a> Personnes et Familles.
+
+<li> <a href="#MAJ">3.</a> Acc&egrave;s aux mises &agrave; jour.
+
+<li> <a href="#Part">4.</a> Quelques points particuliers:
+
+<ul>
+
+<li> <a href="#ModC">4.1.</a> Comment modifier le pr&eacute;nom ou le nom
+d'un enfant.
+
+<li> <a href="#AddC">4.2.</a> Comment ajouter un enfant dans une famille.
+
+</ul>
+
+<li> <a href="#Form">5.</a> Formulaires.
+
+<ul>
+
+<li> <a href="#AddF">5.1.</a> Ajouter une Famille.
+
+<li> <a href="#ModF">5.2.</a> Modifier une Famille.
+
+<li> <a href="#DelF">5.3.</a> Supprimer une Famille.
+
+<li> <a href="#ModP">5.4.</a> Modifier une Personne.
+
+<li> <a href="#DelP">5.5.</a> Supprimer une Personne.
+
+</ul>
+
+</ul>
+
+<h4> <a name="FSO">1.</a> Pr&eacute;noms, noms, num&eacute;ros </h4>
+
+Chaque personne de la base est rep&eacute;r&eacute;e de mani&egrave;re
+unique par son pr&eacute;nom, son nom et un num&eacute;ro, ce dernier
+servant &agrave; distinguer deux personnes ayant m&ecirc;me
+pr&eacute;nom et m&ecirc;me nom. Cet ensemble s'appelle la
+"cl&eacute;" de la personne.
+
+<p>
+
+Ainsi, s'il y a deux "Jean Dupont" dans la base, vous pourrez les
+distinguer par le num&eacute;ro. N'importe quel num&eacute;ro est
+valable et on n'est pas oblig&eacute; de commencer &agrave; 0 ou
+&agrave; 1, ni de compter de un en un. Par exemple, votre premier
+"Jean Dupont", vous pouvez lui donner le num&eacute;ro 7 et le second
+le num&eacute;ro 4. L'un sera rep&eacute;r&eacute; par "Jean",
+"Dupont", "7" et l'autre par "Jean", "Dupont", "4".
+
+<p>
+
+Ce num&eacute;ro, c'est vous qui le choisissez, sauf si vous
+&ecirc;tes parti d'un fichier GEDCOM, auquel cas "ged2gwb" l'aura
+choisi pour vous, pour chaque personne de la base.
+
+<p>
+
+Ce num&eacute;ro n'apparait que dans les pages de mise &agrave; jour:
+on ne les voit pas dans les pages normales. Ainsi, si on tape le nom
+"Jean Dupont" dans la page d'accueil, <em>GeneWeb</em> donnera
+&agrave; choisir entre "Jean Dupont 7" et "Jean Dupont 4", mais sans
+afficher explicitement les num&eacute;ros.
+
+<p>
+
+Cependant, comme vous &ecirc;tes un "gourou" puisque vous faites des
+mises &agrave; jour, sachez que vous pouvez chercher une personne en
+mettant un "point" et le num&eacute;ro entre le pr&eacute;nom et le
+nom.
+
+Ainsi dans la page d'accueil, vous pouvez chercher "Jean .4 Dupont" et
+vous tomberez directement sur celui qui a le num&eacute;ro 4.
+
+<p>
+
+Il faut aussi noter que:
+
+<ul>
+
+<li> Les accents et les majuscules ne comptent pas dans cette
+diff&eacute;renciation entre personnes. Ainsi "therese", "dupont", "5"
+donne acc&egrave;s &agrave; la m&ecirc;me personne que
+"Th&eacute;r&egrave;se", "Dupont", "5".
+
+<li> Quand il n'y a pas de num&eacute;ro, il vaut en fait 0. Ne pas le
+mettre ou mettre 0, c'est pareil.
+
+</ul>
+
+Il est important de bien comprendre cette notion, car certains des
+messages d'erreurs que vous aurez concernent cela. Par exemple, les
+messages du genre:
+
+<ul>
+
+<li> "Personne d&eacute;j&agrave; existante": cela veut dire que vous
+cherchez &agrave; cr&eacute;er une personne dont la combinaison
+"pr&eacute;nom", "nom" 'num&eacute;ro" est d&eacute;j&agrave; prise,
+ce qui arrive:
+
+<p>
+
+<ul>
+
+<li> soit dans un contexte o&ugrave; vous voulez cr&eacute;er une
+nouvelle personne,
+
+<li> soit dans un contexte ou vous avez voulu changer le
+pr&eacute;nom, le nom ou le num&eacute;ro d'une personne
+donn&eacute;e.
+
+</ul>
+
+<p>
+
+<li> "Personne inconnue": cela veut dire qu'il n'y a personne dans la
+base qui correspond &agrave; cette combinaison "pr&eacute;nom", "nom",
+"num&eacute;ro", ce qui arrive dans le cas o&ugrave; vous voulez
+relier une personne donn&eacute;e &agrave; une famille en tant que
+p&egrave;re, m&egrave;re, ou enfant.
+
+</ul>
+
+Notez aussi que ce num&eacute;ro n'a rien &agrave; voir avec un
+num&eacute;ro de pr&eacute;nom des personnes nobles: Louis&nbsp;XIV
+n'est pas oblig&eacute; d'avoir le num&eacute;ro 14.  Cependant, et ce
+n'est pas contradictoire, il est conseill&eacute; de choisir le
+m&ecirc;me num&eacute;ro, quand c'est possible: vous verrez que c'est
+plus pratique dans vos manipulations.
+
+<h4> <a name="PF">2.</a> Personnes et Familles </h4>
+
+Les bases de donn&eacute;es <em>GeneWeb</em>, en interne, comportent
+deux notions principales: les personnes et les familles:
+
+<ul>
+
+<li> Les personnes contiennent les informations individuelles telles
+que le pr&eacute;nom, le nom, le num&eacute;ro, les diff&eacute;rentes
+dates et diff&eacute;rents lieux de naissance, bapt&egrave;me,
+d&eacute;c&egrave;s, les &eacute;ventuels titres de noblesse, etc,
+etc.
+
+<li> Les familles contiennent des familles simples: le p&egrave;re, la
+m&egrave;re et les enfants, la date et le lieu de l'&eacute;ventuel
+mariage et de l'&eacute;ventuel divorce. Notez que si une personne est
+mari&eacute;e plusieurs fois, il y aura autant de "familles"
+diff&eacute;rentes.
+
+</ul>
+
+Les modifications de la base sont simplement et exclusivement des
+mise &agrave; jour des "personnes" et des "familles": ajout,
+modification, suppression.
+
+<h4> <a name="MAJ">3.</a> Acc&egrave;s aux mises &agrave; jour </h4>
+
+Si vous &ecirc;tes bien s&ucirc;rs d'avoir compris les deux sections
+pr&eacute;c&eacute;centes, vous allez pouvoir commencer.
+
+<p>
+
+Pour acc&eacute;der aux mises &agrave; jour, vous pouvez:
+
+<ul>
+
+<li> Soit cliquer sur "Ajouter une famille" dans la page d'accueil.
+
+<li> Soit cliquer sur "Mise &agrave; jour" dans une fiche personnelle.
+
+</ul>
+
+Dans la page d'accueil, en cliquant sur "Ajouter une famille", vous
+allez pouvoir commencer &agrave; remplir une base vide.
+
+<p>
+
+Vous allez voir appara&icirc;tre un formulaire pour ajouter une famille.
+Reportez-vous &agrave; la section <a href="#AddF">Ajouter une Famille</a>.
+
+<p>
+
+Dans une fiche personnelle, en cliquant sur "Mise &agrave; jour" vous
+verrez appara&icirc;tre une page o&ugrave; plusieurs choix vous sont
+propos&eacute;s. Ces choix vont d&eacute;pendre de la situation
+familiale de la personne:
+
+<ol><li value=1> Dans tous les cas, vous aurez les choix "Modifier" et
+"Supprimer": il s'agit de la modification ou de la suppression de la
+personne. Reportez-vous aux sections:
+
+<p>
+
+<ul>
+
+<li> <a href="#ModP">Modifier une Personne</a>
+
+<li> <a href="#DelP">Supprimer une Personne</a>
+
+</ul>
+
+</ol>
+
+<ol><li value=2> Si la personne est mari&eacute;e, vous aurez pour
+chaque mariage, les choix "Modifier/Famille" et
+"Supprimer/Famille". Reportez-vous aux sections:
+
+<p>
+
+<ul>
+
+<li> <a href="#ModF">Modifier une Famille</a>
+
+<li> <a href="#DelF">Supprimer une Famille</a>
+
+</ul>
+
+</ol>
+
+<ol><li value=3> S'il y a plusieurs mariages, il y aura un choix
+"Intervertir" entre chaque mariage, qui vous permet d'&eacute;changer
+l'ordre des familles dans l'affichage.
+
+</ol>
+
+<ol><li value=4> Dans tous les cas, cette liste familiale se termine par
+"Ajouter/Famille". Vous aurez le m&ecirc;me formulaire que pour
+"Ajouter une famille" de la page d'accueil, sauf que la personne sera
+pr&eacute;-inscrite dans le formulaire dans un des parents (selon le
+sexe). Reportez-vous donc &agrave; la section:
+
+<p>
+
+<ul>
+
+<li> <a href="#AddF">Ajouter une Famille</a>
+
+</ul>
+
+</ul>
+
+</ol>
+
+<ol><li value=5> Enfin, si la personne n'a pas de parents, il y aura un choix
+"Ajouter/Parents". Cela va donner &eacute;galement le formulaire
+"Ajouter/Famille" avec la personne pr&eacute;-inscrite comme enfant,
+et le nom de famille r&eacute;p&eacute;t&eacute; dans la zone "nom" du
+p&egrave;re. Reportez-vous donc aussi &agrave; la section:
+
+<p>
+
+<ul>
+
+<li> <a href="#AddF">Ajouter une Famille</a>
+
+</ul>
+
+</ol>
+
+<p> Remarques:
+
+<ul><li>
+
+Tous ces choix vous conduisent soit &agrave; des formulaires &agrave;
+remplir, soit &agrave; des demandes de confirmation: vous ne ferez
+rien de d&eacute;finitif en cliquant dans cette page: vous pourrez
+toujours vous r&eacute;tracter.
+
+<p>
+
+Ainsi "Supprimer" (choix num&eacute;ro 1) ne supprimera la
+personne que si vous faites "Ok" dans la page suivante qui vous
+sera propos&eacute;e.
+
+</ul>
+
+<ul><li>
+
+Dans les formulaires, il arrive que certains champs soient
+pr&eacute;-remplis. Cela ne signifie nullement que vous ne pouvez pas
+changer leur contenu.
+
+<p>
+
+Ainsi dans "Ajouter/Parents" (choix num&eacute;ro 5), le nom de
+famille du p&egrave;re est pr&eacute;-rempli. Mais cela est juste une
+commodit&eacute; d&ucirc; au fait qu'il est fr&eacute;quent qu'un
+p&egrave;re et son enfant aient le m&ecirc;me nom: mais si le
+p&egrave;re porte un autre nom, vous pouvez parfaitement le changer.
+
+</ul>
+
+<h4> <a name="Part">4.</a> Quelques points particuliers </h4>
+
+Ces points sont mis en avant parce que ce sont des pi&egrave;ges
+possibles: suivez bien la proc&eacute;dure indiqu&eacute;e.
+
+<p>
+
+<h4> <a name="ModC">4.1.</a> Comment modifier le pr&eacute;nom ou le
+nom d'un enfant </h4>
+
+Exemple: dans la famille de "Jean Dupont" et "Christine Durand", un
+des enfants a &eacute;t&eacute; nomm&eacute; "Robert", alors qu'il
+s'appelle en fait "Philippe":
+
+<p>
+
+Ce qu'il faut faire:
+
+<ul><li>
+
+Allez dans la fiche personnelle de "Robert Dupont", faites "Mise
+&agrave; jour", puis "Modifier", et proc&eacute;dez comme
+indiqu&eacute; dans la section "Modifier une Personne" (choix
+num&eacute;ro 1 de la section&nbsp;3).
+
+</ul>
+
+<p>
+
+Ce qu'il ne faut surtout pas faire:
+
+<ul><li>
+
+Il ne faut surtout pas utiliser "Modifier/Famille" (choix
+num&eacute;ro 2 de la section&nbsp;3).
+
+<p>
+
+Si vous le faites et que vous changez "Robert" en "Philippe" dans le
+formulaire:
+
+<p>
+
+<ul>
+
+<li> Cela coupera la connexion entre "Robert" et ses parents, lequel
+continuera imperturbablement &agrave; s'appeler "Robert Dupont", mais
+sans parents.
+
+<li> Cela mettra "Philippe Dupont", s'il existe et n'a pas
+d&eacute;j&agrave; des parents, comme enfant du couple.
+
+<li> Mais si ce "Philippe Dupont" n'existe pas dans la base ou bien
+s'il existe mais a d&eacute;j&agrave; des parents, il y aura un
+message d'erreur, et rien ne sera modifi&eacute; (heureusement).
+
+</ul>
+
+</ul>
+
+<h4> <a name="AddC">4.2.</a> Comment ajouter un enfant dans une
+famille </h4>
+
+Par exemple, dans la famille de "Jean Dupont" et de "Christine Durand",
+vous voulez ajouter "Hubert", comme enfant:
+
+<p>
+
+Ce qu'il faut faire:
+
+<ul><li>
+
+Allez dans la fiche personnelle d'un des parents, cliquez sur "Mise
+&agrave; jour", puis sur "Modifier/Famille" (choix num&eacute;ro 2
+de la section&nbsp;3) et ajouter l'enfant comme indiqu&eacute; dans la section
+"Modifier une Famille".
+
+</ul>
+
+Ce qu'il ne faut surtout pas faire:
+
+<ul><li>
+
+Il ne faut surtout pas utiliser "Ajouter/Famille" (num&eacute;ro 4
+de la section 3) qui ne signifie pas "ajouter un enfant dans une famille"
+mais bien "ajouter un nouveau mariage", cr&eacute;ant une nouvelle
+entit&eacute; "famille" pour un nouvel &eacute;poux ou une nouvelle
+&eacute;pouse.
+
+</ul>
+
+<ul><li>
+
+D'autre part, si l'enfant existe d&eacute;j&agrave; dans la base, et
+qu'on veut l'ajouter dans la liste des enfants d'un couple
+d&eacute;j&agrave; existant aussi, il ne faut pas non plus utiliser
+"Ajouter/Parents" (choix num&eacute;ro 5 de la section&nbsp;3).
+
+<p>
+
+Le choix "Ajouter/Parents" est plut&ocirc;t destin&eacute; &agrave;
+ajouter des parents &agrave; un de vos anc&ecirc;tres, pour remonter
+un peu plus haut. Ce choix cr&eacute;e aussi une nouvelle famille.
+
+</ul>
+
+<h4> <a name="Form">5.</a> Formulaires </h4>
+
+<h4> <a name="AddF">5.1.</a> Ajouter une Famille </h4>
+
+Vous tomberez sur ce formulaire intitul&eacute; "Ajouter/Famille":
+
+<ul>
+
+<li> Soit &agrave; partir de la page d'accueil, en cliquant sur
+"Ajouter une famille"; dans ce cas, aucune zone du formulaire ne sera
+pr&eacute;-remplie,
+
+<li> Soit &agrave; partir d'une fiche personnelle, apr&egrave;s avoir
+cliqu&eacute; sur "Mise &agrave; jour" puis "Ajouter/Famille"; dans ce
+cas, les zones "pr&eacute;nom", "nom" et "num&eacute;ro" seront
+pr&eacute;-remplies, pour le p&egrave;re ou la m&egrave;re en fonction
+du sexe de la personne,
+
+<li> Soit, dans le m&ecirc;me contexte, apr&egrave;s avoir
+cliqu&eacute; sur "Ajouter/Parents", si ce choix est propos&eacute;;
+dans ce cas, la zone "nom" du p&egrave;re sera pr&eacute;-remplie,
+ainsi que les zones "pr&eacute;nom", "nom" et "num&eacute;ro" du
+premier (et seul) enfant. Remarquez que vous pouvez tr&egrave;s bien
+changer la zone "nom" du p&egrave;re s'il porte un nom
+diff&eacute;rent de son enfant.
+
+</ul>
+
+<p>
+
+Ce formulaire se comporte exactement comme "Modifier une famille",
+sauf qu'il va cr&eacute;er une nouvelle famille. Autant de fois vous
+l'utiliserez, autant de fois une famille sera cr&eacute;&eacute;e. 
+
+<p>
+
+Ce qui veut dire que si vous vous rendez compte que &ecirc;tes
+tromp&eacute; apr&egrave;s avoir valid&eacute; le formulaire, ne
+refaites pas "Ajouter/Famille", mais "Modifier/Famille"!
+
+<p>
+
+Reportez-vous donc au paragraphe suivant pour le fonctionnement du
+formulaire.
+
+<h4> <a name="ModF">5.2.</a> Modifier une Famille </h4>
+
+Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
+apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+"Modifier/Famille". Le formulaire sera pr&eacute;-rempli du "nom",
+"pr&eacute;nom", "num&eacute;ro" du p&egrave;re, de la m&egrave;re, et
+des enfants, ainsi que de toutes les autres &eacute;ventuelles
+informations relatives &agrave; cette famille.
+
+<p>
+
+Ce formulaire se comporte comme "Ajouter/Famille" de la section
+pr&eacute;c&eacute;dente (sauf qu'il n'y aura pas ici de
+cr&eacute;ation d'une nouvelle famille). Ce qui suit est donc valable
+pour le formulaire "Ajouter/Famille".
+
+<p><strong>Remplissage</strong><p>
+
+Toutes les zones (pr&eacute;-remplies ou non) peuvent &ecirc;tre
+remplies, effac&eacute;es ou modifi&eacute;es. Quand on a rempli,
+effac&eacute; ou modifi&eacute; ce qu'on juge n&eacute;cessaire, il
+faudra aller en fin de formulaire et valider le formulaire en cliquant
+sur "Ok".
+
+<p>
+
+En regard des zones o&ugrave; se trouvent des personnes, remarquez la
+selection "Relier" et "Cr&eacute;er". Suivant les cas, elle sera
+pr&eacute;s&eacute;lectionn&eacute;e sur "Relier" ou sur
+"Cr&eacute;er". Vous pouvez changer cette s&eacute;lection en fonction
+de ce que vous cherchez &agrave; faire.
+
+<ul><li> 
+
+"Relier" signifie que la personne existe d&eacute;j&agrave; dans la
+base. Au moment de la validation, le syst&egrave;me v&eacute;rifiera
+que cette personne existe bien, et pour un parent, qu'il est du bon
+sexe.
+
+<p>
+
+Notez que comme c'est une recherche par "cl&eacute;" (voir premier
+paragraphe), il n'est pas n&eacute;cessaire de respecter les accents
+et les majuscules.
+
+</ul>
+
+<ul><li> 
+
+"Cr&eacute;er" signifie que la personne n'existe pas dans la base et
+qu'on demande au syst&egrave;me, au moment de la validation, de la
+cr&eacute;er avec le pr&eacute;nom, le nom et le num&eacute;ro
+indiqu&eacute;s.
+
+<p>
+
+Ici, contrairement &agrave; "Relier", il faudra mettre les accents et
+les majuscules correctement: la personne sera cr&eacute;&eacute;e avec
+l'orthographe que vous mettez l&agrave;.
+
+</ul>
+
+<p>
+
+Au moment de la validation, les cases "enfants" dont la zone
+"pr&eacute;nom" est vide sont ignor&eacute;es, quel que soit le
+contenu des autres champs. C'est donc comme si elles n'existaient pas.
+
+<p>
+
+Pour les enfants, le champ "nom" est facultatif: s'il est absent,
+c'est le nom du p&egrave;re qui sera pris.
+
+<p><strong>Diff&eacute;rentes modifications</strong><p>
+
+Voici diff&eacute;rentes modifications que vous allez pouvoir faire:
+
+<ul><li>
+
+<strong>Pour ajouter un enfant</strong>, s'il n'y a pas de zone libre
+pour lui, cliquez d'abord sur le ou les boutons "Ins&eacute;rer/Enfant" en
+fonction de la place que vous voulez leur mettre dans la famille. Puis
+cliquez sur "Ok" en fin de formulaire.
+
+<p>
+
+Remarque: cela ne validera pas le formulaire tout de suite. Le
+syst&egrave;me se contentera de vous proposer un nouveau formulaire
+avec une place r&eacute;serv&eacute;e pour le ou les enfants que vous
+voulez ajouter.
+
+<p>
+
+Donc attention: tant que vous cliquerez sur "Ins&eacute;rer/Enfant", en
+faisant "Ok", il n'y aura pas de validation: juste encore un nouveau
+formulaire, plus gros. Il ne faut donc pas interpr&eacute;ter ce
+bouton comme "ajoute-moi cet enfant que je viens de mettre": le
+syst&egrave;me le verra bien, ne vous en faites pas.
+
+<p>
+
+L'enfant que vous allez mettre dans la zone que vous venez de lui
+allouer est peut-&ecirc;tre une personne qui existe d&eacute;j&agrave;
+dans la base. Dans ce cas, s&eacute;lectionnez "Relier" &agrave; la
+place de "Cr&eacute;er".
+
+</ul>
+
+<ul><li>
+
+<strong>Pour supprimer un enfant</strong>, effacez simplement son
+pr&eacute;nom. Comme dit plus haut, les cases dont la zone
+"pr&eacute;nom" est vide sont ignor&eacute;es au moment de la
+validation. Remarquez que cela ne supprimera pas la personne: elle
+sera simplement supprim&eacute;e de la liste des enfants et se
+retrouvera elle-m&ecirc;me sans parents.
+
+</ul>
+
+<ul><li>
+
+<strong>Pour changer la place d'un enfant</strong>, le plus simple est
+de cliquer sur "Ins&eacute;rer/Enfant" &agrave; l'endroit o&ugrave; vous
+voulez le mettre, et faire "Ok". Dans le nouveau formulaire
+propos&eacute;, mettez l'enfant dans la case vide, s&eacute;lectionnez
+"Relier" &agrave; la place du "Cr&eacute;er" qui est propos&eacute;,
+et effacez son pr&eacute;nom dans l'ancienne case.
+
+</ul>
+
+<ul><li>
+
+<strong>Pour intervertir la place de deux enfants</strong>, vous
+pouvez proc&eacute;der de la m&ecirc;me fa&ccedil;on, en passant par
+une nouvelle case pour pouvoir simplement faire du couper-coller (sans
+oublier d'y selectionner "Relier"); n'oubliez pas non plus
+l'&eacute;ventuel num&eacute;ro.
+
+<p>
+
+Vous pouvez aussi le faire directement, sans passer par
+"Ins&eacute;rer/Enfant": l'ennui, c'est qu'il vous faudra alors vous rappeler
+du nom d'un des deux quand vous l'effacerez pour mettre l'autre
+&agrave; la place.
+
+</ul>
+
+<p><strong>Validation</strong><p>
+
+La validation se fait quand vous faites "Ok". Tant que vous ne l'aurez
+pas fait, aucun changement n'aura lieu dans la base. 
+
+<p>
+
+Remarquez bien aussi, comme il est dit plus haut, que si vous avez
+s&eacute;lectionn&eacute; un ou plusieurs "Ins&eacute;rer/Enfant", ce sera
+juste un nouveau formulaire qui sera propos&eacute;: ce ne sera pas
+la validation proprement dite.
+
+<p>
+
+Quand la validation est vraiment faite, vous devez voir appara&icirc;tre
+une nouvelle page, dont le titre va &ecirc;tre:
+
+<ul><li>
+
+Soit: <strong>Famille ajout&eacute;e ou modifi&eacute;e</strong><p>
+
+Vous devez y voir alors les noms des parents sur lesquels vous pouvez
+cliquer.
+
+<p>
+
+Vous y verrez peut-&ecirc;tre &eacute;galement des remarques. Elles
+concernent des incoh&eacute;rences de dates ou d'ordre entre les
+enfants. La modification sera faite tout de m&ecirc;me, mais il est
+pr&eacute;f&eacute;rable de les corriger, s'il y a lieu.
+
+<p>
+
+En cliquant sur un des parents, vous verrez appara&icirc;tre sa fiche
+personnelle. Mais votre mise &agrave; jour ne sera pas
+forc&eacute;ment visible. Les navigateurs Web conservent
+fr&eacute;quemment en m&eacute;moire les pages d&eacute;j&agrave;
+vues, et vous donneront probablement l'ancienne version. Faites alors
+"recharger la page" dans votre navigateur pour voir r&eacute;ellement
+vos modifications.
+
+</ul>
+
+<ul><li>
+
+Soit: <strong>Erreur</strong><p>
+
+La page indiquera l'erreur rencontr&eacute;e. Revenez alors en
+arri&egrave;re et corrigez. Vous pouvez aussi abandonner la
+modification... en ne faisant rien et en vous contentant de vous
+remettre &agrave; naviguer dans la base.
+
+<p>
+
+Si l'erreur vous indique qu'une certaine personne existe
+d&eacute;j&agrave;, c'est que vous avez voulu cr&eacute;er une
+personne dont la combinaison "pr&eacute;nom", "nom", "num&eacute;ro"
+est d&eacute;j&agrave; pr&eacute;sente dans la base.
+
+<p>
+
+Solution:
+
+<p>
+
+<ul>
+
+<li> Si vous vouliez effectivement cr&eacute;er une nouvelle personne,
+revenez en arri&egrave;re et changez son num&eacute;ro. Remarquez que
+la page d'erreur vous a indiqu&eacute; le premier num&eacute;ro libre,
+donc disponible: choisissez celui-l&agrave; ou un autre. S'il y a
+plusieurs personnes ayant ce m&ecirc;me nom, leur liste est
+donn&eacute;e.
+
+
+<li> Si c'est bien de cette personne-l&agrave; dont vous vouliez
+parler, revenez en arri&egrave;re et changez le "Cr&eacute;er" en
+"Relier".
+
+</ul>
+
+<p>
+
+Si l'erreur vous indique qu'une certaine personne n'existe pas, c'est
+que vous avez fait "Relier" en regard d'une personne non existante.
+Peut-&ecirc;tre vous-&ecirc;tes vous tromp&eacute; sur son
+num&eacute;ro? Ou bien vouliez-vous en fait cr&eacute;er une nouvelle
+personne?
+
+</ul>
+
+<h4> <a name="DelF">5.3.</a> Supprimer une Famille </h4>
+
+Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
+apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+"Supprimer/Famille".
+
+<p>
+
+Le formulaire ne contient que la case "Ok" pour vous permettre de
+le faire vraiment. Vous pouvez encore vous r&eacute;tracter.
+
+<p>
+
+Si vous faites "Ok", une nouvelle page apparait avec juste le titre
+"Famille supprim&eacute;e".
+
+<p>
+
+La famille est supprim&eacute;e de la base: le p&egrave;re, la
+m&egrave;re est les enfants s'&eacute;parpillent dans la nature.
+Cependant, aucun d'entre eux n'est supprim&eacute; de la base:
+Le p&egrave;re et la m&egrave;re ne sont plus mari&eacute;s, ils n'ont
+plus ces enfants-l&agrave; (ils peuvent en avoir d'autres avec
+d'autres mariages, lesquels persistent), les enfants n'ont plus de
+parents.
+
+<h4> <a name="ModP">5.4.</a> Modifier une Personne </h4>
+
+Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
+apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+"Modifier". Le formulaire sera pr&eacute;-rempli de toutes les
+informations individuelles de cette personne.
+
+<p><strong>Remplissage</strong><p>
+
+Toutes les zones (pr&eacute;-remplies ou non) peuvent &ecirc;tre
+remplies, effac&eacute;es ou modifi&eacute;es. Quand on a rempli,
+effac&eacute; ou modifi&eacute; ce qu'on juge n&eacute;cessaire, il
+faudra aller en fin de formulaire et valider le formulaire en cliquant
+sur "Ok".
+
+<p>
+
+Un certain nombre de boutons contiennent "Ins&eacute;rer/...":
+"Ins&eacute;rer/Surnom", "Ins&eacute;rer/Alias", etc.
+
+<p>
+
+Attention: ce n'est pas pour indiquer d'ajouter le surnom ou l'alias,
+etc, &agrave; la personne, mais pour demander un nouveau formulaire
+avec une place r&eacute;serv&eacute;e pour un autre surnom, un autre
+alias, etc.
+
+<p>
+
+Ainsi, si vous faites "Ok" apr&egrave;s avoir s&eacute;lectionn&eacute; un
+ou plusieurs de ces boutons, un nouveau formulaire plus gros vous sera
+propos&eacute; et aucune modification ne sera faite.
+
+<p>
+
+Si, donc, apr&egrave;s un "Ok", vous voyez encore un formulaire de
+modification, c'est que votre modification n'a pas &eacute;t&eacute;
+prise en compte (pas encore), et ce, m&ecirc;me si vous avez rempli
+des tas de zones.
+
+<p><strong>Diff&eacute;rents champs</strong><p>
+
+Remarquez bien le sens des diff&eacute;rents champs, en particulier
+l'usage de "nom public", "qualificatif", "alias", etc qui ont chacun des
+sens bien pr&eacute;cis.
+
+<ul><li>
+
+<strong>Pr&eacute;nom</strong> et <strong>nom</strong> ont les sens
+habituels qu'on leur donne. Avec <strong>Num</strong> (num&eacute;ro),
+la personne a une "cl&eacute; d'acc&egrave;s" unique comme
+indiqu&eacute; au d&eacute;but de ce chapitre.
+
+<p>
+
+Il est conseill&eacute; de mettre le pr&eacute;nom d'usage dans la
+zone pr&eacute;nom. Les autres pr&eacute;noms (pr&eacute;noms
+complets, autres pr&eacute;noms possibles, autres orthographes de
+pr&eacute;noms, surnoms pour les proches) doivent plut&ocirc;t aller
+dans les zones "alias" ou "autre(s) pr&eacute;nom(s)" (voir
+ci-dessous). Les noms avec num&eacute;ro des personnes nobles et
+royales doivent aller plut&ocirc;t dans la zone "nom public".
+
+<p>
+
+Ceci parce que le pr&eacute;nom est comptabilis&eacute; dans la liste
+des pr&eacute;noms. On peut ainsi savoir quel est le pr&eacute;nom le
+plus fr&eacute;quent, voir quelles sont les personnes portant le
+m&ecirc;me pr&eacute;nom etc. Les autres sortes de pr&eacute;noms
+risqueraient l&agrave; de se trouver en un seul exemplaire et
+d&eacute;pareilleraient l'ensemble.
+
+</ul>
+
+<ul><li>
+
+<strong>Nom public</strong> est le nom par lequel la personne est la
+plus connue. Exemple: "Louis&nbsp;XIV" (son pr&eacute;nom &eacute;tant
+"Louis" et son nom "de Bourbon").
+
+<p>
+
+Les personnes ayant un nom public sont accessibles
+dans la navigation par ce nom.
+
+<p>
+
+S'il y a un nom public, il sera affich&eacute; comme titre de sa fiche
+personnelle, &agrave; la place du "pr&eacute;nom nom", lesquels sont
+rel&eacute;gu&eacute;s en plus petit, en dessous.
+
+</ul>
+
+<ul><li>
+
+<strong>Photo</strong> est un fichier ".gif" ou ".jpg" associ&eacute;
+&agrave; la personne et qui sera affich&eacute; dans sa fiche
+personnelle. Ce peut &ecirc;tre une adresse URL (commen&ccedil;ant par
+"http://...") ou juste un nom de fichier, que le syst&egrave;me
+cherchera dans le r&eacute;pertoire "image" au moment de l'affichage.
+
+</ul>
+
+<ul><li>
+
+<strong>Qualificatif</strong> est un sobriquet attach&eacute; aux
+personnes c&eacute;l&egrave;bres. Ainsi "le Gros" dans "Louis&nbsp;VI
+le&nbsp;Gros".
+
+<p>
+
+Les personnes sont accessibles par ce qualificatif en lieu et place de leur
+nom de famille. Ainsi "Louis VI le Gros" est accessible par "Louis VI"
+(nom public), "Louis VI le Gros", "Louis le Gros", "Louis Capet", etc.
+Notons que "le Gros" n'est n&eacute;anmoins pas
+consid&eacute;r&eacute; comme un nom de famille en soi.
+
+<p>
+
+Il peut y avoir plusieurs qualificatifs: ainsi "Guillaume le
+Conqu&eacute;rant" est dit aussi "Guillaume le B&acirc;tard". Il y
+faudra donc une zone "qualificatif" contenant "le Conqu&eacute;rant"
+et une autre contenant "le B&acirc;tard". D'o&ugrave; l'utilit&eacute;
+de "Ins&eacute;rer/Qualificatif".
+
+<p>
+
+S'il y a un qualificatif, le nom public (ou le pr&eacute;nom s'il n'y
+a pas de nom public) suivi du qualificatif seront affich&eacute;s
+comme titre dans sa fiche personnelle, &agrave; la place du
+"pr&eacute;nom nom", qui seront rel&eacute;gu&eacute;s en plus petit
+en dessous.
+
+</ul>
+
+<ul><li>
+
+<strong>Alias</strong> est un nom par lequel la personne est connue
+mais sans que cela lui tienne lieu de pr&eacute;nom alternatif (comme
+le "nom public" par exemple).
+
+<p>
+
+Ainsi "Aurore Dupin" est connue sous le nom "George Sand". De
+m&ecirc;me, "Anne-Marie d'Orl&eacute;ans", fille de "Philippe Ier" et
+ni&egrave;ce de "Louis XIV" est dite "Mademoiselle de Valois".
+
+<p>
+
+Notons que l'alias forme un tout: il n'est pas question d'accepter des
+combinaisons telles que "George Dupin" ou "Aurore Sand", "Anne-Marie
+de Valois" ou "Mademoiselle d'Orl&eacute;ans".
+
+<p>
+
+S'il y a un ou plusieurs alias, ils sont affich&eacute;s en lettres
+grasses en dessous du titre, mais en plus petit.
+
+</ul>
+
+<ul><li>
+
+<strong>Autre(s) pr&eacute;nom(s)</strong> peut avoir plusieurs usages:
+
+<p>
+
+<ul>
+
+<li> Ce peut &ecirc;tre les pr&eacute;noms complets de l'&eacute;tat
+civil.
+
+<li> Ce peut &ecirc;tre les petits noms utilis&eacute;s parmi les
+proches. Ainsi "Bobby" &agrave; la place de "Robert".
+
+<li> Ce peut-&ecirc;tre un autre pr&eacute;nom ou le m&ecirc;me
+pr&eacute;nom avec une orthographe diff&eacute;rente, dans le cas de
+personnes tr&egrave;s anciennes dont on n'est pas s&ucirc;r du
+pr&eacute;nom, ou dont le pr&eacute;nom a &eacute;t&eacute; ecrit
+differemment selon les sources.
+
+</ul>
+
+<p>
+
+Il peut y avoir plusieurs "autres pr&eacute;noms".
+
+<p>
+
+Les "autres pr&eacute;noms" peuvent &ecirc;tre utilis&eacute;s en lieu et
+place du pr&eacute;nom dans les requ&ecirc;tes, mais ne sont pas
+consid&eacute;r&eacute;s comme des pr&eacute;noms en soi,
+c'est-&agrave;-dire qu'ils ne sont pas comptabilis&eacute;s dans les
+listes par pr&eacute;noms.
+
+<p>
+
+S'il y a des "autres pr&eacute;noms", ils sont affich&eacute;s dans la
+fiche personnelle, en petites lettres sous le titre.
+
+</ul>
+
+<ul><li>
+
+<strong>Nom alias</strong> peut servir de nom alternatif, si on veut
+mettre une autre version du nom, par exemple, avec une autre
+orthographe. Son usage n'est pas fr&eacute;quent.
+
+</ul>
+
+<ul><li>
+
+<strong>Naissance</strong> permet d'indiquer dates et lieux de naissance
+et de bapt&egrave;me. Il ne pr&eacute;sente pas de probl&egrave;me
+particulier.
+
+</ul>
+
+<ul><li>
+
+<strong>D&eacute;c&egrave;s</strong> permet d'indiquer les
+informations sur le d&eacute;c&egrave;s. La s&eacute;lection initiale
+est "Ne sais pas".
+
+<p>
+
+<ul>
+
+<li> Si la personne est toujours vivante, s&eacute;lectionnez "Non
+d&eacute;c&eacute;d&eacute;". C'est important parce qu'ainsi, avec la
+date de naissance, le syst&egrave;me affichera, dans sa fiche
+personnelle, son &acirc;ge calcul&eacute; &agrave; partir de la date
+du jour. Et, si la date de naissance est compl&egrave;te, la personne
+sera comptabilis&eacute;e dans les anniversaires.
+
+<li> Si la personne est d&eacute;c&eacute;d&eacute;e, s&eacute;lectionnez
+"D&eacute;c&eacute;d&eacute;" et mettez &eacute;ventuellement date, lieu
+et cause de d&eacute;c&egrave;s, et date et lieu d'enterrement ou
+d'incin&eacute;ration.
+
+<li> Si vous ne savez pas, laissez comme &ccedil;a.
+
+</ul>
+
+</ul>
+
+<ul><li>
+
+<strong>Occupation</strong> contient la profession. Si vous voulez
+mettre un titre de noblesse, utilisez plut&ocirc;t les champs "titre",
+qui suivent.
+
+</ul>
+
+<ul><li>
+
+<strong>Titres</strong> contient les titres de noblesse. Il peut y en
+avoir plusieurs. Pour avoir un formulaire avec d'autres places pour
+les titres, cliquez sur un ou plusieurs "Ins&eacute;rer/Titre", allez
+en bas du formulaire et faites "Ok".
+
+<p>
+
+Les titres sont d&eacute;compos&eacute;s en deux parties: le titre
+lui-m&ecirc;me et le lieu. Le titre lui-m&ecirc;me contient la
+d&eacute;nomination: "comte", "duc", "roi", etc. Le lieu contient le
+compl&eacute;ment: "d'Anjou", "de Bourgogne", "de France", et.
+etc.
+
+<p>
+
+Notez la particule: &agrave; l'affichage, on verra une combinaison de
+la d&eacute;nomination et du lieu: "comte d'Anjou", "duc de
+Bourgogne", "roi de France" qui seront des zones cliquables, permettant
+de voir toutes les personnes de la base ayant ce titre.
+
+<p>
+
+Mais la s&eacute;paration entre ces notions permettra de
+s&eacute;lectionner, par exemple tous les "comte", tous les "duc",
+tous les "roi", et inversement, tous les titres finissant par
+"d'Anjou", "de Bourgogne", "de France", etc.
+
+<p>
+
+Le champ "nom" permet de mettre un nom public associ&eacute; au
+titre. Ainsi "Charles Quint" s'appelle "Charles Ier" en tant que "roi
+d'Espagne", "Charles IV" en tant que "roi de Sicile", etc.
+
+<p>
+
+Le champ "N-i&egrave;me" est utilis&eacute; pour les titres
+d&eacute;nomm&eacute;s avec leur num&eacute;ro. Exemple: pour le
+"3&egrave;me comte de Warwick", on pourra mettre "3". Ne pas confondre
+avec "Louis XIV" dont le num&eacute;ro indique que c'est le
+14&egrave;me "Louis" de la lign&eacute;e, et non pas le 14&egrave;me
+"roi de France".
+
+<p>
+
+Le bouton "Titre principal" permet d'indiquer, quand on affiche cette
+personne de fa&ccedil;on simplifi&eacute;e (dans la page de son
+&eacute;pouse, par exemple, ou dans celles de ses enfants), quel titre
+doit &ecirc;tre affich&eacute;. Cela n'a d'importance que s'il y en a
+plusieurs.
+
+<p>
+
+Les deux champs suivants donnent les dates de d&eacute;but et de fin
+de r&egrave;gne.
+
+<p>
+
+Pour supprimer un titre, il suffit d'effacer le contenu du premier
+champ "Titre".
+
+<p>
+
+</ul>
+
+<ul><li>
+
+<strong>Acc&egrave;s</strong> permet de pr&eacute;ciser l'acc&egrave;s
+aux informations personnelles. Ceci s'applique aux personnes
+"actuelles", c'est-&agrave;-dire dont les dates (naissance,
+d&eacute;c&egrave;s, etc.) sont inf&eacute;rieures &agrave; 100 ans:
+
+<p>
+
+<ul>
+
+<li> Par d&eacute;faut, les personnes ayant un titre de noblesse ou
+dont un des parents a un titre de noblesse sont
+consid&eacute;r&eacute;es comme des personnes "publiques" et leurs
+informations personnelles sont toujours affich&eacute;es.
+
+<li> Si on s&eacute;lectionne "public", les informations personnelles
+sont toujours affich&eacute;es, que la personne ait des titres de
+noblesse ou non.
+
+<li> Si on s&eacute;lectionne "priv&eacute;", les informations personnelles
+ne sont pas affich&eacute;es, m&ecirc;me si la personne a des titres de
+noblesse.
+
+</ul>
+
+<p>
+
+Par l'entr&eacute;e "sorcier" ou "amis" (par mots de passe), les
+informations personnelles sont toujours affich&eacute;es.
+
+</ul>
+
+<ul><li>
+
+<strong>Notes</strong> contient les notes sur la personne. &Aacute;
+l'affichage, le texte sera affich&eacute; en continu, m&ecirc;me si
+vous mettez des sauts de ligne. Pour qu'il y ait un passage &agrave;
+la ligne, mettez "&lt;br&gt;" l&agrave; o&ugrave; vous voulez des
+sauts de ligne.
+
+</ul>
+
+<ul><li>
+
+<strong>Sources</strong> permet de noter des informations courtes sur
+l'origine de vos informations: un nom, un sigle, un titre de livre,
+un code &agrave; vous. Vous saurez ainsi d'o&ugrave; vous tenez vos
+informations.
+
+<p>
+
+Il n'est pas pr&eacute;vu pour des informations longues, style
+"recopie du document trouv&eacute; &agrave; la mairie": il faudra pour
+cela utiliser plut&ocirc;t le champ "Notes" ci-dessus.
+
+</ul>
+
+<p><strong>Validation</strong><p>
+
+La validation se fait quand vous faites "Ok". Tant que vous ne l'aurez
+pas fait, aucun changement n'aura lieu dans la base. 
+
+<p>
+
+Remarquez bien aussi, comme il est dit plus haut, que si vous avez
+s&eacute;lectionn&eacute; un ou plusieurs "Ins&eacute;rer/...", ce
+sera juste un nouveau formulaire qui sera propos&eacute; et non pas la
+validation proprement dite.
+
+<p>
+
+Quand la validation est vraiment faite, vous devez voir appara&icirc;tre
+une nouvelle page, dont le titre va &ecirc;tre:
+
+<ul><li>
+
+Soit: <strong>Personne modifi&eacute;e</strong><p>
+
+Vous devez y voir le nom de la personne sur laquelle vous allez pouvoir
+cliquer.
+
+<p>
+
+Vous y verrez peut-&ecirc;tre &eacute;galement des remarques. Elles
+concernent des incoh&eacute;rences de dates. La modification sera
+faite tout de m&ecirc;me, mais il est pr&eacute;f&eacute;rable de les
+corriger.
+
+<p>
+
+En cliquant sur la personne, vous verrez appara&icirc;tre sa fiche
+personnelle. Mais votre mise &agrave; jour ne sera pas
+forc&eacute;ment visible. Les navigateurs Web conservent
+fr&eacute;quemment en m&eacute;moire les pages d&eacute;j&agrave;
+vues, et vous donneront probablement l'ancienne version. Faites alors
+"recharger la page" dans votre navigateur pour voir r&eacute;ellement
+vos modifications.
+
+</ul>
+
+<ul><li>
+
+Soit: <strong>Erreur</strong><p>
+
+La page indiquera l'erreur rencontr&eacute;e. Revenez alors en
+arri&egrave;re et corrigez. Vous pouvez aussi abandonner la
+modification... en ne faisant rien et en vous contentant de vous
+remettre &agrave; naviguer dans la base.
+
+<p>
+
+Si l'erreur vous indique que la personne existe d&eacute;j&agrave;,
+c'est que vous avez modifi&eacute; le pr&eacute;nom, le nom ou le
+num&eacute;ro (vous avez parfaitement le droit de le faire), mais que
+votre nouveau choix entre en conflit avec une autre personne de la
+base.
+
+<p>
+
+Solution: revenez en arri&egrave;re et changez le
+num&eacute;ro. Remarquez que la page d'erreur vous a indiqu&eacute; le
+premier num&eacute;ro libre, donc disponible. Vous pouvez choisir
+celui-l&agrave; ou un autre. S'il y a plusieurs personnes ayant ce
+m&ecirc;me nom, leur liste est donn&eacute;e.
+
+</ul>
+
+<h4> <a name="DelP">5.5.</a> Supprimer une Personne </h4>
+
+Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
+apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+"Supprimer".
+
+<p>
+
+Le formulaire ne contient que la case "Ok" pour vous permettre de
+le faire vraiment. Vous pouvez encore vous r&eacute;tracter.
+
+<p>
+
+Si vous faites "Ok", une nouvelle page apparait avec juste le titre
+"Personne supprim&eacute;e".
+
+<p>
+
+La personne n'est en fait pas tout &agrave; fait supprim&eacute;e. Ses
+informations personnelles sont simplement effac&eacute;es, (y compris
+son pr&eacute;nom et son nom) ainsi que sa connexion avec ses parents.
+
+<p>
+
+Mais il subsiste toujours une "entit&eacute; personne" reli&eacute;e
+&agrave; son &eacute;ventuel conjoint et &agrave; ses &eacute;ventuels
+enfants.
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>G&eacute;n&eacute;alogie - %t</title></head>
+<body%b>
+<h1>G&eacute;n&eacute;alogie</h1>
+
+La base contient actuellement %n personnes.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">%h
+<input type=hidden name=m value=NG>
+Chercher: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Il s'agit:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+Soit de <em>pr&eacute;nom</em> et <em>nom</em>,
+soit de <em>nom public</em>, soit d'<em>alias</em>.
+<li> <input type=radio name=t value=P> D'un <em>pr&eacute;nom</em>.
+<li> <input type=radio name=t value=N> D'un <em>nom</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">%h
+<input type=hidden name=m value=TT>
+Par titre <INPUT NAME=t size=14 maxlength=200>
+lieu <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">%h
+Tous les
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED> Noms
+   <OPTION VALUE="P"> Pr&eacute;noms
+</SELECT>
+par
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> Ordre alphab&eacute;tique
+   <OPTION VALUE="F"> Fr&eacute;quence
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Ajouter une famille</a>.
+%w
+
+</ul>
+
+Les <a href="%sm=AN">anniversaires</a>%x
+et les <a href="%sm=B;k=10">derni&egrave;res naissances</a>%x...
+<br>
+Les <a href="%sm=AD">anniversaires des personnes d&eacute;c&eacute;d&eacute;es</a>.
+<br>
+Et les <a href="%sm=AM">anniversaires de mariage</a>.
+<p>
+Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
+
+<p>
+
+<form method=get action="%f">%h
+<font size=-1>Mot de passe, pour acc&egrave;s <em>amis</em> ou
+<em>mise-&agrave;-jour</em>:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+
+<p>
+
+%rversion

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
 
 open Def;
 open Gutil;

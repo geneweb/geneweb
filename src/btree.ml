@@ -1,4 +1,4 @@
-(* $Id: btree.ml,v 1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: btree.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
 
 module type OrderedType = sig type t = 'a; value compare : t -> t -> int; end;
 

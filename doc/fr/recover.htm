@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - R&eacute;cup&eacute;rer une base</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - R&eacute;cup&eacute;rer une base</h1>
+
+En installant une nouvelle version de <em>GeneWeb</em>, vous voulez
+probablement r&eacute;cup&eacute;rer votre base de donn&eacute;es.
+
+<p>
+
+Si vous &ecirc;tes parti d'un fichier GEDCOM, et que vous n'avez pas
+fait de modifs, ou peu, le mieux est de relancer la nouvelle version
+de "ged2gwb". D'une version sur l'autre, ce programme a pu
+s'am&eacute;liorer: nouveaux champs trait&eacute;s, nouvelles options.
+
+<p>
+
+Par contre, si vous &eacute;tiez parti d'une base vide ou d'un fichier
+GEDCOM et que vous avez fait des modifications, suivez la
+proc&eacute;dure suivante:
+
+<ul>
+
+<li> Deplacez votre base du r&eacute;pertoire de l'ancienne version de
+<em>GeneWeb</em> vers le nouveau. Si votre base s'appelle "dupont",
+c'est le r&eacute;pertoire "dupont.gwb" qu'il faut d&eacute;placer.
+
+<li>
+Lancez le nouveau "gwd" et regardez si votre base est accept&eacute;e ou non
+en la consultant dans le navigateur.
+
+<li> Si elle ne l'est pas, vous devez la recr&eacute;er. Effectuez les
+op&eacute;rations suivantes:
+
+<ul>
+
+<li>
+Remettez "dupont.gwb" dans l'ancien r&eacute;pertoire.
+
+<li>
+Lancez une fen&ecirc;tre de commandes int&eacute;ractives. Allez dans
+l'ancien r&eacute;pertoire (commande "cd") et tapez:
+
+<pre>
+     gwu dupont.gwb > toto.gw
+</pre>
+
+Remarque: cette commande s'appelait "gwb2gw" dans de
+pr&eacute;c&eacute;dentes versions. Si vous l'avez sous ce nom-l&agrave;,
+c'est bien elle qu'il faut utiliser.
+
+<li>
+Copiez le fichier "toto.gw" dans le nouveau r&eacute;pertoire.
+
+<li>
+Dans la fen&ecirc;tre de commande int&eacute;ractives, allez dans
+le nouveau r&eacute;pertoire (commande "cd") et tapez:
+
+<pre>
+     gwc -nc toto.gw -o dupont
+</pre>
+
+<li> Lancez le nouveau d&eacute;mon et v&eacute;rifiez que votre base
+est accept&eacute;e.
+
+<li> Vous pouvez maintenant supprimer les fichiers "toto.gw" et
+"toto.gwo", ce dernier &eacute;tant cr&eacute;&eacute; par "gwc",
+devenus inutiles. Mais vous pouvez aussi conserver "toto.gw" comme
+sauvegarde de votre base.
+
+</ul>
+</ul>
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

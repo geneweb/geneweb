@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.1 1998-09-01 14:32:05 ddr Exp $ *)
+(* $Id: util.ml,v 1.1.1.1 1998-09-01 14:32:05 ddr Exp $ *)
 
 open Def;
 open Config;

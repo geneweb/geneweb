@@ -1,0 +1,331 @@
+GeneWeb Version 1.06
+--------------------
+
+* ged2gwb:
+  - warning, not error now, when a person is undefined
+* a.cnf:
+  - added example of setting background image
+
+GeneWeb Version 1.05
+--------------------
+
+* gwd:
+  - added ability to merge persons and families.
+  - added advanced requests
+  - added year interval when displaying missing ancestors
+  - (detail) added dates when displaying descendants indexes.
+  - (detail) misc terms changing ("add"->"insert"; "nickname"->"qualifier"...)
+
+* gwu:
+  - added option "-a" to select ancestors like in command "gwb2ged".
+
+* bug fixes:
+  - Fixed a problem of blocking: the symptom was that, in some
+    versions of Windows 95, "gwd" started normally, but when opening
+    the site in the navigator, the site was found but the navigator was
+    waiting and waiting forever.
+  - When updating a person, if the "notes" field holds only a newline,
+    the request is rejected => fixed. Moreover some browsers add this "bad"
+    newline if the notes fields is empty => fixed.
+
+GeneWeb Version 1.04
+--------------------
+
+* gwd, ged2gwb, gwb2ged:
+  - added baptism (separated from birth) and burial/cremation.
+  - added sources for marriages.
+
+* gwd:
+  - added "access" info, for infos display when dates < now - 100 years =
+    * "If Titles" => displayed if the person has titles
+    * "Public"    => always displayed
+    * "Private"   => not displayed
+  - added link to welcome page in personal record pages.
+  - added option -auth: authorization file to restrict access (password)
+  - fixed bug: in cgi mode, access to images did not work.
+  - in welcome page, date (since ...) is printed in original language.
+  - birthday months displayed as a menu and at the end instead of beginning
+
+* lexicon.txt:
+  - some changes in translations
+
+GeneWeb Version 1.03
+--------------------
+
+* Added swedish version.
+
+* gwd:
+  - in display by name, display year with precision in marriages
+  - in missing ancestors by alphabetic order, display spouses too
+  - in missing ancestors by Soza, shorter display of numbers
+  - changed syntax of gwd.arg file (for cgi mode) => see doc "server"
+  - in update person form, display "born" and "died" in neutral when
+    language can do it (e.g. french "ne(e)", "decede(e)")
+  - added request m=R;p=..;n=..;p1=..;n1=.. displaying relationship
+    between two persons by their names
+
+* ged2gwb:
+  - when converting a date with qualifier, if the date holds day or month,
+    converts into: "ca Year". Ex: "AFT APR 1218" is read as "ABT 1218".
+  - fixed bug: date 16/2/1964 gave "year = 16" instead of "year = 1964"
+
+* gwd, a.cnf, lang/lexicon.txt
+  - deleted principle of "message" (was undocumented, anyway)
+
+* gwd, doc:
+  - changed terminology "occurrence number" into just "number" (I realized
+    that "occurrence" is mathematical jargon).
+
+* gwd, lang/*/start.txt:
+  - displaying of total number of accesses, not only accesses in welcome page
+
+* in all commands:
+  - options -help display message on standard output instead of standard
+    error, allowing to use "| more" in Windows 95/NT
+
+GeneWeb Version 1.02
+--------------------
+
+* doc:
+  - explain a solution for the problem of connection off line
+
+* ged2gwb:
+  - ANSEL encoding is automatically detected (1 CHAR ANSEL in GEDCOM).
+    Suppression option "-tma"; adding "-ansel" and "-no_ansel" to force
+    or suppress the encoding, overriding the possible setting in GEDCOM.
+
+* gwd:
+  - fixed bug: error while treating anniversaries of marriage in
+    databases where families had been deleted:
+       Uncaught exception: Failure("access persons out of bounds")
+
+GeneWeb Version 1.01
+--------------------
+
+New:
+
+- Command gwb2ged to export GEDCOM files.
+- More doc
+
+Other changes:
+
+* ged2gwb:
+  - accept BAPM (unspecified baptism) together with CHR (christian baptism)
+    in individual records
+  - treat fields TITL (nobility titles) in individual records
+  - fixed bug: families and children was bad ordered or reordered
+  - added field SOUR (sources) (if not a pointer) for personal record; was
+    only selected from BIRT (birth) and DEAT (death)
+  - options -epn and -efn are now by default: options -no_epn and -no_efn
+    added to cancel thems.
+  - applies "-lf" after "-epn"
+
+* gwd:
+  - changed: when deleting a person, it is now deleted also among the
+    children of his parents.
+  - fixed bug: when deleting a person, some fields were not erased.
+  - added option -lang: default language
+  - changed: displaying shortcuts when accessing by titles: for example,
+    if there is only one king in the data base, and it is "king of France",
+    selecting "king" directy displays "kings of France".
+
+* gwb2gw has been renamed gwu.
+
+GeneWeb Version 1.0
+-------------------
+
+CGI mode is Ok.
+
+* gwd, ged2gwb, lang/lexicon.txt:
+  - errors on dates become warnings
+
+GeneWeb Version 1.0-beta.10
+---------------------------
+
+Still intermediate version to perfect "CGI" mode.
+
+* gwd:
+  - fixed bug: update did not work in cgi mode.
+  - print person link after "family switch"
+  - when using "add parents", surname is printed in child area => ability
+    to change father's.
+
+GeneWeb Version 1.0 beta.9
+--------------------------
+
+Intermediate version to perfect "CGI" mode under Windows NT.
+
+* More documentation
+
+* gwd:
+  - cgi is detected by the presence of environment variable QUERY_STRING.
+    It seems that .bat files is not accepted in Web servers in Windows NT,
+    so one must use "gwd" itself.
+  - if "gwd" is installed in cgi directory, and is renamed, e.g. "geneweb.exe",
+    ability to add a file named "geneweb.arg" holding some lines
+       * the first line if existing holds the name of the directory
+            where "lang" is installed
+       * the second line if existing holds the name of the directory
+            where the databases are installed
+       * the third line, if existing, may hold the string "cgi" telling
+            that gwd must run on "cgi" mode, even if QUERY_STRING is
+            not set
+  - added option -bd: bases directory
+  - no error message now if background not found
+
+* Deleted "add/person" in update (gwd) and in welcome pages (lang/*/start.txt)
+  => impossibility now to directly create isolated persons. This is because
+  it often leads to manipulation errors. To add a new baby, use "modify
+  family" from one of his parents' personal record.
+
+GeneWeb Version 1.0 beta.8
+--------------------------
+
+* Added documentation in HTML: directions for use
+* Added LICENCE
+* Deleted COMM-en.txt & COMM-fr.txt
+
+* gwd:
+  - added cgi mode (option -cgi)
+  - Less general for acces by approximative spelling: ex: first name "agns"
+    will not yet answer: "Agnes" and "Gunza", but just "Agnes".
+  - Unix version: time out limited to 120 seconds instead of 60
+  - Descendants by list limited to 8 instead of 5
+  - added missing divorce information in descendants by list
+  - Fixed bug: Ok on "add person" did not work
+  - Fixed bug: could not cancel a friend or wizard password, by giving an
+    empty one in the form in starting page
+  - Fixed bug: shift at end of page for the indexes of descendants.
+  - Fixed bug: update of family did not work.
+
+* ged2gwb:
+  - added divorces
+  - suppressed sources when forward defined (code reorganizing to do).
+
+* lang/lexicon.txt:
+  - german translation updated
+
+* lang/de/start.txt:
+  - german translation updated
+
+GeneWeb Version 1.0 beta.7
+--------------------------
+
+* general:
+  - changed bases representation => memory consummation reduced in gwd and
+    in consang
+  - negative years are treated (gwc, gwd, ged2gwb)
+* gwd:
+  - the directory cnt holding counts is searched in the current directory
+    not in the one given by option "-hd" (no difference if -hd not specified).
+  - this directory, cnt, is created if no present
+  - ability to add a file "foo.trl" for the base "foo", in lang directory
+    and in its subdirectories: the file is inserted at the end of all pages
+    after the GeneWeb copyright. Note: the files ".txt" in the
+    subdirectories do not hold yet the final tag "</body>".
+  - limitation to 5 generations for descendants display in list format
+  - fixed bug: families could be displayed twice in case of close surnames
+  - fixed bug: displaying of lexicon worked bad in 1.0-beta.6
+* gwb2gw:
+  - memory consummation significantly reduced
+  - added option -tnd: infer negative dates when missing minus signs in GEDCOM
+  - added option -lf: lowercase first names
+  - add file "command.txt" in base directory to remind the used command and
+    arguments
+  - fixed bug: when multiple lines with 1 NOTES, only the first was treated
+  - fixed bug: names starting with special letters were truncated
+  - fixed bug: better search for possible years in undecoded dates
+
+GeneWeb Version 1.0 beta.6
+--------------------------
+
+* ged2gwb:
+  - now only shortcut for options, suppressed long versions, finally
+  - fixed bug in option "-tma" creating sometimes strings of bad length
+  - fixed bug sometimes omissions of recording notes
+  - try to find a year (a number between 32 and 2500) in dates impossible
+    to decode
+* gwd:
+  - added option "-only" in version Windows 95 too.
+  - added option "-log" in version Windows 95 to redirect log to a file.
+  - added display of ascendants up to an ancestor in relationship computing.
+  - while displaying ascendants, the first generation is now the person
+    himself (which is displayed with Soza number 1), not his parents
+  - accept local ".GIF" files as photos (up to now, it was only ".gif", ".jpg"
+    and ".JPG").
+  - local photo files are searched in (new) directory "images"
+  - added copyright (c)
+* gwc
+  - options described in english
+  - added "unnamed" in statistics (option -stats)
+* lang/lexicon.txt:
+  - some fixes in dutch version
+* lang/version:
+  - added copyright (c)
+* lang/*/start.txt:
+  - added form at end of pages to allow entering password for other entries.
+
+GeneWeb Version 1.0 beta.5
+--------------------------
+
+Main changes
+
+* ged2gwb:
+  - added option "-translate_msdos_accents"
+  - added shortcuts for options => -ls -efn -epn -tma
+  - errors go to standard output instead of standard error
+* gwd:
+  - missing ancestors:
+    o added alphabetic order
+    o no more display of spouses
+    o proposed for all entries (not only for wizard one)
+  - added "From inet_addr" in traces in Windows NT/95.
+  - added date of service start in starting files.
+  - fixed bug: internal error after: relationship computing => selection by
+    name => alphabetic order
+* lang/lexicon.txt
+  - completed translations in german and spanish
+
+Secondary changes
+
+* gwd:
+  - added more explicit messages for some system errors.
+  - changed the text "numbers" into "Soza numbers" in ancestors.
+  - changed surnames display in alphabetic order (particles after)
+  - improve messages in relationship links ("click here to see the first
+    branch")
+  - signature version of GeneWeb in default starting pages
+
+GeneWeb Version 1.0 beta.4
+--------------------------
+
+* ged2gwb:
+  - fixed bug: tag DEAT generated "dead" in some wrong cases.
+  - options "-extract_first_name" and "-extract_public_name" more separated
+    and working better
+* gwd:
+  - There was another problem of blocking. Fixed (supposed to!).
+* a.cnf:
+  - palette of colors is proposed
+
+GeneWeb Version 1.0 beta.3
+--------------------------
+
+* ged2gwb:
+   Options
+    - option "-uncapitalize" is renamed "-lowercase_surnames"
+    - Added options "-extract_first_names" and "-extract_public_names"
+   Behaviour:
+    - Newlines (<br>) added in notes when CONT.
+    - Field NAME of the form "/ NAME / first name" correctly treated
+    - Field CHR (baptism) taken into account.
+    - Several fields "1 OCCU" treated.
+    - Field SOUR is now only if directly in the line (not reference)
+* consang:
+  - recompute all consanguinity in base if family updates has been done
+* gwd:
+  - added possibility of nth in titles (ex: 3rd earl of ...)
+  - displaying of baptism in short dates, if not birth date
+  - thousand separation in numbers depending on the language (comma in
+    english, dot in french, etc).
+  - fixed bug in Win 95 version: blocks from time to time

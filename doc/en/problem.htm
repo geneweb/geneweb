@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Problem</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Problem</h1>
+
+A frequently encountered problem is the following:
+
+<p>
+
+You launched the <em>GeneWeb</em> daemon "gwd" and it answers normally
+as indicated in the chapter "How to start with GeneWeb", section
+"Command <a href="start.htm#Gwd">gwd</a>".
+
+<h4> Problem </h4>
+
+When you enter the address in your navigator, e.g.:
+
+<p>
+
+<pre>
+     http://localhost:2317/smith
+</pre>
+
+The navigator answers that you have to connect to the network, and that it
+cannot work off line.
+
+<p>
+
+This problem happens with some versions of Internet Explorer.
+
+<h4> Solution </h4>
+
+Maybe depending on the version you have, we received from
+<em>GeneWeb</em> users (thank you) the following solutions:
+
+<p>
+
+<ul><li> Under Internet Explorer, select the menu "Display", "Internet
+options".  Then, in menu "Connection", active "do not use proxy for
+local addresses".</ul>
+
+<p>
+
+<ul><li> [Version 3.02] Under Internet Explorer, select the menu
+"Display", "Options", "Connection". Then go to "Proxyserver" and
+select "Setup", add under "Exceptions" and "Proxyserver not to be used
+for addresses beginning with" the addresses given when you start
+gwd.exe. For example (note the semicolons between names):
+<pre>
+     127.0.0.1;localhost;computer
+</pre>
+ </ul>
+
+<p>
+
+If it does not work better, we suggest you to use another navigator,
+e.g. Netscape (which is free now).
+
+<p>
+
+Return to <a href="diruse.htm">Directions for use</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: adef.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
 
 type iper = int;
 type ifam = int;

@@ -1,0 +1,501 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>D&eacute;marrer avec GeneWeb</title></head>
+<body bgcolor="#d6bfaf">
+<h1>D&eacute;marrer avec GeneWeb</h1>
+
+Cette documentation contient une introduction &agrave;
+<em>GeneWeb</em>, avec une description succinte des commandes et des
+fichiers afin de pouvoir d&eacute;marrer.
+
+<ul>
+
+<li> <a href="#Int">Introduction</a>
+
+<li> <a href="#Gwc">Commande gwc</a>
+
+<li> <a href="#Ged">Commande ged2gwb</a>
+
+<li> <a href="#Gee">Commande gwb2ged</a>
+
+<li> <a href="#Gwd">Commande gwd</a>
+
+<li> <a href="#Csg">Commande consang</a>
+
+<li> <a href="#Gwu">Commande gwu</a>
+
+<li> <a href="#Cnf">Fichier a.cnf</a>
+
+<li> <a href="#Lex">R&eacute;pertoire "lang" - fichier "lexicon.txt"</a>
+
+<li> <a href="#Lng">R&eacute;pertoire "lang" - sous-r&eacute;pertoires</a>
+
+</ul>
+
+<h4> <a name="Int">Introduction</a> </h4>
+
+Pour configurer et d&eacute;marrer <em>GeneWeb</em>, vous devez
+utiliser des commandes int&eacute;ractives. Sous Unix, lancez un
+xterm. Sous Windows 95/NT, cliquez sur "D&eacute;marrer", "Programmes"
+et "Invite de Commandes".
+
+<p>
+
+Dans cette fen&ecirc;tre, tapez la commande pour aller dans le
+r&eacute;pertoire o&ugrave; vous avez install&eacute;
+<em>GeneWeb</em>:
+
+<ul>
+
+<li> Sous Unix, si vous l'avez install&eacute; par exemple dans
+"/home/smith/geneweb":
+<pre>
+     cd /home/smith/geneweb
+</pre>
+
+<li> Sous Windows 95/NT, si vous l'avez install&eacute; par exemple dans
+"C:\soft\geneweb":
+<pre>
+     cd c:\soft\geneweb
+</pre>
+
+</ul>
+
+Toutes les commandes de <em>GeneWeb</em> peuvent &ecirc;tre
+lanc&eacute;es avec l'option -help qui affiche les diff&eacute;rentes
+options possibles, avec une petite explication, en anglais.
+
+<p>
+
+Exemple, si vous tapez:
+<pre>
+     gwd -help
+</pre>
+
+vous devez voir quelque chose du genre:
+
+<pre>
+     Usage: gwd [args]
+       -hd dir: directory where the directory lang is installed
+       -cgi query addr: called from a cgi-bin
+       -p #: port number; greater than 1024 for normal users
+       -wizard passwd: access to all dates and base updating
+       -friend passwd: access to all dates
+       -only address: only inet address accepted
+</pre>
+
+<p>
+
+Les bases de donn&eacute;es <em>GeneWeb</em> sont des
+r&eacute;pertoires avec l'extension ".gwb".
+
+<h4> <a name="Gwc">Commande gwc</a> </h4>
+
+Pour utiliser <em>GeneWeb</em>, vous devez cr&eacute;er une base de
+donn&eacute;es. Vous pouvez le faire soit avec cette commande-ci,
+"gwc", soit avec "ged2gwb", section suivante.
+
+<p>
+
+La commande "gwc", dans son utilisation la plus simple, cr&eacute;e
+une base de donn&eacute;es vide: sous <em>GeneWeb</em>, vous allez
+pouvoir la remplir.
+
+<p>
+
+Vous devez donner un nom &agrave; cette base. N'importe quel nom
+convient.  Ne d&eacute;passez pas, de pr&eacute;f&eacute;rence, 8
+lettres.
+
+<p>
+
+Par exemple, si vous voulez l'appeler "dupont", tapez:
+<pre>
+     gwc -o dupont
+</pre>
+
+<h4> <a name="Ged">Commande ged2gwb</a> </h4>
+
+Un autre moyen de cr&eacute;er une base de donn&eacute;es <em>GeneWeb</em>
+est de partir d'un fichier GEDCOM.
+
+<p>
+
+La commande "ged2gwb" vous permet de convertir un fichier GEDCOM en
+base de donn&eacute;es <em>GeneWeb</em>.
+
+<p>
+
+Le plus simple est d'abord de copier votre fichier GEDCOM dans le
+r&eacute;pertoire o&ugrave; vous avez install&eacute;
+<em>GeneWeb</em>. Faites-le avec votre m&eacute;thode habituelle pour
+copier des fichiers, soit avec une commande int&eacute;ractive, si
+vous savez le faire, soit en d&eacute;pla&ccedil;ant les ic&ocirc;nes.
+
+<p>
+
+Si votre fichier GEDCOM s'appelle, par exemple, "toto.ged" et que vous
+voulez cr&eacute;er une base de nom "dupont", tapez:
+
+<pre>
+     ged2gwb toto.ged -o dupont
+</pre>
+
+<p>
+
+La commande est un peu bavarde, surtout si elle d&eacute;couvre des
+erreurs dans le fichier GEDCOM. Ignorez ces erreurs dans un premier
+temps: votre base sera quand m&ecirc;me fabriqu&eacute;e. Si tout se
+passe bien, la commande doit se terminer par:
+
+<pre>
+     *** Ok
+</pre>
+
+<h4> <a name="Gee">Commande gwb2ged</a> </h4>
+
+Avant de continuer, notons en passant la commande inverse, "gwb2ged",
+permettant de reconstituer un fichier GEDCOM &agrave; partir d'une
+base <em>GeneWeb</em>.
+
+<h4> <a name="Gwd">Commande gwd</a> </h4>
+
+Une fois que vous avez cr&eacute;&eacute; une base, avec une des deux
+commandes "gwc" ou "ged2gwb", vous allez pouvoir enfin la consulter et
+l'&eacute;tendre.
+
+<p>
+
+Toujours dans la fen&ecirc;tre int&eacute;ractive, tapez simplement:
+
+<pre>
+     gwd
+</pre>
+
+<p>
+
+Cette commande lance le "d&eacute;mon" <em>GeneWeb</em>. La commande
+doit afficher:
+
+<pre>
+     GeneWeb 1.0 - Copyright (c) INRIA 1998
+     Possible addresses:
+	http://localhost:2317/base
+	http://127.0.0.1:2317/base
+	http://adresse:2317/base
+     where "base" is the name of the data base
+     Type control C to stop the service
+     Ready (jour) (heure) port 2317...
+</pre>
+
+<p>
+
+
+Remarquez que vous ne reprenez pas la main dans la fen&ecirc;tre
+int&eacute;ractive. Ce programme attend des requ&ecirc;tes que vous
+allez lui faire par l'int&eacute;rm&eacute;diaire de votre navigateur
+Web. Pour l'arr&ecirc;ter, faites control-C.
+
+<p>
+
+Maintenant, on va pouvoir y aller. Puisque vous consultez cette
+documentation, vous &ecirc;tes donc en train d'utiliser un navigateur
+Web. Prenez une nouvelle fen&ecirc;tre dans ce navigateur et ouvrez la
+location suivante. Remplacez "dupont" par le nom de votre base.
+Attention: ne mettez pas le nom complet (style "c:\geneweb\dupont" ou
+"/home/geneweb/dupont"), mais juste "dupont" tout court.
+
+<pre>
+     http://localhost:2317/dupont
+</pre>
+
+<p>
+
+Vous devez voir appara&icirc;tre la page d'accueil de <em>GeneWeb</em>.
+
+<p>
+
+[Si cela ne fonctionne pas, cliquez <a href="problem.htm">ici</a>]
+
+<p>
+
+<ul>
+<li>
+Si vous &ecirc;tes parti d'un fichier GEDCOM (ged2gwb), vous devez voir au
+d&eacute;but le nombre de personnes de votre base.
+
+<p>
+
+&Agrave; partir de l&agrave;, vous pouvez consulter comme un service
+Web classique, en cliquant sur les liens et les boutons, en
+remplissant des zones, etc. Conseil: dans un premier temps, cliquez
+sur le "Ok" apr&egrave;s "Tous les noms par ordre alphab&eacute;tique"
+et, dans la page qui appara&icirc;tra, recliquez sur "Toute la
+liste". S&eacute;lectionnez alors un nom, puis une personne, et
+naviguez.
+
+</ul>
+
+<p>
+
+<ul>
+
+<li> Si vous &ecirc;tes parti d'une base vide (gwc), la page
+d'accueil vous dira que la base contient 0 personnes.
+
+<p>
+
+La seule chose possible est de commencer &agrave; remplir la base en
+cliquant sur "Ajouter une famille". Voyez le chapitre: comment faire
+des <a href="update.htm">modifications</a> dans la base de
+donn&eacute;es.
+
+</ul>
+
+<p>
+
+Pendant ce temps, vous pouvez constater que chaque fois que vous
+cliquez sur un bouton ou un lien, une trace apparait dans la
+fen&ecirc;tre int&eacute;ractive. Quand vous ferez fonctionner votre
+serveur <em>GeneWeb</em> sur le r&eacute;seau, vous pourrez ainsi voir
+les requ&ecirc;tes qui seront faites sur votre base.
+
+<p>
+
+Notez que si vous tapez control-C dans la fen&ecirc;tre int&eacute;ractive,
+le service ne r&eacute;pondra plus dans votre navigateur. Pour le relancer,
+tapez simplement "gwd" de nouveau.
+
+<h4> <a name="Csg"> Commande consang </a> </h4>
+
+Cette commande doit &ecirc;tre lanc&eacute;e dans la fen&ecirc;tre
+int&eacute;rative, comme les autres. Si le d&eacute;mon "gwd" tourne,
+tapez control-c pour l'arr&ecirc;ter. Une autre solution, si vous ne
+voulez pas arr&ecirc;ter le d&eacute;mon, consiste &agrave; lancer une
+autre fen&ecirc;tre de commande int&eacute;ractives, en suivant
+l'indication de l'introduction.
+
+<p>
+
+La commande "consang" calcule les consanguinit&eacute;s dans une base
+de donn&eacute;es. Le calcul des consanguinit&eacute;s est une
+sp&eacute;cialit&eacute; de <em>GeneWeb</em>. L'affichage des
+consanguinit&eacute;s se fait &agrave; la consultation de la base,
+dans les fiches personnelles, et au moment des calculs de
+parent&eacute;.
+
+<p>
+
+Mais pour y avoir acc&egrave;s, il faut pr&eacute;calculer les
+consanguinit&eacute;s individuelles des personnes de la base. C'est ce
+que permet "consang". Si votre base s'appelle toujours "dupont",
+tapez:
+
+<p>
+
+<pre>
+     consang dupont
+</pre>
+
+<p>
+
+Le programme va calculer quelques secondes ou minutes, suivant la
+taille de votre base, en affichant sans arr&ecirc;t le nombre de
+personnes restant &agrave; traiter. &Agrave; la fin, vous reprendrez
+la main dans la fen&ecirc;tre int&eacute;ractive et les
+consanguinit&eacute;s individuelles seront enregistr&eacute;es.
+
+<p>
+
+Pendant ce calcul, si vous n'avez pas arr&ecirc;t&eacute; le d&eacute;mon,
+vous pouvez parfaitement retourner dans votre navigateur et consulter
+votre base.
+
+<p>
+
+Lancez "consang" de temps en temps, si vous avez fait des
+modifications dans votre base, surtout si ce sont des ajouts,
+modications, suppressions de familles: la consanguinit&eacute;
+d&eacute;pend de la structure des familles. Si celle-ci change, les
+consanguinit&eacute;s individuelles ne sont plus valables et il faut
+les recalculer.
+
+<p>
+
+En outre "consang" fait un "nettoyage" interne de votre base,
+n&eacute;cessaire apr&egrave;s un certain nombre de mises &agrave;
+jour.
+
+<h4> <a name="Gwu">Commande gwu</a> </h4>
+
+[Cette commande s'appelait "gwb2gw" dans de pr&eacute;c&eacute;dentes
+versions].
+
+<p>
+
+Cette commande permet d'afficher le contenu de la base sous forme de
+texte. En redirigeant cet affichage vers un fichier, cela peut constituer
+une sauvegarde de votre base.
+
+<p>
+
+Si votre base s'appelle "dupont", et que vous pouvez la sauvegarder dans
+le fichier "toto.gw", tapez:
+
+<p>
+<pre>
+     gwu dupont > toto.gw
+</pre>
+
+<p>
+
+En sauvegardant dans des fichiers diff&eacute;rents, apr&egrave;s
+avoir fait des modifications, vous pourrez ainsi comparer
+diff&eacute;rentes versions de votre base, et voir les modifications
+faites, en utilisant une commande de comparaisons de fichiers.  Ceci
+est particuli&egrave;rement int&eacute;ressant si quelqu'un d'autre a
+fait des modifications dans votre base.
+
+<p>
+
+C'est enfin une m&eacute;thode pour reconstituer votre base quand vous
+prenez une nouvelle version de <em>GeneWeb</em>, dans le cas o&ugrave;
+la repr&eacute;sention interne des bases a chang&eacute;.
+
+<p>
+
+Pour reconstituer votre base, vous devez utiliser la commande "gwc". Le
+fichier sauvegard&eacute; doit avoir obligatoirement l'extension ".gw".
+Pour fabriquer une base de nom "durand" &agrave; partir du fichier "toto.gw"
+ci dessus, tapez:
+
+<p>
+<pre>
+     gwc toto.gw -o durand
+</pre>
+
+<h4> <a name="Cnf">Fichier a.cnf</a> </h4>
+
+Ce fichier contient une configuration-type pour une base de donn&eacute;es.
+Si votre base s'appelle "dupont", faites une copie de "a.cnf" en l'appelant
+"dupont.cnf" et &eacute;ditez le fichier "dupont.cnf".
+
+<p>
+
+Les valeurs configurables sont les suivantes:
+
+<ul><li> <strong>body_prop</strong> permet de configurer les couleurs
+de fond, ou d'y mettre un motif et de changer la couleur du texte et
+des liens. Sa syntaxe est la syntaxe HTML accept&eacute;e dans le tag
+"&lt;body&gt;" avant le "&gt;". Voyez votre documentation
+HTML. Exemple:
+
+<pre>
+     body_prop=background=monfond.jpg vlink=yellow
+</pre>
+
+<p>
+
+Ceci s'applique non seulement &agrave; la page d'accueil mais &agrave;
+toutes les pages affich&eacute;es de cette base.
+</ul>
+
+<p>
+
+<ul><li> <strong>friend_passwd</strong> permet de limiter la
+visibilit&eacute; des donn&eacute;es sur les personnes encore
+vivantes, en fait sur toutes les personnes n&eacute;es ou
+d&eacute;c&eacute;d&eacute;es depuis moins d'un si&egrave;cle.
+
+<p>
+
+Si vous mettez une valeur &agrave; ce champ, seulement les personnes
+qui auront mis le mot de passe &agrave; partir de la page d'accueil
+auront acc&egrave;s &agrave; ces donn&eacute;es.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>wizard_passwd</strong> permet de limiter le droit
+de faire des modifications dans votre base.
+
+<p>
+
+Si vous mettez une valeur &agrave; ce champ, seulement les personnes
+qui auront mis le mot de passe &agrave; partir de la page d'accueil
+auront acc&egrave;s aux modifications.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>default_lang</strong> permet de sp&eacute;cifier une
+langue par d&eacute;faut de la page d'accueil. Sans pr&eacute;cision,
+la langue est le fran&ccedil;ais. Les valeurs possibles sont: "fr"
+(fran&ccedil;ais), "en" (anglais), "es" (espagnol), "de" (allemand),
+"it" (italien), "nl" (n&eacute;erlandais), "se" (su&eacute;dois), "eo"
+(esp&eacute;ranto).
+
+<p>
+
+Notez que quelque soit la langue s&eacute;lectionn&eacute;e par
+d&eacute;faut vous pouvez en choisir une autre dans la page d'accueil, en
+cliquant dans le tableau &agrave; la fin de cette page.
+
+</ul>
+
+<h4> <a name="Lex">R&eacute;pertoire "lang" - fichier "lexicon.txt"</a> </h4>
+
+Ce fichier contient le lexique. Pour chaque terme utilis&eacute; dans
+le programme, il y a une traduction dans chaque langue. Si vous voulez
+ajouter une langue, choisissez un code pour cette langue, et ajoutez
+une ligne avec ce code pour chaque groupe de traduction des termes
+que vous voyez dans le fichier.
+
+<p>
+
+De plus, si une des traductions propos&eacute;es dans une des langues
+d&eacute;j&agrave; pr&eacute;sentes ne vous convient pas, vous pouvez la
+changer.
+
+<p>
+
+Quand vous sauvegarderez le fichier "lexicon.txt", cela sera
+imm&eacute;diatement visible &agrave; l'affichage dans le navigateur.
+Il faudra tout de m&ecirc;me faire "recharger la page".
+
+<h4> <a name="Lng">R&eacute;pertoire "lang" - sous-r&eacute;pertoires</a> </h4>
+
+Chaque nom de sous-r&eacute;pertoire est un code de langue. Chacun
+contient la page d'accueil dans cette langue: le fichier s'appelle
+"start.txt".
+
+<p>
+
+Vous pouvez changer cette page d'accueil pour une base donn&eacute;e.
+Pour la base "dupont", il vous suffit de cr&eacute;er un fichier
+"dupont.txt" dans le ou les sous-r&eacute;pertoires de langues. Le
+plus simple est de partir d'une copie du fichier "start.txt" du
+sous-r&eacute;pertoire en question et de l'adapter.
+
+<p>
+
+Remarque: ces fichiers contiennent du code HTML avec des indications
+particuli&egrave;res: des signes % suivis d'une lettre. Ce sont des
+macros que "gwd" va remplacer par des valeurs. Par exemple, "%t" est
+remplac&eacute; par le nom de la base, "%b" par la valeur de
+"body_prop" du fichier de configuration, etc.
+
+<p>
+
+La doc compl&egrave;te de ces macros n'est pas encore &eacute;crite.
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

@@ -1,4 +1,4 @@
-(* $Id: q_codes.ml,v 1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: q_codes.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
 
 value f _ =
   fun  

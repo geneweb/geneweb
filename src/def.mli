@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: def.mli,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;

@@ -1,0 +1,475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Getting Started</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Getting Started</h1>
+
+The present documentation holds an introdution to <em>GeneWeb</em>
+with a succint description of commands and files, in order to be able
+to start.
+
+<ul>
+
+<li> <a href="#Int">Introduction</a>
+
+<li> <a href="#Gwc">Command gwc</a>
+
+<li> <a href="#Ged">Command ged2gwb</a>
+
+<li> <a href="#Gee">Command gwb2ged</a>
+
+<li> <a href="#Gwd">Command gwd</a>
+
+<li> <a href="#Csg">Command consang</a>
+
+<li> <a href="#Gwu">Command gwu</a>
+
+<li> <a href="#Cnf">File a.cnf</a>
+
+<li> <a href="#Lex">Directory "lang" - file "lexicon.txt"</a>
+
+<li> <a href="#Lng">Directory "lang" - subdirectories</a>
+
+</ul>
+
+<p>
+
+<h4> <a name="Int">Introduction</a> </h4>
+
+To configure and start <em>GeneWeb</em>, you must use interactive
+commands.  Under Unix, launch an xterm. Under Window 95/NT, click on
+"Start", "Programs" ans "Commands MSDOS".
+
+<p>
+
+In this window, type the command to go to the directory where you
+installed <em>GeneWeb</em>:
+
+<ul>
+
+<li> Under Unix, if you intalled it for example in "/home/smith/geneweb":
+<pre>
+     cd /home/smith/geneweb
+</pre>
+
+<li> Under Window 95/NT, if you installed it in:
+"C:\soft\geneweb":
+<pre>
+     cd c:\soft\geneweb
+</pre>
+
+</ul>
+
+All <em>GeneWeb</em> commands can be launched with the option -help which
+displays the different possible options, with a short explanation.
+
+<p>
+
+For example, if you type:
+<pre>
+     gwd -help
+</pre>
+
+you must see something like this:
+<pre>
+     Usage: gwd [args]
+       -hd dir: directory where the directory lang is installed
+       -cgi query addr: called from a cgi-bin
+       -p #: port number; greater than 1024 for normal users
+       -wizard passwd: access to all dates and base updating
+       -friend passwd: access to all dates
+       -only address: only inet address accepted
+</pre>
+
+<p>
+
+<em>GeneWeb</em> databases are directories with the extension ".gwb".
+
+<h4> <a name="Gwc">Command gwc</a> </h4>
+
+To use <em>GeneWeb</em>, you must create a database. You can do it either
+with this command "gwc", or with "ged2gwb", following section.
+
+<p>
+
+The command "gwc", in its simplest usage, creates an empty database: under
+<em>GeneWeb</em>, you will be able to fill it.
+
+<p>
+
+You must give a name to this base. Any name is available. Preferably,
+do not use more than 8 characters.
+
+<p>
+
+For example, if you want to call it "smith", type:
+
+<pre>
+     gwc -o smith
+</pre>
+
+<h4> <a name="Ged">Command ged2gwb</a> </h4>
+
+Another way to create a <em>GeneWeb</em> database is to start from a
+GEDCOM file.
+
+<p>
+
+The command "ged2gwb" allows you to convert a GEDCOM file into a
+<em>GeneWeb</em> database.
+
+<p>
+
+The simplest way is to first copy your GEDCOM file in the directory
+where you installed <em>GeneWeb</em>. Do it with you usual method
+to copy files, either with an interactive command, or by moving icons.
+
+<p>
+
+If your GEDCOM file is named, for example, "foo.ged" and you want to
+create a base named "smith", type:
+
+<pre>
+     ged2gwb foo.ged -o smith
+</pre>
+
+<p>
+
+The command is somewhat verbose, especially if it discovers errors in
+the GEDCOM file. Ignore these errors in a first stage: your database
+will be build even so. If everything is allright, the command must
+end by:
+
+<pre>
+     *** Ok
+</pre>
+
+
+<h4> <a name="Gee">Command gwb2ged</a> </h4>
+
+Before continuing, let us note the reverse command, "gwb2ged",
+allowing to rebuild a GEDCOM file from a <em>GeneWeb</em> base.
+
+<h4> <a name="Gwd">Command gwd</a> </h4>
+
+Once you created a base, with one of the commands "gwc" or "ged2gwb", you can
+consult and extend it.
+
+<p>
+
+Always in the interactive window, type:
+
+<pre>
+     gwd
+</pre>
+
+<p>
+
+This command launches the <em>GeneWeb</em> "daemon". The command must
+display:
+
+<pre>
+     GeneWeb 1.0 - Copyright (c) INRIA 1998
+     Possible addresses:
+	http://localhost:2317/base
+	http://127.0.0.1:2317/base
+	http://address:2317/base
+     where "base" is the name of the data base
+     Type control C to stop the service
+     Ready (day) (hour) port 2317...
+</pre>
+
+<p>
+
+Note that you do not see the prompt in the interactive window. This
+program is waiting for requests you will send it through your Web
+navigator. When it receives one, it treats it and waits again. To
+stop it, type control-C.
+
+<p>
+
+Now, you can really start. Since you consult this documentation, you
+are using a Web navigator. Take a new window in this navigator and
+open the following location. Replace "smith" with the name of your
+base. Warning: do not put the complete name (like "c:\geneweb\smith" or
+"/home/geneweb/smith"), just "smith".
+
+<pre>
+     http://localhost:2317/smith
+</pre>
+
+<p>
+
+You must see <em>GeneWeb</em>'s welcome page in french.
+
+<p>
+
+[If this does not work, click <a href="problem.htm">here</a>]
+
+<p>
+
+Select another language (english, e.g.) in the language table at the
+end of the page.  (There is a way to select a default language
+different than french. See <a href="#Cnf">further</a>).
+
+<p>
+
+<ul>
+<li>
+If you started from a GEDCOM file ("ged2gwb"), you must see at the beginning
+the number of persons of you base.
+
+<p>
+
+From there, you can consult as a classical Web service, clicking on
+links and buttons, fill areas, etc. Hint: in a first stage, click on
+"Ok" after "All surnames by alphabetic order", then in the new page
+which appears: "the whole list". Select a surname, then a person, etc,
+and navigate.
+
+</ul>
+
+<p>
+
+<ul>
+
+<li> If you started from an empty base ("gwc"), the welcome page tells
+you that the database holds 0 persons.
+
+<p>
+
+The only possible thing to do is create persons and families. Click on
+"Add a family". The explanation documentation of this part is not yet
+written. If you are a little curious, try even to. The different areas
+to fill are supposed to be self explicative.  Searching a little, you
+will understand the usage of the different areas.
+
+</ul>
+
+<p>
+
+Meanwhile, you can notice that each time you click on a button or a
+link, a trace appears on the interactive window. When you make your
+<em>GeneWeb</em> server work on the network (explanations not yet
+written), you see the requests sent to your base by this way.
+
+<p>
+
+Note that if you type control-C in the interactive window, the service
+does not answer any more in your navigator. To restart it, just type
+"gwd" again.
+
+<h4> <a name="Csg"> Command consang </a> </h4>
+
+This command must be lanched in the interactive window, like the
+others.  If the "gwd" daemon is running, type control-C to stop
+it. Another way, if you do not want to stop the daemon, constists on
+launching another interactive window, following the instructions of the
+introduction above.
+
+<p>
+
+The command "consang" computes the consanguinities in a database. The
+computing of consanguinities is a <em>GeneWeb</em> speciality. The
+displaying of consanguinities is done when consulting the database,
+in the personal records and while computing relationships.
+
+<p>
+
+But to have access to it, you must pre-compute the individual
+consanguinities of the persons of the database. This is what "consang"
+does. If your base's name is "smith", type:
+
+<p>
+
+<pre>
+     consang smith
+</pre>
+
+<p>
+
+The program will compute some seconds or minutes, depending on the
+size of your base, and displaying without stopping the number of
+remaining persons to treat. At the end, you have the prompt again
+in the interactive window and the individual consanguinities are
+recorded.
+
+<p>
+
+During this computing, if you did not stop the daemon, you can absolutely
+return to your navigator and consult your base.
+
+<p>
+
+Launch "consang" from time to time, if you made modifications in your
+base, especially if they are adding, modification, deletions of
+families: the consanguinity depends on the structure of families. If
+it changes, the individual consanguinities are not yet available and
+you have to recompute them.
+
+<p>
+
+Moreover "consang" makes an internal "cleanup" of the base, necessary
+after a certain number of updates.
+
+<h4> <a name="Gwu">Command gwu</a> </h4>
+
+[This command's name was "gwb2gw" in previous versions].
+
+<p>
+
+This command displays the contents of the base under a text
+form. Redirecting this display to a file, it can constitute a saving of
+your base.
+
+<p>
+
+If your base is named "smith", and you want to save it in the file "foo.gw",
+type:
+
+<p>
+<pre>
+     gwu smith > foo.gw
+</pre>
+
+<p>
+
+Saving in different files different versions of your base, you can see
+the differences, using a command to compare text files, if you have
+some. This is particularly interesting if someboty has done modifications
+on your base and you want to know which ones.
+
+<p>
+
+This is also a method to reconstitute your base when you take another
+version of <em>GeneWeb</em>, in the case when the internal representation
+of bases has been changed.
+
+<p>
+
+To reconstitute your base, you must use the command "gwc". The saved file
+must have the extension ".gw". To build a base named "jones", from the
+file "foo.gw", type:
+
+<p>
+<pre>
+     gwc foo.gw -o jones
+</pre>
+
+<h4> <a name="Cnf">File a.cnf</a> </h4>
+
+This file holds a configuration template for a database. If your base's
+name is "smith", make a copy of "a.cnf" calling it "smith.cnf" and edit
+the file "smith.cnf".
+
+<p>
+
+The configurable values are the following:
+
+<ul><li> <strong>body_prop</strong> allows to select a background color
+or a background pattern and change the text and links colors. Its syntax
+is the HTML syntax accepted in the tag "&lt;body&gt;" before the "&gt;".
+See your HTML documentation (or ask a wizard). Example:
+
+<pre>
+     body_prop=background=mybackg.jpg vlink=yellow
+</pre>
+
+<p>
+
+This applies not only to the welcome page but to all displayed pages for
+this base.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>friend_passwd</strong> allows to limit the datas
+visibility of still living persons, in fact all persons born or
+died since less than one century.
+
+<p>
+
+If you set a value to this variable, only persons who have put the
+password on the welcome page will have access to these datas.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>wizard_passwd</strong> allows to limit the right to
+make updates in your base.
+
+<p>
+
+If you set a value to this variable, only persons who have put the
+password on the welcome page will have access to modifications.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>default_lang</strong> allows to define a default
+language in the welcome page. Without precision, the language is
+french. The possible values are: "fr" (french), "en" (english), "es"
+(spanish), "de" (german), "it" (italian), "nl" (dutch), "se"
+(swedish), "eo" (esperanto).
+
+<p>
+
+Note that whatever language is selected by default, you can choose
+another one in the welcome page by clicking in the table at the end of
+the page.
+
+</ul>
+
+<h4> <a name="Lex">Directory "lang" - file "lexicon.txt"</a> </h4>
+
+This file hold the lexicon of all terms and phrases used in the
+program.  For each, there is a translation in each language. If you
+want to add a language, choose a code for this language, and add a
+line with this code to each translation group you see in the file.
+
+<p>
+
+Moreover, if one of the proposed translations in one of the languages
+does not fit you, you can change it.
+
+<p>
+
+When you save the file "lexicon.txt", this will be applied immediately
+in the displaying in your browser. Maybe you just have to click on
+"reload".
+
+<h4> <a name="Lng">Directory "lang" - subdirectories</a> </h4>
+
+Each subdirectory name is a language code. Each holds the default
+welcome page for this language: the file is named "start.txt".
+
+<p>
+
+You can change this welcome page for a given database. For the
+database "smith" in the language "xx", just make a copy of the file
+"start.txt" in the directory "xx" naming it "smith.txt". Then edit
+your file "smith.txt" and make adaptations you want. You can do that
+or not for each language.
+
+<p>
+
+Remark: these files hold HTML code with some particular indications:
+% signs followed by a letter. These are macros that "gwd" will replace
+by values. For example, "%t" is replaced by the name of the base, "%b"
+by the value of "body_prop" of the configuration file, etc.
+
+<p>
+
+The complete documentation of these macros is not yet written.
+
+<p>
+
+Return to <a href="diruse.htm">Directions for Use</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

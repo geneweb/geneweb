@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
 
 open Config;
 open Def;

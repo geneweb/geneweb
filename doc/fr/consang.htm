@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Consanguinit&eacute;</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Consanguinit&eacute;</h1>
+
+<em>GeneWeb</em> permet le calcul et l'affichage de la
+consanguinit&eacute;. Cette page d&eacute;crit &agrave; quoi elle correspond
+et comment on la calcule (grossi&egrave;rement).
+
+<ul>
+
+<li> <a href="#Gen">G&egrave;nes et Locus</a>
+
+<li> <a href="#Con">Consanguinit&eacute; et Parent&eacute;</a>
+
+<li> <a href="#Mal">Maladies g&eacute;n&eacute;tiques</a>
+
+<li> <a href="#GnW">Affichage avec GeneWeb</a>
+
+<li> <a href="#Exe">Quelques exemples</a>
+
+<li> <a href="#Dis">Disparition des maladies</a>
+
+<li> <a href="#Rem">Remerciements</a>
+
+</ul>
+
+<h4> <a name="Gen">G&egrave;nes et Locus<a> </h4>
+
+Le g&eacute;n&ocirc;me d'un individu est constitu&eacute; d'un grand
+nombre de <em>g&egrave;nes</em> qui, si on ignore les
+mutations, se reproduisent de fa&ccedil;on identique. Les
+g&egrave;nes mesurent l'identit&eacute; d'une personne. Les
+g&egrave;nes sont dispos&eacute;s &agrave; des emplacements
+pr&eacute;cis, appel&eacute; <em>locus</em>.
+
+<p>
+
+Chaque individu poss&egrave;de pour chaque locus deux g&egrave;nes
+transmis, l'un par sa m&egrave;re, l'autre par son p&egrave;re, et
+transmet &agrave; ses enfants une copie de l'un de ses deux
+g&egrave;nes.
+
+<h4> <a name="Con">Consanguinit&eacute; et Parent&eacute;</a> </h4>
+
+La <em>consanguinit&eacute;</em> d'un individu est la
+probabilit&eacute; de trouver &agrave; un locus donn&eacute; deux
+g&egrave;nes identiques.
+
+<p>
+
+La <em>parent&eacute;</em> (ou <em>consanguinit&eacute; mutuelle</em>)
+de deux individus est la probabilit&eacute; de trouver &agrave; un
+m&ecirc;me locus deux g&egrave;nes identiques.
+
+<p>
+
+Le calcul montre que:
+
+<ul>
+
+<li> La consanguinit&eacute; d'un individu est &eacute;gale &agrave;
+la parent&eacute; de ses parents.
+
+<li> Chaque lien de parent&eacute; des parents contribue &agrave; leur
+parent&eacute;. En additionnant la valeur de la parent&eacute; pour
+chaque lien de parent&eacute;, on obtient la parent&eacute; totale.
+
+</ul>
+
+<p>
+
+Comme les gens peuvent avoir un tr&egrave;s grand nombre de liens de
+parent&eacute;, le calcul de cette parent&eacute; peut devenir
+tr&egrave;s complexe et il est impossible, dans la pratique, de la
+calculer &agrave; la main.
+
+<h4> <a name="Mal">Maladies g&eacute;n&eacute;tiques</a> </h4>
+
+Au cours des mutations, certains g&egrave;nes peuvent pr&eacute;senter
+des d&eacute;fauts et provoquer des maladies g&eacute;n&eacute;tiques.
+
+<p>
+
+Mais, en fait, il y a deux cas:
+
+<p>
+
+<ul> <li> Soit ce d&eacute;faut est syst&eacute;matiquement
+compens&eacute; par le g&egrave;ne correspondant du locus, s'il est
+diff&eacute;rent. Ce g&egrave;ne est alors dit
+<em>r&eacute;cessif</em>. Aucune maladie n'apparait.
+
+</ul>
+
+<p>
+
+<ul> <li> Soit ce d&eacute;faut n'est pas compens&eacute; par un
+g&egrave;ne correspondant dans le locus, m&ecirc;me
+diff&eacute;rent. Ce g&egrave;ne est dit alors <em>dominant</em>. La
+maladie appara&icirc;t.
+
+</ul>
+
+<p>
+
+Le risque de la consanguinit&eacute; est de faire appara&icirc;tre des
+maladies r&eacute;cessives, dans le cas o&ugrave; la famille
+poss&egrave;de un g&egrave;ne r&eacute;cessif d&eacute;fectueux. Cette
+maladie n'apparait pas dans la famille, sauf dans le cas ou deux
+&eacute;poux ont h&eacute;rit&eacute; d'un anc&ecirc;tre commun le
+m&ecirc;me g&egrave;ne r&eacute;cessif d&eacute;fectueux.
+
+<p>
+
+En outre, la pr&eacute;sence de deux g&egrave;nes identiques dans un locus
+est un facteur de fragilit&eacute; physique.
+
+<p>
+
+Ne pas confondre avec les maladies g&eacute;n&eacute;tiques
+familiales, parfois li&eacute;es au sexe, qui apparaissent
+syst&eacute;matiquement, qu'il y ait consanguinit&eacute; ou non. Ces
+maladies sont dues &agrave; des g&egrave;nes dominants. Ainsi:
+l'h&eacute;mophilie, le daltonisme, les myopathies, etc.
+
+<h4> <a name="GnW">Affichage avec GeneWeb</a> </h4>
+
+<em>GeneWeb</em> affiche dans les pages personnelles la
+consanguinit&eacute; de l'individu (quand elle ne vaut pas 0) sous la
+forme d'un pourcentage. Quand on calcule la parent&eacute; entre deux
+personnes, il affiche la consanguinit&eacute; mutuelle (appel&eacute;e
+"parent&eacute;" dans l'expos&eacute; ci-dessus).
+
+<p>
+
+Ainsi, si une personne a une certaine consanguinit&eacute;, on peut
+constater qu'elle est &eacute;gale &agrave; la consanguinit&eacute;
+mutuelle de ses parents.
+
+<p>
+
+Un pourcentage affich&eacute; "xx %" peut se lire de deux mani&egrave;res:
+
+<ul>
+
+<li> Soit on dit: pour chaque locus, il y a xx % de chances qu'il contienne
+deux g&egrave;nes identiques.
+
+<li> Soit on dit, en regardant globalement l'individu: il y a xx % de locus
+contenant des g&egrave;nes identiques (statistiquement).
+
+</ul>
+
+<h4> <a name="Exe">Quelques exemples</a> </h4>
+
+Pour un fr&egrave;re et une soeur, dont les parents n'ont pas de liens
+de parent&eacute;, la consanguinit&eacute; mutuelle est de 25%. Cela
+veut dire que s'ils avaient des enfants, ces enfants auraient 25% (un
+quart) de leurs locus contenant des g&egrave;nes identiques.
+
+<p>
+
+&Agrave; chaque g&eacute;n&eacute;ration, la consanguinit&eacute; est
+divis&eacute;e par 4: des cousins germains ont une
+consanguinit&eacute; de 6,25% (25% divis&eacute; par 4), des cousins
+issus de germains, de 1,56%, etc.
+
+<p>
+
+Un p&egrave;re et sa fille, ou une m&egrave;re et son fils ont aussi
+une consanguinit&eacute; de 25%, comme des fr&egrave;res et
+soeurs. Cela peut para&icirc;tre &eacute;trange, puisque le lien de
+parent&eacute; est plus court, mais n'oublions pas que des
+fr&egrave;res et soeurs ont, eux, <em>deux</em> liens de
+parent&eacute;: l'un par le p&egrave;re, l'autre par la m&egrave;re.
+
+<p>
+
+L'oncle et la ni&egrave;ce ont une parent&eacute; de 12,5%.
+
+<p>
+
+Il y a eu souvent, dans l'histoire, en particulier des familles
+royales, des mariages entre cousins germains, et entre oncles et
+ni&egrave;ces. Mais il se trouve que la consanguinit&eacute;
+cumul&eacute;e entre les g&eacute;n&eacute;rations
+pr&eacute;c&eacute;dentes donnait parfois des consanguinit&eacute;s
+entre &eacute;poux plus fortes que celles entre fr&egrave;res et
+soeurs. Il s'est trouv&eacute;, par exemple, des consanguinit&eacute;s
+de 30% entre certains &eacute;poux.
+
+<p>
+
+Charles II (1661-1700), le dernier roi d'Espagne de la Maison de
+Habsbourg, avait une consanguinit&eacute; de 25%. Ses parents
+&eacute;taient oncle et ni&egrave;ce, mais avaient d'autres liens de
+parent&eacute;. Il n'a pas eu d'enfants: certains pensent qu'il
+&eacute;tait st&eacute;rile, &agrave; cause pr&eacute;cis&eacute;ment
+de sa consanguinit&eacute;.
+
+<p>
+
+C'est &agrave; la suite de cela qu'il y a eu la guerre entre la Maison
+des Habsbourg et celle des Bourbon pour le tr&ocirc;ne d'Espagne (la
+guerre de succession d'Espagne). Les Bourbon l'ayant emport&eacute;,
+le roi d'Espagne actuel est un Bourbon. Comme quoi la
+consanguinit&eacute; peut avoir des cons&eacute;quences historiques
+importantes.
+
+<p>
+
+Cela ne leur a d'ailleurs pas servi de le&ccedil;on (probablement ils
+ignoraient tout cela &agrave; l'&eacute;poque), car les Bourbon
+d'Espagne se sont beaucoup mari&eacute;s entre eux depuis et ont eu de
+gros probl&egrave;mes g&eacute;n&eacute;tiques.
+
+<h4> <a name="Dis">Disparition des maladies</a> </h4>
+
+Notons une chose int&eacute;ressante: les probl&egrave;mes de
+consanguinit&eacute; disparaissent compl&egrave;tement quand il y a un
+mariage avec une personne ext&eacute;rieure &agrave; la famille.
+
+<p>
+
+Notre intuition pourrait nous faire penser que quand il y a des
+probl&egrave;mes de consanguinit&eacute;, ces probl&egrave;mes
+disparaissent petit &agrave; petit quand les g&eacute;n&eacute;rations
+futures &eacute;pousent des personnes en dehors de leur famille. En
+fait, non: le probl&egrave;me n'est pas d&ucirc; au g&egrave;ne
+lui-m&ecirc;me, mais au fait qu'il se retrouve en double exemplaire
+dans une personne.
+
+<p>
+
+Ainsi, si on imagine un Rom&eacute;o, compl&egrave;ment
+ab&icirc;m&eacute; par une trop forte consanguinit&eacute; familiale,
+et une Juliette dans le m&ecirc;me cas, mais si les deux familles sont
+s&eacute;par&eacute;es, les enfants de Rom&eacute;o et Juliette
+n'auront plus aucun probl&egrave;me g&eacute;n&eacute;tique.
+
+<p>
+
+Une seule g&eacute;n&eacute;ration suffit pour remettre tout &agrave;
+z&eacute;ro.
+
+<h4> <a name="Rem">Remerciements</a> </h4>
+
+L'&eacute;tude sur la consanguinit&eacute; et la parent&eacute;, ainsi
+que les m&eacute;thodes de calcul permettant de les &eacute;valuer ont
+&eacute;t&eacute; faites par Didier R&eacute;my, charg&eacute; de
+recherche &agrave; l'INRIA, que je remercie ici.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

@@ -1,0 +1,1076 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Modifications</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Modifications</h1>
+
+This part indicates you how to make modifications in a database using
+your navigator, If the database owner has installed a password, you
+have to enter it in the welcome page to have access to the different
+possibilities of updating.
+
+<p>
+
+Before starting, it is important to understand the basic notions:
+first, the notion of "first name", "surname", "number", and second,
+the notions of "persons" and "families". This allows you to understand
+the next sections about updating.
+
+<ul>
+
+<li> <a href="#FSO">1.</a> First names, surnames, numbers.
+
+<li> <a href="#PF">2.</a> Persons and Families.
+
+<li> <a href="#MAJ">3.</a> Access to updating.
+
+<li> <a href="#Part">4.</a> Some specific points:
+
+<ul>
+
+<li> <a href="#ModC">4.1.</a> How to modify the first name or the surname
+of a child.
+
+<li> <a href="#AddC">4.2.</a> How to add a child in a family.
+
+</ul>
+
+<li> <a href="#Form">5.</a> Forms.
+
+<ul>
+
+<li> <a href="#AddF">5.1.</a> Add a Family.
+
+<li> <a href="#ModF">5.2.</a> Modify a Family.
+
+<li> <a href="#DelF">5.3.</a> Delete a Family.
+
+<li> <a href="#ModP">5.4.</a> Modify a Person.
+
+<li> <a href="#DelP">5.5.</a> Delete a Person.
+
+</ul>
+
+</ul>
+
+<h4> <a name="FSO">1.</a> First names, surnames, numbers </h4>
+
+Each person of the base is located by his first name, his surname and
+his number, this last information allowing to distinguish two persons
+having the same first name and the same surname. This set is named the
+person's "key".
+
+<p>
+
+So, if there are two "John Smith" in the database, you can
+differenciate them by the number. Any number is valid and you are not
+obliged to start from 0 or 1, nor counting by adding 1 each time.  For
+example, your first "John Smith" can have the number 7 and the second,
+the number 4. One will be represented by "John", "Smith", "7" and the
+second by "John", "Smith", "4".
+
+<p>
+
+<em>You</em> choose this number, except if you started from a GEDCOM file:
+in this case, "ged2gwb" has choosen it number for you, for all persons
+of the base.
+
+<p>
+
+This number appears only in updating pages: they are not visible in
+the normal pages. So, if you type the name "John Smith" in the welcome
+page, <em>GeneWeb</em> gives a choice between "John Smith 7" and
+"John Smith 4", but without displaying explicitely the numbers.
+
+<p>
+
+However, as you are a "guru" since you make updatings, know that you
+can put a "dot" and the number between the first name and the surname.
+
+For example, in the welcome page, you can search "John .4 Smith" and
+you find directly the one whose number is 4.
+
+<p>
+
+Also note that:
+
+<ul>
+
+<li> Accents and uppercase letters are not taken into account in this
+differenciation. So "john", "smith", "5" gives access to the same
+person than "JOHN", "SMITH", "5" and "John", "Smith", "5".
+
+<li> When there is no number, its value is actually 0. Not setting it
+or setting 0 are the same thing.
+
+</ul>
+
+It is important to understand correctly this notion, because some of
+the error messages you have concerns this. For example, the messages
+like:
+
+<ul>
+
+<li> "Person already existing": this means that you are trying to
+create a person whose combination "first name", "name", "number" is
+already reserved, which happens:
+
+<p>
+
+<ul>
+
+<li> Either in a context where you wanted to create a new person.
+
+<li> Or in a context where you wanted to change the first name, the
+surname or the number of a given person.
+
+</ul>
+
+<p>
+
+<li> "Unknow person": this means that nobody in the base corresponds
+to this combination "first name", "name", "number", which happens when
+you want to link a given person in a family as father, mother or
+child.
+
+</ul>
+
+Note also that this number has nothing to do with the number of first
+names of noble persons: "Edward III" has not necessarily the number
+"3". However, and this is not a contradiction, it is good usage,
+although not mandatory, to choose the same number, whenever possible:
+you will see that is is more practical.
+
+<h4> <a name="PF">2.</a> Persons and Families </h4>
+
+The <em>GeneWeb</em> databases, internally, hold two main notions:
+persons and families:
+
+<ul>
+
+<li> Persons hold individual data such as first name, surname, number,
+dates and places of birth, baptism, death, the possible nobility
+titles, etc, etc.
+
+<li> Families hold simple families: father, mother, children, date and
+place of possible marriage and divorce. Note that if a person is
+married several times, there will be as many "families" as there are
+marriages.
+
+</ul>
+
+The updatings of the base are simply and exclusively updating of "persons"
+and "families": adding, modification, deletion.
+
+<h4> <a name="MAJ">3.</a> Access to updatings </h4>
+
+If you are sure you understand well the two previous sections, you
+can now start.
+
+<p>
+
+To access to updatings, you can:
+
+<ul>
+
+<li> Either click on "Add a family" in the welcome page.
+
+<li> Or click on "Update" in a personal record.
+
+</ul>
+
+In the welcome page, clicking on "Add a family" allows you to start
+filling an empty database.
+
+<p>
+
+You see then a form to add a family. Report to the section <a
+href="#AddF">Add a Family</a>.
+
+<p>
+
+In a personal record, clicking on "Update" allows you to see a page
+where some choices are proposed. This choices depend on the familial
+situation of the person:
+
+<ol><li value=1> In all cases, you have the choice "Modify" and
+"Delete": it is the modification or deletion of the person. Report
+to the sections:
+
+<p>
+
+<ul>
+
+<li> <a href="#ModP">Modify a Person</a>
+
+<li> <a href="#DelP">Delete a Person</a>
+
+</ul>
+
+</ol>
+
+<ol><li value=2> If the person is married, you have, for each marriage,
+the choice "Modify/Family" and "Delete/Family". Report to the sections:
+
+<p>
+
+<ul>
+
+<li> <a href="#ModF">Modify a Family</a>
+
+<li> <a href="#DelF">Delete a Family</a>
+
+</ul>
+
+</ol>
+
+<ol><li value=3> If there are several marriages, there is a choice
+"Switch" between each marriage, allowing you to switch the order
+of the families.
+
+</ol>
+
+<ol><li value=4> In other cases, this familial list ends with
+"Add/Family".  You see the same form than "Add a family" of the
+welcome page, except that the person will be prefilled in the form in
+one of the parents (according to the sex). Report to the section:
+
+<p>
+
+<ul>
+
+<li> <a href="#AddF">Add a Family</a>
+
+</ul>
+
+</ul>
+
+</ol>
+
+<ol><li value=5> At the end, if the person has no parents, the choice
+"Add/Parents" is proposed. This also gives the form "Add/Family" with
+the person prefilled as a child and his surname in the "name" area of
+the father. Report to the section:
+
+<p>
+
+<ul>
+
+<li> <a href="#AddF">Add a Family</a>
+
+</ul>
+
+</ol>
+
+<p> Remarks:
+
+<ul><li>
+
+All these choices lead either to forms to fill, or to confirmation
+asking: you do not do anything definitive by clicking in this page:
+it is always possible to go back.
+
+<p>
+
+So "Delete" (choice number 1) will delete the person only if you
+click on "Ok" in the next page which will be proposed to you.
+
+</ul>
+
+<ul><li>
+
+In the forms, it may happen that some fields are prefilled.
+This does not mean that you cannot change its contents.
+
+<p>
+
+So in "Add/Parents" (choice number 5), the surname of the father is
+prefilled. But this is just a commodity due to the fact that father
+and child have frequently the same surname: but if the father has
+another one, you can absolutely change it.
+
+</ul>
+
+<h4> <a name="Part">4.</a> Some specific points </h4>
+
+These points are highlighted because they are possible pitfalls:
+do follow the indicated procedure.
+
+<p>
+
+<h4> <a name="ModC">4.1.</a> How to modify the first name or the surname of
+a child </h4>
+
+Example: in the family of "John Smith" and "Barbara Jones", one of the
+children has been named "Robert", although his first name was actually
+"Philip":
+
+<p>
+
+What you must do:
+
+<ul><li>
+
+Go to the personal record of "Robert Smith", click on "Update", then
+"Modify" and proceed like indicated in the the section "Modify a
+Person" (choice number 1 in the section 3).
+
+</ul>
+
+What you must <em>not</em> do:
+
+<ul><li>
+
+Do not use use "Modify/Family" (choice number 2 in the section 3).
+
+<p>
+
+If you do that and change "Robert" into "Philip" in the form:
+
+<p>
+
+<ul>
+
+<li> This will cut the connection between "Robert" and his parents,
+and "Robert" continue to be named "Robert Smith", but without parents.
+
+<li> This will set "Philip Smith", if he exists and does not already have
+parents, as a child of the couple.
+
+<li> But if this "Philip Smith" does not exist in the base or else
+he exists but already has parents, an error message will be displayed
+and nothing will be changed (fortunately).
+
+</ul>
+
+</ul>
+
+<h4> <a name="AddC">4.2.</a> How to add a child in a family </h4>
+
+For example, in the family of "John Smith" and "Barbara Jones", you
+want to add "Hubert" as a child:
+
+<p>
+
+What you must do:
+
+<ul><li>
+
+Go to the personal record of one of the parents, click on "Update",
+then "Modify/Family" (choice number 2 in the section 3), and add the
+child as indicated in the section "Modify a Family".
+
+</ul>
+
+What you must <em>not</em> do:
+
+<ul><li>
+
+Do not use "Add/Family" (number 4 in the section 3) which does not
+mean "add a child in a family" but "add a new marriage", creating
+a new entity "family" with a new spouse.
+
+</ul>
+
+<ul><li>
+
+Moreover, if the child already exists in the base and you want to add
+it in the list of the children of an already existing couple, do not
+use "Add/Parents" (choice number 4 of the section 3) either.
+
+<p>
+
+The choice "Add/Parents" is rather used to add parents to one of
+your ancestors to go up a little more. This choice also creates
+a new family.
+
+</ul>
+
+<h4> <a name="Form">5.</a> Foms </h4>
+
+<h4> <a name="AddF">5.1.</a> Add a Family </h4>
+
+You see this form titled "Add/Family":
+
+<ul>
+
+<li> Either from the welcome page, when clicking on "Add a family";
+in this case, no area of the form is prefilled,
+
+<li> Or from a personal record, after having clicked on "Update", then
+"Add/Family"; in this case, the areas "first name", "surname" and
+"number" are prefilled, for the father or the mother according to the
+sex of the person,
+
+<li> Or, in the same context, after having clicked on "Add/Parents",
+if this choice was proposed; in this case, the "surname" area of the
+father will be prefilled, so are the areas "first name", "surname" and
+"number" of their first (and only) child.  Remark that you can
+absolutely change the surname of the father, if it is different.
+
+</ul>
+
+This form behaves exactly like "Modify a Family", except that it
+creates a new family. As many times you use it, as many times a
+family is created.
+
+<p>
+
+This means that if you notice that you made mistakes after having
+validated the form, do not do "Add/Family" again, but "Modify/Family"!
+
+<p>
+
+Report to the following paragraph to see how to fill the form.
+
+<h4> <a name="ModF">5.2.</a> Modify a Family </h4>
+
+You see this form from a personal record, after having clicked on
+"Update", then "Modify/Family". This form is prefilled by the "first
+name", the "surname" and the "number" of the father, the mother and
+the children, as well as all the possible data relative to this
+family.
+
+<p>
+
+This form behaves like "Add/Family" of the previous section (except
+that there is no creation of a new family). What follows is therefore
+valid for the form "Add/Family".
+
+<p><strong>Filling</strong><p>
+
+All areas (prefilled or not) can be filled, erased or modified. When
+you have finished filling, erasing and modifying all you judge
+necessary, go to the end of the form and commit the form by clicking
+on "Ok".
+
+<p>
+
+In front of the area where there are persons, remark the selection "Link"
+and "Create". According to the case, it will be preselected to "Link"
+or "Create". You can change this selection according to what you want
+to do.
+
+<ul><li> 
+
+"Link" means that the person already exists in the base. When committing,
+the system checks that this persons exists and, for a parent, that he
+is of the good sex.
+
+<p>
+
+Note that as it is a research by "key" (see first section), it is not
+necessary to respect accents, lowercase and uppercase.
+
+</ul>
+
+<ul><li> 
+
+"Create" means that the person does not exists in the base and that
+you ask the system, when committing, to create him with the indicated
+first name, surname and number.
+
+<p>
+
+Here, what is different from "Link", you must write the accents, uppercases
+and lowecases correctly: the person will be created with the spelling
+you write there.
+
+</ul>
+
+When committing, the cases "child" whose area "first name" is empty are
+ignored, whatever the contents of the other areas. It is like they do
+not exist.
+
+<p>
+
+For children, the field "name" is facultative: if it is absent,
+the name of the father is taken.
+
+<p><strong>Some modifications</strong><p>
+
+Here are some modifications you can do:
+
+<ul><li>
+
+<strong>To add a child</strong>, if there is no free area for him,
+click first on the button "Insert/Child" according to the place where
+you want to add him in the family. Then click on "Ok" at end of the
+form.
+
+<p>
+
+Remark: this will not commit the form immediately. The system will just
+propose you another form with a reserved place for the child or children
+you want to add.
+
+<p>
+
+Therefore warning: as long as you click on "Insert/Child", when you
+click in "Ok", there is no committing: just another bigger form. You
+must not interpret this button as "add me this child I just wrote":
+the system sees it, don't worry.
+
+<p>
+
+The child you type in the area you allocated for him may be an existing
+person in the base. In this case, select "Link" instead of "Create".
+
+</ul>
+
+<ul><li>
+
+<strong>To delete a child</strong>, simply erase his first name. As
+said above, cases whose first name area is empty are ignored when
+committing. Remark that it will not delete the person: he will simply
+be removed form the list of the children and will be himself without
+parents.
+
+</ul>
+
+<ul><li>
+
+<strong>To change a child's position</strong>, the simplest way is to
+click on "Insert/Child" at the position you want to set him, and do
+"Ok". In the new proposed form, type the child's data in the new case,
+select "Link" instead of "Create" and erase his first name in the old
+area.
+
+</ul>
+
+<ul><li>
+
+<strong>To switch the position of two children</strong>, you can
+proceed with the same way, passing through a new case in order to
+simply cut ant paste. Do not forget to select "Link".
+
+<p>
+
+You can also do it directly, without adding a new room: the problem is
+you have to remember one of the two names, when you erase it to type
+the other one at his location.
+
+</ul>
+
+<p><strong>Committing</strong><p>
+
+The committing takes place when you click on "Ok". As you as you do not
+do it, no change is done in the base.
+
+<p>
+
+Remark also that, as it is said above, that if you selected one or
+several "Insert/Child", just a new form is proposed: this is
+<em>not</em> the proper committing.
+
+<p>
+
+When the committing is really done, you must see a new page whose
+title is:
+
+<ul><li>
+
+Either: <strong>Family added or modified</strong><p>
+
+You see them the parents' names on which you can click.
+
+<p>
+
+Maybe you see also warnings. They concern dates or children order
+inconsistencies. The update is done anyway, but it is preferable to
+fix them, if necessary.
+
+<p>
+
+Clicking on one of the parents, you see his personal record. But your
+update may not be visible. Web navigators use to keep already
+displayed pages in memory, and probably display the old version.
+Do "reload the page" in your navigator to really see your modifications.
+
+</ul>
+
+<ul><li>
+
+Or: <strong>Error</strong><p>
+
+The page indicates the encountered error. Go back and fix. You can
+also give up... doing nothing and go on navigating in the base.
+
+<p>
+
+If the error indicates you that some person already exists, it means
+you wanted to create a person whose combination "first name",
+"surname", "number" is already present in the base.
+
+<p>
+
+Solution:
+
+<p>
+
+<ul>
+
+<li> If you really wanted to create a new person, go back and change
+his number. Remark that the error page give you the first free,
+therefore available, number: choose it or another one. If there are
+several persons with the same name, their list is displayed.
+
+<li> If it was the good person person you wanted to speak about, go
+back and change "Create" into "Link".
+
+</ul>
+
+<p>
+
+Then do "Ok" again.
+
+<p>
+
+If the error indicated you that some person does not exist, this means
+that you selected "Link" in front of an non existing person. Maybe you
+mischoosed his number? Or did you want actually to create a new
+person?
+
+</ul>
+
+<h4> <a name="DelF">5.3.</a> Delete a Family </h4>
+
+You see this form, titled "Delete/Family" from a personal record, after
+having clicked on "Update", the "Delete/Family".
+
+<p>
+
+The form only holds the button "Ok" to allow you to do it really.
+You can still give up.
+
+<p>
+
+If you do "Ok", a new page appears with the the title "Family deleted".
+
+<p>
+
+The family is removed from the base: the father, the mother and the
+children scatter. However none of them is deleted: just the father
+and the mother are no more married, they have no more these children
+(they may have other ones from other marriages, which are persisting),
+the children have no more parents.
+
+
+<h4> <a name="ModP">5.4.</a> Modify a Person </h4>
+
+You see this form titled "Modify/Person" from a personal record,
+after having clicked on "Update", then "Modify". The form is prefilled
+with all the individual data of this person.
+
+<p><strong>Filling</strong><p>
+
+All areas (prefilled or not) can be filled, erased or modified.  When
+you filled, erased, modified all you judge necessary, go to the end of
+the form and commit the form by clicking on "Ok".
+
+<p>
+
+Some buttons hold "Insert/...": "Insert/Nickname", "Insert/Alias", etc.
+
+<p>
+
+Warning: this is not to add the corresponding nickname or alias, etc
+to the person, but to ask for a new form with a reserved place for
+another nickname, another alias, etc.
+
+<p>
+
+So, if you do "Ok" after having selected one or several of these buttons,
+a new bigger form is proposed to you, and no updating is done yet.
+
+<p>
+
+Therefore, if, after an "Ok", you see a new modification form, this
+means that your committing has not been recorded (not yet), even if
+you filled a lot of areas.
+
+<p><strong>Different fields</strong><p>
+
+Remark the meaning of the different fields, specially the use of
+"public name", "qualifier", "alias", etc which all have a very
+specific meaning.
+
+<ul><li>
+
+<strong>First name</strong> and <strong>surname</strong> have their
+usual meaning. With <strong>Num</strong> (number), the person has a
+unique "access key" as indicated in the beginning of this chapter.
+
+<p>
+
+We suggest to put the common first name in the first name area. The
+other first names (complete first names, other possible first names,
+other spelling of first names, etc) must rather go to the area "first
+name alias" (below). The names with number as for noble and royal
+persons must rather go to the area "public name".
+
+<p>
+
+This is because the first name is recorded in the list of first names.
+It is possible to know what is the most frequent first name, see which
+other persons have the same first name, etc. The other kinds of first
+names would risk to be in one only exemplary.
+
+</ul>
+
+<ul><li>
+
+<strong>Public name</strong> is the name the person is known
+with. Example: "Edward VII" (his first name being "Edward" and his
+surname "Windsor").
+
+<p>
+
+The persons having a public name are accessible in the navigation by
+this name.
+
+<p>
+
+If there is a public name, it is displayed as a title in his personal
+record, instead of his "first name surname" which are relegated below
+and in smaller characters.
+
+</ul>
+
+<ul><li>
+
+<strong>Photo</strong> is a ".gif" or ".jpg" file associated to the person
+and with will be displayed in his personal record. This can be an URL
+address (starting with "http://...") or just a name the system will search
+in the directory "image" while displaying.
+
+</ul>
+
+<ul><li>
+
+<strong>Qualifier</strong> is the part of the name attached to the public
+name for famous persons. So is "the Fat" for "Louis VI the Fat".
+
+<p>
+
+Persons are accessible with this qualifier at the place of their surname.
+So "Louis VI the Fat" is accessible by "Louis VI" (public name), "Louis
+VI the Fat", "Louis the Fat", "Louis Capet", etc. Let us note that
+"the Fat" is nevertheless not considered alone as a surname.
+
+<p>
+
+There may be several qualifiers: so "William the Conqueror" is known
+also as "William the Bastard". Therefore you need an area for the
+qualifiers "the Conqueror" and another one for "the Bastard". This is
+why the "Insert/Qualifier" is useful.
+
+<p>
+
+If there is a qualifier, the public name (or the first name if there
+is no public name), followed by the qualifier are displayed as title
+in the personal record, instead of the normal "first name surname",
+which is relagated below, in smaller characters.
+
+</ul>
+
+<ul><li>
+
+<strong>Alias</strong> is a name the person is known by, without being
+an alternative for a first name (like the "public name" is, for example).
+
+<p>
+
+So, "Norma Jean Mortenson" is known as "Marilyn Monroe". Note that the
+alias is in one part: no question to accept combinations like
+"Norma Jean Monroe" or "Marilyn Mortenson".
+
+<p>
+
+If there are one or several aliases, they are displayed in bold small
+characters below the title.
+
+</ul>
+
+<ul><li>
+
+<strong>First name alias</strong> may have several usages:
+
+<p>
+
+<ul>
+
+<li> This can be the complete list of first names.
+
+<li> This can be a little name used by the close relations: "Bob" for
+"Robert".
+
+<li> This can be another first name, or the same one but with a different
+spelling, in case of persons of old times, whom first name is not
+sure, or written differently in different sources.
+
+</ul>
+
+<p>
+
+There may be several first names aliases.
+
+<p>
+
+First name aliases can be used in place of the first name in requests, but
+they are not considered as real first names, i.e. they are not recorded
+in the lists by first names, etc.
+
+<p>
+
+If there are first names aliases, they are displayed in the personal record,
+in small letters under the title.
+
+</ul>
+
+<ul><li>
+
+<strong>Surname alias</strong> can be used as alternative surname, if you
+want to have another version of the name, e.g. with another spelling. Its
+usage is not frequent.
+
+</ul>
+
+<ul><li>
+
+<strong>Birth</strong> allows to indicate dates and places of birth and
+baptism. No particular problem.
+
+</ul>
+
+<ul><li>
+
+<strong>Death</strong> allows to indicate informations about the death.
+The preselection is often "Dont know".
+
+<p>
+
+<ul>
+
+<li> If the person is still alive, select "Not dead". It is important
+because the system displays, in his personal record, his age computed
+from his birth date and today's date. And if the birth date is
+complete (day, month, year), the person will be displayed in the
+birthdays lists.
+
+<li> If the person is dead, select "Dead" and type date, place and cause
+of death, and date, place of burial or cremation.
+
+<li> If you don't know whether the person died or not, leave it like
+that.
+
+</ul>
+
+</ul>
+
+<ul><li>
+
+<strong>Occupation</strong> holds the profession. If you want to put
+a nobility title, use rather the fields "title" below.
+
+</ul>
+
+<ul><li>
+
+<strong>Title</strong> holds a nobility title. There may be several
+of them. To have a form with other places for the titles, click on
+one or several "Insert/Title", go to end of form and do "Ok".
+
+<p>
+
+Titles are composed on two parts: the title itself and the place. The
+title itself holds the designation: "earl", "duke", "king", etc. The
+place holds the complement: "of Warwick", "of Saxony", "of England",
+etc.
+
+<p>
+
+Note the particle: when displayed, you see the combination of the
+disignation and the place: "earl of Warwick", "duke of Saxony",
+"king of England", which are clickable areas, allowing to see all
+persons having this title.
+
+<p>
+
+But the separation of these notions allows to select, for example, all
+the "earl", all the "duke", all the "king" (plural must not be used),
+and conversely all titles ending with "of Warwick", "of Saxony", "of
+England", etc.
+
+<p>
+
+The field "name" represents a public name associated with the title.
+For example, "Charles Quint" is named "Charles I" as "king of Spain",
+"Charles IV" as "king of Sicilia", etc.
+
+<p>
+
+The field "Nth" is used for titles used with a number. Example: for
+the "5th duke of Hamilton", put the value "5". Do not confuse with
+"Edward VII" whose number indicates he is the 7th "Edward" of the
+lineage, not the 7th "king of Great Britain".
+
+<p>
+
+The button "Main title" allows to indicate, when this person is displayed
+with a simple way (in the page of his spouse, for example, or in those
+of his children), which title to use. This has importance only if there
+are several titles.
+
+<p>
+
+The next two fields give dates of begin and end of reign.
+
+<p>
+
+To delete a title, just erase the contents of the first field "Title".
+
+</ul>
+
+<ul><li>
+
+<strong>Access</strong> allows to specify the access to personal
+informations. This is applied to the persons of "nowadays", i.e. whose
+dates (birth, death, etc.) are less than 100 years:
+
+<p>
+
+<ul>
+
+<li> By default, the persons having nobility titles or one of the parents
+of them has nobility titles are considered as "public" persons
+and their personal informations are always displayed.
+
+<li> When selecting "public", the personal informations are always
+displayed, even if the person has no nobility titles.
+
+<li> When selecting "private", the personal informations are not displayed,
+even if the person has nobility titles.
+
+</ul>
+
+<p>
+
+In "wizard" or "friend" entries (by passwords), the personal informations
+are always displayed.
+
+</ul>
+
+<ul><li>
+
+<strong>Notes</strong> holds the notes about the person. In the
+personal record page, the text will be displayed without breaks, even
+if you put breaks in your text. To add a real break, write "&lt;br&gt;"
+where you want breaks to take place.
+
+</ul>
+
+<ul><li>
+
+<strong>Sources</strong> allows to note short informations about the
+origins of the informations: a name, an abbreviation, a book title,
+a code. So you know where you got your informations from.
+
+<p>
+
+It is not designed to long informations, like "the copy of the document
+found in the town hall": use the field "Notes" above for that.
+
+</ul>
+
+<p><strong>Committing</strong><p>
+
+The committing takes place when you click on "Ok". As you as you do not
+do it, no change is done in the base.
+
+<p>
+
+Remark also that, as it is said above, that if you selected one or
+several "Insert/...", just a new form is proposed: this is <em>not</em>
+the proper committing.
+
+<p>
+
+When the committing is really done, you must see a new page whose
+title is:
+
+<ul><li>
+
+Either: <strong>Person modified</strong><p>
+
+You see the name of the person and you can click on it.
+
+<p>
+
+Maybe you see also warnings. They concern dates inconsistencies.  The
+update is done anyway, but it is preferable to fix them.
+
+<p>
+
+Clicking on the person, you see his personal record. But your
+update may not be visible. Web navigators use to keep already
+displayed pages in memory, and probably display the old version.
+Do "reload the page" in your navigator to really see your modifications.
+
+</ul>
+
+<ul><li>
+
+Or: <strong>Error</strong><p>
+
+The page indicates the encountered error. Go back and fix. You can
+also give up... doing nothing and go on navigating in the base.
+
+<p>
+
+If the error indicates you that some person already exists, it means
+that you modified the first name, the surname or the number (you have
+absolutely the right to do it), but you new choice enters in conflict
+with another person of the base.
+
+<p>
+
+Solution: go back and change the number. Remark that the error page
+proposed you a free therefore available number. Take this one or
+another. If there are several persons with the same name, their list
+is displayed.
+
+</ul>
+
+<h4> <a name="DelP">5.5.</a> Delete a Person </h4>
+
+You see this form, titled "Delete/Person" from a personal record, after
+having clicked on "Update", then "Delete/Person".
+
+<p>
+
+The form only holds the button "Ok" to allow you to do it really.
+You can still give up.
+
+<p>
+
+If you do "Ok", a new page appears with the the title "Person deleted".
+
+<p>
+
+The person is not exactly deleted. His personal data is erased (included
+his first name and surname) as well as his connection with his parents.
+
+<p>
+
+But an "entity person" is subsisting, linked to his possible spouse and
+children.
+
+<p>
+
+Return to <a href="diruse.htm">Directions for Use</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

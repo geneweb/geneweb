@@ -1,4 +1,4 @@
-(* $Id: pqueue.mli,v 1.1 1998-09-01 14:32:05 ddr Exp $ *)
+(* $Id: pqueue.mli,v 1.1.1.1 1998-09-01 14:32:05 ddr Exp $ *)
 
 (* Module [Pqueue]: priority queues. *)
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
 
 open Def;
 open Check;

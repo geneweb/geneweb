@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
 
 open Config;
 open Def;

@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Serveur</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Serveur</h1>
+
+Gwd, quand il est lanc&eacute;, est un serveur. La troisi&egrave;me
+adresse: "http://ordinateur:2317/base" est celle &agrave; utiliser
+pour les gens de l'ext&eacute;rieur. Vous pouvez tr&egrave;s bien
+mettre un lien vers cette adresse dans votre page maison.
+
+<p>
+
+Il faut cependant que votre ordinateur soit visible de
+l'ext&eacute;rieur.  La moindre des choses est qu'il soit
+branch&eacute; sur le r&eacute;seau Internet. Mais ce n'est pas
+suffisant. Certains sites ont des "murs de feu" interdisant
+l'acc&egrave;s direct aux ordinateurs du r&eacute;seau interne. Le
+mieux est alors d'essayer: lancez "gwd" et demandez &agrave; un ami,
+sur un ordinateur en dehors de votre site d'essayer de s'y connecter.
+
+<p>
+
+N'oubliez pas que le service que vous avez cr&eacute;&eacute; ne
+r&eacute;pondra que si votre ordinateur est allum&eacute;! Il faut donc
+le laisser en marche. Vous pouvez laisser "gwd" tourner, le service
+ne s'arr&ecirc;tera pas.
+
+<p>
+
+Si vous &ecirc;tes sous Unix ou Windows NT (donc pas Windows 95), vous
+avez d&ucirc; entrer dans l'ordinateur en tant qu'utilisateur, en
+donnant votre nom de "login" et votre mot de passe. Vous voulez
+peut-&ecirc;tre alors sortir sans que <em>GeneWeb</em> s'arr&ecirc;te.
+
+<p>
+
+Vous avez alors deux solutions pour r&eacute;soudre ce probl&egrave;me:
+l'installation en "service" et en l'installation en "cgi".
+
+<h4> Installation en "service" </h4>
+
+Dans ce mode de fonctionnement, vous n'avez pas besoin qu'un serveur Web soit
+install&eacute; sur votre ordinateur. Gwd <em>est</em> un serveur Web
+&agrave; lui tout seul. Sa seule diff&eacute;rence avec les
+autres serveurs, c'est qu'il ne sert que de la
+g&eacute;n&eacute;alogie.
+
+<ul>
+
+<li> Si vous &ecirc;tes sous Unix, au lieu de taper juste "gwd", tapez:
+
+<pre>
+     nohup gwd 2&gt;&amp;1 &amp             (sous "sh", "ksh", "bash")
+     nohup gwd &gt;&amp; nohup.out &amp;     (sous "csh", "tcsh")
+</pre>
+
+Vous pourrez alors vous d&eacute;connecter. Gwd continuera &agrave;
+tourner et enverra sa trace sur le fichier "nohup.out" que vous
+pourrez consulter plus tard. Pour l'arr&ecirc;ter, il faut regarder
+quel est son num&eacute;ro de processus, avec la commande "ps" et le
+tuer avec la commande "kill".
+
+</ul>
+
+<p>
+
+<ul><li> Si vous &ecirc;tres sous Windows NT, il faut installer "gwd" en
+"service". Demandez &agrave; votre administrateur syst&egrave;me.
+
+</ul>
+
+<h4> Installation en "cgi" </h4>
+
+Dans ce mode de fonctionnement, il faut qu'un serveur Web soit
+install&eacute; sur votre ordinateur. Les "cgi" sont des programmes que
+le serveur Web peut lancer. Seul l'administrateur syst&egrave;me est
+autoris&eacute; &agrave; ajouter des "cgi". Il faut donc
+pr&eacute;alablement lui demander la permission.
+
+<p>
+
+<ul><li>
+
+Sous Unix, si vous avez par exemple install&eacute; <em>GeneWeb</em> dans
+le r&eacute;pertoire "/home/dupont/geneweb", fabriquez un fichier que
+vous allez nommer "geneweb" et contenant les lignes suivantes:
+
+<pre>
+     #!/bin/sh
+     DIR=/home/dupont/geneweb
+     cd $DIR
+     $DIR/gwd -cgi
+</pre>
+
+Rendez ce shell script ex&eacute;cutable (chmod +x geneweb) et demandez
+&agrave; votre administrateur syst&egrave;me d'installer ce fichier
+dans le r&eacute;pertoire des "cgi". Demandez-lui &eacute;galement
+quelle est l'adresse Web &agrave; utiliser. Ce sera s&ucirc;rement
+quelque chose du genre:
+
+<pre>
+     http://gnagna.xx.fr/cgi-bin/geneweb
+</pre>
+
+<p>
+
+Si vous ouvrez l'adresse URL ci-dessus dans votre navigateur, vous
+verrez appara&icirc;tre une page qui vous demandera juste
+"Base:". Entrez le nom de votre base. Vous pouvez aussi ajouter
+directement "?b=durand" &agrave; cet URL, si "durand" est le nom
+de votre base.
+
+<p>
+
+Remarques:
+
+<ul>
+
+<li> Si cette derni&egrave;re commande ne fonctionne pas, il est possible
+que le serveur Web n'ait pas le droit d'acc&egrave;s &agrave; la base ni
+aux autres r&eacute;pertoires. Effectuez les op&eacute;rations suivantes:
+
+<pre>
+     cd /home/dupont/geneweb
+     chmod 777 . lang images base.gwb
+</pre>
+
+<li> Si cela r&eacute;pond mais est tr&egrave;s lent, il se peut que
+ce soit d&ucirc; au fait que la base est acc&eacute;d&eacute;e par NFS
+(si vous ne savez pas ce que cela veut dire, demandez &agrave; votre
+administrateur syst&egrave;me). Il est pr&eacute;f&eacute;rable que ce
+ne soit pas le cas: si c'est possible, copiez donc le
+r&eacute;pertoire geneweb sur un disque local du serveur Web. Si cela
+ne vous est pas possible, ajoutez l'option "-nolock" dans l'appel de
+la commande "gwd" du fichier "geneweb" ci-dessus:
+
+<pre>
+     $DIR/gwd -cgi -nolock
+</pre>
+
+</ul>
+
+</ul>
+
+<ul><li>
+
+Sous Windows NT, si vous avez par exemple install&eacute;
+<em>GeneWeb</em> dans le r&eacute;pertoire "c:\home\dupont\geneweb",
+cr&eacute;ez un fichier que vous allez nommer "gwd.arg" et contenant
+les lignes suivantes:
+
+<pre>
+     -hd
+     c:\home\dupont\geneweb
+     -bd
+     c:\home\dupont\geneweb
+     -cgi
+</pre>
+
+<p>
+
+Ce sont les options que l'on peut passer &agrave; la commande
+"gwd". Faire "gwd -help" pour voir l'ensemble de ces options.
+
+<p>
+
+Demandez ensuite &agrave; votre administrateur syst&egrave;me:
+
+<ul>
+
+<li> D'installer le fichier "gwd.arg" dans le r&eacute;pertoire des
+"cgi".
+
+<li> De copier le fichier "gwd.exe" du r&eacute;pertoire "geneweb"
+dans ce m&ecirc;me r&eacute;pertoire des "cgi".
+
+</ul>
+
+<p>
+
+Demandez-lui l'adresse &agrave; utiliser. Ce sera s&ucirc;rement
+quelque chose du genre:
+
+<pre>
+     http://gnagna.xx.fr/cgi-bin/gwd.exe
+</pre>
+
+<p>
+
+Si vous ouvrez cette adresse URL dans votre navigateur, vous verrez
+appara&icirc;tre une page qui vous demandera juste "Base:". Entrez le
+nom de votre base. Vous pouvez aussi ajouter directement "?b=durand"
+&agrave; cet URL, si "durand" est le nom de votre base.
+
+<p>
+
+Remarque: si cette derni&egrave;re commande ne fonctionne pas, il est
+possible que le serveur Web n'ait pas le droit d'acc&egrave;s &agrave;
+la base ni aux autres r&eacute;pertoires. Il faut donner les droits
+de lecture et d'&eacute;criture au r&eacute;pertoire "geneweb" et aux
+sous-r&eacute;pertoires "lang", "durand.gwb", "images" (et "cnt" si
+ce r&eacute;pertoire existe).
+
+</ul>
+
+<h4> Installation en "service" ou en "cgi"? </h4>
+
+Si vous avez le choix entre installation en "service" ou en "cgi", notez
+les points suivants:
+
+<ul>
+
+<li> En mode "cgi", les requ&ecirc;tes sont indirectes, puisqu'il faut
+passer par le serveur Web, ce qui peut ralentir
+l&eacute;g&egrave;rement le traitement.
+
+<li> Sous Unix, l'installation en "service" est plus facile,
+puisqu'elle ne n&eacute;cessite pas la permission ni l'intervention de
+l'administrateur syst&egrave;me.
+
+<li> Sous Windows NT, vous devrez de toutes fa&ccedil;ons passer par
+votre administrateur syst&egrave;me, lequel va s&ucirc;rement
+pr&eacute;f&eacute;rer le mode "cgi" qui est beaucoup plus simple
+&agrave; installer et plus contr&ocirc;lable.
+
+<li> &Eacute;videmment, s'il n'y a pas de serveur Web sur votre ordinateur,
+seule l'installation en "service" est possible.
+
+</ul>
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

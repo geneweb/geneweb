@@ -1,0 +1,35 @@
+# Parameters in "<body>" (background, color, etc)
+# Here is a palette of possibilities... test and choose one of them
+# if you want by removing the initial "#"
+# body_prop=bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900
+# body_prop=bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066
+# body_prop=bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633
+# body_prop=bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300
+# body_prop=bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333
+# body_prop=bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366
+# body_prop=bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066
+# body_prop=bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300
+# body_prop=bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066
+# body_prop=bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066
+# body_prop=bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF
+# body_prop=bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99
+# body_prop=bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00
+# body_prop=bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66
+# body_prop=bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF
+# body_prop=bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66
+# body_prop=bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF
+# body_prop=bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF
+# For a background pattern, e.g. foo.jpg:
+# body_prop=background="geneweb?m=IM;v=foo.jpg"
+# (the file foo.jpg must be in the directory "images")
+
+# Friend can see all dates
+# Choose a password or leave it empty
+friend_passwd=
+
+# Wizard can see all dates and update the base
+# Choose a password or leave it empty
+wizard_passwd=
+
+# Default language
+default_lang=fr

@@ -1,4 +1,4 @@
-(* $Id: name.mli,v 1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: name.mli,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
 
 value lower : string -> string;
   (* Name.lower:

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title> Genealogio - %t</title></head>
+<body%b>
+<h1> Genealogio </h1>
+
+<p>
+
+La datenbazo enhavas nune %n personojn.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">%h
+<input type=hidden name=m value=NG>
+Sercxu: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Estas:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+Cxu <em>personnomo</em> kaj <em>familinomo</em>,
+cxu <em>publica nomo</em>, cxu <em>aliaso</em>.
+<li> <input type=radio name=t value=P> <em>Personnomo</em>.
+<li> <input type=radio name=t value=N> <em>Familinomo</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">%h
+<input type=hidden name=m value=TT>
+Por mosxto <INPUT NAME=t size=14 maxlength=200>
+loko <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<form method=GET action="%f">%h
+Cxiuj
+<select name=m>
+   <option value="N" selected> Familinomoj
+   <option value="P"> Personnomoj
+</select>
+por
+<select name=tri>
+   <option value="A" selected> Alfabetica ordo
+   <option value="F"> Frekvenko
+</select> =&gt;
+<input type=submit value="Ok">
+</form>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Aldoni famiglion</a>.
+%w
+
+</ul>
+
+La <a href="%sm=AN">naskigxtagoj</a>%x
+kay la <a href="%sm=B;k=10">finaj naskigxoj</a>%x...
+<br>
+La <a href="%sm=AD">datrevenoj de la mortaj personoj</a>.
+<br>
+Kaj la <a href="%sm=AM">datrevenoj de edzigxo</a>.
+<p>
+Estis %q alirejoj kaj %c al cxi pagxo.
+
+<p>
+
+<form method=get action="%f">%h
+<font size=-1>Password, for <em>friend</em> or <em>update</em> access:
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+
+<p>
+
+%rversion

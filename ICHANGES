@@ -1,0 +1,145 @@
+Internal Changes
+****************
+
+GeneWeb Version 1.06
+--------------------
+
+* Some changes for compilation with version 2.00 of Ocaml and Camlp4.
+
+* Some changes for sources distribution
+
+* gwd:
+  - added cannot change sex of married person while updating person,
+    this check was missing
+  - changed Name.crush to separate case "roman numbers" and "i" is now
+    treated as other vowels
+  - changed "(%d fois)" into "(%d)" in "descendants, only the selected
+    generation".
+  - updateInd.ml: display number = index for first name or surname = "?"
+
+* gwu:
+  - fixed bug of behavior: created files even if not option -odir
+
+* lexicon.txt:
+  - integrated Lars' updates for swedish version... in fact integrated in
+    "intermediate" version 1.05.
+
+GeneWeb Version 1.05
+--------------------
+
+* gwc:
+  - added "wrap=virtual" in notes updating.
+  - added 1 generation in missing ancestors (because if a level complete =>
+    nothing printed!)
+  - fixed "Chantal.1 N..." did not work because of searching . from the right
+  - generated images have now "content-length" (necessary for Netscape 2)
+  - srcfile.ml: accept now [] in txt files => translation!
+  - p.birth is now of type Adef.codate
+  - suppressed nobr in descend.ml
+  - suppressed <ul></ul> with no <li> in descend.ml
+  - fixed bug: when creating or modifying someone, the test of existing was
+    firstname1 ^ surname1 = firstname2 ^ surname2 instead of
+    firstname1 = firstname2 && surname1 = surname2
+  - Soza -> Sosa
+
+GeneWeb Version 1.04
+--------------------
+
+* gwc:
+  - added magic number in gwo files.
+  - in case of option error, does not display usage, just invitation to
+    use the -help option
+
+* gwd:
+  - fixed bug in relation: if same person, was not detected.
+  - using new pa_html.cmo
+  - added option "-nolock" not to create lock files; drawback: risk of
+    scratching counter (not grave), or the database, if two users attempt
+    to modify it at the same time; this option were only in Unix version,
+    it is now added in Windows version too.
+  - in research by names, "s" ending words are ignored
+  - when refusing a log (fucking robots!), return status 403 and a small
+    message; logs in "refuse_log".
+  - added option -robot_xcl to test fast attacks.
+  - fixed bug descend "only the generation concerned": persons descending
+    several time were not factorized.
+
+* gwd, consang:
+  - in Windows NT/95, locking files never blocks: the action is just
+    refused =>
+    * when updating the base, if the base cannot be locked, the update is
+      rejected.
+    * when applying "consang", if the base cannot be locked, "consang" is
+      rejected.
+    * if the counter file cannot be locked, the counter is just not updated.
+
+* gwc, gwu:
+  - added "csrc" to factorize "#src" when all children have the same
+
+GeneWeb Version 1.03
+--------------------
+
+* gwd:
+  - ascend.ml & relation.ml: print upto faster thanks to maxlen added (l=...)
+  - capitalization of all letters with accents is now ok
+  - added "gwd.xcl" to exclude connexions
+
+* Makefiles:
+  - add and use of tools/camlp4_comm.sh
+
+GeneWeb Version 1.02
+--------------------
+
+* gwd
+  - lower threshold for optimized relationship link from 25 to 15.
+
+* gwc
+  - in photos => recode underscores (transformed into spaces!).
+  - Can now wait for 4 clients in the queue (listen 4).
+
+GeneWeb Version 1.01
+--------------------
+
+* gwd
+  - saw that sometimes "accept" fails for other reasons than timeout => no
+    more message now in the trace.
+
+GeneWeb Version 1.0
+-------------------
+
+GeneWeb Version 1.0 beta.10
+---------------------------
+
+GeneWeb Version 1.0 beta.9
+--------------------------
+
+* gwd
+  - added possible sleep in env to test memory consummation
+  - changed algorithm of last n births: was o(n^2), now o(n*log n)
+
+GeneWeb Version 1.0 beta.8
+--------------------------
+
+* gwd
+  - fixed problem of Maertens: "Cannot access to start.txt", although
+    it was a problem of accessing "copyright.txt"
+  - "%f" in language files (used in version.txt) do not generate just
+    "command", but "command?" if not cgi and "command?b=base;" if cgi
+
+GeneWeb Version 1.0 beta.7
+--------------------------
+
+- changed big num (e.g. for Soza numbers) => no limit
+- HTTP protocol: always return status 202 OK, even on errors
+- lang/lexicon.txt: nth generation go up to 125 (fr)
+- ged2gwb: if surname or first name of someone = "?", may transform it
+  into "x" (to preserve consistency between gwb2gw and gwc)
+- fixed problem of alphabetic order in displaying by titles
+- trailer always included even in source files, which must not yet hold
+  </body> at their end.
+- copyright added at end if file "copyright.txt" not accessible but
+  without link to my site.
+- file "copyright.txt" changed into "copyr.txt" (I am afraid of problems
+  of long file names in Windows).
+- fixed bug: problems of <em> and </a> in displaying "ancestors .. up to .."
+

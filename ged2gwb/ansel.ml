@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 1.1 1998-09-01 14:32:13 ddr Exp $ *)
+(* $Id: ansel.ml,v 1.1.1.1 1998-09-01 14:32:13 ddr Exp $ *)
 
 value acute =
   fun

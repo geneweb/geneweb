@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 1.1 1998-09-01 14:32:14 ddr Exp $ *)
+(* $Id: wserver.mli,v 1.1.1.1 1998-09-01 14:32:14 ddr Exp $ *)
 
 (* module [Wserver]: elementary web service *)
 

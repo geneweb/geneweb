@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
 
 open Def;
 

@@ -1,4 +1,4 @@
-(* $Id: i18n_check.ml,v 1.1 1998-09-01 14:32:12 ddr Exp $ *)
+(* $Id: i18n_check.ml,v 1.1.1.1 1998-09-01 14:32:12 ddr Exp $ *)
 
 value usage () =
   do Printf.eprintf "Usage: i18n_check lang lexicon\n";

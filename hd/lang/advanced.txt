@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>[*advanced request]</title></head></head>
+<body%b>
+<h1>[*advanced request]</h1>
+
+<form method=POST action="%f">
+%h<input type=hidden name=m value=AS_OK>
+
+<h4>[*first name/first names]0</h4>
+
+<table border=1>
+<tr>
+<td>
+<input name=first_name size=40 maxlength=200">
+</td>
+</tr>
+</table>
+
+<h4>[*surname/surnames]0</h4>
+
+<table border=1>
+<tr>
+<td>
+<input name=surname size=40 maxlength=200">
+</td>
+</tr>
+</table>
+
+<h4>[*birth]</h4>
+<table border=1>
+<tr>
+<td>
+[*place]
+</td>
+<td>
+<input name=birth_place size=40 maxlength=200">
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>
+[*after]
+<input name=birth1_dd size=2 maxlength=2>
+<input name=birth1_mm size=2 maxlength=2>
+<input name=birth1_yyyy size=5 maxlength=5>
+</td>
+<td>
+[*before]
+<input name=birth2_dd size=2 maxlength=2>
+<input name=birth2_mm size=2 maxlength=2>
+<input name=birth2_yyyy size=5 maxlength=5>
+</td>
+</tr>
+</table>
+
+<h4>[*baptism]</h4>
+<table border=1>
+<tr>
+<td>[*place]</td>
+<td>
+<input name=bapt_place size=40 maxlength=200>
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>
+[*after]
+<input name=bapt1_dd size=2 maxlength=2>
+<input name=bapt1_mm size=2 maxlength=2>
+<input name=bapt1_yyyy size=5 maxlength=5>
+</td>
+<td>
+[*before]
+<input name=bapt2_dd size=2 maxlength=2>
+<input name=bapt2_mm size=2 maxlength=2>
+<input name=bapt2_yyyy size=5 maxlength=5>
+</td>
+</tr>
+</table>
+
+<h4>[*death]</h4>
+
+<table border=1>
+<tr>
+<td>
+<select name=death>
+<option value=Dead>[*died]
+<option value=NotDead>[*not dead]
+<option value=Any selected>-
+</select>
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>[*place]</td>
+<td>
+<input name=death_place size=40 maxlength=200>
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>
+[*after]
+<input name=death1_dd size=2 maxlength=2>
+<input name=death1_mm size=2 maxlength=2>
+<input name=death1_yyyy size=5 maxlength=5>
+</td>
+<td>
+[*before]
+<input name=death2_dd size=2 maxlength=2>
+<input name=death2_mm size=2 maxlength=2>
+<input name=death2_yyyy size=5 maxlength=5>
+</td>
+</tr>
+</table>
+
+<h4>[*burial]</h4>
+
+<table border=1>
+<tr>
+<td>
+[*place]
+</td>
+<td>
+<input name=burial_place size=40 maxlength=200>
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>
+[*after]
+<input name=burial1_dd size=2 maxlength=2>
+<input name=burial1_mm size=2 maxlength=2>
+<input name=burial1_yyyy size=5 maxlength=5>
+</td>
+<td>
+[*before]
+<input name=burial2_dd size=2 maxlength=2>
+<input name=burial2_mm size=2 maxlength=2>
+<input name=burial2_yyyy size=5 maxlength=5>
+</td>
+</tr>
+</table>
+
+<h4>
+[*occupation]</h4>
+
+<table border=1>
+<tr>
+<td>
+<input name=occu size=50 maxlength=200>
+</td>
+</tr>
+</table>
+
+<h4>[*sex]</h4>
+
+<input type=radio name=sex value=M>[M/F]0
+<input type=radio name=sex value=F>[M/F]1
+<input type=radio name=sex value=N checked>-
+
+<h4>[*marriage/marriages]1</h4>
+
+<input type=radio name=married value=Y>[Y/N]0
+<input type=radio name=married value=N>[Y/N]1
+<input type=radio name=married value=A checked>-
+
+<p>
+Maximum: <input name=max size=5 value=100 maxlength=5>
+<input type=submit value=Ok>
+
+</form>

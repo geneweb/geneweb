@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: title.ml,v 1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: title.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
 
 open Config;
 open Def;

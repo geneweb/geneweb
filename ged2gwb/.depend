@@ -1,0 +1,4 @@
+ged2gwb.cmo: ../src/adef.cmi ansel.cmo ../src/argl.cmo aurejac.cmo \
+    ../src/def.cmi ../src/gutil.cmi ../src/iobase.cmi ../src/name.cmi 
+ged2gwb.cmx: ../src/adef.cmx ansel.cmx ../src/argl.cmx aurejac.cmx \
+    ../src/def.cmi ../src/gutil.cmx ../src/iobase.cmx ../src/name.cmx 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: some.ml,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
 
 open Def;
 open Gutil;

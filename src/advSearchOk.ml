@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
 
 open Config;
 open Def;

@@ -1,4 +1,4 @@
-(* $Id: iovalue.mli,v 1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: iovalue.mli,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
 
 value input : in_channel -> 'a;
 value output : out_channel -> 'a -> unit;

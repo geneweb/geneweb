@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: def.syn.ml,v 1.1 1998-09-01 14:32:02 ddr Exp $ *)
+(* $Id: def.syn.ml,v 1.1.1.1 1998-09-01 14:32:02 ddr Exp $ *)
 
 open Pcaml;
 

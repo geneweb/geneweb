@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Genealogi - %t</title></head>
+<body%b>
+<h1>Genealogi</h1>
+
+Databasen innehåller nu %n personer.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">%h
+<input type=hidden name=m value=NG>
+Sök: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Det är:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+Antingen <em>förnamn</em> och <em>efternamn</em>,
+eller <em>publiktnamn</em>, eller <em>alias</em>.
+<li> <input type=radio name=t value=P> Ett <em>förnamn</em>.
+<li> <input type=radio name=t value=N> Ett <em>efternamn</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">%h
+<input type=hidden name=m value=TT>
+Efter titel <INPUT NAME=t size=14 maxlength=200>
+plats <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">%h
+Alla
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED> Efternamn
+   <OPTION VALUE="P"> Förnamn
+</SELECT>
+efter
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> Bokstavs ordning
+   <OPTION VALUE="F"> Frekvens
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Lägg till en familj</a>.
+%w
+
+</ul>
+
+<a href="%sm=AN">Födelsedagar</a>%x
+och <a href="%sm=B;k=10">de senaste 10 födslarna</a>%x...
+<br>
+<a href="%sm=AD">Döda personers årsdagar</a>.
+<br>
+Och <a href="%sm=AM">bröllopsdagar</a>.
+<p>
+Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.
+
+<p>
+
+<form method=get action="%f">%h
+<font size=-1>Passord, för <em>vänner</em> eller <em>uppdaterings</em>
+tillträde:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+
+<p>
+
+%rversion

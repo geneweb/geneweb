@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Genealogia - %t</title></head>
+<body%b><h1>Genealogia</h1>
+
+<p>
+
+La base di dati contiene attualmente %n persone.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">%h
+<input type=hidden name=m value=NG>
+Ricerca: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Per:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>Nome</em> e <em>cognome</em> o <em>appellativo pubblico</em> o
+<em>alias</em>.
+<li> <input type=radio name=t value=P> <em>Nome</em>.
+<li> <input type=radio name=t value=N> <em>Cognome</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">%h
+<input type=hidden name=m value=TT>
+Per titolo <INPUT NAME=t size=14 maxlength=200>
+luogo <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">%h
+Tutti i
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED> Cognomi
+   <OPTION VALUE="P"> Nomi
+</SELECT>
+in ordine
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> Alfabetico
+   <OPTION VALUE="F"> di Frequenza
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Aggiungere una famiglia</a>.
+%w
+
+</ul>
+
+Le <a href="%sm=AN">date di nascita</a>%x
+e le <a href="%sm=B;k=10">ultime nascite</a>%x...
+<br>
+Gli <a href="%sm=AD">anniversari delle persone decedute</a>.
+<br>
+E gli <a href="%sm=AM">anniversari di matrimonio</a>.
+<p>
+Ci sono stati %c accessi a questa pagina.
+
+<p>
+
+<form method=get action="%f">%h
+<font size=-1>Password, for <em>friend</em> or <em>update</em> access:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+
+<p>
+
+%rversion

@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Consanguinit&eacute;</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Consanguinit&eacute;</h1>
+
+<em>GeneWeb</em> permet le calcul et l'affichage de la
+consanguinit&eacute;. Cette page d&eacute;crit &agrave; quoi elle correspond
+et comment on la calcule (grossi&egrave;rement).
+
+<h4> G&egrave;nes et Locus </h4>
+
+Le g&eacute;n&ocirc;me d'un individu est constitu&eacute; d'un grand
+nombre de <em>g&egrave;nes</em> qui, si on ignore les
+mutations, se reproduisent de fa&ccedil;on identique. Les
+g&egrave;nes mesurent l'identit&eacute; d'une personne. Les
+g&egrave;nes sont dispos&eacute;s &agrave; des emplacements
+pr&eacute;cis, appel&eacute; <em>locus</em>.
+
+<p>
+
+Chaque individu poss&egrave;de pour chaque locus deux g&egrave;nes
+transmis, l'un par sa m&egrave;re, l'autre par son p&egrave;re, et
+transmet &agrave; ses enfants une copie de l'un de ses deux
+g&egrave;nes.
+
+<h4> Consanguinit&eacute; et Parent&eacute; </h4>
+
+La <em>consanguinit&eacute;</em> d'un individu est la
+probabilit&eacute; de trouver &agrave; un locus donn&eacute; deux
+g&egrave;nes identiques.
+
+<p>
+
+La <em>parent&eacute;</em> (ou <em>consanguinit&eacute; mutuelle</em>)
+de deux individus est la probabilit&eacute; de trouver &agrave; un
+m&ecirc;me locus deux g&egrave;nes identiques.
+
+<p>
+
+Le calcul montre que:
+
+<ul>
+
+<li> La consanguinit&eacute; d'un individu est &eacute;gale &agrave;
+la parent&eacute; de ses parents.
+
+<li> Chaque lien de parent&eacute; des parents contribue &agrave; leur
+parent&eacute;. En additionnant la valeur de la parent&eacute; pour
+chaque lien de parent&eacute;, on obtient la parent&eacute; totale.
+
+</ul>
+
+<p>
+
+Comme les gens peuvent avoir un tr&egrave;s grand nombre de liens de
+parent&eacute;, le calcul de cette parent&eacute; peut devenir
+tr&egrave;s complexe et il est impossible, dans la pratique, de la
+calculer &agrave; la main.
+
+<h4> Affichage avec GeneWeb </h4>
+
+<em>GeneWeb</em> affiche dans les pages personnelles la
+consanguinit&eacute; de l'individu (quand elle ne vaut pas 0) sous la
+forme d'un pourcentage. Quand on calcule la parent&eacute; entre deux
+personnes, il affiche la consanguinit&eacute; mutuelle (appel&eacute;e
+"parent&eacute;" dans l'expos&eacute; ci-dessus).
+
+<p>
+
+Ainsi, si une personne a une certaine consanguinit&eacute;, on peut
+constater qu'elle est &eacute;gale &agrave; la consanguinit&eacute;
+mutuelle de ses parents.
+
+<p>
+
+Un pourcentage affich&eacute; "xx %" peut se lire de deux mani&egrave;res:
+
+<ul>
+
+<li> Soit on dit: pour chaque locus, il y a xx % de chances qu'il contienne
+deux g&egrave;nes identiques.
+
+<li> Soit on dit, en regardant globalement l'individu: il y a xx % de locus
+contenant des g&egrave;nes identiques (statistiquement).
+
+</ul>
+
+<h4> Quelques exemples simples </h4>
+
+Prenons la consanguinit&eacute; entre fr&egrave;res et soeurs, par exemple.
+
+<p>
+Nous supposons que leurs parents n'aient pas de liens de parent&eacute;.
+Dans ce cas, il y a deux liens de parent&eacute; entre le fr&egrave;re et
+la soeur:
+
+<p>
+
+<table cellspacing=0 cellpadding=0 width="100%">
+<tr>
+<td colspan=2 align=center>P&egrave;re
+</td></tr>
+<tr>
+<td colspan=2 align=center>|</td></tr>
+<tr>
+<td colspan=2 align=center><hr size=1 noshade width="50%"></td></tr>
+<tr>
+<td align=center>|</td><td align=center>|</td>
+</tr>
+<tr>
+<td valign=top align=center width="50%">Fr&egrave;re
+</td>
+<td valign=top align=center width="50%">Soeur
+</td>
+</tr>
+</table>
+
+<p>
+
+et:
+
+<p>
+
+<table cellspacing=0 cellpadding=0 width="100%">
+<tr>
+<td colspan=2 align=center>M&egrave;re
+</td></tr>
+<tr>
+<td colspan=2 align=center>|</td></tr>
+<tr>
+<td colspan=2 align=center><hr size=1 noshade width="50%"></td></tr>
+<tr>
+<td align=center>|</td><td align=center>|</td>
+</tr>
+<tr>
+<td valign=top align=center width="50%">Fr&egrave;re
+</td>
+<td valign=top align=center width="50%">Soeur
+</td>
+</tr>
+</table>
+
+<p>
+
+Ces deux liens &eacute;tant sym&eacute;triques, nous pouvons raisonner
+uniquement sur un des deux. La consanguinit&eacute; mutuelle du fr&egrave;re
+et de la soeur sera donc le double de la valeur obtenue.
+
+<p>
+
+Prenons donc le p&egrave;re, par exemple: 
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>
