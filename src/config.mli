@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 2.11 1999-09-23 13:43:51 ddr Exp $ *)
+(* $Id: config.mli,v 2.12 1999-10-08 10:19:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -25,6 +25,7 @@ type config =
     charset : string;
     is_rtl : bool;
     auth_file : string;
+    border : int;
     today : dmy;
     today_wd : int;
     time : (int * int * int) }

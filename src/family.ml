@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.32 1999-10-08 07:15:47 ddr Exp $ *)
+(* $Id: family.ml,v 2.33 1999-10-08 10:19:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -359,16 +359,22 @@ value family_m conf base =
   | Some "DOC" ->
       Doc.print conf
   | Some "FORUM" ->
-      match p_getenv conf.env "k" with
+      match p_getenv conf.env "t" with
       [ Some "w" when conf.wizard -> Forum.print_wizard conf base
       | Some "f" when conf.wizard || conf.friend ->
           Forum.print_friend conf base
       | _ -> Util.incorrect_request conf ]
   | Some "FORUM_ADD" ->
-      match p_getenv conf.env "k" with
+      match p_getenv conf.env "t" with
       [ Some "w" when conf.wizard -> Forum.print_add_wizard conf base
       | Some "f" when conf.wizard || conf.friend ->
           Forum.print_add_friend conf base
+      | _ -> Util.incorrect_request conf ]
+  | Some "FORUM_ADD_OK" ->
+      match p_getenv conf.env "t" with
+      [ Some "w" when conf.wizard -> Forum.print_add_ok_wizard conf base
+      | Some "f" when conf.wizard || conf.friend ->
+          Forum.print_add_ok_friend conf base
       | _ -> Util.incorrect_request conf ]
   | Some "H" ->
       match p_getenv conf.env "v" with
