@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.41 2001-02-13 16:15:50 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.42 2001-03-03 20:59:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -179,8 +179,7 @@ value check_month m =
 value warning_month_number_dates () =
   match month_number_dates.val with
   [ MonthNumberHappened s ->
-      do flush log_oc.val;
-         Printf.eprintf
+      do Printf.fprintf log_oc.val
            "
   Warning: the file holds dates with numbered months (like: 12/05/1912).
 
@@ -192,7 +191,7 @@ value warning_month_number_dates () =
 
   (example found in gedcom: \"%s\")
 " s;
-         flush stderr;
+         flush log_oc.val;
       return ()
   | _ -> () ]
 ;
@@ -2402,4 +2401,10 @@ The data base \"%s\" already exists. Use option -f to overwrite it.\n"
   return ()
 ;
 
-Printexc.catch main ();
+try main () with e ->
+  do Printf.fprintf log_oc.val "Uncaught exception: %s\n"
+       (Printexc.to_string e);
+     close_out log_oc.val;
+  return exit 2
+;
+

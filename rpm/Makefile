@@ -1,8 +1,8 @@
-# $Id: Makefile,v 3.13 2001-02-05 12:18:46 ddr Exp $
+# $Id: Makefile,v 3.14 2001-03-03 20:59:19 ddr Exp $
 
 VERSION=3.11
 RELEASE=1
-DESTDIR=/usr/src/redhat
+DESTDIR=/usr/src/RPM
 
 all:
 	@echo "make install (as root)"
