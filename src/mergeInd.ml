@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.5 2001-04-21 02:51:11 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.6 2001-10-11 13:08:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -65,12 +65,14 @@ value print_differences conf base branches p1 p2 =
          [ Male -> "M"
          | Female -> "F"
          | Neuter -> "" ]);
+(*
     string_field False (transl conf "access") "access"
       (fun p ->
          match p.access with
          [ IfTitles -> transl conf "if titles"
          | Private -> "private"
          | Public -> "public" ]);
+*)
     string_field False (transl conf "birth") "birth"
       (fun p ->
          match Adef.od_of_codate p.birth with
@@ -127,7 +129,8 @@ value print_differences conf base branches p1 p2 =
   end
 ;
 
-value compatible_codates cd1 cd2 = cd1 = cd2 || cd2 = Adef.codate_None;
+value compatible_codates cd1 cd2 =
+  cd1 = cd2 || cd2 = Adef.codate_None || cd1 = Adef.codate_None;
 
 value compatible_cdates cd1 cd2 = cd1 = cd2;
 
@@ -142,6 +145,7 @@ value compatible_deaths d1 d2 =
     | (Death _ _, NotDead) -> False
     | (Death _ _, _) -> True
     | (_, DontKnowIfDead) -> True
+    | (DontKnowIfDead, _) -> True
     | _ -> False ]
 ;
 
@@ -150,18 +154,20 @@ value compatible_burials b1 b2 =
   else
     match (b1, b2) with
     [ (_, UnknownBurial) -> True
+    | (UnknownBurial, _) -> True
     | (Buried cd1, Buried cd2) -> compatible_codates cd1 cd2
     | (Cremated cd1, Cremated cd2) -> compatible_codates cd1 cd2
     | _ -> False ]
 ;
 
-value compatible_strings s1 s2 = s1 = s2 || s2 = Adef.istr_of_int 0;
+value compatible_strings s1 s2 =
+  s1 = s2 || s2 = Adef.istr_of_int 0 || s1 = Adef.istr_of_int 0;
 
 value compatible_divorces d1 d2 = d1 = d2;
 
 value compatible_relation_kinds rk1 rk2 = rk1 = rk2;
 
-value compatible_accesses a1 a2 = a1 = a2;
+value compatible_accesses a1 a2 = (*a1 = a2*)True;
 
 value compatible_titles t1 t2 = t1 = t2 || t2 = [];
 
@@ -296,7 +302,20 @@ value effective_merge_ind conf base p1 p2 =
       base.func.patch_union p2.cle_index u2;
     }
     else ();
+    if p1.birth = Adef.codate_None then p1.birth := p2.birth else ();
+    if p1.birth_place = Adef.istr_of_int 0 then
+      p1.birth_place := p2.birth_place
+    else ();
+    if p1.death = DontKnowIfDead then p1.death := p2.death else ();
+    if p1.death_place = Adef.istr_of_int 0 then
+      p1.death_place := p2.death_place
+    else ();
+    if p1.burial = UnknownBurial then p1.burial := p2.burial else ();
+    if p1.burial_place = Adef.istr_of_int 0 then
+      p1.burial_place := p2.burial_place
+    else ();
     UpdateIndOk.effective_del conf base p2;
+    base.func.patch_person p1.cle_index p1;
     base.func.patch_person p2.cle_index p2;
   }
 ;
