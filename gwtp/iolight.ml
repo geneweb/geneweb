@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.6 2005-01-09 11:31:18 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.7 2005-02-11 21:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -198,7 +198,7 @@ value input bname =
     {persons = persons; ascends = ascends; unions = unions;
      visible = { v_write = fun []; v_get = fun [] };
      families = families; couples = couples; descends = descends;
-     strings = strings; bnotes = bnotes}
+     strings = strings; particles = []; bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
