@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.7 2002-01-30 22:46:05 ddr Exp $ *)
+(* $Id: some.ml,v 4.8 2002-02-24 15:45:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -328,6 +328,8 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
 (*
     Wserver.wprint "<nobr>\n";
 *)
+    Wserver.wprint "<table border=0><tr><td nowrap>\n";
+(**)
     if len > 1 && br = None then do {
       Wserver.wprint "%s: %d" (capitale (transl conf "number of branches"))
         len;
@@ -378,6 +380,8 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
         1 ancestors
     in
     if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
+(**)
+    Wserver.wprint "</table>\n";
 (*
     Wserver.wprint "</nobr>\n";
 *)
