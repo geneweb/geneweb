@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.8 2000-06-20 07:56:55 ddr Exp $
+# $Id: Makefile,v 3.9 2000-08-17 16:48:10 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -19,6 +19,7 @@ opt::
 	cd gwb2ged; $(MAKE) opt
 	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
+	cd gwtp; $(MAKE) all
 
 distrib: new_distrib wrappers
 
@@ -69,6 +70,7 @@ classical_distrib:
 	cp src/gwu distribution/gwu$(EXE)
 	cp ged2gwb/ged2gwb distribution/ged2gwb$(EXE)
 	cp gwb2ged/gwb2ged distribution/gwb2ged$(EXE)
+	cp gwtp/gwtp.opt distribution/gwtp$(EXE)
 	cp etc/LISEZMOI.txt distribution/.
 	cp etc/README.txt distribution/.
 	cp etc/INSTALL.htm distribution/.
