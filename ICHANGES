@@ -5,6 +5,8 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [07 Dec 03] French revolution year is now displayed in French as "an"
+    instead of "année".
   - [22 Nov 03] Improved speed in relation by shortest path (computing
     of "next" links were not optimized).
   - [14 Nov 03] Improved speed of displaying by first name or by surname

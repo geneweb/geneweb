@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.163 2003-12-04 20:30:55 ddr Exp $
+# $Id: lexicon.txt,v 4.164 2003-12-07 20:07:39 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -8771,7 +8771,7 @@ eo: jaro/monato/tago
 es: a&ntilde;o/mes/d&iacute;a
 et: aasta/kuu/päev
 fi: vuosi/kuukausi/p&auml;iv&auml;
-fr: ann&eacute;e/mois/jour
+fr: ann&eacute;e/mois/jour/an
 he:  ùðä/ çåãù/ éåí
 is: ár/mánuður/dagur
 it: anno/mese/giorno
