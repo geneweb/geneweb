@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.58 2002-10-31 14:48:38 ddr Exp $ *)
+(* $Id: util.ml,v 4.59 2002-11-08 16:03:14 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1199,11 +1199,11 @@ value email_addr s i =
   | None -> None ]
 ;
 
-value dangerous_tags_list =
-  ["applet"; "embed"; "form"; "input"; "object"; "script"]
+value good_tags_list =
+  ["a"; "br"; "i"; "img"; "p"; "pre"]
 ;
 
-value dangerous_tag s i =
+value good_tag s i =
   let tag_id =
     loop i 0 where rec loop i len =
       if i = String.length s then Buff.get len
@@ -1213,7 +1213,7 @@ value dangerous_tag s i =
             loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
         | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
   in
-  List.mem tag_id dangerous_tags_list
+  List.mem tag_id good_tags_list
 ;
 
 value get_variable s i =
@@ -1280,8 +1280,8 @@ value string_with_macros conf env s =
               | _ -> do { Buffer.add_string buff "%"; i + 1 } ] ]
         in
         loop tt i
-      else if s.[i] = '<' && dangerous_tag s (i + 1) then do {
-        Buffer.add_string buff "..."; loop tt (i + 1)
+      else if s.[i] = '<' && not (good_tag s (i + 1)) then do {
+        Buffer.add_string buff "&lt;"; loop tt (i + 1)
       }
       else
         match tt with
