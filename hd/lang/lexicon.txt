@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.108 2000-06-05 10:23:05 ddr Exp $
+# $Id: lexicon.txt,v 3.109 2000-06-14 07:12:17 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2174,6 +2174,7 @@ de: verlobt
 dk: forlovet
 en: engaged
 fr: fianc&eacute;s
+nl: verloofd
 se: f&ouml;rlovad
 
     engaged%t to
@@ -2181,6 +2182,7 @@ de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
+nl: verloofd%t met
 se: f&ouml;rlovad%t med
 
     error
@@ -2531,6 +2533,7 @@ en: foster father/foster mother/foster parents
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   аб зешв/ ан зешвъ/ дешйн зешвйн
+nl: pleegvader/pleegmoeder/pleegouders
 no: fosterfar/fostermor/fosterforeldre
 ru: приемный отец/приемная мать/приемный родитель
 se: fosterfar/fostermor/fosterf&ouml;r&auml;ldrar
@@ -2543,6 +2546,7 @@ en: foster son/foster daughter/foster child
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 he:  бп зешв/ бъ зешвъ/ ймг зешв
+nl: pleegzoon/pleegdochter/pleegkind
 no: fosters&oslash;nn/fosterdatter/fosterbarn
 ru: приемный сын/приемная дочь/приемный ребенок
 se: fosterson/fosterdotter/fosterbarn
@@ -2755,6 +2759,7 @@ dk: vandret
 en: horizontally
 fi: vaakasuoraan
 fr: horizontalement
+nl: horizontaal
 se: horisontellt
 
     husband/wife
@@ -3284,6 +3289,7 @@ dk: mandlige linie/kvindelige linie
 en: male line/female line
 fi: miespuoleinen linja/naispuoleinen linja
 fr: ligne agnatique/ligne cognatique
+nl: mannelijke lijn/vrouwelijke lijn
 se: manliga linjen/kvinnliga linjen
 
     marriage of %t after his/her death
@@ -4713,6 +4719,7 @@ de: getrennt lebend
 dk: separeret
 en: separated
 fr: s&eacute;par&eacute;s
+nl: gescheiden
 se: separerat
 
     several answers
@@ -4778,6 +4785,7 @@ en: shortest path
 fi: lyhin polku
 fr: chemin le plus court
 it: legame piщ diretto
+nl: kortste weg
 no: korteste gren
 ru: кратчайший путь
 se: kortaste v&auml;gen
@@ -5034,6 +5042,7 @@ de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
 fr: liste &eacute;clair
+nl: bijnamen lijst
 se: efternamns lista
 
     switch
@@ -5474,6 +5483,7 @@ es: los %d casamientos m&aacute;s recientes
 fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
 it: gli ultimi %d matrimoni
+nl: de laatste %d huwelijken
 pt: os %d casamentos mais recentes
 se: de senaste %d дktenskapen
 

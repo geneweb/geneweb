@@ -7,6 +7,9 @@ GeneWeb version 3.06
     and we see the page blinking. Moreover, it has no sense (even if it is
     standard), since the HTTP header already contains that.
 
+* Lexicon (lang/lexicon.txt)
+  - [14 Jun 00] Completed Dutch lexicon (Bernard Ceurstemont).
+
 GeneWeb version 3.05
 --------------------
 
