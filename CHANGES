@@ -48,6 +48,8 @@ GeneWeb version 3.05
     are added in this file, for statistics.
 
 * Documentation
+  - [31 May 00] Added paragraph explaining how to install GeneWeb in server
+    mode under Windows NT (Falko Trojahn). English and German versions.
   - [25 May 00] Updated German documentation (Falko Trojahn).
   - [06 May 00] Updated Swedish documentation (Lars Gustavsson).
   - [04 May 00] Added one item in FAQ about a possible problem in CGI mode.

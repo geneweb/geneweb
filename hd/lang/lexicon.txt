@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.105 2000-05-30 07:41:59 ddr Exp $
+# $Id: lexicon.txt,v 3.106 2000-05-31 13:25:45 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -4712,6 +4712,7 @@ de: getrennt lebend
 dk: separeret
 en: separated
 fr: s&eacute;par&eacute;s
+se: separerat
 
     several answers
 af: verskeie antwoorde
