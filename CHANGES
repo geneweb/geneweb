@@ -7,7 +7,7 @@ GeneWeb version 3.02
 
 * GeneWeb Service/CGI (gwd)
   - [Dec 13, 99] In tree displays with several branches, add the spouse(s)
-    of the top person(s), like in other relationship tree displays.
+    of the top person(s).
   - [Dec 13, 99] Fixed bug: when merging two persons, the godchildren,
     possible children, foster children (and so on...) of the second
     person were not transferred to the first person (problem only
