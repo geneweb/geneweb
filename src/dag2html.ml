@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.8 1999-12-04 05:10:45 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.9 1999-12-04 06:10:00 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -492,6 +492,13 @@ value group_ghost t =
           if t.table.(i).(j - 1).elem = t.table.(i).(j).elem then
             t.table.(i + 1).(j) :=
               {elem = Ghost x; span = t.table.(i + 1).(j - 1).span}
+          else ()
+      | _ -> () ];
+      match (t.table.(i).(j-1).elem, t.table.(i).(j).elem) with
+      [ (Ghost x, Ghost _) ->
+          if t.table.(i+1).(j-1).elem = t.table.(i+1).(j).elem then
+            t.table.(i).(j) :=
+              {elem = Ghost x; span = t.table.(i).(j-1).span}
           else ()
       | _ -> () ];
     done;

@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.3 1999-12-04 05:10:45 ddr Exp $ *)
+(* $Id: dag.ml,v 3.4 1999-12-04 06:10:00 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -107,7 +107,14 @@ value print_dag conf base d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
+  let invert =
+    match Util.p_getenv conf.env "invert" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  let d = if invert then invert_dag d else d in
   let t = table_of_dag False d in
+  let t = if invert then invert_table t else t in
   let print_indi ip =
     let p = poi base ip in
     do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
