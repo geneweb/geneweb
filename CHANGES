@@ -2,8 +2,8 @@ GeneWeb version 3.11
 --------------------
 
 * Languages
-  - [04 Feb 01] Added more declinations applications for dates (to make
-    Estonian work better; may allow to improve other languages)
+  - [04 Feb 01] Added more declinations for dates (to make Estonian work
+    better)
   - [31 Jan 01] Added Estonian (Hanno Kuus)
 
 * GeneWeb server or CGI (gwd)
