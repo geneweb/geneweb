@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 4.2 2001-06-15 18:07:05 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 4.3 2001-06-18 07:06:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -135,9 +135,10 @@ value merge_fam conf base fam1 fam2 =
 ;
 
 value print conf base =
-  match (p_getint conf.env "f1", p_getint conf.env "f2") with
+  match (p_getint conf.env "i", p_getint conf.env "i2") with
   [ (Some f1, Some f2) ->
       let fam1 = base.data.families.get f1 in
-      let fam2 = base.data.families.get f2 in merge_fam conf base fam1 fam2
+      let fam2 = base.data.families.get f2 in
+      merge_fam conf base fam1 fam2
   | _ -> incorrect_request conf ]
 ;

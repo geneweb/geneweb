@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.10 2001-06-15 18:07:06 ddr Exp $ *)
+(* $Id: update.ml,v 4.11 2001-06-18 07:06:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -823,7 +823,7 @@ value print_family_stuff conf base p a u =
                  if cpl1.father = cpl2.father &&
                     cpl1.mother = cpl2.mother then
                     do {
-                   stag "a" "href=\"%sm=MRG_FAM;f1=%d;f2=%d;ip=%d\""
+                   stag "a" "href=\"%sm=MRG_FAM;i=%d;i2=%d;ip=%d\""
                      (commd conf) (Adef.int_of_ifam prev_fi)
                      (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index)
                    begin
