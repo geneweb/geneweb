@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.22 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.23 2005-03-01 05:50:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -236,7 +236,7 @@ value get_request strm =
   loop 0 strm
 ;
 
-ifdef UNIX then
+IFDEF UNIX THEN
 value timeout tmout spid _ =
   do {
     Unix.kill spid Sys.sigkill;
@@ -249,7 +249,7 @@ value timeout tmout spid _ =
     wflush ();
     exit 2
   }
-;
+END;
 
 value get_request_and_content strm =
   let request = get_request strm in
@@ -280,8 +280,8 @@ value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr fd =
   do {
-    ifdef NOFORK then ()
-    else ifdef UNIX then
+    IFDEF NOFORK THEN ()
+    ELSE IFDEF UNIX THEN
       if tmout > 0 then
         let spid = Unix.fork () in
         if spid > 0 then do {
@@ -298,7 +298,7 @@ value treat_connection tmout callback addr fd =
         }
         else ()
       else ()
-    else ();
+    ELSE () END END;
     let (request, script_name, contents) =
       let (request, contents) =
         let strm =
@@ -342,7 +342,7 @@ value treat_connection tmout callback addr fd =
 
 value buff = String.create 1024;
 
-ifdef WIN95 then
+IFDEF WIN95 THEN
 value copy_what_necessary t oc =
   let strm =
     let len = ref 0 in
@@ -362,7 +362,7 @@ value copy_what_necessary t oc =
   in
   let _ = get_request_and_content strm in
   ()
-;
+END;
 
 value rec list_remove x =
   fun
@@ -370,11 +370,13 @@ value rec list_remove x =
   | [y :: l] -> if x = y then l else [y :: list_remove x l] ]
 ;
 
-ifdef NOFORK then declare end else
-value pids = ref [];
-ifdef NOFORK then declare end else
-value cleanup_verbose = ref True;
-ifdef NOFORK then declare end else
+IFDEF NOFORK THEN declare end ELSE
+value pids = ref []
+END;
+IFDEF NOFORK THEN declare end ELSE
+value cleanup_verbose = ref True
+END;
+IFDEF NOFORK THEN declare end ELSE
 value cleanup_sons () =
   List.iter
     (fun p ->
@@ -399,9 +401,9 @@ value cleanup_sons () =
        if pid = 0 then ()
        else pids.val := list_remove pid pids.val)
      pids.val
-;
+END;
 
-ifdef NOFORK then declare end else
+IFDEF NOFORK THEN declare end ELSE
 value wait_available max_clients s =
   match max_clients with
   [ Some m ->
@@ -431,7 +433,7 @@ Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after 
         };
       }
   | None -> () ]
-;
+END;
 
 value wait_and_compact s =
   if Unix.select [s] [] [] 15.0 = ([], [], []) then do {
@@ -459,12 +461,13 @@ value skip_possible_remaining_chars fd =
 
 value accept_connection tmout max_clients callback s =
   do {
-    ifdef NOFORK then wait_and_compact s
-    else if noproc.val then wait_and_compact s
-    else wait_available max_clients s;
+    IFDEF NOFORK THEN wait_and_compact s
+    ELSE if noproc.val then wait_and_compact s
+    else wait_available max_clients s
+    END;
     let (t, addr) = Unix.accept s in
     Unix.setsockopt t Unix.SO_KEEPALIVE True;
-    ifdef NOFORK then
+    IFDEF NOFORK THEN
       let cleanup () =
         do {
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
@@ -477,7 +480,7 @@ value accept_connection tmout max_clients callback s =
         treat_connection tmout callback addr t;
         cleanup ();
       }
-    else ifdef UNIX then
+    ELSE IFDEF UNIX THEN
       match try Some (Unix.fork ()) with _ -> None with
       [ Some 0 ->
           do {
@@ -512,14 +515,14 @@ value accept_connection tmout max_clients callback s =
           }
       | None ->
           do { Unix.close t; Printf.eprintf "Fork failed\n"; flush stderr } ]
-    else do {
+    ELSE do {
       let oc = open_out_bin sock_in.val in
       let cleanup () = try close_out oc with _ -> () in
       try copy_what_necessary t oc with
       [ Unix.Unix_error _ _ _ -> ()
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
-      ifdef SYS_COMMAND then
+      IFDEF SYS_COMMAND THEN
         let comm =
           let stringify_if_spaces s =
             try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
@@ -530,7 +533,7 @@ value accept_connection tmout max_clients callback s =
           "-wserver " ^ string_of_sockaddr addr
         in
         let _ = Sys.command comm in ()
-      else if noproc.val then do {
+      ELSE if noproc.val then do {
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
         wserver_oc.val := oc;
@@ -557,7 +560,7 @@ let args = Sys.argv in
         let ic = open_in_bin sock_in.val in
         let request = get_request (Stream.of_channel ic) in
         close_in ic
-      ;
+      END;
       let cleanup () =
         do {
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
@@ -590,25 +593,28 @@ let args = Sys.argv in
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
     }
+    END END
   }
 ;
 
 value f addr_opt port tmout max_clients g =
   match
-    ifdef NOFORK then None
-    else ifdef WIN95 then
-      ifdef SYS_COMMAND then
+    IFDEF NOFORK THEN None
+    ELSE IFDEF WIN95 THEN
+      IFDEF SYS_COMMAND THEN
         let len = Array.length Sys.argv in
         if len > 2 && Sys.argv.(len - 2) = "-wserver" then
           Some Sys.argv.(len - 1)
         else None
-      else
+      ELSE
         try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
-    else None
+      END
+    ELSE None
+    END END
   with
   [ Some s ->
-      ifdef NOFORK then ()
-      else ifdef WIN95 then do {
+      IFDEF NOFORK THEN ()
+      ELSE IFDEF WIN95 THEN do {
         let addr = sockaddr_of_string s in
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
@@ -616,7 +622,8 @@ value f addr_opt port tmout max_clients g =
         ignore (treat_connection tmout g addr fd);
         exit 0
       }
-      else ()
+      ELSE ()
+      END END
   | None ->
       let addr =
         match addr_opt with
@@ -630,9 +637,9 @@ value f addr_opt port tmout max_clients g =
         Unix.setsockopt s Unix.SO_REUSEADDR True;
         Unix.bind s (Unix.ADDR_INET addr port);
         Unix.listen s 4;
-        ifdef NOFORK then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
-        else ifdef UNIX then let _ = Unix.nice 1 in ()
-        else ();
+        IFDEF NOFORK THEN Sys.set_signal Sys.sigpipe Sys.Signal_ignore
+        ELSE IFDEF UNIX THEN let _ = Unix.nice 1 in ()
+        ELSE () END END;
         let tm = Unix.localtime (Unix.time ()) in
         Printf.eprintf "Ready %4d-%02d-%02d %02d:%02d port"
           (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.53 2005-02-06 10:17:35 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.54 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -64,7 +64,7 @@ value obsolete_list = ref [];
 
 value obsolete version var new_var r =
   if List.mem var obsolete_list.val then r
-  else ifdef UNIX then do {
+  else IFDEF UNIX THEN do {
     Printf.eprintf "*** <W> updfam.txt: \"%s\" obsolete since v%s%s\n"
       var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
@@ -72,7 +72,7 @@ value obsolete version var new_var r =
     obsolete_list.val := [var :: obsolete_list.val];
     r
   }
-  else r
+  ELSE r END
 ;
 
 value bool_val x = VVbool x;

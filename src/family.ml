@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.51 2005-02-05 22:13:16 ddr Exp $ *)
+(* $Id: family.ml,v 4.52 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -565,11 +565,11 @@ value extract_henv conf base =
 ;
 
 value set_owner conf =
-  ifdef UNIX then
+  IFDEF UNIX THEN
     let s = Unix.stat (Util.base_path [] (conf.bname ^ ".gwb")) in
     try do { Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid; } with
     [ Unix.Unix_error _ _ _ -> () ]
-  else ()
+  ELSE () END
 ;
 
 value thousand oc x = Num.print (output_string oc) "," (Num.of_int x);

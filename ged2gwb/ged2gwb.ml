@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.52 2005-02-27 10:04:16 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.53 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -494,7 +494,7 @@ value using_token (p_con, p_prm) =
 value date_lexer =
   {Token.func s =
      (make_date_lexing s,
-      fun _ -> ifdef OCAML_308 then Token.dummy_loc else (0, 0));
+      fun _ -> IFDEF OCAML_308 THEN Token.dummy_loc ELSE (0, 0) END);
    Token.using = using_token; Token.removing _ = (); Token.tparse = tparse;
    Token.text _ = "<tok>"}
 ;

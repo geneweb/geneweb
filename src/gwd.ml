@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.77 2005-02-13 19:15:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.78 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -25,8 +25,9 @@ value log_file = ref "";
 value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
 ;
-ifdef UNIX then
-value max_clients = ref None;
+IFDEF UNIX THEN
+value max_clients = ref None
+END;
 value robot_xcl = ref None;
 value auth_file = ref "";
 value daemon = ref False;
@@ -1270,21 +1271,23 @@ value connection cgi (addr, request) script_name contents =
 ;
 
 value null_reopen flags fd =
-  ifdef UNIX then do {
+  IFDEF UNIX THEN do {
     let fd2 = Unix.openfile "/dev/null" flags 0 in
     Unix.dup2 fd2 fd;
     Unix.close fd2;
   }
-  else ()
+  ELSE () END
 ;
 
-ifdef SYS_COMMAND then
-value wserver_auto_call = ref False;
+IFDEF SYS_COMMAND THEN
+value wserver_auto_call = ref False
+END;
 
 value geneweb_server () =
   let auto_call =
-    ifdef SYS_COMMAND then wserver_auto_call.val
-    else try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
+    IFDEF SYS_COMMAND THEN wserver_auto_call.val
+    ELSE try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
+    END
   in
   do {
     if not auto_call then do {
@@ -1322,7 +1325,7 @@ Type %s to stop the service
     }
     else ();
     Wserver.f selected_addr.val selected_port.val conn_timeout.val
-      (ifdef UNIX then max_clients.val else None) (connection False)
+      (IFDEF UNIX THEN max_clients.val ELSE None END) (connection False)
   }
 ;
 
@@ -1436,21 +1439,21 @@ value mkdir_p x =
 value make_cnt_dir x =
   do {
     mkdir_p x;
-    ifdef WIN95 then do {
+    IFDEF WIN95 THEN do {
       Wserver.sock_in.val := Filename.concat x "gwd.sin";
       Wserver.sock_out.val := Filename.concat x "gwd.sou";
     }
-    else ();
+    ELSE () END;
     Util.cnt_dir.val := x;
   }
 ;
 
 value main () =
   do {
-    ifdef WIN95 then do {
+    IFDEF WIN95 THEN do {
       Wserver.sock_in.val := "gwd.sin"; Wserver.sock_out.val := "gwd.sou";
     }
-    else ();
+    ELSE () END;
     let usage =
       "Usage: " ^ Filename.basename Sys.argv.(0) ^
       " [options] where options are:"
@@ -1514,7 +1517,7 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
         "\n       Print the failed passwords in log");
        ("-nolock", Arg.Set Lock.no_lock_flag,
         "\n       Do not lock files before writing.") ::
-       ifdef UNIX then
+       IFDEF UNIX THEN
          [("-max_clients", Arg.Int (fun x -> max_clients.val := Some x), "\
 <num>
        Max number of clients treated at the same time (default: no limit)
@@ -1523,16 +1526,17 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
            "<sec>\n       Connection timeout (default " ^
              string_of_int conn_timeout.val ^ "s; 0 means no limit)");
           ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")]
-       else
+       ELSE
          [("-noproc", Arg.Set Wserver.noproc,
            "\n       Do not launch a process at each request.") ::
-          ifdef SYS_COMMAND then
+          IFDEF SYS_COMMAND THEN
             [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
               "\n       (internal feature)")]
-          else []]]
+          ELSE [] END]
+       END]
     in
     let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-    ifdef UNIX then
+    IFDEF UNIX THEN
       default_lang.val :=
         let s = try Sys.getenv "LANG" with [ Not_found -> "" ] in
         if List.mem s Version.available_languages then s
@@ -1542,7 +1546,7 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
             let s = String.sub s 0 2 in
             if List.mem s Version.available_languages then s else "en"
           else "en"
-    else ();
+    ELSE () END;
     arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun
       usage;
     Argl.parse speclist anonfun usage;
@@ -1596,7 +1600,7 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
 ;
 
 value test_eacces_bind err fun_name =
-  ifdef UNIX then
+  IFDEF UNIX THEN
     if err = Unix.EACCES && fun_name = "bind" then
       try
         do {
@@ -1611,7 +1615,7 @@ number greater than 1024.
       with
       [ Not_found -> False ]
     else False
-  else False
+  ELSE False END
 ;
 
 value print_exc exc =

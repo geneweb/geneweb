@@ -1,4 +1,4 @@
-(* $Id: lock.ml,v 4.2 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: lock.ml,v 4.3 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -7,7 +7,7 @@ value no_lock_flag = ref False;
 
 value control lname wait f =
   if no_lock_flag.val then Some (f ())
-  else ifdef UNIX then
+  else IFDEF UNIX THEN
     match
       try Some (Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666) with
       [ Unix.Unix_error _ _ _ -> None ]
@@ -33,7 +33,7 @@ value control lname wait f =
           | Right exc -> do { Unix.close fd; raise exc } ]
         }
     | None -> None ]
-  else
+  ELSE
     let r =
       try
         Left (Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666)
@@ -46,4 +46,5 @@ value control lname wait f =
         do { Unix.close fd; Some r }
     | Right (Unix.Unix_error _ _ _) -> None
     | Right exc -> raise exc ]
+  END
 ;

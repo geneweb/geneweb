@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.34 2005-02-19 14:19:39 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.35 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -865,10 +865,10 @@ value link gwo_list =
   do {
     assert (istr_empty = Adef.istr_of_int 0);
     assert (istr_quest = Adef.istr_of_int 1);
-    ifdef UNIX then Sys.remove "gwc_per_index" else ();
-    ifdef UNIX then Sys.remove "gwc_per" else ();
-    ifdef UNIX then Sys.remove "gwc_fam_index" else ();
-    ifdef UNIX then Sys.remove "gwc_fam" else ();
+    IFDEF UNIX THEN Sys.remove "gwc_per_index" ELSE () END;
+    IFDEF UNIX THEN Sys.remove "gwc_per" ELSE () END;
+    IFDEF UNIX THEN Sys.remove "gwc_fam_index" ELSE () END;
+    IFDEF UNIX THEN Sys.remove "gwc_fam" ELSE () END;
     List.iter (insert_comp_families gen) gwo_list;
     Printf.eprintf "\n"; flush stderr;
     close_out gen.g_per_index;
