@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.7 2000-11-23 18:40:09 ddr Exp $ *)
+(* $Id: consang.ml,v 3.8 2000-11-23 18:40:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -242,9 +242,7 @@ value relationship_and_links base ri b ip1 ip2 =
        reltab.(i2).lens2 := [(0, 1)];
        reltab.(i1).anc_stat1 := IsAnc;
        reltab.(i2).anc_stat2 := IsAnc;
-       while
-         qi.val <= qmax.val (*&& nb_anc1.val > 0 && nb_anc2.val > 0*)
-       do
+       while qi.val <= qmax.val && nb_anc1.val > 0 && nb_anc2.val > 0 do
          List.iter treat_ancestor ri.queue.(qi.val);
          incr qi;
        done;
