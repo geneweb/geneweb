@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.8 1999-12-14 05:16:08 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.9 1999-12-16 23:46:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -238,6 +238,7 @@ value rec copy_from_channel conf base ic =
                 (transl conf "(thousand separator)")
                 (Num.of_int wc)
           | 'd' -> print_date conf
+          | 'e' -> Wserver.wprint "%s" conf.charset
           | 'f' -> Wserver.wprint "%s" conf.command
           | 'g' ->
               do Wserver.wprint "%s?" conf.command;

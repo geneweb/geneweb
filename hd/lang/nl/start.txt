@@ -1,10 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.10 1999-11-25 11:21:13 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.11 1999-12-16 23:45:58 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
-  <title>Genealogie - %t</title>
   <meta name="ROBOTS" content="NONE">
+  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <title>Genealogie - %t</title>
 </head>
 <body%b>
 
