@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.35 2004-04-17 03:08:58 ddr Exp $ *)
+(* $Id: forum.ml,v 4.36 2004-04-18 21:38:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -180,6 +180,10 @@ value print_headers conf =
               }
               else
                 let (time, s) = get_var ic "Time:" s in
+                let ((time, s), deleted) =
+                  if time = "" then (get_var ic "****:" s, True)
+                  else ((time, s), False)
+                in
                 let (_, s) = get_var ic "From:" s in
                 let (ident, s) = get_var ic "Ident:" s in
                 let (wizard, s) = get_var ic "Wizard:" s in
@@ -233,6 +237,8 @@ value print_headers conf =
                 in
                 let (nmess, date, ndisp) =
                   if access = "priv" && not conf.wizard && not conf.friend then
+                    (nmess, prec_date, ndisp)
+                  else if deleted then
                     (nmess, prec_date, ndisp)
                   else
                     let ndisp =
@@ -290,32 +296,38 @@ value get_message conf pos =
         try
           do {
             seek_in ic (ic_len - pos);
-            let s = input_line ic in
-            let (time, s) = get_var ic "Time:" s in
-            let (_, s) = get_var ic "From:" s in
-            let (ident, s) = get_var ic "Ident:" s in
-            let (wizard, s) = get_var ic "Wizard:" s in
-            let (friend, s) = get_var ic "Friend:" s in
-            let (email, s) = get_var ic "Email:" s in
-            let (access, s) = get_var ic "Access:" s in
-            let (subject, s) = get_var ic "Subject:" s in
-            let (_, s) = get_var ic "Text:" s in
-            let (mess, s) =
-              get_mess 0 s where rec get_mess len s =
-                if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
-                  let s = String.sub s 2 (String.length s - 2) in
-                  let len = if len = 0 then len else Buff.store len '\n' in
-                  get_mess (Buff.mstore len s) (input_line ic)
-                else (Buff.get len, s)
-            in
-            if ident <> "" then
-              let m =
-                {m_time = time; m_ident = ident; m_wizard = wizard;
-                 m_friend = friend; m_email = email; m_access = access;
-                 m_subject = subject; m_mess = mess}
+            loop pos where rec loop pos =
+              let s = input_line ic in
+              let (time, s) = get_var ic "Time:" s in
+              let ((time, s), deleted) =
+                if time = "" then (get_var ic "****:" s, True)
+                else ((time, s), False)
               in
-              Some (m, ic_len - pos_in ic, ic_len)
-            else None
+              let (_, s) = get_var ic "From:" s in
+              let (ident, s) = get_var ic "Ident:" s in
+              let (wizard, s) = get_var ic "Wizard:" s in
+              let (friend, s) = get_var ic "Friend:" s in
+              let (email, s) = get_var ic "Email:" s in
+              let (access, s) = get_var ic "Access:" s in
+              let (subject, s) = get_var ic "Subject:" s in
+              let (_, s) = get_var ic "Text:" s in
+              let (mess, s) =
+                get_mess 0 s where rec get_mess len s =
+                  if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
+                    let s = String.sub s 2 (String.length s - 2) in
+                    let len = if len = 0 then len else Buff.store len '\n' in
+                    get_mess (Buff.mstore len s) (input_line ic)
+                  else (Buff.get len, s)
+              in
+              if deleted then loop (ic_len - pos_in ic)
+              else if ident <> "" then
+                let m =
+                  {m_time = time; m_ident = ident; m_wizard = wizard;
+                   m_friend = friend; m_email = email; m_access = access;
+                   m_subject = subject; m_mess = mess}
+                in
+                Some (m, pos, ic_len - pos_in ic, ic_len)
+              else None
           }
         with
         [ End_of_file -> None ]
@@ -377,18 +389,19 @@ value print_one_forum_message conf m pos next_pos forum_length =
         else
           let back_pos = backward_pos conf pos in
           match get_message conf back_pos with
-          [ Some (m, _, _) ->
+          [ Some (m, _, _, _) ->
               if m.m_access = "priv" && not conf.wizard && not conf.friend then
                 loop back_pos
-              else
+              else if back_pos <> pos then
                 Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
                   (commd conf) back_pos (capitale (message_txt conf 3))
+              else Wserver.wprint "&nbsp;"
           | None -> Wserver.wprint "&nbsp;" ];
       Wserver.wprint "<li>";
       loop next_pos where rec loop next_pos =
         if next_pos > 0 then
           match get_message conf next_pos with
-          [ Some (m, next_next_pos, _) ->
+          [ Some (m, next_pos, next_next_pos, _) ->
               if m.m_access = "priv" && not conf.wizard && not conf.friend then
                 loop next_next_pos
               else
@@ -452,7 +465,7 @@ value print_one_forum_message conf m pos next_pos forum_length =
 
 value print_forum_message conf base pos =
   match get_message conf pos with
-  [ Some (m, next_pos, forum_length) ->
+  [ Some (m, _, next_pos, forum_length) ->
       if m.m_access = "priv" && not conf.wizard && not conf.friend then
         print_forum_headers conf base
       else
@@ -646,8 +659,8 @@ value forum_del conf base pos next_pos =
           else
             let c = input_char ic in
             do {
-              if i < pos || i >= next_pos then output_char oc c
-              else ();
+              if i < pos || i >= pos + 4 then output_char oc c
+              else output_char oc '*';
               loop (i + 1);
             };
         close_in ic;
@@ -673,7 +686,7 @@ value print_del_ok conf base =
 
 value delete_forum_message conf base pos =
   match get_message conf pos with
-  [ Some (m, next_pos, forum_length) ->
+  [ Some (m, _, next_pos, forum_length) ->
       if conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
         passwd_in_file conf
       then
