@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.8 2001-08-22 09:09:59 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.9 2001-08-22 11:33:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -839,6 +839,17 @@ value unknown_fam gen i =
   and c = {father = father; mother = mother}
   and d = {children = [| |]} in
   (f, c, d)
+;
+
+value phony_fam gen =
+  let i = gen.g_fam.tlen in
+  let (fam, cpl, des) = unknown_fam gen i in
+  do {
+    assume_tab "gen.g_fam" gen.g_fam (Left3 "");
+    gen.g_fam.tlen := gen.g_fam.tlen + 1;
+    gen.g_fam.arr.(i) := Right3 fam cpl des;
+    Adef.ifam_of_int i
+  }
 ;
 
 value this_year =
@@ -2053,9 +2064,18 @@ value add_parents_to_isolated gen =
           let fn = gen.g_str.arr.(Adef.int_of_istr p.first_name) in
           let sn = gen.g_str.arr.(Adef.int_of_istr p.surname) in
           if fn = "?" && sn = "?" then ()
-          else
-            Printf.fprintf log_oc.val "<W> Isolated person: %s.%d %s\n"
-              fn p.occ sn
+          else do {
+            Printf.fprintf log_oc.val
+              "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn;
+            let ifam = phony_fam gen in
+            match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
+            [ Right3 fam cpl des ->
+                do {
+                  des.children := [| p.cle_index |];
+                  a.parents := Some ifam;
+                }
+            | _ -> () ];
+          }
         else ()
     | Left3 _ -> () ]
   }
@@ -2337,17 +2357,8 @@ value check_parents_sex base =
     let fath = poi base cpl.father in
     let moth = poi base cpl.mother in
     if fam.relation = NoSexesCheck then ()
-    else if fath.sex = Female || moth.sex = Male then do {
-      Printf.fprintf log_oc.val "Bad sex for parents\n";
-      Printf.fprintf log_oc.val "- father: %s (sex: %s)\n"
-        (denomination base fath) (string_of_sex fath.sex);
-      Printf.fprintf log_oc.val "- mother: %s (sex: %s)\n"
-        (denomination base moth) (string_of_sex moth.sex);
-      Printf.fprintf log_oc.val "=> family deleted\n\n";
-      flush log_oc.val;
-      effective_del_fam base (base.data.families.get i) cpl
-        (base.data.descends.get i)
-    }
+    else if fath.sex = Female || moth.sex = Male then
+      fam.relation := NoSexesCheck
     else do { fath.sex := Male; moth.sex := Female }
   }
 ;

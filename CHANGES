@@ -25,10 +25,14 @@ GeneWeb version 4.03
     "insert surname alias", the display became "insert first name alias".
 
 * Gedcom to GeneWeb (ged2gwb) and GeneWeb uncompiler (gwu)
-  - [22 Aug 01] In ged2gwb, added a system to recover another kind of
-    error found in (incorrect) GEDCOMs: sometimes, a person is spouse in a
-    family but neither husband or wife. In some cases, this is recovered
-    now.
+  - [22 Aug 01] In ged2gwb, recover now some errorred situations in
+    GEDCOMs which were rejected before: 1/ when a person is a spouse of a
+    family but neither husband nor wife in this family (now sometimes
+    recovered, but not always) 2/ when a father has female sex or a mother
+    has male sex (the family is silently set by the flag "no sexes
+    check"). Moreover, now ged2gwb automatically put parents to isolated
+    persons, so that the future cleanups of the data base do not suppress
+    them.
   - [17 Jul 01] Now, selecting surnames and ancestors/descendants is
     no more exclusive. It is therefore possible to select e.g. a surname
     *and* the ancestors of somebody.
