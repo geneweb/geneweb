@@ -5,6 +5,7 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [23 Dec 03] Nicer calendars page.
   - [23 Dec 03] Optimization: suppressed no-loop-check for added or
     modified marriages when it is not necessary (for big databases,
     this check can take much time and memory).
