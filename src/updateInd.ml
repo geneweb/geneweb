@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.5 2000-01-13 13:10:31 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.6 2000-01-17 13:58:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -239,7 +239,7 @@ value print_death_type conf base p =
     else ();
     Wserver.wprint "<option value=NotDead%s>"
       (match p.death with [ NotDead -> " selected" | _ -> "" ]);
-    Wserver.wprint "%s\n" (capitale (transl_nth conf "living" 2));
+    Wserver.wprint "%s\n" (capitale (transl_nth conf "alive" 2));
     Wserver.wprint "<option value=DontKnowIfDead%s>"
       (if be then ""
        else match p.death with [ DontKnowIfDead -> " selected" | _ -> "" ]);

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.3 2000-01-13 13:10:29 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.4 2000-01-17 13:58:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -90,7 +90,7 @@ value print_differences conf base branches p1 p2 =
       (fun p ->
          let is = 2 in
          match p.death with
-         [ NotDead -> transl_nth conf "living" is
+         [ NotDead -> transl_nth conf "alive" is
          | Death dr cd ->
              let s =
                match dr with
