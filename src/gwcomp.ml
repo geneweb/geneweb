@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.5 2000-01-15 18:55:53 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.6 2000-03-23 15:35:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -566,7 +566,7 @@ value set_infos str u l =
     | Some x -> Adef.codate_of_od x ]
   in
   do u.birth := naissance;
-     u.birth_place := birth_place;
+     if birth_place <> "" then u.birth_place := birth_place else ();
      u.birth_src := birth_src;
      u.baptism := baptism;
      u.baptism_place := baptism_place;
@@ -606,7 +606,7 @@ value parse_parent str l =
     (Defined u, np, l)
 ;
 
-value parse_child str surname csrc l =
+value parse_child str surname csrc cbp l =
   let u = create_person () in
   let (prenom, occ, l) = get_fst_name str l in
   do u.first_name := prenom; u.occ := occ; return
@@ -623,6 +623,7 @@ value parse_child str surname csrc l =
   in
   do u.surname := nom;
      u.psources := csrc;
+     u.birth_place := cbp;
   return
   let l = set_infos str u l in (u, l)
 ;
@@ -714,6 +715,12 @@ value read_family ic fname =
         | Some (str, ["csrc" :: _]) -> failwith str
         | _ -> ("", line) ]
       in
+      let (cbp, line) =
+        match line with
+        [ Some (str, ["cbp"; x]) -> (cut_space x, read_line ic)
+        | Some (str, ["cbp" :: _]) -> failwith str
+        | _ -> ("", line) ]
+      in
       let co = {father = cle_pere; mother = cle_mere} in
       let (comm, line) =
         match line with
@@ -729,7 +736,7 @@ value read_family ic fname =
               match read_line ic with
               [ Some (str, ["-" :: l]) ->
                   let (sex, l) = get_optional_sexe l in
-                  let (child, l) = parse_child str surname csrc l in
+                  let (child, l) = parse_child str surname csrc cbp l in
                   do child.sex := sex; return
                   if l <> [] then failwith str
                   else loop [child :: children]
