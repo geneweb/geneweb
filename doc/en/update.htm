@@ -51,6 +51,8 @@ of a child.
 
 <li> <a href="#SndP">5.6.</a> Send a Photo.
 
+<li> <a href="#DelPh">5.7.</a> Delete a Photo.
+
 </ul>
 
 <li> <a href="#MrgP">6.</a> How to merge two persons.
@@ -222,13 +224,15 @@ to the sections:
 
 If the data base owner gave the authorisation (see <a
 href="start.htm#Cnf">Configuration file</a>), you get the choice "Send
-photo". Report to the section:
+photo". Report to the sections:
 
 <p>
 
 <ul>
 
 <li> <a href="#SndP">Send a Photo</a>
+
+<li> <a href="#DelPh">Delete a Photo</a>
 
 </ul>
 
@@ -1119,7 +1123,7 @@ children.
 You see this form, titled "Send photo" from a personal record, after
 having clicked on "Update", then "Send photo", but only if the data
 base owner gave the <a href="start.htm#Cnf">authorization</a> for
-that.
+that, and if the field "photo" of the person is empty.
 
 <p>
 
@@ -1129,9 +1133,20 @@ already had a photo, yours replaces it.
 
 <p>
 
-Important: the field "Photo" of the person must be empty, otherwise
-this field is taken for the photo, not the photo you sent. If this
-field is filled, do "Update" and "Modify person" to delete it.
+Note: if the field "photo" of the person is not empty, you don't have
+access to "send photo". If you want to do it, do first "Update",
+"Modify person", and erase the contents of the field "photo".
+
+<h4> <a name="DelPh">5.7.</a> Delete a Photo </h4>
+
+You see this form, titled "Delete photo" from a personal record, after
+having clicked on "Update", then "Delete photo", but only if the data
+base owner gave the <a href="start.htm#Cnf">authorization</a> for
+that.
+
+<p>
+
+If you click on "Ok", the photo associated with the person is deleted.
 
 <h4> <a name="MrgP">6.</a> How to merge two persons </h4>
 

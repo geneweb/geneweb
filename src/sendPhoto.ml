@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendPhoto.ml,v 1.2 1999-02-13 23:43:19 ddr Exp $ *)
+(* $Id: sendPhoto.ml,v 1.3 1999-02-18 15:52:53 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -61,7 +61,55 @@ value print conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
       let p = base.data.persons.get ip in
-      print_send_photo conf base p
+      if sou base p.photo <> "" then incorrect_request conf
+      else print_send_photo conf base p
+  | _ -> incorrect_request conf ]
+;
+
+(* Delete photo form *)
+
+value print_delete_photo conf base p =
+  let title h =
+    do Wserver.wprint "%s"
+         (capitale (transl_decline conf "delete" (transl conf "photo")));
+       if h then ()
+       else
+         let fn = sou base p.first_name in
+         let sn = sou base p.surname in
+         let occ =
+         if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
+           else p.occ
+         in
+         do Wserver.wprint ": ";
+            Wserver.wprint "%s.%d %s" (coa conf fn) occ (coa conf sn);
+         return ();
+    return ()
+  in
+  do header conf title;
+     Wserver.wprint "\n";
+     tag "form" "method=POST action=\"%s\"" conf.command begin
+       Srcfile.hidden_env conf;
+       Wserver.wprint "<input type=hidden name=m value=DEL_PHOTO_OK>\n";
+       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+         (Adef.int_of_iper p.cle_index);
+       Wserver.wprint "\n";
+       html_p conf;
+       Wserver.wprint "<input type=submit value=Ok>\n";
+     end;
+     Wserver.wprint "\n";
+     trailer conf;
+  return ()
+;
+
+value print_del conf base =
+  match p_getint conf.env "i" with
+  [ Some ip ->
+      let p = base.data.persons.get ip in
+      if sou base p.photo <> "" then incorrect_request conf
+      else
+        match auto_photo_file conf base p with
+        [ Some _ -> print_delete_photo conf base p
+        | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;
 
@@ -172,6 +220,52 @@ value print_send_ok conf base =
           let file = raw_get conf "file" in
           effective_send_ok conf base p file
         else Update.error_digest conf base
+      with
+      [ Update.ModErr -> () ]
+  | Refuse -> Update.error_locked conf base ]
+;
+
+(* Delete photo form validated *)
+
+value print_deleted conf base p =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "photo deleted"))
+  in
+  do header conf title;
+     tag "ul" begin
+       html_li conf;
+       afficher_personne_referencee conf base p;
+       Wserver.wprint "\n";
+     end;
+     trailer conf;
+  return ()
+;
+
+value effective_delete_ok conf base p =
+  let bfname = default_photo_name base p in
+  let fname =
+    List.fold_right Filename.concat [Util.base_dir.val; "images"; conf.bname]
+      bfname
+  in
+  do if Sys.file_exists (fname ^ ".gif") then
+       move_file_to_old conf ".gif" fname bfname
+     else if Sys.file_exists (fname ^ ".jpg") then
+       move_file_to_old conf ".jpg" fname bfname
+     else incorrect conf;
+     print_deleted conf base p;
+  return ()
+;
+
+value print_del_ok conf base =
+  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  lock (Iobase.lock_file bfile) with
+  [ Accept ->
+      try
+        match p_getint conf.env "i" with
+        [ Some ip ->
+            let p = base.data.persons.get ip in
+            effective_delete_ok conf base p
+        | None -> incorrect conf ]
       with
       [ Update.ModErr -> () ]
   | Refuse -> Update.error_locked conf base ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.15 1999-02-12 12:37:15 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.16 1999-02-18 15:52:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -666,7 +666,7 @@ value print_add1 conf base p =
 
 value print_del1 conf base p =
   let title _ =
-    let s= transl_nth conf "person/persons" 0 in
+    let s = transl_nth conf "person/persons" 0 in
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
   do header conf title;

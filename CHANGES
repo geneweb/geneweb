@@ -6,6 +6,7 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 18, 99] Added deletion of photos.
   - [Feb 13, 99] Added ability to send photos.
   - [Feb 12, 99] Improved displaying in Hebrew language.
   - [Feb 8, 99] Fixed bug in CGI mode under Windows: images (flags e.g.) 
@@ -26,6 +27,8 @@ included.
     correctly, so that gwc did not work afterwards.
 
 * Documentation
+  - [Feb 18, 99] Explained how to delete photos (new feature) in file
+    "update.htm", (new) section 5.7.
   - [Feb 15, 99] Completed info for configuration files in file "start.htm", 
     section "File a.cnf". Explained how to send photo (new feature) in file
     "update.htm": added section 5.6, completed section 3.

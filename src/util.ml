@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 1.32 1999-02-15 13:28:30 ddr Exp $ *)
+(* $Id: util.ml,v 1.33 1999-02-18 15:52:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -952,4 +952,14 @@ value default_photo_name base p =
   let f = space_to_unders (Name.lower (sou base p.first_name)) in
   let s = space_to_unders (Name.lower (sou base p.surname)) in
   f ^ "." ^ string_of_int p.occ ^ "." ^ s
+;
+
+value auto_photo_file conf base p =
+  let s = default_photo_name base p in
+  let f =
+    List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
+  in
+  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
+  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else None
 ;
