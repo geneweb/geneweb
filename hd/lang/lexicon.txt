@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.191 2004-02-23 09:53:50 ddr Exp $
+# $Id: lexicon.txt,v 4.192 2004-03-02 11:50:39 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2266,6 +2266,7 @@ zh:  іцЙъУЪЅсИХµДјЗВј
     border
 bg: рамка
 br: bord 
+ca: vora
 da: ramme
 de: Rand
 en: border
@@ -2745,6 +2746,7 @@ sv: klicka "%s"
     color
 bg: цвят
 br: liv
+ca: color
 da: farve
 de: Farbe
 en: colour
@@ -5894,6 +5896,7 @@ sv: inga tr&auml;ffar
     no mention
 bg: не се споменава
 br: meneg ebet
+ca: no esmentat
 da: andet
 de: nicht erv&auml;hnt
 en: no mention
@@ -6045,6 +6048,7 @@ zh: ±ёЧў
 
     notes modified
 br: notenno&ugrave; kemmet
+ca: notes modificades
 da: noter &aelig;ndret
 de: ge&auml;nderte Notizen
 en: notes modified
