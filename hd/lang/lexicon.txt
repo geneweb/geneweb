@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.125 2002-11-29 13:26:55 ddr Exp $
+# $Id: lexicon.txt,v 4.126 2002-12-01 12:29:45 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -5214,6 +5214,10 @@ ro: adaugat mesajul
 ru: сообщение добавлено
 sl: sporoиilo dodano
 sv: meddelande inlagt
+
+    message deleted
+en: message deleted
+fr: message supprim&eacute;
 
     message/previous message/previous messages/next message
 af: boodskap/vorige boodskap/vorige boodskappe/volgende boodskap
