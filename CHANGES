@@ -1,6 +1,9 @@
 GeneWeb Intermediate version 2.02-1
 -----------------------------------
 
+* Setup program
+  - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
+
 * GeneWeb Daemon/CGI (gwd)
   - [May 7, 99] Fixed bug visible in Danish: the AE ligature ("&aelig;")
     was incorrectly capitalized.
