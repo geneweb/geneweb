@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.11 1999-07-28 07:48:42 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.12 1999-08-01 10:40:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -134,7 +134,7 @@ value print_choice conf base p niveau_effectif =
 value cnt = ref 0;
 
 value give_access conf base ia_asex p1 b1 p2 b2 =
-  do stag "a" "href=\"%sm=RL;i1=%d;b1=%s;i2=%d;b2=%s;opt=spouse\"" (commd conf)
+  do stag "a" "href=\"%sm=RL;i1=%d;b1=%s;i2=%d;b2=%s;spouse=on\"" (commd conf)
        (Adef.int_of_iper p1.cle_index)
        (Num.to_string (Util.sosa_of_branch [ia_asex :: b1]))
        (Adef.int_of_iper p2.cle_index)

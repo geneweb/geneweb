@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.90 1999-08-01 08:50:14 ddr Exp $
+# $Id: lexicon.txt,v 2.91 1999-08-01 10:40:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -395,6 +395,7 @@ se: en brylling
 
     a brother-in-law/a sister-in-law
 en: a brother-in-law/a sister-in-law
+es: un cu&ntilde;ado/una cu&ntilde;ada
 fr: un beau-fr&egrave;re/une belle-soeur
 
     a brother/a sister/a sibling
@@ -549,6 +550,7 @@ se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew (spouse's nephew)/a niece (spouse's niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
+es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
 
     a nephew/a niece
@@ -568,6 +570,7 @@ se: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
 en: a son-in-law/a daughter-in-law
+es: un yerno/una nuera
 fr: un beau-fils/une belle-fille
 
     a son/a daughter/a child
@@ -797,6 +800,7 @@ se: en ana
 
     an uncle (aunt's husband)/an aunt (uncle's wife)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
+es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fr: un oncle (&eacute;poux de la tante)/une tante (&eacute;pouse de l'oncle)
 
     an uncle/an aunt
@@ -3320,6 +3324,7 @@ se: f&ouml;rh&aring;llande%t med
 
     relationships by marriage
 en: relationships by marriage
+es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
 
     see
@@ -3795,6 +3800,7 @@ se: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
 en: the father-in-law/the mother-in-law
+es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
 
     the father/the mother/a parent
