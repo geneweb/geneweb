@@ -6,8 +6,8 @@
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>
 
-From your GeneWeb data base directory (<em>%b.gwb</em> for the base
-<em>%b</em>):<br><p>
+From your local GeneWeb data base directory (<em>%b.gwb</em> for the
+base named <em>%b</em>):<br><p>
 
 <ul>
 <li>
@@ -26,6 +26,13 @@ select the file named <b>notes</b>, if it exists:
 select the file named <b>patches</b>, if it exists:
 </ul>
 <input type=file name=patches size=60><br><p>
+
+<table border=1><tr><td>
+Warning: you have to select <b>all</b> these files when they exist.<br>
+Check that you forget none of them.
+</table>
+
+<p>
 
 <input type=submit value=Send>
 </form>
