@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.22 1999-12-30 21:45:26 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.23 2000-01-01 07:55:40 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -1135,39 +1135,6 @@ value fall2_left t =
           loop_j (j + 1) t
 ;
 
-(*
-value map_dag f d =
-  let a =
-    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
-  in
-  {dag = a}
-;
-
-value tag_dag d =
-  let c = ref 'A' in
-  map_dag
-    (fun v ->
-       let v = c.val in
-       do c.val :=
-            if c.val = 'Z' then 'a'
-            else if c.val = 'z' then '1'
-            else Char.chr (Char.code c.val + 1);
-       return String.make 1 v)
-    d
-;
-*)
-
-value table_of_dag no_optim d =
-  let t = tablify no_optim d in
-  let _ = fall d t in
-  let t = fall2_right t in
-  let t = fall2_left t in
-(*
-do print_char_table (tag_dag d) t; flush stderr; return
-*)
-  t
-;
-
 (* invert *)
 
 value invert_dag d =
@@ -1197,4 +1164,41 @@ value invert_table t =
        else ();
      done;
   return t'
+;
+
+(*
+value map_dag f d =
+  let a =
+    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
+  in
+  {dag = a}
+;
+
+value tag_dag d =
+  let c = ref 'A' in
+  map_dag
+    (fun v ->
+       let v = c.val in
+       do c.val :=
+            if c.val = 'Z' then 'a'
+            else if c.val = 'z' then '1'
+            else Char.chr (Char.code c.val + 1);
+       return String.make 1 v)
+    d
+;
+*)
+
+(* main *)
+
+value table_of_dag no_optim invert d =
+  let d = if invert then invert_dag d else d in
+  let t = tablify no_optim d in
+  let t = if invert then invert_table t else t in
+  let _ = fall d t in
+  let t = fall2_right t in
+  let t = fall2_left t in
+(*
+do print_char_table (tag_dag d) t; flush stderr; return
+*)
+  t
 ;

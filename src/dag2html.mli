@@ -1,4 +1,4 @@
-(* $Id: dag2html.mli,v 3.2 1999-12-21 14:32:54 ddr Exp $ *)
+(* $Id: dag2html.mli,v 3.3 2000-01-01 07:55:40 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -15,6 +15,4 @@ value print_html_table :
   (string -> unit) -> (node 'a -> unit) -> (node 'a -> bool) -> int
     -> dag 'a -> table idag -> unit;
 
-value table_of_dag : bool -> dag 'a -> table idag;
-value invert_dag : dag 'a -> dag 'a;
-value invert_table : table 'a -> table 'a;
+value table_of_dag : bool -> bool -> dag 'a -> table idag;
