@@ -2,6 +2,8 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [10 Oct 02] The GeneWeb logo in bottom of pages is now clickable
+    and return to the database welcome page.
   - [02 Oct 02] In displaying by surname, added ability to mask
     children: the families are prefixed by a clickable "o": when clicked,
     the same page is displayed but without the children of that family,
