@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.30 2002-12-09 22:42:42 ddr Exp $ *)
+(* $Id: family.ml,v 4.31 2003-02-04 13:21:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -70,34 +70,7 @@ value person_selected conf base p =
 ;
 
 value compact_list conf base xl =
-  let pl =
-    Sort.list
-      (fun p1 p2 ->
-         match
-           (Adef.od_of_codate p1.birth, p1.death, Adef.od_of_codate p2.birth,
-            p2.death)
-         with
-         [ (Some d1, _, Some d2, _) -> d1 strictly_before d2
-         | (Some d1, _, _, Death _ d2) ->
-             d1 strictly_before Adef.date_of_cdate d2
-         | (_, Death _ d1, Some d2, _) ->
-             Adef.date_of_cdate d1 strictly_before d2
-         | (_, Death _ d1, _, Death _ d2) ->
-             Adef.date_of_cdate d1 strictly_before Adef.date_of_cdate d2
-         | (Some _, _, _, _) -> False
-         | (_, Death _ _, _, _) -> False
-         | (_, _, Some _, _) -> True
-         | (_, _, _, Death _ _) -> True
-         | _ ->
-             let c = alphabetic (p_surname base p1) (p_surname base p2) in
-             if c == 0 then
-               let c =
-                 alphabetic (p_first_name base p1) (p_first_name base p2)
-               in
-               if c == 0 then p1.occ > p2.occ else c > 0
-             else c > 0 ])
-      xl
-  in
+  let pl = sort_person_list base xl in
   let pl =
     List.fold_right
       (fun p pl ->
