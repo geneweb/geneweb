@@ -2,6 +2,8 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [15 Sep 00] In ascendants long display, added notes for siblings if
+    any (they were missing).
   - [14 Sep 00] In update page, if the person's sex is unknown, the
     selection "add family" proposes now two case according to the sex.
   - [13 Sep 00] Fixed bug: problem of age at death in descendants page,

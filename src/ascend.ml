@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.42 2000-09-05 20:40:20 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.43 2000-09-15 12:04:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -568,7 +568,22 @@ value print_other_marriages conf base ws all_gp auth ifamo p u =
   else ()
 ;
 
-value print_family_long conf base ws all_gp ifam nth =
+value print_notes_ref conf base p wn n child_n =
+  if wn && age_autorise conf base p && person_has_notes base p then
+    do Wserver.wprint "[%s "
+         (capitale (transl_nth conf "note/notes" 0));
+       stag "strong" begin
+         stag "a" "href=\"#notes-%s%s\"" (Num.to_string n) child_n begin
+           Num.print wpr (transl conf "(thousand separator)") n;
+           Wserver.wprint "%s" child_n;
+         end;
+       end;
+       Wserver.wprint "].\n";
+    return ()
+  else ()
+;
+
+value print_family_long conf base ws wn all_gp ifam nth moth_nb =
   let cpl = coi base ifam in
   let des = doi base ifam in
   let auth =
@@ -610,10 +625,20 @@ value print_family_long conf base ws all_gp ifam nth =
               match n with
               [ Some _ -> ()
               | None ->
-                  for i = 0 to Array.length uc.family - 1 do
-                    print_marriage_long conf base all_gp auth None
-                      pc (uc.family.(i));
-                  done ];
+                  do for i = 0 to Array.length uc.family - 1 do
+                       print_marriage_long conf base all_gp auth None
+                         pc (uc.family.(i));
+                     done;
+                     let child_n =
+                       let s =
+                         String.make 1 (Char.chr (Char.code 'a' + i))
+                       in
+                       match nth with
+                       [ Some (_, i) -> "-" ^ string_of_int i ^ s
+                       | None -> s ]
+                     in
+                     print_notes_ref conf base pc wn moth_nb child_n;
+                  return () ];
               if i <> Array.length des.children - 1 then
                 Wserver.wprint "<br>&nbsp;\n"
               else ();
@@ -624,13 +649,14 @@ value print_family_long conf base ws all_gp ifam nth =
   return ()
 ;
 
-value print_other_families conf base all_gp excl_ifam moth_nb =
+value print_other_families conf base wn all_gp excl_ifam moth_nb =
   let print ip n =
     let u = uoi base ip in
     for i = 0 to Array.length u.family - 1 do
       let ifam = u.family.(i) in
       if ifam <> excl_ifam && Array.length (doi base ifam).children <> 0 then
-        print_family_long conf base True all_gp ifam (Some (n, i + 1))
+        print_family_long conf base True wn all_gp ifam (Some (n, i + 1))
+          moth_nb
       else ();
     done
   in
@@ -696,24 +722,14 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
                  return ()
              | _ -> () ]
          | None -> () ];
-         if wn && age_autorise conf base p && person_has_notes base p then
-           do Wserver.wprint "[%s "
-                (capitale (transl_nth conf "note/notes" 0));
-              stag "strong" begin
-                stag "a" "href=\"#notes-%s\"" (Num.to_string n) begin
-                  Num.print wpr (transl conf "(thousand separator)") n;
-                end;
-              end;
-              Wserver.wprint "].\n";
-           return ()
-         else ();
+         print_notes_ref conf base p wn n "";
          print_other_marriages conf base ws all_gp (age_autorise conf base p)
            ifamo p u;
          match ifamo with
          [ Some ifam ->
              if not (Num.even n) then
-               do print_family_long conf base ws all_gp ifam None;
-                  if ws then print_other_families conf base all_gp ifam n
+               do print_family_long conf base ws wn all_gp ifam None n;
+                  if ws then print_other_families conf base wn all_gp ifam n
                   else ();
                return ()
              else ()
@@ -734,26 +750,75 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
   | _ -> () ]
 ;
 
-value print_notes conf base =
-  fun
-  [ GP_person n ip _ ->
-      let p = poi base ip in
-      if age_autorise conf base p && person_has_notes base p then
-        let notes = sou base p.notes in
-        do Wserver.wprint "<dt>\n";
-           stag "strong" begin
-             stag "a" "name=\"notes-%s\"" (Num.to_string n) begin
-               stag "a" "href=#%s" (Num.to_string n) begin
-                 Num.print wpr (transl conf "(thousand separator)") n;
-               end;
-             end;
+value print_notes_for_someone conf base p n child_n =
+  if age_autorise conf base p && person_has_notes base p then
+    let notes = sou base p.notes in
+    do Wserver.wprint "<dt>\n";
+       stag "strong" begin
+         stag "a" "name=\"notes-%s%s\"" (Num.to_string n) child_n begin
+           stag "a" "href=#%s" (Num.to_string n) begin
+             Num.print wpr (transl conf "(thousand separator)") n;
+             Wserver.wprint "%s" child_n;
            end;
-           Wserver.wprint ": \n<dd>\n";
-           copy_string_with_macros conf notes;
-           Perso.print_sources conf base (notes <> "") p;
-           Wserver.wprint "<p>\n";
-        return ()
-      else ()
+         end;
+       end;
+       Wserver.wprint ": \n<dd>\n";
+       copy_string_with_macros conf notes;
+       Perso.print_sources conf base (notes <> "") p;
+       Wserver.wprint "<p>\n";
+    return ()
+  else ()
+;
+
+value print_notes_for_family conf base all_gp ifam nth moth_nb =
+  let des = doi base ifam in
+  for i = 0 to Array.length des.children - 1 do
+    let ipc = des.children.(i) in
+    let pc = poi base ipc in
+    let n = get_link all_gp ipc in
+    match n with
+    [ Some _ -> ()
+    | None ->
+        let child_n =
+          let s = String.make 1 (Char.chr (Char.code 'a' + i)) in
+          match nth with
+          [ Some (_, i) -> "-" ^ string_of_int i ^ s
+          | None -> s ]
+        in
+        print_notes_for_someone conf base pc moth_nb child_n ];
+  done
+;
+
+value print_notes_for_other_families conf base all_gp excl_ifam moth_nb =
+  let print ip n =
+    let u = uoi base ip in
+    for i = 0 to Array.length u.family - 1 do
+      let ifam = u.family.(i) in
+      if ifam <> excl_ifam && Array.length (doi base ifam).children <> 0 then
+        print_notes_for_family conf base all_gp ifam (Some (n, i + 1))
+          moth_nb
+      else ();
+    done
+  in
+  let cpl = coi base excl_ifam in
+  do print cpl.father (Num.sub moth_nb (Num.one));
+     print cpl.mother moth_nb;
+  return ()
+;
+
+value print_notes conf base all_gp ws =
+  fun
+  [ GP_person n ip ifamo ->
+      do print_notes_for_someone conf base (poi base ip) n "";
+         match ifamo with
+         [ Some ifam ->
+             if not (Num.even n) && ws then
+               do print_notes_for_family conf base all_gp ifam None n;
+                  print_notes_for_other_families conf base all_gp ifam n;
+               return ()
+             else ()
+         | _ -> () ];
+      return ()
   | _ -> () ]
 ;
 
@@ -801,7 +866,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
              Wserver.wprint "<h3>%s</h3>\n"
                (capitale (nominative (transl_nth conf "note/notes" 1)));
              tag "dl" begin
-               List.iter (print_notes conf base) all_gp;
+               List.iter (print_notes conf base all_gp ws) all_gp;
              end;
           return ()
         else ();
