@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.2 1998-09-07 11:36:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.3 1998-09-08 09:13:26 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -210,6 +210,29 @@ value propose_base conf =
   return ()
 ;
 
+value unauth typ =
+  let oc = log_oc () in
+  do Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
+     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" typ;
+     nl (); nl ();
+     Wserver.wprint "<head><title>%s access failed</title></head>\n" typ;
+     Wserver.wprint "<body><h1>%s access failed</h1></body>\n" typ;
+     Printf.fprintf oc "Ask for authenticate %s\n" typ;
+     flush_log oc;
+  return ()
+;
+
+value match_auth sauth uauth =
+  if sauth = "" then True
+(*
+  else if sauth.[0] = ':' then
+    match lindex uauth ':' with
+    [ Some i -> sauth = String.sub uauth i (String.length uauth - i)
+    | None -> sauth = uauth ]
+*)
+  else uauth = sauth
+;
+
 value connection_accepted cgi (addr, request) str env =
   let tm = Unix.localtime (Unix.time ()) in
   let iq = index '?' str in
@@ -262,8 +285,25 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     try List.assoc "friend_passwd" base_env with
     [ Not_found -> friend_passwd.val ]
   in
+  let (ok, wizard) =
+    if not cgi && passwd = "w" then
+      if real_wizard_passwd = "" then (True, True)
+      else
+        let auth = Wserver.extract_param "authorization: " '\r' request in
+        if auth = "" then (False, False)
+        else
+          let uauth =
+            let i = String.length "Basic " in
+            Base64.decode (String.sub auth i (String.length auth - i))
+          in
+          if match_auth real_wizard_passwd uauth then (True, True)
+          else (False, False)
+    else (True, passwd = real_wizard_passwd)
+  in
+  if not ok then unauth "Wizard"
+  else
   let conf =
-    {wizard = passwd = real_wizard_passwd;
+    {wizard = wizard;
      friend = passwd = real_friend_passwd;
      cgi = cgi;
      command = command;

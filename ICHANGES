@@ -4,6 +4,11 @@ Internal Changes
 GeneWeb Version 1.07
 --------------------
 
+* gwc:
+   - fix bug: hash table now with "crush_lower" names, not "strip_lower"
+     because error while compiling base with names "Marie d'Orange" and
+     "Marie Dorange", different in "gwd" but equal (beforewards) in "gwc".
+
 * gwd:
   - Don't display person number any more in update form when holding ? in
     his/her surname or first name
