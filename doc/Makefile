@@ -1,7 +1,7 @@
 all out opt: LICENSE.htm
 
 clean:
-	$(RM) LICENSE.htm
+	$(RM) -f LICENSE.htm
 
 LICENSE.htm: ../LICENSE
 	(echo "<head><title>License</title></head><body><pre>"; \
