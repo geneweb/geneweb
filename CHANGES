@@ -1,6 +1,10 @@
 GeneWeb version 3.07
 --------------------
 
+* GeneWeb Service/CGI (gwd)
+  - [19 Jul 00] Fixed bug in places/surnames displaying: some identical
+    places and surnames could be displayed several times.
+
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [18 Jul 00] Fixed Esperanto version (Thomas Ailleret).
 
