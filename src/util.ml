@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.23 1999-01-11 15:05:32 ddr Exp $ *)
+(* $Id: util.ml,v 1.24 1999-01-19 08:35:15 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -55,9 +55,9 @@ value html conf =
   else Wserver.html conf.charset
 ;
 
-value rindex s conf =
+value rindex s c =
   pos (String.length s - 1) where rec pos i =
-    if i < 0 then None else if s.[i] = conf then Some i else pos (i - 1)
+    if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
 ;
 
 value commd conf =
@@ -437,10 +437,7 @@ value transl_nth conf w n =
   [ Not_found -> "[" ^ nth_field w n ^ "]" ]
 ;
 
-value decl = " +decl";
-value decl_len = String.length decl;
-
-value decline conf s =
+value decline conf decl s =
   try
     let a = Hashtbl.find conf.lexicon decl in
     let (start, dest) =
@@ -461,16 +458,27 @@ value decline conf s =
   with [ Not_found -> s ]
 ;
 
+value plus_decl s =
+  match rindex s '+' with
+  [ Some i ->
+      if i > 0 && s.[i - 1] == ' ' then
+        let start = String.sub s 0 (i - 1) in
+        let decl = String.sub s (i - 1) (String.length s - (i - 1)) in
+        Some (start, decl)
+      else None
+  | None -> None ]
+;
+
 value transl_decline conf w s =
   let wt = transl conf w in
   if wt.[String.length wt - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then nth_field wt 1 ^ s
     else nth_field wt 0 ^ " " ^ s
-  else if String.length wt > decl_len
-  && String.sub wt (String.length wt - decl_len) decl_len = decl then
-    String.sub wt 0 (String.length wt - decl_len) ^
-      (if s = "" then "" else " " ^ decline conf s)
-  else wt ^ " " ^ s
+  else
+    match plus_decl wt with
+    [ Some (start, decl) ->
+        start ^ (if s = "" then "" else " " ^ decline conf decl s)
+    | None -> wt ^ " " ^ s ]
 ;
 
 value ftransl conf (s : format 'a 'b 'c) : format 'a 'b 'c =
