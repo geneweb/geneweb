@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.39 1999-05-13 08:54:07 ddr Exp $
+# $Id: lexicon.txt,v 2.40 1999-05-17 11:36:27 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1024,6 +1024,10 @@ nl: begraven
 no: begravet
 pt: enterrado/enterrada/enterrado(a)
 se: begravd
+
+    cancel GeneWeb links
+en: cancel GeneWeb links
+fr: annuler les liens GeneWeb
 
     cannot access base
 de: Datenbank nicht erreichbar

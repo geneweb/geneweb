@@ -13,6 +13,8 @@ GeneWeb Intermediate version 2.02-1
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 17, 99] Added, in ancestors displaying, the ability to cancel GeneWeb
+    links. Useful to extract a Web page for a site without GeneWeb server.
   - [May 16, 99] Fixed bug: in ascendants long displaying, did not display
     the last possible generation.
   - [May 15, 99] Added a "?" at end of empty requests (with just the data base

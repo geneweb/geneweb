@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.17 1999-05-16 03:55:31 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.18 1999-05-17 11:36:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -101,9 +101,9 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=S> %s\n"
         (capitale (transl conf "only the generation selected"));
-   end;
-   html_p conf;
-   tag "ul" begin
+    end;
+    html_p conf;
+    tag "ul" begin
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=M> %s\n"
         (capitale (transl conf "missing ancestors"));
@@ -122,9 +122,14 @@ value print_choice conf base p niveau_effectif =
           (capitale (transl conf "include missing spouses"));
         Wserver.wprint "<input type=checkbox name=ms value=on>\n";
       end;
-      
     end;
     html_p conf;
+    tag "ul" begin
+      html_li conf;
+      Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
+      Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+    end;
+    html_p conf;      
     Wserver.wprint "<input type=submit value=\"Ok\">";
     html_br conf;
   end
@@ -284,9 +289,13 @@ value print_generation_person conf base gp =
       do html_li conf;
          Num.print wpr (transl conf "(thousand separator)") n1;
          Wserver.wprint " =&gt; ";
-         stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-           Num.print wpr (transl conf "(thousand separator)") n2;
-         end;
+         let s =
+           let b = ref "" in
+           do Num.print (fun s -> b.val := b.val ^ s)
+                (transl conf "(thousand separator)") n2;
+           return b.val
+         in
+         Wserver.wprint "%s" (reference conf base p s);
          Wserver.wprint "\n\n";
       return ()
   | _ -> () ]
@@ -371,9 +380,11 @@ value title_reference conf base t =
   let ident = sou base t.t_ident in
   let place = sou base t.t_place in
   let s = if place = "" then ident else ident ^ " " ^ place in
-  "<em><a href=\"" ^ commd conf ^ "m=TT;sm=S;t=" ^
-  code_varenv ident ^ ";p=" ^ code_varenv place ^ "\">" ^
-  coa conf s ^ "</a></em>"
+  "<em>" ^
+  geneweb_link conf
+    ("m=TT;sm=S;t=" ^ code_varenv ident ^ ";p=" ^ code_varenv place)
+    (coa conf s) ^
+  "</em>"
 ;
 
 value strong_referenced_person_title_text conf base p =
@@ -381,7 +392,7 @@ value strong_referenced_person_title_text conf base p =
     match main_title base p with
     [ Some t ->
         "<strong>" ^ reference conf base p (titled_person_text conf base p t) ^
-        "</strong>, " ^ title_reference conf base t
+        "</strong>,\n" ^ title_reference conf base t
     | None ->
         "<strong>" ^ reference conf base p (person_text conf base p) ^
         "</strong>" ]
@@ -406,7 +417,7 @@ value print_persons_parents conf base all_gp p =
       let print ip =
         let p = poi base ip in        
         let link = get_link all_gp ip in
-        do Wserver.wprint " %s "
+        do Wserver.wprint " %s\n"
              (transl_decline conf "of (same or greater generation level)" "");
            Wserver.wprint "%s"
               (strong_referenced_person_title_text conf base p);
@@ -639,7 +650,7 @@ value print_generation_person_long conf base all_gp last_generation gp =
          | None -> () ];
          if age_autorise conf base p && person_has_notes base p then
            do Wserver.wprint "[%s "
-                (capitale (transl_nth conf "note/notes" 1));
+                (capitale (transl_nth conf "note/notes" 0));
               stag "strong" begin
                 stag "a" "href=\"#notes-%s\"" (Num.to_string n) begin
                   Num.print wpr (transl conf "(thousand separator)") n;
@@ -884,11 +895,10 @@ value print_generation_missing_persons conf base title sp_incl gp =
                [ Male -> (0, cpl.mother)
                | _ -> (1, cpl.father) ]
              in
-             do stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-                  Wserver.wprint "%s"
-                    (capitale
-                       (transl_nth conf "husband/wife" parent_name_index));
-                end;
+             do Wserver.wprint "%s"
+                  (geneweb_link conf (acces conf base p)
+                     (capitale
+                        (transl_nth conf "husband/wife" parent_name_index)));
                 Wserver.wprint " %s\n" (transl_decline conf "of" "");
                 afficher_personne_titre conf base (poi base conj);
                 Date.afficher_dates_courtes conf base (poi base conj);
@@ -1009,7 +1019,7 @@ value print_missing_ancestors conf base v spouses_included p =
      | None -> () ];
      Wserver.wprint ".\n";
      if not spouses_included then
-       do html_br conf; html_br conf;return
+       do html_br conf; html_br conf; return
        Wserver.wprint "%s %s...\n" (capitale (transl conf "parents"))
          (transl_decline conf "of" "")
      else ();  
@@ -1135,10 +1145,9 @@ value print_spouses conf base p =
 ;
 
 value print_someone_missing conf base begin_surname spouses_incl (mt, mtl, p) =
-  do stag "a" "href=\"%si=%d\"" (commd conf) (Adef.int_of_iper p.cle_index)
-     begin
-       Wserver.wprint "%s" (person_text_without_surname conf base p);
-     end;
+  do let href= "i=" ^ string_of_int (Adef.int_of_iper p.cle_index) in
+     Wserver.wprint "%s"
+       (geneweb_link conf href (person_text_without_surname conf base p));
      Wserver.wprint "%s" begin_surname;
      afficher_titre conf base p;
      Date.afficher_dates_courtes conf base p;
@@ -1282,8 +1291,8 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
         | None -> () ];
         Wserver.wprint ".\n";
         if not spouses_included then
-          do html_br conf; return
-          Wserver.wprint "%s %s:\n" (capitale (transl conf "parents"))
+          do html_br conf; html_br conf; return
+          Wserver.wprint "%s %s...\n" (capitale (transl conf "parents"))
             (transl_decline conf "of" "")
         else ();  
         tag "ul" begin
