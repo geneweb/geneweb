@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.97 2002-05-28 07:49:37 ddr Exp $
+# $Id: lexicon.txt,v 4.98 2002-06-04 11:45:54 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -29,6 +29,7 @@ zh: gb2312
      !dates order
 af: yymmdd
 ca: ddmmyy
+cs: yymmdd
 da: ddmmyy
 de: ddmmyy
 en: yymmdd
@@ -438,6 +439,7 @@ sv: ,
 
     (french revolution month)
 ca: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
+cs: Vendémiaire/Brumaire/Frimaire/Nivôse/Pluviôse/Ventôse/Germinal/Floréal/Prairial/Messidor/Thermidor/Fructidor/Complémentaire
 da: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 de: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
@@ -458,6 +460,7 @@ sv: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prair
 
     (hebrew month)
 ca: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
+cs: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 da: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 de: Tischri/Marcheschwan/Kislev/Tebet/Schebat/Adar/WeAdar/Nisan/Ijar/Siwan/Tammuz/Ab/Elul
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
@@ -2896,6 +2899,7 @@ sv: skilda
     don't group the common branches together
 af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
 ca: no reagrupar les branques comunes
+cs: nespojovat spolecné vetve
 da: sl&aring; ikke f&aelig;lles anelinier sammen
 de: gemeinsame Zweige nicht zusammenfassen
 en: don't group the common branches together
@@ -5193,6 +5197,7 @@ sv: inga tr&auml;ffar
     no sexes check
 af: geslag word nie aangedui nie
 ca: no verificar els sexes
+cs: bez kontroly pohlaví
 da: ingen verificering af k&oslash;nnene
 de: keine Kontrolle des Geschlechts
 en: no sexes check
@@ -7750,6 +7755,7 @@ sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
     undefined sex for %t
 af: geslag onbekend vir %t
 ca: no s'ha definit el sexe de %t
+cs: neznámé pohlaví pro %t
 da: udefineret k&oslash;n for %t
 de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
