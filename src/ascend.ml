@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.8 2000-01-14 23:14:30 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.9 2000-01-25 09:58:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -375,9 +375,12 @@ value afficher_ascendants_numerotation conf base niveau_max p =
        mark.(Adef.int_of_iper p.cle_index) := Num.one;
        generation 1 [GP_person Num.one p.cle_index None];
      end;
-     html_p conf;
-     Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) cnt.val
-       (transl_nth conf "person/persons" 1);
+     if cnt.val > 1 then
+       do html_p conf;
+          Wserver.wprint "%s: %d %s\n" (capitale (transl conf "total")) cnt.val
+            (transl_nth conf "person/persons" 1);
+       return ()
+     else ();
      trailer conf;
   return ()
 ;
@@ -936,6 +939,12 @@ value afficher_ascendants_niveau conf base niveau_max p =
        mark.(Adef.int_of_iper p.cle_index) := Num.one;
        generation 1 [GP_person Num.one p.cle_index None];
      end;
+     if cnt.val > 1 then
+       do html_p conf;
+          Wserver.wprint "%s: %d %s\n" (capitale (transl conf "total")) cnt.val
+            (transl_nth conf "person/persons" 1);
+       return ()
+     else ();
      trailer conf;
   return ()
 ;

@@ -5,6 +5,8 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [25 Jan 00] Display the number of persons in some more pages. Dont
+    display it when number <= 1.
   - [25 Jan 00] Changed the limit for public persons to 150 years instead
     of 100 years: persons must have been born and dead before 150 years
     to be public.

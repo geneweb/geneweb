@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.5 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: descend.ml,v 3.6 2000-01-25 09:58:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -299,13 +299,16 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
      Wserver.wprint ".";
      html_br conf;
      boucle 1 p (uoi base p.cle_index);
-     html_p conf;
-     Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) compte.val
-       (transl_nth conf "person/persons" 1);
-     if niveau_max > 1 then
-       Wserver.wprint " (%s)" (transl conf "spouses not included")
+     if compte.val > 1 then
+       do html_p conf;
+          Wserver.wprint "%s: %d %s" (capitale (transl conf "total"))
+            compte.val (transl_nth conf "person/persons" 1);
+          if niveau_max > 1 then
+            Wserver.wprint " (%s)" (transl conf "spouses not included")
+          else ();
+          Wserver.wprint ".\n";
+       return ()
      else ();
-     Wserver.wprint ".\n";
 (**)
      if niveau_max > 6 then exit_nobr () else ();
 (**)
