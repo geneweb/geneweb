@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.49 2000-09-20 09:03:20 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.50 2000-09-20 19:25:14 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -310,10 +310,10 @@ value set_base_conf b varenv =
   let varenv = List.map (fun (k, v) -> (k, v, ref False)) varenv in
   let rec extract line =
     fun
-    [ [(v, k, is_set) :: varenv] ->
-        if lowercase_start_with line (v ^ "=") then
+    [ [(k, v, is_set) :: varenv] ->
+        if lowercase_start_with line (k ^ "=") then
           do is_set.val := True; return
-          v ^ "=" ^ k
+          k ^ "=" ^ v
         else extract line varenv
     | [] -> line ]
   in
