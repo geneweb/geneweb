@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.48 2002-07-15 08:34:26 ddr Exp $ *)
+(* $Id: util.ml,v 4.49 2002-09-22 03:39:50 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1491,7 +1491,9 @@ value print_decimal_num conf f =
     if i == String.length s then ()
     else do {
       match s.[i] with
-      [ '.' -> Wserver.wprint "%s" (transl conf "(decimal separator)")
+      [ '.' ->
+         if i == String.length s - 1 then ()
+         else Wserver.wprint "%s" (transl conf "(decimal separator)")
       | x -> Wserver.wprint "%c" x ];
       loop (i + 1)
     }
