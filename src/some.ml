@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.31 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: some.ml,v 4.32 2005-02-15 09:14:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -99,7 +99,7 @@ value first_name_print_list conf base xl liste =
                [ (Some d1, Some d2) -> if d1 strictly_after d2 then -1 else 1
                | (Some d1, _) -> 1
                | _ -> -1 ]
-           | n -> n  ])
+           | n -> -n  ])
         liste
     in
     List.fold_left
