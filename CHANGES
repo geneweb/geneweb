@@ -46,7 +46,7 @@ GeneWeb version 2.07
 * Gedcom to GeneWeb (ged2gwb)
   - [Sep 28, 99] By default now, if a data base with the same name already
     exists, does not erase it and exits in error. Added option -f to
-    overwrite it.
+    overwrite the old version.
 
 * Consanguinity computing (consang)
   - [Sep 17..19, 99] Run faster when no modifications have been done (e.g. just
