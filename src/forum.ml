@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.9 2000-11-02 10:31:28 ddr Exp $ *)
+(* $Id: forum.ml,v 3.10 2000-11-02 13:59:50 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -157,7 +157,7 @@ value forum_add conf base ident comm =
 	       conf.today.year conf.today.month conf.today.day hh mm ss;
              Printf.fprintf oc "Ident: %s\n" ident;
              if email <> "" then Printf.fprintf oc "Email: %s\n" email else ();
-             let subject = if subject = "" then "?" else subject in
+             let subject = if subject = "" then "-" else subject in
              Printf.fprintf oc "Subject: %s\n" subject;
              Printf.fprintf oc "Text:\n";
              loop 0 True where rec loop i bol =
