@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.23 1999-12-17 00:19:41 ddr Exp $ *)
+(* $Id: relation.ml,v 3.24 1999-12-18 13:44:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -214,7 +214,7 @@ value print_relation_path_list conf base path =
                | Child -> transl_nth conf "a son/a daughter/a child" is ]
              in
              let of_txt =
-               if fl = Child then transl_decline conf "of" ""
+               if fl = Parent then transl_decline conf "of" ""
                else
                  transl_decline conf "of (same or greater generation level)" ""
              in
