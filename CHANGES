@@ -3,7 +3,7 @@ GeneWeb Version 1.11
 
 * GeneWeb daemon/CGI (gwd)
 --- [Jan 19, 99] Added direct links to siblings.
-  - [Jan 18, 99] Family comment now displayed like dates (possible
+  - [Jan 18, 99] Family comment now displayed like dates (=> possible
     visibility by password restriction).
 --- [Jan 18, 99] In notes and sources, the string "%s" is replaced by the
     name of the base in the same context. For example, in a source field,
