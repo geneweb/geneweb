@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.219 2001-02-05 10:47:34 ddr Exp $
+# $Id: lexicon.txt,v 3.220 2001-02-07 09:01:05 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2478,6 +2478,7 @@ se: f&ouml;rsvunnen
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
+nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 se: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
@@ -2524,8 +2525,10 @@ ru: â ðàçâîäå
 se: skilda
 
     don't group the common branches together
+de: gemeinsame Zweige nicht zusammenfassen
 en: don't group the common branches together
 fr: ne pas regrouper les branches communes
+nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
 se: gruppera inte ihop de gemensamma anlinjerna
 
@@ -3136,7 +3139,7 @@ se: gregoriansk/juliansk/franska rep./hebreisk
     happy birthday to you!
 af: Geluk met jou verjaarsdag!
 cs: v¹echno nejlep¹í k narozeninám!
-de: Herzlichen Gl&uuml;ckwunsch zum Geburstag!
+de: Herzlichen Glückwunsch zum Geburtstag!
 dk: til lykke med f&oslash;dselsdagen!
 en: happy birthday to you!
 eo: felicxan datrevenon!
