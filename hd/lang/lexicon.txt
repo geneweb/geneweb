@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.37 1999-05-10 15:45:54 ddr Exp $
+# $Id: lexicon.txt,v 2.38 1999-05-12 06:23:27 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2926,6 +2926,7 @@ pt: parentesco
 se: sl&auml;ktskap
 
     relationship%t to
+dk: forbindelse%t med
 en: relationship%t to
 fr: relation%t avec
 
@@ -3206,7 +3207,7 @@ se: efternamn/efternamn
 
     switch
 de: umkehren
-dk: skift
+dk: omvend r&aelig;kkef&oslash;lge
 en: switch
 es: cambiar
 fr: intervertir
@@ -3218,7 +3219,7 @@ se: byt ordning
 
     switch done
 de: umgekehrt
-dk: skiftet
+dk: r&aelig;kkef&oslash;lge omvendt
 en: switch done
 es: cambio hecho
 he:  ההחלפה בוצעה  
