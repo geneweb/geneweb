@@ -1,4 +1,5 @@
-(* $Id: gwtp.ml,v 1.30 2000-08-18 10:54:57 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.31 2000-08-18 12:46:08 ddr Exp $ *)
+(* (c) Copyright INRIA 2000 *)
 
 open Printf;
 
@@ -55,6 +56,55 @@ value cgi_from () =
 ;
 
 (* Utilitaires *)
+
+value crlf () =
+  do flush stdout;
+     let _ : int = Unix.write Unix.stdout "\r\n" 0 2 in ();
+  return ()
+;
+
+value lowercase_start_with s s_ini =
+  let len = String.length s_ini in
+  String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
+;
+
+value quote_escaped s =
+  let rec need_code i =
+    if i < String.length s then
+      match s.[i] with
+      [ '"' | '&' | '<' | '>' -> True
+      | x -> need_code (succ i) ]
+    else False
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i1 =
+        match s.[i] with
+        [ '"' -> i1 + 6
+        | '&' -> i1 + 5
+        | '<' | '>' -> i1 + 4
+        | _ -> succ i1 ]
+      in
+      compute_len (succ i) i1
+    else i1
+  in
+  let rec copy_code_in s1 i i1 =
+    if i < String.length s then
+      let i1 =
+        match s.[i] with
+        [ '"' -> do String.blit "&#034;" 0 s1 i1 6; return i1 + 6
+        | '&' -> do String.blit "&amp;" 0 s1 i1 5; return i1 + 5
+        | '<' -> do String.blit "&lt;" 0 s1 i1 4; return i1 + 4
+        | '>' -> do String.blit "&gt;" 0 s1 i1 4; return i1 + 4
+        | c -> do s1.[i1] := c; return succ i1 ]
+      in
+      copy_code_in s1 (succ i) i1
+    else s1
+  in
+  if need_code 0 then
+    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+  else s
+;
 
 value log_open () = 
   let fname = Filename.concat gwtp_tmp.val "gwtp.log" in
@@ -128,7 +178,7 @@ value html_escaped s =
 ;
 
 value gwtp_error txt =
-  do printf "content-type: text/html\r\n\r\n";
+  do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Error</title></head>\n<body>
 <h1><font color=red>Error</font></h1>
@@ -139,6 +189,61 @@ value gwtp_error txt =
 ;
 
 value gwtp_invalid_request str env = gwtp_error "Invalid request";
+
+(* Base configuration *)
+
+value get_base_conf b =
+  let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
+  let ic = open_in fname in
+  let wizpw = ref "" in
+  let fripw = ref "" in
+  do try
+       while True do
+         let line =
+           let line = input_line ic in
+           if String.length line > 0 && line.[String.length line - 1] = '\r'
+           then String.sub line 0 (String.length line - 1)
+           else line
+         in
+         if lowercase_start_with line "wizard_passwd=" then
+           let len = String.length "wizard_passwd=" in
+           wizpw.val := String.sub line len (String.length line - len)
+         else if lowercase_start_with line "friend_passwd=" then
+           let len = String.length "friend_passwd=" in
+           fripw.val := String.sub line len (String.length line - len)
+         else ();
+       done
+     with
+     [ End_of_file -> close_in ic ];
+  return (wizpw.val, fripw.val)
+;
+
+value set_base_conf b (wizpw, fripw) =
+  let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
+  let fname_out = Filename.concat gwtp_dst.val (b ^ "1.gwf" ) in
+  let fname_saved = fname ^ "~" in
+  let ic = open_in fname in
+  let oc = open_out fname_out in
+  do try
+       while True do
+         let line = input_line ic in
+         let line_out =
+           if lowercase_start_with line "wizard_passwd=" then
+             "wizard_passwd=" ^ wizpw
+           else if lowercase_start_with line "friend_passwd=" then
+             "friend_passwd=" ^ fripw
+           else
+             line
+         in
+         fprintf oc "%s\n" line_out;
+       done
+     with
+     [ End_of_file -> do close_in ic; close_out oc; return () ];
+     try Sys.remove fname_saved with [ Sys_error _ -> () ];
+     Sys.rename fname fname_saved;
+     Sys.rename fname_out fname;
+  return ()
+;
 
 (* Login and tokens *)
 
@@ -226,11 +331,6 @@ value set_token from b tok =
 
 (* Requests *)
 
-value lowercase_start_with s s_ini =
-  let len = String.length s_ini in
-  String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
-;
-
 value insert_file env bdir name =
   let fname = HttpEnv.decode (List.assoc (name ^ "_name") env) in
   let fname = filename_basename fname in
@@ -315,7 +415,8 @@ value printf_link_to_main b tok =
 value send_file str env b tok f fname =
   let fname = filename_basename fname in
   if fname = "base" then
-    do printf "content-type: text/html\r\n\r\n\
+    do printf "content-type: text/html"; crlf (); crlf ();
+       printf "\
 <head><title>Gwtp...</title></head>\n<body>
 <h1 align=center>Gwtp...</h1>
 <pre>\n";
@@ -331,7 +432,7 @@ value send_file str env b tok f fname =
        printf "</body>\n";
     return ()
   else
-    do printf "content-type: text/html\r\n\r\n";
+    do printf "content-type: text/html"; crlf (); crlf ();
        printf "\
 <head><title>Error</title></head>\n<body>
 <h1><font color=red>Error</font></h1>\n";
@@ -358,7 +459,7 @@ value gwtp_receive str env b tok =
   [ Some fname ->
       let fname = filename_basename fname in
       let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-      do printf "content-type: bin/geneweb\r\n\r\n";
+      do printf "content-type: bin/geneweb"; crlf (); crlf ();
          let ic = open_in (Filename.concat bdir fname) in
          do try
               while True do
@@ -372,8 +473,24 @@ value gwtp_receive str env b tok =
   | _ -> gwtp_invalid_request str env ]
 ;
 
+value gwtp_setconf str env b tok =
+  match (HttpEnv.getenv env "wizpw", HttpEnv.getenv env "fripw") with
+  [ (Some wizpw, Some fripw) ->
+      do printf "content-type: text/html"; crlf (); crlf ();
+       printf "\
+<head><title>Gwtp - configuration %s</title></head>\n<body>
+<h1 align=center>Gwtp - configuration %s</h1>
+" b b;
+         set_base_conf b (wizpw, fripw);
+         printf "Configuration changed\n";
+         printf_link_to_main b tok;
+         printf "</body>\n";
+      return ()
+  | _ -> gwtp_invalid_request str env ]
+;
+
 value gwtp_upload str env b tok =
-  do printf "content-type: text/html\r\n\r\n";
+  do printf "content-type: text/html"; crlf (); crlf ();
      copy_template [('b', b); ('t', tok)] "send";
      printf_link_to_main b tok;
      printf "</body>\n";
@@ -382,7 +499,7 @@ value gwtp_upload str env b tok =
 
 value gwtp_download str env b tok =
   let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-  do printf "content-type: text/html\r\n\r\n";
+  do printf "content-type: text/html"; crlf (); crlf ();
      if Sys.file_exists bdir then
        let dh = Unix.opendir bdir in
        do copy_template [('b', b); ('t', tok)] "recv";
@@ -413,14 +530,29 @@ value gwtp_download str env b tok =
   return ()
 ;
 
+value gwtp_config str env b tok =
+  let (wizpw, fripw) = get_base_conf b in
+  do printf "content-type: text/html"; crlf (); crlf ();
+     copy_template
+       [('b', b); ('t', tok); ('w', quote_escaped wizpw);
+        ('f', quote_escaped fripw)]
+       "conf";
+     printf_link_to_main b tok;
+     printf "</body>\n";
+  return ()
+;
+
 value gwtp_main str env b tok =
-  do printf "content-type: text/html\r\n\r\n";
+  do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Gwtp - %s</title></head>\n<body>
 <h1 align=center>Gwtp - %s</h1>
 <ul>\n" b b;
      printf "<li><a href=\"gwtp?m=UPL;b=%s;t=%s\">Upload</a>\n" b tok;
      printf "<li><a href=\"gwtp?m=DNL;b=%s;t=%s\">Download</a>\n" b tok;
+(*
+     printf "<li><a href=\"gwtp?m=CNF;b=%s;t=%s\">Configuration</a>\n" b tok;
+*)
      printf "</ul>\n";
      if gw_site.val <> "" then
        do printf "<p>\n<ul>\n";
@@ -433,7 +565,7 @@ value gwtp_main str env b tok =
 ;
 
 value gwtp_login str env =
-  do printf "content-type: text/html\r\n\r\n";
+  do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Gwtp</title></head>\n<body>
 <h1>Gwtp</h1>
@@ -515,8 +647,10 @@ value gwtp () =
      | Some "MAIN" -> gwtp_logged from str env gwtp_main
      | Some "UPL" -> gwtp_logged from str env gwtp_upload
      | Some "DNL" -> gwtp_logged from str env gwtp_download
+     | Some "CNF" -> gwtp_logged from str env gwtp_config
      | Some "SEND" -> gwtp_logged from str env gwtp_send
      | Some "RECV" -> gwtp_logged from str env gwtp_receive
+     | Some "SCNF" -> gwtp_logged from str env gwtp_setconf
      | Some _ -> gwtp_invalid_request str env
      | None -> gwtp_login str env ];
      flush stdout;
