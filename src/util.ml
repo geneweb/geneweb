@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.70 2000-09-13 15:43:24 ddr Exp $ *)
+(* $Id: util.ml,v 3.71 2000-09-20 20:02:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -751,7 +751,7 @@ value default_body_prop conf =
 value body_prop conf =
   try
     match List.assoc "body_prop" conf.base_env with
-    [ "" -> ""
+    [ "" -> default_body_prop conf
     | s -> " " ^ s ]
   with
   [ Not_found -> default_body_prop conf ]
