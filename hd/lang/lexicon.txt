@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.170 2003-12-16 13:43:36 ddr Exp $
+# $Id: lexicon.txt,v 4.171 2003-12-17 06:48:13 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -6548,6 +6548,7 @@ sl: oznaka
 sv: smeknamn
 
     rape
+da: voldt&aelig;gt
 en: rape
 fr: viol
 pl: gwa³t
@@ -6947,6 +6948,7 @@ sl: spol
 sv: k&ouml;n
 
     sexual abuse%t with
+da: har misbrugt%t/offer for seksuelt misbrug%t ved
 en: having abused%t/victim of sexual abuse%t by
 fr: ayant abus&eacute; sexuellement%t de/victime d'abus sexuel%t de
 pl: zgwalcil%t/zgwalcona%t przez
