@@ -13,6 +13,8 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
+  - [Sep 15, 99] Added calendars for dates (Gregorian, Julian, French
+    Republic).
   - [Sep 11, 99] Added ability to specify an authorization file for wizards
     and for friends: several users and passwords can be defined. The file
     name has to be given in the "base.gwf" file. Works only in service mode

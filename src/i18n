@@ -75,6 +75,7 @@ born
 branch/branches
 burial
 buried
+calendar
 cancel GeneWeb links
 candidate father/candidate mother/candidate parents
 candidate son/candidate daughter/candidate child
@@ -93,6 +94,7 @@ cousins (general term)
 create
 cremated
 date
+day/month/year
 days old
 dead young
 death
@@ -126,6 +128,7 @@ godfather/godmother/godparents
 godson/goddaughter/godchild
 grand-parents
 great-grand-parents
+gregorian/julian/french/hebrew
 happy birthday to you!
 having as children
 here
@@ -215,6 +218,7 @@ person modified
 person/persons
 persons having the same name
 place
+precision
 previous sibling
 private
 probable loop in base
@@ -252,6 +256,7 @@ surname/surnames
 switch
 switch done
 switch the order of the following families
+text
 the %d first names
 the %d surnames
 the %s generation

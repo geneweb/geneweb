@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.25 1999-09-14 22:33:50 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.26 1999-09-15 00:34:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -640,7 +640,8 @@ value main () =
         ("-nc", Arg.Clear do_check, "No consistency check");
         ("-cg", Arg.Set do_consang, "Compute consanguinity");
         ("-sh", Arg.Int (fun x -> shift.val := x),
-         "<int> Shift all persons numbers")]
+         "<int> Shift all persons numbers");
+        ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
        (fun x ->
           do if Filename.check_suffix x ".gw" then ()
              else if Filename.check_suffix x ".gwo" then ()

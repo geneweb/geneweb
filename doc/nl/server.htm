@@ -71,7 +71,7 @@ Onder Unix, als <em>GeneWeb</em> bijvoorbeeld geïnstalleerd is in "/home/jansen/
      #!/bin/sh
      DIR=/home/dupont/geneweb/gw
      cd $DIR
-     $DIR/gwd -cgi
+     $DIR/gwd -cgi 2>/dev/null
 </pre>
 
 Maak deze shell scipt executable (chmod +x geneweb) en vraag uw systembeheerder om dit bestand te installeren in de directory "cgi". Hij zal je ook de url zeggen die je kan gebruiken, vb:
