@@ -10,7 +10,7 @@ function WorkOnBrowser() {
 }
 // --></script>
 
-<table border="0">
+<table border="0" width="100%%">
 <tr align="left">
 <td align="center">
 <a href="%glang=af"
