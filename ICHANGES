@@ -5,6 +5,9 @@ GeneWeb Version 2.08
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Oct 25, 99] Commented the loading of the whole persons and families
+    arrays in "descend.ml": supposed to make things go faster but consumming
+    13M in my data base when clicking on "descendants" for anybody.
   - [Oct 15, 99] Added a check of month day in gregorian dates.
   - [Oct 9, 99] Added a "suicide" request: if exists in the request,
     the sender go the the robot black list... by setting a hidden URL with
