@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.9 2000-10-17 13:21:10 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.10 2000-10-21 12:24:20 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -274,7 +274,7 @@
         <a href="%prefix;m=D;%access;"><b><font
          color=%highlight;>[*descendants]</font></b></a>
       %end;
-      %if;has_grand_parents;
+      %if;(father.has_parents or mother.has_parents)
         <li>
         <a href="%prefix;m=C;%access;"><b><font
          color=%highlight;>[*cousins (general term)]</font></b></a>
