@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.4 2000-11-07 14:56:00 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 3.5 2000-11-11 13:07:45 ddr Exp $ *)
 
 open Printf
 
@@ -69,7 +69,9 @@ missing entries are displayed together with their English and French
 translations.
 <p>
 If you want to collaborate, you can <a
-href=\"mailto:daniel.de_rauglaudre@inria.fr\">send me</a> the translations in
+href=\"mailto:daniel.de_rauglaudre@inria.fr?subject=Missing translations\">send
+me</a>
+the translations in
 the given language if you know it. Thanks.
 <p align=center>
 <tt>
