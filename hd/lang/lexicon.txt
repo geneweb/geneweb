@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.55 2001-11-27 12:10:31 ddr Exp $
+# $Id: lexicon.txt,v 4.56 2001-11-28 11:54:21 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -5888,7 +5888,7 @@ is: sambúð%t með
 it: legame%t con
 lv: %t attiecîbas ar
 nl: verbonden%t met
-no: forbindelse%t med
+no: familie%t med
 pl: zwi±zek%t z:
 pt: relacionado%t com/relacionada%t com
 pt-br: junto%t com
