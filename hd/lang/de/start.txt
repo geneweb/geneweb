@@ -23,7 +23,7 @@ Es handelt sich:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Um einen <em>Vornamen mit Nachnamen</em>
-oder einen <em>&ouml;ffentlicher Namen</em>
+oder einen <em>&ouml;ffentlichen Namen</em>
 oder einen <em>Alias</em>.
 <li> <input type=radio name=t value=P>
 Um einen <em>Vornamen</em>.
