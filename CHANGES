@@ -1,3 +1,15 @@
+GeneWeb version 3.09
+--------------------
+
+* GeneWeb compiler (gwc)
+  - [03 Oct 00] Fixed bug: there were an inconsistency between "gwc"
+    and the inline updating, for persons "keys": the inline updating
+    considered spaces in names as significant but not "gwc". Result:
+    when cleaning up a data base (gwu + gwc) or when importing a data
+    base from an old version of GeneWeb, it could cause names conflict
+    errors (for example if both "Anne.0 Le Blanc" and "Anne.0 Leblanc"
+    were defined).
+
 GeneWeb version 3.08
 --------------------
 
