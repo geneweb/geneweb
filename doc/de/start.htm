@@ -1,0 +1,363 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.6 i586) [Netscape]">
+   <title>GeneWeb - Getting Started</title>
+</head>
+<body>
+
+<h1>
+GeneWeb - Erste Schritte</h1>
+Das vorliegende Kapitel enth&auml;lt eine Einf&uuml;hrung zu <i>GeneWeb</i>
+mit einer kurzen Beschreibung von Befehlen und Dateien f&uuml;r einen schnellen
+Einstieg.
+<ul>
+<li>
+<a href="#Int">Einleitung</a></li>
+
+<li>
+<a href="#Gwc">Der Befehl gwc</a></li>
+
+<li>
+<a href="#Ged">Der Befehl ged2gwb</a></li>
+
+<li>
+<a href="#Gee">Der Befehl gwb2ged</a></li>
+
+<li>
+<a href="#Gwd">Der Befehl gwd</a></li>
+
+<li>
+<a href="#Csg">Der Befehl consang</a></li>
+
+<li>
+<a href="#Gwu">Der Befehl gwu</a></li>
+
+<li>
+<a href="#Cnf">Die Datei a.gwf</a></li>
+
+<li>
+<a href="#Lex">Das Verzeichnis "lang" - die Datei "lexicon.txt"</a></li>
+
+<li>
+<a href="#Lng">Das Verzeichnis "lang" - die Unterverzeichnisse</a></li>
+</ul>
+
+<h4>
+<a NAME="Int"></a>Einleitung</h4>
+Zur Konfiguration und zum Start von <i>GeneWeb&nbsp;</i> mu&szlig; man
+interaktive Befehle benutzen. Unter Unix, starte ein xterm-Fenster. Unter
+Windows 95/NT, klicke auf "Start", "Programme" und "Eingabeaufforderung".
+<p>In diesem Fenster wechsle in das Verzeichnis, wo du <i>GeneWeb</i> installiert
+hast:
+<ul>
+<li>
+Unter Unix, z. B. wenn installiert in "/home/meier/geneweb":</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; cd /home/meier/geneweb</pre>
+
+<li>
+Unter Window 95/NT, wenn installiert in: "C:\soft\geneweb":</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; cd c:\soft\geneweb</pre>
+</ul>
+Alle <i>GeneWeb</i> Befehle k&ouml;nnen mit der Option "-help" aufgerufen
+werden, wodurch die verschiedenen m&ouml;glichen Optionen sowie eine kurze
+Erkl&auml;rung angezeigt werden.
+<p>Wenn du zum Beispiel eingibst:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwd -help</pre>
+erh&auml;lst du so etwas wie:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Usage: gwd [options] where options are:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -hd &lt;dir>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Directory where the directory lang is installed.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -bd dir>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Directory where the databases are installed.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -cgi&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Force cgi mode.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -p &lt;number>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select a port number (default = 2317); > 1024 for normal users.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -wizard &lt;passwd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set a wizard passord: access to all dates and updating.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -friend &lt;passwd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set a friend password: access to all dates.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -lang &lt;lang>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set a default language (default: fr).
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -only &lt;address>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Only inet address accepted.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -auth &lt;file>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Authorization file to restrict access. The file must hold lines
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; of the form "user:password".
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -log &lt;file>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Redirect log trace to this file.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -nolock&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Do not lock files before writing.</pre>
+Einige Befehle sind ziemlich "schwatzhaft". Du kannst ihre Anzeige in eine
+Datei umleiten durch Anh&auml;ngen von "> Datei". Beispiel:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwd -help > blabla.txt</pre>
+<i>GeneWeb</i> Datenbanken sind Verzeichnisse mit der Erweiterung ".gwb".
+<h4>
+<a NAME="Gwc"></a>Der Befehl gwc</h4>
+Um <i>GeneWeb </i>zu benutzen, mu&szlig; man eine Datenbank anlegen. Du
+kannst das mit dem Befehl "gwc" oder mit "ged2gwb" machen, siehe folgender
+Abschnitt.
+<p>Der Befehl "gwc" legt in seiner einfachsten Verwendung eine leere Datenbank
+an: unter
+<i>GeneWeb </i>kann sie gef&uuml;llt werden.
+<p>Du mu&szlig;t dieser Datenbank einen Namen geben. Ein beliebiger Name
+ist m&ouml;glich. Vorzugsweise sollten nicht mehr als 8 Zeichen verwendet
+werden.
+<p>Zum Beispiel, wenn die Datenbank "Meier" hei&szlig;en soll, schreibe:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwc -o Meier</pre>
+
+<h4>
+<a NAME="Ged"></a>Der Befehl ged2gwb</h4>
+Eine andere Art eine <i>GeneWeb</i> Datenbank anzulegen ist, mit einer
+GEDCOM Datei zu beginnen.
+<p>Der Befehl "ged2gwb" erlaubt es, eine GEDCOM Datei in eine
+<i>GeneWeb</i>
+Datenbank umzuwandeln.
+<p>Die einfachste Art ist, zuerst die GEDCOM Datei in das Verzeichnis zu
+kopieren, wo <i>GeneWeb </i>installiert wurde. Mach es mit deiner Methode,
+Dateien zu Kopieren, entweder mit einem interaktiven Befehl, oder per Icon-Bewegung.
+<p>Wenn deine GEDCOM Datei zum Beispiel "blabla.ged" hei&szlig;t und du
+eine Datenbank&nbsp; "Meier" nennen willst, gib ein:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ged2gwb blabla.ged -o Meier</pre>
+Der Befehl ist etwas mitteilsam, besonders wenn er Fehler in der GEDCOM
+Datei findet. Du kannst diese Fehler zuerst einmal ignorieren: deine Datenbank
+wird trotzdem erzeugt. Wenn alles in Ordnung ist, mu&szlig; die Ausschrift
+enden mit:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; *** Ok</pre>
+
+<h4>
+<a NAME="Gee"></a>Der Befehl gwb2ged</h4>
+Bevor wir weitermachen, m&ouml;chten wir noch auf den umgekehrten Befehl
+"gwb2ged" hinweisen, welcher aus einer <i>GeneWeb</i> Datenbank eine GEDCOM
+Datei erzeugt.
+<h4>
+<a NAME="Gwd"></a>Der Befehl gwd</h4>
+Wenn erstmal eine Datenbank mit einem der Befehle "gwc" oder "ged2gwb"
+erzeugt wurde, kannst du diese abfragen und erweitern.
+<p>Gib im Eingabefenster ein:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwd</pre>
+Dieser Befehl startet den <i>GeneWeb</i> "daemon". Das Programm mu&szlig;
+ausgeben:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; GeneWeb 1.0 - Copyright (c) INRIA 1999
+&nbsp;&nbsp;&nbsp;&nbsp; Possible addresses:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; http://localhost:2317/base
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; http://127.0.0.1:2317/base
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; http://address:2317/base
+&nbsp;&nbsp;&nbsp;&nbsp; where "base" is the name of the data base
+&nbsp;&nbsp;&nbsp;&nbsp; Type control C to stop the service
+&nbsp;&nbsp;&nbsp;&nbsp; Ready (day) (hour) port 2317...</pre>
+Beachte, dass du im Eingabefenster keinen Prompt siehst. Das Programm wartet
+auf Anfragen, die du per Web-Browser sendest. Wenn es eine Anfrage erh&auml;lt,
+wird diese verarbeitet und wieder gewartet. Beenden kann man <i>GeneWeb</i>
+durch Dr&uuml;cken von control-C im Eingabefenster.
+<p>So, jetzt k&ouml;nnen wir wirklich anfangen. Da du diese Dokumentation
+liest, benutzt du einen Web-Browser. Mache in diesem Browser ein neues
+Fenster auf und gehe zur folgenden URL. Ersetze "smith" mit dem Namen deiner
+Datenbank. Achtung: setze nicht den kompletten Namen ein (wie "c:\geneweb\smith"
+or "/home/geneweb/smith"), sondern nur "smith":
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; http://localhost:2317/smith</pre>
+Nun siehst Du die <i>GeneWeb Startseite</i>&nbsp; in Franz&ouml;sisch.
+<p>[Wenn das nicht klappt, klicke <a href="problem.htm">hier</a>]
+<p>W&auml;hle eine andere Sprache (z. B. Deutsch) in der Flaggenreihe am
+Anfang der Seite. (Es gibt eine M&ouml;glichkeit, eine andere Standardsprache
+als Franz&ouml;sisch zu w&auml;hlen. Siehe <a href="#Cnf">unten</a>).
+<ul>
+<li>
+Wenn du mit einer GEDCOM Datei ("ged2gwb") begonnen hast, mu&szlig;t du
+am Anfang die Zahl der Personen deiner Datenbank sehen.</li>
+
+<br>Von hier kannst du alles wie einen klassischen Webservice nutzen, auf
+Links und Tasten dr&uuml;cken, Felder ausf&uuml;llen, etc. Hinweis: zu
+Beginn, klicke auf "Ok" nach "Alle Nachnamen in alphabetischer Reihenfolge",
+dann in der neu erscheinenden Seite: "Die ganze Liste". W&auml;hle einen
+Nachnamen aus, dann eine Person, etc.</ul>
+
+<ul>
+<li>
+Wenn Du mit einer leeren Datenbank begonnen hast ("gwc"), sagt die Startseite,
+da&szlig; die Datenbank 0 Personen enth&auml;lt.</li>
+
+<br>Die einzig m&ouml;gliche Sache die man tun kann ist, Personen und Familien
+zu erstellen. Klicke auf "Eine Familie hinzuf&uuml;gen". Siehe das Kapitel:
+wie kann man&nbsp; <a href="update.htm">&Auml;nderungen</a> an der Datenbank
+machen.</ul>
+Inzwischen kannst du sehen, da&szlig; jedes mal, wenn du auf eine Taste
+oder einen Link dr&uuml;ckst, ein Trace im Terminalfenster erzeugt wird.
+Wenn du deinen
+<i>GeneWeb</i><a href="server.htm">server</a> im Netzwerk
+laufen l&auml;&szlig;t, siehst du auf diese Art und Weise die Anfragen
+die gesendet werden.
+<p>Beachte,&nbsp; da&szlig; der Dienst beim Dr&uuml;cken von control-C
+im Terminalfenster nicht mehr die Anfragen des Webbrowser beantwortet.
+Um ihn wieder zu starten, gib wieder "gwd" ein.
+<p>Unter Windows kannst du einfach auf das Icon von "gwd" doppelklicken
+um zu starten. Es &ouml;ffnet sich ein Terminalfenster wo "gwd" seinen
+Ablauf anzeigt.
+<br>Dr&uuml;cken von control-C stoppt "gwd" und schlie&szlig;t das Fenster.
+Wenn man eine Verkn&uuml;pfung auf "gwd" auf der Arbeitsoberfl&auml;che
+erzeugt, kann man es sehr leicht erreichen.
+<h4>
+<a NAME="Csg"></a>Der Befehl consang</h4>
+Dieses Kommando mu&szlig; wie die anderen im Terminalfenster eingegeben
+werden. Wenn der "gwd"-Daemon l&auml;uft, dr&uuml;cke control-C zum Stoppen.
+Ein anderer Weg - wenn du den Daemon nicht stoppen willst - besteht darin,
+ein weiteres Terminalfenster zu starten.
+<p>Der Befehl "consang" berechnet die Verwandschaften in einer Datenbank.
+Die Anzeige der Verwandschaften wird ausgef&uuml;hrt, wenn man die Datenbank
+abfragt, in den pers&ouml;nlichen Datens&auml;tzen und bei der Berechnung
+der Beziehungen.
+<p>Aber um darauf Zugriff zu haben, m&uuml;ssen die individuellen Verwandtschaften
+der Personen in der Datenbank vorherberechnet werden. Das macht "consang".
+Wenn der Name deiner Datenbank "Meier" ist, gib ein:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; consang Meier</pre>
+Das Programm wird einige Sekunden oder Minuten rechnen, abh&auml;ngig von
+der Gr&ouml;&szlig;e deiner Datenbank, und ohne anzuhalten die Zahl der
+noch zu bearbeitenden Personen anzeigen. Am Ende steht wieder das Prompt
+im Terminalfenster und die individuellen Verwandtschaften sind gespeichert.
+<p>W&auml;hrend dieser Berechnung kann man auf jeden Fall in den Webbrowser
+zur&uuml;ckkehren und die Datenbank abfragen, wenn man den Daemon nicht
+gestoppt hat.
+<p>Starte "consang" von Zeit zu Zeit, wenn du &Auml;nderungen an deiner
+Datenbank gemacht hast, besonders wenn Familien hinzukommen, ge&auml;ndert
+oder gel&ouml;scht werden: die Verwandtschaft h&auml;ngt von der Struktur
+der Familien ab. Wenn sie sich &auml;ndert, sind die individuellen Verwandtschaften
+nicht verf&uuml;gbar und man mu&szlig; sie neuberechnen.
+<p>Zudem f&uuml;hrt "consang" eine interne "S&auml;uberung" der Datenbank
+durch, die nach mehreren Updates notwendig wird.
+<h4>
+<a NAME="Gwu"></a>Der Befehl gwu</h4>
+Dieses Kommando zeigt den Inhalt der Datenbank in einer Textform. Wenn
+man die Ausgabe dieses Kommandos in eine Datei umleitet, kann es als Sicherung
+der Datenbank dienen.
+<p>Wenn deine Datenbank "meier" hei&szlig;t, und du sie in der Datei "blabla.gw"
+speichern willst, gib ein:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwu meier > blabla.gw</pre>
+Wenn du deine Datenbank in verschiedenen Versionen und Dateien abspeicherst,
+kannst Du die Unterschiede unter Verwendung eines Vergleichsprogrammes
+sehen. Das ist besonders interessant, wenn jemand Ver&auml;nderungen deiner
+Datenbank vorgenommen hat und du wissen willst, welche das sind.
+<p>Das ist auch eine Methode, die Datenbank wiederherzustellen, wenn du
+eine andere Version von <i>GeneWeb&nbsp;</i> benutzt, f&uuml;r den Fall,
+da&szlig; sich die interne Repr&auml;sentation der Datenbanken ge&auml;ndert
+hat.
+<p>Um deine Datenbank wiederherzustellen, kannst du den Befehl "gwc" nutzen.
+Die gespeicherte Datei mu&szlig; die Erweiterung ".gw" haben. Um eine Datenbank
+namens "jones" aufzubauen aus der Datei "blafasel.gw", gib ein:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwc blafasel.gw -o jones</pre>
+
+<h4>
+<a NAME="Cnf"></a>Die Datei a.gwf</h4>
+Diese Datei enth&auml;lt eine Konfigurationsschablone f&uuml;r eine Datenbank.
+Wenn der Name deiner Datenbank "Meier" ist, mache eine Kopie von "a.gwf",
+benenne sie in "Meier.gwf" um und editiere die Datei "Meier.cnf".
+<p>Die konfigurierbaren Werte sind die folgenden:
+<ul>
+<li>
+<b>body_prop</b> erlaubt eine Hintergrundfarbe oder -muster einzustellen
+und die Text- und Linkfarben zu &auml;ndern. Seine Syntax ist die HTML
+-Syntax die im tag "&lt;body>" vor dem ">" steht. Sieh in deine HTML Dokumentation.
+Beispiel:</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; body_prop=background=mybackg.jpg vlink=yellow</pre>
+Das gilt nicht nur f&uuml;r die Startseite, sondern f&uuml;r alle Seiten
+dieser Datenbank.</ul>
+
+<ul>
+<li>
+<b>friend_passwd</b> erlaubt die Sichtbarkeit von noch lebenden Personen
+zu beschr&auml;nken, also allen Personen, seit weniger als hundert Jahren
+geboren wurden oder gestorben sind.</li>
+
+<br>Wenn du dieser Variable einen Wert gibst, k&ouml;nnen nur Personen,
+die das Passwort auf der Startseite eingegeben haben, auf diese Daten zugreifen.</ul>
+
+<ul>
+<li>
+<b>wizard_passwd</b> erlaubt, den "wizards" das Recht zu beschr&auml;nken,
+Updates der Datenbank durchzuf&uuml;hren.</li>
+
+<br>&nbsp;
+<li>
+Wenn du dieser Variable einen Wert gibst, haben nur Personen, die das Passwort
+auf der Startseite eingegeben haben, Zugriff zu den &Auml;nderungen.</li>
+
+<br>&nbsp;
+<li>
+<b>wizard_just_friend</b> erlaubt es, den "wizards" das &Auml;ndern der
+Datenbank zu verbieten. Setze die Variable auf&nbsp; "yes" um das zu tun,
+auf "no"&nbsp; um die Erlaubnis wieder zu erteilen. Es kann n&uuml;tzlich
+sein, "yes" zeitweise hinzuschreiben, wenn man die Datenbank <a href="maint.htm">s&auml;ubert</a>.</li>
+</ul>
+
+<ul>
+<li>
+<b>default_lang</b> erlaubt es, eine Standardsprache auf der Startseite
+zu definieren. Ohne Angabe is die Sprache Franz&ouml;sisch. Die m&ouml;glichen
+Werte sind: "cn" (Chinese), "de" (German), "en" (English), "eo" (Esperanto),
+"es" (Spanish), "fr" (French), "he" (Hebrew), "it" (Italian), "nl" (Dutch),&nbsp;
+"no" (Norwegian), "pt" (Portuguese), "se" (Swedish).</li>
+
+<br>&nbsp;
+<p>&nbsp;
+<p>Beachte dass, egal welche Sprache standardm&auml;&szlig;ig ausgew&auml;hlt
+ist, jederzeit eine andere auf der Startseite gew&auml;hlt werden kann.
+indem man auf die Flaggenreihe am Kopf der Seite klickt.</ul>
+
+<ul>
+<li>
+<b>can_send_image</b> erlaubt den "wizards" Fotos einzusenden (und zu l&ouml;schen).
+In diesem Fall k&ouml;nnen sie im <a href="update.htm#MAJ">update</a> Prozess
+auf einen Link klicken namens <a href="update.htm#SndP">send image</a>
+(und m&ouml;glicherweise einen anderen namens <a href="update.htm#DelPh">delete
+image</a>). Standard ist "no" (keine Autorisierung Fotos zu senden); um
+es zu erlauben, trage "yes" ein.</li>
+
+<br>&nbsp;
+<p>&nbsp;
+<p>Vorsicht: die Fotos werden auf deinem Computer abgespeichert und k&ouml;nnen
+viel Platz wegnehmen, wenn viele Fotos eingesandt werden.</ul>
+
+<ul>
+<li>
+<b>renamed</b> erlaubt anzuzeigen, dass sich der Name einer Datenbank ge&auml;ndert
+hat. Wenn deine Webseite sehr h&auml;ufig besucht wurde und die Datenbank
+in vielen pers&ouml;nlichen Lesezeichen gespeichert wurde, ist das ein
+Weg, auf die neue Datenbank mit dem neuen Namen umzuleiten. Wenn jemand
+versucht, &uuml;ber den alten Namen darauf zuzugreifen, sieht derjenige
+eine Seite mit einem Link mit der gleichen Abfrage f&uuml;r den neuen Namen.</li>
+</ul>
+
+<h4>
+<a NAME="Lex"></a>Das Verzeichnis "lang" - die Datei "lexicon.txt"</h4>
+Diese Datei enth&auml;lt das W&ouml;rterbuch aller Ausdr&uuml;cke und Redewendungen,
+die in diesem Programm verwendet werden. F&uuml;r jeden gibt es eine &Uuml;bersetzung
+in jede Sprache. Wenn du eine Sprache hinzuf&uuml;gen willst, w&auml;hle
+einen Code f&uuml;r diese Sprache, und f&uuml;ge eine Zeile mit diesem
+Code zu jeder &Uuml;bersetzungsgruppe hinzu die du in der Datei siehst.
+<p>Dar&uuml;berhinaus kannst du die vorgegebenen &Uuml;bersetzungen &auml;ndern,
+wenn sie nicht passt.
+<p>Wenn du die Datei "lexicon.txt" speicherst, wird das sofort in der Browseranzeige
+angewendet. M&ouml;glicherweise mu&szlig; man aber auf "reload" klicken.
+<h4>
+<a NAME="Lng"></a>Das Verzeichnis "lang" - Unterverzeichnisse</h4>
+Jeder Verzeichnisname ist ein Sprach-Code. Jedes Verzeichnis enth&auml;lt
+die Standard-Startseite namens "start.txt".
+<p>Du kannst diese Startseite f&uuml;r eine bestimmte Datenbank &auml;ndern.
+F&uuml;r die Datenbank "Meier" in der Sprache "xx", kopiere einfach die
+Datei "start.txt" in das Verzeichnis "xx" und benenne sie in "Meier.txt"
+um. Dann editiere die Datei "Meier.txt" und mache die Anpassungen die du
+willst. Wenn du m&ouml;chtest, kannst du das f&uuml;r jede Sprache tun.
+<p>Anmerkung: diese Dateien beinhalten HTML -Code mit einigen besonderen
+Angaben: % Zeichen gefolgt von einem Buchstaben. Das sind Makros, die "gwd"
+durch Werte ersetzt. Zum Beispiel wird "%t" durch den Namen der Datenbank
+ersetzt, "%b" durch den Wert von "body_prop" der Konfigurationsdatei usw.
+<p>Die komplette Beschreibung dieser Makros befindet sich <a href="pcustom.htm">hier</a>.
+<p>Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+<p>
+<hr><i><font size=-1>&copy; Copyright INRIA 1999 - GeneWeb</font></i>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.61 [en] (X11; I; Linux 2.2.7 i586) [Netscape]">
+   <title>GeneWeb - Problems</title>
+</head>
+<body>
+
+<h1>
+GeneWeb - Probleme</h1>
+Hier einige &ouml;fter auftretende Probleme mit "gwd":
+<p>Du hast den <i>GeneWeb</i> D&auml;mon "gwd" gestartet und er antwortet
+normal wie im Kapitel "Erste Schritte mit GeneWeb" , Abschnitt "Befehl
+<a href="start.htm#Gwd">gwd</a>", angegeben.
+<p>Dann ...
+<h4>
+Meldung "socket failed"</h4>
+Unter Windows wenn diese Meldung im Eingabefenster erscheint und du kannst
+dich mit deinem Webbrowser nicht zur angegebenen Adresse verbinden, k&ouml;nnte
+es sein, dass das Internet Protokoll (TCP/IP) nicht auf deinem Computer
+installiert ist.
+<p>In diesem Fall installiere es. Du findest es unter "Systemkonfiguration",
+Icon "Netzwerk".
+<p>Starte "gwd" danach erneut und versuche es noch einmal.
+<h4>
+Verbindung mit Netzwerk</h4>
+
+<ul>
+<li>
+Wenn du in deinem Webbrowser die Adresse eingibst, z. B.:</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; http://localhost:2317/smith</pre>
+antwortet der Webbrowser, dass du dich mit dem Netzwerk verbinden sollt
+und dass er nicht off line arbeiten kann.
+<p>Dieses Problem tritt mit einigen Versionen des Internet Explorer auf.</ul>
+
+<ul>
+<li>
+M&ouml;glicherweise abh&auml;ngig von der Browserversion erhielten wir
+von
+<i>GeneWeb</i> Nutzern (Danke!) die folgenden L&ouml;sungen:</li>
+
+<ul>
+<li>
+Beim Internet Explorer w&auml;hle das Men&uuml; "Ansicht", "Internet Optionen".
+Dann aktiviere im Men&uuml; "Verbindung"&nbsp; "Proxy nicht f&uuml;r lokale
+Adressen verwenden".</li>
+</ul>
+
+<ul>
+<li>
+[Version 3.02] Beim Internet Explorer w&auml;hle das Men&uuml; "Ansicht",
+"Optionen", "Verbindung". Dann gehe zu "Proxyserver" und w&auml;hle "Setup",
+f&uuml;ge unter "Ausnahmen" und "Proxyserver nicht f&uuml;r Adressen beginnend
+mit" die Adressen hinzu, die beim Start von gwd.exe ausgegeben werden.
+Zum Beispiel (beachte die Semicolons zwischen den Namen):</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; 127.0.0.1;localhost;computer</pre>
+</ul>
+Wenn dies nicht besser funktioniert, empfehlen wir dir einen anderen Webbrowser
+zu benutzen, z. B.&nbsp; Netscape (welcher frei ist).</ul>
+
+<h4>
+Kann auf Datei "start.txt" nicht zugreifen</h4>
+
+<ul>
+<li>
+Ein weiteres h&auml;ufiges Problem ist die Meldung: "Kann auf Datei start.txt
+nicht zugreifen".</li>
+</ul>
+
+<ul>
+<li>
+Wenn du <i>GeneWeb</i> unter Windows benutzt, hast du m&ouml;glicherweise
+das Archiv entpackt mit "pkunzip". Es ist wichtig, dies mit den Optionen
+"-e -d" aufzurufen:</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; pkunzip -e -d geneweb.zip</pre>
+Wenn du nicht auf diese Art und Weise dekomprimiert hast, mache es noch
+einmal mit den richtigen Optionen.</ul>
+Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+<p>
+<hr><i><font size=-1>&copy; Copyright INRIA 1999 - GeneWeb</font></i>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.9 i586) [Netscape]">
+   <title>GeneWeb - Blutsverwandtschaft</title>
+</head>
+<body>
+
+<h1>
+GeneWeb - Blutsverwandtschaft</h1>
+Dieser Teil erkl&auml;rt das Konzept von "Blutsverwandtschaft" und "Verwandschaftsgrad"
+das von <i>GeneWeb</i> verwendet wird und wie diese berechnet werden.
+<h4>
+Blutsverwandtschaft and Verwandschaftsgrad</h4>
+Das Genom eines Individuum besteht aus vielen Genen, die, wenn man Mutationen
+ignoriert, identisch reproduzieren. Die Gene k&ouml;nnen benutzt werden,
+um die Identit&auml;t einer Person zu messen.
+<p>Die Gene werden in pr&auml;zise Standorte namens "Genort" plaziert.
+Jedes Individuum hat f&uuml;r jeden Genort zwei Gene, eins, das von seiner
+Mutter, eins, das von seinem Vater &uuml;bertragen wird und &uuml;bermittelt
+seinen Kindern eine Kopie von einem seiner Gene.
+<p>Die Blutsverwandtschaft eines Individuum x ist die Wahrscheinlichkeit
+cg(x) an einem gegebenen Genort zwei identische Gene zu finden.
+<p>Der Verwandschaftsgrad von zwei Individuen x und y ist die Wahrscheinlichkeit
+pr(x, y), im gleichen Genort zwei identische Gene zu finden.
+<br>&nbsp;
+<h4>
+Berechnungen</h4>
+Eine Wahrscheinlichkeitsrechnung zeigt dass:
+<ul>
+<li>
+Die Blutsverwandtschaft <i>cg(x)</i> ist gleich dem Verwandtschaftsgrad
+<i>pr(px,mx)</i>
+der Eltern <i>px</i> und <i>mx</i> von
+<i>x</i>.</li>
+</ul>
+
+<ul>
+<li>
+Wenn <i>x..a..y</i> eine minimale Verwandtschaftsbeziehung zwischen
+<i>x</i>
+und <i>y</i> ist (d.h. so dass die Zweige <i>x..a</i> und
+<i>a..y</i> nur
+<i>a</i>
+gemeinsam haben), dann tr&auml;gt die Verwandtschaft von <i>x</i> und <i>y</i>
+mit einem Faktor von:</li>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; 1 / 2**(n+1) * (1 + cg(a))</pre>
+bei, wo <i>n</i> die L&auml;nge (Abstand <i>x..a</i> + Abstand
+<i>a..y</i>)
+der Verwandtschaftsbeziehung <i>x..a..y </i>ist.
+<p>Der Verwandtschaftsgrad von <i>x</i> and <i>y</i> ist die Summe der
+Beitr&auml;ge aller ihrer minimalen Verwandtschaftsbeziehungen.</ul>
+
+<h4>
+GeneWeb</h4>
+<i>GeneWeb</i> zeigt die Blutsverwandtschaft und den Verwandtschaftsgrad
+in Form eines Prozentsatzes an.
+<p>Statistisch gesehen, bei einer gro&szlig;en Zahl von Genorten eines
+Individuum korrespondiert die Blutsverwandtschaft ungef&auml;hr mit dem
+Prozentsatz seiner Genorte, die identische Gene enthalten.
+<p>Die Algorithmen von Blutsverwandtschaft und Verwandtschaftsgrad wurden
+geschrieben von Didier R&eacute;my, Direktor f&uuml;r Forschung bei INRIA.
+Wir danken ihm daf&uuml;r.
+<h4>
+Referenzen</h4>
+
+<ul>
+<li>
+Albert Jacquard. <i>Genetic structures of the Populations.</i> Masson &amp;
+Co, 1970.</li>
+</ul>
+Zur&uuml;ck zur&nbsp; <a href="diruse.htm">Gebrauchsanweisung</a>.
+<p>
+<hr><i><font size=-1>&copy;Copyright INRIA 1999 - GeneWeb</font></i>
+</body>
+</html>
