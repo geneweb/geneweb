@@ -14,7 +14,8 @@ GeneWeb version 3.01
   - [Dec 2..3, 99] In relationship computing, can print the complete graph
     (all branches in one page). Proposed (when there are no too many links)
     in the list of relationships for each branch type ("click here") and
-    globally in a link at end of page in a direct relation ancestor-descendant.
+    globally in a link at end of page if it is a direct relation
+    ancestor-descendant.
   - [Nov 26, 99] Faster computation of list of all titles and all places
   - [Nov 26, 99] Fixed a problem of sometimes displaying of a message
     "document contains no data" from the browser when computing relationship.
