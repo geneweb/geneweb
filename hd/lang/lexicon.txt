@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.153 2000-08-10 06:20:38 ddr Exp $
+# $Id: lexicon.txt,v 3.154 2000-08-27 16:08:31 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3549,7 +3549,7 @@ dk: mandlige linie/kvindelige linie
 en: male line/female line
 eo: vira linio /virina linio
 fi: miehen puoleinen linja/naisen puoleinen linja
-fr: ligne agnatique/ligne cognatique
+fr: lign&eacute;e agnatique/lign&eacute;e cognatique
 lv: tçva lînija/mâtes lînija
 nl: mannelijke lijn/vrouwelijke lijn
 no: mannlig linje/kvinnelig linje

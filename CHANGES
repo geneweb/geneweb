@@ -16,8 +16,9 @@ GeneWeb version 3.08
     the public names.
 
 * Geneweb compiler (gwc)
-  - [27 Aug 00] Fixed bug: date e.g. "between 1300 and 1350 julian" where
-    printed by gwu as 1300..1350J but had to be read 1300J..1350 in gwc.
+  - [27 Aug 00] Fixed bug: date e.g. "between 1300 and 1350 Julian" where
+    printed by gwu as 1300..1350J but gwc expected 1300J..1350 and resulted
+    in a syntax error.   
 
 * GeneWeb data bases Transfer Program (gwtp)
   - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
