@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.30 1999-02-12 12:37:03 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.31 1999-02-13 21:55:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -40,9 +40,16 @@ value is_multipart_form =
       else False
 ;
 
+value extract_boundary content_type =
+  let e = Util.create_env content_type in
+  List.assoc "boundary" e
+;
+
 value log from request s =
   let content_type = Wserver.extract_param "content-type: " '\n' request in
+(*
   let s = if is_multipart_form content_type then "(multipart form)" else s in
+*)
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   let oc = log_oc () in
@@ -140,10 +147,14 @@ value input_lexicon lang =
     try
       do try
            while True do
-             let k = input_line ic in
+             let k =
+               find_key (input_line ic) where rec find_key line =
+                 if String.length line = 0 then find_key (input_line ic)
+                 else if line.[0] = '#' then find_key (input_line ic)
+                 else line
+             in
              loop (input_line ic) where rec loop line =
                if String.length line < 4 then ()
-               else if line.[0] == '#' then ()
                else
                  do if String.sub line 0 4 = pref then
                       Hashtbl.add t (String.sub k 4 (String.length k - 4))
@@ -385,6 +396,9 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;
+     can_send_photo =
+       try List.assoc "can_send_photo" base_env = "yes" with
+       [ Not_found -> False ];
      bname = base_file;
      env = env;
      senv = [];
@@ -530,6 +544,96 @@ value check_auth request =
     | _ -> None ]
 ;
 
+value extract_multipart boundary str =
+  let rec skip_nl i =
+    if i < String.length str && str.[i] == '\r' then skip_nl (i + 1)
+    else if i < String.length str && str.[i] == '\n' then i + 1
+    else i
+  in
+  let next_line i =
+    let i = skip_nl i in
+    loop "" i where rec loop s i =
+      if i == String.length str || str.[i] == '\n' || str.[i] == '\r' then
+        (s, i)
+      else loop (s ^ String.make 1 str.[i]) (i + 1)
+  in
+  let boundary = "--" ^ boundary in
+  let rec loop i =
+    if i == String.length str then []
+    else
+      let (s, i) = next_line i in
+      if s = boundary then
+        let (s, i) = next_line i in
+        let s = String.lowercase s in
+        let env = Util.create_env s in
+        match (Util.p_getenv env "name", Util.p_getenv env "filename") with
+        [ (Some var, Some filename) ->
+            let i = skip_nl i in
+            let i1 =
+              loop i where rec loop i =
+                if i < String.length str then
+                  if i > String.length boundary
+                  && String.sub str (i - String.length boundary)
+                       (String.length boundary) = boundary
+                  then i - String.length boundary
+                  else loop (i + 1)
+                else i
+            in
+            let v = String.sub str i (i1 - i) in
+            [("file", v) :: loop i1]
+        | (Some var, None) ->
+            let var =
+              let i0 =
+                if String.length var > 0 && var.[0] == '"' then 1 else 0
+              in
+              let i1 =
+                if String.length var > 0
+                && var.[String.length var - 1] == '"' then
+                  String.length var - 1
+                else String.length var
+              in
+              String.sub var i0 (i1 - i0)
+            in
+            let (s, i) = next_line i in
+            if s = "" then
+              let (s, i) = next_line i in
+              [(var, s) :: loop i]
+            else loop i
+        | _ -> loop i ]
+      else if s = boundary ^ "--" then []
+      else loop i
+  in
+  let i =
+    start 0 where rec start i =
+      if i == String.length str then i
+      else if str.[i] == '?' then (i + 1)
+      else start (i + 1)
+  in
+  let env = loop i in
+  let (str, _) =
+    List.fold_left
+      (fun (str, sep) (v, x) ->
+         if v = "file" then (str, sep) else (str ^ sep ^ v ^ "=" ^ x, ";"))
+      (String.sub str 0 i, "") env
+  in
+  (str, env)
+;
+
+value build_env request str =
+  let iq = index '?' str in
+  let content_type = Wserver.extract_param "content-type: " '\n' request in
+  if is_multipart_form content_type then
+    let boundary = extract_boundary content_type in
+    let (str, env) = extract_multipart boundary str in
+    (str, env)
+  else
+    let query_string =
+      if iq == String.length str then ""
+      else String.sub str (iq + 1) (String.length str - iq - 1)
+    in
+    (str, Util.create_env query_string)
+;
+
 value connection cgi (addr, request) str =
   let from =
     match addr with
@@ -549,14 +653,7 @@ value connection cgi (addr, request) str =
         if not accept then only_log from cgi
         else
           try
-            let iq = index '?' str in
-            let env =
-              let query_string =
-                if iq == String.length str then ""
-                else String.sub str (iq + 1) (String.length str - iq - 1)
-              in
-              Util.create_env query_string
-            in
+            let (str, env) = build_env request str in
             if image_request cgi str env then ()
             else
               do if cgi && log_file.val = "" then ()

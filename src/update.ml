@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.14 1999-02-12 12:37:13 ddr Exp $ *)
+(* $Id: update.ml,v 1.15 1999-02-13 21:55:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -577,6 +577,14 @@ value print conf base p =
      Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>\n"
        (commd conf) (Adef.int_of_iper p.cle_index)
        (capitale (transl_decline conf "delete" ""));
+     if conf.can_send_photo then
+       do Wserver.wprint "\n";
+          html_li conf;
+          Wserver.wprint "<a href=\"%sm=SND_PHOTO;i=%d\">%s</a>\n"
+            (commd conf) (Adef.int_of_iper p.cle_index)
+            (capitale (transl_decline conf "send" (transl conf "photo")));
+       return ()
+     else ();
      Wserver.wprint "</ul>\n";
      Wserver.wprint "\n";
      print_family_stuff conf base p a;

@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 1.4 1999-02-02 10:24:43 ddr Exp $ *)
+(* $Id: wserver.mli,v 1.5 1999-02-13 21:55:09 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -46,6 +46,8 @@ value extract_param : string -> char -> list string -> string;
        [stopc] is a character ending the request line. For example, the
        string request has been obtained by: [extract_param "GET /" ' '].
        Answers the empty string if the parameter is not found. *)
+
+value get_request_and_content : Stream.t char -> (list string * string);
 
 (* Example:
 
