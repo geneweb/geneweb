@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.14 1999-07-26 07:01:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.15 1999-07-28 13:08:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -464,7 +464,7 @@ value get_persons_with_relations base m list =
     (Array.to_list m.m_chil) list
 ;
 
-value print_relation_parent oc base mark p =
+value print_relation_parent oc base mark defined_p p =
   let a = aoi base p.cle_index in
   do Printf.fprintf oc "%s %s%s"
        (correct_string base p.surname)
@@ -472,14 +472,17 @@ value print_relation_parent oc base mark p =
        (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
      if Array.length p.family = 0 && a.parents = None
      && not mark.(Adef.int_of_iper p.cle_index) then
-       do mark.(Adef.int_of_iper p.cle_index) := True; return
-       if has_infos base p then print_infos oc base False True p
-       else Printf.fprintf oc " 0"
+       do mark.(Adef.int_of_iper p.cle_index) := True;
+          if has_infos base p then print_infos oc base False True p
+          else Printf.fprintf oc " 0";
+          if p.rparents <> [] then defined_p.val := [p :: defined_p.val]
+          else ();
+       return ()
      else ();
   return ()
 ;
 
-value print_relation_for_person oc base mark p r =
+value print_relation_for_person oc base mark def_p p r =
   let fath =
     match r.r_fath with
     [ Some ip ->
@@ -511,19 +514,19 @@ value print_relation_for_person oc base mark p r =
         | _ -> () ];
         Printf.fprintf oc ": ";
         match (fath, moth) with
-        [ (Some fath, None) -> print_relation_parent oc base mark fath
-        | (None, Some moth) -> print_relation_parent oc base mark moth
+        [ (Some fath, None) -> print_relation_parent oc base mark def_p fath
+        | (None, Some moth) -> print_relation_parent oc base mark def_p moth
         | (Some fath, Some moth) ->
-            do print_relation_parent oc base mark fath;
+            do print_relation_parent oc base mark def_p fath;
                Printf.fprintf oc " + ";
-               print_relation_parent oc base mark moth;
+               print_relation_parent oc base mark def_p moth;
             return ()
         | _ -> () ];
         Printf.fprintf oc "\n";
      return () ]
 ;
 
-value print_relations_for_person oc base mark p =
+value print_relations_for_person oc base mark def_p p =
   let surn = correct_string base p.surname in
   let fnam = correct_string base p.first_name in
   if surn <> "?" || fnam <> "?" then
@@ -531,7 +534,7 @@ value print_relations_for_person oc base mark p =
        Printf.fprintf oc "rel %s %s%s\n" surn fnam
          (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
        Printf.fprintf oc "beg\n";
-       List.iter (print_relation_for_person oc base mark p) p.rparents;
+       List.iter (print_relation_for_person oc base mark def_p p) p.rparents;
        Printf.fprintf oc "end\n";
     return ()
   else ()
@@ -544,11 +547,15 @@ value print_relations oc base mark per_sel ml =
       (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl])
       pl []
   in
-  List.iter
-    (fun p ->
-       if per_sel p.cle_index then print_relations_for_person oc base mark p
-       else ())
-    pl
+  loop pl where rec loop =
+    fun
+    [ [] -> ()
+    | [p :: pl] ->
+         let def_p = ref [] in
+         do if per_sel p.cle_index then
+              print_relations_for_person oc base mark def_p p
+            else ();
+         return loop (pl @ def_p.val) ]
 ;
 
 value rec merge_families ifaml1f ifaml2f =
