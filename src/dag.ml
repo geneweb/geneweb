@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.30 2001-01-08 18:54:28 ddr Exp $ *)
+(* $Id: dag.ml,v 3.31 2001-01-08 19:30:44 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -209,6 +209,55 @@ value displayed_next_char s i =
       | _ -> Some (i, i + 1) ]
 ;
 
+value buff_store_int s blen i j =
+  loop blen i where rec loop blen i =
+    if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
+;
+
+value strip_empty_tags s =
+  loop 0 None 0 where rec loop blen opened_tag i =
+    if i >= String.length s then Buff.get blen
+    else
+      match s.[i] with
+      [ '<' ->
+          let j = i + 1 in
+          let (tag_close, j) =
+            match s.[j] with
+            [ '/' -> (True, j + 1)
+            | _ -> (False, j) ]
+          in
+          let (tag_name, j) =
+            loop j where rec loop k =
+              match s.[k] with
+              [ 'a'..'z' | 'A'..'Z' -> loop (k + 1)
+              | _ -> (String.sub s j (k - j), k) ]
+          in
+          let j =
+            loop j where rec loop j =
+              if s.[j] = '>' then j + 1
+              else loop (j + 1)
+          in
+          match opened_tag with
+          [ Some (opened_tag_name, k) ->
+              if tag_close then
+                if tag_name = opened_tag_name then loop blen None j
+                else loop (buff_store_int s blen k j) None j
+              else
+                loop (buff_store_int s blen k i) (Some (tag_name, i)) j
+          | None ->
+              if tag_close then
+                loop (buff_store_int s blen i j) None j
+              else
+                loop blen (Some (tag_name, i)) j ]
+      | c ->
+          let blen =
+            match opened_tag with
+            [ Some (_, k) -> buff_store_int s blen k i
+            | None -> blen ]
+          in
+          loop (Buff.store blen c) None (i + 1) ]
+;
+
 value displayed_length s =
   loop 0 0 where rec loop len i =
     match displayed_next_char s i with
@@ -217,9 +266,9 @@ value displayed_length s =
     | None -> len ]
 ;
 
-value buff_store_int s blen i j =
-  loop blen i where rec loop blen i =
-    if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
+value buff_get len =
+  let s = Buff.get len in
+  strip_empty_tags s
 ;
 
 value displayed_sub s ibeg ilen =
@@ -234,7 +283,7 @@ value displayed_sub s ibeg ilen =
         in
         loop blen (di + 1) dlen k
    | None ->
-        Buff.get (buff_store_int s blen i (String.length s)) ]
+        buff_get (buff_store_int s blen i (String.length s)) ]
 ;
 
 value longuest_word_length s =
@@ -533,12 +582,12 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
       let print_indi n = Wserver.wprint "%s" (indi_txt n) in
       print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
         conf.border d t
-  | Some "notab" ->
+  | x ->
       let hts = html_table_struct indi_txt phony d t in
-      print_table_pre conf hts
-  | _ ->
-      let hts = html_table_struct indi_txt phony d t in
-      print_table conf hts ]
+      if x = Some "notab" || browser_doesnt_have_tables conf then
+        print_table_pre conf hts
+      else
+        print_table conf hts ]
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
