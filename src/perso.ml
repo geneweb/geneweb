@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.48 2000-10-13 15:07:22 ddr Exp $ *)
+(* $Id: perso.ml,v 3.49 2000-10-14 00:50:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1160,7 +1160,7 @@ value open_templ conf dir name =
 
 type ast =
   [ Atext of string
-  | Avar of string
+  | Avar of string and list string
   | Atransl of bool and string and char
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
@@ -1169,27 +1169,35 @@ and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
   | Enot of ast_expr
-  | Evar of string ]
+  | Evar of string and list string ]
 ;
 
-value get_variable ic =
-  loop 0 where rec loop len =
-    match input_char ic with
-    [ ';' -> Buff.get len
-    | '%' -> "%"
-    | c -> loop (Buff.store len c) ]
+type token = [ LPAREN | RPAREN | DOT | IDENT of string ];
+
+value rec get_ident len =
+  parser
+  [ [: `('a'..'z' | 'A'..'Z' | '_' | '%' as c); strm :] ->
+      get_ident (Buff.store len c) strm
+  | [: :] -> Buff.get len ]
 ;
 
-value rec get_token ic c =
-  match c with
-  [ ' ' | '\t' | '\n' | '\r' -> get_token ic (input_char ic)
-  | '(' -> ("(", ' ')
-  | ')' -> (")", ' ')
-  | c ->
-      loop (Buff.store 0 c) where rec loop len =
-        match input_char ic with
-        [ 'a'..'z' | 'A'..'Z' | '_' as c -> loop (Buff.store len c)
-        | c -> (Buff.get len, c) ] ]
+value get_variable =
+  let rec var_kont =
+    parser
+    [ [: `'.'; s = get_ident 0; sl = var_kont :] -> [s :: sl]
+    | [: `';' :] -> []
+    | [: :] -> [] ]
+  in
+  parser [: v = get_ident 0; vl = var_kont :] -> (v, vl)
+;
+
+value rec get_token =
+  parser
+  [ [: `(' ' | '\t' | '\n' | '\r'); strm :] -> get_token strm
+  | [: `'(' :] -> LPAREN
+  | [: `')' :] -> RPAREN
+  | [: `'.' :] -> DOT
+  | [: s = get_ident 0 :] -> IDENT s ]
 ;
 
 value buff = ref (String.create 80);
@@ -1210,110 +1218,107 @@ value buff_mstore len s =
 
 value buff_get len = String.sub buff.val 0 len;
 
-value lexicon_word ic =
-  let (upp, s) =
-    loop 0 (input_char ic) where rec loop len c =
-      if c = ']' then
-        let s = Buff.get len in
-        if len > 0 && s.[0] == '*' then
-          (True, String.sub s 1 (len - 1))
-        else (False, s)
-      else loop (Buff.store len c) (input_char ic)
+value lexicon_word =
+  let upper = parser [ [: `'*' :] -> True | [: :] -> False ] in
+  let rec text len =
+    parser
+    [ [: `']' :] -> Buff.get len
+    | [: `c; strm:] -> text (Buff.store len c) strm ]
   in
-  let n = input_char ic in
-  Atransl upp s n
+  parser [: upp = upper; s = text 0; `n :] -> Atransl upp s n
 ;
 
-value parse_templ conf base ic =
+value parse_templ conf base strm =
   let parse_bool_expr () =
-    let rec parse_1 tok =
-      let (e1, tok) = parse_2 tok in
-      match tok with
-      [ ("or", c) ->
-          let (e2, tok) = parse_1 (get_token ic c) in
-          (Eor e1 e2, tok)
-      | tok -> (e1, tok) ]
-    and parse_2 tok =
-      let (e1, tok) = parse_3 tok in
-      match tok with
-      [ ("and", c) ->
-          let (e2, tok) = parse_2 (get_token ic c) in
-          (Eand e1 e2, tok)
-      | tok -> (e1, tok) ]
-    and parse_3 tok =
-      let (e, c) = parse_4 tok in
-      (e, get_token ic c)
-    and parse_4 =
-      fun
-      [ ("(", c) ->
-          let (e, tok) = parse_1 (get_token ic c) in
-          match tok with
-          [ (")", c) -> (e, c)
-          | (s, c) -> (Evar ("')' expected '" ^ s ^ "' found"), c) ]
-      | ("not", c) ->
-          let (e, c) = parse_4 (get_token ic c) in
-          (Enot e, c)
-      | (v, c) -> (Evar v, c) ]
+    let rec parse_1 =
+      parser
+      [ [: e = parse_2;
+           e =
+             parser
+             [ [: `IDENT "or"; strm :] -> Eor e (parse_1 strm)
+             | [: :] -> e ] :] -> e ]
+    and parse_2 =
+      parser
+      [ [: e = parse_3;
+           e =
+             parser
+             [ [: `IDENT "and"; strm :] -> Eand e (parse_2 strm)
+             | [: :] -> e ] :] -> e ]
+    and parse_3 =
+      parser
+      [ [: `LPAREN; e = parse_1;
+           _ = parser [ [: `RPAREN :] -> () | [: :] -> () ] :] -> e
+      | [: `IDENT "not"; e = parse_3 :] -> Enot e
+      | [: `IDENT id; idl = ident_list :] -> Evar id idl
+      | [: :] -> Evar "bad_variable" [] ]
+    and ident_list =
+      parser
+      [ [: `DOT; `IDENT id; idl = ident_list :] -> [id :: idl]
+      | [: :] -> [] ]
     in
-    fst (parse_4 (get_token ic (input_char ic)))
+    let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
+    let r = parse_3 (Stream.from f) in
+    do match strm with parser [ [: `';' :] -> () | [: :] -> () ]; return r
   in
-  let rec parse_astl astl bol len end_list =
-    match try Some (input_char ic) with [ End_of_file -> None ] with
-    [ Some '%' ->
+  let rec parse_astl astl bol len end_list strm =
+    match strm with parser
+    [ [: `'%' :] ->
         let astl =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
         in
-        match get_variable ic with
-        [ "%" -> parse_astl [Atext "%" :: astl] False 0 end_list
-        | v ->
+        match get_variable strm with
+        [ ("%", _) -> parse_astl [Atext "%" :: astl] False 0 end_list strm
+        | (v, vl) ->
             if List.mem v end_list then (List.rev astl, v)
             else
               let ast =
                 match v with
-                [ "if" -> parse_if ()
-                | "foreach" -> parse_foreach ()
-                | "wid_hei" -> Awid_hei (get_variable ic)
-                | v -> Avar v ]
+                [ "if" -> parse_if strm
+                | "foreach" -> parse_foreach strm
+                | "wid_hei" -> Awid_hei (get_ident 0 strm)
+                | v -> Avar v vl ]
               in
-              parse_astl [ast :: astl] False 0 end_list ]
-    | Some '[' ->
+              parse_astl [ast :: astl] False 0 end_list strm ]
+    | [: `'[' :] ->
         let astl =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
         in
-        let a = lexicon_word ic in
-        parse_astl [a :: astl] False 0 end_list
-    | Some c ->
+        let a = lexicon_word strm in
+        parse_astl [a :: astl] False 0 end_list strm
+    | [: `c :] ->
         let empty_c = c = ' ' || c = '\t' in
         let len = if empty_c && bol then len else buff_store len c in
         let bol = empty_c && bol || c = '\n' in
-        parse_astl astl bol len end_list
-    | None ->
+        parse_astl astl bol len end_list strm
+    | [: :] ->
         let astl =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
         in
         (List.rev astl, "") ]
-  and parse_if () =
+  and parse_if strm =
     let e = parse_bool_expr () in
     let (al1, al2) =
       loop () where rec loop () =
-        let (al1, tok) = parse_astl [] False 0 ["elseif"; "else"; "end"] in
+        let (al1, tok) =
+          parse_astl [] False 0 ["elseif"; "else"; "end"] strm
+        in
         match tok with
         [ "elseif" ->
             let e2 = parse_bool_expr () in
             let (al2, al3) = loop () in
             (al1, [Aif e2 al2 al3])
         | "else" ->
-            let (al2, _) = parse_astl [] False 0 ["end"] in
+            let (al2, _) = parse_astl [] False 0 ["end"] strm in
             (al1, al2)
         | _ -> (al1, []) ]
     in
     Aif e al1 al2
-  and parse_foreach () =
-    let v = get_variable ic in
-    let (astl, _) = parse_astl [] False 0 ["end"] in
+  and parse_foreach strm =
+    let (v, _) = get_variable strm in
+    let (astl, _) = parse_astl [] False 0 ["end"] strm in
     Aforeach v astl
   in
-  fst (parse_astl [] True 0 [])
+  fst (parse_astl [] True 0 [] strm)
 ;
 
 (* 2/ Evaluation of template *)
@@ -2121,7 +2126,7 @@ value eval_bool_value conf base env =
     [ Eor e1 e2 -> eval e1 || eval e2
     | Eand e1 e2 -> eval e1 && eval e2
     | Enot e -> not (eval e)
-    | Evar v ->
+    | Evar v _ ->
         match get_env "p" env with
         [ Eind p _ _ -> eval_bool_variable conf base env p v
         | _ -> False ] ]
@@ -2138,7 +2143,7 @@ value rec eval_ast conf base env =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> print_transl conf base env upp s n
-  | Avar s -> print_variable conf base env s
+  | Avar s _ -> print_variable conf base env s
   | Awid_hei s -> print_wid_hei conf base env s
   | Aif e alt ale -> eval_if conf base env e alt ale
   | Aforeach "alias" al -> eval_foreach_alias conf base env al
@@ -2373,7 +2378,7 @@ value strip_newlines_after_variables =
         [Atext s :: loop astl]
     | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
     | [Aforeach s al :: astl] -> [Aforeach s (loop al) :: loop astl]
-    | [Avar s :: astl] -> [Avar s :: loop astl]
+    | [(Avar _ _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
     | [ast] -> [ast]
@@ -2381,7 +2386,7 @@ value strip_newlines_after_variables =
 ;
 
 value copy_from_templ conf base ic p =
-  let astl = parse_templ conf base ic in
+  let astl = parse_templ conf base (Stream.of_channel ic) in
   do close_in ic; return
   let a = aoi base p.cle_index in
   let u = uoi base p.cle_index in
