@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.148 1999-10-12 09:22:43 ddr Exp $
+# $Id: lexicon.txt,v 2.149 1999-10-13 08:31:22 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1331,6 +1331,7 @@ se: kommentar
 en: comment added
 fr: commentaire ajout&eacute;
 nl: commentaar toegevoegd
+se: kommentar tillagd
 
     consanguinity
 cs: pokrevenství
@@ -4435,6 +4436,7 @@ en: witness at marriage of %s and %s
 fr: t&eacute;moin au mariage de %s et de %s
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
+se: vittne vid &auml;ktenskap mellan %s och %s
 
     witness/witnesses
 dk: vidne/vidner
