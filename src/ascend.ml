@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.5 1999-12-17 20:49:20 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.6 2000-01-05 18:38:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1598,7 +1598,7 @@ value print_tree conf base v p =
                 loop set (lev - 1) cpl.father
             | None -> set ]
       in
-      let d = Dag.make_dag base (Dag.Pset.elements set) in
+      let d = Dag.make_dag conf base (Dag.Pset.elements set) in
       Dag.gen_print_dag conf base False True set [] d
   | _ -> print_normal_tree conf base v p ]
 ;

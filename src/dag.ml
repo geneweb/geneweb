@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.12 2000-01-01 07:55:40 ddr Exp $ *)
+(* $Id: dag.ml,v 3.13 2000-01-05 18:38:16 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -51,7 +51,7 @@ value get_dag_elems conf base =
 
 type sum 'a 'b = [ Left of 'a | Right of 'b ];
 
-value make_dag base list =
+value make_dag conf base list =
   let module O = struct type t = iper; value compare = compare; end in
   let module M = Map.Make O in
   let nodes = Array.of_list list in
@@ -65,6 +65,9 @@ value make_dag base list =
       (fun ip ->
 (*
 do Printf.eprintf "\no %s\n" (denomination base (poi base ip)); flush stderr; return
+*)
+(*
+do let p = poi base ip in Printf.eprintf "\no %s%s\n" (Util.person_title_text conf base p) (Date.short_dates_text conf base p); flush stderr; return
 *)
          let pare =
            match (aoi base ip).parents with
@@ -93,6 +96,9 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
 (*
 do Printf.eprintf "children\n"; flush stderr; return
 do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nodes.(int_of_idag id)))) chil; flush stderr; return
+*)
+(*
+do List.iter (fun id -> let p = poi base nodes.(int_of_idag id) in Printf.eprintf "- %s%s\n" (Util.person_title_text conf base p) (Date.short_dates_text conf base p)) chil; flush stderr; return
 *)
          {pare = pare; valu = Left ip; chil = chil})
       nodes
@@ -192,6 +198,6 @@ value print_dag conf base set spl d =
 
 value print conf base =
   let set = get_dag_elems conf base in
-  let d = make_dag base (Pset.elements set) in
+  let d = make_dag conf base (Pset.elements set) in
   print_dag conf base set [] d
 ;

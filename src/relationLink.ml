@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.8 1999-12-14 15:22:13 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.9 2000-01-05 18:38:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -654,7 +654,7 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
         [(p1.cle_index, "3"); (p2.cle_index, "4")] []
     in
     let list = Dag.Pset.elements set in
-    let d = Dag.make_dag base list in
+    let d = Dag.make_dag conf base list in
     Dag.print_dag conf base set spl d
   with
   [ Exit -> Util.incorrect_request conf ]
