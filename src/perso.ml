@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.64 2000-10-28 08:49:10 ddr Exp $ *)
+(* $Id: perso.ml,v 3.65 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -157,16 +157,13 @@ value print_titles conf base cap and_txt p =
          | _ -> [(t_nth, t_name, t_ident, [t_place], t_dates) :: l] ])
       titles []
   in
-  let _ =
-    List.fold_left
-      (fun first t ->
-         do if not first then Wserver.wprint "," else ();
-            Wserver.wprint "\n";
-            print_title conf base and_txt p t;
-         return False)
-      True titles
-  in
-  ()
+  list_iter_first
+    (fun first t ->
+       do if not first then Wserver.wprint "," else ();
+          Wserver.wprint "\n";
+          print_title conf base and_txt p t;
+       return ())
+    titles
 ;
 
 (* Version matching the Sosa number of the "ancestor" pages *)
@@ -238,13 +235,6 @@ value find_sosa conf base a =
 ;
 
 (* Interpretation of template file 'perso.txt' *)
-
-value iter_first f al =
-  let _ = List.fold_left
-    (fun first a -> let () = f first a in False)
-    True al
-  in ()
-;
 
 value open_templ conf dir name =
   let std_fname =
@@ -1001,7 +991,7 @@ value print_variable conf base env sl =
   [ Some (ep, efam, "") -> print_simple_person_text conf base ep
   | Some (ep, efam, s) -> print_simple_variable conf base env ep efam s
   | None ->
-      do iter_first
+      do list_iter_first
            (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
            sl;
          Wserver.wprint "???";
@@ -1168,7 +1158,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
 value eval_bool_variable conf base env sl =
   match eval_variable conf base env sl with
   [ Some (ep, efam, "") ->
-      do iter_first
+      do list_iter_first
            (fun first s ->
               Wserver.wprint "%s%s" (if first then "" else ".") s)
            sl;
@@ -1346,7 +1336,7 @@ and eval_foreach_first_name_alias conf base env al (p, _, _, p_auth) =
       p.first_names_aliases
   else ()
 and eval_foreach_qualifier conf base env al (p, _, _, _) =
-  iter_first
+  list_iter_first
     (fun first nn ->
        let env = [("qualifier", Estring (sou base nn)) :: env] in
        let env = [("first", Ebool first) :: env] in
@@ -1430,7 +1420,7 @@ and eval_foreach_surname_alias conf base env al (p, _, _, _) =
 and eval_foreach_witness conf base env al =
   fun
   [ Efam fam _ _ ->
-      iter_first
+      list_iter_first
         (fun first ip ->
            let p = poi base ip in
            let a = aoi base ip in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.72 2000-10-12 07:42:12 ddr Exp $ *)
+(* $Id: util.ml,v 3.73 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -81,11 +81,11 @@ value unauthorized conf auth_type =
   return ()
 ;
 
-value rec list_assoc_all x =
-  fun
-  [ [] -> []
-  | [(a, b) :: l] ->
-      if a = x then [b :: list_assoc_all x l] else list_assoc_all x l ]
+value list_iter_first f al =
+  let _ = List.fold_left
+    (fun first a -> let () = f first a in False)
+    True al
+  in ()
 ;
 
 value commd conf =

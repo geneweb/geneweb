@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 3.3 2000-01-10 02:14:36 ddr Exp $ *)
+(* $Id: alln.ml,v 3.4 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -359,30 +359,28 @@ value print_alphabetic_short conf base is_surnames ini list len =
      List.iter
        (fun (ini_k, l) ->
           do html_p conf;
-             let _ =
-               List.fold_left
-                 (fun first (s, cnt) ->
-                    let href =
-                      if not conf.cancel_links then
-                        " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
-                         code_varenv (Name.lower s) ^ "\""
-                      else ""
-                    in
-                    let name =
-                      if first && need_ref then " name=" ^ ini_k
-                      else ""
-                    in
-                    do if not first then Wserver.wprint ",\n" else ();
-                       if href <> "" || name <> "" then
-                         Wserver.wprint "<a%s%s>" href name
-                       else ();
-                       Wserver.wprint "%s" (alphab_string conf is_surnames s);
-                       if href <> "" || name <> "" then Wserver.wprint "</a>"
-                       else ();
-                       Wserver.wprint " (%d)" cnt;
-                    return False)
-                 True l
-             in ();
+             list_iter_first
+               (fun first (s, cnt) ->
+                  let href =
+                    if not conf.cancel_links then
+                      " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
+                       code_varenv (Name.lower s) ^ "\""
+                    else ""
+                  in
+                  let name =
+                    if first && need_ref then " name=" ^ ini_k
+                    else ""
+                  in
+                  do if not first then Wserver.wprint ",\n" else ();
+                     if href <> "" || name <> "" then
+                       Wserver.wprint "<a%s%s>" href name
+                     else ();
+                     Wserver.wprint "%s" (alphab_string conf is_surnames s);
+                     if href <> "" || name <> "" then Wserver.wprint "</a>"
+                     else ();
+                     Wserver.wprint " (%d)" cnt;
+                  return ())
+               l;
              Wserver.wprint "\n";
           return ())
        list;
