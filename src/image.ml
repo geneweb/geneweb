@@ -1,21 +1,24 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.0 2001-03-16 19:34:46 ddr Exp $ *)
+(* $Id: image.ml,v 4.1 2001-04-22 08:56:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
 open Config;
 
 value content cgi t len fname =
-  do if not cgi then
-       do Wserver.wprint "HTTP/1.0 200 OK"; Util.nl (); return ()
-     else ();
-     Wserver.wprint "Content-type: image/%s" t; Util.nl ();
-     Wserver.wprint "Content-length: %d" len; Util.nl ();
-     Wserver.wprint "Content-disposition: attachement; filename=%s"
-       (Filename.basename fname);
-     Util.nl (); Util.nl ();
-     Wserver.wflush ();
-  return ()
+  do {
+    if not cgi then do { Wserver.wprint "HTTP/1.0 200 OK"; Util.nl (); }
+    else ();
+    Wserver.wprint "Content-type: image/%s" t;
+    Util.nl ();
+    Wserver.wprint "Content-length: %d" len;
+    Util.nl ();
+    Wserver.wprint "Content-disposition: attachement; filename=%s"
+      (Filename.basename fname);
+    Util.nl ();
+    Util.nl ();
+    Wserver.wflush ();
+  }
 ;
 
 value print_image_type cgi fname itype =
@@ -23,28 +26,32 @@ value print_image_type cgi fname itype =
   [ Some ic ->
       let buf = String.create 1024 in
       let len = in_channel_length ic in
-      do content cgi itype len fname;
-         loop len where rec loop len =
-           if len == 0 then ()
-           else
-             let olen = min (String.length buf) len in
-             do really_input ic buf 0 olen;
-                Wserver.wprint "%s" (String.sub buf 0 olen);
-             return loop (len - olen);
-         close_in ic;
-      return True
- | None -> False ]
+      do {
+        content cgi itype len fname;
+        let rec loop len =
+          if len == 0 then ()
+          else do {
+            let olen = min (String.length buf) len in
+            really_input ic buf 0 olen;
+            Wserver.wprint "%s" (String.sub buf 0 olen);
+            loop (len - olen)
+          }
+        in
+        loop len;
+        close_in ic;
+        True
+      }
+  | None -> False ]
 ;
 
 value print_image_file cgi fname =
   List.exists
     (fun (suff, itype) ->
-       if Filename.check_suffix fname suff
-       || Filename.check_suffix fname (String.uppercase suff) then
+       if Filename.check_suffix fname suff ||
+          Filename.check_suffix fname (String.uppercase suff) then
          print_image_type cgi fname itype
        else False)
-    [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg");
-     (".gif", "gif")]
+    [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".gif", "gif")]
 ;
 
 value print_personal_image conf base p =
@@ -56,8 +63,7 @@ value print_personal_image conf base p =
 
 value print_source_image conf f =
   let fname =
-    if f.[0] = '/' then String.sub f 1 (String.length f - 1)
-    else f
+    if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
   if fname = Filename.basename fname then
     let fname = source_image_file_name conf.bname fname in
