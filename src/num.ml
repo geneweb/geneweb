@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 3.1 2000-01-08 20:03:39 ddr Exp $ *)
+(* $Id: num.ml,v 3.2 2000-01-09 07:35:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type t = array int;
@@ -114,7 +114,7 @@ value mul x n =
     Array.of_list l
 ;
 value div x n =
-  if n > max_mul_base then invalid_arg "Num.mul"
+  if n > max_mul_base then invalid_arg "Num.div"
   else
     let l =
       loop (Array.length x - 1) [] 0 where rec loop i l r =
