@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: ged2gwb.htm,v 1.5 2002-06-27 09:46:49 ddr Exp $ -->
+  <!-- $Id: ged2gwb.htm,v 1.6 2003-09-17 08:57:58 ddr Exp $ -->
   <title>[
 de: GEDCOM-Datei importieren
 en: Import a GEDCOM file
@@ -98,6 +98,16 @@ sv: Välj de optioner du vill ha:
 
 <dl><dt><dd><table border=1>
 <tr align=left>
+<td><input type=checkbox name=uin value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+en: Put untreated GEDCOM tags in notes.
+fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
 <td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>[
 de: Vornamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
@@ -114,7 +124,7 @@ sv: Forcera gemena förnamn, bara initialer behålls som versaler.
 </tr>
 </table></dl>
 
-<dl><dt><dd><table border=1>
+<dl><dd><table border=1>
 <tr align=left>
 <td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>[
