@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.7 1999-11-04 09:38:06 ddr Exp $
+# $Id: lexicon.txt,v 3.8 1999-11-04 09:40:29 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1436,6 +1436,7 @@ en: comment added
 fr: commentaire ajout&eacute;
 nl: commentaar toegevoegd
 is: athugasemd bætt við
+pt: comment&aacute;rio adicionado
 se: kommentar tillagd
 
     consanguinity
@@ -2007,6 +2008,7 @@ is: umræður
 it: tribuna
 nl: forum
 no: forum
+pt: forum
 se: forum
 
     generation
