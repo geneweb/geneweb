@@ -1,11 +1,11 @@
-(* $Id: gwtp.ml,v 1.5 2000-07-26 04:44:06 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.6 2000-07-27 03:32:40 ddr Exp $ *)
 
 open Printf;
 
 value gwtp_dir = ref "gwtp_dir";
 value comm_ged2gwb = ref "../../geneweb/ged2gwb/ged2gwb";
 value comm_consang = ref "../../geneweb/src/consang";
-value token_tmout = ref 60.0;
+value token_tmout = ref 180.0;
 
 (* Get CGI contents *)
 
@@ -73,10 +73,11 @@ value html_escaped s =
 value gwtp_error txt =
   do printf "content-type: text/html\r\n\r\n";
      printf "\
-<head><title>%s</title></head>\n<body>
-<h1>%s</h1>
+<head><title>Error</title></head>\n<body>
+<h1 align=center><font color=red>Error</font></h1>
+%s
 </body>
-" txt txt;
+" (String.capitalize txt);
   return ()
 ;
 
@@ -171,69 +172,43 @@ value lowercase_start_with s s_ini =
 ;
 
 value send_file str env b t f fname =
-  let fname = Filename.basename fname in
-  do try
-       let oc = open_out (Filename.concat "tmp" fname) in
-       let contents = List.assoc "f" env in
-       let i =
-         if lowercase_start_with contents "content-type: " then
-           String.index contents '\n'
-         else 0
-       in
-       let j = String.index_from contents (i + 1) '\n' in
-       do output oc contents (j + 1) (String.length contents - j - 3);
-          close_out oc;
-       return ()
-     with
-     [ Not_found -> () ];
-     printf "content-type: text/html\r\n\r\n";
-     printf "
-<head><title>Gwtp: data base \"%s\"</title></head>\n<body>
-<h1>Gwtp: data base \"%s\"</h1>
-File %s transfered
-" b b fname;
-     flush stdout;
-     if Filename.check_suffix fname ".ged"
-     || Filename.check_suffix fname ".GED" then
-       do printf "<p>\nThe data base is going to be created.\n";
-          flush stdout;
-       return
-       let bfname = Filename.concat "tmp" b in
-       let fname = Filename.concat "tmp" fname in
-       let pid = Unix.fork () in
-       if pid > 0 then let _ = Unix.waitpid [] pid in ()
-       else
-         do List.iter Unix.close [Unix.stdin; Unix.stdout; Unix.stderr]; return
-         if Unix.fork () > 0 then exit 0
-         else
-           let ic = Unix.openfile "/dev/null" [Unix.O_RDONLY] 0o666 in
-           let oc =
-             Unix.openfile (Filename.concat "tmp" "gwtp.log")
-               [Unix.O_CREAT; Unix.O_WRONLY; Unix.O_APPEND] 0o666
-           in
-           let s =
-             "$ " ^ comm_ged2gwb.val ^ " " ^ fname ^ " -f -o " ^ bfname ^ "\n"
-           in
-           let _ = Unix.write oc s 0 (String.length s) in
-           let _ =
-             Unix.create_process_env comm_ged2gwb.val
-               [| comm_ged2gwb.val; fname; "-f"; "-o"; bfname |] [| |]
-               ic oc oc
-           in
-           let _ = Unix.wait () in
-  (*
-           let _ =
-             Unix.create_process_env comm_consang.val
-               [| comm_consang.val; "-q"; bfname |] [| |]
-               ic oc oc
-           in
-           let _ = Unix.wait () in
-  *)
-           do Unix.close oc; return exit 0
-     else ();
-     printf "Bye\n";
-     printf "</body>\n";
-  return ()
+  if Filename.basename fname = "base" then
+    do printf "content-type: text/html\r\n\r\n\
+<head><title>Gwtp...</title></head>\n<body>
+<h1>Gwtp...</h1>
+<pre>\n";
+       Unix.dup2 Unix.stdout Unix.stderr;
+    return
+    let bdir = Filename.concat "tmp" (b ^ ".gwb") in
+    do try Unix.mkdir bdir 0o777 with
+       [ Unix.Unix_error Unix.EEXIST _ _ -> () ];
+    return
+    let oc = open_out (Filename.concat bdir "base") in
+    do try
+         let contents = List.assoc "f" env in
+         let i =
+           if lowercase_start_with contents "content-type: " then
+             String.index contents '\n'
+           else 0
+         in
+         let j = String.index_from contents (i + 1) '\n' in
+         output oc contents (j + 1) (String.length contents - j - 3)
+       with
+       [ Not_found -> () ];
+       close_out oc;
+       printf "</pre>\n";
+       printf "File \"%s\" transfered.<br>\n" fname;
+       printf "<pre>\n";
+       flush stdout;
+    return
+    let base = Iolight.input bdir in
+    do Iobase.output bdir base;
+       flush stdout;
+       printf "</pre>\n";
+       printf "Data base \"%s\" created.\n" b;
+       printf "</body>\n";
+    return ()
+  else gwtp_error "only \"base\" file implemented"
 ;
 
 value gwtp_send str env =
@@ -256,15 +231,15 @@ value login_ok str env b p tok =
   do set_token b tok;
      printf "content-type: text/html\r\n\r\n";
      printf "\
-<head><title>Gwtp: data base \"%s\"</title></head>\n<body>
-<h1>Gwtp: data base \"%s\"</h1>
+<head><title>Gwtp - data base \"%s\"</title></head>\n<body>
+<h1>Gwtp - data base \"%s\"</h1>
 <form method=POST action=gwtp enctype=\"multipart/form-data\">
 <input type=hidden name=m value=SEND>
 <input type=hidden name=b value=%s>
 <input type=hidden name=t value=%s>
-Gedcom or GeneWeb source file to send:<br>
-<input type=file name=f><br>
-<input type=submit>
+Select the file named \"base\" in your GeneWeb data base directory:<br><p>
+<input type=file name=f size=50><br><p>
+<input type=submit value=Send>
 </form>
 </body>
 " b b b tok;
@@ -289,7 +264,7 @@ value gwtp_welcome str env =
 <input type=hidden name=m value=LOGIN>
 Data base: <input name=b><br>
 Password: <input name=p type=password><br>
-<input type=submit>
+<input type=submit value=Login>
 </form>
 </body>
 ";
@@ -308,7 +283,7 @@ value gwtp () =
 ;
 
 value main () =
-  gwtp ()
+  Unix.handle_unix_error gwtp ()
 ;
 
-main ();
+Printexc.catch main ();

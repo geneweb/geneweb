@@ -1,12 +1,12 @@
-# $Id: Makefile,v 1.6 2000-07-27 02:26:20 ddr Exp $
+# $Id: Makefile,v 1.7 2000-07-27 03:32:40 ddr Exp $
 
 CAMLP4=camlp4r
 OCAMLC=ocamlc.opt
 OCAMLOPT=ocamlopt.opt
 OCOPT=-I ../geneweb/src
 RM=/bin/rm -f
-GWTP_OBJS=httpEnv.cmo gwtp.cmo
-GWTP_OTHER=../geneweb/src/buff.cmo
+GWTP_OBJS=httpEnv.cmo iolight.cmo gwtp.cmo
+GWTP_OTHER=../geneweb/src/buff.cmo ../geneweb/src/name.cmo ../geneweb/src/iovalue.cmo ../geneweb/src/adef.cmo ../geneweb/src/gutil.cmo ../geneweb/src/btree.cmo ../geneweb/src/iobase.cmo
 REBUILD_OBJS=iolight.cmo rebuild.cmo
 REBUILD_OTHER=../geneweb/src/buff.cmo ../geneweb/src/name.cmo ../geneweb/src/iovalue.cmo ../geneweb/src/adef.cmo ../geneweb/src/gutil.cmo ../geneweb/src/btree.cmo ../geneweb/src/iobase.cmo ../geneweb/src/argl.cmo
 
