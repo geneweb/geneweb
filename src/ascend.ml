@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.41 2004-12-26 21:48:28 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.42 2004-12-27 06:45:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -68,7 +68,7 @@ value text_level conf =
 
 value print_choice conf base p effective_level =
   tag "form" "method=get action=\"%s\"" conf.command begin
-    Wserver.wprint "<p>\n";
+    html_p conf;
     Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=A>\n";
     wprint_hidden_person conf base "" p;
@@ -246,14 +246,14 @@ value display_ancestors_upto conf base max_level p =
           if know_fath || know_moth then
             tag "ul" begin
               if know_fath then do {
-                Wserver.wprint "<li type=square> ";
+                Wserver.wprint "<li style=\"list-style-type:square\"> ";
                 display_ancestor conf base pere;
                 Wserver.wprint "\n";
                 loop (succ level) (father cpl)
               }
               else ();
               if know_moth then do {
-                Wserver.wprint "<li type=circle> ";
+                Wserver.wprint "<li style=\"list-style-type:circle\"> ";
                 display_ancestor conf base mere;
                 Wserver.wprint "\n";
                 loop (succ level) (mother cpl)
@@ -273,6 +273,7 @@ value display_ancestors_upto conf base max_level p =
   in
   do {
     header conf title;
+    html_p conf;
     Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
     loop 1 p.cle_index;
     trailer conf
@@ -1267,6 +1268,7 @@ value print_missing_ancestors conf base v spouses_included p =
   in
   do {
     header conf title;
+    html_p conf;
     Wserver.wprint "%s" (capitale (text_to conf v));
     match after with
     [ Some a -> Wserver.wprint " %s %d" (transl conf "after") a
@@ -1462,6 +1464,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   let before = p_getint conf.env "before" in
   do {
     header conf title;
+    html_p conf;
     let list = generation [] 1 [GP_person Num.one p.cle_index None] in
     let list =
       List.fold_left
@@ -1586,7 +1589,8 @@ value tree_reference gv bd color conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
     let im = p_getenv conf.env "image" = Some "on" in
-    sprintf "<a href=\"%sm=A;t=T;v=%d;%s%s%s%s\">%s</a>"
+    sprintf "\
+<a style=\"text-decoration:none\" href=\"%sm=A;t=T;v=%d;%s%s%s%s\">%s</a>"
       (commd conf) gv (acces conf base p) (if im then ";image=on" else "")
       (if bd > 0 then ";bd=" ^ string_of_int bd else "")
       (if color <> "" then ";color=" ^ color else "") s
@@ -1775,8 +1779,7 @@ value print_tree_with_table conf base gv p =
         stag "td" "%s" (align po) begin
           let txt =
             match po with
-            [ Cell _ Right _ _ | Cell _ Center _ _ ->
-                "<hr noshade size=1 width=\"100%\">"
+            [ Cell _ Right _ _ | Cell _ Center _ _ -> "<hr>"
             | _ -> "&nbsp;" ]
           in
           Wserver.wprint "%s" txt;
@@ -1788,10 +1791,8 @@ value print_tree_with_table conf base gv p =
         let txt =
           match po with
           [ Empty -> "&nbsp;"
-          | Cell _ Left _ _ ->
-              "<hr noshade size=1 width=\"50%\" align=right>"
-          | Cell _ Right _ _ ->
-              "<hr noshade size=1 width=\"50%\" align=left>"
+          | Cell _ Left _ _ -> "<hr style=\"margin-left:50%\">"
+          | Cell _ Right _ _ -> "<hr style=\"margin-right:50%\">"
           | Cell _ Alone _ _ -> "|"
           | Cell _ Center _ _ -> "<hr noshade size=1>" ]
         in
@@ -1841,7 +1842,7 @@ value print_normal_tree conf base v p =
   in
   do {
     header_no_page_title conf title;
-    Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
+    Wserver.wprint "<div style=\"text-align:right\"><a href=\"%s" (commd conf);
     List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
     Wserver.wprint "dag=on;notab=on;slices=on";
     Wserver.wprint "\"><tt>//</tt></a></div>\n";
@@ -1926,8 +1927,9 @@ value print_horizontally conf base max_level p =
   do {
     header conf title;
     print_link_to_welcome conf True;
+    html_p conf;
     Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
-    Wserver.wprint "<table><tr><td nowrap>\n";
+    Wserver.wprint "<table><tr><td style=\"white-space:nowrap\">\n";
     let suff13 = "&nbsp;&nbsp;&nbsp;" in
     let suff2 = "--&nbsp;" in
     loop 0 suff13 suff2 suff13 p.cle_index;
@@ -1956,7 +1958,7 @@ value print_male_female_line male conf base v p =
   in
   do {
     header_no_page_title conf title;
-    tag "center" begin
+    tag "div" "style=\"text-align:center\"" begin
       list_iter_first
         (fun first ip ->
            let p = pget conf base ip in

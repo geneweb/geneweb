@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.61 2004-12-25 23:03:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.62 2004-12-27 06:45:18 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -375,7 +375,7 @@ zh: ËÑË÷£º
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>%Iz
-[or] [<em>Sosa number</em> relative to %t](%a)%E
+[or] [<em>Sosa number</em> relative to %t](<br>%a)%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>

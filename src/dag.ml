@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.18 2004-12-26 13:29:23 ddr Exp $ *)
+(* $Id: dag.ml,v 4.19 2004-12-27 06:45:19 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -523,7 +523,7 @@ value print_next_pos conf pos1 pos2 tcol =
            | _ -> [(k, v) :: env] ])
         conf.env []
     in
-    Wserver.wprint "<div align=right>\n";
+    Wserver.wprint "<div style=\"text-align:right\">\n";
     if pos1 = 0 then Wserver.wprint "&nbsp;"
     else do {
       Wserver.wprint "<a href=\"%s" (commd conf);
@@ -813,6 +813,7 @@ value print_slices_menu conf base hts_opt =
     Util.header conf title;
     Util.print_link_to_welcome conf True;
     tag "form" "method=get action=\"%s\"" conf.command begin
+      html_p conf;
       hidden_env conf;
       List.iter
         (fun (k, v) ->
@@ -860,6 +861,7 @@ value print_slices_menu conf base hts_opt =
           end;
         end;
       end;
+      html_p conf;
       Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
     Util.trailer conf
