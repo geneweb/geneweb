@@ -1,3 +1,13 @@
+GeneWeb version 2.07
+--------------------
+
+* Setup program (gwsetup)
+  - [Sep 6, 99] Fixed problem in Windows: if the user choosed a
+    language by writing it in uppercase letters, some phrases where
+    displayed in English language between brackets (no matter which
+    language was selected), indicating that the language was not found
+    in the lexicon.
+
 GeneWeb version 2.06
 --------------------
 

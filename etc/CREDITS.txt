@@ -29,7 +29,7 @@ Documentation
 Setup program
 	Spanish		Luis Castro Guzman
 
-Linux rpm spec file created by
+Initial version of Linux rpm spec file by
 		Dan Kegel
 
 Algorithm of consanguinity and relationship
