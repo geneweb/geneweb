@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.20 1999-06-19 11:04:24 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.21 1999-06-21 14:16:40 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1163,8 +1163,10 @@ value add_fam gen r =
         [ Some d -> Divorced (Adef.codate_of_od (date_of_field r.rpos r.rval))
         | _ ->
             match find_field "PLAC" r.rsons with
-            [ Some _ -> NotDivorced
-            | _ -> Divorced Adef.codate_None ] ]
+            [ Some _ -> Divorced Adef.codate_None
+            | _ ->
+                if r.rval = "Y" then Divorced Adef.codate_None
+                else NotDivorced ] ]
     | None -> NotDivorced ]
   in
   let comment =

@@ -19,7 +19,6 @@
 2nd cousins
 3rd cousins
 M/F
-Sosa numbers
 a %s cousin
 a 2nd cousin
 a 3rd cousin
@@ -219,8 +218,10 @@ see further
 send
 several answers
 sex
+short display
 should be female
 should be male
+siblings
 son/daughter/child
 source/sources
 specify
