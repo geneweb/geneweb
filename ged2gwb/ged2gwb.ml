@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.35 2002-11-08 18:54:54 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.36 2002-11-14 09:55:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1833,12 +1833,20 @@ value add_fam_norm gen r adop_list =
       match sons with
       [ Some r ->
           let (u, p) =
-            match find_field "PLAC" r.rsons with
-            [ Some r ->
+            match find_all_fields "PLAC" r.rsons with
+            [ [r :: rl] ->
                 if String.uncapitalize r.rval = "unmarried" then
                   (NotMarried, "")
-                else (relation, r.rval)
-            | _ -> (relation, "") ]
+                else
+                  let p = r.rval in
+                  loop rl where rec loop =
+                    fun
+                    [ [r :: rl] ->
+                        if String.uncapitalize r.rval = "unmarried" then
+                          (NotMarried, p)
+                        else loop rl
+                    | [] -> (relation, p) ]
+            | [] -> (relation, "") ]
           in
           let u =
             match find_field "TYPE" r.rsons with

@@ -38,10 +38,10 @@ GeneWeb version 4.08
     next path.
 
 * Gedcom to GeneWeb (ged2gwb) and GeneWeb to Gedcom (gwb2ged)
+  - [14 Nov 02] Fixed bug: relation date and place of unmaried persons
+    were not imported.
   - [08 Nov 02] Fixed bad imports and exports of non Gregorian dates
     intervals.
-  - [08 Nov 02] Fixed bug: relation date of unmaried persons was not
-    imported.
 
 * Templates files (etc/*.txt)
   - [25 Oct 02] For perso.txt, added macros: "file_exists_nnn"
