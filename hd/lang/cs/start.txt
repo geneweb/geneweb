@@ -89,32 +89,38 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=#2f6400><b>podle titulu</b></font>
-<input name=t size=14 maxlength=200>
-<font color=#2f6400><b>místa</b></font>
-<input name=p size=25 maxlength=200>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=#2f6400><b>podle titulu</b></font><br>
+<input name=t size=14 maxlength=200><br>
+(ex: roi, duke...)
+</td><td>...</td><td>
+<font color=#2f6400><b>místa</b></font><br>
+<input name=p size=25 maxlength=200><br>
+(ex: de France, of Sax...)
+</td><td>
 <input type=submit value="Ok">
-<br>
-ex:
-<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
-<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</td></tr></table>
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>{by the list}</b></font> {of all}
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+<font color=#2f6400><b>{by the list}</b></font> {of all}<br>
 <select name=m>
 <option value="N" selected>pøíjmení
 <option value="P">køestní jména
 </select>
-seøazená podle
+</td><td>...</td><td align=center>
+seøazená podle<br>
 <select name=tri>
 <option value="A" selected>abecedy
 <option value="F">èetnosti
 </select>
+</td><td>
 <input type=submit VALUE="Ok">
+</td></tr></table>
 </form>
 
 <li><font color=#2f6400><b>{by the}</b></font>

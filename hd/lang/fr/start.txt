@@ -89,15 +89,17 @@ maxlength=200>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=#2f6400><b>par titre</b></font>
-<input name=t size=13 maxlength=200>
-<font color=#2f6400><b>lieu</b></font>
-<input name=p size=25 maxlength=200>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=#2f6400><b>par titre</b></font><br>
+<input name=t size=13 maxlength=200><br>
+(ex: roi, duke...)
+</td><td>...</td><td>
+<font color=#2f6400><b>lieu</b></font><br>
+<input name=p size=25 maxlength=200><br>
+(ex: de France, of Sax...)
+</td><td>
 <input type=submit value="Ok">
-<br>
-ex:
-<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
-<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</table>
 </form>
 
 <li>
