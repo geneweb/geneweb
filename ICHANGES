@@ -5,6 +5,8 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [26 Jul 00] Fixed detail in Wserver: closed socket before callback
+    in order to allow the callback to fork processes without being blocked    
   - [25 Jul 00] Restructured Wserver to be cleaner and to save memory
     when sending big files.
   - [19 Jul 00] Message "Ready" of gwd display now date as yyyy-mm-dd.

@@ -1,5 +1,5 @@
-(* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.23 2000-07-21 07:27:55 ddr Exp $ *)
+(* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
+(* $Id: ged2gwb.ml,v 3.24 2000-07-26 04:42:33 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -2262,8 +2262,15 @@ The data base \"%s\" already exists. Use option -f to overwrite it.\n"
   let arrays = make_subarrays arrays in
   let base = make_base arrays in
   do finish_base base;
-     Iobase.output out_file.val base;
-     output_command_line out_file.val;
+     lock (Iobase.lock_file out_file.val) with
+     [ Accept ->
+         do Iobase.output out_file.val base;
+            output_command_line out_file.val;
+         return ()
+     | Refuse ->
+         do Printf.printf "Base is locked: cannot write it\n";
+            flush stdout;
+         return exit 2 ];
      warning_month_number_dates ();
      if log_oc.val != stdout then close_out log_oc.val else ();
   return ()

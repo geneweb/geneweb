@@ -1,9 +1,11 @@
-(* $Id: gwtp.ml,v 1.4 2000-07-26 01:39:33 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.5 2000-07-26 04:44:06 ddr Exp $ *)
 
 open Printf;
 
 value gwtp_dir = ref "gwtp_dir";
-value token_tmout = ref 30.0;
+value comm_ged2gwb = ref "../../geneweb/ged2gwb/ged2gwb";
+value comm_consang = ref "../../geneweb/src/consang";
+value token_tmout = ref 60.0;
 
 (* Get CGI contents *)
 
@@ -80,55 +82,37 @@ value gwtp_error txt =
 
 value gwtp_invalid_request str env = gwtp_error "Invalid request";
 
-(* Requests *)
-
-value lowercase_start_with s s_ini =
-  let len = String.length s_ini in
-  String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
-;
-
-value send_file str env b t f =
-  do printf "content-type: text/html\r\n\r\n";
-     printf "%s<p>\n" (String.escaped str);
-     printf "Environnement:\n";
-     printf "<ul>\n";
-     List.iter
-        (fun (k, v) ->
-           let v =
-             if String.length v > 40 then String.sub v 0 40 ^ "..."
-             else v
-           in
-           printf "<li>%s = %s\n" k (html_escaped v))
-        env;
-     printf "</ul>\n";
-     printf "Fin.\n";
-     flush stdout;
-  return
-  try
-    let oc = open_out (Filename.concat "tmp" (List.assoc "f_name" env)) in
-    let contents = List.assoc "f" env in
-    let i =
-      if lowercase_start_with contents "content-type: " then
-        String.index contents '\n'
-      else 0
-    in
-    let j = String.index_from contents (i + 1) '\n' in
-    do output oc contents (j + 1) (String.length contents - j - 3);
-       close_out oc;
-    return ()
-  with
-  [ Not_found -> () ]
-;
-
-value gwtp_send str env =
-  match
-    (HttpEnv.getenv env "b", HttpEnv.getenv env "t", HttpEnv.getenv env "f")
-  with
-  [ (Some b, Some t, Some f) -> send_file str env b t f
-  | _ -> gwtp_invalid_request str env ]
-;
-
 (* Login and tokens *)
+
+value tokens_file_name () = Filename.concat gwtp_dir.val "token";
+
+value read_tokens fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop [] where rec loop list =
+        match try Some (input_line ic) with [ End_of_file -> None ] with
+        [ Some line ->
+            let i = String.index line ' ' in
+            let j = String.index_from line (i + 1) ' ' in
+            let tm = float_of_string (String.sub line 0 i) in
+            let b = String.sub line (i + 1) (j - i - 1) in
+            let tok = String.sub line (j + 1) (String.length line - j - 1) in
+            loop [(tm, b, tok) :: list]
+        | None ->
+            do close_in ic; return List.rev list ]
+  | None -> [] ]
+;
+
+value write_tokens fname tokens =
+  let oc = open_out fname in
+  do List.iter
+       (fun (tm, b, tok) -> fprintf oc "%.0f %s %s\n" tm b tok)
+       tokens;
+     close_out oc;
+  return ()
+;
+
+Random.self_init ();
 
 value mk_passwd () =
   loop 0 where rec loop len =
@@ -151,36 +135,121 @@ value check_login b p =
   if login_ok then Some (mk_passwd ()) else None
 ;
 
-value set_token b tok =
+value check_token fname b tok =
+  let tokens = read_tokens fname in
   let tm = Unix.time () in
-  let fname = Filename.concat gwtp_dir.val "token" in
+  loop [] tokens where rec loop tokens_out =
+    fun
+    [ [(tm0, b0, tok0) :: tokens] ->
+        if tm < tm0 || tm -. tm0 > token_tmout.val then
+          loop tokens_out tokens
+        else if b = b0 && tok = tok0 then
+          (True, List.rev tokens_out @ [(tm, b, tok) :: tokens])
+        else loop [(tm0, b0, tok0) :: tokens_out] tokens
+    | [] -> (False, List.rev tokens_out) ]
+;
+
+value set_token b tok =
+  let fname = tokens_file_name () in
   let tokens =
-    match try Some (open_in fname) with [ Sys_error _ -> None ] with
-    [ Some ic ->
-        loop [] where rec loop list =
-          match try Some (input_line ic) with [ End_of_file -> None ] with
-          [ Some line ->
-              let i = String.index line ' ' in
-              let j = String.index_from line (i + 1) ' ' in
-              let tm0 = float_of_string (String.sub line 0 i) in
-              let b0 = String.sub line (i + 1) (j - i) in
-              let tok = String.sub line (j + 1) (String.length line - j - 1) in
-              let list =
-                if b = b0 || tm -. tm0 > token_tmout.val then list
-                else [(tm0, b0, tok) :: list]
-              in
-              loop list
-          | None ->
-              let list = [(tm, b, tok) :: list] in
-              do close_in ic; return List.rev list ]
-    | None -> [(tm, b, tok)] ]
+    let tokens = read_tokens fname in
+    let tm = Unix.time () in
+    List.fold_right
+      (fun (tm0, b0, tok0) tokens ->
+         if b = b0 || tm < tm0 || tm -. tm0 > token_tmout.val then tokens
+         else [(tm0, b0, tok0) :: tokens])
+      tokens [(tm, b, tok)]
   in
-  let oc = open_out fname in
-  do List.iter
-       (fun (tm, b, tok) -> fprintf oc "%f %s %s\n" tm b tok)
-       tokens;
-     close_out oc;
+  write_tokens fname tokens
+;
+
+(* Requests *)
+
+value lowercase_start_with s s_ini =
+  let len = String.length s_ini in
+  String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
+;
+
+value send_file str env b t f fname =
+  let fname = Filename.basename fname in
+  do try
+       let oc = open_out (Filename.concat "tmp" fname) in
+       let contents = List.assoc "f" env in
+       let i =
+         if lowercase_start_with contents "content-type: " then
+           String.index contents '\n'
+         else 0
+       in
+       let j = String.index_from contents (i + 1) '\n' in
+       do output oc contents (j + 1) (String.length contents - j - 3);
+          close_out oc;
+       return ()
+     with
+     [ Not_found -> () ];
+     printf "content-type: text/html\r\n\r\n";
+     printf "
+<head><title>Gwtp: data base \"%s\"</title></head>\n<body>
+<h1>Gwtp: data base \"%s\"</h1>
+File %s transfered
+" b b fname;
+     flush stdout;
+     if Filename.check_suffix fname ".ged"
+     || Filename.check_suffix fname ".GED" then
+       do printf "<p>\nThe data base is going to be created.\n";
+          flush stdout;
+       return
+       let bfname = Filename.concat "tmp" b in
+       let fname = Filename.concat "tmp" fname in
+       let pid = Unix.fork () in
+       if pid > 0 then let _ = Unix.waitpid [] pid in ()
+       else
+         do List.iter Unix.close [Unix.stdin; Unix.stdout; Unix.stderr]; return
+         if Unix.fork () > 0 then exit 0
+         else
+           let ic = Unix.openfile "/dev/null" [Unix.O_RDONLY] 0o666 in
+           let oc =
+             Unix.openfile (Filename.concat "tmp" "gwtp.log")
+               [Unix.O_CREAT; Unix.O_WRONLY; Unix.O_APPEND] 0o666
+           in
+           let s =
+             "$ " ^ comm_ged2gwb.val ^ " " ^ fname ^ " -f -o " ^ bfname ^ "\n"
+           in
+           let _ = Unix.write oc s 0 (String.length s) in
+           let _ =
+             Unix.create_process_env comm_ged2gwb.val
+               [| comm_ged2gwb.val; fname; "-f"; "-o"; bfname |] [| |]
+               ic oc oc
+           in
+           let _ = Unix.wait () in
+  (*
+           let _ =
+             Unix.create_process_env comm_consang.val
+               [| comm_consang.val; "-q"; bfname |] [| |]
+               ic oc oc
+           in
+           let _ = Unix.wait () in
+  *)
+           do Unix.close oc; return exit 0
+     else ();
+     printf "Bye\n";
+     printf "</body>\n";
   return ()
+;
+
+value gwtp_send str env =
+  match
+    (HttpEnv.getenv env "b", HttpEnv.getenv env "t", HttpEnv.getenv env "f",
+     HttpEnv.getenv env "f_name")
+  with
+  [ (Some b, Some t, Some f, Some fname) ->
+      let ok =
+        let fname = tokens_file_name () in
+        let (ok, tokens) = check_token fname b t in
+        do write_tokens fname tokens; return ok
+      in
+      if ok then send_file str env b t f fname
+      else gwtp_error "Login expired"
+  | _ -> gwtp_invalid_request str env ]
 ;
 
 value login_ok str env b p tok =
@@ -193,7 +262,7 @@ value login_ok str env b p tok =
 <input type=hidden name=m value=SEND>
 <input type=hidden name=b value=%s>
 <input type=hidden name=t value=%s>
-File to send:<br>
+Gedcom or GeneWeb source file to send:<br>
 <input type=file name=f><br>
 <input type=submit>
 </form>
