@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.17 1999-09-16 09:31:46 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.18 1999-09-17 06:29:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -797,7 +797,7 @@ value count_error computed found =
   return exit 2
 ;
 
-value output bname base =
+value gen_output no_patches bname base =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
@@ -816,8 +816,6 @@ value output bname base =
   do base.func.cleanup (); return
   let oc = open_out_bin tmp_fname in
   let oc_acc = open_out_bin tmp_fname_acc in
-  let oc_inx = open_out_bin tmp_fname_inx in
-  let oc2 = open_out_bin tmp_fname_gw2 in
   let output_array arr =
     let bpos = pos_out oc in
     do output_value_no_sharing oc arr; return
@@ -858,60 +856,87 @@ value output bname base =
        output_binary_int oc strings_array_pos;
        close_out oc;
        close_out oc_acc;
+       if not no_patches then
+         let oc_inx = open_out_bin tmp_fname_inx in
+         let oc2 = open_out_bin tmp_fname_gw2 in
+         try
 do Printf.eprintf "*** create name index\n"; flush stderr; return
-       output_binary_int oc_inx 0;
-       create_name_index oc_inx base;
-       let surname_or_first_name_pos = pos_out oc_inx in
+           do output_binary_int oc_inx 0;
+	      create_name_index oc_inx base;
+	      let surname_or_first_name_pos = pos_out oc_inx in
 do Printf.eprintf "*** create strings of fsname\n"; flush stderr; return
-       do create_strings_of_fsname oc_inx base;
-          seek_out oc_inx 0;
-          output_binary_int oc_inx surname_or_first_name_pos;
-          close_out oc_inx;
-       return ();
+	      do create_strings_of_fsname oc_inx base;
+	         seek_out oc_inx 0;
+		 output_binary_int oc_inx surname_or_first_name_pos;
+		 close_out oc_inx;
+              return ();
 do Printf.eprintf "*** create string index\n"; flush stderr; return
-       output_strings_hash oc2 base;
-       let surname_pos = pos_out oc2 in
+              output_strings_hash oc2 base;
+              let surname_pos = pos_out oc2 in
 do Printf.eprintf "*** create surname index\n"; flush stderr; return
-       do output_surname_index oc2 base; return
-       let first_name_pos = pos_out oc2 in
+              do output_surname_index oc2 base; return
+              let first_name_pos = pos_out oc2 in
 do Printf.eprintf "*** create first name index\n"; flush stderr; return
-       do output_first_name_index oc2 base;
-          seek_out oc2 int_size;
-          output_binary_int oc2 surname_pos;
-          output_binary_int oc2 first_name_pos;
-       return ();
-       let s = base.data.bnotes.nread 0 in
-       if s = "" then ()
-       else
-         let oc_not = open_out tmp_fname_not in
-         do output_string oc_not s;
-            close_out oc_not;
-         return ();
-       close_out oc2;
+              do output_first_name_index oc2 base;
+                 seek_out oc2 int_size;
+                 output_binary_int oc2 surname_pos;
+                 output_binary_int oc2 first_name_pos;
+              return ();
+              let s = base.data.bnotes.nread 0 in
+              if s = "" then ()
+              else
+                let oc_not = open_out tmp_fname_not in
+                do output_string oc_not s;
+                   close_out oc_not;
+                return ();
+              close_out oc2;
+           return ()
+         with e ->
+           do try close_out oc_inx with _ -> ();
+              try close_out oc2 with _ -> ();
+           return raise e
+       else ();
 do Printf.eprintf "*** ok\n"; flush stderr; return
        remove_file (Filename.concat bname "base");
        Sys.rename tmp_fname (Filename.concat bname "base");
        remove_file (Filename.concat bname "base.acc");
        Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
-       remove_file (Filename.concat bname "names.inx");
-       Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
-       remove_file (Filename.concat bname "strings.inx");
-       Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
-       remove_file (Filename.concat bname "notes");
-       if Sys.file_exists tmp_fname_not then
-         Sys.rename tmp_fname_not (Filename.concat bname "notes")
+       if not no_patches then
+         do remove_file (Filename.concat bname "names.inx");
+            Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
+            remove_file (Filename.concat bname "strings.inx");
+            Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
+            remove_file (Filename.concat bname "notes");
+            if Sys.file_exists tmp_fname_not then
+              Sys.rename tmp_fname_not (Filename.concat bname "notes")
+            else ();
+            remove_file (Filename.concat bname "patches");
+            remove_file (Filename.concat bname "tstab");
+         return ()
        else ();
-       remove_file (Filename.concat bname "patches");
-       remove_file (Filename.concat bname "tstab");
     return ()
   with e ->
     do try close_out oc with _ -> ();
        try close_out oc_acc with _ -> ();
-       try close_out oc_inx with _ -> ();
-       try close_out oc2 with _ -> ();
        remove_file tmp_fname;
        remove_file tmp_fname_acc;
-       remove_file tmp_fname_inx;
-       remove_file tmp_fname_gw2;
+       if not no_patches then
+         do remove_file tmp_fname_inx;
+            remove_file tmp_fname_gw2;
+         return ()
+       else ();
     return raise e
+;
+
+value output = gen_output False;
+
+value simple_output bname base =
+  let no_patches =
+    let bname =
+      if Filename.check_suffix bname ".gwb" then bname
+      else bname ^ ".gwb"
+    in
+    not (Sys.file_exists (Filename.concat bname "patches"))
+  in
+  gen_output no_patches bname base
 ;
