@@ -2562,7 +2562,7 @@ he:  לא כולל בני זוג
 it: coniugi esclusi
 nl: echtgenoten weggelaten
 pt: c&ocirc;njuges n&atilde;o inclu&iacute;dos
-se: xklusive gem&aring;ler
+se: exklusive gem&aring;ler
 
     starting with
 de: beginnend mit
