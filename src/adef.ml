@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 4.0 2001-03-16 19:34:22 ddr Exp $ *)
+(* $Id: adef.ml,v 4.1 2001-06-07 08:40:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type iper = int;
@@ -122,3 +122,5 @@ value od_of_codate od =
 ;
 
 value codate_None = codate_of_od None;
+
+exception Request_failure of string;

@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 4.0 2001-03-16 19:34:23 ddr Exp $ *)
+(* $Id: adef.mli,v 4.1 2001-06-07 08:40:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type iper = 'a;
@@ -44,3 +44,5 @@ external int_of_ifam : ifam -> int = "%identity";
 external ifam_of_int : int -> ifam = "%identity";
 external int_of_istr : istr -> int = "%identity";
 external istr_of_int : int -> istr = "%identity";
+
+exception Request_failure of string;

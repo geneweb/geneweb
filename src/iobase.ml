@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.4 2001-05-12 02:51:40 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.5 2001-06-07 08:40:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -666,7 +666,11 @@ value input bname =
     do {
       try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
       try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
-      let oc9 = open_out_bin fname in
+      let oc9 =
+        try open_out_bin fname with
+        [ Sys_error _ ->
+            raise (Adef.Request_failure "the data base is not writable") ]
+      in
       let patches = patches_of_patches_ht patches in
       output_value_no_sharing oc9 (patches : Old.patches);
       close_out oc9;

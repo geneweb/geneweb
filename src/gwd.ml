@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.9 2001-05-29 17:30:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.10 2001-06-07 08:40:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -621,6 +621,23 @@ value index_not_name s =
       | _ -> i ]
 ;
 
+value print_request_failure cgi msg =
+  do {
+    if not cgi then do { Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl (); }
+    else ();
+    Wserver.wprint "Content-type: text/html";
+    Util.nl (); Util.nl ();
+    Wserver.wprint "<head><title>Request failure</title></head>\n";
+    Wserver.wprint "\
+<body bgcolor=white>
+<h1 align=center><font color=red>Request failure</font></h1>
+The request could not be completed.<p>\n";
+    Wserver.wprint "<em><font size=-1>Internal message: %s</font></em>\n"
+      msg;
+    Wserver.wprint "</body>\n";
+  }    
+;
+
 value refresh_url cgi request s i =
   let url =
     let serv = "http://" ^ Util.get_server_string_aux cgi request in
@@ -1209,7 +1226,8 @@ value connection cgi (addr, request) script_name contents =
           conf_and_connection cgi from (addr, request) script_name contents
             env
       with
-      [ Exit -> () ]
+      [ Adef.Request_failure msg -> print_request_failure cgi msg
+      | Exit -> () ]
 ;
 
 value null_reopen flags fd =

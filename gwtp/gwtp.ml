@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.2 2001-04-28 19:47:50 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.3 2001-06-07 08:40:18 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -236,6 +236,7 @@ value remove_dir_contents dir =
   [ End_of_file -> Unix.closedir dh ]
 ;
 
+(*
 value html_escaped s =
   let s = String.escaped s in
   let rec loop i len =
@@ -251,6 +252,7 @@ value html_escaped s =
   in
   loop 0 0
 ;
+*)
 
 value gwtp_error txt =
   do {
