@@ -16,6 +16,8 @@ GeneWeb Version 2.05
     various encodings). Anyway, code is smaller.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jul 28, 99] In update family forms, shortened the names of the variables
+    "first_name" and "surname" into "fn" and "sn".
   - [Jul 23, 99] Check translated formats (phrases holding %'s) displaying
     the initial format if failed (instead of scratching).
   - [Jul 9, 99] Changed request syntax for cousins: "v1=#" instead of "v=#"

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.19 1999-07-26 07:02:00 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.20 1999-07-28 07:55:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -26,8 +26,8 @@ value getn conf var key =
 ;
 
 value reconstitute_parent conf var =
-  let first_name = strip_spaces (getn conf var "first_name") in
-  let surname = strip_spaces (getn conf var "surname") in
+  let first_name = strip_spaces (getn conf var "fn") in
+  let surname = strip_spaces (getn conf var "sn") in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
@@ -38,9 +38,9 @@ value reconstitute_parent conf var =
 ;
 
 value reconstitute_child conf var default_surname =
-  let first_name = getn conf var "first_name" in
+  let first_name = getn conf var "fn" in
   let surname =
-    let surname = getn conf var "surname" in
+    let surname = getn conf var "sn" in
     if surname = "" then default_surname else surname
   in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
@@ -78,7 +78,7 @@ value reconstitute_family conf =
           (Adef.codate_of_od
              (Update.reconstitute_date conf "divorce")) ]
   in
-  let surname = getn conf "his" "surname" in
+  let surname = getn conf "his" "sn" in
   let (children, ext) =
     loop 1 False where rec loop i ext =
       match
