@@ -5,7 +5,7 @@ GeneWeb Version 3.02
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [Jan 15, 00] Big accelaration of some dags displays by setting a
+  - [Jan 15, 00] Big acceleration of some dags displays by setting a
     smaller threshold (10 instead of 15) in relationLink.ml
   - [Jan 14, 00] No more hypertext link for spouses and all relations in
     relationlink computing page.
