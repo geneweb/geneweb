@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.28 2004-08-05 14:01:30 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.29 2004-08-05 19:41:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -789,6 +789,7 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
     | None ->
         do {
           if name = "persons" then failwith "bug: access to person array"
+          else if name = "families" then failwith "bug: access to family array"
 	  else ();
           ifdef UNIX then
             if verbose.val then do {
@@ -1415,7 +1416,9 @@ value gen_output no_patches bname base =
 *)
       let _ = base.data.ascends.array () in
       let _ = base.data.unions.array () in
+(*
       let _ = base.data.families.array () in
+*)
       let _ = base.data.couples.array () in
       let _ = base.data.descends.array () in
       let _ = base.data.strings.array () in ()
