@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.134 2000-07-08 03:17:08 ddr Exp $
+# $Id: lexicon.txt,v 3.135 2000-07-08 16:21:32 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1995,7 +1995,7 @@ nl: verdergaan met samenvoegen
 no: fortsett sammensl&aring;ing
 pt: continuar a fus&atilde;o
 ru: продолжить объединение
-se: forts&auml;tt sl&aring;samman
+se: forts&auml;tt sl&aring; samman
 
     cousins
 af: neefs/niggies
@@ -3678,7 +3678,7 @@ nl: samenvoegen
 no: sl&aring; sammen
 pt: fus&atilde;o
 ru: объединить
-se: sl&aring;samman
+se: sl&aring; samman
 
     merge done
 af: saamgevoeg
@@ -6459,7 +6459,7 @@ nl: je moet eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen
 pt: Voc&ecirc; tem que fundir primeiro
 ru: вы должны сначала объединить
-se: du m&aring;ste f&ouml;rst sl&aring;samman
+se: du m&aring;ste f&ouml;rst sl&aring; samman
 
     you must first merge the 2 families
 af: jy moet eers die twee families saamvoeg
@@ -6479,4 +6479,4 @@ nl: je moet de twee families eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen de 2 familiene
 pt: Voc&ecirc; tem que fundir primeiro as 2 fam&iacute;lias
 ru: вы должны сначала объединить 2 семьи
-se: du m&aring;ste f&ouml;rst sl&aring;samman de 2 familjerna
+se: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
