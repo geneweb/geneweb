@@ -15,7 +15,7 @@
 		Dutch		Joris Esch
 		Swedish		Lars Gustavsson
 
-        Algorithms of consanguinity and relationship
+        Algorithm of consanguinity and relationship
                                 Didier Rémy
 
 	Program written by Daniel de Rauglaudre.
