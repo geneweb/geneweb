@@ -21,6 +21,10 @@ included.
 * GeneWeb compiler (gwc)
   - [Feb 8, 99] The option "-cg" did not work. Fixed.
 
+* GeneWeb uncompiler (gwu)
+  - [Feb 16, 99] Fixed bug: names holding "?" were sometimes not saved
+    correctly, so that gwc did not work afterwards.
+
 * Documentation
   - [Feb 15, 99] Completed info for configuration files in file "start.htm", 
     section "File a.cnf". Explained how to send photo (new feature) in file
