@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.23 2002-01-13 19:08:54 ddr Exp $ *)
+(* $Id: setup.ml,v 4.24 2002-01-14 18:14:47 ddr Exp $ *)
 
 open Printf;
 
@@ -1618,7 +1618,7 @@ value intro () =
           }
           else (lang_param.val, lang_param.val)
         in
-        copy_text setup_lang (Filename.concat setup_lang "intro.txt");
+        copy_text setup_lang (Filename.concat "lang"(*setup_lang*) "intro.txt");
         (gwd_lang, setup_lang)
       }
     in

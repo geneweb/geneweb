@@ -1,0 +1,88 @@
+
+[
+de: Willkommen zu GeneWeb $q
+en: Welcome to GeneWeb $q
+es: Bienvenido a GeneWeb $q
+fr: Bienvenue dans GeneWeb $q
+lv: Sveicinaati GeneWeb $q Ghenealoghijas datu baazee
+sv: Välkommen till GeneWeb $q
+]
+
+[
+en: Go to your Web browser and open one of the following addresses:
+fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
+]
+       http://127.0.0.1:$z/
+       http://localhost:$z/
+
+[
+en: Warning: for this program to work, you must not delete this window!
+fr: Attention: pour que cela fonctionne, vous ne devez pas detruire cette
+    fenetre!
+lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
+sv: Varning: för att det här programmet ska fungera, får du inte stänga
+    detta fönster!
+]
+
+[
+de: Falls das nicht funktioniert, mußt du eventuell in deinem Webbrowser
+    einige Optionen ändern, wie zum Beispiel "Offline arbeiten" oder
+    "Für lokale Adressen keinen Proxy benutzen" oder "Für die Adresse
+    'localhost' nicht mit dem Internet verbinden".
+en: If none of theses addresses work, you may have to configure, in your
+    browser, options like "work off-line" or "do not use the proxy for
+    local addresses" or "do not connect to Internet for the address
+    'localhost'".
+es: Si esto no funciona, es posible que Ud. haya configurado en su 
+    explorador algunas opciones de tipo "trabajar fuera de conección" 
+    o "no utilizar un proxy con las direcciones locales" o "no conectarse 
+    al internet con la dirección 'localhost'".
+fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez a
+    configurer dans votre navigateur des options du genre "travailler hors
+    connexion" ou "ne pas utiliser de proxy pour les adresses locales" ou
+    "ne pas se connecter sur internet pour l'adresse 'localhost'".
+lv: Ja pie iepriekshmineetajiem nosaciijumiem Juus nevariet pieklhuut pie
+    GeneWeb, Jums iespeejams jaaiestaada savaa Interneta caurluukprogramaa
+    sekojoýi noraadiijumi: "work off-line" vai "do not use the proxy for local
+    addresses" vai "do not connect to Internet for the address
+    'localhost'". 
+sv: Om det inte fungerar, kanske du måste ställa in din webbläsare
+    med optioner som "arbeta off-line" eller "använd inte en proxyserver
+    för lokala adresser" eller "anslut inte till Internet för adressen
+    'localhost'".
+]
+
+[
+de: Wenn du trotz all dieser Anstrengungen keinen Zugriff bekommst,
+    versuche es mit der klassischen Methode, die Dokumentation 
+    anzuschauen. Dazu beende dieses Programm, indem du Control-C 
+    (bzw. Strg-C) in diesem Fenster drückst, dann in das Verzeichnis
+    "gw" wechselst und die folgende Datei öffnest:
+en: If despite your efforts, it still does not answer, try the classical
+    procedure by looking at the documentation. For that, stop this program
+    by typing "control-c" in this window, go to the directory "gw" and
+    open the file:
+es: Si a pesar de todos sus esfuerzos, el problema no se resuelve, trate 
+    con  el método clásico indicado en la documentación. Para ello salga 
+    del programa escribiendo en el teclado "control-c" (en la ventana que 
+    se había abierto al lanzar el programa), vaya luego a la carpeta "gw" 
+    y habra el fichero:
+fr: Si malgre vos efforts, cela ne repond toujours pas, essayez la procedure
+    classique en regardant la documentation. Pour cela arretez ce programme
+    en tapant "control-c" dans cette fenetre, allez dans le repertoire "gw"
+    et ouvrez le fichier:
+lv: Ja tomeer tas viss neliidz, meeghiniet kaa parasts skatiit programmas
+    aprakstu: izejiet no shiis programas nospiezhot "ctr-c" pie aktiiva
+    shii loga, aizejiet uz katalogu "gw" un atveriet datni:
+sv: Om det ändå inte fungerar fast du försökt på olika sätt, försök med det
+    klassiska att titta i dokumentationen. För att göra det, stoppa först
+    det här programmet genom att trycka "control-c" i detta fönster, gå
+    sedan till katalogen "gw" och öppna filen:
+]
+     INSTALL.htm
+
+[
+en: But you risk to meet the same problem a little bit further...
+fr: Mais... vous risquez de vous retrouver confronte au meme probleme un
+    peu plus loin...
+]
