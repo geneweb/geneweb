@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.2 1998-09-08 09:13:27 ddr Exp $ *)
+(* $Id: perso.ml,v 1.3 1998-09-25 09:46:34 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -475,6 +475,15 @@ value print_sources conf base p =
   return ()
 ;
 
+value commd_no_params conf =
+  conf.command ^
+  List.fold_left
+    (fun c (k, v) ->
+       c ^ (if c = "" then "?" else ";") ^ k ^
+       (if v = "" then "" else "=" ^ v))
+    "" conf.henv
+;
+
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
 value print conf base p =
@@ -502,7 +511,7 @@ value print conf base p =
   in
   let a = aoi base p.cle_index in
   do header conf title;
-     Wserver.wprint "<a href=\"%s\">" (commd conf);
+     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
      Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=welcome align=right>"
        (commd conf);
      Wserver.wprint "</a>\n";

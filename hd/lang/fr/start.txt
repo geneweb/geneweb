@@ -73,8 +73,8 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 <p>
 
 <form method=get action="%f">%h
-<font size=-1>Mot de passe, pour acc&egrave;s <em>amis</em> ou
-<em>mise-&agrave;-jour</em>:</font>
+<font size=-1>Mot de passe, pour acc&egrave;s <em>ami</em> ou
+<em>sorcier</em>:</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
