@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.2 1998-09-29 12:22:40 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.3 1998-09-30 14:04:45 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -126,9 +126,9 @@ value print_mod_merge_ok conf base wl p =
               Wserver.wprint "%s" (capitale (transl conf "continue merging"));
             end;
             Wserver.wprint "\n";
-            Merge.print_someone base p1;
+            Merge.print_someone conf base p1;
             Wserver.wprint "\n%s\n" (transl conf "and");
-            Merge.print_someone base p2;
+            Merge.print_someone conf base p2;
             Wserver.wprint "\n";
          return ()
      | _ -> () ];

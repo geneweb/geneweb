@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.6 1998-09-30 07:29:28 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.7 1998-09-30 14:04:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -11,27 +11,36 @@ value f_aoc conf s =
   else s
 ;
 
-value get env key =
-  match p_getenv env key with
+value raw_get conf key =
+  match p_getenv conf.env key with
   [ Some v -> v
   | None -> failwith (key ^ " unbound") ]
 ;
 
-value get_nth env key cnt = p_getenv env (key ^ string_of_int cnt);
+value get conf key =
+  match p_getenv conf.env key with
+  [ Some v -> f_aoc conf v
+  | None -> failwith (key ^ " unbound") ]
+;
+
+value get_nth conf key cnt =
+  match p_getenv conf.env (key ^ string_of_int cnt) with
+  [ Some v -> Some (f_aoc conf v)
+  | None -> None ]
+;
 
 value rec reconstitute_string_list conf var ext cnt =
-  match get_nth conf.env var cnt with
+  match get_nth conf var cnt with
   [ Some s ->
-      let s = f_aoc conf s in
       let (sl, ext) = reconstitute_string_list conf var ext (cnt + 1) in
-      match get_nth conf.env ("add_" ^ var) cnt with
+      match get_nth conf ("add_" ^ var) cnt with
       [ Some "on" -> ([s; "" :: sl], True)
       | _ -> ([s :: sl], ext) ]
   | _ -> ([], ext) ]
 ;
 
 value reconstitute_add_title conf ext cnt tl =
-  match get_nth conf.env "add_title" cnt with
+  match get_nth conf "add_title" cnt with
   [ Some "on" ->
       let t1 =
         {t_name = Tnone; t_title = ""; t_place = "";
@@ -45,15 +54,15 @@ value reconstitute_add_title conf ext cnt tl =
 
 value rec reconstitute_titles conf ext cnt =
   match
-    (get_nth conf.env "t_title" cnt, get_nth conf.env "t_place" cnt,
-     get_nth conf.env "t_name" cnt)
+    (get_nth conf "t_title" cnt, get_nth conf "t_place" cnt,
+     get_nth conf "t_name" cnt)
   with
   [ (Some t_title, Some t_place, Some t_name) ->
       let t_name =
-        match (get_nth conf.env "t_main_title" cnt, t_name) with
+        match (get_nth conf "t_main_title" cnt, t_name) with
         [ (Some "on", _) -> Tmain
         | (_, "") -> Tnone
-        | (_, _) -> Tname (f_aoc conf t_name) ]
+        | (_, _) -> Tname t_name ]
       in
       let t_date_start =
         Update.reconstitute_date conf ("t_date_start" ^ string_of_int cnt)
@@ -62,13 +71,12 @@ value rec reconstitute_titles conf ext cnt =
         Update.reconstitute_date conf ("t_date_end" ^ string_of_int cnt)
       in
       let t_nth =
-        match get_nth conf.env "t_nth" cnt with
+        match get_nth conf "t_nth" cnt with
         [ Some s -> try int_of_string s with [ Failure _ -> 0 ]
         | _ -> 0 ]
       in
       let t =
-        {t_name = t_name; t_title = f_aoc conf t_title;
-         t_place = f_aoc conf t_place;
+        {t_name = t_name; t_title = t_title; t_place = t_place;
          t_date_start = Adef.codate_of_od t_date_start;
          t_date_end = Adef.codate_of_od t_date_end;
          t_nth = t_nth}
@@ -90,7 +98,7 @@ value reconstitute_death conf =
     | Some "Unspecified" | None -> Unspecified
     | Some x -> failwith ("bad death reason type " ^ x) ]
   in
-  match get conf.env "death" with
+  match get conf "death" with
   [ "DeadYoung" when d = None -> DeadYoung
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
@@ -116,32 +124,24 @@ value reconstitute_person conf =
     [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
   in
-  let first_name = f_aoc conf (strip_spaces (get conf.env "first_name")) in
-  let surname = f_aoc conf (strip_spaces (get conf.env "surname")) in
+  let first_name = (strip_spaces (get conf "first_name")) in
+  let surname = (strip_spaces (get conf "surname")) in
   let occ =
 (*
     if first_name = "?" || surname = "?" then 0
     else
 *)
-      try int_of_string (strip_spaces (get conf.env "occ")) with
+      try int_of_string (strip_spaces (get conf "occ")) with
       [ Failure _ -> 0 ]
   in
-  let photo =
-    match p_getenv conf.env "photo" with
-    [ Some s -> f_aoc conf (strip_spaces s)
-    | _ -> "" ]
-  in
+  let photo = get conf "photo" in
   let (first_names_aliases, ext) =
     reconstitute_string_list conf "first_name_alias" ext 0
   in
   let (surnames_aliases, ext) =
     reconstitute_string_list conf "surname_alias" ext 0
   in
-  let public_name =
-    match p_getenv conf.env "public_name" with
-    [ Some s -> f_aoc conf s
-    | None -> "" ]
-  in
+  let public_name = get conf "public_name" in
   let (nicknames, ext) = reconstitute_string_list conf "nickname" ext 0 in
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
@@ -152,11 +152,7 @@ value reconstitute_person conf =
     | Some "Private" -> Private
     | _ -> IfTitles ]
   in
-  let occupation =
-    match p_getenv conf.env "occu" with
-    [ Some s -> f_aoc conf s
-    | None -> "" ]
-  in
+  let occupation = strip_spaces (get conf "occu") in
   let sex =
     match p_getenv conf.env "sex" with
     [ Some "M" -> Masculin
@@ -165,20 +161,19 @@ value reconstitute_person conf =
   in
   let public = False in
   let birth = Adef.codate_of_od (Update.reconstitute_date conf "birth") in
-  let birth_place = f_aoc conf (get conf.env "birth_place") in
+  let birth_place = get conf "birth_place" in
   let bapt = Adef.codate_of_od (Update.reconstitute_date conf "bapt") in
-  let bapt_place = f_aoc conf (get conf.env "bapt_place") in
+  let bapt_place = get conf "bapt_place" in
   let death = reconstitute_death conf in
   let death_place =
     match death with
-    [ Death _ _ | DeadYoung | DeadDontKnowWhen ->
-        f_aoc conf (get conf.env "death_place")
+    [ Death _ _ | DeadYoung | DeadDontKnowWhen -> get conf "death_place"
     | _ -> "" ]
   in
   let burial = reconstitute_burial conf in
   let burial_place =
     match burial with
-    [ Buried _ | Cremated _ -> f_aoc conf (get conf.env "burial_place")
+    [ Buried _ | Cremated _ -> get conf "burial_place"
     | _ -> "" ]
   in
   let death =
@@ -186,16 +181,8 @@ value reconstitute_person conf =
     [ (NotDead | DontKnowIfDead, Buried _ | Cremated _) -> DeadDontKnowWhen
     | _ -> death ]
   in
-  let notes =
-    match p_getenv conf.env "notes" with
-    [ Some s -> f_aoc conf (strip_spaces (strip_controls_m s))
-    | _ -> "" ]
-  in
-  let psources =
-    match p_getenv conf.env "src" with
-    [ Some s -> f_aoc conf (strip_spaces s)
-    | _ -> "" ]
-  in
+  let notes = strip_spaces (strip_controls_m (get conf "notes")) in
+  let psources = strip_spaces (get conf "src") in
   let p =
     {first_name = first_name; surname = surname; occ = occ;
      photo = photo;
@@ -206,13 +193,13 @@ value reconstitute_person conf =
      occupation = occupation;
      sexe = sex; access = access;
      birth = birth; birth_place = birth_place;
-     birth_src = f_aoc conf (get conf.env "birth_src");
+     birth_src = get conf "birth_src";
      baptism = bapt; baptism_place = bapt_place;
-     baptism_src = f_aoc conf (get conf.env "bapt_src");
+     baptism_src = get conf "bapt_src";
      death = death; death_place = death_place;
-     death_src = f_aoc conf (get conf.env "death_src");
+     death_src = get conf "death_src";
      burial = burial; burial_place = burial_place;
-     burial_src = f_aoc conf (get conf.env "burial_src");
+     burial_src = get conf "burial_src";
      family = [| |]; notes = notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in
@@ -512,7 +499,7 @@ value print_mod_aux conf base callback =
       try
         let (p, ext) = reconstitute_person conf in
         let digest = Update.digest_person (poi base p.cle_index) in
-        if digest = get conf.env "digest" then
+        if digest = raw_get conf "digest" then
           if ext then UpdateInd.print_mod1 conf base p digest
           else
             do strip_person p; return

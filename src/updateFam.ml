@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.3 1998-09-30 07:29:26 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.4 1998-09-30 14:04:46 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -7,6 +7,11 @@ open Util;
 open Config;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
+
+value f_coa conf s =
+  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
+  else s
+;
 
 type create = [ Create of sexe | Link ];
 type str_indi = (string * string * int * create);
@@ -38,7 +43,7 @@ value print_person conf base var fmem (first_name, surname, occ, create) =
       end;
       tag "td" begin
         Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
-        Wserver.wprint " value=\"%s\">" first_name;
+        Wserver.wprint " value=\"%s\">" (f_coa conf first_name);
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
@@ -82,7 +87,7 @@ value print_person conf base var fmem (first_name, surname, occ, create) =
       tag "td" "colspan=4" begin
         Wserver.wprint
           "<input name=%s_surname size=40 maxlength=200 value=\"%s\">"
-          var surname;
+          var (f_coa conf surname);
       end;
     end;
   end
@@ -125,7 +130,7 @@ value print_marriage conf base fam =
            Wserver.wprint
              "<input name=marriage_place size=40 maxlength=200%s>\n"
              (if fam.marriage_place = "" then ""
-             else " value=\"" ^ fam.marriage_place ^ "\"");
+             else " value=\"" ^ f_coa conf fam.marriage_place ^ "\"");
          end;
        end;
      end;
@@ -145,7 +150,8 @@ value print_divorce conf base fam =
      tag "table" "border=1" begin
        tag "tr" begin
          tag "tr" "colspan=3" begin
-           Wserver.wprint "<input type=radio name=divorce value=not_divorced%s>"
+           Wserver.wprint
+             "<input type=radio name=divorce value=not_divorced%s>"
              (match fam.divorce with [ NotDivorced -> " checked" | _ -> "" ]);
            Wserver.wprint "%s\n" (capitale (transl conf "not divorced"));
            Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
@@ -223,7 +229,7 @@ value print_comment conf base fam =
          tag "td" begin
            Wserver.wprint "<input name=comment size=50 maxlength=200%s>\n"
              (match fam.comment with
-              [ s when s <> "" -> " value=\"" ^ s ^ "\""
+              [ s when s <> "" -> " value=\"" ^ f_coa conf s ^ "\""
               | _ -> "" ]);
          end;
        end;
@@ -241,7 +247,8 @@ value print_source conf base field =
          tag "td" begin
            Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
              (match field with
-              [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
+              [ s when s <> "" ->
+                  " value=\"" ^ quote_escaped (f_coa conf s) ^ "\""
               | _ -> "" ]);
          end;
        end;

@@ -1,10 +1,15 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: family.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: family.ml,v 1.2 1998-09-30 14:04:42 ddr Exp $ *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
+
+value f_aoc conf s =
+  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
+  else s
+;
 
 value person_is_std_key base p k =
   let k = Name.strip_lower k in
@@ -27,7 +32,7 @@ value inconnu_au_bataillon conf =
   [ (Some nom, Some prenom) ->
       let title _ =
         Wserver.wprint "%s: \"%s %s\"" (capitale (transl conf "not found"))
-          prenom nom
+          (coa conf prenom) (coa conf nom)
       in
       do header conf title; trailer conf; return ()
   | _ -> incorrect_request conf ]
@@ -35,7 +40,8 @@ value inconnu_au_bataillon conf =
 
 value inconnu conf n =
   let title _ =
-    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found")) n
+    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found"))
+      (coa conf n)
   in
   do header conf title; trailer conf; return ()
 ;
@@ -258,14 +264,15 @@ value family_m conf base =
   | Some "NG" ->
       match p_getenv conf.env "n" with
       [ Some n ->
+          let an = f_aoc conf n in
           match p_getenv conf.env "t" with
-          [ Some "P" -> Some.first_name_print conf base n
-          | Some "N" -> Some.surname_print conf base n
+          [ Some "P" -> Some.first_name_print conf base an
+          | Some "N" -> Some.surname_print conf base an
           | _ ->
-              let pl = person_ht_find_all base n in
+              let pl = person_ht_find_all base an in
               let pl = compact_list conf base pl in
               let pl =
-                let spl = select_std_eq base pl n in
+                let spl = select_std_eq base pl an in
                 if spl = [] then pl else spl
               in
               match pl with
