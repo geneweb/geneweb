@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.4 1999-04-22 21:59:27 ddr Exp $
+# $Id: Makefile,v 2.5 1999-04-30 11:45:46 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -10,6 +10,7 @@ out::
 	cd ged2gwb; $(MAKE) all
 	cd gwb2ged; $(MAKE) all
 	cd doc; $(MAKE) all
+	cd setup; $(MAKE) all
 
 opt::
 	cd wserver; $(MAKE) opt
@@ -17,6 +18,19 @@ opt::
 	cd ged2gwb; $(MAKE) opt
 	cd gwb2ged; $(MAKE) opt
 	cd doc; $(MAKE) opt
+	cd setup; $(MAKE) opt
+
+setup_distrib: distrib
+	mkdir t
+	mv distribution t/gw
+	mv t distribution
+	cp setup/setup distribution/.
+	mkdir distribution/gw/setup
+	cp setup/intro.txt distribution/gw/setup/.
+	for i in fr; do \
+	  mkdir distribution/gw/setup/$$i; \
+	  cp setup/$$i/* distribution/gw/setup/$$i; \
+	done
 
 distrib:
 	$(RM) -rf distribution
