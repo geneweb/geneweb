@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.46 2003-01-28 10:47:17 ddr Exp $ *)
+(* $Id: perso.ml,v 4.47 2003-03-06 15:57:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -292,7 +292,7 @@ value rec eval_variable conf base env sl =
               [ Vbool True -> authorized_age conf base p
               | _ -> False ]
             in
-            let ep = (p, a, u, auth) in loop ep efam sl
+            let ep = (p, a, u, auth) in loop ep Vnone sl
         | _ -> VVnone ]
     | ["father" :: sl] ->
         match a.parents with

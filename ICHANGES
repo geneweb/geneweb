@@ -5,6 +5,8 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [06 Mar 03] Fixed bug: in the template perso.txt, the boolean value
+    child.has_children did not work correctly.
   - [14 Feb 03] Changed the ability to send messages to wizards (see
     the change of [24 Dec 01]). Now the message files must be in the
     databases directory, sub-directory "etc", sub-sub-directory having
