@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 4.5 2002-11-30 06:20:06 ddr Exp $ *)
+(* $Id: argl.ml,v 4.6 2004-11-21 02:41:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Printf;
@@ -136,7 +136,15 @@ value parse spec_list anonfun errmsg =
   let remaining_args =
     List.rev (loop [] (Arg.current.val + 1)) where rec loop l i =
       if i == Array.length Sys.argv then l
-      else loop [Sys.argv.(i) :: l] (i + 1)
+      else
+        let s =
+          let s = Sys.argv.(i) in
+          let len = String.length s in
+          if len > 2 && s.[0] = '"' && s.[len-1] = '"' then
+            String.sub s 1 (len-2)
+          else s
+        in
+        loop [s :: l] (i + 1)
   in
   parse_list spec_list anonfun errmsg remaining_args
 ;
