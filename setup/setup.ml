@@ -1,7 +1,7 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.57 1999-10-26 08:28:38 ddr Exp $ *)
+(* $Id: setup.ml,v 1.58 1999-10-27 21:07:53 ddr Exp $ *)
 
-value port = 2316;
+value port = ref 2316;
 value default_lang = ref "en";
 value setup_dir = "setup";
 value charset = "iso-8859-1";
@@ -316,7 +316,7 @@ value rec copy_from_stream conf print strm =
               print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
           | 'w' -> print (Sys.getcwd ())
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
-          | 'z' -> print (string_of_int port)
+          | 'z' -> print (string_of_int port.val)
           | '$' -> print "$"
           | 'A'..'Z' | '0'..'9' as c ->
               match p_getenv conf.env (String.make 1 c) with
@@ -1278,7 +1278,12 @@ value daemon = ref False;
 
 value usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:";
 value speclist =
-  [("-daemon", Arg.Set daemon, "Unix daemon mode.")]
+  [("-daemon", Arg.Set daemon, "Unix daemon mode.");
+   ("-p", Arg.Int (fun x -> port.val := x),
+      "<number>
+       Select a port number (default = " ^
+       string_of_int port.val ^
+       "); > 1024 for normal users.")]
 ;
 value anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) ;
 
@@ -1318,7 +1323,8 @@ value intro () =
      let (gwd_lang, setup_lang) =
        if daemon.val then
          ifdef UNIX then
-           do Printf.printf "To start, open location http://localhost:2316/\n";
+           do Printf.printf "To start, open location http://localhost:%d/\n"
+                port.val;
               flush stdout;
               if Unix.fork () = 0 then
                 do Unix.close Unix.stdin;
@@ -1352,7 +1358,7 @@ value main () =
   do ifdef UNIX then intro ()
      else
        try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ];
-     Wserver.f None 2316 0 None (None, None) wrap_setup;
+     Wserver.f None port.val 0 None (None, None) wrap_setup;
   return ()
 ;
 
