@@ -4,6 +4,10 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 4.03
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [11 Jul 01] Added trace of latest connected friends base_f.txt if there
+    is a friend password file. (already exist for wizards)
+
 GeneWeb Version 4.02
 --------------------
 
