@@ -5,6 +5,8 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [24 May 04] Display the wizards notes by last modification, and a
+    link has been added for alphabetic order.
   - [13 May 04] Added index files snames.inx, snames.dat, fnames.inx
     and fnames.dat to improve memory use in requests dispaying a surname
     or a first name.
