@@ -19,13 +19,13 @@ Databasen indeholder for &oslash;jeblikket %n personer.
 S&oslash;g: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-S&aring;dan:
+V&aelig;lg imellem at s&oslash;ge p&aring;
 <ul>
 <li> <input type=radio name=t value=PN checked>
-Enten <em>fornavn</em> og <em>efternavn</em>,
+enten <em>fornavn</em> og <em>efternavn</em>,
 eller <em>officielt navn</em>, eller <em>alias</em>.
-<li> <input type=radio name=t value=P> Et <em>fornavn</em>.
-<li> <input type=radio name=t value=N> Et <em>efternavn</em>.
+<li> <input type=radio name=t value=P> et <em>fornavn</em>.
+<li> <input type=radio name=t value=N> et <em>efternavn</em>.
 </ul>
 </form>
 
@@ -33,8 +33,8 @@ eller <em>officielt navn</em>, eller <em>alias</em>.
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Efter titel <INPUT NAME=t size=14 maxlength=200>
-sted <INPUT NAME=p size=25 maxlength=200> =&gt;
+S&oslash;g p&aring; titel: <INPUT NAME=t size=14 maxlength=200>
+og/eller stednavn: <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
 
@@ -43,27 +43,27 @@ sted <INPUT NAME=p size=25 maxlength=200> =&gt;
 <FORM method=GET action="%f">
 %hAlle
 <SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Efternavne
-   <OPTION VALUE="P"> Fornavne
+   <OPTION VALUE="N" SELECTED> efternavne
+   <OPTION VALUE="P"> fornavne
 </SELECT>
-efter
+sorteret efter
 <SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Alfabetisk orden
-   <OPTION VALUE="F"> Frekvens
+   <OPTION VALUE="A" SELECTED> alfabetisk orden
+   <OPTION VALUE="F"> hyppighed
 </SELECT> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Tilf&oslash;j en familie</a>.
+%w<li> <a href="%sm=ADD_FAM">Tilf&oslash;j familie</a>.
 %w
 
 </ul>
 
-<a href="%sm=AN">F&oslash;dselsdage</a>.<br>
-<a href="%sm=AD">D&oslash;de personers &aring;rsdage</a>.<br>
-<a href="%sm=AM">Bryllupsdage</a>.<br>%x
+<a href="%sm=AN">&Aring;rsdage for f&oslash;dsler</a>.<br>
+<a href="%sm=AD">&Aring;rsdage for d&oslash;dsfald</a>.<br>
+<a href="%sm=AM">&Aring;rsdage for bryllupper</a>.<br>%x
 De <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>.<br>
 De <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>.<br>%x
 <p>
@@ -73,12 +73,12 @@ Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 
 <ul>
 <li> <a href="%sw=w"><em>Opdaterings</em></a> adgang (password).
-%y%z<li> <a href="%sw=f"><em>Venner</em></a> adgang (password).
+%y%z<li> <a href="%sw=f"><em>Betroet</em></a> adgang (password).
 %z%y</ul>
 
 %y%i<p>
 <form method=get action="%f">
-%h<font size=-1>Password, for <em>venner</em> eller
+%h<font size=-1>Password, for <em>betroet</em> eller
 <em>opdaterings</em> adgang:</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
