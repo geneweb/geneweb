@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.109 2005-01-15 20:00:20 ddr Exp $ *)
+(* $Id: util.ml,v 4.110 2005-01-16 20:07:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1391,7 +1391,7 @@ value setup_link conf =
   [ Not_found -> "" ]
 ;
 
-value gen_trailer with_logo conf =
+value print_copyright conf =
   let env =
     [('s', fun _ -> commd conf);
      ('d',
@@ -1404,6 +1404,19 @@ value gen_trailer with_logo conf =
         else s ^ " - " ^ setup_link conf);
      ('/', fun _ -> conf.xhs)]
   in
+  match open_etc_file "copyr" with
+  [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
+  | None ->
+      do {
+        html_p conf;
+        Wserver.wprint "
+<hr><font size=\"-1\"><em>Copyright (c) 1998-2005 INRIA -
+GeneWeb %s</em></font>" Version.txt;
+        html_br conf;
+      } ]
+;
+
+value gen_trailer with_logo conf =
   do {
     if not with_logo then ()
     else
@@ -1414,16 +1427,7 @@ value gen_trailer with_logo conf =
 <br%s>
 </div>
 " (commd conf) (image_prefix conf) conf.xhs conf.xhs;
-    match open_etc_file "copyr" with
-    [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
-    | None ->
-        do {
-          html_p conf;
-          Wserver.wprint "
-<hr><font size=-1><em>Copyright (c) 1998-2005 INRIA -
-GeneWeb %s</em></font>" Version.txt;
-          html_br conf;
-        } ];
+    print_copyright conf;
     include_hed_trl conf None ".trl";
     Wserver.wprint "</body>\n</html>\n";
   }
