@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.10 1998-12-05 13:50:05 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.11 1998-12-12 10:56:50 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -337,6 +337,7 @@ value lock_file bname =
 
 (* Input *)
 
+(*
 value rec apply_patches tab =
   fun
   [ [] -> tab
@@ -350,6 +351,20 @@ value rec apply_patches tab =
         else tab
       in
       do tab.(i) := v; return tab ]
+;
+*)
+
+value apply_patches tab plist plen =
+  if plist = [] then tab
+  else
+    let new_tab =
+      if plen > Array.length tab then
+        let new_tab = Array.create plen (Obj.magic 0) in
+        do Array.blit tab 0 new_tab 0 (Array.length tab); return
+        new_tab
+      else tab
+    in
+    do List.iter (fun (i, v) -> new_tab.(i) := v) plist; return new_tab
 ;
 
 value rec patch_len len =
@@ -381,18 +396,17 @@ value check_magic =
 
 value make_cache ic ic_acc shift array_pos patches len name =
   let tab = ref None in
+  let plen = patch_len len patches.val in
   let array () =
     match tab.val with
     [ Some x -> x
     | None ->
 do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush Pervasives.stderr; return () else (); return
         do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val in
+        let t = apply_patches (input_value ic) patches.val plen in
         do tab.val := Some t; return t ]
   in
-  let r =
-    {array = array; get = fun []; len = patch_len len patches.val}
-  in
+  let r = {array = array; get = fun []; len = plen} in
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
     else
@@ -411,18 +425,17 @@ do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush Pervasives.stde
 
 value make_cached ic ic_acc shift array_pos patches len cache_htab name =
   let tab = ref None in
+  let plen = patch_len len patches.val in
   let array () =
     match tab.val with
     [ Some x -> x
     | None ->
 do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush Pervasives.stderr; return () else (); return
         do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val in
+        let t = apply_patches (input_value ic) patches.val plen in
         do tab.val := Some t; return t ]
   in
-  let r =
-    {array = array; get = fun []; len = patch_len len patches.val}
-  in
+  let r = {array = array; get = fun []; len = plen} in
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
     else
