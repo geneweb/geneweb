@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.8 1999-10-31 15:48:41 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.9 1999-11-10 22:38:49 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -143,7 +143,9 @@ par
 </table>
 </center>
 
-%E<center>Vous pouvez également consulter<br><p>
+%E<br><p>
+
+<center>Vous pouvez également consulter<br><p>
 
 <table border=0>
 <tr>
