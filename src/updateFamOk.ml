@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.13 1999-02-02 10:24:36 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: updateFamOk.ml,v 1.14 1999-02-12 12:37:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -144,13 +144,15 @@ value print_create_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do header conf title;
      Update.print_error conf base (AlreadyDefined p);
-     Wserver.wprint "<p>\n";
+     html_p conf;
      Wserver.wprint "<ul>\n";
-     Wserver.wprint "<li>%s: %d\n"
+     html_li conf;
+     Wserver.wprint "%s: %d\n"
        (capitale (transl conf "first free number"))
        (Update.find_free_occ base (sou base p.first_name) (sou base p.surname)
           0);
-     Wserver.wprint "<li>%s\n"
+     html_li conf;
+     Wserver.wprint "%s\n"
        (capitale (transl conf "or use \"link\" instead of \"create\""));
      Wserver.wprint "</ul>\n";
      Update.print_same_name conf base p;
@@ -253,11 +255,15 @@ value print_err_parents conf base p =
      Wserver.wprint "\n";
      Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
        (fun _ -> afficher_personne_referencee conf base p);
-     Wserver.wprint "\n<p>\n";
-     Wserver.wprint "<ul><li>%s: %d</ul>\n"
-       (capitale (transl conf "first free number"))
-       (Update.find_free_occ base (sou base p.first_name) (sou base p.surname)
-          0);
+     Wserver.wprint "\n";
+     html_p conf;
+     tag "ul" begin
+       html_li conf;
+       Wserver.wprint "%s: %d"
+         (capitale (transl conf "first free number"))
+         (Update.find_free_occ base (sou base p.first_name)
+            (sou base p.surname) 0);
+     end;
      trailer conf;
   return ()
 ;
@@ -493,18 +499,19 @@ value all_checks_family conf base fam cpl =
 ;
 
 value print_family conf base wl fam cpl =
-  do Wserver.wprint "<ul>";
-     Wserver.wprint "\n<li>\n";
+  do Wserver.wprint "<ul>\n";
+     html_li conf;
      afficher_personne_referencee conf base (poi base cpl.father);
      Wserver.wprint "\n";
-     Wserver.wprint "\n<li>\n";
+     html_li conf;
      afficher_personne_referencee conf base (poi base cpl.mother);
      Wserver.wprint "</ul>\n";
      if fam.children <> [||] then
-       do Wserver.wprint "<p>\n<ul>\n";
+       do html_p conf;
+          Wserver.wprint "<ul>\n";
           Array.iter
             (fun ip ->
-               do Wserver.wprint "<li>\n";
+               do html_li conf;
                   afficher_personne_referencee conf base (poi base ip);
                   Wserver.wprint "\n";
                return ())

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.14 1999-02-02 10:24:37 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.15 1999-02-12 12:37:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -331,7 +331,8 @@ value print_add_title conf base cnt =
          end;
        end;
      end;
-     Wserver.wprint "\n<p>\n";
+     Wserver.wprint "\n";
+     html_p conf;
   return ()
 ;
 
@@ -402,7 +403,8 @@ value print_title conf base t cnt =
           [ Some t -> Adef.od_of_codate t.t_date_end
           | _ -> None ]);
      end;
-     Wserver.wprint "\n<p>\n";
+     Wserver.wprint "\n";
+     html_p conf;
      print_add_title conf base cnt;
   return ()
 ;
@@ -500,7 +502,9 @@ value print_person conf base p =
        Wserver.wprint "\n";
        print_photo conf base p;
      end;
-     Wserver.wprint "\n<br>\n\n";
+     Wserver.wprint "\n";
+     html_br conf;
+     Wserver.wprint "\n";
      tag "table" "border=1" begin
        print_nick_names conf base p;
        Wserver.wprint "\n";
@@ -522,7 +526,7 @@ value print_person conf base p =
      Wserver.wprint "\n";
      Update.print_src conf "birth_src" p.birth_src;
      Wserver.wprint "\n";
-     Wserver.wprint "<p>\n";
+     html_p conf;
      tag "table" "border=1" begin
        print_bapt_place conf base p;
      end;
@@ -631,7 +635,8 @@ value print_mod1 conf base p digest =
        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
        Wserver.wprint "\n";
        print_person conf base p;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -650,7 +655,8 @@ value print_add1 conf base p =
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=ADD_IND_OK>\n";
        print_person conf base p;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -670,7 +676,8 @@ value print_del1 conf base p =
        Wserver.wprint "<input type=hidden name=m value=DEL_IND_OK>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
          (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";

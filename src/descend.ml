@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 1.8 1999-02-02 10:24:07 ddr Exp $ *)
+(* $Id: descend.ml,v 1.9 1999-02-12 12:37:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -97,18 +97,24 @@ value print_choice conf base p niveau_effectif =
       boucle 0;
     end;
     tag "ul" begin
-      Wserver.wprint "<li> <input type=radio name=t value=L checked> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=L checked> %s\n"
         (capitale (transl conf "list"));
-      Wserver.wprint "<li> <input type=radio name=t value=N> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=N> %s\n"
         (capitale (transl conf "families with encoding"));
-      Wserver.wprint "<li> <input type=radio name=t value=G> -> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=G> -> %s\n"
         (capitale (transl conf "index of the descendants"));
-      Wserver.wprint "<li> <input type=radio name=t value=C> -> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=C> -> %s\n"
         (capitale (transl conf "index of the spouses (non descendants)"));
-      Wserver.wprint "<li> <input type=radio name=t value=S> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=S> %s\n"
         (capitale (transl conf "only the generation selected"));
     end;
-    Wserver.wprint "<input type=submit value=\"Ok\"><br>\n";
+    Wserver.wprint "<input type=submit value=\"Ok\">";
+    html_br conf;
   end
 ;
 
@@ -180,7 +186,7 @@ value afficher_marie conf base first fam p conjoint =
 
 value print_child conf base levt boucle niveau_max niveau compte ix =
   let x = poi base ix in
-  do Wserver.wprint "<li> ";
+  do html_li conf;
      stag "strong" begin
        if s_appelle_comme_son_pere base ix then
          afficher_prenom_de_personne_referencee conf base x
@@ -199,10 +205,8 @@ value print_child conf base levt boucle niveau_max niveau compte ix =
   return
   if levt.(Adef.int_of_iper x.cle_index) == niveau then
     do levt.(Adef.int_of_iper x.cle_index) := infini;
-       if Array.length x.family <> 0 then
-         Wserver.wprint "<br>"
-       else ();
-       Wserver.wprint "\n";
+       if Array.length x.family <> 0 then html_br conf
+       else Wserver.wprint "\n";
        if niveau == niveau_max then
          let _ =
            List.fold_left
@@ -213,7 +217,8 @@ value print_child conf base levt boucle niveau_max niveau compte ix =
                 do if connais base c then
                      do afficher_marie conf base first fam x
                           c;
-                        Wserver.wprint ".<br>\n";
+                        Wserver.wprint ".";
+                        html_br conf;
                      return ()
                    else ();
                 return False)
@@ -245,7 +250,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
                        Wserver.wprint ", <em>%s</em>"
                          (transl conf "having as children")
                      else Wserver.wprint ".";
-                     Wserver.wprint "<br>\n";
+                     html_br conf;
                   return ()
                 else ();
                 if Array.length enfants <> 0 then
@@ -274,14 +279,16 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
 (*
      if niveau_max > 6 then enter_nobr () else ();
 *)
-     Wserver.wprint "%s.<p>\n" (capitale (text_to conf niveau_max));
+     Wserver.wprint "%s." (capitale (text_to conf niveau_max));
+     html_p conf;
      stag "strong" begin
        afficher_personne_referencee conf base p;
      end;
      Date.afficher_dates conf base p;
-     Wserver.wprint ".<br>\n";
+     Wserver.wprint ".";
+     html_br conf;
      boucle 1 p;
-     Wserver.wprint "<p>\n";
+     html_p conf;
      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) compte.val
        (transl_nth conf "person/persons" 1);
      if niveau_max > 1 then
@@ -352,8 +359,9 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
      if len.val > 1 then
        Wserver.wprint " (%d %s)" len.val (transl_nth conf "person/persons" 1)
      else ();
-     Wserver.wprint ".\n<p>\n";
-     print_alphab_list
+     Wserver.wprint ".\n";
+     html_p conf;
+     print_alphab_list conf
        (fun (p, _) ->
           String.sub (sou base p.surname) (initiale (sou base p.surname)) 1)
        (fun (p, c) ->
@@ -509,7 +517,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              let c = conjoint p (coi base ifam) in
              let el = fam.children in
              let c = poi base c in
-             do if need_br then Wserver.wprint "<br>" else ();
+             do if need_br then html_br conf else ();
                 if not first then print_repeat_child conf base p1 c1 e
                 else ();
                 afficher_conjoint conf base marks paths p c dmar;
@@ -544,7 +552,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                      let el = fam.children in
                                      let c1 = poi base c1 in
                                      do if not first then
-                                          do Wserver.wprint "<br>\n";
+                                          do html_br conf;
                                              print_repeat_child conf base p c
                                                e;
                                           return ()
@@ -577,7 +585,9 @@ value last_label = ref "";
 
 value print_family conf base marks paths max_lev lev p =
   do if lev <> 0 then
-       Wserver.wprint "<tt><b>%s</b></tt>.<br>\n" (label_of_path paths p)
+       do Wserver.wprint "<tt><b>%s</b></tt>." (label_of_path paths p);
+          html_br conf;
+       return ()
      else ();
      do let lab = label_of_path paths p in
         if lab < last_label.val then failwith "print_family"
@@ -688,15 +698,17 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
      let p = ancetre in
      if age_autorise conf base p then
        match (Adef.od_of_codate p.birth, p.death) with
-       [ (Some _, _) | (_, Death _ _) -> Wserver.wprint "<br>\n"
+       [ (Some _, _) | (_, Death _ _) -> html_br conf
        | _ -> () ]
      else ();
-     Wserver.wprint "%s.<p>\n" (capitale (text_to conf niveau_max));
+     Wserver.wprint "%s." (capitale (text_to conf niveau_max));
+     html_p conf;
      mark_descendants base marks niveau_max ancetre;
      label_descendants base marks paths niveau_max ancetre;
      print_families conf base marks paths niveau_max ancetre;
      if total.val > 1 then
-       do Wserver.wprint "<p>\n%s: %d %s" (capitale (transl conf "total"))
+       do html_p conf;
+          Wserver.wprint "%s: %d %s" (capitale (transl conf "total"))
             total.val (transl_nth conf "person/persons" 1);
           if niveau_max > 1 then
             Wserver.wprint " (%s)" (transl conf "spouses not included")
@@ -726,7 +738,7 @@ value print_ref conf base paths p =
 ;
 
 value print_elem conf base paths precision (n, pll) =
-  do Wserver.wprint "<li> ";
+  do html_li conf;
      match pll with
      [ [[p]] ->
          do Wserver.wprint "<strong>%s " (coa conf (surname_end n));
@@ -751,7 +763,7 @@ value print_elem conf base paths precision (n, pll) =
                    in
                    List.iter
                      (fun p ->
-                        do Wserver.wprint "<li> ";
+                        do html_li conf;
                            stag "strong" begin
                              stag "a" "href=\"%si=%d\""
                                (commd conf)

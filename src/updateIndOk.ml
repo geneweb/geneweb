@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.14 1999-02-02 10:24:38 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.15 1999-02-12 12:37:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -276,15 +276,17 @@ value print_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do header conf title;
      Update.print_error conf base (AlreadyDefined p);
-     Wserver.wprint "<p>\n";
+     html_p conf;
   return
   let free_n =
     Update.find_free_occ base (sou base p.first_name) (sou base p.surname) 0
   in
-  do Wserver.wprint "<ul><li>%s: %d.\n"
-       (capitale (transl conf "first free number")) free_n;
-     print_try_again conf "occ" free_n;
-     Wserver.wprint "</ul>\n";
+  do tag "ul" begin
+       html_li conf;
+       Wserver.wprint "%s: %d.\n"
+         (capitale (transl conf "first free number")) free_n;
+       print_try_again conf "occ" free_n;
+     end;
      Update.print_same_name conf base p;
      trailer conf;
   return ()
@@ -295,7 +297,7 @@ value print_cannot_change_sex conf base p =
   do header conf title;
      Update.print_error conf base (BadSexOfMarriedPerson p);
      tag "ul" begin
-       Wserver.wprint "<li>\n";
+       html_li conf;
        afficher_personne_referencee conf base p;
        Wserver.wprint "\n";
      end;

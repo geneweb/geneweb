@@ -189,14 +189,14 @@ mergeInd.cmo mergeInd.cmx: pa_html.cmo
 mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 perso.cmo perso.cmx: pa_html.cmo
-relation.cmo relation.cmx: pa_lock.cmo
+relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
 some.cmo some.cmx: def.syn.cmo
-srcfile.cmo srcfile.cmx: pa_lock.cmo
+srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 title.cmo title.cmx: def.syn.cmo pa_html.cmo
 update.cmo update.cmx: pa_html.cmo
 updateFam.cmo updateFam.cmx: pa_html.cmo
-updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo
+updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo pa_html.cmo
 updateInd.cmo updateInd.cmx: pa_html.cmo
 updateIndOk.cmo updateIndOk.cmx: pa_lock.cmo pa_html.cmo
 util.cmo util.cmx: pa_lock.cmo

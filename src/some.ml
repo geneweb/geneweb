@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.11 1999-02-02 10:24:30 ddr Exp $ *)
+(* $Id: some.ml,v 1.12 1999-02-12 12:37:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -83,7 +83,7 @@ value print_elem conf base is_surname (p, xl) =
       let _ =
         List.fold_left
           (fun first x ->
-             do if not first then Wserver.wprint "  <li> " else ();
+             do if not first then html_li conf else ();
                 Wserver.wprint "<a href=\"%s%s\">" (commd conf)
                   (acces conf base x);
                 if is_surname then
@@ -131,7 +131,7 @@ value first_name_print_list conf base xl liste =
     return ()
   in
   do header conf title;
-     print_alphab_list (fun (p, _) -> String.sub p (initiale p) 1)
+     print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
        (print_elem conf base True) liste;
      trailer conf;
   return ()
@@ -147,7 +147,8 @@ value select_first_name conf base n list =
      Wserver.wprint "<ul>";
      List.iter
        (fun (sstr, (strl, _)) ->
-          do Wserver.wprint "\n<li>\n";
+          do Wserver.wprint "\n";
+             html_li conf;
              Wserver.wprint "<a href=\"%sm=P;v=%s\">"
                (commd conf) (code_varenv sstr);
              Wserver.wprint "%s" (coa conf (List.hd strl));
@@ -213,7 +214,7 @@ value afficher_date_mariage conf base p c dmar =
 value max_lev = 3;
 
 value rec print_branch conf base lev name p =
-  do Wserver.wprint "%s" (if lev == 0 then "<br>\n" else "<li> ");
+  do if lev == 0 then html_br conf else html_li conf;
      Wserver.wprint "<strong>";
      if sou base p.surname = name then
        afficher_prenom_de_personne_referencee conf base p
@@ -231,7 +232,7 @@ value rec print_branch conf base lev name p =
          let c = conjoint p (coi base ifam) in
          let el = fam.children in
          let c = poi base c in
-         do if need_br then Wserver.wprint "<br>\n" else ();
+         do if need_br then html_br conf else ();
             if not first then
               do Wserver.wprint "<em>";
                  if sou base p.surname = name then
@@ -298,15 +299,19 @@ value rec print_by_branch x conf base (ipl, homonymes) =
          (code_varenv x) (transl conf "here");
        Wserver.wprint "%s"
          (transl conf "for the first names by alphabetic order");
-       Wserver.wprint ".</em></font>\n<p>\n";
+       Wserver.wprint ".</em></font>\n";
+       html_p conf;
        Wserver.wprint "<nobr>\n";
        if len > 1 then
-         Wserver.wprint "%s: %d<p>\n<ol>\n"
-           (capitale (transl conf "number of branches")) len
+         do Wserver.wprint "%s: %d"
+             (capitale (transl conf "number of branches")) len;
+            html_p conf;
+            Wserver.wprint "<ol>\n";
+         return ()
        else ();
        let _ = List.fold_left
          (fun n p ->
-            do if len > 1 then Wserver.wprint "<li>\n" else ();
+            do if len > 1 then html_li conf else ();
                print_branch conf base 0 x p;
             return n + 1)
          1 ancestors
@@ -342,7 +347,7 @@ value print_family_alphabetic x conf base liste =
   | _ ->
       let title _ = Wserver.wprint "%s" (coa conf x) in
       do header conf title;
-         print_alphab_list (fun (p, _) -> String.sub p (initiale p) 1)
+         print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
            (print_elem conf base False) liste;
          trailer conf;
       return () ]

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.29 1999-02-11 09:34:35 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.30 1999-02-12 12:37:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -205,9 +205,10 @@ value print_renamed conf new_n =
   do Util.header conf title;
      Wserver.wprint "The database \"%s\" has been renamed \"%s\".\n"
        conf.bname new_n;
-     Wserver.wprint "Please use now:\n<p>\n";
+     Wserver.wprint "Please use now:\n";
+     Util.html_p conf;
      tag "ul" begin
-       Wserver.wprint "<li>\n";
+       Util.html_li conf;
        tag "a" "href=\"%s\"" link begin
          Wserver.wprint "%s" link;
        end;
@@ -231,7 +232,9 @@ value start_with_base conf bname =
         Wserver.wprint "%s" (Util.capitale (transl conf "error"))
       in
       do Util.header conf title;
-         Wserver.wprint "<ul><li>%s"
+         Wserver.wprint "<ul>";
+         Util.html_li conf;
+         Wserver.wprint "%s"
            (Util.capitale (transl conf "cannot access base"));
          Wserver.wprint " \"%s\".</ul>\n" conf.bname;
          match e with
@@ -246,11 +249,12 @@ value start_with_base conf bname =
 value propose_base conf =
   let title _ = Wserver.wprint "Base" in
   do Util.header conf title;
-     Wserver.wprint "<ul><li>\n";
-     Wserver.wprint "<form method=get action=\"%s\">\n" conf.command;
-     Wserver.wprint "<input name=b size=40> =&gt;\n";
-     Wserver.wprint "<input type=submit value=\"Ok\">\n";
-     Wserver.wprint "</ul>\n";
+     tag "ul" begin
+       Util.html_li conf;
+       Wserver.wprint "<form method=get action=\"%s\">\n" conf.command;
+       Wserver.wprint "<input name=b size=40> =&gt;\n";
+       Wserver.wprint "<input type=submit value=\"Ok\">\n";
+     end;
      Util.trailer conf;
   return ()
 ;

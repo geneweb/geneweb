@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 1.10 1999-02-02 10:24:32 ddr Exp $ *)
+(* $Id: title.ml,v 1.11 1999-02-12 12:37:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -336,7 +336,7 @@ value print_title_place_list conf base t p list =
      Wserver.wprint "<ul>\n";
      let _ = List.fold_left
        (fun list x ->
-          do Wserver.wprint "<li> ";
+          do html_li conf;
              give_access_someone conf base x list;
              Wserver.wprint "\n";
           return [fst x :: list])
@@ -353,7 +353,7 @@ value print_all_with_place_list conf base p list =
      Wserver.wprint "<ul>\n";
      let _ = List.fold_left
        (fun list ((p, t) as x) ->
-          do Wserver.wprint "<li> ";
+          do html_li conf;
              give_access_someone conf base x [];
              Wserver.wprint ", %s\n" (coa conf (sou base t.t_title));
              Wserver.wprint "\n";
@@ -383,7 +383,7 @@ value print_places_list conf base t list =
      Wserver.wprint "<ul>\n";
      List.iter
        (fun p ->
-          do Wserver.wprint "<li> "; give_access_place conf base t p; return
+          do html_li conf; give_access_place conf base t p; return
           ())
        list;
      Wserver.wprint "</ul>\n";
@@ -407,7 +407,7 @@ value print_titles conf base p =
      Wserver.wprint "<ul>\n";
      List.iter
        (fun t ->
-          do Wserver.wprint "<li> "; give_access_title conf t p; return ())
+          do html_li conf; give_access_title conf t p; return ())
        list;
      Wserver.wprint "</ul>\n";
      if List.length list > 1 then
@@ -434,7 +434,7 @@ value print_all_titles conf base =
      Wserver.wprint "<ul>\n";
      List.iter
        (fun t ->
-          do Wserver.wprint "<li> "; give_access_all_titles conf t; return ())
+          do html_li conf; give_access_all_titles conf t; return ())
        list;
      Wserver.wprint "</ul>\n";
      trailer conf;
@@ -453,7 +453,7 @@ value print_all_places conf base =
      Wserver.wprint "<ul>\n";
      List.iter
        (fun t ->
-          do Wserver.wprint "<li> "; give_access_all_places conf t; return ())
+          do html_li conf; give_access_all_places conf t; return ())
        list;
      Wserver.wprint "</ul>\n";
      trailer conf;

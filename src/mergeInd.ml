@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 1.7 1999-02-02 10:24:20 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 1.8 1999-02-12 12:37:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -19,11 +19,11 @@ value print_differences conf base branches p1 p2 =
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
       do Wserver.wprint "<h4>%s</h4>\n" (capitale title);
          tag "ul" begin
-           Wserver.wprint "<li>\n";
+           html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
              name;
            Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
-           Wserver.wprint "<li>\n";
+           html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
            Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
          end;
@@ -47,7 +47,7 @@ value print_differences conf base branches p1 p2 =
           return ()
       | [_ :: branches] -> loop branches
       | _ -> () ];
-    Wserver.wprint "<p>\n";
+    html_p conf;
     string_field True (transl_nth conf "first name/first names" 0) "first_name"
       (fun p -> sou base p.first_name);
     string_field True (transl_nth conf "surname/surnames" 0) "surname"
@@ -123,7 +123,7 @@ value print_differences conf base branches p1 p2 =
               | Some d -> " " ^ Date.string_of_ondate conf d ]) ]);
     string_field True (transl conf "burial" ^ " / " ^ transl conf "place")
       "burial_place" (fun p -> sou base p.burial_place);
-    Wserver.wprint "<p>\n";
+    html_p conf;
     Wserver.wprint "<input type=submit value=Ok>\n";
   end
 ;
@@ -138,7 +138,7 @@ value merge_ind conf base branches p1 p2 =
        do Wserver.wprint "%s:\n"
             (capitale (transl conf "you must first merge"));
           tag "ul" begin
-            Wserver.wprint "<li>\n";
+            html_li conf;
             stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
               Merge.print_someone conf base p1;
             end;
@@ -148,15 +148,17 @@ value merge_ind conf base branches p1 p2 =
             end;
             Wserver.wprint "\n";
           end;
-          Wserver.wprint "<p>\n";
+          html_p conf;
        return ()
      else ();
      print_differences conf base branches p1 p2;
      if branches <> [] then
-       do Wserver.wprint "<p><hr><p>\n";
+       do html_p conf;
+          Wserver.wprint "<hr>";
+          html_p conf;
           Wserver.wprint "%s:\n"
             (capitale (transl_nth conf "branch/branches" 1));
-          Wserver.wprint "<p>\n";
+          html_p conf;
           tag "table" begin
             List.iter
               (fun (ip1, ip2) ->
@@ -190,7 +192,7 @@ value merge_fam_first conf base branches fam1 fam2 p1 p2 =
      Wserver.wprint "%s:\n"
        (capitale (transl conf "you must first merge the 2 families"));
      tag "ul" begin
-       Wserver.wprint "<li>\n";
+       html_li conf;
        stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
          Merge.print_someone conf base p1;
        end;
@@ -200,7 +202,7 @@ value merge_fam_first conf base branches fam1 fam2 p1 p2 =
        end;
        Wserver.wprint "\n";
      end;
-     Wserver.wprint "<p>\n";
+     html_p conf;
      MergeFam.print_differences conf base branches fam1 fam2;
      trailer conf;
   return ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.14 1999-02-02 10:24:29 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.15 1999-02-12 12:37:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -255,11 +255,11 @@ value rec print_one_branch conf base ipl1 =
       | [] -> (None, []) ]
     in
     do match ip1 with
-       [ Some ip1 -> Wserver.wprint "|<br>\n"
+       [ Some ip1 -> do Wserver.wprint "|"; html_br conf; return ()
        | None -> () ];
        match ip1 with
        [ Some ip1 ->
-           do print_someone conf base ip1; Wserver.wprint "<br>\n"; return ()
+           do print_someone conf base ip1; html_br conf; return ()
        | None -> () ];
     return print_one_branch conf base ipl1
 ;
@@ -352,10 +352,10 @@ value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
        let b = if b1 = [] then b2 else b1 in
        do tag "center" begin
             print_someone conf base ip;
-            Wserver.wprint "<br>\n";
+            html_br conf;
             print_one_branch conf base b;
           end;
-          Wserver.wprint "<br>\n";
+          html_br conf;
           if b1 <> [] then
             print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 nb1
           else
@@ -386,14 +386,14 @@ value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
          tag "tr" begin
            if b1 <> [] then
              tag "td" begin
-               do Wserver.wprint "<br>\n"; return
+               do html_br conf; return
                print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
                  pb1 nb1;
              end
            else ();
            if b2 <> [] then
              tag "td" begin
-               do Wserver.wprint "<br>\n"; return
+               do html_br conf; return
                print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
                  pb2 nb2;
              end

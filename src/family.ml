@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.16 1999-02-02 10:24:08 ddr Exp $ *)
+(* $Id: family.ml,v 1.17 1999-02-12 12:37:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -137,7 +137,7 @@ value precisez conf base n pl =
      Wserver.wprint "<ul>\n";
      List.iter
        (fun (p, tl) ->
-          do Wserver.wprint "<li>\n";
+          do html_li conf;
              match tl with
              [ [] -> afficher_personne_titre_referencee conf base p
              | [t :: tl] ->
@@ -409,7 +409,7 @@ value print_no_index conf base =
   let title _ = Wserver.wprint "Link to use" in
   do header conf title;
      tag "ul" begin
-       Wserver.wprint "<li>\n";
+       html_li conf;
        tag "a" "href=\"%s\"" link begin
          Wserver.wprint "%s" link;
        end;

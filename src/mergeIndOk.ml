@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.10 1999-02-02 10:24:20 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.11 1999-02-12 12:37:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -90,7 +90,8 @@ value print_merge1 conf base p p2 digest =
          (Adef.int_of_iper p2.cle_index);
        Wserver.wprint "\n";
        UpdateInd.print_person conf base p;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -122,7 +123,8 @@ value print_mod_merge_ok conf base wl p =
      [ (Some ini1, Some ini2) ->
          let p1 = base.data.persons.get ini1 in
          let p2 = base.data.persons.get ini2 in
-         do Wserver.wprint "\n<p>\n";
+         do Wserver.wprint "\n";
+            html_p conf;
             stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2
             begin
               Wserver.wprint "%s" (capitale (transl conf "continue merging"));

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 1.8 1999-02-02 10:24:19 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 1.9 1999-02-12 12:37:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -65,7 +65,8 @@ value print_merge1 conf base fam fam2 digest =
        | _ -> () ];
        Wserver.wprint "\n";
        UpdateFam.print_family conf base fam cpl False;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -95,7 +96,8 @@ value print_mod_merge_ok conf base wl fam cpl =
      [ (Some ini1, Some ini2) ->
          let p1 = base.data.persons.get ini1 in
          let p2 = base.data.persons.get ini2 in
-         do Wserver.wprint "\n<p>\n";
+         do Wserver.wprint "\n";
+            html_p conf;
             stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2
             begin
               Wserver.wprint "%s" (capitale (transl conf "continue merging"));
