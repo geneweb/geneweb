@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.14 1999-01-29 15:23:06 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.15 1999-01-29 20:55:11 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -251,7 +251,9 @@ value print_start conf base =
 
 value print_lexicon conf base =
   let title _ = Wserver.wprint "Lexicon" in
-  let fname = any_lang_file_name "lexicon" in
+  let fname =
+    List.fold_right Filename.concat [Util.lang_dir.val; "lang"] "lexicon.txt"
+  in
   do Util.header conf title;
      match try Some (open_in fname) with [ Sys_error _ -> None ] with
      [ Some ic ->
