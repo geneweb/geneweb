@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head><title>Consanguinities</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>Consanguinities</h1>
+
+The initialization of consanguinities is necessary so that the
+consanguinities are displayed when browsing the data base.
+
+<p>
+
+<form mode=GET action="consang">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+<input type=hidden name=q value=on>
+
+Select your data base by clicking on the associated button.
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td>
+<input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>- there is no data base at present</tr></td>}
+</table></dl>
+
+<p>
+
+Select the option if you want:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=scratch value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Restart the computing from scratch.</td> </tr>
+</table></dl>
+
+<p>
+
+Then press this button:
+
+<p>
+
+<input type=submit value="Consang">
+
+</form>

@@ -1,0 +1,18 @@
+
+SveicinÆti GeneWeb $q ÖenealoÖijas datu bÆzñ
+
+Atveriet Interneta caurlİkprogramu un norÆdiet sekojoıu adresi:
+       http://localhost:$z/
+
+UzmanØbu: lai ıî programma darbotos Jİs nedrØgstat aizvñrt ıo logu!
+
+Ja pie iepriekıminñtajiem nosacØjumiem Jİs nevariet piekõİt pie GeneWeb,
+Jums iespñjams jÆiestÆda savÆ Interneta caurlİkprogramÆ sekojoıi
+norÆdØjumi: "work off-line" vai "do not use the proxy for local
+addresses" vai "do not connect to Internet for the address
+'localhost'". 
+
+Ja tomñr tas viss nelØdz, mñÖiniet kÆ parasts skatØt programmas
+aprakstu: izejiet no ıØs programas nospie÷ot "ctr-c" pie aktØva
+ıØ loga, aizejiet uz katalogu "gw" un atveriet datni: 
+   INSTALL.htm
