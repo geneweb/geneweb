@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.60 2000-10-22 09:52:26 ddr Exp $ *)
+(* $Id: perso.ml,v 3.61 2000-10-23 14:11:58 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1967,33 +1967,24 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       match efam with
       [ Efam _ _ des -> Array.length des.children > 0
       | _ ->
-          match get_env "p" env with
-          [ Eind _ _ u ->
-              List.exists
-                (fun ifam ->
-                   let des = doi base ifam in
-                   Array.length des.children > 0)
-                (Array.to_list u.family)
-          | _ -> False ] ]
+          List.exists
+            (fun ifam ->
+               let des = doi base ifam in
+               Array.length des.children > 0)
+            (Array.to_list u.family) ]
   | "has_comment" ->
       match efam with
       [ Efam fam _ _ -> p_auth && sou base fam.comment <> ""
       | _ -> False ]
   | "has_consanguinity" ->
-      match get_env "p" env with
-      [ Eind p a _ ->
-          p_auth && a.consang != Adef.fix (-1) && a.consang != Adef.fix 0
-      | _ -> False ]
+      p_auth && a.consang != Adef.fix (-1) && a.consang != Adef.fix 0
   | "has_cremation_place" -> p_auth && sou base p.burial_place <> ""
   | "has_death_date" ->
       match p.death with
       [ Death _ _ -> p_auth
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base p.death_place <> ""
-  | "has_families" ->
-      match get_env "p" env with
-      [ Eind _ _ u -> Array.length u.family > 0
-      | _ -> False ]
+  | "has_families" -> Array.length u.family > 0
   | "has_first_names_aliases" -> p.first_names_aliases <> []
   | "has_image" ->
       match get_env "image" env with
@@ -2006,10 +1997,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "has_nobility_titles" -> p_auth && p.titles <> []
   | "has_notes" -> p_auth && sou base p.notes <> ""
   | "has_occupation" -> p_auth && sou base p.occupation <> ""
-  | "has_parents" ->
-      match get_env "p" env with
-      [ Eind _ a _ -> a.parents <> None
-      | _ -> False ]
+  | "has_parents" -> a.parents <> None
   | "has_public_name" -> sou base p.public_name <> ""
   | "has_qualifiers" -> p.qualifiers <> []
   | "has_referer" -> Wserver.extract_param "referer: " '\n' conf.request <> ""
@@ -2027,23 +2015,19 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       [ Esosa x -> Lazy.force x <> None
       | _ -> False ]
   | "has_sources" ->
-      match get_env "p" env with
-      [ Eind p _ u ->
-          let auth = p_auth in
-          if sou base p.psources <> "" then True
-          else if
-            auth &&
-            (sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
-             sou base p.death_src <> "" || sou base p.burial_src <> "") then
-            True
-          else
-            List.exists
-              (fun ifam ->
-                 let fam = foi base ifam in
-                 auth && sou base fam.marriage_src <> "" ||
-                 sou base fam.fsources <> "")
-              (Array.to_list u.family)
-      | _ -> False ]
+      if sou base p.psources <> "" then True
+      else if
+        p_auth &&
+        (sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
+         sou base p.death_src <> "" || sou base p.burial_src <> "") then
+        True
+      else
+        List.exists
+          (fun ifam ->
+             let fam = foi base ifam in
+             p_auth && sou base fam.marriage_src <> "" ||
+             sou base fam.fsources <> "")
+          (Array.to_list u.family)
   | "has_surnames_aliases" -> p.surnames_aliases <> []
   | "has_witnesses" ->
       match efam with
