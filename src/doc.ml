@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.3 1999-08-20 15:27:32 ddr Exp $ *)
+(* $Id: doc.ml,v 2.4 1999-09-08 10:46:41 ddr Exp $ *)
 
 open Config;
 
@@ -27,7 +27,8 @@ value copy pref s =
           let i =
             if s.[i] = '"' then do Wserver.wprint "\""; return i + 1 else i
           in
-          do if s.[i] = '#' || start_with s i http then ()
+          do if s.[i] = '#' || start_with s i http || start_with s i "mailto:"
+             then ()
              else Wserver.wprint "%s" pref;
           return
           loop i
