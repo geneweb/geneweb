@@ -1,0 +1,56 @@
+OVERVIEW:
+
+Dag2html generates HTML code from a DAG. It is well adapted for
+genealogic DAGs (it is used in the software GeneWeb, same author) but
+may be used for any kind of DAG.
+
+It generates HTML tables. The display is therefore horizontally
+extensible. But it cannot be visible in browsers like Lynx which does
+not treat tables. Moreover the lines cannot cross: to resolve this
+problem, nodes are sometimes duplicated.
+
+This is the version 1.01.
+
+To compile, you need the Objective Caml compiler, and the preprocessor
+Camlp4.
+
+Objective Caml and Camlp4 can be found at address:
+   http://caml.inria.fr/ocaml/
+   http://caml.inria.fr/camlp4/
+
+
+COPYRIGHT:
+
+All files marked in this distribution are copyright 2000 Institut
+National de Recherche en Informatique et Automatique (INRIA) and
+distributed under the conditions stated in file LICENSE. They can be
+freely redistributed for non-commercial purposes, provided the
+copyright notice remains attached.
+
+
+INSTALLATION:
+
+Just do "make" to make it.
+To install it, do "make install".
+
+Examples of dags can be found in directory "ex": just type
+   dag2html ex/dagfile
+The syntax can be easily deducted from these examples.
+
+Usage can be found by typing
+   dag2html -help
+
+
+AUTHOR:
+
+Daniel de Rauglaudre
+daniel.de_rauglaudre@inria.fr
+http://cristal.inria.fr/~ddr/
+
+
+BUG REPORTS AND USER FEEDBACK:
+
+Send your bug reports by E-mail to the author above.
+
+The home page of dag2html is at:
+	http://cristal.inria.fr/~ddr/dag2html/
