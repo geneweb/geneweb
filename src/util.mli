@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.11 1999-05-18 22:35:03 ddr Exp $ *)
+(* $Id: util.mli,v 2.12 1999-07-14 11:50:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -67,6 +67,7 @@ value transl_decline : config -> string -> string -> string;
 value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
 value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
 value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;
+value nominative : string -> string;
 
 value index_of_sex : sex -> int;
 value spouse : person -> couple -> iper;

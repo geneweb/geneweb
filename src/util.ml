@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.24 1999-07-02 13:59:42 ddr Exp $ *)
+(* $Id: util.ml,v 2.25 1999-07-14 11:50:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -47,6 +47,7 @@ value ansel_to_ascii s =
 
 value charset_of_ansel conf s =
   if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
+  else if conf.charset = "iso-8859-2" then s
   else if s = "" then s
   else if String.length s = 2 then
     if Char.code s.[0] >= 128 then s else ansel_to_ascii s
@@ -456,27 +457,6 @@ value transl_nth conf w n =
   [ Not_found -> "[" ^ nth_field w n ^ "]" ]
 ;
 
-value decline conf decl s =
-  try
-    let a = Hashtbl.find conf.lexicon decl in
-    let (start, dest) =
-      let i = String.index a '=' in
-      (String.sub a 0 i, String.sub a (i + 1) (String.length a - i - 1))
-    in
-    let (w1, ws) =
-      try
-        let i = String.index s ' ' in
-        (String.sub s 0 i, String.sub s i (String.length s - i))
-      with
-      [ Not_found -> (s, "") ]
-    in
-    if w1 = start then dest ^ ws
-    else if start = "" && dest.[0] = '+' then
-      w1 ^ String.sub dest 1 (String.length dest - 1) ^ ws
-    else s
-  with [ Not_found -> s ]
-;
-
 value plus_decl s =
   match rindex s '+' with
   [ Some i ->
@@ -488,19 +468,80 @@ value plus_decl s =
   | None -> None ]
 ;
 
+value string_sub s i len =
+  let i = min (String.length s) (max 0 i) in
+  let len = min (String.length s - i) (max 0 len) in
+  String.sub s i len
+;
+
+value decline_word case s ibeg iend =
+  let i =
+    loop ibeg where rec loop i =
+      if i + 3 >= iend then ibeg
+      else if s.[i] == ':' && s.[i+1] == case && s.[i+2] == ':' then i + 3
+      else loop (i + 1)
+  in
+  let j =
+    loop i where rec loop i =
+      if i == iend then i
+      else if s.[i] == ':' then i
+      else loop (i + 1)
+  in
+  if s.[i] == '+' then
+    let k =
+      loop ibeg where rec loop i =
+        if i == iend then i
+        else if s.[i] == ':' then i
+        else loop (i + 1)
+    in
+    let i = i + 1 in
+    string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
+  else if s.[i] == '-' then
+    let k =
+      loop ibeg where rec loop i =
+        if i == iend then i
+        else if s.[i] == ':' then i
+        else loop (i + 1)
+    in
+    let (i, cnt) =
+      loop (i + 1) 1 where rec loop i cnt =
+        if i < iend && s.[i] == '-' then loop (i + 1) (cnt + 1)
+        else (i, cnt)
+    in
+    string_sub s ibeg (k - ibeg - cnt) ^ string_sub s i (j - i)
+  else string_sub s i (j - i)
+;
+
+value decline case s =
+  loop 0 0 where rec loop ibeg i =
+    if i == String.length s then
+      if i == ibeg then "" else decline_word case s ibeg i
+    else if s.[i] == ' ' then
+      decline_word case s ibeg i ^ " " ^ loop (i + 1) (i + 1)
+    else loop ibeg (i + 1)
+;
+
 value transl_decline conf w s =
   let s1 = if s = "" then "" else " " ^ s in
   let wt = transl conf w in
-  if wt.[String.length wt - 1] = ''' then
+  let len = String.length wt in
+  if wt.[len - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then nth_field wt 1 ^ s
     else nth_field wt 0 ^ s1
+  else if len >= 3 && wt.[len-3] == ':' && wt.[len-1] == ':' then
+    let start = String.sub wt 0 (len - 3) in
+    start ^ decline wt.[len-2] s
   else
     match plus_decl wt with
     [ Some (start, " +before") ->
         if s = "" then start else s ^ " " ^ start
-    | Some (start, decl) ->
-        start ^ (if s = "" then "" else " " ^ decline conf decl s)
-    | None -> wt ^ s1 ]
+    | _ -> wt ^ s1 ]
+;
+
+value nominative s =
+  match rindex s ':' with
+  [ Some _ -> decline 'n' s
+  | _ -> s ]
 ;
 
 value ftransl conf (s : format 'a 'b 'c) : format 'a 'b 'c =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.32 1999-06-02 22:43:40 ddr Exp $ *)
+(* $Id: perso.ml,v 2.33 1999-07-14 11:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -409,7 +409,7 @@ value print_parents conf base p =
       let fath = poi base ifath in
       let moth = poi base imoth in
       do Wserver.wprint "<h3>%s</h3>\n\n<ul>\n"
-           (capitale (transl conf "parents"));
+           (capitale (nominative (transl conf "parents")));
          html_li conf;
          Wserver.wprint "%s" (referenced_person_title_text conf base fath);
          Date.afficher_dates_courtes conf base fath;

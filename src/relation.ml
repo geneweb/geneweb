@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.11 1999-07-09 16:22:04 ddr Exp $ *)
+(* $Id: relation.ml,v 2.12 1999-07-14 11:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -170,12 +170,13 @@ value print_link conf base n p1 p2 x1 x2 =
      else if x1 == x2 then
        if x1 == 1 && not (same_parents base p1 p2) then
          Wserver.wprint "%s" (half_brother_label conf p1.sex)
-       else Wserver.wprint "%s" (brother_label conf x2 p1.sex)
+       else
+         Wserver.wprint "%s" (nominative (brother_label conf x2 p1.sex))
      else if x1 == 1 || x2 == 1 then
        if x1 == 1 then Wserver.wprint "%s" (uncle_label conf (x2 - x1) p1)
        else Wserver.wprint "%s" (nephew_label conf (x1 - x2) p1)
      else if x1 < x2 then
-       do Wserver.wprint "%s" (brother_label conf x1 p1.sex);
+       do Wserver.wprint "%s" (nominative (brother_label conf x1 p1.sex));
           Wserver.wprint " %s"
             (transl_decline conf
              "of (same or greater generation level)"
@@ -278,14 +279,12 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
   in
   do tag "ul" begin
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x1)
-         (transl_decline conf "of" "");
+       Wserver.wprint "%s %s\n" (lab x1) (transl_decline conf "of" "");
        afficher_personne_sans_titre conf base p1;
        afficher_titre conf base p1;
        Wserver.wprint "\n";
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x2)
-         (transl_decline conf "of" "");
+       Wserver.wprint "%s %s\n" (lab x2) (transl_decline conf "of" "");
        afficher_personne_sans_titre conf base p2;
        afficher_titre conf base p2;
        Wserver.wprint "\n";

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.70 1999-07-08 10:46:14 ddr Exp $
+# $Id: lexicon.txt,v 2.71 1999-07-14 11:50:54 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -18,10 +18,6 @@ se: iso-8859-1
 
      !dir
 he: rtl
-
-     +decl
-eo: =+n
-de: ein=einem
 
      to see the first branch
 de: , um den ersten zu sehen
@@ -330,7 +326,7 @@ pt: S/N
 se: J/N
 
     a %s cousin
-de: ein Cousin %s Grades/eine Kusine %s Grades
+de: ein:d:+em Cousin %s Grades/eine Kusine %s Grades
 dk: en f&aelig;tter af %s grad/en kusine af %s grad
 en: a %s cousin
 eo: %s kuzo/%s kuzino/%s gekuzo
@@ -344,7 +340,7 @@ pt: um primo %s/uma prima %s/um(a) primo(a) %s
 se: en %s kusin
 
     a 2nd cousin
-de: ein Cousin 2ten Grades/eine Kusine 2ten Grades
+de: ein:d:+em Cousin 2ten Grades/eine Kusine 2ten Grades
 dk: en f&aelig;tter af 2. grad/en kusine af 2. grad
 en: a 2nd cousin
 eo: 2a kuzo/2a kuzino/2a gekuzo
@@ -358,7 +354,7 @@ pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
 se: en syssling
 
     a 3rd cousin
-de: ein Cousin 3ten Grades/eine Kusine 3ten Grades
+de: ein:d:+em Cousin 3ten Grades/eine Kusine 3ten Grades
 dk: en f&aelig;tter af 3. grad/en kusine af 3. grad
 en: a 3rd cousin
 eo: 3a kuzo/3a kuzino/3a gekuzo
@@ -386,7 +382,7 @@ pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
 se: en bror/en syster/ett syskon
 
     a cousin
-de: ein Cousin/eine Kusine
+de: ein:d:+em Cousin/eine Kusine
 dk: en f&aelig;tter/en kusine
 en: a cousin
 eo: kuzo/kuzino
@@ -414,7 +410,7 @@ pt: um descendente/uma descendente
 se: en &auml;ttling
 
     a grandfather/a grandmother/a grandparent
-de: ein Gro&szlig;vater/eine Gro&szlig;mutter/ein Gro&szlig;elternteil
+de: ein Gro&szlig;vater/eine Gro&szlig;mutter/ein:d:+em Gro&szlig;elternteil
 dk: en bedstefader/en bedstemoder/en bedstefor&aelig;lder
 en: a grandfather/a grandmother/a grandparent
 eo: avo/avino/geavo
@@ -442,7 +438,7 @@ pt: um neto/uma neta/um(a) neto(a)
 se: en son(dotter)-son/en son(dotter)-dotter/ett barnbarn
 
     a great-grandfather/a great-grandmother/a great-grandparent
-de: ein Urgro&szlig;vater/eine Urgro&szlig;mutter/ein Urgro&szlig;elternteil
+de: ein Urgro&szlig;vater/eine Urgro&szlig;mutter/ein:d:+em Urgro&szlig;elternteil
 dk: en oldefader/en oldemoder/en oldefor&aelig;lder
 en: a great-grandfather/a great-grandmother/a great-grandparent
 eo: praevo/praevino/gepraevo
@@ -570,7 +566,7 @@ se: tilltr&auml;de
 de: hinzuf&uuml;gen +before
 dk: tilf&oslash;j
 en: add
-eo: aldoni +decl
+eo: aldoni :a:
 es: agregar
 fr: ajouter
 he:   הוספה 
@@ -642,7 +638,7 @@ se: &aring;lder
 de: Alias
 dk: alias
 en: alias
-eo: aliaso
+eo: aliaso:a:+n
 es: alias
 fr: alias
 he:   שם נוסף 
@@ -709,7 +705,7 @@ pt: tamb&eacute;m
 se: ocks&aring;
 
     an ancestor
-de: ein Vorfahre/eine Vorfahrin
+de: ein:d:+em Vorfahre/eine Vorfahrin
 dk: en forfader
 en: an ancestor
 eo: prapatro/prapatrino
@@ -1083,7 +1079,7 @@ cn: ׳׃ֵ®
 de: Kind/Kinder
 dk: barn/b&oslash;rn
 en: child/children
-eo: infano/infanoj
+eo: infano:a:+n/infanoj
 es: hijo/hijos
 fr: enfant/enfants
 he:   ילד/ ילדים
@@ -1288,7 +1284,7 @@ se: &aring;lder:
 de: l&ouml;schen +before
 dk: slet
 en: delete
-eo: malkonstrui +decl
+eo: malkonstrui :a:
 es: borrar
 fr: supprimer
 he:   מחיקה 
@@ -1500,7 +1496,7 @@ se: familj &auml;ndrad
 de: Familie/Familien
 dk: familie/familier
 en: family/families
-eo: familio/familioj
+eo: familio:a:+n/familioj
 es: familia/familias
 fr: famille/familles
 he:   משפחה/ משפחות 
@@ -1555,7 +1551,7 @@ se: f&ouml;rsta lediga nummer
 de: Vornamen Alias
 dk: fornavns alias
 en: first name alias
-eo: personnomo aliaso
+eo: personnomo:a:+n aliaso:a:+n
 es: nombre alias
 fr: pr&eacute;nom alias
 he:  שם פרטי אחר
@@ -1931,7 +1927,7 @@ se: f&ouml;rteckning &ouml;ver makarna (icke &auml;ttlingar)
 de: einf&uuml;gen +before
 dk: inds&aelig;t
 en: insert
-eo: inseri +decl
+eo: inseri :a:
 es: insertar
 he:  להכניס
 it: inserire
@@ -2206,7 +2202,7 @@ se: kanske
 de: zusammenf&uuml;hren
 dk: sammenl&aelig;g
 en: merge
-eo: fuzii +decl
+eo: fuzii :a:
 es: fusionar
 fr: fusionner
 he:  איחוד
@@ -2246,7 +2242,7 @@ se: anor som saknas
 de: &auml;ndern +before
 dk: &aelig;ndre
 en: modify
-eo: modifi +decl
+eo: modifi :a:
 es: modificar
 fr: modifier
 he:  לשנות
@@ -2565,7 +2561,7 @@ pt: ocupa&ccedil;&atilde;o
 se: yrke
 
     of
-de: von +decl
+de: von :d:
 dk: til
 en: of
 eo: de
@@ -2592,7 +2588,7 @@ pt: pelo lado de %t
 se: fr&aring;n %ts sl&auml;ktsida
 
     of (same or greater generation level)
-de: von +decl
+de: von :d:
 dk: til
 en: of
 eo: de
@@ -2791,7 +2787,7 @@ cn: ¸¸ִ¸
 de: Eltern
 dk: for&aelig;ldre
 en: parents
-eo: gepatroj
+eo: gepatroj:a:+n
 es: padres
 fr: parents
 he:  הורים
@@ -2847,7 +2843,7 @@ se: person &auml;ndrad
 de: Person/Personen
 dk: person/personer
 en: person/persons
-eo: persono/personoj
+eo: persono:a:+n/personoj
 es: persona/personas
 fr: personne/personnes
 he:  אדם/ אנשים
@@ -2957,7 +2953,7 @@ se: publikt namn
 de: Beiname
 dk: tilnavn
 en: qualifier
-eo: kromnomo
+eo: kromnomo:a:+n
 es: calificativo
 fr: qualificatif
 he:  כינוי
@@ -3245,7 +3241,7 @@ se: som b&ouml;rjar med
 de: Nachname Alias
 dk: efternavns alias
 en: surname alias
-eo: familinomo aliaso
+eo: familinomo:a:+n aliaso:a:+n
 es: apellido alias
 fr: nom alias
 he:  שם משפחה אחר
@@ -3464,7 +3460,7 @@ se: i &ouml;vermorgon
 
     the father/the mother/a parent
 cn: ¸¸/ִ¸/a parent
-de: der Vater/die Mutter/ein Elternteil
+de: der Vater/die Mutter/ein:d:+em Elternteil
 dk: faderen/moderen/en for&aelig;lder
 en: the father/the mother/a parent
 eo: la patro/la patrino/gepatro
@@ -3620,7 +3616,7 @@ se: hela listan
 de: Titel/Titel
 dk: titel/adelstitler
 en: title/titles
-eo: mosxto/mosxtoj
+eo: mosxto:a:+n/mosxtoj
 es: t&iacute;tulo/t&iacute;tulos
 fr: titre/titres
 he:  תואר/ תארים
