@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.3 1999-03-25 20:25:33 ddr Exp $ *)
+(* $Id: descend.ml,v 2.4 1999-03-26 19:53:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -261,8 +261,14 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
              do if connais base conj then
                   do afficher_marie conf base first fam p conj;
                      if Array.length enfants <> 0 then
-                       Wserver.wprint ", <em>%s</em>"
-                         (transl conf "having as children")
+                       let auth =
+                         age_autorise conf base p &&
+                         age_autorise conf base conj
+                       in
+                       if fam.not_married && auth then Wserver.wprint ":"
+                       else
+                         Wserver.wprint ", <em>%s</em>"
+                           (transl conf "having as children")
                      else Wserver.wprint ".";
                      html_br conf;
                   return ()
