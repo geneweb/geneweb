@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.9 2001-07-17 11:07:10 ddr Exp $ *)
+(* $Id: setup.ml,v 4.10 2001-07-23 09:20:16 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -397,7 +397,7 @@ and print_selector conf print =
     try getenv conf.env "sel" with
     [ Not_found ->
         try Sys.getenv "HOME" with
-        [ Not_found -> ifdef UNIX then "/" else "" ] ]
+        [ Not_found -> Sys.getcwd () ] ]
   in
   let list =
     try
