@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.14 2001-11-27 12:10:11 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.15 2002-01-23 11:52:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -691,12 +691,6 @@ value print_inv_ok conf base p =
   }
 ;
 
-value delete_topological_sort conf base =
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  let tstab_file = Filename.concat bfile "tstab" in
-  try Sys.remove tstab_file with [ Sys_error _ -> () ]
-;
-
 value get_create (_, _, _, create, _) = create;
 
 value forbidden_disconnected conf sfam scpl sdes =
@@ -762,7 +756,7 @@ value print_add o_conf base =
           in
           base.func.commit_patches ();
           History.record conf base (fn, sn, occ) act;
-          delete_topological_sort conf base;
+          Update.delete_topological_sort conf base;
           print_add_ok conf base wl cpl des
         }
       with
@@ -792,7 +786,7 @@ value print_del conf base =
               effective_del conf base fam;
               base.func.commit_patches ();
               History.record conf base k "df";
-              delete_topological_sort conf base
+              Update.delete_topological_sort conf base
             }
             else ();
             print_del_ok conf base []
@@ -839,7 +833,7 @@ value print_mod o_conf base =
     do {
       base.func.commit_patches ();
       History.record conf base (fn, sn, occ) "mf";
-      delete_topological_sort conf base;
+      Update.delete_topological_sort conf base;
       print_mod_ok conf base wl cpl des
     }
   in

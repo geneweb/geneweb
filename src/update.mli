@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 4.2 2001-06-15 18:07:06 ddr Exp $ *)
+(* $Id: update.mli,v 4.3 2002-01-23 11:52:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -19,6 +19,7 @@ value insert_person :
 value insert_string : base -> string -> Adef.istr;
 value add_misc_names_for_new_persons : base -> list person -> unit;
 value update_misc_names_of_family : base -> person -> union -> unit;
+value delete_topological_sort : config -> base -> unit;
 
 value print_return : config -> unit;
 value print_error : config -> base -> Gutil.base_error -> unit;
@@ -35,9 +36,7 @@ value reconstitute_date : config -> string -> option date;
 value print_date : config -> base -> string -> string -> option date -> unit;
 
 value print_src : config -> string -> string -> unit;
-
 value print_someone : config -> base -> person -> unit;
-
 value print : config -> base -> person -> unit;
 
 value update_conf : config -> config;
