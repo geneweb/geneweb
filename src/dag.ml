@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.22 2000-11-01 04:11:16 ddr Exp $ *)
+(* $Id: dag.ml,v 3.23 2001-01-05 23:25:42 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -108,103 +108,135 @@ do List.iter (fun id -> let p = poi base nodes.(int_of_idag id) in Printf.eprint
   {dag = nodes}
 ;
 
-value print_image_normal conf base p fname width height =
+value image_normal_txt conf base p fname width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let b = acces conf base p in
   let k = default_image_name base p in
-  do Wserver.wprint "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k;
-     Wserver.wprint "\
+  sprintf "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k ^
+  sprintf "\
 <img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
         (commd conf)
         (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-        b k width height image_txt;
-     Wserver.wprint "</a>\n";
-  return ()
+        b k width height image_txt ^
+  "</a>"
 ;
 
-value print_image_url conf base url height =
+value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  do Wserver.wprint "<a href=\"%s\">" url;
-     Wserver.wprint "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url
-        height image_txt;
-     Wserver.wprint "</a>\n";
-  return ()
+  sprintf "<a href=\"%s\">" url ^
+  sprintf "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url
+    height image_txt ^
+  "</a>\n"
 ;
 
-value print_image conf base p =
+value image_txt conf base p =
   match p_getenv conf.env "image" with
   [ Some "on" ->
       match image_and_size conf base p (limited_image_size 100 75) with
       [ Some (f, Some (Some (wid, hei))) ->
-          do Wserver.wprint "<br>\n";
-             Wserver.wprint "<center><table border=0><tr><td>\n";
-             print_image_normal conf base p f wid hei;
-             Wserver.wprint "</table></center>\n";
-          return ()
+          "<br>\n<center><table border=0><tr><td>\n" ^
+          image_normal_txt conf base p f wid hei ^
+          "</table></center>\n"
       | Some (url, None) ->
-          do Wserver.wprint "<br>\n";
-             Wserver.wprint "<center><table border=0><tr><td>\n";
-             print_image_url conf base url 75;
-             Wserver.wprint "</table></center>\n";
-          return ()
-      | _ -> () ]
-  | _ -> () ]
+          "<br>\n<center><table border=0><tr><td>\n" ^
+          image_url_txt conf base url 75 ^
+          "</table></center>\n"
+      | _ -> "" ]
+  | _ -> "" ]
+;
+
+value print_table conf hts =
+  do Wserver.wprint "<center><table border=%d" conf.border;
+     Wserver.wprint " cellspacing=0 cellpadding=0>\n";
+     for i = 0 to Array.length hts - 1 do
+       Wserver.wprint "<tr>\n";
+       for j = 0 to Array.length hts.(i) - 1 do
+         let (colspan, align, td) = hts.(i).(j) in
+         do Wserver.wprint "<td";
+(*
+            if colspan > 1 then Wserver.wprint " colspan=%d" colspan else ();
+*)
+if colspan=1 && (td=TDstring "&nbsp;" || td=TDhr CenterA) then ()
+else Wserver.wprint " colspan=%d" colspan;
+(**)
+            match (align, td) with
+            [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=left"
+            | (LeftA, _) -> ()
+            | (CenterA, _) -> Wserver.wprint " align=center"
+            | (RightA, _) -> Wserver.wprint " align=right" ];
+            Wserver.wprint ">";
+            match td with
+            [ TDstring s -> Wserver.wprint "%s" s
+            | TDhr align ->
+                do Wserver.wprint "<hr noshade size=1";
+                   match align with
+                   [ LeftA -> Wserver.wprint " width=\"50%%\" align=left"
+                   | RightA -> Wserver.wprint " width=\"50%%\" align=right"
+                   | _ -> () ];
+                   Wserver.wprint ">";
+                return () ];
+            Wserver.wprint "</td>\n";
+         return ();
+       done;
+     done;
+     Wserver.wprint "</table></center>\n";
+  return () 
 ;
 
 (* main *)
 
-value print_only_dag conf base print_elem spouse_on invert set spl d =
+value print_only_dag conf base elem_txt spouse_on invert set spl d =
   let t = table_of_dag False invert d in
-  let print_indi n =
+  let indi_txt n =
     match n.valu with
     [ Left ip ->
         let p = poi base ip in
-        do print_elem conf base p;
-           let spouses =
-             if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
-               List.fold_left
-                 (fun list id ->
-                    match d.dag.(int_of_idag id).valu with
-                    [ Left cip ->
-                        match (aoi base cip).parents with
-                        [ Some ifam ->
-                            let cpl = coi base ifam in
-                            if ip == cpl.father then
-                              if List.mem_assoc cpl.mother list then list
-                              else [(cpl.mother, Some ifam) :: list]
-                            else if ip == cpl.mother then
-                              if List.mem_assoc cpl.father list then list
-                              else [(cpl.father, Some ifam) :: list]
-                            else list
-                        | None -> list ]
-                    | Right _ -> list ])
-                 [] n.chil
-             else if n.chil = [] then
-               try [List.assq ip spl] with [ Not_found -> [] ]
-             else []
-           in
-           List.iter
-             (fun (ips, ifamo) ->
-                if Pset.mem ips set then ()
-                else
-                  let ps = poi base ips in
-                  let d =
-                    match ifamo with
-                    [ Some ifam ->
-                        Date.short_marriage_date_text conf base (foi base ifam)
-                          p ps
-                    | None -> "" ]
-                  in
-                  do Wserver.wprint "<br>\n&amp;%s " d;
-                     Wserver.wprint "%s"
-                       (Util.referenced_person_title_text conf base ps);
-                     Wserver.wprint "%s" (Date.short_dates_text conf base ps);
-                  return ())
-             spouses;
-           print_image conf base p;
-        return ()
-    | Right _ -> Wserver.wprint "&nbsp;" ]
+        let txt = elem_txt conf base p in
+        let txt =
+          let spouses =
+            if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
+              List.fold_left
+                (fun list id ->
+                   match d.dag.(int_of_idag id).valu with
+                   [ Left cip ->
+                       match (aoi base cip).parents with
+                       [ Some ifam ->
+                           let cpl = coi base ifam in
+                           if ip == cpl.father then
+                             if List.mem_assoc cpl.mother list then list
+                             else [(cpl.mother, Some ifam) :: list]
+                           else if ip == cpl.mother then
+                             if List.mem_assoc cpl.father list then list
+                             else [(cpl.father, Some ifam) :: list]
+                           else list
+                       | None -> list ]
+                   | Right _ -> list ])
+                [] n.chil
+            else if n.chil = [] then
+              try [List.assq ip spl] with [ Not_found -> [] ]
+            else []
+          in
+          List.fold_left
+            (fun txt (ips, ifamo) ->
+               if Pset.mem ips set then txt
+               else
+                 let ps = poi base ips in
+                 let d =
+                   match ifamo with
+                   [ Some ifam ->
+                       Date.short_marriage_date_text conf base (foi base ifam)
+                         p ps
+                   | None -> "" ]
+                 in
+                 txt ^ "<br>\n&amp;" ^ d ^ " " ^
+                 Util.referenced_person_title_text conf base ps ^
+                 Date.short_dates_text conf base ps)
+            txt spouses
+        in
+        let txt = txt ^ image_txt conf base p in
+        txt
+    | Right _ -> "&nbsp;" ]
   in
   let bd =
     match Util.p_getint conf.env "bd" with
@@ -216,39 +248,42 @@ value print_only_dag conf base print_elem spouse_on invert set spl d =
     [ Some x -> " " ^ x
     | _ -> "" ]
   in
-  let print_indi n =
+  let indi_txt n =
     let (bd, td) =
       match n.valu with
       [ Left ip -> (bd, td)
       | _ -> (0, "") ]
     in
     if bd > 0 || td <> "" then
-      do Wserver.wprint "<table border=%d><tr><td align=center%s>" bd td;
-         print_indi n;
-         Wserver.wprint "</table>";
-      return ()
-    else print_indi n
+      sprintf "<table border=%d><tr><td align=center%s>%s</table>" bd td
+        (indi_txt n)
+    else indi_txt n
   in
   let phony n =
     match n.valu with
     [ Left _ -> False
     | Right _ -> True ]
   in
-  print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
-    conf.border d t
+  match Util.p_getenv conf.env "prev" with
+  [ Some "on" ->
+      let print_indi n = Wserver.wprint "%s" (indi_txt n) in
+      print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
+        conf.border d t
+  | _ ->
+      let hts = html_table_struct indi_txt phony d t in
+      print_table conf hts ]
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
-  let print_elem conf base p =
-    do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
-       Wserver.wprint "%s" (Date.short_dates_text conf base p);
-    return ()
+  let elem_txt conf base p =
+    Util.referenced_person_title_text conf base p ^
+    Date.short_dates_text conf base p
   in
   do Util.header_no_page_title conf title;
-     print_only_dag conf base print_elem spouse_on invert set spl d;
+     print_only_dag conf base elem_txt spouse_on invert set spl d;
      Util.trailer conf;
   return ()
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.62 2000-11-28 09:44:37 ddr Exp $ *)
+(* $Id: relation.ml,v 3.63 2001-01-05 23:25:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -309,7 +309,7 @@ value dag_of_ind_dag_list indl =
     indl
 ;
 
-value print_relation_path_dag conf base print_elem path =
+value print_relation_path_dag conf base elem_txt path =
   let indl = dag_ind_list_of_path path in
   let indl = add_missing_parents_of_siblings base indl in
   let faml = dag_fam_list_of_ind_list indl in
@@ -356,19 +356,18 @@ value print_relation_path_dag conf base print_elem path =
     [ Some "on" -> True
     | _ -> False ]
   in
-  Dag.print_only_dag conf base print_elem spouse_on invert set [] d
+  Dag.print_only_dag conf base elem_txt spouse_on invert set [] d
 ;
 
 value print_relation_path conf base ip1 ip2 path excl_faml =
   if path == [] then ()
   else
-    let print_elem conf base p =
-      do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
-         Wserver.wprint "%s" (Date.short_dates_text conf base p);
-      return ()
+    let elem_txt conf base p =
+      Util.referenced_person_title_text conf base p ^
+      Date.short_dates_text conf base p
     in
     do Wserver.wprint "<p>\n";
-       print_relation_path_dag conf base print_elem path;
+       print_relation_path_dag conf base elem_txt path;
        Wserver.wprint "<p>\n";
        Wserver.wprint "<a href=\"%s" (commd conf);
        Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
@@ -1386,18 +1385,19 @@ value print_multi_relation conf base pl lim assoc_txt =
       | [_] | [] -> path ]
   in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  let print_elem conf base p =
-    do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
-       Wserver.wprint "%s" (Date.short_dates_text conf base p);
-       try
-         let t = Hashtbl.find assoc_txt p.cle_index in
-         Wserver.wprint " <b>(%s)</b>" t
-       with
-       [ Not_found -> () ];
-    return ()
+  let elem_txt conf base p =
+    let txt =
+      Util.referenced_person_title_text conf base p ^
+      Date.short_dates_text conf base p
+    in
+     try
+       let t = Hashtbl.find assoc_txt p.cle_index in
+       txt ^ " <b>(" ^ t ^ ")</b>"
+     with
+     [ Not_found -> txt ]
   in
   do header_no_page_title conf title;
-     print_relation_path_dag conf base print_elem path;
+     print_relation_path_dag conf base elem_txt path;
      match pl2 with
      [ [] -> ()
      | _ ->
