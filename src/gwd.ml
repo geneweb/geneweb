@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.36 2002-03-05 16:16:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.37 2002-03-06 22:23:24 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -507,8 +507,10 @@ value unauth_cgi conf passwd =
       Util.hidden_env conf;
       List.iter
         (fun (k, v) ->
-           Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
-             (Util.quote_escaped (Util.decode_varenv v)))
+           if List.mem k ["log_pwd"; "log_uid"; "log_cnl"] then ()
+           else
+             Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
+               (Util.quote_escaped (Util.decode_varenv v)))
         conf.env;
       tag "table" "border=1" begin
         tag "tr" "align=left" begin
@@ -957,7 +959,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
             let has_accepted_cookie =
               Wserver.extract_param "cookie: " '\n' request <> ""
             in
-            if wizard then
+            if passwd = "" then (command, "", None)
+            else if wizard then
               let pwd_id = set_token utm from_addr base_file 'w' user in
               if has_accepted_cookie then
                 (command, passwd, Some (base_file ^ "_w", pwd_id))
