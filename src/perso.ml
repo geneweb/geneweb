@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.39 2002-09-19 15:39:04 ddr Exp $ *)
+(* $Id: perso.ml,v 4.40 2002-10-25 13:14:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -487,12 +487,6 @@ value print_first_name_alias conf base env =
   | _ -> () ]
 ;  
 
-value print_first_name_key conf base env p p_auth =
-  Wserver.wprint "%s"
-    (if conf.hide_names && not p_auth then ""
-     else code_varenv (Name.lower (p_first_name base p)))
-;
-
 value print_image_size conf base env p p_auth =
   if p_auth then
     match get_env "image" env with
@@ -764,12 +758,6 @@ value print_surname_alias conf base env =
   | _ -> () ]
 ;  
 
-value print_surname_key conf base env p p_auth =
-  Wserver.wprint "%s"
-    (if conf.hide_names && not p_auth then ""
-     else code_varenv (Name.lower (p_surname base p)))
-;
-
 value print_witness_relation conf base env =
   fun
   [ Vfam _ (ip1, ip2) _ ->
@@ -789,22 +777,18 @@ value eval_int_env var env =
 value try_eval_gen_variable conf base env (p, a, u, p_auth) =
   fun
   [ "child_cnt" -> eval_int_env "child_cnt" env
+  | "count" ->
+      do { obsolete "count" "child_cnt"; eval_int_env "child_cnt" env }
   | "family_cnt" -> eval_int_env "family_cnt" env
   | "first_name" ->
       if not p_auth && conf.hide_names then "x" else p_first_name base p
-  | "nb_children" ->
-      match get_env "fam" env with
-      [ Vfam _ _ des -> string_of_int (Array.length des.children)
-      | _ -> "" ]
-  | "nb_families" ->
-      match get_env "child" env with
-      [ Vind _ _ u -> string_of_int (Array.length u.family)
-      | _ ->
-          match get_env "p" env with
-          [ Vind _ _ u -> string_of_int (Array.length u.family)
-          | _ -> "" ] ]
-  | "count" ->
-      do { obsolete "count" "child_cnt"; eval_int_env "child_cnt" env }
+  | "first_name_key" ->
+      if conf.hide_names && not p_auth then ""
+      else code_varenv (Name.lower (p_first_name base p))
+  | "ind_access" -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  | "key" ->
+      if not p_auth && conf.hide_names then "x"
+      else Util.default_image_name base p
   | "length" ->
       do {
         obsolete "length" "nb_children";
@@ -818,6 +802,17 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) =
         [ Vfam fam _ _ -> sou base fam.marriage_place
         | _ -> "" ]
       else ""
+  | "nb_children" ->
+      match get_env "fam" env with
+      [ Vfam _ _ des -> string_of_int (Array.length des.children)
+      | _ -> "" ]
+  | "nb_families" ->
+      match get_env "child" env with
+      [ Vind _ _ u -> string_of_int (Array.length u.family)
+      | _ ->
+          match get_env "p" env with
+          [ Vind _ _ u -> string_of_int (Array.length u.family)
+          | _ -> "" ] ]
   | "on_marriage_date" ->
       if p_auth then
         match get_env "fam" env with
@@ -829,6 +824,9 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) =
       else ""
   | "surname" ->
       if not p_auth && conf.hide_names then "x" else p_surname base p
+  | "surname_key" ->
+      if conf.hide_names && not p_auth then ""
+      else code_varenv (Name.lower (p_surname base p))
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -878,11 +876,9 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "father_age_at_birth" ->
       print_parent_age conf base p a p_auth (fun cpl -> cpl.father)
   | "first_name_alias" -> print_first_name_alias conf base env
-  | "first_name_key" -> print_first_name_key conf base env p p_auth
   | "image_size" -> print_image_size conf base env p p_auth
   | "image_txt" -> Wserver.wprint "%s" (default_image_name base p)
   | "image_url" -> print_image_url conf base env p p_auth
-  | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
   | "married_to" ->
       do {
         obsolete "married_to" "";
@@ -913,7 +909,6 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "source_type" -> print_source_type conf base env
   | "source" -> print_source conf base env p
   | "surname_alias" -> print_surname_alias conf base env
-  | "surname_key" -> print_surname_key conf base env p p_auth
   | "title" -> Wserver.wprint "%s" (person_title conf base p)
   | "witness_relation" -> print_witness_relation conf base env efam
   | s -> Wserver.wprint "%s" (try_eval_gen_variable conf base env ep s) ]
@@ -1126,7 +1121,13 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "is_restricted" -> is_hidden p
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "wizard" -> conf.wizard
-  | v -> do { Wserver.wprint ">%%%s???" v; False } ]
+  | v ->
+      let v = extract_var "file_exists_" v in
+      if v <> "" then
+        let v = code_varenv v in
+        let s = Srcfile.source_file_name conf v in
+        Sys.file_exists s
+      else do { Wserver.wprint ">%%%s???" v; False } ]
 ;
 
 value eval_bool_variable conf base env sl =
