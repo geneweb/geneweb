@@ -16,9 +16,10 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </font>
 <br><br>
 
-This part indicates how to customize the welcome pages and to put
-associated pages. It is written for people having handled
-<font color=#2f6400><b>GeneWeb</b></font> already and who want to go into the details.
+This part indicates how to customize the welcome pages and the other
+pages and to put associated pages. It is written for people having
+handled <font color=#2f6400><b>GeneWeb</b></font> already and who want
+to go into the details.
 
 <ul>
 
@@ -27,6 +28,8 @@ associated pages. It is written for people having handled
 <li> <a href="#Mac">Macros</a>
 
 <li> <a href="#Ass">Associated pages</a>
+
+<li> Customization of <a href="#All">all the pages</a>
 
 </ul>
 
@@ -333,6 +336,33 @@ pages as well.
 
 Notice that the "advanced request" works like an associated file named
 "advanced.txt".
+
+<p>
+
+<hr>
+<h3><a name="All">
+</a> <font color=#2f6400>Toutes les pages</font></a></h3>
+
+The pages, the welcome page included, can be customized in three places:
+
+<ul>
+
+<li>You can add a file named <b>base.hed</b> (if "base" is the name
+of your data base) which will be inserted in all the headers of the pages
+(between &lt;head&gt; and &lt;/head&gt;). Allow you to insert style sheets
+for example. To be put in the directory "lang" and/or if you want that it
+be different for the language "xy" in the directory "lang/xy".
+
+<li>In the same way, you can add a file named <b>base.trl</b> which will
+be inserted behind the GeneWeb copyright at each page.
+
+<li>At last, you can set the variable <tt>body_prop</tt> of your file
+<b>base.gwf</b> which will be inserted in the tag "&lt;body&gt;" of all
+the pages. Useful to put a background color or image or to change the
+colours of the displayed texts. See this <a href="start.htm#Cnf">section
+</a> of the chapter "how to start with GeneWeb".
+
+</ul>
 
 <p>
 <hr>
