@@ -16,9 +16,11 @@
 case "$1" in
   start)
 	echo "Starting GeneWeb Services:"
+        touch /var/log/gwd.log /var/log/gwsetup.log
+        chown geneweb /var/log/gwd.log /var/log/gwsetup.log
 	cd /home/geneweb/gw/gw
-	/home/geneweb/gw/gw/gwd -daemon
-	/home/geneweb/gw/gw/gwsetup -daemon
+	./gwd -log /var/log/gwd.log -daemon
+	./gwsetup -daemon 2>> /var/log/gwsetup.log
 	touch /var/lock/subsys/gwd
 	;;
   stop)
@@ -36,9 +38,11 @@ case "$1" in
         killproc gwd
         killproc gwsetup
 	echo
+        touch /var/log/gwd.log /var/log/gwsetup.log
+        chown geneweb /var/log/gwd.log /var/log/gwsetup.log
 	cd /home/geneweb/gw/gw
-	./gwd -daemon
-	./gwsetup -daemon
+	./gwd -log /var/log/gwd.log -daemon
+	./gwsetup -daemon 2>> /var/log/gwsetup.log
 	touch /var/lock/subsys/gwd
 	;;
   *)
