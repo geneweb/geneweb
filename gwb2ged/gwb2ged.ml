@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.13 2000-08-31 17:58:01 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.14 2000-09-06 09:55:52 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -68,16 +68,13 @@ value rec display_note_aux oc s len i =
         else i
       in
       display_note_aux oc s (String.length "2 CONT ") i
-    else if s.[i] == '\n' then
-      do Printf.fprintf oc "\n2 CONC "; return
-      display_note_aux oc s (String.length "2 CONC ") (i + 1)
     else if len == max_len
-         || s.[i] <> ' ' && next_char_pair_overflows s len i
+         || c <> ' ' && next_char_pair_overflows s len i
       then
       do Printf.fprintf oc "\n2 CONC %c" c; return
       display_note_aux oc s (String.length "2 CONC .") (i + 1)
     else
-      do output_char oc s.[i]; return
+      do output_char oc c; return
       display_note_aux oc s (len + 1) (i + 1)
 ;
 

@@ -33,6 +33,11 @@ GeneWeb version 3.08
   - [31 Aug 00] All surnames aliases (instead of only the first one) are
     now saved and restored.
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [06 Sep 00] Fixed bug: newlines in notes were incorrectly saved,
+    resulting that when restoring the data base (ged2gwb), the lines
+    were catenated without any spaces.
+
 * GeneWeb to Gedcom (gwb2ged) and GeneWeb uncompiler (gwu)
   - [29 Aug 00] Now, when option "-d" (descendants of) is applied, the
     spouses' parents are included, except if the option "-nsp" is given.
