@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.06
 --------------------
 
+* Setup program (gwsetup)
+  - [28 Jun 00] Take only the 1st two characters of the language given.
+
 * GeneWeb daemon/CGI (gwd)
   - [23 Jun 00] Added the macro %u in trailer files (base.trl) which is
     expanded as the current URL.
