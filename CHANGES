@@ -16,10 +16,6 @@ GeneWeb Version 1.09
        1 OBJE
          2 FILE ...
 
-* ged2gwb
-  - Now the option "-no_efn" is the default. Use "-efn" to set it.
-    The option "-epn" remains the default. Use "-no_epn" to reset it.
-
 GeneWeb Version 1.08
 --------------------
 

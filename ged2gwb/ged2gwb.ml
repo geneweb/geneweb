@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.12 1998-11-07 11:12:07 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.13 1998-11-09 09:31:24 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -14,7 +14,7 @@ type record =
 value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
-value extract_first_names = ref False;
+value extract_first_names = ref True;
 value extract_public_names = ref True;
 value ansel_option = ref None;
 value ansel_characters = ref True;
@@ -1468,11 +1468,11 @@ value speclist =
    ("-ls", Arg.Set lowercase_surnames, "   - Lowercase surnames -
        Force lowercase surnames keeping only their initials as uppercase
        characters. Try to keep lowercase particles.");
-   ("-efn", Arg.Set extract_first_names, "  - Extract first names -
+   ("-efn", Arg.Set extract_first_names, "  - Extract first names - [default] -
        When creating a person, if the GEDCOM first name part holds several
        names, the first of this names becomes the person \"first name\" and
        the complete GEDCOM first name part a \"first name alias\".");
-   ("-no_efn", Arg.Clear extract_first_names, " - [default]
+   ("-no_efn", Arg.Clear extract_first_names, "
        Cancels the previous option.");
    ("-epn", Arg.Set extract_public_names, "  - Extract public names - [default]
        When creating a person, if the GEDCOM first name part looks like a
