@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.51 1999-10-18 19:31:46 ddr Exp $ *)
+(* $Id: util.ml,v 2.52 1999-10-19 08:58:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -903,6 +903,19 @@ value image_file_name bname str =
   else fname3
 ;
 
+value png_image_size ic =
+  let magic =
+    let s = String.create 4 in
+    do really_input ic s 0 4; return s
+  in
+  if magic = "\137PNG" then
+    do seek_in ic 16; return
+    let wid = input_binary_int ic in
+    let hei = input_binary_int ic in
+    Some (wid, hei)
+  else None
+;
+
 value gif_image_size ic =
   let magic =
     let s = String.create 4 in
@@ -955,8 +968,12 @@ value image_size fname =
   [ Some ic ->
       let r =
         try
-          let sz = gif_image_size ic in
-          if sz = None then do seek_in ic 0; return jpeg_image_size ic
+          let sz = jpeg_image_size ic in
+          let sz =
+            if sz = None then do seek_in ic 0; return png_image_size ic
+            else sz
+          in
+          if sz = None then do seek_in ic 0; return gif_image_size ic
           else sz
         with
         [ End_of_file -> None ]
@@ -966,6 +983,7 @@ value image_size fname =
 ;
 
 value up_fname conf =
+(*
   let s = Wserver.extract_param "accept: " '\n' conf.request in
   let list =
     let insert ibeg i list =
@@ -980,6 +998,8 @@ value up_fname conf =
       else loop list ibeg (i + 1)
   in
   if List.mem "image/png" list then "up.png" else "up.jpg"
+*)
+  "up.jpg"
 ;
 
 value print_link_to_welcome conf right_aligned =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.6 1999-09-24 19:37:39 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.7 1999-10-19 08:58:43 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -143,7 +143,8 @@ value move_file_to_old conf typ fname bfname =
       [Util.base_dir.val; "images"; conf.bname] "old"
   in
   if Sys.file_exists (Filename.concat old_dir bfname ^ ".gif")
-  || Sys.file_exists (Filename.concat old_dir bfname ^ ".jpg") then
+  || Sys.file_exists (Filename.concat old_dir bfname ^ ".jpg")
+  || Sys.file_exists (Filename.concat old_dir bfname ^ ".png") then
     try Sys.remove (fname ^ typ) with [ Sys_error _ -> () ]
   else
     do try Unix.mkdir old_dir 0o777 with [ Unix.Unix_error _ _ _ -> () ];
@@ -172,6 +173,7 @@ value effective_send_ok conf base p file =
     match content_type with
     [ "image/gif" -> ".gif"
     | "image/jpeg" | "image/pjpeg" -> ".jpg"
+    | "image/png" -> ".png"
     | _ -> incorrect conf ]
   in
   let bfname = default_image_name base p in
@@ -183,6 +185,8 @@ value effective_send_ok conf base p file =
        move_file_to_old conf ".gif" fname bfname
      else if Sys.file_exists (fname ^ ".jpg") then
        move_file_to_old conf ".jpg" fname bfname
+     else if Sys.file_exists (fname ^ ".png") then
+       move_file_to_old conf ".png" fname bfname
      else
        let d = Filename.concat Util.base_dir.val "images" in
        do try Unix.mkdir d 0o777 with [ Unix.Unix_error _ _ _ -> () ];
@@ -243,6 +247,8 @@ value effective_delete_ok conf base p =
        move_file_to_old conf ".gif" fname bfname
      else if Sys.file_exists (fname ^ ".jpg") then
        move_file_to_old conf ".jpg" fname bfname
+     else if Sys.file_exists (fname ^ ".png") then
+       move_file_to_old conf ".png" fname bfname
      else incorrect conf;
      let key = (sou base p.first_name, sou base p.surname, p.occ) in
      History.record conf base key "di";

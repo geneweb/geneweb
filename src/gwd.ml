@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.49 1999-10-09 16:50:04 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.50 1999-10-19 08:58:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -773,16 +773,16 @@ value image_request cgi str env =
         else fname
       in
       do if Filename.is_implicit fname then
-           if Filename.check_suffix fname ".jpg"
-           || Filename.check_suffix fname ".JPG" then
-             print_image cgi bname fname "jpeg"
-           else if Filename.check_suffix fname ".jpeg"
-           || Filename.check_suffix fname ".JPEG" then
-             print_image cgi bname fname "jpeg"
-           else if Filename.check_suffix fname ".gif"
-           || Filename.check_suffix fname ".GIF" then
-             print_image cgi bname fname "gif"
-           else ()
+           let _ =
+             List.exists
+               (fun (suff, itype) ->
+                  if Filename.check_suffix fname suff
+                  || Filename.check_suffix fname (String.uppercase suff) then
+                    do print_image cgi bname fname itype; return True
+                  else False)
+               [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg");
+                (".gif", "gif")]
+           in ()
          else ();
       return True
   | _ -> False ]
