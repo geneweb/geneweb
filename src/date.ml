@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.3 1999-11-25 12:17:53 ddr Exp $ *)
+(* $Id: date.ml,v 3.4 1999-11-30 12:30:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -30,22 +30,31 @@ value code_date conf encoding d m y =
       s ^ loop (i + 1)
 ;
 
-value french_month =
+value default_french_month =
   let tab =
-    [| "vend&eacute;miaire"; "brumaire"; "frimaire"; "niv&ocirc;se";
-       "pluvi&ocirc;se"; "vent&ocirc;se"; "germinal"; "flor&eacute;al";
-       "prairial"; "messidor"; "thermidor"; "fructidor";
-       "compl&eacute;mentaire" |]
+    [| "Vendemiaire"; "Brumaire"; "Frimaire"; "Nivose"; "Pluviose"; "Ventose";
+       "Germinal"; "Floreal"; "Prairial"; "Messidor"; "Thermidor"; "Fructidor";
+       "Extra" |]
   in
   fun m -> tab.(m)
 ;
 
-value hebrew_month =
+value default_hebrew_month =
   let tab =
     [| "Tishri"; "Heshvan"; "Kislev"; "Tevet"; "Shevat"; "AdarI";
        "AdarII"; "Nisan"; "Iyyar"; "Sivan"; "Tammuz"; "Av"; "Elul" |]
   in
   fun m -> tab.(m)
+;
+
+value french_month conf m =
+  let r = transl_nth conf "(french month)" m in
+  if r = "[(french month)]" then "[" ^ default_french_month m ^ "]" else r
+;
+
+value hebrew_month conf m =
+  let r = transl_nth conf "(hebrew month)" m in
+  if r = "[(hebrew month)]" then "[" ^ default_hebrew_month m ^ "]" else r
 ;
 
 value code_french_date conf d m y =
@@ -55,17 +64,17 @@ value code_french_date conf d m y =
   in
   let s =
     if m = 0 then ""
-    else s ^ (if s = "" then "" else " ") ^ french_month (m - 1)
+    else s ^ (if s = "" then "" else " ") ^ french_month conf (m - 1)
   in
   s ^ (if s = "" then "" else " ") ^
-  " an " ^ string_of_int y
+  " " ^ an ^ " " ^ string_of_int y
 ;
 
 value code_hebrew_date conf d m y =
   let s = if d = 0 then "" else string_of_int d in
   let s =
     if m = 0 then ""
-    else s ^ (if s = "" then "" else " ") ^ hebrew_month (m - 1)
+    else s ^ (if s = "" then "" else " ") ^ hebrew_month conf (m - 1)
   in
   s ^ (if s = "" then "" else " ") ^ " " ^ string_of_int y
 ;
@@ -428,8 +437,8 @@ value print_dates conf base p =
 
 value gregorian_month_name conf n = capitale (transl_nth conf "(month)" n);
 value julian_month_name = gregorian_month_name;
-value french_month_name conf n = capitale (french_month n);
-value hebrew_month_name conf n = capitale (hebrew_month n);
+value french_month_name conf n = capitale (french_month conf n);
+value hebrew_month_name conf n = capitale (hebrew_month conf n);
 
 value print_some_calendar conf date n month_name n_months var =
   do Wserver.wprint "\n";

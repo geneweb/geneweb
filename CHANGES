@@ -25,6 +25,7 @@ GeneWeb version 3.01
   - [Nov 10, 99] Changed structure of data bases for internal optimizations.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [Nov 30, 99] Added French Revolution and Hebrew months in lexicon
   - [Nov 23, 99] Updated Hebrew version (Jonathan Marder)
 
 * Base configuration files (base.gwf)
