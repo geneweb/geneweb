@@ -25,9 +25,9 @@ Buscar: <input name=n size=40 maxlength=200>
 Se trata:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-De <em>nombre</em> y <em>apellido</em>,
-o de <em>nombre publico</em>,
-o de <em>alias</em>.
+De <em>un nombre</em> y de <em>un apellido</em>,
+o de <em>un nombre publico</em>,
+o de <em>un alias</em>.
 <li> <input type=radio name=t value=P>
 De un <em>nombre</em>.
 <li> <input type=radio name=t value=N>
@@ -71,11 +71,12 @@ Los <a href="%sm=AN">cumplea&ntilde;os</a>.<br>
 Los <a href="%sm=AD">aniversarios de las personas fallecidas</a>.<br>
 Los <a href="%sm=AM">aniversarios de casamiento</a>.<br>%x
 Los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
-Las <a href="%sm=LD;k=10">muertes reci&eacute;ntes</a>.%x
+Las <a href="%sm=LD;k=10">muertes recientes</a>.%x
 
 <p>
 
-Han habido %q consultas con %c a esta p&aacute;gina desde %d.
+Han habido %q consultas, de las cuales %c corresponden a esta
+p&aacute;gina, desde el %d.
 
 %y<p>
 
