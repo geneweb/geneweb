@@ -1,9 +1,9 @@
 (* camlp4r q_MLast.cmo pa_extfun.cmo *)
-(* $Id: pr_lock.ml,v 4.1 2001-05-15 19:41:05 ddr Exp $ *)
+(* $Id: pr_lock.ml,v 4.2 2001-06-22 08:13:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Pcaml;
-open Pretty;
+open Spretty;
 
 value loc = (0, 0);
 

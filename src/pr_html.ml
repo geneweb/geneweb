@@ -1,9 +1,9 @@
 (* camlp4r q_MLast.cmo pa_extfun.cmo *)
-(* $Id: pr_html.ml,v 4.1 2001-05-15 15:57:51 ddr Exp $ *)
+(* $Id: pr_html.ml,v 4.2 2001-06-22 08:13:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Pcaml;
-open Pretty;
+open Spretty;
 
 value loc = (0, 0);
 
