@@ -29,6 +29,10 @@ GeneWeb Version 3.11
   - [30 Dec 00] Fixed information file about how to put a background image,
     the URL to use and the directory were wrong (obsolete).
 
+* GeneWeb data bases Transfer Program (gwtp)
+  - [05 Feb 01] Added a trace in case of error. So far, there were no
+    traces, it just stopped.
+
 GeneWeb Version 3.10
 --------------------
 
