@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.7 1999-07-15 08:52:48 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.8 1999-07-20 03:24:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -622,7 +622,7 @@ value parse_child str surname csrc l =
   let l = set_infos str u l in (u, l)
 ;
 
-value lire_famille ic fname =
+value lire_family ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
@@ -716,7 +716,7 @@ value lire_famille ic fname =
   | None -> None ]
 ;
 
-value comp_familles x =
+value comp_families x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
   do line_cnt.val := 0; return
   let oc = open_out_bin out_file in
@@ -726,7 +726,7 @@ value comp_familles x =
           output_value oc (x : string);
        return
        let rec loop line =
-         match lire_famille ic x line with
+         match lire_family ic x line with
          [ Some (family, line) ->
              do output_value oc (family : syntax_o); return loop line
          | None -> () ]
