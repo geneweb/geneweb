@@ -1,6 +1,9 @@
 GeneWeb version 4.10
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [06 Jan 03] In welcome page, added wizard's name (when named).
+
 * GeneWeb databases Transfer Program (gwtp)
   - [03 Jan 03] Fixed bug: when wizard notes, the "send database" did
     not work.

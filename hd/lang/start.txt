@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.41 2003-01-03 09:56:25 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.42 2003-01-06 12:55:01 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -71,7 +71,7 @@ sv: Genealogisk<br>databas
 zh: ÍøÂç¼ÒÆ×
 ]</font></h1></table>
 </td>
-%I&wNf<td align=%R valign=top><em>([wizard/wizards/friend]0)</em></td>
+%I&wNf<td align=%R valign=top><em>([wizard/wizards/friend]0%U)</em></td>
 %E%I&fNw<td align=%R valign=top><em>([wizard/wizards/friend]2)</em></td>
 %E<td align=%R valign=top>%w</td>
 </tr>
