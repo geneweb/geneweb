@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.67 2000-08-12 10:30:12 ddr Exp $ *)
+(* $Id: util.ml,v 3.68 2000-08-24 11:48:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -954,7 +954,9 @@ value copy_string_with_macros conf s =
                 | None ->
                     let tt =
                       if start_with s i "<a href="
-                      || start_with s i "<a\nhref=" then In_a_href else Out
+                      || start_with s i "<a\nhref=" then In_a_href
+                      else if s.[i] = '<' then In_norm
+                      else Out
                     in
                     do Wserver.wprint "%c" s.[i]; return loop tt (i + 1) ] ] ]
     else ()
