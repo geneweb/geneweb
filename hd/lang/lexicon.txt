@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.6 1999-11-03 09:57:12 ddr Exp $
+# $Id: lexicon.txt,v 3.7 1999-11-04 09:38:06 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -127,7 +127,7 @@ is: %t lést áğur en hann/hún fæddist
 it: %t sarebbe morto prima della sua nascita
 nl: %t zou dood zijn voor zijn/haar geboorte
 no: %t d&oslash;de f&oslash;r sin f&oslash;dsel
-pt: %t moreu antes de nascer
+pt: %t morreu antes de nascer
 se: %t dog f&ouml;re sin egen f&ouml;delse
 
     %t has incorrect title dates: %t
@@ -192,7 +192,7 @@ is: 1 %m %y/%d %m %y/%m %y/%y
 it: 1o %m %y/%d %m %y/%m %y/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 no: 1. %m %y/%d. %m %y/%m %y/%y
-pt: 1 de %m %y/%d de %m %y/%m %y/%y
+pt: 1 de %m de %y/%d de %m de %y/%m %y/%y
 se: 1 %m %y/%d %m %y/%m %y/%y
 
     (decimal separator)
@@ -937,7 +937,7 @@ is: forfeğur
 it: antenati
 nl: voorouders
 no: forfedre
-pt: antepassado
+pt: antepassados
 se: anor
 
     ancestors (some)
@@ -1034,7 +1034,7 @@ is: eru
 it: sono
 nl: zijn
 no: er
-pt: s&atilde;om
+pt: s&atilde;o
 se: &auml;r
 
     at the same time
@@ -1350,7 +1350,7 @@ is: breyta nafni barna
 it: cambiare i nomi dei figli
 nl: namen van kinderen wijzigen
 no: endre barnas navn
-pt: alterar os nomes das crian&ccedil;as
+pt: alterar os nomes dos filhos
 se: &auml;ndra barnens namn
 
     changed order of children
@@ -1770,7 +1770,7 @@ is: nákvæmlega
 it: esatto
 nl: precies
 no: eksakt
-pt: exacto
+pt: exacta
 se: exakt
 
     executed (legally killed)
@@ -1993,7 +1993,7 @@ he:  ìùîåú äôøèééí áñãø àìó-áú
 it: per il primo nome in ordine alfabetico
 nl: dit geeft de voornamen in alfabetische volgorde
 no: alfabetisk p&aring; fornavn
-pt: por os nomes por ordem alfab&eacute;tico
+pt: para obter os nomes proprios por ordem alfab&eacute;tica
 se: f&ouml;r f&ouml;rnamnen i bokstavsordning
 
     forum
@@ -2093,6 +2093,7 @@ is: gregorísk/julian/franskt/hebreskt
 it: gregorian/julian/francese/ebraico
 nl: gregoriaans/juliaans/frans/hebreeuws
 no: gregoriansk/juliansk/fransk rep./j&oslash;disk
+pt: gregoriano/juliano/franc&ecirc;s/hebraico
 se: gregoriansk/juliansk/fransk/hebreisk
 
     happy birthday to you!
@@ -2156,7 +2157,7 @@ is: hans/hennar
 it: lui/lei
 nl: zijn/haar
 no: han/henne
-pt: el/ela
+pt: ele/ela
 se: honom/henne
 
     his wife/her husband
@@ -2215,7 +2216,7 @@ is: ef titlar
 it: se titoli
 nl: als titels
 no: hvis titler
-pt: si t&iacute;tulos
+pt: sem t&iacute;tulos
 se: om titlar
 
     image
@@ -2385,7 +2386,7 @@ is: jú,
 it: infatti,
 nl: inderdaad:
 no: felles forfedre,
-pt: em efecto
+pt: por efeito,
 se: faktiskt,
 
     index of the descendants
@@ -2543,7 +2544,7 @@ is: tengsl
 it: link
 nl: konnektie
 no: koble
-pt: reunir
+pt: ligar
 se: l&auml;nk
 
     link between
@@ -2714,7 +2715,7 @@ it: max %d generazioni
 fr: max %d g&eacute;n&eacute;rations
 nl: maximaal %d generaties
 no: maksimalt %d generasjoner
-pt: maximum %d gera&ccedil;&otilde;es
+pt: maximo %d gera&ccedil;&otilde;es
 se: maximalt %d generationer
 
     maybe (date)
@@ -2773,7 +2774,7 @@ is: vantar forfeğur
 it: antenati mancanti
 nl: ontbrekende voorouders
 no: manglende forfedre
-pt: ascendentes faltando
+pt: ascendentes que faltam
 se: anor som saknas
 
     modify
@@ -2958,7 +2959,7 @@ is: engin şekkt tengsl milli %s og %s
 it: nessun legame di parentela conosciuto tra %s e %s
 nl: er is geen bekende verwantschap tussen %s en %s
 no: ikke kjent slektskap mellom %s og %s
-pt: nenhum grau de parentesco conhecido entre %s y %s
+pt: nenhum grau de parentesco conhecido entre %s e %s
 se: ingen k&auml;nd sl&auml;ktskap emellan %s och %s
 
     no match
@@ -3080,10 +3081,10 @@ it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/2
 no: n/to/tre/fir/fem/seks/syv/&aring;tte/ni/ti/elleve/tolv/tretten/fjorten/femten/seksten/søtten/atten/nitten/tyve/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 
     nth (feminine)
-he:  än/øàùåğä/ ùğéú/ ùìéùéú/ øáéòéú/ çîùéú/ ùéùéú/ ùáéòéú/ ùîéğéú/ úùéòéú/ òùéøéú/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/8/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
-pt: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 es: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
+he:  än/øàùåğä/ ùğéú/ ùìéùéú/ øáéòéú/ çîùéú/ ùéùéú/ ùáéòéú/ ùîéğéú/ úùéòéú/ òùéøéú/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/8/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 no: n./f&oslash;rste/andre/tredje/fjerde/femte/sjette/syvende/&aring;ttende/niende/tiende/ellevte/tolvte/trettende/fjortende/femtende/sekstende/s&oslash;ttende/attende/nittende/tyvende/21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99./100./101./102./103./104./105./106./107./108./109./110./111./112./113./114./115./116./117./118./119./120./121./122./123./124./125./126./127./128./129./130.
+pt: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 
     nth (generation)
 de: n-ten/1sten/2ten/3ten/4ten/5ten/6ten/7ten/8ten/9ten/10ten/11ten/12ten/13ten/14ten/15ten/16ten/17ten/18ten/19ten/20ten/21ten/22ten/23ten/24ten/25ten/26ten/27ten/28ten/29ten/30ten/31ten/32ten/33ten/34ten/35ten/36ten/37ten/38ten/39ten/40ten/41ten/42ten/43ten/44ten/45ten/46ten/47ten/48ten/49ten/50ten/51ten/52ten/53ten/54ten/55ten/56ten/57ten/58ten/59ten/60ten/61ten/62ten/63ten/64ten/65ten/66ten/67ten/68ten/69ten/70ten/71ten/72ten/73ten/74ten/75ten/76ten/77ten/78ten/79ten/80ten/81ten/82ten/83ten/84ten/85ten/86ten/87ten/88ten/89ten/90ten/91ten/92ten/93ten/94ten/95ten/96ten/97ten/98ten/99ten
@@ -3191,7 +3192,7 @@ is: af %s kynslóğ
 it: della %s generazione
 nl: van de %s generatie
 no: av %s generasjon
-pt: a la %s gera&ccedil;&atilde;o
+pt: da %s gera&ccedil;&atilde;o
 se: av den %s generationen
 
     of the birth
@@ -3271,7 +3272,7 @@ is: morğsins
 it: dell'assassinio
 nl: van de moord
 no: av mordet
-pt: do assesinado
+pt: do assassinato
 se: av mordet
 
     on %s's side
@@ -3303,7 +3304,7 @@ is: &nbsp;
 it: il
 nl: op
 no: den
-pt: o
+pt: a
 se: den
 
     one day old
@@ -3530,6 +3531,7 @@ fr: pr&eacute;cision
 is: nákvæmni
 nl: precisie
 no: n&oslash;yaktighet
+pt: precis&atilde;o
 se: precision
 
     previous sibling
@@ -3658,7 +3660,7 @@ is: skyldleiki/skyldleikar
 it: parentela
 nl: relatie/relaties
 no: forbindelse/forbindelser
-pt: rela&ccedil;a&atilde;o/rela&ccedil;&otilde;es
+pt: rela&ccedil;&atilde;o/rela&ccedil;&otilde;es
 se: relation/relationer
 
     relationship
@@ -4105,6 +4107,7 @@ fr: texte
 is: texti
 nl: tekst
 no: tekst
+pt: texto
 se: text
 
     the %d first names
@@ -4199,7 +4202,7 @@ is: gagnagrunnurinn hefur breyst; gerğu "Back", "Reload", og settu aftur í formi
 it: la base &egrave; cambiata; fate "back", "reload" e rifate la scheda
 nl: de informatie is veranderd; druk "back", "reload" en vul in de details
 no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet p&aring; nytt
-pt: a base mudou : fazer "back", "reload" e preencher novamente o formul&aacute;rio
+pt: a base mudou: fazer "back", "reload" e preencher novamente o formul&aacute;rio
 se: databasen har &auml;ndrats; g&aring; tillbaka, klicka uppdatera och fyll i formul&auml;ret igen
 
     the birthday
@@ -4292,7 +4295,7 @@ is: skjaliğ er læst í augnablikinu, reyndu aftur
 it: l'archivio &egrave; temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
 nl: de informatie is tijdelijk ontoegankelijk: probeer later
 no: filen er midlertidig stengt: vent og pr&oslash;v igjen
-pt: a base esta temporalmente fechada: tentar novamente. Si n&atilde;o funciona, espere um momento antes de tentar
+pt: a base esta temporalmente inacessivel: por favor tente novamente. Se n&atilde;o funcionar, espere um momento
 se: filen &auml;r tempor&auml;rt l&aring;st: f&ouml;rs&ouml;k igen. Om det &auml;nd&aring; inte fungerar, v&auml;nta ett tag innan n&auml;sta f&ouml;rs&ouml;k
 
     the following children of %t and %t are not in order
@@ -4388,7 +4391,7 @@ is: síğustu %d fæğingar
 it: le ultime %d nascite
 nl: de laatste %d geboorten
 no: de siste %d f&oslash;dte
-pt: os %d nascimentos m&aacute;s recentes
+pt: os %d nascimentos mais recentes
 se: de senaste %d f&ouml;dslarna
 
     the latest %d deaths
@@ -4404,7 +4407,7 @@ is: síğustu %d andlát
 it: le ultime %d morto
 nl: de %d meest recente overlijdens
 no: de siste %d d&oslash;de
-pt: as %d mortes m&aacute;s recentes
+pt: os %d &oacute;bitos mais recentes
 se: de senaste %d d&ouml;dsfallen
 
     the parents
@@ -4728,7 +4731,7 @@ is: uppfæra
 it: aggiornamento
 nl: wijzigen
 no: oppdatere
-pt: actualizado
+pt: actualizar
 se: uppdatera
 
     warnings
@@ -4808,8 +4811,8 @@ is: ár/mánuğur/dagur
 it: anno/mese/giorno
 nl: jaar/maand/dag
 no: &aring;r/m&aring;ned/dag
-se: &aring;r/m&aring;nad/dag
 pt: ano/m&ecirc;s/dia
+se: &aring;r/m&aring;nad/dag
 
     years old
 cn: Ëê
