@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.2 2001-04-05 13:59:04 ddr Exp $ *)
+(* $Id: setup.ml,v 4.3 2001-04-11 07:58:46 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1260,13 +1260,15 @@ value string_of_sockaddr =
   | Unix.ADDR_INET a _ -> Unix.string_of_inet_addr a ]
 ;
 
+value local_addr = "127.0.0.1";
+
 value only_addr () =
   let fname = Filename.concat setup_dir.val "only.txt" in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let v = try Some (input_line ic) with [ End_of_file -> None ] in
+      let v = try input_line ic with [ End_of_file -> local_addr ] in
       do close_in ic; return v
-  | None -> None ]
+  | None -> local_addr ]
 ;
 
 value setup (addr, req) comm env_str =
@@ -1286,17 +1288,17 @@ value setup (addr, req) comm env_str =
       {lang = lang; comm = comm; env = env; request = req}
   in
   let saddr = string_of_sockaddr addr in
-  match only_addr () with
-  [ Some s when s <> saddr ->
-      let conf = {(conf) with env = [("anon", saddr); ("o", s)]} in
-      do Printf.eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n"
-           saddr s;
-         flush stderr;
-      return
-      print_file conf "err_acc.htm"
-  | _ ->
-      if conf.comm = "" then print_file conf "welcome.htm"
-      else setup_comm conf comm ]
+  let s = only_addr () in
+  if s <> saddr then
+    let conf = {(conf) with env = [("anon", saddr); ("o", s)]} in
+    do Printf.eprintf "Invalid request from \"%s\"; only \"%s\" accepted.\n"
+         saddr s;
+       flush stderr;
+    return
+    print_file conf "err_acc.htm"
+  else
+    if conf.comm = "" then print_file conf "welcome.htm"
+    else setup_comm conf comm
 ;
 
 value wrap_setup a b c =
