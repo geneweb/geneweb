@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.71 2002-03-04 18:01:31 ddr Exp $
+# $Id: lexicon.txt,v 4.72 2002-03-05 14:02:35 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7555,6 +7555,7 @@ sv: anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
     user/password/cancel
 en: user/password/cancel
 fr: utilisateur/mot de passe/annuler
+pl: u¿ytkownik/has³o/anuluj
 
     warnings
 af: waarskuwings
