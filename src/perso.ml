@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.23 2000-05-23 07:19:03 ddr Exp $ *)
+(* $Id: perso.ml,v 3.24 2000-05-24 09:12:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -856,7 +856,7 @@ value print_sub_titles conf base p =
        (fun a ->
           do open_area ();
              Wserver.wprint "%s <em><strong>%s</strong></em>"
-               (capitale (transl conf "alias")) (sou base a);
+               (capitale (nominative (transl conf "alias"))) (sou base a);
              html_br conf;
           return ())
        p.aliases;

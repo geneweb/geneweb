@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.34 2000-05-19 11:10:54 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.35 2000-05-24 09:12:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -415,7 +415,7 @@ value print_link_long conf n =
 value print_person_long_info conf base auth link p =
   do List.iter
        (fun a ->
-          Wserver.wprint ", %s <em>%s</em>" (transl conf "alias")
+          Wserver.wprint ", %s <em>%s</em>" (nominative (transl conf "alias"))
             (sou base a))
        p.aliases;
      if link = None && List.length p.titles > 0 &&
