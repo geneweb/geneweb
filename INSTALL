@@ -1,0 +1,41 @@
+INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
+
+1- For the compilation, you need the Objective Caml compiler version
+   2.00 and the preprocessor Camlp4 version 2.00 installed in your machine.
+   They are freely distributed at addresses:
+      http://caml.inria.fr/ocaml/
+      http://caml.inria.fr/camlp4/
+
+2- From the top directory, do:
+      make
+   This creates executables for the Objective Caml interpretor.
+
+3- If your platform is supported by the native-code Ocaml compiler, you
+   can build the native-code programs. Do:
+      make opt
+
+4- Do:
+      make distrib
+
+   This creates a directory "distribution" where all executables programs
+   and documentation are copied. Read the file README.txt in this directory
+   and follow the instructions.
+
+
+INSTALLATIONS INSTRUCTIONS IN WINDOWS NT
+
+You need:
+
+- The Cygnus interface.
+
+- The Microsoft Visual C++ compiler.
+
+- The Objective Caml compiler (binaries are sufficient).
+
+- The preprocessor Camlp4 (binaries are not distributed, you need to
+  download the sources and compile it).
+
+In directory tools, move the file Makefile.inc as another name, and move
+the file Makefile.inc.win as Makefile.inc.
+
+Then follow the same instructions above than for the Unix installation.
