@@ -12,6 +12,10 @@ GeneWeb version 4.10
     "private" messages.
   - [06 Jan 03] In welcome page, added wizard's name (when named).
 
+* Base configuration files (base.gwf)
+  - [19 Mar 03] Added a variable "moved" to indicate that the database
+    has been moved. This displays the new template file "moved.txt".
+
 * GeneWeb uncompiler (gwu)
   - [12 Feb 03] Fixed bug: exporting bad format when places containing
     just spaces.
