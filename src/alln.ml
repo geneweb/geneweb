@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.12 2005-02-11 21:32:19 ddr Exp $ *)
+(* $Id: alln.ml,v 4.13 2005-02-12 02:34:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -170,6 +170,13 @@ value displayify s =
   else String.capitalize s
 ;
 
+value tr c1 s2 s =
+  loop 0 0 where rec loop i len =
+    if i = String.length s then Buff.get len
+    else if String.unsafe_get s i = c1 then loop (i + 1) (Buff.mstore len s2)
+    else loop (i + 1) (Buff.store len (String.unsafe_get s i))
+;
+
 value print_alphabetic_big conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
@@ -181,7 +188,7 @@ value print_alphabetic_big conf base is_surnames ini list len =
            stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
 	     (Util.code_varenv ini_k)
            begin
-             Wserver.wprint "%s" (displayify (tr '_' ' ' ini_k));
+             Wserver.wprint "%s" (tr '_' "&nbsp;" (displayify ini_k));
            end)
         list;
     end;
@@ -487,7 +494,7 @@ value print_alphabetic_short conf base is_surnames ini list len =
 value print_short conf base is_surnames =
   let ini =
     match p_getenv conf.env "k" with
-    [ Some k -> String.lowercase k
+    [ Some k -> lowercase_if_not_utf8 k
     | _ -> "" ]
   in
   let _ =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.28 2005-02-11 21:32:19 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.29 2005-02-12 02:34:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -751,10 +751,10 @@ value families_cache fam_index_ic fam_ic len =
 
 value input_particles part_file =
   if part_file = "" then
-    ["af "; "d'"; "dal "; "de "; "di "; "du "; "van de "; "van ";
-     "von und zu "; "von "; "zu ";
-     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "VAN DE "; "VAN ";
-     "VON UND ZU "; "VON "; "ZU "]
+    ["af "; "d'"; "dal "; "de "; "di "; "du "; "of "; "van ";
+     "von und zu "; "von "; "zu "; "zur ";
+     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
+     "VON UND ZU "; "VON "; "ZU "; "ZUR "]
   else Iobase.input_particles part_file
 ;
 
