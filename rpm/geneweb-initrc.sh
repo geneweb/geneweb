@@ -11,7 +11,9 @@
 # hide: true
 
 # Source function library.
-. /etc/rc.d/init.d/functions
+if [ -f /etc/rc.d/init.d/functions ]; then
+	. /etc/rc.d/init.d/functions
+fi
 
 # See how we were called.
 case "$1" in
@@ -26,8 +28,9 @@ case "$1" in
 	;;
   stop)
 	echo -n "Shutting down GeneWeb Services: "
-	killproc gwd
-	killproc gwsetup
+	cd /home/geneweb/gw/gw
+	killproc ./gwd
+	killproc ./gwsetup
 	rm -f /var/lock/subsys/gwd
 	echo
 	;;
@@ -36,12 +39,12 @@ case "$1" in
 	;;
   restart)
 	echo -n "Restarting GeneWeb Services: "
+	cd /home/geneweb/gw/gw
         killproc gwd
         killproc gwsetup
 	echo
         touch /var/log/gwd.log /var/log/gwsetup.log
         chown geneweb /var/log/gwd.log /var/log/gwsetup.log
-	cd /home/geneweb/gw/gw
 	./gwd -log /var/log/gwd.log -daemon
 	./gwsetup -daemon 2>> /var/log/gwsetup.log
 	touch /var/lock/subsys/gwd
