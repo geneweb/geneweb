@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_depend.sh,v 4.6 2001-10-03 08:55:34 ddr Exp $
+# $Id: camlp4_depend.sh,v 4.7 2005-03-01 04:14:23 ddr Exp $
 
 FILES=
 DEPARGS=
@@ -9,6 +9,7 @@ for i in $*; do
     *) DEPARGS="$DEPARGS $i";;
     esac
 done
+PR_DEP=../src/pr_dep.cmo
 
 for FILE in $FILES; do
     head -1 $FILE >/dev/null || exit 1
@@ -22,8 +23,8 @@ for FILE in $FILES; do
         ARGS=
     fi
     ARGS2="$DEPARGS"
-    echo $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $ARGS2 $FILE >&2
-    $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $ARGS2 $FILE
+    echo $COMM $PR_DEP pa_ifdef.cmo $ARGS -- $ARGS2 $FILE >&2
+    $COMM $PR_DEP pa_ifdef.cmo $ARGS -- $ARGS2 $FILE
 done
 
 for FILE in $FILES; do
