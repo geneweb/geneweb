@@ -1,6 +1,10 @@
 GeneWeb version 4.00
 --------------------
 
+The new version number (4.00) is in honour of:
+   1/ the new installer for Windows
+   2/ the new port to MacOS X.
+
 * Installation
   - [04 Mar 01] Added version for MacOS X.
   - [03 Mar 01] Changed Linux rpm package installation; it uses now
