@@ -5,6 +5,8 @@ GeneWeb Version 3.02
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jan 11, 00] Put a separation (<td>&nbsp;</td>) between the two branches
+    in simple relationship displaying.
   - [Jan 9, 00] Centered title "genealogical data base".
   - [Jan 9, 00] Added the ability to add ";td=bgcolor=xxx" in URL when
     printing a dag. Color the square of the person.
