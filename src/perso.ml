@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.41 1999-08-13 16:26:02 ddr Exp $ *)
+(* $Id: perso.ml,v 2.42 1999-08-13 17:43:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -14,13 +14,18 @@ value start_with s i p =
 
 value http_string s i =
   if start_with s i "http://" then
-    loop (i + String.length "http://") where rec loop j =
-      if j < String.length s then
-        match s.[j] with
-        [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '/' | ':' | '?' | '%' | ';' | '='
-        | '_' | '-' | '&' | '.' | '~' -> loop (j + 1)
-        | _ -> Some j ]
-      else Some j
+    let j =
+      loop (i + String.length "http://") where rec loop j =
+        if j < String.length s then
+          match s.[j] with
+          [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '/' | ':' | '?' | '%' | ';' | '='
+          | '_' | '-' | '&' | '.' | '~' -> loop (j + 1)
+          | _ -> j ]
+        else j
+    in
+    match s.[j-1] with
+    [ ':' | ';' | '.' -> Some (j - 1)
+    | _ -> Some j ]
   else None
 ;
 
