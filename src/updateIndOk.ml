@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.21 1999-07-28 08:18:41 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.22 1999-07-28 09:02:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -21,6 +21,12 @@ value get conf key =
 
 value get_nth conf key cnt =
   p_getenv conf.env (key ^ string_of_int cnt)
+;
+
+value getn conf var key =
+  match p_getenv conf.env (var ^ "_" ^ key) with
+  [ Some v -> v
+  | None -> failwith (var ^ "_" ^ key ^ " unbound") ]
 ;
 
 value rec reconstitute_string_list conf var ext cnt =
@@ -91,48 +97,44 @@ value reconstitute_add_relation conf ext cnt rl =
   | _ -> (rl, ext) ]
 ;
 
-value rec reconstitute_relations conf ext cnt =
-  match
-    (get_nth conf "r_fath_fn" cnt, get_nth conf "r_fath_sn" cnt,
-     get_nth conf "r_moth_fn" cnt, get_nth conf "r_moth_sn" cnt)
+value reconstitute_relation conf var =
+  try
+    let r_fath =
+      match (getn conf var "fath_fn", getn conf var "fath_sn") with
+      [ ("", _) | ("?", _) | (_, "?") -> None
+      | (fn, sn) ->
+          let occ =
+            try int_of_string (getn conf var "fath_occ") with
+            [ Failure _ -> 0 ]
+          in
+          Some (fn, sn, occ) ]
+    in
+    let r_moth =
+      match (getn conf var "moth_fn", getn conf var "moth_sn") with
+      [ ("", _) | ("?", _) | (_, "?") -> None
+      | (fn, sn) ->
+          let occ =
+            try int_of_string (getn conf var "moth_occ") with
+            [ Failure _ -> 0 ]
+          in
+          Some (fn, sn, occ) ]
+    in
+    let r_type =
+      match getn conf var "type"  with
+      [ "Adoption" -> Adoption
+      | "Recognition" -> Recognition
+      | "CandidateParent" -> CandidateParent
+      | "GodParent" -> GodParent
+      | _ -> Adoption ]
+    in
+    Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth}
   with
-(*
-  [ (Some ("" | "?"), _, Some ("" | "?"), _)
-  | (Some ("" | "?"), _, _, Some ("" | "?"))
-  | (_, Some ("" | "?"), Some ("" | "?"), _)
-  | (_, Some ("" | "?"), _, Some ("" | "?")) ->
-      let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
-      let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
-      (rl, ext)
-*)
-  [ (Some r_fath_fn, Some r_fath_sn, Some r_moth_fn, Some r_moth_sn) ->
-      let r_fath_occ =
-        match get_nth conf "r_fath_occ" cnt with
-        [ Some x -> try int_of_string x with [ Failure _ -> 0 ]
-        | _ -> 0 ]
-      in
-      let r_moth_occ =
-        match get_nth conf "r_moth_occ" cnt with
-        [ Some x -> try int_of_string x with [ Failure _ -> 0 ]
-        | _ -> 0 ]
-      in
-      let r_fath =
-        if r_fath_fn = "" || r_fath_fn = "?" || r_fath_sn = "?" then None
-        else Some (r_fath_fn, r_fath_sn, r_fath_occ)
-      in
-      let r_moth =
-        if r_moth_fn = "" || r_moth_fn = "?" || r_moth_sn = "?" then None
-        else Some (r_moth_fn, r_moth_sn, r_moth_occ)
-      in
-      let r_type =
-        match get_nth conf "r_type" cnt with
-        [ Some "Adoption" -> Adoption
-        | Some "Recognition" -> Recognition
-        | Some "CandidateParent" -> CandidateParent
-        | Some "GodParent" -> GodParent
-        | _ -> Adoption ]
-      in
-      let r = {r_type = r_type; r_fath = r_fath; r_moth = r_moth} in
+  [ Failure _ -> None ]
+;
+
+value rec reconstitute_relations conf ext cnt =
+  match reconstitute_relation conf ("r" ^ string_of_int cnt) with
+  [ Some r ->
       let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
       let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
       ([r :: rl], ext)
