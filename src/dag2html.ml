@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 4.1 2001-04-21 13:50:56 ddr Exp $ *)
+(* $Id: dag2html.ml,v 4.2 2001-06-03 06:17:25 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -22,11 +22,13 @@ external ghost_id_of_int : int -> ghost_id = "%identity";
 external int_of_ghost_id : ghost_id -> int = "%identity";
 
 value new_span_id =
-  let i = ref 0 in fun () -> do { incr i; span_id_of_int i.val }
+  let i = ref 0 in
+  fun () -> do { incr i; span_id_of_int i.val }
 ;
 
 value new_ghost_id =
-  let i = ref 0 in fun () -> do { incr i; ghost_id_of_int i.val }
+  let i = ref 0 in
+  fun () -> do { incr i; ghost_id_of_int i.val }
 ;
 
 (* creating the html table structure *)
@@ -83,7 +85,8 @@ value html_table_struct indi_txt phony d t =
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in loop les next_j
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          loop les next_j
     in
     Array.of_list (List.rev les)
   in
@@ -111,7 +114,8 @@ value html_table_struct indi_txt phony d t =
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in loop les next_j
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          loop les next_j
     in
     Array.of_list (List.rev les)
   in
@@ -147,7 +151,8 @@ value html_table_struct indi_txt phony d t =
               in
               [(colspan, CenterA, TDstring s) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in loop les next_j
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          loop les next_j
     in
     Array.of_list (List.rev les)
   in
@@ -202,7 +207,7 @@ value html_table_struct indi_txt phony d t =
                 Printf.eprintf
                   "assert false i %d k %d l %d next_l %d next_j %d\n" i k l
                   next_l next_j;
-                flush stderr;
+                flush stderr
               }
               else ();
               let next_l = min next_l next_j in
@@ -220,19 +225,22 @@ value html_table_struct indi_txt phony d t =
                       let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
                       let s = ph (TDstring "|") in
                       let les = [(colspan, CenterA, s) :: les] in
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in les
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      les
                     else if l = j then
                       let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
                       let s = ph (TDhr RightA) in
                       let les = [(colspan, RightA, s) :: les] in
                       let s = ph (TDhr CenterA) in
-                      let les = [(1, LeftA, s) :: les] in les
+                      let les = [(1, LeftA, s) :: les] in
+                      les
                     else if next_l = next_j then
                       let s = ph (TDhr CenterA) in
                       let les = [(1, LeftA, s) :: les] in
                       let s = ph (TDhr LeftA) in
                       let les = [(colspan, LeftA, s) :: les] in
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in les
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      les
                     else
                       let s = ph (TDhr CenterA) in
                       [(colspan + 2, LeftA, s) :: les] ]
@@ -301,7 +309,8 @@ value get_children d parents =
 value rec get_block t i j =
   if j = Array.length t.table.(i) then None
   else if j = Array.length t.table.(i) - 1 then
-    let x = t.table.(i).(j) in Some ([(x.elem, 1)], 1, x.span)
+    let x = t.table.(i).(j) in
+    Some ([(x.elem, 1)], 1, x.span)
   else
     let x = t.table.(i).(j) in
     let y = t.table.(i).(j + 1) in
@@ -324,7 +333,8 @@ value group_by_common_children d list =
     List.map
       (fun id ->
          let n = d.dag.(int_of_idag id) in
-         let cs = List.fold_right S.add n.chil S.empty in ([id], cs))
+         let cs = List.fold_right S.add n.chil S.empty in
+         ([id], cs))
       list
   in
   let nlcsl =
@@ -406,11 +416,14 @@ value treat_new_row d t =
                  loop cnt list)
               children []
           in
-          let (t, children_rest) = loop t i j in (t, children @ children_rest)
+          let (t, children_rest) = loop t i j in
+          (t, children @ children_rest)
         else
           let parent_colspan =
             List.fold_left
-              (fun scm (_, c) -> let g = gcd scm c in scm / g * c)
+              (fun scm (_, c) ->
+                 let g = gcd scm c in
+                 scm / g * c)
               max_parent_colspan parents
           in
           let (t, parents, _) =
@@ -439,7 +452,8 @@ value treat_new_row d t =
                    if cc = 0 then (t, j)
                    else
                      let t = insert_columns t (cnt - 1) j in
-                     let j = j + cnt in loop (cc - 1) t j
+                     let j = j + cnt in
+                     loop (cc - 1) t j
                  in
                  loop c t j)
               (t, j) parents
@@ -454,7 +468,8 @@ value treat_new_row d t =
                  loop cnt list)
               children []
           in
-          let (t, children_rest) = loop t i j in (t, children @ children_rest)
+          let (t, children_rest) = loop t i j in
+          (t, children @ children_rest)
     | None -> (t, []) ]
   in
   loop t i 0
@@ -466,7 +481,7 @@ value down_it t i k y =
     for r = i to Array.length t.table - 2 do {
       t.table.(r).(k) :=
         {elem = Ghost (new_ghost_id ()); span = new_span_id ()}
-    };
+    }
   }
 ;
 
@@ -693,7 +708,7 @@ value exch_blocks t i1 i2 j1 j2 j3 j4 =
     let line = t.(i) in
     let saved = Array.copy line in
     for j = j1 to j2 do { line.(j4 - j2 + j) := saved.(j) };
-    for j = j3 to j4 do { line.(j1 - j3 + j) := saved.(j) };
+    for j = j3 to j4 do { line.(j1 - j3 + j) := saved.(j) }
   }
 ;
 
@@ -908,7 +923,8 @@ value tablify phony no_optim no_group d =
           let _ = group_children t in
           let _ = group_span_by_common_children d t in
           let t = if no_optim then t else treat_gaps d t in
-          let _ = group_span_last_row t in t
+          let _ = group_span_last_row t in
+          t
       in
       loop t
   in
@@ -969,7 +985,7 @@ value fall d t =
                         {elem = Ghost (new_ghost_id ());
                          span = new_span_id ()}
                       else copy_data t.table.(i1).(l - 1)
-                };
+                }
               }
               else ();
               loop (j2 + 1)
@@ -1005,7 +1021,7 @@ value fall2_cool_right t i1 i2 i3 j1 j2 =
       }
       else ()
     in
-    loop j1;
+    loop j1
   }
 ;
 
@@ -1034,7 +1050,7 @@ value fall2_cool_left t i1 i2 i3 j1 j2 =
       }
       else ()
     in
-    loop j2;
+    loop j2
   }
 ;
 
@@ -1388,7 +1404,9 @@ value table_of_dag phony no_optim invert no_group d =
   let t = fall2_right t in
   let t = fall2_left t in
   let t = shorten_too_long t in
-  let t = top_adjust t in let t = bottom_adjust t in t
+  let t = top_adjust t in
+  let t = bottom_adjust t in
+  t
 ;
 
 value html_table_of_dag indi_txt phony invert no_group d =
