@@ -1,4 +1,4 @@
-(* $Id: alln.ml,v 1.4 1998-11-29 13:40:43 ddr Exp $ *)
+(* $Id: alln.ml,v 1.5 1998-11-29 13:50:51 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -59,7 +59,6 @@ value print_all mode conf base is_fam liste len par_frequence =
   do header conf title;
      print_alphab_list
        (fun (x, c, _) ->
-          let x = coa conf x in
           if par_frequence then string_of_int c
           else String.sub x (initiale x) 1)
        (fun (x, c, istr) ->
