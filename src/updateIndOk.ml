@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.15 1999-02-12 12:37:16 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.16 1999-02-20 21:59:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -327,6 +327,21 @@ value check_sex_married conf base sp op =
   else ()
 ;
 
+value rename_photo_file conf base op sp =
+  match auto_photo_file conf base op with
+  [ Some old_f ->
+      let s = default_photo_name_of_key sp.first_name sp.surname sp.occ in
+      let f =
+        List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
+      in
+      let new_f =
+        if Filename.check_suffix old_f ".gif" then f ^ ".gif"
+        else f ^ ".jpg"
+      in
+      try Sys.rename old_f new_f with [ Sys_error _ -> () ]
+  | _ -> () ]
+;
+
 value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
@@ -338,8 +353,10 @@ value effective_mod conf base sp =
      && op.occ == sp.occ then ()
      else
        let ipl = person_ht_find_all base key in
-       do check_conflict conf base sp ipl; return
-       person_ht_add base key pi;
+       do check_conflict conf base sp ipl;
+          person_ht_add base key pi;
+          rename_photo_file conf base op sp;
+       return ();
      check_sex_married conf base sp op;
   return
   let np = map_person_strings (Update.insert_string conf base) sp in
