@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>R&eacute;cup&eacute;rer une base</title></head>
+
+<body>
+
+<h1>R&eacute;cup&eacute;rer une base</h1>
+
+R&eacute;pertoire:
+
+<pre>
+  $a
+</pre>
+
+S&eacute;lectionnez la base que vous voulez r&eacute;cup&eacute;rer:
+
+<p>
+
+<form mode=GET action="recover_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<dl><dd><table border=1>
+
+$y{<tr><td><input type=radio name=i value="$a"></td><td> $a </td></tr>|
+<tr><td>il n'y a aucune base de donn&eacute;es dans ce
+r&eacute;pertoire</tr></td>}
+
+</table></dl>
+
+<p>
+
+Indiquez le nom que vous voulez donner &agrave; votre base de
+donn&eacute;es. Par d&eacute;faut, ce sera le m&ecirc;me dans le
+nouveau r&eacute;pertoire.
+
+<p>
+
+<input name=o size=30>
+
+<p>
+
+Puis appuyez sur ce bouton:
+
+<p>
+
+<input type=submit value="R&eacute;cup&eacute;rer">
+</form>
