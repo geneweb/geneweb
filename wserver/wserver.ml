@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.12 2002-02-23 15:39:22 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.13 2002-02-23 20:10:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -9,8 +9,6 @@ value bufferize = ref False;
 value wserver_oc =
   do { set_binary_mode_out stdout True; ref stdout }
 ;
-
-value wserver_ic = ref stdin;
 
 value buffer = Buffer.create 211;
 
@@ -232,8 +230,6 @@ value case_unsensitive_eq s1 s2 =
   String.lowercase s1 = String.lowercase s2
 ;
 
-value end_lines = ['\n'; '\r'];
-
 value rec extract_param name stop_char =
   fun
   [ [x :: l] ->
@@ -243,9 +239,6 @@ value rec extract_param name stop_char =
           loop (String.length name) where rec loop i =
             if i = String.length x then i
             else if x.[i] = stop_char then i
-            else if
-              List.mem stop_char end_lines && List.mem x.[i] end_lines
-            then i
             else loop (i + 1)
         in
         String.sub x (String.length name) (i - String.length name)
@@ -320,7 +313,14 @@ value string_of_sockaddr =
 ;
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
-value treat_connection tmout callback addr ic =
+(* hack for bugged clients under Windows; see mli *)
+
+value keep_alive_condition request =
+  extract_param "POST /" ' ' request <> "" &&
+  String.lowercase (extract_param "connection: " '\n' request) = "keep-alive"
+;
+
+value treat_connection tmout callback addr fd =
   do {
     ifdef NOFORK then ()
     else ifdef UNIX then
@@ -343,7 +343,11 @@ value treat_connection tmout callback addr ic =
     else ();
     let (request, script_name, contents) =
       let (request, contents) =
-        let strm = Stream.of_channel ic in
+        let strm =
+          let c = " " in
+          Stream.from
+            (fun _ -> if Unix.read fd c 0 1 = 1 then Some c.[0] else None)
+        in
         get_request_and_content strm
       in
       let (script_name, contents) =
@@ -375,7 +379,8 @@ value treat_connection tmout callback addr ic =
       | exc -> print_err_exc exc ];
       try wflush () with _ -> ();
       try flush stderr with _ -> ();
-    }
+    };
+    keep_alive_condition request
   }
 ;
 
@@ -481,6 +486,32 @@ value wait_and_compact s =
   else ()
 ;
 
+value fucking_timeout = ref 5.0;
+
+value wait_client_close fd =
+  do {
+    let x = Unix.getpid () in
+    try
+      let b = String.create 50 in
+      loop () where rec loop () =
+        match Unix.select [fd] [] [] fucking_timeout.val with
+        [ ([_], [], []) ->
+            let len = Unix.read fd b 0 (String.length b) in
+            do {
+              Printf.eprintf "epilog (%d): read %d chars after end\n" x len;
+              flush stderr;
+              if len = 0 then () else loop ()
+            }
+        | _ ->
+            Printf.eprintf "epilog (%d): timeout %gs happened\n" x
+              fucking_timeout.val ]
+    with
+    [ Unix.Unix_error Unix.ECONNRESET _ _ ->
+        Printf.eprintf "epilog (%d): disconnection\n" x ];
+    flush stderr;
+  }
+;
+
 value accept_connection tmout max_clients callback s =
   do {
     ifdef NOFORK then wait_and_compact s
@@ -496,11 +527,9 @@ value accept_connection tmout max_clients callback s =
           try Unix.close t with _ -> ();
         }
       in
-      let ic = Unix.in_channel_of_descr t in
       do {
-        wserver_ic.val := Unix.in_channel_of_descr t;
         wserver_oc.val := Unix.out_channel_of_descr t;
-        treat_connection tmout callback addr ic;
+        treat_connection tmout callback addr t;
         cleanup ();
       }
     else ifdef UNIX then
@@ -515,8 +544,9 @@ value accept_connection tmout max_clients callback s =
 (*  
    j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
               try Unix.close t with _ -> ();
-*)  
-              treat_connection tmout callback addr stdin;
+*)
+              let keep_alive = treat_connection tmout callback addr t in
+              if keep_alive then wait_client_close t else ()
             }
             with exc ->
               try do { print_err_exc exc; flush stderr; }
@@ -542,40 +572,53 @@ value accept_connection tmout max_clients callback s =
       [ Unix.Unix_error _ _ _ -> ()
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
-      ifdef SYS_COMMAND then
-        let comm =
-          let stringify_if_spaces s =
-            try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
-            [ Not_found -> s ]
+      let keep_alive =
+        ifdef SYS_COMMAND then
+          let comm =
+            let stringify_if_spaces s =
+              try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
+              [ Not_found -> s ]
+            in
+            List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
+              (Array.to_list Sys.argv) ^
+            "-wserver " ^ string_of_sockaddr addr
           in
-          List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
-            (Array.to_list Sys.argv) ^
-          "-wserver " ^ string_of_sockaddr addr
-        in
-        let _ = Sys.command comm in ()
-      else if noproc.val then do {
-        let ic = open_in_bin sock_in.val in
-        let oc = open_out_bin sock_out.val in
-        wserver_ic.val := ic;
-        wserver_oc.val := oc;
-        treat_connection tmout callback addr ic;
-        flush oc;
-        close_in ic;
-        close_out oc;
-      }
-      else
-        let pid =
-          let env =
-            Array.append (Unix.environment ())
-              [| "WSERVER=" ^ string_of_sockaddr addr |]
+          let _ = Sys.command comm in False
+        else if noproc.val then do {
+          let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
+          let oc = open_out_bin sock_out.val in
+          wserver_oc.val := oc;
+          let keep_alive = treat_connection tmout callback addr fd in
+          flush oc;
+          close_out oc;
+          Unix.close fd;
+          keep_alive
+        }
+        else
+          let pid =
+            let env =
+              Array.append (Unix.environment ())
+                [| "WSERVER=" ^ string_of_sockaddr addr |]
+            in
+            let args = Array.map (fun x -> "\"" ^ x ^ "\"") Sys.argv in
+            Unix.create_process_env Sys.argv.(0) args env Unix.stdin
+              Unix.stdout Unix.stderr
           in
-          let args = Array.map (fun x -> "\"" ^ x ^ "\"") Sys.argv in
-          Unix.create_process_env Sys.argv.(0) args env Unix.stdin
-            Unix.stdout Unix.stderr
-        in
-        let _ = Unix.waitpid [] pid in ();
+          let _ = Unix.waitpid [] pid in
+          let keep_alive =
+            let ic = open_in_bin sock_in.val in
+            let request = get_request (Stream.of_channel ic) in
+            let keep_alive = keep_alive_condition request in
+            do {
+              close_in ic;
+              keep_alive
+            }
+          in
+          keep_alive
+      in
       let cleanup () =
         do {
+          if keep_alive then wait_client_close t else ();
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
           try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
           try Unix.close t with _ -> ();
@@ -625,11 +668,10 @@ value f addr_opt port tmout max_clients g =
       ifdef NOFORK then ()
       else ifdef WIN95 then do {
         let addr = sockaddr_of_string s in
-        let ic = open_in_bin sock_in.val in
+        let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
-        wserver_ic.val := ic;
         wserver_oc.val := oc;
-        treat_connection tmout g addr ic;
+        ignore (treat_connection tmout g addr fd);
         exit 0
       }
       else ()

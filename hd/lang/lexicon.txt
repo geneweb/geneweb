@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.68 2002-02-02 05:40:49 ddr Exp $
+# $Id: lexicon.txt,v 4.69 2002-02-23 20:10:04 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2018,7 +2018,7 @@ eo: entombigita
 es: enterrado/enterrada/enterrado(a)
 et: maetud
 fi: haudattu
-fr: enterr&eacute;/enterr&eacute;e/enterr&eacute;(e)
+fr: inhum&eacute;/inhum&eacute;e/inhum&eacute;(e)
 he:   קבור/ קבורה
 is: grafin(n)
 it: sepolto/sepolta/sepolto(a)

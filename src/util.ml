@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.35 2002-02-23 15:39:21 ddr Exp $ *)
+(* $Id: util.ml,v 4.36 2002-02-23 20:10:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -305,11 +305,7 @@ value html conf =
 ;
 
 value html1 conf =
-  if conf.cgi || Wserver.extract_param "POST /" ' ' conf.request = "" ||
-    String.lowercase
-      (Wserver.extract_param "connection: " '\n' conf.request) <>
-      "keep-alive"
-  then do {
+  if conf.cgi || not (Wserver.keep_alive_condition conf.request) then do {
     html conf;
     nl ();
   }

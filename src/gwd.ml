@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.28 2002-02-23 09:28:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.29 2002-02-23 20:10:06 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1493,7 +1493,11 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
 <addr>
        Send a message to say that this service has been redirected to <addr>");
        ("-nolock", Arg.Set Lock.no_lock_flag,
-        "\n       Do not lock files before writing.") ::
+        "\n       Do not lock files before writing.");
+       ("-windows_bug_tmout",
+        Arg.Float (fun x -> Wserver.fucking_timeout.val := x),
+        ("<sec>\n       No comment (default: " ^
+         string_of_float Wserver.fucking_timeout.val ^ "s)")) ::
        ifdef UNIX then
          [("-max_clients", Arg.Int (fun x -> max_clients.val := Some x), "\
 <num>
