@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.5 2000-04-02 12:50:02 ddr Exp $ *)
+(* $Id: place.ml,v 3.6 2000-04-02 15:58:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -73,7 +73,7 @@ value get_all conf base =
       do Hashtbl.iter
            (fun (istr_pl, _) (cnt, ip) ->
               let s = fold_place inverted (sou base istr_pl) in
-              if ini = "" || List.hd s = ini then
+              if s <> [] && (ini = "" || List.hd s = ini) then
                 do list.val := [(s, cnt.val, ip) :: list.val];
                    incr len;
                 return ()
