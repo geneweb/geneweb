@@ -1,12 +1,12 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.0 2001-03-16 19:35:00 ddr Exp $ *)
+(* $Id: robot.ml,v 4.1 2001-04-21 15:09:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
 
 value magic_robot = "GWRB0002";
 
-module W = Map.Make (struct type t = string ; value compare = compare; end);
+module W = Map.Make (struct type t = string; value compare = compare; end);
 
 type excl =
   { excl : mutable list (string * ref int);
@@ -140,15 +140,26 @@ value check oc tm from max_call sec cgi suicide =
                   "--- to restore access, delete file \"%s\"\n" fname;
              return ()
            else ();
-           W.iter
-             (fun k (_, tm0, nb) ->
+           let list =
+             let list =
+               W.fold (fun k (_, tm, nb) list -> [(k, tm, nb) :: list])
+                 xcl.who []
+             in
+             List.sort
+               (fun (_, tm1, nb1) (_, tm2, nb2) ->
+                  match compare nb2 nb1 with
+                  [ 0 -> compare tm1 tm2
+                  | x -> x ])
+               list
+           in
+           List.iter
+             (fun (k, tm0, nb) ->
                 do Printf.fprintf oc
-                     "--- addr %s: %d requests since %.0f seconds\n" k nb
-                     (tm -. tm0);
+                     "--- %3d req - %3.0f sec - %s\n" nb (tm -. tm0) k;
                    if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
                    else ();
                 return ())
-              xcl.who;
+              list;
            Printf.fprintf oc "--- max %d by %s\n" (fst xcl.max_conn)
              (snd xcl.max_conn);
         return refused ]
