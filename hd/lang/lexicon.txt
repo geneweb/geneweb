@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.146 1999-10-10 20:30:02 ddr Exp $
+# $Id: lexicon.txt,v 2.147 1999-10-11 19:54:23 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1329,6 +1329,7 @@ se: kommentar
     comment added
 en: comment added
 fr: commentaire ajout&eacute;
+nl: commentaar toegevoegd
 
     consanguinity
 cs: pokrevenství
@@ -1857,6 +1858,7 @@ se: f&ouml;r f&ouml;rnamnen i bokstavsordning
 dk: forum
 en: forum
 fr: forum
+nl: forum
 se: forum
 
     generation
@@ -3126,6 +3128,7 @@ se: endast den valda generationen
 dk: efter behag
 en: optional
 fr: facultatif
+nl: optioneel
 se: valfritt
 
     or
