@@ -10,6 +10,9 @@ GeneWeb version 3.03
     telling not to delete the window! (English, French, Swedish versions)
 
 * GeneWeb Service/CGI (gwd)
+  - [05 Mar 00] In birthday anniversaries for close parents (accessible
+    in "cousin" page), the links give now the relationship trees, instead
+    of the persons.
   - [04 Mar 00] In person and family forms, added input area to specify
     a number greater than 1 of titles and children to insert.
   - [24 Feb 00] In latest births and deaths, display by month.
