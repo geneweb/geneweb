@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.14 1999-12-06 07:31:35 ddr Exp $ *)
+(* $Id: relation.ml,v 3.15 1999-12-06 15:06:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -947,7 +947,7 @@ value print_dag_links conf base p1 p2 rl =
                       Wserver.wprint ":\n";
                    return ()
                  else ();
-                 Wserver.wprint "<a href=\"%sm=RLD" (commd conf);
+                 Wserver.wprint "<a href=\"%sm=RL" (commd conf);
                  Wserver.wprint ";%s" (acces conf base a);
                  Wserver.wprint ";%s" (acces_n conf base "1" p1);
                  Wserver.wprint ";%s" (acces_n conf base "2" p2);
@@ -968,18 +968,18 @@ value print_dag_links conf base p1 p2 rl =
                           (l1, l2) list)
                      ([], []) rl
                  in
-                 do Wserver.wprint ";x1=";
+                 do Wserver.wprint ";l1=";
                     let _ = List.fold_right
                       (fun x sep -> do Wserver.wprint "%s%d" sep x; return ",")
                       l1 ""
                     in ();
-                    Wserver.wprint ";x2=";
+                    Wserver.wprint ";l2=";
                     let _ = List.fold_right
                       (fun x sep -> do Wserver.wprint "%s%d" sep x; return ",")
                       l2 ""
                     in ();
                  return ();
-                 Wserver.wprint "\">";
+                 Wserver.wprint ";dag=on\">";
                  if is_anc then Wserver.wprint "%s" (transl conf "tree")
                  else
                    Wserver.wprint "%d %s" nn
