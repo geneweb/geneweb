@@ -2334,7 +2334,7 @@ eo: la %s generacio
 es: la %s generaci&oacute;n
 fr: la %s g&eacute;n&eacute;ration
 it: la %s generazione
-nl: de %d generatie
+nl: de %s generatie
 pt: a %s geraç&atilde;o
 se: den %s generationen
 

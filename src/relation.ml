@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.9 1998-12-05 13:29:49 ddr Exp $ *)
+(* $Id: relation.ml,v 1.10 1998-12-11 09:46:00 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -16,7 +16,7 @@ value print_menu conf base p =
          [ "" ->
              Wserver.wprint "%s %s" (coa conf (sou base p.first_name))
                (coa conf (sou base p.surname))
-         | n -> Wserver.wprint "%s" n ]
+         | n -> Wserver.wprint "%s" (coa conf n) ]
        else Wserver.wprint "%s" (person_text conf base p);
        Wserver.wprint " %s..." (transl conf "and");
     return ()
