@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.8 1999-04-28 16:52:59 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.9 1999-04-29 19:55:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -727,7 +727,7 @@ value geneweb_server () =
     try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
   in
   do if not auto_call then
-       do Printf.eprintf "GeneWeb %s - " Gutil.version;
+       do Printf.eprintf "GeneWeb %s - " Version.txt;
           Printf.eprintf "Copyright (c) INRIA 1999\n";
           Printf.eprintf "Possible addresses:";
           Printf.eprintf "

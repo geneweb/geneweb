@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.2 1999-03-23 21:15:47 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.3 1999-04-29 19:55:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -198,7 +198,7 @@ value rec copy_from_channel conf base ic =
                      conf.henv;
                 return ()
             | 't' -> Wserver.wprint "%s" conf.bname
-            | 'v' -> Wserver.wprint "%s" Gutil.version
+            | 'v' -> Wserver.wprint "%s" Version.txt
             | 'w' -> if conf.wizard then () else echo.val := False
             | 'x' ->
                 if conf.wizard || conf.friend then () else echo.val := False

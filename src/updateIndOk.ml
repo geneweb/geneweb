@@ -1,23 +1,11 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.6 1999-04-05 23:42:29 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.7 1999-04-29 19:55:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
-
-value only_printable s =
-  let s = strip_spaces s in
-  let s' = String.create (String.length s) in
-  do for i = 0 to String.length s - 1 do
-       s'.[i] :=
-         match s.[i] with
-         [ ' '..'~' | '\160'..'\255' -> s.[i]
-         | _ -> ' ' ];
-     done;
-  return s'
-;
 
 value f_aoc conf s =
   if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s

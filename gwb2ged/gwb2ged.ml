@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.5 1999-04-05 23:42:27 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.6 1999-04-29 19:55:44 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -26,7 +26,7 @@ value ged_month =
 value ged_header base oc ifile ofile =
   do Printf.fprintf oc "0 HEAD\n";
      Printf.fprintf oc "1 SOUR GeneWeb\n";
-     Printf.fprintf oc "2 VERS %s\n" Gutil.version;
+     Printf.fprintf oc "2 VERS %s\n" Version.txt;
      Printf.fprintf oc "2 NAME %s\n" (Filename.basename Sys.argv.(0));
      Printf.fprintf oc "2 CORP INRIA\n";
      Printf.fprintf oc "3 ADDR Domaine de Voluceau\n";
