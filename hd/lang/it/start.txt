@@ -70,7 +70,7 @@ Le <a href="%sm=LD;k=10">ultime morto</a>.<br>%x
 Gli <a href="%sm=AD">anniversari delle persone decedute</a>.<br>
 Gli <a href="%sm=AM">anniversari di matrimonio</a>.
 <p>
-Ci sono stati %c accessi a questa pagina.
+Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
 
 %y<p>
 
