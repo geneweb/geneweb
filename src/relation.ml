@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.68 2005-03-19 15:58:08 ddr Exp $ *)
+(* $Id: relation.ml,v 4.69 2005-03-20 12:56:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1550,16 +1550,15 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       in
       if List.mem (b1, b2) found.val then ()
       else do {
-        tag "center" begin
-          tag "table" "border=\"1\"" begin
-            tag "tr" "align=\"%s\"" conf.left begin
-              tag "td" begin
-                RelationLink.print_relation_path conf base info;
-              end;
+        Wserver.wprint "<table width=\"100%%\"><tr><td align=\"center\">\n";
+        tag "table" "border=\"1\"" begin
+          tag "tr" begin
+            tag "td" begin
+              RelationLink.print_relation_path conf base info;
             end;
           end;
         end;
-        html_p conf;
+        Wserver.wprint "</td></tr></table>\n";
         found.val := [(b1, b2) :: found.val]
       }
   | _ -> () ]
@@ -1578,6 +1577,18 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list), _) =
 value print_main_relationship conf base long p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   do {
+    let conf =
+      if long then
+        (* changing doctype to transitional because use of
+           <hr width=... align=...> *)
+        let doctype =
+          match p_getenv conf.base_env "doctype" with
+          [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+          | _ -> "xhtml-1.0-trans" ]
+        in
+        {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+      else conf
+    in
     header conf title;
     print_link_to_welcome conf True;
     match p_getenv conf.env "spouse" with
