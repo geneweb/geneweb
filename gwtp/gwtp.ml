@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.10 2000-07-30 11:12:09 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.11 2000-07-30 14:55:02 ddr Exp $ *)
 
 open Printf;
 
@@ -285,8 +285,7 @@ value copy_temp b =
 
 value send_file str env b t f fname =
   if Filename.basename fname = "base" then
-    do let _ = Unix.umask 0 in ();
-       printf "content-type: text/html\r\n\r\n\
+    do printf "content-type: text/html\r\n\r\n\
 <head><title>Gwtp...</title></head>\n<body>
 <h1 align=center>Gwtp...</h1>
 <pre>\n";
@@ -401,17 +400,43 @@ Download <input type=radio name=m value=DNL><br>
   return ()  
 ;
 
+value log str =
+  let tm = Unix.localtime (Unix.time ()) in
+  let fname = Filename.concat gwtp_tmp.val "gwtp.log" in
+  let user_agent = try Sys.getenv "HTTP_USER_AGENT" with [ Not_found -> "" ] in
+  let referer = try Sys.getenv "HTTP_REFERER" with [ Not_found -> "" ] in
+  let from =
+    try Sys.getenv "REMOTE_HOST" with
+    [ Not_found ->
+        try Sys.getenv "REMOTE_ADDR" with
+        [ Not_found -> "" ] ]
+  in
+  let oc = open_out_gen [Open_wronly; Open_creat; Open_append] 0o777 fname in
+  do fprintf oc "%4d-%02d-%02d %02d:%02d:%02d"
+       (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
+        tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
+     fprintf oc " gwtp?%s\n" str;
+     if from <> "" then fprintf oc "  From: %s\n" from else ();
+     if user_agent <> "" then fprintf oc "  Agent: %s\n" user_agent else ();
+     if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
+     close_out oc;
+  return ()
+;
+
 value gwtp () =
   let content_type = cgi_content_type () in
   let content = cgi_content () in
   let (str, env) = HttpEnv.make content_type content in
-  match HttpEnv.getenv env "m" with
-  [ Some "UPL" -> gwtp_check_login str env gwtp_upload
-  | Some "DNL" -> gwtp_check_login str env gwtp_download
-  | Some "SEND" -> gwtp_logged str env gwtp_send
-  | Some "RECV" -> gwtp_logged str env gwtp_receive
-  | Some _ -> gwtp_invalid_request str env
-  | None -> gwtp_welcome str env ]
+  do let _ = Unix.umask 0 in ();
+     log str;
+     match HttpEnv.getenv env "m" with
+     [ Some "UPL" -> gwtp_check_login str env gwtp_upload
+     | Some "DNL" -> gwtp_check_login str env gwtp_download
+     | Some "SEND" -> gwtp_logged str env gwtp_send
+     | Some "RECV" -> gwtp_logged str env gwtp_receive
+     | Some _ -> gwtp_invalid_request str env
+     | None -> gwtp_welcome str env ];
+  return ()
 ;
 
 value usage_msg = "Usage: gwtp";
