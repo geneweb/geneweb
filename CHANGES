@@ -28,9 +28,10 @@ GeneWeb Version 1.10
   - [02/01/99] Fixed missing accents displaying for undefined persons.    
 
 * Lexicon file (lexicon.txt)
+  - [06/01/99] Fixed and completed German version (thanks to Markus Mottl).
   - [15/12/98] Added some missing phrases in some languages (mainly Espagnol,
     Italian).
-  - [11/12/98] Fixed bug and completed Dutch version (thanks to Joris Esch).
+  - [11/12/98] Fixed and completed Dutch version (thanks to Joris Esch).
 
 * Welcome files (xx/start.txt)
 --- [06/01/99] Wizard and Friend accesses by navigator password.

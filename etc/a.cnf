@@ -26,10 +26,12 @@
 
 # Friend can see all dates
 # Choose a password or leave it empty
+# Form: "user_id:password" or just "password"
 friend_passwd=
 
 # Wizard can see all dates and update the base
 # Choose a password or leave it empty
+# Form: "user_id:password" or just "password"
 wizard_passwd=
 
 # Wizard loosing his powers, becoming just a "friend"
