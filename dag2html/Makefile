@@ -1,6 +1,7 @@
-# $Id: Makefile,v 1.2 2001-10-03 08:56:06 ddr Exp $
+# $Id: Makefile,v 1.3 2004-02-10 09:45:47 ddr Exp $
 
 BINDIR=/usr/local/bin
+MANDIR=/usr/local/share/man/man1
 OCAMLC=ocamlc
 OCAMLOPT=ocamlopt
 OCARGS=
@@ -13,6 +14,7 @@ opt: dag2html.cmx
 
 install:
 	cp dag2html $(BINDIR)/.
+	cp dag2html.1 $(MANDIR)/.
 
 dag2html: $(OBJS)
 	$(OCAMLC) $(OBJS) -o dag2html
