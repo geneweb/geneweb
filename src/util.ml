@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.33 2000-02-23 09:48:47 ddr Exp $ *)
+(* $Id: util.ml,v 3.34 2000-02-24 16:34:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -54,11 +54,12 @@ value html_li conf =
 value nl () = Wserver.wprint "\r\n";
 
 value html conf =
-  if conf.cgi then
-    do Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
-       nl (); nl ();
-    return ()
-  else Wserver.html conf.charset
+  let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
+  do if not conf.cgi then do Wserver.wprint "HTTP/1.0 200 OK"; nl (); return ()
+     else ();
+     Wserver.wprint "Content-type: text/html; charset=%s" charset;
+     nl (); nl ();
+  return ()
 ;
 
 value unauthorized conf auth_type =
