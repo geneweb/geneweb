@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.50 2000-10-15 22:52:33 ddr Exp $ *)
+(* $Id: perso.ml,v 3.51 2000-10-16 02:58:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1807,6 +1807,14 @@ value print_simple_variable conf base env =
   | v -> Wserver.wprint "%%%s;" v ]
 ;
 
+value simple_person_text conf base p p_auth =
+  if p_auth then
+    match main_title base p with
+    [ Some t -> titled_person_text conf base p t
+    | None -> person_text conf base p ]
+  else person_text conf base p
+;
+
 value print_variable conf base env s sl =
   let ep =
     match (get_env "p" env, get_env "p_auth" env) with
@@ -1874,11 +1882,12 @@ value print_variable conf base env s sl =
             loop ep efam sl
         | _ -> () ]
     | ["surname"] -> Wserver.wprint "%s" (p_surname base p)
+    | ["title"] -> Wserver.wprint "%s" (person_title conf base p)
     | [s :: sl] ->
         do print_simple_variable conf base env s;
            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
         return ()
-    | [] -> Wserver.wprint "%s" (person_title_text conf base p) ]
+    | [] -> Wserver.wprint "%s" (simple_person_text conf base p p_auth) ]
 ;
 
 value eval_bool_variable conf base env p =

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.7 2000-10-15 22:52:33 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.8 2000-10-16 02:58:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -154,11 +154,11 @@
   <li>
   %if;cancel_links;%father;
   %else;<a href="%prefix;%father.access;">%father;</a>%end;
-  %father.dates;%nl;
+  %father.title;%father.dates;%nl;
   <li>
   %if;cancel_links;%mother;
   %else;<a href="%prefix;%mother.access;">%mother;</a>%end;
-  %mother.dates;%nl;
+  %mother.title;%mother.dates;%nl;
   </ul>
 %end;
 
@@ -171,7 +171,7 @@
     %married_to;%sp;
     %if;cancel_links;%spouse;
     %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
-    %spouse.dates;
+    %spouse.title;%spouse.dates;
     %if;has_witnesses;
       %sp;([witness/witnesses]w:
       %foreach;witness;%if;not is_first;, %end;%witness;%end;
@@ -197,7 +197,7 @@
   </ul>
 %end;
 
-<!-- -->
+<!--
 %if;has_parents;
   <h3><font color=%highlight;>[*siblings]</font></h3>
   <ul>
@@ -216,7 +216,7 @@
   %end;
   </ul>
 %end;
-<!-- -->
+-->
 
 %if;has_relations;
   <h3><font color=%highlight;>[*relation/relations]1</font></h3>
