@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.7 1998-12-05 13:29:50 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.8 1998-12-13 11:56:44 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -12,7 +12,7 @@ value get_date () =
 ;
 
 value cnt conf ext =
-  List.fold_right Filename.concat ["cnt"] (conf.bname ^ ext)
+  List.fold_right Filename.concat [Util.base_dir.val; "cnt"] (conf.bname ^ ext)
 ;
 
 value count conf =

@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_depend.sh,v 1.1 1998-12-07 19:38:44 ddr Exp $
+# $Id: camlp4_depend.sh,v 1.2 1998-12-13 11:56:44 ddr Exp $
 
 FILES=$*
 
@@ -12,7 +12,8 @@ for FILE in $FILES; do
 	DEPS=
 	for i in $ARGS; do
 	    if test `echo $i | sed "s/^\(..\).*$/\1/"` = "./"; then
-		DEPS="$DEPS $i"
+		DEP=`echo $i | sed "s/^..\(.*\)$/\1/"`
+		DEPS="$DEPS $DEP"
 	    fi
 	done
        if test "$DEPS" != ""; then

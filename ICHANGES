@@ -19,6 +19,13 @@ GeneWeb Version 1.10
     Consequence: saved speed and memory allocation in such bases in gwd,
     gwu, gwb2ged.
 
+* tools/camlp4_depend.sh
+  - [13/12/98] Deleted "./" in depended file name, because that worked bad
+    in alpha.
+
+* src/num.ml
+  - [13/12/98] Display at least "0" when number is 0!
+
 GeneWeb Version 1.09
 --------------------
 
@@ -240,4 +247,3 @@ GeneWeb Version 1.0 beta.7
 - file "copyright.txt" changed into "copyr.txt" (I am afraid of problems
   of long file names in Windows).
 - fixed bug: problems of <em> and </a> in displaying "ancestors .. up to .."
-
