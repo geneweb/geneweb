@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.12 2002-10-18 15:34:45 ddr Exp $ *)
+(* $Id: date.ml,v 4.13 2002-10-18 16:18:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -102,7 +102,7 @@ value code_hebrew_date conf d m y =
     if m = 0 then ""
     else s ^ (if s = "" then "" else " ") ^ hebrew_month conf (m - 1)
   in
-  s ^ (if s = "" then "" else " ") ^ " " ^ string_of_int y
+  s ^ (if s = "" then "" else " ") ^ string_of_int y
 ;
 
 value string_of_on_prec_dmy_aux conf sy d =
