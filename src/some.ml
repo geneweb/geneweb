@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.6 2002-01-30 11:49:51 ddr Exp $ *)
+(* $Id: some.ml,v 4.7 2002-01-30 22:46:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -353,15 +353,19 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
                [ Some ifam ->
                    let cpl = coi base ifam in
                    do {
-                     let href =
-                       Util.acces conf base (pget conf base cpl.father)
-                     in
-                     wprint_geneweb_link conf href "&lt;&lt";
+                     let pp = pget conf base cpl.father in
+                     if is_hidden pp then
+                       Wserver.wprint "&lt;&lt;"
+                     else
+                       let href = Util.acces conf base pp in
+                       wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n&amp;\n";
-                     let href =
-                       Util.acces conf base (pget conf base cpl.mother)
-                     in
-                     wprint_geneweb_link conf href "&lt;&lt";
+                     let pp = pget conf base cpl.mother in
+                     if is_hidden pp then
+                       Wserver.wprint "&lt;&lt;"
+                     else
+                       let href = Util.acces conf base pp in
+                       wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n";
                      tag "ul" begin
                        print_branch conf base True psn 1 x p;
