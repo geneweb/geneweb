@@ -41,6 +41,10 @@ GeneWeb version 3.12
     surname, if no complete name is found.
 
 * Setup program (gwsetup)
+  - [24 Feb 01] Fixed big bug: when creating a data base, a page displays
+    that the data base has been created. Ok. But if this page is requested
+    again later (if it is no more in the cache), the action is made again
+    overwriting the possible user changes.
   - [23 Feb 01] Added option -gd (gwsetup directory) to set a different
     directory for the gwsetup files. It allows to launch gwsetup in another
     directory, therefore to separate the data bases from the GeneWeb files.
