@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.17 2002-01-13 03:05:37 ddr Exp $ *)
+(* $Id: setup.ml,v 4.18 2002-01-13 04:19:01 ddr Exp $ *)
 
 open Printf;
 
@@ -8,18 +8,6 @@ value default_lang = ref "en";
 value setup_dir = ref ".";
 value charset = "iso-8859-1";
 value lang_param = ref "";
-
-value buff = ref (String.create 80);
-value store len x =
-  do {
-    if len >= String.length buff.val then
-      buff.val := buff.val ^ String.create (String.length buff.val)
-    else ();
-    buff.val.[len] := x;
-    succ len
-  }
-;
-value get_buff len = String.sub buff.val 0 len;
 
 value slashify s =
   let s1 = String.copy s in
@@ -282,8 +270,8 @@ value selected env =
 value parse_upto lim =
   loop 0 where rec loop len =
     parser
-    [ [: `c when c = lim :] -> get_buff len
-    | [: `c; a = loop (store len c) :] -> a ]
+    [ [: `c when c = lim :] -> Buff.get len
+    | [: `c; a = loop (Buff.store len c) :] -> a ]
 ;
 
 value is_directory x =
@@ -300,18 +288,103 @@ value server_string conf =
   [ Not_found -> "127.0.0.1" ]
 ;
 
+value skip_lang s =
+  loop where rec loop i =
+    if i = String.length s then None
+    else
+      match s.[i] with
+      [ 'a'..'z' | '-' -> loop (i + 1)
+      | _ -> Some i ]
+;
+
+value macro conf =
+  fun
+  [ '/' -> ifdef UNIX then "/" else "\\"
+  | 'a' -> strip_spaces (s_getenv conf.env "anon")
+  | 'c' -> Filename.concat setup_dir.val conf.comm
+  | 'd' -> conf.comm
+  | 'f' -> slashify (Filename.concat (Sys.getcwd ()) setup_dir.val)
+  | 'i' -> strip_spaces (s_getenv conf.env "i")
+  | 'l' -> conf.lang
+  | 'm' -> server_string conf
+  | 'o' -> strip_spaces (s_getenv conf.env "o")
+  | 'p' -> parameters conf.env
+  | 'q' -> Version.txt
+  | 'u' -> Filename.dirname (Filename.concat (Sys.getcwd ()) setup_dir.val)
+  | 'x' -> setup_dir.val
+  | '$' -> "$"
+  | c -> "BAD MACRO " ^ String.make 1 c ]
+;
+
+value inline_translate conf s =
+  let lang = conf.lang ^ ":" in
+  let derived_lang =
+    try
+      let i = String.index lang '-' in
+      String.sub lang 0 i ^ ":"
+    with
+    [ Not_found -> "" ]
+  in
+  let rec loop alt_version bol i =
+    if i = String.length s then
+      match alt_version with
+      [ Some s -> s
+      | None -> ".........." ]
+    else if bol then
+      match skip_lang s i with
+      [ Some j when s.[j] = ':' ->
+          let curr_lang = String.sub s i (j + 1 - i) in
+          if curr_lang = lang || curr_lang = derived_lang ||
+             curr_lang = "en:" then
+            let (s, i) =
+              let j = if s.[j + 1] = ' ' then j + 1 else j in
+              let rec loop len j =
+                if j = String.length s then (Buff.get len, j)
+                else if s.[j] = '\n' then
+                  if j + 1 < String.length s && s.[j + 1] = ' ' then
+                    let j =
+                      loop (j + 1) where rec loop j =
+                        if j < String.length s && s.[j] = ' ' then
+                          loop (j + 1)
+                        else j
+                    in
+                    loop (Buff.store len '\n') j
+                  else (Buff.get len, j)
+                else if s.[j] == '$' then
+                  loop (Buff.mstore len (macro conf s.[j + 1])) (j + 2)
+                else loop (Buff.store len s.[j]) (j + 1)
+              in
+              loop 0 (j + 1)
+            in
+            if curr_lang = lang then s
+            else
+              let alt_version =
+                if curr_lang = derived_lang then Some s
+                else if alt_version = None then
+                  let s = if s = "" then s else "[" ^ s ^ "]" in Some s
+                else alt_version
+              in
+              loop alt_version True i
+          else loop alt_version (s.[i] = '\n') (i + 1)
+      | _ -> loop alt_version (s.[i] = '\n') (i + 1) ]
+    else loop alt_version (s.[i] = '\n') (i + 1)
+  in
+  loop None True 0
+;
+
 value rec copy_from_stream conf print strm =
   try
     while True do {
       match Stream.next strm with
-      [ '$' ->
+      [ '[' ->
+          let s = parse_upto ']' strm in
+          if String.length s > 0 && s.[0] = '\n' then
+            print (inline_translate conf s)
+          else print ("[" ^ s ^ "]")
+      | '$' ->
           let c = Stream.next strm in
           match c with
-          [ '/' -> ifdef UNIX then print "/" else print "\\"
-          | 'a' -> print (strip_spaces (s_getenv conf.env "anon"))
-          | 'b' -> for_all conf print (all_db ".") strm
-          | 'c' -> print (Filename.concat setup_dir.val conf.comm)
-          | 'd' -> print conf.comm
+          [ 'b' -> for_all conf print (all_db ".") strm
           | 'e' ->
               do {
                 print "lang=";
@@ -322,8 +395,6 @@ value rec copy_from_stream conf print strm =
                      else do { print ";"; print k; print "="; print s; () })
                   conf.env
               }
-          | 'f' ->
-              print (slashify (Filename.concat (Sys.getcwd ()) setup_dir.val))
           | 'g' -> print_specific_file conf print "comm.log" strm
           | 'h' ->
               do {
@@ -343,31 +414,19 @@ value rec copy_from_stream conf print strm =
                      })
                   conf.env
               }
-          | 'i' -> print (strip_spaces (s_getenv conf.env "i"))
           | 'j' -> print_selector conf print
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
-          | 'l' -> print conf.lang
-          | 'm' -> print (server_string conf)
-          | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
-          | 'p' -> print (parameters conf.env)
-          | 'q' -> print Version.txt
           | 'r' ->
               print_specific_file conf print
                 (Filename.concat setup_dir.val "gwd.arg") strm
           | 's' -> for_all conf print (selected conf.env) strm
           | 't' -> print_if conf print (ifdef UNIX then False else True) strm
-          | 'u' ->
-              print
-                (Filename.dirname
-                   (Filename.concat (Sys.getcwd ()) setup_dir.val))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
               print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
           | 'w' -> print (slashify (Sys.getcwd ()))
-          | 'x' -> print setup_dir.val
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port.val)
-          | '$' -> print "$"
           | 'A'..'Z' | '0'..'9' as c ->
               match p_getenv conf.env (String.make 1 c) with
               [ Some v ->
@@ -390,7 +449,7 @@ value rec copy_from_stream conf print strm =
                       }
                   | [: :] -> print (strip_spaces v) ]
               | None -> print "BAD MACRO" ]
-          | c -> do { print "BAD MACRO "; print (String.make 1 c) } ]
+          | c -> print (macro conf c) ]
       | c -> print (String.make 1 c) ]
     }
   with
@@ -503,10 +562,16 @@ and for_all conf print list strm =
   | _ -> () ]
 ;
 
-value print_file conf fname =
+value print_file conf bname =
   let dir = Filename.concat setup_dir.val "setup" in
-  let fname = Filename.concat (Filename.concat dir conf.lang) fname in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  let fname = Filename.concat (Filename.concat dir "lang") bname in
+  let ic_opt =
+    try Some (open_in fname) with
+    [ Sys_error _ ->
+        let fname = Filename.concat (Filename.concat dir conf.lang) bname in
+        try Some (open_in fname) with [ Sys_error _ -> None ] ]
+  in
+  match ic_opt with
   [ Some ic ->
       do {
         Wserver.http "";
@@ -517,7 +582,7 @@ value print_file conf fname =
         close_in ic;
         trailer conf
       }
-  | _ ->
+  | None ->
       let title _ = Wserver.wprint "Error" in
       do {
         header title;
@@ -1144,9 +1209,9 @@ value file_contents fname =
   let len = ref 0 in
   try
     let ic = open_in fname in
-    do { while True do { len.val := store len.val (input_char ic) }; "" }
+    do { while True do { len.val := Buff.store len.val (input_char ic) }; "" }
   with
-  [ Sys_error _ | End_of_file -> get_buff len.val ]
+  [ Sys_error _ | End_of_file -> Buff.get len.val ]
 ;
 
 value gwf conf =
