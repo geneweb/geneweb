@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.5 1999-11-10 08:44:09 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.6 1999-11-28 10:17:34 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -24,7 +24,6 @@ type month_number_dates =
 
 type charset = [ Ansel | Ascii | Msdos ];
 
-value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
 value extract_first_names = ref False;
@@ -37,7 +36,6 @@ value month_number_dates = ref NoMonthNumberDates;
 value no_public_if_titles = ref False;
 value first_names_brackets = ref None;
 value force = ref False;
-value conc_spc = ref False;
 
 (* Reading input *)
 
@@ -849,7 +847,7 @@ value treat_notes gen rl =
   let notes =
     List.fold_left
       (fun s (lab, n) ->
-         let spc = String.length n > 0 && n.[0] == ' ' || conc_spc.val in
+         let spc = String.length n > 0 && n.[0] == ' ' in
          let end_spc = String.length n > 1 && n.[String.length n - 1] == ' ' in
          let n = strip_spaces n in
          if s = "" then n ^ (if end_spc then " " else "")
@@ -861,30 +859,6 @@ value treat_notes gen rl =
       "" lines
   in
   strip_newlines notes
-;
-
-value treat_indi_notes_titles gen rl =
-  let lines = extract_notes gen rl in
-  let (notes, titles) =
-    List.fold_left
-      (fun (s, titles) (lab, n) ->
-         let n = strip_spaces n in
-         let titles = titles @ Aurejac.find_titles n in
-         let s =
-           if s = "" then n
-           else if lab = "CONT" || lab = "NOTE" then s ^ "<br>\n" ^ n
-           else if n = "" then s
-           else s ^ "\n" ^ n
-         in
-         (s, titles))
-      ("", []) lines
-  in
-  let titles = List.map (make_title gen) titles in
-  (add_string gen (strip_newlines notes), titles)
-;
-
-value treat_indi_notes gen rl =
-  add_string gen (treat_notes gen rl)
 ;
 
 value source gen r =
@@ -1118,24 +1092,14 @@ value add_indi gen r =
     [ [r :: rl] -> List.fold_left (fun s r -> s ^ ", " ^ r.rval) r.rval rl
     | [] -> "" ]
   in
-  let (notes, titles) =
-    if titles_aurejac.val then
-      match find_all_fields "NOTE" r.rsons with
-      [ [] -> (string_empty.val, [])
-      | rl -> treat_indi_notes_titles gen rl ]
-    else
-      let notes =
-        match find_all_fields "NOTE" r.rsons with
-        [ [] -> string_empty.val
-        | rl -> treat_indi_notes gen rl ]
-      in
-      (notes, [])
+  let notes =
+    match find_all_fields "NOTE" r.rsons with
+    [ [] -> string_empty.val
+    | rl -> add_string gen (treat_notes gen rl) ]
   in
   let titles =
-    if titles_aurejac.val then titles
-    else
-      List.map (treat_indi_title gen public_name)
-        (find_all_fields "TITL" r.rsons)
+    List.map (treat_indi_title gen public_name)
+      (find_all_fields "TITL" r.rsons)
   in
   let family =
     let rl = find_all_fields "FAMS" r.rsons in
@@ -2108,16 +2072,13 @@ value speclist =
     "[ANSEL|ASCII|MSDOS] \
 - charset decoding -
        Force given charset decoding, overriding the possible setting in
-       GEDCOM");
-   ("-ta", Arg.Set titles_aurejac,
-    "\n       [This option is ad hoc; please do not use it]")]
+       GEDCOM")]
 ;
 
 value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
 
 value main () =
   do Argl.parse speclist (fun s -> in_file.val := s) errmsg;
-     conc_spc.val := titles_aurejac.val; (* kludge *)
      let bdir =
        if Filename.check_suffix out_file.val ".gwb" then out_file.val
        else out_file.val ^ ".gwb"
