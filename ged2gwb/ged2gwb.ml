@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.25 2000-07-28 14:31:21 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.26 2000-08-09 09:16:16 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1873,6 +1873,7 @@ value array_memq x a =
 
 value check_parents_children base =
   let to_delete = ref [] in
+  let fam_to_delete = ref [] in
   do for i = 0 to base.data.persons.len - 1 do
        let a = base.data.ascends.get i in
        match a.parents with
@@ -1898,6 +1899,39 @@ value check_parents_children base =
                   a.parents := None;
                return ()
        | None -> () ];
+       fam_to_delete.val := [];
+       let u = base.data.unions.get i in
+       do for j = 0 to Array.length u.family - 1 do
+            let cpl = coi base u.family.(j) in
+            if Adef.iper_of_int i <> cpl.father
+            && Adef.iper_of_int i <> cpl.mother then
+              do Printf.fprintf log_oc.val
+                   "\
+%s is spouse in this family but neither husband nor wife:\n"
+                   (denomination base (base.data.persons.get i));
+                 Printf.fprintf log_oc.val "- %s\n"
+                   (denomination base (poi base cpl.father));
+                 Printf.fprintf log_oc.val "- %s\n"
+                   (denomination base (poi base cpl.mother));
+                 Printf.fprintf log_oc.val
+                    "=> deleted this family for him/her\n";
+                 Printf.fprintf log_oc.val "\n";
+                 fam_to_delete.val := [j :: fam_to_delete.val];
+                 flush log_oc.val;
+              return ()
+            else ();
+          done;
+          if fam_to_delete.val <> [] then
+            let (list, _) =
+              List.fold_left
+                (fun (list, i) x ->
+                   if List.mem i fam_to_delete.val then (list, i + 1)
+                   else ([x :: list], i + 1))
+                ([], 0) (Array.to_list u.family)
+            in
+            u.family := Array.of_list (List.rev list)
+          else ();
+       return ();
      done;
      for i = 0 to base.data.families.len - 1 do
        to_delete.val := [];
