@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.36 2000-10-26 12:12:14 ddr Exp $ *)
+(* $Id: family.ml,v 3.37 2000-10-30 16:21:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -456,6 +456,7 @@ value family_m conf base =
       Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard ->
       Notes.print_mod_ok conf base
+  | Some "RLM" -> Relation.print_multi conf base
   | Some "N" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.surname_print conf base Some.surname_not_found v
