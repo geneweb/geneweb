@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.0 2001-03-16 19:35:15 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.1 2001-05-07 07:50:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -58,8 +58,9 @@ value noproc : ref bool;
 (* Example:
 
    - Source program "foo.ml":
-        Wserver.f None 2368 60 None (None, None)
-           (fun _ s -> Wserver.html (); Wserver.wprint "You said: %s...\n" s);;
+        Wserver.f None 2371 60 None
+           (fun _ s _ ->
+              Wserver.html ""; Wserver.wprint "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:
