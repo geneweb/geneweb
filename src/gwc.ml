@@ -1,11 +1,13 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.3 2001-04-23 03:02:38 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.4 2001-10-15 13:22:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Check;
 open Gutil;
 open Gwcomp;
+
+value default_source = ref "";
 
 value check_magic =
   let b = String.create (String.length magic_gwo) in
@@ -372,8 +374,9 @@ value insert_person gen so =
       x.titles := List.map (title_unique_string gen) so.titles;
       x.access := so.access;
       x.occupation := unique_string gen so.occupation;
-      x.psources := unique_string gen so.psources;
-      ()
+      x.psources :=
+        unique_string gen
+          (if so.psources = "" then default_source.val else so.psources);
     }
     else ();
     x
@@ -446,7 +449,10 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
       deo.children
   in
   let comment = unique_string gen fo.comment in
-  let fsources = unique_string gen fo.fsources in
+  let fsources =
+    unique_string gen
+      (if fo.fsources = "" then default_source.val else fo.fsources)
+  in
   do {
     new_ifam gen;
     let fam =
@@ -722,8 +728,10 @@ value speclist =
    ("-sep", Arg.Set separate, " Separate all persons in next file");
    ("-sh", Arg.Int (fun x -> shift.val := x),
     "<int> Shift all persons numbers in next files");
+   ("-ds", Arg.String (fun s -> default_source.val := s), "\
+     set the source field for persons and families without source data");
    ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
-   ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
+   ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock data base.")]
 ;
 
 value anonfun x =

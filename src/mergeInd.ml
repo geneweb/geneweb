@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.6 2001-10-11 13:08:23 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.7 2001-10-15 13:22:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -192,8 +192,11 @@ value compatible_ind base p1 p2 =
   compatible_strings p1.death_place p2.death_place &&
   compatible_burials p1.burial p2.burial &&
   compatible_strings p1.burial_place p2.burial_place &&
-  compatible_strings p1.notes p2.notes &&
+  compatible_strings p1.notes p2.notes 
+(*
+ &&
   compatible_strings p1.psources p2.psources
+*)
 ;
 
 value compatible_fam base fam1 fam2 =

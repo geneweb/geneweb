@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.1 2001-04-22 08:56:16 ddr Exp $ *)
+(* $Id: image.ml,v 4.2 2001-10-15 13:22:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -65,8 +65,11 @@ value print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
+let _ = do { Printf.eprintf "%s\n" fname; flush stderr; } in
   if fname = Filename.basename fname then
+let _ = do { Printf.eprintf "%s\n" fname; flush stderr; } in
     let fname = source_image_file_name conf.bname fname in
+let _ = do { Printf.eprintf "%s\n" fname; flush stderr; } in
     if print_image_file conf.cgi fname then () else incorrect_request conf
   else incorrect_request conf
 ;
