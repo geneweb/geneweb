@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.50 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: relation.ml,v 4.51 2004-12-26 10:00:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -77,6 +77,7 @@ value print_menu conf base p =
   do {
     header conf title;
     tag "form" "method=get action=\"%s\"" conf.command begin
+      Wserver.wprint "<p>\n";
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=em value=R>\n";
       wprint_hidden_person conf base "e" p;
@@ -180,7 +181,8 @@ value print_menu conf base p =
             List.iter
               (fun c ->
                  Wserver.wprint "\
-<td bgcolor=%s><input type=radio name=color value=%s></td>\n" c c)
+<td style=\"background:#%s\">
+<input type=\"radio\" name=\"color\" value=\"#%s\"></td>\n" c c)
               ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
             Wserver.wprint "</tr></table>\n";
           end;
@@ -408,7 +410,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
   let color =
     match p_getenv conf.env "color" with
     [ None -> ""
-    | Some x -> ";color=" ^ x ]
+    | Some x -> ";color=" ^ code_varenv x ]
   in
   let (sl, _) =
     List.fold_left
@@ -1539,7 +1541,7 @@ value print_main_relationship conf base long p1 p2 rel =
     | Some x -> conf.senv := conf.senv @ [("bd", x)] ];
     match p_getenv conf.env "color" with
     [ None | Some "" -> ()
-    | Some x -> conf.senv := conf.senv @ [("color", x)] ];
+    | Some x -> conf.senv := conf.senv @ [("color", code_varenv x)] ];
     match rel with
     [ None ->
         if p1.cle_index == p2.cle_index then

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.24 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: descend.ml,v 4.25 2004-12-26 10:00:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -83,6 +83,7 @@ value text_level conf =
 
 value print_choice conf base p effective_level =
   tag "form" "method=get action=\"%s\"" conf.command begin
+    Wserver.wprint "<p>\n";
     List.iter
       (fun (k, v) ->
          Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
@@ -103,8 +104,8 @@ value print_choice conf base p effective_level =
     end;
     Wserver.wprint "<input type=submit value=\"Ok\">\n";
     html_p conf;
-    tag "table" "border=%d width=\"90%%\"" conf.border begin
-      tag "tr" "align=left" begin
+    tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
+      tag "tr" begin
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
             (capitale (transl_nth conf "list/list (ancestors)" 0));
@@ -136,7 +137,8 @@ value print_choice conf base p effective_level =
           List.iter
             (fun c ->
                Wserver.wprint "\
-<td bgcolor=%s><input type=radio name=color value=%s></td>\n" c c)
+<td style=\"background:#%s\">
+<input type=\"radio\" name=\"color\" value=\"#%s\"></td>\n" c c)
             ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
           Wserver.wprint "</tr></table>\n";
         end;
@@ -177,7 +179,15 @@ value display_descendant_menu conf base p =
   let effective_level = min (limit_desc conf) (level_max conf base p) in
   do {
     header conf (descendants_title conf base p);
-    tag "center" begin print_choice conf base p effective_level; end;
+    tag "table" "style=\"margin:auto\" border=\"%d\" width=\"90%%\""
+      conf.border
+    begin
+      tag "tr" begin
+        tag "td" "align=\"center\"" begin
+          print_choice conf base p effective_level;
+        end;
+       end;
+    end;
     trailer conf
   }
 ;

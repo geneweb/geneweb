@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.39 2004-12-14 09:30:10 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.40 2004-12-26 10:00:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -68,11 +68,11 @@ value text_level conf =
 
 value print_choice conf base p effective_level =
   tag "form" "method=get action=\"%s\"" conf.command begin
+    Wserver.wprint "<p>\n";
     Util.hidden_env conf;
-    Wserver.wprint "\n";
     Wserver.wprint "<input type=hidden name=m value=A>\n";
     wprint_hidden_person conf base "" p;
-    tag "center" begin
+    tag "div" begin
       tag "select" "name=v" begin
         let rec loop i =
           if i > effective_level + 1 then ()
@@ -87,10 +87,10 @@ value print_choice conf base p effective_level =
       end;
       Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
-    html_br conf;
-    tag "table" "border=%d width=\"90%%\"" conf.border begin
-      tag "tr" "align=left" begin
-        tag "td" "valign=top" begin
+    html_p conf;
+    tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
+      tag "tr" begin
+        tag "td" begin
           Wserver.wprint
             "<input type=radio name=t value=N checked> %s (*)<br>\n"
             (capitale (transl conf "short display"));
@@ -129,11 +129,12 @@ value print_choice conf base p effective_level =
           List.iter
             (fun c ->
                Wserver.wprint "\
-<td bgcolor=%s><input type=radio name=color value=%s></td>\n" c c)
+<td style=\"background:#%s\">
+<input type=\"radio\" name=\"color\" value=\"#%s\"></td>\n" c c)
             ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
           Wserver.wprint "</tr></table>\n";
         end;
-        tag "td valign=top" begin
+        tag "td" "valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl_nth conf "list/list (ancestors)" 1));
           if effective_level < limit_by_list conf then ()
@@ -196,24 +197,29 @@ value display_ancestor_menu conf base p =
   in
   do {
     header conf title;
-    tag "center" begin
-      print_choice conf base p effective_level;
-      html_p conf;
-      Wserver.wprint
-        (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
-        (fun _ ->
-           do {
-             conf.henv := List.remove_assoc "iz" conf.henv;
-             let reference _ _ _ s =
-               sprintf "<a href=\"%siz=%d\">%s</a>" (commd conf)
-                 (Adef.int_of_iper p.cle_index) s
-             in
-             Wserver.wprint "%s"
-               (gen_person_title_text reference std_access conf base p)
-           });
-      Wserver.wprint ".\n";
+    tag "table" "style=\"margin:auto\" border=\"%d\" width=\"90%%\""
+      conf.border
+    begin
+      tag "tr" begin
+        tag "td" "align=\"center\"" begin
+          print_choice conf base p effective_level;
+          html_p conf;
+          Wserver.wprint
+            (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
+            (fun _ ->
+               do {
+                 conf.henv := List.remove_assoc "iz" conf.henv;
+                 let reference _ _ _ s =
+                   sprintf "<a href=\"%siz=%d\">%s</a>" (commd conf)
+                     (Adef.int_of_iper p.cle_index) s
+                 in
+                 Wserver.wprint "%s"
+                   (gen_person_title_text reference std_access conf base p)
+               });
+          Wserver.wprint ".\n";
+      end;
+      end;
     end;
-    Wserver.wprint "<br>\n";
     trailer conf
   }
 ;
@@ -1659,7 +1665,7 @@ value print_tree_with_table conf base gv p =
   let td_prop =
     match Util.p_getenv conf.env "td" with
     [ Some x -> " " ^ x
-    | _ -> if color = "" then "" else " bgcolor=" ^ color ]
+    | _ -> if color = "" then "" else " style=\"background:" ^ color ^ "\"" ]
   in
   let next_gen pol =
     List.fold_right
