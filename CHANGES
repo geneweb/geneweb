@@ -20,7 +20,7 @@ GeneWeb version 2.04
     alphabetic order + ability to cancel GeneWeb links (for creation of
     static HTML pages).
   - [Jun 22, 99] Fixed bug: send image in CGI mode did not work.
-  - [Jun 19, 99] Added in ancestors long display the ability to select
+  - [Jun 19..28, 99] Added in ancestors long display the ability to select
     and unselect the displaying of siblings and the displaying of notes.
   - [Jun 19, 99] Changed presentation of ancestors displaying main menu.
 
