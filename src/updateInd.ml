@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.39 2001-02-18 09:30:15 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.40 2001-02-18 13:20:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -920,9 +920,11 @@ value try_eval_gen_variable conf base env p =
   | "image" -> quote_escaped p.image
   | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
   | "item" -> eval_string_env "item" env
+  | "notes" -> quote_escaped p.notes
   | "occ" -> if p.occ <> 0 then string_of_int p.occ else ""
   | "occupation" -> quote_escaped p.occupation
   | "public_name" -> quote_escaped p.public_name
+  | "sources" -> quote_escaped p.psources
   | "surname" -> quote_escaped p.surname
   | s ->
       let v = extract_var "evar_" s in
@@ -1064,7 +1066,10 @@ value is_death_reason dr =
 
 value eval_gen_bool_variable conf base env p =
   fun 
-  [ "dead_dont_know_when" -> p.death = DeadDontKnowWhen
+  [ "acc_if_titles" -> p.access = IfTitles
+  | "acc_private" -> p.access = Private
+  | "acc_public" -> p.access = Public
+  | "dead_dont_know_when" -> p.death = DeadDontKnowWhen
   | "died_young" -> p.death = DeadYoung
   | "dont_know_if_dead" -> p.death = DontKnowIfDead
   | "bt_buried" -> match p.burial with [ Buried _ -> True | _ -> False ]
@@ -1377,11 +1382,11 @@ value print_update_ind conf base p digest =
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK")
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
-      if p_getenv conf.env "opt" = Some "new" then
+      if p_getenv conf.env "opt" = Some "old" then
+        print_update_ind_aux conf base p digest
+      else
         let astl = Templ.input conf base "updind" in
         do html conf; interp_templ conf base p digest astl; return ()
-      else
-        print_update_ind_aux conf base p digest
   | _ -> incorrect_request conf ]
 ;
 

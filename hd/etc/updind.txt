@@ -1,12 +1,12 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.10 2001-02-18 09:30:14 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.11 2001-02-18 13:20:28 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
-  <title>
+  <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
       [*merge::person/persons]1 # %index;
-    %elseif;(evar_m = "MOD_IND" or eval_m = "MOD_IND_OK");
+    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
       [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
@@ -24,7 +24,7 @@
   [year/month/day]1
   <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
   [year/month/day]2
-  <input name=xvar_mm size=2 maxlength=2 value="%xdate.day;">
+  <input name=xvar_dd size=2 maxlength=2 value="%xdate.day;">
   </td>
   <td>
   ...[or]0 [text]0
@@ -68,20 +68,22 @@
   <tr>
   <td>[*source/sources]0</td>
   <td>
-  <input name=xx_src size=40 maxlength=200 value="%xx_src");">
+  <input name=xx_src size=40 maxlength=200 value="%xx_src;">
   </td>
   </tr>
   </table>
 %end;
 
-<h1 align=center><font color=%highlight;>
+<h1 align=center><font color=%highlight;>%nn;
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
   [*merge::person/persons]1 # %index;
-%elseif;(evar_m = "MOD_IND" or eval_m = "MOD_IND_OK");
+%elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
   [*modify::person/persons]0 # %index;
 %else;
   [*add::person/persons]0%end;
 </font></h1>
+
+<div align=right>(new version)</div>
 
 <form method=POST action="%action;">
 %hidden;
@@ -90,7 +92,7 @@
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
   %if;evar_i2;<input type=hidden name=i2 value="%evar_i2;">%end;%nl;
   <input type=hidden name=m value=MRG_MOD_IND_OK>
-%elseif;(evar_m = "MOD_IND" or eval_m = "MOD_IND_OK");
+%elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
   <input type=hidden name=m value=MOD_IND_OK>
 %else;
   <input type=hidden name=m value=ADD_IND_OK>
@@ -328,7 +330,7 @@
   <tr>
   <td>
   [*insert::relation/relations]0
-  <input type=checkbox name=add_relationxx; value=on>
+  <input type=checkbox name=add_relationxx value=on>
   </td>
   </tr>
   </table>
@@ -354,22 +356,23 @@
   </tr>
   </table>
 %end;
-%define;relation_father(xx)
+%define;one_relation(xcnt,xvar,xrel)
  <table border=1>
     <tr>
       <td>[*first name/first names]0</td>
       <td>
-        <input name=rxx_fath_fn size=23 maxlength=200%sp;
-         value="%relation.r_father.first_name;">
+        <input name=rxcnt_xvar_fn size=23 maxlength=200%sp;
+         value="%relation.xrel.first_name;">
       </td>
       <td align=right>[*number]</td>
       <td>
-        <input name=rxx_occ size=5 maxlength=8 value="%relation.r_father.occ;">
+        <input name=rxcnt_xvar_occ size=5 maxlength=8%sp;
+         value="%relation.xrel.occ;">
       </td>
       <td>
-        <select name=rxx_p>
-        <option value=link%if;relation.r_father.link; selected%end;>[*link]0
-        <option value=create%if;relation.r_father.create; selected%end;
+        <select name=rxcnt_xvar_p>
+        <option value=link%if;relation.xrel.link; selected%end;>[*link]0
+        <option value=create%if;relation.xrel.create; selected%end;
           >[*create]0
         </select>
       </td>
@@ -377,37 +380,8 @@
     <tr>
       <td>[*surname/surnames]0</td>
       <td colspan=4>
-        <input name=rxx_sn size=40 maxlength=200%sp;
-         value="%relation.r_father.surname;">
-      </td>
-    </tr>
-  </table>
-%end;
-%define;relation_mother(xx)
- <table border=1>
-    <tr>
-      <td>[*first name/first names]0</td>
-      <td>
-        <input name=rxx_moth_fn size=23 maxlength=200%sp;
-         value="%relation.r_mother.first_name;">
-      </td>
-      <td align=right>[*number]</td>
-      <td>
-        <input name=rxx_occ size=5 maxlength=8 value="%relation.r_mother.occ;">
-      </td>
-      <td>
-        <select name=rxx_p>
-        <option value=link%if;relation.r_mother.link; selected%end;>[*link]0
-        <option value=create%if;relation.r_mother.create; selected%end;
-          >[*create]0
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td>[*surname/surnames]0</td>
-      <td colspan=4>
-        <input name=rxx_sn size=40 maxlength=200%sp;
-         value="%relation.r_mother.surname;">
+        <input name=rxcnt_xvar_sn size=40 maxlength=200%sp;
+         value="%relation.xrel.surname;">
       </td>
     </tr>
   </table>
@@ -419,8 +393,8 @@
   %foreach;relation;
     %apply;relation_type(cnt)
     <p>
-    %apply;relation_father(cnt)
-    %apply;relation_mother(cnt)
+    %apply;one_relation(cnt,"fath","r_father")
+    %apply;one_relation(cnt,"moth","r_mother")
     <p>
     %apply;insert_relation(cnt)
     <p>
@@ -428,8 +402,8 @@
 %else;
   %apply;relation_type("1")
   <p>
-  %apply;relation_father("1")
-  %apply;relation_mother("1")
+  %apply;one_relation("1","fath","r_father")
+  %apply;one_relation("1","moth","r_mother")
   <p>
   %apply;insert_relation("1")
   <p>
@@ -496,6 +470,37 @@
   %apply;insert_title("1")
   <p>
 %end;
+
+<table border=1>
+  <tr>
+    <td>[*access]0</td>
+    <td>
+      <input type=radio name=access%sp;
+       value=IfTitles%if;acc_if_titles; checked%end;>
+      [*if titles]0
+      <input type=radio name=access%sp;
+       value=Public%if;acc_public; checked%end;>
+      [*public]0
+      <input type=radio name=access%sp;
+       value=Private%if;acc_private; checked%end;>
+      [*private]0
+    </td>
+  </tr>
+</table>
+
+<h4>[*note/notes]1</h4>
+
+<textarea name=notes rows=6 cols=70 wrap=virtual>%notes;</textarea>
+
+<h4>[*source/sources]0</h4>
+
+<table border=1>
+  <tr>
+    <td>
+      <input name=src size=50 maxlength=200%sp; value="%sources;">
+    </td>
+  </tr>
+</table>
 
 <p>
 <input type=submit value=Ok>
