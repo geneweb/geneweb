@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.38 1999-07-30 07:25:20 ddr Exp $ *)
+(* $Id: util.ml,v 2.39 1999-08-02 10:16:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -164,21 +164,19 @@ value connais base p =
   sou base p.first_name <> "?" || sou base p.surname <> "?"
 ;
 
-value acces_pur conf base x =
+value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if conf.wizard && conf.friend && not (first_name = "?" || surname = "?")
   || conf.access_by_key then
-    "n=" ^ (code_varenv (Name.lower surname)) ^ ";p=" ^
-    (code_varenv (Name.lower first_name)) ^
-      (if x.occ > 0 then ";oc=" ^ string_of_int x.occ else "")
+    "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^
+    ";n" ^ n ^ "=" ^ code_varenv (Name.lower surname) ^
+      (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
   else
-  "i=" ^ string_of_int (Adef.int_of_iper x.cle_index)
+    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper x.cle_index)
 ;
 
-value acces conf base x =
-  acces_pur conf base x
-;
+value acces conf base x = acces_n conf base "" x;
 
 value calculer_age conf p =
   match Adef.od_of_codate p.birth with
@@ -1104,6 +1102,24 @@ value rchild_type_text conf t n =
       transl_nth conf "candidate son/candidate daughter/candidate child" n
   | GodParent ->
       transl_nth conf "godson/goddaughter/godchild" n ]
+;
+
+value wprint_hidden pref name valu =
+  Wserver.wprint "<input type=hidden name=%s%s value=\"%s\">\n" pref name
+    (quote_escaped valu)
+;
+
+value wprint_hidden_person conf base pref p =
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
+  if conf.wizard && conf.friend && not (first_name = "?" || surname = "?")
+  || conf.access_by_key then
+    do wprint_hidden pref "p" (Name.lower first_name);
+       wprint_hidden pref "n" (Name.lower surname);
+       if p.occ > 0 then wprint_hidden pref "oc" (string_of_int p.occ)
+       else ();
+    return ()
+  else wprint_hidden pref "i" (string_of_int (Adef.int_of_iper p.cle_index))
 ;
 
 exception Ok;

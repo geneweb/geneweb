@@ -22,9 +22,10 @@ GeneWeb Version 2.05
     the initial format if failed (instead of scratching).
   - [Jul 9, 99] Changed request syntax for cousins: "v1=#" instead of "v=#"
     and ability to ask for "v1=#;v2=#" for uncles and nephews...
-  - [Jul 2, 99] Added "access_by_key" in "base.gwf" files to generate accesses
-    by keys, allowing to update the data base without disturbing the users
-    accessing it.
+  - [Jul 2..Aug 2, 99] Added "access_by_key" in "base.gwf" files to generate
+    accesses by keys instead of index in the person array (which can change
+    when recompiling the base), allowing to update the data base without
+    disturbing the users accessing it.
 
 * GeneWeb compiler (gwc)
   - [Jul 20, 99] Translated into English some variables and functions whose

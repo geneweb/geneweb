@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.27 1999-08-01 08:50:14 ddr Exp $ *)
+(* $Id: relation.ml,v 2.28 1999-08-02 10:16:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -64,8 +64,7 @@ value print_menu conf base p =
      tag "form" "method=get action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=em value=R>\n";
-       Wserver.wprint "<input type=hidden name=ei value=%d>\n"
-         (Adef.int_of_iper p.cle_index);
+       wprint_hidden_person conf base "e" p;
        tag "ul" begin
          html_li conf;
          Wserver.wprint "<input type=hidden name=m value=NG>\n";
@@ -345,7 +344,7 @@ value string_of_big_int conf i =
       else s ^ sep ^ Printf.sprintf "%03d" (i mod 1000)
 ;
 
-value print_solution_ancestor conf long p1 p2 pp1 pp2 x1 x2 list =
+value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   do Wserver.wprint "<ul>\n";
      List.iter
        (fun (a, n) ->
@@ -357,16 +356,13 @@ value print_solution_ancestor conf long p1 p2 pp1 pp2 x1 x2 list =
                   let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                   let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
                   Wserver.wprint
-                    "<a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d%s%s\">"
-                    (commd conf) (Adef.int_of_iper a.cle_index) x1
-                    (Adef.int_of_iper dp1.cle_index) x2
-                    (Adef.int_of_iper dp2.cle_index)
-                    (if pp1 = None then ""
-                     else
-                       ";i3=" ^ string_of_int (Adef.int_of_iper p1.cle_index))
+                    "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s\">"
+                    (commd conf) (acces conf base a) x1
+                    (acces_n conf base "1" dp1) x2
+                    (acces_n conf base "2" dp2)
+                    (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
                     (if pp2 = None then ""
-                     else
-                       ";i4=" ^ string_of_int (Adef.int_of_iper p2.cle_index));
+                     else ";" ^ acces_n conf base "4" p2);
                   Wserver.wprint "%s</a>" (transl conf "here");
                   if n > 1 then
                     Wserver.wprint "%s"
@@ -400,18 +396,14 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                     let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                     let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
                     Wserver.wprint
-                      " <a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d%s%s\">"
-                      (commd conf) (Adef.int_of_iper a.cle_index) x1
-                      (Adef.int_of_iper dp1.cle_index) x2
-                      (Adef.int_of_iper dp2.cle_index)
+                      " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s\">"
+                      (commd conf) (acces conf base a) x1
+                      (acces_n conf base "1" dp1) x2
+                      (acces_n conf base "2" dp2)
                       (if pp1 = None then ""
-                       else
-                         ";i3=" ^
-                         string_of_int (Adef.int_of_iper p1.cle_index))
+                       else ";" ^ acces_n conf base "3" p1)
                       (if pp2 = None then ""
-                       else
-                         ";i4=" ^
-                         string_of_int (Adef.int_of_iper p2.cle_index));
+                       else ";" ^ acces_n conf base "4" p2);
                     Wserver.wprint "%s</a>" (transl conf "here");
                     if n > 1 then
                       Wserver.wprint "%s"
@@ -474,7 +466,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
 value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list)) =
   do print_link conf base n p2 p1 pp2 pp1 x2 x1;
      if x1 == 0 || x2 == 0 then
-       print_solution_ancestor conf long p1 p2 pp1 pp2 x1 x2 list
+       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
      else print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list;
      Wserver.wprint "\n";
   return ()
@@ -497,9 +489,9 @@ value print_propose_upto conf base p1 p2 rl =
          Wserver.wprint " <em>%s</em>\n" (transl conf "up to");
          afficher_personne_titre conf base a;
          Wserver.wprint ":\n<em>%s\n" (transl conf "click");
-         Wserver.wprint "<a href=\"%sm=A;t=D;i=%d;v=%d;l=%d\">"
-           (commd conf) (Adef.int_of_iper p.cle_index)
-           (Adef.int_of_iper a.cle_index) maxlen;
+         Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">"
+           (commd conf) (acces conf base p)
+           (acces_n conf base "1" a) maxlen;
          Wserver.wprint "%s</a>." (transl conf "here");
          Wserver.wprint "</em></font>\n";
       return ()

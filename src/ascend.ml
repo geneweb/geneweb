@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.34 1999-07-22 21:18:58 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.35 1999-08-02 10:15:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -57,18 +57,7 @@ value print_choice conf base p niveau_effectif =
     Srcfile.hidden_env conf;
     Wserver.wprint "\n";
     Wserver.wprint "<input type=hidden name=m value=A>\n";
-    if conf.wizard && conf.friend then
-      do Wserver.wprint "<input type=hidden name=n value=\"%s\">\n"
-           (quote_escaped (p_surname base p));
-         Wserver.wprint "<input type=hidden name=p value=\"%s\">\n"
-           (quote_escaped (p_first_name base p));
-         if p.occ > 0 then
-           Wserver.wprint "<input type=hidden name=oc value=\"%d\">\n" p.occ
-         else ();
-      return ()
-    else
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
-        (Adef.int_of_iper p.cle_index);
+    wprint_hidden_person conf base "" p;
     tag "select" "name=v" begin
       let rec boucle i =
         if i > niveau_effectif + 1 then ()
@@ -1399,8 +1388,13 @@ value print conf base p =
       in
       if al then print_missing_ancestors_alphabetically conf base v si p
       else print_missing_ancestors conf base v si p
-  | (Some "D", Some v) ->
-      print_ancestors_same_time_descendants conf base p
-        (base.data.persons.get v)
+  | (Some "D", x) ->
+      match (find_person_in_env conf base "1", x) with
+      [ (Some anc, _) ->
+          print_ancestors_same_time_descendants conf base p anc
+      | (_, Some v) -> (* compatibility *)
+          print_ancestors_same_time_descendants conf base p
+            (base.data.persons.get v)
+      | _ -> afficher_menu_ascendants conf base p ]
   | _ -> afficher_menu_ascendants conf base p ]
 ;

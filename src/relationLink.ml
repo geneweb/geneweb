@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.7 1999-08-01 08:50:14 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.8 1999-08-02 10:16:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -389,14 +389,14 @@ value rec print_one_branch conf base ipl1 sp =
 
 value include_marr conf base n =
   match find_person_in_env conf base n with
-  [ Some p -> ";i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  [ Some p -> ";" ^ acces_n conf base n p
   | None -> "" ]
 ;
 
 value sign_text conf base sign info b1 b2 c1 c2 =
   "<a href=\"" ^ commd conf ^ "m=RL"
-  ^ ";i1=" ^ string_of_int (Adef.int_of_iper info.ip1)
-  ^ ";i2=" ^ string_of_int (Adef.int_of_iper info.ip2)
+  ^ ";" ^ acces_n conf base "1" (poi base info.ip1)
+  ^ ";" ^ acces_n conf base "2" (poi base info.ip2)
   ^ ";b1=" ^ Num.to_string (sosa_of_branch [(info.ip, info.sp) :: b1])
   ^ ";b2=" ^ Num.to_string (sosa_of_branch [(info.ip, info.sp) :: b2])
   ^ ";c1=" ^ string_of_int c1 ^ ";c2=" ^ string_of_int c2
