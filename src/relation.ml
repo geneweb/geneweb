@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.26 1999-12-20 14:33:31 ddr Exp $ *)
+(* $Id: relation.ml,v 3.27 1999-12-21 14:32:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -384,12 +384,9 @@ value print_only_dag conf base d =
     | Right _ -> Wserver.wprint "&nbsp;" ]
   in
   let phony n =
-    match n with
-    [ Elem i ->
-        match d.dag.(int_of_idag i).valu with
-        [ Left _ -> False
-        | Right _ -> True ]
-    | _ -> False ]
+    match n.valu with
+    [ Left _ -> False
+    | Right _ -> True ]
   in
   print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
     conf.border d t
@@ -443,11 +440,12 @@ value print_relation_path_dag conf base path =
 value print_relation_path conf base path =
   if path == [] then ()
   else
-    do print_relation_path_list conf base path;
-       match p_getenv conf.env "dag" with
-       [ Some "on" -> print_relation_path_dag conf base path
-       | _ -> print_relation_path_table conf base path ];
-    return ()
+    match p_getenv conf.env "dag" with
+    [ Some "off" ->
+        do print_relation_path_list conf base path;
+           print_relation_path_table conf base path;
+        return ()
+    | _ -> print_relation_path_dag conf base path ]
 ;
 
 type node = [ NotVisited | Visited of (bool * iper * famlink) ];
@@ -569,8 +567,7 @@ value print_relation_with_alliance conf base ip1 ip2 =
       let queue1 = one_step_further True queue1 in
       width_search queue1 visited1 queue2 visited2
   in
-  do header conf title;
-     Util.print_link_to_welcome conf True;
+  do header_no_page_title conf title;
      mark_per.(Adef.int_of_iper ip1) := Visited (True, ip1, Self);
      mark_per.(Adef.int_of_iper ip2) := Visited (False, ip2, Self);
      if try width_search [ip1] 0 [ip2] 0 with [ FoundLink -> False ] then
