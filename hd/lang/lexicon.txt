@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.96 1999-08-03 08:56:18 ddr Exp $
+# $Id: lexicon.txt,v 2.97 1999-08-03 09:03:09 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3273,6 +3273,7 @@ pt: alcunha
 se: smeknamn
 
     recognized son/recognized daughter/recognized child
+de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
 fr: fils reconnu/fille reconnue/enfant reconnu
@@ -3280,6 +3281,7 @@ it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
+de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
@@ -3354,6 +3356,7 @@ pt: relacionado%t com
 se: f&ouml;rh&aring;llande%t med
 
     relationships by marriage
+de: Heiratsbeziehungen
 en: relationships by marriage
 es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
