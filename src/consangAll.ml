@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.9 2004-08-09 11:34:59 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.10 2004-08-10 16:26:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -43,17 +43,16 @@ value start_progr_bar () =
   }
 ;
 
-value run_progr_bar x max_cnt =
+value run_progr_bar cnt max_cnt =
   do {
-    let cnt = max_cnt - x in
-    let already_disp = x * progr_bar_size / max_cnt in
-    let to_disp = (x + 1) * progr_bar_size / max_cnt in
+    let already_disp = cnt * progr_bar_size / max_cnt in
+    let to_disp = (cnt + 1) * progr_bar_size / max_cnt in
     for i = already_disp + 1 to to_disp do {
       Printf.eprintf "%c" progr_bar_full
     };
-    let already_disp = x * progr_bar_cnt / max_cnt in
-    let to_disp = (x + 1) * progr_bar_cnt / max_cnt in
-    if cnt = 1 then Printf.eprintf " \008"
+    let already_disp = cnt * progr_bar_cnt / max_cnt in
+    let to_disp = (cnt + 1) * progr_bar_cnt / max_cnt in
+    if cnt = max_cnt - 1 then Printf.eprintf " \008"
     else if to_disp > already_disp then
       let k = to_disp mod progr_bar_draw_len in
       let k = if k < 0 then progr_bar_draw_len + k else k in
