@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.59 1999-02-24 08:54:19 ddr Exp $
+# $Id: lexicon.txt,v 1.60 1999-02-26 10:35:11 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1293,7 +1293,7 @@ de: Vornamen Alias
 en: first name alias
 eo: personnomo aliaso
 es: nombre alias
-fr: autre(s) pr&eacute;nom(s)
+fr: pr&eacute;nom alias
 he:  שם פרטי אחר
 it: alias del nome
 nl: alias voor voornaam

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.15 1999-02-02 10:23:47 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.16 1999-02-26 10:35:09 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -63,9 +63,14 @@ value encode s =
 ;
 
 value ged_1st_name base p =
+  let fn = sou base p.first_name in
   match p.first_names_aliases with
-  [ [n :: _] -> sou base n
-  | [] -> sou base p.first_name ]
+  [ [n :: _] ->
+      let fna = sou base n in
+      if String.length fna > String.length fn
+      && fn = String.sub fna 0 (String.length fn) then fna
+      else fn
+  | [] -> fn ]
 ;
 
 value ged_name base oc per =

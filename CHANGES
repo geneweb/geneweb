@@ -6,6 +6,8 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 26, 99] Displaying of first name alias in personal pages does
+    not include the surname any more.
   - [Feb 23, 99] In non leap years, birthday anniversaries of February 29
     are counted and celebrated March 1.
   - [Feb 19, 99] Replacement of "%s" by the name of the base with context,
@@ -23,6 +25,12 @@ included.
   - [Feb 6, 99] Accept dates with "/" (20/11/1993) although it is not
     standard Gedcom 5.5. Interpreted as day/month/year.
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [Feb 26, 99] Fixed error: the first name alias if any was always saved
+    in the gedcom as first name. Now saved only as first name if it starts
+    with the first name (e.g. if first name = "John" and first name alias =
+    "John Philip Robert").
+
 * GeneWeb compiler (gwc)
   - [Feb 19, 99] The option "-cg" did not work. Fixed.
 
@@ -30,7 +38,14 @@ included.
   - [Feb 16, 99] Fixed bug: names holding "?" were sometimes not saved
     correctly, so that gwc did not work afterwards.
 
+* Lexicon
+  - [Feb 26, 99] Small change in French translation.
+  - [Feb 11, 99..Feb 24, 99] Some changes in Swedish version and fixed some
+    errors in English version (Lars Gustavsson).
+
 * Documentation
+  - [Feb 26, 99] Small change in French version (translation of "first
+    name alias") in file update.htm, section 5.4.
   - [Feb 18, 99] Explained how to delete photos (new feature) in file
     "update.htm", (new) section 5.7. Some more changes in "start.htm",
     section "File a.cnf" and "update.htm" section 3 and 5.6.
