@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>Merging data bases</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>
+Merging data bases
+</font></h1></center>
+
+<form mode=GET action="merge">
+<input type=hidden name=lang value=$l>
+
+All your data bases to be merged must be first under
+<b><font color=#2f6400>GeneWeb</font></b>.
+
+<p>
+
+If it is not the case, if, for example, some of them are just GEDCOM
+files or GeneWeb source files, return to the <a
+href="gwsetup?lang=$l;v=main.htm">main menu</a> to create them under
+<b><font color=#2f6400>GeneWeb</font></b>, then go back to this page.
+
+<p>
+
+Once done, select the data bases you want to merge by pushing their
+associated buttons:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+<td><input type=checkbox name="$a" value="on_"></td>
+</tr>|
+<tr><td>- il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
+</table></dl>
+
+<p>
+
+Indicate the name you want to give to your resulting data base:
+
+<p>
+
+<input name=o size=30>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<input type=submit value="Merge">
+
+</form>
+
+<p>
+
+Remark: merging consists on simple concatenation of the data bases. There
+is no research for identical persons. After merging, you therefore have
+to research the possible doubled persons or families and merge them.
+See the <a href="file://$w/doc/$l/update.htm#MrgP">documentation</a>.
+

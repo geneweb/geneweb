@@ -29,6 +29,11 @@ GeneWeb version 3.11
     and "%nobility_title;", allowing to display the nobility titles
     differently (e.g. in a list <ul>..</ul>).
 
+* Setup program (gwsetup)
+  - [22 Jan 01] Added a page to merge data bases (French and English version
+    only). Updated the documentation to remove the comments telling that
+    this operation cannot be done under gwsetup.
+
 * GeneWeb to Gedcom (gwb2ged)
   - [18 Jan 01] Fixed problem for names with declinations: they were
     exported with all their declinations; now just the 'nominative'

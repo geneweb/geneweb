@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>Merging data bases</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>
+Merging data bases
+</font></h1></center>
+
+<p><p>
+
+<form mode=GET action="merge_1">
+<input type=hidden name=lang value=$l>
+</form>
+
+<p>
+
+$v{Warning: there already exists a data base with the name "$o" in your
+<a href="gwsetup?lang=$l;v=list.htm">directory</a>. If you push the button
+"Ok" below, it will be erased.<p>
+
+If you just made this, it is probably its result, and therefore it is
+not important. Else, return to the previous page and choose another
+name for your data base.<p>}
+
+<p>
+
+We are going to create a data base named "$o" from the following data bases:
+
+<ul>
+$s{<li>$a</b>|}
+</ul>
+
+<p>
+
+Remark: this operation can answer in the twinkling of a eye or take
+some tenths of seconds or some minutes, depending on the cases. Be
+patient.
+
+<p>
+
+Push the button below to create you data base$v{, and overwrite the previous
+data base "$o" of the target directory}:
+
+<p>
+
+<form mode=GET action="merge_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+For information, this operation corresponds to the following commands:
+
+<pre>
+     $$ cd $w
+$s{     $$ .$/gwu $a -o $a.gw|}     $$ .$/gwc $s{-sep $a.gw |}\-f -o $o
+</pre>
