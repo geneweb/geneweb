@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.28 2000-01-05 12:58:17 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.29 2000-01-05 21:24:50 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -898,9 +898,11 @@ value group_span_last_row t =
   let rec loop i =
     if i >= Array.length row then ()
     else
-      do if row.(i).elem = row.(i - 1).elem then
-           row.(i).span := row.(i - 1).span
-         else ();
+      do match row.(i).elem with
+         [ Elem _ | Ghost _ as x ->
+             if x = row.(i - 1).elem then row.(i).span := row.(i - 1).span
+             else ()
+         | _ -> () ];
       return loop (i + 1)
   in
   loop 1

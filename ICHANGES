@@ -5,6 +5,8 @@ GeneWeb Version 3.02
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jan 5, 00] Added the ability to add ";square=on" in URL when printing
+    a dag. Put a square around each person of the tree.
   - [Dec 14, 99] No more compatibility with old relationship request form e=...
   - [Dec 14, 99] Changed things so that adding ";em=R;ep=fn;en=sn" in
     the URL generates relationship computing with "fn sn" in welcome page
