@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 4.0 2001-03-16 19:34:53 ddr Exp $ *)
+(* $Id: pa_html.ml,v 4.1 2001-04-17 21:56:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Pcaml;
@@ -38,10 +38,12 @@ EXTEND
   expr: LEVEL "top"
     [ [ "tag"; (tn, al, el) = tag_body ->
           let el = tag_encloser loc tn True al el in
-          <:expr< do $list:el$ return () >>
+          ifndef NEWSEQ then MLast.ExSeq loc el (MLast.ExUid loc "()")
+          else MLast.ExSeq loc el
       | "stag"; (tn, al, el) = tag_body ->
           let el = tag_encloser loc tn False al el in
-          <:expr< do $list:el$ return () >> ] ]
+          ifndef NEWSEQ then MLast.ExSeq loc el (MLast.ExUid loc "()")
+          else MLast.ExSeq loc el ] ]
   ;
   tag_body:
     [ [ tn = STRING; a = OPT expr; "begin"; el = LIST0 expr_semi; "end" ->
