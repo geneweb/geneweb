@@ -63,6 +63,13 @@ GeneWeb version 3.08
   - [08 Sep 00] Added small documentation (a README file) for GeneWeb
     Web site administrators.
 
+* Base configuration files (base.gwf)
+  - [20 Sep 00] Deleted the change version 3.07 (on date: 28 Jul 00) about
+    the variable body_prop. Return to the previous behavior: defined as
+    empty or not defined => the default GeneWeb background is used. This
+    change was necessary 1/ by consistency with other variables 2/ to
+    make gwtp work correctly.
+
 * Documentation:
   - [20 Sep 00] Added another page (gwsetup.htm) to explain how to use
     gwsetup (French and English versions). Added two paragraphs in a
