@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.25 1999-01-28 14:53:08 ddr Exp $ *)
+(* $Id: perso.ml,v 1.26 1999-01-30 16:41:32 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -713,15 +713,6 @@ value print_ancestors_descends_cousins conf base p a =
   return ()
 ;
 
-value commd_no_params conf =
-  conf.command ^
-  List.fold_left
-    (fun c (k, v) ->
-       c ^ (if c = "" then "?" else ";") ^ k ^
-       (if v = "" then "" else "=" ^ v))
-    "" conf.henv
-;
-
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
 value print conf base p =
@@ -758,16 +749,7 @@ value print conf base p =
   let a = aoi base p.cle_index in
   do header conf title;
      print_sosa_if_any conf base p;
-     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-     let dir =
-       try
-         if Hashtbl.find conf.lexicon " !dir" = "rtl" then "left"
-         else "right" with
-       [ Not_found -> "right" ]
-     in
-     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\" align=%s>"
-       (commd conf) dir;
-     Wserver.wprint "</a>\n";
+     print_link_to_welcome conf True;
      if age_autorise conf base p then
        let photo_txt = capitale (transl conf "photo") in
        match sou base p.photo with

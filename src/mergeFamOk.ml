@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 1.6 1999-01-11 15:05:27 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 1.7 1999-01-30 16:41:31 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -88,6 +88,7 @@ value print_mod_merge_ok conf base wl fam cpl =
     Wserver.wprint "%s" (capitale (transl conf "merge done"))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      UpdateFamOk.print_family conf base wl fam cpl;
      match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
      [ (Some ini1, Some ini2) ->

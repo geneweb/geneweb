@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.11 1998-12-16 17:36:45 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.12 1999-01-30 16:41:33 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -520,6 +520,7 @@ value print_mod_ok conf base wl fam cpl =
     Wserver.wprint "%s" (capitale (transl conf "family modified"))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      print_family conf base wl fam cpl;
      trailer conf;
   return ()
@@ -530,6 +531,7 @@ value print_add_ok conf base wl fam cpl =
     Wserver.wprint "%s" (capitale (transl conf "family added"))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      print_family conf base wl fam cpl;
      trailer conf;
   return ()
@@ -540,6 +542,7 @@ value print_del_ok conf base wl =
     Wserver.wprint "%s" (capitale (transl conf "family deleted"))
   in
   do header conf title;
+     print_link_to_welcome conf False;
      Update.print_warnings conf base wl;
      trailer conf;
   return ()
@@ -550,6 +553,7 @@ value print_swi_ok conf base p =
     Wserver.wprint "%s" (capitale (transl conf "switch done"))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n";
      trailer conf;

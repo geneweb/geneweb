@@ -5,9 +5,10 @@ GeneWeb Version 1.11
   - [Jan 27, 99] Added Hebrew (Jonathan B. Marder)
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jan 30, 99] Added link to welcome page after updates.
   - [Jan 24, 99] Added default photo names: not necessary to specify a
     photo for someone, a default name is searched.
-  - [Jan 20, 99] Added display of latest deaths.
+  - [Jan 20, 99; Jan 30, 99] Added display of latest deaths.
   - [Jan 19, 99] Added direct links to siblings.
   - [Jan 18, 99] Family comment now displayed like dates (=> possible
     visibility by password restriction).
@@ -44,6 +45,9 @@ GeneWeb Version 1.11
     in english version to be sure there is no ambiguity.
   - [Jan 16, 99] Added declined forms.
   - [Jan 16, 99] Fixed typos in German version (Markus Mottl).
+
+* Welcome files (xx/start.txt)
+  - [Jan 30, 99] (en) Some changes in terms used (anniversaries).
 
 * Documentation
   - [Jan 29, 99] Added remark at end of introduction for how to redirect
