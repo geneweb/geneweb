@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.19 2005-02-03 01:50:45 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.20 2005-02-03 16:19:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -132,4 +132,8 @@ value set_consang : gen_ascend 'a -> Adef.fix -> unit;
 value find_free_occ : base -> string -> string -> int -> int;
 
 value input_lexicon :
-  string -> (unit -> in_channel) -> Hashtbl.t string string;
+  string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;
+
+(* for compatibility databases version <= 4.10 which are not in utf-8 *)
+
+value utf_8_db : ref bool;

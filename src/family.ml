@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.48 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: family.ml,v 4.49 2005-02-03 16:19:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -645,6 +645,17 @@ value treat_request_on_possibly_locked_base conf bfile log =
   match try Left (Iobase.input bfile) with e -> Right e with
   [ Left base ->
       do {
+        if Gutil.utf_8_db.val then ()
+        else do {
+          Name.utf_8.val := False;
+          Hashtbl.clear conf.lexicon;
+          let fname = Filename.concat "lang" "lexicon.txt" in
+          Gutil.input_lexicon conf.lang conf.lexicon
+            (fun () -> Secure.open_in (Util.search_in_lang_path fname));
+          conf.charset :=
+            try Hashtbl.find conf.lexicon " !charset" with
+            [ Not_found -> "iso-8859-1" ];
+        };
         try treat_request conf base log with exc ->
           do { base.func.cleanup (); raise exc };
         base.func.cleanup ();

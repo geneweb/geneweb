@@ -1,5 +1,9 @@
-GeneWeb version 4.11
+GeneWeb version 5.00
 --------------------
+
+Version allowing to mix pages in different languages (using utf-8 encoding).
+Databases version <= 4.10 can be read but this improvement is not available.
+Otherwise, by re-creating the database, the new encoding is set.
 
 * GeneWeb server or CGI (gwd)
   - [02 Jan 05] Each complete date has a link to the calendars page.

@@ -1,10 +1,11 @@
-(* $Id: iobase.ml,v 4.36 2005-01-09 08:26:44 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.37 2005-02-03 16:19:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwb = "GnWb001y";
+value magic_gwb = "GnWb0020";
+value magic_gwb_iso_8859_1 = "GnWb001y";
 
 (*
  Files in base (directory .gwb)
@@ -747,8 +748,10 @@ value check_magic =
   fun ic ->
     do {
       really_input ic b 0 (String.length b);
+      Gutil.utf_8_db.val := True;
       if b <> magic_gwb then
-        if String.sub magic_gwb 0 4 = String.sub b 0 4 then
+        if b = magic_gwb_iso_8859_1 then Gutil.utf_8_db.val := False
+        else if String.sub magic_gwb 0 4 = String.sub b 0 4 then
           failwith "this is a GeneWeb base, but not compatible"
         else
           failwith "this is not a GeneWeb base, or it is a very old version"
