@@ -13,6 +13,7 @@
 		Italian         Raffaele Sena
                 Norwegian       Brynjulf Langballe
 		Portuguese	Yves Guignard
+                Spanish         Luis Castro Guzman
 		Swedish		Lars Gustavsson
 
 	Documentation
