@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.55 2000-10-18 15:33:21 ddr Exp $ *)
+(* $Id: perso.ml,v 3.56 2000-10-19 03:47:20 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1170,7 +1170,7 @@ type token = [ LPAREN | RPAREN | DOT | IDENT of string ];
 
 value rec get_ident len =
   parser
-  [ [: `('a'..'z' | 'A'..'Z' | '_' | '%' as c); strm :] ->
+  [ [: `('a'..'z' | 'A'..'Z' | '_' as c); strm :] ->
       get_ident (Buff.store len c) strm
   | [: :] -> Buff.get len ]
 ;
@@ -1182,7 +1182,9 @@ value get_variable =
     | [: `';' :] -> []
     | [: :] -> [] ]
   in
-  parser [: v = get_ident 0; vl = var_kont :] -> (v, vl)
+  parser
+  [ [: `'%' :] -> ("%", [])
+  | [: v = get_ident 0; vl = var_kont :] -> (v, vl) ]
 ;
 
 value rec get_token =
@@ -1328,10 +1330,6 @@ type env =
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Enone ];
-
-value print_access conf base env p p_auth =
-  Wserver.wprint "%s" (acces conf base p)
-;
 
 value print_age conf base env p p_auth =
   if p_auth then
@@ -1825,7 +1823,7 @@ value print_variable conf base env s sl =
   in
   loop ep efam [s :: sl] where rec loop (p, a, u, p_auth) efam =
     fun
-    [ ["access"] -> print_access conf base env p p_auth
+    [ ["access"] -> Wserver.wprint "%s" (acces conf base p)
     | ["child" :: sl] ->
         match get_env "child" env with
         [ Eind p a u ->
@@ -1850,6 +1848,12 @@ value print_variable conf base env s sl =
            else person_text_without_surname conf base p)
     | ["dates"] ->
         if p_auth then Date.afficher_dates_courtes conf base p else ()
+    | ["fam_access"] ->
+        match efam with
+        [ Efam fam _ _ ->
+            Wserver.wprint "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
+              (Adef.int_of_iper p.cle_index)
+        | _ -> () ]
     | ["father" :: sl] ->
         match a.parents with
         [ Some ifam ->
@@ -1859,6 +1863,7 @@ value print_variable conf base env s sl =
             loop ep efam sl
         | None -> () ]
     | ["first_name"] -> Wserver.wprint "%s" (p_first_name base p)
+    | ["ind_access"] -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
     | ["mother" :: sl] ->
         match a.parents with
         [ Some ifam ->
@@ -2102,10 +2107,26 @@ value eval_bool_variable conf base env s sl =
     | [] -> False ]
 ;
 
+value split_at_coloncolon s =
+  loop 0 where rec loop i =
+    if i >= String.length s - 1 then None
+    else
+      match (s.[i], s.[i+1]) with
+      [ (':', ':') ->
+          let s1 = String.sub s 0 i in
+          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
+          Some (s1, s2)
+      | _ -> loop (i + 1) ]
+;
+
 value print_transl conf base env upp s c =
   let r =
     match c with
-    [ '0'..'9' -> transl_nth conf s (Char.code c - Char.code '0')
+    [ '0'..'9' ->
+        let n = Char.code c - Char.code '0' in
+        match split_at_coloncolon s with
+        [ None -> transl_nth conf s n
+        | Some (s1, s2) -> transl_decline conf s1 (transl_nth conf s2 n) ]
     | 'n' ->
         let n =
           match get_env "p" env with
