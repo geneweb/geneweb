@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.20 2000-05-14 16:43:52 ddr Exp $ *)
+(* $Id: perso.ml,v 3.21 2000-05-14 19:59:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -440,14 +440,10 @@ value print_family conf base p a ifam =
   let spouse = poi base ispouse in
   let children = des.children in
   let divorce = fam.divorce in
-  let is = index_of_sex p.sex in
   let auth = age_autorise conf base p && age_autorise conf base spouse in
   do Wserver.wprint "\n";
      html_li conf;
-     let format =
-       if fam.not_married then ftransl conf "relationship%t to"
-       else ftransl_nth conf "married%t to" is
-     in
+     let format = relation_txt conf p.sex fam in
      let txt =
        gen_referenced_person_title_text raw_access conf base (poi base ispouse)
      in

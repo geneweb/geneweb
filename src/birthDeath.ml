@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.10 2000-05-14 18:57:53 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.11 2000-05-14 19:59:33 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -219,8 +219,10 @@ value print_marriage conf base =
              afficher_personne_referencee conf base (poi base cpl.mother);
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>.\n"
-               (if fam.not_married then transl_nth conf "relation/relations" 0
-                else transl_nth conf "married" 1)
+               (match fam.relation with
+                [ NotMarried -> transl_nth conf "relation/relations" 0
+                | Married -> transl_nth conf "married" 1
+                | Engaged -> transl_nth conf "engaged" 1 ])
                (Date.string_of_ondate conf (Dgreg d cal));
           return (month_txt, future))
        ("", False) list

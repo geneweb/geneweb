@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.19 2000-05-14 18:07:36 ddr Exp $ *)
+(* $Id: util.mli,v 3.20 2000-05-14 19:59:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -112,6 +112,9 @@ value std_color : config -> string -> string;
 
 value index_of_sex : sex -> int;
 value spouse : iper -> couple -> iper;
+
+value relation_txt :
+  config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b;
 
 value incorrect_request : config -> unit;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.37 2000-04-11 02:08:51 ddr Exp $ *)
+(* $Id: relation.ml,v 3.38 2000-05-14 19:59:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -131,7 +131,8 @@ value print_menu conf base p =
                 do html_li conf;
                    Wserver.wprint "<input type=radio name=select value=%d>\n"
                      (Adef.int_of_iper c.cle_index);
-                   if fam.not_married && auth && age_autorise conf base c then
+                   if fam.relation = NotMarried && auth
+                   && age_autorise conf base c then
                      ()
                    else
                      Wserver.wprint "(%s)\n"

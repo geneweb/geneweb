@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.6 2000-05-03 09:50:42 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.7 2000-05-14 19:59:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -48,7 +48,7 @@ value no_family gen =
   let empty = unique_string gen "" in
   let fam =
     {marriage = Adef.codate_None; marriage_place = empty;
-     marriage_src = empty; witnesses = [| |]; not_married = False;
+     marriage_src = empty; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; comment = empty;
      origin_file = empty; fsources = empty; fam_index = Adef.ifam_of_int 0}
   and cpl =
@@ -389,7 +389,7 @@ value insert_family gen co witl fo deo =
      marriage_place = unique_string gen fo.marriage_place;
      marriage_src = unique_string gen fo.marriage_src;
      witnesses = Array.of_list witl;
-     not_married = fo.not_married;
+     relation = fo.relation;
      divorce = fo.divorce;
      comment = comment; origin_file = unique_string gen fo.origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int gen.g_fcnt}
