@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Recover a database - Phase 2</title></head>
+
+<body>
+
+<h1>Recover a database</h1>
+
+Directory
+
+<pre>
+  $a
+</pre>
+
+Select the database you want to recover:
+
+<p>
+
+<form mode=GET action="recover_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<dl><dd><table border=1>
+
+$y{<tr><td><input type=radio name=i value="$a"></td><td> $a </td></tr>|
+<tr><td>there is no databases in this directory</tr></td>}
+
+</table></dl>
+
+<p>
+
+Write the name you want to give to your database. By default, it will
+be the same in the new directory.
+
+<p>
+
+<dl><dd><input name=o size=30></dl>
+
+<p>
+
+You can select an option:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=ged value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Pass by a GEDCOM file. A priori, it is not recommended, but if it
+does not work with the normal procedure, try this option.</td></tr>
+
+</table></dl>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<input type=submit value="Recover">
+</form>

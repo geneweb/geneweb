@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Parameters "$a"</title></head>
+
+<body>
+
+<h1>Parameters "$a"</h1>
+
+<form mode=GET action="gwf_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<p>
+
+Here are the parameters of the base <a
+href="http://localhost:2317/$a">$a</a>. Change what you estimate
+necessary:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>body_prop</strong></td>
+<td>Allows to change the background color, put a background pattern,
+or change the color of the text or the links. Its syntax is the one
+of HTML accepted in the tag "&lt;body&gt;" before the "&gt;". See your
+HTML documentation. Example:
+<p>
+<pre>
+     text=#CC0000 vlink=yellow
+</pre>
+<p>
+Some interesting variables...
+<ul>
+<li>background: background image (see the <a
+href="setup?lang=$l;o=$a;v=backg.html">note</a>)
+<li>bgcolor: background color
+<li>text: text color
+<li>link: links color
+<li>vlink: color of already visited links
+</ul>
+<p>
+This applies non only to the welcome page but to all the displayed pages
+for this database.
+</td>
+</tr>
+
+<tr>
+<td colspan=2><input name=body_prop value="$B" size=60></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>default_lang</strong></td>
+<td>Default language.
+<p>
+If it is "-", the default language of the command "gwd" is applied.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>Chinese
+<option value=$L{dk}>Danish
+<option value=$L{nl}>Dutch
+<option value=$L{en}>English
+<option value=$L{eo}>Esperanto
+<option value=$L{fr}>French
+<option value=$L{de}>German
+<option value=$L{he}>Hebrew
+<option value=$L{it}>Italian
+<option value=$L{no}>Norwegian
+<option value=$L{pt}>Portuguese
+<option value=$L{es}>Spanish
+<option value=$L{se}>Swedish
+</select>
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>friend_passwd</strong></td>
+<td>Password for "friends".
+<p>
+"Friends" can see all dates, notes and photos of the persons born
+since less than one century. The ones who have not entered the below
+password will not see these informations.
+<p>
+If this area is empty, everybody is a "friend".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=friend_passwd value="$F" size=30></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>wizard_passwd</strong></td>
+<td>Password for "wizards".
+<p>
+"Wizards" can moreover make modifications in the database.
+<p>
+If this area is empty, everybody is a "wizard".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=wizard_passwd value="$W" size=30></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>can_send_image</strong></td>
+<td>Ability to send images.
+<p>
+If yes, the "wizards" are authorized to upload images.
+<p>
+Can be useful in local, in order to be able to put an image for somebody,
+because the procedure installs automatically the image at the right place
+with the appropriate file name.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type=radio name=can_send_image value=$I[yes]>Yes
+<input type=radio name=can_send_image value=$I[no]>No
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>wizard_just_friend</strong></td>
+<td>"Wizards" become simple "friend".
+<p>
+If yes, the "wizards" loose their power to make updates.
+<p>
+This can be useful, temporarilly, when you make a cleanup of your database,
+if it is accessible to Internet, to avoid that "wizards" make changes which
+would be lost during the operation (remember to suppress this option after
+cleanup).
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type=radio name=wizard_just_friend value=$J[yes]>Yes
+<input type=radio name=wizard_just_friend value=$J[no]>No
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>renamed</strong></td>
+<td>Base has been renamed.
+<p>
+If you changed the name of your database, but this database has been
+existed since a long time and you think that many people made links to
+it, keep this parameter file for this base and write here the new name
+of the database. People who consult the database with the old name
+receive then a page indicating them the new name to use with the same
+clickable request.
+<p>
+If this area is empty, the database has not been renamed.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=renamed value="$R" size=30></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td>
+If you want that a text appears in the bottom of each page, write it
+here. You can use HTML tags.
+</td>
+</tr>
+<tr>
+<td>
+<textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<dl><dd><input type=submit value="Apply"></dl>
+
+</form>

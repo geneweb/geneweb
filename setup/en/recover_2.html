@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Recover a database - Phase 3</title></head>
+
+<body>
+
+<h1>Recover a database</h1>
+
+$v{Warning: there already exists a database named "$o" in the
+<a href="setup?lang=$l;v=list.html">destination directory</a>. If you
+push the button below, it will be erased. If you just made this
+handling, it is probably its result, therefore it is not important.
+Otherwise, go back and choose another name for your database.<p>}
+
+Starting directory and database:
+
+<pre>
+  $a
+  $i
+</pre>
+
+Destination directory and database:
+
+<pre>
+  $w
+  $o
+</pre>
+
+<p>
+
+Warning: the operation can take several seconds or minutes, depending
+on the case. Be patient.
+
+<p>
+
+Push the below button to launch the operation$v{, and scratch the database
+"$o" of the destination directory}.
+
+<p>
+
+<form mode=GET action="recover_2">
+$h
+<dl><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+For information, this operation corresponds to the following commands:
+
+<pre>
+     $$ cd $a
+     $$ .$/$U $i $O $w$/$T
+     $$ cd $w
+     $$ .$/$C $T -o $o > comm.log
+</pre>
