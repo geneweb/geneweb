@@ -59,6 +59,8 @@ The new version number (4.00) is in honour of:
     %father_age_at_birth; and %mother_age_at_birth;
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [08 Mar 01] Recognizes now the "MACINTOSH" charset. It is not
+    standard, but there are GEDCOMs with this encoding, sometimes.
   - [03 Mar 01] In case of program failure, the message is displayed
     in standard output or in the log file. It is therefore visible
     in the "traces of the last command" of gwsetup.

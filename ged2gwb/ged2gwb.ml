@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.43 2001-03-07 03:13:14 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.44 2001-03-08 09:47:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -22,7 +22,7 @@ type month_number_dates =
   | MonthNumberHappened of string ]
 ;
 
-type charset = [ Ansel | Ascii | Msdos ];
+type charset = [ Ansel | Ascii | Msdos | MacIntosh ];
 
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
@@ -82,51 +82,66 @@ value rec line_start num =
 ;
 
 value ascii_of_msdos s =
-  let need_copy =
-    loop 0 where rec loop i =
-      if i == String.length s then False
-      else
-        match Char.code s.[i] with
-        [ 0o200 | 0o201 | 0o202 | 0o203 | 0o204 | 0o205 | 0o206 | 0o207
-        | 0o210 | 0o211 | 0o212 | 0o213 | 0o214 | 0o215 | 0o216 | 0o217
-        | 0o220 | 0o221 | 0o222 | 0o223 | 0o224 | 0o225 | 0o226 | 0o227
-        | 0o230 | 0o231 | 0o232 | 0o233 | 0o234 | 0o235 | 0o240 | 0o241
-        | 0o242 | 0o243 | 0o244 | 0o245 | 0o246 | 0o247 | 0o250 | 0o252
-        | 0o253 | 0o254 | 0o255 | 0o256 | 0o257 | 0o346 | 0o361 | 0o366
-        | 0o370 | 0o372 | 0o375 -> True
-        | _ -> loop (i + 1) ]
-  in
-  if need_copy then
-    let s' = String.create (String.length s) in
-    do for i = 0 to String.length s - 1 do
-         let cc =
-           match Char.code s.[i] with
-           [ 0o200 -> 0o307 | 0o201 -> 0o374 | 0o202 -> 0o351 | 0o203 -> 0o342
-           | 0o204 -> 0o344 | 0o205 -> 0o340 | 0o206 -> 0o345 | 0o207 -> 0o347
-           | 0o210 -> 0o352 | 0o211 -> 0o353 | 0o212 -> 0o350 | 0o213 -> 0o357
-           | 0o214 -> 0o356 | 0o215 -> 0o354 | 0o216 -> 0o304 | 0o217 -> 0o305
-           | 0o220 -> 0o311 | 0o221 -> 0o346 | 0o222 -> 0o306 | 0o223 -> 0o364
-           | 0o224 -> 0o366 | 0o225 -> 0o362 | 0o226 -> 0o373 | 0o227 -> 0o371
-           | 0o230 -> 0o377 | 0o231 -> 0o326 | 0o232 -> 0o334 | 0o233 -> 0o242
-           | 0o234 -> 0o243 | 0o235 -> 0o245 | 0o240 -> 0o341 | 0o241 -> 0o355
-           | 0o242 -> 0o363 | 0o243 -> 0o372 | 0o244 -> 0o361 | 0o245 -> 0o321
-           | 0o246 -> 0o252 | 0o247 -> 0o272 | 0o250 -> 0o277 | 0o252 -> 0o254
-           | 0o253 -> 0o275 | 0o254 -> 0o274 | 0o255 -> 0o241 | 0o256 -> 0o253
-           | 0o257 -> 0o273 | 0o346 -> 0o265 | 0o361 -> 0o261 | 0o366 -> 0o367
-           | 0o370 -> 0o260 | 0o372 -> 0o267 | 0o375 -> 0o262
-           | c -> c ]
-         in
-         s'.[i] := Char.chr cc;
-       done;
-    return s'
-  else s
+  let s' = String.create (String.length s) in
+  do for i = 0 to String.length s - 1 do
+       let cc =
+         match Char.code s.[i] with
+         [ 0o200 -> 0o307 | 0o201 -> 0o374 | 0o202 -> 0o351 | 0o203 -> 0o342
+         | 0o204 -> 0o344 | 0o205 -> 0o340 | 0o206 -> 0o345 | 0o207 -> 0o347
+         | 0o210 -> 0o352 | 0o211 -> 0o353 | 0o212 -> 0o350 | 0o213 -> 0o357
+         | 0o214 -> 0o356 | 0o215 -> 0o354 | 0o216 -> 0o304 | 0o217 -> 0o305
+         | 0o220 -> 0o311 | 0o221 -> 0o346 | 0o222 -> 0o306 | 0o223 -> 0o364
+         | 0o224 -> 0o366 | 0o225 -> 0o362 | 0o226 -> 0o373 | 0o227 -> 0o371
+         | 0o230 -> 0o377 | 0o231 -> 0o326 | 0o232 -> 0o334 | 0o233 -> 0o242
+         | 0o234 -> 0o243 | 0o235 -> 0o245 | 0o240 -> 0o341 | 0o241 -> 0o355
+         | 0o242 -> 0o363 | 0o243 -> 0o372 | 0o244 -> 0o361 | 0o245 -> 0o321
+         | 0o246 -> 0o252 | 0o247 -> 0o272 | 0o250 -> 0o277 | 0o252 -> 0o254
+         | 0o253 -> 0o275 | 0o254 -> 0o274 | 0o255 -> 0o241 | 0o256 -> 0o253
+         | 0o257 -> 0o273 | 0o346 -> 0o265 | 0o361 -> 0o261 | 0o366 -> 0o367
+         | 0o370 -> 0o260 | 0o372 -> 0o267 | 0o375 -> 0o262
+         | c -> c ]
+       in
+       s'.[i] := Char.chr cc;
+     done;
+  return s'
+;
+
+value ascii_of_macintosh s =
+  let s' = String.create (String.length s) in
+  do for i = 0 to String.length s - 1 do
+       let cc =
+         match Char.code s.[i] with
+         [ 0o200 -> 0o304 | 0o201 -> 0o305 | 0o202 -> 0o307 | 0o203 -> 0o311
+         | 0o204 -> 0o321 | 0o205 -> 0o326 | 0o206 -> 0o334 | 0o207 -> 0o341
+         | 0o210 -> 0o340 | 0o211 -> 0o342 | 0o212 -> 0o344 | 0o213 -> 0o343
+         | 0o214 -> 0o345 | 0o215 -> 0o347 | 0o216 -> 0o351 | 0o217 -> 0o350
+         | 0o220 -> 0o352 | 0o221 -> 0o353 | 0o222 -> 0o355 | 0o223 -> 0o354
+         | 0o224 -> 0o356 | 0o225 -> 0o357 | 0o226 -> 0o361 | 0o227 -> 0o363
+         | 0o230 -> 0o362 | 0o231 -> 0o364 | 0o232 -> 0o366 | 0o233 -> 0o365
+         | 0o234 -> 0o372 | 0o235 -> 0o371 | 0o236 -> 0o373 | 0o237 -> 0o374
+         | 0o241 -> 0o260 | 0o244 -> 0o247 | 0o245 -> 0o267 | 0o246 -> 0o266
+         | 0o247 -> 0o337 | 0o250 -> 0o256 | 0o256 -> 0o306 | 0o257 -> 0o330
+         | 0o264 -> 0o245 | 0o273 -> 0o252 | 0o274 -> 0o272 | 0o276 -> 0o346
+         | 0o277 -> 0o370 | 0o300 -> 0o277 | 0o301 -> 0o241 | 0o302 -> 0o254
+         | 0o307 -> 0o253 | 0o310 -> 0o273 | 0o312 -> 0o040 | 0o313 -> 0o300
+         | 0o314 -> 0o303 | 0o315 -> 0o325 | 0o320 -> 0o255 | 0o326 -> 0o367
+         | 0o330 -> 0o377 | 0o345 -> 0o302 | 0o346 -> 0o312 | 0o347 -> 0o301
+         | 0o350 -> 0o313 | 0o351 -> 0o310 | 0o352 -> 0o315 | 0o353 -> 0o316
+         | 0o354 -> 0o317 | 0o355 -> 0o314 | 0o356 -> 0o323 | 0o357 -> 0o324
+         | 0o361 -> 0o322 | 0o362 -> 0o332 | 0o363 -> 0o333 | 0o364 -> 0o331
+         | c -> c ]
+       in
+       s'.[i] := Char.chr cc;
+     done;
+  return s'
 ;
 
 value ascii_of_string s =
   match charset.val with
   [ Ansel -> Ansel.to_iso_8859_1 s
   | Ascii -> s
-  | Msdos -> ascii_of_msdos s ]
+  | Msdos -> ascii_of_msdos s
+  | MacIntosh -> ascii_of_macintosh s ]
 ;
 
 value rec get_lev n =
@@ -1594,6 +1609,7 @@ value treat_header2 gen r =
           match r.rval with
           [ "ANSEL" -> charset.val := Ansel
           | "ASCII" | "IBMPC" -> charset.val := Ascii
+          | "MACINTOSH" -> charset.val := MacIntosh
           | _ -> charset.val := Ascii ]
       | None -> () ] ]
 ;
