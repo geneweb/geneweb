@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.4 1998-09-29 16:12:23 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.5 1998-09-30 07:29:27 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -71,7 +71,7 @@ value print_surname conf base p =
     end;
     tag "td" begin
       Wserver.wprint "<input name=surname size=40 maxlength=200 value=\"%s\">"
-        p.surname;
+        (f_coa conf p.surname);
     end;
     tag "td" begin Wserver.wprint "%s" (capitale (transl conf "sex")); end;
     tag "td" begin
@@ -94,7 +94,8 @@ value print_public_name conf base p =
     end;
     tag "td" "colspan=3" begin
       Wserver.wprint "<input name=public_name size=40";
-      if p.public_name <> "" then Wserver.wprint " value=\"%s\"" p.public_name
+      if p.public_name <> "" then
+        Wserver.wprint " value=\"%s\"" (f_coa conf p.public_name)
       else ();
       Wserver.wprint ">";
     end;
@@ -108,7 +109,7 @@ value print_photo conf base p =
     end;
     tag "td" "colspan=3" begin
       Wserver.wprint "<input name=photo size=50";
-      if p.photo <> "" then Wserver.wprint " value=\"%s\"" p.photo
+      if p.photo <> "" then Wserver.wprint " value=\"%s\"" (f_coa conf p.photo)
       else ();
       Wserver.wprint ">";
     end;
@@ -121,12 +122,11 @@ type item =
 
 value gen_print_ext_item conf base item i_cnt i_val =
   tag "tr" begin
-    tag "td" begin
-      Wserver.wprint "%s" (capitale item.i_txt_name);
-    end;
+    tag "td" begin Wserver.wprint "%s" (capitale item.i_txt_name); end;
     tag "td" begin
       Wserver.wprint "<input name=\"%s%d\" size=30" item.i_name i_cnt;
-      if i_val <> "" then Wserver.wprint " value=\"%s\"" i_val else ();
+      if i_val <> "" then Wserver.wprint " value=\"%s\"" (f_coa conf i_val)
+      else ();
       Wserver.wprint ">";
     end;
     tag "td" begin Wserver.wprint "%s" (capitale item.i_txt_add); end;
@@ -194,7 +194,7 @@ value print_birth_place conf base p =
     tag "td" begin
       Wserver.wprint "<input name=birth_place size=40 maxlength=200%s>\n"
         (if p.birth_place = "" then ""
-         else " value=\"" ^ p.birth_place ^ "\"");
+         else " value=\"" ^ f_coa conf p.birth_place ^ "\"");
     end;
   end
 ;
@@ -210,7 +210,7 @@ value print_bapt_place conf base p =
     tag "td" begin
       Wserver.wprint "<input name=bapt_place size=40 maxlength=200%s>\n"
         (if p.baptism_place = "" then ""
-         else " value=\"" ^ p.baptism_place ^ "\"");
+         else " value=\"" ^ f_coa conf p.baptism_place ^ "\"");
     end;
   end
 ;
@@ -251,7 +251,7 @@ value print_death_place conf base p =
      tag "td" begin
        Wserver.wprint "<input name=death_place size=40 maxlength=200%s>\n"
          (if p.death_place = "" then ""
-          else " value=\"" ^ p.death_place ^ "\"");
+          else " value=\"" ^ f_coa conf p.death_place ^ "\"");
      end;
   return ()
 ;
@@ -306,7 +306,7 @@ value print_burial_place conf base p =
      tag "td" begin
        Wserver.wprint "<input name=burial_place size=40 maxlength=200%s>\n"
          (if p.burial_place = "" then ""
-          else " value=\"" ^ p.burial_place ^ "\"");
+          else " value=\"" ^ f_coa conf p.burial_place ^ "\"");
      end;
   return ()
 ;
@@ -345,7 +345,7 @@ value print_title conf base t cnt =
          tag "td" begin
            Wserver.wprint "<input name=t_title%d size=15%s>" cnt
              (match t with
-              [ Some {t_title = n} -> " value=\"" ^ n ^ "\""
+              [ Some {t_title = n} -> " value=\"" ^ f_coa conf n ^ "\""
               | _ -> "" ]);
          end;
          tag "td" begin
@@ -354,7 +354,7 @@ value print_title conf base t cnt =
          tag "td" "colspan=2" begin
            Wserver.wprint "<input name=t_place%d size=30%s>" cnt
              (match t with
-              [ Some {t_place = n} -> " value=\"" ^ n ^ "\""
+              [ Some {t_place = n} -> " value=\"" ^ f_coa conf n ^ "\""
             | _ -> "" ]);
          end;
        end;
@@ -366,7 +366,7 @@ value print_title conf base t cnt =
          tag "td" begin
            Wserver.wprint "<input name=t_name%d size=20%s>" cnt
              (match t with
-              [ Some {t_name = Tname n} -> " value=\"" ^ n ^ "\""
+              [ Some {t_name = Tname n} -> " value=\"" ^ f_coa conf n ^ "\""
               | _ -> "" ]);
          end;
          tag "td" begin
@@ -431,7 +431,8 @@ value print_source conf base field =
            Wserver.wprint "<input name=%s size=50 maxlength=200%s>\n"
              "src"
              (match field with
-              [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
+              [ s when s <> "" ->
+                  " value=\"" ^ quote_escaped (f_coa conf s) ^ "\""
               | _ -> "" ]);
          end;
        end;
@@ -449,7 +450,8 @@ value print_occupation conf base p =
          tag "td" begin
            Wserver.wprint "<input name=occu size=50 maxlength=200%s>\n"
              (match p.occupation with
-              [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
+              [ s when s <> "" ->
+                  " value=\"" ^ quote_escaped (f_coa conf s) ^ "\""
               | _ -> "" ]);
          end;
        end;
@@ -480,7 +482,8 @@ value print_access conf base p =
 
 value print_notes conf base p =
   do stag "textarea" "name=notes rows=6 cols=70 wrap=virtual" begin
-       if p.notes <> "" then Wserver.wprint "%s" (quote_escaped p.notes)
+       if p.notes <> "" then
+         Wserver.wprint "%s" (quote_escaped (f_coa conf p.notes))
        else ();
      end;
      Wserver.wprint "\n";

@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 1.1 1998-09-29 16:12:14 ddr Exp $ *)
+(* $Id: ansel.ml,v 1.2 1998-09-30 07:29:22 ddr Exp $ *)
 
 value no_accent =
   fun
@@ -124,6 +124,7 @@ value uml =
   | 'i' -> 'ï'
   | 'o' -> 'ö'
   | 'u' -> 'ü'
+  | 'y' -> 'ÿ'
   | 'A' -> 'Ä'
   | 'E' -> 'Ë'
   | 'I' -> 'Ï'
@@ -164,7 +165,7 @@ value to_iso_8859_1 s =
       else if i == String.length s - 1 then len + 1
       else
         match Char.code s.[i] with
-        [ 225 | 226 | 227 | 228 | 232 | 240 -> loop (i + 1) len
+        [ 225 | 226 | 227 | 228 | 232 | 234 | 240 -> loop (i + 1) len
         | _ -> loop (i + 1) (len + 1) ]
   in
   if len == String.length s then s

@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.5 1998-09-29 16:12:21 ddr Exp $ *)
+(* $Id: perso.ml,v 1.6 1998-09-30 07:29:24 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -47,9 +47,9 @@ value
      Wserver.wprint "\n<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n" (commd conf)
        (code_varenv (sou base title))
        (code_varenv (sou base (List.hd places)));
-     Wserver.wprint "%s"
-       (if first then capitale (sou base title) else sou base title);
-     Wserver.wprint " %s" (sou base (List.hd places));
+     let tit = coa conf (sou base title) in
+     Wserver.wprint "%s" (if first then capitale tit else tit);
+     Wserver.wprint " %s" (coa conf (sou base (List.hd places)));
      Wserver.wprint "</a>";
      let rec loop places =
        do match places with
@@ -62,7 +62,7 @@ value
            do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n"
                 (commd conf) (code_varenv (sou base title))
                 (code_varenv (sou base place));
-              Wserver.wprint "%s</a>" (sou base place);
+              Wserver.wprint "%s</a>" (coa conf (sou base place));
            return loop places
        | _ -> () ]
      in
@@ -85,7 +85,7 @@ value
     match name with
     [ Tname n ->
         do if not first then Wserver.wprint " ," else ();
-           Wserver.wprint "%s" (sou base n);
+           Wserver.wprint "%s" (coa conf (sou base n));
         return False
     | _ -> first ]
   in
@@ -465,7 +465,8 @@ value print_not_empty_src conf base first txt isrc =
        else ();
        Wserver.wprint "<br>-\n";
        first.val := False;
-       Wserver.wprint "<font size=-1><em>%s: %s</em></font>\n" (txt ()) src;
+       Wserver.wprint "<font size=-1><em>%s: %s</em></font>\n" (txt ())
+         (coa conf src);
     return ()
 ;
 
@@ -520,14 +521,18 @@ value print conf base p =
   let title h =
     match (sou base p.public_name, p.nick_names) with
     [ (n, [nn :: _]) when n <> "" ->
-        if h then Wserver.wprint "%s %s" n (sou base nn)
-        else Wserver.wprint "%s <em>%s</em>" n (sou base nn)
-    | (n, []) when n <> "" -> Wserver.wprint "%s %s" n (sou base p.surname)
-    | (_, [nn :: _]) ->
-        if h then Wserver.wprint "%s %s" (sou base p.first_name) (sou base nn)
+        if h then Wserver.wprint "%s %s" n (coa conf (sou base nn))
         else
-          Wserver.wprint "%s <em>%s</em>" (sou base p.first_name)
-            (sou base nn)
+          Wserver.wprint "%s <em>%s</em>" (coa conf n) (coa conf (sou base nn))
+    | (n, []) when n <> "" ->
+        Wserver.wprint "%s %s" (coa conf n) (coa conf (sou base p.surname))
+    | (_, [nn :: _]) ->
+        if h then
+          Wserver.wprint "%s %s" (coa conf (sou base p.first_name))
+            (coa conf (sou base nn))
+        else
+          Wserver.wprint "%s <em>%s</em>" (coa conf (sou base p.first_name))
+            (coa conf (sou base nn))
     | (_, []) ->
         if h then
           Wserver.wprint "%s %s"
@@ -571,19 +576,23 @@ value print conf base p =
      [ (n, [_ :: nnl]) when sou base n <> "" ->
          let n = sou base n in
          List.iter
-           (fun nn -> Wserver.wprint "%s <em>%s</em><br>\n" n (sou base nn))
+           (fun nn ->
+              Wserver.wprint "%s <em>%s</em><br>\n" (coa conf n)
+                (coa conf (sou base nn)))
            nnl
      | (_, [_ :: nnl]) ->
          let n = sou base p.first_name in
          List.iter
-           (fun nn -> Wserver.wprint "%s <em>%s</em><br>\n" n (sou base nn))
+           (fun nn ->
+              Wserver.wprint "%s <em>%s</em><br>\n" (coa conf n)
+                (coa conf (sou base nn)))
            nnl
      | _ -> () ];
      let is = index_of_sex p.sexe in
      List.iter
        (fun a ->
           Wserver.wprint "%s <em><strong>%s</strong></em><br>\n"
-            (capitale (transl conf "alias")) (sou base a))
+            (capitale (transl conf "alias")) (coa conf (sou base a)))
        p.aliases;
      if List.length p.titles > 0 &&
         (p.access <> Private || conf.friend || conf.wizard) then
@@ -605,8 +614,9 @@ value print conf base p =
          return () ];
      List.iter
        (fun n ->
-          Wserver.wprint "<em>(%s %s)</em>\n<br>\n" (sou base p.first_name)
-            (sou base n))
+          Wserver.wprint "<em>(%s %s)</em>\n<br>\n"
+            (coa conf (sou base p.first_name))
+            (coa conf (sou base n)))
        p.surnames_aliases;
      if age_autorise conf base p then
        List.iter
@@ -626,7 +636,7 @@ value print conf base p =
      [ "" -> ()
      | s ->
          if age_autorise conf base p then
-           Wserver.wprint "<em>%s</em>\n<br>\n" (capitale s)
+           Wserver.wprint "<em>%s</em>\n<br>\n" (capitale (coa conf s))
          else () ];
      print_dates conf base p;
      if age_autorise conf base p && a.consang != Adef.fix (-1) &&

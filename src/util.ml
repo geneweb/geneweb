@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.5 1998-09-29 16:12:26 ddr Exp $ *)
+(* $Id: util.ml,v 1.6 1998-09-30 07:29:28 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -43,15 +43,11 @@ value coa = charset_of_ansel;
 value nl () = Wserver.wprint "\r\n";
 
 value html conf =
-  let charset =
-    try Hashtbl.find conf.lexicon " !charset" with
-    [ Not_found -> "iso-8859-1" ]
-  in
   if conf.cgi then
-    do Wserver.wprint "Content-type: text/html; charset=%s" charset;
+    do Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
        nl (); nl ();
     return ()
-  else Wserver.html charset
+  else Wserver.html conf.charset
 ;
 
 value rindex s conf =
@@ -268,17 +264,18 @@ value afficher_personne_un_titre_referencee conf base p t =
        match (t.t_name, p.nick_names) with
        [ (Tname n, []) ->
            Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-             (acces conf base p) (sou base n)
+             (acces conf base p) (coa conf (sou base n))
        | (Tname n, [nn :: _]) ->
            Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-             (acces conf base p) (sou base n) (sou base nn)
+             (acces conf base p) (coa conf (sou base n))
+             (coa conf (sou base nn))
        | _ -> afficher_prenom_de_personne_referencee conf base p ]
      else
        match t.t_name with
        [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
        | _ -> afficher_personne_referencee conf base p ];
-     Wserver.wprint ", <em>%s %s</em>" (sou base t.t_title)
-       (sou base t.t_place);
+     Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_title))
+       (coa conf (sou base t.t_place));
   return ()
 ;
 
@@ -507,7 +504,7 @@ value copy_from_file fname =
 value trailer conf =
   do try copy_from_file "copyr" with _ ->
        Wserver.wprint "
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+<p><hr><font size=-1><em>(c) Copyright INRIA 1998 -
 GeneWeb %s</em></font><br>\n" version;
      let trl_fname =
        List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]

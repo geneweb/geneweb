@@ -1,4 +1,4 @@
-(* $Id: alln.ml,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: alln.ml,v 1.2 1998-09-30 07:29:22 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -59,9 +59,11 @@ value print_all mode conf senv base is_fam liste len par_frequence =
   do header conf title;
      print_alphab_list
        (fun (x, c, _) ->
+          let x = coa conf x in
           if par_frequence then string_of_int c
           else String.sub x (initiale x) 1)
        (fun (x, c, istr) ->
+          let x = coa conf x in
           do Wserver.wprint "<a href=\"%sm=%s%s;v=%s\">" (commd conf) mode
                senv (code_varenv (sou base istr));
              Wserver.wprint "%s</a>%s\n"
@@ -77,8 +79,10 @@ value print_elem mode conf base senv is_fam par_frequence (x, c, istr) =
   do Wserver.wprint "<a href=\"%sm=%s%s;" (commd conf) mode senv;
      Wserver.wprint "v=%s" (code_varenv (sou base istr));
      Wserver.wprint "\">";
-     if is_fam then Wserver.wprint "%s%s" (surname_end x) (surname_begin x)
-     else Wserver.wprint "%s" x;
+     if is_fam then
+       Wserver.wprint "%s%s" (coa conf (surname_end x))
+         (coa conf (surname_begin x))
+     else Wserver.wprint "%s" (coa conf x);
      Wserver.wprint "</a>";
      if not par_frequence then Wserver.wprint " (%d)" c else ();
      Wserver.wprint "\n";

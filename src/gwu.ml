@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.2 1998-09-29 12:22:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.3 1998-09-30 07:29:23 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -47,7 +47,7 @@ value starting_char =
 ;
 
 value correct_string base is =
-  let s = sou base is in
+  let s = Ansel.to_iso_8859_1 (sou base is) in
   loop 0 0 where rec loop i len =
     if i == String.length s then get_buff len
     else
@@ -315,7 +315,7 @@ value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
      | s -> Printf.fprintf oc "src %s\n" (correct_string base fam.fsources) ];
      match fam.comment with
      [ txt when sou base txt <> "" ->
-         Printf.fprintf oc "comm %s\n" (sou base txt)
+         Printf.fprintf oc "comm %s\n" (Ansel.to_iso_8859_1 (sou base txt))
      | _ -> () ];
      let print_sources =
        match common_children_sources base fam.children with
@@ -373,7 +373,7 @@ value print_notes_for_person oc base ip =
        (correct_string base p.first_name)
        (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
      Printf.fprintf oc "beg\n";
-     Printf.fprintf oc "%s\n" (sou base p.notes);
+     Printf.fprintf oc "%s\n" (Ansel.to_iso_8859_1 (sou base p.notes));
      Printf.fprintf oc "end notes\n";
   return ()
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.2 1998-09-29 12:22:44 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.3 1998-09-30 07:29:26 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -321,13 +321,13 @@ value print_swi1 conf base p fam1 fam2 =
        (capitale (transl conf "switch the order of the following families"));
      tag "ul" begin
        Wserver.wprint "<li>\n";
-       Update.print_someone base (poi base cpl1.father);
+       Update.print_someone conf base (poi base cpl1.father);
        Wserver.wprint " %s " (transl conf "and");
-       Update.print_someone base (poi base cpl1.mother);
+       Update.print_someone conf base (poi base cpl1.mother);
        Wserver.wprint "<li>\n";
-       Update.print_someone base (poi base cpl2.father);
+       Update.print_someone conf base (poi base cpl2.father);
        Wserver.wprint " %s " (transl conf "and");
-       Update.print_someone base (poi base cpl2.mother);
+       Update.print_someone conf base (poi base cpl2.mother);
      end;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
