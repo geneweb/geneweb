@@ -1,6 +1,10 @@
 GeneWeb version 4.01
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [13 Mar 01] Fixed problem in displaying "anniversaries month"
+    in Estonian: the month appeared with all its declinations.
+
 GeneWeb version 4.00
 --------------------
 
