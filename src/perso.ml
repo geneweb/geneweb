@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.8 2001-04-19 19:16:59 ddr Exp $ *)
+(* $Id: perso.ml,v 4.9 2001-04-22 03:31:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -36,18 +36,19 @@ value print_marriage_text conf base in_perso fam =
       match (marriage, marriage_place) with
       [ (None, "") -> ()
       | _ -> Wserver.wprint "</em>" ]
-    else ();
+    else ()
   }
 ;
 
 value print_title conf base and_txt p (nth, name, title, places, dates) =
+  let href =
+    "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
+      code_varenv (sou base (List.hd places))
+  in
+  let (tit, est) = (sou base title, sou base (List.hd places)) in
+  let s = tit ^ " " ^ est in
   do {
-    let href =
-      "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
-        code_varenv (sou base (List.hd places))
-    in
-    let (tit, est) = (sou base title, sou base (List.hd places)) in
-    let s = tit ^ " " ^ est in wprint_geneweb_link conf href s;
+    wprint_geneweb_link conf href s;
     let rec loop places =
       do {
         match places with
@@ -116,7 +117,7 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
       in
       ()
     else ();
-    if paren then Wserver.wprint ")" else ();
+    if paren then Wserver.wprint ")" else ()
   }
 ;
 
@@ -165,7 +166,7 @@ value print_titles conf base cap and_txt p =
        do {
          if not first then Wserver.wprint "," else ();
          Wserver.wprint "\n";
-         print_title conf base and_txt p t;
+         print_title conf base and_txt p t
        })
     titles
 ;
@@ -213,8 +214,8 @@ value find_sosa_aux conf base a p =
   let rec find z ip =
     if ip = a.cle_index then Some z
     else if mark.(Adef.int_of_iper ip) then None
-    else
-      do mark.(Adef.int_of_iper ip) := True; return
+    else do {
+      mark.(Adef.int_of_iper ip) := True;
       let asc = aoi base ip in
       match asc.parents with
       [ Some ifam ->
@@ -224,6 +225,7 @@ value find_sosa_aux conf base a p =
           [ Some z -> Some z
           | None -> find (Num.inc z 1) cpl.mother ]
       | None -> None ]
+    }
   in
   find Num.one p.cle_index
 ;
@@ -408,7 +410,7 @@ value print_consanguinity conf base env a p_auth =
   if p_auth then do {
     print_decimal_num conf
       (round_2_dec (Adef.float_of_fix a.consang *. 100.0));
-    Wserver.wprint "%%";
+    Wserver.wprint "%%"
   }
   else ()
 ;
@@ -424,7 +426,7 @@ value print_death_age conf base env p p_auth =
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else
             Wserver.wprint "%s " (transl_decline conf "possibly (date)" "");
-          Date.print_age conf a;
+          Date.print_age conf a
         }
     | _ -> () ]
   else ()
@@ -471,7 +473,7 @@ value print_divorce_date conf base env p p_auth =
               do {
                 Wserver.wprint " <em>";
                 Wserver.wprint "%s" (Date.string_of_ondate conf d);
-                Wserver.wprint "</em>";
+                Wserver.wprint "</em>"
               }
           | _ -> () ]
       | _ -> () ]
@@ -546,7 +548,7 @@ value obsolete var new_var =
 *** <W> perso.txt: variable \"%%%s;\" obsolete; use rather \"%%%s;\"
 " var new_var;
     flush stderr;
-    obsolete_list.val := [var :: obsolete_list.val];
+    obsolete_list.val := [var :: obsolete_list.val]
   }
   else ()
 ;
@@ -646,7 +648,7 @@ value print_prefix_no_templ conf base env =
       (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
       conf.henv []
   in
-  do { conf.henv := henv; Wserver.wprint "%s" (commd conf); }
+  do { conf.henv := henv; Wserver.wprint "%s" (commd conf) }
 ;
 
 value print_public_name conf base env p p_auth =
@@ -878,7 +880,7 @@ value print_variable conf base env sl =
         list_iter_first
           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
           sl;
-        Wserver.wprint "???";
+        Wserver.wprint "???"
       } ]
 ;
 
@@ -1185,7 +1187,7 @@ and eval_foreach conf base env s sl al =
       do {
         Wserver.wprint "foreach ";
         List.iter (fun s -> Wserver.wprint "%s." s) sl;
-        Wserver.wprint "%s???" s;
+        Wserver.wprint "%s???" s
       }
   | None -> () ]
 and eval_simple_foreach conf base env al ep efam =
@@ -1316,7 +1318,7 @@ and eval_foreach_related conf base env al (p, _, _, p_auth) =
                       let env = [("rel", Vrel r) :: env] in
                       List.iter (eval_ast conf base env) al
                     else ()
-                | None -> () ];
+                | None -> () ]
               })
            c.rparents)
       p.related
@@ -1432,12 +1434,12 @@ value print_ok conf base p =
   if conf.wizard || conf.friend || not (is_restricted conf base p) then do {
     let astl = Templ.input conf base "perso" in
     html conf;
-    interp_templ conf base p astl;
+    interp_templ conf base p astl
   }
   else do {
     Util.header conf (fun _ -> Wserver.wprint "Restricted");
     Util.print_link_to_welcome conf True;
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 

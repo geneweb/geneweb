@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 4.0 2001-03-16 19:35:03 ddr Exp $ *)
+(* $Id: title.ml,v 4.1 2001-04-22 03:31:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -12,57 +12,65 @@ type date_search = [ JustSelf | AddSpouse | AddChildren ];
 value infinity = 10000;
 
 value date_interval conf base t x =
-  let d1 = ref {day = 0; month = 0; year = infinity; prec = Sure; delta = 0} in
+  let d1 =
+    ref {day = 0; month = 0; year = infinity; prec = Sure; delta = 0}
+  in
   let d2 = ref {day = 0; month = 0; year = 0; prec = Sure; delta = 0} in
   let found = ref False in
-  do let rec loop t x =
-       let set d =
-         do if strictement_avant_dmy d d1.val then d1.val := d else ();
-            if strictement_apres_dmy d d2.val then d2.val := d else ();
-            found.val := True;
-         return ()
-       in
-       do match Adef.od_of_codate x.birth with
-          [ Some (Dgreg d _) -> set d
-          | _ -> () ];
-          match date_of_death x.death with
-          [ Some (Dgreg d _) -> set d
-          | _ -> if x.death = NotDead then set conf.today else () ];
-          List.iter
-            (fun t ->
-               do match Adef.od_of_codate t.t_date_start with
-                  [ Some (Dgreg d _) -> set d
-                  | _ -> () ];
-                  match Adef.od_of_codate t.t_date_end with
-                  [ Some (Dgreg d _) -> set d
-                  | _ -> () ];
-               return ())
-            x.titles;
-          match t with
-          [ JustSelf -> ()
-          | _ ->
-              let u = uoi base x.cle_index in
-              Array.iter
-                (fun ifam ->
-                   let fam = foi base ifam in
-                   let md = fam.marriage in
-                   let conj = spouse x.cle_index (coi base ifam) in
-                   do match Adef.od_of_codate md with
-                      [ Some (Dgreg d _) -> set d
-                      | _ -> () ];
-                      loop JustSelf (poi base conj);
-                      match t with
-                      [ AddChildren ->
-                          let des = doi base ifam in
-                          Array.iter (fun e -> loop JustSelf (poi base e))
-                            des.children
-                      | _ -> () ];
-                   return ())
-                u.family ];
-       return ()
-     in
-     loop t x;
-  return if found.val then Some (d1.val, d2.val) else None
+  do {
+    let rec loop t x =
+      let set d =
+        do {
+          if strictement_avant_dmy d d1.val then d1.val := d else ();
+          if strictement_apres_dmy d d2.val then d2.val := d else ();
+          found.val := True;
+        }
+      in
+      do {
+        match Adef.od_of_codate x.birth with
+        [ Some (Dgreg d _) -> set d
+        | _ -> () ];
+        match date_of_death x.death with
+        [ Some (Dgreg d _) -> set d
+        | _ -> if x.death = NotDead then set conf.today else () ];
+        List.iter
+          (fun t ->
+             do {
+               match Adef.od_of_codate t.t_date_start with
+               [ Some (Dgreg d _) -> set d
+               | _ -> () ];
+               match Adef.od_of_codate t.t_date_end with
+               [ Some (Dgreg d _) -> set d
+               | _ -> () ];
+             })
+          x.titles;
+        match t with
+        [ JustSelf -> ()
+        | _ ->
+            let u = uoi base x.cle_index in
+            Array.iter
+              (fun ifam ->
+                 let fam = foi base ifam in
+                 let md = fam.marriage in
+                 let conj = spouse x.cle_index (coi base ifam) in
+                 do {
+                   match Adef.od_of_codate md with
+                   [ Some (Dgreg d _) -> set d
+                   | _ -> () ];
+                   loop JustSelf (poi base conj);
+                   match t with
+                   [ AddChildren ->
+                       let des = doi base ifam in
+                       Array.iter (fun e -> loop JustSelf (poi base e))
+                         des.children
+                   | _ -> () ];
+                 })
+              u.family ];
+      }
+    in
+    loop t x;
+    if found.val then Some (d1.val, d2.val) else None
+  }
 ;
 
 value compare_title_dates conf base (x1, t1) (x2, t2) =
@@ -76,8 +84,7 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
       if strictement_avant_dmy d1 d2 then True
       else if annee d1 == annee d2 then
         match
-          (Adef.od_of_codate t1.t_date_end,
-           Adef.od_of_codate t2.t_date_end)
+          (Adef.od_of_codate t1.t_date_end, Adef.od_of_codate t2.t_date_end)
         with
         [ (Some d1, Some d2) -> d1 avant d2
         | _ -> True ]
@@ -159,15 +166,19 @@ value select_title_place conf base title place =
   let select x t =
     if strip_abbrev_lower (sou base t.t_ident) = title &&
        strip_abbrev_lower (sou base t.t_place) = place then
-      do clean_title.val := sou base t.t_ident;
-         clean_place.val := sou base t.t_place;
-      return list.val := [(x, t) :: list.val]
+       do {
+      clean_title.val := sou base t.t_ident;
+      clean_place.val := sou base t.t_place;
+      list.val := [(x, t) :: list.val]
+    }
     else ()
   in
-  do for i = 0 to base.data.persons.len - 1 do
-       let x = base.data.persons.get i in List.iter (select x) x.titles;
-     done;
-  return (list.val, clean_title.val, clean_place.val)
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let x = base.data.persons.get i in List.iter (select x) x.titles
+    };
+    (list.val, clean_title.val, clean_place.val)
+  }
 ;
 
 value select_all_with_place conf base place =
@@ -175,15 +186,17 @@ value select_all_with_place conf base place =
   let clean_place = ref place in
   let place = strip_abbrev_lower place in
   let select x t =
-    if strip_abbrev_lower (sou base t.t_place) = place then
-      do clean_place.val := sou base t.t_place;
-      return list.val := [(x, t) :: list.val]
+    if strip_abbrev_lower (sou base t.t_place) = place then do {
+      clean_place.val := sou base t.t_place; list.val := [(x, t) :: list.val]
+    }
     else ()
   in
-  do for i = 0 to base.data.persons.len - 1 do
-       let x = base.data.persons.get i in List.iter (select x) x.titles;
-     done;
-  return (list.val, clean_place.val)
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let x = base.data.persons.get i in List.iter (select x) x.titles
+    };
+    (list.val, clean_place.val)
+  }
 ;
 
 value select_title base title =
@@ -194,16 +207,18 @@ value select_title base title =
     let tn = sou base t.t_ident in
     if strip_abbrev_lower tn = title then
       let pn = sou base t.t_place in
-      if not (List.mem pn list.val) then
-        do clean_name.val := tn; return
-        list.val := [pn :: list.val]
+      if not (List.mem pn list.val) then do {
+        clean_name.val := tn; list.val := [pn :: list.val]
+      }
       else ()
     else ()
   in
-  do for i = 0 to base.data.persons.len - 1 do
-       let x = base.data.persons.get i in List.iter add_place x.titles;
-     done;
-  return (list.val, clean_name.val)
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let x = base.data.persons.get i in List.iter add_place x.titles
+    };
+    (list.val, clean_name.val)
+  }
 ;
 
 value select_place base place =
@@ -214,16 +229,18 @@ value select_place base place =
     let pn = sou base t.t_place in
     if strip_abbrev_lower pn = place then
       let tn = sou base t.t_ident in
-      if not (List.mem tn list.val) then
-        do clean_name.val := pn; return
-        list.val := [tn :: list.val]
+      if not (List.mem tn list.val) then do {
+        clean_name.val := pn; list.val := [tn :: list.val]
+      }
       else ()
     else ()
   in
-  do for i = 0 to base.data.persons.len - 1 do
-       let x = base.data.persons.get i in List.iter add_title x.titles;
-     done;
-  return (list.val, clean_name.val)
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let x = base.data.persons.get i in List.iter add_title x.titles
+    };
+    (list.val, clean_name.val)
+  }
 ;
 
 value select_all proj conf base =
@@ -237,7 +254,7 @@ value select_all proj conf base =
         let s =
           List.fold_left (fun s t -> S.add (sou base (proj t)) s) s x.titles
         in
-        loop (i + 1) s  
+        loop (i + 1) s
   in
   S.elements s
 ;
@@ -253,141 +270,155 @@ value give_access_someone conf base (x, t) list =
     [ (Some (Dgreg _ _), _) | (_, Some (Dgreg _ _)) -> True
     | _ -> False ]
   in
-  do if has_dates then Wserver.wprint "<em>" else ();
-     match t_date_start with
-     [ Some (Dgreg d _) -> Wserver.wprint "%d" (annee d)
-     | _ -> () ];
-     match t_date_end with
-     [ Some (Dgreg d _) -> Wserver.wprint "-%d" (annee d)
-     | _ -> () ];
-     if has_dates then Wserver.wprint "</em>: " else ();
-     if List.memq x list then Wserver.wprint "<em>"
-     else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
-     match (t.t_name, x.public_name, x.qualifiers) with
-     [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
-         Wserver.wprint "%s <em>%s</em> %s" (sou base pn)
-           (sou base nn)
-           (p_surname base x)
-     | (Tmain, pn, []) when sou base pn <> "" ->
-         Wserver.wprint "%s %s" (sou base pn) (p_surname base x)
-     | (Tname n, _, [nn :: _]) ->
-         Wserver.wprint "%s <em>%s</em> %s" (sou base n)
-           (sou base nn) (p_surname base x)
-     | (Tname n, _, []) ->
-          Wserver.wprint "%s %s" (sou base n)
-            (p_surname base x)
-     | _ -> Wserver.wprint "%s" (person_text conf base x) ];
-     Wserver.wprint "\n";
-     Date.afficher_dates_courtes conf base x;
-     if t.t_nth <> 0 then
-       Wserver.wprint " (%s)"
-         (if t.t_nth >= 100 then string_of_int t.t_nth
-          else transl_nth conf "nth" t.t_nth)
-     else ();
-     if List.memq x list then Wserver.wprint "</em>"
-     else Wserver.wprint "</a>";
-  return ()
+  do {
+    if has_dates then Wserver.wprint "<em>" else ();
+    match t_date_start with
+    [ Some (Dgreg d _) -> Wserver.wprint "%d" (annee d)
+    | _ -> () ];
+    match t_date_end with
+    [ Some (Dgreg d _) -> Wserver.wprint "-%d" (annee d)
+    | _ -> () ];
+    if has_dates then Wserver.wprint "</em>: " else ();
+    if List.memq x list then Wserver.wprint "<em>"
+    else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
+    match (t.t_name, x.public_name, x.qualifiers) with
+    [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
+        Wserver.wprint "%s <em>%s</em> %s" (sou base pn) (sou base nn)
+          (p_surname base x)
+    | (Tmain, pn, []) when sou base pn <> "" ->
+        Wserver.wprint "%s %s" (sou base pn) (p_surname base x)
+    | (Tname n, _, [nn :: _]) ->
+        Wserver.wprint "%s <em>%s</em> %s" (sou base n) (sou base nn)
+          (p_surname base x)
+    | (Tname n, _, []) ->
+        Wserver.wprint "%s %s" (sou base n) (p_surname base x)
+    | _ -> Wserver.wprint "%s" (person_text conf base x) ];
+    Wserver.wprint "\n";
+    Date.afficher_dates_courtes conf base x;
+    if t.t_nth <> 0 then
+      Wserver.wprint " (%s)"
+        (if t.t_nth >= 100 then string_of_int t.t_nth
+         else transl_nth conf "nth" t.t_nth)
+    else ();
+    if List.memq x list then Wserver.wprint "</em>"
+    else Wserver.wprint "</a>";
+  }
 ;
 
 value give_access_place conf base t p =
-  do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
-       (code_varenv t) (code_varenv p);
-     Wserver.wprint "... ";
-     Wserver.wprint "%s" p;
-     Wserver.wprint "</a>\n";
-  return ()
+  do {
+    Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
+      (code_varenv t) (code_varenv p);
+    Wserver.wprint "... ";
+    Wserver.wprint "%s" p;
+    Wserver.wprint "</a>\n";
+  }
 ;
 
 value give_access_title conf t p =
-  do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
-       (code_varenv t) (code_varenv p);
-     Wserver.wprint "%s" (capitale t);
-     Wserver.wprint "</a>\n";
-  return ()
+  do {
+    Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
+      (code_varenv t) (code_varenv p);
+    Wserver.wprint "%s" (capitale t);
+    Wserver.wprint "</a>\n";
+  }
 ;
 
 value give_access_all_titles conf t =
-  do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">" (commd conf)
-       (code_varenv t);
-     Wserver.wprint "%s" (capitale t);
-     Wserver.wprint "</a>\n";
-  return ()
+  do {
+    Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">" (commd conf)
+      (code_varenv t);
+    Wserver.wprint "%s" (capitale t);
+    Wserver.wprint "</a>\n";
+  }
 ;
 
 value give_access_all_places conf t =
-  do Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf)
-       (code_varenv t);
-     Wserver.wprint "... %s" t;
-     Wserver.wprint "</a>\n";
-  return ()
+  do {
+    Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf)
+      (code_varenv t);
+    Wserver.wprint "... %s" t;
+    Wserver.wprint "</a>\n";
+  }
 ;
 
 value print_title_place_list conf base t p list =
   let title h =
     if h then Wserver.wprint "%s %s\n" (capitale t) p
-    else
-      do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">\n" (commd conf)
-           (code_varenv t);
-         Wserver.wprint "%s</a>\n" (capitale t);
-         Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">\n" (commd conf)
-           (code_varenv p);
-         Wserver.wprint "%s</a>\n" p;
-      return ()
+    else do {
+      Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">\n" (commd conf)
+        (code_varenv t);
+      Wserver.wprint "%s</a>\n" (capitale t);
+      Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">\n" (commd conf)
+        (code_varenv p);
+      Wserver.wprint "%s</a>\n" p;
+    }
   in
-  do header conf title;
-     Wserver.wprint "<ul>\n";
-     let _ = List.fold_left
-       (fun list x ->
-          do html_li conf;
+  do {
+    header conf title;
+    Wserver.wprint "<ul>\n";
+    let _ =
+      List.fold_left
+        (fun list x ->
+           do {
+             html_li conf;
              give_access_someone conf base x list;
              Wserver.wprint "\n";
-          return [fst x :: list])
-       [] list
-     in ();
-     Wserver.wprint "</ul>\n";
-     let (list, _) =
-       List.fold_left
-         (fun (list, n) (p, _) ->
-            let list =
-              if List.mem_assq p list then list else [(p, n) :: list]
-            in
-            (list, n + 1))
-         ([], 1) list
-     in
-     match List.rev list with
-     [ [_; _ :: _] as list ->
-         do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
-            let _ = List.fold_left
+             [fst x :: list]
+           })
+        [] list
+    in
+    Wserver.wprint "</ul>\n";
+    let (list, _) =
+      List.fold_left
+        (fun (list, n) (p, _) ->
+           let list =
+             if List.mem_assq p list then list else [(p, n) :: list]
+           in
+           (list, n + 1))
+        ([], 1) list
+    in
+    match List.rev list with
+    [ [_; _ :: _] as list ->
+        do {
+          Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+          let _ =
+            List.fold_left
               (fun i (p, n) ->
-                 do Wserver.wprint ";i%d=%d;t%d=%d" i
-                      (Adef.int_of_iper p.cle_index) i n;
-                 return i + 1)
+                 do {
+                   Wserver.wprint ";i%d=%d;t%d=%d" i
+                     (Adef.int_of_iper p.cle_index) i n;
+                   i + 1
+                 })
               1 list
-            in ();
-            Wserver.wprint ";lim=6\">%s</a>\n"
-              (capitale (transl conf "tree"));
-         return ()
-     | _ -> () ];
-     trailer conf;
-  return ()
+          in
+          Wserver.wprint ";lim=6\">%s</a>\n" (capitale (transl conf "tree"));
+        }
+    | _ -> () ];
+    trailer conf;
+  }
 ;
 
 value print_all_with_place_list conf base p list =
   let title _ = Wserver.wprint "... %s\n" p in
-  do header conf title;
-     Wserver.wprint "<ul>\n";
-     let _ = List.fold_left
-       (fun list ((p, t) as x) ->
-          do html_li conf;
+  do {
+    header conf title;
+    Wserver.wprint "<ul>\n";
+    let _ =
+      List.fold_left
+        (fun list ((p, t) as x) ->
+           do {
+             html_li conf;
              give_access_someone conf base x [];
              Wserver.wprint ", %s\n" (sou base t.t_ident);
              Wserver.wprint "\n";
-          return [fst x :: list])
-       [] list
-     in ();
-     Wserver.wprint "</ul>\n";
-     trailer conf;
-  return ()
+             [fst x :: list]
+           })
+        [] list
+    in
+    Wserver.wprint "</ul>\n";
+    trailer conf;
+  }
 ;
 
 value print_title_place conf base t p =
@@ -404,16 +435,15 @@ value print_all_with_place conf base p =
 
 value print_places_list conf base t list =
   let title _ = Wserver.wprint "%s" (capitale t) in
-  do header conf title;
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun p ->
-          do html_li conf; give_access_place conf base t p; return
-          ())
-       list;
-     Wserver.wprint "</ul>\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "<ul>\n";
+    List.iter
+      (fun p -> do { html_li conf; give_access_place conf base t p; () })
+      list;
+    Wserver.wprint "</ul>\n";
+    trailer conf;
+  }
 ;
 
 value print_places conf base t =
@@ -428,23 +458,21 @@ value print_titles conf base p =
   let (l, p) = select_place base p in
   let list = string_list_uniq (Sort.list compare_titles l) in
   let title _ = Wserver.wprint "... %s" p in
-  do header conf title;
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun t ->
-          do html_li conf; give_access_title conf t p; return ())
-       list;
-     Wserver.wprint "</ul>\n";
-     if List.length list > 1 then
-       do stag "a" "href=\"%sm=TT;sm=A;p=%s\"" (commd conf) (code_varenv p)
-          begin
-            Wserver.wprint "%s" (capitale (transl conf "the whole list"));
-          end;
-          Wserver.wprint "\n";
-       return ()
-     else ();
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "<ul>\n";
+    List.iter (fun t -> do { html_li conf; give_access_title conf t p; () })
+      list;
+    Wserver.wprint "</ul>\n";
+    if List.length list > 1 then do {
+      stag "a" "href=\"%sm=TT;sm=A;p=%s\"" (commd conf) (code_varenv p) begin
+        Wserver.wprint "%s" (capitale (transl conf "the whole list"));
+      end;
+      Wserver.wprint "\n";
+    }
+    else ();
+    trailer conf;
+  }
 ;
 
 value print_all_titles conf base =
@@ -455,15 +483,14 @@ value print_all_titles conf base =
     let l = select_all_titles conf base in
     string_list_uniq (Sort.list compare_titles l)
   in
-  do header conf title;
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun t ->
-          do html_li conf; give_access_all_titles conf t; return ())
-       list;
-     Wserver.wprint "</ul>\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "<ul>\n";
+    List.iter
+      (fun t -> do { html_li conf; give_access_all_titles conf t; () }) list;
+    Wserver.wprint "</ul>\n";
+    trailer conf;
+  }
 ;
 
 value print_all_places conf base =
@@ -474,15 +501,14 @@ value print_all_places conf base =
     let l = select_all_places conf base in
     string_list_uniq (Sort.list compare_places l)
   in
-  do header conf title;
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun t ->
-          do html_li conf; give_access_all_places conf t; return ())
-       list;
-     Wserver.wprint "</ul>\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "<ul>\n";
+    List.iter
+      (fun t -> do { html_li conf; give_access_all_places conf t; () }) list;
+    Wserver.wprint "</ul>\n";
+    trailer conf;
+  }
 ;
 
 value print conf base =

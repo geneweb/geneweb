@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.13 2001-04-21 18:23:33 ddr Exp $ *)
+(* $Id: relation.ml,v 4.14 2001-04-22 03:31:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1067,10 +1067,8 @@ open RelationLink;
 value max_br = 33;
 
 value print_dag_links conf base p1 p2 rl =
-  let module O = struct type t = iper; value compare = compare; end
-  in
-  let module M = Map.Make O
-  in
+  let module O = struct type t = iper; value compare = compare; end in
+  let module M = Map.Make O in
   let anc_map =
     List.fold_left
       (fun anc_map (pp1, pp2, (x1, x2, list), _) ->
