@@ -1,208 +1,293 @@
-(* $Id: alln.ml,v 1.5 1998-11-29 13:50:51 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: alln.ml,v 1.6 1998-11-30 00:51:23 ddr Exp $ *)
 
 open Def;
 open Config;
 open Util;
 open Gutil;
 
-value print_menu mode conf base is_fam liste len par_frequence =
-  let titre _ =
-    do if is_fam then
+(* tools *)
+
+value string_start_with ini s =
+  loop 0 0 where rec loop i1 i2 =
+    if i1 == String.length ini then True
+    else if i2 == String.length s then False
+    else if s.[i2] == ini.[i1] || s.[i2] == ' ' && ini.[i1] == '_' then
+      loop (i1 + 1) (i2 + 1)
+    else False
+;
+
+value combine_by_ini ini list =
+  let list =
+    loop [] list where rec loop new_list =
+      fun
+      [ [] -> new_list
+      | [(k, s, cnt) :: list] ->
+          let ini_k =
+            if String.length k > String.length ini then
+              String.sub k 0 (String.length ini + 1)
+            else
+              k ^ String.make (String.length ini + 1 - String.length k) '_'
+          in
+          do for i = 0 to String.length ini_k - 1 do
+               if ini_k.[i] == ' ' then ini_k.[i] := '_' else ();
+             done;
+          return
+          let new_list =
+            if ini_k = "_" then new_list
+            else
+              match new_list with
+              [ [] -> [(ini_k, [(s, cnt)])]
+              | [(ini_k1, l) :: ll] ->
+                  if ini_k1 = ini_k then [(ini_k1, [(s, cnt) :: l]) :: ll]
+                  else [(ini_k, [(s, cnt)]); (ini_k1, l) :: ll] ]
+          in
+          loop new_list list ]
+  in
+  List.fold_left (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l])
+    [] list
+;
+
+value combine_by_count list =
+  let list =
+    loop [] list where rec loop new_list =
+      fun
+      [ [] -> new_list
+      | [(_, s, cnt) :: list] ->
+          let new_list =
+            match new_list with
+            [ [] -> [(cnt, [s])]
+            | [(cnt1, l) :: ll] ->
+                if cnt1 = cnt then [(cnt1, [s :: l]) :: ll]
+                else [(cnt, [s]); (cnt1, l) :: ll] ]
+          in
+          loop new_list list ]
+  in
+  List.fold_left (fun new_l (cnt, l) -> [(cnt, List.rev l) :: new_l])
+    [] list
+;
+
+value alphab_string conf is_surname s =
+  if is_surname then
+    let s = coa conf s in
+    surname_end s ^ surname_begin s
+  else coa conf s
+;
+
+(* print *)
+
+value print_title conf base is_surnames ini len =
+  do if len >= 2 then
+       if is_surnames then
          Wserver.wprint (fcapitale (ftransl conf "the %d surnames")) len
        else
-         Wserver.wprint (fcapitale (ftransl conf "the %d first names")) len;
+         Wserver.wprint (fcapitale (ftransl conf "the %d first names")) len
+     else
+       if is_surnames then
+         Wserver.wprint "%s"
+           (capitale (transl_nth conf "surname/surnames" 0))
+       else
+         Wserver.wprint "%s"
+           (capitale (transl_nth conf "first name/first names" 0));
+     if ini <> "" then
+       Wserver.wprint " %s %s" (transl conf "starting with")
+         (String.capitalize ini)
+     else
        Wserver.wprint " (%d %s)" base.persons.len
          (transl_nth conf "person/persons" 1);
-    return ()
-  in
-  do header conf titre;
-     let _ =
-       List.fold_left
-         (fun last (x, c, _) ->
-            let i = x.[initiale x] in
-            let same_than_last =
-              match last with
-              [ Some (i1, c1) -> if par_frequence then c = c1 else i = i1
-              | _ -> False ]
-            in
-            do if not same_than_last then
-                 let t =
-                   if par_frequence then string_of_int c else String.make 1 i
-                 in
-                 Wserver.wprint "<a href=\"%sm=%s;tri=%s;k=%s\">%s</a>\n"
-                   (commd conf) mode (if par_frequence then "F" else "A")
-                   t t
-               else ();
-            return Some (i, c))
-         None liste
-     in
-     ();
-     if p_getenv conf.env "k" <> Some "" then
-       Wserver.wprint "<p>\n<a href=\"%sm=%s;tri=%s;k=\">%s</a>\n"
-         (commd conf) mode (if par_frequence then "F" else "A")
-         (capitale (transl conf "the whole list"))
-     else ();
-     trailer conf;
   return ()
 ;
 
-value print_all mode conf base is_fam liste len par_frequence =
-  let title _ =
-    do if is_fam then
-         Wserver.wprint (fcapitale (ftransl conf "the %d surnames")) len
-       else
-         Wserver.wprint (fcapitale (ftransl conf "the %d first names")) len;
-       Wserver.wprint " (%d %s)" base.persons.len
-         (transl_nth conf "person/persons" 1);
-    return ()
-  in
+value print_alphabetic_big conf base is_surnames ini list len =
+  let title _ = print_title conf base is_surnames ini len in
+  let mode = if is_surnames then "N" else "P" in
   do header conf title;
-     print_alphab_list
-       (fun (x, c, _) ->
-          if par_frequence then string_of_int c
-          else String.sub x (initiale x) 1)
-       (fun (x, c, istr) ->
-          let x = coa conf x in
-          do Wserver.wprint "<a href=\"%sm=%s;v=%s\">" (commd conf) mode
-               (code_varenv (sou base istr));
-             Wserver.wprint "%s</a>%s\n"
-               (if is_fam then surname_end x ^ surname_begin x else x)
-               (if par_frequence then "" else " (" ^ string_of_int c ^ ")");
+     List.iter
+       (fun (ini_k, _) ->
+          do stag "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode ini_k
+             begin
+               Wserver.wprint "%s" (String.capitalize ini_k);
+             end;
+             Wserver.wprint "\n";
           return ())
-       liste;
+       list;
+     Wserver.wprint "<p>";
+     stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
+       Wserver.wprint "%s" (capitale (transl conf "the whole list"));
+     end;
      trailer conf;
   return ()
 ;
 
-value print_elem mode conf base is_fam par_frequence (x, c, istr) =
-  do Wserver.wprint "<a href=\"%sm=%s;" (commd conf) mode;
-     Wserver.wprint "v=%s" (code_varenv (sou base istr));
-     Wserver.wprint "\">";
-     if is_fam then
-       Wserver.wprint "%s%s" (coa conf (surname_end x))
-         (coa conf (surname_begin x))
-     else Wserver.wprint "%s" (coa conf x);
-     Wserver.wprint "</a>";
-     if not par_frequence then Wserver.wprint " (%d)" c else ();
-     Wserver.wprint "\n";
-  return ()
-;
-
-value print_frequence mode conf base is_fam liste len f =
-  let liste =
-    List.fold_right
-      (fun (x, c, ip) liste ->
-         if c == f then [(x, c, ip) :: liste] else liste)
-      liste []
-  in
-  let len = List.length liste in
-  let title _ =
-    let lab =
-      if is_fam then transl_nth conf "surname/surnames" 1
-      else transl_nth conf "first name/first names" 1
-    in
-    Wserver.wprint "%s %s %d %s"
-      (capitale lab) (transl conf "shared by") f
-      (transl_nth conf "person/persons" (if f == 1 then 0 else 1))
-  in
+value print_alphabetic_all conf base is_surnames ini list len =
+  let title _ = print_title conf base is_surnames ini len in
+  let mode = if is_surnames then "N" else "P" in
   do header conf title;
-     print_alphab_list (fun (x, _, _) -> String.sub x (initiale x) 1)
-       (print_elem mode conf base is_fam True) liste;
+     List.iter
+       (fun (ini_k, _) ->
+          do stag "a" "href=\"#%s\"" ini_k begin
+               Wserver.wprint "%s" (String.capitalize ini_k);
+             end;
+             Wserver.wprint "\n";
+          return ())
+       list;
+     tag "ul" begin
+       List.iter
+         (fun (ini_k, l) ->
+            do Wserver.wprint "<li>";
+               stag "a" "name=\"%s\"" ini_k begin
+                 Wserver.wprint "%s" (String.capitalize ini_k);
+               end;
+               Wserver.wprint "\n";
+               tag "ul" begin
+                 List.iter
+                   (fun (s, cnt) ->
+                      do Wserver.wprint "<li>";
+                         stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+                           (code_varenv (Name.lower s))
+                         begin
+                           Wserver.wprint "%s" 
+                             (alphab_string conf is_surnames s);
+                         end;
+                         Wserver.wprint " (%d)\n" cnt;
+                      return ())
+                   l;
+               end;
+            return ())
+         list;
+     end;
      trailer conf;
   return ()
 ;
 
-value rec same_initial s1 i1 s2 i2 =
-  if i1 >= String.length s1 || i2 >= String.length s2 then True
-  else if s1.[i1] == s2.[i2] then same_initial s1 (succ i1) s2 (succ i2)
-  else False
-;
-
-value print_alphab mode conf base is_fam liste len l =
-  let liste =
-    List.fold_right
-      (fun (x, c, ip) liste ->
-         if same_initial l 0 x (initiale x) then [(x, c, ip) :: liste]
-         else liste)
-      liste []
-  in
-  let len = List.length liste in
-  let title _ =
-    let lab =
-      if is_fam then transl_nth conf "surname/surnames" 1
-      else transl_nth conf "first name/first names" 1
-    in
-    Wserver.wprint "%s %s %s" (capitale lab) (transl conf "starting with") l
-  in
-  let crit_len = String.length l + 1 in
+value print_alphabetic_small conf base is_surnames ini list len =
+  let title _ = print_title conf base is_surnames ini len in
+  let mode = if is_surnames then "N" else "P" in
   do header conf title;
-     print_alphab_list
-       (fun (e, _, _) ->
-          let i = initiale e in
-          String.sub e i (min crit_len (String.length e - i)))
-       (print_elem mode conf base is_fam False) liste;
+     tag "ul" begin
+       List.iter
+         (fun (_, s, cnt) ->
+            do Wserver.wprint "<li>\n";
+               stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+                 (code_varenv (Name.lower s))
+               begin
+                 Wserver.wprint "%s" (alphab_string conf is_surnames s);
+               end;
+               Wserver.wprint " (%d)\n" cnt;
+            return ())
+         list;
+     end;
      trailer conf;
   return ()
 ;
 
-value afficher_tous_x proj mode is_fam conf base =
-  let par_frequence =
-    match p_getenv conf.env "tri" with
-    [ Some "F" -> True
+value print_frequency_any conf base is_surnames list len =
+  let title _ = print_title conf base is_surnames "" len in
+  let mode = if is_surnames then "N" else "P" in
+  do header conf title;
+     tag "ul" begin
+       List.iter
+         (fun (cnt, l) ->
+            do Wserver.wprint "<li>%d\n" cnt;
+               tag "ul" begin
+                 List.iter
+                   (fun s ->
+                      do Wserver.wprint "<li>";
+                         stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+                           (code_varenv (Name.lower s))
+                         begin
+                           Wserver.wprint "%s"
+                             (alphab_string conf is_surnames s);
+                         end;
+                         Wserver.wprint "\n";
+                      return ())
+                   l;
+               end;
+            return ())
+         list;
+     end;
+     trailer conf;
+  return ()
+;
+
+(* selection *)
+
+value select_names conf base is_surnames ini =
+  let table = Mhashtbl.create 801 in
+  let list = ref [] in
+  do for i = 0 to base.persons.len - 1 do
+       let p = base.persons.get i in
+       let s =
+         if is_surnames then sou base p.surname
+         else sou base p.first_name
+       in
+       let k =
+         Name.lower (if is_surnames then surname_end s else s)
+       in
+       if s <> "?" && string_start_with ini k then
+         let cnt =
+           try fst (Mhashtbl.find table k) with
+           [ Not_found ->
+               let c = ref 0 in
+               do Mhashtbl.add table k (c, s); return c ]
+         in
+         incr cnt
+       else ();
+     done;
+     Mhashtbl.iter
+       (fun k (cnt, s) -> list.val := [(k, s, cnt.val) :: list.val])
+       table;
+  return list.val
+;
+
+value print_frequency conf base is_surnames =
+  let list =
+    let list = select_names conf base is_surnames "" in
+    Sort.list
+      (fun (k1, _, cnt1) (k2, _, cnt2) ->
+         if cnt1 > cnt2 then True
+         else if cnt1 < cnt2 then False
+         else k1 <= k2)
+      list
+  in
+  let len = List.length list in
+  let list = combine_by_count list in
+  print_frequency_any conf base is_surnames list len
+;
+
+value print_alphabetic conf base is_surnames =
+  let ini =
+    match p_getenv conf.env "k" with
+    [ Some k -> String.lowercase k
+    | _ -> "" ]
+  in
+  let all =
+    match p_getenv conf.env "o" with
+    [ Some "A" -> True
     | _ -> False ]
   in
-  let liste =
-    let table_x = Mhashtbl.create 801 in
-    let liste = ref [] in
-    do for i = 0 to base.persons.len - 1 do
-         let p = base.persons.get i in
-         let istr = proj p in
-         let pr = sou base istr in
-         if pr = "?" then ()
-         else
-           let compte =
-             try fst (Mhashtbl.find table_x pr) with
-             [ Not_found ->
-                 let c = ref 0 in
-                 do Mhashtbl.add table_x pr (c, istr); return c ]
-           in
-           incr compte;
-       done;
-       Mhashtbl.iter
-         (fun x (compte, i) -> liste.val := [(x, compte.val, i) :: liste.val])
-         table_x;
-    return
-    let tri =
-      if par_frequence then
-        fun (x, cx, _) (y, cy, _) ->
-          if cx > cy then True
-          else if cx < cy then False
-          else alphabetique x y <= 0
-      else fun (x, cx, _) (y, cy, _) -> alphabetique x y <= 0
-    in
-    Sort.list tri liste.val
+  let list =
+    let list = select_names conf base is_surnames ini in
+    Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
   in
-  let len = List.length liste in
-  if len >= 50 && p_getenv conf.env "k" <> Some "" then
-    if par_frequence then
-      match p_getint conf.env "k" with
-      [ Some f -> print_frequence mode conf base is_fam liste len f
-      | _ -> print_menu mode conf base is_fam liste len par_frequence ]
-    else
-      match p_getenv conf.env "k" with
-      [ Some x -> print_alphab mode conf base is_fam liste len x
-      | _ -> print_menu mode conf base is_fam liste len par_frequence ]
-  else print_all mode conf base is_fam liste len par_frequence
+  let len = List.length list in
+  if len >= 50 then
+    let list = combine_by_ini ini list in
+    if all then print_alphabetic_all conf base is_surnames ini list len
+    else print_alphabetic_big conf base is_surnames ini list len
+  else print_alphabetic_small conf base is_surnames ini list len
 ;
 
-value person_has_surname base key ip =
-  (poi base ip).surname = key
+(* main *)
+
+value print_surnames conf base =
+  match p_getenv conf.env "tri" with
+  [ Some "F" -> print_frequency conf base True
+  | _ -> print_alphabetic conf base True ]
 ;
 
-value family_names_print conf base =
-  afficher_tous_x (fun p -> p.surname) "N" True conf base
-;
-
-value first_names_print conf base =
-  afficher_tous_x (fun p -> p.first_name) "P" False conf base
+value print_first_names conf base =
+  match p_getenv conf.env "tri" with
+  [ Some "F" -> print_frequency conf base False
+  | _ -> print_alphabetic conf base False ]
 ;

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 1998-11-28 09:46:42 ddr Exp $
+# $Id: Makefile,v 1.11 1998-11-30 00:51:22 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -72,8 +72,8 @@ iovalue.cmx: q_codes.cmo
 gwc.cmo mk_consang.cmo: pa_lock.cmo
 gwc.cmx mk_consang.cmx: pa_lock.cmo
 
-ascend.cmo birth.cmo birthday.cmo descend.cmo family.cmo gwd.cmo merge.cmo mergeInd.cmo mergeIndOk.cmo mergeFam.cmo mergeFamOk.cmo relationLink.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo: pa_html.cmo
-ascend.cmx birth.cmo birthday.cmx descend.cmx family.cmx gwd.cmx merge.cmx mergeInd.cmx mergeIndOk.cmx mergeFam.cmx mergeFamOk.cmo relationLink.cmx update.cmx updateInd.cmx updateIndOk.cmo updateFam.cmx: pa_html.cmo
+alln.cmo ascend.cmo birth.cmo birthday.cmo descend.cmo family.cmo gwd.cmo merge.cmo mergeInd.cmo mergeIndOk.cmo mergeFam.cmo mergeFamOk.cmo relationLink.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo: pa_html.cmo
+alln.cmx ascend.cmx birth.cmo birthday.cmx descend.cmx family.cmx gwd.cmx merge.cmx mergeInd.cmx mergeIndOk.cmx mergeFam.cmx mergeFamOk.cmo relationLink.cmx update.cmx updateInd.cmx updateIndOk.cmo updateFam.cmx: pa_html.cmo
 
 depend:
 	ocamldep $(OCAMLI) *.ml* > .depend
