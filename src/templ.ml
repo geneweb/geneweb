@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.27 2005-01-20 07:07:48 ddr Exp $ *)
+(* $Id: templ.ml,v 4.28 2005-01-22 20:11:41 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -631,5 +631,5 @@ value print_variable conf base =
   | "prefix" -> Wserver.wprint "%s" (commd conf)
   | "sp" -> Wserver.wprint " "
   | "/" -> Wserver.wprint "%s" conf.xhs
-  | s -> Wserver.wprint ">%%%s???" s ]
+  | s -> Wserver.wprint " %%%s?" s ]
 ;

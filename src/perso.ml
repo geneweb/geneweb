@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.62 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: perso.ml,v 4.63 2005-01-22 20:11:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -253,12 +253,7 @@ and title_item =
    list (option date * option date))
 ;
 
-type variable_value =
-  [ VVsome of
-      (list (string * env) * (person * ascend * union * bool) * env * string)
-  | VVcvar of string
-  | VVnone ]
-;
+type var_value = [ VVbool of bool | VVstring of string ];
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 
@@ -269,176 +264,640 @@ value extract_var sini s =
   else ""
 ;
 
-value rec eval_variable conf base env sl =
-  let ep =
-    match (get_env "p" env, get_env "p_auth" env) with
-    [ (Vind p a u, Vbool p_auth) -> (p, a, u, p_auth)
-    | _ -> assert False ]
-  in
-  let efam = get_env "fam" env in
-  let make_ep ip =
-    let p = pget conf base ip in
-    let a = aget conf base ip in
-    let u = uget conf base ip in
-    let p_auth = authorized_age conf base p in (p, a, u, p_auth)
-  in
-  let rec loop (p, a, u, p_auth) efam =
-    fun
-    [ ["child" :: sl] ->
-        match get_env "child" env with
-        [ Vind p a u ->
-            let auth =
-              match get_env "auth" env with
-              [ Vbool True -> authorized_age conf base p
-              | _ -> False ]
-            in
-            let ep = (p, a, u, auth) in loop ep Vnone sl
-        | _ -> VVnone ]
-    | ["parent" :: sl] ->
-        match get_env "parent" env with
-        [ Vind p a u ->
-            let ep = (p, a, u, authorized_age conf base p ) in loop ep efam sl
-        | _ -> VVnone ]
-    | ["father" :: sl] ->
-        match parents a with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            let ep = make_ep (father cpl) in
-            let cpl = ((father cpl), (mother cpl)) in
-            let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-            loop ep efam sl
-        | None -> VVnone ]
-    | ["mother" :: sl] ->
-        match parents a with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            let ep = make_ep (mother cpl) in
-            let cpl = ((mother cpl), (father cpl)) in
-            let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-            loop ep efam sl
-        | None -> VVnone ]
-    | ["related" :: sl] ->
-        match get_env "c" env with
-        [ Vind p a u ->
-            let ep = (p, a, u, authorized_age conf base p) in loop ep efam sl
-        | _ -> VVnone ]
-    | ["relation_her" :: sl] ->
-        match get_env "rel" env with
-        [ Vrel {r_moth = Some ip} -> let ep = make_ep ip in loop ep efam sl
-        | _ -> VVnone ]
-    | ["relation_him" :: sl] ->
-        match get_env "rel" env with
-        [ Vrel {r_fath = Some ip} -> let ep = make_ep ip in loop ep efam sl
-        | _ -> VVnone ]
-    | ["self" :: sl] -> loop (p, a, u, p_auth) efam sl
-    | ["spouse" :: sl] ->
-        match efam with
-        [ Vfam fam (_, ip) _ -> let ep = make_ep ip in loop ep efam sl
-        | _ -> VVnone ]
-    | ["witness" :: sl] ->
-        match get_env "witness" env with
-        [ Vind p a u ->
-            let ep = (p, a, u, authorized_age conf base p) in loop ep efam sl
-        | _ -> VVnone ]
-    | ["enclosing" :: sl] ->
-        let rec loop =
-          fun
-          [ [("#loop", _) :: env] -> eval_variable conf base env sl
-          | [_ :: env] -> loop env
-          | [] -> VVnone ]
-        in
-        loop env
-    | [] -> VVsome (env, (p, a, u, p_auth), efam, "")
-    | [s] ->
+value warning_use_has_parents_before_parent var =
+  ifdef UNIX then do {
+    Printf.eprintf "\
+*** <W> perso.txt: since v4.11, must test \"has_parents\" before using \"%s\"\n"
+      var;
+    flush stderr;
+  }
+  else ()
+;
+
+value obsolete_list = ref [];
+
+value obsolete version var new_var r =
+  if List.mem var obsolete_list.val then r
+  else ifdef UNIX then do {
+    Printf.eprintf "*** <W> perso.txt: \"%s\" obsolete since v%s%s\n"
+      var version
+      (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
+    flush stderr;
+    obsolete_list.val := [var :: obsolete_list.val];
+    r
+  }
+  else r
+;
+
+value bool_val x = VVbool x;
+value str_val x = VVstring x;
+
+value string_of_place conf base istr =
+  string_with_macros conf False [] (sou base istr)
+;
+
+value make_ep conf base ip =
+  let p = pget conf base ip in
+  let a = aget conf base ip in
+  let u = uget conf base ip in
+  let p_auth = authorized_age conf base p in (p, a, u, p_auth)
+;
+
+value rec eval_var conf base env ep sl =
+  try eval_simple_var conf base env ep sl with
+  [ Not_found -> eval_compound_var conf base env ep sl ]
+and eval_simple_var conf base env ep sl =
+  try bool_val (eval_simple_bool_var conf base env ep sl) with
+  [ Not_found -> str_val (eval_simple_str_var conf base env ep sl) ]
+and eval_simple_bool_var conf base env (_, _, _, p_auth) =
+  fun
+  [ ["are_divorced"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ ->
+          match fam.divorce with
+          [ Divorced _ -> True
+          | _ -> False ]
+      | _ -> raise Not_found ]
+  | ["are_engaged"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> fam.relation = Engaged
+      | _ -> raise Not_found ]
+  | ["are_married"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> fam.relation = Married
+      | _ -> raise Not_found ]
+  | ["are_not_married"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> fam.relation = NotMarried
+      | _ -> raise Not_found ]
+  | ["are_separated"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ ->
+          match fam.divorce with
+          [ Separated -> True
+          | _ -> False ]
+      | _ -> raise Not_found ]
+  | ["cancel_links"] -> conf.cancel_links
+  | ["friend"] -> conf.friend
+  | ["has_comment"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> p_auth && sou base fam.comment <> ""
+      | _ -> raise Not_found ]
+  | ["has_referer"] ->
+      Wserver.extract_param "referer: " '\n' conf.request <> ""
+  | ["has_relation_her"] ->
+      match get_env "rel" env with
+      [ Vrel {r_moth = Some _} -> True
+      | _ -> False ]
+  | ["has_relation_him"] ->
+      match get_env "rel" env with
+      [ Vrel {r_fath = Some _} -> True
+      | _ -> False ]
+  | ["has_sosa"] ->
+      match get_env "sosa" env with
+      [ Vsosa x -> x <> None
+      | _ -> False ]
+  | ["has_witnesses"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> Array.length fam.witnesses > 0
+      | _ -> raise Not_found ]
+  | ["is_first"] ->
+      match get_env "first" env with
+      [ Vbool x -> x
+      | _ -> raise Not_found ]
+  | ["is_no_mention"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> fam.relation = NoMention
+      | _ -> raise Not_found ]
+  | ["is_no_sexes_check"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> fam.relation = NoSexesCheck
+      | _ -> raise Not_found ]
+  | ["is_self"] -> get_env "pos" env = Vstring "self"
+  | ["is_sibling_after"] -> get_env "pos" env = Vstring "next"
+  | ["is_sibling_before"] -> get_env "pos" env = Vstring "prev"
+  | ["wizard"] -> conf.wizard
+  | [s] ->
+      let v = extract_var "file_exists_" s in
+      if v <> "" then
+        let v = code_varenv v in
+        let s = Srcfile.source_file_name conf v in
+        Sys.file_exists s
+      else False
+  | _ -> raise Not_found ]
+and eval_simple_str_var conf base env (_, _, _, p_auth) =
+  fun
+  [ ["alias"] ->
+      match get_env "alias" env with
+      [ Vstring s -> s
+      | _ -> raise Not_found ]
+  | ["border"] -> string_of_int conf.border
+  | ["child_cnt"] -> string_of_int_env "child_cnt" env
+  | ["comment"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ ->
+          if p_auth then
+            string_with_macros conf False [] (sou base fam.comment)
+          else ""
+      | _ -> raise Not_found ]
+  | ["divorce_date"] ->
+      match get_env "fam" env with
+      [ Vfam fam (_, isp) _ ->
+          match fam.divorce with
+          [ Divorced d ->
+              let d = Adef.od_of_codate d in
+              let auth =
+                let spouse = pget conf base isp in
+                p_auth && authorized_age conf base spouse
+              in
+              match d with
+              [ Some d when auth ->
+                  " <em>" ^ Date.string_of_ondate conf d ^ "</em>"
+              | _ -> "" ]
+          | _ -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["family_cnt"] -> string_of_int_env "family_cnt" env
+  | ["first_name_alias"] ->
+      match get_env "first_name_alias" env with
+      [ Vstring s -> s
+      | _ -> "" ]
+  | ["marriage_place"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> if p_auth then sou base fam.marriage_place else ""
+      | _ -> raise Not_found ]
+  | ["on_marriage_date"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ ->
+          match (p_auth, Adef.od_of_codate fam.marriage) with
+          [ (True, Some s) -> Date.string_of_ondate conf s
+          | _ -> "" ] 
+      | _ -> raise Not_found ]
+  | ["origin_file"] ->
+      if conf.wizard then
+        match get_env "fam" env with
+        [ Vfam fam _ _ -> sou base fam.origin_file
+        | _ -> "" ]
+      else raise Not_found
+  | ["prefix_no_templ"] ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
+        (henv @ conf.senv)
+  | ["referer"] -> Wserver.extract_param "referer: " '\n' conf.request
+  | ["related_type"] ->
+      match (get_env "c" env, get_env "rel" env) with
+      [ (Vind c _ _, Vrel r) ->
+          capitale (rchild_type_text conf r.r_type (index_of_sex c.sex))
+      | _ -> raise Not_found ]
+  | ["relation_type"] ->
+      match get_env "rel" env with
+      [ Vrel r ->
+          match (r.r_fath, r.r_moth) with
+          [ (Some ip, None) -> capitale (relation_type_text conf r.r_type 0)
+          | (None, Some ip) -> capitale (relation_type_text conf r.r_type 1)
+          | (Some ip1, Some ip2) ->
+              capitale (relation_type_text conf r.r_type 2)
+          | _ -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["sosa"] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match x with
+          [ Some (n, p) ->
+              let b = Buffer.create 25 in
+              do {
+                Num.print (fun x -> Buffer.add_string b x)
+                  (transl conf "(thousand separator)") n;
+                Buffer.contents b
+              }
+          | None -> "" ]
+      | _ -> raise Not_found ]
+  | ["sosa_ref"] ->
+      match get_env "sosa" env with
+      [ Vsosa (Some (_, p)) ->
+          let p_auth = authorized_age conf base p in
+          simple_person_text conf base p p_auth
+      | _ -> "" ]
+  | ["source_type"] ->
+       match get_env "src_typ" env with
+       [ Vstring s -> s
+       | _ -> raise Not_found ]
+  | ["surname_alias"] ->
+      match get_env "surname_alias" env with
+      [ Vstring s -> s
+      | _ -> raise Not_found ]
+  | ["witness_relation"] ->
+      match get_env "fam" env with
+      [ Vfam _ (ip1, ip2) _ ->
+          Printf.sprintf
+            (fcapitale (ftransl conf "witness at marriage of %s and %s"))
+            (referenced_person_title_text conf base (pget conf base ip1))
+            (referenced_person_title_text conf base (pget conf base ip2))
+      | _ -> raise Not_found ]
+  | [s] ->
+      let v = extract_var "evar_" s in
+      if v <> "" then
+        match p_getenv (conf.env @ conf.henv) v with
+        [ Some vv -> quote_escaped vv
+        | None -> "" ]
+      else
         let v = extract_var "cvar_" s in
-        if v <> "" then VVcvar v else VVsome (env, (p, a, u, p_auth), efam, s)
-    | _ -> VVnone ]
-  in
-  loop ep efam sl
-;
-
-value eval_base_env_variable conf v =
-  try List.assoc v conf.base_env with [ Not_found -> "" ]
-;
-
-value simple_person_text conf base p p_auth =
+        if v <> "" then
+          try List.assoc v conf.base_env with [ Not_found -> "" ]
+        else raise Not_found
+  | _ -> raise Not_found ]
+and eval_compound_var conf base env ((_, a, _, _) as ep) =
+  fun
+  [ ["child" :: sl] ->
+      match get_env "child" env with
+      [ Vind p a u ->
+          let auth =
+            match get_env "auth" env with
+            [ Vbool True -> authorized_age conf base p
+            | _ -> False ]
+          in
+          let ep = (p, a, u, auth) in
+          eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | ["enclosing" :: sl] ->
+      let rec loop =
+        fun
+        [ [("#loop", _) :: env] -> eval_compound_var conf base env ep sl
+        | [_ :: env] -> loop env
+        | [] -> raise Not_found ]
+      in
+      loop env
+  | ["father" :: sl] ->
+      match parents a with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let ep = make_ep conf base (father cpl) in
+          let cpl = (father cpl, mother cpl) in
+          let efam = Vfam (foi base ifam) cpl (doi base ifam) in
+          eval_compound_var conf base [("fam", efam) :: env] ep sl
+      | None ->
+          do {
+            warning_use_has_parents_before_parent "father";
+            str_val ""
+          } ]
+  | ["mother" :: sl] ->
+      match parents a with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let ep = make_ep conf base (mother cpl) in
+          let cpl = (father cpl, mother cpl) in
+          let efam = Vfam (foi base ifam) cpl (doi base ifam) in
+          eval_compound_var conf base [("fam", efam) :: env] ep sl
+      | None ->
+          do {
+            warning_use_has_parents_before_parent "mother";
+            str_val ""
+          } ]
+  | ["parent" :: sl] ->
+      match get_env "parent" env with
+      [ Vind p a u ->
+          let ep = (p, a, u, authorized_age conf base p) in
+          eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | ["related" :: sl] ->
+      match get_env "c" env with
+      [ Vind p a u ->
+          let ep = (p, a, u, authorized_age conf base p) in
+          eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | ["relation_her" :: sl] ->
+      match get_env "rel" env with
+      [ Vrel {r_moth = Some ip} ->
+         let ep = make_ep conf base ip in
+         eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | ["relation_him" :: sl] ->
+      match get_env "rel" env with
+      [ Vrel {r_fath = Some ip} ->
+         let ep = make_ep conf base ip in
+         eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | ["self" :: sl] -> eval_compound_var conf base env ep sl
+  | ["spouse" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam _ (_, ip) _ ->
+          let ep = make_ep conf base ip in
+          eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | ["witness" :: sl] ->
+      match get_env "witness" env with
+      [ Vind p a u ->
+          let ep = (p, a, u, authorized_age conf base p) in
+          eval_compound_var conf base env ep sl
+      | _ -> raise Not_found ]
+  | sl ->
+      try bool_val (eval_bool_var conf base env ep sl) with
+      [ Not_found ->
+          try str_val (eval_str_var conf base env ep sl) with
+          [ Not_found -> obsolete_eval conf base env ep sl ] ] ]
+and eval_bool_var conf base env ((p, a, u, p_auth) as ep) =
+  fun
+  [ ["birthday"] ->
+      match (p_auth, Adef.od_of_codate p.birth) with
+      [ (True, Some (Dgreg d _)) ->
+          if d.prec = Sure && p.death = NotDead then
+            d.day = conf.today.day && d.month = conf.today.month &&
+            d.year < conf.today.year ||
+            not (leap_year conf.today.year) && d.day = 29 && d.month = 2 &&
+            conf.today.day = 1 && conf.today.month = 3
+          else False
+      | _ -> False ]
+  | ["computable_age"] ->
+      if p_auth then
+        match (Adef.od_of_codate p.birth, p.death) with
+        [ (Some (Dgreg d _), NotDead) ->
+            not (d.day == 0 && d.month == 0 && d.prec <> Sure)
+        | _ -> False ]
+      else False
+  | ["computable_death_age"] ->
+      if p_auth then
+        match Date.get_birth_death_date p with
+        [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+           Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
+          when d1 <> d2 ->
+            let a = time_gone_by d1 d2 in
+            a.year > 0 ||
+            a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
+        | _ -> False ]
+      else False
+  | ["has_aliases"] -> p.aliases <> []
+  | ["has_baptism_date"] -> p_auth && p.baptism <> Adef.codate_None
+  | ["has_baptism_place"] -> p_auth && sou base p.baptism_place <> ""
+  | ["has_birth_date"] -> p_auth && p.birth <> Adef.codate_None
+  | ["has_birth_place"] -> p_auth && sou base p.birth_place <> ""
+  | ["has_burial_date"] ->
+      if p_auth then
+        match p.burial with
+        [ Buried cod -> Adef.od_of_codate cod <> None
+        | _ -> False ]
+      else False
+  | ["has_burial_place"] -> p_auth && sou base p.burial_place <> ""
+  | ["has_children"] ->
+      match get_env "fam" env with
+      [ Vfam _ _ des -> Array.length des.children > 0
+      | _ ->
+          List.exists
+            (fun ifam ->
+             let des = doi base ifam in Array.length des.children > 0)
+          (Array.to_list u.family) ]
+  | ["has_consanguinity"] ->
+      p_auth && consang a != Adef.fix (-1) && consang a != Adef.fix 0
+  | ["has_cremation_date"] ->
+      if p_auth then
+        match p.burial with
+        [ Cremated cod -> Adef.od_of_codate cod <> None
+        | _ -> False ]
+      else False
+  | ["has_cremation_place"] -> p_auth && sou base p.burial_place <> ""
+  | ["has_death_date"] ->
+      match p.death with
+      [ Death _ _ -> p_auth
+      | _ -> False ]
+  | ["has_death_place"] -> p_auth && sou base p.death_place <> ""
+  | ["has_families"] -> Array.length u.family > 0
+  | ["has_first_names_aliases"] -> p.first_names_aliases <> []
+  | ["has_image"] -> Util.has_image conf base p
+  | ["has_nephews_or_nieces"] -> has_nephews_or_nieces conf base p
+  | ["has_nobility_titles"] -> p_auth && p.titles <> []
+  | ["has_notes"] -> p_auth && sou base p.notes <> ""
+  | ["has_occupation"] -> p_auth && sou base p.occupation <> ""
+  | ["has_parents"] -> parents a <> None
+  | ["has_public_name"] -> sou base p.public_name <> ""
+  | ["has_qualifiers"] -> p.qualifiers <> []
+  | ["has_relations"] ->
+      if p_auth && conf.use_restrict then
+        let related =
+          List.fold_left
+            (fun l ip ->
+               let rp = pget conf base ip in
+               if is_hidden rp then l else [ip :: l])
+          [] p.related
+        in
+        p.rparents <> [] || related <> []
+      else p_auth && (p.rparents <> [] || p.related <> [])
+  | ["has_siblings"] ->
+      match parents a with
+      [ Some ifam -> Array.length (doi base ifam).children > 1
+      | None -> False ]
+  | ["has_sources"] ->
+      if conf.hide_names && not p_auth then False
+      else if sou base p.psources <> "" then True
+      else if
+        p_auth &&
+        (sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
+         sou base p.death_src <> "" || sou base p.burial_src <> "") then
+        True
+      else
+        List.exists
+          (fun ifam ->
+             let fam = foi base ifam in
+             p_auth && sou base fam.marriage_src <> "" ||
+             sou base fam.fsources <> "")
+          (Array.to_list u.family)
+  | ["has_surnames_aliases"] -> p.surnames_aliases <> []
+  | ["is_buried"] ->
+      match p.burial with
+      [ Buried _ -> p_auth
+      | _ -> False ]
+  | ["is_cremated"] ->
+      match p.burial with
+      [ Cremated _ -> p_auth
+      | _ -> False ]
+  | ["is_dead"] ->
+      match p.death with
+      [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
+      | _ -> False ]
+  | ["is_female"] -> p.sex = Female
+  | ["is_male"] -> p.sex = Male
+  | ["is_private"] -> p.access = Private
+  | ["is_public"] -> p.access = Public
+  | ["is_restricted"] -> is_hidden p
+  | _ -> raise Not_found ]
+and eval_str_var conf base env ((p, a, u, p_auth) as ep) =
+  fun
+  [ ["access"] -> acces conf base p
+  | ["age"] ->
+      match (p_auth, Adef.od_of_codate p.birth, p.death) with
+      [ (True, Some (Dgreg d _), NotDead) ->
+          let a = time_gone_by d conf.today in
+          Date.string_of_age conf a
+      | _ -> "" ]
+  | ["birth_place"] ->
+      if p_auth then string_of_place conf base p.birth_place else ""
+  | ["baptism_place"] ->
+      if p_auth then string_of_place conf base p.baptism_place else ""
+  | ["burial_place"] ->
+      if p_auth then string_of_place conf base p.burial_place else ""
+  | ["child_name"] ->
+      let force_surname =
+        match parents a with
+        [ None -> False
+        | Some ifam ->
+            p_surname base (pget conf base (father (coi base ifam))) <>
+              p_surname base p ]
+      in
+      if not p_auth && conf.hide_names then "x x"
+      else if force_surname then person_text conf base p
+      else person_text_without_surname conf base p
+  | ["consanguinity"] ->
+      if p_auth then
+        string_of_decimal_num conf
+          (round_2_dec (Adef.float_of_fix (consang a) *. 100.0)) ^ "%"
+      else ""
+  | ["cremation_place"] ->
+      if p_auth then string_of_place conf base p.burial_place else ""
+  | ["dates"] ->
+      if p_auth then Date.short_dates_text conf base p else ""
+  | ["death_age"] ->
+      if p_auth then
+        match Date.get_birth_death_date p with
+        [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+           Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
+          when d1 <> d2 ->
+            let a = time_gone_by d1 d2 in
+            let s =
+              if not approx && d1.prec = Sure && d2.prec = Sure then ""
+              else transl_decline conf "possibly (date)" "" ^ " "
+            in
+            s ^ Date.string_of_age conf a
+        | _ -> "" ]
+      else ""
+  | ["death_place"] ->
+      if p_auth then string_of_place conf base p.death_place else ""
+  | ["died"] -> string_of_died conf base env p p_auth
+  | ["fam_access"] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ ->
+          Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
+            (Adef.int_of_iper p.cle_index)
+      | _ -> raise Not_found ]
+  | ["father_age_at_birth"] -> string_of_parent_age conf base ep father
+  | ["first_name"] ->
+      if not p_auth && conf.hide_names then "x" else p_first_name base p
+  | ["first_name_key"] ->
+      if conf.hide_names && not p_auth then ""
+      else code_varenv (Name.lower (p_first_name base p))
+  | ["image_html_url"] -> string_of_image_url conf base env ep True
+  | ["image_size"] -> string_of_image_size conf base env ep
+  | ["image_url"] -> string_of_image_url conf base env ep False
+  | ["ind_access"] -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  | ["mother_age_at_birth"] -> string_of_parent_age conf base ep mother
+  | ["misc_names"] ->
+      if p_auth then
+        let list = Gutil.person_misc_names base p in
+        let list =
+          let first_name = p_first_name base p in
+          let surname = p_surname base p in
+          if first_name <> "?" && surname <> "?" then
+            [Name.lower (first_name ^ " " ^ surname) :: list]
+          else list
+        in
+        if list <> [] then
+          "<ul>\n" ^
+          List.fold_left (fun s n -> s ^ "<li>" ^ n ^ "\n") "" list ^
+          "</ul>\n"
+        else ""
+      else ""
+  | ["nb_children"] ->
+      match get_env "fam" env with
+      [ Vfam _ _ des -> string_of_int (Array.length des.children)
+      | _ ->
+          let n =
+            List.fold_left
+              (fun n ifam -> n + Array.length (doi base ifam).children) 0
+              (Array.to_list u.family)
+          in
+          string_of_int n ]
+  | ["nb_families"] -> string_of_int (Array.length u.family)
+  | ["nobility_title"] ->
+      match get_env "nobility_title" env with
+      [ Vtitle t ->
+          if p_auth then
+            string_of_title conf base (transl_nth conf "and" 0) p t
+          else ""
+      | _ -> raise Not_found ]
+  | ["notes"] ->
+      if p_auth then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        string_with_macros conf False env (sou base p.notes)
+      else ""
+  | ["occupation"] ->
+      if p_auth then capitale (sou base p.occupation) else ""
+  | ["on_baptism_date"] ->
+      match (p_auth, Adef.od_of_codate p.baptism) with
+      [ (True, Some d) -> Date.string_of_ondate conf d
+      | _ -> "" ]
+  | ["on_birth_date"] ->
+      match (p_auth, Adef.od_of_codate p.birth) with
+      [ (True, Some d) -> Date.string_of_ondate conf d
+      | _ -> "" ]
+  | ["on_burial_date"] ->
+      match p.burial with
+      [ Buried cod ->
+          match (p_auth, Adef.od_of_codate cod) with
+          [ (True, Some d) -> Date.string_of_ondate conf d
+          | _ -> "" ]
+      | _ -> raise Not_found ]
+  | ["on_cremation_date"] ->
+      match p.burial with
+      [ Cremated cod ->
+          match (p_auth, Adef.od_of_codate cod) with
+          [ (True, Some d) -> Date.string_of_ondate conf d
+          | _ -> "" ]
+      | _ -> raise Not_found ]
+  | ["on_death_date"] ->
+      match (p_auth, p.death) with
+      [ (True, Death _ d) ->
+          let d = Adef.date_of_cdate d in
+          Date.string_of_ondate conf d
+      | _ -> "" ]
+  | ["public_name"] -> sou base p.public_name
+  | ["qualifier"] ->
+      match (get_env "qualifier" env, p.qualifiers) with
+      [ (Vstring nn, _) -> nn
+      | (_, [nn :: _]) -> sou base nn
+      | _ -> raise Not_found ]
+  | ["sosa_link"] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match x with
+          [ Some (n, q) ->
+              Printf.sprintf "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
+                (Adef.int_of_iper p.cle_index) (Adef.int_of_iper q.cle_index)
+                (Num.to_string n)
+          | None -> "" ]
+      | _ -> raise Not_found ] 
+  | ["source"] ->
+      match get_env "src" env with
+      [ Vstring s ->
+          let env = [('i', fun () -> Util.default_image_name base p)] in
+          string_with_macros conf False env s
+      | _ -> raise Not_found ]
+  | ["surname"] ->
+      if not p_auth && conf.hide_names then "x" else p_surname base p
+  | ["surname_key"] ->
+      if conf.hide_names && not p_auth then ""
+      else code_varenv (Name.lower (p_surname base p))
+  | ["title"] -> person_title conf base p
+  | [] -> simple_person_text conf base p p_auth
+  | _ -> raise Not_found ]
+and simple_person_text conf base p p_auth =
   if p_auth then
     match main_title base p with
     [ Some t -> titled_person_text conf base p t
     | None -> person_text conf base p ]
   else if conf.hide_names then "x x"
   else person_text conf base p
-;
-
-value string_of_age conf base env p p_auth =
-  if p_auth then
-    match (Adef.od_of_codate p.birth, p.death) with
-    [ (Some (Dgreg d _), NotDead) ->
-        let a = time_gone_by d conf.today in
-        Date.string_of_age conf a
-    | _ -> "" ]
-  else ""
-;
-
-value string_of_alias conf base env =
-  match get_env "alias" env with
-  [ Vstring s -> s
-  | _ -> "" ]
-;
-
-value string_of_place conf base istr =
-  string_with_macros conf False [] (sou base istr)
-;
-
-value string_of_baptism_place conf base env p p_auth =
-  if p_auth then string_of_place conf base p.baptism_place else ""
-;
-
-value string_of_birth_place conf base env p p_auth =
-  if p_auth then string_of_place conf base p.birth_place else ""
-;
-
-value string_of_burial_place conf base env p p_auth =
-  if p_auth then string_of_place conf base p.burial_place else ""
-;
-
-value string_of_comment conf base env p p_auth =
-  fun
-  [ Vfam fam _ _ ->
-      if p_auth then string_with_macros conf False [] (sou base fam.comment)
-      else ""
-  | _ -> "" ]
-;
-
-value string_of_consanguinity conf base env a p_auth =
-  if p_auth then
-    string_of_decimal_num conf
-      (round_2_dec (Adef.float_of_fix (consang a) *. 100.0)) ^
-    "%"
-  else ""
-;
-
-value string_of_death_age conf base env p p_auth =
-  if p_auth then
-    match Date.get_birth_death_date p with
-    [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
-       Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
-      when d1 <> d2 ->
-        let a = time_gone_by d1 d2 in
-        let s =
-          if not approx && d1.prec = Sure && d2.prec = Sure then ""
-          else transl_decline conf "possibly (date)" "" ^ " "
-        in
-        s ^ Date.string_of_age conf a
-    | _ -> "" ]
-  else ""
-;
-
-value string_of_death_place conf base env p p_auth =
-  if p_auth then string_of_place conf base p.death_place else ""
-;
-
-value string_of_died conf base env p p_auth =
+and string_of_died conf base env p p_auth =
   if p_auth then
     let is = index_of_sex p.sex in
     match p.death with
@@ -458,46 +917,7 @@ value string_of_died conf base env p p_auth =
         capitale (transl_nth conf "died" is)
     | _ -> "" ]
   else ""
-;
-
-value string_of_divorce_date conf base env p p_auth =
-  fun
-  [ Vfam fam (_, isp) _ ->
-      match fam.divorce with
-      [ Divorced d ->
-          let d = Adef.od_of_codate d in
-          let auth =
-            let spouse = pget conf base isp in
-            p_auth && authorized_age conf base spouse
-          in
-          match d with
-          [ Some d when auth ->
-              " <em>" ^ Date.string_of_ondate conf d ^ "</em>"
-          | _ -> "" ]
-      | _ -> "" ]
-  | _ -> "" ]
-;
-
-value string_of_first_name_alias conf base env =
-  match get_env "first_name_alias" env with
-  [ Vstring s -> s
-  | _ -> "" ]
-;  
-
-value string_of_image_size conf base env p p_auth =
-  if p_auth then
-    match get_env "image" env with
-    [ Vimage x ->
-        match x with
-        [ Some (_, _, Some (width, height)) ->
-            Format.sprintf " width=%d height=%d" width height
-        | Some (_, link, None) -> Format.sprintf " height=%d" max_im_hei
-        | None -> "" ]
-    | _ -> "" ]
-  else ""
-;
-
-value string_of_image_url conf base env p p_auth html =
+and string_of_image_url conf base env (p, _, _, p_auth) html =
   if p_auth then
     match get_env "image" env with
     [ Vimage x ->
@@ -515,134 +935,18 @@ value string_of_image_url conf base env p p_auth html =
         | None -> "" ]
     | _ -> "" ]
   else ""
-;
-
-(* obsolete; should be removed one day *)
-
-value string_of_married_to conf base env p p_auth =
-  fun
-  [ Vfam fam (_, ispouse) des ->
-     let spouse = pget conf base ispouse in
-     let auth = p_auth && authorized_age conf base spouse in
-     let format = relation_txt conf p.sex fam in
-     Printf.sprintf (fcapitale format)
-       (fun _ -> if auth then string_of_marriage_text conf base fam else "")
-  | _ -> "" ]
-;
-
-value string_of_misc_names conf base env p p_auth =
+and string_of_image_size conf base env (p, _, _, p_auth) =
   if p_auth then
-    let list = Gutil.person_misc_names base p in
-    let list =
-      let first_name = p_first_name base p in
-      let surname = p_surname base p in
-      if first_name <> "?" && surname <> "?" then
-        [Name.lower (first_name ^ " " ^ surname) :: list]
-      else list
-    in
-    if list <> [] then
-      "<ul>\n" ^
-      List.fold_left (fun s n -> s ^ "<li>" ^ n ^ "\n") "" list ^
-      "</ul>\n"
-    else ""
-  else ""
-;
-
-value string_of_nobility_title conf base env p p_auth =
-  match get_env "nobility_title" env with
-  [ Vtitle t when p_auth ->
-      string_of_title conf base (transl_nth conf "and" 0) p t
-  | _ -> "" ]
-;
-
-value obsolete_list = ref [];
-
-value obsolete var new_var =
-  if List.mem var obsolete_list.val then ()
-  else ifdef UNIX then do {
-    Printf.eprintf "*** <W> perso.txt: variable \"%%%s;\" obsolete%s\n"
-      var
-      (if new_var = "" then "" else "; use rather \"" ^ new_var ^ "%%%s;\"");
-    flush stderr;
-    obsolete_list.val := [var :: obsolete_list.val]
-  }
-  else ()
-;
-
-value string_of_nobility_titles conf base env p p_auth =
-  let () = obsolete "nobility_titles" "nobility_title" in
-  if p_auth then string_of_titles conf base True (transl_nth conf "and" 0) p
-  else ""
-;
-
-value string_of_notes conf base env p p_auth =
-  if p_auth then
-    let env = [('i', fun () -> Util.default_image_name base p)] in
-    string_with_macros conf False env (sou base p.notes)
-  else ""
-;
-
-value string_of_occupation conf base env p p_auth =
-  if p_auth then capitale (sou base p.occupation) else ""
-;
-
-value string_of_on_baptism_date conf base env p p_auth =
-  if p_auth then
-    match Adef.od_of_codate p.baptism with
-    [ Some d -> Date.string_of_ondate conf d
-    | None -> "" ]
-  else ""
-;
-
-value string_of_on_birth_date conf base env p p_auth =
-  if p_auth then
-    match Adef.od_of_codate p.birth with
-    [ Some d -> Date.string_of_ondate conf d
-    | None -> "" ]
-  else ""
-;
-
-value string_of_on_burial_date conf base env p p_auth =
-  if p_auth then
-    match p.burial with
-    [ Buried cod ->
-        match Adef.od_of_codate cod with
-        [ Some d -> Date.string_of_ondate conf d
+    match get_env "image" env with
+    [ Vimage x ->
+        match x with
+        [ Some (_, _, Some (width, height)) ->
+            Format.sprintf " width=%d height=%d" width height
+        | Some (_, link, None) -> Format.sprintf " height=%d" max_im_hei
         | None -> "" ]
     | _ -> "" ]
   else ""
-;
-
-value string_of_on_cremation_date conf base env p p_auth =
-  if p_auth then
-    match p.burial with
-    [ Cremated cod ->
-        match Adef.od_of_codate cod with
-        [ Some d -> Date.string_of_ondate conf d
-        | None -> "" ]
-    | _ -> "" ]
-  else ""
-;
-
-value string_of_on_death_date conf base env p p_auth =
-  if p_auth then
-    match p.death with
-    [ Death _ d ->
-        let d = Adef.date_of_cdate d in
-        Date.string_of_ondate conf d
-    | _ -> "" ]
-  else ""
-;
-
-value string_of_origin_file conf base env =
-  if conf.wizard then
-    match get_env "fam" env with
-    [ Vfam fam _ _ -> sou base fam.origin_file
-    | _ -> "" ]
-  else ""
-;
-
-value string_of_parent_age conf base p a p_auth parent =
+and string_of_parent_age conf base (p, a, _, p_auth) parent =
   match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -653,483 +957,61 @@ value string_of_parent_age conf base p a p_auth parent =
             Date.string_of_age conf (time_gone_by d1 d2)
         | _ -> "" ]
       else ""
-  | None -> "" ]
-;
-
-value string_of_prefix_no_templ conf base env =
-  let henv =
-    List.fold_right
-      (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
-      conf.henv []
-  in
-  let c = conf.command ^ "?" in
-  List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
-    (henv @ conf.senv)
-;
-
-value string_of_qualifier conf base env p p_auth =
-  match (get_env "qualifier" env, p.qualifiers) with
-  [ (Vstring nn, _) -> nn
-  | (_, [nn :: _]) -> sou base nn
-  | _ -> "" ]
-;
-
-value string_of_referer conf base env =
-  Wserver.extract_param "referer: " '\n' conf.request
-;
-
-value string_of_related_type conf base env =
-  match (get_env "c" env, get_env "rel" env) with
-  [ (Vind c _ _, Vrel r) ->
-      capitale (rchild_type_text conf r.r_type (index_of_sex c.sex))
-  | _ -> "" ]
-;
-
-value string_of_relation_type conf base env =
-  match get_env "rel" env with
-  [ Vrel r ->
-      match (r.r_fath, r.r_moth) with
-      [ (Some ip, None) -> capitale (relation_type_text conf r.r_type 0)
-      | (None, Some ip) -> capitale (relation_type_text conf r.r_type 1)
-      | (Some ip1, Some ip2) -> capitale (relation_type_text conf r.r_type 2)
-      | _ -> "" ]
-  | _ -> "" ]
-;
-
-value string_of_sosa conf base env a a_auth =
-  match get_env "sosa" env with
-  [ Vsosa x ->
-      match x with
-      [ Some (n, p) ->
-          let b = Buffer.create 25 in
-          do {
-            Num.print (fun x -> Buffer.add_string b x)
-              (transl conf "(thousand separator)") n;
-            Buffer.contents b
-          }
-      | None -> "" ]
-  | _ -> "" ]
-;
-
-value string_of_sosa_link conf base env a a_auth =
-  match get_env "sosa" env with
-  [ Vsosa x ->
-      match x with
-      [ Some (n, p) ->
-          Printf.sprintf "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
-            (Adef.int_of_iper a.cle_index) (Adef.int_of_iper p.cle_index)
-            (Num.to_string n)
-      | None -> "" ]
-  | _ -> "" ]
-;
-
-value string_of_sosa_ref conf base env a a_auth =
-  match get_env "sosa" env with
-  [ Vsosa (Some (_, p)) ->
-      let p_auth = authorized_age conf base p in
-      simple_person_text conf base p p_auth
-  | _ -> "" ]
-;
-
-value string_of_source conf base env p =
-  match get_env "src" env with
-  [ Vstring s ->
-      let env = [('i', fun () -> Util.default_image_name base p)] in
-      string_with_macros conf False env s
-  | _ -> "" ]
-;
-
-value string_of_source_type conf base env =
-  match get_env "src_typ" env with
-  [ Vstring s -> s
-  | _ -> "" ]
-;
-
-value string_of_surname_alias conf base env =
-  match get_env "surname_alias" env with
-  [ Vstring s -> s
-  | _ -> "" ]
-;  
-
-value string_of_witness_relation conf base env =
-  fun
-  [ Vfam _ (ip1, ip2) _ ->
-      Printf.sprintf
-        (fcapitale (ftransl conf "witness at marriage of %s and %s"))
-        (referenced_person_title_text conf base (pget conf base ip1))
-        (referenced_person_title_text conf base (pget conf base ip2))
-  | _ -> "" ]
-;
-
-value eval_int_env var env =
+  | None -> raise Not_found ]
+and string_of_int_env var env =
   match get_env var env with
   [ Vint x -> string_of_int x
-  | _ -> "" ]
-;
-
-value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
+  | _ -> raise Not_found ]
+and obsolete_eval conf base env (p, a, u, p_auth) =
   fun
-  [ "alias" -> string_of_alias conf base env
-  | "access" -> acces conf base p
-  | "age" -> string_of_age conf base env p p_auth
-  | "baptism_place" -> string_of_baptism_place conf base env p p_auth
-  | "birth_place" -> string_of_birth_place conf base env p p_auth
-  | "burial_place" -> string_of_burial_place conf base env p p_auth
-  | "border" -> string_of_int conf.border
-  | "child_cnt" -> eval_int_env "child_cnt" env
-  | "child_name" ->
-      let force_surname =
-        match parents a with
-        [ None -> False
-        | Some ifam ->
-            p_surname base (pget conf base (father (coi base ifam))) <>
-              p_surname base p ]
+  [ ["married_to"] ->
+      let s =
+        match get_env "fam" env with
+        [ Vfam fam (_, ispouse) des ->
+           let spouse = pget conf base ispouse in
+           let auth = p_auth && authorized_age conf base spouse in
+           let format = relation_txt conf p.sex fam in
+           Printf.sprintf (fcapitale format)
+             (fun _ ->
+                if auth then string_of_marriage_text conf base fam else "")
+        | _ -> raise Not_found ]
       in
-      if not p_auth && conf.hide_names then "x x"
-      else if force_surname then person_text conf base p
-      else person_text_without_surname conf base p
-  | "comment" -> string_of_comment conf base env p p_auth efam
-  | "consanguinity" -> string_of_consanguinity conf base env a p_auth
-  | "count" ->
-      let () = obsolete "count" "child_cnt" in
-      eval_int_env "child_cnt" env
-  | "cremation_place" -> string_of_burial_place conf base env p p_auth
-  | "dates" ->
-      if p_auth then Date.short_dates_text conf base p else ""
-  | "death_age" -> string_of_death_age conf base env p p_auth
-  | "death_place" -> string_of_death_place conf base env p p_auth
-  | "died" -> string_of_died conf base env p p_auth
-  | "divorce_date" -> string_of_divorce_date conf base env p p_auth efam
-  | "fam_access" ->
-      match efam with
-      [ Vfam fam _ _ ->
-          Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
-            (Adef.int_of_iper p.cle_index)
-      | _ -> "" ]
-  | "family_cnt" -> eval_int_env "family_cnt" env
-  | "father_age_at_birth" ->
-      string_of_parent_age conf base p a p_auth (fun cpl -> (father cpl))
-  | "first_name" ->
-      if not p_auth && conf.hide_names then "x" else p_first_name base p
-  | "first_name_alias" -> string_of_first_name_alias conf base env
-  | "first_name_key" ->
-      if conf.hide_names && not p_auth then ""
-      else code_varenv (Name.lower (p_first_name base p))
-  | "image_html_url" -> string_of_image_url conf base env p p_auth True
-  | "image_txt" -> default_image_name base p
-  | "image_size" -> string_of_image_size conf base env p p_auth
-  | "image_url" -> string_of_image_url conf base env p p_auth False
-  | "ind_access" -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
-  | "key" ->
-      if not p_auth && conf.hide_names then "x"
-      else Util.default_image_name base p
-  | "length" ->
-      let () = obsolete "length" "nb_children" in
-      match get_env "fam" env with
-      [ Vfam _ _ des -> string_of_int (Array.length des.children)
-      | _ -> "" ]
-  | "marriage_place" ->
-      if p_auth then
-        match get_env "fam" env with
-        [ Vfam fam _ _ -> sou base fam.marriage_place
-        | _ -> "" ]
-      else ""
-  | "married_to" ->
-      let () = obsolete "married_to" "" in
-      string_of_married_to conf base env p p_auth efam
-  | "misc_names" -> string_of_misc_names conf base env p p_auth
-  | "mother_age_at_birth" ->
-      string_of_parent_age conf base p a p_auth (fun cpl -> (mother cpl))
-  | "nb_children" ->
-      match get_env "fam" env with
-      [ Vfam _ _ des -> string_of_int (Array.length des.children)
-      | _ -> "" ]
-  | "nb_families" ->
-      match get_env "child" env with
-      [ Vind _ _ u -> string_of_int (Array.length u.family)
+      obsolete "4.08" "married_to" "" (str_val s)
+  | _ -> raise Not_found ]
+;
+
+value print_variable conf base env ep s sl =
+  try
+    match eval_var conf base env ep [s :: sl] with
+    [ VVstring s -> Wserver.wprint "%s" s
+    | VVbool True -> Wserver.wprint "1"
+    | VVbool False -> Wserver.wprint "0" ]
+  with
+  [ Not_found ->
+      match sl with
+      [ [] -> Templ.print_variable conf base s
       | _ ->
-          match get_env "p" env with
-          [ Vind _ _ u -> string_of_int (Array.length u.family)
-          | _ -> "" ] ]
-  | "nobility_title" -> string_of_nobility_title conf base env p p_auth
-  | "nobility_titles" -> string_of_nobility_titles conf base env p p_auth
-  | "notes" -> string_of_notes conf base env p p_auth
-  | "occupation" -> string_of_occupation conf base env p p_auth
-  | "on_baptism_date" -> string_of_on_baptism_date conf base env p p_auth
-  | "on_birth_date" -> string_of_on_birth_date conf base env p p_auth
-  | "on_burial_date" -> string_of_on_burial_date conf base env p p_auth
-  | "on_cremation_date" -> string_of_on_cremation_date conf base env p p_auth
-  | "on_death_date" -> string_of_on_death_date conf base env p p_auth
-  | "on_marriage_date" ->
-      if p_auth then
-        match get_env "fam" env with
-        [ Vfam fam _ _ ->
-            match Adef.od_of_codate fam.marriage with
-            [ Some s -> Date.string_of_ondate conf s
-            | None -> "" ] 
-        | _ -> "" ]
-      else ""
-  | "origin_file" -> string_of_origin_file conf base env
-  | "prefix_no_templ" -> string_of_prefix_no_templ conf base env
-  | "public_name" ->  sou base p.public_name
-  | "qualifier" -> string_of_qualifier conf base env p p_auth
-  | "referer" -> string_of_referer conf base env
-  | "relation_type" -> string_of_relation_type conf base env
-  | "related_type" -> string_of_related_type conf base env
-  | "sosa" -> string_of_sosa conf base env p p_auth
-  | "sosa_link" -> string_of_sosa_link conf base env p p_auth
-  | "sosa_ref" -> string_of_sosa_ref conf base env p p_auth
-  | "source" -> string_of_source conf base env p
-  | "source_type" -> string_of_source_type conf base env
-  | "surname" ->
-      if not p_auth && conf.hide_names then "x" else p_surname base p
-  | "surname_alias" -> string_of_surname_alias conf base env
-  | "surname_key" ->
-      if conf.hide_names && not p_auth then ""
-      else code_varenv (Name.lower (p_surname base p))
-  | "title" -> person_title conf base p
-  | "witness_relation" -> string_of_witness_relation conf base env efam
-  | s ->
-      let v = extract_var "evar_" s in
-      if v <> "" then
-        match p_getenv (conf.env @ conf.henv) v with
-        [ Some vv -> quote_escaped vv
-        | _ -> "" ]
-      else raise Not_found ]
+          do {
+            Wserver.wprint " %%%s" s;
+            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+            Wserver.wprint "?"
+          } ] ]
 ;
 
-value print_simple_person_text conf base (p, _, _, p_auth) =
-  Wserver.wprint "%s" (simple_person_text conf base p p_auth)
-;
-
-value print_variable conf base env sl =
-  match eval_variable conf base env sl with
-  [ VVsome (env, ep, efam, "") -> print_simple_person_text conf base ep
-  | VVsome (env, ep, efam, s) ->
-      try
-        Wserver.wprint "%s" (try_eval_gen_variable conf base env ep efam s)
-      with
-      [ Not_found -> Templ.print_variable conf base s ]
-  | VVcvar s ->
-      Wserver.wprint "%s" (eval_base_env_variable conf s)
-  | VVnone ->
+value eval_bool_variable conf base env p s sl =
+  try
+    match eval_var conf base env p [s :: sl] with
+    [ VVbool x -> x
+    | VVstring "" -> False
+    | VVstring _ -> True ]
+  with
+  [ Not_found ->
       do {
-        list_iter_first
-          (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
-          sl;
-        Wserver.wprint "???"
-      } ]
-;
-
-value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
-  fun
-  [ "are_divorced" ->
-      match efam with
-      [ Vfam fam cpl _ ->
-          match fam.divorce with
-          [ Divorced d -> True
-          | _ -> False ]
-      | _ -> False ]
-  | "are_engaged" ->
-      match efam with
-      [ Vfam fam _ _ -> fam.relation = Engaged
-      | _ -> False ]
-  | "are_married" ->
-      match efam with
-      [ Vfam fam _ _ -> fam.relation = Married
-      | _ -> False ]
-  | "are_not_married" ->
-      match efam with
-      [ Vfam fam _ _ -> fam.relation = NotMarried
-      | _ -> False ]
-  | "are_separated" ->
-      match efam with
-      [ Vfam fam cpl _ -> fam.divorce = Separated
-      | _ -> False ]
-  | "is_no_sexes_check" ->
-      match efam with
-      [ Vfam fam _ _ -> fam.relation = NoSexesCheck
-      | _ -> False ]
-  | "is_no_mention" ->
-      match efam with
-      [ Vfam fam _ _ -> fam.relation = NoMention
-      | _ -> False ]
-  | "birthday" ->
-      if p_auth then
-        match Adef.od_of_codate p.birth with
-        [ Some (Dgreg d _) ->
-            if d.prec = Sure && p.death = NotDead then
-              d.day = conf.today.day && d.month = conf.today.month &&
-              d.year < conf.today.year ||
-              not (leap_year conf.today.year) && d.day = 29 && d.month = 2 &&
-              conf.today.day = 1 && conf.today.month = 3
-            else False
-        | _ -> False ]
-      else False
-  | "cancel_links" -> conf.cancel_links
-  | "computable_age" ->
-      if p_auth then
-        match (Adef.od_of_codate p.birth, p.death) with
-        [ (Some (Dgreg d _), NotDead) ->
-            not (d.day == 0 && d.month == 0 && d.prec <> Sure)
-        | _ -> False ]
-      else False
-  | "computable_death_age" ->
-      if p_auth then
-        match Date.get_birth_death_date p with
-        [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
-           Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
-          when d1 <> d2 ->
-            let a = time_gone_by d1 d2 in
-            a.year > 0 ||
-            a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
-        | _ -> False ]
-      else False
-  | "has_aliases" -> p.aliases <> []
-  | "has_baptism_date" -> p_auth && p.baptism <> Adef.codate_None
-  | "has_baptism_place" -> p_auth && sou base p.baptism_place <> ""
-  | "has_birth_date" -> p_auth && p.birth <> Adef.codate_None
-  | "has_birth_place" -> p_auth && sou base p.birth_place <> ""
-  | "has_burial_date" ->
-      if p_auth then
-        match p.burial with
-        [ Buried cod -> Adef.od_of_codate cod <> None
-        | _ -> False ]
-      else False
-  | "has_burial_place" -> p_auth && sou base p.burial_place <> ""
-  | "has_cremation_date" ->
-      if p_auth then
-        match p.burial with
-        [ Cremated cod -> Adef.od_of_codate cod <> None
-        | _ -> False ]
-      else False
-  | "has_children" ->
-      match efam with
-      [ Vfam _ _ des -> Array.length des.children > 0
-      | _ ->
-          List.exists
-            (fun ifam ->
-               let des = doi base ifam in Array.length des.children > 0)
-            (Array.to_list u.family) ]
-  | "has_comment" ->
-      match efam with
-      [ Vfam fam _ _ -> p_auth && sou base fam.comment <> ""
-      | _ -> False ]
-  | "has_consanguinity" ->
-      p_auth && consang a != Adef.fix (-1) && consang a != Adef.fix 0
-  | "has_cremation_place" -> p_auth && sou base p.burial_place <> ""
-  | "has_death_date" ->
-      match p.death with
-      [ Death _ _ -> p_auth
-      | _ -> False ]
-  | "has_death_place" -> p_auth && sou base p.death_place <> ""
-  | "has_families" -> Array.length u.family > 0
-  | "has_first_names_aliases" -> p.first_names_aliases <> []
-  | "has_image" -> Util.has_image conf base p
-  | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
-  | "has_nobility_titles" -> p_auth && p.titles <> []
-  | "has_notes" -> p_auth && sou base p.notes <> ""
-  | "has_occupation" -> p_auth && sou base p.occupation <> ""
-  | "has_parents" -> parents a <> None
-  | "has_public_name" -> sou base p.public_name <> ""
-  | "has_qualifiers" -> p.qualifiers <> []
-  | "has_referer" -> Wserver.extract_param "referer: " '\n' conf.request <> ""
-  | "has_relation_her" ->
-      match get_env "rel" env with
-      [ Vrel {r_moth = Some _} -> True
-      | _ -> False ]
-  | "has_relation_him" ->
-      match get_env "rel" env with
-      [ Vrel {r_fath = Some _} -> True
-      | _ -> False ]
-  | "has_relations" ->
-      if p_auth && conf.use_restrict then
-        let related =
-          List.fold_left
-            (fun l ip ->
-               let rp = pget conf base ip in
-               if is_hidden rp then l else [ip :: l])
-          [] p.related
-        in
-        (p.rparents <> [] || related <> [])
-      else p_auth && (p.rparents <> [] || p.related <> [])
-  | "has_siblings" ->
-      match parents a with
-      [ Some ifam -> Array.length (doi base ifam).children > 1
-      | None -> False ]
-  | "has_sosa" ->
-      match get_env "sosa" env with
-      [ Vsosa x -> x <> None
-      | _ -> False ]
-  | "has_sources" ->
-      if conf.hide_names && not p_auth then False
-      else if sou base p.psources <> "" then True
-      else if
-        p_auth &&
-        (sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
-         sou base p.death_src <> "" || sou base p.burial_src <> "") then
-        True
-      else
-        List.exists
-          (fun ifam ->
-             let fam = foi base ifam in
-             p_auth && sou base fam.marriage_src <> "" ||
-             sou base fam.fsources <> "")
-          (Array.to_list u.family)
-  | "has_surnames_aliases" -> p.surnames_aliases <> []
-  | "has_witnesses" ->
-      match efam with
-      [ Vfam fam _ _ -> Array.length fam.witnesses > 0
-      | _ -> False ]
-  | "is_buried" ->
-      match p.burial with
-      [ Buried _ -> p_auth
-      | _ -> False ]
-  | "is_cremated" ->
-      match p.burial with
-      [ Cremated _ -> p_auth
-      | _ -> False ]
-  | "is_dead" ->
-      match p.death with
-      [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
-      | _ -> False ]
-  | "is_female" -> p.sex = Female
-  | "is_first" ->
-      match get_env "first" env with
-      [ Vbool x -> x
-      | _ -> False ]
-  | "is_male" -> p.sex = Male
-  | "is_sibling_after" -> get_env "pos" env = Vstring "next"
-  | "is_sibling_before" -> get_env "pos" env = Vstring "prev"
-  | "is_private" -> p.access = Private
-  | "is_public" -> p.access = Public
-  | "is_restricted" -> is_hidden p
-  | "is_self" -> get_env "pos" env = Vstring "self"
-  | "wizard" -> conf.wizard
-  | "friend" -> conf.friend
-  | v ->
-      let v = extract_var "file_exists_" v in
-      if v <> "" then
-        let v = code_varenv v in
-        let s = Srcfile.source_file_name conf v in
-        Sys.file_exists s
-      else do { Wserver.wprint ">%%%s???" v; False } ]
-;
-
-value eval_bool_variable conf base env sl =
-  match eval_variable conf base env sl with
-  [ VVsome (env, ep, efam, "") ->
-      do {
-        list_iter_first
-          (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
-          sl;
-        Wserver.wprint "???";
+        Wserver.wprint " %%%s" s;
+        List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+        Wserver.wprint "?";
         False
-      }
-  | VVsome (env, ep, efam, s) ->
-      eval_simple_bool_variable conf base env ep efam s
-  | VVcvar s -> do { Wserver.wprint ">%%%s???" s; False }
-  | VVnone -> False ]
+      } ]
 ;
 
 value print_transl conf base env upp s c =
@@ -1169,7 +1051,7 @@ value print_wid_hei conf base env fname =
   | None -> () ]
 ;
 
-value eval_bool_value conf base env =
+value eval_bool_value conf base env ep =
   let rec bool_eval =
     fun
     [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
@@ -1180,7 +1062,7 @@ value eval_bool_value conf base env =
         | "!=" -> string_eval e1 <> string_eval e2
         | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
-    | Evar s sl -> eval_bool_variable conf base env [s :: sl]
+    | Evar s sl -> eval_bool_variable conf base env ep s sl
     | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
     | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
     | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
@@ -1190,14 +1072,18 @@ value eval_bool_value conf base env =
     | Eint s -> s
     | Evar s sl ->
         try
-          match eval_variable conf base env [s :: sl] with
-          [ VVsome (env, ((p, _, _, p_auth) as ep), efam, s) ->
-              if s <> "" then try_eval_gen_variable conf base env ep efam s
-              else simple_person_text conf base p p_auth
-          | VVcvar s -> eval_base_env_variable conf s
-          | _ -> raise Not_found ]
+          match eval_var conf base env ep [s :: sl] with
+          [ VVbool True -> "1"
+          | VVbool False -> "0"
+          | VVstring s -> s ]
         with
-        [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
+        [ Not_found ->
+            do {
+              Wserver.wprint " %%%s" s;
+              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+              Wserver.wprint "?";
+              ""
+            } ]
     | Etransl upp s c -> Templ.eval_transl conf upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
@@ -1207,33 +1093,39 @@ value eval_bool_value conf base env =
 value eval_expr conf base env p =
   fun
   [ Estr s -> s
-  | Evar s [] ->
-      try try_eval_gen_variable conf base env p Vnone s with
-      [ Not_found -> ">" ^ s ^ "???" ]
+  | Evar s sl ->
+      try
+        match eval_var conf base env p [s :: sl] with
+        [ VVstring s -> s
+        | VVbool True -> "1"
+        | VVbool False -> "0" ]
+      with
+      [ Not_found ->
+          do {
+            Wserver.wprint " %%%s" s;
+            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+            Wserver.wprint "?";
+            ""
+          } ]
   | Etransl upp s c -> Templ.eval_transl conf upp s c
   | _ -> ">parse_error" ]
 ;
 
-value rec print_ast conf base env =
+value rec print_ast conf base env ep =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> print_transl conf base env upp s n
-  | Avar s sl -> print_variable conf base env [s :: sl]
+  | Avar s sl -> print_variable conf base env ep s sl
   | Awid_hei s -> print_wid_hei conf base env s
-  | Aif e alt ale -> print_if conf base env e alt ale
-  | Aforeach s sl al -> print_foreach conf base env s sl al
-  | Adefine f xl al alk -> print_define conf base env f xl al alk
-  | Aapply f el -> print_apply conf base env f el ]
-and print_define conf base env f xl al alk =
-  List.iter (print_ast conf base [(f, Vfun xl al) :: env]) alk
-and print_apply conf base env f el =
+  | Aif e alt ale -> print_if conf base env ep e alt ale
+  | Aforeach s sl al -> print_foreach conf base env ep s sl al
+  | Adefine f xl al alk -> print_define conf base env ep f xl al alk
+  | Aapply f el -> print_apply conf base env ep f el ]
+and print_define conf base env ep f xl al alk =
+  List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
+and print_apply conf base env ep f el =
   match get_env f env with
   [ Vfun xl al ->
-      let ep =
-        match (get_env "p" env, get_env "p_auth" env) with
-        [ (Vind p a u, Vbool p_auth) -> (p, a, u, p_auth)
-        | _ -> assert False ]
-      in
       let vl = List.map (eval_expr conf base env ep) el in
       List.iter
         (fun a ->
@@ -1245,31 +1137,61 @@ and print_apply conf base env f el =
                | ([], []) -> a
                | _ -> Atext "parse_error" ]
            in
-           print_ast conf base env a)
+           print_ast conf base env ep a)
         al
-  | _ -> Wserver.wprint ">%%%s???" f ]
-and print_if conf base env e alt ale =
-  let al = if eval_bool_value conf base env e then alt else ale in
-  List.iter (print_ast conf base env) al
-and print_foreach conf base env s sl al =
-  let (sl, s) =
-    let sl = List.rev [s :: sl] in (List.rev (List.tl sl), List.hd sl)
+  | _ -> Wserver.wprint " %%%s???" f ]
+and print_if conf base env ep e alt ale =
+  let al = if eval_bool_value conf base env ep e then alt else ale in
+  List.iter (print_ast conf base env ep) al
+and print_foreach conf base env ep s sl al =
+  let rec loop ((_, a, _, _) as ep) efam =
+    fun 
+    [ [s] -> print_simple_foreach conf base env al ep efam s
+    | ["child" :: sl] ->
+        match get_env "child" env with
+        [ Vind p a u ->
+            let auth =
+              match get_env "auth" env with
+              [ Vbool True -> authorized_age conf base p
+              | _ -> False ]
+            in
+            let ep = (p, a, u, auth) in
+            loop ep efam sl
+        | _ -> raise Not_found ]
+    | ["father" :: sl] ->
+        match parents a with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let ep = make_ep conf base (father cpl) in
+            let cpl = (father cpl, mother cpl) in
+            let efam = Vfam (foi base ifam) cpl (doi base ifam) in
+            loop ep efam sl
+        | None ->
+            warning_use_has_parents_before_parent "father" ]
+    | ["mother" :: sl] ->
+        match parents a with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let ep = make_ep conf base (mother cpl) in
+            let cpl = (father cpl, mother cpl) in
+            let efam = Vfam (foi base ifam) cpl (doi base ifam) in
+            loop ep efam sl
+        | None ->
+            warning_use_has_parents_before_parent "mother" ]
+    | _ -> raise Not_found ]
   in
-  match eval_variable conf base env sl with
-  [ VVsome (env, ep, efam, "") ->
-      print_simple_foreach conf base env al ep efam s
-  | VVsome (env, ep, efam, _) ->
+  let efam = get_env "fam" env in
+  try loop ep efam [s :: sl] with
+  [ Not_found ->
       do {
-        Wserver.wprint "foreach ";
-        List.iter (fun s -> Wserver.wprint "%s." s) sl;
-        Wserver.wprint "%s???" s
-      }
- | VVcvar s -> Wserver.wprint ">%%%s???" s
- | VVnone -> () ]
+        Wserver.wprint " %%foreach;%s" s;
+        List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+        Wserver.wprint "?"
+      } ]
 and print_simple_foreach conf base env al ep efam =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
-  | "child" -> print_foreach_child conf base env al efam
+  | "child" -> print_foreach_child conf base env al ep efam
   | "family" -> print_foreach_family conf base env al ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
   | "nobility_title" -> print_foreach_nobility_title conf base env al ep
@@ -1279,16 +1201,16 @@ and print_simple_foreach conf base env al ep efam =
   | "relation" -> print_foreach_relation conf base env al ep
   | "source" -> print_foreach_source conf base env al ep
   | "surname_alias" -> print_foreach_surname_alias conf base env al ep
-  | "witness" -> print_foreach_witness conf base env al efam
+  | "witness" -> print_foreach_witness conf base env al ep efam
   | "witness_relation" -> print_foreach_witness_relation conf base env al ep
-  | s -> Wserver.wprint "foreach %s???" s ]
-and print_foreach_alias conf base env al (p, _, _, p_auth) =
+  | s -> Wserver.wprint " %%foreach;%s?" s ]
+and print_foreach_alias conf base env al ((p, _, _, p_auth) as ep) =
   List.iter
     (fun a ->
        let env = [("alias", Vstring (sou base a)) :: env] in
-       List.iter (print_ast conf base env) al)
+       List.iter (print_ast conf base env ep) al)
     p.aliases
-and print_foreach_child conf base env al =
+and print_foreach_child conf base env al ep =
   fun
   [ Vfam _ _ des ->
       let auth =
@@ -1325,10 +1247,10 @@ and print_foreach_child conf base env al =
                [("pos", Vstring "next") :: env]
              else env
            in
-           List.iter (print_ast conf base env) al)
+           List.iter (print_ast conf base env ep) al)
         des.children
   | _ -> () ]
-and print_foreach_family conf base env al (p, _, u, _) =
+and print_foreach_family conf base env al ((p, _, u, _) as ep) =
   Array.iteri
     (fun i ifam ->
        let fam = foi base ifam in
@@ -1338,27 +1260,27 @@ and print_foreach_family conf base env al (p, _, u, _) =
        let env = [("#loop", Vint 0) :: env] in
        let env = [("fam", Vfam fam cpl des) :: env] in
        let env = [("family_cnt", Vint (i + 1)) :: env] in
-       List.iter (print_ast conf base env) al)
+       List.iter (print_ast conf base env ep) al)
     u.family
-and print_foreach_first_name_alias conf base env al (p, _, _, p_auth) =
+and print_foreach_first_name_alias conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     List.iter
       (fun s ->
          let env = [("first_name_alias", Vstring (sou base s)) :: env] in
-         List.iter (print_ast conf base env) al)
+         List.iter (print_ast conf base env ep) al)
       p.first_names_aliases
   else ()
-and print_foreach_nobility_title conf base env al (p, _, _, p_auth) =
+and print_foreach_nobility_title conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     let titles = nobility_titles_list conf p in
     list_iter_first
       (fun first x ->
          let env = [("nobility_title", Vtitle x) :: env] in
          let env = [("first", Vbool first) :: env] in
-         List.iter (print_ast conf base env) al)
+         List.iter (print_ast conf base env ep) al)
       titles
   else ()
-and print_foreach_parent conf base env al (_, a, _, _) =
+and print_foreach_parent conf base env al ((_, a, _, _) as ep) =
   match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -1368,25 +1290,25 @@ and print_foreach_parent conf base env al (_, a, _, _) =
            let a = aget conf base iper in
            let u = uget conf base iper in
            let env = [("parent", Vind p a u) :: env] in
-           List.iter (print_ast conf base env) al)
+           List.iter (print_ast conf base env ep) al)
         (parent_array cpl)
   | None -> () ]
-and print_foreach_qualifier conf base env al (p, _, _, _) =
+and print_foreach_qualifier conf base env al ((p, _, _, _) as ep) =
   list_iter_first
     (fun first nn ->
        let env = [("qualifier", Vstring (sou base nn)) :: env] in
        let env = [("first", Vbool first) :: env] in
-       List.iter (print_ast conf base env) al)
+       List.iter (print_ast conf base env ep) al)
     p.qualifiers
-and print_foreach_relation conf base env al (p, _, _, p_auth) =
+and print_foreach_relation conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     List.iter
       (fun r ->
          let env = [("rel", Vrel r) :: env] in
-         List.iter (print_ast conf base env) al)
+         List.iter (print_ast conf base env ep) al)
       p.rparents
   else ()
-and print_foreach_related conf base env al (p, _, _, p_auth) =
+and print_foreach_related conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     let list =
       List.fold_left
@@ -1428,10 +1350,10 @@ and print_foreach_related conf base env al (p, _, _, p_auth) =
          let a = aget conf base c.cle_index in
          let u = uget conf base c.cle_index in
          let env = [("c", Vind c a u); ("rel", Vrel r) :: env] in
-         List.iter (print_ast conf base env) al)
+         List.iter (print_ast conf base env ep) al)
       list
   else ()
-and print_foreach_source conf base env al (p, _, u, p_auth) =
+and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
   let rec insert_loop typ src =
     fun
     [ [(typ1, src1) :: srcl] ->
@@ -1476,16 +1398,16 @@ and print_foreach_source conf base env al (p, _, u, p_auth) =
     if s = "" then ()
     else
       let env = [("src_typ", Vstring src_typ); ("src", Vstring s) :: env] in
-      List.iter (print_ast conf base env) al
+      List.iter (print_ast conf base env ep) al
   in
   List.iter print_src srcl
-and print_foreach_surname_alias conf base env al (p, _, _, _) =
+and print_foreach_surname_alias conf base env al ((p, _, _, _) as ep) =
   List.iter
     (fun s ->
        let env = [("surname_alias", Vstring (sou base s)) :: env] in
-       List.iter (print_ast conf base env) al)
+       List.iter (print_ast conf base env ep) al)
     p.surnames_aliases
-and print_foreach_witness conf base env al =
+and print_foreach_witness conf base env al ep =
   fun
   [ Vfam fam _ _ ->
       list_iter_first
@@ -1495,10 +1417,10 @@ and print_foreach_witness conf base env al =
            let u = uget conf base ip in
            let env = [("witness", Vind p a u) :: env] in
            let env = [("first", Vbool first) :: env] in
-           List.iter (print_ast conf base env) al)
+           List.iter (print_ast conf base env ep) al)
         (Array.to_list fam.witnesses)
   | _ -> () ]
-and print_foreach_witness_relation conf base env al (p, _, _, _) =
+and print_foreach_witness_relation conf base env al ((p, _, _, _) as ep) =
   let list =
     let list = ref [] in
     do {
@@ -1541,13 +1463,14 @@ and print_foreach_witness_relation conf base env al (p, _, _, _) =
        let des = doi base ifam in
        let cpl = ((father cpl), (mother cpl)) in
        let env = [("fam", Vfam fam cpl des) :: env] in
-       List.iter (print_ast conf base env) al)
+       List.iter (print_ast conf base env ep) al)
     list
 ;
 
 value interp_templ conf base p astl =
   let a = aget conf base p.cle_index in
   let u = uget conf base p.cle_index in
+  let ep = (p, a, u, authorized_age conf base p) in
   let env =
     let env = [] in
     let env =
@@ -1562,7 +1485,7 @@ value interp_templ conf base p astl =
     let env = [("p_auth", Vbool (authorized_age conf base p)) :: env] in
     let env = [("p", Vind p a u) :: env] in env
   in
-  List.iter (print_ast conf base env) astl
+  List.iter (print_ast conf base env ep) astl
 ;
 
 (* Main *)

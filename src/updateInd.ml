@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.17 2005-01-21 10:13:00 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.18 2005-01-22 20:11:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -333,7 +333,7 @@ and eval_is_relation_type rt =
 and eval_int_env var env =
   match get_env var env with
   [ Vint x -> str_val (string_of_int x)
-  | _ -> str_val "" ]
+  | _ -> raise Not_found ]
 and eval_string_env var env =
   match get_env var env with
   [ Vstring x -> str_val (quote_escaped x)
