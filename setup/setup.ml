@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.21 2002-01-13 15:24:21 ddr Exp $ *)
+(* $Id: setup.ml,v 4.22 2002-01-13 17:07:24 ddr Exp $ *)
 
 open Printf;
 
@@ -288,6 +288,10 @@ value server_string conf =
   [ Not_found -> "127.0.0.1" ]
 ;
 
+value referer conf =
+  Wserver.extract_param "referer: " '\r' conf.request
+;
+
 value skip_lang s =
   loop where rec loop i =
     if i = String.length s then None
@@ -307,6 +311,7 @@ value macro conf =
   | 'i' -> strip_spaces (s_getenv conf.env "i")
   | 'l' -> conf.lang
   | 'm' -> server_string conf
+  | 'n' -> referer conf
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'p' -> parameters conf.env
   | 'q' -> Version.txt
