@@ -2,7 +2,7 @@
 Bienvenido a GeneWeb $q
 
 Vaya a su explorador Web y habra la dirección siguiente:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 Si esto no funciona, es posible que Ud. haya configurado en su 
 explorador algunas opciones de tipo "trabajar fuera de conección" 

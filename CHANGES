@@ -33,6 +33,11 @@ GeneWeb version 3.12
     the first choice of the first case. But it goes on searching up by
     surname, if no complete name is found.
 
+* Setup program (gwsetup)
+  - [20 Feb 01] Added option -lang: if provided in parameter, the lang
+    name is not asked the user. Changed all "localhost:" into
+    "127.0.0.1:" which always work on Windows.
+
 GeneWeb version 3.11
 --------------------
 

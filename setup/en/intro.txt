@@ -2,7 +2,7 @@
 Welcome to GeneWeb $q
 
 Go to your Web browser and open the address:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 Warning: for this program to work, you must not delete this window!
 
