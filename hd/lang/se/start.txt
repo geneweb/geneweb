@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.46 2000-07-07 12:11:14 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.47 2000-07-23 18:55:51 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -23,6 +23,10 @@ databas</font></h1></table>
 <td align=right valign=top>%w</td>
 </tr>
 </table>
+
+<br>
+
+<font size=-1><em>Du kan välja ett annat språk bland de följande:</em></font>
 
 <br>
 
