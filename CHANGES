@@ -46,7 +46,8 @@ GeneWeb version 3.10
 * Consanguinity computing (consang)
   - [15 Nov 00] Improved the program: now 30% faster.
 
-* Lexicon (lang/lexicon.txt)
+* Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [26 Nov 00] Updated Czech welcome page (Petr Slansky)
   - [13 Nov 00] Deleted entry "of": using only "%1 of %2" now. Some
     consequences in displaying (depending on language).
 

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.40 2000-11-06 10:36:59 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.41 2000-11-26 15:05:09 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -17,8 +17,7 @@
 height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<table><tr><td align=center><h1><font color=%i>{Genealogical<br>data
-base}</font></h1></table>
+<table><tr><td align=center><h1><font color=%i>Genealogická<br>databáze</font></h1></table>
 </td>
 <td align=right valign=top>%w</td>
 </tr>
@@ -26,11 +25,15 @@ base}</font></h1></table>
 
 <br>
 
+<font size=-1><em>Zvolte jazyk pro prohlí¾ení databáze:</em></font>
+
+<br>
+
 %rversion
 
 <p>
 
-Databáze <font color=%i><b>"%t"</b></font> nyní obsahuje %n osob.%In<br>
+Databáze <font color=%i><b>"%t"</b></font> obsahuje %n osob.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
 %I&NwNj<br><p>
@@ -38,16 +41,16 @@ Databáze <font color=%i><b>"%t"</b></font> nyní obsahuje %n osob.%In<br>
 %I&NcNa<table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w">{<em>Wizard</em></a> access<br>
-(password)}<br></td>
+<td align=center><a href="%sw=w">{<em>"Wizard"</em></a> pøístup<br>
+(heslo)}<br></td>
 
-%INf<td align=center><a href="%sw=f">{<em>Friend</em></a> access<br>
-(password)}</td>
+%INf<td align=center><a href="%sw=f">{<em>"Friend"</em></a> pøístup<br>
+(heslo)}</td>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=POST action="%f">
-%hPassword, for <em>friend</em> or <em>wizard</em> access:</em>:
+%hHeslo pro<em>"friend"</em> nebo <em>"wizard"</em> pøístup:</em>:
 <input name=w type=password size=10 maxlength=200>
 <input type=submit value="Ok">
 </form>
@@ -60,7 +63,7 @@ Databáze <font color=%i><b>"%t"</b></font> nyní obsahuje %n osob.%In<br>
 
 <tr><td>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
-{To navigate in this data base, you can do your search}:<br><p>
+Databázi lze prohledávat:<br><p>
 
 <ul>
 
@@ -68,7 +71,7 @@ Databáze <font color=%i><b>"%t"</b></font> nyní obsahuje %n osob.%In<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=%i><b>{by person}</b></font>
+<font color=%i><b>Podle osob</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -105,10 +108,10 @@ Databáze <font color=%i><b>"%t"</b></font> nyní obsahuje %n osob.%In<br>
 
 <form method=GET action="%f">
 %h
-<font color=%i><b>{by the list}</b></font> {of all}
+<font color=%i><b>ze seznamu</b></font> v¹ech
 <select name=m>
-<option value="N" selected>pøíjmení
-<option value="P">køestní jména
+<option value="N" selected>[surname/surnames]
+<option value="P">[first name/first names]
 </select>
 seøazená podle
 <select name=tri>
@@ -122,33 +125,33 @@ seøazená podle
 
 <form method=GET action="%s">
 %h<input type=hidden name=m value=PS>
-<font color=%i><b>{by} [place] / [surname/surnames]0</b></font>
+<font color=%i><b>podle [place] / [surname/surnames]</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
 - [death] <input type=checkbox name=de value=on>
 - [marriage/marriages]0 <input type=checkbox name=ma value=on>
 - <input type=submit value="Ok">
 </form>
 
-<li><font color=%i><b>{by the}</b></font>
-<a href="%sm=H;v=advanced"><font color=%i><b>pokroèilý
+<li><font color=%i><b>lze také zadat</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>roz¹íøený
 dotaz</b></font></a>.
 
 </ul>
 </td></tr></table></center>
 
 %Iw<p>
-<center>{You can}<br><p>
+<center>Zde mù¾ete<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-%Ispropose_add_family;<li><a href="%sm=ADD_FAM">{add a family}</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">pøidat novou rodinu</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-%E<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+%E<li><a href="%sm=MOD_NOTES">upravit poznámky</a>
 </ul>
 </td>
 </tr>
@@ -157,7 +160,7 @@ dotaz</b></font></a>.
 
 %E<br><p>
 
-<center>{You can also consult}<br><p>
+<center>Lze se také podívat na<br><p>
 
 <table border=0>
 <tr>
@@ -187,15 +190,14 @@ dotaz</b></font></a>.
 
 <p>
 
-{If your browser does not automatically update the modified pages (forcing you
-to do "reload current document"), try navigating from <a
-href="%sescache=0">this link</a>}.
+Pokud Vá¹ prohlí¾eè neprovádí automaticky obnovu upravených stránek (musíte pou¾ívat tlaèítko "obnovit"), zkuste prohlí¾ení pøes <a
+href="%sescache=0">tento odkaz</a>}.
 
 </td></tr>
 </table>
 
 <br>
 
-<p align=right><font size=-1><em><a href="%sm=LEX">lexicon</a></em></font></p>
+<p align=right><font size=-1><em><a href="%sm=LEX">lexikon</a></em></font></p>
 
 </center>
