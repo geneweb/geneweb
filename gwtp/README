@@ -1,7 +1,7 @@
 What is gwtp?
 
-Gwtp is a CGI program allowing owners of data bases accomodated in a
-GeneWeb site to upload and download their data bases on the site and
+Gwtp is a CGI program allowing owners of databases accomodated in a
+GeneWeb site to upload and download their databases on the site and
 change their configuration parameters.
 
 
@@ -19,12 +19,12 @@ by the correct values:
 
   #!/bin/sh
   tmp=[the above directory holding gwtp, lang and passwd]
-  dst=[the directory holding the GeneWeb data bases]
+  dst=[the directory holding the GeneWeb databases]
   site=[the URL of the GeneWeb site]
   cd $tmp
   ./gwtp -tmp $tmp -dst $dst -site $site
 
-The above variable 'site' is the Web address of a GeneWeb data base
+The above variable 'site' is the Web address of a GeneWeb database
 *minus* its name. Things like that:
    http://my.site.net/cgi-bin/geneweb.cgi?b=
    http://my.site.net:2317/
@@ -33,29 +33,29 @@ Make your CGI executable:
    chmod a+x gwtp.cgi
 
 Then, when accessing that CGI, people get a login page where they have to
-enter a data base name and a password.
+enter a database name and a password.
 
 
 Adding an user
 
-To add a new accomodated data base, just add a line in the passwd file
+To add a new accomodated database, just add a line in the passwd file
 of the directory $tmp above, holding:
     base:passwd
 
-replacing "base" by the name of the data base you want and "passwd" by
-a complicated enough password. Send these values to the data base owner.
+replacing "base" by the name of the database you want and "passwd" by
+a complicated enough password. Send these values to the database owner.
 
-The data base owner can then access the CGI and log in. The first
-time, he has to configure his data base parameters; once done, he
-can upload his data base. Later, using the same login, he can at any
+The database owner can then access the CGI and log in. The first
+time, he has to configure his database parameters; once done, he
+can upload his database. Later, using the same login, he can at any
 time change his configuration, or upload or download his GeneWeb
-data base.
+database.
 
 
 Removing an user
 
-Remove his entry in the passwd file, delete his GeneWeb data base
-(directory ending with ".gwb"), and delete his data base configuration
+Remove his entry in the passwd file, delete his GeneWeb database
+(directory ending with ".gwb"), and delete his database configuration
 file (file ending with ".gwf").
 
 
@@ -70,7 +70,7 @@ will be copied at the beginning of the user configuration file.
 Sending gedcom files
 
 By default, the cgi does not allow to send gedcom files: people have
-to send the contents of their data base. But if you add the executable
+to send the contents of their database. But if you add the executable
 "ged2gwb" in the directory corresponding to the option -etc of gwtp,
 (by default, same than -tmp), a link to send gedcoms is proposed in
 the main menu.

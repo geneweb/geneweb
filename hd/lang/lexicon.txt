@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.54 2001-11-26 10:39:56 ddr Exp $
+# $Id: lexicon.txt,v 4.55 2001-11-27 12:10:31 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2484,13 +2484,13 @@ pt: cremado/cremada/cremado(a)
 ru: êğåìèğîâàí/êğåìèğîâàíà
 sv: kremerad
 
-    data base forum
+    database forum
 af: databasis forum
 ca: fòrum de la base de dades
 cs: databázové fórum
 da: database-forum
 de: Datenbankforum
-en: data base forum
+en: database forum
 eo: datenbankforumo
 es: foro de la base de datos
 et: andmebaasi foorum
@@ -4305,12 +4305,12 @@ pt: resultados detalhados
 ru: ïîäğîáíî
 sv: ut&ouml;kad rapport
 
-    loop in data base: %s is his/her own ancestor
+    loop in database: %s is his/her own ancestor
 ca: bucle a la base de dades: %s és avantpassat d'ell mateix
 cs: smyèka v databázi: %s je svùj pøedek
 da: loop i databasen: %s er sin egen ane
 de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
-en: loop in data base: %s is his/her own ancestor
+en: loop in database: %s is his/her own ancestor
 eo: estas masxo en la datenbazo: %s estas sia propra avo
 es: referencia circul&aacute;r en la base de datos: %s es su propio ancestro
 et: silmus andmebaasis: %s on iseenda esivanem
@@ -4319,7 +4319,7 @@ fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  îòâì áîàâø äğúåğéí: %s  öàöà(ä) ìàöîå/ìàöîä
 it: loop nel data-base: %s e' antenato di se stesso
 lv: cilpa datu bâzç: %s ir viòa/viòas pağas secis
-nl: kring in de data base: %s is zijn/haar eigen voorouder
+nl: kring in de database: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
 pl: pêtla w bazie: %s jest swoim w³asnym przodkiem
 pt: refer&ecirc;ncia circular no banco de dados: %s &eacute; seu pr&oacute;prio ancestral

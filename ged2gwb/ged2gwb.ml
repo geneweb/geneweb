@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.11 2001-08-22 14:52:08 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.12 2001-11-27 12:11:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2536,8 +2536,8 @@ value set_undefined_death_interval s =
 value out_file = ref "a";
 value speclist =
   [("-o", Arg.String (fun s -> out_file.val := s),
-    "<file>\n       Output data base (default: \"a\").");
-   ("-f", Arg.Set force, "\n       Remove data base if already existing");
+    "<file>\n       Output database (default: \"a\").");
+   ("-f", Arg.Set force, "\n       Remove database if already existing");
    ("-log", Arg.String (fun s -> log_oc.val := open_out s),
     "<file>\n       Redirect log trace to this file.");
    ("-lf", Arg.Set lowercase_first_names, "   \
@@ -2637,7 +2637,7 @@ value main () =
     in
     if not force.val && Sys.file_exists bdir then do {
       Printf.printf "\
-The data base \"%s\" already exists. Use option -f to overwrite it.
+The database \"%s\" already exists. Use option -f to overwrite it.
 "
         out_file.val;
       flush stdout;

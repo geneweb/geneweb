@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.6 2001-10-27 20:03:01 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.7 2001-11-27 12:10:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1097,7 +1097,7 @@ value speclist =
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
     ": no spouses' parents (for options -s and -d)");
-   ("-nn", Arg.Set no_notes, ": no (data base) notes");
+   ("-nn", Arg.Set no_notes, ": no (database) notes");
    ("-c", Arg.Int (fun i -> censor.val := i), "\
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
@@ -1125,7 +1125,7 @@ value anonfun s =
   match arg_state.val with
   [ ASnone ->
       if in_file.val = "" then in_file.val := s
-      else raise (Arg.Bad "Cannot treat several data bases")
+      else raise (Arg.Bad "Cannot treat several databases")
   | ASwaitAncOcc ->
       try
         do { anc_occ.val := int_of_string s; arg_state.val := ASwaitAncSurn }

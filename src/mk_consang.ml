@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 4.2 2001-04-23 03:02:38 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 4.3 2001-11-27 12:10:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value fname = ref "";
@@ -13,12 +13,12 @@ value speclist =
    ("-i", Arg.Set indexes, ": build the indexes again");
    ("-scratch", Arg.Set scratch, ": from scratch");
    ("-mem", Arg.Set Iobase.save_mem,
-    ": Save memory, but slower when rewritting data base");
-   ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
+    ": Save memory, but slower when rewritting database");
+   ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock database.")]
 ;
 value anonfun s =
   if fname.val = "" then fname.val := s
-  else raise (Arg.Bad "Cannot treat several data bases")
+  else raise (Arg.Bad "Cannot treat several databases")
 ;
 
 value simple_output bname base =

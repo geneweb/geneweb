@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.17 2001-11-24 13:17:14 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.18 2001-11-27 12:10:32 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -46,7 +46,7 @@ ca: Base de dades<br>geneal&ograve;gica
 cs: Genealogická databáze
 da: Genealogisk<br>database
 de: Genealogische<br>Datenbank
-en: Genealogical<br>data base
+en: Genealogical<br>database
 eo: Datenbazo<br>genealogia
 es: Base de datos<br>geneal&oacute;gica
 et: Genealoogiline<br>andmebaas
@@ -107,7 +107,7 @@ da: Databasen <font color=%i><b>"%t"</b></font> indeholder for
     &oslash;jeblikket %n personer.
 de: Die Datenbank <font color=%i><b>"%t"</b></font> enth&auml;lt z. Zt.
     %n Personen.
-en: The data base <font color=%i><b>"%t"</b></font> now holds %n persons.
+en: The database <font color=%i><b>"%t"</b></font> now holds %n persons.
 eo: La datenbazo <font color=%i><b>"%t"</b></font> enhavas nun %n
     personojn.
 es: La base <font color=%i><b>"%t"</b></font> contiene actualmente %n
@@ -235,7 +235,7 @@ ca: Per navegar en aquesta base, podeu fer la vostra recerca:
 cs: Databázi lze prohledávat:
 da: For at navigere i denne database kan du søge:
 de: Zum Benutzen dieser Datenbank kannst du hier suchen:
-en: To navigate in this data base, you can do your search:
+en: To navigate in this database, you can do your search:
 eo: Por navigi en cxi tiu datenbazo, vi povas fari vian sercxon:
 es: Para navegar en esta base de datos, puede hacer su búsqueda:
 et: Navigeeri andmebaasis:
@@ -731,7 +731,7 @@ zh:
 <ul>%Ih
 <li><a href="%sm=HIST;k=10">[history of updates]</a>%E
 <li><a href="%sm=CAL">[calendar/calendars]1</a>
-<li><a href="%sm=FORUM">[data base forum]</a>
+<li><a href="%sm=FORUM">[database forum]</a>
 </ul>
 </td>
 </tr>

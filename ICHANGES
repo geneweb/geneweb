@@ -12,7 +12,7 @@ GeneWeb Version 4.04
     with internet explorer.
   - [19 Sep 01] Trace: too big texts in referer now cut.
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [05 Oct 01] Added other acceptable tags in trl files: ul, ol, li, table,
     tr, td.
 
@@ -32,7 +32,7 @@ GeneWeb Version 4.03
 * Lexicon (lang/lexicon.txt)
   - [14 Jul 01] Added phrase "undefined sex for %t".
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [13 Jul 01] Added "wizard_just_friend" which is now configurable under
     gwtp.
 
@@ -156,7 +156,7 @@ GeneWeb Version 3.11
   - [30 Dec 00] Fixed information file about how to put a background image,
     the URL to use and the directory were wrong (obsolete).
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [05 Feb 01] Added a trace in case of error. So far, there were no
     traces, it just stopped.
 
@@ -229,7 +229,7 @@ GeneWeb Version 3.08
   - [23 Sep 00] Fixed bug: if GIVN = first name, should have ignored it,
     but did not.
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [06 Sep 00] Added ability to change the default language.
   - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
     be gwtp.cgi, for example). Fixed also the distribution: template files
@@ -303,7 +303,7 @@ GeneWeb Version 3.05
   - [14 May 00] Does not fail any more ("document contains no data") when
     the "cnt" directory has no access permissions.
   - [10 May 00] Changed traces when wizards, friends, global accesses.
-  - [10 May 00] Reply now "no access" for attempt of access to data base
+  - [10 May 00] Reply now "no access" for attempt of access to database
     in CGI mode when base auth file defined (because that works only in
     server mode).
   - [04 May 00] Dates "or year" and "year interval" are shortly displayed
@@ -424,7 +424,7 @@ GeneWeb Version 3.02
     relationlink computing page.
   - [Jan 11, 00] Put a separation (<td>&nbsp;</td>) between the two branches
     in simple relationship displaying.
-  - [Jan 9, 00] Centered title "genealogical data base".
+  - [Jan 9, 00] Centered title "genealogical database".
   - [Jan 9, 00] Added the ability to add ";td=bgcolor=xxx" in URL when
     printing a dag. Color the square of the person.
   - [Jan 5, 00] Added the ability to add ";bd=n" (n >= 1) in URL when
@@ -442,9 +442,9 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [Dec 2, 99] Added a system of "areas" in data bases protected by
+  - [Dec 2, 99] Added a system of "areas" in databases protected by
     a password, based on the name of the ".gw" files => works only
-    for data bases created with "gwc".
+    for databases created with "gwc".
   - [Nov 23, 99] Fixed problem of selecting a first name: sometimes it
     did not work. Used "Name.lower" instead of "Name.strip_lower" for the
     list for a future selection.
@@ -453,9 +453,9 @@ GeneWeb Version 3.01
   - [Nov 13, 99] Added some checks of access tables out of bounds
   - [Nov 13, 99] Added link to welcome page in case of not found
   - [Nov 9, 99] Chop suffix ".gwb" if the base name has it in URL
-  - [Nov 6, 99] The URL for the "up" image now independent from the data base
+  - [Nov 6, 99] The URL for the "up" image now independent from the database
   - [Nov 5, 99] Red display title for not found persons.
-  - [Nov 5, 99] Lengthened the height of the data base notes area.
+  - [Nov 5, 99] Lengthened the height of the database notes area.
 
 * GeneWeb compiler (gwc) and uncompiler (gwu) 
   - [Nov 9, 99] Fixed problem for titles holding the character colon. The
@@ -476,13 +476,13 @@ GeneWeb Version 3.00
 * GeneWeb daemon/CGI (gwd)
   - [Nov 1, 99] Print relations only for friends and wizards.
   - [Oct 31, 99] Added macro %k for images in order to have the same request
-    for any data base in any language. And several changes to make the DOC
-    request independant from the data base.
+    for any database in any language. And several changes to make the DOC
+    request independant from the database.
   - [Oct 25, 99] Modified the treatment of nth (overflowing after 100)
     to display the number itself (better than just "n-th").
   - [Oct 25, 99] Commented the loading of the whole persons and families
     arrays in "descend.ml": supposed to make things go faster but consumming
-    13M in my data base when clicking on "descendants" for anybody.
+    13M in my database when clicking on "descendants" for anybody.
   - [Oct 15, 99] Added a check of month day in gregorian dates.
   - [Oct 9, 99] Added a "suicide" request: if exists in the request,
     the sender go the the robot black list... by setting a hidden URL with
@@ -507,7 +507,7 @@ GeneWeb Version 2.07
     his first name or surname hold a "?" since it cannot not saved in
     GeneWeb source files.
   - [Sep 29, 99] Errorred when clicking on surnames by alphabetic order
-    on empty data bases. Fixed.
+    on empty databases. Fixed.
   - [Sep 28, 99] Forgot sharp (#) as possible character in URLs. Fixed.
   - [Sep 26, 99] Fixed bug of ordering persons by dates in "specify" page.
 
@@ -515,7 +515,7 @@ GeneWeb Version 2.06
 --------------------
 
 * General
-  - [Aug 31, 99] Changed internal representation of data bases to add
+  - [Aug 31, 99] Changed internal representation of databases to add
     "notes origin file" and "sources" for global notes.
   - [Aug 16, 99] Now "make" does "make opt". To run the older "make"
     do "make out". The installation tells to run "make" (i.e. "make opt").
@@ -556,7 +556,7 @@ GeneWeb Version 2.05
   - [Jul 22, 99] Added functions p_first_name and p_surname to prepare
     installation of declined forms for names. Hope it works one day (not
     sure...)
-  - [Jul 15, 99] Changed internal reprentation of strings in data bases:
+  - [Jul 15, 99] Changed internal reprentation of strings in databases:
     no more use of ansel encoding, returning back to version 1.06. Should
     not change anything to normal users. This was done because of too
     many drawbacks (many displaying bugs, code more complicated) against
@@ -580,7 +580,7 @@ GeneWeb Version 2.05
     and ability to ask for "v1=#;v2=#" for uncles and nephews...
   - [Jul 2..Aug 2, 99] Added "access_by_key" in "base.gwf" files to generate
     accesses by keys instead of index in the person array (which can change
-    when recompiling the base), allowing to update the data base without
+    when recompiling the base), allowing to update the database without
     disturbing the users accessing it.
 
 * GeneWeb compiler (gwc)
@@ -599,7 +599,7 @@ GeneWeb Version 2.03
 
 * New
   - [May 30, 99] Added program "fpla": first parentless ancestors. Given
-    a data base, displays the Sosa number of the first ancestor without
+    a database, displays the Sosa number of the first ancestor without
     parent. Sorted by Sosa numbers: the first displayed person is therefore
     the person whose ancestors list is the most complete.
 

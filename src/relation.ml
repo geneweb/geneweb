@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.18 2001-08-24 04:54:10 ddr Exp $ *)
+(* $Id: relation.ml,v 4.19 2001-11-27 12:10:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1617,7 +1617,7 @@ value print_base_loop conf base p =
     rheader conf title;
     Wserver.wprint
       (fcapitale
-         (ftransl conf "loop in data base: %s is his/her own ancestor"))
+         (ftransl conf "loop in database: %s is his/her own ancestor"))
       (reference conf base p (person_text conf base p));
     Wserver.wprint ".\n";
     trailer conf
