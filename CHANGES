@@ -2,6 +2,8 @@ GeneWeb version 2.07
 --------------------
 
 * Setup program (gwsetup)
+  - [Sep 16, 99] Distribute different versions of the introduction text
+    for Windows and Unix (problems of accents).
   - [Sep 13, 99] Added German version (Thomas Omerzu).
   - [Sep 9, 99] Added Swedish version (Lars Gustavsson).
   - [Sep 8, 99] Fixed lot of typos and errors in English version

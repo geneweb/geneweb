@@ -1,18 +1,18 @@
 
 Bienvenido a GeneWeb $q
 
-Vaya a su explorador Web y habra la dirección siguiente:
+Vaya a su explorador Web y habra la direcci¢n siguiente:
        http://localhost:$z/
 
 Si esto no funciona, es posible que Ud. haya configurado en su 
-explorador algunas opciones de tipo "trabajar fuera de conección" 
+explorador algunas opciones de tipo "trabajar fuera de conecci¢n" 
 o "no utilizar un proxy con las direcciones locales" o "no conectarse 
-al internet con la dirección 'localhost'".
+al internet con la direcci¢n 'localhost'".
 
 Si a pesar de todos sus esfuerzos, el problema no se resuelve, trate 
-con  el método clásico indicado en la documentación. Para ello salga 
+con  el m‚todo cl sico indicado en la documentaci¢n. Para ello salga 
 del programa escribiendo en el teclado "control-c" (en la ventana que 
-se había abierto al lanzar el programa), vaya luego a la carpeta "gw" 
+se hab¡a abierto al lanzar el programa), vaya luego a la carpeta "gw" 
 y habra el fichero:
 
    INSTALL.htm

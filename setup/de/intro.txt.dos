@@ -5,13 +5,13 @@ Greife mit deinem Webbrowser auf folgende Adresse zu:
        http://localhost:$z/
 
 Falls das nicht funktioniert, mußt du eventuell in deinem Webbrowser
-einige Optionen ändern, wie zum Beispiel "Offline arbeiten" oder
-"Für lokale Adressen keinen Proxy benutzen" oder "Für die Adresse
+einige Optionen „ndern, wie zum Beispiel "Offline arbeiten" oder
+"Fr lokale Adressen keinen Proxy benutzen" oder "Fr die Adresse
 'localhost' nicht mit dem Internet verbinden".
 
 Wenn du trotz all dieser Anstrengungen keinen Zugriff bekommst,
 versuche es mit der klassischen Methode, die Dokumentation 
 anzuschauen. Dazu beende dieses Programm, indem du Control-C 
-(bzw. Strg-C) in diesem Fenster drückst, dann in das Verzeichnis
-"gw" wechselst und die folgende Datei öffnest:
+(bzw. Strg-C) in diesem Fenster drckst, dann in das Verzeichnis
+"gw" wechselst und die folgende Datei ”ffnest:
    INSTALL.htm
