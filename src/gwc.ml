@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.6 1998-10-23 17:18:29 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.7 1998-11-20 19:11:10 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -189,13 +189,13 @@ value insert_undefined_parent gen key =
   do if not gen.g_errored then
        if sou gen.g_base x.first_name <> key.pk_first_name ||
           sou gen.g_base x.surname <> key.pk_surname then
-         do Printf.eprintf "\nPersonne définie avec deux orthographes:\n";
-            Printf.eprintf "  \"%s%s %s\"\n" key.pk_first_name
+         do Printf.printf "\nPersonne définie avec deux orthographes:\n";
+            Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
               (match x.occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
               key.pk_surname;
-            Printf.eprintf "  \"%s%s %s\"\n" (sou gen.g_base x.first_name)
+            Printf.printf "  \"%s%s %s\"\n" (sou gen.g_base x.first_name)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
@@ -233,15 +233,15 @@ value insert_person gen so =
         return x ]
   in
   do if gen.g_def.(Adef.int_of_iper x.cle_index) then
-       do Printf.eprintf "\nPersonne déja définie: \"%s%s %s\"\n"
-            so.first_name
+       do Printf.printf "\nPersonne déja définie: \"%s%s %s\"\n"
+            (Ansel.to_iso_8859_1 so.first_name)
             (match x.occ with
              [ 0 -> ""
              | n -> "." ^ string_of_int n ])
-            so.surname;
+            (Ansel.to_iso_8859_1 so.surname);
           if sou gen.g_base x.first_name <> so.first_name ||
              sou gen.g_base x.surname <> so.surname then
-            Printf.eprintf "sous le nom: \"%s%s %s\"\n"
+            Printf.printf "sous le nom: \"%s%s %s\"\n"
               (sou gen.g_base x.first_name)
               (match occ with
                [ 0 -> ""
@@ -255,13 +255,13 @@ value insert_person gen so =
      if not gen.g_errored then
        if sou gen.g_base x.first_name <> so.first_name ||
           sou gen.g_base x.surname <> so.surname then
-         do Printf.eprintf "\nPersonne définie avec deux orthographes:\n";
-            Printf.eprintf "  \"%s%s %s\"\n" so.first_name
+         do Printf.printf "\nPersonne définie avec deux orthographes:\n";
+            Printf.printf "  \"%s%s %s\"\n" so.first_name
               (match x.occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
               so.surname;
-            Printf.eprintf "  \"%s%s %s\"\n" (sou gen.g_base x.first_name)
+            Printf.printf "  \"%s%s %s\"\n" (sou gen.g_base x.first_name)
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
@@ -312,7 +312,7 @@ value verif_parents_non_deja_definis gen x pere mere =
       let cpl = coi gen.g_base ifam in
       let p = cpl.father in
       let m = cpl.mother in
-      do Printf.eprintf
+      do Printf.printf
            "
 Je ne peux pas ajouter \"%s\", enfant de
     - \"%s\"
@@ -324,7 +324,7 @@ parce que cette personne existe deja en tant qu'enfant de
            (denomination gen.g_base mere)
            (denomination gen.g_base (poi gen.g_base p))
            (denomination gen.g_base (poi gen.g_base m));
-         flush stderr;
+         flush stdout;
          x.birth := Adef.codate_None;
          x.death := DontKnowIfDead;
       return Check.error gen
@@ -335,7 +335,7 @@ value noter_sexe gen p s =
   if p.sexe == Neutre then p.sexe := s
   else if p.sexe == s || s == Neutre then ()
   else
-    do Printf.eprintf "\nIncohérence sur le sexe de\n  %s %s\n"
+    do Printf.printf "\nInconcistency about the sex of\n  %s %s\n"
          (sou gen.g_base p.first_name) (sou gen.g_base p.surname);
     return Check.error gen
 ;
@@ -392,8 +392,8 @@ value insere_notes fname gen key str =
   [ Some ip ->
       let p = poi gen.g_base ip in
       if sou gen.g_base p.notes <> "" then
-        do Printf.eprintf "\nFile \"%s\"\n" fname;
-           Printf.eprintf "Notes already defined for \"%s%s %s\"\n"
+        do Printf.printf "\nFile \"%s\"\n" fname;
+           Printf.printf "Notes already defined for \"%s%s %s\"\n"
              key.pk_first_name
              (if occ == 0 then "" else "." ^ string_of_int occ)
              key.pk_surname;
@@ -401,12 +401,12 @@ value insere_notes fname gen key str =
       else
         p.notes := unique_string gen str
   | None ->
-      do Printf.eprintf "File \"%s\"\n" fname;
-         Printf.eprintf "Notes before person definition: \"%s%s %s\"\n"
+      do Printf.printf "File \"%s\"\n" fname;
+         Printf.printf "Notes before person definition: \"%s%s %s\"\n"
            key.pk_first_name
            (if occ == 0 then "" else "." ^ string_of_int occ)
            key.pk_surname;
-         flush stderr;
+         flush stdout;
       return Check.error gen ]
 ;
 
@@ -496,7 +496,7 @@ value link gwo_list =
      cleanup = fun () -> ()}
   in
   do if do_check.val && Array.length persons > 0 then
-       do Check.check_base base gen pr_stats.val; flush stderr; return ()
+       do Check.check_base base gen pr_stats.val; flush stdout; return ()
      else ();
      if not gen.g_errored then
        if do_consang.val then Consang.compute_all_consang base False
@@ -549,7 +549,7 @@ and [options] are:";
        (fun (x, shift) ->
           if Filename.check_suffix x ".gw" then
             do try Gwcomp.comp_familles x with e ->
-                 do Printf.eprintf "File \"%s\", line %d:\n" x line_cnt.val;
+                 do Printf.printf "File \"%s\", line %d:\n" x line_cnt.val;
                  return raise e;
                gwo.val := [(x ^ "o", shift) :: gwo.val];
             return ()
@@ -565,8 +565,8 @@ and [options] are:";
                  Iobase.output out_file.val base;
               return ()
           | Refuse ->
-              do Printf.eprintf "Base is locked: cannot write it\n";
-                 flush stderr;
+              do Printf.printf "Base is locked: cannot write it\n";
+                 flush stdout;
               return exit 2 ];
           output_command_line out_file.val;
        return ()

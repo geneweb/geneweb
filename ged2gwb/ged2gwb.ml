@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.14 1998-11-13 14:31:34 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.15 1998-11-20 19:11:08 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -745,13 +745,12 @@ value add_indi gen r =
   in
   let family =
     let rl = find_all_fields "FAMS" r.rsons in
-(*
-    let rl =
-      List.fold_right (fun r rl -> if exists gen r.rval then [r :: rl] else rl)
+    let rvl =
+      List.fold_right
+        (fun r rvl -> if List.mem r.rval rvl then [r.rval :: rvl] else rvl)
         rl []
     in
-*)
-    List.map (fun r -> fam_index gen r.rval) rl
+    List.map (fun r -> fam_index gen r) rvl
   in
   let (birth, birth_place, birth_src) =
     match find_field "BIRT" r.rsons with

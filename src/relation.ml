@@ -1,4 +1,4 @@
-(* $Id: relation.ml,v 1.4 1998-11-15 22:55:06 ddr Exp $ *)
+(* $Id: relation.ml,v 1.5 1998-11-20 19:11:11 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -25,7 +25,8 @@ value print_menu conf base p =
      Srcfile.hidden_env conf;
      Wserver.wprint
        "
-<input type=hidden name=e value=\"m=R;i=%d\">
+<input type=hidden name=em value=R>
+<input type=hidden name=ei value=%d>
 <input type=hidden name=m value=NG>
 <input name=n size=40 maxlength=200> =>
 <input type=submit VALUE=\"Ok\">
