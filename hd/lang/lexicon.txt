@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.10 1999-11-10 10:39:03 ddr Exp $
+# $Id: lexicon.txt,v 3.11 1999-11-10 21:24:54 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2015,11 +2015,13 @@ se: forum
 en: foster father/foster mother/foster parents
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 no: fosterfar/fostermor/fosterforeldre
+se: fosterfar/fostermor/fosterf&ouml;r&auml;lder
 
     foster son/foster daughter/foster child
 en: foster son/foster daughter/foster child
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 no: fosters&oslash;nn/fosterdatter/fosterbarn
+se: fosterson/fosterdotter/fosterbarn
 
     generation
 cs: generace
@@ -2682,7 +2684,7 @@ it: sposati
 nl: gehuwd
 no: gift
 pt: casado/casados
-se: gifta
+se: gift
 
     married at age %t
 cs: o¾enil se ve vìku %t/vdala se ve vìku %t
@@ -3859,6 +3861,11 @@ nl: beknopte weergave
 no: kort rapport
 pt: short display
 se: kort rapport
+
+    shortest path
+en: shortest path
+fr: chemin le plus court
+se: kortaste grenen
 
     should be female
 cs: mìla by být ¾enského pohlaví
