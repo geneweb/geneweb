@@ -1,12 +1,71 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb</title></head>
-<body bgcolor="#d6bfaf">
+<html>
 
-<h1>Translation soon available</h1>
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="Template"
+content="D:\Program Files\Microsoft Office\Office\html.dot">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>GeneWeb - Återskapa en databas</title>
+</head>
 
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
-GeneWeb</em></font><br>
+<body bgcolor="#D6BFAF" link="#0000FF" vlink="#800080">
 
+<h1>GeneWeb - Återskapa en databas</h1>
+
+<p>När du installerar en ny version av <em>GeneWeb</em>, vill du
+förmodligen fortsätta använda din databas. </p>
+
+<p>Om du startade från en GEDCOM fil och du inte hade gjort
+några ändringar eller det var väldigt få av dem, är det
+bättre att starta om med den nya versionen av
+&quot;ged2gwb&quot;. Från en version till nästa kan det här
+programmet ha förbättrats: nya behandlade fält, nya optioner. </p>
+
+<p>Å andra sidan, om du hade startat från en tom databas eller
+från en GEDCOM fil och du hade gjort ändringar, följ denna
+procedur: </p>
+
+<ul>
+    <li>Flytta din databas från katalogen i den gamla versionen
+        av <em>GeneWeb</em> till den nya. Om din databas namn är
+        &quot;svensson&quot;, är det katalogen
+        &quot;svensson.gwb&quot; du ska flytta. </li>
+    <li>Starta den nya &quot;gwd&quot; och kontrollera om din
+        databas blir accepterad genom att försöka komma åt den
+        i webbläsaren. </li>
+    <li>Om den inte blir det måste du återskapa den. Gör
+        följande operationer: <ul>
+            <li>Lägg &quot;svensson.gwb&quot; tillbaka i den
+                gamla katalogen </li>
+            <li>Starta ett DOS fönster. Gå till den gamla
+                katalogen (kommandot &quot;cd&quot;) och skriv: <pre>
+     gwu svensson.gwb &gt; foo.gw</pre>
+                <p>Obs: detta kommando kallades
+                &quot;gwb2gw&quot; i tidiga versioner. Om du har
+                det under detta namn använd det istället. </p>
+            </li>
+            <li>Kopiera filen &quot;foo.gw&quot; till den nya
+                katalogen. </li>
+            <li>I DOS fönstret, gå till den nya katalogen
+                (kommandot &quot;cd&quot;) och skriv: <pre>
+     gwc -nc foo.gw -o svensson</pre>
+            </li>
+            <li>Starta den nya demonen och kontrollera att din
+                databas blir accepterad. Det borde den bli. </li>
+            <li>Du kan nu radera filen &quot;foo.gw&quot; och
+                &quot;foo.gwo&quot;, den sista filen skapas av
+                &quot;gwc&quot; och är en temporär fil. Om du
+                vill kan du spara &quot;foo.gw&quot; som en
+                säkerhetskopia av din databas. </li>
+        </ul>
+    </li>
+</ul>
+
+<p>Tillbaka till <a href="diruse.htm">bruksanvisningen</a>. </p>
+
+<hr>
+
+<p><font size="2"><em>© Copyright INRIA 1999 - GeneWeb</em></font></p>
 </body>
-
+</html>
