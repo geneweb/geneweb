@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 4.11 2004-08-05 12:37:14 ddr Exp $ *)
+(* $Id: check.ml,v 4.12 2004-08-05 19:41:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -12,16 +12,15 @@ type gen_min_person 'person 'string =
     m_rparents : mutable list (gen_relation 'person 'string);
     m_related : mutable list iper;
     m_sex : mutable sex;
-    m_notes : mutable 'string;
-    m_cle_index : mutable iper }
+    m_notes : mutable 'string }
 ;
+
 type min_person = gen_min_person iper istr;
 
 type cbase =
   { c_persons : mutable array min_person;
     c_ascends : mutable array ascend;
     c_unions : mutable array union;
-    c_families : mutable array family;
     c_couples : mutable array couple;
     c_descends : mutable array descend;
     c_strings : mutable array string;
@@ -41,7 +40,9 @@ type gen =
     g_shift : mutable int;
     g_errored : mutable bool;
     g_per_index : out_channel;
-    g_per : out_channel }
+    g_per : out_channel;
+    g_fam_index : out_channel;
+    g_fam : out_channel }
 ;
 
 value error gen = gen.g_errored := True;

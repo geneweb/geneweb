@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.6 2004-07-17 09:16:53 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.7 2004-08-05 19:41:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -73,15 +73,11 @@ value compute base from_scratch quiet =
       match base.func.patched_ascends () with
       [ [] -> ()
       | list ->
-          let _ = base.data.families.array () in
-          do {
-            List.iter
-              (fun ip ->
-                 let u = uoi base ip in
-                 Array.iter (clear_descend_consang base mark) u.family)
-              list;
-            base.data.families.clear_array ()
-          } ]
+          List.iter
+            (fun ip ->
+               let u = uoi base ip in
+               Array.iter (clear_descend_consang base mark) u.family)
+            list ]
     else ();
     for i = 0 to base.data.ascends.len - 1 do {
       let a = base.data.ascends.get i in

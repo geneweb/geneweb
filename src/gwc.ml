@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.21 2004-08-05 14:01:30 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.22 2004-08-05 19:41:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -64,28 +64,23 @@ value unique_string gen x =
 
 value no_family gen =
   let empty = unique_string gen "" in
-  let fam =
-    {marriage = Adef.codate_None; marriage_place = empty;
-     marriage_src = empty; witnesses = [| |]; relation = Married;
-     divorce = NotDivorced; comment = empty; origin_file = empty;
-     fsources = empty; fam_index = Adef.ifam_of_int 0}
-  and cpl = couple False (Adef.iper_of_int 0) (Adef.iper_of_int 0)
+  let cpl = couple False (Adef.iper_of_int 0) (Adef.iper_of_int 0)
   and des = {children = [| |]} in
-  (fam, cpl, des)
+  (cpl, des)
 ;
 
-value make_person gen p n occ i =
+value make_person gen p n occ =
   let empty_string = unique_string gen "" in
   let p =
     {m_first_name = unique_string gen p; m_surname = unique_string gen n;
      m_occ = occ; m_rparents = []; m_related = []; m_sex = Neuter;
-     m_notes = empty_string; m_cle_index = Adef.iper_of_int i}
+     m_notes = empty_string}
   and a = no_ascend ()
   and u = {family = [| |]} in
   (p, a, u)
 ;
 
-value no_person gen = make_person gen "" "" 0 0;
+value no_person gen = make_person gen "" "" 0;
 
 value new_iper gen =
   if gen.g_pcnt == Array.length gen.g_base.c_persons then do {
@@ -111,17 +106,13 @@ value new_iper gen =
 ;
 
 value new_ifam gen =
-  if gen.g_fcnt == Array.length gen.g_base.c_families then do {
-    let fam_arr = gen.g_base.c_families in
+  if gen.g_fcnt == Array.length gen.g_base.c_couples then do {
     let cpl_arr = gen.g_base.c_couples in
     let des_arr = gen.g_base.c_descends in
-    let new_size = 2 * Array.length fam_arr + 1 in
-    let (phony_fam, phony_cpl, phony_des) = no_family gen in
-    let new_fam_arr = Array.create new_size phony_fam in
+    let new_size = 2 * Array.length cpl_arr + 1 in
+    let (phony_cpl, phony_des) = no_family gen in
     let new_cpl_arr = Array.create new_size phony_cpl in
     let new_des_arr = Array.create new_size phony_des in
-    Array.blit fam_arr 0 new_fam_arr 0 (Array.length fam_arr);
-    gen.g_base.c_families := new_fam_arr;
     Array.blit cpl_arr 0 new_cpl_arr 0 (Array.length cpl_arr);
     gen.g_base.c_couples := new_cpl_arr;
     Array.blit des_arr 0 new_des_arr 0 (Array.length des_arr);
@@ -214,14 +205,14 @@ value find_first_available_occ gen fn sn occ =
 
 value insert_undefined gen key =
   let occ = key.pk_occ + gen.g_shift in
-  let x =
+  let (x, ip) =
     try
       if key.pk_first_name = "?" || key.pk_surname = "?" then raise Not_found
       else
-        let x =
+        let ip =
           find_person_by_name gen key.pk_first_name key.pk_surname occ
         in
-        poi gen.g_base x
+        (poi gen.g_base ip, ip)
     with
     [ Not_found ->
         let new_occ =
@@ -230,22 +221,25 @@ value insert_undefined gen key =
             find_first_available_occ gen key.pk_first_name key.pk_surname occ
           else occ
         in
+        let i = gen.g_pcnt in
         let (x, a, u) =
-          make_person gen key.pk_first_name key.pk_surname new_occ gen.g_pcnt
+          make_person gen key.pk_first_name key.pk_surname new_occ
         in
         do {
           if key.pk_first_name <> "?" && key.pk_surname <> "?" then
             add_person_by_name gen key.pk_first_name key.pk_surname new_occ
-              x.m_cle_index
+              (Adef.iper_of_int i)
           else ();
           new_iper gen;
-          gen.g_base.c_persons.(gen.g_pcnt) := x;
-          gen.g_base.c_ascends.(gen.g_pcnt) := a;
-          gen.g_base.c_unions.(gen.g_pcnt) := u;
+          gen.g_base.c_persons.(i) := x;
+          gen.g_base.c_ascends.(i) := a;
+          gen.g_base.c_unions.(i) := u;
           gen.g_pcnt := gen.g_pcnt + 1;
-          let h = person_hash key.pk_first_name key.pk_surname in
-          Hashtbl.add gen.g_local_names (h, occ) x.m_cle_index;
-          x
+          if key.pk_first_name <> "?" && key.pk_surname <> "?" then
+            let h = person_hash key.pk_first_name key.pk_surname in
+            Hashtbl.add gen.g_local_names (h, occ) (Adef.iper_of_int i)
+          else ();
+          (x, Adef.iper_of_int i)
         } ]
   in
   do {
@@ -264,23 +258,23 @@ value insert_undefined gen key =
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
           (p_surname gen.g_base x);
-        gen.g_def.(Adef.int_of_iper x.m_cle_index) := True;
+        gen.g_def.(Adef.int_of_iper ip) := True;
         Check.error gen
       }
       else ()
     else ();
-    x
+    (x, ip)
   }
 ;
 
 value insert_person gen so =
   let occ = so.occ + gen.g_shift in
-  let x =
+  let (x, ip) =
     try
       if so.first_name = "?" || so.surname = "?" then raise Not_found
       else
-        let x = find_person_by_name gen so.first_name so.surname occ in
-        poi gen.g_base x
+        let ip = find_person_by_name gen so.first_name so.surname occ in
+        (poi gen.g_base ip, ip)
     with
     [ Not_found ->
         let new_occ =
@@ -288,28 +282,29 @@ value insert_person gen so =
             find_first_available_occ gen so.first_name so.surname occ
           else occ
         in
+        let i = gen.g_pcnt in
         let (x, a, u) =
-          make_person gen so.first_name so.surname new_occ gen.g_pcnt
+          make_person gen so.first_name so.surname new_occ
         in
         do {
           if so.first_name <> "?" && so.surname <> "?" then
             add_person_by_name gen so.first_name so.surname new_occ
-              x.m_cle_index
+              (Adef.iper_of_int i)
           else ();
           new_iper gen;
-          gen.g_base.c_persons.(gen.g_pcnt) := x;
-          gen.g_base.c_ascends.(gen.g_pcnt) := a;
-          gen.g_base.c_unions.(gen.g_pcnt) := u;
+          gen.g_base.c_persons.(i) := x;
+          gen.g_base.c_ascends.(i) := a;
+          gen.g_base.c_unions.(i) := u;
           gen.g_pcnt := gen.g_pcnt + 1;
           if so.first_name <> "?" && so.surname <> "?" then
             let h = person_hash so.first_name so.surname in
-            Hashtbl.add gen.g_local_names (h, occ) x.m_cle_index
+            Hashtbl.add gen.g_local_names (h, occ) (Adef.iper_of_int i)
           else ();
-          x
+          (x, Adef.iper_of_int i)
         } ]
   in
   do {
-    if gen.g_def.(Adef.int_of_iper x.m_cle_index) then do {
+    if gen.g_def.(Adef.int_of_iper ip) then do {
       printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
         (match x.m_occ with
          [ 0 -> ""
@@ -329,7 +324,7 @@ value insert_person gen so =
 *)
       Check.error gen
     }
-    else gen.g_def.(Adef.int_of_iper x.m_cle_index) := True;
+    else gen.g_def.(Adef.int_of_iper ip) := True;
     if not gen.g_errored then
       if sou gen.g_base x.m_first_name <> so.first_name ||
          sou gen.g_base x.m_surname <> so.surname then
@@ -345,7 +340,7 @@ value insert_person gen so =
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
           (p_surname gen.g_base x);
-        gen.g_def.(Adef.int_of_iper x.m_cle_index) := True;
+        gen.g_def.(Adef.int_of_iper ip) := True;
         Check.error gen
       }
       else ()
@@ -365,7 +360,7 @@ value insert_person gen so =
          death_src = empty_string; burial = UnknownBurial;
          burial_place = empty_string; burial_src = empty_string;
          notes = empty_string; psources = empty_string;
-         cle_index = x.m_cle_index}
+         cle_index = ip}
       in
       x.birth := so.birth;
       x.birth_place := unique_string gen so.birth_place;
@@ -398,7 +393,7 @@ value insert_person gen so =
       output_value gen.g_per (x : person);
     }
     else ();
-    x
+    (x, ip)
   }
 ;
 
@@ -408,8 +403,9 @@ value insert_somebody gen =
   | Defined so -> insert_person gen so ]
 ;
 
-value verif_parents_non_deja_definis gen x pere mere =
-  match parents (aoi gen.g_base x.m_cle_index) with
+value verif_parents_non_deja_definis gen ix pere mere =
+  let x = poi gen.g_base ix in
+  match parents (aoi gen.g_base ix) with
   [ Some ifam ->
       let cpl = coi gen.g_base ifam in
       let p = (father cpl) in
@@ -447,26 +443,26 @@ value notice_sex gen p s =
 ;
 
 value insert_family gen co fath_sex moth_sex witl fo deo =
-  let pere = insert_somebody gen (father co) in
-  let mere = insert_somebody gen (mother co) in
+  let (pere, ipere) = insert_somebody gen (father co) in
+  let (mere, imere) = insert_somebody gen (mother co) in
   let witl =
     List.map
       (fun (wit, sex) ->
-         let p = insert_somebody gen wit in
+         let (p, ip) = insert_somebody gen wit in
          do {
            notice_sex gen p sex;
-           if not (List.mem pere.m_cle_index p.m_related) then
-             p.m_related := [pere.m_cle_index :: p.m_related]
+           if not (List.mem ipere p.m_related) then
+             p.m_related := [ipere :: p.m_related]
            else ();
-           p.m_cle_index
+           ip
          })
       witl
   in
   let children =
     Array.map
       (fun cle ->
-         let e = insert_person gen cle in
-         do { notice_sex gen e cle.sex; e.m_cle_index })
+         let (e, ie) = insert_person gen cle in
+         do { notice_sex gen e cle.sex; ie })
       deo.children
   in
   let comment = unique_string gen fo.comment in
@@ -476,6 +472,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
   in
   do {
     new_ifam gen;
+    let i = gen.g_fcnt in
     let fam =
       {marriage = fo.marriage;
        marriage_place = unique_string gen fo.marriage_place;
@@ -483,27 +480,27 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
        witnesses = Array.of_list witl; relation = fo.relation;
        divorce = fo.divorce; comment = comment;
        origin_file = unique_string gen fo.origin_file; fsources = fsources;
-       fam_index = Adef.ifam_of_int gen.g_fcnt}
-    and cpl = couple False pere.m_cle_index mere.m_cle_index
+       fam_index = Adef.ifam_of_int i}
+    and cpl = couple False ipere imere
     and des = {children = children} in
-    let fath_uni = uoi gen.g_base pere.m_cle_index in
-    let moth_uni = uoi gen.g_base mere.m_cle_index in
-    gen.g_base.c_families.(gen.g_fcnt) := fam;
+    let fath_uni = uoi gen.g_base ipere in
+    let moth_uni = uoi gen.g_base imere in
+    seek_out gen.g_fam_index (Iovalue.sizeof_long * i);
+    output_binary_int gen.g_fam_index (pos_out gen.g_fam);
+    output_value gen.g_fam (fam : family);
     gen.g_base.c_couples.(gen.g_fcnt) := cpl;
     gen.g_base.c_descends.(gen.g_fcnt) := des;
     gen.g_fcnt := gen.g_fcnt + 1;
-    fath_uni.family := Array.append fath_uni.family [| fam.fam_index |];
-    moth_uni.family := Array.append moth_uni.family [| fam.fam_index |];
+    fath_uni.family := Array.append fath_uni.family [| Adef.ifam_of_int i |];
+    moth_uni.family := Array.append moth_uni.family [| Adef.ifam_of_int i |];
     notice_sex gen pere fath_sex;
     notice_sex gen mere moth_sex;
     Array.iter
       (fun ix ->
-         let x = poi gen.g_base ix in
          let a = aoi gen.g_base ix in
          do {
-           verif_parents_non_deja_definis gen x pere mere;
-           set_parents a (Some fam.fam_index);
-           ()
+           verif_parents_non_deja_definis gen ix pere mere;
+           set_parents a (Some (Adef.ifam_of_int i));
          })
       children;
   }
@@ -550,26 +547,26 @@ value map_option f =
   | None -> None ]
 ;
 
-value insert_relation_parent gen p s k =
-  let par = insert_somebody gen k in
+value insert_relation_parent gen ip s k =
+  let (par, ipar) = insert_somebody gen k in
   do {
-    if not (List.mem p.m_cle_index par.m_related) then
-      par.m_related := [p.m_cle_index :: par.m_related]
+    if not (List.mem ip par.m_related) then
+      par.m_related := [ip :: par.m_related]
     else ();
     if par.m_sex = Neuter then par.m_sex := s else ();
-    par.m_cle_index
+    ipar
   }
 ;
 
-value insert_relation gen p r =
+value insert_relation gen ip r =
   {r_type = r.r_type;
-   r_fath = map_option (insert_relation_parent gen p Neuter) r.r_fath;
-   r_moth = map_option (insert_relation_parent gen p Neuter) r.r_moth;
+   r_fath = map_option (insert_relation_parent gen ip Neuter) r.r_fath;
+   r_moth = map_option (insert_relation_parent gen ip Neuter) r.r_moth;
    r_sources = unique_string gen r.r_sources}
 ;
 
 value insert_relations fname gen sb sex rl =
-  let p = insert_somebody gen sb in
+  let (p, ip) = insert_somebody gen sb in
   if p.m_rparents <> [] then do {
     printf "\nFile \"%s\"\n" fname;
     printf "Relations already defined for \"%s%s %s\"\n"
@@ -580,7 +577,7 @@ value insert_relations fname gen sb sex rl =
   }
   else do {
     notice_sex gen p sex;
-    let rl = List.map (insert_relation gen p) rl in
+    let rl = List.map (insert_relation gen ip) rl in
     p.m_rparents := rl
   }
 ;
@@ -594,6 +591,9 @@ value insert_syntax fname gen =
 ;
 
 value insert_comp_families gen (x, separate, shift) =
+(*
+  let _ = do { Printf.eprintf "%s " x; flush stderr; } in
+*)
   let ic = open_in_bin x in
   do {
     check_magic x ic;
@@ -631,8 +631,7 @@ value persons_cache per_index_ic per_ic persons =
   let get_fun i =
     let mp = persons.(i) in
     do {
-      seek_in per_index_ic
-        (Iovalue.sizeof_long * Adef.int_of_iper mp.m_cle_index);
+      seek_in per_index_ic (Iovalue.sizeof_long * i);
       let pos = input_binary_int per_index_ic in
       seek_in per_ic pos;
       let p : person = input_value per_ic in
@@ -643,7 +642,7 @@ value persons_cache per_index_ic per_ic persons =
       p.related := mp.m_related;
       p.sex := mp.m_sex;
       p.notes := mp.m_notes;
-      p.cle_index := mp.m_cle_index;
+      p.cle_index := Adef.iper_of_int i;
       p
     }
   in
@@ -652,15 +651,36 @@ value persons_cache per_index_ic per_ic persons =
    clear_array = fun _ -> ()}
 ;
 
+value families_cache fam_index_ic fam_ic len =
+  let get_fun i =
+    do {
+      seek_in fam_index_ic (Iovalue.sizeof_long * i);
+      let pos = input_binary_int fam_index_ic in
+      seek_in fam_ic pos;
+      let fam : family = input_value fam_ic in
+      fam
+    }
+  in
+  {array = fun _ -> failwith "bug: accessing family array";
+   get = get_fun; len = len; clear_array = fun _ -> ()}
+;
+
 value empty_base : Check.cbase =
-  {c_persons = [| |]; c_ascends = [| |];
-   c_unions = [| |]; c_families = [| |];
-   c_couples = [| |]; c_descends = [| |];
-   c_strings = [| |];
+  {c_persons = [| |]; c_ascends = [| |]; c_unions = [| |];
+   c_couples = [| |]; c_descends = [| |]; c_strings = [| |];
    c_bnotes = {nread = fun _ -> ""; norigin_file = ""}}
 ;
 
-value linked_base gen per_index_ic per_ic : Def.base =
+value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
+(*
+  let _ =
+    do {
+      Printf.eprintf "\npcnt %d persons %d\n" gen.g_pcnt
+        (Array.length gen.g_base.c_persons);
+      flush stderr;
+    }
+  in
+*)
   let persons =
     let a = Array.sub gen.g_base.c_persons 0 gen.g_pcnt in
     do { gen.g_base.c_persons := [| |]; a }
@@ -673,10 +693,15 @@ value linked_base gen per_index_ic per_ic : Def.base =
     let a = Array.sub gen.g_base.c_unions 0 gen.g_pcnt in
     do { gen.g_base.c_unions := [| |]; a }
   in
-  let families =
-    let a = Array.sub gen.g_base.c_families 0 gen.g_fcnt in
-    do { gen.g_base.c_families := [| |]; a }
+(*
+  let _ =
+    do {
+      Printf.eprintf "fcnt %d families %d\n" gen.g_fcnt
+        (Array.length gen.g_base.c_couples);
+      flush stderr;
+    }
   in
+*)
   let couples =
     let a = Array.sub gen.g_base.c_couples 0 gen.g_fcnt in
     do { gen.g_base.c_couples := [| |]; a }
@@ -685,6 +710,15 @@ value linked_base gen per_index_ic per_ic : Def.base =
     let a = Array.sub gen.g_base.c_descends 0 gen.g_fcnt in
     do { gen.g_base.c_descends := [| |]; a }
   in
+(*
+  let _ =
+    do {
+      Printf.eprintf "scnt %d strings %d\n" gen.g_scnt
+        (Array.length gen.g_base.c_strings);
+      flush stderr;
+    }
+  in
+*)
   let strings =
     let a = Array.sub gen.g_base.c_strings 0 gen.g_scnt in
     do { gen.g_base.c_strings := [| |]; a }
@@ -693,7 +727,8 @@ value linked_base gen per_index_ic per_ic : Def.base =
   let base_data =
     {persons = persons_cache per_index_ic per_ic persons;
      ascends = cache_of ascends;
-     unions = cache_of unions; families = cache_of families;
+     unions = cache_of unions;
+     families = families_cache fam_index_ic fam_ic gen.g_fcnt;
      visible = { v_write = fun []; v_get = fun [] };
      couples = cache_of couples; descends = cache_of descends;
      strings = cache_of strings; bnotes = bnotes}
@@ -717,10 +752,14 @@ value link gwo_list =
      g_scnt = 0; g_base = empty_base; g_def = [| |]; g_separate = False;
      g_shift = 0; g_errored = False;
      g_per_index = open_out_bin "gwc_per_index";
-     g_per = open_out_bin "gwc_per" }
+     g_per = open_out_bin "gwc_per";
+     g_fam_index = open_out_bin "gwc_fam_index";
+     g_fam = open_out_bin "gwc_fam" }
   in
   let per_index_ic = open_in_bin "gwc_per_index" in
   let per_ic = open_in_bin "gwc_per" in
+  let fam_index_ic = open_in_bin "gwc_fam_index" in
+  let fam_ic = open_in_bin "gwc_fam" in
   let istr_empty = unique_string gen "" in
   let istr_quest = unique_string gen "?" in
   do {
@@ -728,10 +767,14 @@ value link gwo_list =
     assert (istr_quest = Adef.istr_of_int 1);
     ifdef UNIX then Sys.remove "gwc_per_index" else ();
     ifdef UNIX then Sys.remove "gwc_per" else ();
+    ifdef UNIX then Sys.remove "gwc_fam_index" else ();
+    ifdef UNIX then Sys.remove "gwc_fam" else ();
     List.iter (insert_comp_families gen) gwo_list;
     close_out gen.g_per_index;
     close_out gen.g_per;
-    let base = linked_base gen per_index_ic per_ic in
+    close_out gen.g_fam_index;
+    close_out gen.g_fam;
+    let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
     if do_check.val && gen.g_pcnt > 0 then do {
       Check.check_base base gen pr_stats.val; flush stdout;
     }
