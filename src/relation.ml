@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.13 1999-12-03 19:14:36 ddr Exp $ *)
+(* $Id: relation.ml,v 3.14 1999-12-06 07:31:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -901,44 +901,100 @@ value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list)) =
 
 open RelationLink;
 
-value dag_item conf base dist x p list cnt =
-  if x = 0 then cnt
-  else
-    List.fold_left
-      (fun cnt (a, _) ->
-         let b =
-           find_first_branch base dist a.cle_index x p.cle_index Neuter
-         in
-         loop cnt b
-         where rec loop cnt =
-           fun
-           [ Some b ->
-               let s = Util.sosa_of_branch [(a.cle_index, a.sex) :: b] in
-               do Wserver.wprint ";i%d=%d;s%d=%s" cnt
-                    (Adef.int_of_iper p.cle_index) cnt (Num.to_string s);
-               return
-               let b = find_next_branch base dist a.cle_index a.sex b in
-               loop (cnt + 1) b
-           | None ->  cnt ])
-      cnt list
-;
+value max_br = 33;
 
-value print_list_for_dag conf base p1 p2 rl =
-  match rl with
-  [ [(None, None, (x1, x2, _)) :: _] when x1 == 0 || x2 == 0 ->
-       do Wserver.wprint "<p>\n";
-          Wserver.wprint "<a href=\"%sm=DAG" (commd conf);
-          let dist = phony_dist_tab in
-          let _ = List.fold_left
-            (fun cnt (_, _, (x1, x2, list)) ->
-               let cnt = dag_item conf base dist x1 p1 list cnt in
-               let cnt = dag_item conf base dist x2 p2 list cnt in
-               cnt)
-            1 rl
-          in ();
-          Wserver.wprint "\">%s</a>\n" (capitale (transl conf "tree"));
-       return ()
-  | _ -> () ]
+value print_dag_links conf base p1 p2 rl =
+  let module O = struct type t = iper; value compare = compare; end in
+  let module M = Map.Make O in
+  let anc_map =
+    List.fold_left
+      (fun anc_map (_, _, (x1, x2, list)) ->
+         List.fold_left
+           (fun anc_map (p, n) ->
+              let (nn, nt, maxlev) =
+                try M.find p.cle_index anc_map with
+                [ Not_found -> (0, 0, 0) ]
+              in
+              if nn >= max_br then anc_map
+              else
+                M.add p.cle_index (nn + n, nt + 1, max maxlev (max x1 x2))
+                  anc_map)
+           anc_map list)
+      M.empty rl
+  in
+  let is_anc =
+    match rl with
+    [ [(_, _, (x1, x2, _)) :: _] -> x1 = 0 || x2 = 0
+    | _ -> False ]
+  in
+  let something =
+    M.fold
+      (fun ip (nn, nt, maxlev) something ->
+         something || nt > 1 && nn > 1 && nn < max_br)
+      anc_map False
+  in
+  if something then
+    let rest = ref False in
+    do if is_anc then Wserver.wprint "(" else Wserver.wprint "<ul>\n";
+       M.iter
+         (fun ip (nn, nt, maxlev) ->
+            if nt > 1 && nn > 1 && nn < max_br then
+              let a = poi base ip in
+              do if is_anc then () else html_li conf;
+                 if not is_anc then
+                   do afficher_personne_sans_titre conf base a;
+                      afficher_titre conf base a;
+                      Wserver.wprint ":\n";
+                   return ()
+                 else ();
+                 Wserver.wprint "<a href=\"%sm=RLD" (commd conf);
+                 Wserver.wprint ";%s" (acces conf base a);
+                 Wserver.wprint ";%s" (acces_n conf base "1" p1);
+                 Wserver.wprint ";%s" (acces_n conf base "2" p2);
+                 let (l1, l2) =
+                   List.fold_left
+                     (fun (l1, l2) (_, _, (x1, x2, list)) ->
+                        List.fold_left
+                          (fun (l1, l2) (a, _) ->
+                             if a.cle_index = ip then
+                               let l1 =
+                                 if List.mem x1 l1 then l1 else [x1 :: l1]
+                               in
+                               let l2 =
+                                 if List.mem x2 l2 then l2 else [x2 :: l2]
+                               in
+                               (l1, l2)
+                             else (l1, l2))
+                          (l1, l2) list)
+                     ([], []) rl
+                 in
+                 do Wserver.wprint ";x1=";
+                    let _ = List.fold_right
+                      (fun x sep -> do Wserver.wprint "%s%d" sep x; return ",")
+                      l1 ""
+                    in ();
+                    Wserver.wprint ";x2=";
+                    let _ = List.fold_right
+                      (fun x sep -> do Wserver.wprint "%s%d" sep x; return ",")
+                      l2 ""
+                    in ();
+                 return ();
+                 Wserver.wprint "\">";
+                 if is_anc then Wserver.wprint "%s" (transl conf "tree")
+                 else
+                   Wserver.wprint "%d %s" nn
+                     (transl_nth conf "relationship link/relationship links"
+                        1);
+                 Wserver.wprint "</a>";
+                 if is_anc then () else Wserver.wprint "\n";
+              return ()
+            else rest.val := True)
+         anc_map;
+       if rest.val then do html_li conf; Wserver.wprint "...\n"; return ()
+       else ();
+       if is_anc then Wserver.wprint ")\n" else Wserver.wprint "</ul>\n";
+    return ()
+  else ()
 ;
 
 value print_propose_upto conf base p1 p2 rl =
@@ -1190,6 +1246,8 @@ value print_main_relationship conf base long p1 p2 rel =
             Wserver.wprint "</em> %s\n"
               (transl_nth conf "relationship link/relationship links"
                  (if Num.eq total Num.one then 0 else 1));
+            if long then ()
+            else print_dag_links conf base p1 p2 rl;
             if age_autorise conf base p1 && age_autorise conf base p2 &&
                a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1) then
               do html_p conf;
@@ -1204,9 +1262,6 @@ value print_main_relationship conf base long p1 p2 rel =
               return ()
             else ();
             print_propose_upto conf base p1 p2 rl;
-            if Num.gt total Num.one && Num.gt (Num.of_int 33) total then
-              print_list_for_dag conf base p1 p2 rl
-            else ();
          return () ];
      trailer conf;
   return ()
