@@ -4,6 +4,10 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.07
 --------------------
 
+* Distribution
+  - [18 Aug 00] Create files named README.htm and LISEZMOI.htm instead
+    of README.txt and LISEZMOI.txt.
+
 * GeneWeb daemon/CGI (gwd)
   - [16 Aug 00] In personal pages, does not display the age at death
     if less than one year and undefined (it displayed "age at death:
