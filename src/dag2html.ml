@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.39 2001-01-31 23:09:38 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.40 2001-02-01 12:51:18 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -31,59 +31,6 @@ value new_span_id =
 
 value new_ghost_id =
   let i = ref 0 in fun () -> do incr i; return ghost_id_of_int i.val
-;
-
-(* testing *)
-
-(*
-value map_dag f d =
-  let a =
-    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
-  in
-  {dag = a}
-;
-
-value tag_dag d =
-  let c = ref 'A' in
-  map_dag
-    (fun v ->
-       let v = c.val in
-       do c.val :=
-            if c.val = 'Z' then 'a'
-            else if c.val = 'z' then '1'
-            else Char.chr (Char.code c.val + 1);
-       return String.make 1 v)
-    d
-;
-*)
-
-(* print *)
-
-value print_table print_newline print_elem print_span t =
-  for i = 0 to Array.length t.table - 1 do
-    for j = 0 to Array.length t.table.(i) - 1 do
-      print_elem t.table.(i).(j).elem;
-    done;
-    print_newline ();
-    for j = 0 to Array.length t.table.(i) - 1 do
-      print_span i j t.table.(i).(j).span;
-    done;
-    print_newline ();
-  done
-;
-
-value print_char_table d t =
-  let print_elem =
-    fun
-    [ Elem e -> Printf.eprintf "  %s" d.dag.(int_of_idag e).valu
-    | Ghost x -> Printf.eprintf "  |"
-    | Nothing -> Printf.eprintf "   " ]
-  in
-  let print_span i j r =
-    if j > 0 && t.table.(i).(j - 1).span = r then Printf.eprintf "---"
-    else Printf.eprintf "  -"
-  in
-  print_table prerr_newline print_elem print_span t
 ;
 
 (* creating the html table structure *)
@@ -1281,8 +1228,7 @@ value invert_table t =
 
 (* main *)
 
-value html_table_of_dag indi_txt phony invert no_group d =
-  let no_optim = False in
+value table_of_dag no_optim invert no_group d =
   let d = if invert then invert_dag d else d in
   let t = tablify no_optim no_group d in
   let t = if invert then invert_table t else t in
@@ -1290,5 +1236,10 @@ value html_table_of_dag indi_txt phony invert no_group d =
   let t = fall2_right t in
   let t = fall2_left t in
   let t = top_adjust t in
+  t
+;
+
+value html_table_of_dag indi_txt phony invert no_group d =
+  let t = table_of_dag False invert no_group d in
   html_table_struct indi_txt phony d t
 ;
