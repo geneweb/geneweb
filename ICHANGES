@@ -10,6 +10,7 @@ GeneWeb Version 1.09
     etc.) coming from forms.
   - Fixed some displaying and behavior bugs when adding elements in merging
     forms.
+  - Fixed some displayed "value=" when the value hold the " character
 
 GeneWeb Version 1.08
 --------------------

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.5 1998-11-10 10:24:11 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.6 1998-11-13 09:36:36 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -43,7 +43,8 @@ value print_person conf base var fmem (first_name, surname, occ, create) =
       end;
       tag "td" begin
         Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
-        Wserver.wprint " value=\"%s\">" (f_coa conf first_name);
+        Wserver.wprint " value=\"%s\">"
+          (quote_escaped (f_coa conf first_name));
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in

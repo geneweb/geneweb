@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.6 1998-11-10 10:24:12 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.7 1998-11-13 09:36:37 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -48,7 +48,7 @@ value print_first_name conf base p =
     tag "td" begin
       Wserver.wprint
         "<input name=\"first_name\" size=30 maxlength=200 value=\"%s\">"
-        (f_coa conf p.first_name);
+        (quote_escaped (f_coa conf p.first_name));
     end;
     tag "td" begin
       let s = capitale (transl conf "number") in
