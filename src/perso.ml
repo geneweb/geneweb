@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 4.1 2001-03-17 05:54:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.2 2001-03-18 06:32:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1320,40 +1320,50 @@ and eval_foreach_related conf base env al (p, _, _, p_auth) =
       p.related
   else ()
 and eval_foreach_source conf base env al (p, _, u, p_auth) =
-  let print_src src_typ src =
+  let rec insert_loop typ src =
+    fun
+    [ [(typ1, src1) :: srcl] ->
+        if src = src1 then [(typ1 ^ ", " ^ typ, src1) :: srcl]
+        else [(typ1, src1) :: insert_loop typ src srcl]
+    | [] -> [(typ, src)] ]
+  in
+  let insert typ src srcl = insert_loop (nominative typ) src srcl in
+  let srcl = [] in
+  let srcl = insert (transl_nth conf "person/persons" 0) p.psources srcl in
+  let srcl =
+    if p_auth then
+      let srcl = insert (transl_nth conf "birth" 0) p.birth_src srcl in
+      let srcl = insert (transl_nth conf "baptism" 0) p.baptism_src srcl in
+      let srcl = insert (transl_nth conf "death" 0) p.death_src srcl in
+      let srcl = insert (transl_nth conf "burial" 0) p.burial_src srcl in
+      srcl
+    else srcl
+  in
+  let (srcl, _) =
+    Array.fold_left
+      (fun (srcl, i) ifam ->
+         let fam = foi base ifam in
+         let lab =
+           if Array.length u.family == 1 then "" else " " ^ string_of_int i
+         in
+         let srcl =
+           if p_auth then
+             let src_typ = transl_nth conf "marriage/marriages" 0 in
+             insert (src_typ ^ lab) fam.marriage_src srcl
+           else srcl
+         in
+         let src_typ = transl_nth conf "family/families" 0 in
+         (insert (src_typ ^ lab) fam.fsources srcl, i + 1))
+      (srcl, 1) u.family
+  in
+  let print_src (src_typ, src) =
     let s = sou base src in
     if s = "" then ()
     else
-      let env =
-        [("src_typ", Vstring src_typ); ("src", Vstring s) :: env]
-      in
+      let env = [("src_typ", Vstring src_typ); ("src", Vstring s) :: env] in
       List.iter (eval_ast conf base env) al
   in
-  do print_src (nominative (transl_nth conf "person/persons" 0)) p.psources;
-     if p_auth then
-       do print_src (transl_nth conf "birth" 0) p.birth_src;
-          print_src (transl_nth conf "baptism" 0) p.baptism_src;
-          print_src (transl_nth conf "death" 0) p.death_src;
-          print_src (transl_nth conf "burial" 0) p.burial_src;
-       return ()
-     else ();
-     for i = 0 to Array.length u.family - 1 do
-       let fam = foi base u.family.(i) in
-       let lab =
-         if Array.length u.family == 1 then ""
-         else " " ^ string_of_int (i + 1)
-       in
-       do if p_auth then
-            let src_typ =
-              nominative (transl_nth conf "marriage/marriages" 0)
-            in
-            print_src (src_typ ^ lab) fam.marriage_src
-          else ();
-          let src_typ = nominative (transl_nth conf "family/families" 0) in
-          print_src (src_typ ^ lab) fam.fsources;
-       return ();
-     done;
-  return ()
+  List.iter print_src srcl
 and eval_foreach_surname_alias conf base env al (p, _, _, _) =
   List.iter
     (fun s ->
