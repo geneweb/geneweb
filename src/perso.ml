@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.21 1999-01-18 16:01:51 ddr Exp $ *)
+(* $Id: perso.ml,v 1.22 1999-01-19 10:17:10 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -40,6 +40,31 @@ value a_des_petits_enfants base p =
     return False
   with
   [ Ok -> True ]
+;
+
+value prev_sibling base p a =
+  match a.parents with
+  [ Some ifam ->
+      let fam = foi base ifam in
+      loop 0 where rec loop i =
+        if i == Array.length fam.children then None
+        else if fam.children.(i) = p.cle_index then
+          if i == 0 then None else Some (poi base fam.children.(i-1))
+        else loop (i + 1)
+  | None -> None ]
+;
+
+value next_sibling base p a =
+  match a.parents with
+  [ Some ifam ->
+      let fam = foi base ifam in
+      loop 0 where rec loop i =
+        if i == Array.length fam.children then None
+        else if fam.children.(i) = p.cle_index then
+          if i == Array.length fam.children - 1 then None
+          else Some (poi base fam.children.(i+1))
+        else loop (i + 1)
+  | None -> None ]
 ;
 
 value
@@ -641,6 +666,30 @@ value print_ancestors_descends_cousins conf base p a =
            (capitale (transl conf "cousins"));
       return True
     else things
+  in
+  let things =
+    match prev_sibling base p a with
+    [ Some p ->
+        do head things;
+           stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
+             Wserver.wprint "%s"
+               (capitale
+                  (transl_nth conf "previous sibling" (index_of_sex p.sex)));
+           end;
+        return True
+    | None -> things ]
+  in
+  let things =
+    match next_sibling base p a with
+    [ Some p ->
+        do head things;
+           stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
+             Wserver.wprint "%s"
+               (capitale
+                  (transl_nth conf "next sibling" (index_of_sex p.sex)));
+           end;
+        return True
+    | None -> things ]
   in
   do if things then Wserver.wprint "</h4>" else ();
      Wserver.wprint "\n";

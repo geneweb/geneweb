@@ -1722,7 +1722,7 @@ se: navigering med %t som Sosa referens
     next sibling
 de: folgende Geschwister 
 en: next sibling
-eo: posta frat(in)o
+eo: posta frato/posta fratino/posta frat(in)o
 es: siguiente hermano/siguiente hermana/siguiente hermano(a)
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 it: seguente fratello/seguente sorella/seguente fratello o sorella
@@ -2128,7 +2128,7 @@ se: plats
     previous sibling
 de: vorhergehende Geschwister
 en: previous sibling
-eo: precedento frat(in)o
+eo: precedento frato/precedento fratino/precedento frat(in)o
 es: anterior hermano/anterior hermana/anterior hermano(a)
 fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
 it: precedente fratello/precedente sorella/precedente fratello o sorella
