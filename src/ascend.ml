@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.30 2000-05-08 08:58:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.31 2000-05-08 11:58:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -136,11 +136,11 @@ value print_choice conf base p niveau_effectif =
               (limit_by_list conf)
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
+            (capitale (transl conf "only the generation selected"));
           Wserver.wprint "<input type=radio name=t value=F> %s\n"
             (capitale (transl conf "surnames list"));
           Wserver.wprint "<br>\n";
-          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
-            (capitale (transl conf "only the generation selected"));
           Wserver.wprint "<input type=radio name=t value=M> %s<br>\n"
             (capitale (transl conf "missing ancestors"));
           Wserver.wprint "- %s\n"
