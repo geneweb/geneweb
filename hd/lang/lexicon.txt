@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.107 1999-08-06 10:22:47 ddr Exp $
+# $Id: lexicon.txt,v 2.108 1999-08-06 14:06:54 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -4255,7 +4255,7 @@ dk: tr&aelig;
 en: tree
 fr: arbre
 nl: boom
-se: antr&auml;d
+se: tr&auml;d
 
     uncles and aunts
 de: Onkel und Tanten
