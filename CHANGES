@@ -1,6 +1,10 @@
 GeneWeb version 2.04
 --------------------
 
+* GeneWeb Daemon/CGI (gwd)
+  - [Jun 15, 99] No more shifted generation number for missing ancestors
+    displaying.
+
 GeneWeb version 2.03
 --------------------
 
