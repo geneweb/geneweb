@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 3.3 2000-05-02 17:28:05 ddr Exp $ *)
+(* $Id: image.ml,v 3.4 2000-05-03 17:54:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -19,17 +19,16 @@ value content cgi t len =
 value print_image_type cgi fname itype =
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      do try
-           do content cgi itype (in_channel_length ic);
-              try
-                let b = " " in
-                while True do
-                  b.[0] := input_char ic;
-                  Wserver.wprint "%c" b.[0];
-                done
-              with [ End_of_file -> () ];
-           return ()
-         with e -> do close_in ic; return raise e;
+      let buf = String.create 1024 in
+      let len = in_channel_length ic in
+      do content cgi itype len;
+         loop len where rec loop len =
+           if len == 0 then ()
+           else
+             let olen = min (String.length buf) len in
+             do really_input ic buf 0 olen;
+                Wserver.wprint "%s" (String.sub buf 0 olen);
+             return loop (len - olen);
          close_in ic;
       return True
  | None -> False ]
