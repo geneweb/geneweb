@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.5 1999-08-22 15:09:41 ddr Exp $ *)
+(* $Id: tree.ml,v 2.6 1999-08-23 04:58:27 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -22,8 +22,8 @@ value rec insert l tl =
         let t = {node = t.node; sons = insert l t.sons} in
         [t :: tl]
       else [t :: insert [x :: l] tl]
-  | (l, []) -> [tree_of_branch l]
-  | ([], _) -> tl ]
+  | ([], tl) -> tl
+  | (l, []) -> [tree_of_branch l] ]
 ;
 
 value append t =
