@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.38 1999-09-23 19:39:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.39 1999-09-28 16:29:59 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -34,6 +34,7 @@ value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
 value no_public_if_titles = ref False;
+value force = ref False;
 value conc_spc = ref False;
 
 (* Reading input *)
@@ -1975,6 +1976,8 @@ value out_file = ref "a";
 value speclist =
   [("-o", Arg.String (fun s -> out_file.val := s),
     "<file>\n       Output data base (default: \"a\").");
+   ("-f", Arg.Set force,
+    "\n       Remove data base if already existing");
    ("-log", Arg.String (fun s -> log_oc.val := open_out s),
     "<file>\n       Redirect log trace to this file.");
    ("-lf", Arg.Set lowercase_first_names,
@@ -2052,6 +2055,17 @@ value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
 value main () =
   do Argl.parse speclist (fun s -> in_file.val := s) errmsg;
      conc_spc.val := titles_aurejac.val; (* kludge *)
+     let bdir =
+       if Filename.check_suffix out_file.val ".gwb" then out_file.val
+       else out_file.val ^ ".gwb"
+     in
+     if not force.val && Sys.file_exists bdir then
+       do Printf.printf "\
+The data base \"%s\" already exists. Use option -f to overwrite it.\n"
+            out_file.val;
+          flush stdout;
+       return exit 2
+     else ();
   return
   let arrays = make_arrays in_file.val in
   do Gc.compact (); return

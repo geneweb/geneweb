@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.53 1999-09-25 21:23:02 ddr Exp $ *)
+(* $Id: setup.ml,v 1.54 1999-09-28 16:30:01 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -463,9 +463,10 @@ value simple conf =
     else if out_file = "" then out_name_of_ged ged
     else out_file
   in
+  let env = if ged = "" then conf.env else [("f", "on") :: conf.env] in
   let conf =
     {comm = if ged = "" then "gwc" else "ged2gwb";
-     env = list_replace "o" out_file conf.env;
+     env = list_replace "o" out_file env;
      lang = conf.lang;
      request = conf.request}
   in
@@ -498,8 +499,12 @@ value gwc_or_ged2gwb out_name_of_in_name conf =
   else print_file conf "bso.htm"
 ;
 
-value gwc_check = gwc_or_ged2gwb out_name_of_gw;
-value ged2gwb_check = gwc_or_ged2gwb out_name_of_ged;
+value gwc_check conf = gwc_or_ged2gwb out_name_of_gw conf;
+
+value ged2gwb_check conf =
+  let conf = {(conf) with env = [("f", "on") :: conf.env]} in
+  gwc_or_ged2gwb out_name_of_ged conf
+;
 
 ifdef WIN95 then
 value infer_rc conf rc =
