@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.15 2001-11-24 13:17:15 ddr Exp $ *)
+(* $Id: util.ml,v 4.16 2001-12-10 14:07:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1052,6 +1052,26 @@ value get_variable s i =
 
 type tag_type = [ In_a_href | In_norm | Out ];
 
+value expand_env =
+  let buff = Buffer.create 30 in
+  fun conf s ->
+    match p_getenv conf.base_env "expand_env" with
+    [ Some "yes" ->
+        let _ : unit = Buffer.clear buff in
+        loop 0 where rec loop i =
+          if i = String.length s then Buffer.contents buff
+          else if i + 1 < String.length s && s.[i] = '$' && s.[i+1] = '{' then
+            try
+              let j = String.index_from s (i+1) '}' in
+              let v = Sys.getenv (String.sub s (i + 2) (j - i - 2)) in
+              do { Buffer.add_string buff v; loop (j + 1) }
+            with
+            [ Not_found -> do { Buffer.add_char buff s.[i]; loop (i + 1) } ]
+          else
+            do { Buffer.add_char buff s.[i]; loop (i + 1) }
+   | _ -> s ]
+;
+
 value copy_string_with_macros conf env s =
   loop Out 0 where rec loop tt i =
     if i < String.length s then
@@ -1066,8 +1086,16 @@ value copy_string_with_macros conf env s =
               | 'v' ->
                   let (k, j) = get_variable s (i + 2) in
                   let (v, i) =
-                    try (List.assoc ("var_" ^ k) conf.base_env, j) with
-                    [ Not_found -> ("%", i + 1) ]
+                    let v =
+                      try
+                        let v = List.assoc ("var_" ^ k) conf.base_env in
+                        Some (expand_env conf v)
+                      with
+                      [ Not_found -> None ]
+                    in
+                    match v with
+                    [ Some v -> (v, j)
+                    | None -> ("%", i + 1) ]
                   in
                   do { Wserver.wprint "%s" v; i }
               | '%' -> do { Wserver.wprint "%%"; i + 2 }

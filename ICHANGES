@@ -5,6 +5,12 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [10 Dec 01] In configuration file (base.gwf), if the variable
+    "expand_env" is set to "yes" ("no" by default), the system
+    environment variables are expanded in the values of the customized
+    variables (whose name start with "var_"). The syntax for environment
+    variables si ${xxx} where xxx is the environment variable. See the
+    example configuration file a.gwf of the distribution.
   - [17 Dec 01] Added request variables "by=", "bm=" and "bd=" in displaying
     of the latest birthdays and death days to specify resp. a year, a month
     and a day before.
