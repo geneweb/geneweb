@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.1 1999-03-08 11:18:26 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.2 1999-03-15 00:02:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -234,14 +234,15 @@ value print_birth_day conf base day_name verb wd d m y list =
 value propose_months conf mode =
   tag "form" "method=get action=\"%s\"" conf.command begin
     Srcfile.hidden_env conf;
-    Wserver.wprint "\n<input type=hidden name=m value=%s>" mode;
+    Wserver.wprint "<input type=hidden name=m value=%s>\n" mode;
     tag "select" "name=v" begin
       for i = 1 to 12 do
-        Wserver.wprint "\n<option value=%d>%s" i
+        Wserver.wprint "<option value=%d%s>%s\n" i
+          (if i = conf.today.month then " selected" else "")
           (capitale (transl_nth conf "(month)" (i - 1)));
       done;
     end;
-    Wserver.wprint "\n<input type=submit value=\"Ok\">";
+    Wserver.wprint "<input type=submit value=\"Ok\">\n";
   end
 ;
 

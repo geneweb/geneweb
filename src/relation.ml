@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.1 1999-03-08 11:19:09 ddr Exp $ *)
+(* $Id: relation.ml,v 2.2 1999-03-15 00:02:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -26,33 +26,30 @@ value print_menu conf base p =
   do header conf title;
      Wserver.wprint "<ul>\n";
      html_li conf;
-     Wserver.wprint "<form method=get action=\"%s\">" conf.command;
-     Srcfile.hidden_env conf;
-     Wserver.wprint
-       "
-<input type=hidden name=em value=R>
-<input type=hidden name=ei value=%d>
-<input type=hidden name=m value=NG>
-<input name=n size=40 maxlength=200> =>
-<input type=submit VALUE=\"Ok\">
-<ul>
-" (Adef.int_of_iper p.cle_index);
-     html_li conf;
-     Wserver.wprint "
-<input type=radio name=t value=PN checked>
-<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>
-"
-  (capitale (transl_nth conf "first name/first names" 0))
-  (transl_nth conf "surname/surnames" 0)
-  (transl conf "or") (transl conf "public name")
-  (transl conf "or") (transl conf "alias");
-     html_li conf;
-     Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
-      (capitale (transl_nth conf "first name/first names" 0));
-     html_li conf;
-     Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
-       (capitale (transl_nth conf "surname/surnames" 0));
-     Wserver.wprint "</ul>\n</form>\n";
+     tag "form" "method=get action=\"%s\"" conf.command begin
+       Srcfile.hidden_env conf;
+       Wserver.wprint "<input type=hidden name=em value=R>\n";
+       Wserver.wprint "<input type=hidden name=ei value=%d>\n"
+         (Adef.int_of_iper p.cle_index);
+       Wserver.wprint "<input type=hidden name=m value=NG>\n";
+       Wserver.wprint "<input name=n size=40 maxlength=200> =&gt;\n";
+       Wserver.wprint "<input type=submit VALUE=\"Ok\">\n";
+       tag "ul" begin
+         html_li conf;
+         Wserver.wprint "<input type=radio name=t value=PN checked>\n";
+         Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
+           (capitale (transl_nth conf "first name/first names" 0))
+           (transl_nth conf "surname/surnames" 0)
+           (transl conf "or") (transl conf "public name")
+           (transl conf "or") (transl conf "alias");
+         html_li conf;
+         Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
+           (capitale (transl_nth conf "first name/first names" 0));
+         html_li conf;
+         Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
+           (capitale (transl_nth conf "surname/surnames" 0));
+       end;
+     end;
      Array.iter
        (fun ifam ->
           let cpl = coi base ifam in
