@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.33 2005-02-20 10:52:00 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.34 2005-02-20 14:34:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1006,53 +1006,45 @@ value strip_spaces str =
   else String.sub str start (stop - start)
 ;
 
-value utf_8_char_equiv s i =
+value utf_8_alphab_value s i =
   let c = s.[i] in
-  match Char.code c with
-  [ 0xC2 ->
-      if i = String.length s then (c, i + 1)
-      else
-        let _ =
-          do {
-            Printf.eprintf "not impl utf_8_char_equiv %02X%02X %s\n"
-              (Char.code c) (Char.code s.[i+1])
-              (iso_8859_1_of_utf_8 (String.sub s i (String.length s - i)));
-            flush stderr;
-          }
-        in
-        (c, i + 1)
-  | 0xC3 ->
-      if i = String.length s then (c, i + 1)
-      else
-        match Char.code s.[i+1] with
-        [ 0x80 | 0x81 | 0x82 | 0x83 | 0x84 | 0x85 | 0x86 -> ('A', i + 2)
-        | 0x87 -> ('C', i + 2)
-        | 0x88 | 0x89 | 0x8A | 0x8B -> ('E', i + 2)
-        | 0x8C | 0x8D | 0x8E | 0x8F -> ('I', i + 2)
-        | 0x91 -> ('N', i + 2)
-        | 0x92 | 0x93 | 0x94 | 0x95 | 0x96 | 0x98 -> ('O', i + 2)
-        | 0x99 | 0x9A | 0x9B | 0x9C -> ('U', i + 2)
-        | 0x9F -> ('z', i + 2)
-        | 0xA0 | 0xA1 | 0xA2 | 0xA3 | 0xA4 | 0xA5 | 0xA6 -> ('a', i + 2)
-        | 0xA7 -> ('c', i + 2)
-        | 0xA8 | 0xA9 | 0xAA | 0xAB -> ('e', i + 2)
-        | 0xAC | 0xAD | 0xAE | 0xAF -> ('i', i + 2)
-        | 0xB1 -> ('n', i + 2)
-        | 0xB2 | 0xB3 | 0xB4 | 0xB5 | 0xB6 | 0xB8 -> ('o', i + 2)
-        | 0xB9 | 0xBA | 0xBB | 0xBC -> ('u', i + 2)
-        | 0xBF -> ('y', i + 2)
-        | c2 ->
-            let _ =
-              do {
-                Printf.eprintf "not impl utf_8_char_equiv %02X%02X %s (%s)\n"
-                  (Char.code c) c2
-                  (iso_8859_1_of_utf_8 (String.sub s i (String.length s - i)))
-                  (iso_8859_1_of_utf_8 s);
-                flush stderr;
-              }
-            in
-            (c, i + 1) ]
-  | _ ->  (c, i + 1) ]
+  if Char.code c < 0b11000000 then (c, i + 1)
+  else
+    match Char.code c with
+    [ 0xC3 ->
+        if i = String.length s then (c, i + 1)
+        else
+          match Char.code s.[i+1] with
+          [ 0x80 | 0x81 | 0x82 | 0x83 | 0x84 | 0x85 | 0x86 -> ('A', i + 2)
+          | 0x87 -> ('C', i + 2)
+          | 0x88 | 0x89 | 0x8A | 0x8B -> ('E', i + 2)
+          | 0x8C | 0x8D | 0x8E | 0x8F -> ('I', i + 2)
+          | 0x91 -> ('N', i + 2)
+          | 0x92 | 0x93 | 0x94 | 0x95 | 0x96 | 0x98 -> ('O', i + 2)
+          | 0x99 | 0x9A | 0x9B | 0x9C -> ('U', i + 2)
+          | 0x9F -> ('z', i + 2)
+          | 0xA0 | 0xA1 | 0xA2 | 0xA3 | 0xA4 | 0xA5 | 0xA6 -> ('a', i + 2)
+          | 0xA7 -> ('c', i + 2)
+          | 0xA8 | 0xA9 | 0xAA | 0xAB -> ('e', i + 2)
+          | 0xAC | 0xAD | 0xAE | 0xAF -> ('i', i + 2)
+          | 0xB1 -> ('n', i + 2)
+          | 0xB2 | 0xB3 | 0xB4 | 0xB5 | 0xB6 | 0xB8 -> ('o', i + 2)
+          | 0xB9 | 0xBA | 0xBB | 0xBC -> ('u', i + 2)
+          | 0xBF -> ('y', i + 2)
+          | c2 ->
+              let _ =
+                do {
+                  Printf.eprintf
+                    "not impl utf_8_alphab_value %02X%02X %s (%s)\n"
+                    (Char.code c) c2
+                    (iso_8859_1_of_utf_8
+                       (String.sub s i (String.length s - i)))
+                    (iso_8859_1_of_utf_8 s);
+                  flush stderr;
+                }
+              in
+              (c, i + 1) ]
+    | _ -> (c, i + 1) ]
 ;
 
 value alphabetic_utf_8 n1 n2 =
@@ -1063,17 +1055,11 @@ value alphabetic_utf_8 n1 n2 =
     else
       let c1 = String.unsafe_get n1 i1 in
       let c2 = String.unsafe_get n2 i2 in
-      let (cc1, ii1) =
-        if Char.code c1 < 0b11000000 then (c1, i1 + 1)
-        else utf_8_char_equiv n1 i1
-      in
-      let (cc2, ii2) =
-        if Char.code c2 < 0b11000000 then (c2, i2 + 1)
-        else utf_8_char_equiv n2 i2
-      in
+      let (cv1, ii1) = utf_8_alphab_value n1 i1 in
+      let (cv2, ii2) = utf_8_alphab_value n2 i2 in
       let (c, i1, i2) =
-        if cc1 = cc2 then (compare c1 c2, i1 + 1, i2 + 1)
-        else (compare cc1 cc2, ii1, ii2)
+        if cv1 = cv2 then (compare c1 c2, i1 + 1, i2 + 1)
+        else (compare cv1 cv2, ii1, ii2)
       in
       if c = 0 then loop i1 i2 else c
   in

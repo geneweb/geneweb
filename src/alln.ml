@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.18 2005-02-20 10:52:00 ddr Exp $ *)
+(* $Id: alln.ml,v 4.19 2005-02-20 14:34:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -387,6 +387,10 @@ value select_names conf base is_surnames ini =
   (list, if Gutil.utf_8_db.val then False else True)
 ;
 
+value compare2 s1 s2 =
+  if Gutil.utf_8_db.val then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2
+;
+
 value print_frequency conf base is_surnames =
   let _ = base.data.strings.array () in
   let list =
@@ -395,18 +399,12 @@ value print_frequency conf base is_surnames =
       (fun (k1, _, cnt1) (k2, _, cnt2) ->
          if cnt1 > cnt2 then -1
          else if cnt1 < cnt2 then 1
-         else if k1 < k2 then -1
-         else if k1 > k2 then 1
-         else 0)
+         else compare2 k1 k2)
       list
   in
   let len = List.length list in
   let list = combine_by_count list in
   print_frequency_any conf base is_surnames list len
-;
-
-value compare2 s1 s2 =
-  if Gutil.utf_8_db.val then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2
 ;
 
 value print_alphabetic conf base is_surnames =
