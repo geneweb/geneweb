@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.5 1999-04-05 23:42:28 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.6 1999-05-03 13:41:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -535,7 +535,10 @@ value set_infos str u l =
   let (birth_place, l) = get_field "#bp" l in
   let (birth_src, l) = get_field "#bs" l in
   let (baptism, l) = get_optional_baptdate l in
-  let (baptism_place, l) = get_field "#pp" l in
+  let (baptism_place, l) =
+    let (pp, l) = get_field "#pp" l in
+    if pp = "" then get_field "#bp" l else (pp, l)
+  in
   let (bapt_src, l) = get_field "#ps" l in
   let (mort, l) = get_optional_deathdate l in
   let (death_place, l) = get_field "#dp" l in

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.8 1999-05-03 07:09:35 ddr Exp $ *)
+(* $Id: setup.ml,v 1.9 1999-05-03 13:41:08 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -225,6 +225,7 @@ value rec copy_from_stream conf print strm =
           | 'l' -> print conf.lang
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
+          | 'q' -> print Version.txt
           | 'u' -> print (Filename.dirname (Sys.getcwd ()))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
@@ -233,6 +234,8 @@ value rec copy_from_stream conf print strm =
           | 'y' -> for_all_db conf print (s_getenv conf.env "anon") strm
           | 'z' -> print (string_of_int port)
           | '$' -> print "$"
+          | 'A'..'Z' as c ->
+              print (strip_spaces (s_getenv conf.env (String.make 1 c)))
           | c -> do print "BAD MACRO "; print (String.make 1 c); return () ]
       | c -> print (String.make 1 c) ];
     done
@@ -392,7 +395,8 @@ value simple_check conf =
      env = list_replace "o" out_file conf.env;
      lang = conf.lang}
   in
-  if ged <> "" && not (Sys.file_exists ged) then print_file conf "unknown.html"
+  if ged <> "" && not (Sys.file_exists ged) then
+    print_file conf "err_unknown.html"
   else if out_file = "" then print_file conf "err_missing.html"
   else if not (good_name out_file) then print_file conf "err_name.html"
   else print_file conf "base_out.html"
@@ -414,7 +418,8 @@ value gwc_or_ged2gwb_check out_name_of_in_name conf =
   in
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_missing.html"
-  else if not (Sys.file_exists in_file) then print_file conf "unknown.html"
+  else if not (Sys.file_exists in_file) then
+    print_file conf "err_unknown.html"
   else if not (good_name out_file) then print_file conf "err_name.html"
   else print_file conf "base_out.html"
 ;
@@ -466,6 +471,16 @@ value exec_f comm =
   Sys.command s
 ;
 
+ifdef WIN95 then
+value infer_rc conf rc =
+  if rc > 0 then rc
+  else
+    match p_getenv conf.env "o" with
+    [ Some out_file ->
+        if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
+    | _ -> 0 ]
+;
+
 value recover conf =
   let init_dir =
     match p_getenv conf.env "anon" with
@@ -480,15 +495,18 @@ value recover conf =
   let dest_dir = Sys.getcwd () in
   if init_dir = "" then print_file conf "err_missing.html"
   else if init_dir = dest_dir then print_file conf "err_same_dir.html"
+  else if not (Sys.file_exists init_dir) then
+    print_file conf "err_no_such_dir.html"
   else if
     (ifdef UNIX then
-       (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino =
-       (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+       try
+         (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino =
+         (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+       with
+       [ Unix.Unix_error _ _ _ -> False ]
      else False)
   then
     print_file conf "err_same_dir.html"
-  else if not (Sys.file_exists init_dir) then
-    print_file conf "err_no_such_directory.html"
   else
     let dh = Unix.opendir init_dir in
     let gwu_found =
@@ -496,10 +514,13 @@ value recover conf =
         loop () where rec loop () =
           let e = Unix.readdir dh in
           ifdef UNIX then
-            if e = "gwu" then raise Exit else loop ()
+            match e with
+            [ "gwu" -> raise Exit
+            | _ -> loop () ]
           else
-            if String.uncapitalize e = "gwu.exe" then raise Exit
-            else loop ()
+            match String.uncapitalize e with
+            [ "gwu.exe" -> raise Exit
+            | _ -> loop () ]
        with
        [ End_of_file -> False
        | Exit -> True ]
@@ -521,10 +542,25 @@ value recover_1 conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
+  let by_gedcom =
+    match p_getenv conf.env "ged" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
   let out_file = if out_file = "" then in_file else out_file in
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_not_appl.html"
-  else print_file conf "recover_2.html"
+  else
+    let (old_to_src, o_opt, tmp, src_to_new) =
+      if not by_gedcom then ("gwu", " > ", "tmp.gw", "gwc")
+      else ("gwb2ged", " -o ", "tmp.ged", "ged2gwb")
+    in
+    let conf =
+      {(conf) with env =
+       [("U", old_to_src); ("O", o_opt); ("T", tmp); ("C", src_to_new) ::
+        conf.env]}
+    in
+    print_file conf "recover_2.html"
 ;
 
 value recover_2 conf =
@@ -543,6 +579,15 @@ value recover_2 conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
+  let by_gedcom =
+    match p_getenv conf.env "ged" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  let (old_to_src, o_opt, tmp, src_to_new) =
+    if not by_gedcom then ("gwu", " > ", "tmp.gw", "gwc")
+    else ("gwb2ged", " -o ", "tmp.ged", "ged2gwb")
+  in
   let out_file = if out_file = "" then in_file else out_file in
   let conf = conf_with_env conf "o" out_file in
   let dir = Sys.getcwd () in
@@ -551,8 +596,8 @@ value recover_2 conf =
           flush stderr;
           Sys.chdir init_dir;
           let c =
-            Filename.concat "." "gwu" ^ " " ^ in_file ^ " > " ^
-            Filename.concat dir "tmp.gw"
+            Filename.concat "." old_to_src ^ " " ^ in_file ^ o_opt ^
+            Filename.concat dir tmp
           in
           do Printf.eprintf "$ %s\n" c;
              flush stderr;
@@ -565,27 +610,21 @@ value recover_2 conf =
      flush stderr;
      Sys.chdir dir;
      let c =
-       Filename.concat "." "gwc tmp.gw -o " ^ out_file ^
+       Filename.concat "." src_to_new ^ " " ^ tmp ^ " -o " ^ out_file ^
        " > " ^ "comm.log"
      in
      do Printf.eprintf "$ %s\n" c;
         flush stderr;
-        let _ = Sys.command c in ();
-     return ();
-     Printf.eprintf "\n";
-     flush stderr;
-     print_file conf "created.html";
+     return
+     let rc = Sys.command c in
+     let rc = ifdef WIN95 then infer_rc conf rc else rc in
+     do Printf.eprintf "\n";
+        flush stderr;
+     return
+     if rc = 1 then print_file conf "warnings.html"
+     else if rc > 1 then print_file conf "recover_err.html"
+     else print_file conf "base_out_ok.html";
   return ()
-;
-
-ifdef WIN95 then
-value infer_rc conf rc =
-  if rc > 0 then rc
-  else
-    match p_getenv conf.env "o" with
-    [ Some out_file ->
-        if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
-    | _ -> 0 ]
 ;
 
 value exec_command_out conf =

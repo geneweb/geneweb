@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.11 1999-05-03 07:10:47 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.12 1999-05-03 13:41:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -243,11 +243,11 @@ value insert_person gen so =
           if sou gen.g_base x.first_name <> so.first_name ||
              sou gen.g_base x.surname <> so.surname then
             Printf.printf "as name: \"%s%s %s\"\n"
-              (sou gen.g_base x.first_name)
+              (Ansel.to_iso_8859_1 (sou gen.g_base x.first_name))
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (sou gen.g_base x.surname)
+              (Ansel.to_iso_8859_1 (sou gen.g_base x.surname))
           else ();
           x.birth := Adef.codate_None;
           x.death := DontKnowIfDead;
@@ -256,17 +256,18 @@ value insert_person gen so =
      if not gen.g_errored then
        if sou gen.g_base x.first_name <> so.first_name ||
           sou gen.g_base x.surname <> so.surname then
-         do Printf.printf "\nPersonne définie avec deux orthographes:\n";
-            Printf.printf "  \"%s%s %s\"\n" so.first_name
+         do Printf.printf "\nPerson defined with two spellings:\n";
+            Printf.printf "  \"%s%s %s\"\n" (Ansel.to_iso_8859_1 so.first_name)
               (match x.occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              so.surname;
-            Printf.printf "  \"%s%s %s\"\n" (sou gen.g_base x.first_name)
+              (Ansel.to_iso_8859_1 so.surname);
+            Printf.printf "  \"%s%s %s\"\n"
+              (Ansel.to_iso_8859_1 (sou gen.g_base x.first_name))
               (match occ with
                [ 0 -> ""
                | n -> "." ^ string_of_int n ])
-              (sou gen.g_base x.surname);
+              (Ansel.to_iso_8859_1 (sou gen.g_base x.surname));
             gen.g_def.(Adef.int_of_iper x.cle_index) := True;
          return Check.error gen
        else ()
