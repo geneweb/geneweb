@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.27 2004-12-28 15:12:56 ddr Exp $ *)
+(* $Id: descend.ml,v 4.28 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1032,7 +1032,7 @@ value make_tree_hts conf base gv p =
     [ Some x -> " " ^ x
     | _ ->
         match Util.p_getenv conf.env "color" with
-	[ None | Some "" -> ""
+        [ None | Some "" -> ""
         | Some x -> " bgcolor=" ^ x ] ]
   in
   let rec nb_column n v u =

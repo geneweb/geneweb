@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.61 2004-12-28 19:59:42 ddr Exp $ *)
+(* $Id: perso.ml,v 4.62 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1364,10 +1364,10 @@ and print_foreach_parent conf base env al (_, a, _, _) =
       let cpl = coi base ifam in
       Array.iter
         (fun iper ->
-	   let p = pget conf base iper in
-	   let a = aget conf base iper in
-	   let u = uget conf base iper in
-	   let env = [("parent", Vind p a u) :: env] in
+           let p = pget conf base iper in
+           let a = aget conf base iper in
+           let u = uget conf base iper in
+           let env = [("parent", Vind p a u) :: env] in
            List.iter (print_ast conf base env) al)
         (parent_array cpl)
   | None -> () ]
@@ -1525,14 +1525,14 @@ and print_foreach_witness_relation conf base env al (p, _, _, _) =
   let list =
     List.sort
       (fun (_, fam1) (_, fam2) ->
-	 match
-	   (Adef.od_of_codate fam1.marriage, Adef.od_of_codate fam2.marriage)
-	 with
-	 [ (Some d1, Some d2) ->
-	     if strictly_before d1 d2 then -1
-	     else if strictly_before d2 d1 then 1
-	     else 0
-	 | _ -> 0 ])
+         match
+           (Adef.od_of_codate fam1.marriage, Adef.od_of_codate fam2.marriage)
+         with
+         [ (Some d1, Some d2) ->
+             if strictly_before d1 d2 then -1
+             else if strictly_before d2 d1 then 1
+             else 0
+         | _ -> 0 ])
       list
   in
   List.iter

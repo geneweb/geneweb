@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.33 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.34 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -285,7 +285,7 @@ value old_persons_of_first_name_or_surname base_data strings params =
                in
                if List.memq p.cle_index ipera then ()
                else
-	         bt.val := IstrTree.add istr [p.cle_index :: ipera] bt.val)
+                 bt.val := IstrTree.add istr [p.cle_index :: ipera] bt.val)
           person_patches;
         if gistro = None then completed.val := True else ();
         bt.val
@@ -430,7 +430,7 @@ flush stderr;
                  [ Not_found -> bt.val := IstrTree.add istr1 0 bt.val ])
               person_patches;
             btr.val := Some bt.val;
-	    bt.val
+            bt.val
           } ]
   in
   let cursor str =
@@ -800,7 +800,7 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
         do {
           if name = "persons" then failwith "bug: access to person array"
           else if name = "families" then failwith "bug: access to family array"
-	  else ();
+          else ();
           ifdef UNIX then
             if verbose.val then do {
               Printf.eprintf "*** read %s%s\n" name
@@ -1139,7 +1139,7 @@ value output_strings_hash oc2 base =
   let taba =
     Array.create
       (min Sys.max_array_length
-	 (prime_after (max 2 (10 * Array.length strings_array))))
+        (prime_after (max 2 (10 * Array.length strings_array))))
       (-1)
   in
   let tabl = Array.create (Array.length strings_array) (-1) in
@@ -1442,7 +1442,7 @@ value gen_output no_patches bname base =
         flush stderr;
         match try Some (arr.array ()) with [ Failure _ -> None ] with
         [ Some a -> output_value_no_sharing oc a
-	| None -> output_cache_array_no_sharing oc arr ];
+        | None -> output_cache_array_no_sharing oc arr ];
         let epos = output_array_access oc_acc arr bpos in
         if epos <> pos_out oc then count_error epos (pos_out oc) else ()
       }
@@ -1531,7 +1531,7 @@ value gen_output no_patches bname base =
               else ();
               let first_name_pos = pos_out oc2 in
               trace "create first name index";
-	      output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
+              output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
               seek_out oc2 int_size;
               output_binary_int oc2 surname_pos;
               output_binary_int oc2 first_name_pos;

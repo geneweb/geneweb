@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.39 2004-12-28 15:12:58 ddr Exp $ *)
+(* $Id: forum.ml,v 4.40 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -521,9 +521,9 @@ value print_add conf base =
       stag "textarea" "name=\"Text\" rows=\"15\" cols=\"70\" wrap=\"soft\"" begin end;
       Wserver.wprint "\n<br>\n";
       if conf.wizard || conf.friend then
-	do {
+        do {
           Wserver.wprint "<input type=\"submit\" name=\"publ_acc\" value=\"%s\">\n"
-	    (transl conf "public");
+            (transl conf "public");
           Wserver.wprint "<input type=\"submit\" name=\"priv_acc\" value=\"%s\">\n"
             (transl conf "private");
         }

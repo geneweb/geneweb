@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.23 2004-12-28 15:12:55 ddr Exp $ *)
+(* $Id: dag.ml,v 4.24 2004-12-29 21:03:34 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -780,7 +780,7 @@ value make_tree_hts
     [ Some x -> " " ^ x
     | _ ->
         match Util.p_getenv conf.env "color" with
-	[ None | Some "" -> ""
+        [ None | Some "" -> ""
         | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
   in
   let indi_txt n =
@@ -866,7 +866,7 @@ value print_slices_menu conf base hts_opt =
               | None -> wid ]
             in
             Wserver.wprint "<input name=\"width\" size=\"5\" value=\"%d\">\n"
-	      wid;
+              wid;
           end;
         end;
       end;
