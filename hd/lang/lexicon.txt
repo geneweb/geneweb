@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.142 2002-12-23 10:29:06 ddr Exp $
+# $Id: lexicon.txt,v 4.143 2002-12-23 10:52:17 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -892,7 +892,7 @@ sv: en brylling
 
     a brother-in-law/a sister-in-law
 af: 'n swaer/'n skoonsuster
-bg: зет (съпруг на сестра), шурей или баджанак/снаха (съпруга на брат) или балдъза/зет (съпруг на сестра) или девер/снаха (съпруга на брат), зълва или етърва
+bg: зет (съпруг на сестра), шурей или баджанак/снаха (съпруга на брат или на шурей) или балдъза/зет (съпруг на сестра или на зълва) или девер/снаха (съпруга на брат), зълва или етърва
 ca: un cunyat/una cunyada
 cs: №vagr/№vagrovб
 da: en svoger/en svigerinde
@@ -8681,7 +8681,7 @@ sv: vittne/vittnen
 
     wizard/wizards/friend
 af: Medewerkers/Medewerkers/vriend
-bg: администратор/администратор/приятел
+bg: администратор/администратори/приятел
 ca: administrador/administrador/amic
 cs: wizard/wizards/friend
 da: bidragyder/bidragydere/betroet
