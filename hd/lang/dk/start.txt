@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.23 2000-03-08 17:43:56 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.24 2000-03-09 09:42:44 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -166,7 +166,7 @@ søgning</b></font></a>.
 <td valign=up>
 <ul>%I|wf
 <li><a href="%sm=LD">seneste d&oslash;dsfald</a>
-<li><a href="%sm=LM">seneste gifterm&aring;l</a>%E%Ih
+<li><a href="%sm=LM">seneste bryllupper</a>%E%Ih
 <li><a href="%sm=HIST;k=10">opdateringers historie</a>%E
 <li><a href="%sm=CAL">kalendere</a>
 <li><a href="%sm=FORUM">database-forum</a>

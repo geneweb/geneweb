@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.69 2000-03-08 17:43:53 ddr Exp $
+# $Id: lexicon.txt,v 3.70 2000-03-09 09:42:42 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5122,7 +5122,7 @@ se: de senaste %d d&ouml;dsfallen
 
     the latest %d marriages
 de: die letzen %d Heiraten
-dk: de seneste %d gifterm&aring;l
+dk: de seneste %d bryllupper
 en: the latest %d marriages
 eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
@@ -5537,6 +5537,7 @@ se: med
 
     witness at marriage of %s and %s
 de: Trauzeugen bei der Hochzeit von %s und %s
+dk: vidne ved bryllup mellem %s and %s
 en: witness at marriage of %s and %s
 fi: avioliiton %s ja %s todistaja
 fr: t&eacute;moin au mariage de %s et de %s
