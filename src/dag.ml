@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 3.48 2001-01-30 16:53:22 ddr Exp $ *)
+(* $Id: dag.ml,v 3.49 2001-01-31 12:50:24 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -502,6 +502,14 @@ value print_next_pos conf pos1 pos2 tcol =
         conf.env []
     in
     do Wserver.wprint "<div align=right>\n";
+       if pos1 = 0 then Wserver.wprint "&nbsp;"
+       else
+         do Wserver.wprint "<a href=\"%s" (commd conf);
+            List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+            Wserver.wprint "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
+              (pos1 + overlap);
+            Wserver.wprint "\">&lt;&lt;</a>\n";
+         return ();
        if pos2 >= tcol then Wserver.wprint "&nbsp;"
        else
          do Wserver.wprint "<a href=\"%s" (commd conf);
