@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.47 2000-07-17 09:34:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.48 2000-07-17 09:35:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -855,9 +855,9 @@ value conf_and_connection cgi from (addr, request) str env =
   in
   match (cgi, auth_err, passwd_err) with
   [ (True, True, _) ->
-      if is_robot from then () else no_access conf
+      if is_robot from then Robot.robot_error cgi from 0 0 else no_access conf
   | (_, True, _) ->
-      if is_robot from then Robot.error cgi from 0 0
+      if is_robot from then Robot.robot_error cgi from 0 0
       else
         let auth_type =
           let x =
