@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 4.0 2001-03-16 19:34:24 ddr Exp $ *)
+(* $Id: ansel.ml,v 4.1 2001-04-18 09:33:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value no_accent =
@@ -43,30 +43,44 @@ value of_iso_8859_1 s =
           match s.[i] with
           [ 'À' | 'È' | 'Ì' | 'Ò' | 'Ù'
           | 'à' | 'è' | 'ì' | 'ò' | 'ù' ->
-              do s'.[i'] := Char.chr 225; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
+              do {
+                s'.[i'] := Char.chr 225; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
           | 'Á' | 'É' | 'Í' | 'Ó' | 'Ú' | 'Ý'
           | 'á' | 'é' | 'í' | 'ó' | 'ú' | 'ý' ->
-              do s'.[i'] := Char.chr 226; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
+              do {
+                s'.[i'] := Char.chr 226; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
           | 'Â' | 'Ê' | 'Î' | 'Ô' | 'Û'
           | 'â' | 'ê' | 'î' | 'ô' | 'û' ->
-              do s'.[i'] := Char.chr 227; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
+              do {
+                s'.[i'] := Char.chr 227; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
           | 'Ã' | 'Ñ' | 'Õ' | 'ã' | 'ñ' | 'õ' ->
-              do s'.[i'] := Char.chr 228; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
+              do {
+                s'.[i'] := Char.chr 228; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
           | 'Ä' | 'Ë' | 'Ï' | 'Ö' | 'Ü'
           | 'ä' | 'ë' | 'ï' | 'ö' | 'ü' | 'ÿ' ->
-              do s'.[i'] := Char.chr 232; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
+              do {
+                s'.[i'] := Char.chr 232; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
           | 'Å' | 'å' ->
-              do s'.[i'] := Char.chr 234; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
+              do {
+                s'.[i'] := Char.chr 234; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
           | 'Ç' | 'ç' ->
-              do s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
-              return i' + 1
-          | c -> do s'.[i'] := c; return i' ]
+              do {
+                s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
+                i' + 1
+              }
+          | c -> do { s'.[i'] := c; i' } ]
         in
         loop (i + 1) (i' + 1)
 ;
@@ -175,18 +189,18 @@ value to_iso_8859_1 s =
     loop 0 0 where rec loop i i' =
       if i == String.length s then s'
       else if i == String.length s - 1 then
-        do s'.[i'] := s.[i]; return s'
+        do { s'.[i'] := s.[i]; s' }
       else
         let i =
           match Char.code s.[i] with
-          [ 225 -> do s'.[i'] := grave s.[i+1]; return i + 1
-          | 226 -> do s'.[i'] := acute s.[i+1]; return i + 1
-          | 227 -> do s'.[i'] := circum s.[i+1]; return i + 1
-          | 228 -> do s'.[i'] := tilde s.[i+1]; return i + 1
-          | 232 -> do s'.[i'] := uml s.[i+1]; return i + 1
-          | 234 -> do s'.[i'] := circle s.[i+1]; return i + 1
-          | 240 -> do s'.[i'] := cedil s.[i+1]; return i + 1
-          | _ -> do s'.[i'] := s.[i]; return i ]
+          [ 225 -> do { s'.[i'] := grave s.[i+1]; i + 1 }
+          | 226 -> do { s'.[i'] := acute s.[i+1]; i + 1 }
+          | 227 -> do { s'.[i'] := circum s.[i+1]; i + 1 }
+          | 228 -> do { s'.[i'] := tilde s.[i+1]; i + 1 }
+          | 232 -> do { s'.[i'] := uml s.[i+1]; i + 1 }
+          | 234 -> do { s'.[i'] := circle s.[i+1]; i + 1 }
+          | 240 -> do { s'.[i'] := cedil s.[i+1]; i + 1 }
+          | _ -> do { s'.[i'] := s.[i]; i } ]
         in
         loop (i + 1) (i' + 1)
 ;

@@ -1,34 +1,34 @@
-(* $Id: argl.ml,v 4.0 2001-03-16 19:34:24 ddr Exp $ *)
+(* $Id: argl.ml,v 4.1 2001-04-18 09:38:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value action_arg s sl =
   fun
-  [ Arg.Unit f -> if s = "" then do f (); return Some sl else None
-  | Arg.Set r -> if s = "" then do r.val := True; return Some sl else None
-  | Arg.Clear r -> if s = "" then do r.val := False; return Some sl else None
-  | Arg.Rest f -> do List.iter f [s :: sl]; return Some []
+  [ Arg.Unit f -> if s = "" then do { f (); Some sl } else None
+  | Arg.Set r -> if s = "" then do { r.val := True; Some sl } else None
+  | Arg.Clear r -> if s = "" then do { r.val := False; Some sl } else None
+  | Arg.Rest f -> do { List.iter f [s :: sl]; Some [] }
   | Arg.String f ->
       if s = "" then
         match sl with
-        [ [s :: sl] -> do f s; return Some sl
+        [ [s :: sl] -> do { f s; Some sl }
         | [] -> None ]
-      else do f s; return Some sl
+      else do { f s; Some sl }
   | Arg.Int f ->
       if s = "" then
         match sl with
         [ [s :: sl] ->
-            try do f (int_of_string s); return Some sl with
+            try do { f (int_of_string s); Some sl } with
             [ Failure "int_of_string" -> None ]
         | [] -> None ]
       else
-        try do f (int_of_string s); return Some sl with
+        try do { f (int_of_string s); Some sl } with
         [ Failure "int_of_string" -> None ]
   | Arg.Float f ->
       if s = "" then
         match sl with
-        [ [s :: sl] -> do f (float_of_string s); return Some sl
+        [ [s :: sl] -> do { f (float_of_string s); Some sl }
         | [] -> None ]
-      else do f (float_of_string s); return Some sl ]
+      else do { f (float_of_string s); Some sl } ]
 ;
 
 value common_start s1 s2 =
@@ -57,7 +57,7 @@ value rec parse_aux spec_list anon_fun =
         match parse_arg s sl spec_list with
         [ Some sl -> parse_aux spec_list anon_fun sl
         | None -> [s :: parse_aux spec_list anon_fun sl] ]
-      else do (anon_fun s : unit); return parse_aux spec_list anon_fun sl ]
+      else do { (anon_fun s : unit); parse_aux spec_list anon_fun sl } ]
 ;
 
 value parse_arg_list spec_list anon_fun remaining_args =
@@ -66,31 +66,34 @@ value parse_arg_list spec_list anon_fun remaining_args =
   in
   try parse_aux spec_list anon_fun remaining_args with
   [ Arg.Bad s ->
-      do Printf.eprintf "Error: %s\n" s;
-         Printf.eprintf "Use option -help for usage\n";
-         flush stderr;
-      return exit 2 ]
+      do {
+        Printf.eprintf "Error: %s\n" s;
+        Printf.eprintf "Use option -help for usage\n";
+        flush stderr;
+        exit 2
+      } ]
 ;
 
 value usage speclist errmsg =
-  do Printf.printf "%s\n" errmsg;
-     List.iter (fun (key, _, doc) -> Printf.printf "  %s %s\n" key doc)
-       speclist;
-     flush stdout;
-  return ()
+  do {
+    Printf.printf "%s\n" errmsg;
+    List.iter (fun (key, _, doc) -> Printf.printf "  %s %s\n" key doc)
+      speclist;
+    flush stdout;
+  }
 ;
 
 value parse_list spec_list anonfun errmsg list =
-  do match parse_arg_list spec_list anonfun list with
-     [ [] -> ()
-     | ["-help" :: sl] ->
-         do usage spec_list errmsg; return exit 0
-     | [s :: sl] ->
-         do Printf.eprintf "%s: unknown or misused option\n" s;
-            Printf.eprintf "Use option -help for usage\n";
-            flush stderr;
-         return exit 2 ];
-  return ()
+  match parse_arg_list spec_list anonfun list with
+  [ [] -> ()
+  | ["-help" :: sl] -> do { usage spec_list errmsg; exit 0 }
+  | [s :: sl] ->
+      do {
+        Printf.eprintf "%s: unknown or misused option\n" s;
+        Printf.eprintf "Use option -help for usage\n";
+        flush stderr;
+        exit 2
+      } ]
 ;
 
 value parse spec_list anonfun errmsg =
