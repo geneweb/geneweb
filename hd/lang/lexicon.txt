@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.16 1999-11-23 18:49:28 ddr Exp $
+# $Id: lexicon.txt,v 3.17 1999-11-24 10:45:39 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3260,7 +3260,7 @@ dk: note/noter
 en: note/notes
 eo: noto/notoj:a:+n
 es: nota/notas
-fi: huomautus/huomautuksia 
+fi: viitteet
 fr: note/notes
 he:  הערות
 is: athugasemd/athugasemdum
@@ -3392,7 +3392,7 @@ dk: til
 en: of
 eo: de
 es: de
-fi: :l:
+fi: :g:
 fr: de/d'
 he:    של
 is: &nbsp;
