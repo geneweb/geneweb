@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.15 2000-02-14 14:39:50 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.16 2000-02-24 20:43:17 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -155,12 +155,12 @@ eftir
 <li><a href="%sm=AN">afmælisdaga</a>
 <li><a href="%sm=AD">ártíðir</a>
 <li><a href="%sm=AM">brúðkaupsafmæli</a>%I|wf
-<li><a href="%sm=LB;k=10">síðustu fæðingar</a>%E
+<li><a href="%sm=LB">síðustu fæðingar</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li><a href="%sm=LD;k=10">síðustu andlát</a>%E%Ih
+<li><a href="%sm=LD">síðustu andlát</a>%E%Ih
 <li><a href="%sm=HIST;k=10">uppfærslusögu</a>%E
 <li><a href="%sm=CAL">dagatöl</a>
 <li><a href="%sm=FORUM">umræður</a>
