@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwf_1.htm,v 1.7 2002-01-21 05:01:01 ddr Exp $ -->
+  <!-- $Id: gwf_1.htm,v 1.8 2002-01-21 13:36:17 ddr Exp $ -->
   <title>[
 de: Parameter "$a"
 en: Parameters "$a"
@@ -1004,10 +1004,10 @@ sv: kinesiska
 <p>
 
 <table border=1 width="100%" width="90%">
-<tr align=left><td><strong>- mac_anc_level -</strong></td></tr>
+<tr align=left><td><strong>- max_anc_level -</strong></td></tr>
 <tr align=left>
 <td>[
-en: Maximum level when displaying ancestor.
+en: Maximum level when displaying ancestors.
 fr: Niveau maximum dans l'affichage des ascendants.
 ]
 
@@ -1015,7 +1015,7 @@ fr: Niveau maximum dans l'affichage des ascendants.
 
 [
 en: When ancestors are displayed, limit the number of displayed
-    generation. By default, it is 8 generations, but you can
+    generations. By default, it is 8 generations, but you can
     indicate a different value here.
 fr: Quand on affiche les ascendants, limite le nombre de
     g&eacute;n&eacute;rations affichables. C'est 8 par d&eacute;faut,
@@ -1026,6 +1026,96 @@ fr: Quand on affiche les ascendants, limite le nombre de
 </tr>
 <tr align=left>
 <td align=center><input name=max_anc_level value="$Vmax_anc_level;"
+size=5></td>
+</tr>
+
+</table>
+
+<p>
+
+<table border=1 width="100%" width="90%">
+<tr align=left><td><strong>- max_desc_level -</strong></td></tr>
+<tr align=left>
+<td>[
+en: Maximum level when displaying descendants.
+fr: Niveau maximum dans l'affichage des descendants.
+]
+
+<p>
+
+[
+en: When descendants are displayed, limit the number of displayed
+    generations. By default, it is 12 generations, but you can
+    indicate a different value here.
+fr: Quand on affiche les descendants, limite le nombre de
+    g&eacute;n&eacute;rations affichables. C'est 12 par d&eacute;faut,
+    mais vous pouvez indiquer une valeur diff&eacute;rente ici.
+]
+</tr>
+
+</tr>
+<tr align=left>
+<td align=center><input name=max_desc_level value="$Vmax_desc_level;"
+size=5></td>
+</tr>
+
+</table>
+
+<p>
+
+<table border=1 width="100%" width="90%">
+<tr align=left><td><strong>- max_anc_tree -</strong></td></tr>
+<tr align=left>
+<td>[
+en: Maximum level when displaying ancestors by tree.
+fr: Niveau maximum dans l'affichage des ascendants par arbre.
+]
+
+<p>
+
+[
+en: When ancestors are displayed by tree, limit the number of displayed
+    generations. By default, it is 7 generations, but you can
+    indicate a different value here.
+fr: Quand on affiche les ascendants par arbre, limite le nombre de
+    g&eacute;n&eacute;rations affichables. C'est 7 par d&eacute;faut,
+    mais vous pouvez indiquer une valeur diff&eacute;rente ici.
+]
+</tr>
+
+</tr>
+<tr align=left>
+<td align=center><input name=max_anc_tree value="$Vmax_anc_tree;"
+size=5></td>
+</tr>
+
+</table>
+
+<p>
+
+<table border=1 width="100%" width="90%">
+<tr align=left><td><strong>- max_desc_tree -</strong></td></tr>
+<tr align=left>
+<td>[
+en: Maximum level when displaying descendants by tree.
+fr: Niveau maximum dans l'affichage des descendants par arbre.
+]
+
+<p>
+
+[
+en: When descendants are displayed by tree, limit the number of displayed
+    generations. By default, it is 4 generations, but you can
+    indicate a different value here.
+fr: Quand on affiche les descendants par arbre, limite le nombre de
+    g&eacute;n&eacute;rations affichables. C'est 4 par d&eacute;faut,
+    mais vous pouvez indiquer une valeur diff&eacute;rente ici.
+]
+</tr>
+
+</tr>
+<tr align=left>
+<td align=center><input name=max_desc_tree value="$Vmax_desc_tree;"
 size=5></td>
 </tr>
 
