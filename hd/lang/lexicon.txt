@@ -376,7 +376,7 @@ nl: een zoon/een dochter/een kind
 pt: um filho/uma filha/um(a) filho(a)
 se: en son/en dotter/ett barn
 
-    about (year)
+    about (date)
 de: ca.
 en: about
 eo: cxirkaux
@@ -427,7 +427,7 @@ nl: na
 pt: depois
 se: efter
 
-    after (year)
+    after (date)
 de: nach
 en: after
 eo: post
@@ -657,7 +657,7 @@ nl: voor
 pt: antes
 se: f&ouml;re
 
-    before (year)
+    before (date)
 de: vor
 en: before
 eo: antaux
@@ -678,6 +678,17 @@ it: inizio
 nl: begin
 pt: começo
 se: b&ouml;rjar
+
+    between (date)
+de: zwischen
+en: between
+eo: inter
+es: entre
+fr: entre
+it: tra
+nl: tussen
+pt: entre
+se: emellan
 
     birth
 de: Geburt
@@ -1517,16 +1528,16 @@ nl: maximaal %d generaties
 pt: maximum %d geraç&otilde;es
 se: maximalt %d generationer
 
-    maybe in (year)
-de: vielleicht im
-en: maybe in
-eo: eble en
-es: possiblemente en
-fr: peut-&ecirc;tre en
-it: forse nel
-nl: waarschijnlijk in
-pt: possivelmente en
-se: kanske i
+    maybe (date)
+de: vielleicht
+en: maybe
+eo: eble
+es: possiblemente
+fr: peut-&ecirc;tre
+it: forse
+nl: waarschijnlijk
+pt: possivelmente
+se: kanske
 
     merge
 de: zusammenf&uuml;hren
@@ -2691,28 +2702,6 @@ it: sarebbe antenato(a) di se stesso(a)
 nl: zou zijn/haar eigen voorouder zijn
 pt: seria seu própio ancestro
 se: skulle vara hans/hennes egen stamfader
-
-    year
-de: Jahr
-en: year
-eo: jaro
-es: a&ntilde;o
-fr: ann&eacute;e
-it: anno
-nl: jaar
-pt: ano
-se: &aring;r
-
-    year precision
-de: Genauigkeit des Jahres
-en: year precision
-eo: precizeco de la jaro
-es: precision del a&ntilde;o
-fr: pr&eacute;cision de l'ann&eacute;e
-it: precisione dell'anno
-nl: juiste jaar
-pt: precis&atilde;o do ano
-se: &aring;rs precision
 
     years old
 cn: Ëê

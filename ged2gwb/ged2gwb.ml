@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.21 1998-11-26 20:12:40 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.22 1998-11-27 20:09:33 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -296,15 +296,18 @@ value date_of_field pos d =
       [ Stdpp.Exc_located loc e -> None ]
     in
     match r with
-    [ Some (Sure, Some d, Some m, Some y) -> Some (Djma d m y)
-    | Some (p, Some d, Some m, Some y) -> Some (Da About y)
-    | Some (Sure, None, Some m, Some y) -> Some (Dma m y)
-    | Some (p, None, Some m, Some y) -> Some (Da About y)
-    | Some (p, None, None, Some y) -> Some (Da p y)
-    | Some (p, Some y, None, None) -> Some (Da p y)
+    [ Some (p, Some d, Some m, Some y) ->
+        Some {day = 0; month = 0; year = y; prec = p}
+    | Some (p, None, Some m, Some y) ->
+        Some {day = 0; month = m; year = y; prec = p}
+    | Some (p, None, None, Some y) ->
+        Some {day = 0; month = 0; year = y; prec = p}
+    | Some (p, Some y, None, None) ->
+        Some {day = 0; month = 0; year = y; prec = p}
     | _ ->
         try
-          Some (Da Maybe (Grammar.Entry.parse find_year (Stream.of_string d)))
+          let y = Grammar.Entry.parse find_year (Stream.of_string d) in
+          Some {day = 0; month = 0; year = y; prec = Maybe}
         with
         [ Stdpp.Exc_located loc e ->
             do print_bad_date pos d; return None ] ]
@@ -660,10 +663,10 @@ value decode_title s =
 
 value date_of_sd =
   fun
-  [ (Some d, Some m, Some y) -> Djma d m y
-  | (None, Some m, Some y) -> Dma m y
-  | (None, None, Some y) -> Da Sure y
-  | (Some y, None, None) -> Da Sure y
+  [ (Some d, Some m, Some y) -> {day = d; month = m; year = y; prec = Sure}
+  | (None, Some m, Some y) -> {day = 0; month = m; year = y; prec = Sure}
+  | (None, None, Some y) -> {day = 0; month = 0; year = y; prec = Sure}
+  | (Some y, None, None) -> {day = 0; month = 0; year = y; prec = Sure}
   | _ -> raise Not_found ]
 ;
 
@@ -1450,10 +1453,12 @@ value check_parents_sex base =
 
 value neg_year =
   fun
-  [ Da (OrYear y2) y -> Da (OrYear (- abs y2)) (- abs y)
-  | Da p y -> Da p (- abs y)
-  | Dma m y -> Dma m (- abs y)
-  | Djma d m y -> Djma d m (- abs y) ]
+  [ {day = d; month = m; year = y; prec = OrYear y2} ->
+      {day = d; month = m; year = - abs y; prec = OrYear (- abs y2)}
+  | {day = d; month = m; year = y; prec = YearInt y2} ->
+      {day = d; month = m; year = - abs y; prec = YearInt (- abs y2)}
+  | {day = d; month = m; year = y; prec = p} ->
+      {day = d; month = m; year = - abs y; prec = p} ]
 ;
 
 value neg_year_cdate cd =

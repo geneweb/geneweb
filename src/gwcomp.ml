@@ -1,9 +1,9 @@
-(* $Id: gwcomp.ml,v 1.8 1998-10-28 09:59:59 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.9 1998-11-27 20:09:42 ddr Exp $ *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000a";
+value magic_gwo = "GnWo000b";
 
 type key =
   { pk_first_name : string;
@@ -85,10 +85,13 @@ value date_de_string s i =
   let (precision, i) =
     if i < String.length s && s.[i] == '|' then
       let (y2, i) = champ (succ i) in (OrYear y2, i)
+    else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
+      let (y2, i) = champ (i + 2) in (OrYear y2, i)
     else (precision, i)
   in
   if i == String.length s then
-    if undef then None else Some (Da precision annee)
+    if undef then None
+    else Some {day = 0; month = 0; year = annee; prec = precision}
   else
     let i = skip_slash i in
     let mois = annee in
@@ -96,7 +99,7 @@ value date_de_string s i =
     if i == String.length s then
       if annee == 0 then None
       else if mois < 1 || mois > 12 then failwith ("date_de_string " ^ s)
-      else Some (Dma mois annee)
+      else Some {day = 0; month = mois; year = annee; prec = precision}
     else
       let i = skip_slash i in
       let jour = mois in
@@ -106,7 +109,7 @@ value date_de_string s i =
         if annee == 0 then None
         else if mois < 1 || mois > 12 then failwith ("date_de_string " ^ s)
         else if jour < 1 || jour > 31 then failwith ("date_de_string " ^ s)
-        else Some (Djma jour mois annee)
+        else Some {day = jour; month = mois; year = annee; prec = precision}
       else failwith ("date_de_string " ^ s)
 ;
 

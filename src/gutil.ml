@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.3 1998-11-20 13:44:49 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.4 1998-11-27 20:09:41 ddr Exp $ *)
 
 open Def;
 
@@ -17,11 +17,50 @@ value nb_jours_dans_mois =
   fun m a -> if m == 2 && bissextile a then 29 else tb.(m - 1)
 ;
 
+value common_prec p1 p2 =
+ if p1 = p2 then p1
+  else
+    match (p1, p2) with
+    [ (Sure, _) -> p2
+    | (_, Sure) -> p1
+    | _ -> Maybe ]
+;
+
 value temps_ecoule d1 d2 =
+  let prec = common_prec d1.prec d2.prec in
   match d1 with
-  [ Djma j1 m1 a1 ->
+  [ {day = 0; month = 0; year = a1} ->
+      {day = 0; month = 0; year = d2.year - a1; prec = prec}
+  | {day = 0; month = m1; year = a1} ->
       match d2 with
-      [ Djma j2 m2 a2 ->
+      [ {day = 0; month = 0; year = a2} ->
+          {day = 0; month = 0; year = a2 - a1; prec = prec}
+      | {day = 0; month = m2; year = a2} ->
+          let r = 0 in
+          let (mois, r) =
+            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
+          in
+          let annee = a2 - a1 - r in
+          {day = 0; month = mois; year = annee; prec = prec}
+      | {day = j2; month = m2; year = a2} ->
+          let r = 0 in
+          let (mois, r) =
+            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
+          in
+          let annee = a2 - a1 - r in
+          {day = 0; month = mois; year = annee; prec = prec} ]
+  | {day = j1; month = m1; year = a1} ->
+      match d2 with
+      [ {day = 0; month = 0; year = a2} ->
+          {day = 0; month = 0; year = a2 - a1; prec = prec}
+      | {day = 0; month = m2; year = a2} ->
+          let r = 0 in
+          let (mois, r) =
+            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
+          in
+          let annee = a2 - a1 - r in
+          {day = 0; month = mois; year = annee; prec = prec}
+      | {day = j2; month = m2; year = a2} ->
           let (jour, r) =
             if j1 <= j2 then (j2 - j1, 0)
             else (j2 - j1 + nb_jours_dans_mois m1 a1, 1)
@@ -29,88 +68,36 @@ value temps_ecoule d1 d2 =
           let (mois, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
-          let annee = a2 - a1 - r in Djma jour mois annee
-      | Dma m2 a2 ->
-          let r = 0 in
-          let (mois, r) =
-            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
-          in
-          let annee = a2 - a1 - r in Dma mois annee
-      | Da sure a2 -> Da sure (a2 - a1) ]
-  | Dma m1 a1 ->
-      match d2 with
-      [ Djma j2 m2 a2 ->
-          let r = 0 in
-          let (mois, r) =
-            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
-          in
-          let annee = a2 - a1 - r in Dma mois annee
-      | Dma m2 a2 ->
-          let r = 0 in
-          let (mois, r) =
-            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
-          in
-          let annee = a2 - a1 - r in Dma mois annee
-      | Da sure a2 -> Da sure (a2 - a1) ]
-  | Da sure a1 ->
-      match d2 with
-      [ Djma _ _ a2 -> Da sure (a2 - a1)
-      | Dma _ a2 -> Da sure (a2 - a1)
-      | Da sure2 a2 ->
-          Da (match sure with
-              [ Sure -> sure2
-              | About -> if sure2 = Sure then About else sure2
-              | _ -> Maybe ])
-             (a2 - a1) ] ]
+          let annee = a2 - a1 - r in
+          {day = jour; month = mois; year = annee; prec = prec} ] ]
 ;
 
-value annee =
-  fun
-  [ Djma _ _ a -> a
-  | Dma _ a -> a
-  | Da _ a -> a ]
-;
+value annee d = d.year;
 
 value strictement_avant d1 d2 =
-  match temps_ecoule d2 d1 with
-  [ Djma j m a -> a < 0
-  | Dma m a -> a < 0
-  | Da Sure a -> a < 0
-  | Da _ a ->
-      if a < 0 then True
-      else if a > 0 then False
-      else
-        match (d1, d2) with
-        [ (Da p1 _, Da p2 _) when p1 = p2 -> False
-        | (Da Before _, _) | (_, Da After _) -> True
-        | _ -> False ] ]
+  let {day = d; month = m; year = y; prec = p} = temps_ecoule d2 d1 in
+  if y < 0 then True
+  else if y > 0 then False
+  else if m < 0 then True
+  else if m > 0 then False
+  else if d < 0 then True
+  else if d > 0 then False
+  else if d1.prec = d2.prec then False
+  else if d1.prec = Before && d2.prec = After then True
+  else False
 ;
 
 value strictement_apres d1 d2 =
-  match temps_ecoule d1 d2 with
-  [ Djma j m a -> a < 0
-  | Dma m a -> a < 0
-  | Da _ a ->
-      if a < 0 then True
-      else if a > 0 then False
-      else
-        match (d2, d1) with
-        [ (Da p2 _, Da p1 _) when p1 = p2 -> False
-        | (Da Before _, _) | (_, Da After _) -> True
-        | _ -> False ] ]
-;
-
-value string_of_date =
-  fun
-  [ Djma j m a ->
-      "on " ^ string_of_int j ^ "/" ^ string_of_int m ^ "/" ^ string_of_int a
-  | Dma m a -> "in " ^ string_of_int m ^ "/" ^ string_of_int a
-  | Da Sure a -> "in " ^ string_of_int a
-  | Da About a -> "about " ^ string_of_int a
-  | Da Maybe a -> "maybe in " ^ string_of_int a
-  | Da Before a -> "before " ^ string_of_int a
-  | Da After a -> "after " ^ string_of_int a
-  | Da (OrYear a1) a -> "in " ^ string_of_int a ^ " or " ^ string_of_int a1 ]
+  let {day = d; month = m; year = y; prec = p} = temps_ecoule d1 d2 in
+  if y < 0 then True
+  else if y > 0 then False
+  else if m < 0 then True
+  else if m > 0 then False
+  else if d < 0 then True
+  else if d > 0 then False
+  else if d2.prec = d1.prec then False
+  else if d2.prec = Before && d1.prec = After then True
+  else False
 ;
 
 value denomination base p =
@@ -414,7 +401,7 @@ value possible_father base warning x ifath =
   match (Adef.od_of_codate x.birth, father.death) with
   [ (Some d1, Death _ d2) ->
       match (d1, Adef.date_of_cdate d2) with
-      [ (Da Before _, _) | (_, Da After _) -> ()
+      [ ({prec = Before}, _) | (_, {prec = After}) -> ()
       | (d1, d2) ->
           if annee d1 > annee d2 + 1 then
             warning (DeadTooEarlyToBeFather father x)

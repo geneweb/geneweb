@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: adef.mli,v 1.2 1998-11-27 20:09:37 ddr Exp $ *)
 
 type iper = 'a;
 type ifam = 'a;
@@ -7,11 +7,14 @@ type fix = 'a;
 type cdate = 'a;
 type codate = 'a;
 
-type precision = [ Sure | About | Maybe | Before | After | OrYear of int ];
+type precision =
+  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
+;
 type date =
-  [ Djma of int and int and int
-  | Dma of int and int
-  | Da of precision and int ]
+  { year : int;
+    month : int;
+    day : int;
+    prec : precision }
 ;
 
 value float_of_fix : fix -> float;

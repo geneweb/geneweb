@@ -1,26 +1,28 @@
-(* $Id: gwu.ml,v 1.5 1998-10-20 09:22:05 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.6 1998-11-27 20:09:44 ddr Exp $ *)
 
 open Def;
 open Gutil;
 
 value soy y = if y == 0 then "-0" else string_of_int y;
 
-value print_date oc =
-  fun
-  [ Djma d m y -> Printf.fprintf oc "%d/%d/%s" d m (soy y)
-  | Dma m y -> Printf.fprintf oc "%d/%s" m (soy y)
-  | Da prec y ->
-      do match prec with
-         [ About -> Printf.fprintf oc "~"
-         | Maybe -> Printf.fprintf oc "?"
-         | Before -> Printf.fprintf oc "<"
-         | After -> Printf.fprintf oc ">"
-         | _ -> () ];
-         Printf.fprintf oc "%s" (soy y);
-         match prec with
-         [ OrYear y -> Printf.fprintf oc "|%s" (soy y)
-         | _ -> () ];
-      return () ]
+value print_date oc d =
+  do match d.prec with
+     [ About -> Printf.fprintf oc "~"
+     | Maybe -> Printf.fprintf oc "?"
+     | Before -> Printf.fprintf oc "<"
+     | After -> Printf.fprintf oc ">"
+     | _ -> () ];
+     if d.day == 0 && d.month == 0 then
+       Printf.fprintf oc "%s" (soy d.year)
+     else if d.day == 0 then
+       Printf.fprintf oc "%d/%s" d.month (soy d.year)
+     else
+       Printf.fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
+     match d.prec with
+     [ OrYear y -> Printf.fprintf oc "|%s" (soy y)
+     | YearInt y -> Printf.fprintf oc "..%s" (soy y)
+     | _ -> () ];
+  return ()
 ;
 
 value print_date_option oc =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 1.2 1998-11-27 20:09:38 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,14 +15,15 @@ value reconstitute_date conf var =
       [ Some m ->
           match get_number var "dd" conf.env with
           [ Some d ->
-              if d >= 1 && d <= 31 && m >= 1 && m <= 12 then Some (Djma d m y)
+              if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
+                Some {day = d; month = m; year = y; prec = Sure}
               else None
           | None ->
-              if m >= 1 && m <= 12 then Some (Dma m y)
+              if m >= 1 && m <= 12 then
+                Some {day = 0; month = m; year = y; prec = Sure}
               else None ]
       | None ->
-          let prec = Sure in
-          Some (Da prec y) ]
+          Some {day = 0; month = 0; year = y; prec = Sure} ]
   | None -> None ]
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.4 1998-09-25 09:46:35 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.5 1998-11-27 20:09:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -117,7 +117,8 @@ value print_date conf =
   let (wc, rc, d) = count conf in
   match extract_date d with
   [ Some (d, m, y) ->
-      Wserver.wprint "%s" (Date.string_of_date conf (Djma d m y))
+      Wserver.wprint "%s"
+        (Date.string_of_date conf {day = d; month = m; year = y; prec = Sure})
   | _ -> Wserver.wprint "%s" d ]
 ;
 
