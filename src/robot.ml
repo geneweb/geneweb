@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.2 1999-08-06 03:56:14 ddr Exp $ *)
+(* $Id: robot.ml,v 1.3 1999-08-06 04:06:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -118,7 +118,7 @@ value check oc tm from max_call sec =
            W.iter
              (fun k (_, tm0, nb) ->
                 Printf.fprintf oc
-                  " --- address %s: %d requests since %.0f seconds\n" k nb
+                  " --- addr %s: %d requests since %.0f seconds\n" k nb
                   (tm -. tm0))
               xcl.who;
         return refused ]
