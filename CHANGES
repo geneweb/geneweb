@@ -1,6 +1,9 @@
 GeneWeb version 3.03
 --------------------
 
+* Languages
+  - [23 Jan 00] Added Russian (Konstantin Abakumov).
+
 * GeneWeb Service/CGI (gwd)
   - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.

@@ -15,10 +15,6 @@ GeneWeb Version 3.03
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [21 Jan 00] Changed "anniversaries of dead" into "annivesaries of death"
   - [13 Jan 00] Changed "living" into "alive"
-  - [17 Jan 00] Added a message in welcome pages when the flag
-    "wizard_just_friend" is set for the data base to inform the
-    wizards that they cannot make changes for some minutes. This
-    message is actually added in the file 'version.txt'
 
 GeneWeb Version 3.02
 --------------------

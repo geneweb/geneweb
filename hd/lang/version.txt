@@ -33,6 +33,8 @@
 <img src="%km=IM;v=/l-no.jpg" width=36 height=22 alt=no></a>
 <a href="%glang=pt">
 <img src="%km=IM;v=/l-pt.jpg" width=36 height=22 alt=pt></a>
+<a href="%glang=ru">
+<img src="%km=IM;v=/l-ru.jpg" width=36 height=22 alt=ru></a>
 <a href="%glang=se">
 <img src="%km=IM;v=/l-se.jpg" width=36 height=22 alt=se></a>
 </td>
