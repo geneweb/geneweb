@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.29 1998-12-16 17:36:17 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.30 1999-01-16 06:01:28 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -558,7 +558,8 @@ value find_notes_record gen addr =
   match try Some (Hashtbl.find gen.g_not addr) with [ Not_found -> None ] with
   [ Some i ->
       do seek_in gen.g_ic i; return
-      Some (get_lev0 (Stream.of_channel gen.g_ic))
+      try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
+      [ Stream.Failure | Stream.Error _ -> None ]
   | None -> None ]
 ;
 
@@ -566,7 +567,8 @@ value find_sources_record gen addr =
   match try Some (Hashtbl.find gen.g_src addr) with [ Not_found -> None ] with
   [ Some i ->
       do seek_in gen.g_ic i; return
-      Some (get_lev0 (Stream.of_channel gen.g_ic))
+      try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
+      [ Stream.Failure | Stream.Error _ -> None ]
   | None -> None ]
 ;
 
