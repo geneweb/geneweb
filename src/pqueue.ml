@@ -1,5 +1,5 @@
-(* $Id: pqueue.ml,v 3.0 1999-10-29 10:31:31 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: pqueue.ml,v 3.1 2000-01-10 02:14:41 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 module type OrderedType = sig type t = 'a; value leq : t -> t -> bool; end;
 

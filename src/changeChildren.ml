@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.2 1999-11-10 08:44:15 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: changeChildren.ml,v 3.3 2000-01-10 02:14:37 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Gutil;

@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 3.1 1999-11-10 08:44:27 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: mergeFamOk.ml,v 3.2 2000-01-10 02:14:39 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Config;
 open Def;

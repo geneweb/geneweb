@@ -1,6 +1,6 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.2 1999-11-26 21:54:08 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: title.ml,v 3.3 2000-01-10 02:14:41 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Config;
 open Def;

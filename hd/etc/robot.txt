@@ -12,7 +12,7 @@ been automatically disconnected.
 <p>
 Contact the site administrator to restore it.
 
-<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
+<p><hr><font size=-1><em>(c) Copyright INRIA 2000 -
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/">
 GeneWeb %v</a></em></font><br>
 </body>

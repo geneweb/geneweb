@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.26 1999-12-26 13:30:11 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: util.ml,v 3.27 2000-01-10 02:14:42 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Config;
@@ -866,7 +866,7 @@ alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
      | None ->
          do html_p conf;
             Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright INRIA 1999 -
+<hr><font size=-1><em>(c) Copyright INRIA 2000 -
 GeneWeb %s</em></font>" Version.txt;
             html_br conf;
          return () ];

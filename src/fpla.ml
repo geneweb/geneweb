@@ -1,5 +1,5 @@
-(* $Id: fpla.ml,v 3.0 1999-10-29 10:31:11 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: fpla.ml,v 3.1 2000-01-10 02:14:38 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 (* First Parentless Ancestor *)
 
 open Gutil;
