@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.2 2001-05-15 15:57:12 ddr Exp $ *)
+(* $Id: descend.ml,v 4.3 2001-06-03 15:43:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -838,7 +838,7 @@ value trier_et_afficher conf base paths precision liste =
            let c =
              alphabetique (p_first_name base p1) (p_first_name base p2)
            in
-           c < 0
+           c > 0
          else c > 0)
       liste
   in
