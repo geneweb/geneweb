@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.7 2001-08-22 08:26:41 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.8 2001-08-22 09:09:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2043,6 +2043,24 @@ value check_undefined gen =
   }
 ;
 
+value add_parents_to_isolated gen =
+  for i = 0 to gen.g_per.tlen - 1 do {
+    match gen.g_per.arr.(i) with
+    [ Right3 p a u ->
+        if a.parents = None && Array.length u.family = 0 && p.rparents = [] &&
+           p.related = []
+        then
+          let fn = gen.g_str.arr.(Adef.int_of_istr p.first_name) in
+          let sn = gen.g_str.arr.(Adef.int_of_istr p.surname) in
+          if fn = "?" && sn = "?" then ()
+          else
+            Printf.fprintf log_oc.val "<W> Isolated person: %s.%d %s\n"
+              fn p.occ sn
+        else ()
+    | Left3 _ -> () ]
+  }
+;
+
 value make_arrays in_file =
   let fname =
     if Filename.check_suffix in_file ".ged" then in_file
@@ -2071,6 +2089,7 @@ value make_arrays in_file =
     pass3 gen fname;
     close_in gen.g_ic;
     check_undefined gen;
+    add_parents_to_isolated gen;
     (gen.g_per, gen.g_fam, gen.g_str, gen.g_bnot)
   }
 ;
@@ -2187,9 +2206,29 @@ value check_parents_children base =
             (denomination base (poi base cpl.father));
           Printf.fprintf log_oc.val "- %s\n"
             (denomination base (poi base cpl.mother));
-          Printf.fprintf log_oc.val "=> deleted this family for him/her\n";
+          let fath = poi base cpl.father in
+          let moth = poi base cpl.mother in
+          let ffn = sou base fath.first_name in
+          let fsn = sou base fath.surname in
+          let mfn = sou base moth.first_name in
+          let msn = sou base moth.surname in
+          if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
+            Printf.fprintf log_oc.val
+              "However, the husband is unknown, I set him as husband\n";
+            (uoi base cpl.father).family := [| |];
+            cpl.father := Adef.iper_of_int i;
+          }
+          else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
+            Printf.fprintf log_oc.val
+              "However, the wife is unknown, I set her as wife\n";
+            (uoi base cpl.mother).family := [| |];
+            cpl.mother := Adef.iper_of_int i;
+          }
+          else do {
+            Printf.fprintf log_oc.val "=> deleted this family for him/her\n";
+            fam_to_delete.val := [j :: fam_to_delete.val];
+          };
           Printf.fprintf log_oc.val "\n";
-          fam_to_delete.val := [j :: fam_to_delete.val];
           flush log_oc.val
         }
         else ()
