@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.24 2004-07-16 16:17:56 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.25 2004-07-17 09:16:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -277,7 +277,7 @@ value reparent_ind base p1 p2 =
         in
         replace 0;
         set_parents a1 (Some ifam);
-        a1.consang := Adef.fix (-1);
+        set_consang a1 (Adef.fix (-1));
         base.func.patch_ascend p1.cle_index a1;
         base.func.patch_descend ifam des;
       }

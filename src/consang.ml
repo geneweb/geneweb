@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 4.6 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: consang.ml,v 4.7 2004-07-17 09:16:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -149,7 +149,7 @@ value insert_branch_len ip lens (len, n, ipl) =
 ;
 
 value consang_of p =
-  if p.consang == no_consang then 0.0 else Adef.float_of_fix p.consang
+  if consang p == no_consang then 0.0 else Adef.float_of_fix (consang p)
 ;
 
 value relationship_and_links base ri b ip1 ip2 =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.13 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.14 2004-07-17 09:16:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -78,7 +78,7 @@ value make_person gen p n occ i =
      burial_place = empty_string; burial_src = empty_string;
      notes = empty_string; psources = empty_string;
      cle_index = Adef.iper_of_int i}
-  and a = no_parents ()
+  and a = no_ascend ()
   and u = {family = [| |]} in
   (p, a, u)
 ;

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.16 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.17 2004-07-17 09:16:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -216,17 +216,10 @@ declare
   value father cpl = cpl.father;
   value mother cpl = cpl.mother;
   value parent father mother = {father = father; mother = mother};
+  value parent_array cpl = [| cpl.father; cpl.mother |];
 
   value set_father cpl father = cpl.father := father;
   value set_mother cpl mother = cpl.mother := mother;
-
-  value parents asc = asc.parents;
-  value no_parents () = {parents = None; consang = Adef.fix (-1)};
-  value set_parents asc =
-    fun
-    [ None -> asc.parents := None
-    | Some p -> asc.parents := Some p ]
-  ;
 end
 else
 declare
@@ -239,6 +232,7 @@ declare
     else invalid_arg "mother"
   ;
   value parent father mother = {parent = [| father; mother |]};
+  value parent_array cpl = cpl.parent;
 
   value set_father cpl father =
     if Array.length cpl.parent >= 1 then cpl.parent.(0) := father
@@ -248,17 +242,13 @@ declare
     if Array.length cpl.parent >= 2 then cpl.parent.(1) := mother
     else invalid_arg "set_mother"
   ;
-
-  value parents asc =
-    if Array.length asc.parents >= 1 then Some asc.parents.(0) else None
-  ; 
-  value no_parents () = {parents = [| |]; consang = Adef.fix (-1)};
-  value set_parents asc =
-    fun
-    [ None -> asc.parents := [| |]
-    | Some p -> asc.parents := [| p |] ]
-  ;
 end;
+
+value parents asc = asc.parents;
+value consang asc = asc.consang;
+value no_ascend () = {parents = None; consang = Adef.fix (-1)};
+value set_parents asc v = asc.parents := v;
+value set_consang asc v = asc.consang := v;
 
 value spouse ip cpl =
   if ip == father cpl then mother cpl

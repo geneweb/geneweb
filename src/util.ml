@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.89 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: util.ml,v 4.90 2004-07-17 09:14:29 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -558,7 +558,7 @@ value pget (conf : config) base ip =
 ;
 
 value aget (conf : config) base ip =
-  if is_restricted conf base ip then no_parents ()
+  if is_restricted conf base ip then no_ascend ()
   else base.data.ascends.get (Adef.int_of_iper ip)
 ;
 
