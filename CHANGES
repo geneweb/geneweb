@@ -33,7 +33,7 @@ GeneWeb version 2.07
     with Email addresses did not work correctly. Fixed.
 
 * Consanguinity computing (consang)
-  - [Sep 17, 99] Run faster when no modifications have been done (e.g. just
+  - [Sep 17..19, 99] Run faster when no modifications have been done (e.g. just
     after the creation of the data base).
 
 * Documentation

@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.18 1999-09-17 06:29:56 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.19 1999-09-19 09:25:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -797,6 +797,61 @@ value count_error computed found =
   return exit 2
 ;
 
+value just_copy bname what oc oc_acc =
+do Printf.eprintf "*** copying %s\n" what; flush stderr; return
+  let ic =
+    let ic = open_in_bin (Filename.concat bname "base") in
+    do check_magic ic; return ic
+  in
+  let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
+  let persons_len = input_binary_int ic in
+  let ascends_len = input_binary_int ic in
+  let families_len = input_binary_int ic in
+  let couples_len = input_binary_int ic in
+  let strings_len = input_binary_int ic in
+  let persons_array_pos = input_binary_int ic in
+  let ascends_array_pos = input_binary_int ic in
+  let families_array_pos = input_binary_int ic in
+  let couples_array_pos = input_binary_int ic in
+  let strings_array_pos = input_binary_int ic in
+  let norigin_file = input_value ic in
+  let (beg_pos, end_pos, beg_acc_pos, array_len) =
+    match what with
+    [ "persons" ->
+        (persons_array_pos, ascends_array_pos, 0, persons_len)
+    | "families" ->
+        let pos = (persons_len + ascends_len) * Iovalue.sizeof_long in
+        (families_array_pos, couples_array_pos, pos, families_len)
+    | "couples" ->
+        let pos =
+          (persons_len + ascends_len + families_len) * Iovalue.sizeof_long
+        in
+        (couples_array_pos, strings_array_pos, pos, couples_len)
+    | "strings" ->
+        let pos =
+          (persons_len + ascends_len + families_len + couples_len) *
+          Iovalue.sizeof_long
+        in
+        (strings_array_pos, in_channel_length ic, pos, strings_len)
+    | _ -> failwith ("just copy " ^ what) ]
+  in
+  let shift = pos_out oc - beg_pos in
+(*
+do Printf.eprintf "old_pos %d new_pos %d shift %d\n" beg_pos (pos_out oc) shift; flush stderr; return
+*)
+  do seek_in ic beg_pos;
+     loop beg_pos where rec loop pos =
+       if pos = end_pos then close_in ic
+       else do output_char oc (input_char ic); return loop (pos + 1);
+     seek_in ic_acc beg_acc_pos;
+     loop 0 where rec loop len =
+       if len = array_len then close_in ic_acc
+       else
+         do output_binary_int oc_acc (input_binary_int ic_acc + shift);
+         return loop (len + 1);
+  return ()
+;
+
 value gen_output no_patches bname base =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname
@@ -808,12 +863,16 @@ value gen_output no_patches bname base =
   let tmp_fname_inx = Filename.concat bname "1names.inx" in
   let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
   let tmp_fname_not = Filename.concat bname "1notes" in
-  let _ = base.data.persons.array () in
-  let _ = base.data.ascends.array () in
-  let _ = base.data.families.array () in
-  let _ = base.data.couples.array () in
-  let _ = base.data.strings.array () in
-  do base.func.cleanup (); return
+  do if not no_patches then
+       let _ = base.data.persons.array () in
+       let _ = base.data.ascends.array () in
+       let _ = base.data.families.array () in
+       let _ = base.data.couples.array () in
+       let _ = base.data.strings.array () in
+       ()
+     else ();
+     base.func.cleanup ();
+  return
   let oc = open_out_bin tmp_fname in
   let oc_acc = open_out_bin tmp_fname_acc in
   let output_array arr =
@@ -839,16 +898,24 @@ value gen_output no_patches bname base =
        output_value_no_sharing oc base.data.bnotes.norigin_file;
     return
     let persons_array_pos = pos_out oc in
-    do output_array (base.data.persons.array ()); return
+    do if not no_patches then output_array (base.data.persons.array ())
+       else just_copy bname "persons" oc oc_acc;
+    return
     let ascends_array_pos = pos_out oc in
     do output_array (base.data.ascends.array ()); return
     let families_array_pos = pos_out oc in
-    do output_array (base.data.families.array ()); return
+    do if not no_patches then output_array (base.data.families.array ())
+       else just_copy bname "families" oc oc_acc;
+    return
     let couples_array_pos = pos_out oc in
-    do output_array (base.data.couples.array ()); return
+    do if not no_patches then output_array (base.data.couples.array ())
+       else just_copy bname "couples" oc oc_acc;
+    return
     let strings_array_pos = pos_out oc in
-    do output_array (base.data.strings.array ());
-       seek_out oc array_start_indexes;
+    do if not no_patches then output_array (base.data.strings.array ())
+       else just_copy bname "strings" oc oc_acc;
+    return
+    do seek_out oc array_start_indexes;
        output_binary_int oc persons_array_pos;
        output_binary_int oc ascends_array_pos;
        output_binary_int oc families_array_pos;
