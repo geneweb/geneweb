@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.0 2001-03-16 19:32:44 ddr Exp $
+# $Id: lexicon.txt,v 4.1 2001-03-17 11:02:05 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -573,7 +573,6 @@ se: , &auml;r det
 
     2nd cousins
 af: kleinneef/kleinniggie
-br: primos em 2&ordm; grau
 cs: bratraneci/sestøenice z druhého kolena
 ct: cosins de segon grau
 de: Cousins 2. Grades
@@ -591,13 +590,12 @@ lv: otrâs pakâpes brâlçns/mâsîca
 nl: neven en nichten in de 2de graad
 no: tremenninger
 pl: kuzyni drugiego stopnia
-pt: primos 2ndos
+pt: primos em 2&ordm; grau
 ru: òğîşğîäíûå áğàòüÿ/òğîşğîäíûå ñåñòğû
 se: sysslingar
 
     3rd cousins
 af: agterkleinneef/agterkleinniggie
-br: primos em 3&ordm; grau
 cs: bratraneci/sestøenice z tøetího kolena
 ct: cosins de 3er grau
 de: Cousins 3. Grades
@@ -615,7 +613,7 @@ lv: treğâs pakâpes brâlçns mâsîca
 nl: neven en nichten in de 3e graad
 no: firmenninger
 pl: kuzyni trzeciego stopnia
-pt: primos 3ros
+pt: primos em 3&ordm; grau
 ru: òğîşğîäíûå êóçåíû/òğîşğîäíûå êóçèíû
 se: bryllingar
 
@@ -713,7 +711,6 @@ se: J/N
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
-br: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
 cs: bratranec z %s kolena/sestøenice z %s kolena
 ct: un cosí de %s grau/una cosina de %s grau/un(a) cosí(na) de %s grau
 de: ein:d:+em Cousin %s Grades/eine Cousine %s Grades
@@ -731,13 +728,12 @@ lv: %s brâlçns/mâsîca
 nl: een neef in de %s generatie/een nicht in de %s generatie
 no: %smenning
 pl: kuzyn w %s-tym stopniu/kuzynka w %s-tym stopniu
-pt: um primo %s/uma prima %s/um(a) primo(a) %s
+pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
 ru: %s-èé êóçåí/%s-ÿ êóçèíà
 se: %sm&auml;nning
 
     a 2nd cousin
 af: 'n kleinneef/'n kleinniggie
-br: um primo em 2&ordm; grau/uma prima em 2&ordm; grau/um(a) primo(a) em 2&ordm; grau
 cs: bratranec z druhého kolena/sestøenice z druhého kolena
 ct: un cosí segon/una cosina segona/un(a) cosí(na) segon(a)
 de: ein:d:+em Cousin 2. Grades/eine:d:+r Cousine 2. Grades
@@ -755,13 +751,12 @@ lv: otrais brâlçns/mâsîca
 nl: een neef in de tweede generatie/een nicht in de tweede generatie
 no: tremenning	
 pl: kuzyn/kuzynka w drugim stopniu
-pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
+pt: um primo em 2&ordm; grau/uma prima em 2&ordm; grau/um(a) primo(a) em 2&ordm; grau
 ru: òğîşğîäíûé áğàò/òğîşğîäíàÿ ñåñòğà
 se: en syssling
 
     a 3rd cousin
 af: 'n agterkleinneef/'n agterkleinniggie
-br: um primo em 3&ordm; grau/uma prima em 3&ordm; grau/um(a) primo(a) em 3&ordm; grau
 cs: bratranec z tøetího kolena/sestøenice z tøetího kolena
 ct: un cosí 3er/una cosina 3a/un(a) cosí(na) 3er(a)
 de: ein:d:+em Cousin 3. Grades/eine:d:+r Cousine 3. Grades
@@ -779,7 +774,7 @@ lv: treğais brâlçns/mâsîca
 nl: een neef in de derde generatie/een nicht in de derde generatie
 no: firmenning
 pl: kuzyn/kuzynka w trzecim stopniu
-pt: um primo 3ro/uma prima 3ro/um(a) primo(a) 3ro
+pt: um primo em 3&ordm; grau/uma prima em 3&ordm; grau/um(a) primo(a) em 3&ordm; grau
 ru: òğîşğîäíûé êóçåí/òğîşğîäíàÿ êóçèíà
 se: en brylling
 
@@ -992,7 +987,6 @@ se: en gammel-nev&ouml;/en gammel-niece
 
     a great-uncle/a great-aunt
 af: 'n grootoom/'n groottante
-br: um tio-av&ocirc;/uma tia-av&oacute;
 cs: prastrıc/prateta
 ct: un oncle avi/una tia àvia
 de: ein Gro&szlig;onkel/eine Gro&szlig;tante
@@ -1010,7 +1004,7 @@ lv: vectçva/vecmamas brâlis/mâsa
 nl: een oud-oom/een oud-tante
 no: en grandonkel/en grandtante
 pl: brat/siostra dziadka lub babki
-pt: um tio av&ocirc;/uma tia av&oacute;
+pt: um tio-av&ocirc;/uma tia-av&oacute;
 ru: äÿäÿ ğîäèòåëÿ/òåòÿ ğîäèòåëÿ
 se: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
 
@@ -2169,7 +2163,7 @@ lv: nav iespçjams piekïût datu bâzei
 nl: geen toegang tot bestand
 no: kan ikke n&aring; databasen
 pl: dostêp do bazy jest niemo¿liwy
-pt: n&atilde;o se pode acceder &agrave; base
+pt: n&atilde;o se pode aceder &agrave; base
 ru: íåò äîñòóïà ê áàçå
 se: kan inte n&aring; databasen
 
@@ -2521,7 +2515,6 @@ se: kremerad
 
     data base forum
 af: databasis forum
-br: f&oacute;rum da base de dados
 cs: databázové fórum
 ct: fòrum de la base de dades
 de: Datenbankforum
@@ -2539,7 +2532,7 @@ lv: datu bâzes "ziòojumu dçlis"
 nl: databank forum
 no: database forum
 pl: forum bazy
-pt: forum da base de dados
+pt: f&oacute;rum da base de dados
 ru: ôîğóì áàçû äàííûõ
 se: databas forum
 
@@ -4052,7 +4045,6 @@ se: &auml;r f&ouml;dd efter sitt barn
 
     it is the same person!
 af: is dieselfde persoon!
-br: &eacute; a mesma pessoa!
 cs: je ta samá osoba!
 ct: és la mateixa persona
 de: es ist dieselbe Person!
@@ -4070,7 +4062,7 @@ lv: tâ ir viena un tâ pati persona!
 nl: het is dezelfde persoon!
 no: det er samme person!
 pl: to jest ta sama osoba!
-pt: &eacute; a mesma pessoa !
+pt: &eacute; a mesma pessoa!
 ru: ıòî òîò æå ÷åëîâåê!
 se: det &auml;r samma person!
 
@@ -4803,7 +4795,6 @@ se: ingen &aring;rsdag
 
     no birthday
 af: geen verjaarsdag
-br: nenhum anivers&aacute;rio de nascimento
 cs: ¾ádné narozeniny
 ct: no hi ha cap aniversari
 de: kein Geburtstag
@@ -4821,7 +4812,7 @@ lv: nav dzimğanas dienas
 nl: geen verjaardag
 no: ingen f&oslash;dselsdager
 pl: nie ma ¿adnej rocznicy urodzin
-pt: nenhum anivers&aacute;rio
+pt: nenhum anivers&aacute;rio de nascimento
 ru: íåò äíåé ğîæäåíèé
 se: ingen f&ouml;delsedag
 
@@ -5165,7 +5156,6 @@ se: av bortg&aring;ngen
 
     of the disappearance
 af: van die verdwyning
-br: do desaparecimento
 cs: zmizení
 ct: de la desaparició
 de: des Verschwindens
@@ -5183,7 +5173,7 @@ lv: pazuğanas
 nl: van het verdwijnen
 no: av forsvinningsnummeret
 pl: zaginiêcia
-pt: da desapari&ccedil;&atilde;o
+pt: do desaparecimento
 ru: èñ÷åçíîâåíèÿ
 se: av f&ouml;rsvinnandet
 
@@ -6068,7 +6058,6 @@ se: separerat
 
     several answers
 af: verskeie antwoorde
-br: v&aacute;rias respostas
 cs: více odpovìdí
 ct: vàries respostes
 de: mehrere Antworten
@@ -6086,7 +6075,7 @@ lv: vairâkas atbildes
 nl: meerdere antwoorden
 no: flere svar
 pl: wiêcej ni¿ jedna odpowiedŸ
-pt: varias respostas
+pt: v&aacute;rias respostas
 ru: íåñêîëüêî îòâåòîâ
 se: flera svar
 
@@ -6805,7 +6794,6 @@ se: databasen har &auml;ndrats; g&aring; tillbaka, klicka uppdatera och fyll i f
 
     the birthday
 af: die verjaarsdag
-br: o anivers&aacute;rio de nascimento
 cs: narozeniny
 ct: l'aniversari
 de: der Geburtstag
@@ -6823,7 +6811,7 @@ lv: dzimğanas diena
 nl: de verjaardag
 no: f&oslash;dselsdagen
 pl: urodziny
-pt: o anivers&aacute;rio
+pt: o anivers&aacute;rio de nascimento
 ru: äåíü ğîæäåíèÿ
 se: f&ouml;delsedagen
 
@@ -6898,7 +6886,6 @@ se: sv&auml;rfadern/sv&auml;rmodern
 
     the father/the mother/a parent
 af: die pa/die ma/'n ouer
-br: o pai/a m&atilde;e/um dos pais
 cn: ¸¸/Ä¸/a parent
 cs: otec/matka/rodièe
 ct: el pare/la mare/un pare
@@ -6917,7 +6904,7 @@ lv: tçvs/mâte/vecâks
 nl: de vader/de moeder/een ouder
 no: faren/moren/en av foreldrene
 pl: ojciec/matka/rodzic
-pt: o pai/a m&atilde;e/um pai
+pt: o pai/a m&atilde;e/um dos pais
 ru: ìàòü/îòåö/ğîäèòåëè
 se: fadern/modern/en f&ouml;r&auml;lder
 
