@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: delete.htm,v 1.1 2002-01-14 07:21:39 ddr Exp $ -->
+  <title>[
+de: Datenbanken l&ouml;schen
+en: Delete
+es: Supresi&oacute;n
+fr: Suppression
+lv: Dzçst
+sv: Radera
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Datenbanken l&ouml;schen
+en: Deletion of databases
+es: Supresi&oacute;n de bases de datos
+fr: Suppression de bases de donn&eacute;es
+lv: Datu bâþu dzçðana
+sv: Radering av databaser
+]</font></h1></center>
+
+<form method=GET action="delete">
+<input type=hidden name=lang value=$l>
+
+[
+de: W&auml;hle die Datenbanken, die du l&ouml;schen m&ouml;chtest, mit
+    dem zugeh&ouml;rigen Schalter.
+en: Select the database or databases you want to delete, by clicking on the
+    associated buttons.
+es: Seleccione  la o las  bases que Ud desea destruir cliqueando 
+    en el, o los, botones asociados:
+fr: S&eacute;lectionnez la ou les bases que vous voulez d&eacute;truire
+    en cliquant sur le ou les boutons associ&eacute;s:
+lv: Iezîmçjiet datu bâzi vai datu bâzes, kuras Jûs vçlaties dzçst.
+sv: Välj den databas eller de databaser du vill radera, genom att klicka på
+    motsvarande knappar.
+]
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr align=left>
+<td><a href="http://$m:2317/$a">$a</a></td>
+<td><input type=checkbox name="$a" value=on></td>
+</tr>|
+<tr align=left><td>- [
+de: keine Datenbank vorhanden
+en: there is no database at present
+es: actualmente no existe ninguna base de datos 
+fr: il n'y a aucune base de donn&eacute;es actuellement
+lv: patreiz nav nevienas datubâzes
+sv: det finns ingen databas för tillfället
+]</tr></td>}
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke diesen Knopf:
+en: Then push this button:
+es: Luego apoye en este bot&oacute;n:
+fr: Puis appuyez sur ce bouton:
+lv: Tad nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+de: Pr&uuml;fen
+en: Check
+es: Verificar
+fr: V&eacute;rifier
+lv: Pârbaudît
+sv: Radera
+]">
+
+</form>

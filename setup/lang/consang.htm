@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: consang.htm,v 1.1 2002-01-14 07:21:39 ddr Exp $ -->
+  <title>[
+de: Blutsverwandtschaften
+en: Consanguinities
+es: Consanguinidades
+fr: Consanguinit&eacute;s
+lv: Consanguinities
+sv: Blodsband
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Blutsverwandtschaften
+en: Consanguinities
+es: Consanguinidades
+fr: Consanguinit&eacute;s
+lv: Consanguinities
+sv: Blodsband
+]</font></h1></center>
+
+[
+de: Die Initialisierung der Blutsverwandtschaften ist notwendig, damit
+    sie beim Abrufen der Datenbank angezeigt werden k&ouml;nnen.
+en: The initialization of consanguinities is necessary so that the
+    consanguinities are displayed when browsing the database.
+es: La inicializaci&oacute;n de las consanguinidades es necesaria para 
+    que estas sean visibles cuando uno explora la base.
+fr: L'initialisation des consanguinit&eacute;s est n&eacute;cessaire pour
+    que les consanguinit&eacute;s s'affichent quand on navigue dans la
+    base.
+lv: The initialization of consanguinities is necessary so that the
+    consanguinities are displayed when browsing the database.
+sv: Beräkningen av blodsbanden är nödvändig för att
+    blodsbanden ska visas i databasen.
+]
+
+<p>
+
+<form method=GET action="consang">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+<input type=hidden name=q value=on>
+
+[
+de: W&auml;hle deine Datenbank mit dem zugeh&ouml;rigen Schalter.
+en: Select your database by clicking on the associated button.
+es: Seleccione su base de datos cliqueando en el bot&oacute;n asociado.
+fr: S&eacute;lectionnez votre base de donn&eacute;es en cliquant sur le
+    bouton associ&eacute;.
+lv: Select your database by clicking on the associated button.
+sv: Välj din databas genom att klicka på motsvarande knapp.
+]
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr align=left>
+<td>
+<input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://$m:2317/$a">$a</a></td>
+</tr>|
+<tr align=left>
+<td>- [
+de: keine Datenbank vorhanden
+en: there is no database at present
+es: no existe ninguna base de datos actualmente
+fr: il n'y a aucune base de donn&eacute;es actuellement
+lv: there is no database at present
+sv: det finns ingen databas för tillfället
+]</tr></td>}
+</table></dl>
+
+<p>
+
+[
+de: Falls gew&uuml;nscht, w&auml;hle die folgende Option:
+en: Select the option if you want:
+es: Seleccione eventualmente la opci&oacute;n propuesta:
+fr: S&eacute;lectionnez &eacute;ventuellement l'option propos&eacute;e:
+lv: Select the option if you want:
+sv: Välj option om du vill:
+]
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=scratch value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Komplett neu berechnen.
+en: Restart the computing from scratch.
+es: Recomenzar el c&aacute;lculo de toda la base.
+fr: Recommencer le calcul sur toute la base.
+lv: Restart the computing from scratch.
+sv: Starta beräkning från början.
+]</td> </tr>
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke diesen Knopf:
+en: Then press this button:
+es: Luego apoye en este bot&oacute;n:
+fr: Puis appuyez sur ce bouton:
+lv: Then press this button:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+de: Initialisieren
+en: Consang
+es: Consanguinidades
+fr: Consang
+lv: Consang
+sv: Beräkna blodsband
+]">
+
+</form>
