@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.9 2005-02-10 05:20:18 ddr Exp $ *)
+(* $Id: alln.ml,v 4.10 2005-02-10 06:49:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -19,6 +19,22 @@ value string_start_with ini s =
     else False
 ;
 
+value nbc c =
+  if c < 0b10000000 then 1
+  else if c < 0b10000000 then -1
+  else if c < 0b11100000 then 2
+  else if c < 0b11110000 then 3
+  else if c < 0b11111000 then 4
+  else if c < 0b11111100 then 5
+  else if c < 0b11111110 then 6
+  else -1
+;
+
+value len_with_next_char s i =
+  if Gutil.utf_8_db.val then min (String.length s) (i + nbc (Char.code s.[i]))
+  else i + 1
+;
+
 value combine_by_ini ini list =
   let list =
     loop [] list where rec loop new_list =
@@ -27,7 +43,7 @@ value combine_by_ini ini list =
       | [(k, s, cnt) :: list] ->
           let ini_k =
             if String.length k > String.length ini then
-              String.sub k 0 (String.length ini + 1)
+              String.sub k 0 (len_with_next_char k (String.length ini))
             else k ^ String.make (String.length ini + 1 - String.length k) '_'
           in
           do {
@@ -74,6 +90,22 @@ value alphab_string conf is_surname s =
   else s
 ;
 
+value lower_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else Name.lower s
+;
+
+value capitalize_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else String.capitalize s
+;
+
+value lowercase_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else String.lowercase s
+;
+
+value name_key_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else Iobase.name_key s
+;
+
 (* print *)
 
 value print_title conf base is_surnames ini len =
@@ -89,7 +121,7 @@ value print_title conf base is_surnames ini len =
         (capitale (transl_nth conf "first name/first names" 0));
     if ini <> "" then
       Wserver.wprint " %s %s" (transl conf "starting with")
-        (String.capitalize ini)
+        (capitalize_if_not_utf8 ini)
     else
       Wserver.wprint " (%d %s)" base.data.persons.len
         (nominative (transl_nth_def conf "person/persons" 2 1));
@@ -101,17 +133,7 @@ value displayify s =
     loop 0 0 where rec loop i len =
       if i = String.length s then Buff.get len
       else
-        let c = Char.code s.[i] in
-        let nbc =
-          if c < 0b10000000 then 1
-          else if c < 0b10000000 then -1
-          else if c < 0b11100000 then 2
-          else if c < 0b11110000 then 3
-          else if c < 0b11111000 then 4
-          else if c < 0b11111100 then 5
-          else if c < 0b11111110 then 6
-          else -1
-        in
+        let nbc = nbc (Char.code s.[i]) in
         if nbc < 0 || i + nbc > String.length s then
           Buff.get (Buff.mstore len "...")
         else loop (i + nbc) (Buff.gstore len s i nbc)
@@ -197,22 +219,6 @@ value print_alphabetic_all conf base is_surnames ini list len =
     end;
     trailer conf;
   }
-;
-
-value lower_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else Name.lower s
-;
-
-value capitalize_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else String.capitalize s
-;
-
-value lowercase_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else String.lowercase s
-;
-
-value name_key_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else Iobase.name_key s
 ;
 
 value print_alphabetic_small conf base is_surnames ini list len =
@@ -304,7 +310,6 @@ value select_names conf base is_surnames ini =
                   else my_list
                 in
                 let cnt = List.length my_list in
-                (*let cnt = List.length (iii.find istr) in*)
                 if cnt = 0 then list
                 else
                   match list with
