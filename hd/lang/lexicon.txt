@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.244 2001-03-01 13:03:30 ddr Exp $
+# $Id: lexicon.txt,v 3.245 2001-03-01 19:00:15 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -104,7 +104,7 @@ dk:  for at fors&oslash;ge igen med dette nummer
 en:  to try again with this number
 eo:  por reprovi kun cxi tiu numero
 es:  para ensayar de nuevo con este n&uacute;mero
-et: , proovi uuesti sama numbriga
+et: , proovimaks uuesti selle numbriga
 fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla
 fr:  pour r&eacute;essayer avec ce num&eacute;ro
 he:  ìğñåú ùåá òí äîñôø äæä
@@ -479,7 +479,7 @@ dk: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
 eo: dimancxo/lundo/mardo/merkredo/jaùdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
-et: pühapäev:i:+al/esmaspäev:i:+al/teisipäev:i:+al/kolmapäev:i:+al/neljapäev:i:+al/reede:i:+l/laupäev:i:+al
+et: pühapäev:e:+al/esmaspäev:e:+al/teisipäev:e:+al/kolmapäev:e:+al/neljapäev:e:+al/reede:e:+l/laupäev:e:+al
 fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
 he:  éåí à'/ éåí á'/ éåí â'/ éåí ã'/ éåí ä'/ éåí å'/ ùáú
@@ -4130,7 +4130,7 @@ dk: sl&aelig;gtskab mellem
 en: link between
 eo: bindo inter
 es: relaci&oacute;n entre
-et: nendevaheline ühendus:
+et: nendevaheline side:
 fi: n&auml;iden v&auml;linen yhteys
 fr: lien entre
 he:   ÷ùø áéï
@@ -4647,7 +4647,7 @@ dk: navn %s er allerede anvendt af %tdenne person%t
 en: name %s already used by %tthis person%t
 eo: nomo %s jam uzita de %ttiu persono%t
 es: nombre %s ya utilizado por %testa persona%t
-et: nimi %s onjuba kasutatud %tselleinimese poolt%t
+et: nimi %s on juba kasutuses %tselle inimese poolt%t
 fi: nimi %s on jo k&auml;yt&ouml;ss&auml %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
 fr: nom %s d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
 he:  äùí %s áùéîåù ëáø ò"é %tàãí æä%t
@@ -4827,6 +4827,7 @@ ct: no verificar els sexes
 de: keine Kontrolle des Geschlechts
 dk: ingen verificering af k&oslash;nnene
 en: no sexes check
+et: ära kontrolli sugude sobivust
 fr: pas de v&eacute;rification des sexes
 nl: Geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
@@ -5878,7 +5879,7 @@ dk: forbindelse%t med
 en: relationship%t to
 eo: rilato%t kun
 es: parentesco%t con
-et: suhe%t
+et: kooselu%t
 fi: suhde%t ja
 fr: relation%t avec
 he:  ÷éøáä
@@ -6245,7 +6246,7 @@ dk: pr&aelig;ciser
 en: specify
 eo: specifu :a:
 es: especificar
-et: määratle
+et: täpsusta
 fi: tarkenna
 fr: pr&eacute;cisez
 he:  ôøè
@@ -7569,7 +7570,7 @@ dk: anvend "forbind" i stedet for "opret"
 en: use "link" instead of "create"
 eo: uzu "bindi" anstataù ol "krei"
 es: utilise "reunir" en lugar de "crear"
-et: kasuta "loo" asemel "viita"
+et: vali "loo" asemel "viita"
 fi: käytä "luo" toiminnon "liit&auml" sijaan
 fr: utilisez "relier" au lieu de "cr&eacute;er"
 he:  ìäùúîù á-"÷ùø" áî÷åí "òùä"
