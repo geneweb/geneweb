@@ -1,4 +1,4 @@
-GeneWeb 3.09
+GeneWeb 3.10
 
 If you are under Windows:
    Double-click on the file "index.htm" of the directory "doc",
