@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.21 2005-03-04 20:49:36 ddr Exp $ *)
+(* $Id: alln.ml,v 4.22 2005-04-08 18:02:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -21,19 +21,8 @@ value string_start_with ini s =
     else False
 ;
 
-value nbc c =
-  if c < 0b10000000 then 1
-  else if c < 0b10000000 then -1
-  else if c < 0b11100000 then 2
-  else if c < 0b11110000 then 3
-  else if c < 0b11111000 then 4
-  else if c < 0b11111100 then 5
-  else if c < 0b11111110 then 6
-  else -1
-;
-
 value len_with_next_char s i =
-  if Gutil.utf_8_db.val then min (String.length s) (i + nbc (Char.code s.[i]))
+  if Gutil.utf_8_db.val then min (String.length s) (i + Gutil.nbc s.[i])
   else i + 1
 ;
 
@@ -165,7 +154,7 @@ value displayify s =
     loop 0 0 where rec loop i len =
       if i = String.length s then Buff.get len
       else
-        let nbc = nbc (Char.code s.[i]) in
+        let nbc = Gutil.nbc s.[i] in
         if nbc < 0 || i + nbc > String.length s then
           Buff.get (Buff.mstore len "...")
         else loop (i + nbc) (Buff.gstore len s i nbc)
