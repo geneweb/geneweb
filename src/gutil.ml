@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.35 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.36 2005-04-08 18:02:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -492,7 +492,8 @@ value person_of_key base s =
 
 value person_ht_find_all base s =
   match person_of_key base s with
-  [ Some p -> [p]
+  [ Some p ->
+      [p]
   | _ ->
       let ipl = base.func.persons_of_name s in
       let rec select =
@@ -1006,6 +1007,17 @@ value strip_spaces str =
   else String.sub str start (stop - start)
 ;
 
+value nbc c =
+  if Char.code c < 0b10000000 then 1
+  else if Char.code c < 0b10000000 then -1
+  else if Char.code c < 0b11100000 then 2
+  else if Char.code c < 0b11110000 then 3
+  else if Char.code c < 0b11111000 then 4
+  else if Char.code c < 0b11111100 then 5
+  else if Char.code c < 0b11111110 then 6
+  else -1
+;
+
 value utf_8_alphab_value s i =
   let c = s.[i] in
   if Char.code c < 0b11000000 then (c, i + 1)
@@ -1097,7 +1109,7 @@ value alphabetic_value =
   }
 ;
 
-value alphabetic n1 n2 =
+value alphabetic_iso_8859_1 n1 n2 =
   let rec loop i1 i2 =
     if i1 == String.length n1 && i2 == String.length n2 then i1 - i2
     else if i1 == String.length n1 then -1
@@ -1110,6 +1122,14 @@ value alphabetic n1 n2 =
       else loop (succ i1) (succ i2)
   in
   if n1 = n2 then 0 else loop (initial n1) (initial n2)
+;
+
+value alphabetic n1 n2 =
+(*
+  if utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
+*)
+  alphabetic_iso_8859_1 n1 n2
+(**)
 ;
 
 value map_title_strings f t =

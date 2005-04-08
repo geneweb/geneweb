@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.35 2005-02-27 08:44:56 ddr Exp $ *)
+(* $Id: some.ml,v 4.36 2005-04-08 18:02:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -446,6 +446,18 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
   }
 ;
 
+value first_char s =
+  if Gutil.utf_8_db.val then
+    let len = Gutil.nbc s.[0] in
+    if len < String.length s then String.sub s 0 len
+    else s
+  else String.sub s (initial s) 1
+;
+
+value alphabetic1 n1 n2 =
+  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2 else Gutil.alphabetic n1 n2
+;
+
 value print_family_alphabetic x conf base liste =
   let homonymes =
     let list =
@@ -461,7 +473,7 @@ value print_family_alphabetic x conf base liste =
       List.sort
         (fun x1 x2 ->
            match
-             alphabetic (p_first_name base x2) (p_first_name base x1)
+             alphabetic1 (p_first_name base x2) (p_first_name base x1)
            with
            [ 0 -> compare x1.occ x2.occ
            | n -> n ])
@@ -471,7 +483,7 @@ value print_family_alphabetic x conf base liste =
       (fun l x ->
          let px = p_first_name base x in
          match l with
-         [ [(p, l1) :: l] when alphabetic px p == 0 -> [(p, [x :: l1]) :: l]
+         [ [(p, l1) :: l] when alphabetic1 px p == 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
       [] l
   in
@@ -492,7 +504,7 @@ value print_family_alphabetic x conf base liste =
       do {
         header conf title;
         print_link_to_welcome conf True;
-        print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
+        print_alphab_list conf (fun (p, _) -> first_char p)
           (print_elem conf base False) liste;
         trailer conf;
       } ]

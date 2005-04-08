@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.24 2005-02-20 10:52:00 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.25 2005-04-08 18:02:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -104,6 +104,7 @@ value alphabetic : string -> string -> int;
 value initial : string -> int;
 value strip_all_trailing_spaces : string -> string;
 value tr : char -> char -> string -> string;
+value nbc : char -> int;
 
 value rindex : string -> char -> option int;
 value lindex : string -> char -> option int;
