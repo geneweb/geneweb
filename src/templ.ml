@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.35 2005-02-06 10:17:35 ddr Exp $ *)
+(* $Id: templ.ml,v 4.36 2005-04-11 08:30:40 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -320,7 +320,7 @@ value open_templ conf dir name =
   let std_fname =
     Util.search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
   in
-  if dir = "" then
+  if dir = "" || dir = Filename.current_dir_name then
     try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
   else
     let dir = Filename.basename dir in
