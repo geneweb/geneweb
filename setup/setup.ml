@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.58 2005-03-01 19:09:51 ddr Exp $ *)
+(* $Id: setup.ml,v 4.59 2005-04-11 08:30:40 ddr Exp $ *)
 
 open Printf;
 
@@ -853,7 +853,8 @@ value gwu_or_gwb2ged_check suffix conf =
     | None -> "" ]
   in
   let out_file =
-    if out_file = "" then in_file ^ suffix
+    if out_file = "" || out_file = Filename.current_dir_name then
+      in_file ^ suffix
     else if Filename.check_suffix out_file suffix then out_file
     else if Filename.check_suffix out_file (String.uppercase suffix) then
       out_file
