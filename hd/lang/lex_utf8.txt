@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.27 2005-04-12 09:52:26 ddr Exp $
+# $Id: lex_utf8.txt,v 1.28 2005-04-12 11:31:37 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -5924,6 +5924,7 @@ es: sin informaci&oacute;n
 et: pole mainitud
 fi: ei mainintaa
 fr: pas de mention
+he: אין אזכור
 is: óþekkt
 it: senza menzione
 nl: geen vermelding
@@ -6085,6 +6086,7 @@ es: notas modificadas
 et: märkused muudetud
 fi: muistiinpanoja muokattu
 fr: notes modifi&eacute;es
+he: רשימות עודכנו
 is: athugasemd gerð
 it: note modificate
 nl: notitities veranderd
