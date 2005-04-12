@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.235 2005-04-12 09:52:26 ddr Exp $
+# $Id: lexicon.txt,v 4.236 2005-04-12 11:31:37 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -5939,6 +5939,7 @@ es: sin informaci&oacute;n
 et: pole mainitud
 fi: ei mainintaa
 fr: pas de mention
+he: אין אזכור
 is: ף‏ekkt
 it: senza menzione
 nl: geen vermelding
@@ -6099,6 +6100,7 @@ es: notas modificadas
 et: mהrkused muudetud
 fi: muistiinpanoja muokattu
 fr: notes modifi&eacute;es
+he: רשימות עודכנו
 is: athugasemd gerנ
 it: note modificate
 nl: notitities veranderd
