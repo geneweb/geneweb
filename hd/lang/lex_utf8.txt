@@ -1,5 +1,5 @@
-# $Id: lex_utf8.txt,v 1.26 2005-04-04 08:23:18 ddr Exp $
-# Copyright (c) 1998-2005 INRIA
+# $Id: lex_utf8.txt,v 1.27 2005-04-12 09:52:26 ddr Exp $
+# Copyright (c) 1998-2005 JOSJB
 
      !dates order
 af: yymmdd
@@ -512,6 +512,7 @@ et: vandemjäär/brümäär/frimäär/nivoos/plüvioos/vantoos/žerminaal/florea
 fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 he:  וונדמיאיאר / ברומאיאר / פרימאיאר / ניבוז / פלוביוז / ג'רמינאל / פלוריאל / פראריאל / מסידור / תרמידור / פרוקטידור / נוסף
+is: vínyrkjumánuður/þokumánuður/hrímmánuður/snjómánuður/regnmánuður/vindmánuður/frjóangamánuður/blómmánuður/engmánuður/uppskerumánuður/hitamánuður/aldinmánuður/hlaupársdagar
 it: vendemmiaio/brumaio/frimaio/nevoso/piovioso/ventoso/germinale/fiorile/pratile/ messidoro/termidoro/fruttidoro/complementare
 lv: vendemiaire/brumaire/frimaire/nivose/pluviose/ventose/germinal/floreal/prairial/messidor/thermidor/fructidor/complementaire
 nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
@@ -537,6 +538,7 @@ et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א'/ אדר ב'/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול
+is: tísrí/marhesvan/kíslev/tebet/sebat/adar 1/adar 2/nísan/ijjar/sívan/tammús/ab/elúl
 it: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar 1/Adar 2/Nisan/Iyar/Sivan/Tammuz/Av/Elul
 lv: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
@@ -2258,6 +2260,7 @@ et: ääris
 fi: raja
 fr: bordure
 he:  מסגרת
+is: jaðar
 it: bordo
 nl: omranding
 no: ramme         
@@ -2748,6 +2751,7 @@ et: värv
 fi: v&auml;ri
 fr: couleur
 he:  צבע
+is: litur
 it: colore
 nl: kleur
 no: farge         
@@ -5598,6 +5602,7 @@ de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+is: tunglaldur/nýtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
 nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
 no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
@@ -5919,6 +5924,7 @@ es: sin informaci&oacute;n
 et: pole mainitud
 fi: ei mainintaa
 fr: pas de mention
+is: óþekkt
 it: senza menzione
 nl: geen vermelding
 no: ukjent familieforhold
@@ -6079,6 +6085,7 @@ es: notas modificadas
 et: märkused muudetud
 fi: muistiinpanoja muokattu
 fr: notes modifi&eacute;es
+is: athugasemd gerð
 it: note modificate
 nl: notitities veranderd
 no: notater er endret 
@@ -7795,6 +7802,7 @@ eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
 et: %d vanimat paari kes on võib-olla veel elus ja kihlatud
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
+is: elstu %d pörin eru hugsanlega enn saman og á lífi
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
 no: Det % eldste par som kanskje fremdeles er i live og forlovet
 pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
