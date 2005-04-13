@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.28 2005-04-12 11:31:37 ddr Exp $
+# $Id: lex_utf8.txt,v 1.29 2005-04-13 10:04:32 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -5602,6 +5602,7 @@ de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+he: גיל הירח/ירח חדש/רביע ראשון/ירח מלא/רביע אחרון
 is: tunglaldur/nýtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
 nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
 no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
