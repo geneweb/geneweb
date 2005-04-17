@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.78 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.79 2005-04-17 17:58:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -899,7 +899,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
        setup_link = setup_link.val;
        access_by_key =
          try List.assoc "access_by_key" base_env = "yes" with
-         [ Not_found -> False ];
+         [ Not_found -> wizard && friend ];
        private_years =
          try int_of_string (List.assoc "private_years" base_env) with
          [ Not_found | Failure _ -> 150 ];

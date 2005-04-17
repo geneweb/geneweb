@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.125 2005-03-19 12:18:19 ddr Exp $ *)
+(* $Id: util.ml,v 4.126 2005-04-17 17:58:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -630,7 +630,7 @@ value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if surname = "" then ""
-  else if (conf.wizard && conf.friend || conf.access_by_key)
+  else if conf.access_by_key
   && not (first_name = "?" || surname = "?")
   && (not conf.hide_names || is_public conf base x) then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
@@ -2121,8 +2121,7 @@ value wprint_hidden conf pref name valu =
 value wprint_hidden_person conf base pref p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
-  if (conf.wizard && conf.friend || conf.access_by_key) &&
-     not (first_name = "?" || surname = "?") then do {
+  if conf.access_by_key && not (first_name = "?" || surname = "?") then do {
     wprint_hidden conf pref "p" (Name.lower first_name);
     wprint_hidden conf pref "n" (Name.lower surname);
     if p.occ > 0 then wprint_hidden conf pref "oc" (string_of_int p.occ)
