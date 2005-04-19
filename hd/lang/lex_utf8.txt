@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.30 2005-04-19 08:27:36 ddr Exp $
+# $Id: lex_utf8.txt,v 1.31 2005-04-19 15:21:05 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -320,7 +320,7 @@ es: %t ha muerto antes de su nacimiento
 et: %t suri enne sündi
 fi: %t on kuollut ennen syntym&auml;&auml;ns&auml;
 fr: %t est mort(e) avant sa naissance
-he:  %t מת לפני הולדתו/הולדתה
+he: %t מת לפני הולדתו/הולדתה
 is: %t lést áður en hann/hún fæddist
 it: %t sarebbe morto prima della sua nascita
 lv: %t miris pirms viòð/viòa dzimusi
@@ -5614,6 +5614,7 @@ no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
+sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 
     more than %d answers
 af: meer as %d antwoorde
@@ -7788,7 +7789,7 @@ es: los %d nombres
 et: %d eesnime
 fi: %d etunime&auml;
 fr: les %d pr&eacute;noms
-he:  %d שמות הפרטיים
+he: %d שמות הפרטיים
 is: %d fyrstu fornöfnin
 it: i %d nomi
 lv: %d personvârdi
@@ -7820,6 +7821,7 @@ pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
 pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
+sl: %d najstarejših morda še živih in zaročenih parov
 sv: de %d &auml;ldsta nu levande paren som kanske fortfarande &auml;r f&ouml;rlovade
 
     the %d oldest perhaps still alive
@@ -7863,7 +7865,7 @@ es: los %d apellidos
 et: %d perekonnanime
 fi: %d sukunime&auml;
 fr: les %d patronymes
-he:  %d שמות המשפחה
+he: %d שמות המשפחה
 is: %d fyrstu eftirnöfnin
 it: i %d cognomi
 lv: %d uzvârdi
@@ -8324,7 +8326,7 @@ es: los %d nacimientos m&aacute;s recientes
 et: viimased %d sündi
 fi: viimeiset %d syntym&auml;&auml;
 fr: les %d derni&egrave;res naissances
-he:  %d הלידות האחרונות
+he: %d הלידות האחרונות
 is: síðustu %d fæðingar
 it: le ultime %d nascite
 lv: pçdçjie %d dzimuðie
@@ -8351,7 +8353,7 @@ es: las %d muertes m&aacute;s recientes
 et: viimased %d surma
 fi: viimeiset %d kuolemantapausta
 fr: les %d derniers d&eacute;c&egrave;s
-he:  %d המתים האחרונים
+he: %d המתים האחרונים
 is: síðustu %d andlát
 it: le ultime %d morti
 lv: pçdçjie %d miruðie
@@ -8378,7 +8380,7 @@ es: los %d casamientos m&aacute;s recientes
 et: viimased %d pulma
 fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
-he:  %d הנישואים האחרונים
+he: %d הנישואים האחרונים
 is: síðast giftist %d
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
