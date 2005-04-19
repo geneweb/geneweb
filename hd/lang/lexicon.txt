@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.237 2005-04-19 08:27:36 ddr Exp $
+# $Id: lexicon.txt,v 4.238 2005-04-19 15:21:05 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -5629,6 +5629,7 @@ no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza ksiê¿yca/nów/pierwsza kwadra/pe³nia/trzecia kwadra
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
+sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 
     more than %d answers
 af: meer as %d antwoorde
@@ -7798,7 +7799,7 @@ es: los %d nombres
 et: %d eesnime
 fi: %d etunime&auml;
 fr: les %d pr&eacute;noms
-he:  %d ùîåú äôøèééí
+he: %d ùîåú äôøèééí
 is: %d fyrstu fornöfnin
 it: i %d nomi
 lv: %d personvârdi
@@ -7830,6 +7831,7 @@ pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
 pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
+sl: %d najstarej¹ih morda ¹e ¾ivih in zaroèenih parov
 sv: de %d &auml;ldsta nu levande paren som kanske fortfarande &auml;r f&ouml;rlovade
 
     the %d oldest perhaps still alive
@@ -7873,7 +7875,7 @@ es: los %d apellidos
 et: %d perekonnanime
 fi: %d sukunime&auml;
 fr: les %d patronymes
-he:  %d ùîåú äîùôçä
+he: %d ùîåú äîùôçä
 is: %d fyrstu eftirnöfnin
 it: i %d cognomi
 lv: %d uzvârdi
@@ -8334,7 +8336,7 @@ es: los %d nacimientos m&aacute;s recientes
 et: viimased %d sündi
 fi: viimeiset %d syntym&auml;&auml;
 fr: les %d derni&egrave;res naissances
-he:  %d äìéãåú äàçøåğåú
+he: %d äìéãåú äàçøåğåú
 is: síğustu %d fæğingar
 it: le ultime %d nascite
 lv: pçdçjie %d dzimuğie
@@ -8361,7 +8363,7 @@ es: las %d muertes m&aacute;s recientes
 et: viimased %d surma
 fi: viimeiset %d kuolemantapausta
 fr: les %d derniers d&eacute;c&egrave;s
-he:  %d äîúéí äàçøåğéí
+he: %d äîúéí äàçøåğéí
 is: síğustu %d andlát
 it: le ultime %d morti
 lv: pçdçjie %d miruğie
@@ -8388,7 +8390,7 @@ es: los %d casamientos m&aacute;s recientes
 et: viimased %d pulma
 fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
-he:  %d äğéùåàéí äàçøåğéí
+he: %d äğéùåàéí äàçøåğéí
 is: síğast giftist %d
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
