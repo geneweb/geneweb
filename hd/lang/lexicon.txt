@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.238 2005-04-19 15:21:05 ddr Exp $
+# $Id: lexicon.txt,v 4.239 2005-04-22 09:34:11 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -552,6 +552,7 @@ sl: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;
 sv: vendйmiaire/brumaire/frimaire/nivфse/pluviфse/ventфse/germinal/florйal/prairial/messidor/thermidor/fructidor/komplementдr
 
     (hebrew month)
+af: Tisjri/Hesjvan/Kislev/Tevet/Sjevat/Adar I/Adar II/Nisan/Ijjar/Sivan/Tammus/Av/Elul
 bg: тишри/хешван/кислев/тевет/шеват/адар I/адар II/нисан/ияр/сиван/тамуз/ав/елул
 br: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 ca: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
@@ -5624,11 +5625,13 @@ eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
 he:  вйм дйшз/ йшз згщ/ шбйт шащеп/ йшз ома/ шбйт азшеп
 is: tunglaldur/nэtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
+it: fasi della luna/luna nuova/primo quarto/luna piena/ultimo quarto
 nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
 no: mеnefaser/nymеne/fшrste kvarter/fullmеne/siste kvarter
 pl: faza ksiкїyca/nуw/pierwsza kwadra/peіnia/trzecia kwadra
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
+ru: фаза луны/новолуние/первая четверть/полнолуние/четвертая четверть
 sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 
     more than %d answers
@@ -7814,6 +7817,7 @@ sl: %d lastnih imen
 sv: de %d f&ouml;rnamnen
 
     the %d oldest couples perhaps still alive and engaged
+af: die %d oudste pare moontlik nog in lewe en verloof
 bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
 cs: %d nejstar№нch pбrщ pravdмpodobnм ѕijнcнch a zadanэch
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
