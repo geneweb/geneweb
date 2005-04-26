@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.32 2005-04-22 09:34:11 ddr Exp $
+# $Id: lex_utf8.txt,v 1.33 2005-04-26 13:08:09 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -2264,6 +2264,7 @@ fr: bordure
 he:  מסגרת
 is: jaðar
 it: bordo
+lv: mala
 nl: omranding
 no: ramme         
 pl: granica 
@@ -2756,6 +2757,7 @@ fr: couleur
 he:  צבע
 is: litur
 it: colore
+lv: krāsa
 nl: kleur
 no: farge         
 pl: kolor
@@ -5482,6 +5484,7 @@ fr: message supprim&eacute;
 he:  הודעה נמחקה
 is: skilaboðum eytt
 it: messaggio cancellato
+lv: izdzēsta ziņa
 nl: boodschap verwijderd
 no: melding fjernet
 pl: wiadomość usunięta
@@ -5611,6 +5614,7 @@ fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quar
 he: גיל הירח/ירח חדש/רביע ראשון/ירח מלא/רביע אחרון
 is: tunglaldur/nýtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
 it: fasi della luna/luna nuova/primo quarto/luna piena/ultimo quarto
+lv: Mēness fāze/jauns Mēness/pirmais ceturksnis/pilns Mēness/pēdējais ceturksnis
 nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
 no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
@@ -5938,6 +5942,7 @@ fr: pas de mention
 he: אין אזכור
 is: óþekkt
 it: senza menzione
+lv: nav minēts
 nl: geen vermelding
 no: ukjent familieforhold
 pl: bez wzmianki
@@ -6101,6 +6106,7 @@ fr: notes modifi&eacute;es
 he: רשימות עודכנו
 is: athugasemd gerð
 it: note modificate
+lv: pārveidotas piezīmes
 nl: notitities veranderd
 no: notater er endret 
 pl: uwagi zmodyfikowane
@@ -7819,6 +7825,7 @@ fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים ועודם מאורסים
 is: %d elstu pörin eru hugsanlega enn saman og á lífi
+lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
 no: Det % eldste par som kanskje fremdeles er i live og forlovet
 pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
