@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.239 2005-04-22 09:34:11 ddr Exp $
+# $Id: lexicon.txt,v 4.240 2005-04-28 11:30:46 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -2286,6 +2286,7 @@ fr: bordure
 he:  îñâøú
 is: jaðar
 it: bordo
+lv: mala
 nl: omranding
 no: ramme         
 pl: granica 
