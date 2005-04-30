@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.9 2005-03-04 10:16:19 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.10 2005-04-30 08:23:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -20,7 +20,7 @@ fr: G&eacute;n&eacute;alogie
 he: תולדות
 is: Ættfræði
 it: Genealogia
-lv: Genealogy
+lv: Ģenealoģija
 nl: Genealogie
 no: Genealogi
 pl: Genealogia
@@ -72,7 +72,7 @@ fr: Base de donn&eacute;es g&eacute;n&eacute;alogique
 he: מאגר מידע תולדותי
 is: Ættfræði gagnagrunnur
 it: Base di dati genealogica
-lv: Ciltsrakstu datu bâze
+lv: Ciltsrakstu datu bāze
 nl: Genealogische databank
 no: Genealogisk database
 pl: Genealogiczna baza danych
@@ -108,7 +108,7 @@ fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 it: Potete scegliere un'altra lingua fra le seguenti:
 is: Þú getur valið milli eftirfarandi tungumála:
-lv: Jûs variet apskatît datu bâzi arî citâs sekojoðâs valodâs:
+lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
 nl: U kunt een andere taal kiezen uit een van de volgende mogelijkheden:
 no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
     f&oslash;lgende:
@@ -159,7 +159,7 @@ is: Gagnagrunnurinn <span class="highlight">"%t"</span> er nú með %n
     einstaklinga skráða.
 it: La base di dati <span class="highlight">"%t"</span> contiene
     attualmente %n persone.
-lv: Datu bâze <span class="highlight">"%t"</span> patreiz satur %n personas.
+lv: Datu bāze <span class="highlight">"%t"</span> patreiz satur %n personas.
 nl: Deze databank <span class="highlight">"%t"</span> bevat nu %n personen.
 no: Databasen <span class="highlight">"%t"</span> inneholder n&aring; %n
     personer.
@@ -328,7 +328,7 @@ fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
 he: נווט במאגר מידה על-ידי חיפוס:
 is: Í þessum gagnagrunni getur þú leitað:
 it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
-lv: Jûs variet meklçt ðinî datu bâzç:
+lv: Jūs variet meklēt šinī datu bāzē:
 nl: Om deze databank te consulteren, kan u een opzoeking doen:
 no: For &aring; navigere i databasen, kan du s&oslash;ke:
 pl: Aby poruszać się po bazie, możesz:
@@ -494,7 +494,7 @@ fr-cr: nom-fan-mille
 he:   המשפחה
 is: eftirnöfn
 it: cognomi
-lv: uzvârdus
+lv: uzvārdus
 nl: familienamen
 no: etternavn
 pl: nazwisk
@@ -523,7 +523,7 @@ fr: pr&eacute;noms
 he:   הפרטיים
 is: fornöfn
 it: nomi
-lv: vârdus
+lv: vārdus
 nl: voornamen
 no: fornavn
 pl: imion
@@ -584,7 +584,7 @@ fr-cr: ça ki coumencé con ça a.b.c.d...
 he:  סדר האלף-בית
 is: stafrófsröð
 it: alfabetico
-lv: alfabçtiskâ kârtîbâ
+lv: alfabētiskā kārtībā
 nl: alfabet
 no: alfabetisk
 pl: w porządku alfabetycznym
@@ -613,7 +613,7 @@ fr-cr: ça ki ka ruvini empile
 he:  השכיחות
 is: tíðni
 it: di frequenza
-lv: pçc sastopamîbas
+lv: pēc sastopamības
 nl: aantal
 no: etter frekvens
 pl: według częstości występowania
@@ -716,7 +716,7 @@ is: <span class="highlight">eftir </span>
 it: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>richiesta
        avanzata</b></font></a>.
-lv: <span class="highlight">meklçt pçc</span>
+lv: <span class="highlight">meklēt pēc</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>citiem
        parametriem</b></font></a>.
 nl: <span class="highlight">via een</span>
@@ -767,7 +767,7 @@ fr: Vous pouvez
 he:  יש אפשרות 
 is: Þú getur
 it: Si pu&ograve;
-lv: Izmaiòu veikðana:
+lv: Izmaiņu veikšana:
 nl: U kunt:
 no: Du kan
 pl: Możesz:
@@ -799,7 +799,7 @@ fr: ajouter une famille
 he:  להוסיף משפחה
 is: bætt við fjölskyldu
 it: aggiungere una famiglia
-lv: pievienot ìimeni
+lv: pievienot ģimeni
 nl: een familie toevoegen
 no: legge til en familie
 pl: dodać rodzinę (parę)
@@ -831,7 +831,7 @@ fr: modifier les notes
 he:  לעדכן את ההערות
 is: breytt athugasemdum
 it: modificare le note
-lv: labot piezîmes
+lv: labot piezīmes
 nl: de aantekeningen wijzigen
 no: endre notater
 pl: zmodyfikować uwagi
@@ -868,7 +868,7 @@ fr: Vous pouvez également consulter
 he: אפשר גם להראות
 is: Þú getur einnig athugað
 it: Si pu&ograve; anche consultare
-lv: Informâcija par:
+lv: Informācija par:
 nl: U kunt de volgende zaken bekijken:
 no: Du kan ogs&aring; sl&aring; opp
 pl: Możesz także obejrzeć:
@@ -923,8 +923,8 @@ fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 he: היו %q כניסות, כולל %c כניסות לעמוד זה, מאז %d.
 is: Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
 it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
-lv: Kopð %D datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuði ðinî
-    lappusç. 
+lv: Kopš %D datu bāze ir apmeklēta %q reizes, %c no tiem ir bijuši šinī
+    lappusē. 
 nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
     deze verwelkomingspagina.
 no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
@@ -988,10 +988,10 @@ is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna próf
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
     (obbligandovi a fare « aggiorna »), provate a partire da
     <a href="%sescache=0">questo collegamento</a>.
-lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
-    veiktajâm izmaiòâm (tâdçjâdi radot Jums nepiecieðamîbu "pârlâdçt
-    tekoðo dokumentu"), tad pamçìiniet uzklikðíinât <a
-    href="%sescache=0">ðeit</a>.
+lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
+    veiktajām izmaiņām (tādējādi radot Jums nepieciešamību "pārlādēt
+    tekošo dokumentu"), tad pamēģiniet uzklikšķināt <a
+    href="%sescache=0">šeit</a>.
 nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
     alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
     <a href="%sescache=0">deze link</a>.
