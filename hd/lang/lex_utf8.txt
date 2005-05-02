@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.34 2005-04-30 08:23:59 ddr Exp $
+# $Id: lex_utf8.txt,v 1.35 2005-05-02 09:27:53 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -7825,6 +7825,7 @@ fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים ועודם מאורסים
 is: %d elstu pörin eru hugsanlega enn saman og á lífi
+it: le %d coppie più anziane forse ancora viventi e fidanzate
 lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
 no: Det % eldste par som kanskje fremdeles er i live og forlovet
