@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.77 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: perso.ml,v 4.78 2005-05-02 10:02:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -244,7 +244,6 @@ type env =
   | Vint of int
   | Vstring of string
   | Vsosa of option (Num.t * person)
-  | Vimage of option (bool * string * option (int * int))
   | Vtitle of title_item
   | Vfun of list string and list ast
   | Vnone ]
@@ -960,32 +959,32 @@ and string_of_died conf base env p p_auth =
   else ""
 and string_of_image_url conf base env (p, _, _, p_auth) html =
   if p_auth then
-    match get_env "image" env with
-    [ Vimage x ->
-        match x with
-        [ Some (True, fname, _) ->
-            let s = Unix.stat fname in
-            let b = acces conf base p in
-            let k = default_image_name base p in
-            Format.sprintf "%sm=IM%s;d=%d;%s;k=/%s" (commd conf)
-              (if html then "H" else "")
-              (int_of_float
-                 (mod_float s.Unix.st_mtime (float_of_int max_int)))
-              b k
-        | Some (False, link, _) -> link
-        | None -> "" ]
-    | _ -> "" ]
+    let v =
+      image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
+    in
+    match v with
+    [ Some (True, fname, _) ->
+        let s = Unix.stat fname in
+        let b = acces conf base p in
+        let k = default_image_name base p in
+        Format.sprintf "%sm=IM%s;d=%d;%s;k=/%s" (commd conf)
+          (if html then "H" else "")
+          (int_of_float
+             (mod_float s.Unix.st_mtime (float_of_int max_int)))
+          b k
+    | Some (False, link, _) -> link
+    | None -> "" ]
   else ""
 and string_of_image_size conf base env (p, _, _, p_auth) =
   if p_auth then
-    match get_env "image" env with
-    [ Vimage x ->
-        match x with
-        [ Some (_, _, Some (width, height)) ->
-            Format.sprintf " width=%d height=%d" width height
-        | Some (_, link, None) -> Format.sprintf " height=%d" max_im_hei
-        | None -> "" ]
-    | _ -> "" ]
+    let v =
+      image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
+    in
+    match v with
+    [ Some (_, _, Some (width, height)) ->
+        Format.sprintf " width=%d height=%d" width height
+    | Some (_, link, None) -> Format.sprintf " height=%d" max_im_hei
+    | None -> "" ]
   else ""
 and string_of_parent_age conf base (p, a, _, p_auth) parent =
   match parents a with
@@ -1417,12 +1416,6 @@ value interp_templ conf base p astl =
     let env = [] in
     let env =
       let v = find_sosa conf base p in [("sosa", Vsosa v) :: env]
-    in
-    let env =
-      let v =
-        image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
-      in
-      [("image", Vimage v) :: env]
     in
     let env = [("p_auth", Vbool (authorized_age conf base p)) :: env] in
     let env = [("p", Vind p a u) :: env] in env
