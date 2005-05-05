@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.37 2005-05-05 17:09:27 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.38 2005-05-05 17:11:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -956,7 +956,6 @@ value semi_sort base a before comp di =
 
 value sort_children base warning ifam des =
   let before = ref None in
-  let a = des.children in
   do {
     semi_sort base des.children before strictly_before 1 1;
     semi_sort base des.children before strictly_after ~-1 1;
