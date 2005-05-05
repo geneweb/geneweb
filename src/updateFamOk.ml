@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.42 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.43 2005-05-05 09:24:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -75,6 +75,13 @@ value reconstitute_parent_or_child conf var default_surname =
     | _ -> Update.Link ]
   in
   (first_name, surname, occ, create, var)
+;
+
+value invert_children conf (c, children, ext) i =
+  let var = "inv_ch" ^ string_of_int (i + 1) in
+  match (p_getenv conf.env var, children) with
+  [ (Some "on", [c1 :: children]) -> (c1, [c :: children], True)
+  | _ -> (c, children, ext) ]
 ;
 
 value insert_child conf (children, ext) i =
@@ -167,6 +174,7 @@ value reconstitute_family conf =
       with
       [ Some c ->
           let (children, ext) = loop (i + 1) ext in
+          let (c, children, ext) = invert_children conf (c, children, ext) i in
           let (children, ext) = insert_child conf (children, ext) i in
           ([c :: children], ext)
       | None -> ([], ext) ]
