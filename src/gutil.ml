@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.36 2005-04-08 18:02:26 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.37 2005-05-05 17:09:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -866,42 +866,101 @@ value check_normal_marriage_date base error warning fam =
   }
 ;
 
+(*
+ * Semi sort children by birth dates.
+ * If all children have birth dates, no problem.
+ * Otherwise, sorting groups of consecutive children who have dates.
+ * In not possible cases, try to keep order of children of same sex.
+ *   ex: G1, B2 being resp. girl and boy with date(G1) < date(B2)
+ *       and G and B begin resp. girls boys without dates
+ *     if order is ... B2 B B B G1 ... it becomes ... G1 B2 B B B ...
+ *     if order is ... B2 G G G G1 ... it becomes ... G G G G1 B2 ...
+ *     if order is ... B2 G B G G1 ... no change (a warning appears).
+ *)
+
+value semi_sort base a before comp di =
+  loop where rec loop i =
+    if i < 0 || i >= Array.length a then ()
+    else
+      let p1 = poi base a.(i) in
+      let d1 =
+        match Adef.od_of_codate p1.birth with
+        [ Some d1 -> Some d1
+        | None -> Adef.od_of_codate p1.baptism ]
+      in
+      match d1 with
+      [ Some d1 ->
+          loop_j None (i - di) where rec loop_j sex_interm_sib j =
+            if j < 0 || j >= Array.length a then loop (i + di)
+            else
+              let p2 = poi base a.(j) in
+              let d2 =
+                match Adef.od_of_codate p2.birth with
+                [ Some d2 -> Some d2
+                | None -> Adef.od_of_codate p2.baptism ]
+              in
+              match d2 with
+              [ Some d2 ->
+                  if comp d1 d2 then do {
+                    let j =
+                      match sex_interm_sib with
+                      [ Some s ->
+                          if s = p1.sex then None
+                          else if s = p2.sex then Some j
+                          else None
+                      | None -> Some j ]
+                    in
+                    match j with
+                    [ Some j ->
+                        let k =
+                          loop_k (j - di) where rec loop_k k =
+                            if k < 0 || k >= Array.length a then k + di
+                            else
+                              let p3 = poi base a.(k) in
+                              let d3 =
+                                match Adef.od_of_codate p3.birth with
+                                [ Some d3 -> Some d3
+                                | None -> Adef.od_of_codate p3.baptism ]
+                              in
+                              match d3 with
+                              [ Some d3 ->
+                                  if comp d1 d3 then loop_k (k - di)
+                                  else k + di
+                              | None -> k + di ]
+                        in
+                        do  {
+                          match before.val with
+                          [ Some _ -> ()
+                          | None -> before.val := Some (Array.copy a) ];
+                          let ip = a.(i) in
+                          loop_up i where rec loop_up j =
+                            if j = k then ()
+                            else do {
+                              a.(j) := a.(j - di);
+                              loop_up (j - di)
+                            };
+                          a.(k) := ip;
+                          loop (i + di)
+                        }
+                    | None -> loop (i + di) ]
+                  }
+                  else loop (i + di)
+              | None ->
+                  match sex_interm_sib with
+                  [ Some s ->
+                      if s = p2.sex then loop_j sex_interm_sib (j - di)
+                      else loop (i + di)
+                  | None -> loop_j (Some p2.sex) (j - di) ] ]
+      | None -> loop (i + di) ]
+;
+
 value sort_children base warning ifam des =
   let before = ref None in
   let a = des.children in
   do {
-    for i = 1 to Array.length a - 1 do {
-      let rec loop j =
-        if j >= 0 then
-          let p1 = poi base a.(j) in
-          let p2 = poi base a.(j + 1) in
-          let d1 =
-            match Adef.od_of_codate p1.birth with
-            [ Some d1 -> Some d1
-            | None -> Adef.od_of_codate p1.baptism ]
-          in
-          let d2 =
-            match Adef.od_of_codate p2.birth with
-            [ Some d2 -> Some d2
-            | None -> Adef.od_of_codate p2.baptism ]
-          in
-          match (d1, d2) with
-          [ (Some d1, Some d2) ->
-              if strictly_before d2 d1 then do {
-                let ip = a.(j + 1) in
-                match before.val with
-                [ Some _ -> ()
-                | None -> before.val := Some (Array.copy a) ];
-                a.(j + 1) := a.(j);
-                a.(j) := ip;
-                loop (j - 1)
-              }
-              else ()
-          | _ -> () ]
-        else ()
-      in
-      loop (i - 1)
-    };
+    semi_sort base des.children before strictly_before 1 1;
+    semi_sort base des.children before strictly_after ~-1 1;
+    semi_sort base des.children before strictly_before 1 1;
     match before.val with
     [ None -> ()
     | Some a -> warning (ChangedOrderOfChildren ifam des a) ];
