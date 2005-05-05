@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.46 2005-02-05 18:57:00 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.47 2005-05-05 09:24:32 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -382,6 +382,17 @@ function checkCreate(create, redirect)
   </table>
 %end;
 
+%define;invert_children(xcnt)
+  <table border="1">
+    <tr>
+      <td>
+        <label>[*invert]
+        <input type="checkbox" name="inv_chxcnt" value="on"%/></label>
+      </td>
+    </tr>
+  </table>
+%end;
+
 %define;child(xcnt)
   <table border="1">
     <tr>
@@ -443,6 +454,7 @@ function checkCreate(create, redirect)
 <dl><dd>
 %apply;insert_child("0")
 %foreach;child;
+  %if;(cnt != 1);%apply;invert_children(cnt)%end;
   %apply;child(cnt)
   %apply;insert_child(cnt)
 %end;
