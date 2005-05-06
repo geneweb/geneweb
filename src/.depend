@@ -176,15 +176,19 @@ pqueue.cmo: pqueue.cmi
 pqueue.cmx: pqueue.cmi 
 relation.cmo: adef.cmi config.cmi consang.cmi dag.cmi \
     ../dag2html/dag2html.cmi date.cmi def.cmi gutil.cmi num.cmi \
-    relationLink.cmi util.cmi ../wserver/wserver.cmi 
+    relationLink.cmi relmenu.cmo util.cmi ../wserver/wserver.cmi 
 relation.cmx: adef.cmx config.cmi consang.cmx dag.cmx \
     ../dag2html/dag2html.cmx date.cmx def.cmi gutil.cmx num.cmx \
-    relationLink.cmx util.cmx ../wserver/wserver.cmx 
+    relationLink.cmx relmenu.cmx util.cmx ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi dag.cmi date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi relationLink.cmi 
 relationLink.cmx: adef.cmx config.cmi dag.cmx date.cmx def.cmi gutil.cmx \
     num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx relationLink.cmi 
 relationLink.cmi: config.cmi def.cmi 
+relmenu.cmo: adef.cmi config.cmi def.cmi gutil.cmi name.cmi templ.cmi \
+    templAst.cmi util.cmi ../wserver/wserver.cmi 
+relmenu.cmx: adef.cmx config.cmi def.cmi gutil.cmx name.cmx templ.cmx \
+    templAst.cmi util.cmx ../wserver/wserver.cmx 
 robot.cmo: secure.cmi srcfile.cmi util.cmi ../wserver/wserver.cmi 
 robot.cmx: secure.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
 secure.cmo: secure.cmi 
