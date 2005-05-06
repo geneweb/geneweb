@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.37 2005-01-16 20:07:18 ddr Exp $ *)
+(* $Id: util.mli,v 4.38 2005-05-06 21:36:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -44,6 +44,7 @@ value know : base -> person -> bool;
 value acces_n : config -> base -> string -> person -> string;
 value acces : config -> base -> person -> string;
 value wprint_hidden_person : config -> base -> string -> person -> unit;
+value accessible_by_key : config -> base -> person -> string -> string -> bool;
 
 value geneweb_link : config -> string -> string -> string;
 value wprint_geneweb_link : config -> string -> string -> unit;

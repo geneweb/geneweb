@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.53 2005-04-17 17:58:58 ddr Exp $ *)
+(* $Id: family.ml,v 4.54 2005-05-06 21:36:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -538,7 +538,7 @@ value extract_henv conf base =
         let x =
           let first_name = p_first_name base p in
           let surname = p_surname base p in
-          if conf.access_by_key && not (first_name = "?" || surname = "?") then
+          if Util.accessible_by_key conf base p first_name surname then
             [("pz", code_varenv (Name.lower first_name));
              ("nz", code_varenv (Name.lower surname));
              ("ocz", string_of_int p.occ)]

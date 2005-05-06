@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.78 2005-05-02 10:02:18 ddr Exp $ *)
+(* $Id: perso.ml,v 4.79 2005-05-06 21:36:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -402,7 +402,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "alias" env with
       [ Vstring s -> s
       | _ -> raise Not_found ]
-  | ["border"] -> string_of_int conf.border
   | ["child_cnt"] -> string_of_int_env "child_cnt" env
   | ["comment"] ->
       match get_env "fam" env with

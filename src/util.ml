@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.127 2005-05-06 06:11:16 ddr Exp $ *)
+(* $Id: util.ml,v 4.128 2005-05-06 21:36:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -626,13 +626,17 @@ value is_public conf base p =
   is_old_person conf p
 ;
 
+value accessible_by_key conf base p fn sn =
+  conf.access_by_key
+  && not (sn = "?" || sn = "?")
+  && (not conf.hide_names || is_public conf base p)
+;
+
 value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if surname = "" then ""
-  else if conf.access_by_key
-  && not (first_name = "?" || surname = "?")
-  && (not conf.hide_names || is_public conf base x) then
+  else if accessible_by_key conf base x first_name surname then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
       (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
@@ -2121,9 +2125,7 @@ value wprint_hidden conf pref name valu =
 value wprint_hidden_person conf base pref p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
-  if conf.access_by_key && not (first_name = "?" || surname = "?")
-     && (not conf.hide_names || is_public conf base p)
-  then do {
+  if accessible_by_key conf base p first_name surname then do {
     wprint_hidden conf pref "p" (Name.lower first_name);
     wprint_hidden conf pref "n" (Name.lower surname);
     if p.occ > 0 then wprint_hidden conf pref "oc" (string_of_int p.occ)
