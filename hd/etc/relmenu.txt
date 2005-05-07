@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.1 2005-05-06 21:36:52 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.2 2005-05-07 17:50:50 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -18,6 +18,7 @@
 %base_header;
 </head>
 <body%body_prop;>
+
 <h1 style="text-align:center" class="highlight">[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
   %if;(qualifier != "") <em>%qualifier;</em>%end;
@@ -25,9 +26,11 @@
   %if;(alias != "") <em>(%alias;)</em>%end;
   %sp;[and]0...%nn;
 </h1>
+
 %define;relative_sosa(sosa_link)
   [<em>Sosa number</em> relative to %t:::sosa_link]
 %end;
+
 <form method="get" action="%action;">
 <p>
 %hidden;

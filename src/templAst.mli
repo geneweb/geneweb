@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templAst.mli,v 4.4 2005-02-06 10:17:35 ddr Exp $ *)
+(* $Id: templAst.mli,v 4.5 2005-05-07 17:50:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type ast =
@@ -10,7 +10,8 @@ type ast =
   | Aif of ast_expr and list ast and list ast
   | Aforeach of (loc * string * list string) and list ast
   | Adefine of string and list string and list ast and list ast
-  | Aapply of string and list ast_expr ]
+  | Aapply of string and list ast_expr
+  | AapplyWithAst of string and list (list ast) ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr

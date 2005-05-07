@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.128 2005-05-06 21:36:52 ddr Exp $ *)
+(* $Id: util.ml,v 4.129 2005-05-07 17:50:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -37,10 +37,7 @@ value search_in_doc_path = search_in_path Secure.doc_path;
 value start_with_vowel s =
   if String.length s > 0 then
     match Char.lowercase s.[0] with
-    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' | 'h' | 'à' | 'á' | 'â' | 'ã' | 'ä' |
-      'å' | 'æ' | 'è' | 'é' | 'ê' | 'ë' | 'ì' | 'í' | 'î' | 'ï' | 'ò' | 'ó' |
-      'ô' | 'õ' | 'ö' | 'ù' | 'ú' | 'û' | 'ü' | 'ý' | 'ÿ' ->
-        True
+    [ 'a' | 'e' | 'i' | 'o' | 'u' -> True
     | _ -> False ]
   else False
 ;
@@ -234,26 +231,30 @@ value transl_a_of_gr_eq_gen_lev conf =
   gen_decline2 (transl_nth conf "%1 of %2" 1)
 ;
 
-value failed_format s : format 'a 'b 'c = Obj.magic (tnf s);
-
-value valid_format ini_fmt (r : string) =
+value check_format ini_fmt (r : string) =
   let s : string = Obj.magic (ini_fmt : format 'a 'b 'c) in
   let rec loop i j =
     if i < String.length s - 1 && j < String.length r - 1 then
       match (s.[i], s.[i + 1], r.[j], r.[j + 1]) with
       [ ('%', x, '%', y) ->
-          if x = y then loop (i + 2) (j + 2) else failed_format s
+          if x = y then loop (i + 2) (j + 2) else None
       | ('%', _, _, _) -> loop i (j + 1)
       | (_, _, '%', _) -> loop (i + 1) j
       | _ -> loop (i + 1) (j + 1) ]
     else if i < String.length s - 1 then
-      if s.[i] == '%' then failed_format s else loop (i + 1) j
+      if s.[i] == '%' then None else loop (i + 1) j
     else if j < String.length r - 1 then
-      if r.[j] == '%' then failed_format s else loop i (j + 1)
+      if r.[j] == '%' then None else loop i (j + 1)
     else
-      (Obj.magic r : format 'a 'b 'c)
+      Some (Obj.magic r : format 'a 'b 'c)
   in
   loop 0 0
+;
+
+value valid_format ini_fmt r =
+  match check_format ini_fmt r with
+  [ Some fmt -> fmt
+  | None -> Obj.magic (tnf (Obj.magic ini_fmt)) ]
 ;
 
 value cftransl conf fmt =

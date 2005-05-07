@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.25 2005-03-01 10:14:55 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.26 2005-05-07 17:50:50 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -219,7 +219,7 @@ function changeDeath()
      id="add_qualifier%cnt;"%/></td>
     </tr>
   %end;
-%elseif;(cvar_propose_qualifier != "no");
+%elseif;(bvar_propose_qualifier != "no");
   <tr>
   <td><label for="qualifier0">[*qualifier]0</label></td>
   <td><input name="qualifier0" size="30" value="" id="qualifier0"%/></td>
@@ -239,7 +239,7 @@ function changeDeath()
      id="add_alias%cnt;"%/></td>
     </tr>
   %end;
-%elseif;(cvar_propose_alias != "no");
+%elseif;(bvar_propose_alias != "no");
   <tr>
   <td><label for="alias0">[*alias]0</label></td>
   <td><input name="alias0" size="30" value="" id="alias0"%/></td>
@@ -533,24 +533,24 @@ function changeDeath()
       <td><label for="t_identxcnt">[*title/titles]0</label></td>
       <td>
         <input name="t_identxcnt" size="15" value="%title.t_ident;"%sp;
-	 id="t_identxcnt"%/>
+         id="t_identxcnt"%/>
       </td>
       <td><label for="t_placexcnt">[*estate]0</label></td>
       <td colspan="2">
         <input name="t_placexcnt" size="30" value="%title.t_estate;"%sp;
-	 id="t_placexcnt"%/>
+         id="t_placexcnt"%/>
       </td>
     </tr>
     <tr>
       <td><label for="t_namexcnt">[*name]0</label></td>
       <td>
         <input name="t_namexcnt" size="20" value="%title.t_name;"%sp;
-	 id="t_namexcnt"%/>
+         id="t_namexcnt"%/>
       </td>
       <td><label for="t_nthxcnt">[*nth]0</label></td>
       <td>
         <input name="t_nthxcnt" size="3" value="%title.t_nth;"%sp;
-	 id="t_nthxcnt"%/>
+         id="t_nthxcnt"%/>
       </td>
       <td>
         <label>[*main title]0

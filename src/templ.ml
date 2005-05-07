@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.37 2005-05-06 21:36:52 ddr Exp $ *)
+(* $Id: templ.ml,v 4.38 2005-05-07 17:50:50 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -11,6 +11,7 @@ type token =
   | COMMA
   | DOT
   | EQUAL
+  | GREATEREQUAL
   | LPAREN
   | RPAREN
   | IDENT of string
@@ -93,6 +94,7 @@ value rec get_token =
   | [: `'.' :] ep -> Tok (bp, ep) DOT
   | [: `'=' :] ep -> Tok (bp, ep) EQUAL
   | [: `'!'; `'=' :] ep -> Tok (bp, ep) BANGEQUAL
+  | [: `'>'; `'=' :] ep -> Tok (bp, ep) GREATEREQUAL
   | [: `'"'; s = get_string 0 :] ep -> Tok (bp, ep) (STRING s)
   | [: `('0'..'9' as c); s = get_int (Buff.store 0 c) :] ep ->
       Tok (bp, ep) (INT s)
@@ -153,6 +155,7 @@ value rec parse_expr strm =
            parser
            [ [: `Tok _ EQUAL; e2 = parse_simple :] -> Eop "=" e e2
            | [: `Tok _ BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
+           | [: `Tok _ GREATEREQUAL; e2 = parse_simple :] -> Eop ">=" e e2
            | [: :] -> e ] :] ->
         a
   and parse_simple =
@@ -287,9 +290,26 @@ value parse_templ conf strm =
   and parse_apply strm =
     try
       let f = get_ident 0 strm in
-      let el = parse_real_params strm in Aapply f el
+      match strm with parser
+      [ [: `'%' :] ->
+          match get_variable strm with
+          [ (_, "with", []) ->
+              let all =
+                loop () where rec loop () =
+                  let (al, tok) =
+                    parse_astl [] False 0 ["and"; "end"] strm
+                  in
+                  match tok with
+                  [ "and" -> [al :: loop ()]
+                  | _ -> [al] ]
+              in
+              AapplyWithAst f all
+          | _ -> raise (Stream.Error "'with' expected") ]
+      | [: :] ->
+          let el = parse_real_params strm in
+          Aapply f el ]
     with
-    [ Stream.Failure | Stream.Error _ -> Atext "apply error" ]
+    [ Stream.Failure | Stream.Error _ -> Atext "apply syntax error" ]
   and parse_if strm =
     let e = parse_expr strm in
     let (al1, al2) =
@@ -346,6 +366,8 @@ value strip_newlines_after_variables =
     | [Aforeach v al :: astl] -> [Aforeach v (loop al) :: loop astl]
     | [Adefine f x al alk :: astl] ->
         [Adefine f x (loop al) (loop alk) :: loop astl]
+    | [AapplyWithAst f all :: astl] ->
+        [AapplyWithAst f (List.map loop all) :: loop astl]
     | [(Avar _ _ _ | Aapply _ _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
@@ -425,7 +447,8 @@ value rec subst sf =
       Aforeach (loc, sf s, List.map sf sl) (substl sf al)
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
-  | Aapply f el -> Aapply (sf f) (substel sf el) ]
+  | Aapply f el -> Aapply (sf f) (substel sf el)
+  | AapplyWithAst f all -> AapplyWithAst (sf f) (List.map (substl sf) all) ]
 and substl sf al = List.map (subst sf) al
 and subste sf =
   fun
@@ -470,10 +493,16 @@ value not_impl func x =
 
 value eval_variable conf =
   fun 
-  [ "border" -> string_of_int conf.border
+  [ "action" -> conf.command
+  | "border" -> string_of_int conf.border
+  | "charset" -> conf.charset
+  | "doctype" -> Util.doctype conf ^ "\n"
+  | "highlight" -> conf.highlight
+  | "image_prefix" -> Util.image_prefix conf
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
+  | "prefix" -> Util.commd conf
   | "right" -> conf.right
   | "sp" -> " "
   | "/" -> conf.xhs
@@ -487,6 +516,40 @@ value eval_ast conf =
       try eval_variable conf s with
       [ Not_found -> " %%" ^ s ^ "?" ]
   | x -> not_impl "eval_ast" x ]
+;
+
+value eval_var conf eval_var s sl =
+  try
+    match eval_var [s :: sl] with
+    [ VVstring s -> s
+    | VVbool True -> "1"
+    | VVbool False -> "0" ]
+  with
+  [ Not_found ->
+      try
+        match sl with
+        [ [] -> eval_variable conf s
+        | _ -> raise Not_found ]
+      with
+      [ Not_found -> " %" ^ s ^ String.concat "." [s :: sl] ^ "?" ] ]
+;
+
+value eval_apply f eval_ast xl al all =
+  let vl = List.map (fun al -> String.concat "" (List.map eval_ast al)) all in
+  let sl =
+    List.map
+      (fun a ->
+         let a =
+           loop a xl vl where rec loop a xl vl =
+             match (xl, vl) with
+             [ ([x :: xl], [v :: vl]) -> loop (subst (subst_text x v) a) xl vl
+             | ([], []) -> a
+             | _ -> Atext (f ^ ": bad # of params") ]
+         in
+         eval_ast a)
+      al
+  in
+  String.concat "" sl
 ;
 
 value eval_transl_lexicon conf upp s c =
@@ -522,13 +585,17 @@ value eval_transl_lexicon conf upp s c =
             Util.transl_decline conf s1 s2
           else if String.length s2 > 0 && s2.[0] = ':' then
             let s2 = String.sub s2 1 (String.length s2 - 1) in
-            let s3 = Util.valid_format "%t" s1 in
-            let s4 =
+            let transl_nth_format s =
               match nth with
-              [ Some n -> Util.ftransl_nth conf s3 n
-              | None -> Util.ftransl conf s3 ]
+              [ Some n -> Util.ftransl_nth conf s n
+              | None -> Util.ftransl conf s ]
             in
-            Printf.sprintf s4 (fun _ -> s2)
+            match Util.check_format "%t" s1 with
+            [ Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
+            | None ->
+                match Util.check_format "%s" s1 with
+                [ Some s3 -> Printf.sprintf (transl_nth_format s3) s2
+                | None -> raise Not_found ] ]
           else raise Not_found
         with
         [ Not_found ->
@@ -630,6 +697,7 @@ value eval_bool_expr conf eval_var =
         match op with
         [ "=" -> string_eval e1 = string_eval e2
         | "!=" -> string_eval e1 <> string_eval e2
+        | ">=" -> int_eval e1 >= int_eval e2
         | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
     | Evar loc s sl ->
@@ -649,6 +717,10 @@ value eval_bool_expr conf eval_var =
     | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
     | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
     | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
+  and int_eval e =
+    let s = string_eval e in
+    try int_of_string s with
+    [ Failure _ -> do { Wserver.wprint "not int: \"%s\"" s; 0 } ]
   and string_eval =
     fun
     [ Estr s -> s
@@ -704,18 +776,12 @@ value print_body_prop conf base =
 
 value print_variable conf base =
   fun
-  [ "action" -> Wserver.wprint "%s" conf.command
-  | "base_header" -> Util.include_hed_trl conf (Some base) ".hed"
+  [ "base_header" -> Util.include_hed_trl conf (Some base) ".hed"
   | "base_trailer" -> Util.include_hed_trl conf (Some base) ".trl"
   | "body_prop" -> print_body_prop conf base
-  | "charset" -> Wserver.wprint "%s" conf.charset
   | "copyright" -> Util.print_copyright conf
-  | "doctype" -> Wserver.wprint "%s\n" (Util.doctype conf)
   | "hidden" -> Util.hidden_env conf
-  | "highlight" -> Wserver.wprint "%s" conf.highlight
-  | "image_prefix" -> Wserver.wprint "%s" (Util.image_prefix conf)
   | "message_to_wizard" -> Util.message_to_wizard conf
-  | "prefix" -> Wserver.wprint "%s" (Util.commd conf)
   | s ->
       try Wserver.wprint "%s" (eval_variable conf s) with
       [ Not_found -> Wserver.wprint " %%%s?" s ] ]
@@ -739,17 +805,16 @@ value print_var conf base eval_var s sl =
           } ] ]
 ;
 
-value print_apply conf print_ast eval_var xl al el =
+value print_apply conf f print_ast eval_var xl al el =
   let vl = List.map (eval_expr conf eval_var) el in
   List.iter
     (fun a ->
        let a =
          loop a xl vl where rec loop a xl vl =
            match (xl, vl) with
-           [ ([x :: xl], [v :: vl]) ->
-               loop (subst (subst_text x v) a) xl vl
+           [ ([x :: xl], [v :: vl]) -> loop (subst (subst_text x v) a) xl vl
            | ([], []) -> a
-           | _ -> Atext "parse_error" ]
+           | _ -> Atext (f ^ ": bad # of params") ]
        in
        print_ast a)
     al
