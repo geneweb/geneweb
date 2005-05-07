@@ -57,9 +57,13 @@ date.cmx: adef.cmx buff.cmx calendar.cmx config.cmi def.cmi gutil.cmx num.cmx \
 date.cmi: config.cmi def.cmi 
 def.cmi: adef.cmi 
 descend.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
-    def.cmi gutil.cmi perso.cmi util.cmi ../wserver/wserver.cmi 
+    def.cmi desmenu.cmo gutil.cmi perso.cmi util.cmi ../wserver/wserver.cmi 
 descend.cmx: adef.cmx config.cmi dag.cmx ../dag2html/dag2html.cmx date.cmx \
-    def.cmi gutil.cmx perso.cmx util.cmx ../wserver/wserver.cmx 
+    def.cmi desmenu.cmx gutil.cmx perso.cmx util.cmx ../wserver/wserver.cmx 
+desmenu.cmo: adef.cmi config.cmi def.cmi gutil.cmi name.cmi templ.cmi \
+    templAst.cmi util.cmi ../wserver/wserver.cmi 
+desmenu.cmx: adef.cmx config.cmi def.cmi gutil.cmx name.cmx templ.cmx \
+    templAst.cmi util.cmx ../wserver/wserver.cmx 
 doc.cmo: buff.cmo config.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi secure.cmx util.cmx ../wserver/wserver.cmx 
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birthDeath.cmo \
