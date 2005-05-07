@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.1 2005-05-07 17:50:49 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.2 2005-05-07 17:56:55 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -23,6 +23,7 @@
 %base_header;
 </head>
 <body%body_prop;>
+%message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">%nn;
   %apply;a_of_b%with;
