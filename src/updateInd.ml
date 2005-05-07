@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.24 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.25 2005-05-07 17:50:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -169,7 +169,11 @@ value rec eval_var conf base env p loc =
         [ Some vv -> str_val (quote_escaped vv)
         | None -> str_val "" ]
       else
-        let v = extract_var "cvar_" s in
+        let v = extract_var "bvar_" s in
+        let v =
+          if v = "" then extract_var "cvar_" s (* deprecated since 5.00 *)
+          else v
+        in
         if v <> "" then
           str_val (try List.assoc v conf.base_env with [ Not_found -> "" ])
         else raise Not_found
@@ -344,7 +348,8 @@ value rec print_ast conf base env p =
   | Aif e alt ale -> print_if conf base env p e alt ale
   | Aforeach v al -> print_foreach conf base env p v al
   | Adefine f xl al alk -> print_define conf base env p f xl al alk
-  | Aapply f el -> print_apply conf base env p f el ]
+  | Aapply f el -> print_apply conf base env p f el
+  | AapplyWithAst _ _ -> Wserver.wprint "%%apply..%%with not impl" ]
 and print_define conf base env p f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] p) alk
 and print_apply conf base env p f el =
@@ -352,7 +357,7 @@ and print_apply conf base env p f el =
   [ Vfun xl al ->
       let eval_var = eval_var conf base env p in
       let print_ast = print_ast conf base env p in
-      Templ.print_apply conf print_ast eval_var xl al el
+      Templ.print_apply conf f print_ast eval_var xl al el
   | _ -> Wserver.wprint " %%%s?" f ]
 and print_if conf base env p e alt ale =
   let eval_var = eval_var conf base env p in

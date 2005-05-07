@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.40 2005-02-05 06:34:39 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.41 2005-05-07 17:50:50 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -155,7 +155,7 @@
     %if;computable_death_age;
       <li>[*age at death:] %death_age;</li>%nl;
     %end;
-    %if;(has_consanguinity and cvar_show_consang != "no");
+    %if;(has_consanguinity and bvar_show_consang != "no");
       <li>[*consanguinity]: %consanguinity;</li>%nl;
     %end;
   </ul>
@@ -194,31 +194,18 @@
   %end;
 %end;
 
-%define;married_to_with_place(place)
-  %apply;married_to("<em>, place, </em>")
-%end;
-
-%define;married_to_with_date(ondate)
-  %apply;married_to(" <em>ondate</em>")
-%end;
-
-%define;married_to_with_date_and_place(ondate,place)
-  %apply;married_to(" <em>ondate, place, </em>")
-%end;
-
 %if;has_families;
   <h3 class="highlight">[*marriage/marriages]1 [and::child/children]1</h3>
   <ul>
   %foreach;family;
     <li style="list-style-type:%if;spouse.has_parents;disc%else;circle%end;">
-    %if;(marriage_place = "")
-      %if;(on_marriage_date = "")%apply;married_to("")
-      %else;%apply;married_to_with_date(on_marriage_date)
-      %end;
-    %else;
-      %if;(on_marriage_date = "")%apply;married_to_with_place(marriage_place)
+    %apply;married_to%with
+      %if;(marriage_place = "")
+        %if;(on_marriage_date = "")
+        %else; <em>%on_marriage_date</em>%end;
       %else;
-        %apply;married_to_with_date_and_place(on_marriage_date,marriage_place)
+        %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
+        %else; <em>%on_marriage_date;, %marriage_place, </em>%end;
       %end;
     %end;
     %if;(cancel_links or spouse.is_restricted);%spouse;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: relmenu.ml,v 4.1 2005-05-06 21:36:52 ddr Exp $ *)
+(* $Id: relmenu.ml,v 4.2 2005-05-07 17:50:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -120,7 +120,7 @@ and print_apply conf base env p f el =
   [ Vfun xl al ->
       let eval_var = eval_var conf base env p in
       let print_ast = print_ast conf base env p in
-      Templ.print_apply conf print_ast eval_var xl al el
+      Templ.print_apply conf f print_ast eval_var xl al el
   | _ -> Wserver.wprint " %%%s?" f ]
 and print_if conf base env p e alt ale =
   let eval_var = eval_var conf base env p in

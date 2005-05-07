@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.79 2005-05-06 21:36:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.80 2005-05-07 17:50:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -253,6 +253,15 @@ and title_item =
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+
+value not_impl func x =
+  let desc =
+    if Obj.is_block (Obj.repr x) then
+      "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
+    else "int_val = " ^ string_of_int (Obj.magic x)
+  in
+  ">Perso." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
+;
 
 value extract_var sini s =
   let len = String.length sini in
@@ -515,7 +524,11 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
         [ Some vv -> quote_escaped vv
         | None -> "" ]
       else
-        let v = extract_var "cvar_" s in
+        let v = extract_var "bvar_" s in
+        let v =
+          if v = "" then extract_var "cvar_" s (* deprecated since 5.00 *)
+          else v
+        in
         if v <> "" then
           try List.assoc v conf.base_env with [ Not_found -> "" ]
         else raise Not_found
@@ -1053,17 +1066,36 @@ value print_wid_hei conf base env fname =
   | None -> () ]
 ;
 
+value rec eval_ast conf base env ep =
+  fun
+  [ Atext s -> s
+  | Avar loc s sl -> Templ.eval_var conf (eval_var conf base env ep loc) s sl
+  | Atransl upp s n -> eval_transl conf base env upp s n
+  | Aif e alt ale -> eval_if conf base env ep e alt ale
+  | AapplyWithAst f all -> eval_apply conf base env ep f all
+  | x -> not_impl "eval_ast" x ]
+and eval_apply conf base env ep f all =
+  match get_env f env with
+  [ Vfun xl al ->
+      let eval_ast = eval_ast conf base env ep in
+      Templ.eval_apply f eval_ast xl al all
+  | _ -> Printf.sprintf "%%apply;%s?" f ]
+and eval_if conf base env p e alt ale =
+  let eval_var = eval_var conf base env p in
+  let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
+  String.concat "" (List.map (eval_ast conf base env p) al)
+;
+
 value rec print_ast conf base env ep =
   fun
-  [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n -> Wserver.wprint "%s" (eval_transl conf base env upp s n)
-  | Avar loc s sl ->
+  [ Avar loc s sl ->
       Templ.print_var conf base (eval_var conf base env ep loc) s sl
   | Awid_hei s -> print_wid_hei conf base env s
   | Aif e alt ale -> print_if conf base env ep e alt ale
   | Aforeach (loc, s, sl) al -> print_foreach conf base env ep loc s sl al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
-  | Aapply f el -> print_apply conf base env ep f el ]
+  | Aapply f el -> print_apply conf base env ep f el
+  | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
 and print_define conf base env ep f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
 and print_apply conf base env ep f el =
@@ -1071,7 +1103,7 @@ and print_apply conf base env ep f el =
   [ Vfun xl al ->
       let eval_var = eval_var conf base env ep in
       let print_ast = print_ast conf base env ep in
-      Templ.print_apply conf print_ast eval_var xl al el
+      Templ.print_apply conf f print_ast eval_var xl al el
   | _ -> Wserver.wprint " %%%s?" f ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in

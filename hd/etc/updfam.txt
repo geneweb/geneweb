@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.47 2005-05-05 09:24:32 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.48 2005-05-07 17:50:50 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -39,29 +39,29 @@ function checkCreate(create, redirect)
       <td>xlab</td>
       <td>
         %if;([ !dates order]0 = "ddmmyy");
-	  <label>
-	  [year/month/day]2
-          <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
-	  </label><label>
-          [year/month/day]1
-          <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
-	  </label><label>
-          [year/month/day]0
-          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-           value="%xdate.year;"%/>
-	  </label>
-        %else;
-	  <label>
-          [year/month/day]0
-          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-           value="%xdate.year;"%/>
-	  </label><label>
-          [year/month/day]1
-          <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
-	  </label><label>
+          <label>
           [year/month/day]2
           <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
-	  </label>
+          </label><label>
+          [year/month/day]1
+          <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
+          </label><label>
+          [year/month/day]0
+          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
+           value="%xdate.year;"%/>
+          </label>
+        %else;
+          <label>
+          [year/month/day]0
+          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
+           value="%xdate.year;"%/>
+          </label><label>
+          [year/month/day]1
+          <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
+          </label><label>
+          [year/month/day]2
+          <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
+          </label>
         %end;
       </td>
       <td>
@@ -168,7 +168,7 @@ function checkCreate(create, redirect)
       <td align="%right;"><label for="paxcnt_occ">[*number]</label></td>
       <td>
         <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;"%sp;
-	 id="paxcnt_occ"%/>
+         id="paxcnt_occ"%/>
       </td>
       <td>
         <select name="paxcnt_p">
@@ -248,9 +248,9 @@ function checkCreate(create, redirect)
 </p>
 
 %foreach;parent;
-%if;(cvar_multi_parents != "yes");<h4>%parent.himher;</h4>%end;%nl;
+%if;(bvar_multi_parents != "yes");<h4>%parent.himher;</h4>%end;%nl;
 %apply;parent(cnt, "parent")
-%if;(cvar_multi_parents = "yes");%apply;insert_parent(cnt)%end;
+%if;(bvar_multi_parents = "yes");%apply;insert_parent(cnt)%end;
 %end;
 
 <h4>[*marriage/marriages]0</h4>
@@ -326,10 +326,10 @@ function checkCreate(create, redirect)
         <label>
         <input type="radio" name="witn%cnt;_sex" value="N"%nn;
          %if;(witness.create.sex = "neuter") checked="checked"%end;%/>?
-	</label><label>
+        </label><label>
         <input type="radio" name="witn%cnt;_sex" value="M"%nn;
          %if;(witness.create.sex = "male") checked="checked"%end;%/>[M/F]0
-	</label><label>
+        </label><label>
         <input type="radio" name="witn%cnt;_sex" value="F"%nn;
          %if;(witness.create.sex = "female") checked="checked"%end;%/>[M/F]1
         </label>
@@ -404,7 +404,7 @@ function checkCreate(create, redirect)
       <td align="%right;"><label for="chxcnt_occ">[*number]</label></td>
       <td>
         <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;"%sp;
-	 id="chxcnt_occ"%/>
+         id="chxcnt_occ"%/>
       </td>
     </tr>
     <tr>
@@ -481,7 +481,7 @@ function checkCreate(create, redirect)
   </tr>
 </table>
 
-%if;(cvar_origin_file = "on")
+%if;(bvar_origin_file = "on")
   <input name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
 %end;
 

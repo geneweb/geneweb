@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.55 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.56 2005-05-07 17:50:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -150,7 +150,11 @@ value rec eval_var conf base env (fam, cpl, des) loc =
         [ Some vv -> str_val (quote_escaped vv)
         | None -> str_val "" ]
       else
-        let v = extract_var "cvar_" s in
+        let v = extract_var "bvar_" s in
+        let v =
+          if v = "" then extract_var "cvar_" s (* deprecated since 5.00 *)
+          else v
+        in
         if v <> "" then
           str_val (try List.assoc v conf.base_env with [ Not_found -> "" ])
         else raise Not_found
@@ -360,7 +364,7 @@ and print_apply conf base env fcd f el =
   [ Vfun xl al ->
       let eval_var = eval_var conf base env fcd in
       let print_ast = print_ast conf base env fcd in
-      Templ.print_apply conf print_ast eval_var xl al el
+      Templ.print_apply conf f print_ast eval_var xl al el
   | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env fcd e alt ale =
   let eval_var = eval_var conf base env fcd in
