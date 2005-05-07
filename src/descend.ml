@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.37 2005-03-04 17:51:06 ddr Exp $ *)
+(* $Id: descend.ml,v 4.38 2005-05-07 21:24:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -8,53 +8,10 @@ open Gutil;
 open Util;
 open Dag2html;
 
-value limit_desc conf =
-  match p_getint conf.base_env "max_desc_level" with
-  [ Some x -> max 1 x
-  | None -> 12 ]
-;
-
 value limit_by_tree conf =
   match p_getint conf.base_env "max_desc_tree" with
   [ Some x -> max 1 x
   | None -> 4 ]
-;
-
-value infinite = 10000;
-
-value make_level_table conf base max_level p =
-  let mark = Array.create base.data.persons.len False in
-  let levt = Array.create base.data.persons.len infinite in
-  let rec fill ip u lev =
-    if max_level == infinite && mark.(Adef.int_of_iper ip) then ()
-    else do {
-      mark.(Adef.int_of_iper ip) := True;
-      if lev <= max_level then do {
-        if lev < levt.(Adef.int_of_iper ip) then
-          levt.(Adef.int_of_iper ip) := lev
-        else ();
-        Array.iter
-          (fun ifam ->
-             let ipl = (doi base ifam).children in
-             Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
-          u.family
-      }
-      else ()
-    }
-  in
-  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
-;
-
-value level_max conf base p =
-  let levt = make_level_table conf base infinite p in
-  let x = ref 0 in
-  do {
-    for i = 0 to Array.length levt - 1 do {
-      let lev = levt.(i) in
-      if lev != infinite && x.val < lev then x.val := lev else ()
-    };
-    x.val
-  }
 ;
 
 value text_to conf =
@@ -83,141 +40,6 @@ value text_level conf =
         (transl_nth conf "nth (generation)" i) ]
 ;
 
-value print_choice conf base p effective_level =
-  tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-    tag "p" begin
-      List.iter
-        (fun (k, v) ->
-           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" k
-             (quote_escaped (decode_varenv v)))
-        conf.henv;
-      xtag "input" "type=\"hidden\" name=\"m\" value=\"D\"";
-      wprint_hidden_person conf base "" p;
-      tag "select" "name=\"v\"" begin
-        let rec loop i =
-          if i > effective_level then ()
-          else do {
-            Wserver.wprint "  <option value=\"%d\"%s>%s</option>\n" i
-              (if i == 0 then " selected=\"selected\"" else "")
-              (capitale (text_to conf i));
-            loop (succ i)
-          }
-        in
-        loop 0;
-      end;
-      xtag "input" "type=\"submit\" value=\"Ok\"";
-    end;
-    tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
-      tag "tr" begin
-        tag "td" "align=\"%s\"" conf.left begin
-          tag "label" begin
-            xtag "input"
-              "type=\"radio\" name=\"t\" value=\"L\" checked=\"checked\"";
-            Wserver.wprint "%s\n"
-              (capitale (transl_nth conf "list/list (ancestors)" 0));
-          end;
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"M\"";
-            Wserver.wprint "%s\n"
-              (capitale (transl_nth conf "male line/female line" 0));
-          end;
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"F\"";
-            Wserver.wprint "%s\n"
-              (capitale (transl_nth conf "male line/female line" 1));
-          end;
-          xtag "br";
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"T\"";
-            Wserver.wprint "%s\n" (capitale (transl conf "tree"));
-            if effective_level <= limit_by_tree conf then ()
-            else
-              Wserver.wprint " (%s %d %s)\n" (transl conf "maximum")
-                (limit_by_tree conf)
-                (transl_nth conf "generation/generations" 1);
-          end;
-          xtag "br";
-          tag "label" begin
-            Wserver.wprint "- %s "
-              (capitale (transl_nth conf "image/images" 1));
-            xtag "input" "type=\"checkbox\" name=\"image\" value=\"on\"";
-          end;
-          xtag "br";
-          tag "label" begin
-            Wserver.wprint "- %s " (capitale (transl conf "border"));
-            xtag "input" "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
-          end;
-          xtag "br";
-          tag "table" "cellpadding=\"0\" cellspacing=\"0\"" begin
-            tag "tr" begin
-              tag "td" "align=\"%s\"" conf.left begin
-                Wserver.wprint "-&nbsp;%s" (capitale (transl conf "color"));
-              end;
-              tag "td" begin
-                xtag "input" "\
-type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
-                end;
-              List.iter
-                (fun c ->
-                   tag "td" "style=\"background:#%s\"" c begin
-                     xtag "input" "type=\"radio\" name=\"color\" value=\"#%s\""
-                       c;
-                   end)
-                ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
-            end;
-          end;
-        end;
-        tag "td" "align=\"%s\"" conf.left begin
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"S\"";
-            Wserver.wprint "%s"
-              (capitale (transl conf "only the generation selected"));
-          end;
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"N\"";
-            Wserver.wprint "%s"
-              (capitale (transl conf "families with encoding"));
-          end;
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"G\"";
-            Wserver.wprint "- %s"
-              (capitale (transl conf "index of the descendants"));
-          end;
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"C\"";
-            Wserver.wprint "- %s"
-              (capitale
-                 (transl conf "index of the spouses (non descendants)"));
-          end;
-          xtag "br";
-          tag "label" begin
-            xtag "input" "type=\"radio\" name=\"t\" value=\"A\"";
-            Wserver.wprint "d'Aboville";
-          end;
-          xtag "br";
-        end;
-      end;
-      tag "tr" "align=\"%s\"" conf.left begin
-        tag "td" "colspan=\"2\" align=\"center\"" begin
-          xtag "br";
-          tag "label" begin
-            Wserver.wprint "%s\n"
-              (capitale (transl conf "cancel GeneWeb links"));
-            xtag "input" "type=\"checkbox\" name=\"cgl\" value=\"on\"";
-          end;
-          xtag "br";
-        end;
-      end;
-    end;
-  end
-;
-
 value descendants_title conf base p h =
   let txt_fun = if h then gen_person_text_no_html else gen_person_text in
   let s =
@@ -225,24 +47,6 @@ value descendants_title conf base p h =
       (transl conf "descendants") (txt_fun raw_access conf base p)
   in
   Wserver.wprint "%s" (capitale s)
-;
-
-value display_descendant_menu conf base p =
-  let effective_level = min (limit_desc conf) (level_max conf base p) in
-  do {
-    header conf (descendants_title conf base p);
-    begin_centered conf;
-    tag "table" "border=\"%d\" width=\"90%%\"" conf.border
-    begin
-      tag "tr" begin
-        tag "td" "align=\"center\"" begin
-          print_choice conf base p effective_level;
-        end;
-       end;
-    end;
-    end_centered conf;
-    trailer conf
-  }
 ;
 
 value named_like_father conf base ip =
@@ -310,7 +114,7 @@ value
     else incr count;
     Wserver.wprint ".";
     if levt.(Adef.int_of_iper x.cle_index) == level then do {
-      levt.(Adef.int_of_iper x.cle_index) := infinite;
+      levt.(Adef.int_of_iper x.cle_index) := Desmenu.infinite;
       if Array.length ux.family <> 0 then html_br conf
       else Wserver.wprint "\n";
       if level == max_level then
@@ -334,8 +138,8 @@ value
 ;
 
 value display_descendants_upto conf base max_level p line =
-  let max_level = min (limit_desc conf) max_level in
-  let levt = make_level_table conf base max_level p in
+  let max_level = min (Desmenu.limit_desc conf) max_level in
+  let levt = Desmenu.make_level_table conf base max_level p in
   let count = ref 0 in
   let always_surname =
     match p_getenv conf.env "alwsurn" with
@@ -430,8 +234,8 @@ value display_descendants_upto conf base max_level p line =
 ;
 
 value display_descendants_level conf base max_level ancestor =
-  let max_level = min (limit_desc conf) max_level in
-  let levt = make_level_table conf base max_level ancestor in
+  let max_level = min (Desmenu.limit_desc conf) max_level in
+  let levt = Desmenu.make_level_table conf base max_level ancestor in
   let rec get_level level u list =
     List.fold_left
       (fun list ifam ->
@@ -805,7 +609,7 @@ value print_families conf base marks paths max_lev =
 ;
 
 value display_descendants_with_numbers conf base max_level ancestor =
-  let max_level = min (limit_desc conf) max_level in
+  let max_level = min (Desmenu.limit_desc conf) max_level in
   let title h =
     if h then descendants_title conf base ancestor h
     else
@@ -957,7 +761,7 @@ value sort_and_display conf base paths precision list =
 ;
 
 value display_descendant_index conf base max_level ancestor =
-  let max_level = min (limit_desc conf) max_level in
+  let max_level = min (Desmenu.limit_desc conf) max_level in
   let title h =
     let txt = capitale (transl conf "index of the descendants") in
     if not h then
@@ -990,7 +794,7 @@ value display_descendant_index conf base max_level ancestor =
 ;
 
 value display_spouse_index conf base max_level ancestor =
-  let max_level = min (limit_desc conf) max_level in
+  let max_level = min (Desmenu.limit_desc conf) max_level in
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl conf "index of the spouses (non descendants)"))
@@ -1068,7 +872,7 @@ value rec print_table_person conf base max_lev ip =
 
 value display_descendant_with_table conf base max_lev a =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "descendants")) in
-  let max_lev = min (limit_desc conf) max_lev in
+  let max_lev = min (Desmenu.limit_desc conf) max_lev in
   do {
     header conf title;
     print_table_person conf base max_lev a.cle_index;
@@ -1344,7 +1148,7 @@ value print_tree conf base gv p =
 ;
 
 value print_aboville conf base max_level p =
-  let max_level = min (limit_desc conf) max_level in
+  let max_level = min (Desmenu.limit_desc conf) max_level in
   do {
     Util.header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
@@ -1412,5 +1216,5 @@ value print conf base p =
   | (Some "G", Some v) -> display_descendant_index conf base v p
   | (Some "C", Some v) -> display_spouse_index conf base v p
   | (Some "T", Some v) -> print_tree conf base v p
-  | _ -> display_descendant_menu conf base p ]
+  | _ -> Desmenu.print conf base p ]
 ;

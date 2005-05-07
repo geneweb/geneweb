@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ancmenu.ml,v 4.2 2005-05-07 21:24:15 ddr Exp $ *)
+(* $Id: desmenu.ml,v 4.1 2005-05-07 21:24:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -22,31 +22,51 @@ value not_impl func x =
       "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
     else "int_val = " ^ string_of_int (Obj.magic x)
   in
-  ">Ascmenu." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
+  ">Desmenu." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
 ;
 
-value max_ancestor_level conf base ip =
-(*
-  let _ = base.data.ascends.array () in
-  let _ = base.data.couples.array () in
-*)
-  let x = ref 0 in
+value limit_desc conf =
+  match p_getint conf.base_env "max_desc_level" with
+  [ Some x -> max 1 x
+  | None -> 12 ]
+;
+
+value infinite = 10000;
+
+value make_level_table conf base max_level p =
   let mark = Array.create base.data.persons.len False in
-  let rec loop level ip =
-    if mark.(Adef.int_of_iper ip) then ()
+  let levt = Array.create base.data.persons.len infinite in
+  let rec fill ip u lev =
+    if max_level == infinite && mark.(Adef.int_of_iper ip) then ()
     else do {
       mark.(Adef.int_of_iper ip) := True;
-      x.val := max x.val level;
-      match parents (aget conf base ip) with
-      [ Some ifam ->
-          let cpl = coi base ifam in
-          do { loop (succ level) (father cpl); loop (succ level) (mother cpl) }
-      | _ -> () ]
+      if lev <= max_level then do {
+        if lev < levt.(Adef.int_of_iper ip) then
+          levt.(Adef.int_of_iper ip) := lev
+        else ();
+        Array.iter
+          (fun ifam ->
+             let ipl = (doi base ifam).children in
+             Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
+          u.family
+      }
+      else ()
     }
   in
-  do { loop 0 ip; x.val }
+  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
 ;
 
+value level_max conf base p =
+  let levt = make_level_table conf base infinite p in
+  let x = ref 0 in
+  do {
+    for i = 0 to Array.length levt - 1 do {
+      let lev = levt.(i) in
+      if lev != infinite && x.val < lev then x.val := lev else ()
+    };
+    x.val
+  }
+;
 
 value extract_var sini s =
   let len = String.length sini in
@@ -78,21 +98,11 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match get_env "level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
-  | ["main_title_ident"] ->
-      match Util.main_title base p with
-      [ Some t when p_auth_name -> sou base t.t_ident
-      | _ -> "" ]
-  | ["main_title_place"] ->
-      match Util.main_title base p with
-      [ Some t when p_auth_name -> sou base t.t_place
-      | _ -> "" ]
   | ["max_level"] ->
       match get_env "max_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
   | ["occ"] -> if p_auth_name then string_of_int p.occ else ""
-  | ["prefix_no_iz"] ->
-      commd {(conf) with henv = List.remove_assoc "iz" conf.henv}
   | ["public_name"] -> if not p_auth_name then "" else sou base p.public_name
   | ["qualifier"] ->
       match p.qualifiers with
@@ -114,11 +124,11 @@ value rec eval_ast conf base env ep =
   | Avar loc s sl -> Templ.eval_var conf (eval_var conf base env ep loc) s sl
   | Atransl upp s c -> Templ.eval_transl conf upp s c
   | Aif e alt ale -> eval_if conf base env ep e alt ale
-  | AapplyWithAst "a_of_b" [al1; al2] ->
+  | AapplyWithAst "a_of_b_gr_eq_lev" [al1; al2] ->
       let eval_ast = eval_ast conf base env ep in
       let s1 = String.concat "" (List.map eval_ast al1) in
       let s2 = String.concat "" (List.map eval_ast al2) in
-      capitale (transl_a_of_b conf s1 s2)
+      capitale (transl_a_of_gr_eq_gen_lev conf s1 s2)
   | AapplyWithAst "nth" [al1; al2] ->
       let eval_ast = eval_ast conf base env ep in
       let s1 = String.concat "" (List.map eval_ast al1) in
@@ -173,10 +183,10 @@ and print_foreach_level conf base env ((p, _) as ep) al =
   let max_level =
     match get_env "max_level" env with
     [ Vint n -> n
-    | _ -> -1 ]
+    | _ -> 0 ]
   in
-  loop 1 where rec loop i =
-    if i > max_level + 1 then ()
+  loop 0 where rec loop i =
+    if i > max_level then ()
     else
       let env = [("level", Vint i) :: env] in
       do {
@@ -186,8 +196,8 @@ and print_foreach_level conf base env ((p, _) as ep) al =
 ;
 
 value print conf base p =
-  let max_level = max_ancestor_level conf base p.cle_index in
-  let astl = Templ.input conf "ancmenu" in
+  let max_level = min (limit_desc conf) (level_max conf base p) in
+  let astl = Templ.input conf "desmenu" in
   let p_auth_name = authorized_age conf base p || not conf.hide_names in
   let env = [("max_level", Vint max_level)] in
   let ep = (p, p_auth_name) in
