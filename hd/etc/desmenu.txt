@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: desmenu.txt,v 1.1 2005-05-07 21:24:15 ddr Exp $ -->
+  <!-- $Id: desmenu.txt,v 1.2 2005-05-08 12:09:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -38,6 +38,17 @@
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
+%end;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
 %end;
 
 <table border="%border;" width="100%%"><tr><td align="center">

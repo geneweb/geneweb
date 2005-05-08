@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.41 2005-05-07 17:50:50 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.42 2005-05-08 12:09:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -98,7 +98,7 @@
 
 %if;not cancel_links;
   <table style="float:%right;"><tr><td>
-    %if;has_referer;
+    %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
     %end;

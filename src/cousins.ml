@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.18 2005-01-03 18:35:30 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.19 2005-05-08 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -7,32 +7,7 @@ open Gutil;
 open Util;
 open Config;
 
-value default_max_lev = 5;
 value default_max_cnt = 2000;
-
-(* Utilities *)
-
-value max_ancestor_level conf base ip max_lev =
-  let x = ref 0 in
-  let mark = Array.create base.data.persons.len False in
-  let rec loop niveau ip =
-    if mark.(Adef.int_of_iper ip) then ()
-    else do {
-      mark.(Adef.int_of_iper ip) := True;
-      x.val := max x.val niveau;
-      if x.val = max_lev then ()
-      else
-        match parents (aget conf base ip) with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            do {
-              loop (succ niveau) (father cpl); loop (succ niveau) (mother cpl)
-            }
-        | _ -> () ]
-    }
-  in
-  do { loop 0 ip; x.val }
-;
 
 value brother_label conf x =
   match x with
@@ -42,7 +17,7 @@ value brother_label conf x =
   | 4 -> transl conf "3rd cousins"
   | n ->
       Printf.sprintf (ftransl conf "%s cousins")
-        (transl_nth conf "*nth (cousin)*" (n - 1)) ]
+        (transl_nth conf "nth (cousin)" (n - 1)) ]
 ;
 
 value rec except x =
@@ -109,32 +84,6 @@ value br_inter_is_empty b1 b2 =
 ;
 
 (* Algorithms *)
-
-value print_choice conf base p niveau_effectif =
-  tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-    tag "p" begin
-      Util.hidden_env conf;
-      xtag "input" "type=\"hidden\" name=\"m\" value=\"C\"";
-      wprint_hidden_person conf base "" p;
-      tag "select" "name=\"v1\"" begin
-        let rec boucle i =
-          if i > niveau_effectif then ()
-          else do {
-            Wserver.wprint "  <option value=\"%d\"%s>%s</option>\n" i
-              (if i == 2 then " selected=\"selected\"" else "")
-              (capitale (brother_label conf i));
-            boucle (succ i)
-          }
-        in
-        boucle 1;
-      end;
-      xtag "input" "type=\"submit\" value=\"Ok\"";
-      xtag "br";
-      xtag "input" "type=\"checkbox\" name=\"csp\" value=\"on\"";
-      Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-    end;
-  end
-;
 
 value cnt = ref 0;
 
@@ -341,50 +290,6 @@ value print_cousins conf base p lev1 lev2 =
   }
 ;
 
-value print_menu conf base p effective_level =
-  let title h =
-    let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    let s =
-      transl_a_of_gr_eq_gen_lev conf
-        (transl conf "cousins (general term)")
-        (txt_fun raw_access conf base p)
-    in
-    Wserver.wprint "%s" (capitale s)
-  in
-  do {
-    header conf title;
-    tag "ul" begin
-      tag "li" begin
-        print_choice conf base p effective_level;
-      end;
-      stagn "li" begin
-        Wserver.wprint "<a href=\"%s%s;m=C;v1=2;v2=1\">%s</a>" (commd conf)
-          (acces conf base p) (capitale (transl conf "uncles and aunts"));
-      end;
-      if has_nephews_or_nieces conf base p then
-        stagn "li" begin
-          Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>" (commd conf)
-            (acces conf base p) (capitale (transl conf "nephews and nieces"));
-        end
-      else ();
-    end;
-    match p.death with
-    [ NotDead | DontKnowIfDead when conf.wizard || conf.friend ->
-        do {
-          Wserver.wprint "\n";
-          tag "ul" begin
-            stagn "li" begin
-              Wserver.wprint "<a href=\"%s%s;m=C;t=AN" (commd conf)
-                (acces conf base p);
-              Wserver.wprint "\">%s</a>" (capitale (transl conf "birthdays"));
-            end;
-          end
-        }
-    | _ -> () ];
-    trailer conf
-  }
-;
-
 value sosa_of_persons conf base =
   loop 1 where rec loop n =
     fun
@@ -512,7 +417,7 @@ value print_anniv conf base p level =
 value print conf base p =
   let max_lev =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
-    [ Not_found | Failure _ -> default_max_lev ]
+    [ Not_found | Failure _ -> Cousmenu.default_max_lev ]
   in
   match (p_getint conf.env "v1", p_getenv conf.env "t") with
   [ (Some lev1, _) ->
@@ -526,9 +431,5 @@ value print conf base p =
   | (_, Some "AN") when conf.wizard || conf.friend ->
       print_anniv conf base p max_lev
   | _ ->
-      let effective_level =
-        max_ancestor_level conf base p.cle_index max_lev + 1
-      in
-      if effective_level == 2 then print_cousins conf base p 2 2
-      else print_menu conf base p effective_level ]
+      Cousmenu.print conf base p ]
 ;

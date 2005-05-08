@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: relmenu.ml,v 4.2 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: relmenu.ml,v 4.3 2005-05-08 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -109,6 +109,10 @@ value rec print_ast conf base env ep =
       Templ.print_var conf base (eval_var conf base env ep loc) s sl
   | Atransl upp s c -> Wserver.wprint "%s" (Templ.eval_transl conf upp s c)
   | Aif e alt ale -> print_if conf base env ep e alt ale
+  | Awid_hei s ->
+      match image_size (image_file_name s) with
+      [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
+      | None -> () ]
   | Aforeach v al -> print_foreach conf base env ep v al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
   | Aapply f el -> print_apply conf base env ep f el

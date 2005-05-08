@@ -41,10 +41,14 @@ consang.cmx: adef.cmx def.cmi gutil.cmx consang.cmi
 consang.cmi: def.cmi 
 consangAll.cmo: adef.cmi consang.cmi def.cmi gutil.cmi 
 consangAll.cmx: adef.cmx consang.cmx def.cmi gutil.cmx 
-cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \
-    num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
-cousins.cmx: adef.cmx birthday.cmx config.cmi date.cmx def.cmi gutil.cmx \
-    num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
+cousins.cmo: adef.cmi birthday.cmo config.cmi cousmenu.cmo date.cmi def.cmi \
+    gutil.cmi num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
+cousins.cmx: adef.cmx birthday.cmx config.cmi cousmenu.cmx date.cmx def.cmi \
+    gutil.cmx num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
+cousmenu.cmo: adef.cmi config.cmi def.cmi gutil.cmi name.cmi templ.cmi \
+    templAst.cmi util.cmi ../wserver/wserver.cmi 
+cousmenu.cmx: adef.cmx config.cmi def.cmi gutil.cmx name.cmx templ.cmx \
+    templAst.cmi util.cmx ../wserver/wserver.cmx 
 dag.cmo: buff.cmo config.cmi ../dag2html/dag2html.cmi date.cmi def.cmi \
     gutil.cmi num.cmi util.cmi ../wserver/wserver.cmi dag.cmi 
 dag.cmx: buff.cmx config.cmi ../dag2html/dag2html.cmx date.cmx def.cmi \
