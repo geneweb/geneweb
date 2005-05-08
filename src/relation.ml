@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.70 2005-05-06 21:36:52 ddr Exp $ *)
+(* $Id: relation.ml,v 4.71 2005-05-08 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -643,7 +643,7 @@ value brother_label conf x sex =
   | 4 -> transl_nth conf "a 3rd cousin" is
   | n ->
       Printf.sprintf (ftransl_nth conf "a %s cousin" is)
-        (transl_nth conf "*nth (cousin)*" (n - 1)) ]
+        (transl_nth conf "nth (cousin)" (n - 1)) ]
 ;
 
 value half_brother_label conf sex =

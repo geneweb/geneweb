@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.3 2005-05-07 17:56:55 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.4 2005-05-08 12:09:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -30,6 +30,17 @@
 
 %define;relative_sosa(sosa_link)
   [<em>Sosa number</em> relative to %t:::sosa_link]
+%end;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
 %end;
 
 <form method="get" action="%action;">

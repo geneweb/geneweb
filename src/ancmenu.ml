@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ancmenu.ml,v 4.2 2005-05-07 21:24:15 ddr Exp $ *)
+(* $Id: ancmenu.ml,v 4.3 2005-05-08 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -111,8 +111,13 @@ and eval_str_var conf base env (p, p_auth_name) loc =
 value rec eval_ast conf base env ep =
   fun
   [ Atext s -> s
-  | Avar loc s sl -> Templ.eval_var conf (eval_var conf base env ep loc) s sl
+  | Avar loc s sl ->
+      Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
   | Atransl upp s c -> Templ.eval_transl conf upp s c
+  | Awid_hei s ->
+      match image_size (image_file_name s) with
+      [ Some (wid, hei) -> Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei
+      | None -> "" ]
   | Aif e alt ale -> eval_if conf base env ep e alt ale
   | AapplyWithAst "a_of_b" [al1; al2] ->
       let eval_ast = eval_ast conf base env ep in

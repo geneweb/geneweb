@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.80 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: perso.ml,v 4.81 2005-05-08 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -357,14 +357,10 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
           [ Separated -> True
           | _ -> False ]
       | _ -> raise Not_found ]
-  | ["cancel_links"] -> conf.cancel_links
-  | ["friend"] -> conf.friend
   | ["has_comment"] ->
       match get_env "fam" env with
       [ Vfam fam _ _ -> p_auth && sou base fam.comment <> ""
       | _ -> raise Not_found ]
-  | ["has_referer"] ->
-      Wserver.extract_param "referer: " '\n' conf.request <> ""
   | ["has_relation_her"] ->
       match get_env "rel" env with
       [ Vrel {r_moth = Some _} -> True
@@ -396,7 +392,6 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   | ["is_self"] -> get_env "pos" env = Vstring "self"
   | ["is_sibling_after"] -> get_env "pos" env = Vstring "next"
   | ["is_sibling_before"] -> get_env "pos" env = Vstring "prev"
-  | ["wizard"] -> conf.wizard
   | [s] ->
       let v = extract_var "file_exists_" s in
       if v <> "" then
@@ -466,7 +461,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       let c = conf.command ^ "?" in
       List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
         (henv @ conf.senv)
-  | ["referer"] -> Wserver.extract_param "referer: " '\n' conf.request
   | ["related_type"] ->
       match (get_env "c" env, get_env "rel" env) with
       [ (Vind c _ _, Vrel r) ->
@@ -1069,7 +1063,8 @@ value print_wid_hei conf base env fname =
 value rec eval_ast conf base env ep =
   fun
   [ Atext s -> s
-  | Avar loc s sl -> Templ.eval_var conf (eval_var conf base env ep loc) s sl
+  | Avar loc s sl ->
+      Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
   | AapplyWithAst f all -> eval_apply conf base env ep f all

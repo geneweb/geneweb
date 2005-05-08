@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.38 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: templ.ml,v 4.39 2005-05-08 12:09:34 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -503,6 +503,7 @@ value eval_variable conf =
   | "nl" -> "\n"
   | "nn" -> ""
   | "prefix" -> Util.commd conf
+  | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
   | "right" -> conf.right
   | "sp" -> " "
   | "/" -> conf.xhs
@@ -518,7 +519,7 @@ value eval_ast conf =
   | x -> not_impl "eval_ast" x ]
 ;
 
-value eval_var conf eval_var s sl =
+value eval_string_var conf eval_var s sl =
   try
     match eval_var [s :: sl] with
     [ VVstring s -> s
@@ -623,70 +624,19 @@ value eval_transl conf upp s c =
     eval_transl_lexicon conf upp s c
 ;
 
-(*
-value eval_date_field =
+value eval_bool_var conf eval_var =
   fun
-  [ Some d ->
-      match d with
-      [ Dgreg d Dgregorian -> Some d
-      | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
-      | Dgreg d Dfrench -> Some (Calendar.french_of_gregorian d)
-      | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
-      | _ -> None ]
-  | None -> None ]
+  [ ["cancel_links"] -> conf.cancel_links
+  | ["friend"] -> conf.friend
+  | ["has_referer"] -> (* deprecated since version 5.00 *) 
+      Wserver.extract_param "referer: " '\n' conf.request <> ""
+  | ["wizard"] -> conf.wizard
+  | sl ->
+      match eval_var sl with
+      [ VVbool x -> x
+      | VVstring "" -> False
+      | VVstring _ -> True ] ]
 ;
-
-value eval_date_text =
-  fun
-  [ Some (Dtext s) -> s
-  | _ -> "" ]
-;
-
-value eval_date_variable od =
-  fun
-  [ "day" ->
-      match eval_date_field od with
-      [ Some d -> if d.day = 0 then "" else string_of_int d.day
-      | None -> "" ]
-  | "month" ->
-      match eval_date_field od with
-      [ Some d ->
-          if d.month = 0 then ""
-          else
-            match od with
-            [ Some (Dgreg _ Dfrench) -> short_f_month d.month
-            | _ -> string_of_int d.month ]
-      | None -> "" ]
-  | "text" -> eval_date_text od
-  | "year" ->
-      match eval_date_field od with
-      [ Some d -> string_of_int d.year
-      | None -> "" ]
-  | "oryear" ->
-      match od with
-      [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
-      | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
-      | _ -> "" ]
-  | "calendar" ->
-      match od with
-      [ Some (Dgreg _ Dgregorian) -> "gregorian"
-      | Some (Dgreg _ Djulian) -> "julian"
-      | Some (Dgreg _ Dfrench) -> "french"
-      | Some (Dgreg _ Dhebrew) -> "hebrew"
-      | _ -> "" ]
-  | "prec" ->
-      match od with
-      [ Some (Dgreg {prec = Sure} _) -> "sure"
-      | Some (Dgreg {prec = About} _) -> "about"
-      | Some (Dgreg {prec = Maybe} _) -> "maybe"
-      | Some (Dgreg {prec = Before} _) -> "before"
-      | Some (Dgreg {prec = After} _) -> "after"
-      | Some (Dgreg {prec = OrYear _} _) -> "oryear"
-      | Some (Dgreg {prec = YearInt _} _) -> "yearint"
-      | _ -> "" ]
-  | v -> ">%" ^ v ^ "???" ]
-;
-*)
 
 value eval_bool_expr conf eval_var =
   let rec bool_eval =
@@ -701,12 +651,7 @@ value eval_bool_expr conf eval_var =
         | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
     | Evar loc s sl ->
-        try
-          match eval_var loc [s :: sl] with
-          [ VVbool x -> x
-          | VVstring "" -> False
-          | VVstring _ -> True ]
-        with
+        try eval_bool_var conf (eval_var loc) [s :: sl] with
         [ Not_found ->
             do {
               Wserver.wprint " %%%s" s;
@@ -726,12 +671,7 @@ value eval_bool_expr conf eval_var =
     [ Estr s -> s
     | Eint s -> s
     | Evar loc s sl ->
-        try
-          match eval_var loc [s :: sl] with
-          [ VVbool True -> "1"
-          | VVbool False -> "0"
-          | VVstring s -> s ]
-        with
+        try eval_string_var conf (eval_var loc) s sl with
         [ Not_found ->
             do {
               Wserver.wprint " %%%s" s;

@@ -1,11 +1,11 @@
 (* camlp4r *)
-(* $Id: desmenu.ml,v 4.2 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: cousmenu.ml,v 4.1 2005-05-08 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
-open Config;
 open Def;
 open Gutil;
 open Util;
+open Config;
 open TemplAst;
 
 type env = 
@@ -22,50 +22,31 @@ value not_impl func x =
       "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
     else "int_val = " ^ string_of_int (Obj.magic x)
   in
-  ">Desmenu." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
+  ">Cousmenu." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
 ;
 
-value limit_desc conf =
-  match p_getint conf.base_env "max_desc_level" with
-  [ Some x -> max 1 x
-  | None -> 12 ]
-;
+value default_max_lev = 5;
 
-value infinite = 10000;
-
-value make_level_table conf base max_level p =
+value max_ancestor_level conf base ip max_lev =
+  let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
-  let levt = Array.create base.data.persons.len infinite in
-  let rec fill ip u lev =
-    if max_level == infinite && mark.(Adef.int_of_iper ip) then ()
+  let rec loop niveau ip =
+    if mark.(Adef.int_of_iper ip) then ()
     else do {
       mark.(Adef.int_of_iper ip) := True;
-      if lev <= max_level then do {
-        if lev < levt.(Adef.int_of_iper ip) then
-          levt.(Adef.int_of_iper ip) := lev
-        else ();
-        Array.iter
-          (fun ifam ->
-             let ipl = (doi base ifam).children in
-             Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
-          u.family
-      }
-      else ()
+      x.val := max x.val niveau;
+      if x.val = max_lev then ()
+      else
+        match parents (aget conf base ip) with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            do {
+              loop (succ niveau) (father cpl); loop (succ niveau) (mother cpl)
+            }
+        | _ -> () ]
     }
   in
-  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
-;
-
-value level_max conf base p =
-  let levt = make_level_table conf base infinite p in
-  let x = ref 0 in
-  do {
-    for i = 0 to Array.length levt - 1 do {
-      let lev = levt.(i) in
-      if lev != infinite && x.val < lev then x.val := lev else ()
-    };
-    x.val
-  }
+  do { loop 0 ip; x.val }
 ;
 
 value extract_var sini s =
@@ -83,10 +64,16 @@ and eval_bool_var conf base (p, p_auth_name) loc =
   [ ["access_by_key"] ->
       Util.accessible_by_key conf base p (p_first_name base p)
         (p_surname base p)
+  | ["dead"] ->
+      match p.death with
+      [ NotDead | DontKnowIfDead -> False
+      | _ -> True ]
+  | ["has_nephews_or_nieces"] -> has_nephews_or_nieces conf base p
   | _ -> raise Not_found ]
 and eval_str_var conf base env (p, p_auth_name) loc =
   fun
-  [ ["alias"] ->
+  [ ["access"] -> acces conf base p
+  | ["alias"] ->
       match p.aliases with
       [ [nn :: _] -> if not p_auth_name then "" else sou base nn
       | [] -> "" ]
@@ -96,10 +83,6 @@ and eval_str_var conf base env (p, p_auth_name) loc =
   | ["index"] -> string_of_int (Adef.int_of_iper p.cle_index)
   | ["level"] ->
       match get_env "level" env with
-      [ Vint i -> string_of_int i
-      | _ -> "" ]
-  | ["max_level"] ->
-      match get_env "max_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
   | ["occ"] -> if p_auth_name then string_of_int p.occ else ""
@@ -190,7 +173,7 @@ and print_foreach_level conf base env ((p, _) as ep) al =
     [ Vint n -> n
     | _ -> 0 ]
   in
-  loop 0 where rec loop i =
+  loop 1 where rec loop i =
     if i > max_level then ()
     else
       let env = [("level", Vint i) :: env] in
@@ -201,8 +184,12 @@ and print_foreach_level conf base env ((p, _) as ep) al =
 ;
 
 value print conf base p =
-  let max_level = min (limit_desc conf) (level_max conf base p) in
-  let astl = Templ.input conf "desmenu" in
+  let max_lev =
+    try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
+    [ Not_found | Failure _ -> default_max_lev ]
+  in
+  let max_level = max_ancestor_level conf base p.cle_index max_lev + 1 in
+  let astl = Templ.input conf "cousmenu" in
   let p_auth_name = authorized_age conf base p || not conf.hide_names in
   let env = [("max_level", Vint max_level)] in
   let ep = (p, p_auth_name) in
