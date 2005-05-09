@@ -77,7 +77,7 @@ family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birthDeath.cmo \
     mergeInd.cmo mergeIndOk.cmo name.cmi notes.cmo num.cmi perso.cmi \
     place.cmo relation.cmo relationLink.cmi secure.cmi sendImage.cmo some.cmo \
     srcfile.cmi title.cmo update.cmi updateFam.cmi updateFamOk.cmo \
-    updateInd.cmi updateIndOk.cmi util.cmi wiznotes.cmo \
+    updateInd.cmi updateIndOk.cmi updmenu.cmo util.cmi wiznotes.cmo \
     ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     birthday.cmx buff.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx \
@@ -86,7 +86,7 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     mergeInd.cmx mergeIndOk.cmx name.cmx notes.cmx num.cmx perso.cmx \
     place.cmx relation.cmx relationLink.cmx secure.cmx sendImage.cmx some.cmx \
     srcfile.cmx title.cmx update.cmx updateFam.cmx updateFamOk.cmx \
-    updateInd.cmx updateIndOk.cmx util.cmx wiznotes.cmx \
+    updateInd.cmx updateIndOk.cmx updmenu.cmx util.cmx wiznotes.cmx \
     ../wserver/wserver.cmx family.cmi 
 family.cmi: config.cmi 
 forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi secure.cmi \
@@ -257,6 +257,10 @@ updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi name.cmi \
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx name.cmx \
     update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi update.cmi 
+updmenu.cmo: adef.cmi config.cmi def.cmi gutil.cmi templ.cmi templAst.cmi \
+    util.cmi ../wserver/wserver.cmi 
+updmenu.cmx: adef.cmx config.cmi def.cmi gutil.cmx templ.cmx templAst.cmi \
+    util.cmx ../wserver/wserver.cmx 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
     gwlib.cmo iobase.cmi lock.cmi name.cmi num.cmi secure.cmi translate.cmi \
     version.cmo ../wserver/wserver.cmi util.cmi 
