@@ -21,7 +21,6 @@
 (month)
 (thousand separator)
 (week day)
-*nth (cousin)*
 2nd cousins
 3rd cousins
 <em>Sosa number</em> relative to %t
@@ -194,7 +193,6 @@ marriage/marriages
 married
 married at age %t
 married%t to
-maximum
 merge
 merge done
 message added
@@ -223,6 +221,7 @@ not married
 note/notes
 notes modified
 nth
+nth (cousin)
 nth (generation)
 number
 number of branches
