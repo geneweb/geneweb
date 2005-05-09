@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.54 2005-05-06 21:36:52 ddr Exp $ *)
+(* $Id: family.ml,v 4.55 2005-05-09 04:43:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -499,7 +499,7 @@ value family_m conf base =
   | Some "TT" -> Title.print conf base
   | Some "U" when conf.wizard ->
       match find_person_in_env conf base "" with
-      [ Some p -> Update.print conf base p
+      [ Some p -> Updmenu.print conf base p
       | _ -> very_unknown conf ]
   | Some "WIZNOTES" -> Wiznotes.print conf base
   | Some mode -> incorrect_request conf
@@ -694,23 +694,11 @@ value this_request_updates_database conf =
   | _ -> False ]
 ;
 
-value error_locked conf =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint
-      (fcapitale
-         (ftransl conf "the file is temporarily locked: please try again"));
-    Wserver.wprint ".\n";
-    trailer conf
-  }
-;
-
 value treat_request_on_base conf log =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   if this_request_updates_database conf then
     lock Iobase.lock_file bfile with
     [ Accept -> treat_request_on_possibly_locked_base conf bfile log
-    | Refuse -> error_locked conf ]
+    | Refuse -> Update.error_locked conf ]
   else treat_request_on_possibly_locked_base conf bfile log
 ;

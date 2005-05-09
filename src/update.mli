@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 4.7 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: update.mli,v 4.8 2005-05-09 04:43:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -26,17 +26,14 @@ value print_error : config -> base -> Gutil.base_error -> unit;
 value print_warnings : config -> base -> list Gutil.base_warning -> unit;
 value error : config -> base -> Gutil.base_error -> 'a;
 
-value error_locked : config -> base -> unit;
+value error_locked : config -> unit;
 value error_digest : config -> base -> 'a;
 
 value digest_person : person -> Digest.t;
 value digest_family : family -> couple -> descend -> Digest.t;
 
 value reconstitute_date : config -> string -> option date;
-value print_date : config -> base -> string -> string -> option date -> unit;
 
-value print_src : config -> string -> string -> unit;
 value print_someone : config -> base -> person -> unit;
-value print : config -> base -> person -> unit;
 
 value update_conf : config -> config;
