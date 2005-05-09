@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.36 2005-05-08 12:09:34 ddr Exp $
+# $Id: lex_utf8.txt,v 1.37 2005-05-09 09:29:22 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -5594,6 +5594,7 @@ pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
 ru: фаза луны/новолуние/первая четверть/полнолуние/четвертая четверть
 sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
+sv: m&aring;n&aring;lder/nym&aring;ne/f&ouml;rsta kvarter/fullm&aring;ne/sista kvarter
 
     more than %d answers
 af: meer as %d antwoorde
