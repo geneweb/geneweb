@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.37 2005-05-09 09:29:22 ddr Exp $
+# $Id: lex_utf8.txt,v 1.38 2005-05-09 09:42:33 ddr Exp $
 # Copyright (c) 1998-2005 JOSJB
 
      !dates order
@@ -5590,6 +5590,7 @@ lv: Mēness fāze/jauns Mēness/pirmais ceturksnis/pilns Mēness/pēdējais cetu
 nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
 no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
+pt: dia do mês lunar/lua nova/quarto crescente/lua cheia/quarto minguante
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
 ru: фаза луны/новолуние/первая четверть/полнолуние/четвертая четверть
