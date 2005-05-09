@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.81 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: perso.ml,v 4.82 2005-05-09 18:05:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1067,6 +1067,16 @@ value rec eval_ast conf base env ep =
       Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
+  | AapplyWithAst "a_of_b" [al1; al2] ->
+      let eval_ast = eval_ast conf base env ep in
+      let s1 = String.concat "" (List.map eval_ast al1) in
+      let s2 = String.concat "" (List.map eval_ast al2) in
+      capitale (transl_a_of_b conf s1 s2)
+  | AapplyWithAst "a_of_b_gr_eq_lev" [al1; al2] ->
+      let eval_ast = eval_ast conf base env ep in
+      let s1 = String.concat "" (List.map eval_ast al1) in
+      let s2 = String.concat "" (List.map eval_ast al2) in
+      capitale (transl_a_of_gr_eq_gen_lev conf s1 s2)
   | AapplyWithAst f all -> eval_apply conf base env ep f all
   | x -> not_impl "eval_ast" x ]
 and eval_apply conf base env ep f all =
