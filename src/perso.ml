@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.82 2005-05-09 18:05:34 ddr Exp $ *)
+(* $Id: perso.ml,v 4.83 2005-05-09 19:48:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -645,7 +645,10 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
   | _ -> warning_not_impl loc ]
 and eval_bool_person_field conf base env (p, a, u, p_auth) =
   fun
-  [ "birthday" ->
+  [ "access_by_key" ->
+      Util.accessible_by_key conf base p (p_first_name base p)
+        (p_surname base p)
+  | "birthday" ->
       match (p_auth, Adef.od_of_codate p.birth) with
       [ (True, Some (Dgreg d _)) ->
           if d.prec = Sure && p.death = NotDead then
