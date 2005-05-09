@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.34 2005-05-09 05:11:20 ddr Exp $
+# $Id: Makefile,v 4.35 2005-05-09 09:18:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -101,7 +101,7 @@ i18n: pr_transl.cmo always
 	    echo $$i 1>&2; \
 	    camlp4r ./ppdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; \
 	  done; \
-	  cat ../hd/etc/*.txt ../hd/lang/start_utf8.txt ../hd/lang/advanced.txt | grep -v "%\[" | grep "\[" | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//" \
+	  cat ../hd/etc/*.txt ../hd/lang/start_utf8.txt ../hd/lang/advanced.txt | sed -e 's/%\[//g' -e 's/%]//g' -e 's/\]/\]\n/g' | grep "\[" | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//" \
 	) | \
 	sort | uniq | grep -v '^$$' > i18n
 
