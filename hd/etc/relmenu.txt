@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.4 2005-05-08 12:09:34 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.5 2005-05-09 11:44:57 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -86,13 +86,15 @@
   </li>
   </ul>
 </li>
-%foreach;spouse;
-<li>
-  <label>
-    <input type="radio" name="select" value="%spouse_index;"%/>
-    %spouse;%nl;
-  </label>
-</li>
+%foreach;family;
+  %if;(spouse != "? ?")
+    <li>
+      <label>
+        <input type="radio" name="select" value="%spouse_index;"%/>
+        %spouse;%nl;
+      </label>
+    </li>
+  %end;
 %end;
 %foreach;relation;
 <li>
@@ -110,13 +112,15 @@
   </label>
 </li>
 %end;
-%foreach;witness;
-<li>
-  <label>
-    <input type="radio" name="select" value="%witness_index;"%/>
-    ([witness/witnesses]0)%nl;%witness;%nl;
-  </label>
-</li>
+%foreach;family;
+  %foreach;witness;
+  <li>
+    <label>
+      <input type="radio" name="select" value="%witness_index;"%/>
+      ([witness/witnesses]0)%nl;%witness;%nl;
+    </label>
+  </li>
+  %end;
 %end;
 </ul>
 <table border="%border;" width="90%%">
