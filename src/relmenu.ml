@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: relmenu.ml,v 4.3 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: relmenu.ml,v 4.4 2005-05-09 11:44:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -10,6 +10,7 @@ open TemplAst;
 
 type env = 
   [ Vind of person
+  | Vfam of Adef.ifam
   | Vrel of string and person
   | Vfun of list string and list ast
   | Vnone ]
@@ -81,24 +82,28 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       [ Some p -> referenced_person_title_text conf base p
       | None -> "" ]
   | ["spouse"] ->
-      match get_env "spouse" env with
-      [ Vind c -> person_title_text conf base c
-      | _ -> "" ]
+      match get_env "fam" env with
+      [ Vfam ifam ->
+          let p = poi base (spouse p.cle_index (coi base ifam)) in
+          person_title_text conf base p
+      | _ -> raise Not_found ]
   | ["spouse_index"] ->
-      match get_env "spouse" env with
-      [ Vind c -> string_of_int (Adef.int_of_iper c.cle_index)
-      | _ -> "" ]
+      match get_env "fam" env with
+      [ Vfam ifam ->
+          let ip = spouse p.cle_index (coi base ifam) in
+          string_of_int (Adef.int_of_iper ip)
+      | _ -> raise Not_found ]
   | ["surname"] -> if not p_auth_name then "x" else p_surname base p
   | ["surname_key_val"] ->
       if not p_auth_name then "" else Name.lower (p_surname base p)
   | ["witness"] ->
       match get_env "witness" env with
       [ Vind p -> person_title_text conf base p
-      | _ -> "" ]
+      | _ -> raise Not_found ]
   | ["witness_index"] ->
       match get_env "witness" env with
       [ Vind p -> string_of_int (Adef.int_of_iper p.cle_index)
-      | _ -> "" ]
+      | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 ;
 
@@ -131,17 +136,27 @@ and print_if conf base env p e alt ale =
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env ep (loc, s, sl) al =
-  match [s :: sl] with
-  [ ["related"] -> print_foreach_related conf base env ep al
-  | ["relation"] -> print_foreach_relation conf base env ep al
-  | ["spouse"] -> print_foreach_spouse conf base env ep al
-  | ["witness"] -> print_foreach_witness conf base env ep al
-  | _ ->
+  try
+    match [s :: sl] with
+    [ ["family"] -> print_foreach_family conf base env ep al
+    | ["related"] -> print_foreach_related conf base env ep al
+    | ["relation"] -> print_foreach_relation conf base env ep al
+    | ["witness"] -> print_foreach_witness conf base env ep al
+    | _ -> raise Not_found ]
+  with
+  [ Not_found ->
       do {
         Wserver.wprint ">%%foreach;%s" s;
         List.iter (fun s -> Wserver.wprint ".%s" s) sl;
         Wserver.wprint "?";
        } ]
+and print_foreach_family conf base env ((p, _) as ep) al =
+  let u = uoi base p.cle_index in
+  Array.iter
+    (fun ifam ->
+       let env = [("fam", Vfam ifam) :: env] in
+       List.iter (print_ast conf base env ep) al)
+    u.family
 and print_foreach_related conf base env ((p, _) as ep) al =
   List.iter
     (fun ip ->
@@ -176,35 +191,20 @@ and print_foreach_relation conf base env ((p, _) as ep) al =
           | (_, None) -> () ])
          [(0, r.r_fath); (1, r.r_moth)])
     p.rparents
-and print_foreach_spouse conf base env ((p, _) as ep) al =
-  let u = uoi base p.cle_index in
-  Array.iter
-    (fun ifam ->
-       let cpl = coi base ifam in
-       let c = spouse p.cle_index cpl in
-       let c = pget conf base c in
-       let env = [("spouse", Vind c) :: env] in
-       if (p_first_name base c <> "?" || p_surname base c <> "?")
-          && not (is_hidden c)
-       then
-         List.iter (print_ast conf base env ep) al
-       else ())
-    u.family
 and print_foreach_witness conf base env ((p, _) as ep) al =
-  let u = uoi base p.cle_index in
-  Array.iter
-    (fun ifam ->
-       let fam = foi base ifam in
-       Array.iter
-         (fun ip ->
-            let w = pget conf base ip in
-            if is_hidden w then ()
-            else
-              let env = [("witness", Vind w) :: env] in
-              List.iter (print_ast conf base env ep) al
-         )
-         fam.witnesses)
-    u.family
+  match get_env "fam" env with
+  [ Vfam ifam ->
+      let fam = foi base ifam in
+      Array.iter
+        (fun ip ->
+           let w = pget conf base ip in
+           if is_hidden w then ()
+           else
+             let env = [("witness", Vind w) :: env] in
+             List.iter (print_ast conf base env ep) al
+        )
+        fam.witnesses
+  | _ -> raise Not_found ]
 ;
 
 value print conf base p =
