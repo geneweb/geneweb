@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.33 2005-05-09 04:43:42 ddr Exp $
+# $Id: Makefile,v 4.34 2005-05-09 05:11:20 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -94,7 +94,16 @@ i18n_check.out: i18n_check.cmo
 
 i18n: pr_transl.cmo always
 	if test -f i18n; then mv i18n i18n.bak; fi
-	export LC_ALL=C; OBJS=`(grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; (for i in $$OBJS; do echo $$i 1>&2; camlp4r ./ppdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done; grep -h "\[" ../hd/etc/*.txt ../hd/lang/start_utf8.txt ../hd/lang/advanced.txt | grep -v "%\[" | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//") | sort | uniq | grep -v '^$$' > i18n
+	export LC_ALL=C; \
+	OBJS=$$((grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq); \
+	( \
+	  for i in $$OBJS; do \
+	    echo $$i 1>&2; \
+	    camlp4r ./ppdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; \
+	  done; \
+	  cat ../hd/etc/*.txt ../hd/lang/start_utf8.txt ../hd/lang/advanced.txt | grep -v "%\[" | grep "\[" | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//" \
+	) | \
+	sort | uniq | grep -v '^$$' > i18n
 
 ppdef:
 	$(MAKE) ppdef.cmo CAMLP4F= PPDEF=
