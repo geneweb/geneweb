@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.84 2005-05-10 21:40:47 ddr Exp $ *)
+(* $Id: perso.ml,v 4.85 2005-05-10 23:49:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -779,6 +779,10 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       [ (Vstring s, _) -> s
       | (_, [nn :: _]) when p_auth -> sou base nn
       | _ -> raise Not_found ]
+  | "auto_image_file_name" ->
+      match auto_image_file conf base p with
+      [ Some s when p_auth -> s
+      | _ -> "" ]
   | "birth_place" ->
       if p_auth then string_of_place conf base p.birth_place else ""
   | "baptism_place" ->
@@ -823,10 +827,15 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       if p_auth then string_of_place conf base p.death_place else ""
   | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
+      (* deprecated since 5.00: rather use "i=%fam_index;;ip=%fam_index;" *)
       match get_env "fam" env with
       [ Vfam fam _ _ ->
           Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
             (Adef.int_of_iper p.cle_index)
+      | _ -> raise Not_found ]
+  | "fam_index" ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ -> string_of_int (Adef.int_of_ifam fam.fam_index)
       | _ -> raise Not_found ]
   | "father_age_at_birth" -> string_of_parent_age conf base ep father
   | "first_name" ->
@@ -837,6 +846,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "first_name_key_val" ->
       if conf.hide_names && not p_auth then ""
       else Name.lower (p_first_name base p)
+  | "image" -> if not p_auth then "" else sou base p.image
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
   | "image_url" -> string_of_image_url conf base env ep False

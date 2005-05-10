@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: updmenu.ml,v 4.1 2005-05-09 04:43:42 ddr Exp $ *)
+(* $Id: updmenu.ml,v 4.2 2005-05-10 23:49:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -34,25 +34,27 @@ value extract_var sini s =
 ;
 
 value rec eval_var conf base env ep loc sl =
-  try VVbool (eval_bool_var conf base ep loc sl) with
-  [ Not_found -> VVstring (eval_str_var conf base env ep loc sl) ]
-and eval_bool_var conf base (p, p_auth_name) loc =
+  try eval_simple_var conf base env ep loc sl with
+  [ Not_found -> eval_person_var conf base env ep loc sl ]
+and eval_simple_var conf base env ep loc sl =
+  try VVbool (eval_simple_bool_var conf base ep loc sl) with
+  [ Not_found -> VVstring (eval_simple_str_var conf base env ep loc sl) ]
+and eval_simple_bool_var conf base (p, p_auth_name) loc =
   fun
   [ ["has_parents"] -> parents (aoi base p.cle_index) <> None
   | ["is_female"] -> p.sex = Female
   | ["is_male"] -> p.sex = Male
   | _ -> raise Not_found ]
-and eval_str_var conf base env (p, p_auth_name) loc =
+and eval_simple_str_var conf base env (p, p_auth_name) loc =
   fun
   [ ["auto_image_file_name"] ->
       match auto_image_file conf base p with
       [ Some s when p_auth_name -> s
       | _ -> "" ]
-  | ["cnt"] ->
-      match get_env "cnt" env with
+  | ["family_cnt"] ->
+      match get_env "fam_cnt" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
-  | ["first_name"] -> if not p_auth_name then "x" else p_first_name base p
   | ["fam_father"] ->
       match get_env "fam" env with
       [ Vfam ifam -> string_of_int (Adef.int_of_iper (father (coi base ifam)))
@@ -79,7 +81,6 @@ and eval_str_var conf base env (p, p_auth_name) loc =
           string_of_int n ]
   | ["nb_families"] ->
       string_of_int (Array.length (uoi base p.cle_index).family)
-  | ["occ"] -> if p_auth_name then string_of_int p.occ else ""
   | ["prev_fam_father"] ->
       match get_env "prev_fam" env with
       [ Vfam ifam -> string_of_int (Adef.int_of_iper (father (coi base ifam)))
@@ -92,20 +93,32 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match get_env "prev_fam" env with
       [ Vfam ifam -> string_of_int (Adef.int_of_iper (mother (coi base ifam)))
       | _ -> "" ]
-  | ["spouse"] ->
-      match get_env "fam" env with
-      [ Vfam ifam ->
-          let p = poi base (spouse p.cle_index (coi base ifam)) in
-          p_first_name base p ^
-            (if p.occ = 0 then "" else "." ^ string_of_int p.occ) ^ " " ^
-            p_surname base p
-      | _ -> "" ]
-  | ["surname"] -> if not p_auth_name then "x" else p_surname base p
   | [s] ->
       let v = extract_var "bvar_" s in
       if v <> "" then try List.assoc v conf.base_env with [ Not_found -> "" ]
       else raise Not_found
   |_ -> raise Not_found ]
+and eval_person_var conf base env ((p, _) as ep) loc =
+  fun
+  [ ["spouse" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam ifam ->
+          let p = poi base (spouse p.cle_index (coi base ifam)) in
+          let p_auth_name = authorized_age conf base p || not conf.hide_names in
+          let ep = (p, p_auth_name) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | sl -> eval_person_field_var conf base env ep loc sl ]
+and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
+  fun
+  [ [s] -> VVstring (eval_str_person_field conf base env ep s)
+  | _ -> raise Not_found ]
+and eval_str_person_field conf base env ((p, p_auth_name) as ep) =
+  fun
+  [ "first_name" -> if not p_auth_name then "x" else p_first_name base p
+  | "occ" -> if p_auth_name then string_of_int p.occ else ""
+  | "surname" -> if not p_auth_name then "x" else p_surname base p
+  | _ -> raise Not_found ]
 ;
 
 value rec eval_ast conf base env ep =
@@ -163,7 +176,7 @@ and print_foreach_family conf base env ((p, p_auth) as ep) al =
     if i = Array.length a then ()
     else
       let ifam = a.(i) in
-      let env = [("fam", Vfam ifam); ("cnt", Vint (i + 1)) :: env] in
+      let env = [("fam", Vfam ifam); ("fam_cnt", Vint (i + 1)) :: env] in
       let env =
         match prev_fam with
         [ Some ifam -> [("prev_fam", Vfam ifam) :: env]
