@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.83 2005-05-09 19:48:34 ddr Exp $ *)
+(* $Id: perso.ml,v 4.84 2005-05-10 21:40:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -402,11 +402,7 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   | _ -> raise Not_found ]
 and eval_simple_str_var conf base env (_, _, _, p_auth) =
   fun
-  [ ["alias"] ->
-      match get_env "alias" env with
-      [ Vstring s -> s
-      | _ -> raise Not_found ]
-  | ["child_cnt"] -> string_of_int_env "child_cnt" env
+  [ ["child_cnt"] -> string_of_int_env "child_cnt" env
   | ["comment"] ->
       match get_env "fam" env with
       [ Vfam fam _ _ ->
@@ -676,7 +672,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
             a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
         | _ -> False ]
       else False
-  | "has_aliases" -> p.aliases <> []
+  | "has_aliases" -> p_auth && p.aliases <> []
   | "has_baptism_date" -> p_auth && p.baptism <> Adef.codate_None
   | "has_baptism_place" -> p_auth && sou base p.baptism_place <> ""
   | "has_birth_date" -> p_auth && p.birth <> Adef.codate_None
@@ -718,8 +714,8 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
   | "has_notes" -> p_auth && sou base p.notes <> ""
   | "has_occupation" -> p_auth && sou base p.occupation <> ""
   | "has_parents" -> parents a <> None
-  | "has_public_name" -> sou base p.public_name <> ""
-  | "has_qualifiers" -> p.qualifiers <> []
+  | "has_public_name" -> p_auth && sou base p.public_name <> ""
+  | "has_qualifiers" -> p_auth && p.qualifiers <> []
   | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
@@ -778,6 +774,11 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           let a = time_gone_by d conf.today in
           Date.string_of_age conf a
       | _ -> "" ]
+  | "alias" ->
+      match (get_env "alias" env, p.aliases) with
+      [ (Vstring s, _) -> s
+      | (_, [nn :: _]) when p_auth -> sou base nn
+      | _ -> raise Not_found ]
   | "birth_place" ->
       if p_auth then string_of_place conf base p.birth_place else ""
   | "baptism_place" ->
@@ -833,10 +834,16 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "first_name_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_first_name base p))
+  | "first_name_key_val" ->
+      if conf.hide_names && not p_auth then ""
+      else Name.lower (p_first_name base p)
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
   | "image_url" -> string_of_image_url conf base env ep False
-  | "ind_access" -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  | "ind_access" ->
+      (* deprecated since 5.00: rather use "i=%index;" *)
+      "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
   | "mother_age_at_birth" -> string_of_parent_age conf base ep mother
   | "misc_names" ->
       if p_auth then
@@ -910,11 +917,11 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           let d = Adef.date_of_cdate d in
           Date.string_of_ondate conf d
       | _ -> "" ]
-  | "public_name" -> sou base p.public_name
+  | "public_name" -> if not p_auth then "" else sou base p.public_name
   | "qualifier" ->
       match (get_env "qualifier" env, p.qualifiers) with
       [ (Vstring nn, _) -> nn
-      | (_, [nn :: _]) -> sou base nn
+      | (_, [nn :: _]) when p_auth -> sou base nn
       | _ -> raise Not_found ]
   | "sosa_link" ->
       match get_env "sosa" env with
@@ -937,6 +944,9 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "surname_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_surname base p))
+  | "surname_key_val" ->
+      if conf.hide_names && not p_auth then ""
+      else Name.lower (p_surname base p)
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
@@ -1080,6 +1090,11 @@ value rec eval_ast conf base env ep =
       let s1 = String.concat "" (List.map eval_ast al1) in
       let s2 = String.concat "" (List.map eval_ast al2) in
       capitale (transl_a_of_gr_eq_gen_lev conf s1 s2)
+  | AapplyWithAst "nth" [al1; al2] ->
+      let eval_ast = eval_ast conf base env ep in
+      let s1 = String.concat "" (List.map eval_ast al1) in
+      let s2 = String.concat "" (List.map eval_ast al2) in
+      Util.nth_field s1 (try int_of_string s2 with [ Failure _ -> 0 ])
   | AapplyWithAst f all -> eval_apply conf base env ep f all
   | x -> not_impl "eval_ast" x ]
 and eval_apply conf base env ep f all =
@@ -1185,11 +1200,13 @@ and print_simple_foreach conf base env al ini_ep ep efam =
   | "witness_relation" -> print_foreach_witness_relation conf base env al ep
   | s -> Wserver.wprint " %%foreach;%s?" s ]
 and print_foreach_alias conf base env al ((p, _, _, p_auth) as ep) =
-  List.iter
-    (fun a ->
-       let env = [("alias", Vstring (sou base a)) :: env] in
-       List.iter (print_ast conf base env ep) al)
-    p.aliases
+  if p_auth then
+    List.iter
+      (fun a ->
+         let env = [("alias", Vstring (sou base a)) :: env] in
+         List.iter (print_ast conf base env ep) al)
+      p.aliases
+  else ()
 and print_foreach_child conf base env al ep =
   fun
   [ Vfam _ _ des ->
@@ -1273,13 +1290,15 @@ and print_foreach_parent conf base env al ((_, a, _, _) as ep) =
            List.iter (print_ast conf base env ep) al)
         (parent_array cpl)
   | None -> () ]
-and print_foreach_qualifier conf base env al ((p, _, _, _) as ep) =
-  list_iter_first
-    (fun first nn ->
-       let env = [("qualifier", Vstring (sou base nn)) :: env] in
-       let env = [("first", Vbool first) :: env] in
-       List.iter (print_ast conf base env ep) al)
-    p.qualifiers
+and print_foreach_qualifier conf base env al ((p, _, _, p_auth) as ep) =
+  if p_auth then
+    list_iter_first
+      (fun first nn ->
+         let env = [("qualifier", Vstring (sou base nn)) :: env] in
+         let env = [("first", Vbool first) :: env] in
+         List.iter (print_ast conf base env ep) al)
+      p.qualifiers
+  else ()
 and print_foreach_relation conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     List.iter
@@ -1381,12 +1400,14 @@ and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
       List.iter (print_ast conf base env ep) al
   in
   List.iter print_src srcl
-and print_foreach_surname_alias conf base env al ((p, _, _, _) as ep) =
-  List.iter
-    (fun s ->
-       let env = [("surname_alias", Vstring (sou base s)) :: env] in
-       List.iter (print_ast conf base env ep) al)
-    p.surnames_aliases
+and print_foreach_surname_alias conf base env al ((p, _, _, p_auth) as ep) =
+  if p_auth then
+    List.iter
+      (fun s ->
+         let env = [("surname_alias", Vstring (sou base s)) :: env] in
+         List.iter (print_ast conf base env ep) al)
+      p.surnames_aliases
+  else ()
 and print_foreach_witness conf base env al ep =
   fun
   [ Vfam fam _ _ ->
@@ -1447,31 +1468,25 @@ and print_foreach_witness_relation conf base env al ((p, _, _, _) as ep) =
     list
 ;
 
-value interp_templ conf base p astl =
+value interp_templ templ_fname conf base p =
+  let astl = Templ.input conf templ_fname in
   let a = aget conf base p.cle_index in
   let u = uget conf base p.cle_index in
   let ep = (p, a, u, authorized_age conf base p) in
   let env =
-    let env = [] in
-    let env =
-      let v = find_sosa conf base p in [("sosa", Vsosa v) :: env]
-    in
-    let env = [("p_auth", Vbool (authorized_age conf base p)) :: env] in
-    let env = [("p", Vind p a u) :: env] in env
+    let v = find_sosa conf base p in
+    [("p", Vind p a u);
+     ("p_auth", Vbool (authorized_age conf base p));
+     ("sosa", Vsosa v)]
   in
-  List.iter (print_ast conf base env ep) astl
-;
-
-(* Main *)
-
-value print_ok conf base p =
-  let astl = Templ.input conf "perso" in
   do {
     html conf;
     nl ();
-    interp_templ conf base p astl
+    List.iter (print_ast conf base env ep) astl
   }
 ;
+
+(* Main *)
 
 value print conf base p =
   let passwd =
@@ -1488,5 +1503,6 @@ value print conf base p =
   match passwd with
   [ Some (src, passwd) when passwd <> conf.passwd ->
       Util.unauthorized conf src
-  | _ -> print_ok conf base p ]
+  | _ ->
+      interp_templ "perso" conf base p ]
 ;
