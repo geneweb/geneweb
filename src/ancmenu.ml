@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ancmenu.ml,v 4.3 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: ancmenu.ml,v 4.4 2005-05-10 11:29:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -10,6 +10,7 @@ open TemplAst;
 
 type env = 
   [ Vint of int
+  | Vlazy of Lazy.t env
   | Vfun of list string and list ast
   | Vnone ]
 ;
@@ -25,7 +26,7 @@ value not_impl func x =
   ">Ascmenu." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
 ;
 
-value max_ancestor_level conf base ip =
+value max_anc_level conf base ip =
 (*
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
@@ -70,14 +71,14 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match p.aliases with
       [ [nn :: _] -> if not p_auth_name then "" else sou base nn
       | [] -> "" ]
+  | ["anc_level"] ->
+      match get_env "anc_level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
   | ["first_name"] -> if not p_auth_name then "x" else p_first_name base p
   | ["first_name_key_val"] ->
       if not p_auth_name then "" else Name.lower (p_first_name base p)
   | ["index"] -> string_of_int (Adef.int_of_iper p.cle_index)
-  | ["level"] ->
-      match get_env "level" env with
-      [ Vint i -> string_of_int i
-      | _ -> "" ]
   | ["main_title_ident"] ->
       match Util.main_title base p with
       [ Some t when p_auth_name -> sou base t.t_ident
@@ -86,9 +87,12 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match Util.main_title base p with
       [ Some t when p_auth_name -> sou base t.t_place
       | _ -> "" ]
-  | ["max_level"] ->
-      match get_env "max_level" env with
-      [ Vint i -> string_of_int i
+  | ["max_anc_level"] ->
+      match get_env "max_anc_level" env with
+      [ Vlazy l ->
+	  match Lazy.force l with
+	  [ Vint i -> string_of_int i
+	  | _ -> "" ]
       | _ -> "" ]
   | ["occ"] -> if p_auth_name then string_of_int p.occ else ""
   | ["prefix_no_iz"] ->
@@ -167,23 +171,26 @@ and print_if conf base env p e alt ale =
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env ep (loc, s, sl) al =
   match [s :: sl] with
-  [ ["level"] -> print_foreach_level conf base env ep al
+  [ ["anc_level"] -> print_foreach_anc_level conf base env ep al
   | _ ->
       do {
         Wserver.wprint ">%%foreach;%s" s;
         List.iter (fun s -> Wserver.wprint ".%s" s) sl;
         Wserver.wprint "?";
        } ]
-and print_foreach_level conf base env ((p, _) as ep) al =
+and print_foreach_anc_level conf base env ((p, _) as ep) al =
   let max_level =
-    match get_env "max_level" env with
-    [ Vint n -> n
+    match get_env "max_anc_level" env with
+    [ Vlazy l ->
+        match Lazy.force l with
+	[ Vint n -> n
+	| _ -> -1 ]
     | _ -> -1 ]
   in
   loop 1 where rec loop i =
     if i > max_level + 1 then ()
     else
-      let env = [("level", Vint i) :: env] in
+      let env = [("anc_level", Vint i) :: env] in
       do {
         List.iter (print_ast conf base env ep) al;
         loop (succ i)
@@ -191,13 +198,14 @@ and print_foreach_level conf base env ((p, _) as ep) al =
 ;
 
 value print conf base p =
-  let max_level = max_ancestor_level conf base p.cle_index in
   let astl = Templ.input conf "ancmenu" in
+  let max_level = lazy (Vint (max_anc_level conf base p.cle_index)) in
   let p_auth_name = authorized_age conf base p || not conf.hide_names in
-  let env = [("max_level", Vint max_level)] in
+  let env = [("max_anc_level", Vlazy max_level)] in
   let ep = (p, p_auth_name) in
   do {
-    Util.html1 conf;
+    Util.html conf;
+    Util.nl ();
     List.iter (print_ast conf base env ep) astl;
   }
 ;
