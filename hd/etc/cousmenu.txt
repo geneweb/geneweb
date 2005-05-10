@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: cousmenu.txt,v 4.1 2005-05-08 12:09:34 ddr Exp $ -->
+  <!-- $Id: cousmenu.txt,v 4.2 2005-05-10 03:22:37 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -58,10 +58,10 @@
       %hidden;
       <input type="hidden" name="m" value="C"%/>
       %if;access_by_key;
-        <input type="hidden" name="ep" value="%first_name_key_val;"%/>
-        <input type="hidden" name="en" value="%surname_key_val;"%/>
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
         %if;(occ != "0")
-          <input type="hidden" name="eoc" value="%occ;"%/>
+          <input type="hidden" name="oc" value="%occ;"%/>
         %end;
       %else
         <input type="hidden" name="i" value="%index;"%/>
