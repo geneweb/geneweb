@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.1 2005-05-09 04:43:42 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.2 2005-05-10 23:49:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -66,7 +66,7 @@
   </td>
   <td valign="top">
     %foreach;family;
-      %if;(cnt != 1)
+      %if;(family_cnt != 1)
         <a href="%prefix;m=INV_FAM;i=%index;;f=%fam_index;">[*invert]</a>
         <br%/>
         %if;(fam_father = prev_fam_father and fam_mother = prev_fam_mother)
@@ -78,11 +78,11 @@
       %end;
       <a href="%prefix;m=MOD_FAM;i=%fam_index;;ip=%index">%nn;
       [*modify::family/families]0</a>
-      <em>[with] %spouse;</em>
+      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br%/>
       <a href="%prefix;m=DEL_FAM;i=%fam_index;;ip=%index">%nn;
       [*delete::family/families]0</a>
-      <em>[with] %spouse;</em>
+      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br%/>
     %end;
     <br%/>
