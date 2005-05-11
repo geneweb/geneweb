@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: updmenu.ml,v 4.2 2005-05-10 23:49:02 ddr Exp $ *)
+(* $Id: updmenu.ml,v 4.3 2005-05-11 09:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -113,7 +113,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   fun
   [ [s] -> VVstring (eval_str_person_field conf base env ep s)
   | _ -> raise Not_found ]
-and eval_str_person_field conf base env ((p, p_auth_name) as ep) =
+and eval_str_person_field conf base env (p, p_auth_name) =
   fun
   [ "first_name" -> if not p_auth_name then "x" else p_first_name base p
   | "occ" -> if p_auth_name then string_of_int p.occ else ""
