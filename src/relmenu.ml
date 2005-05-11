@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: relmenu.ml,v 4.4 2005-05-09 11:44:57 ddr Exp $ *)
+(* $Id: relmenu.ml,v 4.5 2005-05-11 14:44:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -11,7 +11,7 @@ open TemplAst;
 type env = 
   [ Vind of person
   | Vfam of Adef.ifam
-  | Vrel of string and person
+  | Vrel of relation and option person
   | Vfun of list string and list ast
   | Vnone ]
 ;
@@ -28,13 +28,21 @@ value not_impl func x =
 ;
 
 value rec eval_var conf base env ep loc sl =
-  try VVbool (eval_bool_var conf base ep loc sl) with
+  try VVbool (eval_bool_var conf base env ep loc sl) with
   [ Not_found -> VVstring (eval_str_var conf base env ep loc sl) ]
-and eval_bool_var conf base (p, p_auth_name) loc =
+and eval_bool_var conf base env (p, p_auth_name) loc =
   fun
   [ ["access_by_key"] ->
       Util.accessible_by_key conf base p (p_first_name base p)
         (p_surname base p)
+  | ["has_relation_her"] ->
+      match get_env "relation" env with
+      [ Vrel {r_moth = Some _} None -> True
+      | _ -> False ]
+  | ["has_relation_him"] ->
+      match get_env "relation" env with
+      [ Vrel {r_fath = Some _} None -> True
+      | _ -> False ]
   | ["sosa_ref"] -> Util.find_sosa_ref conf base <> None
   | _ -> raise Not_found ]
 and eval_str_var conf base env (p, p_auth_name) loc =
@@ -55,27 +63,71 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       | [] -> "" ]
   | ["related"] ->
       match get_env "related" env with
-      [ Vrel txt p -> person_title_text conf base p
+      [ Vrel _ (Some p) -> simple_person_text conf base p p_auth_name
       | _ -> "" ]
-  | ["related_index"] ->
+  | ["related"; "index"] ->
       match get_env "related" env with
-      [ Vrel txt p -> string_of_int (Adef.int_of_iper p.cle_index)
+      [ Vrel _ (Some p) -> string_of_int (Adef.int_of_iper p.cle_index)
       | _ -> "" ]
-  | ["related_type"] ->
+  | ["related"; "nobility_title"] ->
       match get_env "related" env with
-      [ Vrel txt p -> txt
+      [ Vrel _ (Some p) ->
+          match Util.main_title base p with
+          [ Some t when p_auth_name ->
+              let id = sou base t.t_ident in
+              let pl = sou base t.t_place in
+              if pl = "" then id else id ^ " " ^ pl
+          | _ -> "" ]
       | _ -> "" ]
-  | ["relation"] ->
-      match get_env "relation" env with
-      [ Vrel txt p -> person_title_text conf base p
+  | ["related"; "type"] ->
+      match get_env "related" env with
+      [ Vrel r (Some c) -> rchild_type_text conf r.r_type (index_of_sex c.sex)
       | _ -> "" ]
-  | ["relation_index"] ->
+  | ["relation_her"] ->
       match get_env "relation" env with
-      [ Vrel txt p -> string_of_int (Adef.int_of_iper p.cle_index)
+      [ Vrel {r_moth = Some ip} None ->
+           simple_person_text conf base (poi base ip) p_auth_name
       | _ -> "" ]
-  | ["relation_type"] ->
+  | ["relation_him"] ->
       match get_env "relation" env with
-      [ Vrel txt p -> txt
+      [ Vrel {r_fath = Some ip} None ->
+          simple_person_text conf base (poi base ip) p_auth_name
+      | _ -> "" ]
+  | ["relation_her"; "nobility_title"] ->
+      match get_env "relation" env with
+      [ Vrel {r_moth = Some ip} None ->
+          match Util.main_title base (poi base ip) with
+          [ Some t when p_auth_name ->
+              let id = sou base t.t_ident in
+              let pl = sou base t.t_place in
+              if pl = "" then id else id ^ " " ^ pl
+          | _ -> "" ]
+      | _ -> "" ]
+  | ["relation_him"; "nobility_title"] ->
+      match get_env "relation" env with
+      [ Vrel {r_fath = Some ip} None ->
+          match Util.main_title base (poi base ip) with
+          [ Some t when p_auth_name ->
+              let id = sou base t.t_ident in
+              let pl = sou base t.t_place in
+              if pl = "" then id else id ^ " " ^ pl
+          | _ -> "" ]
+      | _ -> "" ]
+  | ["relation_her"; "index"] ->
+      match get_env "relation" env with
+      [ Vrel {r_moth = Some ip} None -> string_of_int (Adef.int_of_iper ip)
+      | _ -> "" ]
+  | ["relation_him"; "index"] ->
+      match get_env "relation" env with
+      [ Vrel {r_fath = Some ip} None -> string_of_int (Adef.int_of_iper ip)
+      | _ -> "" ]
+  | ["relation_her"; "type"] ->
+      match get_env "relation" env with
+      [ Vrel {r_type = rt} None -> relation_type_text conf rt 1
+      | _ -> "" ]
+  | ["relation_him"; "type"] ->
+      match get_env "relation" env with
+      [ Vrel {r_type = rt} None -> relation_type_text conf rt 0
       | _ -> "" ]
   | ["sosa_link"] ->
       match Util.find_sosa_ref conf base with
@@ -85,26 +137,44 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match get_env "fam" env with
       [ Vfam ifam ->
           let p = poi base (spouse p.cle_index (coi base ifam)) in
-          person_title_text conf base p
+          simple_person_text conf base p p_auth_name
       | _ -> raise Not_found ]
-  | ["spouse_index"] ->
+  | ["spouse"; "index"] ->
       match get_env "fam" env with
       [ Vfam ifam ->
           let ip = spouse p.cle_index (coi base ifam) in
           string_of_int (Adef.int_of_iper ip)
+      | _ -> raise Not_found ]
+  | ["spouse"; "nobility_title"] ->
+      match get_env "fam" env with
+      [ Vfam ifam ->
+          let ip = spouse p.cle_index (coi base ifam) in
+          match Util.main_title base (poi base ip) with
+          [ Some t when p_auth_name ->
+              let id = sou base t.t_ident in
+              let pl = sou base t.t_place in
+              if pl = "" then id else id ^ " " ^ pl
+          | _ -> "" ]
       | _ -> raise Not_found ]
   | ["surname"] -> if not p_auth_name then "x" else p_surname base p
   | ["surname_key_val"] ->
       if not p_auth_name then "" else Name.lower (p_surname base p)
   | ["witness"] ->
       match get_env "witness" env with
-      [ Vind p -> person_title_text conf base p
+      [ Vind p -> simple_person_text conf base p p_auth_name
       | _ -> raise Not_found ]
-  | ["witness_index"] ->
+  | ["witness"; "index"] ->
       match get_env "witness" env with
       [ Vind p -> string_of_int (Adef.int_of_iper p.cle_index)
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
+and simple_person_text conf base p p_auth =
+  if p_auth then
+    match main_title base p with
+    [ Some t -> titled_person_text conf base p t
+    | None -> person_text conf base p ]
+  else if conf.hide_names then "x x"
+  else person_text conf base p
 ;
 
 value rec print_ast conf base env ep =
@@ -168,9 +238,7 @@ and print_foreach_related conf base env ((p, _) as ep) al =
               List.iter
                 (fun
                  [ Some ip1 when p.cle_index == ip1 ->
-                     let rs = index_of_sex c.sex in
-                     let txt = rchild_type_text conf r.r_type rs in
-                     let env = [("related", Vrel txt c) :: env] in
+                     let env = [("related", Vrel r (Some c)) :: env] in
                      List.iter (print_ast conf base env ep) al
                  | _ -> () ])
                 [r.r_fath; r.r_moth])
@@ -179,17 +247,8 @@ and print_foreach_related conf base env ((p, _) as ep) al =
 and print_foreach_relation conf base env ((p, _) as ep) al =
   List.iter
     (fun r ->
-       List.iter
-         (fun
-          [ (rs, Some ic) ->
-              let c = pget conf base ic in
-              if is_hidden c then ()
-              else
-                let txt = relation_type_text conf r.r_type rs in
-                let env = [("relation", Vrel txt (poi base ic)) :: env] in
-                List.iter (print_ast conf base env ep) al
-          | (_, None) -> () ])
-         [(0, r.r_fath); (1, r.r_moth)])
+       let env = [("relation", Vrel r None) :: env] in
+       List.iter (print_ast conf base env ep) al)
     p.rparents
 and print_foreach_witness conf base env ((p, _) as ep) al =
   match get_env "fam" env with

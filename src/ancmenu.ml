@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ancmenu.ml,v 4.4 2005-05-10 11:29:17 ddr Exp $ *)
+(* $Id: ancmenu.ml,v 4.5 2005-05-11 14:44:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -90,9 +90,9 @@ and eval_str_var conf base env (p, p_auth_name) loc =
   | ["max_anc_level"] ->
       match get_env "max_anc_level" env with
       [ Vlazy l ->
-	  match Lazy.force l with
-	  [ Vint i -> string_of_int i
-	  | _ -> "" ]
+          match Lazy.force l with
+          [ Vint i -> string_of_int i
+          | _ -> "" ]
       | _ -> "" ]
   | ["occ"] -> if p_auth_name then string_of_int p.occ else ""
   | ["prefix_no_iz"] ->
@@ -183,8 +183,8 @@ and print_foreach_anc_level conf base env ((p, _) as ep) al =
     match get_env "max_anc_level" env with
     [ Vlazy l ->
         match Lazy.force l with
-	[ Vint n -> n
-	| _ -> -1 ]
+        [ Vint n -> n
+        | _ -> -1 ]
     | _ -> -1 ]
   in
   loop 1 where rec loop i =
