@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.5 2005-05-09 11:44:57 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.6 2005-05-11 14:44:58 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -90,25 +90,43 @@
   %if;(spouse != "? ?")
     <li>
       <label>
-        <input type="radio" name="select" value="%spouse_index;"%/>
-        %spouse;%nl;
+        <input type="radio" name="select" value="%spouse.index;"%/>
+        %spouse;
+        %if;(spouse.nobility_title != ""),%sp;
+        <em>%spouse.nobility_title;</em>%end;%nl;
       </label>
     </li>
   %end;
 %end;
 %foreach;relation;
-<li>
-  <label>
-    <input type="radio" name="select" value="%relation_index;"%/>
-    (%relation_type;)%nl;%relation;%nl;
-  </label>
-</li>
+  %if;has_relation_him;
+  <li>
+    <label>
+      <input type="radio" name="select" value="%relation_him.index;"%/>
+      (%relation_him.type;)%nl;%relation_him;
+      %if;(relation_him.nobility_title != ""),%sp;
+      <em>%relation_him.nobility_title;</em>%end;%nl;
+    </label>
+  </li>
+  %end;
+  %if;has_relation_her;
+  <li>
+    <label>
+      <input type="radio" name="select" value="%relation_her.index;"%/>
+      (%relation_her.type;)%nl;%relation_her;
+      %if;(relation_her.nobility_title != ""),%sp;
+      <em>%relation_her.nobility_title;</em>%end;%nl;
+    </label>
+  </li>
+  %end;
 %end;
 %foreach;related;
 <li>
   <label>
-    <input type="radio" name="select" value="%related_index;"%/>
-    (%related_type;)%nl;%related;%nl;
+    <input type="radio" name="select" value="%related.index;"%/>
+    (%related.type;)%nl;%related;
+    %if;(related.nobility_title != ""),%sp;
+    <em>%related.nobility_title;</em>%end;%nl;
   </label>
 </li>
 %end;
@@ -116,7 +134,7 @@
   %foreach;witness;
   <li>
     <label>
-      <input type="radio" name="select" value="%witness_index;"%/>
+      <input type="radio" name="select" value="%witness.index;"%/>
       ([witness/witnesses]0)%nl;%witness;%nl;
     </label>
   </li>

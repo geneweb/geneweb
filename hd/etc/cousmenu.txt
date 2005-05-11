@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: cousmenu.txt,v 4.2 2005-05-10 03:22:37 ddr Exp $ -->
+  <!-- $Id: cousmenu.txt,v 4.3 2005-05-11 14:44:58 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -77,9 +77,9 @@
             %apply;nth_cousins%with;
               %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
             %end;
-	  %end;
+          %end;
           </option>
-	%end;
+         %end;
       </select>
       <input type="submit" value="Ok"%/>
       <br%/>
