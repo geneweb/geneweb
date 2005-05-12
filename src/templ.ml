@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.40 2005-05-12 02:51:10 ddr Exp $ *)
+(* $Id: templ.ml,v 4.41 2005-05-12 20:14:24 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -349,7 +349,7 @@ value open_templ conf dir name =
     in
     try Some (Secure.open_in fname) with
     [ Sys_error _ ->
-        if dir = conf.bname then
+        if (*dir = conf.bname*)True(**) then
           try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
         else None ]
 ;
@@ -397,7 +397,10 @@ value input conf fname =
         [ [] | ["*"] -> ""
         | [x :: _] -> x ] ]
   in
-  let dir = Filename.basename dir in
+  let dir =
+    if dir = "" then Filename.current_dir_name
+    else Filename.basename dir
+  in
   match open_templ conf dir fname with
   [ Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in

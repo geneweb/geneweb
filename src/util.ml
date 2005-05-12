@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.129 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: util.ml,v 4.130 2005-05-12 20:14:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -17,7 +17,7 @@ value set_base_dir = Secure.set_base_dir;
 add_lang_path sharelib;
 add_lang_path Filename.current_dir_name;
 
-value cnt_dir = ref "";
+value cnt_dir = ref Filename.current_dir_name;
 value images_url = ref "";
 
 value search_in_path p s =
