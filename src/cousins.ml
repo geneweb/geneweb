@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.19 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.20 2005-05-12 14:32:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -417,7 +417,7 @@ value print_anniv conf base p level =
 value print conf base p =
   let max_lev =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
-    [ Not_found | Failure _ -> Cousmenu.default_max_lev ]
+    [ Not_found | Failure _ -> Perso.default_max_cousin_lev ]
   in
   match (p_getint conf.env "v1", p_getenv conf.env "t") with
   [ (Some lev1, _) ->

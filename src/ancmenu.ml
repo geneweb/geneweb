@@ -1,7 +1,8 @@
 (* camlp4r *)
-(* $Id: ancmenu.ml,v 4.7 2005-05-12 13:42:10 ddr Exp $ *)
+(* $Id: ancmenu.ml,v 4.8 2005-05-12 14:32:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
+(*
 open Config;
 open Def;
 open Gutil;
@@ -229,3 +230,6 @@ value print conf =
   (if p_getenv conf.env "new" = Some "on" then Perso.interp_templ "ancmenu"
    else print) conf
 ;
+*)
+
+value print = Perso.interp_templ "ancmenu";
