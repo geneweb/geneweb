@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.5 2005-05-10 11:29:17 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.6 2005-05-12 01:17:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -76,16 +76,16 @@
     </p>
     <div>
       <select name="v">
-        %foreach;anc_level;
-          <option value="%anc_level;"%nn;
-            %if(anc_level = 1) selected="selected"%end;>%nn;
-            %if;(anc_level = 1)[*specify::generation/generations]0%nn;
-            %elseif;(anc_level = 2)[*to the parents]%nn;
-            %elseif;(anc_level = 3)[*to the grandparents]%nn;
-            %elseif;(anc_level = 4)[*to the great-grandparents]%nn;
+        %foreach;ancestor_level;
+          <option value="%level;"%nn;
+            %if(level = 1) selected="selected"%end;>%nn;
+            %if;(level = 1)[*specify::generation/generations]0%nn;
+            %elseif;(level = 2)[*to the parents]%nn;
+            %elseif;(level = 3)[*to the grandparents]%nn;
+            %elseif;(level = 4)[*to the great-grandparents]%nn;
             %else;
               %apply;tothegen%with;
-                %apply;nth%with;[nth (generation)]%and;%anc_level;%end;
+                %apply;nth%with;[nth (generation)]%and;%level;%end;
               %end;
             %end;
           </option>
@@ -255,15 +255,8 @@
 
     <p>
       %apply;navsosa%with;
-        <a href="%prefix_no_iz;iz=%index;">%nn;
-          %if;(public_name != "")%public_name;%else;%first_name;%end;
-          %if;(qualifier != "") <em>%qualifier;</em>%end;
-          %if(surname != main_title_place) %surname;%end;
-          %if;(alias != "") <em>(%alias;)</em>%end;
-        </a>%nn;
-        %if;(main_title_place != ""),
-          <em>%main_title_ident; %main_title_place;</em>%nn;
-        %end;
+        <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
+        %if;(nobility_title != ""), <em>%nobility_title;</em>%end;%nl;
       %end;
     </p>
   </td>

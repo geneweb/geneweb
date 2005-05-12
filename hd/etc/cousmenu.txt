@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: cousmenu.txt,v 4.3 2005-05-11 14:44:58 ddr Exp $ -->
+  <!-- $Id: cousmenu.txt,v 4.4 2005-05-12 01:17:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -67,7 +67,7 @@
         <input type="hidden" name="i" value="%index;"%/>
       %end;
       <select name="v1">
-        %foreach;level
+        %foreach;cousin_level;
           <option value="%level;"%if;(level = 2) selected="selected"%end;>%nn;
           %if;(level = 1)[*siblings]%nn;
           %elseif;(level = 2)[*cousins]%nn;
@@ -99,7 +99,7 @@
     </li>
   %end;
 </ul>
-%if;(not dead and (wizard or friend))
+%if;(died = "" and (wizard or friend))
   <ul>
     <li>
       <a href="%prefix;%access;;m=C;t=AN">[*birthdays]</a>

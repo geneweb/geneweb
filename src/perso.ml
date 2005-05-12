@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.86 2005-05-11 14:44:58 ddr Exp $ *)
+(* $Id: perso.ml,v 4.87 2005-05-12 01:17:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -234,6 +234,38 @@ value find_sosa conf base a =
   | None -> None ]
 ;
 
+value max_ancestor_level conf base ip max_lev =
+  let x = ref 0 in
+  let mark = Array.create base.data.persons.len False in
+  let rec loop level ip =
+    if mark.(Adef.int_of_iper ip) then ()
+    else do {
+      mark.(Adef.int_of_iper ip) := True;
+      x.val := max x.val level;
+      if x.val = max_lev then ()
+      else
+        match parents (aget conf base ip) with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            do {
+              loop (succ level) (father cpl); loop (succ level) (mother cpl)
+            }
+        | _ -> () ]
+    }
+  in
+  do { loop 0 ip; x.val }
+;
+
+value default_max_cousin_lev = 5;
+
+value max_cousin_level conf base p =
+  let max_lev =
+    try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
+    [ Not_found | Failure _ -> default_max_cousin_lev ]
+  in
+  max_ancestor_level conf base p.cle_index max_lev + 1
+;
+
 (* Interpretation of template file 'perso.txt' *)
 
 type env =
@@ -245,6 +277,7 @@ type env =
   | Vstring of string
   | Vsosa of option (Num.t * person)
   | Vtitle of person and title_item
+  | Vlazy of Lazy.t env  
   | Vfun of list string and list ast
   | Vnone ]
 and title_item =
@@ -441,6 +474,24 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "fam" env with
       [ Vfam fam _ _ -> if p_auth then sou base fam.marriage_place else ""
       | _ -> raise Not_found ]
+  | "level" ->
+      match get_env "level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
+  | "max_anc_level" ->
+      match get_env "max_anc_level" env with
+      [ Vlazy l ->
+          match Lazy.force l with
+          [ Vint i -> string_of_int i
+          | _ -> "" ]
+      | _ -> "" ]
+  | "max_cous_level" ->
+      match get_env "max_cous_level" env with
+      [ Vlazy l ->
+          match Lazy.force l with
+          [ Vint i -> string_of_int i
+          | _ -> "" ]
+      | _ -> "" ]
   | "nobility_title" ->
       match get_env "nobility_title" env with
       [ Vtitle p t ->
@@ -461,6 +512,8 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
         [ Vfam fam _ _ -> sou base fam.origin_file
         | _ -> "" ]
       else raise Not_found
+  | "prefix_no_iz" ->
+      commd {(conf) with henv = List.remove_assoc "iz" conf.henv}
   | "prefix_no_templ" ->
       let henv =
         List.fold_right
@@ -1216,7 +1269,9 @@ and print_foreach conf base env ini_ep loc s sl al =
 and print_simple_foreach conf base env al ini_ep ep efam =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
+  | "ancestor_level" -> print_foreach_level "max_anc_level" conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
+  | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
   | "family" -> print_foreach_family conf base env al ini_ep ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
   | "nobility_title" -> print_foreach_nobility_title conf base env al ep
@@ -1297,6 +1352,23 @@ and print_foreach_first_name_alias conf base env al ((p, _, _, p_auth) as ep) =
          List.iter (print_ast conf base env ep) al)
       p.first_names_aliases
   else ()
+and print_foreach_level max_lev conf base env al ((p, _, _, _) as ep) =
+  let max_level =
+    match get_env max_lev env with
+    [ Vlazy l ->
+        match Lazy.force l with
+        [ Vint n -> n
+        | _ -> 0 ]
+    | _ -> 0 ]
+  in
+  loop 1 where rec loop i =
+    if i > max_level then ()
+    else
+      let env = [("level", Vint i) :: env] in
+      do {
+        List.iter (print_ast conf base env ep) al;
+        loop (succ i)
+      }
 and print_foreach_nobility_title conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     let titles = nobility_titles_list conf p in
@@ -1503,9 +1575,13 @@ value interp_templ templ_fname conf base p =
   let ep = (p, a, u, authorized_age conf base p) in
   let env =
     let v = find_sosa conf base p in
+    let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
+    let mcl () =  Vint (max_cousin_level conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
-     ("sosa", Vsosa v)]
+     ("sosa", Vsosa v);
+     ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
+     ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl))]
   in
   do {
     html conf;
