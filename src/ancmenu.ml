@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ancmenu.ml,v 4.5 2005-05-11 14:44:58 ddr Exp $ *)
+(* $Id: ancmenu.ml,v 4.6 2005-05-12 01:17:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -71,14 +71,14 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match p.aliases with
       [ [nn :: _] -> if not p_auth_name then "" else sou base nn
       | [] -> "" ]
-  | ["anc_level"] ->
-      match get_env "anc_level" env with
-      [ Vint i -> string_of_int i
-      | _ -> "" ]
   | ["first_name"] -> if not p_auth_name then "x" else p_first_name base p
   | ["first_name_key_val"] ->
       if not p_auth_name then "" else Name.lower (p_first_name base p)
   | ["index"] -> string_of_int (Adef.int_of_iper p.cle_index)
+  | ["level"] ->
+      match get_env "level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
   | ["main_title_ident"] ->
       match Util.main_title base p with
       [ Some t when p_auth_name -> sou base t.t_ident
@@ -94,6 +94,13 @@ and eval_str_var conf base env (p, p_auth_name) loc =
           [ Vint i -> string_of_int i
           | _ -> "" ]
       | _ -> "" ]
+  | ["nobility_title"] ->
+      match Util.main_title base p with
+      [ Some t when p_auth_name ->
+          let id = sou base t.t_ident in
+          let pl = sou base t.t_place in
+          if pl = "" then id else id ^ " " ^ pl
+      | _ -> "" ]
   | ["occ"] -> if p_auth_name then string_of_int p.occ else ""
   | ["prefix_no_iz"] ->
       commd {(conf) with henv = List.remove_assoc "iz" conf.henv}
@@ -102,6 +109,7 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match p.qualifiers with
       [ [nn :: _] -> if not p_auth_name then "" else sou base nn
       | [] -> "" ]
+  | ["self"] -> simple_person_text conf base p p_auth_name
   | ["surname"] -> if not p_auth_name then "x" else p_surname base p
   | ["surname_key_val"] ->
       if not p_auth_name then "" else Name.lower (p_surname base p)
@@ -110,6 +118,13 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       if v <> "" then try List.assoc v conf.base_env with [ Not_found -> "" ]
       else raise Not_found
   | _ -> raise Not_found ]
+and simple_person_text conf base p p_auth =
+  if p_auth then
+    match main_title base p with
+    [ Some t -> titled_person_text conf base p t
+    | None -> person_text conf base p ]
+  else if conf.hide_names then "x x"
+  else person_text conf base p
 ;
 
 value rec eval_ast conf base env ep =
@@ -171,7 +186,7 @@ and print_if conf base env p e alt ale =
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env ep (loc, s, sl) al =
   match [s :: sl] with
-  [ ["anc_level"] -> print_foreach_anc_level conf base env ep al
+  [ ["ancestor_level"] -> print_foreach_anc_level conf base env ep al
   | _ ->
       do {
         Wserver.wprint ">%%foreach;%s" s;
@@ -190,7 +205,7 @@ and print_foreach_anc_level conf base env ((p, _) as ep) al =
   loop 1 where rec loop i =
     if i > max_level + 1 then ()
     else
-      let env = [("anc_level", Vint i) :: env] in
+      let env = [("level", Vint i) :: env] in
       do {
         List.iter (print_ast conf base env ep) al;
         loop (succ i)

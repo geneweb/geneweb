@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: cousmenu.ml,v 4.1 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: cousmenu.ml,v 4.2 2005-05-12 01:17:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -30,18 +30,18 @@ value default_max_lev = 5;
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
-  let rec loop niveau ip =
+  let rec loop level ip =
     if mark.(Adef.int_of_iper ip) then ()
     else do {
       mark.(Adef.int_of_iper ip) := True;
-      x.val := max x.val niveau;
+      x.val := max x.val level;
       if x.val = max_lev then ()
       else
         match parents (aget conf base ip) with
         [ Some ifam ->
             let cpl = coi base ifam in
             do {
-              loop (succ niveau) (father cpl); loop (succ niveau) (mother cpl)
+              loop (succ level) (father cpl); loop (succ level) (mother cpl)
             }
         | _ -> () ]
     }
@@ -64,10 +64,6 @@ and eval_bool_var conf base (p, p_auth_name) loc =
   [ ["access_by_key"] ->
       Util.accessible_by_key conf base p (p_first_name base p)
         (p_surname base p)
-  | ["dead"] ->
-      match p.death with
-      [ NotDead | DontKnowIfDead -> False
-      | _ -> True ]
   | ["has_nephews_or_nieces"] -> has_nephews_or_nieces conf base p
   | _ -> raise Not_found ]
 and eval_str_var conf base env (p, p_auth_name) loc =
@@ -77,6 +73,10 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match p.aliases with
       [ [nn :: _] -> if not p_auth_name then "" else sou base nn
       | [] -> "" ]
+  | ["died"] ->
+      match p.death with
+      [ NotDead | DontKnowIfDead -> ""
+      | _ -> "dead" ]
   | ["first_name"] -> if not p_auth_name then "x" else p_first_name base p
   | ["first_name_key_val"] ->
       if not p_auth_name then "" else Name.lower (p_first_name base p)
@@ -160,7 +160,7 @@ and print_if conf base env p e alt ale =
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env ep (loc, s, sl) al =
   match [s :: sl] with
-  [ ["level"] -> print_foreach_level conf base env ep al
+  [ ["cousin_level"] -> print_foreach_level conf base env ep al
   | _ ->
       do {
         Wserver.wprint ">%%foreach;%s" s;
