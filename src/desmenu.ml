@@ -1,7 +1,8 @@
 (* camlp4r *)
-(* $Id: desmenu.ml,v 4.4 2005-05-12 13:42:10 ddr Exp $ *)
+(* $Id: desmenu.ml,v 4.5 2005-05-12 14:32:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
+(*
 open Config;
 open Def;
 open Gutil;
@@ -216,3 +217,6 @@ value print conf =
   (if p_getenv conf.env "new" = Some "on" then Perso.interp_templ "desmenu"
    else print) conf
 ;
+*)
+
+value print = Perso.interp_templ "desmenu";

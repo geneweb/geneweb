@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.38 2005-05-07 21:24:15 ddr Exp $ *)
+(* $Id: descend.ml,v 4.39 2005-05-12 14:32:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -114,7 +114,7 @@ value
     else incr count;
     Wserver.wprint ".";
     if levt.(Adef.int_of_iper x.cle_index) == level then do {
-      levt.(Adef.int_of_iper x.cle_index) := Desmenu.infinite;
+      levt.(Adef.int_of_iper x.cle_index) := Perso.infinite;
       if Array.length ux.family <> 0 then html_br conf
       else Wserver.wprint "\n";
       if level == max_level then
@@ -138,8 +138,8 @@ value
 ;
 
 value display_descendants_upto conf base max_level p line =
-  let max_level = min (Desmenu.limit_desc conf) max_level in
-  let levt = Desmenu.make_level_table conf base max_level p in
+  let max_level = min (Perso.limit_desc conf) max_level in
+  let levt = Perso.make_desc_level_table conf base max_level p in
   let count = ref 0 in
   let always_surname =
     match p_getenv conf.env "alwsurn" with
@@ -234,8 +234,8 @@ value display_descendants_upto conf base max_level p line =
 ;
 
 value display_descendants_level conf base max_level ancestor =
-  let max_level = min (Desmenu.limit_desc conf) max_level in
-  let levt = Desmenu.make_level_table conf base max_level ancestor in
+  let max_level = min (Perso.limit_desc conf) max_level in
+  let levt = Perso.make_desc_level_table conf base max_level ancestor in
   let rec get_level level u list =
     List.fold_left
       (fun list ifam ->
@@ -609,7 +609,7 @@ value print_families conf base marks paths max_lev =
 ;
 
 value display_descendants_with_numbers conf base max_level ancestor =
-  let max_level = min (Desmenu.limit_desc conf) max_level in
+  let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
     if h then descendants_title conf base ancestor h
     else
@@ -761,7 +761,7 @@ value sort_and_display conf base paths precision list =
 ;
 
 value display_descendant_index conf base max_level ancestor =
-  let max_level = min (Desmenu.limit_desc conf) max_level in
+  let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
     let txt = capitale (transl conf "index of the descendants") in
     if not h then
@@ -794,7 +794,7 @@ value display_descendant_index conf base max_level ancestor =
 ;
 
 value display_spouse_index conf base max_level ancestor =
-  let max_level = min (Desmenu.limit_desc conf) max_level in
+  let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl conf "index of the spouses (non descendants)"))
@@ -872,7 +872,7 @@ value rec print_table_person conf base max_lev ip =
 
 value display_descendant_with_table conf base max_lev a =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "descendants")) in
-  let max_lev = min (Desmenu.limit_desc conf) max_lev in
+  let max_lev = min (Perso.limit_desc conf) max_lev in
   do {
     header conf title;
     print_table_person conf base max_lev a.cle_index;
@@ -1148,7 +1148,7 @@ value print_tree conf base gv p =
 ;
 
 value print_aboville conf base max_level p =
-  let max_level = min (Desmenu.limit_desc conf) max_level in
+  let max_level = min (Perso.limit_desc conf) max_level in
   do {
     Util.header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
