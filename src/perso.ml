@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.88 2005-05-12 02:51:10 ddr Exp $ *)
+(* $Id: perso.ml,v 4.89 2005-05-12 13:42:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -224,8 +224,8 @@ value find_sosa_aux conf base a p =
 ;
 *)
 
-value find_sosa conf base a =
-  match Util.find_sosa_ref conf base with
+value find_sosa conf base a sosa_ref_v =
+  match Lazy.force sosa_ref_v with
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else
@@ -322,6 +322,7 @@ type env =
   | Vbool of bool
   | Vint of int
   | Vstring of string
+  | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
   | Vtitle of person and title_item
   | Vlazy of Lazy.t env  
@@ -332,7 +333,14 @@ and title_item =
    list (option date * option date))
 ;
 
-value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_env v env =
+  try
+    match List.assoc v env with
+    [ Vlazy l -> Lazy.force l
+    | x -> x ]
+  with
+  [ Not_found -> Vnone ]
+;
 
 value not_impl func x =
   let desc =
@@ -440,6 +448,10 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
           [ Separated -> True
           | _ -> False ]
       | _ -> raise Not_found ]
+  | "browsing_with_sosa_ref" ->
+      match get_env "sosa_ref" env with
+      [ Vsosa_ref v -> Lazy.force v <> None
+      | _ -> raise Not_found ]
   | "has_comment" ->
       match get_env "fam" env with
       [ Vfam fam _ _ -> p_auth && sou base fam.comment <> ""
@@ -454,7 +466,7 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> False ]
   | "has_sosa" ->
       match get_env "sosa" env with
-      [ Vsosa x -> x <> None
+      [ Vsosa (Some _) -> True
       | _ -> False ]
   | "has_witnesses" ->
       match get_env "fam" env with
@@ -527,24 +539,15 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       | _ -> "" ]
   | "max_anc_level" ->
       match get_env "max_anc_level" env with
-      [ Vlazy l ->
-          match Lazy.force l with
-          [ Vint i -> string_of_int i
-          | _ -> "" ]
+      [ Vint i -> string_of_int i
       | _ -> "" ]
   | "max_cous_level" ->
       match get_env "max_cous_level" env with
-      [ Vlazy l ->
-          match Lazy.force l with
-          [ Vint i -> string_of_int i
-          | _ -> "" ]
+      [ Vint i -> string_of_int i
       | _ -> "" ]
   | "max_desc_level" ->
       match get_env "max_desc_level" env with
-      [ Vlazy l ->
-          match Lazy.force l with
-          [ Vint i -> string_of_int i
-          | _ -> "" ]
+      [ Vint i -> string_of_int i
       | _ -> "" ]
   | "nobility_title" ->
       match get_env "nobility_title" env with
@@ -609,12 +612,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
               }
           | None -> "" ]
       | _ -> raise Not_found ]
-  | "sosa_ref" ->
-      match get_env "sosa" env with
-      [ Vsosa (Some (_, p)) ->
-          let p_auth = authorized_age conf base p in
-          simple_person_text conf base p p_auth
-      | _ -> "" ]
   | "source_type" ->
        match get_env "src_typ" env with
        [ Vstring s -> s
@@ -707,6 +704,15 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_relation_field_var conf base env (0, rt, ip, True) loc sl
       | _ -> raise Not_found ]
   | ["self" :: sl] -> eval_person_field_var conf base env ep loc sl
+  | ["sosa_ref" :: sl] ->
+      match get_env "sosa_ref" env with
+      [ Vsosa_ref v ->
+          match Lazy.force v with
+          [ Some p ->
+              let ep = make_ep conf base p.cle_index in
+              eval_person_field_var conf base env ep loc sl
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam _ (_, ip) _ ->
@@ -1390,10 +1396,7 @@ and print_foreach_child conf base env al ep =
 and print_foreach_descendant_level conf base env al ep =
   let max_level =
     match get_env "max_desc_level" env with
-    [ Vlazy l ->
-        match Lazy.force l with
-        [ Vint n -> n
-        | _ -> 0 ]
+    [ Vint n -> n
     | _ -> 0 ]
   in
   loop 0 where rec loop i =
@@ -1427,10 +1430,7 @@ and print_foreach_first_name_alias conf base env al ((p, _, _, p_auth) as ep) =
 and print_foreach_level max_lev conf base env al ((p, _, _, _) as ep) =
   let max_level =
     match get_env max_lev env with
-    [ Vlazy l ->
-        match Lazy.force l with
-        [ Vint n -> n
-        | _ -> 0 ]
+    [ Vint n -> n
     | _ -> 0 ]
   in
   loop 1 where rec loop i =
@@ -1646,13 +1646,16 @@ value interp_templ templ_fname conf base p =
   let u = uget conf base p.cle_index in
   let ep = (p, a, u, authorized_age conf base p) in
   let env =
-    let v = find_sosa conf base p in
+    let sosa_ref () = Util.find_sosa_ref conf base in
+    let sosa_ref_v = Lazy.lazy_from_fun sosa_ref in
+    let sosa () = Vsosa (find_sosa conf base p sosa_ref_v) in
     let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
     let mdl () =  Vint (max_descendant_level conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
-     ("sosa", Vsosa v);
+     ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
+     ("sosa_ref", Vsosa_ref sosa_ref_v);
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl))]

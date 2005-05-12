@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: updmenu.ml,v 4.3 2005-05-11 09:07:47 ddr Exp $ *)
+(* $Id: updmenu.ml,v 4.4 2005-05-12 13:42:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -197,4 +197,9 @@ value print conf base p =
     Util.html1 conf;
     List.iter (print_ast conf base env ep) astl;
   }
+;
+
+value print conf =
+  (if p_getenv conf.env "new" = Some "on" then Perso.interp_templ "updmenu"
+   else print) conf
 ;

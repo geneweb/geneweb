@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: relmenu.ml,v 4.5 2005-05-11 14:44:58 ddr Exp $ *)
+(* $Id: relmenu.ml,v 4.6 2005-05-12 13:42:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -24,7 +24,7 @@ value not_impl func x =
       "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
     else "int_val = " ^ string_of_int (Obj.magic x)
   in
-  Wserver.wprint ">%s<p>\n" ("Relmenu." ^ func ^ ": not impl " ^ desc)
+  Printf.sprintf ">%s<p>\n" ("Relmenu." ^ func ^ ": not impl " ^ desc)
 ;
 
 value rec eval_var conf base env ep loc sl =
@@ -43,7 +43,7 @@ and eval_bool_var conf base env (p, p_auth_name) loc =
       match get_env "relation" env with
       [ Vrel {r_fath = Some _} None -> True
       | _ -> False ]
-  | ["sosa_ref"] -> Util.find_sosa_ref conf base <> None
+  | ["browsing_with_sosa_ref"] -> Util.find_sosa_ref conf base <> None
   | _ -> raise Not_found ]
 and eval_str_var conf base env (p, p_auth_name) loc =
   fun
@@ -129,9 +129,13 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match get_env "relation" env with
       [ Vrel {r_type = rt} None -> relation_type_text conf rt 0
       | _ -> "" ]
-  | ["sosa_link"] ->
+  | ["sosa_ref"] ->
       match Util.find_sosa_ref conf base with
-      [ Some p -> referenced_person_title_text conf base p
+      [ Some p -> person_title_text conf base p
+      | None -> "" ]
+  | ["sosa_ref"; "access"] ->
+      match Util.find_sosa_ref conf base with
+      [ Some p -> acces conf base p
       | None -> "" ]
   | ["spouse"] ->
       match get_env "fam" env with
@@ -177,12 +181,26 @@ and simple_person_text conf base p p_auth =
   else person_text conf base p
 ;
 
+value rec eval_ast conf base env ep =
+  fun
+  [ Atext s -> s
+  | Avar loc s sl ->
+      Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
+  | Atransl upp s c -> Templ.eval_transl conf upp s c
+  | AapplyWithAst f all -> eval_apply conf base env ep f all
+  | x -> not_impl "eval_ast" x ]
+and eval_apply conf base env ep f all =
+  match get_env f env with
+  [ Vfun xl al ->
+      let eval_ast = eval_ast conf base env ep in
+      Templ.eval_apply f eval_ast xl al all
+  | _ -> Printf.sprintf "%%apply;%s?" f ]
+;
+
 value rec print_ast conf base env ep =
   fun
-  [ Atext s -> Wserver.wprint "%s" s
-  | Avar loc s sl ->
+  [ Avar loc s sl ->
       Templ.print_var conf base (eval_var conf base env ep loc) s sl
-  | Atransl upp s c -> Wserver.wprint "%s" (Templ.eval_transl conf upp s c)
   | Aif e alt ale -> print_if conf base env ep e alt ale
   | Awid_hei s ->
       match image_size (image_file_name s) with
@@ -191,7 +209,7 @@ value rec print_ast conf base env ep =
   | Aforeach v al -> print_foreach conf base env ep v al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
   | Aapply f el -> print_apply conf base env ep f el
-  | x -> not_impl "print_ast" x ]
+  | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
 and print_define conf base env ep f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
 and print_apply conf base env p f el =
@@ -274,4 +292,9 @@ value print conf base p =
     Util.html1 conf;
     List.iter (print_ast conf base [] ep) astl;
   }
+;
+
+value print conf =
+  (if p_getenv conf.env "new" = Some "on" then Perso.interp_templ "relmenu"
+   else print) conf
 ;
