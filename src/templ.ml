@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.39 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: templ.ml,v 4.40 2005-05-12 02:51:10 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -532,7 +532,7 @@ value eval_string_var conf eval_var s sl =
         [ [] -> eval_variable conf s
         | _ -> raise Not_found ]
       with
-      [ Not_found -> " %" ^ s ^ String.concat "." [s :: sl] ^ "?" ] ]
+      [ Not_found -> " %" ^ String.concat "." [s :: sl] ^ "?" ] ]
 ;
 
 value eval_apply f eval_ast xl al all =

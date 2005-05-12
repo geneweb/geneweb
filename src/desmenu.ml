@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: desmenu.ml,v 4.2 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: desmenu.ml,v 4.3 2005-05-12 02:51:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -98,7 +98,7 @@ and eval_str_var conf base env (p, p_auth_name) loc =
       match get_env "level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
-  | ["max_level"] ->
+  | ["max_desc_level"] ->
       match get_env "max_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
@@ -177,7 +177,7 @@ and print_if conf base env p e alt ale =
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env ep (loc, s, sl) al =
   match [s :: sl] with
-  [ ["level"] -> print_foreach_level conf base env ep al
+  [ ["descendant_level"] -> print_foreach_level conf base env ep al
   | _ ->
       do {
         Wserver.wprint ">%%foreach;%s" s;

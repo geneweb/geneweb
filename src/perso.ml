@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.87 2005-05-12 01:17:17 ddr Exp $ *)
+(* $Id: perso.ml,v 4.88 2005-05-12 02:51:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -266,6 +266,53 @@ value max_cousin_level conf base p =
   max_ancestor_level conf base p.cle_index max_lev + 1
 ;
 
+value limit_desc conf =
+  match p_getint conf.base_env "max_desc_level" with
+  [ Some x -> max 1 x
+  | None -> 12 ]
+;
+
+value infinite = 10000;
+
+value make_desc_level_table conf base max_level p =
+  let mark = Array.create base.data.persons.len False in
+  let levt = Array.create base.data.persons.len infinite in
+  let rec fill ip u lev =
+    if max_level == infinite && mark.(Adef.int_of_iper ip) then ()
+    else do {
+      mark.(Adef.int_of_iper ip) := True;
+      if lev <= max_level then do {
+        if lev < levt.(Adef.int_of_iper ip) then
+          levt.(Adef.int_of_iper ip) := lev
+        else ();
+        Array.iter
+          (fun ifam ->
+             let ipl = (doi base ifam).children in
+             Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
+          u.family
+      }
+      else ()
+    }
+  in
+  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
+;
+
+value desc_level_max conf base p =
+  let levt = make_desc_level_table conf base infinite p in
+  let x = ref 0 in
+  do {
+    for i = 0 to Array.length levt - 1 do {
+      let lev = levt.(i) in
+      if lev != infinite && x.val < lev then x.val := lev else ()
+    };
+    x.val
+  }
+;
+
+value max_descendant_level conf base p =
+  min (limit_desc conf) (desc_level_max conf base p)
+;
+
 (* Interpretation of template file 'perso.txt' *)
 
 type env =
@@ -487,6 +534,13 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       | _ -> "" ]
   | "max_cous_level" ->
       match get_env "max_cous_level" env with
+      [ Vlazy l ->
+          match Lazy.force l with
+          [ Vint i -> string_of_int i
+          | _ -> "" ]
+      | _ -> "" ]
+  | "max_desc_level" ->
+      match get_env "max_desc_level" env with
       [ Vlazy l ->
           match Lazy.force l with
           [ Vint i -> string_of_int i
@@ -1272,6 +1326,7 @@ and print_simple_foreach conf base env al ini_ep ep efam =
   | "ancestor_level" -> print_foreach_level "max_anc_level" conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
+  | "descendant_level" -> print_foreach_descendant_level conf base env al ep
   | "family" -> print_foreach_family conf base env al ini_ep ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
   | "nobility_title" -> print_foreach_nobility_title conf base env al ep
@@ -1332,6 +1387,23 @@ and print_foreach_child conf base env al ep =
            List.iter (print_ast conf base env ep) al)
         des.children
   | _ -> () ]
+and print_foreach_descendant_level conf base env al ep =
+  let max_level =
+    match get_env "max_desc_level" env with
+    [ Vlazy l ->
+        match Lazy.force l with
+        [ Vint n -> n
+        | _ -> 0 ]
+    | _ -> 0 ]
+  in
+  loop 0 where rec loop i =
+    if i > max_level then ()
+    else
+      let env = [("level", Vint i) :: env] in
+      do {
+        List.iter (print_ast conf base env ep) al;
+        loop (succ i)
+      }
 and print_foreach_family conf base env al ini_ep (p, _, u, _) =
   Array.iteri
     (fun i ifam ->
@@ -1577,11 +1649,13 @@ value interp_templ templ_fname conf base p =
     let v = find_sosa conf base p in
     let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
+    let mdl () =  Vint (max_descendant_level conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
      ("sosa", Vsosa v);
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
-     ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl))]
+     ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
+     ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl))]
   in
   do {
     html conf;
