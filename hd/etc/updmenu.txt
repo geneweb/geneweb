@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.2 2005-05-10 23:49:02 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.3 2005-05-12 17:52:22 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -67,20 +67,23 @@
   <td valign="top">
     %foreach;family;
       %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM;i=%index;;f=%fam_index;">[*invert]</a>
+        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
+         ">[*invert]</a>
         <br%/>
-        %if;(fam_father = prev_fam_father and fam_mother = prev_fam_mother)
+        %if;(family.father = prev_family.father
+         and family.mother = prev_family.mother)
           <a href=%nn;
-          "%prefix;m=MRG_FAM;i=%prev_fam_index;;i2=%fam_index;;ip=%index;">%nn;
+          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
+          ;ip=%index;">%nn;
           [*merge]</a>
           <br%/>
         %end;
       %end;
-      <a href="%prefix;m=MOD_FAM;i=%fam_index;;ip=%index">%nn;
+      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index">%nn;
       [*modify::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br%/>
-      <a href="%prefix;m=DEL_FAM;i=%fam_index;;ip=%index">%nn;
+      <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br%/>
