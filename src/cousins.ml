@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.20 2005-05-12 14:32:05 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.21 2005-05-12 14:43:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -414,6 +414,8 @@ value print_anniv conf base p level =
   | _ -> Birthday.gen_print_menu_birth conf base f_scan mode ]
 ;
 
+value cousmenu_print = Perso.interp_templ "cousmenu";
+
 value print conf base p =
   let max_lev =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
@@ -431,5 +433,5 @@ value print conf base p =
   | (_, Some "AN") when conf.wizard || conf.friend ->
       print_anniv conf base p max_lev
   | _ ->
-      Cousmenu.print conf base p ]
+      cousmenu_print conf base p ]
 ;

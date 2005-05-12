@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.71 2005-05-08 12:09:34 ddr Exp $ *)
+(* $Id: relation.ml,v 4.72 2005-05-12 14:43:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1529,6 +1529,8 @@ value print_base_loop conf base p =
   }
 ;
 
+value relmenu_print = Perso.interp_templ "relmenu";
+
 value print conf base p =
   fun
   [ Some p1 ->
@@ -1547,7 +1549,7 @@ value print conf base p =
           with
           [ Left rel -> print_main_relationship conf base long p1 p rel
           | Right p -> print_base_loop conf base p ] ]
-  | None -> Relmenu.print conf base p ]
+  | None -> relmenu_print conf base p ]
 ;
 
 value print_multi conf base =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.39 2005-05-12 14:32:05 ddr Exp $ *)
+(* $Id: descend.ml,v 4.40 2005-05-12 14:43:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1204,6 +1204,8 @@ value print_aboville conf base max_level p =
   }
 ;
 
+value desmenu_print = Perso.interp_templ "desmenu";
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "A", Some v) -> print_aboville conf base v p
@@ -1216,5 +1218,5 @@ value print conf base p =
   | (Some "G", Some v) -> display_descendant_index conf base v p
   | (Some "C", Some v) -> display_spouse_index conf base v p
   | (Some "T", Some v) -> print_tree conf base v p
-  | _ -> Desmenu.print conf base p ]
+  | _ -> desmenu_print conf base p ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.55 2005-05-09 04:43:42 ddr Exp $ *)
+(* $Id: family.ml,v 4.56 2005-05-12 14:43:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -336,6 +336,8 @@ value make_senv conf base =
   | _ -> () ]
 ;
 
+value updmenu_print = Perso.interp_templ "updmenu";
+
 value family_m conf base =
   match p_getenv conf.env "m" with
   [ Some "A" ->
@@ -499,7 +501,7 @@ value family_m conf base =
   | Some "TT" -> Title.print conf base
   | Some "U" when conf.wizard ->
       match find_person_in_env conf base "" with
-      [ Some p -> Updmenu.print conf base p
+      [ Some p -> updmenu_print conf base p
       | _ -> very_unknown conf ]
   | Some "WIZNOTES" -> Wiznotes.print conf base
   | Some mode -> incorrect_request conf
