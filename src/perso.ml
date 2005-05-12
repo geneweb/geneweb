@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.89 2005-05-12 13:42:10 ddr Exp $ *)
+(* $Id: perso.ml,v 4.90 2005-05-12 16:49:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -967,9 +967,17 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
             (Adef.int_of_iper p.cle_index)
       | _ -> raise Not_found ]
+  | "fam_father" ->
+      match get_env "fam" env with
+      [ Vfam fam (ifath, _) _ -> string_of_int (Adef.int_of_iper ifath)
+      | _ -> raise Not_found ]
   | "fam_index" ->
       match get_env "fam" env with
       [ Vfam fam _ _ -> string_of_int (Adef.int_of_ifam fam.fam_index)
+      | _ -> raise Not_found ]
+  | "fam_mother" ->
+      match get_env "fam" env with
+      [ Vfam fam (_, imoth) _ -> string_of_int (Adef.int_of_iper imoth)
       | _ -> raise Not_found ]
   | "father_age_at_birth" -> string_of_parent_age conf base ep father
   | "first_name" ->
@@ -1061,6 +1069,18 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           let d = Adef.date_of_cdate d in
           Date.string_of_ondate conf d
       | _ -> "" ]
+  | "prev_fam_father" ->
+      match get_env "prev_fam" env with
+      [ Vfam fam (ifath, _) _ -> string_of_int (Adef.int_of_iper ifath)
+      | _ -> raise Not_found ]
+  | "prev_fam_index" ->
+      match get_env "prev_fam" env with
+      [ Vfam fam _ _ -> string_of_int (Adef.int_of_ifam fam.fam_index)
+      | _ -> raise Not_found ]
+  | "prev_fam_mother" ->
+      match get_env "prev_fam" env with
+      [ Vfam fam (_, imoth) _ -> string_of_int (Adef.int_of_iper imoth)
+      | _ -> raise Not_found ]
   | "public_name" -> if not p_auth then "" else sou base p.public_name
   | "qualifier" ->
       match p.qualifiers with
@@ -1408,17 +1428,27 @@ and print_foreach_descendant_level conf base env al ep =
         loop (succ i)
       }
 and print_foreach_family conf base env al ini_ep (p, _, u, _) =
-  Array.iteri
-    (fun i ifam ->
-       let fam = foi base ifam in
-       let cpl = coi base ifam in
-       let des = doi base ifam in
-       let cpl = (p.cle_index, spouse p.cle_index cpl) in
-       let env = [("#loop", Vint 0) :: env] in
-       let env = [("fam", Vfam fam cpl des) :: env] in
-       let env = [("family_cnt", Vint (i + 1)) :: env] in
-       List.iter (print_ast conf base env ini_ep) al)
-    u.family
+  loop None 0 where rec loop prev i =
+    if i = Array.length u.family then ()
+    else
+      let ifam = u.family.(i) in
+      let fam = foi base ifam in
+      let cpl = coi base ifam in
+      let des = doi base ifam in
+      let cpl = (p.cle_index, spouse p.cle_index cpl) in
+      let vfam = Vfam fam cpl des in
+      let env = [("#loop", Vint 0) :: env] in
+      let env = [("fam", vfam) :: env] in
+      let env = [("family_cnt", Vint (i + 1)) :: env] in
+      let env =
+        match prev with
+        [ Some vfam -> [("prev_fam", vfam) :: env]
+        | None -> env ]
+      in
+      do {
+        List.iter (print_ast conf base env ini_ep) al;
+        loop (Some vfam) (i + 1);
+      }
 and print_foreach_first_name_alias conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
     List.iter
