@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.90 2005-05-12 16:49:57 ddr Exp $ *)
+(* $Id: perso.ml,v 4.91 2005-05-12 17:52:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -665,6 +665,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
         | [] -> raise Not_found ]
       in
       loop env
+  | ["family" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam f c d -> eval_family_field_var conf base env (f, c, d) loc sl
+      | _ -> raise Not_found ]
   | ["father" :: sl] ->
       match parents a with
       [ Some ifam ->
@@ -686,6 +690,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["prev_family" :: sl] ->
+      match get_env "prev_fam" env with
+      [ Vfam f c d -> eval_family_field_var conf base env (f, c, d) loc sl
       | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
@@ -961,23 +969,11 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       if p_auth then string_of_place conf base p.death_place else ""
   | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
-      (* deprecated since 5.00: rather use "i=%fam_index;;ip=%fam_index;" *)
+      (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
       match get_env "fam" env with
       [ Vfam fam _ _ ->
           Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
             (Adef.int_of_iper p.cle_index)
-      | _ -> raise Not_found ]
-  | "fam_father" ->
-      match get_env "fam" env with
-      [ Vfam fam (ifath, _) _ -> string_of_int (Adef.int_of_iper ifath)
-      | _ -> raise Not_found ]
-  | "fam_index" ->
-      match get_env "fam" env with
-      [ Vfam fam _ _ -> string_of_int (Adef.int_of_ifam fam.fam_index)
-      | _ -> raise Not_found ]
-  | "fam_mother" ->
-      match get_env "fam" env with
-      [ Vfam fam (_, imoth) _ -> string_of_int (Adef.int_of_iper imoth)
       | _ -> raise Not_found ]
   | "father_age_at_birth" -> string_of_parent_age conf base ep father
   | "first_name" ->
@@ -1111,6 +1107,16 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       if conf.hide_names && not p_auth then ""
       else Name.lower (p_surname base p)
   | "title" -> person_title conf base p
+  | _ -> raise Not_found ]
+and eval_family_field_var conf base env fcd loc =
+  fun
+  [ [s] -> str_val (eval_str_family_field conf base env fcd loc s)
+  | _ -> raise Not_found ]
+and eval_str_family_field conf base env (f, (ifath, imoth), d) loc =
+  fun
+  [ "father" -> string_of_int (Adef.int_of_iper ifath)
+  | "index" -> string_of_int (Adef.int_of_ifam f.fam_index)
+  | "mother" -> string_of_int (Adef.int_of_iper imoth)
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
   if p_auth then
