@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.61 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.62 2005-05-12 14:43:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -2028,6 +2028,8 @@ value print_surnames_list conf base v p =
   }
 ;
 
+value ancmenu_print = Perso.interp_templ "ancmenu";
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> display_ancestors_upto conf base v p
@@ -2070,7 +2072,7 @@ value print conf base p =
       | (_, Some v) ->
           print_ancestors_same_time_descendants conf base p
             (pget conf base (Adef.iper_of_int v))
-      | _ -> Ancmenu.print conf base p ]
+      | _ -> ancmenu_print conf base p ]
   | (Some "F", Some v) -> print_surnames_list conf base v p
-  | _ -> Ancmenu.print conf base p ]
+  | _ -> ancmenu_print conf base p ]
 ;
