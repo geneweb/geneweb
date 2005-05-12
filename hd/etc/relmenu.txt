@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.6 2005-05-11 14:44:58 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.7 2005-05-12 13:42:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -69,7 +69,11 @@
       <em>[first name/first names]0 [surname/surnames]0</em>
       [or] <em>[public name]</em>
       [or] <em>[alias]</em>
-      %if;sosa_ref;[or] %apply;relative_sosa(sosa_link)%end;
+      %if;browsing_with_sosa_ref;[or]
+        %apply;relative_sosa%with
+          <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+        %end;
+      %end;
     </label>
   </li>
   <li>

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: cousmenu.ml,v 4.2 2005-05-12 01:17:17 ddr Exp $ *)
+(* $Id: cousmenu.ml,v 4.3 2005-05-12 13:42:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -197,4 +197,9 @@ value print conf base p =
     Util.html1 conf;
     List.iter (print_ast conf base env ep) astl;
   }
+;
+
+value print conf =
+  (if p_getenv conf.env "new" = Some "on" then Perso.interp_templ "cousmenu"
+   else print) conf
 ;
