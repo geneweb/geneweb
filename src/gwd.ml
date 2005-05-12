@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.79 2005-04-17 17:58:58 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.80 2005-05-12 20:14:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1566,7 +1566,8 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
       List.iter (fun d -> Util.add_doc_path (Filename.concat d "doc"))
         (List.rev (Secure.lang_path ()))
     else ();
-    if Util.cnt_dir.val = "" then Util.cnt_dir.val := Secure.base_dir ()
+    if Util.cnt_dir.val = Filename.current_dir_name then
+      Util.cnt_dir.val := Secure.base_dir ()
     else ();
     let (query, cgi) =
       try (Sys.getenv "QUERY_STRING", True) with
