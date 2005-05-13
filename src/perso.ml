@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.91 2005-05-12 17:52:22 ddr Exp $ *)
+(* $Id: perso.ml,v 4.92 2005-05-13 14:03:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -313,14 +313,67 @@ value max_descendant_level conf base p =
   min (limit_desc conf) (desc_level_max conf base p)
 ;
 
+(**)
+type generation_person =
+  [ GP_person of Num.t and iper and option ifam
+  | GP_same of Num.t and Num.t and iper
+  | GP_interv of option (Num.t * Num.t * option (Num.t * Num.t))
+  | GP_missing of Num.t and iper ]
+;
+value next_generation conf base mark gpl =
+  let gpl =
+    List.fold_right
+      (fun gp gpl ->
+         match gp with
+         [ GP_person n ip _ ->
+             let n_fath = Num.twice n in
+             let n_moth = Num.inc n_fath 1 in
+             let a = aget conf base ip in
+             match parents a with
+             [ Some ifam ->
+                 let cpl = coi base ifam in
+                 [GP_person n_fath (father cpl) (Some ifam);
+                  GP_person n_moth (mother cpl) (Some ifam) :: gpl]
+             | None -> [GP_missing n ip :: gpl] ]
+         | GP_interv None -> [gp :: gpl]
+         | GP_interv (Some (n1, n2, x)) ->
+             let x =
+               match x with
+               [ Some (m1, m2) -> Some (Num.twice m1, Num.twice m2)
+               | None -> None ]
+             in
+             let gp = GP_interv (Some (Num.twice n1, Num.twice n2, x)) in
+             [gp :: gpl]
+         | _ -> gpl ])
+      gpl []
+  in
+  let gpl =
+    List.fold_left
+      (fun gpl gp ->
+         match gp with
+         [ GP_person n ip _ ->
+             let i = Adef.int_of_iper ip in
+             let m = mark.(i) in
+             if Num.eq m Num.zero then do { mark.(i) := n; [gp :: gpl] }
+             else [GP_same n m ip :: gpl]
+         | _ -> [gp :: gpl] ])
+      [] gpl
+  in
+  List.rev gpl
+;
+(**)
+
 (* Interpretation of template file 'perso.txt' *)
 
 type env =
-  [ Vind of person and ascend and union
+  [ Vanc of Num.t and iper and option Num.t
+  | Vind of person and ascend and union
   | Vfam of family and (iper * iper) and descend
   | Vrel of relation and option person
   | Vbool of bool
   | Vint of int
+  | Vgpl of ref (list generation_person)
+  | Vmark of array Num.t
   | Vstring of string
   | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
@@ -644,8 +697,13 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
           try List.assoc v conf.base_env with [ Not_found -> "" ]
         else raise Not_found ]
 and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
-  fun
-  [ ["child" :: sl] ->
+  fun 
+  [ ["ancestor" :: sl] ->
+      match get_env "ancestor" env with
+      [ Vanc n ip no ->
+          eval_ancestor_field_var conf base env (n, ip, no) loc sl
+      | _ -> raise Not_found ]
+  | ["child" :: sl] ->
       match get_env "child" env with
       [ Vind p a u ->
           let auth =
@@ -744,6 +802,20 @@ and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
   [ ["type"] ->
        if is_relation then VVstring (relation_type_text conf rt i)
        else VVstring (rchild_type_text conf rt i)
+  | sl ->
+      let ep = make_ep conf base ip in
+      eval_person_field_var conf base env ep loc sl ]
+and eval_ancestor_field_var conf base env (n, ip, no) loc =
+  fun
+  [ ["same"] ->
+      match no with
+      [ Some n -> 
+          let s = Num.to_string_sep (transl conf "(thousand separator)") n in
+          VVstring s
+      | None -> VVstring "" ]
+  | ["sosa"] ->
+      let s = Num.to_string_sep (transl conf "(thousand separator)") n in
+      VVstring s
   | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl ]
@@ -1355,6 +1427,7 @@ and print_foreach conf base env ini_ep loc s sl al =
 and print_simple_foreach conf base env al ini_ep ep efam =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
+  | "ancestor" -> print_foreach_ancestor conf base env al ep
   | "ancestor_level" -> print_foreach_level "max_anc_level" conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
@@ -1379,6 +1452,27 @@ and print_foreach_alias conf base env al ((p, _, _, p_auth) as ep) =
          List.iter (print_ast conf base env ep) al)
       p.aliases
   else ()
+and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
+  match (get_env "gpl" env, get_env "mark" env) with
+  [ (Vgpl gpl, Vmark mark) ->
+      do {
+        List.iter
+          (fun gp ->
+             let v =
+               match gp with
+               [ GP_person n ip _ -> Vanc n ip None
+               | GP_same n1 n2 ip -> Vanc n1 ip (Some n2)
+               | _ -> Vnone ]
+             in
+             match v with
+             [ Vanc _ _ _ ->
+                 let env = [("ancestor", v) :: env] in
+                 List.iter (print_ast conf base env ep) al
+             | _ -> () ])
+          gpl.val;
+        gpl.val := next_generation conf base mark gpl.val;
+      }
+  | _ -> () ]
 and print_foreach_child conf base env al ep =
   fun
   [ Vfam _ _ des ->
@@ -1688,13 +1782,17 @@ value interp_templ templ_fname conf base p =
     let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
     let mdl () =  Vint (max_descendant_level conf base p) in
+    let gpl () = Vgpl (ref [GP_person Num.one p.cle_index None]) in
+    let mark () = Vmark (Array.create base.data.persons.len Num.zero) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
      ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
      ("sosa_ref", Vsosa_ref sosa_ref_v);
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
-     ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl))]
+     ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl));
+     ("gpl", Vlazy (Lazy.lazy_from_fun gpl));
+     ("mark", Vlazy (Lazy.lazy_from_fun mark))]
   in
   do {
     html conf;
