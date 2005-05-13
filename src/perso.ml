@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.92 2005-05-13 14:03:46 ddr Exp $ *)
+(* $Id: perso.ml,v 4.93 2005-05-13 22:40:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -224,8 +224,8 @@ value find_sosa_aux conf base a p =
 ;
 *)
 
-value find_sosa conf base a sosa_ref_v =
-  match Lazy.force sosa_ref_v with
+value find_sosa conf base a sosa_ref_l =
+  match Lazy.force sosa_ref_l with
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else
@@ -320,6 +320,7 @@ type generation_person =
   | GP_interv of option (Num.t * Num.t * option (Num.t * Num.t))
   | GP_missing of Num.t and iper ]
 ;
+
 value next_generation conf base mark gpl =
   let gpl =
     List.fold_right
@@ -361,12 +362,58 @@ value next_generation conf base mark gpl =
   in
   List.rev gpl
 ;
+
+value get_link all_gp ip =
+  loop all_gp where rec loop =
+    fun
+    [ [GP_person n ip0 _ :: gpl] -> if ip = ip0 then Some n else loop gpl
+    | [gp :: gpl] -> loop gpl
+    | [] -> None ]
+;
+
+value parent_sosa conf base ip all_gp parent =
+  match parents (aget conf base ip) with
+  [ Some ifam ->
+      match get_link all_gp (parent (coi base ifam)) with
+      [ Some n -> Num.to_string n
+      | None -> "" ]
+  | None -> "" ]
+;
+
+value will_print =
+  fun
+  [ GP_person _ _ _ -> True
+  | GP_same _ _ _ -> True
+  | _ -> False ]
+;
+
+value get_all_generations conf base p =
+  let max_level =
+    match p_getint conf.env "v" with
+    [ Some v -> v
+    | None -> 0 ]
+  in
+  let mark = Array.create base.data.persons.len Num.zero in
+  let rec get_generations level gpll gpl =
+    let gpll = [gpl :: gpll] in
+    if level < max_level then
+      let next_gpl = next_generation conf base mark gpl in
+      if List.exists will_print next_gpl then
+        get_generations (level + 1) gpll next_gpl
+      else gpll
+    else gpll
+  in
+  let gpll = get_generations 1 [] [GP_person Num.one p.cle_index None] in
+  let gpll = List.rev gpll in
+  List.flatten gpll
+;
 (**)
 
 (* Interpretation of template file 'perso.txt' *)
 
 type env =
-  [ Vanc of Num.t and iper and option Num.t
+  [ Vallgp of list generation_person
+  | Vanc of Num.t and iper and option Num.t
   | Vind of person and ascend and union
   | Vfam of family and (iper * iper) and descend
   | Vrel of relation and option person
@@ -807,7 +854,15 @@ and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
       eval_person_field_var conf base env ep loc sl ]
 and eval_ancestor_field_var conf base env (n, ip, no) loc =
   fun
-  [ ["same"] ->
+  [ ["father_sosa"] ->
+      match get_env "all_gp" env with
+      [ Vallgp all_gp -> VVstring (parent_sosa conf base ip all_gp father)
+      | _ -> VVstring "" ]
+  | ["mother_sosa"] ->
+      match get_env "all_gp" env with
+      [ Vallgp all_gp -> VVstring (parent_sosa conf base ip all_gp mother)
+      | _ -> VVstring "" ]
+  | ["same"] ->
       match no with
       [ Some n -> 
           let s = Num.to_string_sep (transl conf "(thousand separator)") n in
@@ -1039,7 +1094,8 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else ""
   | "death_place" ->
       if p_auth then string_of_place conf base p.death_place else ""
-  | "died" -> string_of_died conf base env p p_auth
+  | "died" -> capitale (string_of_died conf base env p p_auth)
+  | "died_u" -> string_of_died conf base env p p_auth
   | "fam_access" ->
       (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
       match get_env "fam" env with
@@ -1202,19 +1258,14 @@ and string_of_died conf base env p p_auth =
     let is = index_of_sex p.sex in
     match p.death with
     [ Death dr _ ->
-        let dr_w =
-          match dr with
-          [ Unspecified -> transl_nth conf "died" is
-          | Murdered -> transl_nth conf "murdered" is
-          | Killed -> transl_nth conf "killed (in action)" is
-          | Executed -> transl_nth conf "executed (legally killed)" is
-          | Disappeared -> transl_nth conf "disappeared" is ]
-        in
-        capitale dr_w
-    | DeadYoung ->
-        capitale (transl_nth conf "died young" is)
-    | DeadDontKnowWhen ->
-        capitale (transl_nth conf "died" is)
+        match dr with
+        [ Unspecified -> transl_nth conf "died" is
+        | Murdered -> transl_nth conf "murdered" is
+        | Killed -> transl_nth conf "killed (in action)" is
+        | Executed -> transl_nth conf "executed (legally killed)" is
+        | Disappeared -> transl_nth conf "disappeared" is ]
+    | DeadYoung -> transl_nth conf "died young" is
+    | DeadDontKnowWhen -> transl_nth conf "died" is
     | _ -> "" ]
   else ""
 and string_of_image_url conf base env (p, _, _, p_auth) html =
@@ -1377,6 +1428,12 @@ and print_foreach conf base env ini_ep loc s sl al =
   let rec loop ((_, a, _, _) as ep) efam =
     fun 
     [ [s] -> print_simple_foreach conf base env al ini_ep ep efam s
+    | ["ancestor" :: sl] ->
+        match get_env "ancestor" env with
+        [ Vanc n ip no ->
+            let ep = make_ep conf base ip in
+            loop ep efam sl
+        | _ -> raise Not_found ]
     | ["child" :: sl] ->
         match get_env "child" env with
         [ Vind p a u ->
@@ -1776,23 +1833,27 @@ value interp_templ templ_fname conf base p =
   let u = uget conf base p.cle_index in
   let ep = (p, a, u, authorized_age conf base p) in
   let env =
-    let sosa_ref () = Util.find_sosa_ref conf base in
-    let sosa_ref_v = Lazy.lazy_from_fun sosa_ref in
-    let sosa () = Vsosa (find_sosa conf base p sosa_ref_v) in
+    let sosa_ref_l =
+      let sosa_ref () = Util.find_sosa_ref conf base in
+      Lazy.lazy_from_fun sosa_ref
+    in
+    let sosa () = Vsosa (find_sosa conf base p sosa_ref_l) in
     let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
     let mdl () =  Vint (max_descendant_level conf base p) in
     let gpl () = Vgpl (ref [GP_person Num.one p.cle_index None]) in
     let mark () = Vmark (Array.create base.data.persons.len Num.zero) in
+    let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
      ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
-     ("sosa_ref", Vsosa_ref sosa_ref_v);
+     ("sosa_ref", Vsosa_ref sosa_ref_l);
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl));
      ("gpl", Vlazy (Lazy.lazy_from_fun gpl));
-     ("mark", Vlazy (Lazy.lazy_from_fun mark))]
+     ("mark", Vlazy (Lazy.lazy_from_fun mark));
+     ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
   do {
     html conf;
