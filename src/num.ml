@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 4.2 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: num.ml,v 4.3 2005-05-13 14:03:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type t = array int;
@@ -165,20 +165,31 @@ value print f sep x =
         (List.length digits - 1) digits
     in ()
 ;
-value to_string x =
+value to_string_sep sep x =
   let digits = loop [] x
     where rec loop d x =
       if eq x zero then d
       else loop [modl x 10 :: d] (div x 10)
   in
-  let s = String.create (List.length digits) in
+  let len = List.length digits in
+  let slen = String.length sep in
+  let s = String.create (len + (len - 1) / 3 * slen) in
   let _ =
     List.fold_left
-       (fun i d -> do { s.[i] := Char.chr (Char.code '0' + d); (i + 1) })
-       0 digits
+       (fun (i, j) d ->
+          do {
+            s.[j] := Char.chr (Char.code '0' + d);
+            if i < len - 1 && (len - 1 - i) mod 3 = 0 then do {
+              String.blit sep 0 s (j + 1) slen;
+              (i + 1, j + 1 + slen)
+            }
+            else (i + 1, j + 1)
+          })
+       (0, 0) digits
   in
   s
 ;
+value to_string = to_string_sep "";
 
 value of_string s =
   loop zero 0 where rec loop n i =

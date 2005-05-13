@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.41 2005-05-12 20:14:24 ddr Exp $ *)
+(* $Id: templ.ml,v 4.42 2005-05-13 14:03:46 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -12,6 +12,7 @@ type token =
   | DOT
   | EQUAL
   | GREATEREQUAL
+  | LESSEQUAL
   | LPAREN
   | RPAREN
   | IDENT of string
@@ -95,6 +96,7 @@ value rec get_token =
   | [: `'=' :] ep -> Tok (bp, ep) EQUAL
   | [: `'!'; `'=' :] ep -> Tok (bp, ep) BANGEQUAL
   | [: `'>'; `'=' :] ep -> Tok (bp, ep) GREATEREQUAL
+  | [: `'<'; `'=' :] ep -> Tok (bp, ep) LESSEQUAL
   | [: `'"'; s = get_string 0 :] ep -> Tok (bp, ep) (STRING s)
   | [: `('0'..'9' as c); s = get_int (Buff.store 0 c) :] ep ->
       Tok (bp, ep) (INT s)
@@ -156,6 +158,7 @@ value rec parse_expr strm =
            [ [: `Tok _ EQUAL; e2 = parse_simple :] -> Eop "=" e e2
            | [: `Tok _ BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
            | [: `Tok _ GREATEREQUAL; e2 = parse_simple :] -> Eop ">=" e e2
+           | [: `Tok _ LESSEQUAL; e2 = parse_simple :] -> Eop "<=" e e2
            | [: :] -> e ] :] ->
         a
   and parse_simple =
@@ -651,6 +654,7 @@ value eval_bool_expr conf eval_var =
         [ "=" -> string_eval e1 = string_eval e2
         | "!=" -> string_eval e1 <> string_eval e2
         | ">=" -> int_eval e1 >= int_eval e2
+        | "<=" -> int_eval e1 <= int_eval e2
         | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
     | Evar loc s sl ->
