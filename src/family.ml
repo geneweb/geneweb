@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.56 2005-05-12 14:43:01 ddr Exp $ *)
+(* $Id: family.ml,v 4.57 2005-05-13 04:10:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -613,30 +613,36 @@ value print_moved conf base s =
 
 value treat_request conf base log =
   do {
-    match p_getenv conf.base_env "moved" with
-    [ Some s ->
+    match (
+      p_getenv conf.base_env "moved",
+      p_getenv conf.env "opt",
+      p_getenv conf.env "m")
+   with
+   [ (Some s, _, _) ->
         print_moved conf base s
-    | None ->
-        match (p_getenv conf.env "opt", p_getenv conf.env "m") with
-        [ (Some "no_index", _) -> print_no_index conf base
-        | (_, Some "IM") -> Image.print conf base
-        | _ ->
-    
-            do {
-              set_owner conf;
-              extract_henv conf base;
-              make_senv conf base;
-              if only_special_env conf.env then do {
-                let r = Srcfile.incr_welcome_counter conf in
-                log_count conf log r;
-                Srcfile.print_start conf base;
-              }
-              else do {
-                let r = Srcfile.incr_request_counter conf in
-                log_count conf log r;
-                family_m conf base;
-              };
-            } ] ];
+   | (_, Some "no_index", _) -> print_no_index conf base
+   | (_, _, Some "IM") -> Image.print conf base
+   | _ ->
+       do {
+         set_owner conf;
+         extract_henv conf base;
+         make_senv conf base;
+         if only_special_env conf.env then do {
+           let r = Srcfile.incr_welcome_counter conf in
+           log_count conf log r;
+           Srcfile.print_start conf base;
+         }
+         else do {
+           let r = Srcfile.incr_request_counter conf in
+           log_count conf log r;
+           match p_getenv conf.env "ptempl" with
+           [ Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
+               match find_person_in_env conf base "" with
+               [ Some p -> Perso.interp_templ tname conf base p
+               | None -> family_m conf base ]
+           | _ -> family_m conf base ];
+         };
+       } ];
     Wserver.wflush ();
   }
 ;
