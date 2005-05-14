@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.6 2005-05-12 01:17:17 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.7 2005-05-14 17:48:46 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -85,7 +85,7 @@
             %elseif;(level = 4)[*to the great-grandparents]%nn;
             %else;
               %apply;tothegen%with;
-                %apply;nth%with;[nth (generation)]%and;%level;%end;
+                %apply;nth([nth (generation)], level)
               %end;
             %end;
           </option>
