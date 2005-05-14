@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.42 2005-05-13 14:03:46 ddr Exp $ *)
+(* $Id: templ.ml,v 4.43 2005-05-14 17:48:46 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -541,22 +541,12 @@ value eval_string_var conf eval_var s sl =
       [ Not_found -> " %" ^ String.concat "." [s :: sl] ^ "?" ] ]
 ;
 
-value eval_apply f eval_ast xl al all =
-  let vl = List.map (fun al -> String.concat "" (List.map eval_ast al)) all in
-  let sl =
-    List.map
-      (fun a ->
-         let a =
-           loop a xl vl where rec loop a xl vl =
-             match (xl, vl) with
-             [ ([x :: xl], [v :: vl]) -> loop (subst (subst_text x v) a) xl vl
-             | ([], []) -> a
-             | _ -> Atext (f ^ ": bad # of params") ]
-         in
-         eval_ast a)
-      al
-  in
-  String.concat "" sl
+value eval_subst f xl vl a =
+  loop a xl vl where rec loop a xl vl =
+    match (xl, vl) with
+    [ ([x :: xl], [v :: vl]) -> loop (subst (subst_text x v) a) xl vl
+    | ([], []) -> a
+    | _ -> Atext (f ^ ": bad # of params") ]
 ;
 
 value eval_transl_lexicon conf upp s c =

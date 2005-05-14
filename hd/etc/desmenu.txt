@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: desmenu.txt,v 1.4 2005-05-12 02:51:10 ddr Exp $ -->
+  <!-- $Id: desmenu.txt,v 1.5 2005-05-14 17:48:46 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -77,7 +77,7 @@
             %elseif;(level = 3)[*to the great-grandchildren]%nn;
             %else;
               %apply;tothegen%with;
-                %apply;nth%with;[nth (generation)]%and;%level;%end;
+                %apply;nth([nth (generation)], level)
               %end;
             %end;
           </option>
