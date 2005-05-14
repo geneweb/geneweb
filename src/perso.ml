@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.95 2005-05-14 17:48:46 ddr Exp $ *)
+(* $Id: perso.ml,v 4.96 2005-05-14 21:21:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1396,44 +1396,31 @@ value rec eval_ast conf base env ep =
       Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
-  | Aapply "nth" [e1; e2] ->
-      let eval_var = eval_var conf base env ep in
-      let s1 = Templ.eval_expr conf eval_var e1 in
-      let s2 = Templ.eval_expr conf eval_var e2 in
-      Util.nth_field s1 (try int_of_string s2 with [ Failure _ -> 0 ])
   | Aapply f el ->
       let eval_ast = eval_ast conf base env ep in
       let eval_var = eval_var conf base env ep in
       let vl = List.map (Templ.eval_expr conf eval_var) el in
-      eval_apply f env eval_ast vl
-  | AapplyWithAst "a_of_b" [al1; al2] ->
-      let eval_ast = eval_ast conf base env ep in
-      let s1 = String.concat "" (List.map eval_ast al1) in
-      let s2 = String.concat "" (List.map eval_ast al2) in
-      transl_a_of_b conf s1 s2
-  | AapplyWithAst "a_of_b_gr_eq_lev" [al1; al2] ->
-      let eval_ast = eval_ast conf base env ep in
-      let s1 = String.concat "" (List.map eval_ast al1) in
-      let s2 = String.concat "" (List.map eval_ast al2) in
-      capitale (transl_a_of_gr_eq_gen_lev conf s1 s2)
-  | AapplyWithAst "nth" [al1; al2] ->
-      let eval_ast = eval_ast conf base env ep in
-      let s1 = String.concat "" (List.map eval_ast al1) in
-      let s2 = String.concat "" (List.map eval_ast al2) in
-      Util.nth_field s1 (try int_of_string s2 with [ Failure _ -> 0 ])
+      eval_apply conf f env eval_ast vl
   | AapplyWithAst f all ->
       let eval_ast = eval_ast conf base env ep in
       let sll = List.map (List.map eval_ast) all in
       let vl = List.map (String.concat "") sll in
-      eval_apply f env eval_ast vl
+      eval_apply conf f env eval_ast vl
   | x -> not_impl "eval_ast" x ]
-and eval_apply f env eval_ast vl =
+and eval_apply conf f env eval_ast vl =
   match get_env f env with
   [ Vfun xl al ->
       let al = List.map (Templ.eval_subst f xl vl) al in
       let sl = List.map eval_ast al in
       String.concat "" sl
-  | _ -> Printf.sprintf "%%apply;%s?" f ]
+  | _ ->
+      match (f, vl) with
+      [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
+      | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
+      | ("nth", [s1; s2]) ->
+          let n = try int_of_string s2 with [ Failure _ -> 0 ] in
+          Util.nth_field s1 n
+      | _ -> Printf.sprintf "%%apply;%s?" f ] ]
 and eval_if conf base env p e alt ale =
   let eval_var = eval_var conf base env p in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
