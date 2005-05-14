@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.93 2005-05-13 22:40:22 ddr Exp $ *)
+(* $Id: perso.ml,v 4.94 2005-05-14 09:36:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -363,6 +363,15 @@ value next_generation conf base mark gpl =
   List.rev gpl
 ;
 
+value sosa_is_present all_gp n1 =
+  loop all_gp where rec loop =
+    fun
+    [ [GP_person n _ _ :: gpl]
+    | [GP_same n _ _ :: gpl] -> if Num.eq n n1 then True else loop gpl
+    | [gp :: gpl] -> loop gpl
+    | [] -> False ]
+;
+
 value get_link all_gp ip =
   loop all_gp where rec loop =
     fun
@@ -371,13 +380,15 @@ value get_link all_gp ip =
     | [] -> None ]
 ;
 
-value parent_sosa conf base ip all_gp parent =
-  match parents (aget conf base ip) with
-  [ Some ifam ->
-      match get_link all_gp (parent (coi base ifam)) with
-      [ Some n -> Num.to_string n
-      | None -> "" ]
-  | None -> "" ]
+value parent_sosa conf base ip all_gp n parent =
+  if sosa_is_present all_gp n then Num.to_string n
+  else
+    match parents (aget conf base ip) with
+    [ Some ifam ->
+        match get_link all_gp (parent (coi base ifam)) with
+        [ Some n -> Num.to_string n
+        | None -> "" ]
+    | None -> "" ]
 ;
 
 value will_print =
@@ -413,7 +424,7 @@ value get_all_generations conf base p =
 
 type env =
   [ Vallgp of list generation_person
-  | Vanc of Num.t and iper and option Num.t
+  | Vanc of Num.t and iper and option Num.t and option ifam
   | Vind of person and ascend and union
   | Vfam of family and (iper * iper) and descend
   | Vrel of relation and option person
@@ -747,8 +758,8 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   fun 
   [ ["ancestor" :: sl] ->
       match get_env "ancestor" env with
-      [ Vanc n ip no ->
-          eval_ancestor_field_var conf base env (n, ip, no) loc sl
+      [ Vanc n ip no ifamo ->
+          eval_ancestor_field_var conf base env (n, ip, no, ifamo) loc sl
       | _ -> raise Not_found ]
   | ["child" :: sl] ->
       match get_env "child" env with
@@ -852,15 +863,28 @@ and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
   | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl ]
-and eval_ancestor_field_var conf base env (n, ip, no) loc =
+and eval_ancestor_field_var conf base env (n, ip, no, ifamo) loc =
   fun
-  [ ["father_sosa"] ->
+  [ ["family" :: sl] ->
+      match ifamo with
+      [ Some ifam ->
+          let f = foi base ifam in
+          let c = coi base ifam in
+          let d = doi base ifam in
+          let c = (father c, mother c) in
+          eval_family_field_var conf base env (f, c, d) loc sl
+      | None -> raise Not_found ]
+  | ["father_sosa"] ->
       match get_env "all_gp" env with
-      [ Vallgp all_gp -> VVstring (parent_sosa conf base ip all_gp father)
+      [ Vallgp all_gp ->
+          let n = Num.twice n in
+          VVstring (parent_sosa conf base ip all_gp n father)
       | _ -> VVstring "" ]
   | ["mother_sosa"] ->
       match get_env "all_gp" env with
-      [ Vallgp all_gp -> VVstring (parent_sosa conf base ip all_gp mother)
+      [ Vallgp all_gp ->
+          let n = Num.inc (Num.twice n) 1 in
+          VVstring (parent_sosa conf base ip all_gp n mother)
       | _ -> VVstring "" ]
   | ["same"] ->
       match no with
@@ -1430,7 +1454,7 @@ and print_foreach conf base env ini_ep loc s sl al =
     [ [s] -> print_simple_foreach conf base env al ini_ep ep efam s
     | ["ancestor" :: sl] ->
         match get_env "ancestor" env with
-        [ Vanc n ip no ->
+        [ Vanc n ip no _ ->
             let ep = make_ep conf base ip in
             loop ep efam sl
         | _ -> raise Not_found ]
@@ -1517,12 +1541,12 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
           (fun gp ->
              let v =
                match gp with
-               [ GP_person n ip _ -> Vanc n ip None
-               | GP_same n1 n2 ip -> Vanc n1 ip (Some n2)
+               [ GP_person n ip ifamo -> Vanc n ip None ifamo
+               | GP_same n1 n2 ip -> Vanc n1 ip (Some n2) None
                | _ -> Vnone ]
              in
              match v with
-             [ Vanc _ _ _ ->
+             [ Vanc _ _ _ _ ->
                  let env = [("ancestor", v) :: env] in
                  List.iter (print_ast conf base env ep) al
              | _ -> () ])
