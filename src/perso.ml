@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.97 2005-05-15 06:59:23 ddr Exp $ *)
+(* $Id: perso.ml,v 4.98 2005-05-15 07:01:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1445,7 +1445,6 @@ and print_apply conf base env ep f el =
       let print_ast = print_ast conf base env ep in
       Templ.print_apply conf f print_ast eval_var xl al el
   | _ ->
-      let eval_ast = eval_ast conf base env ep in
       let eval_var = eval_var conf base env ep in
       let vl = List.map (Templ.eval_expr conf eval_var) el in
       Wserver.wprint "%s" (eval_predefined_apply conf f vl) ]
