@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.96 2005-05-14 21:21:59 ddr Exp $ *)
+(* $Id: perso.ml,v 4.97 2005-05-15 06:59:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -697,17 +697,15 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "related_type" ->
       match get_env "rel" env with
-      [ Vrel r (Some c) ->
-          capitale (rchild_type_text conf r.r_type (index_of_sex c.sex))
+      [ Vrel r (Some c) -> rchild_type_text conf r.r_type (index_of_sex c.sex)
       | _ -> raise Not_found ]
   | "relation_type" ->
       match get_env "rel" env with
       [ Vrel r None ->
           match (r.r_fath, r.r_moth) with
-          [ (Some ip, None) -> capitale (relation_type_text conf r.r_type 0)
-          | (None, Some ip) -> capitale (relation_type_text conf r.r_type 1)
-          | (Some ip1, Some ip2) ->
-              capitale (relation_type_text conf r.r_type 2)
+          [ (Some ip, None) -> relation_type_text conf r.r_type 0
+          | (None, Some ip) -> relation_type_text conf r.r_type 1
+          | (Some ip1, Some ip2) -> relation_type_text conf r.r_type 2
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
   | "sosa" ->
@@ -735,7 +733,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "fam" env with
       [ Vfam _ (ip1, ip2) _ ->
           Printf.sprintf
-            (fcapitale (ftransl conf "witness at marriage of %s and %s"))
+            (ftransl conf "witness at marriage of %s and %s")
             (referenced_person_title_text conf base (pget conf base ip1))
             (referenced_person_title_text conf base (pget conf base ip2))
       | _ -> raise Not_found ]
@@ -1118,8 +1116,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else ""
   | "death_place" ->
       if p_auth then string_of_place conf base p.death_place else ""
-  | "died" -> capitale (string_of_died conf base env p p_auth)
-  | "died_u" -> string_of_died conf base env p p_auth
+  | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
       (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
       match get_env "fam" env with
@@ -1186,8 +1183,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else ""
   | "occ" -> if p_auth then string_of_int p.occ else ""
   | "occupation" ->
-      if p_auth then
-        string_with_macros conf False [] (capitale (sou base p.occupation))
+      if p_auth then string_with_macros conf False [] (sou base p.occupation)
       else ""
   | "on_baptism_date" ->
       match (p_auth, Adef.od_of_codate p.baptism) with
@@ -1414,13 +1410,16 @@ and eval_apply conf f env eval_ast vl =
       let sl = List.map eval_ast al in
       String.concat "" sl
   | _ ->
-      match (f, vl) with
-      [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
-      | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
-      | ("nth", [s1; s2]) ->
-          let n = try int_of_string s2 with [ Failure _ -> 0 ] in
-          Util.nth_field s1 n
-      | _ -> Printf.sprintf "%%apply;%s?" f ] ]
+      eval_predefined_apply conf f vl ]
+and eval_predefined_apply conf f vl =
+  match (f, vl) with
+  [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
+  | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
+  | ("capitalize", [s]) -> capitale s
+  | ("nth", [s1; s2]) ->
+      let n = try int_of_string s2 with [ Failure _ -> 0 ] in
+      Util.nth_field s1 n
+  | _ -> Printf.sprintf "%%apply;%s?" f ]
 and eval_if conf base env p e alt ale =
   let eval_var = eval_var conf base env p in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
@@ -1445,7 +1444,11 @@ and print_apply conf base env ep f el =
       let eval_var = eval_var conf base env ep in
       let print_ast = print_ast conf base env ep in
       Templ.print_apply conf f print_ast eval_var xl al el
-  | _ -> Wserver.wprint " %%%s?" f ]
+  | _ ->
+      let eval_ast = eval_ast conf base env ep in
+      let eval_var = eval_var conf base env ep in
+      let vl = List.map (Templ.eval_expr conf eval_var) el in
+      Wserver.wprint "%s" (eval_predefined_apply conf f vl) ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in

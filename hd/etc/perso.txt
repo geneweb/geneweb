@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.42 2005-05-08 12:09:34 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.43 2005-05-15 06:59:22 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -135,7 +135,7 @@
       %end;
     %end;
     %if;is_dead;
-      <li>%died;
+      <li>%apply;capitalize(died)
       %if;has_death_date; %on_death_date;%end;
       %if;has_death_place; -&nbsp;%death_place;%end;</li>%nl;
     %end;
@@ -247,7 +247,7 @@
   <h3 class="highlight">[*relation/relations]1</h3>
   <ul>
     %foreach;relation;
-      <li>%relation_type;
+      <li>%apply;capitalize(relation_type)
       %if;(has_relation_him and has_relation_her)
         %nl;
         <ul>
@@ -275,13 +275,15 @@
     %end;
     %foreach;related;
       <li style="list-style-type:%if;related.has_families;disc%else;
-       circle%end;">%related_type;:
+       circle%end;">%apply;capitalize(related_type):
       %if;cancel_links;%related;
       %else;<a href="%prefix;%related.access">%related;</a>%end;
       %related.title;%related.dates;</li>%nl;
     %end;
     %foreach;witness_relation;
-      <li style="list-style-type:disc">%witness_relation;</li>%nl;
+      <li style="list-style-type:disc">%nn;
+        %apply;capitalize(witness_relation)%nn;
+      </li>%nl;
     %end;
   </ul>
 %end;
