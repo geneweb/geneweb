@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.7 2005-05-12 13:42:10 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.8 2005-05-15 21:33:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -213,20 +213,24 @@
 </tr>
 <tr align="%left;">
   <td align="center" colspan="2">
-    <table><tr align="%left;"><td>
-      <label>
-        <input type="radio" name="et" value="A" checked="checked"%/>
-        [*ancestors]<br%/>
-      </label>
-      <label>
-        <input type="radio" name="et" value="M"%/>
-        [*relationships by marriage]<br%/>
-      </label>
-      <label>
-        <input type="radio" name="et" value="S"%/>
-        [*shortest path]<br%/>
-      </label>
-    </td></tr></table>
+    <table border="%border;" cellspacing="0" cellpadding="0"><tr>
+      <td align="%left;">
+        <label>
+          <input type="radio" name="et" value="A" checked="checked"%/>
+          [*ancestors]
+        </label>
+      </td></tr><tr><td align="%left;">
+        <label>
+          <input type="radio" name="et" value="M"%/>
+          [*relationships by marriage]
+        </label>
+      </td></tr><tr><td align="%left;">
+        <label>
+          <input type="radio" name="et" value="S"%/>
+          [*shortest path]
+        </label>
+      </td>
+    </tr></table>
   </td>
 </tr>
 <tr align="%left;">

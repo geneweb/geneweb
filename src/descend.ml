@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.40 2005-05-12 14:43:00 ddr Exp $ *)
+(* $Id: descend.ml,v 4.41 2005-05-15 21:33:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -189,7 +189,7 @@ value display_descendants_upto conf base max_level p line =
                    children;
                end
              }
-             else ()
+             else html_br conf;
            })
         ifaml
     else ()
