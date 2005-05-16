@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.43 2005-05-14 17:48:46 ddr Exp $ *)
+(* $Id: templ.ml,v 4.44 2005-05-16 19:17:44 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -171,7 +171,7 @@ value rec parse_expr strm =
         a
     | [: `Tok _ (IDENT "not"); e = parse_simple :] -> Enot e
     | [: `Tok _ (STRING s) :] -> Estr s
-    | [: `Tok _ (INT s) :] -> Eint s
+    | [: `Tok loc (INT s) :] -> Eint loc s
     | [: `Tok _ (LEXICON upp s n) :] -> Etransl upp s n
     | [: (loc, id, idl) = parse_var :] -> Evar loc id idl
     | [: `Tok loc _ :] -> Evar loc "parse_error" [] ]
@@ -463,7 +463,7 @@ and subste sf =
   | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
   | Enot e -> Enot (subste sf e)
   | Estr s -> Estr (sf s)
-  | Eint s -> Eint s
+  | Eint loc s -> Eint loc s
   | Evar loc s sl -> Evar loc (sf s) (List.map sf sl)
   | Etransl upp s c -> Etransl upp s c ]
 and substel sf el = List.map (subste sf) el;
@@ -634,7 +634,16 @@ value eval_bool_var conf eval_var =
       | VVstring _ -> True ] ]
 ;
 
-value eval_bool_expr conf eval_var =
+value nb_errors = ref 0;
+
+value loc_of_expr =
+  fun
+  [ Eint loc _ -> loc
+  | Evar loc _ _ -> loc
+  | _ -> (-1, -1) ]
+;
+
+value eval_bool_expr conf eval_var e =
   let rec bool_eval =
     fun
     [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
@@ -657,16 +666,17 @@ value eval_bool_expr conf eval_var =
               False
             } ]
     | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
-    | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Eint loc s -> Stdpp.raise_with_loc loc (Failure "bool value expected")
     | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
   and int_eval e =
     let s = string_eval e in
     try int_of_string s with
-    [ Failure _ -> do { Wserver.wprint "not int: \"%s\"" s; 0 } ]
+    [ Failure _ ->
+        Stdpp.raise_with_loc (loc_of_expr e) (Failure "int value expected") ]
   and string_eval =
     fun
     [ Estr s -> s
-    | Eint s -> s
+    | Eint _ s -> s
     | Evar loc s sl ->
         try eval_string_var conf (eval_var loc) s sl with
         [ Not_found ->
@@ -679,7 +689,22 @@ value eval_bool_expr conf eval_var =
     | Etransl upp s c -> eval_transl conf upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
-  bool_eval
+  try bool_eval e with
+  [ Stdpp.Exc_located (bp, ep) exc ->
+      do {
+        incr nb_errors;
+        IFDEF UNIX THEN do {
+          if nb_errors.val <= 10 then do {
+            Printf.eprintf "*** <W> template file";
+            Printf.eprintf ", chars %d-%d" bp ep;
+            Printf.eprintf ": %s\n" (Printexc.to_string exc);
+            flush stderr;
+          }
+          else ();
+        }
+        ELSE () END;
+        False
+      } ]
 ;
 
 value eval_expr conf eval_var =

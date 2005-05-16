@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.100 2005-05-16 12:14:26 ddr Exp $ *)
+(* $Id: perso.ml,v 4.101 2005-05-16 19:17:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1520,7 +1520,7 @@ and print_simple_foreach conf base env al ini_ep ep efam =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
   | "ancestor" -> print_foreach_ancestor conf base env al ep
-  | "ancestor_level" -> print_foreach_level "max_anc_level" conf base env al ep
+  | "ancestor_level" -> print_foreach_ancestor_level conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
   | "descendant_level" -> print_foreach_descendant_level conf base env al ep
@@ -1565,6 +1565,24 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
         gpl.val := next_generation conf base mark gpl.val;
       }
   | _ -> () ]
+and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
+  let max_lev = "max_anc_level" in
+  let max_level =
+    match get_env max_lev env with
+    [ Vint n -> n
+    | _ -> 0 ]
+  in
+  let gpl = Vgpl (ref [GP_person Num.one p.cle_index None]) in
+  let mark = Vmark (Array.create base.data.persons.len Num.zero) in
+  let env = [("mark", mark); ("gpl", gpl) :: env] in
+  loop 1 where rec loop i =
+    if i > max_level then ()
+    else
+      let env = [("level", Vint i) :: env] in
+      do {
+        List.iter (print_ast conf base env ep) al;
+        loop (succ i)
+      }
 and print_foreach_child conf base env al ep =
   fun
   [ Vfam _ _ des ->
@@ -1876,8 +1894,6 @@ value interp_templ templ_fname conf base p =
     let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
     let mdl () =  Vint (max_descendant_level conf base p) in
-    let gpl () = Vgpl (ref [GP_person Num.one p.cle_index None]) in
-    let mark () = Vmark (Array.create base.data.persons.len Num.zero) in
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
@@ -1886,8 +1902,6 @@ value interp_templ templ_fname conf base p =
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl));
-     ("gpl", Vlazy (Lazy.lazy_from_fun gpl));
-     ("mark", Vlazy (Lazy.lazy_from_fun mark));
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
   do {
