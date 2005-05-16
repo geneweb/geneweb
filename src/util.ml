@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.130 2005-05-12 20:14:24 ddr Exp $ *)
+(* $Id: util.ml,v 4.131 2005-05-16 03:49:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -600,22 +600,6 @@ value uget (conf : config) base ip =
     { family = [| |] }
   else base.data.unions.get (Adef.int_of_iper ip)
 ;
-
-(*
-value nobr_level = ref 0;
-value enter_nobr () =
-  do {
-    if nobr_level.val == 0 then Wserver.wprint "<nobr>" else ();
-    incr nobr_level;
-  }
-;
-value exit_nobr () =
-  do {
-    decr nobr_level;
-    if nobr_level.val == 0 then Wserver.wprint "</nobr>" else ();
-  }
-;
-*)
 
 value know base p =
   sou base p.first_name <> "?" || sou base p.surname <> "?"
