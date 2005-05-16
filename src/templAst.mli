@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templAst.mli,v 4.5 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: templAst.mli,v 4.6 2005-05-16 19:17:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type ast =
@@ -18,7 +18,7 @@ and ast_expr =
   | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
-  | Eint of string
+  | Eint of loc and string
   | Evar of loc and string and list string
   | Etransl of bool and string and string ]
 and loc = (int * int)
