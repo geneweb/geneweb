@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.99 2005-05-15 18:43:51 ddr Exp $ *)
+(* $Id: perso.ml,v 4.100 2005-05-16 12:14:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1091,13 +1091,6 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       if not p_auth && conf.hide_names then "x x"
       else if force_surname then person_text conf base p
       else person_text_without_surname conf base p
-  | "child_sosa" ->
-      match get_env "all_gp" env with
-      [ Vallgp all_gp ->
-          match get_link all_gp p.cle_index with
-          [ Some s -> Num.to_string s
-          | None -> "" ]
-      | _ -> raise Not_found ]
   | "consanguinity" ->
       if p_auth then
         string_of_decimal_num conf
@@ -1237,6 +1230,13 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match p.qualifiers with
       [ [nn :: _] when p_auth -> sou base nn
       | _ -> "" ]
+  | "sosa_in_list" ->
+      match get_env "all_gp" env with
+      [ Vallgp all_gp ->
+          match get_link all_gp p.cle_index with
+          [ Some s -> Num.to_string s
+          | None -> "" ]
+      | _ -> raise Not_found ]
   | "sosa_link" ->
       match get_env "sosa" env with
       [ Vsosa x ->
