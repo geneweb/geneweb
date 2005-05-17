@@ -1,9 +1,11 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.8 2005-05-14 21:21:59 ddr Exp $ *)
+(* $Id: templ.mli,v 4.9 2005-05-17 03:36:14 ddr Exp $ *)
 
 open Config;
 open Def;
 open TemplAst;
+
+exception Exc_located of loc and exn;
 
 value input : config -> string -> list ast;
 
