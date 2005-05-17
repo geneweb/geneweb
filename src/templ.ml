@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.45 2005-05-17 03:25:28 ddr Exp $ *)
+(* $Id: templ.ml,v 4.46 2005-05-17 03:36:14 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -22,6 +22,14 @@ type token =
 ;
 
 type loc_token = [ Tok of loc and token ];
+
+exception Exc_located of loc and exn;
+
+value raise_with_loc loc exc =
+  match exc with
+  [ Exc_located _ _ -> raise exc
+  | _ -> raise (Exc_located loc exc) ]
+;
 
 value rec get_ident len =
   parser
@@ -688,13 +696,13 @@ value eval_bool_expr conf eval_var e =
               False
             } ]
     | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
-    | Eint loc s -> Stdpp.raise_with_loc loc (Failure "bool value expected")
+    | Eint loc s -> raise_with_loc loc (Failure "bool value expected")
     | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
   and int_eval e =
     let s = string_eval e in
     try int_of_string s with
     [ Failure _ ->
-        Stdpp.raise_with_loc (loc_of_expr e) (Failure "int value expected") ]
+        raise_with_loc (loc_of_expr e) (Failure "int value expected") ]
   and string_eval =
     fun
     [ Estr s -> s
@@ -712,7 +720,7 @@ value eval_bool_expr conf eval_var e =
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   try bool_eval e with
-  [ Stdpp.Exc_located (bp, ep) exc ->
+  [ Exc_located (bp, ep) exc ->
       do {
         incr nb_errors;
         IFDEF UNIX THEN do {
