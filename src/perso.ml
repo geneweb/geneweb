@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.101 2005-05-16 19:17:44 ddr Exp $ *)
+(* $Id: perso.ml,v 4.102 2005-05-17 11:40:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -420,13 +420,13 @@ value get_all_generations conf base p =
 ;
 (**)
 
-(* Interpretation of template file 'perso.txt' *)
+(* Interpretation of template file *)
 
 type env =
   [ Vallgp of list generation_person
   | Vanc of Num.t and iper and option Num.t and option ifam
   | Vind of person and ascend and union
-  | Vfam of family and (iper * iper) and descend
+  | Vfam of family and (iper * iper * iper) and descend
   | Vrel of relation and option person
   | Vbool of bool
   | Vint of int
@@ -469,9 +469,11 @@ value extract_var sini s =
   else ""
 ;
 
+value template_file = ref "perso.txt";
+
 value warning_use_has_parents_before_parent (bp, ep) var r =
   IFDEF UNIX THEN do {
-    Printf.eprintf "*** <W> perso.txt";
+    Printf.eprintf "*** <W> %s" template_file.val;
     Printf.eprintf ", chars %d-%d" bp ep;
     Printf.eprintf "\
 : since v5.00, must test \"has_parents\" before using \"%s\"\n"
@@ -484,7 +486,7 @@ value warning_use_has_parents_before_parent (bp, ep) var r =
 
 value warning_not_impl (bp, ep) =
   IFDEF UNIX THEN do {
-    Printf.eprintf "*** <W> perso.txt";
+    Printf.eprintf "*** <W> %s" template_file.val;
     Printf.eprintf ", chars %d-%d" bp ep;
     Printf.eprintf " not implemented\n";
     flush stderr;
@@ -498,7 +500,7 @@ value obsolete_list = ref [];
 value obsolete (bp, ep) version var new_var r =
   if List.mem var obsolete_list.val then r
   else IFDEF UNIX THEN do {
-    Printf.eprintf "*** <W> perso.txt, chars %d-%d:" bp ep;
+    Printf.eprintf "*** <W> %s, chars %d-%d:" template_file.val bp ep;
     Printf.eprintf " \"%s\" obsolete since v%s%s\n" var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
     flush stderr;
@@ -621,7 +623,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "divorce_date" ->
       match get_env "fam" env with
-      [ Vfam fam (_, isp) _ ->
+      [ Vfam fam (_, _, isp) _ ->
           match fam.divorce with
           [ Divorced d ->
               let d = Adef.od_of_codate d in
@@ -731,7 +733,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "witness_relation" ->
       match get_env "fam" env with
-      [ Vfam _ (ip1, ip2) _ ->
+      [ Vfam _ (ip1, ip2, _) _ ->
           Printf.sprintf
             (ftransl conf "witness at marriage of %s and %s")
             (referenced_person_title_text conf base (pget conf base ip1))
@@ -837,7 +839,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       | _ -> raise Not_found ]
   | ["spouse" :: sl] ->
       match get_env "fam" env with
-      [ Vfam _ (_, ip) _ ->
+      [ Vfam _ (_, _, ip) _ ->
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
@@ -869,7 +871,10 @@ and eval_ancestor_field_var conf base env (n, ip, no, ifamo) loc =
           let f = foi base ifam in
           let c = coi base ifam in
           let d = doi base ifam in
-          let c = (father c, mother c) in
+          let ifath = father c in
+          let imoth = mother c in
+          let ispouse = if ip = ifath then imoth else ifath in
+          let c = (ifath, imoth, ispouse) in
           eval_family_field_var conf base env (f, c, d) loc sl
       | None -> raise Not_found ]
   | ["father_sosa"] ->
@@ -1215,7 +1220,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       | _ -> "" ]
   | "prev_fam_father" ->
       match get_env "prev_fam" env with
-      [ Vfam fam (ifath, _) _ -> string_of_int (Adef.int_of_iper ifath)
+      [ Vfam fam (ifath, _, _) _ -> string_of_int (Adef.int_of_iper ifath)
       | _ -> raise Not_found ]
   | "prev_fam_index" ->
       match get_env "prev_fam" env with
@@ -1223,7 +1228,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       | _ -> raise Not_found ]
   | "prev_fam_mother" ->
       match get_env "prev_fam" env with
-      [ Vfam fam (_, imoth) _ -> string_of_int (Adef.int_of_iper imoth)
+      [ Vfam fam (_, imoth, _) _ -> string_of_int (Adef.int_of_iper imoth)
       | _ -> raise Not_found ]
   | "public_name" -> if not p_auth then "" else sou base p.public_name
   | "qualifier" ->
@@ -1263,15 +1268,19 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else Name.lower (p_surname base p)
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
-and eval_family_field_var conf base env fcd loc =
+and eval_family_field_var conf base env ((_, (ifath, imoth, _), _) as fcd) loc =
   fun
-  [ [s] -> str_val (eval_str_family_field conf base env fcd loc s)
+  [ ["father" :: sl] ->
+      let ep = make_ep conf base ifath in
+      eval_person_field_var conf base env ep loc sl
+  | ["mother" :: sl] ->
+      let ep = make_ep conf base imoth in
+      eval_person_field_var conf base env ep loc sl
+  | [s] -> str_val (eval_str_family_field conf base env fcd loc s)
   | _ -> raise Not_found ]
-and eval_str_family_field conf base env (f, (ifath, imoth), d) loc =
+and eval_str_family_field conf base env (f, _, _) loc =
   fun
-  [ "father" -> string_of_int (Adef.int_of_iper ifath)
-  | "index" -> string_of_int (Adef.int_of_ifam f.fam_index)
-  | "mother" -> string_of_int (Adef.int_of_iper imoth)
+  [ "index" -> string_of_int (Adef.int_of_ifam f.fam_index)
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
   if p_auth then
@@ -1345,7 +1354,7 @@ and obsolete_eval conf base env (p, a, u, p_auth) loc =
   [ "married_to" ->
       let s =
         match get_env "fam" env with
-        [ Vfam fam (_, ispouse) des ->
+        [ Vfam fam (_, _, ispouse) des ->
            let spouse = pget conf base ispouse in
            let auth = p_auth && authorized_age conf base spouse in
            let format = relation_txt conf p.sex fam in
@@ -1485,7 +1494,8 @@ and print_foreach conf base env ini_ep loc s sl al =
         [ Some ifam ->
             let cpl = coi base ifam in
             let ep = make_ep conf base (father cpl) in
-            let cpl = (father cpl, mother cpl) in
+            let imoth = mother cpl in
+            let cpl = (father cpl, imoth, imoth) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None ->
@@ -1495,14 +1505,15 @@ and print_foreach conf base env ini_ep loc s sl al =
         [ Some ifam ->
             let cpl = coi base ifam in
             let ep = make_ep conf base (mother cpl) in
-            let cpl = (father cpl, mother cpl) in
+            let ifath = father cpl in
+            let cpl = (ifath, mother cpl, ifath) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None ->
             warning_use_has_parents_before_parent loc "mother" () ]
     | ["spouse" :: sl] ->
         match efam with
-        [ Vfam _ (_, ip) _ ->
+        [ Vfam _ (_, _, ip) _ ->
             let ep = make_ep conf base ip in
             loop ep efam sl
         | _ -> raise Not_found ]
@@ -1645,7 +1656,10 @@ and print_foreach_family conf base env al ini_ep (p, _, u, _) =
       let fam = foi base ifam in
       let cpl = coi base ifam in
       let des = doi base ifam in
-      let cpl = (p.cle_index, spouse p.cle_index cpl) in
+      let ifath = father cpl in
+      let imoth = mother cpl in
+      let ispouse = spouse p.cle_index cpl in
+      let cpl = (ifath, imoth, ispouse) in
       let vfam = Vfam fam cpl des in
       let env = [("#loop", Vint 0) :: env] in
       let env = [("fam", vfam) :: env] in
@@ -1874,13 +1888,15 @@ and print_foreach_witness_relation conf base env al ((p, _, _, _) as ep) =
     (fun (ifam, fam) ->
        let cpl = coi base ifam in
        let des = doi base ifam in
-       let cpl = ((father cpl), (mother cpl)) in
+       let imoth = mother cpl in
+       let cpl = (father cpl, imoth, imoth) in
        let env = [("fam", Vfam fam cpl des) :: env] in
        List.iter (print_ast conf base env ep) al)
     list
 ;
 
 value interp_templ templ_fname conf base p =
+  let _ = do { template_file.val := templ_fname ^ ".txt"; } in
   let astl = Templ.input conf templ_fname in
   let a = aget conf base p.cle_index in
   let u = uget conf base p.cle_index in
