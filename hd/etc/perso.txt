@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.43 2005-05-15 06:59:22 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.44 2005-05-17 03:29:25 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -119,7 +119,7 @@
      is_cremated or has_consanguinity)
   %if;has_image;<td>%end;
   <ul>
-    %if;has_occupation;<li>%occupation;</li>%nl;%end;
+    %if;has_occupation;<li>%apply;capitalize(occupation)</li>%nl;%end;
     %if;has_birth_date;
       <li>[*born]s %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.44 2005-05-16 19:17:44 ddr Exp $ *)
+(* $Id: templ.ml,v 4.45 2005-05-17 03:25:28 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -60,6 +60,8 @@ value get_variable =
   | [: `'/' :] ep -> ((bp, ep), "/", [])
   | [: `'[' :] ep -> ((bp, ep), "[", [])
   | [: `']' :] ep -> ((bp, ep), "]", [])
+  | [: `'(' :] ep -> ((bp, ep), "(", [])
+  | [: `')' :] ep -> ((bp, ep), ")", [])
   | [: v = get_ident 0; vl = var_kont :] ep -> ((bp, ep), v, vl) ]
 ;
 
@@ -235,6 +237,21 @@ value parse_formal_params strm =
   parse_tuple (Stream.from f)
 ;
 
+value rec parse_comment =
+  parser
+  [ [: `'%'; s :] -> parse_comment_after_percent s
+  | [: `_; s :] -> parse_comment s ]
+and parse_comment_after_percent =
+  parser
+  [ [: `')'; s :] -> parse_spaces_after_comment s
+  | [: `'('; s :] -> do { parse_comment s; parse_comment s }
+  | [: `_; s :] -> parse_comment s ]
+and parse_spaces_after_comment =
+  parser
+  [ [: `(' ' | '\n' | '\t' | '\r'); s :] -> parse_spaces_after_comment s
+  | [: :] -> () ]
+;
+
 value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser bp
@@ -243,6 +260,11 @@ value parse_templ conf strm =
         match get_variable strm with
         [ (_, ("%" | "[" | "]" as c), []) ->
             parse_astl [Atext c :: astl] False 0 end_list strm
+        | (_, "(", []) ->
+            do {
+              parse_comment strm;
+              parse_astl astl bol len end_list strm
+            }
         | (_, v, []) when List.mem v end_list -> (List.rev astl, v)
         | (_, "define", []) -> parse_define astl end_list strm
         | x ->
