@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.102 2005-05-17 11:40:01 ddr Exp $ *)
+(* $Id: perso.ml,v 4.103 2005-05-17 20:11:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -898,6 +898,13 @@ and eval_ancestor_field_var conf base env (n, ip, no, ifamo) loc =
   | ["sosa"] ->
       let s = Num.to_string_sep (transl conf "(thousand separator)") n in
       VVstring s
+  | ["spouse" :: sl] ->
+      match ifamo with
+      [ Some ifam ->
+          let ip = Gutil.spouse ip (coi base ifam) in
+          let ep = make_ep conf base ip in
+          eval_person_field_var conf base env ep loc sl
+      | None -> raise Not_found ]
   | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl ]
@@ -1474,8 +1481,19 @@ and print_foreach conf base env ini_ep loc s sl al =
     [ [s] -> print_simple_foreach conf base env al ini_ep ep efam s
     | ["ancestor" :: sl] ->
         match get_env "ancestor" env with
-        [ Vanc n ip no _ ->
+        [ Vanc n ip no ifamo ->
             let ep = make_ep conf base ip in
+            let efam =
+              match ifamo with
+              [ Some ifam ->
+                  let cpl = coi base ifam in
+                  let ifath = father cpl in
+                  let imoth = mother cpl in
+                  let ispouse = if ip = ifath then imoth else ifath in
+                  let cpl = (ifath, imoth, ispouse) in
+                  Vfam (foi base ifam) cpl (doi base ifam)
+              | None -> efam ]
+            in
             loop ep efam sl
         | _ -> raise Not_found ]
     | ["child" :: sl] ->

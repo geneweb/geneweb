@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.3 2005-05-17 11:53:15 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.4 2005-05-17 20:11:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -145,6 +145,29 @@
   Long display
 %)
 
+%define;child_notes(spec)
+  %if;(child.sosa_in_list = "" and
+       (child.has_sources or child.has_notes))
+    <dt><a href="#%ancestor.sosa;" name="notes-%ancestor.sosa;
+    %if;("spec" != "")-spec%end;%apply;letter(child_cnt)"><b>%ancestor.sosa;
+    %if;("spec" != "")-spec%end;%apply;letter(child_cnt)</b></a>:</dt>
+    <dd>
+    %if;child.has_notes;
+      <table><tr><td>%child.notes;</td></tr></table>
+      <br%/>
+    %end;
+    %if;child.has_sources;
+      <em style="font-size:80%%">[*source/sources]1:<br%/>
+      %foreach;child.source;
+        - %source_type;: %source;<br%/>
+      %end;
+      </em>
+      <br%/>
+    %end;
+    </dd>
+  %end;
+%end;
+
 %define;long_display_notes()
   <h3>[*note/notes]1</h3>
   <dl>
@@ -173,26 +196,16 @@
           %foreach;ancestor.family;
             %if;(family.index = ancestor.family.index)
               %foreach;child;
-                %if;(child.sosa_in_list = "" and
-                     (child.has_notes or child.has_sources))
-                  <dt><b><a href="#%ancestor.sosa;
-                  " name="notes-%ancestor.sosa;
-                  %apply;letter(child_cnt)">%ancestor.sosa;
-                  %apply;letter(child_cnt)</a></b>:</dt>
-                  <dd>
-                  %if;child.has_notes;
-                    <table><tr><td>%child.notes;</td></tr></table>
-                    <br%/>
-                  %end;
-                  %if;child.has_sources;
-                    <em style="font-size:80%%">[*source/sources]1:<br%/>
-                    %foreach;child.source;
-                      - %source_type;: %source;<br%/>
-                    %end;
-                    </em>
-                    <br%/>
-                  %end;
-                  </dd>
+                %apply;child_notes("")
+              %end;
+            %end;
+          %end;
+          %if;(ancestor.index != self.index)
+            %( father's other families %)
+            %foreach;ancestor.spouse.family;
+              %if;(spouse.index != ancestor.index)
+                %foreach;child;
+                  %apply;child_notes(family_cnt)
                 %end;
               %end;
             %end;
@@ -318,28 +331,23 @@
       %end;
     %end;
     </p>
-    %( other father's children %)
-    %foreach;ancestor.family;
-      %if;(spouse.index = ancestor.family.father.index)
-        %foreach;spouse.family;
-           %if;(spouse.index != ancestor.index and nb_children > 0)
-             ... [having as children]%sp;
-             <a href="#%family.father.sosa_in_list;
-             "><b>%family.father.sosa_in_list;
-             </b></a>-(X%family_cnt;):
-             <p><ol style="list-style-type:lower-latin">
-             %foreach;child;
-               <li>%apply;child_long_info(family.father.sosa_in_list)</li>
-             %end;
-             </ol></p>
-           %end;
+    %( father's other children %)
+    %foreach;ancestor.spouse.family;
+      %if;(spouse.index != ancestor.index and nb_children > 0)
+        ... [having as children]%sp;
+        <a href="#%family.father.sosa_in_list;
+        "><b>%family.father.sosa_in_list;
+        </b></a>-(X%family_cnt;):
+        <p><ol style="list-style-type:lower-latin">
+        %foreach;child;
+          <li>%apply;child_long_info(family.father.sosa_in_list)</li>
         %end;
+        </ol></p>
       %end;
     %end;
-    %( other mother's children %)
+    %( mother's other children %)
     %foreach;ancestor.family;
-      %if;(family.father.index != ancestor.family.father.index and
-           nb_children > 0)
+      %if;(spouse.index != ancestor.spouse.index and nb_children > 0)
         faut que j'affiche %spouse; (= %family.father;) (%nb_children;)<br>
       %end;
     %end;
