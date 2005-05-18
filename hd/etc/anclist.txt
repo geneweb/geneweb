@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.4 2005-05-17 20:11:19 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.5 2005-05-18 02:25:21 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -115,7 +115,11 @@
 
 %define;somebody_spouse_parent(xx)
   <b><a href="%prefix;%spouse.xx.access;">%spouse.xx;</a></b>%nn;
-  %if;spouse.xx.has_nobility_titles;, <em>%spouse.xx.nobility_title;</em>%end;
+  %if;spouse.xx.has_nobility_titles;,
+    <a href="%prefix;m=TT;sm=S;t=%spouse.xx.nobility_title.ident_key;
+    ;p=%spouse.xx.nobility_title.place_key;">%nn;
+      <em>%spouse.xx.nobility_title;</em></a>%nn;
+  %end;
   %spouse.xx.dates;
   %if;(spouse.xx.sosa_in_list != "")%sp;
     ([see] <a href="#%spouse.xx.sosa_in_list;"><b>%spouse.xx.sosa_in_list;

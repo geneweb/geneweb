@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.103 2005-05-17 20:11:19 ddr Exp $ *)
+(* $Id: perso.ml,v 4.104 2005-05-18 02:25:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -430,8 +430,7 @@ type env =
   | Vrel of relation and option person
   | Vbool of bool
   | Vint of int
-  | Vgpl of ref (list generation_person)
-  | Vmark of array Num.t
+  | Vgpl of ref (list generation_person) and array Num.t
   | Vstring of string
   | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
@@ -926,6 +925,13 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
           warning_use_has_parents_before_parent loc "mother" (str_val "") ]
+  | ["nobility_title" :: sl] ->
+      match Util.main_title base p with
+      [ Some t when p_auth ->
+          let id = sou base t.t_ident in
+          let pl = sou base t.t_place in
+          eval_nobility_title_field_var (id, pl) sl
+      | _ -> raise Not_found ]
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam fam _ _ ->
@@ -943,6 +949,12 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
               [ Not_found -> warning_not_impl loc ] ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> warning_not_impl loc ]
+and eval_nobility_title_field_var (id, pl) =
+  fun
+  [ ["ident_key"] -> VVstring (code_varenv id)
+  | ["place_key"] -> VVstring (code_varenv pl)
+  | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
+  | _ -> raise Not_found ]
 and eval_bool_person_field conf base env (p, a, u, p_auth) =
   fun
   [ "access_by_key" ->
@@ -1181,13 +1193,6 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           in
           string_of_int n ]
   | "nb_families" -> string_of_int (Array.length u.family)
-  | "nobility_title" ->
-      match Util.main_title base p with
-      [ Some t when p_auth ->
-          let id = sou base t.t_ident in
-          let pl = sou base t.t_place in
-          if pl = "" then id else id ^ " " ^ pl
-      | _ -> "" ]
   | "notes" ->
       if p_auth then
         let env = [('i', fun () -> Util.default_image_name base p)] in
@@ -1574,8 +1579,8 @@ and print_foreach_alias conf base env al ((p, _, _, p_auth) as ep) =
       p.aliases
   else ()
 and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
-  match (get_env "gpl" env, get_env "mark" env) with
-  [ (Vgpl gpl, Vmark mark) ->
+  match get_env "gpl" env with
+  [ Vgpl gpl mark ->
       do {
         List.iter
           (fun gp ->
@@ -1601,9 +1606,9 @@ and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
     [ Vint n -> n
     | _ -> 0 ]
   in
-  let gpl = Vgpl (ref [GP_person Num.one p.cle_index None]) in
-  let mark = Vmark (Array.create base.data.persons.len Num.zero) in
-  let env = [("mark", mark); ("gpl", gpl) :: env] in
+  let gpl = ref [GP_person Num.one p.cle_index None] in
+  let mark = Array.create base.data.persons.len Num.zero in
+  let env = [("gpl", Vgpl gpl mark) :: env] in
   loop 1 where rec loop i =
     if i > max_level then ()
     else
