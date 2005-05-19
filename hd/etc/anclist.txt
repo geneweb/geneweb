@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.8 2005-05-19 11:18:27 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.9 2005-05-19 21:51:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -176,7 +176,8 @@
   <h3>[*note/notes]1</h3>
   <dl>
   %foreach;ancestor_level;
-    %if;(evar_v != "" and level <= evar_v)
+    %if;(evar_v != "" and level <= evar_v
+         and (evar_only != "on" or level = evar_v))
       %foreach;ancestor;
         %if;((ancestor.has_sources or ancestor.has_notes)
              and ancestor.same = "")
@@ -388,7 +389,8 @@
   </p>
   <ul>
   %foreach;ancestor_level;
-    %if;(evar_v != "" and level <= evar_v)
+    %if;(evar_v != "" and level <= evar_v
+         and (evar_only != "on" or level = evar_v))
       <li>%nl;[*generation/generations]0 %level;%nl;
         <ul>
         %foreach;ancestor;
@@ -414,7 +416,8 @@
   %apply;togen("evar_v").
   </p>
   %foreach;ancestor_level;
-    %if;(evar_v != "" and level <= evar_v)
+    %if;(evar_v != "" and level <= evar_v
+         and (evar_only != "on" or level = evar_v))
       <h3><em>[*generation/generations]0 %level;</em></h3>
       %foreach;ancestor;
         %if;(ancestor.same != "")

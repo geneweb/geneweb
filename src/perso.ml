@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.105 2005-05-19 03:53:10 ddr Exp $ *)
+(* $Id: perso.ml,v 4.106 2005-05-19 21:51:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -430,7 +430,7 @@ type env =
   | Vrel of relation and option person
   | Vbool of bool
   | Vint of int
-  | Vgpl of ref (list generation_person) and array Num.t
+  | Vgpl of list generation_person
   | Vstring of string
   | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
@@ -1592,24 +1592,21 @@ and print_foreach_alias conf base env al ((p, _, _, p_auth) as ep) =
   else ()
 and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
   match get_env "gpl" env with
-  [ Vgpl gpl mark ->
-      do {
-        List.iter
-          (fun gp ->
-             let v =
-               match gp with
-               [ GP_person n ip ifamo -> Vanc n ip None ifamo
-               | GP_same n1 n2 ip -> Vanc n1 ip (Some n2) None
-               | _ -> Vnone ]
-             in
-             match v with
-             [ Vanc _ _ _ _ ->
-                 let env = [("ancestor", v) :: env] in
-                 List.iter (print_ast conf base env ep) al
-             | _ -> () ])
-          gpl.val;
-        gpl.val := next_generation conf base mark gpl.val;
-      }
+  [ Vgpl gpl ->
+      List.iter
+        (fun gp ->
+           let v =
+             match gp with
+             [ GP_person n ip ifamo -> Vanc n ip None ifamo
+             | GP_same n1 n2 ip -> Vanc n1 ip (Some n2) None
+             | _ -> Vnone ]
+           in
+           match v with
+           [ Vanc _ _ _ _ ->
+               let env = [("ancestor", v) :: env] in
+               List.iter (print_ast conf base env ep) al
+           | _ -> () ])
+        gpl
   | _ -> () ]
 and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
   let max_lev = "max_anc_level" in
@@ -1618,16 +1615,15 @@ and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
     [ Vint n -> n
     | _ -> 0 ]
   in
-  let gpl = ref [GP_person Num.one p.cle_index None] in
   let mark = Array.create base.data.persons.len Num.zero in
-  let env = [("gpl", Vgpl gpl mark) :: env] in
-  loop 1 where rec loop i =
+  loop [GP_person Num.one p.cle_index None] 1 where rec loop gpl i =
     if i > max_level then ()
     else
-      let env = [("level", Vint i) :: env] in
+      let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
       do {
         List.iter (print_ast conf base env ep) al;
-        loop (succ i)
+        let gpl = next_generation conf base mark gpl in
+        loop gpl (succ i)
       }
 and print_foreach_child conf base env al ep =
   fun
