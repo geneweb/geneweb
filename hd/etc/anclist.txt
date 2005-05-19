@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.7 2005-05-19 03:53:10 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.8 2005-05-19 11:18:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -78,16 +78,16 @@
     %foreach;xx.nobility_title;, %nobility_title;%end;
     </em>%nn;
   %end;
-  %if;xx.has_birth_date;
-    , %if;xx.is_male;[born]0%else;[born]1%end;%sp;
-    %xx.on_birth_date;
+  %if;(xx.has_birth_date or xx.has_birth_place)
+    , %if;xx.is_male;[born]0%else;[born]1%end;
+    %if;xx.has_birth_date; %xx.on_birth_date;%end;
+    %if;xx.has_birth_place;, %xx.birth_place;%end;
   %end;
-  %if;xx.has_birth_place;, %xx.birth_place;%end;
-  %if;xx.has_baptism_date;
-    , %if;xx.is_male;[baptized]0%else;[baptized]1%end;%sp;
-    %xx.on_baptism_date;
+  %if;(xx.has_baptism_date or xx.has_baptism_place)
+    , %if;xx.is_male;[baptized]0%else;[baptized]1%end;
+    %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
+    %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %end;
-  %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %if;xx.is_dead;, %xx.died;
     %if;(xx.has_death_date) %xx.on_death_date;%end;
     %if;(xx.has_death_place), %xx.death_place;%end;
