@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.6 2005-05-19 02:11:17 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.7 2005-05-19 03:53:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -198,6 +198,7 @@
           </dd>
         %end;
         %if;(evar_siblings = "on" and ancestor.is_female and ancestor.same = "")
+          %( siblings %)
           %foreach;ancestor.family;
             %if;(family.index = ancestor.family.index)
               %foreach;child;
@@ -207,12 +208,10 @@
           %end;
           %if;(ancestor.index != self.index)
             %( father's other families %)
-            %if;(ancestor.spouse.same = "")
-              %foreach;ancestor.spouse.family;
-                %if;(spouse.index != ancestor.index)
-                  %foreach;child;
-                    %apply;child_notes(family_cnt)
-                  %end;
+            %foreach;ancestor.spouse.family;
+              %if;(spouse.index != ancestor.index)
+                %foreach;child;
+                  %apply;child_notes(family_cnt)
                 %end;
               %end;
             %end;
@@ -249,8 +248,7 @@
   %end;
   %if;(evar_siblings = "on")
     %foreach;ancestor.family;
-      %if;(ancestor.index = index or
-           family.index != ancestor.family.index)
+      %if;(ancestor.index = index or family.index != ancestor.family.index)
         %apply;capitalize%with;
           %apply;married_to%with;
             %ancestor.is_male;
@@ -346,32 +344,34 @@
       %end;
     %end;
     </p>
-    %( father's other children %)
-    %foreach;ancestor.spouse.family;
-      %if;(spouse.index != ancestor.index and nb_children > 0)
-        ... [having as children]%sp;
-        <a href="#%family.father.sosa_in_list;
-        "><b>%family.father.sosa_in_list;
-        </b></a>-(X%family_cnt;):
-        <p><ol style="list-style-type:lower-latin">
-        %foreach;child;
-          <li>%apply;child_long_info(family_cnt)</li>
+    %if;(evar_siblings = "on")
+      %( father's other children %)
+      %foreach;ancestor.spouse.family;
+        %if;(spouse.index != ancestor.index and nb_children > 0)
+          ... [having as children]%sp;
+          <a href="#%family.father.sosa_in_list;
+          "><b>%family.father.sosa_in_list;
+          </b></a>-(X%family_cnt;):
+          <p><ol style="list-style-type:lower-latin">
+          %foreach;child;
+            <li>%apply;child_long_info(family_cnt)</li>
+          %end;
+          </ol></p>
         %end;
-        </ol></p>
       %end;
-    %end;
-    %( mother's other children %)
-    %foreach;ancestor.family;
-      %if;(spouse.index != ancestor.spouse.index and nb_children > 0)
-        ... [having as children]%sp;
-        <a href="#%family.mother.sosa_in_list;
-        "><b>%family.mother.sosa_in_list;
-        </b></a>-(X%family_cnt;):
-        <p><ol style="list-style-type:lower-latin">
-        %foreach;child;
-          <li>%apply;child_long_info(family_cnt)</li>
+      %( mother's other children %)
+      %foreach;ancestor.family;
+        %if;(spouse.index != ancestor.spouse.index and nb_children > 0)
+          ... [having as children]%sp;
+          <a href="#%family.mother.sosa_in_list;
+          "><b>%family.mother.sosa_in_list;
+          </b></a>-(X%family_cnt;):
+          <p><ol style="list-style-type:lower-latin">
+          %foreach;child;
+            <li>%apply;child_long_info(family_cnt)</li>
+          %end;
+          </ol></p>
         %end;
-        </ol></p>
       %end;
     %end;
   %end;
@@ -398,7 +398,7 @@
              %if;(ancestor.same != "")%ancestor.same;
              %else;%ancestor;%end;
           </a>%nn;
-          %if;(ancestor.nobility_title != ""),%sp;
+          %if;(ancestor.has_nobility_titles),%sp;
           <em>%ancestor.nobility_title;</em>%end;
           %if;(ancestor.same = "")%ancestor.dates;%end;
           </li>%nl;
