@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.62 2005-05-12 14:43:00 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.63 2005-05-19 12:22:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -211,6 +211,7 @@ value print_generation_person conf base cnt gp =
   | _ -> () ]
 ;
 
+(*
 value will_print =
   fun
   [ GP_person _ _ _ -> True
@@ -793,6 +794,7 @@ value display_ancestors_with_numbers_long conf base max_level ws wn p =
     trailer conf
   }
 ;
+*)
 
 value print_ancestors_same_time_descendants conf base p a =
   let maxlen =
@@ -2036,8 +2038,14 @@ value print conf base p =
   | (Some "N", Some v) ->
       if p_getenv conf.env "only" = Some "on" then
         display_ancestors_level conf base v p
-      else display_ancestors_with_numbers conf base v p
+      else
+(*
+        display_ancestors_with_numbers conf base v p
+*)
+        Perso.interp_templ "anclist" conf base p
+(**)
   | (Some "G", Some v) ->
+(*
       let ws =
         match p_getenv conf.env "siblings" with
         [ Some "on" -> True
@@ -2049,6 +2057,9 @@ value print conf base p =
         | _ -> False ]
       in
       display_ancestors_with_numbers_long conf base v ws wn p
+*)
+      Perso.interp_templ "anclist" conf base p
+(**)
   | (Some "M", Some v) ->
       let al =
         match p_getenv conf.env "al" with

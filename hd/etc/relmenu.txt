@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 1.8 2005-05-15 21:33:17 ddr Exp $ -->
+  <!-- $Id: relmenu.txt,v 1.9 2005-05-19 12:25:41 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -96,7 +96,7 @@
       <label>
         <input type="radio" name="select" value="%spouse.index;"%/>
         %spouse;
-        %if;(spouse.nobility_title != ""),%sp;
+        %if;spouse.has_nobility_titles;,%sp;
         <em>%spouse.nobility_title;</em>%end;%nl;
       </label>
     </li>
@@ -108,7 +108,7 @@
     <label>
       <input type="radio" name="select" value="%relation_him.index;"%/>
       (%relation_him.type;)%nl;%relation_him;
-      %if;(relation_him.nobility_title != ""),%sp;
+      %if;relation_him.has_nobility_titles;,%sp;
       <em>%relation_him.nobility_title;</em>%end;%nl;
     </label>
   </li>
@@ -118,7 +118,7 @@
     <label>
       <input type="radio" name="select" value="%relation_her.index;"%/>
       (%relation_her.type;)%nl;%relation_her;
-      %if;(relation_her.nobility_title != ""),%sp;
+      %if;relation_her.has_nobility_titles;,%sp;
       <em>%relation_her.nobility_title;</em>%end;%nl;
     </label>
   </li>
@@ -129,7 +129,7 @@
   <label>
     <input type="radio" name="select" value="%related.index;"%/>
     (%related.type;)%nl;%related;
-    %if;(related.nobility_title != ""),%sp;
+    %if;related.has_nobility_titles;,%sp;
     <em>%related.nobility_title;</em>%end;%nl;
   </label>
 </li>

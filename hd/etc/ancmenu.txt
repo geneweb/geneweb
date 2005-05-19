@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.7 2005-05-14 17:48:46 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.8 2005-05-19 12:22:49 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -256,7 +256,7 @@
     <p>
       %apply;navsosa%with;
         <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
-        %if;(nobility_title != ""), <em>%nobility_title;</em>%end;%nl;
+        %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
       %end;
     </p>
   </td>
