@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.106 2005-05-19 21:51:34 ddr Exp $ *)
+(* $Id: perso.ml,v 4.107 2005-05-20 11:45:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -435,7 +435,8 @@ type env =
   | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
   | Vtitle of person and title_item
-  | Vlazy of Lazy.t env  
+  | Vlazyp of ref (option (list string))
+  | Vlazy of Lazy.t env
   | Vfun of list string and list ast
   | Vnone ]
 and title_item =
@@ -599,6 +600,10 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"
   | "is_sibling_before" -> get_env "pos" env = Vstring "prev"
+  | "lazy_printed" ->
+      match get_env "lazy_print" env with
+      [ Vlazyp r -> r.val = None
+      | _ -> raise Not_found ]
   | s ->
       let v = extract_var "file_exists_" s in
       if v <> "" then
@@ -726,6 +731,13 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "surname_alias" ->
       match get_env "surname_alias" env with
       [ Vstring s -> s
+      | _ -> raise Not_found ]
+  | "unfreeze_lazy" ->
+      match get_env "lazy_print" env with
+      [ Vlazyp r ->
+          match r.val with
+          [ Some sl -> do { r.val := None; String.concat "" sl }
+          | None -> "" ]
       | _ -> raise Not_found ]
   | "witness_relation" ->
       match get_env "fam" env with
@@ -1421,6 +1433,9 @@ value rec eval_ast conf base env ep =
   [ Atext s -> s
   | Avar loc s sl ->
       Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
+  | Aexpr e ->
+      let eval_var = eval_var conf base env ep in
+      Templ.eval_expr conf eval_var e
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
   | Aapply f el ->
@@ -1441,12 +1456,16 @@ and eval_apply conf f env eval_ast vl =
       let sl = List.map eval_ast al in
       String.concat "" sl
   | _ ->
-      eval_predefined_apply conf f vl ]
-and eval_predefined_apply conf f vl =
+      eval_predefined_apply conf env f vl ]
+and eval_predefined_apply conf env f vl =
   match (f, vl) with
   [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
   | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
   | ("capitalize", [s]) -> capitale s
+  | ("lazy_print", sl) ->
+      match get_env "lazy_print" env with
+      [ Vlazyp r -> do { r.val := Some sl; "" }
+      | _ -> raise Not_found ]
   | ("nth", [s1; s2]) ->
       let n = try int_of_string s2 with [ Failure _ -> 0 ] in
       Util.nth_field s1 n
@@ -1478,7 +1497,7 @@ and print_apply conf base env ep f el =
   | _ ->
       let eval_var = eval_var conf base env ep in
       let vl = List.map (Templ.eval_expr conf eval_var) el in
-      Wserver.wprint "%s" (eval_predefined_apply conf f vl) ]
+      Wserver.wprint "%s" (eval_predefined_apply conf env f vl) ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
@@ -1959,6 +1978,7 @@ value interp_templ templ_fname conf base p =
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
+     ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
      ("sosa_ref", Vsosa_ref sosa_ref_l);
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));

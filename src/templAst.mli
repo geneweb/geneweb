@@ -1,10 +1,11 @@
 (* camlp4r *)
-(* $Id: templAst.mli,v 4.6 2005-05-16 19:17:44 ddr Exp $ *)
+(* $Id: templAst.mli,v 4.7 2005-05-20 11:45:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type ast =
   [ Atext of string
   | Avar of loc and string and list string
+  | Aexpr of ast_expr
   | Atransl of bool and string and string
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
