@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.48 2005-05-20 11:45:44 ddr Exp $ *)
+(* $Id: templ.ml,v 4.49 2005-05-20 12:59:52 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -437,9 +437,9 @@ value strip_newlines_after_variables =
         [Adefine f x (loop al) (loop alk) :: loop astl]
     | [AapplyWithAst f all :: astl] ->
         [AapplyWithAst f (List.map loop all) :: loop astl]
-    | [(Avar _ _ _ | Aexpr _ | Aapply _ _ | Atransl _ _ _ |
-        Awid_hei _ as ast) :: astl] ->
-        [ast :: loop astl]
+    | [(Atransl _ _ _ | Awid_hei _ as ast1); (Atext _ as ast2) :: astl] ->
+        [ast1; ast2 :: loop astl]
+    | [ast :: astl] -> [ast :: loop astl]
     | [] -> [] ]
 ;
 
