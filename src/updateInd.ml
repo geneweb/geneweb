@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.25 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.26 2005-05-20 11:45:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -342,6 +342,7 @@ value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
+  | Aexpr e -> Wserver.wprint "Aexpr"
   | Avar loc s sl ->
       Templ.print_var conf base (eval_var conf base env p loc) s sl
   | Awid_hei s -> Wserver.wprint "Awid_hei"

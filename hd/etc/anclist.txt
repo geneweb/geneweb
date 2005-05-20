@@ -1,11 +1,11 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.9 2005-05-19 21:51:34 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.10 2005-05-20 11:45:44 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
-      [*ancestors]%nn;
+      %if;(evar_t = "M")[*missing ancestors]%else;[*ancestors]%end;
     %and;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
       %if;(qualifier != "") %qualifier;%end;
@@ -27,7 +27,7 @@
 
 <h1 style="text-align:center" class="highlight">%nn;
   %apply;a_of_b%with;
-    [*ancestors]%nn;
+    %if;(evar_t = "M")[*missing ancestors]%else;[*ancestors]%end;
   %and;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
@@ -407,6 +407,39 @@
         %end;
         </ul>
       </li>
+    %end;
+  %end;
+  </ul>
+%elseif;(evar_t = "M")
+  %( missing ancestors %)
+  <p>
+  %apply;togen("evar_v").
+  </p>
+  <p>
+  %apply;a_of_b([*parents], "...")
+  </p>
+  <ul>
+  %foreach;ancestor_level;
+    %if;(evar_v != "" and level <= evar_v)
+      %apply;lazy_print%with;
+        <li>%nl;[*generation/generations]0 %expr(level+1);%nl;
+        <ul>%nl;
+      %end;
+      %foreach;ancestor;
+        %if;(not ancestor.has_parents)
+          %unfreeze_lazy;
+          <li> %expr(ancestor.sosa * 2)-%expr((ancestor.sosa * 2 + 1) % 10) -
+          <a href="%prefix;%ancestor.access;">%nn;
+             %if;(ancestor.same != "")%ancestor.same;
+             %else;%ancestor;%end;
+          </a>%nn;
+          %if;(ancestor.has_nobility_titles),%sp;
+          <em>%ancestor.nobility_title;</em>%end;
+          %if;(ancestor.same = "")%ancestor.dates;%end;
+          </li>%nl;
+        %end;
+      %end;
+      %if;lazy_printed;</ul>%nl;</li>%nl;%end;
     %end;
   %end;
   </ul>
