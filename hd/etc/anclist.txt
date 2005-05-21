@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.13 2005-05-21 15:06:47 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.14 2005-05-21 17:35:33 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -427,9 +427,11 @@
   <p>
   %apply;togen("evar_v").
   </p>
-  <p>
-  %apply;a_of_b([*parents], "...")
-  </p>
+  %if;(evar_ms != "on")
+    <p>
+    %apply;a_of_b([*parents], "...")
+    </p>
+  %end;
   <ul>
   %foreach;ancestor_level;
     %if;(evar_v != "" and level <= evar_v)
@@ -439,16 +441,51 @@
       %end;
       %foreach;ancestor;
         %if;(ancestor.same = "" and not ancestor.has_parents and
-             (ancestor.first_name != "?" or ancestor.surname != "?"))
+             ancestor.first_name != "?" and ancestor.surname != "?")
           %lazy_force;
           <li>%sp;
             %expr(ancestor.sosa.v * 2)
             -%expr((ancestor.sosa.v * 2 + 1) % 10) -
-          %apply;link(ancestor.access, ancestor)
+          %if;(evar_ms != "on")
+            %apply;link(ancestor.access, ancestor)
+          %else;
+            %apply;a_of_b%with;[parents]%and;
+              %apply;link(ancestor.access, ancestor)
+            %end;
+          %end;
           %if;(ancestor.has_nobility_titles),%sp;
           <em>%ancestor.nobility_title;</em>%end;
           %ancestor.dates;
           </li>%nl;
+        %elseif;(evar_ms = "on" and ancestor.same = "" and ancestor.has_parents)
+          %if;(ancestor.father.first_name = "?" and
+               ancestor.father.surname = "?")
+            %lazy_force;
+            <li> %expr(ancestor.sosa.v * 2)%sp; -
+            %apply;a_of_b%with;
+              %apply;link(ancestor.father.access, [husband/wife]0)
+            %and;
+              %ancestor.mother;
+              %if;(ancestor.mother.has_nobility_titles),%sp;
+              <em>%ancestor.mother.nobility_title;</em>%end;
+              %ancestor.mother.dates;
+            %end;
+            </li>%nl;
+          %end;
+          %if;(ancestor.mother.first_name = "?" and
+               ancestor.mother.surname = "?")
+            %lazy_force;
+            <li> %expr(ancestor.sosa.v * 2 + 1)%sp; -
+            %apply;a_of_b%with;
+              %apply;link(ancestor.mother.access, [husband/wife]1)
+            %and;
+              %ancestor.father;
+              %if;(ancestor.father.has_nobility_titles),%sp;
+              <em>%ancestor.father.nobility_title;</em>%end;
+              %ancestor.father.dates;
+            %end;
+            </li>%nl;
+          %end;
         %end;
       %end;
       %if;lazy_printed;</ul>%nl;</li>%nl;%end;

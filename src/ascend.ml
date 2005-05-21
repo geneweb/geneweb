@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.64 2005-05-19 19:39:03 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.65 2005-05-21 17:35:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1227,7 +1227,7 @@ value
   let href = "i=" ^ string_of_int (Adef.int_of_iper p.cle_index) in
   do {
     wprint_geneweb_link conf href (person_text_without_surname conf base p);
-    Wserver.wprint "%s %s" begin_surname (person_title_text conf base p);
+    Wserver.wprint "%s %s" begin_surname (person_title conf base p);
     Wserver.wprint "%s" (Date.short_dates_text conf base p);
     if spouses_incl then do {
       Wserver.wprint "\n=&gt; ";
