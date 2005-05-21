@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.11 2005-05-21 07:03:26 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.12 2005-05-21 08:52:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -36,7 +36,7 @@
   %end;
 </h1>
 
-%if;not cancel_links;
+%if;(evar_cgl != "on")
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
@@ -107,14 +107,18 @@
   %end;
 %end;
 
+%define;link(aa, xx)
+  %if;(evar_cgl = "on")xx%else;<a href="%prefix;aa">xx</a>%end;
+%end;
+
 %define;somebody(xx)
-  <b><a href="%prefix;%xx.access;">%xx;</a></b>%nn;
+  <b>%apply;link(xx.access, xx)</b>%nn;
   %apply;somebody_long_info("xx")
   %if;xx.has_occupation;, %xx.occupation;%end;
 %end;
 
 %define;somebody_spouse_parent(xx)
-  <b><a href="%prefix;%spouse.xx.access;">%spouse.xx;</a></b>%nn;
+  <b>%apply;link(spouse.xx.access, spouse.xx)</b>%nn;
   %if;spouse.xx.has_nobility_titles;,
     <a href="%prefix;m=TT;sm=S;t=%spouse.xx.nobility_title.ident_key;
     ;p=%spouse.xx.nobility_title.place_key;">%nn;
@@ -275,8 +279,7 @@
 %end;
 
 %define;child_long_info(spec)
-  <b><a href="%prefix;%child.access;">%child.child_name;
-  </a></b>%nn;
+  <b>%apply;link(child.access, child.child_name)</b>%nn;
   %apply;somebody_long_info("child")
   %if(child.sosa_in_list != ""). [*see]%sp;
     <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;
@@ -401,9 +404,10 @@
         %if;(ancestor.same = "")%incr_count;%end;
         <li> %ancestor.sosa;%sp;
         %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-        <a href="%prefix;%ancestor.access;">%nn;
+        %apply;link%with;%ancestor.access;%and;
            %if;(ancestor.same != "")%ancestor.same;
            %else;%ancestor;%end;
+        %end;
         </a>%nn;
         %if;(ancestor.has_nobility_titles),%sp;
         <em>%ancestor.nobility_title;</em>%end;
@@ -440,7 +444,7 @@
           <li>%sp;
             %expr(ancestor.sosa.v * 2)
             -%expr((ancestor.sosa.v * 2 + 1) % 10) -
-          <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
+          %apply;link(ancestor.access, ancestor)
           %if;(ancestor.has_nobility_titles),%sp;
           <em>%ancestor.nobility_title;</em>%end;
           %ancestor.dates;
