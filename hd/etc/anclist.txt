@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.12 2005-05-21 08:52:36 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.13 2005-05-21 15:06:47 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -439,7 +439,7 @@
       %end;
       %foreach;ancestor;
         %if;(ancestor.same = "" and not ancestor.has_parents and
-             ancestor.first_name != "?" and ancestor.surname != "?")
+             (ancestor.first_name != "?" or ancestor.surname != "?"))
           %lazy_force;
           <li>%sp;
             %expr(ancestor.sosa.v * 2)
