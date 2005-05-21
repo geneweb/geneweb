@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.49 2005-05-20 12:59:52 ddr Exp $ *)
+(* $Id: templ.ml,v 4.50 2005-05-21 07:03:26 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -780,42 +780,49 @@ value eval_bool_expr conf eval_var e =
       } ]
 ;
 
-value rec eval_expr conf eval_var =
-  fun
-  [ Estr s -> s
-  | Evar loc s sl ->
-      try
-        match eval_var loc [s :: sl] with
-        [ VVstring s -> s
-        | VVbool True -> "1"
-        | VVbool False -> "0" ]
-      with
-      [ Not_found ->
-          do {
-            Wserver.wprint " %%%s" s;
-            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-            Wserver.wprint "?";
-            ""
-          } ]
-  | Etransl upp s c -> eval_transl conf upp s c
-  | e ->
-      try string_of_int (eval_int_expr eval_var e) with
-      [ Failure x -> x ] ]
-and eval_int_expr eval_var =
-  fun
-  [ Eint _ x -> int_of_string x
-  | Eop "+" x y -> eval_int_expr eval_var x + eval_int_expr eval_var y
-  | Eop "*" x y -> eval_int_expr eval_var x * eval_int_expr eval_var y
-  | Eop "%" x y -> eval_int_expr eval_var x mod eval_int_expr eval_var y
-  | Evar loc s sl ->
-      try
-        match eval_var loc [s :: sl] with
-        [ VVstring s -> int_of_string s
-        | VVbool True -> 1
-        | VVbool False -> 0 ]
-      with
-      [ Not_found -> failwith "parse error" ]
-  | _ -> failwith "parse_error" ]
+value eval_expr conf eval_var =
+  let rec string_eval =
+    fun
+    [ Estr s -> s
+    | Evar loc s sl ->
+        try
+          match eval_var loc [s :: sl] with
+          [ VVstring s -> s
+          | VVbool True -> "1"
+          | VVbool False -> "0" ]
+        with
+        [ Not_found ->
+            do {
+              Wserver.wprint " %%%s" s;
+              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+              Wserver.wprint "?";
+              ""
+            } ]
+    | Etransl upp s c -> eval_transl conf upp s c
+    | e ->
+        try
+          Num.to_string_sep (Util.transl conf "(thousand separator)")
+            (num_eval e)
+        with
+        [ Failure x -> x ] ]
+  and num_eval =
+    fun
+    [ Eint _ x -> Num.of_string x
+    | Eop "+" x y -> Num.add (num_eval x) (num_eval y)
+    | Eop "*" x (Eint _ y) -> Num.mul (num_eval x) (int_of_string y)
+    | Eop "%" x (Eint _ y) ->
+        Num.of_int (Num.modl (num_eval x) (int_of_string y))
+    | Evar loc s sl ->
+        try
+          match eval_var loc [s :: sl] with
+          [ VVstring s -> Num.of_string s
+          | VVbool True -> Num.one
+          | VVbool False -> Num.zero ]
+        with
+        [ Not_found -> failwith "parse error" ]
+    | _ -> failwith "parse_error" ]
+  in
+  string_eval
 ;
 
 value print_body_prop conf base =
