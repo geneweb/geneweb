@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.10 2005-05-20 11:45:44 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.11 2005-05-21 07:03:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -387,29 +387,37 @@
   <p>
   %apply;togen("evar_v").
   </p>
+  %reset_count;
   <ul>
   %foreach;ancestor_level;
     %if;(evar_v != "" and level <= evar_v
          and (evar_only != "on" or level = evar_v))
-      <li>%nl;[*generation/generations]0 %level;%nl;
-        <ul>
-        %foreach;ancestor;
-          <li> %ancestor.sosa;%sp;
-          %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-          <a href="%prefix;%ancestor.access;">%nn;
-             %if;(ancestor.same != "")%ancestor.same;
-             %else;%ancestor;%end;
-          </a>%nn;
-          %if;(ancestor.has_nobility_titles),%sp;
-          <em>%ancestor.nobility_title;</em>%end;
-          %if;(ancestor.same = "")%ancestor.dates;%end;
-          </li>%nl;
-        %end;
+      %apply;lazy_print%with;
+        <li>%nl;[*generation/generations]0 %level;%nl;
+        <ul>%nl;
+      %end;
+      %foreach;ancestor;
+        %lazy_force;
+        %if;(ancestor.same = "")%incr_count;%end;
+        <li> %ancestor.sosa;%sp;
+        %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
+        <a href="%prefix;%ancestor.access;">%nn;
+           %if;(ancestor.same != "")%ancestor.same;
+           %else;%ancestor;%end;
+        </a>%nn;
+        %if;(ancestor.has_nobility_titles),%sp;
+        <em>%ancestor.nobility_title;</em>%end;
+        %if;(ancestor.same = "")%ancestor.dates;%end;
+        </li>%nl;
+      %end;
+      %if;lazy_printed;
         </ul>
-      </li>
+        </li>
+      %end;
     %end;
   %end;
   </ul>
+  [*total]: %count; [person/persons]1
 %elseif;(evar_t = "M")
   %( missing ancestors %)
   <p>
@@ -426,16 +434,16 @@
         <ul>%nl;
       %end;
       %foreach;ancestor;
-        %if;(not ancestor.has_parents)
-          %unfreeze_lazy;
-          <li> %expr(ancestor.sosa * 2)-%expr((ancestor.sosa * 2 + 1) % 10) -
-          <a href="%prefix;%ancestor.access;">%nn;
-             %if;(ancestor.same != "")%ancestor.same;
-             %else;%ancestor;%end;
-          </a>%nn;
+        %if;(ancestor.same = "" and not ancestor.has_parents and
+             ancestor.first_name != "?" and ancestor.surname != "?")
+          %lazy_force;
+          <li>%sp;
+            %expr(ancestor.sosa.v * 2)
+            -%expr((ancestor.sosa.v * 2 + 1) % 10) -
+          <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
           %if;(ancestor.has_nobility_titles),%sp;
           <em>%ancestor.nobility_title;</em>%end;
-          %if;(ancestor.same = "")%ancestor.dates;%end;
+          %ancestor.dates;
           </li>%nl;
         %end;
       %end;
@@ -445,9 +453,11 @@
   </ul>
 %elseif;(evar_t = "G")
   %( long display %)
-  <p>
-  %apply;togen("evar_v").
-  </p>
+  %if;(evar_only != "on")
+    <p>
+    %apply;togen("evar_v").
+    </p>
+  %end;
   %foreach;ancestor_level;
     %if;(evar_v != "" and level <= evar_v
          and (evar_only != "on" or level = evar_v))

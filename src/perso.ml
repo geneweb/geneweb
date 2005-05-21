@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.107 2005-05-20 11:45:44 ddr Exp $ *)
+(* $Id: perso.ml,v 4.108 2005-05-21 07:03:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -425,6 +425,7 @@ value get_all_generations conf base p =
 type env =
   [ Vallgp of list generation_person
   | Vanc of Num.t and iper and option Num.t and option ifam
+  | Vcnt of ref int
   | Vind of person and ascend and union
   | Vfam of family and (iper * iper * iper) and descend and bool
   | Vrel of relation and option person
@@ -435,7 +436,7 @@ type env =
   | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
   | Vtitle of person and title_item
-  | Vlazyp of ref (option (list string))
+  | Vlazyp of ref (option string)
   | Vlazy of Lazy.t env
   | Vfun of list string and list ast
   | Vnone ]
@@ -625,6 +626,10 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
             string_with_macros conf False [] (sou base fam.comment)
           else ""
       | _ -> raise Not_found ]
+  | "count" ->
+      match get_env "count" env with
+      [ Vcnt c -> string_of_int c.val
+      | _ -> "" ]
   | "divorce_date" ->
       match get_env "fam" env with
       [ Vfam fam (_, _, isp) _ m_auth ->
@@ -642,6 +647,17 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "first_name_alias" env with
       [ Vstring s -> s
       | _ -> "" ]
+  | "incr_count" ->
+      match get_env "count" env with
+      [ Vcnt c -> do { incr c; "" }
+      | _ -> "" ]
+  | "lazy_force" ->
+      match get_env "lazy_print" env with
+      [ Vlazyp r ->
+          match r.val with
+          [ Some s -> do { r.val := None; s }
+          | None -> "" ]
+      | _ -> raise Not_found ]
   | "level" ->
       match get_env "level" env with
       [ Vint i -> string_of_int i
@@ -711,17 +727,15 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
           | (Some ip1, Some ip2) -> relation_type_text conf r.r_type 2
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
+  | "reset_count" ->
+      match get_env "count" env with
+      [ Vcnt c -> do { c.val := 0; "" }
+      | _ -> "" ]
   | "sosa" ->
       match get_env "sosa" env with
       [ Vsosa x ->
           match x with
-          [ Some (n, p) ->
-              let b = Buffer.create 25 in
-              do {
-                Num.print (fun x -> Buffer.add_string b x)
-                  (transl conf "(thousand separator)") n;
-                Buffer.contents b
-              }
+          [ Some (n, p) -> Num.to_string n
           | None -> "" ]
       | _ -> raise Not_found ]
   | "source_type" ->
@@ -731,13 +745,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "surname_alias" ->
       match get_env "surname_alias" env with
       [ Vstring s -> s
-      | _ -> raise Not_found ]
-  | "unfreeze_lazy" ->
-      match get_env "lazy_print" env with
-      [ Vlazyp r ->
-          match r.val with
-          [ Some sl -> do { r.val := None; String.concat "" sl }
-          | None -> "" ]
       | _ -> raise Not_found ]
   | "witness_relation" ->
       match get_env "fam" env with
@@ -903,15 +910,12 @@ and eval_ancestor_field_var conf base env (n, ip, no, ifamo) loc =
           let n = Num.inc (Num.twice n) 1 in
           VVstring (parent_sosa conf base ip all_gp n mother)
       | _ -> VVstring "" ]
-  | ["same"] ->
+  | ["same" :: sl] ->
       match no with
-      [ Some n -> 
-          let s = Num.to_string_sep (transl conf "(thousand separator)") n in
-          VVstring s
+      [ Some n -> VVstring (eval_num conf n sl)
       | None -> VVstring "" ]
-  | ["sosa"] ->
-      let s = Num.to_string_sep (transl conf "(thousand separator)") n in
-      VVstring s
+  | ["sosa" :: sl] ->
+      VVstring (eval_num conf n sl)
   | ["spouse" :: sl] ->
       match ifamo with
       [ Some ifam ->
@@ -922,6 +926,11 @@ and eval_ancestor_field_var conf base env (n, ip, no, ifamo) loc =
   | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl ]
+and eval_num conf n =
+  fun
+  [ ["v"] -> Num.to_string n
+  | [] -> Num.to_string_sep (transl conf "(thousand separator)") n
+  | _ -> raise Not_found ]
 and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
   fun
   [ ["father" :: sl] ->
@@ -1462,9 +1471,9 @@ and eval_predefined_apply conf env f vl =
   [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
   | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
   | ("capitalize", [s]) -> capitale s
-  | ("lazy_print", sl) ->
+  | ("lazy_print", [v]) ->
       match get_env "lazy_print" env with
-      [ Vlazyp r -> do { r.val := Some sl; "" }
+      [ Vlazyp r -> do { r.val := Some v; "" }
       | _ -> raise Not_found ]
   | ("nth", [s1; s2]) ->
       let n = try int_of_string s2 with [ Failure _ -> 0 ] in
@@ -1978,6 +1987,7 @@ value interp_templ templ_fname conf base p =
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
+     ("count", Vcnt (ref 0));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
      ("sosa_ref", Vsosa_ref sosa_ref_l);
