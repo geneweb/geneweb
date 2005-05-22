@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.109 2005-05-21 15:06:48 ddr Exp $ *)
+(* $Id: perso.ml,v 4.110 2005-05-22 14:45:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -939,7 +939,33 @@ and eval_num conf n =
   | _ -> raise Not_found ]
 and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
   fun
-  [ ["father" :: sl] ->
+  [ ["baptism_date" :: sl] ->
+      match Adef.od_of_codate p.baptism with
+      [ Some d when p_auth -> eval_date_field_var d sl
+      | _ -> VVstring "" ]
+  | ["birth_date" :: sl] ->
+      match Adef.od_of_codate p.birth with
+      [ Some d when p_auth -> eval_date_field_var d sl
+      | _ -> VVstring "" ]
+  | ["burial_date" :: sl] ->
+      match p.burial with
+      [ Buried cod when p_auth ->
+          match Adef.od_of_codate cod with
+          [ Some d -> eval_date_field_var d sl
+          | None -> VVstring "" ]
+      | _ -> VVstring "" ]
+  | ["cremated_date" :: sl] ->
+      match p.burial with
+      [ Cremated cod when p_auth ->
+          match Adef.od_of_codate cod with
+          [ Some d -> eval_date_field_var d sl
+          | None -> VVstring "" ]
+      | _ -> VVstring "" ]
+  | ["death_date" :: sl] ->
+      match p.death with
+      [ Death _ cd when p_auth -> eval_date_field_var (Adef.date_of_cdate cd) sl
+      | _ -> VVstring "" ]
+  | ["father" :: sl] ->
       match parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
@@ -962,6 +988,8 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           let pl = sou base t.t_place in
           eval_nobility_title_field_var (id, pl) sl
       | _ -> raise Not_found ]
+  | ["self" :: sl] ->
+      eval_person_field_var conf base env ep loc sl
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
@@ -979,6 +1007,13 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
               [ Not_found -> warning_not_impl loc ] ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> warning_not_impl loc ]
+and eval_date_field_var d =
+  fun
+  [ ["year"] ->
+      match d with
+      [ Dgreg dmy _ -> VVstring (string_of_int dmy.year)
+      | _ -> VVstring "" ]
+  | _ -> raise Not_found ]
 and eval_nobility_title_field_var (id, pl) =
   fun
   [ ["ident_key"] -> VVstring (code_varenv id)
