@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.111 2005-05-23 01:23:40 ddr Exp $ *)
+(* $Id: perso.ml,v 4.112 2005-05-23 02:10:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -672,12 +672,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]  
-(*
-  | "sorted_list" ->
-      match get_env "list" env with
-      [ Vlist l -> String.concat "/<br>\n" (List.map (String.concat ",") (SortedList.elements l.val))
-      | _ -> "" ]
-*)
   | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
@@ -1378,13 +1372,17 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else Name.lower (p_surname base p)
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
-and eval_family_field_var conf base env ((_, (ifath, imoth, _), _, _) as fcd)
-  loc
+and eval_family_field_var conf base env
+  ((fam, (ifath, imoth, _), _, m_auth) as fcd) loc
 =
   fun
   [ ["father" :: sl] ->
       let ep = make_ep conf base ifath in
       eval_person_field_var conf base env ep loc sl
+  | ["marriage_date" :: sl] ->
+      match Adef.od_of_codate fam.marriage with
+      [ Some d when m_auth -> eval_date_field_var d sl
+      | _ -> VVstring "" ]
   | ["mother" :: sl] ->
       let ep = make_ep conf base imoth in
       eval_person_field_var conf base env ep loc sl
