@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.132 2005-05-23 01:23:40 ddr Exp $ *)
+(* $Id: util.ml,v 4.133 2005-05-23 11:35:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -613,7 +613,7 @@ value is_public conf base p =
 
 value accessible_by_key conf base p fn sn =
   conf.access_by_key
-  && not (sn = "?" || sn = "?")
+  && not (fn = "?" || sn = "?")
   && (not conf.hide_names || is_public conf base p)
 ;
 
