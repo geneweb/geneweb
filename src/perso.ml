@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.110 2005-05-22 14:45:50 ddr Exp $ *)
+(* $Id: perso.ml,v 4.111 2005-05-23 01:23:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -422,10 +422,16 @@ value get_all_generations conf base p =
 
 (* Interpretation of template file *)
 
+module SortedList =
+  Set.Make (struct type t = list string; value compare = compare; end)
+;
+
 type env =
   [ Vallgp of list generation_person
   | Vanc of generation_person
   | Vcnt of ref int
+  | Vslist of ref SortedList.t
+  | Vslistlm of list string
   | Vind of person and ascend and union
   | Vfam of family and (iper * iper * iper) and descend and bool
   | Vrel of relation and option person
@@ -642,6 +648,10 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
               | _ -> "" ]
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
+  | "empty_sorted_list" ->
+      match get_env "list" env with
+      [ Vslist l -> do { l.val := SortedList.empty; "" }
+      | _ -> "" ]
   | "family_cnt" -> string_of_int_env "family_cnt" env
   | "first_name_alias" ->
       match get_env "first_name_alias" env with
@@ -661,7 +671,13 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "level" ->
       match get_env "level" env with
       [ Vint i -> string_of_int i
+      | _ -> "" ]  
+(*
+  | "sorted_list" ->
+      match get_env "list" env with
+      [ Vlist l -> String.concat "/<br>\n" (List.map (String.concat ",") (SortedList.elements l.val))
       | _ -> "" ]
+*)
   | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
@@ -757,20 +773,31 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
               (referenced_person_title_text conf base (pget conf base ip2))
       | _ -> raise Not_found ]
   | s ->
-      let v = extract_var "evar_" s in
-      if v <> "" then
-        match p_getenv (conf.env @ conf.henv) v with
-        [ Some vv -> quote_escaped vv
-        | None -> "" ]
-      else
-        let v = extract_var "bvar_" s in
-        let v =
-          if v = "" then extract_var "cvar_" s (* deprecated since 5.00 *)
-          else v
-        in
-        if v <> "" then
-          try List.assoc v conf.base_env with [ Not_found -> "" ]
-        else raise Not_found ]
+      loop
+        [("evar_",
+          fun v ->
+            match p_getenv (conf.env @ conf.henv) v with
+            [ Some vv -> quote_escaped vv
+            | None -> "" ]);
+         ("bvar_",
+          fun v -> try List.assoc v conf.base_env with [ Not_found -> "" ]);
+         ("elem_",
+          fun v ->
+            match get_env "elem" env with
+            [ Vslistlm sl ->
+                try List.nth sl (int_of_string v - 1) with
+                [ Failure _ -> "" ]
+            | _ -> raise Not_found ]);
+         (* warning: "cvar_" deprecated since 5.00 *)         
+         ("cvar_",
+          fun v -> try List.assoc v conf.base_env with [ Not_found -> "" ])]
+      where rec loop =
+        fun
+        [ [(pfx, f) :: pfx_list] ->
+            let v = extract_var pfx s in
+            if v <> "" then f v
+            else loop pfx_list
+        | [] -> raise Not_found ] ]
 and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   fun 
   [ ["ancestor" :: sl] ->
@@ -987,7 +1014,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           let id = sou base t.t_ident in
           let pl = sou base t.t_place in
           eval_nobility_title_field_var (id, pl) sl
-      | _ -> raise Not_found ]
+      | _ -> VVstring "" ]
   | ["self" :: sl] ->
       eval_person_field_var conf base env ep loc sl
   | ["spouse" :: sl] ->
@@ -1337,6 +1364,12 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       | _ -> raise Not_found ]
   | "surname" ->
       if not p_auth && conf.hide_names then "x" else p_surname base p
+  | "surname_begin" ->
+      if not p_auth && conf.hide_names then ""
+      else surname_begin base (p_surname base p)
+  | "surname_end" ->
+      if not p_auth && conf.hide_names then "x"
+      else surname_end base (p_surname base p)
   | "surname_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_surname base p))
@@ -1511,6 +1544,10 @@ and eval_predefined_apply conf env f vl =
   match (f, vl) with
   [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
   | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
+  | ("add_in_sorted_list", sl) ->
+      match get_env "list" env with
+      [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
+      | _ -> "" ]
   | ("capitalize", [s]) -> capitale s
   | ("lazy_print", [v]) ->
       match get_env "lazy_print" env with
@@ -1652,6 +1689,7 @@ and print_simple_foreach conf base env al ini_ep ep efam =
   | "qualifier" -> print_foreach_qualifier conf base env al ep
   | "related" -> print_foreach_related conf base env al ep
   | "relation" -> print_foreach_relation conf base env al ep
+  | "sorted_list_elem" -> print_foreach_sorted_list_elem conf base env al ep
   | "source" -> print_foreach_source conf base env al ep
   | "surname_alias" -> print_foreach_surname_alias conf base env al ep
   | "witness" -> print_foreach_witness conf base env al ep efam
@@ -1886,6 +1924,17 @@ and print_foreach_related conf base env al ((p, _, _, p_auth) as ep) =
          List.iter (print_ast conf base env ep) al)
       list
   else ()
+and print_foreach_sorted_list_elem conf base env al ep =
+  let list =
+    match get_env "list" env with
+    [ Vslist l -> SortedList.elements l.val
+    | _ -> [] ]
+  in
+  List.iter
+    (fun sl ->
+       let env = [("elem", Vslistlm sl) :: env] in
+       List.iter (print_ast conf base env ep) al)
+    list
 and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
   let rec insert_loop typ src =
     fun
@@ -2029,6 +2078,7 @@ value interp_templ templ_fname conf base p =
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
      ("count", Vcnt (ref 0));
+     ("list", Vslist (ref SortedList.empty));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
      ("sosa_ref", Vsosa_ref sosa_ref_l);

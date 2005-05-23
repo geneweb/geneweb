@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.15 2005-05-22 14:45:50 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.16 2005-05-23 01:23:39 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -381,6 +381,7 @@
   %end;
 %end;
 
+%( not satisfactory (yy always evaluated); should be changed one day %)
 %define;if_ancestor_dates_in_interval(xx, yy)
   %if;(evar_after != "" and
        (ancestor.xx.birth_date.year = "" and
@@ -416,7 +417,7 @@
         ancestor.xx.cremated_date.year > evar_before))
   %else;
     %lazy_force;
-    yy
+    yy%nn;
   %end;
 %end;
 
@@ -461,6 +462,56 @@
   %end;
   </ul>
   [*total]: %count; [person/persons]1
+%elseif;(evar_t = "M" and evar_al = "on")
+  %( missing ancestors alphabetically %)
+  <p>
+  %apply;togen("evar_v")
+  %if;(evar_after != "") [after] %evar_after;%end;
+  %if;(evar_before != "") [before] %evar_before;%end;.
+  </p>
+  %if;(evar_ms != "on")
+    <p>
+    %apply;a_of_b([*parents], "...")
+    </p>
+  %end;
+  %empty_sorted_list;
+  %foreach;ancestor_level;
+    %if;(evar_v != "" and level <= evar_v)
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %if;(not ancestor.has_parents and
+               ancestor.first_name != "?" and ancestor.surname != "?")
+            %apply;if_ancestor_dates_in_interval%with;self%and;
+              %apply;add_in_sorted_list(
+                ancestor.surname_end, ancestor.first_name,
+                ancestor.surname_begin, ancestor.sosa.v,
+                ancestor.nobility_title, ancestor.access,
+                ancestor.dates)
+            %end;
+          %elseif;(evar_ms = "on" and ancestor.has_parents)
+            %if;(ancestor.father.first_name = "?" and
+                 ancestor.father.surname = "?")
+              %apply;if_ancestor_dates_in_interval%with;mother%and;
+                %apply;add_in_list(ancestor.father)
+              %end;
+            %end;
+            %if;(ancestor.mother.first_name = "?" and
+                 ancestor.mother.surname = "?")
+              %apply;if_ancestor_dates_in_interval%with;father%and;
+                %apply;add_in_list(ancestor.mother)
+              %end;
+            %end; 
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+  <ul>
+  %foreach;sorted_list_elem;
+    <li>%elem_1; <a href="%prefix;%elem_6;">%elem_2;</a>%elem_3;
+    %if(elem_5 != ""), <em>%elem_5;</em>%end;</li>
+  %end;
+  </ul>
 %elseif;(evar_t = "M")
   %( missing ancestors %)
   <p>

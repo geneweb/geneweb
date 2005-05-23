@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.131 2005-05-16 03:49:51 ddr Exp $ *)
+(* $Id: util.ml,v 4.132 2005-05-23 01:23:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -813,7 +813,7 @@ value person_title conf base p =
   else ""
 ;
 
-value surname_begin n =
+value old_surname_begin n =
   let i = initial n in
   if i == 0 then ""
   else
@@ -824,9 +824,34 @@ value surname_begin n =
     " (" ^ String.sub n 0 i ^ ")"
 ;
 
-value surname_end n =
+value old_surname_end n =
   let i = initial n in
   if i == 0 then n else String.sub n i (String.length n - i)
+;
+
+value start_with s i p =
+  i + String.length p <= String.length s &&
+  String.lowercase (String.sub s i (String.length p)) = p
+;
+
+value get_particle base s =
+  loop base.data.particles where rec loop =
+    fun
+    [ [part :: parts] -> if start_with s 0 part then part else loop parts
+    | [] -> "" ]
+;
+
+value surname_begin base s =
+  let part = get_particle base s in
+  let len = String.length part in
+  if len = 0 then ""
+  else if part.[len-1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
+  else " (" ^ part ^ ")"
+;
+
+value surname_end base s =
+  let part_len = String.length (get_particle base s) in
+  String.sub s part_len (String.length s - part_len)
 ;
 
 value rec skip_spaces s i =
@@ -1222,11 +1247,6 @@ value header_no_page_title conf title =
           Wserver.wprint "</font></h1>\n"
         } ];
   }
-;
-
-value start_with s i p =
-  i + String.length p <= String.length s &&
-  String.lowercase (String.sub s i (String.length p)) = p
 ;
 
 value http_string s i =

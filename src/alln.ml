@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.22 2005-04-08 18:02:26 ddr Exp $ *)
+(* $Id: alln.ml,v 4.23 2005-05-23 01:23:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -75,31 +75,11 @@ value combine_by_count list =
   List.fold_left (fun new_l (cnt, l) -> [(cnt, List.rev l) :: new_l]) [] list
 ;
 
-value get_particle base s =
-  loop base.data.particles where rec loop =
-    fun
-    [ [part :: parts] -> if string_start_with part s then part else loop parts
-    | [] -> "" ]
-;
-
-value new_surname_begin base s =
-  let part = get_particle base s in
-  let len = String.length part in
-  if len = 0 then ""
-  else if part.[len-1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
-  else " (" ^ part ^ ")"
-;
-
-value new_surname_end base s =
-  let part_len = String.length (get_particle base s) in
-  String.sub s part_len (String.length s - part_len)
-;
-
 value alphab_string conf base is_surname s =
   if is_surname then
     if Gutil.utf_8_db.val then
-      new_surname_end base s ^ new_surname_begin base s
-    else surname_end s ^ surname_begin s
+      surname_end base s ^ surname_begin base s
+    else old_surname_end s ^ old_surname_begin s
   else s
 ;
 
@@ -116,7 +96,7 @@ value lowercase_if_not_utf8 s =
 ;
 
 value new_name_key base s =
-  let part = get_particle base s in
+  let part = Util.get_particle base s in
   if part = "" then s
   else
     let i = String.length part in
