@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.18 2005-05-23 09:38:26 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.19 2005-05-23 13:34:54 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -480,22 +480,29 @@
             %if;(ancestor_dates_in_interval(self) = "true")
               %apply;add_in_sorted_list(
                 ancestor.surname_end, ancestor.first_name,
-                ancestor.surname_begin, ancestor.sosa.v,
+                ancestor.surname_begin, "0",
                 ancestor.nobility_title, ancestor.access,
-                ancestor.dates, ancestor.family.marriage_date.year,
-                ancestor.spouse, ancestor.spouse.dates)
+                ancestor.dates, [parents])
             %end;
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
               %if;(ancestor_dates_in_interval(mother) = "true")
-                %apply;add_in_list(ancestor.father)
+                %apply;add_in_sorted_list(
+                  ancestor.mother.surname_end, ancestor.mother.first_name,
+                  ancestor.mother.surname_begin, "1",
+                  ancestor.mother.nobility_title, ancestor.mother.access,
+                  ancestor.mother.dates, [husband/wife]0)
               %end;
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
               %if(ancestor_dates_in_interval(father) = "true")
-                %apply;add_in_list(ancestor.mother)
+                %apply;add_in_sorted_list(
+                  ancestor.father.surname_end, ancestor.father.first_name,
+                  ancestor.father.surname_begin, "1",
+                  ancestor.father.nobility_title, ancestor.father.access,
+                  ancestor.father.dates, [husband/wife]1)
               %end;
             %end; 
           %end;
@@ -505,11 +512,9 @@
   %end;
   <ul>
   %foreach;sorted_list_elem;
-    <li>%elem_1; <a href="%prefix;%elem_6;">%elem_2;</a>%elem_3;
-    %if(elem_5 != ""), <em>%elem_5;</em>%end;%elem_7;%nl;
-    &amp;%nn;
-    %if;(elem_8 != "")<span style="font-size:70%%">%elem_8;</span>%end;
-    %sp;%elem_9;%elem_10;
+    <li>%elem_1;
+    %sp;<a href="%prefix;%elem_6;">%elem_2;</a>%elem_3;
+    %if(elem_5 != ""), <em>%elem_5;</em>%end;%elem_7; =&gt; %elem_8;
     </li>
   %end;
   </ul>
