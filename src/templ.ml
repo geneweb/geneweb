@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.51 2005-05-23 08:44:15 ddr Exp $ *)
+(* $Id: templ.ml,v 4.52 2005-05-23 09:38:26 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -218,7 +218,12 @@ value rec parse_simple_expr strm =
     | [: `Tok _ (STRING s) :] -> Estr s
     | [: `Tok loc (INT s) :] -> Eint loc s
     | [: `Tok _ (LEXICON upp s n) :] -> Etransl upp s n
-    | [: (loc, id, idl) = parse_var :] -> Evar loc id idl
+    | [: (loc, id, idl) = parse_var;
+         a =
+           parser
+           [ [: t = parse_tuple :] -> Eapp loc id t
+           | [: :] -> Evar loc id idl ] :] ->
+       a
     | [: `Tok loc _ :] -> Evar loc "parse_error" [] ]
   in
   parse_simple strm
@@ -532,6 +537,7 @@ and subste sf =
   | Enot e -> Enot (subste sf e)
   | Estr s -> Estr (sf s)
   | Eint loc s -> Eint loc s
+  | Eapp loc s el -> Eapp loc (sf s) (List.map (subste sf) el)
   | Evar loc s sl -> Evar loc (sf s) (List.map sf sl)
   | Etransl upp s c -> Etransl upp s c ]
 and substel sf el = List.map (subste sf) el;
@@ -711,7 +717,7 @@ value loc_of_expr =
   | _ -> (-1, -1) ]
 ;
 
-value eval_bool_expr conf eval_var e =
+value eval_bool_expr conf (eval_var, eval_apply) e =
   let rec bool_eval =
     fun
     [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
@@ -726,6 +732,7 @@ value eval_bool_expr conf eval_var e =
         | "<=" -> int_eval e1 <= int_eval e2
         | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
+    | Eapp loc s el -> do { Wserver.wprint "not impl %s" s; False }
     | Evar loc s sl ->
         try eval_bool_var conf (eval_var loc) [s :: sl] with
         [ Not_found ->
@@ -752,6 +759,7 @@ value eval_bool_expr conf eval_var e =
     fun
     [ Estr s -> s
     | Eint _ s -> s
+    | Eapp loc s el -> eval_apply s (List.map string_eval el)
     | Evar loc s sl ->
         try eval_string_var conf (eval_var loc) s sl with
         [ Not_found ->

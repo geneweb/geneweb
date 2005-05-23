@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.17 2005-05-23 02:10:01 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.18 2005-05-23 09:38:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -381,8 +381,7 @@
   %end;
 %end;
 
-%( not satisfactory (yy always evaluated); should be changed one day %)
-%define;if_ancestor_dates_in_interval(xx, yy)
+%define;ancestor_dates_in_interval(xx)
   %if;(evar_after != "" and
        (ancestor.xx.birth_date.year = "" and
         ancestor.xx.baptism_date.year = "" and
@@ -414,11 +413,8 @@
         ancestor.xx.burial_date.year != "" and
         ancestor.xx.burial_date.year > evar_before or
         ancestor.xx.cremated_date.year != "" and
-        ancestor.xx.cremated_date.year > evar_before))
-  %else;
-    %lazy_force;
-    yy%nn;
-  %end;
+        ancestor.xx.cremated_date.year > evar_before))false
+  %else;true%end;
 %end;
 
 %(
@@ -481,7 +477,7 @@
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
-            %apply;if_ancestor_dates_in_interval%with;self%and;
+            %if;(ancestor_dates_in_interval(self) = "true")
               %apply;add_in_sorted_list(
                 ancestor.surname_end, ancestor.first_name,
                 ancestor.surname_begin, ancestor.sosa.v,
@@ -492,13 +488,13 @@
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %apply;if_ancestor_dates_in_interval%with;mother%and;
+              %if;(ancestor_dates_in_interval(mother) = "true")
                 %apply;add_in_list(ancestor.father)
               %end;
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %apply;if_ancestor_dates_in_interval%with;father%and;
+              %if(ancestor_dates_in_interval(father) = "true")
                 %apply;add_in_list(ancestor.mother)
               %end;
             %end; 
@@ -540,7 +536,8 @@
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
-            %apply;if_ancestor_dates_in_interval%with;self%and;
+            %if;(ancestor_dates_in_interval(self) = "true")
+              %lazy_force;
               <li>%sp;
                 %expr(ancestor.sosa.v * 2)
                 -%expr((ancestor.sosa.v * 2 + 1) % 10) -
@@ -559,7 +556,8 @@
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %apply;if_ancestor_dates_in_interval%with;mother%and;
+              %if(ancestor_dates_in_interval(mother) = "true")
+                %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2)%sp; -
                 %apply;a_of_b%with;
                   %apply;link(ancestor.father.access, [husband/wife]0)
@@ -574,7 +572,8 @@
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %apply;if_ancestor_dates_in_interval%with;father%and;
+              %if;(ancestor_dates_in_interval(father) = "true")
+                %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2 + 1)%sp; -
                 %apply;a_of_b%with;
                   %apply;link(ancestor.mother.access, [husband/wife]1)

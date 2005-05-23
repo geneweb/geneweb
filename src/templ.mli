@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.9 2005-05-17 03:36:14 ddr Exp $ *)
+(* $Id: templ.mli,v 4.10 2005-05-23 09:38:26 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -11,7 +11,8 @@ value input : config -> string -> list ast;
 
 value eval_transl : config -> bool -> string -> string -> string;
 value eval_bool_expr :
-  config -> (loc -> list string -> expr_val) -> ast_expr -> bool;
+  config -> (loc -> list string -> expr_val * string -> list string -> string)
+    -> ast_expr -> bool;
 value eval_expr :
   config -> (loc -> list string -> expr_val) -> ast_expr -> string;
 value eval_subst : string -> list string -> list string -> ast -> ast;
