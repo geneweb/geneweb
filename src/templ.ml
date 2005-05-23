@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.50 2005-05-21 07:03:26 ddr Exp $ *)
+(* $Id: templ.ml,v 4.51 2005-05-23 08:44:15 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -159,7 +159,7 @@ and ident_list ((bp, _) as loc) =
   | [: :] -> (loc, []) ]
 ;
 
-value rec parse_expr strm =
+value rec parse_simple_expr strm =
   let rec parse_1 =
     parser
       [: e = parse_2;
@@ -221,21 +221,11 @@ value rec parse_expr strm =
     | [: (loc, id, idl) = parse_var :] -> Evar loc id idl
     | [: `Tok loc _ :] -> Evar loc "parse_error" [] ]
   in
-  let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
-  let r = parse_simple (Stream.from f) in
-  do { match strm with parser [ [: `';' :] -> () | [: :] -> () ]; r }
-;
-
-value parse_real_params strm =
-  let expr =
-    parser
-    [ [: `Tok loc (STRING s) :] -> Estr s
-    | [: `Tok loc (LEXICON upp s n) :] -> Etransl upp s n
-    | [: (loc, id, idl) = parse_var :] -> Evar loc id idl ]
-  in
+  parse_simple strm
+and parse_tuple strm =
   let rec parse_expr_list =
     parser
-      [: x = expr;
+      [: x = parse_simple_expr;
          xl =
            parser
            [ [: `Tok _ COMMA; a = parse_expr_list :] -> a
@@ -252,8 +242,18 @@ value parse_real_params strm =
            | [: :] -> [Estr "parse_error"] ] :] ->
         a
   in
+  parse_tuple strm
+;
+
+value parse_char_stream p strm =
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
-  parse_tuple (Stream.from f)
+  p (Stream.from f)
+;
+
+value parse_char_stream_semi p strm =
+  let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
+  let r = p (Stream.from f) in
+  do { match strm with parser [ [: `';' :] -> () | [: :] -> () ]; r }
 ;
 
 value parse_formal_params strm =
@@ -316,7 +316,7 @@ value parse_templ conf strm =
               [ (_, "if", []) -> parse_if strm
               | (_, "foreach", []) -> parse_foreach strm
               | (_, "apply", []) -> parse_apply strm
-              | (_, "expr", []) -> Aexpr (parse_expr strm)
+              | (_, "expr", []) -> parse_expr_stmt strm
               | (_, "wid_hei", []) -> Awid_hei (get_value 0 strm)
               | ((_, ep), v, vl) -> Avar (bp, ep) v vl ]
             in
@@ -375,12 +375,14 @@ value parse_templ conf strm =
               AapplyWithAst f all
           | _ -> raise (Stream.Error "'with' expected") ]
       | [: :] ->
-          let el = parse_real_params strm in
+          let el = parse_char_stream parse_tuple strm in
           Aapply f el ]
     with
     [ Stream.Failure | Stream.Error _ -> Atext "apply syntax error" ]
+  and parse_expr_stmt strm =
+    Aexpr (parse_char_stream_semi parse_simple_expr strm)
   and parse_if strm =
-    let e = parse_expr strm in
+    let e = parse_char_stream_semi parse_simple_expr strm in
     let (al1, al2) =
       loop () where rec loop () =
         let (al1, tok) =
@@ -388,7 +390,7 @@ value parse_templ conf strm =
         in
         match tok with
         [ "elseif" ->
-            let e2 = parse_expr strm in
+            let e2 = parse_char_stream_semi parse_simple_expr strm in
             let (al2, al3) = loop () in
             (al1, [Aif e2 al2 al3])
         | "else" ->
