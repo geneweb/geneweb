@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.16 2005-05-23 01:23:39 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.17 2005-05-23 02:10:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -476,7 +476,7 @@
   %end;
   %empty_sorted_list;
   %foreach;ancestor_level;
-    %if;(evar_v != "" and level <= evar_v)
+    %if;(evar_v != "" and level < evar_v)
       %foreach;ancestor;
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
@@ -486,7 +486,8 @@
                 ancestor.surname_end, ancestor.first_name,
                 ancestor.surname_begin, ancestor.sosa.v,
                 ancestor.nobility_title, ancestor.access,
-                ancestor.dates)
+                ancestor.dates, ancestor.family.marriage_date.year,
+                ancestor.spouse, ancestor.spouse.dates)
             %end;
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
@@ -509,7 +510,11 @@
   <ul>
   %foreach;sorted_list_elem;
     <li>%elem_1; <a href="%prefix;%elem_6;">%elem_2;</a>%elem_3;
-    %if(elem_5 != ""), <em>%elem_5;</em>%end;</li>
+    %if(elem_5 != ""), <em>%elem_5;</em>%end;%elem_7;%nl;
+    &amp;%nn;
+    %if;(elem_8 != "")<span style="font-size:70%%">%elem_8;</span>%end;
+    %sp;%elem_9;%elem_10;
+    </li>
   %end;
   </ul>
 %elseif;(evar_t = "M")
