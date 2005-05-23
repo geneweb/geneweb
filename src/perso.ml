@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.112 2005-05-23 02:10:01 ddr Exp $ *)
+(* $Id: perso.ml,v 4.113 2005-05-23 09:38:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1523,14 +1523,14 @@ value rec eval_ast conf base env ep =
       let eval_ast = eval_ast conf base env ep in
       let eval_var = eval_var conf base env ep in
       let vl = List.map (Templ.eval_expr conf eval_var) el in
-      eval_apply conf f env eval_ast vl
+      eval_apply conf env eval_ast f vl
   | AapplyWithAst f all ->
       let eval_ast = eval_ast conf base env ep in
       let sll = List.map (List.map eval_ast) all in
       let vl = List.map (String.concat "") sll in
-      eval_apply conf f env eval_ast vl
+      eval_apply conf env eval_ast f vl
   | x -> not_impl "eval_ast" x ]
-and eval_apply conf f env eval_ast vl =
+and eval_apply conf env eval_ast f vl =
   match get_env f env with
   [ Vfun xl al ->
       let al = List.map (Templ.eval_subst f xl vl) al in
@@ -1555,10 +1555,14 @@ and eval_predefined_apply conf env f vl =
       let n = try int_of_string s2 with [ Failure _ -> 0 ] in
       Util.nth_field s1 n
   | _ -> Printf.sprintf "%%apply;%s?" f ]
-and eval_if conf base env p e alt ale =
-  let eval_var = eval_var conf base env p in
-  let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
-  String.concat "" (List.map (eval_ast conf base env p) al)
+and eval_if conf base env ep e alt ale =
+  let eval_var = eval_var conf base env ep in
+  let eval_ast = eval_ast conf base env ep in
+  let eval_apply = eval_apply conf env eval_ast in
+  let al =
+    if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
+  in
+  String.concat "" (List.map eval_ast al)
 ;
 
 value rec print_ast conf base env ep =
@@ -1585,7 +1589,11 @@ and print_apply conf base env ep f el =
       Wserver.wprint "%s" (eval_predefined_apply conf env f vl) ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
-  let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
+  let eval_ast = eval_ast conf base env ep in
+  let eval_apply = eval_apply conf env eval_ast in
+  let al =
+    if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
+  in
   List.iter (print_ast conf base env ep) al
 and print_foreach conf base env ini_ep loc s sl al =
   let rec loop ((_, a, _, _) as ep) efam =
