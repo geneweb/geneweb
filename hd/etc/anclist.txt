@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.19 2005-05-23 13:34:54 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.20 2005-05-23 19:44:42 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -482,7 +482,9 @@
                 ancestor.surname_end, ancestor.first_name,
                 ancestor.surname_begin, "0",
                 ancestor.nobility_title, ancestor.access,
-                ancestor.dates, [parents])
+                ancestor.dates, [parents],
+                ancestor.family.marriage_date.year,
+                ancestor.spouse, ancestor.spouse.dates)
             %end;
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
@@ -511,11 +513,22 @@
     %end;
   %end;
   <ul>
+  %apply;lazy_print%with;<ul><li>%end;
   %foreach;sorted_list_elem;
-    <li>%elem_1;
+    <li>%if;(not lazy_printed)%elem_1;%end;
+    %if;(number_of_subelems > 1)%lazy_force;%end;
     %sp;<a href="%prefix;%elem_6;">%elem_2;</a>%elem_3;
-    %if(elem_5 != ""), <em>%elem_5;</em>%end;%elem_7; =&gt; %elem_8;
+    %if;(elem_5 != ""), <em>%elem_5;</em>%end;%elem_7;
+    %if;(evar_ms != "on")
+      %nl;&amp;%nn;
+      %if;(elem_9 != "")<span style="font-size:70%%">%elem_9;</span>%end;
+      %sp;%elem_10;%elem_11;
+    %else; =&gt; %elem_8;%end;
     </li>
+    %if;(number_of_subelems = "1")
+      %if;lazy_printed;</li></ul>%end;
+      %apply;lazy_print%with;<ul><li>%end;
+    %end;
   %end;
   </ul>
 %elseif;(evar_t = "M")
