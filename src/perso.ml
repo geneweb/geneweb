@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.113 2005-05-23 09:38:26 ddr Exp $ *)
+(* $Id: perso.ml,v 4.114 2005-05-23 13:34:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -375,7 +375,8 @@ value sosa_is_present all_gp n1 =
 value get_link all_gp ip =
   loop all_gp where rec loop =
     fun
-    [ [GP_person n ip0 _ :: gpl] -> if ip = ip0 then Some n else loop gpl
+    [ [(GP_person n ip0 _ as gp) :: gpl] ->
+         if ip = ip0 then Some gp else loop gpl
     | [gp :: gpl] -> loop gpl
     | [] -> None ]
 ;
@@ -386,8 +387,8 @@ value parent_sosa conf base ip all_gp n parent =
     match parents (aget conf base ip) with
     [ Some ifam ->
         match get_link all_gp (parent (coi base ifam)) with
-        [ Some n -> Num.to_string n
-        | None -> "" ]
+        [ Some (GP_person n _ _) -> Num.to_string n
+        | _ -> "" ]
     | None -> "" ]
 ;
 
@@ -919,6 +920,17 @@ and eval_ancestor_field_var conf base env gp loc =
           in
           eval_family_field_var conf base env (f, c, d, m_auth) loc sl
       | _ -> raise Not_found ]
+  | ["father" :: sl] ->
+      match gp with
+      [ GP_person _ ip _ ->
+          match (parents (aoi base ip), get_env "all_gp" env) with
+          [ (Some ifam, Vallgp all_gp) ->
+              let cpl = coi base ifam in
+              match get_link all_gp (father cpl) with
+              [ Some gp -> eval_ancestor_field_var conf base env gp loc sl
+              | None -> raise Not_found ]
+          | (_, _) -> raise Not_found ]
+      | _ -> raise Not_found ]
   | ["father_sosa"] ->
       match (gp, get_env "all_gp" env) with
       [ (GP_person n ip _ | GP_same n _ ip, Vallgp all_gp) ->
@@ -1337,8 +1349,8 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match get_env "all_gp" env with
       [ Vallgp all_gp ->
           match get_link all_gp p.cle_index with
-          [ Some s -> Num.to_string s
-          | None -> "" ]
+          [ Some (GP_person s _ _) -> Num.to_string s
+          | _ -> "" ]
       | _ -> raise Not_found ]
   | "sosa_link" ->
       match get_env "sosa" env with
