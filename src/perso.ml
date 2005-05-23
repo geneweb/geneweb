@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.114 2005-05-23 13:34:54 ddr Exp $ *)
+(* $Id: perso.ml,v 4.115 2005-05-23 19:44:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -432,7 +432,7 @@ type env =
   | Vanc of generation_person
   | Vcnt of ref int
   | Vslist of ref SortedList.t
-  | Vslistlm of list string
+  | Vslistlm of list (list string)
   | Vind of person and ascend and union
   | Vfam of family and (iper * iper * iper) and descend and bool
   | Vrel of relation and option person
@@ -697,6 +697,17 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
             string_of_title conf base (transl_nth conf "and" 0) p t
           else ""
       | _ -> raise Not_found ]
+  | "number_of_subelems" ->
+      match get_env "elem" env with
+      [ Vslistlm [[s :: _] :: sll] ->
+          let n =
+            loop 1 sll where rec loop n =
+              fun
+              [ [[s1 :: _] :: sll] -> if s = s1 then loop (n + 1) sll else n
+              | _ -> n ]
+          in
+          string_of_int n
+      | _ -> raise Not_found ]
   | "on_marriage_date" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
@@ -779,7 +790,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
          ("elem_",
           fun v ->
             match get_env "elem" env with
-            [ Vslistlm sl ->
+            [ Vslistlm [sl :: _] ->
                 try List.nth sl (int_of_string v - 1) with
                 [ Failure _ -> "" ]
             | _ -> raise Not_found ]);
@@ -888,12 +899,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           let ep = (p, a, u, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | [s] ->
-      try bool_val (eval_bool_person_field conf base env ep s) with
-      [ Not_found ->
-          try str_val (eval_str_person_field conf base env ep s) with
-          [ Not_found -> obsolete_eval conf base env ep loc s ] ]
-  | _ -> raise Not_found ]
+  | sl -> eval_person_field_var conf base env ep loc sl ]
 and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
   fun
   [ ["type"] ->
@@ -1948,11 +1954,15 @@ and print_foreach_sorted_list_elem conf base env al ep =
     [ Vslist l -> SortedList.elements l.val
     | _ -> [] ]
   in
-  List.iter
-    (fun sl ->
-       let env = [("elem", Vslistlm sl) :: env] in
-       List.iter (print_ast conf base env ep) al)
-    list
+  loop list where rec loop =
+    fun
+    [ [_ :: sll] as gsll ->
+         let env = [("elem", Vslistlm gsll) :: env] in
+         do {
+           List.iter (print_ast conf base env ep) al;
+           loop sll
+         }
+    | [] -> () ]
 and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
   let rec insert_loop typ src =
     fun
