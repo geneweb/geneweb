@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.39 2005-05-07 17:50:50 ddr Exp $ *)
+(* $Id: util.mli,v 4.40 2005-05-23 01:23:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -112,8 +112,11 @@ value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
 value of_course_died : config -> person -> bool;
 
-value surname_begin : string -> string;
-value surname_end : string -> string;
+value surname_begin : base -> string -> string;
+value surname_end : base -> string -> string;
+value get_particle : base -> string -> string;
+value old_surname_begin : string -> string;
+value old_surname_end : string -> string;
 
 value specify_homonymous : config -> base -> person -> unit;
 

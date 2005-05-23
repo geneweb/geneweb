@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.65 2005-05-21 17:35:33 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.66 2005-05-23 01:23:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1242,14 +1242,14 @@ value
 
 value print_alphabetic_missing conf base spouses_included (surname, list) =
   do {
-    Wserver.wprint "%s " (surname_end surname);
+    Wserver.wprint "%s " (surname_end base surname);
     match list with
     [ [e] ->
-        print_someone_missing conf base (surname_begin surname)
+        print_someone_missing conf base (surname_begin base surname)
           spouses_included e
     | _ ->
         do {
-          Wserver.wprint "%s\n" (surname_begin surname);
+          Wserver.wprint "%s\n" (surname_begin base surname);
           tag "ul" begin
             List.iter
               (fun e ->
@@ -1988,7 +1988,7 @@ value print_surnames_list conf base v p =
                ("m=RL;" ^ acces conf base anc ^ ";" ^
                   acces_n conf base "1" p ^ ";" ^ acces_n conf base "2" anc ^
                   ";b1=" ^ Num.to_string sosa ^ ";b2=1")
-               (surname_end surn ^ surname_begin surn)
+               (surname_end base surn ^ surname_begin base surn)
            else
              let (str, _) =
                List.fold_right
@@ -2001,7 +2001,7 @@ value print_surnames_list conf base v p =
              in
              wprint_geneweb_link conf
                ("m=DAG;" ^ acces_n conf base "1" p ^ str)
-               (surname_end surn ^ surname_begin surn);
+               (surname_end base surn ^ surname_begin base surn);
            if conf.cancel_links then ()
            else
              let comm =

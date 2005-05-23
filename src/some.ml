@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.36 2005-04-08 18:02:26 ddr Exp $ *)
+(* $Id: some.ml,v 4.37 2005-05-23 01:23:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -75,7 +75,7 @@ value print_elem conf base is_surname (p, xl) =
          if not first then Wserver.wprint "</li>\n<li>\n  " else ();
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
-           Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
+           Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p)
          else Wserver.wprint "%s" p;
          Wserver.wprint "</a>";
          Wserver.wprint "%s" (Date.short_dates_text conf base x);

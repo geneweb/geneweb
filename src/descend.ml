@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.41 2005-05-15 21:33:17 ddr Exp $ *)
+(* $Id: descend.ml,v 4.42 2005-05-23 01:23:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -672,17 +672,17 @@ value print_elem conf base paths precision (n, pll) =
     match List.rev pll with
     [ [[p]] ->
         do {
-          Wserver.wprint "<strong>%s %s %s</strong>" (surname_end n)
+          Wserver.wprint "<strong>%s %s %s</strong>" (surname_end base n)
             (reference conf base p (person_text_without_surname conf base p))
-            (surname_begin n);
+            (surname_begin base n);
           Wserver.wprint "%s" (Date.short_dates_text conf base p);
           print_ref conf base paths p;
           Wserver.wprint "\n"
         }
     | pll ->
         do {
-          Wserver.wprint "<strong>%s%s</strong>\n" (surname_end n)
-            (surname_begin n);
+          Wserver.wprint "<strong>%s%s</strong>\n" (surname_end base n)
+            (surname_begin base n);
           tag "ul" begin
             List.iter
               (fun pl ->
