@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.117 2005-05-24 07:32:54 ddr Exp $ *)
+(* $Id: perso.ml,v 4.118 2005-05-24 17:08:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -780,13 +780,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
             | None -> "" ]);
          ("bvar_",
           fun v -> try List.assoc v conf.base_env with [ Not_found -> "" ]);
-         ("elem_",
-          fun v ->
-            match get_env "elem" env with
-            [ Vslistlm [sl :: _] ->
-                try List.nth sl (int_of_string v - 1) with
-                [ Failure _ -> "" ]
-            | _ -> raise Not_found ]);
          (* warning: "cvar_" deprecated since 5.00 *)         
          ("cvar_",
           fun v -> try List.assoc v conf.base_env with [ Not_found -> "" ])]
@@ -814,6 +807,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           in
           let ep = (p, a, u, auth) in
           eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["elem" :: sl] ->
+      match get_env "elem" env with
+      [ Vslistlm ell -> eval_elem_field_var env ell sl
       | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
@@ -849,6 +846,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["prev_elem" :: sl] ->
+      match get_env "prev_elem" env with
+      [ Vslistlm ell -> eval_elem_field_var env ell sl
       | _ -> raise Not_found ]
   | ["prev_family" :: sl] ->
       match get_env "prev_fam" env with
@@ -900,6 +901,19 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | sl -> eval_person_field_var conf base env ep loc sl ]
+and eval_elem_field_var env ell =
+  fun
+  [ [s] ->
+      try
+        match ell with
+        [ [el :: _] ->
+            let v = int_of_string s in
+            let r = try List.nth el (v - 1) with [ Failure _ -> "" ] in
+            VVstring r
+        | [] -> VVstring "" ]
+      with
+      [ Failure _ -> raise Not_found ]
+  | _ -> raise Not_found ]
 and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
   fun
   [ ["type"] ->
@@ -1952,13 +1966,14 @@ and print_foreach_sorted_list_elem conf base env al ep =
     [ Vslist l -> SortedList.elements l.val
     | _ -> [] ]
   in
-  loop list where rec loop =
+  loop (Vslistlm []) list where rec loop prev_elem =
     fun
     [ [_ :: sll] as gsll ->
-         let env = [("elem", Vslistlm gsll) :: env] in
+         let elem = Vslistlm gsll in
+         let env = [("elem", elem); ("prev_elem", prev_elem) :: env] in
          do {
            List.iter (print_ast conf base env ep) al;
-           loop sll
+           loop elem sll
          }
     | [] -> () ]
 and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
@@ -2091,13 +2106,18 @@ value interp_templ templ_fname conf base p =
   let a = aget conf base p.cle_index in
   let u = uget conf base p.cle_index in
   let ep = (p, a, u, authorized_age conf base p) in
+  let emal =
+    match p_getint conf.env "v" with
+    [ Some i -> i
+    | None -> 0 ]
+  in
   let env =
     let sosa_ref_l =
       let sosa_ref () = Util.find_sosa_ref conf base in
       Lazy.lazy_from_fun sosa_ref
     in
     let sosa () = Vsosa (find_sosa conf base p sosa_ref_l) in
-    let mal () =  Vint (max_ancestor_level conf base p.cle_index 120 + 1) in
+    let mal () =  Vint (max_ancestor_level conf base p.cle_index emal + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
     let mdl () =  Vint (max_descendant_level conf base p) in
     let all_gp () = Vallgp (get_all_generations conf base p) in

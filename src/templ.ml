@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.52 2005-05-23 09:38:26 ddr Exp $ *)
+(* $Id: templ.ml,v 4.53 2005-05-24 17:08:28 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -153,6 +153,7 @@ and ident_list ((bp, _) as loc) =
        (loc, id) =
          parser
          [ [: `Tok (_, ep) (IDENT id) :] -> ((bp, ep), id)
+         | [: `Tok (_, ep) (INT id) :] -> ((bp, ep), id)
          | [: `Tok loc _ :] -> (loc, "parse_error") ];
        (loc, idl) = ident_list loc :] ->
       (loc, [id :: idl])
@@ -435,7 +436,12 @@ value strip_newlines_after_variables =
     fun
     [ [Atext s :: astl] ->
         let s =
-          if s.[0] = '\n' then String.sub s 1 (String.length s - 1) else s
+          loop 0 where rec loop i =
+            if i = String.length s then s
+            else if s.[i] = ' ' || s.[i] = '\t' then loop (i + 1)
+            else if s.[i] = '\n' then
+              String.sub s (i + 1) (String.length s - i - 1)
+            else s
         in
         [Atext s :: loop astl]
     | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
