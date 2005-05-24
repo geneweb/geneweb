@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.116 2005-05-24 02:31:18 ddr Exp $ *)
+(* $Id: perso.ml,v 4.117 2005-05-24 07:32:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1041,9 +1041,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
       try bool_val (eval_bool_person_field conf base env ep s) with
       [ Not_found ->
           try str_val (eval_str_person_field conf base env ep s) with
-          [ Not_found ->
-              try obsolete_eval conf base env ep loc s with
-              [ Not_found -> warning_not_impl loc ] ] ]
+          [ Not_found -> obsolete_eval conf base env ep loc s ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> warning_not_impl loc ]
 and eval_date_field_var d =
