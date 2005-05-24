@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.115 2005-05-23 19:44:42 ddr Exp $ *)
+(* $Id: perso.ml,v 4.116 2005-05-24 02:31:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -753,13 +753,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "count" env with
       [ Vcnt c -> do { c.val := 0; "" }
       | _ -> "" ]
-  | "sosa" ->
-      match get_env "sosa" env with
-      [ Vsosa x ->
-          match x with
-          [ Some (n, p) -> Num.to_string n
-          | None -> "" ]
-      | _ -> raise Not_found ]
   | "source_type" ->
        match get_env "src_typ" env with
        [ Vstring s -> s
@@ -878,6 +871,13 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_relation_field_var conf base env (0, rt, ip, True) loc sl
       | _ -> raise Not_found ]
   | ["self" :: sl] -> eval_person_field_var conf base env ep loc sl
+  | ["sosa" :: sl] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match x with
+          [ Some (n, p) -> VVstring (eval_num conf n sl)
+          | None -> VVstring "" ]
+      | _ -> raise Not_found ]
   | ["sosa_ref" :: sl] ->
       match get_env "sosa_ref" env with
       [ Vsosa_ref v ->
