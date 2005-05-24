@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.20 2005-05-23 19:44:42 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.21 2005-05-24 17:08:28 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -413,7 +413,7 @@
         ancestor.xx.burial_date.year != "" and
         ancestor.xx.burial_date.year > evar_before or
         ancestor.xx.cremated_date.year != "" and
-        ancestor.xx.cremated_date.year > evar_before))false
+        ancestor.xx.cremated_date.year > evar_before))false%nn;
   %else;true%end;
 %end;
 
@@ -472,7 +472,7 @@
   %end;
   %empty_sorted_list;
   %foreach;ancestor_level;
-    %if;(evar_v != "" and level < evar_v)
+    %if;(evar_v != "" and level < evar_v)%nn;
       %foreach;ancestor;
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
@@ -506,28 +506,32 @@
                   ancestor.father.nobility_title, ancestor.father.access,
                   ancestor.father.dates, [husband/wife]1)
               %end;
-            %end; 
+            %end;
           %end;
         %end;
       %end;
     %end;
   %end;
   <ul>
-  %apply;lazy_print%with;<ul><li>%end;
   %foreach;sorted_list_elem;
-    <li>%if;(not lazy_printed)%elem_1;%end;
-    %if;(number_of_subelems > 1)%lazy_force;%end;
-    %sp;<a href="%prefix;%elem_6;">%elem_2;</a>%elem_3;
-    %if;(elem_5 != ""), <em>%elem_5;</em>%end;%elem_7;
+    <li>%nn;
+    %if;(prev_elem.1 != elem.1)
+      %elem.1;
+      %if;(number_of_subelems > 1)%nl;
+        <ul>
+          <li>%nn;
+      %end;
+    %end;
+    %sp;<a href="%prefix;%elem.6;">%elem.2;</a>%elem.3;
+    %if;(elem.5 != ""), <em>%elem.5;</em>%end;%elem.7;
     %if;(evar_ms != "on")
       %nl;&amp;%nn;
-      %if;(elem_9 != "")<span style="font-size:70%%">%elem_9;</span>%end;
-      %sp;%elem_10;%elem_11;
-    %else; =&gt; %elem_8;%end;
+      %if;(elem.9 != "")<span style="font-size:70%%">%elem.9;</span>%end;
+      %sp;%elem.10;%elem.11;
+    %else; =&gt; %elem.8;%end;
     </li>
-    %if;(number_of_subelems = "1")
-      %if;lazy_printed;</li></ul>%end;
-      %apply;lazy_print%with;<ul><li>%end;
+    %if;(prev_elem.1 = elem.1 and number_of_subelems = 1)
+      </ul>
     %end;
   %end;
   </ul>
