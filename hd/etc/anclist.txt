@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.21 2005-05-24 17:08:28 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.22 2005-05-24 18:02:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -513,25 +513,35 @@
     %end;
   %end;
   <ul>
-  %foreach;sorted_list_elem;
+  %foreach;sorted_list_item;
     <li>%nn;
-    %if;(prev_elem.1 != elem.1)
-      %elem.1;
-      %if;(number_of_subelems > 1)%nl;
+    %if;(initial(prev_item.1) != initial(item.1))
+      %apply;initial(item.1)%nl;
+      <ul>
+        <li>%nn;
+    %end;
+    %if;(prev_item.1 != item.1)
+      %item.1;
+      %if;(number_of_subitems > 1)%nl;
         <ul>
           <li>%nn;
       %end;
     %end;
-    %sp;<a href="%prefix;%elem.6;">%elem.2;</a>%elem.3;
-    %if;(elem.5 != ""), <em>%elem.5;</em>%end;%elem.7;
+    %sp;<a href="%prefix;%item.6;">%item.2;</a>%item.3;
+    %if;(item.5 != ""), <em>%item.5;</em>%end;%item.7;
     %if;(evar_ms != "on")
       %nl;&amp;%nn;
-      %if;(elem.9 != "")<span style="font-size:70%%">%elem.9;</span>%end;
-      %sp;%elem.10;%elem.11;
-    %else; =&gt; %elem.8;%end;
+      %if;(item.9 != "")<span style="font-size:70%%">%item.9;</span>%end;
+      %sp;%item.10;%item.11;
+    %else; =&gt; %item.8;%end;
     </li>
-    %if;(prev_elem.1 = elem.1 and number_of_subelems = 1)
+    %if;(prev_item.1 = item.1 and number_of_subitems = 1)
       </ul>
+      </li>
+    %end;
+    %if;(initial(item.1) != initial(next_item.1))
+      </ul>
+      </li>
     %end;
   %end;
   </ul>
