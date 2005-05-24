@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.118 2005-05-24 17:08:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.119 2005-05-24 18:02:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -402,7 +402,7 @@ value will_print =
 value get_all_generations conf base p =
   let max_level =
     match p_getint conf.env "v" with
-    [ Some v -> v
+    [ Some v -> v + 1
     | None -> 0 ]
   in
   let mark = Array.create base.data.persons.len Num.zero in
@@ -697,8 +697,8 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
             string_of_title conf base (transl_nth conf "and" 0) p t
           else ""
       | _ -> raise Not_found ]
-  | "number_of_subelems" ->
-      match get_env "elem" env with
+  | "number_of_subitems" ->
+      match get_env "item" env with
       [ Vslistlm [[s :: _] :: sll] ->
           let n =
             loop 1 sll where rec loop n =
@@ -808,10 +808,6 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           let ep = (p, a, u, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | ["elem" :: sl] ->
-      match get_env "elem" env with
-      [ Vslistlm ell -> eval_elem_field_var env ell sl
-      | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
@@ -833,6 +829,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
           warning_use_has_parents_before_parent loc "father" (str_val "") ]
+  | ["item" :: sl] ->
+      match get_env "item" env with
+      [ Vslistlm ell -> eval_item_field_var env ell sl
+      | _ -> raise Not_found ]
   | ["mother" :: sl] ->
       match parents a with
       [ Some ifam ->
@@ -841,15 +841,19 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
           warning_use_has_parents_before_parent loc "mother" (str_val "") ]
+  | ["next_item" :: sl] ->
+      match get_env "item" env with
+      [ Vslistlm [_ :: ell] -> eval_item_field_var env ell sl
+      | _ -> raise Not_found ]
   | ["parent" :: sl] ->
       match get_env "parent" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | ["prev_elem" :: sl] ->
-      match get_env "prev_elem" env with
-      [ Vslistlm ell -> eval_elem_field_var env ell sl
+  | ["prev_item" :: sl] ->
+      match get_env "prev_item" env with
+      [ Vslistlm ell -> eval_item_field_var env ell sl
       | _ -> raise Not_found ]
   | ["prev_family" :: sl] ->
       match get_env "prev_fam" env with
@@ -901,7 +905,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | sl -> eval_person_field_var conf base env ep loc sl ]
-and eval_elem_field_var env ell =
+and eval_item_field_var env ell =
   fun
   [ [s] ->
       try
@@ -1577,6 +1581,7 @@ and eval_predefined_apply conf env f vl =
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
       | _ -> "" ]
   | ("capitalize", [s]) -> capitale s
+  | ("initial", [s]) -> if String.length s = 0 then "" else String.make 1 s.[0]
   | ("lazy_print", [v]) ->
       match get_env "lazy_print" env with
       [ Vlazyp r -> do { r.val := Some v; "" }
@@ -1725,7 +1730,7 @@ and print_simple_foreach conf base env al ini_ep ep efam =
   | "qualifier" -> print_foreach_qualifier conf base env al ep
   | "related" -> print_foreach_related conf base env al ep
   | "relation" -> print_foreach_relation conf base env al ep
-  | "sorted_list_elem" -> print_foreach_sorted_list_elem conf base env al ep
+  | "sorted_list_item" -> print_foreach_sorted_list_item conf base env al ep
   | "source" -> print_foreach_source conf base env al ep
   | "surname_alias" -> print_foreach_surname_alias conf base env al ep
   | "witness" -> print_foreach_witness conf base env al ep efam
@@ -1960,20 +1965,20 @@ and print_foreach_related conf base env al ((p, _, _, p_auth) as ep) =
          List.iter (print_ast conf base env ep) al)
       list
   else ()
-and print_foreach_sorted_list_elem conf base env al ep =
+and print_foreach_sorted_list_item conf base env al ep =
   let list =
     match get_env "list" env with
     [ Vslist l -> SortedList.elements l.val
     | _ -> [] ]
   in
-  loop (Vslistlm []) list where rec loop prev_elem =
+  loop (Vslistlm []) list where rec loop prev_item =
     fun
     [ [_ :: sll] as gsll ->
-         let elem = Vslistlm gsll in
-         let env = [("elem", elem); ("prev_elem", prev_elem) :: env] in
+         let item = Vslistlm gsll in
+         let env = [("item", item); ("prev_item", prev_item) :: env] in
          do {
            List.iter (print_ast conf base env ep) al;
-           loop elem sll
+           loop item sll
          }
     | [] -> () ]
 and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
