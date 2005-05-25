@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.3 2005-05-12 17:52:22 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.4 2005-05-25 11:59:55 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -43,7 +43,7 @@
   <td valign="top">
     <a href="%prefix;m=MOD_IND;i=%index;">[*modify]</a>
     <br%/>
-    %if;(bvar_can_send_image != "no" and image = "" and first_name != "?"
+    %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
          and surname != "?")
       <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
       <br%/>

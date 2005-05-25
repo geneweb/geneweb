@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.45 2005-05-20 12:59:52 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.46 2005-05-25 11:59:55 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -155,7 +155,7 @@
     %if;computable_death_age;
       <li>[*age at death:] %death_age;</li>%nl;
     %end;
-    %if;(has_consanguinity and bvar_show_consang != "no");
+    %if;(has_consanguinity and bvar.show_consang != "no");
       <li>[*consanguinity]: %consanguinity;</li>%nl;
     %end;
   </ul>
@@ -237,7 +237,7 @@
         %end;
       </ul>
     %end;
-    %if;(evar_opt = "from" and wizard);<em>(%origin_file;)</em><br%/>%nl;%end;
+    %if;(evar.opt = "from" and wizard);<em>(%origin_file;)</em><br%/>%nl;%end;
     </li>
   %end;
   </ul>
@@ -359,7 +359,7 @@
   </table>
 %end;
 
-%if;(evar_opt = "misc")%misc_names;<p>%end;
+%if;(evar.opt = "misc")%misc_names;<p>%end;
 
 <div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
  alt="..." width="64" height="72" style="border:0;float:%right;"%/></a><br%/>
