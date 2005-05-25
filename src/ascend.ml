@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.66 2005-05-23 01:23:39 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.67 2005-05-25 02:03:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -946,6 +946,7 @@ value display_ancestors_level conf base max_level p =
   }
 ;
 
+(* ... display missing ancestors ... begin *)
 value print_generation_missing_persons conf base title sp_incl gp =
   let print_title () =
     match title.val with
@@ -1408,6 +1409,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
     trailer conf
   }
 ;
+(* ... display missing ancestors ... end *)
 
 value tree_reference gv bd color conf base p s =
   if conf.cancel_links || is_hidden p then s
@@ -2064,6 +2066,7 @@ value print conf base p =
       anclist_print conf base p
 *)
   | (Some "M", Some v) ->
+(**)
       let al =
         match p_getenv conf.env "al" with
         [ Some "on" -> True
@@ -2076,6 +2079,9 @@ value print conf base p =
       in
       if al then print_missing_ancestors_alphabetically conf base v si p
       else print_missing_ancestors conf base v si p
+(*
+      anclist_print conf base p
+*)
   | (Some "T", Some v) -> print_tree conf base v p
   | (Some "H", Some v) -> print_horizontally conf base v p
   | (Some "A", Some v) -> print_male_line conf base v p

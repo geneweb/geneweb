@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.23 2005-05-25 00:55:26 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.24 2005-05-25 02:03:40 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -478,7 +478,7 @@
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
-            %if;(ancestor_dates_in_interval(self) = "true")
+            %if;(ancestor_dates_in_interval("self") = "true")
               %incr_count;
               %apply;add_in_sorted_list(
                 ancestor.surname_end, ancestor.first_name,
@@ -491,7 +491,7 @@
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %if;(ancestor_dates_in_interval(mother) = "true")
+              %if;(ancestor_dates_in_interval("mother") = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.mother.surname_end, ancestor.mother.first_name,
@@ -502,7 +502,7 @@
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %if(ancestor_dates_in_interval(father) = "true")
+              %if(ancestor_dates_in_interval("father") = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.father.surname_end, ancestor.father.first_name,
@@ -579,7 +579,7 @@
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
-            %if;(ancestor_dates_in_interval(self) = "true")
+            %if;(ancestor_dates_in_interval("self") = "true")
               %lazy_force;
               <li>%sp;
                 %expr(ancestor.sosa.v * 2)
@@ -599,7 +599,7 @@
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %if(ancestor_dates_in_interval(mother) = "true")
+              %if(ancestor_dates_in_interval("mother") = "true")
                 %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2)%sp; -
                 %apply;a_of_b%with;
@@ -615,7 +615,7 @@
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %if;(ancestor_dates_in_interval(father) = "true")
+              %if;(ancestor_dates_in_interval("father") = "true")
                 %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2 + 1)%sp; -
                 %apply;a_of_b%with;
