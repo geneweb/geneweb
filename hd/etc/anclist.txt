@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.26 2005-05-25 11:59:55 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.27 2005-05-25 12:17:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -680,7 +680,7 @@
   %end;
 %elseif;(evar.t = "D")
   %( ancestors up to somebody %)
-  %apply;mark_descendants(pvar.1)
+  %pvar.1.index;
 %end;
 
 <div>
