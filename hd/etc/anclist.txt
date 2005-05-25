@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.22 2005-05-24 18:02:36 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.23 2005-05-25 00:55:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -471,6 +471,7 @@
     </p>
   %end;
   %empty_sorted_list;
+  %reset_count;
   %foreach;ancestor_level;
     %if;(evar_v != "" and level < evar_v)%nn;
       %foreach;ancestor;
@@ -478,6 +479,7 @@
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
             %if;(ancestor_dates_in_interval(self) = "true")
+              %incr_count;
               %apply;add_in_sorted_list(
                 ancestor.surname_end, ancestor.first_name,
                 ancestor.surname_begin, "0",
@@ -490,6 +492,7 @@
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
               %if;(ancestor_dates_in_interval(mother) = "true")
+                %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.mother.surname_end, ancestor.mother.first_name,
                   ancestor.mother.surname_begin, "1",
@@ -500,6 +503,7 @@
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
               %if(ancestor_dates_in_interval(father) = "true")
+                %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.father.surname_end, ancestor.father.first_name,
                   ancestor.father.surname_begin, "1",
@@ -512,11 +516,18 @@
       %end;
     %end;
   %end;
+  %if;(count > 100)
+    %foreach;sorted_list_item;
+      %if;(initial(prev_item.1) != initial(item.1))
+        <a href="#a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+      %end;
+    %end;
+  %end;
   <ul>
   %foreach;sorted_list_item;
     <li>%nn;
-    %if;(initial(prev_item.1) != initial(item.1))
-      %apply;initial(item.1)%nl;
+    %if;(count > 100 and initial(prev_item.1) != initial(item.1))
+      <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
       <ul>
         <li>%nn;
     %end;
@@ -539,7 +550,7 @@
       </ul>
       </li>
     %end;
-    %if;(initial(item.1) != initial(next_item.1))
+    %if;(count > 100 and initial(item.1) != initial(next_item.1))
       </ul>
       </li>
     %end;

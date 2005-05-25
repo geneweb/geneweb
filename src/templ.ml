@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.53 2005-05-24 17:08:28 ddr Exp $ *)
+(* $Id: templ.ml,v 4.54 2005-05-25 00:55:26 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -154,7 +154,7 @@ and ident_list ((bp, _) as loc) =
          parser
          [ [: `Tok (_, ep) (IDENT id) :] -> ((bp, ep), id)
          | [: `Tok (_, ep) (INT id) :] -> ((bp, ep), id)
-         | [: `Tok loc _ :] -> (loc, "parse_error") ];
+         | [: `Tok loc _ :] -> (loc, "parse_error1") ];
        (loc, idl) = ident_list loc :] ->
       (loc, [id :: idl])
   | [: :] -> (loc, []) ]
@@ -213,7 +213,7 @@ value rec parse_simple_expr strm =
          a =
            parser
            [ [: `Tok _ RPAREN :] -> e
-           | [: `Tok loc _ :] -> Evar loc "parse_error" [] ] :] ->
+           | [: `Tok loc _ :] -> Evar loc "parse_error2" [] ] :] ->
         a
     | [: `Tok _ (IDENT "not"); e = parse_simple :] -> Enot e
     | [: `Tok _ (STRING s) :] -> Estr s
@@ -225,7 +225,7 @@ value rec parse_simple_expr strm =
            [ [: t = parse_tuple :] -> Eapp loc id t
            | [: :] -> Evar loc id idl ] :] ->
        a
-    | [: `Tok loc _ :] -> Evar loc "parse_error" [] ]
+    | [: `Tok loc _ :] -> Evar loc "parse_error3" [] ]
   in
   parse_simple strm
 and parse_tuple strm =
@@ -245,7 +245,7 @@ and parse_tuple strm =
          a =
            parser
            [ [: `Tok _ RPAREN :] -> xl
-           | [: :] -> [Estr "parse_error"] ] :] ->
+           | [: :] -> [Estr "parse_error4"] ] :] ->
         a
   in
   parse_tuple strm
@@ -279,7 +279,7 @@ value parse_formal_params strm =
          a =
            parser
            [ [: `Tok _ RPAREN :] -> xl
-           | [: :] -> ["parse_error"] ] :] ->
+           | [: :] -> ["parse_error5"] ] :] ->
         a
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
@@ -723,62 +723,78 @@ value loc_of_expr =
   | _ -> (-1, -1) ]
 ;
 
+value rec bool_eval ((conf, eval_var, _) as ceva) =
+  fun
+  [ Eor e1 e2 -> bool_eval ceva e1 || bool_eval ceva e2
+  | Eand e1 e2 -> bool_eval ceva e1 && bool_eval ceva e2
+  | Eop op e1 e2 ->
+      match op with
+      [ "=" -> string_eval ceva e1 = string_eval ceva e2
+      | "!=" -> string_eval ceva e1 <> string_eval ceva e2
+      | ">" -> int_eval ceva e1 > int_eval ceva e2
+      | ">=" -> int_eval ceva e1 >= int_eval ceva e2
+      | "<" -> int_eval ceva e1 < int_eval ceva e2
+      | "<=" -> int_eval ceva e1 <= int_eval ceva e2
+      | _ -> do { Wserver.wprint "op %s???" op; False } ]
+  | Enot e -> not (bool_eval ceva e)
+  | Eapp loc s el -> do { Wserver.wprint "not impl %s" s; False }
+  | Evar loc s sl ->
+      try eval_bool_var conf (eval_var loc) [s :: sl] with
+      [ Not_found ->
+          do {
+            Wserver.wprint " %%%s" s;
+            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+            Wserver.wprint "?";
+            False
+          } ]
+  | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
+  | Eint loc s -> raise_with_loc loc (Failure "bool value expected")
+  | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
+and int_eval ceva =
+  fun
+  [ Eop "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
+  | Eop "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
+  | Eop "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
+  | e ->
+      let s = string_eval ceva e in
+      try int_of_string s with
+      [ Failure _ ->
+          raise_with_loc (loc_of_expr e) (Failure "int value expected") ] ]
+and string_eval ((conf, eval_var, eval_apply) as ceva) =
+  fun
+  [ Estr s -> s
+  | Eapp loc s el -> eval_apply s (List.map (string_eval ceva) el)
+  | Evar loc s sl ->
+      try eval_string_var conf (eval_var loc) s sl with
+      [ Not_found ->
+          do {
+            Wserver.wprint " %%%s" s;
+            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+            Wserver.wprint "?";
+            ""
+          } ]
+  | Etransl upp s c -> eval_transl conf upp s c
+  | e -> try Num.to_string (num_eval ceva e) with [ Failure x -> x ] ]
+and num_eval ((_, eval_var, _) as ceva) =
+  fun
+  [ Eint _ x -> Num.of_string x
+  | Eop "+" x y -> Num.add (num_eval ceva x) (num_eval ceva y)
+  | Eop "*" x (Eint _ y) -> Num.mul (num_eval ceva x) (int_of_string y)
+  | Eop "%" x (Eint _ y) ->
+      Num.of_int (Num.modl (num_eval ceva x) (int_of_string y))
+  | Evar loc s sl ->
+      try
+        match eval_var loc [s :: sl] with
+        [ VVstring s -> Num.of_string s
+        | VVbool True -> Num.one
+        | VVbool False -> Num.zero ]
+      with
+      [ Not_found -> failwith "parse error" ]
+  | _ -> failwith "parse_error6" ]
+;
+
 value eval_bool_expr conf (eval_var, eval_apply) e =
-  let rec bool_eval =
-    fun
-    [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
-    | Eand e1 e2 -> bool_eval e1 && bool_eval e2
-    | Eop op e1 e2 ->
-        match op with
-        [ "=" -> string_eval e1 = string_eval e2
-        | "!=" -> string_eval e1 <> string_eval e2
-        | ">" -> int_eval e1 > int_eval e2
-        | ">=" -> int_eval e1 >= int_eval e2
-        | "<" -> int_eval e1 < int_eval e2
-        | "<=" -> int_eval e1 <= int_eval e2
-        | _ -> do { Wserver.wprint "op %s???" op; False } ]
-    | Enot e -> not (bool_eval e)
-    | Eapp loc s el -> do { Wserver.wprint "not impl %s" s; False }
-    | Evar loc s sl ->
-        try eval_bool_var conf (eval_var loc) [s :: sl] with
-        [ Not_found ->
-            do {
-              Wserver.wprint " %%%s" s;
-              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-              Wserver.wprint "?";
-              False
-            } ]
-    | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
-    | Eint loc s -> raise_with_loc loc (Failure "bool value expected")
-    | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
-  and int_eval =
-    fun
-    [ Eop "+" e1 e2 -> int_eval e1 + int_eval e2
-    | Eop "*" e1 e2 -> int_eval e1 * int_eval e2
-    | Eop "%" e1 e2 -> int_eval e1 mod int_eval e2
-    | e ->
-        let s = string_eval e in
-        try int_of_string s with
-        [ Failure _ ->
-            raise_with_loc (loc_of_expr e) (Failure "int value expected") ] ]
-  and string_eval =
-    fun
-    [ Estr s -> s
-    | Eint _ s -> s
-    | Eapp loc s el -> eval_apply s (List.map string_eval el)
-    | Evar loc s sl ->
-        try eval_string_var conf (eval_var loc) s sl with
-        [ Not_found ->
-            do {
-              Wserver.wprint " %%%s" s;
-              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-              Wserver.wprint "?";
-              ""
-            } ]
-    | Etransl upp s c -> eval_transl conf upp s c
-    | x -> do { Wserver.wprint "val???"; "" } ]
-  in
-  try bool_eval e with
+  try bool_eval (conf, eval_var, eval_apply) e with
   [ Exc_located (bp, ep) exc ->
       do {
         incr nb_errors;
@@ -796,6 +812,26 @@ value eval_bool_expr conf (eval_var, eval_apply) e =
       } ]
 ;
 
+value eval_expr conf (eval_var, eval_apply) e =
+  try string_eval (conf, eval_var, eval_apply) e with
+  [ Exc_located (bp, ep) exc ->
+      do {
+        incr nb_errors;
+        IFDEF UNIX THEN do {
+          if nb_errors.val <= 10 then do {
+            Printf.eprintf "*** <W> template file";
+            Printf.eprintf ", chars %d-%d" bp ep;
+            Printf.eprintf ": %s\n" (Printexc.to_string exc);
+            flush stderr;
+          }
+          else ();
+        }
+        ELSE () END;
+        "eval_error"
+      } ]
+;
+
+(*
 value eval_expr conf eval_var =
   let rec string_eval =
     fun
@@ -836,10 +872,11 @@ value eval_expr conf eval_var =
           | VVbool False -> Num.zero ]
         with
         [ Not_found -> failwith "parse error" ]
-    | _ -> failwith "parse_error" ]
+    | _ -> failwith "parse_error6" ]
   in
   string_eval
 ;
+*)
 
 value print_body_prop conf base =
   let s =

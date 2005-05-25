@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.40 2005-05-23 01:23:40 ddr Exp $ *)
+(* $Id: util.mli,v 4.41 2005-05-25 00:55:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -91,6 +91,7 @@ value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
 value capitale : string -> string;
+value index_of_next_char : string -> int -> int;
 
 value header_no_page_title : config -> (bool -> unit) -> unit;
 value header : config -> (bool -> unit) -> unit;
@@ -111,6 +112,7 @@ value message_to_wizard : config -> unit;
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
 value of_course_died : config -> person -> bool;
+value hexa_string : string -> string;
 
 value surname_begin : base -> string -> string;
 value surname_end : base -> string -> string;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.119 2005-05-24 18:02:36 ddr Exp $ *)
+(* $Id: perso.ml,v 4.120 2005-05-25 00:55:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -423,8 +423,23 @@ value get_all_generations conf base p =
 
 (* Interpretation of template file *)
 
+value compare2 n1 n2 =
+  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2
+  else Gutil.alphabetic n1 n2
+;
+
+value rec compare_ls sl1 sl2 =
+  match (sl1, sl2) with
+  [ ([s1 :: sl1], [s2 :: sl2]) ->
+      let c = compare2 s1 s2 in
+      if c = 0 then compare_ls sl1 sl2 else c
+  | ([_ :: _], []) -> 1
+  | ([], [_ :: _]) -> -1
+  | ([], []) -> 0 ]
+;
+
 module SortedList =
-  Set.Make (struct type t = list string; value compare = compare; end)
+  Set.Make (struct type t = list string; value compare = compare_ls; end)
 ;
 
 type env =
@@ -1549,15 +1564,18 @@ value rec eval_ast conf base env ep =
   | Avar loc s sl ->
       Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
   | Aexpr e ->
+      let eval_ast = eval_ast conf base env ep in
+      let eval_apply = eval_apply conf env eval_ast in
       let eval_var = eval_var conf base env ep in
-      Templ.eval_expr conf eval_var e
+      Templ.eval_expr conf (eval_var, eval_apply) e
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
   | Aapply f el ->
       let eval_ast = eval_ast conf base env ep in
+      let eval_apply = eval_apply conf env eval_ast in
       let eval_var = eval_var conf base env ep in
-      let vl = List.map (Templ.eval_expr conf eval_var) el in
-      eval_apply conf env eval_ast f vl
+      let vl = List.map (Templ.eval_expr conf (eval_var, eval_apply)) el in
+      eval_apply f vl
   | AapplyWithAst f all ->
       let eval_ast = eval_ast conf base env ep in
       let sll = List.map (List.map eval_ast) all in
@@ -1581,7 +1599,10 @@ and eval_predefined_apply conf env f vl =
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
       | _ -> "" ]
   | ("capitalize", [s]) -> capitale s
-  | ("initial", [s]) -> if String.length s = 0 then "" else String.make 1 s.[0]
+  | ("hexa", [s]) -> Util.hexa_string s
+  | ("initial", [s]) ->
+      if String.length s = 0 then ""
+      else String.sub s 0 (Util.index_of_next_char s 0)
   | ("lazy_print", [v]) ->
       match get_env "lazy_print" env with
       [ Vlazyp r -> do { r.val := Some v; "" }
@@ -1613,14 +1634,15 @@ value rec print_ast conf base env ep =
 and print_define conf base env ep f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
 and print_apply conf base env ep f el =
+  let eval_var = eval_var conf base env ep in
+  let eval_ast = eval_ast conf base env ep in
+  let eval_apply = eval_apply conf env eval_ast in
   match get_env f env with
   [ Vfun xl al ->
-      let eval_var = eval_var conf base env ep in
       let print_ast = print_ast conf base env ep in
-      Templ.print_apply conf f print_ast eval_var xl al el
+      Templ.print_apply conf f print_ast (eval_var, eval_apply) xl al el
   | _ ->
-      let eval_var = eval_var conf base env ep in
-      let vl = List.map (Templ.eval_expr conf eval_var) el in
+      let vl = List.map (Templ.eval_expr conf (eval_var, eval_apply)) el in
       Wserver.wprint "%s" (eval_predefined_apply conf env f vl) ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
