@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.24 2005-05-25 02:03:40 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.25 2005-05-25 07:35:03 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -465,11 +465,6 @@
   %if;(evar_after != "") [after] %evar_after;%end;
   %if;(evar_before != "") [before] %evar_before;%end;.
   </p>
-  %if;(evar_ms != "on")
-    <p>
-    %apply;a_of_b([*parents], "...")
-    </p>
-  %end;
   %empty_sorted_list;
   %reset_count;
   %foreach;ancestor_level;
@@ -486,7 +481,8 @@
                 ancestor.nobility_title, ancestor.access,
                 ancestor.dates, [parents],
                 ancestor.family.marriage_date.year,
-                ancestor.spouse, ancestor.spouse.dates)
+                ancestor.spouse, ancestor.spouse.dates,
+                ancestor.spouse.nobility_title)
             %end;
           %elseif;(evar_ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
@@ -523,6 +519,11 @@
       %end;
     %end;
   %end;
+  %if;(evar_ms != "on")
+    <p>
+    %apply;a_of_b([*parents], "...")
+    </p>
+  %end;
   <ul>
   %foreach;sorted_list_item;
     <li>%nn;
@@ -541,9 +542,12 @@
     %sp;<a href="%prefix;%item.6;">%item.2;</a>%item.3;
     %if;(item.5 != ""), <em>%item.5;</em>%end;%item.7;
     %if;(evar_ms != "on")
-      %nl;&amp;%nn;
-      %if;(item.9 != "")<span style="font-size:70%%">%item.9;</span>%end;
-      %sp;%item.10;%item.11;
+      %if;(item.10 != "? ?")
+        %nl;&amp;%nn;
+        %if;(item.9 != "")<span style="font-size:70%%">%item.9;</span>%end;
+        %sp;%item.10;%item.11;
+        %if;(item.12 != ""), <em>%item.12;</em>%end;
+      %end;
     %else; =&gt; %item.8;%end;
     </li>
     %if;(prev_item.1 = item.1 and number_of_subitems = 1)
