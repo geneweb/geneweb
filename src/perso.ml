@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.120 2005-05-25 00:55:26 ddr Exp $ *)
+(* $Id: perso.ml,v 4.121 2005-05-25 11:59:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -793,9 +793,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
             match p_getenv (conf.env @ conf.henv) v with
             [ Some vv -> quote_escaped vv
             | None -> "" ]);
-         ("bvar_",
-          fun v -> try List.assoc v conf.base_env with [ Not_found -> "" ]);
-         (* warning: "cvar_" deprecated since 5.00 *)         
+         (* warning: "cvar_" deprecated since 5.00; use "bvar." *)
          ("cvar_",
           fun v -> try List.assoc v conf.base_env with [ Not_found -> "" ])]
       where rec loop =
@@ -812,6 +810,9 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vanc (GP_person _ _ _ | GP_same _ _ _ as gp) ->
           eval_ancestor_field_var conf base env gp loc sl
       | _ -> raise Not_found ]
+  | ["bvar"; v] ->
+      try VVstring (List.assoc v conf.base_env) with
+      [ Not_found -> VVstring "" ]
   | ["child" :: sl] ->
       match get_env "child" env with
       [ Vind p a u ->
@@ -832,6 +833,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
         | [] -> raise Not_found ]
       in
       loop env
+  | ["evar"; v] ->
+      match p_getenv (conf.env @ conf.henv) v with
+      [ Some vv -> VVstring (quote_escaped vv)
+      | None -> VVstring "" ]
   | ["family" :: sl] ->
       match get_env "fam" env with
       [ Vfam f c d m -> eval_family_field_var conf base env (f, c, d, m) loc sl
@@ -2136,7 +2141,7 @@ value interp_templ templ_fname conf base p =
   let emal =
     match p_getint conf.env "v" with
     [ Some i -> i
-    | None -> 0 ]
+    | None -> 120 ]
   in
   let env =
     let sosa_ref_l =
