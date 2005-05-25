@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.28 2005-05-25 13:19:21 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.29 2005-05-25 17:24:51 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -56,14 +56,30 @@
   [*to the %s generation:::xx]%nn;
 %end;
 
+%define;thegen(xx)
+  [*the %s generation:::xx]%nn;
+%end;
+
 %define;togen(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(evar.xx = 2)[*to the parents]%nn;
+  %elseif;(evar.xx = 3)[*to the grandparents]%nn;
+  %elseif;(evar.xx = 4)[*to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
+      %apply;nth([nth (generation)], evar.xx)
+    %end;
+  %end;
+%end;
+
+%define;gen(xx)
+  %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(evar.xx = 2)[*the parents]%nn;
+  %elseif;(evar.xx = 3)[*the grandparents]%nn;
+  %elseif;(evar.xx = 4)[*the great-grandparents]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], evar.xx)
     %end;
   %end;
 %end;
@@ -428,17 +444,24 @@
 
 %if;(evar.t = "N")
   %( short display %)
-  <p>
-  %apply;togen("evar.v").
-  </p>
+  %if;(evar.only != "on")
+    <p>
+    %apply;togen("v").
+    </p>
+  %end;
   %reset_count;
   <ul>
   %foreach;ancestor_level;
     %if;(evar.v != "" and level <= evar.v
          and (evar.only != "on" or level = evar.v))
-      %apply;lazy_print%with;
-        <li>%nl;[*generation/generations]0 %level;%nl;
+      %if;(evar.only = "on")
+        <li>%nl;%apply;gen("v")%nl;
         <ul>%nl;
+      %else;
+        %apply;lazy_print%with;
+          <li>%nl;[*generation/generations]0 %level;%nl;
+          <ul>%nl;
+        %end;
       %end;
       %foreach;ancestor;
         %lazy_force;
@@ -450,12 +473,14 @@
            %else;%ancestor;%end;
         %end;
         </a>%nn;
-        %if;(ancestor.has_nobility_titles),%sp;
-        <em>%ancestor.nobility_title;</em>%end;
-        %if;(ancestor.same = "")%ancestor.dates;%end;
+        %if;(ancestor.same = "")
+          %if;(ancestor.has_nobility_titles),%sp;
+          <em>%ancestor.nobility_title;</em>%end;
+          %ancestor.dates;
+        %end;
         </li>%nl;
       %end;
-      %if;lazy_printed;
+      %if;(evar.only = "on" or lazy_printed)
         </ul>
         </li>
       %end;
@@ -466,7 +491,7 @@
 %elseif;(evar.t = "M" and evar.al = "on")
   %( missing ancestors alphabetically %)
   <p>
-  %apply;togen("evar.v")
+  %apply;togen("v")
   %if;(evar.after != "") [after] %evar.after;%end;
   %if;(evar.before != "") [before] %evar.before;%end;.
   </p>
@@ -568,7 +593,7 @@
 %elseif;(evar.t = "M")
   %( missing ancestors in ancestors order %)
   <p>
-  %apply;togen("evar.v")
+  %apply;togen("v")
   %if;(evar.after != "") [after] %evar.after;%end;
   %if;(evar.before != "") [before] %evar.before;%end;.
   </p>
@@ -649,7 +674,7 @@
   %( long display %)
   %if;(evar.only != "on")
     <p>
-    %apply;togen("evar.v").
+    %apply;togen("v").
     </p>
   %end;
   %foreach;ancestor_level;
