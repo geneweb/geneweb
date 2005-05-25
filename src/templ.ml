@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.54 2005-05-25 00:55:26 ddr Exp $ *)
+(* $Id: templ.ml,v 4.55 2005-05-25 02:03:40 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -101,6 +101,21 @@ value lexicon_word =
   parser [: upp = upper; s = text 0; n = transl_index :] -> (upp, s, n)
 ;
 
+value rec parse_comment =
+  parser
+  [ [: `'%'; s :] -> parse_comment_after_percent s
+  | [: `_; s :] -> parse_comment s ]
+and parse_comment_after_percent =
+  parser
+  [ [: `')'; s :] -> parse_spaces_after_comment s
+  | [: `'('; s :] -> do { parse_comment s; parse_comment s }
+  | [: `_; s :] -> parse_comment s ]
+and parse_spaces_after_comment =
+  parser
+  [ [: `(' ' | '\n' | '\t' | '\r'); s :] -> parse_spaces_after_comment s
+  | [: :] -> () ]
+;
+
 value rec get_token =
   parser bp
   [ [: `' ' | '\t' | '\n' | '\r'; s :] -> get_token s
@@ -111,7 +126,12 @@ value rec get_token =
   | [: `'=' :] ep -> Tok (bp, ep) EQUAL
   | [: `'+' :] ep -> Tok (bp, ep) PLUS
   | [: `'*' :] ep -> Tok (bp, ep) STAR
-  | [: `'%' :] ep -> Tok (bp, ep) PERCENT
+  | [: `'%';
+       a =
+         parser
+         [ [: `'('; _ = parse_comment; s :] -> get_token s
+         | [: :]  ep -> Tok (bp, ep) PERCENT ] :] ->
+      a
   | [: `'!'; `'='?"'=' expected" :] ep -> Tok (bp, ep) BANGEQUAL
   | [: `'>';
        tok =
@@ -284,21 +304,6 @@ value parse_formal_params strm =
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
   parse_tuple (Stream.from f)
-;
-
-value rec parse_comment =
-  parser
-  [ [: `'%'; s :] -> parse_comment_after_percent s
-  | [: `_; s :] -> parse_comment s ]
-and parse_comment_after_percent =
-  parser
-  [ [: `')'; s :] -> parse_spaces_after_comment s
-  | [: `'('; s :] -> do { parse_comment s; parse_comment s }
-  | [: `_; s :] -> parse_comment s ]
-and parse_spaces_after_comment =
-  parser
-  [ [: `(' ' | '\n' | '\t' | '\r'); s :] -> parse_spaces_after_comment s
-  | [: :] -> () ]
 ;
 
 value parse_templ conf strm =
