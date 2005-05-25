@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.121 2005-05-25 11:59:55 ddr Exp $ *)
+(* $Id: perso.ml,v 4.122 2005-05-25 12:17:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -879,6 +879,12 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       match get_env "prev_fam" env with
       [ Vfam f c d m -> eval_family_field_var conf base env (f, c, d, m) loc sl
       | _ -> raise Not_found ]
+  | ["pvar"; v :: sl] ->
+      match find_person_in_env conf base v with
+      [ Some p ->
+          let ep = make_ep conf base p.cle_index in
+          eval_person_field_var conf base env ep loc sl
+      | None -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
