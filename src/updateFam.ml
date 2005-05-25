@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.57 2005-05-23 09:38:26 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.58 2005-05-25 00:55:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -363,8 +363,9 @@ and print_apply conf base env fcd f el =
   match get_env f env with
   [ Vfun xl al ->
       let eval_var = eval_var conf base env fcd in
+      let eval_apply _ _ = "not impl apply in apply" in
       let print_ast = print_ast conf base env fcd in
-      Templ.print_apply conf f print_ast eval_var xl al el
+      Templ.print_apply conf f print_ast (eval_var, eval_apply) xl al el
   | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env fcd e alt ale =
   let eval_var = eval_var conf base env fcd in

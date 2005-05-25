@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.23 2005-05-23 01:23:39 ddr Exp $ *)
+(* $Id: alln.ml,v 4.24 2005-05-25 00:55:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -21,11 +21,6 @@ value string_start_with ini s =
     else False
 ;
 
-value len_with_next_char s i =
-  if Gutil.utf_8_db.val then min (String.length s) (i + Gutil.nbc s.[i])
-  else i + 1
-;
-
 value combine_by_ini ini list =
   let list =
     loop [] list where rec loop new_list =
@@ -34,7 +29,7 @@ value combine_by_ini ini list =
       | [(k, s, cnt) :: list] ->
           let ini_k =
             if String.length k > String.length ini then
-              String.sub k 0 (len_with_next_char k (String.length ini))
+              String.sub k 0 (index_of_next_char k (String.length ini))
             else k ^ String.make (String.length ini + 1 - String.length k) '_'
           in
           do {
