@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.122 2005-05-25 12:17:17 ddr Exp $ *)
+(* $Id: perso.ml,v 4.123 2005-05-25 13:19:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -446,6 +446,7 @@ type env =
   [ Vallgp of list generation_person
   | Vanc of generation_person
   | Vcnt of ref int
+  | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
   | Vind of person and ascend and union
@@ -1221,6 +1222,10 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       match p.death with
       [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
       | _ -> False ]
+  | "is_descendant" ->
+      match get_env "desc_mark" env with
+      [ Vdmark r -> r.val.(Adef.int_of_iper p.cle_index)
+      | _ -> raise Not_found ]
   | "is_female" -> p.sex = Female
   | "is_male" -> p.sex = Male
   | "is_private" -> p.access = Private
@@ -1311,6 +1316,30 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       (* deprecated since 5.00: rather use "i=%index;" *)
       "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
   | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
+  | "mark_descendants" ->
+      match get_env "desc_mark" env with
+      [ Vdmark r ->
+          let tab = Array.create base.data.persons.len False in
+          let rec mark_descendants len p =
+            let i = Adef.int_of_iper p.cle_index in
+            if tab.(i) then ()
+            else do {
+              tab.(i) := True;
+              let u = uget conf base p.cle_index in
+              for i = 0 to Array.length u.family - 1 do {
+                let des = doi base u.family.(i) in
+                for i = 0 to Array.length des.children - 1 do {
+                  mark_descendants (len + 1) (pget conf base des.children.(i))
+                }
+              }
+            }
+          in
+          do {
+            mark_descendants 0 p;
+            r.val := tab;
+            "";
+          }
+      | _ -> raise Not_found ]
   | "mother_age_at_birth" -> string_of_parent_age conf base ep mother
   | "misc_names" ->
       if p_auth then
@@ -2163,6 +2192,7 @@ value interp_templ templ_fname conf base p =
      ("p_auth", Vbool (authorized_age conf base p));
      ("count", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
+     ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
      ("sosa_ref", Vsosa_ref sosa_ref_l);

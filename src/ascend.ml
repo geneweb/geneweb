@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.67 2005-05-25 02:03:40 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.68 2005-05-25 13:19:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -796,6 +796,7 @@ value display_ancestors_with_numbers_long conf base max_level ws wn p =
 ;
 (* ... short and long display by list ... end *)
 
+(* ... ancestors of ... up to ... (ancestors same time descendants) begin *)
 value print_ancestors_same_time_descendants conf base p a =
   let maxlen =
     match p_getint conf.env "l" with
@@ -870,6 +871,7 @@ value print_ancestors_same_time_descendants conf base p a =
     trailer conf
   }
 ;
+(* ... ancestors of ... up to ... (ancestors same time descendants) end *)
 
 value display_ancestors_level conf base max_level p =
   let mark = Array.create base.data.persons.len Num.zero in
@@ -2087,12 +2089,16 @@ value print conf base p =
   | (Some "A", Some v) -> print_male_line conf base v p
   | (Some "C", Some v) -> print_female_line conf base v p
   | (Some "D", x) ->
+(**)
       match (find_person_in_env conf base "1", x) with
       [ (Some anc, _) -> print_ancestors_same_time_descendants conf base p anc
       | (_, Some v) ->
           print_ancestors_same_time_descendants conf base p
             (pget conf base (Adef.iper_of_int v))
       | _ -> ancmenu_print conf base p ]
+(*
+      anclist_print conf base p
+*)
   | (Some "F", Some v) -> print_surnames_list conf base v p
   | _ -> ancmenu_print conf base p ]
 ;

@@ -1,15 +1,19 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.27 2005-05-25 12:17:17 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.28 2005-05-25 13:19:21 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
-    %apply;a_of_b%with;
-      %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
-    %and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") %qualifier;%end;
-      %sp;%surname;
+    %if;(evar.t = "D")
+      [*ancestors] ... [up to] ...%nn;
+    %else;
+      %apply;a_of_b%with;
+        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+      %and;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") %qualifier;%end;
+        %sp;%surname;
+      %end;
     %end;
   </title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -34,6 +38,7 @@
     %sp;%surname;
     %if;(alias != "") <em>(%alias;)</em>%end;
   %end;
+  %if;(evar.t = "D") [up to] %pvar.1;%end;
 </h1>
 
 %if;(evar.cgl != "on")
@@ -680,7 +685,26 @@
   %end;
 %elseif;(evar.t = "D")
   %( ancestors up to somebody %)
-  %pvar.1.index;
+  %pvar.1.mark_descendants;
+  <ul>
+  %foreach;ancestor_level;
+    %apply;lazy_print%with;
+      <li>[*generation/generations]0 %level;%nl;
+      <ul>
+    %end;
+    %if;(level <= evar.l + 1)
+      %foreach;ancestor;
+        %if;(ancestor.same = "" and ancestor.is_descendant)
+          %lazy_force;
+          <li>%ancestor.sosa; -%sp;
+          <a href="%prefix;%ancestor.access;">%ancestor;</a>%ancestor.dates;
+          </li>
+        %end;
+      %end;
+    %end;
+    %if;lazy_printed;</ul>%nl;</li>%nl;%end;
+  %end;
+  </ul>
 %end;
 
 <div>
