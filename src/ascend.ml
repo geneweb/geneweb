@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.68 2005-05-25 13:19:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.69 2005-05-26 01:47:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -33,6 +33,7 @@ value text_to conf =
         (transl_nth conf "nth (generation)" i) ]
 ;
 
+(**)
 value text_level conf =
   fun
   [ 1 ->
@@ -45,6 +46,7 @@ value text_level conf =
       sprintf (ftransl conf "the %s generation")
         (transl_nth conf "nth (generation)" i) ]
 ;
+(**)
 
 value display_ancestor conf base p =
   do {
@@ -101,6 +103,9 @@ value display_ancestors_upto conf base max_level p =
     trailer conf
   }
 ;
+
+(* ... short / long display / missing ancestors / ancestors up to
+   ... begin *)
 
 (* Print ancestors with numbers.
    The mark table holds the number of the ancestor after it has been
@@ -211,7 +216,6 @@ value print_generation_person conf base cnt gp =
   | _ -> () ]
 ;
 
-(* ... short and long display by list ... begin *)
 value will_print =
   fun
   [ GP_person _ _ _ -> True
@@ -794,9 +798,7 @@ value display_ancestors_with_numbers_long conf base max_level ws wn p =
     trailer conf
   }
 ;
-(* ... short and long display by list ... end *)
 
-(* ... ancestors of ... up to ... (ancestors same time descendants) begin *)
 value print_ancestors_same_time_descendants conf base p a =
   let maxlen =
     match p_getint conf.env "l" with
@@ -871,7 +873,6 @@ value print_ancestors_same_time_descendants conf base p a =
     trailer conf
   }
 ;
-(* ... ancestors of ... up to ... (ancestors same time descendants) end *)
 
 value display_ancestors_level conf base max_level p =
   let mark = Array.create base.data.persons.len Num.zero in
@@ -948,7 +949,6 @@ value display_ancestors_level conf base max_level p =
   }
 ;
 
-(* ... display missing ancestors ... begin *)
 value print_generation_missing_persons conf base title sp_incl gp =
   let print_title () =
     match title.val with
@@ -1411,7 +1411,9 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
     trailer conf
   }
 ;
-(* ... display missing ancestors ... end *)
+
+(* ... end
+   ... short / long display / missing ancestors / ancestors up to *)
 
 value tree_reference gv bd color conf base p s =
   if conf.cancel_links || is_hidden p then s
@@ -2043,10 +2045,10 @@ value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> display_ancestors_upto conf base v p
   | (Some "N", Some v) ->
+(**)
       if p_getenv conf.env "only" = Some "on" then
         display_ancestors_level conf base v p
       else
-(**)
         display_ancestors_with_numbers conf base v p
 (*
         anclist_print conf base p

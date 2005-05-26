@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.123 2005-05-25 13:19:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.124 2005-05-26 01:47:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -361,6 +361,38 @@ value next_generation conf base mark gpl =
       [] gpl
   in
   List.rev gpl
+;
+
+value next_generation2 conf base mark gpl =
+  let gpl =
+    List.map
+      (fun gp ->
+         match gp with
+         [ GP_same n m ip ->
+             GP_interv (Some (n, Num.inc n 1, Some (m, Num.inc m 1)))
+         | _ -> gp ])
+      gpl
+  in
+  let gpl = next_generation conf base mark gpl in
+  List.fold_right
+    (fun gp gpl ->
+       match (gp, gpl) with
+       [ (GP_interv (Some (n1, n2, x)),
+          [GP_interv (Some (n3, n4, y)) :: gpl1]) ->
+           if Num.eq n2 n3 then
+             let z =
+               match (x, y) with
+               [ (Some (m1, m2), Some (m3, m4)) ->
+                   if Num.eq m2 m3 then Some (m1, m4) else None
+               | _ -> None ]
+             in
+             [GP_interv (Some (n1, n4, z)) :: gpl1]
+           else [GP_interv None :: gpl1]
+       | (GP_interv _, [GP_interv _ :: gpl]) ->
+           [GP_interv None :: gpl]
+       | (GP_missing _ _, gpl) -> gpl
+       | _ -> [gp :: gpl] ])
+    gpl []
 ;
 
 value sosa_is_present all_gp n1 =
@@ -808,8 +840,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   fun 
   [ ["ancestor" :: sl] ->
       match get_env "ancestor" env with
-      [ Vanc (GP_person _ _ _ | GP_same _ _ _ as gp) ->
-          eval_ancestor_field_var conf base env gp loc sl
+      [ Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
       | _ -> raise Not_found ]
   | ["bvar"; v] ->
       try VVstring (List.assoc v conf.base_env) with
@@ -988,6 +1019,27 @@ and eval_ancestor_field_var conf base env gp loc =
           let n = Num.twice n in
           VVstring (parent_sosa conf base ip all_gp n father)
       | _ -> VVstring "" ]
+  | ["interval"] ->
+      match gp with
+      [ GP_interv (Some (n1, n2, Some (n3, n4))) ->
+          let n2 = Num.sub n2 Num.one in
+          let n4 = Num.sub n4 Num.one in
+          let sep = transl conf "(thousand separator)" in
+          let r =
+            Num.to_string_sep sep n1 ^ "-" ^ Num.to_string_sep sep n2 ^ " = " ^
+            Num.to_string_sep sep n3 ^ "-" ^ Num.to_string_sep sep n4
+          in
+          VVstring r
+      | GP_interv (Some (n1, n2, None)) ->
+          let n2 = Num.sub n2 Num.one in
+          let sep = transl conf "(thousand separator)" in
+          let r =
+            Num.to_string_sep sep n1 ^ "-" ^ Num.to_string_sep sep n2 ^
+            " = ..."
+          in
+          VVstring r
+      | GP_interv None -> VVstring "..."
+      | _ -> VVstring "" ]
   | ["mother_sosa"] ->
       match (gp, get_env "all_gp" env) with
       [ (GP_person n ip _ | GP_same n _ ip, Vallgp all_gp) ->
@@ -1000,8 +1052,7 @@ and eval_ancestor_field_var conf base env gp loc =
       | _ -> VVstring "" ]
   | ["sosa" :: sl] ->
       match gp with
-      [ GP_person n _ _ | GP_same n _ _ | GP_missing n _ ->
-          VVstring (eval_num conf n sl)
+      [ GP_person n _ _ | GP_same n _ _ -> VVstring (eval_num conf n sl)
       | _ -> VVstring "" ]
   | ["spouse" :: sl] ->
       match gp with
@@ -1782,6 +1833,7 @@ and print_simple_foreach conf base env al ini_ep ep efam =
   [ "alias" -> print_foreach_alias conf base env al ep
   | "ancestor" -> print_foreach_ancestor conf base env al ep
   | "ancestor_level" -> print_foreach_ancestor_level conf base env al ep
+  | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
   | "descendant_level" -> print_foreach_descendant_level conf base env al ep
@@ -1811,11 +1863,8 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
   [ Vgpl gpl ->
       List.iter
         (fun gp ->
-           match gp with
-           [ GP_person _ _ _ | GP_same _ _ _ ->
-               let env = [("ancestor", Vanc gp) :: env] in
-               List.iter (print_ast conf base env ep) al
-           | _ -> () ])
+           let env = [("ancestor", Vanc gp) :: env] in
+           List.iter (print_ast conf base env ep) al)
         gpl
   | _ -> () ]
 and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
@@ -1833,6 +1882,24 @@ and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
       do {
         List.iter (print_ast conf base env ep) al;
         let gpl = next_generation conf base mark gpl in
+        loop gpl (succ i)
+      }
+and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
+  let max_lev = "max_anc_level" in
+  let max_level =
+    match get_env max_lev env with
+    [ Vint n -> n
+    | _ -> 0 ]
+  in
+  let mark = Array.create base.data.persons.len Num.zero in
+  loop [GP_person Num.one p.cle_index None] 1 where rec loop gpl i =
+    if i > max_level then ()
+    else
+      let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
+      do {
+        List.iter (print_ast conf base env ep) al;
+        for i = 0 to base.data.persons.len - 1 do { mark.(i) := Num.zero };
+        let gpl = next_generation2 conf base mark gpl in
         loop gpl (succ i)
       }
 and print_foreach_child conf base env al ep =
