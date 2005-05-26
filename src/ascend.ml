@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.70 2005-05-26 09:53:57 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.71 2005-05-26 09:58:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -2088,7 +2088,8 @@ value print_old conf base p =
 ;
 
 value print conf base p =
-  if p_getenv conf.env "old" = Some "on" then print_old conf base p else
+  if p_getenv conf.env "old" = Some "on"
+  || p_getenv conf.base_env "old" = Some "on" then print_old conf base p else
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> display_ancestors_upto conf base v p
   | (Some "N", Some v) -> anclist_print conf base p
