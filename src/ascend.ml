@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.69 2005-05-26 01:47:42 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.70 2005-05-26 09:53:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -2037,24 +2037,17 @@ value print_surnames_list conf base v p =
 ;
 
 value ancmenu_print = Perso.interp_templ "ancmenu";
-(*
 value anclist_print = Perso.interp_templ "anclist";
-*)
 
-value print conf base p =
+value print_old conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> display_ancestors_upto conf base v p
   | (Some "N", Some v) ->
-(**)
       if p_getenv conf.env "only" = Some "on" then
         display_ancestors_level conf base v p
       else
         display_ancestors_with_numbers conf base v p
-(*
-        anclist_print conf base p
-*)
   | (Some "G", Some v) ->
-(**)
       let ws =
         match p_getenv conf.env "siblings" with
         [ Some "on" -> True
@@ -2066,11 +2059,7 @@ value print conf base p =
         | _ -> False ]
       in
       display_ancestors_with_numbers_long conf base v ws wn p
-(*
-      anclist_print conf base p
-*)
   | (Some "M", Some v) ->
-(**)
       let al =
         match p_getenv conf.env "al" with
         [ Some "on" -> True
@@ -2083,24 +2072,33 @@ value print conf base p =
       in
       if al then print_missing_ancestors_alphabetically conf base v si p
       else print_missing_ancestors conf base v si p
-(*
-      anclist_print conf base p
-*)
   | (Some "T", Some v) -> print_tree conf base v p
   | (Some "H", Some v) -> print_horizontally conf base v p
   | (Some "A", Some v) -> print_male_line conf base v p
   | (Some "C", Some v) -> print_female_line conf base v p
   | (Some "D", x) ->
-(**)
       match (find_person_in_env conf base "1", x) with
       [ (Some anc, _) -> print_ancestors_same_time_descendants conf base p anc
       | (_, Some v) ->
           print_ancestors_same_time_descendants conf base p
             (pget conf base (Adef.iper_of_int v))
       | _ -> ancmenu_print conf base p ]
-(*
-      anclist_print conf base p
-*)
+  | (Some "F", Some v) -> print_surnames_list conf base v p
+  | _ -> ancmenu_print conf base p ]
+;
+
+value print conf base p =
+  if p_getenv conf.env "old" = Some "on" then print_old conf base p else
+  match (p_getenv conf.env "t", p_getint conf.env "v") with
+  [ (Some "L", Some v) -> display_ancestors_upto conf base v p
+  | (Some "N", Some v) -> anclist_print conf base p
+  | (Some "G", Some v) -> anclist_print conf base p
+  | (Some "M", Some v) -> anclist_print conf base p
+  | (Some "T", Some v) -> print_tree conf base v p
+  | (Some "H", Some v) -> print_horizontally conf base v p
+  | (Some "A", Some v) -> print_male_line conf base v p
+  | (Some "C", Some v) -> print_female_line conf base v p
+  | (Some "D", x) -> anclist_print conf base p
   | (Some "F", Some v) -> print_surnames_list conf base v p
   | _ -> ancmenu_print conf base p ]
 ;
