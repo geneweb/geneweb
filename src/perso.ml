@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.124 2005-05-26 01:47:42 ddr Exp $ *)
+(* $Id: perso.ml,v 4.125 2005-05-26 09:45:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1863,8 +1863,11 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
   [ Vgpl gpl ->
       List.iter
         (fun gp ->
-           let env = [("ancestor", Vanc gp) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           match gp with
+           [ GP_missing _ _ -> ()
+           | _ ->
+               let env = [("ancestor", Vanc gp) :: env] in
+               List.iter (print_ast conf base env ep) al ])
         gpl
   | _ -> () ]
 and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
