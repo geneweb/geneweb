@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.55 2005-05-25 02:03:40 ddr Exp $ *)
+(* $Id: templ.ml,v 4.56 2005-05-26 09:45:05 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -244,8 +244,7 @@ value rec parse_simple_expr strm =
            parser
            [ [: t = parse_tuple :] -> Eapp loc id t
            | [: :] -> Evar loc id idl ] :] ->
-       a
-    | [: `Tok loc _ :] -> Evar loc "parse_error3" [] ]
+       a ]
   in
   parse_simple strm
 and parse_tuple strm =
@@ -760,6 +759,7 @@ and int_eval ceva =
   [ Eop "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
   | Eop "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
   | Eop "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
+  | Eint _ x -> int_of_string x
   | e ->
       let s = string_eval ceva e in
       try int_of_string s with
@@ -931,7 +931,10 @@ value print_apply conf f print_ast eval_var xl al el =
            match (xl, vl) with
            [ ([x :: xl], [v :: vl]) -> loop (subst (subst_text x v) a) xl vl
            | ([], []) -> a
-           | _ -> Atext (f ^ ": bad # of params") ]
+           | _ ->
+               Atext
+                 (Printf.sprintf "%s: bad # of params (%d instead of %d)" f
+                    (List.length vl) (List.length xl)) ]
        in
        print_ast a)
     al

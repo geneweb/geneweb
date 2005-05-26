@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.30 2005-05-26 01:47:42 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.31 2005-05-26 09:45:05 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -102,12 +102,13 @@
     </em>%nn;
   %end;
   %if;(xx.has_birth_date or xx.has_birth_place)
-    , %if;xx.is_male;[born]0%else;[born]1%end;
+    , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
     %if;xx.has_birth_date; %xx.on_birth_date;%end;
     %if;xx.has_birth_place;, %xx.birth_place;%end;
   %end;
   %if;(xx.has_baptism_date or xx.has_baptism_place)
-    , %if;xx.is_male;[baptized]0%else;[baptized]1%end;
+    , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
+    %else;[baptized]2%end;
     %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
     %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %end;
@@ -179,7 +180,7 @@
 %define;child_notes(spec)
   %if;(child.sosa_in_list = "" and
        (child.has_sources or child.has_notes))
-    <dt><a href="#%ancestor.sosa;" name="notes-%ancestor.sosa;
+    <dt><a href="#%ancestor.sosa.v;" name="notes-%ancestor.sosa.v;
     %if;("spec" != "")-spec%end;%apply;letter(child_cnt)"><b>%ancestor.sosa;
     %if;("spec" != "")-spec%end;%apply;letter(child_cnt)</b></a>:</dt>
     <dd>
@@ -208,7 +209,7 @@
       %foreach;ancestor;
         %if;((ancestor.has_sources or ancestor.has_notes)
              and ancestor.same = "")
-          <dt><b><a href="#%ancestor.sosa;" name="notes-%ancestor.sosa;
+          <dt><b><a href="#%ancestor.sosa.v;" name="notes-%ancestor.sosa.v;
           ">%ancestor.sosa;</a></b>:</dt>
           <dd>
           %if;ancestor.has_notes;
@@ -261,7 +262,7 @@
 
 %define;long_display_ancestor_personal()
   %apply;somebody("ancestor").
-  %if;(ancestor.father_sosa != "")
+  %if;(evar.only != "on" and ancestor.father_sosa != "")
     [*parents]:%sp;
     <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;
     </a></b>%sp;
@@ -272,7 +273,7 @@
   %if;(evar.notes = "on" and
       (ancestor.has_sources or ancestor.has_notes))
     %[[*note/notes]0%sp;
-    <b><a href="#notes-%ancestor.sosa;">%ancestor.sosa;</a></b>%].
+    <b><a href="#notes-%ancestor.sosa.v;">%ancestor.sosa;</a></b>%].
   %end;
   %if;(evar.siblings = "on")
     %foreach;ancestor.family;
@@ -281,7 +282,7 @@
           %apply;married_to%with;
             %ancestor.is_male;
           %and;
-            %if(ancestor.index != index) (%family_cnt;)%end;
+            %if;(ancestor.index != index) (%family_cnt;)%end;
             %if;(on_marriage_date != "") %on_marriage_date;%end;
             %if;(marriage_place != ""), %marriage_place;, %end;
           %end;%sp;
@@ -304,9 +305,11 @@
 %define;child_long_info(spec)
   <b>%apply;link(child.access, child.child_name)</b>%nn;
   %apply;somebody_long_info("child")
-  %if(child.sosa_in_list != ""). [*see]%sp;
-    <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;
-    </b></a>.
+  %if;(child.sosa_in_list != "").
+    %if;(evar.only != "on")[*see]%sp;
+      <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;
+      </b></a>.
+    %end;
   %else;
     %if;child.has_occupation;, %child.occupation;%end;.
     %foreach;child.family;
@@ -334,7 +337,7 @@
     %if;(evar.notes = "on" and
         (child.has_sources or child.has_notes))
       %[[*note/notes]0%sp;
-      <b><a href="#notes-%ancestor.sosa;
+      <b><a href="#notes-%ancestor.sosa.v;
       %if;("spec" != "")-spec%end;
       %apply;letter(child_cnt)">%ancestor.sosa;
       %if;("spec" != "")-spec%end;
@@ -556,7 +559,7 @@
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %if(ancestor_dates_in_interval("father") = "true")
+              %if;(ancestor_dates_in_interval("father") = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.father.surname_end, ancestor.father.first_name,
@@ -661,7 +664,7 @@
           %elseif;(evar.ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %if(ancestor_dates_in_interval("mother") = "true")
+              %if;(ancestor_dates_in_interval("mother") = "true")
                 %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2)%sp; -
                 %apply;a_of_b%with;
@@ -712,12 +715,12 @@
       %foreach;ancestor;
         %if;(ancestor.same != "")
           <p>
-          <b><a name="%ancestor.sosa;">%ancestor.sosa</a></b>:
+          <b><a name="%ancestor.sosa.v;">%ancestor.sosa;</a></b>:
           [see] <b><a href="#%ancestor.same;">%ancestor.same;</a></b>.
           </p>
         %else;
           <p>
-          <b><a name="%ancestor.sosa;">%ancestor.sosa</a></b>:
+          <b><a name="%ancestor.sosa.v;">%ancestor.sosa;</a></b>:
           %apply;long_display_ancestor_personal()
           </p>
           %if;(ancestor.index != self.index)
