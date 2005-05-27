@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.56 2005-05-26 09:45:05 ddr Exp $ *)
+(* $Id: templ.ml,v 4.57 2005-05-27 04:50:35 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -59,6 +59,16 @@ value rec get_int len =
   parser
   [ [: `('0'..'9' as c); s :] -> get_int (Buff.store len c) s
   | [: :] -> Buff.get len ]
+;
+
+value get_compound_var =
+  let rec var_kont =
+    parser
+    [ [: `'.'; s = get_ident 0; sl = var_kont :] -> [s :: sl]
+    | [: :] -> [] ]
+  in
+  parser bp
+  [ [: v = get_ident 0; vl = var_kont :] ep -> ((bp, ep), v, vl) ]
 ;
 
 value get_variable =
@@ -180,77 +190,74 @@ and ident_list ((bp, _) as loc) =
   | [: :] -> (loc, []) ]
 ;
 
-value rec parse_simple_expr strm =
-  let rec parse_1 =
-    parser
-      [: e = parse_2;
-         a =
-           parser
-           [ [: `Tok _ (IDENT "or"); s :] -> Eor e (parse_1 s)
-           | [: :] -> e ] :] ->
-        a
-  and parse_2 =
-    parser
-      [: e = parse_3;
-         a =
-           parser
-           [ [: `Tok _ (IDENT "and"); s :] -> Eand e (parse_2 s)
-           | [: :] -> e ] :] ->
-        a
-  and parse_3 =
-    parser
-      [: e = parse_4;
-         a =
-           parser
-           [ [: `Tok _ EQUAL; e2 = parse_4 :] -> Eop "=" e e2
-           | [: `Tok _ BANGEQUAL; e2 = parse_4 :] -> Eop "!=" e e2
-           | [: `Tok _ GREATER; e2 = parse_4 :] -> Eop ">" e e2
-           | [: `Tok _ GREATEREQUAL; e2 = parse_4 :] -> Eop ">=" e e2
-           | [: `Tok _ LESS; e2 = parse_4 :] -> Eop "<" e e2
-           | [: `Tok _ LESSEQUAL; e2 = parse_4 :] -> Eop "<=" e e2
-           | [: :] -> e ] :] ->
-        a
-  and parse_4 =
-    parser
-      [: e = parse_5;
-         a =
-           parser
-           [ [: `Tok _ PLUS; e2 = parse_5 :] -> Eop "+" e e2
-           | [: :] -> e ] :] ->
-        a
-  and parse_5 =
-    parser
-      [: e = parse_simple;
-         a =
-           parser
-           [ [: `Tok _ STAR; e2 = parse_simple :] -> Eop "*" e e2
-           | [: `Tok _ PERCENT; e2 = parse_simple :] -> Eop "%" e e2
-           | [: :] -> e ] :] ->
-        a
-  and parse_simple =
-    parser
-    [ [: `Tok _ LPAREN; e = parse_1;
-         a =
-           parser
-           [ [: `Tok _ RPAREN :] -> e
-           | [: `Tok loc _ :] -> Evar loc "parse_error2" [] ] :] ->
-        a
-    | [: `Tok _ (IDENT "not"); e = parse_simple :] -> Enot e
-    | [: `Tok _ (STRING s) :] -> Estr s
-    | [: `Tok loc (INT s) :] -> Eint loc s
-    | [: `Tok _ (LEXICON upp s n) :] -> Etransl upp s n
-    | [: (loc, id, idl) = parse_var;
-         a =
-           parser
-           [ [: t = parse_tuple :] -> Eapp loc id t
-           | [: :] -> Evar loc id idl ] :] ->
-       a ]
-  in
-  parse_simple strm
+value rec parse_expr_1 =
+  parser
+    [: e = parse_expr_2;
+       a =
+         parser
+         [ [: `Tok _ (IDENT "or"); s :] -> Eor e (parse_expr_1 s)
+         | [: :] -> e ] :] ->
+      a
+and parse_expr_2 =
+  parser
+    [: e = parse_expr_3;
+       a =
+         parser
+         [ [: `Tok _ (IDENT "and"); s :] -> Eand e (parse_expr_2 s)
+         | [: :] -> e ] :] ->
+      a
+and parse_expr_3 =
+  parser
+    [: e = parse_expr_4;
+       a =
+         parser
+         [ [: `Tok _ EQUAL; e2 = parse_expr_4 :] -> Eop "=" e e2
+         | [: `Tok _ BANGEQUAL; e2 = parse_expr_4 :] -> Eop "!=" e e2
+         | [: `Tok _ GREATER; e2 = parse_expr_4 :] -> Eop ">" e e2
+         | [: `Tok _ GREATEREQUAL; e2 = parse_expr_4 :] -> Eop ">=" e e2
+         | [: `Tok _ LESS; e2 = parse_expr_4 :] -> Eop "<" e e2
+         | [: `Tok _ LESSEQUAL; e2 = parse_expr_4 :] -> Eop "<=" e e2
+         | [: :] -> e ] :] ->
+      a
+and parse_expr_4 =
+  parser
+    [: e = parse_expr_5;
+       a =
+         parser
+         [ [: `Tok _ PLUS; e2 = parse_expr_5 :] -> Eop "+" e e2
+         | [: :] -> e ] :] ->
+      a
+and parse_expr_5 =
+  parser
+    [: e = parse_simple_expr;
+       a =
+         parser
+         [ [: `Tok _ STAR; e2 = parse_simple_expr :] -> Eop "*" e e2
+         | [: `Tok _ PERCENT; e2 = parse_simple_expr :] -> Eop "%" e e2
+         | [: :] -> e ] :] ->
+      a
+and parse_simple_expr =
+  parser
+  [ [: `Tok _ LPAREN; e = parse_expr_1;
+       a =
+         parser
+         [ [: `Tok _ RPAREN :] -> e
+         | [: `Tok loc _ :] -> Evar loc "parse_error2" [] ] :] ->
+      a
+  | [: `Tok _ (IDENT "not"); e = parse_simple_expr :] -> Enot e
+  | [: `Tok _ (STRING s) :] -> Estr s
+  | [: `Tok loc (INT s) :] -> Eint loc s
+  | [: `Tok _ (LEXICON upp s n) :] -> Etransl upp s n
+  | [: (loc, id, idl) = parse_var;
+       a =
+         parser
+         [ [: t = parse_tuple :] -> Eapp loc id t
+         | [: :] -> Evar loc id idl ] :] ->
+     a ]
 and parse_tuple strm =
   let rec parse_expr_list =
     parser
-      [: x = parse_simple_expr;
+      [: x = parse_expr_1;
          xl =
            parser
            [ [: `Tok _ COMMA; a = parse_expr_list :] -> a
@@ -410,9 +417,18 @@ value parse_templ conf strm =
     in
     Aif e al1 al2
   and parse_foreach strm =
-    let (loc, v, vl) = get_variable strm in
+    let (loc, v, vl) = get_compound_var strm in
+    let params =
+      if Stream.peek strm = Some '(' then parse_char_stream parse_tuple strm
+      else do {
+        match strm with parser
+        [ [: `';' :] -> ()
+        | [: :] -> () ];
+        []
+      }
+    in
     let (astl, _) = parse_astl [] False 0 ["end"] strm in
-    Aforeach (loc, v, vl) astl
+    Aforeach (loc, v, vl) params astl
   in
   fst (parse_astl [] True 0 [] strm)
 ;
@@ -449,7 +465,7 @@ value strip_newlines_after_variables =
         in
         [Atext s :: loop astl]
     | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
-    | [Aforeach v al :: astl] -> [Aforeach v (loop al) :: loop astl]
+    | [Aforeach v pl al :: astl] -> [Aforeach v pl (loop al) :: loop astl]
     | [Adefine f x al alk :: astl] ->
         [Adefine f x (loop al) (loop alk) :: loop astl]
     | [AapplyWithAst f all :: astl] ->
@@ -532,8 +548,8 @@ value rec subst sf =
   | Atransl b s c -> Atransl b (sf s) c
   | Awid_hei s -> Awid_hei (sf s)
   | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
-  | Aforeach (loc, s, sl) al ->
-      Aforeach (loc, sf s, List.map sf sl) (substl sf al)
+  | Aforeach (loc, s, sl) pl al ->
+      Aforeach (loc, sf s, List.map sf sl) (substel sf pl) (substl sf al)
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
   | Aapply f el -> Aapply (sf f) (substel sf el)
@@ -764,7 +780,8 @@ and int_eval ceva =
       let s = string_eval ceva e in
       try int_of_string s with
       [ Failure _ ->
-          raise_with_loc (loc_of_expr e) (Failure "int value expected") ] ]
+          raise_with_loc (loc_of_expr e)
+            (Failure (s ^ " int value expected")) ] ]
 and string_eval ((conf, eval_var, eval_apply) as ceva) =
   fun
   [ Estr s -> s
@@ -798,8 +815,8 @@ and num_eval ((_, eval_var, _) as ceva) =
   | _ -> failwith "parse_error6" ]
 ;
 
-value eval_bool_expr conf (eval_var, eval_apply) e =
-  try bool_eval (conf, eval_var, eval_apply) e with
+value handle_eval thing_eval nothing conf (eval_var, eval_apply) e =
+  try thing_eval (conf, eval_var, eval_apply) e with
   [ Exc_located (bp, ep) exc ->
       do {
         incr nb_errors;
@@ -813,75 +830,13 @@ value eval_bool_expr conf (eval_var, eval_apply) e =
           else ();
         }
         ELSE () END;
-        False
+        nothing
       } ]
 ;
 
-value eval_expr conf (eval_var, eval_apply) e =
-  try string_eval (conf, eval_var, eval_apply) e with
-  [ Exc_located (bp, ep) exc ->
-      do {
-        incr nb_errors;
-        IFDEF UNIX THEN do {
-          if nb_errors.val <= 10 then do {
-            Printf.eprintf "*** <W> template file";
-            Printf.eprintf ", chars %d-%d" bp ep;
-            Printf.eprintf ": %s\n" (Printexc.to_string exc);
-            flush stderr;
-          }
-          else ();
-        }
-        ELSE () END;
-        "eval_error"
-      } ]
-;
-
-(*
-value eval_expr conf eval_var =
-  let rec string_eval =
-    fun
-    [ Estr s -> s
-    | Evar loc s sl ->
-        try
-          match eval_var loc [s :: sl] with
-          [ VVstring s -> s
-          | VVbool True -> "1"
-          | VVbool False -> "0" ]
-        with
-        [ Not_found ->
-            do {
-              Wserver.wprint " %%%s" s;
-              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-              Wserver.wprint "?";
-              ""
-            } ]
-    | Etransl upp s c -> eval_transl conf upp s c
-    | e ->
-        try
-          Num.to_string_sep (Util.transl conf "(thousand separator)")
-            (num_eval e)
-        with
-        [ Failure x -> x ] ]
-  and num_eval =
-    fun
-    [ Eint _ x -> Num.of_string x
-    | Eop "+" x y -> Num.add (num_eval x) (num_eval y)
-    | Eop "*" x (Eint _ y) -> Num.mul (num_eval x) (int_of_string y)
-    | Eop "%" x (Eint _ y) ->
-        Num.of_int (Num.modl (num_eval x) (int_of_string y))
-    | Evar loc s sl ->
-        try
-          match eval_var loc [s :: sl] with
-          [ VVstring s -> Num.of_string s
-          | VVbool True -> Num.one
-          | VVbool False -> Num.zero ]
-        with
-        [ Not_found -> failwith "parse error" ]
-    | _ -> failwith "parse_error6" ]
-  in
-  string_eval
-;
-*)
+value eval_bool_expr = handle_eval bool_eval False;
+value eval_int_expr = handle_eval int_eval 0;
+value eval_expr = handle_eval string_eval "eval_error";
 
 value print_body_prop conf base =
   let s =

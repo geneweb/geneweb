@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.31 2005-05-26 09:45:05 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.32 2005-05-27 04:50:35 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -488,33 +488,31 @@
   </p>
   %reset_count;
   <ul>
-  %foreach;ancestor_level;
-    %if;(evar.v != "" and level <= evar.v)
-      %apply;lazy_print%with;
-        <li>%nl;[*generation/generations]0 %level;%nl;
-        <ul>%nl;
+  %foreach;ancestor_level(evar.v)
+    %apply;lazy_print%with;
+      <li>%nl;[*generation/generations]0 %level;%nl;
+      <ul>%nl;
+    %end;
+    %foreach;ancestor;
+      %lazy_force;
+      %if;(ancestor.same = "")%incr_count;%end;
+      <li> %ancestor.sosa;%sp;
+      %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
+      %apply;link%with;%ancestor.access;%and;
+         %if;(ancestor.same != "")%ancestor.same;
+         %else;%ancestor;%end;
       %end;
-      %foreach;ancestor;
-        %lazy_force;
-        %if;(ancestor.same = "")%incr_count;%end;
-        <li> %ancestor.sosa;%sp;
-        %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-        %apply;link%with;%ancestor.access;%and;
-           %if;(ancestor.same != "")%ancestor.same;
-           %else;%ancestor;%end;
-        %end;
-        </a>%nn;
-        %if;(ancestor.same = "")
-          %if;(ancestor.has_nobility_titles),%sp;
-          <em>%ancestor.nobility_title;</em>%end;
-          %ancestor.dates;
-        %end;
-        </li>%nl;
+      </a>%nn;
+      %if;(ancestor.same = "")
+        %if;(ancestor.has_nobility_titles),%sp;
+        <em>%ancestor.nobility_title;</em>%end;
+        %ancestor.dates;
       %end;
-      %if;lazy_printed;
-        </ul>
-        </li>
-      %end;
+      </li>%nl;
+    %end;
+    %if;lazy_printed;
+      </ul>
+      </li>
     %end;
   %end;
   </ul>
