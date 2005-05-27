@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.58 2005-05-25 00:55:26 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.59 2005-05-27 04:50:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -353,7 +353,7 @@ value rec print_ast conf base env fcd =
   | Avar loc s sl ->
       Templ.print_var conf base (eval_var conf base env fcd loc) s sl
   | Aif e alt ale -> print_if conf base env fcd e alt ale
-  | Aforeach v al -> print_foreach conf base env fcd v al
+  | Aforeach v [] al -> print_foreach conf base env fcd v al
   | Adefine f xl al alk -> print_define conf base env fcd f xl al alk
   | Aapply f el -> print_apply conf base env fcd f el
   | x -> not_impl "print_ast" x ]

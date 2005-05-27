@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.125 2005-05-26 09:45:05 ddr Exp $ *)
+(* $Id: perso.ml,v 4.126 2005-05-27 04:50:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1718,7 +1718,7 @@ value rec print_ast conf base env ep =
       Templ.print_var conf base (eval_var conf base env ep loc) s sl
   | Awid_hei s -> print_wid_hei conf base env s
   | Aif e alt ale -> print_if conf base env ep e alt ale
-  | Aforeach (loc, s, sl) al -> print_foreach conf base env ep loc s sl al
+  | Aforeach (loc, s, sl) el al -> print_foreach conf base env ep loc s sl el al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
   | Aapply f el -> print_apply conf base env ep f el
   | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
@@ -1743,10 +1743,10 @@ and print_if conf base env ep e alt ale =
     if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
   in
   List.iter (print_ast conf base env ep) al
-and print_foreach conf base env ini_ep loc s sl al =
+and print_foreach conf base env ini_ep loc s sl el al =
   let rec loop ((_, a, _, _) as ep) efam =
     fun 
-    [ [s] -> print_simple_foreach conf base env al ini_ep ep efam s
+    [ [s] -> print_simple_foreach conf base env el al ini_ep ep efam s
     | ["ancestor" :: sl] ->
         let ip_ifamo =
           match get_env "ancestor" env with
@@ -1828,11 +1828,11 @@ and print_foreach conf base env ini_ep loc s sl al =
         List.iter (fun s -> Wserver.wprint ".%s" s) sl;
         Wserver.wprint "?"
       } ]
-and print_simple_foreach conf base env al ini_ep ep efam =
+and print_simple_foreach conf base env el al ini_ep ep efam =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
   | "ancestor" -> print_foreach_ancestor conf base env al ep
-  | "ancestor_level" -> print_foreach_ancestor_level conf base env al ep
+  | "ancestor_level" -> print_foreach_ancestor_level conf base env el al ep
   | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
@@ -1870,12 +1870,18 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
                List.iter (print_ast conf base env ep) al ])
         gpl
   | _ -> () ]
-and print_foreach_ancestor_level conf base env al ((p, _, _, _) as ep) =
-  let max_lev = "max_anc_level" in
+and print_foreach_ancestor_level conf base env el al ((p, _, _, _) as ep) =
   let max_level =
-    match get_env max_lev env with
-    [ Vint n -> n
-    | _ -> 0 ]
+    match el with
+    [ [e] ->
+        let eval_ast = eval_ast conf base env ep in
+        let eval_apply = eval_apply conf env eval_ast in
+        let eval_var = eval_var conf base env ep in
+        Templ.eval_int_expr conf (eval_var, eval_apply) e
+    | _ ->
+        match get_env "max_anc_level" env with
+        [ Vint n -> n
+        | _ -> 0 ] ]
   in
   let mark = Array.create base.data.persons.len Num.zero in
   loop [GP_person Num.one p.cle_index None] 1 where rec loop gpl i =
