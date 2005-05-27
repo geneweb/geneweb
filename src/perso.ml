@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.126 2005-05-27 04:50:35 ddr Exp $ *)
+(* $Id: perso.ml,v 4.127 2005-05-27 08:25:03 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1878,10 +1878,11 @@ and print_foreach_ancestor_level conf base env el al ((p, _, _, _) as ep) =
         let eval_apply = eval_apply conf env eval_ast in
         let eval_var = eval_var conf base env ep in
         Templ.eval_int_expr conf (eval_var, eval_apply) e
-    | _ ->
+    | [] ->
         match get_env "max_anc_level" env with
         [ Vint n -> n
-        | _ -> 0 ] ]
+        | _ -> 0 ]
+    | _ -> raise Not_found ]
   in
   let mark = Array.create base.data.persons.len Num.zero in
   loop [GP_person Num.one p.cle_index None] 1 where rec loop gpl i =
