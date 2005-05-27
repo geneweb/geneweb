@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.32 2005-05-27 04:50:35 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.33 2005-05-27 08:25:03 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -706,9 +706,8 @@
     %apply;togen("v").
     </p>
   %end;
-  %foreach;ancestor_level;
-    %if;(evar.v != "" and level <= evar.v
-         and (evar.only != "on" or level = evar.v))
+  %foreach;ancestor_level(evar.v)
+    %if;(evar.only != "on" or level = evar.v)
       <h3><em>[*generation/generations]0 %level;</em></h3>
       %foreach;ancestor;
         %if;(ancestor.same != "")

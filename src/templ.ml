@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.57 2005-05-27 04:50:35 ddr Exp $ *)
+(* $Id: templ.ml,v 4.58 2005-05-27 08:25:03 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -16,6 +16,7 @@ type token =
   | LESS
   | LESSEQUAL
   | LPAREN
+  | MINUS
   | PERCENT
   | PLUS
   | RPAREN
@@ -135,6 +136,7 @@ value rec get_token =
   | [: `'.' :] ep -> Tok (bp, ep) DOT
   | [: `'=' :] ep -> Tok (bp, ep) EQUAL
   | [: `'+' :] ep -> Tok (bp, ep) PLUS
+  | [: `'-' :] ep -> Tok (bp, ep) MINUS
   | [: `'*' :] ep -> Tok (bp, ep) STAR
   | [: `'%';
        a =
@@ -225,6 +227,7 @@ and parse_expr_4 =
        a =
          parser
          [ [: `Tok _ PLUS; e2 = parse_expr_5 :] -> Eop "+" e e2
+         | [: `Tok _ MINUS; e2 = parse_expr_5 :] -> Eop "-" e e2
          | [: :] -> e ] :] ->
       a
 and parse_expr_5 =
@@ -773,6 +776,7 @@ value rec bool_eval ((conf, eval_var, _) as ceva) =
 and int_eval ceva =
   fun
   [ Eop "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
+  | Eop "-" e1 e2 -> int_eval ceva e1 - int_eval ceva e2
   | Eop "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
   | Eop "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
   | Eint _ x -> int_of_string x
@@ -801,6 +805,7 @@ and num_eval ((_, eval_var, _) as ceva) =
   fun
   [ Eint _ x -> Num.of_string x
   | Eop "+" x y -> Num.add (num_eval ceva x) (num_eval ceva y)
+  | Eop "-" x y -> Num.sub (num_eval ceva x) (num_eval ceva y)
   | Eop "*" x (Eint _ y) -> Num.mul (num_eval ceva x) (int_of_string y)
   | Eop "%" x (Eint _ y) ->
       Num.of_int (Num.modl (num_eval ceva x) (int_of_string y))
