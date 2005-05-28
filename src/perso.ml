@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.128 2005-05-28 02:30:32 ddr Exp $ *)
+(* $Id: perso.ml,v 4.129 2005-05-28 22:20:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1789,11 +1789,7 @@ value rec eval_ast conf base env ep =
   [ Atext s -> s
   | Avar loc s sl ->
       Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
-  | Aexpr e ->
-      let eval_ast = eval_ast conf base env ep in
-      let eval_apply = eval_apply conf env eval_ast in
-      let eval_var = eval_var conf base env ep in
-      Templ.eval_expr conf (eval_var, eval_apply) e
+  | Aexpr e -> eval_expr conf base env ep e
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
   | Aapply f el ->
@@ -1808,6 +1804,16 @@ value rec eval_ast conf base env ep =
       let vl = List.map (String.concat "") sll in
       eval_apply conf env eval_ast f vl
   | x -> not_impl "eval_ast" x ]
+and eval_expr conf base env ep e =
+  let eval_ast = eval_ast conf base env ep in
+  let eval_apply = eval_apply conf env eval_ast in
+  let eval_var = eval_var conf base env ep in
+  Templ.eval_expr conf (eval_var, eval_apply) e
+and eval_int_expr conf base env ep e =
+  let eval_ast = eval_ast conf base env ep in
+  let eval_apply = eval_apply conf env eval_ast in
+  let eval_var = eval_var conf base env ep in
+  Templ.eval_int_expr conf (eval_var, eval_apply) e
 and eval_apply conf env eval_ast f vl =
   match get_env f env with
   [ Vfun xl al ->
@@ -1969,7 +1975,7 @@ and print_simple_foreach conf base env el al ini_ep ep efam =
   | "ancestor" -> print_foreach_ancestor conf base env al ep
   | "ancestor_level" -> print_foreach_ancestor_level conf base env el al ep
   | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
-  | "ancestor_tree_level" -> print_foreach_ancestor_tree conf base env el al ep
+  | "ancestor_tree_line" -> print_foreach_ancestor_tree conf base env el al ep
   | "cell" -> print_foreach_cell conf base env el al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
@@ -2010,11 +2016,7 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
 and print_foreach_ancestor_level conf base env el al ((p, _, _, _) as ep) =
   let max_level =
     match el with
-    [ [e] ->
-        let eval_ast = eval_ast conf base env ep in
-        let eval_apply = eval_apply conf env eval_ast in
-        let eval_var = eval_var conf base env ep in
-        Templ.eval_int_expr conf (eval_var, eval_apply) e
+    [ [e] -> eval_int_expr conf base env ep  e
     | [] ->
         match get_env "max_anc_level" env with
         [ Vint n -> n
@@ -2050,17 +2052,18 @@ and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
         loop gpl (succ i)
       }
 and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
-  let max_level =
+  let (p, max_level) =
     match el with
-    [ [e] ->
-        let eval_ast = eval_ast conf base env ep in
-        let eval_apply = eval_apply conf env eval_ast in
-        let eval_var = eval_var conf base env ep in
-        Templ.eval_int_expr conf (eval_var, eval_apply) e
+    [ [e1; e2] ->
+        let ip = eval_int_expr conf base env ep e1 in
+        let max_level = eval_int_expr conf base env ep e2 in
+        (pget conf base (Adef.iper_of_int ip), max_level)
+    | [e] ->
+        (p, eval_int_expr conf base env ep e)
     | [] ->
         match get_env "max_anc_level" env with
-        [ Vint n -> n
-        | _ -> 0 ]
+        [ Vint n -> (p, n)
+        | _ -> (p, 0) ]
     | _ -> raise Not_found ]
   in
   let gen = tree_generation_list conf base max_level p in

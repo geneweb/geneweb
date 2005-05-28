@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.1 2005-05-28 02:30:32 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.2 2005-05-28 22:20:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -17,14 +17,13 @@
 <body%body_prop;>
 %message_to_wizard;
 
-<div style="text-align:%right;">
+<div style="text-align:%right;">%nn;
 <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-;dag=on;notab=on;slices=on"><tt>//</tt></a>
-</div>
+;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
 
 %if;(evar.t = "T")
   <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
-  %foreach;ancestor_tree_level(evar.v)
+  %foreach;ancestor_tree_line(evar.v)
     %if;(not is_first)
       <tr>
       %foreach;cell;
@@ -39,7 +38,20 @@
     %foreach;cell;
       %if;(not is_first)<td colspan="1" align="center">&nbsp;</td>%nl;%end;
       <td colspan="%cell.colspan;" align="center">%nn;
-      %if;(cell.is_empty)&nbsp;%else;%cell.ancestor;%cell.ancestor.dates;%end;
+      %if;(cell.is_empty)&nbsp;%nn;
+      %else;
+        <a href="%prefix;%cell.ancestor.access;">%cell.ancestor;
+        </a>%cell.ancestor.dates;
+        %if;(evar.image = "on" and cell.ancestor.has_image)
+          <br%/>
+          <table border="0" align="center">
+          <tr align="left"><td>
+          <a href="%cell.ancestor.image_html_url;"><img
+          src="%cell.ancestor.image_url;"%cell.ancestor.image_small_size;%sp; 
+           border="0" alt="[image/images]0"%/></a>
+          </td></tr></table>
+        %end;
+      %end;
       </td>
     %end;
     </tr>
@@ -48,7 +60,11 @@
       %foreach;cell;
         %if;(not is_first)<td colspan="1" align="center">&nbsp;</td>%nl;%end;
         <td colspan="%cell.colspan;" align="center">%nn;
-        %if;cell.is_empty;&nbsp;%else;|%end;
+        %if;cell.is_empty;&nbsp;%nn;
+        %else;
+          <a style="text-decoration:none" href="%prefix;
+          m=A;t=T;v=%evar.v;;%cell.ancestor.access;">|</a>%nn;
+        %end;
         </td>
       %end;
       </tr>
