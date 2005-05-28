@@ -1,0 +1,87 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: anctree.txt,v 1.1 2005-05-28 02:30:32 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
+  <title>[*tree]</title>
+  <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<div style="text-align:%right;">
+<a href="%prefix;m=A;t=T;v=%evar.v;;%access;
+;dag=on;notab=on;slices=on"><tt>//</tt></a>
+</div>
+
+%if;(evar.t = "T")
+  <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
+  %foreach;ancestor_tree_level(evar.v)
+    %if;(not is_first)
+      <tr>
+      %foreach;cell;
+        %if;(not is_first)<td colspan="1" align="center">&nbsp;</td>%nl;%end;
+        <td colspan="%cell.colspan;" align="center">%nn;
+          %if;(cell.is_empty or cell.is_top)&nbsp;%else;|%end;
+        </td>
+      %end;
+      </tr>
+    %end;
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)<td colspan="1" align="center">&nbsp;</td>%nl;%end;
+      <td colspan="%cell.colspan;" align="center">%nn;
+      %if;(cell.is_empty)&nbsp;%else;%cell.ancestor;%cell.ancestor.dates;%end;
+      </td>
+    %end;
+    </tr>
+    %if;(not is_last)
+      <tr>
+      %foreach;cell;
+        %if;(not is_first)<td colspan="1" align="center">&nbsp;</td>%nl;%end;
+        <td colspan="%cell.colspan;" align="center">%nn;
+        %if;cell.is_empty;&nbsp;%else;|%end;
+        </td>
+      %end;
+      </tr>
+      <tr>
+      %foreach;cell;
+        %if;(not is_first)
+          <td colspan="1" align="center">%nn;
+          %if;(cell.is_right)<hr width="100%%"%/>%nn;
+          %else;&nbsp;%end;
+          </td>
+        %end;
+        <td colspan="%cell.colspan;" align="%nn;
+           %if;cell.is_left;%right;
+           %elseif;cell.is_right;%left;
+           %else;center%end;">%nn;
+        %if;cell.is_empty;&nbsp;%nn;
+        %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+        %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+        %else;|%end;
+        </td>
+      %end;
+      </tr>
+    %end;
+  %end;
+  </table>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

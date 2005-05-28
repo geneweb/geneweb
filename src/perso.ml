@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.127 2005-05-27 08:25:03 ddr Exp $ *)
+(* $Id: perso.ml,v 4.128 2005-05-28 02:30:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -313,7 +313,7 @@ value max_descendant_level conf base p =
   min (limit_desc conf) (desc_level_max conf base p)
 ;
 
-(**)
+(* ascendants by list *)
 type generation_person =
   [ GP_person of Num.t and iper and option ifam
   | GP_same of Num.t and Num.t and iper
@@ -451,7 +451,99 @@ value get_all_generations conf base p =
   let gpll = List.rev gpll in
   List.flatten gpll
 ;
-(**)
+
+(* Ascendants by tree:
+
+  8 ? ? ? ? ? ? ?
+   4   5   ?   7
+     2       3 
+         1
+
+1) Build list of levels (t1 = True for parents flag, size 1)
+   => [ [8At1 E E] [4Lt1 5Rt1 7At1] [2Lt1 3Rt1] [1Ct1] ] 
+
+2) Enrich list of levels (parents flag, sizing)
+   => [ [8At1 E E] [4Lt1 5Rf1 7Af1] [2Lt3 3Rt1] [1Ct5] ]
+
+3) Display it
+    For each cell:
+      Top vertical bar if parents flag (not on top line)
+      Person
+      Person tree link (vertical bar) ) not on bottom line
+      Horizontal line                 )
+
+*)
+
+type pos = [ Left | Right | Center | Alone ];
+type cell = [ Cell of person and pos and bool and int | Empty ];
+
+value rec enrich lst1 lst2 =
+  match (lst1, lst2) with
+  [ (_, []) -> []
+  | ([], lst) -> lst
+  | ([Cell _ Right _ s1 :: l1], [Cell p d u s2 :: l2]) ->
+      [Cell p d u (s1 + s2 + 1) :: enrich l1 l2]
+  | ([Cell _ Left _ s :: l1], [Cell p d u _ :: l2]) ->
+      enrich l1 [Cell p d u s :: l2]
+  | ([Cell _ _ _ s :: l1], [Cell p d u _ :: l2]) ->
+     [Cell p d u s :: enrich l1 l2]
+  | ([Empty :: l1], [Cell p d _ s :: l2]) -> [Cell p d False s :: enrich l1 l2]
+  | ([_ :: l1], [Empty :: l2]) -> [Empty :: enrich l1 l2] ]
+;
+    
+value is_empty = List.for_all (\== Empty);
+     
+value rec enrich_tree lst =
+  match lst with
+  [ [] -> []
+  | [head :: tail] ->
+      if is_empty head then enrich_tree tail
+      else
+        match tail with
+        [ [] -> [head]
+        | [thead :: ttail] ->
+            [head :: enrich_tree [enrich head thead :: ttail]] ] ]
+;
+
+(* tree_generation_list
+    conf: configuration parameters
+    base: base name
+    gv: number of generations
+    p: person *)
+value tree_generation_list conf base gv p =
+  let next_gen pol =
+    List.fold_right
+      (fun po list ->
+         match po with
+         [ Empty -> [Empty :: list]
+         | Cell p _ _ _ ->
+             match parents (aget conf base p.cle_index) with
+             [ Some ifam ->
+                 let cpl = coi base ifam in
+                 let fath =
+                   let p = pget conf base (father cpl) in
+                   if know base p then Some p else None
+                 in
+                 let moth =
+                   let p = pget conf base (mother cpl) in
+                   if know base p then Some p else None
+                 in
+                 match (fath, moth) with
+                 [ (Some f, Some m) ->
+                     [Cell f Left True 1; Cell m Right True 1 :: list]
+                 | (Some f, None) -> [Cell f Alone True 1 :: list]
+                 | (None, Some m) -> [Cell m Alone True 1 :: list]
+                 | (None, None) -> [Empty :: list] ]
+             | _ -> [Empty :: list] ] ])
+      pol []
+  in
+  let gen =
+    loop (gv - 1) [Cell p Center True 1] [] where rec loop i gen list =
+      if i == 0 then [gen :: list]
+      else loop (i - 1) (next_gen gen) [gen :: list]
+  in
+  enrich_tree gen
+;
 
 (* Interpretation of template file *)
 
@@ -477,6 +569,8 @@ module SortedList =
 type env =
   [ Vallgp of list generation_person
   | Vanc of generation_person
+  | Vcell of cell
+  | Vcelll of list cell
   | Vcnt of ref int
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
@@ -643,6 +737,10 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "is_first" ->
       match get_env "first" env with
+      [ Vbool x -> x
+      | _ -> raise Not_found ]
+  | "is_last" ->
+      match get_env "last" env with
       [ Vbool x -> x
       | _ -> raise Not_found ]
   | "is_no_mention" ->
@@ -845,6 +943,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   | ["bvar"; v] ->
       try VVstring (List.assoc v conf.base_env) with
       [ Not_found -> VVstring "" ]
+  | ["cell" :: sl] ->
+      match get_env "cell" env with
+      [ Vcell cell -> eval_cell_field_var conf base env ep cell loc sl
+      | _ -> raise Not_found ]
   | ["child" :: sl] ->
       match get_env "child" env with
       [ Vind p a u ->
@@ -984,6 +1086,39 @@ and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
   | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl ]
+and eval_cell_field_var conf base env ep cell loc =
+  fun
+  [ ["ancestor" :: sl] ->
+      match cell with
+      [ Cell p _ _ _ ->
+          let ep = make_ep conf base p.cle_index in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["colspan"] ->
+      match cell with
+      [ Empty -> VVstring "1"
+      | Cell _ _ _ s -> VVstring (string_of_int s) ]
+  | ["is_center"] ->
+      match cell with
+      [ Cell _ Center _ _ -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_empty"] ->
+      match cell with
+      [ Empty -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_left"] ->
+      match cell with
+      [ Cell _ Left _ _ -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_right"] ->
+      match cell with
+      [ Cell _ Right _ _ -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_top"] ->
+      match cell with
+      [ Cell _ _ False _ -> VVbool True
+      | _ -> VVbool False ]
+  | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
   fun
   [ ["family" :: sl] ->
@@ -1701,7 +1836,7 @@ and eval_predefined_apply conf env f vl =
   | ("nth", [s1; s2]) ->
       let n = try int_of_string s2 with [ Failure _ -> 0 ] in
       Util.nth_field s1 n
-  | _ -> Printf.sprintf "%%apply;%s?" f ]
+  | _ -> Printf.sprintf " %%apply;%s?" f ]
 and eval_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let eval_ast = eval_ast conf base env ep in
@@ -1834,6 +1969,8 @@ and print_simple_foreach conf base env el al ini_ep ep efam =
   | "ancestor" -> print_foreach_ancestor conf base env al ep
   | "ancestor_level" -> print_foreach_ancestor_level conf base env el al ep
   | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
+  | "ancestor_tree_level" -> print_foreach_ancestor_tree conf base env el al ep
+  | "cell" -> print_foreach_cell conf base env el al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
   | "descendant_level" -> print_foreach_descendant_level conf base env al ep
@@ -1912,6 +2049,44 @@ and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
         let gpl = next_generation2 conf base mark gpl in
         loop gpl (succ i)
       }
+and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
+  let max_level =
+    match el with
+    [ [e] ->
+        let eval_ast = eval_ast conf base env ep in
+        let eval_apply = eval_apply conf env eval_ast in
+        let eval_var = eval_var conf base env ep in
+        Templ.eval_int_expr conf (eval_var, eval_apply) e
+    | [] ->
+        match get_env "max_anc_level" env with
+        [ Vint n -> n
+        | _ -> 0 ]
+    | _ -> raise Not_found ]
+  in
+  let gen = tree_generation_list conf base max_level p in
+  loop True gen where rec loop first =
+    fun
+    [ [g :: gl] ->
+        let env =
+          [("celll", Vcelll g); ("first", Vbool first);
+           ("last", Vbool (gl = [])) :: env]
+        in
+        do {
+          List.iter (print_ast conf base env ep) al;
+          loop False gl
+        }
+    | [] -> () ]
+and print_foreach_cell conf base env el al ((p, _, _, _) as ep) =
+  let celll =
+    match get_env "celll" env with
+    [ Vcelll celll -> celll
+    | _ -> raise Not_found ]
+  in
+  list_iter_first
+    (fun first cell ->
+       let env = [("cell", Vcell cell); ("first", Vbool first) :: env] in
+       List.iter (print_ast conf base env ep) al)
+    celll
 and print_foreach_child conf base env al ep =
   fun
   [ Vfam _ _ des _ ->
