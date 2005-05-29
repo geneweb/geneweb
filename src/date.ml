@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.38 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: date.ml,v 4.39 2005-05-29 19:15:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -218,8 +218,21 @@ value string_of_ondate conf =
         if d.year < 1582 then "" else " (" ^ gregorian_precision conf d ^ ")"
       in
       let d1 = Calendar.julian_of_gregorian d in
-      string_of_on_dmy conf d1 ^ " " ^
-        transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+      let year_prec =
+        if d1.month > 0 && d1.month < 3 ||
+           d1.month = 3 && d1.day > 0 && d1.day < 25 then
+          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+        else ""
+      in
+      let s =
+        string_of_on_dmy conf d1 ^ year_prec ^ " " ^
+          transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+      in
+      if d1.day > 0 then
+        Printf.sprintf 
+          "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
+          (commd conf) d1.year d1.month d1.day s
+      else s
   | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
@@ -488,14 +501,18 @@ value julian_month_name = gregorian_month_name;
 value french_month_name conf n = capitale (nominative (french_month conf n));
 value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 
-value print_year conf date var =
+value print_year conf date cal var =
   do {
     stagn "td" begin
       xtag "input" "type=\"submit\" name=\"y%s1\" value=\" &lt; \"" var;
     end;
     stagn "td" begin
-      xtag "input" "name=\"y%s\" size=\"5\" maxlength=\"5\" value=\"%d\"" var
-        date.year;
+      xtag "input" "name=\"y%s\" size=\"6\" maxlength=\"6\" value=\"%s\"" var
+        (if cal = Djulian &&
+            (date.month > 0 && date.month < 3 ||
+             date.month = 3 && date.day > 0 && date.day < 25) then
+           Printf.sprintf "%d/%d" (date.year - 1) (date.year mod 10)
+         else Printf.sprintf "%d" date.year);
     end;
     stagn "td" begin
       xtag "input" "type=\"submit\" name=\"y%s2\" value=\" &gt; \"" var;
@@ -540,7 +557,7 @@ value print_day conf date var =
   }
 ;
 
-value print_some_calendar conf order date n month_name n_months var =
+value print_some_calendar conf order date cal n month_name n_months var =
   do {
     Wserver.wprint "\n";
     tag "tr" "align=\"%s\"" conf.left begin
@@ -552,10 +569,10 @@ value print_some_calendar conf order date n month_name n_months var =
       if order = "ddmmyy" then do {
         print_day conf date var;
         print_month conf date month_name n_months var;
-        print_year conf date var;
+        print_year conf date cal var;
       }
       else do {
-        print_year conf date var;
+        print_year conf date cal var;
         print_month conf date month_name n_months var;
         print_day conf date var;
       };
@@ -600,8 +617,19 @@ value print_calendar conf base =
   in
   let sdn =
     List.fold_left
-      (fun d (var, conv, max_month) ->
-         let yy = getint ("y" ^ var) in
+      (fun d (var, cal, conv, max_month) ->
+         let yy =
+           match p_getenv conf.env ("y" ^ var) with
+           [ Some v ->
+              try
+                let len = String.length v in
+                if cal = Djulian && len > 2 && v.[len-2] = '/' then
+                  int_of_string (String.sub v 0 (len - 2)) + 1
+                else int_of_string v
+              with
+              [ Failure _ -> 0 ]
+           | None -> 0 ]
+         in
          let mm = getint ("m" ^ var) in
          let dd = getint ("d" ^ var) in
          let dt = {day = dd; month = mm; year = yy; prec = Sure; delta = 0} in
@@ -639,9 +667,10 @@ value print_calendar conf base =
              | (_, _, _, _, _, Some _) -> conv {(dt) with day = dd + 1}
              | _ -> d ] ])
       (Calendar.sdn_of_gregorian conf.today)
-      [("g", Calendar.sdn_of_gregorian, 12);
-       ("j", Calendar.sdn_of_julian, 12); ("f", Calendar.sdn_of_french, 13);
-       ("h", Calendar.sdn_of_hebrew, 13)]
+      [("g", Dgregorian, Calendar.sdn_of_gregorian, 12);
+       ("j", Djulian, Calendar.sdn_of_julian, 12);
+       ("f", Dfrench, Calendar.sdn_of_french, 13);
+       ("h", Dhebrew, Calendar.sdn_of_hebrew, 13)]
   in
   let date = Calendar.gregorian_of_sdn Sure sdn in
   let wday =
@@ -686,17 +715,17 @@ value print_calendar conf base =
               let order = transl conf " !dates order" in
               tag "table" "border=\"1\"" begin
                 print_calendar_head conf order;
-                print_some_calendar conf order date 0 gregorian_month_name
-                  12 "g";
+                print_some_calendar conf order date Dgregorian 0
+                  gregorian_month_name 12 "g";
                 print_some_calendar conf order
-                  (Calendar.julian_of_gregorian date) 1 julian_month_name
-                  12 "j";
+                  (Calendar.julian_of_gregorian date) Djulian 1
+                  julian_month_name 12 "j";
                 print_some_calendar conf order
-                  (Calendar.french_of_gregorian date) 2 french_month_name
-                  13 "f";
+                  (Calendar.french_of_gregorian date) Dfrench 2
+                  french_month_name 13 "f";
                 print_some_calendar conf order
-                  (Calendar.hebrew_of_gregorian date) 3 hebrew_month_name
-                  13 "h";
+                  (Calendar.hebrew_of_gregorian date) Dhebrew 3
+                  hebrew_month_name 13 "h";
               end;
             end;
           end;
