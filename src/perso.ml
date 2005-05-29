@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.129 2005-05-28 22:20:27 ddr Exp $ *)
+(* $Id: perso.ml,v 4.130 2005-05-29 06:34:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -666,6 +666,19 @@ value str_val x = VVstring x;
 value string_of_place conf base istr =
   string_with_macros conf False [] (sou base istr)
 ;
+
+value gen_string_of_img_sz max_wid max_hei conf base env (p, _, _, p_auth) =
+  if p_auth then
+    let v = image_and_size conf base p (limited_image_size max_wid max_hei) in
+    match v with
+    [ Some (_, _, Some (width, height)) ->
+        Format.sprintf " width=\"%d\" height=\"%d\"" width height
+    | Some (_, _, None) -> Format.sprintf " height=\"%d\"" max_im_hei
+    | None -> "" ]
+  else ""
+;
+value string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid;
+value string_of_image_small_size = gen_string_of_img_sz 100 75;
 
 value make_ep conf base ip =
   let p = pget conf base ip in
@@ -1497,6 +1510,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "image" -> if not p_auth then "" else sou base p.image
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
+  | "image_small_size" -> string_of_image_small_size conf base env ep
   | "image_url" -> string_of_image_url conf base env ep False
   | "ind_access" ->
       (* deprecated since 5.00: rather use "i=%index;" *)
@@ -1705,17 +1719,6 @@ and string_of_image_url conf base env (p, _, _, p_auth) html =
              (mod_float s.Unix.st_mtime (float_of_int max_int)))
           b k
     | Some (False, link, _) -> link
-    | None -> "" ]
-  else ""
-and string_of_image_size conf base env (p, _, _, p_auth) =
-  if p_auth then
-    let v =
-      image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
-    in
-    match v with
-    [ Some (_, _, Some (width, height)) ->
-        Format.sprintf " width=%d height=%d" width height
-    | Some (_, link, None) -> Format.sprintf " height=%d" max_im_hei
     | None -> "" ]
   else ""
 and string_of_parent_age conf base (p, a, _, p_auth) parent =
