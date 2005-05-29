@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.242 2005-05-29 06:34:42 ddr Exp $
+# $Id: lexicon.txt,v 4.243 2005-05-29 14:13:54 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -4216,7 +4216,7 @@ eo: historio de la gxisdatigoj
 es: historia de las actualizaciones
 et: muudatuste ajalugu
 fi: p&auml;ivityshistoria
-fr: historique des mises-&agrave;-jour
+fr: historique des mises &agrave; jour
 he:  øùéîú äòãëåğéí
 is: uppfærslusaga
 it: riassunto degli aggiornamenti

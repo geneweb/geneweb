@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.58 2005-05-27 08:25:03 ddr Exp $ *)
+(* $Id: templ.ml,v 4.59 2005-05-29 14:16:21 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -606,6 +606,16 @@ value eval_variable conf =
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
   | "doctype" -> Util.doctype conf ^ "\n"
+  | "doctype_transitional" ->
+      let doctype =
+        match Util.p_getenv conf.base_env "doctype" with
+        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+        | _ -> "xhtml-1.0-trans" ]
+      in
+      let conf =
+        {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+      in
+      Util.doctype conf ^ "\n"
   | "highlight" -> conf.highlight
   | "image_prefix" -> Util.image_prefix conf
   | "left" -> conf.left

@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.39 2005-05-29 06:34:42 ddr Exp $
+# $Id: lex_utf8.txt,v 1.40 2005-05-29 14:13:54 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -4200,7 +4200,7 @@ eo: historio de la ĝisdatigoj
 es: historia de las actualizaciones
 et: muudatuste ajalugu
 fi: p&auml;ivityshistoria
-fr: historique des mises-&agrave;-jour
+fr: historique des mises &agrave; jour
 he:  רשימת העדכונים
 is: uppfærslusaga
 it: riassunto degli aggiornamenti
