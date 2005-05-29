@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.5 2005-05-29 06:34:42 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.6 2005-05-29 14:43:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -70,8 +70,8 @@
         <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
          ">[*invert]</a>
         <br%/>
-        %if;(family.father = prev_family.father
-         and family.mother = prev_family.mother)
+        %if;(family.father.index = prev_family.father.index
+         and family.mother.index = prev_family.mother.index)
           <a href=%nn;
           "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
           ;ip=%index;">%nn;
