@@ -1,7 +1,7 @@
 %doctype_transitional;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.4 2005-05-29 14:13:54 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.5 2005-05-29 20:07:51 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -43,9 +43,18 @@
       <td colspan="%cell.colspan;" align="center">%nn;
       %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
       %else;
+        %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
+          <table border="%evar.bd;"><tr>
+          <td align="center"%nn;
+           %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
+        %end;
         %if;(evar.cgl = "on")%cell.ancestor;
         %else;<a href="%prefix;%cell.ancestor.access;">%cell.ancestor;</a>%end;
         %cell.ancestor.dates;
+        %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
+          </td>
+          </tr></table>
+        %end;
         %if;(evar.image = "on" and cell.ancestor.has_image)
           <br%/>
           <table border="0" align="center"><tr align="left">
