@@ -1,7 +1,7 @@
 %doctype_transitional;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.5 2005-05-29 20:07:51 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.6 2005-05-29 21:35:29 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -18,96 +18,107 @@
 %message_to_wizard;
 
 %if;(evar.t = "T")
-  <div style="text-align:%right;">%nn;
-  <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-  ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
-  <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
-  %foreach;ancestor_tree_line(evar.v)
-    %if;(not is_first)
-      <tr>
-      %foreach;cell;
-        %if;(not is_first)
-          <td colspan="1" align="center"><tt>&nbsp;</tt></td>
-        %end;
-        <td colspan="%cell.colspan;" align="center">%nn;
-          %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;|%end;
-        </td>
+  %if;(evar.dag = "on")
+    %empty_dag;
+    %foreach;ancestor_level(evar.v)
+      %foreach;ancestor;
+        %apply;add_in_dag(ancestor.index)
       %end;
-      </tr>
     %end;
-    <tr>
-    %foreach;cell;
+  %else;
+    <div style="text-align:%right;">%nn;
+    <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
+    ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
+    <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
+    %foreach;ancestor_tree_line(evar.v)
       %if;(not is_first)
-        <td colspan="1" align="center"><tt>&nbsp;</tt></td>
-      %end;
-      <td colspan="%cell.colspan;" align="center">%nn;
-      %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
-      %else;
-        %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
-          <table border="%evar.bd;"><tr>
-          <td align="center"%nn;
-           %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
-        %end;
-        %if;(evar.cgl = "on")%cell.ancestor;
-        %else;<a href="%prefix;%cell.ancestor.access;">%cell.ancestor;</a>%end;
-        %cell.ancestor.dates;
-        %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
+        <tr>
+        %foreach;cell;
+          %if;(not is_first)
+            <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+          %end;
+          <td colspan="%cell.colspan;" align="center">%nn;
+            %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;|%end;
           </td>
-          </tr></table>
         %end;
-        %if;(evar.image = "on" and cell.ancestor.has_image)
-          <br%/>
-          <table border="0" align="center"><tr align="left">
-          <td>%nn;
-          %if;(evar.cgl != "on")<a href="%cell.ancestor.image_html_url;">%end;
-          <img%sp;
-          src="%cell.ancestor.image_url;"%cell.ancestor.image_small_size;%sp;
-           border="0" alt="[image/images]0"%/>%nn;
-          %if;(evar.cgl != "on")</a>%end;</td>%nl;
-          </tr></table>
-        %end;
+        </tr>
       %end;
-      </td>
-    %end;
-    </tr>
-    %if;(not is_last)
       <tr>
       %foreach;cell;
         %if;(not is_first)
           <td colspan="1" align="center"><tt>&nbsp;</tt></td>
         %end;
         <td colspan="%cell.colspan;" align="center">%nn;
-        %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-        %elseif;(evar.cgl = "on")|%nn;
+        %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
         %else;
-          <a style="text-decoration:none" href="%prefix;
-          m=A;t=T;v=%evar.v;;%cell.ancestor.access;">|</a>%nn;
+          %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
+            <table border="%evar.bd;"><tr>
+            <td align="center"%nn;
+             %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
+          %end;
+          %if;(evar.cgl = "on")%cell.ancestor;
+          %else;
+            <a href="%prefix;%cell.ancestor.access;">%cell.ancestor;</a>%nn;
+          %end;
+          %cell.ancestor.dates;
+          %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
+            </td>
+            </tr></table>
+          %end;
+          %if;(evar.image = "on" and cell.ancestor.has_image)
+            <br%/>
+            <table border="0" align="center"><tr align="left">
+            <td>%nn;
+            %if;(evar.cgl != "on")<a href="%cell.ancestor.image_html_url;">%end;
+            <img%sp;
+            src="%cell.ancestor.image_url;"%cell.ancestor.image_small_size;%sp;
+             border="0" alt="[image/images]0"%/>%nn;
+            %if;(evar.cgl != "on")</a>%end;</td>%nl;
+            </tr></table>
+          %end;
         %end;
         </td>
       %end;
       </tr>
-      <tr>
-      %foreach;cell;
-        %if;(not is_first)
-          <td colspan="1" align="center">%nn;
-          %if;(cell.is_right)<hr width="100%%"%/>%nn;
-          %else;<tt>&nbsp;</tt>%end;
+      %if;(not is_last)
+        <tr>
+        %foreach;cell;
+          %if;(not is_first)
+            <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+          %end;
+          <td colspan="%cell.colspan;" align="center">%nn;
+          %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+          %elseif;(evar.cgl = "on")|%nn;
+          %else;
+            <a style="text-decoration:none" href="%prefix;
+            m=A;t=T;v=%evar.v;;%cell.ancestor.access;">|</a>%nn;
+          %end;
           </td>
         %end;
-        <td colspan="%cell.colspan;" align="%nn;
-           %if;cell.is_left;%right;
-           %elseif;cell.is_right;%left;
-           %else;center%end;">%nn;
-        %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-        %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
-        %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
-        %else;|%end;
-        </td>
+        </tr>
+        <tr>
+        %foreach;cell;
+          %if;(not is_first)
+            <td colspan="1" align="center">%nn;
+            %if;(cell.is_right)<hr width="100%%"%/>%nn;
+            %else;<tt>&nbsp;</tt>%end;
+            </td>
+          %end;
+          <td colspan="%cell.colspan;" align="%nn;
+             %if;cell.is_left;%right;
+             %elseif;cell.is_right;%left;
+             %else;center%end;">%nn;
+          %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+          %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+          %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+          %else;|%end;
+          </td>
+        %end;
+        </tr>
       %end;
-      </tr>
     %end;
+    </table>
   %end;
-  </table>
 %end;
 
 <div>
