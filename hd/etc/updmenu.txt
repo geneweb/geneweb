@@ -1,12 +1,12 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.4 2005-05-25 11:59:55 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.5 2005-05-29 06:34:42 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
     hr { border: 0; margin: 0; border-bottom: 1px solid }

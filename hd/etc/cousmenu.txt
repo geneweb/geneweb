@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: cousmenu.txt,v 4.5 2005-05-14 17:48:46 ddr Exp $ -->
+  <!-- $Id: cousmenu.txt,v 4.6 2005-05-29 06:34:42 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -14,7 +14,7 @@
   </title>
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
     hr { border: 0; margin: 0; border-bottom: 1px solid }
