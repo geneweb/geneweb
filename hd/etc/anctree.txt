@@ -1,7 +1,7 @@
 %doctype_transitional;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.6 2005-05-29 21:35:29 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.7 2005-05-30 04:16:43 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -25,6 +25,22 @@
         %apply;add_in_dag(ancestor.index)
       %end;
     %end;
+    <table border="%border;" width="100%%"><tr><td align="center">
+      <table cellspacing="0" cellpadding="0">
+      %foreach;dag_cell_line;
+        <tr align="left">
+        %foreach;cell;
+          <td colspan="%cell.colspan;" align="%nn;
+            %if;cell.is_left;%left;
+            %elseif;cell.is_right;%right;
+            %else;center%end;">
+            &nbsp;aaa&nbsp;
+          </td>
+        %end;
+        </tr>
+      %end;
+      </table>
+    </tr></tr></table>
   %else;
     <div style="text-align:%right;">%nn;
     <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
@@ -56,22 +72,22 @@
             <td align="center"%nn;
              %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
           %end;
-          %if;(evar.cgl = "on")%cell.ancestor;
+          %if;(evar.cgl = "on")%cell.person;
           %else;
-            <a href="%prefix;%cell.ancestor.access;">%cell.ancestor;</a>%nn;
+            <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
           %end;
-          %cell.ancestor.dates;
+          %cell.person.dates;
           %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
             </td>
             </tr></table>
           %end;
-          %if;(evar.image = "on" and cell.ancestor.has_image)
+          %if;(evar.image = "on" and cell.person.has_image)
             <br%/>
             <table border="0" align="center"><tr align="left">
             <td>%nn;
-            %if;(evar.cgl != "on")<a href="%cell.ancestor.image_html_url;">%end;
+            %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
             <img%sp;
-            src="%cell.ancestor.image_url;"%cell.ancestor.image_small_size;%sp;
+            src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
              border="0" alt="[image/images]0"%/>%nn;
             %if;(evar.cgl != "on")</a>%end;</td>%nl;
             </tr></table>
@@ -91,7 +107,7 @@
           %elseif;(evar.cgl = "on")|%nn;
           %else;
             <a style="text-decoration:none" href="%prefix;
-            m=A;t=T;v=%evar.v;;%cell.ancestor.access;">|</a>%nn;
+            m=A;t=T;v=%evar.v;;%cell.person.access;">|</a>%nn;
           %end;
           </td>
         %end;
