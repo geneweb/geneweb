@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.133 2005-05-30 20:21:08 ddr Exp $ *)
+(* $Id: perso.ml,v 4.134 2005-05-30 22:41:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -573,6 +573,8 @@ type env =
   | Vcelll of list cell
   | Vcnt of ref int
   | Vdag of ref Dag.Pset.t
+  | Vdcell of (int * Dag2html.align * Dag2html.table_data)
+  | Vdline of array (int * Dag2html.align * Dag2html.table_data)
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
@@ -976,6 +978,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           let ep = (p, a, u, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
+  | ["dag_cell" :: sl] ->
+      match get_env "dag_cell" env with
+      [ Vdcell dcell -> eval_dag_cell_field_var conf base env ep dcell loc sl
+      | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
@@ -1136,6 +1142,37 @@ and eval_cell_field_var conf base env ep cell loc =
           let ep = make_ep conf base p.cle_index in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
+  | _ -> raise Not_found ]
+and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
+  fun
+  [ ["align"] ->
+      match (align, td) with
+      [ (Dag2html.LeftA, Dag2html.TDhr Dag2html.LeftA) -> VVstring conf.left
+      | (Dag2html.LeftA, _) -> VVstring conf.left
+      | (Dag2html.CenterA, _) -> VVstring "center"
+      | (Dag2html.RightA, _) -> VVstring conf.right ]
+  | ["colspan"] -> VVstring (string_of_int colspan)
+  | ["is_bar"] ->
+      match td with
+      [ Dag2html.TDbar _ -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_hr_left"] ->
+      match td with
+      [ Dag2html.TDhr Dag2html.LeftA -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_hr_right"] ->
+      match td with
+      [ Dag2html.TDhr Dag2html.RightA -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_nothing"] -> VVbool (td = Dag2html.TDnothing)
+  | ["link"] ->
+      match td with
+      [ Dag2html.TDbar s -> VVstring s
+      | _ -> VVstring "" ]
+  | ["string"] ->
+      match td with
+      [ Dag2html.TDstring s -> VVstring s
+      | _ -> VVstring "" ]
   | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
   fun
@@ -1992,7 +2029,8 @@ and print_simple_foreach conf base env el al ini_ep ep efam =
   | "cell" -> print_foreach_cell conf base env el al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
-  | "dag_cell_line" -> print_foreach_dag_line conf base env el al ep
+  | "dag_cell" -> print_foreach_dag_cell conf base env el al ep
+  | "dag_line" -> print_foreach_dag_line conf base env el al ep
   | "descendant_level" -> print_foreach_descendant_level conf base env al ep
   | "family" -> print_foreach_family conf base env al ini_ep ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
@@ -2148,62 +2186,36 @@ and print_foreach_child conf base env al ep =
            List.iter (print_ast conf base env ep) al)
         des.children
   | _ -> () ]
-and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
-  let gen =
-    let set =
-      match get_env "dag" env with
-      [ Vdag d -> d.val
-      | _ -> raise Not_found ]
-    in
-    let d = Dag.make_dag conf base (Dag.Pset.elements set) in
-    let hts =
-      Dag.make_tree_hts conf base (fun _ -> "dag_elem_txt")
-        (fun _ -> "vbar_txt") False False False set [] d
-    in
-    List.fold_right
-     (fun a ll ->
-        let l = Array.to_list a in
-        if List.exists
-             (fun (c, a, t) ->
-                match t with
-                [ Dag2html.TDhr _ | Dag2html.TDbar _ -> True
-                | _ -> False ])
-             l
-        then ll
-        else
-          let l =
-            List.map
-              (fun (colspan, align, td) ->
-                 match td with
-                 [ Dag2html.TDstring _ ->
-                     let pos =
-                       match align with
-                       [ Dag2html.LeftA -> Left
-                       | Dag2html.RightA -> Right
-                       | Dag2html.CenterA -> Center ]
-                     in
-                     let top = False in
-                     Cell p pos top colspan
-                 | Dag2html.TDnothing -> Empty
-                 | Dag2html.TDhr align -> Empty
-                 | Dag2html.TDbar s -> Empty ])
-              l
-          in
-          [l :: ll])
-     (Array.to_list hts) []
+and print_foreach_dag_cell conf base env el al ((p, _, _, _) as ep) =
+  let dline =
+    match get_env "dag_line" env with
+    [ Vdline dline -> dline
+    | _ -> raise Not_found ]
   in
-  loop True gen where rec loop first =
-    fun
-    [ [g :: gl] ->
-        let env =
-          [("celll", Vcelll g); ("first", Vbool first);
-           ("last", Vbool (gl = [])) :: env]
-        in
-        do {
-          List.iter (print_ast conf base env ep) al;
-          loop False gl
-        }
-    | [] -> () ]
+  for i = 0 to Array.length dline - 1 do {
+    let env = [("dag_cell", Vdcell dline.(i)) :: env] in
+    List.iter (print_ast conf base env ep) al;
+  }
+and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
+  let set =
+    match get_env "dag" env with
+    [ Vdag d -> d.val
+    | _ -> raise Not_found ]
+  in
+  let d = Dag.make_dag conf base (Dag.Pset.elements set) in
+  let hts =
+    let dag_elem_txt p =
+      Util.referenced_person_title_text conf base p ^
+        Date.short_dates_text conf base p
+    in
+    let vbar_txt ip = "" in
+    Dag.make_tree_hts conf base dag_elem_txt vbar_txt False True False
+      set [] d
+  in
+  for i = 0 to Array.length hts - 1 do {
+    let env = [("dag_line", Vdline hts.(i)) :: env] in
+    List.iter (print_ast conf base env ep) al;
+  }
 and print_foreach_descendant_level conf base env al ep =
   let max_level =
     match get_env "max_desc_level" env with
