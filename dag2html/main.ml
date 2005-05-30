@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 1.6 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: main.ml,v 1.7 2005-05-30 20:21:08 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -205,7 +205,8 @@ if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
               | RightA -> printf " width=\"50%%\" align=right"
               | _ -> () ];
               printf ">"
-            } ];
+            }
+        | TDnothing -> printf "&nbsp;" ];
         printf "</td>\n"
       }
     };

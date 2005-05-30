@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.32 2005-03-24 11:43:15 ddr Exp $ *)
+(* $Id: dag.ml,v 4.33 2005-05-30 20:21:08 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -183,6 +183,7 @@ value print_table conf hts =
           Wserver.wprint ">";
           match td with
           [ TDstring s -> Wserver.wprint "%s" s
+          | TDnothing -> Wserver.wprint "&nbsp;"
           | TDbar s ->
               if s = "" then Wserver.wprint "|"
               else
@@ -374,9 +375,15 @@ value gen_compute_columns_sizes size_fun hts ncol =
             else do {
               let (colspan, _, td) = hts.(i).(j) in
               match td with
-              [ TDstring s ->
+              [ TDstring _ | TDnothing ->
                   if colspan = curr_colspan then
+(**)
+                    let len =
+                      match td with [ TDstring s -> size_fun s | _ -> 1 ]
+                    in
+(*
                     let len = size_fun s in
+*)
                     let currsz =
                       loop 0 col colspan where rec loop currsz col cnt =
                         if cnt = 0 then currsz
@@ -652,6 +659,9 @@ value print_table_pre conf hts =
                   let len = displayed_length s in
                   String.make ((sz - len) / 2) ' ' ^ s ^
                     String.make (sz - (sz + len) / 2) ' '
+              | TDnothing ->
+                  String.make ((sz - 1) / 2) ' ' ^ "&nbsp;" ^
+                    String.make (sz - (sz + 1) / 2) ' '
               | TDbar s ->
                   let s =
                     if s = "" then "|" else "<a href=\"" ^ s ^ "\">|</a>"

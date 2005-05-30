@@ -1,4 +1,4 @@
-(* $Id: dag2html.mli,v 1.4 2001-08-24 04:54:09 ddr Exp $ *)
+(* $Id: dag2html.mli,v 1.5 2005-05-30 20:21:08 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -17,7 +17,12 @@ and ghost_id = 'x
 ;
 
 type align = [ LeftA | CenterA | RightA ];
-type table_data = [ TDstring of string | TDhr of align | TDbar of string ];
+type table_data =
+  [ TDstring of string
+  | TDhr of align
+  | TDbar of string
+  | TDnothing ]
+;
 type html_table = array (array (int * align * table_data));
 
 value html_table_struct :

@@ -1,7 +1,7 @@
 %doctype_transitional;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.8 2005-05-30 18:58:10 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.9 2005-05-30 20:21:08 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -129,7 +129,7 @@
     <table border="%border;" width="100%%"><tr><td align="center">
       <table cellspacing="0" cellpadding="0">
       %foreach;dag_cell_line;
-        %apply;zouip()
+        %apply;blibop()
       %end;
       </table>
     </tr></tr></table>
