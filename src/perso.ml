@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.132 2005-05-30 18:58:10 ddr Exp $ *)
+(* $Id: perso.ml,v 4.133 2005-05-30 20:21:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2160,25 +2160,37 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
       Dag.make_tree_hts conf base (fun _ -> "dag_elem_txt")
         (fun _ -> "vbar_txt") False False False set [] d
     in
-    List.map
-     (fun a ->
-        List.map
-          (fun (colspan, align, td) ->
-             match td with
-             [ Dag2html.TDstring "dag_elem_txt" ->
-                 let pos =
-                   match align with
-                   [ Dag2html.LeftA -> Left
-                   | Dag2html.RightA -> Right
-                   | Dag2html.CenterA -> Center ]
-                 in
-                 let top = False in
-                 Cell p pos top colspan
-             | Dag2html.TDstring _ -> Empty
-             | Dag2html.TDhr align -> Empty
-             | Dag2html.TDbar s -> Empty ])
-          (Array.to_list a))
-     (Array.to_list hts)
+    List.fold_right
+     (fun a ll ->
+        let l = Array.to_list a in
+        if List.exists
+             (fun (c, a, t) ->
+                match t with
+                [ Dag2html.TDhr _ | Dag2html.TDbar _ -> True
+                | _ -> False ])
+             l
+        then ll
+        else
+          let l =
+            List.map
+              (fun (colspan, align, td) ->
+                 match td with
+                 [ Dag2html.TDstring _ ->
+                     let pos =
+                       match align with
+                       [ Dag2html.LeftA -> Left
+                       | Dag2html.RightA -> Right
+                       | Dag2html.CenterA -> Center ]
+                     in
+                     let top = False in
+                     Cell p pos top colspan
+                 | Dag2html.TDnothing -> Empty
+                 | Dag2html.TDhr align -> Empty
+                 | Dag2html.TDbar s -> Empty ])
+              l
+          in
+          [l :: ll])
+     (Array.to_list hts) []
   in
   loop True gen where rec loop first =
     fun

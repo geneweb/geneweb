@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.5 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.6 2005-05-30 20:21:08 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -34,7 +34,12 @@ value new_ghost_id =
 (* creating the html table structure *)
 
 type align = [ LeftA | CenterA | RightA ];
-type table_data = [ TDstring of string | TDhr of align | TDbar of string ];
+type table_data =
+  [ TDstring of string
+  | TDhr of align
+  | TDbar of string
+  | TDnothing ]
+;
 type html_table = array (array (int * align * table_data));
 
 value html_table_struct indi_txt vbar_txt phony d t =
@@ -48,14 +53,14 @@ value html_table_struct indi_txt vbar_txt phony d t =
     fun
     [ Elem e -> TDstring (indi_txt d.dag.(int_of_idag e))
     | Ghost _ -> TDbar ""
-    | Nothing -> TDstring "&nbsp;" ]
+    | Nothing -> TDnothing ]
   in
   let bar_txt first_vbar =
     fun
     [ Elem e ->
         TDbar (if first_vbar then vbar_txt d.dag.(int_of_idag e) else "")
     | Ghost _ -> TDbar ""
-    | Nothing -> TDstring "&nbsp;" ]
+    | Nothing -> TDnothing ]
   in
   let all_empty i =
     loop 0 where rec loop j =
@@ -78,15 +83,15 @@ value html_table_struct indi_txt vbar_txt phony d t =
               else j
           in
           let colspan = 3 * (next_j - j) in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les = [(1, LeftA, TDnothing) :: les] in
           let les =
             let td =
-              if t.table.(i).(j).elem = Nothing then TDstring "&nbsp;"
+              if t.table.(i).(j).elem = Nothing then TDnothing
               else elem_txt t.table.(i).(j).elem
             in
             [(colspan - 2, CenterA, td) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les = [(1, LeftA, TDnothing) :: les] in
           loop les next_j
     in
     Array.of_list (List.rev les)
@@ -104,19 +109,19 @@ value html_table_struct indi_txt vbar_txt phony d t =
               else j
           in
           let colspan = 3 * (next_j - j) in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les = [(1, LeftA, TDnothing) :: les] in
           let les =
             let td =
               if k > 0 && t.table.(k - 1).(j).elem = Nothing ||
                  t.table.(k).(j).elem = Nothing
               then
-                TDstring "&nbsp;"
-              else if phony t.table.(i).(j).elem then TDstring "&nbsp;"
+                TDnothing
+              else if phony t.table.(i).(j).elem then TDnothing
               else bar_txt (k <> i) t.table.(i).(j).elem
             in
             [(colspan - 2, CenterA, td) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les = [(1, LeftA, TDnothing) :: les] in
           loop les next_j
     in
     Array.of_list (List.rev les)
@@ -136,12 +141,12 @@ value html_table_struct indi_txt vbar_txt phony d t =
             loop (j + 1)
           in
           let colspan = 3 * (next_j - j) - 2 in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les = [(1, LeftA, TDnothing) :: les] in
           let les =
             if t.table.(i).(j).elem = Nothing ||
                t.table.(i + 1).(j).elem = Nothing
             then
-              [(colspan, LeftA, TDstring "&nbsp;") :: les]
+              [(colspan, LeftA, TDnothing) :: les]
             else
               let td =
                 let all_ph =
@@ -150,11 +155,11 @@ value html_table_struct indi_txt vbar_txt phony d t =
                     else if phony t.table.(i + 1).(j).elem then loop (j + 1)
                     else False
                 in
-                if all_ph then TDstring "&nbsp;" else TDbar ""
+                if all_ph then TDnothing else TDbar ""
               in
               [(colspan, CenterA, td) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les = [(1, LeftA, TDnothing) :: les] in
           loop les next_j
     in
     Array.of_list (List.rev les)
@@ -218,20 +223,20 @@ value html_table_struct indi_txt vbar_txt phony d t =
               let les =
                 match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
                 [ (Nothing, _) | (_, Nothing) ->
-                    [(colspan + 2, LeftA, TDstring "&nbsp;") :: les]
+                    [(colspan + 2, LeftA, TDnothing) :: les]
                 | _ ->
                     let ph s =
-                      if phony t.table.(k).(l).elem then TDstring "&nbsp;"
+                      if phony t.table.(k).(l).elem then TDnothing
                       else s
                     in
                     if l = j && next_l = next_j then
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      let les = [(1, LeftA, TDnothing) :: les] in
                       let s = ph (TDbar "") in
                       let les = [(colspan, CenterA, s) :: les] in
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      let les = [(1, LeftA, TDnothing) :: les] in
                       les
                     else if l = j then
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      let les = [(1, LeftA, TDnothing) :: les] in
                       let s = ph (TDhr RightA) in
                       let les = [(colspan, RightA, s) :: les] in
                       let s = ph (TDhr CenterA) in
@@ -242,7 +247,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
                       let les = [(1, LeftA, s) :: les] in
                       let s = ph (TDhr LeftA) in
                       let les = [(colspan, LeftA, s) :: les] in
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      let les = [(1, LeftA, TDnothing) :: les] in
                       les
                     else
                       let s = ph (TDhr CenterA) in
