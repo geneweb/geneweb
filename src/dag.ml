@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.33 2005-05-30 20:21:08 ddr Exp $ *)
+(* $Id: dag.ml,v 4.34 2005-05-30 22:41:27 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -172,7 +172,7 @@ value print_table conf hts =
         for j = 0 to Array.length hts.(i) - 1 do {
           let (colspan, align, td) = hts.(i).(j) in
           Wserver.wprint "<td";
-          if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
+          if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then
             ()
           else Wserver.wprint " colspan=\"%d\"" colspan;
           match (align, td) with

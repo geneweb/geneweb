@@ -1,7 +1,7 @@
 %doctype_transitional;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.9 2005-05-30 20:21:08 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.10 2005-05-30 22:41:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -17,7 +17,7 @@
 <body%body_prop;>
 %message_to_wizard;
 
-%define;blibop()
+%define;a_tree_line()
   %if;(not is_first)
     <tr>
     %foreach;cell;
@@ -105,18 +105,33 @@
   %end;
 %end;
 
-%define;zouip()
+%define;a_dag_line()
   <tr align="left">
-  %foreach;cell;
-    <td colspan="%cell.colspan;" align="%nn;
-      %if;cell.is_left;%left;
-      %elseif;cell.is_right;%right;
-      %else;center%end;">
-      aaa
+  %foreach;dag_cell;
+    <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
+    %if;(dag_cell.string != "")%dag_cell.string;
+    %elseif;dag_cell.is_nothing;&nbsp;%nn;
+    %elseif;(dag_cell.is_bar and dag_cell.link = "")|%nn;
+    %elseif;(dag_cell.is_bar and dag_cell.link != "")
+      <a style="text-decoration:none" href="%dag_cell.link;">|</a>%nn;
+    %else;
+      %if;dag_cell.is_hr_left;
+        <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+      %elseif;dag_cell.is_hr_right;
+        <hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+      %else;
+        <hr width="100%%"%/>%nn;
+      %end;
+    %end;
     </td>
   %end;
   </tr>
 %end;
+
+<div style="text-align:%right;">%nn;
+<a href="%prefix;m=A;t=T;v=%evar.v;;%access;
+;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
+<table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
 
 %if;(evar.t = "T")
   %if;(evar.dag = "on")
@@ -128,18 +143,14 @@
     %end;
     <table border="%border;" width="100%%"><tr><td align="center">
       <table cellspacing="0" cellpadding="0">
-      %foreach;dag_cell_line;
-        %apply;blibop()
+      %foreach;dag_line;
+        %apply;a_dag_line()
       %end;
       </table>
     </tr></tr></table>
   %else;
-    <div style="text-align:%right;">%nn;
-    <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-    ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
-    <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
     %foreach;ancestor_tree_line(evar.v)
-      %apply;blibop()
+      %apply;a_tree_line()
     %end;
     </table>
   %end;
