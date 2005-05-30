@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.131 2005-05-30 04:16:43 ddr Exp $ *)
+(* $Id: perso.ml,v 4.132 2005-05-30 18:58:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2164,14 +2164,19 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
      (fun a ->
         List.map
           (fun (colspan, align, td) ->
-             let pos =
-               match align with
-               [ Dag2html.LeftA -> Left
-               | Dag2html.RightA -> Right
-               | Dag2html.CenterA -> Center ]
-             in
-             let top = False in
-             Cell p pos top colspan)
+             match td with
+             [ Dag2html.TDstring "dag_elem_txt" ->
+                 let pos =
+                   match align with
+                   [ Dag2html.LeftA -> Left
+                   | Dag2html.RightA -> Right
+                   | Dag2html.CenterA -> Center ]
+                 in
+                 let top = False in
+                 Cell p pos top colspan
+             | Dag2html.TDstring _ -> Empty
+             | Dag2html.TDhr align -> Empty
+             | Dag2html.TDbar s -> Empty ])
           (Array.to_list a))
      (Array.to_list hts)
   in

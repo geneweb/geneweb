@@ -1,7 +1,7 @@
 %doctype_transitional;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.7 2005-05-30 04:16:43 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.8 2005-05-30 18:58:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -17,6 +17,107 @@
 <body%body_prop;>
 %message_to_wizard;
 
+%define;blibop()
+  %if;(not is_first)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+      %end;
+      <td colspan="%cell.colspan;" align="center">%nn;
+        %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;|%end;
+      </td>
+    %end;
+    </tr>
+  %end;
+  <tr>
+  %foreach;cell;
+    %if;(not is_first)
+      <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+    %end;
+    <td colspan="%cell.colspan;" align="center">%nn;
+    %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
+    %else;
+      %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
+        <table border="%evar.bd;"><tr>
+        <td align="center"%nn;
+         %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
+      %end;
+      %if;(evar.cgl = "on")%cell.person;
+      %else;
+        <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
+      %end;
+      %cell.person.dates;
+      %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
+        </td>
+        </tr></table>
+      %end;
+      %if;(evar.image = "on" and cell.person.has_image)
+        <br%/>
+        <table border="0" align="center"><tr align="left">
+        <td>%nn;
+        %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
+        <img%sp;
+        src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
+         border="0" alt="[image/images]0"%/>%nn;
+        %if;(evar.cgl != "on")</a>%end;</td>%nl;
+        </tr></table>
+      %end;
+    %end;
+    </td>
+  %end;
+  </tr>
+  %if;(not is_last)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+      %end;
+      <td colspan="%cell.colspan;" align="center">%nn;
+      %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+      %elseif;(evar.cgl = "on")|%nn;
+      %else;
+        <a style="text-decoration:none" href="%prefix;
+        m=A;t=T;v=%evar.v;;%cell.person.access;">|</a>%nn;
+      %end;
+      </td>
+    %end;
+    </tr>
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td colspan="1" align="center">%nn;
+        %if;(cell.is_right)<hr width="100%%"%/>%nn;
+        %else;<tt>&nbsp;</tt>%end;
+        </td>
+      %end;
+      <td colspan="%cell.colspan;" align="%nn;
+         %if;cell.is_left;%right;
+         %elseif;cell.is_right;%left;
+         %else;center%end;">%nn;
+      %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+      %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+      %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+      %else;|%end;
+      </td>
+    %end;
+    </tr>
+  %end;
+%end;
+
+%define;zouip()
+  <tr align="left">
+  %foreach;cell;
+    <td colspan="%cell.colspan;" align="%nn;
+      %if;cell.is_left;%left;
+      %elseif;cell.is_right;%right;
+      %else;center%end;">
+      aaa
+    </td>
+  %end;
+  </tr>
+%end;
+
 %if;(evar.t = "T")
   %if;(evar.dag = "on")
     %empty_dag;
@@ -28,16 +129,7 @@
     <table border="%border;" width="100%%"><tr><td align="center">
       <table cellspacing="0" cellpadding="0">
       %foreach;dag_cell_line;
-        <tr align="left">
-        %foreach;cell;
-          <td colspan="%cell.colspan;" align="%nn;
-            %if;cell.is_left;%left;
-            %elseif;cell.is_right;%right;
-            %else;center%end;">
-            &nbsp;aaa&nbsp;
-          </td>
-        %end;
-        </tr>
+        %apply;zouip()
       %end;
       </table>
     </tr></tr></table>
@@ -47,91 +139,7 @@
     ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
     <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
     %foreach;ancestor_tree_line(evar.v)
-      %if;(not is_first)
-        <tr>
-        %foreach;cell;
-          %if;(not is_first)
-            <td colspan="1" align="center"><tt>&nbsp;</tt></td>
-          %end;
-          <td colspan="%cell.colspan;" align="center">%nn;
-            %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;|%end;
-          </td>
-        %end;
-        </tr>
-      %end;
-      <tr>
-      %foreach;cell;
-        %if;(not is_first)
-          <td colspan="1" align="center"><tt>&nbsp;</tt></td>
-        %end;
-        <td colspan="%cell.colspan;" align="center">%nn;
-        %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
-        %else;
-          %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
-            <table border="%evar.bd;"><tr>
-            <td align="center"%nn;
-             %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
-          %end;
-          %if;(evar.cgl = "on")%cell.person;
-          %else;
-            <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
-          %end;
-          %cell.person.dates;
-          %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
-            </td>
-            </tr></table>
-          %end;
-          %if;(evar.image = "on" and cell.person.has_image)
-            <br%/>
-            <table border="0" align="center"><tr align="left">
-            <td>%nn;
-            %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
-            <img%sp;
-            src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
-             border="0" alt="[image/images]0"%/>%nn;
-            %if;(evar.cgl != "on")</a>%end;</td>%nl;
-            </tr></table>
-          %end;
-        %end;
-        </td>
-      %end;
-      </tr>
-      %if;(not is_last)
-        <tr>
-        %foreach;cell;
-          %if;(not is_first)
-            <td colspan="1" align="center"><tt>&nbsp;</tt></td>
-          %end;
-          <td colspan="%cell.colspan;" align="center">%nn;
-          %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-          %elseif;(evar.cgl = "on")|%nn;
-          %else;
-            <a style="text-decoration:none" href="%prefix;
-            m=A;t=T;v=%evar.v;;%cell.person.access;">|</a>%nn;
-          %end;
-          </td>
-        %end;
-        </tr>
-        <tr>
-        %foreach;cell;
-          %if;(not is_first)
-            <td colspan="1" align="center">%nn;
-            %if;(cell.is_right)<hr width="100%%"%/>%nn;
-            %else;<tt>&nbsp;</tt>%end;
-            </td>
-          %end;
-          <td colspan="%cell.colspan;" align="%nn;
-             %if;cell.is_left;%right;
-             %elseif;cell.is_right;%left;
-             %else;center%end;">%nn;
-          %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-          %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
-          %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
-          %else;|%end;
-          </td>
-        %end;
-        </tr>
-      %end;
+      %apply;blibop()
     %end;
     </table>
   %end;
