@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.130 2005-05-29 06:34:42 ddr Exp $ *)
+(* $Id: perso.ml,v 4.131 2005-05-30 04:16:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -572,6 +572,7 @@ type env =
   | Vcell of cell
   | Vcelll of list cell
   | Vcnt of ref int
+  | Vdag of ref Dag.Pset.t
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
@@ -808,10 +809,14 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
               | _ -> "" ]
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
+  | "empty_dag" ->
+      match get_env "dag" env with
+      [ Vdag d -> do { d.val := Dag.Pset.empty; "" }
+      | _ -> raise Not_found ]
   | "empty_sorted_list" ->
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.empty; "" }
-      | _ -> "" ]
+      | _ -> raise Not_found ]
   | "family_cnt" -> string_of_int_env "family_cnt" env
   | "first_name_alias" ->
       match get_env "first_name_alias" env with
@@ -1101,13 +1106,7 @@ and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
       eval_person_field_var conf base env ep loc sl ]
 and eval_cell_field_var conf base env ep cell loc =
   fun
-  [ ["ancestor" :: sl] ->
-      match cell with
-      [ Cell p _ _ _ ->
-          let ep = make_ep conf base p.cle_index in
-          eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found ]
-  | ["colspan"] ->
+  [ ["colspan"] ->
       match cell with
       [ Empty -> VVstring "1"
       | Cell _ _ _ s -> VVstring (string_of_int s) ]
@@ -1131,6 +1130,12 @@ and eval_cell_field_var conf base env ep cell loc =
       match cell with
       [ Cell _ _ False _ -> VVbool True
       | _ -> VVbool False ]
+  | ["person" :: sl] ->
+      match cell with
+      [ Cell p _ _ _ ->
+          let ep = make_ep conf base p.cle_index in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
   fun
@@ -1829,10 +1834,15 @@ and eval_predefined_apply conf env f vl =
   match (f, vl) with
   [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
   | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
+  | ("add_in_dag", [s]) ->
+      let ip = Adef.iper_of_int (int_of_string s) in
+      match get_env "dag" env with
+      [ Vdag d -> do { d.val := Dag.Pset.add ip d.val; "" }
+      | _ -> raise Not_found ]
   | ("add_in_sorted_list", sl) ->
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
-      | _ -> "" ]
+      | _ -> raise Not_found ]
   | ("capitalize", [s]) -> capitale s
   | ("hexa", [s]) -> Util.hexa_string s
   | ("initial", [s]) ->
@@ -1982,6 +1992,7 @@ and print_simple_foreach conf base env el al ini_ep ep efam =
   | "cell" -> print_foreach_cell conf base env el al ep
   | "child" -> print_foreach_child conf base env al ep efam
   | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
+  | "dag_cell_line" -> print_foreach_dag_line conf base env el al ep
   | "descendant_level" -> print_foreach_descendant_level conf base env al ep
   | "family" -> print_foreach_family conf base env al ini_ep ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
@@ -2137,6 +2148,45 @@ and print_foreach_child conf base env al ep =
            List.iter (print_ast conf base env ep) al)
         des.children
   | _ -> () ]
+and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
+  let gen =
+    let set =
+      match get_env "dag" env with
+      [ Vdag d -> d.val
+      | _ -> raise Not_found ]
+    in
+    let d = Dag.make_dag conf base (Dag.Pset.elements set) in
+    let hts =
+      Dag.make_tree_hts conf base (fun _ -> "dag_elem_txt")
+        (fun _ -> "vbar_txt") False False False set [] d
+    in
+    List.map
+     (fun a ->
+        List.map
+          (fun (colspan, align, td) ->
+             let pos =
+               match align with
+               [ Dag2html.LeftA -> Left
+               | Dag2html.RightA -> Right
+               | Dag2html.CenterA -> Center ]
+             in
+             let top = False in
+             Cell p pos top colspan)
+          (Array.to_list a))
+     (Array.to_list hts)
+  in
+  loop True gen where rec loop first =
+    fun
+    [ [g :: gl] ->
+        let env =
+          [("celll", Vcelll g); ("first", Vbool first);
+           ("last", Vbool (gl = [])) :: env]
+        in
+        do {
+          List.iter (print_ast conf base env ep) al;
+          loop False gl
+        }
+    | [] -> () ]
 and print_foreach_descendant_level conf base env al ep =
   let max_level =
     match get_env "max_desc_level" env with
@@ -2449,6 +2499,7 @@ value interp_templ templ_fname conf base p =
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
      ("count", Vcnt (ref 0));
+     ("dag", Vdag (ref Dag.Pset.empty));
      ("list", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));
