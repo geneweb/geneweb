@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.134 2005-05-30 22:41:27 ddr Exp $ *)
+(* $Id: perso.ml,v 4.135 2005-05-31 01:24:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1151,6 +1151,10 @@ and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
       | (Dag2html.LeftA, _) -> VVstring conf.left
       | (Dag2html.CenterA, _) -> VVstring "center"
       | (Dag2html.RightA, _) -> VVstring conf.right ]
+  | ["bar_link"] ->
+      match td with
+      [ Dag2html.TDbar s -> VVstring s
+      | _ -> VVstring "" ]
   | ["colspan"] -> VVstring (string_of_int colspan)
   | ["is_bar"] ->
       match td with
@@ -1165,10 +1169,6 @@ and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
       [ Dag2html.TDhr Dag2html.RightA -> VVbool True
       | _ -> VVbool False ]
   | ["is_nothing"] -> VVbool (td = Dag2html.TDnothing)
-  | ["link"] ->
-      match td with
-      [ Dag2html.TDbar s -> VVstring s
-      | _ -> VVstring "" ]
   | ["string"] ->
       match td with
       [ Dag2html.TDstring s -> VVstring s
