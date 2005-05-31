@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.54 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.55 2005-05-31 08:25:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -973,10 +973,8 @@ value look_like_a_number s =
 
 value is_a_name_char =
   fun
-  [ 'A'..'Z' | 'a'..'z' | 'À'..'Ö' | 'Ø'..'ö' | 'ø'..'ÿ' | '0'..'9' | '-' |
-    ''' ->
-      True
-  | _ -> False ]
+  [ 'A'..'Z' | 'a'..'z' | '0'..'9' | '-' | ''' -> True
+  | c -> Char.code c > 127 ]
 ;
 
 value rec next_word_pos s i =
