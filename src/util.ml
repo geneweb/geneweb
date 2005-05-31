@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.134 2005-05-25 00:55:26 ddr Exp $ *)
+(* $Id: util.ml,v 4.135 2005-05-31 08:25:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -93,7 +93,8 @@ value rec capitale_utf_8 s =
 ;
 
 value index_of_next_char s i =
-  if Gutil.utf_8_db.val then min (String.length s) (i + Gutil.nbc s.[i])
+  if Gutil.utf_8_db.val then
+    min (String.length s) (i + min 1 (Gutil.nbc s.[i]))
   else i + 1
 ;
 
