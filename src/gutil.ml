@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.38 2005-05-05 17:11:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.39 2005-05-31 07:39:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1082,7 +1082,7 @@ value utf_8_alphab_value s i =
   else
     match Char.code c with
     [ 0xC3 ->
-        if i = String.length s then (c, i + 1)
+        if i = String.length s - 1 then (c, i + 1)
         else
           match Char.code s.[i+1] with
           [ 0x80 | 0x81 | 0x82 | 0x83 | 0x84 | 0x85 | 0x86 -> ('A', i + 2)
