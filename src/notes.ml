@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.10 2005-06-01 13:38:38 ddr Exp $ *)
+(* $Id: notes.ml,v 4.11 2005-06-01 16:05:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,25 +15,29 @@ value html_of_structure s =
   in
   let (_, _, _, _, index) =
     List.fold_left
-      (fun (prev_lev, num, prev_nums, cnt, index) s ->
+      (fun (prev_lev, num, nums, cnt, index) s ->
          let len = String.length s in
          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
            let lev =
              if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
-               if len > 6 && s.[1] = '=' && s.[len-3] = '=' then 3
+               if len > 6 && s.[2] = '=' && s.[len-3] = '=' then
+                 if len > 8 && s.[3] = '=' && s.[len-4] = '=' then 4
+                 else 3
                else 2
              else 1
            in             
            let (num, nums) =
-             if lev > prev_lev then
-               (0, [num :: prev_nums])
-             else if lev < prev_lev then
-               (List.hd prev_nums + 1, List.tl prev_nums)
-             else (num + 1, prev_nums)
+             if lev > prev_lev then (0, [num :: nums])
+             else if lev < prev_lev then (List.hd nums + 1, List.tl nums)
+             else (num + 1, nums)
            in
            let s =
-             Printf.sprintf "<li><a href=\"#a_%d\">%d %s</a></li>" cnt
-               (num + 1) (String.sub s lev (len - 2 * lev))
+             let inx =
+               List.tl
+                 (List.rev_map (fun x -> string_of_int (x + 1)) [num :: nums])
+             in
+             Printf.sprintf "<li><a href=\"#a_%d\">%s %s</a></li>" cnt
+               (String.concat "." inx) (String.sub s lev (len - 2 * lev))
            in
            let index =
              if lev > prev_lev then
@@ -43,7 +47,7 @@ value html_of_structure s =
              else [s :: index]
            in
            (lev, num, nums, cnt + 1, index)
-         else (prev_lev, num, prev_nums, cnt, index))
+         else (prev_lev, num, nums, cnt, index))
       (0, 0, [], 0, []) lines
   in
   let index =
@@ -62,7 +66,9 @@ value html_of_structure s =
          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
            let lev = 
              if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
-               if len > 6 && s.[1] = '=' && s.[len-3] = '=' then 3
+               if len > 6 && s.[2] = '=' && s.[len-3] = '=' then
+                 if len > 8 && s.[3] = '=' && s.[len-4] = '=' then 4
+                 else 3
                else 2
              else 1
            in
