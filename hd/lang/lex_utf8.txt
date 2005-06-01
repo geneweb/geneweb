@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.40 2005-05-29 14:13:54 ddr Exp $
+# $Id: lex_utf8.txt,v 1.41 2005-06-01 08:48:35 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5582,6 +5582,7 @@ cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
+fi: kuun kierto/uusi kuu/ensimmäinen neljännes/täysikuu/viimeinen neljännes
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
 he: גיל הירח/ירח חדש/רביע ראשון/ירח מלא/רביע אחרון
 is: tunglaldur/nýtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
