@@ -1,12 +1,51 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.11 2005-06-01 16:05:47 ddr Exp $ *)
+(* $Id: notes.ml,v 4.12 2005-06-01 20:34:37 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
 
-value html_of_structure s =
+value linkify conf s =
+  let slen = String.length s in
+  loop 0 0 where rec loop i len =
+    if i = slen then Buff.get len
+    else if i < slen - 1 && s.[i] = '[' && s.[i+1] = '[' then
+      let j =
+        loop (i + 2) where rec loop j =
+          if j = slen then j
+          else if j < slen - 1 && s.[j] = ']' && s.[j+1] = ']' then j + 2
+          else loop (j + 1)
+      in
+      let t =
+        let b = String.sub s (i + 2) (j - i - 4) in
+        try
+          let k = 0 in
+          let l = String.index_from b k '|'in
+          let fn = String.sub b k (l - k) in
+          let k = l + 1 in
+          let l = String.index_from b k '|'in
+          let sn = String.sub b k (l - k) in
+          let (oc, name) =
+            try
+              let k = l + 1 in
+              let l = String.index_from b k '|' in
+              let x = String.sub b k (l - k) in
+              (x, String.sub b (l + 1) (String.length b - l - 1))
+            with
+            [ Not_found ->
+                ("", String.sub b (l + 1) (String.length b - l - 1)) ]
+          in
+          Printf.sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
+            fn sn (if oc = "" then "" else ";oc=" ^ oc) name
+        with
+        [ Scanf.Scan_failure _ -> "[[" ^ b ^ "]]" ]
+      in
+      loop j (Buff.mstore len t)
+    else loop (i + 1) (Buff.store len s.[i])
+;
+
+value html_of_structure conf s =
   let lines =
     loop [] 0 0 where rec loop lines len i =
       if i = String.length s then List.rev lines
@@ -52,14 +91,28 @@ value html_of_structure s =
   in
   let index =
     if index <> [] then
-      ["<table border=\"1\"><tr><td>"; "<table><tr><td>" ::
+      ["<dl><dd>";
+       "<table border=\"1\"><tr><td>";
+       "<table><tr>";
+       "<td align=\"center\"><b>" ^ capitale (transl conf "summary") ^
+         "</b></td>";
+       "</tr><tr><td>" ::
        List.rev_append index
          ["</ul>"; "</td><td>";
           "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
-          "</td></tr></table"; "</td></tr></table>"]]
+          "</td></tr></table"; "</td></tr></table>";
+          "</dd></dl>"]]
     else []
   in
-  let (lines, _) =
+  let (lines_before_index, lines) =
+    loop [] lines where rec loop lines_bef =
+      fun
+      [ [s :: sl] ->
+          if String.length s > 1 && s.[0] = '=' then (lines_bef, [s :: sl])
+          else loop [s :: lines_bef] sl
+      | [] -> (lines_bef, []) ]
+  in
+  let (lines_after_index, _) =
     List.fold_left
       (fun (lines, cnt) s ->
          let len = String.length s in
@@ -73,19 +126,29 @@ value html_of_structure s =
              else 1
            in
            let s =
-             Printf.sprintf "<h%d>%s</h%d>" lev
-               (String.sub s lev (len-2*lev)) lev
+             Printf.sprintf "<h%d>%s%s</h%d>" lev
+               (String.sub s lev (len-2*lev))
+               (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
            in
-           let n =
-             Printf.sprintf "&nbsp;<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
+           let n1 =
+             if conf.wizard && False (* not implemented *) then
+               Printf.sprintf
+                 "<div style=\"float:right;margin-left:5px\">\
+                  [<a href=\"%sm=MOD_NOTES;v=%d\">%s</a>]</div>"
+                 (commd conf) cnt (transl_decline conf "modify" "")
+             else ""
+           in
+           let n2 =
+             Printf.sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
                cnt cnt
            in
-           ([s; n :: lines], cnt + 1)
+           ([s; n2; n1 :: lines], cnt + 1)
          else ([s :: lines], cnt))
       ([], 0) lines
   in
+  linkify conf (String.concat "\n" (List.rev lines_before_index)) ^
   String.concat "\n" index ^ "\n" ^
-  String.concat "\n" (List.rev lines)
+  linkify conf (String.concat "\n" (List.rev lines_after_index))
 ;
 
 value print conf base =
@@ -94,7 +157,7 @@ value print conf base =
       (capitale (nominative (transl_nth conf "note/notes" 1))) conf.bname
   in
   let s = base.data.bnotes.nread 0 in
-  let s = html_of_structure s in
+  let s = html_of_structure conf s in
   do {
     header_no_page_title conf title;
     print_link_to_welcome conf False;
@@ -119,7 +182,7 @@ value print_mod conf base =
         xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_NOTES_OK\"";
         let digest = Iovalue.digest s in
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
-        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"70\"" begin
+        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"110\"" begin
           if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
         end;
       end;
