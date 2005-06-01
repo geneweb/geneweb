@@ -1,10 +1,86 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.9 2004-12-28 15:13:01 ddr Exp $ *)
+(* $Id: notes.ml,v 4.10 2005-06-01 13:38:38 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+
+value html_of_structure s =
+  let lines =
+    loop [] 0 0 where rec loop lines len i =
+      if i = String.length s then List.rev lines
+      else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
+      else loop lines (Buff.store len s.[i]) (i + 1)
+  in
+  let (_, _, _, _, index) =
+    List.fold_left
+      (fun (prev_lev, num, prev_nums, cnt, index) s ->
+         let len = String.length s in
+         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+           let lev =
+             if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
+               if len > 6 && s.[1] = '=' && s.[len-3] = '=' then 3
+               else 2
+             else 1
+           in             
+           let (num, nums) =
+             if lev > prev_lev then
+               (0, [num :: prev_nums])
+             else if lev < prev_lev then
+               (List.hd prev_nums + 1, List.tl prev_nums)
+             else (num + 1, prev_nums)
+           in
+           let s =
+             Printf.sprintf "<li><a href=\"#a_%d\">%d %s</a></li>" cnt
+               (num + 1) (String.sub s lev (len - 2 * lev))
+           in
+           let index =
+             if lev > prev_lev then
+               [s; "<ul style=\"list-style:none\">" :: index]
+             else if lev < prev_lev then
+               [s; "</ul>" :: index]
+             else [s :: index]
+           in
+           (lev, num, nums, cnt + 1, index)
+         else (prev_lev, num, prev_nums, cnt, index))
+      (0, 0, [], 0, []) lines
+  in
+  let index =
+    if index <> [] then
+      ["<table border=\"1\"><tr><td>"; "<table><tr><td>" ::
+       List.rev_append index
+         ["</ul>"; "</td><td>";
+          "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
+          "</td></tr></table"; "</td></tr></table>"]]
+    else []
+  in
+  let (lines, _) =
+    List.fold_left
+      (fun (lines, cnt) s ->
+         let len = String.length s in
+         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+           let lev = 
+             if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
+               if len > 6 && s.[1] = '=' && s.[len-3] = '=' then 3
+               else 2
+             else 1
+           in
+           let s =
+             Printf.sprintf "<h%d>%s</h%d>" lev
+               (String.sub s lev (len-2*lev)) lev
+           in
+           let n =
+             Printf.sprintf "&nbsp;<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
+               cnt cnt
+           in
+           ([s; n :: lines], cnt + 1)
+         else ([s :: lines], cnt))
+      ([], 0) lines
+  in
+  String.concat "\n" index ^ "\n" ^
+  String.concat "\n" (List.rev lines)
+;
 
 value print conf base =
   let title _ =
@@ -12,6 +88,7 @@ value print conf base =
       (capitale (nominative (transl_nth conf "note/notes" 1))) conf.bname
   in
   let s = base.data.bnotes.nread 0 in
+  let s = html_of_structure s in
   do {
     header_no_page_title conf title;
     print_link_to_welcome conf False;
