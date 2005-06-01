@@ -1,7 +1,7 @@
-%doctype_transitional;
+%if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.11 2005-05-31 01:24:18 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.12 2005-06-01 09:52:53 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*tree]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -156,6 +156,7 @@
     %end;
     </table>
   %end;
+%elseif;(evar.t = "A")
 %end;
 
 <div>

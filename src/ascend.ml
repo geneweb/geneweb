@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.71 2005-05-26 09:58:38 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.72 2005-06-01 09:52:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -14,11 +14,13 @@ value limit_by_list conf =
   | None -> 8 ]
 ;
 
+(**)
 value limit_by_tree conf =
   match p_getint conf.base_env "max_anc_tree" with
   [ Some x -> max 1 x
   | None -> 7 ]
 ;
+(**)
 
 value text_to conf =
   fun
@@ -104,8 +106,7 @@ value display_ancestors_upto conf base max_level p =
   }
 ;
 
-(* ... short / long display / missing ancestors / ancestors up to
-   ... begin *)
+(* ... begin ... short/long/missing/up to/tree *)
 
 (* Print ancestors with numbers.
    The mark table holds the number of the ancestor after it has been
@@ -1412,9 +1413,6 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   }
 ;
 
-(* ... end
-   ... short / long display / missing ancestors / ancestors up to *)
-
 value tree_reference gv bd color conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
@@ -1720,6 +1718,8 @@ value print_tree conf base v p =
     Dag.gen_print_dag conf base False True set [] d
   else print_normal_tree conf base v p
 ;
+
+(* ... end ... short/long/missing/up to/tree *)
 
 value no_spaces s =
   loop 0 0 where rec loop len i =
@@ -2038,6 +2038,7 @@ value print_surnames_list conf base v p =
 
 value ancmenu_print = Perso.interp_templ "ancmenu";
 value anclist_print = Perso.interp_templ "anclist";
+value anctree_print = Perso.interp_templ "anctree";
 
 value print_old conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
@@ -2095,7 +2096,12 @@ value print conf base p =
   | (Some "N", Some v) -> anclist_print conf base p
   | (Some "G", Some v) -> anclist_print conf base p
   | (Some "M", Some v) -> anclist_print conf base p
-  | (Some "T", Some v) -> print_tree conf base v p
+  | (Some "T", Some v) ->
+(**)
+      print_tree conf base v p
+(*
+      anctree_print conf base p
+*)
   | (Some "H", Some v) -> print_horizontally conf base v p
   | (Some "A", Some v) -> print_male_line conf base v p
   | (Some "C", Some v) -> print_female_line conf base v p
