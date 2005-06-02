@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.14 2005-06-02 16:43:02 ddr Exp $ *)
+(* $Id: history.ml,v 4.15 2005-06-02 20:03:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -40,7 +40,8 @@ value record conf base ind action =
             conf.today.year conf.today.month conf.today.day hh mm ss conf.user
             action
             (match ind with
-             [ Some (fn, sn, occ) -> " " ^ fn ^ string_of_int occ ^ " " ^ sn
+             [ Some (fn, sn, occ) ->
+                 " " ^ fn ^ "." ^ string_of_int occ ^ " " ^ sn
              | None -> "" ]);
           close_out oc;
         }

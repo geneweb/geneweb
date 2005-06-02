@@ -1,12 +1,32 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.21 2005-06-02 18:58:13 ddr Exp $ *)
+(* $Id: notes.ml,v 4.22 2005-06-02 20:01:51 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
 
-value linkify conf s =
+value rec rev_syntax_lists list =
+  fun
+  [ [s :: rsl] ->
+      if String.length s > 0 && s.[0] = '*' then rev_syntax_ul list [s :: rsl]
+      else rev_syntax_lists [s :: list] rsl
+  | [] -> list ]
+and rev_syntax_ul list rsl =
+  let (list, rest) =
+    loop ["</ul>" :: list] rsl where rec loop list =
+      fun
+      [ [s :: rsl] ->
+          let len = String.length s in
+          if len > 0 && s.[0] = '*' then
+            loop ["<li>" ^ String.sub s 1 (len - 1) ^ "</li>" :: list] rsl
+          else (list, rsl)
+      | [] -> (list, []) ]
+  in
+  rev_syntax_lists ["<ul>" :: list] rest
+;
+
+value syntax_links conf s =
   let slen = String.length s in
   loop 0 0 where rec loop i len =
     if i = slen then Buff.get len
@@ -191,7 +211,7 @@ value html_of_structure conf s =
           "</dd></dl>"]]
     else []
   in
-  let (lines_before_index, lines) =
+  let (rev_lines_before_index, lines) =
     loop [] lines where rec loop lines_bef =
       fun
       [ [s :: sl] ->
@@ -199,7 +219,7 @@ value html_of_structure conf s =
           else loop [s :: lines_bef] sl
       | [] -> (lines_bef, []) ]
   in
-  let (lines_after_index, _) =
+  let (rev_lines_after_index, _) =
     List.fold_left
       (fun (lines, cnt) s ->
          let len = String.length s in
@@ -226,11 +246,12 @@ value html_of_structure conf s =
          else ([s :: lines], cnt))
       ([], 0) lines
   in
+  let lines_before_index = rev_syntax_lists [] rev_lines_before_index in
+  let lines_after_index = rev_syntax_lists [] rev_lines_after_index in
   let s =
-    linkify conf
+    syntax_links conf
       (String.concat "\n"
-        (List.rev_append lines_before_index
-          (index @ List.rev lines_after_index)))
+        (lines_before_index @ index @ lines_after_index))
   in
   if conf.wizard then
     Printf.sprintf "%s[<a href=\"%sm=MOD_NOTES\">%s</a>]%s\n"
