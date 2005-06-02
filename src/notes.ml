@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.18 2005-06-02 12:01:45 ddr Exp $ *)
+(* $Id: notes.ml,v 4.19 2005-06-02 16:23:12 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -124,61 +124,55 @@ value html_of_structure conf s =
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
-          let fs stack =
+          let (index, lev, stack) =
+            loop index lev indent_stack where rec loop index lev stack =
+              match stack with
+              [ [(prev_num, prev_slev) :: rest_stack] ->
+                  if slev < prev_slev then
+                    match rest_stack with
+                    [ [(_, prev_prev_slev) :: _] ->
+                        if slev > prev_prev_slev then
+                          let stack = [(prev_num + 1, slev) :: rest_stack] in
+                          loop index lev stack
+                        else
+                          let index = [tab (lev - 1) ^ "</li>" :: index] in
+                          let index = [tab (lev - 1) ^ "</ul>" :: index] in
+                          loop index (lev - 1) rest_stack
+                    | [] ->
+                        let index = [tab (lev - 1) ^ "</li>" :: index] in
+                        let stack = [(prev_num + 1, slev) :: rest_stack] in
+                        (index, lev - 1, stack) ]
+                  else if slev = prev_slev then
+                    let index = [tab (lev - 1) ^ "</li>" :: index] in
+                    let stack = [(prev_num + 1, slev) :: rest_stack] in
+                    (index, lev - 1, stack)
+                  else
+                    let index = [tab lev ^ ul :: index] in
+                    let stack = [(1, slev) :: stack] in
+                    (index, lev, stack)
+              | [] ->
+                  let index = [tab lev ^ ul :: index] in
+                  let stack = [(1, slev) :: stack] in
+                  (index, lev, stack) ]
+          in
+          let index = [tab lev ^ "<li>" :: index] in
+          let s =
             let nums = List.map fst stack in
             Printf.sprintf "<a href=\"#a_%d\">%s %s</a>"
               cnt (String.concat "." (List.rev_map string_of_int nums))
               (String.sub s slev (len - 2 * slev))
           in
-          match indent_stack with
-          [ [(prev_num, prev_slev) :: rest_stack] ->
-              if slev > prev_slev then
-                let stack = [(1, slev) :: indent_stack] in
-                let index = [tab (lev + 1) ^ ul :: index] in
-                let index = [tab (lev + 1) ^ "<li>" ^ fs stack :: index] in
-                (index, lev + 1, stack, cnt + 1)
-              else if slev < prev_slev then
-                loop index lev indent_stack
-                where rec loop index lev =
-                  fun
-                  [ [(prev_num, prev_slev) :: stack] ->
-                      let index = [tab lev ^ "</li>" :: index] in
-                      if slev < prev_slev then
-                        match stack with
-                        [ [(_, prev_prev_slev) :: _] ->
-                            if slev > prev_prev_slev then
-                        let stack = [(prev_num + 1, slev) :: stack] in
-                        let index = [tab lev ^ "<li>blibope" ^ fs stack :: index] in
-                        (index, lev, stack, cnt + 1)
-                            else
-                              let index = [tab lev ^ "</ul>" :: index] in
-                              loop index (lev - 1) stack
-                        | [] ->
-                            let stack = [(prev_num + 1, slev) :: stack] in
-                            let index = [tab lev ^ "<li>" ^ fs stack :: index] in
-                            (index, lev, stack, cnt + 1) ]
-                      else
-                        let stack = [(prev_num + 1, slev) :: stack] in
-                        let index = [tab lev ^ "<li>" ^ fs stack :: index] in
-                        (index, lev, stack, cnt + 1)
-                  | _ -> assert False ]
-              else
-                let stack = [(prev_num + 1, lev) :: rest_stack] in
-                let index = [tab lev ^ "</li>" :: index] in
-                let index = [tab lev ^ "<li>" ^ fs stack :: index] in
-                (index, lev, stack, cnt + 1)
-          | [] ->
-              let stack = [(1, slev)] in
-              let index = [tab 1 ^ ul :: index] in
-              let index = [tab 1 ^ "<li>" ^ fs stack :: index] in
-              (index, 1, stack, 1) ]
+          let index = [tab (lev + 1) ^ s :: index] in
+          (index, lev + 1, stack, cnt + 1)
         else (index, lev, indent_stack, cnt))
       ([], 0, [], 0) lines
   in
   let rev_index =
     loop lev rev_index where rec loop lev index =
       if lev > 0 then
-        loop (lev - 1) [tab lev ^ "</ul>"; tab lev ^ "</li>" :: index]
+        let index = [tab (lev - 1) ^ "</li>" :: index] in
+        let index = [tab (lev - 1) ^ "</ul>" :: index] in
+        loop (lev - 1) index
       else index
   in
   let index =
@@ -227,17 +221,23 @@ value html_of_structure conf s =
              Printf.sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
                cnt cnt
            in
-           ([s; n2; n1 :: lines], cnt + 1)
+           ([s; n1; n2 :: lines], cnt + 1)
          else ([s :: lines], cnt))
       ([], 0) lines
   in
-  Printf.sprintf
-    "<div style=\"float:right;margin-left:5px\">\
-     [<a href=\"%sm=MOD_NOTES\">%s</a>]</div>"
-    (commd conf) (transl_decline conf "modify" "") ^
-  linkify conf (String.concat "\n" (List.rev lines_before_index)) ^
-  String.concat "\n" index ^ "\n" ^
-  linkify conf (String.concat "\n" (List.rev lines_after_index))
+  let s =
+    linkify conf
+      (String.concat "\n"
+        (List.rev_append lines_before_index
+          (index @ List.rev lines_after_index)))
+  in
+  if conf.wizard then
+    Printf.sprintf "%s[<a href=\"%sm=MOD_NOTES\">%s</a>]%s\n"
+      (if s = "" then "<p>" else "<div style=\"float:right;margin-left:5px\">")
+      (commd conf) (transl_decline conf "modify" "")
+      (if s = "" then "</p>" else "</div>") ^
+    s
+  else s
 ;
 
 value print conf base =
