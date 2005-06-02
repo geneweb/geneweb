@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.15 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.16 2005-06-02 16:43:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -271,7 +271,7 @@ value print_change_ok conf base p u =
       List.iter (change_child conf base parent_surname) ipl;
       Util.commit_patches conf base;
       let key = (sou base p.first_name, sou base p.surname, p.occ) in
-      History.record conf base key "cn";
+      History.record conf base (Some key) "cn";
       print_change_done conf base p u;
     }
   with

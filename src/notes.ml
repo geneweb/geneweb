@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.19 2005-06-02 16:23:12 ddr Exp $ *)
+(* $Id: notes.ml,v 4.20 2005-06-02 16:43:02 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -302,6 +302,7 @@ value print_ok conf base =
     print_link_to_welcome conf True;
     Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>" (commd conf)
       (capitale (transl_nth conf "note/notes" 1));
+    History.record conf base None "mn";
     trailer conf
   }
 ;

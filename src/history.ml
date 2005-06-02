@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.13 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: history.ml,v 4.14 2005-06-02 16:43:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -21,7 +21,7 @@ value ext_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
 ;
 
-value record conf base (fn, sn, occ) action =
+value record conf base ind action =
   let do_it =
     match p_getenv conf.base_env "history" with
     [ Some "yes" -> True
@@ -36,9 +36,12 @@ value record conf base (fn, sn, occ) action =
     [ Some oc ->
         let (hh, mm, ss) = conf.time in
         do {
-          Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s.%d %s\n"
+          Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s%s\n"
             conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-            action fn occ sn;
+            action
+            (match ind with
+             [ Some (fn, sn, occ) -> " " ^ fn ^ string_of_int occ ^ " " ^ sn
+             | None -> "" ]);
           close_out oc;
         }
     | None -> () ]
@@ -102,6 +105,7 @@ value action_text conf =
   | "ff" -> transl_decline conf "merge" (transl_nth conf "family/families" 1)
   | "cn" -> transl conf "change children's names"
   | "aa" -> transl_decline conf "add" (transl conf "parents")
+  | "mn" -> transl_decline conf "modify" (transl_nth conf "note/notes" 1)
   | x -> x ]
 ;
 
@@ -117,19 +121,26 @@ value line_fields line =
       | _ -> ("", 20) ]
     in
     let action = String.sub line i 2 in
-    let key = String.sub line (i + 3) (String.length line - i - 3) in
+    let key =
+      let i = i + 3 in
+      if i >= String.length line then None
+      else Some (String.sub line i (String.length line - i))
+    in
     Some (time, user, action, key)
   else None
 ;
 
 value print_history_line conf base line wiz k i =
   match line_fields line with
-  [ Some (time, user, action, key) ->
+  [ Some (time, user, action, keyo) ->
       if wiz = "" || user = wiz then do {
         let po =
-          match person_ht_find_all base key with
-          [ [ip] -> Some (pget conf base ip)
-          | _ -> None ]
+          match keyo with
+          [ Some key ->
+              match person_ht_find_all base key with
+              [ [ip] -> Some (pget conf base ip)
+              | _ -> None ]
+          | None -> None ]
         in
         let not_displayed =
           match po with
@@ -156,16 +167,19 @@ value print_history_line conf base line wiz k i =
             else ();
           end;
           stagn "dd" begin
-            match po with
-            [ Some p ->
-                do {
-                  Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
-                   (p_surname base p) p.occ;
-                  Wserver.wprint "%s"
-                    (referenced_person_title_text conf base p);
-                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                }
-            | None -> Wserver.wprint "%s" key ];
+            match keyo with
+            [ Some key ->
+                match po with
+                 [ Some p ->
+                    do {
+                      Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
+                        (p_surname base p) p.occ;
+                      Wserver.wprint "%s"
+                        (referenced_person_title_text conf base p);
+                      Wserver.wprint "%s" (Date.short_dates_text conf base p);
+                    }
+                | None -> Wserver.wprint "%s" key ]
+            | None -> Wserver.wprint "..." ];
           end;
           i + 1
         }
