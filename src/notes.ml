@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.12 2005-06-01 20:34:37 ddr Exp $ *)
+(* $Id: notes.ml,v 4.13 2005-06-02 04:34:11 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -45,10 +45,74 @@ value linkify conf s =
     else loop (i + 1) (Buff.store len s.[i])
 ;
 
+value level_of_line s len =
+  if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
+    if len > 6 && s.[2] = '=' && s.[len-3] = '=' then
+      if len > 8 && s.[3] = '=' && s.[len-4] = '=' then 4
+      else 3
+    else 2
+  else 1
+;
+
+value insert_sub_part s v sub_part =
+  let lines =
+    loop [] 0 0 where rec loop lines len i =
+      if i = String.length s then
+        List.rev (if len = 0 then lines else [Buff.get len :: lines])
+      else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
+      else loop lines (Buff.store len s.[i]) (i + 1)
+  in
+  let (lines, sl) =
+    loop [] 0 0 lines where rec loop lines lev cnt =
+      fun
+      [ [s :: sl] ->
+          let len = String.length s in
+          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+            let nlev = level_of_line s len in
+            if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
+            else if cnt > v then
+              if nlev > lev then loop lines lev (cnt + 1) sl
+              else (lines, [s :: sl])
+            else loop [s :: lines] lev (cnt + 1) sl
+          else if cnt <= v then loop [s :: lines] lev cnt sl
+          else loop lines lev cnt sl
+      | [] -> (lines, []) ]
+  in
+  String.concat "\n" (List.rev_append lines sl)
+;
+
+value extract_sub_part s v =
+  let lines =
+    loop [] 0 0 where rec loop lines len i =
+      if i = String.length s then
+        List.rev (if len = 0 then lines else [Buff.get len :: lines])
+      else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
+      else loop lines (Buff.store len s.[i]) (i + 1)
+  in
+  let lines =
+    loop [] 0 0 lines where rec loop lines lev cnt =
+      fun
+      [ [s :: sl] ->
+          let len = String.length s in
+          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+            let nlev = level_of_line s len in
+            if cnt = v then loop [s :: lines] nlev (cnt + 1) sl
+            else if cnt > v then
+              if nlev > lev then loop [s :: lines] lev (cnt + 1) sl
+              else lines
+            else loop lines lev (cnt + 1) sl
+          else if cnt <= v then loop lines lev cnt sl
+          else loop [s :: lines] lev cnt sl
+      | [] -> lines ]
+  in
+  String.concat "\n" (List.rev lines)
+;
+
 value html_of_structure conf s =
   let lines =
     loop [] 0 0 where rec loop lines len i =
-      if i = String.length s then List.rev lines
+      if i = String.length s then
+        List.rev (if len = 0 then lines else [Buff.get len :: lines])
       else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
       else loop lines (Buff.store len s.[i]) (i + 1)
   in
@@ -57,14 +121,7 @@ value html_of_structure conf s =
       (fun (prev_lev, num, nums, cnt, index) s ->
          let len = String.length s in
          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-           let lev =
-             if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
-               if len > 6 && s.[2] = '=' && s.[len-3] = '=' then
-                 if len > 8 && s.[3] = '=' && s.[len-4] = '=' then 4
-                 else 3
-               else 2
-             else 1
-           in             
+           let lev = level_of_line s len in
            let (num, nums) =
              if lev > prev_lev then (0, [num :: nums])
              else if lev < prev_lev then (List.hd nums + 1, List.tl nums)
@@ -79,10 +136,21 @@ value html_of_structure conf s =
                (String.concat "." inx) (String.sub s lev (len - 2 * lev))
            in
            let index =
+             let ul = "<ul style=\"list-style:none\">" in
              if lev > prev_lev then
-               [s; "<ul style=\"list-style:none\">" :: index]
+               let sl =
+                 loop (lev - 1) [ul :: index] where rec loop lev sl =
+                   if lev <= prev_lev then sl
+                   else loop (lev - 1) [ul; "<li>" :: sl]
+               in
+               [s :: sl]
              else if lev < prev_lev then
-               [s; "</ul>" :: index]
+               let sl =
+                 loop (lev + 1) index where rec loop lev sl =
+                   if lev >= prev_lev then ["</ul>" :: sl]
+                   else loop (lev + 1) ["</li>"; "</ul>" :: sl]
+               in
+               [s :: sl]
              else [s :: index]
            in
            (lev, num, nums, cnt + 1, index)
@@ -117,21 +185,14 @@ value html_of_structure conf s =
       (fun (lines, cnt) s ->
          let len = String.length s in
          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-           let lev = 
-             if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
-               if len > 6 && s.[2] = '=' && s.[len-3] = '=' then
-                 if len > 8 && s.[3] = '=' && s.[len-4] = '=' then 4
-                 else 3
-               else 2
-             else 1
-           in
+           let lev = level_of_line s len in
            let s =
              Printf.sprintf "<h%d>%s%s</h%d>" lev
                (String.sub s lev (len-2*lev))
                (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
            in
            let n1 =
-             if conf.wizard && False (* not implemented *) then
+             if conf.wizard then
                Printf.sprintf
                  "<div style=\"float:right;margin-left:5px\">\
                   [<a href=\"%sm=MOD_NOTES;v=%d\">%s</a>]</div>"
@@ -146,6 +207,10 @@ value html_of_structure conf s =
          else ([s :: lines], cnt))
       ([], 0) lines
   in
+  Printf.sprintf
+    "<div style=\"float:right;margin-left:5px\">\
+     [<a href=\"%sm=MOD_NOTES\">%s</a>]</div>"
+    (commd conf) (transl_decline conf "modify" "") ^
   linkify conf (String.concat "\n" (List.rev lines_before_index)) ^
   String.concat "\n" index ^ "\n" ^
   linkify conf (String.concat "\n" (List.rev lines_after_index))
@@ -174,16 +239,26 @@ value print_mod conf base =
       conf.bname
   in
   let s = base.data.bnotes.nread 0 in
+  let v =
+    match p_getint conf.env "v" with
+    [ Some v -> v
+    | None -> -1 ]
+  in
+  let sub_part = if v = -1 then s else extract_sub_part s v in
   do {
     header conf title;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_NOTES_OK\"";
+        if v >= 0 then
+          xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
+        else ();
         let digest = Iovalue.digest s in
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
         stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"110\"" begin
-          if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
+          if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
+          else ();
         end;
       end;
       tag "p" begin
@@ -208,7 +283,7 @@ value print_ok conf base =
 ;
 
 value print_mod_ok conf base =
-  let s =
+  let sub_part =
     match p_getenv conf.env "notes" with
     [ Some v -> strip_all_trailing_spaces v
     | None -> failwith "notes unbound" ]
@@ -221,7 +296,13 @@ value print_mod_ok conf base =
   let old_notes = base.data.bnotes.nread 0 in
   try
     if digest <> Iovalue.digest old_notes then Update.error_digest conf base
-    else do { base.func.commit_notes s; print_ok conf base }
+    else
+      let s =
+        match p_getint conf.env "v" with
+        [ Some v -> insert_sub_part old_notes v sub_part
+        | None -> sub_part ]
+      in
+      do { base.func.commit_notes s; print_ok conf base }
   with
   [ Update.ModErr -> () ]
 ;
