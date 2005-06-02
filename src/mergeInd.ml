@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.32 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.33 2005-06-02 16:43:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -581,7 +581,7 @@ value print conf base =
                 let key =
                   (sou base p1.first_name, sou base p1.surname, p1.occ)
                 in
-                History.record conf base key "fp";
+                History.record conf base (Some key) "fp";
                 print_merged conf base p1;
               }
               else ();
@@ -638,7 +638,7 @@ value print_kill_ancestors conf base =
           do {
             kill_ancestors conf base False p nb_ind nb_fam;
             Util.commit_patches conf base;
-            History.record conf base key "ka";
+            History.record conf base (Some key) "ka";
             print_killed conf base p nb_ind.val nb_fam.val;
           }
       | None -> incorrect_request conf ]
