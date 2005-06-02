@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.20 2005-06-02 16:43:02 ddr Exp $ *)
+(* $Id: notes.ml,v 4.21 2005-06-02 18:58:13 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -21,15 +21,15 @@ value linkify conf s =
         let b = String.sub s (i + 2) (j - i - 4) in
         try
           let k = 0 in
-          let l = String.index_from b k '|'in
+          let l = String.index_from b k '/' in
           let fn = String.sub b k (l - k) in
           let k = l + 1 in
-          let l = String.index_from b k '|'in
+          let l = String.index_from b k '/' in
           let sn = String.sub b k (l - k) in
           let (oc, name) =
             try
               let k = l + 1 in
-              let l = String.index_from b k '|' in
+              let l = String.index_from b k '/' in
               let x = String.sub b k (l - k) in
               (x, String.sub b (l + 1) (String.length b - l - 1))
             with
@@ -37,9 +37,10 @@ value linkify conf s =
                 ("", String.sub b (l + 1) (String.length b - l - 1)) ]
           in
           Printf.sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
-            fn sn (if oc = "" then "" else ";oc=" ^ oc) name
+            (code_varenv fn) (code_varenv sn)
+            (if oc = "" then "" else ";oc=" ^ oc) name
         with
-        [ Scanf.Scan_failure _ -> "[[" ^ b ^ "]]" ]
+        [ Not_found -> "[[" ^ b ^ "]]" ]
       in
       loop j (Buff.mstore len t)
     else loop (i + 1) (Buff.store len s.[i])
