@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.17 2005-06-02 11:23:06 ddr Exp $ *)
+(* $Id: notes.ml,v 4.18 2005-06-02 12:01:45 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -143,23 +143,19 @@ value html_of_structure conf s =
                   fun
                   [ [(prev_num, prev_slev) :: stack] ->
                       let index = [tab lev ^ "</li>" :: index] in
-                      if slev < prev_slev then 
+                      if slev < prev_slev then
                         match stack with
                         [ [(_, prev_prev_slev) :: _] ->
                             if slev > prev_prev_slev then
-                              let stack = [(prev_num + 1, slev) :: stack] in
-                              let index =
-                                [tab lev ^ "<li>" ^ fs stack :: index]
-                              in
-                              (index, lev, stack, cnt + 1)
+                        let stack = [(prev_num + 1, slev) :: stack] in
+                        let index = [tab lev ^ "<li>blibope" ^ fs stack :: index] in
+                        (index, lev, stack, cnt + 1)
                             else
                               let index = [tab lev ^ "</ul>" :: index] in
                               loop index (lev - 1) stack
                         | [] ->
-                            let stack = [(prev_num + 1, slev)] in
-                            let index =
-                              [tab lev ^ "<li>" ^ fs stack :: index]
-                            in
+                            let stack = [(prev_num + 1, slev) :: stack] in
+                            let index = [tab lev ^ "<li>" ^ fs stack :: index] in
                             (index, lev, stack, cnt + 1) ]
                       else
                         let stack = [(prev_num + 1, slev) :: stack] in
