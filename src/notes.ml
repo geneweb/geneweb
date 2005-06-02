@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.14 2005-06-02 07:52:37 ddr Exp $ *)
+(* $Id: notes.ml,v 4.15 2005-06-02 09:44:14 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -117,9 +117,10 @@ value html_of_structure conf s =
       else loop lines (Buff.store len s.[i]) (i + 1)
   in
   let tab lev = String.make (2 * lev) ' ' in
-  let (rev_index, lev, _, _, _, _, _) =
+  let (rev_index, lev, _, _, _) =
+    let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
-      (fun (index, lev, prev_slev, slev_stack, num, nums, cnt) s ->
+      (fun (index, lev, slev_stack, nums, cnt) s ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
@@ -128,35 +129,38 @@ value html_of_structure conf s =
               cnt (String.concat "." (List.rev_map string_of_int nums))
               (String.sub s slev (len - 2 * slev))
           in
+          let prev_slev =
+            match slev_stack with
+            [ [prev_slev :: _] -> prev_slev
+            | [] -> -1 ]
+          in
           if slev > prev_slev then
-            let index = [tab (lev + 1) ^ "<ul>" :: index] in
+            let index = [tab (lev + 1) ^ ul :: index] in
             let index = [tab (lev + 1) ^ "<li>" ^ fs [1 :: nums] :: index] in
-            (index, lev + 1, slev, [prev_slev :: slev_stack], 1,
-             [num :: nums], cnt + 1)
+            (index, lev + 1, [slev :: slev_stack], [1 :: nums], cnt + 1)
           else if slev < prev_slev then
-            loop index lev num nums [prev_slev :: slev_stack]
-            where rec loop index lev num nums =
-              fun
-              [ [prev_slev :: slev_stack] ->
-                  if slev < prev_slev then
-                    if lev > 1 then
-                      let index = [tab lev ^ "</li>" :: index] in
-                      let index = [tab lev ^ "</ul>" :: index] in
-                      loop index (lev - 1) (List.hd nums) (List.tl nums) slev_stack
-                    else loop index lev num nums slev_stack
+            loop index lev nums slev_stack
+            where rec loop index lev nums slev_stack =
+              match (nums, slev_stack) with
+              [ ([prev_num :: prev_nums], [prev_slev :: slev_stack]) ->
+                  let index = [tab lev ^ "</li>" :: index] in
+                  if slev < prev_slev && lev > 1 then
+                    let index = [tab lev ^ "</ul>" :: index] in
+                    loop index (lev - 1) prev_nums slev_stack
                   else
-                    let index = [tab lev ^ "</li>" :: index] in
-                    let index = [tab lev ^ "<li>arg" ^ fs [num + 1 :: nums] :: index] in
-                    (index, lev, prev_slev, slev_stack, num + 1, nums, cnt + 1)
-              | [] ->
-                  (["not implem 3" :: index], lev, prev_slev, slev_stack, 1,
-                   [], cnt + 1) ]
+                    let nums = [prev_num + 1 :: prev_nums] in
+                    let index = [tab lev ^ "<li>" ^ fs nums :: index] in
+                    (index, lev, [slev :: slev_stack], nums, cnt + 1)
+              | _ ->
+                  (["not implem 2" :: index], lev,
+                   [prev_slev :: slev_stack], [], cnt + 1) ]
           else
+            let nums = [List.hd nums + 1 :: List.tl nums] in
             let index = [tab lev ^ "</li>" :: index] in
-            let index = [tab lev ^ "<li>" ^ fs [num + 1 :: List.tl nums] :: index] in
-            (index, lev, prev_slev, slev_stack, num + 1, [num + 1 :: List.tl nums], cnt + 1)
-        else (index, lev, prev_slev, slev_stack, num, nums, cnt))
-      ([], 0, 0, [], 1, [], 0) lines
+            let index = [tab lev ^ "<li>" ^ fs nums :: index] in
+            (index, lev, slev_stack, nums, cnt + 1)
+        else (index, lev, slev_stack, nums, cnt))
+      ([], 0, [], [], 0) lines
   in
   let rev_index =
     loop lev rev_index where rec loop lev index =
