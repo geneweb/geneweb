@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.22 2005-06-02 20:01:51 ddr Exp $ *)
+(* $Id: notes.ml,v 4.23 2005-06-02 21:08:25 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -75,14 +75,16 @@ value section_level s len =
   else 1
 ;
 
+value lines_list_of_string s =
+  loop [] 0 0 where rec loop lines len i =
+    if i = String.length s then
+      List.rev (if len = 0 then lines else [Buff.get len :: lines])
+    else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
+    else loop lines (Buff.store len s.[i]) (i + 1)
+;
+
 value insert_sub_part s v sub_part =
-  let lines =
-    loop [] 0 0 where rec loop lines len i =
-      if i = String.length s then
-        List.rev (if len = 0 then lines else [Buff.get len :: lines])
-      else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
-      else loop lines (Buff.store len s.[i]) (i + 1)
-  in
+  let lines = lines_list_of_string s in
   let (lines, sl) =
     loop [] 0 0 lines where rec loop lines lev cnt =
       fun
@@ -103,13 +105,7 @@ value insert_sub_part s v sub_part =
 ;
 
 value extract_sub_part s v =
-  let lines =
-    loop [] 0 0 where rec loop lines len i =
-      if i = String.length s then
-        List.rev (if len = 0 then lines else [Buff.get len :: lines])
-      else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
-      else loop lines (Buff.store len s.[i]) (i + 1)
-  in
+  let lines = lines_list_of_string s in
   let lines =
     loop [] 0 0 lines where rec loop lines lev cnt =
       fun
@@ -129,24 +125,17 @@ value extract_sub_part s v =
   String.concat "\n" (List.rev lines)
 ;
 
-value html_of_structure conf s =
-  let lines =
-    loop [] 0 0 where rec loop lines len i =
-      if i = String.length s then
-        List.rev (if len = 0 then lines else [Buff.get len :: lines])
-      else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
-      else loop lines (Buff.store len s.[i]) (i + 1)
-  in
+value make_summary conf lines =
   let tab lev = String.make (2 * lev) ' ' in
-  let (rev_index, lev, _, _) =
+  let (rev_summary, lev, _, _) =
     let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
-      (fun (index, lev, indent_stack, cnt) s ->
+      (fun (summary, lev, indent_stack, cnt) s ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
-          let (index, lev, stack) =
-            loop index lev indent_stack where rec loop index lev stack =
+          let (summary, lev, stack) =
+            loop summary lev indent_stack where rec loop summary lev stack =
               match stack with
               [ [(prev_num, prev_slev) :: rest_stack] ->
                   if slev < prev_slev then
@@ -154,72 +143,65 @@ value html_of_structure conf s =
                     [ [(_, prev_prev_slev) :: _] ->
                         if slev > prev_prev_slev then
                           let stack = [(prev_num + 1, slev) :: rest_stack] in
-                          loop index lev stack
+                          loop summary lev stack
                         else
-                          let index = [tab (lev - 1) ^ "</li>" :: index] in
-                          let index = [tab (lev - 1) ^ "</ul>" :: index] in
-                          loop index (lev - 1) rest_stack
+                          let summary = [tab (lev - 1) ^ "</li>" :: summary] in
+                          let summary = [tab (lev - 1) ^ "</ul>" :: summary] in
+                          loop summary (lev - 1) rest_stack
                     | [] ->
-                        let index = [tab (lev - 1) ^ "</li>" :: index] in
+                        let summary = [tab (lev - 1) ^ "</li>" :: summary] in
                         let stack = [(prev_num + 1, slev) :: rest_stack] in
-                        (index, lev - 1, stack) ]
+                        (summary, lev - 1, stack) ]
                   else if slev = prev_slev then
-                    let index = [tab (lev - 1) ^ "</li>" :: index] in
+                    let summary = [tab (lev - 1) ^ "</li>" :: summary] in
                     let stack = [(prev_num + 1, slev) :: rest_stack] in
-                    (index, lev - 1, stack)
+                    (summary, lev - 1, stack)
                   else
-                    let index = [tab lev ^ ul :: index] in
+                    let summary = [tab lev ^ ul :: summary] in
                     let stack = [(1, slev) :: stack] in
-                    (index, lev, stack)
+                    (summary, lev, stack)
               | [] ->
-                  let index = [tab lev ^ ul :: index] in
+                  let summary = [tab lev ^ ul :: summary] in
                   let stack = [(1, slev) :: stack] in
-                  (index, lev, stack) ]
+                  (summary, lev, stack) ]
           in
-          let index = [tab lev ^ "<li>" :: index] in
+          let summary = [tab lev ^ "<li>" :: summary] in
           let s =
             let nums = List.map fst stack in
             Printf.sprintf "<a href=\"#a_%d\">%s %s</a>"
               cnt (String.concat "." (List.rev_map string_of_int nums))
               (String.sub s slev (len - 2 * slev))
           in
-          let index = [tab (lev + 1) ^ s :: index] in
-          (index, lev + 1, stack, cnt + 1)
-        else (index, lev, indent_stack, cnt))
+          let summary = [tab (lev + 1) ^ s :: summary] in
+          (summary, lev + 1, stack, cnt + 1)
+        else (summary, lev, indent_stack, cnt))
       ([], 0, [], 0) lines
   in
-  let rev_index =
-    loop lev rev_index where rec loop lev index =
+  let rev_summary =
+    loop lev rev_summary where rec loop lev summary =
       if lev > 0 then
-        let index = [tab (lev - 1) ^ "</li>" :: index] in
-        let index = [tab (lev - 1) ^ "</ul>" :: index] in
-        loop (lev - 1) index
-      else index
+        let summary = [tab (lev - 1) ^ "</li>" :: summary] in
+        let summary = [tab (lev - 1) ^ "</ul>" :: summary] in
+        loop (lev - 1) summary
+      else summary
   in
-  let index =
-    if rev_index <> [] then
-      ["<dl><dd>";
-       "<table border=\"1\"><tr><td>";
-       "<table><tr>";
-       "<td align=\"center\"><b>" ^ capitale (transl conf "summary") ^
-         "</b></td>";
-       "</tr><tr><td>" ::
-       List.rev_append rev_index
-         ["</td><td>";
-          "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
-          "</td></tr></table"; "</td></tr></table>";
-          "</dd></dl>"]]
-    else []
-  in
-  let (rev_lines_before_index, lines) =
-    loop [] lines where rec loop lines_bef =
-      fun
-      [ [s :: sl] ->
-          if String.length s > 1 && s.[0] = '=' then (lines_bef, [s :: sl])
-          else loop [s :: lines_bef] sl
-      | [] -> (lines_bef, []) ]
-  in
-  let (rev_lines_after_index, _) =
+  if rev_summary <> [] then
+    ["<dl><dd>";
+     "<table border=\"1\"><tr><td>";
+     "<table><tr>";
+     "<td align=\"center\"><b>" ^ capitale (transl conf "summary") ^
+       "</b></td>";
+     "</tr><tr><td>" ::
+     List.rev_append rev_summary
+       ["</td><td>";
+        "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
+        "</td></tr></table"; "</td></tr></table>";
+        "</dd></dl>"]]
+  else []
+;
+
+value make_lines_after_summary conf cnt0 lines =
+  let (rev_lines_after_summary, _) =
     List.fold_left
       (fun (lines, cnt) s ->
          let len = String.length s in
@@ -244,14 +226,28 @@ value html_of_structure conf s =
            in
            ([s; n1; n2 :: lines], cnt + 1)
          else ([s :: lines], cnt))
-      ([], 0) lines
+      ([], cnt0) lines
   in
-  let lines_before_index = rev_syntax_lists [] rev_lines_before_index in
-  let lines_after_index = rev_syntax_lists [] rev_lines_after_index in
+  rev_syntax_lists [] rev_lines_after_summary
+;
+
+value html_of_structure conf s =
+  let lines = lines_list_of_string s in
+  let summary = make_summary conf lines in
+  let (rev_lines_before_summary, lines) =
+    loop [] lines where rec loop lines_bef =
+      fun
+      [ [s :: sl] ->
+          if String.length s > 1 && s.[0] = '=' then (lines_bef, [s :: sl])
+          else loop [s :: lines_bef] sl
+      | [] -> (lines_bef, []) ]
+  in
+  let lines_before_summary = rev_syntax_lists [] rev_lines_before_summary in
+  let lines_after_summary = make_lines_after_summary conf 0 lines in
   let s =
     syntax_links conf
       (String.concat "\n"
-        (lines_before_index @ index @ lines_after_index))
+        (lines_before_summary @ summary @ lines_after_summary))
   in
   if conf.wizard then
     Printf.sprintf "%s[<a href=\"%sm=MOD_NOTES\">%s</a>]%s\n"
@@ -315,16 +311,23 @@ value print_mod conf base =
   }
 ;
 
-value print_ok conf base =
+value print_ok conf base s =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "notes modified"))
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>" (commd conf)
+    Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>\n" (commd conf)
       (capitale (transl_nth conf "note/notes" 1));
     History.record conf base None "mn";
+    match p_getint conf.env "v" with
+    [ Some cnt0 ->
+        let lines = lines_list_of_string s in
+        let lines = make_lines_after_summary conf cnt0 lines in
+        let s = syntax_links conf (String.concat "\n" lines) in
+        Wserver.wprint "<p>&nbsp;</p>\n%s\n<p>&nbsp;</p>\n" s
+    | _ -> () ];
     trailer conf
   }
 ;
@@ -349,7 +352,7 @@ value print_mod_ok conf base =
         [ Some v -> insert_sub_part old_notes v sub_part
         | None -> sub_part ]
       in
-      do { base.func.commit_notes s; print_ok conf base }
+      do { base.func.commit_notes s; print_ok conf base sub_part }
   with
   [ Update.ModErr -> () ]
 ;
