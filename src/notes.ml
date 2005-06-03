@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.29 2005-06-03 10:01:12 ddr Exp $ *)
+(* $Id: notes.ml,v 4.30 2005-06-03 11:34:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -67,10 +67,10 @@ value syntax_links conf s =
             [ Not_found ->
                 let sn = String.sub b k (String.length b - k) in
                 let name = fn ^ " " ^ sn in
-                (Name.lower fn, Name.lower sn, "", name) ]
+                (fn, sn, "", name) ]
           in
           Printf.sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
-            (code_varenv fn) (code_varenv sn)
+            (code_varenv (Name.lower fn)) (code_varenv (Name.lower sn))
             (if oc = "" then "" else ";oc=" ^ oc) name
         with
         [ Not_found -> "[[" ^ b ^ "]]" ]
