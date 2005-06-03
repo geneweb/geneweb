@@ -1,10 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.24 2005-06-03 02:34:56 ddr Exp $ *)
+(* $Id: notes.ml,v 4.25 2005-06-03 03:22:22 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+
+value first_cnt = 1;
 
 value rec rev_syntax_lists list =
   fun
@@ -85,7 +87,7 @@ value lines_list_of_string s =
 value insert_sub_part s v sub_part =
   let lines = lines_list_of_string s in
   let (lines, sl) =
-    loop [] 0 0 lines where rec loop lines lev cnt =
+    loop [] 0 first_cnt lines where rec loop lines lev cnt =
       fun
       [ [s :: sl] ->
           let len = String.length s in
@@ -103,25 +105,27 @@ value insert_sub_part s v sub_part =
   String.concat "\n" (List.rev_append lines sl)
 ;
 
-value extract_sub_part s v =
+value rev_extract_sub_part s v =
   let lines = lines_list_of_string s in
-  let lines =
-    loop [] 0 0 lines where rec loop lines lev cnt =
-      fun
-      [ [s :: sl] ->
-          let len = String.length s in
-          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-            let nlev = section_level s len in
-            if cnt = v then loop [s :: lines] nlev (cnt + 1) sl
-            else if cnt > v then
-              if nlev > lev then loop [s :: lines] lev (cnt + 1) sl
-              else lines
-            else loop lines lev (cnt + 1) sl
-          else if cnt <= v then loop lines lev cnt sl
-          else loop [s :: lines] lev cnt sl
-      | [] -> lines ]
-  in
-  String.concat "\n" (List.rev lines)
+  loop [] 0 first_cnt lines where rec loop lines lev cnt =
+    fun
+    [ [s :: sl] ->
+        let len = String.length s in
+        if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+          let nlev = section_level s len in
+          if cnt = v then loop [s :: lines] nlev (cnt + 1) sl
+          else if cnt > v then
+            if nlev > lev then loop [s :: lines] lev (cnt + 1) sl
+            else lines
+          else loop lines lev (cnt + 1) sl
+        else if cnt <= v then loop lines lev cnt sl
+        else loop [s :: lines] lev cnt sl
+    | [] -> lines ]
+;
+
+value extract_sub_part s v =
+  let rev_lines = rev_extract_sub_part s v in
+  String.concat "\n" (List.rev rev_lines)
 ;
 
 value make_summary conf lines =
@@ -174,7 +178,7 @@ value make_summary conf lines =
           let summary = [tab (lev + 1) ^ s :: summary] in
           (summary, lev + 1, stack, cnt + 1)
         else (summary, lev, indent_stack, cnt))
-      ([], 0, [], 0) lines
+      ([], 0, [], first_cnt) lines
   in
   let rev_summary =
     loop lev rev_summary where rec loop lev summary =
@@ -242,7 +246,7 @@ value html_of_structure conf s =
       | [] -> (lines_bef, []) ]
   in
   let lines_before_summary = rev_syntax_lists [] rev_lines_before_summary in
-  let lines_after_summary = make_lines_after_summary conf 0 lines in
+  let lines_after_summary = make_lines_after_summary conf first_cnt lines in
   let s =
     syntax_links conf
       (String.concat "\n"
@@ -257,18 +261,46 @@ value html_of_structure conf s =
   else s
 ;
 
+value print_sub_part conf cnt0 lines =
+  let lines = make_lines_after_summary conf cnt0 lines in
+  let s = syntax_links conf (String.concat "\n" lines) in
+  let s = string_with_macros conf False [] s in
+  do {
+    tag "p" begin
+      if cnt0 > 0 then do {
+        stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) (cnt0 - 1) begin
+          Wserver.wprint "&lt;&lt;";
+        end;
+        Wserver.wprint "\n";
+      }
+      else ();
+      stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) (cnt0 + 1) begin
+        Wserver.wprint "&gt;&gt;";
+      end;
+      Wserver.wprint "\n";
+    end;
+    Wserver.wprint "%s\n" s
+  }
+;
+
 value print conf base =
   let title _ =
     Wserver.wprint "%s - %s"
       (capitale (nominative (transl_nth conf "note/notes" 1))) conf.bname
   in
   let s = base.data.bnotes.nread 0 in
-  let s = html_of_structure conf s in
   do {
     header_no_page_title conf title;
     print_link_to_welcome conf False;
     html_p conf;
-    Wserver.wprint "%s\n" (string_with_macros conf False [] s);
+    match p_getint conf.env "v" with
+    [ Some cnt0 ->
+        let lines = List.rev (rev_extract_sub_part s cnt0) in
+        print_sub_part conf cnt0 lines
+    | None ->
+        let s = html_of_structure conf s in
+        let s = string_with_macros conf False [] s in
+        Wserver.wprint "%s\n" s ];
     trailer conf;
   }
 ;
@@ -283,9 +315,9 @@ value print_mod conf base =
   let v =
     match p_getint conf.env "v" with
     [ Some v -> v
-    | None -> -1 ]
+    | None -> first_cnt - 1 ]
   in
-  let sub_part = if v = -1 then s else extract_sub_part s v in
+  let sub_part = if v = first_cnt - 1 then s else extract_sub_part s v in
   do {
     header conf title;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
@@ -321,11 +353,7 @@ value print_ok conf base s =
       (capitale (transl_nth conf "note/notes" 1));
     History.record conf base None "mn";
     match p_getint conf.env "v" with
-    [ Some cnt0 ->
-        let lines = lines_list_of_string s in
-        let lines = make_lines_after_summary conf cnt0 lines in
-        let s = syntax_links conf (String.concat "\n" lines) in
-        Wserver.wprint "<p>&nbsp;</p>\n%s\n<p>&nbsp;</p>\n" s
+    [ Some cnt0 -> print_sub_part conf cnt0 (lines_list_of_string s)
     | _ -> () ];
     trailer conf
   }
