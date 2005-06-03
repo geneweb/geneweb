@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.16 2005-06-03 12:17:55 ddr Exp $ *)
+(* $Id: history.ml,v 4.17 2005-06-03 12:31:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -193,10 +193,14 @@ value print_history_line conf base line wiz k i =
                     }
                 | HI_num x ->
                     do {
+                      Wserver.wprint "- ";
                       stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) x begin
-                        Wserver.wprint "%s" (transl_nth conf "note/notes" 1);
+                        stag "em" begin
+                          Wserver.wprint "%s"
+                            (transl_nth conf "note/notes" 1);
+                        end;
                       end;
-                      Wserver.wprint " ";
+                      Wserver.wprint " - ";
                       stag "span" "style=\"font-size:50%%\"" begin
                         Wserver.wprint "#%d" x;
                       end;
