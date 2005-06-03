@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.31 2005-06-03 12:17:55 ddr Exp $ *)
+(* $Id: notes.ml,v 4.32 2005-06-03 20:27:18 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -10,24 +10,38 @@ module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
 value first_cnt = 1;
 
-value rec rev_syntax_lists list =
+value rec syntax_lists list =
   fun
-  [ [s :: rsl] ->
-      if String.length s > 0 && s.[0] = '*' then rev_syntax_ul list [s :: rsl]
-      else rev_syntax_lists [s :: list] rsl
+  [ [s :: sl] ->
+      if String.length s > 0 && s.[0] = '*' then syntax_ul list [s :: sl]
+      else syntax_lists [s :: list] sl
   | [] -> list ]
-and rev_syntax_ul list rsl =
+and syntax_ul list sl =
   let (list, rest) =
-    loop ["</ul>" :: list] rsl where rec loop list =
+    loop ["<ul>" :: list] sl where rec loop list =
       fun
-      [ [s :: rsl] ->
+      [ [s :: sl] ->
           let len = String.length s in
           if len > 0 && s.[0] = '*' then
-            loop ["<li>" ^ String.sub s 1 (len - 1) ^ "</li>" :: list] rsl
-          else (list, rsl)
+            let s = String.sub s 1 (len - 1) in
+            let (s, sl) =
+              loop s sl where rec loop s1 =
+                fun
+                [ [s :: sl] ->
+                    if String.length s > 0 && s.[0] = ' ' then
+                      loop (s1 ^ "\n" ^ s) sl
+                    else (s1, [s :: sl])
+                | [] -> (s, []) ]
+            in
+            loop ["<li>" ^ s ^ "</li>" :: list] sl
+          else (list, [s :: sl])
       | [] -> (list, []) ]
   in
-  rev_syntax_lists ["<ul>" :: list] rest
+  syntax_lists ["</ul>" :: list] rest
+;
+
+value rev_syntax_lists list rev_list =
+  List.rev (syntax_lists list (List.rev rev_list))
 ;
 
 value syntax_links conf s =
