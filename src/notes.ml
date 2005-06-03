@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.25 2005-06-03 03:22:22 ddr Exp $ *)
+(* $Id: notes.ml,v 4.26 2005-06-03 04:02:16 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -86,23 +86,28 @@ value lines_list_of_string s =
 
 value insert_sub_part s v sub_part =
   let lines = lines_list_of_string s in
-  let (lines, sl) =
-    loop [] 0 first_cnt lines where rec loop lines lev cnt =
-      fun
-      [ [s :: sl] ->
-          let len = String.length s in
-          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-            let nlev = section_level s len in
-            if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
-            else if cnt > v then
-              if nlev > lev then loop lines lev (cnt + 1) sl
-              else (lines, [s :: sl])
-            else loop [s :: lines] lev (cnt + 1) sl
-          else if cnt <= v then loop [s :: lines] lev cnt sl
-          else loop lines lev cnt sl
-      | [] -> (lines, []) ]
+  let lines =
+    if v < first_cnt then lines
+    else
+      let (lines, sl) =
+        loop [] 0 first_cnt lines where rec loop lines lev cnt =
+          fun
+          [ [s :: sl] ->
+              let len = String.length s in
+              if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+                let nlev = section_level s len in
+                if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
+                else if cnt > v then
+                  if nlev > lev then loop lines lev (cnt + 1) sl
+                  else (lines, [s :: sl])
+                else loop [s :: lines] lev (cnt + 1) sl
+              else if cnt <= v then loop [s :: lines] lev cnt sl
+              else loop lines lev cnt sl
+          | [] -> (lines, []) ]
+      in
+      List.rev_append lines sl
   in
-  String.concat "\n" (List.rev_append lines sl)
+  String.concat "\n" lines
 ;
 
 value rev_extract_sub_part s v =
@@ -262,9 +267,20 @@ value html_of_structure conf s =
 ;
 
 value print_sub_part conf cnt0 lines =
-  let lines = make_lines_after_summary conf cnt0 lines in
+  (* mmmh... "max cnt first_cnt", below, is a hack to avoid a bug... *)
+  let lines = make_lines_after_summary conf (max cnt0 first_cnt) lines in
   let s = syntax_links conf (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
+  let s =
+    if cnt0 < first_cnt && conf.wizard then
+      Printf.sprintf "%s[<a href=\"%sm=MOD_NOTES;v=0\">%s</a>]%s\n"
+        (if s = "" then "<p>"
+         else "<div style=\"float:right;margin-left:5px\">")
+        (commd conf) (transl_decline conf "modify" "")
+        (if s = "" then "</p>" else "</div>") ^
+      s
+    else s
+  in
   do {
     tag "p" begin
       if cnt0 > 0 then do {
