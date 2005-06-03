@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.15 2005-06-02 20:03:27 ddr Exp $ *)
+(* $Id: history.ml,v 4.16 2005-06-03 12:17:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -21,7 +21,7 @@ value ext_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
 ;
 
-value record conf base ind action =
+value gen_record conf base item action =
   let do_it =
     match p_getenv conf.base_env "history" with
     [ Some "yes" -> True
@@ -36,17 +36,21 @@ value record conf base ind action =
     [ Some oc ->
         let (hh, mm, ss) = conf.time in
         do {
-          Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s%s\n"
+          Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s\n"
             conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-            action
-            (match ind with
-             [ Some (fn, sn, occ) ->
-                 " " ^ fn ^ "." ^ string_of_int occ ^ " " ^ sn
-             | None -> "" ]);
+            action item;
           close_out oc;
         }
     | None -> () ]
   else ()
+;
+
+value record conf base (fn, sn, occ) action =
+  gen_record conf base (fn ^ "." ^ string_of_int occ ^ " " ^ sn) action
+;
+
+value record_notes conf base num action =
+  gen_record conf base (string_of_int num) action
 ;
 
 (* Request for history printing *)
@@ -131,23 +135,31 @@ value line_fields line =
   else None
 ;
 
+type hist_item =
+  [ HI_num of int
+  | HI_ind of person
+  | HI_none ]
+;
+
 value print_history_line conf base line wiz k i =
   match line_fields line with
   [ Some (time, user, action, keyo) ->
       if wiz = "" || user = wiz then do {
-        let po =
+        let hist_item =
           match keyo with
           [ Some key ->
-              match person_ht_find_all base key with
-              [ [ip] -> Some (pget conf base ip)
-              | _ -> None ]
-          | None -> None ]
+              try HI_num (int_of_string key) with
+              [ Failure _ ->
+                  match person_ht_find_all base key with
+                  [ [ip] -> HI_ind (pget conf base ip)
+                  | _ -> HI_none ] ]
+          | None -> HI_none ]
         in
         let not_displayed =
-          match po with
-          [ Some p ->
+          match hist_item with
+          [ HI_ind p ->
               is_hidden p || (conf.hide_names && not (fast_auth_age conf p))
-          | None -> False ]
+          | _ -> False ]
         in
         if not_displayed then i
         else do {
@@ -170,8 +182,8 @@ value print_history_line conf base line wiz k i =
           stagn "dd" begin
             match keyo with
             [ Some key ->
-                match po with
-                 [ Some p ->
+                match hist_item with
+                [ HI_ind p ->
                     do {
                       Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
                         (p_surname base p) p.occ;
@@ -179,7 +191,17 @@ value print_history_line conf base line wiz k i =
                         (referenced_person_title_text conf base p);
                       Wserver.wprint "%s" (Date.short_dates_text conf base p);
                     }
-                | None -> Wserver.wprint "%s" key ]
+                | HI_num x ->
+                    do {
+                      stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) x begin
+                        Wserver.wprint "%s" (transl_nth conf "note/notes" 1);
+                      end;
+                      Wserver.wprint " ";
+                      stag "span" "style=\"font-size:50%%\"" begin
+                        Wserver.wprint "#%d" x;
+                      end;
+                    }
+                | HI_none -> Wserver.wprint "%s" key ]
             | None -> Wserver.wprint "..." ];
           end;
           i + 1

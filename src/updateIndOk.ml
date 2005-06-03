@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.25 2005-06-02 16:43:02 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.26 2005-06-03 12:17:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -698,7 +698,7 @@ value print_add o_conf base =
           let k = (sp.first_name, sp.surname, sp.occ) in
           do {
             Util.commit_patches conf base;
-            History.record conf base (Some k) "ap";
+            History.record conf base k "ap";
             print_add_ok conf base wl p;
           } ]
     }
@@ -715,7 +715,7 @@ value print_del conf base =
         effective_del conf base p;
         base.func.patch_person p.cle_index p;
         Util.commit_patches conf base;
-        History.record conf base (Some k) "dp";
+        History.record conf base k "dp";
         print_del_ok conf base [];
       }
   | _ -> incorrect_request conf ]
@@ -758,7 +758,7 @@ value print_mod o_conf base =
       let wl = all_checks_person conf base p (aoi base p.cle_index) u in
       let k = (sp.first_name, sp.surname, sp.occ) in
       Util.commit_patches conf base;
-      History.record conf base (Some k) "mp";
+      History.record conf base k "mp";
       let quest_string = Adef.istr_of_int 1 in
       if p.surname <> quest_string && p.first_name <> quest_string
          && not (is_old_person conf p) then
