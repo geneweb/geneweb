@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.27 2005-06-03 08:22:56 ddr Exp $ *)
+(* $Id: notes.ml,v 4.28 2005-06-03 08:27:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -336,6 +336,7 @@ value print_mod conf base =
   let sub_part = if v = first_cnt - 1 then s else extract_sub_part s v in
   do {
     header conf title;
+    print_link_to_welcome conf False;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
