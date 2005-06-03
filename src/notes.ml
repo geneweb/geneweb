@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.30 2005-06-03 11:34:48 ddr Exp $ *)
+(* $Id: notes.ml,v 4.31 2005-06-03 12:17:55 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -379,10 +379,15 @@ value print_ok conf base s =
     print_link_to_welcome conf True;
     Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>\n" (commd conf)
       (capitale (transl_nth conf "note/notes" 1));
-    History.record conf base None "mn";
-    match p_getint conf.env "v" with
-    [ Some cnt0 -> print_sub_part conf cnt0 (lines_list_of_string s)
-    | _ -> () ];
+    let cnt0 =
+      match p_getint conf.env "v" with
+      [ Some cnt0 -> cnt0
+      | None -> first_cnt - 1 ]
+    in
+    History.record_notes conf base cnt0 "mn";
+    if cnt0 <> first_cnt - 1 then
+      print_sub_part conf cnt0 (lines_list_of_string s)
+    else ();
     trailer conf
   }
 ;

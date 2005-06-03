@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.18 2005-06-02 16:43:02 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.19 2005-06-03 12:17:55 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -294,7 +294,7 @@ value effective_send_ok conf base p file =
     else ();
     write_file (fname ^ typ) content;
     let key = (sou base p.first_name, sou base p.surname, p.occ) in
-    History.record conf base (Some key) "si";
+    History.record conf base key "si";
     print_sent conf base p
   }
 ;
@@ -345,7 +345,7 @@ value effective_delete_ok conf base p =
       move_file_to_old conf ".png" fname bfname
     else incorrect conf;
     let key = (sou base p.first_name, sou base p.surname, p.occ) in
-    History.record conf base (Some key) "di";
+    History.record conf base key "di";
     print_deleted conf base p
   }
 ;
