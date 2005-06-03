@@ -1,10 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.28 2005-06-03 08:27:48 ddr Exp $ *)
+(* $Id: notes.ml,v 4.29 2005-06-03 10:01:12 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+
+module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
 value first_cnt = 1;
 
@@ -46,17 +48,26 @@ value syntax_links conf s =
           let l = String.index_from b k '/' in
           let fn = String.sub b k (l - k) in
           let k = l + 1 in
-          let l = String.index_from b k '/' in
-          let sn = String.sub b k (l - k) in
-          let (oc, name) =
+          let (fn, sn, oc, name) =
             try
-              let k = l + 1 in
               let l = String.index_from b k '/' in
-              let x = String.sub b k (l - k) in
-              (x, String.sub b (l + 1) (String.length b - l - 1))
+              let sn = String.sub b k (l - k) in
+              let (oc, name) =
+                try
+                  let k = l + 1 in
+                  let l = String.index_from b k '/' in
+                  let x = String.sub b k (l - k) in
+                  (x, String.sub b (l + 1) (String.length b - l - 1))
+                with
+                [ Not_found ->
+                    ("", String.sub b (l + 1) (String.length b - l - 1)) ]
+              in
+              (fn, sn, oc, name)
             with
             [ Not_found ->
-                ("", String.sub b (l + 1) (String.length b - l - 1)) ]
+                let sn = String.sub b k (String.length b - k) in
+                let name = fn ^ " " ^ sn in
+                (Name.lower fn, Name.lower sn, "", name) ]
           in
           Printf.sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
             (code_varenv fn) (code_varenv sn)
