@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.26 2005-06-03 04:02:16 ddr Exp $ *)
+(* $Id: notes.ml,v 4.27 2005-06-03 08:22:56 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -85,29 +85,29 @@ value lines_list_of_string s =
 ;
 
 value insert_sub_part s v sub_part =
-  let lines = lines_list_of_string s in
-  let lines =
-    if v < first_cnt then lines
-    else
-      let (lines, sl) =
-        loop [] 0 first_cnt lines where rec loop lines lev cnt =
-          fun
-          [ [s :: sl] ->
-              let len = String.length s in
-              if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-                let nlev = section_level s len in
-                if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
-                else if cnt > v then
-                  if nlev > lev then loop lines lev (cnt + 1) sl
-                  else (lines, [s :: sl])
-                else loop [s :: lines] lev (cnt + 1) sl
-              else if cnt <= v then loop [s :: lines] lev cnt sl
-              else loop lines lev cnt sl
-          | [] -> (lines, []) ]
-      in
-      List.rev_append lines sl
-  in
-  String.concat "\n" lines
+  if v < first_cnt then sub_part
+  else
+    let lines = lines_list_of_string s in
+    let lines =
+        let (lines, sl) =
+          loop [] 0 first_cnt lines where rec loop lines lev cnt =
+            fun
+            [ [s :: sl] ->
+                let len = String.length s in
+                if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+                  let nlev = section_level s len in
+                  if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
+                  else if cnt > v then
+                    if nlev > lev then loop lines lev (cnt + 1) sl
+                    else (lines, [s :: sl])
+                  else loop [s :: lines] lev (cnt + 1) sl
+                else if cnt <= v then loop [s :: lines] lev cnt sl
+                else loop lines lev cnt sl
+            | [] -> (lines, []) ]
+        in
+        List.rev_append lines sl
+    in
+    String.concat "\n" lines
 ;
 
 value rev_extract_sub_part s v =
