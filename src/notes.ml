@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.23 2005-06-02 21:08:25 ddr Exp $ *)
+(* $Id: notes.ml,v 4.24 2005-06-03 02:34:56 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -67,12 +67,11 @@ value syntax_links conf s =
 ;
 
 value section_level s len =
-  if len > 4 && s.[1] = '=' && s.[len-2] = '=' then
-    if len > 6 && s.[2] = '=' && s.[len-3] = '=' then
-      if len > 8 && s.[3] = '=' && s.[len-4] = '=' then 4
-      else 3
-    else 2
-  else 1
+  loop 1 (len - 2) 4 where rec loop i j k =
+    if i > 5 then i
+    else if len > k && s.[i] = '=' && s.[j] = '=' then
+      loop (i + 1) (j - 1) (k + 2)
+    else i
 ;
 
 value lines_list_of_string s =
