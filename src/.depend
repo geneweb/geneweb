@@ -153,10 +153,10 @@ mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
     name.cmx num.cmx pqueue.cmx secure.cmx 
 name.cmo: buff.cmo name.cmi 
 name.cmx: buff.cmx name.cmi 
-notes.cmo: config.cmi def.cmi gutil.cmi iovalue.cmi update.cmi util.cmi \
-    ../wserver/wserver.cmi 
-notes.cmx: config.cmi def.cmi gutil.cmx iovalue.cmx update.cmx util.cmx \
-    ../wserver/wserver.cmx 
+notes.cmo: buff.cmo config.cmi def.cmi gutil.cmi history.cmi iovalue.cmi \
+    update.cmi util.cmi ../wserver/wserver.cmi 
+notes.cmx: buff.cmx config.cmi def.cmi gutil.cmx history.cmx iovalue.cmx \
+    update.cmx util.cmx ../wserver/wserver.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
 perso.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
