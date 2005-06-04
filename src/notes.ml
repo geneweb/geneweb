@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.35 2005-06-04 06:59:36 ddr Exp $ *)
+(* $Id: notes.ml,v 4.36 2005-06-04 10:17:55 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -279,7 +279,7 @@ value make_lines_after_summary conf cnt0 lines =
              if conf.wizard then
                Printf.sprintf
                  "<div style=\"float:right;margin-left:5px\">\
-                  [<a href=\"%sm=MOD_NOTES;v=%d\">%s</a>]</div>"
+                  (<a href=\"%sm=MOD_NOTES;v=%d\">%s</a>)</div>"
                  (commd conf) cnt (transl_decline conf "modify" "")
              else ""
            in
@@ -347,10 +347,13 @@ value print_sub_part conf cnt0 lines =
         Wserver.wprint "\n";
       }
       else ();
-      stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) (cnt0 + 1) begin
-        Wserver.wprint "&gt;&gt;";
-      end;
-      Wserver.wprint "\n";
+      if lines <> [] then do {
+        stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) (cnt0 + 1) begin
+          Wserver.wprint "&gt;&gt;";
+        end;
+        Wserver.wprint "\n";
+      }
+      else ();
     end;
     Wserver.wprint "%s\n" s
   }
@@ -393,12 +396,19 @@ value print_mod conf base =
   let sub_part = if v = first_cnt - 1 then s else extract_sub_part s v in
   do {
     header conf title;
+    tag "div" "style=\"float:right;margin-left:5px\"" begin
+      stag "a" "href=\"%sm=NOTES%s\"" (commd conf)
+        (if v >= first_cnt then ";v=" ^ string_of_int v else "")
+      begin
+        Wserver.wprint "(%s)\n" (transl conf "visualize");
+      end;
+    end;
     print_link_to_welcome conf False;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_NOTES_OK\"";
-        if v >= 0 then
+        if v >= first_cnt then
           xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
         else ();
         let digest = Iovalue.digest s in
