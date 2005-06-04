@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.42 2005-06-01 20:34:36 ddr Exp $
+# $Id: lex_utf8.txt,v 1.43 2005-06-04 10:17:55 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -9054,6 +9054,10 @@ pl: użytkownik/hasło/anuluj
 ro: utilizator/parola/anulare
 sl: uporabnik/geslo/prekliči
 sv: användare/passord/avbryt
+
+    visualize
+en: visualize
+fr: visualiser
 
     warnings
 af: waarskuwings
