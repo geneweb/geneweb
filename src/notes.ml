@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.38 2005-06-04 20:26:27 ddr Exp $ *)
+(* $Id: notes.ml,v 4.39 2005-06-04 21:12:51 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -143,7 +143,8 @@ value lines_list_of_string s =
 value insert_sub_part s v sub_part =
   let lines = lines_list_of_string s in
   let (lines, sl) =
-    loop [] 0 first_cnt lines where rec loop lines lev cnt =
+    loop False [] 0 first_cnt lines
+    where rec loop sub_part_added lines lev cnt =
       fun
       [ [s :: sl] ->
           let len = String.length s in
@@ -151,14 +152,19 @@ value insert_sub_part s v sub_part =
             if v = first_cnt - 1 then ([""; sub_part], [s :: sl])
             else
               let nlev = section_level s len in
-              if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
+              if cnt = v then
+                loop True [""; sub_part :: lines] nlev (cnt + 1) sl
               else if cnt > v then
-                if nlev > lev then loop lines lev (cnt + 1) sl
+                if nlev > lev then loop sub_part_added lines lev (cnt + 1) sl
                 else (lines, [s :: sl])
-              else loop [s :: lines] lev (cnt + 1) sl
-            else if cnt <= v then loop [s :: lines] lev cnt sl
-            else loop lines lev cnt sl
-      | [] -> (lines, []) ]
+              else loop sub_part_added [s :: lines] lev (cnt + 1) sl
+            else if cnt <= v then loop sub_part_added [s :: lines] lev cnt sl
+            else loop sub_part_added lines lev cnt sl
+      | [] ->
+          let lines =
+            if sub_part_added then lines else [""; sub_part :: lines]
+          in
+          (lines, []) ]
   in
   String.concat "\n" (List.rev_append lines sl)
 ;
