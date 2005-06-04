@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.36 2005-06-04 10:17:55 ddr Exp $ *)
+(* $Id: notes.ml,v 4.37 2005-06-04 10:54:16 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -315,7 +315,7 @@ value html_of_structure conf s =
         (lines_before_summary @ summary @ lines_after_summary))
   in
   if conf.wizard then
-    Printf.sprintf "%s[<a href=\"%sm=MOD_NOTES\">%s</a>]%s\n"
+    Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES\">%s</a>)%s\n"
       (if s = "" then "<p>" else "<div style=\"float:right;margin-left:5px\">")
       (commd conf) (transl_decline conf "modify" "")
       (if s = "" then "</p>" else "</div>") ^
@@ -330,7 +330,7 @@ value print_sub_part conf cnt0 lines =
   let s = string_with_macros conf False [] s in
   let s =
     if cnt0 < first_cnt && conf.wizard then
-      Printf.sprintf "%s[<a href=\"%sm=MOD_NOTES;v=0\">%s</a>]%s\n"
+      Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES;v=0\">%s</a>)%s\n"
         (if s = "" then "<p>"
          else "<div style=\"float:right;margin-left:5px\">")
         (commd conf) (transl_decline conf "modify" "")
