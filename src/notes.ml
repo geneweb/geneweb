@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.34 2005-06-04 06:51:01 ddr Exp $ *)
+(* $Id: notes.ml,v 4.35 2005-06-04 06:59:36 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -71,8 +71,8 @@ and syntax_ul lev list sl =
   [tab lev "</ul>" :: list]
 ;
 
-value rev_syntax_lists list rev_list =
-  syntax_lists list (List.rev rev_list)
+value rev_syntax_lists conf list rev_list =
+  syntax_lists conf list (List.rev rev_list)
 ;
 
 value syntax_links conf s =
