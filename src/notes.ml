@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.33 2005-06-04 00:39:25 ddr Exp $ *)
+(* $Id: notes.ml,v 4.34 2005-06-04 06:51:01 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -12,16 +12,16 @@ value first_cnt = 1;
 
 value tab lev s = String.make (2 * lev) ' ' ^ s;
 
-value rec syntax_lists list =
+value rec syntax_lists conf list =
   fun
   [ [s :: sl] ->
       if String.length s > 0 && s.[0] = '*' then
-        let (sl, rest) = select_list_lines [] [s :: sl] in
+        let (sl, rest) = select_list_lines conf [] [s :: sl] in
         let list = syntax_ul 0 list sl in
-        syntax_lists list rest
-      else syntax_lists [s :: list] sl
+        syntax_lists conf list rest
+      else syntax_lists conf [s :: list] sl
   | [] -> List.rev list ]
-and select_list_lines list =
+and select_list_lines conf list =
   fun
   [ [s :: sl] ->
       let len = String.length s in
@@ -30,13 +30,17 @@ and select_list_lines list =
         let (s, sl) =
           loop s sl where rec loop s1 =
             fun
-            [ [s :: sl] ->
+            [ [""; s :: sl]
+              when String.length s > 1 && s.[0] = '*' && s.[1] = '*' ->
+                let br = "<br" ^ conf.xhs ^ ">" in
+                loop (s1 ^ br ^ br) [s :: sl]
+            | [s :: sl] ->
                 if String.length s > 0 && s.[0] <> '*' then
                   loop (s1 ^ "\n" ^ s) sl
                 else (s1, [s :: sl])
             | [] -> (s1, []) ]
         in
-        select_list_lines [s :: list] sl
+        select_list_lines conf [s :: list] sl
       else (List.rev list, [s :: sl])
   | [] -> (List.rev list, []) ]
 and syntax_ul lev list sl =
@@ -287,7 +291,7 @@ value make_lines_after_summary conf cnt0 lines =
          else ([s :: lines], cnt))
       ([], cnt0) lines
   in
-  rev_syntax_lists [] rev_lines_after_summary
+  rev_syntax_lists conf [] rev_lines_after_summary
 ;
 
 value html_of_structure conf s =
@@ -301,7 +305,9 @@ value html_of_structure conf s =
           else loop [s :: lines_bef] sl
       | [] -> (lines_bef, []) ]
   in
-  let lines_before_summary = rev_syntax_lists [] rev_lines_before_summary in
+  let lines_before_summary =
+    rev_syntax_lists conf [] rev_lines_before_summary
+  in
   let lines_after_summary = make_lines_after_summary conf first_cnt lines in
   let s =
     syntax_links conf
