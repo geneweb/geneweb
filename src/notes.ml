@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.32 2005-06-03 20:27:18 ddr Exp $ *)
+(* $Id: notes.ml,v 4.33 2005-06-04 00:39:25 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -10,38 +10,65 @@ module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
 value first_cnt = 1;
 
+value tab lev s = String.make (2 * lev) ' ' ^ s;
+
 value rec syntax_lists list =
   fun
   [ [s :: sl] ->
-      if String.length s > 0 && s.[0] = '*' then syntax_ul list [s :: sl]
+      if String.length s > 0 && s.[0] = '*' then
+        let (sl, rest) = select_list_lines [] [s :: sl] in
+        let list = syntax_ul 0 list sl in
+        syntax_lists list rest
       else syntax_lists [s :: list] sl
-  | [] -> list ]
-and syntax_ul list sl =
-  let (list, rest) =
-    loop ["<ul>" :: list] sl where rec loop list =
+  | [] -> List.rev list ]
+and select_list_lines list =
+  fun
+  [ [s :: sl] ->
+      let len = String.length s in
+      if len > 0 && s.[0] = '*' then
+        let s = String.sub s 1 (len - 1) in
+        let (s, sl) =
+          loop s sl where rec loop s1 =
+            fun
+            [ [s :: sl] ->
+                if String.length s > 0 && s.[0] <> '*' then
+                  loop (s1 ^ "\n" ^ s) sl
+                else (s1, [s :: sl])
+            | [] -> (s1, []) ]
+        in
+        select_list_lines [s :: list] sl
+      else (List.rev list, [s :: sl])
+  | [] -> (List.rev list, []) ]
+and syntax_ul lev list sl =
+  let list = [tab lev "<ul>" :: list] in
+  let list =
+    loop list sl where rec loop list =
       fun
-      [ [s :: sl] ->
-          let len = String.length s in
-          if len > 0 && s.[0] = '*' then
-            let s = String.sub s 1 (len - 1) in
-            let (s, sl) =
-              loop s sl where rec loop s1 =
+      [ [s1; s2 :: sl] ->
+          if String.length s2 > 0 && s2.[0] = '*' then
+            let list = [tab lev "<li>" ^ s1 :: list] in
+            let (list2, sl) =
+              loop [] [s2 :: sl] where rec loop list =
                 fun
                 [ [s :: sl] ->
-                    if String.length s > 0 && s.[0] = ' ' then
-                      loop (s1 ^ "\n" ^ s) sl
-                    else (s1, [s :: sl])
-                | [] -> (s, []) ]
+                    if String.length s > 0 && s.[0] = '*' then
+                      let s = String.sub s 1 (String.length s - 1) in
+                      loop [s :: list] sl
+                    else (list, [s :: sl])
+                | [] -> (list, []) ]
             in
-            loop ["<li>" ^ s ^ "</li>" :: list] sl
-          else (list, [s :: sl])
-      | [] -> (list, []) ]
+            let list = syntax_ul (lev + 1) list (List.rev list2) in
+            loop [tab lev "</li>" :: list] sl
+          else
+            loop [tab lev "<li>" ^ s1 ^ "</li>" :: list] [s2 :: sl]
+      | [s] -> [tab lev "<li>" ^ s ^ "</li>" :: list]
+      | [] -> list ]
   in
-  syntax_lists ["</ul>" :: list] rest
+  [tab lev "</ul>" :: list]
 ;
 
 value rev_syntax_lists list rev_list =
-  List.rev (syntax_lists list (List.rev rev_list))
+  syntax_lists list (List.rev rev_list)
 ;
 
 value syntax_links conf s =
@@ -159,7 +186,6 @@ value extract_sub_part s v =
 ;
 
 value make_summary conf lines =
-  let tab lev = String.make (2 * lev) ' ' in
   let (rev_summary, lev, _, _) =
     let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
@@ -178,34 +204,34 @@ value make_summary conf lines =
                           let stack = [(prev_num + 1, slev) :: rest_stack] in
                           loop summary lev stack
                         else
-                          let summary = [tab (lev - 1) ^ "</li>" :: summary] in
-                          let summary = [tab (lev - 1) ^ "</ul>" :: summary] in
+                          let summary = [tab (lev - 1) "</li>" :: summary] in
+                          let summary = [tab (lev - 1) "</ul>" :: summary] in
                           loop summary (lev - 1) rest_stack
                     | [] ->
-                        let summary = [tab (lev - 1) ^ "</li>" :: summary] in
+                        let summary = [tab (lev - 1) "</li>" :: summary] in
                         let stack = [(prev_num + 1, slev) :: rest_stack] in
                         (summary, lev - 1, stack) ]
                   else if slev = prev_slev then
-                    let summary = [tab (lev - 1) ^ "</li>" :: summary] in
+                    let summary = [tab (lev - 1) "</li>" :: summary] in
                     let stack = [(prev_num + 1, slev) :: rest_stack] in
                     (summary, lev - 1, stack)
                   else
-                    let summary = [tab lev ^ ul :: summary] in
+                    let summary = [tab lev ul :: summary] in
                     let stack = [(1, slev) :: stack] in
                     (summary, lev, stack)
               | [] ->
-                  let summary = [tab lev ^ ul :: summary] in
+                  let summary = [tab lev ul :: summary] in
                   let stack = [(1, slev) :: stack] in
                   (summary, lev, stack) ]
           in
-          let summary = [tab lev ^ "<li>" :: summary] in
+          let summary = [tab lev "<li>" :: summary] in
           let s =
             let nums = List.map fst stack in
             Printf.sprintf "<a href=\"#a_%d\">%s %s</a>"
               cnt (String.concat "." (List.rev_map string_of_int nums))
               (String.sub s slev (len - 2 * slev))
           in
-          let summary = [tab (lev + 1) ^ s :: summary] in
+          let summary = [tab (lev + 1) s :: summary] in
           (summary, lev + 1, stack, cnt + 1)
         else (summary, lev, indent_stack, cnt))
       ([], 0, [], first_cnt) lines
@@ -213,8 +239,8 @@ value make_summary conf lines =
   let rev_summary =
     loop lev rev_summary where rec loop lev summary =
       if lev > 0 then
-        let summary = [tab (lev - 1) ^ "</li>" :: summary] in
-        let summary = [tab (lev - 1) ^ "</ul>" :: summary] in
+        let summary = [tab (lev - 1) "</li>" :: summary] in
+        let summary = [tab (lev - 1) "</ul>" :: summary] in
         loop (lev - 1) summary
       else summary
   in
