@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.37 2005-06-04 10:54:16 ddr Exp $ *)
+(* $Id: notes.ml,v 4.38 2005-06-04 20:26:27 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -141,29 +141,26 @@ value lines_list_of_string s =
 ;
 
 value insert_sub_part s v sub_part =
-  if v < first_cnt then sub_part
-  else
-    let lines = lines_list_of_string s in
-    let lines =
-        let (lines, sl) =
-          loop [] 0 first_cnt lines where rec loop lines lev cnt =
-            fun
-            [ [s :: sl] ->
-                let len = String.length s in
-                if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-                  let nlev = section_level s len in
-                  if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
-                  else if cnt > v then
-                    if nlev > lev then loop lines lev (cnt + 1) sl
-                    else (lines, [s :: sl])
-                  else loop [s :: lines] lev (cnt + 1) sl
-                else if cnt <= v then loop [s :: lines] lev cnt sl
-                else loop lines lev cnt sl
-            | [] -> (lines, []) ]
-        in
-        List.rev_append lines sl
-    in
-    String.concat "\n" lines
+  let lines = lines_list_of_string s in
+  let (lines, sl) =
+    loop [] 0 first_cnt lines where rec loop lines lev cnt =
+      fun
+      [ [s :: sl] ->
+          let len = String.length s in
+          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+            if v = first_cnt - 1 then ([""; sub_part], [s :: sl])
+            else
+              let nlev = section_level s len in
+              if cnt = v then loop [""; sub_part :: lines] nlev (cnt + 1) sl
+              else if cnt > v then
+                if nlev > lev then loop lines lev (cnt + 1) sl
+                else (lines, [s :: sl])
+              else loop [s :: lines] lev (cnt + 1) sl
+            else if cnt <= v then loop [s :: lines] lev cnt sl
+            else loop lines lev cnt sl
+      | [] -> (lines, []) ]
+  in
+  String.concat "\n" (List.rev_append lines sl)
 ;
 
 value rev_extract_sub_part s v =
@@ -173,12 +170,14 @@ value rev_extract_sub_part s v =
     [ [s :: sl] ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-          let nlev = section_level s len in
-          if cnt = v then loop [s :: lines] nlev (cnt + 1) sl
-          else if cnt > v then
-            if nlev > lev then loop [s :: lines] lev (cnt + 1) sl
-            else lines
-          else loop lines lev (cnt + 1) sl
+          if v = first_cnt - 1 then lines
+          else
+            let nlev = section_level s len in
+            if cnt = v then loop [s :: lines] nlev (cnt + 1) sl
+            else if cnt > v then
+              if nlev > lev then loop [s :: lines] lev (cnt + 1) sl
+              else lines
+            else loop lines lev (cnt + 1) sl
         else if cnt <= v then loop lines lev cnt sl
         else loop [s :: lines] lev cnt sl
     | [] -> lines ]
@@ -315,7 +314,7 @@ value html_of_structure conf s =
         (lines_before_summary @ summary @ lines_after_summary))
   in
   if conf.wizard then
-    Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES\">%s</a>)%s\n"
+    Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES;v=0\">%s</a>)%s\n"
       (if s = "" then "<p>" else "<div style=\"float:right;margin-left:5px\">")
       (commd conf) (transl_decline conf "modify" "")
       (if s = "" then "</p>" else "</div>") ^
@@ -324,8 +323,7 @@ value html_of_structure conf s =
 ;
 
 value print_sub_part conf cnt0 lines =
-  (* mmmh... "max cnt first_cnt", below, is a hack to avoid a bug... *)
-  let lines = make_lines_after_summary conf (max cnt0 first_cnt) lines in
+  let lines = make_lines_after_summary conf cnt0 lines in
   let s = syntax_links conf (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   let s =
@@ -340,9 +338,16 @@ value print_sub_part conf cnt0 lines =
   in
   do {
     tag "p" begin
-      if cnt0 > 0 then do {
+      if cnt0 >= first_cnt then do {
         stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) (cnt0 - 1) begin
           Wserver.wprint "&lt;&lt;";
+        end;
+        Wserver.wprint "\n";
+      }
+      else ();
+      if cnt0 >= first_cnt - 1 then do {
+        stag "a" "href=\"%sm=NOTES\"" (commd conf) begin
+          Wserver.wprint "^^";
         end;
         Wserver.wprint "\n";
       }
@@ -388,17 +393,17 @@ value print_mod conf base =
       conf.bname
   in
   let s = base.data.bnotes.nread 0 in
-  let v =
+  let (has_v, v) =
     match p_getint conf.env "v" with
-    [ Some v -> v
-    | None -> first_cnt - 1 ]
+    [ Some v -> (True, v)
+    | None -> (False, 0) ]
   in
-  let sub_part = if v = first_cnt - 1 then s else extract_sub_part s v in
+  let sub_part = if not has_v then s else extract_sub_part s v in
   do {
     header conf title;
     tag "div" "style=\"float:right;margin-left:5px\"" begin
       stag "a" "href=\"%sm=NOTES%s\"" (commd conf)
-        (if v >= first_cnt then ";v=" ^ string_of_int v else "")
+        (if has_v then ";v=" ^ string_of_int v else "")
       begin
         Wserver.wprint "(%s)\n" (transl conf "visualize");
       end;
@@ -408,7 +413,7 @@ value print_mod conf base =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_NOTES_OK\"";
-        if v >= first_cnt then
+        if has_v then
           xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
         else ();
         let digest = Iovalue.digest s in
@@ -433,17 +438,17 @@ value print_ok conf base s =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>\n" (commd conf)
-      (capitale (transl_nth conf "note/notes" 1));
-    let cnt0 =
-      match p_getint conf.env "v" with
-      [ Some cnt0 -> cnt0
-      | None -> first_cnt - 1 ]
+    let get_v = p_getint conf.env "v" in
+    let (has_v, v) =
+      match get_v with
+      [ Some v -> (True, v)
+      | None -> (False, 0) ]
     in
-    History.record_notes conf base cnt0 "mn";
-    if cnt0 <> first_cnt - 1 then
-      print_sub_part conf cnt0 (lines_list_of_string s)
-    else ();
+    History.record_notes conf base get_v "mn";
+    if has_v then print_sub_part conf v (lines_list_of_string s)
+    else
+      Wserver.wprint "<a href=\"%sm=NOTES\">%s</a>\n" (commd conf)
+        (capitale (transl_nth conf "note/notes" 1));
     trailer conf
   }
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.17 2005-06-03 12:31:24 ddr Exp $ *)
+(* $Id: history.ml,v 4.18 2005-06-04 20:26:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -50,7 +50,12 @@ value record conf base (fn, sn, occ) action =
 ;
 
 value record_notes conf base num action =
-  gen_record conf base (string_of_int num) action
+  let s =
+    match num with
+    [ Some num -> string_of_int num
+    | None -> "" ]
+  in
+  gen_record conf base s action
 ;
 
 (* Request for history printing *)
