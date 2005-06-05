@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.40 2005-06-05 11:27:57 ddr Exp $ *)
+(* $Id: notes.ml,v 4.41 2005-06-05 23:55:15 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -308,12 +308,12 @@ value html_of_tlsw_lines conf cnt0 lines =
            in
            ([s; n1; n2 :: lines], cnt + 1)
          else ([s :: lines], cnt))
-      ([], cnt0) lines
+      ([], max cnt0 first_cnt) lines
   in
   rev_syntax_lists conf [] rev_lines
 ;
 
-value html_with_summary_of_structure conf s =
+value html_with_summary_of_tlsw conf s =
   let lines = lines_list_of_string s in
   let summary = summary_of_tlsw_lines conf lines in
   let (rev_lines_before_summary, lines) =
@@ -399,7 +399,7 @@ value print conf base =
         let lines = List.rev (rev_extract_sub_part s cnt0) in
         print_sub_part conf cnt0 lines
     | None ->
-        let s = html_with_summary_of_structure conf s in
+        let s = html_with_summary_of_tlsw conf s in
         let s = string_with_macros conf False [] s in
         Wserver.wprint "%s\n" s ];
     trailer conf;
