@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.26 2005-05-07 17:50:50 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.27 2005-06-05 11:27:57 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -599,7 +599,7 @@ function changeDeath()
 <h4><label for="notes">[*note/notes]1</label></h4>
 
 <p>
-<textarea name="notes" rows="6" cols="70" id="notes">%notes;</textarea>
+<textarea name="notes" rows="12" cols="80" id="notes">%notes;</textarea>
 </p>
 
 <h4><label for="src">[*source/sources]0</label></h4>

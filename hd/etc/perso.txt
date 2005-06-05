@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.46 2005-05-25 11:59:55 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.47 2005-06-05 11:27:57 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -290,7 +290,7 @@
 
 %if;has_notes;
   <h3><span class="highlight">[*note/notes]1</span></h3>
-  <ul><li>%notes;</li></ul>
+  <dl><dd>%notes;</dd></dl>
 %end;
 
 %if;has_sources;

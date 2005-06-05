@@ -1,10 +1,24 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.39 2005-06-04 21:12:51 ddr Exp $ *)
+(* $Id: notes.ml,v 4.40 2005-06-05 11:27:57 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+
+(* TLSW: Text Language Stolen to Wikipedia
+   = title level 1 =
+   == title level 2 ==
+   ...
+   ====== title level 6 ======
+   * list ul/li item
+   * list ul/li item
+   ** list ul/li item 2nd level
+   ** list ul/li item 2nd level
+   ...
+   [[first_name/surname/oc/text]] link; 'text' displayed
+   [[first_name/surname/text]] link (oc = 0); 'text' displayed
+   [[first_name/surname]] link (oc = 0) ; 'first_name surname' displayed *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
@@ -194,7 +208,7 @@ value extract_sub_part s v =
   String.concat "\n" (List.rev rev_lines)
 ;
 
-value make_summary conf lines =
+value summary_of_tlsw_lines conf lines =
   let (rev_summary, lev, _, _) =
     let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
@@ -268,8 +282,8 @@ value make_summary conf lines =
   else []
 ;
 
-value make_lines_after_summary conf cnt0 lines =
-  let (rev_lines_after_summary, _) =
+value html_of_tlsw_lines conf cnt0 lines =
+  let (rev_lines, _) =
     List.fold_left
       (fun (lines, cnt) s ->
          let len = String.length s in
@@ -296,12 +310,12 @@ value make_lines_after_summary conf cnt0 lines =
          else ([s :: lines], cnt))
       ([], cnt0) lines
   in
-  rev_syntax_lists conf [] rev_lines_after_summary
+  rev_syntax_lists conf [] rev_lines
 ;
 
-value html_of_structure conf s =
+value html_with_summary_of_structure conf s =
   let lines = lines_list_of_string s in
-  let summary = make_summary conf lines in
+  let summary = summary_of_tlsw_lines conf lines in
   let (rev_lines_before_summary, lines) =
     loop [] lines where rec loop lines_bef =
       fun
@@ -313,7 +327,7 @@ value html_of_structure conf s =
   let lines_before_summary =
     rev_syntax_lists conf [] rev_lines_before_summary
   in
-  let lines_after_summary = make_lines_after_summary conf first_cnt lines in
+  let lines_after_summary = html_of_tlsw_lines conf first_cnt lines in
   let s =
     syntax_links conf
       (String.concat "\n"
@@ -329,7 +343,7 @@ value html_of_structure conf s =
 ;
 
 value print_sub_part conf cnt0 lines =
-  let lines = make_lines_after_summary conf cnt0 lines in
+  let lines = html_of_tlsw_lines conf cnt0 lines in
   let s = syntax_links conf (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   let s =
@@ -385,7 +399,7 @@ value print conf base =
         let lines = List.rev (rev_extract_sub_part s cnt0) in
         print_sub_part conf cnt0 lines
     | None ->
-        let s = html_of_structure conf s in
+        let s = html_with_summary_of_structure conf s in
         let s = string_with_macros conf False [] s in
         Wserver.wprint "%s\n" s ];
     trailer conf;
