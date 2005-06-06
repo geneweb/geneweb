@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.43 2005-06-06 14:59:50 ddr Exp $ *)
+(* $Id: notes.ml,v 4.44 2005-06-06 19:14:42 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -382,7 +382,10 @@ value print_sub_part conf cnt0 lines =
       s
     else s
   in
-  navigate "NOTES" conf cnt0 (lines <> [])
+  do {
+    navigate "NOTES" conf cnt0 (lines <> []);
+    Wserver.wprint "%s\n" s
+  }
 ;
 
 value print conf base =
