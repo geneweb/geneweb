@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.44 2005-06-06 19:14:42 ddr Exp $ *)
+(* $Id: notes.ml,v 4.45 2005-06-06 19:53:46 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -342,32 +342,6 @@ value html_with_summary_of_tlsw conf s =
   else s
 ;
 
-value navigate mode conf cnt0 test_end =
-  tag "p" begin
-    if cnt0 >= first_cnt then do {
-      stag "a" "href=\"%sm=%s;v=%d\"" (commd conf) mode (cnt0 - 1) begin
-        Wserver.wprint "&lt;&lt;";
-      end;
-      Wserver.wprint "\n";
-    }
-    else ();
-    if cnt0 >= first_cnt - 1 then do {
-      stag "a" "href=\"%sm=%s\"" (commd conf) mode begin
-        Wserver.wprint "^^";
-      end;
-      Wserver.wprint "\n";
-    }
-    else ();
-    if test_end then do {
-      stag "a" "href=\"%sm=%s;v=%d\"" (commd conf) mode (cnt0 + 1) begin
-        Wserver.wprint "&gt;&gt;";
-      end;
-      Wserver.wprint "\n";
-    }
-    else ();
-  end
-;
-
 value print_sub_part conf cnt0 lines =
   let lines = html_of_tlsw_lines conf cnt0 lines in
   let s = syntax_links conf (String.concat "\n" lines) in
@@ -383,7 +357,30 @@ value print_sub_part conf cnt0 lines =
     else s
   in
   do {
-    navigate "NOTES" conf cnt0 (lines <> []);
+    let mode = "NOTES" in
+    tag "p" begin
+      if cnt0 >= first_cnt then do {
+        stag "a" "href=\"%sm=%s;v=%d\"" (commd conf) mode (cnt0 - 1) begin
+          Wserver.wprint "&lt;&lt;";
+        end;
+        Wserver.wprint "\n";
+      }
+      else ();
+      if cnt0 >= first_cnt - 1 then do {
+        stag "a" "href=\"%sm=%s\"" (commd conf) mode begin
+          Wserver.wprint "^^";
+        end;
+        Wserver.wprint "\n";
+      }
+      else ();
+      if lines <> [] then do {
+        stag "a" "href=\"%sm=%s;v=%d\"" (commd conf) mode (cnt0 + 1) begin
+          Wserver.wprint "&gt;&gt;";
+        end;
+        Wserver.wprint "\n";
+      }
+      else ();
+    end;
     Wserver.wprint "%s\n" s
   }
 ;
@@ -433,7 +430,25 @@ value print_mod conf base =
       end;
     end;
     print_link_to_welcome conf False;
-    if has_v then navigate "MOD_NOTES" conf v (sub_part <> "") else ();
+    if has_v then
+      let mode = "MOD_NOTES" in
+      tag "p" begin
+        if v >= first_cnt then do {
+          stag "a" "href=\"%sm=%s;v=%d\"" (commd conf) mode (v - 1) begin
+            Wserver.wprint "&lt;&lt;";
+          end;
+          Wserver.wprint "\n";
+        }
+        else ();
+        if sub_part <> "" then do {
+          stag "a" "href=\"%sm=%s;v=%d\"" (commd conf) mode (v + 1) begin
+            Wserver.wprint "&gt;&gt;";
+          end;
+          Wserver.wprint "\n";
+        }
+        else ();
+      end
+    else ();
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
