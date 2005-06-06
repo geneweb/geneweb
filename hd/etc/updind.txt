@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.27 2005-06-05 11:27:57 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.28 2005-06-06 09:10:07 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -219,7 +219,7 @@ function changeDeath()
      id="add_qualifier%cnt;"%/></td>
     </tr>
   %end;
-%elseif;(bvar_propose_qualifier != "no");
+%elseif;(bvar.propose_qualifier != "no");
   <tr>
   <td><label for="qualifier0">[*qualifier]0</label></td>
   <td><input name="qualifier0" size="30" value="" id="qualifier0"%/></td>
@@ -239,7 +239,7 @@ function changeDeath()
      id="add_alias%cnt;"%/></td>
     </tr>
   %end;
-%elseif;(bvar_propose_alias != "no");
+%elseif;(bvar.propose_alias != "no");
   <tr>
   <td><label for="alias0">[*alias]0</label></td>
   <td><input name="alias0" size="30" value="" id="alias0"%/></td>

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.48 2005-05-07 17:50:50 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.49 2005-06-06 09:10:07 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -248,9 +248,9 @@ function checkCreate(create, redirect)
 </p>
 
 %foreach;parent;
-%if;(bvar_multi_parents != "yes");<h4>%parent.himher;</h4>%end;%nl;
+%if;(bvar.multi_parents != "yes");<h4>%parent.himher;</h4>%end;%nl;
 %apply;parent(cnt, "parent")
-%if;(bvar_multi_parents = "yes");%apply;insert_parent(cnt)%end;
+%if;(bvar.multi_parents = "yes");%apply;insert_parent(cnt)%end;
 %end;
 
 <h4>[*marriage/marriages]0</h4>
@@ -481,7 +481,7 @@ function checkCreate(create, redirect)
   </tr>
 </table>
 
-%if;(bvar_origin_file = "on")
+%if;(bvar.origin_file = "on")
   <input name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
 %end;
 
