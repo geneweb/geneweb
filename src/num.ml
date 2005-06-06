@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 4.3 2005-05-13 14:03:46 ddr Exp $ *)
+(* $Id: num.ml,v 4.4 2005-06-06 09:26:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type t = array int;
@@ -171,6 +171,7 @@ value to_string_sep sep x =
       if eq x zero then d
       else loop [modl x 10 :: d] (div x 10)
   in
+  let digits = if digits = [] then [0] else digits in
   let len = List.length digits in
   let slen = String.length sep in
   let s = String.create (len + (len - 1) / 3 * slen) in
