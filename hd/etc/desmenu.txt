@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: desmenu.txt,v 1.7 2005-05-29 06:34:42 ddr Exp $ -->
+  <!-- $Id: desmenu.txt,v 1.8 2005-06-06 09:10:07 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -112,12 +112,12 @@
           <label>
             <input type="radio" name="t" value="T"%/>
             [*tree]
-            %if;(bvar_max_desc_tree = "" and max_desc_level >= 4)
+            %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
               ([maximum] 4 [generation/generations]1)
             %elseif;(
-              bvar_max_desc_tree != "" and max_desc_level >= bvar_max_desc_tree
+              bvar.max_desc_tree != "" and max_desc_level >= bvar.max_desc_tree
             )
-              ([maximum] %bvar_max_desc_tree; [generation/generations]1)
+              ([maximum] %bvar.max_desc_tree; [generation/generations]1)
             %end;
           </label>
           <br%/>
