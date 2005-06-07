@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.59 2005-05-27 04:50:35 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.60 2005-06-07 20:15:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -414,7 +414,7 @@ value print_update_fam conf base fcd digest =
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let astl = Templ.input conf "updfam" in
-      do { html1 conf; interp_templ conf base fcd digest astl }
+      do { html conf; nl (); interp_templ conf base fcd digest astl }
   | _ -> incorrect_request conf ]
 ;
 

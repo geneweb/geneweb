@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.29 2005-05-27 04:50:35 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.30 2005-06-07 20:15:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -424,7 +424,7 @@ value print_update_ind conf base p digest =
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
       let astl = Templ.input conf "updind" in
-      do { html1 conf; interp_templ conf base p digest astl }
+      do { html conf; nl (); interp_templ conf base p digest astl }
   | _ -> incorrect_request conf ]
 ;
 
