@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.13 2005-02-13 10:45:51 ddr Exp $ *)
+(* $Id: def.mli,v 4.14 2005-06-07 13:58:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -161,7 +161,7 @@ type relation = gen_relation iper istr;
 type title = gen_title istr;
 
 type notes =
-  { nread : mutable int -> string;
+  { nread : mutable string -> int -> string;
     norigin_file : mutable string }
 ;
 
@@ -211,7 +211,7 @@ type base_func =
     patch_string : istr -> string -> unit;
     patch_name : string -> iper -> unit;
     commit_patches : unit -> unit;
-    commit_notes : string -> unit;
+    commit_notes : string -> string -> unit;
     patched_ascends : unit -> list iper;
     is_patched_person : iper -> bool;
     cleanup : unit -> unit }
