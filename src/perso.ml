@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.135 2005-05-31 01:24:18 ddr Exp $ *)
+(* $Id: perso.ml,v 4.136 2005-06-07 18:34:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1613,7 +1613,13 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "notes" ->
       if p_auth then
         let env = [('i', fun () -> Util.default_image_name base p)] in
-        string_with_macros conf False env (sou base p.notes)
+        let s = sou base p.notes in
+        let s =
+          let lines = Notes.lines_list_of_string s in
+          let lines = Notes.html_of_tlsw_lines conf "" 0 False lines in
+          Notes.syntax_links conf (String.concat "\n" lines)
+        in
+        string_with_macros conf False env s
       else ""
   | "occ" -> if p_auth then string_of_int p.occ else ""
   | "occupation" ->

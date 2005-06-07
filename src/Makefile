@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.37 2005-05-30 04:16:43 ddr Exp $
+# $Id: Makefile,v 4.38 2005-06-07 18:34:35 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -6,8 +6,8 @@ PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo check.cmo calendar.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo dag.cmo templ.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
-GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo notes.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo
+GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo dag.cmo templ.cmo notes.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
+GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
