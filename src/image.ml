@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.12 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: image.ml,v 4.13 2005-06-07 20:15:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -84,7 +84,8 @@ value print conf base =
 
 value print_html conf base =
   do {
-    Util.html1 conf;
+    Util.html conf;
+    nl ();
     Wserver.wprint "<html>\n<head>\n";
     Wserver.wprint "  <title>%s</title>\n"
       (Util.transl_nth conf "image/images" 0);
