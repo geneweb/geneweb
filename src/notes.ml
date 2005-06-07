@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.52 2005-06-07 21:29:47 ddr Exp $ *)
+(* $Id: notes.ml,v 4.53 2005-06-07 21:49:03 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -199,7 +199,7 @@ value lines_list_of_string s =
     else loop lines (Buff.store len s.[i]) (i + 1)
 ;
 
-value insert_sub_part s v sub_part =
+value insert_not_empty_sub_part s v sub_part =
   let lines = lines_list_of_string s in
   let (lines, sl) =
     loop False [] 0 first_cnt lines
@@ -208,8 +208,7 @@ value insert_sub_part s v sub_part =
       [ [s :: sl] ->
           let len = String.length s in
           if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-            if v = first_cnt - 1 then
-              (if sub_part = "" then [] else [""; sub_part], [s :: sl])
+            if v = first_cnt - 1 then ([""; sub_part], [s :: sl])
             else
               let nlev = section_level s len in
               if cnt = v then
@@ -227,6 +226,11 @@ value insert_sub_part s v sub_part =
           (lines, []) ]
   in
   String.concat "\n" (List.rev_append lines sl)
+;
+
+value insert_sub_part s v sub_part =
+  if sub_part = "" then if s = "\n" then "" else s
+  else insert_not_empty_sub_part s v sub_part
 ;
 
 value rev_extract_sub_part s v =
