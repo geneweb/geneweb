@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.135 2005-05-31 08:25:39 ddr Exp $ *)
+(* $Id: util.ml,v 4.136 2005-06-07 20:15:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -368,13 +368,6 @@ value html conf =
     Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
     Wserver.wprint "Connection: close"; nl ();
     Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
-  }
-;
-
-value html1 conf =
-  do {
-    html conf;
-    nl ();
   }
 ;
 
@@ -1192,7 +1185,8 @@ value doctype conf =
 
 value header_without_page_title conf title =
   do {
-    html1 conf;
+    html conf;
+    nl ();
     Wserver.wprint "%s\n" (doctype conf);
     Wserver.wprint "<html>\n<head>\n";
     Wserver.wprint "  <title>";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.49 2005-06-07 20:15:22 ddr Exp $ *)
+(* $Id: notes.ml,v 4.50 2005-06-07 20:20:10 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -546,7 +546,11 @@ value print_ok conf base fnotes s =
   in
   do {
     header_no_page_title conf title;
-    tag "h3" begin title (); end;
+    tag "div" "style=\"text-align:center\"" begin
+      Wserver.wprint "--- ";
+      title ();
+      Wserver.wprint " ---\n";
+    end;
     print_link_to_welcome conf True;
     let get_v = p_getint conf.env "v" in
     let (has_v, v) =
