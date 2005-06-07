@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.51 2005-06-07 20:31:43 ddr Exp $ *)
+(* $Id: notes.ml,v 4.52 2005-06-07 21:29:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -440,6 +440,8 @@ value print_sub_part conf sub_fname cnt0 lines =
   }
 ;
 
+value read_notes base fnotes = base.data.bnotes.nread fnotes 0;
+
 value print conf base =
   let title _ =
     Wserver.wprint "%s - %s"
@@ -450,7 +452,7 @@ value print conf base =
     [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
-  let s = base.data.bnotes.nread fnotes 0 in
+  let s = read_notes base fnotes in
   do {
     header_no_page_title conf title;
     print_link_to_welcome conf False;
@@ -478,7 +480,7 @@ value print_mod conf base =
     Wserver.wprint "%s - %s%s" (capitale (transl_decline conf "modify" s))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let s = base.data.bnotes.nread fnotes 0 in
+  let s = read_notes base fnotes in
   let (has_v, v) =
     match p_getint conf.env "v" with
     [ Some v -> (True, v)
@@ -561,7 +563,7 @@ value print_ok conf base fnotes s =
     History.record_notes conf base (get_v, fnotes) "mn";
     if has_v then print_sub_part conf fnotes v (lines_list_of_string s)
     else
-     let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in
+      let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in
       Wserver.wprint "<a href=\"%sm=NOTES%s\">%s</a>\n" (commd conf) sfn
         (capitale (transl_nth conf "note/notes" 1));
     trailer conf
@@ -584,7 +586,7 @@ value print_mod_ok conf base =
     [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
-  let old_notes = base.data.bnotes.nread fnotes 0 in
+  let old_notes = read_notes base fnotes in
   try
     if digest <> Iovalue.digest old_notes then Update.error_digest conf base
     else
