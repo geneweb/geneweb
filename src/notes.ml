@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.46 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: notes.ml,v 4.47 2005-06-07 16:01:10 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -18,7 +18,9 @@ open Util;
    ...
    [[first_name/surname/oc/text]] link; 'text' displayed
    [[first_name/surname/text]] link (oc = 0); 'text' displayed
-   [[first_name/surname]] link (oc = 0) ; 'first_name surname' displayed *)
+   [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
+   [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
+   [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
@@ -89,6 +91,15 @@ value rev_syntax_lists conf list rev_list =
   syntax_lists conf list (List.rev rev_list)
 ;
 
+value check_file_name s =
+  loop 0 where rec loop i =
+    if i = String.length s then True
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '_' -> loop (i + 1)
+      | _ -> False ]
+;
+
 value syntax_links conf s =
   let slen = String.length s in
   loop 0 0 where rec loop i len =
@@ -100,10 +111,7 @@ value syntax_links conf s =
           else if
             j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
           then j + 3
-          else
-            match s.[j] with
-            [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '/' -> loop (j + 1)
-            | _ -> j ]
+          else loop (j + 1)
       in
       if j > i + 6 then
         let b = String.sub s (i + 3) (j - i - 6) in
@@ -114,19 +122,21 @@ value syntax_links conf s =
           with
           [ Not_found -> (b, b) ]
         in
-        let c =
-          let f =
-            List.fold_right Filename.concat
-              [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
-              (fname ^ ".txt")
+        if check_file_name fname then
+          let c =
+            let f =
+              List.fold_right Filename.concat
+                [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
+                (fname ^ ".txt")
+            in
+            if Sys.file_exists f then "" else " style=\"color:red\""
           in
-          if Sys.file_exists f then "" else " style=\"color:red\""
-        in
-        let t =
-          Printf.sprintf "<a href=\"%sm=NOTES;f=%s\"%s>%s</a>"
-            (commd conf) fname c text
-        in
-        loop j (Buff.mstore len t)
+          let t =
+            Printf.sprintf "<a href=\"%sm=NOTES;f=%s\"%s>%s</a>"
+              (commd conf) fname c text
+          in
+          loop j (Buff.mstore len t)
+        else loop (i + 3) (Buff.mstore len "[[[")
       else loop (i + 1) (Buff.store len s.[i])
     else if i < slen - 1 && s.[i] = '[' && s.[i+1] = '[' then
       let j =
@@ -423,15 +433,6 @@ value print_sub_part conf sub_fname cnt0 lines =
   }
 ;
 
-value check_notes_name s =
-  loop 0 where rec loop i =
-    if i = String.length s then True
-    else
-      match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '_' -> loop (i + 1)
-      | _ -> False ]
-;
-
 value print conf base =
   let title _ =
     Wserver.wprint "%s - %s"
@@ -439,7 +440,7 @@ value print conf base =
   in
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_notes_name f then f else ""
+    [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
   let s = base.data.bnotes.nread fnotes 0 in
@@ -462,7 +463,7 @@ value print conf base =
 value print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_notes_name f then f else ""
+    [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
   let title _ =
@@ -568,7 +569,7 @@ value print_mod_ok conf base =
   in
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_notes_name f then f else ""
+    [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
   let old_notes = base.data.bnotes.nread fnotes 0 in
