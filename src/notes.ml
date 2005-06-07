@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.47 2005-06-07 16:01:10 ddr Exp $ *)
+(* $Id: notes.ml,v 4.48 2005-06-07 18:34:35 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -208,7 +208,8 @@ value insert_sub_part s v sub_part =
       [ [s :: sl] ->
           let len = String.length s in
           if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-            if v = first_cnt - 1 then ([""; sub_part], [s :: sl])
+            if v = first_cnt - 1 then
+              (if sub_part = "" then [] else [""; sub_part], [s :: sl])
             else
               let nlev = section_level s len in
               if cnt = v then
@@ -254,7 +255,7 @@ value extract_sub_part s v =
 ;
 
 value summary_of_tlsw_lines conf lines =
-  let (rev_summary, lev, _, _) =
+  let (rev_summary, lev, _, cnt) =
     let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
       (fun (summary, lev, indent_stack, cnt) s ->
@@ -304,15 +305,18 @@ value summary_of_tlsw_lines conf lines =
         else (summary, lev, indent_stack, cnt))
       ([], 0, [], first_cnt) lines
   in
-  let rev_summary =
-    loop lev rev_summary where rec loop lev summary =
-      if lev > 0 then
-        let summary = [tab (lev - 1) "</li>" :: summary] in
-        let summary = [tab (lev - 1) "</ul>" :: summary] in
-        loop (lev - 1) summary
-      else summary
-  in
-  if rev_summary <> [] then
+  if cnt <= first_cnt + 1 then
+    (* less that 2 paragraphs : summary abandonned *)
+    []
+  else
+    let rev_summary =
+      loop lev rev_summary where rec loop lev summary =
+        if lev > 0 then
+          let summary = [tab (lev - 1) "</li>" :: summary] in
+          let summary = [tab (lev - 1) "</ul>" :: summary] in
+          loop (lev - 1) summary
+        else summary
+    in
     ["<dl><dd>";
      "<table border=\"1\"><tr><td>";
      "<table><tr>";
@@ -324,10 +328,9 @@ value summary_of_tlsw_lines conf lines =
         "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
         "</td></tr></table"; "</td></tr></table>";
         "</dd></dl>"]]
-  else []
 ;
 
-value html_of_tlsw_lines conf sub_fname cnt0 lines =
+value html_of_tlsw_lines conf sub_fname cnt0 with_mod_parag lines =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let (rev_lines, _) =
     List.fold_left
@@ -340,19 +343,21 @@ value html_of_tlsw_lines conf sub_fname cnt0 lines =
                (String.sub s lev (len-2*lev))
                (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
            in
-           let n1 =
-             if conf.wizard then
-               Printf.sprintf
-                 "<div style=\"float:right;margin-left:5px\">\
-                  (<a href=\"%sm=MOD_NOTES;v=%d%s\">%s</a>)</div>"
-                 (commd conf) cnt sfn (transl_decline conf "modify" "")
-             else ""
-           in
-           let n2 =
-             Printf.sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
-               cnt cnt
-           in
-           ([s; n1; n2 :: lines], cnt + 1)
+           if with_mod_parag then
+             let n1 =
+               if conf.wizard then
+                 Printf.sprintf
+                   "<div style=\"float:right;margin-left:5px\">\
+                    (<a href=\"%sm=MOD_NOTES;v=%d%s\">%s</a>)</div>"
+                   (commd conf) cnt sfn (transl_decline conf "modify" "")
+               else ""
+             in
+             let n2 =
+               Printf.sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
+                 cnt cnt
+             in
+             ([s; n1; n2 :: lines], cnt + 1)
+           else ([s :: lines], cnt + 1)
          else ([s :: lines], cnt))
       ([], max cnt0 first_cnt) lines
   in
@@ -373,13 +378,15 @@ value html_with_summary_of_tlsw conf sub_fname s =
   let lines_before_summary =
     rev_syntax_lists conf [] rev_lines_before_summary
   in
-  let lines_after_summary = html_of_tlsw_lines conf sub_fname first_cnt lines in
+  let lines_after_summary =
+    html_of_tlsw_lines conf sub_fname first_cnt True lines
+  in
   let s =
     syntax_links conf
       (String.concat "\n"
         (lines_before_summary @ summary @ lines_after_summary))
   in
-  if conf.wizard then
+  if conf.wizard && (lines_before_summary <> [] || lines = []) then
     Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES;v=0%s\">%s</a>)%s\n"
       (if s = "" then "<p>" else "<div style=\"float:right;margin-left:5px\">")
       (commd conf) (if sub_fname = "" then "" else ";f=" ^ sub_fname)
@@ -390,7 +397,7 @@ value html_with_summary_of_tlsw conf sub_fname s =
 ;
 
 value print_sub_part conf sub_fname cnt0 lines =
-  let lines = html_of_tlsw_lines conf sub_fname cnt0 lines in
+  let lines = html_of_tlsw_lines conf sub_fname cnt0 True lines in
   let s = syntax_links conf (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in

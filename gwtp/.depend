@@ -4,5 +4,7 @@ gwtp.cmo: ../src/buff.cmo ../src/def.cmi ../src/gutil.cmi httpEnv.cmo \
 gwtp.cmx: ../src/buff.cmx ../src/def.cmi ../src/gutil.cmx httpEnv.cmx \
     ../src/iobase.cmx iolight.cmx ../src/lock.cmx ../src/secure.cmx \
     ../src/translate.cmx 
-iolight.cmo: ../src/buff.cmo ../src/def.cmi ../src/iovalue.cmi 
-iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/iovalue.cmx 
+iolight.cmo: ../src/buff.cmo ../src/def.cmi ../src/iovalue.cmi \
+    ../src/secure.cmi 
+iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/iovalue.cmx \
+    ../src/secure.cmx 
