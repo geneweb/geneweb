@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.10 2005-04-30 08:23:59 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.11 2005-06-07 20:15:22 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -748,7 +748,7 @@ sv: <span class="highlight">genom</span>
 </ul>
 </td></tr></table>
 
-%Iw
+%I&w|Nnspropose_add_family;
 <table border="0" cellspacing="0" cellpadding="0" style="text-align: center">
 <tr><td><div>[
 af: Jy kan
@@ -814,7 +814,7 @@ zh: 增加家庭记录
 </td>
 <td align="%L">
 <ul style="list-style:inside">%E
-%E<li><a href="%sm=MOD_NOTES">[
+%E%INn<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
 bg: да промените бележките
 br: kemm an notennoù
@@ -822,12 +822,12 @@ ca: modificar les notes
 cs: upravit poznámky
 da: ændre noterne
 de: die Notizen &auml;ndern
-en: modify the notes
+en: add notes
 eo: modifi la notojn
 es: modificar las notas
 et: muuda märkusi andmebaasi kohta
 fi: muokkaa lis&auml;tietoja
-fr: modifier les notes
+fr: ajouter des notes
 he:  לעדכן את ההערות
 is: breytt athugasemdum
 it: modificare le note
@@ -841,7 +841,7 @@ ru: изменить заметку
 sl: spremenite zapiske
 sv: &auml;ndra noteringar
 ]</a></li>
-</ul>
+%E</ul>
 </td>
 </tr>
 </table>
@@ -859,12 +859,12 @@ ca: Tamb&eacute; podeu consultar
 cs: Lze také zobrazit
 da: Du kan også fremkalde:
 de: Du kannst zugreifen auf
-en: You can also consult
+en: You can consult
 eo: Vi povas anka&ugrave; konsulti
 es: Puede consultar
 et: Vaata lisaks:
 fi: Voit my&ouml;s katsoa
-fr: Vous pouvez également consulter
+fr: Vous pouvez consulter
 he: אפשר גם להראות
 is: Þú getur einnig athugað
 it: Si pu&ograve; anche consultare

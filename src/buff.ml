@@ -1,8 +1,8 @@
-(* $Id: buff.ml,v 4.3 2005-06-03 10:01:12 ddr Exp $ *)
+(* $Id: buff.ml,v 4.4 2005-06-07 20:15:22 ddr Exp $ *)
 
-module Make (Buff : sig value buff : ref string; end) =
+module Make (B : sig value buff : ref string; end) =
   struct
-    value buff = Buff.buff;
+    value buff = B.buff;
     value store len x =
       do {
         if len >= String.length buff.val then
