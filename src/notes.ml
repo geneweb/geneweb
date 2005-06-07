@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.50 2005-06-07 20:20:10 ddr Exp $ *)
+(* $Id: notes.ml,v 4.51 2005-06-07 20:31:43 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -558,7 +558,7 @@ value print_ok conf base fnotes s =
       [ Some v -> (True, v)
       | None -> (False, 0) ]
     in
-    History.record_notes conf base get_v "mn";
+    History.record_notes conf base (get_v, fnotes) "mn";
     if has_v then print_sub_part conf fnotes v (lines_list_of_string s)
     else
      let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in

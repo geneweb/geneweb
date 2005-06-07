@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.18 2005-06-04 20:26:27 ddr Exp $ *)
+(* $Id: history.ml,v 4.19 2005-06-07 20:31:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -49,11 +49,13 @@ value record conf base (fn, sn, occ) action =
   gen_record conf base (fn ^ "." ^ string_of_int occ ^ " " ^ sn) action
 ;
 
-value record_notes conf base num action =
+value record_notes conf base (num, file) action =
   let s =
     match num with
-    [ Some num -> string_of_int num
-    | None -> "" ]
+    [ Some num ->
+        let s = string_of_int num in
+        if file = "" then s else file ^ "/" ^ s
+    | None -> file ]
   in
   gen_record conf base s action
 ;
