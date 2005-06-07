@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.36 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.37 2005-06-07 13:58:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -599,7 +599,7 @@ value insert_notes fname gen key str =
 
 value insert_bnotes fname gen str =
   do {
-    gen.g_base.c_bnotes.nread := fun _ -> str;
+    gen.g_base.c_bnotes.nread := fun f _ -> if f = "" then str else "";
     gen.g_base.c_bnotes.norigin_file := fname;
   }
 ;
@@ -766,7 +766,7 @@ value input_particles part_file =
 value empty_base : cbase =
   {c_persons = [| |]; c_ascends = [| |]; c_unions = [| |];
    c_couples = [| |]; c_descends = [| |]; c_strings = [| |];
-   c_bnotes = {nread = fun _ -> ""; norigin_file = ""}}
+   c_bnotes = {nread = fun _ _ -> ""; norigin_file = ""}}
 ;
 
 value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =

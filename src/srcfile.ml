@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.32 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.33 2005-06-07 13:58:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -365,7 +365,7 @@ value rec copy_from_stream conf base strm mode =
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
-    | 'n' -> base.data.bnotes.nread 1 <> ""
+    | 'n' -> base.data.bnotes.nread "" 1 <> ""
     | 'o' -> Sys.file_exists (Wiznotes.dir conf)
     | 'p' ->
         match p_getenv conf.base_env (get_variable strm) with

@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.44 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.45 2005-06-07 13:58:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1166,9 +1166,13 @@ value input bname =
     with
     [ Not_found -> Hashtbl.add (snd patches.h_name) i [ip] ]
   in
-  let read_notes mlen =
+  let read_notes fnotes mlen =
+    let fname =
+      if fnotes = "" then "notes"
+      else Filename.concat "notes_d" (fnotes ^ ".txt")
+    in
     match
-      try Some (Secure.open_in (Filename.concat bname "notes")) with
+      try Some (Secure.open_in (Filename.concat bname fname)) with
       [ Sys_error _ -> None ]
     with
     [ Some ic ->
@@ -1185,8 +1189,15 @@ value input bname =
         }
     | None -> "" ]
   in
-  let commit_notes s =
-    let fname = Filename.concat bname "notes" in
+  let commit_notes fnotes s =
+    let fname =
+      if fnotes = "" then "notes"
+      else do {
+        try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with _ -> ();
+        Filename.concat "notes_d" (fnotes ^ ".txt")
+      }
+    in
+    let fname = Filename.concat bname fname in
     do {
       try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
       try Sys.rename fname (fname ^ "~") with _ -> ();
@@ -1640,7 +1651,7 @@ value gen_output no_patches bname base =
               seek_out oc2 int_size;
               output_binary_int oc2 surname_pos;
               output_binary_int oc2 first_name_pos;
-              let s = base.data.bnotes.nread 0 in
+              let s = base.data.bnotes.nread "" 0 in
               if s = "" then ()
               else do {
                 let oc_not = Secure.open_out tmp_notes in

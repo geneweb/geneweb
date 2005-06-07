@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.33 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.34 2005-06-07 13:58:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1053,7 +1053,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
         else ()
       else ()
     };
-    let s = base.data.bnotes.nread 0 in
+    let s = base.data.bnotes.nread "" 0 in
     if s = "" then ()
     else if not no_notes.val then do {
       let (oc, first) = origin_file base.data.bnotes.norigin_file in

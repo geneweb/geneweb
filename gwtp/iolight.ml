@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.9 2005-02-14 18:19:23 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.10 2005-06-07 13:58:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -163,9 +163,13 @@ value input bname =
       "strings"
   in
   let cleanup () = close_in ic in
-  let read_notes mlen =
+  let read_notes fnotes mlen =
+    let fname =
+      if fnotes = "" then "notes"
+      else Filename.concat "notes_d" (fnotes ^ ".txt")
+    in
     match
-      try Some (open_in (Filename.concat bname "notes")) with
+      try Some (Secure.open_in (Filename.concat bname fname)) with
       [ Sys_error _ -> None ]
     with
     [ Some ic ->
@@ -182,8 +186,15 @@ value input bname =
         }
     | None -> "" ]
   in
-  let commit_notes s =
-    let fname = Filename.concat bname "notes" in
+  let commit_notes fnotes s =
+    let fname =
+      if fnotes = "" then "notes"
+      else do {
+        try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with _ -> ();
+        Filename.concat "notes_d" (fnotes ^ ".txt")
+      }
+    in
+    let fname = Filename.concat bname fname in
     do {
       try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
       try Sys.rename fname (fname ^ "~") with _ -> ();
