@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.35 2005-06-08 17:44:42 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.36 2005-06-08 19:49:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1111,17 +1111,27 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       fprintf oc "notes\n";
       fprintf oc "%s\n" s;
       fprintf oc "end notes\n";
-      add_extended_files (fun _ -> "notes") gen s
+      add_extended_files (fun _ -> "notes") gen s;
+      List.iter
+        (fun (f, r) ->
+           do {
+(*
+             printf "File \"%s\" is used by:\n" f;
+             List.iter (fun f -> printf "  - %s\n" f) r.val;
+             flush stdout;
+*)
+             let s = base.data.bnotes.nread f 0 in
+             if s <> "" then do {
+               fprintf oc "\n";
+               fprintf oc "notes %s\n" f;
+               fprintf oc "%s\n" s;
+               fprintf oc "end notes\n";
+             }
+             else ()
+           })
+        gen.ext_files;
     }
     else ();
-    List.iter
-      (fun (f, r) ->
-         do {
-           printf "File \"%s\" is used by:\n" f;
-           List.iter (fun f -> printf "  - %s\n" f) r.val;
-           flush stdout;
-         })
-      gen.ext_files;
   }
 ;
 
