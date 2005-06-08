@@ -1,11 +1,11 @@
-# $Id: Makefile,v 4.24 2005-05-10 22:07:02 ddr Exp $
+# $Id: Makefile,v 4.25 2005-06-08 08:54:44 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
 DOCDIR=$(PREFIX)/share/geneweb/doc
 MANDIR=$(PREFIX)/man/man1
 DESTDIR=distribution
-MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwu.1
+MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwu.1 gwd.1
 
 include tools/Makefile.inc
 
