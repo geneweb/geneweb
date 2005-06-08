@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.34 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.35 2005-06-08 17:44:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -274,16 +274,25 @@ value print_infos oc base is_child csrc cbp p =
   }
 ;
 
-value print_parent oc base mark fam_sel fam p =
+type gen =
+  { mark : array bool;
+    per_sel : iper -> bool;
+    fam_sel : ifam -> bool;
+    fam_done : array bool;
+    notes_pl_p : mutable list person;
+    ext_files : mutable list (string * ref (list string)) }
+;
+
+value print_parent oc base gen fam p =
   let a = aoi base p.cle_index in
   let has_printed_parents =
     match parents a with
-    [ Some ifam -> fam_sel ifam
+    [ Some ifam -> gen.fam_sel ifam
     | None -> False ]
   in
   let first_parent_definition =
-    if mark.(Adef.int_of_iper p.cle_index) then False
-    else do { mark.(Adef.int_of_iper p.cle_index) := True; True }
+    if gen.mark.(Adef.int_of_iper p.cle_index) then False
+    else do { gen.mark.(Adef.int_of_iper p.cle_index) := True; True }
   in
   let pr = not has_printed_parents && first_parent_definition in
   let has_infos = if pr then has_infos base p else False in
@@ -362,7 +371,7 @@ value empty_family base m =
   array_forall (bogus_person base) m.m_chil
 ;
 
-value print_witness oc base mark p notes_pl_p =
+value print_witness oc base gen p =
   let a = aoi base p.cle_index in
   let u = uoi base p.cle_index in
   do {
@@ -370,24 +379,24 @@ value print_witness oc base mark p notes_pl_p =
       (correct_string base p.first_name)
       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
     if Array.length u.family = 0 && parents a = None &&
-       not mark.(Adef.int_of_iper p.cle_index)
+       not gen.mark.(Adef.int_of_iper p.cle_index)
     then do {
-      mark.(Adef.int_of_iper p.cle_index) := True;
+      gen.mark.(Adef.int_of_iper p.cle_index) := True;
       if has_infos base p then print_infos oc base False "" "" p
       else fprintf oc " 0";
       match sou base p.notes with
       [ "" -> ()
-      | _ -> notes_pl_p.val := [p :: notes_pl_p.val] ]
+      | _ -> gen.notes_pl_p := [p :: gen.notes_pl_p] ]
     }
     else ()
   }
 ;
 
-value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
+value print_family oc base gen m =
   let fam = m.m_fam in
   do {
     fprintf oc "fam ";
-    print_parent oc base mark fam_sel fam m.m_fath;
+    print_parent oc base gen fam m.m_fath;
     fprintf oc " +";
     print_date_option oc (Adef.od_of_codate fam.marriage);
     match fam.relation with
@@ -412,11 +421,11 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
         let d = Adef.od_of_codate d in
         do { fprintf oc " -"; print_date_option oc d } ];
     fprintf oc " ";
-    print_parent oc base mark fam_sel fam m.m_moth;
+    print_parent oc base gen fam m.m_moth;
     fprintf oc "\n";
     Array.iter
       (fun ip ->
-         if per_sel ip then do {
+         if gen.per_sel ip then do {
            let p = poi base ip in
            fprintf oc "wit";
            match p.sex with
@@ -424,7 +433,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
            | Female -> fprintf oc " f"
            | _ -> () ];
            fprintf oc ": ";
-           print_witness oc base mark p notes_pl_p;
+           print_witness oc base gen p;
            fprintf oc "\n"
          }
          else ())
@@ -454,13 +463,13 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
           fprintf oc "beg\n";
           Array.iter
             (fun p ->
-               if per_sel p.cle_index then
+               if gen.per_sel p.cle_index then
                  print_child oc base fam_surname csrc cbp p
                else ())
             m.m_chil;
           fprintf oc "end\n"
         } ];
-    fam_done.(Adef.int_of_ifam fam.fam_index) := True
+    gen.fam_done.(Adef.int_of_ifam fam.fam_index) := True
   }
 ;
 
@@ -485,7 +494,43 @@ value get_persons_with_notes base m list =
     (Array.to_list m.m_chil) list
 ;
 
-value print_notes_for_person oc base p =
+value add_extended_files from gen s =
+  let slen = String.length s in
+  loop 0 where rec loop i =
+    if i = slen then ()
+    else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
+      let j =
+        loop (i + 3) where rec loop j =
+          if j = slen then j
+          else if
+            j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
+          then j + 3
+          else loop (j + 1)
+      in
+      if j > i + 6 then
+        let b = String.sub s (i + 3) (j - i - 6) in
+        let fname =
+          try
+            let k = String.index b '/' in
+            String.sub b 0 k
+          with
+          [ Not_found -> b ]
+        in
+        do {
+          let r =
+            try List.assoc fname gen.ext_files with
+            [ Not_found ->
+                let r = ref [] in
+                do { gen.ext_files := [(fname, r) :: gen.ext_files]; r } ]
+          in
+          r.val := [from () :: r.val];
+          loop j
+        }
+      else loop (i + 1)
+    else loop (i + 1)
+;
+
+value print_notes_for_person oc base gen p =
   let notes = sou base p.notes in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
@@ -495,7 +540,8 @@ value print_notes_for_person oc base p =
       (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
     fprintf oc "beg\n";
     fprintf oc "%s\n" notes;
-    fprintf oc "end notes\n"
+    fprintf oc "end notes\n";
+    add_extended_files (fun _ -> Gutil.designation base p) gen notes
   }
   else ()
 ;
@@ -509,15 +555,16 @@ value rec list_memf f x =
 value eq_key p1 p2 = p1.cle_index == p2.cle_index;
 value eq_key_fst (p1, _) (p2, _) = p1.cle_index == p2.cle_index;
 
-value print_notes oc base ml per_sel pl =
-  let pl = List.fold_right (get_persons_with_notes base) ml pl in
+value print_notes oc base gen ml =
+  let pl = List.fold_right (get_persons_with_notes base) ml gen.notes_pl_p in
   let pl =
     List.fold_right
       (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl]) pl []
   in
   List.iter
     (fun p ->
-       if per_sel p.cle_index then print_notes_for_person oc base p else ())
+       if gen.per_sel p.cle_index then print_notes_for_person oc base gen p
+       else ())
     pl
 ;
 
@@ -615,11 +662,11 @@ value print_relation_parent oc base mark defined_p p =
   }
 ;
 
-value print_relation_for_person oc base mark per_sel def_p p r =
+value print_relation_for_person oc base gen def_p p r =
   let fath =
     match r.r_fath with
     [ Some ip ->
-        if per_sel ip then
+        if gen.per_sel ip then
           let p = poi base ip in
           if sou base p.first_name = "?" || sou base p.surname = "?" then None
           else Some p
@@ -629,7 +676,7 @@ value print_relation_for_person oc base mark per_sel def_p p r =
   let moth =
     match r.r_moth with
     [ Some ip ->
-        if per_sel ip then
+        if gen.per_sel ip then
           let p = poi base ip in
           if sou base p.first_name = "?" || sou base p.surname = "?" then None
           else Some p
@@ -653,29 +700,29 @@ value print_relation_for_person oc base mark per_sel def_p p r =
         | _ -> () ];
         fprintf oc ": ";
         match (fath, moth) with
-        [ (Some fath, None) -> print_relation_parent oc base mark def_p fath
-        | (None, Some moth) -> print_relation_parent oc base mark def_p moth
+        [ (Some fath, None) -> print_relation_parent oc base gen.mark def_p fath
+        | (None, Some moth) -> print_relation_parent oc base gen.mark def_p moth
         | (Some fath, Some moth) ->
             do {
-              print_relation_parent oc base mark def_p fath;
+              print_relation_parent oc base gen.mark def_p fath;
               fprintf oc " + ";
-              print_relation_parent oc base mark def_p moth
+              print_relation_parent oc base gen.mark def_p moth
             }
         | _ -> () ];
         fprintf oc "\n"
       } ]
 ;
 
-value print_relations_for_person oc base mark per_sel def_p is_definition p =
+value print_relations_for_person oc base gen def_p is_definition p =
   let surn = correct_string base p.surname in
   let fnam = correct_string base p.first_name in
   let exist_relation =
     List.exists
       (fun r ->
          match (r.r_fath, r.r_moth) with
-         [ (Some ip1, Some ip2) -> per_sel ip1 && per_sel ip2
-         | (Some ip1, _) -> per_sel ip1
-         | (_, Some ip2) -> per_sel ip2
+         [ (Some ip1, Some ip2) -> gen.per_sel ip1 && gen.per_sel ip2
+         | (Some ip1, _) -> gen.per_sel ip1
+         | (_, Some ip2) -> gen.per_sel ip2
          | _ -> False ])
       p.rparents
   in
@@ -694,14 +741,13 @@ value print_relations_for_person oc base mark per_sel def_p is_definition p =
     else ();
     fprintf oc "\n";
     fprintf oc "beg\n";
-    List.iter (print_relation_for_person oc base mark per_sel def_p p)
-      p.rparents;
+    List.iter (print_relation_for_person oc base gen def_p p) p.rparents;
     fprintf oc "end\n"
   }
   else ()
 ;
 
-value print_relations oc base mark per_sel ml =
+value print_relations oc base gen ml =
   let pl = List.fold_right (get_persons_with_relations base) ml [] in
   let pl = List.fold_right (get_isolated_related base) ml pl in
   let pl =
@@ -714,9 +760,9 @@ value print_relations oc base mark per_sel ml =
     | [(p, if_def) :: pl] ->
         let def_p = ref [] in
         do {
-          if p.rparents <> [] && per_sel p.cle_index then do {
-            print_relations_for_person oc base mark per_sel def_p if_def p;
-            List.iter (print_notes_for_person oc base) def_p.val
+          if p.rparents <> [] && gen.per_sel p.cle_index then do {
+            print_relations_for_person oc base gen def_p if_def p;
+            List.iter (print_notes_for_person oc base gen) def_p.val
           }
           else ();
           loop (pl @ List.map (fun p -> (p, False)) def_p.val)
@@ -993,12 +1039,6 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
     [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
     | None -> None ]
   in
-  let ((per_sel, fam_sel) as sel) =
-    Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
-      censor.val with_siblings.val maxlev.val
-  in
-  let fam_done = Array.create base.data.families.len False in
-  let mark = Array.create base.data.persons.len False in
   let out_oc_first = ref True in
   let origin_file fname =
     if out_dir = "" then (out_oc, out_oc_first)
@@ -1013,14 +1053,24 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
             src_oc_list.val := [(fname, x) :: src_oc_list.val]; x
           } ]
   in
+  let gen =
+    let mark = Array.create base.data.persons.len False in
+    let (per_sel, fam_sel) =
+      Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
+        censor.val with_siblings.val maxlev.val
+    in
+    let fam_done = Array.create base.data.families.len False in
+    {mark = mark; per_sel = per_sel; fam_sel = fam_sel;
+     fam_done = fam_done; notes_pl_p = []; ext_files = []}
+  in
   do {
     for i = 0 to base.data.families.len - 1 do {
       let fam = base.data.families.get i in
       let cpl = base.data.couples.get i in
       if is_deleted_family fam then ()
-      else if fam_done.(i) then ()
-      else if fam_sel fam.fam_index then
-        let ifaml = connected_families base fam_sel fam cpl in
+      else if gen.fam_done.(i) then ()
+      else if gen.fam_sel fam.fam_index then
+        let ifaml = connected_families base gen.fam_sel fam cpl in
         let (oc, first) =
           if to_separate fam.fam_index then (out_oc, out_oc_first)
           else origin_file (sou base fam.origin_file)
@@ -1037,18 +1087,18 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
                   m_chil = Array.map (fun ip -> poi base ip) des.children}
                in
                if empty_family base m then do {
-                 fam_done.(Adef.int_of_ifam m.m_fam.fam_index) := True; ml
+                 gen.fam_done.(Adef.int_of_ifam m.m_fam.fam_index) := True; ml
                }
                else [m :: ml])
             ifaml []
         in
         if ml <> [] then do {
-          let notes_pl_p = ref [] in
+          gen.notes_pl_p := [];
           if not first.val then fprintf oc "\n" else ();
           first.val := False;
-          List.iter (print_family oc base mark sel fam_done notes_pl_p) ml;
-          print_notes oc base ml per_sel notes_pl_p.val;
-          print_relations oc base mark per_sel ml
+          List.iter (print_family oc base gen) ml;
+          print_notes oc base gen ml;
+          print_relations oc base gen ml
         }
         else ()
       else ()
@@ -1060,9 +1110,18 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       if not first.val then fprintf oc "\n" else ();
       fprintf oc "notes\n";
       fprintf oc "%s\n" s;
-      fprintf oc "end notes\n"
+      fprintf oc "end notes\n";
+      add_extended_files (fun _ -> "notes") gen s
     }
-    else ()
+    else ();
+    List.iter
+      (fun (f, r) ->
+         do {
+           printf "File \"%s\" is used by:\n" f;
+           List.iter (fun f -> printf "  - %s\n" f) r.val;
+           flush stdout;
+         })
+      gen.ext_files;
   }
 ;
 
