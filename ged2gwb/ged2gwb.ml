@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.57 2005-06-09 08:59:24 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.58 2005-06-09 12:22:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2295,7 +2295,7 @@ value make_base (persons, families, strings, bnotes) =
   let (families, couples, descends) = families in
   let bnotes =
     {nread s _ = if s = "" then bnotes else ""; norigin_file = "";
-     nfiles _ = []}
+     efiles _ = []}
   in
   let base_data =
     {persons = cache_of persons; ascends = cache_of ascends;

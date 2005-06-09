@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.15 2005-06-09 08:43:09 ddr Exp $ *)
+(* $Id: def.mli,v 4.16 2005-06-09 12:22:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -163,7 +163,7 @@ type title = gen_title istr;
 type notes =
   { nread : mutable string -> int -> string;
     norigin_file : mutable string;
-    nfiles  : mutable unit -> list string }
+    efiles  : mutable unit -> list string }
 ;
 
 type cache 'a =
