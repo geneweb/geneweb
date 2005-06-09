@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.36 2005-06-08 19:49:01 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.37 2005-06-09 03:19:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -494,10 +494,10 @@ value get_persons_with_notes base m list =
     (Array.to_list m.m_chil) list
 ;
 
-value add_extended_files from gen s =
+value add_linked_files gen from s some_linked_files =
   let slen = String.length s in
-  loop 0 where rec loop i =
-    if i = slen then ()
+  loop some_linked_files 0 where rec loop new_linked_files i =
+    if i = slen then new_linked_files
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       let j =
         loop (i + 3) where rec loop j =
@@ -516,18 +516,25 @@ value add_extended_files from gen s =
           with
           [ Not_found -> b ]
         in
-        do {
-          let r =
-            try List.assoc fname gen.ext_files with
-            [ Not_found ->
-                let r = ref [] in
-                do { gen.ext_files := [(fname, r) :: gen.ext_files]; r } ]
-          in
-          r.val := [from () :: r.val];
-          loop j
-        }
-      else loop (i + 1)
-    else loop (i + 1)
+        let f = from () in
+        let new_linked_files =
+          try
+            let r = List.assoc fname gen.ext_files in
+            do {
+              if List.mem f r.val then () else r.val := [f :: r.val];
+              new_linked_files
+            }
+          with
+          [ Not_found ->
+              let lf = (fname, ref [f]) in
+              do {
+                gen.ext_files := [lf :: gen.ext_files];
+                [lf :: new_linked_files];
+              } ]
+        in
+        loop new_linked_files j
+      else loop new_linked_files (i + 1)
+    else loop new_linked_files (i + 1)
 ;
 
 value print_notes_for_person oc base gen p =
@@ -541,7 +548,8 @@ value print_notes_for_person oc base gen p =
     fprintf oc "beg\n";
     fprintf oc "%s\n" notes;
     fprintf oc "end notes\n";
-    add_extended_files (fun _ -> Gutil.designation base p) gen notes
+    let f _ = sprintf "indiv \"%s\"" (Gutil.designation base p) in
+    ignore (add_linked_files gen f notes [] : list _)
   }
   else ()
 ;
@@ -1013,6 +1021,17 @@ value separate base =
       } ]
 ;
 
+value rs_printf oc s =
+  loop True 0 where rec loop bol i =
+    if i = String.length s then ()
+    else if s.[i] = '\n' then do { fprintf oc "\n"; loop True (i + 1) }
+    else do {
+      if bol then fprintf oc "  " else ();
+      fprintf oc "%c" s.[i];
+      loop False (i + 1)
+    }
+;
+
 (* Main *)
 
 value surnames = ref [];
@@ -1108,28 +1127,38 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
     else if not no_notes.val then do {
       let (oc, first) = origin_file base.data.bnotes.norigin_file in
       if not first.val then fprintf oc "\n" else ();
-      fprintf oc "notes\n";
-      fprintf oc "%s\n" s;
-      fprintf oc "end notes\n";
-      add_extended_files (fun _ -> "notes") gen s;
+      fprintf oc "notes page\n";
+      rs_printf oc s;
+      fprintf oc "\nend notes\n";
+      ignore (add_linked_files gen (fun _ -> "main notes") s [] : list _);
+      let rec loop =
+        fun
+        [ [] -> ()
+        | [(f, _) :: files] ->
+            let s = base.data.bnotes.nread f 0 in
+            let files =
+              add_linked_files gen (fun _ -> sprintf "page \"%s\"" f) s files
+            in
+            loop files ]
+      in
+      loop gen.ext_files;
       List.iter
         (fun (f, r) ->
-           do {
-(*
-             printf "File \"%s\" is used by:\n" f;
-             List.iter (fun f -> printf "  - %s\n" f) r.val;
-             flush stdout;
-*)
+             do {
              let s = base.data.bnotes.nread f 0 in
              if s <> "" then do {
                fprintf oc "\n";
-               fprintf oc "notes %s\n" f;
-               fprintf oc "%s\n" s;
-               fprintf oc "end notes\n";
+               (* the following generated comment is just informative
+                  (not required to rebuild the database) *)
+               fprintf oc "# note page \"%s\" used by:\n" f;
+               List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
+               fprintf oc "notes page %s\n" f;
+               rs_printf oc s;
+               fprintf oc "\nend notes\n";
              }
              else ()
            })
-        gen.ext_files;
+        (List.rev gen.ext_files);
     }
     else ();
   }

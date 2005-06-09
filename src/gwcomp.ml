@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.17 2005-02-13 13:35:46 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.18 2005-06-09 03:19:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -16,7 +16,7 @@ type syntax_o =
       gen_descend (gen_person iper string)
   | Notes of key and string
   | Relations of somebody and sex and list (gen_relation somebody string)
-  | Bnotes of string ]
+  | Bnotes of string and string ]
 ;
 
 type encoding = [ E_utf_8 | E_iso_8859_1 ];
@@ -698,13 +698,37 @@ value get_relation str =
   | _ -> failwith str ]
 ;
 
-value read_notes ic =
+(* before version 5.00 *)
+value old_read_notes ic =
   let notes =
     try
       let rec loop =
         fun
         [ "end notes" -> ""
         | l -> l ^ "\n" ^ loop (input_a_line ic) ]
+      in
+      loop (input_a_line ic)
+    with
+    [ End_of_file -> failwith "end of file" ]
+  in
+  strip_all_trailing_spaces notes
+;
+
+(* from version 5.00 *)
+value read_notes ic =
+  let notes =
+    try
+      let rec loop =
+        fun
+        [ "end notes" -> ""
+        | s ->
+            let len = String.length s in
+            let s =
+              if len > 2 && s.[0] = ' ' && s.[1] = ' ' then
+                String.sub s 2 (len - 2)
+              else s
+            in
+            s ^ "\n" ^ loop (input_a_line ic) ]
       in
       loop (input_a_line ic)
     with
@@ -817,7 +841,11 @@ value read_family ic fname =
             F_some (Family co fath_sex moth_sex witn fo deo, line) ]
       }
   | Some (str, ["notes"]) ->
-      let notes = read_notes ic in F_some (Bnotes notes, read_line ic)
+      let notes = old_read_notes ic in F_some (Bnotes "" notes, read_line ic)
+  | Some (str, ["notes"; "page"]) ->
+      let notes = read_notes ic in F_some (Bnotes "" notes, read_line ic)
+  | Some (str, ["notes"; "page"; p]) ->
+      let notes = read_notes ic in F_some (Bnotes p notes, read_line ic)
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in

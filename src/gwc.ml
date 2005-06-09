@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.37 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.38 2005-06-09 03:19:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -597,9 +597,11 @@ value insert_notes fname gen key str =
       } ]
 ;
 
-value insert_bnotes fname gen str =
+value insert_bnotes fname gen nfname str =
+  let old_nread = gen.g_base.c_bnotes.nread in
   do {
-    gen.g_base.c_bnotes.nread := fun f _ -> if f = "" then str else "";
+    gen.g_base.c_bnotes.nread :=
+      fun f n -> if f = nfname then str else old_nread f n;
     gen.g_base.c_bnotes.norigin_file := fname;
   }
 ;
@@ -650,7 +652,7 @@ value insert_syntax fname gen =
   [ Family cpl fs ms witl fam des -> insert_family gen cpl fs ms witl fam des
   | Notes key str -> insert_notes fname gen key str
   | Relations sb sex rl -> insert_relations fname gen sb sex rl
-  | Bnotes str -> insert_bnotes fname gen str ]
+  | Bnotes nfname str -> insert_bnotes fname gen nfname str ]
 ;
 
 value insert_comp_families gen (x, separate, shift) =
