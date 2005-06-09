@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.45 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.46 2005-06-09 08:43:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1207,7 +1207,21 @@ value input bname =
       }
     }
   in
-  let bnotes = {nread = read_notes; norigin_file = norigin_file} in
+  let notes_files () =
+    try
+      let files = Sys.readdir (Filename.concat bname "notes_d") in
+      List.fold_left
+        (fun files file ->
+           if Filename.check_suffix file ".txt" then
+             [Filename.chop_suffix file ".txt" :: files]
+           else files)
+        [] (Array.to_list files)
+    with
+    [ Sys_error _ -> [] ]
+  in
+  let bnotes =
+    {nread = read_notes; norigin_file = norigin_file; nfiles = notes_files}
+  in
   let base_data =
     {persons = persons; ascends = ascends; unions = unions;
      visible = make_visible_cache bname persons;

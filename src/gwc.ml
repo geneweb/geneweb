@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.38 2005-06-09 03:19:47 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.39 2005-06-09 08:43:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -768,7 +768,7 @@ value input_particles part_file =
 value empty_base : cbase =
   {c_persons = [| |]; c_ascends = [| |]; c_unions = [| |];
    c_couples = [| |]; c_descends = [| |]; c_strings = [| |];
-   c_bnotes = {nread = fun _ _ -> ""; norigin_file = ""}}
+   c_bnotes = {nread = fun _ _ -> ""; norigin_file = ""; nfiles _ = []}}
 ;
 
 value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
