@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.56 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.57 2005-06-09 08:59:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2293,7 +2293,10 @@ value cache_of tab =
 value make_base (persons, families, strings, bnotes) =
   let (persons, ascends, unions) = persons in
   let (families, couples, descends) = families in
-  let bnotes = {nread s _ = if s = "" then bnotes else ""; norigin_file = ""} in
+  let bnotes =
+    {nread s _ = if s = "" then bnotes else ""; norigin_file = "";
+     nfiles _ = []}
+  in
   let base_data =
     {persons = cache_of persons; ascends = cache_of ascends;
      unions = cache_of unions; families = cache_of families;

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.40 2005-06-09 08:43:09 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.41 2005-06-09 08:59:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1152,7 +1152,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
              if s <> "" then do {
                if not first.val then fprintf oc "\n" else ();
                first.val := False;
-               fprintf oc "# note page \"%s\" used by:\n" f;
+               fprintf oc "# extended page \"%s\" used by:\n" f;
                List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
                fprintf oc "notes_db %s\n" f;
                rs_printf oc s;

@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.10 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.11 2005-06-09 08:59:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -204,7 +204,9 @@ value input bname =
       }
     }
   in
-  let bnotes = {nread = read_notes; norigin_file = norigin_file} in
+  let bnotes =
+    {nread = read_notes; norigin_file = norigin_file; nfiles _ = []}
+  in
   let base_data =
     {persons = persons; ascends = ascends; unions = unions;
      visible = { v_write = fun []; v_get = fun [] };
