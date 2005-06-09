@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.19 2005-06-09 03:51:37 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.20 2005-06-09 09:24:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -714,20 +714,19 @@ value read_notes ic =
 ;
 
 (* from version 5.00 *)
-value read_notes_db ic =
+value read_notes_db ic end_txt =
   let notes =
     try
-      let rec loop =
-        fun
-        [ "end notes_db" -> ""
-        | s ->
-            let len = String.length s in
-            let s =
-              if len > 2 && s.[0] = ' ' && s.[1] = ' ' then
-                String.sub s 2 (len - 2)
-              else s
-            in
-            s ^ "\n" ^ loop (input_a_line ic) ]
+      let rec loop s =
+        if s = end_txt then ""
+        else
+          let len = String.length s in
+          let s =
+            if len > 2 && s.[0] = ' ' && s.[1] = ' ' then
+              String.sub s 2 (len - 2)
+            else s
+          in
+          s ^ "\n" ^ loop (input_a_line ic)
       in
       loop (input_a_line ic)
     with
@@ -839,13 +838,16 @@ value read_family ic fname =
             let deo = {children = [| |]} in
             F_some (Family co fath_sex moth_sex witn fo deo, line) ]
       }
+  | Some (str, ["notes-db"]) ->
+      let notes = read_notes_db ic "end notes-db" in
+      F_some (Bnotes "" notes, read_line ic)
+  | Some (str, ["page-ext"; p]) ->
+      let notes = read_notes_db ic "end page-ext" in
+      F_some (Bnotes p notes, read_line ic)
   | Some (str, ["notes"]) ->
       (* used before version 5.00 *)
-      let notes = read_notes ic in F_some (Bnotes "" notes, read_line ic)
-  | Some (str, ["db_notes"]) ->
-      let notes = read_notes_db ic in F_some (Bnotes "" notes, read_line ic)
-  | Some (str, ["db_notes"; p]) ->
-      let notes = read_notes_db ic in F_some (Bnotes p notes, read_line ic)
+      let notes = read_notes ic in
+      F_some (Bnotes "" notes, read_line ic)
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in
