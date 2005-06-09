@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.41 2005-06-09 08:59:24 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.42 2005-06-09 09:24:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -548,7 +548,7 @@ value print_notes_for_person oc base gen p =
     fprintf oc "beg\n";
     fprintf oc "%s\n" notes;
     fprintf oc "end notes\n";
-    let f _ = sprintf "indiv \"%s\"" (Gutil.designation base p) in
+    let f _ = sprintf "person \"%s\"" (Gutil.designation base p) in
     ignore (add_linked_files gen f notes [] : list _)
   }
   else ()
@@ -1128,10 +1128,10 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       if s <> "" then do {
         if not first.val then fprintf oc "\n" else ();
         first.val := False;
-        fprintf oc "notes_db\n";
+        fprintf oc "notes-db\n";
         rs_printf oc s;
-        fprintf oc "\nend notes_db\n";
-        ignore (add_linked_files gen (fun _ -> "main notes") s [] : list _);
+        fprintf oc "\nend notes-db\n";
+        ignore (add_linked_files gen (fun _ -> "database notes") s [] : list _);
       }
       else ();
       let rec loop =
@@ -1140,7 +1140,8 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
         | [(f, _) :: files] ->
             let s = base.data.bnotes.nread f 0 in
             let files =
-              add_linked_files gen (fun _ -> sprintf "page \"%s\"" f) s files
+              add_linked_files gen (fun _ -> sprintf "extended page \"%s\"" f)
+                s files
             in
             loop files ]
       in
@@ -1154,9 +1155,9 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
                first.val := False;
                fprintf oc "# extended page \"%s\" used by:\n" f;
                List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
-               fprintf oc "notes_db %s\n" f;
+               fprintf oc "page-ext %s\n" f;
                rs_printf oc s;
-               fprintf oc "\nend notes_db\n";
+               fprintf oc "\nend page-ext\n";
              }
              else ()
            })
