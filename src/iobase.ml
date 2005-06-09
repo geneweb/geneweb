@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.46 2005-06-09 08:43:20 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.47 2005-06-09 12:22:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -111,6 +111,18 @@ value trace s =
 ;
 
 value remove_file f = try Sys.remove f with [ Sys_error _ -> () ];
+value remove_dir d =
+  do {
+    try
+      let files = Sys.readdir d in
+      for i = 0 to Array.length files - 1 do {
+        try Sys.remove (Filename.concat d files.(i)) with _ -> ();
+      }
+    with
+    [ Sys_error _ -> () ];
+    try Unix.rmdir d with [ Unix.Unix_error _ _ _ -> () ];
+  }
+;
 
 value output_value_header_size = 20;
 value output_value_no_sharing oc v =
@@ -1207,7 +1219,7 @@ value input bname =
       }
     }
   in
-  let notes_files () =
+  let ext_files () =
     try
       let files = Sys.readdir (Filename.concat bname "notes_d") in
       List.fold_left
@@ -1220,7 +1232,7 @@ value input bname =
     [ Sys_error _ -> [] ]
   in
   let bnotes =
-    {nread = read_notes; norigin_file = norigin_file; nfiles = notes_files}
+    {nread = read_notes; norigin_file = norigin_file; efiles = ext_files}
   in
   let base_data =
     {persons = persons; ascends = ascends; unions = unions;
@@ -1549,6 +1561,7 @@ value gen_output no_patches bname base =
     let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
     let tmp_strings_inx = Filename.concat bname "1strings.inx" in
     let tmp_notes = Filename.concat bname "1notes" in
+    let tmp_notes_d = Filename.concat bname "1notes_d" in
     if not no_patches then
 (*
       let _ = base.data.persons.array () in
@@ -1673,6 +1686,17 @@ value gen_output no_patches bname base =
                 close_out oc_not;
               };
               close_out oc2;
+              List.iter
+                (fun f ->
+                   let s = base.data.bnotes.nread f 0 in
+                   let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
+                   do {
+                     try Unix.mkdir tmp_notes_d 0o755 with _ -> ();
+                     let oc = open_out fname in
+                     output_string oc s;
+                     close_out oc;
+                   })
+                (List.rev (base.data.bnotes.efiles ()));
             }
           with e ->
             do {
@@ -1694,6 +1718,7 @@ value gen_output no_patches bname base =
           remove_file tmp_names_inx;
           remove_file tmp_names_acc;
           remove_file tmp_strings_inx;
+          remove_dir tmp_notes_d;
         }
         else ();
         raise e
@@ -1721,6 +1746,12 @@ value gen_output no_patches bname base =
       remove_file (Filename.concat bname "notes");
       if Sys.file_exists tmp_notes then
         Sys.rename tmp_notes (Filename.concat bname "notes")
+      else ();
+      if Sys.file_exists tmp_notes_d then do {
+        let notes_d = Filename.concat bname "notes_d" in
+        remove_dir notes_d;
+        Sys.rename tmp_notes_d notes_d;
+      }
       else ();
       remove_file (Filename.concat bname "patches");
       remove_file (Filename.concat bname "patches~");
