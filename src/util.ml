@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.136 2005-06-07 20:15:22 ddr Exp $ *)
+(* $Id: util.ml,v 4.137 2005-06-09 18:36:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1313,7 +1313,7 @@ value tag_id s i =
 value good_tags_list =
   ["a"; "b"; "br"; "dd"; "div"; "dl"; "dt"; "em"; "font"; "hr"; "h1"; "h2";
    "h3"; "h4"; "i"; "img"; "li"; "ol"; "p"; "pre"; "span"; "strong"; "sup";
-   "table"; "td"; "tr"; "u"; "ul"]
+   "table"; "td"; "tr"; "tt"; "u"; "ul"]
 ;
 value bad_tags_list =
   ["applet"; "embed"; "form"; "input"; "object"; "script"]
