@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.38 2005-06-09 03:33:15 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.39 2005-06-09 03:51:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1127,9 +1127,9 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
     else if not no_notes.val then do {
       let (oc, first) = origin_file base.data.bnotes.norigin_file in
       if not first.val then fprintf oc "\n" else ();
-      fprintf oc "notes page\n";
+      fprintf oc "notes_db\n";
       rs_printf oc s;
-      fprintf oc "\nend notes\n";
+      fprintf oc "\nend notes_db\n";
       ignore (add_linked_files gen (fun _ -> "main notes") s [] : list _);
       let rec loop =
         fun
@@ -1151,9 +1151,9 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
                fprintf oc "# note page \"%s\" used by:\n" f;
                List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
                fprintf oc "# (the comment above is just informative)\n";
-               fprintf oc "notes page %s\n" f;
+               fprintf oc "notes_db %s\n" f;
                rs_printf oc s;
-               fprintf oc "\nend notes\n";
+               fprintf oc "\nend notes_db\n";
              }
              else ()
            })

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.18 2005-06-09 03:19:47 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.19 2005-06-09 03:51:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -698,8 +698,7 @@ value get_relation str =
   | _ -> failwith str ]
 ;
 
-(* before version 5.00 *)
-value old_read_notes ic =
+value read_notes ic =
   let notes =
     try
       let rec loop =
@@ -715,12 +714,12 @@ value old_read_notes ic =
 ;
 
 (* from version 5.00 *)
-value read_notes ic =
+value read_notes_db ic =
   let notes =
     try
       let rec loop =
         fun
-        [ "end notes" -> ""
+        [ "end notes_db" -> ""
         | s ->
             let len = String.length s in
             let s =
@@ -841,11 +840,12 @@ value read_family ic fname =
             F_some (Family co fath_sex moth_sex witn fo deo, line) ]
       }
   | Some (str, ["notes"]) ->
-      let notes = old_read_notes ic in F_some (Bnotes "" notes, read_line ic)
-  | Some (str, ["notes"; "page"]) ->
+      (* used before version 5.00 *)
       let notes = read_notes ic in F_some (Bnotes "" notes, read_line ic)
-  | Some (str, ["notes"; "page"; p]) ->
-      let notes = read_notes ic in F_some (Bnotes p notes, read_line ic)
+  | Some (str, ["db_notes"]) ->
+      let notes = read_notes_db ic in F_some (Bnotes "" notes, read_line ic)
+  | Some (str, ["db_notes"; p]) ->
+      let notes = read_notes_db ic in F_some (Bnotes p notes, read_line ic)
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in
