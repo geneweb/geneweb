@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.37 2005-06-09 03:19:47 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.38 2005-06-09 03:33:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1148,10 +1148,9 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
              let s = base.data.bnotes.nread f 0 in
              if s <> "" then do {
                fprintf oc "\n";
-               (* the following generated comment is just informative
-                  (not required to rebuild the database) *)
                fprintf oc "# note page \"%s\" used by:\n" f;
                List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
+               fprintf oc "# (the comment above is just informative)\n";
                fprintf oc "notes page %s\n" f;
                rs_printf oc s;
                fprintf oc "\nend notes\n";
