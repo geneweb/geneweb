@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.57 2005-05-13 04:10:58 ddr Exp $ *)
+(* $Id: family.ml,v 4.58 2005-06-10 02:24:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -696,8 +696,8 @@ value this_request_updates_database conf =
       match x with
       [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
         "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" | "KILL_ANC" |
-        "MOD_FAM_OK" | "MOD_IND_OK" | "MRG_IND" | "MRG_MOD_FAM_OK" |
-        "MRG_MOD_IND_OK" | "SND_IMAGE_OK" -> True
+        "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" | "MRG_IND" |
+        "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK" -> True
       | _ -> False ]
   | _ -> False ]
 ;
