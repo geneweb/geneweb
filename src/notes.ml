@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.54 2005-06-08 05:01:57 ddr Exp $ *)
+(* $Id: notes.ml,v 4.55 2005-06-10 03:54:56 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -100,29 +100,37 @@ value check_file_name s =
       | _ -> False ]
 ;
 
+value ext_file_link s i =
+  let slen = String.length s in
+  let j =
+    loop (i + 3) where rec loop j =
+      if j = slen then j
+      else if
+        j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
+      then j + 3
+      else loop (j + 1)
+  in
+  if j > i + 6 then
+    let b = String.sub s (i + 3) (j - i - 6) in
+    let (fname, text) =
+      try
+        let k = String.index b '/' in
+        (String.sub b 0 k, String.sub b (k + 1) (String.length b - k - 1))
+      with
+      [ Not_found -> (b, b) ]
+    in
+    if check_file_name fname then Some (j, fname, text)
+    else None
+  else None
+;
+
 value syntax_links conf s =
   let slen = String.length s in
   loop 0 0 where rec loop i len =
     if i = slen then Buff.get len
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-      let j =
-        loop (i + 3) where rec loop j =
-          if j = slen then j
-          else if
-            j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
-          then j + 3
-          else loop (j + 1)
-      in
-      if j > i + 6 then
-        let b = String.sub s (i + 3) (j - i - 6) in
-        let (fname, text) =
-          try
-            let k = String.index b '/' in
-            (String.sub b 0 k, String.sub b (k + 1) (String.length b - k - 1))
-          with
-          [ Not_found -> (b, b) ]
-        in
-        if check_file_name fname then
+      match ext_file_link s i with
+      [ Some (j, fname, text) ->
           let c =
             let f =
               List.fold_right Filename.concat
@@ -136,8 +144,7 @@ value syntax_links conf s =
               (commd conf) fname c text
           in
           loop j (Buff.mstore len t)
-        else loop (i + 3) (Buff.mstore len "[[[")
-      else loop (i + 1) (Buff.store len s.[i])
+      | None -> loop (i + 3) (Buff.mstore len "[[[") ]
     else if i < slen - 1 && s.[i] = '[' && s.[i+1] = '[' then
       let j =
         loop (i + 2) where rec loop j =
@@ -575,6 +582,35 @@ value print_ok conf base fnotes s =
   }
 ;
 
+(*
+value update_notes_links_db conf base fnotes s =
+  let fname =
+    let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+    Filename.concat bfile "notes_links"
+  in
+  let notes_links_db =
+    match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+    [ Some ic ->
+        let r = try input_value ic with _ -> [] in
+        do { close_in ic ; r }
+    | None -> [] ]
+  in
+  let slen = String.length s in
+  loop 0 where rec loop i =
+    if i = slen then ()
+    else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
+      match ext_file_link s i with
+      [ Some (j, lfname, _) ->
+          do {
+            Printf.eprintf "Link from \"%s\" to \"%s\"\n" fnotes lfname;
+            flush stderr;
+            loop j;
+          }
+      | None -> loop (i + 3) ]
+    else loop (i + 1)
+;
+*)
+
 value print_mod_ok conf base =
   let sub_part =
     match p_getenv conf.env "notes" with
@@ -600,7 +636,13 @@ value print_mod_ok conf base =
         [ Some v -> insert_sub_part old_notes v sub_part
         | None -> sub_part ]
       in
-      do { base.func.commit_notes fnotes s; print_ok conf base fnotes sub_part }
+      do {
+        base.func.commit_notes fnotes s;
+(*
+        update_notes_links_db conf base fnotes s;
+*)
+        print_ok conf base fnotes sub_part
+      }
   with
   [ Update.ModErr -> () ]
 ;
