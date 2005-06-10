@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.26 2005-06-03 12:17:55 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.27 2005-06-10 11:31:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -751,6 +751,8 @@ value print_mod o_conf base =
     let u = uoi base p.cle_index in
     do {
       base.func.patch_person p.cle_index p;
+      Notes.update_notes_links_db conf base (Gutil.designation base p)
+        (sou base p.notes);
       if op.surname <> p.surname || op.surnames_aliases <> p.surnames_aliases
       || op.titles <> p.titles then
         Update.update_misc_names_of_family base p u

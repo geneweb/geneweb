@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.55 2005-06-10 03:54:56 ddr Exp $ *)
+(* $Id: notes.ml,v 4.56 2005-06-10 11:31:11 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -582,34 +582,39 @@ value print_ok conf base fnotes s =
   }
 ;
 
-(*
+type notes_links_db = list (string * list string);
+
 value update_notes_links_db conf base fnotes s =
-  let fname =
-    let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-    Filename.concat bfile "notes_links"
-  in
-  let notes_links_db =
-    match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
-    [ Some ic ->
-        let r = try input_value ic with _ -> [] in
-        do { close_in ic ; r }
-    | None -> [] ]
-  in
   let slen = String.length s in
-  loop 0 where rec loop i =
-    if i = slen then ()
-    else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-      match ext_file_link s i with
-      [ Some (j, lfname, _) ->
-          do {
-            Printf.eprintf "Link from \"%s\" to \"%s\"\n" fnotes lfname;
-            flush stderr;
-            loop j;
-          }
-      | None -> loop (i + 3) ]
-    else loop (i + 1)
+  let list =
+    loop [] 0 where rec loop list i =
+      if i = slen then list
+      else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
+        match ext_file_link s i with
+        [ Some (j, lfname, _) -> loop [lfname :: list] j
+        | None -> loop list (i + 3) ]
+      else loop list (i + 1)
+  in
+  if list = [] then ()
+  else
+    let fname =
+      let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+      Filename.concat bfile "notes_links"
+    in
+    let notes_links_db =
+      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          let r = try (input_value ic : notes_links_db) with _ -> [] in
+          do { close_in ic ; r }
+      | None -> [] ]
+    in
+    let new_db = [(fnotes, list) :: List.remove_assoc fnotes notes_links_db] in
+    let oc = Secure.open_out fname in
+    do {
+      output_value oc (new_db : notes_links_db);
+      close_out oc;
+    }
 ;
-*)
 
 value print_mod_ok conf base =
   let sub_part =
@@ -638,9 +643,7 @@ value print_mod_ok conf base =
       in
       do {
         base.func.commit_notes fnotes s;
-(*
         update_notes_links_db conf base fnotes s;
-*)
         print_ok conf base fnotes sub_part
       }
   with
