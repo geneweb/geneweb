@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.60 2005-06-11 21:22:49 ddr Exp $ *)
+(* $Id: templ.ml,v 4.61 2005-06-11 22:17:16 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -546,7 +546,18 @@ value subst_text x v s =
 value rec subst sf =
   fun
   [ Atext s -> Atext (sf s)
-  | Avar loc s sl -> Avar loc (sf s) (List.map sf sl)
+  | Avar loc s sl ->
+      let s1 = sf s in
+      let sl1 = List.map sf sl in
+      if sl = [] &&
+        try let _ = int_of_string s1 in True with [ Failure _ -> False ]
+      then
+        Aint loc s1
+      else
+        let strm = Stream.of_string s1 in
+        let (_, s2, sl2) = get_compound_var strm in
+        if Stream.peek strm <> None then Avar loc s1 sl1
+        else Avar loc s2 (sl2 @ sl1)
   | Atransl b s c -> Atransl b (sf s) c
   | Awid_hei s -> Awid_hei (sf s)
   | Aif e alt ale -> Aif (subst sf e) (substl sf alt) (substl sf ale)
@@ -808,7 +819,7 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
   | Atransl upp s c -> eval_transl conf upp s c
   | e ->
       try Num.to_string (num_eval ceva e) with
-      [ Failure x -> not_impl "string_eval" e ] ]
+      [ Failure x -> x ] ]
 and num_eval ((_, eval_var, _) as ceva) =
   fun
   [ Aint _ x -> Num.of_string x
@@ -824,7 +835,8 @@ and num_eval ((_, eval_var, _) as ceva) =
         | VVbool True -> Num.one
         | VVbool False -> Num.zero ]
       with
-      [ Not_found -> failwith "parse error" ]
+      [ Not_found ->
+          failwith ("parse error/(" ^ String.concat "." [s :: sl] ^ ")") ]
   | _ -> failwith "parse_error6" ]
 ;
 

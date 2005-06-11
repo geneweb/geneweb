@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.137 2005-06-11 21:22:49 ddr Exp $ *)
+(* $Id: perso.ml,v 4.138 2005-06-11 22:17:16 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1847,7 +1847,7 @@ value rec eval_ast conf base env ep =
       let sll = List.map (List.map eval_ast) all in
       let vl = List.map (String.concat "") sll in
       eval_apply conf env eval_ast f vl
-  | x -> not_impl "eval_ast" x ]
+  | x -> eval_expr conf base env ep x ]
 and eval_expr conf base env ep e =
   let eval_ast = eval_ast conf base env ep in
   let eval_apply = eval_apply conf env eval_ast in
@@ -1910,9 +1910,22 @@ value rec print_ast conf base env ep =
   | Aif e alt ale -> print_if conf base env ep e alt ale
   | Aforeach (loc, s, sl) el al -> print_foreach conf base env ep loc s sl el al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
+  | Aapply loc f ell -> print_apply conf base env ep loc f ell
   | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
 and print_define conf base env ep f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
+and print_apply conf base env ep loc f ell =
+  let eval_var = eval_var conf base env ep in
+  let eval_ast = eval_ast conf base env ep in
+  let eval_apply = eval_apply conf env eval_ast in
+  match get_env f env with
+  [ Vfun xl al ->
+      let print_ast = print_ast conf base env ep in
+      Templ.print_apply conf f print_ast (eval_var, eval_apply) xl al ell
+  | _ ->
+      let sll = List.map (List.map eval_ast) ell in
+      let vl = List.map (String.concat "") sll in
+      Wserver.wprint "%s" (eval_apply f vl) ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let eval_ast = eval_ast conf base env ep in

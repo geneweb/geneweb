@@ -1,9 +1,17 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.12 2005-06-01 09:52:53 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.13 2005-06-11 22:17:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
-  <title>[*tree]</title>
+  <title>%nn;
+    %if;(evar.t = "A")[*male line/female line]0%nn;
+    %elseif;(evar.t = "C")[*male line/female line]1%nn;
+    %else[*tree]%end;
+    %if;(evar.t = "A" or evar.t = "C"):%sp;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end; %surname;
+    %end;
+  </title>
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
@@ -130,10 +138,13 @@
   </tr>
 %end;
 
+%define;add_father(xx, nn)
+  %if;("nn" > 1)%apply;add_father("xx.father", nn - 1)%end;
+%end;
+
 <div style="text-align:%right;">%nn;
 <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
 ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
-<table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
 
 %if;(evar.t = "T")
   %if;(evar.dag = "on")
@@ -151,12 +162,23 @@
       </table>
     </tr></tr></table>
   %else;
+    <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
     %foreach;ancestor_tree_line(evar.v)
       %apply;a_tree_line()
     %end;
     </table>
   %end;
 %elseif;(evar.t = "A")
+  %empty_dag;
+  %apply;add_in_dag(index)
+  %apply;add_father("self", evar.v)
+  <table border="%border;" width="100%%"><tr><td align="center">
+    <table cellspacing="0" cellpadding="0">
+    %foreach;dag_line;
+      %apply;a_dag_line()
+    %end;
+    </table>
+  </tr></tr></table>
 %end;
 
 <div>
