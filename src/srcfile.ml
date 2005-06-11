@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.33 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.34 2005-06-11 05:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -243,6 +243,13 @@ value macro conf base =
   | 'n' ->
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int base.data.persons.len)
+  | 'N' ->
+      let s = base.data.bnotes.nread "" Rn1Ln in
+      let len = String.length s in
+      if len > 9 && String.sub s 0 5 = "<!-- " &&
+         String.sub s (len - 4) 4 = " -->"
+      then String.sub s 5 (String.length s - 9)
+      else ""
   | 'o' -> image_prefix conf
   | 'q' ->
       let r = count conf in
@@ -365,7 +372,7 @@ value rec copy_from_stream conf base strm mode =
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
-    | 'n' -> base.data.bnotes.nread "" 1 <> ""
+    | 'n' -> base.data.bnotes.nread "" Rn1Ch <> ""
     | 'o' -> Sys.file_exists (Wiznotes.dir conf)
     | 'p' ->
         match p_getenv conf.base_env (get_variable strm) with

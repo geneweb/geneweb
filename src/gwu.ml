@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.42 2005-06-09 09:24:28 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.43 2005-06-11 05:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1123,7 +1123,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       else ()
     };
     if not no_notes.val then do {
-      let s = base.data.bnotes.nread "" 0 in
+      let s = base.data.bnotes.nread "" RnAll in
       let (oc, first) = origin_file base.data.bnotes.norigin_file in
       if s <> "" then do {
         if not first.val then fprintf oc "\n" else ();
@@ -1138,7 +1138,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
         fun
         [ [] -> ()
         | [(f, _) :: files] ->
-            let s = base.data.bnotes.nread f 0 in
+            let s = base.data.bnotes.nread f RnAll in
             let files =
               add_linked_files gen (fun _ -> sprintf "extended page \"%s\"" f)
                 s files
@@ -1149,7 +1149,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       List.iter
         (fun (f, r) ->
              do {
-             let s = base.data.bnotes.nread f 0 in
+             let s = base.data.bnotes.nread f RnAll in
              if s <> "" then do {
                if not first.val then fprintf oc "\n" else ();
                first.val := False;

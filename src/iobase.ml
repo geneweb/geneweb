@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.47 2005-06-09 12:22:49 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.48 2005-06-11 05:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1178,7 +1178,7 @@ value input bname =
     with
     [ Not_found -> Hashtbl.add (snd patches.h_name) i [ip] ]
   in
-  let read_notes fnotes mlen =
+  let read_notes fnotes rn_mode =
     let fname =
       if fnotes = "" then "notes"
       else Filename.concat "notes_d" (fnotes ^ ".txt")
@@ -1191,11 +1191,16 @@ value input bname =
         let len = ref 0 in
         do {
           try
-            while mlen = 0 || len.val < mlen do {
-              len.val := Buff.store len.val (input_char ic)
+            while True do {
+              let c = input_char ic in
+              len.val := Buff.store len.val c;
+              match rn_mode with
+              [ Rn1Ch -> raise Exit
+              | Rn1Ln -> if c = '\n' then do { decr len; raise Exit } else ()
+              | RnAll -> () ];
             }
           with
-          [ End_of_file -> () ];
+          [ Exit | End_of_file -> () ];
           close_in ic;
           Buff.get len.val
         }
@@ -1678,7 +1683,7 @@ value gen_output no_patches bname base =
               seek_out oc2 int_size;
               output_binary_int oc2 surname_pos;
               output_binary_int oc2 first_name_pos;
-              let s = base.data.bnotes.nread "" 0 in
+              let s = base.data.bnotes.nread "" RnAll in
               if s = "" then ()
               else do {
                 let oc_not = Secure.open_out tmp_notes in
@@ -1688,7 +1693,7 @@ value gen_output no_patches bname base =
               close_out oc2;
               List.iter
                 (fun f ->
-                   let s = base.data.bnotes.nread f 0 in
+                   let s = base.data.bnotes.nread f RnAll in
                    let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
                    do {
                      try Unix.mkdir tmp_notes_d 0o755 with _ -> ();

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.15 2005-06-07 13:58:22 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.16 2005-06-11 05:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -123,7 +123,7 @@ value ged_header base oc ifile ofile =
     else fprintf oc "1 CHAR ANSEL\n";
     if no_notes.val then ()
     else
-      let s = base.data.bnotes.nread "" 0 in
+      let s = base.data.bnotes.nread "" RnAll in
       if s = "" then () else display_note oc s;
   }
 ;
