@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.12 2005-06-11 05:16:31 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.13 2005-06-11 10:38:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -175,7 +175,7 @@ sv: Databasen <span class="highlight">"%t"</span> inneh&aring;ller nu
     %n personer.
 zh: 现有 %n 人在数据库中。
 ]%In<br%/>
-([see] <a href="%sm=NOTES">[note/notes]1</a>%N)%E
+(<a href="%sm=NOTES">[note/notes]1</a>%N)%E
 %I&|pwizard_passwd_file;pwizard_descr_file;|wo<br%/>
 (<a href="%sm=WIZNOTES">[wizard/wizards/friend/friends]1/[note/notes]1</a>)%E
 %E</p>
