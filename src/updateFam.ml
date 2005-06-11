@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.60 2005-06-07 20:15:22 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.61 2005-06-11 21:22:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -355,7 +355,7 @@ value rec print_ast conf base env fcd =
   | Aif e alt ale -> print_if conf base env fcd e alt ale
   | Aforeach v [] al -> print_foreach conf base env fcd v al
   | Adefine f xl al alk -> print_define conf base env fcd f xl al alk
-  | Aapply f el -> print_apply conf base env fcd f el
+  | Aapply _ f el -> print_apply conf base env fcd f el
   | x -> not_impl "print_ast" x ]
 and print_define conf base env fcd f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] fcd) alk

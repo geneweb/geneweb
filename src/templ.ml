@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.59 2005-05-29 14:16:21 ddr Exp $ *)
+(* $Id: templ.ml,v 4.60 2005-06-11 21:22:49 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -197,7 +197,7 @@ value rec parse_expr_1 =
     [: e = parse_expr_2;
        a =
          parser
-         [ [: `Tok _ (IDENT "or"); s :] -> Eor e (parse_expr_1 s)
+         [ [: `Tok _ (IDENT "or"); s :] -> Aop2 "or" e (parse_expr_1 s)
          | [: :] -> e ] :] ->
       a
 and parse_expr_2 =
@@ -205,7 +205,7 @@ and parse_expr_2 =
     [: e = parse_expr_3;
        a =
          parser
-         [ [: `Tok _ (IDENT "and"); s :] -> Eand e (parse_expr_2 s)
+         [ [: `Tok _ (IDENT "and"); s :] -> Aop2 "and" e (parse_expr_2 s)
          | [: :] -> e ] :] ->
       a
 and parse_expr_3 =
@@ -213,12 +213,12 @@ and parse_expr_3 =
     [: e = parse_expr_4;
        a =
          parser
-         [ [: `Tok _ EQUAL; e2 = parse_expr_4 :] -> Eop "=" e e2
-         | [: `Tok _ BANGEQUAL; e2 = parse_expr_4 :] -> Eop "!=" e e2
-         | [: `Tok _ GREATER; e2 = parse_expr_4 :] -> Eop ">" e e2
-         | [: `Tok _ GREATEREQUAL; e2 = parse_expr_4 :] -> Eop ">=" e e2
-         | [: `Tok _ LESS; e2 = parse_expr_4 :] -> Eop "<" e e2
-         | [: `Tok _ LESSEQUAL; e2 = parse_expr_4 :] -> Eop "<=" e e2
+         [ [: `Tok _ EQUAL; e2 = parse_expr_4 :] -> Aop2 "=" e e2
+         | [: `Tok _ BANGEQUAL; e2 = parse_expr_4 :] -> Aop2 "!=" e e2
+         | [: `Tok _ GREATER; e2 = parse_expr_4 :] -> Aop2 ">" e e2
+         | [: `Tok _ GREATEREQUAL; e2 = parse_expr_4 :] -> Aop2 ">=" e e2
+         | [: `Tok _ LESS; e2 = parse_expr_4 :] -> Aop2 "<" e e2
+         | [: `Tok _ LESSEQUAL; e2 = parse_expr_4 :] -> Aop2 "<=" e e2
          | [: :] -> e ] :] ->
       a
 and parse_expr_4 =
@@ -226,8 +226,8 @@ and parse_expr_4 =
     [: e = parse_expr_5;
        a =
          parser
-         [ [: `Tok _ PLUS; e2 = parse_expr_5 :] -> Eop "+" e e2
-         | [: `Tok _ MINUS; e2 = parse_expr_5 :] -> Eop "-" e e2
+         [ [: `Tok _ PLUS; e2 = parse_expr_5 :] -> Aop2 "+" e e2
+         | [: `Tok _ MINUS; e2 = parse_expr_5 :] -> Aop2 "-" e e2
          | [: :] -> e ] :] ->
       a
 and parse_expr_5 =
@@ -235,8 +235,8 @@ and parse_expr_5 =
     [: e = parse_simple_expr;
        a =
          parser
-         [ [: `Tok _ STAR; e2 = parse_simple_expr :] -> Eop "*" e e2
-         | [: `Tok _ PERCENT; e2 = parse_simple_expr :] -> Eop "%" e e2
+         [ [: `Tok _ STAR; e2 = parse_simple_expr :] -> Aop2 "*" e e2
+         | [: `Tok _ PERCENT; e2 = parse_simple_expr :] -> Aop2 "%" e e2
          | [: :] -> e ] :] ->
       a
 and parse_simple_expr =
@@ -245,17 +245,17 @@ and parse_simple_expr =
        a =
          parser
          [ [: `Tok _ RPAREN :] -> e
-         | [: `Tok loc _ :] -> Evar loc "parse_error2" [] ] :] ->
+         | [: `Tok loc _ :] -> Avar loc "parse_error2" [] ] :] ->
       a
-  | [: `Tok _ (IDENT "not"); e = parse_simple_expr :] -> Enot e
-  | [: `Tok _ (STRING s) :] -> Estr s
-  | [: `Tok loc (INT s) :] -> Eint loc s
-  | [: `Tok _ (LEXICON upp s n) :] -> Etransl upp s n
+  | [: `Tok _ (IDENT "not"); e = parse_simple_expr :] -> Aop1 "not" e
+  | [: `Tok _ (STRING s) :] -> Atext s
+  | [: `Tok loc (INT s) :] -> Aint loc s
+  | [: `Tok _ (LEXICON upp s n) :] -> Atransl upp s n
   | [: (loc, id, idl) = parse_var;
        a =
          parser
-         [ [: t = parse_tuple :] -> Eapp loc id t
-         | [: :] -> Evar loc id idl ] :] ->
+         [ [: t = parse_tuple :] -> Aapply loc id t
+         | [: :] -> Avar loc id idl ] :] ->
      a ]
 and parse_tuple strm =
   let rec parse_expr_list =
@@ -265,7 +265,7 @@ and parse_tuple strm =
            parser
            [ [: `Tok _ COMMA; a = parse_expr_list :] -> a
            | [: :] -> [] ] :] ->
-        [x :: xl]
+        [[x] :: xl]
   in
   let parse_tuple =
     parser
@@ -274,7 +274,7 @@ and parse_tuple strm =
          a =
            parser
            [ [: `Tok _ RPAREN :] -> xl
-           | [: :] -> [Estr "parse_error4"] ] :] ->
+           | [: :] -> [[Atext "parse_error4"]] ] :] ->
         a
   in
   parse_tuple strm
@@ -335,7 +335,7 @@ value parse_templ conf strm =
               match x with
               [ (_, "if", []) -> parse_if strm
               | (_, "foreach", []) -> parse_foreach strm
-              | (_, "apply", []) -> parse_apply strm
+              | (_, "apply", []) -> parse_apply bp strm
               | (_, "expr", []) -> parse_expr_stmt strm
               | (_, "wid_hei", []) -> Awid_hei (get_value 0 strm)
               | ((_, ep), v, vl) -> Avar (bp, ep) v vl ]
@@ -376,7 +376,7 @@ value parse_templ conf strm =
       | None -> [Atext "define error" :: alk @ astl] ]
     in
     (List.rev astl, v)
-  and parse_apply strm =
+  and parse_apply bp strm =
     try
       let f = get_ident 0 strm in
       match strm with parser
@@ -392,15 +392,15 @@ value parse_templ conf strm =
                   [ "and" -> [al :: loop ()]
                   | _ -> [al] ]
               in
-              AapplyWithAst f all
+              Aapply (bp, Stream.count strm) f all
           | _ -> raise (Stream.Error "'with' expected") ]
       | [: :] ->
           let el = parse_char_stream parse_tuple strm in
-          Aapply f el ]
+          Aapply (bp, Stream.count strm) f el ]
     with
     [ Stream.Failure | Stream.Error _ -> Atext "apply syntax error" ]
   and parse_expr_stmt strm =
-    Aexpr (parse_char_stream_semi parse_simple_expr strm)
+    parse_char_stream_semi parse_simple_expr strm
   and parse_if strm =
     let e = parse_char_stream_semi parse_simple_expr strm in
     let (al1, al2) =
@@ -471,8 +471,8 @@ value strip_newlines_after_variables =
     | [Aforeach v pl al :: astl] -> [Aforeach v pl (loop al) :: loop astl]
     | [Adefine f x al alk :: astl] ->
         [Adefine f x (loop al) (loop alk) :: loop astl]
-    | [AapplyWithAst f all :: astl] ->
-        [AapplyWithAst f (List.map loop all) :: loop astl]
+    | [Aapply loc f all :: astl] ->
+        [Aapply loc f (List.map loop all) :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); (Atext _ as ast2) :: astl] ->
         [ast1; ast2 :: loop astl]
     | [ast :: astl] -> [ast :: loop astl]
@@ -547,29 +547,20 @@ value rec subst sf =
   fun
   [ Atext s -> Atext (sf s)
   | Avar loc s sl -> Avar loc (sf s) (List.map sf sl)
-  | Aexpr e -> Aexpr (subste sf e)
   | Atransl b s c -> Atransl b (sf s) c
   | Awid_hei s -> Awid_hei (sf s)
-  | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
+  | Aif e alt ale -> Aif (subst sf e) (substl sf alt) (substl sf ale)
   | Aforeach (loc, s, sl) pl al ->
-      Aforeach (loc, sf s, List.map sf sl) (substel sf pl) (substl sf al)
+      Aforeach (loc, sf s, List.map sf sl) (List.map (substl sf) pl)
+        (substl sf al)
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
-  | Aapply f el -> Aapply (sf f) (substel sf el)
-  | AapplyWithAst f all -> AapplyWithAst (sf f) (List.map (substl sf) all) ]
+  | Aapply loc f all -> Aapply loc (sf f) (List.map (substl sf) all)
+  | Aint loc s -> Aint loc s
+  | Aop1 op e -> Aop1 op (subst sf e)
+  | Aop2 op e1 e2 -> Aop2 (sf op) (subst sf e1) (subst sf e2) ]
 and substl sf al = List.map (subst sf) al
-and subste sf =
-  fun
-  [ Eor e1 e2 -> Eor (subste sf e1) (subste sf e2)
-  | Eand e1 e2 -> Eand (subste sf e1) (subste sf e2)
-  | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
-  | Enot e -> Enot (subste sf e)
-  | Estr s -> Estr (sf s)
-  | Eint loc s -> Eint loc s
-  | Eapp loc s el -> Eapp loc (sf s) (List.map (subste sf) el)
-  | Evar loc s sl -> Evar loc (sf s) (List.map sf sl)
-  | Etransl upp s c -> Etransl upp s c ]
-and substel sf el = List.map (subste sf) el;
+;
 
 value split_at_coloncolon s =
   loop 0 where rec loop i =
@@ -751,16 +742,16 @@ value nb_errors = ref 0;
 
 value loc_of_expr =
   fun
-  [ Eint loc _ -> loc
-  | Evar loc _ _ -> loc
+  [ Aint loc _ -> loc
+  | Avar loc _ _ -> loc
   | _ -> (-1, -1) ]
 ;
 
 value rec bool_eval ((conf, eval_var, _) as ceva) =
   fun
-  [ Eor e1 e2 -> bool_eval ceva e1 || bool_eval ceva e2
-  | Eand e1 e2 -> bool_eval ceva e1 && bool_eval ceva e2
-  | Eop op e1 e2 ->
+  [ Aop2 "or" e1 e2 -> bool_eval ceva e1 || bool_eval ceva e2
+  | Aop2 "and" e1 e2 -> bool_eval ceva e1 && bool_eval ceva e2
+  | Aop2 op e1 e2 ->
       match op with
       [ "=" -> string_eval ceva e1 = string_eval ceva e2
       | "!=" -> string_eval ceva e1 <> string_eval ceva e2
@@ -769,9 +760,9 @@ value rec bool_eval ((conf, eval_var, _) as ceva) =
       | "<" -> int_eval ceva e1 < int_eval ceva e2
       | "<=" -> int_eval ceva e1 <= int_eval ceva e2
       | _ -> do { Wserver.wprint "op %s???" op; False } ]
-  | Enot e -> not (bool_eval ceva e)
-  | Eapp loc s el -> do { Wserver.wprint "not impl %s" s; False }
-  | Evar loc s sl ->
+  | Aop1 "not" e -> not (bool_eval ceva e)
+  | Aapply loc s el -> do { Wserver.wprint "not impl %s" s; False }
+  | Avar loc s sl ->
       try eval_bool_var conf (eval_var loc) [s :: sl] with
       [ Not_found ->
           do {
@@ -780,16 +771,18 @@ value rec bool_eval ((conf, eval_var, _) as ceva) =
             Wserver.wprint "?";
             False
           } ]
-  | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
-  | Eint loc s -> raise_with_loc loc (Failure "bool value expected")
-  | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
+  | Atext s -> do { Wserver.wprint "\"%s\"???" s; False }
+  | Aint loc s -> raise_with_loc loc (Failure "bool value expected")
+  | Atransl _ s _ -> do { Wserver.wprint "[%s]???" s; False }
+  | Aop1 _ _ | Adefine _ _ _ _ | Aforeach _ _ _ | Aif _ _ _ | Awid_hei _ ->
+      do { Wserver.wprint "error14"; False } ]
 and int_eval ceva =
   fun
-  [ Eop "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
-  | Eop "-" e1 e2 -> int_eval ceva e1 - int_eval ceva e2
-  | Eop "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
-  | Eop "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
-  | Eint _ x -> int_of_string x
+  [ Aop2 "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
+  | Aop2 "-" e1 e2 -> int_eval ceva e1 - int_eval ceva e2
+  | Aop2 "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
+  | Aop2 "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
+  | Aint _ x -> int_of_string x
   | e ->
       let s = string_eval ceva e in
       try int_of_string s with
@@ -798,9 +791,12 @@ and int_eval ceva =
             (Failure (s ^ " int value expected")) ] ]
 and string_eval ((conf, eval_var, eval_apply) as ceva) =
   fun
-  [ Estr s -> s
-  | Eapp loc s el -> eval_apply s (List.map (string_eval ceva) el)
-  | Evar loc s sl ->
+  [ Atext s -> s
+  | Aapply loc s el ->
+      eval_apply s
+        (List.map
+           (fun el -> String.concat "" (List.map (string_eval ceva) el)) el)
+  | Avar loc s sl ->
       try eval_string_var conf (eval_var loc) s sl with
       [ Not_found ->
           do {
@@ -809,17 +805,19 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
             Wserver.wprint "?";
             ""
           } ]
-  | Etransl upp s c -> eval_transl conf upp s c
-  | e -> try Num.to_string (num_eval ceva e) with [ Failure x -> x ] ]
+  | Atransl upp s c -> eval_transl conf upp s c
+  | e ->
+      try Num.to_string (num_eval ceva e) with
+      [ Failure x -> not_impl "string_eval" e ] ]
 and num_eval ((_, eval_var, _) as ceva) =
   fun
-  [ Eint _ x -> Num.of_string x
-  | Eop "+" x y -> Num.add (num_eval ceva x) (num_eval ceva y)
-  | Eop "-" x y -> Num.sub (num_eval ceva x) (num_eval ceva y)
-  | Eop "*" x (Eint _ y) -> Num.mul (num_eval ceva x) (int_of_string y)
-  | Eop "%" x (Eint _ y) ->
+  [ Aint _ x -> Num.of_string x
+  | Aop2 "+" x y -> Num.add (num_eval ceva x) (num_eval ceva y)
+  | Aop2 "-" x y -> Num.sub (num_eval ceva x) (num_eval ceva y)
+  | Aop2 "*" x (Aint _ y) -> Num.mul (num_eval ceva x) (int_of_string y)
+  | Aop2 "%" x (Aint _ y) ->
       Num.of_int (Num.modl (num_eval ceva x) (int_of_string y))
-  | Evar loc s sl ->
+  | Avar loc s sl ->
       try
         match eval_var loc [s :: sl] with
         [ VVstring s -> Num.of_string s
@@ -892,8 +890,11 @@ value print_var conf base eval_var s sl =
           } ] ]
 ;
 
-value print_apply conf f print_ast eval_var xl al el =
-  let vl = List.map (eval_expr conf eval_var) el in
+value print_apply conf f print_ast eval_var xl al ell =
+  let vl =
+    List.map
+      (fun el -> String.concat "" (List.map (eval_expr conf eval_var) el)) ell
+  in
   List.iter
     (fun a ->
        let a =
