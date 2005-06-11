@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.16 2005-06-09 12:22:49 ddr Exp $ *)
+(* $Id: def.mli,v 4.17 2005-06-11 05:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -160,8 +160,10 @@ type descend = gen_descend iper;
 type relation = gen_relation iper istr;
 type title = gen_title istr;
 
+type rn_mode = [ RnAll | Rn1Ch | Rn1Ln ];
+
 type notes =
-  { nread : mutable string -> int -> string;
+  { nread : mutable string -> rn_mode -> string;
     norigin_file : mutable string;
     efiles  : mutable unit -> list string }
 ;

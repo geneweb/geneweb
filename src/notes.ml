@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.56 2005-06-10 11:31:11 ddr Exp $ *)
+(* $Id: notes.ml,v 4.57 2005-06-11 05:16:31 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -452,7 +452,7 @@ value print_sub_part conf sub_fname cnt0 lines =
   }
 ;
 
-value read_notes base fnotes = base.data.bnotes.nread fnotes 0;
+value read_notes base fnotes = base.data.bnotes.nread fnotes RnAll;
 
 value print conf base =
   let title _ =

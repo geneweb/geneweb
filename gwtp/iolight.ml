@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.12 2005-06-09 12:22:49 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.13 2005-06-11 05:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -163,7 +163,7 @@ value input bname =
       "strings"
   in
   let cleanup () = close_in ic in
-  let read_notes fnotes mlen =
+  let read_notes fnotes rn_mode =
     let fname =
       if fnotes = "" then "notes"
       else Filename.concat "notes_d" (fnotes ^ ".txt")
@@ -176,11 +176,16 @@ value input bname =
         let len = ref 0 in
         do {
           try
-            while mlen = 0 || len.val < mlen do {
-              len.val := Buff.store len.val (input_char ic)
+            while True do {
+              let c = input_char ic in
+              len.val := Buff.store len.val c;
+              match rn_mode with
+              [ Rn1Ch -> raise Exit
+              | Rn1Ln -> if c = '\n' then do { decr len; raise Exit } else ()
+              | RnAll -> () ];
             }
           with
-          [ End_of_file -> () ];
+          [ Exit | End_of_file -> () ];
           close_in ic;
           Buff.get len.val
         }
