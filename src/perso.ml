@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.136 2005-06-07 18:34:35 ddr Exp $ *)
+(* $Id: perso.ml,v 4.137 2005-06-11 21:22:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1840,16 +1840,9 @@ value rec eval_ast conf base env ep =
   [ Atext s -> s
   | Avar loc s sl ->
       Templ.eval_string_var conf (eval_var conf base env ep loc) s sl
-  | Aexpr e -> eval_expr conf base env ep e
   | Atransl upp s n -> eval_transl conf base env upp s n
   | Aif e alt ale -> eval_if conf base env ep e alt ale
-  | Aapply f el ->
-      let eval_ast = eval_ast conf base env ep in
-      let eval_apply = eval_apply conf env eval_ast in
-      let eval_var = eval_var conf base env ep in
-      let vl = List.map (Templ.eval_expr conf (eval_var, eval_apply)) el in
-      eval_apply f vl
-  | AapplyWithAst f all ->
+  | Aapply _ f all ->
       let eval_ast = eval_ast conf base env ep in
       let sll = List.map (List.map eval_ast) all in
       let vl = List.map (String.concat "") sll in
@@ -1917,21 +1910,9 @@ value rec print_ast conf base env ep =
   | Aif e alt ale -> print_if conf base env ep e alt ale
   | Aforeach (loc, s, sl) el al -> print_foreach conf base env ep loc s sl el al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
-  | Aapply f el -> print_apply conf base env ep f el
   | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
 and print_define conf base env ep f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
-and print_apply conf base env ep f el =
-  let eval_var = eval_var conf base env ep in
-  let eval_ast = eval_ast conf base env ep in
-  let eval_apply = eval_apply conf env eval_ast in
-  match get_env f env with
-  [ Vfun xl al ->
-      let print_ast = print_ast conf base env ep in
-      Templ.print_apply conf f print_ast (eval_var, eval_apply) xl al el
-  | _ ->
-      let vl = List.map (Templ.eval_expr conf (eval_var, eval_apply)) el in
-      Wserver.wprint "%s" (eval_predefined_apply conf env f vl) ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let eval_ast = eval_ast conf base env ep in
@@ -1940,10 +1921,10 @@ and print_if conf base env ep e alt ale =
     if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
   in
   List.iter (print_ast conf base env ep) al
-and print_foreach conf base env ini_ep loc s sl el al =
+and print_foreach conf base env ini_ep loc s sl ell al =
   let rec loop ((_, a, _, _) as ep) efam =
     fun 
-    [ [s] -> print_simple_foreach conf base env el al ini_ep ep efam s
+    [ [s] -> print_simple_foreach conf base env ell al ini_ep ep efam s
     | ["ancestor" :: sl] ->
         let ip_ifamo =
           match get_env "ancestor" env with
@@ -2074,7 +2055,7 @@ and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
 and print_foreach_ancestor_level conf base env el al ((p, _, _, _) as ep) =
   let max_level =
     match el with
-    [ [e] -> eval_int_expr conf base env ep  e
+    [ [[e]] -> eval_int_expr conf base env ep e
     | [] ->
         match get_env "max_anc_level" env with
         [ Vint n -> n
@@ -2112,11 +2093,11 @@ and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
 and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
   let (p, max_level) =
     match el with
-    [ [e1; e2] ->
+    [ [[e1]; [e2]] ->
         let ip = eval_int_expr conf base env ep e1 in
         let max_level = eval_int_expr conf base env ep e2 in
         (pget conf base (Adef.iper_of_int ip), max_level)
-    | [e] ->
+    | [[e]] ->
         (p, eval_int_expr conf base env ep e)
     | [] ->
         match get_env "max_anc_level" env with
