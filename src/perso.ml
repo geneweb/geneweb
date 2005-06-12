@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.140 2005-06-12 06:33:41 ddr Exp $ *)
+(* $Id: perso.ml,v 4.141 2005-06-12 18:48:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -566,6 +566,8 @@ module SortedList =
   Set.Make (struct type t = list string; value compare = compare_ls; end)
 ;
 
+type dag_item = string;
+
 type env =
   [ Vallgp of list generation_person
   | Vanc of generation_person
@@ -573,8 +575,8 @@ type env =
   | Vcelll of list cell
   | Vcnt of ref int
   | Vdag of ref Dag.Pset.t
-  | Vdcell of (int * Dag2html.align * Dag2html.table_data)
-  | Vdline of array (int * Dag2html.align * Dag2html.table_data)
+  | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
+  | Vdline of array (int * Dag2html.align * Dag2html.table_data dag_item)
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
@@ -1169,9 +1171,9 @@ and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
       [ Dag2html.TDhr Dag2html.RightA -> VVbool True
       | _ -> VVbool False ]
   | ["is_nothing"] -> VVbool (td = Dag2html.TDnothing)
-  | ["string"] ->
+  | ["item"] ->
       match td with
-      [ Dag2html.TDstring s -> VVstring s
+      [ Dag2html.TDitem s -> VVstring s
       | _ -> VVstring "" ]
   | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
@@ -1871,7 +1873,8 @@ and eval_predefined_apply conf env f vl =
   [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
   | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
   | ("add_in_dag", [s]) ->
-      let ip = Adef.iper_of_int (int_of_string s) in
+      let i = try int_of_string s with [ Failure _ -> raise Not_found ] in
+      let ip = Adef.iper_of_int i in
       match get_env "dag" env with
       [ Vdag d -> do { d.val := Dag.Pset.add ip d.val; "" }
       | _ -> raise Not_found ]

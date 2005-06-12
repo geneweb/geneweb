@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.14 2005-06-12 05:46:57 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.15 2005-06-12 18:48:21 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -117,7 +117,7 @@
   <tr align="left">
   %foreach;dag_cell;
     <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
-    %if;(dag_cell.string != "")%dag_cell.string;
+    %if;(dag_cell.item != "")%dag_cell.item;
     %elseif;dag_cell.is_nothing;&nbsp;%nn;
     %elseif;dag_cell.is_bar;
       %if;(dag_cell.bar_link = "")|%nn;
@@ -140,14 +140,17 @@
 
 %define;add_father(xx, nn)
   %if;(nn > 0)
-    %apply;add_in_dag(xx.index)
-    %apply;add_father("xx.father", nn - 1)
+    %if;(xx.has_parents)%apply;add_father("xx.father", nn - 1)%end;
+    %xx;
+    %if;("xx" != "self")<br%/>|<br%/>%end;
   %end;
 %end;
 
+%if;(evar.t = "T")%nn;
 <div style="text-align:%right;">%nn;
 <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
 ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
+%end;
 
 %if;(evar.t = "T")
   %if;(evar.dag = "on")
@@ -172,15 +175,9 @@
     </table>
   %end;
 %elseif;(evar.t = "A")
-  %empty_dag;
-  %apply;add_in_dag(index)
-  %apply;add_father("self", evar.v)
   <table border="%border;" width="100%%"><tr><td align="center">
-    <table cellspacing="0" cellpadding="0">
-    %foreach;dag_line;
-      %apply;a_dag_line()
-    %end;
-    </table>
+  <tr><td align="center">
+    %apply;add_father("self", evar.v)
   </tr></tr></table>
 %end;
 

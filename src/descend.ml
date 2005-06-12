@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.42 2005-05-23 01:23:40 ddr Exp $ *)
+(* $Id: descend.ml,v 4.43 2005-06-12 18:48:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -906,14 +906,14 @@ value make_tree_hts conf base gv p =
   in
   let vertical_bar_txt v tdl po =
     let tdl =
-      if tdl = [] then [] else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+      if tdl = [] then [] else [(1, LeftA, TDitem "&nbsp;") :: tdl]
     in
     let td =
       match po with
       [ Some (_, u, _) ->
           let ncol = nb_column 0 (v - 1) u in
-          (2 * ncol - 1, CenterA, TDstring "|")
-      | None -> (1, LeftA, TDstring "&nbsp;") ]
+          (2 * ncol - 1, CenterA, TDitem "|")
+      | None -> (1, LeftA, TDitem "&nbsp;") ]
     in
     [td :: tdl]
   in
@@ -923,7 +923,7 @@ value make_tree_hts conf base gv p =
   in
   let spouses_vertical_bar_txt v tdl po =
     let tdl =
-      if tdl = [] then [] else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+      if tdl = [] then [] else [(1, LeftA, TDitem "&nbsp;") :: tdl]
     in
     match po with
     [ Some (p, u, _) when Array.length u.family > 0 ->
@@ -932,19 +932,19 @@ value make_tree_hts conf base gv p =
              (fun (tdl, first) ifam ->
                 let tdl =
                   if first then tdl
-                  else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+                  else [(1, LeftA, TDitem "&nbsp;") :: tdl]
                 in
                 let des = doi base ifam in
                 let td =
                   if Array.length des.children = 0 then
-                    (1, LeftA, TDstring "&nbsp;")
+                    (1, LeftA, TDitem "&nbsp;")
                   else
                     let ncol = fam_nb_column 0 (v - 1) des in
-                    (2 * ncol - 1, CenterA, TDstring "|")
+                    (2 * ncol - 1, CenterA, TDitem "|")
                 in
                 ([td :: tdl], False))
              (tdl, True) (Array.to_list u.family))
-    | _ -> [(1, LeftA, TDstring "&nbsp;") :: tdl] ]
+    | _ -> [(1, LeftA, TDitem "&nbsp;") :: tdl] ]
   in
   let spouses_vertical_bar v gen =
     let tdl = List.fold_left (spouses_vertical_bar_txt v) [] gen in
@@ -952,7 +952,7 @@ value make_tree_hts conf base gv p =
   in
   let horizontal_bar_txt v tdl po =
     let tdl =
-      if tdl = [] then [] else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+      if tdl = [] then [] else [(1, LeftA, TDitem "&nbsp;") :: tdl]
     in
     match po with
     [ Some (p, u, _) when Array.length u.family > 0 ->
@@ -961,16 +961,16 @@ value make_tree_hts conf base gv p =
              (fun (tdl, first) ifam ->
                 let tdl =
                   if first then tdl
-                  else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+                  else [(1, LeftA, TDitem "&nbsp;") :: tdl]
                 in
                 let des = doi base ifam in
                 let tdl =
                   if Array.length des.children = 0 then
-                    [(1, LeftA, TDstring "&nbsp;") :: tdl]
+                    [(1, LeftA, TDitem "&nbsp;") :: tdl]
                   else if Array.length des.children = 1 then
                     let u = uget conf base des.children.(0) in
                     let ncol = nb_column 0 (v - 1) u in
-                    [(2 * ncol - 1, CenterA, TDstring "|") :: tdl]
+                    [(2 * ncol - 1, CenterA, TDitem "|") :: tdl]
                   else
                     let rec loop tdl i =
                       if i = Array.length des.children then tdl
@@ -997,7 +997,7 @@ value make_tree_hts conf base gv p =
                 in
                 (tdl, False))
              (tdl, True) (Array.to_list u.family))
-    | _ -> [(1, LeftA, TDstring "&nbsp;") :: tdl] ]
+    | _ -> [(1, LeftA, TDitem "&nbsp;") :: tdl] ]
   in
   let horizontal_bars v gen =
     let tdl = List.fold_left (horizontal_bar_txt v) [] gen in
@@ -1005,7 +1005,7 @@ value make_tree_hts conf base gv p =
   in
   let person_txt v tdl po =
     let tdl =
-      if tdl = [] then [] else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+      if tdl = [] then [] else [(1, LeftA, TDitem "&nbsp;") :: tdl]
     in
     let td =
       match po with
@@ -1027,14 +1027,14 @@ value make_tree_hts conf base gv p =
             else txt
           in
           let txt = txt ^ Dag.image_txt conf base p in
-          (2 * ncol - 1, CenterA, TDstring txt)
-      | None -> (1, LeftA, TDstring "&nbsp;") ]
+          (2 * ncol - 1, CenterA, TDitem txt)
+      | None -> (1, LeftA, TDitem "&nbsp;") ]
     in
     [td :: tdl]
   in
   let spouses_txt v tdl po =
     let tdl =
-      if tdl = [] then [] else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+      if tdl = [] then [] else [(1, LeftA, TDitem "&nbsp;") :: tdl]
     in
     match po with
     [ Some (p, u, auth) when Array.length u.family > 0 ->
@@ -1043,7 +1043,7 @@ value make_tree_hts conf base gv p =
           else
             let ifam = u.family.(i) in
             let tdl =
-              if i > 0 then [(1, LeftA, TDstring "...") :: tdl] else tdl
+              if i > 0 then [(1, LeftA, TDitem "...") :: tdl] else tdl
             in
             let td =
               let fam = foi base ifam in
@@ -1070,12 +1070,12 @@ value make_tree_hts conf base gv p =
                      <td align=\"center\"%s>%s</td></tr></table>" bd td_prop s
                 else s
               in
-              (2 * ncol - 1, CenterA, TDstring s)
+              (2 * ncol - 1, CenterA, TDitem s)
             in
             loop [td :: tdl] (i + 1)
         in
         loop tdl 0
-    | _ -> [(1, LeftA, TDstring "&nbsp;") :: tdl] ]
+    | _ -> [(1, LeftA, TDitem "&nbsp;") :: tdl] ]
   in
   let next_gen gen =
     List.fold_right
