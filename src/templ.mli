@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.14 2005-06-12 05:46:58 ddr Exp $ *)
+(* $Id: templ.mli,v 4.15 2005-06-12 06:33:41 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -27,8 +27,4 @@ value print_var :
    config -> base -> (list string -> expr_val) -> string -> list string ->
      unit;
 value print_apply :
-   config -> string -> (ast -> unit) ->
-     (loc -> list string -> expr_val * string -> list string -> string) ->
-     list string -> list ast -> list (list ast) -> unit;
-value print_apply2 :
    string -> (ast -> unit) -> list string -> list ast -> list string -> unit;
