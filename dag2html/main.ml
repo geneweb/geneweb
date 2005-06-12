@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 1.7 2005-05-30 20:21:08 ddr Exp $ *)
+(* $Id: main.ml,v 1.8 2005-06-12 18:48:21 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -184,7 +184,7 @@ value print_table border hts =
         (*
             if colspan > 1 then printf " colspan=%d" colspan else ();
 *)
-if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
+if colspan = 1 && (td = TDitem "&nbsp;" || td = TDhr CenterA) then
           ()
         else printf " colspan=%d" colspan;
         (**)
@@ -195,7 +195,7 @@ if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
         | (RightA, _) -> printf " align=right" ];
         printf ">";
         match td with
-        [ TDstring s -> printf "%s" s
+        [ TDitem s -> printf "%s" s
         | TDbar _ -> printf "|"
         | TDhr align ->
             do {

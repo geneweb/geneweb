@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.6 2005-05-30 20:21:08 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.7 2005-06-12 18:48:21 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -34,13 +34,13 @@ value new_ghost_id =
 (* creating the html table structure *)
 
 type align = [ LeftA | CenterA | RightA ];
-type table_data =
-  [ TDstring of string
+type table_data 'a =
+  [ TDitem of 'a
   | TDhr of align
   | TDbar of string
   | TDnothing ]
 ;
-type html_table = array (array (int * align * table_data));
+type html_table 'a = array (array (int * align * table_data 'a));
 
 value html_table_struct indi_txt vbar_txt phony d t =
   let phony =
@@ -51,7 +51,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
   in
   let elem_txt =
     fun
-    [ Elem e -> TDstring (indi_txt d.dag.(int_of_idag e))
+    [ Elem e -> TDitem (indi_txt d.dag.(int_of_idag e))
     | Ghost _ -> TDbar ""
     | Nothing -> TDnothing ]
   in

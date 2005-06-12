@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.34 2005-05-30 22:41:27 ddr Exp $ *)
+(* $Id: dag.ml,v 4.35 2005-06-12 18:48:21 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -182,7 +182,7 @@ value print_table conf hts =
           | (RightA, _) -> Wserver.wprint " align=\"%s\"" conf.right ];
           Wserver.wprint ">";
           match td with
-          [ TDstring s -> Wserver.wprint "%s" s
+          [ TDitem s -> Wserver.wprint "%s" s
           | TDnothing -> Wserver.wprint "&nbsp;"
           | TDbar s ->
               if s = "" then Wserver.wprint "|"
@@ -375,11 +375,11 @@ value gen_compute_columns_sizes size_fun hts ncol =
             else do {
               let (colspan, _, td) = hts.(i).(j) in
               match td with
-              [ TDstring _ | TDnothing ->
+              [ TDitem _ | TDnothing ->
                   if colspan = curr_colspan then
 (**)
                     let len =
-                      match td with [ TDstring s -> size_fun s | _ -> 1 ]
+                      match td with [ TDitem s -> size_fun s | _ -> 1 ]
                     in
 (*
                     let len = size_fun s in
@@ -499,8 +499,8 @@ value table_strip_troublemakers hts =
   for i = 0 to Array.length hts - 1 do {
     for j = 0 to Array.length hts.(i) - 1 do {
       match hts.(i).(j) with
-      [ (colspan, align, TDstring s) ->
-          hts.(i).(j) := (colspan, align, TDstring (strip_troublemakers s))
+      [ (colspan, align, TDitem s) ->
+          hts.(i).(j) := (colspan, align, TDitem (strip_troublemakers s))
       | _ -> () ]
     }
   }
@@ -620,7 +620,7 @@ value print_table_pre conf hts =
               let (colspan, _, td) = hts.(i).(j) in
               let stra =
                 match td with
-                [ TDstring s ->
+                [ TDitem s ->
                     let sz =
                       loop 0 colspan where rec loop sz k =
                         if k = 0 then sz
@@ -645,7 +645,7 @@ value print_table_pre conf hts =
             in
             let outs =
               match td with
-              [ TDstring s ->
+              [ TDitem s ->
                   let s =
                     let k =
                       let dk = (max_row - Array.length stra.(j)) / 2 in
@@ -778,9 +778,7 @@ value make_tree_hts
                          p ps
                    | None -> "" ]
                  in
-                 txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
-                   Util.referenced_person_title_text conf base ps ^
-                   Date.short_dates_text conf base ps)
+                 txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^ elem_txt ps)
             txt spouses
         in
         txt ^ image_txt conf base p
