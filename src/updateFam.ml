@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.61 2005-06-11 21:22:49 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.62 2005-06-12 06:33:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -359,13 +359,16 @@ value rec print_ast conf base env fcd =
   | x -> not_impl "print_ast" x ]
 and print_define conf base env fcd f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] fcd) alk
-and print_apply conf base env fcd f el =
+and print_apply conf base env fcd f ell =
+  let eval_var = eval_var conf base env fcd in
+  let eval_apply _ _ = "not impl apply in apply" in
+  let eval_ast = Templ.eval_expr conf (eval_var, eval_apply) in
+  let sll = List.map (List.map eval_ast) ell in
+  let vl = List.map (String.concat "") sll in
   match get_env f env with
   [ Vfun xl al ->
-      let eval_var = eval_var conf base env fcd in
-      let eval_apply _ _ = "not impl apply in apply" in
       let print_ast = print_ast conf base env fcd in
-      Templ.print_apply conf f print_ast (eval_var, eval_apply) xl al el
+      Templ.print_apply f print_ast xl al vl
   | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env fcd e alt ale =
   let eval_var = eval_var conf base env fcd in

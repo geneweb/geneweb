@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.139 2005-06-12 05:46:57 ddr Exp $ *)
+(* $Id: perso.ml,v 4.140 2005-06-12 06:33:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1921,7 +1921,7 @@ and print_apply conf base env ep loc f ell =
   match get_env f env with
   [ Vfun xl al ->
       let print_ast = print_ast conf base env ep in
-      Templ.print_apply2 f print_ast xl al vl
+      Templ.print_apply f print_ast xl al vl
   | _ ->
       Wserver.wprint "%s" (eval_apply conf env eval_ast f vl) ]
 and print_if conf base env ep e alt ale =

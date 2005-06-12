@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.62 2005-06-12 05:46:58 ddr Exp $ *)
+(* $Id: templ.ml,v 4.63 2005-06-12 06:33:41 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -902,9 +902,7 @@ value print_var conf base eval_var s sl =
           } ] ]
 ;
 
-(* print_apply2 + print_apply => to be simplified... *)
-
-value print_apply2 f print_ast xl al vl =
+value print_apply f print_ast xl al vl =
   List.iter
     (fun a ->
        let a =
@@ -919,12 +917,4 @@ value print_apply2 f print_ast xl al vl =
        in
        print_ast a)
     al
-;
-
-value print_apply conf f print_ast eval_var xl al ell =
-  let vl =
-    List.map
-      (fun el -> String.concat "" (List.map (eval_expr conf eval_var) el)) ell
-  in
-  print_apply2 f print_ast xl al vl
 ;

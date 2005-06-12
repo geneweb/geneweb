@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.31 2005-06-11 21:22:49 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.32 2005-06-12 06:33:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -352,14 +352,17 @@ value rec print_ast conf base env p =
   | Aint _ _ | Aop2 _ _ _ | Aop1 _ _ -> Wserver.wprint "error1" ]
 and print_define conf base env p f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] p) alk
-and print_apply conf base env p f el =
+and print_apply conf base env p f ell =
+  let eval_var = eval_var conf base env p in
+  let eval_apply _ _ = "not impl apply in apply" in
+  let eval_ast = Templ.eval_expr conf (eval_var, eval_apply) in
+  let sll = List.map (List.map eval_ast) ell in
+  let vl = List.map (String.concat "") sll in
   match get_env f env with
   [ Vfun xl al ->
-      let eval_var = eval_var conf base env p in
-      let eval_apply _ _ = "not impl apply in apply" in
       let print_ast = print_ast conf base env p in
-      Templ.print_apply conf f print_ast (eval_var, eval_apply) xl al el
-  | _ -> Wserver.wprint " %%%s?" f ]
+      Templ.print_apply f print_ast xl al vl
+  | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env p e alt ale =
   let eval_var = eval_var conf base env p in
   let eval_apply _ _ = "not impl apply in if" in
