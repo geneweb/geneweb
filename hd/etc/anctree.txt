@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.13 2005-06-11 22:17:16 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.14 2005-06-12 05:46:57 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -139,7 +139,10 @@
 %end;
 
 %define;add_father(xx, nn)
-  %if;("nn" > 1)%apply;add_father("xx.father", nn - 1)%end;
+  %if;(nn > 0)
+    %apply;add_in_dag(xx.index)
+    %apply;add_father("xx.father", nn - 1)
+  %end;
 %end;
 
 <div style="text-align:%right;">%nn;
