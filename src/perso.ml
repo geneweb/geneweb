@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.141 2005-06-12 18:48:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.142 2005-06-13 05:10:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2205,11 +2205,11 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
   in
   let d = Dag.make_dag conf base (Dag.Pset.elements set) in
   let hts =
+    let vbar_txt ip = "" in
     let dag_elem_txt p =
       Util.referenced_person_title_text conf base p ^
         Date.short_dates_text conf base p
     in
-    let vbar_txt ip = "" in
     Dag.make_tree_hts conf base dag_elem_txt vbar_txt False True False
       set [] d
   in

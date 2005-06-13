@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.35 2005-06-12 18:48:21 ddr Exp $ *)
+(* $Id: dag.ml,v 4.36 2005-06-13 05:10:54 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -736,7 +736,20 @@ value html_table_of_dag indi_txt vbar_txt phony invert no_group d =
 ;
 
 value make_tree_hts
-  conf base elem_txt vbar_txt spouse_on invert no_group set spl d =
+    conf base elem_txt vbar_txt spouse_on invert no_group set spl d =
+  let bd =
+    match Util.p_getint conf.env "bd" with
+    [ Some x -> x
+    | _ -> 0 ]
+  in
+  let td =
+    match Util.p_getenv conf.env "td" with
+    [ Some x -> " " ^ x
+    | _ ->
+        match Util.p_getenv conf.env "color" with
+        [ None | Some "" -> ""
+        | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
+  in
   let indi_txt n =
     match n.valu with
     [ Left ip ->
@@ -783,19 +796,6 @@ value make_tree_hts
         in
         txt ^ image_txt conf base p
     | Right _ -> "&nbsp;" ]
-  in
-  let bd =
-    match Util.p_getint conf.env "bd" with
-    [ Some x -> x
-    | _ -> 0 ]
-  in
-  let td =
-    match Util.p_getenv conf.env "td" with
-    [ Some x -> " " ^ x
-    | _ ->
-        match Util.p_getenv conf.env "color" with
-        [ None | Some "" -> ""
-        | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
   in
   let indi_txt n =
     let (bd, td) =
