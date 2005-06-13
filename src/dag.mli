@@ -1,7 +1,8 @@
-(* $Id: dag.mli,v 4.2 2005-06-12 18:48:21 ddr Exp $ *)
+(* $Id: dag.mli,v 4.3 2005-06-13 05:10:54 ddr Exp $ *)
 
 open Config;
 open Def;
+open Dag2html;
 
 module Pset :
   sig
@@ -14,27 +15,25 @@ module Pset :
 
 type sum 'a 'b = [ Left of 'a | Right of 'b ];
 
-value make_dag : config -> base -> list iper -> Dag2html.dag (sum iper 'b);
+value make_dag : config -> base -> list iper -> dag (sum iper 'b);
 
 value image_txt : config -> base -> person -> string;
 
-value print_html_table : config -> Dag2html.html_table string -> unit;
+value print_html_table : config -> html_table string -> unit;
 
 value make_tree_hts :
   config -> base ->
     (person -> string) -> (iper -> string) -> bool -> bool -> bool ->
     Pset.t -> list (iper * (iper * option ifam)) ->
-    Dag2html.dag (sum  iper 'a) ->
-    Dag2html.html_table string;
+    dag (sum  iper 'a) -> html_table string;
 
 value gen_print_dag :
   config -> base -> bool -> bool -> Pset.t ->
     list (iper * (iper * option ifam)) ->
-    Dag2html.dag (sum iper 'a) -> unit;
+    dag (sum iper 'a) -> unit;
 value print_dag :
   config -> base -> Pset.t -> list (iper * (iper * option ifam)) ->
-    Dag2html.dag (sum iper 'a) -> unit;
+    dag (sum iper 'a) -> unit;
 value print : config -> base -> unit;
 
-value print_slices_menu :
-  config -> base -> option (Dag2html.html_table string) -> unit;
+value print_slices_menu : config -> base -> option (html_table string) -> unit;

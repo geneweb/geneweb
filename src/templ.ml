@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.63 2005-06-12 06:33:41 ddr Exp $ *)
+(* $Id: templ.ml,v 4.64 2005-06-13 05:10:54 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -162,19 +162,7 @@ value rec get_token =
   | [: s = get_ident 0 :] ep -> Tok (bp, ep) (IDENT s) ]
 ;
 
-value buff = ref (String.create 80);
-
-value buff_store len x =
-  do {
-    if len >= String.length buff.val then
-      buff.val := buff.val ^ String.create (String.length buff.val)
-    else ();
-    buff.val.[len] := x;
-    succ len
-  }
-;
-
-value buff_get len = String.sub buff.val 0 len;
+module Buff2 = Buff.Make (struct value buff = ref (String.create 80); end);
 
 value rec parse_var =
   parser
@@ -319,7 +307,7 @@ value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser bp
     [ [: `'%' :] ->
-        let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
+        let astl = if len = 0 then astl else [Atext (Buff2.get len) :: astl] in
         match get_variable strm with
         [ (_, ("%" | "[" | "]" as c), []) ->
             parse_astl [Atext c :: astl] False 0 end_list strm
@@ -342,16 +330,16 @@ value parse_templ conf strm =
             in
             parse_astl [ast :: astl] False 0 end_list strm ]
     | [: `'[' :] ->
-        let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
+        let astl = if len = 0 then astl else [Atext (Buff2.get len) :: astl] in
         let a = let (x, y, z) = lexicon_word strm in Atransl x y z in
         parse_astl [a :: astl] False 0 end_list strm
     | [: `c :] ->
         let empty_c = c = ' ' || c = '\t' in
-        let len = if empty_c && bol then len else buff_store len c in
+        let len = if empty_c && bol then len else Buff2.store len c in
         let bol = empty_c && bol || c = '\n' in
         parse_astl astl bol len end_list strm
     | [: :] ->
-        let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
+        let astl = if len = 0 then astl else [Atext (Buff2.get len) :: astl] in
         (List.rev astl, "") ]
   and parse_define astl end_list strm =
     let fxlal =
