@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.72 2005-06-01 09:52:53 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.73 2005-06-13 20:16:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -2037,7 +2037,7 @@ value print_surnames_list conf base v p =
 ;
 
 value ancmenu_print = Perso.interp_templ "ancmenu";
-value anclist_print = Perso.interp_templ "anclist";
+value ancsosa_print = Perso.interp_templ "ancsosa";
 value anctree_print = Perso.interp_templ "anctree";
 
 value print_old conf base p =
@@ -2093,9 +2093,9 @@ value print conf base p =
   || p_getenv conf.base_env "old" = Some "on" then print_old conf base p else
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> display_ancestors_upto conf base v p
-  | (Some "N", Some v) -> anclist_print conf base p
-  | (Some "G", Some v) -> anclist_print conf base p
-  | (Some "M", Some v) -> anclist_print conf base p
+  | (Some "N", Some v) -> ancsosa_print conf base p
+  | (Some "G", Some v) -> ancsosa_print conf base p
+  | (Some "M", Some v) -> ancsosa_print conf base p
   | (Some "T", Some v) ->
 (**)
       print_tree conf base v p
@@ -2105,7 +2105,7 @@ value print conf base p =
   | (Some "H", Some v) -> print_horizontally conf base v p
   | (Some "A", Some v) -> print_male_line conf base v p
   | (Some "C", Some v) -> print_female_line conf base v p
-  | (Some "D", x) -> anclist_print conf base p
+  | (Some "D", x) -> ancsosa_print conf base p
   | (Some "F", Some v) -> print_surnames_list conf base v p
   | _ -> ancmenu_print conf base p ]
 ;
