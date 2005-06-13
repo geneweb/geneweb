@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.143 2005-06-13 12:27:26 ddr Exp $ *)
+(* $Id: perso.ml,v 4.144 2005-06-13 19:26:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2228,7 +2228,7 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
       [ Dag.Left _ -> False
       | Dag.Right _ -> True ]
     in
-    Dag.html_table_of_dag dag_elem vbar_txt phony False False d
+    Dag.html_table_of_dag dag_elem vbar_txt phony True False d
   in
 (**)
   for i = 0 to Array.length hts - 1 do {

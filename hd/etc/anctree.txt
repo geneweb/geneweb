@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.16 2005-06-13 12:27:26 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.17 2005-06-13 19:26:53 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -119,11 +119,16 @@
     <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
     %if;dag_cell.is_nothing;&nbsp;%nn;
     %elseif;dag_cell.is_bar;
-      %if;dag_cell.is_bar_link;
+      %if;(dag_cell.is_bar_link and evar.cgl != "on")
         <a style="text-decoration:none" href="%prefix;
         m=A;%dag_cell.item.access;;v=%evar.v;;t=T">|</a>%nn;
       %else;|%end;
-    %elseif;(dag_cell.item != "")%dag_cell.item;%dag_cell.item.dates;
+    %elseif;(dag_cell.item != "")
+      %if;(evar.cgl = "on")%dag_cell.item;
+      %else;<a href="%prefix;%dag_cell.access;">%dag_cell.item;</a>%end;
+      %if;(dag_cell.item.has_nobility_titles),%sp;
+      <em>%dag_cell.item.nobility_title;</em>%end;
+      %dag_cell.item.dates;
     %else;
       %if;dag_cell.is_hr_left;
         <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
