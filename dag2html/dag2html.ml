@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.7 2005-06-12 18:48:21 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.8 2005-06-13 12:27:26 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -37,7 +37,7 @@ type align = [ LeftA | CenterA | RightA ];
 type table_data 'a =
   [ TDitem of 'a
   | TDhr of align
-  | TDbar of string
+  | TDbar of option 'a
   | TDnothing ]
 ;
 type html_table 'a = array (array (int * align * table_data 'a));
@@ -52,14 +52,17 @@ value html_table_struct indi_txt vbar_txt phony d t =
   let elem_txt =
     fun
     [ Elem e -> TDitem (indi_txt d.dag.(int_of_idag e))
-    | Ghost _ -> TDbar ""
+    | Ghost _ -> TDbar None
     | Nothing -> TDnothing ]
   in
   let bar_txt first_vbar =
     fun
     [ Elem e ->
-        TDbar (if first_vbar then vbar_txt d.dag.(int_of_idag e) else "")
-    | Ghost _ -> TDbar ""
+        let b =
+          if first_vbar then Some (vbar_txt d.dag.(int_of_idag e)) else None
+        in
+        TDbar b
+    | Ghost _ -> TDbar None
     | Nothing -> TDnothing ]
   in
   let all_empty i =
@@ -155,7 +158,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
                     else if phony t.table.(i + 1).(j).elem then loop (j + 1)
                     else False
                 in
-                if all_ph then TDnothing else TDbar ""
+                if all_ph then TDnothing else TDbar None
               in
               [(colspan, CenterA, td) :: les]
           in
@@ -231,7 +234,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
                     in
                     if l = j && next_l = next_j then
                       let les = [(1, LeftA, TDnothing) :: les] in
-                      let s = ph (TDbar "") in
+                      let s = ph (TDbar None) in
                       let les = [(colspan, CenterA, s) :: les] in
                       let les = [(1, LeftA, TDnothing) :: les] in
                       les
