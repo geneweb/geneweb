@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.17 2005-06-13 19:26:53 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.18 2005-06-13 20:16:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -143,10 +143,18 @@
   </tr>
 %end;
 
-%define;add_father(xx, nn)
+%define;male_line(xx, nn)
   %if;(nn > 0)
-    %if;(xx.has_parents)%apply;add_father("xx.father", nn - 1)%end;
-    %xx;
+    %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
+    <a href="%prefix;%xx.access">%xx;</a>%xx.dates;
+    %if;("xx" != "self")<br%/>|<br%/>%end;
+  %end;
+%end;
+
+%define;female_line(xx, nn)
+  %if;(nn > 0)
+    %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
+    <a href="%prefix;%xx.access">%xx;</a>%xx.dates;
     %if;("xx" != "self")<br%/>|<br%/>%end;
   %end;
 %end;
@@ -182,7 +190,12 @@
 %elseif;(evar.t = "A")
   <table border="%border;" width="100%%"><tr><td align="center">
   <tr><td align="center">
-    %apply;add_father("self", evar.v)
+    %apply;male_line("self", evar.v)
+  </tr></tr></table>
+%elseif;(evar.t = "C")
+  <table border="%border;" width="100%%"><tr><td align="center">
+  <tr><td align="center">
+    %apply;female_line("self", evar.v)
   </tr></tr></table>
 %end;
 
