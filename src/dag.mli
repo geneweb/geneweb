@@ -1,4 +1,4 @@
-(* $Id: dag.mli,v 4.3 2005-06-13 05:10:54 ddr Exp $ *)
+(* $Id: dag.mli,v 4.4 2005-06-13 12:27:26 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -20,6 +20,11 @@ value make_dag : config -> base -> list iper -> dag (sum iper 'b);
 value image_txt : config -> base -> person -> string;
 
 value print_html_table : config -> html_table string -> unit;
+
+value html_table_of_dag :
+  (node 'a -> 'b) -> (node 'a -> 'b) -> (node 'a -> bool) -> bool -> bool ->
+    dag 'a -> array (array (int * align * table_data 'b))
+;
 
 value make_tree_hts :
   config -> base ->

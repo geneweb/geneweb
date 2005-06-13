@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.36 2005-06-13 05:10:54 ddr Exp $ *)
+(* $Id: dag.ml,v 4.37 2005-06-13 12:27:26 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -184,11 +184,10 @@ value print_table conf hts =
           match td with
           [ TDitem s -> Wserver.wprint "%s" s
           | TDnothing -> Wserver.wprint "&nbsp;"
-          | TDbar s ->
-              if s = "" then Wserver.wprint "|"
-              else
-                Wserver.wprint
-                  "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
+          | TDbar None -> Wserver.wprint "|"
+          | TDbar (Some s) ->
+              Wserver.wprint
+                "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
           | TDhr align ->
               match align with
               [ LeftA ->
@@ -664,7 +663,9 @@ value print_table_pre conf hts =
                     String.make (sz - (sz + 1) / 2) ' '
               | TDbar s ->
                   let s =
-                    if s = "" then "|" else "<a href=\"" ^ s ^ "\">|</a>"
+                    match s with
+                    [ None -> "|"
+                    | Some s -> "<a href=\"" ^ s ^ "\">|</a>" ]
                   in
                   let len = displayed_length s in
                   String.make ((sz - len) / 2) ' ' ^ s ^

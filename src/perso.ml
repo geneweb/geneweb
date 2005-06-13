@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.142 2005-06-13 05:10:54 ddr Exp $ *)
+(* $Id: perso.ml,v 4.143 2005-06-13 12:27:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -566,7 +566,7 @@ module SortedList =
   Set.Make (struct type t = list string; value compare = compare_ls; end)
 ;
 
-type dag_item = string;
+type dag_item = Dag2html.node (Dag.sum Def.iper string);
 
 type env =
   [ Vallgp of list generation_person
@@ -1153,14 +1153,14 @@ and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
       | (Dag2html.LeftA, _) -> VVstring conf.left
       | (Dag2html.CenterA, _) -> VVstring "center"
       | (Dag2html.RightA, _) -> VVstring conf.right ]
-  | ["bar_link"] ->
-      match td with
-      [ Dag2html.TDbar s -> VVstring s
-      | _ -> VVstring "" ]
   | ["colspan"] -> VVstring (string_of_int colspan)
   | ["is_bar"] ->
       match td with
       [ Dag2html.TDbar _ -> VVbool True
+      | _ -> VVbool False ]
+  | ["is_bar_link"] ->
+      match td with
+      [ Dag2html.TDbar (Some _) -> VVbool True
       | _ -> VVbool False ]
   | ["is_hr_left"] ->
       match td with
@@ -1171,9 +1171,14 @@ and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
       [ Dag2html.TDhr Dag2html.RightA -> VVbool True
       | _ -> VVbool False ]
   | ["is_nothing"] -> VVbool (td = Dag2html.TDnothing)
-  | ["item"] ->
+  | ["item" :: sl] ->
       match td with
-      [ Dag2html.TDitem s -> VVstring s
+      [ Dag2html.TDitem u | Dag2html.TDbar (Some u) ->
+          match u.Dag2html.valu with
+          [ Dag.Left ip ->
+              let ep = make_ep conf base ip in
+              eval_person_field_var conf base env ep loc sl
+          | Dag.Right s -> VVstring "" ]
       | _ -> VVstring "" ]
   | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
@@ -2204,6 +2209,7 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
     | _ -> raise Not_found ]
   in
   let d = Dag.make_dag conf base (Dag.Pset.elements set) in
+(*
   let hts =
     let vbar_txt ip = "" in
     let dag_elem_txt p =
@@ -2213,6 +2219,18 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
     Dag.make_tree_hts conf base dag_elem_txt vbar_txt False True False
       set [] d
   in
+*)
+  let hts =
+    let dag_elem n = n in
+    let vbar_txt n = n in
+    let phony n =
+      match n.Dag2html.valu with
+      [ Dag.Left _ -> False
+      | Dag.Right _ -> True ]
+    in
+    Dag.html_table_of_dag dag_elem vbar_txt phony False False d
+  in
+(**)
   for i = 0 to Array.length hts - 1 do {
     let env = [("dag_line", Vdline hts.(i)) :: env] in
     List.iter (print_ast conf base env ep) al;
