@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.36 2005-06-14 08:26:34 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.37 2005-06-14 11:30:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -81,12 +81,56 @@
   %end;
 %end;
 
+%define;horizontally(pp, xx, ss1, ss2, ss3)
+  %if;(xx > 0)
+    %if;(pp.has_parents)
+      %apply;horizontally%with;
+        pp.father%nn;
+      %and;
+        %expr(xx - 1)
+      %and;
+        ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%nn;
+      %and;
+        ss1&nbsp;+--&nbsp;%nn;
+      %and;
+        ss1&nbsp;|&nbsp;&nbsp;&nbsp;%nn;
+      %end;
+    %end;
+    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%nn;
+    %if;(pp.has_nobility_titles), <em>%pp.nobility_title;</em>%end;
+    %pp.dates;<br%/>
+    %if;(pp.has_parents)
+      %apply;horizontally%with;
+        pp.mother%nn;
+      %and;
+        %expr(xx - 1)
+      %and;
+        ss3&nbsp;|&nbsp;&nbsp;&nbsp;%nn;
+      %and;
+        ss3&nbsp;+--&nbsp;%nn;
+      %and;
+        ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%nn;
+      %end;
+    %end;
+  %end;
+%end;
+
 %if;(evar.t = "L")
   %( by list %)
   <p>
   %apply;togen("v").
   </p>
   %apply;ancestors("self", evar.v)
+%elseif;(evar.t = "H")
+  %( horizontally %)
+  <p>
+  %apply;togen("v").
+  </p>
+  <table><tr><td style="white-space:nowrap">
+  %apply;horizontally(
+    "self", evar.v, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
+  </tr></tr></table>
+  </p>
 %end;
 
 <div>
