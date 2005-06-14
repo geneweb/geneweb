@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.144 2005-06-13 19:26:53 ddr Exp $ *)
+(* $Id: perso.ml,v 4.145 2005-06-14 20:18:03 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -313,7 +313,8 @@ value max_descendant_level conf base p =
   min (limit_desc conf) (desc_level_max conf base p)
 ;
 
-(* ascendants by list *)
+(* ancestors by list *)
+
 type generation_person =
   [ GP_person of Num.t and iper and option ifam
   | GP_same of Num.t and Num.t and iper
@@ -452,7 +453,7 @@ value get_all_generations conf base p =
   List.flatten gpll
 ;
 
-(* Ascendants by tree:
+(* Ancestors by tree:
 
   8 ? ? ? ? ? ? ?
    4   5   ?   7
@@ -543,6 +544,140 @@ value tree_generation_list conf base gv p =
       else loop (i - 1) (next_gen gen) [gen :: list]
   in
   enrich_tree gen
+;
+
+(* Ancestors surnames list *)
+
+value get_date_place conf base auth_for_all_anc p =
+  if auth_for_all_anc || authorized_age conf base p then
+    let d1 =
+      match Adef.od_of_codate p.birth with
+      [ None -> Adef.od_of_codate p.baptism
+      | x -> x ]
+    in
+    let d1 =
+      if d1 <> None then d1
+      else
+        List.fold_left
+          (fun d ifam ->
+             if d <> None then d
+             else Adef.od_of_codate (foi base ifam).marriage)
+          d1 (Array.to_list (uget conf base p.cle_index).family)
+    in
+    let d2 =
+      match p.death with
+      [ Death _ cd -> Some (Adef.date_of_cdate cd)
+      | _ ->
+          match p.burial with
+          [ Buried cod -> Adef.od_of_codate cod
+          | Cremated cod -> Adef.od_of_codate cod
+          | _ -> None ] ]
+    in
+    let auth_for_all_anc =
+      if auth_for_all_anc then True
+      else
+        match d2 with
+        [ Some (Dgreg d _)
+          when (time_gone_by d conf.today).year > conf.private_years ->
+            True
+        | _ -> False ]
+    in
+    let pl =
+      let pl = "" in
+      let pl = if pl <> "" then pl else sou base p.birth_place in
+      let pl = if pl <> "" then pl else sou base p.baptism_place in
+      let pl = if pl <> "" then pl else sou base p.death_place in
+      let pl = if pl <> "" then pl else sou base p.burial_place in
+      let pl =
+        if pl <> "" then pl
+        else
+          List.fold_left
+            (fun pl ifam ->
+               if pl <> "" then pl
+               else sou base (foi base ifam).marriage_place)
+            pl (Array.to_list (uget conf base p.cle_index).family)
+      in
+      pl
+    in
+    ((d1, d2, pl), auth_for_all_anc)
+  else ((None, None, ""), False)
+;
+
+value merge_date_place conf base surn ((d1, d2, pl), auth) p =
+  let ((pd1, pd2, ppl), auth) = get_date_place conf base auth p in
+  let nd1 =
+    if pd1 <> None then pd1
+    else if p.surname = surn then if pd2 <> None then pd2 else d1
+    else None
+  in
+  let nd2 =
+    if p.surname = surn then
+      if d2 <> None then d2
+      else if d1 <> None then d1
+      else if pd1 <> None then pd2
+      else pd1
+    else if pd2 <> None then pd2
+    else if pd1 <> None then pd1
+    else d1
+  in
+  let pl = if ppl <> "" then ppl else if p.surname = surn then pl else "" in
+  ((nd1, nd2, pl), auth)
+;
+
+value build_surnames_list conf base v p =
+  let ht = Hashtbl.create 701 in
+  let mark = Array.create base.data.persons.len 5 in
+  let auth = conf.wizard || conf.friend in
+  let add_surname sosa p surn dp =
+    let r =
+      try Hashtbl.find ht surn with
+      [ Not_found ->
+          let r = ref ((fst dp, p), []) in
+          do { Hashtbl.add ht surn r; r } ]
+    in
+    r.val := (fst r.val, [sosa :: snd r.val])
+  in
+  let rec loop lev sosa p surn dp =
+    if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
+    else if lev = v then
+      if conf.hide_names && not (fast_auth_age conf p) then ()
+      else add_surname sosa p surn dp
+    else do {
+      mark.(Adef.int_of_iper p.cle_index) :=
+        mark.(Adef.int_of_iper p.cle_index) - 1;
+      match parents (aget conf base p.cle_index) with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let fath = pget conf base (father cpl) in
+          let moth = pget conf base (mother cpl) in
+          do {
+            if surn <> fath.surname && surn <> moth.surname then
+              add_surname sosa p surn dp
+            else ();
+            let sosa = Num.twice sosa in
+            if not (is_hidden fath) then
+              let dp1 = merge_date_place conf base surn dp fath in
+              loop (lev + 1) sosa fath fath.surname dp1
+            else ();
+            let sosa = Num.inc sosa 1 in
+            if not (is_hidden moth) then
+              let dp2 = merge_date_place conf base surn dp moth in
+              loop (lev + 1) sosa moth moth.surname dp2
+            else ();
+          }
+      | None -> add_surname sosa p surn dp ]
+    }
+  in
+  do {
+    loop 0 Num.one p p.surname (get_date_place conf base auth p);
+    let list = ref [] in
+    Hashtbl.iter
+      (fun i dp ->
+         let surn = sou base i in
+         if surn <> "?" then list.val := [(surn, dp.val) :: list.val] else ())
+      ht;
+    List.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic s1 s2) list.val
+  }
 ;
 
 (* Interpretation of template file *)
@@ -2031,6 +2166,7 @@ and print_simple_foreach conf base env el al ini_ep ep efam =
   | "ancestor" -> print_foreach_ancestor conf base env al ep
   | "ancestor_level" -> print_foreach_ancestor_level conf base env el al ep
   | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
+  | "ancestor_surname" -> print_foreach_ancestor_surname conf base env el al ep
   | "ancestor_tree_line" -> print_foreach_ancestor_tree conf base env el al ep
   | "cell" -> print_foreach_cell conf base env el al ep
   | "child" -> print_foreach_child conf base env al ep efam
@@ -2109,6 +2245,22 @@ and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
         let gpl = next_generation2 conf base mark gpl in
         loop gpl (succ i)
       }
+and print_foreach_ancestor_surname conf base env el al ((p, _, _, _) as ep) =
+  let max_level =
+    match el with
+    [ [[e]] -> eval_int_expr conf base env ep e
+    | [] ->
+        match get_env "max_anc_level" env with
+        [ Vint n -> n
+        | _ -> 0 ]
+    | _ -> raise Not_found ]
+  in
+  let list = build_surnames_list conf base max_level p in
+  List.iter
+    (fun (surn, (((d1, d2, pl), anc), sosa_list)) ->
+       let env = env in
+       List.iter (print_ast conf base env ep) al)
+    list
 and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
   let (p, max_level) =
     match el with
@@ -2209,17 +2361,6 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
     | _ -> raise Not_found ]
   in
   let d = Dag.make_dag conf base (Dag.Pset.elements set) in
-(*
-  let hts =
-    let vbar_txt ip = "" in
-    let dag_elem_txt p =
-      Util.referenced_person_title_text conf base p ^
-        Date.short_dates_text conf base p
-    in
-    Dag.make_tree_hts conf base dag_elem_txt vbar_txt False True False
-      set [] d
-  in
-*)
   let hts =
     let dag_elem n = n in
     let vbar_txt n = n in
@@ -2230,7 +2371,6 @@ and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
     in
     Dag.html_table_of_dag dag_elem vbar_txt phony True False d
   in
-(**)
   for i = 0 to Array.length hts - 1 do {
     let env = [("dag_line", Vdline hts.(i)) :: env] in
     List.iter (print_ast conf base env ep) al;
