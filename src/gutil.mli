@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.25 2005-04-08 18:02:26 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.26 2005-06-15 09:59:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -101,6 +101,7 @@ value check_noloop_for_person_list :
 value strip_spaces : string -> string;
 value alphabetic_utf_8 : string -> string -> int;
 value alphabetic : string -> string -> int;
+value alphabetic_order : string -> string -> int;
 value initial : string -> int;
 value strip_all_trailing_spaces : string -> string;
 value tr : char -> char -> string -> string;
