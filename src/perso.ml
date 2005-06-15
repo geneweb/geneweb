@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.146 2005-06-15 09:59:07 ddr Exp $ *)
+(* $Id: perso.ml,v 4.147 2005-06-15 10:27:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -707,7 +707,7 @@ module SortedList =
 
 type dag_item = Dag2html.node (Dag.sum Def.iper string);
 type ancestor_surname_info =
-  (string * (((option date * option date * string) * person) * list Num.t))
+  (string * option date * option date * string * person * list Num.t)
 ;
 
 type env =
@@ -1408,11 +1408,20 @@ and eval_ancestor_field_var conf base env gp loc =
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ] ]
-and eval_ancestor_surname_field_var conf base env (s, _) =
+and eval_ancestor_surname_field_var conf base env
+      (s, db, de, place, _, sosa_list) =
   fun
-  [ ["surname"] ->
-      let s = surname_end base s ^ surname_begin base s in
-      VVstring s
+  [ ["date_begin" :: sl] ->
+      match db with
+      [ Some d -> eval_date_field_var d sl
+      | None -> VVstring "" ]
+  | ["date_end" :: sl] ->
+      match de with
+      [ Some d -> eval_date_field_var d sl
+      | None -> VVstring "" ]
+  | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
+  | ["place"] -> VVstring place
+  | ["surname"] -> VVstring (surname_end base s ^ surname_begin base s)
   | _ -> raise Not_found ]
 and eval_num conf n =
   fun
@@ -2272,8 +2281,8 @@ and print_foreach_ancestor_surname conf base env el al ((p, _, _, _) as ep) =
   in
   let list = build_surnames_list conf base max_level p in
   List.iter
-    (fun info ->
-       let env = [("ancestor", Vanc_surn info) :: env] in
+    (fun (a, (((b, c, d), e), f)) ->
+       let env = [("ancestor", Vanc_surn (a, b, c, d, e, f)) :: env] in
        List.iter (print_ast conf base env ep) al)
     list
 and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =

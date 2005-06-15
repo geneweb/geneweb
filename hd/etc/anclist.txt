@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.40 2005-06-15 09:59:07 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.41 2005-06-15 10:27:33 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -130,7 +130,10 @@
   %( surnames list %)
   <ul>
   %foreach;ancestor_surname(evar.v)
-    <li>%ancestor.surname;</li>
+    <li>%ancestor.surname;
+    %if;(ancestor.nb_times > 1) (%ancestor.nb_times;)%end;
+    ; %ancestor.place;
+    ; %ancestor.date_begin.year;-%ancestor.date_end.year;</li>
   %end;
   </ul>
 %end;
