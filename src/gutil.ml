@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.39 2005-05-31 07:39:21 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.40 2005-06-15 09:59:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1188,6 +1188,10 @@ value alphabetic n1 n2 =
 *)
   alphabetic_iso_8859_1 n1 n2
 (**)
+;
+
+value alphabetic_order n1 n2 =
+  if utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
 ;
 
 value map_title_strings f t =
