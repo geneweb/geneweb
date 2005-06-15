@@ -1,11 +1,15 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.73 2005-06-13 20:16:31 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.74 2005-06-15 19:51:48 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
+DEFINE OLD;
+
 open Config;
+open Util;
+
+IFDEF OLD THEN declare
 open Def;
 open Gutil;
-open Util;
 open Printf;
 
 value limit_by_list conf =
@@ -14,13 +18,11 @@ value limit_by_list conf =
   | None -> 8 ]
 ;
 
-(**)
 value limit_by_tree conf =
   match p_getint conf.base_env "max_anc_tree" with
   [ Some x -> max 1 x
   | None -> 7 ]
 ;
-(**)
 
 value text_to conf =
   fun
@@ -35,7 +37,6 @@ value text_to conf =
         (transl_nth conf "nth (generation)" i) ]
 ;
 
-(**)
 value text_level conf =
   fun
   [ 1 ->
@@ -48,7 +49,6 @@ value text_level conf =
       sprintf (ftransl conf "the %s generation")
         (transl_nth conf "nth (generation)" i) ]
 ;
-(**)
 
 value display_ancestor conf base p =
   do {
@@ -105,8 +105,6 @@ value display_ancestors_upto conf base max_level p =
     trailer conf
   }
 ;
-
-(* ... begin ... short/long/missing/up to/tree *)
 
 (* Print ancestors with numbers.
    The mark table holds the number of the ancestor after it has been
@@ -1719,8 +1717,6 @@ value print_tree conf base v p =
   else print_normal_tree conf base v p
 ;
 
-(* ... end ... short/long/missing/up to/tree *)
-
 value no_spaces s =
   loop 0 0 where rec loop len i =
     if i == String.length s then Buff.get len
@@ -2035,11 +2031,14 @@ value print_surnames_list conf base v p =
     Util.trailer conf
   }
 ;
+end END;
 
+value anclist_print = Perso.interp_templ "anclist";
 value ancmenu_print = Perso.interp_templ "ancmenu";
 value ancsosa_print = Perso.interp_templ "ancsosa";
 value anctree_print = Perso.interp_templ "anctree";
 
+IFDEF OLD THEN declare
 value print_old conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> display_ancestors_upto conf base v p
@@ -2087,25 +2086,25 @@ value print_old conf base p =
   | (Some "F", Some v) -> print_surnames_list conf base v p
   | _ -> ancmenu_print conf base p ]
 ;
+end END;
+
+IFNDEF OLD THEN
+value print_old conf base p = incorrect_request conf
+END;
 
 value print conf base p =
   if p_getenv conf.env "old" = Some "on"
   || p_getenv conf.base_env "old" = Some "on" then print_old conf base p else
-  match (p_getenv conf.env "t", p_getint conf.env "v") with
-  [ (Some "L", Some v) -> display_ancestors_upto conf base v p
-  | (Some "N", Some v) -> ancsosa_print conf base p
-  | (Some "G", Some v) -> ancsosa_print conf base p
-  | (Some "M", Some v) -> ancsosa_print conf base p
-  | (Some "T", Some v) ->
-(**)
-      print_tree conf base v p
-(*
-      anctree_print conf base p
-*)
-  | (Some "H", Some v) -> print_horizontally conf base v p
-  | (Some "A", Some v) -> print_male_line conf base v p
-  | (Some "C", Some v) -> print_female_line conf base v p
-  | (Some "D", x) -> ancsosa_print conf base p
-  | (Some "F", Some v) -> print_surnames_list conf base v p
+  match p_getenv conf.env "t" with
+  [ Some "L" -> anclist_print conf base p
+  | Some "N" -> ancsosa_print conf base p
+  | Some "G" -> ancsosa_print conf base p
+  | Some "M" -> ancsosa_print conf base p
+  | Some "T" -> anctree_print conf base p
+  | Some "H" -> anclist_print conf base p
+  | Some "A" -> anctree_print conf base p
+  | Some "C" -> anctree_print conf base p
+  | Some "D" -> ancsosa_print conf base p
+  | Some "F" -> anclist_print conf base p
   | _ -> ancmenu_print conf base p ]
 ;
