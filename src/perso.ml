@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.147 2005-06-15 10:27:33 ddr Exp $ *)
+(* $Id: perso.ml,v 4.148 2005-06-15 11:36:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -707,7 +707,7 @@ module SortedList =
 
 type dag_item = Dag2html.node (Dag.sum Def.iper string);
 type ancestor_surname_info =
-  (string * option date * option date * string * person * list Num.t)
+  (string * option date * option date * string * person * list Num.t * loc)
 ;
 
 type env =
@@ -1104,7 +1104,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   [ ["ancestor" :: sl] ->
       match get_env "ancestor" env with
       [ Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
-      | Vanc_surn info -> eval_ancestor_surname_field_var conf base env info sl
+      | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found ]
   | ["bvar"; v] ->
       try VVstring (List.assoc v conf.base_env) with
@@ -1408,8 +1408,8 @@ and eval_ancestor_field_var conf base env gp loc =
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ] ]
-and eval_ancestor_surname_field_var conf base env
-      (s, db, de, place, _, sosa_list) =
+and eval_anc_by_surnl_field_var conf base env ep
+      (s, db, de, place, p, sosa_list, loc) =
   fun
   [ ["date_begin" :: sl] ->
       match db with
@@ -1421,8 +1421,21 @@ and eval_ancestor_surname_field_var conf base env
       | None -> VVstring "" ]
   | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
   | ["place"] -> VVstring place
-  | ["surname"] -> VVstring (surname_end base s ^ surname_begin base s)
-  | _ -> raise Not_found ]
+  | ["sosa_access"] ->
+      let (str, _) =
+        List.fold_right
+          (fun sosa (str, n) ->
+             let str =
+               str ^ ";s" ^ string_of_int n ^ "=" ^ Num.to_string sosa
+             in
+             (str, n + 1))
+          sosa_list ("", 1)
+      in
+      let (p, _, _, _) = ep in
+      VVstring (acces_n conf base "1" p ^ str)
+  | sl ->
+      let ep = make_ep conf base p.cle_index in
+      eval_person_field_var conf base env ep loc sl ]
 and eval_num conf n =
   fun
   [ ["v"] -> Num.to_string n
@@ -2102,7 +2115,7 @@ and print_if conf base env ep e alt ale =
 and print_foreach conf base env ini_ep loc s sl ell al =
   let rec loop ((_, a, _, _) as ep) efam =
     fun 
-    [ [s] -> print_simple_foreach conf base env ell al ini_ep ep efam s
+    [ [s] -> print_simple_foreach conf base env ell al ini_ep ep efam loc s
     | ["ancestor" :: sl] ->
         let ip_ifamo =
           match get_env "ancestor" env with
@@ -2184,13 +2197,13 @@ and print_foreach conf base env ini_ep loc s sl ell al =
         List.iter (fun s -> Wserver.wprint ".%s" s) sl;
         Wserver.wprint "?"
       } ]
-and print_simple_foreach conf base env el al ini_ep ep efam =
+and print_simple_foreach conf base env el al ini_ep ep efam loc =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
   | "ancestor" -> print_foreach_ancestor conf base env al ep
   | "ancestor_level" -> print_foreach_ancestor_level conf base env el al ep
   | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
-  | "ancestor_surname" -> print_foreach_ancestor_surname conf base env el al ep
+  | "ancestor_surname" -> print_foreach_anc_surn conf base env el al loc ep
   | "ancestor_tree_line" -> print_foreach_ancestor_tree conf base env el al ep
   | "cell" -> print_foreach_cell conf base env el al ep
   | "child" -> print_foreach_child conf base env al ep efam
@@ -2269,7 +2282,7 @@ and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
         let gpl = next_generation2 conf base mark gpl in
         loop gpl (succ i)
       }
-and print_foreach_ancestor_surname conf base env el al ((p, _, _, _) as ep) =
+and print_foreach_anc_surn conf base env el al loc ((p, _, _, _) as ep) =
   let max_level =
     match el with
     [ [[e]] -> eval_int_expr conf base env ep e
@@ -2282,7 +2295,7 @@ and print_foreach_ancestor_surname conf base env el al ((p, _, _, _) as ep) =
   let list = build_surnames_list conf base max_level p in
   List.iter
     (fun (a, (((b, c, d), e), f)) ->
-       let env = [("ancestor", Vanc_surn (a, b, c, d, e, f)) :: env] in
+       let env = [("ancestor", Vanc_surn (a, b, c, d, e, f, loc)) :: env] in
        List.iter (print_ast conf base env ep) al)
     list
 and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
