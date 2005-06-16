@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.138 2005-06-16 04:42:51 ddr Exp $ *)
+(* $Id: util.ml,v 4.139 2005-06-16 09:33:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1451,6 +1451,7 @@ value print_copyright conf =
   let env =
     [('s', fun _ -> commd conf);
      ('c', fun _ -> compilation_time conf);
+     ('C', fun _ -> if Gutil.utf_8_db.val then "&copy;" else "(c)");
      ('d',
       fun _ ->
         let s =
