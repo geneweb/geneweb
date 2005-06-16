@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.40 2005-06-16 05:00:29 ddr Exp $
+# $Id: Makefile,v 4.41 2005-06-16 09:46:12 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -36,14 +36,19 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
 	$(STRIP) gwc consang gwd gwu
 
 compilation.cmo: always
+	$(MAKE) compilation.ml
+	ocamlc -pp camlp4r -c compilation.ml
+
+compilation.cmx: always
+	$(MAKE) compilation.ml
+	ocamlopt -pp camlp4r -c compilation.ml
+
+compilation.ml: always
 	> compilation.ml
 	echo "open Def;" >> compilation.ml
 	echo "value (wd, d, h) = ($$(date "+%u, {day=%d;month=%m;year=%Y;prec=Sure;delta=0}, \"%T %Z\""));" >> compilation.ml
 	echo "value ct conf = Printf.sprintf \" (%s %s)\" (Util.transl_decline conf \"on (weekday day month year)\" (Util.transl_nth conf \"(week day)\" wd ^ \" \" ^ Date.code_dmy conf d)) h;" >> compilation.ml
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
-	ocamlc -pp camlp4r -c compilation.ml
-
-compilation.cmx: compilation.cmo
 
 clean::
 	$(RM) gwc consang gwd gwu gwlib.ml
