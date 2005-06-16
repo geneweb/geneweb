@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.12 2005-06-16 05:33:12 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.13 2005-06-16 19:43:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -100,10 +100,12 @@
             [*short display] (*)
           </label>
           <br%/>
-          <label>
-            - Sosa hexadecimal
-            <input type="checkbox" name="hexa" value="on"%/>
-          </label>
+          - Sosa base
+          <label><input type="radio" name="sosab" value="8"%/>8</label>
+          <label>%nn
+            <input type="radio" name="sosab" value="10" checked="checked"%/
+          >10</label>
+          <label><input type="radio" name="sosab" value="16"%/>16</label>
           <br%/>
           <label>
             <input type="radio" name="t" value="G"%/>
