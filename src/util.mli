@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.42 2005-06-07 20:15:22 ddr Exp $ *)
+(* $Id: util.mli,v 4.43 2005-06-16 04:42:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -214,3 +214,5 @@ value print_selection_bullet : config -> option (string * bool) -> unit;
 value unselected_bullets : config -> list int;
 
 value short_f_month : int -> string;
+
+value compilation_time_hook : ref (config -> string);
