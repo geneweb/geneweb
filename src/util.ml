@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.137 2005-06-09 18:36:34 ddr Exp $ *)
+(* $Id: util.ml,v 4.138 2005-06-16 04:42:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -167,7 +167,7 @@ value plus_decl s =
 ;
 
 value gen_decline wt s =
-  let s1 = if s = "" then "" else " " ^ s in
+  let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
   if rindex wt '/' <> None then
     match rindex wt '/' with
@@ -1440,9 +1440,17 @@ value setup_link conf =
   [ Not_found -> "" ]
 ;
 
+value compilation_time_hook = ref (fun _ -> "");
+value compilation_time conf =
+  match p_getenv conf.base_env "display_compilation_time" with
+  [ Some "on" -> compilation_time_hook.val conf
+  | _ -> "" ]
+;
+
 value print_copyright conf =
   let env =
     [('s', fun _ -> commd conf);
+     ('c', fun _ -> compilation_time conf);
      ('d',
       fun _ ->
         let s =

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.38 2005-06-07 18:34:35 ddr Exp $
+# $Id: Makefile,v 4.39 2005-06-16 04:42:51 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -8,7 +8,7 @@ GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btre
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
 GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo dag.cmo templ.cmo notes.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo
-GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
+GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
@@ -34,6 +34,21 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
 	cp gwd.opt gwd
 	cp gwu.opt gwu
 	$(STRIP) gwc consang gwd gwu
+
+compilation.cmo.old: always
+	echo "value ct () = \" - compiled $$(date) -\";" > compilation.ml
+	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
+	ocamlc -pp camlp4r -c compilation.ml
+
+compilation.cmo: always
+	> compilation.ml
+	echo "open Def;" >> compilation.ml
+	echo "value (wd, d, h) = ($$(date "+%u, {day=%d;month=%m;year=%Y;prec=Sure;delta=0}, \"%T %Z\""));" >> compilation.ml
+	echo "value ct conf = Printf.sprintf \" (%s %s)\" (Util.transl_decline conf \"on (weekday day month year)\" (Util.transl_nth conf \"(week day)\" wd ^ \" \" ^ Date.code_dmy conf d)) h;" >> compilation.ml
+	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
+	ocamlc -pp camlp4r -c compilation.ml
+
+compilation.cmx: compilation.cmo
 
 clean::
 	$(RM) gwc consang gwd gwu gwlib.ml

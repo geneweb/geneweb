@@ -12,5 +12,5 @@ it: Pagina visualizzata da
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
 sl: Strani ustvarjene z:
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
-]
+]%c
 Copyright (c) 1998-2005 INRIA %d</em><br%/><br%/></div>
