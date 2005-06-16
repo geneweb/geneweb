@@ -1,4 +1,4 @@
-(* $Id: num.mli,v 4.2 2005-05-13 14:03:46 ddr Exp $ *)
+(* $Id: num.mli,v 4.3 2005-06-16 05:33:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type t = 'a;
@@ -21,3 +21,4 @@ value of_int : int -> t;
 value of_string : string -> t;
 value to_string : t -> string;
 value to_string_sep : string -> t -> string;
+value to_string_sep_base : string -> int -> t -> string;

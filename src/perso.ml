@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.148 2005-06-15 11:36:01 ddr Exp $ *)
+(* $Id: perso.ml,v 4.149 2005-06-16 05:33:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1438,7 +1438,8 @@ and eval_anc_by_surnl_field_var conf base env ep
       eval_person_field_var conf base env ep loc sl ]
 and eval_num conf n =
   fun
-  [ ["v"] -> Num.to_string n
+  [ ["hexa"] -> "0x" ^ Num.to_string_sep_base "" 16 n
+  | ["v"] -> Num.to_string n
   | [] -> Num.to_string_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found ]
 and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
