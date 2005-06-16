@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.64 2005-06-13 05:10:54 ddr Exp $ *)
+(* $Id: templ.ml,v 4.65 2005-06-16 13:11:31 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -180,20 +180,27 @@ and ident_list ((bp, _) as loc) =
   | [: :] -> (loc, []) ]
 ;
 
-value rec parse_expr_1 =
+value rec parse_expr strm = parse_expr_if strm
+and parse_expr_if =
   parser
-    [: e = parse_expr_2;
+  [ [: `Tok _ (IDENT "if"); e1 = parse_expr_or; `Tok _ (IDENT "then");
+       e2 = parse_expr_or; `Tok _ (IDENT "else"); e3 = parse_expr_or :] ->
+      Aif e1 [e2] [e3]
+  | [: e = parse_expr_or :] -> e ]
+and parse_expr_or =
+  parser
+    [: e = parse_expr_and;
        a =
          parser
-         [ [: `Tok _ (IDENT "or"); s :] -> Aop2 "or" e (parse_expr_1 s)
+         [ [: `Tok _ (IDENT "or"); s :] -> Aop2 "or" e (parse_expr_or s)
          | [: :] -> e ] :] ->
       a
-and parse_expr_2 =
+and parse_expr_and =
   parser
     [: e = parse_expr_3;
        a =
          parser
-         [ [: `Tok _ (IDENT "and"); s :] -> Aop2 "and" e (parse_expr_2 s)
+         [ [: `Tok _ (IDENT "and"); s :] -> Aop2 "and" e (parse_expr_and s)
          | [: :] -> e ] :] ->
       a
 and parse_expr_3 =
@@ -229,7 +236,7 @@ and parse_expr_5 =
       a
 and parse_simple_expr =
   parser
-  [ [: `Tok _ LPAREN; e = parse_expr_1;
+  [ [: `Tok _ LPAREN; e = parse_expr;
        a =
          parser
          [ [: `Tok _ RPAREN :] -> e
@@ -248,7 +255,7 @@ and parse_simple_expr =
 and parse_tuple strm =
   let rec parse_expr_list =
     parser
-      [: x = parse_expr_1;
+      [: x = parse_expr;
          xl =
            parser
            [ [: `Tok _ COMMA; a = parse_expr_list :] -> a
@@ -805,6 +812,8 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
             ""
           } ]
   | Atransl upp s c -> eval_transl conf upp s c
+  | Aif e1 [e2] [e3] ->
+      if bool_eval ceva e1 then string_eval ceva e2 else string_eval ceva e3
   | e ->
       try Num.to_string (num_eval ceva e) with
       [ Failure x -> x ] ]
