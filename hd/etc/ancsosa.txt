@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 1.2 2005-06-16 05:33:12 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 1.3 2005-06-16 08:55:15 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -500,7 +500,8 @@
       %if;(evar.hexa = "on")%ancestor.sosa.hexa;%else;%ancestor.sosa;%end;%sp;
       %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
       %apply;link%with;%ancestor.access;%and;
-         %if;(ancestor.same != "")%ancestor.same;
+         %if;(ancestor.same != "")%nn;
+           %if(evar.hexa = "on")%ancestor.same.hexa;%else;%ancestor.same;%end;
          %else;%ancestor;%end;
       %end;
       </a>%nn;
