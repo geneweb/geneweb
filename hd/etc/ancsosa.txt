@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 1.3 2005-06-16 08:55:15 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 1.4 2005-06-16 19:43:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -497,11 +497,15 @@
       %lazy_force;
       %if;(ancestor.same = "")%incr_count;%end;
       <li%if;ancestor.has_parents; style="list-style-type:disc"%end;>%nn;
-      %if;(evar.hexa = "on")%ancestor.sosa.hexa;%else;%ancestor.sosa;%end;%sp;
+      %if;(evar.sosab = 16)%ancestor.sosa.hexa;
+      %elseif;(evar.sosab = 8)%ancestor.sosa.octal;
+      %else;%ancestor.sosa;%end;%sp;
       %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
       %apply;link%with;%ancestor.access;%and;
          %if;(ancestor.same != "")%nn;
-           %if(evar.hexa = "on")%ancestor.same.hexa;%else;%ancestor.same;%end;
+           %if(evar.sosab = 16)%ancestor.same.hexa;
+           %elseif(evar.sosab = 8)%ancestor.same.octal;
+           %else;%ancestor.same;%end;
          %else;%ancestor;%end;
       %end;
       </a>%nn;
