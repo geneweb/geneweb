@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.149 2005-06-16 05:33:12 ddr Exp $ *)
+(* $Id: perso.ml,v 4.150 2005-06-16 13:11:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -264,6 +264,12 @@ value max_cousin_level conf base p =
     [ Not_found | Failure _ -> default_max_cousin_lev ]
   in
   max_ancestor_level conf base p.cle_index max_lev + 1
+;
+
+value limit_anc_by_tree conf =
+  match p_getint conf.base_env "max_anc_tree" with
+  [ Some x -> max 1 x
+  | None -> 7 ]
 ;
 
 value limit_desc conf =
@@ -2034,10 +2040,15 @@ and eval_expr conf base env ep e =
   let eval_var = eval_var conf base env ep in
   Templ.eval_expr conf (eval_var, eval_apply) e
 and eval_int_expr conf base env ep e =
+(*
   let eval_ast = eval_ast conf base env ep in
   let eval_apply = eval_apply conf env eval_ast in
   let eval_var = eval_var conf base env ep in
   Templ.eval_int_expr conf (eval_var, eval_apply) e
+*)
+  let s = eval_expr conf base env ep e in
+  try int_of_string s with [ Failure _ -> raise Not_found ]
+(**)
 and eval_apply conf env eval_ast f vl =
   match get_env f env with
   [ Vfun xl al ->
@@ -2314,6 +2325,7 @@ and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
         | _ -> (p, 0) ]
     | _ -> raise Not_found ]
   in
+  let max_level = min max_level (limit_anc_by_tree conf) in
   let gen = tree_generation_list conf base max_level p in
   loop True gen where rec loop first =
     fun
