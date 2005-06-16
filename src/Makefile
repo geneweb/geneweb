@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.39 2005-06-16 04:42:51 ddr Exp $
+# $Id: Makefile,v 4.40 2005-06-16 05:00:29 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -34,11 +34,6 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
 	cp gwd.opt gwd
 	cp gwu.opt gwu
 	$(STRIP) gwc consang gwd gwu
-
-compilation.cmo.old: always
-	echo "value ct () = \" - compiled $$(date) -\";" > compilation.ml
-	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
-	ocamlc -pp camlp4r -c compilation.ml
 
 compilation.cmo: always
 	> compilation.ml
@@ -78,7 +73,7 @@ gwd.out: $(GWD_OBJS)
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
 	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-	$(OCAMLOPT) $(STATIC) unix.cmxa $(CAMLP4D)/gramlib.cmxa x1.cmxa x2.cmxa gwd.cmx $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(CAMLP4D)/gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
