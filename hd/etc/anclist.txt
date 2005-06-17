@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.42 2005-06-15 11:36:01 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.43 2005-06-17 21:25:38 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -62,18 +62,18 @@
 %end;
 
 %define;togen(xx)
-  %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(evar.xx = 2)[*to the parents]%nn;
-  %elseif;(evar.xx = 3)[*to the grandparents]%nn;
-  %elseif;(evar.xx = 4)[*to the great-grandparents]%nn;
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*to the parents]%nn;
+  %elseif;(xx = 3)[*to the grandparents]%nn;
+  %elseif;(xx = 4)[*to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
-      %apply;nth([nth (generation)], evar.xx)
+      %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
 
-%define;ancestors(xx, nnn)
+%define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 1)
     <ul>
     <li style="list-style-type:square"><a href="%prefix;
@@ -81,21 +81,28 @@
     %if;(xx.father.has_nobility_titles),%sp;
       <em>%xx.father.nobility_title;</em>%end;
     %xx.father.dates;%nl;
-    %apply;ancestors("xx.father", nnn - 1)</li>
+    %apply;ancestors_by_list("xx.father", nnn - 1)</li>
     <li style="list-style-type:circle"><a href="%prefix;
     %xx.mother.access;">%xx.mother;</a>%nn;
     %if;(xx.mother.has_nobility_titles),%sp;
       <em>%xx.mother.nobility_title;</em>%end;
     %xx.mother.dates;%nl;
-    %apply;ancestors("xx.mother", nnn - 1)</li>
+    %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
   %end;
 %end;
 
-%define;horizontally(pp, xx, ss1, ss2, ss3)
+%define;by_list(xx)
+  <p>
+  %apply;togen(xx).
+  </p>
+  %apply;ancestors_by_list("self", xx)
+%end;
+
+%define;ancestors_horizontally(pp, xx, ss1, ss2, ss3)
   %if;(xx > 0)
     %if;(pp.has_parents)
-      %apply;horizontally(
+      %apply;ancestors_horizontally(
         "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
         "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
     %end;
@@ -103,29 +110,35 @@
     %if;(pp.has_nobility_titles), <em>%pp.nobility_title;</em>%end;
     %pp.dates;<br%/>
     %if;(pp.has_parents)
-      %apply;horizontally(
+      %apply;ancestors_horizontally(
         "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
         "ss3&nbsp;+--&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
     %end;
   %end;
 %end;
 
-%if;(evar.t = "L")
-  %( by list %)
+%define;horizontally(xx)
   <p>
-  %apply;togen("v").
-  </p>
-  %apply;ancestors("self", evar.v)
-%elseif;(evar.t = "H")
-  %( horizontally %)
-  <p>
-  %apply;togen("v").
+  %apply;togen(xx).
   </p>
   <table><tr><td style="white-space:nowrap">
-  %apply;horizontally(
-    "self", evar.v, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
+  %apply;ancestors_horizontally(
+    "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
   </tr></tr></table>
-  </p>
+%end;
+
+%if;(evar.t = "L")
+  %( by list %)
+  %apply;by_list%with;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %end;
+%elseif;(evar.t = "H")
+  %( horizontally %)
+  %apply;horizontally%with;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %end;
 %elseif;(evar.t = "F")
   %( surnames list %)
   <ul>

@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.18 2005-06-13 20:16:30 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.19 2005-06-17 21:25:38 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -165,10 +165,10 @@
 ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
 %end;
 
-%if;(evar.t = "T")
+%define;tree(xx)
   %if;(evar.dag = "on")
     %empty_dag;
-    %foreach;ancestor_level(evar.v)
+    %foreach;ancestor_level(xx)
       %foreach;ancestor;
         %apply;add_in_dag(ancestor.index)
       %end;
@@ -182,10 +182,17 @@
     </tr></tr></table>
   %else;
     <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
-    %foreach;ancestor_tree_line(evar.v)
+    %foreach;ancestor_tree_line(xx)
       %apply;a_tree_line()
     %end;
     </table>
+  %end;
+%end;
+
+%if;(evar.t = "T")
+  %apply;tree%with;
+    %if;(bvar.max_anc_tree = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)%end;
   %end;
 %elseif;(evar.t = "A")
   <table border="%border;" width="100%%"><tr><td align="center">
