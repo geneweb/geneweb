@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.57 2005-06-11 05:16:31 ddr Exp $ *)
+(* $Id: notes.ml,v 4.58 2005-06-17 12:33:13 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -282,7 +282,7 @@ value summary_of_tlsw_lines conf lines =
                     match rest_stack with
                     [ [(_, prev_prev_slev) :: _] ->
                         if slev > prev_prev_slev then
-                          let stack = [(prev_num + 1, slev) :: rest_stack] in
+                          let stack = [(prev_num, slev) :: rest_stack] in
                           loop summary lev stack
                         else
                           let summary = [tab (lev - 1) "</li>" :: summary] in
