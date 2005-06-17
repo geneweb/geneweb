@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.151 2005-06-16 19:43:19 ddr Exp $ *)
+(* $Id: perso.ml,v 4.152 2005-06-17 21:25:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2081,6 +2081,14 @@ and eval_predefined_apply conf env f vl =
       match get_env "lazy_print" env with
       [ Vlazyp r -> do { r.val := Some v; "" }
       | _ -> raise Not_found ]
+  | ("min", [s :: sl]) ->
+      try
+        let m =
+          List.fold_right (fun s -> min (int_of_string s)) sl (int_of_string s)
+        in
+        string_of_int m
+      with
+      [ Failure _ -> raise Not_found ]
   | ("nth", [s1; s2]) ->
       let n = try int_of_string s2 with [ Failure _ -> 0 ] in
       Util.nth_field s1 n
@@ -2326,7 +2334,6 @@ and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
         | _ -> (p, 0) ]
     | _ -> raise Not_found ]
   in
-  let max_level = min max_level (limit_anc_by_tree conf) in
   let gen = tree_generation_list conf base max_level p in
   loop True gen where rec loop first =
     fun
