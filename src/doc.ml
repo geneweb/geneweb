@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.8 2005-06-18 20:58:23 ddr Exp $ *)
+(* $Id: doc.ml,v 4.9 2005-06-18 21:15:36 ddr Exp $ *)
 
 open Config;
 
@@ -293,4 +293,12 @@ value print_mod_wdoc conf =
   in
   let (ntitle, s) = read_wdoc conf fname in
   Notes.print_mod_page conf "WDOC" fname title (ntitle ^ "\n" ^ s)
+;
+
+value print_mod_wdoc_ok conf =
+  let title _ = Wserver.wprint "not implemented" in
+  do {
+    Util.header conf title;
+    Util.trailer conf;
+  }
 ;
