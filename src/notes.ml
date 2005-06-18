@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.59 2005-06-18 15:34:25 ddr Exp $ *)
+(* $Id: notes.ml,v 4.60 2005-06-18 20:58:23 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+open Printf;
 
 (* TLSW: Text Language Stolen to Wikipedia
    = title level 1 =
@@ -134,6 +135,15 @@ value syntax_links conf mode file_path s =
   let slen = String.length s in
   loop 0 0 where rec loop i len =
     if i = slen then Buff.get len
+    else if s.[i] = '{' then
+      let j =
+        loop (i + 1) where rec loop j =
+          if j = slen then j
+          else if s.[j] = '}' then j + 1
+          else loop (j + 1)
+      in
+      let b = String.sub s (i + 1) (j - i - 2) in
+      loop j (Buff.mstore len (sprintf "<span class=\"highlight\">%s</span>" b))
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match ext_file_link s i with
       [ Some (j, fname, text) ->
@@ -142,7 +152,7 @@ value syntax_links conf mode file_path s =
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
-            Printf.sprintf "<a href=\"%sm=%s;f=%s\"%s>%s</a>"
+            sprintf "<a href=\"%sm=%s;f=%s\"%s>%s</a>"
               (commd conf) mode fname c text
           in
           loop j (Buff.mstore len t)
@@ -182,7 +192,7 @@ value syntax_links conf mode file_path s =
                 let name = fn ^ " " ^ sn in
                 (fn, sn, "", name) ]
           in
-          Printf.sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
+          sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
             (code_varenv (Name.lower fn)) (code_varenv (Name.lower sn))
             (if oc = "" then "" else ";oc=" ^ oc) name
         with
@@ -310,7 +320,7 @@ value summary_of_tlsw_lines conf lines =
           let summary = [tab lev "<li>" :: summary] in
           let s =
             let nums = List.map fst stack in
-            Printf.sprintf "<a href=\"#a_%d\">%s %s</a>"
+            sprintf "<a href=\"#a_%d\">%s %s</a>"
               cnt (String.concat "." (List.rev_map string_of_int nums))
               (String.sub s slev (len - 2 * slev))
           in
@@ -333,9 +343,9 @@ value summary_of_tlsw_lines conf lines =
     in
     ["<dl><dd>";
      "<table border=\"1\"><tr><td>";
-     "<table><tr>";
-     "<td align=\"center\"><b>" ^ capitale (transl conf "summary") ^
-       "</b></td>";
+     "<table width=\"100%\"><tr>";
+     "<td align=\"center\" colspan=\"2\"><b>" ^
+        capitale (transl conf "summary") ^ "</b></td>";
      "</tr><tr><td>" ::
      List.rev_append rev_summary
        ["</td><td>";
@@ -353,22 +363,21 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines =
          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
            let lev = section_level s len in
            let s =
-             Printf.sprintf "<h%d>%s%s</h%d>" lev
+             sprintf "<h%d>%s%s</h%d>" lev
                (String.sub s lev (len-2*lev))
                (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
            in
            if with_mod_parag then
              let n1 =
                if conf.wizard then
-                 Printf.sprintf
+                 sprintf
                    "<div style=\"float:right;margin-left:5px\">\
                     (<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)</div>"
                    (commd conf) mode cnt sfn (transl_decline conf "modify" "")
                else ""
              in
              let n2 =
-               Printf.sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>"
-                 cnt cnt
+               sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
              in
              ([s; n1; n2 :: lines], cnt + 1)
            else ([s :: lines], cnt + 1)
@@ -401,7 +410,7 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
         (lines_before_summary @ summary @ lines_after_summary))
   in
   if conf.wizard && (lines_before_summary <> [] || lines = []) then
-    Printf.sprintf "%s(<a href=\"%sm=MOD_%s;v=0%s\">%s</a>)%s\n"
+    sprintf "%s(<a href=\"%sm=MOD_%s;v=0%s\">%s</a>)%s\n"
       (if s = "" then "<p>" else "<div style=\"float:right;margin-left:15px\">")
       (commd conf) mode (if sub_fname = "" then "" else ";f=" ^ sub_fname)
       (transl_decline conf "modify" "")
@@ -410,23 +419,22 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   else s
 ;
 
-value print_sub_part conf sub_fname cnt0 lines =
-  let lines = html_of_tlsw_lines conf "NOTES" sub_fname cnt0 True lines in
-  let s = syntax_links conf "NOTES" file_path (String.concat "\n" lines) in
+value print_sub_part conf mode file_path sub_fname cnt0 lines =
+  let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines in
+  let s = syntax_links conf mode file_path (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let s =
     if cnt0 < first_cnt && conf.wizard then
-      Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES;v=0%s\">%s</a>)%s\n"
+      sprintf "%s(<a href=\"%sm=MOD_%s;v=0%s\">%s</a>)%s\n"
         (if s = "" then "<p>"
          else "<div style=\"float:right;margin-left:5px\">")
-        (commd conf) sfn (transl_decline conf "modify" "")
+        (commd conf) mode sfn (transl_decline conf "modify" "")
         (if s = "" then "</p>" else "</div>") ^
       s
     else s
   in
   do {
-    let mode = "NOTES" in
     tag "p" begin
       if cnt0 >= first_cnt then do {
         stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 - 1) sfn begin
@@ -474,11 +482,74 @@ value print conf base =
     match p_getint conf.env "v" with
     [ Some cnt0 ->
         let lines = List.rev (rev_extract_sub_part s cnt0) in
-        print_sub_part conf fnotes cnt0 lines
+        print_sub_part conf "NOTES" file_path fnotes cnt0 lines
     | None ->
         let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         let s = string_with_macros conf False [] s in
         Wserver.wprint "%s\n" s ];
+    trailer conf;
+  }
+;
+
+value print_mod_page conf mode fname title s =
+  let (has_v, v) =
+    match p_getint conf.env "v" with
+    [ Some v -> (True, v)
+    | None -> (False, 0) ]
+  in
+  let sub_part = if not has_v then s else extract_sub_part s v in
+  let sfn = if fname = "" then "" else ";f=" ^ fname in
+  do {
+    header conf title;
+    tag "div" "style=\"float:right;margin-left:5px\"" begin
+      stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
+        (if has_v then ";v=" ^ string_of_int v else "") sfn
+      begin
+        Wserver.wprint "(%s)\n" (transl conf "visualize");
+      end;
+    end;
+    print_link_to_welcome conf False;
+    if has_v then
+      tag "p" begin
+        if v >= first_cnt then do {
+          stag "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v - 1) sfn
+          begin
+            Wserver.wprint "&lt;&lt;";
+          end;
+          Wserver.wprint "\n";
+        }
+        else ();
+        if sub_part <> "" then do {
+          stag "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v + 1) sfn
+          begin
+            Wserver.wprint "&gt;&gt;";
+          end;
+          Wserver.wprint "\n";
+        }
+        else ();
+      end
+    else ();
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"" mode;
+        if has_v then
+          xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
+        else ();
+        if fname <> "" then
+          xtag "input" "type=\"hidden\" name=\"f\" value=\"%s\"" fname
+        else ();
+        let digest = Iovalue.digest s in
+        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
+        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"110\"" begin
+          if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
+          else ();
+        end;
+      end;
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
+    end;
     trailer conf;
   }
 ;
@@ -495,65 +566,7 @@ value print_mod conf base =
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let s = read_notes base fnotes in
-  let (has_v, v) =
-    match p_getint conf.env "v" with
-    [ Some v -> (True, v)
-    | None -> (False, 0) ]
-  in
-  let sub_part = if not has_v then s else extract_sub_part s v in
-  let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in
-  do {
-    header conf title;
-    tag "div" "style=\"float:right;margin-left:5px\"" begin
-      stag "a" "href=\"%sm=NOTES%s%s\"" (commd conf)
-        (if has_v then ";v=" ^ string_of_int v else "") sfn
-      begin
-        Wserver.wprint "(%s)\n" (transl conf "visualize");
-      end;
-    end;
-    print_link_to_welcome conf False;
-    if has_v then
-      let mode = "MOD_NOTES" in
-      tag "p" begin
-        if v >= first_cnt then do {
-          stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (v - 1) sfn begin
-            Wserver.wprint "&lt;&lt;";
-          end;
-          Wserver.wprint "\n";
-        }
-        else ();
-        if sub_part <> "" then do {
-          stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (v + 1) sfn begin
-            Wserver.wprint "&gt;&gt;";
-          end;
-          Wserver.wprint "\n";
-        }
-        else ();
-      end
-    else ();
-    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      tag "p" begin
-        Util.hidden_env conf;
-        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_NOTES_OK\"";
-        if has_v then
-          xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
-        else ();
-        if fnotes <> "" then
-          xtag "input" "type=\"hidden\" name=\"f\" value=\"%s\"" fnotes
-        else ();
-        let digest = Iovalue.digest s in
-        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
-        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"110\"" begin
-          if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
-          else ();
-        end;
-      end;
-      tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
-      end;
-    end;
-    trailer conf;
-  }
+  print_mod_page conf "NOTES" fnotes title s
 ;
 
 value print_ok conf base fnotes s =
@@ -575,7 +588,8 @@ value print_ok conf base fnotes s =
       | None -> (False, 0) ]
     in
     History.record_notes conf base (get_v, fnotes) "mn";
-    if has_v then print_sub_part conf fnotes v (lines_list_of_string s)
+    if has_v then
+      print_sub_part conf "NOTES" file_path fnotes v (lines_list_of_string s)
     else
       let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in
       Wserver.wprint "<a href=\"%sm=NOTES%s\">%s</a>\n" (commd conf) sfn

@@ -1,4 +1,5 @@
-(* $Id: doc.ml,v 4.7 2005-06-18 15:34:25 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: doc.ml,v 4.8 2005-06-18 20:58:23 ddr Exp $ *)
 
 open Config;
 
@@ -202,10 +203,13 @@ value not_impl func x =
   ">Doc." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
 ;
 
+value no_lang conf = {(conf) with henv = List.remove_assoc "lang" conf.henv};
+
 value print_var conf env loc =
   fun
   [ ["copyright"] -> Util.print_copyright conf
   | ["doctype"] -> Wserver.wprint "%s\n" (Util.doctype conf)
+  | ["prefix_no_lang"] -> Wserver.wprint "%s" (Util.commd (no_lang conf))
   | ["/"] -> Wserver.wprint "%s" conf.xhs
   | [s] -> Wserver.wprint "%s" (List.assoc s env)
   | _ -> raise Not_found ]
@@ -223,18 +227,10 @@ value print_ast conf env =
   | ast -> Wserver.wprint " %s" (not_impl "print_ast" ast) ]
 ;
 
-value print_wdoc conf =
-  let conf = {(conf) with cancel_links = True} in
-  let v =
-    match Util.p_getenv conf.env "f" with
-    [ Some f -> f
-    | None -> "" ]
-  in
-  let v = if v = "" then "index" else v in
-  let (title, s) = read_wdoc conf v in
+value print_whole_wdoc conf f title s =
   let s = Util.string_with_macros conf True [] s in
   let s = "<br /><br />\n" ^ s in
-  let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path v s in
+  let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path f s in
   let fname =
     let f = Filename.concat "wdoc" "wdoc.txt" in
     Util.search_in_doc_path f
@@ -246,7 +242,8 @@ value print_wdoc conf =
         close_in ic;
         Util.html conf;
         Util.nl ();
-        List.iter (print_ast conf [("title", title); ("doc", s)]) astl;
+        let env = [("title", title); ("doc", s); ("page", f)] in
+        List.iter (print_ast conf env) astl;
       }
   | None ->
       let title _ = Wserver.wprint "Error" in
@@ -260,11 +257,40 @@ value print_wdoc conf =
       } ]
 ;
 
-value print_mod_wdoc conf =
-  let conf = {(conf) with cancel_links = True} in
-  let title _ = Wserver.wprint "not implemented" in
+value print_part_wdoc conf f title s cnt0 =
   do {
-    Util.header conf title;
+    Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    let lines = List.rev (Notes.rev_extract_sub_part s cnt0) in
+    Notes.print_sub_part conf "WDOC" wdoc_file_path f cnt0 lines;
     Util.trailer conf;
   }
+;
+
+value print_wdoc conf =
+  let conf = {(conf) with cancel_links = True} in
+  let f =
+    match Util.p_getenv conf.env "f" with
+    [ Some f -> f
+    | None -> "" ]
+  in
+  let f = if f = "" then "index" else f in
+  let (title, s) = read_wdoc conf f in
+  match Util.p_getint conf.env "v" with
+  [ Some cnt0 -> print_part_wdoc conf f title s cnt0
+  | None -> print_whole_wdoc conf f title s ]
+;
+
+value print_mod_wdoc conf =
+  let conf = {(conf) with cancel_links = True} in
+  let fname =
+    match Util.p_getenv conf.env "f" with
+    [ Some f -> if Notes.check_file_name f then f else ""
+    | None -> "" ]
+  in
+  let title _ =
+    Wserver.wprint "%s - %s" (Util.capitale (Util.transl conf "modify"))
+      (if fname = "" then "" else " (" ^ fname ^ ")")
+  in
+  let (ntitle, s) = read_wdoc conf fname in
+  Notes.print_mod_page conf "WDOC" fname title (ntitle ^ "\n" ^ s)
 ;
