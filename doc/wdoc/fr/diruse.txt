@@ -1,66 +1,54 @@
 GeneWeb - mode d'emploi
 
-Remarque préliminaire :
-la pr&eacute;sente documentation fait parfois r&eacute;f&eacute;rence
-&agrave; des fen&ecirc;tres de commandes interactives. Il existe
-d&eacute;sormais un programme <b>"[[[gwsetup]]]"</b>, plus simple
-d'utilisation, permettant d'&eacute;viter d'avoir &agrave; les
-utiliser.
+la présente documentation fait souvent référence à des <em>fenêtres de
+commandes interactives</em>. Il existe un programme [[[gwsetup]]],
+plus simple d'utilisation, permettant d'éviter d'avoir à les
+utiliser. Allez directement à [[[gwsetup/sa page]]] si vous n'êtes pas
+un spécialiste en informatique.
 
-* Vous &ecirc;tes d&eacute;butant:
+* Vous êtes débutant:
 
-** Comment [[[initial/d&eacute;marrer]]] avec [GeneWeb].
-** Voyez quelques [[[problem/probl&egrave;mes]]]
-fr&eacute;quemment rencontr&eacute;s.
+** Comment [[[initial/démarrer]]] avec {GeneWeb}.
+** Voyez quelques [[[problem/problèmes]]] fréquemment rencontrés.
 
-* Vous voulez plus de d&eacute;tails:
+* Vous voulez plus de détails:
 
-** Comment <a href="recover.htm">r&eacute;cup&eacute;rer</a> une
-base quand on a une nouvelle version de <b><font color=#2f6400>GeneWeb</font></b>.
-** Comment installer <b><font color=#2f6400>GeneWeb</font></b> en <a href="server.htm">serveur</a> ou en CGI.
-** Les <a href="access.htm">restrictions</a> d'acc&egrave;s &agrave;
-la base de donn&eacute;es.
-** Comment faire des <a href="update.htm">modifications</a> en ligne
-dans la base de donn&eacute;es.
-** Comment <a href="merge.htm">fusionner</a> des bases de
-donn&eacute;es.
-** Nettoyer, renommer, sauvegarder</a> des bases de donn&eacute;es:
-<a href="maint.htm">maintenance</a>.
-** Voyez la <a href="faq.htm">foire aux questions</a>.
+** Comment [[[recover/récupérer]]] une base quand on a une nouvelle
+   version de {GeneWeb}.
+** Comment installer {GeneWeb} en [[[server/serveur]]] ou en CGI.
+** Les [[[access/restrictions]]] d'accès à la base de données.
+** Comment faire des [[[update/modifications]]] en ligne
+   dans la base de données.
+** Comment [[[merge/fusionner]]] des bases de données.
+** Nettoyer, renommer, sauvegarder des bases de données:
+   [[[maint/maintenance]]].
+** Voyez la [[[faq/foire aux questions]]].
 
 * Vous en voulez encore plus:
 
-** Comment mettre des <a href="links.htm">liens</a> vers votre base.
-** Comment <a href="pcustom.htm">personnaliser</a> la page
-d'accueil et les autres pages.
-** Comment <a href="divide.htm">s&eacute;parer les donn&eacute;es</a>
-dans la base.
-** Information sur la <a href="consang.htm">consanguinit&eacute;</a>.
-** Le <a href="gwformat.htm">format des fichiers source</a> <font
-color=#2f6400><b>GeneWeb</b></font>.
-** Comment <a href="cdrom.htm">cr&eacute;er un CDrom</a> pour distribuer
-votre base de donn&eacute;es.
+** Comment mettre des [[[links/liens]]] vers votre base.
+** Comment [[[pcustom/personnaliser]]] la page d'accueil et les autres pages.
+** Comment [[[divide/séparer les données]]] dans la base.
+** Information sur la [[[consang/consanguinité]]].
+** Le [[[gwformat/format des fichiers source]]] {GeneWeb}.
+** Comment [[[cdrom/créer un CDrom]]] pour distribuer votre base de données.
 
-* Vous voulez participer &agrave; l'am&eacute;lioration de <b><font
-color=#2f6400>GeneWeb</font></b>:
+* Vous voulez participer à l'amélioration de {GeneWeb}:
 
-** Comment faire des <a href="report.htm">remarques</a>, suggestions,
-rapports d'anomalie, contributions.
+** Comment faire des [[[report/remarques]]], suggestions,
+   rapports d'anomalie, contributions.
 
 <p>
-
 <hr>
+</p>
 
-<p>
-
-La page d'accueil de <b><font color=#2f6400>GeneWeb</font></b> est la suivante.
+La page d'accueil de {GeneWeb} est la suivante.
 
 * <a href="http://www.geneweb.org/">http://www.geneweb.org/</a>
 
 <p>
-Elle vous donnera la documentation en ligne la plus &agrave;
-jour. Elle vous indiquera o&ugrave; t&eacute;l&eacute;charger la
-derni&egrave;re version de <b><font color=#2f6400>GeneWeb</font></b>
-et quel est son num&eacute;ro de version. N'h&eacute;sitez pas
-&agrave; venir la consulter de temps en temps.
+Elle vous donnera la documentation en ligne la plus à jour. Elle vous
+indiquera où télécharger la dernière version de {GeneWeb} et quel est
+son numéro de version. N'hésitez pas à venir la consulter de temps en
+temps.
 </p>

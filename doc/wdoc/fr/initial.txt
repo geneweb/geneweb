@@ -34,5 +34,4 @@ m&eacute;thode.
 <hr>
 <br>
 
-<div style="text-align:center">Retour vers <a href="diruse.htm">Mode
-d'Emploi</a></div>
+<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
