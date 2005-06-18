@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 4.6 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: doc.ml,v 4.7 2005-06-18 15:34:25 ddr Exp $ *)
 
 open Config;
 
@@ -156,4 +156,115 @@ value print conf =
         }
     | None -> Util.incorrect_request conf ]
   else Util.incorrect_request conf
+;
+
+(* Writable (ou Wiki) Doc *)
+
+open TemplAst;
+
+value wdoc_file_path conf fname =
+  let fname =
+    List.fold_right Filename.concat ["wdoc"; conf.lang] (fname ^ ".txt")
+  in
+  Util.search_in_doc_path fname
+;
+
+value read_wdoc conf fname =
+  let fname = wdoc_file_path conf fname in
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let title = input_line ic in
+      let s =
+        let len = ref 0 in
+        do {
+          try
+            let rec loop () =
+              do {
+                len.val := Buff.store len.val (input_char ic); loop ()
+              }
+            in
+            loop ()
+          with
+          [ End_of_file -> close_in ic ];
+          Buff.get len.val
+        }
+      in
+      (title, s)
+  | None -> ("", "") ]
+;
+
+value not_impl func x =
+  let desc =
+    if Obj.is_block (Obj.repr x) then
+      "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
+    else "int_val = " ^ string_of_int (Obj.magic x)
+  in
+  ">Doc." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
+;
+
+value print_var conf env loc =
+  fun
+  [ ["copyright"] -> Util.print_copyright conf
+  | ["doctype"] -> Wserver.wprint "%s\n" (Util.doctype conf)
+  | ["/"] -> Wserver.wprint "%s" conf.xhs
+  | [s] -> Wserver.wprint "%s" (List.assoc s env)
+  | _ -> raise Not_found ]
+;
+
+value print_var_handled conf env loc sl =
+  try print_var conf env loc sl with
+  [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ]
+;
+
+value print_ast conf env =
+  fun
+  [ Atext s -> Wserver.wprint "%s" s
+  | Avar loc s sl -> print_var_handled conf env loc [s :: sl]
+  | ast -> Wserver.wprint " %s" (not_impl "print_ast" ast) ]
+;
+
+value print_wdoc conf =
+  let conf = {(conf) with cancel_links = True} in
+  let v =
+    match Util.p_getenv conf.env "f" with
+    [ Some f -> f
+    | None -> "" ]
+  in
+  let v = if v = "" then "index" else v in
+  let (title, s) = read_wdoc conf v in
+  let s = Util.string_with_macros conf True [] s in
+  let s = "<br /><br />\n" ^ s in
+  let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path v s in
+  let fname =
+    let f = Filename.concat "wdoc" "wdoc.txt" in
+    Util.search_in_doc_path f
+  in
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let astl = Templ.parse_templ conf (Stream.of_channel ic) in
+      do {
+        close_in ic;
+        Util.html conf;
+        Util.nl ();
+        List.iter (print_ast conf [("title", title); ("doc", s)]) astl;
+      }
+  | None ->
+      let title _ = Wserver.wprint "Error" in
+      do {
+        Util.header conf title;
+        Wserver.wprint "<ul>\n<li>\n";
+        Wserver.wprint "Cannot access file \"wdoc.txt\".\n";
+        Wserver.wprint "</li>\n</ul>\n";
+        Util.trailer conf;
+        raise Exit
+      } ]
+;
+
+value print_mod_wdoc conf =
+  let conf = {(conf) with cancel_links = True} in
+  let title _ = Wserver.wprint "not implemented" in
+  do {
+    Util.header conf title;
+    Util.trailer conf;
+  }
 ;

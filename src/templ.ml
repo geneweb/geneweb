@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.65 2005-06-16 13:11:31 ddr Exp $ *)
+(* $Id: templ.ml,v 4.66 2005-06-18 15:34:25 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -310,6 +310,31 @@ value parse_formal_params strm =
   parse_tuple (Stream.from f)
 ;
 
+value strip_newlines_after_variables =
+  loop where rec loop =
+    fun
+    [ [Atext s :: astl] ->
+        let s =
+          loop 0 where rec loop i =
+            if i = String.length s then s
+            else if s.[i] = ' ' || s.[i] = '\t' then loop (i + 1)
+            else if s.[i] = '\n' then
+              String.sub s (i + 1) (String.length s - i - 1)
+            else s
+        in
+        [Atext s :: loop astl]
+    | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
+    | [Aforeach v pl al :: astl] -> [Aforeach v pl (loop al) :: loop astl]
+    | [Adefine f x al alk :: astl] ->
+        [Adefine f x (loop al) (loop alk) :: loop astl]
+    | [Aapply loc f all :: astl] ->
+        [Aapply loc f (List.map loop all) :: loop astl]
+    | [(Atransl _ _ _ | Awid_hei _ as ast1); (Atext _ as ast2) :: astl] ->
+        [ast1; ast2 :: loop astl]
+    | [ast :: astl] -> [ast :: loop astl]
+    | [] -> [] ]
+;
+
 value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser bp
@@ -428,7 +453,8 @@ value parse_templ conf strm =
     let (astl, _) = parse_astl [] False 0 ["end"] strm in
     Aforeach (loc, v, vl) params astl
   in
-  fst (parse_astl [] True 0 [] strm)
+  let astl = fst (parse_astl [] True 0 [] strm) in
+  strip_newlines_after_variables astl
 ;
 
 value open_templ conf dir name =
@@ -447,31 +473,6 @@ value open_templ conf dir name =
         if (*dir = conf.bname*)True(**) then
           try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
         else None ]
-;
-
-value strip_newlines_after_variables =
-  loop where rec loop =
-    fun
-    [ [Atext s :: astl] ->
-        let s =
-          loop 0 where rec loop i =
-            if i = String.length s then s
-            else if s.[i] = ' ' || s.[i] = '\t' then loop (i + 1)
-            else if s.[i] = '\n' then
-              String.sub s (i + 1) (String.length s - i - 1)
-            else s
-        in
-        [Atext s :: loop astl]
-    | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
-    | [Aforeach v pl al :: astl] -> [Aforeach v pl (loop al) :: loop astl]
-    | [Adefine f x al alk :: astl] ->
-        [Adefine f x (loop al) (loop alk) :: loop astl]
-    | [Aapply loc f all :: astl] ->
-        [Aapply loc f (List.map loop all) :: loop astl]
-    | [(Atransl _ _ _ | Awid_hei _ as ast1); (Atext _ as ast2) :: astl] ->
-        [ast1; ast2 :: loop astl]
-    | [ast :: astl] -> [ast :: loop astl]
-    | [] -> [] ]
 ;
 
 value input conf fname =
@@ -503,7 +504,6 @@ value input conf fname =
   match open_templ conf dir fname with
   [ Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
-      let astl = strip_newlines_after_variables astl in
       do { close_in ic; astl }
   | None ->
       let title _ = Wserver.wprint "Error" in
@@ -679,7 +679,6 @@ value eval_transl_lexicon conf upp s c =
             let s3 =
               let s = String.sub s2 i (j - i) in
               let astl = parse_templ conf (Stream.of_string s) in
-              let astl = strip_newlines_after_variables astl in
               List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
             in
             let s4 = String.sub s2 k (String.length s2 - k) in

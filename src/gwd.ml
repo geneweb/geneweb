@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.80 2005-05-12 20:14:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.81 2005-06-18 15:34:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1086,6 +1086,8 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
         | _ ->
             match mode with
             [ Some "DOC" -> Doc.print conf
+            | Some "WDOC" -> Doc.print_wdoc conf
+            | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf
             | _ ->
                if conf.bname = "" then general_welcome conf
                else
