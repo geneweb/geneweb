@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.19 2005-06-17 21:25:38 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.20 2005-06-18 02:24:15 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -125,7 +125,7 @@
       %else;|%end;
     %elseif;(dag_cell.item != "")
       %if;(evar.cgl = "on")%dag_cell.item;
-      %else;<a href="%prefix;%dag_cell.access;">%dag_cell.item;</a>%end;
+      %else;<a href="%prefix;%dag_cell.item.access;">%dag_cell.item;</a>%end;
       %if;(dag_cell.item.has_nobility_titles),%sp;
       <em>%dag_cell.item.nobility_title;</em>%end;
       %dag_cell.item.dates;
