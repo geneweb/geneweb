@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.152 2005-06-17 21:25:38 ddr Exp $ *)
+(* $Id: perso.ml,v 4.153 2005-06-18 15:34:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1803,8 +1803,9 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         let s = sou base p.notes in
         let s =
           let lines = Notes.lines_list_of_string s in
-          let lines = Notes.html_of_tlsw_lines conf "" 0 False lines in
-          Notes.syntax_links conf (String.concat "\n" lines)
+          let lines = Notes.html_of_tlsw_lines conf "NOTES" "" 0 False lines in
+          Notes.syntax_links conf "NOTES" Notes.file_path
+            (String.concat "\n" lines)
         in
         string_with_macros conf False env s
       else ""

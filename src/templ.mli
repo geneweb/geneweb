@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.15 2005-06-12 06:33:41 ddr Exp $ *)
+(* $Id: templ.mli,v 4.16 2005-06-18 15:34:25 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -8,6 +8,7 @@ open TemplAst;
 exception Exc_located of loc and exn;
 
 value input : config -> string -> list ast;
+value parse_templ : config -> Stream.t char -> list ast;
 
 value eval_transl : config -> bool -> string -> string -> string;
 value eval_bool_expr :

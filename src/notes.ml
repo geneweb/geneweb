@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.58 2005-06-17 12:33:13 ddr Exp $ *)
+(* $Id: notes.ml,v 4.59 2005-06-18 15:34:25 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -124,7 +124,13 @@ value ext_file_link s i =
   else None
 ;
 
-value syntax_links conf s =
+value file_path conf fname =
+  List.fold_right Filename.concat
+    [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
+    (fname ^ ".txt")
+;
+
+value syntax_links conf mode file_path s =
   let slen = String.length s in
   loop 0 0 where rec loop i len =
     if i = slen then Buff.get len
@@ -132,16 +138,12 @@ value syntax_links conf s =
       match ext_file_link s i with
       [ Some (j, fname, text) ->
           let c =
-            let f =
-              List.fold_right Filename.concat
-                [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
-                (fname ^ ".txt")
-            in
+            let f = file_path conf fname in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
-            Printf.sprintf "<a href=\"%sm=NOTES;f=%s\"%s>%s</a>"
-              (commd conf) fname c text
+            Printf.sprintf "<a href=\"%sm=%s;f=%s\"%s>%s</a>"
+              (commd conf) mode fname c text
           in
           loop j (Buff.mstore len t)
       | None -> loop (i + 3) (Buff.mstore len "[[[") ]
@@ -342,7 +344,7 @@ value summary_of_tlsw_lines conf lines =
         "</dd></dl>"]]
 ;
 
-value html_of_tlsw_lines conf sub_fname cnt0 with_mod_parag lines =
+value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let (rev_lines, _) =
     List.fold_left
@@ -360,8 +362,8 @@ value html_of_tlsw_lines conf sub_fname cnt0 with_mod_parag lines =
                if conf.wizard then
                  Printf.sprintf
                    "<div style=\"float:right;margin-left:5px\">\
-                    (<a href=\"%sm=MOD_NOTES;v=%d%s\">%s</a>)</div>"
-                   (commd conf) cnt sfn (transl_decline conf "modify" "")
+                    (<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)</div>"
+                   (commd conf) mode cnt sfn (transl_decline conf "modify" "")
                else ""
              in
              let n2 =
@@ -376,7 +378,7 @@ value html_of_tlsw_lines conf sub_fname cnt0 with_mod_parag lines =
   rev_syntax_lists conf [] rev_lines
 ;
 
-value html_with_summary_of_tlsw conf sub_fname s =
+value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   let lines = lines_list_of_string s in
   let summary = summary_of_tlsw_lines conf lines in
   let (rev_lines_before_summary, lines) =
@@ -391,17 +393,17 @@ value html_with_summary_of_tlsw conf sub_fname s =
     rev_syntax_lists conf [] rev_lines_before_summary
   in
   let lines_after_summary =
-    html_of_tlsw_lines conf sub_fname first_cnt True lines
+    html_of_tlsw_lines conf mode sub_fname first_cnt True lines
   in
   let s =
-    syntax_links conf
+    syntax_links conf mode file_path
       (String.concat "\n"
         (lines_before_summary @ summary @ lines_after_summary))
   in
   if conf.wizard && (lines_before_summary <> [] || lines = []) then
-    Printf.sprintf "%s(<a href=\"%sm=MOD_NOTES;v=0%s\">%s</a>)%s\n"
-      (if s = "" then "<p>" else "<div style=\"float:right;margin-left:5px\">")
-      (commd conf) (if sub_fname = "" then "" else ";f=" ^ sub_fname)
+    Printf.sprintf "%s(<a href=\"%sm=MOD_%s;v=0%s\">%s</a>)%s\n"
+      (if s = "" then "<p>" else "<div style=\"float:right;margin-left:15px\">")
+      (commd conf) mode (if sub_fname = "" then "" else ";f=" ^ sub_fname)
       (transl_decline conf "modify" "")
       (if s = "" then "</p>" else "</div>") ^
     s
@@ -409,8 +411,8 @@ value html_with_summary_of_tlsw conf sub_fname s =
 ;
 
 value print_sub_part conf sub_fname cnt0 lines =
-  let lines = html_of_tlsw_lines conf sub_fname cnt0 True lines in
-  let s = syntax_links conf (String.concat "\n" lines) in
+  let lines = html_of_tlsw_lines conf "NOTES" sub_fname cnt0 True lines in
+  let s = syntax_links conf "NOTES" file_path (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let s =
@@ -474,7 +476,7 @@ value print conf base =
         let lines = List.rev (rev_extract_sub_part s cnt0) in
         print_sub_part conf fnotes cnt0 lines
     | None ->
-        let s = html_with_summary_of_tlsw conf fnotes s in
+        let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         let s = string_with_macros conf False [] s in
         Wserver.wprint "%s\n" s ];
     trailer conf;

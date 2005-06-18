@@ -1,0 +1,25 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: wdoc.txt,v 1.1 2005-06-18 15:34:25 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
+  <title>%title;</title>
+  <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+<body style="background: url('../images/gwback.jpg')">
+
+<table border="0" width="100%%"><tr><td>
+<a href="http://www.geneweb.org/"><img width="96" height="108"
+src="../images/gwlogo.png" align="left" border="0" alt="GeneWeb"></a>
+</td>
+<td align="left">
+<h1 class="highlight">%title;</h1>
+</td></tr></table>
+
+%doc;
+
+%copyright;
+</body>
+</html>
+
