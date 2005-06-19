@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.19 2005-06-03 12:17:55 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.20 2005-06-19 04:46:59 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -311,7 +311,7 @@ value print_send_ok conf base =
       let file = raw_get conf "file" in
 let _ = do { Printf.eprintf "file size %d\n" (String.length file); flush stderr; } in
       effective_send_ok conf base p file
-    else Update.error_digest conf base
+    else Update.error_digest conf
   with
   [ Update.ModErr -> () ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.60 2005-06-18 20:58:23 ddr Exp $ *)
+(* $Id: notes.ml,v 4.61 2005-06-19 04:46:59 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -650,7 +650,7 @@ value print_mod_ok conf base =
   in
   let old_notes = read_notes base fnotes in
   try
-    if digest <> Iovalue.digest old_notes then Update.error_digest conf base
+    if digest <> Iovalue.digest old_notes then Update.error_digest conf
     else
       let s =
         match p_getint conf.env "v" with

@@ -15,7 +15,7 @@ les notions de base: premi&egrave;rement, la notion de
 les notions de "personnes" et de "familles". Cela vous permettra de
 comprendre les sections suivantes sur les mises &agrave; jour.
 
-=== Pr&eacute;noms, patronymes, num&eacute;ros ===
+== Pr&eacute;noms, patronymes, num&eacute;ros ==
 
 Chaque personne de la base est rep&eacute;r&eacute;e de mani&egrave;re
 unique par son pr&eacute;nom, son patronyme et un num&eacute;ro, ce
@@ -120,7 +120,7 @@ Mais la plupart du temps, il n'est pas besoin de sp&eacute;cifier un
 num&eacute;ro. Ne mettez rien: ce sera 0 par d&eacute;faut et c'est
 bien.
 
-=== Personnes et Familles ===
+== Personnes et Familles ==
 
 Les bases de donn&eacute;es <font color=#2f6400><b>GeneWeb</b></font>, en interne, comportent
 deux notions principales: les personnes et les familles:
@@ -145,7 +145,7 @@ Les modifications de la base sont simplement et exclusivement des
 mise &agrave; jour des "personnes" et des "familles": ajout,
 modification, suppression.
 
-=== Acc&egrave;s aux mises &agrave; jour ===
+== Acc&egrave;s aux mises &agrave; jour ==
 
 Si vous &ecirc;tes bien s&ucirc;rs d'avoir compris les deux sections
 pr&eacute;c&eacute;centes, vous allez pouvoir commencer.
@@ -314,7 +314,7 @@ changer.
 
 </ul>
 
-=== Quelques points particuliers ===
+== Quelques points particuliers ==
 
 
 Ces points sont mis en avant parce que ce sont des pi&egrave;ges
@@ -322,7 +322,7 @@ possibles: suivez bien la proc&eacute;dure indiqu&eacute;e.
 
 <p>
 
-==== Comment modifier le pr&eacute;nom ou le patronyme d'un enfant ====
+=== Comment modifier le pr&eacute;nom ou le patronyme d'un enfant ===
 
 Exemple: dans la famille de "Jean Dupont" et "Christine Durand", un
 des enfants a &eacute;t&eacute; nomm&eacute; "Robert", alors qu'il
@@ -374,7 +374,7 @@ message d'erreur, et rien ne sera modifi&eacute; (heureusement).
 
 </ul>
 
-==== Comment ajouter un enfant dans une famille ====
+=== Comment ajouter un enfant dans une famille ===
 
 Par exemple, dans la famille de "Jean Dupont" et de "Christine Durand",
 vous voulez ajouter "Hubert", comme enfant:
@@ -419,9 +419,9 @@ un peu plus haut. Ce choix cr&eacute;e aussi une nouvelle famille.
 
 </ul>
 
-=== Formulaires ===
+== Formulaires ==
 
-==== Ajouter une Famille ====
+=== Ajouter une Famille ===
 
 Vous tomberez sur ce formulaire intitul&eacute; "Ajouter/Famille":
 
@@ -464,7 +464,7 @@ refaites pas "Ajouter/Famille", mais "Modifier/Famille"!
 Reportez-vous donc au paragraphe suivant pour le fonctionnement du
 formulaire.
 
-==== Modifier une Famille ====
+=== Modifier une Famille ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -709,7 +709,7 @@ personne?
 
 </ul>
 
-==== Supprimer une Famille ====
+=== Supprimer une Famille ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -735,7 +735,7 @@ plus ces enfants-l&agrave; (ils peuvent en avoir d'autres avec
 d'autres mariages, lesquels persistent), les enfants n'ont plus de
 parents.
 
-==== Modifier une Personne ====
+=== Modifier une Personne ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -1222,7 +1222,7 @@ m&ecirc;me nom, leur liste est donn&eacute;e.
 
 </ul>
 
-==== Supprimer une Personne ====
+=== Supprimer une Personne ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -1251,7 +1251,7 @@ Mais il subsiste toujours une "entit&eacute; personne" reli&eacute;e
 &agrave; son &eacute;ventuel conjoint et &agrave; ses &eacute;ventuels
 enfants.
 
-==== Envoyer une Image ====
+=== Envoyer une Image ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -1272,7 +1272,7 @@ pas acc&egrave;s &agrave; "envoyer image". Si vous voulez le faire,
 faites "Mise &agrave; jour" et "Modifier personne" et effacez le
 contenu du champ "image".
 
-==== Supprimer une Image ====
+=== Supprimer une Image ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -1284,7 +1284,7 @@ base en ait donn&eacute; l'<a href="start.htm#Cnf">autorisation</a>.
 Si vous cliquez sur "Ok", la image associ&eacute;e &agrave; la personne
 est supprim&eacute;e.
 
-==== Changer les noms des enfants ====
+=== Changer les noms des enfants ===
 
 Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
 apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
@@ -1319,7 +1319,7 @@ faire simplement avec "modifier personne".
 
 <p>
 
-==== Raccourcis dans les dates ====
+=== Raccourcis dans les dates ===
 
 <p>
 
@@ -1353,7 +1353,7 @@ Et pour l'ann&eacute;e de la date de la zone "d&eacute;cès":
 
 <p>
 
-=== Comment fusionner deux personnes ===
+== Comment fusionner deux personnes ==
 
 Cette section d&eacute;crit le moyen de fusionner deux
 <strong>personnes</strong> dans une base de donn&eacute;es, dans le
@@ -1496,7 +1496,7 @@ pouvez redemander plus tard la fusion de vos deux personnes du
 d&eacute;but, cela continuera la fusion l&agrave; o&ugrave; vous
 l'avez laiss&eacute;e.</ul>
 
-=== Comment fusionner deux familles ===
+== Comment fusionner deux familles ==
 
 Pour fusionner deux familles, fusionnez d'abord les p&egrave;res
 (s'ils sont diff&eacute;rents) et les m&egrave;res (si elles sont
@@ -1511,7 +1511,7 @@ contigu&euml;s, vous verrez qu'il y a un "Fusionner" entre les deux.
 Cliquez dessus. Si elles ne sont pas contigu&euml;s, utilisez
 "Intervertir" autant de fois que n&eacute;cessaire.
 
-=== Langues avec d&eacute;clinaisons ===
+== Langues avec d&eacute;clinaisons ==
 
 
 Certaines langues ont des d&eacute;clinaisons, c'est &agrave; dire que
@@ -1542,7 +1542,7 @@ Le pr&eacute;nom tch&egrave;que "Vladana" a donc plusieurs formes:
 "Vladana" est le nominatif, "Vladanu" l'accusatif, "Vladany" le
 g&eacute;nitif.
 
-==== Entr&eacute;e des donn&eacute;es ====
+=== Entr&eacute;e des donn&eacute;es ===
 
 Dans le lexique de la langue et dans les donn&eacute;es, les cas sont
 indiqu&eacute;s par une lettre entour&eacute;e de deux
@@ -1589,7 +1589,7 @@ La forme avec '-' peut s'utiliser pour "Vladana":
    Vladana:a:-u:g:-y
 </pre>
 
-==== Affichage, documentation ====
+=== Affichage, documentation ===
 
 &Agrave; l'affichage, seul le nominatif est habituellement
 visible. Les autres formes ne seront utilis&eacute;es que si les

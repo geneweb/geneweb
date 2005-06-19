@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.27 2005-06-10 11:31:11 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.28 2005-06-19 04:46:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -738,7 +738,7 @@ value print_mod_aux conf base callback =
         [ Some err -> error_person conf base p err
         | None -> callback p ]
       }
-    else Update.error_digest conf base
+    else Update.error_digest conf
   with
   [ Update.ModErr -> () ]
 ;
