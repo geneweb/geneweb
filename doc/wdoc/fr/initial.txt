@@ -1,17 +1,14 @@
-D&eacute;marrer avec GeneWeb
+Démarrer avec GeneWeb
 
-Vous avez deux fa&ccedil;ons de d&eacute;marrer avec <b><font
-color=#2f6400>GeneWeb</font></b>:
+Vous avez deux façons de démarrer avec {GeneWeb}:
 
 <ul>
 
-<li> Vous pouvez utiliser le programme <a
-href="gwsetup.htm"><b>gwsetup</b></a>. Dans ce cas, il vous suffit de
-lancer ce programme (si votre installation ne l'a pas
-d&eacute;j&agrave; lanc&eacute; automatiquement), puis d'ouvrir
-&agrave; l'adresse Web (locale) qu'il propose et vous suivez les
-instructions. L'utilisation est tr&egrave;s simple et est donc
-pr&eacute;conis&eacute;e aux d&eacute;butants.
+<li> Vous pouvez utiliser le programme [[[gwsetup]]]. Dans ce cas, il
+vous suffit de lancer ce programme (si votre installation ne l'a pas
+déjà lancé automatiquement), puis d'ouvrir à l'adresse Web (locale)
+qu'il propose et vous suivez les instructions. L'utilisation est très
+simple et est donc préconisée aux débutants.
 
 </ul>
 
@@ -20,13 +17,11 @@ pr&eacute;conis&eacute;e aux d&eacute;butants.
 <ul>
 
 <li> Sinon, si vous vous y connaissez, vous pouvez utiliser des
-commandes dans une fen&ecirc;tre int&eacute;ractive. Cette utilisation
-vous permet d'acc&eacute;der &agrave; tous les d&eacute;tails des
-diff&eacute;rentes commandes et de comprendre ce qui se passe, mais
-n'est pas recommand&eacute;e si vous n'&ecirc;tes pas
-sp&eacute;cialiste de ce genre d'approche. Cliquez <a
-href="start.htm">ici</a> pour d&eacute;marrer par cette
-m&eacute;thode.
+commandes dans une fenêtre intéractive. Cette utilisation vous permet
+d'accéder à tous les détails des différentes commandes et de
+comprendre ce qui se passe, mais n'est pas recommandée si vous n'êtes
+pas spécialiste de ce genre d'approche. Cliquez [[[start/ici]]] pour
+démarrer par cette méthode.
 
 </ul>
 

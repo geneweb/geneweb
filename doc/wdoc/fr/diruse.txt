@@ -1,6 +1,6 @@
 GeneWeb - mode d'emploi
 
-la présente documentation fait souvent référence à des <em>fenêtres de
+La présente documentation fait souvent référence à des <em>fenêtres de
 commandes interactives</em>. Il existe un programme [[[gwsetup]]],
 plus simple d'utilisation, permettant d'éviter d'avoir à les
 utiliser. Allez directement à [[[gwsetup/sa page]]] si vous n'êtes pas

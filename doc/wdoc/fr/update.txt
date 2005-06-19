@@ -1,61 +1,61 @@
 GeneWeb - Modifications
 
 Cette partie vous indique comment faire des modifications dans une
-base de donn&eacute;es en utilisant votre navigateur. Si le
-propri&eacute;taire de la base de donn&eacute;es a mis un mot de
+base de données en utilisant votre navigateur. Si le
+propriétaire de la base de données a mis un mot de
 passe, vous devrez le rentrer dans la page d'accueil pour avoir
-acc&egrave;s &agrave; ces diff&eacute;rentes possiblilit&eacute;s de
-mises &agrave; jour.
+accès à ces différentes possiblilités de
+mises à jour.
 
 <p>
 
 Avant d'entrer dans le vif du sujet, il est important de comprendre
-les notions de base: premi&egrave;rement, la notion de
-"pr&eacute;nom", "patronyme", "num&eacute;ro", et deuxi&egrave;mement,
+les notions de base: premièrement, la notion de
+"prénom", "patronyme", "numéro", et deuxièmement,
 les notions de "personnes" et de "familles". Cela vous permettra de
-comprendre les sections suivantes sur les mises &agrave; jour.
+comprendre les sections suivantes sur les mises à jour.
 
-== Pr&eacute;noms, patronymes, num&eacute;ros ==
+== Prénoms, patronymes, numéros ==
 
-Chaque personne de la base est rep&eacute;r&eacute;e de mani&egrave;re
-unique par son pr&eacute;nom, son patronyme et un num&eacute;ro, ce
-dernier servant &agrave; distinguer deux personnes ayant m&ecirc;me
-pr&eacute;nom et m&ecirc;me patronyme. Cet ensemble s'appelle la
-"cl&eacute;" de la personne.
+Chaque personne de la base est repérée de manière
+unique par son prénom, son patronyme et un numéro, ce
+dernier servant à distinguer deux personnes ayant même
+prénom et même patronyme. Cet ensemble s'appelle la
+"clé" de la personne.
 
 <p>
 
 Ainsi, s'il y a deux "Jean Dupont" dans la base, vous pourrez les
-distinguer par le num&eacute;ro. N'importe quel num&eacute;ro est
-valable et on n'est pas oblig&eacute; de commencer &agrave; 0 ou
-&agrave; 1, ni de compter de un en un. Par exemple, votre premier
-"Jean Dupont", vous pouvez lui donner le num&eacute;ro 7 et le second
-le num&eacute;ro 4. L'un sera rep&eacute;r&eacute; par "Jean",
+distinguer par le numéro. N'importe quel numéro est
+valable et on n'est pas obligé de commencer à 0 ou
+à 1, ni de compter de un en un. Par exemple, votre premier
+"Jean Dupont", vous pouvez lui donner le numéro 7 et le second
+le numéro 4. L'un sera repéré par "Jean",
 "Dupont", "7" et l'autre par "Jean", "Dupont", "4".
 
 <p>
 
-Ce num&eacute;ro, c'est vous qui le choisissez, sauf si vous
-&ecirc;tes parti d'un fichier GEDCOM, auquel cas "ged2gwb" l'aura
+Ce numéro, c'est vous qui le choisissez, sauf si vous
+êtes parti d'un fichier GEDCOM, auquel cas "ged2gwb" l'aura
 choisi pour vous, pour chaque personne de la base.
 
 <p>
 
-Ce num&eacute;ro n'apparait que dans les pages de mise &agrave; jour:
+Ce numéro n'apparait que dans les pages de mise à jour:
 on ne les voit pas dans les pages normales. Ainsi, si on tape le nom
-"Jean Dupont" dans la page d'accueil, <font color=#2f6400><b>GeneWeb</b></font> donnera
-&agrave; choisir entre "Jean Dupont 7" et "Jean Dupont 4", mais sans
-afficher explicitement les num&eacute;ros.
+"Jean Dupont" dans la page d'accueil, {GeneWeb} donnera
+à choisir entre "Jean Dupont 7" et "Jean Dupont 4", mais sans
+afficher explicitement les numéros.
 
 <p>
 
-Cependant, comme vous &ecirc;tes un "gourou" puisque vous faites des
-mises &agrave; jour, sachez que vous pouvez chercher une personne en
-mettant un "point" et le num&eacute;ro entre le pr&eacute;nom et le
+Cependant, comme vous êtes un "gourou" puisque vous faites des
+mises à jour, sachez que vous pouvez chercher une personne en
+mettant un "point" et le numéro entre le prénom et le
 patronyme.
 
 Ainsi dans la page d'accueil, vous pouvez chercher "Jean .4 Dupont" et
-vous tomberez directement sur celui qui a le num&eacute;ro 4.
+vous tomberez directement sur celui qui a le numéro 4.
 
 <p>
 
@@ -64,11 +64,11 @@ Il faut aussi noter que:
 <ul>
 
 <li> Les accents et les majuscules ne comptent pas dans cette
-diff&eacute;renciation entre personnes. Ainsi "therese", "dupont", "5"
-donne acc&egrave;s &agrave; la m&ecirc;me personne que
-"Th&eacute;r&egrave;se", "Dupont", "5".
+différenciation entre personnes. Ainsi "therese", "dupont", "5"
+donne accès à la même personne que
+"Thérèse", "Dupont", "5".
 <p>
-<li> Quand il n'y a pas de num&eacute;ro, il vaut en fait 0. Ne pas le
+<li> Quand il n'y a pas de numéro, il vaut en fait 0. Ne pas le
 mettre ou mettre 0, c'est pareil.
 
 </ul>
@@ -79,102 +79,102 @@ messages du genre:
 
 <ul>
 
-<li> "Personne d&eacute;j&agrave; existante": cela veut dire que vous
-cherchez &agrave; cr&eacute;er une personne dont la combinaison
-"pr&eacute;nom", "patronyme" 'num&eacute;ro" est d&eacute;j&agrave; prise,
+<li> "Personne déjà existante": cela veut dire que vous
+cherchez à créer une personne dont la combinaison
+"prénom", "patronyme" 'numéro" est déjà prise,
 ce qui arrive:
 
 <p>
 
 <ul>
 
-<li> soit dans un contexte o&ugrave; vous voulez cr&eacute;er une
+<li> soit dans un contexte où vous voulez créer une
 nouvelle personne,
 
 <li> soit dans un contexte ou vous avez voulu changer le
-pr&eacute;nom, le patronyme ou le num&eacute;ro d'une personne
-donn&eacute;e.
+prénom, le patronyme ou le numéro d'une personne
+donnée.
 
 </ul>
 
 <p>
 
 <li> "Personne inconnue": cela veut dire qu'il n'y a personne dans la
-base qui correspond &agrave; cette combinaison "pr&eacute;nom",
-"patronyme", "num&eacute;ro", ce qui arrive dans le cas o&ugrave; vous
-voulez relier une personne donn&eacute;e &agrave; une famille en tant
-que p&egrave;re, m&egrave;re, ou enfant.
+base qui correspond à cette combinaison "prénom",
+"patronyme", "numéro", ce qui arrive dans le cas où vous
+voulez relier une personne donnée à une famille en tant
+que père, mère, ou enfant.
 
 </ul>
 
-Notez aussi que ce num&eacute;ro n'a rien &agrave; voir avec un
-num&eacute;ro de pr&eacute;nom des personnes nobles: Louis&nbsp;XIV
-n'est pas oblig&eacute; d'avoir le num&eacute;ro 14.  Cependant, et ce
-n'est pas contradictoire, il est conseill&eacute; de choisir le
-m&ecirc;me num&eacute;ro, quand c'est possible: vous verrez que c'est
+Notez aussi que ce numéro n'a rien à voir avec un
+numéro de prénom des personnes nobles: Louis&nbsp;XIV
+n'est pas obligé d'avoir le numéro 14.  Cependant, et ce
+n'est pas contradictoire, il est conseillé de choisir le
+même numéro, quand c'est possible: vous verrez que c'est
 plus pratique dans vos manipulations.
 
 <p>
 
-Mais la plupart du temps, il n'est pas besoin de sp&eacute;cifier un
-num&eacute;ro. Ne mettez rien: ce sera 0 par d&eacute;faut et c'est
+Mais la plupart du temps, il n'est pas besoin de spécifier un
+numéro. Ne mettez rien: ce sera 0 par défaut et c'est
 bien.
 
 == Personnes et Familles ==
 
-Les bases de donn&eacute;es <font color=#2f6400><b>GeneWeb</b></font>, en interne, comportent
+Les bases de données {GeneWeb}, en interne, comportent
 deux notions principales: les personnes et les familles:
 
 <ul>
 
 <li> Les personnes contiennent les informations individuelles telles
-que le pr&eacute;nom, le patronyme, le num&eacute;ro, les
-diff&eacute;rentes dates et diff&eacute;rents lieux de naissance,
-bapt&ecirc;me, d&eacute;c&egrave;s, les &eacute;ventuels titres de
+que le prénom, le patronyme, le numéro, les
+différentes dates et différents lieux de naissance,
+baptême, décès, les éventuels titres de
 noblesse, etc, etc.
 <p>
-<li> Les familles contiennent des familles simples: le p&egrave;re, la
-m&egrave;re et les enfants, la date et le lieu de l'&eacute;ventuel
-mariage et de l'&eacute;ventuel divorce. Notez que si une personne est
-mari&eacute;e plusieurs fois, il y aura autant de "familles"
-diff&eacute;rentes.
+<li> Les familles contiennent des familles simples: le père, la
+mère et les enfants, la date et le lieu de l'éventuel
+mariage et de l'éventuel divorce. Notez que si une personne est
+mariée plusieurs fois, il y aura autant de "familles"
+différentes.
 
 </ul>
 
 Les modifications de la base sont simplement et exclusivement des
-mise &agrave; jour des "personnes" et des "familles": ajout,
+mise à jour des "personnes" et des "familles": ajout,
 modification, suppression.
 
-== Acc&egrave;s aux mises &agrave; jour ==
+== Accès aux mises à jour ==
 
-Si vous &ecirc;tes bien s&ucirc;rs d'avoir compris les deux sections
-pr&eacute;c&eacute;centes, vous allez pouvoir commencer.
+Si vous êtes bien sûrs d'avoir compris les deux sections
+précécentes, vous allez pouvoir commencer.
 
 <p>
 
-Pour acc&eacute;der aux mises &agrave; jour, vous pouvez:
+Pour accéder aux mises à jour, vous pouvez:
 
 <ul>
 
 <li> Soit cliquer sur "Ajouter une famille" dans la page d'accueil.
 
-<li> Soit cliquer sur "Mise &agrave; jour" dans une fiche personnelle.
+<li> Soit cliquer sur "Mise à jour" dans une fiche personnelle.
 
 </ul>
 
 Dans la page d'accueil, en cliquant sur "Ajouter une famille", vous
-allez pouvoir commencer &agrave; remplir une base vide.
+allez pouvoir commencer à remplir une base vide.
 
 <p>
 
-Vous allez voir appara&icirc;tre un formulaire pour ajouter une famille.
-Reportez-vous &agrave; la section <a href="#AddF">Ajouter une Famille</a>.
+Vous allez voir apparaître un formulaire pour ajouter une famille.
+Reportez-vous à la section <a href="#AddF">Ajouter une Famille</a>.
 
 <p>
 
-Dans une fiche personnelle, en cliquant sur "Mise &agrave; jour" vous
-verrez appara&icirc;tre une page o&ugrave; plusieurs choix vous sont
-propos&eacute;s. Ces choix vont d&eacute;pendre de la situation
+Dans une fiche personnelle, en cliquant sur "Mise à jour" vous
+verrez apparaître une page où plusieurs choix vous sont
+proposés. Ces choix vont dépendre de la situation
 familiale de la personne:
 
 <ol><li value=1> Dans tous les cas, vous aurez les choix "Modifier" et
@@ -193,9 +193,9 @@ personne. Reportez-vous aux sections:
 
 <p>
 
-Si le propri&eacute;taire de la base l'a autoris&eacute;, (voir <a
+Si le propriétaire de la base l'a autorisé, (voir <a
 href="start.htm#Cnf">fichier de configuration</a>), vous aurez le
-choix "Envoyer image" et &eacute;ventuellement "Supprimer
+choix "Envoyer image" et éventuellement "Supprimer
 image". Reportez-vous aux sections:
 
 <p>
@@ -210,7 +210,7 @@ image". Reportez-vous aux sections:
 
 </ol>
 
-<ol><li value=2> Si la personne est mari&eacute;e, vous aurez pour
+<ol><li value=2> Si la personne est mariée, vous aurez pour
 chaque mariage, les choix "Modifier/Famille" et
 "Supprimer/Famille". Reportez-vous aux sections:
 
@@ -227,16 +227,16 @@ chaque mariage, les choix "Modifier/Famille" et
 </ol>
 
 <ol><li value=3> S'il y a plusieurs mariages, il y aura un choix
-"Intervertir" entre chaque mariage, qui vous permet d'&eacute;changer
+"Intervertir" entre chaque mariage, qui vous permet d'échanger
 l'ordre des familles dans l'affichage.
 
 </ol>
 
 <ol><li value=4> Dans tous les cas, cette liste familiale se termine par
-"Ajouter/Famille". Vous aurez le m&ecirc;me formulaire que pour
+"Ajouter/Famille". Vous aurez le même formulaire que pour
 "Ajouter une famille" de la page d'accueil, sauf que la personne sera
-pr&eacute;-inscrite dans le formulaire dans un des parents (selon le
-sexe). Reportez-vous donc &agrave; la section:
+pré-inscrite dans le formulaire dans un des parents (selon le
+sexe). Reportez-vous donc à la section:
 
 <p>
 
@@ -248,10 +248,10 @@ sexe). Reportez-vous donc &agrave; la section:
 
 </ol>
 
-<ol><li value=5> Un choix est propos&eacute; aussi pour changer les
-noms des enfants. Cela permet de changer le pr&eacute;nom et le
+<ol><li value=5> Un choix est proposé aussi pour changer les
+noms des enfants. Cela permet de changer le prénom et le
 nom de famille de tous les enfants d'une personne en un seul
-formulaire. Reportez-vous &agrave; la section:
+formulaire. Reportez-vous à la section:
 
 <p>
 
@@ -264,10 +264,10 @@ formulaire. Reportez-vous &agrave; la section:
 </ol>
 
 <ol><li value=6> Enfin, si la personne n'a pas de parents, il y aura
-un choix "Ajouter/Parents". Cela va donner &eacute;galement le
-formulaire "Ajouter/Famille" avec la personne pr&eacute;-inscrite
-comme enfant, et le nom de famille r&eacute;p&eacute;t&eacute; dans la
-zone "patronyme" du p&egrave;re. Reportez-vous donc aussi &agrave; la
+un choix "Ajouter/Parents". Cela va donner également le
+formulaire "Ajouter/Famille" avec la personne pré-inscrite
+comme enfant, et le nom de famille répété dans la
+zone "patronyme" du père. Reportez-vous donc aussi à la
 section:
 
 <p>
@@ -284,32 +284,32 @@ section:
 
 <ul><li>
 
-Tous ces choix vous conduisent soit &agrave; des formulaires &agrave;
-remplir, soit &agrave; des demandes de confirmation: vous ne ferez
-rien de d&eacute;finitif en cliquant dans cette page: vous pourrez
-toujours vous r&eacute;tracter.
+Tous ces choix vous conduisent soit à des formulaires à
+remplir, soit à des demandes de confirmation: vous ne ferez
+rien de définitif en cliquant dans cette page: vous pourrez
+toujours vous rétracter.
 
 <p>
 
-Ainsi "Supprimer" (choix num&eacute;ro 1) ne supprimera la
+Ainsi "Supprimer" (choix numéro 1) ne supprimera la
 personne que si vous faites "Ok" dans la page suivante qui vous
-sera propos&eacute;e.
+sera proposée.
 
 </ul>
 
 <ul><li>
 
 Dans les formulaires, il arrive que certains champs soient
-pr&eacute;-remplis. Cela ne signifie nullement que vous ne pouvez pas
+pré-remplis. Cela ne signifie nullement que vous ne pouvez pas
 changer leur contenu.
 
 <p>
 
-Ainsi dans "Ajouter/Parents" (choix num&eacute;ro 6), le nom de
-famille du p&egrave;re est pr&eacute;-rempli. Mais cela est juste une
-commodit&eacute; d&ucirc; au fait qu'il est fr&eacute;quent qu'un
-p&egrave;re et son enfant aient le m&ecirc;me patronyme: mais si le
-p&egrave;re porte un autre patronyme, vous pouvez parfaitement le
+Ainsi dans "Ajouter/Parents" (choix numéro 6), le nom de
+famille du père est pré-rempli. Mais cela est juste une
+commodité dû au fait qu'il est fréquent qu'un
+père et son enfant aient le même patronyme: mais si le
+père porte un autre patronyme, vous pouvez parfaitement le
 changer.
 
 </ul>
@@ -317,15 +317,15 @@ changer.
 == Quelques points particuliers ==
 
 
-Ces points sont mis en avant parce que ce sont des pi&egrave;ges
-possibles: suivez bien la proc&eacute;dure indiqu&eacute;e.
+Ces points sont mis en avant parce que ce sont des pièges
+possibles: suivez bien la procédure indiquée.
 
 <p>
 
-=== Comment modifier le pr&eacute;nom ou le patronyme d'un enfant ===
+=== Comment modifier le prénom ou le patronyme d'un enfant ===
 
 Exemple: dans la famille de "Jean Dupont" et "Christine Durand", un
-des enfants a &eacute;t&eacute; nomm&eacute; "Robert", alors qu'il
+des enfants a été nommé "Robert", alors qu'il
 s'appelle en fait "Philippe":
 
 <p>
@@ -335,9 +335,9 @@ Ce qu'il faut faire:
 <ul><li>
 
 Allez dans la fiche personnelle de "Robert Dupont", faites "Mise
-&agrave; jour", puis "Modifier", et proc&eacute;dez comme
-indiqu&eacute; dans la section "Modifier une Personne" (choix
-num&eacute;ro 1 de la section&nbsp;3).
+à jour", puis "Modifier", et procédez comme
+indiqué dans la section "Modifier une Personne" (choix
+numéro 1 de la section&nbsp;3).
 
 </ul>
 
@@ -348,7 +348,7 @@ Ce qu'il ne faut surtout pas faire:
 <ul><li>
 
 Il ne faut surtout pas utiliser "Modifier/Famille" (choix
-num&eacute;ro 2 de la section&nbsp;3).
+numéro 2 de la section&nbsp;3).
 
 <p>
 
@@ -360,15 +360,15 @@ formulaire:
 <ul>
 
 <li> Cela coupera la connexion entre "Robert" et ses parents, lequel
-continuera imperturbablement &agrave; s'appeler "Robert Dupont", mais
+continuera imperturbablement à s'appeler "Robert Dupont", mais
 sans parents.
 
 <li> Cela mettra "Philippe Dupont", s'il existe et n'a pas
-d&eacute;j&agrave; des parents, comme enfant du couple.
+déjà des parents, comme enfant du couple.
 
 <li> Mais si ce "Philippe Dupont" n'existe pas dans la base ou bien
-s'il existe mais a d&eacute;j&agrave; des parents, il y aura un
-message d'erreur, et rien ne sera modifi&eacute; (heureusement).
+s'il existe mais a déjà des parents, il y aura un
+message d'erreur, et rien ne sera modifié (heureusement).
 
 </ul>
 
@@ -386,8 +386,8 @@ Ce qu'il faut faire:
 <ul><li>
 
 Allez dans la fiche personnelle d'un des parents, cliquez sur "Mise
-&agrave; jour", puis sur "Modifier/Famille" (choix num&eacute;ro 2
-de la section&nbsp;3) et ajouter l'enfant comme indiqu&eacute; dans la section
+à jour", puis sur "Modifier/Famille" (choix numéro 2
+de la section&nbsp;3) et ajouter l'enfant comme indiqué dans la section
 "Modifier une Famille".
 
 </ul>
@@ -396,26 +396,26 @@ Ce qu'il ne faut surtout pas faire:
 
 <ul><li>
 
-Il ne faut surtout pas utiliser "Ajouter/Famille" (num&eacute;ro 4
+Il ne faut surtout pas utiliser "Ajouter/Famille" (numéro 4
 de la section 3) qui ne signifie pas "ajouter un enfant dans une famille"
-mais bien "ajouter un nouveau mariage", cr&eacute;ant une nouvelle
-entit&eacute; "famille" pour un nouvel &eacute;poux ou une nouvelle
-&eacute;pouse.
+mais bien "ajouter un nouveau mariage", créant une nouvelle
+entité "famille" pour un nouvel époux ou une nouvelle
+épouse.
 
 </ul>
 
 <ul><li>
 
-D'autre part, si l'enfant existe d&eacute;j&agrave; dans la base, et
+D'autre part, si l'enfant existe déjà dans la base, et
 qu'on veut l'ajouter dans la liste des enfants d'un couple
-d&eacute;j&agrave; existant aussi, il ne faut pas non plus utiliser
-"Ajouter/Parents" (choix num&eacute;ro 6 de la section&nbsp;3).
+déjà existant aussi, il ne faut pas non plus utiliser
+"Ajouter/Parents" (choix numéro 6 de la section&nbsp;3).
 
 <p>
 
-Le choix "Ajouter/Parents" est plut&ocirc;t destin&eacute; &agrave;
-ajouter des parents &agrave; un de vos anc&ecirc;tres, pour remonter
-un peu plus haut. Ce choix cr&eacute;e aussi une nouvelle famille.
+Le choix "Ajouter/Parents" est plutôt destiné à
+ajouter des parents à un de vos ancêtres, pour remonter
+un peu plus haut. Ce choix crée aussi une nouvelle famille.
 
 </ul>
 
@@ -423,40 +423,40 @@ un peu plus haut. Ce choix cr&eacute;e aussi une nouvelle famille.
 
 === Ajouter une Famille ===
 
-Vous tomberez sur ce formulaire intitul&eacute; "Ajouter/Famille":
+Vous tomberez sur ce formulaire intitulé "Ajouter/Famille":
 
 <ul>
 
-<li> Soit &agrave; partir de la page d'accueil, en cliquant sur
+<li> Soit à partir de la page d'accueil, en cliquant sur
 "Ajouter une famille"; dans ce cas, aucune zone du formulaire ne sera
-pr&eacute;-remplie,
+pré-remplie,
 
-<li> Soit &agrave; partir d'une fiche personnelle, apr&egrave;s avoir
-cliqu&eacute; sur "Mise &agrave; jour" puis "Ajouter/Famille"; dans ce
-cas, les zones "pr&eacute;nom", "patronyme" et "num&eacute;ro" seront
-pr&eacute;-remplies, pour le p&egrave;re ou la m&egrave;re en fonction
+<li> Soit à partir d'une fiche personnelle, après avoir
+cliqué sur "Mise à jour" puis "Ajouter/Famille"; dans ce
+cas, les zones "prénom", "patronyme" et "numéro" seront
+pré-remplies, pour le père ou la mère en fonction
 du sexe de la personne,
 
-<li> Soit, dans le m&ecirc;me contexte, apr&egrave;s avoir
-cliqu&eacute; sur "Ajouter/Parents", si ce choix est propos&eacute;;
-dans ce cas, la zone "patronyme" du p&egrave;re sera
-pr&eacute;-remplie, ainsi que les zones "pr&eacute;nom", "patronyme"
-et "num&eacute;ro" du premier (et seul) enfant. Remarquez que vous
-pouvez tr&egrave;s bien changer la zone "patronyme" du p&egrave;re
-s'il porte un patronyme diff&eacute;rent de son enfant.
+<li> Soit, dans le même contexte, après avoir
+cliqué sur "Ajouter/Parents", si ce choix est proposé;
+dans ce cas, la zone "patronyme" du père sera
+pré-remplie, ainsi que les zones "prénom", "patronyme"
+et "numéro" du premier (et seul) enfant. Remarquez que vous
+pouvez très bien changer la zone "patronyme" du père
+s'il porte un patronyme différent de son enfant.
 
 </ul>
 
 <p>
 
 Ce formulaire se comporte exactement comme "Modifier une famille",
-sauf qu'il va cr&eacute;er une nouvelle famille. Autant de fois vous
-l'utiliserez, autant de fois une famille sera cr&eacute;&eacute;e. 
+sauf qu'il va créer une nouvelle famille. Autant de fois vous
+l'utiliserez, autant de fois une famille sera créée. 
 
 <p>
 
-Ce qui veut dire que si vous vous rendez compte que &ecirc;tes
-tromp&eacute; apr&egrave;s avoir valid&eacute; le formulaire, ne
+Ce qui veut dire que si vous vous rendez compte que êtes
+trompé après avoir validé le formulaire, ne
 refaites pas "Ajouter/Famille", mais "Modifier/Famille"!
 
 <p>
@@ -466,69 +466,69 @@ formulaire.
 
 === Modifier une Famille ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
-"Modifier/Famille". Le formulaire sera pr&eacute;-rempli du
-"patronyme", "pr&eacute;nom", "num&eacute;ro" du p&egrave;re, de la
-m&egrave;re, et des enfants, ainsi que de toutes les autres
-&eacute;ventuelles informations relatives &agrave; cette famille.
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
+"Modifier/Famille". Le formulaire sera pré-rempli du
+"patronyme", "prénom", "numéro" du père, de la
+mère, et des enfants, ainsi que de toutes les autres
+éventuelles informations relatives à cette famille.
 
 <p>
 
 Ce formulaire se comporte comme "Ajouter/Famille" de la section
-pr&eacute;c&eacute;dente (sauf qu'il n'y aura pas ici de
-cr&eacute;ation d'une nouvelle famille). Ce qui suit est donc valable
+précédente (sauf qu'il n'y aura pas ici de
+création d'une nouvelle famille). Ce qui suit est donc valable
 pour le formulaire "Ajouter/Famille".
 
 <p><strong>Remplissage</strong><p>
 
-Toutes les zones (pr&eacute;-remplies ou non) peuvent &ecirc;tre
-remplies, effac&eacute;es ou modifi&eacute;es. Quand on a rempli,
-effac&eacute; ou modifi&eacute; ce qu'on juge n&eacute;cessaire, il
+Toutes les zones (pré-remplies ou non) peuvent être
+remplies, effacées ou modifiées. Quand on a rempli,
+effacé ou modifié ce qu'on juge nécessaire, il
 faudra aller en fin de formulaire et valider le formulaire en cliquant
 sur "Ok".
 
 <p>
 
-Dans les zones o&ugrave; se trouvent des personnes, remarquez la
-selection "Relier" et "Cr&eacute;er". Suivant les cas, elle sera
-pr&eacute;s&eacute;lectionn&eacute;e sur "Relier" ou sur
-"Cr&eacute;er". Vous pouvez changer cette s&eacute;lection en fonction
-de ce que vous cherchez &agrave; faire.
+Dans les zones où se trouvent des personnes, remarquez la
+selection "Relier" et "Créer". Suivant les cas, elle sera
+présélectionnée sur "Relier" ou sur
+"Créer". Vous pouvez changer cette sélection en fonction
+de ce que vous cherchez à faire.
 
 <ul><li>
 
-"Relier" signifie que la personne existe d&eacute;j&agrave; dans la
-base. Au moment de la validation, le syst&egrave;me v&eacute;rifiera
+"Relier" signifie que la personne existe déjà dans la
+base. Au moment de la validation, le système vérifiera
 que cette personne existe bien, et pour un parent, qu'il est du bon
 sexe.
 
 <p>
 
-Notez que comme c'est une recherche par "cl&eacute;" (voir premier
-paragraphe), il n'est pas n&eacute;cessaire de respecter les accents
+Notez que comme c'est une recherche par "clé" (voir premier
+paragraphe), il n'est pas nécessaire de respecter les accents
 et les majuscules.
 
 </ul>
 
 <ul><li> 
 
-"Cr&eacute;er" signifie que la personne n'existe pas dans la base et
-qu'on demande au syst&egrave;me, au moment de la validation, de la
-cr&eacute;er avec le pr&eacute;nom, le patronyme et le num&eacute;ro
-indiqu&eacute;s.
+"Créer" signifie que la personne n'existe pas dans la base et
+qu'on demande au système, au moment de la validation, de la
+créer avec le prénom, le patronyme et le numéro
+indiqués.
 
 <p>
 
-Ici, contrairement &agrave; "Relier", il faudra mettre les accents et
-les majuscules correctement: la personne sera cr&eacute;&eacute;e avec
-l'orthographe que vous mettez l&agrave;.
+Ici, contrairement à "Relier", il faudra mettre les accents et
+les majuscules correctement: la personne sera créée avec
+l'orthographe que vous mettez là.
 
 <p>
 
-Vous avez la possibilit&eacute; d'entrer le sexe de l'enfant et sa
+Vous avez la possibilité d'entrer le sexe de l'enfant et sa
 date de naissance. Pour les autres indications personnelles, il vous
-faudra faire "mise &agrave; jour" plus tard &agrave; partir de sa page
+faudra faire "mise à jour" plus tard à partir de sa page
 personnelle.
 
 </ul>
@@ -536,85 +536,85 @@ personnelle.
 <p>
 
 Au moment de la validation, les cases "enfants" dont la zone
-"pr&eacute;nom" est vide sont ignor&eacute;es, quel que soit le
+"prénom" est vide sont ignorées, quel que soit le
 contenu des autres champs. C'est donc comme si elles n'existaient pas.
 
 <p>
 
 Pour les enfants, le champ "patronyme" est facultatif: s'il est absent,
-c'est le patronyme du p&egrave;re qui sera pris.
+c'est le patronyme du père qui sera pris.
 
-<p><strong>Diff&eacute;rentes modifications</strong><p>
+<p><strong>Différentes modifications</strong><p>
 
-Voici diff&eacute;rentes modifications que vous allez pouvoir faire:
+Voici différentes modifications que vous allez pouvoir faire:
 
 <ul><li>
 
 <strong>Pour ajouter un enfant</strong>, s'il n'y a pas de zone libre
-pour lui, cliquez d'abord sur le ou les boutons "Ins&eacute;rer/Enfant" en
+pour lui, cliquez d'abord sur le ou les boutons "Insérer/Enfant" en
 fonction de la place que vous voulez leur mettre dans la famille. Puis
 cliquez sur "Ok" en fin de formulaire.
 
 <p>
 
 Remarque: cela ne validera pas le formulaire tout de suite. Le
-syst&egrave;me se contentera de vous proposer un nouveau formulaire
-avec une place r&eacute;serv&eacute;e pour le ou les enfants que vous
+système se contentera de vous proposer un nouveau formulaire
+avec une place réservée pour le ou les enfants que vous
 voulez ajouter.
 
 <p>
 
-Donc attention: tant que vous cliquerez sur "Ins&eacute;rer/Enfant", en
+Donc attention: tant que vous cliquerez sur "Insérer/Enfant", en
 faisant "Ok", il n'y aura pas de validation: juste encore un nouveau
-formulaire, plus gros. Il ne faut donc pas interpr&eacute;ter ce
+formulaire, plus gros. Il ne faut donc pas interpréter ce
 bouton comme "ajoute-moi cet enfant que je viens de mettre": le
-syst&egrave;me le verra bien, ne vous en faites pas.
+système le verra bien, ne vous en faites pas.
 
 <p>
 
 L'enfant que vous allez mettre dans la zone que vous venez de lui
-allouer est peut-&ecirc;tre une personne qui existe d&eacute;j&agrave;
-dans la base. Dans ce cas, s&eacute;lectionnez "Relier" &agrave; la
-place de "Cr&eacute;er".
+allouer est peut-être une personne qui existe déjà
+dans la base. Dans ce cas, sélectionnez "Relier" à la
+place de "Créer".
 
 </ul>
 
 <ul><li>
 
 <strong>Pour supprimer un enfant</strong>, effacez simplement son
-pr&eacute;nom. Comme dit plus haut, les cases dont la zone
-"pr&eacute;nom" est vide sont ignor&eacute;es au moment de la
+prénom. Comme dit plus haut, les cases dont la zone
+"prénom" est vide sont ignorées au moment de la
 validation. Remarquez que cela ne supprimera pas la personne: elle
-sera simplement supprim&eacute;e de la liste des enfants et se
-retrouvera elle-m&ecirc;me sans parents.
+sera simplement supprimée de la liste des enfants et se
+retrouvera elle-même sans parents.
 
 </ul>
 
 <ul><li>
 
 <strong>Pour changer la place d'un enfant</strong>, le plus simple est
-de cliquer sur "Ins&eacute;rer/Enfant" &agrave; l'endroit o&ugrave; vous
+de cliquer sur "Insérer/Enfant" à l'endroit où vous
 voulez le mettre, et faire "Ok". Dans le nouveau formulaire
-propos&eacute;, mettez l'enfant dans la case vide, s&eacute;lectionnez
-"Relier" &agrave; la place du "Cr&eacute;er" qui est propos&eacute;,
-et effacez son pr&eacute;nom dans l'ancienne case.
+proposé, mettez l'enfant dans la case vide, sélectionnez
+"Relier" à la place du "Créer" qui est proposé,
+et effacez son prénom dans l'ancienne case.
 
 </ul>
 
 <ul><li>
 
 <strong>Pour intervertir la place de deux enfants</strong>, vous
-pouvez proc&eacute;der de la m&ecirc;me fa&ccedil;on, en passant par
+pouvez procéder de la même façon, en passant par
 une nouvelle case pour pouvoir simplement faire du couper-coller (sans
 oublier d'y selectionner "Relier"); n'oubliez pas non plus
-l'&eacute;ventuel num&eacute;ro.
+l'éventuel numéro.
 
 <p>
 
 Vous pouvez aussi le faire directement, sans passer par
-"Ins&eacute;rer/Enfant": l'ennui, c'est qu'il vous faudra alors vous rappeler
+"Insérer/Enfant": l'ennui, c'est qu'il vous faudra alors vous rappeler
 du nom d'un des deux quand vous l'effacerez pour mettre l'autre
-&agrave; la place.
+à la place.
 
 </ul>
 
@@ -626,37 +626,37 @@ pas fait, aucun changement n'aura lieu dans la base.
 <p>
 
 Remarquez bien aussi, comme il est dit plus haut, que si vous avez
-s&eacute;lectionn&eacute; un ou plusieurs "Ins&eacute;rer/Enfant", ce sera
-juste un nouveau formulaire qui sera propos&eacute;: ce ne sera pas
+sélectionné un ou plusieurs "Insérer/Enfant", ce sera
+juste un nouveau formulaire qui sera proposé: ce ne sera pas
 la validation proprement dite.
 
 <p>
 
-Quand la validation est vraiment faite, vous devez voir appara&icirc;tre
-une nouvelle page, dont le titre va &ecirc;tre:
+Quand la validation est vraiment faite, vous devez voir apparaître
+une nouvelle page, dont le titre va être:
 
 <ul><li>
 
-Soit: <strong>Famille ajout&eacute;e ou modifi&eacute;e</strong><p>
+Soit: <strong>Famille ajoutée ou modifiée</strong><p>
 
 Vous devez y voir alors les noms des parents sur lesquels vous pouvez
 cliquer.
 
 <p>
 
-Vous y verrez peut-&ecirc;tre &eacute;galement des remarques. Elles
-concernent des incoh&eacute;rences de dates ou d'ordre entre les
-enfants. La modification sera faite tout de m&ecirc;me, mais il est
-pr&eacute;f&eacute;rable de les corriger, s'il y a lieu.
+Vous y verrez peut-être également des remarques. Elles
+concernent des incohérences de dates ou d'ordre entre les
+enfants. La modification sera faite tout de même, mais il est
+préférable de les corriger, s'il y a lieu.
 
 <p>
 
-En cliquant sur un des parents, vous verrez appara&icirc;tre sa fiche
-personnelle. Mais votre mise &agrave; jour ne sera pas
-forc&eacute;ment visible. Les navigateurs Web conservent
-fr&eacute;quemment en m&eacute;moire les pages d&eacute;j&agrave;
+En cliquant sur un des parents, vous verrez apparaître sa fiche
+personnelle. Mais votre mise à jour ne sera pas
+forcément visible. Les navigateurs Web conservent
+fréquemment en mémoire les pages déjà
 vues, et vous donneront probablement l'ancienne version. Faites alors
-"recharger la page" dans votre navigateur pour voir r&eacute;ellement
+"recharger la page" dans votre navigateur pour voir réellement
 vos modifications.
 
 </ul>
@@ -665,17 +665,17 @@ vos modifications.
 
 Soit: <strong>Erreur</strong><p>
 
-La page indiquera l'erreur rencontr&eacute;e. Revenez alors en
-arri&egrave;re et corrigez. Vous pouvez aussi abandonner la
+La page indiquera l'erreur rencontrée. Revenez alors en
+arrière et corrigez. Vous pouvez aussi abandonner la
 modification... en ne faisant rien et en vous contentant de vous
-remettre &agrave; naviguer dans la base.
+remettre à naviguer dans la base.
 
 <p>
 
 Si l'erreur vous indique qu'une certaine personne existe
-d&eacute;j&agrave;, c'est que vous avez voulu cr&eacute;er une
-personne dont la combinaison "pr&eacute;nom", "patronyme",
-"num&eacute;ro" est d&eacute;j&agrave; pr&eacute;sente dans la base.
+déjà, c'est que vous avez voulu créer une
+personne dont la combinaison "prénom", "patronyme",
+"numéro" est déjà présente dans la base.
 
 <p>
 
@@ -685,16 +685,16 @@ Solution:
 
 <ul>
 
-<li> Si vous vouliez effectivement cr&eacute;er une nouvelle personne,
-revenez en arri&egrave;re et changez son num&eacute;ro. Remarquez que
-la page d'erreur vous a indiqu&eacute; le premier num&eacute;ro libre,
-donc disponible: choisissez celui-l&agrave; ou un autre. S'il y a
-plusieurs personnes ayant ce m&ecirc;me nom, leur liste est
-donn&eacute;e.
+<li> Si vous vouliez effectivement créer une nouvelle personne,
+revenez en arrière et changez son numéro. Remarquez que
+la page d'erreur vous a indiqué le premier numéro libre,
+donc disponible: choisissez celui-là ou un autre. S'il y a
+plusieurs personnes ayant ce même nom, leur liste est
+donnée.
 
 
-<li> Si c'est bien de cette personne-l&agrave; dont vous vouliez
-parler, revenez en arri&egrave;re et changez le "Cr&eacute;er" en
+<li> Si c'est bien de cette personne-là dont vous vouliez
+parler, revenez en arrière et changez le "Créer" en
 "Relier".
 
 </ul>
@@ -703,116 +703,116 @@ parler, revenez en arri&egrave;re et changez le "Cr&eacute;er" en
 
 Si l'erreur vous indique qu'une certaine personne n'existe pas, c'est
 que vous avez fait "Relier" en regard d'une personne non existante.
-Peut-&ecirc;tre vous-&ecirc;tes vous tromp&eacute; sur son
-num&eacute;ro? Ou bien vouliez-vous en fait cr&eacute;er une nouvelle
+Peut-être vous-êtes vous trompé sur son
+numéro? Ou bien vouliez-vous en fait créer une nouvelle
 personne?
 
 </ul>
 
 === Supprimer une Famille ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
 "Supprimer/Famille".
 
 <p>
 
 Le formulaire ne contient que la case "Ok" pour vous permettre de
-le faire vraiment. Vous pouvez encore vous r&eacute;tracter.
+le faire vraiment. Vous pouvez encore vous rétracter.
 
 <p>
 
 Si vous faites "Ok", une nouvelle page apparait avec juste le titre
-"Famille supprim&eacute;e".
+"Famille supprimée".
 
 <p>
 
-La famille est supprim&eacute;e de la base: le p&egrave;re, la
-m&egrave;re est les enfants s'&eacute;parpillent dans la nature.
-Cependant, aucun d'entre eux n'est supprim&eacute; de la base:
-Le p&egrave;re et la m&egrave;re ne sont plus mari&eacute;s, ils n'ont
-plus ces enfants-l&agrave; (ils peuvent en avoir d'autres avec
+La famille est supprimée de la base: le père, la
+mère est les enfants s'éparpillent dans la nature.
+Cependant, aucun d'entre eux n'est supprimé de la base:
+Le père et la mère ne sont plus mariés, ils n'ont
+plus ces enfants-là (ils peuvent en avoir d'autres avec
 d'autres mariages, lesquels persistent), les enfants n'ont plus de
 parents.
 
 === Modifier une Personne ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
-"Modifier". Le formulaire sera pr&eacute;-rempli de toutes les
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
+"Modifier". Le formulaire sera pré-rempli de toutes les
 informations individuelles de cette personne.
 
 <p><strong>Remplissage</strong><p>
 
-Toutes les zones (pr&eacute;-remplies ou non) peuvent &ecirc;tre
-remplies, effac&eacute;es ou modifi&eacute;es. Quand on a rempli,
-effac&eacute; ou modifi&eacute; ce qu'on juge n&eacute;cessaire, il
+Toutes les zones (pré-remplies ou non) peuvent être
+remplies, effacées ou modifiées. Quand on a rempli,
+effacé ou modifié ce qu'on juge nécessaire, il
 faudra aller en fin de formulaire et valider le formulaire en cliquant
 sur "Ok".
 
 <p>
 
-Un certain nombre de boutons contiennent "Ins&eacute;rer/...":
-"Ins&eacute;rer/Surnom", "Ins&eacute;rer/Alias", etc.
+Un certain nombre de boutons contiennent "Insérer/...":
+"Insérer/Surnom", "Insérer/Alias", etc.
 
 <p>
 
 Attention: ce n'est pas pour indiquer d'ajouter le surnom ou l'alias,
-etc, &agrave; la personne, mais pour demander un nouveau formulaire
-avec une place r&eacute;serv&eacute;e pour un autre surnom, un autre
+etc, à la personne, mais pour demander un nouveau formulaire
+avec une place réservée pour un autre surnom, un autre
 alias, etc.
 
 <p>
 
-Ainsi, si vous faites "Ok" apr&egrave;s avoir s&eacute;lectionn&eacute; un
+Ainsi, si vous faites "Ok" après avoir sélectionné un
 ou plusieurs de ces boutons, un nouveau formulaire plus gros vous sera
-propos&eacute; et aucune modification ne sera faite.
+proposé et aucune modification ne sera faite.
 
 <p>
 
-Si, donc, apr&egrave;s un "Ok", vous voyez encore un formulaire de
-modification, c'est que votre modification n'a pas &eacute;t&eacute;
-prise en compte (pas encore), et ce, m&ecirc;me si vous avez rempli
+Si, donc, après un "Ok", vous voyez encore un formulaire de
+modification, c'est que votre modification n'a pas été
+prise en compte (pas encore), et ce, même si vous avez rempli
 des tas de zones.
 
-<p><strong>Diff&eacute;rents champs</strong><p>
+<p><strong>Différents champs</strong><p>
 
-Remarquez bien le sens des diff&eacute;rents champs, en particulier
+Remarquez bien le sens des différents champs, en particulier
 l'usage de "nom public", "qualificatif", "alias", etc qui ont chacun des
-sens bien pr&eacute;cis.
+sens bien précis.
 
 <ul><li>
 
-<strong>Pr&eacute;nom</strong> et <strong>patronyme</strong> ont les
-sens habituels qu'on leur donne. Avec <strong>num&eacute;ro</strong>,
-la personne a une "cl&eacute; d'acc&egrave;s" unique comme
-indiqu&eacute; au d&eacute;but de ce chapitre.
+<strong>Prénom</strong> et <strong>patronyme</strong> ont les
+sens habituels qu'on leur donne. Avec <strong>numéro</strong>,
+la personne a une "clé d'accès" unique comme
+indiqué au début de ce chapitre.
 
 <p>
 
-Il est conseill&eacute; de mettre le pr&eacute;nom d'usage dans la
-zone pr&eacute;nom. Les autres pr&eacute;noms (pr&eacute;noms
-complets, autres pr&eacute;noms possibles, autres orthographes de
-pr&eacute;noms, surnoms pour les proches) doivent plut&ocirc;t aller
-dans les zones "alias" ou "autre(s) pr&eacute;nom(s)" (voir
-ci-dessous). Les noms avec num&eacute;ro des personnes nobles et
-royales doivent aller plut&ocirc;t dans la zone "nom public".
+Il est conseillé de mettre le prénom d'usage dans la
+zone prénom. Les autres prénoms (prénoms
+complets, autres prénoms possibles, autres orthographes de
+prénoms, surnoms pour les proches) doivent plutôt aller
+dans les zones "alias" ou "autre(s) prénom(s)" (voir
+ci-dessous). Les noms avec numéro des personnes nobles et
+royales doivent aller plutôt dans la zone "nom public".
 
 <p>
 
-Ceci parce que le pr&eacute;nom est comptabilis&eacute; dans la liste
-des pr&eacute;noms. On peut ainsi savoir quel est le pr&eacute;nom le
-plus fr&eacute;quent, voir quelles sont les personnes portant le
-m&ecirc;me pr&eacute;nom etc. Les autres sortes de pr&eacute;noms
-risqueraient l&agrave; de se trouver en un seul exemplaire et
-d&eacute;pareilleraient l'ensemble.
+Ceci parce que le prénom est comptabilisé dans la liste
+des prénoms. On peut ainsi savoir quel est le prénom le
+plus fréquent, voir quelles sont les personnes portant le
+même prénom etc. Les autres sortes de prénoms
+risqueraient là de se trouver en un seul exemplaire et
+dépareilleraient l'ensemble.
 
 </ul>
 
 <ul><li>
 
 <strong>Nom public</strong> est le nom par lequel la personne est la
-plus connue. Exemple: "Louis&nbsp;XIV" (son pr&eacute;nom &eacute;tant
+plus connue. Exemple: "Louis&nbsp;XIV" (son prénom étant
 "Louis" et son patronyme "de Bourbon").
 
 <p>
@@ -822,38 +822,38 @@ par ce nom.
 
 <p>
 
-S'il y a un nom public, il sera affich&eacute; comme titre de sa fiche
-personnelle, &agrave; la place du "pr&eacute;nom patronyme", lesquels
-sont rel&eacute;gu&eacute;s en plus petit, en dessous.
+S'il y a un nom public, il sera affiché comme titre de sa fiche
+personnelle, à la place du "prénom patronyme", lesquels
+sont relégués en plus petit, en dessous.
 
 </ul>
 
 <ul><li>
 
 <strong>Image</strong> est un fichier ".gif", ".jpg" ou ".png"
-associ&eacute; &agrave; la personne et qui sera affich&eacute; dans sa
-fiche personnelle. Ce peut &ecirc;tre une adresse URL
-(commen&ccedil;ant par "http://...") ou juste un nom de fichier, que
-le syst&egrave;me cherchera dans le r&eacute;pertoire "images",
-sous-r&eacute;pertoire "base" (o&ugrave; "base" est le nom de la base)
+associé à la personne et qui sera affiché dans sa
+fiche personnelle. Ce peut être une adresse URL
+(commençant par "http://...") ou juste un nom de fichier, que
+le système cherchera dans le répertoire "images",
+sous-répertoire "base" (où "base" est le nom de la base)
 au moment de l'affichage.
 
 <p>
 
-Si vous ne pr&eacute;cisez pas de nom de fichier, il y a un nom par
-d&eacute;faut.
+Si vous ne précisez pas de nom de fichier, il y a un nom par
+défaut.
 
 <p>
 
-Ce nom est constitu&eacute;: du pr&eacute;nom, d'un point, du
-num&eacute;ro, d'un autre point, du nom de famille, tout en
-minuscules, sans accents et tous les caract&egrave;res qui ne sont pas
-des lettres sont convertis en caract&egrave;re soulign&eacute; ("_").
+Ce nom est constitué: du prénom, d'un point, du
+numéro, d'un autre point, du nom de famille, tout en
+minuscules, sans accents et tous les caractères qui ne sont pas
+des lettres sont convertis en caractère souligné ("_").
 
 <p>
 
-Exemple, la personne nomm&eacute;e "Anne-C&eacute;cile Dupont de
-Nemours" aura pour nom de image par d&eacute;faut:
+Exemple, la personne nommée "Anne-Cécile Dupont de
+Nemours" aura pour nom de image par défaut:
 
 <pre>
    anne_cecile.0.dupont_de_nemours
@@ -861,16 +861,16 @@ Nemours" aura pour nom de image par d&eacute;faut:
 
 <p>
 
-<font color=#2f6400><b>GeneWeb</b></font> cherchera un fichier portant
-ce nom suivi de ".gif", ".jpg" ou ".png" dans le r&eacute;pertoire des
-images de la base cit&eacute; ci-dessus.
+{GeneWeb} cherchera un fichier portant
+ce nom suivi de ".gif", ".jpg" ou ".png" dans le répertoire des
+images de la base cité ci-dessus.
 
 </ul>
 
 <ul><li>
 
-<strong>Qualificatif</strong> est un sobriquet attach&eacute; aux
-personnes c&eacute;l&egrave;bres. Ainsi "le Gros" dans "Louis&nbsp;VI
+<strong>Qualificatif</strong> est un sobriquet attaché aux
+personnes célèbres. Ainsi "le Gros" dans "Louis&nbsp;VI
 le&nbsp;Gros".
 
 <p>
@@ -878,23 +878,23 @@ le&nbsp;Gros".
 Les personnes sont accessibles par ce qualificatif en lieu et place de leur
 nom de famille. Ainsi "Louis VI le Gros" est accessible par "Louis VI"
 (nom public), "Louis VI le Gros", "Louis le Gros", "Louis Capet", etc.
-Notons que "le Gros" n'est n&eacute;anmoins pas
-consid&eacute;r&eacute; comme un nom de famille en soi.
+Notons que "le Gros" n'est néanmoins pas
+considéré comme un nom de famille en soi.
 
 <p>
 
 Il peut y avoir plusieurs qualificatifs: ainsi "Guillaume le
-Conqu&eacute;rant" est dit aussi "Guillaume le B&acirc;tard". Il y
-faudra donc une zone "qualificatif" contenant "le Conqu&eacute;rant"
-et une autre contenant "le B&acirc;tard". D'o&ugrave; l'utilit&eacute;
-de "Ins&eacute;rer/Qualificatif".
+Conquérant" est dit aussi "Guillaume le Bâtard". Il y
+faudra donc une zone "qualificatif" contenant "le Conquérant"
+et une autre contenant "le Bâtard". D'où l'utilité
+de "Insérer/Qualificatif".
 
 <p>
 
-S'il y a un qualificatif, le nom public (ou le pr&eacute;nom s'il n'y
-a pas de nom public) suivi du qualificatif seront affich&eacute;s
-comme titre dans sa fiche personnelle, &agrave; la place du
-"pr&eacute;nom patronyme", qui seront rel&eacute;gu&eacute;s en plus
+S'il y a un qualificatif, le nom public (ou le prénom s'il n'y
+a pas de nom public) suivi du qualificatif seront affichés
+comme titre dans sa fiche personnelle, à la place du
+"prénom patronyme", qui seront relégués en plus
 petit en dessous.
 
 </ul>
@@ -902,65 +902,65 @@ petit en dessous.
 <ul><li>
 
 <strong>Alias</strong> est un nom par lequel la personne est connue
-mais sans que cela lui tienne lieu de pr&eacute;nom alternatif (comme
+mais sans que cela lui tienne lieu de prénom alternatif (comme
 le "nom public" par exemple).
 
 <p>
 
 Ainsi "Aurore Dupin" est connue sous le nom "George Sand". De
-m&ecirc;me, "Anne-Marie d'Orl&eacute;ans", fille de "Philippe Ier" et
-ni&egrave;ce de "Louis XIV" est dite "Mademoiselle de Valois".
+même, "Anne-Marie d'Orléans", fille de "Philippe Ier" et
+nièce de "Louis XIV" est dite "Mademoiselle de Valois".
 
 <p>
 
 Notons que l'alias forme un tout: il n'est pas question d'accepter des
 combinaisons telles que "George Dupin" ou "Aurore Sand", "Anne-Marie
-de Valois" ou "Mademoiselle d'Orl&eacute;ans".
+de Valois" ou "Mademoiselle d'Orléans".
 
 <p>
 
-S'il y a un ou plusieurs alias, ils sont affich&eacute;s en lettres
+S'il y a un ou plusieurs alias, ils sont affichés en lettres
 grasses en dessous du titre, mais en plus petit.
 
 </ul>
 
 <ul><li>
 
-<strong>Pr&eacute;nom alias</strong> peut avoir plusieurs usages:
+<strong>Prénom alias</strong> peut avoir plusieurs usages:
 
 <p>
 
 <ul>
 
-<li> Ce peut &ecirc;tre les pr&eacute;noms complets de l'&eacute;tat
+<li> Ce peut être les prénoms complets de l'état
 civil.
 
-<li> Ce peut &ecirc;tre les petits noms utilis&eacute;s parmi les
-proches. Ainsi "Bobby" &agrave; la place de "Robert".
+<li> Ce peut être les petits noms utilisés parmi les
+proches. Ainsi "Bobby" à la place de "Robert".
 
-<li> Ce peut-&ecirc;tre un autre pr&eacute;nom ou le m&ecirc;me
-pr&eacute;nom avec une orthographe diff&eacute;rente, dans le cas de
-personnes tr&egrave;s anciennes dont on n'est pas s&ucirc;r du
-pr&eacute;nom, ou dont le pr&eacute;nom a &eacute;t&eacute; ecrit
+<li> Ce peut-être un autre prénom ou le même
+prénom avec une orthographe différente, dans le cas de
+personnes très anciennes dont on n'est pas sûr du
+prénom, ou dont le prénom a été ecrit
 differemment selon les sources.
 
 </ul>
 
 <p>
 
-Il peut y avoir plusieurs "pr&eacute;nom alias".
+Il peut y avoir plusieurs "prénom alias".
 
 <p>
 
-Les "autres pr&eacute;noms" peuvent &ecirc;tre utilis&eacute;s en lieu et
-place du pr&eacute;nom dans les requ&ecirc;tes, mais ne sont pas
-consid&eacute;r&eacute;s comme des pr&eacute;noms en soi,
-c'est-&agrave;-dire qu'ils ne sont pas comptabilis&eacute;s dans les
-listes par pr&eacute;noms.
+Les "autres prénoms" peuvent être utilisés en lieu et
+place du prénom dans les requêtes, mais ne sont pas
+considérés comme des prénoms en soi,
+c'est-à-dire qu'ils ne sont pas comptabilisés dans les
+listes par prénoms.
 
 <p>
 
-S'il y a des "autres pr&eacute;noms", ils sont affich&eacute;s dans la
+S'il y a des "autres prénoms", ils sont affichés dans la
 fiche personnelle, en petites lettres sous le titre.
 
 </ul>
@@ -969,61 +969,61 @@ fiche personnelle, en petites lettres sous le titre.
 
 <strong>Nom alias</strong> peut servir de patronyme alternatif, si on
 veut mettre une autre version du patronyme, par exemple, avec une
-autre orthographe. Son usage n'est pas fr&eacute;quent.
+autre orthographe. Son usage n'est pas fréquent.
 
 </ul>
 
 <ul><li>
 
 <strong>Naissance</strong> permet d'indiquer dates et lieux de naissance
-et de bapt&ecirc;me. Il ne pr&eacute;sente pas de probl&egrave;me
+et de baptême. Il ne présente pas de problème
 particulier.
 
 </ul>
 
 <ul><li>
 
-<strong>D&eacute;c&egrave;s</strong> permet d'indiquer les
-informations sur le d&eacute;c&egrave;s. Pas de probl&egrave;me
-particulier &agrave; part la notion de "choix automatique" que nous
+<strong>Décès</strong> permet d'indiquer les
+informations sur le décès. Pas de problème
+particulier à part la notion de "choix automatique" que nous
 allons expliciter.
 
 <p>
 
-Le "choix automatique" est pr&eacute;sent quand la selection du premier
-menu de la zone "d&eacute;c&egrave;s" affiche un "-". Il indique qu'on
-ne sait pas si cette personne est d&eacute;c&eacute;d&eacute;e ou non.
+Le "choix automatique" est présent quand la selection du premier
+menu de la zone "décès" affiche un "-". Il indique qu'on
+ne sait pas si cette personne est décédée ou non.
 
 <p>
 
 Dans ce cas, si vous n'indiquez pas de date ni de lieu de
-d&eacute;c&egrave;s, le syst&egrave;me choisira pour vous le fait que
-la personne est d&eacute;c&eacute;d&eacute;e ou non en fonction de sa
-date de naissance: si elle a moins de 80 ans, il d&eacute;cidera "non
-d&eacute;c&eacute;d&eacute;", entre 81 et 120 ans, il d&eacute;cidera
-"ne sais pas", et &agrave; plus de 120 ans, il d&eacute;cidera
-"d&eacute;c&eacute;d&eacute;".
+décès, le système choisira pour vous le fait que
+la personne est décédée ou non en fonction de sa
+date de naissance: si elle a moins de 80 ans, il décidera "non
+décédé", entre 81 et 120 ans, il décidera
+"ne sais pas", et à plus de 120 ans, il décidera
+"décédé".
 
 <p>
 
 Si ce choix automatique ne correspond pas, vous pouvez
-s&eacute;lectionner vous-m&ecirc;me le bon cas dans ce premier menu,
-&agrave; la place du "-" affich&eacute;.
+sélectionner vous-même le bon cas dans ce premier menu,
+à la place du "-" affiché.
 
 <p>
 
-Remarquez que les personnes dont le d&eacute;c&egrave;s est "ne sais
-pas" ne verront pas leur &acirc;ge calcul&eacute; dans leur page
+Remarquez que les personnes dont le décès est "ne sais
+pas" ne verront pas leur âge calculé dans leur page
 personnelle ni dans les anniversaires. Donc si une personne a entre 80
-et 120 ans et n'est pas d&eacute;c&eacute;d&eacute;e,
-s&eacute;lectionnez "non d&eacute;c&eacute;d&eacute;".
+et 120 ans et n'est pas décédée,
+sélectionnez "non décédé".
 
 </ul>
 
 <ul><li>
 
 <strong>Occupation</strong> contient la profession. Si vous voulez
-mettre un titre de noblesse, utilisez plut&ocirc;t les champs "titre",
+mettre un titre de noblesse, utilisez plutôt les champs "titre",
 qui suivent.
 
 </ul>
@@ -1032,58 +1032,58 @@ qui suivent.
 
 <strong>Titres</strong> contient les titres de noblesse. Il peut y en
 avoir plusieurs. Pour avoir un formulaire avec d'autres places pour
-les titres, cliquez sur un ou plusieurs "Ins&eacute;rer/Titre", allez
+les titres, cliquez sur un ou plusieurs "Insérer/Titre", allez
 en bas du formulaire et faites "Ok".
 
 <p>
 
-Les titres sont d&eacute;compos&eacute;s en deux parties: le titre
-lui-m&ecirc;me et le lieu. Le titre lui-m&ecirc;me contient la
-d&eacute;nomination: "comte", "duc", "roi", etc. Le lieu contient le
-compl&eacute;ment: "d'Anjou", "de Bourgogne", "de France", et.
+Les titres sont décomposés en deux parties: le titre
+lui-même et le lieu. Le titre lui-même contient la
+dénomination: "comte", "duc", "roi", etc. Le lieu contient le
+complément: "d'Anjou", "de Bourgogne", "de France", et.
 etc.
 
 <p>
 
-Notez la particule: &agrave; l'affichage, on verra une combinaison de
-la d&eacute;nomination et du lieu: "comte d'Anjou", "duc de
+Notez la particule: à l'affichage, on verra une combinaison de
+la dénomination et du lieu: "comte d'Anjou", "duc de
 Bourgogne", "roi de France" qui seront des zones cliquables, permettant
 de voir toutes les personnes de la base ayant ce titre.
 
 <p>
 
-Mais la s&eacute;paration entre ces notions permettra de
-s&eacute;lectionner, par exemple tous les "comte", tous les "duc",
+Mais la séparation entre ces notions permettra de
+sélectionner, par exemple tous les "comte", tous les "duc",
 tous les "roi", et inversement, tous les titres finissant par
 "d'Anjou", "de Bourgogne", "de France", etc.
 
 <p>
 
-Le champ "nom" permet de mettre un nom public associ&eacute; au
+Le champ "nom" permet de mettre un nom public associé au
 titre. Ainsi "Charles Quint" s'appelle "Charles Ier" en tant que "roi
 d'Espagne", "Charles IV" en tant que "roi de Sicile", etc.
 
 <p>
 
-Le champ "N-i&egrave;me" est utilis&eacute; pour les titres
-d&eacute;nomm&eacute;s avec leur num&eacute;ro. Exemple: pour le
-"3&egrave;me comte de Warwick", on pourra mettre "3". Ne pas confondre
-avec "Louis XIV" dont le num&eacute;ro indique que c'est le
-14&egrave;me "Louis" de la lign&eacute;e, et non pas le 14&egrave;me
+Le champ "N-ième" est utilisé pour les titres
+dénommés avec leur numéro. Exemple: pour le
+"3ème comte de Warwick", on pourra mettre "3". Ne pas confondre
+avec "Louis XIV" dont le numéro indique que c'est le
+14ème "Louis" de la lignée, et non pas le 14ème
 "roi de France".
 
 <p>
 
 Le bouton "Titre principal" permet d'indiquer, quand on affiche cette
-personne de fa&ccedil;on simplifi&eacute;e (dans la page de son
-&eacute;pouse, par exemple, ou dans celles de ses enfants), quel titre
-doit &ecirc;tre affich&eacute;. Cela n'a d'importance que s'il y en a
+personne de façon simplifiée (dans la page de son
+épouse, par exemple, ou dans celles de ses enfants), quel titre
+doit être affiché. Cela n'a d'importance que s'il y en a
 plusieurs.
 
 <p>
 
-Les deux champs suivants donnent les dates de d&eacute;but et de fin
-de r&egrave;gne.
+Les deux champs suivants donnent les dates de début et de fin
+de règne.
 
 <p>
 
@@ -1096,43 +1096,43 @@ champ "Titre".
 
 <ul><li>
 
-<strong>Acc&egrave;s</strong> permet de pr&eacute;ciser l'acc&egrave;s
+<strong>Accès</strong> permet de préciser l'accès
 aux informations personnelles. Ceci s'applique aux personnes
-"actuelles", c'est-&agrave;-dire dont les dates (naissance,
-d&eacute;c&egrave;s, etc.) sont inf&eacute;rieures &agrave; 100 ans:
+"actuelles", c'est-à-dire dont les dates (naissance,
+décès, etc.) sont inférieures à 100 ans:
 
 <p>
 
 <ul>
 
-<li> Par d&eacute;faut, les personnes ayant un titre de noblesse ou
+<li> Par défaut, les personnes ayant un titre de noblesse ou
 dont un des parents a un titre de noblesse sont
-consid&eacute;r&eacute;es comme des personnes "publiques" et leurs
-informations personnelles sont toujours affich&eacute;es.
+considérées comme des personnes "publiques" et leurs
+informations personnelles sont toujours affichées.
 
-<li> Si on s&eacute;lectionne "public", les informations personnelles
-sont toujours affich&eacute;es, que la personne ait des titres de
+<li> Si on sélectionne "public", les informations personnelles
+sont toujours affichées, que la personne ait des titres de
 noblesse ou non.
 
-<li> Si on s&eacute;lectionne "priv&eacute;", les informations personnelles
-ne sont pas affich&eacute;es, m&ecirc;me si la personne a des titres de
+<li> Si on sélectionne "privé", les informations personnelles
+ne sont pas affichées, même si la personne a des titres de
 noblesse.
 
 </ul>
 
 <p>
 
-Par l'entr&eacute;e "magicien" ou "amis" (par mots de passe), les
-informations personnelles sont toujours affich&eacute;es.
+Par l'entrée "magicien" ou "amis" (par mots de passe), les
+informations personnelles sont toujours affichées.
 
 </ul>
 
 <ul><li>
 
-<strong>Notes</strong> contient les notes sur la personne. &Aacute;
-l'affichage, le texte sera affich&eacute; en continu, m&ecirc;me si
-vous mettez des sauts de ligne. Pour qu'il y ait un passage &agrave;
-la ligne, mettez "&lt;br&gt;" l&agrave; o&ugrave; vous voulez des
+<strong>Notes</strong> contient les notes sur la personne. À
+l'affichage, le texte sera affiché en continu, même si
+vous mettez des sauts de ligne. Pour qu'il y ait un passage à
+la ligne, mettez "&lt;br&gt;" là où vous voulez des
 sauts de ligne.
 
 </ul>
@@ -1141,14 +1141,14 @@ sauts de ligne.
 
 <strong>Sources</strong> permet de noter des informations courtes sur
 l'origine de vos informations: un nom, un sigle, un titre de livre,
-un code &agrave; vous. Vous saurez ainsi d'o&ugrave; vous tenez vos
+un code à vous. Vous saurez ainsi d'où vous tenez vos
 informations.
 
 <p>
 
-Il n'est pas pr&eacute;vu pour des informations longues, style
-"recopie du document trouv&eacute; &agrave; la mairie": il faudra pour
-cela utiliser plut&ocirc;t le champ "Notes" ci-dessus.
+Il n'est pas prévu pour des informations longues, style
+"recopie du document trouvé à la mairie": il faudra pour
+cela utiliser plutôt le champ "Notes" ci-dessus.
 
 </ul>
 
@@ -1160,37 +1160,37 @@ pas fait, aucun changement n'aura lieu dans la base.
 <p>
 
 Remarquez bien aussi, comme il est dit plus haut, que si vous avez
-s&eacute;lectionn&eacute; un ou plusieurs "Ins&eacute;rer/...", ce
-sera juste un nouveau formulaire qui sera propos&eacute; et non pas la
+sélectionné un ou plusieurs "Insérer/...", ce
+sera juste un nouveau formulaire qui sera proposé et non pas la
 validation proprement dite.
 
 <p>
 
-Quand la validation est vraiment faite, vous devez voir appara&icirc;tre
-une nouvelle page, dont le titre va &ecirc;tre:
+Quand la validation est vraiment faite, vous devez voir apparaître
+une nouvelle page, dont le titre va être:
 
 <ul><li>
 
-Soit: <strong>Personne modifi&eacute;e</strong><p>
+Soit: <strong>Personne modifiée</strong><p>
 
 Vous devez y voir le nom de la personne sur laquelle vous allez pouvoir
 cliquer.
 
 <p>
 
-Vous y verrez peut-&ecirc;tre &eacute;galement des remarques. Elles
-concernent des incoh&eacute;rences de dates. La modification sera
-faite tout de m&ecirc;me, mais il est pr&eacute;f&eacute;rable de les
+Vous y verrez peut-être également des remarques. Elles
+concernent des incohérences de dates. La modification sera
+faite tout de même, mais il est préférable de les
 corriger.
 
 <p>
 
-En cliquant sur la personne, vous verrez appara&icirc;tre sa fiche
-personnelle. Mais votre mise &agrave; jour ne sera pas
-forc&eacute;ment visible. Les navigateurs Web conservent
-fr&eacute;quemment en m&eacute;moire les pages d&eacute;j&agrave;
+En cliquant sur la personne, vous verrez apparaître sa fiche
+personnelle. Mais votre mise à jour ne sera pas
+forcément visible. Les navigateurs Web conservent
+fréquemment en mémoire les pages déjà
 vues, et vous donneront probablement l'ancienne version. Faites alors
-"recharger la page" dans votre navigateur pour voir r&eacute;ellement
+"recharger la page" dans votre navigateur pour voir réellement
 vos modifications.
 
 </ul>
@@ -1199,121 +1199,121 @@ vos modifications.
 
 Soit: <strong>Erreur</strong><p>
 
-La page indiquera l'erreur rencontr&eacute;e. Revenez alors en
-arri&egrave;re et corrigez. Vous pouvez aussi abandonner la
+La page indiquera l'erreur rencontrée. Revenez alors en
+arrière et corrigez. Vous pouvez aussi abandonner la
 modification... en ne faisant rien et en vous contentant de vous
-remettre &agrave; naviguer dans la base.
+remettre à naviguer dans la base.
 
 <p>
 
-Si l'erreur vous indique que la personne existe d&eacute;j&agrave;,
-c'est que vous avez modifi&eacute; le pr&eacute;nom, le patronyme ou
-le num&eacute;ro (vous avez parfaitement le droit de le faire), mais
+Si l'erreur vous indique que la personne existe déjà,
+c'est que vous avez modifié le prénom, le patronyme ou
+le numéro (vous avez parfaitement le droit de le faire), mais
 que votre nouveau choix entre en conflit avec une autre personne de la
 base.
 
 <p>
 
-Solution: revenez en arri&egrave;re et changez le
-num&eacute;ro. Remarquez que la page d'erreur vous a indiqu&eacute; le
-premier num&eacute;ro libre, donc disponible. Vous pouvez choisir
-celui-l&agrave; ou un autre. S'il y a plusieurs personnes ayant ce
-m&ecirc;me nom, leur liste est donn&eacute;e.
+Solution: revenez en arrière et changez le
+numéro. Remarquez que la page d'erreur vous a indiqué le
+premier numéro libre, donc disponible. Vous pouvez choisir
+celui-là ou un autre. S'il y a plusieurs personnes ayant ce
+même nom, leur liste est donnée.
 
 </ul>
 
 === Supprimer une Personne ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
 "Supprimer".
 
 <p>
 
 Le formulaire ne contient que la case "Ok" pour vous permettre de
-le faire vraiment. Vous pouvez encore vous r&eacute;tracter.
+le faire vraiment. Vous pouvez encore vous rétracter.
 
 <p>
 
 Si vous faites "Ok", une nouvelle page apparait avec juste le titre
-"Personne supprim&eacute;e".
+"Personne supprimée".
 
 <p>
 
-La personne n'est en fait pas tout &agrave; fait supprim&eacute;e. Ses
-informations personnelles sont simplement effac&eacute;es, (y compris
-son pr&eacute;nom et son patronyme) ainsi que sa connexion avec ses
+La personne n'est en fait pas tout à fait supprimée. Ses
+informations personnelles sont simplement effacées, (y compris
+son prénom et son patronyme) ainsi que sa connexion avec ses
 parents.
 
 <p>
 
-Mais il subsiste toujours une "entit&eacute; personne" reli&eacute;e
-&agrave; son &eacute;ventuel conjoint et &agrave; ses &eacute;ventuels
+Mais il subsiste toujours une "entité personne" reliée
+à son éventuel conjoint et à ses éventuels
 enfants.
 
 === Envoyer une Image ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
-"Envoyer image", &agrave; condition que le propri&eacute;taire de la
-base en ait donn&eacute; l'<a href="start.htm#Cnf">autorisation</a>,
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
+"Envoyer image", à condition que le propriétaire de la
+base en ait donné l'<a href="start.htm#Cnf">autorisation</a>,
 et que le champ "image" de la personne soit vide.
 
 <p>
 
 Il s'agit d'envoyer un fichier "gif", "jpeg" ou "png" qui sera
-associ&eacute; &agrave; la personne. Si cette personne avait
-d&eacute;j&agrave; une image, celle que vous enverrez la remplacera.
+associé à la personne. Si cette personne avait
+déjà une image, celle que vous enverrez la remplacera.
 
 <p>
 
 Note: si le champ "Image" de la personne n'est pas vide, vous n'aurez
-pas acc&egrave;s &agrave; "envoyer image". Si vous voulez le faire,
-faites "Mise &agrave; jour" et "Modifier personne" et effacez le
+pas accès à "envoyer image". Si vous voulez le faire,
+faites "Mise à jour" et "Modifier personne" et effacez le
 contenu du champ "image".
 
 === Supprimer une Image ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
-"Supprimer image", &agrave; condition que le propri&eacute;taire de la
-base en ait donn&eacute; l'<a href="start.htm#Cnf">autorisation</a>.
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
+"Supprimer image", à condition que le propriétaire de la
+base en ait donné l'<a href="start.htm#Cnf">autorisation</a>.
 
 <p>
 
-Si vous cliquez sur "Ok", la image associ&eacute;e &agrave; la personne
-est supprim&eacute;e.
+Si vous cliquez sur "Ok", la image associée à la personne
+est supprimée.
 
 === Changer les noms des enfants ===
 
-Vous tomberez sur ce formulaire &agrave; partir d'une page personnelle
-apr&egrave;s avoir cliqu&eacute; sur "Mise &agrave; jour", puis
+Vous tomberez sur ce formulaire à partir d'une page personnelle
+après avoir cliqué sur "Mise à jour", puis
 "Changer noms des enfants".
 
 <p>
 
-Tous les enfants de la personne sont affich&eacute;s. Il est possible
-de modifier le pr&eacute;nom, le patronyme et le num&eacute;ro de chaque
+Tous les enfants de la personne sont affichés. Il est possible
+de modifier le prénom, le patronyme et le numéro de chaque
 enfant.
 
 <p>
 
-Une facilit&eacute; int&eacute;ressante: si on supprime le nom de
-famille d'un enfant, &ccedil;a prendra automatiquement celui du
+Une facilité intéressante: si on supprime le nom de
+famille d'un enfant, ça prendra automatiquement celui du
 parent.
 
 <p>
 
-Cela peut &ecirc;tre commode pour changer le nom de famille de toute
+Cela peut être commode pour changer le nom de famille de toute
 une branche: on change avec "modifier personne" le nom de famille de
-l'anc&ecirc;tre. Puis on applique "changer nom des enfants" sur
-l'anc&ecirc;tre en supprimant simplement dans ce formulaire les noms
-de famille de ses enfants, ce qui est une op&eacute;ration
+l'ancêtre. Puis on applique "changer nom des enfants" sur
+l'ancêtre en supprimant simplement dans ce formulaire les noms
+de famille de ses enfants, ce qui est une opération
 rapide. Puis on recommence avec les enfants.
 
 <p>
 
-On peut s'en servir aussi pour corriger le pr&eacute;nom d'un enfant
+On peut s'en servir aussi pour corriger le prénom d'un enfant
 d'une famille. Mais si c'est juste pour un enfant, cela peut se
 faire simplement avec "modifier personne".
 
@@ -1324,14 +1324,14 @@ faire simplement avec "modifier personne".
 <p>
 
 Dans les formulaires "famille", il est possible d'ajouter directement
-des dates de naissance et de d&eacute;c&egrave;s pour les personnes
-cr&eacute;&eacute;es. Cela permet d'aller plus vite quand on ajoute ces
-personnes. Vous disposez &eacute;galement des raccourcis suivants
-concernant la pr&eacute;cision des dates:
+des dates de naissance et de décès pour les personnes
+créées. Cela permet d'aller plus vite quand on ajoute ces
+personnes. Vous disposez également des raccourcis suivants
+concernant la précision des dates:
 
 <ul>
 
-<li> "?1912" veut dire "peut-&ecirc;tre en 1912"
+<li> "?1912" veut dire "peut-être en 1912"
 
 <li> "&gt;1912" ou "1912/" veut dire: "après 1912" 
 
@@ -1341,11 +1341,11 @@ concernant la pr&eacute;cision des dates:
 
 </ul>
 
-Et pour l'ann&eacute;e de la date de la zone "d&eacute;cès": 
+Et pour l'année de la date de la zone "décès": 
 
 <ul>
 
-<li> "+" tout seul veut dire: "d&eacute;c&eacute;d&eacute;" (on ne sait pas quand)
+<li> "+" tout seul veut dire: "décédé" (on ne sait pas quand)
 
 <li> "-" tout seul veut dire: "vivant" 
 
@@ -1355,181 +1355,181 @@ Et pour l'ann&eacute;e de la date de la zone "d&eacute;cès":
 
 == Comment fusionner deux personnes ==
 
-Cette section d&eacute;crit le moyen de fusionner deux
-<strong>personnes</strong> dans une base de donn&eacute;es, dans le
-cas o&ugrave; vous auriez mis deux fois la m&ecirc;me personne.
+Cette section décrit le moyen de fusionner deux
+<strong>personnes</strong> dans une base de données, dans le
+cas où vous auriez mis deux fois la même personne.
 
 <p>
 
 Remarque: nous ne parlons pas ici de comment fusionner deux
-<strong>bases de donn&eacute;es</strong>: cela est trait&eacute; <a
+<strong>bases de données</strong>: cela est traité <a
 href="merge.htm">ailleurs</a>.
 
 <p>
 
-La fusion de deux personnes est assez manuelle, mais &agrave; tout
-moment, vous gardez une base de donn&eacute;es coh&eacute;rente.
+La fusion de deux personnes est assez manuelle, mais à tout
+moment, vous gardez une base de données cohérente.
 
 <p>
 
 Le principe est le suivant:
 
-<p><ul><li> Vous s&eacute;lectionnez les deux personnes &agrave;
-fusionner. Mais l&agrave; se pose le probl&egrave;me de leurs
+<p><ul><li> Vous sélectionnez les deux personnes à
+fusionner. Mais là se pose le problème de leurs
 parents. S'ils ont tous les deux des parents, il faudra d'abord
 fusionner les parents. Et il faut recommencer en regardant les parents
 des parents, etc.</ul>
 
 <p>
 
-Il faut donc remonter les anc&ecirc;tres jusqu'&agrave; ce qu'on tombe
-sur des anc&ecirc;tres "fusionnables". <font color=#2f6400><b>GeneWeb</b></font> fait cette
-remont&eacute;e pour vous: il vous indiquera les anc&ecirc;tres qu'il
+Il faut donc remonter les ancêtres jusqu'à ce qu'on tombe
+sur des ancêtres "fusionnables". {GeneWeb} fait cette
+remontée pour vous: il vous indiquera les ancêtres qu'il
 est possible de fusionner.
 
 <p>
 
-Voici comment proc&eacute;der. Suivez les instructions ci-dessous en
+Voici comment procéder. Suivez les instructions ci-dessous en
 faisant votre fusion:
 
 <p>
 
-<ul><li> Le mieux est de prendre deux fen&ecirc;tres de votre
+<ul><li> Le mieux est de prendre deux fenêtres de votre
 navigateur.</ul>
 
-<ul><li> Dans la fen&ecirc;tre de gauche, cherchez la premi&egrave;re
-personne &agrave; fusionner.  </ul>
+<ul><li> Dans la fenêtre de gauche, cherchez la première
+personne à fusionner.  </ul>
 
-<p><ul><li> Dans l'autre fen&ecirc;tre, celle de droite, cherchez la
-deuxi&egrave;me. </ul>
+<p><ul><li> Dans l'autre fenêtre, celle de droite, cherchez la
+deuxième. </ul>
 
-<p><ul><li> Dans chacune des deux fen&ecirc;tres, faites "Mise &agrave;
+<p><ul><li> Dans chacune des deux fenêtres, faites "Mise à
 jour".</ul>
 
-<p><ul><li> Dans la fen&ecirc;tre de gauche, faites "fusionner".</ul>
+<p><ul><li> Dans la fenêtre de gauche, faites "fusionner".</ul>
 
-<p><ul><li> Dans le formulaire propos&eacute;, mettez le pr&eacute;nom,
-un point, le num&eacute;ro et le patronymne de la deuxi&egrave;me
-personne. Vous trouvez cela dans le titre de la fen&ecirc;tre de
+<p><ul><li> Dans le formulaire proposé, mettez le prénom,
+un point, le numéro et le patronymne de la deuxième
+personne. Vous trouvez cela dans le titre de la fenêtre de
 droite. Le mieux, si vous pouvez le faire, est d'utiliser le
 "couper-coller".</ul>
 
-<p><ul><li> Puis faites "Ok". &Agrave; partir de l&agrave;, la fen&ecirc;tre
-de droite ne vous sert plus &agrave; rien. Vous pouvez la fermer.</ul>
+<p><ul><li> Puis faites "Ok". À partir de là, la fenêtre
+de droite ne vous sert plus à rien. Vous pouvez la fermer.</ul>
 
 <p><ul><li> Si les deux personnes sont directement "fusionnables" (au
-moins un des deux n'a pas de parents), <font color=#2f6400><b>GeneWeb</b></font> vous propose
+moins un des deux n'a pas de parents), {GeneWeb} vous propose
 de les fusionner. Sinon, il vous dit que vous devez d'abord fusionner
-tel et tel anc&ecirc;tres ou telle ou telle familles.</ul>
+tel et tel ancêtres ou telle ou telle familles.</ul>
 
-<p><ul><li> S'il s'agit de <strong>personnes</strong> &agrave;
-fusionner (les personnes elles-m&ecirc;mes ou leurs anc&ecirc;tres):
+<p><ul><li> S'il s'agit de <strong>personnes</strong> à
+fusionner (les personnes elles-mêmes ou leurs ancêtres):
 
 <p>
 
 <ul>
 
-<li> Dans le cas d'anc&ecirc;tres, le bas du formulaire indique les
-deux branches en train d'&ecirc;tre fusionn&eacute;es. Avec votre
-aide, il fusionnera le haut, puis les interm&eacute;diaires, et finira par
-fusionner le bas, ceux que vous avez demand&eacute;s &agrave;
+<li> Dans le cas d'ancêtres, le bas du formulaire indique les
+deux branches en train d'être fusionnées. Avec votre
+aide, il fusionnera le haut, puis les intermédiaires, et finira par
+fusionner le bas, ceux que vous avez demandés à
 l'origine.
 
 <li> Le formulaire contient les valeurs en conflit, s'il y en a, entre
-les deux personnes &agrave; fusionner. Choisissez et faites "Ok".
+les deux personnes à fusionner. Choisissez et faites "Ok".
 
 <li> Vous voyez alors un formulaire "Fusionner/Personne" qui se
-pr&eacute;sente comme un "Modifier/Personne". Contr&ocirc;lez les
-diff&eacute;rents champs, ajoutez, modifiez, supprimez ce que vous
+présente comme un "Modifier/Personne". Contrôlez les
+différents champs, ajoutez, modifiez, supprimez ce que vous
 voulez et faites "Ok".
 
-<li> &Ccedil;a y est: les deux personnes sont fusionn&eacute;es. S'il
-s'agit d'anc&ecirc;tres de vos personnes initiales, la page vous
-propose de continuer &agrave; &agrave; les fusionner. Cliquez sur
-"continuer &agrave; fusionner". Avancez ainsi jusqu'&agrave; ce que
-vous ayez fusionn&eacute; les deux personnes du d&eacute;but.
+<li> Ça y est: les deux personnes sont fusionnées. S'il
+s'agit d'ancêtres de vos personnes initiales, la page vous
+propose de continuer à à les fusionner. Cliquez sur
+"continuer à fusionner". Avancez ainsi jusqu'à ce que
+vous ayez fusionné les deux personnes du début.
 
 </ul>
 
 </ul>
 
-<p><ul><li> S'il s'agit de <strong>familles</strong> &agrave;
+<p><ul><li> S'il s'agit de <strong>familles</strong> à
 fusionner:
 
 <p>
 
 <ul>
 
-<li> Cela arrive quand on a fusionn&eacute; un couple
-d'anc&ecirc;tres. Dans ce cas, il reste toujours deux familles. C'est
-comme si ce couple s'&eacute;tait mari&eacute; deux fois. Il faut donc
+<li> Cela arrive quand on a fusionné un couple
+d'ancêtres. Dans ce cas, il reste toujours deux familles. C'est
+comme si ce couple s'était marié deux fois. Il faut donc
 regrouper les deux familles en une seule.
 
-<li> D'abord, comme pour le cas de personnes &agrave; fusionner
-ci-dessus, selectionnez dans les &eacute;ventuelles valeurs en conflit
+<li> D'abord, comme pour le cas de personnes à fusionner
+ci-dessus, selectionnez dans les éventuelles valeurs en conflit
 et faites "Ok".
 
 <li> Vous voyez alors un formulaire "Fusionner/Familles" qui ressemble
-&agrave; "Ajouter/Famille" ou "Modifier/Famille". Faites les mises
-&agrave; jour que vous voulez. Remarquez que certains enfants peuvent
-&ecirc;tre en double. Laissez-les: ils seront fusionn&eacute;s plus
+à "Ajouter/Famille" ou "Modifier/Famille". Faites les mises
+à jour que vous voulez. Remarquez que certains enfants peuvent
+être en double. Laissez-les: ils seront fusionnés plus
 tard.
 
-<li> Faites "Ok" et les familles seront fusionn&eacute;es
+<li> Faites "Ok" et les familles seront fusionnées
 effectivement. Avancez dans la fusion en cliquant sur "continuer
-&agrave; fusionner".
+à fusionner".
 
 </ul>
 
 </ul>
 
 <p><ul><li> Remarquez que dans les formulaires de fusion de personnes
-ou de familles, les personnes affich&eacute;es sont cliquables. Vous
-pouvez cliquer dessus si vous d&eacute;sirez v&eacute;rifier que cette
-fusion est correcte (revenez en arri&egrave;re ensuite avec votre
+ou de familles, les personnes affichées sont cliquables. Vous
+pouvez cliquer dessus si vous désirez vérifier que cette
+fusion est correcte (revenez en arrière ensuite avec votre
 navigateur).</ul>
 
-<p><ul><li> Notez &eacute;galement que vous pouvez vous arr&ecirc;ter
-&agrave; tout moment: votre base reste coh&eacute;rente et les fusions
-que vous avez d&eacute;j&agrave; faites sont enregistr&eacute;es. Vous
+<p><ul><li> Notez également que vous pouvez vous arrêter
+à tout moment: votre base reste cohérente et les fusions
+que vous avez déjà faites sont enregistrées. Vous
 pouvez redemander plus tard la fusion de vos deux personnes du
-d&eacute;but, cela continuera la fusion l&agrave; o&ugrave; vous
-l'avez laiss&eacute;e.</ul>
+début, cela continuera la fusion là où vous
+l'avez laissée.</ul>
 
 == Comment fusionner deux familles ==
 
-Pour fusionner deux familles, fusionnez d'abord les p&egrave;res
-(s'ils sont diff&eacute;rents) et les m&egrave;res (si elles sont
-diff&eacute;rentes) en suivant les directives de la section
-pr&eacute;c&eacute;dente.
+Pour fusionner deux familles, fusionnez d'abord les pères
+(s'ils sont différents) et les mères (si elles sont
+différentes) en suivant les directives de la section
+précédente.
 
 <p>
 
-Ensuite, &agrave; partir de la page du p&egrave;re ou de la
-m&egrave;re, faites "Mise &agrave; jour". Si les deux familles sont
-contigu&euml;s, vous verrez qu'il y a un "Fusionner" entre les deux.
-Cliquez dessus. Si elles ne sont pas contigu&euml;s, utilisez
-"Intervertir" autant de fois que n&eacute;cessaire.
+Ensuite, à partir de la page du père ou de la
+mère, faites "Mise à jour". Si les deux familles sont
+contiguës, vous verrez qu'il y a un "Fusionner" entre les deux.
+Cliquez dessus. Si elles ne sont pas contiguës, utilisez
+"Intervertir" autant de fois que nécessaire.
 
-== Langues avec d&eacute;clinaisons ==
+== Langues avec déclinaisons ==
 
 
-Certaines langues ont des d&eacute;clinaisons, c'est &agrave; dire que
-les noms propres et les noms communs s'&eacute;crivent
-diff&eacute;remment suivant la place qu'ils ont dans la phrase. C'est
-le cas du tch&egrave;que, une des langues fournies par
-<font color=#2f6400><b>GeneWeb</b></font>.
+Certaines langues ont des déclinaisons, c'est à dire que
+les noms propres et les noms communs s'écrivent
+différemment suivant la place qu'ils ont dans la phrase. C'est
+le cas du tchèque, une des langues fournies par
+{GeneWeb}.
 
 <p>
 
-Ainsi les expressions en fran&ccedil;ais:
+Ainsi les expressions en français:
 
 <pre>
-   ... mari&eacute; avec Vladana
+   ... marié avec Vladana
    ... cousins de Vladana
 </pre>
 
-se traduisent en tch&egrave;que par:
+se traduisent en tchèque par:
 
 <pre>
    ... si vzal Vladanu
@@ -1538,20 +1538,20 @@ se traduisent en tch&egrave;que par:
 
 <p>
 
-Le pr&eacute;nom tch&egrave;que "Vladana" a donc plusieurs formes:
+Le prénom tchèque "Vladana" a donc plusieurs formes:
 "Vladana" est le nominatif, "Vladanu" l'accusatif, "Vladany" le
-g&eacute;nitif.
+génitif.
 
-=== Entr&eacute;e des donn&eacute;es ===
+=== Entrée des données ===
 
-Dans le lexique de la langue et dans les donn&eacute;es, les cas sont
-indiqu&eacute;s par une lettre entour&eacute;e de deux
+Dans le lexique de la langue et dans les données, les cas sont
+indiqués par une lettre entourée de deux
 <code>":"</code>.
 
 <p>
 
-Ainsi en tch&egrave;que, l'accusatif et le g&eacute;nitif sont
-repr&eacute;sent&eacute;s respectivement par:
+Ainsi en tchèque, l'accusatif et le génitif sont
+représentés respectivement par:
 
 <pre>
    :a:
@@ -1560,8 +1560,8 @@ repr&eacute;sent&eacute;s respectivement par:
 
 <p>
 
-Dans un formulaire de mise &agrave; jour, pour entrer un pr&eacute;nom
-ou un patronyme avec ses d&eacute;clinaisons, il faut donner le
+Dans un formulaire de mise à jour, pour entrer un prénom
+ou un patronyme avec ses déclinaisons, il faut donner le
 nominatif suivi du code et la forme de chaque cas. Par exemple, pour
 notre "Vladana":
 
@@ -1573,13 +1573,13 @@ Il existe deux racourcis possibles:
 
 <ul>
 
-<li> Une forme commen&ccedil;ant par '+' indique qu'il faut partir du
-nominatif: ainsi "Adler:g:+a" veut dire que le g&eacute;nitif de
+<li> Une forme commençant par '+' indique qu'il faut partir du
+nominatif: ainsi "Adler:g:+a" veut dire que le génitif de
 "Adler" est "Adlera".
 
-<li> Une forme commen&ccedil;ant par '-' indique aussi qu'il faut partir
-du nominatif, mais y enlever la derni&egrave;re lettre ('--' pour les
-deux derni&egrave;res lettres, etc.).
+<li> Une forme commençant par '-' indique aussi qu'il faut partir
+du nominatif, mais y enlever la dernière lettre ('--' pour les
+deux dernières lettres, etc.).
 
 </ul>
 
@@ -1591,27 +1591,27 @@ La forme avec '-' peut s'utiliser pour "Vladana":
 
 === Affichage, documentation ===
 
-&Agrave; l'affichage, seul le nominatif est habituellement
-visible. Les autres formes ne seront utilis&eacute;es que si les
+À l'affichage, seul le nominatif est habituellement
+visible. Les autres formes ne seront utilisées que si les
 expressions de la langue les demandent.
 
 <p>
 
-Dans la navigation avec une langue sans d&eacute;clinaisons, le
-nominatif sera syst&eacute;matiquement utilis&eacute;.
+Dans la navigation avec une langue sans déclinaisons, le
+nominatif sera systématiquement utilisé.
 
 <p>
 
-La forme compl&egrave;te (avec la description compl&egrave;te des
-formes) n'apparait que dans les formulaires de mise-&agrave;-jour.
+La forme complète (avec la description complète des
+formes) n'apparait que dans les formulaires de mise-à-jour.
 
 <p>
 
-Il n'y a pas de documentation sur les diff&eacute;rents cas
-utilis&eacute;s car cela d&eacute;pend de la langue. Le mieux, c'est
-de regarder dans le lexique. Celui-ci peut se consulter &agrave;
+Il n'y a pas de documentation sur les différents cas
+utilisés car cela dépend de la langue. Le mieux, c'est
+de regarder dans le lexique. Celui-ci peut se consulter à
 partir de la page d'accueil en cliquant sur "lexique" en bas de
-page. Regardez les expressions correspondant &agrave; votre langue.
+page. Regardez les expressions correspondant à votre langue.
 
 <p>
 <hr>
