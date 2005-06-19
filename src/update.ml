@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.41 2005-05-09 04:43:42 ddr Exp $ *)
+(* $Id: update.ml,v 4.42 2005-06-19 04:46:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -381,7 +381,7 @@ value error_locked conf =
   }
 ;
 
-value error_digest conf base =
+value error_digest conf =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;

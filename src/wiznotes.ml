@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.20 2005-01-04 12:45:41 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.21 2005-06-19 04:46:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -305,7 +305,7 @@ value print_wizard_mod conf base wizfile wz nn =
     else ();
     print_main conf base wizfile
   }
-  else try Update.error_digest conf base with [ Update.ModErr -> () ]
+  else try Update.error_digest conf with [ Update.ModErr -> () ]
 ;
 
 value print conf base =

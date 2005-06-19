@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.17 2005-06-03 12:17:55 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.18 2005-06-19 04:46:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -64,7 +64,7 @@ value digest_children base ipl =
 value check_digest conf base digest =
   match p_getenv conf.env "digest" with
   [ Some ini_digest ->
-      if digest <> ini_digest then Update.error_digest conf base else ()
+      if digest <> ini_digest then Update.error_digest conf else ()
   | None -> () ]
 ;
 

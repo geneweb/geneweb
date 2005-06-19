@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.9 2005-06-18 21:15:36 ddr Exp $ *)
+(* $Id: doc.ml,v 4.10 2005-06-19 04:46:59 ddr Exp $ *)
 
 open Config;
 
@@ -227,10 +227,10 @@ value print_ast conf env =
   | ast -> Wserver.wprint " %s" (not_impl "print_ast" ast) ]
 ;
 
-value print_whole_wdoc conf f title s =
+value print_whole_wdoc conf fdoc title s =
   let s = Util.string_with_macros conf True [] s in
   let s = "<br /><br />\n" ^ s in
-  let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path f s in
+  let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path fdoc s in
   let fname =
     let f = Filename.concat "wdoc" "wdoc.txt" in
     Util.search_in_doc_path f
@@ -242,7 +242,7 @@ value print_whole_wdoc conf f title s =
         close_in ic;
         Util.html conf;
         Util.nl ();
-        let env = [("title", title); ("doc", s); ("page", f)] in
+        let env = [("title", title); ("doc", s); ("page", fdoc)] in
         List.iter (print_ast conf env) astl;
       }
   | None ->
@@ -257,27 +257,30 @@ value print_whole_wdoc conf f title s =
       } ]
 ;
 
-value print_part_wdoc conf f title s cnt0 =
+value print_part_wdoc conf fdoc title s cnt0 =
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
     let lines = List.rev (Notes.rev_extract_sub_part s cnt0) in
-    Notes.print_sub_part conf "WDOC" wdoc_file_path f cnt0 lines;
+    let lines =
+      if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
+    in
+    Notes.print_sub_part conf "WDOC" wdoc_file_path fdoc cnt0 lines;
     Util.trailer conf;
   }
 ;
 
 value print_wdoc conf =
   let conf = {(conf) with cancel_links = True} in
-  let f =
+  let fdoc =
     match Util.p_getenv conf.env "f" with
     [ Some f -> f
     | None -> "" ]
   in
-  let f = if f = "" then "index" else f in
-  let (title, s) = read_wdoc conf f in
+  let fdoc = if fdoc = "" then "index" else fdoc in
+  let (title, s) = read_wdoc conf fdoc in
   match Util.p_getint conf.env "v" with
-  [ Some cnt0 -> print_part_wdoc conf f title s cnt0
-  | None -> print_whole_wdoc conf f title s ]
+  [ Some cnt0 -> print_part_wdoc conf fdoc title s cnt0
+  | None -> print_whole_wdoc conf fdoc title s ]
 ;
 
 value print_mod_wdoc conf =
@@ -295,10 +298,70 @@ value print_mod_wdoc conf =
   Notes.print_mod_page conf "WDOC" fname title (ntitle ^ "\n" ^ s)
 ;
 
-value print_mod_wdoc_ok conf =
-  let title _ = Wserver.wprint "not implemented" in
+value print_ok conf fdoc s =
+  let title _ =
+    Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
+  in
   do {
-    Util.header conf title;
-    Util.trailer conf;
+    Util.header_no_page_title conf title;
+    tag "div" "style=\"text-align:center\"" begin
+      Wserver.wprint "--- ";
+      title ();
+      Wserver.wprint " ---\n";
+    end;
+    let get_v = Util.p_getint conf.env "v" in
+    let (has_v, v) =
+      match get_v with
+      [ Some v -> (True, v)
+      | None -> (False, 0) ]
+    in
+    if has_v then
+      let lines = Notes.lines_list_of_string s in
+      let lines =
+        match lines with
+        [ [title :: lines] when v = 0 -> [title; "<br /><br />" :: lines]
+        | l -> l ]
+      in
+      Notes.print_sub_part conf "WDOC" wdoc_file_path fdoc v lines
+    else
+      let sfn = if fdoc = "" then "" else ";f=" ^ fdoc in
+      Wserver.wprint "<a href=\"%sm=WDOC%s\">%s</a>\n" (Util.commd conf) sfn
+        (Util.capitale (Util.transl_nth conf "note/notes" 1));
+    Util.trailer conf
   }
+;
+
+value print_mod_wdoc_ok conf =
+   let sub_part =
+    match Util.p_getenv conf.env "notes" with
+    [ Some v -> Gutil.strip_all_trailing_spaces v
+    | None -> failwith "notes unbound" ]
+  in
+  let digest =
+    match Util.p_getenv conf.env "digest" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  let fdoc =
+    match Util.p_getenv conf.env "f" with
+    [ Some f -> if Notes.check_file_name f then f else ""
+    | None -> "" ]
+  in
+  let old_doc =
+    let (t, s) = read_wdoc conf fdoc in
+    t ^ "\n" ^ s
+  in
+  try
+    if digest <> Iovalue.digest old_doc then Update.error_digest conf
+    else
+      let s =
+        match Util.p_getint conf.env "v" with
+        [ Some v -> Notes.insert_sub_part old_doc v sub_part
+        | None -> sub_part ]
+      in
+      do {
+        print_ok conf fdoc sub_part
+      }
+  with
+  [ Update.ModErr -> () ]
 ;
