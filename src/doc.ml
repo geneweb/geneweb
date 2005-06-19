@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.10 2005-06-19 04:46:59 ddr Exp $ *)
+(* $Id: doc.ml,v 4.11 2005-06-19 08:57:09 ddr Exp $ *)
 
 open Config;
 
@@ -164,10 +164,8 @@ value print conf =
 open TemplAst;
 
 value wdoc_file_path conf fname =
-  let fname =
-    List.fold_right Filename.concat ["wdoc"; conf.lang] (fname ^ ".txt")
-  in
-  Util.search_in_doc_path fname
+  let dir = Util.search_in_doc_path "wdoc" in
+  List.fold_right Filename.concat [dir; conf.lang] (fname ^ ".txt")
 ;
 
 value read_wdoc conf fname =
@@ -331,6 +329,21 @@ value print_ok conf fdoc s =
   }
 ;
 
+value commit_wdoc conf fdoc s =
+  let fname = wdoc_file_path conf fdoc in
+  do {
+    try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+    try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+    if s = "" then ()
+    else do {
+      let oc = Secure.open_out fname in
+      output_string oc s;
+      output_char oc '\n';
+      close_out oc;
+    }
+  }
+;
+
 value print_mod_wdoc_ok conf =
    let sub_part =
     match Util.p_getenv conf.env "notes" with
@@ -360,6 +373,7 @@ value print_mod_wdoc_ok conf =
         | None -> sub_part ]
       in
       do {
+        commit_wdoc conf fdoc s;
         print_ok conf fdoc sub_part
       }
   with
