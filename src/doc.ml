@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.11 2005-06-19 08:57:09 ddr Exp $ *)
+(* $Id: doc.ml,v 4.12 2005-06-20 03:14:29 ddr Exp $ *)
 
 open Config;
 
@@ -357,8 +357,8 @@ value print_mod_wdoc_ok conf =
   in
   let fdoc =
     match Util.p_getenv conf.env "f" with
-    [ Some f -> if Notes.check_file_name f then f else ""
-    | None -> "" ]
+    [ Some f -> if Notes.check_file_name f then f else "index"
+    | None -> "index" ]
   in
   let old_doc =
     let (t, s) = read_wdoc conf fdoc in
