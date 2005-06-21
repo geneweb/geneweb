@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.13 2005-06-21 02:53:40 ddr Exp $ *)
+(* $Id: doc.ml,v 4.14 2005-06-21 12:58:06 ddr Exp $ *)
 
 open Config;
 
@@ -172,7 +172,7 @@ value read_wdoc conf fname =
   let fname = wdoc_file_path conf fname in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let title = input_line ic in
+      let title = try input_line ic with [ End_of_file -> "" ] in
       let s =
         let len = ref 0 in
         do {
@@ -288,16 +288,16 @@ value print_mod_wdoc conf =
     [ Some f -> if Notes.check_file_name f then f else ""
     | None -> "" ]
   in
+  let fname = if fname = "" then "index" else fname in
   let cnt =
     match Util.p_getenv conf.env "v" with
     [ Some cnt -> cnt
     | None -> "" ]
   in
   let title _ =
-    Wserver.wprint "%s - %s"
+    Wserver.wprint "%s - (%s)"
       (Util.capitale (Util.transl_decline conf "modify" ""))
-      (if fname = "" then ""
-       else " (" ^ fname ^ (if cnt = "" then "" else " #" ^ cnt) ^ ")")
+      (fname ^ (if cnt = "" then "" else " #" ^ cnt))
   in
   let (ntitle, s) = read_wdoc conf fname in
   Notes.print_mod_page conf "WDOC" fname title (ntitle ^ "\n" ^ s)
