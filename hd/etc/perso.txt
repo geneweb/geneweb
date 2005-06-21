@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.48 2005-06-21 20:08:26 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.49 2005-06-21 20:08:52 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -25,7 +25,7 @@
 %message_to_wizard;
 
 %if;(is_male or is_female or
-     bvar.show_invisible = "on and wizard and is_invisible)
+     bvar.show_invisible = "on" and wizard and is_invisible)
   <div style="float:%left;">%nn;
   %if;is_male;
     <img src="%image_prefix;/male.png"%wid_hei;male.png; alt="[M/F]0"%/>%nn;

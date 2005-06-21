@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.153 2005-06-18 15:34:25 ddr Exp $ *)
+(* $Id: perso.ml,v 4.154 2005-06-21 20:08:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1655,6 +1655,9 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       [ Vdmark r -> r.val.(Adef.int_of_iper p.cle_index)
       | _ -> raise Not_found ]
   | "is_female" -> p.sex = Female
+  | "is_invisible" ->
+      let conf = {(conf) with wizard = False; friend = False} in
+      not (authorized_age conf base p)
   | "is_male" -> p.sex = Male
   | "is_private" -> p.access = Private
   | "is_public" -> p.access = Public
