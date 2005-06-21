@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.64 2005-06-21 12:58:06 ddr Exp $ *)
+(* $Id: notes.ml,v 4.65 2005-06-21 19:29:07 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -421,10 +421,7 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   else s
 ;
 
-value print_sub_part conf mode file_path sub_fname cnt0 lines =
-  let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines in
-  let s = syntax_links conf mode file_path (String.concat "\n" lines) in
-  let s = string_with_macros conf False [] s in
+value print_sub_part conf mode sub_fname cnt0 s =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let s =
     if cnt0 < first_cnt && conf.wizard then
@@ -452,7 +449,7 @@ value print_sub_part conf mode file_path sub_fname cnt0 lines =
         Wserver.wprint "\n";
       }
       else ();
-      if lines <> [] then do {
+      if s <> "" then do {
         stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 + 1) sfn begin
           Wserver.wprint "&gt;&gt;";
         end;
@@ -462,6 +459,14 @@ value print_sub_part conf mode file_path sub_fname cnt0 lines =
     end;
     Wserver.wprint "%s\n" s
   }
+;
+
+value print_notes_sub_part conf sub_fname cnt0 lines =
+  let mode = "NOTES" in
+  let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines in
+  let s = syntax_links conf mode file_path (String.concat "\n" lines) in
+  let s = string_with_macros conf False [] s in
+  print_sub_part conf mode sub_fname cnt0 s
 ;
 
 value read_notes base fnotes = base.data.bnotes.nread fnotes RnAll;
@@ -484,7 +489,7 @@ value print conf base =
     match p_getint conf.env "v" with
     [ Some cnt0 ->
         let lines = List.rev (rev_extract_sub_part s cnt0) in
-        print_sub_part conf "NOTES" file_path fnotes cnt0 lines
+        print_notes_sub_part conf fnotes cnt0 lines
     | None ->
         let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         let s = string_with_macros conf False [] s in
@@ -590,8 +595,7 @@ value print_ok conf base fnotes s =
       | None -> (False, 0) ]
     in
     History.record_notes conf base (get_v, fnotes) "mn";
-    if has_v then
-      print_sub_part conf "NOTES" file_path fnotes v (lines_list_of_string s)
+    if has_v then print_notes_sub_part conf fnotes v (lines_list_of_string s)
     else
       let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in
       Wserver.wprint "<a href=\"%sm=NOTES%s\">%s</a>\n" (commd conf) sfn
