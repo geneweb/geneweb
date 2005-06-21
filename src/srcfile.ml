@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.35 2005-06-18 15:34:25 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.36 2005-06-21 09:27:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -248,7 +248,7 @@ value macro conf base =
       let len = String.length s in
       if len > 9 && String.sub s 0 5 = "<!-- " &&
          String.sub s (len - 4) 4 = " -->"
-      then String.sub s 5 (String.length s - 9)
+      then " : " ^ String.sub s 5 (String.length s - 9)
       else ""
   | 'o' -> image_prefix conf
   | 'q' ->

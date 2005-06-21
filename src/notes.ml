@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.62 2005-06-20 03:14:29 ddr Exp $ *)
+(* $Id: notes.ml,v 4.63 2005-06-21 09:27:22 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -557,8 +557,8 @@ value print_mod_page conf mode fname title s =
 value print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_file_name f then f else "index"
-    | None -> "index" ]
+    [ Some f -> if check_file_name f then f else ""
+    | None -> "" ]
   in
   let title _ =
     let s = transl_nth conf "note/notes" 1 in
