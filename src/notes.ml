@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.63 2005-06-21 09:27:22 ddr Exp $ *)
+(* $Id: notes.ml,v 4.64 2005-06-21 12:58:06 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -113,14 +113,16 @@ value ext_file_link s i =
   in
   if j > i + 6 then
     let b = String.sub s (i + 3) (j - i - 6) in
-    let (fname, text) =
+    let (fname, sname, text) =
       try
         let k = String.index b '/' in
-        (String.sub b 0 k, String.sub b (k + 1) (String.length b - k - 1))
+        let j = try String.index b '#' with [ Not_found -> k ] in
+        (String.sub b 0 j, String.sub b j (k - j),
+         String.sub b (k + 1) (String.length b - k - 1))
       with
-      [ Not_found -> (b, b) ]
+      [ Not_found -> (b, "", b) ]
     in
-    if check_file_name fname then Some (j, fname, text)
+    if check_file_name fname then Some (j, fname, sname, text)
     else None
   else None
 ;
@@ -146,14 +148,14 @@ value syntax_links conf mode file_path s =
       loop j (Buff.mstore len (sprintf "<span class=\"highlight\">%s</span>" b))
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match ext_file_link s i with
-      [ Some (j, fname, text) ->
+      [ Some (j, fname, sname, text) ->
           let c =
             let f = file_path conf fname in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
-            sprintf "<a href=\"%sm=%s;f=%s\"%s>%s</a>"
-              (commd conf) mode fname c text
+            sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
+              (commd conf) mode fname sname c text
           in
           loop j (Buff.mstore len t)
       | None -> loop (i + 3) (Buff.mstore len "[[[") ]
@@ -607,7 +609,7 @@ value update_notes_links_db conf base fnotes s =
       if i = slen then list
       else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
         match ext_file_link s i with
-        [ Some (j, lfname, _) -> loop [lfname :: list] j
+        [ Some (j, lfname, _, _) -> loop [lfname :: list] j
         | None -> loop list (i + 3) ]
       else loop list (i + 1)
   in
