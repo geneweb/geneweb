@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.14 2005-06-21 12:58:06 ddr Exp $ *)
+(* $Id: doc.ml,v 4.15 2005-06-21 19:29:07 ddr Exp $ *)
 
 open Config;
 
@@ -226,7 +226,7 @@ value print_ast conf env =
 ;
 
 value print_whole_wdoc conf fdoc title s =
-  let s = Util.string_with_macros conf True [] s in
+  let s = Util.filter_html_tags True s in
   let s = "<br /><br />\n" ^ s in
   let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path fdoc s in
   let fname =
@@ -255,6 +255,15 @@ value print_whole_wdoc conf fdoc title s =
       } ]
 ;
 
+value print_wdoc_sub_part conf sub_fname cnt0 lines =
+  let mode = "WDOC" in
+  let file_path = wdoc_file_path in
+  let lines = Notes.html_of_tlsw_lines conf mode sub_fname cnt0 True lines in
+  let s = Notes.syntax_links conf mode file_path (String.concat "\n" lines) in
+  let s = Util.filter_html_tags True s in
+  Notes.print_sub_part conf mode sub_fname cnt0 s
+;
+
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
@@ -262,7 +271,7 @@ value print_part_wdoc conf fdoc title s cnt0 =
     let lines =
       if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
     in
-    Notes.print_sub_part conf "WDOC" wdoc_file_path fdoc cnt0 lines;
+    print_wdoc_sub_part conf fdoc cnt0 lines;
     Util.trailer conf;
   }
 ;
@@ -327,7 +336,7 @@ value print_ok conf fdoc s =
         [ [title :: lines] when v = 0 -> [title; "<br /><br />" :: lines]
         | l -> l ]
       in
-      Notes.print_sub_part conf "WDOC" wdoc_file_path fdoc v lines
+      print_wdoc_sub_part conf fdoc v lines
     else
       let sfn = if fdoc = "" then "" else ";f=" ^ fdoc in
       Wserver.wprint "<a href=\"%sm=WDOC%s\">%s</a>\n" (Util.commd conf) sfn

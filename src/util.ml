@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.140 2005-06-20 03:14:29 ddr Exp $ *)
+(* $Id: util.ml,v 4.141 2005-06-21 19:29:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1312,8 +1312,8 @@ value tag_id s i =
 
 value good_tags_list =
   ["a"; "b"; "br"; "center"; "dd"; "div"; "dl"; "dt"; "em"; "font"; "hr";
-   "h1"; "h2"; "h3"; "h4"; "i"; "img"; "li"; "ol"; "p"; "pre"; "span";
-   "strong"; "sup"; "table"; "td"; "tr"; "tt"; "u"; "ul"]
+   "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "i"; "img"; "li"; "ol"; "p"; "pre";
+   "span"; "strong"; "sup"; "table"; "td"; "tr"; "tt"; "u"; "ul"]
 ;
 value bad_tags_list =
   ["applet"; "embed"; "form"; "input"; "object"; "script"]
@@ -1358,7 +1358,16 @@ value string_with_macros conf positive_filtering env s =
   let buff = Buffer.create 1000 in
   loop Out 0 where rec loop tt i =
     if i < String.length s then
-      if i + 1 < String.length s && s.[i] = '%' then
+      if s.[i] = '<' &&
+        (positive_filtering && not (good_tag s (i + 1)) ||
+         not positive_filtering && bad_tag s (i + 1))
+      then do {
+        Buffer.add_string buff "&lt;"; loop tt (i + 1)
+      }
+      else if s.[i] = '<' && i + 1 < String.length s && s.[i+1] = '%' then do {
+        Buffer.add_string buff "&lt;"; loop tt (i + 1)
+      }
+      else if i + 1 < String.length s && s.[i] = '%' then
         let i =
           try
             do { Buffer.add_string buff (List.assoc s.[i + 1] env ()); i + 2 }
@@ -1385,15 +1394,6 @@ value string_with_macros conf positive_filtering env s =
               | _ -> do { Buffer.add_string buff "%"; i + 1 } ] ]
         in
         loop tt i
-      else if s.[i] = '<' && i + 1 < String.length s && s.[i+1] = '%' then do {
-        Buffer.add_string buff "<"; loop tt (i + 1)
-      }
-      else if s.[i] = '<' &&
-        (positive_filtering && not (good_tag s (i + 1)) ||
-         not positive_filtering && bad_tag s (i + 1))
-      then do {
-        Buffer.add_string buff "&lt;"; loop tt (i + 1)
-      }
       else
         match tt with
         [ In_a_href ->
@@ -1428,6 +1428,19 @@ value string_with_macros conf positive_filtering env s =
                     in
                     do { Buffer.add_char buff s.[i]; loop tt (i + 1) } ] ] ]
     else Buffer.contents buff
+;
+
+module Lbuff = Buff.Make (struct value buff = ref (String.create 80); end);
+
+value filter_html_tags positive_filtering s =
+  loop 0 0 where rec loop len i =
+    if i < String.length s then
+      if s.[i] = '<' &&
+        (positive_filtering && not (good_tag s (i + 1)) ||
+         not positive_filtering && bad_tag s (i + 1))
+      then loop (Lbuff.mstore len "&lt;") (i + 1)
+      else loop (Lbuff.store len s.[i]) (i + 1)
+    else Lbuff.get len
 ;
 
 value setup_link conf =
