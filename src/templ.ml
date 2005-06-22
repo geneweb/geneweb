@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.66 2005-06-18 15:34:25 ddr Exp $ *)
+(* $Id: templ.ml,v 4.67 2005-06-22 11:37:44 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -281,9 +281,15 @@ value parse_char_stream p strm =
 ;
 
 value parse_char_stream_semi p strm =
+  let opt_semi = Stream.peek strm <> Some '(' in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
   let r = p (Stream.from f) in
-  do { match strm with parser [ [: `';' :] -> () | [: :] -> () ]; r }
+  do {
+    if opt_semi then
+      match strm with parser [ [: `';' :] -> () | [: :] -> () ]
+    else ();
+    r
+  }
 ;
 
 value parse_formal_params strm =

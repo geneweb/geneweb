@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.15 2005-06-21 19:29:07 ddr Exp $ *)
+(* $Id: doc.ml,v 4.16 2005-06-22 11:37:44 ddr Exp $ *)
 
 open Config;
 
@@ -203,26 +203,52 @@ value not_impl func x =
 
 value no_lang conf = {(conf) with henv = List.remove_assoc "lang" conf.henv};
 
-value print_var conf env loc =
+value eval_var conf env loc =
   fun
-  [ ["copyright"] -> Util.print_copyright conf
-  | ["doctype"] -> Wserver.wprint "%s\n" (Util.doctype conf)
-  | ["prefix_no_lang"] -> Wserver.wprint "%s" (Util.commd (no_lang conf))
-  | ["/"] -> Wserver.wprint "%s" conf.xhs
-  | [s] -> Wserver.wprint "%s" (List.assoc s env)
+  [ ["doctype"] -> Util.doctype conf ^ "\n"
+  | ["prefix_no_lang"] -> Util.commd (no_lang conf)
+  | ["/"] -> conf.xhs
+  | [s] -> List.assoc s env
   | _ -> raise Not_found ]
 ;
 
-value print_var_handled conf env loc sl =
-  try print_var conf env loc sl with
-  [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ]
+value eval_var_handled conf env loc sl =
+  try eval_var conf env loc sl with
+  [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
-value print_ast conf env =
+value eval_bool_ast conf env a =
+  let eval_var loc sl  = VVstring (eval_var conf env loc sl) in
+  let eval_apply _ = raise Not_found in
+  Templ.eval_bool_expr conf (eval_var, eval_apply) a
+;
+
+value eval_ast conf env =
   fun
-  [ Atext s -> Wserver.wprint "%s" s
-  | Avar loc s sl -> print_var_handled conf env loc [s :: sl]
-  | ast -> Wserver.wprint " %s" (not_impl "print_ast" ast) ]
+  [ Atext s -> s
+  | Avar loc s sl -> eval_var_handled conf env loc [s :: sl]
+  | ast -> not_impl "eval_ast" ast ]
+;
+
+value print_var conf env loc =
+  fun
+  [ ["copyright"] -> Util.print_copyright conf
+  | sl -> Wserver.wprint "%s" (eval_var_handled conf env loc sl) ]
+;
+
+value rec print_ast conf env =
+  fun
+  [ Avar loc s sl -> print_var conf env loc [s :: sl]
+  | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
+  | ast -> Wserver.wprint "%s" (eval_ast conf env ast) ]
+and print_ast_list conf env al =
+  List.iter (print_ast conf env) al
+and print_if conf env a1 a2 a3 =
+  let test =
+    try eval_bool_ast conf env a1 with
+    [ Failure x -> do { Wserver.wprint "%s" x; False } ]
+  in
+  print_ast_list conf env (if test then a2 else a3)
 ;
 
 value print_whole_wdoc conf fdoc title s =
@@ -276,18 +302,46 @@ value print_part_wdoc conf fdoc title s cnt0 =
   }
 ;
 
+value print_wdoc_dir conf =
+  let dname =
+    let dir = Util.search_in_doc_path "wdoc" in
+    Filename.concat dir conf.lang
+  in
+  let files = try Sys.readdir dname with [ Sys_error _ -> [| |] ] in
+  let () = Array.sort compare files in
+  let s =
+    loop 0 0 where rec loop len i =
+      if i = Array.length files then Buff.get len
+      else
+        let f = files.(i) in
+        if Filename.check_suffix f ".txt" then
+          let f = Filename.chop_suffix f ".txt" in
+          let s =
+            Printf.sprintf "<li><a href=\"%sm=WDOC;f=%s\">%s</a></li>\n"
+              (Util.commd conf) f f
+          in
+          loop (Buff.mstore len s) (i + 1)
+        else loop len (i + 1)
+  in
+  let s = if s = "" then s else "<ul>\n" ^ s ^ "</ul>" in
+  print_whole_wdoc conf "" conf.lang s
+;
+
 value print_wdoc conf =
   let conf = {(conf) with cancel_links = True} in
-  let fdoc =
+  let fdocp =
     match Util.p_getenv conf.env "f" with
     [ Some f -> f
     | None -> "" ]
   in
-  let fdoc = if fdoc = "" then "index" else fdoc in
+  let fdoc = if fdocp = "" then "index" else fdocp in
   let (title, s) = read_wdoc conf fdoc in
-  match Util.p_getint conf.env "v" with
-  [ Some cnt0 -> print_part_wdoc conf fdoc title s cnt0
-  | None -> print_whole_wdoc conf fdoc title s ]
+  if s = "" && fdocp = "" then
+    print_wdoc_dir conf
+  else
+    match Util.p_getint conf.env "v" with
+    [ Some cnt0 -> print_part_wdoc conf fdoc title s cnt0
+    | None -> print_whole_wdoc conf fdoc title s ]
 ;
 
 value print_mod_wdoc conf =

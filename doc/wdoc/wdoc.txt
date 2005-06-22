@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: wdoc.txt,v 1.2 2005-06-18 20:56:58 ddr Exp $ -->
+  <!-- $Id: wdoc.txt,v 1.3 2005-06-22 11:37:44 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%title;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -22,22 +22,22 @@ src="../images/gwlogo.png" align="left" border="0" alt="GeneWeb"></a>
 </td>
 <td align="right" valign="top">
 
-<a href="%prefix_no_lang;m=WDOC;lang=de;f=%page"><img
+<a href="%prefix_no_lang;m=WDOC;lang=de%if;(page != "");f=%page;%end;"><img
 src="images/l-de.jpg" alt="de" width="24" height="15" title="de"
 style="border:0"%/></a>
-<a href="%prefix_no_lang;m=WDOC;lang=en;f=%page;"><img
+<a href="%prefix_no_lang;m=WDOC;lang=en%if;(page != "");f=%page;%end;"><img
 src="images/l-en.jpg" alt="en" width="24" height="15" title="en"
 style="border:0"%/></a>
-<a href="%prefix_no_lang;m=WDOC;lang=fr;f=%page;"><img
+<a href="%prefix_no_lang;m=WDOC;lang=fr%if;(page != "");f=%page;%end;"><img
 src="images/l-fr.jpg" alt="fr" width="24" height="15" title="fr"
 style="border:0"%/></a>
-<a href="%prefix_no_lang;m=WDOC;lang=it;f=%page;"><img
+<a href="%prefix_no_lang;m=WDOC;lang=it%if;(page != "");f=%page;%end;"><img
 src="images/l-it.jpg" alt="it" width="24" height="15" title="it"
 style="border:0"%/></a>
-<a href="%prefix_no_lang;m=WDOC;lang=nl;f=%page;"><img
+<a href="%prefix_no_lang;m=WDOC;lang=nl%if;(page != "");f=%page;%end;"><img
 src="images/l-nl.jpg" alt="nl" width="24" height="15" title="nl"
 style="border:0"%/></a>
-<a href="%prefix_no_lang;m=WDOC;lang=sv;f=%page;"><img
+<a href="%prefix_no_lang;m=WDOC;lang=sv%if;(page != "");f=%page;%end;"><img
 src="images/l-sv.jpg" alt="sv" width="24" height="15" title="sv"
 style="border:0"%/></a>
 
