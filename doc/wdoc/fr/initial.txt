@@ -4,11 +4,12 @@ Vous avez deux façons de démarrer avec {GeneWeb}:
 
 <ul>
 
-<li> Vous pouvez utiliser le programme [[[gwsetup]]]. Dans ce cas, il
-vous suffit de lancer ce programme (si votre installation ne l'a pas
-déjà lancé automatiquement), puis d'ouvrir à l'adresse Web (locale)
-qu'il propose et vous suivez les instructions. L'utilisation est très
-simple et est donc préconisée aux débutants.
+<li> Vous pouvez utiliser le programme <a href="gwsetup.htm"><b>gwsetup</b></a>. Dans ce cas, il vous suffit de
+lancer ce programme (si votre installation ne l'a pas
+déjà lancé automatiquement), puis d'ouvrir
+à l'adresse Web (locale) qu'il propose et vous suivez les
+instructions. L'utilisation est très simple et est donc
+préconisée aux débutants.
 
 </ul>
 
@@ -17,16 +18,17 @@ simple et est donc préconisée aux débutants.
 <ul>
 
 <li> Sinon, si vous vous y connaissez, vous pouvez utiliser des
-commandes dans une fenêtre intéractive. Cette utilisation vous permet
-d'accéder à tous les détails des différentes commandes et de
-comprendre ce qui se passe, mais n'est pas recommandée si vous n'êtes
-pas spécialiste de ce genre d'approche. Cliquez [[[start/ici]]] pour
-démarrer par cette méthode.
+commandes dans une fenêtre intéractive. Cette utilisation
+vous permet d'accéder à tous les détails des
+différentes commandes et de comprendre ce qui se passe, mais
+n'est pas recommandée si vous n'êtes pas
+spécialiste de ce genre d'approche. Cliquez [[[start/ici]]] pour démarrer par cette
+méthode.
 
 </ul>
 
 <p>
-<hr>
-<br>
 
-<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
+<br>
+<center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
+

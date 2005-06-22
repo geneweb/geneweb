@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.67 2005-06-22 13:42:51 ddr Exp $ *)
+(* $Id: notes.ml,v 4.68 2005-06-22 23:06:33 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -281,10 +281,10 @@ value extract_sub_part s v =
 ;
 
 value summary_of_tlsw_lines conf lines =
-  let (rev_summary, lev, _, cnt) =
+  let (rev_summary, lev, _, cnt, rev_sections_nums) =
     let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
-      (fun (summary, lev, indent_stack, cnt) s ->
+      (fun (summary, lev, indent_stack, cnt, sections_nums) s ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
@@ -320,20 +320,22 @@ value summary_of_tlsw_lines conf lines =
                   (summary, lev, stack) ]
           in
           let summary = [tab lev "<li>" :: summary] in
-          let s =
+          let section_num =
             let nums = List.map fst stack in
-            sprintf "<a href=\"#a_%d\">%s %s</a>"
-              cnt (String.concat "." (List.rev_map string_of_int nums))
+            String.concat "." (List.rev_map string_of_int nums)
+          in
+          let s =
+            sprintf "<a href=\"#a_%d\">%s - %s</a>" cnt section_num
               (String.sub s slev (len - 2 * slev))
           in
           let summary = [tab (lev + 1) s :: summary] in
-          (summary, lev + 1, stack, cnt + 1)
-        else (summary, lev, indent_stack, cnt))
-      ([], 0, [], first_cnt) lines
+          (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
+        else (summary, lev, indent_stack, cnt, sections_nums))
+      ([], 0, [], first_cnt, []) lines
   in
   if cnt <= first_cnt + 1 then
     (* less that 2 paragraphs : summary abandonned *)
-    []
+    ([], [])
   else
     let rev_summary =
       loop lev rev_summary where rec loop lev summary =
@@ -343,29 +345,38 @@ value summary_of_tlsw_lines conf lines =
           loop (lev - 1) summary
         else summary
     in
-    ["<dl><dd>";
-     "<table border=\"1\"><tr><td>";
-     "<table width=\"100%\" border=\"0\"><tr>";
-     "<td align=\"center\" colspan=\"2\"><b>" ^
-        capitale (transl conf "summary") ^ "</b></td>";
-     "</tr><tr><td>" ::
-     List.rev_append rev_summary
-       ["</td><td>";
-        "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
-        "</td></tr></table>"; "</td></tr></table>";
-        "</dd></dl>"]]
+    let lines =
+      ["<dl><dd>";
+       "<table border=\"1\"><tr><td>";
+       "<table width=\"100%\" border=\"0\"><tr>";
+       "<td align=\"center\" colspan=\"2\"><b>" ^
+          capitale (transl conf "summary") ^ "</b></td>";
+       "</tr><tr><td>" ::
+       List.rev_append rev_summary
+         ["</td><td>";
+          "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
+          "</td></tr></table>"; "</td></tr></table>";
+          "</dd></dl>"]]
+    in
+    (lines, List.rev rev_sections_nums)
 ;
 
-value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines =
+value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
+    sections_nums =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
-  let (rev_lines, _) =
+  let (rev_lines, _, _) =
     List.fold_left
-      (fun (lines, cnt) s ->
+      (fun (lines, cnt, sections_nums) s ->
          let len = String.length s in
          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
            let lev = section_level s len in
+           let (section_num, sections_nums) =
+             match sections_nums with
+             [ [a :: l] -> (a ^ " - ", l)
+             | [] -> ("", []) ]
+           in
            let s =
-             sprintf "<h%d>%s%s</h%d>" lev
+             sprintf "<h%d>%s%s%s</h%d>" lev section_num
                (String.sub s lev (len-2*lev))
                (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
            in
@@ -381,17 +392,17 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines =
              let n2 =
                sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
              in
-             ([s; n1; n2 :: lines], cnt + 1)
-           else ([s :: lines], cnt + 1)
-         else ([s :: lines], cnt))
-      ([], max cnt0 first_cnt) lines
+             ([s; n1; n2 :: lines], cnt + 1, sections_nums)
+           else ([s :: lines], cnt + 1, sections_nums)
+         else ([s :: lines], cnt, sections_nums))
+      ([], max cnt0 first_cnt, sections_nums) lines
   in
   rev_syntax_lists conf [] rev_lines
 ;
 
 value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   let lines = lines_list_of_string s in
-  let summary = summary_of_tlsw_lines conf lines in
+  let (summary, sections_nums) = summary_of_tlsw_lines conf lines in
   let (rev_lines_before_summary, lines) =
     loop [] lines where rec loop lines_bef =
       fun
@@ -404,7 +415,7 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
     rev_syntax_lists conf [] rev_lines_before_summary
   in
   let lines_after_summary =
-    html_of_tlsw_lines conf mode sub_fname first_cnt True lines
+    html_of_tlsw_lines conf mode sub_fname first_cnt True lines sections_nums
   in
   let s =
     syntax_links conf mode file_path
@@ -463,7 +474,7 @@ value print_sub_part conf mode sub_fname cnt0 s =
 
 value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
-  let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines in
+  let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
   let s = syntax_links conf mode file_path (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   print_sub_part conf mode sub_fname cnt0 s

@@ -1,22 +1,23 @@
 GeneWeb - Serveur ou CGI
 
-<b>Gwd</b>, quand il est lancé, est un serveur. En principe, la
-troisième adresse: "http://ordinateur:2317/base" est celle à utiliser
-pour les gens de l'extérieur.
+<b><b>Gwd</b></b>, quand il est lancé, est un serveur. En principe, la
+troisième adresse: "http://ordinateur:2317/base" est celle
+à utiliser pour les gens de l'extérieur.
 
 <p>
 
 Cependant, cela ne s'applique qu'aux ordinateurs visibles de
-l'extérieur, c'est-à-dire ceux qui sont connectés directement sur
-Internet.
+l'extérieur, c'est-à-dire ceux qui sont connectés
+directement sur Internet.
 
 <p>
 
-Si vous passez par un fournisseur d'accès, votre ordinateur personnel
-n'est pas visible. Dans ce cas, on ne peut rien faire. C'est au
-fournisseur d'accès d'installer {GeneWeb} sur son site. Au moment où
-j'écris ces lignes (oct 98), je ne crois pas qu'aucun fournisseur
-d'accès ne l'ait installé.
+Si vous passez par un fournisseur d'accès, votre ordinateur
+personnel n'est pas visible. Dans ce cas, on ne peut rien
+faire. C'est au fournisseur d'accès d'installer
+{GeneWeb} sur son site. Au moment où j'écris ces
+lignes (oct 98), je ne crois pas qu'aucun fournisseur d'accès
+ne l'ait installé.
 
 <p>
 
@@ -25,17 +26,18 @@ Internet.
 
 <p>
 
-Si vous êtes sous Unix ou Windows NT (donc pas Windows 95), vous avez
-dû entrer dans l'ordinateur en tant qu'utilisateur, en donnant votre
-nom de "login" et votre mot de passe. Vous voulez peut-être alors
-sortir sans que {GeneWeb} s'arrête.
+Si vous êtes sous Unix ou Windows NT (donc pas Windows 95), vous
+avez dû entrer dans l'ordinateur en tant qu'utilisateur, en
+donnant votre nom de "login" et votre mot de passe. Vous voulez
+peut-être alors sortir sans que {GeneWeb} s'arrête.
 
 <p>
 
 Vous avez alors deux solutions pour résoudre ce problème:
 l'installation en "service" et en l'installation en "cgi".
 
-=== Installation en "service" ===
+
+==Installation en "service " ==
 
 Dans ce mode de fonctionnement, vous n'avez pas besoin qu'un serveur Web soit
 installé sur votre ordinateur. <b><b>Gwd</b></b> <em>est</em> un serveur Web
@@ -64,13 +66,14 @@ tuer avec la commande "kill".
 
 </ul>
 
-<ul><li> Si vous êtes sous Windows NT, vous pouvez installer "gwd" en
-"service" en utilisant l'utilitaire "srvany.exe", en étant connecté en
-tant qu'administrateur. À partir de Windows NT Ressource Kit, vous
-avez besoin de: srvany.exe, instsrv.exe, peut-être srvinstw.exe et
-delsrv.exe, too. D'abord, copiez srvany.exe dans un répertoire
-(dossier) de votre ordinateur (par exemple C:\GeneWeb) et installez-le
-en service (un utilitaire graphique sympa pour ça est srvinstw.exe):
+<ul><li> Si vous êtes sous Windows NT, vous pouvez installer
+"gwd" en "service" en utilisant l'utilitaire "srvany.exe", en
+étant connecté en tant qu'administrateur. À
+partir de Windows NT Ressource Kit, vous avez besoin de: srvany.exe,
+instsrv.exe, peut-être srvinstw.exe et delsrv.exe, too. D'abord,
+copiez srvany.exe dans un répertoire (dossier) de votre
+ordinateur (par exemple C:\GeneWeb) et installez-le en service (un
+utilitaire graphique sympa pour ça est srvinstw.exe):
 
 <PRE>      instsrv GeneWebServer c:\GeneWeb\srvany.exe
 </PRE>
@@ -78,9 +81,9 @@ en service (un utilitaire graphique sympa pour ça est srvinstw.exe):
 Dans Services dans le panneau de configuration, cliquez GeneWebServer,
 puis sur Startup et choisissez Automatique ou Manuel. Dans la boite
 "se connecter comme", choisissez le compte sous lequel le service sera
-lancé et son mot de passe (c'est nécessaire pour avoir accès au
-réseau). {GeneWeb} sera lancé en présisant les clés "registry" avec
-regedt32:
+lancé et son mot de passe (c'est nécessaire pour avoir
+accès au réseau). {GeneWeb} sera lancé en
+présisant les clés "registry" avec regedt32:
 
 <PRE>
 1. sous HKLM\System\CurrentControlSet\Services\GeneWebServer créez
@@ -92,15 +95,17 @@ regedt32:
    AppDirectory: REG_SZ: C:\GeneWeb\gw
 </PRE>
 
-Maintenant, vous pouvez contrôler le service GeneWeb dans le panneau
-de configuration -&gt; Services -&gt; GeneWebServer "Startup"/"Stop"
-ou en tapant "net start GeneWebServer" ou "net stop GeneWebServer" à
-l'invite de commandes. Pour enlever GeneWebServer, l'arrêter et taper
-"delsrv GeneWebServer" ou "instsrv GeneWebServer remove".
+Maintenant, vous pouvez contrôler le service GeneWeb dans le
+panneau de configuration -&gt; Services -&gt; GeneWebServer
+"Startup"/"Stop" ou en tapant "net start GeneWebServer" ou "net stop
+GeneWebServer" à l'invite de commandes. Pour enlever
+GeneWebServer, l'arrêter et taper "delsrv GeneWebServer" ou
+"instsrv GeneWebServer remove".
 
 </ul>
 
-=== Installation en "cgi" ===
+
+==Installation en "cgi" ==
 
 
 Dans ce mode de fonctionnement, il faut qu'un serveur Web soit
@@ -113,9 +118,9 @@ préalablement lui demander la permission.
 
 <ul><li>
 
-Sous Unix, si vous avez par exemple installé {GeneWeb} dans le
-répertoire "/home/dupont/geneweb", fabriquez un fichier que vous allez
-nommer "geneweb" et contenant les lignes suivantes:
+Sous Unix, si vous avez par exemple installé {GeneWeb} dans
+le répertoire "/home/dupont/geneweb", fabriquez un fichier que
+vous allez nommer "geneweb" et contenant les lignes suivantes:
 
 <pre>
      #!/bin/sh
@@ -175,9 +180,10 @@ possible, ajoutez l'option "-nolock" dans l'appel de la commande
 
 <ul><li>
 
-Sous Windows NT, si vous avez par exemple installé {GeneWeb} dans le
-répertoire "c:\home\dupont\geneweb", créez un fichier que vous allez
-nommer "gwd.arg" et contenant les lignes suivantes:
+Sous Windows NT, si vous avez par exemple installé
+{GeneWeb} dans le répertoire "c:\home\dupont\geneweb",
+créez un fichier que vous allez nommer "gwd.arg" et contenant
+les lignes suivantes:
 
 <pre>
      -hd
@@ -233,7 +239,8 @@ son sous-répertoire "gw" et aux sous-répertoires "lang",
 
 </ul>
 
-=== Installation en "service" ou en "cgi"? ===
+
+==Installation en "service" ou en "cgi"?  ==
 
 Si vous avez le choix entre installation en "service" ou en "cgi", notez
 les points suivants:
@@ -253,13 +260,13 @@ votre administrateur système, lequel va sûrement
 préférer le mode "cgi" qui est beaucoup plus simple
 à installer et plus contrôlable.
 
-<li> &Eacute;videmment, s'il n'y a pas de serveur Web sur votre ordinateur,
+<li> Évidemment, s'il n'y a pas de serveur Web sur votre ordinateur,
 seule l'installation en "service" est possible.
 
 </ul>
 
 <p>
-<hr>
+
 <br>
 <center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
 

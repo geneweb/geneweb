@@ -1,4 +1,4 @@
-GeneWeb - Problèmes
+GeneWeb: problèmes
 
 Voici quelques problèmes fréquemment rencontrés
 avec "gwd".
@@ -7,13 +7,13 @@ avec "gwd".
 
 Vous avez lancé le démon {GeneWeb}, "gwd", et il
 répond normalement comme indiqué dans le chapitre
-"Comment démarrer avec GeneWeb", paragraphe "Commande <a
-href="start.htm#Gwd">gwd</a>".
+"Comment démarrer avec GeneWeb", paragraphe "Commande [[[start#Gwd/gwd]]]".
 
 <p>
 
 Puis...
-=== Message "socket failed" ===
+
+==Message "socket failed" ==
 
 Sous Windows, si ce message apparait dans la fenêtre
 interactive, et que vous n'arrivez pas à vous connecter
@@ -30,42 +30,64 @@ configuration", dossier "réseau".
 
 Puis relancez "gwd" et essayez à nouveau.
 
-=== Tentative de connexion au réseau ===
+
+==Tentative de connexion au réseau  ==
 
 
-* Au moment d'entrer l'adresse dans votre navigateur, par exemple:
+<ul><li>
+
+Au moment d'entrer l'adresse dans votre navigateur, par exemple:
+
+<p>
+
 <pre>
      http://localhost:2317/dupont
 </pre>
-<p>
+
 Le navigateur répond qu'il faut se connecter au réseau, que
 cela ne fonctionne pas en mode non connecté.
-</p>
+
 <p>
+
 Ce problème se rencontre avec certaines versions d'Internet
 Explorer.
-</p>
+</ul>
 
-* Nous avons reçu plusieurs réponses de la part des utilisateurs
-{GeneWeb} (merci). Cela dépend peut-être du numéro de version utilisé:
+<ul><li>
 
-** Sous Internet Explorer, sélectionnez le menu "Affichage", "Options
-Internet". Puis dans l'onglet "Connexion", activer "ne pas utiliser de
-serveur proxy pour les adresses locales".
+Nous avons reçu plusieurs réponses de la part des
+utilisateurs {GeneWeb} (merci). Cela dépend peut-être
+du numéro de version utilisé:
 
-** [Version 3.02] Sous Internet Explorer, sélectionnez le menu
-"Affichage", "Options", "Connexion". Ensuite allez à "Serveur proxy"
-et sélectionnez "Installation", ajouter sous "Exceptions" et "Ne pas
-utiliser le serveur proxy pour les adresses commençant par" les
-adresses données quand vous demarrez gwd.exe. Par exemple (notez les
-points-virgules entre les noms):
+<p>
+
+<ul><li> Sous Internet Explorer, sélectionnez le menu
+"Affichage", "Options Internet". Puis dans l'onglet "Connexion",
+activer "ne pas utiliser de serveur proxy pour les adresses locales".</ul>
+
+<p>
+
+<ul><li> [Version 3.02] Soux Internet Explorer, sélectionnez le
+menu "Affichage", "Options", "Connexion". Ensuite allez à
+"Serveur proxy" et sélectionnez "Installation", ajouter sous
+"Exceptions" et "Ne pas utiliser le serveur proxy pour les adresses
+commençant par" les adresses données quand vous demarrez
+gwd.exe. Par exemple (notez les points-virgules entre les noms):
+
 <pre>
      127.0.0.1;localhost;ordinateur
 </pre>
-** Si cela ne fonctionne toujours pas, nous vous suggérons d'utiliser
-un autre navigateur.
+ </ul>
 
-=== Cannot access file "start.txt" ===
+<p>
+
+Si cela ne fonctionne toujours pas, nous vous suggérons
+d'utiliser un autre navigateur, par exemple Netscape (lequel est
+distribué gratuitement).
+</ul>
+
+
+==Cannot access file "start.txt " ==
 
 <ul><li>Un autre problème fréquent est le message:
 "Cannot access file start.txt".</ul>
@@ -84,7 +106,7 @@ les bonnes options.
 </ul>
 
 <p>
-<hr>
-<br>
 
-<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
+<br>
+<center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
+
