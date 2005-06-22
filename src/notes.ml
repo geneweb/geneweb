@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.65 2005-06-21 19:29:07 ddr Exp $ *)
+(* $Id: notes.ml,v 4.66 2005-06-22 04:27:38 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -344,15 +344,15 @@ value summary_of_tlsw_lines conf lines =
         else summary
     in
     ["<dl><dd>";
-     "<table border=\"1\"><tr><td>";
-     "<table width=\"100%\"><tr>";
+     "<table border=\"1\" width=\"50%\"><tr><td>";
+     "<table width=\"100%\" border=\"0\"><tr>";
      "<td align=\"center\" colspan=\"2\"><b>" ^
         capitale (transl conf "summary") ^ "</b></td>";
      "</tr><tr><td>" ::
      List.rev_append rev_summary
        ["</td><td>";
         "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
-        "</td></tr></table"; "</td></tr></table>";
+        "</td></tr></table>"; "</td></tr></table>";
         "</dd></dl>"]]
 ;
 
