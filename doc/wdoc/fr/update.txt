@@ -1,4 +1,5 @@
-GeneWeb - Modifications
+ Modifications
+
 
 Cette partie vous indique comment faire des modifications dans une
 base de données en utilisant votre navigateur. Si le
@@ -15,7 +16,68 @@ les notions de base: premièrement, la notion de
 les notions de "personnes" et de "familles". Cela vous permettra de
 comprendre les sections suivantes sur les mises à jour.
 
-== Prénoms, patronymes, numéros ==
+<ul>
+
+<li> <a href="#FSO">1.</a> Prénoms, patronymes, numéros.
+
+<li> <a href="#PF">2.</a> Personnes et Familles.
+
+<li> <a href="#MAJ">3.</a> Accès aux mises à jour.
+
+<li> <a href="#Part">4.</a> Quelques points particuliers:
+
+<ul>
+
+<li> <a href="#ModC">4.1.</a> Comment modifier le prénom ou le
+patronyme d'un enfant.
+
+<li> <a href="#AddC">4.2.</a> Comment ajouter un enfant dans une famille.
+
+</ul>
+
+<li> <a href="#Form">5.</a> Formulaires.
+
+<ul>
+
+<li> <a href="#AddF">5.1.</a> Ajouter une Famille.
+
+<li> <a href="#ModF">5.2.</a> Modifier une Famille.
+
+<li> <a href="#DelF">5.3.</a> Supprimer une Famille.
+
+<li> <a href="#ModP">5.4.</a> Modifier une Personne.
+
+<li> <a href="#DelP">5.5.</a> Supprimer une Personne.
+
+<li> <a href="#SndP">5.6.</a> Envoyer une image.
+
+<li> <a href="#DelPh">5.7.</a> Supprimer une image.
+
+<li> <a href="#ChgC">5.8.</a> Changer les noms des enfants.
+
+<li> <a href="#ShrtC">5.9.</a> Raccourcis dans les dates.
+
+</ul>
+
+<li> <a href="#MrgP">6.</a> Comment fusionner deux personnes.
+
+<li> <a href="#MrgF">7.</a> Comment fusionner deux familles.
+
+<li> <a href="#Dcln">8.</a> Langues avec déclinaisons.
+
+<ul>
+
+<li> <a href="#Data">8.1.</a> Entrée des données.
+
+<li> <a href="#Disp">8.2.</a> Affichage, documentation.
+
+</ul>
+
+</ul>
+
+
+<a name="FSO"></a>
+== Prénoms, patronymes, numéros  ==
 
 Chaque personne de la base est repérée de manière
 unique par son prénom, son patronyme et un numéro, ce
@@ -120,7 +182,9 @@ Mais la plupart du temps, il n'est pas besoin de spécifier un
 numéro. Ne mettez rien: ce sera 0 par défaut et c'est
 bien.
 
-== Personnes et Familles ==
+
+<a name="PF"></a>
+== Personnes et Familles  ==
 
 Les bases de données {GeneWeb}, en interne, comportent
 deux notions principales: les personnes et les familles:
@@ -145,7 +209,9 @@ Les modifications de la base sont simplement et exclusivement des
 mise à jour des "personnes" et des "familles": ajout,
 modification, suppression.
 
-== Accès aux mises à jour ==
+
+<a name="MAJ"></a>
+== Accès aux mises à jour  ==
 
 Si vous êtes bien sûrs d'avoir compris les deux sections
 précécentes, vous allez pouvoir commencer.
@@ -193,8 +259,7 @@ personne. Reportez-vous aux sections:
 
 <p>
 
-Si le propriétaire de la base l'a autorisé, (voir <a
-href="start.htm#Cnf">fichier de configuration</a>), vous aurez le
+Si le propriétaire de la base l'a autorisé, (voir [[[start#Cnf/fichier de configuration]]]), vous aurez le
 choix "Envoyer image" et éventuellement "Supprimer
 image". Reportez-vous aux sections:
 
@@ -314,7 +379,9 @@ changer.
 
 </ul>
 
-== Quelques points particuliers ==
+
+<a name="Part"></a>
+== Quelques points particuliers  ==
 
 
 Ces points sont mis en avant parce que ce sont des pièges
@@ -322,6 +389,7 @@ possibles: suivez bien la procédure indiquée.
 
 <p>
 
+<a name="ModC"></a>
 === Comment modifier le prénom ou le patronyme d'un enfant ===
 
 Exemple: dans la famille de "Jean Dupont" et "Christine Durand", un
@@ -374,7 +442,8 @@ message d'erreur, et rien ne sera modifié (heureusement).
 
 </ul>
 
-=== Comment ajouter un enfant dans une famille ===
+<a name="AddC"></a>
+=== Comment ajouter un enfant dans une famille  ===
 
 Par exemple, dans la famille de "Jean Dupont" et de "Christine Durand",
 vous voulez ajouter "Hubert", comme enfant:
@@ -419,9 +488,13 @@ un peu plus haut. Ce choix crée aussi une nouvelle famille.
 
 </ul>
 
-== Formulaires ==
 
-=== Ajouter une Famille ===
+<a name="Form"></a>
+== Formulaires  ==
+
+
+<a name="AddF"></a>
+=== Ajouter une Famille  ===
 
 Vous tomberez sur ce formulaire intitulé "Ajouter/Famille":
 
@@ -464,7 +537,8 @@ refaites pas "Ajouter/Famille", mais "Modifier/Famille"!
 Reportez-vous donc au paragraphe suivant pour le fonctionnement du
 formulaire.
 
-=== Modifier une Famille ===
+<a name="ModF"></a>
+=== Modifier une Famille  ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
@@ -709,7 +783,8 @@ personne?
 
 </ul>
 
-=== Supprimer une Famille ===
+<a name="DelF"></a>
+=== Supprimer une Famille  ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
@@ -735,7 +810,8 @@ plus ces enfants-là (ils peuvent en avoir d'autres avec
 d'autres mariages, lesquels persistent), les enfants n'ont plus de
 parents.
 
-=== Modifier une Personne ===
+<a name="ModP"></a>
+=== Modifier une Personne  ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
@@ -1222,7 +1298,8 @@ même nom, leur liste est donnée.
 
 </ul>
 
-=== Supprimer une Personne ===
+<a name="DelP"></a>
+=== Supprimer une Personne  ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
@@ -1251,12 +1328,13 @@ Mais il subsiste toujours une "entité personne" reliée
 à son éventuel conjoint et à ses éventuels
 enfants.
 
-=== Envoyer une Image ===
+<a name="SndP"></a>
+=== Envoyer une Image  ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
 "Envoyer image", à condition que le propriétaire de la
-base en ait donné l'<a href="start.htm#Cnf">autorisation</a>,
+base en ait donné l'[[[start#Cnf/autorisation]]],
 et que le champ "image" de la personne soit vide.
 
 <p>
@@ -1272,19 +1350,21 @@ pas accès à "envoyer image". Si vous voulez le faire,
 faites "Mise à jour" et "Modifier personne" et effacez le
 contenu du champ "image".
 
-=== Supprimer une Image ===
+<a name="DelPh"></a>
+=== Supprimer une Image  ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
 "Supprimer image", à condition que le propriétaire de la
-base en ait donné l'<a href="start.htm#Cnf">autorisation</a>.
+base en ait donné l'[[[start#Cnf/autorisation]]].
 
 <p>
 
 Si vous cliquez sur "Ok", la image associée à la personne
 est supprimée.
 
-=== Changer les noms des enfants ===
+<a name="ChgC"></a>
+=== Changer les noms des enfants. ===
 
 Vous tomberez sur ce formulaire à partir d'une page personnelle
 après avoir cliqué sur "Mise à jour", puis
@@ -1319,7 +1399,8 @@ faire simplement avec "modifier personne".
 
 <p>
 
-=== Raccourcis dans les dates ===
+<a name="ShrtC"></a>
+=== Raccourcis dans les dates. ===
 
 <p>
 
@@ -1353,7 +1434,9 @@ Et pour l'année de la date de la zone "décès":
 
 <p>
 
-== Comment fusionner deux personnes ==
+
+<a name="MrgP"></a>
+== Comment fusionner deux personnes  ==
 
 Cette section décrit le moyen de fusionner deux
 <strong>personnes</strong> dans une base de données, dans le
@@ -1362,8 +1445,7 @@ cas où vous auriez mis deux fois la même personne.
 <p>
 
 Remarque: nous ne parlons pas ici de comment fusionner deux
-<strong>bases de données</strong>: cela est traité <a
-href="merge.htm">ailleurs</a>.
+<strong>bases de données</strong>: cela est traité [[[merge/ailleurs]]].
 
 <p>
 
@@ -1496,7 +1578,9 @@ pouvez redemander plus tard la fusion de vos deux personnes du
 début, cela continuera la fusion là où vous
 l'avez laissée.</ul>
 
-== Comment fusionner deux familles ==
+
+<a name="MrgF"></a>
+== Comment fusionner deux familles  ==
 
 Pour fusionner deux familles, fusionnez d'abord les pères
 (s'ils sont différents) et les mères (si elles sont
@@ -1511,7 +1595,9 @@ contiguës, vous verrez qu'il y a un "Fusionner" entre les deux.
 Cliquez dessus. Si elles ne sont pas contiguës, utilisez
 "Intervertir" autant de fois que nécessaire.
 
-== Langues avec déclinaisons ==
+
+<a name="Dcln"></a>
+== Langues avec déclinaisons  ==
 
 
 Certaines langues ont des déclinaisons, c'est à dire que
@@ -1542,6 +1628,7 @@ Le prénom tchèque "Vladana" a donc plusieurs formes:
 "Vladana" est le nominatif, "Vladanu" l'accusatif, "Vladany" le
 génitif.
 
+<a name="Data"></a>
 === Entrée des données ===
 
 Dans le lexique de la langue et dans les données, les cas sont
@@ -1589,6 +1676,7 @@ La forme avec '-' peut s'utiliser pour "Vladana":
    Vladana:a:-u:g:-y
 </pre>
 
+<a name="Disp"></a>
 === Affichage, documentation ===
 
 À l'affichage, seul le nominatif est habituellement
@@ -1614,7 +1702,7 @@ partir de la page d'accueil en cliquant sur "lexique" en bas de
 page. Regardez les expressions correspondant à votre langue.
 
 <p>
-<hr>
-<br>
 
-<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
+<br>
+<center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
+

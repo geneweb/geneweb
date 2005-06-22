@@ -1,28 +1,55 @@
 Démarrer avec GeneWeb
 
-Ce chapitre contient une introduction à {GeneWeb}, avec une
-description succinte des commandes et des fichiers afin de pouvoir
-démarrer.
+Ce chapitre contient une introduction à {GeneWeb}, avec une description succinte des
+commandes et des fichiers afin de pouvoir démarrer.
 
 <p>
 
-Attention: cette approche suppose que vous êtes à l'aise avec la
-notion de "fichier" et de "répertoire" et que vous n'avez pas peur de
-taper des commandes; sinon, utilisez plutôt le programme [[[gwsetup]]].
+Attention: cette approche suppose que vous êtes à l'aise
+avec la notion de "fichier" et de "répertoire" et que vous
+n'avez pas peur de taper des commandes; sinon, utilisez plutôt
+le programme [[[gwsetup/gwsetup]]].
 
 <p>
 
-=== Introduction ===
+<ul>
 
-Pour configurer et démarrer {GeneWeb}, vous devez utiliser des
-commandes interactives. Sous Unix, lancez un xterm. Sous Windows
-95/NT, cliquez sur "Démarrer", "Programmes" et "Invite de Commandes"
-(ça s'appelle parfois "Commandes MSdos").
+<li> <a href="#Int">Introduction</a>
+
+<li> <a href="#Gwc">Commande gwc</a>
+
+<li> <a href="#Ged">Commande ged2gwb</a>
+
+<li> <a href="#Gee">Commande gwb2ged</a>
+
+<li> <a href="#Gwd">Commande gwd</a>
+
+<li> <a href="#Csg">Commande consang</a>
+
+<li> <a href="#Gwu">Commande gwu</a>
+
+<li> <a href="#Cnf">Fichier a.gwf</a>
+
+<li> <a href="#Lex">Répertoire "lang" - fichier "lexicon.txt"</a>
+
+<li> <a href="#Lng">Répertoire "lang" - sous-répertoires</a>
+
+</ul>
+
+<a name="Int"></a>
+== Introduction  ==
+
+Pour configurer et démarrer {GeneWeb}, vous devez
+utiliser des commandes interactives. Sous Unix, lancez un
+xterm. Sous Windows 95/NT, cliquez sur "Démarrer", "Programmes"
+et "Invite de Commandes" (ça s'appelle parfois "Commandes
+MSdos").
 
 <p>
 
-Dans cette fenêtre, tapez la commande pour aller dans le répertoire où
-vous avez installé {GeneWeb}:
+Dans cette fenêtre, tapez la commande pour aller dans le
+répertoire où vous avez installé
+{GeneWeb}:
 
 <ul>
 
@@ -46,9 +73,9 @@ Puis allez dans le sous-répertoire "gw", en tapant:
      cd gw
 </pre>
 
-Toutes les commandes de {GeneWeb} peuvent être lancées avec l'option
--help qui affiche les différentes options possibles, avec une petite
-explication, en anglais.
+Toutes les commandes de {GeneWeb} peuvent être
+lancées avec l'option -help qui affiche les différentes
+options possibles, avec une petite explication, en anglais.
 
 <p>
 
@@ -97,19 +124,22 @@ Exemple:
 
 <p>
 
-Les bases de données {GeneWeb} sont des répertoires avec l'extension
-".gwb".
+Les bases de données {GeneWeb} sont des
+répertoires avec l'extension ".gwb".
 
-=== Commande gwc ===
 
-Pour utiliser {GeneWeb}, vous devez créer une base de données. Vous
-pouvez le faire soit avec cette commande-ci, "gwc", soit avec
-"ged2gwb", section suivante.
+<a name="Gwc"></a>
+== Commande gwc  ==
+
+Pour utiliser {GeneWeb}, vous devez créer une base de
+données. Vous pouvez le faire soit avec cette commande-ci,
+"gwc", soit avec "ged2gwb", section suivante.
 
 <p>
 
-La commande "gwc", dans son utilisation la plus simple, crée une base
-de données vide: sous {GeneWeb}, vous allez pouvoir la remplir.
+La commande "gwc", dans son utilisation la plus simple, crée
+une base de données vide: sous {GeneWeb}, vous allez
+pouvoir la remplir.
 
 <p>
 
@@ -124,10 +154,12 @@ Par exemple, si vous voulez l'appeler "dupont", tapez:
      gwc -o dupont
 </pre>
 
-=== Commande ged2gwb ===
 
-Un autre moyen de créer une base de données {GeneWeb} est de partir
-d'un fichier GEDCOM.
+<a name="Ged"></a>
+== Commande ged2gwb   ==
+
+Un autre moyen de créer une base de données {GeneWeb}
+est de partir d'un fichier GEDCOM.
 
 <p>
 
@@ -137,9 +169,10 @@ base de données {GeneWeb}.
 <p>
 
 Le plus simple est d'abord de copier votre fichier GEDCOM dans le
-répertoire où vous avez installé {GeneWeb}. Faites-le avec votre
-méthode habituelle pour copier des fichiers, soit avec une commande
-interactive, si vous savez le faire, soit en déplaçant les icônes.
+répertoire où vous avez installé
+{GeneWeb}. Faites-le avec votre méthode habituelle pour
+copier des fichiers, soit avec une commande interactive, si
+vous savez le faire, soit en déplaçant les icônes.
 
 <p>
 
@@ -161,13 +194,17 @@ passe bien, la commande doit se terminer par:
      *** Ok
 </pre>
 
-=== Commande gwb2ged ===
+
+<a name="Gee"></a>
+== Commande gwb2ged   ==
 
 Avant de continuer, notons en passant la commande inverse, "gwb2ged",
-permettant de reconstituer un fichier GEDCOM à partir d'une base
-{GeneWeb}.
+permettant de reconstituer un fichier GEDCOM à partir d'une
+base {GeneWeb}.
 
-=== Commande gwd ===
+
+<a name="Gwd"></a>
+== Commande gwd   ==
 
 Une fois que vous avez créé une base, avec une des deux
 commandes "gwc" ou "ged2gwb", vous allez pouvoir enfin la consulter et
@@ -183,7 +220,8 @@ Toujours dans la fenêtre interactive, tapez simplement:
 
 <p>
 
-Cette commande lance le "démon" {GeneWeb}. La commande doit afficher:
+Cette commande lance le "démon" {GeneWeb}. La commande
+doit afficher:
 
 <pre>
      GeneWeb - Copyright (c) 1998-2005 INRIA
@@ -200,10 +238,11 @@ Cette commande lance le "démon" {GeneWeb}. La commande doit afficher:
 
 
 Remarquez que vous ne reprenez pas la main dans la fenêtre
-interactive. Ce programme attend des requêtes que vous allez lui faire
-par l'intermédiaire de votre navigateur Web. Quand vous avez fini
-d'utiliser {GeneWeb}, vous pouvez l'arrêter en faisant control-C dans
-la fenêtre interactive.
+interactive. Ce programme attend des requêtes que vous
+allez lui faire par l'intermédiaire de votre navigateur
+Web. Quand vous avez fini d'utiliser {GeneWeb}, vous pouvez
+l'arrêter en faisant control-C dans la fenêtre
+interactive.
 
 <p>
 
@@ -224,7 +263,7 @@ Vous devez voir apparaître la page d'accueil de {GeneWeb}.
 
 <p>
 
-Si cela ne fonctionne pas, cliquez [[[problem/ici]]].
+[Si cela ne fonctionne pas, cliquez [[[problem/ici]]]]
 
 <p>
 
@@ -254,19 +293,21 @@ d'accueil vous dira que la base contient 0 personnes.
 
 <p>
 
-La seule chose possible est de commencer à remplir la base en cliquant
-sur "Ajouter une famille". Voyez le chapitre: comment faire des
-[[[update/modifications]]] dans la base de données.
+La seule chose possible est de commencer à remplir la base en
+cliquant sur "Ajouter une famille". Voyez le chapitre: comment faire
+des [[[update/modifications]]] dans la base de
+données.
 
 </ul>
 
 <p>
 
 Pendant ce temps, vous pouvez constater que chaque fois que vous
-cliquez sur un bouton ou un lien, une trace apparait dans la fenêtre
-interactive. Quand vous ferez fonctionner votre [[[server/serveur]]]
-{GeneWeb} sur le réseau, vous pourrez ainsi voir les requêtes qui
-seront faites sur votre base.
+cliquez sur un bouton ou un lien, une trace apparait dans la
+fenêtre interactive. Quand vous ferez fonctionner votre
+[[[server/serveur]]] {GeneWeb} sur le
+réseau, vous pourrez ainsi voir les requêtes qui seront
+faites sur votre base.
 
 <p>
 
@@ -283,7 +324,9 @@ Control-C, "gwd" s'arrêtera et la fenêtre se fermera. En
 créant un raccourci de "gwd" sur le bureau, vous pourrez
 l'utiliser de manière très simple.
 
-=== Commande consang ===
+
+<a name="Csg"></a>
+== Commande consang   ==
 
 Cette commande doit être lancée dans la fenêtre
 interactive, comme les autres. Si le démon "gwd" tourne,
@@ -341,7 +384,9 @@ En outre "consang" fait un "nettoyage" interne de votre base,
 nécessaire après un certain nombre de mises à
 jour.
 
-=== Commande gwu ===
+
+<a name="Gwu"></a>
+== Commande gwu   ==
 
 Cette commande permet d'afficher le contenu de la base sous forme de
 texte. En redirigeant cet affichage vers un fichier, cela peut constituer
@@ -368,9 +413,9 @@ fait des modifications dans votre base.
 
 <p>
 
-C'est enfin une méthode pour reconstituer votre base quand vous prenez
-une nouvelle version de {GeneWeb}, dans le cas où la représention
-interne des bases a changé.
+C'est enfin une méthode pour reconstituer votre base quand vous
+prenez une nouvelle version de {GeneWeb}, dans le cas où
+la représention interne des bases a changé.
 
 <p>
 
@@ -384,7 +429,9 @@ ci dessus, tapez:
      gwc toto.gw -o durand
 </pre>
 
-=== Fichier a.gwf ===
+
+<a name="Cnf"></a>
+== Fichier a.gwf   ==
 
 Ce fichier contient une configuration-type pour une base de données.
 Si votre base s'appelle "dupont", faites une copie de "a.gwf" en l'appelant
@@ -441,10 +488,9 @@ auront accès aux modifications.
 <p>
 
 <ul><li> <strong>wizard_just_friend</strong> ("magicien" seulement
-"ami") permet d'interdire la mise à jour de la base. Mettez "yes" pour
-le faire, "no" pour remettre l'autorisation. Il peut être utile de
-mettre "yes", temporairement, pendant la [[[maint/nettoyage]]] de
-votre base.
+"ami") permet d'interdire la mise à jour de la base. Mettez
+"yes" pour le faire, "no" pour remettre l'autorisation. Il peut
+être utile de mettre "yes", temporairement, pendant la [[[maint/nettoyage]]] de votre base.
 
 </ul>
 
@@ -494,11 +540,11 @@ en cliquant dans son drapeau en haut de la page.
 
 <ul><li> <strong>can_send_image</strong> (peut envoyer des images)
 permet d'autoriser les "magiciens" à envoyer (et supprimer) des
-images. Dans ce cas, au moment des [[[update/mises à jour]]], ils
-peuvent cliquer sur un lien [[[update/envoyer image]]] (et
-éventuellement un autre intitulé <a href="update.htm#DelPh">supprimer
-image</a>). Par défaut, c'est "no" (on ne peut pas en envoyer); pour
-l'autoriser, il faut mettre explicitement "yes".
+images. Dans ce cas, au moment des <a href="update.htm#MAJ">mises
+à jour</a>, ils peuvent cliquer sur un lien [[[update#SndP/envoyer image]]] (et éventuellement un
+autre intitulé <a href="update.htm#DelPh">supprimer
+image</a>). Par défaut, c'est "no" (on ne peut pas en envoyer);
+pour l'autoriser, il faut mettre explicitement "yes".
 
 <p>
 
@@ -521,7 +567,9 @@ le nouveau nom.
 
 </ul>
 
-=== Répertoire "lang" - fichier "lexicon.txt" ===
+
+<a name="Lex"></a>
+== Répertoire "lang" - fichier "lexicon.txt"  ==
 
 Ce fichier contient le lexique. Pour chaque terme utilisé dans
 le programme, il y a une traduction dans chaque langue. Si vous voulez
@@ -541,7 +589,9 @@ Quand vous sauvegarderez le fichier "lexicon.txt", cela sera
 immédiatement visible à l'affichage dans le navigateur.
 Il faudra tout de même faire "recharger la page".
 
-=== Répertoire "lang" - sous-répertoires ===
+
+<a name="Lng"></a>
+== Répertoire "lang" - sous-répertoires  ==
 
 Chaque nom de sous-répertoire est un code de langue. Chacun
 contient la page d'accueil dans cette langue: le fichier s'appelle
@@ -565,12 +615,10 @@ remplacé par le nom de la base, "%b" par la valeur de
 
 <p>
 
-La description complète de ces macros est donnée <a
-href="pcustom.htm">ici</a>.
+La description complète de ces macros est donnée [[[pcustom/ici]]].
 
 <p>
-<hr>
-<br>
 
-<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
+<br>
+<center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
 

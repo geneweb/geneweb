@@ -1,10 +1,10 @@
 Gwsetup
 
-Gwsetup est un programme qui vous permet de démarrer avec {GeneWeb}
-sans avoir besoin de taper des commandes. Si vous utilisez ce
-programme, vous pouvez ignorer complètement le chapitre
-[[[start/Démarrer avec GeneWeb]]] réservé aux personnes qui préfèrent
-taper des commandes.
+Gwsetup est un programme qui vous permet de démarrer avec {GeneWeb} sans avoir besoin de taper des
+commandes. Si vous utilisez ce programme, vous pouvez ignorer
+complètement le chapitre <a href="start.htm">Démarrer avec
+GeneWeb</a> réservé aux personnes qui
+préfèrent taper des commandes.
 
 <p>
 
@@ -45,7 +45,7 @@ d'un GEDCOM, ou, plus tard, d'extraire un GEDCOM de votre base de
 données, de changer des paramêtres d'affichage, etc etc.
 
 <p>
-<hr>
-<br>
 
-<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
+<br>
+<center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
+

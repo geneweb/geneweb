@@ -1,13 +1,13 @@
-GeneWeb - Récupérer une base
+GeneWeb: récupérer une base
 
-En installant une nouvelle version de {GeneWeb}, vous voulez
-probablement récupérer votre base de données.
+En installant une nouvelle version de {GeneWeb}, vous voulez probablement
+récupérer votre base de données.
 
 <p>
 
-Si vous n'êtes pas spécialiste des commandes intéractives, utilisez le
-programme [[[gwsetup]]] qui vous indiquera comment faire (vous pouvez
-ignorer le reste du présent chapitre).
+Si vous n'êtes pas spécialiste des commandes
+intéractives, utilisez le programme [[[gwsetup/gwsetup]]] qui vous indiquera comment faire
+(vous pouvez ignorer le reste du présent chapitre).
 
 <p>
 
@@ -78,7 +78,7 @@ sauvegarde de votre base.
 </ul>
 
 <p>
-<hr>
-<br>
 
-<div style="text-align:center">Retour vers [[[diruse/Mode d'Emploi]]]</div>
+<br>
+<center>Retour vers [[[diruse/Mode d'Emploi]]]</center>
+
