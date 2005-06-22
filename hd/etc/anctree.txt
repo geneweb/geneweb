@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.20 2005-06-18 02:24:15 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.21 2005-06-22 19:46:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -55,7 +55,7 @@
       %else;
         <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
       %end;
-      %cell.person.dates;
+      %cell.person.title;%cell.person.dates;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
         </td>
         </tr></table>
@@ -86,7 +86,8 @@
       %elseif;(evar.cgl = "on")|%nn;
       %else;
         <a style="text-decoration:none" href="%prefix;
-        m=A;t=T;v=%evar.v;;%cell.person.access;">|</a>%nn;
+        m=A;t=T;v=%evar.v;;%cell.person.access;
+        %if;(evar.image="on");image=on%end;">|</a>%nn;
       %end;
       </td>
     %end;
@@ -126,9 +127,7 @@
     %elseif;(dag_cell.item != "")
       %if;(evar.cgl = "on")%dag_cell.item;
       %else;<a href="%prefix;%dag_cell.item.access;">%dag_cell.item;</a>%end;
-      %if;(dag_cell.item.has_nobility_titles),%sp;
-      <em>%dag_cell.item.nobility_title;</em>%end;
-      %dag_cell.item.dates;
+      %dag_cell.item.title;%dag_cell.item.dates;
     %else;
       %if;dag_cell.is_hr_left;
         <hr dir="ltr" width="50%%" align="%left;"%/>%nn;

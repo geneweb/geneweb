@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.43 2005-06-17 21:25:38 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.44 2005-06-22 19:46:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -77,16 +77,10 @@
   %if;(xx.has_parents and nnn > 1)
     <ul>
     <li style="list-style-type:square"><a href="%prefix;
-    %xx.father.access;">%xx.father;</a>%nn;
-    %if;(xx.father.has_nobility_titles),%sp;
-      <em>%xx.father.nobility_title;</em>%end;
-    %xx.father.dates;%nl;
+    %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
     %apply;ancestors_by_list("xx.father", nnn - 1)</li>
     <li style="list-style-type:circle"><a href="%prefix;
-    %xx.mother.access;">%xx.mother;</a>%nn;
-    %if;(xx.mother.has_nobility_titles),%sp;
-      <em>%xx.mother.nobility_title;</em>%end;
-    %xx.mother.dates;%nl;
+    %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
     %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
   %end;
@@ -106,9 +100,7 @@
         "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
         "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
     %end;
-    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%nn;
-    %if;(pp.has_nobility_titles), <em>%pp.nobility_title;</em>%end;
-    %pp.dates;<br%/>
+    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
     %if;(pp.has_parents)
       %apply;ancestors_horizontally(
         "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
