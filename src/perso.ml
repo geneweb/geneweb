@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.154 2005-06-21 20:08:26 ddr Exp $ *)
+(* $Id: perso.ml,v 4.155 2005-06-22 20:06:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -827,7 +827,7 @@ value gen_string_of_img_sz max_wid max_hei conf base env (p, _, _, p_auth) =
     match v with
     [ Some (_, _, Some (width, height)) ->
         Format.sprintf " width=\"%d\" height=\"%d\"" width height
-    | Some (_, _, None) -> Format.sprintf " height=\"%d\"" max_im_hei
+    | Some (_, _, None) -> Format.sprintf " height=\"%d\"" max_hei
     | None -> "" ]
   else ""
 ;
