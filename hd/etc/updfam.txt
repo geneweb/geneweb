@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.49 2005-06-06 09:10:07 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.50 2005-06-22 19:56:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -38,7 +38,7 @@ function checkCreate(create, redirect)
     <tr>
       <td>xlab</td>
       <td>
-        %if;([ !dates order]0 = "ddmmyy");
+        %if;([ !dates order]0 = "ddmmyy")
           <label>
           [year/month/day]2
           <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
@@ -123,7 +123,7 @@ function checkCreate(create, redirect)
 
 %define;small_date(kind,xvar,xx,verbose,xp)
   <td>
-    %if;([ !dates order]0 = "ddmmyy");
+    %if;([ !dates order]0 = "ddmmyy")
       <input name="xvar_dd" size="2" maxlength="2"%sp;
        value="%xx.create.kind_day;"xp%/>/
       <input name="xvar_mm" size="2" maxlength="2"%sp;
@@ -248,9 +248,9 @@ function checkCreate(create, redirect)
 </p>
 
 %foreach;parent;
-%if;(bvar.multi_parents != "yes");<h4>%parent.himher;</h4>%end;%nl;
+%if;(bvar.multi_parents != "yes")<h4>%parent.himher;</h4>%end;%nl;
 %apply;parent(cnt, "parent")
-%if;(bvar.multi_parents = "yes");%apply;insert_parent(cnt)%end;
+%if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
 %end;
 
 <h4>[*marriage/marriages]0</h4>
@@ -454,7 +454,7 @@ function checkCreate(create, redirect)
 <dl><dd>
 %apply;insert_child("0")
 %foreach;child;
-  %if;(cnt != 1);%apply;invert_children(cnt)%end;
+  %if;(cnt != 1)%apply;invert_children(cnt)%end;
   %apply;child(cnt)
   %apply;insert_child(cnt)
 %end;
