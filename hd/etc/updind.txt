@@ -1,14 +1,14 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.28 2005-06-06 09:10:07 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.29 2005-06-22 19:56:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <title>%nn;
-    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
+    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
-    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
+    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
       [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
@@ -56,7 +56,7 @@ function changeDeath()
   <tr>
   <td>xlab</td>
   <td>
-    %if;([ !dates order]0 = "ddmmyy");
+    %if;([ !dates order]0 = "ddmmyy")
       <label>[year/month/day]2
       <input name="xvar_dd" size="2" maxlength="2"%sp;
        value="%xdt.day;"xcond%/></label>
@@ -89,32 +89,32 @@ function changeDeath()
   <tr>
   <td>[*calendar/calendars]0
   <select name="xvar_cal"xcond>
-  <option value="G"%if;(xdt.calendar = "gregorian"); selected="selected"%end;
+  <option value="G"%if;(xdt.calendar = "gregorian") selected="selected"%end;
   >[*gregorian/julian/french/hebrew]0</option>
-  <option value="J"%if;(xdt.calendar = "julian"); selected="selected"%end;
+  <option value="J"%if;(xdt.calendar = "julian") selected="selected"%end;
   >[*gregorian/julian/french/hebrew]1</option>
-  <option value="F"%if;(xdt.calendar = "french"); selected="selected"%end;
+  <option value="F"%if;(xdt.calendar = "french") selected="selected"%end;
   >[*gregorian/julian/french/hebrew]2</option>
-  <option value="H"%if;(xdt.calendar = "hebrew"); selected="selected"%end;
+  <option value="H"%if;(xdt.calendar = "hebrew") selected="selected"%end;
   >[*gregorian/julian/french/hebrew]3</option>
   </select>
   </td>
   <td>[*precision]0
   <select name="xvar_prec"xcond>
-  <option value="-"%if;(xdt.prec = ""); selected="selected"%end;>-</option>
-  <option value="sure"%if;(xdt.prec = "sure"); selected="selected"%end;
+  <option value="-"%if;(xdt.prec = "") selected="selected"%end;>-</option>
+  <option value="sure"%if;(xdt.prec = "sure") selected="selected"%end;
   >[*exact]0</option>
-  <option value="about"%if;(xdt.prec = "about"); selected="selected"%end;
+  <option value="about"%if;(xdt.prec = "about") selected="selected"%end;
   >[*about (date)]0</option>
-  <option value="maybe"%if;(xdt.prec = "maybe"); selected="selected"%end;
+  <option value="maybe"%if;(xdt.prec = "maybe") selected="selected"%end;
   >[*possibly (date)]0</option>
-  <option value="before"%if;(xdt.prec = "before"); selected="selected"%end;
+  <option value="before"%if;(xdt.prec = "before") selected="selected"%end;
   >[*before (date)]0</option>
-  <option value="after"%if;(xdt.prec = "after"); selected="selected"%end;
+  <option value="after"%if;(xdt.prec = "after") selected="selected"%end;
   >[*after (date)]0</option>
-  <option value="oryear"%if;(xdt.prec = "oryear"); selected="selected"%end;
+  <option value="oryear"%if;(xdt.prec = "oryear") selected="selected"%end;
       >&lt;- [*or] -&gt;</option>
-  <option value="yearint"%if;(xdt.prec = "yearint"); selected="selected"%end;
+  <option value="yearint"%if;(xdt.prec = "yearint") selected="selected"%end;
       >&lt;- [*between (date)] -&gt;</option>
   </select>
   <input name="xvar_oryear" size="5" maxlength="5" value="%xdt.oryear;"xcond%/>
@@ -138,9 +138,9 @@ function changeDeath()
 %end;
 
 <h1 style="text-align:center" class="highlight">%nn;
-%if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
+%if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
   [*merge::person/persons]1 # %index;
-%elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
+%elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
   [*modify::person/persons]0 # %index;
 %else;
   [*add::person/persons]0%end;
@@ -151,14 +151,14 @@ function changeDeath()
 %hidden;
 <input type="hidden" name="digest" value="%digest;"%/>
 <input type="hidden" name="i" value="%index;"%/>
-%if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
+%if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
   %if;evar_i2;<input type="hidden" name="i2" value="%evar_i2;">%end;%nl;
-  %if;(evar_ini1 and evar_ini2);
+  %if;(evar_ini1 and evar_ini2)
     <input type="hidden" name="ini1" value="%evar_ini1;"%/>
     <input type="hidden" name="ini2" value="%evar_ini2;"%/>
   %end;
   <input type="hidden" name="m" value="MRG_MOD_IND_OK"%/>
-%elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
+%elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
   <input type="hidden" name="m" value="MOD_IND_OK"%/>
 %else;
   <input type="hidden" name="m" value="ADD_IND_OK"%/>
@@ -187,7 +187,7 @@ function changeDeath()
 <input type="radio" name="sex" value="F" id="sexF"%if;is_female;%sp;
  checked="checked"%end;%/><label for="sexF">[M/F]1</label>
 <input type="radio" name="sex" value="N" id="sexU"%nn;
- %if;not(is_male or is_female); checked="checked"%end;%/><label%sp;
+ %if;not(is_male or is_female) checked="checked"%end;%/><label%sp;
  for="sexU">?</label>
 </td>
 </tr>
@@ -219,7 +219,7 @@ function changeDeath()
      id="add_qualifier%cnt;"%/></td>
     </tr>
   %end;
-%elseif;(bvar.propose_qualifier != "no");
+%elseif;(bvar.propose_qualifier != "no")
   <tr>
   <td><label for="qualifier0">[*qualifier]0</label></td>
   <td><input name="qualifier0" size="30" value="" id="qualifier0"%/></td>
@@ -239,7 +239,7 @@ function changeDeath()
      id="add_alias%cnt;"%/></td>
     </tr>
   %end;
-%elseif;(bvar.propose_alias != "no");
+%elseif;(bvar.propose_alias != "no")
   <tr>
   <td><label for="alias0">[*alias]0</label></td>
   <td><input name="alias0" size="30" value="" id="alias0"%/></td>
@@ -336,15 +336,15 @@ function changeDeath()
 <tr>
 <td>
 <select name="death">
-  %if;(not has_birth_date and dont_know_if_dead);
+  %if;(not has_birth_date and dont_know_if_dead)
   <option value="Auto" selected="selected"> -</option>
   %end;
   <option value="NotDead"%if;not_dead; selected="selected"%end;
    onclick="changeDeath()">[*alive]2</option>
-  <option value="DontKnowIfDead"%if;(dont_know_if_dead and has_birth_date);%sp;
+  <option value="DontKnowIfDead"%if;(dont_know_if_dead and has_birth_date)%sp;
    selected="selected"%end; onclick="changeDeath()">[*don't know]0%nl;</option>
   <option value="Death"%if;(death.year != "" or death.text != "" or
-   dead_dont_know_when); selected="selected"%end;
+   dead_dont_know_when) selected="selected"%end;
    onclick="changeDeath()">[*died]2...</option>
   <option value="DeadYoung"%if;died_young; selected="selected"%end;%sp;
    onclick="changeDeath()">[*died young]2</option>
