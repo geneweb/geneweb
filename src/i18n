@@ -277,6 +277,7 @@ specify
 spouses not included
 starting with
 statistics
+summary
 surname alias
 surname missing
 surname not found
@@ -329,6 +330,7 @@ unspecified
 up to
 update
 use "link" instead of "create"
+visualize
 warnings
 with
 witness at marriage of %s and %s
