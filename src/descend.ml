@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.43 2005-06-12 18:48:21 ddr Exp $ *)
+(* $Id: descend.ml,v 4.44 2005-06-23 09:56:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -696,9 +696,7 @@ value print_elem conf base paths precision (n, pll) =
                       do {
                         html_li conf;
                         stag "strong" begin
-                          wprint_geneweb_link conf
-                            ("i=" ^
-                               string_of_int (Adef.int_of_iper p.cle_index))
+                          wprint_geneweb_link conf (acces conf base p)
                             (p_first_name base p);
                         end;
                         if several && precision then do {
