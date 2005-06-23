@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.49 2005-06-21 20:08:52 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.50 2005-06-23 09:56:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -32,7 +32,7 @@
   %elseif;is_female;
     <img src="%image_prefix;/female.png"%wid_hei;female.png; alt="[M/F]1"%/>%nn;
   %end;
-  %if;(bvar.show_invisible = "on" and wizard and is_invisible); (I)%end;
+  %if;(bvar.show_invisible = "on" and wizard and is_invisible) (I)%end;
   </div>
 %end;
 
@@ -159,7 +159,7 @@
     %if;computable_death_age;
       <li>[*age at death:] %death_age;</li>%nl;
     %end;
-    %if;(has_consanguinity and bvar.show_consang != "no");
+    %if;(has_consanguinity and bvar.show_consang != "no")
       <li>[*consanguinity]: %consanguinity;</li>%nl;
     %end;
   </ul>
@@ -173,7 +173,7 @@
   <ul>
   %foreach;parent;
     <li style="list-style-type:%if;parent.has_parents;disc%else;circle%end;">
-    %if;(cancel_links or parent.is_restricted);%parent;
+    %if;(cancel_links or parent.is_restricted)%parent;
     %else;<a href="%prefix;%parent.access;">%parent;</a>%end;
     %parent.title;%parent.dates;</li>%nl;
   %end;
@@ -212,14 +212,14 @@
         %else; <em>%on_marriage_date;, %marriage_place, </em>%end;
       %end;
     %end;
-    %if;(cancel_links or spouse.is_restricted);%spouse;
+    %if;(cancel_links or spouse.is_restricted)%spouse;
     %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
     %spouse.title;%spouse.dates;
     %if;has_witnesses;
       %sp;([witness/witnesses]w:
       %foreach;witness;
         %if;not is_first;, %end;
-        %if;(cancel_links or witness.is_restricted);%witness;
+        %if;(cancel_links or witness.is_restricted)%witness;
         %else;<a href="%prefix;%witness.access">%witness;</a>%end;
         %witness.title;%witness.dates;
       %end;
@@ -233,7 +233,7 @@
         %foreach;child;
           <li style="list-style-type:%if;child.has_families;disc%else;
            circle%end;">
-          %if;(cancel_links or child.is_restricted);%child.child_name;
+          %if;(cancel_links or child.is_restricted)%child.child_name;
           %else;
             <a href="%prefix;%child.access;">%child.child_name;</a>%nn;
           %end;
@@ -241,7 +241,7 @@
         %end;
       </ul>
     %end;
-    %if;(evar.opt = "from" and wizard);<em>(%origin_file;)</em><br%/>%nl;%end;
+    %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
     </li>
   %end;
   </ul>
@@ -257,21 +257,21 @@
         <ul>
         <li style="list-style-type:%if;relation_him.has_families;disc%else;
          circle%end;">
-        %if;(cancel_links or relation_him.is_restricted);%relation_him;
+        %if;(cancel_links or relation_him.is_restricted)%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;</li>%nl;
         <li style="list-style-type:%if;relation_her.has_families;disc%else;
          circle%end;">
-        %if;(cancel_links or relation_her.is_restricted);%relation_her;
+        %if;(cancel_links or relation_her.is_restricted)%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;</li>%nl;
         </ul>
       %elseif;has_relation_him;:
-        %if;(cancel_links or relation_him.is_restricted);%relation_him;
+        %if;(cancel_links or relation_him.is_restricted)%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;%nl;
       %elseif;has_relation_her;:
-        %if;(cancel_links or relation_her.is_restricted);%relation_her;
+        %if;(cancel_links or relation_her.is_restricted)%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;%nl;
       %end;
