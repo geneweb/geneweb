@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.68 2005-06-22 23:06:33 ddr Exp $ *)
+(* $Id: notes.ml,v 4.69 2005-06-24 08:05:12 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -282,14 +282,13 @@ value extract_sub_part s v =
 
 value summary_of_tlsw_lines conf lines =
   let (rev_summary, lev, _, cnt, rev_sections_nums) =
-    let ul = "<ul style=\"list-style:none\">" in
     List.fold_left
       (fun (summary, lev, indent_stack, cnt, sections_nums) s ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
-          let (summary, lev, stack) =
-            loop summary lev indent_stack where rec loop summary lev stack =
+          let (lev, stack) =
+            loop lev indent_stack where rec loop lev stack =
               match stack with
               [ [(prev_num, prev_slev) :: rest_stack] ->
                   if slev < prev_slev then
@@ -297,38 +296,37 @@ value summary_of_tlsw_lines conf lines =
                     [ [(_, prev_prev_slev) :: _] ->
                         if slev > prev_prev_slev then
                           let stack = [(prev_num, slev) :: rest_stack] in
-                          loop summary lev stack
+                          loop lev stack
                         else
-                          let summary = [tab (lev - 1) "</li>" :: summary] in
-                          let summary = [tab (lev - 1) "</ul>" :: summary] in
-                          loop summary (lev - 1) rest_stack
+                          loop (lev - 1) rest_stack
                     | [] ->
-                        let summary = [tab (lev - 1) "</li>" :: summary] in
                         let stack = [(prev_num + 1, slev) :: rest_stack] in
-                        (summary, lev - 1, stack) ]
+                        (lev - 1, stack) ]
                   else if slev = prev_slev then
-                    let summary = [tab (lev - 1) "</li>" :: summary] in
                     let stack = [(prev_num + 1, slev) :: rest_stack] in
-                    (summary, lev - 1, stack)
+                    (lev - 1, stack)
                   else
-                    let summary = [tab lev ul :: summary] in
                     let stack = [(1, slev) :: stack] in
-                    (summary, lev, stack)
+                    (lev, stack)
               | [] ->
-                  let summary = [tab lev ul :: summary] in
                   let stack = [(1, slev) :: stack] in
-                  (summary, lev, stack) ]
+                  (lev, stack) ]
           in
-          let summary = [tab lev "<li>" :: summary] in
           let section_num =
             let nums = List.map fst stack in
             String.concat "." (List.rev_map string_of_int nums)
           in
-          let s =
-            sprintf "<a href=\"#a_%d\">%s - %s</a>" cnt section_num
-              (String.sub s slev (len - 2 * slev))
+          let summary =
+            let s =
+              sprintf "<a href=\"#a_%d\">%s - %s</a>" cnt section_num
+                (String.sub s slev (len - 2 * slev))
+            in
+            let line =
+              sprintf "<div style=\"margin-left:%.3fem\">%s</div>"
+                (float lev *. 1.618) s
+            in
+            [line :: summary]
           in
-          let summary = [tab (lev + 1) s :: summary] in
           (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
         else (summary, lev, indent_stack, cnt, sections_nums))
       ([], 0, [], first_cnt, []) lines
@@ -337,25 +335,14 @@ value summary_of_tlsw_lines conf lines =
     (* less that 2 paragraphs : summary abandonned *)
     ([], [])
   else
-    let rev_summary =
-      loop lev rev_summary where rec loop lev summary =
-        if lev > 0 then
-          let summary = [tab (lev - 1) "</li>" :: summary] in
-          let summary = [tab (lev - 1) "</ul>" :: summary] in
-          loop (lev - 1) summary
-        else summary
-    in
     let lines =
       ["<dl><dd>";
-       "<table border=\"1\"><tr><td>";
-       "<table width=\"100%\" border=\"0\"><tr>";
-       "<td align=\"center\" colspan=\"2\"><b>" ^
-          capitale (transl conf "summary") ^ "</b></td>";
-       "</tr><tr><td>" ::
+       "<table border=\"1\" cellpadding=\"10\"><tr><td align=\"" ^ conf.left ^
+          "\">";
+       "<div style=\"text-align:center\"><b>" ^
+          capitale (transl conf "summary") ^ "</b></div>" ::
        List.rev_append rev_summary
-         ["</td><td>";
-          "<ul style=\"list-style:none\"><li>&nbsp;</li></ul>";
-          "</td></tr></table>"; "</td></tr></table>";
+         ["</td></tr></table>";
           "</dd></dl>"]]
     in
     (lines, List.rev rev_sections_nums)
@@ -384,9 +371,10 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
              let n1 =
                if conf.wizard then
                  sprintf
-                   "<div style=\"float:right;margin-left:5px\">\
+                   "<div style=\"float:%s;margin-%s:5px\">\
                     (<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)</div>"
-                   (commd conf) mode cnt sfn (transl_decline conf "modify" "")
+                   conf.right conf.left (commd conf) mode cnt sfn
+                     (transl_decline conf "modify" "")
                else ""
              in
              let n2 =
@@ -519,7 +507,7 @@ value print_mod_page conf mode fname title s =
   let sfn = if fname = "" then "" else ";f=" ^ fname in
   do {
     header conf title;
-    tag "div" "style=\"float:right;margin-left:5px\"" begin
+    tag "div" "style=\"float:%s;margin-%s:5px\"" conf.right conf.left begin
       stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
         (if has_v then ";v=" ^ string_of_int v else "") sfn
       begin
@@ -617,7 +605,7 @@ value print_ok conf base fnotes s =
 
 type notes_links_db = list (string * list string);
 
-value update_notes_links_db conf base fnotes s =
+value update_notes_links_db conf fnotes s =
   let slen = String.length s in
   let list =
     loop [] 0 where rec loop list i =
@@ -676,7 +664,7 @@ value print_mod_ok conf base =
       in
       do {
         base.func.commit_notes fnotes s;
-        update_notes_links_db conf base fnotes s;
+        update_notes_links_db conf fnotes s;
         print_ok conf base fnotes sub_part
       }
   with
