@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.17 2005-06-22 23:06:33 ddr Exp $ *)
+(* $Id: doc.ml,v 4.18 2005-06-24 15:50:33 ddr Exp $ *)
 
 open Config;
 
@@ -406,6 +406,8 @@ value commit_wdoc conf fdoc s =
     try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
     if s = "" then ()
     else do {
+      let dir = Util.search_in_doc_path "wdoc" in
+      try Unix.mkdir (Filename.concat dir conf.lang) 0o755 with _ -> ();
       let oc = Secure.open_out fname in
       output_string oc s;
       output_char oc '\n';
