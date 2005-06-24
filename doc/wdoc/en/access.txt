@@ -1,0 +1,379 @@
+GeneWeb - Access restrictions
+
+If your database is visible on the Web, you may want to have at your
+disposal some ways to restrict the access to the information it holds.
+
+<p>
+
+With {GeneWeb}, you can:
+
+<ul>
+
+<li>Limit the inline updatings: <a href="#Wiz">wizard</a> access.
+
+<li>Protect the private informations: <a href="#Fri">friend</a> access.
+
+<li>Protect the global access to a <a href="#DBA">database</a>.
+
+<li>Protect the global access to the <a href="#GWA">gwd service</a>.
+
+</ul>
+
+<p>
+
+If your database is accommodated in a site, you are concerned only by
+the first three points.
+
+<p>
+
+The first two points (global accesses) work only in server mode. In
+cgi mode, you have to use the means given by the HTTP server you
+depend on.
+
+<p>
+
+Since the topic is about access restrictions, the next section
+concerns the issue of <a href="#Rob">robots</a> and the ways to
+prevent them from harming. The last section indicates a even rougher
+way of access interdiction: the <a href="#Bla">black list</a>.
+
+
+<a name="Wiz"></a>
+== Limitation of the modifications: "wizard" access ==
+
+If you don't want that anybody be able to make inline modifications,
+you have to put a "wizard" password to your database.
+
+<p>
+
+In this case, only the persons having given the good "wizard" password
+have the right to make updates. The other ones can normally navigate
+but don't see the clickable text "update" in the personal pages.
+
+<p>
+
+To install a "wizard" password", proceed as follow:
+
+<p>
+
+<ul>
+
+<li>If you usually pass by the "[[[gwsetup/gwsetup]]]"
+program, launch it, go to the main menu and select "database
+parameters". Write the "wizard" password and do "Ok".
+
+<li>If you don't use "gwsetup", edit your file "foo.gwf" (for a data
+base named "foo"). If this file does not exist, create it by making
+a copy of the template file "a.gwf" provided in the distribution.
+Put your password as value of the variable "wizard_password". Example:
+
+<pre>
+     wizard_passwd=xyzzy
+</pre>
+
+<li>If your database is accommodated in a site, ask the site
+administrator to put a "wizard" password. Always pass by him,
+afterwards, if you want to change this password.
+
+</ul>
+
+<p>
+
+When a "wizard" password is installed, the welcome page (the one with
+the flags) gives you an area for the passwords.
+
+<p>
+
+<ul>
+
+<li>In server mode, the page displays "wizard access" on which you can
+click: your browser then pops a window where you can type the password
+in the appropriate area (the "user" area is ignored; you can type what
+you want inside).
+
+<li>In CGI mode or if there is a global access authorization (see below),
+an input area is displayed. Enter your password and do "Ok" (in this
+case the password is visible and stay visible in the URLs during the
+navigation).
+
+</ul>
+
+<p>
+
+After having entered the password, the welcome page must be displayed
+again. You can detect that you are in "wizard" mode because the texts
+"modify family" and "modify notes" should be displayed.
+
+<p>
+
+In the navigation, in the personal pages, you have an access to "update".
+
+
+<a name="Fri"></a>
+== Protection of the private informations: "friend" access ==
+
+If you want to protect the private informations of your database, you
+have to put a "friend" password. The private data concern only the person
+born since less than one century and are:
+
+<p>
+
+<ul>
+
+<li>Birth, death, marriage, etc. dates and places.
+
+<li>Profession.
+
+<li>Notes.
+
+<li>Image.
+
+<li>"Other relations" (godparents, adoptive parents, etc).
+
+</ul>
+
+<p>
+
+The other genealogical informations (parents, children) stay displayed.
+
+<p>
+
+If there is a "friend" password, only the persons having provided this
+password (or the "wizard" password) can see the private informations.
+
+<p>
+
+To install the "friend" password, proceed like for the "wizard"
+password above. If you pass by the file "foo.gwf", the variable name
+is "friend_passwd".
+
+
+<a name="DBA"></a>
+== Global access restriction to a database ==
+
+If you want that your database be visible only by some persons, you
+can put a global access restriction.
+
+<p>
+
+Warning: this works only in server mode. If you are in cgi mode, you
+have to use the means provided by the HTTP server you depend on (the
+present documentation does not explain how, because it depends on the
+server).
+
+<p>
+
+You must first constituate an authorization file. This text file holds
+line of the kind "user:password". For example:
+
+<p>
+
+<pre>
+     smith:ex23zuu
+     martin:2wxuz4
+</pre>
+
+<p>
+
+To install this authorization file, proceed as follow:
+
+<p>
+
+<ul>
+
+<li>Copy your file in the databases directory. In the standard
+installation, it is the directory "gw". Then edit your file "foo.gwf"
+(if your database name is "foo"; if this file does not exist, make a
+copy from the template file "a.gwf" provided with the distribution).
+Put your authorization file name you just wrote as value of the
+variable "auth_file". For example (if you called your authorization
+file "foo.auth"):
+
+<pre>
+     auth_file=foo.auth
+</pre>
+
+<li>If your database is accommodated in a site, ask the site
+administrator by sending him your authorizations file.
+
+</ul>
+
+<p>
+
+When accessing this database, your browser pops a window where you
+have to give a valid user name and its corresponding password.
+
+<p>
+
+In the above example, you have to write "smith" in the "user" area and
+"ex23zuu" in the "password" area, or "martin" in the "user" area and
+"2wxuz4" in the "password" area.
+
+<p>
+
+If your entry is not validated, you have no access at all to the data
+base.
+
+
+<a name="GWA"></a>
+== Global access restriction to the gwd service ==
+
+If you want that the gwd service be accessible only by some persons, you
+can put a global access restriction to the gwd service. This apply to
+all the databases it takes care of.
+
+<p>
+
+The databases are then accessible only by the access protocol. If,
+however, some database has a specific global access restriction (see
+previous section), this specific restriction rather applies.
+
+<p>
+
+Warning: as for the previous section, this works only in server mode,
+not cgi mode.
+
+<p>
+
+You have to constituate an authorization file, as well. It can be only
+done by the site administrator: if your database is accommodated
+elsewhere, you are not concerned.
+
+<p>
+
+The global access authorization is done in the parameters of the "gwd"
+command. The option is named "-auth" and must be followed by the name
+of the authorizations file.
+
+
+<a name="Rob"></a>
+== Robots ==
+
+Some persons happen to send "robot" in your site. These robots are
+programs which explore your site methodically, for example by starting
+from some specific page and "clicking" on everything clickable in
+the page and continuing in the resulting pages.
+
+<p>
+
+Most of these robots are bad ideas, because the number of possible
+pages is almost infinite. For example, if the robot starts from
+a personal page, clicks on "relationship computing", then on the
+spouse, it computes all the relationship links between the person
+and his spouse, then it can click on all the details of these links,
+and in all the intermediate persons, and so on.
+
+<p>
+
+The idea of these persons who launch robot is often to say: rather
+than pass hours clicking on this interesting site, I am going to
+download all its pages and read them quietly afterwards, at home,
+freeing my telephonic line.
+
+<p>
+
+Unhappily, as the {GeneWeb} service is a maze without exit,
+this makes only one thing: overload the person's disk with HTML
+pages.
+
+<p>
+
+For the site owner's point of view, he is generally not happy to receive
+so many requests so quickly, sometimes more than 10 per second. Because:
+
+<p>
+
+<ul>
+
+<li>That slows down his computer,
+
+<li>That slows down the other users who consult the site normally,
+
+<li>That distorts the statistics of the site accesses,
+
+<li>That gives the disagreeable feeling to be spyed on.
+
+</ul>
+
+<p>
+
+However, the pages that {GeneWeb} generated clearly indicate
+to the robot (in the protocol) not to go on exploring from its pages.
+
+<p>
+
+"Good" robots, those which index the Web pages or the whole world,
+respect this protocol and don't insist. But when one launches a robot,
+it is perfectly possible to tell it to ignore it.
+
+<p>
+
+Against these impolite robots, the option "-robot_xcl" of gwd exists.
+It is based on the observation of the quickness of the requests coming
+from the same place.
+
+<p>
+
+The parameters are two numbers, separated by a comma. The first one is
+a number "x" of accesses and the second one a number "y" of seconds. If
+some address makes more than "x" accesses in "y" seconds, the address
+is then automatically registered in a black list and all the future
+requests are refused for it with an appropriate message.
+
+<p>
+
+Example:
+
+<p>
+
+<pre>
+     gwd -robot_xcl 100,150
+</pre>
+
+<p>
+
+If more than 100 connections in 150 seconds is detected from the same
+place, the origin address has no more access until the site owner decides
+to "free" it.
+
+<p>
+
+To free the forbidden addresses, the site owner just has to delete the
+file named "robot" located in the directory "cnt": anyway this is displayed
+in the access traces of gwd.
+
+
+<a name="Bla"></a>
+== The black list ==
+
+The black list allows to forbid the access to a {GeneWeb} site
+for internet addresses or groups of internet addresses.
+
+<p>
+
+Build a file named "gwd.xcl" and put it in the same directory than the
+one of the command "gwd".
+
+<p>
+
+Edit this text file and put the address (one per line) you want to
+refuse. You can put "*" to indicated any sequence of
+characters. Example:
+
+<pre>
+     big-bad@wolf.wood
+     provider-*@of.access
+</pre>
+
+<p>
+
+This forbids the access from the addresses like "big-bad@wolf.wood",
+"provider-22@of.access", "provider-xx@of.access", and so on. If you
+just put a line with "*", all address are forbidden of access
+(including yours).
+
+<p>
+
+<br>
+<center>Return to [[[diruse/Directions for Use]]]</center>
+

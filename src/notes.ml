@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.69 2005-06-24 08:05:12 ddr Exp $ *)
+(* $Id: notes.ml,v 4.70 2005-06-24 21:00:27 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -337,12 +337,20 @@ value summary_of_tlsw_lines conf lines =
   else
     let lines =
       ["<dl><dd>";
-       "<table border=\"1\" cellpadding=\"10\"><tr><td align=\"" ^ conf.left ^
-          "\">";
+       "<table id=\"toc\" border=\"1\" cellpadding=\"10\">";
+       "<tr><td align=\"" ^ conf.left ^ "\">";
        "<div style=\"text-align:center\"><b>" ^
-          capitale (transl conf "summary") ^ "</b></div>" ::
+          capitale (transl_nth conf "visualize/show/hide/summary" 3) ^ "</b>";
+"<script type=\"text/javascript\">
+//<![CDATA[
+showTocToggle()
+//]]>
+</script>";
+"</div>";
+"<div id=\"tocinside\">" ::
        List.rev_append rev_summary
-         ["</td></tr></table>";
+         ["</div>";
+          "</td></tr></table>";
           "</dd></dl>"]]
     in
     (lines, List.rev rev_sections_nums)
@@ -470,6 +478,76 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
 
 value read_notes base fnotes = base.data.bnotes.nread fnotes RnAll;
 
+(**)
+open TemplAst;
+
+value not_impl func x =
+  let desc =
+    if Obj.is_block (Obj.repr x) then
+      "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
+    else "int_val = " ^ string_of_int (Obj.magic x)
+  in
+  ">Notes." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
+;
+
+value eval_var conf env loc =
+  fun
+  [ ["doctype"] -> Util.doctype conf ^ "\n"
+  | ["/"] -> conf.xhs
+  | [s] -> List.assoc s env
+  | _ -> raise Not_found ]
+;
+
+value eval_var_handled conf env loc sl =
+  try eval_var conf env loc sl with
+  [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
+;
+
+value print_var conf env loc =
+  fun
+  [ ["copyright"] -> Util.print_copyright conf
+  | sl -> Wserver.wprint "%s" (eval_var_handled conf env loc sl) ]
+;
+
+value eval_bool_ast conf env a =
+  let eval_var loc sl  = VVstring (eval_var conf env loc sl) in
+  let eval_apply _ = raise Not_found in
+  Templ.eval_bool_expr conf (eval_var, eval_apply) a
+;
+
+value eval_ast conf env =
+  fun
+  [ Atext s -> s
+  | Avar loc s sl -> eval_var_handled conf env loc [s :: sl]
+  | Atransl upp s c -> Templ.eval_transl conf upp s c
+  | ast -> not_impl "eval_ast" ast ]
+;
+
+value rec print_ast conf env =
+  fun
+  [ Avar loc s sl -> print_var conf env loc [s :: sl]
+  | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
+  | ast -> Wserver.wprint "%s" (eval_ast conf env ast) ]
+and print_ast_list conf env al =
+  List.iter (print_ast conf env) al
+and print_if conf env a1 a2 a3 =
+  let test =
+    try eval_bool_ast conf env a1 with
+    [ Failure x -> do { Wserver.wprint "%s" x; False } ]
+  in
+  print_ast_list conf env (if test then a2 else a3)
+;
+
+value copy_from_templ conf ic =
+  let astl = Templ.parse_templ conf (Stream.of_channel ic) in
+  do {
+    close_in ic;
+    let env = [] in
+    List.iter (print_ast conf env) astl;
+  }
+;
+(**)
+
 value print conf base =
   let title _ =
     Wserver.wprint "%s - %s"
@@ -483,6 +561,9 @@ value print conf base =
   let s = read_notes base fnotes in
   do {
     header_no_page_title conf title;
+    match Util.open_etc_file "summary" with
+    [ Some ic -> copy_from_templ conf ic
+    | None -> () ];
     print_link_to_welcome conf False;
     html_p conf;
     match p_getint conf.env "v" with
@@ -490,8 +571,8 @@ value print conf base =
         let lines = List.rev (rev_extract_sub_part s cnt0) in
         print_notes_sub_part conf fnotes cnt0 lines
     | None ->
-        let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         let s = string_with_macros conf False [] s in
+        let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         Wserver.wprint "%s\n" s ];
     trailer conf;
   }
@@ -511,7 +592,8 @@ value print_mod_page conf mode fname title s =
       stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
         (if has_v then ";v=" ^ string_of_int v else "") sfn
       begin
-        Wserver.wprint "(%s)\n" (transl conf "visualize");
+        Wserver.wprint "(%s)\n"
+          (transl_nth conf "visualize/show/hide/summary" 0);
       end;
     end;
     print_link_to_welcome conf False;

@@ -1,0 +1,108 @@
+GeneWeb - Getrennte Daten in einer Datenbank
+
+Wenn du GEDCOM-Dateien oder Informationen von anderen Forschern erhalten hast oder du willst
+deine Datenbank in mehrere verschiedene Dateien geteilt lassen, aber nur auf eine Datenbank
+zugreifen, so kann {GeneWeb} das für Dich tun.
+
+<p>
+
+
+==Mischen der Dateien in eine Datenbank  ==
+
+<ul>
+
+<li>
+Wenn du drei Quelldateien "meier.gw", "schulze.gw" und "lehmann.gw" hast, die Du getrennt
+halten willst, öffne ein Eingabefenster und gib ein:
+
+<pre>
+     gwc meier.gw schulze.gw lehmann.gw -o mischdaten
+</pre>
+
+
+Es kann vorkommen, daß gwc Fehler anzeigt, weil Personen zweimal in "meier.gw", "schulze.gw"
+und "lehmann.gw" definiert sind. Um das zu beheben, hat gwc eine Option "-sh", um die Nummer
+der Personen zu verschieben und so Konflikte zu vermeiden. Versuche:
+
+<pre>
+     gwc meier.gw -sh 10 schulze.gw -sh 10 lehmann.gw -o mischdaten
+</pre>
+
+Wenn der Wert 10 das Problem nicht behebt, versuche es mit 20, 30 oder 100...
+
+<br>
+
+Siehe auch [[[merge/Zusammenführen von Datenbanken]]].
+
+<p>
+
+<li>
+Nun kannst du auf die Datenbank "mischdaten" zugreifen und sie bearbeiten. {GeneWeb}
+wird sich die Dateien merken, aus denen die Daten jeweils stammen.
+
+<p>
+
+<li>
+Innerhalb der Datenbank kann die Form <TT>";opt=from"</TT> an die URL angehangen werden, um
+zu sehen, aus welcher Datei die Daten stammen. Zum Beispiel:
+
+<pre>
+     http://maschine:2317/mischdaten?i=357;opt=from
+</pre>
+
+Beachte: Dies funktioniert nur für Personen mit Familien.
+</ul>
+
+
+==Wiederherstellen der Quelldateien aus der gemischten Datenbank  ==
+
+<ul>
+
+<li>
+Wenn das Verzeichnis "outdir" nicht existiert, lege es an (mit dem Befehl "mkdir").
+
+<p>
+
+<li>
+Gib zum Wiederherstellen der Quelldateien im Eingabefenster ein:
+
+<pre>
+     gwu mischdaten -odir outdir
+</pre>
+
+<li>
+Im Verzeichnis "outdir" sollten nun die drei Quelldateien "meier.gw", "schulze.gw" und "lehmann.gw"
+erzeugt worden sein. Wenn die Datenbank geändert wurde, sind diese Quelldateien
+auch geändert worden (d. h. dies sind nicht diesselben, mit denen du begonnen hast).
+
+<p>
+
+<font color=#ff0000>Wenn der Befehl gwu Quellinformationen ausgibt</font>
+
+<p>
+
+<li>
+Wenn du Personen hinzugefügt hast, die {GeneWeb} nicht einer
+der Quelldateien zuordnen kann, so wird {GeneWeb} diese Personen
+im Eingabefenster ausgeben.
+
+<p>
+
+<li>
+Um auch diese neuen Personen in der Quelldatei "neu.gw" zu haben, gib ein:
+
+<pre>
+     gwu mischdaten -odir outdir > neu.gw
+</pre>
+
+<li>
+Der Inhalt von "neu.gw" kann dann in eine der anderen Quelldateien mittels
+eines Texteditors verschoben werden.
+
+</ul>
+
+<p>
+
+<br>
+<center>Zurück zur [[[diruse/Gebrauchsanweisung]]]</center>
+

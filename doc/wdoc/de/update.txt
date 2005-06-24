@@ -1,0 +1,1266 @@
+GeneWeb - Änderungen
+
+Dieser Teil zeigt dir, wie du unter Verwendung deines Webbrowsers
+Änderungen an einer Datenbank vornehmen kannst.
+Wenn der Eigentümer der
+Datenbank ein Kennwort installiert hat, mußt du dieses in die Startseite
+eintragen um Zugriff zu den verschiedenen Update-Möglichkeiten zu
+haben.
+<p>Vor dem Start ist es wichtig, die grundsätzlichen Begriffe zu verstehen:
+Zuerst die Begriffe "Vorname", "Nachname", "Nummer" und weiterhin die
+Begriffe "Personen" und "Familien". Das erlaubt dir, die nächsten
+Abschnitte über die Bearbeitung zu verstehen.
+<ul>
+<li>
+<a href="#FSO">1.</a> Vornamen, Nachnamen, Nummern.</li>
+
+<li>
+<a href="#PF">2.</a> Personen and Familien.</li>
+
+<li>
+<a href="#MAJ">3.</a> Zugriff zum Bearbeiten.</li>
+
+<li>
+<a href="#Part">4.</a> Einige spezifische Punkte:</li>
+
+<ul>
+<li>
+<a href="#ModC">4.1.</a> Wie ändert man den Vornamen oder den
+Nachnamen eines Kindes</li>
+
+<li>
+<a href="#AddC">4.2.</a> Wie wird ein Kind einer Familie hinzugefügt.</li>
+</ul>
+
+<li>
+<a href="#Form">5.</a> Formulare.</li>
+
+<ul>
+<li>
+<a href="#AddF">5.1.</a> Familie hinzufügen.</li>
+
+<li>
+<a href="#ModF">5.2.</a> Familie verändern.</li>
+
+<li>
+<a href="#DelF">5.3.</a> Familie löschen.</li>
+
+<li>
+<a href="#ModP">5.4.</a> Person ändern.</li>
+
+<li>
+<a href="#DelP">5.5.</a> Person löschen.</li>
+
+<li>
+<a href="#SndP">5.6.</a> Bild senden.</li>
+
+<li>
+<a href="#DelPh">5.7.</a> Bild löschen.</li>
+
+<li>
+<a href="#ChgC">5.8.</a> Ändern der Namen eines Kindes.</li>
+</ul>
+
+<li>
+<a href="#MrgP">6.</a> Zusammenführen zweier Personen.</li>
+
+<li>
+<a href="#MrgF">7.</a> Zusammenführen zweier Familien.</li>
+
+<li>
+<a href="#Dcln">8.</a> Sprachen mit Deklination.</li>
+
+<ul>
+<li>
+<a href="#Data">8.1.</a> Dateneingabe.</li>
+
+<li>
+<a href="#Disp">8.2.</a> Anzeige, Dokumentation.</li>
+</ul>
+</ul>
+
+
+<p>
+
+
+<a name="FSO"></a>
+== Vornamen, Nachnamen, Nummern ==
+Jede Person der Datenbank wird gekennzeichnet durch ihren Vornamen, ihren
+Nachnamen und ihre Nummer; letztere Information erlaubt zwei Personen gleichen
+Vor- und Nachnamens zu unterscheiden. Dieses Set wird der "Schlüssel"
+einer Person genannt (<a href="#note">Anm.</a>).
+<p>Wenn es also zwei "Max Meier" in der Datenbank gibt, so kannst du sie
+durch die Nummer unterscheiden. Jede Nummer ist gültig und du
+brauchst weder bei 0 oder 1 zu beginnen noch jedesmal eine 1 zu addieren. 
+Zum Beispiel kann dein erster "Max Meier" die Nummer 7 und der
+zweite die Nummer 4 haben.
+Der eine wird repräsentiert durch 
+"Max", "Meier", "7".
+und der zweite durch "Max", "Meier", "4".
+<p>
+<i>Du</i> wählst diese Nummer, es sei denn, du beginnst mit einer
+GEDCOM-Datei: In diesem Fall hat "ged2gwb" die Nummer für dich 
+für alle Personen in der Datenbank gewählt.
+<p>
+Diese Nummer erscheint nur bei der Änderung von Seiten: Sie ist auf
+normalen Seiten nicht sichtbar.
+Wenn du also den Namen "Max Meier" in der Startseite
+eingibst, gibt {GeneWeb} die Auswahl zwischen "Max Meier 7" and
+"Max Meier 4", aber ohne explizit die Nummern anzuzeigen.
+<p>
+Jedoch solltest du als "Guru", der auch Änderungen; macht, wissen,
+daß du einen Punkt und die Nummer zwischen den Vornamen und den Nachnamen
+schreiben kannst. Zum Beispiel kannst du auf der Startseite "Max .4 Meier"
+suchen und du findest direkt denjenigen, dessen Nummer 4 ist.
+<p>Beachte auch, daß:
+<ul>
+<li>
+Akzente und Großbuchstaben bei der Unterscheidung nicht
+berüsichtigt werden.
+So gibt "Max", "Meier", "5" Zugriff zur gleichen
+Person wie "MAX", "MEIER", "5" und "Max", "Meier", "5".</li>
+
+<li>
+Ohne Angabe einer Nummer wird der Wert 0 verwendet. Nicht setzen oder gleich
+0 setzen der Nummer sind identisch.</li>
+</ul>
+Es ist wichtig, diesen Begriff zu verstehen, weil einige Fehlermeldungen
+dies betreffen. Zum Beispiel Meldungen wie:
+<ul>
+<li>
+"Person existiert schon": Das heißt, daß du versuchst eine Person
+anzulegen, deren Kombination von Vorname, Nachname, Nummer schon reserviert
+ist, was auftritt</li>
+
+<ul>
+<li>
+entweder in einem Kontext, wo du eine neue Person anlegen wolltest</li>
+
+<li>
+oder in einem Kontext, wo du den Vornamen, Nachnamen oder die Nummer einer
+vorhandenen Person ändern wolltest.</li>
+</ul>
+
+<li>
+"Unbekannte Person": Das heißt, daß niemand in der Datenbank
+zu der Kombination Vorname, Nachname, Nummer korrespondiert, was
+auftritt,
+wenn du eine vorhandene Person in einer Familie als Vater, Mutter oder
+Kind zuweisen willst.</li>
+</ul>
+Beachte außerdem, daß diese Nummer nichts zu tun hat mit der Zahl
+in Vornamen von adligen Personen: "Edward III" hat nicht notwendigerweise
+die Nummer "3". Jedoch - und das ist kein Gegensatz - es ist eine sinnvolle
+Gepflogenheit, obwohl es nicht vorgeschrieben ist, die gleiche Nummer
+zu wählen, wenn immer das möglich ist: Du wirst sehen,
+daß das praktischer ist.
+<p>Aber meistens gibt es keinen Grund, eine Nummer anzugeben. Gib nichts
+ein: 0 ist Standard und ist damit ok.
+
+<p>
+
+
+<a name="PF"></a>
+== Personen und Familien ==
+Die {GeneWeb}-Datenbanken beinhalten intern zwei Hauptbegriffe: Personen
+und Familien:
+<ul>
+<li>
+Personen beinhalten individuelle Daten wie Vorname, Nachname, Nummer, Geburtsdatum
+und -ort, Taufe, Tod, mögliche Adelstitel usw. usf.</li>
+
+<li>
+Familien enthalten einfach Familien: Vater, Mutter, Kinder, möglicherweise
+Datum und Ort von Hochzeit und Scheidung. Beachte, daß wenn eine Person
+mehrere Male verheiratet ist, gibt es soviele "Familien" wie Ehen.</li>
+</ul>
+Die Änderungen der Datenbank sind einfach und ausschließlich
+Änderungen von "Personen" und "Familien": Hinzufügen, Ändern, Löschen.
+
+<p>
+
+
+<a name="MAJ"></a>
+== Zugriff zu Aktualisierungen ==
+Wenn du sicher bist, die vorherigen zwei Abschnitte gut verstanden zu haben,
+kannst du nun anfangen.
+<p>Um auf Aktualisierungen zuzugreifen, kannst du:
+<ul>
+<li>
+entweder auf "eine Familie hinzufügen" in der Startseite klicken</li>
+
+<li>
+oder auf "Aktualisieren" in einem Personendatensatz.</li>
+</ul>
+Auf der Startseite erlaubt dir das Klicken auf "eine Familie hinzufügen"
+mit dem Füllen einer leeren Datenbank zu beginnen.
+<p>Du siehst dann ein Formular zum Hinzufügen einer Familie. Siehe
+den Abschnitt <a href="#AddF">Familie hinzufügen</a>.
+<p>In einem Personendatensatz erlaubt dir das Klicken auf "Aktualisieren"
+eine Auswahlseite zu sehen. Diese Auswahl hängt von der familiären
+Situation der Person ab:
+<ol>
+<li value="1">
+Auf alle Fälle hast du die Auswahl "Ändern" und "Löschen":
+Das ist das Anpassen oder Löschen der Person. Weiter siehe die Abschnitte:</li>
+
+<ul>
+<li>
+<a href="#ModP">Ändern einer Person</a></li>
+
+<li>
+<a href="#DelP">Löschen einer Person</a></li>
+</ul>
+Wenn der Datenbank-Eigentümer die Berechtigung dafür zur Verfügung
+gestellt hat (siehe [[[start#Cnf/Konfigurationsdatei]]]),
+erhältst
+du die Auswahl "Bild senden". Weiter siehe die Abschnitte:
+<ul>
+<li>
+<a href="#SndP">Bild senden</a></li>
+
+<li>
+<a href="#DelPh">Bild löschen</a></li>
+</ul>
+</ol>
+
+<ol>
+<li value="2">
+Wenn die Person verheiratet ist, hast du für jede Ehe die Auswahl
+"Familie ändern" und "Familie löschen". Weiter siehe die Abschnitte:</li>
+
+<ul>
+<li>
+<a href="#ModF">Familie ändern</a></li>
+
+<li>
+<a href="#DelF">Familie löschen</a></li>
+</ul>
+</ol>
+
+<ol>
+<li value="3">
+Wenn es mehrere Ehen gibt, ist ein Auswahl-"schalter" zwischen jeder Ehe,
+um die Reihenfolge der Familien zu tauschen.</li>
+</ol>
+
+<ol>
+<li value="4">
+In anderen Fällen endet diese Familienliste mit "Familie
+hinzufügen". Du siehst
+das gleiche Formular wie nach "eine Familie hinzufügen" von der Startseite,
+außer daß die Person vorausgefüllt wird im Formular als
+eines der Elternteile (entsprechend dem Geschlecht). Weiter siehe Abschnitt:
+
+<p>
+<ul>
+<li>
+<a href="#AddF">Hinzufügen einer Familie</a></li>
+</ul>
+</ol>
+
+<ol>
+<li value="5">
+Es gibt eine Auswahl zur Änderung der Namen der Kinder. Dies erlaubt
+die Vor- und Nachnamen aller Kinder einer Person in einem einzigen Formular
+zu ändern. Weiter siehe Abschnitt:</li>
+
+<p>
+<ul>
+<li>
+<a href="#ChgC">Namen der Kinder ändern</a></li>
+</ul>
+</ol>
+
+<ol>
+<li value="6">
+Am Ende - wenn die Person keine Eltern hat - gibt es die Auswahl "Eltern
+hinzufügen". Dies ruft ebenfalls das Formular "Familie hinzufügen"
+auf, wobei die betreffende
+Person vorausgefüllt als Kind und sein Nachname im Feld "Nachname"
+des Vaters. Weiter siehe Abschnitt:</li>
+
+<p>
+<ul>
+<li>
+<a href="#AddF">Hinzufügen einer Familie</a></li>
+</ul>
+</ol>
+Anmerkungen:
+<ul>
+<li>
+Alle diese Auswahlen führen entweder zu auszufüllenden Formularen
+oder zu einer Bestätigungsabfrage.
+Es ist immer möglich, zurückzugehen.
+
+<p>Also wird "Löschen" (Auswahlnummer 1) die Person nur entfernen,
+wenn du auf der nächsten Seite auf "Ok" drückst.
+
+<p>
+<li>
+In den Formularen kann es passieren, daß einige Felder vorausgefüllt
+sind. Das heißt nicht, daß du deren Inhalt nicht ändern kannst.
+
+<p>So wird bei "Eltern hinzufügen" (Auswahlnummer 6) der Nachname
+des Vaters vorausgefüllt. Aber das geschieht nur der 
+Bequemlichkeit halber, da 
+Vater und Kind oft denselben Nachnamen haben: Wenn aber der
+Vater anders heißt, kannst du den Namen beliebig ändern.</ul>
+
+
+<p>
+
+
+<a name="Part"></a>
+== Einige spezifische Punkte ==
+Diese Punkte sind hervorgehoben, weil sie mögliche Fallstricke
+sein können: Folge dann jeweils der angegebenen Prozedur.
+
+
+<a name="ModC"></a>
+=== Wie ändert man den Vornamen oder den Nachnamen eines Kindes ===
+Beispiel: In der Familie von "Max Meier" und "Barbara Mueller" wird eins
+der Kinder "Robert" genannt, obwohl sein Vorname in Wirklichkeit "Phillip"
+war:
+<p>Was du machen kannst:
+<ul>
+<li>
+Gehe zum Personendatensatz von "Robert Meier", klicke auf "Aktualisieren",
+dann "Ändern" und fahre fort wie im Abschnitt "Ändern einer Person"
+beschrieben (Auswahlnummer 1 in Abschnitt 3).</li>
+</ul>
+Was du&nbsp; <i>nicht</i> machen darfst:
+<ul>
+<li>
+Verwende nicht "Ändern Familie" (Auswahlnummer 2 in Abschnitt 3).</li>
+
+<p>Wenn du das tust, und im Formular "Robert" in "Phillip"
+änderst, dann
+<p>
+<ul>
+<li>
+trennt das die Verbindung zwischen "Robert" und seinen Eltern und "Robert"
+heißt weiterhin "Robert Meier", aber ohne Eltern.</li>
+
+<li>
+trägt das "Phillip Meier", wenn er existiert und noch keine Eltern
+hat, als ein Kind dieses Paares ein.</li>
+
+<li>
+aber wenn dieser "Phillip Meier" in der Datenbank nicht existiert, 
+oder bereits existiert, aber schon Eltern hat, wird eine Fehlermeldung
+angezeigt und nichts geändert (glücklicherweise).</li>
+</ul>
+</ul>
+
+
+<a name="AddC"></a>
+=== Wie wird ein Kind einer Familie hinzugefügt ===
+In der Familie von "John Meier" und "Barbara Mueller" willst
+du "Hubert" als ein Kind hinzufügen:
+<p>Was du machen kannst:
+<ul>
+<li>
+Gehe zum Personendatensatz eines der Elternteile, klicke auf
+"Aktualisieren", dann "Familie ändern" (Auswahlnummer 2 in Abschnitt
+3), und füge das Kind hinzu wie in Abschnitt "Familie ändern"
+beschrieben.</li>
+</ul>
+Was du <i>nicht</i> machen darfst:
+<ul>
+<li>
+Verwende nicht "Familie hinzufügen" (Nummer 4 in Abschnitt 3),
+denn das bedeutet nicht "füge ein Kind einer Familie hinzu",
+sondern "füge eine neue Ehe hinzu", was einen neuen Eintrag
+"Familie" mit einer neuen Gattin erzeugt.</li>
+</ul>
+
+<ul>
+<li>
+Wenn das Kind schon in der Datenbank existiert und du willst
+es der Liste der Kinder eines schon existierenden Paares hinzufügen,
+verwende nicht "Eltern hinzufügen" (Auswahlnummer 4 in Abschnitt 3).
+
+<p>Die Auswahl "Eltern hinzufügen" dient nämlich dazu,
+Eltern zu einem deiner Vorfahren hinzuzufügen. Diese Funktion erzeugt
+außerdem eine neue Familie.</ul>
+
+<p>
+
+
+<a name="Form"></a>
+== Formulare ==
+
+<a name="AddF"></a>
+=== Familie hinzufügen ===
+
+Du siehst dieses Formular mit der Überschrift "Familie hinzufügen":
+<ul>
+<li>
+entweder von der Startseite, wenn du auf "Familie hinzufügen" klickst;
+in diesem Fall ist kein Bereich des Formulars vorausgefüllt,</li>
+
+<li>
+oder von einem Personendatensatz aus, nachdem du auf "Aktualisieren",
+dann "Familie hinzufügen" geklickt hast; in diesem Fall sind die Bereiche
+"Vorname", "Nachname" und "Nummer" vorausgefüllt, für den Vater
+oder die Mutter entsprechend dem Geschlecht der Person,</li>
+
+<li>
+oder, im selben Kontext, nachdem man auf "Eltern hinzufügen" geklickt
+hat, wenn diese Auswahl existierte; in diesem Fall ist das "Nachname"-Feld
+des Vaters vorausgefüllt, genauso die Felder "Vorname", "Nachname"
+und "Nummer" des ersten (und einzigen) Kindes. 
+Beachte, daß du den Nachnamen
+des Vaters beliebig ändern kannst, wenn er von dem des
+Kindes verschieden ist.</li>
+</ul>
+Dieses Formular verhält sich exakt wie "Familie ändern",
+außer daß es eine neue Familie erzeugt. Sooft du es verwendest,
+wird eine neue Familie angelegt.
+<p>Das heißt, daß wenn du bemerkst, daß du Fehler gemacht hast,
+nachdem das Formular abgeschickt wurde, darfst du nicht nochmal "Familie
+hinzufügen", sondern mußt "Familie ändern"!
+<p>Weiter siehe nächster Absatz, wo
+das Ausfüllen des Formulares beschrieben wird.
+
+
+<a name="ModF"></a>
+=== Familie ändern ===
+
+Du siehst dieses Formular von einem Personendatensatz ausgehend, nachdem du
+auf "Aktualisieren", dann "Familie ändern" geklickt hast. Dieses Formular
+ist vorausgefüllt mit "Vorname", "Nachname" und "Nummer" von Vater,
+Mutter und Kindern, sowie allen möglichen Daten zu dieser Familie.
+<p>
+Dieses Formular funktioniert wie das von "Familie hinzufügen" des
+vorherigen Abschnitts (außer daß keine neue Familie angelegt wird).
+Das folgende gilt demnach genauso für das Formular "Familie hinzufügen".
+<p><b>Ausfüllen</b>
+<p>Alle Felder (vorausgefüllt oder nicht) können gefüllt,
+gelöscht oder geändert werden. Wenn du alles, was du für
+nötig hältst, ausgefüllt, gelöscht und geändert
+hast, gehe ans Ende des Formulars und klicke auf "Ok".
+<p>In dem Bereich mit den Personen beachte die Auswahl von "Verbinden"
+und "Erzeugen". Fallabhängig wird eins davon vorausgewählt. Du
+kannst diese Auswahl ändern entsprechend dessen, was du tun willst.
+<ul>
+<li>
+"Verbinden" heißt, daß die Person schon in der Datenbank existiert.
+Beim Bestätigen checkt das System, ob diese Person existiert und,
+bei einem Elternteil, ob dieser dem richtigen Geschlecht entspricht.</li>
+
+<p>Beachte: Da dies eine Suche nach "Schlüssel" ist (siehe erster
+Abschnitt), ist es nicht notwendig, Betonungszeichen, Klein- und Großschreibung
+zu beachten.</ul>
+
+<ul>
+<li>
+"Erzeugen" heißt, daß die Person in der Datenbank nicht existiert
+und
+daß das System beim Bestätigen die Person anlegen soll mit dem angegebenen
+Vornamen, Nachnamen und Nummer.</li>
+
+<p>
+Hier mußt du - im Unterschied zum "Verbinden" - die Betonungszeichen,
+Groß- und Kleinbuchstaben korrekt schreiben: Die Person wird erzeugt
+mit der angegebenen Schreibung.
+<p>
+Du kannst das Geschlecht und den Geburtstag des Kindes eingeben. Für
+dessen andere Personendaten muß später "Aktualisieren"
+von dessen Personenseite aus aufgerufen werden.</ul>
+Beim Bestätigen werden die "Kinder"-Felder ignoriert, deren Feld "Vorname"
+leer ist, unabhängig vom Inhalt der anderen Felder. Sie werden
+behandelt, als würden sie nicht existieren.
+<p>
+Bei Kindern ist das Feld "Nachname" optional: Wenn es fehlt, wird der
+Name des Vaters verwendet.
+<p>
+<b>Einige Änderungen</b>
+<p>&nbsp;Hier sind einige Änderungen, die du durchführen kannst:
+<ul>
+<li>
+<b>Um ein Kind hinzuzufügen</b>, wenn kein freier Bereich dafür
+da ist, klicke zuerst auf die Taste "Kind einfügen" entsprechend des
+Platzes, wo du es in der Familie hinzufügen willst. Dann klicke auf
+"Ok" am Ende des Formulars.</li>
+
+<p>Anmerkung: Das bestätigt das Formular nicht sofort. Das System
+liefert jetzt nur ein anderes Formular mit einem reservierten Platz für
+das Kind oder die Kinder, die du hinzufügen willst.
+<p>
+Daher eine Warnung: Solange du auf "Kind einfügen" und dann auf
+"Ok" drückst, wird das Formular noch nicht abgeschickt: Es erscheint
+nur ein größeres Formular. Du darfst diese Taste nicht interpretieren
+als "füge das Kind hinzu, was ich gerade eingegeben habe": Das System
+sieht das, keine Angst.
+<p>Das Kind, welches du in das dafür erzeugte Feld einträgst,
+kann eine existierende Person in der Datenbank sein. In diesem Fall wähle
+"Verbinden" statt "Erzeugen".</ul>
+
+<ul>
+<li>
+<b>Um ein Kind zu löschen</b>, lösche einfach seinen Vornamen.
+Wie oben erwähnt, werden Einträge, deren Vornamenfeld leer ist,
+beim Bestätigen ignoriert. Merke, daß dies nicht die Person löscht:
+Diese wird nur von der Liste der Kinder entfernt und bleibt ohne Eltern bestehen.</li>
+</ul>
+
+<ul>
+<li>
+<b>Um die Position eines Kindes zu ändern</b>, ist der einfachste
+Weg, auf "Kind einfügen" zu klicken auf der Position, auf die es gesetzt
+werden soll, und auf&nbsp; "Ok" zu drücken. Im neu angezeigten Formular
+gib die Daten des Kindes an der neuen Stelle ein, wähle "Verbinden"
+anstelle von "Erzeugen" und lösche den Vornamen an der alten Position.</li>
+</ul>
+
+<ul>
+<li>
+<b>Um die Position von zwei Kindern zu tauschen</b>, kannst du in der gleichen
+Weise verfahren, indem eine neue Position erzeugt und dann per Ausschneiden
+und Einfügen getauscht wird. Vergiß nicht,&nbsp; "Verbinden"
+auszuwählen.</li>
+
+<p>Du kannst das aber auch direkt machen, ohne einen neuen Platz hinzuzufügen:
+Dann entsteht aber das Problem, daß du dir den einen der beiden Namen 
+merken mußt,
+wenn du ihn löschst, um den anderen an dieser Stelle einzutragen.</ul>
+
+<b>Bestätigung</b>
+<p>Das Bestätigen findet statt, wenn du auf "Ok" drückst.
+Solange du das nicht tust, wird keine Veränderung an der Datenbank
+vorgenommen.
+<p>Merke auch, daß, wie oben gesagt, wenn ein oder mehrere Male "Kind einfügen"
+ausgewählt ist, nur ein neues Formular erzeugt wird: Das ist <i>kein</i>
+richtiges Bestätigen.
+<p>Wenn das Bestätigen wirklich stattgefunden hat, mußt du eine
+neue Seite sehen, deren Titel lautet:
+<ul>
+<li>
+Entweder: <b>Familie hinzugefügt oder geändert</b></li>
+
+<p>Du siehst dann die Namen der Eltern, auf die du klicken kannst.
+<p>Es kann auch sein, daß du Warnungen siehst. Diese betreffen Inkonistenzen
+bei Datums- oder Kinderreihenfolge. 
+Die Änderung wurde trotzdem ausgeführt,
+aber möglicherweise ist es besser, die
+aufgelisteten Probleme zu beheben.
+<p>Wenn du auf eines der Elternteile klickst, siehst du dessen 
+Personendatensatz. Aber deine Änderung kann unsichtbar sein. Webbrowser behalten
+bereits angezeigte Seiten normalerweise im Speicher, und zeigen möglicherweise
+die alte Version an. Gehe auf "Seite neuladen" in deinem Webbrowser um
+die Änderungen wirklich zu sehen.</ul>
+
+<ul>
+<li>
+Oder: <b>Fehler</b></li>
+
+<p>Die Seite zeigt den aufgetretenen Fehler an. Gehe zurück
+und behebe diesen. Man kann das auch sein lassen ... einfach nichts machen
+und weiter in der Datenbank arbeiten.
+<p>Wenn der Fehler anzeigt, daß eine Person schon existiert, heißt
+das, daß du eine Person anlegen wolltest, deren Kombination aus "Vorname",
+"Nachname", "Nummer" bereits in der Datenbank existiert.
+<p>Lösung:
+<p>
+<ul>
+<li>
+Wenn du wirklich eine Person neu anlegen wolltest, gehe zurück und
+ändere deren Nummer. Beachte daß die Fehlerseite die erste freie,
+also verfügbare Nummer anzeigt: Wähle diese oder eine andere
+aus. Wenn es mehrere Personen mit demselben Namen gibt, wird eine Liste
+angezeigt.</li>
+
+<li>
+Wenn dies die richtige Person war die du haben wolltest, gehe zurück
+und ändere "Hinzufügen" zu "Verbinden"."</li>
+</ul>
+<p>
+Dann drücke wieder auf "Ok".
+<p>Wenn der Fehler dir angezeigt hat, daß eine Person nicht existiert,
+heißt das, du hast "Verbinden" bei einer nicht existierenden Person
+ausgewählt. Vielleicht eine falsche Nummer gewählt? Oder wolltest
+du eigentlich eine neue Person hinzufügen?</ul>
+
+
+<a name="DelF"></a>
+=== Familie löschen ===
+
+Du siehst dieses Formular mit der Überschrift "Familie löschen"
+von einem Personendatensatz ausgehend, nachdem du auf "Aktualisieren",
+dann "Familie löschen" geklickt hast.
+<p>
+Das Formular enthält nur die "Ok"-Taste um zu bestätigen,
+daß du wirklich löschen willst.
+Du kannst es aber auch noch sein lassen.
+<p>Wenn du auf "Ok" drückst, erscheint eine neue Seite mit der Überschrift
+"Familie gelöscht".
+<p>Die Familie wurde aus der Datenbank gelöscht: Vater, Mutter und
+die Kinder werden voneinander getrennt. Trotzdem wird keiner 
+davon gelöscht:
+Nur sind Vater und Mutter nicht mehr verheiratet, sie haben nicht mehr
+diese Kinder (sie können andere aus anderen Ehen haben, die 
+bestehen bleiben),
+die Kinder haben keine Eltern mehr.
+
+<a name="ModP"></a>
+=== Person ändern ===
+
+Du siehst dieses Formular mit der Überschrift "Person ändern"
+von einem Personendatensatz ausgehend, nachdem du auf "Aktualisieren",
+dann "Ändern" geklickt hast. Das Formular ist vorausgefüllt mit
+allen individuellen Daten dieser Person.
+
+<p><b>Ausfüllen</b>
+
+<p>Alle Felder (vorausgefüllt oder nicht) können ausgefüllt,
+gelöscht oder geändert werden. Wenn du alles, was du für
+notwendig hältst, ausgefüllt, gelöscht, geändert hast,
+gehe zum Ende des Formulars und bestätige das Formular durch Klicken
+auf "Ok".
+<p>Einige Tasten heißen "Beiname einfügen",
+"Alias einfügen", etc.
+<p>Warnung: Dies dient nicht zum Hinzufügen des entsprechenden
+Beinamen, Alias etc. zur Person, sondern um ein anderes Formular mit einem 
+reservierten
+Platz für eine weiteren Beinamen, ein anderes Alias etc. zu erzeugen.
+<p>Wenn du also auf "Ok" drückst, nachdem du eine oder mehrere dieser
+Tasten ausgewählt hast, wird ein neues, größeres Formular
+angeboten, aber es ist noch keine Änderung erfolgt.
+<p>Solltest du daher, nach einem "Ok", ein neues Änderungsformular
+sehen, heißt das, daß das Bestätigen noch nicht erfolgt ist,
+auch wenn eine Menge von Feldern ausgefüllt ist.
+
+<p><b>Verschiedene Felder</b>
+
+<p>Beachte die Bedeutung der verschiedenen Felder, speziell die Verwendung
+von "Öffentlicher Name", "Beiname", "Alias" usw. die alle eine sehr
+spezielle Bedeutung haben.
+<ul>
+<li>
+<b>Vorname</b> und <b>Nachname</b> haben ihre gewöhnliche Bedeutung.
+Zusammen mit der <b>Nummer</b> hat die Person einen eindeutigen "Zugriffsschlüssel"
+wie am Anfang dieses Kapitels gezeigt.</li>
+
+<p>Wir empfehlen, den allgemeinen Vornamen in das Vornamenfeld zu
+schreiben. Die anderen Vornamen (komplette Vornamen, andere mögliche
+Vornamen, andere Schreibungen von Vornamen usw) sollten besser in das Feld
+"Vornamen-Alias" (darunter). Namen mit Zahl wie bei adligen und königlichen
+Personen gehören besser in das Feld "Öffentlicher Name".
+
+<p>Grund hierfür ist, daß der Vorname in der Liste der
+Vornamen gespeichert wird. So wird es möglich zu wissen, was der
+häufigste Vorname ist,
+zu sehen, welche anderen Personen den gleichen Vornamen haben etc. Die
+anderen Arten von Vornamen könnten sonst nur als ein Exemplar 
+existieren.</ul>
+
+<ul>
+<li>
+<b>Öffentlicher Name</b> ist der Name, unter dem die Person bekannt
+ist. Beispiel: "Edward VII" (sein Vorname ist "Edward" und sein Nachname
+"Windsor").</li>
+
+<p>Die Personen, die einen öffentlichen Namen haben, sind in der
+Navigation über diesen Namen zu finden.
+
+<p>Wenn es einen öffentlichen Namen gibt, wird dieser als Titel im
+Personendatensatz angezeigt anstelle von "Vorname Nachname",
+welche darunter und in kleineren Buchstaben erscheinen.</ul>
+
+<ul>
+<li>
+<b>Bild</b> ist eine ".gif", ".jpg" oder ".png"-Datei, die dieser
+Person zugeordnet ist und 
+die in deren Personendatensatz mit angezeigt wird. Dies kann
+eine URL-Adresse sein (beginnend mit "http://...") oder nur ein Name, den
+das System in den Verzeichnissen "images", Unterverzeichnis "base" (wobei
+"base" der Name der Datenbank ist) während der Anzeige sucht.</li>
+
+<p>Wenn du keinen Dateinamen angibst, existiert ein Default-Name.
+
+<p>Dieser Name besteht aus dem Vornamen, einem Punkt, der Nummer, einem
+weiteren Punkt, dem Nachnamen, alles kleingeschrieben, ohne Betonungszeichen
+und alle nicht-Buchstaben-Zeichen konvertiert zu Unterstrichen.
+<p>Beispielsweise hat eine Person namens "Anne-Cécile Dupont de
+Nemours" als Standard-Bild-Namen:
+<pre>&nbsp;&nbsp; anne_cecile.0.dupont_de_nemours</pre>
+{GeneWeb} sucht eine Datei mit diesem Namen, gefolgt von&nbsp; ".gif",
+".jpg" oder ".png" im obigen Verzeichnis der Bilder der Datenbank.</ul>
+
+<ul>
+<li>
+<b>Beiname</b> ist der Teil des Namens, der an den öffentlichen Namen
+von berühmten Personen angehängt wird. So z. B. "der Dicke" für
+"Louis VI der Dicke".</li>
+
+<p>Auf Personen kann mit diesem Beinamen anstelle ihres Nachnamens
+zugegriffen werden. So kann auf "Louis VI der Dicke " zugegriffen werden
+durch "Louis VI" (öffentlicher Name), "Louis VI der Dicke", "Louis
+der Dicke", "Louis Capet", etc. Merken wir uns, daß "der Dicke" niemals
+allein als Nachname betrachtet wird.
+
+<p>Es kann meherere Beinamen geben: So ist "William der Eroberer" 
+auch bekannt
+als "William der Bastard". Daher benötigst du ein Feld für
+die Beinamen "der Eroberer" und ein weiteres für "der Bastard".
+Daher ist "Beiname einfügen" nützlich.
+
+<p>Wenn es einen Beinamen gibt, wird der öffentliche Name (oder der
+Vorname, wenn es keinen öffentlichen Namen gibt), gefolgt vom
+Beinamen als Titel im Personendatensatz angezeigt, anstelle
+des normalen "Vorname Nachname", welches darunter in kleineren Buchstaben
+erscheint.</ul>
+
+<ul>
+<li>
+<b>Alias</b> ist ein Name, durch den die Person bekannt ist, ohne
+daß
+dies eine Alternative für einen Vornamen ist 
+(wie z. B. der "öffentliche Name").</li>
+
+<p>So ist "Norma Jean Mortenson" bekannt als "Marilyn Monroe". Beachte,
+daß der Alias aus einem Teil besteht: Kombinationen wie
+"Norma Jean Monroe" oder "Marilyn Mortenson" werden nicht akzeptiert.
+<p>Wenn es einen oder mehrere Aliase gibt, werden diese in kleiner Fettschrift
+unter dem Titel angezeigt.</ul>
+
+<ul>
+<li>
+<b>Vornamen-Alias</b> kann mehrere Verwendungen haben:</li>
+
+<p>
+<ul>
+<li>
+das kann die komplette Liste der Vornamen sein.</li>
+
+<li>
+das kann ein Spitzname sein für enge Beziehungen sein: "Bob" für
+"Robert".</li>
+
+<li>
+dies kann ein anderer Vorname sein, oder der gleiche mit einer anderen 
+Schreibweise,
+für den Fall von Personen aus alten Zeiten, deren Vorname nicht sicher
+ist, oder in verschiedenen Quellen verschieden geschrieben wird.</li>
+</ul>
+<p>
+Es können mehrere Vornamen-Aliase existieren.
+<p>
+Vornamen-Aliase können verwendet werden anstelle des Vornamens
+bei Anfragen, aber sie werden nicht als richtige Vornamen betrachtet, 
+d.&nbsp;h. sie werden nicht in der Liste der Vornamen geführt etc.
+
+<p>Wenn es Vornamen-Aliase gibt, werden diese im Personendatensatz
+angezeigt, in Kleinbuchstaben unter dem Titel.</ul>
+
+<ul>
+<li>
+<b>Nachnamen-Alias</b> kann als alternativer Nachname benutzt werden,
+wenn du eine andere Version des Namens haben willst, z. B. mit einer anderen
+Schreibweise. Dessen Verwendung ist nicht häufig.</li>
+</ul>
+
+<ul>
+<li>
+<b>Geburt</b> erlaubt die Angabe von Datum und Ort von Geburt und Taufe.
+Nicht besonders schwierig.</li>
+</ul>
+
+<ul>
+<li>
+<b>Tod</b> erlaubt die Angabe von Informationen über den Tod.
+Ebenfalls nicht besonders kompliziert, außer der 
+"automatischen Auswahl" welche wir hier erklären.</li>
+
+<p>Die "automatische Auswahl" erfolgt, wenn die Auswahl des ersten
+Menüs des "Tod"-Feldes ein"-" enthält. Das zeigt an,
+daß jemand
+nicht weiß, ob die Person tot ist oder nicht.
+<p>
+Wenn in diesem Fall kein Todesdatum oder -ort angegeben ist, wählt
+das System entsprechend dem Geburtsdatum für dich aus, ob die Person
+tot ist oder nicht:
+Wenn sie weniger als 80 Jahre alt ist, entscheidet es
+"nicht tot", zwischen 81 und 120 Jahren "unbekannt", und bei mehr als 120
+Jahren entscheidet es "tot".
+<p>
+Wenn diese automatische Auswahl nicht paßt, kannst du selbst die
+richtige Wahl im ersten Menü treffen anstelle des angezeigten "-".
+<p>
+Beachte, daß das Alter der Personen, deren Tod "unbekannt" ist, weder
+auf deren Personenseite noch bei den Jubiläen angezeigt
+wird. Daher wähle, wenn eine Person zwischen 81 und 120 Jahren alt
+ist, "nicht tot".</ul>
+
+<ul>
+<li>
+<b>Beruf</b> enthält den Beruf. Wenn du einen Adelstitel
+eintragen willst, benutze lieber die "Titel"-Felder darunter.</li>
+</ul>
+
+<ul>
+<li>
+<b>Titel</b> enthält den Adelstitel. Es kann mehrere davon geben.
+Um ein Formular mit mehr Platz für die Titel zu erhalten, klicke ein
+oder mehrere Male auf "Titel einfügen", gehe ans Ende des Formulars
+und drücke "Ok".</li>
+
+<p>Titel bestehen aus zwei Teilen: Dem Titel selbst und dem Ort. Der
+Titel selbst enthält den Rang: "Graf", "Herzog", "König" etc.
+Der Ort enthält die Ergänzung: "von Warwick", "von Sachsen",
+"von England" etc.
+<p>
+Beachte das Partikel: In der Anzeige siehst du die Kombination von
+Rang und Ort: "Graf von Warwick", "Herzog von Sachsen", "König von
+England", welche klickbare Felder sind, die es erlauben, alle Personen
+anzuzeigen, die diesen Titel tragen.
+<p>Aber die Trennung dieser Begriffe erlaubt die Auswahl von z. B. allen
+"Graf", allen "Herzog", allen "König" (der Plural darf nicht verwendet
+werden), und umgekehrt allen Titeln, die mit "von Warwick", "von Sachsen",
+"von England" etc. enden.
+<p>Das Feld "Name" repräsentiert einen öffentlichen Namen verbunden
+mit dem Titel. Zum Beispiel wird "Charles Quint" genannt "Charles I" als
+"König von Spanien", "Charles IV" als "König von Sizilien" etc.
+<p>Das Feld "N-ten" wird verwendet für Titel in Verwendung mit einer
+Nummer. Beispiel: Für den "5ten Herzog von Hamilton", nimm die Zahl
+"5". Verwechsle das nicht mit "Edward VII" dessen Nummer anzeigt,
+daß
+er der 7te "Edward" der Abstammung nach ist, nicht aber der 7te "König
+von Großbritannien".
+<p>
+Mit der Taste "Haupttitel" kann ausgewälht werden,
+welcher Titel verwendet werden soll, wenn diese Person auf einfache
+Weise angezeigt wird (zum Beispiel auf der Seite seiner Gattin oder der
+seiner Kinder). 
+Dies hat nur Bedeutung, wenn es mehrere Titel gibt.
+<p>
+Die nächsten beiden Felder geben die Daten von Beginn und Ende
+der Regentschaft an.
+<p>Um einen Titel zu löschen, entferne nur den Inhalt des ersten Feldes
+"Titel".</ul>
+
+<ul>
+<li>
+<b>Zugriff</b> erlaubt es, den Zugriff auf die persönlichen Informationen
+einzustellen. Dies wird angewandt auf die Personen der "Jetzt-Zeit", d.h.
+jene, deren Daten (Geburt, Tod etc.) jünger als 100 Jahre sind:</li>
+
+<p>
+<ul>
+<li>
+Standardmäßig werden Personen, die Adelstitel haben oder
+bei denen ein Elternteil einen Adelstitel hat, als "öffentliche" Personen
+betrachtet und ihre persönlichen Informationen werden immer angezeigt.</li>
+
+<li>
+Wenn "öffentlich" ausgewählt wird, werden die persönlichen
+Informationen immer angezeigt, auch wenn die Person keine Adelstitel hat.</li>
+
+<li>
+Wenn "privat" ausgewählt wird, werden die Informationen nicht angezeigt,
+auch wenn die Person Adelstitel hat.</li>
+</ul>
+
+<p>
+Bei "Wizard"- oder "Freund"-Einträgen (per Kennwort) werden die persönlichen
+Informationen immer angezeigt.</ul>
+
+<ul>
+<li>
+<b>Notizen</b> enthält Bemerkungen zu der Person. In
+der Personendatensatzseite wird der Text ohne Leerzeilen angezeigt,
+auch wenn du Leerzeilen in deinem Text hast. Um eine richtige Leerzeile
+einzufügen, schreibe "&lt;br&gt;" an die gewünschte Stelle.
+</ul>
+
+<ul>
+<li>
+<b>Quelle</b> erlaubt die Aufzeichnung von Kurzinformationen über
+den Ursprung der Daten: Ein Name, eine Abkürzung, ein Buchtitel,
+ein Code. So weiß man, woher die Informationen stammen.</li>
+
+<p>Dies ist nicht gedacht für lange Informationen, wie "die Kopie
+des im Rathaus gefundenen Dokumentes": Benutze dafür besser das Feld 
+"Notizen".
+</ul>
+
+<b>Bestätigen</b>
+<p>Das Bestätigen findet statt, wenn du auf "Ok" klickst. 
+Solange du dies nicht machst, werden keine Veränderungen an der Datenbank
+durchgeführt.
+<p>Merke also, daß - wie oben erwähnt - wenn ein oder mehrere Male
+"Einfügen" ausgewählt wurde, nur ein neues Formular geliefert
+wird: Das ist <i>nicht</i> das richtige Bestätigen.
+
+<p>Wenn das Bestätigen erfolgt ist, mußt du eine neue Seite
+sehen, deren Titel lautet:
+<ul>
+<li>
+entweder: <b>Person geändert</b></li>
+
+<p>Du siehst den Namen der Person und kannst darauf klicken.
+<p>Es kann auch sein, daß du Warnungen siehst. Diese betreffen Datumsinkonsistenzen.
+Die Aktualisierung wird trotzdem durchgeführt, aber diese sollten
+besser korrigiert werden.
+<p>Wenn du auf eine Person klickst, siehst du deren Personendatensatz.
+Aber deine Aktualisierung könnte unsichtbar sein. Webbrowser behalten
+oftmals schon angezeigte Seiten im Speicher und zeigen möglicherweise
+die alte Version an. Gehe auf "Seite aktualisieren" in deinem Webbrowser
+um wirklich die Änderungen zu sehen.</ul>
+
+<ul>
+<li>
+oder: <b>Fehler</b></li>
+
+<p>Die Seite zeigt den aufgetretenen Fehler. Gehe zurück und behebe
+ihn. Du kannst es aber auch sein lassen ... mache einfach nichts und arbeite
+weiter mit der Datenbank.
+<p>Wenn der Fehler anzeigt, daß eine Person schon existiert, heißt
+das, daß du Vorname, Nachname oder die Nummer geändert hast
+(du hast natürlich das absolute Recht dies zu machen), aber die neue
+Auswahl steht im Konflikt mit einer anderen Person in der Datenbank.
+<p>Lösung: Gehe zurück und ändere die Nummer. Beachte,
+daß
+die Fehlermeldung dir dafür eine frei verfügbare Nummer angeboten hat.
+Nimm diese oder eine andere. Wenn es mehrere Personen mit dem selben Namen
+gibt, wird eine Liste angezeigt.</ul>
+
+
+<a name="DelP"></a>
+=== Person löschen ===
+
+Du siehst das Formular mit der Überschrift "Person löschen" von
+einem Personendatensatz ausgehend, nachdem du auf "Aktualisieren",
+dann "Löschen" klickst.
+<p>
+Das Formular enthält nur die "Ok"-Taste um zu bestätigen,
+daß du wirklich löschen willst.
+Du kannst es aber auch noch sein lassen.
+<p>
+Wenn du auf "Ok" drückst, erscheint eine neue Seite mit dem Titel
+"Person gelöscht".
+<p>
+Die Person wird nicht direkt gelöscht. Ihre Personendaten
+werden entfernt (einschließlich Vor- und Nachname) wie auch
+die Verbindung mit ihren Eltern.
+<p>Jedoch bleibt ein "Personenobjekt" bestehen, das verbunden mit
+seiner/m Ehegattin/en und den Kindern ist.
+
+
+<a name="SndP"></a>
+=== Bild senden ===
+
+Du siehst dieses Formular mit der Überschrift "Bild senden" von einem
+Personendatensatz ausgehend, nachdem du auf "Aktualisieren", dann "Bild
+senden" geklickt hast, aber nur wenn der Eigentümer der Datenbank
+die [[[start#Cnf/Berechtigung]]] dafür gegeben hat und
+wenn das Feld "Bild" der Person leer ist.
+<p>Du kannst eine "gif", "jpeg" oder "png" Datei senden (uploaden), welche mit
+der Person verknüpft wird. Diese Datei wird auf der Website abgespeichert.
+Wenn die Person schon ein Bild hatte, wird es durch das neue ersetzt.
+<p>Beachte: Wenn das Feld "Bild" der Person nicht leer ist, hast du keinen
+Zugriff auf "Bild senden". Wenn du dies tun willst, so gehe erst auf "Aktualisieren",
+"Ändern", und lösche den Inhalt des Feldes "Bild".
+
+
+<a name="DelPh"></a>
+=== Bild löschen ===
+
+Du siehst dieses Formular mit der Überschrift "Bild löschen"
+von einem Personendatensatz ausgehend, nachdem du auf "Aktualisieren",
+dann "Bild löschen" geklickt hast, aber nur wenn der Eigentümer
+der Datenbank dir die [[[start#Cnf/Berechtigung]]] dafür
+gegeben hat.
+<p>Wenn du auf "Ok" klickst, wird das mit der Person verbundene Bild gelöscht.
+
+
+<a name="ChgC"></a>
+=== Namen der Kinder ändern ===
+
+Du siehst dieses Formular von einem Personendatensatz ausgehend, nachdem 
+du auf "Aktualisieren", dann "Namen der Kinder ändern" geklickt hast.
+<p>
+Alle Kinder der Person werden angezeigt. Es ist möglich, den Vornamen,
+den Nachnamen und die Nummer jedes Kindes zu ändern.
+<p>
+Interessante Möglichkeit: Wenn der Nachname eines Kindes gelöscht
+wird, wird automatisch der Nachname der Eltern verwendet.
+<p>
+Das kann bequem sein, um den Nachnamen eines ganzen Zweiges zu ändern:
+Man ändert mit "Ändern" den Nachnamen des Vorfahren. Dann
+geht man zu "Namen der Kinder ändern" beim Vorfahren und löscht 
+einfach
+in diesem Formular die Nachnamen der Kinder, was eine schnelle Operation
+ist. Dann macht man mit den Kindern weiter.
+<p>
+Dies kann auch genutzt werden, um den Vornamen eines Kindes zu korrigieren.
+Aber wenn es nur um ein Kind geht, kann dies mit "Person ändern" erfolgen.
+
+
+<p>
+
+
+<a name="MrgP"></a>
+== Zusammenführen zweier Personen ==
+Dieser Abschnitt beschreibt, wie zwei <b>Personen</b> in einer Datenbank
+zusammengeführt werden, für den Fall, daß diesselbe Person 
+zweimal eingetragen wurde.
+<p>
+Beachte: Wir sprechen hier nicht darüber, wie zwei <b>Datenbanken</b>
+zusammenzuführen sind, dies wird [[[merge/woanders]]]
+betrachtet. Es ist nicht möglich, dies online zu tun (dieses Kapitel 
+bezieht sich nur auf Online-Änderungen).
+<p>Das Zusammenführen von zwei Personen erfolgt zwar ziemlich manuell,
+aber du behältst
+stets eine zusammenhängende Datenbank.
+<p>Das Prinzip ist das folgende:
+<ul>
+<li>
+Du wählst die zwei Personen, die zusammengeführt werden
+sollen. Aber es gibt dort die Schwierigkeit
+ihrer Eltern. Wenn beide Eltern haben, müssen ihre Eltern zuerst 
+zusammengeführt 
+werden. Und es ist notwendig, wieder mit den Eltern der Eltern usw. zu
+beginnen.</li>
+</ul>
+Es ist daher notwendig, die Vorfahren zu scannen, bis wir
+"zusammenführbare" finden.
+{GeneWeb} 
+macht diese Arbeit für dich: Es zeigt dir die
+zusammenführbaren Vorfahren an.
+
+<p>Hier steht wie das geht. Folge den untenstehenden Anweisungen während
+des Zusammenführens:
+<ul>
+<li>
+Nimm zwei Fenster deines Webbrowsers.</li>
+</ul>
+
+<ul>
+<li>
+Im linken Fenster, suche die erste zusammenzuführende Person.</li>
+</ul>
+
+<ul>
+<li>
+Im anderen, rechten Fenster suche die zweite Person.</li>
+</ul>
+
+<ul>
+<li>
+In beiden Fenstern gehe auf "Aktualisieren".</li>
+</ul>
+
+<ul>
+<li>
+Im linken Fenster gehe auf "Zusammenführen".</li>
+</ul>
+
+<ul>
+<li>
+In das Formular trage Vorname, Punkt, Nummer und Nachname der zweiten Person
+ein. Du findest dies im Titel des rechten Fensters. Verwende "Ausschneiden/Einfügen"
+wenn möglich.</li>
+</ul>
+
+<ul>
+<li>
+Dann gehe auf "Ok". Von nun an ist das rechte Fenster nicht mehr nützlich.
+Du kannst es schließen.</li>
+</ul>
+
+<ul>
+<li>
+Wenn die zwei Personen direkt "zusammenführbar" sind 
+(wenigstens einer von ihnen
+hat keine Eltern), bietet dir {GeneWeb} an, diese
+zusammenzuführen. Ansonsten
+sagt es dir, daß du vorher einige Vorfahren oder Familien
+zusammenführen mußt.</li>
+</ul>
+
+<ul>
+<li>
+Wenn <b>Personen</b> gemischt werden sollen (Personen selbst oder deren
+Vorfahren):</li>
+<p>
+<ul>
+<li>
+Im Falle von Vorfahren zeigt der untere Teil des Formulars die beiden
+zusammenzuführenden Zweige an. Mit deiner Unterstützung wird 
+zuerst das
+obere Ende zusammengeführt, dann die Personen zwischendrin, 
+und zum Schluß
+das untere Ende, welches die änfänglich angefragten Personen
+enthält.</li> 
+<li>
+Das Formular enthält die widersprüchlichen Werte
+zwischen zwei zusammenzuführenden Personen,
+sofern es solche Werte gibt. Wähle aus und drücke "Ok".</li>
+
+<li>
+Du siehst dann ein Formular "Person zusammenführen", welches wie
+das Formular "Person ändern" aussieht. Kontrolliere die
+verschiedenen Felder,
+füge hinzu, ändere, lösche was du willst und drücke
+"Ok".</li>
+
+<li>
+Nun werden die zwei Personen zusammengeführt. 
+Wenn dies Vorfahren von deiner Anfangsperson
+sind, schlägt dir die Seite vor, mit dem Zusammenführen
+weiterzumachen. Klicke auf "Zusammenführen fortsetzen". 
+Gehe weiter, bis du die beiden anfänglichen
+Personen zusammengeführt hast.</li>
+</ul>
+</ul>
+
+<ul>
+<li>
+Wenn <b>Familien</b> zusammengeführt werden sollen:</li>
+<p>
+<ul>
+<li>
+Dies passiert, wenn ein Paar von Vorfahren zusammengeführt wurde.
+In diesem Fall bleiben zwei Familien übrig. Es ist, als ob dieses
+Paar zweimal geheiratet hätte. Daher ist es notwendig, die beiden
+Familien zusammenzuziehen.</li>
+
+<li>
+Zuerst wähle, wie im obigen Fall des Zusammenführens von Personen, 
+die möglicherweise widersprüchlichen Werte aus und
+drücke "Ok".</li> 
+<li>
+Du siehst dann das Formular "Familie zusammenführen", welches
+aussieht wie "Familie hinzufügen" oder "Familie ändern".
+Mache die Änderungen, die du
+möchtest. Beachte, daß einige Kinder zweimal angezeigt
+werden können.  Lasse sie so: Diese können später
+zusammengefürt werden.</li>
+
+<li>
+Drücke "Ok": Die Familien sind zusammengefürt. Mache weiter
+durch klicken auf "Zusammenführen fortsetzen".</li>
+</ul>
+</ul>
+
+<ul>
+<li>
+Beachte, daß in den Formularen zum Zusammenführen von
+Personen oder Familien die angezeigten Personen anklickbar sind. Du
+kannst eine anklicken, wenn
+du kontrollieren möchtest, ob dieses Zusammenführen richtig
+ist (gehe danach mittels Webbrowser zurück).</li>
+</ul>
+
+<ul>
+<li>
+Beachte auch, daß du zu jeder Zeit stoppen kannst: Die Datenbank bleibt
+zusammenhängend und die schon erfolgten Zusammenführungen werden aufgezeichnet.
+Du kannst später wieder das Zusammenführen der beiden
+anfänglichen Personen anfragen, das Zusammenführen startet
+wieder dort, wo es angehalten wurde.</li>
+</ul>
+
+
+<p>
+
+
+<a name="MrgF"></a>
+== Zusammenführen zweier Familien ==
+Um zwei Familien zusammenzuführen, führe erst die Väter
+zusammen (wenn sich diese unterscheiden) und dann die Mütter 
+(wenn sie verschieden sind) entsprechend den Anweisungen im vorherigen
+Abschnitt.
+<p>
+Dann gehe von der Seite des Vaters oder der Mutter auf "Aktualisieren".
+Wenn die beiden Familien nebeneinander stehen, kannst du ein
+"Zusammenführen"
+dazwischen stehen sehen. Klicke darauf. Wenn sie nicht direkt nebeneinander
+stehen, verwende "Umkehren" so oft wie nötig.
+
+<p>
+
+
+<a name="Dcln"></a>
+== Sprachen mit Deklination ==
+Einige Sprachen haben Deklinationen, d. h. die Subjekte und die Objekte
+werden verschieden geschrieben entsprechend ihrem Platz innerhalb des Satzes.
+Dies ist der Fall bei Tschechisch, einer der von {GeneWeb} angebotenen
+Sprachen.
+<p>So werden die englischen Wendungen:
+<pre>
+   ... verheiratet mit Vladana
+   ... Cousins von Vladana
+</pre>
+übersetzt ins Tschechische durch:
+<pre>
+   ... si vzal Vladanu
+   ... bratranci Vladany
+</pre>
+Der tschechische Vorname "Vladana" hat daher mehrere Formen: "Vladana"
+ist der Nominativ, "Vladanu" der Akkusativ, "Vladany" der Genitiv.
+
+
+<a name="Data"></a>
+=== Dateneingabe ===
+
+In der Sprache des Lexikon und bei den Daten werden diese Fälle angegeben
+durch einen Buchstaben, eingeschlossen durch zwei <tt>":"</tt>.
+<p>So werden beim Tschechischen der Akkusativ und der Genitiv entsprechend
+repräsentiert durch:
+<pre>&nbsp;&nbsp; :a:
+&nbsp;&nbsp; :g:</pre>
+In einem Aktualisierungsformular muß, um einen Vornamen oder 
+einen Nachnamen
+mit seinen Deklinationen einzugeben, der Nominativ gefolgt von
+Code und Form jedes Falles angegeben werden. Zum Beispiel für "Vladana":
+<pre>&nbsp;&nbsp; Vladana:a:Vladanu:g:Vladany</pre>
+Zwei Abkürzungen sind möglich:
+<ul>
+<li>
+Eine Form beginnend mit '+' zeigt an, daß man mit dem Nominativ beginnen
+muß: So "Adler:g:+a" heißt daß der Genitive von "Adler" "Adlera"
+ist.</li>
+
+<li>
+Eine Form beginnend mit '-' zeigt auch an daß man mit dem Nominativ beginnt,
+aber indem man den letzten Buchstaben entfernt ('--' für die letzten
+beiden Buchstaben und so weiter).</li>
+</ul>
+Die Form mit '-' kann für "Vladana" verwendet werden:
+<pre>&nbsp;&nbsp; Vladana:a:-u:g:-y</pre>
+
+
+<a name="Disp"></a>
+=== Anzeige, Dokumentation ===
+
+Auf der Seite ist normalerweise nur der Nominativ sichtbar. Die anderen
+Formen werden nur benutzt, wenn die Ausdrücke für die Sprache
+danach fragen.
+<p>Wenn mit einer Sprache ohne Deklinationen gebrowst wird, wird der Nominativ
+systematisch angezeigt.
+<p>Die komplette Form (mit den kompletten Beschreibungen der Formen) erscheint
+nur in den Aktualisierungsformularen.
+<p>Es gibt keine Dokumentation der verschiedenen benutzten Fälle,
+weil diese von der Sprache abhängen. Der bessere Weg ist, ins Lexikon
+zu schauen. Dieses kann von der Startseite aus aufgerufen werden durch
+Klicken auf "lexicon" am Fuß der Seite. Schaue auf die Wendungen
+entsprechend deiner Sprache.
+<p>
+
+<font size=-1><a name=note>Anmerkung</a>: im "Schlüssel" einer Person werden
+alle akzentuierten Vokale als ihre unakzentuierten Äquivalente behandelt;
+{GeneWeb} unterstellt die Verwendung der Westeuropa-Sprachcodierung
+(iso-8859-1). Es würde nicht funktionieren oder seltsame Ergebnisse anzeigen, wenn du
+andere Kodierungen versuchst (z. B.Kyrillisch, Hebräisch, Chinesisch, Tschechisch).</font>
+                                                                               
+<p>
+
+<br>
+<center>
+Zurück zur [[[diruse/Gebrauchsanweisung]]].
+</center>
+

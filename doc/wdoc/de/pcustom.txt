@@ -1,0 +1,295 @@
+GeneWeb - Anpassung von Seiten
+
+Dieser Teil erklärt, wie die Startseiten anzupassen und verwandte
+Seiten hinzuzufügen sind. Er wurde geschrieben für Leute, die
+{GeneWeb} bereits verwendet haben und ins Detail gehen wollen.
+<UL>
+<LI>
+<a href="#Wel">Startseite</a></LI>
+
+<LI>
+<a href="#Mac">Makros</a></LI>
+
+<LI>
+<a href="#Ass">Verbundene Seiten</a></LI>
+
+<LI>
+<a href="#All">Alle Seiten</a> anpassen</LI>
+</UL>
+
+
+<p>
+
+
+<a name="Wel"></a>
+== Startseite ==
+Die Startseite wird aus Textdateien zusammengebaut, den "start.txt"-Dateien,
+die mit {GeneWeb} geliefert werden. Es ist möglich,
+diese Dateien zu modifizieren und/oder eine spezifische Version für
+eine spezielle Datenbank zu erstellen.
+
+<P>Diese Dateien enthalten HTML gemischt mit "Makros" (siehe folgender
+Abschnitt). Wenn du solche Dateien anlegen oder ändern möchtest,
+verwende keinen HTML-Editor, sondern einen normalen Texteditor.
+
+<P>Für die Startseite der Datenbank "bla" sucht {GeneWeb} nach
+den folgenden Dateien in dieser Reihenfolge:
+<UL>
+<LI>
+bdir/lang/lg/bla.txt</LI>
+
+<LI>
+hdir/lang/lg/bla.txt</LI>
+
+<LI>
+bdir/lang/bla.txt</LI>
+
+<LI>
+hdir/lang/bla.txt</LI>
+
+<LI>
+bdir/lang/lg/start.txt</LI>
+
+<LI>
+hdir/lang/lg/start.txt</LI>
+
+<LI>
+bdir/lang/start.txt</LI>
+
+<LI>
+hdir/lang/start.txt</LI>
+</UL>
+wobei:
+<UL>
+<LI>
+"bdir" = Wert von "-bd" des Befehls "gwd" (Default: aktuelles Verzeichnis).</LI>
+
+<LI>
+"hdir" = Wert von "-hd" des Befehls "gwd" (Default: aktuelles Verzeichnis).</LI>
+
+<LI>
+"lg" = aktuelle Sprache.</LI>
+</UL>
+Die Dateien "hdir/lang/lg/start.txt" werden mit der Distribution geliefert.
+Der einfachste Weg, um eine angepaßte Datei zu erstellen, ist eine Kopie
+der Datei "start.txt" zu machen, welche du ändern kannst wie du
+willst. Wenn die Darstellung der Datei "start.txt" nicht genügt,
+kann diese auch direkt geändert werden.
+
+<P>Trotzdem eine Warnung: Von einer Version von {GeneWeb} zur nächsten
+kann es sein, daß die "start.txt"-Dateien verbessert worden sind.
+Wenn du die neue Version nimmst und die Verbesserungen nutzen willst, schau
+in die "start.txt"-Dateien um zu sehen, wo diese verändert worden
+sind und ergänze die Änderungen in deinen angepaßten Dateien.
+
+<p>
+
+
+<a name="Mac"></a>
+== Makros ==
+Wie oben erwähnt, sind die Dateien der Startseiten kein pures HTML.
+Sie enthalten "Makros". Das sind Sequenzen beginnend mit dem Zeichen
+"%", gefolgt von einem Buchstaben. Beispiele: "%s", "%x", etc.
+
+<P>Diese Makros werden ersetzt durch Werte, die vom Kontext abhängen:
+Name der Datenbank, Sprache, Zahl der Personen in der Datenbank etc.
+
+<P>Außerdem gibt es eine spezielle Verarbeitung für die Klammern
+"[" und "]": der Text dazwischen wird aus dem Lexikon (Datei "lexicon.txt")
+in die aktuelle Sprache umgesetzt mit folgenden Änderungen:
+<UL>
+<LI>
+Wenn nach der öffnenden Klammer ein Stern steht, wird der erste Buchstabe
+der Übersetzung groß geschrieben.</LI>
+
+<LI>
+Wenn die schließende Klammer von einer Zahl gefolgt wird, korrespondiert
+diese mit dem N-ten Auftreten der Übersetzung (beginnend mit 0), getrennt
+durch Schrägstriche. Wenn die N-te Übersetzung nicht existiert,
+wird die erste verwendet.</LI>
+</UL>
+Um zu verstehen, wie die Makros verwendet werden, schaut man am besten
+in die mitgelieferten "start.txt"-Dateien.
+
+<P>Hier die Bedeutung der "%"-Makros:
+<UL>
+<LI>
+<b>Datenbank.</b></LI>
+
+<UL>
+<LI>
+"<TT><font size=+1>%t</font></TT>": Name der Datenbank.</LI>
+
+<LI>
+"<TT><font size=+1>%f</font></TT>": im Servermodus, Name der Datenbank
+gefolgt von einem möglichen Kennwort (Bsp.: "bla_xyzzy"); im CGI Modus
+Name des CGI-Aufrufs (Bsp.: "gwd.exe").</LI>
+
+<LI>
+"<TT><font size=+1>%g</font></TT>": im Servermodus wie "%f"; im CGI-Modus
+Name des CGI-Kommandos gefolgt von "?b=", dem Namen der Datenbank und einem
+Semikolon (Bsp.: "gwd.exe?b=bla;").</LI>
+
+<LI>
+"<TT><font size=+1>%s</font></TT>": Wert von "%f" gefolgt von einem Fragezeichen
+und Kontextvariablen (s.&nbsp;u.) gefolgt von einem Semikolon. Bsp.: "bla?lang=it;iz=8233;".</LI>
+</UL>
+
+<LI>
+<b>Zahlen.</b></LI>
+
+<UL>
+<LI>
+"<TT><font size=+1>%c</font></TT>": Zahl der Zugriffe auf die Startseite.</LI>
+
+<LI>
+"<TT><font size=+1>%q</font></TT>": Zahl der Anfragen.</LI>
+
+<LI>
+"<TT><font size=+1>%d</font></TT>": Datum der ersten Abfrage.</LI>
+</UL>
+
+<LI>
+<b>Bedingungen.</b></LI>
+
+<UL>
+<LI>
+"<TT><font size=+1>%w... %w</font></TT>": anzeigen falls "Wizard".</LI>
+
+<LI>
+"<TT><font size=+1>%x... %x</font></TT>": anzeigen wenn "Wizard" oder "Freund".</LI>
+
+<LI>
+"<TT><font size=+1>%y... %y</font></TT>": anzeigen wenn "Server"-Modus
+(nicht CGI) und kein "Wizard".</LI>
+
+<LI>
+"<TT><font size=+1>%z... %z</font></TT>": anzeigen wenn "Server"-Modus
+(nicht CGI) und weder "Wizard" noch "Freund".</LI>
+
+<LI>
+"<TT><font size=+1>%i... %i</font></TT>": anzeigen wenn CGI-Modus.</LI>
+</UL>
+
+<LI>
+<b>Andere.</b></LI>
+
+<UL>
+<LI>
+"<TT><font size=+1>%r</font></TT>" gefolgt von einem Namen und einer neuen
+Zeile: Einschluß der Datei "name.txt".</LI>
+
+<LI>
+"<TT><font size=+1>%b</font></TT>": Wert der Variablen "body_prop" der
+Datei "bla.gwf" für die Datenbank "bla".</LI>
+
+<LI>
+"<TT><font size=+1>%h</font></TT>": Kontextvariablen (s. u.) in der Form
+"&lt;input type=hidden name=var value=val&gt;".</LI>
+
+<LI>
+"<TT><font size=+1>%l</font></TT>": Sprache.</LI>
+
+<LI>
+"<TT><font size=+1>%n</font></TT>": Anzahl von Personen in der Datenbank.</LI>
+
+<LI>
+"<TT><font size=+1>%%</font></TT>": einzelnes "%".</LI>
+
+<LI>
+"<TT><font size=+1>%[</font></TT>": "[".</LI>
+
+<LI>
+"<TT><font size=+1>%]</font></TT>": "]".</LI>
+</UL>
+</UL>
+Einige Makros beziehen sich auf&nbsp; <b>Kontextvariablen</b>. Das sind:
+<UL>
+<LI>
+b: im CGI-Modus, Datenbankname.</LI>
+
+<LI>
+lang: Sprache.</LI>
+
+<LI>
+iz: Nummer der Person, die als Sosa-Referenz verwendet wird, falls vorhanden.</LI>
+</UL>
+Die <b>Bedingungen</b> können nicht überlappen: Man kann kein
+"<TT><font size=+1>%w... %w</font></TT>" innerhalb eines "<TT><font size=+1>%i...
+%i</font></TT>" verwenden.
+
+<p>
+
+
+<a name="Ass"></a>
+== Verbundene Seiten ==
+In die angepaßten Startseiten kannst du Links zu verbundenen Dateien einfügen,
+die von {GeneWeb} auf die gleiche Art und Weise behandelt werden:
+Die Makros werden umgewandelt.
+
+<P>Wenn du zum Beispiel eine spezielle Seite der berühmten Personen
+deiner Datenbank erstellen willst, erzeuge eine Datei namens "famous.txt"
+im Verzeichnis "bdir/lang/lg" oder im Verzeichnis "bdir/lang" (siehe erster
+Abschnitt).
+
+<P>Die Zugriffsanfrage nach "famous.txt" lautet: "m=H;v=famous". In der
+Startseite trägst du also ein:
+<PRE>&nbsp;&nbsp; &lt;a href="%sm=H;v=famous">Beruehmte&lt;/a> Personen meiner
+&nbsp;&nbsp; Datenbank.</PRE>
+In die Datei "famous.txt" kannst Du Links zu Personen deiner Datenbank
+einfügen unabhängig von deren Namen und Kontext unter Verwendung
+der entsprechenden Makros.
+
+<P>Die im einzelnen interessierenden Makros sind:
+<UL>
+<LI>
+"<TT><font size=+1>%b</font></TT>" kannst du in den "&lt;body>"-tag einfügen
+als "&lt;body%b>".</LI>
+
+<LI>
+"<TT><font size=+1>%s</font></TT>" kannst du in Links verwenden.</LI>
+</UL>
+Beispielsatz in der Datei "famous.txt":
+<PRE>&nbsp;&nbsp; Siehe meinen Cousin &lt;a href="%sp=louis;n=de+bourbon;oc=5">
+&nbsp;&nbsp; Louis XIV&lt;/a> und meine
+&nbsp;&nbsp; &lt;a href="%sem=R;ep=john;en=smith;m=NG;n=louis+xiv;t=PN">
+&nbsp;&nbsp; Verwandtschaftsbeziehungen&lt;/a> zu ihm.</PRE>
+Siehe auch: Wie man korrekte [[[links/Links]]] zu {GeneWeb} 
+Seiten machen kann.
+
+<P>Beachte, daß die "erweiterte Anfrage" wie eine verbundene Datei namens
+"advanced.txt" wirkt.
+
+<p>
+
+
+<a name="All"></a>
+== Alle Seiten anpassen ==
+
+Alle Seiten, die Startseite eingeschlossen, können an drei Stellen angepasst werden:
+
+<ul>
+
+<li>Du kannst eine Datei namens <b>base.hed</b> (wobei "base" der Name
+deiner Datenbank ist) erstellen, welche in allen Seiten als Kopf eingefügt wird
+(zwischen &lt;head&gt; und &lt;/head&gt;). Damit können z. B. style sheets
+eingebunden werden. Speichere die Datei im Verzeichnis "lang" und/oder für einzelne
+Sprachen "xy" im Verzeichnis "lang/xy".
+
+<li>Auf die gleiche Art kannst du eine Datei namens <b>base.trl</b> anlegen, welche
+nach dem {GeneWeb} copyright auf jeder Seite erscheint.
+
+<li>Schließlich kannst du noch die Variable <tt>body_prop</tt> in der Datei
+<b>base.gwf</b> setzen, welche in das tag "&lt;body&gt;" aller Seiten
+eingesetzt wird. Das ist nützlich, um Hintergrundfarbe oder -image anzugeben oder die
+Farben der angezeigten Texte zu ändern. Siehe diesen [[[start#Cnf/Abschnitt ]]] des Kapitels "Erste Schritte mit {GeneWeb}".
+
+</ul>                                                                         
+
+<p>
+
+<br>
+<center>
+Zurück zur [[[diruse/Gebrauchsanweisung]]].
+</center>
+

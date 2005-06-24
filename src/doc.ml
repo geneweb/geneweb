@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.18 2005-06-24 15:50:33 ddr Exp $ *)
+(* $Id: doc.ml,v 4.19 2005-06-24 21:00:27 ddr Exp $ *)
 
 open Config;
 
@@ -233,6 +233,10 @@ value eval_ast conf env =
 value print_var conf env loc =
   fun
   [ ["copyright"] -> Util.print_copyright conf
+  | ["summary"] ->
+      match Util.open_etc_file "summary" with
+      [ Some ic -> Notes.copy_from_templ conf ic
+      | None -> () ]
   | sl -> Wserver.wprint "%s" (eval_var_handled conf env loc sl) ]
 ;
 

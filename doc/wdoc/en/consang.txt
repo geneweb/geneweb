@@ -1,0 +1,93 @@
+GeneWeb - Consanguinity
+
+This part explains the concepts of "consanguinity" and "relationship"
+used by {GeneWeb} and how they are computed.
+
+
+==Consanguinity and Relationship ==
+
+The genom of an individual consists of a great number of genes which,
+if mutations are ignored, reproduce identically. The genes can be used
+to measure the identity of a person.
+
+<p>
+
+The genes are placed in precise locations named "locus". Each
+individual has for each locus two genes, one transmitted by his
+mother, the other by his father, and transmits to his children a copy
+of the one of his genes.
+
+<p>
+
+The <em>Consanguinity</em> of an individual <em>x</em> is the
+probability <em>cg(x)</em> to find in a given locus two identical
+genes.
+
+<p>
+
+The <em>Relationship</em> of two individuals <em>x</em> and <em>y</em>
+is the probability <em>pr(x, y)</em> to find in the same locus two
+identical genes.
+
+
+==Computations ==
+
+A probability calculus shows that:
+
+<ul><li>The consanguinity <em>cg(x)</em> is equal to the relationship
+<em>pr(px,mx)</em> of the parents <em>px</em> and <em>mx</em> of
+<em>x</em>.</ul>
+
+<p>
+
+<ul><li>If <em>x..a..y</em> is a minimal relationship link between
+<em>x</em> and <em>y</em> (i.e. such as the branches <em>x..a</em> and
+<em>a..y</em> have just <em>a</em> in common), then it contributes to
+the relationship of <em>x</em> and <em>y</em> of a factor:
+
+<pre>
+      1
+     ---- (1 + cg a)
+      n+1
+     2
+</pre>
+
+where <em>n</em> is the length (distance <em>x..a</em> + distance
+<em>a..y</em>) of the relationship link <em>x..a..y</em>.
+
+<p>
+
+The relationship of <em>x</em> and <em>y</em> is the sum of the
+contributions of all their minimal relationship links.
+
+</ul>
+
+
+==GeneWeb ==
+
+{GeneWeb} displays the consanguinity and the relationship in
+the form of a percentage.
+
+<p>
+
+Statistically, on the great number of locuses of an individual, the
+consanguinity corresponds approximately to the percentage of his
+locuses holding identical genes.
+
+<p>
+
+The algorithms of consanguinity and relationship were written by
+Didier Rémy, director of research at INRIA. We thank him for
+that.
+
+
+==References ==
+
+<ul><li>Albert Jacquard. <em> Genetic structures of the
+Populations.</em> Masson &amp; Co, 1970.</ul>
+
+<p>
+
+<br>
+<center>Return to [[[diruse/Directions for Use]]]</center>
+
