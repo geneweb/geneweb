@@ -540,10 +540,8 @@ en cliquant dans son drapeau en haut de la page.
 
 <ul><li> <strong>can_send_image</strong> (peut envoyer des images)
 permet d'autoriser les "magiciens" à envoyer (et supprimer) des
-images. Dans ce cas, au moment des <a href="update.htm#MAJ">mises
-à jour</a>, ils peuvent cliquer sur un lien [[[update#SndP/envoyer image]]] (et éventuellement un
-autre intitulé <a href="update.htm#DelPh">supprimer
-image</a>). Par défaut, c'est "no" (on ne peut pas en envoyer);
+images. Dans ce cas, au moment des [[[update#MAJ/mises à jour]]], ils peuvent cliquer sur un lien [[[update#SndP/envoyer image]]] (et éventuellement un
+autre intitulé [[[update#DelPh/supprimer image]]]). Par défaut, c'est "no" (on ne peut pas en envoyer);
 pour l'autoriser, il faut mettre explicitement "yes".
 
 <p>

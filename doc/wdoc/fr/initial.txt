@@ -4,7 +4,7 @@ Vous avez deux façons de démarrer avec {GeneWeb}:
 
 <ul>
 
-<li> Vous pouvez utiliser le programme <a href="gwsetup.htm"><b>gwsetup</b></a>. Dans ce cas, il vous suffit de
+<li> Vous pouvez utiliser le programme [[[gwsetup/gwsetup]]]. Dans ce cas, il vous suffit de
 lancer ce programme (si votre installation ne l'a pas
 déjà lancé automatiquement), puis d'ouvrir
 à l'adresse Web (locale) qu'il propose et vous suivez les
