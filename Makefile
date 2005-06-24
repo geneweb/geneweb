@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.27 2005-06-22 23:06:33 ddr Exp $
+# $Id: Makefile,v 4.28 2005-06-24 15:20:56 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -140,7 +140,7 @@ classical_distrib:
 	  mkdir $(DESTDIR)/doc/$$i; \
 	  mkdir $(DESTDIR)/doc/wdoc/$$i; \
 	  cp doc/$$i/*.htm $(DESTDIR)/doc/$$i/.; \
-	  cp doc/wdoc/$$i/*.txt $(DESTDIR)/doc/wdoc/$$i/.; \
+	  if test -d "doc/wdoc/$$i"; then cp doc/wdoc/$$i/*.txt $(DESTDIR)/doc/wdoc/$$i/.; fi; \
 	done
 	mkdir $(DESTDIR)/doc/images
 	cp doc/images/*.jpg doc/images/gwlogo.png $(DESTDIR)/doc/images/.
