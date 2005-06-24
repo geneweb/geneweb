@@ -1,0 +1,97 @@
+GeneWeb - Blutsverwandtschaft
+
+Dieser Teil erklärt das Konzept von "Blutsverwandtschaft" und "Verwandschaftsgrad"
+das von {GeneWeb} verwendet wird und wie diese berechnet werden.
+
+<p>
+
+
+==Blutsverwandtschaft and Verwandschaftsgrad ==
+Das Genom eines Individuum besteht aus vielen Genen, die, wenn man Mutationen
+ignoriert, identisch reproduzieren. Die Gene können benutzt werden,
+um die Identität einer Person zu messen.
+<p>
+Die Gene werden in präzise Standorte namens "Genort" plaziert.
+Jedes Individuum hat für jeden Genort zwei Gene, eins, das von seiner
+Mutter, eins, das von seinem Vater übertragen wird und übermittelt
+seinen Kindern eine Kopie von einem seiner Gene.
+<p>
+Die Blutsverwandtschaft eines Individuum x ist die Wahrscheinlichkeit
+<i>cg(x)</i> an einem gegebenen Genort zwei identische Gene zu finden.
+<p>
+Der Verwandschaftsgrad von zwei Individuen x und y ist die Wahrscheinlichkeit
+<i>pr(x, y)</i>, im gleichen Genort zwei identische Gene zu finden.
+<br>&nbsp;
+
+<p>
+
+
+==Berechnungen ==
+Eine Wahrscheinlichkeitsrechnung zeigt, daß:
+<ul>
+<li>
+Die Blutsverwandtschaft <i>cg(x)</i> ist gleich dem Verwandtschaftsgrad
+<i>pr(px,mx)</i>
+der Eltern <i>px</i> und <i>mx</i> von
+<i>x</i>.</li>
+</ul>
+
+<ul>
+<li>
+Wenn <i>x..a..y</i> eine minimale Verwandtschaftsbeziehung zwischen
+<i>x</i>
+und <i>y</i> ist (d.h. so daß die Zweige <i>x..a</i> und
+<i>a..y</i> nur
+<i>a</i>
+gemeinsam haben), dann trägt die Verwandtschaft von <i>x</i> und <i>y</i>
+mit einem Faktor von:</li>
+
+<pre>
+      1
+     ---- (1 + cg a)
+      n+1
+     2                                                                          
+</pre>
+
+bei, wo <i>n</i> die Länge (Abstand <i>x..a</i> + Abstand
+<i>a..y</i>)
+der Verwandtschaftsbeziehung <i>x..a..y </i>ist.
+<p>Der Verwandtschaftsgrad von <i>x</i> und <i>y</i> ist die Summe der
+Beiträge aller ihrer minimalen Verwandtschaftsbeziehungen.</ul>
+
+
+<p>
+
+
+==GeneWeb ==
+{GeneWeb} zeigt die Blutsverwandtschaft und den Verwandtschaftsgrad
+in Form eines Prozentsatzes an.
+<p>
+Bei einer großen Zahl von Genorten eines
+Individuum korrespondiert, statistisch gesehen, die
+Blutsverwandtschaft ungefähr mit dem Prozentsatz seiner Genorte,
+die identische Gene enthalten.
+<p>
+Die Algorithmen von Blutsverwandtschaft und Verwandtschaftsgrad wurden
+geschrieben von Didier Rémy, Direktor für Forschung bei INRIA.
+Wir danken ihm dafür.
+
+<p>
+
+
+==Referenzen ==
+
+<ul>
+<li>
+Albert Jacquard. <i>Genetic structures of the Populations.</i> Masson &amp;
+Co, 1970.</li>
+</ul>
+
+
+<p>
+
+<br>
+<center>
+Zurück zur [[[diruse/Gebrauchsanweisung]]].
+</center>
+

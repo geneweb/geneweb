@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.43 2005-06-04 10:17:55 ddr Exp $
+# $Id: lex_utf8.txt,v 1.44 2005-06-24 21:00:27 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7617,10 +7617,6 @@ ru: статистика
 sl: statistike
 sv: statistik
 
-    summary
-en: summary
-fr: sommaire
-
     surname alias
 af: van alias
 bg: друго фамилно име
@@ -9055,9 +9051,9 @@ ro: utilizator/parola/anulare
 sl: uporabnik/geslo/prekliči
 sv: användare/passord/avbryt
 
-    visualize
-en: visualize
-fr: visualiser
+    visualize/show/hide/summary
+en: visualize/show/hide/summary
+fr: visualiser/afficher/masquer/sommaire
 
     warnings
 af: waarskuwings

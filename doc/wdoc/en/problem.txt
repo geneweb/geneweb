@@ -1,0 +1,104 @@
+GeneWeb - Problems
+
+Here are some frequently encountered problems with "gwd":
+
+<p>
+
+You launched the {GeneWeb} daemon "gwd" and it answers normally
+as indicated in the chapter "How to start with GeneWeb", section
+"Command [[[start#Gwd/gwd]]]".
+
+<p>
+
+Then...
+
+
+==Message "socket failed" ==
+
+Under Windows, if this message appears in the interactive window, and
+you cannot connect with your navigator to the specified address, maybe
+the internet protocol (TCP/IP) is not installed in your computer.
+
+<p>
+
+In this case, install it. It is in the "configuration panel", icon
+"network".
+
+<p>
+
+Restart "gwd" afterwards and try again.
+
+
+==Attempt to connect to the network ==
+
+<ul><li>
+
+When you enter the address in your navigator, e.g.:
+
+<p>
+
+<pre>
+     http://localhost:2317/smith
+</pre>
+
+The navigator answers that you have to connect to the network, and that it
+cannot work off line.
+
+<p>
+
+This problem happens with some versions of Internet Explorer.
+</ul>
+
+<ul><li>
+
+Maybe depending on the navigator version, we received from
+{GeneWeb} users (thank you) the following solutions:
+
+<p>
+
+<ul><li> Under Internet Explorer, select the menu "Display", "Internet
+options".  Then, in menu "Connection", active "do not use proxy for
+local addresses".</ul>
+
+<p>
+
+<ul><li> [Version 3.02] Under Internet Explorer, select the menu
+"Display", "Options", "Connection". Then go to "Proxyserver" and
+select "Setup", add under "Exceptions" and "Proxyserver not to be used
+for addresses beginning with" the addresses given when you start
+gwd.exe. For example (note the semicolons between names):
+<pre>
+     127.0.0.1;localhost;computer
+</pre>
+ </ul>
+
+<p>
+
+If it does not work better, we suggest you to use another navigator,
+e.g. Netscape (which is free).
+</ul>
+
+
+==Cannot access file "start.txt" ==
+
+<ul><li>Another frequent problem is the message: "Cannot access file
+start.txt".</ul>
+
+<ul><li>If you use {GeneWeb} under Windows, maybe you
+uncompressed the archive with "pkunzip". It is important to do it
+with the options "-e -d":
+
+<pre>
+     pkunzip -e -d geneweb.zip
+</pre>
+
+If you did not uncompressed it like this, do it again with the good
+options.
+
+</ul>
+
+<p>
+
+<br>
+<center>Return to [[[diruse/Directions for Use]]]</center>
+

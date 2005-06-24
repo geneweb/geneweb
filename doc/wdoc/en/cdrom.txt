@@ -1,0 +1,224 @@
+GeneWeb - Create a CD-ROM
+
+You can create a CD-ROM of your database with {GeneWeb} included inside: it allows you
+to distribute your database directly usable.
+
+<p>
+
+This chapter explains the minimum steps to manage to do it. This
+installation has the advantage that the user has nothing to install
+in his hard disk, neither the software, nor the database.
+
+<p>
+
+Here are the operations to do:
+
+<p>
+
+<ol>
+
+<li> Do a deep cleanup of your database. If you have gwsetup, use it:
+look at its "main menu". You can also do that with the commands gwu
+and gwc (gwu extracts the database as source text and gwc recreates
+it).
+
+<p>
+
+<font size=-1>Remark: this step is not absolutely mandatory but allows
+to distribute a database which is optimized in memory space and in
+access speed. However, if your database comes from a GEDCOM file or
+from a {GeneWeb} source file and if
+you made no changes in your database, it is un-useful.</font>
+
+<p>
+
+<li> If you want that the consanguinities be displayed in the personal
+pages and in the relationship computings, run the program of
+initialization of consanguinities. Under gwsetup, see the "main
+menu". Interactively, this can be done with the command consang.
+
+<p>
+
+<font size=-1>Remark: step also optional. If you don't do it, the
+relationship work even so but the consanguinities are not
+displayed.</font>
+
+<p>
+
+<li> Enter in your database and do any relationship computing, for
+example between a father and his son.
+
+<p>
+
+<font size=-1>Remark: this is also an optional step to optimize the
+access to the database. Indeed, the first relationship computing
+builds a file (named tstab) in the database which allows the future
+relationship computings to go faster. If this file was not created, it
+will not be possible in the CD-ROM and the relationship computings will
+be slower.</font>
+
+<p>
+
+<li> Create a directory for the items that you are going to put in
+your CD-ROM. This directory is named "destination" for the following
+explanation.
+
+<p>
+
+<li> Transfer your database in the destination directory: your data
+base is a directory ending with ".gwb". For example, if your database
+is named "xyz", the directory is "xyz.gwb". This directory is located
+in the databases directory (depending on your installation: Windows,
+MacOS X, Unix, Linux rpm, Linux Debian...)
+
+<p>
+
+<li> Add a configuration file in the destination directory. If you
+have some which fits you, use it, otherwise create it. The
+configuration file is a text file ending by ".gwf": if your database
+is "xyz", the file is "xyz.gwf". If this file already exists, it is
+also in the database directory.
+
+<p>
+
+In this file, add a phoney "wizard" password, by adding the line:
+
+<pre>
+     wizard_passwd=a
+</pre>
+
+<p>
+
+<font size=-1>Remark: this operation is optional but it allows to avoid
+that it proposes a "update" in the personal pages, updating which would
+not work anyway on a write-only support. Warning: if you create a
+configuration file, check that the extension ".txt" is <em>not</em>
+added like some OS badly do automatically: the extension must be .gwf
+and nothing else.</font>
+
+<p>
+
+<li> Copy the executable "gwd" in the destination directory. In some
+systems, it has the extension ".exe". Warning: there may be several
+files named "gwd" in your {GeneWeb}
+installation.  The good one is a rather big file (more thab 1 Mb). It
+is generally under a directory named "gw".
+
+<p>
+
+<li> Copy in the destination directory the directories "lang", "etc"
+and "images" (and their contents) which must be located in the same
+directory as the one where you found gwd.
+
+<p>
+
+<font size=-1>Remark: the presence of these directories is mandatory.
+They contain files used by gwd, in particular for all languages and for
+the displaying of some pages.</font>
+
+<p>
+
+<li> In the directory "lang" of the destination directory, edit the
+file named "start.txt" and delete the group of lines which contain
+the links for the "wizard" access. They start with something like:
+
+<pre>
+   &lt;td align=center&gt;[
+   af: &lt;a href="%sw=w"&gt;&lt;em&gt;Medewerkers&lt;/em&gt;&lt;/a&gt; toegang&lt;br&gt; (password)
+   ca: accés &lt;a href="%sw=w"&gt;&lt;em&gt;administrador&lt;/em&gt;&lt;/a&gt;&lt;br&gt; (clau)
+</pre>
+
+and end with:
+
+<pre>
+   pl: &lt;a href="%sw=w"&gt;&lt;em&gt;"Wizard"&lt;/em&gt;&lt;/a&gt; dostêp&lt;br&gt; (has³o)
+   pt: Entrada &lt;a href="%sw=w"&gt;&lt;em&gt;feiticeiro&lt;/em&gt;&lt;/a&gt;&lt;br&gt; (palavra chave)
+   sv: &lt;a href="%sw=w"&gt;&lt;em&gt;Uppdaterings&lt;/em&gt;&lt;/a&gt; tillträde&lt;br&gt; (passord)
+   ]&lt;br&gt;&lt;/td&gt;
+</pre>
+
+<p>
+
+<font size=-1>This step is not mandatory but avoid that the welcome
+page proposes a wizard access which would not work, anyway.</font>
+
+<p>
+
+<li><b>Important step</b>. The executable gwd builds files in its
+current directory. If it cannot do it, it can block its operation (in
+particular, under Windows, it will not work certainly). An option must
+be indicated in order that it uses the hard disk (note: these files
+are not big, are temporary and destroying them explicitely or by
+mistake will not perturbate gwd).
+
+<p>
+
+For that, create a text file named "gwd.arg" (warning: not "gwd.arg.txt"
+but just "gwd.arg") and write inside:
+
+<pre>
+   If you prepare a CD-ROM for Windows:
+          -wd
+          c:\temp\geneweb
+   If it is for Unix or MacOS X:
+          -wd
+          /tmp/geneweb
+</pre>
+
+<p>
+
+<li>If your database has images, put them in the directory images,
+sub directory holding the name of your database ("images/xyz" if
+your database is named "xyz").
+
+<p>
+
+<li> After all these steps, you have a minimum installation, obliging
+the user to launch gwd himself and open the URL address to access the
+database. You can improve that by providing HTML files and/or scripts
+(shell, batch) which launch all that. You can also put several data
+bases, other HTML files and so on.
+
+<p>
+
+<font size=-1>
+
+Don't ask me how to make a CD-ROM which launches all of that automatically
+when you insert it in its support: there is probably tricks to do that
+but I don't know.
+
+<p>
+
+Remark: if you want that your database be readable under other
+Operating Systems than the one you use, you can create a directory for
+each OS and put the version of gwd inside. Of course, you must have
+downloaded the versions of {GeneWeb}
+for all these systems. You have also to look at the files "gwd.arg"
+(one by gwd file) and in particular ask them to indicate the
+access path to the database (options -hd and -bd of gwd).
+
+</font>
+
+<p>
+
+<li>Before engraving your disk, do a test. For that, change the access
+rights of the destination directory and all its files and directory:
+make them no-writable. Then launch the command gwd (by double-click or
+by an interactive command). Open in your Web navigator the address
+http://127.0.0.1:2317/xyz (if your database is named xyz) and check
+if it works.
+
+<p>
+
+<li>If it is Ok, create your CD-ROM with the destination directory and
+its contents.
+
+</ol>
+
+<p>
+
+<p>
+
+<br>
+<center>Return to [[[diruse/Directions for Use]]]</center>
+

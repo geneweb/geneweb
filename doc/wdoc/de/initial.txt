@@ -1,0 +1,31 @@
+Erste Schritte mit GeneWeb
+
+Es gibt 2 Methoden zum Start mit {GeneWeb}:
+
+<ul>
+
+<li> Du kannst das Programm [[[gwsetup/gwsetup]]] verwenden. In diesem Fall muss nur
+das Programm gestartet werden (wenn nicht schon durch die Installation
+geschehen), dann öffne die (lokale) Web-Adresse die vorgeschlagen
+wird und folge den Anweisungen. Die Verwendung ist sehr einfach und
+daher für Anfänger empfohlen.
+
+</ul>
+
+<p>
+
+<ul>
+
+<li> Andererseits, wenn du etwas Wissen über Computer hast, kannst
+du auch die Kommandos im Eingabefenster verwenden. Das erlaubt die 
+Kenntnis aller Details der Kommandos und das Verständnis darüber, was
+passiert, aber dies ist nicht zu empfehlen, wenn man kein Spezialist ist.
+Klicke [[[start/hier]]] um auf diesem Wege zu starten.
+
+</ul>
+
+<p>
+
+<br>
+<center>Zurück zur [[[diruse/Gebrauchsanweisung]]]</center>
+

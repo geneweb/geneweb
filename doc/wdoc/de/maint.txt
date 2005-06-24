@@ -1,0 +1,206 @@
+GeneWeb - Wartung
+
+
+Dieser Teil zeigt einige wichtige "Tricks" für die Instandhaltung
+deiner Datenbanken.
+<UL>
+<LI>
+<a href="#Clea">1.</a> Säuberung.</LI>
+
+<LI>
+<a href="#Rena">2.</a> Umbenennung.</LI>
+
+<LI>
+<a href="#Save">3.</a> Sicherung.</LI>
+</UL>
+
+<p>
+
+
+<a name="Clea"></a>
+== Säuberung ==
+Wenn du deine Datenbank mit deinem Webbrowser modifizierst, können
+einige kleine Probleme auftreten:
+<UL>
+<LI>
+Wenn du viele Änderungen gemacht hast, wird der Datenzugriff allmählich
+langsamer.</LI>
+</UL>
+
+<UL>
+<LI>
+Wenn du neue Familien hinzufügst oder Personen änderst, wird
+die Blutsverwandtschaft nicht mehr angezeigt oder kann falsch sein.</LI>
+</UL>
+
+<UL>
+<LI>
+Wenn du Personen und Familien entfernst, wird der belegte Platz nicht
+freigegeben:
+Deswegen zeigt die Startseite, obwohl du eine Person entfernt hast, immer
+noch die gleiche Zahl von Personen an.</LI>
+</UL>
+In diesen Fällen sollte die Datenbank gesäubert werden.
+<UL>
+<LI>
+Die erste Säuberung kann mit dem Befehl "consang" durchgeführt
+werden, welcher die Blutsverwandtschaft für alle Datenbanken neuberechnet
+und die anfängliche Zugriffsgeschwindigkeit wiederherstellt. Wenn
+die Datenbank "bla" heißt, nimm ein Eingabefenster (siehe
+"[[[start#Int/Erste Schritte]]] mit GeneWeb") und gib ein:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; consang bla</PRE>
+Dieser Befehl kann einige Sekunden oder Minuten benötigen, abhängig
+von der Größe der Datenbank. Ein Zähler wird angezeigt...
+Beachte, daß während dieser Operation die Online-Änderungen
+abgewiesen werden: Wenn du in einem Formular auf "Ok" drückst, fordert
+dich eine Meldung auf, es später noch einmal zu versuchen.
+
+<P>Unter Unix kannst du diesen Befehl zu jeder Zeit stoppen, indem du
+Control-C (bzw. Strg-C)
+im Eingabefenster drückst. Die Berechnung der Blutsverwandtschaften
+wird nicht abgeschlossen, aber die Datenbank wird gesäubert. Du kannst
+"consang" später wieder starten, die Berechnung wird an der
+Stelle wiederaufgenommen,
+wo sie beendet wurde (es sei denn, du hast Änderungen an Familien
+gemacht, dann fängt die Berechnung von vorn an).</UL>
+
+<UL>
+<LI>
+Eine bessere Art, Datenbanken zu säubern, besteht in der Benutzung
+von "gwu" und "gwc". Diese Säuberung erzeugt eine neue Datenbank,
+wo der Platz von entfernten Personen und Familien wiederbenutzt wird. Im
+Eingabefenster gib für die Datenbank "bla" ein:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwu bla > bla.gw</PRE>
+dann:
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwc bla.gw -o blub</PRE>
+Es empfiehlt sich, die Datenbank nicht mit demselben Namen anzulegen,
+denn
+wenn "gwu" oder "gwc" nicht richtig arbeiten, riskierst du, alles zu verlieren.
+Hier haben wir die neue Datenbank "blub" genannt.
+
+<P>Kontrolliere, daß "blub" korrekt ist, und wenn das der Fall ist, entferne
+die Datenbank "bla" (durch Löschen des Verzeichnisses&nbsp;
+"bla.gwb"),
+dann benenne "blub" in "bla" um (durch Umbenennen von "blub.gwb" in
+"bla.gwb
+"). Wie das geht, siehst du im nächsten Abschnitt.
+
+<P>Nach dem Aufruf von&nbsp; "gwc" bleiben Dateien mit der Erweiterung
+".gwo" übrig. Du kannst sie entfernen. Lösche auch die Dateien
+".gw", außer du willst diese als Backup aufheben.
+
+<P>Wenn du willst, das die Anzeige der Blutsverwandtschaft
+funktioniert, mußt du außerdem noch einmal "consang"
+für diese neue Datenbank ausführen.</UL>
+
+<p>
+
+
+<a name="Rena"></a>
+== Umbenennung ==
+Die {GeneWeb}-Datenbanken sind Verzeichnisse mit der Erweiterung ".gwb".
+Wenn du einfach den Namen des Verzeichnisses "blub.gwb" nach "bla.gwb" änderst,
+heißt deine Datenbank jetzt nicht mehr "blub" sondern "bla".
+
+<P>Um das zu machen, hast du die Wahl zwischen der graphischen Oberfläche,
+wenn dein System eine solche besitzt, oder interaktiven Befehlen.
+<UL>
+<LI>
+um "blub.gwb" nach "bla.gwb" mit der graphischen Oberfläche zu ändern:</LI>
+
+<UL>
+<LI>
+Öffne ein Fenster mit dem Verzeichnis, das deine Datenbanken enthält.</LI>
+
+<LI>
+Ziehe "bla.gwb", wenn ein solcher existiert, in den Papierkorb.</LI>
+
+<LI>
+Benenne "blub.gwb" in "bla.gwb" um.</LI>
+</UL>
+</UL>
+
+<UL>
+<LI>
+mit einem interaktiven Eingabefenster:</LI>
+
+<UL>
+<LI>
+Unter Unix:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; rm -rf bla.gwb
+&nbsp;&nbsp;&nbsp;&nbsp; mv blub.gwb bla.gwb</PRE>
+
+<LI>
+Unter Windows:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; del bla.gwb\*.*
+&nbsp;&nbsp;&nbsp;&nbsp; rmdir bla.gwb
+&nbsp;&nbsp;&nbsp;&nbsp; move blub.gwb bla.gwb</PRE>
+</UL>
+</UL>
+
+<p>
+
+
+<a name="Save"></a>
+== Sicherung ==
+Computer sind keine absolut verläßlichen Maschinen. Es ist wichtig,
+die Daten von Zeit zu Zeit zu sichern durch Kopie auf ein anderes Medium
+(Disketten zum Beispiel).
+
+<P>Es kann außerdem interessant sein, verschiedene Zwischenversionen
+zu behalten, um zu älteren Versionen zurückkehren zu können.
+
+<P>Um die Datenbank "bla" zu sichern, mache einfach eine Kopie vom Verzeichnis
+"bla.gwb" auf das andere Medium (oder woanders auf die Festplatte, wenn
+du nur eine Zwischenversion aufheben willst).
+
+<P>Aber es gibt noch einen besseren Weg zum Sichern: Speichere stattdessen
+deine Datenbank als Quelldatei ab. Für die Datenbank "bla" gib in
+einem Eingabefenster ein:
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwu bla > bla.gw</PRE>
+Und kopiere die Datei "bla.gw" auf das andere Medium oder woanders auf
+die Festplatte. Du kannst der Datei für deine Ablage auch einen anderen
+Namen geben (aber immer mit der Erweiterung ".gw").
+
+<P>Das Backup als ".gw"-Dateien hat mehrere Vorteile:
+<UL>
+<LI>
+Es ist einfacher, weil es nur eine Datei ist, währenddessen die Datenbank
+ein ganzes Verzeichnis umfaßt.
+
+<p>
+<LI>
+Die Dateigröße ist geringer.
+
+<p>
+<LI>
+Man kann sie wieder zusammensetzen mit einem anderen "gwc", sogar mit einer
+zukünftige Version von GeneWeb.
+
+<p>
+<LI>
+Da es sich um einfachen Text handelt, ist sie mit einem Editor lesbar (Word, Emacs,
+etc.); was sehr nützlich sein kann. Eine Genealogiesoftware wird auch
+noch in dreihundert Jahren in der Lage sein, die Datenbank wiederaufzubauen.</LI>
+</UL>
+
+<UL>
+<LI>
+Man kann einen Vergleich zwischen verschiedenen gesicherten Versionen und
+der aktuellen Version machen.</LI>
+</UL>
+Um die Datenbank "bla" aus der Datei "bla.gw" wiederherzustellen, gib ein:
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwc bla.gw -o bla</PRE>
+
+
+<p>
+
+<br>
+<center>
+Zurück zur [[[diruse/Gebrauchsanweisung]]].
+</center>
+

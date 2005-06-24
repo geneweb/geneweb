@@ -1,0 +1,93 @@
+GeneWeb - Zusammenführen von Datenbanken
+
+
+Dieser Teil zeigt die Prozedur zum Zusammenführen von Datenbanken. Diese ist zwar
+noch manuell, aber sie wird möglicherweise in Zukunft verbessert.
+
+<P>Das Zusammenführen von Datenbanken erfolgt in zwei Schritten:
+<UL>
+<LI>
+Erstens: Zusammenfügen der zwei Datenbanken zu einer.</LI>
+</UL>
+
+<UL>
+<LI>
+Zweitens: Zusammenführen der Personen.</LI>
+</UL>
+
+<p>
+
+
+==Erster Schritt: Verkettung der Datenbanken ==
+Das kann nur im Eingabefenster erfolgen (siehe
+"[[[start/Erste Schritte]]] mit GeneWeb").
+<UL>
+<LI>
+Wenn du eine Datenbank namens "bla" hast und eine weitere namens "blub",
+extrahiere diese beiden Datenbanken als Quelldateien mit dem Befehl "gwu".
+Gib ein:</LI>
+
+<PRE>
+     gwu bla  > bla.gw
+     gwu blub > blub.gw
+</PRE>
+</UL>
+
+<UL>
+<LI>
+Erzeuge eine gemeinsame Datenbank "base". Gib ein:</LI>
+
+<PRE>
+     gwc bla.gw -sep blub.gw -o base
+</PRE>
+
+Die Option "-sep" erlaubt es, "blub.gw" getrennt zu behandeln: Wenn eine
+Person aus "blub.gw" schon mit demselben Schlüssel (Vorname/Name/Nummer) in
+"bla.gw" existiert, wird die Nummer dieses Schlüssels automatisch erhöht, um
+einen Konflikt zu vermeiden
+
+</UL>
+
+<p>
+
+
+==Zweiter Schritt: Zusammenführen von Personen ==
+Du hast nun eine Datenbank "base", die "bla" und "blub" enthält, mit
+einigen doppelt vorhandenen Personen.
+
+<P>Du kannst diese Personen mit dem Webbrowser zusammenführen. Wenn
+"gwd" nicht läuft, starte es jetzt.
+
+<P>Dann wende die 
+im Kapitel "Wie nimmt man Änderungen an der
+Datenbank vor" beschriebene Prozedur
+[[[update#MrgP/"Zusammenführen zweier Personen"]]] an
+(hierbei ist die dort angegebenen Bemerkung, daß es sich nicht um das
+"Zusammenführen von Datenbanken" handelt, zu ignorieren).
+<p>
+
+
+==Abschließendes Aufräumen ==
+Am Ende des Zusammenführens ist es klug, ein abschließendes Säubern der
+Datenbank durchzuführen. In der Tat wird der Platz von gelöschten
+Personen oder Familien nicht wieder freigegeben (was ja beim
+Zusammenführen passiert).
+Speziell die Startseite zeigt immer die gleiche Zahl von Personen an.
+
+<P>Um das Säubern der Datenbank "base" durchzuführen (du kannst
+das zu jeder Zeit und auch mehrmals machen), benutze wieder ein Eingabefenster.
+Gib ein:
+<PRE>     gwu base > base.gw
+     gwc base.gw -o base</PRE>
+Beachte, daß du zum Überschreiben der alten Datenbank "bla" einfach
+"-o bla -f" in diesem zweiten Befehl schreiben kannst:
+<PRE>     gwc base.gw -o bla -f</PRE>
+
+
+<p>
+
+<br>
+<center>
+Zurück zur [[[diruse/Gebrauchsanweisung]]].
+</center>
+

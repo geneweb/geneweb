@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: wdoc.txt,v 1.3 2005-06-22 11:37:44 ddr Exp $ -->
+  <!-- $Id: wdoc.txt,v 1.4 2005-06-24 21:00:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%title;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -11,6 +11,8 @@
     *.highlight { color: #2f6000; font-weight: bold }
   --></style>
 <body style="background: url('../images/gwback.jpg')">
+
+%summary;
 
 <table border="0" width="100%%"><tr>
 <td>

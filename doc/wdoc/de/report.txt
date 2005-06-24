@@ -1,0 +1,36 @@
+GeneWeb - 
+
+Sende deine Anmerkungen per E-Mail an die folgende Adresse:
+<UL>
+<LI>
+<a href="mailto:daniel.de_rauglaudre@inria.fr">daniel.de_rauglaudre@inria.fr</a></LI>
+</UL>
+Bitte:
+<UL>
+<LI>
+Gib die Versionsnummer von {GeneWeb} an, die du benutzt.</LI>
+
+<LI>
+Spezifiziere das Betriebssystem, worauf {GeneWeb} läuft: Linux,
+Windows NT, Windows 95.</LI>
+
+<LI>
+Bei einem Fehlerbericht erkläre die Umstände der Anomalie und
+die möglicherweise angezeigten Meldungen.</LI>
+
+<LI>
+Wenn du mit einer neuen Sprache oder Änderungen am Lexikon oder der
+Startseite einer Sprache o. ä. beitragen willst, sende die kompletten
+Dateien "lexicon.txt" und "start.txt" und gib die Version an, die als Grundlage
+dient. In den Lexikonausdrücken füge deine Sprache in der alphabetischen
+Reihenfolge ihrer Abkürzung ein (z. B.: "pt:" zwischen "no:" und "se:").</LI>
+</UL>
+
+
+<p>
+
+<br>
+<center>
+Zurück zur [[[diruse/Gebrauchsanweisung]]].
+</center>
+
