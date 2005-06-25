@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.74 2005-06-25 13:59:01 ddr Exp $ *)
+(* $Id: notes.ml,v 4.75 2005-06-25 16:33:37 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -481,7 +481,7 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
   let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
   let file_path = file_path conf in
   let s = syntax_links conf mode file_path (String.concat "\n" lines) in
-  let s = string_with_macros conf True [] s in
+  let s = string_with_macros conf [] s in
   print_sub_part conf mode sub_fname cnt0 s
 ;
 
@@ -511,7 +511,7 @@ value print conf base =
         print_notes_sub_part conf fnotes cnt0 lines
     | None ->
         let file_path = file_path conf in
-        let s = string_with_macros conf True [] s in
+        let s = string_with_macros conf [] s in
         let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         Wserver.wprint "%s\n" s ];
     trailer conf;

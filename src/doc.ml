@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.22 2005-06-25 13:47:21 ddr Exp $ *)
+(* $Id: doc.ml,v 4.23 2005-06-25 16:33:37 ddr Exp $ *)
 
 open Config;
 
@@ -194,7 +194,7 @@ value read_wdoc lang fname =
 ;
 
 value print_whole_wdoc conf fdoc title s =
-  let s = Util.filter_html_tags True s in
+  let s = Util.filter_html_tags s in
   let s = "<br /><br />\n" ^ s in
   let s =
     Notes.html_with_summary_of_tlsw conf "WDOC" (wdoc_file_path conf.lang)
@@ -229,7 +229,7 @@ value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let file_path = wdoc_file_path conf.lang in
   let lines = Notes.html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
   let s = Notes.syntax_links conf mode file_path (String.concat "\n" lines) in
-  let s = Util.filter_html_tags True s in
+  let s = Util.filter_html_tags s in
   Notes.print_sub_part conf mode sub_fname cnt0 s
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.46 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: forum.ml,v 4.47 2005-06-25 16:33:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -126,12 +126,13 @@ value print_one_header conf prec_date ndisp pos h =
       tag "td" begin Wserver.wprint "<tt>%s</tt>" hour; end;
       tag "td" begin
         Wserver.wprint "<a href=\"%sm=FORUM;p=%d\"><b>%s</b></a>" (commd conf)
-          pos (secure (sp2nbsp 23 ident));
+          pos (no_html_tags (sp2nbsp 23 ident));
       end;
       tag "td" begin
         if subject = "" || subject = "-" then
-          Wserver.wprint "<em>...&nbsp;%s</em>" (secure (sp2nbsp 50 beg_mess))
-        else Wserver.wprint "%s" (secure (sp2nbsp 50 subject));
+          Wserver.wprint "<em>...&nbsp;%s</em>"
+            (no_html_tags (sp2nbsp 50 beg_mess))
+        else Wserver.wprint "%s" (no_html_tags (sp2nbsp 50 subject));
       end;
     end;
     ndisp
@@ -377,7 +378,7 @@ value print_one_forum_message conf m pos next_pos forum_length =
     let subject =
       if m.m_subject = "" || m.m_subject = "-" then
         capitale (transl conf "database forum")
-      else secure m.m_subject
+      else no_html_tags m.m_subject
     in
     Wserver.wprint "%s" subject
   in
@@ -419,15 +420,15 @@ value print_one_forum_message conf m pos next_pos forum_length =
       end;
     end;
     tag "p" begin
-      Wserver.wprint "<strong>%s</strong>\n" (secure m.m_ident);
+      Wserver.wprint "<strong>%s</strong>\n" (no_html_tags m.m_ident);
       if m.m_email <> "" then
-        let email = secure m.m_email in
+        let email = no_html_tags m.m_email in
         Wserver.wprint " <a href=\"mailto:%s\">%s</a>\n" email email
       else ();
       xtag "br";
       if m.m_subject <> "" then do {
         Wserver.wprint "<b>%s: %s</b>\n"
-          (capitale (header_txt conf 2)) (secure m.m_subject);
+          (capitale (header_txt conf 2)) (no_html_tags m.m_subject);
         xtag "br";
       }
       else ();
@@ -455,7 +456,7 @@ value print_one_forum_message conf m pos next_pos forum_length =
         else
           loop (m.m_mess.[i] = '\n') (Buff.store len m.m_mess.[i]) (i + 1)
     in
-    Wserver.wprint "%s\n" (string_with_macros conf True [] mess);
+    Wserver.wprint "%s\n" (string_with_macros conf [] mess);
     if browser_doesnt_have_tables conf then ()
     else Wserver.wprint "</td></tr></table>";
     Wserver.wprint "</dd></dl>\n";
