@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.70 2005-06-24 21:00:27 ddr Exp $ *)
+(* $Id: notes.ml,v 4.71 2005-06-25 05:29:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -280,15 +280,24 @@ value extract_sub_part s v =
   String.concat "\n" (List.rev rev_lines)
 ;
 
+value adjust_ul_level rev_lines old_lev new_lev =
+  if old_lev < new_lev then [tab (old_lev + 1) "<ul>" :: rev_lines]
+  else
+    let rev_lines = [List.hd rev_lines ^ "</li>" :: List.tl rev_lines] in
+    loop rev_lines old_lev where rec loop rev_lines lev =
+      if lev = new_lev then rev_lines
+      else loop [tab lev "</ul></li>" :: rev_lines] (lev - 1)
+;
+
 value summary_of_tlsw_lines conf lines =
   let (rev_summary, lev, _, cnt, rev_sections_nums) =
     List.fold_left
-      (fun (summary, lev, indent_stack, cnt, sections_nums) s ->
+      (fun (summary, prev_lev, indent_stack, cnt, sections_nums) s ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
           let (lev, stack) =
-            loop lev indent_stack where rec loop lev stack =
+            loop prev_lev indent_stack where rec loop lev stack =
               match stack with
               [ [(prev_num, prev_slev) :: rest_stack] ->
                   if slev < prev_slev then
@@ -319,35 +328,34 @@ value summary_of_tlsw_lines conf lines =
           let summary =
             let s =
               sprintf "<a href=\"#a_%d\">%s - %s</a>" cnt section_num
-                (String.sub s slev (len - 2 * slev))
+                (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
             in
-            let line =
-              sprintf "<div style=\"margin-left:%.3fem\">%s</div>"
-                (float lev *. 1.618) s
-            in
-            [line :: summary]
+            let line = tab (lev + 1) "<li>" ^ s in
+            [line :: adjust_ul_level summary (prev_lev - 1) lev]
           in
           (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
-        else (summary, lev, indent_stack, cnt, sections_nums))
+        else (summary, prev_lev, indent_stack, cnt, sections_nums))
       ([], 0, [], first_cnt, []) lines
   in
   if cnt <= first_cnt + 1 then
     (* less that 2 paragraphs : summary abandonned *)
     ([], [])
   else
+    let rev_summary = ["</ul>" :: adjust_ul_level rev_summary (lev - 1) 0]
+    in
     let lines =
       ["<dl><dd>";
-       "<table id=\"toc\" border=\"1\" cellpadding=\"10\">";
+       "<table border=\"1\" cellpadding=\"10\">";
        "<tr><td align=\"" ^ conf.left ^ "\">";
        "<div style=\"text-align:center\"><b>" ^
           capitale (transl_nth conf "visualize/show/hide/summary" 3) ^ "</b>";
-"<script type=\"text/javascript\">
-//<![CDATA[
-showTocToggle()
-//]]>
-</script>";
-"</div>";
-"<div id=\"tocinside\">" ::
+       "<script type=\"text/javascript\">";
+       "//<![CDATA[";
+       "showTocToggle()";
+       "//]]>";
+       "</script>";
+       "</div>";
+       "<div class=\"summary\" id=\"tocinside\">" ::
        List.rev_append rev_summary
          ["</div>";
           "</td></tr></table>";
