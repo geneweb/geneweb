@@ -1,10 +1,11 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.142 2005-06-22 04:27:38 ddr Exp $ *)
+(* $Id: util.ml,v 4.143 2005-06-25 09:18:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Config;
 open Gutil;
+open Printf;
 
 value sharelib =
   List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
@@ -351,7 +352,7 @@ value month_txt =
 
 value string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
-  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
+  sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
     (week_day_txt lt.Unix.tm_wday) lt.Unix.tm_mday (month_txt lt.Unix.tm_mon)
     (1900 + lt.Unix.tm_year) lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 ;
@@ -938,6 +939,7 @@ value macro_etc env imcom c =
       | c -> "%" ^ String.make 1 c ] ]
 ;
 
+(* "copy_from_etc" is old method; rather use "Templ.copy_from_templ" *)
 value rec copy_from_etc env lang imcom ic =
   let cnt = ref 0 in
   try
@@ -1408,7 +1410,7 @@ value string_with_macros conf positive_filtering env s =
             [ Some j ->
                 let x = String.sub s i (j - i) in
                 do {
-                  Printf.bprintf buff "<a href=\"%s\">%s</a>" x x;
+                  bprintf buff "<a href=\"%s\">%s</a>" x x;
                   loop Out j
                 }
             | None ->
@@ -1416,7 +1418,7 @@ value string_with_macros conf positive_filtering env s =
                 [ Some j ->
                     let x = String.sub s i (j - i) in
                     do {
-                      Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+                      bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                       loop Out j
                     }
                 | None ->
@@ -1470,7 +1472,8 @@ value print_copyright conf =
       fun _ ->
         let s =
           if conf.cancel_links then ""
-          else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>"
+          else
+            sprintf " - <a href=\"%sm=DOC\">DOC</a>" conf.indep_command
         in
         if not conf.setup_link then s
         else s ^ " - " ^ setup_link conf);
@@ -1683,9 +1686,7 @@ value specify_homonymous conf base p =
 ;
 
 (* fix system bug: string_of_float 17.97 = "17.969999999999" *)
-value my_string_of_float f =
-  Printf.sprintf "%.6g" f
-;
+value my_string_of_float f = sprintf "%.6g" f;
 
 value string_of_decimal_num conf f =
   let s = my_string_of_float f in
@@ -2280,7 +2281,7 @@ value adm_file f =
 
 value std_date conf =
   let (hour, min, sec) = conf.time in
-  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
+  sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
     conf.today.month conf.today.day hour min sec
 ;
 
@@ -2299,7 +2300,7 @@ value read_wf_trace fname =
 value write_wf_trace fname wt =
   let oc = Secure.open_out fname in
   do {
-    List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
+    List.iter (fun (dt, u) -> fprintf oc "%s %s\n" dt u) wt;
     close_out oc;
   }
 ;

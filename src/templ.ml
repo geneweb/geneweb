@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.67 2005-06-22 11:37:44 ddr Exp $ *)
+(* $Id: templ.ml,v 4.68 2005-06-25 09:18:43 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -603,7 +603,11 @@ value not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 ;
 
-value eval_variable conf =
+value rec eval_variable conf =
+  fun
+  [ [s] -> eval_simple_variable conf s
+  | _ -> raise Not_found ]
+and eval_simple_variable conf =
   fun 
   [ "action" -> conf.command
   | "border" -> string_of_int conf.border
@@ -625,20 +629,14 @@ value eval_variable conf =
   | "nl" -> "\n"
   | "nn" -> ""
   | "prefix" -> Util.commd conf
+  | "prefix_no_lang" ->
+      let conf = {(conf) with henv = List.remove_assoc "lang" conf.henv} in
+      Util.commd conf
   | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
   | "right" -> conf.right
   | "sp" -> " "
   | "/" -> conf.xhs
   | _ -> raise Not_found ]
-;
-
-value eval_ast conf =
-  fun
-  [ Atext s -> s
-  | Avar _ s [] ->
-      try eval_variable conf s with
-      [ Not_found -> " %%" ^ s ^ "?" ]
-  | x -> not_impl "eval_ast" x ]
 ;
 
 value eval_string_var conf eval_var s sl =
@@ -649,11 +647,7 @@ value eval_string_var conf eval_var s sl =
     | VVbool False -> "0" ]
   with
   [ Not_found ->
-      try
-        match sl with
-        [ [] -> eval_variable conf s
-        | _ -> raise Not_found ]
-      with
+      try eval_variable conf [s :: sl] with
       [ Not_found -> " %" ^ String.concat "." [s :: sl] ^ "?" ] ]
 ;
 
@@ -665,7 +659,28 @@ value eval_subst f xl vl a =
     | _ -> Atext (f ^ ": bad # of params") ]
 ;
 
-value eval_transl_lexicon conf upp s c =
+value eval_var_handled conf sl =
+  try eval_variable conf sl with
+  [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
+;
+
+value rec eval_ast conf =
+  fun
+  [ Atext s -> s
+  | Avar _ s sl -> eval_var_handled conf [s :: sl]
+  | Atransl upp s c -> eval_transl conf upp s c
+  | ast -> not_impl "eval_ast" ast ]
+and eval_transl conf upp s c =
+  if c = "" && String.length s > 0 && s.[0] = '\n' then
+    eval_transl_inline conf s
+  else
+    eval_transl_lexicon conf upp s c
+and eval_transl_inline conf s =
+  let (s, alt) =
+    Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
+  in
+  if alt then "[" ^ s ^ "]" else s
+and eval_transl_lexicon conf upp s c =
   let r =
     let nth = try Some (int_of_string c) with [ Failure _ -> None ] in
     match split_at_coloncolon s with
@@ -719,20 +734,6 @@ value eval_transl_lexicon conf upp s c =
             Util.transl_decline conf s1 s3 ] ]
   in
   if upp then Util.capitale r else r
-;
-
-value eval_transl_inline conf s =
-  let (s, alt) =
-    Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
-  in
-  if alt then "[" ^ s ^ "]" else s
-;
-
-value eval_transl conf upp s c =
-  if c = "" && String.length s > 0 && s.[0] = '\n' then
-    eval_transl_inline conf s
-  else
-    eval_transl_lexicon conf upp s c
 ;
 
 value eval_bool_var conf eval_var =
@@ -865,7 +866,7 @@ value eval_bool_expr = handle_eval bool_eval False;
 value eval_int_expr = handle_eval int_eval 0;
 value eval_expr = handle_eval string_eval "eval_error";
 
-value print_body_prop conf base =
+value print_body_prop conf =
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
     [ Not_found -> "" ]
@@ -873,17 +874,24 @@ value print_body_prop conf base =
   Wserver.wprint "%s" (s ^ Util.body_prop conf)
 ;
 
-value print_variable conf base =
+value rec print_variable conf base_opt sl =
+  try Wserver.wprint "%s" (eval_variable conf sl) with
+  [ Not_found ->
+      try
+        match sl with
+        [ [s] -> print_simple_variable conf base_opt s
+        | _ -> raise Not_found ]
+      with
+      [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ] ]
+and print_simple_variable conf base_opt =
   fun
-  [ "base_header" -> Util.include_hed_trl conf (Some base) ".hed"
-  | "base_trailer" -> Util.include_hed_trl conf (Some base) ".trl"
-  | "body_prop" -> print_body_prop conf base
+  [ "base_header" -> Util.include_hed_trl conf base_opt ".hed"
+  | "base_trailer" -> Util.include_hed_trl conf base_opt ".trl"
+  | "body_prop" -> print_body_prop conf
   | "copyright" -> Util.print_copyright conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
-  | s ->
-      try Wserver.wprint "%s" (eval_variable conf s) with
-      [ Not_found -> Wserver.wprint " %%%s?" s ] ]
+  | _ -> raise Not_found ]
 ;
 
 value print_var conf base eval_var s sl =
@@ -895,7 +903,7 @@ value print_var conf base eval_var s sl =
   with
   [ Not_found ->
       match sl with
-      [ [] -> print_variable conf base s
+      [ [] -> print_variable conf (Some base) sl
       | _ ->
           do {
             Wserver.wprint " %%%s" s;
@@ -919,4 +927,45 @@ value print_apply f print_ast xl al vl =
        in
        print_ast a)
     al
+;
+
+(* not clear... all this stuff with eval/bool/expr... *)
+value eval_bool_ast conf a =
+  let eval_var loc sl  = VVstring (eval_variable conf sl) in
+  let eval_apply _ = raise Not_found in
+  eval_bool_expr conf (eval_var, eval_apply) a
+;
+
+value rec copy_from_templ conf env ic =
+  let astl = parse_templ conf (Stream.of_channel ic) in
+  do {
+    close_in ic;
+    List.iter (print_ast conf env) astl;
+  }
+and print_ast conf env =
+  fun
+  [ Avar _ s sl -> print_ast_var conf env [s :: sl]
+  | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
+  | ast -> Wserver.wprint "%s" (eval_ast conf ast) ]
+and print_if conf env a1 a2 a3 =
+  let test =
+    try eval_bool_ast conf a1 with
+    [ Failure x -> do { Wserver.wprint "%s" x; False } ]
+  in
+  List.iter (print_ast conf env) (if test then a2 else a3)
+and print_ast_var conf env sl =
+  try
+    match sl with
+    [ [s] -> Wserver.wprint "%s" (List.assoc s env)
+    | _ -> raise Not_found ]
+  with
+  [ Not_found ->
+      match sl with
+      [ ["include"; templ] ->
+          match Util.open_etc_file templ with
+          [ Some ic -> copy_from_templ conf env ic
+          | None -> () ]
+      | sl ->
+          try print_variable conf None sl with
+          [ Not_found -> Wserver.wprint "%s" (eval_var_handled conf sl) ] ] ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.20 2005-06-25 05:51:20 ddr Exp $ *)
+(* $Id: doc.ml,v 4.21 2005-06-25 09:18:43 ddr Exp $ *)
 
 open Config;
 
@@ -192,70 +192,6 @@ value read_wdoc conf fname =
   | None -> ("", "") ]
 ;
 
-value not_impl func x =
-  let desc =
-    if Obj.is_block (Obj.repr x) then
-      "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
-    else "int_val = " ^ string_of_int (Obj.magic x)
-  in
-  ">Doc." ^ func ^ ": not impl " ^ desc ^ "<p>\n"
-;
-
-value no_lang conf = {(conf) with henv = List.remove_assoc "lang" conf.henv};
-
-value eval_var conf env loc =
-  fun
-  [ ["doctype"] -> Util.doctype conf ^ "\n"
-  | ["image_prefix"] -> Util.image_prefix conf
-  | ["prefix_no_lang"] -> Util.commd (no_lang conf)
-  | ["/"] -> conf.xhs
-  | [s] -> List.assoc s env
-  | _ -> raise Not_found ]
-;
-
-value eval_var_handled conf env loc sl =
-  try eval_var conf env loc sl with
-  [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
-;
-
-value eval_bool_ast conf env a =
-  let eval_var loc sl  = VVstring (eval_var conf env loc sl) in
-  let eval_apply _ = raise Not_found in
-  Templ.eval_bool_expr conf (eval_var, eval_apply) a
-;
-
-value eval_ast conf env =
-  fun
-  [ Atext s -> s
-  | Avar loc s sl -> eval_var_handled conf env loc [s :: sl]
-  | ast -> not_impl "eval_ast" ast ]
-;
-
-value print_var conf env loc =
-  fun
-  [ ["copyright"] -> Util.print_copyright conf
-  | ["summary"] ->
-      match Util.open_etc_file "summary" with
-      [ Some ic -> Notes.copy_from_templ conf ic
-      | None -> () ]
-  | sl -> Wserver.wprint "%s" (eval_var_handled conf env loc sl) ]
-;
-
-value rec print_ast conf env =
-  fun
-  [ Avar loc s sl -> print_var conf env loc [s :: sl]
-  | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
-  | ast -> Wserver.wprint "%s" (eval_ast conf env ast) ]
-and print_ast_list conf env al =
-  List.iter (print_ast conf env) al
-and print_if conf env a1 a2 a3 =
-  let test =
-    try eval_bool_ast conf env a1 with
-    [ Failure x -> do { Wserver.wprint "%s" x; False } ]
-  in
-  print_ast_list conf env (if test then a2 else a3)
-;
-
 value print_whole_wdoc conf fdoc title s =
   let s = Util.filter_html_tags True s in
   let s = "<br /><br />\n" ^ s in
@@ -266,13 +202,11 @@ value print_whole_wdoc conf fdoc title s =
   in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let astl = Templ.parse_templ conf (Stream.of_channel ic) in
       do {
-        close_in ic;
         Util.html conf;
         Util.nl ();
         let env = [("title", title); ("doc", s); ("page", fdoc)] in
-        List.iter (print_ast conf env) astl;
+        Templ.copy_from_templ conf env ic;
       }
   | None ->
       let title _ = Wserver.wprint "Error" in
