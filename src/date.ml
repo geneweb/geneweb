@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.39 2005-05-29 19:15:02 ddr Exp $ *)
+(* $Id: date.ml,v 4.40 2005-06-25 13:59:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -372,7 +372,7 @@ value short_marriage_date_text conf base fam p1 p2 =
 ;
 
 value string_of_place conf pl =
-  Util.string_with_macros conf False [] pl
+  Util.string_with_macros conf True [] pl
 ;
 
 value print_dates conf base p =

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.157 2005-06-25 13:47:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.158 2005-06-25 13:59:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -28,7 +28,7 @@ value string_of_marriage_text conf base fam =
   in
   match marriage_place with
   [ "" -> s
-  | _ -> s ^ ", " ^ string_with_macros conf False [] marriage_place ^ "," ]
+  | _ -> s ^ ", " ^ string_with_macros conf True [] marriage_place ^ "," ]
 ;
 
 value string_of_title conf base and_txt p (nth, name, title, places, dates) =
@@ -818,7 +818,7 @@ value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
 value string_of_place conf base istr =
-  string_with_macros conf False [] (sou base istr)
+  string_with_macros conf True [] (sou base istr)
 ;
 
 value gen_string_of_img_sz max_wid max_hei conf base env (p, _, _, p_auth) =
@@ -943,7 +943,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
           if m_auth then
-            string_with_macros conf False [] (sou base fam.comment)
+            string_with_macros conf True [] (sou base fam.comment)
           else ""
       | _ -> raise Not_found ]
   | "count" ->
@@ -1812,11 +1812,11 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           Notes.syntax_links conf "NOTES" (Notes.file_path conf)
             (String.concat "\n" lines)
         in
-        string_with_macros conf False env s
+        string_with_macros conf True env s
       else ""
   | "occ" -> if p_auth then string_of_int p.occ else ""
   | "occupation" ->
-      if p_auth then string_with_macros conf False [] (sou base p.occupation)
+      if p_auth then string_with_macros conf True [] (sou base p.occupation)
       else ""
   | "on_baptism_date" ->
       match (p_auth, Adef.od_of_codate p.baptism) with
@@ -1884,7 +1884,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match get_env "src" env with
       [ Vstring s ->
           let env = [('i', fun () -> Util.default_image_name base p)] in
-          string_with_macros conf False env s
+          string_with_macros conf True env s
       | _ -> raise Not_found ]
   | "surname" ->
       if not p_auth && conf.hide_names then "x" else p_surname base p
