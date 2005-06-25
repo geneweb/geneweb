@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.69 2005-06-25 13:47:21 ddr Exp $ *)
+(* $Id: templ.ml,v 4.70 2005-06-25 13:59:01 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -901,15 +901,7 @@ value print_var conf base eval_var s sl =
     | VVbool True -> Wserver.wprint "1"
     | VVbool False -> Wserver.wprint "0" ]
   with
-  [ Not_found ->
-      match sl with
-      [ [] -> print_variable conf (Some base) sl
-      | _ ->
-          do {
-            Wserver.wprint " %%%s" s;
-            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-            Wserver.wprint "?"
-          } ] ]
+  [ Not_found -> print_variable conf (Some base) [s :: sl] ]
 ;
 
 value print_apply f print_ast xl al vl =
