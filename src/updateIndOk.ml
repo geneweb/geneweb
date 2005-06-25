@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.29 2005-06-24 08:05:12 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.30 2005-06-25 16:33:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -111,6 +111,8 @@ value reconstitute_relation_parent conf var key sex =
   match (getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn")) with
   [ ("", _) | ("?", _) | (_, "?") -> None
   | (fn, sn) ->
+      let fn = only_printable fn in
+      let sn = only_printable sn in
       let occ =
         try int_of_string (getn conf var (key ^ "_occ")) with
         [ Failure _ -> 0 ]

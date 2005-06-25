@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.44 2005-06-21 19:29:07 ddr Exp $ *)
+(* $Id: util.mli,v 4.45 2005-06-25 16:33:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -19,7 +19,7 @@ value escache_value : config -> string;
 value commit_patches : config -> base -> unit;
 value update_wf_trace : config -> string -> unit;
 
-value secure : string -> string;
+value no_html_tags : string -> string;
 
 value nl : unit -> unit;
 value html : config -> unit;
@@ -101,8 +101,9 @@ value open_etc_file : string -> option in_channel;
 value copy_from_etc :
   list (char * unit -> string) -> string -> string -> in_channel -> unit;
 value string_with_macros :
-  config -> bool -> list (char * unit -> string) -> string -> string;
-value filter_html_tags : bool -> string -> string;
+  config -> list (char * unit -> string) -> string -> string;
+value filter_html_tags : string -> string;
+value allowed_tags_file : ref string;
 value body_prop : config -> string;
 value include_hed_trl : config -> option base -> string -> unit;
 value url_no_index : config -> base -> string;

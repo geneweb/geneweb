@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.145 2005-06-25 14:05:08 ddr Exp $ *)
+(* $Id: util.ml,v 4.146 2005-06-25 16:33:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -296,7 +296,7 @@ value fdecline conf w s =
 
 (* *)
 
-value secure s =
+value no_html_tags s =
   let rec need_code i =
     if i < String.length s then
       match s.[i] with
@@ -1312,17 +1312,42 @@ value tag_id s i =
       | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
 ;
 
-value good_tags_list =
+value default_good_tag_list =
   ["a"; "b"; "blockquote"; "br"; "center"; "dd"; "dir"; "div"; "dl"; "dt";
    "em"; "font"; "hr"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "i"; "img"; "li";
    "ol"; "p"; "pre"; "span"; "strong"; "sup"; "table"; "tbody"; "td"; "tr";
    "tt"; "u"; "ul"; "!--"]
 ;
-value bad_tags_list =
-  ["applet"; "embed"; "form"; "input"; "object"; "script"]
+
+value allowed_tags_file = ref "";
+
+value good_tag_list_fun () =
+  if allowed_tags_file.val <> "" then
+    match
+      try Some (open_in allowed_tags_file.val) with [ Sys_error _ -> None ]
+    with
+    [ Some ic ->
+        loop [] where rec loop tags =
+          match try Some (input_line ic) with [ End_of_file -> None ] with
+          [ Some tag -> loop [String.lowercase tag :: tags]
+          | None -> do { close_in ic; tags } ]
+    | None -> default_good_tag_list ]
+  else default_good_tag_list
 ;
-value good_tag s i = List.mem (tag_id s i) good_tags_list;
-value bad_tag s i = List.mem (tag_id s i) bad_tags_list;
+
+value good_tags_list = Lazy.lazy_from_fun good_tag_list_fun;
+value good_tag s i = List.mem (tag_id s i) (Lazy.force good_tags_list);
+
+module Lbuff = Buff.Make (struct value buff = ref (String.create 80); end);
+
+value filter_html_tags s =
+  loop 0 0 where rec loop len i =
+    if i < String.length s then
+      if s.[i] = '<' && not (good_tag s (i + 1)) then
+        loop (Lbuff.mstore len "&lt;") (i + 1)
+      else loop (Lbuff.store len s.[i]) (i + 1)
+    else Lbuff.get len
+;
 
 value get_variable s i =
   loop 0 i where rec loop len i =
@@ -1357,20 +1382,11 @@ value expand_env =
    | _ -> s ]
 ;
 
-value string_with_macros conf positive_filtering env s =
+value string_with_macros conf env s =
   let buff = Buffer.create 1000 in
   loop Out 0 where rec loop tt i =
     if i < String.length s then
-      if s.[i] = '<' &&
-        (positive_filtering && not (good_tag s (i + 1)) ||
-         not positive_filtering && bad_tag s (i + 1))
-      then do {
-        Buffer.add_string buff "&lt;"; loop tt (i + 1)
-      }
-      else if s.[i] = '<' && i + 1 < String.length s && s.[i+1] = '%' then do {
-        Buffer.add_string buff "&lt;"; loop tt (i + 1)
-      }
-      else if i + 1 < String.length s && s.[i] = '%' then
+      if i + 1 < String.length s && s.[i] = '%' then
         let i =
           try
             do { Buffer.add_string buff (List.assoc s.[i + 1] env ()); i + 2 }
@@ -1430,20 +1446,7 @@ value string_with_macros conf positive_filtering env s =
                       else Out
                     in
                     do { Buffer.add_char buff s.[i]; loop tt (i + 1) } ] ] ]
-    else Buffer.contents buff
-;
-
-module Lbuff = Buff.Make (struct value buff = ref (String.create 80); end);
-
-value filter_html_tags positive_filtering s =
-  loop 0 0 where rec loop len i =
-    if i < String.length s then
-      if s.[i] = '<' &&
-        (positive_filtering && not (good_tag s (i + 1)) ||
-         not positive_filtering && bad_tag s (i + 1))
-      then loop (Lbuff.mstore len "&lt;") (i + 1)
-      else loop (Lbuff.store len s.[i]) (i + 1)
-    else Lbuff.get len
+    else filter_html_tags (Buffer.contents buff)
 ;
 
 value setup_link conf =
@@ -2104,19 +2107,19 @@ value has_image conf base p =
 ;
 
 value only_printable s =
-  let s = strip_spaces s in
-  if Gutil.utf_8_db.val then s
-  else
-    let s' = String.create (String.length s) in
-    do {
-      for i = 0 to String.length s - 1 do {
-        s'.[i] :=
+  let s' = String.create (String.length s) in
+  do {
+    for i = 0 to String.length s - 1 do {
+      s'.[i] :=
+        if Gutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
+        else
           match s.[i] with
-          [ ' '..'~' | '\160'..'\255' -> s.[i]
+          [ '<' | '>' -> ' '
+          | ' '..'~' | '\160'..'\255' -> s.[i]
           | _ -> ' ' ]
-      };
-      s'
-    }
+    };
+    strip_spaces s'
+  }
 ;
 
 value relation_type_text conf t n =

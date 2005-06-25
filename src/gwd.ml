@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.83 2005-06-21 09:27:22 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.84 2005-06-25 16:33:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1485,6 +1485,10 @@ value main () =
           string_of_int selected_port.val ^ "); > 1024 for normal users.");
        ("-setup_link", Arg.Set setup_link,
         "\n       Display a link to local gwsetup in bottom of pages.");
+       ("-allowed_tags",
+        Arg.String (fun x -> Util.allowed_tags_file.val := x), "\
+<file>
+       HTML tags which are allowed to be displayed. One tag per line in file.");
        ("-wizard", Arg.String (fun x -> wizard_passwd.val := x), "\
 <passwd>
        Set a wizard password: access to all dates and updating.");

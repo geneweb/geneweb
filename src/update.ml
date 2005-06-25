@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.42 2005-06-19 04:46:59 ddr Exp $ *)
+(* $Id: update.ml,v 4.43 2005-06-25 16:33:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -523,7 +523,7 @@ value reconstitute_date conf var =
   | (None, _) ->
       match p_getenv conf.env (var ^ "_text") with
       [ Some txt ->
-          let txt = strip_spaces (get var "text" conf.env) in
+          let txt = only_printable (get var "text" conf.env) in
           if txt = "" then None else Some (Dtext txt)
       | _ -> None ] ]
 ;
