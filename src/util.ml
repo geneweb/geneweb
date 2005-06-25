@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.144 2005-06-25 13:47:21 ddr Exp $ *)
+(* $Id: util.ml,v 4.145 2005-06-25 14:05:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1307,7 +1307,7 @@ value tag_id s i =
     if i = String.length s then Buff.get len
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' ->
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '!' | '-' ->
           loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
       | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
 ;
@@ -1316,7 +1316,7 @@ value good_tags_list =
   ["a"; "b"; "blockquote"; "br"; "center"; "dd"; "dir"; "div"; "dl"; "dt";
    "em"; "font"; "hr"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "i"; "img"; "li";
    "ol"; "p"; "pre"; "span"; "strong"; "sup"; "table"; "tbody"; "td"; "tr";
-   "tt"; "u"; "ul"]
+   "tt"; "u"; "ul"; "!--"]
 ;
 value bad_tags_list =
   ["applet"; "embed"; "form"; "input"; "object"; "script"]
