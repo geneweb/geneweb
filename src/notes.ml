@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.72 2005-06-25 09:18:43 ddr Exp $ *)
+(* $Id: notes.ml,v 4.73 2005-06-25 13:47:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -150,7 +150,7 @@ value syntax_links conf mode file_path s =
       match ext_file_link s i with
       [ Some (j, fname, sname, text) ->
           let c =
-            let f = file_path conf fname in
+            let f = file_path fname in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
@@ -479,6 +479,7 @@ value print_sub_part conf mode sub_fname cnt0 s =
 value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
   let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
+  let file_path = file_path conf in
   let s = syntax_links conf mode file_path (String.concat "\n" lines) in
   let s = string_with_macros conf False [] s in
   print_sub_part conf mode sub_fname cnt0 s
@@ -509,6 +510,7 @@ value print conf base =
         let lines = List.rev (rev_extract_sub_part s cnt0) in
         print_notes_sub_part conf fnotes cnt0 lines
     | None ->
+        let file_path = file_path conf in
         let s = string_with_macros conf False [] s in
         let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
         Wserver.wprint "%s\n" s ];

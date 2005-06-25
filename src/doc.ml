@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.21 2005-06-25 09:18:43 ddr Exp $ *)
+(* $Id: doc.ml,v 4.22 2005-06-25 13:47:21 ddr Exp $ *)
 
 open Config;
 
@@ -163,13 +163,14 @@ value print conf =
 
 open TemplAst;
 
-value wdoc_file_path conf fname =
+value wdoc_file_path lang fname =
   let dir = Util.search_in_doc_path "wdoc" in
-  List.fold_right Filename.concat [dir; conf.lang] (fname ^ ".txt")
+  if lang = "" then Filename.concat dir (fname ^ ".txt")
+  else List.fold_right Filename.concat [dir; lang] (fname ^ ".txt")
 ;
 
-value read_wdoc conf fname =
-  let fname = wdoc_file_path conf fname in
+value read_wdoc lang fname =
+  let fname = wdoc_file_path lang fname in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let title = try input_line ic with [ End_of_file -> "" ] in
@@ -195,7 +196,10 @@ value read_wdoc conf fname =
 value print_whole_wdoc conf fdoc title s =
   let s = Util.filter_html_tags True s in
   let s = "<br /><br />\n" ^ s in
-  let s = Notes.html_with_summary_of_tlsw conf "WDOC" wdoc_file_path fdoc s in
+  let s =
+    Notes.html_with_summary_of_tlsw conf "WDOC" (wdoc_file_path conf.lang)
+      fdoc s
+  in
   let fname =
     let f = Filename.concat "wdoc" "wdoc.txt" in
     Util.search_in_doc_path f
@@ -222,7 +226,7 @@ value print_whole_wdoc conf fdoc title s =
 
 value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let mode = "WDOC" in
-  let file_path = wdoc_file_path in
+  let file_path = wdoc_file_path conf.lang in
   let lines = Notes.html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
   let s = Notes.syntax_links conf mode file_path (String.concat "\n" lines) in
   let s = Util.filter_html_tags True s in
@@ -241,12 +245,7 @@ value print_part_wdoc conf fdoc title s cnt0 =
   }
 ;
 
-value print_wdoc_dir conf =
-  let dname =
-    let dir = Util.search_in_doc_path "wdoc" in
-    Filename.concat dir conf.lang
-  in
-  let files = try Sys.readdir dname with [ Sys_error _ -> [| |] ] in
+value print_wdoc_dir conf files =
   let () = Array.sort compare files in
   let s =
     loop 0 0 where rec loop len i =
@@ -266,6 +265,19 @@ value print_wdoc_dir conf =
   print_whole_wdoc conf "" conf.lang s
 ;
 
+value print_wdoc_not_this_lang conf =
+  print_whole_wdoc conf "" (Printf.sprintf "(%s)" conf.lang) ""
+;
+
+value print_wdoc_main conf =
+  let dname =
+    let dir = Util.search_in_doc_path "wdoc" in
+    Filename.concat dir conf.lang
+  in
+  try print_wdoc_dir conf (Sys.readdir dname) with
+  [ Sys_error _ -> print_wdoc_not_this_lang conf ]
+;
+
 value print_wdoc conf =
   let conf = {(conf) with cancel_links = True} in
   let fdocp =
@@ -274,13 +286,13 @@ value print_wdoc conf =
     | None -> "" ]
   in
   let fdoc = if fdocp = "" then "index" else fdocp in
-  let (title, s) = read_wdoc conf fdoc in
+  let (title, s) = read_wdoc conf.lang fdoc in
   if s = "" && fdocp = "" then
-    print_wdoc_dir conf
+    print_wdoc_main conf
   else
     match Util.p_getint conf.env "v" with
     [ Some cnt0 -> print_part_wdoc conf fdoc title s cnt0
-    | None -> print_whole_wdoc conf fdoc title s ]
+    | None -> print_whole_wdoc conf fdocp title s ]
 ;
 
 value print_mod_wdoc conf =
@@ -301,7 +313,7 @@ value print_mod_wdoc conf =
       (Util.capitale (Util.transl_decline conf "modify" ""))
       (fname ^ (if cnt = "" then "" else " #" ^ cnt))
   in
-  let (ntitle, s) = read_wdoc conf fname in
+  let (ntitle, s) = read_wdoc conf.lang fname in
   Notes.print_mod_page conf "WDOC" fname title (ntitle ^ "\n" ^ s)
 ;
 
@@ -339,7 +351,7 @@ value print_ok conf fdoc s =
 ;
 
 value commit_wdoc conf fdoc s =
-  let fname = wdoc_file_path conf fdoc in
+  let fname = wdoc_file_path conf.lang fdoc in
   do {
     try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
     try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
@@ -372,7 +384,7 @@ value print_mod_wdoc_ok conf =
     | None -> "index" ]
   in
   let old_doc =
-    let (t, s) = read_wdoc conf fdoc in
+    let (t, s) = read_wdoc conf.lang fdoc in
     t ^ "\n" ^ s
   in
   try
