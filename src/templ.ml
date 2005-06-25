@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.68 2005-06-25 09:18:43 ddr Exp $ *)
+(* $Id: templ.ml,v 4.69 2005-06-25 13:47:21 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -603,11 +603,11 @@ value not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 ;
 
-value rec eval_variable conf =
+value rec eval_variable conf env =
   fun
-  [ [s] -> eval_simple_variable conf s
+  [ [s] -> eval_simple_variable conf env s
   | _ -> raise Not_found ]
-and eval_simple_variable conf =
+and eval_simple_variable conf env =
   fun 
   [ "action" -> conf.command
   | "border" -> string_of_int conf.border
@@ -636,7 +636,7 @@ and eval_simple_variable conf =
   | "right" -> conf.right
   | "sp" -> " "
   | "/" -> conf.xhs
-  | _ -> raise Not_found ]
+  | s -> List.assoc s env ]
 ;
 
 value eval_string_var conf eval_var s sl =
@@ -647,7 +647,7 @@ value eval_string_var conf eval_var s sl =
     | VVbool False -> "0" ]
   with
   [ Not_found ->
-      try eval_variable conf [s :: sl] with
+      try eval_variable conf [] [s :: sl] with
       [ Not_found -> " %" ^ String.concat "." [s :: sl] ^ "?" ] ]
 ;
 
@@ -659,15 +659,15 @@ value eval_subst f xl vl a =
     | _ -> Atext (f ^ ": bad # of params") ]
 ;
 
-value eval_var_handled conf sl =
-  try eval_variable conf sl with
+value eval_var_handled conf env sl =
+  try eval_variable conf env sl with
   [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
 value rec eval_ast conf =
   fun
   [ Atext s -> s
-  | Avar _ s sl -> eval_var_handled conf [s :: sl]
+  | Avar _ s sl -> eval_var_handled conf [] [s :: sl]
   | Atransl upp s c -> eval_transl conf upp s c
   | ast -> not_impl "eval_ast" ast ]
 and eval_transl conf upp s c =
@@ -875,7 +875,7 @@ value print_body_prop conf =
 ;
 
 value rec print_variable conf base_opt sl =
-  try Wserver.wprint "%s" (eval_variable conf sl) with
+  try Wserver.wprint "%s" (eval_variable conf [] sl) with
   [ Not_found ->
       try
         match sl with
@@ -930,8 +930,8 @@ value print_apply f print_ast xl al vl =
 ;
 
 (* not clear... all this stuff with eval/bool/expr... *)
-value eval_bool_ast conf a =
-  let eval_var loc sl  = VVstring (eval_variable conf sl) in
+value eval_bool_ast conf env a =
+  let eval_var loc sl  = VVstring (eval_variable conf env sl) in
   let eval_apply _ = raise Not_found in
   eval_bool_expr conf (eval_var, eval_apply) a
 ;
@@ -949,23 +949,17 @@ and print_ast conf env =
   | ast -> Wserver.wprint "%s" (eval_ast conf ast) ]
 and print_if conf env a1 a2 a3 =
   let test =
-    try eval_bool_ast conf a1 with
+    try eval_bool_ast conf env a1 with
     [ Failure x -> do { Wserver.wprint "%s" x; False } ]
   in
   List.iter (print_ast conf env) (if test then a2 else a3)
-and print_ast_var conf env sl =
-  try
-    match sl with
-    [ [s] -> Wserver.wprint "%s" (List.assoc s env)
-    | _ -> raise Not_found ]
-  with
-  [ Not_found ->
-      match sl with
-      [ ["include"; templ] ->
-          match Util.open_etc_file templ with
-          [ Some ic -> copy_from_templ conf env ic
-          | None -> () ]
-      | sl ->
-          try print_variable conf None sl with
-          [ Not_found -> Wserver.wprint "%s" (eval_var_handled conf sl) ] ] ]
+and print_ast_var conf env =
+  fun
+  [ ["include"; templ] ->
+      match Util.open_etc_file templ with
+      [ Some ic -> copy_from_templ conf env ic
+      | None -> () ]
+  | sl ->
+      try Wserver.wprint "%s" (eval_variable conf env sl) with
+      [ Not_found -> print_variable conf None sl ] ]
 ;

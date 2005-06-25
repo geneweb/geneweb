@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: wdoc.txt,v 1.6 2005-06-25 09:18:43 ddr Exp $ -->
+  <!-- $Id: wdoc.txt,v 1.7 2005-06-25 13:47:21 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%title;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -43,7 +43,6 @@ style="border:0"%/></a>
 src="%image_prefix;/l-sv.jpg" alt="sv" width="24" height="15" title="sv"
 style="border:0"%/></a>
 
-
 </td>
 </tr>
 </table>
@@ -53,4 +52,3 @@ style="border:0"%/></a>
 %copyright;
 </body>
 </html>
-

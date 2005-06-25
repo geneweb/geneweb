@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.143 2005-06-25 09:18:43 ddr Exp $ *)
+(* $Id: util.ml,v 4.144 2005-06-25 13:47:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1473,7 +1473,7 @@ value print_copyright conf =
         let s =
           if conf.cancel_links then ""
           else
-            sprintf " - <a href=\"%sm=DOC\">DOC</a>" conf.indep_command
+            sprintf " - <a href=\"%sm=DOC\">DOC</a>" (commd conf)
         in
         if not conf.setup_link then s
         else s ^ " - " ^ setup_link conf);
