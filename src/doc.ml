@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.19 2005-06-24 21:00:27 ddr Exp $ *)
+(* $Id: doc.ml,v 4.20 2005-06-25 05:51:20 ddr Exp $ *)
 
 open Config;
 
@@ -206,6 +206,7 @@ value no_lang conf = {(conf) with henv = List.remove_assoc "lang" conf.henv};
 value eval_var conf env loc =
   fun
   [ ["doctype"] -> Util.doctype conf ^ "\n"
+  | ["image_prefix"] -> Util.image_prefix conf
   | ["prefix_no_lang"] -> Util.commd (no_lang conf)
   | ["/"] -> conf.xhs
   | [s] -> List.assoc s env
