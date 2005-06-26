@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.31 2005-06-26 15:39:40 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.32 2005-06-26 18:48:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -30,7 +30,7 @@ value getn conf var key =
 value rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
   [ Some s ->
-      let s = only_printable s in
+      let s = no_html_tags (only_printable s) in
       let (sl, ext) = reconstitute_string_list conf var ext (cnt + 1) in
       match get_nth conf ("add_" ^ var) cnt with
       [ Some "on" -> ([s; "" :: sl], True)
@@ -72,7 +72,7 @@ value rec reconstitute_titles conf ext cnt =
         match (get_nth conf "t_main_title" cnt, t_name) with
         [ (Some "on", _) -> Tmain
         | (_, "") -> Tnone
-        | (_, _) -> Tname (only_printable t_name) ]
+        | (_, _) -> Tname (no_html_tags (only_printable t_name)) ]
       in
       let t_date_start =
         Update.reconstitute_date conf ("t_date_start" ^ string_of_int cnt)
@@ -86,8 +86,8 @@ value rec reconstitute_titles conf ext cnt =
         | _ -> 0 ]
       in
       let t =
-        {t_name = t_name; t_ident = only_printable t_ident;
-         t_place = only_printable t_place;
+        {t_name = t_name; t_ident = no_html_tags (only_printable t_ident);
+         t_place = no_html_tags (only_printable t_place);
          t_date_start = Adef.codate_of_od t_date_start;
          t_date_end = Adef.codate_of_od t_date_end; t_nth = t_nth}
       in
@@ -191,19 +191,18 @@ value reconstitute_burial conf burial_place =
 ;
 
 value only_printable_or_nl s =
-  let s = strip_spaces s in
-  if Gutil.utf_8_db.val then s
-  else
-    let s' = String.create (String.length s) in
-    do {
-      for i = 0 to String.length s - 1 do {
-        s'.[i] :=
+  let s' = String.create (String.length s) in
+  do {
+    for i = 0 to String.length s - 1 do {
+      s'.[i] :=
+        if Gutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
+        else
           match s.[i] with
           [ ' '..'~' | '\160'..'\255' | '\n' -> s.[i]
           | _ -> ' ' ]
-      };
-      s'
-    }
+    };
+    strip_spaces s'
+  }
 ;
 
 value reconstitute_person conf =
@@ -213,8 +212,8 @@ value reconstitute_person conf =
     [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
   in
-  let first_name = only_printable (get conf "first_name") in
-  let surname = only_printable (get conf "surname") in
+  let first_name = no_html_tags (only_printable (get conf "first_name")) in
+  let surname = no_html_tags (only_printable (get conf "surname")) in
   let occ =
     try int_of_string (strip_spaces (get conf "occ")) with [ Failure _ -> 0 ]
   in
@@ -225,7 +224,7 @@ value reconstitute_person conf =
   let (surnames_aliases, ext) =
     reconstitute_string_list conf "surname_alias" ext 0
   in
-  let public_name = only_printable (get conf "public_name") in
+  let public_name = no_html_tags (only_printable (get conf "public_name")) in
   let (qualifiers, ext) = reconstitute_string_list conf "qualifier" ext 0 in
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
@@ -238,7 +237,7 @@ value reconstitute_person conf =
     | Some "Private" -> Private
     | _ -> IfTitles ]
   in
-  let occupation = get conf "occu" in
+  let occupation = only_printable (get conf "occu") in
   let sex =
     match p_getenv conf.env "sex" with
     [ Some "M" -> Male
