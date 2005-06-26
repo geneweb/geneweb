@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.30 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.31 2005-06-26 15:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -238,7 +238,7 @@ value reconstitute_person conf =
     | Some "Private" -> Private
     | _ -> IfTitles ]
   in
-  let occupation = only_printable (get conf "occu") in
+  let occupation = get conf "occu" in
   let sex =
     match p_getenv conf.env "sex" with
     [ Some "M" -> Male
