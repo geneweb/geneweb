@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.41 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: date.ml,v 4.42 2005-06-26 18:48:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -252,7 +252,7 @@ value string_of_ondate conf =
       match d.prec with
       [ Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s ]
-  | Dtext t -> "(" ^ t ^ ")" ]
+  | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")" ]
 ;
 
 (*

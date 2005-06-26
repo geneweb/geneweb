@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.46 2005-06-19 04:46:59 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.47 2005-06-26 18:48:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -26,8 +26,8 @@ value getn conf var key =
 ;
 
 value reconstitute_somebody conf var =
-  let first_name = only_printable (getn conf var "fn") in
-  let surname = only_printable (getn conf var "sn") in
+  let first_name = no_html_tags (only_printable (getn conf var "fn")) in
+  let surname = no_html_tags (only_printable (getn conf var "sn")) in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let sex =
     match p_getenv conf.env (var ^ "_sex") with
@@ -44,9 +44,9 @@ value reconstitute_somebody conf var =
 ;
 
 value reconstitute_parent_or_child conf var default_surname =
-  let first_name = only_printable (getn conf var "fn") in
+  let first_name = no_html_tags (only_printable (getn conf var "fn")) in
   let surname =
-    let surname = only_printable (getn conf var "sn") in
+    let surname = no_html_tags (only_printable (getn conf var "sn")) in
     if surname = "" then default_surname else surname
   in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in

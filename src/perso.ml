@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.159 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: perso.ml,v 4.160 2005-06-26 18:48:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -552,6 +552,10 @@ value tree_generation_list conf base gv p =
   enrich_tree gen
 ;
 
+value string_of_place conf base istr =
+  string_with_macros conf [] (sou base istr)
+;
+
 (* Ancestors surnames list *)
 
 value get_date_place conf base auth_for_all_anc p =
@@ -817,10 +821,6 @@ value obsolete (bp, ep) version var new_var r =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value string_of_place conf base istr =
-  string_with_macros conf [] (sou base istr)
-;
-
 value gen_string_of_img_sz max_wid max_hei conf base env (p, _, _, p_auth) =
   if p_auth then
     let v = image_and_size conf base p (limited_image_size max_wid max_hei) in
@@ -992,7 +992,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
-          if m_auth then sou base fam.marriage_place else ""
+          if m_auth then string_of_place conf base fam.marriage_place else ""
       | _ -> raise Not_found ]
   | "max_anc_level" ->
       match get_env "max_anc_level" env with
@@ -1425,7 +1425,7 @@ and eval_anc_by_surnl_field_var conf base env ep
       [ Some d -> eval_date_field_var d sl
       | None -> VVstring "" ]
   | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
-  | ["place"] -> VVstring place
+  | ["place"] -> VVstring (string_with_macros conf [] place)
   | ["sosa_access"] ->
       let (str, _) =
         List.fold_right

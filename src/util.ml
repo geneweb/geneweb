@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.146 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: util.ml,v 4.147 2005-06-26 18:48:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2114,8 +2114,7 @@ value only_printable s =
         if Gutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
         else
           match s.[i] with
-          [ '<' | '>' -> ' '
-          | ' '..'~' | '\160'..'\255' -> s.[i]
+          [ ' '..'~' | '\160'..'\255' -> s.[i]
           | _ -> ' ' ]
     };
     strip_spaces s'
