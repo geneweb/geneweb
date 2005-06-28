@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.147 2005-06-26 18:48:49 ddr Exp $ *)
+(* $Id: util.ml,v 4.148 2005-06-28 18:58:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1269,6 +1269,25 @@ value http_string s i =
   else None
 ;
 
+value rec followed_by_ident_semi s i =
+  if i = String.length s then False
+  else
+    match s.[i] with
+    [ 'a'..'z' | 'A'..'Z' -> followed_by_ident_semi s (i + 1)
+    | ';' -> True
+    | _ -> False ]
+;
+
+value expand_ampersand buff s =
+  loop 0 where rec loop i =
+    if i = String.length s then ()
+    else do {
+      if s.[i] = '&' then Buffer.add_string buff "&amp;"
+      else Buffer.add_char buff s.[i];
+      loop (i + 1)
+    }
+;
+
 value email_addr s i =
   let rec before_at empty i =
     if i = String.length s then None
@@ -1426,7 +1445,9 @@ value string_with_macros conf env s =
             [ Some j ->
                 let x = String.sub s i (j - i) in
                 do {
-                  bprintf buff "<a href=\"%s\">%s</a>" x x;
+                  bprintf buff "<a href=\"%s\">" x;
+                  expand_ampersand buff x;
+                  bprintf buff "</a>";
                   loop Out j
                 }
             | None ->
@@ -1445,7 +1466,14 @@ value string_with_macros conf env s =
                       else if s.[i] = '<' then In_norm
                       else Out
                     in
-                    do { Buffer.add_char buff s.[i]; loop tt (i + 1) } ] ] ]
+                    do {
+                      if s.[i] = '&' &&
+                      not (followed_by_ident_semi s (i + 1)) then
+                        Buffer.add_string buff "&amp;"
+                      else
+                        Buffer.add_char buff s.[i];
+                      loop tt (i + 1)
+                    } ] ] ]
     else filter_html_tags (Buffer.contents buff)
 ;
 
