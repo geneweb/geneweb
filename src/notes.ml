@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.76 2005-06-29 12:22:20 ddr Exp $ *)
+(* $Id: notes.ml,v 4.77 2005-06-29 20:02:53 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -97,7 +97,7 @@ value check_file_name s =
     if i = String.length s then True
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '_' -> loop (i + 1)
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' -> loop (i + 1)
       | _ -> False ]
 ;
 
@@ -625,7 +625,7 @@ value print_ok conf base fnotes s =
   }
 ;
 
-value update_notes_links_db conf fnotes s =
+value update_notes_links_db conf fnotes s force =
   let slen = String.length s in
   let list =
     loop [] 0 where rec loop list i =
@@ -636,7 +636,7 @@ value update_notes_links_db conf fnotes s =
         | None -> loop list (i + 3) ]
       else loop list (i + 1)
   in
-  if list = [] then ()
+  if not force && list = [] then ()
   else
     let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
     NotesLinks.update_db bdir fnotes list
@@ -669,7 +669,7 @@ value print_mod_ok conf base =
       in
       do {
         base.func.commit_notes fnotes s;
-        update_notes_links_db conf (-1) s;
+        update_notes_links_db conf (-1) s False;
         print_ok conf base fnotes sub_part
       }
   with
@@ -714,13 +714,16 @@ value print_misc_notes conf base =
                stagn "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) s begin
                  Wserver.wprint "%s" s;
                end;
-               tag "ul" begin
+               tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
                  List.iter
                    (fun p ->
-                      let s =
-                        Util.referenced_person_title_text conf base p
-                      in
-                      stagn "li" begin Wserver.wprint "%s" s; end)
+                      stagn "li" begin
+                        Wserver.wprint "%s %s%s"
+                          (if Gutil.utf_8_db.val then "â\134\144"
+                           else "&lt;---")
+                          (Util.referenced_person_title_text conf base p)
+                          (Date.short_dates_text conf base p);
+                      end)
                    pl;
                end;
              end)
@@ -730,4 +733,3 @@ value print_misc_notes conf base =
     trailer conf;
   }
 ;
-
