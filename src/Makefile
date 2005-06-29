@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.41 2005-06-16 09:46:12 ddr Exp $
+# $Id: Makefile,v 4.42 2005-06-29 12:22:20 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -6,7 +6,7 @@ PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo check.cmo calendar.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo dag.cmo templ.cmo notes.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
+GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo notesLinks.cmo srcfile.cmo dag.cmo templ.cmo notes.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
@@ -14,20 +14,21 @@ PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
 MOSTDESC_OBJS=adef.cmo buff.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo adef.cmo buff.cmo name.cmo gutil.cmo btree.cmo iovalue.cmo secure.cmo iobase.cmo fpla.cmo
+UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo argl.cmo notesLinks.cmo update_nldb.cmo
 
 all:: out
 
 out:: gwlib.ml
 opt:: gwlib.ml
 
-out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out i18n_check.out
+out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out update_nldb.out i18n_check.out
 	$(RM) gwc consang gwd gwu
 	cp gwc.out gwc
 	cp consang.out consang
 	cp gwd.out gwd
 	cp gwu.out gwu
 
-opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
+opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt update_nldb.opt
 	$(RM) gwd consang gwd gwu
 	cp gwc.opt gwc
 	cp consang.opt consang
@@ -103,6 +104,12 @@ fpla.out: $(FPLA_OBJS)
 
 fpla.opt: $(FPLA_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(FPLA_OBJS:.cmo=.cmx) -o fpla.opt
+
+update_nldb.out: $(UPDATE_NLDB_OBJS)
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(UPDATE_NLDB_OBJS) -o update_nldb.out
+
+update_nldb.opt: $(UPDATE_NLDB_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(UPDATE_NLDB_OBJS:.cmo=.cmx) -o update_nldb.opt
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out
