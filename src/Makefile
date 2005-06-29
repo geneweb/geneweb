@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.42 2005-06-29 12:22:20 ddr Exp $
+# $Id: Makefile,v 4.43 2005-06-29 12:25:47 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -27,6 +27,7 @@ out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out update_nldb.out 
 	cp consang.out consang
 	cp gwd.out gwd
 	cp gwu.out gwu
+	cp update_nldb.out update_nldb
 
 opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt update_nldb.opt
 	$(RM) gwd consang gwd gwu
@@ -34,7 +35,8 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt update_nldb.opt
 	cp consang.opt consang
 	cp gwd.opt gwd
 	cp gwu.opt gwu
-	$(STRIP) gwc consang gwd gwu
+	cp update_nldb.opt update_nldb
+	$(STRIP) gwc consang gwd gwu update_nldb
 
 compilation.cmo: always
 	$(MAKE) compilation.ml
@@ -52,7 +54,7 @@ compilation.ml: always
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
 
 clean::
-	$(RM) gwc consang gwd gwu gwlib.ml
+	$(RM) gwc consang gwd gwu update_nldb gwlib.ml
 
 gwlib.ml:
 	echo "value prefix =" > gwlib.ml

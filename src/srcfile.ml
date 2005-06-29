@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.36 2005-06-21 09:27:22 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.37 2005-06-29 12:22:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -333,6 +333,12 @@ value rec stream_line =
 
 type src_mode = [ Lang | Source ];
 
+value notes_links conf =
+  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let fname = Filename.concat bdir "notes_links" in
+  NotesLinks.read_db_from_file fname
+;
+
 value rec copy_from_stream conf base strm mode =
   let echo = ref True in
   let no_tables = browser_doesnt_have_tables conf in
@@ -353,6 +359,7 @@ value rec copy_from_stream conf base strm mode =
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
+    | 'm' -> notes_links conf <> []
     | 'n' -> base.data.bnotes.nread "" Rn1Ch <> ""
     | 'o' -> Sys.file_exists (Wiznotes.dir conf)
     | 'p' ->

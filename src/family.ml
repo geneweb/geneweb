@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.58 2005-06-10 02:24:21 ddr Exp $ *)
+(* $Id: family.ml,v 4.59 2005-06-29 12:22:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -407,6 +407,7 @@ value family_m conf base =
   | Some "LM" when conf.wizard || conf.friend ->
       BirthDeath.print_marriage conf base
   | Some "LEX" -> Srcfile.print_lexicon conf base
+  | Some "MISC_NOTES" -> Notes.print_misc_notes conf base
   | Some "MOD_FAM" when conf.wizard -> UpdateFam.print_mod conf base
   | Some "MOD_FAM_OK" when conf.wizard -> UpdateFamOk.print_mod conf base
   | Some "MOD_IND" when conf.wizard -> UpdateInd.print_mod conf base

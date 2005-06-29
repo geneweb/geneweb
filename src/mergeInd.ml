@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.36 2005-06-24 08:05:12 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.37 2005-06-29 12:22:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -344,7 +344,7 @@ value effective_merge_ind conf base p1 p2 =
     UpdateIndOk.effective_del conf base p2;
     base.func.patch_person p1.cle_index p1;
     base.func.patch_person p2.cle_index p2;
-    Notes.update_notes_links_db conf (Gutil.designation base p1)
+    Notes.update_notes_links_db conf (Adef.int_of_iper p1.cle_index)
       (sou base p1.notes);
   }
 ;
