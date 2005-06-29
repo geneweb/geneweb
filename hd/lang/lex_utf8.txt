@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.44 2005-06-24 21:00:27 ddr Exp $
+# $Id: lex_utf8.txt,v 1.45 2005-06-29 12:22:20 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5492,6 +5492,10 @@ ro: mesaj/mesajul anterior/mesajele anterioare/mesajele urmatoara
 ru: сообщение/предыдущее сообщение/предыдущие сообщения/следующее сообщение
 sl: sporočilo/prejšnje sporočilo/prejšnja sporočila/naslednje sporočilo
 sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
+
+    miscellaneous notes
+en: miscellaneous notes
+fr: notes diverses
 
     missing ancestors
 af: ontbrekende voorsate
