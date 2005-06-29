@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notes.mli,v 4.5 2005-06-29 12:22:20 ddr Exp $ *)
+(* $Id: notes.mli,v 4.6 2005-06-29 20:02:53 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -21,7 +21,7 @@ value print : config -> base -> unit;
 value print_mod_page :
   config -> string -> string -> (bool -> unit) -> string -> unit;
 value print_mod : config -> base -> unit;
-value update_notes_links_db : config -> int -> string -> unit;
+value update_notes_links_db : config -> int -> string -> bool -> unit;
 value print_mod_ok : config -> base -> unit;
 
 value print_misc_notes : config -> base -> unit;
