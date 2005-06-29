@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 4.6 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 4.7 2005-06-29 12:22:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value fname = ref "";
@@ -38,6 +38,7 @@ value main () =
       Printf.eprintf "Missing file name\n";
       Printf.eprintf "Use option -help for usage\n";
       flush stderr;
+      exit 2;
     }
     else ();
     Secure.set_base_dir (Filename.dirname fname.val);
