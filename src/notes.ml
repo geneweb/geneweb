@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.77 2005-06-29 20:02:53 ddr Exp $ *)
+(* $Id: notes.ml,v 4.78 2005-06-30 03:31:41 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -676,6 +676,23 @@ value print_mod_ok conf base =
   [ Update.ModErr -> () ]
 ;
 
+value begin_text_without_html_tags lim s =
+  loop 0 0 0 where rec loop i size len =
+    if i >= String.length s then Buff.get len
+    else if size > lim && String.length s > i + 3 then Buff.get len ^ "..."
+    else if s.[i] = '<' then
+      let i =
+        loop (i + 1) where rec loop i =
+          if i = String.length s then i
+          else if s.[i] = '>' then i + 1
+          else loop (i + 1)
+      in
+      loop i size len
+    else
+      let nbc = if utf_8_db.val then Gutil.nbc s.[i] else i + 1 in
+      loop (i + nbc) (size + 1) (Buff.mstore len (String.sub s i nbc))
+;
+
 value print_misc_notes conf base =
   let title _ =
     Wserver.wprint "%s - %s"
@@ -709,11 +726,18 @@ value print_misc_notes conf base =
     if db2 <> [] then
       tag "ul" begin
         List.iter
-          (fun (s, pl) ->
+          (fun (f, pl) ->
+             let txt =
+               let s = read_notes base f in
+               if String.length s < String.length f then f
+               else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
+             in
              tag "li" begin
-               stagn "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) s begin
-                 Wserver.wprint "%s" s;
+               Wserver.wprint "<tt>[";
+               stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) f begin
+                 Wserver.wprint "%s" f;
                end;
+               Wserver.wprint "]</tt> : %s\n" txt;
                tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
                  List.iter
                    (fun p ->
