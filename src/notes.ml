@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.78 2005-06-30 03:31:41 ddr Exp $ *)
+(* $Id: notes.ml,v 4.79 2005-06-30 16:49:41 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -739,16 +739,30 @@ value print_misc_notes conf base =
                end;
                Wserver.wprint "]</tt> : %s\n" txt;
                tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
+(**)
                  List.iter
                    (fun p ->
                       stagn "li" begin
-                        Wserver.wprint "%s %s%s"
-                          (if Gutil.utf_8_db.val then "â\134\144"
-                           else "&lt;---")
-                          (Util.referenced_person_title_text conf base p)
+                        Wserver.wprint "&lt;--- %s%s"
+                         (Util.referenced_person_title_text conf base p)
                           (Date.short_dates_text conf base p);
                       end)
                    pl;
+(*
+                 loop pl where rec loop =
+                   fun
+                   [ [p :: pl] ->
+                       do {
+                         stagn "li" begin
+                           Wserver.wprint "%sâ\148\128â\148\128 %s%s"
+                             (if pl = [] then "â\148\148" else "â\148\156")
+                             (Util.referenced_person_title_text conf base p)
+                             (Date.short_dates_text conf base p);
+                         end;
+                         loop pl
+                       }
+                   | [] -> () ];
+*)
                end;
              end)
           db2;
