@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.1 2005-06-29 12:24:01 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.2 2005-06-30 02:16:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -18,7 +18,7 @@ value check_file_name s =
     if i = String.length s then True
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '_' -> loop (i + 1)
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' -> loop (i + 1)
       | _ -> False ]
 ;
 
