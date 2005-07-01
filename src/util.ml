@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.148 2005-06-28 18:58:24 ddr Exp $ *)
+(* $Id: util.ml,v 4.149 2005-07-01 09:40:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1332,10 +1332,10 @@ value tag_id s i =
 ;
 
 value default_good_tag_list =
-  ["a"; "b"; "blockquote"; "br"; "center"; "dd"; "dir"; "div"; "dl"; "dt";
-   "em"; "font"; "hr"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "i"; "img"; "li";
-   "ol"; "p"; "pre"; "span"; "strong"; "sup"; "table"; "tbody"; "td"; "tr";
-   "tt"; "u"; "ul"; "!--"]
+  ["a"; "b"; "blockquote"; "br"; "center"; "cite"; "dd"; "dir"; "div"; "dl";
+   "dt"; "em"; "font"; "hr"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "i"; "img";
+   "li"; "ol"; "p"; "pre"; "span"; "strong"; "sup"; "table"; "tbody"; "td";
+   "tr"; "tt"; "u"; "ul"; "!--"]
 ;
 
 value allowed_tags_file = ref "";
