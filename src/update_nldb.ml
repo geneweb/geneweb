@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.2 2005-06-30 02:16:19 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.3 2005-07-02 13:49:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -111,8 +111,7 @@ value compute base bdir =
       let p = base.data.persons.get i in
       let list = notes_links (Gutil.sou base p.notes) in
       if list = [] then ()
-      else
-        NotesLinks.update_db bdir i list;
+      else NotesLinks.update_db bdir i list;
       run_progr_bar i len
     };
     finish_progr_bar ();
@@ -123,7 +122,7 @@ value main () =
   do {
     Argl.parse speclist anonfun errmsg;
     if fname.val = "" then do {
-      Printf.eprintf "Missing file name\n";
+      Printf.eprintf "Missing database name\n";
       Printf.eprintf "Use option -help for usage\n";
       flush stderr;
       exit 2;

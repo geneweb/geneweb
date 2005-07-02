@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 4.5 2005-01-09 08:26:44 ddr Exp $ *)
+(* $Id: iovalue.ml,v 4.6 2005-07-02 13:49:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -94,7 +94,14 @@ value gen_output_block_header ofuns oc tag size =
       ofuns.output_byte oc (<<PREFIX_SMALL_BLOCK>> + tag + size lsl 4)
     else do {
       ofuns.output_byte oc <<CODE_BLOCK32>>;
+(*
       ofuns.output_binary_int oc (tag + size lsl 10);
+*)
+      ofuns.output_byte oc (size lsr 14 land 0xFF);
+      ofuns.output_byte oc (size lsr 6 land 0xFF);
+      ofuns.output_byte oc (size lsl 2 land 0xFF);
+      ofuns.output_byte oc (size lsl 10 land 0xFF + tag);
+(**)
     };
     if size = 0 then ()
     else do {
