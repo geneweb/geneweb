@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.41 2005-07-02 13:49:13 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.42 2005-07-02 16:36:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -889,6 +889,10 @@ value link gwo_list bname =
     close_out gen.g_per;
     close_out gen.g_fam_index;
     close_out gen.g_fam;
+    Hashtbl.clear gen.g_strings;
+    Hashtbl.clear gen.g_names;
+    Hashtbl.clear gen.g_local_names;
+    Gc.compact ();
     let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
     let changed_p p =
       let i = Adef.int_of_iper p.cle_index in
@@ -900,6 +904,7 @@ value link gwo_list bname =
       flush stdout;
     }
     else ();
+    Hashtbl.clear gen.g_patch_p;
     if not gen.g_errored then
       if do_consang.val then ConsangAll.compute base True False else ()
     else exit 2;
