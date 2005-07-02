@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.50 2005-07-02 14:22:22 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.51 2005-07-02 16:36:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1415,9 +1415,7 @@ value make_name_index base =
     t
   }
 ;
-
-(* to be tested : whether the following version is faster and memory saving *)
-(*
+(* to be tested : whether the following version is faster and memory saving...
 value make_name_index base =
   let module M =
     Set.Make (struct type t = Def.iper; value compare = compare; end)
@@ -1445,18 +1443,13 @@ value make_name_index base =
         in
         add_names p.cle_index names
       else ();
-Printf.eprintf "\ri %d" i; flush stderr;
     };
-let r =
     Array.map
       (fun s ->
          let a = Array.create (M.cardinal s) (Adef.iper_of_int 0) in
          let i = M.fold (fun ip i -> do { a.(i) := ip; i + 1 }) s 0 in
          do { assert (i == Array.length a); a })
       t
-in
-Printf.eprintf "\n"; flush stderr;
-r
   }
 ;
 *)
