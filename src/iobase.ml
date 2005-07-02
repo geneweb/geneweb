@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.48 2005-06-11 05:16:31 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.49 2005-07-02 13:49:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1385,6 +1385,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
   }
 ;
 
+(**)
 value make_name_index base =
   let t = Array.create table_size [| |] in
   let add_name key valu =
@@ -1409,11 +1410,58 @@ value make_name_index base =
            person_misc_names base p]
         in
         add_names p.cle_index names
-      else ()
+      else ();
+Printf.eprintf "\ri %d" i; flush stderr;
     };
+Printf.eprintf "\n"; flush stderr;
     t
   }
 ;
+
+(* to be tested : whether the following version is faster and memory saving *)
+(*
+value make_name_index base =
+  let module M =
+    Set.Make (struct type t = Def.iper; value compare = compare; end)
+  in
+  let t = Array.create table_size M.empty in
+  let add_name key valu =
+    let key = Name.crush (Name.abbrev key) in
+    let i = Hashtbl.hash key mod Array.length t in
+    t.(i) := M.add valu t.(i)
+  in
+  let rec add_names ip =
+    fun
+    [ [] -> ()
+    | [n :: nl] -> do { add_name n ip; add_names ip nl } ]
+  in
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let p = base.data.persons.get i in
+      let first_name = p_first_name base p in
+      let surname = p_surname base p in
+      if first_name <> "?" && surname <> "?" then
+        let names =
+          [Name.lower (first_name ^ " " ^ surname) ::
+           person_misc_names base p]
+        in
+        add_names p.cle_index names
+      else ();
+Printf.eprintf "\ri %d" i; flush stderr;
+    };
+let r =
+    Array.map
+      (fun s ->
+         let a = Array.create (M.cardinal s) (Adef.iper_of_int 0) in
+         let i = M.fold (fun ip i -> do { a.(i) := ip; i + 1 }) s 0 in
+         do { assert (i == Array.length a); a })
+      t
+in
+Printf.eprintf "\n"; flush stderr;
+r
+  }
+;
+*)
 
 value count_error computed found =
   do {

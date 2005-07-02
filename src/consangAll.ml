@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.11 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.12 2005-07-02 13:49:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -73,7 +73,7 @@ value trace quiet cnt max_cnt =
   do {
     if quiet then run_progr_bar (max_cnt - cnt) max_cnt
     else do {
-      Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
+      Printf.eprintf "%7d\008\008\008\008\008\008\008" cnt;
       flush stderr;
     }
   }

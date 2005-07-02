@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.40 2005-06-09 12:22:49 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.41 2005-07-02 13:49:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -851,30 +851,38 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
   {data = base_data; func = base_func}
 ;
 
-value link gwo_list =
-  let gen =
-    {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
-     g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
-     g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
-     g_def = [| |]; g_separate = False; g_shift = 0; g_errored = False;
-     g_per_index = open_out_bin "gwc_per_index";
-     g_per = open_out_bin "gwc_per";
-     g_fam_index = open_out_bin "gwc_fam_index";
-     g_fam = open_out_bin "gwc_fam" }
+value link gwo_list bname =
+  let gwb_dir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  let per_index_ic = open_in_bin "gwc_per_index" in
-  let per_ic = open_in_bin "gwc_per" in
-  let fam_index_ic = open_in_bin "gwc_fam_index" in
-  let fam_ic = open_in_bin "gwc_fam" in
-  let istr_empty = unique_string gen "" in
-  let istr_quest = unique_string gen "?" in
+  let tmp_per_index = Filename.concat gwb_dir "gwc_per_index" in
+  let tmp_per = Filename.concat gwb_dir "gwc_per" in
+  let tmp_fam_index = Filename.concat gwb_dir "gwc_fam_index" in
+  let tmp_fam = Filename.concat gwb_dir "gwc_fam" in
   do {
+    try Unix.mkdir gwb_dir 0o755 with _ -> ();
+    let gen =
+      {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
+       g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
+       g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
+       g_def = [| |]; g_separate = False; g_shift = 0; g_errored = False;
+       g_per_index = open_out_bin tmp_per_index;
+       g_per = open_out_bin tmp_per;
+       g_fam_index = open_out_bin tmp_fam_index;
+       g_fam = open_out_bin tmp_fam }
+    in
+    let per_index_ic = open_in_bin tmp_per_index in
+    let per_ic = open_in_bin tmp_per in
+    let fam_index_ic = open_in_bin tmp_fam_index in
+    let fam_ic = open_in_bin tmp_fam in
+    let istr_empty = unique_string gen "" in
+    let istr_quest = unique_string gen "?" in
     assert (istr_empty = Adef.istr_of_int 0);
     assert (istr_quest = Adef.istr_of_int 1);
-    IFDEF UNIX THEN Sys.remove "gwc_per_index" ELSE () END;
-    IFDEF UNIX THEN Sys.remove "gwc_per" ELSE () END;
-    IFDEF UNIX THEN Sys.remove "gwc_fam_index" ELSE () END;
-    IFDEF UNIX THEN Sys.remove "gwc_fam" ELSE () END;
+    IFDEF UNIX THEN Sys.remove tmp_per_index ELSE () END;
+    IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
+    IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
+    IFDEF UNIX THEN Sys.remove tmp_fam ELSE () END;
     List.iter (insert_comp_families gen) gwo_list;
     Printf.eprintf "\n"; flush stderr;
     close_out gen.g_per_index;
@@ -1002,7 +1010,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Iobase.lock_file out_file.val) with
       [ Accept ->
-          let base = link (List.rev gwo.val) in
+          let base = link (List.rev gwo.val) out_file.val in
           do {
             Gc.compact ();
             Iobase.output out_file.val base;
