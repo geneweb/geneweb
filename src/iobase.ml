@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.49 2005-07-02 13:49:13 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.50 2005-07-02 14:22:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1411,9 +1411,7 @@ value make_name_index base =
         in
         add_names p.cle_index names
       else ();
-Printf.eprintf "\ri %d" i; flush stderr;
     };
-Printf.eprintf "\n"; flush stderr;
     t
   }
 ;

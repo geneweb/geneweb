@@ -5,11 +5,11 @@ GeneWeb Version 5.00
 --------------------
 
 I neglected to record the Internal changes between version 4.10
-and 30 Jun 2005, but there are a lot of them... I add them when
+and 01 Jul 2005, but there are a lot of them... I add them when
 I have some time (and some courage).
 
 * Consanguinity computing (consang)
-  - [01 Jul 05] Fixed bug: when number of persons was greater than 1M,
+  - [02 Jul 05] Fixed bug: when number of persons was greater than 1M,
     the consang applied to a *modified* database failed by "Segmentation
     fault" after the message "*** read persons". Bug at creation of
     database. This was due to initial bad save of array header (OCaml
