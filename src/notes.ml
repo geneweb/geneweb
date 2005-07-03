@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.79 2005-06-30 16:49:41 ddr Exp $ *)
+(* $Id: notes.ml,v 4.80 2005-07-03 22:42:08 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -485,40 +485,78 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
   print_sub_part conf mode sub_fname cnt0 s
 ;
 
-value read_notes base fnotes = base.data.bnotes.nread fnotes RnAll;
+value split_title_and_text s =
+  try
+    let i = String.index s '\n' in
+    let tit = String.sub s 0 i in
+    let txt = String.sub s (i + 1) (String.length s - i - 1) in
+    if String.length s > 0 && s.[0] = '=' || String.contains tit '<' then
+      ("", s)
+    else (tit, txt)
+  with
+  [ Not_found -> ("", s) ]
+;
+
+value read_notes base fnotes =
+  let s = base.data.bnotes.nread fnotes RnAll in
+  split_title_and_text s
+;
+
+value print_whole_notes conf fnotes title s =
+  do {
+    header_no_page_title conf
+      (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
+    print_link_to_welcome conf True;
+    xtag "br";
+    xtag "br";
+    if title <> "" then
+      Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
+    else ();
+    match Util.open_etc_file "summary" with
+    [ Some ic -> Templ.copy_from_templ conf [] ic
+    | None -> () ];
+    let file_path = file_path conf in
+    let s = string_with_macros conf [] s in
+    let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
+    Wserver.wprint "%s\n" s;
+    trailer conf;
+  }
+;
+
+value print_notes_part conf fnotes title s cnt0 =
+  do {
+    header_no_page_title conf
+      (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
+    print_link_to_welcome conf True;
+    match Util.open_etc_file "summary" with
+    [ Some ic -> Templ.copy_from_templ conf [] ic
+    | None -> () ];
+    if cnt0 = 0 && title <> "" then do {
+      xtag "br";
+      xtag "br";
+      Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
+    }
+    else ();
+    let lines = List.rev (rev_extract_sub_part s cnt0) in
+    print_notes_sub_part conf fnotes cnt0 lines;
+    trailer conf;
+  }
+;
 
 value print conf base =
-  let title _ =
-    Wserver.wprint "%s - %s"
-      (capitale (nominative (transl_nth conf "note/notes" 1))) conf.bname
-  in
   let fnotes =
     match p_getenv conf.env "f" with
     [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
-  let s = read_notes base fnotes in
-  do {
-    header_no_page_title conf title;
-    match Util.open_etc_file "summary" with
-    [ Some ic -> Templ.copy_from_templ conf [] ic
-    | None -> () ];
-    print_link_to_welcome conf False;
-    html_p conf;
-    match p_getint conf.env "v" with
-    [ Some cnt0 ->
-        let lines = List.rev (rev_extract_sub_part s cnt0) in
-        print_notes_sub_part conf fnotes cnt0 lines
-    | None ->
-        let file_path = file_path conf in
-        let s = string_with_macros conf [] s in
-        let s = html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
-        Wserver.wprint "%s\n" s ];
-    trailer conf;
-  }
+  let (title, s) = read_notes base fnotes in
+  match p_getint conf.env "v" with
+  [ Some cnt0 -> print_notes_part conf fnotes title s cnt0
+  | None -> print_whole_notes conf fnotes title s ]
 ;
 
-value print_mod_page conf mode fname title s =
+value print_mod_page conf mode fname title ntitle s =
+  let s = ntitle ^ "\n" ^ s in
   let (has_v, v) =
     match p_getint conf.env "v" with
     [ Some v -> (True, v)
@@ -593,8 +631,8 @@ value print_mod conf base =
     Wserver.wprint "%s - %s%s" (capitale (transl_decline conf "modify" s))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let s = read_notes base fnotes in
-  print_mod_page conf "NOTES" fnotes title s
+  let (ntitle, s) = read_notes base fnotes in
+  print_mod_page conf "NOTES" fnotes title ntitle s
 ;
 
 value print_ok conf base fnotes s =
@@ -610,17 +648,20 @@ value print_ok conf base fnotes s =
     end;
     print_link_to_welcome conf True;
     let get_v = p_getint conf.env "v" in
-    let (has_v, v) =
+    let v =
       match get_v with
-      [ Some v -> (True, v)
-      | None -> (False, 0) ]
+      [ Some v -> v
+      | None -> 0 ]
     in
     History.record_notes conf base (get_v, fnotes) "mn";
-    if has_v then print_notes_sub_part conf fnotes v (lines_list_of_string s)
-    else
-      let sfn = if fnotes = "" then "" else ";f=" ^ fnotes in
-      Wserver.wprint "<a href=\"%sm=NOTES%s\">%s</a>\n" (commd conf) sfn
-        (capitale (transl_nth conf "note/notes" 1));
+    let (title, s) = if v = 0 then split_title_and_text s else ("", s) in
+    if v = 0 && title <> "" then do {
+      xtag "br";
+      xtag "br";
+      Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
+    }
+    else ();
+    print_notes_sub_part conf fnotes v (lines_list_of_string s);
     trailer conf
   }
 ;
@@ -658,7 +699,10 @@ value print_mod_ok conf base =
     [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
-  let old_notes = read_notes base fnotes in
+  let old_notes =
+    let (t, s) = read_notes base fnotes in
+    t ^ "\n" ^ s
+  in
   try
     if digest <> Iovalue.digest old_notes then Update.error_digest conf
     else
@@ -728,8 +772,9 @@ value print_misc_notes conf base =
         List.iter
           (fun (f, pl) ->
              let txt =
-               let s = read_notes base f in
-               if String.length s < String.length f then f
+               let (t, s) = read_notes base f in
+               if t <> "" then t
+               else if String.length s < String.length f then f
                else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
              in
              tag "li" begin
@@ -739,7 +784,6 @@ value print_misc_notes conf base =
                end;
                Wserver.wprint "]</tt> : %s\n" txt;
                tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
-(**)
                  List.iter
                    (fun p ->
                       stagn "li" begin
@@ -748,21 +792,6 @@ value print_misc_notes conf base =
                           (Date.short_dates_text conf base p);
                       end)
                    pl;
-(*
-                 loop pl where rec loop =
-                   fun
-                   [ [p :: pl] ->
-                       do {
-                         stagn "li" begin
-                           Wserver.wprint "%sâ\148\128â\148\128 %s%s"
-                             (if pl = [] then "â\148\148" else "â\148\156")
-                             (Util.referenced_person_title_text conf base p)
-                             (Date.short_dates_text conf base p);
-                         end;
-                         loop pl
-                       }
-                   | [] -> () ];
-*)
                end;
              end)
           db2;

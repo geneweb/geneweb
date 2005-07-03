@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.3 2005-07-02 13:49:13 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.4 2005-07-03 22:42:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -63,12 +63,10 @@ value progr_bar_size = 60;
 value progr_bar_draw_rep = 5;
 value progr_bar_draw = "|/-\\";
 value progr_bar_empty = '.';
-value progr_bar_full = '#';
+value progr_bar_full = '*';
 
 value progr_bar_draw_len = String.length progr_bar_draw;
-value progr_bar_cnt =
-  progr_bar_size * progr_bar_draw_rep * progr_bar_draw_len
-;
+value progr_bar_cnt = progr_bar_size * progr_bar_draw_rep * progr_bar_draw_len;
 
 value start_progr_bar () =
   do {
