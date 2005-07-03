@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.81 2005-07-03 22:49:02 ddr Exp $ *)
+(* $Id: notes.ml,v 4.82 2005-07-03 23:03:14 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -494,7 +494,7 @@ value split_title_and_text s =
       ("", s)
     else (tit, txt)
   with
-  [ Not_found -> ("", s) ]
+  [ Not_found -> (s, ,"") ]
 ;
 
 value read_notes base fnotes =
