@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.80 2005-07-03 22:42:08 ddr Exp $ *)
+(* $Id: notes.ml,v 4.81 2005-07-03 22:49:02 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -732,6 +732,7 @@ value begin_text_without_html_tags lim s =
           else loop (i + 1)
       in
       loop i size len
+    else if s.[i] = '=' then loop (i + 1) size len
     else
       let nbc = if utf_8_db.val then Gutil.nbc s.[i] else i + 1 in
       loop (i + nbc) (size + 1) (Buff.mstore len (String.sub s i nbc))
