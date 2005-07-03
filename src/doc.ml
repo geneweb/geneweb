@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.23 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: doc.ml,v 4.24 2005-07-03 22:42:08 ddr Exp $ *)
 
 open Config;
 
@@ -314,7 +314,7 @@ value print_mod_wdoc conf =
       (fname ^ (if cnt = "" then "" else " #" ^ cnt))
   in
   let (ntitle, s) = read_wdoc conf.lang fname in
-  Notes.print_mod_page conf "WDOC" fname title (ntitle ^ "\n" ^ s)
+  Notes.print_mod_page conf "WDOC" fname title ntitle s
 ;
 
 value print_ok conf fdoc s =
