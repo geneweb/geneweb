@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.86 2005-07-04 11:25:28 ddr Exp $ *)
+(* $Id: notes.ml,v 4.87 2005-07-04 12:09:13 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -506,7 +506,7 @@ value print_whole_notes conf fnotes title s =
       (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
     let what_links_here () =
       if fnotes <> "" then
-        stag "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
+        stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
           Wserver.wprint "(%s)" (transl conf "what links here");
         end
       else ()
