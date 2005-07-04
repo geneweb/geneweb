@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.84 2005-07-04 00:08:28 ddr Exp $ *)
+(* $Id: notes.ml,v 4.85 2005-07-04 00:47:54 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -510,7 +510,14 @@ value print_whole_notes conf fnotes title s =
   do {
     header_no_page_title conf
       (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
-    print_link_to_welcome conf True;
+    let what_links_here () =
+      if fnotes <> "" then
+        stag "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
+          Wserver.wprint "(%s)" (transl conf "what links here");
+        end
+      else ()
+    in      
+    gen_print_link_to_welcome what_links_here conf True;
     xtag "br";
     xtag "br";
     if title <> "" then
@@ -547,16 +554,81 @@ value print_notes_part conf fnotes title s cnt0 =
   }
 ;
 
+value notes_links_db conf base =
+  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let fname = Filename.concat bdir "notes_links" in
+  let db = NotesLinks.read_db_from_file fname in
+  let db2 =
+    List.fold_left
+      (fun db2 (i, sl) ->
+         if i < 0 then db2
+         else
+           let p = poi base (Adef.iper_of_int i) in
+           if authorized_age conf base p then
+             List.fold_left
+               (fun db2 s ->
+                  try
+                    let list = List.assoc s db2 in
+                    [(s, [p :: list]) :: List.remove_assoc s db2]
+                  with
+                  [ Not_found -> [(s, [p]) :: db2] ])
+                db2 sl
+           else db2)
+      [] db
+  in
+  List.sort (fun (s1, _) (s2, _) -> compare s1 s2) db2
+;
+
+value print_what_links conf base fnotes =
+  let title h =
+    do {
+      Wserver.wprint "%s --&gt; " (capitale (transl conf "what links here"));
+      if h then Wserver.wprint "[%s]" fnotes
+      else
+        stag "tt" begin
+          Wserver.wprint "[";
+          stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes begin
+            Wserver.wprint "%s" fnotes;
+          end;
+          Wserver.wprint "]";
+        end
+    }
+  in
+  let db = notes_links_db conf base in
+  do {
+    Util.header conf title;
+    Util.print_link_to_welcome conf True;
+    try
+      let pl = List.assoc fnotes db in
+      tag "ul" begin
+        List.iter
+          (fun p ->
+             stagn "li" begin
+               Wserver.wprint "%s%s"
+                 (Util.referenced_person_title_text conf base p)
+                 (Date.short_dates_text conf base p);
+             end)
+          pl;
+      end
+    with
+    [ Not_found -> () ];
+    Util.trailer conf;
+  }
+;
+
 value print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
     [ Some f -> if check_file_name f then f else ""
     | None -> "" ]
   in
-  let (title, s) = read_notes base fnotes in
-  match p_getint conf.env "v" with
-  [ Some cnt0 -> print_notes_part conf fnotes title s cnt0
-  | None -> print_whole_notes conf fnotes title s ]
+  match p_getenv conf.env "ref" with
+  [ Some "on" -> print_what_links conf base fnotes
+  | _ ->
+      let (title, s) = read_notes base fnotes in
+      match p_getint conf.env "v" with
+      [ Some cnt0 -> print_notes_part conf fnotes title s cnt0
+      | None -> print_whole_notes conf fnotes title s ] ]
 ;
 
 value print_mod_page conf mode fname title ntitle s =
@@ -747,29 +819,7 @@ value print_misc_notes conf base =
     Wserver.wprint "%s"
       (capitale (nominative (transl conf "miscellaneous notes")))
   in
-  let ref = p_getenv conf.env "ref" = Some "on" in
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
-  let db2 =
-    List.fold_left
-      (fun db2 (i, sl) ->
-         if i < 0 then db2
-         else
-           let p = poi base (Adef.iper_of_int i) in
-           if authorized_age conf base p then
-             List.fold_left
-               (fun db2 s ->
-                  try
-                    let list = List.assoc s db2 in
-                    [(s, [p :: list]) :: List.remove_assoc s db2]
-                  with
-                  [ Not_found -> [(s, [p]) :: db2] ])
-                db2 sl
-           else db2)
-      [] db
-  in
-  let db2 = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) db2 in
+  let db2 = notes_links_db conf base in
   do {
     header conf title;
     print_link_to_welcome conf True;
@@ -789,27 +839,8 @@ value print_misc_notes conf base =
                  Wserver.wprint "%s" f;
                end;
                Wserver.wprint "]</tt> : %s\n" txt;
-               if ref then
-                 tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
-                   List.iter
-                     (fun p ->
-                        stagn "li" begin
-                          Wserver.wprint "&lt;--- %s%s"
-                           (Util.referenced_person_title_text conf base p)
-                            (Date.short_dates_text conf base p);
-                        end)
-                     pl;
-                 end
-               else ();
              end)
           db2;
-      end
-    else ();
-    if not ref then
-      tag "p" begin
-        stag "a" "href=\"%sm=MISC_NOTES;ref=on\"" (commd conf) begin
-          Wserver.wprint "%s" (transl conf "what links here");
-        end;
       end
     else ();
     trailer conf;
