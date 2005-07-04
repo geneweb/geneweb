@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.85 2005-07-04 00:47:54 ddr Exp $ *)
+(* $Id: notes.ml,v 4.86 2005-07-04 11:25:28 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -368,6 +368,13 @@ value summary_of_tlsw_lines conf lines =
     (lines, List.rev rev_sections_nums)
 ;
 
+value string_of_modify_link conf mode cnt sfn empty =
+  sprintf "%s(<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)%s\n"
+    (if empty then "<p>" else "<div style=\"float:" ^ conf.right ^ "\">")
+    (commd conf) mode cnt sfn (transl_decline conf "modify" "")
+    (if empty then "</p>" else "</div>")
+;
+
 value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
     sections_nums =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
@@ -390,11 +397,7 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
            if with_mod_parag then
              let n1 =
                if conf.wizard then
-                 sprintf
-                   "<div style=\"float:%s;margin-%s:5px\">\
-                    (<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)</div>"
-                   conf.right conf.left (commd conf) mode cnt sfn
-                     (transl_decline conf "modify" "")
+                 string_of_modify_link conf mode cnt sfn False
                else ""
              in
              let n2 =
@@ -431,12 +434,8 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
         (lines_before_summary @ summary @ lines_after_summary))
   in
   if conf.wizard && (lines_before_summary <> [] || lines = []) then
-    sprintf "%s(<a href=\"%sm=MOD_%s;v=0%s\">%s</a>)%s\n"
-      (if s = "" then "<p>" else "<div style=\"float:right;margin-left:15px\">")
-      (commd conf) mode (if sub_fname = "" then "" else ";f=" ^ sub_fname)
-      (transl_decline conf "modify" "")
-      (if s = "" then "</p>" else "</div>") ^
-    s
+    let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
+    string_of_modify_link conf mode 0 sfn (s = "") ^ s
   else s
 ;
 
@@ -444,12 +443,7 @@ value print_sub_part conf mode sub_fname cnt0 s =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let s =
     if cnt0 < first_cnt && conf.wizard then
-      sprintf "%s(<a href=\"%sm=MOD_%s;v=0%s\">%s</a>)%s\n"
-        (if s = "" then "<p>"
-         else "<div style=\"float:right;margin-left:5px\">")
-        (commd conf) mode sfn (transl_decline conf "modify" "")
-        (if s = "" then "</p>" else "</div>") ^
-      s
+      string_of_modify_link conf mode 0 sfn (s = "") ^ s
     else s
   in
   do {
