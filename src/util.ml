@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.149 2005-07-01 09:40:25 ddr Exp $ *)
+(* $Id: util.ml,v 4.150 2005-07-04 00:47:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1876,7 +1876,7 @@ value link_to_referer conf =
   else ""
 ;
 
-value print_link_to_welcome conf right_aligned =
+value gen_print_link_to_welcome f conf right_aligned =
   if conf.cancel_links then ()
   else do {
     let fname = up_fname conf in
@@ -1896,10 +1896,13 @@ value print_link_to_welcome conf right_aligned =
     Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>" (image_prefix conf)
       fname wid_hei conf.xhs;
     Wserver.wprint "</a>\n";
+    f ();
     if right_aligned then Wserver.wprint "</td></tr></table>\n"
     else Wserver.wprint "</p>\n"
   }
 ;
+
+value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 
 value incorrect_request conf =
   let title _ =
