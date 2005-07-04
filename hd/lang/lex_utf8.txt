@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.45 2005-06-29 12:22:20 ddr Exp $
+# $Id: lex_utf8.txt,v 1.46 2005-07-04 00:08:28 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -9085,6 +9085,10 @@ ro: avertisment
 ru: внимание
 sl: opozorila
 sv: varningar
+
+    what links here
+en: what links here
+fr: pages liées
 
     with
 af: met

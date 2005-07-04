@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.83 2005-07-03 23:39:47 ddr Exp $ *)
+(* $Id: notes.ml,v 4.84 2005-07-04 00:08:28 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -744,9 +744,10 @@ value begin_text_without_html_tags lim s =
 
 value print_misc_notes conf base =
   let title _ =
-    Wserver.wprint "%s - %s"
-      (capitale (nominative (transl conf "miscellaneous notes"))) conf.bname
+    Wserver.wprint "%s"
+      (capitale (nominative (transl conf "miscellaneous notes")))
   in
+  let ref = p_getenv conf.env "ref" = Some "on" in
   let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
   let fname = Filename.concat bdir "notes_links" in
   let db = NotesLinks.read_db_from_file fname in
@@ -788,18 +789,27 @@ value print_misc_notes conf base =
                  Wserver.wprint "%s" f;
                end;
                Wserver.wprint "]</tt> : %s\n" txt;
-               tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
-                 List.iter
-                   (fun p ->
-                      stagn "li" begin
-                        Wserver.wprint "&lt;--- %s%s"
-                         (Util.referenced_person_title_text conf base p)
-                          (Date.short_dates_text conf base p);
-                      end)
-                   pl;
-               end;
+               if ref then
+                 tag "ul" "style=\"font-size:70%%;list-style-type:none\"" begin
+                   List.iter
+                     (fun p ->
+                        stagn "li" begin
+                          Wserver.wprint "&lt;--- %s%s"
+                           (Util.referenced_person_title_text conf base p)
+                            (Date.short_dates_text conf base p);
+                        end)
+                     pl;
+                 end
+               else ();
              end)
           db2;
+      end
+    else ();
+    if not ref then
+      tag "p" begin
+        stag "a" "href=\"%sm=MISC_NOTES;ref=on\"" (commd conf) begin
+          Wserver.wprint "%s" (transl conf "what links here");
+        end;
       end
     else ();
     trailer conf;
