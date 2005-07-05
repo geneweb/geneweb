@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.88 2005-07-05 01:06:25 ddr Exp $ *)
+(* $Id: notes.ml,v 4.89 2005-07-05 09:57:29 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -370,7 +370,10 @@ value summary_of_tlsw_lines conf lines =
 
 value string_of_modify_link conf mode cnt sfn empty =
   sprintf "%s(<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)%s\n"
-    (if empty then "<p>" else "<div style=\"float:" ^ conf.right ^ "\">")
+    (if empty then "<p>"
+     else
+       "<div style=\"float:" ^ conf.right ^ ";margin-" ^ conf.left ^
+       ":3em\">")
     (commd conf) mode cnt sfn (transl_decline conf "modify" "")
     (if empty then "</p>" else "</div>")
 ;
