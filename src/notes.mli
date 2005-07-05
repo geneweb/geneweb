@@ -1,8 +1,9 @@
 (* camlp4r *)
-(* $Id: notes.mli,v 4.7 2005-07-03 22:42:08 ddr Exp $ *)
+(* $Id: notes.mli,v 4.8 2005-07-05 01:06:25 ddr Exp $ *)
 
 open Config;
 open Def;
+open NotesLinks;
 
 value check_file_name : string -> bool;
 value file_path : config -> string -> string;
@@ -21,7 +22,7 @@ value print : config -> base -> unit;
 value print_mod_page :
   config -> string -> string -> (bool -> unit) -> string -> string -> unit;
 value print_mod : config -> base -> unit;
-value update_notes_links_db : config -> int -> string -> bool -> unit;
+value update_notes_links_db : config -> page -> string -> bool -> unit;
 value print_mod_ok : config -> base -> unit;
 
 value print_misc_notes : config -> base -> unit;

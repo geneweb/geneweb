@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.4 2005-07-03 22:42:08 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.5 2005-07-05 01:06:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -102,14 +102,50 @@ value finish_progr_bar () =
 ;
 
 value compute base bdir =
+  let bdir =
+    if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
+  in
   let len = base.data.persons.len in
   do {
+    Printf.eprintf "--- database notes\n";
+    flush stderr;
+    let list = notes_links (base.data.bnotes.nread "" RnAll) in
+    if list = [] then ()
+    else 
+      let pg = NotesLinks.PgNotes in
+      NotesLinks.update_db bdir pg list;
+    Printf.eprintf "--- misc notes\n";
+    flush stderr;
+    try
+      let files = Sys.readdir (Filename.concat bdir "notes_d") in
+      do {
+        for i = 0 to Array.length files - 1 do {
+          let file = files.(i) in
+          if Filename.check_suffix file ".txt" then do {
+            let fnotes = Filename.chop_suffix file ".txt" in
+            Printf.eprintf "%s... " fnotes; flush stderr;
+            let list = notes_links (base.data.bnotes.nread fnotes RnAll) in
+            if list = [] then ()
+            else
+              let pg = NotesLinks.PgMisc fnotes in
+              NotesLinks.update_db bdir pg list
+          }
+          else ()
+        };
+        Printf.eprintf "\n"; flush stderr;
+      }
+    with
+    [ Sys_error _ -> () ];
+    Printf.eprintf "--- individual notes\n";
+    flush stderr;
     start_progr_bar ();
     for i = 0 to len - 1 do {
       let p = base.data.persons.get i in
       let list = notes_links (Gutil.sou base p.notes) in
       if list = [] then ()
-      else NotesLinks.update_db bdir i list;
+      else
+        let pg = NotesLinks.PgInd (Adef.iper_of_int i) in
+        NotesLinks.update_db bdir pg list;
       run_progr_bar i len
     };
     finish_progr_bar ();

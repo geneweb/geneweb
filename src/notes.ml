@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.87 2005-07-04 12:09:13 ddr Exp $ *)
+(* $Id: notes.ml,v 4.88 2005-07-05 01:06:25 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -484,15 +484,21 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
 ;
 
 value split_title_and_text s =
-  try
-    let i = String.index s '\n' in
-    let tit = String.sub s 0 i in
-    let txt = String.sub s (i + 1) (String.length s - i - 1) in
-    if String.length s > 0 && s.[0] = '=' || String.contains tit '<' then
-      ("", s)
-    else (tit, txt)
-  with
-  [ Not_found -> (s, "") ]
+  let (tit, txt) =
+    try
+      let i = String.index s '\n' in
+      let tit = String.sub s 0 i in
+      let txt = String.sub s (i + 1) (String.length s - i - 1) in
+      (tit, txt)
+    with
+    [ Not_found -> (s, "") ]
+  in
+  if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
+  || String.contains tit '['
+  then
+    ("", s)
+  else (tit, txt)
+
 ;
 
 value read_notes base fnotes =
@@ -504,14 +510,14 @@ value print_whole_notes conf fnotes title s =
   do {
     header_no_page_title conf
       (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
-    let what_links_here () =
+    let what_links_page () =
       if fnotes <> "" then
         stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
-          Wserver.wprint "(%s)" (transl conf "what links here");
+          Wserver.wprint "(%s)" (transl conf "what links page");
         end
       else ()
     in      
-    gen_print_link_to_welcome what_links_here conf True;
+    gen_print_link_to_welcome what_links_page conf True;
     xtag "br";
     xtag "br";
     if title <> "" then
@@ -548,27 +554,52 @@ value print_notes_part conf fnotes title s cnt0 =
   }
 ;
 
-value notes_links_db conf base =
+value notes_links_db conf base eliminate_unlinked =
   let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
   let fname = Filename.concat bdir "notes_links" in
   let db = NotesLinks.read_db_from_file fname in
   let db2 =
     List.fold_left
-      (fun db2 (i, sl) ->
-         if i < 0 then db2
-         else
-           let p = poi base (Adef.iper_of_int i) in
-           if authorized_age conf base p then
-             List.fold_left
-               (fun db2 s ->
-                  try
-                    let list = List.assoc s db2 in
-                    [(s, [p :: list]) :: List.remove_assoc s db2]
-                  with
-                  [ Not_found -> [(s, [p]) :: db2] ])
-                db2 sl
-           else db2)
+      (fun db2 (pg, sl) ->
+         let record_it =
+           match pg with
+           [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
+           | NotesLinks.PgNotes | NotesLinks.PgMisc _ -> True ]
+         in
+         if record_it then
+           List.fold_left
+             (fun db2 s ->
+                try
+                  let list = List.assoc s db2 in
+                  [(s, [pg :: list]) :: List.remove_assoc s db2]
+                with
+                [ Not_found -> [(s, [pg]) :: db2] ])
+              db2 sl
+         else db2)
       [] db
+  in
+  (* some kind of basic gc... *)
+  let rec is_referenced in_test s =
+    fun
+    [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes, sl) :: pgsll] ->
+        if List.mem s sl then True
+        else is_referenced in_test s pgsll
+    | [(NotesLinks.PgMisc s1, sl) :: pgsll] ->
+        if is_referenced in_test s pgsll then True
+        else if List.mem s sl then
+          if List.mem s1 in_test then False
+          else is_referenced [s :: in_test] s1 db
+        else False
+    | [] -> False ]
+  in
+  let db2 =
+    if eliminate_unlinked then
+      List.fold_right
+        (fun (s, list) db2 ->
+           if is_referenced [] s db then [(s, list) :: db2]
+           else db2)
+        db2 []
+    else db2
   in
   List.sort (fun (s1, _) (s2, _) -> compare s1 s2) db2
 ;
@@ -576,7 +607,7 @@ value notes_links_db conf base =
 value print_what_links conf base fnotes =
   let title h =
     do {
-      Wserver.wprint "%s --&gt; " (capitale (transl conf "what links here"));
+      Wserver.wprint "%s " (capitale (transl conf "what links page"));
       if h then Wserver.wprint "[%s]" fnotes
       else
         stag "tt" begin
@@ -588,7 +619,7 @@ value print_what_links conf base fnotes =
         end
     }
   in
-  let db = notes_links_db conf base in
+  let db = notes_links_db conf base False in
   do {
     Util.header conf title;
     Util.print_link_to_welcome conf True;
@@ -596,11 +627,26 @@ value print_what_links conf base fnotes =
       let pl = List.assoc fnotes db in
       tag "ul" begin
         List.iter
-          (fun p ->
+          (fun pg ->
              stagn "li" begin
-               Wserver.wprint "%s%s"
-                 (Util.referenced_person_title_text conf base p)
-                 (Date.short_dates_text conf base p);
+               match pg with
+               [ NotesLinks.PgInd ip ->
+                   let p = poi base ip in
+                   Wserver.wprint "%s%s"
+                     (Util.referenced_person_title_text conf base p)
+                     (Date.short_dates_text conf base p)
+               | NotesLinks.PgNotes ->
+                   stagn "a" "href=\"%sm=NOTES\"" (commd conf) begin
+                     Wserver.wprint "%s" (transl_nth conf "note/notes" 1);
+                   end
+               | NotesLinks.PgMisc fnotes ->
+                   stagn "tt" begin
+                     Wserver.wprint "[";
+                     stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes begin
+                       Wserver.wprint "%s" fnotes;
+                     end;
+                     Wserver.wprint "]";
+                   end ];
              end)
           pl;
       end
@@ -781,9 +827,13 @@ value print_mod_ok conf base =
         [ Some v -> insert_sub_part old_notes v sub_part
         | None -> sub_part ]
       in
+      let pg =
+        if fnotes = "" then NotesLinks.PgNotes
+        else NotesLinks.PgMisc fnotes
+      in
       do {
         base.func.commit_notes fnotes s;
-        update_notes_links_db conf (-1) s False;
+        update_notes_links_db conf pg s True;
         print_ok conf base fnotes sub_part
       }
   with
@@ -813,7 +863,7 @@ value print_misc_notes conf base =
     Wserver.wprint "%s"
       (capitale (nominative (transl conf "miscellaneous notes")))
   in
-  let db2 = notes_links_db conf base in
+  let db2 = notes_links_db conf base True in
   do {
     header conf title;
     print_link_to_welcome conf True;

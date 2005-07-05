@@ -1,8 +1,15 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.1 2005-06-29 12:24:01 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.2 2005-07-05 01:06:25 ddr Exp $ *)
 
-value magic_notes_links = "GWNL0002";
-type notes_links_db = list (int * list string);
+open Def;
+
+value magic_notes_links = "GWNL0003";
+type page =
+  [ PgInd of iper
+  | PgNotes
+  | PgMisc of string ]
+;
+type notes_links_db = list (page * list string);
 
 value read_db_from_file fname =
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
@@ -23,7 +30,8 @@ value read_db_from_file fname =
 value update_db bdir who list =
   let fname = Filename.concat bdir "notes_links" in
   let notes_links_db = read_db_from_file fname in
-  let new_db = [(who, list) :: List.remove_assoc who notes_links_db] in
+  let db = List.remove_assoc who notes_links_db in
+  let new_db = if list = [] then db else [(who, list) :: db] in
   let oc = open_out_bin fname in
   do {
     output_string oc magic_notes_links;

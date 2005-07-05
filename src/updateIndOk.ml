@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.34 2005-06-29 20:02:53 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.35 2005-07-05 01:06:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -752,7 +752,7 @@ value print_mod o_conf base =
     let u = uoi base p.cle_index in
     do {
       base.func.patch_person p.cle_index p;
-      Notes.update_notes_links_db conf (Adef.int_of_iper p.cle_index)
+      Notes.update_notes_links_db conf (NotesLinks.PgInd p.cle_index)
         (sou base p.notes) (p.notes <> op.notes);
       if op.surname <> p.surname || op.surnames_aliases <> p.surnames_aliases
       || op.titles <> p.titles then
