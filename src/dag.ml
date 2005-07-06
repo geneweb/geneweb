@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.38 2005-07-06 12:37:27 ddr Exp $ *)
+(* $Id: dag.ml,v 4.39 2005-07-06 12:48:12 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -110,10 +110,12 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=\"%d\"%s border=\"0\" alt=\"%s\">"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s border=\"0\" alt=\"%s\">"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
-      width (if height = 0 then "" else " height=" ^ string_of_int height) image_txt
+      (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
+      (if height = 0 then "" else " height=" ^ string_of_int height ^ "\"")
+      image_txt
   in
   if conf.cancel_links then r
   else sprintf "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k ^ r ^ "</a>"
