@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notes.mli,v 4.8 2005-07-05 01:06:25 ddr Exp $ *)
+(* $Id: notes.mli,v 4.9 2005-07-07 08:55:58 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -8,7 +8,7 @@ open NotesLinks;
 value check_file_name : string -> bool;
 value file_path : config -> string -> string;
 value syntax_links : config -> string -> (string -> string) -> string -> string;
-value lines_list_of_string : string -> list string;
+value lines_list_of_string : string -> (list string * bool);
 value insert_sub_part : string -> int -> string -> string;
 value rev_extract_sub_part : string -> int -> list string;
 value html_of_tlsw_lines :

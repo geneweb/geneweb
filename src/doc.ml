@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.24 2005-07-03 22:42:08 ddr Exp $ *)
+(* $Id: doc.ml,v 4.25 2005-07-07 08:55:57 ddr Exp $ *)
 
 open Config;
 
@@ -335,7 +335,7 @@ value print_ok conf fdoc s =
       | None -> (False, 0) ]
     in
     if has_v then
-      let lines = Notes.lines_list_of_string s in
+      let (lines, _) = Notes.lines_list_of_string s in
       let lines =
         match lines with
         [ [title :: lines] when v = 0 -> [title; "<br /><br />" :: lines]
