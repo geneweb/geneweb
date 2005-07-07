@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.91 2005-07-07 08:55:57 ddr Exp $ *)
+(* $Id: notes.ml,v 4.92 2005-07-07 09:17:06 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -23,6 +23,7 @@ open Printf;
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
    __TOC__ : summary (unnumbered)
+   __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
@@ -48,7 +49,7 @@ value adjust_ul_level rev_lines old_lev new_lev =
       else loop [tab lev "</ul></li>" :: rev_lines] (lev - 1)
 ;
 
-value summary_of_tlsw_lines conf no_num lines =
+value summary_of_tlsw_lines conf no_num short lines =
   let (rev_summary, lev, _, cnt, rev_sections_nums) =
     List.fold_left
       (fun (summary, prev_lev, indent_stack, cnt, sections_nums) s ->
@@ -90,8 +91,11 @@ value summary_of_tlsw_lines conf no_num lines =
                 (if no_num then "" else section_num ^ " - ")
                 (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
             in
-            let line = tab (lev + 1) "<li>" ^ s in
-            [line :: adjust_ul_level summary (prev_lev - 1) lev]
+            if short then
+              if summary = [] then [s] else [s; ";" :: summary]
+            else
+              let line = tab (lev + 1) "<li>" ^ s in
+              [line :: adjust_ul_level summary (prev_lev - 1) lev]
           in
           (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
         else (summary, prev_lev, indent_stack, cnt, sections_nums))
@@ -101,7 +105,9 @@ value summary_of_tlsw_lines conf no_num lines =
     (* less that 2 paragraphs : summary abandonned *)
     ([], [])
   else
-    let rev_summary = ["</ul>" :: adjust_ul_level rev_summary (lev - 1) 0]
+    let rev_summary =
+      if short then rev_summary
+      else ["</ul>" :: adjust_ul_level rev_summary (lev - 1) 0]
     in
     let lines =
       ["<dl><dd>";
@@ -131,7 +137,16 @@ value rec syntax_lists conf wlo list =
       let list =
         match wlo with
         [ Some lines ->
-            let (summary, _) = summary_of_tlsw_lines conf True lines in
+            let (summary, _) = summary_of_tlsw_lines conf True False lines in
+            List.rev_append summary list
+        | None -> list ]
+      in
+      syntax_lists conf wlo list sl
+  | ["__SHORT_TOC__" :: sl] ->
+      let list =
+        match wlo with
+        [ Some lines ->
+            let (summary, _) = summary_of_tlsw_lines conf True True lines in
             List.rev_append summary list
         | None -> list ]
       in
@@ -313,13 +328,15 @@ value syntax_links conf mode file_path s =
     else loop (i + 1) (Buff.store len s.[i])
 ;
 
+value no_auto_toc_list = ["__NOTOC__"; "__TOC__"; "__SHORT_TOC__"];
+
 value lines_list_of_string s =
   loop False [] 0 0 where rec loop no_toc lines len i =
     if i = String.length s then
       (List.rev (if len = 0 then lines else [Buff.get len :: lines]), no_toc)
     else if s.[i] = '\n' then
       let line = Buff.get len in
-      let no_toc = line = "__NOTOC__" || no_toc in
+      let no_toc = List.mem line no_auto_toc_list || no_toc in
       loop no_toc [line :: lines] 0 (i + 1)
     else
       loop no_toc lines (Buff.store len s.[i]) (i + 1)
@@ -434,7 +451,7 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
 value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   let (lines, no_toc) = lines_list_of_string s in
   let (summary, sections_nums) =
-    if no_toc then ([], []) else summary_of_tlsw_lines conf False lines
+    if no_toc then ([], []) else summary_of_tlsw_lines conf False False lines
   in
   let (rev_lines_before_summary, lines) =
     loop [] lines where rec loop lines_bef =
@@ -506,7 +523,7 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
   let lines =
     List.map
       (fun
-       [ "__TOC__" ->
+       [ "__TOC__" | "__SHORT_TOC__" ->
            sprintf "<p>...%s...</p>"
              (transl_nth conf "visualize/show/hide/summary" 3)
        | "__NOTOC__" -> ""
