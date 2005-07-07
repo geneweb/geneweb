@@ -1,10 +1,29 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.3 2005-07-07 12:53:03 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.4 2005-07-07 18:32:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
 open Printf;
 open Util;
+
+(* TLSW: Text Language Stolen to Wikipedia
+   = title level 1 =
+   == title level 2 ==
+   ...
+   ====== title level 6 ======
+   * list ul/li item
+   * list ul/li item
+   ** list ul/li item 2nd level
+   ** list ul/li item 2nd level
+   ...
+   [[first_name/surname/oc/text]] link; 'text' displayed
+   [[first_name/surname/text]] link (oc = 0); 'text' displayed
+   [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
+   [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
+   [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   __TOC__ : summary (unnumbered)
+   __SHORT_TOC__ : short summary (unnumbered)
+   __NOTOC__ : no (automatic) numbered summary *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
@@ -385,7 +404,21 @@ value extract_sub_part s v =
   String.concat "\n" (List.rev rev_lines)
 ;
 
-value print_sub_part conf mode sub_fname cnt0 s =
+value print_sub_part conf file_path mode sub_fname cnt0 lines ending_filter =
+  let lines =
+    List.map
+      (fun
+       [ "__TOC__" | "__SHORT_TOC__" ->
+           sprintf "<p>...%s...</p>"
+             (transl_nth conf "visualize/show/hide/summary" 3)
+       | "__NOTOC__" -> ""
+       | s -> s ])
+      lines
+  in
+  let lines = html_of_tlsw_lines  conf mode sub_fname cnt0 True lines [] in
+  let s = String.concat "\n" lines in
+  let s = syntax_links conf mode file_path s in
+  let s = ending_filter s in
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let s =
     if cnt0 < first_cnt && conf.wizard then
@@ -518,4 +551,22 @@ value insert_sub_part s v sub_part =
           (lines, []) ]
   in
   String.concat "\n" (List.rev_append lines sl)
+;
+
+value split_title_and_text s =
+  let (tit, txt) =
+    try
+      let i = String.index s '\n' in
+      let tit = String.sub s 0 i in
+      let txt = String.sub s (i + 1) (String.length s - i - 1) in
+      (tit, txt)
+    with
+    [ Not_found -> (s, "") ]
+  in
+  if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
+  || String.contains tit '['
+  then
+    ("", s)
+  else (tit, txt)
+
 ;

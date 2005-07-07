@@ -1,5 +1,6 @@
- Modifications
+Modifications
 
+__SHORT_TOC__
 
 Cette partie vous indique comment faire des modifications dans une
 base de données en utilisant votre navigateur. Si le
@@ -77,6 +78,7 @@ patronyme d'un enfant.
 
 
 <a name="FSO"></a>
+
 == Prénoms, patronymes, numéros  ==
 
 Chaque personne de la base est repérée de manière

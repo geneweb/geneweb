@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.28 2005-07-07 12:53:03 ddr Exp $ *)
+(* $Id: doc.ml,v 4.29 2005-07-07 18:32:27 ddr Exp $ *)
 
 open Config;
 
@@ -173,7 +173,6 @@ value read_wdoc lang fname =
   let fname = wdoc_file_path lang fname in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let title = try input_line ic with [ End_of_file -> "" ] in
       let s =
         let len = ref 0 in
         do {
@@ -189,7 +188,7 @@ value read_wdoc lang fname =
           Buff.get len.val
         }
       in
-      (title, s)
+      Wiki.split_title_and_text s
   | None -> ("", "") ]
 ;
 
@@ -227,10 +226,8 @@ value print_whole_wdoc conf fdoc title s =
 value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let mode = "WDOC" in
   let file_path = wdoc_file_path conf.lang in
-  let lines = Wiki.html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
-  let s = Wiki.syntax_links conf mode file_path (String.concat "\n" lines) in
-  let s = Util.filter_html_tags s in
-  Wiki.print_sub_part conf mode sub_fname cnt0 s
+  Wiki.print_sub_part conf file_path mode sub_fname cnt0 lines
+    Util.filter_html_tags
 ;
 
 value print_part_wdoc conf fdoc title s cnt0 =
