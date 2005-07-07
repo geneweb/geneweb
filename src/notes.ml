@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.97 2005-07-07 18:32:27 ddr Exp $ *)
+(* $Id: notes.ml,v 4.98 2005-07-07 19:30:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -67,7 +67,7 @@ value print_notes_part conf fnotes title s cnt0 =
       Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
     }
     else ();
-    let lines = List.rev (Wiki.rev_extract_sub_part s cnt0) in
+    let lines = Wiki.extract_sub_part s cnt0 in
     print_notes_sub_part conf fnotes cnt0 lines;
     trailer conf;
   }

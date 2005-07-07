@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.4 2005-07-07 18:32:27 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.5 2005-07-07 19:30:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -48,7 +48,9 @@ value adjust_ul_level rev_lines old_lev new_lev =
       else loop [tab lev "</ul></li>" :: rev_lines] (lev - 1)
 ;
 
-value summary_of_tlsw_lines conf no_num short lines =
+value message_txt conf i = transl_nth conf "visualize/show/hide/summary" i;
+
+value summary_of_tlsw_lines conf short lines =
   let (rev_summary, lev, _, cnt, rev_sections_nums) =
     List.fold_left
       (fun (summary, prev_lev, indent_stack, cnt, sections_nums) s ->
@@ -87,7 +89,7 @@ value summary_of_tlsw_lines conf no_num short lines =
           let summary =
             let s =
               sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
-                (if no_num then "" else section_num ^ " - ")
+                (if short then "" else section_num ^ " - ")
                 (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
             in
             if short then
@@ -113,7 +115,7 @@ value summary_of_tlsw_lines conf no_num short lines =
        "<table border=\"1\" cellpadding=\"10\">";
        "<tr><td align=\"" ^ conf.left ^ "\">";
        "<div style=\"text-align:center\"><b>" ^
-          capitale (transl_nth conf "visualize/show/hide/summary" 3) ^ "</b>";
+          capitale (message_txt conf 3) ^ "</b>";
        "<script type=\"text/javascript\">";
        "//<![CDATA[";
        "showTocToggle()";
@@ -136,7 +138,7 @@ value rec syntax_lists conf wlo list =
       let list =
         match wlo with
         [ Some lines ->
-            let (summary, _) = summary_of_tlsw_lines conf True False lines in
+            let (summary, _) = summary_of_tlsw_lines conf False lines in
             List.rev_append summary list
         | None -> list ]
       in
@@ -145,7 +147,7 @@ value rec syntax_lists conf wlo list =
       let list =
         match wlo with
         [ Some lines ->
-            let (summary, _) = summary_of_tlsw_lines conf True True lines in
+            let (summary, _) = summary_of_tlsw_lines conf True lines in
             List.rev_append summary list
         | None -> list ]
       in
@@ -310,7 +312,7 @@ value string_of_modify_link conf mode cnt sfn empty =
     (if empty then "</p>" else "</div>")
 ;
 
-value gen_html_of_tlsw_lines wlo conf mode sub_fname cnt0 with_mod_parag lines
+value gen_html_of_tlsw_lines wlo conf mode_opt sub_fname cnt0 lines
     sections_nums =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let (rev_lines, _, _) =
@@ -329,17 +331,18 @@ value gen_html_of_tlsw_lines wlo conf mode sub_fname cnt0 with_mod_parag lines
                (String.sub s lev (len-2*lev))
                (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
            in
-           if with_mod_parag then
-             let n1 =
-               if conf.wizard then
-                 string_of_modify_link conf mode cnt sfn False
-               else ""
-             in
-             let n2 =
-               sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
-             in
-             ([s; n1; n2 :: lines], cnt + 1, sections_nums)
-           else ([s :: lines], cnt + 1, sections_nums)
+           match mode_opt with
+           [ Some mode ->
+               let n1 =
+                 if conf.wizard then
+                   string_of_modify_link conf mode cnt sfn False
+                 else ""
+               in
+               let n2 =
+                 sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
+               in
+               ([s; n1; n2 :: lines], cnt + 1, sections_nums)
+           | None -> ([s :: lines], cnt + 1, sections_nums) ]
          else ([s :: lines], cnt, sections_nums))
       ([], max cnt0 first_cnt, sections_nums) lines
   in
@@ -348,10 +351,15 @@ value gen_html_of_tlsw_lines wlo conf mode sub_fname cnt0 with_mod_parag lines
 
 value html_of_tlsw_lines = gen_html_of_tlsw_lines None;
 
+value html_of_tlsw conf s =
+  let (lines, _) = lines_list_of_string s in
+  html_of_tlsw_lines conf None "" 0 lines []
+;
+
 value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   let (lines, no_toc) = lines_list_of_string s in
   let (summary, sections_nums) =
-    if no_toc then ([], []) else summary_of_tlsw_lines conf False False lines
+    if no_toc then ([], []) else summary_of_tlsw_lines conf False lines
   in
   let (rev_lines_before_summary, lines) =
     loop [] lines where rec loop lines_bef =
@@ -365,7 +373,7 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
     rev_syntax_lists conf (Some lines) [] rev_lines_before_summary
   in
   let lines_after_summary =
-    gen_html_of_tlsw_lines (Some lines) conf mode sub_fname first_cnt True
+    gen_html_of_tlsw_lines (Some lines) conf (Some mode) sub_fname first_cnt
       lines sections_nums
   in
   let s =
@@ -399,23 +407,19 @@ value rev_extract_sub_part s v =
     | [] -> lines ]
 ;
 
-value extract_sub_part s v =
-  let rev_lines = rev_extract_sub_part s v in
-  String.concat "\n" (List.rev rev_lines)
-;
+value extract_sub_part s v = List.rev (rev_extract_sub_part s v);
 
 value print_sub_part conf file_path mode sub_fname cnt0 lines ending_filter =
   let lines =
     List.map
       (fun
        [ "__TOC__" | "__SHORT_TOC__" ->
-           sprintf "<p>...%s...</p>"
-             (transl_nth conf "visualize/show/hide/summary" 3)
+           sprintf "<p>...%s...</p>" (message_txt conf 3)
        | "__NOTOC__" -> ""
        | s -> s ])
       lines
   in
-  let lines = html_of_tlsw_lines  conf mode sub_fname cnt0 True lines [] in
+  let lines = html_of_tlsw_lines conf (Some mode) sub_fname cnt0 lines [] in
   let s = String.concat "\n" lines in
   let s = syntax_links conf mode file_path s in
   let s = ending_filter s in
@@ -460,7 +464,9 @@ value print_mod_page conf mode fname title ntitle s =
     [ Some v -> (True, v)
     | None -> (False, 0) ]
   in
-  let sub_part = if not has_v then s else extract_sub_part s v in
+  let sub_part =
+    if not has_v then s else String.concat "\n" (extract_sub_part s v)
+  in
   let sfn = if fname = "" then "" else ";f=" ^ fname in
   do {
     header conf title;
@@ -468,8 +474,7 @@ value print_mod_page conf mode fname title ntitle s =
       stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
         (if has_v then ";v=" ^ string_of_int v else "") sfn
       begin
-        Wserver.wprint "(%s)\n"
-          (transl_nth conf "visualize/show/hide/summary" 0);
+        Wserver.wprint "(%s)\n" (message_txt conf 0);
       end;
     end;
     print_link_to_welcome conf False;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.162 2005-07-07 12:39:46 ddr Exp $ *)
+(* $Id: perso.ml,v 4.163 2005-07-07 19:30:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1804,10 +1804,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = sou base p.notes in
         let s =
-          let (lines, _) = Wiki.lines_list_of_string s in
-          let lines =
-            Wiki.html_of_tlsw_lines conf "NOTES" "" 0 False lines []
-          in
+          let lines = Wiki.html_of_tlsw conf s in
           Wiki.syntax_links conf "NOTES" (Notes.file_path conf)
             (String.concat "\n" lines)
         in
