@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.92 2005-07-07 09:17:06 ddr Exp $ *)
+(* $Id: notes.ml,v 4.93 2005-07-07 09:52:55 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -412,7 +412,7 @@ value string_of_modify_link conf mode cnt sfn empty =
     (if empty then "</p>" else "</div>")
 ;
 
-value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
+value gen_html_of_tlsw_lines wlo conf mode sub_fname cnt0 with_mod_parag lines
     sections_nums =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   let (rev_lines, _, _) =
@@ -445,8 +445,10 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
          else ([s :: lines], cnt, sections_nums))
       ([], max cnt0 first_cnt, sections_nums) lines
   in
-  List.rev rev_lines
+  rev_syntax_lists conf wlo [] rev_lines
 ;
+
+value html_of_tlsw_lines = gen_html_of_tlsw_lines None;
 
 value html_with_summary_of_tlsw conf mode file_path sub_fname s =
   let (lines, no_toc) = lines_list_of_string s in
@@ -465,10 +467,8 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
     rev_syntax_lists conf (Some lines) [] rev_lines_before_summary
   in
   let lines_after_summary =
-    let sl =
-      html_of_tlsw_lines conf mode sub_fname first_cnt True lines sections_nums
-    in
-    syntax_lists conf (Some lines) [] sl
+    gen_html_of_tlsw_lines (Some lines) conf mode sub_fname first_cnt True
+      lines sections_nums
   in
   let s =
     syntax_links conf mode file_path
@@ -518,7 +518,7 @@ value print_sub_part conf mode sub_fname cnt0 s =
 
 value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
-  let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
+  let lines = html_of_tlsw_lines  conf mode sub_fname cnt0 True lines [] in
   let file_path = file_path conf in
   let lines =
     List.map
