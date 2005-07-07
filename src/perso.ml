@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.160 2005-06-26 18:48:49 ddr Exp $ *)
+(* $Id: perso.ml,v 4.161 2005-07-07 08:55:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1804,7 +1804,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = sou base p.notes in
         let s =
-          let lines = Notes.lines_list_of_string s in
+          let (lines, _) = Notes.lines_list_of_string s in
           let lines =
             Notes.html_of_tlsw_lines conf "NOTES" "" 0 False lines []
           in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.90 2005-07-07 07:30:36 ddr Exp $ *)
+(* $Id: notes.ml,v 4.91 2005-07-07 08:55:57 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -21,7 +21,9 @@ open Printf;
    [[first_name/surname/text]] link (oc = 0); 'text' displayed
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
-   [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed *)
+   [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   __TOC__ : summary (unnumbered)
+   __NOTOC__ : no (automatic) numbered summary *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
@@ -29,14 +31,117 @@ value first_cnt = 1;
 
 value tab lev s = String.make (2 * lev) ' ' ^ s;
 
-value rec syntax_lists conf list =
+value section_level s len =
+  loop 1 (len - 2) 4 where rec loop i j k =
+    if i > 5 then i
+    else if len > k && s.[i] = '=' && s.[j] = '=' then
+      loop (i + 1) (j - 1) (k + 2)
+    else i
+;
+
+value adjust_ul_level rev_lines old_lev new_lev =
+  if old_lev < new_lev then [tab (old_lev + 1) "<ul>" :: rev_lines]
+  else
+    let rev_lines = [List.hd rev_lines ^ "</li>" :: List.tl rev_lines] in
+    loop rev_lines old_lev where rec loop rev_lines lev =
+      if lev = new_lev then rev_lines
+      else loop [tab lev "</ul></li>" :: rev_lines] (lev - 1)
+;
+
+value summary_of_tlsw_lines conf no_num lines =
+  let (rev_summary, lev, _, cnt, rev_sections_nums) =
+    List.fold_left
+      (fun (summary, prev_lev, indent_stack, cnt, sections_nums) s ->
+        let len = String.length s in
+        if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+          let slev = section_level s len in
+          let (lev, stack) =
+            loop prev_lev indent_stack where rec loop lev stack =
+              match stack with
+              [ [(prev_num, prev_slev) :: rest_stack] ->
+                  if slev < prev_slev then
+                    match rest_stack with
+                    [ [(_, prev_prev_slev) :: _] ->
+                        if slev > prev_prev_slev then
+                          let stack = [(prev_num, slev) :: rest_stack] in
+                          loop lev stack
+                        else
+                          loop (lev - 1) rest_stack
+                    | [] ->
+                        let stack = [(prev_num + 1, slev) :: rest_stack] in
+                        (lev - 1, stack) ]
+                  else if slev = prev_slev then
+                    let stack = [(prev_num + 1, slev) :: rest_stack] in
+                    (lev - 1, stack)
+                  else
+                    let stack = [(1, slev) :: stack] in
+                    (lev, stack)
+              | [] ->
+                  let stack = [(1, slev) :: stack] in
+                  (lev, stack) ]
+          in
+          let section_num =
+            let nums = List.map fst stack in
+            String.concat "." (List.rev_map string_of_int nums)
+          in
+          let summary =
+            let s =
+              sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
+                (if no_num then "" else section_num ^ " - ")
+                (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
+            in
+            let line = tab (lev + 1) "<li>" ^ s in
+            [line :: adjust_ul_level summary (prev_lev - 1) lev]
+          in
+          (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
+        else (summary, prev_lev, indent_stack, cnt, sections_nums))
+      ([], 0, [], first_cnt, []) lines
+  in
+  if cnt <= first_cnt + 1 then
+    (* less that 2 paragraphs : summary abandonned *)
+    ([], [])
+  else
+    let rev_summary = ["</ul>" :: adjust_ul_level rev_summary (lev - 1) 0]
+    in
+    let lines =
+      ["<dl><dd>";
+       "<table border=\"1\" cellpadding=\"10\">";
+       "<tr><td align=\"" ^ conf.left ^ "\">";
+       "<div style=\"text-align:center\"><b>" ^
+          capitale (transl_nth conf "visualize/show/hide/summary" 3) ^ "</b>";
+       "<script type=\"text/javascript\">";
+       "//<![CDATA[";
+       "showTocToggle()";
+       "//]]>";
+       "</script>";
+       "</div>";
+       "<div class=\"summary\" id=\"tocinside\">" ::
+       List.rev_append rev_summary
+         ["</div>";
+          "</td></tr></table>";
+          "</dd></dl>"]]
+    in
+    (lines, List.rev rev_sections_nums)
+;
+
+value rec syntax_lists conf wlo list =
   fun
-  [ [s :: sl] ->
+  [ ["__NOTOC__" :: sl] -> syntax_lists conf wlo list sl
+  | ["__TOC__" :: sl] ->
+      let list =
+        match wlo with
+        [ Some lines ->
+            let (summary, _) = summary_of_tlsw_lines conf True lines in
+            List.rev_append summary list
+        | None -> list ]
+      in
+      syntax_lists conf wlo list sl
+  | [s :: sl] ->
       if String.length s > 0 && s.[0] = '*' then
         let (sl, rest) = select_list_lines conf [] [s :: sl] in
         let list = syntax_ul 0 list sl in
-        syntax_lists conf list rest
-      else syntax_lists conf [s :: list] sl
+        syntax_lists conf wlo list rest
+      else syntax_lists conf wlo [s :: list] sl
   | [] -> List.rev list ]
 and select_list_lines conf list =
   fun
@@ -88,8 +193,8 @@ and syntax_ul lev list sl =
   [tab lev "</ul>" :: list]
 ;
 
-value rev_syntax_lists conf list rev_list =
-  syntax_lists conf list (List.rev rev_list)
+value rev_syntax_lists conf wlo list rev_list =
+  syntax_lists conf wlo list (List.rev rev_list)
 ;
 
 value check_file_name s =
@@ -208,24 +313,20 @@ value syntax_links conf mode file_path s =
     else loop (i + 1) (Buff.store len s.[i])
 ;
 
-value section_level s len =
-  loop 1 (len - 2) 4 where rec loop i j k =
-    if i > 5 then i
-    else if len > k && s.[i] = '=' && s.[j] = '=' then
-      loop (i + 1) (j - 1) (k + 2)
-    else i
-;
-
 value lines_list_of_string s =
-  loop [] 0 0 where rec loop lines len i =
+  loop False [] 0 0 where rec loop no_toc lines len i =
     if i = String.length s then
-      List.rev (if len = 0 then lines else [Buff.get len :: lines])
-    else if s.[i] = '\n' then loop [Buff.get len :: lines] 0 (i + 1)
-    else loop lines (Buff.store len s.[i]) (i + 1)
+      (List.rev (if len = 0 then lines else [Buff.get len :: lines]), no_toc)
+    else if s.[i] = '\n' then
+      let line = Buff.get len in
+      let no_toc = line = "__NOTOC__" || no_toc in
+      loop no_toc [line :: lines] 0 (i + 1)
+    else
+      loop no_toc lines (Buff.store len s.[i]) (i + 1)
 ;
 
 value insert_sub_part s v sub_part =
-  let lines = lines_list_of_string s in
+  let (lines, _) = lines_list_of_string s in
   let (lines, sl) =
     loop False [] 0 first_cnt lines
     where rec loop sub_part_added lines lev cnt =
@@ -260,7 +361,7 @@ value insert_sub_part s v sub_part =
 ;
 
 value rev_extract_sub_part s v =
-  let lines = lines_list_of_string s in
+  let (lines, _) = lines_list_of_string s in
   loop [] 0 first_cnt lines where rec loop lines lev cnt =
     fun
     [ [s :: sl] ->
@@ -282,90 +383,6 @@ value rev_extract_sub_part s v =
 value extract_sub_part s v =
   let rev_lines = rev_extract_sub_part s v in
   String.concat "\n" (List.rev rev_lines)
-;
-
-value adjust_ul_level rev_lines old_lev new_lev =
-  if old_lev < new_lev then [tab (old_lev + 1) "<ul>" :: rev_lines]
-  else
-    let rev_lines = [List.hd rev_lines ^ "</li>" :: List.tl rev_lines] in
-    loop rev_lines old_lev where rec loop rev_lines lev =
-      if lev = new_lev then rev_lines
-      else loop [tab lev "</ul></li>" :: rev_lines] (lev - 1)
-;
-
-value summary_of_tlsw_lines conf lines =
-  let (rev_summary, lev, _, cnt, rev_sections_nums) =
-    List.fold_left
-      (fun (summary, prev_lev, indent_stack, cnt, sections_nums) s ->
-        let len = String.length s in
-        if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-          let slev = section_level s len in
-          let (lev, stack) =
-            loop prev_lev indent_stack where rec loop lev stack =
-              match stack with
-              [ [(prev_num, prev_slev) :: rest_stack] ->
-                  if slev < prev_slev then
-                    match rest_stack with
-                    [ [(_, prev_prev_slev) :: _] ->
-                        if slev > prev_prev_slev then
-                          let stack = [(prev_num, slev) :: rest_stack] in
-                          loop lev stack
-                        else
-                          loop (lev - 1) rest_stack
-                    | [] ->
-                        let stack = [(prev_num + 1, slev) :: rest_stack] in
-                        (lev - 1, stack) ]
-                  else if slev = prev_slev then
-                    let stack = [(prev_num + 1, slev) :: rest_stack] in
-                    (lev - 1, stack)
-                  else
-                    let stack = [(1, slev) :: stack] in
-                    (lev, stack)
-              | [] ->
-                  let stack = [(1, slev) :: stack] in
-                  (lev, stack) ]
-          in
-          let section_num =
-            let nums = List.map fst stack in
-            String.concat "." (List.rev_map string_of_int nums)
-          in
-          let summary =
-            let s =
-              sprintf "<a href=\"#a_%d\">%s - %s</a>" cnt section_num
-                (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
-            in
-            let line = tab (lev + 1) "<li>" ^ s in
-            [line :: adjust_ul_level summary (prev_lev - 1) lev]
-          in
-          (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
-        else (summary, prev_lev, indent_stack, cnt, sections_nums))
-      ([], 0, [], first_cnt, []) lines
-  in
-  if cnt <= first_cnt + 1 then
-    (* less that 2 paragraphs : summary abandonned *)
-    ([], [])
-  else
-    let rev_summary = ["</ul>" :: adjust_ul_level rev_summary (lev - 1) 0]
-    in
-    let lines =
-      ["<dl><dd>";
-       "<table border=\"1\" cellpadding=\"10\">";
-       "<tr><td align=\"" ^ conf.left ^ "\">";
-       "<div style=\"text-align:center\"><b>" ^
-          capitale (transl_nth conf "visualize/show/hide/summary" 3) ^ "</b>";
-       "<script type=\"text/javascript\">";
-       "//<![CDATA[";
-       "showTocToggle()";
-       "//]]>";
-       "</script>";
-       "</div>";
-       "<div class=\"summary\" id=\"tocinside\">" ::
-       List.rev_append rev_summary
-         ["</div>";
-          "</td></tr></table>";
-          "</dd></dl>"]]
-    in
-    (lines, List.rev rev_sections_nums)
 ;
 
 value string_of_modify_link conf mode cnt sfn empty =
@@ -411,12 +428,14 @@ value html_of_tlsw_lines conf mode sub_fname cnt0 with_mod_parag lines
          else ([s :: lines], cnt, sections_nums))
       ([], max cnt0 first_cnt, sections_nums) lines
   in
-  rev_syntax_lists conf [] rev_lines
+  List.rev rev_lines
 ;
 
 value html_with_summary_of_tlsw conf mode file_path sub_fname s =
-  let lines = lines_list_of_string s in
-  let (summary, sections_nums) = summary_of_tlsw_lines conf lines in
+  let (lines, no_toc) = lines_list_of_string s in
+  let (summary, sections_nums) =
+    if no_toc then ([], []) else summary_of_tlsw_lines conf False lines
+  in
   let (rev_lines_before_summary, lines) =
     loop [] lines where rec loop lines_bef =
       fun
@@ -426,10 +445,13 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
       | [] -> (lines_bef, []) ]
   in
   let lines_before_summary =
-    rev_syntax_lists conf [] rev_lines_before_summary
+    rev_syntax_lists conf (Some lines) [] rev_lines_before_summary
   in
   let lines_after_summary =
-    html_of_tlsw_lines conf mode sub_fname first_cnt True lines sections_nums
+    let sl =
+      html_of_tlsw_lines conf mode sub_fname first_cnt True lines sections_nums
+    in
+    syntax_lists conf (Some lines) [] sl
   in
   let s =
     syntax_links conf mode file_path
@@ -481,7 +503,18 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
   let lines = html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
   let file_path = file_path conf in
-  let s = syntax_links conf mode file_path (String.concat "\n" lines) in
+  let lines =
+    List.map
+      (fun
+       [ "__TOC__" ->
+           sprintf "<p>...%s...</p>"
+             (transl_nth conf "visualize/show/hide/summary" 3)
+       | "__NOTOC__" -> ""
+       | s -> s ])
+      lines
+  in
+  let s = String.concat "\n" lines in
+  let s = syntax_links conf mode file_path s in
   let s = string_with_macros conf [] s in
   print_sub_part conf mode sub_fname cnt0 s
 ;
@@ -780,7 +813,8 @@ value print_ok conf base fnotes s =
       Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
     }
     else ();
-    print_notes_sub_part conf fnotes v (lines_list_of_string s);
+    let (lines, _) = lines_list_of_string s in
+    print_notes_sub_part conf fnotes v lines;
     trailer conf
   }
 ;
