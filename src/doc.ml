@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.29 2005-07-07 18:32:27 ddr Exp $ *)
+(* $Id: doc.ml,v 4.30 2005-07-07 19:30:23 ddr Exp $ *)
 
 open Config;
 
@@ -233,7 +233,7 @@ value print_wdoc_sub_part conf sub_fname cnt0 lines =
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
-    let lines = List.rev (Wiki.rev_extract_sub_part s cnt0) in
+    let lines = Wiki.extract_sub_part s cnt0 in
     let lines =
       if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
     in
