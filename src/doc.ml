@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.27 2005-07-07 12:39:46 ddr Exp $ *)
+(* $Id: doc.ml,v 4.28 2005-07-07 12:53:03 ddr Exp $ *)
 
 open Config;
 
@@ -230,13 +230,13 @@ value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let lines = Wiki.html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
   let s = Wiki.syntax_links conf mode file_path (String.concat "\n" lines) in
   let s = Util.filter_html_tags s in
-  Notes.print_sub_part conf mode sub_fname cnt0 s
+  Wiki.print_sub_part conf mode sub_fname cnt0 s
 ;
 
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
-    let lines = List.rev (Notes.rev_extract_sub_part s cnt0) in
+    let lines = List.rev (Wiki.rev_extract_sub_part s cnt0) in
     let lines =
       if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
     in
@@ -314,7 +314,7 @@ value print_mod_wdoc conf =
       (fname ^ (if cnt = "" then "" else " #" ^ cnt))
   in
   let (ntitle, s) = read_wdoc conf.lang fname in
-  Notes.print_mod_page conf "WDOC" fname title ntitle s
+  Wiki.print_mod_page conf "WDOC" fname title ntitle s
 ;
 
 value print_ok conf fdoc s =
@@ -392,7 +392,7 @@ value print_mod_wdoc_ok conf =
     else
       let s =
         match Util.p_getint conf.env "v" with
-        [ Some v -> Notes.insert_sub_part old_doc v sub_part
+        [ Some v -> Wiki.insert_sub_part old_doc v sub_part
         | None -> sub_part ]
       in
       do {
