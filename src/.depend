@@ -160,11 +160,11 @@ mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
 name.cmo: buff.cmo name.cmi 
 name.cmx: buff.cmx name.cmi 
 notes.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi history.cmi \
-    iovalue.cmi name.cmi notesLinks.cmo templ.cmi update.cmi util.cmi \
-    wiki.cmo ../wserver/wserver.cmi notes.cmi 
+    iovalue.cmi notesLinks.cmo templ.cmi update.cmi util.cmi wiki.cmo \
+    ../wserver/wserver.cmi notes.cmi 
 notes.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
-    iovalue.cmx name.cmx notesLinks.cmx templ.cmx update.cmx util.cmx \
-    wiki.cmx ../wserver/wserver.cmx notes.cmi 
+    iovalue.cmx notesLinks.cmx templ.cmx update.cmx util.cmx wiki.cmx \
+    ../wserver/wserver.cmx notes.cmi 
 notes.cmi: config.cmi def.cmi notesLinks.cmo 
 notesLinks.cmo: def.cmi 
 notesLinks.cmx: def.cmi 
@@ -172,10 +172,10 @@ num.cmo: num.cmi
 num.cmx: num.cmi 
 perso.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
     def.cmi gutil.cmi name.cmi notes.cmi num.cmi srcfile.cmi templ.cmi \
-    templAst.cmi util.cmi ../wserver/wserver.cmi perso.cmi 
+    templAst.cmi util.cmi wiki.cmo ../wserver/wserver.cmi perso.cmi 
 perso.cmx: adef.cmx config.cmi dag.cmx ../dag2html/dag2html.cmx date.cmx \
     def.cmi gutil.cmx name.cmx notes.cmx num.cmx srcfile.cmx templ.cmx \
-    templAst.cmi util.cmx ../wserver/wserver.cmx perso.cmi 
+    templAst.cmi util.cmx wiki.cmx ../wserver/wserver.cmx perso.cmi 
 perso.cmi: config.cmi def.cmi 
 phonygwd.cmo: argl.cmo secure.cmi ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx secure.cmx ../wserver/wserver.cmx 
@@ -255,9 +255,9 @@ updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx name.cmx \
     ../wserver/wserver.cmx updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi update.cmi 
 update_nldb.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi \
-    notesLinks.cmo secure.cmi wiki.cmo 
+    notesLinks.cmo secure.cmi 
 update_nldb.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx \
-    notesLinks.cmx secure.cmx wiki.cmx 
+    notesLinks.cmx secure.cmx 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
     gwlib.cmo iobase.cmi lock.cmi name.cmi num.cmi secure.cmi translate.cmi \
     version.cmo ../wserver/wserver.cmi util.cmi 
@@ -265,6 +265,8 @@ util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx \
     gwlib.cmx iobase.cmx lock.cmx name.cmx num.cmx secure.cmx translate.cmx \
     version.cmx ../wserver/wserver.cmx util.cmi 
 util.cmi: config.cmi def.cmi num.cmi 
+wiki.cmo: buff.cmo config.cmi gutil.cmi name.cmi util.cmi 
+wiki.cmx: buff.cmx config.cmi gutil.cmx name.cmx util.cmx 
 wiznotes.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi iovalue.cmi \
     secure.cmi update.cmi util.cmi ../wserver/wserver.cmi 
 wiznotes.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx iovalue.cmx \

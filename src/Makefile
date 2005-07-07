@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.44 2005-07-07 11:24:41 ddr Exp $
+# $Id: Makefile,v 4.45 2005-07-07 12:39:46 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -14,7 +14,7 @@ PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
 MOSTDESC_OBJS=adef.cmo buff.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo adef.cmo buff.cmo name.cmo gutil.cmo btree.cmo iovalue.cmo secure.cmo iobase.cmo fpla.cmo
-UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo argl.cmo notesLinks.cmo wiki.cmo update_nldb.cmo
+UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo argl.cmo notesLinks.cmo update_nldb.cmo
 
 all:: out
 
