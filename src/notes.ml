@@ -1,30 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.96 2005-07-07 12:53:03 ddr Exp $ *)
+(* $Id: notes.ml,v 4.97 2005-07-07 18:32:27 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
-open Printf;
-
-(* TLSW: Text Language Stolen to Wikipedia
-   = title level 1 =
-   == title level 2 ==
-   ...
-   ====== title level 6 ======
-   * list ul/li item
-   * list ul/li item
-   ** list ul/li item 2nd level
-   ** list ul/li item 2nd level
-   ...
-   [[first_name/surname/oc/text]] link; 'text' displayed
-   [[first_name/surname/text]] link (oc = 0); 'text' displayed
-   [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
-   [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
-   [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
-   __TOC__ : summary (unnumbered)
-   __SHORT_TOC__ : short summary (unnumbered)
-   __NOTOC__ : no (automatic) numbered summary *)
 
 value file_path conf fname =
   List.fold_right Filename.concat
@@ -34,45 +15,14 @@ value file_path conf fname =
 
 value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
-  let lines = Wiki.html_of_tlsw_lines  conf mode sub_fname cnt0 True lines [] in
   let file_path = file_path conf in
-  let lines =
-    List.map
-      (fun
-       [ "__TOC__" | "__SHORT_TOC__" ->
-           sprintf "<p>...%s...</p>"
-             (transl_nth conf "visualize/show/hide/summary" 3)
-       | "__NOTOC__" -> ""
-       | s -> s ])
-      lines
-  in
-  let s = String.concat "\n" lines in
-  let s = Wiki.syntax_links conf mode file_path s in
-  let s = string_with_macros conf [] s in
-  Wiki.print_sub_part conf mode sub_fname cnt0 s
-;
-
-value split_title_and_text s =
-  let (tit, txt) =
-    try
-      let i = String.index s '\n' in
-      let tit = String.sub s 0 i in
-      let txt = String.sub s (i + 1) (String.length s - i - 1) in
-      (tit, txt)
-    with
-    [ Not_found -> (s, "") ]
-  in
-  if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
-  || String.contains tit '['
-  then
-    ("", s)
-  else (tit, txt)
-
+  Wiki.print_sub_part conf file_path mode sub_fname cnt0 lines
+    (string_with_macros conf [])
 ;
 
 value read_notes base fnotes =
   let s = base.data.bnotes.nread fnotes RnAll in
-  split_title_and_text s
+  Wiki.split_title_and_text s
 ;
 
 value print_whole_notes conf fnotes title s =
@@ -274,7 +224,7 @@ value print_ok conf base fnotes s =
       | None -> 0 ]
     in
     History.record_notes conf base (get_v, fnotes) "mn";
-    let (title, s) = if v = 0 then split_title_and_text s else ("", s) in
+    let (title, s) = if v = 0 then Wiki.split_title_and_text s else ("", s) in
     if v = 0 && title <> "" then do {
       xtag "br";
       xtag "br";
