@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.89 2005-07-05 09:57:29 ddr Exp $ *)
+(* $Id: notes.ml,v 4.90 2005-07-07 07:30:36 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -675,7 +675,7 @@ value print conf base =
 ;
 
 value print_mod_page conf mode fname title ntitle s =
-  let s = ntitle ^ "\n" ^ s in
+  let s = if ntitle = "" then s else ntitle ^ "\n" ^ s in
   let (has_v, v) =
     match p_getint conf.env "v" with
     [ Some v -> (True, v)
@@ -820,7 +820,7 @@ value print_mod_ok conf base =
   in
   let old_notes =
     let (t, s) = read_notes base fnotes in
-    t ^ "\n" ^ s
+    if t = "" then s else t ^ "\n" ^ s
   in
   try
     if digest <> Iovalue.digest old_notes then Update.error_digest conf
