@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.93 2005-07-07 09:52:55 ddr Exp $ *)
+(* $Id: notes.ml,v 4.94 2005-07-07 11:24:41 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -212,41 +212,6 @@ value rev_syntax_lists conf wlo list rev_list =
   syntax_lists conf wlo list (List.rev rev_list)
 ;
 
-value check_file_name s =
-  loop 0 where rec loop i =
-    if i = String.length s then True
-    else
-      match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' -> loop (i + 1)
-      | _ -> False ]
-;
-
-value ext_file_link s i =
-  let slen = String.length s in
-  let j =
-    loop (i + 3) where rec loop j =
-      if j = slen then j
-      else if
-        j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
-      then j + 3
-      else loop (j + 1)
-  in
-  if j > i + 6 then
-    let b = String.sub s (i + 3) (j - i - 6) in
-    let (fname, sname, text) =
-      try
-        let k = String.index b '/' in
-        let j = try String.index b '#' with [ Not_found -> k ] in
-        (String.sub b 0 j, String.sub b j (k - j),
-         String.sub b (k + 1) (String.length b - k - 1))
-      with
-      [ Not_found -> (b, "", b) ]
-    in
-    if check_file_name fname then Some (j, fname, sname, text)
-    else None
-  else None
-;
-
 value file_path conf fname =
   List.fold_right Filename.concat
     [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
@@ -271,7 +236,7 @@ value syntax_links conf mode file_path s =
       let b = String.sub s (i + 1) (j - i - 2) in
       loop j (Buff.mstore len (sprintf "<span class=\"highlight\">%s</span>" b))
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-      match ext_file_link s i with
+      match Wiki.ext_file_link s i with
       [ Some (j, fname, sname, text) ->
           let c =
             let f = file_path fname in
@@ -712,7 +677,7 @@ value print_what_links conf base fnotes =
 value print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_file_name f then f else ""
+    [ Some f -> if Wiki.check_file_name f then f else ""
     | None -> "" ]
   in
   match p_getenv conf.env "ref" with
@@ -792,7 +757,7 @@ value print_mod_page conf mode fname title ntitle s =
 value print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_file_name f then f else ""
+    [ Some f -> if Wiki.check_file_name f then f else ""
     | None -> "" ]
   in
   let title _ =
@@ -842,7 +807,7 @@ value update_notes_links_db conf fnotes s force =
     loop [] 0 where rec loop list i =
       if i = slen then list
       else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-        match ext_file_link s i with
+        match Wiki.ext_file_link s i with
         [ Some (j, lfname, _, _) -> loop [lfname :: list] j
         | None -> loop list (i + 3) ]
       else loop list (i + 1)
@@ -866,7 +831,7 @@ value print_mod_ok conf base =
   in
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if check_file_name f then f else ""
+    [ Some f -> if Wiki.check_file_name f then f else ""
     | None -> "" ]
   in
   let old_notes =

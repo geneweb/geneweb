@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.25 2005-07-07 08:55:57 ddr Exp $ *)
+(* $Id: doc.ml,v 4.26 2005-07-07 11:24:41 ddr Exp $ *)
 
 open Config;
 
@@ -299,7 +299,7 @@ value print_mod_wdoc conf =
   let conf = {(conf) with cancel_links = True} in
   let fname =
     match Util.p_getenv conf.env "f" with
-    [ Some f -> if Notes.check_file_name f then f else ""
+    [ Some f -> if Wiki.check_file_name f then f else ""
     | None -> "" ]
   in
   let fname = if fname = "" then "index" else fname in
@@ -380,7 +380,7 @@ value print_mod_wdoc_ok conf =
   in
   let fdoc =
     match Util.p_getenv conf.env "f" with
-    [ Some f -> if Notes.check_file_name f then f else "index"
+    [ Some f -> if Wiki.check_file_name f then f else "index"
     | None -> "index" ]
   in
   let old_doc =
