@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.6 2005-07-07 11:24:41 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.7 2005-07-07 12:39:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -18,7 +18,7 @@ value notes_links s =
   loop [] 0 where rec loop list i =
     if i = slen then list
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-      match Wiki.ext_file_link s i with
+      match Gutil.ext_file_link s i with
       [ Some (j, lfname, _, _) -> loop [lfname :: list] j
       | None -> loop list (i + 3) ]
     else loop list (i + 1)

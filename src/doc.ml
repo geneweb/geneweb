@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.26 2005-07-07 11:24:41 ddr Exp $ *)
+(* $Id: doc.ml,v 4.27 2005-07-07 12:39:46 ddr Exp $ *)
 
 open Config;
 
@@ -197,7 +197,7 @@ value print_whole_wdoc conf fdoc title s =
   let s = Util.filter_html_tags s in
   let s = "<br /><br />\n" ^ s in
   let s =
-    Notes.html_with_summary_of_tlsw conf "WDOC" (wdoc_file_path conf.lang)
+    Wiki.html_with_summary_of_tlsw conf "WDOC" (wdoc_file_path conf.lang)
       fdoc s
   in
   let fname =
@@ -227,8 +227,8 @@ value print_whole_wdoc conf fdoc title s =
 value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let mode = "WDOC" in
   let file_path = wdoc_file_path conf.lang in
-  let lines = Notes.html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
-  let s = Notes.syntax_links conf mode file_path (String.concat "\n" lines) in
+  let lines = Wiki.html_of_tlsw_lines conf mode sub_fname cnt0 True lines [] in
+  let s = Wiki.syntax_links conf mode file_path (String.concat "\n" lines) in
   let s = Util.filter_html_tags s in
   Notes.print_sub_part conf mode sub_fname cnt0 s
 ;
@@ -299,7 +299,7 @@ value print_mod_wdoc conf =
   let conf = {(conf) with cancel_links = True} in
   let fname =
     match Util.p_getenv conf.env "f" with
-    [ Some f -> if Wiki.check_file_name f then f else ""
+    [ Some f -> if Gutil.check_file_name f then f else ""
     | None -> "" ]
   in
   let fname = if fname = "" then "index" else fname in
@@ -335,7 +335,7 @@ value print_ok conf fdoc s =
       | None -> (False, 0) ]
     in
     if has_v then
-      let (lines, _) = Notes.lines_list_of_string s in
+      let (lines, _) = Wiki.lines_list_of_string s in
       let lines =
         match lines with
         [ [title :: lines] when v = 0 -> [title; "<br /><br />" :: lines]
@@ -380,7 +380,7 @@ value print_mod_wdoc_ok conf =
   in
   let fdoc =
     match Util.p_getenv conf.env "f" with
-    [ Some f -> if Wiki.check_file_name f then f else "index"
+    [ Some f -> if Gutil.check_file_name f then f else "index"
     | None -> "index" ]
   in
   let old_doc =
