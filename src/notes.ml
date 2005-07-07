@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.95 2005-07-07 12:39:46 ddr Exp $ *)
+(* $Id: notes.ml,v 4.96 2005-07-07 12:53:03 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -32,101 +32,6 @@ value file_path conf fname =
     (fname ^ ".txt")
 ;
 
-value insert_sub_part s v sub_part =
-  let (lines, _) = Wiki.lines_list_of_string s in
-  let (lines, sl) =
-    loop False [] 0 Wiki.first_cnt lines
-    where rec loop sub_part_added lines lev cnt =
-      fun
-      [ [s :: sl] ->
-          let len = String.length s in
-          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-            if v = Wiki.first_cnt - 1 then
-              (if sub_part = "" then [] else [""; sub_part], [s :: sl])
-            else
-              let nlev = Wiki.section_level s len in
-              if cnt = v then
-                let lines =
-                  if sub_part = "" then lines else [""; sub_part :: lines]
-                in
-                loop True lines nlev (cnt + 1) sl
-              else if cnt > v then
-                if nlev > lev then loop sub_part_added lines lev (cnt + 1) sl
-                else (lines, [s :: sl])
-              else loop sub_part_added [s :: lines] lev (cnt + 1) sl
-            else if cnt <= v then loop sub_part_added [s :: lines] lev cnt sl
-            else loop sub_part_added lines lev cnt sl
-      | [] ->
-          let lines =
-            if sub_part_added then lines
-            else if sub_part = "" then lines
-            else [""; sub_part :: lines]
-          in
-          (lines, []) ]
-  in
-  String.concat "\n" (List.rev_append lines sl)
-;
-
-value rev_extract_sub_part s v =
-  let (lines, _) = Wiki.lines_list_of_string s in
-  loop [] 0 Wiki.first_cnt lines where rec loop lines lev cnt =
-    fun
-    [ [s :: sl] ->
-        let len = String.length s in
-        if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-          if v = Wiki.first_cnt - 1 then lines
-          else
-            let nlev = Wiki.section_level s len in
-            if cnt = v then loop [s :: lines] nlev (cnt + 1) sl
-            else if cnt > v then
-              if nlev > lev then loop [s :: lines] lev (cnt + 1) sl
-              else lines
-            else loop lines lev (cnt + 1) sl
-        else if cnt <= v then loop lines lev cnt sl
-        else loop [s :: lines] lev cnt sl
-    | [] -> lines ]
-;
-
-value extract_sub_part s v =
-  let rev_lines = rev_extract_sub_part s v in
-  String.concat "\n" (List.rev rev_lines)
-;
-
-value print_sub_part conf mode sub_fname cnt0 s =
-  let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
-  let s =
-    if cnt0 < Wiki.first_cnt && conf.wizard then
-      Wiki.string_of_modify_link conf mode 0 sfn (s = "") ^ s
-    else s
-  in
-  do {
-    tag "p" begin
-      if cnt0 >= Wiki.first_cnt then do {
-        stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 - 1) sfn begin
-          Wserver.wprint "&lt;&lt;";
-        end;
-        Wserver.wprint "\n";
-      }
-      else ();
-      if cnt0 >= Wiki.first_cnt - 1 then do {
-        stag "a" "href=\"%sm=%s%s\"" (commd conf) mode sfn begin
-          Wserver.wprint "^^";
-        end;
-        Wserver.wprint "\n";
-      }
-      else ();
-      if s <> "" then do {
-        stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 + 1) sfn begin
-          Wserver.wprint "&gt;&gt;";
-        end;
-        Wserver.wprint "\n";
-      }
-      else ();
-    end;
-    Wserver.wprint "%s\n" s
-  }
-;
-
 value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
   let lines = Wiki.html_of_tlsw_lines  conf mode sub_fname cnt0 True lines [] in
@@ -144,7 +49,7 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
   let s = String.concat "\n" lines in
   let s = Wiki.syntax_links conf mode file_path s in
   let s = string_with_macros conf [] s in
-  print_sub_part conf mode sub_fname cnt0 s
+  Wiki.print_sub_part conf mode sub_fname cnt0 s
 ;
 
 value split_title_and_text s =
@@ -212,7 +117,7 @@ value print_notes_part conf fnotes title s cnt0 =
       Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
     }
     else ();
-    let lines = List.rev (rev_extract_sub_part s cnt0) in
+    let lines = List.rev (Wiki.rev_extract_sub_part s cnt0) in
     print_notes_sub_part conf fnotes cnt0 lines;
     trailer conf;
   }
@@ -335,71 +240,6 @@ value print conf base =
       | None -> print_whole_notes conf fnotes title s ] ]
 ;
 
-value print_mod_page conf mode fname title ntitle s =
-  let s = if ntitle = "" then s else ntitle ^ "\n" ^ s in
-  let (has_v, v) =
-    match p_getint conf.env "v" with
-    [ Some v -> (True, v)
-    | None -> (False, 0) ]
-  in
-  let sub_part = if not has_v then s else extract_sub_part s v in
-  let sfn = if fname = "" then "" else ";f=" ^ fname in
-  do {
-    header conf title;
-    tag "div" "style=\"float:%s;margin-%s:5px\"" conf.right conf.left begin
-      stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
-        (if has_v then ";v=" ^ string_of_int v else "") sfn
-      begin
-        Wserver.wprint "(%s)\n"
-          (transl_nth conf "visualize/show/hide/summary" 0);
-      end;
-    end;
-    print_link_to_welcome conf False;
-    if has_v then
-      tag "p" begin
-        if v >= Wiki.first_cnt then do {
-          stag "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v - 1) sfn
-          begin
-            Wserver.wprint "&lt;&lt;";
-          end;
-          Wserver.wprint "\n";
-        }
-        else ();
-        if sub_part <> "" then do {
-          stag "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v + 1) sfn
-          begin
-            Wserver.wprint "&gt;&gt;";
-          end;
-          Wserver.wprint "\n";
-        }
-        else ();
-      end
-    else ();
-    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      tag "p" begin
-        Util.hidden_env conf;
-        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"" mode;
-        if has_v then
-          xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
-        else ();
-        if fname <> "" then
-          xtag "input" "type=\"hidden\" name=\"f\" value=\"%s\"" fname
-        else ();
-        let digest = Iovalue.digest s in
-        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
-        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"110\"" begin
-          if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
-          else ();
-        end;
-      end;
-      tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
-      end;
-    end;
-    trailer conf;
-  }
-;
-
 value print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
@@ -412,7 +252,7 @@ value print_mod conf base =
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (ntitle, s) = read_notes base fnotes in
-  print_mod_page conf "NOTES" fnotes title ntitle s
+  Wiki.print_mod_page conf "NOTES" fnotes title ntitle s
 ;
 
 value print_ok conf base fnotes s =
@@ -489,7 +329,7 @@ value print_mod_ok conf base =
     else
       let s =
         match p_getint conf.env "v" with
-        [ Some v -> insert_sub_part old_notes v sub_part
+        [ Some v -> Wiki.insert_sub_part old_notes v sub_part
         | None -> sub_part ]
       in
       let pg =
