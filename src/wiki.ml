@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.5 2005-07-07 19:30:23 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.6 2005-07-07 19:33:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -21,7 +21,7 @@ open Util;
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
-   __TOC__ : summary (unnumbered)
+   __TOC__ : summary
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
