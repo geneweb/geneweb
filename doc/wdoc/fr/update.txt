@@ -1,6 +1,6 @@
 Modifications
 
-__SHORT_TOC__
+__NOTOC__
 
 Cette partie vous indique comment faire des modifications dans une
 base de données en utilisant votre navigateur. Si le
