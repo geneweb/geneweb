@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.47 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: forum.ml,v 4.48 2005-07-08 11:40:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -446,17 +446,23 @@ value print_one_forum_message conf m pos next_pos forum_length =
       Wserver.wprint
         "<table cellspacing=\"0\" cellpadding=\"0\"><tr align=\"%s\"><td>\n"
         conf.left;
-    let mess =
-      loop True 0 0 where rec loop last_was_eoln len i =
-        if i = String.length m.m_mess then Buff.get len
-        else if m.m_mess.[i] = '\n' && last_was_eoln then
-          loop False
-            (Buff.mstore len (sprintf "<br%s><br%s>\n" conf.xhs conf.xhs))
-            (i + 1)
-        else
-          loop (m.m_mess.[i] = '\n') (Buff.store len m.m_mess.[i]) (i + 1)
-    in
-    Wserver.wprint "%s\n" (string_with_macros conf [] mess);
+    if p_getenv conf.env "wiki" = Some "on" then
+      let lines = Wiki.html_of_tlsw conf m.m_mess in
+      let s = String.concat "\n" lines in
+      let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
+      Wserver.wprint "%s\n" s
+    else
+      let mess =
+        loop True 0 0 where rec loop last_was_eoln len i =
+          if i = String.length m.m_mess then Buff.get len
+          else if m.m_mess.[i] = '\n' && last_was_eoln then
+            loop False
+              (Buff.mstore len (sprintf "<br%s><br%s>\n" conf.xhs conf.xhs))
+              (i + 1)
+          else
+            loop (m.m_mess.[i] = '\n') (Buff.store len m.m_mess.[i]) (i + 1)
+      in
+      Wserver.wprint "%s\n" (string_with_macros conf [] mess);
     if browser_doesnt_have_tables conf then ()
     else Wserver.wprint "</td></tr></table>";
     Wserver.wprint "</dd></dl>\n";
