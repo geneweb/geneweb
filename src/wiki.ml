@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.8 2005-07-08 22:34:53 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.9 2005-07-08 22:40:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -22,7 +22,7 @@ open Util;
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
    empty line : new paragraph
-   lines starting with space : displayed telles quelles
+   lines starting with space : displayed as they are
    __TOC__ : summary
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
@@ -265,6 +265,7 @@ and hotl conf wlo mode_opt sfn cnt sections_nums list =
           [ ["" :: sl] -> Some (parag, sl)
           | [s :: sl] ->
               if List.mem s.[0] ['*'; '='; ' '] then None
+              else if List.mem s toc_list then None
               else loop [s :: parag] sl
           | [] -> Some (parag, []) ]
       in
