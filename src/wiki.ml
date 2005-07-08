@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.7 2005-07-08 21:10:36 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.8 2005-07-08 22:34:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -21,6 +21,8 @@ open Util;
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
+   empty line : new paragraph
+   lines starting with space : displayed telles quelles
    __TOC__ : summary
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
@@ -114,7 +116,7 @@ value syntax_links conf mode file_path s =
     else loop (i + 1) (Buff.store len s.[i])
 ;
 
-value no_auto_toc_list = ["__NOTOC__"; "__TOC__"; "__SHORT_TOC__"];
+value toc_list = ["__NOTOC__"; "__TOC__"; "__SHORT_TOC__"];
 
 value lines_list_of_string s =
   loop False [] 0 0 where rec loop no_toc lines len i =
@@ -122,7 +124,7 @@ value lines_list_of_string s =
       (List.rev (if len = 0 then lines else [Buff.get len :: lines]), no_toc)
     else if s.[i] = '\n' then
       let line = Buff.get len in
-      let no_toc = List.mem line no_auto_toc_list || no_toc in
+      let no_toc = List.mem line toc_list || no_toc in
       loop no_toc [line :: lines] 0 (i + 1)
     else
       loop no_toc lines (Buff.store len s.[i]) (i + 1)
@@ -256,9 +258,39 @@ and hotl conf wlo mode_opt sfn cnt sections_nums list =
         | None -> list ]
       in
       hotl conf wlo mode_opt sfn cnt sections_nums list sl
+  | ["" :: sl] ->
+      let parag =
+        loop [] sl where rec loop parag =
+          fun
+          [ ["" :: sl] -> Some (parag, sl)
+          | [s :: sl] ->
+              if List.mem s.[0] ['*'; '='; ' '] then None
+              else loop [s :: parag] sl
+          | [] -> Some (parag, []) ]
+      in
+      let (list, sl) =
+        match parag with
+        [ Some ([], _) | None -> (list, sl)
+        | Some (parag, sl) -> (["</p>" :: parag @ ["<p>" :: list]], ["" :: sl]) ]
+      in
+      hotl conf wlo mode_opt sfn cnt sections_nums list sl
   | [s :: sl] ->
       let len = String.length s in
-      if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+      if len > 0 && s.[0] = '*' then
+        let (sl, rest) = select_list_lines conf [] [s :: sl] in
+        let list = syntax_ul 0 list sl in
+        hotl conf wlo mode_opt sfn cnt sections_nums list rest
+      else if len > 0 && s.[0] = ' ' then
+        let (list, rest) =
+          loop [s; "<pre>" :: list] sl where rec loop list =
+            fun
+            [ [s :: sl] ->
+                if String.length s > 0 && s.[0] = ' ' then loop [s :: list] sl
+                else (list, [s :: sl])
+            | [] -> (list, []) ]
+        in
+        hotl conf wlo mode_opt sfn cnt sections_nums ["</pre>" :: list] rest
+      else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
         let lev = section_level s len in
         let (section_num, sections_nums) =
           match sections_nums with
@@ -285,10 +317,6 @@ and hotl conf wlo mode_opt sfn cnt sections_nums list =
           | None -> [s :: list] ]
         in
         hotl conf wlo mode_opt sfn (cnt + 1) sections_nums list sl
-      else if len > 0 && s.[0] = '*' then
-        let (sl, rest) = select_list_lines conf [] [s :: sl] in
-        let list = syntax_ul 0 list sl in
-        hotl conf wlo mode_opt sfn cnt sections_nums list rest
       else
         hotl conf wlo mode_opt sfn cnt sections_nums [s :: list] sl
   | [] -> List.rev list ]
