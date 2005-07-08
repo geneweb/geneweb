@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.23 2005-06-25 16:33:38 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.24 2005-07-08 09:38:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -250,7 +250,9 @@ value print_wizard conf base wizfile wz =
     tag "table" "border=\"0\"" begin
       tag "tr" begin
         tag "td" begin
-          Wserver.wprint "%s\n" (string_with_macros conf [] s);
+          let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
+          let s = string_with_macros conf [] s in
+          Wserver.wprint "%s\n" s;
         end;
       end;
     end;
