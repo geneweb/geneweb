@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.11 2005-07-09 06:52:21 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.12 2005-07-09 10:48:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -137,10 +137,10 @@ value adjust_ul_level rev_lines old_lev new_lev =
 
 value message_txt conf i = transl_nth conf "visualize/show/hide/summary" i;
 
-value summary_of_tlsw_lines conf short lines =
-  let (rev_summary, lev, _, cnt, rev_sections_nums) =
+value sections_nums_of_tlsw_lines lines =
+  let (lev, _, cnt, rev_sections_nums) =
     List.fold_left
-      (fun (summary, prev_lev, indent_stack, cnt, sections_nums) s ->
+      (fun (prev_lev, indent_stack, cnt, sections_nums) s ->
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
@@ -173,10 +173,30 @@ value summary_of_tlsw_lines conf short lines =
             let nums = List.map fst stack in
             String.concat "." (List.rev_map string_of_int nums)
           in
+          (lev + 1, stack, cnt + 1, [(lev, section_num) :: sections_nums])
+        else (prev_lev, indent_stack, cnt, sections_nums))
+      (0, [], first_cnt, []) lines
+  in
+  List.rev rev_sections_nums
+;
+
+value summary_of_tlsw_lines conf short lines =
+  let sections_nums = sections_nums_of_tlsw_lines lines in
+  let (rev_summary, lev, cnt, _) =
+    List.fold_left
+      (fun (summary, prev_lev, cnt, sections_nums) s ->
+        let len = String.length s in
+        if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+          let slev = section_level s len in
+          let (lev, section_num, sections_nums) =
+            match sections_nums with
+            [ [(lev, sn) :: sns] -> (lev, sn, sns)
+            | [] -> (0, "fuck", []) ]
+          in
           let summary =
             let s =
               sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
-                (if short then "" else section_num ^ " - ")
+              (if short then "" else section_num ^ " - ")
                 (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
             in
             if short then
@@ -185,9 +205,10 @@ value summary_of_tlsw_lines conf short lines =
               let line = tab (lev + 1) "<li>" ^ s in
               [line :: adjust_ul_level summary (prev_lev - 1) lev]
           in
-          (summary, lev + 1, stack, cnt + 1, [section_num :: sections_nums])
-        else (summary, prev_lev, indent_stack, cnt, sections_nums))
-      ([], 0, [], first_cnt, []) lines
+          (summary, lev + 1, cnt + 1, sections_nums)
+        else
+          (summary, prev_lev, cnt, sections_nums))
+      ([], 0, first_cnt, sections_nums) lines
   in
   if cnt <= first_cnt + 2 then
     (* less that 3 paragraphs : summary abandonned *)
@@ -215,7 +236,7 @@ value summary_of_tlsw_lines conf short lines =
           "</td></tr></table>";
           "</dd></dl>"]]
     in
-    (lines, List.rev rev_sections_nums)
+    (lines, sections_nums)
 ;
 
 value string_of_modify_link conf mode cnt sfn empty =
@@ -275,11 +296,11 @@ and hotl conf wlo mode_opt sections_nums list =
       if len > 0 && s.[0] = '*' then
         let (sl, rest) = select_list_lines conf '*' [] [s :: sl] in
         let list = syntax_ul 0 list sl in
-        hotl conf wlo mode_opt sections_nums list rest
+        hotl conf wlo mode_opt sections_nums list ["" :: rest]
       else if len > 0 && s.[0] = ':' then
         let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
         let list = syntax_dd 0 list sl in
-        hotl conf wlo mode_opt sections_nums list rest
+        hotl conf wlo mode_opt sections_nums list ["" :: rest]
       else if len > 0 && s.[0] = ' ' then
         let (list, rest) =
           loop [s; "<pre>" :: list] sl where rec loop list =
@@ -291,16 +312,16 @@ and hotl conf wlo mode_opt sections_nums list =
         in
         hotl conf wlo mode_opt sections_nums ["</pre>" :: list] ["" :: rest]
       else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-        let lev = section_level s len in
+        let slev = section_level s len in
         let (section_num, sections_nums) =
           match sections_nums with
-          [ [a :: l] -> (a ^ " - ", l)
+          [ [(_, a) :: l] -> (a ^ " - ", l)
           | [] -> ("", []) ]
         in
         let s =
-          sprintf "<h%d>%s%s%s</h%d>" lev section_num
-            (String.sub s lev (len-2*lev))
-            (if lev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") lev
+          sprintf "<h%d>%s%s%s</h%d>" slev section_num
+            (String.sub s slev (len-2*slev))
+            (if slev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") slev
         in
         let (list, mode_opt) =
           match mode_opt with
@@ -324,7 +345,8 @@ and select_list_lines conf prompt list =
   fun
   [ [s :: sl] ->
       let len = String.length s in
-      if len > 0 && s.[0] = prompt then
+      if len > 0 && s.[0] = '=' then (List.rev list, [s :: sl])
+      else if len > 0 && s.[0] = prompt then
         let s = String.sub s 1 (len - 1) in
         let (s, sl) =
           loop s sl where rec loop s1 =
@@ -334,7 +356,8 @@ and select_list_lines conf prompt list =
                 let br = "<br" ^ conf.xhs ^ ">" in
                 loop (s1 ^ br ^ br) [s :: sl]
             | [s :: sl] ->
-                if String.length s > 0 && s.[0] <> prompt then
+                if String.length s > 0 && s.[0] = '=' then (s1, [s :: sl])
+                else if String.length s > 0 && s.[0] <> prompt then
                   loop (s1 ^ "\n" ^ s) sl
                 else (s1, [s :: sl])
             | [] -> (s1, []) ]
