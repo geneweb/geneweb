@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.10 2004-12-14 09:30:21 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.11 2005-07-09 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -38,7 +38,12 @@ value encode : string -> string;
 
 value decode : string -> string;
     (* [Wserver.decode s] does the inverse job than [Wserver.code],
-       restoring the initial string. *)
+       restoring the initial string. The heading and trailing spaces
+       are stripped. *)
+
+value gen_decode : bool -> string -> string;
+    (* Like above but heading and trailing spaces are stripped
+       only if bool parameter is True. [decode] = [gen_decode True]. *)
 
 value extract_param : string -> char -> list string -> string;
     (* [extract_param name stopc request] can be used to extract some
