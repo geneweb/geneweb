@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.10 2005-07-09 05:48:23 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.11 2005-07-09 06:52:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -16,6 +16,7 @@ open Util;
    ** list ul/li item 2nd level
    ** list ul/li item 2nd level
    ...
+   : indentation
    [[first_name/surname/oc/text]] link; 'text' displayed
    [[first_name/surname/text]] link (oc = 0); 'text' displayed
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
@@ -258,8 +259,8 @@ and hotl conf wlo mode_opt sections_nums list =
           fun
           [ ["" :: sl] -> Some (parag, sl)
           | [s :: sl] ->
-              if List.mem s.[0] ['*'; '='; ' '] then None
-              else if List.mem s toc_list then None
+              if List.mem s.[0] ['*'; ':'; '='; ' '] || List.mem s toc_list then
+                if parag = [] then None else Some (parag, [s :: sl])
               else loop [s :: parag] sl
           | [] -> Some (parag, []) ]
       in
@@ -272,8 +273,12 @@ and hotl conf wlo mode_opt sections_nums list =
   | [s :: sl] ->
       let len = String.length s in
       if len > 0 && s.[0] = '*' then
-        let (sl, rest) = select_list_lines conf [] [s :: sl] in
+        let (sl, rest) = select_list_lines conf '*' [] [s :: sl] in
         let list = syntax_ul 0 list sl in
+        hotl conf wlo mode_opt sections_nums list rest
+      else if len > 0 && s.[0] = ':' then
+        let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
+        let list = syntax_dd 0 list sl in
         hotl conf wlo mode_opt sections_nums list rest
       else if len > 0 && s.[0] = ' ' then
         let (list, rest) =
@@ -284,7 +289,7 @@ and hotl conf wlo mode_opt sections_nums list =
                 else (list, [s :: sl])
             | [] -> (list, []) ]
         in
-        hotl conf wlo mode_opt sections_nums ["</pre>" :: list] rest
+        hotl conf wlo mode_opt sections_nums ["</pre>" :: list] ["" :: rest]
       else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
         let lev = section_level s len in
         let (section_num, sections_nums) =
@@ -311,30 +316,30 @@ and hotl conf wlo mode_opt sections_nums list =
               ([s; n1; n2 :: list], Some (mode, sfn, cnt + 1))
           | None -> ([s :: list], None) ]
         in
-        hotl conf wlo mode_opt sections_nums list sl
+        hotl conf wlo mode_opt sections_nums list ["" :: sl]
       else
         hotl conf wlo mode_opt sections_nums [s :: list] sl
   | [] -> List.rev list ]
-and select_list_lines conf list =
+and select_list_lines conf prompt list =
   fun
   [ [s :: sl] ->
       let len = String.length s in
-      if len > 0 && s.[0] = '*' then
+      if len > 0 && s.[0] = prompt then
         let s = String.sub s 1 (len - 1) in
         let (s, sl) =
           loop s sl where rec loop s1 =
             fun
             [ [""; s :: sl]
-              when String.length s > 1 && s.[0] = '*' && s.[1] = '*' ->
+              when String.length s > 1 && s.[0] = prompt && s.[1] = prompt ->
                 let br = "<br" ^ conf.xhs ^ ">" in
                 loop (s1 ^ br ^ br) [s :: sl]
             | [s :: sl] ->
-                if String.length s > 0 && s.[0] <> '*' then
+                if String.length s > 0 && s.[0] <> prompt then
                   loop (s1 ^ "\n" ^ s) sl
                 else (s1, [s :: sl])
             | [] -> (s1, []) ]
         in
-        select_list_lines conf [s :: list] sl
+        select_list_lines conf prompt [s :: list] sl
       else (List.rev list, [s :: sl])
   | [] -> (List.rev list, []) ]
 and syntax_ul lev list sl =
@@ -363,6 +368,9 @@ and syntax_ul lev list sl =
       | [] -> list ]
   in
   [tab lev "</ul>" :: list]
+and syntax_dd lev list sl =
+  let list = ["<dd>"; "<dl>" :: list] in
+  ["</dl>"; "</dd>" :: List.rev_append sl list]
 ;
 
 value html_with_summary_of_tlsw conf mode file_path sub_fname s =
