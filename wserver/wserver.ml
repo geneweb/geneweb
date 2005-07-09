@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.24 2005-03-01 19:09:51 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.25 2005-07-09 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -25,7 +25,7 @@ value hexa_val conf =
   | _ -> 0 ]
 ;
 
-value decode s =
+value gen_decode strip_spaces s =
   let rec need_decode i =
     if i < String.length s then
       match s.[i] with
@@ -70,9 +70,12 @@ value decode s =
   if need_decode 0 then
     let len = compute_len 0 0 in
     let s1 = String.create len in
-    strip_heading_and_trailing_spaces (copy_decode_in s1 0 0)
+    let s = copy_decode_in s1 0 0 in
+    if strip_spaces then strip_heading_and_trailing_spaces s else s
   else s
 ;
+
+value decode = gen_decode True;
 
 value special =
   fun

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.41 2005-07-07 12:39:46 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.42 2005-07-09 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1043,14 +1043,16 @@ value strip_all_trailing_spaces s =
       | c -> do { Buffer.add_char b c; loop (i + 1) } ]
 ;
 
-value strip_spaces str =
+value gen_strip_spaces strip_heading str =
   let start =
-    loop 0 where rec loop i =
-      if i == String.length str then i
-      else
-        match str.[i] with
-        [ ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
-        | _ -> i ]
+    if strip_heading then
+      loop 0 where rec loop i =
+        if i == String.length str then i
+        else
+          match str.[i] with
+          [ ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
+          | _ -> i ]
+    else 0
   in
   let stop =
     loop (String.length str - 1) where rec loop i =
@@ -1064,6 +1066,8 @@ value strip_spaces str =
   else if start > stop then ""
   else String.sub str start (stop - start)
 ;
+
+value strip_spaces = gen_strip_spaces True;
 
 value nbc c =
   if Char.code c < 0b10000000 then 1

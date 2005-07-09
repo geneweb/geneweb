@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.49 2005-07-09 05:48:23 ddr Exp $ *)
+(* $Id: forum.ml,v 4.50 2005-07-09 12:09:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -562,6 +562,11 @@ value get conf key =
   | None -> failwith (key ^ " unbound") ]
 ;
 
+value get1 conf key =
+  try Wserver.gen_decode False (List.assoc key conf.env) with
+  [ Not_found -> failwith (key ^ " unbound") ]
+;
+
 value forum_add conf base ident comm =
   let email = Gutil.strip_spaces (get conf "Email") in
   let subject = Gutil.strip_spaces (get conf "Subject") in
@@ -633,7 +638,7 @@ value forum_add conf base ident comm =
 
 value print_add_ok conf base =
   let ident = Gutil.strip_spaces (get conf "Ident") in
-  let comm = Gutil.strip_spaces (get conf "Text") in
+  let comm = Gutil.gen_strip_spaces False (get1 conf "Text") in
   if not (can_post conf) then incorrect_request conf
   else if ident = "" || comm = "" then print conf base
   else
