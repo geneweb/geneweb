@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.25 2005-07-08 11:40:04 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.26 2005-07-09 05:48:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -245,15 +245,15 @@ value print_wizard conf base wizfile wz =
   let (s, date) = read_wizard_notes wfile in
   do {
     header conf title;
-    print_link_to_welcome conf False;
+    print_link_to_welcome conf True;
     html_p conf;
     tag "table" "border=\"0\"" begin
       tag "tr" begin
         tag "td" begin
+          let s = string_with_macros conf [] s in
           let lines = Wiki.html_of_tlsw conf s in
           let s = String.concat "\n" lines in
           let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
-          let s = string_with_macros conf [] s in
           Wserver.wprint "%s\n" s;
         end;
       end;

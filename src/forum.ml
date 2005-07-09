@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.48 2005-07-08 11:40:04 ddr Exp $ *)
+(* $Id: forum.ml,v 4.49 2005-07-09 05:48:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -15,6 +15,7 @@ type message =
     m_email : string;
     m_access : string;
     m_subject : string;
+    m_wiki : string;
     m_mess : string }
 ;
 
@@ -194,6 +195,7 @@ value print_headers conf =
                 let (_, s) = get_var ic "Email:" s in
                 let (access, s) = get_var ic "Access:" s in
                 let (subject, s) = get_var ic "Subject:" s in
+                let (_, s) = get_var ic "Wiki:" s in
                 let (_, s) = get_var ic "Text:" s in
                 let (text, s) =
                   if subject = "" || subject = "-" then
@@ -315,6 +317,7 @@ value get_message conf pos =
               let (email, s) = get_var ic "Email:" s in
               let (access, s) = get_var ic "Access:" s in
               let (subject, s) = get_var ic "Subject:" s in
+              let (wiki, s) = get_var ic "Wiki:" s in
               let (_, s) = get_var ic "Text:" s in
               let (mess, s) =
                 get_mess 0 s where rec get_mess len s =
@@ -329,7 +332,7 @@ value get_message conf pos =
                 let m =
                   {m_time = time; m_ident = ident; m_wizard = wizard;
                    m_friend = friend; m_email = email; m_access = access;
-                   m_subject = subject; m_mess = mess}
+                   m_subject = subject; m_wiki = wiki; m_mess = mess}
                 in
                 Some (m, pos, ic_len - pos_in ic, ic_len)
               else None
@@ -441,13 +444,9 @@ value print_one_forum_message conf m pos next_pos forum_length =
       Wserver.wprint "<em>%s</em>\n" m.m_time;
     end;
     Wserver.wprint "<dl><dd>\n";
-    if browser_doesnt_have_tables conf then ()
-    else
-      Wserver.wprint
-        "<table cellspacing=\"0\" cellpadding=\"0\"><tr align=\"%s\"><td>\n"
-        conf.left;
-    if p_getenv conf.env "wiki" = Some "on" then
-      let lines = Wiki.html_of_tlsw conf m.m_mess in
+    if m.m_wiki = "on" || p_getenv conf.env "wiki" = Some "on" then
+      let s = string_with_macros conf [] m.m_mess in
+      let lines = Wiki.html_of_tlsw conf s in
       let s = String.concat "\n" lines in
       let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
       Wserver.wprint "%s\n" s
@@ -463,8 +462,6 @@ value print_one_forum_message conf m pos next_pos forum_length =
             loop (m.m_mess.[i] = '\n') (Buff.store len m.m_mess.[i]) (i + 1)
       in
       Wserver.wprint "%s\n" (string_with_macros conf [] mess);
-    if browser_doesnt_have_tables conf then ()
-    else Wserver.wprint "</td></tr></table>";
     Wserver.wprint "</dd></dl>\n";
     if m.m_wizard <> "" && conf.wizard && conf.user = m.m_wizard &&
       passwd_in_file conf
@@ -597,6 +594,7 @@ value forum_add conf base ident comm =
         fprintf oc "Access: %s\n" access;
         let subject = if subject = "" then "-" else subject in
         fprintf oc "Subject: %s\n" subject;
+        fprintf oc "Wiki: on\n";
         fprintf oc "Text:\n";
         let rec loop i bol =
           if i == String.length comm then ()
