@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.13 2005-07-10 12:46:00 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.14 2005-07-10 17:43:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -252,7 +252,9 @@ value string_of_modify_link conf mode cnt sfn empty =
 
 value rec html_of_tlsw conf s =
   let (lines, _) = lines_list_of_string s in
-  hotl conf (Some lines) None [] [] ["" :: lines]
+  let sections_nums = sections_nums_of_tlsw_lines lines in
+  let mode_opt = Some ("", "", first_cnt, False) in
+  hotl conf (Some lines) mode_opt sections_nums [] ["" :: lines]
 and hotl conf wlo mode_opt sections_nums list =
   fun
   [ ["__NOTOC__" :: sl] -> hotl conf wlo mode_opt sections_nums list sl
@@ -327,16 +329,16 @@ and hotl conf wlo mode_opt sections_nums list =
         in
         let (list, mode_opt) =
           match mode_opt with
-          [ Some (mode, sfn, cnt) ->
+          [ Some (mode, sfn, cnt, mod_auth) ->
               let n1 =
-                if conf.wizard then
+                if mod_auth then
                   string_of_modify_link conf mode cnt sfn False
                 else ""
               in
               let n2 =
                 sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
               in
-              ([s; n1; n2 :: list], Some (mode, sfn, cnt + 1))
+              ([s; n1; n2 :: list], Some (mode, sfn, cnt + 1, mod_auth))
           | None -> ([s :: list], None) ]
         in
         hotl conf wlo mode_opt sections_nums list ["" :: sl]
@@ -412,11 +414,11 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
       | [] -> (lines_bef, []) ]
   in
   let lines_before_summary =
-    hotl conf (Some lines) (Some (mode, sub_fname, first_cnt))
+    hotl conf (Some lines) (Some (mode, sub_fname, first_cnt, conf.wizard))
       [] [] (List.rev rev_lines_before_summary)
   in
   let lines_after_summary =
-    hotl conf (Some lines) (Some (mode, sub_fname, first_cnt))
+    hotl conf (Some lines) (Some (mode, sub_fname, first_cnt, conf.wizard))
       sections_nums [] lines
   in
   let s =
@@ -461,7 +463,8 @@ value print_sub_part conf file_path mode sub_fname cnt0 lines ending_filter =
        | s -> s ])
       lines
   in
-  let lines = hotl conf None (Some (mode, sub_fname, cnt0)) [] [] lines in
+  let mode_opt = Some (mode, sub_fname, cnt0, conf.wizard) in
+  let lines = hotl conf None mode_opt [] [] lines in
   let s = String.concat "\n" lines in
   let s = syntax_links conf mode file_path s in
   let s = ending_filter s in
