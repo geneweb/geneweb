@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.26 2005-07-09 05:48:23 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.27 2005-07-10 17:43:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -246,6 +246,9 @@ value print_wizard conf base wizfile wz =
   do {
     header conf title;
     print_link_to_welcome conf True;
+    match Util.open_etc_file "summary" with
+    [ Some ic -> Templ.copy_from_templ conf [] ic
+    | None -> () ];
     html_p conf;
     tag "table" "border=\"0\"" begin
       tag "tr" begin
