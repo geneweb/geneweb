@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.12 2005-07-09 10:48:25 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.13 2005-07-10 12:46:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -23,7 +23,7 @@ open Util;
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
    empty line : new paragraph
-   lines starting with space : displayed as they are
+   (deleted ------> lines starting with space : displayed as they are)
    __TOC__ : summary
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
@@ -280,7 +280,7 @@ and hotl conf wlo mode_opt sections_nums list =
           fun
           [ ["" :: sl] -> Some (parag, sl)
           | [s :: sl] ->
-              if List.mem s.[0] ['*'; ':'; '='; ' '] || List.mem s toc_list then
+              if List.mem s.[0] ['*'; ':'; '='] || List.mem s toc_list then
                 if parag = [] then None else Some (parag, [s :: sl])
               else loop [s :: parag] sl
           | [] -> Some (parag, []) ]
@@ -301,6 +301,7 @@ and hotl conf wlo mode_opt sections_nums list =
         let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
         let list = syntax_dd 0 list sl in
         hotl conf wlo mode_opt sections_nums list ["" :: rest]
+(*
       else if len > 0 && s.[0] = ' ' then
         let (list, rest) =
           loop [s; "<pre>" :: list] sl where rec loop list =
@@ -311,6 +312,7 @@ and hotl conf wlo mode_opt sections_nums list =
             | [] -> (list, []) ]
         in
         hotl conf wlo mode_opt sections_nums ["</pre>" :: list] ["" :: rest]
+*)
       else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
         let slev = section_level s len in
         let (section_num, sections_nums) =
