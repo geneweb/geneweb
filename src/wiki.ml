@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.16 2005-07-11 17:06:44 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.17 2005-07-11 20:03:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -295,7 +295,7 @@ and hotl conf wlo mode_opt sections_nums list =
           [ ["" :: sl] -> Some (parag, sl, False)
           | [s :: sl] ->
               if s.[0] = ' ' then loop2 [s :: parag] sl
-              else loop1 [s :: parag] sl
+              else loop1 parag [s :: sl]
           | [] -> Some (parag, [], True) ]
         in
         loop1 [] sl
