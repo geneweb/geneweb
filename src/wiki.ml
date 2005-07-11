@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.14 2005-07-10 17:43:57 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.15 2005-07-11 17:04:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -278,19 +278,33 @@ and hotl conf wlo mode_opt sections_nums list =
       hotl conf wlo mode_opt sections_nums list sl
   | ["" :: sl] ->
       let parag =
-        loop [] sl where rec loop parag =
+        let rec loop1 parag =
           fun
-          [ ["" :: sl] -> Some (parag, sl)
+          [ ["" :: sl] -> Some (parag, sl, True)
           | [s :: sl] ->
               if List.mem s.[0] ['*'; ':'; '='] || List.mem s toc_list then
-                if parag = [] then None else Some (parag, [s :: sl])
-              else loop [s :: parag] sl
-          | [] -> Some (parag, []) ]
+                if parag = [] then None else Some (parag, [s :: sl], True)
+              else if s.[0] = ' ' && parag = [] then
+               loop2 [s] sl
+              else loop1 [s :: parag] sl
+          | [] -> Some (parag, [], True) ]
+        and loop2 parag = 
+          fun
+          [ ["" :: sl] -> Some (parag, sl, False)
+          | [s :: sl] ->
+              if s.[0] = ' ' then loop2 [s :: parag] sl
+              else loop1 [s :: parag] sl
+          | [] -> Some (parag, [], True) ]
+        in
+        loop1 [] sl
       in
       let (list, sl) =
         match parag with
-        [ Some ([], _) | None -> (list, sl)
-        | Some (parag, sl) -> (["</p>" :: parag @ ["<p>" :: list]], ["" :: sl]) ]
+        [ Some ([], _, _) | None -> (list, sl)
+        | Some (parag, sl, False) when List.length parag >= 2 ->
+            (["</pre>" :: parag @ ["<pre>" :: list]], ["" :: sl])
+        | Some (parag, sl, _) ->
+            (["</p>" :: parag @ ["<p>" :: list]], ["" :: sl]) ]
       in
       hotl conf wlo mode_opt sections_nums list sl
   | [s :: sl] ->
