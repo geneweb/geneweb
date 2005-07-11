@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.15 2005-07-11 17:04:52 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.16 2005-07-11 17:06:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -23,7 +23,9 @@ open Util;
    [[[notes_subfile/text]]] link to a sub-file; 'text' displayed
    [[[notes_subfile]]] link to a sub-file; 'notes_subfile' displayed
    empty line : new paragraph
-   (deleted ------> lines starting with space : displayed as they are)
+   lines starting with space : displayed as they are (providing 1/ there
+     are at least two 2/ there is empty lines before and after the group
+     of lines).
    __TOC__ : summary
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
@@ -317,18 +319,6 @@ and hotl conf wlo mode_opt sections_nums list =
         let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
         let list = syntax_dd 0 list sl in
         hotl conf wlo mode_opt sections_nums list ["" :: rest]
-(*
-      else if len > 0 && s.[0] = ' ' then
-        let (list, rest) =
-          loop [s; "<pre>" :: list] sl where rec loop list =
-            fun
-            [ [s :: sl] ->
-                if String.length s > 0 && s.[0] = ' ' then loop [s :: list] sl
-                else (list, [s :: sl])
-            | [] -> (list, []) ]
-        in
-        hotl conf wlo mode_opt sections_nums ["</pre>" :: list] ["" :: rest]
-*)
       else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
         let slev = section_level s len in
         let (section_num, sections_nums) =
