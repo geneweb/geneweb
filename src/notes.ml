@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.99 2005-07-12 07:11:15 ddr Exp $ *)
+(* $Id: notes.ml,v 4.100 2005-07-12 07:18:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -242,11 +242,10 @@ value update_notes_links_db conf fnotes s force =
   let list =
     loop [] 0 where rec loop list i =
       if i = slen then list
-      else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-        match NotesLinks.ext_file_link s i with
+      else
+        match NotesLinks.misc_notes_link s i with
         [ Some (j, lfname, _, _) -> loop [lfname :: list] j
-        | None -> loop list (i + 3) ]
-      else loop list (i + 1)
+        | None -> loop list (i + 1) ]
   in
   if not force && list = [] then ()
   else

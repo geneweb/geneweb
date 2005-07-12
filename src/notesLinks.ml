@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.3 2005-07-12 07:11:15 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.4 2005-07-12 07:18:29 ddr Exp $ *)
 
 open Def;
 
@@ -20,28 +20,30 @@ value check_file_name s =
       | _ -> False ]
 ;
 
-value ext_file_link s i =
+value misc_notes_link s i =
   let slen = String.length s in
-  let j =
-    loop (i + 3) where rec loop j =
-      if j = slen then j
-      else if
-        j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
-      then j + 3
-      else loop (j + 1)
-  in
-  if j > i + 6 then
-    let b = String.sub s (i + 3) (j - i - 6) in
-    let (fname, sname, text) =
-      try
-        let k = String.index b '/' in
-        let j = try String.index b '#' with [ Not_found -> k ] in
-        (String.sub b 0 j, String.sub b j (k - j),
-         String.sub b (k + 1) (String.length b - k - 1))
-      with
-      [ Not_found -> (b, "", b) ]
+  if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
+    let j =
+      loop (i + 3) where rec loop j =
+        if j = slen then j
+        else if
+          j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
+        then j + 3
+        else loop (j + 1)
     in
-    if check_file_name fname then Some (j, fname, sname, text)
+    if j > i + 6 then
+      let b = String.sub s (i + 3) (j - i - 6) in
+      let (fname, sname, text) =
+        try
+          let k = String.index b '/' in
+          let j = try String.index b '#' with [ Not_found -> k ] in
+          (String.sub b 0 j, String.sub b j (k - j),
+           String.sub b (k + 1) (String.length b - k - 1))
+        with
+        [ Not_found -> (b, "", b) ]
+      in
+      if check_file_name fname then Some (j, fname, sname, text)
+      else None
     else None
   else None
 ;
