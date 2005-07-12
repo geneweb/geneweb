@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.28 2005-07-09 12:09:34 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.29 2005-07-12 07:11:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -138,9 +138,6 @@ value find_free_occ : base -> string -> string -> int -> int;
 
 value input_lexicon :
   string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;
-
-value check_file_name : string -> bool;
-value ext_file_link : string -> int -> option (int * string * string * string);
 
 value utf_8_of_iso_8859_1 : string -> string;
 value iso_8859_1_of_utf_8 : string -> string;

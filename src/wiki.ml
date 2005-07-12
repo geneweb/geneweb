@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.17 2005-07-11 20:03:23 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.18 2005-07-12 07:11:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -53,11 +53,13 @@ value syntax_links conf mode file_path s =
     then
       loop (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '{' then
-      let j = try String.index_from s (i+1) '}' + 1 with [ Not_found -> slen ] in
+      let j =
+        try String.index_from s (i+1) '}' + 1 with [ Not_found -> slen ]
+      in
       let b = String.sub s (i + 1) (j - i - 2) in
       loop j (Buff.mstore len (sprintf "<span class=\"highlight\">%s</span>" b))
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-      match Gutil.ext_file_link s i with
+      match NotesLinks.ext_file_link s i with
       [ Some (j, fname, sname, text) ->
           let c =
             let f = file_path fname in

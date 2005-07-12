@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.98 2005-07-07 19:30:23 ddr Exp $ *)
+(* $Id: notes.ml,v 4.99 2005-07-12 07:11:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -178,7 +178,7 @@ value print_what_links conf base fnotes =
 value print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if Gutil.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f then f else ""
     | None -> "" ]
   in
   match p_getenv conf.env "ref" with
@@ -193,7 +193,7 @@ value print conf base =
 value print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if Gutil.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f then f else ""
     | None -> "" ]
   in
   let title _ =
@@ -243,7 +243,7 @@ value update_notes_links_db conf fnotes s force =
     loop [] 0 where rec loop list i =
       if i = slen then list
       else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-        match Gutil.ext_file_link s i with
+        match NotesLinks.ext_file_link s i with
         [ Some (j, lfname, _, _) -> loop [lfname :: list] j
         | None -> loop list (i + 3) ]
       else loop list (i + 1)
@@ -267,7 +267,7 @@ value print_mod_ok conf base =
   in
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if Gutil.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f then f else ""
     | None -> "" ]
   in
   let old_notes =
