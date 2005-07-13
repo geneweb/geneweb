@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.51 2005-07-02 16:36:23 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.52 2005-07-13 20:37:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -108,20 +108,6 @@ value verbose = ref True;
 value trace s =
   if verbose.val then do { Printf.eprintf "*** %s\n" s; flush stderr }
   else ()
-;
-
-value remove_file f = try Sys.remove f with [ Sys_error _ -> () ];
-value remove_dir d =
-  do {
-    try
-      let files = Sys.readdir d in
-      for i = 0 to Array.length files - 1 do {
-        try Sys.remove (Filename.concat d files.(i)) with _ -> ();
-      }
-    with
-    [ Sys_error _ -> () ];
-    try Unix.rmdir d with [ Unix.Unix_error _ _ _ -> () ];
-  }
 ;
 
 value output_value_header_size = 20;

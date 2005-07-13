@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 4.20 2005-06-09 09:24:27 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.21 2005-07-13 20:37:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000n";
+value magic_gwo = "GnWo000o";
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
@@ -16,7 +16,8 @@ type syntax_o =
       gen_descend (gen_person iper string)
   | Notes of key and string
   | Relations of somebody and sex and list (gen_relation somebody string)
-  | Bnotes of string and string ]
+  | Bnotes of string and string
+  | Wnotes of string and string ]
 ;
 
 type encoding = [ E_utf_8 | E_iso_8859_1 ];
@@ -862,6 +863,13 @@ value read_family ic fname =
             F_some (Notes key notes, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
+  | Some (str, ["wizard-note" :: _]) ->
+      let wizid =
+        let len = String.length "wizard-note " in
+        String.sub str len (String.length str - len)
+      in
+      let notes = read_notes_db ic "end wizard-note" in
+      F_some (Wnotes wizid notes, read_line ic)
   | Some (str, ["rel" :: l]) ->
       let (sb, _, l) = parse_parent str l in
       let (sex, l) =

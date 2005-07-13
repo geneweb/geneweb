@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.29 2005-07-12 07:11:15 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.30 2005-07-13 20:37:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -141,6 +141,9 @@ value input_lexicon :
 
 value utf_8_of_iso_8859_1 : string -> string;
 value iso_8859_1_of_utf_8 : string -> string;
+
+value remove_file : string -> unit;
+value remove_dir : string -> unit;
 
 (* for compatibility databases version <= 4.10 which are not in utf-8 *)
 

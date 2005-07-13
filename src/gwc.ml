@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.42 2005-07-02 16:36:23 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.43 2005-07-13 20:37:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -37,6 +37,7 @@ type gen =
     g_fcnt : mutable int;
     g_scnt : mutable int;
     g_base : cbase;
+    g_wiznotes : mutable list (string * string);
     g_patch_p : Hashtbl.t int person;
     g_def : mutable array bool;
     g_separate : mutable bool;
@@ -610,6 +611,10 @@ value insert_bnotes fname gen nfname str =
   }
 ;
 
+value insert_wiznote fname gen wizid str =
+  gen.g_wiznotes := [(wizid, str) :: gen.g_wiznotes]
+;
+
 value map_option f =
   fun
   [ Some x -> Some (f x)
@@ -656,7 +661,8 @@ value insert_syntax fname gen =
   [ Family cpl fs ms witl fam des -> insert_family gen cpl fs ms witl fam des
   | Notes key str -> insert_notes fname gen key str
   | Relations sb sex rl -> insert_relations fname gen sb sex rl
-  | Bnotes nfname str -> insert_bnotes fname gen nfname str ]
+  | Bnotes nfname str -> insert_bnotes fname gen nfname str
+  | Wnotes wizid str -> insert_wiznote fname gen wizid str ]
 ;
 
 value insert_comp_families gen (x, separate, shift) =
@@ -865,6 +871,7 @@ value link gwo_list bname =
       {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
        g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
        g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
+       g_wiznotes = [];
        g_def = [| |]; g_separate = False; g_shift = 0; g_errored = False;
        g_per_index = open_out_bin tmp_per_index;
        g_per = open_out_bin tmp_per;
@@ -908,7 +915,35 @@ value link gwo_list bname =
     if not gen.g_errored then
       if do_consang.val then ConsangAll.compute base True False else ()
     else exit 2;
-    base
+    (base, gen.g_wiznotes)
+  }
+;
+
+value write_file_contents fname text =
+  let oc = open_out fname in
+  do {
+    output_string oc text;
+    close_out oc;
+  }
+;
+
+value output_wizard_notes bname wiznotes =
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let wizdir = Filename.concat bdir "wiznotes" in
+  do {
+    Gutil.remove_dir wizdir;
+    if wiznotes = [] then ()
+    else
+      do {
+        try Unix.mkdir wizdir 0o755 with _ -> ();
+        List.iter
+          (fun (wizid, text) ->
+             let fname = Filename.concat wizdir wizid ^ ".txt" in
+             write_file_contents fname text)
+          wiznotes;
+      }
   }
 ;
 
@@ -1015,10 +1050,11 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Iobase.lock_file out_file.val) with
       [ Accept ->
-          let base = link (List.rev gwo.val) out_file.val in
+          let (base, wiznotes) = link (List.rev gwo.val) out_file.val in
           do {
             Gc.compact ();
             Iobase.output out_file.val base;
+            output_wizard_notes out_file.val wiznotes;
             output_command_line out_file.val;
             output_particles_file out_file.val base.data.particles;
           }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.101 2005-07-13 19:01:59 ddr Exp $ *)
+(* $Id: notes.ml,v 4.102 2005-07-13 20:37:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -341,9 +341,13 @@ value print_misc_notes conf base =
                else if String.length s < String.length f then f
                else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
              in
+             let c =
+               let f = file_path conf f in
+               if Sys.file_exists f then "" else " style=\"color:red\""
+             in
              tag "li" begin
                Wserver.wprint "<tt>[";
-               stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) f begin
+               stag "a" "href=\"%sm=NOTES;f=%s\"%s" (commd conf) f c begin
                  Wserver.wprint "%s" f;
                end;
                Wserver.wprint "]</tt> : %s\n" txt;
