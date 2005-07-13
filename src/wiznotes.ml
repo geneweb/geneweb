@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.27 2005-07-10 17:43:57 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.28 2005-07-13 19:16:45 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -307,7 +307,9 @@ value print_wizard_mod conf base wizfile wz nn =
   if digest = Iovalue.digest on then do {
     if nn <> on then do {
       try Unix.mkdir wddir 0o755 with [ Unix.Unix_error _ _ _ -> () ];
-      write_wizard_notes fname nn
+      write_wizard_notes fname nn;
+      let pg = NotesLinks.PgWizard wz in
+      Notes.update_notes_links_db conf pg nn True
     }
     else ();
     print_main conf base wizfile
