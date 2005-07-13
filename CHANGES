@@ -1,6 +1,10 @@
 GeneWeb version 5.00
 --------------------
 
+Preliminary remark: I neglected to record the changes between January
+2005 and July 2005, but there are a lot of them... I complete the
+missing part when I have some time (and some courage).
+
 This Version allows to mix pages in different languages (using utf-8
 encoding). Databases version <= 4.10 can be read but still in old
 encoding. By re-creating the database, the new encoding is set.
@@ -12,6 +16,9 @@ The new version number (5.00) is in honour of this new encoding.
   - [20 Dec 04] Fixed bug: in display places/surnames, when vars are used
     in base configuration file (base.gwf), the alphabetical order was done
     before the vars substitutions.
+
+* GeneWeb compiler (gwc) and GeneWeb uncompiler (gwu)
+  - [13 Jul 05] Wizard notes are now saved and restored.
 
 * GeneWeb databases Transfer Program (gwtp)
   - [08 Jan 05] Fixed bug: databases created by version 4.10 could

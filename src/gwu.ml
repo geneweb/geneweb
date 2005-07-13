@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.43 2005-06-11 05:16:31 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.44 2005-07-13 20:37:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -831,6 +831,18 @@ value find_person base p1 po p2 =
       } ]
 ;
 
+value read_file_contents fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let len = ref 0 in
+      try
+        loop () where rec loop () =
+          do { len.val := Buff.store len.val (input_char ic); loop () }
+      with
+      [ End_of_file -> Buff.get len.val ]                   
+  | None -> "" ]
+;
+
 (* Separate option *)
 
 type separate =
@@ -1041,7 +1053,7 @@ value censor = ref 0;
 value with_siblings = ref False;
 value maxlev = ref (-1);
 
-value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
+value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
   let to_separate = separate base in
   let anc =
     match anc with
@@ -1148,20 +1160,39 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       loop gen.ext_files;
       List.iter
         (fun (f, r) ->
-             do {
-             let s = base.data.bnotes.nread f RnAll in
-             if s <> "" then do {
-               if not first.val then fprintf oc "\n" else ();
-               first.val := False;
-               fprintf oc "# extended page \"%s\" used by:\n" f;
-               List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
-               fprintf oc "page-ext %s\n" f;
-               rs_printf oc s;
-               fprintf oc "\nend page-ext\n";
-             }
-             else ()
-           })
+           let s = base.data.bnotes.nread f RnAll in
+           if s <> "" then do {
+             if not first.val then fprintf oc "\n" else ();
+             first.val := False;
+             fprintf oc "# extended page \"%s\" used by:\n" f;
+             List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
+             fprintf oc "page-ext %s\n" f;
+             rs_printf oc s;
+             fprintf oc "\nend page-ext\n";
+           }
+           else ())
         (List.rev gen.ext_files);
+      try
+        let files = Sys.readdir (Filename.concat in_dir "wiznotes") in
+        do {
+          for i = 0 to Array.length files - 1 do {
+            let file = files.(i) in
+            if Filename.check_suffix file ".txt" then do {
+              let wizid = Filename.chop_suffix file ".txt" in
+              let wfile =
+                List.fold_right Filename.concat [in_dir; "wiznotes"] file
+              in
+              let s = read_file_contents wfile in
+              fprintf oc "\nwizard-note %s\n" wizid;
+              rs_printf oc s;
+              fprintf oc "end wizard-note\n";
+              flush stderr;
+            }
+            else ()
+          };
+        }
+      with
+      [ Sys_error _ -> () ];
     }
     else ();
   }
@@ -1355,6 +1386,10 @@ value main () =
       else None
     in
     let base = Iobase.input in_file.val in
+    let in_dir =
+      if Filename.check_suffix in_file.val ".gwb" then in_file.val
+      else in_file.val ^ ".gwb"
+    in
     let src_oc_list = ref [] in
     let _ = base.data.ascends.array () in
     let _ = base.data.strings.array () in
@@ -1371,7 +1406,7 @@ value main () =
       if out_file.val = "" then stdout else open_out out_file.val
     in
     if raw_output.val then () else fprintf out_oc "encoding: utf-8\n\n";
-    gwu base out_dir.val out_oc src_oc_list anc desc ancdesc;
+    gwu base in_dir out_dir.val out_oc src_oc_list anc desc ancdesc;
     List.iter (fun (src, (oc, _)) -> do { flush oc; close_out oc })
       src_oc_list.val;
     flush out_oc;
