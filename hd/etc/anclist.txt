@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.44 2005-06-22 19:46:59 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.45 2005-07-13 01:28:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -135,8 +135,10 @@
   %( surnames list %)
   <ul>
   %foreach;ancestor_surname(evar.v)
-    <li><a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
+    <li>%nn;
+    %if;(evar.cgl != "on")<a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
     %ancestor.surname_end;%ancestor.surname_begin;</a>%nn;
+    %else;%ancestor.surname_end;%ancestor.surname_begin;%end;
     %if;(ancestor.nb_times > 1) (%ancestor.nb_times;)%end;
     ; %ancestor.place;
     ; %ancestor.date_begin.year;-%ancestor.date_end.year;</li>
