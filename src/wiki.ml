@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.19 2005-07-12 07:18:29 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.20 2005-07-13 09:37:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -482,26 +482,22 @@ value print_sub_part conf file_path mode sub_fname cnt0 lines ending_filter =
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   do {
     tag "p" begin
-      if cnt0 >= first_cnt then do {
-        stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 - 1) sfn begin
+      if cnt0 >= first_cnt then
+        stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 - 1) sfn
+        begin
           Wserver.wprint "&lt;&lt;";
-        end;
-        Wserver.wprint "\n";
-      }
+        end
       else ();
-      if cnt0 >= first_cnt - 1 then do {
-        stag "a" "href=\"%sm=%s%s\"" (commd conf) mode sfn begin
+      if cnt0 >= first_cnt - 1 then
+        stagn "a" "href=\"%sm=%s%s\"" (commd conf) mode sfn begin
           Wserver.wprint "^^";
-        end;
-        Wserver.wprint "\n";
-      }
+        end
       else ();
-      if s <> "" then do {
-        stag "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 + 1) sfn begin
+      if s <> "" then
+        stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 + 1) sfn
+        begin
           Wserver.wprint "&gt;&gt;";
-        end;
-        Wserver.wprint "\n";
-      }
+        end
       else ();
     end;
     Wserver.wprint "%s\n" s
@@ -531,21 +527,20 @@ value print_mod_page conf mode fname title ntitle s =
     print_link_to_welcome conf False;
     if has_v then
       tag "p" begin
-        if v >= first_cnt then do {
-          stag "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v - 1) sfn
+        if v >= first_cnt then
+          stagn "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v - 1) sfn
           begin
             Wserver.wprint "&lt;&lt;";
-          end;
-          Wserver.wprint "\n";
-        }
+          end
         else ();
-        if sub_part <> "" then do {
-          stag "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v + 1) sfn
+	stagn "a" "href=\"%sm=MOD_%s%s\"" (commd conf) mode sfn begin
+          Wserver.wprint "^^";
+        end;
+        if sub_part <> "" then
+          stagn "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v + 1) sfn
           begin
             Wserver.wprint "&gt;&gt;";
-          end;
-          Wserver.wprint "\n";
-        }
+          end
         else ();
       end
     else ();
