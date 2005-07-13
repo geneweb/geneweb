@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.100 2005-07-12 07:18:29 ddr Exp $ *)
+(* $Id: notes.ml,v 4.101 2005-07-13 19:01:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -83,7 +83,8 @@ value notes_links_db conf base eliminate_unlinked =
          let record_it =
            match pg with
            [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
-           | NotesLinks.PgNotes | NotesLinks.PgMisc _ -> True ]
+           | NotesLinks.PgNotes | NotesLinks.PgMisc _
+           | NotesLinks.PgWizard _ -> True ]
          in
          if record_it then
            List.fold_left
@@ -100,7 +101,8 @@ value notes_links_db conf base eliminate_unlinked =
   (* some kind of basic gc... *)
   let rec is_referenced in_test s =
     fun
-    [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes, sl) :: pgsll] ->
+    [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _, sl) ::
+       pgsll] ->
         if List.mem s sl then True
         else is_referenced in_test s pgsll
     | [(NotesLinks.PgMisc s1, sl) :: pgsll] ->
@@ -165,6 +167,14 @@ value print_what_links conf base fnotes =
                        Wserver.wprint "%s" fnotes;
                      end;
                      Wserver.wprint "]";
+                   end
+               | NotesLinks.PgWizard wizname ->
+                   stagn "tt" begin
+                     stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
+                       (code_varenv wizname)
+                     begin
+                       Wserver.wprint "%s" wizname;
+                     end;
                    end ];
              end)
           pl;

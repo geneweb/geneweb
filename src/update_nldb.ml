@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.9 2005-07-12 07:18:29 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.10 2005-07-13 19:01:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -65,6 +65,18 @@ value finish_progr_bar () =
   }
 ;
 
+value read_file_contents fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let len = ref 0 in
+      try
+        loop () where rec loop () =
+          do { len.val := Buff.store len.val (input_char ic); loop () }
+      with
+      [ End_of_file -> Buff.get len.val ]                   
+  | None -> "" ]
+;
+
 value compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -78,6 +90,32 @@ value compute base bdir =
     else 
       let pg = NotesLinks.PgNotes in
       NotesLinks.update_db bdir pg list;
+    Printf.eprintf "--- wizard notes\n";
+    flush stderr;
+    try
+      let files = Sys.readdir (Filename.concat bdir "wiznotes") in
+      do {
+        for i = 0 to Array.length files - 1 do {
+          let file = files.(i) in
+          if Filename.check_suffix file ".txt" then do {
+            let wizid = Filename.chop_suffix file ".txt" in
+            let wfile =
+              List.fold_right Filename.concat [bdir; "wiznotes"] file
+            in
+            let list = notes_links (read_file_contents wfile) in
+            if list = [] then ()
+            else do {
+              Printf.eprintf "%s... " wizid; flush stderr;
+              let pg = NotesLinks.PgWizard wizid in
+              NotesLinks.update_db bdir pg list;
+            }
+          }
+          else ()
+        };
+        Printf.eprintf "\n"; flush stderr;
+      }
+    with
+    [ Sys_error _ -> () ];
     Printf.eprintf "--- misc notes\n";
     flush stderr;
     try
@@ -87,12 +125,13 @@ value compute base bdir =
           let file = files.(i) in
           if Filename.check_suffix file ".txt" then do {
             let fnotes = Filename.chop_suffix file ".txt" in
-            Printf.eprintf "%s... " fnotes; flush stderr;
             let list = notes_links (base.data.bnotes.nread fnotes RnAll) in
             if list = [] then ()
-            else
+            else do {
+              Printf.eprintf "%s... " fnotes; flush stderr;
               let pg = NotesLinks.PgMisc fnotes in
               NotesLinks.update_db bdir pg list
+            }
           }
           else ()
         };
