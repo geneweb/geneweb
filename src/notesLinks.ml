@@ -1,13 +1,14 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.4 2005-07-12 07:18:29 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.5 2005-07-13 19:01:59 ddr Exp $ *)
 
 open Def;
 
-value magic_notes_links = "GWNL0003";
+value magic_notes_links = "GWNL0004";
 type page =
   [ PgInd of iper
   | PgNotes
-  | PgMisc of string ]
+  | PgMisc of string
+  | PgWizard of string ]
 ;
 type notes_links_db = list (page * list string);
 
