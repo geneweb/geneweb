@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.151 2005-07-04 11:25:28 ddr Exp $ *)
+(* $Id: util.ml,v 4.152 2005-07-14 05:16:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1071,9 +1071,7 @@ value url_no_index conf base =
       fun
       [ [] -> []
       | [("opt", "no_index") :: l] -> loop l
-      | [("escache", _) :: l] -> loop l
-      | [("dsrc", _) :: l] -> loop l
-      | [("templ", _) :: l] -> loop l
+      | [("dsrc" | "escache" | "oc" | "templ", _) :: l] -> loop l
       | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
       | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
       | [(k, v) :: l] when String.length k == 2 && k.[0] == 'i' ->
