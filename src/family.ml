@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.59 2005-06-29 12:22:20 ddr Exp $ *)
+(* $Id: family.ml,v 4.60 2005-07-14 13:57:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -414,6 +414,7 @@ value family_m conf base =
   | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
+  | Some "MOD_WIZNOTE" -> Wiznotes.print_mod conf base
   | Some "MRG" when conf.wizard ->
       match find_person_in_env conf base "" with
       [ Some p -> Merge.print conf base p
@@ -504,7 +505,8 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> updmenu_print conf base p
       | _ -> very_unknown conf ]
-  | Some "WIZNOTES" -> Wiznotes.print conf base
+  | Some "WIZNOTE" -> Wiznotes.print conf base
+  | Some "WIZNOTES" -> Wiznotes.print_old conf base
   | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.28 2005-07-13 19:16:45 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.29 2005-07-14 13:57:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -12,7 +12,7 @@ value dir conf =
 
 value wzfile wddir wz = Filename.concat wddir (wz ^ ".txt");
 
-value read_wizfile fname =
+value read_auth_file fname =
   let fname = Util.base_path [] fname in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -96,7 +96,7 @@ value wiznote_date wfile =
   | None -> ("", 0.) ]
 ;
 
-value print_main conf base wizfile =
+value print_main conf base auth_file =
   let wiztxt =
     Gutil.nominative (transl_nth conf "wizard/wizards/friend/friends" 1)
   in
@@ -104,7 +104,7 @@ value print_main conf base wizfile =
     Wserver.wprint "%s - %s" (capitale wiztxt)
       (Gutil.nominative (transl_nth conf "note/notes" 1))
   in
-  let wizdata = read_wizfile wizfile in
+  let wizdata = read_auth_file auth_file in
   let wddir = dir conf in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
   do {
@@ -229,23 +229,26 @@ value print_main conf base wizfile =
   }
 ;
 
-value print_wizard conf base wizfile wz =
+value wizard_page_title wz wizname h =
+  Wserver.wprint "%s%s" wizname
+    (if wz <> wizname && not h then
+       "<br><font size=\"-1\">(" ^ wz ^ ")</font>"
+     else "")
+;
+
+value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
   let wizname =
-    let wizdata = read_wizfile wizfile in
+    let wizdata = read_auth_file auth_file in
     try List.assoc wz wizdata with
     [ Not_found -> wz ]
   in
-  let title h =
-    Wserver.wprint "%s%s" wizname
-      (if wz <> wizname && not h then
-         "<br><font size=\"-1\">(" ^ wz ^ ")</font>"
-       else "")
-  in
-  let wfile = wzfile (dir conf) wz in
-  let (s, date) = read_wizard_notes wfile in
+  let title = wizard_page_title wz wizname in
   do {
-    header conf title;
+    header_no_page_title conf title;
     print_link_to_welcome conf True;
+    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+    title False;
+    Wserver.wprint "</h1>\n";
     match Util.open_etc_file "summary" with
     [ Some ic -> Templ.copy_from_templ conf [] ic
     | None -> () ];
@@ -254,9 +257,10 @@ value print_wizard conf base wizfile wz =
       tag "tr" begin
         tag "td" begin
           let s = string_with_macros conf [] s in
-          let lines = Wiki.html_of_tlsw conf s in
-          let s = String.concat "\n" lines in
-          let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
+          let s =
+            Wiki.html_with_summary_of_tlsw conf "NOTES" (Notes.file_path conf)
+              edit_opt s
+          in
           Wserver.wprint "%s\n" s;
         end;
       end;
@@ -294,7 +298,13 @@ value print_wizard conf base wizfile wz =
   }
 ;
 
-value print_wizard_mod conf base wizfile wz nn =
+value print_wizard conf auth_file wz =
+  let wfile = wzfile (dir conf) wz in
+  let (s, date) = read_wizard_notes wfile in
+  print_whole_wiznote conf auth_file None wz wfile (s, date)
+;
+
+value print_wizard_mod conf base auth_file wz nn =
   let wddir = dir conf in
   let fname = wzfile wddir wz in
   let (on, _) = read_wizard_notes fname in
@@ -312,22 +322,23 @@ value print_wizard_mod conf base wizfile wz nn =
       Notes.update_notes_links_db conf pg nn True
     }
     else ();
-    print_main conf base wizfile
+    print_main conf base auth_file
   }
   else try Update.error_digest conf with [ Update.ModErr -> () ]
 ;
 
-value print conf base =
-  let wizfile =
+(* version obsolete since 5.00 *)
+value print_old conf base =
+  let auth_file =
     match
       (p_getenv conf.base_env "wizard_descr_file",
        p_getenv conf.base_env "wizard_passwd_file")
     with
     [ (Some "" | None, Some "" | None) -> ""
-    | (Some wizfile, _) -> wizfile
-    | (_, Some wizfile) -> wizfile ]
+    | (Some auth_file, _) -> auth_file
+    | (_, Some auth_file) -> auth_file ]
   in
-  if wizfile = "" then incorrect_request conf
+  if auth_file = "" then incorrect_request conf
   else
     match p_getenv conf.env "v" with
     [ Some wz ->
@@ -335,8 +346,82 @@ value print conf base =
         match p_getenv conf.env "notes" with
         [ Some nn ->
             if conf.wizard && conf.user = wz then
-              print_wizard_mod conf base wizfile wz nn
+              print_wizard_mod conf base auth_file wz nn
             else incorrect_request conf
-        | None -> print_wizard conf base wizfile wz ]
-    | None -> print_main conf base wizfile ]
+        | None -> print_wizard conf auth_file wz ]
+    | None -> print_main conf base auth_file ]
+;
+
+value print_wiznote_sub_part conf wz cnt0 lines =
+  let mode = "WIZNOTE" in
+  let file_path = Notes.file_path conf in
+  let can_edit = conf.wizard && conf.user = wz in
+  Wiki.print_sub_part conf can_edit file_path "NOTES" mode (code_varenv wz)
+    cnt0 lines (string_with_macros conf [])
+;
+
+value print_part_wiznote conf wz s cnt0 =
+  let title = wz in
+  do {
+    Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    let lines = Wiki.extract_sub_part s cnt0 in
+    let lines =
+      if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
+    in
+    print_wiznote_sub_part conf wz cnt0 lines;
+    Util.trailer conf;
+  }
+;
+
+value print conf base =
+  let auth_file =
+    match
+      (p_getenv conf.base_env "wizard_descr_file",
+       p_getenv conf.base_env "wizard_passwd_file")
+    with
+    [ (Some "" | None, Some "" | None) -> ""
+    | (Some auth_file, _) -> auth_file
+    | (_, Some auth_file) -> auth_file ]
+  in
+  if auth_file = "" then incorrect_request conf
+  else
+    match p_getenv conf.env "f" with
+    [ Some wz ->
+        let wz = Filename.basename wz in
+        let wfile = wzfile (dir conf) wz in
+        let (s, date) = read_wizard_notes wfile in
+        let edit_opt =
+          if conf.wizard && conf.user = wz then Some ("WIZNOTE", code_varenv wz)
+          else None
+        in
+        match Util.p_getint conf.env "v" with
+        [ Some cnt0 -> print_part_wiznote conf wz s cnt0
+        | None ->
+            print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) ]
+    | None -> print_main conf base auth_file ]
+;
+
+value print_mod conf base =
+  let auth_file =
+    match
+      (p_getenv conf.base_env "wizard_descr_file",
+       p_getenv conf.base_env "wizard_passwd_file")
+    with
+    [ (Some "" | None, Some "" | None) -> ""
+    | (Some auth_file, _) -> auth_file
+    | (_, Some auth_file) -> auth_file ]
+  in
+  if auth_file = "" then incorrect_request conf
+  else
+    match p_getenv conf.env "f" with
+    [ Some wz ->
+        let wz = Filename.basename wz in
+        let can_edit = conf.wizard && conf.user = wz in
+        if can_edit then
+          let title = wizard_page_title wz wz in
+          let wfile = wzfile (dir conf) wz in
+          let (s, _) = read_wizard_notes wfile in
+          Wiki.print_mod_page conf "WIZNOTE" (code_varenv wz) title "" s
+        else incorrect_request conf
+    | None -> incorrect_request conf ]
 ;

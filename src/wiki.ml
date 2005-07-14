@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.21 2005-07-14 07:37:30 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.22 2005-07-14 13:57:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -274,7 +274,7 @@ value summary_of_tlsw_lines conf short lines =
     (lines, sections_nums)
 ;
 
-value string_of_modify_link conf mode cnt sfn empty =
+value string_of_modify_link conf cnt mode sfn empty =
   sprintf "%s(<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)%s\n"
     (if empty then "<p>"
      else
@@ -285,14 +285,9 @@ value string_of_modify_link conf mode cnt sfn empty =
     (if empty then "</p>" else "</div>")
 ;
 
-value rec html_of_tlsw conf s =
-  let (lines, _) = lines_list_of_string s in
-  let sections_nums = sections_nums_of_tlsw_lines lines in
-  let mode_opt = Some ("", "", first_cnt, False) in
-  hotl conf (Some lines) mode_opt sections_nums [] ["" :: lines]
-and hotl conf wlo mode_opt sections_nums list =
+value rec hotl conf wlo cnt edit_opt sections_nums list =
   fun
-  [ ["__NOTOC__" :: sl] -> hotl conf wlo mode_opt sections_nums list sl
+  [ ["__NOTOC__" :: sl] -> hotl conf wlo cnt edit_opt sections_nums list sl
   | ["__TOC__" :: sl] ->
       let list =
         match wlo with
@@ -301,7 +296,7 @@ and hotl conf wlo mode_opt sections_nums list =
             List.rev_append summary list
         | None -> list ]
       in
-      hotl conf wlo mode_opt sections_nums list sl
+      hotl conf wlo cnt edit_opt sections_nums list sl
   | ["__SHORT_TOC__" :: sl] ->
       let list =
         match wlo with
@@ -310,7 +305,7 @@ and hotl conf wlo mode_opt sections_nums list =
             List.rev_append summary list
         | None -> list ]
       in
-      hotl conf wlo mode_opt sections_nums list sl
+      hotl conf wlo cnt edit_opt sections_nums list sl
   | ["" :: sl] ->
       let parag =
         let rec loop1 parag =
@@ -341,17 +336,17 @@ and hotl conf wlo mode_opt sections_nums list =
         | Some (parag, sl, _) ->
             (["</p>" :: parag @ ["<p>" :: list]], ["" :: sl]) ]
       in
-      hotl conf wlo mode_opt sections_nums list sl
+      hotl conf wlo cnt edit_opt sections_nums list sl
   | [s :: sl] ->
       let len = String.length s in
       if len > 0 && s.[0] = '*' then
         let (sl, rest) = select_list_lines conf '*' [] [s :: sl] in
         let list = syntax_ul 0 list sl in
-        hotl conf wlo mode_opt sections_nums list ["" :: rest]
+        hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
       else if len > 0 && s.[0] = ':' then
         let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
         let list = syntax_dd 0 list sl in
-        hotl conf wlo mode_opt sections_nums list ["" :: rest]
+        hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
       else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
         let slev = section_level s len in
         let (section_num, sections_nums) =
@@ -364,23 +359,22 @@ and hotl conf wlo mode_opt sections_nums list =
             (String.sub s slev (len-2*slev))
             (if slev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") slev
         in
-        let (list, mode_opt) =
-          match mode_opt with
-          [ Some (mode, sfn, cnt, mod_auth) ->
-              let n1 =
-                if mod_auth then
-                  string_of_modify_link conf mode cnt sfn False
-                else ""
-              in
-              let n2 =
-                sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
-              in
-              ([s; n1; n2 :: list], Some (mode, sfn, cnt + 1, mod_auth))
-          | None -> ([s :: list], None) ]
+        let list =
+          if wlo <> None then
+            let s = sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt in
+            [s:: list]
+          else list
         in
-        hotl conf wlo mode_opt sections_nums list ["" :: sl]
+        let list =
+          match edit_opt with
+          [ Some (mode, sfn) ->
+              let s = string_of_modify_link conf cnt mode sfn False in
+              [s :: list]
+          | None -> list ]
+        in
+        hotl conf wlo (cnt + 1) edit_opt sections_nums list [""; s :: sl]
       else
-        hotl conf wlo mode_opt sections_nums [s :: list] sl
+        hotl conf wlo cnt edit_opt sections_nums [s :: list] sl
   | [] -> List.rev list ]
 and select_list_lines conf prompt list =
   fun
@@ -437,7 +431,13 @@ and syntax_dd lev list sl =
   ["</dl>"; "</dd>" :: List.rev_append sl list]
 ;
 
-value html_with_summary_of_tlsw conf mode file_path sub_fname s =
+value html_of_tlsw conf s =
+  let (lines, _) = lines_list_of_string s in
+  let sections_nums = sections_nums_of_tlsw_lines lines in
+  hotl conf (Some lines) first_cnt None sections_nums [] ["" :: lines]
+;
+
+value html_with_summary_of_tlsw conf mode file_path edit_opt s =
   let (lines, no_toc) = lines_list_of_string s in
   let (summary, sections_nums) =
     if no_toc then ([], []) else summary_of_tlsw_lines conf False lines
@@ -451,21 +451,23 @@ value html_with_summary_of_tlsw conf mode file_path sub_fname s =
       | [] -> (lines_bef, []) ]
   in
   let lines_before_summary =
-    hotl conf (Some lines) (Some (mode, sub_fname, first_cnt, conf.wizard))
-      [] [] (List.rev rev_lines_before_summary)
+    hotl conf (Some lines) first_cnt None [] []
+      (List.rev rev_lines_before_summary)
   in
   let lines_after_summary =
-    hotl conf (Some lines) (Some (mode, sub_fname, first_cnt, conf.wizard))
-      sections_nums [] lines
+    hotl conf (Some lines) first_cnt edit_opt sections_nums [] lines
   in
   let s =
     syntax_links conf mode file_path
       (String.concat "\n"
         (lines_before_summary @ summary @ lines_after_summary))
   in
-  if conf.wizard && (lines_before_summary <> [] || lines = []) then
-    string_of_modify_link conf mode 0 sub_fname (s = "") ^ s
-  else s
+  match edit_opt with
+  [ Some (mode, sub_fname) ->
+      if lines_before_summary <> [] || lines = [] then
+        string_of_modify_link conf 0 mode sub_fname (s = "") ^ s
+      else s
+  | None -> s ]
 ;
 
 value rev_extract_sub_part s v =
@@ -490,7 +492,30 @@ value rev_extract_sub_part s v =
 
 value extract_sub_part s v = List.rev (rev_extract_sub_part s v);
 
-value print_sub_part conf file_path mode sub_fname cnt0 lines ending_filter =
+value print_sub_part_links conf edit_mode sub_fname cnt0 lines =
+  let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
+  tag "p" begin
+    if cnt0 >= first_cnt then
+      stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) edit_mode (cnt0 - 1) sfn
+      begin
+        Wserver.wprint "&lt;&lt;";
+      end
+    else ();
+    if cnt0 >= first_cnt - 1 then
+      stagn "a" "href=\"%sm=%s%s\"" (commd conf) edit_mode sfn begin
+        Wserver.wprint "^^";
+      end
+    else ();
+    if lines <> [] then
+      stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) edit_mode (cnt0 + 1) sfn
+      begin
+        Wserver.wprint "&gt;&gt;";
+      end
+    else ();
+  end
+;
+
+value print_sub_part_text conf file_path mode edit_opt cnt0 lines ending_filter =
   let lines =
     List.map
       (fun
@@ -500,38 +525,27 @@ value print_sub_part conf file_path mode sub_fname cnt0 lines ending_filter =
        | s -> s ])
       lines
   in
-  let mode_opt = Some (mode, sub_fname, cnt0, conf.wizard) in
-  let lines = hotl conf None mode_opt [] [] lines in
+  let lines = hotl conf None cnt0 edit_opt [] [] lines in
   let s = String.concat "\n" lines in
   let s = syntax_links conf mode file_path s in
   let s = ending_filter s in
   let s =
-    if cnt0 < first_cnt && conf.wizard then
-      string_of_modify_link conf mode 0 sub_fname (s = "") ^ s
+    if cnt0 < first_cnt then
+      match edit_opt with
+      [ Some (edit_mode, sub_fname) ->
+          string_of_modify_link conf 0 edit_mode sub_fname (s = "") ^ s
+      | None -> s ]
     else s
   in
-  let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
+  Wserver.wprint "%s\n" s
+;
+
+value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0 lines
+    ending_filter =
+  let edit_opt = if can_edit then Some (edit_mode, sub_fname) else None in
   do {
-    tag "p" begin
-      if cnt0 >= first_cnt then
-        stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 - 1) sfn
-        begin
-          Wserver.wprint "&lt;&lt;";
-        end
-      else ();
-      if cnt0 >= first_cnt - 1 then
-        stagn "a" "href=\"%sm=%s%s\"" (commd conf) mode sfn begin
-          Wserver.wprint "^^";
-        end
-      else ();
-      if s <> "" then
-        stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) mode (cnt0 + 1) sfn
-        begin
-          Wserver.wprint "&gt;&gt;";
-        end
-      else ();
-    end;
-    Wserver.wprint "%s\n" s
+    print_sub_part_links conf edit_mode sub_fname cnt0 lines;
+    print_sub_part_text conf file_path mode edit_opt cnt0 lines ending_filter;
   }
 ;
 

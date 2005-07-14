@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.102 2005-07-13 20:37:59 ddr Exp $ *)
+(* $Id: notes.ml,v 4.103 2005-07-14 13:57:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ value file_path conf fname =
 value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
   let file_path = file_path conf in
-  Wiki.print_sub_part conf file_path mode sub_fname cnt0 lines
+  Wiki.print_sub_part conf conf.wizard file_path mode mode sub_fname cnt0 lines
     (string_with_macros conf [])
 ;
 
@@ -47,7 +47,8 @@ value print_whole_notes conf fnotes title s =
     | None -> () ];
     let file_path = file_path conf in
     let s = string_with_macros conf [] s in
-    let s = Wiki.html_with_summary_of_tlsw conf "NOTES" file_path fnotes s in
+    let edit_opt = if conf.wizard then Some ("NOTES", fnotes) else None in
+    let s = Wiki.html_with_summary_of_tlsw conf "NOTES" file_path edit_opt s in
     Wserver.wprint "%s\n" s;
     trailer conf;
   }
