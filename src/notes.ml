@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.105 2005-07-14 20:08:54 ddr Exp $ *)
+(* $Id: notes.ml,v 4.106 2005-07-14 20:11:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -175,6 +175,7 @@ value print_what_links conf base fnotes =
                        Wserver.wprint "%s"
                          (transl_nth conf "wizard/wizards/friend/friends" 0);
                      end;
+		     Wserver.wprint " ";
                      stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
                        (code_varenv wizname)
                      begin
