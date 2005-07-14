@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.103 2005-07-14 13:57:12 ddr Exp $ *)
+(* $Id: notes.ml,v 4.104 2005-07-14 19:51:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -17,7 +17,6 @@ value print_notes_sub_part conf sub_fname cnt0 lines =
   let mode = "NOTES" in
   let file_path = file_path conf in
   Wiki.print_sub_part conf conf.wizard file_path mode mode sub_fname cnt0 lines
-    (string_with_macros conf [])
 ;
 
 value read_notes base fnotes =
@@ -68,6 +67,7 @@ value print_notes_part conf fnotes title s cnt0 =
       Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
     }
     else ();
+    let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     print_notes_sub_part conf fnotes cnt0 lines;
     trailer conf;
@@ -216,35 +216,38 @@ value print_mod conf base =
   Wiki.print_mod_page conf "NOTES" fnotes title ntitle s
 ;
 
-value print_ok conf base fnotes s =
+value print_ok conf fnotes s =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "notes modified"))
+    Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
   in
   do {
-    header_no_page_title conf title;
+    Util.header_no_page_title conf title;
     tag "div" "style=\"text-align:center\"" begin
       Wserver.wprint "--- ";
       title ();
       Wserver.wprint " ---\n";
     end;
-    print_link_to_welcome conf True;
-    let get_v = p_getint conf.env "v" in
+    Util.print_link_to_welcome conf True;
+    let get_v = Util.p_getint conf.env "v" in
     let v =
       match get_v with
       [ Some v -> v
       | None -> 0 ]
     in
-    History.record_notes conf base (get_v, fnotes) "mn";
     let (title, s) = if v = 0 then Wiki.split_title_and_text s else ("", s) in
-    if v = 0 && title <> "" then do {
-      xtag "br";
-      xtag "br";
-      Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
-    }
-    else ();
     let (lines, _) = Wiki.lines_list_of_string s in
-    print_notes_sub_part conf fnotes v lines;
-    trailer conf
+    let lines =
+      if v = 0 && title <> "" then
+        let title =
+          Printf.sprintf "<h1 style=\"text-align:center\">%s</h1>\n" title
+        in
+        [title :: lines]
+      else lines
+    in
+    let mode = "NOTES" in
+    let file_path = file_path conf in
+    Wiki.print_sub_part conf conf.wizard file_path mode mode fnotes v lines;
+    Util.trailer conf
   }
 ;
 
@@ -264,17 +267,19 @@ value update_notes_links_db conf fnotes s force =
     NotesLinks.update_db bdir fnotes list
 ;
 
+value commit_notes conf base fnotes s =
+  let pg =
+    if fnotes = "" then NotesLinks.PgNotes
+    else NotesLinks.PgMisc fnotes
+  in
+  do {
+    base.func.commit_notes fnotes s;
+    History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
+    update_notes_links_db conf pg s True;
+  }
+;
+
 value print_mod_ok conf base =
-  let sub_part =
-    match p_getenv conf.env "notes" with
-    [ Some v -> strip_all_trailing_spaces v
-    | None -> failwith "notes unbound" ]
-  in
-  let digest =
-    match p_getenv conf.env "digest" with
-    [ Some s -> s
-    | None -> "" ]
-  in
   let fnotes =
     match p_getenv conf.env "f" with
     [ Some f -> if NotesLinks.check_file_name f then f else ""
@@ -284,22 +289,28 @@ value print_mod_ok conf base =
     let (t, s) = read_notes base fnotes in
     if t = "" then s else t ^ "\n" ^ s
   in
+  let sub_part =
+    match Util.p_getenv conf.env "notes" with
+    [ Some v -> Gutil.strip_all_trailing_spaces v
+    | None -> failwith "notes unbound" ]
+  in
+  let digest =
+    match Util.p_getenv conf.env "digest" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   try
     if digest <> Iovalue.digest old_notes then Update.error_digest conf
     else
       let s =
-        match p_getint conf.env "v" with
+        match Util.p_getint conf.env "v" with
         [ Some v -> Wiki.insert_sub_part old_notes v sub_part
         | None -> sub_part ]
       in
-      let pg =
-        if fnotes = "" then NotesLinks.PgNotes
-        else NotesLinks.PgMisc fnotes
-      in
       do {
-        base.func.commit_notes fnotes s;
-        update_notes_links_db conf pg s True;
-        print_ok conf base fnotes sub_part
+        commit_notes conf base fnotes s;
+        let sub_part = string_with_macros conf [] sub_part in
+        print_ok conf fnotes sub_part;
       }
   with
   [ Update.ModErr -> () ]

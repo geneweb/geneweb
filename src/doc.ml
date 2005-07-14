@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.32 2005-07-14 13:57:12 ddr Exp $ *)
+(* $Id: doc.ml,v 4.33 2005-07-14 19:51:52 ddr Exp $ *)
 
 open Config;
 
@@ -228,12 +228,12 @@ value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let mode = "WDOC" in
   let file_path = wdoc_file_path conf.lang in
   Wiki.print_sub_part conf conf.wizard file_path mode mode sub_fname cnt0 lines
-    Util.filter_html_tags
 ;
 
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    let s = Util.filter_html_tags s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines =
       if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
@@ -326,24 +326,26 @@ value print_ok conf fdoc s =
       title ();
       Wserver.wprint " ---\n";
     end;
+    Util.print_link_to_welcome conf True;
     let get_v = Util.p_getint conf.env "v" in
-    let (has_v, v) =
+    let v =
       match get_v with
-      [ Some v -> (True, v)
-      | None -> (False, 0) ]
+      [ Some v -> v
+      | None -> 0 ]
     in
-    if has_v then
-      let (lines, _) = Wiki.lines_list_of_string s in
-      let lines =
-        match lines with
-        [ [title :: lines] when v = 0 -> [title; "<br /><br />" :: lines]
-        | l -> l ]
-      in
-      print_wdoc_sub_part conf fdoc v lines
-    else
-      let sfn = if fdoc = "" then "" else ";f=" ^ fdoc in
-      Wserver.wprint "<a href=\"%sm=WDOC%s\">%s</a>\n" (Util.commd conf) sfn
-        (Util.capitale (Util.transl_nth conf "note/notes" 1));
+    let (title, s) = if v = 0 then Wiki.split_title_and_text s else ("", s) in
+    let (lines, _) = Wiki.lines_list_of_string s in
+    let lines =
+      if v = 0 && title <> "" then
+        let title =
+          Printf.sprintf "<h1 style=\"text-align:center\">%s</h1>\n" title
+        in
+        [title :: lines]
+      else lines
+    in
+    let mode = "WDOC" in
+    let file_path = wdoc_file_path conf.lang in
+    Wiki.print_sub_part conf conf.wizard file_path mode mode fdoc v lines;
     Util.trailer conf
   }
 ;
@@ -366,7 +368,16 @@ value commit_wdoc conf fdoc s =
 ;
 
 value print_mod_wdoc_ok conf =
-   let sub_part =
+  let fdoc =
+    match Util.p_getenv conf.env "f" with
+    [ Some f -> if NotesLinks.check_file_name f then f else "index"
+    | None -> "index" ]
+  in
+  let old_doc =
+    let (t, s) = read_wdoc conf.lang fdoc in
+    if t = "" then s else t ^ "\n" ^ s
+  in
+  let sub_part =
     match Util.p_getenv conf.env "notes" with
     [ Some v -> Gutil.strip_all_trailing_spaces v
     | None -> failwith "notes unbound" ]
@@ -375,15 +386,6 @@ value print_mod_wdoc_ok conf =
     match Util.p_getenv conf.env "digest" with
     [ Some s -> s
     | None -> "" ]
-  in
-  let fdoc =
-    match Util.p_getenv conf.env "f" with
-    [ Some f -> if NotesLinks.check_file_name f then f else "index"
-    | None -> "index" ]
-  in
-  let old_doc =
-    let (t, s) = read_wdoc conf.lang fdoc in
-    t ^ "\n" ^ s
   in
   try
     if digest <> Iovalue.digest old_doc then Update.error_digest conf
@@ -395,7 +397,8 @@ value print_mod_wdoc_ok conf =
       in
       do {
         commit_wdoc conf fdoc s;
-        print_ok conf fdoc sub_part
+        let sub_part = Util.filter_html_tags sub_part in
+        print_ok conf fdoc sub_part;
       }
   with
   [ Update.ModErr -> () ]
