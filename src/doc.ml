@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.33 2005-07-14 19:51:52 ddr Exp $ *)
+(* $Id: doc.ml,v 4.34 2005-07-14 22:52:27 ddr Exp $ *)
 
 open Config;
 
@@ -315,42 +315,7 @@ value print_mod_wdoc conf =
   Wiki.print_mod_page conf "WDOC" fname title ntitle s
 ;
 
-value print_ok conf fdoc s =
-  let title _ =
-    Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
-  in
-  do {
-    Util.header_no_page_title conf title;
-    tag "div" "style=\"text-align:center\"" begin
-      Wserver.wprint "--- ";
-      title ();
-      Wserver.wprint " ---\n";
-    end;
-    Util.print_link_to_welcome conf True;
-    let get_v = Util.p_getint conf.env "v" in
-    let v =
-      match get_v with
-      [ Some v -> v
-      | None -> 0 ]
-    in
-    let (title, s) = if v = 0 then Wiki.split_title_and_text s else ("", s) in
-    let (lines, _) = Wiki.lines_list_of_string s in
-    let lines =
-      if v = 0 && title <> "" then
-        let title =
-          Printf.sprintf "<h1 style=\"text-align:center\">%s</h1>\n" title
-        in
-        [title :: lines]
-      else lines
-    in
-    let mode = "WDOC" in
-    let file_path = wdoc_file_path conf.lang in
-    Wiki.print_sub_part conf conf.wizard file_path mode mode fdoc v lines;
-    Util.trailer conf
-  }
-;
-
-value commit_wdoc conf fdoc s =
+value commit_wdoc conf file_path fdoc s =
   let fname = wdoc_file_path conf.lang fdoc in
   do {
     try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
@@ -368,38 +333,17 @@ value commit_wdoc conf fdoc s =
 ;
 
 value print_mod_wdoc_ok conf =
-  let fdoc =
-    match Util.p_getenv conf.env "f" with
+  let fname =
+    fun
     [ Some f -> if NotesLinks.check_file_name f then f else "index"
     | None -> "index" ]
   in
-  let old_doc =
-    let (t, s) = read_wdoc conf.lang fdoc in
-    if t = "" then s else t ^ "\n" ^ s
-  in
-  let sub_part =
-    match Util.p_getenv conf.env "notes" with
-    [ Some v -> Gutil.strip_all_trailing_spaces v
-    | None -> failwith "notes unbound" ]
-  in
-  let digest =
-    match Util.p_getenv conf.env "digest" with
-    [ Some s -> s
-    | None -> "" ]
-  in
-  try
-    if digest <> Iovalue.digest old_doc then Update.error_digest conf
-    else
-      let s =
-        match Util.p_getint conf.env "v" with
-        [ Some v -> Wiki.insert_sub_part old_doc v sub_part
-        | None -> sub_part ]
-      in
-      do {
-        commit_wdoc conf fdoc s;
-        let sub_part = Util.filter_html_tags sub_part in
-        print_ok conf fdoc sub_part;
-      }
-  with
-  [ Update.ModErr -> () ]
+  let edit_mode _ = if conf.wizard then Some "WDOC" else None in
+  let mode = "WDOC" in
+  let read_string = read_wdoc conf.lang in
+  let commit = commit_wdoc conf in
+  let string_filter = Util.filter_html_tags in
+  let file_path = wdoc_file_path conf.lang in
+  Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
+    file_path
 ;

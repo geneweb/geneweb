@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.30 2005-07-14 19:51:52 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.31 2005-07-14 22:52:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -428,11 +428,47 @@ value print_mod conf base =
           let title = wizard_page_title wz wz in
           let wfile = wzfile (dir conf) wz in
           let (s, _) = read_wizard_notes wfile in
-          Wiki.print_mod_page conf "WIZNOTES" (code_varenv wz) title "" s
+          Wiki.print_mod_page conf "WIZNOTES" wz title "" s
         else incorrect_request conf
     | None -> incorrect_request conf ]
 ;
 
+value commit_wiznotes conf wz s =
+  let wddir = dir conf in
+  let fname = wzfile wddir wz in
+  do {
+    try Unix.mkdir wddir 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+    write_wizard_notes fname s;
+    let pg = NotesLinks.PgWizard wz in
+    Notes.update_notes_links_db conf pg s True;
+  }
+;
+
 value print_mod_ok conf base =
-  ()
+  let auth_file =
+    match
+      (p_getenv conf.base_env "wizard_descr_file",
+       p_getenv conf.base_env "wizard_passwd_file")
+    with
+    [ (Some "" | None, Some "" | None) -> ""
+    | (Some auth_file, _) -> auth_file
+    | (_, Some auth_file) -> auth_file ]
+  in
+  if auth_file = "" then incorrect_request conf
+  else
+    let fname =
+      fun
+      [ Some f -> f
+      | None -> "nobody" ]
+    in
+    let edit_mode wz =
+      if conf.wizard && conf.user = wz then Some "WIZNOTES" else None
+    in
+    let mode = "NOTES" in
+    let read_string wz = ("", fst (read_wizard_notes (wzfile (dir conf) wz))) in
+    let commit = commit_wiznotes in
+    let string_filter = string_with_macros conf [] in
+    let file_path = Notes.file_path conf in
+    Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
+      file_path
 ;

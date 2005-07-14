@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.23 2005-07-14 19:51:52 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.24 2005-07-14 22:52:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -557,7 +557,7 @@ value print_mod_page conf mode fname title ntitle s =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
   let is_empty = sub_part = "" in
-  let sfn = if fname = "" then "" else ";f=" ^ fname in
+  let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
   do {
     header conf title;
     tag "div" "style=\"float:%s;margin-%s:5px\"" conf.right conf.left begin
@@ -646,4 +646,74 @@ value split_title_and_text s =
     ("", s)
   else (tit, txt)
 
+;
+
+value print_ok conf file_path mode edit_mode fname s =
+  let title _ =
+    Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
+  in
+  do {
+    Util.header_no_page_title conf title;
+    tag "div" "style=\"text-align:center\"" begin
+      Wserver.wprint "--- ";
+      title ();
+      Wserver.wprint " ---\n";
+    end;
+    Util.print_link_to_welcome conf True;
+    let get_v = Util.p_getint conf.env "v" in
+    let v =
+      match get_v with
+      [ Some v -> v
+      | None -> 0 ]
+    in
+    let (title, s) = if v = 0 then split_title_and_text s else ("", s) in
+    let (lines, _) = lines_list_of_string s in
+    let lines =
+      if v = 0 && title <> "" then
+        let title =
+          Printf.sprintf "<h1 style=\"text-align:center\">%s</h1>\n" title
+        in
+        [title :: lines]
+      else lines
+    in
+    print_sub_part conf conf.wizard file_path mode edit_mode fname v lines;
+    Util.trailer conf
+  }
+;
+
+value print_mod_ok conf edit_mode mode fname read_string commit string_filter
+    file_path =
+  let fname = fname (Util.p_getenv conf.env "f") in
+  try
+    match edit_mode fname with
+    [ Some edit_mode ->
+        let old_string =
+          let (t, s) = read_string fname in
+          if t = "" then s else t ^ "\n" ^ s
+        in
+        let sub_part =
+          match Util.p_getenv conf.env "notes" with
+          [ Some v -> Gutil.strip_all_trailing_spaces v
+          | None -> failwith "notes unbound" ]
+        in
+        let digest =
+          match Util.p_getenv conf.env "digest" with
+          [ Some s -> s
+          | None -> "" ]
+        in
+        if digest <> Iovalue.digest old_string then Update.error_digest conf
+        else
+          let s =
+            match Util.p_getint conf.env "v" with
+            [ Some v -> insert_sub_part old_string v sub_part
+            | None -> sub_part ]
+          in
+          do {
+            if s <> old_string then commit conf fname s else ();
+            let sub_part = string_filter sub_part in
+            print_ok conf file_path mode edit_mode fname sub_part;
+          }
+    | None -> Util.incorrect_request conf ]
+  with
+  [ Update.ModErr -> () ]
 ;
