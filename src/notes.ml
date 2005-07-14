@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.104 2005-07-14 19:51:52 ddr Exp $ *)
+(* $Id: notes.ml,v 4.105 2005-07-14 20:08:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -171,6 +171,10 @@ value print_what_links conf base fnotes =
                    end
                | NotesLinks.PgWizard wizname ->
                    stagn "tt" begin
+                     stag "i" begin
+                       Wserver.wprint "%s"
+                         (transl_nth conf "wizard/wizards/friend/friends" 0);
+                     end;
                      stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
                        (code_varenv wizname)
                      begin
