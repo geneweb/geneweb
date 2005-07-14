@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.106 2005-07-14 20:11:01 ddr Exp $ *)
+(* $Id: notes.ml,v 4.107 2005-07-14 22:52:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -221,41 +221,6 @@ value print_mod conf base =
   Wiki.print_mod_page conf "NOTES" fnotes title ntitle s
 ;
 
-value print_ok conf fnotes s =
-  let title _ =
-    Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
-  in
-  do {
-    Util.header_no_page_title conf title;
-    tag "div" "style=\"text-align:center\"" begin
-      Wserver.wprint "--- ";
-      title ();
-      Wserver.wprint " ---\n";
-    end;
-    Util.print_link_to_welcome conf True;
-    let get_v = Util.p_getint conf.env "v" in
-    let v =
-      match get_v with
-      [ Some v -> v
-      | None -> 0 ]
-    in
-    let (title, s) = if v = 0 then Wiki.split_title_and_text s else ("", s) in
-    let (lines, _) = Wiki.lines_list_of_string s in
-    let lines =
-      if v = 0 && title <> "" then
-        let title =
-          Printf.sprintf "<h1 style=\"text-align:center\">%s</h1>\n" title
-        in
-        [title :: lines]
-      else lines
-    in
-    let mode = "NOTES" in
-    let file_path = file_path conf in
-    Wiki.print_sub_part conf conf.wizard file_path mode mode fnotes v lines;
-    Util.trailer conf
-  }
-;
-
 value update_notes_links_db conf fnotes s force =
   let slen = String.length s in
   let list =
@@ -263,7 +228,9 @@ value update_notes_links_db conf fnotes s force =
       if i = slen then list
       else
         match NotesLinks.misc_notes_link s i with
-        [ Some (j, lfname, _, _) -> loop [lfname :: list] j
+        [ Some (j, lfname, _, _) ->
+            let list = if List.mem lfname list then list else [lfname :: list] in
+            loop list j
         | None -> loop list (i + 1) ]
   in
   if not force && list = [] then ()
@@ -285,40 +252,19 @@ value commit_notes conf base fnotes s =
 ;
 
 value print_mod_ok conf base =
-  let fnotes =
-    match p_getenv conf.env "f" with
+  let fname =
+    fun
     [ Some f -> if NotesLinks.check_file_name f then f else ""
     | None -> "" ]
   in
-  let old_notes =
-    let (t, s) = read_notes base fnotes in
-    if t = "" then s else t ^ "\n" ^ s
-  in
-  let sub_part =
-    match Util.p_getenv conf.env "notes" with
-    [ Some v -> Gutil.strip_all_trailing_spaces v
-    | None -> failwith "notes unbound" ]
-  in
-  let digest =
-    match Util.p_getenv conf.env "digest" with
-    [ Some s -> s
-    | None -> "" ]
-  in
-  try
-    if digest <> Iovalue.digest old_notes then Update.error_digest conf
-    else
-      let s =
-        match Util.p_getint conf.env "v" with
-        [ Some v -> Wiki.insert_sub_part old_notes v sub_part
-        | None -> sub_part ]
-      in
-      do {
-        commit_notes conf base fnotes s;
-        let sub_part = string_with_macros conf [] sub_part in
-        print_ok conf fnotes sub_part;
-      }
-  with
-  [ Update.ModErr -> () ]
+  let edit_mode _ = if conf.wizard then Some "NOTES" else None in
+  let mode = "NOTES" in
+  let read_string = read_notes base in
+  let commit conf = commit_notes conf base in
+  let string_filter = string_with_macros conf [] in
+  let file_path = file_path conf in
+  Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
+    file_path
 ;
 
 value begin_text_without_html_tags lim s =
