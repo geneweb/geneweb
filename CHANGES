@@ -11,6 +11,46 @@ encoding. By re-creating the database, the new encoding is set.
 
 The new version number (5.00) is in honour of this new encoding.
 
+* New features : Wiki syntax and miscellaneous Notes
+  - [14 Jul 05] It is now possible to use a specific ("Wiki") syntax
+    inside database notes, individual notes, wizard notes and database
+    forum. It is also possible to add new "miscelleneous notes". The
+    syntax is close to the one used by Wikipedia (see Web). In database
+    notes and wizard notes, an automatic summary is displayed. Wiki syntax
+    and HTML syntax can be both used in the same page. The Wiki syntax is:
+    - Lines starting with from 1 to 6 '=' and ending with the same number
+      of '=' are section titles (1 = most important.. 6 = less important).
+      If the text is modifiable, they can be independantly editable (a
+      link "(modify)" is displayed to allot it).
+    - An empty line makes a new paragraph.
+    - Group of at least 2 lines starting with space and with an empty
+      line before and after the group of lines are displayed are they
+      are with a fixed size font.
+    - Lines starting with one or several '*' are list items. The number
+      of '*' is the list level (must start with one '*' then two '**' etc.)
+    - Lines starting with ':' are indented.
+    - Text between '' are displayed in Italic.
+    - Text between ''' are displayed in Bold.
+    - Text between ''''' are displayed in Bold-Italic.
+    - The syntax [[first_name/surname/oc/text]] makes a link to the
+      individual with key (firstname, surname, oc) with 'text' displayed.
+      Simplified syntaxes: if oc = 0, [[fn/sn/t]] can be used, and
+      [[fn/sn]] is equivalent to [[fn/sn/0/fn sn]].
+    - The syntax [[[name/text]]] makes a link to a "miscelleneous note"
+      (new feature), an independant page which can be edited (if updating
+      allowed), and using Wiki syntax also. The page name is 'name' (only
+      letters, digits and '_' allowed) and 'text' is displayed as link. If
+      the page does not exist, the link is displayed in red. These new
+      pages are saved by gwu only if they did not become isolated (= no
+      more linked by database notes, individual notes, wizard notes nor
+      another (recursively) linked miscelleneous note). Simplified syntax
+      [[[name]]] displays 'name' as link text.
+    - If there is a line containing '__NOTOC__' the summary is not displayed.
+    - If there is a line containing '__TOC__' the summary is displayed at
+      this place instead of the default place.
+    - If there is a line containing '__SHORT_TOC__' a short summary is
+      displayed.
+
 * GeneWeb server or CGI (gwd)
   - [02 Jan 05] Each complete date has a link to the calendars page.
   - [20 Dec 04] Fixed bug: in display places/surnames, when vars are used

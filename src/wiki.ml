@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.20 2005-07-13 09:37:42 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.21 2005-07-14 07:37:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -17,6 +17,9 @@ open Util;
    ** list ul/li item 2nd level
    ...
    : indentation
+   ''italic''
+   '''bold'''
+   '''''bold+italic'''''
    [[first_name/surname/oc/text]] link; 'text' displayed
    [[first_name/surname/text]] link (oc = 0); 'text' displayed
    [[first_name/surname]] link (oc = 0); 'first_name surname' displayed
@@ -46,18 +49,46 @@ value section_level s len =
 
 value syntax_links conf mode file_path s =
   let slen = String.length s in
-  loop 0 0 where rec loop i len =
-    if i = slen then Buff.get len
+  loop 0 0 0 where rec loop quot_lev i len =
+    if i = slen then
+      let len =
+        match quot_lev with
+        [ 1 -> Buff.mstore len "</i>"
+        | 2 -> Buff.mstore len "</b>"
+        | 3 -> Buff.mstore len "</b></i>"
+        | _ -> len ]
+      in
+      Buff.get len
     else if
-      s.[i] = '%' && i < slen - 1 && List.mem s.[i+1] ['['; ']'; '{'; '}']
+      s.[i] = '%' && i < slen - 1 && List.mem s.[i+1] ['['; ']'; '{'; '}'; ''']
     then
-      loop (i + 2) (Buff.store len s.[i+1])
+      loop quot_lev (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '{' then
       let j =
         try String.index_from s (i+1) '}' + 1 with [ Not_found -> slen ]
       in
       let b = String.sub s (i + 1) (j - i - 2) in
-      loop j (Buff.mstore len (sprintf "<span class=\"highlight\">%s</span>" b))
+      let s = sprintf "<span class=\"highlight\">%s</span>" b in
+      loop quot_lev j (Buff.mstore len s)
+
+    else if
+      i <= slen - 5 && s.[i] = ''' && s.[i+1] = ''' && s.[i+2] = ''' &&
+      s.[i+3] = ''' && s.[i+4] = ''' && (quot_lev = 0 || quot_lev = 3)
+    then
+      let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
+      loop (3 - quot_lev) (i + 5) (Buff.mstore len s)
+    else if
+      i <= slen - 3 && s.[i] = ''' && s.[i+1] = ''' && s.[i+2] = ''' &&
+      (quot_lev = 0 || quot_lev = 2)
+    then
+      let s = if quot_lev = 0 then "<b>" else "</b>" in
+      loop (2 - quot_lev) (i + 3) (Buff.mstore len s)
+    else if
+      i <= slen - 2 && s.[i] = ''' && s.[i+1] = ''' &&
+      (quot_lev = 0 || quot_lev = 1)
+    then
+      let s = if quot_lev = 0 then "<i>" else "</i>" in
+      loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match NotesLinks.misc_notes_link s i with
       [ Some (j, fname, sname, text) ->
@@ -69,8 +100,8 @@ value syntax_links conf mode file_path s =
             sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
               (commd conf) mode fname sname c text
           in
-          loop j (Buff.mstore len t)
-      | None -> loop (i + 3) (Buff.mstore len "[[[") ]
+          loop quot_lev j (Buff.mstore len t)
+      | None -> loop quot_lev (i + 3) (Buff.mstore len "[[[") ]
     else if i < slen - 1 && s.[i] = '[' && s.[i+1] = '[' then
       let j =
         loop (i + 2) where rec loop j =
@@ -112,8 +143,8 @@ value syntax_links conf mode file_path s =
         with
         [ Not_found -> "[[" ^ b ^ "]]" ]
       in
-      loop j (Buff.mstore len t)
-    else loop (i + 1) (Buff.store len s.[i])
+      loop quot_lev j (Buff.mstore len t)
+    else loop quot_lev (i + 1) (Buff.store len s.[i])
 ;
 
 value toc_list = ["__NOTOC__"; "__TOC__"; "__SHORT_TOC__"];
