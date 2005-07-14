@@ -21,7 +21,7 @@ The new version number (5.00) is in honour of this new encoding.
     - Lines starting with from 1 to 6 '=' and ending with the same number
       of '=' are section titles (1 = most important.. 6 = less important).
       If the text is modifiable, they can be independantly editable (a
-      link "(modify)" is displayed to allot it).
+      link "(modify)" is displayed to allow it).
     - An empty line makes a new paragraph.
     - Group of at least 2 lines starting with space and with an empty
       line before and after the group of lines are displayed are they
@@ -32,6 +32,9 @@ The new version number (5.00) is in honour of this new encoding.
     - Text between '' are displayed in Italic.
     - Text between ''' are displayed in Bold.
     - Text between ''''' are displayed in Bold-Italic.
+    - Text between { and } is displayed with GeneWeb highlight (bold green
+      by default).
+    - Characters ' [ ] { } can be displayed as they are if prefixed by %.
     - The syntax [[first_name/surname/oc/text]] makes a link to the
       individual with key (firstname, surname, oc) with 'text' displayed.
       Simplified syntaxes: if oc = 0, [[fn/sn/t]] can be used, and

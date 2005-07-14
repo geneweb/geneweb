@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.31 2005-07-12 07:11:15 ddr Exp $ *)
+(* $Id: doc.ml,v 4.32 2005-07-14 13:57:12 ddr Exp $ *)
 
 open Config;
 
@@ -196,8 +196,9 @@ value print_whole_wdoc conf fdoc title s =
   let s = Util.filter_html_tags s in
   let s = "<br /><br />\n" ^ s in
   let s =
+    let edit_opt = if conf.wizard then Some ("WDOC", fdoc) else None in
     Wiki.html_with_summary_of_tlsw conf "WDOC" (wdoc_file_path conf.lang)
-      fdoc s
+      edit_opt s
   in
   let fname =
     let f = Filename.concat "wdoc" "wdoc.txt" in
@@ -226,7 +227,7 @@ value print_whole_wdoc conf fdoc title s =
 value print_wdoc_sub_part conf sub_fname cnt0 lines =
   let mode = "WDOC" in
   let file_path = wdoc_file_path conf.lang in
-  Wiki.print_sub_part conf file_path mode sub_fname cnt0 lines
+  Wiki.print_sub_part conf conf.wizard file_path mode mode sub_fname cnt0 lines
     Util.filter_html_tags
 ;
 
