@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.29 2005-07-14 13:57:12 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.30 2005-07-14 19:51:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -353,17 +353,17 @@ value print_old conf base =
 ;
 
 value print_wiznote_sub_part conf wz cnt0 lines =
-  let mode = "WIZNOTE" in
   let file_path = Notes.file_path conf in
   let can_edit = conf.wizard && conf.user = wz in
-  Wiki.print_sub_part conf can_edit file_path "NOTES" mode (code_varenv wz)
-    cnt0 lines (string_with_macros conf [])
+  Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES" (code_varenv wz)
+    cnt0 lines
 ;
 
 value print_part_wiznote conf wz s cnt0 =
   let title = wz in
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines =
       if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
@@ -374,6 +374,7 @@ value print_part_wiznote conf wz s cnt0 =
 ;
 
 value print conf base =
+  if p_getenv conf.env "new" <> Some "on" && p_getenv conf.env "f" = None then print_old conf base else
   let auth_file =
     match
       (p_getenv conf.base_env "wizard_descr_file",
@@ -385,16 +386,22 @@ value print conf base =
   in
   if auth_file = "" then incorrect_request conf
   else
-    match p_getenv conf.env "f" with
+    let f =
+      (* backward compatibility *)
+      match p_getenv conf.env "f" with
+      [ None -> p_getenv conf.env "v"
+      | x -> x ]
+    in
+    match f with
     [ Some wz ->
         let wz = Filename.basename wz in
         let wfile = wzfile (dir conf) wz in
         let (s, date) = read_wizard_notes wfile in
         let edit_opt =
-          if conf.wizard && conf.user = wz then Some ("WIZNOTE", code_varenv wz)
+          if conf.wizard && conf.user = wz then Some ("WIZNOTES", code_varenv wz)
           else None
         in
-        match Util.p_getint conf.env "v" with
+        match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf wz s cnt0
         | None ->
             print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) ]
@@ -421,7 +428,11 @@ value print_mod conf base =
           let title = wizard_page_title wz wz in
           let wfile = wzfile (dir conf) wz in
           let (s, _) = read_wizard_notes wfile in
-          Wiki.print_mod_page conf "WIZNOTE" (code_varenv wz) title "" s
+          Wiki.print_mod_page conf "WIZNOTES" (code_varenv wz) title "" s
         else incorrect_request conf
     | None -> incorrect_request conf ]
+;
+
+value print_mod_ok conf base =
+  ()
 ;

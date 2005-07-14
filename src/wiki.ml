@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.22 2005-07-14 13:57:12 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.23 2005-07-14 19:51:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -492,22 +492,19 @@ value rev_extract_sub_part s v =
 
 value extract_sub_part s v = List.rev (rev_extract_sub_part s v);
 
-value print_sub_part_links conf edit_mode sub_fname cnt0 lines =
-  let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
+value print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   tag "p" begin
     if cnt0 >= first_cnt then
-      stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) edit_mode (cnt0 - 1) sfn
+      stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 - 1)
       begin
         Wserver.wprint "&lt;&lt;";
       end
     else ();
-    if cnt0 >= first_cnt - 1 then
-      stagn "a" "href=\"%sm=%s%s\"" (commd conf) edit_mode sfn begin
-        Wserver.wprint "^^";
-      end
-    else ();
-    if lines <> [] then
-      stagn "a" "href=\"%sm=%s;v=%d%s\"" (commd conf) edit_mode (cnt0 + 1) sfn
+    stagn "a" "href=\"%sm=%s%s\"" (commd conf) edit_mode sfn begin
+      Wserver.wprint "^^";
+    end;
+    if not is_empty then
+      stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 + 1)
       begin
         Wserver.wprint "&gt;&gt;";
       end
@@ -515,7 +512,7 @@ value print_sub_part_links conf edit_mode sub_fname cnt0 lines =
   end
 ;
 
-value print_sub_part_text conf file_path mode edit_opt cnt0 lines ending_filter =
+value print_sub_part_text conf file_path mode edit_opt cnt0 lines =
   let lines =
     List.map
       (fun
@@ -528,7 +525,6 @@ value print_sub_part_text conf file_path mode edit_opt cnt0 lines ending_filter 
   let lines = hotl conf None cnt0 edit_opt [] [] lines in
   let s = String.concat "\n" lines in
   let s = syntax_links conf mode file_path s in
-  let s = ending_filter s in
   let s =
     if cnt0 < first_cnt then
       match edit_opt with
@@ -540,12 +536,13 @@ value print_sub_part_text conf file_path mode edit_opt cnt0 lines ending_filter 
   Wserver.wprint "%s\n" s
 ;
 
-value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0 lines
-    ending_filter =
+value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
+    lines =
   let edit_opt = if can_edit then Some (edit_mode, sub_fname) else None in
+  let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   do {
-    print_sub_part_links conf edit_mode sub_fname cnt0 lines;
-    print_sub_part_text conf file_path mode edit_opt cnt0 lines ending_filter;
+    print_sub_part_links conf edit_mode sfn cnt0 (lines = []);
+    print_sub_part_text conf file_path mode edit_opt cnt0 lines;
   }
 ;
 
@@ -559,6 +556,7 @@ value print_mod_page conf mode fname title ntitle s =
   let sub_part =
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
+  let is_empty = sub_part = "" in
   let sfn = if fname = "" then "" else ";f=" ^ fname in
   do {
     header conf title;
@@ -570,24 +568,7 @@ value print_mod_page conf mode fname title ntitle s =
       end;
     end;
     print_link_to_welcome conf False;
-    if has_v then
-      tag "p" begin
-        if v >= first_cnt then
-          stagn "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v - 1) sfn
-          begin
-            Wserver.wprint "&lt;&lt;";
-          end
-        else ();
-	stagn "a" "href=\"%sm=MOD_%s%s\"" (commd conf) mode sfn begin
-          Wserver.wprint "^^";
-        end;
-        if sub_part <> "" then
-          stagn "a" "href=\"%sm=MOD_%s;v=%d%s\"" (commd conf) mode (v + 1) sfn
-          begin
-            Wserver.wprint "&gt;&gt;";
-          end
-        else ();
-      end
+    if has_v then print_sub_part_links conf ("MOD_" ^mode) sfn v is_empty
     else ();
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
