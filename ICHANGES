@@ -8,6 +8,10 @@ I neglected to record the Internal changes between version 4.10
 and 01 Jul 2005, but there are a lot of them... I add them when
 I have some time (and some courage).
 
+* GeneWeb server or CGI (gwd)
+  - [14 Jul 05] Fixed small bug: URL without index (";opt=no_index")
+    displayed "oc=" twice.
+
 * Consanguinity computing (consang)
   - [02 Jul 05] Fixed bug: when number of persons was greater than 1M,
     the consang applied to a *modified* database failed by "Segmentation
