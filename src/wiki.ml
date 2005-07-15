@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.26 2005-07-15 05:48:56 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.27 2005-07-15 12:55:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -102,14 +102,14 @@ use of database forum by ill-intentioned people to communicate)...
 
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, fname, sname, text) ->
+      [ Some (j, fname, sharp, text) ->
           let c =
             let f = file_path fname in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
             sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
-              (commd conf) mode fname sname c text
+              (commd conf) mode fname sharp c text
           in
           loop quot_lev j (Buff.mstore len t)
       | None -> loop quot_lev (i + 3) (Buff.mstore len "[[[") ]
