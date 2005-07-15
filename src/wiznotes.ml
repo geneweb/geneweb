@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.35 2005-07-15 10:14:15 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.36 2005-07-15 14:55:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -109,7 +109,7 @@ value print_main conf base auth_file =
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
   do {
     header conf title;
-    print_link_to_welcome conf False;
+    print_link_to_welcome conf True;
     let list =
       List.map
         (fun (wz, wname) ->

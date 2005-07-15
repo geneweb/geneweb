@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.11 2005-07-14 22:52:27 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.12 2005-07-15 14:55:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -19,7 +19,7 @@ value notes_links s =
     if i = slen then list
     else
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, lfname, _, _) ->
+      [ Some (j, _, lfname, _, _) ->
           let list = if List.mem lfname list then list else [lfname :: list] in
           loop list j
       | None -> loop list (i + 1) ]

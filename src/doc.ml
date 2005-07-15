@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.36 2005-07-15 10:14:15 ddr Exp $ *)
+(* $Id: doc.ml,v 4.37 2005-07-15 14:55:32 ddr Exp $ *)
 
 open Config;
 
@@ -291,7 +291,7 @@ value print_mod_wdoc conf =
   let conf = {(conf) with cancel_links = True} in
   let fname =
     match Util.p_getenv conf.env "f" with
-    [ Some f -> if NotesLinks.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> "" ]
   in
   let fname = if fname = "" then "index" else fname in
@@ -329,7 +329,7 @@ value commit_wdoc conf file_path fdoc s =
 value print_mod_wdoc_ok conf =
   let fname =
     fun
-    [ Some f -> if NotesLinks.check_file_name f then f else "index"
+    [ Some f -> if NotesLinks.check_file_name f <> None then f else "index"
     | None -> "index" ]
   in
   let edit_mode _ = if conf.wizard then Some "WDOC" else None in

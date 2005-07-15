@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.6 2005-07-15 13:00:13 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.7 2005-07-15 14:55:32 ddr Exp $ *)
 
 open Def;
 
@@ -12,13 +12,24 @@ type page =
 ;
 type notes_links_db = list (page * list string);
 
+value char_dir_sep = ':';
+
 value check_file_name s =
-  loop 0 where rec loop i =
-    if i = String.length s then True
+  loop [] 0 0 where rec loop path ibeg i =
+    if i = String.length s then
+      if i > ibeg then
+        let path = (List.rev path, String.sub s ibeg (i - ibeg)) in
+        Some path
+      else None
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' -> loop (i + 1)
-      | _ -> False ]
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' -> loop path ibeg (i + 1)
+      | c ->
+          if c = char_dir_sep then
+            if i > ibeg then
+              loop [String.sub s ibeg (i - ibeg) :: path] (i + 1) (i + 1)
+            else None
+          else None ]
 ;
 
 value misc_notes_link s i =
@@ -36,15 +47,16 @@ value misc_notes_link s i =
       let b = String.sub s (i + 3) (j - i - 6) in
       let (fname, sharp, text) =
         try
-          let k = String.index b '/' in
+          let k = String.rindex b '/' in
           let j = try String.index b '#' with [ Not_found -> k ] in
           (String.sub b 0 j, String.sub b j (k - j),
            String.sub b (k + 1) (String.length b - k - 1))
         with
         [ Not_found -> (b, "", b) ]
       in
-      if check_file_name fname then Some (j, fname, sharp, text)
-      else None
+      match check_file_name fname with
+      [ Some pg_path -> Some (j, pg_path, fname, sharp, text)
+      | None -> None ]
     else None
   else None
 ;
