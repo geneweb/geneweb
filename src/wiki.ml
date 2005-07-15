@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.28 2005-07-15 14:55:32 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.29 2005-07-15 15:03:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -444,7 +444,11 @@ and syntax_dd lev list sl =
 
 value html_of_tlsw conf s =
   let (lines, _) = lines_list_of_string s in
-  let sections_nums = sections_nums_of_tlsw_lines lines in
+  let sections_nums =
+    match sections_nums_of_tlsw_lines lines with
+    [ [_] -> []
+    | l -> l ]
+  in
   hotl conf (Some lines) first_cnt None sections_nums [] ["" :: lines]
 ;
 
