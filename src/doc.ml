@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.35 2005-07-15 05:48:56 ddr Exp $ *)
+(* $Id: doc.ml,v 4.36 2005-07-15 10:14:15 ddr Exp $ *)
 
 open Config;
 
@@ -224,21 +224,15 @@ value print_whole_wdoc conf fdoc title s =
       } ]
 ;
 
-value print_wdoc_sub_part conf sub_fname cnt0 lines =
-  let mode = "WDOC" in
-  let file_path = wdoc_file_path conf.lang in
-  Wiki.print_sub_part conf conf.wizard file_path mode mode sub_fname cnt0 lines
-;
-
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
     let s = Util.filter_html_tags s in
     let lines = Wiki.extract_sub_part s cnt0 in
-    let lines =
-      if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
-    in
-    print_wdoc_sub_part conf fdoc cnt0 lines;
+    let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
+    let mode = "WDOC" in
+    let file_path = wdoc_file_path conf.lang in
+    Wiki.print_sub_part conf conf.wizard file_path mode mode fdoc cnt0 lines;
     Util.trailer conf;
   }
 ;
