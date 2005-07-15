@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.27 2005-07-15 12:55:20 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.28 2005-07-15 14:55:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -102,7 +102,7 @@ use of database forum by ill-intentioned people to communicate)...
 
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, fname, sharp, text) ->
+      [ Some (j, _, fname, sharp, text) ->
           let c =
             let f = file_path fname in
             if Sys.file_exists f then "" else " style=\"color:red\""

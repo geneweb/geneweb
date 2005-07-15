@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.109 2005-07-15 10:14:15 ddr Exp $ *)
+(* $Id: notes.ml,v 4.110 2005-07-15 14:55:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -13,7 +13,14 @@ value file_path conf fname =
     (fname ^ ".txt")
 ;
 
+value path_of_fnotes fnotes =
+  match NotesLinks.check_file_name fnotes with
+  [ Some (dl, f) -> List.fold_right Filename.concat dl f
+  | None -> fnotes ]
+;
+
 value read_notes base fnotes =
+  let fnotes = path_of_fnotes fnotes in
   let s = base.data.bnotes.nread fnotes RnAll in
   Wiki.split_title_and_text s
 ;
@@ -190,7 +197,7 @@ value print_what_links conf base fnotes =
 value print conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if NotesLinks.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> "" ]
   in
   match p_getenv conf.env "ref" with
@@ -205,7 +212,7 @@ value print conf base =
 value print_mod conf base =
   let fnotes =
     match p_getenv conf.env "f" with
-    [ Some f -> if NotesLinks.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> "" ]
   in
   let title _ =
@@ -224,7 +231,7 @@ value update_notes_links_db conf fnotes s force =
       if i = slen then list
       else
         match NotesLinks.misc_notes_link s i with
-        [ Some (j, lfname, _, _) ->
+        [ Some (j, _, lfname, _, _) ->
             let list = if List.mem lfname list then list else [lfname :: list] in
             loop list j
         | None -> loop list (i + 1) ]
@@ -240,8 +247,10 @@ value commit_notes conf base fnotes s =
     if fnotes = "" then NotesLinks.PgNotes
     else NotesLinks.PgMisc fnotes
   in
+  let fname = path_of_fnotes fnotes in
   do {
-    base.func.commit_notes fnotes s;
+    try base.func.commit_notes fname s with
+    [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
     History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
     update_notes_links_db conf pg s True;
   }
@@ -250,7 +259,7 @@ value commit_notes conf base fnotes s =
 value print_mod_ok conf base =
   let fname =
     fun
-    [ Some f -> if NotesLinks.check_file_name f then f else ""
+    [ Some f -> if NotesLinks.check_file_name f <> None then f else ""
     | None -> "" ]
   in
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
@@ -301,7 +310,7 @@ value print_misc_notes conf base =
                else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
              in
              let c =
-               let f = file_path conf f in
+               let f = file_path conf (path_of_fnotes f) in
                if Sys.file_exists f then "" else " style=\"color:red\""
              in
              tag "li" begin
