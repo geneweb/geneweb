@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.25 2005-07-15 00:18:09 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.26 2005-07-15 05:48:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -659,7 +659,7 @@ value split_title_and_text s =
 
 ;
 
-value print_ok conf file_path mode edit_mode fname s =
+value print_ok conf file_path mode edit_mode fname title_is_1st s =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
   in
@@ -677,7 +677,9 @@ value print_ok conf file_path mode edit_mode fname s =
       [ Some v -> v
       | None -> 0 ]
     in
-    let (title, s) = if v = 0 then split_title_and_text s else ("", s) in
+    let (title, s) =
+      if v = 0 && title_is_1st then split_title_and_text s else ("", s)
+    in
     let (lines, _) = lines_list_of_string s in
     let lines =
       if v = 0 && title <> "" then
@@ -693,7 +695,7 @@ value print_ok conf file_path mode edit_mode fname s =
 ;
 
 value print_mod_ok conf edit_mode mode fname read_string commit string_filter
-    file_path =
+    file_path title_is_1st =
   let fname = fname (Util.p_getenv conf.env "f") in
   try
     match edit_mode fname with
@@ -722,7 +724,7 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
           do {
             if s <> old_string then commit conf fname s else ();
             let sub_part = string_filter sub_part in
-            print_ok conf file_path mode edit_mode fname sub_part;
+            print_ok conf file_path mode edit_mode fname title_is_1st sub_part;
           }
     | None -> Util.incorrect_request conf ]
   with

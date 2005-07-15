@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.34 2005-07-14 22:52:27 ddr Exp $ *)
+(* $Id: doc.ml,v 4.35 2005-07-15 05:48:56 ddr Exp $ *)
 
 open Config;
 
@@ -345,5 +345,5 @@ value print_mod_wdoc_ok conf =
   let string_filter = Util.filter_html_tags in
   let file_path = wdoc_file_path conf.lang in
   Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
-    file_path
+    file_path True
 ;
