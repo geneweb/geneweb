@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.31 2005-07-14 22:52:27 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.32 2005-07-15 00:18:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -236,7 +236,8 @@ value wizard_page_title wz wizname h =
      else "")
 ;
 
-value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
+value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date)
+    new_version =
   let wizname =
     let wizdata = read_auth_file auth_file in
     try List.assoc wz wizdata with
@@ -253,7 +254,7 @@ value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
     [ Some ic -> Templ.copy_from_templ conf [] ic
     | None -> () ];
     html_p conf;
-    tag "table" "border=\"0\"" begin
+    tag "table" "border=\"0\" width=\"100%%\"" begin
       tag "tr" begin
         tag "td" begin
           let s = string_with_macros conf [] s in
@@ -276,7 +277,7 @@ value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
         tm.Unix.tm_hour tm.Unix.tm_min
     }
     else ();
-    if conf.wizard && conf.user = wz then do {
+    if not new_version && conf.wizard && conf.user = wz then do {
       html_p conf;
       tag "form" "method=\"post\" action=\"%s\"" conf.command begin
         Util.hidden_env conf;
@@ -348,7 +349,7 @@ value print_old conf base =
             if conf.wizard && conf.user = wz then
               print_wizard_mod conf base auth_file wz nn
             else incorrect_request conf
-        | None -> print_wizard conf auth_file wz ]
+        | None -> print_wizard conf auth_file wz False ]
     | None -> print_main conf base auth_file ]
 ;
 
@@ -374,7 +375,7 @@ value print_part_wiznote conf wz s cnt0 =
 ;
 
 value print conf base =
-  if p_getenv conf.env "new" <> Some "on" && p_getenv conf.env "f" = None then print_old conf base else
+  if p_getenv conf.env "old" = Some "on" then print_old conf base else
   let auth_file =
     match
       (p_getenv conf.base_env "wizard_descr_file",
@@ -404,7 +405,7 @@ value print conf base =
         match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf wz s cnt0
         | None ->
-            print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) ]
+            print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) True ]
     | None -> print_main conf base auth_file ]
 ;
 
