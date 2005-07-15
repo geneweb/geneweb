@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.24 2005-07-14 22:52:27 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.25 2005-07-15 00:18:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -70,7 +70,17 @@ value syntax_links conf mode file_path s =
       let b = String.sub s (i + 1) (j - i - 2) in
       let s = sprintf "<span class=\"highlight\">%s</span>" b in
       loop quot_lev j (Buff.mstore len s)
-
+(*
+interesting idea, but perhaps dangerous (risk of hidden messages and
+use of database forum by ill-intentioned people to communicate)...
+    else if i <= slen - 2 && s.[i] = '[' && s.[i+1] = '\n' then
+      let j =
+        try String.index_from s (i+2) ']' + 1 with [ Not_found -> slen ]
+      in
+      let b = String.sub s (i + 2) (j - i - 3) in
+      let (tb, _) = Translate.inline conf.lang '%' (String.make 1) b in
+      loop quot_lev j (Buff.mstore len tb)
+*)
     else if
       i <= slen - 5 && s.[i] = ''' && s.[i+1] = ''' && s.[i+2] = ''' &&
       s.[i+3] = ''' && s.[i+4] = ''' && (quot_lev = 0 || quot_lev = 3)
@@ -89,6 +99,7 @@ value syntax_links conf mode file_path s =
     then
       let s = if quot_lev = 0 then "<i>" else "</i>" in
       loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
+
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match NotesLinks.misc_notes_link s i with
       [ Some (j, fname, sname, text) ->
