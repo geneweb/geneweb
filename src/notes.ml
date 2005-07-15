@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.107 2005-07-14 22:52:27 ddr Exp $ *)
+(* $Id: notes.ml,v 4.108 2005-07-15 05:48:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -264,7 +264,7 @@ value print_mod_ok conf base =
   let string_filter = string_with_macros conf [] in
   let file_path = file_path conf in
   Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
-    file_path
+    file_path True
 ;
 
 value begin_text_without_html_tags lim s =

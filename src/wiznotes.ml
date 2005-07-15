@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.32 2005-07-15 00:18:09 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.33 2005-07-15 05:48:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -471,5 +471,5 @@ value print_mod_ok conf base =
     let string_filter = string_with_macros conf [] in
     let file_path = Notes.file_path conf in
     Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
-      file_path
+      file_path False
 ;
