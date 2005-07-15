@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.34 2005-07-15 08:40:43 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.35 2005-07-15 10:14:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -280,23 +280,17 @@ value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
   }
 ;
 
-value print_wiznote_sub_part conf wz cnt0 lines =
-  let file_path = Notes.file_path conf in
-  let can_edit = conf.wizard && conf.user = wz in
-  Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES" (code_varenv wz)
-    cnt0 lines
-;
-
 value print_part_wiznote conf wz s cnt0 =
   let title = wz in
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
     let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
-    let lines =
-      if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines
-    in
-    print_wiznote_sub_part conf wz cnt0 lines;
+    let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
+    let file_path = Notes.file_path conf in
+    let can_edit = conf.wizard && conf.user = wz in
+    Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES"
+      (code_varenv wz) cnt0 lines;
     Util.trailer conf;
   }
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.108 2005-07-15 05:48:56 ddr Exp $ *)
+(* $Id: notes.ml,v 4.109 2005-07-15 10:14:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -11,12 +11,6 @@ value file_path conf fname =
   List.fold_right Filename.concat
     [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
     (fname ^ ".txt")
-;
-
-value print_notes_sub_part conf sub_fname cnt0 lines =
-  let mode = "NOTES" in
-  let file_path = file_path conf in
-  Wiki.print_sub_part conf conf.wizard file_path mode mode sub_fname cnt0 lines
 ;
 
 value read_notes base fnotes =
@@ -69,7 +63,9 @@ value print_notes_part conf fnotes title s cnt0 =
     else ();
     let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
-    print_notes_sub_part conf fnotes cnt0 lines;
+    let mode = "NOTES" in
+    let file_path = file_path conf in
+    Wiki.print_sub_part conf conf.wizard file_path mode mode fnotes cnt0 lines;
     trailer conf;
   }
 ;
