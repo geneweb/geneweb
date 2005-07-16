@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.113 2005-07-16 11:52:50 ddr Exp $ *)
+(* $Id: notes.ml,v 4.114 2005-07-16 12:44:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -315,14 +315,15 @@ value begin_text_without_html_tags lim s =
 ;
 
 value print_misc_notes conf base =
-  let title _ =
-    Wserver.wprint "%s"
-      (capitale (nominative (transl conf "miscellaneous notes")))
-  in
   let d =
     match p_getenv conf.env "d" with
     [ Some d -> d
     | None -> "" ]
+  in
+  let title _ =
+    Wserver.wprint "%s"
+      (if d = "" then capitale (nominative (transl conf "miscellaneous notes"))
+       else "<tt>- " ^ d ^ " -</tt>")
   in
   let db = notes_links_db conf base True in
   let db =
