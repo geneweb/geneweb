@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.29 2005-07-15 15:03:08 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.30 2005-07-16 03:06:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -46,6 +46,8 @@ value section_level s len =
       loop (i + 1) (j - 1) (k + 2)
     else i
 ;
+
+value fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file;
 
 value syntax_links conf mode file_path s =
   let slen = String.length s in
@@ -102,14 +104,14 @@ use of database forum by ill-intentioned people to communicate)...
 
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, _, fname, sharp, text) ->
+      [ Some (j, fpath, fname, anchor, text) ->
           let c =
-            let f = file_path fname in
+            let f = file_path (fname_of_path fpath) in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
             sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
-              (commd conf) mode fname sharp c text
+              (commd conf) mode fname anchor c text
           in
           loop quot_lev j (Buff.mstore len t)
       | None -> loop quot_lev (i + 3) (Buff.mstore len "[[[") ]
