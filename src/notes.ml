@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.110 2005-07-15 14:55:32 ddr Exp $ *)
+(* $Id: notes.ml,v 4.111 2005-07-16 03:06:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -295,32 +295,90 @@ value print_misc_notes conf base =
     Wserver.wprint "%s"
       (capitale (nominative (transl conf "miscellaneous notes")))
   in
-  let db2 = notes_links_db conf base True in
+  let d =
+    match p_getenv conf.env "d" with
+    [ Some d -> d
+    | None -> "" ]
+  in
+  let db = notes_links_db conf base True in
+  let db =
+    List.fold_right
+      (fun (f, _) list ->
+         if String.length f >= String.length d then
+           if String.sub f 0 (String.length d) = d then
+             let r =
+               String.sub f (String.length d) (String.length f - String.length d)
+             in
+             if d = "" || r <> "" && r.[0] = NotesLinks.char_dir_sep then
+               let r =
+                 if d = "" then r else String.sub r 1 (String.length r - 1)
+               in
+               try
+                 let i = String.index r NotesLinks.char_dir_sep in
+                 let r = String.sub r 0 i in
+                 match list with
+                 [ [(r', None) :: _] when r = r' -> list
+                 | _ -> [(r, None) :: list] ]
+               with
+               [ Not_found -> [(r, Some f) :: list] ]
+             else list
+           else list
+         else list)
+      db []
+  in
   do {
     header conf title;
     print_link_to_welcome conf True;
-    if db2 <> [] then
+    if db <> [] then
       tag "ul" begin
+        if d <> "" then
+          tag "li" begin
+            stag "a" "href=\"%sm=MISC_NOTES%s\"" (commd conf)
+              (try
+                 let i = String.rindex d NotesLinks.char_dir_sep in
+                 let d = String.sub d 0 i in
+                 ";d=" ^ d
+               with
+               [ Not_found -> "" ])
+            begin
+              Wserver.wprint "<tt>&lt;--</tt>";
+            end;
+          end
+        else ();
         List.iter
-          (fun (f, pl) ->
-             let txt =
-               let (t, s) = read_notes base f in
-               if t <> "" then t
-               else if String.length s < String.length f then f
-               else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
-             in
-             let c =
-               let f = file_path conf (path_of_fnotes f) in
-               if Sys.file_exists f then "" else " style=\"color:red\""
-             in
-             tag "li" begin
-               Wserver.wprint "<tt>[";
-               stag "a" "href=\"%sm=NOTES;f=%s\"%s" (commd conf) f c begin
-                 Wserver.wprint "%s" f;
-               end;
-               Wserver.wprint "]</tt> : %s\n" txt;
-             end)
-          db2;
+          (fun (r, f) ->
+             match f with
+             [ Some f ->
+                 let txt =
+                   let (t, s) = read_notes base f in
+                   if t <> "" then t
+                   else if s = "" then ""
+                   else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
+                 in
+                 let c =
+                   let f = file_path conf (path_of_fnotes f) in
+                   if Sys.file_exists f then "" else " style=\"color:red\""
+                 in
+                 tag "li" "style=\"list-style-type:circle\"" begin
+                   Wserver.wprint "<tt>[";
+                   stag "a" "href=\"%sm=NOTES;f=%s\"%s" (commd conf) f c begin
+                     Wserver.wprint "%s" r;
+                   end;
+                   Wserver.wprint "]</tt> : %s\n" txt;
+                 end
+             | None ->
+                 tag "li" begin
+                   stag "tt" begin
+                     stag "a" "href=\"%sm=MISC_NOTES;d=%s\"" (commd conf)
+                       (if d = "" then r else
+                        d ^ String.make 1 NotesLinks.char_dir_sep ^ r)
+                     begin
+                       Wserver.wprint "%s " r;
+                       Wserver.wprint "--&gt;";
+                     end;
+                   end;
+                 end ])
+          db;
       end
     else ();
     trailer conf;

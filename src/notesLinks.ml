@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.7 2005-07-15 14:55:32 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.8 2005-07-16 03:06:14 ddr Exp $ *)
 
 open Def;
 
@@ -45,7 +45,7 @@ value misc_notes_link s i =
     in
     if j > i + 6 then
       let b = String.sub s (i + 3) (j - i - 6) in
-      let (fname, sharp, text) =
+      let (fname, anchor, text) =
         try
           let k = String.rindex b '/' in
           let j = try String.index b '#' with [ Not_found -> k ] in
@@ -55,7 +55,7 @@ value misc_notes_link s i =
         [ Not_found -> (b, "", b) ]
       in
       match check_file_name fname with
-      [ Some pg_path -> Some (j, pg_path, fname, sharp, text)
+      [ Some pg_path -> Some (j, pg_path, fname, anchor, text)
       | None -> None ]
     else None
   else None
