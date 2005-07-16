@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.112 2005-07-16 10:13:15 ddr Exp $ *)
+(* $Id: notes.ml,v 4.113 2005-07-16 11:52:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -81,6 +81,30 @@ value notes_links_db conf base eliminate_unlinked =
   let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
   let fname = Filename.concat bdir "notes_links" in
   let db = NotesLinks.read_db_from_file fname in
+  let db =
+    let aliases = Wiki.notes_aliases conf in
+    List.fold_left
+      (fun list (pg, sl) ->
+         let pg =
+           match pg with
+           [ NotesLinks.PgMisc f -> NotesLinks.PgMisc (Wiki.map_notes aliases f)
+           | x -> x ]
+         in
+         let sl = List.map (Wiki.map_notes aliases) sl in
+         let (sl, list) =
+           let (list1, list2) = List.partition (fun (pg1, _) -> pg = pg1) list in
+           match list1 with
+           [ [(_, sl1)] ->
+               let sl =
+                 List.fold_left
+                   (fun sl s -> if List.mem s sl then sl else [s :: sl]) sl sl1
+               in
+               (sl, list2)
+           | _ -> (sl, list) ]
+         in
+         [(pg, sl) :: list])
+      [] db
+  in
   let db2 =
     List.fold_left
       (fun db2 (pg, sl) ->
