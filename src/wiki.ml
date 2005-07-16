@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.33 2005-07-16 12:47:09 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.34 2005-07-16 14:37:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -50,7 +50,7 @@ value section_level s len =
 value notes_aliases conf =
   let fname =
     List.fold_right Filename.concat
-      [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"] "aliases.txt"
+      [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"] "notes.alias"
   in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
