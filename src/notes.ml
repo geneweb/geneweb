@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.111 2005-07-16 03:06:14 ddr Exp $ *)
+(* $Id: notes.ml,v 4.112 2005-07-16 10:13:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -364,7 +364,8 @@ value print_misc_notes conf base =
                    stag "a" "href=\"%sm=NOTES;f=%s\"%s" (commd conf) f c begin
                      Wserver.wprint "%s" r;
                    end;
-                   Wserver.wprint "]</tt> : %s\n" txt;
+                   Wserver.wprint "]</tt>%s\n"
+                     (if txt = "" then "" else " : " ^ txt);
                  end
              | None ->
                  tag "li" begin
