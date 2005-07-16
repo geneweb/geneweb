@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.32 2005-07-16 12:44:39 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.33 2005-07-16 12:47:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -67,8 +67,7 @@ value notes_aliases conf =
             in
             loop list
         | None -> do { close_in ic; list } ]
-  | None ->let _ = do { Printf.eprintf "%s not found\n" fname; flush stderr } in
- [] ]
+  | None -> [] ]
 ;
 
 value map_notes aliases f =
