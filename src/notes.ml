@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.114 2005-07-16 12:44:39 ddr Exp $ *)
+(* $Id: notes.ml,v 4.115 2005-07-16 12:48:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -320,9 +320,10 @@ value print_misc_notes conf base =
     [ Some d -> d
     | None -> "" ]
   in
-  let title _ =
+  let title h =
     Wserver.wprint "%s"
       (if d = "" then capitale (nominative (transl conf "miscellaneous notes"))
+       else if h then "- " ^ d ^ " -"
        else "<tt>- " ^ d ^ " -</tt>")
   in
   let db = notes_links_db conf base True in
