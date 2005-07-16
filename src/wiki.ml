@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.30 2005-07-16 03:06:14 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.31 2005-07-16 11:52:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -45,6 +45,34 @@ value section_level s len =
     else if len > k && s.[i] = '=' && s.[j] = '=' then
       loop (i + 1) (j - 1) (k + 2)
     else i
+;
+
+value notes_aliases conf =
+  let fname =
+    List.fold_right Filename.concat
+      [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"] "notes.aliases"
+  in
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop [] where rec loop list =
+        match try Some (input_line ic) with [ End_of_file -> None ] with
+        [ Some s ->
+            let list =
+              try
+                let i = String.index s ' ' in
+                [(String.sub s 0 i,
+                  String.sub s (i + 1) (String.length s - i - 1)) :: list]
+              with
+              [ Not_found -> list ]
+            in
+            loop list
+        | None -> do { close_in ic; list } ]
+  | None ->let _ = do { Printf.eprintf "%s not found\n" fname; flush stderr } in
+ [] ]
+;
+
+value map_notes aliases f =
+  try List.assoc f aliases with [ Not_found -> f ]
 ;
 
 value fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file;
@@ -104,7 +132,14 @@ use of database forum by ill-intentioned people to communicate)...
 
     else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, fpath, fname, anchor, text) ->
+      [ Some (j, fpath1, fname1, anchor, text) ->
+          let (fpath, fname) =
+            let aliases = notes_aliases conf in
+            let fname = map_notes aliases fname1 in
+            match NotesLinks.check_file_name fname with
+            [ Some fpath -> (fpath, fname)
+            | None -> (fpath1, fname1) ]
+          in
           let c =
             let f = file_path (fname_of_path fpath) in
             if Sys.file_exists f then "" else " style=\"color:red\""
