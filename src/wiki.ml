@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.34 2005-07-16 14:37:44 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.35 2005-07-16 17:30:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -76,18 +76,30 @@ value map_notes aliases f =
 
 value fname_of_path (dirs, file) = List.fold_right Filename.concat dirs file;
 
+value str_start_with str i x =
+  loop i 0 where rec loop i j =
+    if j = String.length x then True
+    else if i = String.length str then False
+    else if str.[i] = x.[j] then loop (i + 1) (j + 1)
+    else False
+;
+
 value syntax_links conf mode file_path s =
   let slen = String.length s in
   loop 0 0 0 where rec loop quot_lev i len =
-    if i = slen then
-      let len =
-        match quot_lev with
-        [ 1 -> Buff.mstore len "</i>"
-        | 2 -> Buff.mstore len "</b>"
-        | 3 -> Buff.mstore len "</b></i>"
-        | _ -> len ]
-      in
-      Buff.get len
+    let (len, quot_lev) =
+      if i = slen || List.exists (str_start_with s i) ["</li>"; "</p>"] then
+        let len =
+          match quot_lev with
+          [ 1 -> Buff.mstore len "</i>"
+          | 2 -> Buff.mstore len "</b>"
+          | 3 -> Buff.mstore len "</b></i>"
+          | _ -> len ]
+        in
+        (len, 0)
+      else (len, quot_lev)
+    in
+    if i = slen then Buff.get len
     else if
       s.[i] = '%' && i < slen - 1 && List.mem s.[i+1] ['['; ']'; '{'; '}'; ''']
     then
@@ -102,7 +114,7 @@ value syntax_links conf mode file_path s =
 (*
 interesting idea, but perhaps dangerous (risk of hidden messages and
 use of database forum by ill-intentioned people to communicate)...
-    else if i <= slen - 2 && s.[i] = '[' && s.[i+1] = '\n' then
+    else if str_start_with s i "[\n" then
       let j =
         try String.index_from s (i+2) ']' + 1 with [ Not_found -> slen ]
       in
@@ -129,7 +141,7 @@ use of database forum by ill-intentioned people to communicate)...
       let s = if quot_lev = 0 then "<i>" else "</i>" in
       loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
 
-    else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
+    else if str_start_with s i "[[[" then
       match NotesLinks.misc_notes_link s i with
       [ Some (j, fpath1, fname1, anchor, text) ->
           let (fpath, fname) =
@@ -149,7 +161,7 @@ use of database forum by ill-intentioned people to communicate)...
           in
           loop quot_lev j (Buff.mstore len t)
       | None -> loop quot_lev (i + 3) (Buff.mstore len "[[[") ]
-    else if i < slen - 1 && s.[i] = '[' && s.[i+1] = '[' then
+    else if str_start_with s i "[[" then
       let j =
         loop (i + 2) where rec loop j =
           if j = slen then j
@@ -408,7 +420,9 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
         in
         let list =
           if wlo <> None then
-            let s = sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt in
+            let s =
+              sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
+            in
             [s:: list]
           else list
         in
