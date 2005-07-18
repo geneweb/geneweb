@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.35 2005-07-16 17:30:06 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.36 2005-07-18 17:31:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -165,7 +165,7 @@ use of database forum by ill-intentioned people to communicate)...
       let j =
         loop (i + 2) where rec loop j =
           if j = slen then j
-          else if j < slen - 1 && s.[j] = ']' && s.[j+1] = ']' then j + 2
+          else if start_with s j "]]" then j + 2
           else loop (j + 1)
       in
       let t =
