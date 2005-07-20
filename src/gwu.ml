@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.46 2005-07-20 17:21:37 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.47 2005-07-20 19:09:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1182,7 +1182,7 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
             let fn =
               match NotesLinks.check_file_name f with
               [ Some (dl, f) -> List.fold_right Filename.concat dl f
-              | None -> f ]
+              | None -> "bad" ]
             in
             let s = base.data.bnotes.nread fn RnAll in
             let files =
@@ -1197,7 +1197,7 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
            let fn =
              match NotesLinks.check_file_name f with
              [ Some (dl, f) -> List.fold_right Filename.concat dl f
-             | None -> f ]
+             | None -> "bad" ]
            in
            let s = base.data.bnotes.nread fn RnAll in
            if s <> "" then do {
