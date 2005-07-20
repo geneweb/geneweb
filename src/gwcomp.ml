@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.21 2005-07-13 20:37:59 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.22 2005-07-20 16:30:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -842,7 +842,11 @@ value read_family ic fname =
   | Some (str, ["notes-db"]) ->
       let notes = read_notes_db ic "end notes-db" in
       F_some (Bnotes "" notes, read_line ic)
-  | Some (str, ["page-ext"; p]) ->
+  | Some (str, ["page-ext"; _]) ->
+      let p =
+        let len = String.length "page-ext" + 1 in
+        String.sub str len (String.length str - len)
+      in
       let notes = read_notes_db ic "end page-ext" in
       F_some (Bnotes p notes, read_line ic)
   | Some (str, ["notes"]) ->
