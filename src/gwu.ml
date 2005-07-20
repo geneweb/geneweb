@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.45 2005-07-20 15:23:10 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.46 2005-07-20 17:21:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1179,7 +1179,12 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
         fun
         [ [] -> ()
         | [(f, _) :: files] ->
-            let s = base.data.bnotes.nread f RnAll in
+            let fn =
+              match NotesLinks.check_file_name f with
+              [ Some (dl, f) -> List.fold_right Filename.concat dl f
+              | None -> f ]
+            in
+            let s = base.data.bnotes.nread fn RnAll in
             let files =
               add_linked_files gen (fun _ -> sprintf "extended page \"%s\"" f)
                 s files
