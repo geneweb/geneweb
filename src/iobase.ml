@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.52 2005-07-13 20:37:59 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.53 2005-07-20 15:23:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1721,7 +1721,7 @@ value gen_output no_patches bname base =
                    let s = base.data.bnotes.nread f RnAll in
                    let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
                    do {
-                     try Unix.mkdir tmp_notes_d 0o755 with _ -> ();
+                     mkdir_p (Filename.dirname fname);
                      let oc = open_out fname in
                      output_string oc s;
                      close_out oc;
