@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.44 2005-07-13 20:37:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.45 2005-07-20 15:23:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -280,7 +280,8 @@ type gen =
     fam_sel : ifam -> bool;
     fam_done : array bool;
     notes_pl_p : mutable list person;
-    ext_files : mutable list (string * ref (list string)) }
+    ext_files : mutable list (string * ref (list string));
+    notes_alias : mutable list (string * string) }
 ;
 
 value print_parent oc base gen fam p =
@@ -494,6 +495,32 @@ value get_persons_with_notes base m list =
     (Array.to_list m.m_chil) list
 ;
 
+value notes_aliases bdir =
+  let fname =
+    List.fold_right Filename.concat [bdir; "notes_d"] "notes.alias"
+  in
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop [] where rec loop list =
+        match try Some (input_line ic) with [ End_of_file -> None ] with
+        [ Some s ->
+            let list =
+              try
+                let i = String.index s ' ' in
+                [(String.sub s 0 i,
+                  String.sub s (i + 1) (String.length s - i - 1)) :: list]
+              with
+              [ Not_found -> list ]
+            in
+            loop list
+        | None -> do { close_in ic; list } ]
+  | None -> [] ]
+;
+
+value map_notes aliases f =
+  try List.assoc f aliases with [ Not_found -> f ]
+;
+
 value add_linked_files gen from s some_linked_files =
   let slen = String.length s in
   loop some_linked_files 0 where rec loop new_linked_files i =
@@ -516,6 +543,7 @@ value add_linked_files gen from s some_linked_files =
           with
           [ Not_found -> b ]
         in
+        let fname = map_notes gen.notes_alias fname in
         let f = from () in
         let new_linked_files =
           try
@@ -1092,7 +1120,8 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
     in
     let fam_done = Array.create base.data.families.len False in
     {mark = mark; per_sel = per_sel; fam_sel = fam_sel;
-     fam_done = fam_done; notes_pl_p = []; ext_files = []}
+     fam_done = fam_done; notes_pl_p = []; ext_files = [];
+     notes_alias = notes_aliases in_dir}
   in
   do {
     for i = 0 to base.data.families.len - 1 do {
@@ -1160,7 +1189,12 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
       loop gen.ext_files;
       List.iter
         (fun (f, r) ->
-           let s = base.data.bnotes.nread f RnAll in
+           let fn =
+             match NotesLinks.check_file_name f with
+             [ Some (dl, f) -> List.fold_right Filename.concat dl f
+             | None -> f ]
+           in
+           let s = base.data.bnotes.nread fn RnAll in
            if s <> "" then do {
              if not first.val then fprintf oc "\n" else ();
              first.val := False;

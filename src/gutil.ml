@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.44 2005-07-13 20:37:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.45 2005-07-20 15:23:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1379,15 +1379,25 @@ value input_lexicon lang ht open_fname =
 ;
 
 value remove_file f = try Sys.remove f with [ Sys_error _ -> () ];
-value remove_dir d =
+value rec remove_dir d =
   do {
     try
       let files = Sys.readdir d in
       for i = 0 to Array.length files - 1 do {
-        try Sys.remove (Filename.concat d files.(i)) with _ -> ();
+        remove_dir (Filename.concat d files.(i));
+        remove_file (Filename.concat d files.(i));
       }
     with
     [ Sys_error _ -> () ];
     try Unix.rmdir d with [ Unix.Unix_error _ _ _ -> () ];
   }
+;
+
+value mkdir_p x =
+  loop x where rec loop x =
+    do  {
+      let y = Filename.dirname x;
+      if y <> x && String.length y < String.length x then loop y else ();
+      try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+    }
 ;

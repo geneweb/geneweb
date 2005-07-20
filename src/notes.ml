@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.115 2005-07-16 12:48:11 ddr Exp $ *)
+(* $Id: notes.ml,v 4.116 2005-07-20 15:23:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -92,7 +92,9 @@ value notes_links_db conf base eliminate_unlinked =
          in
          let sl = List.map (Wiki.map_notes aliases) sl in
          let (sl, list) =
-           let (list1, list2) = List.partition (fun (pg1, _) -> pg = pg1) list in
+           let (list1, list2) =
+             List.partition (fun (pg1, _) -> pg = pg1) list
+           in
            match list1 with
            [ [(_, sl1)] ->
                let sl =

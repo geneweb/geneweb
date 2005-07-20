@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.85 2005-06-26 15:39:40 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.86 2005-07-20 15:23:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1428,15 +1428,6 @@ value slashify s =
     };
     s1
   }
-;
-
-value mkdir_p x =
-  loop x where rec loop x =
-    do  {
-      let y = Filename.dirname x;
-      if y <> x && String.length y < String.length x then loop y else ();
-      try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
-    }
 ;
 
 value make_cnt_dir x =
