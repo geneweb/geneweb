@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.116 2005-07-20 15:23:10 ddr Exp $ *)
+(* $Id: notes.ml,v 4.117 2005-07-20 19:09:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ value file_path conf fname =
 value path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
   [ Some (dl, f) -> List.fold_right Filename.concat dl f
-  | None -> fnotes ]
+  | None -> "bad" ]
 ;
 
 value read_notes base fnotes =
