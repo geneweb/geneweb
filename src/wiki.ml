@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.36 2005-07-18 17:31:11 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.37 2005-07-21 19:26:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -49,8 +49,11 @@ value section_level s len =
 
 value notes_aliases conf =
   let fname =
-    List.fold_right Filename.concat
-      [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"] "notes.alias"
+    match p_getenv conf.base_env "notes_alias_file" with
+    [ Some f -> Util.base_path [] f
+    | None ->
+        List.fold_right Filename.concat
+          [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"] "notes.alias" ]
   in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
