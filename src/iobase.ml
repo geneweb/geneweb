@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.53 2005-07-20 15:23:10 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.54 2005-07-21 09:04:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1211,16 +1211,19 @@ value input bname =
     }
   in
   let ext_files () =
-    try
-      let files = Sys.readdir (Filename.concat bname "notes_d") in
-      List.fold_left
-        (fun files file ->
-           if Filename.check_suffix file ".txt" then
-             [Filename.chop_suffix file ".txt" :: files]
-           else files)
-        [] (Array.to_list files)
-    with
-    [ Sys_error _ -> [] ]
+    let top = Filename.concat bname "notes_d" in
+    loop [] (Filename.current_dir_name) where rec loop list subdir =
+      let dir = Filename.concat top subdir in
+      match try Some (Sys.readdir dir) with [ Sys_error _ -> None ] with
+      [ Some files ->
+          List.fold_left
+            (fun files file ->
+               let f = Filename.concat subdir file in
+               if Filename.check_suffix f ".txt" then
+                 [Filename.chop_suffix f ".txt" :: files]
+               else loop files f)
+            list (Array.to_list files)
+      | None -> list ]
   in
   let bnotes =
     {nread = read_notes; norigin_file = norigin_file; efiles = ext_files}
