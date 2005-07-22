@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.50 2005-07-22 12:44:06 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.51 2005-07-22 15:00:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1181,12 +1181,12 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
           for i = 0 to Array.length files - 1 do {
             let file = files.(i) in
             if Filename.check_suffix file ".txt" then do {
-              let wizid = Filename.chop_suffix file ".txt" in
               let wfile =
                 List.fold_right Filename.concat [in_dir; "wiznotes"] file
               in
               let s = read_file_contents wfile in
-              ignore (add_linked_files gen (fun _ -> "wizard \"" ^ file ^ "\"") s [] : list _);
+              ignore (add_linked_files gen
+                (fun _ -> "wizard \"" ^ file ^ "\"") s [] : list _);
             }
             else ()
           };
