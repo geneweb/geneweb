@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.49 2005-07-22 11:29:28 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.50 2005-07-22 12:44:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1232,6 +1232,7 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
       try
         let files = Sys.readdir (Filename.concat in_dir "wiznotes") in
         do {
+          Array.sort compare files;
           for i = 0 to Array.length files - 1 do {
             let file = files.(i) in
             if Filename.check_suffix file ".txt" then do {
