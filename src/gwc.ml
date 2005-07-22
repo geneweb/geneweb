@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.45 2005-07-20 19:09:42 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.46 2005-07-22 10:52:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -601,9 +601,11 @@ value insert_notes fname gen key str =
 value insert_bnotes fname gen nfname str =
   let old_nread = gen.g_base.c_bnotes.nread in
   let nfname =
-    match NotesLinks.check_file_name nfname with
-    [ Some (dl, f) -> List.fold_right Filename.concat dl f
-    | None -> "bad" ]
+    if nfname = "" then ""
+    else
+      match NotesLinks.check_file_name nfname with
+      [ Some (dl, f) -> List.fold_right Filename.concat dl f
+      | None -> "bad" ]
   in
   do {
     gen.g_base.c_bnotes.nread :=
