@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.47 2005-07-20 19:09:42 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.48 2005-07-22 10:52:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1175,6 +1175,24 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
         ignore (add_linked_files gen (fun _ -> "database notes") s [] : list _);
       }
       else ();
+      try
+        let files = Sys.readdir (Filename.concat in_dir "wiznotes") in
+        do {
+          for i = 0 to Array.length files - 1 do {
+            let file = files.(i) in
+            if Filename.check_suffix file ".txt" then do {
+              let wizid = Filename.chop_suffix file ".txt" in
+              let wfile =
+                List.fold_right Filename.concat [in_dir; "wiznotes"] file
+              in
+              let s = read_file_contents wfile in
+              ignore (add_linked_files gen (fun _ -> "wizard \"" ^ file ^ "\"") s [] : list _);
+            }
+            else ()
+          };
+        }
+      with
+      [ Sys_error _ -> () ];
       let rec loop =
         fun
         [ [] -> ()
@@ -1225,7 +1243,6 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
               fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;
               fprintf oc "end wizard-note\n";
-              flush stderr;
             }
             else ()
           };
