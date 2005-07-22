@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.48 2005-07-22 10:52:51 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.49 2005-07-22 11:29:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1242,7 +1242,7 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
               let s = read_file_contents wfile in
               fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;
-              fprintf oc "end wizard-note\n";
+              fprintf oc "\nend wizard-note\n";
             }
             else ()
           };
