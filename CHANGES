@@ -55,6 +55,9 @@ The new version number (5.00) is in honour of this new encoding.
       displayed.
 
 * GeneWeb server or CGI (gwd)
+  - [23 Jul 05] All "ancestors" pages are now customizable. Depending to
+    the kind of page, they use the new template files: "ancmenu.txt",
+    "ancsosa.txt", "anctree.txt" and "anclist.txt".
   - [02 Jan 05] Each complete date has a link to the calendars page.
   - [20 Dec 04] Fixed bug: in display places/surnames, when vars are used
     in base configuration file (base.gwf), the alphabetical order was done
