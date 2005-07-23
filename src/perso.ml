@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.163 2005-07-07 19:30:23 ddr Exp $ *)
+(* $Id: perso.ml,v 4.164 2005-07-23 08:49:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2784,4 +2784,15 @@ value print conf base p =
       Util.unauthorized conf src
   | _ ->
       interp_templ "perso" conf base p ]
+;
+
+value print_ascend conf base p =
+  let templ =
+    match p_getenv conf.env "t" with
+    [ Some ("F" | "L") -> "anclist"
+    | Some ("D" | "G" | "M" | "N") -> "ancsosa"
+    | Some ("A" | "C" | "H" | "T") -> "anctree"
+    | _ -> "ancmenu" ]
+  in
+  interp_templ templ conf base p
 ;
