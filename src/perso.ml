@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.165 2005-07-24 15:39:49 ddr Exp $ *)
+(* $Id: perso.ml,v 4.166 2005-07-24 22:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2790,9 +2790,9 @@ value print conf base p =
 value print_ascend conf base p =
   let templ =
     match p_getenv conf.env "t" with
-    [ Some ("F" | "L") -> "anclist"
+    [ Some ("F" | "H" | "L") -> "anclist"
     | Some ("D" | "G" | "M" | "N") -> "ancsosa"
-    | Some ("A" | "C" | "H" | "T") -> "anctree"
+    | Some ("A" | "C" | "T") -> "anctree"
     | _ -> "ancmenu" ]
   in
   interp_templ templ conf base p
