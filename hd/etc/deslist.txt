@@ -1,0 +1,198 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: deslist.txt,v 1.1 2005-07-24 15:39:49 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
+  <title>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<h1 style="text-align:center" class="highlight">%nn;
+  %apply;a_of_b_gr_eq_lev%with;
+    [*descendants]%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+</h1>
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%define;tothegen(xx)
+  [*to the %s generation:::xx]%nn;
+%end;
+
+%define;togen(xx)
+  %if;(xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[*to the children]%nn;
+  %elseif;(xx = 2)[*to the grandchildren]%nn;
+  %elseif;(xx = 3)[*to the great-grandchildren]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
+%define;somebody_long_info(xx)
+  %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles);
+    <em>%nn;
+    %foreach;xx.nobility_title;, %nobility_title;%end;
+    </em>%nn;
+  %end;
+  %if;(xx.has_birth_date or xx.has_birth_place)
+    , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
+    %if;xx.has_birth_date; %xx.on_birth_date;%end;
+    %if;xx.has_birth_place;, %xx.birth_place;%end;
+  %end;
+  %if;(xx.has_baptism_date or xx.has_baptism_place)
+    , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
+    %else;[baptized]2%end;
+    %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
+    %if;xx.has_baptism_place;, %xx.baptism_place;%end;
+  %end;
+  %if;xx.is_dead;, %xx.died;
+    %if;(xx.has_death_date) %xx.on_death_date;%end;
+    %if;(xx.has_death_place), %xx.death_place;%end;
+  %end;
+  %if;xx.is_buried;,
+    %if;xx.is_male;[buried]0%else;[buried]1%end;
+    %if;xx.has_burial_date; %xx.on_burial_date;%end;
+    %if;xx.has_burial_place;, %xx.burial_place;%end;%nl;
+  %end;
+  %if;xx.is_cremated;,
+    %if;xx.is_male;[cremated]0%else;[cremated]1%end;
+    %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
+    %if;xx.has_cremation_place;, %xx.cremation_place;%end;%nl;
+  %end;
+  %if;xx.computable_death_age;%sp;
+    ([age at death:] %xx.death_age;)%nn;
+  %end;
+  %if;xx.has_occupation;, %xx.occupation;%end;
+%end;
+
+%define;married_to(is_male, date_place)
+  %if;("is_male" = 1)
+    %if;are_married;[married%t to:::date_place]0%nn;
+    %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
+    %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
+    %elseif;is_no_mention;date_place [with]%nn;
+    %end;
+  %else;
+    %if;are_married;[married%t to:::date_place]1%nn;
+    %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
+    %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
+    %elseif;is_no_mention;date_place [with]%nn;
+    %end;
+  %end;
+%end;
+
+%define;descendants_by_list(xx, yy, nnn, first_level)
+  %if;("first_level" = "true")<p>%nl;%end;
+  <b>%if;(evar.cgl = "on")%yy;%else;
+  <a href="%prefix;%xx.access;">%yy;</a>%end;</b>%nn;
+  %apply;somebody_long_info("xx").
+  %apply;lazy_print%with;<br%/>%nl;%end;
+  %foreach;xx.family;
+    %if;(family_cnt != 1 and "first_level" = "true")<p>%nl;%end;
+    %lazy_force;
+    %apply;capitalize%with;
+      %apply;married_to%with;
+        %xx.is_male;
+      %and;
+        %if;(on_marriage_date != "") %on_marriage_date;%end;
+        %if;(marriage_place != ""), %marriage_place;, %end;
+      %end;%sp;
+    %end;
+    <b>%if;(evar.cgl = "on")%spouse;%else;
+    <a href="%prefix;%spouse.access;">%spouse;</a>%end;</b>%nn;
+    %apply;somebody_long_info("spouse")
+    %if;(nnn >= 1)
+      %if;("first_level" = "true" or
+           evar.t = "M" and xx.is_male or
+           evar.t = "F" and xx.is_female or
+           evar.t = "L")
+        %if;has_children;, <i>[having as children]</i>
+          %if;("first_level" = "true")</p>%nl;%end;
+          <ul>
+          %foreach;child;
+            <li>
+            %incr_count;
+            %if;(evar.alwsurn = "yes")
+              %apply;descendants_by_list("child", "child", nnn-1, "false")
+            %else;
+              %apply;descendants_by_list("child", "child_name", nnn-1, "false")
+            %end;
+            </li>
+          %end;
+          </ul>
+          %apply;lazy_print%with;%end;
+        %else;
+          %if;("first_level" = "true")%nl;</p>%nl;
+          %else;%apply;lazy_print%with;<br%/>%nl;%end;
+          %end;
+        %end;
+      %elseif;has_children;, ...
+      %end;
+    %else;.%nl;
+      %apply;lazy_print%with;<br%/>%nl;%end;
+    %end;
+  %end;
+%end;
+
+%define;by_list(xx)
+  <p>
+  %apply;togen(xx).
+  </p>
+  %reset_count;
+  %apply;descendants_by_list("self", "self", xx, "true")%nl;
+  <p>
+  [*total]: %count; [person/persons]1 ([spouses not included]).
+  </p>
+%end;
+
+%apply;by_list%with;
+  %if;(bvar.max_desc_level = "")%apply;min(evar.v, max_desc_level, 12)
+  %else;%apply;min(evar.v, max_desc_level, bvar.max_desc_level)%end;
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

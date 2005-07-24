@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.164 2005-07-23 08:49:14 ddr Exp $ *)
+(* $Id: perso.ml,v 4.165 2005-07-24 15:39:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2204,6 +2204,7 @@ and print_foreach conf base env ini_ep loc s sl ell al =
             loop ep efam sl
         | None ->
             warning_use_has_parents_before_parent loc "mother" () ]
+    | ["self" :: sl] -> loop ep efam sl
     | ["spouse" :: sl] ->
         match efam with
         [ Vfam _ (_, _, ip) _ _ ->
