@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 1.2 2005-07-24 22:33:43 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 1.3 2005-07-24 22:36:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -64,7 +64,7 @@
 %end;
 
 %define;somebody_long_info(xx)
-  %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles)
+  %if;xx.has_nobility_titles;
     <em>%nn;
     %foreach;xx.nobility_title;, %nobility_title;%end;
     </em>%nn;
