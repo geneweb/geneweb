@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 1.5 2005-06-22 19:46:59 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 1.6 2005-07-24 22:33:43 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -96,7 +96,7 @@
   %if;xx.has_aliases;
     %foreach;xx.alias;, [alias] <em>%alias;</em>%end;
   %end;
-  %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles);
+  %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles)
     <em>%nn;
     %foreach;xx.nobility_title;, %nobility_title;%end;
     </em>%nn;
