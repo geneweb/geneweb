@@ -1,6 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.44 2005-06-23 09:56:01 ddr Exp $ *)
+(* $Id: descend.ml,v 4.45 2005-07-24 15:39:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
+
+DEFINE OLD;
 
 open Config;
 open Def;
@@ -49,6 +51,7 @@ value descendants_title conf base p h =
   Wserver.wprint "%s" (capitale s)
 ;
 
+IFDEF OLD THEN declare
 value named_like_father conf base ip =
   let a = aget conf base ip in
   match parents a with
@@ -232,6 +235,7 @@ value display_descendants_upto conf base max_level p line =
     trailer conf
   }
 ;
+end END;
 
 value display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -1204,7 +1208,8 @@ value print_aboville conf base max_level p =
 
 value desmenu_print = Perso.interp_templ "desmenu";
 
-value print conf base p =
+IFDEF OLD THEN declare
+value old_print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "A", Some v) -> print_aboville conf base v p
   | (Some "L", Some v) -> display_descendants_upto conf base v p Neuter
@@ -1217,4 +1222,28 @@ value print conf base p =
   | (Some "C", Some v) -> display_spouse_index conf base v p
   | (Some "T", Some v) -> print_tree conf base v p
   | _ -> desmenu_print conf base p ]
+;
+end ELSE
+value old_print conf base p = incorrect_request conf
+END;
+
+value print conf base p =
+  if p_getenv conf.env "old" = Some "on" then old_print conf base p else
+  let templ =
+    match p_getenv conf.env "t" with
+    [ Some ("F" | "L" | "M") -> "deslist"
+    | Some _ -> ""
+    | _ -> "desmenu" ]
+  in
+  if templ <> "" then Perso.interp_templ templ conf base p
+  else
+    match (p_getenv conf.env "t", p_getint conf.env "v") with
+    [ (Some "A", Some v) -> print_aboville conf base v p
+    | (Some "S", Some v) -> display_descendants_level conf base v p
+    | (Some "H", Some v) -> display_descendant_with_table conf base v p
+    | (Some "N", Some v) -> display_descendants_with_numbers conf base v p
+    | (Some "G", Some v) -> display_descendant_index conf base v p
+    | (Some "C", Some v) -> display_spouse_index conf base v p
+    | (Some "T", Some v) -> print_tree conf base v p
+    | _ -> desmenu_print conf base p ]
 ;
