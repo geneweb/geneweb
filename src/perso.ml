@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.166 2005-07-24 22:17:54 ddr Exp $ *)
+(* $Id: perso.ml,v 4.167 2005-07-25 09:50:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -303,8 +303,8 @@ value make_desc_level_table conf base max_level p =
   do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
 ;
 
-value desc_level_max conf base p =
-  let levt = make_desc_level_table conf base infinite p in
+value desc_level_max conf base desc_level_table_l =
+  let levt = Lazy.force desc_level_table_l in
   let x = ref 0 in
   do {
     for i = 0 to Array.length levt - 1 do {
@@ -315,8 +315,8 @@ value desc_level_max conf base p =
   }
 ;
 
-value max_descendant_level conf base p =
-  min (limit_desc conf) (desc_level_max conf base p)
+value max_descendant_level conf base desc_level_table_l =
+  min (limit_desc conf) (desc_level_max conf base desc_level_table_l)
 ;
 
 (* ancestors by list *)
@@ -729,6 +729,7 @@ type env =
   | Vcnt of ref int
   | Vdag of ref Dag.Pset.t
   | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
+  | Vdesclevtab of Lazy.t (array int)
   | Vdline of array (int * Dag2html.align * Dag2html.table_data dag_item)
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
@@ -1721,6 +1722,21 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else ""
   | "death_place" ->
       if p_auth then string_of_place conf base p.death_place else ""
+  | "desc_level" ->
+      match get_env "desc_level_table" env with
+      [ Vdesclevtab levt ->
+          let levt = Lazy.force levt in
+          string_of_int (levt.(Adef.int_of_iper p.cle_index))
+      | _ -> raise Not_found ]
+  | "set_infinite_desc_level" ->
+      match get_env "desc_level_table" env with
+      [ Vdesclevtab levt ->
+          let levt = Lazy.force levt in
+          do {
+            levt.(Adef.int_of_iper p.cle_index) := infinite;
+            ""
+          }
+      | _ -> raise Not_found ]
   | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
       (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
@@ -2741,9 +2757,13 @@ value interp_templ templ_fname conf base p =
       Lazy.lazy_from_fun sosa_ref
     in
     let sosa () = Vsosa (find_sosa conf base p sosa_ref_l) in
+    let desc_level_table_l =
+      let dlt () = make_desc_level_table conf base (*infinite*)(limit_desc conf) p in
+      Lazy.lazy_from_fun dlt
+    in
     let mal () =  Vint (max_ancestor_level conf base p.cle_index emal + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
-    let mdl () =  Vint (max_descendant_level conf base p) in
+    let mdl () =  Vint (max_descendant_level conf base desc_level_table_l) in
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
@@ -2757,6 +2777,7 @@ value interp_templ templ_fname conf base p =
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl));
+     ("desc_level_table", Vdesclevtab desc_level_table_l);
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
   do {
