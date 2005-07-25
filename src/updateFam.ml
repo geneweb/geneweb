@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.62 2005-06-12 06:33:41 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.63 2005-07-25 11:36:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -80,7 +80,10 @@ value str_val x = VVstring x;
 
 value rec eval_var conf base env (fam, cpl, des) loc =
   fun
-  [ ["child" :: sl] ->
+  [ ["bvar"; v] ->
+      try VVstring (List.assoc v conf.base_env) with
+      [ Not_found -> VVstring "" ]
+  | ["child" :: sl] ->
         let k =
           match get_env "cnt" env with
           [ Vint i ->
