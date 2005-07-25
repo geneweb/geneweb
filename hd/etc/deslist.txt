@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 1.3 2005-07-24 22:36:01 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 1.4 2005-07-25 08:18:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -118,14 +118,14 @@
   %end;
 %end;
 
-%define;descendants_by_list(xx, yy, nnn, first_level)
-  %if;("first_level" = "true")<p>%nl;%end;
+%define;descendants_by_list(xx, yy, curlev, maxlev)
+  %if;(curlev = 1)<p>%nl;%end;
   <b>%if;(evar.cgl = "on")%yy;%else;
   <a href="%prefix;%xx.access;">%yy;</a>%end;</b>%nn;
   %apply;somebody_long_info("xx").
   %apply;lazy_print%with;<br%/>%nl;%end;
   %foreach;xx.family;
-    %if;(family_cnt != 1 and "first_level" = "true")<p>%nl;%end;
+    %if;(family_cnt != 1 and curlev = 1)<p>%nl;%end;
     %lazy_force;
     %apply;capitalize%with;
       %apply;married_to%with;
@@ -138,28 +138,29 @@
     <b>%if;(evar.cgl = "on")%spouse;%else;
     <a href="%prefix;%spouse.access;">%spouse;</a>%end;</b>%nn;
     %apply;somebody_long_info("spouse")
-    %if;(nnn >= 1)
-      %if;("first_level" = "true" or
+    %if;(curlev <= maxlev)
+      %if;(curlev = 1 or
            evar.t = "M" and xx.is_male or
            evar.t = "F" and xx.is_female or
            evar.t = "L")
         %if;has_children;, <i>[having as children]</i>
-          %if;("first_level" = "true")</p>%nl;%end;
+          %if;(curlev = 1)</p>%nl;%end;
           <ul>
           %foreach;child;
             <li>
             %incr_count;
             %if;(evar.alwsurn = "yes")
-              %apply;descendants_by_list("child", "child", nnn-1, "false")
+              %apply;descendants_by_list("child", "child", curlev+1, maxlev)
             %else;
-              %apply;descendants_by_list("child", "child_name", nnn-1, "false")
+              %apply;descendants_by_list("child", "child_name", curlev+1,
+                                         maxlev)
             %end;
             </li>
           %end;
           </ul>
           %apply;lazy_print%with;%end;
         %else;
-          %if;("first_level" = "true")%nl;</p>%nl;
+          %if;(curlev = 1)%nl;</p>%nl;
           %else;%apply;lazy_print%with;<br%/>%nl;%end;
           %end;
         %end;
@@ -176,7 +177,7 @@
   %apply;togen(xx).
   </p>
   %reset_count;
-  %apply;descendants_by_list("self", "self", xx, "true")%nl;
+  %apply;descendants_by_list("self", "self", 1, xx)%nl;
   <p>
   [*total]: %count; [person/persons]1 ([spouses not included]).
   </p>
