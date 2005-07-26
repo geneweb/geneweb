@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.168 2005-07-25 18:06:08 ddr Exp $ *)
+(* $Id: perso.ml,v 4.169 2005-07-26 02:55:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2808,35 +2808,42 @@ value print conf base p =
       interp_templ "perso" conf base p ]
 ;
 
-value print_tree conf base v p =
-  let v = min 7 v in
-  if p_getenv conf.env "dag" = Some "on" ||
-     browser_doesnt_have_tables conf then
-    let set =
-      loop Dag.Pset.empty v p.cle_index where rec loop set lev ip =
-        let set = Dag.Pset.add ip set in
-        if lev <= 1 then set
-        else
-          match parents (aget conf base ip) with
-          [ Some ifam ->
-              let cpl = coi base ifam in
-              let set = loop set (lev - 1) (mother cpl) in
-              loop set (lev - 1) (father cpl)
-          | None -> set ]
-    in
-    let d = Dag.make_dag conf base (Dag.Pset.elements set) in
-    Dag.gen_print_dag conf base False True set [] d
-  else interp_templ "anctree" conf base p
+value limit_by_tree conf =
+  match p_getint conf.base_env "max_anc_tree" with
+  [ Some x -> max 1 x
+  | None -> 7 ]
+;
+
+value print_dag conf base v p =
+  let v = min (limit_by_tree conf) v in
+  let set =
+    loop Dag.Pset.empty v p.cle_index where rec loop set lev ip =
+      let set = Dag.Pset.add ip set in
+      if lev <= 1 then set
+      else
+        match parents (aget conf base ip) with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let set = loop set (lev - 1) (mother cpl) in
+            loop set (lev - 1) (father cpl)
+        | None -> set ]
+  in
+  let d = Dag.make_dag conf base (Dag.Pset.elements set) in
+  Dag.gen_print_dag conf base False True set [] d
 ;
 
 value print_ascend conf base p =
-if p_getenv conf.env "t" = Some "T" then let v = match p_getint conf.env "v" with [ Some v -> v | None -> 0 ] in print_tree conf base v p else
-  let templ =
-    match p_getenv conf.env "t" with
-    [ Some ("F" | "H" | "L") -> "anclist"
-    | Some ("D" | "G" | "M" | "N") -> "ancsosa"
-    | Some ("A" | "C" | "T") -> "anctree"
-    | _ -> "ancmenu" ]
-  in
-  interp_templ templ conf base p
+  match
+    (p_getenv conf.env "t", p_getenv conf.env "dag", p_getint conf.env "v")
+  with
+  [ (Some "t", Some "on", Some v) -> print_dag conf base v p
+  | _ ->
+      let templ =
+        match p_getenv conf.env "t" with
+        [ Some ("F" | "H" | "L") -> "anclist"
+        | Some ("D" | "G" | "M" | "N") -> "ancsosa"
+        | Some ("A" | "C" | "T") -> "anctree"
+        | _ -> "ancmenu" ]
+      in
+      interp_templ templ conf base p ]
 ;
