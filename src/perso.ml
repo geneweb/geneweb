@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.169 2005-07-26 02:55:06 ddr Exp $ *)
+(* $Id: perso.ml,v 4.170 2005-07-26 09:39:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2836,7 +2836,7 @@ value print_ascend conf base p =
   match
     (p_getenv conf.env "t", p_getenv conf.env "dag", p_getint conf.env "v")
   with
-  [ (Some "t", Some "on", Some v) -> print_dag conf base v p
+  [ (Some "T", Some "on", Some v) -> print_dag conf base v p
   | _ ->
       let templ =
         match p_getenv conf.env "t" with
