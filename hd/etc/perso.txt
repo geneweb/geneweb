@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.51 2005-06-25 23:23:21 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.52 2005-07-26 09:46:32 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -34,6 +34,17 @@
   %end;
   %if;(bvar.show_invisible = "on" and wizard and is_invisible) (x)%end;
   </div>
+%end;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
 %end;
 
 <h1 style="text-align:center" class="highlight">
@@ -98,17 +109,6 @@
   </table>
   </td></tr></table>
   <p></p>
-%end;
-
-%if;not cancel_links;
-  <table style="float:%right;"><tr><td>
-    %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
-    %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
-  </td></tr></table>
 %end;
 
 %if;has_image;
