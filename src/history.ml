@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.23 2005-07-27 19:06:20 ddr Exp $ *)
+(* $Id: history.ml,v 4.24 2005-07-27 19:10:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -183,7 +183,7 @@ value print_history_line conf base line wiz k i =
           if i = 0 then Wserver.wprint "<dl>\n" else ();
           stagn "dt" begin
 *)
-          Wserver.wprint "<td>\n";
+          Wserver.wprint "<tr>\n<td>\n";
 (**)
             Wserver.wprint" <tt><b>*</b> %s</tt>\n" time;
             Wserver.wprint "(%s" (action_text conf action);
@@ -247,7 +247,7 @@ value print_history_line conf base line wiz k i =
 (*
           end;
 *)
-          Wserver.wprint "</td>\n";
+          Wserver.wprint "</td>\n</tr>\n";
 (**)
           i + 1
         }
@@ -284,14 +284,7 @@ value print_history conf base ic =
           try Some (rev_input_line ic pos vv) with [ Begin_of_file -> None ]
         with
         [ Some (line, pos) ->
-            let i =
-              do {
-                Wserver.wprint "<tr>\n";
-                let i = print_history_line conf base line wiz k i in
-                Wserver.wprint "</tr>\n";
-                i
-              }
-            in
+            let i = print_history_line conf base line wiz k i in
             loop pos i
         | _ -> (pos, i) ]
     in
