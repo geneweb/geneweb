@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.152 2005-07-14 05:16:15 ddr Exp $ *)
+(* $Id: util.ml,v 4.153 2005-07-27 19:06:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1901,6 +1901,16 @@ value gen_print_link_to_welcome f conf right_aligned =
 ;
 
 value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
+
+value header_link_welcome conf title =
+  do {
+    header_without_page_title conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+    title False;
+    Wserver.wprint "</h1>\n";
+  }
+;
 
 value incorrect_request conf =
   let title _ =

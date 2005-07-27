@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.46 2005-07-04 00:47:54 ddr Exp $ *)
+(* $Id: util.mli,v 4.47 2005-07-27 19:06:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -171,6 +171,7 @@ value sosa_of_branch : list (iper * sex) -> Num.t;
 value link_to_referer : config -> string;
 value print_link_to_welcome : config -> bool -> unit;
 value gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit;
+value header_link_welcome : config -> (bool -> unit) -> unit;
 
 value has_image : config -> base -> person -> bool;
 value image_file_name : string -> string;
