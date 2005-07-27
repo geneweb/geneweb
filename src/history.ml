@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.19 2005-06-07 20:31:43 ddr Exp $ *)
+(* $Id: history.ml,v 4.20 2005-07-27 09:31:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -143,7 +143,7 @@ value line_fields line =
 ;
 
 type hist_item =
-  [ HI_num of int
+  [ HI_notes of string and int
   | HI_ind of person
   | HI_none ]
 ;
@@ -155,8 +155,17 @@ value print_history_line conf base line wiz k i =
         let hist_item =
           match keyo with
           [ Some key ->
-              try HI_num (int_of_string key) with
-              [ Failure _ ->
+              match action with
+              [ "mn" ->
+                  let (i, j) =
+                    try let i = String.rindex key '/' in (i, i + 1) with
+                    [ Not_found -> (0, 0) ]
+                  in
+                  let pg = String.sub key 0 i in
+                  let s = String.sub key j (String.length key - j) in
+                  try HI_notes pg (int_of_string s) with
+                  [ Failure _ -> HI_none ]
+              | _ ->
                   match person_ht_find_all base key with
                   [ [ip] -> HI_ind (pget conf base ip)
                   | _ -> HI_none ] ]
@@ -198,13 +207,16 @@ value print_history_line conf base line wiz k i =
                         (referenced_person_title_text conf base p);
                       Wserver.wprint "%s" (Date.short_dates_text conf base p);
                     }
-                | HI_num x ->
+                | HI_notes pg x ->
                     do {
                       Wserver.wprint "- ";
-                      stag "a" "href=\"%sm=NOTES;v=%d\"" (commd conf) x begin
-                        stag "em" begin
+                      stag "a" "href=\"%sm=NOTES%s;v=%d\"" (commd conf)
+                        (if pg = "" then "" else ";f=" ^ pg) x
+                      begin
+                        stag "i" begin
                           Wserver.wprint "%s"
-                            (transl_nth conf "note/notes" 1);
+                            (if pg = "" then transl_nth conf "note/notes" 1
+                             else "[" ^ pg ^ "]");
                         end;
                       end;
                       Wserver.wprint " - ";
