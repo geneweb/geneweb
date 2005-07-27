@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.22 2005-07-27 18:10:39 ddr Exp $ *)
+(* $Id: history.ml,v 4.23 2005-07-27 19:06:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -296,7 +296,8 @@ value print_history conf base ic =
         | _ -> (pos, i) ]
     in
     do {
-      Wserver.wprint "<table border=\"%d\">\n" conf.border;
+      Wserver.wprint "<table border=\"%d\" style=\"white-space:nowrap\">\n"
+        conf.border;
       let r = loop pos 0 in
       Wserver.wprint "</table>\n";
       r;
@@ -331,8 +332,7 @@ value print conf base =
     Wserver.wprint "%s" (capitale (transl conf "history of updates"))
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    header_link_welcome conf title;
     let fname = file_name conf in
     match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
     [ Some ic -> do { print_history conf base ic; close_in ic; }
