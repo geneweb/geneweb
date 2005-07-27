@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.20 2005-07-27 09:31:33 ddr Exp $ *)
+(* $Id: history.ml,v 4.21 2005-07-27 10:58:48 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -143,7 +143,7 @@ value line_fields line =
 ;
 
 type hist_item =
-  [ HI_notes of string and int
+  [ HI_notes of string and option int
   | HI_ind of person
   | HI_none ]
 ;
@@ -163,8 +163,8 @@ value print_history_line conf base line wiz k i =
                   in
                   let pg = String.sub key 0 i in
                   let s = String.sub key j (String.length key - j) in
-                  try HI_notes pg (int_of_string s) with
-                  [ Failure _ -> HI_none ]
+                  try HI_notes pg (Some (int_of_string s)) with
+                  [ Failure _ -> HI_notes key None ]
               | _ ->
                   match person_ht_find_all base key with
                   [ [ip] -> HI_ind (pget conf base ip)
@@ -210,8 +210,11 @@ value print_history_line conf base line wiz k i =
                 | HI_notes pg x ->
                     do {
                       Wserver.wprint "- ";
-                      stag "a" "href=\"%sm=NOTES%s;v=%d\"" (commd conf)
-                        (if pg = "" then "" else ";f=" ^ pg) x
+                      stag "a" "href=\"%sm=NOTES%s%s\"" (commd conf)
+                        (if pg = "" then "" else ";f=" ^ pg)
+                        (match x with
+                         [ Some x -> ";v=" ^ string_of_int x
+                         | None -> "" ])
                       begin
                         stag "i" begin
                           Wserver.wprint "%s"
@@ -219,10 +222,15 @@ value print_history_line conf base line wiz k i =
                              else "[" ^ pg ^ "]");
                         end;
                       end;
-                      Wserver.wprint " - ";
-                      stag "span" "style=\"font-size:50%%\"" begin
-                        Wserver.wprint "#%d" x;
-                      end;
+                      match x with
+                      [ Some x ->
+                          do {
+                            Wserver.wprint " - ";
+                            stag "span" "style=\"font-size:50%%\"" begin
+                              Wserver.wprint "#%d" x;
+                            end;
+                          }
+                      | None -> () ];
                     }
                 | HI_none -> Wserver.wprint "%s" key ]
             | None -> Wserver.wprint "..." ];
