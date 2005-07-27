@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.21 2005-07-27 10:58:48 ddr Exp $ *)
+(* $Id: history.ml,v 4.22 2005-07-27 18:10:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -179,10 +179,14 @@ value print_history_line conf base line wiz k i =
         in
         if not_displayed then i
         else do {
+(*
           if i = 0 then Wserver.wprint "<dl>\n" else ();
           stagn "dt" begin
+*)
+          Wserver.wprint "<td>\n";
+(**)
             Wserver.wprint" <tt><b>*</b> %s</tt>\n" time;
-            Wserver.wprint "(%s)" (action_text conf action);
+            Wserver.wprint "(%s" (action_text conf action);
             if user <> "" then do {
               Wserver.wprint "\n<em>";
               if wiz = "" then
@@ -194,8 +198,14 @@ value print_history_line conf base line wiz k i =
               Wserver.wprint "</em>";
             }
             else ();
+            Wserver.wprint ")";
+(*
           end;
           stagn "dd" begin
+*)
+          Wserver.wprint "</td><td>\n";
+          Wserver.wprint " ...\n";
+(**)
             match keyo with
             [ Some key ->
                 match hist_item with
@@ -234,7 +244,11 @@ value print_history_line conf base line wiz k i =
                     }
                 | HI_none -> Wserver.wprint "%s" key ]
             | None -> Wserver.wprint "..." ];
+(*
           end;
+*)
+          Wserver.wprint "</td>\n";
+(**)
           i + 1
         }
       }
@@ -270,11 +284,23 @@ value print_history conf base ic =
           try Some (rev_input_line ic pos vv) with [ Begin_of_file -> None ]
         with
         [ Some (line, pos) ->
-            let i = print_history_line conf base line wiz k i in
+            let i =
+              do {
+                Wserver.wprint "<tr>\n";
+                let i = print_history_line conf base line wiz k i in
+                Wserver.wprint "</tr>\n";
+                i
+              }
+            in
             loop pos i
         | _ -> (pos, i) ]
     in
-    loop pos 0
+    do {
+      Wserver.wprint "<table border=\"%d\">\n" conf.border;
+      let r = loop pos 0 in
+      Wserver.wprint "</table>\n";
+      r;
+    }
   in
   do {
     if n > 0 then Wserver.wprint "</dl>\n" else ();
