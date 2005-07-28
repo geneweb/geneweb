@@ -11,7 +11,7 @@ function disp() {
     else if (enc == "iso-8859-8")
         system("echo \"" $0 "\" | iconv -f utf-8 -t " enc " | sed -e \"s/he: \\([вайш]\\)/he:  \\1/\" -e \"s|/\\([вайш]\\)|/ \\1|g\"")
     else if (enc == "lv")
-        system("echo \"" $0 "\" | sed -e 's/Д\\214/И/g' -e 's/Д\\201/в/g' -e 's/Е\\206/т/g' -e 's/Дј/п/g' -e 's/Д\\215/и/g' -e 's/ЕЎ/р/g' -e 's/Е«/ы/g' -e 's/Д\\223/з/g' -e 's/ДЈ/м/g' -e 's/Д¶/Н/g' -e 's/Д«/о/g' -e 's/Д·/н/g' -e 's/Гѕ/ю/g'")
+        system("echo \"" $0 "\" | sed -e 's/Д\\214/И/g' -e 's/Д\\201/в/g' -e 's/Е\\206/т/g' -e 's/Дј/п/g' -e 's/Д\\215/и/g' -e 's/ЕЎ/р/g' -e 's/Е«/ы/g' -e 's/Д\\223/з/g' -e 's/Дў/М/g' -e 's/ДЈ/м/g' -e 's/Д¶/Н/g' -e 's/Д«/о/g' -e 's/Д·/н/g' -e 's/Гѕ/ю/g'")
     else system("echo \"" $0 "\" | iconv -f utf-8 -t " enc);
     next;
 }
