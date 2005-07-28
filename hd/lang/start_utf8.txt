@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.20 2005-07-27 18:10:39 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.21 2005-07-28 03:56:20 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -894,7 +894,7 @@ zh:
 </td>
 <td valign="top">
 <ul style="list-style:inside">%Ih
-<li><a href="%sm=HIST;k=15">[history of updates]</a></li>%E
+<li><a href="%sm=HIST;k=20">[history of updates]</a></li>%E
 <li><a href="%sm=CAL">[calendar/calendars]1</a></li>
 <li><a href="%sm=FORUM">[database forum]</a></li>
 </ul>
