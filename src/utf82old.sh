@@ -8,6 +8,10 @@ function disp() {
     if (enc == "ar") ;
     else if (enc == "iso-8859-3")
         system("echo \"" $0 "\" | iconv -f utf-8 -t " enc " | sed -e 's/ז/cx/g' -e 's/ר/gx/g' -e 's/¼/jx/g' -e 's/‏/sx/g' -e 's/‎/ux/g'")
+    else if (enc == "iso-8859-8")
+        system("echo \"" $0 "\" | iconv -f utf-8 -t " enc " | sed -e \"s/he: \\([גאיר]\\)/he:  \\1/\" -e \"s|/\\([גאיר]\\)|/ \\1|g\"")
+    else if (enc == "lv")
+        system("echo \"" $0 "\" | sed -e 's/Ä\\214/È/g' -e 's/Ä\\201/ג/g' -e 's/Å\\206/ע/g' -e 's/Ä¼/ן/g' -e 's/Ä\\215/ט/g' -e 's/Å¡/נ/g' -e 's/Å«/û/g' -e 's/Ä\\223/ח/g' -e 's/Ä£/ל/g' -e 's/Ä¶/Í/g' -e 's/Ä«/מ/g' -e 's/Ä·/ם/g' -e 's/Ã¾/‏/g'")
     else system("echo \"" $0 "\" | iconv -f utf-8 -t " enc);
     next;
 }
@@ -29,7 +33,7 @@ function conv(t) { enc=t; disp() }
 /^he: / { conv("iso-8859-8") }
 /^is: / { conv("iso-8859-1") }
 /^it: / { conv("iso-8859-1") }
-/^lv: / { conv("iso-8859-1") }
+/^lv: / { conv("lv") }
 /^nl: / { conv("iso-8859-1") }
 /^no: / { conv("iso-8859-1") }
 /^pl: / { conv("iso-8859-2") }
