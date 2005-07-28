@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.50 2005-07-15 00:18:09 ddr Exp $
+# $Id: lex_utf8.txt,v 1.51 2005-07-28 15:28:09 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -138,7 +138,6 @@ nl: , om dit nummer weer te proberen
 no:  for å pr&oslash;ve igjen med dette nummeret
 pl:  aby ponowić z tym numerem
 pt:  para tentar novamente com este n&uacute;mero
-pt-br: para tentar novamente com este n&uacute;mero
 ro:  incearca din nou cu acest numar 
 ru:  для того, чтобы пытаться снова с этим числом
 sl:  za ponoven poskus s to številko
