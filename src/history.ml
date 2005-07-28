@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.25 2005-07-28 03:56:20 ddr Exp $ *)
+(* $Id: history.ml,v 4.26 2005-07-28 09:36:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -186,7 +186,7 @@ value print_history_line conf base line wiz k i =
               if user <> "" then do {
                 Wserver.wprint "\n<em>";
                 if wiz = "" then
-                  Wserver.wprint "/ <a href=\"%sm=HIST;k=%d;wiz=%s\">"
+                  Wserver.wprint "- <a href=\"%sm=HIST;k=%d;wiz=%s\">"
                     (commd conf) k (Util.code_varenv user)
                 else ();
                 Wserver.wprint "%s" user;
