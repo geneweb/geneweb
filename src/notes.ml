@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.118 2005-07-21 11:24:24 ddr Exp $ *)
+(* $Id: notes.ml,v 4.119 2005-07-28 04:33:22 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -275,6 +275,7 @@ value commit_notes conf base fnotes s =
   in
   let fname = path_of_fnotes fnotes in
   do {
+    Gutil.mkdir_p (Filename.dirname (file_path conf fname));
     try base.func.commit_notes fname s with
     [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
     History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
