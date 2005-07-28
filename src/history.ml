@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.24 2005-07-27 19:10:39 ddr Exp $ *)
+(* $Id: history.ml,v 4.25 2005-07-28 03:56:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -179,76 +179,65 @@ value print_history_line conf base line wiz k i =
         in
         if not_displayed then i
         else do {
-(*
-          if i = 0 then Wserver.wprint "<dl>\n" else ();
-          stagn "dt" begin
-*)
-          Wserver.wprint "<tr>\n<td>\n";
-(**)
-            Wserver.wprint" <tt><b>*</b> %s</tt>\n" time;
-            Wserver.wprint "(%s" (action_text conf action);
-            if user <> "" then do {
-              Wserver.wprint "\n<em>";
-              if wiz = "" then
-                Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">"
-                  (commd conf) k (Util.code_varenv user)
+          tag "tr" begin
+            tag "td" begin
+              Wserver.wprint" <tt><b>*</b> %s</tt>\n" time;
+              Wserver.wprint "(%s" (action_text conf action);
+              if user <> "" then do {
+                Wserver.wprint "\n<em>";
+                if wiz = "" then
+                  Wserver.wprint "/ <a href=\"%sm=HIST;k=%d;wiz=%s\">"
+                    (commd conf) k (Util.code_varenv user)
+                else ();
+                Wserver.wprint "%s" user;
+                if wiz = "" then Wserver.wprint "</a>" else ();
+                Wserver.wprint "</em>";
+              }
               else ();
-              Wserver.wprint "%s" user;
-              if wiz = "" then Wserver.wprint "</a>" else ();
-              Wserver.wprint "</em>";
-            }
-            else ();
-            Wserver.wprint ")";
-(*
-          end;
-          stagn "dd" begin
-*)
-          Wserver.wprint "</td><td>\n";
-          Wserver.wprint " ...\n";
-(**)
-            match keyo with
-            [ Some key ->
-                match hist_item with
-                [ HI_ind p ->
-                    do {
-                      Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
-                        (p_surname base p) p.occ;
-                      Wserver.wprint "%s"
-                        (referenced_person_title_text conf base p);
-                      Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                    }
-                | HI_notes pg x ->
-                    do {
-                      Wserver.wprint "- ";
-                      stag "a" "href=\"%sm=NOTES%s%s\"" (commd conf)
-                        (if pg = "" then "" else ";f=" ^ pg)
-                        (match x with
-                         [ Some x -> ";v=" ^ string_of_int x
-                         | None -> "" ])
-                      begin
-                        stag "i" begin
-                          Wserver.wprint "%s"
-                            (if pg = "" then transl_nth conf "note/notes" 1
-                             else "[" ^ pg ^ "]");
+              Wserver.wprint ")";
+            end;
+            tag "td" begin
+              Wserver.wprint " ...\n";
+              match keyo with
+              [ Some key ->
+                  match hist_item with
+                  [ HI_ind p ->
+                      do {
+                        Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
+                          (p_surname base p) p.occ;
+                        Wserver.wprint "%s"
+                          (referenced_person_title_text conf base p);
+                        Wserver.wprint "%s" (Date.short_dates_text conf base p);
+                      }
+                  | HI_notes pg x ->
+                      do {
+                        Wserver.wprint "- ";
+                        stag "a" "href=\"%sm=NOTES%s%s\"" (commd conf)
+                          (if pg = "" then "" else ";f=" ^ pg)
+                          (match x with
+                           [ Some x -> ";v=" ^ string_of_int x
+                           | None -> "" ])
+                        begin
+                          stag "i" begin
+                            Wserver.wprint "%s"
+                              (if pg = "" then transl_nth conf "note/notes" 1
+                               else "[" ^ pg ^ "]");
+                          end;
                         end;
-                      end;
-                      match x with
-                      [ Some x ->
-                          do {
-                            Wserver.wprint " - ";
-                            stag "span" "style=\"font-size:50%%\"" begin
-                              Wserver.wprint "#%d" x;
-                            end;
-                          }
-                      | None -> () ];
-                    }
-                | HI_none -> Wserver.wprint "%s" key ]
-            | None -> Wserver.wprint "..." ];
-(*
+                        match x with
+                        [ Some x ->
+                            do {
+                              Wserver.wprint " - ";
+                              stag "span" "style=\"font-size:50%%\"" begin
+                                Wserver.wprint "#%d" x;
+                              end;
+                            }
+                        | None -> () ];
+                      }
+                  | HI_none -> Wserver.wprint "%s" key ]
+              | None -> Wserver.wprint "..." ];
+            end;
           end;
-*)
-          Wserver.wprint "</td>\n</tr>\n";
-(**)
           i + 1
         }
       }
