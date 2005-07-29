@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.51 2005-07-28 15:28:09 ddr Exp $
+# $Id: lex_utf8.txt,v 1.52 2005-07-29 07:51:48 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -9090,7 +9090,7 @@ sv: varningar
 
     what links page
 en: what links page
-fr: qui référence la page
+fr: pages liées
 
     with
 af: met
