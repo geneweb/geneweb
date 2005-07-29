@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.8 2005-06-13 12:27:26 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.9 2005-07-29 09:56:00 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -71,7 +71,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
       else
         match t.table.(i).(j).elem with
         [ Nothing -> loop (j + 1)
-        | e -> if phony e then loop (j + 1) else False ]
+        | Elem _ | Ghost _ as e -> if phony e then loop (j + 1) else False ]
   in
   let line_elem_txt i =
     let les =
@@ -212,7 +212,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
                       else l
                     in
                     loop (l + 1)
-                | _ -> l + 1 ]
+                | Nothing -> l + 1 ]
               in
               if next_l > next_j then do {
                 Printf.eprintf
@@ -313,7 +313,7 @@ value get_children d parents =
                (fun c children ->
                   if List.mem c children then children else [c :: children])
                e.chil children
-         | _ -> [] ])
+         | Ghost _ | Nothing -> [] ])
       el children
 ;
 
@@ -526,7 +526,7 @@ value equilibrate t =
               loop2 0
           in
           loop1 0
-      | _ -> loop (j + 1) ]
+      | Ghost _ | Nothing -> loop (j + 1) ]
   in
   loop 0
 ;
@@ -627,7 +627,7 @@ value group_span_by_common_children d t =
             line.(j).span := line.(j - 1).span;
             loop (j + 1) (S.union cs curr_cs)
           }
-      | _ -> loop (j + 1) S.empty ]
+      | Ghost _ | Nothing -> loop (j + 1) S.empty ]
   in
   loop 0 S.empty
 ;

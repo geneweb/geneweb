@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 4.4 2004-12-14 09:30:10 ddr Exp $ *)
+(* $Id: adef.ml,v 4.5 2005-07-29 09:56:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type iper = int;
@@ -54,7 +54,7 @@ value compress d =
     [ Sure | About | Maybe | Before | After ->
         d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500 &&
         d.delta = 0
-    | _ -> False ]
+    | OrYear _ | YearInt _ -> False ]
   in
   if simple then
     let p =
@@ -63,7 +63,7 @@ value compress d =
       | Maybe -> 2
       | Before -> 3
       | After -> 4
-      | _ -> 0 ]
+      | Sure | OrYear _ | YearInt _ -> 0 ]
     in
     Some (((p * 32 + d.day) * 13 + d.month) * 2500 + d.year)
   else None

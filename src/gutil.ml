@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.45 2005-07-20 15:23:10 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.46 2005-07-29 09:56:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -387,7 +387,7 @@ value person_misc_names base p =
              let first_names =
                match t.t_name with
                [ Tname f -> [sou base f :: first_names]
-               | _ ->
+               | Tmain | Tnone ->
                    let f = sou base p.public_name in
                    if f = "" then first_names else [f :: first_names] ]
              in
@@ -973,12 +973,12 @@ value check_family base error warning fam cpl des =
   do {
     match fath.sex with
     [ Male -> birth_before_death base warning fath
-    | _ ->
+    | Female | Neuter ->
         if fam.relation = NoSexesCheck then ()
         else error (BadSexOfMarriedPerson fath) ];
     match moth.sex with
     [ Female -> birth_before_death base warning moth
-    | _ ->
+    | Male | Neuter ->
         if fam.relation = NoSexesCheck then ()
         else error (BadSexOfMarriedPerson moth) ];
     check_normal_marriage_date base error warning fam;
