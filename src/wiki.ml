@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.42 2005-07-29 07:59:52 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.43 2005-07-29 11:27:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -352,7 +352,7 @@ value string_of_modify_link conf cnt mode sfn empty =
     (if empty then "</p>" else "</div>")
 ;
 
-value rec tlsw_list tag1 tag2 prompt lev list sl =
+value rec tlsw_list tag1 tag2 lev list sl =
   let btag2 = "<" ^ tag2 ^ ">" in
   let etag2 = "</" ^ tag2 ^ ">" in
   let list = [tab lev ("<" ^ tag1 ^ ">") :: list] in
@@ -392,13 +392,13 @@ and select_sub_list tag1 tag2 prompt lev list sl =
           else (list, [s :: sl])
       | [] -> (list, []) ]
   in
-  let list = tlsw_list tag1 tag2 prompt (lev + 1) list (List.rev list2) in
+  let list = tlsw_list tag1 tag2 (lev + 1) list (List.rev list2) in
   (list, sl)
 ;
 
-value syntax_ul = tlsw_list "ul" "li" '*';
-value syntax_ol = tlsw_list "ol" "li" '#';
-value syntax_dd = tlsw_list "dl" "dd" ':';
+value syntax_ul = tlsw_list "ul" "li";
+value syntax_ol = tlsw_list "ol" "li";
+value syntax_dd = tlsw_list "dl" "dd";
 
 value rec hotl conf wlo cnt edit_opt sections_nums list =
   fun
