@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.37 2005-07-21 19:26:08 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.38 2005-07-29 00:54:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -109,7 +109,11 @@ value syntax_links conf mode file_path s =
       loop quot_lev (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '{' then
       let j =
-        try String.index_from s (i+1) '}' + 1 with [ Not_found -> slen ]
+        loop (i + 1) where rec loop j =
+          if j = slen then slen
+          else if j < slen - 1 && s.[j] = '%' then loop (j + 2)
+          else if s.[j] = '}' then j + 1
+          else loop (j + 1)
       in
       let b = String.sub s (i + 1) (j - i - 2) in
       let s = sprintf "<span class=\"highlight\">%s</span>" b in
