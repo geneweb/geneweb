@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.38 2005-07-29 00:54:32 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.39 2005-07-29 01:09:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -495,8 +495,9 @@ and syntax_ul lev list sl =
   in
   [tab lev "</ul>" :: list]
 and syntax_dd lev list sl =
-  let list = ["<dd>"; "<dl>" :: list] in
-  ["</dl>"; "</dd>" :: List.rev_append sl list]
+  let list = ["<dl>" :: list] in
+  let sl = List.fold_right (fun s sl -> ["<dd>" ^ s ^ "</dd>" :: sl]) sl [] in
+  ["</dl>" :: List.rev_append sl list]
 ;
 
 value html_of_tlsw conf s =
