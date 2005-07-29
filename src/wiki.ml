@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.40 2005-07-29 02:25:55 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.41 2005-07-29 03:05:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -351,43 +351,53 @@ value string_of_modify_link conf cnt mode sfn empty =
     (if empty then "</p>" else "</div>")
 ;
 
-value rec syntax_list tag1 tag2 prompt lev list sl =
-  let btag1 = "<" ^ tag1 ^ ">" in
-  let etag1 = "</" ^ tag1 ^ ">" in
+value rec tlsw_list tag1 tag2 prompt lev list sl =
   let btag2 = "<" ^ tag2 ^ ">" in
   let etag2 = "</" ^ tag2 ^ ">" in
-  let list = [tab lev btag1 :: list] in
+  let list = [tab lev ("<" ^ tag1 ^ ">") :: list] in
   let list =
     loop list sl where rec loop list =
       fun
       [ [s1; s2 :: sl] ->
-          if String.length s2 > 0 && s2.[0] = prompt then
+          if String.length s2 > 0 && s2.[0] = '*' then
+            let sl = [s2 :: sl] in
             let list = [tab lev btag2 ^ s1 :: list] in
-            let (list2, sl) =
-              loop [] [s2 :: sl] where rec loop list =
-                fun
-                [ [s :: sl] ->
-                    if String.length s > 0 && s.[0] = prompt then
-                      let s = String.sub s 1 (String.length s - 1) in
-                      loop [s :: list] sl
-                    else (list, [s :: sl])
-                | [] -> (list, []) ]
-            in
-            let list =
-              syntax_list tag1 tag2 prompt (lev + 1) list (List.rev list2)
-            in
+            let (list, sl) = select_sub_list "ul" "li" '*' lev list sl in
+            loop [tab lev etag2 :: list] sl
+          else if String.length s2 > 0 && s2.[0] = '#' then
+            let sl = [s2 :: sl] in
+            let list = [tab lev btag2 ^ s1 :: list] in
+            let (list, sl) = select_sub_list "ol" "li" '#' lev list sl in
+            loop [tab lev etag2 :: list] sl
+          else if String.length s2 > 0 && s2.[0] = ':' then
+            let sl = [s2 :: sl] in
+            let list = [tab lev btag2 ^ s1 :: list] in
+            let (list, sl) = select_sub_list "dl" "dd" ':' lev list sl in
             loop [tab lev etag2 :: list] sl
           else
             loop [tab lev btag2 ^ s1 ^ etag2 :: list] [s2 :: sl]
       | [s] -> [tab lev btag2 ^ s ^ etag2 :: list]
       | [] -> list ]
   in
-  [tab lev etag1 :: list]
+  [tab lev ("</" ^ tag1 ^ ">") :: list]
+and select_sub_list tag1 tag2 prompt lev list sl =
+  let (list2, sl) =
+    loop [] sl where rec loop list =
+      fun
+      [ [s :: sl] ->
+          if String.length s > 0 && s.[0] = prompt then
+            let s = String.sub s 1 (String.length s - 1) in
+            loop [s :: list] sl
+          else (list, [s :: sl])
+      | [] -> (list, []) ]
+  in
+  let list = tlsw_list tag1 tag2 prompt (lev + 1) list (List.rev list2) in
+  (list, sl)
 ;
 
-value syntax_ul = syntax_list "ul" "li" '*';
-value syntax_ol = syntax_list "ol" "li" '#';
-value syntax_dd = syntax_list "dl" "dd" ':';
+value syntax_ul = tlsw_list "ul" "li" '*';
+value syntax_ol = tlsw_list "ol" "li" '#';
+value syntax_dd = tlsw_list "dl" "dd" ':';
 
 value rec hotl conf wlo cnt edit_opt sections_nums list =
   fun
