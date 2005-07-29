@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.35 2005-07-05 01:06:25 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.36 2005-07-29 00:13:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -715,6 +715,8 @@ value print_del conf base =
       do {
         effective_del conf base p;
         base.func.patch_person p.cle_index p;
+        Notes.update_notes_links_db conf (NotesLinks.PgInd p.cle_index)
+          "" True;
         Util.commit_patches conf base;
         History.record conf base k "dp";
         print_del_ok conf base [];
