@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.41 2005-07-29 03:05:53 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.42 2005-07-29 07:59:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -33,6 +33,7 @@ open Util;
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
+module Buff2 = Buff.Make (struct value buff = ref (String.create 80); end);
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
 
 value first_cnt = 1;
@@ -108,14 +109,14 @@ value syntax_links conf mode file_path s =
     then
       loop quot_lev (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '{' then
-      let j =
-        loop (i + 1) where rec loop j =
-          if j = slen then slen
-          else if j < slen - 1 && s.[j] = '%' then loop (j + 2)
-          else if s.[j] = '}' then j + 1
-          else loop (j + 1)
+      let (b, j) =
+        loop 0 (i + 1) where rec loop len j =
+          if j = slen then (Buff2.get len, j)
+          else if j < slen - 1 && s.[j] = '%' then
+            loop (Buff2.store len s.[j+1]) (j + 2)
+          else if s.[j] = '}' then (Buff2.get len, j + 1)
+          else loop (Buff2.store len s.[j]) (j + 1)
       in
-      let b = String.sub s (i + 1) (j - i - 2) in
       let s = sprintf "<span class=\"highlight\">%s</span>" b in
       loop quot_lev j (Buff.mstore len s)
 (*
