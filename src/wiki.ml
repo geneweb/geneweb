@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.39 2005-07-29 01:09:35 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.40 2005-07-29 02:25:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -351,6 +351,44 @@ value string_of_modify_link conf cnt mode sfn empty =
     (if empty then "</p>" else "</div>")
 ;
 
+value rec syntax_list tag1 tag2 prompt lev list sl =
+  let btag1 = "<" ^ tag1 ^ ">" in
+  let etag1 = "</" ^ tag1 ^ ">" in
+  let btag2 = "<" ^ tag2 ^ ">" in
+  let etag2 = "</" ^ tag2 ^ ">" in
+  let list = [tab lev btag1 :: list] in
+  let list =
+    loop list sl where rec loop list =
+      fun
+      [ [s1; s2 :: sl] ->
+          if String.length s2 > 0 && s2.[0] = prompt then
+            let list = [tab lev btag2 ^ s1 :: list] in
+            let (list2, sl) =
+              loop [] [s2 :: sl] where rec loop list =
+                fun
+                [ [s :: sl] ->
+                    if String.length s > 0 && s.[0] = prompt then
+                      let s = String.sub s 1 (String.length s - 1) in
+                      loop [s :: list] sl
+                    else (list, [s :: sl])
+                | [] -> (list, []) ]
+            in
+            let list =
+              syntax_list tag1 tag2 prompt (lev + 1) list (List.rev list2)
+            in
+            loop [tab lev etag2 :: list] sl
+          else
+            loop [tab lev btag2 ^ s1 ^ etag2 :: list] [s2 :: sl]
+      | [s] -> [tab lev btag2 ^ s ^ etag2 :: list]
+      | [] -> list ]
+  in
+  [tab lev etag1 :: list]
+;
+
+value syntax_ul = syntax_list "ul" "li" '*';
+value syntax_ol = syntax_list "ol" "li" '#';
+value syntax_dd = syntax_list "dl" "dd" ':';
+
 value rec hotl conf wlo cnt edit_opt sections_nums list =
   fun
   [ ["__NOTOC__" :: sl] -> hotl conf wlo cnt edit_opt sections_nums list sl
@@ -378,7 +416,7 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
           fun
           [ ["" :: sl] -> Some (parag, sl, True)
           | [s :: sl] ->
-              if List.mem s.[0] ['*'; ':'; '='] || List.mem s toc_list then
+              if List.mem s.[0] ['*'; '#'; ':'; '='] || List.mem s toc_list then
                 if parag = [] then None else Some (parag, [s :: sl], True)
               else if s.[0] = ' ' && parag = [] then
                loop2 [s] sl
@@ -408,6 +446,10 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
       if len > 0 && s.[0] = '*' then
         let (sl, rest) = select_list_lines conf '*' [] [s :: sl] in
         let list = syntax_ul 0 list sl in
+        hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
+      else if len > 0 && s.[0] = '#' then
+        let (sl, rest) = select_list_lines conf '#' [] [s :: sl] in
+        let list = syntax_ol 0 list sl in
         hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
       else if len > 0 && s.[0] = ':' then
         let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
@@ -468,36 +510,6 @@ and select_list_lines conf prompt list =
         select_list_lines conf prompt [s :: list] sl
       else (List.rev list, [s :: sl])
   | [] -> (List.rev list, []) ]
-and syntax_ul lev list sl =
-  let list = [tab lev "<ul>" :: list] in
-  let list =
-    loop list sl where rec loop list =
-      fun
-      [ [s1; s2 :: sl] ->
-          if String.length s2 > 0 && s2.[0] = '*' then
-            let list = [tab lev "<li>" ^ s1 :: list] in
-            let (list2, sl) =
-              loop [] [s2 :: sl] where rec loop list =
-                fun
-                [ [s :: sl] ->
-                    if String.length s > 0 && s.[0] = '*' then
-                      let s = String.sub s 1 (String.length s - 1) in
-                      loop [s :: list] sl
-                    else (list, [s :: sl])
-                | [] -> (list, []) ]
-            in
-            let list = syntax_ul (lev + 1) list (List.rev list2) in
-            loop [tab lev "</li>" :: list] sl
-          else
-            loop [tab lev "<li>" ^ s1 ^ "</li>" :: list] [s2 :: sl]
-      | [s] -> [tab lev "<li>" ^ s ^ "</li>" :: list]
-      | [] -> list ]
-  in
-  [tab lev "</ul>" :: list]
-and syntax_dd lev list sl =
-  let list = ["<dl>" :: list] in
-  let sl = List.fold_right (fun s sl -> ["<dd>" ^ s ^ "</dd>" :: sl]) sl [] in
-  ["</dl>" :: List.rev_append sl list]
 ;
 
 value html_of_tlsw conf s =
