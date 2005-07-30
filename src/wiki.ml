@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.43 2005-07-29 11:27:53 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.44 2005-07-30 02:42:45 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -360,27 +360,25 @@ value rec tlsw_list tag1 tag2 lev list sl =
     loop list sl where rec loop list =
       fun
       [ [s1; s2 :: sl] ->
-          if String.length s2 > 0 && s2.[0] = '*' then
-            let sl = [s2 :: sl] in
+          let sl = [s2 :: sl] in
+          if String.length s2 > 0 && List.mem s2.[0] ['*'; '#'; ':'] then
             let list = [tab lev btag2 ^ s1 :: list] in
-            let (list, sl) = select_sub_list "ul" "li" '*' lev list sl in
-            loop [tab lev etag2 :: list] sl
-          else if String.length s2 > 0 && s2.[0] = '#' then
-            let sl = [s2 :: sl] in
-            let list = [tab lev btag2 ^ s1 :: list] in
-            let (list, sl) = select_sub_list "ol" "li" '#' lev list sl in
-            loop [tab lev etag2 :: list] sl
-          else if String.length s2 > 0 && s2.[0] = ':' then
-            let sl = [s2 :: sl] in
-            let list = [tab lev btag2 ^ s1 :: list] in
-            let (list, sl) = select_sub_list "dl" "dd" ':' lev list sl in
+            let (list, sl) = do_sub_list s2 lev list sl in
             loop [tab lev etag2 :: list] sl
           else
-            loop [tab lev btag2 ^ s1 ^ etag2 :: list] [s2 :: sl]
+            loop [tab lev btag2 ^ s1 ^ etag2 :: list] sl
       | [s] -> [tab lev btag2 ^ s ^ etag2 :: list]
       | [] -> list ]
   in
   [tab lev ("</" ^ tag1 ^ ">") :: list]
+and do_sub_list s lev list sl =
+  if String.length s > 0 && s.[0] = '*' then
+    select_sub_list "ul" "li" '*' lev list sl
+  else if String.length s > 0 && s.[0] = '#' then
+    select_sub_list "ol" "li" '#' lev list sl
+  else if String.length s > 0 && s.[0] = ':' then
+    select_sub_list "dl" "dd" ':' lev list sl
+  else (list, sl)
 and select_sub_list tag1 tag2 prompt lev list sl =
   let (list2, sl) =
     loop [] sl where rec loop list =
@@ -393,7 +391,9 @@ and select_sub_list tag1 tag2 prompt lev list sl =
       | [] -> (list, []) ]
   in
   let list = tlsw_list tag1 tag2 (lev + 1) list (List.rev list2) in
-  (list, sl)
+  match sl with
+  [ [s :: _] -> do_sub_list s lev list sl
+  | [] -> (list, sl) ]
 ;
 
 value syntax_ul = tlsw_list "ul" "li";
