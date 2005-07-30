@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.44 2005-07-30 02:42:45 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.45 2005-07-30 11:31:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -363,7 +363,7 @@ value rec tlsw_list tag1 tag2 lev list sl =
           let sl = [s2 :: sl] in
           if String.length s2 > 0 && List.mem s2.[0] ['*'; '#'; ':'] then
             let list = [tab lev btag2 ^ s1 :: list] in
-            let (list, sl) = do_sub_list s2 lev list sl in
+            let (list, sl) = do_sub_list s2.[0] lev list sl in
             loop [tab lev etag2 :: list] sl
           else
             loop [tab lev btag2 ^ s1 ^ etag2 :: list] sl
@@ -371,15 +371,14 @@ value rec tlsw_list tag1 tag2 lev list sl =
       | [] -> list ]
   in
   [tab lev ("</" ^ tag1 ^ ">") :: list]
-and do_sub_list s lev list sl =
-  if String.length s > 0 && s.[0] = '*' then
-    select_sub_list "ul" "li" '*' lev list sl
-  else if String.length s > 0 && s.[0] = '#' then
-    select_sub_list "ol" "li" '#' lev list sl
-  else if String.length s > 0 && s.[0] = ':' then
-    select_sub_list "dl" "dd" ':' lev list sl
-  else (list, sl)
-and select_sub_list tag1 tag2 prompt lev list sl =
+and do_sub_list prompt lev list sl =
+  let (tag1, tag2) =
+    match prompt with
+    [ '*' -> ("ul", "li")
+    | '#' -> ("ol", "li")
+    | ':' -> ("dl", "dd")
+    | _ -> assert False ]
+  in
   let (list2, sl) =
     loop [] sl where rec loop list =
       fun
@@ -392,13 +391,16 @@ and select_sub_list tag1 tag2 prompt lev list sl =
   in
   let list = tlsw_list tag1 tag2 (lev + 1) list (List.rev list2) in
   match sl with
-  [ [s :: _] -> do_sub_list s lev list sl
+  [ [s :: _] ->
+      if String.length s > 0 && List.mem s.[0] ['*'; '#'; ':'] then
+        do_sub_list s.[0] lev list sl
+      else (list, sl)
   | [] -> (list, sl) ]
 ;
 
-value syntax_ul = tlsw_list "ul" "li";
-value syntax_ol = tlsw_list "ol" "li";
-value syntax_dd = tlsw_list "dl" "dd";
+value syntax_ul = tlsw_list "ul" "li" 0;
+value syntax_ol = tlsw_list "ol" "li" 0;
+value syntax_dd = tlsw_list "dl" "dd" 0;
 
 value rec hotl conf wlo cnt edit_opt sections_nums list =
   fun
@@ -456,15 +458,15 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
       let len = String.length s in
       if len > 0 && s.[0] = '*' then
         let (sl, rest) = select_list_lines conf '*' [] [s :: sl] in
-        let list = syntax_ul 0 list sl in
+        let list = syntax_ul list sl in
         hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
       else if len > 0 && s.[0] = '#' then
         let (sl, rest) = select_list_lines conf '#' [] [s :: sl] in
-        let list = syntax_ol 0 list sl in
+        let list = syntax_ol list sl in
         hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
       else if len > 0 && s.[0] = ':' then
         let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
-        let list = syntax_dd 0 list sl in
+        let list = syntax_dd list sl in
         hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
       else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
         let slev = section_level s len in
