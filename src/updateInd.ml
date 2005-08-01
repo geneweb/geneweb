@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.32 2005-06-12 06:33:41 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.33 2005-08-01 23:59:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -349,7 +349,7 @@ value rec print_ast conf base env p =
   | Aforeach v el al -> print_foreach conf base env p v el al
   | Adefine f xl al alk -> print_define conf base env p f xl al alk
   | Aapply _ f el -> print_apply conf base env p f el
-  | Aint _ _ | Aop2 _ _ _ | Aop1 _ _ -> Wserver.wprint "error1" ]
+  | Alet _ _ _ | Aint _ _ | Aop2 _ _ _ | Aop1 _ _ -> Wserver.wprint "error1" ]
 and print_define conf base env p f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] p) alk
 and print_apply conf base env p f ell =

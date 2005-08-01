@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.70 2005-06-25 13:59:01 ddr Exp $ *)
+(* $Id: templ.ml,v 4.71 2005-08-01 23:59:18 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -356,6 +356,7 @@ value parse_templ conf strm =
             }
         | (_, v, []) when List.mem v end_list -> (List.rev astl, v)
         | (_, "define", []) -> parse_define astl end_list strm
+        | (_, "let", []) -> parse_let astl end_list strm
         | x ->
             let ast =
               match x with
@@ -402,6 +403,19 @@ value parse_templ conf strm =
       | None -> [Atext "define error" :: alk @ astl] ]
     in
     (List.rev astl, v)
+  and parse_let astl end_list strm =
+    let (ast, tok) =
+      try
+        let k = get_ident 0 strm in
+        match strm with parser
+        [ [: `';' :] ->
+            let (v, _) = parse_astl [] False 0 ["in"] strm in
+            let (al, tok) = parse_astl [] False 0 end_list strm in
+            (Alet k v al, tok) ]
+      with
+      [ Stream.Failure | Stream.Error _ -> (Atext "let syntax error", "") ]
+    in        
+    (List.rev [ast :: astl], tok)
   and parse_apply bp strm =
     try
       let f = get_ident 0 strm in
@@ -568,6 +582,7 @@ value rec subst sf =
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
   | Aapply loc f all -> Aapply loc (sf f) (List.map (substl sf) all)
+  | Alet k v al -> Alet (sf k) (substl sf v) (substl sf al)
   | Aint loc s -> Aint loc s
   | Aop1 op e -> Aop1 op (subst sf e)
   | Aop2 op e1 e2 -> Aop2 (sf op) (subst sf e1) (subst sf e2) ]
@@ -786,7 +801,8 @@ value rec bool_eval ((conf, eval_var, _) as ceva) =
   | Atext s -> do { Wserver.wprint "\"%s\"???" s; False }
   | Aint loc s -> raise_with_loc loc (Failure "bool value expected")
   | Atransl _ s _ -> do { Wserver.wprint "[%s]???" s; False }
-  | Aop1 _ _ | Adefine _ _ _ _ | Aforeach _ _ _ | Aif _ _ _ | Awid_hei _ ->
+  | Aop1 _ _ | Adefine _ _ _ _ | Aforeach _ _ _ | Aif _ _ _ | Awid_hei _
+  | Alet _ _ _ ->
       do { Wserver.wprint "error14"; False } ]
 and int_eval ceva =
   fun
