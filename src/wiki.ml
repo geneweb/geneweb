@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.45 2005-07-30 11:31:15 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.46 2005-08-01 07:59:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -359,8 +359,7 @@ value rec tlsw_list tag1 tag2 lev list sl =
   let list =
     loop list sl where rec loop list =
       fun
-      [ [s1; s2 :: sl] ->
-          let sl = [s2 :: sl] in
+      [ [s1 :: ([s2 :: _] as sl)] ->
           if String.length s2 > 0 && List.mem s2.[0] ['*'; '#'; ':'] then
             let list = [tab lev btag2 ^ s1 :: list] in
             let (list, sl) = do_sub_list s2.[0] lev list sl in
@@ -397,10 +396,6 @@ and do_sub_list prompt lev list sl =
       else (list, sl)
   | [] -> (list, sl) ]
 ;
-
-value syntax_ul = tlsw_list "ul" "li" 0;
-value syntax_ol = tlsw_list "ol" "li" 0;
-value syntax_dd = tlsw_list "dl" "dd" 0;
 
 value rec hotl conf wlo cnt edit_opt sections_nums list =
   fun
@@ -456,48 +451,51 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
       hotl conf wlo cnt edit_opt sections_nums list sl
   | [s :: sl] ->
       let len = String.length s in
-      if len > 0 && s.[0] = '*' then
-        let (sl, rest) = select_list_lines conf '*' [] [s :: sl] in
-        let list = syntax_ul list sl in
-        hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
-      else if len > 0 && s.[0] = '#' then
-        let (sl, rest) = select_list_lines conf '#' [] [s :: sl] in
-        let list = syntax_ol list sl in
-        hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
-      else if len > 0 && s.[0] = ':' then
-        let (sl, rest) = select_list_lines conf ':' [] [s :: sl] in
-        let list = syntax_dd list sl in
-        hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
-      else if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-        let slev = section_level s len in
-        let (section_num, sections_nums) =
-          match sections_nums with
-          [ [(_, a) :: l] -> (a ^ " - ", l)
-          | [] -> ("", []) ]
-        in
-        let s =
-          sprintf "<h%d>%s%s%s</h%d>" slev section_num
-            (String.sub s slev (len-2*slev))
-            (if slev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") slev
-        in
-        let list =
-          if wlo <> None then
-            let s =
-              sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
+      let tago =
+        if len > 0 then
+          match s.[0] with
+          [ '*' -> Some ("ul", "li")
+          | '#' -> Some ("ol", "li")
+          | ':' -> Some ("dl", "dd")
+          | _ -> None ]
+        else None
+      in
+      match tago with
+      [ Some (tag1, tag2) ->
+          let (sl, rest) = select_list_lines conf s.[0] [] [s :: sl] in
+          let list = tlsw_list tag1 tag2 0 list sl in
+          hotl conf wlo cnt edit_opt sections_nums list ["" :: rest]
+      | None ->
+          if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+            let slev = section_level s len in
+            let (section_num, sections_nums) =
+              match sections_nums with
+              [ [(_, a) :: l] -> (a ^ " - ", l)
+              | [] -> ("", []) ]
             in
-            [s:: list]
-          else list
-        in
-        let list =
-          match edit_opt with
-          [ Some (mode, sfn) ->
-              let s = string_of_modify_link conf cnt mode sfn False in
-              [s :: list]
-          | None -> list ]
-        in
-        hotl conf wlo (cnt + 1) edit_opt sections_nums list [""; s :: sl]
-      else
-        hotl conf wlo cnt edit_opt sections_nums [s :: list] sl
+            let s =
+              sprintf "<h%d>%s%s%s</h%d>" slev section_num
+                (String.sub s slev (len-2*slev))
+                (if slev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") slev
+            in
+            let list =
+              if wlo <> None then
+                let s =
+                  sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
+                in
+                [s:: list]
+              else list
+            in
+            let list =
+              match edit_opt with
+              [ Some (mode, sfn) ->
+                  let s = string_of_modify_link conf cnt mode sfn False in
+                  [s :: list]
+              | None -> list ]
+            in
+            hotl conf wlo (cnt + 1) edit_opt sections_nums list [""; s :: sl]
+          else
+            hotl conf wlo cnt edit_opt sections_nums [s :: list] sl ]
   | [] -> List.rev list ]
 and select_list_lines conf prompt list =
   fun
