@@ -105,9 +105,9 @@ gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi iobase.cmi \
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx iobase.cmx \
     notesLinks.cmx secure.cmx select.cmx 
 history.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi secure.cmi \
-    util.cmi ../wserver/wserver.cmi history.cmi 
+    templ.cmi templAst.cmi util.cmi ../wserver/wserver.cmi history.cmi 
 history.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx secure.cmx \
-    util.cmx ../wserver/wserver.cmx history.cmi 
+    templ.cmx templAst.cmi util.cmx ../wserver/wserver.cmx history.cmi 
 history.cmi: config.cmi def.cmi 
 image.cmo: config.cmi gutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
 image.cmx: config.cmi gutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 
