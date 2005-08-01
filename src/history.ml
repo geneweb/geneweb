@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.26 2005-07-28 09:36:11 ddr Exp $ *)
+(* $Id: history.ml,v 4.27 2005-08-01 17:27:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -195,8 +195,6 @@ value print_history_line conf base line wiz k i =
               }
               else ();
               Wserver.wprint ")";
-            end;
-            tag "td" begin
               Wserver.wprint " ...\n";
               match keyo with
               [ Some key ->
