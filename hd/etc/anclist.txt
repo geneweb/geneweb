@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.46 2005-08-02 06:27:48 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.47 2005-08-02 07:43:00 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -68,7 +68,7 @@
   %elseif;(xx = 4)[*to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
-      %apply;nth([nth (generation)], evar.xx)
+      %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
