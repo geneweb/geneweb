@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 1.45 2005-07-13 01:28:30 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 1.46 2005-08-02 06:27:48 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -68,7 +68,7 @@
   %elseif;(xx = 4)[*to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
+      %apply;nth([nth (generation)], evar.xx)
     %end;
   %end;
 %end;
@@ -84,13 +84,6 @@
     %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
   %end;
-%end;
-
-%define;by_list(xx)
-  <p>
-  %apply;togen(xx).
-  </p>
-  %apply;ancestors_by_list("self", xx)
 %end;
 
 %define;ancestors_horizontally(pp, xx, ss1, ss2, ss3)
@@ -109,7 +102,22 @@
   %end;
 %end;
 
-%define;horizontally(xx)
+%if;(evar.t = "L")
+  %( by list %)
+  %let;xx;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %in;
+  <p>
+  %apply;togen(xx).
+  </p>
+  %apply;ancestors_by_list("self", xx)
+%elseif;(evar.t = "H")
+  %( horizontally %)
+  %let;xx;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %in;
   <p>
   %apply;togen(xx).
   </p>
@@ -117,20 +125,6 @@
   %apply;ancestors_horizontally(
     "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
   </tr></tr></table>
-%end;
-
-%if;(evar.t = "L")
-  %( by list %)
-  %apply;by_list%with;
-    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
-  %end;
-%elseif;(evar.t = "H")
-  %( horizontally %)
-  %apply;horizontally%with;
-    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
-  %end;
 %elseif;(evar.t = "F")
   %( surnames list %)
   <ul>
