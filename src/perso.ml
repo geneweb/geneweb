@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.170 2005-07-26 09:39:58 ddr Exp $ *)
+(* $Id: perso.ml,v 4.171 2005-08-02 06:27:48 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -747,6 +747,7 @@ type env =
   | Vlazyp of ref (option string)
   | Vlazy of Lazy.t env
   | Vfun of list string and list ast
+  | Vval of string
   | Vnone ]
 and title_item =
   (int * gen_title_name istr * istr * list istr *
@@ -848,8 +849,11 @@ value rec eval_var conf base env ep loc sl =
 and eval_simple_var conf base env ep =
   fun
   [ [s] ->
-      try bool_val (eval_simple_bool_var conf base env ep s) with
-      [ Not_found -> str_val (eval_simple_str_var conf base env ep s) ]
+      match get_env s env with
+      [ Vval s -> str_val s
+      | _ ->
+          try bool_val (eval_simple_bool_var conf base env ep s) with
+          [ Not_found -> str_val (eval_simple_str_var conf base env ep s) ] ]
   | _ -> raise Not_found ]
 and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   fun
@@ -2130,6 +2134,7 @@ value rec print_ast conf base env ep =
   | Aforeach (loc, s, sl) el al -> print_foreach conf base env ep loc s sl el al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
   | Aapply loc f ell -> print_apply conf base env ep loc f ell
+  | Alet k v al -> print_let conf base env ep k v al
   | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
 and print_define conf base env ep f xl al alk =
   List.iter (print_ast conf base [(f, Vfun xl al) :: env] ep) alk
@@ -2143,6 +2148,10 @@ and print_apply conf base env ep loc f ell =
       Templ.print_apply f print_ast xl al vl
   | _ ->
       Wserver.wprint "%s" (eval_apply conf env eval_ast f vl) ]
+and print_let conf base env ep k v al =
+  let v = String.concat "" (List.map (eval_ast conf base env ep) v) in
+  let env = [(k, Vval v) :: env] in
+  List.iter (print_ast conf base env ep) al
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let eval_ast = eval_ast conf base env ep in
