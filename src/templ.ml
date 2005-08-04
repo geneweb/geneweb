@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.72 2005-08-02 06:27:48 ddr Exp $ *)
+(* $Id: templ.ml,v 4.73 2005-08-04 16:12:43 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -836,11 +836,14 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
             ""
           } ]
   | Atransl upp s c -> eval_transl conf upp s c
-  | Aif e1 [e2] [e3] ->
-      if bool_eval ceva e1 then string_eval ceva e2 else string_eval ceva e3
+  | Aif e1 el2 el3 ->
+      if bool_eval ceva e1 then string_list_eval ceva el2
+      else string_list_eval ceva el3
   | e ->
       try Num.to_string (num_eval ceva e) with
       [ Failure x -> x ] ]
+and string_list_eval ceva el =
+  String.concat "" (List.map (string_eval ceva) el)
 and num_eval ((_, eval_var, _) as ceva) =
   fun
   [ Aint _ x -> Num.of_string x
