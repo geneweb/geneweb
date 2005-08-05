@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.23 2005-08-05 19:04:13 ddr Exp $ *)
+(* $Id: templ.mli,v 4.24 2005-08-05 19:50:49 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -8,7 +8,7 @@ open TemplAst;
 type vother = 'abstract;
 type env 'a = list (string * 'a);
 
-value eval_transl : config -> _ -> bool -> string -> string -> string;
+value eval_transl : config -> bool -> string -> string -> string;
 value copy_from_templ : config -> list (string * string) -> in_channel -> unit;
 
 value interp :

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.68 2005-08-05 19:04:13 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.69 2005-08-05 19:50:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -387,6 +387,8 @@ value eval_predefined_apply env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
+value eval_transl conf env = Templ.eval_transl conf;
+
 value print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
   [ Some
@@ -394,7 +396,7 @@ value print_update_fam conf base fcd digest =
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let env = [("digest", Vstring digest)] in
       Templ.interp conf base "updfam" (eval_var conf base)
-        (Templ.eval_transl conf) eval_predefined_apply get_vother set_vother
+        (eval_transl conf) eval_predefined_apply get_vother set_vother
         print_foreach env fcd
   | _ -> incorrect_request conf ]
 ;

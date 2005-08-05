@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.176 2005-08-05 19:04:13 ddr Exp $ *)
+(* $Id: perso.ml,v 4.177 2005-08-05 19:50:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2033,7 +2033,7 @@ value eval_transl conf env upp s c =
       let r = Gutil.nominative (Util.transl_nth conf s n) in
       if upp then capitale r else r
   | _ ->
-      Templ.eval_transl conf env upp s c ]
+      Templ.eval_transl conf upp s c ]
 ;
 
 value print_foreach conf base print_ast eval_expr =
