@@ -55,6 +55,8 @@ The new version number (5.00) is in honour of this new encoding.
       displayed.
 
 * GeneWeb server or CGI (gwd)
+  - [04 Aug 05] The page "history of updates" is now customizable. It uses
+    the template file "updhist.txt".
   - [23 Jul 05] All "ancestors" pages are now customizable. Depending to
     the kind of page, they use the new template files: "ancmenu.txt",
     "ancsosa.txt", "anctree.txt" and "anclist.txt".
