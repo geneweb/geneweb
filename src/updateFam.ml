@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.63 2005-07-25 11:36:14 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.64 2005-08-05 10:44:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -39,10 +39,19 @@ type env =
   [ Vstring of string
   | Vfun of list string and list ast
   | Vint of int
+  | Vval of string
   | Vnone ]
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+
+value get_fun f env =
+  match get_env f env with
+  [ Vfun al el -> Some (al, el)
+  | _ -> None ]
+;
+value set_fun f al el env = [(f, Vfun al el) :: env];
+value set_val k v env = [(k, Vval v) :: env];
 
 value extract_var sini s =
   let len = String.length sini in
@@ -349,67 +358,50 @@ and eval_string_env var env =
 
 (* print *)
 
-value rec print_ast conf base env fcd =
-  fun
-  [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
-  | Avar loc s sl ->
-      Templ.print_var conf base (eval_var conf base env fcd loc) s sl
-  | Aif e alt ale -> print_if conf base env fcd e alt ale
-  | Aforeach v [] al -> print_foreach conf base env fcd v al
-  | Adefine f xl al alk -> print_define conf base env fcd f xl al alk
-  | Aapply _ f el -> print_apply conf base env fcd f el
-  | x -> not_impl "print_ast" x ]
-and print_define conf base env fcd f xl al alk =
-  List.iter (print_ast conf base [(f, Vfun xl al) :: env] fcd) alk
-and print_apply conf base env fcd f ell =
-  let eval_var = eval_var conf base env fcd in
-  let eval_apply _ _ = "not impl apply in apply" in
-  let eval_ast = Templ.eval_expr conf (eval_var, eval_apply) in
-  let sll = List.map (List.map eval_ast) ell in
-  let vl = List.map (String.concat "") sll in
-  match get_env f env with
-  [ Vfun xl al ->
-      let print_ast = print_ast conf base env fcd in
-      Templ.print_apply f print_ast xl al vl
-  | _ -> Wserver.wprint ">%%%s???" f ]
-and print_if conf base env fcd e alt ale =
-  let eval_var = eval_var conf base env fcd in
-  let eval_apply _ _ = "not impl apply in if" in
-  let al =
-    if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
+value print_foreach print_ast eval_expr eval_int_expr =
+  let rec print_foreach conf base env ((fam, cpl, des) as fcd) _ s sl _ al =
+    match [s :: sl] with
+    [ ["child"] -> print_foreach_child conf base env fcd al des.children s
+    | ["witness"] -> print_foreach_witness conf base env fcd al fam.witnesses s
+    | ["parent"] ->
+        print_foreach_parent conf base env fcd al (parent_array cpl) s
+    | _ ->
+        do {
+          Wserver.wprint ">%%foreach;%s" s;
+          List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+          Wserver.wprint "?";
+         } ]
+  and print_foreach_child conf base env fcd al arr lab =
+    for i = 0 to max 1 (Array.length arr) - 1 do {
+      let env = [("cnt", Vint (i + 1)) :: env] in
+      List.iter (print_ast conf base env fcd) al
+    }
+  and print_foreach_witness conf base env fcd al arr lab =
+    for i = 0 to max 2 (Array.length arr) - 1 do {
+      let env = [("cnt", Vint (i + 1)) :: env] in
+      List.iter (print_ast conf base env fcd) al
+    }
+  and print_foreach_parent conf base env fcd al arr lab =
+    for i = 0 to Array.length arr - 1 do {
+      let env = [("cnt", Vint (i + 1)) :: env] in
+      List.iter (print_ast conf base env fcd) al
+    }
   in
-  List.iter (print_ast conf base env fcd) al
-and print_foreach conf base env ((fam, cpl, des) as fcd) (_, s, sl) al =
-  match [s :: sl] with
-  [ ["child"] -> print_foreach_child conf base env fcd al des.children s
-  | ["witness"] -> print_foreach_witness conf base env fcd al fam.witnesses s
-  | ["parent"] ->
-      print_foreach_parent conf base env fcd al (parent_array cpl) s
-  | _ ->
-      do {
-        Wserver.wprint ">%%foreach;%s" s;
-        List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-        Wserver.wprint "?";
-       } ]
-and print_foreach_child conf base env fcd al arr lab =
-  for i = 0 to max 1 (Array.length arr) - 1 do {
-    let env = [("cnt", Vint (i + 1)) :: env] in
-    List.iter (print_ast conf base env fcd) al
-  }
-and print_foreach_witness conf base env fcd al arr lab =
-  for i = 0 to max 2 (Array.length arr) - 1 do {
-    let env = [("cnt", Vint (i + 1)) :: env] in
-    List.iter (print_ast conf base env fcd) al
-  }
-and print_foreach_parent conf base env fcd al arr lab =
-  for i = 0 to Array.length arr - 1 do {
-    let env = [("cnt", Vint (i + 1)) :: env] in
-    List.iter (print_ast conf base env fcd) al
-  }
+  print_foreach
+;
+
+value eval_transl conf base env = Templ.eval_transl conf;
+
+value eval_predefined_apply conf env f vl =
+  match (f, vl) with
+  [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
 value interp_templ conf base fcd digest astl =
+  let print_ast =
+    Templ.print_ast eval_var eval_transl eval_predefined_apply get_fun set_fun
+      set_val print_foreach
+  in
   let env = [("digest", Vstring digest)] in
   List.iter (print_ast conf base env fcd) astl
 ;
