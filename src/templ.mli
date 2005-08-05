@@ -1,15 +1,15 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.22 2005-08-05 17:50:24 ddr Exp $ *)
+(* $Id: templ.mli,v 4.23 2005-08-05 19:04:13 ddr Exp $ *)
 
 open Config;
 open Def;
 open TemplAst;
 
-value eval_transl : config -> bool -> string -> string -> string;
-value copy_from_templ : config -> list (string * string) -> in_channel -> unit;
-
 type vother = 'abstract;
 type env 'a = list (string * 'a);
+
+value eval_transl : config -> _ -> bool -> string -> string -> string;
+value copy_from_templ : config -> list (string * string) -> in_channel -> unit;
 
 value interp :
   config -> base -> string ->
@@ -19,7 +19,6 @@ value interp :
     ('a -> option vother) -> (vother -> 'a) ->
     ((env 'a -> 'b -> ast -> unit) ->
        (env 'a -> 'b -> ast -> string) ->
-       (env 'a -> 'b -> ast -> int) ->
        env 'a -> 'b -> loc -> string -> list string ->
        list (list ast) -> list ast -> unit) ->
     env 'a -> 'b -> unit;
