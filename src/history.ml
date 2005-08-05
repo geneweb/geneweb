@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.31 2005-08-05 13:07:27 ddr Exp $ *)
+(* $Id: history.ml,v 4.32 2005-08-05 17:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -331,12 +331,8 @@ type env 'a =
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
-value get_vother v env =
-  match get_env v env with
-  [ Vother x -> Some x
-  | _ -> None ]
-;
-value set_vother k x env = [(k, Vother x) :: env];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
 
 value rec eval_var conf base env xx loc =
   fun
@@ -504,22 +500,10 @@ value eval_predefined_apply conf env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value interp_templ templ_fname conf base =
-  let astl = Templ.input conf templ_fname in
-  let print_ast =
-    Templ.print_ast (eval_var conf base) (eval_transl conf)
-      (eval_predefined_apply conf) get_vother set_vother
-      (print_foreach conf base)
-  in
-  do {
-    Util.html conf;
-    Util.nl ();
-    let env = [("pos", Vpos (ref 0))] in
-    List.iter (print_ast conf base env ()) astl;
-  }
-;
-
 value print conf base =
   if p_getenv conf.env "old" = Some "on" then print_old conf base else
-  interp_templ "updhist" conf base
+  let env = [("pos", Vpos (ref 0))] in
+  Templ.interp conf base "updhist" (eval_var conf base) (eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) env ()
 ;

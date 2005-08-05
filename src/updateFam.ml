@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.66 2005-08-05 13:07:27 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.67 2005-08-05 17:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -43,12 +43,8 @@ type env 'a =
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
-value get_vother v env =
-  match get_env v env with
-  [ Vother x -> Some x
-  | _ -> None ]
-;
-value set_vother k x env = [(k, Vother x) :: env];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
 
 value extract_var sini s =
   let len = String.length sini in
@@ -393,31 +389,16 @@ value eval_predefined_apply env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value interp_templ conf base fcd digest astl =
-  let print_ast =
-    Templ.print_ast (eval_var conf base) (eval_transl conf)
-      eval_predefined_apply get_vother set_vother print_foreach
-  in
-  let env = [("digest", Vstring digest)] in
-  List.iter (print_ast conf base env fcd) astl
-;
-
 value print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
   [ Some
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
-      let astl = Templ.input conf "updfam" in
-      do { html conf; nl (); interp_templ conf base fcd digest astl }
+      let env = [("digest", Vstring digest)] in
+      Templ.interp conf base "updfam" (eval_var conf base)
+        (eval_transl conf) eval_predefined_apply get_vother set_vother
+        print_foreach env fcd
   | _ -> incorrect_request conf ]
-;
-
-value print_add1 conf base fam cpl des digest force_children_surnames =
-  print_update_fam conf base (fam, cpl, des) digest
-;
-
-value print_mod1 conf base fam cpl des digest =
-  print_update_fam conf base (fam, cpl, des) digest
 ;
 
 value print_del1 conf base fam =
@@ -521,7 +502,7 @@ value print_add conf base =
      fam_index = bogus_family_index}
   and cpl = couple conf.multi_parents fath moth
   and des = {children = [| |]} in
-  print_add1 conf base fam cpl des digest False
+  print_update_fam conf base (fam, cpl, des) digest
 ;
 
 value print_add_parents conf base =
@@ -542,7 +523,7 @@ value print_add_parents conf base =
            [| (sou base p.first_name, sou base p.surname, p.occ, Update.Link,
                "") |]}
       in
-      print_add1 conf base fam cpl des "" True
+      print_update_fam conf base (fam, cpl, des) ""
   | _ -> incorrect_request conf ]
 ;
 
@@ -554,7 +535,7 @@ value print_mod conf base =
       let des = doi base (Adef.ifam_of_int i) in
       let (sfam, scpl, sdes) = string_family_of conf base fam cpl des in
       let digest = Update.digest_family fam cpl des in
-      print_mod1 conf base sfam scpl sdes digest
+      print_update_fam conf base (sfam, scpl, sdes) digest
   | _ -> incorrect_request conf ]
 ;
 
