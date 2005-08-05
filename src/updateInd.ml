@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.34 2005-08-05 10:44:58 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.35 2005-08-05 11:02:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -33,6 +33,11 @@ value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 value get_fun f env =
   match get_env f env with
   [ Vfun al el -> Some (al, el)
+  | _ -> None ]
+;
+value get_val k env =
+  match get_env k env with
+  [ Vval v -> Some v
   | _ -> None ]
 ;
 value set_fun f al el env = [(f, Vfun al el) :: env];
@@ -406,7 +411,7 @@ value eval_predefined_apply conf env f vl =
 value interp_templ conf base p digest astl =
   let print_ast =
     Templ.print_ast eval_var eval_transl eval_predefined_apply get_fun set_fun
-      set_val print_foreach
+      get_val set_val print_foreach
   in
   let env = [("digest", Vstring digest)] in
   List.iter (print_ast conf base env p) astl
