@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.78 2005-08-05 19:04:13 ddr Exp $ *)
+(* $Id: templ.ml,v 4.79 2005-08-05 19:50:49 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -681,23 +681,23 @@ value eval_var_handled conf env sl =
   [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
-value rec eval_ast conf xx =
+value rec eval_ast conf =
   fun
   [ Atext s -> s
   | Avar _ s sl -> eval_var_handled conf [] [s :: sl]
-  | Atransl upp s c -> eval_transl conf xx upp s c
+  | Atransl upp s c -> eval_transl conf upp s c
   | ast -> not_impl "eval_ast" ast ]
-and eval_transl conf xx upp s c =
+and eval_transl conf upp s c =
   if c = "" && String.length s > 0 && s.[0] = '\n' then
     eval_transl_inline conf s
   else
-    eval_transl_lexicon conf xx upp s c
+    eval_transl_lexicon conf upp s c
 and eval_transl_inline conf s =
   let (s, alt) =
     Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
   in
   if alt then "[" ^ s ^ "]" else s
-and eval_transl_lexicon conf xx upp s c =
+and eval_transl_lexicon conf upp s c =
   let r =
     let nth = try Some (int_of_string c) with [ Failure _ -> None ] in
     match split_at_coloncolon s with
@@ -717,7 +717,7 @@ and eval_transl_lexicon conf xx upp s c =
             let s3 =
               let s = String.sub s2 i (j - i) in
               let astl = parse_templ conf (Stream.of_string s) in
-              List.fold_left (fun s a -> s ^ eval_ast conf xx a) "" astl
+              List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
             in
             let s4 = String.sub s2 k (String.length s2 - k) in
             let s5 =
@@ -835,7 +835,7 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
             Wserver.wprint "?";
             ""
           } ]
-  | Atransl upp s c -> eval_transl conf () upp s c
+  | Atransl upp s c -> eval_transl conf upp s c
   | Aif e1 el2 el3 ->
       if bool_eval ceva e1 then string_list_eval ceva el2
       else string_list_eval ceva el3
@@ -958,7 +958,7 @@ and print_ast conf env =
   fun
   [ Avar _ s sl -> print_ast_var conf env [s :: sl]
   | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
-  | ast -> Wserver.wprint "%s" (eval_ast conf () ast) ]
+  | ast -> Wserver.wprint "%s" (eval_ast conf ast) ]
 and print_if conf env a1 a2 a3 =
   let test =
     try eval_bool_ast conf env a1 with

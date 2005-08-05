@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.38 2005-08-05 19:04:13 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.39 2005-08-05 19:50:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -393,13 +393,15 @@ value eval_predefined_apply env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
+value eval_transl conf env = Templ.eval_transl conf;
+
 value print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
       let env = [("digest", Vstring digest)] in
       Templ.interp conf base "updind" (eval_var conf base)
-        (Templ.eval_transl conf) eval_predefined_apply get_vother set_vother
+        (eval_transl conf) eval_predefined_apply get_vother set_vother
         print_foreach env p
   | _ -> incorrect_request conf ]
 ;
