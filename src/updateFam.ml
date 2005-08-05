@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.65 2005-08-05 11:02:02 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.66 2005-08-05 13:07:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -35,28 +35,20 @@ value string_family_of conf base fam cpl des =
 
 (* Interpretation of template file 'updfam.txt' *)
 
-type env = 
+type env 'a =
   [ Vstring of string
-  | Vfun of list string and list ast
   | Vint of int
-  | Vval of string
+  | Vother of 'a
   | Vnone ]
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
-
-value get_fun f env =
-  match get_env f env with
-  [ Vfun al el -> Some (al, el)
+value get_vother v env =
+  match get_env v env with
+  [ Vother x -> Some x
   | _ -> None ]
 ;
-value get_val k env =
-  match get_env k env with
-  [ Vval v -> Some v
-  | _ -> None ]
-;
-value set_fun f al el env = [(f, Vfun al el) :: env];
-value set_val k v env = [(k, Vval v) :: env];
+value set_vother k x env = [(k, Vother x) :: env];
 
 value extract_var sini s =
   let len = String.length sini in
@@ -364,48 +356,47 @@ and eval_string_env var env =
 (* print *)
 
 value print_foreach print_ast eval_expr eval_int_expr =
-  let rec print_foreach conf base env ((fam, cpl, des) as fcd) _ s sl _ al =
+  let rec print_foreach env ((fam, cpl, des) as fcd) _ s sl _ al =
     match [s :: sl] with
-    [ ["child"] -> print_foreach_child conf base env fcd al des.children s
-    | ["witness"] -> print_foreach_witness conf base env fcd al fam.witnesses s
-    | ["parent"] ->
-        print_foreach_parent conf base env fcd al (parent_array cpl) s
+    [ ["child"] -> print_foreach_child env fcd al des.children s
+    | ["witness"] -> print_foreach_witness env fcd al fam.witnesses s
+    | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl) s
     | _ ->
         do {
           Wserver.wprint ">%%foreach;%s" s;
           List.iter (fun s -> Wserver.wprint ".%s" s) sl;
           Wserver.wprint "?";
          } ]
-  and print_foreach_child conf base env fcd al arr lab =
+  and print_foreach_child env fcd al arr lab =
     for i = 0 to max 1 (Array.length arr) - 1 do {
       let env = [("cnt", Vint (i + 1)) :: env] in
-      List.iter (print_ast conf base env fcd) al
+      List.iter (print_ast env fcd) al
     }
-  and print_foreach_witness conf base env fcd al arr lab =
+  and print_foreach_witness env fcd al arr lab =
     for i = 0 to max 2 (Array.length arr) - 1 do {
       let env = [("cnt", Vint (i + 1)) :: env] in
-      List.iter (print_ast conf base env fcd) al
+      List.iter (print_ast env fcd) al
     }
-  and print_foreach_parent conf base env fcd al arr lab =
+  and print_foreach_parent env fcd al arr lab =
     for i = 0 to Array.length arr - 1 do {
       let env = [("cnt", Vint (i + 1)) :: env] in
-      List.iter (print_ast conf base env fcd) al
+      List.iter (print_ast env fcd) al
     }
   in
   print_foreach
 ;
 
-value eval_transl conf base env = Templ.eval_transl conf;
+value eval_transl conf env = Templ.eval_transl conf;
 
-value eval_predefined_apply conf env f vl =
+value eval_predefined_apply env f vl =
   match (f, vl) with
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
 value interp_templ conf base fcd digest astl =
   let print_ast =
-    Templ.print_ast eval_var eval_transl eval_predefined_apply get_fun set_fun
-      get_val set_val print_foreach
+    Templ.print_ast (eval_var conf base) (eval_transl conf)
+      eval_predefined_apply get_vother set_vother print_foreach
   in
   let env = [("digest", Vstring digest)] in
   List.iter (print_ast conf base env fcd) astl

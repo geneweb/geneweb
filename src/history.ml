@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.30 2005-08-05 11:02:02 ddr Exp $ *)
+(* $Id: history.ml,v 4.31 2005-08-05 13:07:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -323,31 +323,20 @@ value print_old conf base =
 
 (* *)
 
-type env =
+type env 'a =
   [ Vinfo of string and string and string and hist_item and string
   | Vpos of ref int
-  | Vfun of list string and list TemplAst.ast
-  | Vval of string
+  | Vother of 'a
   | Vnone ]
 ;
 
-value get_env v env =
-  try List.assoc v env with
-  [ Not_found -> Vnone ]
-;
-
-value get_fun f env =
-  match get_env f env with
-  [ Vfun al el -> Some (al, el)
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_vother v env =
+  match get_env v env with
+  [ Vother x -> Some x
   | _ -> None ]
 ;
-value get_val k env =
-  match get_env k env with
-  [ Vval v -> Some v
-  | _ -> None ]
-;
-value set_fun f al el env = [(f, Vfun al el) :: env];
-value set_val k v env = [(k, Vval v) :: env];
+value set_vother k x env = [(k, Vother x) :: env];
 
 value rec eval_var conf base env xx loc =
   fun
@@ -418,16 +407,15 @@ and simple_person_text conf base p =
   | None -> person_text conf base p ]
 ;
 
-value print_foreach print_ast eval_expr eval_int_expr =
-  let rec print_foreach conf base env xx loc s sl el al =
+value print_foreach conf base print_ast eval_expr eval_int_expr =
+  let rec print_foreach env xx loc s sl el al =
     try
       match (s, sl) with
-      [ ("history_line", []) ->
-          print_foreach_history_line conf base env xx el al
+      [ ("history_line", []) -> print_foreach_history_line env xx el al
       | (s, _) -> raise Not_found ]
     with
     [ Not_found -> Wserver.wprint " %%foreach;%s?" s ]
-  and print_foreach_history_line conf base env xx el al =
+  and print_foreach_history_line env xx el al =
     match
       try Some (Secure.open_in_bin (file_name conf))
       with [ Sys_error _ -> None ]
@@ -436,12 +424,12 @@ value print_foreach print_ast eval_expr eval_int_expr =
         let (k, pos, wiz) =
           match el with
           [ [[e1]; [e2]; [e3]] ->
-              let k = eval_int_expr conf base env xx e1 in
+              let k = eval_int_expr env xx e1 in
               let pos =
-                try eval_int_expr conf base env xx e2 with
+                try eval_int_expr env xx e2 with
                 [ Not_found -> in_channel_length ic ]
               in
-              let wiz = eval_expr conf base env xx e3 in
+              let wiz = eval_expr env xx e3 in
               (k, pos, wiz)
           | [] -> (3, in_channel_length ic, "")
           | _ -> raise Not_found ]
@@ -456,7 +444,7 @@ value print_foreach print_ast eval_expr eval_int_expr =
                 [ Begin_of_file -> None ]
               with
               [ Some (line, pos) ->
-                  let i = print_history_line2 conf base env xx line wiz i al in
+                  let i = print_history_line2 env xx line wiz i al in
                   loop pos i
               | None -> (pos, i) ]
           in
@@ -466,7 +454,7 @@ value print_foreach print_ast eval_expr eval_int_expr =
         [ Vpos r -> r.val := pos
         | _ -> () ]
     | None -> () ]
-  and print_history_line2 conf base env xx line wiz i al =
+  and print_history_line2 env xx line wiz i al =
     match line_fields line with
     [ Some (time, user, action, keyo) ->
         if wiz = "" || user = wiz then do {
@@ -499,7 +487,7 @@ value print_foreach print_ast eval_expr eval_int_expr =
           else do {
             let key = match keyo with [ Some s -> s | None -> "" ] in
             let env = [("info", Vinfo time action user hist_item key) :: env] in
-            List.iter (print_ast conf base env xx) al;
+            List.iter (print_ast env xx) al;
             i + 1
           }
         }
@@ -509,7 +497,7 @@ value print_foreach print_ast eval_expr eval_int_expr =
   print_foreach
 ;
 
-value eval_transl conf base env = Templ.eval_transl conf;
+value eval_transl conf env = Templ.eval_transl conf;
 
 value eval_predefined_apply conf env f vl =
   match (f, vl) with
@@ -519,8 +507,9 @@ value eval_predefined_apply conf env f vl =
 value interp_templ templ_fname conf base =
   let astl = Templ.input conf templ_fname in
   let print_ast =
-    Templ.print_ast eval_var eval_transl eval_predefined_apply
-      get_fun set_fun get_val set_val print_foreach
+    Templ.print_ast (eval_var conf base) (eval_transl conf)
+      (eval_predefined_apply conf) get_vother set_vother
+      (print_foreach conf base)
   in
   do {
     Util.html conf;
