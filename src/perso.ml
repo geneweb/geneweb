@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.173 2005-08-05 11:02:02 ddr Exp $ *)
+(* $Id: perso.ml,v 4.174 2005-08-05 13:07:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -720,7 +720,7 @@ type ancestor_surname_info =
   (string * option date * option date * string * person * list Num.t * loc)
 ;
 
-type env =
+type env 'a =
   [ Vallgp of list generation_person
   | Vanc of generation_person
   | Vanc_surn of ancestor_surname_info
@@ -745,9 +745,8 @@ type env =
   | Vsosa of option (Num.t * person)
   | Vtitle of person and title_item
   | Vlazyp of ref (option string)
-  | Vlazy of Lazy.t env
-  | Vfun of list string and list ast
-  | Vval of string
+  | Vlazy of Lazy.t (env 'a)
+  | Vother of 'a
   | Vnone ]
 and title_item =
   (int * gen_title_name istr * istr * list istr *
@@ -762,19 +761,12 @@ value get_env v env =
   with
   [ Not_found -> Vnone ]
 ;
-
-value get_fun f env =
-  match get_env f env with
-  [ Vfun al el -> Some (al, el)
+value get_vother v env =
+  match get_env v env with
+  [ Vother x -> Some x
   | _ -> None ]
 ;
-value get_val k env =
-  match get_env k env with
-  [ Vval v -> Some v
-  | _ -> None ]
-;
-value set_fun f al el env = [(f, Vfun al el) :: env];
-value set_val k v env = [(k, Vval v) :: env];
+value set_vother k x env = [(k, Vother x) :: env];
 
 value not_impl func x =
   let desc =
@@ -2020,7 +2012,7 @@ and obsolete_eval conf base env (p, a, u, p_auth) loc =
   | _ -> raise Not_found ]
 ;
 
-value eval_transl conf base env upp s c =
+value eval_transl conf env upp s c =
   match c with
   [ "n" | "s" | "w" ->
       let n =
@@ -2048,11 +2040,11 @@ value eval_transl conf base env upp s c =
       Templ.eval_transl conf upp s c ]
 ;
 
-value print_foreach print_ast eval_expr eval_int_expr =
-  let rec print_foreach conf base env ini_ep loc s sl ell al =
+value print_foreach conf base print_ast eval_expr eval_int_expr =
+  let rec print_foreach env ini_ep loc s sl ell al =
     let rec loop ((_, a, _, _) as ep) efam =
       fun 
-      [ [s] -> print_simple_foreach conf base env ell al ini_ep ep efam loc s
+      [ [s] -> print_simple_foreach env ell al ini_ep ep efam loc s
       | ["ancestor" :: sl] ->
           let ip_ifamo =
             match get_env "ancestor" env with
@@ -2135,42 +2127,42 @@ value print_foreach print_ast eval_expr eval_int_expr =
           List.iter (fun s -> Wserver.wprint ".%s" s) sl;
           Wserver.wprint "?"
         } ]
-  and print_simple_foreach conf base env el al ini_ep ep efam loc =
+  and print_simple_foreach env el al ini_ep ep efam loc =
     fun
-    [ "alias" -> print_foreach_alias conf base env al ep
-    | "ancestor" -> print_foreach_ancestor conf base env al ep
-    | "ancestor_level" -> print_foreach_ancestor_level conf base env el al ep
-    | "ancestor_level2" -> print_foreach_ancestor_level2 conf base env al ep
-    | "ancestor_surname" -> print_foreach_anc_surn conf base env el al loc ep
-    | "ancestor_tree_line" -> print_foreach_ancestor_tree conf base env el al ep
-    | "cell" -> print_foreach_cell conf base env el al ep
-    | "child" -> print_foreach_child conf base env al ep efam
-    | "cousin_level" -> print_foreach_level "max_cous_level" conf base env al ep
-    | "dag_cell" -> print_foreach_dag_cell conf base env el al ep
-    | "dag_line" -> print_foreach_dag_line conf base env el al ep
-    | "descendant_level" -> print_foreach_descendant_level conf base env al ep
-    | "family" -> print_foreach_family conf base env al ini_ep ep
-    | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
-    | "nobility_title" -> print_foreach_nobility_title conf base env al ep
-    | "parent" -> print_foreach_parent conf base env al ep
-    | "qualifier" -> print_foreach_qualifier conf base env al ep
-    | "related" -> print_foreach_related conf base env al ep
-    | "relation" -> print_foreach_relation conf base env al ep
-    | "sorted_list_item" -> print_foreach_sorted_list_item conf base env al ep
-    | "source" -> print_foreach_source conf base env al ep
-    | "surname_alias" -> print_foreach_surname_alias conf base env al ep
-    | "witness" -> print_foreach_witness conf base env al ep efam
-    | "witness_relation" -> print_foreach_witness_relation conf base env al ep
+    [ "alias" -> print_foreach_alias env al ep
+    | "ancestor" -> print_foreach_ancestor env al ep
+    | "ancestor_level" -> print_foreach_ancestor_level env el al ep
+    | "ancestor_level2" -> print_foreach_ancestor_level2 env al ep
+    | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
+    | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
+    | "cell" -> print_foreach_cell env el al ep
+    | "child" -> print_foreach_child env al ep efam
+    | "cousin_level" -> print_foreach_level "max_cous_level" env al ep
+    | "dag_cell" -> print_foreach_dag_cell env el al ep
+    | "dag_line" -> print_foreach_dag_line env el al ep
+    | "descendant_level" -> print_foreach_descendant_level env al ep
+    | "family" -> print_foreach_family env al ini_ep ep
+    | "first_name_alias" -> print_foreach_first_name_alias env al ep
+    | "nobility_title" -> print_foreach_nobility_title env al ep
+    | "parent" -> print_foreach_parent env al ep
+    | "qualifier" -> print_foreach_qualifier env al ep
+    | "related" -> print_foreach_related env al ep
+    | "relation" -> print_foreach_relation env al ep
+    | "sorted_list_item" -> print_foreach_sorted_list_item env al ep
+    | "source" -> print_foreach_source env al ep
+    | "surname_alias" -> print_foreach_surname_alias env al ep
+    | "witness" -> print_foreach_witness env al ep efam
+    | "witness_relation" -> print_foreach_witness_relation env al ep
     | s -> Wserver.wprint " %%foreach;%s?" s ]
-  and print_foreach_alias conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_alias env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       List.iter
         (fun a ->
            let env = [("alias", Vstring (sou base a)) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         p.aliases
     else ()
-  and print_foreach_ancestor conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_ancestor env al ((p, _, _, p_auth) as ep) =
     match get_env "gpl" env with
     [ Vgpl gpl ->
         List.iter
@@ -2179,13 +2171,13 @@ value print_foreach print_ast eval_expr eval_int_expr =
              [ GP_missing _ _ -> ()
              | _ ->
                  let env = [("ancestor", Vanc gp) :: env] in
-                 List.iter (print_ast conf base env ep) al ])
+                 List.iter (print_ast env ep) al ])
           gpl
     | _ -> () ]
-  and print_foreach_ancestor_level conf base env el al ((p, _, _, _) as ep) =
+  and print_foreach_ancestor_level env el al ((p, _, _, _) as ep) =
     let max_level =
       match el with
-      [ [[e]] -> eval_int_expr conf base env ep e
+      [ [[e]] -> eval_int_expr env ep e
       | [] ->
           match get_env "max_anc_level" env with
           [ Vint n -> n
@@ -2198,11 +2190,11 @@ value print_foreach print_ast eval_expr eval_int_expr =
       else
         let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
         do {
-          List.iter (print_ast conf base env ep) al;
+          List.iter (print_ast env ep) al;
           let gpl = next_generation conf base mark gpl in
           loop gpl (succ i)
         }
-  and print_foreach_ancestor_level2 conf base env al ((p, _, _, _) as ep) =
+  and print_foreach_ancestor_level2 env al ((p, _, _, _) as ep) =
     let max_lev = "max_anc_level" in
     let max_level =
       match get_env max_lev env with
@@ -2215,15 +2207,15 @@ value print_foreach print_ast eval_expr eval_int_expr =
       else
         let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
         do {
-          List.iter (print_ast conf base env ep) al;
+          List.iter (print_ast env ep) al;
           for i = 0 to base.data.persons.len - 1 do { mark.(i) := Num.zero };
           let gpl = next_generation2 conf base mark gpl in
           loop gpl (succ i)
         }
-  and print_foreach_anc_surn conf base env el al loc ((p, _, _, _) as ep) =
+  and print_foreach_anc_surn env el al loc ((p, _, _, _) as ep) =
     let max_level =
       match el with
-      [ [[e]] -> eval_int_expr conf base env ep e
+      [ [[e]] -> eval_int_expr env ep e
       | [] ->
           match get_env "max_anc_level" env with
           [ Vint n -> n
@@ -2234,17 +2226,17 @@ value print_foreach print_ast eval_expr eval_int_expr =
     List.iter
       (fun (a, (((b, c, d), e), f)) ->
          let env = [("ancestor", Vanc_surn (a, b, c, d, e, f, loc)) :: env] in
-         List.iter (print_ast conf base env ep) al)
+         List.iter (print_ast env ep) al)
       list
-  and print_foreach_ancestor_tree conf base env el al ((p, _, _, _) as ep) =
+  and print_foreach_ancestor_tree env el al ((p, _, _, _) as ep) =
     let (p, max_level) =
       match el with
       [ [[e1]; [e2]] ->
-          let ip = eval_int_expr conf base env ep e1 in
-          let max_level = eval_int_expr conf base env ep e2 in
+          let ip = eval_int_expr env ep e1 in
+          let max_level = eval_int_expr env ep e2 in
           (pget conf base (Adef.iper_of_int ip), max_level)
       | [[e]] ->
-          (p, eval_int_expr conf base env ep e)
+          (p, eval_int_expr env ep e)
       | [] ->
           match get_env "max_anc_level" env with
           [ Vint n -> (p, n)
@@ -2260,11 +2252,11 @@ value print_foreach print_ast eval_expr eval_int_expr =
              ("last", Vbool (gl = [])) :: env]
           in
           do {
-            List.iter (print_ast conf base env ep) al;
+            List.iter (print_ast env ep) al;
             loop False gl
           }
       | [] -> () ]
-  and print_foreach_cell conf base env el al ((p, _, _, _) as ep) =
+  and print_foreach_cell env el al ((p, _, _, _) as ep) =
     let celll =
       match get_env "celll" env with
       [ Vcelll celll -> celll
@@ -2273,9 +2265,9 @@ value print_foreach print_ast eval_expr eval_int_expr =
     list_iter_first
       (fun first cell ->
          let env = [("cell", Vcell cell); ("first", Vbool first) :: env] in
-         List.iter (print_ast conf base env ep) al)
+         List.iter (print_ast env ep) al)
       celll
-  and print_foreach_child conf base env al ep =
+  and print_foreach_child env al ep =
     fun
     [ Vfam _ _ des _ ->
         let auth =
@@ -2316,10 +2308,10 @@ value print_foreach print_ast eval_expr eval_int_expr =
                let p_auth = authorized_age conf base p in
                (p, a, u, p_auth)
              in
-             List.iter (print_ast conf base env ep) al)
+             List.iter (print_ast env ep) al)
           des.children
     | _ -> () ]
-  and print_foreach_dag_cell conf base env el al ((p, _, _, _) as ep) =
+  and print_foreach_dag_cell env el al ((p, _, _, _) as ep) =
     let dline =
       match get_env "dag_line" env with
       [ Vdline dline -> dline
@@ -2327,9 +2319,9 @@ value print_foreach print_ast eval_expr eval_int_expr =
     in
     for i = 0 to Array.length dline - 1 do {
       let env = [("dag_cell", Vdcell dline.(i)) :: env] in
-      List.iter (print_ast conf base env ep) al;
+      List.iter (print_ast env ep) al;
     }
-  and print_foreach_dag_line conf base env el al ((p, _, _, _) as ep) =
+  and print_foreach_dag_line env el al ((p, _, _, _) as ep) =
     let set =
       match get_env "dag" env with
       [ Vdag d -> d.val
@@ -2348,9 +2340,9 @@ value print_foreach print_ast eval_expr eval_int_expr =
     in
     for i = 0 to Array.length hts - 1 do {
       let env = [("dag_line", Vdline hts.(i)) :: env] in
-      List.iter (print_ast conf base env ep) al;
+      List.iter (print_ast env ep) al;
     }
-  and print_foreach_descendant_level conf base env al ep =
+  and print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with
       [ Vint n -> n
@@ -2361,10 +2353,10 @@ value print_foreach print_ast eval_expr eval_int_expr =
       else
         let env = [("level", Vint i) :: env] in
         do {
-          List.iter (print_ast conf base env ep) al;
+          List.iter (print_ast env ep) al;
           loop (succ i)
         }
-  and print_foreach_family conf base env al ini_ep (p, _, u, _) =
+  and print_foreach_family env al ini_ep (p, _, u, _) =
     loop None 0 where rec loop prev i =
       if i = Array.length u.family then ()
       else
@@ -2390,20 +2382,19 @@ value print_foreach print_ast eval_expr eval_int_expr =
           | None -> env ]
         in
         do {
-          List.iter (print_ast conf base env ini_ep) al;
+          List.iter (print_ast env ini_ep) al;
           loop (Some vfam) (i + 1);
         }
-  and print_foreach_first_name_alias
-    conf base env al ((p, _, _, p_auth) as ep)
+  and print_foreach_first_name_alias env al ((p, _, _, p_auth) as ep)
   =
     if p_auth then
       List.iter
         (fun s ->
            let env = [("first_name_alias", Vstring (sou base s)) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         p.first_names_aliases
     else ()
-  and print_foreach_level max_lev conf base env al ((p, _, _, _) as ep) =
+  and print_foreach_level max_lev env al ((p, _, _, _) as ep) =
     let max_level =
       match get_env max_lev env with
       [ Vint n -> n
@@ -2414,20 +2405,20 @@ value print_foreach print_ast eval_expr eval_int_expr =
       else
         let env = [("level", Vint i) :: env] in
         do {
-          List.iter (print_ast conf base env ep) al;
+          List.iter (print_ast env ep) al;
           loop (succ i)
         }
-  and print_foreach_nobility_title conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_nobility_title env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf p in
       list_iter_first
         (fun first x ->
            let env = [("nobility_title", Vtitle p x) :: env] in
            let env = [("first", Vbool first) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         titles
     else ()
-  and print_foreach_parent conf base env al ((_, a, _, _) as ep) =
+  and print_foreach_parent env al ((_, a, _, _) as ep) =
     match parents a with
     [ Some ifam ->
         let cpl = coi base ifam in
@@ -2437,27 +2428,27 @@ value print_foreach print_ast eval_expr eval_int_expr =
              let a = aget conf base iper in
              let u = uget conf base iper in
              let env = [("parent", Vind p a u) :: env] in
-             List.iter (print_ast conf base env ep) al)
+             List.iter (print_ast env ep) al)
           (parent_array cpl)
     | None -> () ]
-  and print_foreach_qualifier conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_qualifier env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       list_iter_first
         (fun first nn ->
            let env = [("qualifier", Vstring (sou base nn)) :: env] in
            let env = [("first", Vbool first) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         p.qualifiers
     else ()
-  and print_foreach_relation conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_relation env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       List.iter
         (fun r ->
            let env = [("rel", Vrel r None) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         p.rparents
     else ()
-  and print_foreach_related conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_related env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       let list =
         List.fold_left
@@ -2497,10 +2488,10 @@ value print_foreach print_ast eval_expr eval_int_expr =
       List.iter
         (fun (c, r) ->
            let env = [("rel", Vrel r (Some c)) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         list
     else ()
-  and print_foreach_sorted_list_item conf base env al ep =
+  and print_foreach_sorted_list_item env al ep =
     let list =
       match get_env "list" env with
       [ Vslist l -> SortedList.elements l.val
@@ -2512,11 +2503,11 @@ value print_foreach print_ast eval_expr eval_int_expr =
            let item = Vslistlm gsll in
            let env = [("item", item); ("prev_item", prev_item) :: env] in
            do {
-             List.iter (print_ast conf base env ep) al;
+             List.iter (print_ast env ep) al;
              loop item sll
            }
       | [] -> () ]
-  and print_foreach_source conf base env al ((p, _, u, p_auth) as ep) =
+  and print_foreach_source env al ((p, _, u, p_auth) as ep) =
     let rec insert_loop typ src =
       fun
       [ [(typ1, src1) :: srcl] ->
@@ -2561,18 +2552,18 @@ value print_foreach print_ast eval_expr eval_int_expr =
       if s = "" then ()
       else
         let env = [("src_typ", Vstring src_typ); ("src", Vstring s) :: env] in
-        List.iter (print_ast conf base env ep) al
+        List.iter (print_ast env ep) al
     in
     List.iter print_src srcl
-  and print_foreach_surname_alias conf base env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_surname_alias env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       List.iter
         (fun s ->
            let env = [("surname_alias", Vstring (sou base s)) :: env] in
-           List.iter (print_ast conf base env ep) al)
+           List.iter (print_ast env ep) al)
         p.surnames_aliases
     else ()
-  and print_foreach_witness conf base env al ep =
+  and print_foreach_witness env al ep =
     fun
     [ Vfam fam _ _ True ->
         list_iter_first
@@ -2582,10 +2573,10 @@ value print_foreach print_ast eval_expr eval_int_expr =
              let u = uget conf base ip in
              let env = [("witness", Vind p a u) :: env] in
              let env = [("first", Vbool first) :: env] in
-             List.iter (print_ast conf base env ep) al)
+             List.iter (print_ast env ep) al)
           (Array.to_list fam.witnesses)
     | _ -> () ]
-  and print_foreach_witness_relation conf base env al ((p, _, _, _) as ep) =
+  and print_foreach_witness_relation env al ((p, _, _, _) as ep) =
     let list =
       let list = ref [] in
       do {
@@ -2635,7 +2626,7 @@ value print_foreach print_ast eval_expr eval_int_expr =
          in
          if m_auth then
            let env = [("fam", Vfam fam cpl des True) :: env] in
-           List.iter (print_ast conf base env ep) al
+           List.iter (print_ast env ep) al
          else ())
       list
   in
@@ -2720,13 +2711,14 @@ value interp_templ templ_fname conf base p =
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
   let print_ast =
-    Templ.print_ast eval_var eval_transl eval_predefined_apply get_fun set_fun
-      get_val set_val print_foreach
+    Templ.print_ast (eval_var conf base) (eval_transl conf)
+      (eval_predefined_apply conf) get_vother set_vother
+      (print_foreach conf base) conf base
   in
   do {
     html conf;
     nl ();
-    List.iter (print_ast conf base env ep) astl
+    List.iter (print_ast env ep) astl
   }
 ;
 
