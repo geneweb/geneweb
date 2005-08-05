@@ -1,6 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.32 2005-08-05 17:50:24 ddr Exp $ *)
+(* $Id: history.ml,v 4.33 2005-08-05 19:04:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
+
+DEFINE OLD;
 
 open Config;
 open Def;
@@ -103,6 +105,7 @@ value rev_input_line ic pos (rbuff, rpos) =
     loop 0 (pos - 1)
 ;
 
+IFDEF OLD THEN declare
 value action_text conf =
   fun
   [ "ap" -> transl_decline conf "add" (transl_nth conf "person/persons" 0)
@@ -121,6 +124,7 @@ value action_text conf =
   | "mn" -> transl_decline conf "modify" (transl_nth conf "note/notes" 1)
   | x -> x ]
 ;
+end END;
 
 value line_tpl = "0000-00-00 00:00:00 xx .";
 
@@ -149,6 +153,7 @@ type hist_item =
   | HI_none ]
 ;
 
+IFDEF OLD THEN declare
 value print_history_line conf base line wiz k i =
   match line_fields line with
   [ Some (time, user, action, keyo) ->
@@ -320,6 +325,7 @@ value print_old conf base =
     trailer conf;
   }
 ;
+end END;
 
 (* *)
 
@@ -403,7 +409,11 @@ and simple_person_text conf base p =
   | None -> person_text conf base p ]
 ;
 
-value print_foreach conf base print_ast eval_expr eval_int_expr =
+value print_foreach conf base print_ast eval_expr =
+  let eval_int_expr env ep e =
+    let s = eval_expr env ep e in
+    try int_of_string s with [ Failure _ -> raise Not_found ]
+  in
   let rec print_foreach env xx loc s sl el al =
     try
       match (s, sl) with
@@ -493,17 +503,23 @@ value print_foreach conf base print_ast eval_expr eval_int_expr =
   print_foreach
 ;
 
-value eval_transl conf env = Templ.eval_transl conf;
-
 value eval_predefined_apply conf env f vl =
   match (f, vl) with
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
+IFDEF OLD THEN declare
 value print conf base =
   if p_getenv conf.env "old" = Some "on" then print_old conf base else
   let env = [("pos", Vpos (ref 0))] in
-  Templ.interp conf base "updhist" (eval_var conf base) (eval_transl conf)
+  Templ.interp conf base "updhist" (eval_var conf base) (Templ.eval_transl conf)
     (eval_predefined_apply conf) get_vother set_vother
     (print_foreach conf base) env ()
 ;
+end ELSE
+value print conf base =
+  let env = [("pos", Vpos (ref 0))] in
+  Templ.interp conf base "updhist" (eval_var conf base) (Templ.eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) env ()
+END;
