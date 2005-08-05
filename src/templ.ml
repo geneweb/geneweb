@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.74 2005-08-05 10:44:58 ddr Exp $ *)
+(* $Id: templ.ml,v 4.75 2005-08-05 11:02:02 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -981,9 +981,17 @@ value templ_eval_expr = eval_expr;
 value templ_print_apply = print_apply;
 
 value print_ast
-  eval_var eval_transl eval_predefined_apply get_fun set_fun set_val
+  eval_var eval_transl eval_predefined_apply get_fun set_fun get_val set_val
   print_foreach
 =
+  let eval_var conf base env ep loc sl =
+    match sl with
+    [ [k] ->
+        match get_val k env with
+        [ Some v -> VVstring v
+        | None -> eval_var conf base env ep loc sl ]
+    | _ -> eval_var conf base env ep loc sl ]
+  in
   let print_wid_hei conf base env fname =
     match Util.image_size (Util.image_file_name fname) with
     [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei

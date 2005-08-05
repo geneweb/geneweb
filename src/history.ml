@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.29 2005-08-05 10:44:58 ddr Exp $ *)
+(* $Id: history.ml,v 4.30 2005-08-05 11:02:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -341,6 +341,11 @@ value get_fun f env =
   [ Vfun al el -> Some (al, el)
   | _ -> None ]
 ;
+value get_val k env =
+  match get_env k env with
+  [ Vval v -> Some v
+  | _ -> None ]
+;
 value set_fun f al el env = [(f, Vfun al el) :: env];
 value set_val k v env = [(k, Vval v) :: env];
 
@@ -398,10 +403,6 @@ value rec eval_var conf base env xx loc =
   | ["user"] ->
       match get_env "info" env with
       [ Vinfo _ _ u _ _ -> VVstring u
-      | _ -> raise Not_found ]
-  | [v] ->
-      match get_env v env with
-      [ Vval s -> VVstring s
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_person_field_var conf base env p =
@@ -519,7 +520,7 @@ value interp_templ templ_fname conf base =
   let astl = Templ.input conf templ_fname in
   let print_ast =
     Templ.print_ast eval_var eval_transl eval_predefined_apply
-      get_fun set_fun set_val print_foreach
+      get_fun set_fun get_val set_val print_foreach
   in
   do {
     Util.html conf;

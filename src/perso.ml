@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.172 2005-08-05 10:44:58 ddr Exp $ *)
+(* $Id: perso.ml,v 4.173 2005-08-05 11:02:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -768,6 +768,11 @@ value get_fun f env =
   [ Vfun al el -> Some (al, el)
   | _ -> None ]
 ;
+value get_val k env =
+  match get_env k env with
+  [ Vval v -> Some v
+  | _ -> None ]
+;
 value set_fun f al el env = [(f, Vfun al el) :: env];
 value set_val k v env = [(k, Vval v) :: env];
 
@@ -857,11 +862,8 @@ value rec eval_var conf base env ep loc sl =
 and eval_simple_var conf base env ep =
   fun
   [ [s] ->
-      match get_env s env with
-      [ Vval s -> str_val s
-      | _ ->
-          try bool_val (eval_simple_bool_var conf base env ep s) with
-          [ Not_found -> str_val (eval_simple_str_var conf base env ep s) ] ]
+      try bool_val (eval_simple_bool_var conf base env ep s) with
+      [ Not_found -> str_val (eval_simple_str_var conf base env ep s) ]
   | _ -> raise Not_found ]
 and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   fun
@@ -2719,7 +2721,7 @@ value interp_templ templ_fname conf base p =
   in
   let print_ast =
     Templ.print_ast eval_var eval_transl eval_predefined_apply get_fun set_fun
-      set_val print_foreach
+      get_val set_val print_foreach
   in
   do {
     html conf;
