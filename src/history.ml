@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.28 2005-08-04 16:12:43 ddr Exp $ *)
+(* $Id: history.ml,v 4.29 2005-08-05 10:44:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -336,7 +336,15 @@ value get_env v env =
   [ Not_found -> Vnone ]
 ;
 
-value rec eval_var conf base env loc =
+value get_fun f env =
+  match get_env f env with
+  [ Vfun al el -> Some (al, el)
+  | _ -> None ]
+;
+value set_fun f al el env = [(f, Vfun al el) :: env];
+value set_val k v env = [(k, Vval v) :: env];
+
+value rec eval_var conf base env xx loc =
   fun
   [ ["evar"; v] ->
       match p_getenv (conf.env @ conf.henv) v with
@@ -409,156 +417,115 @@ and simple_person_text conf base p =
   | None -> person_text conf base p ]
 ;
 
-value rec eval_ast conf base env =
-  fun
-  [ x -> eval_expr conf base env x ]
-and eval_expr conf base env e =
-  let eval_ast = eval_ast conf base env in
-  let eval_apply = eval_apply conf env eval_ast in
-  let eval_var = eval_var conf base env in
-  Templ.eval_expr conf (eval_var, eval_apply) e
-and eval_int_expr conf base env e =
-  let s = eval_expr conf base env e in
-  try int_of_string s with [ Failure _ -> raise Not_found ]
-and eval_apply conf env eval_ast f vl =
-  match get_env f env with
-  [ Vfun xl al ->
-      let al = List.map (Templ.eval_subst f xl vl) al in
-      let sl = List.map eval_ast al in
-      String.concat "" sl
-  | _ ->
-      eval_predefined_apply conf env f vl ]
-and eval_predefined_apply conf env f vl =
+value print_foreach print_ast eval_expr eval_int_expr =
+  let rec print_foreach conf base env xx loc s sl el al =
+    try
+      match (s, sl) with
+      [ ("history_line", []) ->
+          print_foreach_history_line conf base env xx el al
+      | (s, _) -> raise Not_found ]
+    with
+    [ Not_found -> Wserver.wprint " %%foreach;%s?" s ]
+  and print_foreach_history_line conf base env xx el al =
+    match
+      try Some (Secure.open_in_bin (file_name conf))
+      with [ Sys_error _ -> None ]
+    with
+    [ Some ic ->
+        let (k, pos, wiz) =
+          match el with
+          [ [[e1]; [e2]; [e3]] ->
+              let k = eval_int_expr conf base env xx e1 in
+              let pos =
+                try eval_int_expr conf base env xx e2 with
+                [ Not_found -> in_channel_length ic ]
+              in
+              let wiz = eval_expr conf base env xx e3 in
+              (k, pos, wiz)
+          | [] -> (3, in_channel_length ic, "")
+          | _ -> raise Not_found ]
+        in
+        let (pos, n) =
+          let vv = (ref "", ref 0) in
+          let rec loop pos i =
+            if i >= k then (pos, i)
+            else
+              match
+                try Some (rev_input_line ic pos vv) with
+                [ Begin_of_file -> None ]
+              with
+              [ Some (line, pos) ->
+                  let i = print_history_line2 conf base env xx line wiz i al in
+                  loop pos i
+              | None -> (pos, i) ]
+          in
+          loop pos 0
+        in
+        match get_env "pos" env with
+        [ Vpos r -> r.val := pos
+        | _ -> () ]
+    | None -> () ]
+  and print_history_line2 conf base env xx line wiz i al =
+    match line_fields line with
+    [ Some (time, user, action, keyo) ->
+        if wiz = "" || user = wiz then do {
+          let hist_item =
+            match keyo with
+            [ Some key ->
+                match action with
+                [ "mn" ->
+                    let (i, j) =
+                      try let i = String.rindex key '/' in (i, i + 1) with
+                      [ Not_found -> (0, 0) ]
+                    in
+                    let pg = String.sub key 0 i in
+                    let s = String.sub key j (String.length key - j) in
+                    try HI_notes pg (Some (int_of_string s)) with
+                    [ Failure _ -> HI_notes key None ]
+                | _ ->
+                    match person_ht_find_all base key with
+                    [ [ip] -> HI_ind (pget conf base ip)
+                    | _ -> HI_none ] ]
+            | None -> HI_none ]
+          in
+          let not_displayed =
+            match hist_item with
+            [ HI_ind p ->
+                is_hidden p || (conf.hide_names && not (fast_auth_age conf p))
+            | _ -> False ]
+          in
+          if not_displayed then i
+          else do {
+            let key = match keyo with [ Some s -> s | None -> "" ] in
+            let env = [("info", Vinfo time action user hist_item key) :: env] in
+            List.iter (print_ast conf base env xx) al;
+            i + 1
+          }
+        }
+        else i
+    | None -> i ]
+  in
+  print_foreach
+;
+
+value eval_transl conf base env = Templ.eval_transl conf;
+
+value eval_predefined_apply conf env f vl =
   match (f, vl) with
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value rec print_ast conf base env =
-  fun
-  [ Avar loc s sl ->
-      Templ.print_var conf base (eval_var conf base env loc) s sl
-  | Aif e alt ale -> print_if conf base env e alt ale
-  | Aforeach (loc, s, sl) el al -> print_foreach conf base env loc s sl el al
-  | Adefine f xl al alk -> print_define conf base env f xl al alk
-  | Aapply loc f ell -> print_apply conf base env loc f ell
-  | Alet k v al -> print_let conf base env k v al
-  | x -> Wserver.wprint "%s" (eval_ast conf base env x) ]
-and print_define conf base env f xl al alk =
-  List.iter (print_ast conf base [(f, Vfun xl al) :: env]) alk
-and print_apply conf base env loc f ell =
-  let eval_ast = eval_ast conf base env in
-  let sll = List.map (List.map eval_ast) ell in
-  let vl = List.map (String.concat "") sll in
-  match get_env f env with
-  [ Vfun xl al ->
-      let print_ast = print_ast conf base env in
-      Templ.print_apply f print_ast xl al vl
-  | _ ->
-      Wserver.wprint "%s" (eval_apply conf env eval_ast f vl) ]
-and print_let conf base env k v al =
-  let v = String.concat "" (List.map (eval_ast conf base env) v) in
-  let env = [(k, Vval v) :: env] in
-  List.iter (print_ast conf base env) al
-and print_if conf base env e alt ale =
-  let eval_var = eval_var conf base env in
-  let eval_ast = eval_ast conf base env in
-  let eval_apply = eval_apply conf env eval_ast in
-  let al =
-    if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
-  in
-  List.iter (print_ast conf base env) al
-and print_foreach conf base env loc s sl el al =
-  try
-    match (s, sl) with
-    [ ("history_line", []) -> print_foreach_history_line conf base env el al
-    | (s, _) -> raise Not_found ]
-  with
-  [ Not_found -> Wserver.wprint " %%foreach;%s?" s ]
-and print_foreach_history_line conf base env el al =
-  match
-    try Some (Secure.open_in_bin (file_name conf)) with [ Sys_error _ -> None ]
-  with
-  [ Some ic ->
-      let (k, pos, wiz) =
-        match el with
-        [ [[e1]; [e2]; [e3]] ->
-            let k = eval_int_expr conf base env e1 in
-            let pos =
-              try eval_int_expr conf base env e2 with
-              [ Not_found -> in_channel_length ic ]
-            in
-            let wiz = eval_expr conf base env e3 in
-            (k, pos, wiz)
-        | [] -> (3, in_channel_length ic, "")
-        | _ -> raise Not_found ]
-      in
-      let (pos, n) =
-        let vv = (ref "", ref 0) in
-        let rec loop pos i =
-          if i >= k then (pos, i)
-          else
-            match
-              try Some (rev_input_line ic pos vv) with [ Begin_of_file -> None ]
-            with
-            [ Some (line, pos) ->
-                let i = print_history_line2 conf base env line wiz i al in
-                loop pos i
-            | None -> (pos, i) ]
-        in
-        loop pos 0
-      in
-      match get_env "pos" env with
-      [ Vpos r -> r.val := pos
-      | _ -> () ]
-  | None -> () ]
-and print_history_line2 conf base env line wiz i al =
-  match line_fields line with
-  [ Some (time, user, action, keyo) ->
-      if wiz = "" || user = wiz then do {
-        let hist_item =
-          match keyo with
-          [ Some key ->
-              match action with
-              [ "mn" ->
-                  let (i, j) =
-                    try let i = String.rindex key '/' in (i, i + 1) with
-                    [ Not_found -> (0, 0) ]
-                  in
-                  let pg = String.sub key 0 i in
-                  let s = String.sub key j (String.length key - j) in
-                  try HI_notes pg (Some (int_of_string s)) with
-                  [ Failure _ -> HI_notes key None ]
-              | _ ->
-                  match person_ht_find_all base key with
-                  [ [ip] -> HI_ind (pget conf base ip)
-                  | _ -> HI_none ] ]
-          | None -> HI_none ]
-        in
-        let not_displayed =
-          match hist_item with
-          [ HI_ind p ->
-              is_hidden p || (conf.hide_names && not (fast_auth_age conf p))
-          | _ -> False ]
-        in
-        if not_displayed then i
-        else do {
-          let key = match keyo with [ Some s -> s | None -> "" ] in
-          let env = [("info", Vinfo time action user hist_item key) :: env] in
-          List.iter (print_ast conf base env) al;
-          i + 1
-        }
-      }
-      else i
-  | None -> i ]
-;
-
 value interp_templ templ_fname conf base =
   let astl = Templ.input conf templ_fname in
+  let print_ast =
+    Templ.print_ast eval_var eval_transl eval_predefined_apply
+      get_fun set_fun set_val print_foreach
+  in
   do {
     Util.html conf;
     Util.nl ();
     let env = [("pos", Vpos (ref 0))] in
-    List.iter (print_ast conf base env) astl;
+    List.iter (print_ast conf base env ()) astl;
   }
 ;
 

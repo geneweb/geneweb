@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.73 2005-08-04 16:12:43 ddr Exp $ *)
+(* $Id: templ.ml,v 4.74 2005-08-05 10:44:58 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -975,4 +975,93 @@ and print_ast_var conf env =
   | sl ->
       try Wserver.wprint "%s" (eval_variable conf env sl) with
       [ Not_found -> print_variable conf None sl ] ]
+;
+
+value templ_eval_expr = eval_expr;
+value templ_print_apply = print_apply;
+
+value print_ast
+  eval_var eval_transl eval_predefined_apply get_fun set_fun set_val
+  print_foreach
+=
+  let print_wid_hei conf base env fname =
+    match Util.image_size (Util.image_file_name fname) with
+    [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
+    | None -> () ]
+  in
+  let rec eval_ast conf base env ep =
+    fun
+    [ Atext s -> s
+    | Avar loc s sl -> eval_string_var conf (eval_var conf base env ep loc) s sl
+    | Atransl upp s n -> eval_transl conf base env upp s n
+    | Aif e alt ale -> eval_if conf base env ep e alt ale
+    | Aapply _ f all ->
+        let eval_ast = eval_ast conf base env ep in
+        let sll = List.map (List.map eval_ast) all in
+        let vl = List.map (String.concat "") sll in
+        eval_apply conf env eval_ast f vl
+    | x -> eval_expr conf base env ep x ]
+  and eval_expr conf base env ep e =
+    let eval_ast = eval_ast conf base env ep in
+    let eval_apply = eval_apply conf env eval_ast in
+    let eval_var = eval_var conf base env ep in
+    templ_eval_expr conf (eval_var, eval_apply) e
+  and eval_int_expr conf base env ep e =
+    let s = eval_expr conf base env ep e in
+    try int_of_string s with [ Failure _ -> raise Not_found ]
+  and eval_apply conf env eval_ast f vl =
+    match get_fun f env with
+    [ Some (xl, al) ->
+        let al = List.map (eval_subst f xl vl) al in
+        let sl = List.map eval_ast al in
+        String.concat "" sl
+    | None ->
+        eval_predefined_apply conf env f vl ]
+  and eval_if conf base env ep e alt ale =
+    let eval_var = eval_var conf base env ep in
+    let eval_ast = eval_ast conf base env ep in
+    let eval_apply = eval_apply conf env eval_ast in
+    let al =
+      if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
+    in
+    String.concat "" (List.map eval_ast al)
+  in
+  let rec print_ast conf base env ep =
+    fun
+    [ Avar loc s sl -> print_var conf base (eval_var conf base env ep loc) s sl
+    | Awid_hei s -> print_wid_hei conf base env s
+    | Aif e alt ale -> print_if conf base env ep e alt ale
+    | Aforeach (loc, s, sl) el al ->
+        print_foreach print_ast eval_expr eval_int_expr conf base env ep loc
+          s sl el al
+    | Adefine f xl al alk -> print_define conf base env ep f xl al alk
+    | Aapply loc f ell -> print_apply conf base env ep loc f ell
+    | Alet k v al -> print_let conf base env ep k v al
+    | x -> Wserver.wprint "%s" (eval_ast conf base env ep x) ]
+  and print_define conf base env ep f xl al alk =
+    List.iter (print_ast conf base (set_fun f xl al env) ep) alk
+  and print_apply conf base env ep loc f ell =
+    let eval_ast = eval_ast conf base env ep in
+    let sll = List.map (List.map eval_ast) ell in
+    let vl = List.map (String.concat "") sll in
+    match get_fun f env with
+    [ Some (xl, al) ->
+        let print_ast = print_ast conf base env ep in
+        templ_print_apply f print_ast xl al vl
+    | None ->
+        Wserver.wprint "%s" (eval_apply conf env eval_ast f vl) ]
+  and print_let conf base env ep k v al =
+    let v = String.concat "" (List.map (eval_ast conf base env ep) v) in
+    let env = set_val k v env in
+    List.iter (print_ast conf base env ep) al
+  and print_if conf base env ep e alt ale =
+    let eval_var = eval_var conf base env ep in
+    let eval_ast = eval_ast conf base env ep in
+    let eval_apply = eval_apply conf env eval_ast in
+    let al =
+      if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
+    in
+    List.iter (print_ast conf base env ep) al
+  in
+  print_ast
 ;

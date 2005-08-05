@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.33 2005-08-01 23:59:18 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.34 2005-08-05 10:44:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -23,11 +23,20 @@ value string_person_of base p =
 type env =
   [ Vstring of string
   | Vfun of list string and list ast
+  | Vval of string
   | Vint of int
   | Vnone ]
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+
+value get_fun f env =
+  match get_env f env with
+  [ Vfun al el -> Some (al, el)
+  | _ -> None ]
+;
+value set_fun f al el env = [(f, Vfun al el) :: env];
+value set_val k v env = [(k, Vval v) :: env];
 
 value extract_var sini s =
   let len = String.length sini in
@@ -338,85 +347,67 @@ and eval_string_env var env =
 
 (* print *)
 
-value rec print_ast conf base env p =
-  fun
-  [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
-  | Avar loc s sl ->
-      Templ.print_var conf base (eval_var conf base env p loc) s sl
-  | Awid_hei s -> Wserver.wprint "Awid_hei"
-  | Aif e alt ale -> print_if conf base env p e alt ale
-  | Aforeach v el al -> print_foreach conf base env p v el al
-  | Adefine f xl al alk -> print_define conf base env p f xl al alk
-  | Aapply _ f el -> print_apply conf base env p f el
-  | Alet _ _ _ | Aint _ _ | Aop2 _ _ _ | Aop1 _ _ -> Wserver.wprint "error1" ]
-and print_define conf base env p f xl al alk =
-  List.iter (print_ast conf base [(f, Vfun xl al) :: env] p) alk
-and print_apply conf base env p f ell =
-  let eval_var = eval_var conf base env p in
-  let eval_apply _ _ = "not impl apply in apply" in
-  let eval_ast = Templ.eval_expr conf (eval_var, eval_apply) in
-  let sll = List.map (List.map eval_ast) ell in
-  let vl = List.map (String.concat "") sll in
-  match get_env f env with
-  [ Vfun xl al ->
-      let print_ast = print_ast conf base env p in
-      Templ.print_apply f print_ast xl al vl
-  | _ -> Wserver.wprint ">%%%s???" f ]
-and print_if conf base env p e alt ale =
-  let eval_var = eval_var conf base env p in
-  let eval_apply _ _ = "not impl apply in if" in
-  let al =
-    if Templ.eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
+value print_foreach print_ast eval_expr eval_int_expr =
+  let rec print_foreach conf base env p loc s sl _ al =
+    match [s :: sl] with
+    [ ["alias"] -> print_foreach_string conf base env p al p.aliases s
+    | ["first_name_alias"] ->
+        print_foreach_string conf base env p al p.first_names_aliases s
+    | ["qualifier"] -> print_foreach_string conf base env p al p.qualifiers s
+    | ["surname_alias"] ->
+        print_foreach_string conf base env p al p.surnames_aliases s
+    | ["relation"] -> print_foreach_relation conf base env p al p.rparents
+    | ["title"] -> print_foreach_title conf base env p al p.titles
+    | _ ->
+        do {
+          Wserver.wprint ">%%foreach;%s" s;
+          List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+          Wserver.wprint "?";
+         } ]
+  and print_foreach_string conf base env p al list lab =
+    let _ =
+      List.fold_left
+        (fun cnt nn ->
+           let env = [(lab, Vstring nn) :: env] in
+           let env = [("cnt", Vint cnt) :: env] in
+           do { List.iter (print_ast conf base env p) al; cnt + 1 })
+        0 list
+    in
+    ()
+  and print_foreach_relation conf base env p al list =
+    let _ =
+      List.fold_left
+        (fun cnt nn ->
+           let env = [("cnt", Vint cnt) :: env] in
+           do { List.iter (print_ast conf base env p) al; cnt + 1 })
+        1 list
+    in
+    ()
+  and print_foreach_title conf base env p al list =
+    let _ =
+      List.fold_left
+        (fun cnt nn ->
+           let env = [("cnt", Vint cnt) :: env] in
+           do { List.iter (print_ast conf base env p) al; cnt + 1 })
+        1 list
+    in
+    ()
   in
-  List.iter (print_ast conf base env p) al
-and print_foreach conf base env p (loc, s, sl) _ al =
-  match [s :: sl] with
-  [ ["alias"] -> print_foreach_string conf base env p al p.aliases s
-  | ["first_name_alias"] ->
-      print_foreach_string conf base env p al p.first_names_aliases s
-  | ["qualifier"] -> print_foreach_string conf base env p al p.qualifiers s
-  | ["surname_alias"] ->
-      print_foreach_string conf base env p al p.surnames_aliases s
-  | ["relation"] -> print_foreach_relation conf base env p al p.rparents
-  | ["title"] -> print_foreach_title conf base env p al p.titles
-  | _ ->
-      do {
-        Wserver.wprint ">%%foreach;%s" s;
-        List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-        Wserver.wprint "?";
-       } ]
-and print_foreach_string conf base env p al list lab =
-  let _ =
-    List.fold_left
-      (fun cnt nn ->
-         let env = [(lab, Vstring nn) :: env] in
-         let env = [("cnt", Vint cnt) :: env] in
-         do { List.iter (print_ast conf base env p) al; cnt + 1 })
-      0 list
-  in
-  ()
-and print_foreach_relation conf base env p al list =
-  let _ =
-    List.fold_left
-      (fun cnt nn ->
-         let env = [("cnt", Vint cnt) :: env] in
-         do { List.iter (print_ast conf base env p) al; cnt + 1 })
-      1 list
-  in
-  ()
-and print_foreach_title conf base env p al list =
-  let _ =
-    List.fold_left
-      (fun cnt nn ->
-         let env = [("cnt", Vint cnt) :: env] in
-         do { List.iter (print_ast conf base env p) al; cnt + 1 })
-      1 list
-  in
-  ()
+  print_foreach
+;
+
+value eval_transl conf base env = Templ.eval_transl conf;
+
+value eval_predefined_apply conf env f vl =
+  match (f, vl) with
+  [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
 value interp_templ conf base p digest astl =
+  let print_ast =
+    Templ.print_ast eval_var eval_transl eval_predefined_apply get_fun set_fun
+      set_val print_foreach
+  in
   let env = [("digest", Vstring digest)] in
   List.iter (print_ast conf base env p) astl
 ;
