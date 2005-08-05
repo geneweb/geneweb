@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.36 2005-08-05 13:07:27 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.37 2005-08-05 17:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -28,12 +28,8 @@ type env 'a =
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
-value get_vother v env =
-  match get_env v env with
-  [ Vother x -> Some x
-  | _ -> None ]
-;
-value set_vother k x env = [(k, Vother x) :: env];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
 
 value extract_var sini s =
   let len = String.length sini in
@@ -399,21 +395,14 @@ value eval_predefined_apply env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value interp_templ conf base p digest astl =
-  let print_ast =
-    Templ.print_ast (eval_var conf base) (eval_transl conf)
-      eval_predefined_apply get_vother set_vother print_foreach
-  in
-  let env = [("digest", Vstring digest)] in
-  List.iter (print_ast conf base env p) astl
-;
-
 value print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
-      let astl = Templ.input conf "updind" in
-      do { html conf; nl (); interp_templ conf base p digest astl }
+      let env = [("digest", Vstring digest)] in
+      Templ.interp conf base "updind" (eval_var conf base)
+        (eval_transl conf) eval_predefined_apply get_vother set_vother
+        print_foreach env p
   | _ -> incorrect_request conf ]
 ;
 

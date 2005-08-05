@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.76 2005-08-05 13:07:27 ddr Exp $ *)
+(* $Id: templ.ml,v 4.77 2005-08-05 17:50:24 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -984,23 +984,30 @@ type vother =
   [ Vfun of list string and list ast
   | Vval of string ]
 ;
+type env 'a = list (string * 'a);
 
-value get_fun get_vother f env =
-  match get_vother f env with
-  [ Some (Vfun al el) -> Some (al, el)
-  | _ -> None ]
+value get_fun get_vother k env =
+  try
+    match get_vother (List.assoc k env) with
+    [ Some (Vfun al el) -> Some (al, el)
+    | _ -> None ]
+  with
+  [ Not_found -> None ]
 ;
 value get_val get_vother k env =
-  match get_vother k env with
-  [ Some (Vval v) -> Some v
-  | _ -> None ]
+  try
+    match get_vother (List.assoc k env) with
+    [ Some (Vval x) -> Some x
+    | _ -> None ]
+  with
+  [ Not_found -> None ]
 ;
-value set_fun set_vother f al el env = set_vother f (Vfun al el) env;
-value set_val set_vother k v env = set_vother k (Vval v) env;
+value set_fun set_vother f al el env = [(f, set_vother (Vfun al el)) :: env];
+value set_val set_vother k v env = [(k, set_vother (Vval v)) :: env];
 
-value print_ast
-  eval_var eval_transl eval_predefined_apply get_vother set_vother
-  print_foreach conf base
+value interp
+  conf base fname eval_var eval_transl eval_predefined_apply get_vother
+  set_vother print_foreach
 =
   let eval_var env ep loc sl =
     match sl with
@@ -1089,5 +1096,12 @@ value print_ast
     in
     List.iter (print_ast env ep) al
   in
-  print_ast
+  fun env ep ->
+    let astl = input conf fname in
+    let print_ast = print_ast env ep in
+    do {
+      Util.html conf;
+      Util.nl ();
+      List.iter print_ast astl;
+    }
 ;

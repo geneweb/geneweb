@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.174 2005-08-05 13:07:27 ddr Exp $ *)
+(* $Id: perso.ml,v 4.175 2005-08-05 17:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -761,12 +761,8 @@ value get_env v env =
   with
   [ Not_found -> Vnone ]
 ;
-value get_vother v env =
-  match get_env v env with
-  [ Vother x -> Some x
-  | _ -> None ]
-;
-value set_vother k x env = [(k, Vother x) :: env];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
 
 value not_impl func x =
   let desc =
@@ -2672,7 +2668,6 @@ value eval_predefined_apply conf env f vl =
 
 value interp_templ templ_fname conf base p =
   let _ = do { template_file.val := templ_fname ^ ".txt"; } in
-  let astl = Templ.input conf templ_fname in
   let a = aget conf base p.cle_index in
   let u = uget conf base p.cle_index in
   let ep = (p, a, u, authorized_age conf base p) in
@@ -2710,16 +2705,9 @@ value interp_templ templ_fname conf base p =
      ("desc_level_table", Vdesclevtab desc_level_table_l);
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
-  let print_ast =
-    Templ.print_ast (eval_var conf base) (eval_transl conf)
-      (eval_predefined_apply conf) get_vother set_vother
-      (print_foreach conf base) conf base
-  in
-  do {
-    html conf;
-    nl ();
-    List.iter (print_ast env ep) astl
-  }
+  Templ.interp conf base templ_fname (eval_var conf base) (eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) env ep
 ;
 
 (* Main *)
