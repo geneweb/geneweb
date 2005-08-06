@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.34 2005-08-05 19:50:49 ddr Exp $ *)
+(* $Id: history.ml,v 4.35 2005-08-06 12:05:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -342,11 +342,7 @@ value set_vother x = Vother x;
 
 value rec eval_var conf base env xx loc =
   fun
-  [ ["evar"; v] ->
-      match p_getenv (conf.env @ conf.henv) v with
-      [ Some vv -> VVstring (quote_escaped vv)
-      | None -> VVstring "" ]
-  | ["first_name"] ->
+  [ ["first_name"] ->
       match get_env "info" env with
       [ Vinfo _ _ _ (HI_ind p) _ -> VVstring (p_first_name base p)
       | _ -> VVstring "" ]
@@ -415,50 +411,52 @@ value print_foreach conf base print_ast eval_expr =
     try int_of_string s with [ Failure _ -> raise Not_found ]
   in
   let rec print_foreach env xx loc s sl el al =
-    try
-      match (s, sl) with
-      [ ("history_line", []) -> print_foreach_history_line env xx el al
-      | (s, _) -> raise Not_found ]
-    with
-    [ Not_found -> Wserver.wprint " %%foreach;%s?" s ]
+    match (s, sl) with
+    [ ("history_line", []) -> print_foreach_history_line env xx el al
+    | (s, _) -> raise Not_found ]
   and print_foreach_history_line env xx el al =
     match
       try Some (Secure.open_in_bin (file_name conf))
       with [ Sys_error _ -> None ]
     with
     [ Some ic ->
-        let (k, pos, wiz) =
-          match el with
-          [ [[e1]; [e2]; [e3]] ->
-              let k = eval_int_expr env xx e1 in
-              let pos =
-                try eval_int_expr env xx e2 with
-                [ Not_found -> in_channel_length ic ]
-              in
-              let wiz = eval_expr env xx e3 in
-              (k, pos, wiz)
-          | [] -> (3, in_channel_length ic, "")
-          | _ -> raise Not_found ]
-        in
-        let (pos, n) =
-          let vv = (ref "", ref 0) in
-          let rec loop pos i =
-            if i >= k then (pos, i)
-            else
-              match
-                try Some (rev_input_line ic pos vv) with
-                [ Begin_of_file -> None ]
-              with
-              [ Some (line, pos) ->
-                  let i = print_history_line2 env xx line wiz i al in
-                  loop pos i
-              | None -> (pos, i) ]
+        try
+          let (k, pos, wiz) =
+            match el with
+            [ [[e1]; [e2]; [e3]] ->
+                let k = eval_int_expr env xx e1 in
+                let pos =
+                  try eval_int_expr env xx e2 with
+                  [ Not_found -> in_channel_length ic ]
+                in
+                let wiz = eval_expr env xx e3 in
+                (k, pos, wiz)
+            | [] -> (3, in_channel_length ic, "")
+            | _ -> raise Not_found ]
           in
-          loop pos 0
-        in
-        match get_env "pos" env with
-        [ Vpos r -> r.val := pos
-        | _ -> () ]
+          let (pos, n) =
+            let vv = (ref "", ref 0) in
+            let rec loop pos i =
+              if i >= k then (pos, i)
+              else
+                match
+                  try Some (rev_input_line ic pos vv) with
+                  [ Begin_of_file -> None ]
+                with
+                [ Some (line, pos) ->
+                    let i = print_history_line2 env xx line wiz i al in
+                    loop pos i
+                | None -> (pos, i) ]
+            in
+            loop pos 0
+          in
+          do {
+            match get_env "pos" env with
+            [ Vpos r -> r.val := pos
+            | _ -> () ];
+            close_in ic;
+          }
+        with e -> do { close_in ic; raise e }
     | None -> () ]
   and print_history_line2 env xx line wiz i al =
     match line_fields line with
@@ -508,20 +506,20 @@ value eval_predefined_apply conf env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value eval_transl conf env = Templ.eval_transl conf;
-
 IFDEF OLD THEN declare
 value print conf base =
   if p_getenv conf.env "old" = Some "on" then print_old conf base else
   let env = [("pos", Vpos (ref 0))] in
-  Templ.interp conf base "updhist" (eval_var conf base) (eval_transl conf)
+  Templ.interp conf base "updhist" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf)
     (eval_predefined_apply conf) get_vother set_vother
     (print_foreach conf base) env ()
 ;
 end ELSE
 value print conf base =
   let env = [("pos", Vpos (ref 0))] in
-  Templ.interp conf base "updhist" (eval_var conf base) (eval_transl conf)
+  Templ.interp conf base "updhist" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf)
     (eval_predefined_apply conf) get_vother set_vother
     (print_foreach conf base) env ()
 END;

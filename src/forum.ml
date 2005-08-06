@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.50 2005-07-09 12:09:34 ddr Exp $ *)
+(* $Id: forum.ml,v 4.51 2005-08-06 12:05:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
 open Config;
 open Def;
 open Printf;
+open TemplAst;
 
 type message =
   { m_time : string;
@@ -168,16 +169,16 @@ value print_headers conf =
           match try Some (input_line ic) with [ End_of_file -> None ] with
           [ Some s ->
               if nmess > max_header_mess then do {
-                 Wserver.wprint
-                   "<tr align=\"%s\"><td colspan=\"4\">&nbsp;</td></tr>\n"
-                   conf.left;
-                 tag "tr" "align=\"%s\"" conf.left begin
-                   tag "td" "colspan=\"4\"" begin
-                     Wserver.wprint
-                       "<a href=\"%sm=FORUM;len=%d;from=%d\">%s</a>\n"
-                          (commd conf) max_header_mess (ic_len - pos)
-                          (message_txt conf 2);
-                   end;
+                Wserver.wprint
+                  "<tr align=\"%s\"><td colspan=\"4\">&nbsp;</td></tr>\n"
+                  conf.left;
+                tag "tr" "align=\"%s\"" conf.left begin
+                  tag "td" "colspan=\"4\"" begin
+                    Wserver.wprint
+                      "<a href=\"%sm=FORUM;len=%d;from=%d\">%s</a>\n"
+                         (commd conf) max_header_mess (ic_len - pos)
+                         (message_txt conf 2);
+                  end;
                 end;
                 close_in ic;
                 prec_date
@@ -492,10 +493,156 @@ value print_forum_message conf base pos =
 
 (* Print headers or message *)
 
-value print conf base =
+type env 'a =
+  [ Vmess of message and int
+  | Vother of 'a
+  | Vnone ]
+;
+
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
+
+value rec eval_var conf base env xx loc =
+  fun
+  [ ["can_post"] -> VVbool (can_post conf)
+  | ["message" :: sl] -> eval_message_var conf base env sl
+  | _ -> raise Not_found ]
+and eval_message_var conf base env =
+  fun
+  [ ["access"] ->
+      match get_env "mess" env with
+      [ Vmess mess _ -> VVstring mess.m_access
+      | _ -> raise Not_found ]
+  | ["ident" :: sl] ->
+      match get_env "mess" env with
+      [ Vmess mess _ -> eval_message_string_var mess.m_ident sl
+      | _ -> raise Not_found ]
+  | ["pos"] ->
+      match get_env "mess" env with
+      [ Vmess _ pos -> VVstring (string_of_int pos)
+      | _ -> raise Not_found ]
+  | ["subject" :: sl] ->
+      match get_env "mess" env with
+      [ Vmess mess _ -> eval_message_string_var mess.m_subject sl
+      | _ -> raise Not_found ]
+  | ["text" :: sl] ->
+      match get_env "mess" env with
+      [ Vmess mess _ -> eval_message_string_var mess.m_mess sl
+      | _ -> raise Not_found ]
+  | ["time"] ->
+      match get_env "mess" env with
+      [ Vmess mess _ -> VVstring mess.m_time
+      | _ -> raise Not_found ]
+  | _ -> raise Not_found ]
+and eval_message_string_var str =
+  fun
+  [ ["cut"; s] ->
+      try VVstring (no_html_tags (sp2nbsp (int_of_string s) str)) with
+      [ Failure _ -> raise Not_found ]
+  | [] -> VVstring str
+  | _ -> raise Not_found ]
+;
+
+value read_message ic =
+  try
+    let s = input_line ic in
+    let (time, s) = get_var ic "Time:" s in
+    let ((time, s), deleted) =
+      if time = "" then (get_var ic "****:" s, True)
+      else ((time, s), False)
+    in
+    let (_, s) = get_var ic "From:" s in
+    let (ident, s) = get_var ic "Ident:" s in
+    let (wizard, s) = get_var ic "Wizard:" s in
+    let (friend, s) = get_var ic "Friend:" s in
+    let (email, s) = get_var ic "Email:" s in
+    let (access, s) = get_var ic "Access:" s in
+    let (subject, s) = get_var ic "Subject:" s in
+    let (wiki, s) = get_var ic "Wiki:" s in
+    let (_, s) = get_var ic "Text:" s in
+    let (mess, s) =
+      get_mess 0 s where rec get_mess len s =
+        if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
+          let s = String.sub s 2 (String.length s - 2) in
+          let len = if len = 0 then len else Buff.store len '\n' in
+          get_mess (Buff.mstore len s) (input_line ic)
+        else (Buff.get len, s)
+    in
+    let mess =
+      {m_time = time; m_ident = ident; m_wizard = wizard; m_friend = friend;
+       m_email = email; m_access = access; m_subject = subject; m_wiki = wiki;
+       m_mess = mess}
+    in
+    Some (mess, deleted)
+  with
+  [ End_of_file -> None ]
+;
+
+value print_foreach conf base print_ast eval_expr =
+  let eval_int_expr env e =
+    let s = eval_expr env () e in
+    try int_of_string s with [ Failure _ -> raise Not_found ]
+  in
+  let rec print_foreach env xx loc s sl el al =
+    match [s :: sl] with
+    [ ["message"] -> print_foreach_message env el al
+    | _ -> raise Not_found ]
+  and print_foreach_message env el al =
+    let max_mess =
+      match el with
+      [ [[e]] -> eval_int_expr env e
+      | _ -> raise Not_found ]
+    in
+    let fname = forum_file conf in
+    match
+      try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+    with
+    [ Some ic ->
+        let ic_len = in_channel_length ic in
+        let rec loop i =
+          if i >= max_mess then ()
+          else
+            let pos = ic_len - pos_in ic in
+            match read_message ic with
+            [ Some (mess, deleted) ->
+                if deleted ||
+                  mess.m_access = "priv" && not conf.wizard && not conf.friend
+                then loop i
+                else
+                  let env = [("mess", Vmess mess pos) :: env] in
+                  do {
+                    List.iter (print_ast env ()) al;
+                    loop (i + 1);
+                  }
+            | None -> () ]
+        in
+        do {
+          loop 0;
+          close_in ic;
+        }
+    | None -> () ]
+  in
+  print_foreach
+;
+
+value eval_predefined_apply conf env f vl =
+  match (f, vl) with
+  [ _ -> Printf.sprintf " %%apply;%s?" f ]
+;
+
+value old_print conf base =
   match p_getint conf.env "p" with
   [ Some pos -> print_forum_message conf base pos
   | None -> print_forum_headers conf base ]
+;
+
+value print conf base =
+  if p_getenv conf.env "new" <> Some "on" then old_print conf base else
+  Templ.interp conf base "forum" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) [] ()
 ;
 
 (* Send a message *)

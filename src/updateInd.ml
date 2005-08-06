@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.39 2005-08-05 19:50:49 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.40 2005-08-06 12:05:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -350,12 +350,7 @@ value print_foreach print_ast eval_expr =
     | ["surname_alias"] -> print_foreach_string env p al p.surnames_aliases s
     | ["relation"] -> print_foreach_relation env p al p.rparents
     | ["title"] -> print_foreach_title env p al p.titles
-    | _ ->
-        do {
-          Wserver.wprint ">%%foreach;%s" s;
-          List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-          Wserver.wprint "?";
-         } ]
+    | _ -> raise Not_found ]
   and print_foreach_string env p al list lab =
     let _ =
       List.fold_left
@@ -393,16 +388,14 @@ value eval_predefined_apply env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value eval_transl conf env = Templ.eval_transl conf;
-
 value print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
       let env = [("digest", Vstring digest)] in
       Templ.interp conf base "updind" (eval_var conf base)
-        (eval_transl conf) eval_predefined_apply get_vother set_vother
-        print_foreach env p
+        (fun _ -> Templ.eval_transl conf) eval_predefined_apply
+        get_vother set_vother print_foreach env p
   | _ -> incorrect_request conf ]
 ;
 
