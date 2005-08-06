@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.177 2005-08-05 19:50:49 ddr Exp $ *)
+(* $Id: perso.ml,v 4.178 2005-08-06 12:05:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1145,10 +1145,6 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
         | [] -> raise Not_found ]
       in
       loop env
-  | ["evar"; v] ->
-      match p_getenv (conf.env @ conf.henv) v with
-      [ Some vv -> VVstring (quote_escaped vv)
-      | None -> VVstring "" ]
   | ["family" :: sl] ->
       match get_env "fam" env with
       [ Vfam f c d m -> eval_family_field_var conf base env (f, c, d, m) loc sl
@@ -2120,13 +2116,7 @@ value print_foreach conf base print_ast eval_expr =
       | _ -> raise Not_found ]
     in
     let efam = get_env "fam" env in
-    try loop ini_ep efam [s :: sl] with
-    [ Not_found ->
-        do {
-          Wserver.wprint " %%foreach;%s" s;
-          List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-          Wserver.wprint "?"
-        } ]
+    loop ini_ep efam [s :: sl]
   and print_simple_foreach env el al ini_ep ep efam loc =
     fun
     [ "alias" -> print_foreach_alias env al ep
@@ -2153,7 +2143,7 @@ value print_foreach conf base print_ast eval_expr =
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep efam
     | "witness_relation" -> print_foreach_witness_relation env al ep
-    | s -> Wserver.wprint " %%foreach;%s?" s ]
+    | _ -> raise Not_found ]
   and print_foreach_alias env al ((p, _, _, p_auth) as ep) =
     if p_auth then
       List.iter

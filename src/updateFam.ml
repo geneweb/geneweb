@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.69 2005-08-05 19:50:49 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.70 2005-08-06 12:05:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -357,12 +357,7 @@ value print_foreach print_ast eval_expr =
     [ ["child"] -> print_foreach_child env fcd al des.children s
     | ["witness"] -> print_foreach_witness env fcd al fam.witnesses s
     | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl) s
-    | _ ->
-        do {
-          Wserver.wprint ">%%foreach;%s" s;
-          List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-          Wserver.wprint "?";
-         } ]
+    | _ -> raise Not_found ]
   and print_foreach_child env fcd al arr lab =
     for i = 0 to max 1 (Array.length arr) - 1 do {
       let env = [("cnt", Vint (i + 1)) :: env] in
@@ -387,8 +382,6 @@ value eval_predefined_apply env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value eval_transl conf env = Templ.eval_transl conf;
-
 value print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
   [ Some
@@ -396,8 +389,8 @@ value print_update_fam conf base fcd digest =
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let env = [("digest", Vstring digest)] in
       Templ.interp conf base "updfam" (eval_var conf base)
-        (eval_transl conf) eval_predefined_apply get_vother set_vother
-        print_foreach env fcd
+        (fun _ -> Templ.eval_transl conf) eval_predefined_apply
+        get_vother set_vother print_foreach env fcd
   | _ -> incorrect_request conf ]
 ;
 

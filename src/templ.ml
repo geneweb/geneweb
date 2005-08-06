@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.79 2005-08-05 19:50:49 ddr Exp $ *)
+(* $Id: templ.ml,v 4.80 2005-08-06 12:05:21 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -622,7 +622,11 @@ value not_impl func x =
 
 value rec eval_variable conf env =
   fun
-  [ [s] -> eval_simple_variable conf env s
+  [ ["evar"; v] ->
+      match Util.p_getenv (conf.env @ conf.henv) v with
+      [ Some vv -> Util.quote_escaped vv
+      | None -> "" ]
+  | [s] -> eval_simple_variable conf env s
   | _ -> raise Not_found ]
 and eval_simple_variable conf env =
   fun 
@@ -1061,7 +1065,9 @@ value interp
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->
-        print_foreach print_ast eval_expr env ep loc s sl el al
+        try print_foreach print_ast eval_expr env ep loc s sl el al with
+        [ Not_found ->
+            Wserver.wprint " %%foreach;%s?" (String.concat "." [s :: sl]) ]
     | Adefine f xl al alk -> print_define env ep f xl al alk
     | Aapply loc f ell -> print_apply env ep loc f ell
     | Alet k v al -> print_let env ep k v al
