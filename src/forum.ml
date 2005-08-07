@@ -1,6 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.53 2005-08-07 02:46:02 ddr Exp $ *)
+(* $Id: forum.ml,v 4.54 2005-08-07 09:09:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
+
+DEFINE OLD;
 
 open Util;
 open Config;
@@ -25,6 +27,12 @@ type message =
 value forum_file conf =
   Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
 ;
+
+value message_txt conf i =
+  transl_nth conf "message/previous message/previous messages/next message" i
+;
+
+value header_txt conf i = transl_nth conf "ident/email/subject" i;
 
 (* Black list *)
 
@@ -83,6 +91,7 @@ value sp2nbsp lim s =
       loop (i + 1) len
 ;
 
+IFDEF OLD THEN declare
 value ndisp_items = 2;
 value change_item pd d = d.month <> pd.month;
 
@@ -141,10 +150,6 @@ value print_one_header conf prec_date ndisp pos h =
     end;
     ndisp
   }
-;
-
-value message_txt conf i =
-  transl_nth conf "message/previous message/previous messages/next message" i
 ;
 
 value print_headers conf =
@@ -266,8 +271,6 @@ value print_headers conf =
   | None -> () ]
 ;
 
-value header_txt conf i = transl_nth conf "ident/email/subject" i;
-
 value print_add_message conf =
   tag "form" "method=\"get\" action=\"%s\"" conf.command begin
     tag "p" begin
@@ -279,7 +282,7 @@ value print_add_message conf =
   end
 ;
 
-value print_forum_headers conf base =
+value old_print_forum_headers conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "database forum"))
   in
@@ -292,6 +295,7 @@ value print_forum_headers conf base =
     trailer conf;
   }
 ;
+end END;
 
 (* Print a message *)
 
@@ -407,6 +411,7 @@ value passwd_in_file conf =
   | Some _ -> True ]
 ;
 
+IFDEF OLD THEN declare
 value print_one_forum_message conf m pos next_pos forum_length =
   let title _ =
     let subject =
@@ -510,12 +515,19 @@ value print_one_forum_message conf m pos next_pos forum_length =
 value print_forum_message conf base pos =
   match get_message conf pos with
   [ Some (a, m, _, next_pos, forum_length) ->
-      if not a then print_forum_headers conf base
+      if not a then old_print_forum_headers conf base
       else print_one_forum_message conf m pos next_pos forum_length
-  | None -> print_forum_headers conf base ]
+  | None -> old_print_forum_headers conf base ]
 ;
 
 (* Print headers or message *)
+
+value old_print conf base =
+  match p_getint conf.env "p" with
+  [ Some pos -> print_forum_message conf base pos
+  | None -> old_print_forum_headers conf base ]
+;
+end END;
 
 type env 'a =
   [ Vmess of message and option message and int and int and int
@@ -612,6 +624,12 @@ and eval_message_var conf env =
       match get_env "mess" env with
       [ Vmess mess _ _ _ _ -> VVstring mess.m_wiki
       | _ -> raise Not_found ]
+  | ["wizard"] ->
+      if passwd_in_file conf then
+        match get_env "mess" env with
+        [ Vmess mess _ _ _ _ -> VVstring (mess.m_wizard)
+        | _ -> raise Not_found ]
+      else VVstring ""
   | _ -> raise Not_found ]
 and eval_date_var conf date =
   fun
@@ -696,14 +714,9 @@ value eval_predefined_apply conf env f vl =
   [ _ -> Printf.sprintf " %%apply;%s?" f ]
 ;
 
-value old_print conf base =
-  match p_getint conf.env "p" with
-  [ Some pos -> print_forum_message conf base pos
-  | None -> print_forum_headers conf base ]
-;
-
+IFDEF OLD THEN declare
 value print conf base =
-  if p_getenv conf.env "new" <> Some "on" then old_print conf base else
+  if p_getenv conf.env "old" = Some "on" then old_print conf base else
   let env =
     match p_getint conf.env "p" with
     [ Some pos ->
@@ -721,6 +734,48 @@ value print conf base =
     (eval_predefined_apply conf) get_vother set_vother
     (print_foreach conf base) env ()
 ;
+
+value print_forum_headers conf base =
+  if p_getenv conf.env "old" = Some "on" then
+    old_print_forum_headers conf base else
+  let env = [("pos", Vpos (ref (-1)))] in
+  Templ.interp conf base "forum" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) env ()
+;
+
+end ELSE declare
+
+value print conf base =
+  let env =
+    match p_getint conf.env "p" with
+    [ Some pos ->
+        match get_message conf pos with
+        [ Some (a, mess, _, next_pos, ic_len) ->
+            if a then
+              [("mess", Vmess mess None pos next_pos ic_len);
+               ("pos", Vpos (ref pos))]
+            else [("pos", Vpos (ref (-1)))]
+        | None -> [("pos", Vpos (ref (-1)))] ]
+    | None -> [("pos", Vpos (ref (-1)))] ]
+  in
+  Templ.interp conf base "forum" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) env ()
+;
+
+value print_forum_headers conf base =
+  let env = [("pos", Vpos (ref (-1)))] in
+  Templ.interp conf base "forum" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf)
+    (eval_predefined_apply conf) get_vother set_vother
+    (print_foreach conf base) env ()
+;
+
+end END;
+
 
 (* Send a message *)
 
@@ -957,3 +1012,4 @@ value print_del conf base =
   [ Some pos -> delete_forum_message conf base pos
   | None -> print_forum_headers conf base ]
 ;
+

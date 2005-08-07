@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.80 2005-08-06 12:05:21 ddr Exp $ *)
+(* $Id: templ.ml,v 4.81 2005-08-07 09:09:15 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -656,6 +656,7 @@ and eval_simple_variable conf env =
   | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
   | "right" -> conf.right
   | "sp" -> " "
+  | "user" -> conf.user
   | "/" -> conf.xhs
   | s -> List.assoc s env ]
 ;
