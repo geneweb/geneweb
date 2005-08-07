@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.82 2005-08-07 14:57:35 ddr Exp $ *)
+(* $Id: templ.ml,v 4.83 2005-08-07 22:38:29 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -533,7 +533,9 @@ value input conf fname =
         Util.header conf title;
         tag "ul" begin
           tag "li" begin
-            Wserver.wprint "Cannot access file \"%s/%s.txt\".\n" dir fname;
+            Wserver.wprint "Cannot access file \"%s.txt\".\n"
+              (if dir = Filename.current_dir_name then fname
+               else Filename.concat dir fname);
           end;
         end;
         Util.trailer conf;
@@ -1051,7 +1053,13 @@ value interp
         let sl = List.map eval_ast al in
         String.concat "" sl
     | None ->
-        eval_predefined_apply env f vl ]
+        match (f, vl) with
+        [ ("nth", [s1; s2]) ->
+            let n = try int_of_string s2 with [ Failure _ -> 0 ] in
+            Util.nth_field s1 n
+        | _ ->
+            try eval_predefined_apply env f vl with
+            [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
   and eval_if env ep e alt ale =
     let eval_var = eval_var env ep in
     let eval_ast = eval_ast env ep in

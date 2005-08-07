@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.22 2005-08-07 14:57:35 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.23 2005-08-07 22:38:29 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -881,9 +881,8 @@ sl: Lahko pregledate:
 sv: Du kan ocks&aring; konsultera
 zh:
 ]</div>
-</td></tr></table>
 
-<table border="0">
+<table border="0" style="white-space:nowrap">
 <tr align="%L">
 <td valign="top">
 <ul style="list-style:inside">
@@ -902,6 +901,7 @@ zh:
 </td>
 </tr>
 </table>
+</td></tr></table>
 
 <table border="0"><tr><td><div>
 [

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.36 2005-08-07 09:09:15 ddr Exp $ *)
+(* $Id: history.ml,v 4.37 2005-08-07 22:38:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 UNDEF OLD;
@@ -501,25 +501,18 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
-value eval_predefined_apply conf env f vl =
-  match (f, vl) with
-  [ _ -> Printf.sprintf " %%apply;%s?" f ]
-;
-
 IFDEF OLD THEN declare
 value print conf base =
   if p_getenv conf.env "old" = Some "on" then print_old conf base else
   let env = [("pos", Vpos (ref 0))] in
   Templ.interp conf base "updhist" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ()
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 end ELSE
 value print conf base =
   let env = [("pos", Vpos (ref 0))] in
   Templ.interp conf base "updhist" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ()
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
 END;
