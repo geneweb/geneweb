@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.81 2005-08-07 09:09:15 ddr Exp $ *)
+(* $Id: templ.ml,v 4.82 2005-08-07 14:57:35 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -626,6 +626,8 @@ value rec eval_variable conf env =
       match Util.p_getenv (conf.env @ conf.henv) v with
       [ Some vv -> Util.quote_escaped vv
       | None -> "" ]
+  | ["user"; "ident"] -> conf.user
+  | ["user"; "name"] -> conf.username
   | [s] -> eval_simple_variable conf env s
   | _ -> raise Not_found ]
 and eval_simple_variable conf env =
@@ -656,7 +658,6 @@ and eval_simple_variable conf env =
   | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
   | "right" -> conf.right
   | "sp" -> " "
-  | "user" -> conf.user
   | "/" -> conf.xhs
   | s -> List.assoc s env ]
 ;
