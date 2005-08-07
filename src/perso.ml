@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.178 2005-08-06 12:05:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.179 2005-08-07 22:38:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2654,10 +2654,7 @@ value eval_predefined_apply conf env f vl =
         string_of_int m
       with
       [ Failure _ -> raise Not_found ]
-  | ("nth", [s1; s2]) ->
-      let n = try int_of_string s2 with [ Failure _ -> 0 ] in
-      Util.nth_field s1 n
-  | _ -> Printf.sprintf " %%apply;%s?" f ]
+  | _ -> raise Not_found ]
 ;
 
 value interp_templ templ_fname conf base p =

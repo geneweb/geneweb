@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.55 2005-08-07 14:57:35 ddr Exp $ *)
+(* $Id: forum.ml,v 4.56 2005-08-07 22:38:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -711,11 +711,6 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
-value eval_predefined_apply conf env f vl =
-  match (f, vl) with
-  [ _ -> Printf.sprintf " %%apply;%s?" f ]
-;
-
 IFDEF OLD THEN declare
 value print conf base =
   if p_getenv conf.env "old" = Some "on" then old_print conf base else
@@ -732,9 +727,8 @@ value print conf base =
     | None -> [("pos", Vpos (ref (-1)))] ]
   in
   Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ()
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 
 value print_forum_headers conf base =
@@ -742,9 +736,8 @@ value print_forum_headers conf base =
     old_print_forum_headers conf base else
   let env = [("pos", Vpos (ref (-1)))] in
   Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ()
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 
 end ELSE declare
@@ -763,17 +756,15 @@ value print conf base =
     | None -> [("pos", Vpos (ref (-1)))] ]
   in
   Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ()
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 
 value print_forum_headers conf base =
   let env = [("pos", Vpos (ref (-1)))] in
   Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ()
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 
 end END;
