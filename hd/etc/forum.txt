@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.2 2005-08-07 02:46:02 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.3 2005-08-07 09:09:15 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(pos = "")[*database forum]%nn;
@@ -61,14 +61,25 @@
     <br%/>
   %end;
   <i>%message.time;</i>
+  </p>
   <dl><dd>
     %if;(message.wiki = "on")%message.text.wiki;%else;%message.text;%end;
   </dd></dl>
-  </p>
+  %if;(message.wizard != "" and wizard and user = message.wizard)
+    <form method="POST" action="%action;">
+    <p>
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_DEL"%/>
+    <input type="hidden" name="p" value="%message.pos;"%/>
+    <input type="submit" value="%nn;
+       [*delete::message/previous message/previous messages/next message]0"%/>
+    </p>
+    </form>
+  %end;
 %else;
   <h1 style="text-align:center" class="highlight">[*database forum]</h1>
   %if;can_post;
-    <form method="get" action="%action;">
+    <form method="GET" action="%action;">
     <p>
     %hidden;
     <input type="hidden" name="m" value="FORUM_ADD"%/>
