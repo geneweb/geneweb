@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.1 2005-08-07 00:47:42 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.2 2005-08-07 02:46:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(pos = "")[*database forum]%nn;
@@ -79,11 +79,19 @@
   %end;
   %let;len;%if;(evar.len != "")%evar.len;%else;100%end;%in;
   %let;from;%if;(evar.from != "")%evar.from;%else;-1%end;%in;
-  <table>
+  <table border="%border;">
   %foreach;message(from, len)
+    %if;(message.date != message.prev_date)
+      %if;(message.prev_date != "" and
+           message.date.month != message.prev_date.month)
+        <tr align="%left;"><td colspan="4">&nbsp;</td></tr>
+      %end;
+      <tr align="%left;"><td colspan="4">%message.date;</td></tr>
+    %end;
     <tr align="%left;">
-    <td><tt>%if;(message.access = "priv")*%else;&nbsp;%end;</tt></td>
-    <td><tt>%message.time;</tt></td>
+    <td><tt>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
+            &nbsp;</tt></td>
+    <td><tt>%message.hour;</tt></td>
     <td><a href="%prefix;m=FORUM;p=%message.pos;"><b>%message.ident.cut.23;
         </b></a></td>
     <td>%nn;
