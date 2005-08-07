@@ -1,0 +1,115 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: forum.txt,v 1.1 2005-08-07 00:47:42 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
+  <title>%nn;
+    %if;(pos = "")[*database forum]%nn;
+    %elseif;(message.subject = "" or message.subject = "-")
+      [*database forum]%nn;
+    %else;
+      %message.subject.cut.50;%nn;
+    %end;
+  </title>
+  <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%if;(pos != "")
+  <ul>
+  <li><a href="%prefix;m=FORUM">[*database forum]</a></li>
+  <li>%if;(message.next_pos != "")<a href="%prefix;m=FORUM;p=%message.next_pos;
+         ">[*message/previous message/previous messages/next message]3%nn;
+         </a>%nn;
+      %else;&nbsp;%end;</li>
+  <li>%if;(message.prev_pos != "")<a href="%prefix;m=FORUM;p=%message.prev_pos;
+         ">[*message/previous message/previous messages/next message]1%nn;
+         </a>%nn;
+      %else;&nbsp;%end;</li>
+  </ul>
+  <p>
+  <b>%message.ident;</b>
+  %if;(message.email != "")%nn;
+    <a href="mailto:%message.email;">%message.email;</a>%end;
+  <br%/>
+  %if;(message.subject != "")
+    <b>[*ident/email/subject]2: %message.subject;</b>
+    <br%/>
+  %end;
+  %if;(message.access = "priv")
+    <b>[*access]: [private]</b>
+    <br%/>
+  %end;
+  <i>%message.time;</i>
+  <dl><dd>
+    %if;(message.wiki = "on")%message.text.wiki;%else;%message.text;%end;
+  </dd></dl>
+  </p>
+%else;
+  <h1 style="text-align:center" class="highlight">[*database forum]</h1>
+  %if;can_post;
+    <form method="get" action="%action;">
+    <p>
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_ADD"%/>
+    <input type="submit"%sp;
+     value="[*add::message/previous message/previous messages/next message]0"%/>
+    </p>
+    </form>
+  %end;
+  %let;len;%if;(evar.len != "")%evar.len;%else;100%end;%in;
+  %let;from;%if;(evar.from != "")%evar.from;%else;-1%end;%in;
+  <table>
+  %foreach;message(from, len)
+    <tr align="%left;">
+    <td><tt>%if;(message.access = "priv")*%else;&nbsp;%end;</tt></td>
+    <td><tt>%message.time;</tt></td>
+    <td><a href="%prefix;m=FORUM;p=%message.pos;"><b>%message.ident.cut.23;
+        </b></a></td>
+    <td>%nn;
+       %if;(message.subject = "" or message.subject = "-")
+         <i>...&nbsp;%message.text.cut.50;</i>%nn;
+       %else;
+         %message.subject.cut.50;%nn;
+       %end;
+    </td>
+    </tr>
+  %end;
+  %if;(pos != "")
+    <tr align="%left;"><td colspan="4">&nbsp;</td></tr>
+    <tr align="%left;"><td colspan="4">%nn;
+      <a href="%prefix;m=FORUM;len=%len;;from=%pos;
+      ">[message/previous message/previous messages/next message]2</a></td></tr>
+  %end;
+  </table>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>
