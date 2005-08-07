@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.52 2005-08-07 00:47:42 ddr Exp $ *)
+(* $Id: forum.ml,v 4.53 2005-08-07 02:46:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -10,6 +10,8 @@ open TemplAst;
 
 type message =
   { m_time : string;
+    m_date : date;
+    m_hour : string;
     m_ident : string;
     m_wizard : string;
     m_friend : string;
@@ -70,7 +72,7 @@ value get_var ic lab s =
 
 value sp2nbsp lim s =
   loop 0 0 where rec loop i len =
-    if i >= String.length s then Buff.get len
+    if i >= String.length s || s.[i] = '\n' then Buff.get len
     else if i > lim && String.length s > lim + 3 then Buff.get len ^ "..."
     else
       let len =
@@ -301,6 +303,25 @@ value read_message conf ic =
       if time = "" then (get_var ic "****:" s, True)
       else ((time, s), False)
     in
+    let (date, hour) =
+      try
+        let i = String.index time ' ' in
+        (String.sub time 0 i,
+         String.sub time (i + 1) (String.length time - i - 1))
+      with
+      [ Not_found -> ("", time) ]
+    in
+    let date =
+      try
+        let y = int_of_string (String.sub date 0 4) in
+        let m = int_of_string (String.sub date 5 2) in
+        let d = int_of_string (String.sub date 8 2) in
+        Dgreg
+          {year = y; month = m; day = d; prec = Sure; delta = 0}
+          Dgregorian
+      with
+      [ Failure _ | Invalid_argument _ -> Dtext date ]
+    in
     let (_, s) = get_var ic "From:" s in
     let (ident, s) = get_var ic "Ident:" s in
     let (wizard, s) = get_var ic "Wizard:" s in
@@ -319,9 +340,9 @@ value read_message conf ic =
         else (Buff.get len, s)
     in
     let mess =
-      {m_time = time; m_ident = ident; m_wizard = wizard; m_friend = friend;
-       m_email = email; m_access = access; m_subject = subject; m_wiki = wiki;
-       m_mess = mess}
+      {m_time = time; m_date = date; m_hour = hour; m_ident = ident;
+       m_wizard = wizard; m_friend = friend; m_email = email;
+       m_access = access; m_subject = subject; m_wiki = wiki; m_mess = mess}
     in
     let accessible =
       if deleted then False
@@ -497,7 +518,7 @@ value print_forum_message conf base pos =
 (* Print headers or message *)
 
 type env 'a =
-  [ Vmess of message and int and int and int
+  [ Vmess of message and option message and int and int and int
   | Vpos of ref int
   | Vother of 'a
   | Vnone ]
@@ -510,30 +531,38 @@ value set_vother x = Vother x;
 value rec eval_var conf base env xx loc =
   fun
   [ ["can_post"] -> VVbool (can_post conf)
-  | ["message" :: sl] -> eval_message_var conf base env sl
+  | ["message" :: sl] -> eval_message_var conf env sl
   | ["pos"] ->
       match get_env "pos" env with
       [ Vpos r ->
           if r.val < 0 then VVstring "" else VVstring (string_of_int r.val)
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
-and eval_message_var conf base env =
+and eval_message_var conf env =
   fun
   [ ["access"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> VVstring mess.m_access
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_access
+      | _ -> raise Not_found ]
+  | ["date" :: sl] ->
+      match get_env "mess" env with
+      [ Vmess mess _ _ _ _ -> eval_date_var conf mess.m_date sl
       | _ -> raise Not_found ]
   | ["email" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> eval_message_string_var conf mess.m_email sl
+      [ Vmess mess _ _ _ _ -> eval_message_string_var conf mess.m_email sl
+      | _ -> raise Not_found ]
+  | ["hour"] ->
+      match get_env "mess" env with
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_hour
       | _ -> raise Not_found ]
   | ["ident" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> eval_message_string_var conf mess.m_ident sl
+      [ Vmess mess _ _ _ _ -> eval_message_string_var conf mess.m_ident sl
       | _ -> raise Not_found ]
   | ["next_pos"] ->
       match get_env "mess" env with
-      [ Vmess _ pos _ ic_len ->
+      [ Vmess _ _ pos _ ic_len ->
           loop pos where rec loop pos =
             if pos = ic_len then VVstring ""
             else
@@ -546,11 +575,18 @@ and eval_message_var conf base env =
       | _ -> raise Not_found ]
   | ["pos"] ->
       match get_env "mess" env with
-      [ Vmess _ pos _ _ -> VVstring (string_of_int pos)
+      [ Vmess _ _ pos _ _ -> VVstring (string_of_int pos)
+      | _ -> raise Not_found ]
+  | ["prev_date" :: sl] ->
+      match get_env "mess" env with
+      [ Vmess _ prev_mess _ _ _ ->
+          match prev_mess with
+          [ Some mess -> eval_date_var conf mess.m_date sl
+          | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["prev_pos"] ->
       match get_env "mess" env with
-      [ Vmess _ pos next_pos ic_len ->
+      [ Vmess _ _ pos next_pos ic_len ->
           loop next_pos where rec loop next_pos =
             if next_pos > 0 then
               match get_message conf next_pos with
@@ -562,20 +598,28 @@ and eval_message_var conf base env =
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> eval_message_string_var conf mess.m_subject sl
+      [ Vmess mess _ _ _ _ -> eval_message_string_var conf mess.m_subject sl
       | _ -> raise Not_found ]
   | ["text" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> eval_message_text_var conf mess.m_mess sl
+      [ Vmess mess _ _ _ _ -> eval_message_text_var conf mess.m_mess sl
       | _ -> raise Not_found ]
   | ["time"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> VVstring mess.m_time
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_time
       | _ -> raise Not_found ]
   | ["wiki"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ -> VVstring mess.m_wiki
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_wiki
       | _ -> raise Not_found ]
+  | _ -> raise Not_found ]
+and eval_date_var conf date =
+  fun
+  [ ["month"] ->
+      match date with
+      [ Dgreg d _ -> VVstring (string_of_int d.month)
+      | _ -> VVstring "" ]
+  | [] -> VVstring (Date.string_of_date conf date)
   | _ -> raise Not_found ]
 and eval_message_text_var conf str =
   fun
@@ -616,26 +660,27 @@ value print_foreach conf base print_ast eval_expr =
     with
     [ Some ic ->
         let ic_len = in_channel_length ic in
-        let rec loop i =
+        let rec loop prev_mess i =
           if i >= max_mess then pos_in ic
           else
             let pos = ic_len - pos_in ic in
             match read_message conf ic with
             [ Some (mess, accessible) ->
-                if not accessible then loop i
+                if not accessible then loop prev_mess i
                 else
                   let next_pos = ic_len - pos_in ic in
-                  let env = [("mess", Vmess mess pos next_pos ic_len) :: env] in
+                  let vmess = Vmess mess prev_mess pos next_pos ic_len in
+                  let env = [("mess", vmess) :: env] in
                   do {
                     List.iter (print_ast env ()) al;
-                    loop (i + 1);
+                    loop (Some mess) (i + 1);
                   }
             | None -> -1 ]
         in
         do {
           if from_pos < 0 then ()
           else try seek_in ic from_pos with [ Sys_error _ -> () ];
-          let pos = loop 0 in
+          let pos = loop None 0 in
           match get_env "pos" env with
           [ Vpos r -> r.val := pos
           | _ -> () ];
@@ -665,7 +710,7 @@ value print conf base =
         match get_message conf pos with
         [ Some (a, mess, _, next_pos, ic_len) ->
             if a then
-              [("mess", Vmess mess pos next_pos ic_len);
+              [("mess", Vmess mess None pos next_pos ic_len);
                ("pos", Vpos (ref pos))]
             else [("pos", Vpos (ref (-1)))]
         | None -> [("pos", Vpos (ref (-1)))] ]
