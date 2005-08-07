@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.54 2005-08-07 09:09:15 ddr Exp $ *)
+(* $Id: forum.ml,v 4.55 2005-08-07 14:57:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -28,11 +28,13 @@ value forum_file conf =
   Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
 ;
 
+IFDEF OLD THEN declare
 value message_txt conf i =
   transl_nth conf "message/previous message/previous messages/next message" i
 ;
 
 value header_txt conf i = transl_nth conf "ident/email/subject" i;
+end END;
 
 (* Black list *)
 
@@ -779,6 +781,7 @@ end END;
 
 (* Send a message *)
 
+IFDEF OLD THEN declare
 value print_var conf var name opt def_value =
   tag "tr" "align=\"%s\"" conf.left begin
     stag "td" begin
@@ -794,7 +797,7 @@ value print_var conf var name opt def_value =
   end
 ;
 
-value print_add conf base =
+value old_print_add conf base =
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl_decline conf "add" (message_txt conf 0)))
@@ -834,6 +837,16 @@ value print_add conf base =
   }
   else incorrect_request conf
 ;
+end END;
+
+IFDEF OLD THEN declare
+value print_add conf base =
+  if p_getenv conf.env "old" = Some "on" then old_print_add conf base else
+  print conf base
+;
+end ELSE declare
+value print_add conf base = print conf base;
+end END;
 
 value get conf key =
   match p_getenv conf.env key with
@@ -1012,4 +1025,3 @@ value print_del conf base =
   [ Some pos -> delete_forum_message conf base pos
   | None -> print_forum_headers conf base ]
 ;
-
