@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.43 2005-08-07 22:38:29 ddr Exp $ *)
+(* $Id: date.ml,v 4.44 2005-08-08 00:40:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -7,6 +7,7 @@ open Util;
 open Gutil;
 open Config;
 open TemplAst;
+open Printf;
 
 value nbsp = "&nbsp;";
 
@@ -210,7 +211,7 @@ value string_of_ondate conf =
   [ Dgreg d Dgregorian ->
       let s = string_of_on_dmy conf d in
       if d.day > 0 then
-        Printf.sprintf
+        sprintf
           "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
       else s
@@ -222,7 +223,7 @@ value string_of_ondate conf =
       let year_prec =
         if d1.month > 0 && d1.month < 3 ||
            d1.month = 3 && d1.day > 0 && d1.day < 25 then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+          sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
         else ""
       in
       let s =
@@ -230,7 +231,7 @@ value string_of_ondate conf =
           transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
       if d1.day > 0 then
-        Printf.sprintf 
+        sprintf 
           "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
       else s
@@ -239,7 +240,7 @@ value string_of_ondate conf =
       let s = string_of_on_french_dmy conf d1 in
       let s =
         if d1.day > 0 then
-          Printf.sprintf
+          sprintf
             "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
         else s
@@ -510,8 +511,8 @@ value print_year conf date cal var =
         (if cal = Djulian &&
             (date.month > 0 && date.month < 3 ||
              date.month = 3 && date.day > 0 && date.day < 25) then
-           Printf.sprintf "%d/%d" (date.year - 1) (date.year mod 10)
-         else Printf.sprintf "%d" date.year);
+           sprintf "%d/%d" (date.year - 1) (date.year mod 10)
+         else sprintf "%d" date.year);
     end;
     stagn "td" begin
       xtag "input" "type=\"submit\" name=\"y%s2\" value=\" &gt; \"" var;
@@ -781,16 +782,34 @@ value old_print_calendar conf base =
 (* *)
 
 type env 'a =
-  [ Vother of 'a
+  [ Vint of int
+  | Vother of 'a
   | Vnone ]
 ;
 
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
-value eval_var conf env jd loc =
+value rec eval_var conf env jd loc =
   fun
-  [ ["week_day"] ->
+  [ ["date" :: sl] -> eval_date_var conf jd sl
+  | ["integer"] ->
+      match get_env "integer" env with
+      [ Vint i -> VVstring (string_of_int i)
+      | _ -> raise Not_found ]
+  | ["time"] ->
+      let (hh, mm, ss) = conf.time in
+      VVstring (sprintf "%02d:%02d:%02d" hh mm ss)
+  | ["today" :: sl] ->
+      eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+  | _ -> raise Not_found ]
+and eval_date_var conf jd =
+  fun
+  [ ["gregorian" :: sl] ->
+      eval_dmy_var conf (Calendar.gregorian_of_sdn Sure jd) sl
+  | ["julian_day"] -> VVstring (string_of_int jd)
+  | ["week_day"] ->
       let wday =
         let jd_today = Calendar.sdn_of_gregorian conf.today in
         let x = conf.today_wd - jd_today + jd in
@@ -798,11 +817,40 @@ value eval_var conf env jd loc =
       in
       VVstring (string_of_int wday)
   | _ -> raise Not_found ]
+and eval_dmy_var conf dmy =
+  fun
+  [ ["day"] -> VVstring (string_of_int dmy.day)
+  | ["month"] -> VVstring (string_of_int dmy.month)
+  | ["year"] -> VVstring (string_of_int dmy.year)
+  | _ -> raise Not_found ]
+;
+
+value print_foreach conf print_ast eval_expr =
+  let eval_int_expr env jd e =
+    let s = eval_expr env jd e in
+    try int_of_string s with [ Failure _ -> raise Not_found ]
+  in
+  let rec print_foreach env jd loc s sl el al =
+    match (s, sl) with
+    [ ("integer_range", []) -> print_integer_range env jd el al
+    | _ -> raise Not_found ]
+  and print_integer_range env jd el al =
+    let (i1, i2) =
+      match el with
+      [ [[e1]; [e2]] -> (eval_int_expr env jd e1, eval_int_expr env jd e2)
+      | _ -> raise Not_found ]
+    in
+    for i = i1 to i2 do {
+      let env = [("integer", Vint i) :: env] in
+      List.iter (print_ast env jd) al;
+    }
+  in
+  print_foreach
 ;
 
 value print_calendar conf base =
   if p_getenv conf.env "new" <> Some "on" then old_print_calendar conf base else
   Templ.interp conf base "calendar" (eval_var conf)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (fun _ -> raise Not_found) [] (eval_julian_day conf)
+    get_vother set_vother (print_foreach conf) [] (eval_julian_day conf)
 ;

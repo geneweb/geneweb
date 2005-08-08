@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.83 2005-08-07 22:38:29 ddr Exp $ *)
+(* $Id: templ.ml,v 4.84 2005-08-08 00:40:46 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1054,7 +1054,8 @@ value interp
         String.concat "" sl
     | None ->
         match (f, vl) with
-        [ ("nth", [s1; s2]) ->
+        [ ("capitalize", [s]) -> Util.capitale s
+        | ("nth", [s1; s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
             Util.nth_field s1 n
         | _ ->

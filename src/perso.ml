@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.179 2005-08-07 22:38:29 ddr Exp $ *)
+(* $Id: perso.ml,v 4.180 2005-08-08 00:40:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2637,7 +2637,6 @@ value eval_predefined_apply conf env f vl =
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
       | _ -> raise Not_found ]
-  | ("capitalize", [s]) -> capitale s
   | ("hexa", [s]) -> Util.hexa_string s
   | ("initial", [s]) ->
       if String.length s = 0 then ""
