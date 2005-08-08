@@ -1,8 +1,11 @@
-(* $Id: calendar.mli,v 4.5 2005-02-28 04:08:21 ddr Exp $ *)
+(* $Id: calendar.mli,v 4.6 2005-08-08 00:40:46 ddr Exp $ *)
 
 open Def;
 
 value gregorian_of_sdn : precision -> int -> dmy;
+value julian_of_sdn : precision -> int -> dmy;
+value french_of_sdn : precision -> int -> dmy;
+value hebrew_of_sdn : precision -> int -> dmy;
 
 value sdn_of_gregorian : dmy -> int;
 value sdn_of_julian : dmy -> int;
