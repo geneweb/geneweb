@@ -9,6 +9,11 @@ and 01 Jul 2005, but there are a lot of them... I add them when
 I have some time (and some courage).
 
 * GeneWeb server or CGI (gwd)
+  - [08 Aug 05] Fixed bug: in normal access, in personal page,
+    some displayed children could have "x x" and not all for
+    however visible children. Due to combination of authorized_age
+    in perso.ml and fast_auth_age in util.ml (2nd unuseful and
+    perturbating).
   - [14 Jul 05] Fixed small bug: URL without index (";opt=no_index")
     displayed "oc=" twice.
 

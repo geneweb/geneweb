@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.47 2005-07-27 19:06:20 ddr Exp $ *)
+(* $Id: util.mli,v 4.48 2005-08-08 07:01:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -74,6 +74,7 @@ value no_reference : config -> base -> person -> string -> string;
 value person_text : config -> base -> person -> string;
 value person_text_no_html : config -> base -> person -> string;
 value person_text_without_surname : config -> base -> person -> string;
+value person_text_no_surn_no_acc_chk : config -> base -> person -> string;
 value person_text_without_title : config -> base -> person -> string;
 value titled_person_text : config -> base -> person -> title -> string;
 value one_title_text : config -> base -> person -> title -> string;
