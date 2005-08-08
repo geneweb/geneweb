@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.181 2005-08-08 06:43:29 ddr Exp $ *)
+(* $Id: perso.ml,v 4.182 2005-08-08 07:01:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1683,7 +1683,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       in
       if not p_auth && conf.hide_names then "x x"
       else if force_surname then person_text conf base p
-      else person_text_without_surname conf base p
+      else person_text_no_surn_no_acc_chk conf base p
   | "consanguinity" ->
       if p_auth then
         string_of_decimal_num conf

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.153 2005-07-27 19:06:20 ddr Exp $ *)
+(* $Id: util.ml,v 4.154 2005-08-08 07:01:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -675,9 +675,11 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
     beg ^ " " ^ p_surname base p
 ;
 
-value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
+value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
+    base p
+=
   if is_hidden p then restricted_txt conf
-  else if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else if check_acc && conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
     let s =
       match (sou base p.public_name, p.qualifiers) with
@@ -697,7 +699,10 @@ value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
 value person_text = gen_person_text std_access;
 value person_text_no_html = gen_person_text_no_html std_access;
 value person_text_without_surname =
-  gen_person_text_without_surname std_access
+  gen_person_text_without_surname True std_access
+;
+value person_text_no_surn_no_acc_chk =
+  gen_person_text_without_surname False std_access
 ;
 
 value main_title base p =
@@ -794,7 +799,7 @@ value gen_person_text_without_title p_access conf base p =
   match main_title base p with
   [ Some t ->
       if t.t_place == p.surname then
-        gen_person_text_without_surname p_access conf base p
+        gen_person_text_without_surname True p_access conf base p
       else
         match (t.t_name, p.qualifiers) with
         [ (Tname s, [nn :: _]) -> sou base s ^ " <em>" ^ sou base nn ^ "</em>"
