@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.180 2005-08-08 00:40:46 ddr Exp $ *)
+(* $Id: perso.ml,v 4.181 2005-08-08 06:43:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -795,17 +795,6 @@ value warning_use_has_parents_before_parent (bp, ep) var r =
   ELSE r END
 ;
 
-value warning_not_impl (bp, ep) =
-  IFDEF UNIX THEN do {
-    Printf.eprintf "*** <W> %s" template_file.val;
-    Printf.eprintf ", chars %d-%d" bp ep;
-    Printf.eprintf " not implemented\n";
-    flush stderr;
-    raise Not_found
-  }
-  ELSE raise Not_found END
-;
-
 value obsolete_list = ref [];
 
 value obsolete (bp, ep) version var new_var r =
@@ -1514,7 +1503,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           try str_val (eval_str_person_field conf base env ep s) with
           [ Not_found -> obsolete_eval conf base env ep loc s ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
-  | _ -> warning_not_impl loc ]
+  | _ -> raise Not_found ]
 and eval_date_field_var d =
   fun
   [ ["year"] ->
