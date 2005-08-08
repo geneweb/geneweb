@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.44 2005-08-08 00:40:46 ddr Exp $ *)
+(* $Id: date.ml,v 4.45 2005-08-08 13:03:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -806,9 +806,49 @@ value rec eval_var conf env jd loc =
   | _ -> raise Not_found ]
 and eval_date_var conf jd =
   fun
-  [ ["gregorian" :: sl] ->
+  [ ["french" :: sl] ->
+      eval_dmy_var conf (Calendar.french_of_sdn Sure jd) sl
+  | ["gregorian" :: sl] ->
       eval_dmy_var conf (Calendar.gregorian_of_sdn Sure jd) sl
+  | ["hebrew" :: sl] ->
+      eval_dmy_var conf (Calendar.hebrew_of_sdn Sure jd) sl
+  | ["julian" :: sl] ->
+      eval_dmy_var conf (Calendar.julian_of_sdn Sure jd) sl
   | ["julian_day"] -> VVstring (string_of_int jd)
+  | ["julian_day"; "sep1000"] ->
+       VVstring
+         (Num.to_string_sep (transl conf "(thousand separator)")
+            (Num.of_int jd))
+  | ["moon_age"] ->
+        try
+          let (mp, md) = Calendar.moon_phase_of_sdn jd in
+          VVstring (string_of_int md)
+        with [ Failure _ -> VVstring "" ]
+  | ["moon_phase"] ->
+        try
+          let (mp, md) = Calendar.moon_phase_of_sdn jd in
+          let s =
+            let moon_txt i =
+              transl_nth conf
+                 "moon age/new moon/first quarter/full moon/last quarter" i
+            in
+            match mp with
+            [ Calendar.NoPhase -> ""
+            | Calendar.NewMoon hh mm ->
+                sprintf "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (moon_txt 1)) hh mm
+            | Calendar.FirstQuarter hh mm ->
+                sprintf "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (moon_txt 2)) hh mm
+            | Calendar.FullMoon hh mm ->
+                sprintf "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (moon_txt 3)) hh mm
+            | Calendar.LastQuarter hh mm ->
+                sprintf "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (moon_txt 4)) hh mm ]
+          in
+          VVstring s
+        with [ Failure _ -> VVstring "" ]
   | ["week_day"] ->
       let wday =
         let jd_today = Calendar.sdn_of_gregorian conf.today in
