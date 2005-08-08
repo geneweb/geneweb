@@ -1,6 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.45 2005-08-08 13:03:05 ddr Exp $ *)
+(* $Id: date.ml,v 4.46 2005-08-08 19:03:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
+
+DEFINE OLD;
 
 open Def;
 open Util;
@@ -257,18 +259,6 @@ value string_of_ondate conf =
   | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")" ]
 ;
 
-(*
-value string_of_ondate conf d =
-  match d with
-  [ Dgreg {day = day; month = month; year = year} _
-    when day <> 0 && month <> 0 && not conf.cancel_links ->
-      "<a href=\"" ^ commd conf ^ "m=CAL;yg=" ^ string_of_int year ^ ";mg=" ^
-      string_of_int month ^ ";dg=" ^ string_of_int day ^ ";tg=ok\">" ^
-      string_of_ondate conf d ^ "</a>"
-  | _ -> string_of_ondate conf d ]
-;
-*)
-
 value string_of_date conf =
   fun
   [ Dgreg d _ -> string_of_dmy conf d
@@ -310,12 +300,6 @@ value year_text d =
   | OrYear x -> s ^ "/" ^ string_of_int x
   | YearInt x -> s ^ "/" ^ string_of_int x
   | _ -> s ]
-;
-
-value of_course_died conf p =
-  match Adef.od_of_codate p.birth with
-  [ Some (Dgreg d _) -> conf.Config.today.year - d.year > 120
-  | _ -> False ]
 ;
 
 value get_birth_death_date p =
@@ -494,6 +478,70 @@ value print_dates conf base p =
 
 (* Calendar request *)
 
+value eval_julian_day conf =
+  let getint v =
+    match p_getint conf.env v with
+    [ Some x -> x
+    | _ -> 0 ]
+  in
+  List.fold_left
+    (fun d (var, cal, conv, max_month) ->
+       let yy =
+         match p_getenv conf.env ("y" ^ var) with
+         [ Some v ->
+            try
+              let len = String.length v in
+              if cal = Djulian && len > 2 && v.[len-2] = '/' then
+                int_of_string (String.sub v 0 (len - 2)) + 1
+              else int_of_string v
+            with
+            [ Failure _ -> 0 ]
+         | None -> 0 ]
+       in
+       let mm = getint ("m" ^ var) in
+       let dd = getint ("d" ^ var) in
+       let dt = {day = dd; month = mm; year = yy; prec = Sure; delta = 0} in
+       match p_getenv conf.env ("t" ^ var) with
+       [ Some _ -> conv dt
+       | None ->
+           match
+             (p_getenv conf.env ("y" ^ var ^ "1"),
+              p_getenv conf.env ("y" ^ var ^ "2"),
+              p_getenv conf.env ("m" ^ var ^ "1"),
+              p_getenv conf.env ("m" ^ var ^ "2"),
+              p_getenv conf.env ("d" ^ var ^ "1"),
+              p_getenv conf.env ("d" ^ var ^ "2"))
+           with
+           [ (Some _, _, _, _, _, _) -> conv {(dt) with year = yy - 1}
+           | (_, Some _, _, _, _, _) -> conv {(dt) with year = yy + 1}
+           | (_, _, Some _, _, _, _) ->
+               let (yy, mm) =
+                 if mm = 1 then (yy - 1, max_month) else (yy, mm - 1)
+               in
+               conv {(dt) with year = yy; month = mm}
+           | (_, _, _, Some _, _, _) ->
+               let (yy, mm) =
+                 if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
+               in
+               let r = conv {(dt) with year = yy; month = mm} in
+               if r = conv dt then
+                 (* turn around problem with Hebrew Adar1/Adar2 *)
+                 let (yy, mm) =
+                   if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
+                 in
+                 conv {(dt) with year = yy; month = mm}
+               else r
+           | (_, _, _, _, Some _, _) -> conv {(dt) with day = dd - 1}
+           | (_, _, _, _, _, Some _) -> conv {(dt) with day = dd + 1}
+           | _ -> d ] ])
+    (Calendar.sdn_of_gregorian conf.today)
+    [("g", Dgregorian, Calendar.sdn_of_gregorian, 12);
+     ("j", Djulian, Calendar.sdn_of_julian, 12);
+     ("f", Dfrench, Calendar.sdn_of_french, 13);
+     ("h", Dhebrew, Calendar.sdn_of_hebrew, 13)]
+;  
+
+IFDEF OLD THEN declare
 value gregorian_month_name conf n =
   capitale (nominative (transl_nth conf "(month)" n))
 ;
@@ -606,69 +654,6 @@ value print_calendar_head conf order =
   end
 ;
 
-value eval_julian_day conf =
-  let getint v =
-    match p_getint conf.env v with
-    [ Some x -> x
-    | _ -> 0 ]
-  in
-  List.fold_left
-    (fun d (var, cal, conv, max_month) ->
-       let yy =
-         match p_getenv conf.env ("y" ^ var) with
-         [ Some v ->
-            try
-              let len = String.length v in
-              if cal = Djulian && len > 2 && v.[len-2] = '/' then
-                int_of_string (String.sub v 0 (len - 2)) + 1
-              else int_of_string v
-            with
-            [ Failure _ -> 0 ]
-         | None -> 0 ]
-       in
-       let mm = getint ("m" ^ var) in
-       let dd = getint ("d" ^ var) in
-       let dt = {day = dd; month = mm; year = yy; prec = Sure; delta = 0} in
-       match p_getenv conf.env ("t" ^ var) with
-       [ Some _ -> conv dt
-       | None ->
-           match
-             (p_getenv conf.env ("y" ^ var ^ "1"),
-              p_getenv conf.env ("y" ^ var ^ "2"),
-              p_getenv conf.env ("m" ^ var ^ "1"),
-              p_getenv conf.env ("m" ^ var ^ "2"),
-              p_getenv conf.env ("d" ^ var ^ "1"),
-              p_getenv conf.env ("d" ^ var ^ "2"))
-           with
-           [ (Some _, _, _, _, _, _) -> conv {(dt) with year = yy - 1}
-           | (_, Some _, _, _, _, _) -> conv {(dt) with year = yy + 1}
-           | (_, _, Some _, _, _, _) ->
-               let (yy, mm) =
-                 if mm = 1 then (yy - 1, max_month) else (yy, mm - 1)
-               in
-               conv {(dt) with year = yy; month = mm}
-           | (_, _, _, Some _, _, _) ->
-               let (yy, mm) =
-                 if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
-               in
-               let r = conv {(dt) with year = yy; month = mm} in
-               if r = conv dt then
-                 (* turn around problem with Hebrew Adar1/Adar2 *)
-                 let (yy, mm) =
-                   if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
-                 in
-                 conv {(dt) with year = yy; month = mm}
-               else r
-           | (_, _, _, _, Some _, _) -> conv {(dt) with day = dd - 1}
-           | (_, _, _, _, _, Some _) -> conv {(dt) with day = dd + 1}
-           | _ -> d ] ])
-    (Calendar.sdn_of_gregorian conf.today)
-    [("g", Dgregorian, Calendar.sdn_of_gregorian, 12);
-     ("j", Djulian, Calendar.sdn_of_julian, 12);
-     ("f", Dfrench, Calendar.sdn_of_french, 13);
-     ("h", Dhebrew, Calendar.sdn_of_hebrew, 13)]
-;  
-
 value old_print_calendar conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl_nth conf "calendar/calendars" 1))
@@ -778,6 +763,7 @@ value old_print_calendar conf base =
     trailer conf;
   }
 ;
+end END;
 
 (* *)
 
@@ -888,9 +874,17 @@ value print_foreach conf print_ast eval_expr =
   print_foreach
 ;
 
+IFDEF OLD THEN declare
 value print_calendar conf base =
-  if p_getenv conf.env "new" <> Some "on" then old_print_calendar conf base else
+  if p_getenv conf.env "old" = Some "on" then old_print_calendar conf base else
   Templ.interp conf base "calendar" (eval_var conf)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (print_foreach conf) [] (eval_julian_day conf)
 ;
+end ELSE declare
+value print_calendar conf base =
+  Templ.interp conf base "calendar" (eval_var conf)
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf) [] (eval_julian_day conf)
+;
+end END;
