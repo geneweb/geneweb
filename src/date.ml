@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.47 2005-08-09 02:54:37 ddr Exp $ *)
+(* $Id: date.ml,v 4.48 2005-08-09 03:46:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -792,14 +792,10 @@ value rec eval_var conf env jd loc =
   | _ -> raise Not_found ]
 and eval_date_var conf jd =
   fun
-  [ ["french" :: sl] ->
-      eval_dmy_var conf (Calendar.french_of_sdn Sure jd) sl
-  | ["gregorian" :: sl] ->
-      eval_dmy_var conf (Calendar.gregorian_of_sdn Sure jd) sl
-  | ["hebrew" :: sl] ->
-      eval_dmy_var conf (Calendar.hebrew_of_sdn Sure jd) sl
-  | ["julian" :: sl] ->
-      eval_dmy_var conf (Calendar.julian_of_sdn Sure jd) sl
+  [ ["french" :: sl] -> eval_dmy_var (Calendar.french_of_sdn Sure jd) sl
+  | ["gregorian" :: sl] -> eval_dmy_var (Calendar.gregorian_of_sdn Sure jd) sl
+  | ["hebrew" :: sl] -> eval_dmy_var (Calendar.hebrew_of_sdn Sure jd) sl
+  | ["julian" :: sl] -> eval_dmy_var (Calendar.julian_of_sdn Sure jd) sl
   | ["julian_day"] -> VVstring (string_of_int jd)
   | ["julian_day"; "sep1000"] ->
        VVstring
@@ -850,11 +846,16 @@ and eval_moon_phase_var mp =
       in
       VVstring s
   | _ -> raise Not_found ]
-and eval_dmy_var conf dmy =
+and eval_dmy_var dmy =
   fun
   [ ["day"] -> VVstring (string_of_int dmy.day)
   | ["month"] -> VVstring (string_of_int dmy.month)
-  | ["year"] -> VVstring (string_of_int dmy.year)
+  | ["year" :: sl] -> eval_integer dmy.year sl
+  | _ -> raise Not_found ]
+and eval_integer i =
+  fun
+  [ ["roman"] -> VVstring (roman_of_arabian i)
+  | [] -> VVstring (string_of_int i)
   | _ -> raise Not_found ]
 ;
 
