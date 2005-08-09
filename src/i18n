@@ -182,6 +182,7 @@ killed (in action)
 less than one month old
 link
 link between
+linked pages
 list/list (ancestors)
 long display
 loop in database: %s is his/her own ancestor
@@ -332,7 +333,6 @@ update
 use "link" instead of "create"
 visualize/show/hide/summary
 warnings
-what links page
 with
 witness at marriage of %s and %s
 witness/witnesses

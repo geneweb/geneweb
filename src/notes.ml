@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.120 2005-07-29 00:13:06 ddr Exp $ *)
+(* $Id: notes.ml,v 4.121 2005-08-09 08:24:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -32,7 +32,7 @@ value print_whole_notes conf fnotes title s =
     let what_links_page () =
       if fnotes <> "" then
         stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
-          Wserver.wprint "(%s)" (transl conf "what links page");
+          Wserver.wprint "(%s)" (transl conf "linked pages");
         end
       else ()
     in      
@@ -158,7 +158,7 @@ value notes_links_db conf base eliminate_unlinked =
 value print_what_links conf base fnotes =
   let title h =
     do {
-      Wserver.wprint "%s " (capitale (transl conf "what links page"));
+      Wserver.wprint "%s " (capitale (transl conf "linked pages"));
       if h then Wserver.wprint "[%s]" fnotes
       else
         stag "tt" begin
