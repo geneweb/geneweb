@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.52 2005-07-29 07:51:48 ddr Exp $
+# $Id: lex_utf8.txt,v 1.53 2005-08-09 08:08:16 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -9059,6 +9059,7 @@ bg: да се визуализира/да се покаже/да се скрие
 de: veranschaulichen/einblenden/ausblenden/Inhalt
 en: visualize/show/hide/summary
 fr: visualiser/afficher/masquer/sommaire
+it: visualizza/mostra/nascondi/riassunto
 pt: visualizar/mostrar/esconder/sumário
 
     warnings

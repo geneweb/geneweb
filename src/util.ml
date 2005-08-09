@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.154 2005-08-08 07:01:55 ddr Exp $ *)
+(* $Id: util.ml,v 4.155 2005-08-09 08:12:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1351,7 +1351,7 @@ value good_tag_list_fun () =
     [ Some ic ->
         loop [] where rec loop tags =
           match try Some (input_line ic) with [ End_of_file -> None ] with
-          [ Some tag -> loop [String.lowercase tag :: tags]
+          [ Some tg -> loop [String.lowercase tg :: tags]
           | None -> do { close_in ic; tags } ]
     | None -> default_good_tag_list ]
   else default_good_tag_list
