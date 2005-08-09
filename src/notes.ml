@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.121 2005-08-09 08:24:17 ddr Exp $ *)
+(* $Id: notes.ml,v 4.122 2005-08-09 11:23:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -193,7 +193,8 @@ value print_what_links conf base fnotes =
                | NotesLinks.PgMisc fnotes ->
                    stagn "tt" begin
                      Wserver.wprint "[";
-                     stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes begin
+                     stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes
+                     begin
                        Wserver.wprint "%s" fnotes;
                      end;
                      Wserver.wprint "]";

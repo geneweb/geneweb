@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.39 2005-07-06 12:48:12 ddr Exp $ *)
+(* $Id: dag.ml,v 4.40 2005-08-09 11:23:56 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -244,7 +244,9 @@ value displayed_next_char s i =
               | _ -> Some (i, j) ]
           in
           loop1 (i + 1)
-      | _ -> Some (i, i + 1) ]
+      | c ->
+          if utf_8_db.val then Some (i, i + max 1 (Gutil.nbc c))
+          else Some (i, i + 1) ]
 ;
 
 value buff_store_int s blen i j =
