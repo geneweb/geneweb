@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: calendar.txt,v 1.1 2005-08-08 13:03:05 ddr Exp $ -->
+  <!-- $Id: calendar.txt,v 1.2 2005-08-09 02:54:37 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -135,7 +135,13 @@
 </tr>
 <tr>
 <td align="center">
-  %date.moon_phase;
+  %if;(date.moon_phase.index != 0)
+    %apply;capitalize%with;
+      %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
+                 date.moon_phase.index) -%sp;
+      <tt>%date.moon_phase.hour;:%date.moon_phase.minute;</tt> UT
+    %end;
+  %end;
   <br%/>
   <span style="font-size:80%%">(%nn;
     [moon age/new moon/first quarter/full moon/last quarter]0%sp;

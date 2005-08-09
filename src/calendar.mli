@@ -1,4 +1,4 @@
-(* $Id: calendar.mli,v 4.6 2005-08-08 00:40:46 ddr Exp $ *)
+(* $Id: calendar.mli,v 4.7 2005-08-09 02:54:37 ddr Exp $ *)
 
 open Def;
 
@@ -20,11 +20,10 @@ value gregorian_of_hebrew : dmy -> dmy;
 value hebrew_of_gregorian : dmy -> dmy;
 
 type moon_phase =
-  [ NoPhase
-  | NewMoon of int and int
-  | FirstQuarter of int and int
-  | FullMoon of int and int
-  | LastQuarter of int and int ]
+  [ NewMoon
+  | FirstQuarter
+  | FullMoon
+  | LastQuarter ]
 ;
 
-value moon_phase_of_sdn : int -> (moon_phase * int);
+value moon_phase_of_sdn : int -> (option (moon_phase * int * int) * int);

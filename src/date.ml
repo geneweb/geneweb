@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.46 2005-08-08 19:03:55 ddr Exp $ *)
+(* $Id: date.ml,v 4.47 2005-08-09 02:54:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -729,17 +729,17 @@ value old_print_calendar conf base =
             [ Some (mp, md) ->
                 do {
                   match mp with
-                  [ Calendar.NoPhase -> ()
-                  | Calendar.NewMoon hh mm ->
+                  [ None -> ()
+                  | Some (Calendar.NewMoon, hh, mm) ->
                       Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 1)) hh mm
-                  | Calendar.FirstQuarter hh mm ->
+                  | Some (Calendar.FirstQuarter, hh, mm) ->
                       Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 2)) hh mm
-                  | Calendar.FullMoon hh mm ->
+                  | Some (Calendar.FullMoon, hh, mm) ->
                       Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 3)) hh mm
-                  | Calendar.LastQuarter hh mm ->
+                  | Some (Calendar.LastQuarter, hh, mm) ->
                       Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 4)) hh mm ];
                   xtag "br";
@@ -810,30 +810,10 @@ and eval_date_var conf jd =
           let (mp, md) = Calendar.moon_phase_of_sdn jd in
           VVstring (string_of_int md)
         with [ Failure _ -> VVstring "" ]
-  | ["moon_phase"] ->
+  | ["moon_phase" :: sl] ->
         try
           let (mp, md) = Calendar.moon_phase_of_sdn jd in
-          let s =
-            let moon_txt i =
-              transl_nth conf
-                 "moon age/new moon/first quarter/full moon/last quarter" i
-            in
-            match mp with
-            [ Calendar.NoPhase -> ""
-            | Calendar.NewMoon hh mm ->
-                sprintf "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 1)) hh mm
-            | Calendar.FirstQuarter hh mm ->
-                sprintf "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 2)) hh mm
-            | Calendar.FullMoon hh mm ->
-                sprintf "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 3)) hh mm
-            | Calendar.LastQuarter hh mm ->
-                sprintf "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 4)) hh mm ]
-          in
-          VVstring s
+          eval_moon_phase_var mp sl
         with [ Failure _ -> VVstring "" ]
   | ["week_day"] ->
       let wday =
@@ -842,6 +822,33 @@ and eval_date_var conf jd =
         if x < 0 then 6 + (x + 1) mod 7 else x mod 7
       in
       VVstring (string_of_int wday)
+  | _ -> raise Not_found ]
+and eval_moon_phase_var mp =
+  fun
+  [ ["hour"] ->
+      let s =
+        match mp with
+        [ None -> ""
+        | Some (_, hh, _) -> sprintf "%02d" hh ]
+      in
+      VVstring s
+  | ["index"] ->
+      let i =
+        match mp with
+        [ None -> 0
+        | Some (Calendar.NewMoon, _, _) -> 1
+        | Some (Calendar.FirstQuarter, _, _) -> 2
+        | Some (Calendar.FullMoon, _, _) -> 3
+        | Some (Calendar.LastQuarter, _, _) -> 4 ]
+      in
+      VVstring (string_of_int i)
+  | ["minute"] ->
+      let s =
+        match mp with
+        [ None -> ""
+        | Some (_, _, mm) -> sprintf "%02d" mm ]
+      in
+      VVstring s
   | _ -> raise Not_found ]
 and eval_dmy_var conf dmy =
   fun
