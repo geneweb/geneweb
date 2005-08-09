@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.53 2005-08-09 08:08:16 ddr Exp $
+# $Id: lex_utf8.txt,v 1.54 2005-08-09 08:24:17 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5030,6 +5030,10 @@ ru: связь между
 sl: sorodstvo med
 sv: sl&auml;ktskap emellan
 
+    linked pages
+en: linked pages
+fr: pages liées
+
     list/list (ancestors)
 af: lys
 bg: списък
@@ -9088,10 +9092,6 @@ ro: avertisment
 ru: внимание
 sl: opozorila
 sv: varningar
-
-    what links page
-en: what links page
-fr: pages liées
 
     with
 af: met
