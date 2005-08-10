@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.72 2005-05-12 14:43:01 ddr Exp $ *)
+(* $Id: relation.ml,v 4.73 2005-08-10 15:56:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -219,8 +219,21 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
 ;
 
 value print_relation_path conf base ip1 ip2 path ifam excl_faml =
-  if path == [] then ()
-  else do {
+  if path == [] then do {
+    let title _ =
+      Wserver.wprint "%s" (capitale (transl conf "relationship"))
+    in
+    header_no_page_title conf title;
+    trailer conf
+  }
+  else
+    let page_title = capitale (transl conf "relationship") in
+    let after_dag () =
+      tag "p" begin
+        Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
+          (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml]);
+      end
+    in
     let elem_txt p =
       Util.referenced_person_title_text conf base p ^
         Date.short_dates_text conf base p
@@ -233,12 +246,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let hts =
       html_table_of_relation_path_dag conf base elem_txt vbar_txt path
     in
-    Dag.print_html_table conf hts;
-    tag "p" begin
-      Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
-        (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml]);
-    end
-  }
+    Dag.print_dag_page conf True page_title hts after_dag
 ;
 
 type node =
@@ -435,23 +443,7 @@ value print_shortest_path conf base p1 p2 =
     let ip2 = p2.cle_index in
     match get_shortest_path_relation conf base ip1 ip2 excl_faml with
     [ Some (path, ifam) ->
-        if p_getenv conf.env "slices" = Some "on" then
-          Dag.print_slices_menu conf base None
-        else do {
-          let conf =
-            (* changing doctype to transitional because use of
-               <hr width=... align=...> *)
-            let doctype =
-              match p_getenv conf.base_env "doctype" with
-              [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-              | _ -> "xhtml-1.0-trans" ]
-            in
-            {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
-          in
-          header_no_page_title conf title;
-          print_relation_path conf base ip1 ip2 path ifam excl_faml;
-          trailer conf
-        }
+        print_relation_path conf base ip1 ip2 path ifam excl_faml
     | None ->
         let s1 = gen_person_title_text reference raw_access conf base p1 in
         let s2 = gen_person_title_text reference raw_access conf base p2 in
@@ -1414,10 +1406,8 @@ value print_main_relationship conf base long p1 p2 rel =
 ;
 
 value print_multi_relation_html_table conf hts pl2 lim assoc_txt =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  do {
-    header_no_page_title conf title;
-    Dag.print_html_table conf hts;
+  let page_title = capitale (transl conf "relationship") in
+  let after_dag () =
     match pl2 with
     [ [] -> ()
     | _ ->
@@ -1439,9 +1429,9 @@ value print_multi_relation_html_table conf hts pl2 lim assoc_txt =
           in
           if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
           Wserver.wprint "\">&gt;&gt;</a>\n"
-        } ];
-    trailer conf
-  }
+        } ]
+  in
+  Dag.print_dag_page conf False page_title hts after_dag
 ;
 
 value print_no_relationship conf base pl =
@@ -1511,9 +1501,7 @@ value print_multi_relation conf base pl lim assoc_txt =
     let hts =
       html_table_of_relation_path_dag conf base elem_txt vbar_txt path
     in
-    if p_getenv conf.env "slices" = Some "on" then
-      Dag.print_slices_menu conf base (Some hts)
-    else print_multi_relation_html_table conf hts pl2 lim assoc_txt
+    print_multi_relation_html_table conf hts pl2 lim assoc_txt
 ;
 
 value print_base_loop conf base p =
