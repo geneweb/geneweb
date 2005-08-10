@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.184 2005-08-10 17:54:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.185 2005-08-10 19:01:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2310,12 +2310,7 @@ value print_foreach conf base print_ast eval_expr =
     let hts =
       let dag_elem n = n in
       let vbar_txt n = n in
-      let phony n =
-        match n.Dag2html.valu with
-        [ Dag.Left _ -> False
-        | Dag.Right _ -> True ]
-      in
-      Dag.html_table_of_dag dag_elem vbar_txt phony True False d
+      Dag.html_table_of_dag dag_elem vbar_txt True False d
     in
     for i = 0 to Array.length hts - 1 do {
       let env = [("dag_line", Vdline hts.(i)) :: env] in
