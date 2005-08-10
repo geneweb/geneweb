@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.45 2005-07-24 15:39:49 ddr Exp $ *)
+(* $Id: descend.ml,v 4.46 2005-08-10 15:56:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -883,7 +883,6 @@ value display_descendant_with_table conf base max_lev a =
 ;
 
 value make_tree_hts conf base gv p =
-  let gv = min (limit_by_tree conf) gv in
   let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
   let td_prop =
     match Util.p_getenv conf.env "td" with
@@ -1134,19 +1133,15 @@ value make_tree_hts conf base gv p =
   hts
 ;
 
-value print_tree conf base gv p =
+value print_tree conf base v p =
+  let gv = min (limit_by_tree conf) v in
   let hts = make_tree_hts conf base gv p in
-  if p_getenv conf.env "slices" = Some "on" then
-    Dag.print_slices_menu conf base (Some hts)
-  else do {
-    let title _ =
-      Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
-        (person_text_no_html conf base p)
-    in
-    header_no_page_title conf title;
-    Dag.print_html_table conf hts;
-    trailer conf
-  }
+  let page_title =
+    Printf.sprintf "%s: %s" (capitale (transl conf "tree"))
+      (person_text_no_html conf base p)
+  in
+  let after_dag () = () in
+  Dag.print_dag_page conf False page_title hts after_dag
 ;
 
 value print_aboville conf base max_level p =

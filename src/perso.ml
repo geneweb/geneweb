@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.182 2005-08-08 07:01:55 ddr Exp $ *)
+(* $Id: perso.ml,v 4.183 2005-08-10 15:56:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2306,7 +2306,7 @@ value print_foreach conf base print_ast eval_expr =
       [ Vdag d -> d.val
       | _ -> raise Not_found ]
     in
-    let d = Dag.make_dag conf base (Dag.Pset.elements set) in
+    let d = Dag.make_dag conf base set in
     let hts =
       let dag_elem n = n in
       let vbar_txt n = n in
@@ -2716,7 +2716,7 @@ value limit_by_tree conf =
   | None -> 7 ]
 ;
 
-value print_dag conf base v p =
+value print_ancestors_dag conf base v p =
   let v = min (limit_by_tree conf) v in
   let set =
     loop Dag.Pset.empty v p.cle_index where rec loop set lev ip =
@@ -2730,15 +2730,14 @@ value print_dag conf base v p =
             loop set (lev - 1) (father cpl)
         | None -> set ]
   in
-  let d = Dag.make_dag conf base (Dag.Pset.elements set) in
-  Dag.gen_print_dag conf base False True set [] d
+  Dag.print_dag conf base False True set []
 ;
 
 value print_ascend conf base p =
   match
     (p_getenv conf.env "t", p_getenv conf.env "dag", p_getint conf.env "v")
   with
-  [ (Some "T", Some "on", Some v) -> print_dag conf base v p
+  [ (Some "T", Some "on", Some v) -> print_ancestors_dag conf base v p
   | _ ->
       let templ =
         match p_getenv conf.env "t" with

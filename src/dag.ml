@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.40 2005-08-09 11:23:56 ddr Exp $ *)
+(* $Id: dag.ml,v 4.41 2005-08-10 15:56:05 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -65,7 +65,8 @@ type sum 'a 'b =
   | Right of 'b ]
 ;
 
-value make_dag conf base list =
+value make_dag conf base set =
+  let list = Pset.elements set in
   let module O = struct type t = iper; value compare = compare; end in
   let module M = Map.Make O in
   let nodes = Array.of_list list in
@@ -827,7 +828,7 @@ value make_tree_hts
   html_table_of_dag indi_txt vbar_txt phony invert no_group d
 ;
 
-value print_slices_menu conf base hts_opt =
+value print_slices_menu conf hts_opt =
   let txt n =
     Util.capitale
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
@@ -896,30 +897,48 @@ value print_slices_menu conf base hts_opt =
   }
 ;
 
-value gen_print_dag conf base spouse_on invert set spl d =
+value print_dag_page conf transi page_title hts after_dag =
+  if p_getenv conf.env "slices" = Some "on" then
+    print_slices_menu conf (Some hts)
+  else
+    let conf =
+      if transi then
+        let doctype =
+          match p_getenv conf.base_env "doctype" with
+          [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+          | _ -> "xhtml-1.0-trans" ]
+        in
+        {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+      else conf
+    in
+    let title _ = Wserver.wprint "%s" page_title in
+    do {
+      Util.header_no_page_title conf title;
+      print_html_table conf hts;
+      after_dag ();
+      Util.trailer conf
+    }
+;
+
+value print_dag conf base spouse_on invert set spl =
+  let d = make_dag conf base set in
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  let page_title = Util.capitale (Util.transl conf "tree") in
+  let after_dag () = () in
+
   let dag_elem_txt p =
     Util.referenced_person_title_text conf base p ^
       Date.short_dates_text conf base p
   in
   let vbar_txt ip = "" in
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let hts =
     make_tree_hts conf base dag_elem_txt vbar_txt spouse_on invert no_group
       set spl d
   in
-  if p_getenv conf.env "slices" = Some "on" then
-    print_slices_menu conf base (Some hts)
-  else do {
-    let title _ =
-      Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
-    in
-    Util.header_no_page_title conf title;
-    print_html_table conf hts;
-    Util.trailer conf
-  }
+  print_dag_page conf True page_title hts after_dag
 ;
 
-value print_dag conf base set spl d =
+value print conf base =
   let spouse_on =
     match Util.p_getenv conf.env "spouse" with
     [ Some "on" -> True
@@ -930,11 +949,6 @@ value print_dag conf base set spl d =
     [ Some "on" -> True
     | _ -> False ]
   in
-  gen_print_dag conf base spouse_on invert set spl d
-;
-
-value print conf base =
   let set = get_dag_elems conf base in
-  let d = make_dag conf base (Pset.elements set) in
-  print_dag conf base set [] d
+  print_dag conf base spouse_on invert set []
 ;

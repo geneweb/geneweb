@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.26 2005-03-24 11:43:15 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.27 2005-08-10 15:56:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -758,9 +758,17 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
            | None -> spl ])
         [(p1.cle_index, "3"); (p2.cle_index, "4")] []
     in
-    let list = Dag.Pset.elements set in
-    let d = Dag.make_dag conf base list in
-    Dag.print_dag conf base set spl d
+    let spouse_on =
+      match Util.p_getenv conf.env "spouse" with
+      [ Some "on" -> True
+      | _ -> False ]
+    in
+    let invert =
+      match Util.p_getenv conf.env "invert" with
+      [ Some "on" -> True
+      | _ -> False ]
+    in
+    Dag.print_dag conf base spouse_on invert set spl
   with
   [ Exit -> Util.incorrect_request conf ]
 ;
