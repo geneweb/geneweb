@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.41 2005-08-10 15:56:05 ddr Exp $ *)
+(* $Id: dag.ml,v 4.42 2005-08-10 17:54:28 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -741,8 +741,13 @@ value html_table_of_dag indi_txt vbar_txt phony invert no_group d =
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
-value make_tree_hts
-    conf base elem_txt vbar_txt spouse_on invert no_group set spl d =
+value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
+  let spouse_on =
+    match Util.p_getenv conf.env "spouse" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let bd =
     match Util.p_getint conf.env "bd" with
     [ Some x -> x
@@ -920,35 +925,25 @@ value print_dag_page conf transi page_title hts after_dag =
     }
 ;
 
-value print_dag conf base spouse_on invert set spl =
+value print_dag conf base invert set spl =
   let d = make_dag conf base set in
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let page_title = Util.capitale (Util.transl conf "tree") in
   let after_dag () = () in
-
   let dag_elem_txt p =
     Util.referenced_person_title_text conf base p ^
       Date.short_dates_text conf base p
   in
   let vbar_txt ip = "" in
-  let hts =
-    make_tree_hts conf base dag_elem_txt vbar_txt spouse_on invert no_group
-      set spl d
-  in
+  let hts = make_tree_hts conf base dag_elem_txt vbar_txt invert set spl d in
   print_dag_page conf True page_title hts after_dag
 ;
 
 value print conf base =
-  let spouse_on =
-    match Util.p_getenv conf.env "spouse" with
-    [ Some "on" -> True
-    | _ -> False ]
-  in
+  let set = get_dag_elems conf base in
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
     | _ -> False ]
   in
-  let set = get_dag_elems conf base in
-  print_dag conf base spouse_on invert set []
+  print_dag conf base invert set []
 ;
