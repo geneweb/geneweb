@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.74 2005-08-10 17:54:28 ddr Exp $ *)
+(* $Id: relation.ml,v 4.75 2005-08-10 19:01:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -181,7 +181,6 @@ value dag_of_relation_path conf base path =
 value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
   let page_title = capitale (transl conf "relationship") in
   let (set, d) = dag_of_relation_path conf base path in
-
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.42 2005-08-10 17:54:28 ddr Exp $ *)
+(* $Id: dag.ml,v 4.43 2005-08-10 19:01:57 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -735,19 +735,24 @@ value print_html_table conf hts =
   }
 ;
 
-value html_table_of_dag indi_txt vbar_txt phony invert no_group d =
+value html_table_of_dag indi_txt vbar_txt invert no_group d =
+  let phony n =
+    match n.valu with
+    [ Left _ -> False
+    | Right _ -> True ]
+  in
   let t = Dag2html.table_of_dag phony False invert no_group d in
   if Array.length t.table = 0 then [| |]
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
 value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match Util.p_getenv conf.env "spouse" with
     [ Some "on" -> True
     | _ -> False ]
   in
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let bd =
     match Util.p_getint conf.env "bd" with
     [ Some x -> x
@@ -825,12 +830,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     [ Left ip -> vbar_txt ip
     | _ -> "" ]
   in
-  let phony n =
-    match n.valu with
-    [ Left _ -> False
-    | Right _ -> True ]
-  in
-  html_table_of_dag indi_txt vbar_txt phony invert no_group d
+  html_table_of_dag indi_txt vbar_txt invert no_group d
 ;
 
 value print_slices_menu conf hts_opt =
@@ -909,6 +909,8 @@ value print_dag_page conf transi page_title hts after_dag =
     let conf =
       if transi then
         let doctype =
+          (* changing doctype to transitional because use of
+             <hr width=... align=...> *)
           match p_getenv conf.base_env "doctype" with
           [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
           | _ -> "xhtml-1.0-trans" ]
