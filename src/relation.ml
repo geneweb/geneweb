@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.73 2005-08-10 15:56:05 ddr Exp $ *)
+(* $Id: relation.ml,v 4.74 2005-08-10 17:54:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -160,7 +160,7 @@ value dag_of_ind_dag_list indl =
     indl
 ;
 
-value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
+value dag_of_relation_path conf base path =
   let indl = dag_ind_list_of_path path in
   let indl = add_missing_parents_of_siblings conf base indl in
   let faml = dag_fam_list_of_ind_list indl in
@@ -175,19 +175,20 @@ value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
          | Dag.Right _ -> set ])
       Dag.Pset.empty nl
   in
-  let spouse_on =
-    match Util.p_getenv conf.env "spouse" with
-    [ Some "on" -> True
-    | _ -> False ]
-  in
+  (set, d)
+;
+
+value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+  let page_title = capitale (transl conf "relationship") in
+  let (set, d) = dag_of_relation_path conf base path in
+
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
     | _ -> False ]
   in
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
-  Dag.make_tree_hts conf base elem_txt vbar_txt spouse_on invert no_group set
-    [] d
+  let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
+  Dag.print_dag_page conf True page_title hts after_dag
 ;
 
 value next_relation_link_txt conf ip1 ip2 excl_faml =
@@ -227,7 +228,6 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     trailer conf
   }
   else
-    let page_title = capitale (transl conf "relationship") in
     let after_dag () =
       tag "p" begin
         Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
@@ -243,10 +243,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
       let excl_faml = Array.to_list u.family @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
-    let hts =
-      html_table_of_relation_path_dag conf base elem_txt vbar_txt path
-    in
-    Dag.print_dag_page conf True page_title hts after_dag
+    print_relationship_dag conf base elem_txt vbar_txt path after_dag
 ;
 
 type node =
@@ -1405,33 +1402,29 @@ value print_main_relationship conf base long p1 p2 rel =
   }
 ;
 
-value print_multi_relation_html_table conf hts pl2 lim assoc_txt =
-  let page_title = capitale (transl conf "relationship") in
-  let after_dag () =
-    match pl2 with
-    [ [] -> ()
-    | _ ->
-        do {
-          Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
-          let _ =
-            List.fold_left
-              (fun n p ->
-                 do {
-                   Wserver.wprint ";i%d=%d" n (Adef.int_of_iper p.cle_index);
-                   try
-                     let t = Hashtbl.find assoc_txt p.cle_index in
-                     Wserver.wprint ";t%d=%s" n t
-                   with
-                   [ Not_found -> () ];
-                   n + 1
-                 })
-              1 pl2
-          in
-          if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
-          Wserver.wprint "\">&gt;&gt;</a>\n"
-        } ]
-  in
-  Dag.print_dag_page conf False page_title hts after_dag
+value multi_relation_after_dag conf pl2 lim assoc_txt () =
+  match pl2 with
+  [ [] -> ()
+  | _ ->
+      do {
+        Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+        let _ =
+          List.fold_left
+            (fun n p ->
+               do {
+                 Wserver.wprint ";i%d=%d" n (Adef.int_of_iper p.cle_index);
+                 try
+                   let t = Hashtbl.find assoc_txt p.cle_index in
+                   Wserver.wprint ";t%d=%s" n t
+                 with
+                 [ Not_found -> () ];
+                 n + 1
+               })
+            1 pl2
+        in
+        if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
+        Wserver.wprint "\">&gt;&gt;</a>\n"
+      } ]
 ;
 
 value print_no_relationship conf base pl =
@@ -1483,25 +1476,23 @@ value print_multi_relation conf base pl lim assoc_txt =
               loop path pl
           | None -> loop path pl ]
       | [_] | [] -> path ]
-  in
-  let elem_txt p =
-    let txt =
-      Util.referenced_person_title_text conf base p ^
-        Date.short_dates_text conf base p
-    in
-    try
-      let t = Hashtbl.find assoc_txt p.cle_index in
-      txt ^ " <b>(" ^ t ^ ")</b>"
-    with
-    [ Not_found -> txt ]
-  in
-  let vbar_txt ip = "" in
+  in 
   if path = [] then print_no_relationship conf base pl
   else
-    let hts =
-      html_table_of_relation_path_dag conf base elem_txt vbar_txt path
+    let elem_txt p =
+      let txt =
+        Util.referenced_person_title_text conf base p ^
+          Date.short_dates_text conf base p
+       in
+       try
+         let t = Hashtbl.find assoc_txt p.cle_index in
+           txt ^ " <b>(" ^ t ^ ")</b>"
+       with
+       [ Not_found -> txt ]
     in
-    print_multi_relation_html_table conf hts pl2 lim assoc_txt
+    let vbar_txt ip = "" in
+    let after_dag = multi_relation_after_dag conf pl2 lim assoc_txt in
+    print_relationship_dag conf base elem_txt vbar_txt path after_dag
 ;
 
 value print_base_loop conf base p =
