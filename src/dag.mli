@@ -1,4 +1,4 @@
-(* $Id: dag.mli,v 4.8 2005-08-11 00:42:45 ddr Exp $ *)
+(* $Id: dag.mli,v 4.9 2005-08-11 06:54:52 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -29,10 +29,10 @@ value make_tree_hts :
     Pset.t -> list (iper * (iper * option ifam)) ->
     dag (sum iper 'a) -> html_table string;
 
-value print_dag_page :
-  config -> string -> html_table string -> (unit -> unit) -> unit;
+value print_slices_menu_or_dag_page :
+  config -> base -> string -> html_table string -> (unit -> unit) -> unit;
 
-value print_dag :
-  config -> base -> bool -> Pset.t ->
-    list (iper * (iper * option ifam)) -> unit;
+value make_and_print_dag :
+  config -> base -> bool -> Pset.t -> list (iper * (iper * option ifam)) ->
+    unit;
 value print : config -> base -> unit;

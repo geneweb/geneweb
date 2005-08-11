@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.45 2005-08-11 06:13:12 ddr Exp $ *)
+(* $Id: dag.ml,v 4.46 2005-08-11 06:54:52 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -901,30 +901,32 @@ value print_slices_menu conf hts =
   }
 ;
 
-value print_dag_page conf page_title hts after_dag =
-  if p_getenv conf.env "slices" = Some "on" then
-    print_slices_menu conf hts
-  else
-    let conf =
-      let doctype =
-        (* changing doctype to transitional because use of
-           <hr width=... align=...> *)
-        match p_getenv conf.base_env "doctype" with
-        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-        | _ -> "xhtml-1.0-trans" ]
-      in
-      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+value print_dag_page conf base page_title hts after_dag =
+  let conf =
+    let doctype =
+      (* changing doctype to transitional because use of
+         <hr width=... align=...> *)
+      match p_getenv conf.base_env "doctype" with
+      [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+      | _ -> "xhtml-1.0-trans" ]
     in
-    let title _ = Wserver.wprint "%s" page_title in
-    do {
-      Util.header_no_page_title conf title;
-      print_html_table conf hts;
-      after_dag ();
-      Util.trailer conf
-    }
+    {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+  in
+  let title _ = Wserver.wprint "%s" page_title in
+  do {
+    Util.header_no_page_title conf title;
+    print_html_table conf hts;
+    after_dag ();
+    Util.trailer conf
+  }
 ;
 
-value print_dag conf base invert set spl =
+value print_slices_menu_or_dag_page conf base page_title hts after_dag =
+  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
+  else print_dag_page conf base page_title hts after_dag
+;
+
+value make_and_print_dag conf base invert set spl =
   let d = make_dag conf base set in
   let page_title = Util.capitale (Util.transl conf "tree") in
   let after_dag () = () in
@@ -934,7 +936,7 @@ value print_dag conf base invert set spl =
   in
   let vbar_txt ip = "" in
   let hts = make_tree_hts conf base dag_elem_txt vbar_txt invert set spl d in
-  print_dag_page conf page_title hts after_dag
+  print_slices_menu_or_dag_page conf base page_title hts after_dag
 ;
 
 value print conf base =
@@ -944,5 +946,5 @@ value print conf base =
     [ Some "on" -> True
     | _ -> False ]
   in
-  print_dag conf base invert set []
+  make_and_print_dag conf base invert set []
 ;
