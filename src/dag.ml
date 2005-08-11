@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.44 2005-08-11 00:42:45 ddr Exp $ *)
+(* $Id: dag.ml,v 4.45 2005-08-11 06:13:12 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -759,9 +759,9 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let bd =
     match Util.p_getint conf.env "bd" with
     [ Some x -> x
-    | _ -> 0 ]
+    | None -> 0 ]
   in
-  let td =
+  let td_prop =
     match Util.p_getenv conf.env "td" with
     [ Some x -> " " ^ x
     | _ ->
@@ -819,7 +819,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let indi_txt n =
     let (bd, td) =
       match n.valu with
-      [ Left ip -> (bd, td)
+      [ Left ip -> (bd, td_prop)
       | _ -> (0, "") ]
     in
     if bd > 0 || td <> "" then
