@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.75 2005-08-10 19:01:58 ddr Exp $ *)
+(* $Id: relation.ml,v 4.76 2005-08-11 00:42:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -187,7 +187,7 @@ value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
     | _ -> False ]
   in
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
-  Dag.print_dag_page conf True page_title hts after_dag
+  Dag.print_dag_page conf page_title hts after_dag
 ;
 
 value next_relation_link_txt conf ip1 ip2 excl_faml =

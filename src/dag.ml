@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.43 2005-08-10 19:01:57 ddr Exp $ *)
+(* $Id: dag.ml,v 4.44 2005-08-11 00:42:45 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -670,7 +670,10 @@ value print_table_pre conf hts =
                   let s =
                     match s with
                     [ None -> "|"
-                    | Some s -> "<a href=\"" ^ s ^ "\">|</a>" ]
+                    | Some s ->
+                        sprintf
+                          "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
+                          s ]
                   in
                   let len = displayed_length s in
                   String.make ((sz - len) / 2) ' ' ^ s ^
@@ -833,7 +836,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   html_table_of_dag indi_txt vbar_txt invert no_group d
 ;
 
-value print_slices_menu conf hts_opt =
+value print_slices_menu conf hts =
   let txt n =
     Util.capitale
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
@@ -880,15 +883,11 @@ value print_slices_menu conf hts_opt =
           tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (txt 3);
             let wid =
-              let wid = 78 in
-              match hts_opt with
-              [ Some hts ->
-                  let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
-                  do {
-                    Wserver.wprint "(%d-%d)\n" min_wid max_wid;
-                    max min_wid (min max_wid wid)
-                  }
-              | None -> wid ]
+              let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
+              do {
+                Wserver.wprint "(%d-%d)\n" min_wid max_wid;
+                max min_wid (min max_wid 78)
+              }
             in
             Wserver.wprint "<input name=\"width\" size=\"5\" value=\"%d\">\n"
               wid;
@@ -902,21 +901,19 @@ value print_slices_menu conf hts_opt =
   }
 ;
 
-value print_dag_page conf transi page_title hts after_dag =
+value print_dag_page conf page_title hts after_dag =
   if p_getenv conf.env "slices" = Some "on" then
-    print_slices_menu conf (Some hts)
+    print_slices_menu conf hts
   else
     let conf =
-      if transi then
-        let doctype =
-          (* changing doctype to transitional because use of
-             <hr width=... align=...> *)
-          match p_getenv conf.base_env "doctype" with
-          [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-          | _ -> "xhtml-1.0-trans" ]
-        in
-        {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
-      else conf
+      let doctype =
+        (* changing doctype to transitional because use of
+           <hr width=... align=...> *)
+        match p_getenv conf.base_env "doctype" with
+        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+        | _ -> "xhtml-1.0-trans" ]
+      in
+      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
     in
     let title _ = Wserver.wprint "%s" page_title in
     do {
@@ -937,7 +934,7 @@ value print_dag conf base invert set spl =
   in
   let vbar_txt ip = "" in
   let hts = make_tree_hts conf base dag_elem_txt vbar_txt invert set spl d in
-  print_dag_page conf True page_title hts after_dag
+  print_dag_page conf page_title hts after_dag
 ;
 
 value print conf base =
