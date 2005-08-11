@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.185 2005-08-10 19:01:57 ddr Exp $ *)
+(* $Id: perso.ml,v 4.186 2005-08-11 06:54:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2725,7 +2725,7 @@ value print_ancestors_dag conf base v p =
             loop set (lev - 1) (father cpl)
         | None -> set ]
   in
-  Dag.print_dag conf base True set []
+  Dag.make_and_print_dag conf base True set []
 ;
 
 value print_ascend conf base p =

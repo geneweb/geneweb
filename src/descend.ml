@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.48 2005-08-11 06:13:12 ddr Exp $ *)
+(* $Id: descend.ml,v 4.49 2005-08-11 06:54:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -1145,7 +1145,7 @@ value print_tree conf base v p =
       (person_text_no_html conf base p)
   in
   let after_dag () = () in
-  Dag.print_dag_page conf page_title hts after_dag
+  Dag.print_slices_menu_or_dag_page conf base page_title hts after_dag
 ;
 
 value print_aboville conf base max_level p =
