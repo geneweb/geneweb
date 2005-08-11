@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.46 2005-08-11 06:54:52 ddr Exp $ *)
+(* $Id: dag.ml,v 4.47 2005-08-11 12:30:57 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -7,6 +7,7 @@ open Config;
 open Gutil;
 open Util;
 open Printf;
+open TemplAst;
 
 module Pset = Set.Make (struct type t = iper; value compare = compare; end);
 
@@ -901,7 +902,7 @@ value print_slices_menu conf hts =
   }
 ;
 
-value print_dag_page conf base page_title hts after_dag =
+value old_print_dag_page conf base page_title hts after_dag =
   let conf =
     let doctype =
       (* changing doctype to transitional because use of
@@ -919,6 +920,104 @@ value print_dag_page conf base page_title hts after_dag =
     after_dag ();
     Util.trailer conf
   }
+;
+
+(* *)
+
+type dag_item = string;
+
+type env 'a =
+  [ Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
+  | Vdline of Dag2html.html_table_line dag_item
+  | Vother of 'a
+  | Vnone ]
+;
+
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
+
+value rec eval_var conf page_title env xx loc =
+  fun
+  [ ["dag_cell" :: sl] ->
+      match get_env "dag_cell" env with
+      [ Vdcell dcell -> eval_dag_cell_var conf dcell sl
+      | _ -> raise Not_found ]
+  | ["head_title"] -> VVstring page_title
+  | _ -> raise Not_found ]
+and eval_dag_cell_var conf (colspan, align, td) =
+  fun
+  [ ["align"] ->
+      match align with
+      [ LeftA -> VVstring conf.left
+      | CenterA -> VVstring "center"
+      | RightA -> VVstring conf.right ]
+  | ["bar_link"] ->
+       VVstring (match td with [ TDbar (Some s) -> s | _ -> "" ])
+  | ["colspan"] -> VVstring (string_of_int colspan)
+  | ["is_bar"] ->
+       VVbool (match td with [ TDbar _ -> True | _ -> False ])
+  | ["is_hr_left"] ->
+       match td with
+       [ TDhr LeftA -> VVbool True
+       | _ -> VVbool False ]
+  | ["is_hr_right"] ->
+       match td with
+       [ TDhr RightA -> VVbool True
+       | _ -> VVbool False ]
+  | ["is_nothing"] -> VVbool (td = TDnothing)
+  | ["item"] ->
+      match td with
+      [ TDitem s -> VVstring s
+      | _ -> VVstring "" ]
+  | _ -> raise Not_found ]
+;
+
+value print_var conf hts after_dag =
+  fun
+  [ ["after_dag"] -> after_dag ()
+  | ["glop"] -> print_table conf hts
+  | _ -> raise Not_found ]
+;
+
+value rec print_foreach conf hts print_ast eval_expr env () loc s sl el al =
+  match [s :: sl] with
+  [ ["dag_cell"] -> print_foreach_dag_cell conf print_ast env al
+  | ["dag_line"] -> print_foreach_dag_line conf print_ast env hts al
+  | _ -> raise Not_found ]
+and print_foreach_dag_cell conf print_ast env al =
+  let dline =
+    match get_env "dag_line" env with
+    [ Vdline dline -> dline
+    | _ -> raise Not_found ]
+  in
+  for i = 0 to Array.length dline - 1 do {
+    let print_ast = print_ast [("dag_cell", Vdcell dline.(i)) :: env] () in
+    List.iter print_ast al;
+  }
+and print_foreach_dag_line conf print_ast env hts al =
+  for i = 0 to Array.length hts - 1 do {
+    let print_ast = print_ast [("dag_line", Vdline hts.(i)) :: env] () in
+    List.iter print_ast al;
+  }
+;
+
+value print_dag_page conf base page_title hts after_dag =
+  if p_getenv conf.env "new" <> Some "on" then
+    old_print_dag_page conf base page_title hts after_dag else
+  let conf =
+    let doctype =
+      (* changing doctype to transitional because use of
+         <hr width=... align=...> *)
+      match p_getenv conf.base_env "doctype" with
+      [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+      | _ -> "xhtml-1.0-trans" ]
+    in
+    {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+  in
+  Templ.interp conf base "dag" (eval_var conf page_title)
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found) get_vother
+    set_vother (print_var conf hts after_dag) (print_foreach conf hts) [] ()
 ;
 
 value print_slices_menu_or_dag_page conf base page_title hts after_dag =

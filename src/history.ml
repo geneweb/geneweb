@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.37 2005-08-07 22:38:29 ddr Exp $ *)
+(* $Id: history.ml,v 4.38 2005-08-11 12:30:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 UNDEF OLD;
@@ -514,5 +514,6 @@ value print conf base =
   let env = [("pos", Vpos (ref 0))] in
   Templ.interp conf base "updhist" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf base) env ()
+    get_vother set_vother (fun _ -> raise Not_found) (print_foreach conf base)
+    env ()
 END;

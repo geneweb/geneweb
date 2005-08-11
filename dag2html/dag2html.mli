@@ -1,4 +1,4 @@
-(* $Id: dag2html.mli,v 1.7 2005-06-13 12:27:26 ddr Exp $ *)
+(* $Id: dag2html.mli,v 1.8 2005-08-11 12:30:57 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -23,7 +23,8 @@ type table_data 'a =
   | TDbar of option 'a
   | TDnothing ]
 ;
-type html_table 'a = array (array (int * align * table_data 'a));
+type html_table_line 'a = array (int * align * table_data 'a);
+type html_table 'a = array (html_table_line 'a);
 
 value html_table_struct :
   (node 'a -> 'b) -> (node 'a -> 'b) -> (node 'a -> bool) ->

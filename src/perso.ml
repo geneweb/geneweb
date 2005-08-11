@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.186 2005-08-11 06:54:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.187 2005-08-11 12:30:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -730,7 +730,7 @@ type env 'a =
   | Vdag of ref Dag.Pset.t
   | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
   | Vdesclevtab of Lazy.t (array int)
-  | Vdline of array (int * Dag2html.align * Dag2html.table_data dag_item)
+  | Vdline of Dag2html.html_table_line dag_item
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
@@ -1285,11 +1285,10 @@ and eval_cell_field_var conf base env ep cell loc =
 and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
   fun
   [ ["align"] ->
-      match (align, td) with
-      [ (Dag2html.LeftA, Dag2html.TDhr Dag2html.LeftA) -> VVstring conf.left
-      | (Dag2html.LeftA, _) -> VVstring conf.left
-      | (Dag2html.CenterA, _) -> VVstring "center"
-      | (Dag2html.RightA, _) -> VVstring conf.right ]
+      match align with
+      [ Dag2html.LeftA -> VVstring conf.left
+      | Dag2html.CenterA -> VVstring "center"
+      | Dag2html.RightA -> VVstring conf.right ]
   | ["colspan"] -> VVstring (string_of_int colspan)
   | ["is_bar"] ->
       match td with
@@ -2681,7 +2680,7 @@ value interp_templ templ_fname conf base p =
   in
   Templ.interp conf base templ_fname (eval_var conf base) (eval_transl conf)
     (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ep
+    (fun _ -> raise Not_found) (print_foreach conf base) env ep
 ;
 
 (* Main *)

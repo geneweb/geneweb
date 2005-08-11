@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.9 2005-07-29 09:56:00 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.10 2005-08-11 12:30:57 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -40,7 +40,8 @@ type table_data 'a =
   | TDbar of option 'a
   | TDnothing ]
 ;
-type html_table 'a = array (array (int * align * table_data 'a));
+type html_table_line 'a = array (int * align * table_data 'a);
+type html_table 'a = array (html_table_line 'a);
 
 value html_table_struct indi_txt vbar_txt phony d t =
   let phony =
