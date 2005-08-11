@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.47 2005-08-11 00:42:45 ddr Exp $ *)
+(* $Id: descend.ml,v 4.48 2005-08-11 06:13:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -883,14 +883,18 @@ value display_descendant_with_table conf base max_lev a =
 ;
 
 value make_tree_hts conf base gv p =
-  let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
+  let bd =
+    match Util.p_getint conf.env "bd" with
+    [ Some x -> x
+    | None -> 0 ]
+  in
   let td_prop =
     match Util.p_getenv conf.env "td" with
     [ Some x -> " " ^ x
     | _ ->
         match Util.p_getenv conf.env "color" with
         [ None | Some "" -> ""
-        | Some x -> " bgcolor=" ^ x ] ]
+        | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
   in
   let rec nb_column n v u =
     if v == 0 then n + 1
