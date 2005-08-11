@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.84 2005-08-08 00:40:46 ddr Exp $ *)
+(* $Id: templ.ml,v 4.85 2005-08-11 12:30:57 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -648,6 +648,9 @@ and eval_simple_variable conf env =
         {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
       in
       Util.doctype conf ^ "\n"
+  | "env" ->
+      let bl = List.map (fun (k, v) -> k ^ "=" ^ v ^ ";") conf.env in
+      String.concat "" bl
   | "highlight" -> conf.highlight
   | "image_prefix" -> Util.image_prefix conf
   | "left" -> conf.left
@@ -985,6 +988,7 @@ and print_ast_var conf env =
 ;
 
 value templ_eval_expr = eval_expr;
+value templ_print_var = print_var;
 value templ_print_apply = print_apply;
 
 type vother =
@@ -1014,7 +1018,7 @@ value set_val set_vother k v env = [(k, set_vother (Vval v)) :: env];
 
 value interp
   conf base fname eval_var eval_transl eval_predefined_apply get_vother
-  set_vother print_foreach
+  set_vother print_var print_foreach
 =
   let eval_var env ep loc sl =
     match sl with
@@ -1023,6 +1027,10 @@ value interp
         [ Some v -> VVstring v
         | None -> eval_var env ep loc sl ]
     | _ -> eval_var env ep loc sl ]
+  in
+  let print_var conf base env ep loc s sl =
+    try print_var [s :: sl] with
+    [ Not_found -> templ_print_var conf base (eval_var env ep loc) s sl ]
   in
   let print_wid_hei env fname =
     match Util.image_size (Util.image_file_name fname) with
@@ -1072,7 +1080,7 @@ value interp
   in
   let rec print_ast env ep =
     fun
-    [ Avar loc s sl -> print_var conf base (eval_var env ep loc) s sl
+    [ Avar loc s sl -> print_var conf base env ep loc s sl
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->

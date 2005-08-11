@@ -40,9 +40,9 @@ cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \
 cousins.cmx: adef.cmx birthday.cmx config.cmi date.cmx def.cmi gutil.cmx \
     num.cmx perso.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
 dag.cmo: buff.cmo config.cmi ../dag2html/dag2html.cmi date.cmi def.cmi \
-    gutil.cmi num.cmi util.cmi ../wserver/wserver.cmi dag.cmi 
+    gutil.cmi num.cmi templ.cmi util.cmi ../wserver/wserver.cmi dag.cmi 
 dag.cmx: buff.cmx config.cmi ../dag2html/dag2html.cmx date.cmx def.cmi \
-    gutil.cmx num.cmx util.cmx ../wserver/wserver.cmx dag.cmi 
+    gutil.cmx num.cmx templ.cmx util.cmx ../wserver/wserver.cmx dag.cmi 
 dag.cmi: config.cmi ../dag2html/dag2html.cmi def.cmi 
 date.cmo: adef.cmi buff.cmo calendar.cmi config.cmi def.cmi gutil.cmi num.cmi \
     templ.cmi templAst.cmi util.cmi ../wserver/wserver.cmi date.cmi 

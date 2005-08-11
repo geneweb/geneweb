@@ -1,0 +1,66 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: dag.txt,v 1.1 2005-08-11 12:30:57 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
+  <title>%head_title;</title>
+  <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;(evar.notab != "on")
+  <p><a style="float:%right;
+  " href="%prefix;%env;notab=on;slices=on"><tt>//</tt> </a></p>
+%end;
+
+%if;(evar.notab = "on" or evar.pos2 != "")%table_pre;
+%else;
+  <table border="%border;" width="100%%"><tr><td align="center">
+  <table border="%border;" cellspacing="0" cellpadding="0">
+  %foreach;dag_line;
+    <tr align="left">
+    %foreach;dag_cell;
+      <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
+      %if;dag_cell.is_nothing;&nbsp;%nn;
+      %elseif;dag_cell.is_bar;
+        %if;(dag_cell.bar_link != "" and evar.cgl != "on")
+          <a style="text-decoration:none" href="%dag_cell.bar_link;">|</a>%nn;
+        %else;|%end;
+      %elseif;(dag_cell.item != "")%dag_cell.item;
+      %else;
+        %if;dag_cell.is_hr_left;
+          <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+        %elseif;dag_cell.is_hr_right;
+          <hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+        %else;
+          <hr width="100%%"%/>
+        %end;
+      %end;
+      </td>
+    %end;
+    </tr>
+  %end;
+  </table>
+  </td></tr></table>
+%end;
+
+%after_dag;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>
