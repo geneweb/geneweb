@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.48 2005-08-12 00:06:04 ddr Exp $ *)
+(* $Id: dag.ml,v 4.49 2005-08-12 16:32:24 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -924,13 +924,22 @@ value old_print_dag_page conf base page_title hts after_dag =
 type dag_item = string;
 
 type env 'a =
-  [ Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
+  [ Vdag of (int * int * array int * array int * int)
+  | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
   | Vdline of Dag2html.html_table_line dag_item
+  | Vlazy of Lazy.t (env 'a)
   | Vother of 'a
   | Vnone ]
 ;
 
-value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_env v env =
+  try
+    match List.assoc v env with
+    [ Vlazy l -> Lazy.force l
+    | x -> x ]
+  with
+  [ Not_found -> Vnone ]
+;
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
@@ -940,7 +949,15 @@ value rec eval_var conf page_title env xx loc =
       match get_env "dag_cell" env with
       [ Vdcell dcell -> eval_dag_cell_var conf dcell sl
       | _ -> raise Not_found ]
+  | ["dag" :: sl] ->
+      match get_env "dag" env with
+      [ Vdag d -> eval_dag_var conf d sl
+      | _ -> raise Not_found ]
   | ["head_title"] -> VVstring page_title
+  | _ -> raise Not_found ]
+and eval_dag_var conf (tmincol, tcol, colminsz, colsz, ncol) =
+  fun
+  [ ["ncol"] -> VVstring (string_of_int (Array.fold_left \+ 0 colsz))
   | _ -> raise Not_found ]
 and eval_dag_cell_var conf (colspan, align, td) =
   fun
@@ -1012,9 +1029,33 @@ value print_dag_page conf base page_title hts after_dag =
     in
     {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
   in
+  let env =
+    let table_pre_dim () =
+      let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim conf hts in
+      let dcol =
+        let dcol =
+          match p_getint conf.env "width" with
+          [ Some i -> i
+          | None -> 79 ]
+        in
+        max tmincol (min dcol tcol)
+      in
+      do {
+        if tcol > tmincol then
+          for i = 0 to ncol - 1 do {
+            colsz.(i) :=
+              colminsz.(i) +
+                (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol)
+          }
+        else ();
+        Vdag (tmincol, tcol, colminsz, colsz, ncol)
+      }
+    in
+    [("dag", Vlazy (Lazy.lazy_from_fun table_pre_dim))]
+  in
   Templ.interp conf base "dag" (eval_var conf page_title)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found) get_vother
-    set_vother (print_var conf hts after_dag) (print_foreach conf hts) [] ()
+    set_vother (print_var conf hts after_dag) (print_foreach conf hts) env ()
 ;
 
 value print_slices_menu_or_dag_page conf base page_title hts after_dag =
