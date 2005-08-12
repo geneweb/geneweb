@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.49 2005-08-12 16:32:24 ddr Exp $ *)
+(* $Id: dag.ml,v 4.50 2005-08-12 18:09:48 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -926,7 +926,8 @@ type dag_item = string;
 type env 'a =
   [ Vdag of (int * int * array int * array int * int)
   | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
-  | Vdline of Dag2html.html_table_line dag_item
+  | Vdcellp of (int * array (array string) * int * option int * option int)
+  | Vdline of int
   | Vlazy of Lazy.t (env 'a)
   | Vother of 'a
   | Vnone ]
@@ -945,13 +946,13 @@ value set_vother x = Vother x;
 
 value rec eval_var conf page_title env xx loc =
   fun
-  [ ["dag_cell" :: sl] ->
-      match get_env "dag_cell" env with
-      [ Vdcell dcell -> eval_dag_cell_var conf dcell sl
-      | _ -> raise Not_found ]
-  | ["dag" :: sl] ->
+  [ ["dag" :: sl] ->
       match get_env "dag" env with
       [ Vdag d -> eval_dag_var conf d sl
+      | _ -> raise Not_found ]
+  | ["dag_cell" :: sl] ->
+      match get_env "dag_cell" env with
+      [ Vdcell dcell -> eval_dag_cell_var conf dcell sl
       | _ -> raise Not_found ]
   | ["head_title"] -> VVstring page_title
   | _ -> raise Not_found ]
@@ -987,31 +988,162 @@ and eval_dag_cell_var conf (colspan, align, td) =
   | _ -> raise Not_found ]
 ;
 
-value print_var conf hts after_dag =
+value rec print_var conf hts after_dag env =
   fun
   [ ["after_dag"] -> after_dag ()
-  | ["glop"] -> print_table conf hts
+  | ["dag_cell_pre"] -> print_dag_cell_pre conf hts env
   | _ -> raise Not_found ]
+and print_dag_cell_pre conf hts env =
+  let (_, _, _, colsz, _) =
+    match get_env "dag" env with
+    [ Vdag d -> d
+    | _ -> raise Not_found ]
+  in
+  let i =
+    match get_env "dag_line" env with
+    [ Vdline i -> i
+    | _ -> raise Not_found ]
+  in
+  let (max_row, stra, row, pos1, pos2) =
+    match get_env "dag_cell_pre" env with
+    [ Vdcellp x -> x
+    | _ -> raise Not_found ]
+  in
+  let rec loop pos col j =
+    if j = Array.length hts.(i) then ()
+    else do {
+      let (colspan, align, td) = hts.(i).(j) in
+      let sz =
+        loop 0 colspan where rec loop sz k =
+          if k = 0 then sz else loop (sz + colsz.(col + k - 1)) (k - 1)
+      in
+      let outs =
+        match td with
+        [ TDitem s ->
+            let s =
+              let k =
+                let dk = (max_row - Array.length stra.(j)) / 2 in
+                row - dk
+              in
+              if k >= 0 && k < Array.length stra.(j) then
+                let s = stra.(j).(k) in
+                if s = "&nbsp;" then " " else s
+              else try_add_vbar k (Array.length stra.(j)) hts i col
+            in
+            let len = displayed_length s in
+            String.make ((sz - len) / 2) ' ' ^ s ^
+              String.make (sz - (sz + len) / 2) ' '
+        | TDnothing -> String.make sz ' '
+        | TDbar s ->
+            let s =
+              match s with
+              [ None -> "|"
+              | Some s ->
+                  sprintf
+                    "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
+                    s ]
+            in
+            let len = displayed_length s in
+            String.make ((sz - len) / 2) ' ' ^ s ^
+              String.make (sz - (sz + len) / 2) ' '
+        | TDhr LeftA ->
+            let len = (sz + 1) / 2 in
+            String.make len '-' ^ String.make (sz - len) ' '
+        | TDhr RightA ->
+            let len = sz / 2 in
+            String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
+        | TDhr CenterA -> String.make sz '-' ]
+      in
+      let clipped_outs =
+        if pos1 = None && pos2 = None then outs
+        else
+          let pos1 =
+            match pos1 with
+            [ Some pos1 -> pos1
+            | None -> pos ]
+          in
+          let pos2 =
+            match pos2 with
+            [ Some pos2 -> pos2
+            | None -> pos + sz ]
+          in
+          if pos + sz <= pos1 then ""
+          else if pos > pos2 then ""
+          else if pos2 >= pos + sz then
+            displayed_sub outs (pos1 - pos) (pos + sz - pos1)
+          else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
+          else displayed_sub outs (pos1 - pos) (pos2 - pos1)
+      in
+      Wserver.wprint "%s" clipped_outs;
+      loop (pos + sz) (col + colspan) (j + 1)
+    }
+  in
+  loop 0 0 0
 ;
 
 value rec print_foreach conf hts print_ast eval_expr env () loc s sl el al =
   match [s :: sl] with
-  [ ["dag_cell"] -> print_foreach_dag_cell conf print_ast env al
+  [ ["dag_cell"] -> print_foreach_dag_cell conf hts print_ast env al
+  | ["dag_cell_pre"] -> print_foreach_dag_cell_pre conf hts print_ast env al
   | ["dag_line"] -> print_foreach_dag_line conf print_ast env hts al
   | _ -> raise Not_found ]
-and print_foreach_dag_cell conf print_ast env al =
-  let dline =
+and print_foreach_dag_cell conf hts print_ast env al =
+  let i =
     match get_env "dag_line" env with
-    [ Vdline dline -> dline
+    [ Vdline i -> i
     | _ -> raise Not_found ]
   in
-  for i = 0 to Array.length dline - 1 do {
-    let print_ast = print_ast [("dag_cell", Vdcell dline.(i)) :: env] () in
+  for j = 0 to Array.length hts.(i) - 1 do {
+    let print_ast = print_ast [("dag_cell", Vdcell hts.(i).(j)) :: env] () in
+    List.iter print_ast al;
+  }
+and print_foreach_dag_cell_pre conf hts print_ast env al =
+  let i =
+    match get_env "dag_line" env with
+    [ Vdline i -> i
+    | _ -> raise Not_found ]
+  in
+  let (tmincol, tcol, colminsz, colsz, ncol) =
+    match get_env "dag" env with
+    [ Vdag d -> d
+    | _ -> raise Not_found ]
+  in
+  let (stra, max_row) =
+    let (stral, max_row) =
+      loop [] 1 0 0 where rec loop stral max_row col j =
+        if j = Array.length hts.(i) then (stral, max_row)
+        else
+          let (colspan, _, td) = hts.(i).(j) in
+          let stra =
+            match td with
+            [ TDitem s ->
+                let sz =
+                  loop 0 colspan where rec loop sz k =
+                    if k = 0 then sz
+                    else loop (sz + colsz.(col + k - 1)) (k - 1)
+                in
+                Array.of_list (displayed_strip s sz)
+            | _ -> [| |] ]
+          in
+          loop [stra :: stral] (max max_row (Array.length stra))
+            (col + colspan) (j + 1)
+    in
+    (Array.of_list (List.rev stral), max_row)
+  in
+  let pos1 = p_getint conf.env "pos1" in
+  let pos2 =
+    match p_getint conf.env "pos2" with
+    [ None -> p_getint conf.env "dpos"
+    | x -> x ]
+  in
+  for row = 0 to max_row - 1 do {
+    let v = Vdcellp (max_row, stra, row, pos1, pos2) in
+    let print_ast = print_ast [("dag_cell_pre", v) :: env] () in
     List.iter print_ast al;
   }
 and print_foreach_dag_line conf print_ast env hts al =
   for i = 0 to Array.length hts - 1 do {
-    let print_ast = print_ast [("dag_line", Vdline hts.(i)) :: env] () in
+    let print_ast = print_ast [("dag_line", Vdline i) :: env] () in
     List.iter print_ast al;
   }
 ;

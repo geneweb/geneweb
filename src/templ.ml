@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.88 2005-08-12 16:32:24 ddr Exp $ *)
+(* $Id: templ.ml,v 4.89 2005-08-12 18:09:48 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1034,7 +1034,7 @@ value interp
     [ Not_found -> VVstring (eval_variable conf [] sl) ]
   in
   let print_var conf base env ep loc s sl =
-    try print_var [s :: sl] with
+    try print_var env [s :: sl] with
     [ Not_found -> templ_print_var conf base (eval_var env ep loc) s sl ]
   in
   let print_wid_hei env fname =
