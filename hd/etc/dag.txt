@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: dag.txt,v 1.3 2005-08-12 16:32:24 ddr Exp $ -->
+  <!-- $Id: dag.txt,v 1.4 2005-08-12 18:09:48 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%head_title;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -39,7 +39,9 @@
   </div>
   <pre>
   %foreach;dag_line;
-    %table_pre;%nl;
+    %foreach;dag_cell_pre;
+      %dag_cell_pre;%nl;
+    %end;
   %end;
   </pre>
 %else;
