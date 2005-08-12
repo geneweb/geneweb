@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.47 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: dag.ml,v 4.48 2005-08-12 00:06:04 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -614,7 +614,7 @@ value print_table_pre conf hts =
       [ None -> p_getint conf.env "dpos"
       | x -> x ]
     in
-    print_next_pos conf pos1 pos2 (Array.fold_left  \+ 0 colsz);
+    print_next_pos conf pos1 pos2 (Array.fold_left \+ 0 colsz);
     Wserver.wprint "<pre>\n";
     for i = 0 to Array.length hts - 1 do {
       let (stra, max_row) =
@@ -724,10 +724,11 @@ value print_html_table conf hts =
   do {
     if Util.p_getenv conf.env "notab" <> Some "on" then
       tag "p" begin
-        Wserver.wprint "<a style=\"float:right\" href=\"%s" (commd conf);
+        Wserver.wprint "<div style=\"text-align:%s\"><a href=\"%s" conf.right
+          (commd conf);
         List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
         Wserver.wprint "notab=on;slices=on";
-        Wserver.wprint "\"><tt>//</tt></a>\n";
+        Wserver.wprint "\"><tt>//</tt></a></div>\n";
       end
     else ();
     if Util.p_getenv conf.env "notab" = Some "on" ||
@@ -737,17 +738,6 @@ value print_html_table conf hts =
       print_table_pre conf hts
     else print_table conf hts
   }
-;
-
-value html_table_of_dag indi_txt vbar_txt invert no_group d =
-  let phony n =
-    match n.valu with
-    [ Left _ -> False
-    | Right _ -> True ]
-  in
-  let t = Dag2html.table_of_dag phony False invert no_group d in
-  if Array.length t.table = 0 then [| |]
-  else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
 value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
@@ -834,7 +824,14 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     [ Left ip -> vbar_txt ip
     | _ -> "" ]
   in
-  html_table_of_dag indi_txt vbar_txt invert no_group d
+  let phony n =
+    match n.valu with
+    [ Left _ -> False
+    | Right _ -> True ]
+  in
+  let t = Dag2html.table_of_dag phony False invert no_group d in
+  if Array.length t.table = 0 then [| |]
+  else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
 value print_slices_menu conf hts =
@@ -1025,7 +1022,7 @@ value print_slices_menu_or_dag_page conf base page_title hts after_dag =
   else print_dag_page conf base page_title hts after_dag
 ;
 
-value make_and_print_dag conf base invert set spl =
+value make_and_print_dag conf base vbar_txt invert set spl =
   let d = make_dag conf base set in
   let page_title = Util.capitale (Util.transl conf "tree") in
   let after_dag () = () in
@@ -1033,17 +1030,17 @@ value make_and_print_dag conf base invert set spl =
     Util.referenced_person_title_text conf base p ^
       Date.short_dates_text conf base p
   in
-  let vbar_txt ip = "" in
   let hts = make_tree_hts conf base dag_elem_txt vbar_txt invert set spl d in
   print_slices_menu_or_dag_page conf base page_title hts after_dag
 ;
 
 value print conf base =
   let set = get_dag_elems conf base in
+  let vbar_txt ip = "" in
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
     | _ -> False ]
   in
-  make_and_print_dag conf base invert set []
+  make_and_print_dag conf base vbar_txt invert set []
 ;

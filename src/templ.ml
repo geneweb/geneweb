@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.85 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: templ.ml,v 4.86 2005-08-12 00:06:04 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -354,7 +354,7 @@ value parse_templ conf strm =
         | (_, "(", []) ->
             do {
               parse_comment strm;
-              parse_astl astl bol len end_list strm
+              parse_astl astl False 0 end_list strm
             }
         | (_, v, []) when List.mem v end_list -> (List.rev astl, v)
         | (_, "define", []) -> parse_define astl end_list strm

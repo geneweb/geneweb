@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: dag.txt,v 1.1 2005-08-11 12:30:57 ddr Exp $ -->
+  <!-- $Id: dag.txt,v 1.2 2005-08-12 00:06:04 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%head_title;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -18,8 +18,8 @@
 %message_to_wizard;
 
 %if;(evar.notab != "on")
-  <p><a style="float:%right;
-  " href="%prefix;%env;notab=on;slices=on"><tt>//</tt> </a></p>
+  <div style="text-align:%right;
+  "><a href="%prefix;%env;notab=on;slices=on"><tt>//</tt></a></div>
 %end;
 
 %if;(evar.notab = "on" or evar.pos2 != "")%table_pre;
