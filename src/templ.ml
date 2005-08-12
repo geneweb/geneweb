@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.86 2005-08-12 00:06:04 ddr Exp $ *)
+(* $Id: templ.ml,v 4.87 2005-08-12 14:31:44 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -218,22 +218,24 @@ and parse_expr_3 =
       a
 and parse_expr_4 =
   parser
-    [: e = parse_expr_5;
-       a =
-         parser
-         [ [: `Tok _ PLUS; e2 = parse_expr_5 :] -> Aop2 "+" e e2
-         | [: `Tok _ MINUS; e2 = parse_expr_5 :] -> Aop2 "-" e e2
-         | [: :] -> e ] :] ->
-      a
+    [: e = parse_expr_5; a = parse_expr_4_kont e :] -> a
+and parse_expr_4_kont e =
+  parser
+  [ [: `Tok _ PLUS; e2 = parse_expr_5;
+       a = parse_expr_4_kont (Aop2 "+" e e2) :] -> a
+  | [: `Tok _ MINUS; e2 = parse_expr_5;
+       a = parse_expr_4_kont (Aop2 "-" e e2) :] -> a
+  | [: :] -> e ]
 and parse_expr_5 =
   parser
-    [: e = parse_simple_expr;
-       a =
-         parser
-         [ [: `Tok _ STAR; e2 = parse_simple_expr :] -> Aop2 "*" e e2
-         | [: `Tok _ PERCENT; e2 = parse_simple_expr :] -> Aop2 "%" e e2
-         | [: :] -> e ] :] ->
-      a
+    [: e = parse_simple_expr; a = parse_expr_5_kont e :] -> a
+and parse_expr_5_kont e =
+  parser
+  [ [: `Tok _ STAR; e2 = parse_simple_expr;
+       a = parse_expr_5_kont (Aop2 "*" e e2) :] -> a
+  | [: `Tok _ PERCENT; e2 = parse_simple_expr;
+       a = parse_expr_5_kont (Aop2 "%" e e2) :] -> a
+  | [: :] -> e ]
 and parse_simple_expr =
   parser
   [ [: `Tok _ LPAREN; e = parse_expr;
@@ -1021,12 +1023,15 @@ value interp
   set_vother print_var print_foreach
 =
   let eval_var env ep loc sl =
-    match sl with
-    [ [k] ->
-        match get_val get_vother k env with
-        [ Some v -> VVstring v
-        | None -> eval_var env ep loc sl ]
-    | _ -> eval_var env ep loc sl ]
+    try
+      match sl with
+      [ [k] ->
+          match get_val get_vother k env with
+          [ Some v -> VVstring v
+          | None -> eval_var env ep loc sl ]
+      | _ -> eval_var env ep loc sl ]
+    with
+    [ Not_found -> VVstring (eval_variable conf [] sl) ]
   in
   let print_var conf base env ep loc s sl =
     try print_var [s :: sl] with
