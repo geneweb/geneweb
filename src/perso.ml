@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.187 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: perso.ml,v 4.188 2005-08-12 00:06:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -715,7 +715,6 @@ module SortedList =
   Set.Make (struct type t = list string; value compare = compare_ls; end)
 ;
 
-type dag_item = Dag2html.node (Dag.sum Def.iper string);
 type ancestor_surname_info =
   (string * option date * option date * string * person * list Num.t * loc)
 ;
@@ -727,10 +726,7 @@ type env 'a =
   | Vcell of cell
   | Vcelll of list cell
   | Vcnt of ref int
-  | Vdag of ref Dag.Pset.t
-  | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
   | Vdesclevtab of Lazy.t (array int)
-  | Vdline of Dag2html.html_table_line dag_item
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
@@ -953,10 +949,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
               | _ -> "" ]
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
-  | "empty_dag" ->
-      match get_env "dag" env with
-      [ Vdag d -> do { d.val := Dag.Pset.empty; "" }
-      | _ -> raise Not_found ]
   | "empty_sorted_list" ->
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.empty; "" }
@@ -1121,10 +1113,6 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           let ep = (p, a, u, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | ["dag_cell" :: sl] ->
-      match get_env "dag_cell" env with
-      [ Vdcell dcell -> eval_dag_cell_field_var conf base env ep dcell loc sl
-      | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
@@ -1281,41 +1269,6 @@ and eval_cell_field_var conf base env ep cell loc =
           let ep = make_ep conf base p.cle_index in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | _ -> raise Not_found ]
-and eval_dag_cell_field_var conf base env ep (colspan, align, td) loc =
-  fun
-  [ ["align"] ->
-      match align with
-      [ Dag2html.LeftA -> VVstring conf.left
-      | Dag2html.CenterA -> VVstring "center"
-      | Dag2html.RightA -> VVstring conf.right ]
-  | ["colspan"] -> VVstring (string_of_int colspan)
-  | ["is_bar"] ->
-      match td with
-      [ Dag2html.TDbar _ -> VVbool True
-      | _ -> VVbool False ]
-  | ["is_bar_link"] ->
-      match td with
-      [ Dag2html.TDbar (Some _) -> VVbool True
-      | _ -> VVbool False ]
-  | ["is_hr_left"] ->
-      match td with
-      [ Dag2html.TDhr Dag2html.LeftA -> VVbool True
-      | _ -> VVbool False ]
-  | ["is_hr_right"] ->
-      match td with
-      [ Dag2html.TDhr Dag2html.RightA -> VVbool True
-      | _ -> VVbool False ]
-  | ["is_nothing"] -> VVbool (td = Dag2html.TDnothing)
-  | ["item" :: sl] ->
-      match td with
-      [ Dag2html.TDitem u | Dag2html.TDbar (Some u) ->
-          match u.Dag2html.valu with
-          [ Dag.Left ip ->
-              let ep = make_ep conf base ip in
-              eval_person_field_var conf base env ep loc sl
-          | Dag.Right s -> VVstring "" ]
-      | _ -> VVstring "" ]
   | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
   fun
@@ -2116,8 +2069,6 @@ value print_foreach conf base print_ast eval_expr =
     | "cell" -> print_foreach_cell env el al ep
     | "child" -> print_foreach_child env al ep efam
     | "cousin_level" -> print_foreach_level "max_cous_level" env al ep
-    | "dag_cell" -> print_foreach_dag_cell env el al ep
-    | "dag_line" -> print_foreach_dag_line env el al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
@@ -2289,32 +2240,6 @@ value print_foreach conf base print_ast eval_expr =
              List.iter (print_ast env ep) al)
           des.children
     | _ -> () ]
-  and print_foreach_dag_cell env el al ((p, _, _, _) as ep) =
-    let dline =
-      match get_env "dag_line" env with
-      [ Vdline dline -> dline
-      | _ -> raise Not_found ]
-    in
-    for i = 0 to Array.length dline - 1 do {
-      let env = [("dag_cell", Vdcell dline.(i)) :: env] in
-      List.iter (print_ast env ep) al;
-    }
-  and print_foreach_dag_line env el al ((p, _, _, _) as ep) =
-    let set =
-      match get_env "dag" env with
-      [ Vdag d -> d.val
-      | _ -> raise Not_found ]
-    in
-    let d = Dag.make_dag conf base set in
-    let hts =
-      let dag_elem n = n in
-      let vbar_txt n = n in
-      Dag.html_table_of_dag dag_elem vbar_txt True False d
-    in
-    for i = 0 to Array.length hts - 1 do {
-      let env = [("dag_line", Vdline hts.(i)) :: env] in
-      List.iter (print_ast env ep) al;
-    }
   and print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with
@@ -2610,12 +2535,6 @@ value eval_predefined_apply conf env f vl =
   match (f, vl) with
   [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
   | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
-  | ("add_in_dag", [s]) ->
-      let i = try int_of_string s with [ Failure _ -> raise Not_found ] in
-      let ip = Adef.iper_of_int i in
-      match get_env "dag" env with
-      [ Vdag d -> do { d.val := Dag.Pset.add ip d.val; "" }
-      | _ -> raise Not_found ]
   | ("add_in_sorted_list", sl) ->
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
@@ -2666,7 +2585,6 @@ value interp_templ templ_fname conf base p =
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
      ("count", Vcnt (ref 0));
-     ("dag", Vdag (ref Dag.Pset.empty));
      ("list", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));
@@ -2724,7 +2642,12 @@ value print_ancestors_dag conf base v p =
             loop set (lev - 1) (father cpl)
         | None -> set ]
   in
-  Dag.make_and_print_dag conf base True set []
+  let vbar_txt ip =
+    let p = poi base ip in
+    Printf.sprintf "%sm=A;t=T;v=%d;%s;dag=on" (commd conf) v
+      (acces conf base p)
+  in
+  Dag.make_and_print_dag conf base vbar_txt True set []
 ;
 
 value print_ascend conf base p =

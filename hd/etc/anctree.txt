@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 1.21 2005-06-22 19:46:59 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 1.22 2005-08-12 00:06:04 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -114,34 +114,6 @@
   %end;
 %end;
 
-%define;a_dag_line()
-  <tr align="left">
-  %foreach;dag_cell;
-    <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
-    %if;dag_cell.is_nothing;&nbsp;%nn;
-    %elseif;dag_cell.is_bar;
-      %if;(dag_cell.is_bar_link and evar.cgl != "on")
-        <a style="text-decoration:none" href="%prefix;
-        m=A;%dag_cell.item.access;;v=%evar.v;;t=T">|</a>%nn;
-      %else;|%end;
-    %elseif;(dag_cell.item != "")
-      %if;(evar.cgl = "on")%dag_cell.item;
-      %else;<a href="%prefix;%dag_cell.item.access;">%dag_cell.item;</a>%end;
-      %dag_cell.item.title;%dag_cell.item.dates;
-    %else;
-      %if;dag_cell.is_hr_left;
-        <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
-      %elseif;dag_cell.is_hr_right;
-        <hr dir="ltr" width="50%%" align="%right;"%/>%nn;
-      %else;
-        <hr width="100%%"%/>%nn;
-      %end;
-    %end;
-    </td>
-  %end;
-  </tr>
-%end;
-
 %define;male_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
@@ -165,27 +137,11 @@
 %end;
 
 %define;tree(xx)
-  %if;(evar.dag = "on")
-    %empty_dag;
-    %foreach;ancestor_level(xx)
-      %foreach;ancestor;
-        %apply;add_in_dag(ancestor.index)
-      %end;
-    %end;
-    <table border="%border;" width="100%%"><tr><td align="center">
-      <table cellspacing="0" cellpadding="0">
-      %foreach;dag_line;
-        %apply;a_dag_line()
-      %end;
-      </table>
-    </tr></tr></table>
-  %else;
-    <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
-    %foreach;ancestor_tree_line(xx)
-      %apply;a_tree_line()
-    %end;
-    </table>
+  <table border="%border;" cellspacing="0" cellpadding="0" width="100%%">
+  %foreach;ancestor_tree_line(xx)
+    %apply;a_tree_line()
   %end;
+  </table>
 %end;
 
 %if;(evar.t = "T")
