@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.87 2005-08-12 14:31:44 ddr Exp $ *)
+(* $Id: templ.ml,v 4.88 2005-08-12 16:32:24 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -853,8 +853,8 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
       if bool_eval ceva e1 then string_list_eval ceva el2
       else string_list_eval ceva el3
   | e ->
-      try Num.to_string (num_eval ceva e) with
-      [ Failure x -> x ] ]
+      try string_of_int (int_eval ceva e) with
+      [ Failure _ -> Num.to_string (num_eval ceva e) ] ]
 and string_list_eval ceva el =
   String.concat "" (List.map (string_eval ceva) el)
 and num_eval ((_, eval_var, _) as ceva) =
@@ -1068,6 +1068,15 @@ value interp
     | None ->
         match (f, vl) with
         [ ("capitalize", [s]) -> Util.capitale s
+        | ("env_but", sl) ->
+            let env =
+              List.fold_right
+                (fun (k, v) env ->
+                   if List.mem k sl then env else [(k, v) :: env])
+                conf.env []
+            in
+            let bl = List.map (fun (k, v) -> k ^ "=" ^ v ^ ";") env in
+            String.concat "" bl
         | ("nth", [s1; s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
             Util.nth_field s1 n

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: dag.txt,v 1.2 2005-08-12 00:06:04 ddr Exp $ -->
+  <!-- $Id: dag.txt,v 1.3 2005-08-12 16:32:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%head_title;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -22,7 +22,26 @@
   "><a href="%prefix;%env;notab=on;slices=on"><tt>//</tt></a></div>
 %end;
 
-%if;(evar.notab = "on" or evar.pos2 != "")%table_pre;
+%if;(evar.notab = "on" or evar.pos2 != "")
+  <div style="text-align:right">
+    %if;(evar.pos1 = "" or evar.pos1 = 0)&nbsp;%nn;
+    %else;
+      <a href="%prefix;%apply;env_but("pos1","pos2")%nn;
+        pos1=%expr;(evar.pos1 + evar.overlap - evar.dpos)
+        ;pos2=%expr(evar.pos1 + evar.overlap)">&lt;&lt;</a>%nn;
+    %end;%nl
+    %if;(evar.pos2 >= dag.ncol)&nbsp;%nn;
+    %else;
+      <a href="%prefix;%apply;env_but("pos1","pos2")%nn;
+        pos1=%expr;(evar.pos2 - evar.overlap)
+        ;pos2=%expr(evar.pos2 - evar.overlap + evar.dpos)">&gt;&gt;</a>%nn;
+    %end;%nl;
+  </div>
+  <pre>
+  %foreach;dag_line;
+    %table_pre;%nl;
+  %end;
+  </pre>
 %else;
   <table border="%border;" width="100%%"><tr><td align="center">
   <table border="%border;" cellspacing="0" cellpadding="0">
