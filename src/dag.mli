@@ -1,4 +1,4 @@
-(* $Id: dag.mli,v 4.11 2005-08-13 15:07:52 ddr Exp $ *)
+(* $Id: dag.mli,v 4.12 2005-08-13 16:39:23 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -12,19 +12,19 @@ module Pset :
   end
 ;
 
-(*
+(**)
 type sum 'a 'b = [ Left of 'a | Right of 'b ];
-*)
+(**)
 
 value image_txt : config -> base -> person -> string;
 
-(*
+(**)
 value make_tree_hts :
   config -> base ->
     (person -> string) -> (iper -> string) -> bool ->
     Pset.t -> list (iper * (iper * option ifam)) ->
     dag (sum iper 'a) -> html_table string;
-*)
+(**)
 
 value print_slices_menu_or_dag_page :
   config -> base -> string -> html_table string -> (unit -> unit) -> unit;
