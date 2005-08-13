@@ -1,5 +1,7 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.52 2005-08-13 01:59:33 ddr Exp $ *)
+(* $Id: dag.ml,v 4.53 2005-08-13 08:33:25 ddr Exp $ *)
+
+DEFINE OLD;
 
 open Dag2html;
 open Def;
@@ -13,6 +15,7 @@ module Pset = Set.Make (struct type t = iper; value compare = compare; end);
 
 (* testing *)
 
+IFDEF TESTING THEN declare
 value map_dag f d =
   let a =
     Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
@@ -34,6 +37,7 @@ value tag_dag d =
        })
     d
 ;
+end END;
 
 (* input dag *)
 
@@ -166,6 +170,7 @@ value image_txt conf base p =
 
 (* Print with HTML table tags: <table> <tr> <td> *)
 
+IFDEF OLD THEN declare
 value print_table conf hts =
   do {
     begin_centered conf;
@@ -212,6 +217,7 @@ value print_table conf hts =
     end_centered conf;
   }
 ;
+end END;
 
 (*
  * Print without HTML table tags: using <pre>
@@ -512,6 +518,28 @@ value table_strip_troublemakers hts =
   }
 ;
 
+value table_pre_dim conf hts =
+  do {
+    table_strip_troublemakers hts;
+    let ncol =
+      let hts0 = hts.(0) in
+      let rec loop ncol j =
+        if j = Array.length hts0 then ncol
+        else
+          let (colspan, _, _) = hts0.(j) in
+          loop (ncol + colspan) (j + 1)
+      in
+      loop 0 0
+    in
+    let min_widths_tab = compute_columns_minimum_sizes hts ncol in
+    let max_widths_tab = compute_columns_sizes hts ncol in
+    let min_wid = Array.fold_left  \+ 0 min_widths_tab in
+    let max_wid = Array.fold_left  \+ 0 max_widths_tab in
+    (min_wid, max_wid, min_widths_tab, max_widths_tab, ncol)
+  }
+;
+
+IFDEF OLD THEN declare
 value print_next_pos conf pos1 pos2 tcol =
   let doit = p_getenv conf.env "notab" = Some "on" in
   if doit then do {
@@ -569,27 +597,6 @@ value print_next_pos conf pos1 pos2 tcol =
 ;
 
 (* Main print table algorithm with <pre> *)
-
-value table_pre_dim conf hts =
-  do {
-    table_strip_troublemakers hts;
-    let ncol =
-      let hts0 = hts.(0) in
-      let rec loop ncol j =
-        if j = Array.length hts0 then ncol
-        else
-          let (colspan, _, _) = hts0.(j) in
-          loop (ncol + colspan) (j + 1)
-      in
-      loop 0 0
-    in
-    let min_widths_tab = compute_columns_minimum_sizes hts ncol in
-    let max_widths_tab = compute_columns_sizes hts ncol in
-    let min_wid = Array.fold_left  \+ 0 min_widths_tab in
-    let max_wid = Array.fold_left  \+ 0 max_widths_tab in
-    (min_wid, max_wid, min_widths_tab, max_widths_tab, ncol)
-  }
-;
 
 value print_table_pre conf hts =
   let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim conf hts in
@@ -671,7 +678,7 @@ value print_table_pre conf hts =
               | TDbar s ->
                   let s =
                     match s with
-                    [ None -> "|"
+                    [ None | Some "" -> "|"
                     | Some s ->
                         sprintf
                           "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
@@ -740,6 +747,7 @@ value print_html_table conf hts =
     else print_table conf hts
   }
 ;
+end END;
 
 value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
@@ -835,6 +843,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
+IFDEF OLD THEN declare
 value print_slices_menu conf hts =
   let txt n =
     Util.capitale
@@ -919,6 +928,7 @@ value print_dag_page conf base page_title hts after_dag =
     Util.trailer conf
   }
 ;
+end END;
 
 (* *)
 
@@ -1053,7 +1063,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
         | TDbar s ->
             let s =
               match s with
-              [ None -> "|"
+              [ None | Some "" -> "|"
               | Some s ->
                   if conf.cancel_links then "|"
                   else
@@ -1163,14 +1173,22 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
   }
 ;
 
+IFDEF OLD THEN declare
 value old_print_slices_menu_or_dag_page conf base page_title hts after_dag =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
   else print_dag_page conf base page_title hts after_dag
 ;
+end ELSE declare
+value old_print_slices_menu_or_dag_page conf base page_title hts after_dag =
+  incorrect_request conf
+;
+end END;
 
 value print_slices_menu_or_dag_page conf base page_title hts after_dag =
-  if p_getenv conf.env "new" <> Some "on" then
+(**)
+  if p_getenv conf.env "old" = Some "on" then
     old_print_slices_menu_or_dag_page conf base page_title hts after_dag else
+(**)
   let conf =
     if p_getenv conf.env "slices" = Some "on" then conf
     else
