@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.89 2005-08-12 18:09:48 ddr Exp $ *)
+(* $Id: templ.ml,v 4.90 2005-08-13 00:12:53 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -819,13 +819,22 @@ value rec bool_eval ((conf, eval_var, _) as ceva) =
   | Aop1 _ _ | Adefine _ _ _ _ | Aforeach _ _ _ | Aif _ _ _ | Awid_hei _
   | Alet _ _ _ ->
       do { Wserver.wprint "error14"; False } ]
-and int_eval ceva =
+and int_eval ((_, eval_var, _) as ceva) =
   fun
   [ Aop2 "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
   | Aop2 "-" e1 e2 -> int_eval ceva e1 - int_eval ceva e2
   | Aop2 "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
   | Aop2 "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
   | Aint _ x -> int_of_string x
+  | Avar loc s sl ->
+      try
+        match eval_var loc [s :: sl] with
+        [ VVstring s -> int_of_string s
+        | VVbool True -> 1
+        | VVbool False -> 0 ]
+      with
+      [ Not_found ->
+          failwith ("parse error%(" ^ String.concat "." [s :: sl] ^ ")") ]
   | e ->
       let s = string_eval ceva e in
       try int_of_string s with
@@ -854,7 +863,7 @@ and string_eval ((conf, eval_var, eval_apply) as ceva) =
       else string_list_eval ceva el3
   | e ->
       try string_of_int (int_eval ceva e) with
-      [ Failure _ -> Num.to_string (num_eval ceva e) ] ]
+      [ Exc_located _ _ | Failure _ -> Num.to_string (num_eval ceva e) ] ]
 and string_list_eval ceva el =
   String.concat "" (List.map (string_eval ceva) el)
 and num_eval ((_, eval_var, _) as ceva) =

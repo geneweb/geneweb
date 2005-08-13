@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.50 2005-08-12 18:09:48 ddr Exp $ *)
+(* $Id: dag.ml,v 4.51 2005-08-13 00:12:53 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -490,7 +490,8 @@ value strip_troublemakers s =
           in
           let len =
             match tag_name with
-            [ "br" | "font" | "img" | "table" | "td" | "tr" | "center" -> len
+            [ "bdo" | "br" | "font" | "img" | "span" | "table" | "td" | "tr"
+            | "center" -> len
             | _ -> buff_store_int s len i j ]
           in
           loop last_space len j
@@ -926,8 +927,9 @@ type dag_item = string;
 type env 'a =
   [ Vdag of (int * int * array int * array int * int)
   | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
-  | Vdcellp of (int * array (array string) * int * option int * option int)
+  | Vdcellp of string
   | Vdline of int
+  | Vdlinep of (int * array (array string) * int * option int * option int)
   | Vlazy of Lazy.t (env 'a)
   | Vother of 'a
   | Vnone ]
@@ -953,6 +955,10 @@ value rec eval_var conf page_title env xx loc =
   | ["dag_cell" :: sl] ->
       match get_env "dag_cell" env with
       [ Vdcell dcell -> eval_dag_cell_var conf dcell sl
+      | _ -> raise Not_found ]
+  | ["dag_cell_pre"] ->
+      match get_env "dag_cell_pre" env with
+      [ Vdcellp s -> VVstring s
       | _ -> raise Not_found ]
   | ["head_title"] -> VVstring page_title
   | _ -> raise Not_found ]
@@ -991,22 +997,30 @@ and eval_dag_cell_var conf (colspan, align, td) =
 value rec print_var conf hts after_dag env =
   fun
   [ ["after_dag"] -> after_dag ()
-  | ["dag_cell_pre"] -> print_dag_cell_pre conf hts env
   | _ -> raise Not_found ]
-and print_dag_cell_pre conf hts env =
-  let (_, _, _, colsz, _) =
-    match get_env "dag" env with
-    [ Vdag d -> d
-    | _ -> raise Not_found ]
-  in
+;
+
+value rec print_foreach conf hts print_ast eval_expr env () loc s sl el al =
+  match [s :: sl] with
+  [ ["dag_cell"] -> print_foreach_dag_cell conf hts print_ast env al
+  | ["dag_cell_pre"] -> print_foreach_dag_cell_pre conf hts print_ast env al
+  | ["dag_line"] -> print_foreach_dag_line conf print_ast env hts al
+  | ["dag_line_pre"] -> print_foreach_dag_line_pre conf hts print_ast env al
+  | _ -> raise Not_found ]
+and print_foreach_dag_cell_pre conf hts print_ast env al =
   let i =
     match get_env "dag_line" env with
     [ Vdline i -> i
     | _ -> raise Not_found ]
   in
+  let (_, _, _, colsz, _) =
+    match get_env "dag" env with
+    [ Vdag d -> d
+    | _ -> raise Not_found ]
+  in
   let (max_row, stra, row, pos1, pos2) =
-    match get_env "dag_cell_pre" env with
-    [ Vdcellp x -> x
+    match get_env "dag_line_pre" env with
+    [ Vdlinep x -> x
     | _ -> raise Not_found ]
   in
   let rec loop pos col j =
@@ -1039,9 +1053,11 @@ and print_dag_cell_pre conf hts env =
               match s with
               [ None -> "|"
               | Some s ->
-                  sprintf
-                    "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
-                    s ]
+                  if conf.cancel_links then "|"
+                  else
+                    sprintf
+                      "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
+                      s ]
             in
             let len = displayed_length s in
             String.make ((sz - len) / 2) ' ' ^ s ^
@@ -1074,19 +1090,16 @@ and print_dag_cell_pre conf hts env =
           else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
           else displayed_sub outs (pos1 - pos) (pos2 - pos1)
       in
-      Wserver.wprint "%s" clipped_outs;
+      if clipped_outs <> "" then do {
+        let v = Vdcellp clipped_outs in
+        let print_ast = print_ast [("dag_cell_pre", v) :: env] () in
+        List.iter print_ast al;
+      }
+      else ();
       loop (pos + sz) (col + colspan) (j + 1)
     }
   in
   loop 0 0 0
-;
-
-value rec print_foreach conf hts print_ast eval_expr env () loc s sl el al =
-  match [s :: sl] with
-  [ ["dag_cell"] -> print_foreach_dag_cell conf hts print_ast env al
-  | ["dag_cell_pre"] -> print_foreach_dag_cell_pre conf hts print_ast env al
-  | ["dag_line"] -> print_foreach_dag_line conf print_ast env hts al
-  | _ -> raise Not_found ]
 and print_foreach_dag_cell conf hts print_ast env al =
   let i =
     match get_env "dag_line" env with
@@ -1097,7 +1110,12 @@ and print_foreach_dag_cell conf hts print_ast env al =
     let print_ast = print_ast [("dag_cell", Vdcell hts.(i).(j)) :: env] () in
     List.iter print_ast al;
   }
-and print_foreach_dag_cell_pre conf hts print_ast env al =
+and print_foreach_dag_line conf print_ast env hts al =
+  for i = 0 to Array.length hts - 1 do {
+    let print_ast = print_ast [("dag_line", Vdline i) :: env] () in
+    List.iter print_ast al;
+  }
+and print_foreach_dag_line_pre conf hts print_ast env al =
   let i =
     match get_env "dag_line" env with
     [ Vdline i -> i
@@ -1137,13 +1155,8 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
     | x -> x ]
   in
   for row = 0 to max_row - 1 do {
-    let v = Vdcellp (max_row, stra, row, pos1, pos2) in
-    let print_ast = print_ast [("dag_cell_pre", v) :: env] () in
-    List.iter print_ast al;
-  }
-and print_foreach_dag_line conf print_ast env hts al =
-  for i = 0 to Array.length hts - 1 do {
-    let print_ast = print_ast [("dag_line", Vdline i) :: env] () in
+    let v = Vdlinep (max_row, stra, row, pos1, pos2) in
+    let print_ast = print_ast [("dag_line_pre", v) :: env] () in
     List.iter print_ast al;
   }
 ;
