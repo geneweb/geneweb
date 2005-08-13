@@ -1,6 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.78 2005-08-13 15:07:52 ddr Exp $ *)
+(* $Id: relation.ml,v 4.79 2005-08-13 16:39:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
+
+DEFINE OLD;
 
 open Def;
 open Gutil;
@@ -190,6 +192,10 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   Dag.print_slices_menu_or_dag_page conf base page_title hts after_dag
 ;
+end ELSE declare 
+value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+  incorrect_request conf
+;
 end END;
 
 value add_common_parent base ip1 ip2 set =
@@ -224,6 +230,9 @@ value ind_set_of_relation_path conf base path =
 ;
 
 value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+  if p_getenv conf.env "new" <> Some "on" then 
+    old_print_relationship_dag conf base elem_txt vbar_txt path after_dag
+  else
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
