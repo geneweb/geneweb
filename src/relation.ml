@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.77 2005-08-11 06:54:52 ddr Exp $ *)
+(* $Id: relation.ml,v 4.78 2005-08-13 15:07:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -21,6 +21,7 @@ type famlink =
   | Child ]
 ;
 
+IFDEF OLD THEN declare
 open Dag2html;
 
 type dag_ind 'a =
@@ -178,16 +179,60 @@ value dag_of_relation_path conf base path =
   (set, d)
 ;
 
-value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
-  let page_title = capitale (transl conf "relationship") in
-  let (set, d) = dag_of_relation_path conf base path in
+value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
     | _ -> False ]
   in
+  let (set, d) = dag_of_relation_path conf base path in
+  let page_title = capitale (transl conf "fucking relationship") in
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   Dag.print_slices_menu_or_dag_page conf base page_title hts after_dag
+;
+end END;
+
+value add_common_parent base ip1 ip2 set =
+  let a1 = aoi base ip1 in
+  let a2 = aoi base ip2 in
+  match (parents a1, parents a2) with
+  [ (Some ifam1, Some ifam2) ->
+      let cpl1 = coi base ifam1 in
+      let cpl2 = coi base ifam2 in
+      if father cpl1 = father cpl2 then Dag.Pset.add (father cpl1) set
+      else if mother cpl1 = mother cpl2 then Dag.Pset.add (mother cpl1) set
+      else set
+  | _ -> set ]
+;
+
+value ind_set_of_relation_path conf base path =
+  let (set, _) =
+    List.fold_left
+      (fun (set, prev_ip) (ip, fl) ->
+         let set =
+           match fl with
+           [ Parent | Child | Self | Mate -> set
+           | Sibling | HalfSibling ->
+               match prev_ip with
+               [ Some prev_ip -> add_common_parent base prev_ip ip set
+               | None -> set ] ]
+         in
+         (Dag.Pset.add ip set, Some ip))
+      (Dag.Pset.empty, None) (List.rev path)
+  in
+  set
+;
+
+value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+  let invert =
+    match Util.p_getenv conf.env "invert" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  let set = ind_set_of_relation_path conf base path in
+  let page_title = capitale (transl conf "relationship") in
+  Dag.make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
+    after_dag
 ;
 
 value next_relation_link_txt conf ip1 ip2 excl_faml =

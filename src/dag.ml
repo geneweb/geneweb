@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.53 2005-08-13 08:33:25 ddr Exp $ *)
+(* $Id: dag.ml,v 4.54 2005-08-13 15:07:52 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -106,7 +106,40 @@ value make_dag conf base set =
          {pare = pare; valu = Left ip; chil = chil})
       nodes
   in
-  {dag = nodes}
+  let nodes_for_couples =
+    loop [] (Array.length nodes) 0 where rec loop list1 nd i =
+      if i = Array.length nodes then list1
+      else
+        match nodes.(i) with
+        [ {valu = Left ip; chil = []} ->
+            let ifaml = Array.to_list (uoi base ip).family in
+            let (list1, nd) =
+              loop list1 ifaml where rec loop list1 =
+                fun
+                [ [ifam :: ifaml] ->
+                    let cpl = coi base ifam in
+                    if ip = father cpl then
+                      try
+                        let jd = M.find (mother cpl) map in
+                        let j = int_of_idag jd in
+                        let pare = [idag_of_int i; jd] in
+                        let list1 =
+                          [{pare = pare; valu = Right (); chil = []} :: list1]
+                        in
+                        do {
+                          nodes.(i).chil := [idag_of_int nd];
+                          nodes.(j).chil := [idag_of_int nd];
+                          (list1, nd + 1)
+                        }
+                      with
+                      [ Not_found -> loop list1 ifaml ]
+                    else loop list1 ifaml
+                | [] -> (list1, nd) ]
+            in
+            loop list1 nd (i + 1)
+        | _ -> loop list1 nd (i + 1) ]
+  in
+  {dag = Array.append nodes (Array.of_list nodes_for_couples)}
 ;
 
 value image_normal_txt conf base p fname width height =
@@ -1230,25 +1263,28 @@ value print_slices_menu_or_dag_page conf base page_title hts after_dag =
     set_vother (print_var conf hts after_dag) (print_foreach conf hts) env ()
 ;
 
-value make_and_print_dag conf base vbar_txt invert set spl =
+value make_and_print_dag conf base elem_txt vbar_txt invert set spl
+  page_title after_dag
+=
   let d = make_dag conf base set in
-  let page_title = Util.capitale (Util.transl conf "tree") in
-  let after_dag () = () in
-  let dag_elem_txt p =
-    Util.referenced_person_title_text conf base p ^
-      Date.short_dates_text conf base p
-  in
-  let hts = make_tree_hts conf base dag_elem_txt vbar_txt invert set spl d in
+  let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
   print_slices_menu_or_dag_page conf base page_title hts after_dag
 ;
 
 value print conf base =
   let set = get_dag_elems conf base in
+  let elem_txt p =
+    Util.referenced_person_title_text conf base p ^
+      Date.short_dates_text conf base p
+  in
   let vbar_txt ip = "" in
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
     | _ -> False ]
   in
-  make_and_print_dag conf base vbar_txt invert set []
+  let page_title = Util.capitale (Util.transl conf "tree") in
+  let after_dag () = () in
+  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
+    after_dag
 ;
