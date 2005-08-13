@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.90 2005-08-13 00:12:53 ddr Exp $ *)
+(* $Id: templ.ml,v 4.91 2005-08-13 01:59:33 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -650,9 +650,6 @@ and eval_simple_variable conf env =
         {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
       in
       Util.doctype conf ^ "\n"
-  | "env" ->
-      let bl = List.map (fun (k, v) -> k ^ "=" ^ v ^ ";") conf.env in
-      String.concat "" bl
   | "highlight" -> conf.highlight
   | "image_prefix" -> Util.image_prefix conf
   | "left" -> conf.left
@@ -1004,7 +1001,8 @@ value templ_print_apply = print_apply;
 
 type vother =
   [ Vfun of list string and list ast
-  | Vval of string ]
+  | Vval of string
+  | Vbind of string and string ]
 ;
 type env 'a = list (string * 'a);
 
@@ -1027,6 +1025,21 @@ value get_val get_vother k env =
 value set_fun set_vother f al el env = [(f, set_vother (Vfun al el)) :: env];
 value set_val set_vother k v env = [(k, set_vother (Vval v)) :: env];
 
+value rec templ_print_foreach conf print_ast set_vother env ep loc s sl el al =
+  match [s :: sl] with
+  [ ["env_binding"] ->
+      print_foreach_env_binding conf print_ast set_vother env ep al
+  | _ -> raise Not_found ]
+and print_foreach_env_binding conf print_ast set_vother env ep al =
+  List.iter
+    (fun (k, v) ->
+       let print_ast =
+         print_ast [("binding", set_vother (Vbind k v)) :: env] ep
+       in
+       List.iter print_ast al)
+    conf.env
+;
+
 value interp
   conf base fname eval_var eval_transl eval_predefined_apply get_vother
   set_vother print_var print_foreach
@@ -1038,6 +1051,18 @@ value interp
           match get_val get_vother k env with
           [ Some v -> VVstring v
           | None -> eval_var env ep loc sl ]
+      | ["env"; "key"] ->
+          match get_vother (List.assoc "binding" env) with
+          [ Some (Vbind k v) -> VVstring k
+          | _ -> raise Not_found ]
+      | ["env"; "val"] ->
+          match get_vother (List.assoc "binding" env) with
+          [ Some (Vbind k v) -> VVstring v
+          | _ -> raise Not_found ]
+      | ["env"; "val"; "decoded"] ->
+          match get_vother (List.assoc "binding" env) with
+          [ Some (Vbind k v) -> VVstring (Util.decode_varenv v)
+          | _ -> raise Not_found ]
       | _ -> eval_var env ep loc sl ]
     with
     [ Not_found -> VVstring (eval_variable conf [] sl) ]
@@ -1045,6 +1070,11 @@ value interp
   let print_var conf base env ep loc s sl =
     try print_var env [s :: sl] with
     [ Not_found -> templ_print_var conf base (eval_var env ep loc) s sl ]
+  in
+  let print_foreach print_ast eval_expr env ep loc s sl el al =
+    try print_foreach print_ast eval_expr env ep loc s sl el al with
+    [ Not_found ->
+        templ_print_foreach conf print_ast set_vother env ep loc s sl el al ]
   in
   let print_wid_hei env fname =
     match Util.image_size (Util.image_file_name fname) with
@@ -1077,15 +1107,6 @@ value interp
     | None ->
         match (f, vl) with
         [ ("capitalize", [s]) -> Util.capitale s
-        | ("env_but", sl) ->
-            let env =
-              List.fold_right
-                (fun (k, v) env ->
-                   if List.mem k sl then env else [(k, v) :: env])
-                conf.env []
-            in
-            let bl = List.map (fun (k, v) -> k ^ "=" ^ v ^ ";") env in
-            String.concat "" bl
         | ("nth", [s1; s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
             Util.nth_field s1 n
