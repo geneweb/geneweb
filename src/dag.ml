@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.51 2005-08-13 00:12:53 ddr Exp $ *)
+(* $Id: dag.ml,v 4.52 2005-08-13 01:59:33 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -900,7 +900,7 @@ value print_slices_menu conf hts =
   }
 ;
 
-value old_print_dag_page conf base page_title hts after_dag =
+value print_dag_page conf base page_title hts after_dag =
   let conf =
     let doctype =
       (* changing doctype to transitional because use of
@@ -964,7 +964,9 @@ value rec eval_var conf page_title env xx loc =
   | _ -> raise Not_found ]
 and eval_dag_var conf (tmincol, tcol, colminsz, colsz, ncol) =
   fun
-  [ ["ncol"] -> VVstring (string_of_int (Array.fold_left \+ 0 colsz))
+  [ ["max_wid"] -> VVstring (string_of_int tcol)
+  | ["min_wid"] -> VVstring (string_of_int tmincol)
+  | ["ncol"] -> VVstring (string_of_int (Array.fold_left \+ 0 colsz))
   | _ -> raise Not_found ]
 and eval_dag_cell_var conf (colspan, align, td) =
   fun
@@ -1161,18 +1163,25 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
   }
 ;
 
-value print_dag_page conf base page_title hts after_dag =
+value old_print_slices_menu_or_dag_page conf base page_title hts after_dag =
+  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
+  else print_dag_page conf base page_title hts after_dag
+;
+
+value print_slices_menu_or_dag_page conf base page_title hts after_dag =
   if p_getenv conf.env "new" <> Some "on" then
-    old_print_dag_page conf base page_title hts after_dag else
+    old_print_slices_menu_or_dag_page conf base page_title hts after_dag else
   let conf =
-    let doctype =
-      (* changing doctype to transitional because use of
-         <hr width=... align=...> *)
-      match p_getenv conf.base_env "doctype" with
-      [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-      | _ -> "xhtml-1.0-trans" ]
-    in
-    {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+    if p_getenv conf.env "slices" = Some "on" then conf
+    else
+      let doctype =
+        (* changing doctype to transitional because use of
+           <hr width=... align=...> *)
+        match p_getenv conf.base_env "doctype" with
+        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+        | _ -> "xhtml-1.0-trans" ]
+      in
+      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
   in
   let env =
     let table_pre_dim () =
@@ -1201,11 +1210,6 @@ value print_dag_page conf base page_title hts after_dag =
   Templ.interp conf base "dag" (eval_var conf page_title)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found) get_vother
     set_vother (print_var conf hts after_dag) (print_foreach conf hts) env ()
-;
-
-value print_slices_menu_or_dag_page conf base page_title hts after_dag =
-  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
-  else print_dag_page conf base page_title hts after_dag
 ;
 
 value make_and_print_dag conf base vbar_txt invert set spl =
