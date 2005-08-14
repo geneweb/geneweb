@@ -24,6 +24,12 @@ I have some time (and some courage).
     database. This was due to initial bad save of array header (OCaml
     integer overflowed on sign).
 
+* Dag2html
+  - [14 Aug 05] Fixed bug. Sometimes horiz bar linking two mates did
+    not appear in case of children exchange to nearer them. Had some
+    influence in relationship links "shortest path" because of cleaning
+    up the code by unifying parts coded differently.
+
 GeneWeb Version 4.10
 --------------------
 

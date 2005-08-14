@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.55 2005-08-14 17:43:11 ddr Exp $ *)
+(* $Id: dag.ml,v 4.56 2005-08-14 20:40:31 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -104,9 +104,8 @@ value make_dag conf base set =
          in
 (*
          let chil = List.rev chil in
-*)
          let chil = List.sort compare chil in
-(**)
+*)
          {pare = pare; valu = Left ip; chil = chil})
       nodes
   in
