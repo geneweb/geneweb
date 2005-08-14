@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.54 2005-08-13 15:07:52 ddr Exp $ *)
+(* $Id: dag.ml,v 4.55 2005-08-14 17:43:11 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -102,44 +102,78 @@ value make_dag conf base set =
                   chil des.children)
              [] u.family
          in
+(*
          let chil = List.rev chil in
+*)
+         let chil = List.sort compare chil in
+(**)
          {pare = pare; valu = Left ip; chil = chil})
       nodes
   in
-  let nodes_for_couples =
-    loop [] (Array.length nodes) 0 where rec loop list1 nd i =
-      if i = Array.length nodes then list1
+  let extra_nodes =
+    loop [] (Array.length nodes) 0 where rec loop list1 n i =
+      if i = Array.length nodes then List.rev list1
       else
         match nodes.(i) with
-        [ {valu = Left ip; chil = []} ->
+        [ {valu = Left ip; chil = chil} ->
             let ifaml = Array.to_list (uoi base ip).family in
-            let (list1, nd) =
+            let (list1, n) =
               loop list1 ifaml where rec loop list1 =
                 fun
                 [ [ifam :: ifaml] ->
                     let cpl = coi base ifam in
                     if ip = father cpl then
-                      try
-                        let jd = M.find (mother cpl) map in
-                        let j = int_of_idag jd in
-                        let pare = [idag_of_int i; jd] in
-                        let list1 =
-                          [{pare = pare; valu = Right (); chil = []} :: list1]
-                        in
-                        do {
-                          nodes.(i).chil := [idag_of_int nd];
-                          nodes.(j).chil := [idag_of_int nd];
-                          (list1, nd + 1)
-                        }
-                      with
-                      [ Not_found -> loop list1 ifaml ]
+                      let jdo =
+                        try Some (M.find (mother cpl) map) with
+                        [ Not_found -> None ]
+                      in
+                      match jdo with
+                      [ Some jd ->
+                          let j = int_of_idag jd in
+                          if chil = [] && nodes.(j).chil = [] then
+                            (* married but no child in the dag *)
+                            let pare = [idag_of_int i; jd] in
+                            let d = {pare = pare; valu = Right n; chil = []} in
+                            let list1 = [d :: list1] in
+                            let nd = idag_of_int n in
+                            do {
+                              nodes.(i).chil := [nd];
+                              nodes.(j).chil := [nd];
+                              (list1, n + 1)
+                            }
+                          else if chil <> nodes.(j).chil then
+                            (* married; group their children even step ones *)
+                            do {
+                              List.iter
+                                (fun nd ->
+                                   if List.mem nd nodes.(j).chil then ()
+                                   else do {
+                                     let n = int_of_idag nd in
+                                     nodes.(j).chil := [nd :: nodes.(j).chil];
+                                     nodes.(n).pare := [jd :: nodes.(n).pare];
+                                   })
+                                chil;
+                              List.iter
+                                (fun nd ->
+                                   if List.mem nd chil then ()
+                                   else do {
+                                     let id = idag_of_int i in
+                                     let n = int_of_idag nd in
+                                     nodes.(i).chil := [nd :: chil];
+                                     nodes.(n).pare := [id :: nodes.(n).pare];
+                                   })
+                                nodes.(j).chil;
+                              loop list1 ifaml
+                            }
+                          else loop list1 ifaml
+                      | None -> loop list1 ifaml ]
                     else loop list1 ifaml
-                | [] -> (list1, nd) ]
+                | [] -> (list1, n) ]
             in
-            loop list1 nd (i + 1)
-        | _ -> loop list1 nd (i + 1) ]
+            loop list1 n (i + 1)
+        | _ -> loop list1 n (i + 1) ]
   in
-  {dag = Array.append nodes (Array.of_list nodes_for_couples)}
+  {dag = Array.append nodes (Array.of_list extra_nodes)}
 ;
 
 value image_normal_txt conf base p fname width height =
