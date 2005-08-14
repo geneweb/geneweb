@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.11 2005-08-14 17:43:11 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.12 2005-08-14 20:40:31 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -866,7 +866,7 @@ value fill_gap d t i j1 j2 =
         if i > 0 then t1.(i - 1).(j).span := t1.(i - 1).(j - 1).span else ();
         loop y (j + 1)
       }
-      else ()
+      else loop line.(j).span (j + 1)
     in
     loop y j2;
     Some ({table = t1}, True)
