@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.10 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.11 2005-08-14 17:43:11 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -359,7 +359,9 @@ value group_by_common_children d list =
             [ [(nl1, cs1) :: rest1] ->
                 if S.is_empty (S.inter cs cs1) then
                   loop1 [(nl1, cs1) :: beg] rest1
-                else loop [(nl @ nl1, S.union cs cs1) :: List.rev beg @ rest1]
+                else
+                  loop
+                    [(nl @ nl1, S.union cs cs1) :: List.rev_append beg rest1]
             | [] -> [(nl, cs) :: loop rest] ]
           in
           loop1 [] rest ]

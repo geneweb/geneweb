@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.79 2005-08-13 16:39:23 ddr Exp $ *)
+(* $Id: relation.ml,v 4.80 2005-08-14 17:43:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -188,7 +188,7 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
     | _ -> False ]
   in
   let (set, d) = dag_of_relation_path conf base path in
-  let page_title = capitale (transl conf "fucking relationship") in
+  let page_title = capitale (transl conf "relationship") in
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   Dag.print_slices_menu_or_dag_page conf base page_title hts after_dag
 ;
