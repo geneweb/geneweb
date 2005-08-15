@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.4 2005-08-07 14:57:35 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.5 2005-08-15 10:53:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -86,13 +86,15 @@
   %end;
 %elseif;(pos != "")
   <ul>
-  <li><a href="%prefix;m=FORUM">[*database forum]</a></li>
-  <li>%if;(message.next_pos != "")<a href="%prefix;m=FORUM;p=%message.next_pos;
-         ">[*message/previous message/previous messages/next message]3%nn;
+  <li><a href="%prefix;m=FORUM" accesskey="F">[*database forum] (F)</a></li>
+  <li>%if;(message.next_pos != "")
+         <a href="%prefix;m=FORUM;p=%message.next_pos;" accesskey="N">%nn;
+         [*message/previous message/previous messages/next message]3 (N)%nn;
          </a>%nn;
       %else;&nbsp;%end;</li>
-  <li>%if;(message.prev_pos != "")<a href="%prefix;m=FORUM;p=%message.prev_pos;
-         ">[*message/previous message/previous messages/next message]1%nn;
+  <li>%if;(message.prev_pos != "")
+         <a href="%prefix;m=FORUM;p=%message.prev_pos;" accesskey="P">%nn;
+         [*message/previous message/previous messages/next message]1 (P)%nn;
          </a>%nn;
       %else;&nbsp;%end;</li>
   </ul>
