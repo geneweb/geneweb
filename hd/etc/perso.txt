@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.52 2005-07-26 09:46:32 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.53 2005-08-15 01:52:31 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -356,7 +356,7 @@
   %if;wizard;
     <td>
       <a href="%prefix;m=U;%access;"
-       class="highlight">[*update]</a>
+       class="highlight" accesskey="U">[*update] (U)</a>
     </td>
   %end;
   </tr>

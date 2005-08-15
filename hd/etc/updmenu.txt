@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.6 2005-05-29 14:43:02 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.7 2005-08-15 01:52:31 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -41,7 +41,7 @@
 </tr>
 <tr align="%left;">
   <td valign="top">
-    <a href="%prefix;m=MOD_IND;i=%index;">[*modify]</a>
+    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify] (P)</a>
     <br%/>
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
          and surname != "?")
@@ -79,8 +79,9 @@
           <br%/>
         %end;
       %end;
-      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index">%nn;
-      [*modify::family/families]0</a>
+      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
+       "%if;(nb_families = 1) accesskey="F"%end;>%nn;
+      [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br%/>
       <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
