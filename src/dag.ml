@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.57 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: dag.ml,v 4.58 2005-08-15 20:30:48 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -1009,10 +1009,11 @@ end END;
 (* *)
 
 type dag_item = string;
+type dag_bar = string;
 
 type env 'a =
   [ Vdag of (int * int * array int * array int * int)
-  | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item)
+  | Vdcell of (int * Dag2html.align * Dag2html.table_data dag_item dag_bar)
   | Vdcellp of string
   | Vdline of int
   | Vdlinep of (int * array (array string) * int * option int * option int)
