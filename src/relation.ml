@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.81 2005-08-15 01:10:18 ddr Exp $ *)
+(* $Id: relation.ml,v 4.82 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -181,7 +181,7 @@ value dag_of_relation_path conf base path =
   (set, d)
 ;
 
-value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
@@ -190,10 +190,10 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
   let (set, d) = dag_of_relation_path conf base path in
   let page_title = capitale (transl conf "relationship") in
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
-  Dag.print_slices_menu_or_dag_page conf base page_title hts after_dag
+  Dag.print_slices_menu_or_dag_page conf base page_title hts next_txt
 ;
 end ELSE declare 
-value old_print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   incorrect_request conf
 ;
 end END;
@@ -229,9 +229,9 @@ value ind_set_of_relation_path conf base path =
   set
 ;
 
-value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
+value print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   if p_getenv conf.env "old" = Some "on" then 
-    old_print_relationship_dag conf base elem_txt vbar_txt path after_dag
+    old_print_relationship_dag conf base elem_txt vbar_txt path next_txt
   else
   let invert =
     match Util.p_getenv conf.env "invert" with
@@ -241,7 +241,7 @@ value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
   let set = ind_set_of_relation_path conf base path in
   let page_title = capitale (transl conf "relationship") in
   Dag.make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
-    after_dag
+    next_txt
 ;
 
 value next_relation_link_txt conf ip1 ip2 excl_faml =
@@ -263,7 +263,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
       ([], List.length excl_faml - 1) excl_faml
   in
   let sl =
-    [commd conf; "em=R;ei=";
+    ["em=R;ei=";
      string_of_int (Adef.int_of_iper ip1); ";i=";
      string_of_int (Adef.int_of_iper ip2);
      if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";
@@ -281,12 +281,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     trailer conf
   }
   else
-    let after_dag () =
-      tag "p" begin
-        Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
-          (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml]);
-      end
-    in
+    let next_txt = next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml] in
     let elem_txt p =
       Util.referenced_person_title_text conf base p ^
         Date.short_dates_text conf base p
@@ -296,7 +291,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
       let excl_faml = Array.to_list u.family @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
-    print_relationship_dag conf base elem_txt vbar_txt path after_dag
+    print_relationship_dag conf base elem_txt vbar_txt path next_txt
 ;
 
 type node =
@@ -1455,29 +1450,30 @@ value print_main_relationship conf base long p1 p2 rel =
   }
 ;
 
-value multi_relation_after_dag conf pl2 lim assoc_txt () =
+value multi_relation_next_txt conf pl2 lim assoc_txt =
   match pl2 with
-  [ [] -> ()
+  [ [] -> ""
   | _ ->
-      do {
-        Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
-        let _ =
-          List.fold_left
-            (fun n p ->
-               do {
-                 Wserver.wprint ";i%d=%d" n (Adef.int_of_iper p.cle_index);
-                 try
-                   let t = Hashtbl.find assoc_txt p.cle_index in
-                   Wserver.wprint ";t%d=%s" n t
-                 with
-                 [ Not_found -> () ];
-                 n + 1
-               })
-            1 pl2
-        in
-        if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
-        Wserver.wprint "\">&gt;&gt;</a>\n"
-      } ]
+      let sl = if lim > 0 then [";lim="; string_of_int lim] else [] in
+      let (sl, _) =
+        List.fold_left
+          (fun (sl, n) p ->
+             let sl =
+               try
+                 let t = Hashtbl.find assoc_txt p.cle_index in
+                 [";t"; string_of_int n; "="; t :: sl]
+               with
+               [ Not_found -> sl ]
+             in
+             let sl =
+               [";i"; string_of_int n; "=";
+                string_of_int (Adef.int_of_iper p.cle_index) :: sl]
+             in
+             (sl, n - 1))
+          (sl, List.length pl2) (List.rev pl2)
+      in
+      let sl = ["m=RLM" :: sl] in
+      String.concat "" sl ]
 ;
 
 value print_no_relationship conf base pl =
@@ -1544,8 +1540,8 @@ value print_multi_relation conf base pl lim assoc_txt =
        [ Not_found -> txt ]
     in
     let vbar_txt ip = "" in
-    let after_dag = multi_relation_after_dag conf pl2 lim assoc_txt in
-    print_relationship_dag conf base elem_txt vbar_txt path after_dag
+    let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in
+    print_relationship_dag conf base elem_txt vbar_txt path next_txt
 ;
 
 value print_base_loop conf base p =

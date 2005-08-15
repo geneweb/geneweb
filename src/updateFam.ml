@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.72 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.73 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -385,7 +385,7 @@ value print_update_fam conf base fcd digest =
       let env = [("digest", Vstring digest)] in
       Templ.interp conf base "updfam" (eval_var conf base)
         (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-        get_vother set_vother (fun _ -> raise Not_found) print_foreach env fcd
+        get_vother set_vother print_foreach env fcd
   | _ -> incorrect_request conf ]
 ;
 

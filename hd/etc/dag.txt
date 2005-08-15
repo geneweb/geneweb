@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: dag.txt,v 1.6 2005-08-13 01:59:33 ddr Exp $ -->
+  <!-- $Id: dag.txt,v 1.7 2005-08-15 09:32:09 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.slices = "on")
@@ -88,7 +88,7 @@
   %if;(evar.notab != "on")
     <div style="text-align:%right;
     "><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
-       notab=on;slices=on"><tt>//</tt></a></div>
+       notab=on;slices=on" accesskey="/"><tt>//</tt></a></div>
   %end;
   %if;(evar.notab = "on" or evar.pos2 != "")
     %let;dpos;%if;(evar.dpos != "")%evar.dpos;%else;78%end;%in;
@@ -159,7 +159,11 @@
     </table>
     </td></tr></table>
   %end;
-  %after_dag;
+  %if;(link_next != "")
+    <p>
+    <a href="%prefix;%link_next;">&gt;&gt;</a>%nl;
+    </p>
+  %end;
 %end;
 
 <div>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.91 2005-08-13 01:59:33 ddr Exp $ *)
+(* $Id: templ.ml,v 4.92 2005-08-15 09:32:09 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1042,7 +1042,7 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
 
 value interp
   conf base fname eval_var eval_transl eval_predefined_apply get_vother
-  set_vother print_var print_foreach
+  set_vother print_foreach
 =
   let eval_var env ep loc sl =
     try
@@ -1068,8 +1068,7 @@ value interp
     [ Not_found -> VVstring (eval_variable conf [] sl) ]
   in
   let print_var conf base env ep loc s sl =
-    try print_var env [s :: sl] with
-    [ Not_found -> templ_print_var conf base (eval_var env ep loc) s sl ]
+    templ_print_var conf base (eval_var env ep loc) s sl
   in
   let print_foreach print_ast eval_expr env ep loc s sl el al =
     try print_foreach print_ast eval_expr env ep loc s sl el al with

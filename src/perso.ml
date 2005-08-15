@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.189 2005-08-13 15:07:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.190 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2598,7 +2598,7 @@ value interp_templ templ_fname conf base p =
   in
   Templ.interp conf base templ_fname (eval_var conf base) (eval_transl conf)
     (eval_predefined_apply conf) get_vother set_vother
-    (fun _ -> raise Not_found) (print_foreach conf base) env ep
+    (print_foreach conf base) env ep
 ;
 
 (* Main *)
@@ -2652,9 +2652,7 @@ value print_ancestors_dag conf base v p =
       (acces conf base p)
   in
   let page_title = Util.capitale (Util.transl conf "tree") in
-  let after_dag () = () in
-  Dag.make_and_print_dag conf base elem_txt vbar_txt True set [] page_title
-    after_dag
+  Dag.make_and_print_dag conf base elem_txt vbar_txt True set [] page_title ""
 ;
 
 value print_ascend conf base p =
