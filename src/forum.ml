@@ -1,8 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.58 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: forum.ml,v 4.59 2005-08-15 15:52:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
-DEFINE OLD;
+UNDEF OLD;
 
 open Util;
 open Config;
