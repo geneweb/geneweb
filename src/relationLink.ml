@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.31 2005-08-13 15:07:52 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.32 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -769,9 +769,8 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
       | _ -> False ]
     in
     let page_title = Util.capitale (Util.transl conf "tree") in
-    let after_dag () = () in
-    Dag.make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
-      after_dag
+    Dag.make_and_print_dag conf base elem_txt vbar_txt invert set spl
+      page_title ""
   with
   [ Exit -> Util.incorrect_request conf ]
 ;

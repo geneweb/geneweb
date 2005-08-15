@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.57 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: forum.ml,v 4.58 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -728,8 +728,7 @@ value print conf base =
   in
   Templ.interp conf base "forum" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (fun _ -> raise Not_found) (print_foreach conf base)
-    env ()
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 
 value print_forum_headers conf base =
@@ -738,8 +737,7 @@ value print_forum_headers conf base =
   let env = [("pos", Vpos (ref (-1)))] in
   Templ.interp conf base "forum" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (fun _ -> raise Not_found)
-   (print_foreach conf base) env ()
+    get_vother set_vother (print_foreach conf base) env ()
 ;
 
 end ELSE declare

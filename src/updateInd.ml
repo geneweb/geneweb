@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.42 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.43 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -390,7 +390,7 @@ value print_update_ind conf base p digest =
       let env = [("digest", Vstring digest)] in
       Templ.interp conf base "updind" (eval_var conf base)
         (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-        get_vother set_vother (fun _ -> raise Not_found) print_foreach env p
+        get_vother set_vother print_foreach env p
   | _ -> incorrect_request conf ]
 ;
 

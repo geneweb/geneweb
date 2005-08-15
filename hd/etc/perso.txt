@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.53 2005-08-15 01:52:31 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.54 2005-08-15 09:32:09 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -312,7 +312,7 @@
   <tr>
   <td align="center">
     <a href="%prefix;m=R;%access;"
-    class="highlight">[*relationship computing]</a>
+    class="highlight" accesskey="R">[*relationship computing] (R)</a>
   </td>
   <td align="%left;">
     <ul style="list-style:inside">

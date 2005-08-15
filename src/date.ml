@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.49 2005-08-11 12:30:57 ddr Exp $ *)
+(* $Id: date.ml,v 4.50 2005-08-15 09:32:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -887,8 +887,7 @@ value print_calendar conf base =
   if p_getenv conf.env "old" = Some "on" then old_print_calendar conf base else
   Templ.interp conf base "calendar" (eval_var conf)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (fun _ -> raise Not_found) (print_foreach conf) []
-    (eval_julian_day conf)
+    get_vother set_vother (print_foreach conf) [] (eval_julian_day conf)
 ;
 end ELSE declare
 value print_calendar conf base =

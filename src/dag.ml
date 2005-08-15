@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.56 2005-08-14 20:40:31 ddr Exp $ *)
+(* $Id: dag.ml,v 4.57 2005-08-15 09:32:09 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -11,7 +11,16 @@ open Util;
 open Printf;
 open TemplAst;
 
-module Pset = Set.Make (struct type t = iper; value compare = compare; end);
+module Pset =
+ struct
+   type t = list iper;
+   type elt = iper;
+   value add e s = if List.mem e s then s else [e :: s];
+   value empty = [];
+   value elements s = List.rev s;
+   value mem = List.mem;
+ end
+;
 
 (* testing *)
 
@@ -102,10 +111,7 @@ value make_dag conf base set =
                   chil des.children)
              [] u.family
          in
-(*
          let chil = List.rev chil in
-         let chil = List.sort compare chil in
-*)
          {pare = pare; valu = Left ip; chil = chil})
       nodes
   in
@@ -975,7 +981,7 @@ value print_slices_menu conf hts =
   }
 ;
 
-value print_dag_page conf base page_title hts after_dag =
+value print_dag_page conf base page_title hts next_txt =
   let conf =
     let doctype =
       (* changing doctype to transitional because use of
@@ -990,7 +996,11 @@ value print_dag_page conf base page_title hts after_dag =
   do {
     Util.header_no_page_title conf title;
     print_html_table conf hts;
-    after_dag ();
+    if next_txt <> "" then
+      tag "p" begin
+        Wserver.wprint "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
+      end
+    else ();
     Util.trailer conf
   }
 ;
@@ -1022,7 +1032,7 @@ value get_env v env =
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
-value rec eval_var conf page_title env xx loc =
+value rec eval_var conf page_title next_txt env xx loc =
   fun
   [ ["dag" :: sl] ->
       match get_env "dag" env with
@@ -1037,6 +1047,7 @@ value rec eval_var conf page_title env xx loc =
       [ Vdcellp s -> VVstring s
       | _ -> raise Not_found ]
   | ["head_title"] -> VVstring page_title
+  | ["link_next"] -> VVstring next_txt
   | _ -> raise Not_found ]
 and eval_dag_var conf (tmincol, tcol, colminsz, colsz, ncol) =
   fun
@@ -1069,12 +1080,6 @@ and eval_dag_cell_var conf (colspan, align, td) =
       match td with
       [ TDitem s -> VVstring s
       | _ -> VVstring "" ]
-  | _ -> raise Not_found ]
-;
-
-value rec print_var conf hts after_dag env =
-  fun
-  [ ["after_dag"] -> after_dag ()
   | _ -> raise Not_found ]
 ;
 
@@ -1240,20 +1245,20 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
 ;
 
 IFDEF OLD THEN declare
-value old_print_slices_menu_or_dag_page conf base page_title hts after_dag =
+value old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
-  else print_dag_page conf base page_title hts after_dag
+  else print_dag_page conf base page_title hts next_txt
 ;
 end ELSE declare
-value old_print_slices_menu_or_dag_page conf base page_title hts after_dag =
+value old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
   incorrect_request conf
 ;
 end END;
 
-value print_slices_menu_or_dag_page conf base page_title hts after_dag =
+value print_slices_menu_or_dag_page conf base page_title hts next_txt =
 (**)
   if p_getenv conf.env "old" = Some "on" then
-    old_print_slices_menu_or_dag_page conf base page_title hts after_dag else
+    old_print_slices_menu_or_dag_page conf base page_title hts next_txt else
 (**)
   let conf =
     if p_getenv conf.env "slices" = Some "on" then conf
@@ -1291,17 +1296,17 @@ value print_slices_menu_or_dag_page conf base page_title hts after_dag =
     in
     [("dag", Vlazy (Lazy.lazy_from_fun table_pre_dim))]
   in
-  Templ.interp conf base "dag" (eval_var conf page_title)
+  Templ.interp conf base "dag" (eval_var conf page_title next_txt)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found) get_vother
-    set_vother (print_var conf hts after_dag) (print_foreach conf hts) env ()
+    set_vother (print_foreach conf hts) env ()
 ;
 
 value make_and_print_dag conf base elem_txt vbar_txt invert set spl
-  page_title after_dag
+  page_title next_txt
 =
   let d = make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
-  print_slices_menu_or_dag_page conf base page_title hts after_dag
+  print_slices_menu_or_dag_page conf base page_title hts next_txt
 ;
 
 value print conf base =
@@ -1317,7 +1322,5 @@ value print conf base =
     | _ -> False ]
   in
   let page_title = Util.capitale (Util.transl conf "tree") in
-  let after_dag () = () in
-  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title
-    after_dag
+  make_and_print_dag conf base elem_txt vbar_txt invert set [] page_title ""
 ;
