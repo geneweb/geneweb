@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.80 2005-08-14 17:43:11 ddr Exp $ *)
+(* $Id: relation.ml,v 4.81 2005-08-15 01:10:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -230,7 +230,7 @@ value ind_set_of_relation_path conf base path =
 ;
 
 value print_relationship_dag conf base elem_txt vbar_txt path after_dag =
-  if p_getenv conf.env "new" <> Some "on" then 
+  if p_getenv conf.env "old" = Some "on" then 
     old_print_relationship_dag conf base elem_txt vbar_txt path after_dag
   else
   let invert =
