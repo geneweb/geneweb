@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: dag.txt,v 1.7 2005-08-15 09:32:09 ddr Exp $ -->
+  <!-- $Id: dag.txt,v 1.8 2005-08-15 14:10:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.slices = "on")
@@ -161,7 +161,7 @@
   %end;
   %if;(link_next != "")
     <p>
-    <a href="%prefix;%link_next;">&gt;&gt;</a>%nl;
+    <a href="%prefix;%link_next;" accesskey=">">&gt;&gt;</a>%nl;
     </p>
   %end;
 %end;
