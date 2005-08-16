@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.7 2005-08-15 01:52:31 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.8 2005-08-16 12:34:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -100,8 +100,8 @@
       [*add::marriage/marriages]0 ([M/F]1)</a>
       <br%/>
     %else;
-      <a href="%prefix;m=ADD_FAM;ip=%index;">%nn;
-      [*add::marriage/marriages]0</a>
+      <a href="%prefix;m=ADD_FAM;ip=%index;" accesskey="A">%nn;
+      [*add::marriage/marriages]0 (A)</a>
       <br%/>
     %end;
     %if;(nb_children != 0)

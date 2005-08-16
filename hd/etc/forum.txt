@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.5 2005-08-15 10:53:27 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.6 2005-08-16 12:34:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -55,7 +55,8 @@
     <tr align="%left;">
       <td>[*ident/email/subject]0</td>
       <td><input name="Ident" size="40" maxlength="200"%sp;
-           value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/><td>
+           value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/
+	   ><td>
     </tr>
     <tr align="%left;">
       <td>[*ident/email/subject]1 ([optional])</td>
@@ -135,7 +136,8 @@
     %hidden;
     <input type="hidden" name="m" value="FORUM_ADD"%/>
     <input type="submit"%sp;
-     value="[*add::message/previous message/previous messages/next message]0"%/>
+     value="[*add::message/previous message/previous messages/next message]0"%/
+     >
     </p>
     </form>
   %end;
@@ -154,7 +156,9 @@
     <td><tt>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
             &nbsp;</tt></td>
     <td><tt>%message.hour;</tt></td>
-    <td><a href="%prefix;m=FORUM;p=%message.pos;"><b>%message.ident.cut.23;
+    <td><a href="%prefix;m=FORUM;p=%message.pos;
+         "%if;(message.prev_date = "") accesskey="1"%end;
+	 ><b>%message.ident.cut.23;
         </b></a></td>
     <td>%nn;
        %if;(message.subject = "" or message.subject = "-")
