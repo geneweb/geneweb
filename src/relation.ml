@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.82 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: relation.ml,v 4.83 2005-08-16 21:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -282,10 +282,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
   }
   else
     let next_txt = next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml] in
-    let elem_txt p =
-      Util.referenced_person_title_text conf base p ^
-        Date.short_dates_text conf base p
-    in
+    let elem_txt p = Dag.Item p "" in
     let vbar_txt ip =
       let u = uget conf base ip in
       let excl_faml = Array.to_list u.family @ excl_faml in
@@ -1529,15 +1526,12 @@ value print_multi_relation conf base pl lim assoc_txt =
   if path = [] then print_no_relationship conf base pl
   else
     let elem_txt p =
-      let txt =
-        Util.referenced_person_title_text conf base p ^
-          Date.short_dates_text conf base p
-       in
-       try
-         let t = Hashtbl.find assoc_txt p.cle_index in
-           txt ^ " <b>(" ^ t ^ ")</b>"
-       with
-       [ Not_found -> txt ]
+      Dag.Item p
+        (try
+           let t = Hashtbl.find assoc_txt p.cle_index in
+           "<b>(" ^ t ^ ")</b>"
+         with
+         [ Not_found -> "" ])
     in
     let vbar_txt ip = "" in
     let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in

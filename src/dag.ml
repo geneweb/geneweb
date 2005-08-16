@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.58 2005-08-15 20:30:48 ddr Exp $ *)
+(* $Id: dag.ml,v 4.59 2005-08-16 21:39:00 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -210,8 +210,8 @@ value image_url_txt conf base url height =
 value image_url_txt_with_size conf base url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\">" url
-      width height image_txt ^
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\">"
+      url width height image_txt ^
     "</a>\n"
 ;
 
@@ -238,6 +238,18 @@ value image_txt conf base p =
             image_url_txt conf base url 75 ^ "</table></center>\n"
       | _ -> "" ]
   | _ -> "" ]
+;
+
+(* *)
+
+type item = [ Item of person and string ];
+
+value string_of_item conf base =
+  fun
+  [ Item p s ->
+      Util.referenced_person_title_text conf base p ^
+        Date.short_dates_text conf base p ^
+      (if s = "" then "" else " " ^ s) ]
 ;
 
 (* Print with HTML table tags: <table> <tr> <td> *)
@@ -845,7 +857,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     match n.valu with
     [ Left ip ->
         let p = pget conf base ip in
-        let txt = elem_txt p in
+        let txt = string_of_item conf base (elem_txt p) in
         let txt =
           let spouses =
             if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
@@ -882,7 +894,8 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                          p ps
                    | None -> "" ]
                  in
-                 txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^ elem_txt ps)
+                 txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
+                   string_of_item conf base (elem_txt ps))
             txt spouses
         in
         txt ^ image_txt conf base p
@@ -1312,10 +1325,7 @@ value make_and_print_dag conf base elem_txt vbar_txt invert set spl
 
 value print conf base =
   let set = get_dag_elems conf base in
-  let elem_txt p =
-    Util.referenced_person_title_text conf base p ^
-      Date.short_dates_text conf base p
-  in
+  let elem_txt p = Item p "" in
   let vbar_txt ip = "" in
   let invert =
     match Util.p_getenv conf.env "invert" with

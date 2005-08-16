@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.190 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: perso.ml,v 4.191 2005-08-16 21:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2642,10 +2642,7 @@ value print_ancestors_dag conf base v p =
             loop set (lev - 1) (father cpl)
         | None -> set ]
   in
-  let elem_txt p =
-    Util.referenced_person_title_text conf base p ^
-      Date.short_dates_text conf base p
-  in
+  let elem_txt p = Dag.Item p "" in
   let vbar_txt ip =
     let p = poi base ip in
     Printf.sprintf "%sm=A;t=T;v=%d;%s;dag=on" (commd conf) v

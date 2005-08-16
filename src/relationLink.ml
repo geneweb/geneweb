@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.32 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.33 2005-08-16 21:39:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -758,10 +758,7 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
            | None -> spl ])
         [(p1.cle_index, "3"); (p2.cle_index, "4")] []
     in
-    let elem_txt p =
-      Util.referenced_person_title_text conf base p ^
-        Date.short_dates_text conf base p
-    in
+    let elem_txt p = Dag.Item p "" in
     let vbar_txt ip = "" in
     let invert =
       match Util.p_getenv conf.env "invert" with
