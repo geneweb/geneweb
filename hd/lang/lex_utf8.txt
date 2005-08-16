@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.54 2005-08-09 08:24:17 ddr Exp $
+# $Id: lex_utf8.txt,v 1.55 2005-08-16 09:20:47 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5033,6 +5033,7 @@ sv: sl&auml;ktskap emellan
     linked pages
 en: linked pages
 fr: pages liées
+sv: länkade sidor
 
     list/list (ancestors)
 af: lys
@@ -5499,6 +5500,7 @@ sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande
     miscellaneous notes
 en: miscellaneous notes
 fr: notes diverses
+sv: blandade noteringar
 
     missing ancestors
 af: ontbrekende voorsate
@@ -9065,6 +9067,7 @@ en: visualize/show/hide/summary
 fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
 pt: visualizar/mostrar/esconder/sumário
+sv: visualisera/visa/g&ouml;m/summering
 
     warnings
 af: waarskuwings

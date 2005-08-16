@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.75 2005-07-28 15:28:09 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.76 2005-08-16 09:25:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <!-- This file is kept by compatibility to allow displaying databases
        created before version 5.00. -->
@@ -879,7 +879,7 @@ sv: Du kan ocks&aring; konsultera
 zh:
 ]</div>
 
-<table border="0">
+<table border="0" style="white-space:nowrap">
 <tr align="%L">
 <td valign="top">
 <ul style="list-style:inside">

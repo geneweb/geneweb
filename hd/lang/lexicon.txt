@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.244 2005-07-28 09:36:11 ddr Exp $
+# $Id: lexicon.txt,v 4.245 2005-08-16 09:25:24 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -166,7 +166,6 @@ nl: , om dit nummer weer te proberen
 no:  for е pr&oslash;ve igjen med dette nummeret
 pl:  aby ponowiж z tym numerem
 pt:  para tentar novamente com este n&uacute;mero
-pt-br: para tentar novamente com este n&uacute;mero
 ro:  incearca din nou cu acest numar 
 ru:  для того, чтобы пытаться снова с этим числом
 sl:  za ponoven poskus s to №tevilko
@@ -5048,6 +5047,11 @@ ru: связь между
 sl: sorodstvo med
 sv: sl&auml;ktskap emellan
 
+    linked pages
+en: linked pages
+fr: pages liйes
+sv: lдnkade sidor
+
     list/list (ancestors)
 af: lys
 bg: списък
@@ -5512,6 +5516,7 @@ sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande
     miscellaneous notes
 en: miscellaneous notes
 fr: notes diverses
+sv: blandade noteringar
 
     missing ancestors
 af: ontbrekende voorsate
@@ -9070,7 +9075,9 @@ bg: да се визуализира/да се покаже/да се скрие/резюме
 de: veranschaulichen/einblenden/ausblenden/Inhalt
 en: visualize/show/hide/summary
 fr: visualiser/afficher/masquer/sommaire
+it: visualizza/mostra/nascondi/riassunto
 pt: visualizar/mostrar/esconder/sumбrio
+sv: visualisera/visa/g&ouml;m/summering
 
     warnings
 af: waarskuwings
@@ -9098,10 +9105,6 @@ ro: avertisment
 ru: внимание
 sl: opozorila
 sv: varningar
-
-    what links page
-en: what links page
-fr: qui rйfйrence la page
 
     with
 af: met
