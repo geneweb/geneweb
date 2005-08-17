@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.19 2005-02-14 15:10:40 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.20 2005-08-17 08:24:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -409,7 +409,7 @@ value print_oldest_engagements conf base =
   print_marr_or_eng conf base title list len
 ;
 
-value print_statistics conf base =
+value old_print_statistics conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "statistics")) in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
@@ -457,4 +457,22 @@ value print_statistics conf base =
     end;
     trailer conf;
   }
+;
+
+(* *)
+
+type env 'a =
+  [ Vother of 'a
+  | Vnone ]
+;
+
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
+
+value print_statistics conf base =
+  if p_getenv conf.env "old" = Some "on" then old_print_statistics conf base
+  else
+  Templ.interp conf base "stats" (fun _ -> raise Not_found)
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (fun _ -> raise Not_found) [] ()
 ;

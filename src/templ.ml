@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.92 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: templ.ml,v 4.93 2005-08-17 08:24:51 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -625,8 +625,10 @@ value not_impl func x =
 ;
 
 value rec eval_variable conf env =
-  fun
-  [ ["evar"; v] ->
+  fun 
+  [ ["bvar"; v] ->
+      try List.assoc v conf.base_env with [ Not_found -> "" ]
+  | ["evar"; v] ->
       match Util.p_getenv (conf.env @ conf.henv) v with
       [ Some vv -> Util.quote_escaped vv
       | None -> "" ]
@@ -749,7 +751,15 @@ and eval_transl_lexicon conf upp s c =
             | None ->
                 match Util.check_format "%s" s1 with
                 [ Some s3 -> Printf.sprintf (transl_nth_format s3) s2
-                | None -> raise Not_found ] ]
+                | None ->
+                    match Util.check_format "%d" s1 with
+                    [ Some s3 ->
+                        try
+                          Printf.sprintf (transl_nth_format s3)
+                            (int_of_string s2)
+                        with
+                        [ Failure _ -> raise Not_found ]
+                    | None -> raise Not_found ] ] ]
           else raise Not_found
         with
         [ Not_found ->

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.191 2005-08-16 21:39:01 ddr Exp $ *)
+(* $Id: perso.ml,v 4.192 2005-08-17 08:24:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1095,9 +1095,6 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
       | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found ]
-  | ["bvar"; v] ->
-      try VVstring (List.assoc v conf.base_env) with
-      [ Not_found -> VVstring "" ]
   | ["cell" :: sl] ->
       match get_env "cell" env with
       [ Vcell cell -> eval_cell_field_var conf base env ep cell loc sl
