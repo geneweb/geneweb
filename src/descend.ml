@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.52 2005-08-17 09:11:05 ddr Exp $ *)
+(* $Id: descend.ml,v 4.53 2005-08-17 09:33:12 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -1048,7 +1048,7 @@ value make_tree_hts conf base gv p =
           else
             let ifam = u.family.(i) in
             let tdl =
-              if i > 0 then [(1, LeftA, TDitem "...") :: tdl] else tdl
+              if i > 0 then [(1, LeftA, TDtext "...") :: tdl] else tdl
             in
             let td =
               let fam = foi base ifam in

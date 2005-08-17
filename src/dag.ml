@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.59 2005-08-16 21:39:00 ddr Exp $ *)
+(* $Id: dag.ml,v 4.60 2005-08-17 09:33:12 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -276,6 +276,7 @@ value print_table conf hts =
           Wserver.wprint ">";
           match td with
           [ TDitem s -> Wserver.wprint "%s" s
+          | TDtext s -> Wserver.wprint "%s" s
           | TDnothing -> Wserver.wprint "&nbsp;"
           | TDbar None -> Wserver.wprint "|"
           | TDbar (Some s) ->
@@ -470,15 +471,14 @@ value gen_compute_columns_sizes size_fun hts ncol =
             else do {
               let (colspan, _, td) = hts.(i).(j) in
               match td with
-              [ TDitem _ | TDnothing ->
+              [ TDitem _ | TDtext _ | TDnothing ->
                   if colspan = curr_colspan then
-(**)
                     let len =
-                      match td with [ TDitem s -> size_fun s | _ -> 1 ]
+                      match td with
+                      [ TDitem s -> size_fun s
+                      | TDtext s -> size_fun s
+                      | _ -> 1 ]
                     in
-(*
-                    let len = size_fun s in
-*)
                     let currsz =
                       loop 0 col colspan where rec loop currsz col cnt =
                         if cnt = 0 then currsz
@@ -717,7 +717,7 @@ value print_table_pre conf hts =
               let (colspan, _, td) = hts.(i).(j) in
               let stra =
                 match td with
-                [ TDitem s ->
+                [ TDitem s | TDtext s ->
                     let sz =
                       loop 0 colspan where rec loop sz k =
                         if k = 0 then sz
@@ -742,7 +742,7 @@ value print_table_pre conf hts =
             in
             let outs =
               match td with
-              [ TDitem s ->
+              [ TDitem s | TDtext s ->
                   let s =
                     let k =
                       let dk = (max_row - Array.length stra.(j)) / 2 in
@@ -1094,6 +1094,10 @@ and eval_dag_cell_var conf (colspan, align, td) =
       match td with
       [ TDitem s -> VVstring s
       | _ -> VVstring "" ]
+  | ["text"] ->
+      match td with
+      [ TDtext s -> VVstring s
+      | _ -> VVstring "" ]
   | _ -> raise Not_found ]
 ;
 
@@ -1130,7 +1134,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
       in
       let outs =
         match td with
-        [ TDitem s ->
+        [ TDitem s | TDtext s ->
             let s =
               let k =
                 let dk = (max_row - Array.length stra.(j)) / 2 in
@@ -1231,7 +1235,7 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
           let (colspan, _, td) = hts.(i).(j) in
           let stra =
             match td with
-            [ TDitem s ->
+            [ TDitem s | TDtext s ->
                 let sz =
                   loop 0 colspan where rec loop sz k =
                     if k = 0 then sz
