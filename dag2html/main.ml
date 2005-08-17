@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 1.8 2005-06-12 18:48:21 ddr Exp $ *)
+(* $Id: main.ml,v 1.9 2005-08-17 09:33:12 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -196,6 +196,7 @@ if colspan = 1 && (td = TDitem "&nbsp;" || td = TDhr CenterA) then
         printf ">";
         match td with
         [ TDitem s -> printf "%s" s
+        | TDtext s -> printf "%s" s
         | TDbar _ -> printf "|"
         | TDhr align ->
             do {

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: dag.txt,v 1.9 2005-08-16 21:39:00 ddr Exp $ -->
+  <!-- $Id: dag.txt,v 1.10 2005-08-17 09:33:12 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.slices = "on")
@@ -145,6 +145,7 @@
             <a style="text-decoration:none" href="%dag_cell.bar_link;">|</a>%nn;
           %else;|%end;
         %elseif;(dag_cell.item != "")%dag_cell.item;
+        %elseif;(dag_cell.text != "")%dag_cell.text;
         %else;
           %if;dag_cell.is_hr_left;
             <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
