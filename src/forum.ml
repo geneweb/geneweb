@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.59 2005-08-15 15:52:19 ddr Exp $ *)
+(* $Id: forum.ml,v 4.60 2005-08-17 11:57:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 UNDEF OLD;
@@ -584,6 +584,7 @@ and eval_message_var conf env =
               match get_message conf back_pos with
               [ Some (a, _, _, _, _) ->
                   if not a then loop back_pos
+                  else if back_pos = pos then VVstring ""
                   else VVstring (string_of_int back_pos)
               | None -> VVstring "" ]
       | _ -> raise Not_found ]
