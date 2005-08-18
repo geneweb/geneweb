@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.37 2005-07-15 14:55:32 ddr Exp $ *)
+(* $Id: doc.ml,v 4.38 2005-08-18 15:11:36 ddr Exp $ *)
 
 open Config;
 
@@ -189,7 +189,7 @@ value read_wdoc lang fname =
         }
       in
       Wiki.split_title_and_text s
-  | None -> ("", "") ]
+  | None -> ("", "", "") ]
 ;
 
 value print_whole_wdoc conf fdoc title s =
@@ -278,7 +278,7 @@ value print_wdoc conf =
     | None -> "" ]
   in
   let fdoc = if fdocp = "" then "index" else fdocp in
-  let (title, s) = read_wdoc conf.lang fdoc in
+  let (title, _, s) = read_wdoc conf.lang fdoc in
   if s = "" && fdocp = "" then
     print_wdoc_main conf
   else
@@ -305,8 +305,8 @@ value print_mod_wdoc conf =
       (Util.capitale (Util.transl_decline conf "modify" ""))
       (fname ^ (if cnt = "" then "" else " #" ^ cnt))
   in
-  let (ntitle, s) = read_wdoc conf.lang fname in
-  Wiki.print_mod_page conf "WDOC" fname title ntitle s
+  let (ntitle, name, s) = read_wdoc conf.lang fname in
+  Wiki.print_mod_page conf "WDOC" fname title (ntitle, name) s
 ;
 
 value commit_wdoc conf file_path fdoc s =

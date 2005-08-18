@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.122 2005-08-09 11:23:56 ddr Exp $ *)
+(* $Id: notes.ml,v 4.123 2005-08-18 15:11:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -84,32 +84,36 @@ value notes_links_db conf base eliminate_unlinked =
   let db =
     let aliases = Wiki.notes_aliases conf in
     List.fold_left
-      (fun list (pg, sl) ->
+      (fun list (pg, (sl, il)) ->
          let pg =
            match pg with
            [ NotesLinks.PgMisc f -> NotesLinks.PgMisc (Wiki.map_notes aliases f)
            | x -> x ]
          in
          let sl = List.map (Wiki.map_notes aliases) sl in
-         let (sl, list) =
+         let (sl, il1, list) =
            let (list1, list2) =
              List.partition (fun (pg1, _) -> pg = pg1) list
            in
            match list1 with
-           [ [(_, sl1)] ->
+           [ [(_, (sl1, il1))] ->
                let sl =
                  List.fold_left
                    (fun sl s -> if List.mem s sl then sl else [s :: sl]) sl sl1
                in
-               (sl, list2)
-           | _ -> (sl, list) ]
+               let il =
+                 List.fold_left
+                   (fun il i -> if List.mem i il then il else [i :: il]) il il1
+               in
+               (sl, il, list2)
+           | _ -> (sl, il, list) ]
          in
-         [(pg, sl) :: list])
+         [(pg, (sl, il)) :: list])
       [] db
   in
   let db2 =
     List.fold_left
-      (fun db2 (pg, sl) ->
+      (fun db2 (pg, (sl, il)) ->
          let record_it =
            match pg with
            [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
@@ -131,11 +135,12 @@ value notes_links_db conf base eliminate_unlinked =
   (* some kind of basic gc... *)
   let rec is_referenced in_test s =
     fun
-    [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _, sl) ::
+    [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _,
+        (sl, il)) ::
        pgsll] ->
         if List.mem s sl then True
         else is_referenced in_test s pgsll
-    | [(NotesLinks.PgMisc s1, sl) :: pgsll] ->
+    | [(NotesLinks.PgMisc s1, (sl, il)) :: pgsll] ->
         if is_referenced in_test s pgsll then True
         else if List.mem s sl then
           if List.mem s1 in_test then False
@@ -230,7 +235,7 @@ value print conf base =
   match p_getenv conf.env "ref" with
   [ Some "on" -> print_what_links conf base fnotes
   | _ ->
-      let (title, s) = read_notes base fnotes in
+      let (title, _, s) = read_notes base fnotes in
       match p_getint conf.env "v" with
       [ Some cnt0 -> print_notes_part conf fnotes title s cnt0
       | None -> print_whole_notes conf fnotes title s ] ]
@@ -247,28 +252,33 @@ value print_mod conf base =
     Wserver.wprint "%s - %s%s" (capitale (transl_decline conf "modify" s))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let (ntitle, s) = read_notes base fnotes in
-  Wiki.print_mod_page conf "NOTES" fnotes title ntitle s
+  let (ntitle, name, s) = read_notes base fnotes in
+  Wiki.print_mod_page conf "NOTES" fnotes title (ntitle, name) s
 ;
 
 value update_notes_links_db conf fnotes s force =
   let slen = String.length s in
-  let list =
-    loop [] 0 where rec loop list i =
-      if i = slen then list
+  let (list_nt, list_ind) =
+    loop [] [] 0 where rec loop list_nt list_ind i =
+      if i = slen then (list_nt, list_ind)
       else
         match NotesLinks.misc_notes_link s i with
-        [ Some (j, _, lfname, _, _) ->
-            let list =
-              if List.mem lfname list then list else [lfname :: list]
+        [ NotesLinks.WLpage j _ lfname _ _ ->
+            let list_nt =
+              if List.mem lfname list_nt then list_nt else [lfname :: list_nt]
             in
-            loop list j
-        | None -> loop list (i + 1) ]
+            loop list_nt list_ind j
+        | NotesLinks.WLperson j key _ ->
+            let list_ind =
+              if List.mem key list_ind then list_ind else [key :: list_ind]
+            in
+            loop list_nt list_ind j
+        | NotesLinks.WLnone -> loop list_nt list_ind (i + 1) ]
   in
-  if not force && list = [] then ()
+  if not force && list_nt = [] && list_ind = [] then ()
   else
     let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    NotesLinks.update_db bdir fnotes list
+    NotesLinks.update_db bdir fnotes (list_nt, list_ind)
 ;
 
 value commit_notes conf base fnotes s =
@@ -382,7 +392,7 @@ value print_misc_notes conf base =
              match f with
              [ Some f ->
                  let txt =
-                   let (t, s) = read_notes base f in
+                   let (t, n, s) = read_notes base f in
                    if t <> "" then t
                    else if s = "" then ""
                    else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"

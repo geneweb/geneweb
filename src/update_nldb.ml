@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.12 2005-07-15 14:55:32 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.13 2005-08-18 15:11:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -15,14 +15,21 @@ value anonfun s =
 
 value notes_links s =
   let slen = String.length s in
-  loop [] 0 where rec loop list i =
-    if i = slen then list
+  loop [] [] 0 where rec loop list_nt list_ind i =
+    if i = slen then (list_nt, list_ind)
     else
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, _, lfname, _, _) ->
-          let list = if List.mem lfname list then list else [lfname :: list] in
-          loop list j
-      | None -> loop list (i + 1) ]
+      [ NotesLinks.WLpage j _ lfname _ _ ->
+          let list_nt =
+            if List.mem lfname list_nt then list_nt else [lfname :: list_nt]
+          in
+          loop list_nt list_ind j
+      | NotesLinks.WLperson j key _ ->
+          let list_ind =
+            if List.mem key list_ind then list_ind else [key :: list_ind]
+          in
+          loop list_nt list_ind j
+      | NotesLinks.WLnone -> loop list_nt list_ind (i + 1) ]
 ;
 
 value progr_bar_size = 60;
@@ -88,7 +95,7 @@ value compute base bdir =
     Printf.eprintf "--- database notes\n";
     flush stderr;
     let list = notes_links (base.data.bnotes.nread "" RnAll) in
-    if list = [] then ()
+    if list = ([], []) then ()
     else 
       let pg = NotesLinks.PgNotes in
       NotesLinks.update_db bdir pg list;
@@ -105,7 +112,7 @@ value compute base bdir =
               List.fold_right Filename.concat [bdir; "wiznotes"] file
             in
             let list = notes_links (read_file_contents wfile) in
-            if list = [] then ()
+            if list = ([], []) then ()
             else do {
               Printf.eprintf "%s... " wizid; flush stderr;
               let pg = NotesLinks.PgWizard wizid in
@@ -120,34 +127,50 @@ value compute base bdir =
     [ Sys_error _ -> () ];
     Printf.eprintf "--- misc notes\n";
     flush stderr;
-    try
-      let files = Sys.readdir (Filename.concat bdir "notes_d") in
-      do {
-        for i = 0 to Array.length files - 1 do {
-          let file = files.(i) in
-          if Filename.check_suffix file ".txt" then do {
-            let fnotes = Filename.chop_suffix file ".txt" in
-            let list = notes_links (base.data.bnotes.nread fnotes RnAll) in
-            if list = [] then ()
-            else do {
-              Printf.eprintf "%s... " fnotes; flush stderr;
-              let pg = NotesLinks.PgMisc fnotes in
-              NotesLinks.update_db bdir pg list
+    let ndir = Filename.concat bdir "notes_d" in
+    let rec loop dir name =
+      try
+        let cdir = Filename.concat ndir dir in
+        let files = Sys.readdir cdir in
+        do {
+          for i = 0 to Array.length files - 1 do {
+            let file = files.(i) in
+            if Filename.check_suffix file ".txt" then do {
+              let fnotes = Filename.chop_suffix file ".txt" in
+              let file = Filename.concat dir fnotes in
+              let list = notes_links (base.data.bnotes.nread file RnAll) in
+              if list = ([], []) then ()
+              else do {
+                let fnotes =
+                  if name = "" then fnotes
+                  else
+                    Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep
+                      fnotes
+                in
+                Printf.eprintf "%s...\n" fnotes; flush stderr;
+                let pg = NotesLinks.PgMisc fnotes in
+                NotesLinks.update_db bdir pg list
+              }
             }
-          }
-          else ()
-        };
-        Printf.eprintf "\n"; flush stderr;
-      }
-    with
-    [ Sys_error _ -> () ];
+            else
+              loop (Filename.concat dir file)
+                (if name = "" then file
+                 else
+                   Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
+          };
+          flush stderr;
+        }
+      with
+      [ Sys_error _ -> () ]
+    in
+    loop Filename.current_dir_name "";
     Printf.eprintf "--- individual notes\n";
     flush stderr;
     start_progr_bar ();
     for i = 0 to len - 1 do {
       let p = base.data.persons.get i in
       let list = notes_links (Gutil.sou base p.notes) in
-      if list = [] then ()
+      if list = ([], []) then ()
       else
         let pg = NotesLinks.PgInd (Adef.iper_of_int i) in
         NotesLinks.update_db bdir pg list;

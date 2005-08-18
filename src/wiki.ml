@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.46 2005-08-01 07:59:43 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.47 2005-08-18 15:11:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -149,9 +149,9 @@ use of database forum by ill-intentioned people to communicate)...
       let s = if quot_lev = 0 then "<i>" else "</i>" in
       loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
 
-    else if str_start_with s i "[[[" then
+    else
       match NotesLinks.misc_notes_link s i with
-      [ Some (j, fpath1, fname1, anchor, text) ->
+      [ NotesLinks.WLpage j fpath1 fname1 anchor text ->
           let (fpath, fname) =
             let aliases = notes_aliases conf in
             let fname = map_notes aliases fname1 in
@@ -168,50 +168,14 @@ use of database forum by ill-intentioned people to communicate)...
               (commd conf) mode fname anchor c text
           in
           loop quot_lev j (Buff.mstore len t)
-      | None -> loop quot_lev (i + 3) (Buff.mstore len "[[[") ]
-    else if str_start_with s i "[[" then
-      let j =
-        loop (i + 2) where rec loop j =
-          if j = slen then j
-          else if start_with s j "]]" then j + 2
-          else loop (j + 1)
-      in
-      let t =
-        let b = String.sub s (i + 2) (j - i - 4) in
-        try
-          let k = 0 in
-          let l = String.index_from b k '/' in
-          let fn = String.sub b k (l - k) in
-          let k = l + 1 in
-          let (fn, sn, oc, name) =
-            try
-              let l = String.index_from b k '/' in
-              let sn = String.sub b k (l - k) in
-              let (oc, name) =
-                try
-                  let k = l + 1 in
-                  let l = String.index_from b k '/' in
-                  let x = String.sub b k (l - k) in
-                  (x, String.sub b (l + 1) (String.length b - l - 1))
-                with
-                [ Not_found ->
-                    ("", String.sub b (l + 1) (String.length b - l - 1)) ]
-              in
-              (fn, sn, oc, name)
-            with
-            [ Not_found ->
-                let sn = String.sub b k (String.length b - k) in
-                let name = fn ^ " " ^ sn in
-                (fn, sn, "", name) ]
+      | NotesLinks.WLperson j (fn, sn, oc) name ->
+          let t =
+            sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
+              (code_varenv fn) (code_varenv sn)
+              (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
           in
-          sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
-            (code_varenv (Name.lower fn)) (code_varenv (Name.lower sn))
-            (if oc = "" then "" else ";oc=" ^ oc) name
-        with
-        [ Not_found -> "[[" ^ b ^ "]]" ]
-      in
-      loop quot_lev j (Buff.mstore len t)
-    else loop quot_lev (i + 1) (Buff.store len s.[i])
+          loop quot_lev j (Buff.mstore len t)
+      | NotesLinks.WLnone -> loop quot_lev (i + 1) (Buff.store len s.[i]) ]
 ;
 
 value toc_list = ["__NOTOC__"; "__TOC__"; "__SHORT_TOC__"];
@@ -642,8 +606,9 @@ value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
   }
 ;
 
-value print_mod_page conf mode fname title ntitle s =
+value print_mod_page conf mode fname title (ntitle, name) s =
   let s = if ntitle = "" then s else ntitle ^ "\n" ^ s in
+  let s = if name = "" then s else "NAME=" ^ name ^ "\n" ^ s in
   let (has_v, v) =
     match p_getint conf.env "v" with
     [ Some v -> (True, v)
@@ -727,6 +692,18 @@ value insert_sub_part s v sub_part =
 ;
 
 value split_title_and_text s =
+  let (name, s) =
+    if str_start_with s 0 "NAME=" then
+      try
+        let i = String.length "NAME=" in
+        let j = String.index s '\n' in
+        let name = String.sub s i (j - i) in
+        let s = String.sub s (j + 1) (String.length s - j - 1) in
+        (name, s)
+      with
+      [ Not_found -> ("", s) ]
+    else ("", s)
+  in
   let (tit, txt) =
     try
       let i = String.index s '\n' in
@@ -736,12 +713,14 @@ value split_title_and_text s =
     with
     [ Not_found -> (s, "") ]
   in
-  if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
-  || String.contains tit '['
-  then
-    ("", s)
-  else (tit, txt)
-
+  let (tit, txt) =
+    if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
+    || String.contains tit '['
+    then
+      ("", s)
+    else (tit, txt)
+  in
+  (tit, name, txt)
 ;
 
 value print_ok conf file_path mode edit_mode fname title_is_1st s =
@@ -762,8 +741,8 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
       [ Some v -> v
       | None -> 0 ]
     in
-    let (title, s) =
-      if v = 0 && title_is_1st then split_title_and_text s else ("", s)
+    let (title, _, s) =
+      if v = 0 && title_is_1st then split_title_and_text s else ("", "", s)
     in
     let (lines, _) = lines_list_of_string s in
     let lines =
@@ -786,8 +765,9 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
     match edit_mode fname with
     [ Some edit_mode ->
         let old_string =
-          let (t, s) = read_string fname in
-          if t = "" then s else t ^ "\n" ^ s
+          let (t, n, s) = read_string fname in
+          let s = if t = "" then s else t ^ "\n" ^ s in
+          if n = "" then s else "NAME=" ^ n ^ "\n" ^ s
         in
         let sub_part =
           match Util.p_getenv conf.env "notes" with

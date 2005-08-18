@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.192 2005-08-17 08:24:51 ddr Exp $ *)
+(* $Id: perso.ml,v 4.193 2005-08-18 15:11:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -973,7 +973,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]  
-  | "marriage_place" ->
+ | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
           if m_auth then string_of_place conf base fam.marriage_place else ""
@@ -1699,6 +1699,34 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       (* deprecated since 5.00: rather use "i=%index;" *)
       "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
   | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
+  | "linked_pages" ->
+      let db =
+        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+        let fname = Filename.concat bdir "notes_links" in
+        NotesLinks.read_db_from_file fname
+      in
+      let key =
+        let fn = Name.lower (sou base p.first_name) in
+        let sn = Name.lower (sou base p.surname) in
+        (fn, sn, p.occ)
+      in
+      List.fold_left
+        (fun str (pg, (_, il)) ->
+           match pg with
+           [ NotesLinks.PgMisc pg ->
+               if List.mem key il then
+                 let (_, name, _) = Notes.read_notes base pg in
+                 if name = "" then str
+                 else
+                   let str1 =
+                     Printf.sprintf
+                       "<a href=\"%sm=NOTES;f=%s\">%s</a>" (commd conf)
+                       pg name
+                   in
+                   if str = "" then str1 else str ^ ", " ^ str1
+               else str
+          | _ -> str ])
+         "" db
   | "mark_descendants" ->
       match get_env "desc_mark" env with
       [ Vdmark r ->
