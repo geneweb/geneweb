@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.55 2005-08-18 15:11:36 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.56 2005-08-18 15:30:56 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -64,8 +64,7 @@
 </h1>
 
 %if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
-     has_public_name or has_surnames_aliases or has_first_names_aliases or
-     linked_pages != "")
+     has_public_name or has_surnames_aliases or has_first_names_aliases)
   <table style="width:100%%" border="%border;"><tr><td align="center">
   <table border="%border;" cellspacing="0" cellpadding="0">
   <tr><td>
@@ -92,9 +91,6 @@
       %nobility_title;
     %end;
     </em><br%/>
-  %end;
-  %if;(linked_pages != "")
-    <i>%linked_pages;</i><br%/>
   %end;
   %if;(has_public_name or has_qualifiers)
     <em>(%if;cancel_links;%first_name; %surname;
@@ -124,7 +120,7 @@
 %end;
 %if;(has_occupation or has_birth_date or has_birth_place or
      has_baptism_date or has_baptism_place or is_dead or is_buried or
-     is_cremated or has_consanguinity)
+     is_cremated or has_consanguinity or has_linked_pages)
   %if;has_image;<td>%end;
   <ul>
     %if;has_occupation;<li>%apply;capitalize(occupation)</li>%nl;%end;
@@ -162,6 +158,9 @@
     %end;
     %if;computable_death_age;
       <li>[*age at death:] %death_age;</li>%nl;
+    %end;
+    %if;(linked_pages != "")
+      <li>%linked_pages;</li>
     %end;
     %if;(has_consanguinity and bvar.show_consang != "no")
       <li>[*consanguinity]: %consanguinity;</li>%nl;
