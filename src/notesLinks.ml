@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.8 2005-07-16 03:06:14 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.9 2005-08-18 08:18:26 ddr Exp $ *)
 
 open Def;
 
@@ -77,11 +77,32 @@ value read_db_from_file fname =
   | None -> [] ]
 ;
 
+value share ht s =
+  try Hashtbl.find ht s with
+  [ Not_found -> do { Hashtbl.add ht s s; s } ]
+;
+
+value share_strings db =
+  let ht = Hashtbl.create 103 in
+  List.map
+    (fun (page, list) ->
+       let page =
+         match page with
+         [ PgMisc s -> PgMisc (share ht s)
+         | PgWizard s -> PgWizard (share ht s)
+         | x -> x ]
+       in
+       let list = List.map (share ht) list in
+       (page, list))
+    db
+;
+
 value update_db bdir who list =
   let fname = Filename.concat bdir "notes_links" in
   let notes_links_db = read_db_from_file fname in
   let db = List.remove_assoc who notes_links_db in
   let new_db = if list = [] then db else [(who, list) :: db] in
+  let new_db = share_strings new_db in
   let oc = open_out_bin fname in
   do {
     output_string oc magic_notes_links;
