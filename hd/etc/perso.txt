@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.54 2005-08-15 09:32:09 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.55 2005-08-18 15:11:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -64,7 +64,8 @@
 </h1>
 
 %if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
-     has_public_name or has_surnames_aliases or has_first_names_aliases)
+     has_public_name or has_surnames_aliases or has_first_names_aliases or
+     linked_pages != "")
   <table style="width:100%%" border="%border;"><tr><td align="center">
   <table border="%border;" cellspacing="0" cellpadding="0">
   <tr><td>
@@ -91,6 +92,9 @@
       %nobility_title;
     %end;
     </em><br%/>
+  %end;
+  %if;(linked_pages != "")
+    <i>%linked_pages;</i><br%/>
   %end;
   %if;(has_public_name or has_qualifiers)
     <em>(%if;cancel_links;%first_name; %surname;
