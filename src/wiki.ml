@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.47 2005-08-18 15:11:36 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.48 2005-08-19 01:39:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -606,9 +606,9 @@ value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
   }
 ;
 
-value print_mod_page conf mode fname title (ntitle, name) s =
+value print_mod_page conf mode fname title (ntitle, env) s =
   let s = if ntitle = "" then s else ntitle ^ "\n" ^ s in
-  let s = if name = "" then s else "NAME=" ^ name ^ "\n" ^ s in
+  let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
   let (has_v, v) =
     match p_getint conf.env "v" with
     [ Some v -> (True, v)
@@ -691,19 +691,34 @@ value insert_sub_part s v sub_part =
   String.concat "\n" (List.rev_append lines sl)
 ;
 
+value rec find_env s i =
+  match
+    try Some (String.index_from s i '=', String.index_from s i '\n') with
+    [ Not_found -> None ]
+  with
+  [ Some (j, k) ->
+      if j > i && j < k then
+        let is_key =
+          loop i where rec loop i =
+            if i = j then True
+            else
+              match s.[i] with
+              [ 'A'..'Z' -> loop (i + 1)
+              | _ -> False ]
+        in
+        if is_key then
+          let key = String.sub s i (j - i) in
+          let v = String.sub s (j + 1) (k - j - 1) in
+          let (env, i) = find_env s (k + 1) in
+          ([(key, v) :: env], i)
+        else ([], i)
+      else ([], i)
+  | None -> ([], i) ]
+;
+
 value split_title_and_text s =
-  let (name, s) =
-    if str_start_with s 0 "NAME=" then
-      try
-        let i = String.length "NAME=" in
-        let j = String.index s '\n' in
-        let name = String.sub s i (j - i) in
-        let s = String.sub s (j + 1) (String.length s - j - 1) in
-        (name, s)
-      with
-      [ Not_found -> ("", s) ]
-    else ("", s)
-  in
+  let (env, i) = find_env s 0 in
+  let s = if i = 0 then s else String.sub s i (String.length s - i) in
   let (tit, txt) =
     try
       let i = String.index s '\n' in
@@ -720,7 +735,7 @@ value split_title_and_text s =
       ("", s)
     else (tit, txt)
   in
-  (tit, name, txt)
+  (tit, env, txt)
 ;
 
 value print_ok conf file_path mode edit_mode fname title_is_1st s =
@@ -742,7 +757,7 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
       | None -> 0 ]
     in
     let (title, _, s) =
-      if v = 0 && title_is_1st then split_title_and_text s else ("", "", s)
+      if v = 0 && title_is_1st then split_title_and_text s else ("", [], s)
     in
     let (lines, _) = lines_list_of_string s in
     let lines =
@@ -765,9 +780,9 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
     match edit_mode fname with
     [ Some edit_mode ->
         let old_string =
-          let (t, n, s) = read_string fname in
+          let (t, e, s) = read_string fname in
           let s = if t = "" then s else t ^ "\n" ^ s in
-          if n = "" then s else "NAME=" ^ n ^ "\n" ^ s
+          List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
         in
         let sub_part =
           match Util.p_getenv conf.env "notes" with

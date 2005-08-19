@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.193 2005-08-18 15:11:36 ddr Exp $ *)
+(* $Id: perso.ml,v 4.194 2005-08-19 01:39:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -736,6 +736,7 @@ type env 'a =
   | Vbool of bool
   | Vint of int
   | Vgpl of list generation_person
+  | Vnldb of NotesLinks.notes_links_db
   | Vstring of string
   | Vsosa_ref of Lazy.t (option person)
   | Vsosa of option (Num.t * person)
@@ -1421,6 +1422,62 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | None ->
           warning_use_has_parents_before_parent loc "father" (str_val "") ]
+  | ["has_linked_page"; s] ->
+      match get_env "nldb" env with
+      [ Vnldb db ->
+          let key =
+            let fn = Name.lower (sou base p.first_name) in
+            let sn = Name.lower (sou base p.surname) in
+            (fn, sn, p.occ)
+          in
+          try
+            do {
+              List.iter
+                (fun (pg, (_, il)) ->
+                   match pg with
+                   [ NotesLinks.PgMisc pg ->
+                       if List.mem key il then
+                         let (_, nenv, _) = Notes.read_notes base pg in
+                         try let _ = List.assoc s nenv in raise Exit
+                         with [ Not_found -> () ]
+                       else ()
+                   | _ -> () ])
+                db;
+              VVbool False
+            }
+          with
+          [ Exit -> VVbool True ]
+      | _ -> raise Not_found ]
+  | ["linked_page"; s] ->
+      match get_env "nldb" env with
+      [ Vnldb db ->
+          let key =
+            let fn = Name.lower (sou base p.first_name) in
+            let sn = Name.lower (sou base p.surname) in
+            (fn, sn, p.occ)
+          in
+          let s =
+            List.fold_left
+              (fun str (pg, (_, il)) ->
+                 match pg with
+                 [ NotesLinks.PgMisc pg ->
+                     if List.mem key il then
+                       let (_, nenv, _) = Notes.read_notes base pg in
+                       let v = try List.assoc s nenv with [ Not_found -> "" ] in
+                       if v = "" then str
+                       else
+                         let str1 =
+                           Printf.sprintf
+                             "<a href=\"%sm=NOTES;f=%s\">%s</a>" (commd conf)
+                             pg v
+                         in
+                         if str = "" then str1 else str ^ ", " ^ str1
+                     else str
+                | _ -> str ])
+               "" db
+          in
+          VVstring s
+      | _ -> raise Not_found ]
   | ["mother" :: sl] ->
       match parents a with
       [ Some ifam ->
@@ -1699,34 +1756,6 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       (* deprecated since 5.00: rather use "i=%index;" *)
       "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
   | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
-  | "linked_pages" ->
-      let db =
-        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-        let fname = Filename.concat bdir "notes_links" in
-        NotesLinks.read_db_from_file fname
-      in
-      let key =
-        let fn = Name.lower (sou base p.first_name) in
-        let sn = Name.lower (sou base p.surname) in
-        (fn, sn, p.occ)
-      in
-      List.fold_left
-        (fun str (pg, (_, il)) ->
-           match pg with
-           [ NotesLinks.PgMisc pg ->
-               if List.mem key il then
-                 let (_, name, _) = Notes.read_notes base pg in
-                 if name = "" then str
-                 else
-                   let str1 =
-                     Printf.sprintf
-                       "<a href=\"%sm=NOTES;f=%s\">%s</a>" (commd conf)
-                       pg name
-                   in
-                   if str = "" then str1 else str ^ ", " ^ str1
-               else str
-          | _ -> str ])
-         "" db
   | "mark_descendants" ->
       match get_env "desc_mark" env with
       [ Vdmark r ->
@@ -2606,6 +2635,11 @@ value interp_templ templ_fname conf base p =
     let mal () =  Vint (max_ancestor_level conf base p.cle_index emal + 1) in
     let mcl () =  Vint (max_cousin_level conf base p) in
     let mdl () =  Vint (max_descendant_level conf base desc_level_table_l) in
+    let nldb () =
+      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+      let fname = Filename.concat bdir "notes_links" in
+      Vnldb (NotesLinks.read_db_from_file fname)
+    in
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p a u);
      ("p_auth", Vbool (authorized_age conf base p));
@@ -2619,6 +2653,7 @@ value interp_templ templ_fname conf base p =
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl));
      ("desc_level_table", Vdesclevtab desc_level_table_l);
+     ("nldb", Vlazy (Lazy.lazy_from_fun nldb));
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
   Templ.interp conf base templ_fname (eval_var conf base) (eval_transl conf)

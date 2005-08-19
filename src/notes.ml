@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.123 2005-08-18 15:11:36 ddr Exp $ *)
+(* $Id: notes.ml,v 4.124 2005-08-19 01:39:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -252,8 +252,8 @@ value print_mod conf base =
     Wserver.wprint "%s - %s%s" (capitale (transl_decline conf "modify" s))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let (ntitle, name, s) = read_notes base fnotes in
-  Wiki.print_mod_page conf "NOTES" fnotes title (ntitle, name) s
+  let (ntitle, env, s) = read_notes base fnotes in
+  Wiki.print_mod_page conf "NOTES" fnotes title (ntitle, env) s
 ;
 
 value update_notes_links_db conf fnotes s force =
