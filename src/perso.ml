@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.195 2005-08-19 02:51:39 ddr Exp $ *)
+(* $Id: perso.ml,v 4.196 2005-08-19 08:35:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1466,6 +1466,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                        let v = try List.assoc s nenv with [ Not_found -> "" ] in
                        if v = "" then str
                        else
+                         let v = Util.nth_field v (Util.index_of_sex p.sex) in
                          let str1 =
                            Printf.sprintf
                              "<a href=\"%sm=NOTES;f=%s\">%s</a>" (commd conf)
