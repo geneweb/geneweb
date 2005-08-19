@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.10 2005-08-18 15:11:36 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.11 2005-08-19 01:39:29 ddr Exp $ *)
 
 open Def;
 
@@ -141,6 +141,9 @@ value share_strings db =
          | x -> x ]
        in
        let list_nt = List.map (share ht) list_nt in
+       let list_ind =
+         List.map (fun (fn, sn, oc) -> (share ht fn, share ht sn, oc)) list_ind
+       in
        (page, (list_nt, list_ind)))
     db
 ;

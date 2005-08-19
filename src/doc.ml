@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.38 2005-08-18 15:11:36 ddr Exp $ *)
+(* $Id: doc.ml,v 4.39 2005-08-19 01:39:29 ddr Exp $ *)
 
 open Config;
 
@@ -189,7 +189,7 @@ value read_wdoc lang fname =
         }
       in
       Wiki.split_title_and_text s
-  | None -> ("", "", "") ]
+  | None -> ("", [], "") ]
 ;
 
 value print_whole_wdoc conf fdoc title s =

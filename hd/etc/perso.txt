@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.56 2005-08-18 15:30:56 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.57 2005-08-19 01:39:29 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -120,47 +120,46 @@
 %end;
 %if;(has_occupation or has_birth_date or has_birth_place or
      has_baptism_date or has_baptism_place or is_dead or is_buried or
-     is_cremated or has_consanguinity or has_linked_pages)
+     is_cremated or has_consanguinity or has_linked_page.OCCU != "")
   %if;has_image;<td>%end;
   <ul>
     %if;has_occupation;<li>%apply;capitalize(occupation)</li>%nl;%end;
+    %if;(has_linked_page.OCCU)<li>%linked_page.OCCU;</li>%nl;%end;
     %if;has_birth_date;
       <li>[*born]s %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
-      %if;has_birth_place; - %birth_place;%end;</li>%nl;
+      %if;has_birth_place; - %birth_place;%end;</li>
     %else;
       %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;</li>%nl;%end;
     %end;
     %if;has_baptism_date;
       <li>[*baptized]s %on_baptism_date;
-      %if;has_baptism_place; - %baptism_place;%end;</li>%nl;
+      %if;has_baptism_place; - %baptism_place;%end;</li>
     %else;
-      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;</li>%nl;
+      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;</li>
       %end;
     %end;
     %if;is_dead;
       <li>%apply;capitalize(died)
       %if;has_death_date; %on_death_date;%end;
-      %if;has_death_place; -&nbsp;%death_place;%end;</li>%nl;
+      %if;has_death_place; -&nbsp;%death_place;%end;
+      %if;(has_linked_page.DEATH != "") %linked_page.DEATH;%end;</li>
     %end;
     %if;computable_age;
-      <li>[*age]: %age;</li>%nl;
+      <li>[*age]: %age;</li>
     %end;
     %if;is_buried;
       <li>[*buried]s
       %if;has_burial_date; %on_burial_date;%end;
-      %if;has_burial_place; -&nbsp;%burial_place;%end;</li>%nl;
+      %if;has_burial_place; -&nbsp;%burial_place;%end;</li>
     %end;
     %if;is_cremated;
       <li>[*cremated]s
       %if;has_cremation_date; %on_cremation_date;%end;
-      %if;has_cremation_place; -&nbsp;%cremation_place;%end;</li>%nl;
+      %if;has_cremation_place; -&nbsp;%cremation_place;%end;</li>
     %end;
     %if;computable_death_age;
       <li>[*age at death:] %death_age;</li>%nl;
-    %end;
-    %if;(linked_pages != "")
-      <li>%linked_pages;</li>
     %end;
     %if;(has_consanguinity and bvar.show_consang != "no")
       <li>[*consanguinity]: %consanguinity;</li>%nl;
@@ -295,9 +294,11 @@
   </ul>
 %end;
 
-%if;has_notes;
+%if;(has_notes or has_linked_page.NOTE)
   <h3><span class="highlight">[*note/notes]1</span></h3>
-  <dl><dd>%notes;</dd></dl>
+  <dl><dd>
+    %if;(has_linked_page.NOTE)%linked_page.NOTE;.<br%/>%nl;%end;
+    %notes;</dd></dl>
 %end;
 
 %if;has_sources;
