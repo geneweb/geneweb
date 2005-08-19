@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.58 2005-08-19 01:50:35 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.59 2005-08-19 11:52:20 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -126,17 +126,20 @@
     %if;has_occupation;<li>%apply;capitalize(occupation)</li>%nl;%end;
     %if;(has_linked_page.OCCU)<li>%linked_page.OCCU;</li>%nl;%end;
     %if;has_birth_date;
-      <li>[*born]s %on_birth_date;
+      <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
       %if;has_birth_place; - %birth_place;%end;</li>
     %else;
-      %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;</li>%nl;%end;
+      %if;has_birth_place;
+        <li>%apply;capitalize(nth([born],sex)) -&nbsp;%birth_place;</li>
+      %end;
     %end;
     %if;has_baptism_date;
-      <li>[*baptized]s %on_baptism_date;
+      <li>%apply;capitalize(nth([baptized],sex)) %on_baptism_date;
       %if;has_baptism_place; - %baptism_place;%end;</li>
     %else;
-      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;</li>
+      %if;has_baptism_place;
+        <li>%apply;capitalize(nth([baptized],sex)) -&nbsp;%baptism_place;</li>
       %end;
     %end;
     %if;is_dead;
@@ -149,12 +152,12 @@
       <li>[*age]: %age;</li>
     %end;
     %if;is_buried;
-      <li>[*buried]s
+      <li>%apply;capitalize(nth([buried],sex))
       %if;has_burial_date; %on_burial_date;%end;
       %if;has_burial_place; -&nbsp;%burial_place;%end;</li>
     %end;
     %if;is_cremated;
-      <li>[*cremated]s
+      <li>%apply;capitalize(nth([cremated],sex))
       %if;has_cremation_date; %on_cremation_date;%end;
       %if;has_cremation_place; -&nbsp;%cremation_place;%end;</li>
     %end;
@@ -346,13 +349,13 @@
         %foreach;father.child;
           %if;is_sibling_before;
             <li>
-            <a href="%prefix;%child.access;"
-             class="highlight">[*previous sibling]s</a></li>
+            <a href="%prefix;%child.access;" class="highlight">%nn;
+            %apply;capitalize(nth([previous sibling],sex))</a></li>
           %end;
           %if;is_sibling_after;
             <li>
-            <a href="%prefix;%child.access;"
-             class="highlight">[*next sibling]s</a></li>
+            <a href="%prefix;%child.access;" class="highlight">%nn;
+            %apply;capitalize(nth([next sibling],sex))</a></li>
           %end;
         %end;
       %end;
