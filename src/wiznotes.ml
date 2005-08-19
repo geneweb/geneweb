@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.38 2005-08-19 01:39:30 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.39 2005-08-19 02:51:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -349,7 +349,7 @@ value print_mod conf base =
           let title = wizard_page_title wz wz in
           let wfile = wzfile (dir conf) wz in
           let (s, _) = read_wizard_notes wfile in
-          Wiki.print_mod_page conf "WIZNOTES" wz title ("", []) s
+          Wiki.print_mod_page conf "WIZNOTES" wz title [] s
         else incorrect_request conf
     | None -> incorrect_request conf ]
 ;
@@ -387,7 +387,7 @@ value print_mod_ok conf base =
     in
     let mode = "NOTES" in
     let read_string wz =
-      ("", [], fst (read_wizard_notes (wzfile (dir conf) wz)))
+      ([], fst (read_wizard_notes (wzfile (dir conf) wz)))
     in
     let commit = commit_wiznotes in
     let string_filter = string_with_macros conf [] in

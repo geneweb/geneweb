@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.194 2005-08-19 01:39:29 ddr Exp $ *)
+(* $Id: perso.ml,v 4.195 2005-08-19 02:51:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1437,7 +1437,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                    match pg with
                    [ NotesLinks.PgMisc pg ->
                        if List.mem key il then
-                         let (_, nenv, _) = Notes.read_notes base pg in
+                         let (nenv, _) = Notes.read_notes base pg in
                          try let _ = List.assoc s nenv in raise Exit
                          with [ Not_found -> () ]
                        else ()
@@ -1462,7 +1462,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                  match pg with
                  [ NotesLinks.PgMisc pg ->
                      if List.mem key il then
-                       let (_, nenv, _) = Notes.read_notes base pg in
+                       let (nenv, _) = Notes.read_notes base pg in
                        let v = try List.assoc s nenv with [ Not_found -> "" ] in
                        if v = "" then str
                        else
