@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.196 2005-08-19 08:35:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.197 2005-08-19 11:52:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1869,6 +1869,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match p.qualifiers with
       [ [nn :: _] when p_auth -> sou base nn
       | _ -> "" ]
+  | "sex" -> string_of_int (index_of_sex p.sex)
   | "sosa_in_list" ->
       match get_env "all_gp" env with
       [ Vallgp all_gp ->
@@ -2006,6 +2007,7 @@ value eval_transl conf env upp s c =
       let n =
         match c with
         [ "n" ->
+            (* replaced by %apply;nth([...],sex) *)
             match get_env "p" env with
             [ Vind p _ _ -> 1 - index_of_sex p.sex
             | _ -> 2 ]
