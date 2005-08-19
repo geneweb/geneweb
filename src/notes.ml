@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.124 2005-08-19 01:39:29 ddr Exp $ *)
+(* $Id: notes.ml,v 4.125 2005-08-19 02:51:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -235,7 +235,8 @@ value print conf base =
   match p_getenv conf.env "ref" with
   [ Some "on" -> print_what_links conf base fnotes
   | _ ->
-      let (title, _, s) = read_notes base fnotes in
+      let (nenv, s) = read_notes base fnotes in
+      let title = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
       match p_getint conf.env "v" with
       [ Some cnt0 -> print_notes_part conf fnotes title s cnt0
       | None -> print_whole_notes conf fnotes title s ] ]
@@ -252,8 +253,8 @@ value print_mod conf base =
     Wserver.wprint "%s - %s%s" (capitale (transl_decline conf "modify" s))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
-  let (ntitle, env, s) = read_notes base fnotes in
-  Wiki.print_mod_page conf "NOTES" fnotes title (ntitle, env) s
+  let (env, s) = read_notes base fnotes in
+  Wiki.print_mod_page conf "NOTES" fnotes title env s
 ;
 
 value update_notes_links_db conf fnotes s force =
@@ -392,7 +393,8 @@ value print_misc_notes conf base =
              match f with
              [ Some f ->
                  let txt =
-                   let (t, n, s) = read_notes base f in
+                   let (n, s) = read_notes base f in
+                   let t = try List.assoc "TITLE" n with [ Not_found -> "" ] in
                    if t <> "" then t
                    else if s = "" then ""
                    else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"

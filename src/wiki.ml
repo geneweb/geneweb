@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.48 2005-08-19 01:39:30 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.49 2005-08-19 02:51:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -606,8 +606,7 @@ value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
   }
 ;
 
-value print_mod_page conf mode fname title (ntitle, env) s =
-  let s = if ntitle = "" then s else ntitle ^ "\n" ^ s in
+value print_mod_page conf mode fname title env s =
   let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
   let (has_v, v) =
     match p_getint conf.env "v" with
@@ -719,23 +718,28 @@ value rec find_env s i =
 value split_title_and_text s =
   let (env, i) = find_env s 0 in
   let s = if i = 0 then s else String.sub s i (String.length s - i) in
-  let (tit, txt) =
-    try
-      let i = String.index s '\n' in
-      let tit = String.sub s 0 i in
-      let txt = String.sub s (i + 1) (String.length s - i - 1) in
-      (tit, txt)
-    with
-    [ Not_found -> (s, "") ]
-  in
-  let (tit, txt) =
-    if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
-    || String.contains tit '['
-    then
-      ("", s)
-    else (tit, txt)
-  in
-  (tit, env, txt)
+  if try List.assoc "TITLE" env with [ Not_found -> "" ] = "" then
+    (* just compatibility with prev impl (could be removed at release) *)
+    let (tit, txt) =
+      try
+        let i = String.index s '\n' in
+        let tit = String.sub s 0 i in
+        let txt = String.sub s (i + 1) (String.length s - i - 1) in
+        (tit, txt)
+      with
+      [ Not_found -> (s, "") ]
+    in
+    let (tit, txt) =
+      if String.length tit > 0 && tit.[0] = '=' || String.contains tit '<'
+      || String.contains tit '['
+      then
+        ("", s)
+      else (tit, txt)
+    in
+    let env = if tit <> "" then [("TITLE", tit) :: env] else env in
+    (env, txt)
+  else
+    (env, s)
 ;
 
 value print_ok conf file_path mode edit_mode fname title_is_1st s =
@@ -756,8 +760,11 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
       [ Some v -> v
       | None -> 0 ]
     in
-    let (title, _, s) =
-      if v = 0 && title_is_1st then split_title_and_text s else ("", [], s)
+    let (title, s) =
+      if v = 0 && title_is_1st then
+        let (env, s) = split_title_and_text s in
+        (try List.assoc "TITLE" env with [ Not_found -> "" ], s)
+      else ("", s)
     in
     let (lines, _) = lines_list_of_string s in
     let lines =
@@ -780,8 +787,7 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
     match edit_mode fname with
     [ Some edit_mode ->
         let old_string =
-          let (t, e, s) = read_string fname in
-          let s = if t = "" then s else t ^ "\n" ^ s in
+          let (e, s) = read_string fname in
           List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
         in
         let sub_part =
