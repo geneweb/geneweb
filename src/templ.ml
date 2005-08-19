@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.93 2005-08-17 08:24:51 ddr Exp $ *)
+(* $Id: templ.ml,v 4.94 2005-08-19 12:30:22 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -104,12 +104,15 @@ value transl_index =
 
 value lexicon_word =
   let upper = parser [ [: `'*' :] -> True | [: :] -> False ] in
-  let rec text len =
+  let rec text lev len =
     parser
-    [ [: `']' :] -> Buff.get len
-    | [: `c; s :] -> text (Buff.store len c) s ]
+    [ [: `'['; s :] -> text (lev + 1) (Buff.store len '[') s
+    | [: `']'; s :] ->
+        if lev = 0 then Buff.get len
+        else text (lev - 1) (Buff.store len ']') s
+    | [: `c; s :] -> text lev (Buff.store len c) s ]
   in
-  parser [: upp = upper; s = text 0; n = transl_index :] -> (upp, s, n)
+  parser [: upp = upper; s = text 0 0; n = transl_index :] -> (upp, s, n)
 ;
 
 value rec parse_comment =
