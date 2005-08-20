@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.94 2005-08-19 12:30:22 ddr Exp $ *)
+(* $Id: templ.ml,v 4.95 2005-08-20 09:48:14 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -531,21 +531,22 @@ value input conf fname =
   match open_templ conf dir fname with
   [ Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
-      do { close_in ic; astl }
-  | None ->
-      let title _ = Wserver.wprint "Error" in
-      do {
-        Util.header conf title;
-        tag "ul" begin
-          tag "li" begin
-            Wserver.wprint "Cannot access file \"%s.txt\".\n"
-              (if dir = Filename.current_dir_name then fname
-               else Filename.concat dir fname);
-          end;
-        end;
-        Util.trailer conf;
-        raise Exit
-      } ]
+      do { close_in ic; Some astl }
+  | None -> None ]
+;
+
+value error_cannot_access conf fname =
+  let title _ = Wserver.wprint "Error" in
+  do {
+    Util.header conf title;
+    tag "ul" begin
+      tag "li" begin
+        Wserver.wprint "Cannot access file \"%s.txt\".\n"
+          fname;
+      end;
+    end;
+    Util.trailer conf;
+  }
 ;
 
 (* Common evaluation functions *)
@@ -782,6 +783,7 @@ value eval_bool_var conf eval_var =
   | ["friend"] -> conf.friend
   | ["has_referer"] -> (* deprecated since version 5.00 *) 
       Wserver.extract_param "referer: " '\n' conf.request <> ""
+  | ["just_friend_wizard"] -> conf.just_friend_wizard
   | ["wizard"] -> conf.wizard
   | sl ->
       match eval_var sl with
@@ -1080,8 +1082,13 @@ value interp
     with
     [ Not_found -> VVstring (eval_variable conf [] sl) ]
   in
-  let print_var conf base env ep loc s sl =
-    templ_print_var conf base (eval_var env ep loc) s sl
+  let print_var print_ast conf base env ep loc s sl =
+    match [s :: sl] with
+    [ ["include"; templ] ->
+        match  input conf templ with
+        [ Some astl -> List.iter (print_ast env ep) astl
+        | None ->  Wserver.wprint " %%%s?" (String.concat "." [s :: sl]) ]
+    | _ -> templ_print_var conf base (eval_var env ep loc) s sl ]
   in
   let print_foreach print_ast eval_expr env ep loc s sl el al =
     try print_foreach print_ast eval_expr env ep loc s sl el al with
@@ -1119,6 +1126,8 @@ value interp
     | None ->
         match (f, vl) with
         [ ("capitalize", [s]) -> Util.capitale s
+        | ("language_name", [s]) ->
+            Translate.language_name s (Util.transl conf " !languages")
         | ("nth", [s1; s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
             Util.nth_field s1 n
@@ -1136,7 +1145,7 @@ value interp
   in
   let rec print_ast env ep =
     fun
-    [ Avar loc s sl -> print_var conf base env ep loc s sl
+    [ Avar loc s sl -> print_var print_ast conf base env ep loc s sl
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->
@@ -1173,11 +1182,14 @@ value interp
     List.iter (print_ast env ep) al
   in
   fun env ep ->
-    let astl = input conf fname in
-    let print_ast = print_ast env ep in
-    do {
-      Util.html conf;
-      Util.nl ();
-      List.iter print_ast astl;
-    }
+    match input conf fname with
+    [ Some astl ->
+        let print_ast = print_ast env ep in
+        do {
+          Util.html conf;
+          Util.nl ();
+          List.iter print_ast astl;
+        }
+    | None ->
+        error_cannot_access conf fname ]
 ;
