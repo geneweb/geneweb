@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.197 2005-08-19 11:52:20 ddr Exp $ *)
+(* $Id: perso.ml,v 4.198 2005-08-21 23:08:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -807,6 +807,14 @@ value obsolete (bp, ep) version var new_var r =
   ELSE r END
 ;
 
+value string_of_num sep num =
+  let len = ref 0 in
+  do {
+    Num.print (fun x -> len.val := Buff.mstore len.val x) sep num;
+    Buff.get len.val
+  }
+;
+
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
@@ -1096,6 +1104,11 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
       | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found ]
+  | ["base"; "name"] -> VVstring conf.bname
+  | ["base"; "nb_persons"] ->
+      VVstring
+        (string_of_num (Util.transl conf "(thousand separator)")
+           (Num.of_int base.data.persons.len))
   | ["cell" :: sl] ->
       match get_env "cell" env with
       [ Vcell cell -> eval_cell_field_var conf base env ep cell loc sl

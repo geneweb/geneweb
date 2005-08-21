@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.60 2005-08-17 09:33:12 ddr Exp $ *)
+(* $Id: dag.ml,v 4.61 2005-08-21 23:08:49 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -115,70 +115,69 @@ value make_dag conf base set =
          {pare = pare; valu = Left ip; chil = chil})
       nodes
   in
-  let extra_nodes =
-    loop [] (Array.length nodes) 0 where rec loop list1 n i =
-      if i = Array.length nodes then List.rev list1
+  let nodes =
+    loop nodes (Array.length nodes) 0 where rec loop nodes n i =
+      if i = Array.length nodes then nodes
       else
         match nodes.(i) with
         [ {valu = Left ip; chil = chil} ->
             let ifaml = Array.to_list (uoi base ip).family in
-            let (list1, n) =
-              loop list1 ifaml where rec loop list1 =
+            let (nodes, n) =
+              loop nodes ifaml where rec loop nodes =
                 fun
                 [ [ifam :: ifaml] ->
                     let cpl = coi base ifam in
-                    if ip = father cpl then
-                      let jdo =
-                        try Some (M.find (mother cpl) map) with
-                        [ Not_found -> None ]
-                      in
-                      match jdo with
-                      [ Some jd ->
-                          let j = int_of_idag jd in
-                          if chil = [] && nodes.(j).chil = [] then
-                            (* married but no child in the dag *)
-                            let pare = [idag_of_int i; jd] in
-                            let d = {pare = pare; valu = Right n; chil = []} in
-                            let list1 = [d :: list1] in
-                            let nd = idag_of_int n in
-                            do {
-                              nodes.(i).chil := [nd];
-                              nodes.(j).chil := [nd];
-                              (list1, n + 1)
-                            }
-                          else if chil <> nodes.(j).chil then
-                            (* married; group their children even step ones *)
-                            do {
-                              List.iter
-                                (fun nd ->
-                                   if List.mem nd nodes.(j).chil then ()
-                                   else do {
-                                     let n = int_of_idag nd in
-                                     nodes.(j).chil := [nd :: nodes.(j).chil];
-                                     nodes.(n).pare := [jd :: nodes.(n).pare];
-                                   })
-                                chil;
-                              List.iter
-                                (fun nd ->
-                                   if List.mem nd chil then ()
-                                   else do {
-                                     let id = idag_of_int i in
-                                     let n = int_of_idag nd in
-                                     nodes.(i).chil := [nd :: chil];
-                                     nodes.(n).pare := [id :: nodes.(n).pare];
-                                   })
-                                nodes.(j).chil;
-                              loop list1 ifaml
-                            }
-                          else loop list1 ifaml
-                      | None -> loop list1 ifaml ]
-                    else loop list1 ifaml
-                | [] -> (list1, n) ]
+                    let isp = spouse ip cpl in
+                    let jdo =
+                      try Some (M.find isp map) with
+                      [ Not_found -> None ]
+                    in
+                    match jdo with
+                    [ Some jd ->
+                        let j = int_of_idag jd in
+                        if chil = [] && nodes.(j).chil = [] then
+                          (* married but no child in the dag *)
+                          let pare = [idag_of_int i; jd] in
+                          let d = {pare = pare; valu = Right n; chil = []} in
+                          let nodes = Array.append nodes [| d |] in
+                          let nd = idag_of_int n in
+                          do {
+                            nodes.(i).chil := [nd];
+                            nodes.(j).chil := [nd];
+                            (nodes, n + 1)
+                          }
+                        else if chil <> nodes.(j).chil then
+                          (* married; group their children even step ones *)
+                          do {
+                            List.iter
+                              (fun nd ->
+                                 if List.mem nd nodes.(j).chil then ()
+                                 else do {
+                                   let n = int_of_idag nd in
+                                   nodes.(j).chil := [nd :: nodes.(j).chil];
+                                   nodes.(n).pare := [jd :: nodes.(n).pare];
+                                 })
+                              chil;
+                            List.iter
+                              (fun nd ->
+                                 if List.mem nd chil then ()
+                                 else do {
+                                   let id = idag_of_int i in
+                                   let n = int_of_idag nd in
+                                   nodes.(i).chil := [nd :: chil];
+                                   nodes.(n).pare := [id :: nodes.(n).pare];
+                                 })
+                              nodes.(j).chil;
+                            loop nodes ifaml
+                          }
+                        else loop nodes ifaml
+                    | None -> loop nodes ifaml ]
+                | [] -> (nodes, n) ]
             in
-            loop list1 n (i + 1)
-        | _ -> loop list1 n (i + 1) ]
+            loop nodes n (i + 1)
+        | _ -> loop nodes n (i + 1) ]
   in
-  {dag = Array.append nodes (Array.of_list extra_nodes)}
+  {dag = nodes}
 ;
 
 value image_normal_txt conf base p fname width height =
@@ -1157,8 +1156,7 @@ and print_foreach_dag_cell_pre conf hts print_ast env al =
                   if conf.cancel_links then "|"
                   else
                     sprintf
-                      "<a style=\"text-decoration:none\" href=\"%s\">|</a>"
-                      s ]
+                      "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s ]
             in
             let len = displayed_length s in
             String.make ((sz - len) / 2) ' ' ^ s ^
