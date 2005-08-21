@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.83 2005-08-16 21:39:01 ddr Exp $ *)
+(* $Id: relation.ml,v 4.84 2005-08-21 23:08:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -263,7 +263,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
       ([], List.length excl_faml - 1) excl_faml
   in
   let sl =
-    ["em=R;ei=";
+    [commd conf; "em=R;ei=";
      string_of_int (Adef.int_of_iper ip1); ";i=";
      string_of_int (Adef.int_of_iper ip2);
      if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";

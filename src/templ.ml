@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.95 2005-08-20 09:48:14 ddr Exp $ *)
+(* $Id: templ.ml,v 4.96 2005-08-21 23:08:49 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -629,7 +629,7 @@ value not_impl func x =
 ;
 
 value rec eval_variable conf env =
-  fun 
+  fun
   [ ["bvar"; v] ->
       try List.assoc v conf.base_env with [ Not_found -> "" ]
   | ["evar"; v] ->
@@ -1126,6 +1126,9 @@ value interp
     | None ->
         match (f, vl) with
         [ ("capitalize", [s]) -> Util.capitale s
+        | ("interp", [s]) ->
+            let astl = parse_templ conf (Stream.of_string s) in
+            String.concat "" (List.map eval_ast astl)
         | ("language_name", [s]) ->
             Translate.language_name s (Util.transl conf " !languages")
         | ("nth", [s1; s2]) ->
