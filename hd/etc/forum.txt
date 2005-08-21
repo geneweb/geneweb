@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.6 2005-08-16 12:34:16 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.7 2005-08-21 19:48:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -162,9 +162,9 @@
         </b></a></td>
     <td>%nn;
        %if;(message.subject = "" or message.subject = "-")
-         <i>...&nbsp;%message.text.cut.50;</i>%nn;
+         <i>...&nbsp;%message.text.cut.80;</i>%nn;
        %else;
-         %message.subject.cut.50;%nn;
+         %message.subject.cut.80;%nn;
        %end;
     </td>
     </tr>
