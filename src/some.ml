@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.37 2005-05-23 01:23:40 ddr Exp $ *)
+(* $Id: some.ml,v 4.38 2005-08-22 08:55:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -223,8 +223,22 @@ value she_has_children_with_her_name conf base wife husband children =
 
 value max_lev = 3;
 
+value child_has_children_with_same_name base des cln =
+  List.exists
+    (fun ip ->
+       List.exists
+         (fun ifam ->
+            List.exists
+              (fun ip ->
+                 Name.crush_lower (p_surname base (poi base ip)) = cln)
+              (Array.to_list (doi base ifam).children))
+         (Array.to_list (uoi base ip).family))
+    (Array.to_list des.children)
+;
+
 value print_branch conf base psn name =
   let unsel_list = Util.unselected_bullets conf in
+  let cln = Name.crush_lower name in
   loop True where rec loop is_first_lev lev p =
     do {
       let u = uget conf base p.cle_index in
@@ -238,12 +252,11 @@ value print_branch conf base psn name =
              let c = pget conf base c in
              let down =
                p.sex = Male &&
-               (Name.crush_lower (p_surname base p) =
-                  Name.crush_lower name ||
-                is_first_lev) &&
+               (Name.crush_lower (p_surname base p) = cln || is_first_lev) &&
                Array.length des.children <> 0 ||
                p.sex = Female &&
-               she_has_children_with_her_name conf base p c el
+               she_has_children_with_her_name conf base p c el ||
+               child_has_children_with_same_name base des cln
              in
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.memq i unsel_list) in
@@ -529,17 +542,29 @@ value select_ancestors conf base name_inj ipl =
        match parents a with
        [ Some ifam ->
            let cpl = coi base ifam in
-           let fath = pget conf base (father cpl) in
+           let ifath = father cpl in
+           let fath = pget conf base ifath in
            let moth = pget conf base (mother cpl) in
            let s = str_inj p.surname in
            if str_inj fath.surname <> s && str_inj moth.surname <> s &&
               not (List.memq ip ipl) then
-             if List.memq (father cpl) ipl then ipl
-             else if not (is_hidden fath) &&
-               has_at_least_2_children_with_surname conf base (doi base ifam)
-                 p.surname then
-               [(father cpl) :: ipl]
-             else [ip :: ipl]
+             if List.memq ifath ipl then ipl
+             else
+               let grandfath_same_surname =
+                 match parents (aoi base ifath) with
+                 [ Some igfam ->
+                     let gfath = poi base (father (coi base igfam)) in
+                     str_inj gfath.surname = s
+                 | None -> False ]
+               in
+               if grandfath_same_surname then ipl
+               else if
+                 not (is_hidden fath) &&
+                 has_at_least_2_children_with_surname conf base (doi base ifam)
+                 p.surname
+               then
+                 [ifath :: ipl]
+               else [ip :: ipl]
            else ipl
        | _ -> [ip :: ipl] ])
     [] ipl
