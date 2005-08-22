@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.38 2005-08-22 08:55:20 ddr Exp $ *)
+(* $Id: some.ml,v 4.39 2005-08-22 12:02:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -223,14 +223,13 @@ value she_has_children_with_her_name conf base wife husband children =
 
 value max_lev = 3;
 
-value child_has_children_with_same_name base des cln =
+value child_has_children_with_same_name base des name =
   List.exists
     (fun ip ->
        List.exists
          (fun ifam ->
             List.exists
-              (fun ip ->
-                 Name.crush_lower (p_surname base (poi base ip)) = cln)
+              (fun ip -> p_surname base (poi base ip) = name)
               (Array.to_list (doi base ifam).children))
          (Array.to_list (uoi base ip).family))
     (Array.to_list des.children)
@@ -256,7 +255,7 @@ value print_branch conf base psn name =
                Array.length des.children <> 0 ||
                p.sex = Female &&
                she_has_children_with_her_name conf base p c el ||
-               child_has_children_with_same_name base des cln
+               child_has_children_with_same_name base des name
              in
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.memq i unsel_list) in
