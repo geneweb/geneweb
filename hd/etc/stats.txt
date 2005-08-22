@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: stats.txt,v 1.1 2005-08-17 08:24:51 ddr Exp $ -->
+  <!-- $Id: stats.txt,v 1.2 2005-08-22 09:51:42 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*statistics]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -39,7 +39,7 @@
 %define;alive(nnn)[the %d oldest perhaps still alive:::nnn]%end;
 %define;lived(nnn)[the %d who lived the longest:::nnn]%end;
 
-%let;n;%if;(bvar.latest_event != "")%bvar.latest_event;%else;20;%end;%in;
+%let;n;%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;%in;
 
 <ul>
 %if;(wizard or friend)
