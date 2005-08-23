@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.7 2005-08-21 19:48:10 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.8 2005-08-23 00:52:22 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -54,23 +54,23 @@
     <table border="%border;">
     <tr align="%left;">
       <td>[*ident/email/subject]0</td>
-      <td><input name="Ident" size="40" maxlength="200"%sp;
+      <td><input name="Ident" size="60" maxlength="200"%sp;
            value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/
 	   ><td>
     </tr>
     <tr align="%left;">
       <td>[*ident/email/subject]1 ([optional])</td>
-      <td><input name="Email" size="40" maxlength="200" value=""%/><td>
+      <td><input name="Email" size="60" maxlength="200" value=""%/><td>
     </tr>
     <tr align="%left;">
       <td>[*ident/email/subject]2</td>
-      <td><input name="Subject" size="40" maxlength="200" value=""%/><td>
+      <td><input name="Subject" size="60" maxlength="200" value=""%/><td>
     </tr>
     </table>
     <p>
     [*message/previous message/previous messages/next message]0
     <br%/>
-    <textarea name="Text" rows="15" cols="70"></textarea>
+    <textarea name="Text" rows="15" cols="80"></textarea>
     <br%/>
     %if;(wizard or friend)
       <input type="submit" name="publ_acc" value="[public]"%/>
