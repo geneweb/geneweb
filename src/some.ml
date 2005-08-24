@@ -1,11 +1,12 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.42 2005-08-24 12:46:42 ddr Exp $ *)
+(* $Id: some.ml,v 4.43 2005-08-24 13:20:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
+open TemplAst;
 
 value not_found conf txt x =
   let title _ = Wserver.wprint "%s: \"%s\"" (capitale txt) x in
@@ -585,7 +586,7 @@ value persons_of_absolute_surname conf base x =
     istrl []
 ;
 
-value surname_print conf base not_found_fun x =
+value old_surname_print conf base not_found_fun x =
   let (l, name_inj) =
     if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
@@ -623,4 +624,134 @@ value surname_print conf base not_found_fun x =
       let pl = List.map (pget conf base) iperl in
       if pl = [] then not_found_fun conf x
       else print_by_branch x conf base (pl, strl) ]
+;
+
+(* *)
+
+type env 'a =
+  [ Vbool of bool
+  | Vbr of list person and list string
+  | Vhomon of string
+  | Vlazy of Lazy.t (env 'a)
+  | Vother of 'a
+  | Vnone ]
+;
+
+value get_env v env =
+  try
+    match List.assoc v env with
+    [ Vlazy l -> Lazy.force l
+    | x -> x ]
+  with
+  [ Not_found -> Vnone ]
+;
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
+
+value rec eval_var env x loc =
+  fun
+  [ ["is_first"] ->
+      match get_env "first" env with
+      [ Vbool b -> VVbool b
+      | _ -> raise Not_found ]
+  | ["number_of_branches"] ->
+      match get_env "branches" env with
+      [ Vbr ancestors _ -> VVstring (string_of_int (List.length ancestors))
+      | _ -> raise Not_found ]
+  | ["number_of_possible_surnames"] ->
+      match get_env "branches" env with
+      [ Vbr _ homonyms -> VVstring (string_of_int (List.length homonyms))
+      | _ -> raise Not_found ]
+  | ["possible_surname" :: sl] ->
+      match get_env "homonym" env with
+      [ Vhomon s -> VVstring (eval_string_var s sl)
+      | _ -> raise Not_found ]
+  | ["surname" :: sl] ->
+      match get_env "branches" env with
+      [ Vbr _ [s] -> VVstring (eval_string_var s sl)
+      | _ -> VVstring (eval_string_var x sl) ]
+  | _ -> raise Not_found ]
+and eval_string_var s =
+  fun
+  [ ["key"] -> code_varenv s
+  | [] -> s
+  | _ -> raise Not_found ]
+;
+
+value print_foreach print_ast eval_expr =
+  let rec print_foreach env n loc s sl el al =
+    match [s :: sl] with
+    [ ["possible_surname"] -> print_foreach_possible_surname env n al
+    | _ -> raise Not_found ]
+  and print_foreach_possible_surname env n al =
+    let homonyms =
+      match get_env "branches" env with
+      [ Vbr _ homonyms -> homonyms
+      | _ -> raise Not_found ]
+    in
+    list_iter_first
+      (fun first x ->
+         let env = [("first", Vbool first); ("homonym", Vhomon x) :: env] in
+         let print_ast = print_ast env n in
+         List.iter print_ast al)
+      homonyms
+  in
+  print_foreach
+;
+
+value surname_print_2 conf base x =
+  let (l, name_inj) =
+    if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_surname conf base x, fun x -> x)
+    else if x = "" then ([], fun [])
+    else
+      persons_of_fsname conf base base.func.persons_of_surname.find
+        (fun x -> x.surname) x
+  in
+  let (iperl, strl) =
+    List.fold_right
+      (fun (str, istr, iperl1) (iperl, strl) ->
+         let len = List.length iperl1 in
+         (iperl1 @ iperl, [(str, len) :: strl]))
+      l ([], [])
+  in
+  let br () =
+    let strl =
+      List.sort (fun (_, len1) (_, len2) -> compare len2 len1) strl
+    in
+    let homonyms = List.map fst strl in
+    let homonyms = List.sort compare homonyms in
+    let iperl = select_ancestors conf base name_inj iperl in
+    let pl = List.map (pget conf base) iperl in
+    let ancestors =
+      match p_getenv conf.env "order" with
+      [ Some "d" ->
+          let born_before p1 p2 =
+            match (Adef.od_of_codate p1.birth,
+                   Adef.od_of_codate p2.birth) with
+            [ (Some d1, Some d2) ->
+                if d2 strictly_after d1 then -1 else 1
+            | (_, None) -> -1
+            | (None, _) -> 1 ]
+          in
+          List.sort born_before pl
+      | _ ->
+          List.sort
+            (fun p1 p2 ->
+               alphabetic (p_first_name base p1) (p_first_name base p2))
+            pl ]
+    in
+    Vbr ancestors homonyms
+  in
+  let env = [("branches", Vlazy (Lazy.lazy_from_fun br))] in
+  Templ.interp conf base "surname" eval_var
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother print_foreach env x
+;
+
+value surname_print conf base not_found_fun x =
+  if p_getenv conf.env "new" <> Some "on" then
+    old_surname_print conf base not_found_fun x else
+  try surname_print_2 conf base x with
+  [ Not_found -> not_found_fun conf x ]
 ;
