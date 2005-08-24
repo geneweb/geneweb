@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: surname.txt,v 1.1 2005-08-24 13:20:08 ddr Exp $ -->
+  <!-- $Id: surname.txt,v 1.2 2005-08-24 18:33:04 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[surname/surnames]0: %surname;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -38,8 +38,11 @@
     %else;
       %foreach;possible_surname;
         %if;(not is_first), %end;
-        <a href="%prefix;m=N;v=%possible_surname.key;;t=A">%possible_surname;
-        </a>%nn;
+        %if;(evar.cgl = "on")%possible_surname;
+        %else;
+          <a href="%prefix;m=N;v=%possible_surname.key;;t=A">%possible_surname;
+          </a>%nn;
+        %end;
       %end;
     %end;
   </h1>
@@ -55,7 +58,28 @@
       [*number of branches]: %number_of_branches;
       <dl>
     %end;
-    ...branches... (to be implemented)
+    %foreach;branch;
+      %if;(number_of_branches > 1 and evar.br = "")
+        <dt><a href="%prefix;m=N;v=%surname.key;;br=%cnt;">%cnt;.</a></dt>
+      %end;
+      %if;(evar.br = "" or evar.br = cnt)
+        %if;ancestor.has_parents;
+          <dd>
+          %if;(ancestor.father.is_restricted or evar.cgl = "on")&lt;&lt;%sp;
+          %else;
+            <a href="%prefix;%ancestor.father.access;">&lt;&lt;</a>
+          %end;
+          &amp;
+          %if;(ancestor.mother.is_restricted or evar.cgl = "on")&lt;&lt;%nl;
+          %else;
+            <a href="%prefix;%ancestor.mother.access;">&lt;&lt;</a>
+          %end;
+          <dl>
+        %end;
+        ...branch...part 2...(to be implemented)
+        %if;ancestor.has_parents;</dl>%nl;</dd>%end;
+      %end;
+    %end;
     %if;(number_of_branches > 1 and evar.br = "")</dl>%nl;%end;
   </div>
 %end;
