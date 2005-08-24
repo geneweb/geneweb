@@ -1,0 +1,71 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: surname.txt,v 1.1 2005-08-24 13:20:08 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
+  <title>[surname/surnames]0: %surname;</title>
+  <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%if;(evar.o = "i")
+  %( print alphabetically %)
+  alpha
+%else;
+  %( print by branch %)
+  <h1 style="text-align:center" class="highlight">%nn;
+    %if;(number_of_possible_surnames = 1)%surname;
+    %else;
+      %foreach;possible_surname;
+        %if;(not is_first), %end;
+        <a href="%prefix;m=N;v=%possible_surname.key;;t=A">%possible_surname;
+        </a>%nn;
+      %end;
+    %end;
+  </h1>
+  %if;(evar.br = "")
+    <p>
+      <i style="font-size:80%%">%nn;
+      [*click] <a href="%prefix;m=N;o=i;v=%surname.key;;t=A">[here]</a>%sp;
+      [for the first names by alphabetic order].</i>
+    </p>
+  %end;
+  <div style="white-space:nowrap">
+    %if;(number_of_branches > 1 and evar.br = "")
+      [*number of branches]: %number_of_branches;
+      <dl>
+    %end;
+    ...branches... (to be implemented)
+    %if;(number_of_branches > 1 and evar.br = "")</dl>%nl;%end;
+  </div>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>
