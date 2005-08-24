@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.43 2005-08-24 13:20:08 ddr Exp $ *)
+(* $Id: some.ml,v 4.44 2005-08-24 18:33:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -630,7 +630,8 @@ value old_surname_print conf base not_found_fun x =
 
 type env 'a =
   [ Vbool of bool
-  | Vbr of list person and list string
+  | Vbr of int and person
+  | Vbrs of list person and list string
   | Vhomon of string
   | Vlazy of Lazy.t (env 'a)
   | Vother of 'a
@@ -648,19 +649,27 @@ value get_env v env =
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
-value rec eval_var env x loc =
+value rec eval_var conf base env x loc =
   fun
-  [ ["is_first"] ->
+  [ ["ancestor" :: sl] ->
+      match get_env "branch" env with
+      [ Vbr _ p -> eval_person_var conf base p sl
+      | _ -> raise Not_found ]
+  | ["cnt"] ->
+      match get_env "branch" env with
+      [ Vbr cnt _ -> VVstring (string_of_int cnt)
+      | _ -> raise Not_found ]
+  | ["is_first"] ->
       match get_env "first" env with
       [ Vbool b -> VVbool b
       | _ -> raise Not_found ]
   | ["number_of_branches"] ->
       match get_env "branches" env with
-      [ Vbr ancestors _ -> VVstring (string_of_int (List.length ancestors))
+      [ Vbrs ancestors _ -> VVstring (string_of_int (List.length ancestors))
       | _ -> raise Not_found ]
   | ["number_of_possible_surnames"] ->
       match get_env "branches" env with
-      [ Vbr _ homonyms -> VVstring (string_of_int (List.length homonyms))
+      [ Vbrs _ homonyms -> VVstring (string_of_int (List.length homonyms))
       | _ -> raise Not_found ]
   | ["possible_surname" :: sl] ->
       match get_env "homonym" env with
@@ -668,8 +677,29 @@ value rec eval_var env x loc =
       | _ -> raise Not_found ]
   | ["surname" :: sl] ->
       match get_env "branches" env with
-      [ Vbr _ [s] -> VVstring (eval_string_var s sl)
+      [ Vbrs _ [s] -> VVstring (eval_string_var s sl)
       | _ -> VVstring (eval_string_var x sl) ]
+  | _ -> raise Not_found ]
+and eval_person_var conf base p =
+  fun
+  [ ["access"] -> VVstring (acces conf base p)
+  | ["father" :: sl] ->
+      match parents (aget conf base p.cle_index) with
+      [ Some ifam ->
+          let p = pget conf base (father (coi base ifam)) in
+          eval_person_var conf base p sl
+      | None -> raise Not_found ]
+  | ["has_parents"] ->
+      match parents (aget conf base p.cle_index) with
+      [ Some _ -> VVbool True
+      | None -> VVbool False ]
+  | ["is_restricted"] -> VVbool (is_hidden p)
+  | ["mother" :: sl] ->
+      match parents (aget conf base p.cle_index) with
+      [ Some ifam ->
+          let p = pget conf base (mother (coi base ifam)) in
+          eval_person_var conf base p sl
+      | None -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_string_var s =
   fun
@@ -681,12 +711,31 @@ and eval_string_var s =
 value print_foreach print_ast eval_expr =
   let rec print_foreach env n loc s sl el al =
     match [s :: sl] with
-    [ ["possible_surname"] -> print_foreach_possible_surname env n al
+    [ ["branch"] -> print_foreach_branch env n al
+    | ["possible_surname"] -> print_foreach_possible_surname env n al
     | _ -> raise Not_found ]
+  and print_foreach_branch env x al =
+    let ancestors =
+      match get_env "branches" env with
+      [ Vbrs ancestors _ -> ancestors
+      | _ -> raise Not_found ]
+    in
+    let _ =
+      List.fold_left
+        (fun n p ->
+           do {
+             let env = [("branch", Vbr n p) :: env] in
+             let print_ast = print_ast env x in
+             List.iter print_ast al;
+             n + 1
+           })
+        1 ancestors
+    in
+    ()
   and print_foreach_possible_surname env n al =
     let homonyms =
       match get_env "branches" env with
-      [ Vbr _ homonyms -> homonyms
+      [ Vbrs _ homonyms -> homonyms
       | _ -> raise Not_found ]
     in
     list_iter_first
@@ -741,10 +790,10 @@ value surname_print_2 conf base x =
                alphabetic (p_first_name base p1) (p_first_name base p2))
             pl ]
     in
-    Vbr ancestors homonyms
+    Vbrs ancestors homonyms
   in
   let env = [("branches", Vlazy (Lazy.lazy_from_fun br))] in
-  Templ.interp conf base "surname" eval_var
+  Templ.interp conf base "surname" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother print_foreach env x
 ;
