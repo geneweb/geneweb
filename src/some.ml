@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.39 2005-08-22 12:02:00 ddr Exp $ *)
+(* $Id: some.ml,v 4.40 2005-08-24 09:00:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -331,7 +331,7 @@ value print_branch conf base psn name =
     }
 ;
 
-value print_by_branch x conf base not_found_fun (pl, homonymes) =
+value print_by_branch x conf base (pl, homonymes) =
   let ancestors =
     match p_getenv conf.env "order" with
     [ Some "d" ->
@@ -351,8 +351,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
           pl ]
   in
   let len = List.length ancestors in
-  if len == 0 then not_found_fun conf x
-  else do {
+  do {
     let fx = x in
     let x =
       match homonymes with
@@ -624,5 +623,6 @@ value surname_print conf base not_found_fun x =
       let strl = List.map fst strl in
       let iperl = select_ancestors conf base name_inj iperl in
       let pl = List.map (pget conf base) iperl in
-      print_by_branch x conf base not_found_fun (pl, strl) ]
+      if pl = [] then not_found_fun conf x
+      else print_by_branch x conf base (pl, strl) ]
 ;
