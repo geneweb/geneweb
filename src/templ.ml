@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.96 2005-08-21 23:08:49 ddr Exp $ *)
+(* $Id: templ.ml,v 4.97 2005-08-24 13:05:50 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -846,7 +846,7 @@ and int_eval ((_, eval_var, _) as ceva) =
         | VVbool False -> 0 ]
       with
       [ Not_found ->
-          failwith ("parse error%(" ^ String.concat "." [s :: sl] ^ ")") ]
+          raise_with_loc loc (Failure (String.concat "." [s :: sl])) ]
   | e ->
       let s = string_eval ceva e in
       try int_of_string s with
