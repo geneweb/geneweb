@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.8 2005-08-23 00:52:22 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.9 2005-08-24 12:47:09 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -158,7 +158,7 @@
     <td><tt>%message.hour;</tt></td>
     <td><a href="%prefix;m=FORUM;p=%message.pos;
          "%if;(message.prev_date = "") accesskey="1"%end;
-	 ><b>%message.ident.cut.23;
+	 ><b>%message.ident.cut.26;
         </b></a></td>
     <td>%nn;
        %if;(message.subject = "" or message.subject = "-")
