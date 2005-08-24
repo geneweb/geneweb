@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.40 2005-08-24 09:00:36 ddr Exp $ *)
+(* $Id: some.ml,v 4.41 2005-08-24 09:34:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -351,36 +351,36 @@ value print_by_branch x conf base (pl, homonymes) =
           pl ]
   in
   let len = List.length ancestors in
+  let fx = x in
+  let x =
+    match homonymes with
+    [ [x :: _] -> x
+    | _ -> x ]
+  in
+  let psn =
+    match homonymes with
+    [ [_] ->
+        match p_getenv conf.env "alwsurn" with
+        [ Some x -> x = "yes"
+        | None ->
+            try List.assoc "always_surname" conf.base_env = "yes" with
+            [ Not_found -> False ] ]
+    | _ -> True ]
+  in
+  let title h =
+    let access x =
+      if h || List.length homonymes = 1 then x
+      else geneweb_link conf ("m=N;v=" ^ code_varenv x ^ ";t=A") x
+    in
+    do {
+      let homonymes = List.sort compare homonymes in
+      Wserver.wprint "%s" (access (List.hd homonymes));
+      List.iter (fun x -> Wserver.wprint ", %s" (access x))
+        (List.tl homonymes);
+    }
+  in
+  let br = p_getint conf.env "br" in
   do {
-    let fx = x in
-    let x =
-      match homonymes with
-      [ [x :: _] -> x
-      | _ -> x ]
-    in
-    let psn =
-      match homonymes with
-      [ [_] ->
-          match p_getenv conf.env "alwsurn" with
-          [ Some x -> x = "yes"
-          | None ->
-              try List.assoc "always_surname" conf.base_env = "yes" with
-              [ Not_found -> False ] ]
-      | _ -> True ]
-    in
-    let title h =
-      let access x =
-        if h || List.length homonymes = 1 then x
-        else geneweb_link conf ("m=N;v=" ^ code_varenv x ^ ";t=A") x
-      in
-      do {
-        let homonymes = List.sort compare homonymes in
-        Wserver.wprint "%s" (access (List.hd homonymes));
-        List.iter (fun x -> Wserver.wprint ", %s" (access x))
-          (List.tl homonymes);
-      }
-    in
-    let br = p_getint conf.env "br" in
     header conf title;
     print_link_to_welcome conf True;
     if br = None then do {
