@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: surname.txt,v 1.2 2005-08-24 18:33:04 ddr Exp $ -->
+  <!-- $Id: surname.txt,v 1.3 2005-08-25 02:16:33 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[surname/surnames]0: %surname;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -26,6 +26,10 @@
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
   </td></tr></table>
+%end;
+
+%define;branch(lev, ppp)
+  ...branch...(to be implemented)<br%/>
 %end;
 
 %if;(evar.o = "i")
@@ -75,9 +79,14 @@
             <a href="%prefix;%ancestor.mother.access;">&lt;&lt;</a>
           %end;
           <dl>
+            %apply;branch(1, person(ancestor))%nl;
+          </dl>
+          </dd>
+        %elseif;(number_of_branches > 1 and evar.br = "")
+          %apply;branch(1, person(ancestor))%nl;
+        %else;
+          %apply;branch(0, person(ancestor))%nl;
         %end;
-        ...branch...part 2...(to be implemented)
-        %if;ancestor.has_parents;</dl>%nl;</dd>%end;
       %end;
     %end;
     %if;(number_of_branches > 1 and evar.br = "")</dl>%nl;%end;
