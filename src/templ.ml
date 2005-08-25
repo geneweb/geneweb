@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.97 2005-08-24 13:05:50 ddr Exp $ *)
+(* $Id: templ.ml,v 4.98 2005-08-25 02:16:33 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -958,18 +958,18 @@ value print_var conf base eval_var s sl =
   [ Not_found -> print_variable conf (Some base) [s :: sl] ]
 ;
 
-value print_apply f print_ast xl al vl =
+value print_apply f print_ast gxl al gvl =
   List.iter
     (fun a ->
        let a =
-         loop a xl vl where rec loop a xl vl =
+         loop a gxl gvl where rec loop a xl vl =
            match (xl, vl) with
            [ ([x :: xl], [v :: vl]) -> loop (subst (subst_text x v) a) xl vl
            | ([], []) -> a
            | _ ->
                Atext
                  (Printf.sprintf "%s: bad # of params (%d instead of %d)" f
-                    (List.length vl) (List.length xl)) ]
+                    (List.length gvl) (List.length gxl)) ]
        in
        print_ast a)
     al
@@ -1022,6 +1022,7 @@ type vother =
 type env 'a = list (string * 'a);
 
 value get_fun get_vother k env =
+  let k = "#" ^ k in
   try
     match get_vother (List.assoc k env) with
     [ Some (Vfun al el) -> Some (al, el)
@@ -1030,6 +1031,7 @@ value get_fun get_vother k env =
   [ Not_found -> None ]
 ;
 value get_val get_vother k env =
+  let k = "#" ^ k in
   try
     match get_vother (List.assoc k env) with
     [ Some (Vval x) -> Some x
@@ -1037,8 +1039,14 @@ value get_val get_vother k env =
   with
   [ Not_found -> None ]
 ;
-value set_fun set_vother f al el env = [(f, set_vother (Vfun al el)) :: env];
-value set_val set_vother k v env = [(k, set_vother (Vval v)) :: env];
+value set_fun set_vother k al el env =
+  let k = "#" ^ k in
+  [(k, set_vother (Vfun al el)) :: env]
+;
+value set_val set_vother k v env =
+  let k = "#" ^ k in
+  [(k, set_vother (Vval v)) :: env]
+;
 
 value rec templ_print_foreach conf print_ast set_vother env ep loc s sl el al =
   match [s :: sl] with
