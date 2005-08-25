@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.8 2005-08-16 12:34:16 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.9 2005-08-25 18:57:51 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -117,7 +117,7 @@
   [*to add a child to a family, use "%s":::xx]
 %end;
 
-%if;(nb_familes != 0)
+%if;(nb_families != 0)
   <p>
     %apply;hint([*modify::family/families]0)
     <br%/>
