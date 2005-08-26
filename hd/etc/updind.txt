@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.30 2005-08-26 02:28:01 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.31 2005-08-26 10:53:43 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -118,8 +118,10 @@
 <input type="hidden" name="digest" value="%digest;"%/>
 <input type="hidden" name="i" value="%index;"%/>
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-  %if;evar_i2;<input type="hidden" name="i2" value="%evar_i2;">%end;%nl;
-  %if;(evar_ini1 and evar_ini2)
+  %if;(evar_i2 != "")
+    <input type="hidden" name="i2" value="%evar_i2;">
+  %end;
+  %if;(evar_ini1 != "" and evar_ini2 != "")
     <input type="hidden" name="ini1" value="%evar_ini1;"%/>
     <input type="hidden" name="ini2" value="%evar_ini2;"%/>
   %end;
