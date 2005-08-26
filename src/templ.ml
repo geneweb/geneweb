@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.101 2005-08-26 07:34:16 ddr Exp $ *)
+(* $Id: templ.ml,v 4.102 2005-08-26 10:53:43 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -504,25 +504,7 @@ value parse_templ conf strm =
   strip_newlines_after_variables astl
 ;
 
-value open_templ conf dir name =
-  let std_fname =
-    Util.search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
-  in
-  if dir = "" || dir = Filename.current_dir_name then
-    try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-  else
-    let dir = Filename.basename dir in
-    let fname =
-      Filename.concat (Util.base_path ["etc"] dir) (name ^ ".txt")
-    in
-    try Some (Secure.open_in fname) with
-    [ Sys_error _ ->
-        if (*dir = conf.bname*)True(**) then
-          try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-        else None ]
-;
-
-value input conf fname =
+value open_templ conf name =
   let config_templ =
     try
       let s = List.assoc "template" conf.base_env in
@@ -548,7 +530,25 @@ value input conf fname =
     if dir = "" then Filename.current_dir_name
     else Filename.basename dir
   in
-  match open_templ conf dir fname with
+  let std_fname =
+    Util.search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
+  in
+  if dir = "" || dir = Filename.current_dir_name then
+    try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
+  else
+    let dir = Filename.basename dir in
+    let fname =
+      Filename.concat (Util.base_path ["etc"] dir) (name ^ ".txt")
+    in
+    try Some (Secure.open_in fname) with
+    [ Sys_error _ ->
+        if (*dir = conf.bname*)True(**) then
+          try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
+        else None ]
+;
+
+value input conf fname =
+  match open_templ conf fname with
   [ Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
       do { close_in ic; Some astl }
@@ -895,15 +895,46 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e)) ]
 ;
 
+value line_of_loc conf fname (bp, ep) =
+  match open_templ conf fname with
+  [ Some ic ->
+      let strm = Stream.of_channel ic in
+      let rec loop lin =
+        let rec scan_line col =
+          parser cnt
+            [: `c; s :] ->
+              if cnt < bp then
+                if c = '\n' then loop (lin + 1)
+                else scan_line (col + 1) s
+              else
+                let col = col - (cnt - bp) in
+                (lin, col, col + ep - bp)
+        in
+        scan_line 0 strm
+      in
+      let r = try Some (loop 1) with [ Stream.Failure -> None ] in
+      do { close_in ic; r }
+  | None -> None ]
+;
+
 value template_file = ref "";
-value print_error (bp, ep) exc =
+value print_error conf (bp, ep) exc =
   do {
     incr nb_errors;
     IFDEF UNIX THEN do {
       if nb_errors.val <= 10 then do {
         if template_file.val = "" then Printf.eprintf "*** <W> template file"
         else Printf.eprintf "File \"%s.txt\"" template_file.val;
-        Printf.eprintf ", characters %d-%d:\n" bp ep;
+        let line =
+          if template_file.val = "" then None
+          else line_of_loc conf template_file.val (bp, ep)
+        in
+        Printf.eprintf ", ";
+        match line with
+        [ Some (lin, col1, col2) ->
+            Printf.eprintf "line %d, characters %d-%d:\n" lin col1 col2
+        | None ->
+            Printf.eprintf "characters %d-%d:\n" bp ep ];
         match exc with
         [ Failure s -> Printf.eprintf "Failed - %s" s
         | _ -> Printf.eprintf "%s" (Printexc.to_string exc) ];
@@ -923,7 +954,7 @@ value eval_bool_expr conf (eval_var, eval_apply) e =
     | VVstring _ ->
         raise_with_loc (loc_of_expr e) (Failure "bool value expected") ]
   with
-  [ Exc_located loc exc -> do { print_error loc exc; False } ]
+  [ Exc_located loc exc -> do { print_error conf loc exc; False } ]
 ;
 
 value eval_string_expr conf (eval_var, eval_apply) e =
@@ -933,7 +964,7 @@ value eval_string_expr conf (eval_var, eval_apply) e =
     | VVbool b ->
         raise_with_loc (loc_of_expr e) (Failure "string value expected") ]
   with
-  [ Exc_located loc exc -> do { print_error loc exc; "" } ]
+  [ Exc_located loc exc -> do { print_error conf loc exc; "" } ]
 ;
 
 value print_body_prop conf =
