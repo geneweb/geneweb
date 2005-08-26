@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.100 2005-08-26 01:56:26 ddr Exp $ *)
+(* $Id: templ.ml,v 4.101 2005-08-26 07:34:16 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -228,7 +228,7 @@ and parse_expr_4_kont e =
   parser
   [ [: `Tok loc PLUS; e2 = parse_expr_5;
        a = parse_expr_4_kont (Aop2 loc "+" e e2) :] -> a
-  | [: `Tok loc MINUS; e2 = parse_expr_5; ep = Stream.count;
+  | [: `Tok loc MINUS; e2 = parse_expr_5;
        a = parse_expr_4_kont (Aop2 loc "-" e e2) :] -> a
   | [: :] -> e ]
 and parse_expr_5 =
@@ -876,7 +876,6 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
   | Aop2 loc op e1 e2 ->
       let int e = int_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
-      let string e = string_of e (eval_expr ceva e) in
       match op with
       [ "and" -> VVbool (if bool e1 then bool e2 else False)
       | "or" -> VVbool (if bool e1 then True else bool e2)

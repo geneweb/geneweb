@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.55 2005-08-16 09:20:47 ddr Exp $
+# $Id: lex_utf8.txt,v 1.56 2005-08-26 07:35:36 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5031,6 +5031,7 @@ sl: sorodstvo med
 sv: sl&auml;ktskap emellan
 
     linked pages
+bg: свързани страници
 en: linked pages
 fr: pages liées
 sv: länkade sidor
@@ -5498,6 +5499,7 @@ sl: sporočilo/prejšnje sporočilo/prejšnja sporočila/naslednje sporočilo
 sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     miscellaneous notes
+bg: разни бележки
 en: miscellaneous notes
 fr: notes diverses
 sv: blandade noteringar
