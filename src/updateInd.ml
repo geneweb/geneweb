@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.43 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.44 2005-08-26 09:35:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -284,13 +284,19 @@ and eval_title_var conf base env t =
 and eval_relation_var conf base env r =
   fun 
   [ ["r_father" :: sl] ->
-      match r with
-      [ Some {r_fath = Some x} -> eval_person_var conf base env x sl
-      | _ -> str_val "" ]
+      let x =
+        match r with
+        [ Some {r_fath = Some x} -> x
+        | _ -> ("", "", 0, Update.Link, "") ]
+      in
+      eval_person_var conf base env x sl
   | ["r_mother" :: sl] ->
-      match r with
-      [ Some {r_moth = Some x} -> eval_person_var conf base env x sl
-      | _ -> str_val "" ]
+      let x =
+        match r with
+        [ Some {r_moth = Some x} -> x
+        | _ -> ("", "", 0, Update.Link, "") ]
+      in
+      eval_person_var conf base env x sl
   | ["rt_adoption"] -> eval_is_relation_type Adoption r
   | ["rt_candidate_parent"] -> eval_is_relation_type CandidateParent r
   | ["rt_empty"] ->
