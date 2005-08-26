@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.29 2005-06-22 19:56:27 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.30 2005-08-26 02:28:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -20,38 +20,7 @@
 <body%body_prop;>
 %message_to_wizard;
 
-<script type="text/javascript">
-<!--
-function sourceIfData(src, place, year, text)
-{
-  if (place.value == "" && year.value == "" && text.value == "" &&
-      src.value == "") {
-    place.focus();
-  }
-}
-function setDead()
-{
-  document.forms%[0].death.value = "Death";
-  changeDeath();
-}
-function changeDeath()
-{
-  var color = "black";
-  if (document.forms%[0].death.value != "Death") color = "#b0b0b0";
-  document.forms%[0].death_place.style.color = color;
-  document.forms%[0].death_dd.style.color = color;
-  document.forms%[0].death_mm.style.color = color;
-  document.forms%[0].death_yyyy.style.color = color;
-  document.forms%[0].death_text.style.color = color;
-  document.forms%[0].death_cal.style.color = color;
-  document.forms%[0].death_prec.style.color = color;
-  document.forms%[0].death_oryear.style.color = color;
-  document.forms%[0].death_src.style.color = color;
-}
--->
-</script>
-
-%define;date(xlab,xvar,xdt,xcond)
+%define;date(xlab,xvar,xdt)
   <table border="1">
   <tr>
   <td>xlab</td>
@@ -59,36 +28,36 @@ function changeDeath()
     %if;([ !dates order]0 = "ddmmyy")
       <label>[year/month/day]2
       <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xdt.day;"xcond%/></label>
+       value="%xdt.day;"%/></label>
       <label>[year/month/day]1
       <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xdt.month;"xcond%/></label>
+       value="%xdt.month;"%/></label>
       <label>[year/month/day]0
       <input name="xvar_yyyy" size="5" maxlength="6"%sp;
-       value="%xdt.year;"xcond%/></label>
+       value="%xdt.year;"%/></label>
     %else;
       <label>[year/month/day]0
       <input name="xvar_yyyy" size="5" maxlength="6"%sp;
-       value="%xdt.year;"xcond%/></label>
+       value="%xdt.year;"%/></label>
       <label>[year/month/day]1
       <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xdt.month;"xcond%/></label>
+       value="%xdt.month;"%/></label>
       <label>[year/month/day]2
       <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xdt.day;"xcond%/></label>
+       value="%xdt.day;"%/></label>
     %end;
   </td>
   <td>
   ...<label>[or]0 [text]0
   <input name="xvar_text" size="15" maxlength="30"%sp;
-   value="%xdt.text;"xcond%/></label>
+   value="%xdt.text;"%/></label>
   </td>
   </tr>
   </table>
   <table border="1">
   <tr>
   <td>[*calendar/calendars]0
-  <select name="xvar_cal"xcond>
+  <select name="xvar_cal">
   <option value="G"%if;(xdt.calendar = "gregorian") selected="selected"%end;
   >[*gregorian/julian/french/hebrew]0</option>
   <option value="J"%if;(xdt.calendar = "julian") selected="selected"%end;
@@ -100,7 +69,7 @@ function changeDeath()
   </select>
   </td>
   <td>[*precision]0
-  <select name="xvar_prec"xcond>
+  <select name="xvar_prec">
   <option value="-"%if;(xdt.prec = "") selected="selected"%end;>-</option>
   <option value="sure"%if;(xdt.prec = "sure") selected="selected"%end;
   >[*exact]0</option>
@@ -117,7 +86,7 @@ function changeDeath()
   <option value="yearint"%if;(xdt.prec = "yearint") selected="selected"%end;
       >&lt;- [*between (date)] -&gt;</option>
   </select>
-  <input name="xvar_oryear" size="5" maxlength="5" value="%xdt.oryear;"xcond%/>
+  <input name="xvar_oryear" size="5" maxlength="5" value="%xdt.oryear;"%/>
   </td>
   </tr>
   </table>
@@ -127,11 +96,8 @@ function changeDeath()
   <tr>
   <td><label for="xx_src">[*source/sources]0</label></td>
   <td>
-  <input name="xx_src" size="40" maxlength="200" value="%xx_src;" id="xx_src"
-   onfocus='
-     sourceIfData
-       (document.forms%[0].xx_src, document.forms%[0].xx_place,
-        document.forms%[0].xx_yyyy, document.forms%[0].xx_text)'%/>
+  <input name="xx_src" size="40" maxlength="200" value="%xx_src;"%sp;
+   id="xx_src"%/>
   </td>
   </tr>
   </table>
@@ -309,7 +275,7 @@ function changeDeath()
 </tr>
 </table>
 
-%apply;date([*date]0, "birth", "birth", "")
+%apply;date([*date]0, "birth", "birth")
 
 %apply;source("birth")
 
@@ -326,7 +292,7 @@ function changeDeath()
 </tr>
 </table>
 
-%apply;date([*date]0, "bapt", "bapt", "")
+%apply;date([*date]0, "bapt", "bapt")
 
 %apply;source("bapt")
 
@@ -340,14 +306,14 @@ function changeDeath()
   <option value="Auto" selected="selected"> -</option>
   %end;
   <option value="NotDead"%if;not_dead; selected="selected"%end;
-   onclick="changeDeath()">[*alive]2</option>
+   >[*alive]2</option>
   <option value="DontKnowIfDead"%if;(dont_know_if_dead and has_birth_date)%sp;
-   selected="selected"%end; onclick="changeDeath()">[*don't know]0%nl;</option>
+   selected="selected"%end;>[*don't know]0%nl;</option>
   <option value="Death"%if;(death.year != "" or death.text != "" or
    dead_dont_know_when) selected="selected"%end;
-   onclick="changeDeath()">[*died]2...</option>
-  <option value="DeadYoung"%if;died_young; selected="selected"%end;%sp;
-   onclick="changeDeath()">[*died young]2</option>
+   >[*died]2...</option>
+  <option value="DeadYoung"%if;died_young; selected="selected"%end;
+   >[*died young]2</option>
 </select>
 </td>
 <td>
@@ -358,26 +324,26 @@ function changeDeath()
 </tr>
 </table>
 
-%apply;date([*date]0, "death", "death", " onfocus='setDead()'")
+%apply;date([*date]0, "death", "death")
 
 <table border="1">
 <tr>
 <td>
 <label>
 <input type="radio" name="death_reason" value="Killed"%if;dr_killed;
-%sp;checked="checked"%end; onclick='setDead()'%/>[*killed (in action)]2
+%sp;checked="checked"%end;%/>[*killed (in action)]2
 </label><label>
 <input type="radio" name="death_reason" value="Murdered"%if;dr_murdered;
-%sp;checked="checked"%end; onclick='setDead()'%/>[*murdered]2
+%sp;checked="checked"%end;%/>[*murdered]2
 </label><label>
 <input type="radio" name="death_reason" value="Executed"%if;dr_executed;
-%sp;checked="checked"%end; onclick='setDead()'%/>[*executed (legally killed)]2
+%sp;checked="checked"%end;%/>[*executed (legally killed)]2
 </label><label>
 <input type="radio" name="death_reason" value="Disappeared"%if;dr_disappeared;
-%sp;checked="checked"%end; onclick='setDead()'%/>[*disappeared]2
+%sp;checked="checked"%end;%/>[*disappeared]2
 </label><label>
 <input type="radio" name="death_reason" value="Unspecified"%if;dr_unspecified;
-%sp;checked="checked"%end; onclick='setDead()'%/>[*unspecified]2
+%sp;checked="checked"%end;%/>[*unspecified]2
 </label>
 </td>
 </tr>
@@ -407,7 +373,7 @@ function changeDeath()
 </tr>
 </table>
 
-%apply;date([*date]0, "burial", "burial", "")
+%apply;date([*date]0, "burial", "burial")
 
 %apply;source("burial")
 
@@ -559,8 +525,8 @@ function changeDeath()
       </td>
     </tr>
   </table>
-  %apply;date([*begin]0, "t_date_startxcnt", "title_date_start", "")
-  %apply;date([*end]0, "t_date_endxcnt", "title_date_end", "")
+  %apply;date([*begin]0, "t_date_startxcnt", "title_date_start")
+  %apply;date([*end]0, "t_date_endxcnt", "title_date_end")
 %end
 
 %apply;insert_title("0")
