@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.99 2005-08-25 18:57:51 ddr Exp $ *)
+(* $Id: templ.ml,v 4.100 2005-08-26 01:56:26 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -811,127 +811,6 @@ value loc_of_expr =
   | _ -> (-1, -1) ]
 ;
 
-(*
-value rec bool_eval ((conf, eval_var, _) as ceva) =
-  fun
-  [ Aop2 "or" e1 e2 -> bool_eval ceva e1 || bool_eval ceva e2
-  | Aop2 "and" e1 e2 -> bool_eval ceva e1 && bool_eval ceva e2
-  | Aop2 op e1 e2 ->
-      match op with
-      [ "=" -> string_eval ceva e1 = string_eval ceva e2
-      | "!=" -> string_eval ceva e1 <> string_eval ceva e2
-      | ">" -> int_eval ceva e1 > int_eval ceva e2
-      | ">=" -> int_eval ceva e1 >= int_eval ceva e2
-      | "<" -> int_eval ceva e1 < int_eval ceva e2
-      | "<=" -> int_eval ceva e1 <= int_eval ceva e2
-      | _ -> do { Wserver.wprint "op %s???" op; False } ]
-  | Aop1 "not" e -> not (bool_eval ceva e)
-  | Aapply loc s el -> do { Wserver.wprint "not impl %s" s; False }
-  | Avar loc s sl ->
-      try eval_bool_var conf (eval_var loc) [s :: sl] with
-      [ Not_found ->
-          do {
-            Wserver.wprint " %%%s" s;
-            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-            Wserver.wprint "?";
-            False
-          } ]
-  | Atext s -> do { Wserver.wprint "\"%s\"???" s; False }
-  | Aint loc s -> raise_with_loc loc (Failure "bool value expected")
-  | Atransl _ s _ -> do { Wserver.wprint "[%s]???" s; False }
-  | Aop1 _ _ | Adefine _ _ _ _ | Aforeach _ _ _ | Aif _ _ _ | Awid_hei _
-  | Alet _ _ _ ->
-      do { Wserver.wprint "error14"; False } ]
-and int_eval ((_, eval_var, _) as ceva) =
-  fun
-  [ Aop2 "+" e1 e2 -> int_eval ceva e1 + int_eval ceva e2
-  | Aop2 "-" e1 e2 -> int_eval ceva e1 - int_eval ceva e2
-  | Aop2 "*" e1 e2 -> int_eval ceva e1 * int_eval ceva e2
-  | Aop2 "%" e1 e2 -> int_eval ceva e1 mod int_eval ceva e2
-  | Aint _ x -> int_of_string x
-  | Avar loc s sl ->
-      try
-        match eval_var loc [s :: sl] with
-        [ VVstring s -> int_of_string s
-        | VVbool True -> 1
-        | VVbool False -> 0 ]
-      with
-      [ Not_found ->
-          raise_with_loc loc (Failure (String.concat "." [s :: sl])) ]
-  | e ->
-      let s = string_eval ceva e in
-      try int_of_string s with
-      [ Failure _ ->
-          raise_with_loc (loc_of_expr e)
-            (Failure (s ^ " int value expected")) ] ]
-and string_eval ((conf, eval_var, eval_apply) as ceva) =
-  fun
-  [ Atext s -> s
-  | Aapply loc s el ->
-      eval_apply s
-        (List.map
-           (fun el -> String.concat "" (List.map (string_eval ceva) el)) el)
-  | Avar loc s sl ->
-      try eval_string_var conf (eval_var loc) s sl with
-      [ Not_found ->
-          do {
-            Wserver.wprint " %%%s" s;
-            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-            Wserver.wprint "?";
-            ""
-          } ]
-  | Atransl upp s c -> eval_transl conf upp s c
-  | Aif e1 el2 el3 ->
-      if bool_eval ceva e1 then string_list_eval ceva el2
-      else string_list_eval ceva el3
-  | e ->
-      try string_of_int (int_eval ceva e) with
-      [ Exc_located _ _ | Failure _ -> Num.to_string (num_eval ceva e) ] ]
-and string_list_eval ceva el =
-  String.concat "" (List.map (string_eval ceva) el)
-and num_eval ((_, eval_var, _) as ceva) =
-  fun
-  [ Aint _ x -> Num.of_string x
-  | Aop2 "+" x y -> Num.add (num_eval ceva x) (num_eval ceva y)
-  | Aop2 "-" x y -> Num.sub (num_eval ceva x) (num_eval ceva y)
-  | Aop2 "*" x (Aint _ y) -> Num.mul (num_eval ceva x) (int_of_string y)
-  | Aop2 "%" x (Aint _ y) ->
-      Num.of_int (Num.modl (num_eval ceva x) (int_of_string y))
-  | Avar loc s sl ->
-      try
-        match eval_var loc [s :: sl] with
-        [ VVstring s -> Num.of_string s
-        | VVbool True -> Num.one
-        | VVbool False -> Num.zero ]
-      with
-      [ Not_found ->
-          failwith ("parse error/(" ^ String.concat "." [s :: sl] ^ ")") ]
-  | _ -> failwith "parse_error6" ]
-;
-
-value handle_eval thing_eval nothing conf (eval_var, eval_apply) e =
-  try thing_eval (conf, eval_var, eval_apply) e with
-  [ Exc_located (bp, ep) exc ->
-      do {
-        incr nb_errors;
-        IFDEF UNIX THEN do {
-          if nb_errors.val <= 10 then do {
-            Printf.eprintf "*** <W> template file";
-            Printf.eprintf ", chars %d-%d" bp ep;
-            Printf.eprintf ": %s\n" (Printexc.to_string exc);
-            flush stderr;
-          }
-          else ();
-        }
-        ELSE () END;
-        nothing
-      } ]
-;
-
-value eval_bool_expr = handle_eval bool_eval False;
-value eval_expr = handle_eval string_eval "eval_error";
-*)
-
 value templ_eval_var conf =
   fun
   [ ["cancel_links"] -> VVbool conf.cancel_links
@@ -1115,7 +994,7 @@ value print_apply loc f print_ast gxl al gvl =
 
 (* not clear... all this stuff with eval/bool/expr... *)
 value eval_bool_ast conf env a =
-  let eval_var loc sl  = VVstring (eval_variable conf env sl) in
+  let eval_var loc sl = VVstring (eval_variable conf env sl) in
   let eval_apply _ = raise Not_found in
   eval_bool_expr conf (eval_var, eval_apply) a
 ;
