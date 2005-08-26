@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.50 2005-06-22 19:56:27 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.51 2005-08-26 02:28:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -23,15 +23,6 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
-<script type="text/javascript">
-<!--
-function checkCreate(create, redirect)
-{
-  if (create.value != "create") redirect.focus();
-}
--->
-</script>
 
 %define;date(xlab,xvar,xdate)
   <table border="1">
@@ -121,40 +112,40 @@ function checkCreate(create, redirect)
   </table>
 %end;
 
-%define;small_date(kind,xvar,xx,verbose,xp)
+%define;small_date(kind,xvar,xx,verbose)
   <td>
     %if;([ !dates order]0 = "ddmmyy")
       <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_day;"xp%/>/
+       value="%xx.create.kind_day;"%/>/
       <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_month;"xp%/>/
+       value="%xx.create.kind_month;"%/>/
       <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-       value="%xx.create.kind_year;"xp%/>
+       value="%xx.create.kind_year;"%/>
     %else;
       <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-       value="%xx.create.kind_year;"xp%/>-
+       value="%xx.create.kind_year;"%/>-
       <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_month;"xp%/>-
+       value="%xx.create.kind_month;"%/>-
       <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_day;"xp%/>
+       value="%xx.create.kind_day;"%/>
     %end;
   </td>
   %if;("verbose" = "true")<td><label for="xvar_pl">[*place]</label>%nn;
   </td>%end;%nl;
   <td colspan="2">
     <input name="xvar_pl" size="20" maxlength="200"%sp;
-     value="%xx.create.kind_place;"xp id="xvar_pl"%/>
+     value="%xx.create.kind_place;" id="xvar_pl"%/>
   </td>
 %end;
 
-%define;birth(xvar,xx,verbose,xp)
+%define;birth(xvar,xx,verbose)
   <td>[*birth]</td>
-  %apply;small_date("birth","xvarb","xx","verbose","xp")
+  %apply;small_date("birth","xvarb","xx","verbose")
 %end;
 
-%define;death(xvar,xx,verbose,xp)
+%define;death(xvar,xx,verbose)
   <td>[*death]</td>
-  %apply;small_date("death","xvard","xx","verbose","xp")
+  %apply;small_date("death","xvard","xx","verbose")
 %end;
 
 %define;parent(xcnt,xx)
@@ -189,12 +180,10 @@ function checkCreate(create, redirect)
   </table>
   <table border="1">
     <tr>
-      %apply;birth("paxcnt","xx","true",
-                   " onfocus='checkCreate(paxcnt_p,paxcnt_fn)'")
+      %apply;birth("paxcnt","xx","true")
     </tr>
     <tr>
-      %apply;death("paxcnt","xx","true",
-                   " onfocus='checkCreate(paxcnt_p,paxcnt_fn)'")
+      %apply;death("paxcnt","xx","true")
     </tr>
   </table>
 %end;
@@ -429,8 +418,7 @@ function checkCreate(create, redirect)
            selected="selected"%end;>[*create]0</option>
         </select>
       </td>
-      %apply;birth("chxcnt", "child", "false",
-                   " onfocus='checkCreate(chxcnt_p,chxcnt_fn)'")
+      %apply;birth("chxcnt", "child", "false")
     </tr>
     <tr>
       <td>
@@ -445,8 +433,7 @@ function checkCreate(create, redirect)
          %if;(child.create.sex = "female") checked="checked"%end;%/>[M/F]1
         </label>
       </td>
-      %apply;death("chxcnt", "child", "false",
-                   " onfocus='checkCreate(chxcnt_p,chxcnt_fn)'")
+      %apply;death("chxcnt", "child", "false")
     </tr>
   </table>
 %end;
