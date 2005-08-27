@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.51 2005-08-26 02:28:01 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.52 2005-08-27 18:45:08 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -245,20 +245,23 @@
 <h4>[*marriage/marriages]0</h4>
 <p>
 <label>
-<input type="radio" name="mrel" value="marr"%if;(mrel = "marr")
- checked="checked"%end;%/>[*married]
+<input type="radio" name="mrel" value="marr"%nn;
+ %if;(mrel = "marr" or mrel = "nsckm") checked="checked"%end;
+ %/>[*married]
 </label><label>
-<input type="radio" name="mrel" value="not_marr"%if;(mrel = "not_marr")
- checked="checked"%end;%/>[*not married]
+<input type="radio" name="mrel" value="not_marr"%nn;
+ %if;(mrel = "not_marr" or mrel = "nsck") checked="checked"%end;
+ %/>[*not married]
 </label><label>
 <input type="radio" name="mrel" value="engaged"%if;(mrel = "engaged")
  checked="checked"%end;%/>[*engaged]
 </label><label>
-<input type="radio" name="mrel" value="nsck"%if;(mrel = "nsck")
- checked="checked"%end;%/>[*no sexes check]<br%/>
-</label><label>
 <input type="radio" name="mrel" value="no_ment"%if;(mrel = "no_ment")
  checked="checked"%end;%/>[*no mention]
+</label><label>
+<input type="checkbox" name="nsck" value="on%nn;
+ "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;
+ %>[*no sexes check]<br%/>
 </label>
 </p>
 <table border="1">
