@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.16 2005-06-11 05:16:31 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.17 2005-08-27 18:48:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -489,7 +489,11 @@ value ged_marriage base oc fam =
       do {
         fprintf oc "1 %s"
           (if fam.relation = Engaged then "ENGA" else "MARR");
-        let typ = if fam.relation = NoSexesCheck then "gay" else "" in
+        let typ =
+          if fam.relation = NoSexesCheckNotMarried
+          || fam.relation = NoSexesCheckMarried then "gay"
+          else ""
+        in
         ged_ev_detail oc 2 typ d pl (sou base fam.marriage_src);
         if fam.relation = NotMarried then
           fprintf oc "2 PLAC unmarried\n"

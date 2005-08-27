@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.58 2005-06-09 12:22:49 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.59 2005-08-27 18:48:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1846,7 +1846,9 @@ value add_fam_norm gen r adop_list =
           let u =
             match find_field "TYPE" r.rsons with
             [ Some r ->
-                if String.uncapitalize r.rval = "gay" then NoSexesCheck else u
+                if String.uncapitalize r.rval = "gay" then
+                  NoSexesCheckNotMarried
+                else u
             | None -> u ]
           in
           let d =
@@ -2497,7 +2499,8 @@ value check_parents_sex base =
     let fam = base.data.families.get i in
     let fath = poi base (father cpl) in
     let moth = poi base (mother cpl) in
-    if fam.relation = NoSexesCheck then ()
+    if fam.relation = NoSexesCheckNotMarried
+    || fam.relation = NoSexesCheckMarried then ()
     else if fath.sex = Female || moth.sex = Male then do {
       if fath.sex = Female then
         fprintf log_oc.val "Warning - husband with female sex: %s\n"
@@ -2508,7 +2511,7 @@ value check_parents_sex base =
           (designation base moth)
       else ();
       flush log_oc.val;
-      fam.relation := NoSexesCheck
+      fam.relation := NoSexesCheckNotMarried
     }
     else do { fath.sex := Male; moth.sex := Female }
   }

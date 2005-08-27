@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.73 2005-08-15 09:32:09 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.74 2005-08-27 18:45:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -337,7 +337,8 @@ and eval_relation_kind =
   [ Married -> "marr"
   | NotMarried -> "not_marr"
   | Engaged -> "engaged"
-  | NoSexesCheck -> "nsck"
+  | NoSexesCheckNotMarried -> "nsck"
+  | NoSexesCheckMarried -> "nsckm"
   | NoMention -> "no_ment" ]
 and eval_int_env var env =
   match get_env var env with

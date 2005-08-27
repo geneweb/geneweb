@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.198 2005-08-21 23:08:49 ddr Exp $ *)
+(* $Id: perso.ml,v 4.199 2005-08-27 18:45:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -862,11 +862,13 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "are_married" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ _ -> fam.relation = Married
+      [ Vfam fam _ _ _ ->
+          fam.relation = Married || fam.relation = NoSexesCheckMarried
       | _ -> raise Not_found ]
   | "are_not_married" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ _ -> fam.relation = NotMarried
+      [ Vfam fam _ _ _ ->
+          fam.relation = NotMarried || fam.relation = NoSexesCheckNotMarried
       | _ -> raise Not_found ]
   | "are_separated" ->
       match get_env "fam" env with
@@ -913,7 +915,9 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "is_no_sexes_check" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ _ -> fam.relation = NoSexesCheck
+      [ Vfam fam _ _ _ ->
+          fam.relation = NoSexesCheckNotMarried ||
+          fam.relation = NoSexesCheckMarried
       | _ -> raise Not_found ]
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"

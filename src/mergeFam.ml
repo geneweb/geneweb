@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 4.11 2004-12-28 15:13:00 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 4.12 2005-08-27 18:45:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -18,7 +18,8 @@ value need_differences_selection conf base fam1 fam2 =
        [ Married -> "married"
        | NotMarried -> "not married"
        | Engaged -> "engaged"
-       | NoSexesCheck -> "no sexes check"
+       | NoSexesCheckNotMarried -> "no sexes check"
+       | NoSexesCheckMarried -> "no sexes check married"
        | NoMention -> "no mention" ]) ||
   need_selection
     (fun fam ->
@@ -85,7 +86,8 @@ value print_differences conf base branches fam1 fam2 =
          [ Married -> transl conf "married"
          | NotMarried -> transl conf "not married"
          | Engaged -> transl conf "engaged"
-         | NoSexesCheck -> transl conf "no sexes check"
+         | NoSexesCheckNotMarried -> transl conf "no sexes check"
+         | NoSexesCheckMarried -> transl conf "married"
          | NoMention -> transl conf "no mention" ]);
     string_field (nominative (transl_nth conf "marriage/marriages" 0))
       "marriage"

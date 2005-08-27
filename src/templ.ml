@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.103 2005-08-27 07:59:49 ddr Exp $ *)
+(* $Id: templ.ml,v 4.104 2005-08-27 18:45:09 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1054,17 +1054,17 @@ value templ_print_var = print_var;
 value templ_print_apply = print_apply;
 
 type vother =
-  [ Vfun of list string and list ast
+  [ Vdef of list string and list ast
   | Vval of string
   | Vbind of string and string ]
 ;
 type env 'a = list (string * 'a);
 
-value get_fun get_vother k env =
+value get_def get_vother k env =
   let k = "#" ^ k in
   try
     match get_vother (List.assoc k env) with
-    [ Some (Vfun al el) -> Some (al, el)
+    [ Some (Vdef al el) -> Some (al, el)
     | _ -> None ]
   with
   [ Not_found -> None ]
@@ -1078,9 +1078,9 @@ value get_val get_vother k env =
   with
   [ Not_found -> None ]
 ;
-value set_fun set_vother k al el env =
+value set_def set_vother k al el env =
   let k = "#" ^ k in
-  [(k, set_vother (Vfun al el)) :: env]
+  [(k, set_vother (Vdef al el)) :: env]
 ;
 value set_val set_vother k v env =
   let k = "#" ^ k in
@@ -1165,7 +1165,7 @@ value interp
     let eval_var = eval_var env ep in
     templ_eval_expr conf (eval_var, eval_apply) e
   and eval_apply env eval_ast loc f vl =
-    match get_fun get_vother f env with
+    match get_def get_vother f env with
     [ Some (xl, al) ->
         let al = List.map (eval_subst loc f xl vl) al in
         let sl = List.map eval_ast al in
@@ -1207,12 +1207,12 @@ value interp
     | Alet k v al -> print_let env ep k v al
     | x -> Wserver.wprint "%s" (eval_ast env ep x) ]
   and print_define env ep f xl al alk =
-    List.iter (print_ast (set_fun set_vother f xl al env) ep) alk
+    List.iter (print_ast (set_def set_vother f xl al env) ep) alk
   and print_apply env ep loc f ell =
     let eval_ast = eval_ast env ep in
     let sll = List.map (List.map eval_ast) ell in
     let vl = List.map (String.concat "") sll in
-    match get_fun get_vother f env with
+    match get_def get_vother f env with
     [ Some (xl, al) ->
         let print_ast = print_ast env ep in
         templ_print_apply loc f print_ast xl al vl
