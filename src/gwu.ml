@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.51 2005-07-22 15:00:50 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.52 2005-08-27 18:45:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -404,7 +404,7 @@ value print_family oc base gen m =
     [ NotMarried -> fprintf oc " #nm"
     | Married -> ()
     | Engaged -> fprintf oc " #eng"
-    | NoSexesCheck ->
+    | NoSexesCheckNotMarried ->
         let c x =
           match x.sex with
           [ Male -> 'm'
@@ -412,6 +412,14 @@ value print_family oc base gen m =
           | Neuter -> '?' ]
         in
         fprintf oc " #nsck %c%c" (c m.m_fath) (c m.m_moth)
+    | NoSexesCheckMarried ->
+        let c x =
+          match x.sex with
+          [ Male -> 'm'
+          | Female -> 'f'
+          | Neuter -> '?' ]
+        in
+        fprintf oc " #nsckm %c%c" (c m.m_fath) (c m.m_moth)
     | NoMention -> fprintf oc " #noment" ];
     print_if_no_empty oc base "#mp" fam.marriage_place;
     print_if_no_empty oc base "#ms" fam.marriage_src;

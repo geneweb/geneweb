@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.47 2005-06-26 18:48:49 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.48 2005-08-27 18:45:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -123,11 +123,15 @@ value insert_parent conf (parents, ext) i =
 value reconstitute_family conf =
   let ext = False in
   let relation =
-    match p_getenv conf.env "mrel" with
-    [ Some "not_marr" -> NotMarried
-    | Some "engaged" -> Engaged
-    | Some "nsck" -> NoSexesCheck
-    | Some "no_ment" -> NoMention
+    match (p_getenv conf.env "mrel", p_getenv conf.env "nsck") with
+    [ (Some "marr", Some "on") -> NoSexesCheckMarried
+    | (Some "marr", Some _ | None) -> Married
+    | (Some "not_marr", Some "on") -> NoSexesCheckNotMarried
+    | (Some "not_marr", Some _ | None) -> NotMarried
+    | (Some "engaged", _) -> Engaged
+    | (Some "nsck", _) -> NoSexesCheckNotMarried
+    | (Some "nsckm", _) -> NoSexesCheckMarried
+    | (Some "no_ment", _) -> NoMention
     | _ -> Married ]
   in
   let marriage = Update.reconstitute_date conf "marr" in
@@ -427,7 +431,8 @@ value effective_mod conf base sfam scpl sdes =
   let nfath_u = uoi base (father ncpl) in
   let _ (*nmoth_u*) = uoi base (mother ncpl) in
   do {
-    if sfam.relation <> NoSexesCheck then do {
+    if sfam.relation <> NoSexesCheckNotMarried &&
+       sfam.relation <> NoSexesCheckMarried then do {
       match nfath.sex with
       [ Female -> print_err_father_sex conf base nfath
       | _ -> nfath.sex := Male ];
@@ -543,7 +548,8 @@ value effective_add conf base sfam scpl sdes =
   let nfath_u = uoi base (father ncpl) in
   let nmoth_u = uoi base (mother ncpl) in
   do {
-    if sfam.relation <> NoSexesCheck then do {
+    if sfam.relation <> NoSexesCheckNotMarried &&
+       sfam.relation <> NoSexesCheckMarried then do {
       match nfath_p.sex with
       [ Female -> print_err_father_sex conf base nfath_p
       | Male -> ()

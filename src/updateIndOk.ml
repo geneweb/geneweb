@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.36 2005-07-29 00:13:06 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.37 2005-08-27 18:45:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -393,7 +393,10 @@ value check_sex_married conf base sp op =
   if sp.sex <> op.sex then
     let u = uoi base op.cle_index in
     let no_check =
-      List.for_all (fun ifam -> (foi base ifam).relation = NoSexesCheck)
+      List.for_all
+        (fun ifam ->
+           let r = (foi base ifam).relation in
+           r = NoSexesCheckNotMarried || r = NoSexesCheckMarried)
         (Array.to_list u.family)
     in
     if no_check then () else print_cannot_change_sex conf base op
