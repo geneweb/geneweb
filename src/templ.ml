@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.102 2005-08-26 10:53:43 ddr Exp $ *)
+(* $Id: templ.ml,v 4.103 2005-08-27 07:59:49 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1022,13 +1022,6 @@ value print_apply loc f print_ast gxl al gvl =
     al
 ;
 
-(* not clear... all this stuff with eval/bool/expr... *)
-value eval_bool_ast conf env a =
-  let eval_var loc sl = VVstring (eval_variable conf env sl) in
-  let eval_apply _ = raise Not_found in
-  eval_bool_expr conf (eval_var, eval_apply) a
-;
-
 value rec copy_from_templ conf env ic =
   let astl = parse_templ conf (Stream.of_channel ic) in
   do {
@@ -1041,10 +1034,9 @@ and print_ast conf env =
   | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
   | ast -> Wserver.wprint "%s" (eval_ast conf ast) ]
 and print_if conf env a1 a2 a3 =
-  let test =
-    try eval_bool_ast conf env a1 with
-    [ Failure x -> do { Wserver.wprint "%s" x; False } ]
-  in
+  let eval_var loc sl = VVstring (eval_variable conf env sl) in
+  let eval_apply _ = raise Not_found in
+  let test = eval_bool_expr conf (eval_var, eval_apply) a1 in
   List.iter (print_ast conf env) (if test then a2 else a3)
 and print_ast_var conf env =
   fun
