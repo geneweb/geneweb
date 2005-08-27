@@ -1,8 +1,6 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.39 2005-08-15 09:32:09 ddr Exp $ *)
+(* camlp4r *)
+(* $Id: history.ml,v 4.40 2005-08-27 09:19:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
-
-UNDEF OLD;
 
 open Config;
 open Def;
@@ -105,27 +103,6 @@ value rev_input_line ic pos (rbuff, rpos) =
     loop 0 (pos - 1)
 ;
 
-IFDEF OLD THEN declare
-value action_text conf =
-  fun
-  [ "ap" -> transl_decline conf "add" (transl_nth conf "person/persons" 0)
-  | "mp" -> transl_decline conf "modify" (transl_nth conf "person/persons" 0)
-  | "dp" -> transl_decline conf "delete" (transl_nth conf "person/persons" 0)
-  | "fp" -> transl_decline conf "merge" (transl_nth conf "person/persons" 1)
-  | "si" -> transl_decline conf "send" (transl_nth conf "image/images" 0)
-  | "di" -> transl_decline conf "delete" (transl_nth conf "image/images" 0)
-  | "af" -> transl_decline conf "add" (transl_nth conf "family/families" 0)
-  | "mf" -> transl_decline conf "modify" (transl_nth conf "family/families" 0)
-  | "df" -> transl_decline conf "delete" (transl_nth conf "family/families" 0)
-  | "if" -> transl_decline conf "invert" (transl_nth conf "family/families" 1)
-  | "ff" -> transl_decline conf "merge" (transl_nth conf "family/families" 1)
-  | "cn" -> transl conf "change children's names"
-  | "aa" -> transl_decline conf "add" (transl conf "parents")
-  | "mn" -> transl_decline conf "modify" (transl_nth conf "note/notes" 1)
-  | x -> x ]
-;
-end END;
-
 value line_tpl = "0000-00-00 00:00:00 xx .";
 
 value line_fields line =
@@ -152,182 +129,6 @@ type hist_item =
   | HI_ind of person
   | HI_none ]
 ;
-
-IFDEF OLD THEN declare
-value print_history_line conf base line wiz k i =
-  match line_fields line with
-  [ Some (time, user, action, keyo) ->
-      if wiz = "" || user = wiz then do {
-        let hist_item =
-          match keyo with
-          [ Some key ->
-              match action with
-              [ "mn" ->
-                  let (i, j) =
-                    try let i = String.rindex key '/' in (i, i + 1) with
-                    [ Not_found -> (0, 0) ]
-                  in
-                  let pg = String.sub key 0 i in
-                  let s = String.sub key j (String.length key - j) in
-                  try HI_notes pg (Some (int_of_string s)) with
-                  [ Failure _ -> HI_notes key None ]
-              | _ ->
-                  match person_ht_find_all base key with
-                  [ [ip] -> HI_ind (pget conf base ip)
-                  | _ -> HI_none ] ]
-          | None -> HI_none ]
-        in
-        let not_displayed =
-          match hist_item with
-          [ HI_ind p ->
-              is_hidden p || (conf.hide_names && not (fast_auth_age conf p))
-          | _ -> False ]
-        in
-        if not_displayed then i
-        else do {
-          tag "tr" begin
-            tag "td" begin
-              Wserver.wprint" <tt><b>*</b> %s</tt>\n" time;
-              Wserver.wprint "(%s" (action_text conf action);
-              if user <> "" then do {
-                Wserver.wprint "\n<em>";
-                if wiz = "" then
-                  Wserver.wprint "- <a href=\"%sm=HIST;k=%d;wiz=%s\">"
-                    (commd conf) k (Util.code_varenv user)
-                else ();
-                Wserver.wprint "%s" user;
-                if wiz = "" then Wserver.wprint "</a>" else ();
-                Wserver.wprint "</em>";
-              }
-              else ();
-              Wserver.wprint ")";
-              Wserver.wprint " ...\n";
-              match keyo with
-              [ Some key ->
-                  match hist_item with
-                  [ HI_ind p ->
-                      do {
-                        Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
-                          (p_surname base p) p.occ;
-                        Wserver.wprint "%s"
-                          (referenced_person_title_text conf base p);
-                        Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                      }
-                  | HI_notes pg x ->
-                      do {
-                        Wserver.wprint "- ";
-                        stag "a" "href=\"%sm=NOTES%s%s\"" (commd conf)
-                          (if pg = "" then "" else ";f=" ^ pg)
-                          (match x with
-                           [ Some x -> ";v=" ^ string_of_int x
-                           | None -> "" ])
-                        begin
-                          stag "i" begin
-                            Wserver.wprint "%s"
-                              (if pg = "" then transl_nth conf "note/notes" 1
-                               else "[" ^ pg ^ "]");
-                          end;
-                        end;
-                        match x with
-                        [ Some x ->
-                            do {
-                              Wserver.wprint " - ";
-                              stag "span" "style=\"font-size:50%%\"" begin
-                                Wserver.wprint "#%d" x;
-                              end;
-                            }
-                        | None -> () ];
-                      }
-                  | HI_none -> Wserver.wprint "%s" key ]
-              | None -> Wserver.wprint "..." ];
-            end;
-          end;
-          i + 1
-        }
-      }
-      else i
-  | None -> i ]
-;
-
-value print_history conf base ic =
-  let k =
-    match p_getint conf.env "k" with
-    [ Some x -> x
-    | _ -> 3 ]
-  in
-  let pos =
-    match p_getint conf.env "pos" with
-    [ Some x -> x
-    | _ -> in_channel_length ic ]
-  in
-  let wiz =
-    match p_getenv conf.env "wiz" with
-    [ Some x ->
-        match p_getenv conf.env "n" with
-        [ Some "" | None -> x
-        | _ -> "" ]
-    | _ -> "" ]
-  in
-  let (pos, n) =
-    let vv = (ref "", ref 0) in
-    let rec loop pos i =
-      if i >= k then (pos, i)
-      else
-        match
-          try Some (rev_input_line ic pos vv) with [ Begin_of_file -> None ]
-        with
-        [ Some (line, pos) ->
-            let i = print_history_line conf base line wiz k i in
-            loop pos i
-        | _ -> (pos, i) ]
-    in
-    do {
-      Wserver.wprint "<table border=\"%d\" style=\"white-space:nowrap\">\n"
-        conf.border;
-      let r = loop pos 0 in
-      Wserver.wprint "</table>\n";
-      r;
-    }
-  in
-  do {
-    if pos > 0 then
-      tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-        tag "p" begin
-          Util.hidden_env conf;
-          xtag "input" "type=\"hidden\" name=\"m\" value=\"HIST\"";
-          xtag "input" "name=\"k\" size=\"3\" value=\"%d\"" k;
-          xtag "input" "type=\"hidden\" name=\"pos\" value=\"%d\"" pos;
-          if wiz <> "" then do {
-            xtag "input" "type=\"hidden\" name=\"wiz\" value=\"%s\"" wiz;
-            Wserver.wprint "(%s)\n" wiz;
-          }
-          else ();
-          xtag "input" "type=\"submit\" value=\"&gt;&gt;\"";
-          if wiz <> "" then
-            xtag "input" "type=\"submit\" name=\"n\" value=\"&gt;&gt;\""
-          else ();
-        end;
-      end
-    else ();
-  }
-;
-
-value print_old conf base =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "history of updates"))
-  in
-  do {
-    header_link_welcome conf title;
-    let fname = file_name conf in
-    match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
-    [ Some ic -> do { print_history conf base ic; close_in ic; }
-    | _ -> () ];
-    trailer conf;
-  }
-;
-end END;
-
-(* *)
 
 type env 'a =
   [ Vinfo of string and string and string and hist_item and string
@@ -501,18 +302,9 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
-IFDEF OLD THEN declare
 value print conf base =
-  if p_getenv conf.env "old" = Some "on" then print_old conf base else
   let env = [("pos", Vpos (ref 0))] in
   Templ.interp conf base "updhist" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (print_foreach conf base) env ()
 ;
-end ELSE
-value print conf base =
-  let env = [("pos", Vpos (ref 0))] in
-  Templ.interp conf base "updhist" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf base) env ()
-END;

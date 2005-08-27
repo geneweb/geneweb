@@ -217,9 +217,9 @@ srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
     lock.cmx notesLinks.cmx num.cmx secure.cmx translate.cmx util.cmx \
     version.cmx wiznotes.cmx ../wserver/wserver.cmx srcfile.cmi 
 srcfile.cmi: config.cmi def.cmi 
-templ.cmo: buff.cmo config.cmi gutil.cmi num.cmi secure.cmi templAst.cmi \
+templ.cmo: buff.cmo config.cmi gutil.cmi secure.cmi templAst.cmi \
     translate.cmi util.cmi ../wserver/wserver.cmi templ.cmi 
-templ.cmx: buff.cmx config.cmi gutil.cmx num.cmx secure.cmx templAst.cmi \
+templ.cmx: buff.cmx config.cmi gutil.cmx secure.cmx templAst.cmi \
     translate.cmx util.cmx ../wserver/wserver.cmx templ.cmi 
 templ.cmi: config.cmi def.cmi templAst.cmi 
 title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
@@ -287,10 +287,8 @@ date.cmo date.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
 doc.cmo doc.cmx: pa_html.cmo
 family.cmo family.cmx: def.syn.cmo pa_lock.cmo pa_html.cmo
-forum.cmo forum.cmx: pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
-history.cmo history.cmx: pa_html.cmo
 iovalue.cmo iovalue.cmx: q_codes.cmo
 merge.cmo merge.cmx: pa_html.cmo
 mergeFam.cmo mergeFam.cmx: pa_html.cmo
