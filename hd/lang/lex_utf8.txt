@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.56 2005-08-26 07:35:36 ddr Exp $
+# $Id: lex_utf8.txt,v 1.57 2005-08-27 04:36:29 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5239,7 +5239,7 @@ eo: edziĝo:a:+n/edziĝoj
 es: casamiento/casamientos
 et: abielu/abielud
 fi: avioliitto/avioliitot
-fr: mariage/mariages
+fr: union/unions
 he:    נישואין
 is: gifting/giftingar
 it: matrimonio/matrimoni
