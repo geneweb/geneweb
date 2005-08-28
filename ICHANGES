@@ -9,9 +9,7 @@ version 4.10 and 01 Jul 2005, but there are a lot of them... I add
 them when I have some time (and some courage).
 
 * GeneWeb server or CGI (gwd)
-  - [27 Aug 05] In marriage relation kind added "no sex check married"
-    to allow adding homo marriages and temporary inversion of erroneous
-    inverted married and unmarried couple.
+  - [27 Aug 05] In marriage relation kind added "no sex check married".
   - [22 Aug 05] Changed behaviour of displaying a surname : grouping
     branches when grandchildren have same name (and not children).
   - [15 Aug 05] Added some shortcuts ("Alt-U" for "update", "Alt-P"
