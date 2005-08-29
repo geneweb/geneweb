@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.53 2005-08-27 18:50:02 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.54 2005-08-29 11:13:43 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -363,26 +363,18 @@
 <h4>[*child/children]1</h4>
 
 %define;insert_child(xcnt)
-  <table border="1">
-    <tr>
-      <td>
-        <label>[*insert::|<input name="ins_chxcnt_n" size="1" maxlength="1"%sp;
-         value="1"%/></label><label> | child/children]
-        <input type="checkbox" name="ins_chxcnt" value="on"%/></label>
-      </td>
-    </tr>
-  </table>
+  <td>
+    <label>[*insert::|<input name="ins_chxcnt_n" size="1" maxlength="1"%sp;
+       value="1"%/></label><label> | child/children]
+      <input type="checkbox" name="ins_chxcnt" value="on"%/></label>
+  </td>
 %end;
 
 %define;invert_children(xcnt)
-  <table border="1">
-    <tr>
-      <td>
-        <label>[*invert]
-        <input type="checkbox" name="inv_chxcnt" value="on"%/></label>
-      </td>
-    </tr>
-  </table>
+  <td>
+    <label>[*invert]
+    <input type="checkbox" name="inv_chxcnt" value="on"%/></label>
+  </td>
 %end;
 
 %define;child(xcnt)
@@ -442,12 +434,19 @@
 %end;
 
 <dl><dd>
+<table border="1"><tr>
 %apply;insert_child("0")
 %foreach;child;
-  %if;(cnt != 1)%apply;invert_children(cnt)%end;
+  %if;(cnt != 1)
+    </td><td>&nbsp;</td><td>
+    %apply;invert_children(cnt)
+  %end;
+  </tr></table>
   %apply;child(cnt)
+  <table border="1"><tr>
   %apply;insert_child(cnt)
 %end;
+</tr></table>
 </dd></dl>
 
 <h4>[*source/sources]0</h4>
