@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templAst.mli,v 4.12 2005-08-25 18:57:51 ddr Exp $ *)
+(* $Id: templAst.mli,v 4.13 2005-08-30 17:56:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type ast =
@@ -18,4 +18,8 @@ type ast =
 and loc = (int * int)
 ;
 
-type expr_val = [ VVbool of bool | VVstring of string ];
+type expr_val 'a =
+  [ VVbool of bool
+  | VVstring of string
+  | VVother of 'a ]
+;
