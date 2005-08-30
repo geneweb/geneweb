@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.28 2005-08-30 17:56:23 ddr Exp $ *)
+(* $Id: templ.mli,v 4.29 2005-08-30 21:36:13 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,7 +15,7 @@ value interp :
   config -> base -> string ->
     (env 'a -> 'b -> loc -> list string -> expr_val 'b) ->
     (env 'a -> bool -> string -> string -> string) ->
-    (env 'a -> string -> list string -> string) ->
+    (env 'a -> string -> list (expr_val 'b) -> string) ->
     ('a -> option (vother 'b)) -> (vother 'b -> 'a) ->
     ((env 'a -> 'b -> ast -> unit) ->
        (env 'a -> 'b -> ast -> string) ->
