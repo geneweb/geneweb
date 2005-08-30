@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.104 2005-08-27 18:45:09 ddr Exp $ *)
+(* $Id: templ.ml,v 4.105 2005-08-30 17:56:23 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -692,16 +692,19 @@ and eval_simple_variable conf env =
   | s -> List.assoc s env ]
 ;
 
-value eval_string_var conf eval_var s sl =
-  try
-    match eval_var [s :: sl] with
-    [ VVstring s -> s
-    | VVbool True -> "1"
-    | VVbool False -> "0" ]
-  with
+value rec string_of_expr_val eval_var =
+  fun
+  [ VVstring s -> s
+  | VVbool True -> "1"
+  | VVbool False -> "0"
+  | VVother ep -> string_of_expr_val eval_var (eval_var ep (0, 0) []) ]
+;
+
+value eval_string_var conf eval_var ep loc sl =
+  try eval_var ep loc sl with
   [ Not_found ->
-      try eval_variable conf [] [s :: sl] with
-      [ Not_found -> " %" ^ String.concat "." [s :: sl] ^ "?" ] ]
+      try VVstring (eval_variable conf [] sl) with
+      [ Not_found -> VVstring (" %" ^ String.concat "." sl ^ "?") ] ]
 ;
 
 value eval_subst loc f xl vl a =
@@ -825,14 +828,14 @@ value templ_eval_var conf =
 value bool_of e =
   fun
   [ VVbool b -> b
-  | VVstring _ ->
+  | VVstring _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "bool value expected") ]
 ;
 
 value string_of e =
   fun
   [ VVstring s -> s
-  | VVbool _ ->
+  | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "string value expected") ]
 ;
 
@@ -843,7 +846,7 @@ value int_of e =
       [ Failure _ ->
           raise_with_loc (loc_of_expr e)
             (Failure ("int value expected\nFound = " ^ s)) ]
-  | VVbool _ ->
+  | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "int value expected") ]
 ;
 
@@ -951,7 +954,7 @@ value eval_bool_expr conf (eval_var, eval_apply) e =
   try
     match eval_expr (conf, eval_var, eval_apply) e with
     [ VVbool b -> b
-    | VVstring _ ->
+    | VVstring _ | VVother _ ->
         raise_with_loc (loc_of_expr e) (Failure "bool value expected") ]
   with
   [ Exc_located loc exc -> do { print_error conf loc exc; False } ]
@@ -961,7 +964,7 @@ value eval_string_expr conf (eval_var, eval_apply) e =
   try
     match eval_expr (conf, eval_var, eval_apply) e with
     [ VVstring s -> s
-    | VVbool b ->
+    | VVbool _ | VVother _ ->
         raise_with_loc (loc_of_expr e) (Failure "string value expected") ]
   with
   [ Exc_located loc exc -> do { print_error conf loc exc; "" } ]
@@ -995,14 +998,15 @@ and print_simple_variable conf base_opt =
   | _ -> raise Not_found ]
 ;
 
-value print_var conf base eval_var s sl =
+value rec print_var conf base eval_var ep loc sl =
   try
-    match eval_var [s :: sl] with
+    match eval_var ep loc sl with
     [ VVstring s -> Wserver.wprint "%s" s
     | VVbool True -> Wserver.wprint "1"
-    | VVbool False -> Wserver.wprint "0" ]
+    | VVbool False -> Wserver.wprint "0"
+    | VVother ep -> print_var conf base eval_var ep loc [] ]
   with
-  [ Not_found -> print_variable conf (Some base) [s :: sl] ]
+  [ Not_found -> print_variable conf (Some base) sl ]
 ;
 
 value print_apply loc f print_ast gxl al gvl =
@@ -1053,9 +1057,9 @@ value templ_eval_expr = eval_string_expr;
 value templ_print_var = print_var;
 value templ_print_apply = print_apply;
 
-type vother =
+type vother 'a =
   [ Vdef of list string and list ast
-  | Vval of string
+  | Vval of expr_val 'a
   | Vbind of string and string ]
 ;
 type env 'a = list (string * 'a);
@@ -1109,11 +1113,7 @@ value interp
   let eval_var env ep loc sl =
     try
       match sl with
-      [ [k] ->
-          match get_val get_vother k env with
-          [ Some v -> VVstring v
-          | None -> eval_var env ep loc sl ]
-      | ["env"; "key"] ->
+      [ ["env"; "key"] ->
           match get_vother (List.assoc "binding" env) with
           [ Some (Vbind k v) -> VVstring k
           | _ -> raise Not_found ]
@@ -1125,17 +1125,22 @@ value interp
           match get_vother (List.assoc "binding" env) with
           [ Some (Vbind k v) -> VVstring (Util.decode_varenv v)
           | _ -> raise Not_found ]
+      | [s :: sl] ->
+          match (get_val get_vother s env, sl) with
+          [ (Some (VVother x), sl) -> eval_var env x loc sl
+          | (Some v, []) -> v
+          | (_, sl) -> eval_var env ep loc [s :: sl] ]
       | _ -> eval_var env ep loc sl ]
     with
     [ Not_found -> VVstring (eval_variable conf [] sl) ]
   in
-  let print_var print_ast conf base env ep loc s sl =
-    match [s :: sl] with
+  let print_var print_ast conf base env ep loc sl =
+    match sl with
     [ ["include"; templ] ->
         match  input conf templ with
         [ Some astl -> List.iter (print_ast env ep) astl
-        | None ->  Wserver.wprint " %%%s?" (String.concat "." [s :: sl]) ]
-    | _ -> templ_print_var conf base (eval_var env ep loc) s sl ]
+        | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
+    | _ -> templ_print_var conf base (eval_var env) ep loc sl ]
   in
   let print_foreach print_ast eval_expr env ep loc s sl el al =
     try print_foreach print_ast eval_expr env ep loc s sl el al with
@@ -1147,18 +1152,20 @@ value interp
     [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
     | None -> () ]
   in
-  let rec eval_ast env ep =
+  let rec eval_ast env ep a =
+    string_of_expr_val (eval_var env) (eval_ast_expr env ep a)
+  and eval_ast_expr env ep =
     fun
-    [ Atext _ s -> s
-    | Avar loc s sl -> eval_string_var conf (eval_var env ep loc) s sl
-    | Atransl _ upp s n -> eval_transl env upp s n
-    | Aif e alt ale -> eval_if env ep e alt ale
+    [ Atext _ s -> VVstring s
+    | Avar loc s sl -> eval_string_var conf (eval_var env) ep loc [s :: sl]
+    | Atransl _ upp s n -> VVstring (eval_transl env upp s n)
+    | Aif e alt ale -> VVstring (eval_if env ep e alt ale)
     | Aapply loc f all ->
         let eval_ast = eval_ast env ep in
         let sll = List.map (List.map eval_ast) all in
         let vl = List.map (String.concat "") sll in
-        eval_apply env eval_ast loc f vl
-    | x -> eval_expr env ep x ]
+        VVstring (eval_apply env eval_ast loc f vl)
+    | x -> VVstring (eval_expr env ep x) ]
   and eval_expr env ep e =
     let eval_ast = eval_ast env ep in
     let eval_apply = eval_apply env eval_ast in
@@ -1195,7 +1202,7 @@ value interp
   in
   let rec print_ast env ep =
     fun
-    [ Avar loc s sl -> print_var print_ast conf base env ep loc s sl
+    [ Avar loc s sl -> print_var print_ast conf base env ep loc [s :: sl]
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->
@@ -1219,7 +1226,13 @@ value interp
     | None ->
         Wserver.wprint "%s" (eval_apply env eval_ast loc f vl) ]
   and print_let env ep k v al =
-    let v = String.concat "" (List.map (eval_ast env ep) v) in
+    let v =
+      match List.map (eval_ast_expr env ep) v with
+      [ [e] -> e
+      | el ->
+          let sl = List.map (string_of_expr_val (eval_var env)) el in
+          VVstring (String.concat "" sl) ]
+    in
     let env = set_val set_vother k v env in
     List.iter (print_ast env ep) al
   and print_if env ep e alt ale =
