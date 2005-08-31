@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.201 2005-08-30 21:36:13 ddr Exp $ *)
+(* $Id: perso.ml,v 4.202 2005-08-31 17:41:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1521,7 +1521,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | ["var"] -> VVother ep
+  | ["var"] -> VVother (eval_person_field_var conf base env ep loc)
   | [s] ->
       try bool_val (eval_bool_person_field conf base env ep s) with
       [ Not_found ->
