@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: surname.txt,v 1.4 2005-08-25 18:57:51 ddr Exp $ -->
+  <!-- $Id: surname.txt,v 1.5 2005-08-31 17:41:28 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[surname/surnames]0: %surname;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -28,10 +28,10 @@
   </td></tr></table>
 %end;
 
-%define;branch(lev, ppp)
+%define;branch(lev, pp)
   ...branch...(to be implemented)<br%/>
   lev
-  ppp
+  %pp.access;
 %end;
 
 %if;(evar.o = "i")
@@ -81,13 +81,13 @@
             <a href="%prefix;%ancestor.mother.access;">&lt;&lt;</a>
           %end;
           <dl>
-            %apply;branch(1, person(ancestor))%nl;
+            %apply;branch(1, ancestor.var)%nl;
           </dl>
           </dd>
         %elseif;(number_of_branches > 1 and evar.br = "")
-          %apply;branch(1, person(ancestor))%nl;
+          %apply;branch(1, ancestor.var)%nl;
         %else;
-          %apply;branch(0, person(ancestor))%nl;
+          %apply;branch(0, ancestor.var)%nl;
         %end;
       %end;
     %end;
