@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 1.6 2005-07-24 22:33:43 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 1.7 2005-09-01 08:28:18 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -409,37 +409,37 @@
 
 %define;ancestor_dates_in_interval(xx)
   %if;(evar.after != "" and
-       (ancestor.xx.birth_date.year = "" and
-        ancestor.xx.baptism_date.year = "" and
-        ancestor.xx.death_date.year = "" and
-        ancestor.xx.burial_date.year = "" and
-        ancestor.xx.cremated_date.year = "" or
-        ancestor.xx.birth_date.year != "" and
-        ancestor.xx.birth_date.year < evar.after or
-        ancestor.xx.baptism_date.year != "" and
-        ancestor.xx.baptism_date.year < evar.after or
-        ancestor.xx.death_date.year != "" and
-        ancestor.xx.death_date.year < evar.after or
-        ancestor.xx.burial_date.year != "" and
-        ancestor.xx.burial_date.year < evar.after or
-        ancestor.xx.cremated_date.year != "" and
-        ancestor.xx.cremated_date.year < evar.after) or
+       (xx.birth_date.year = "" and
+        xx.baptism_date.year = "" and
+        xx.death_date.year = "" and
+        xx.burial_date.year = "" and
+        xx.cremated_date.year = "" or
+        xx.birth_date.year != "" and
+        xx.birth_date.year < evar.after or
+        xx.baptism_date.year != "" and
+        xx.baptism_date.year < evar.after or
+        xx.death_date.year != "" and
+        xx.death_date.year < evar.after or
+        xx.burial_date.year != "" and
+        xx.burial_date.year < evar.after or
+        xx.cremated_date.year != "" and
+        xx.cremated_date.year < evar.after) or
        evar.before != "" and
-       (ancestor.xx.birth_date.year = "" and
-        ancestor.xx.baptism_date.year = "" and
-        ancestor.xx.death_date.year = "" and
-        ancestor.xx.burial_date.year = "" and
-        ancestor.xx.cremated_date.year = "" or
-        ancestor.xx.birth_date.year != "" and
-        ancestor.xx.birth_date.year > evar.before or
-        ancestor.xx.baptism_date.year != "" and
-        ancestor.xx.baptism_date.year > evar.before or
-        ancestor.xx.death_date.year != "" and
-        ancestor.xx.death_date.year > evar.before or
-        ancestor.xx.burial_date.year != "" and
-        ancestor.xx.burial_date.year > evar.before or
-        ancestor.xx.cremated_date.year != "" and
-        ancestor.xx.cremated_date.year > evar.before))false%nn;
+       (xx.birth_date.year = "" and
+        xx.baptism_date.year = "" and
+        xx.death_date.year = "" and
+        xx.burial_date.year = "" and
+        xx.cremated_date.year = "" or
+        xx.birth_date.year != "" and
+        xx.birth_date.year > evar.before or
+        xx.baptism_date.year != "" and
+        xx.baptism_date.year > evar.before or
+        xx.death_date.year != "" and
+        xx.death_date.year > evar.before or
+        xx.burial_date.year != "" and
+        xx.burial_date.year > evar.before or
+        xx.cremated_date.year != "" and
+        xx.cremated_date.year > evar.before))false%nn;
   %else;true%end;
 %end;
 
@@ -530,7 +530,7 @@
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
-            %if;(ancestor_dates_in_interval("self") = "true")
+            %if;(ancestor_dates_in_interval(ancestor.var) = "true")
               %incr_count;
               %apply;add_in_sorted_list(
                 ancestor.surname_end, ancestor.first_name,
@@ -544,7 +544,7 @@
           %elseif;(evar.ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %if;(ancestor_dates_in_interval("mother") = "true")
+              %if;(ancestor_dates_in_interval(ancestor.mother.var) = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.mother.surname_end, ancestor.mother.first_name,
@@ -555,7 +555,7 @@
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %if;(ancestor_dates_in_interval("father") = "true")
+              %if;(ancestor_dates_in_interval(ancestor.father.var) = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.father.surname_end, ancestor.father.first_name,
@@ -640,7 +640,7 @@
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
                ancestor.first_name != "?" and ancestor.surname != "?")
-            %if;(ancestor_dates_in_interval("self") = "true")
+            %if;(ancestor_dates_in_interval(ancestor.var) = "true")
               %lazy_force;
               <li>%sp;
                 %expr(ancestor.sosa.v * 2)
@@ -658,7 +658,7 @@
           %elseif;(evar.ms = "on" and ancestor.has_parents)
             %if;(ancestor.father.first_name = "?" and
                  ancestor.father.surname = "?")
-              %if;(ancestor_dates_in_interval("mother") = "true")
+              %if;(ancestor_dates_in_interval(ancestor.mother.var) = "true")
                 %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2)%sp; -
                 %apply;a_of_b%with;
@@ -673,7 +673,7 @@
             %end;
             %if;(ancestor.mother.first_name = "?" and
                  ancestor.mother.surname = "?")
-              %if;(ancestor_dates_in_interval("father") = "true")
+              %if;(ancestor_dates_in_interval(ancestor.father.var) = "true")
                 %lazy_force;
                 <li> %expr(ancestor.sosa.v * 2 + 1)%sp; -
                 %apply;a_of_b%with;
