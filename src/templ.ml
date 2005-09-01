@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.107 2005-08-31 17:41:28 ddr Exp $ *)
+(* $Id: templ.ml,v 4.108 2005-09-01 08:28:19 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -707,15 +707,6 @@ value eval_string_var conf eval_var sl =
       [ Not_found -> VVstring (" %" ^ String.concat "." sl ^ "?") ] ]
 ;
 
-value eval_subst loc f xl vl a =
-  loop a xl vl where rec loop a xl vl =
-    match (xl, vl) with
-    [ ([x :: xl], [VVstring v :: vl]) -> loop (subst (subst_text x v) a) xl vl
-    | ([x :: xl], [v :: vl]) -> loop (subst (subst_text x "argh") a) xl vl
-    | ([], []) -> a
-    | _ -> Atext loc (f ^ ": bad # of params") ]
-;
-
 value eval_var_handled conf env sl =
   try eval_variable conf env sl with
   [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
@@ -1074,6 +1065,18 @@ value set_val set_vother k v env =
   [(k, set_vother (Vval v)) :: env]
 ;
 
+value eval_subst loc f set_vother env xl vl a =
+  loop env a xl vl where rec loop env a xl vl =
+    match (xl, vl) with
+    [ ([x :: xl], [VVstring v :: vl]) ->
+        loop env (subst (subst_text x v) a) xl vl
+    | ([x :: xl], [v :: vl]) ->
+        let env = set_val set_vother x v env in
+        loop env a xl vl
+    | ([], []) -> (env, a)
+    | _ -> (env, Atext loc (f ^ ": bad # of params")) ]
+;
+
 value print_apply loc f set_vother print_ast env ep gxl al gvl =
   List.iter
     (fun a ->
@@ -1169,9 +1172,8 @@ value interp
     | Atransl _ upp s n -> VVstring (eval_transl env upp s n)
     | Aif e alt ale -> VVstring (eval_if env ep e alt ale)
     | Aapply loc f all ->
-        let eval_ast = eval_ast env ep in
         let vl = List.map (eval_ast_expr_list env ep) all in
-        VVstring (eval_apply env eval_ast loc f vl)
+        VVstring (eval_apply env ep loc f vl)
     | x -> VVstring (eval_expr env ep x) ]
   and eval_ast_expr_list env ep v =
     match List.map (eval_ast_expr env ep) v with
@@ -1180,22 +1182,27 @@ value interp
         let sl = List.map string_of_expr_val el in
         VVstring (String.concat "" sl) ]
   and eval_expr env ep e =
-    let eval_ast = eval_ast env ep in
-    let eval_apply = eval_apply env eval_ast in
+    let eval_apply = eval_apply env ep in
     let eval_var = eval_var env ep in
     templ_eval_expr conf (eval_var, eval_apply) e
-  and eval_apply env eval_ast loc f vl =
+  and eval_apply env ep loc f vl =
     match get_def get_vother f env with
     [ Some (xl, al) ->
-        let al = List.map (eval_subst loc f xl vl) al in
-        let sl = List.map eval_ast al in
+        let (env, al) =
+          List.fold_right
+            (fun a (env, al) ->
+               let (env, a) = eval_subst loc f set_vother env xl vl a in
+               (env, [a :: al]))
+          al (env, [])
+        in
+        let sl = List.map (eval_ast env ep) al in
         String.concat "" sl
     | None ->
         match (f, vl) with
         [ ("capitalize", [VVstring s]) -> Util.capitale s
         | ("interp", [VVstring s]) ->
             let astl = parse_templ conf (Stream.of_string s) in
-            String.concat "" (List.map eval_ast astl)
+            String.concat "" (List.map (eval_ast env ep) astl)
         | ("language_name", [VVstring s]) ->
             Translate.language_name s (Util.transl conf " !languages")
         | ("nth", [VVstring s1; VVstring s2]) ->
@@ -1207,7 +1214,7 @@ value interp
   and eval_if env ep e alt ale =
     let eval_var = eval_var env ep in
     let eval_ast = eval_ast env ep in
-    let eval_apply = eval_apply env eval_ast in
+    let eval_apply = eval_apply env ep in
     let al =
       if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
     in
@@ -1229,21 +1236,19 @@ value interp
   and print_define env ep f xl al alk =
     List.iter (print_ast (set_def set_vother f xl al env) ep) alk
   and print_apply env ep loc f ell =
-    let eval_ast = eval_ast env ep in
     let vl = List.map (eval_ast_expr_list env ep) ell in
     match get_def get_vother f env with
     [ Some (xl, al) ->
         templ_print_apply loc f set_vother print_ast env ep xl al vl
     | None ->
-        Wserver.wprint "%s" (eval_apply env eval_ast loc f vl) ]
+        Wserver.wprint "%s" (eval_apply env ep loc f vl) ]
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
     let env = set_val set_vother k v env in
     List.iter (print_ast env ep) al
   and print_if env ep e alt ale =
     let eval_var = eval_var env ep in
-    let eval_ast = eval_ast env ep in
-    let eval_apply = eval_apply env eval_ast in
+    let eval_apply = eval_apply env ep in
     let al =
       if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
     in
