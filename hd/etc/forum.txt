@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.10 2005-09-02 01:50:30 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.11 2005-09-02 02:13:28 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -92,7 +92,7 @@
       %hidden;
       <input type="hidden" name="m" value="FORUM_FIND"%/>
       <input type="hidden" name="p" value="%pos;">
-      <input name="s" size="30" maxlength="40" value="%evar.s;"%/><br%/>
+      <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
       <input type="submit" value="[*find]"%/>
     </form>
     </td></tr></table>
@@ -145,7 +145,7 @@
   <form method="GET" action="%action;">
     %hidden;
     <input type="hidden" name="m" value="FORUM_FIND"%/>
-    <input name="s" size="30" maxlength="40" value="%evar.s;"%/><br%/>
+    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
     <input type="submit" value="[*find]"%/>
   </form>
   </td></tr></table>

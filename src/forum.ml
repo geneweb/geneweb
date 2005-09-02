@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.62 2005-09-02 01:50:30 ddr Exp $ *)
+(* $Id: forum.ml,v 4.63 2005-09-02 02:13:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -665,7 +665,7 @@ value find_text conf base s =
 ;
 
 value print_find conf base =
-  match p_getenv conf.env "s" with
-  [ Some s -> find_text conf base s
+  match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
+  [ Some s -> find_text conf base (Wserver.gen_decode False s)
   | None -> print_forum_headers conf base ]
 ;
