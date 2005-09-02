@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.45 2005-08-31 17:41:28 ddr Exp $ *)
+(* $Id: some.ml,v 4.46 2005-09-02 01:50:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -701,6 +701,7 @@ and eval_person_var conf base p =
           eval_person_var conf base p sl
       | None -> raise Not_found ]
   | ["var"] -> VVother (eval_person_var conf base p)
+  | [] -> VVstring (person_text conf base p)
   | _ -> raise Not_found ]
 and eval_string_var s =
   fun

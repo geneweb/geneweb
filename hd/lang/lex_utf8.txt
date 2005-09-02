@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.59 2005-08-29 07:54:27 ddr Exp $
+# $Id: lex_utf8.txt,v 1.60 2005-09-02 01:50:30 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -3689,6 +3689,10 @@ ro: fisier
 ru: файл
 sl: datoteka
 sv: fil
+
+    find
+en: find
+fr: rechercher
 
     first free number
 af: eerste beskikbare nommer

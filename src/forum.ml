@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.61 2005-08-27 09:19:01 ddr Exp $ *)
+(* $Id: forum.ml,v 4.62 2005-09-02 01:50:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -198,7 +198,8 @@ value passwd_in_file conf =
 ;
 
 type env 'a =
-  [ Vmess of message and option message and int and int and int
+  [ Vmess of
+      message and option message and int and int and int and option string
   | Vpos of ref int
   | Vother of 'a
   | Vnone ]
@@ -207,6 +208,22 @@ type env 'a =
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
+
+value html_highlight h s =
+  let ht =
+    "<span style=\"color:black;background-color:#afa;font-weight:bold\">" ^
+    h ^ "</span>"
+  in
+  loop False 0 0 0 where rec loop in_tag i j len =
+    if j = String.length h then loop False i 0 (Buff.mstore len ht)
+    else if i = String.length s then
+      if j = 0 then Buff.get len
+      else loop False (i - j + 1) 0 (Buff.store len s.[i-j])
+    else if in_tag then loop (s.[i] <> '>') (i + 1) 0 (Buff.store len s.[i])
+    else if s.[i] = '<' then loop True (i - j + 1) 0 (Buff.store len s.[i-j])
+    else if s.[i] = h.[j] then loop False (i + 1) (j + 1) len
+    else loop False (i - j + 1) 0 (Buff.store len s.[i-j])
+;
 
 value rec eval_var conf base env xx loc =
   fun
@@ -222,27 +239,27 @@ and eval_message_var conf env =
   fun
   [ ["access"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> VVstring mess.m_access
+      [ Vmess mess _ _ _ _ _ -> VVstring mess.m_access
       | _ -> raise Not_found ]
   | ["date" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> eval_date_var conf mess.m_date sl
+      [ Vmess mess _ _ _ _ _ -> eval_date_var conf mess.m_date sl
       | _ -> raise Not_found ]
   | ["email" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> eval_message_string_var conf mess.m_email sl
+      [ Vmess mess _ _ _ _ so -> eval_message_string_var conf mess.m_email so sl
       | _ -> raise Not_found ]
   | ["hour"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> VVstring mess.m_hour
+      [ Vmess mess _ _ _ _ _ -> VVstring mess.m_hour
       | _ -> raise Not_found ]
   | ["ident" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> eval_message_string_var conf mess.m_ident sl
+      [ Vmess mess _ _ _ _ so -> eval_message_string_var conf mess.m_ident so sl
       | _ -> raise Not_found ]
   | ["next_pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos _ ic_len ->
+      [ Vmess _ _ pos _ ic_len _ ->
           loop pos where rec loop pos =
             if pos = ic_len then VVstring ""
             else
@@ -256,18 +273,18 @@ and eval_message_var conf env =
       | _ -> raise Not_found ]
   | ["pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos _ _ -> VVstring (string_of_int pos)
+      [ Vmess _ _ pos _ _ _ -> VVstring (string_of_int pos)
       | _ -> raise Not_found ]
   | ["prev_date" :: sl] ->
       match get_env "mess" env with
-      [ Vmess _ prev_mess _ _ _ ->
+      [ Vmess _ prev_mess _ _ _ _ ->
           match prev_mess with
           [ Some mess -> eval_date_var conf mess.m_date sl
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["prev_pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos next_pos ic_len ->
+      [ Vmess _ _ pos next_pos ic_len _ ->
           loop next_pos where rec loop next_pos =
             if next_pos > 0 then
               match get_message conf next_pos with
@@ -279,24 +296,24 @@ and eval_message_var conf env =
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> eval_message_string_var conf mess.m_subject sl
+      [ Vmess m _ _ _ _ so -> eval_message_string_var conf m.m_subject so sl
       | _ -> raise Not_found ]
   | ["text" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> eval_message_text_var conf mess.m_mess sl
+      [ Vmess m _ _ _ _ so -> eval_message_text_var conf m.m_mess so sl
       | _ -> raise Not_found ]
-  | ["time"] ->
+  | ["time" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> VVstring mess.m_time
+      [ Vmess m _ _ _ _ so -> eval_message_text_var conf m.m_time so sl
       | _ -> raise Not_found ]
   | ["wiki"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ -> VVstring mess.m_wiki
+      [ Vmess mess _ _ _ _ _ -> VVstring mess.m_wiki
       | _ -> raise Not_found ]
   | ["wizard"] ->
       if passwd_in_file conf then
         match get_env "mess" env with
-        [ Vmess mess _ _ _ _ -> VVstring (mess.m_wizard)
+        [ Vmess mess _ _ _ _ _ -> VVstring (mess.m_wizard)
         | _ -> raise Not_found ]
       else VVstring ""
   | _ -> raise Not_found ]
@@ -308,21 +325,33 @@ and eval_date_var conf date =
       | _ -> VVstring "" ]
   | [] -> VVstring (Date.string_of_date conf date)
   | _ -> raise Not_found ]
-and eval_message_text_var conf str =
+and eval_message_text_var conf str so =
   fun
   [ ["wiki"] ->
       let s = string_with_macros conf [] str in
       let lines = Wiki.html_of_tlsw conf s in
       let s = String.concat "\n" lines in
       let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
+      let s =
+        match so with
+        [ Some h -> html_highlight h s
+        | None -> s ]
+      in
       VVstring s
-  | sl -> eval_message_string_var conf str sl ]
-and eval_message_string_var conf str =
+  | sl -> eval_message_string_var conf str so sl ]
+and eval_message_string_var conf str so =
   fun
   [ ["cut"; s] ->
       try VVstring (no_html_tags (sp2nbsp (int_of_string s) str)) with
       [ Failure _ -> raise Not_found ]
-  | [] -> VVstring (no_html_tags str)
+  | [] ->
+      let s = no_html_tags str in
+      let s =
+        match so with
+        [ Some h -> html_highlight h s
+        | None -> s ]
+      in
+      VVstring s
   | _ -> raise Not_found ]
 ;
 
@@ -356,7 +385,7 @@ value print_foreach conf base print_ast eval_expr =
                 if not accessible then loop prev_mess i
                 else
                   let next_pos = ic_len - pos_in ic in
-                  let vmess = Vmess mess prev_mess pos next_pos ic_len in
+                  let vmess = Vmess mess prev_mess pos next_pos ic_len None in
                   let env = [("mess", vmess) :: env] in
                   do {
                     List.iter (print_ast env ()) al;
@@ -378,22 +407,28 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
-value print conf base =
+value print_forum_message conf base r so =
   let env =
-    match p_getint conf.env "p" with
-    [ Some pos ->
-        match get_message conf pos with
-        [ Some (a, mess, _, next_pos, ic_len) ->
-            if a then
-              [("mess", Vmess mess None pos next_pos ic_len);
-               ("pos", Vpos (ref pos))]
-            else [("pos", Vpos (ref (-1)))]
-        | None -> [("pos", Vpos (ref (-1)))] ]
+    match r with
+    [ Some (a, mess, pos, next_pos, ic_len) ->
+        if a then
+          [("mess", Vmess mess None pos next_pos ic_len so);
+           ("pos", Vpos (ref pos))]
+        else [("pos", Vpos (ref (-1)))]
     | None -> [("pos", Vpos (ref (-1)))] ]
   in
   Templ.interp conf base "forum" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (print_foreach conf base) env ()
+;
+
+value print conf base =
+  let r =
+    match p_getint conf.env "p" with
+    [ Some pos -> get_message conf pos
+    | None -> None ]
+  in
+  print_forum_message conf base r None
 ;
 
 value print_forum_headers conf base =
@@ -582,5 +617,55 @@ value delete_forum_message conf base pos =
 value print_del conf base =
   match p_getint conf.env "p" with
   [ Some pos -> delete_forum_message conf base pos
+  | None -> print_forum_headers conf base ]
+;
+
+value in_message s m =
+  loop 0 0 where rec loop i j =
+    if j = String.length s then True
+    else if i = String.length m then False
+    else if m.[i] = s.[j] then loop (i + 1) (j + 1)
+    else loop (i - j + 1) 0
+;
+
+value find_text conf base s =
+  let s = if s = "" then " " else s in
+  let fname = forum_file conf in
+  match
+    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+  with
+  [ Some ic ->
+      let ic_len = in_channel_length ic in
+      let rec loop () =
+        let pos = ic_len - pos_in ic in
+        match read_message conf ic with
+        [ Some (m, accessible) ->
+            if accessible &&
+               List.exists (in_message s)
+                 [m.m_ident; m.m_subject; m.m_time; m.m_mess]
+            then Some (m, pos)
+            else loop ()
+        | None -> None ]
+      in
+      do {
+        match p_getint conf.env "p" with
+        [ Some pos ->
+            try seek_in ic (ic_len - pos + 1) with [ Sys_error _ -> () ]
+        | None -> () ];
+        let messo = loop () in
+        let next_pos = ic_len - pos_in ic in
+        close_in ic;
+        match messo with
+        [ Some (mess, pos) ->
+            let r = Some (True, mess, pos, next_pos, ic_len) in
+            print_forum_message conf base r (Some s)
+        | None -> print_forum_headers conf base ]
+      }
+  | None -> print_forum_headers conf base ]
+;
+
+value print_find conf base =
+  match p_getenv conf.env "s" with
+  [ Some s -> find_text conf base s
   | None -> print_forum_headers conf base ]
 ;
