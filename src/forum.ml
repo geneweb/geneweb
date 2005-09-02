@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.63 2005-09-02 02:13:28 ddr Exp $ *)
+(* $Id: forum.ml,v 4.64 2005-09-02 07:53:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -628,7 +628,7 @@ value in_message s m =
     else loop (i - j + 1) 0
 ;
 
-value find_text conf base s =
+value search_text conf base s =
   let s = if s = "" then " " else s in
   let fname = forum_file conf in
   match
@@ -664,8 +664,8 @@ value find_text conf base s =
   | None -> print_forum_headers conf base ]
 ;
 
-value print_find conf base =
+value print_search conf base =
   match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
-  [ Some s -> find_text conf base (Wserver.gen_decode False s)
+  [ Some s -> search_text conf base (Wserver.gen_decode False s)
   | None -> print_forum_headers conf base ]
 ;

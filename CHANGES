@@ -55,7 +55,7 @@ The new version number (5.00) is in honour of this new encoding.
       displayed.
 
 * GeneWeb server or CGI (gwd)
-  - [02 Sep 05] Added a "find" form in database forum.
+  - [02 Sep 05] Added a "search" form in database forum.
   - [17 Aug 05] The pages "statistics", "history of updates", "database
     forum", "calendars", and some pages displaying relationship links by
     trees are now customizable. They resp. use the template files

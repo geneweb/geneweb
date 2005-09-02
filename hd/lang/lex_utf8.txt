@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.60 2005-09-02 01:50:30 ddr Exp $
+# $Id: lex_utf8.txt,v 1.61 2005-09-02 07:53:51 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -3690,10 +3690,6 @@ ru: файл
 sl: datoteka
 sv: fil
 
-    find
-en: find
-fr: rechercher
-
     first free number
 af: eerste beskikbare nommer
 bg: пръв свободен номер
@@ -7143,6 +7139,10 @@ ro: relatie prin mariaj
 ru: связь браком
 sl: sorodstvo preko poroke
 sv: sl&auml;ktskap genom &auml;ktenskap
+
+    search
+en: search
+fr: rechercher
 
     see
 af: sien
