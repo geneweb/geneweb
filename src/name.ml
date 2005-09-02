@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.19 2005-02-09 22:04:33 ddr Exp $ *)
+(* $Id: name.ml,v 4.20 2005-09-02 12:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value utf_8_db = ref True;
@@ -19,6 +19,36 @@ value unaccent_iso_8859_1 =
   | 'þ' -> 'p'
   | 'ß' -> 's'
   | c -> c ]
+;
+
+value char_iso_8859_1_of_utf_8 s i =
+  if Char.code s.[i] < 0x80 then Some (s.[i], i + 1)
+  else if Char.code s.[i] = 0xC2 then
+    let c = Char.chr (Char.code s.[i+1]) in
+    Some (c, i + 2)
+  else if Char.code s.[i] = 0xC3 then
+    let c = Char.chr (Char.code s.[i+1] + 0x40) in
+    Some (c, i + 2)
+  else None
+;
+
+value next_chars_if_equiv s i t j =
+  if i >= String.length s || j >= String.length t then None
+  else if utf_8_db.val then
+    match (char_iso_8859_1_of_utf_8 s i, char_iso_8859_1_of_utf_8 t j) with
+    [ (Some (c1, i), Some (c2, j)) ->
+        if unaccent_iso_8859_1 (Char.lowercase c1) =
+           unaccent_iso_8859_1 (Char.lowercase c2) then Some (i, j)
+        else None
+    | (None, None) ->
+        if s.[i] = t.[j] then Some (i + 1, j + 1) else None
+    | _ -> None ]
+  else if s.[i] = t.[j] then Some (i + 1, j + 1)
+  else if
+    unaccent_iso_8859_1 (Char.lowercase s.[i]) =
+    unaccent_iso_8859_1 (Char.lowercase t.[j])
+  then Some (i + 1, j + 1)
+  else None
 ;
 
 value lower s =

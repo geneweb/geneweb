@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.61 2005-09-02 07:53:51 ddr Exp $
+# $Id: lex_utf8.txt,v 1.62 2005-09-02 12:07:59 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7140,9 +7140,9 @@ ru: связь браком
 sl: sorodstvo preko poroke
 sv: sl&auml;ktskap genom &auml;ktenskap
 
-    search
-en: search
-fr: rechercher
+    search/case sensitive
+en: search/case sensitive
+fr: rechercher/sensible à la casse
 
     see
 af: sien

@@ -1,4 +1,4 @@
-(* $Id: name.mli,v 4.3 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: name.mli,v 4.4 2005-09-02 12:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value lower : string -> string;
@@ -32,5 +32,9 @@ value strip_lower : string -> string;
 value crush_lower : string -> string;
   (* crush_lower = crush o abbrev o lower, as second comparison of names.
      In index by names, the "names" are crush_lowers *)
+
+value next_chars_if_equiv :
+  string -> int -> string -> int -> option (int * int)
+;
 
 value utf_8_db : ref bool;
