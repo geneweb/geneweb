@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.108 2005-09-01 08:28:19 ddr Exp $ *)
+(* $Id: templ.ml,v 4.109 2005-09-02 02:13:28 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -652,6 +652,12 @@ value rec eval_variable conf env =
   fun
   [ ["bvar"; v] ->
       try List.assoc v conf.base_env with [ Not_found -> "" ]
+  | ["evar"; v; "ns"] ->
+      try
+        let vv = List.assoc v (conf.env @ conf.henv) in
+        Util.quote_escaped (Wserver.gen_decode False vv)
+      with
+      [ Not_found -> "" ]
   | ["evar"; v] ->
       match Util.p_getenv (conf.env @ conf.henv) v with
       [ Some vv -> Util.quote_escaped vv
