@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.64 2005-09-02 07:53:51 ddr Exp $ *)
+(* $Id: forum.ml,v 4.65 2005-09-02 08:16:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -210,10 +210,7 @@ value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
 value html_highlight h s =
-  let ht =
-    "<span style=\"color:black;background-color:#afa;font-weight:bold\">" ^
-    h ^ "</span>"
-  in
+  let ht = "<span class=\"found\">" ^ h ^ "</span>" in
   loop False 0 0 0 where rec loop in_tag i j len =
     if j = String.length h then loop False i 0 (Buff.mstore len ht)
     else if i = String.length s then
