@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.14 2005-09-02 08:31:09 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.15 2005-09-02 12:07:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -39,6 +39,25 @@
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%define;search_form(main)
+  <table style="float:%right;"><tr><td align="%right;">
+  <form method="GET" action="%action;">
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_SEARCH"%/>
+    %if;("main" != "true")
+      <input type="hidden" name="p" value="%pos;"%/>
+    %end;
+    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+    <label>
+    <input type="checkbox" name="c" value="on"%nn;
+     %if;("main" != "true" and evar.c = "on") checked="checked"%end;
+     %/>[search/case sensitive]1
+    </label>
+    <input type="submit" value="[*search/case sensitive]0"%/>
+  </form>
   </td></tr></table>
 %end;
 
@@ -88,15 +107,7 @@
   %end;
 %elseif;(pos != "")
   %if;(evar.m = "FORUM_SEARCH")
-    <table style="float:%right;"><tr><td align="%right;">
-    <form method="GET" action="%action;">
-      %hidden;
-      <input type="hidden" name="m" value="FORUM_SEARCH"%/>
-      <input type="hidden" name="p" value="%pos;">
-      <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
-      <input type="submit" value="[*search]"%/>
-    </form>
-    </td></tr></table>
+    %apply;search_form("false")
   %end;
   <ul>
   <li><a href="%prefix;m=FORUM" accesskey="F">[*database forum] (F)</a></li>
@@ -143,14 +154,7 @@
   %end;
 %else;
   <h1 style="text-align:center" class="highlight">[*database forum]</h1>
-  <table style="float:%right;"><tr><td align="%right;">
-  <form method="GET" action="%action;">
-    %hidden;
-    <input type="hidden" name="m" value="FORUM_SEARCH"%/>
-    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
-    <input type="submit" value="[*search]"%/>
-  </form>
-  </td></tr></table>
+  %apply;search_form("true")
   %if;can_post;
     <form method="GET" action="%action;">
     <p>

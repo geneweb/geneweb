@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.66 2005-09-02 08:31:09 ddr Exp $ *)
+(* $Id: forum.ml,v 4.67 2005-09-02 12:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -209,17 +209,35 @@ value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
+value start_equiv_with case_sens s m i =
+  let rec test i j =
+    if j = String.length s then Some i
+    else if i = String.length m then None
+    else if case_sens then
+      if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+    else
+      match Name.next_chars_if_equiv m i s j with
+      [ Some (i, j) -> test i j
+      | None -> None ]
+  in
+  if case_sens then
+    if m.[i] = s.[0] then test (i + 1) 1 else None
+  else
+    match Name.next_chars_if_equiv m i s 0 with
+    [ Some (i, j) -> test i j
+    | None -> None ]
+;
+
 value html_highlight h s =
-  let ht = "<span class=\"found\">" ^ h ^ "</span>" in
-  loop False 0 0 0 where rec loop in_tag i j len =
-    if j = String.length h then loop False i 0 (Buff.mstore len ht)
-    else if i = String.length s then
-      if j = 0 then Buff.get len
-      else loop False (i - j + 1) 0 (Buff.store len s.[i-j])
-    else if in_tag then loop (s.[i] <> '>') (i + 1) 0 (Buff.store len s.[i])
-    else if s.[i] = '<' then loop True (i - j + 1) 0 (Buff.store len s.[i-j])
-    else if s.[i] = h.[j] then loop False (i + 1) (j + 1) len
-    else loop False (i - j + 1) 0 (Buff.store len s.[i-j])
+  let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
+  loop False 0 0 where rec loop in_tag i len =
+    if i = String.length s then Buff.get len
+    else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
+    else if s.[i] = '<' then loop True (i + 1) (Buff.store len s.[i])
+    else
+      match start_equiv_with False h s i with
+      [ Some j -> loop False j (Buff.mstore len (ht i j))
+      | None -> loop False (i + 1) (Buff.store len s.[i]) ]
 ;
 
 value rec eval_var conf base env xx loc =
@@ -626,12 +644,13 @@ value print_del conf base =
   | None -> print_forum_headers conf base ]
 ;
 
-value in_message s m =
-  loop 0 0 where rec loop i j =
-    if j = String.length s then True
-    else if i = String.length m then False
-    else if m.[i] = s.[j] then loop (i + 1) (j + 1)
-    else loop (i - j + 1) 0
+value in_message case_sens s m =
+  loop 0 where rec loop i =
+    if i = String.length m then False
+    else
+      match start_equiv_with case_sens s m i with
+      [ Some _ -> True
+      | None -> loop (i + 1) ]
 ;
 
 value search_text conf base s =
@@ -642,12 +661,13 @@ value search_text conf base s =
   with
   [ Some ic ->
       let ic_len = in_channel_length ic in
+      let case_sens = p_getenv conf.env "c" = Some "on" in
       let rec loop () =
         let pos = ic_len - pos_in ic in
         match read_message conf ic with
         [ Some (m, accessible) ->
             if accessible &&
-               List.exists (in_message s)
+               List.exists (in_message case_sens s)
                  [m.m_ident; m.m_subject; m.m_time; m.m_mess]
             then Some (m, pos)
             else loop ()
