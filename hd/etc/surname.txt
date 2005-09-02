@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: surname.txt,v 1.5 2005-08-31 17:41:28 ddr Exp $ -->
+  <!-- $Id: surname.txt,v 1.6 2005-09-02 01:50:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[surname/surnames]0: %surname;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -29,9 +29,10 @@
 %end;
 
 %define;branch(lev, pp)
-  ...branch...(to be implemented)<br%/>
-  lev
-  %pp.access;
+  %pp;
+  %foreach;family(pp);
+    aaa
+  %end;
 %end;
 
 %if;(evar.o = "i")

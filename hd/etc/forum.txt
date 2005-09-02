@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.9 2005-08-24 12:47:09 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.10 2005-09-02 01:50:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -86,6 +86,17 @@
     </h1>
   %end;
 %elseif;(pos != "")
+  %if;(evar.m = "FORUM_FIND")
+    <table style="float:%right;"><tr><td align="%right;">
+    <form method="GET" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="FORUM_FIND"%/>
+      <input type="hidden" name="p" value="%pos;">
+      <input name="s" size="30" maxlength="40" value="%evar.s;"%/><br%/>
+      <input type="submit" value="[*find]"%/>
+    </form>
+    </td></tr></table>
+  %end;
   <ul>
   <li><a href="%prefix;m=FORUM" accesskey="F">[*database forum] (F)</a></li>
   <li>%if;(message.next_pos != "")
@@ -130,6 +141,14 @@
   %end;
 %else;
   <h1 style="text-align:center" class="highlight">[*database forum]</h1>
+  <table style="float:%right;"><tr><td align="%right;">
+  <form method="GET" action="%action;">
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_FIND"%/>
+    <input name="s" size="30" maxlength="40" value="%evar.s;"%/><br%/>
+    <input type="submit" value="[*find]"%/>
+  </form>
+  </td></tr></table>
   %if;can_post;
     <form method="GET" action="%action;">
     <p>
