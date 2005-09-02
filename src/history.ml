@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 4.40 2005-08-27 09:19:01 ddr Exp $ *)
+(* $Id: history.ml,v 4.41 2005-09-02 09:16:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -184,14 +184,19 @@ value rec eval_var conf base env xx loc =
       match get_env "info" env with
       [ Vinfo s _ _ _ _ -> VVstring s
       | _ -> raise Not_found ]
-  | ["update"] ->
+  | ["update" :: sl] ->
       match get_env "info" env with
-      [ Vinfo _ u _ _ _ -> VVstring u
+      [ Vinfo _ u _ _ _ -> eval_string u sl
       | _ -> raise Not_found ]
   | ["user"] ->
       match get_env "info" env with
       [ Vinfo _ _ u _ _ -> VVstring u
       | _ -> raise Not_found ]
+  | _ -> raise Not_found ]
+and eval_string s =
+  fun
+  [ ["var"] -> VVother (eval_string s)
+  | [] -> VVstring s
   | _ -> raise Not_found ]
 and eval_person_field_var conf base env p =
   fun

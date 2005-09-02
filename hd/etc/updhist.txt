@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 1.1 2005-08-04 16:14:16 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 1.2 2005-09-02 09:16:54 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*history of updates]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -31,20 +31,20 @@
 <h1 style="text-align:center" class="highlight">[*history of updates]</h1>
 
 %define;update_text(uu)
-  %if;("uu" = "ap")[add::person/persons]0%nn;
-  %elseif;("uu" = "mp")[modify::person/persons]0%nn;
-  %elseif;("uu" = "dp")[delete::person/persons]0%nn;
-  %elseif;("uu" = "fp")[merge::person/persons]1%nn;
-  %elseif;("uu" = "si")[send::image/images]0%nn;
-  %elseif;("uu" = "di")[delete::image/images]0%nn;
-  %elseif;("uu" = "af")[add::family/families]0%nn;
-  %elseif;("uu" = "mf")[modify::family/families]0%nn;
-  %elseif;("uu" = "df")[delete::family/families]0%nn;
-  %elseif;("uu" = "if")[invert::family/families]1%nn;
-  %elseif;("uu" = "ff")[merge::family/families]1%nn;
-  %elseif;("uu" = "cn")[change children's names]%nn;
-  %elseif;("uu" = "aa")[add::parents]%nn;
-  %elseif;("uu" = "mn")[modify::note/notes]1%nn;
+  %if;(uu = "ap")[add::person/persons]0%nn;
+  %elseif;(uu = "mp")[modify::person/persons]0%nn;
+  %elseif;(uu = "dp")[delete::person/persons]0%nn;
+  %elseif;(uu = "fp")[merge::person/persons]1%nn;
+  %elseif;(uu = "si")[send::image/images]0%nn;
+  %elseif;(uu = "di")[delete::image/images]0%nn;
+  %elseif;(uu = "af")[add::family/families]0%nn;
+  %elseif;(uu = "mf")[modify::family/families]0%nn;
+  %elseif;(uu = "df")[delete::family/families]0%nn;
+  %elseif;(uu = "if")[invert::family/families]1%nn;
+  %elseif;(uu = "ff")[merge::family/families]1%nn;
+  %elseif;(uu = "cn")[change children's names]%nn;
+  %elseif;(uu = "aa")[add::parents]%nn;
+  %elseif;(uu = "mn")[modify::note/notes]1%nn;
   %else;uu%nn;
   %end;
 %end;
@@ -56,7 +56,7 @@
   <tr>
     <td>
       <tt><b>*</b> %time;</tt>
-      (%apply;update_text(update)
+      (%apply;update_text(update.var)
       %if;(user != "")
         %sp;<i>-%sp;
         %if;(wiz = "")<a href="%prefix;m=HIST;k=%kk;;wiz=%user;">%user;</a>%nn;
