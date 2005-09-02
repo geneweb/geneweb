@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.65 2005-09-02 08:16:30 ddr Exp $ *)
+(* $Id: forum.ml,v 4.66 2005-09-02 08:31:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -335,7 +335,16 @@ and eval_message_text_var conf str so =
         | None -> s ]
       in
       VVstring s
-  | sl -> eval_message_string_var conf str so sl ]
+  | ["nowiki"] ->
+      let s = string_with_macros conf [] str in
+      let s =
+        match so with
+        [ Some h -> html_highlight h s
+        | None -> s ]
+      in
+      VVstring s
+  | sl ->
+      eval_message_string_var conf str so sl ]
 and eval_message_string_var conf str so =
   fun
   [ ["cut"; s] ->
