@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.15 2005-09-02 12:07:59 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.16 2005-09-03 02:09:42 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -61,7 +61,8 @@
   </td></tr></table>
 %end;
 
-%if;(evar.m = "FORUM_ADD")
+%if;(evar.m = "FORUM_ADD") 
+  %( add a message %)
   %if;can_post;
     <h1 style="text-align:center" class="highlight">%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
@@ -106,6 +107,7 @@
     </h1>
   %end;
 %elseif;(pos != "")
+  %( display a message %)
   %if;(evar.m = "FORUM_SEARCH")
     %apply;search_form("false")
   %end;
@@ -153,6 +155,7 @@
     </form>
   %end;
 %else;
+  %( display message headers %)
   <h1 style="text-align:center" class="highlight">[*database forum]</h1>
   %apply;search_form("true")
   %if;can_post;
