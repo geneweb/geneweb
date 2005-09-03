@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.63 2005-09-02 23:45:48 ddr Exp $
+# $Id: lex_utf8.txt,v 1.64 2005-09-03 02:09:42 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5252,7 +5252,6 @@ ro: casatorie/casatorii
 ru: брак/браки
 sl: poroke/poroke
 sv: &auml;ktenskap/&auml;ktenskap
-zh:  "橐
 
     married
 af: getroud
