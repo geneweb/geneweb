@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.16 2005-09-03 02:09:42 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.17 2005-09-04 14:09:53 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -170,9 +170,9 @@
     </form>
   %end;
   %let;len;%if;(evar.len != "")%evar.len;%else;100%end;%in;
-  %let;from;%if;(evar.from != "")%evar.from;%else;-1%end;%in;
+  %let;to;%if;(evar.to != "")%evar.to;%else;-1%end;%in;
   <table border="%border;">
-  %foreach;message(from, len)
+  %foreach;message(to, len)
     %if;(message.date != message.prev_date)
       %if;(message.prev_date != "" and
            message.date.month != message.prev_date.month)
@@ -200,7 +200,7 @@
   %if;(pos != "")
     <tr align="%left;"><td colspan="4">&nbsp;</td></tr>
     <tr align="%left;"><td colspan="4">%nn;
-      <a href="%prefix;m=FORUM;len=%len;;from=%pos;
+      <a href="%prefix;m=FORUM;len=%len;;to=%pos;
       ">[message/previous message/previous messages/next message]2</a></td></tr>
   %end;
   </table>

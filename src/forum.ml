@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.68 2005-09-04 03:05:46 ddr Exp $ *)
+(* $Id: forum.ml,v 4.69 2005-09-04 14:09:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -22,8 +22,81 @@ type message =
     m_mess : string }
 ;
 
+module MF :
+  sig
+    type in_chan = 'abstract;
+    type filename = 'abstract;
+    value filename_of_string : string -> filename;
+    value open_in : filename -> in_chan;
+    value in_channel_length : in_chan -> int;
+    value input_char : in_chan -> char;
+    value input_line : in_chan -> string;
+    value rpos_in : in_chan -> int;
+    value rseek_in : in_chan -> int -> unit;
+    value close_in : in_chan -> unit;
+    value extend : filename -> (out_channel -> unit) -> unit;
+    value patch : filename -> int -> string -> unit;
+  end =
+  struct
+    type in_chan = Pervasives.in_channel;
+    type filename = string;
+    value filename_of_string x = x;
+    value open_in = Pervasives.open_in_bin;
+    value in_channel_length = Pervasives.in_channel_length;
+    value input_char = Pervasives.input_char;
+    value input_line = Pervasives.input_line;
+    value rpos_in ic = in_channel_length ic - pos_in ic;
+    value rseek_in ic pos = seek_in ic (in_channel_length ic - pos);
+    value close_in = Pervasives.close_in;
+    value extend fname f =
+      let tmp = fname ^ "~" in
+      let oc = open_out tmp in
+      do {
+        try f oc with e -> do { close_out oc; raise e };
+        match try Some (open_in fname) with [ Sys_error _ -> None ] with
+        [ Some ic ->
+            do {
+              try while True do { output_char oc (input_char ic) } with
+              [ End_of_file -> () ];
+              close_in ic;
+            }
+        | None -> () ];
+        close_out oc;
+        try Sys.remove fname with [ Sys_error _ -> () ];
+        Sys.rename tmp fname;
+      }
+    ;
+    value patch fname pos str =
+      match try Some (open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          let tmp_fname = fname ^ "~" in
+          let oc = open_out tmp_fname in
+          let ic_len = in_channel_length ic in
+          do {
+            loop 0 where rec loop i =
+              if i = ic_len then ()
+              else
+                let c = input_char ic in
+                do {
+                  if i < ic_len - pos || i >= ic_len - pos + String.length str
+                  then
+                    output_char oc c
+                  else output_char oc str.[i-ic_len+pos];
+                  loop (i + 1);
+                };
+            close_in ic;
+            close_out oc;
+            try Sys.remove fname with [ Sys_error _ -> () ];
+            Sys.rename tmp_fname fname;
+          }
+      | None -> () ]
+    ;
+  end
+;
+
 value forum_file conf =
-  Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
+  let fn = Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum" in
+  MF.filename_of_string fn
 ;
 
 (* Black list *)
@@ -66,7 +139,7 @@ value get_var ic lab s =
     let start =
       if String.length s > len && s.[len] = ' ' then len + 1 else len
     in
-    (String.sub s start (String.length s - start), input_line ic)
+    (String.sub s start (String.length s - start), MF.input_line ic)
   else ("", s)
 ;
 
@@ -87,7 +160,7 @@ value sp2nbsp lim s =
 
 value read_message conf ic =
   try
-    let s = input_line ic in
+    let s = MF.input_line ic in
     let (time, s) = get_var ic "Time:" s in
     let ((time, s), deleted) =
       if time = "" then (get_var ic "****:" s, True)
@@ -126,7 +199,7 @@ value read_message conf ic =
         if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
           let s = String.sub s 2 (String.length s - 2) in
           let len = if len = 0 then len else Buff.store len '\n' in
-          get_mess (Buff.mstore len s) (input_line ic)
+          get_mess (Buff.mstore len s) (MF.input_line ic)
         else (Buff.get len, s)
     in
     let mess =
@@ -147,19 +220,17 @@ value read_message conf ic =
 value get_message conf pos =
   let fname = forum_file conf in
   match
-    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+    try Some (MF.open_in fname) with [ Sys_error _ -> None ]
   with
   [ Some ic ->
-      let ic_len = in_channel_length ic in
       do {
-        seek_in ic (ic_len - pos);
+        MF.rseek_in ic pos;
         let r =
           match read_message conf ic with
-          [ Some (m, accessible) ->
-              Some (accessible, m, pos, ic_len - pos_in ic, ic_len)
+          [ Some (m, accessible) -> Some (accessible, m, pos, MF.rpos_in ic)
           | None -> None ]
         in
-        close_in ic;
+        MF.close_in ic;
         r
       }
   | None -> None ]
@@ -168,26 +239,26 @@ value get_message conf pos =
 value backward_pos conf pos =
   let fname = forum_file conf in
   match
-    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+    try Some (MF.open_in fname) with [ Sys_error _ -> None ]
   with
   [ Some ic ->
-      let ic_len = in_channel_length ic in
       let sync_txt = "\nTime: " in
       let sync_txt_last = String.length sync_txt - 1 in
+      let ic_len = MF.in_channel_length ic in
       let new_pos =
-        loop (ic_len - pos - 1) sync_txt_last where rec loop new_pos i =
-          if new_pos = 0 && i = 1 then ic_len
-          else if new_pos > 0 then do {
-            seek_in ic new_pos;
-            let c = input_char ic in
+        loop (pos + 1) sync_txt_last where rec loop new_pos i =
+          if new_pos = ic_len && i = 1 then ic_len
+          else if new_pos < ic_len then do {
+            MF.rseek_in ic new_pos;
+            let c = MF.input_char ic in
             if c = sync_txt.[i] then
-              if i = 0 then ic_len - new_pos - 1
-              else loop (new_pos - 1) (i - 1)
-            else loop (new_pos - 1) sync_txt_last
+              if i = 0 then new_pos - 1
+              else loop (new_pos + 1) (i - 1)
+            else loop (new_pos + 1) sync_txt_last
           }
           else pos
       in
-      do { close_in ic; new_pos }
+      do { MF.close_in ic; new_pos }
   | None -> pos ]
 ;
 
@@ -198,8 +269,7 @@ value passwd_in_file conf =
 ;
 
 type env 'a =
-  [ Vmess of
-      message and option message and int and int and int and option string
+  [ Vmess of message and option message and int and int and option string
   | Vpos of ref int
   | Vother of 'a
   | Vnone ]
@@ -254,56 +324,54 @@ and eval_message_var conf env =
   fun
   [ ["access"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ _ -> VVstring mess.m_access
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_access
       | _ -> raise Not_found ]
   | ["date" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ _ -> eval_date_var conf mess.m_date sl
+      [ Vmess mess _ _ _ _ -> eval_date_var conf mess.m_date sl
       | _ -> raise Not_found ]
   | ["email" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ so -> eval_message_string_var conf mess.m_email so sl
+      [ Vmess mess _ _ _ so -> eval_message_string_var conf mess.m_email so sl
       | _ -> raise Not_found ]
   | ["hour"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ _ -> VVstring mess.m_hour
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_hour
       | _ -> raise Not_found ]
   | ["ident" :: sl] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ so -> eval_message_string_var conf mess.m_ident so sl
+      [ Vmess mess _ _ _ so -> eval_message_string_var conf mess.m_ident so sl
       | _ -> raise Not_found ]
   | ["next_pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos _ ic_len _ ->
+      [ Vmess _ _ pos _ _ ->
           loop pos where rec loop pos =
-            if pos = ic_len then VVstring ""
-            else
-              let back_pos = backward_pos conf pos in
-              match get_message conf back_pos with
-              [ Some (a, _, _, _, _) ->
-                  if not a then loop back_pos
-                  else if back_pos = pos then VVstring ""
-                  else VVstring (string_of_int back_pos)
-              | None -> VVstring "" ]
+            let back_pos = backward_pos conf pos in
+            match get_message conf back_pos with
+            [ Some (a, _, _, _) ->
+                if back_pos = pos then VVstring ""
+                else if not a then loop back_pos
+                else VVstring (string_of_int back_pos)
+            | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos _ _ _ -> VVstring (string_of_int pos)
+      [ Vmess _ _ pos _ _ -> VVstring (string_of_int pos)
       | _ -> raise Not_found ]
   | ["prev_date" :: sl] ->
       match get_env "mess" env with
-      [ Vmess _ prev_mess _ _ _ _ ->
+      [ Vmess _ prev_mess _ _ _ ->
           match prev_mess with
           [ Some mess -> eval_date_var conf mess.m_date sl
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["prev_pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos next_pos ic_len _ ->
+      [ Vmess _ _ pos next_pos _ ->
           loop next_pos where rec loop next_pos =
             if next_pos > 0 then
               match get_message conf next_pos with
-              [ Some (a, _, next_pos, next_next_pos, _) ->
+              [ Some (a, _, next_pos, next_next_pos) ->
                   if not a then loop next_next_pos
                   else VVstring (string_of_int next_pos)
               | None -> VVstring "" ]
@@ -311,24 +379,24 @@ and eval_message_var conf env =
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
       match get_env "mess" env with
-      [ Vmess m _ _ _ _ so -> eval_message_string_var conf m.m_subject so sl
+      [ Vmess m _ _ _ so -> eval_message_string_var conf m.m_subject so sl
       | _ -> raise Not_found ]
   | ["text" :: sl] ->
       match get_env "mess" env with
-      [ Vmess m _ _ _ _ so -> eval_message_text_var conf m.m_mess so sl
+      [ Vmess m _ _ _ so -> eval_message_text_var conf m.m_mess so sl
       | _ -> raise Not_found ]
   | ["time" :: sl] ->
       match get_env "mess" env with
-      [ Vmess m _ _ _ _ so -> eval_message_text_var conf m.m_time so sl
+      [ Vmess m _ _ _ so -> eval_message_text_var conf m.m_time so sl
       | _ -> raise Not_found ]
   | ["wiki"] ->
       match get_env "mess" env with
-      [ Vmess mess _ _ _ _ _ -> VVstring mess.m_wiki
+      [ Vmess mess _ _ _ _ -> VVstring mess.m_wiki
       | _ -> raise Not_found ]
   | ["wizard"] ->
       if passwd_in_file conf then
         match get_env "mess" env with
-        [ Vmess mess _ _ _ _ _ -> VVstring (mess.m_wizard)
+        [ Vmess mess _ _ _ _ -> VVstring (mess.m_wizard)
         | _ -> raise Not_found ]
       else VVstring ""
   | _ -> raise Not_found ]
@@ -395,27 +463,26 @@ value print_foreach conf base print_ast eval_expr =
     [ ["message"] -> print_foreach_message env el al
     | _ -> raise Not_found ]
   and print_foreach_message env el al =
-    let (from_pos, max_mess) =
+    let (to_pos, max_mess) =
       match el with
       [ [[e1]; [e2]] -> (eval_int_expr env e1, eval_int_expr env e2)
       | _ -> raise Not_found ]
     in
     let fname = forum_file conf in
     match
-      try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+      try Some (MF.open_in fname) with [ Sys_error _ -> None ]
     with
     [ Some ic ->
-        let ic_len = in_channel_length ic in
         let rec loop prev_mess i =
-          if i >= max_mess then pos_in ic
+          if i >= max_mess then MF.rpos_in ic
           else
-            let pos = ic_len - pos_in ic in
+            let pos = MF.rpos_in ic in
             match read_message conf ic with
             [ Some (mess, accessible) ->
                 if not accessible then loop prev_mess i
                 else
-                  let next_pos = ic_len - pos_in ic in
-                  let vmess = Vmess mess prev_mess pos next_pos ic_len None in
+                  let next_pos = MF.rpos_in ic in
+                  let vmess = Vmess mess prev_mess pos next_pos None in
                   let env = [("mess", vmess) :: env] in
                   do {
                     List.iter (print_ast env ()) al;
@@ -424,13 +491,13 @@ value print_foreach conf base print_ast eval_expr =
             | None -> -1 ]
         in
         do {
-          if from_pos < 0 then ()
-          else try seek_in ic from_pos with [ Sys_error _ -> () ];
+          if to_pos < 0 then ()
+          else try MF.rseek_in ic to_pos with [ Sys_error _ -> () ];
           let pos = loop None 0 in
           match get_env "pos" env with
-          [ Vpos r -> r.val := pos
+          [ Vpos r -> r.val := if pos < 0 then -1 else pos
           | _ -> () ];
-          close_in ic;
+          MF.close_in ic;
         }
     | None -> () ]
   in
@@ -440,9 +507,9 @@ value print_foreach conf base print_ast eval_expr =
 value print_forum_message conf base r so =
   let env =
     match r with
-    [ Some (a, mess, pos, next_pos, ic_len) ->
+    [ Some (a, mess, pos, next_pos) ->
         if a then
-          [("mess", Vmess mess None pos next_pos ic_len so);
+          [("mess", Vmess mess None pos next_pos so);
            ("pos", Vpos (ref pos))]
         else [("pos", Vpos (ref (-1)))]
     | None -> [("pos", Vpos (ref (-1)))] ]
@@ -494,61 +561,38 @@ value forum_add conf base ident comm =
     else "publ"
   in
   if ident <> "" && comm <> "" then
-    let fname = forum_file conf in
-    let tmp_fname = fname ^ "~" in
-    let oc = Secure.open_out tmp_fname in
-    try
-      let (hh, mm, ss) = conf.time in
-      do {
-        fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
-          conf.today.year conf.today.month conf.today.day hh mm ss;
-        fprintf oc "From: %s\n" conf.from;
-        fprintf oc "Ident: %s\n" ident;
-        if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
-        then
-          fprintf oc "Wizard: %s\n" conf.user
-        else ();
-        if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
-          fprintf oc "Friend: %s\n" conf.user
-        else ();
-        if email <> "" then fprintf oc "Email: %s\n" email else ();
-        fprintf oc "Access: %s\n" access;
-        let subject = if subject = "" then "-" else subject in
-        fprintf oc "Subject: %s\n" subject;
-        fprintf oc "Wiki: on\n";
-        fprintf oc "Text:\n";
-        let rec loop i bol =
-          if i == String.length comm then ()
-          else do {
-            if bol then fprintf oc "  " else ();
-            if comm.[i] <> '\r' then output_char oc comm.[i] else ();
-            loop (i + 1) (comm.[i] = '\n')
-          }
-        in
-        loop 0 True;
-        fprintf oc "\n\n";
-        match
-          try
-            Some (Secure.open_in_bin fname) with
-            [ Sys_error _ -> None ]
-        with
-        [ Some ic ->
-            do {
-              try while True do { output_char oc (input_char ic) } with
-              [ End_of_file -> () ];
-              close_in ic;
-            }
-        | _ -> () ];
-        close_out oc;
-        try Sys.remove fname with [ Sys_error _ -> () ];
-        Sys.rename tmp_fname fname;
-      }
-    with e ->
-      do {
-        try close_out oc with _ -> ();
-        try Sys.remove tmp_fname with [ Sys_error _ -> () ];
-        raise e
-      }
+    MF.extend (forum_file conf)
+      (fun oc ->
+         let (hh, mm, ss) = conf.time in
+         do {
+           fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
+             conf.today.year conf.today.month conf.today.day hh mm ss;
+           fprintf oc "From: %s\n" conf.from;
+           fprintf oc "Ident: %s\n" ident;
+           if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
+           then
+             fprintf oc "Wizard: %s\n" conf.user
+           else ();
+           if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
+             fprintf oc "Friend: %s\n" conf.user
+           else ();
+           if email <> "" then fprintf oc "Email: %s\n" email else ();
+           fprintf oc "Access: %s\n" access;
+           let subject = if subject = "" then "-" else subject in
+           fprintf oc "Subject: %s\n" subject;
+           fprintf oc "Wiki: on\n";
+           fprintf oc "Text:\n";
+           let rec loop i bol =
+             if i == String.length comm then ()
+             else do {
+               if bol then fprintf oc "  " else ();
+               if comm.[i] <> '\r' then output_char oc comm.[i] else ();
+               loop (i + 1) (comm.[i] = '\n')
+             }
+           in
+           loop 0 True;
+           fprintf oc "\n\n";
+         })
   else ()
 ;
 
@@ -576,42 +620,9 @@ value print_add_ok conf base =
 
 (* Deleting a message *)
 
-value internal_error conf base =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "<em>internal error</em>\n";
-    trailer conf;
-    raise Update.ModErr
-  }
-;
-
-value forum_del conf base pos next_pos =
+value forum_del conf base pos =
   let fname = forum_file conf in
-  let tmp_fname = fname ^ "~" in
-  match
-     try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
-  with
-  [ Some ic ->
-      let oc = Secure.open_out tmp_fname in
-      let len = in_channel_length ic in
-      let pos = len - pos in
-      do {
-        loop 0 where rec loop i =
-          if i = len then ()
-          else
-            let c = input_char ic in
-            do {
-              if i < pos || i >= pos + 4 then output_char oc c
-              else output_char oc '*';
-              loop (i + 1);
-            };
-        close_in ic;
-        close_out oc;
-        try Sys.remove fname with [ Sys_error _ -> () ];
-        Sys.rename tmp_fname fname;
-      }
-  | None -> internal_error conf base ]
+  MF.patch fname pos "****"
 ;
 
 value print_del_ok conf base =
@@ -629,13 +640,13 @@ value print_del_ok conf base =
 
 value delete_forum_message conf base pos =
   match get_message conf pos with
-  [ Some (a, m, _, next_pos, forum_length) ->
+  [ Some (a, m, _, _) ->
       if a && conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
         passwd_in_file conf
       then
         try
           do {
-            forum_del conf base pos next_pos;
+            forum_del conf base pos;
             print_del_ok conf base;
           }
         with
@@ -664,14 +675,11 @@ value in_message case_sens s m =
 value search_text conf base s =
   let s = if s = "" then " " else s in
   let fname = forum_file conf in
-  match
-    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
-  with
+  match try Some (MF.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let ic_len = in_channel_length ic in
       let case_sens = p_getenv conf.env "c" = Some "on" in
       let rec loop () =
-        let pos = ic_len - pos_in ic in
+        let pos = MF.rpos_in ic in
         match read_message conf ic with
         [ Some (m, accessible) ->
             if accessible &&
@@ -684,14 +692,14 @@ value search_text conf base s =
       do {
         match p_getint conf.env "p" with
         [ Some pos ->
-            try seek_in ic (ic_len - pos + 1) with [ Sys_error _ -> () ]
+            try MF.rseek_in ic (pos - 1) with [ Sys_error _ -> () ]
         | None -> () ];
         let messo = loop () in
-        let next_pos = ic_len - pos_in ic in
-        close_in ic;
+        let next_pos = MF.rpos_in ic in
+        MF.close_in ic;
         match messo with
         [ Some (mess, pos) ->
-            let r = Some (True, mess, pos, next_pos, ic_len) in
+            let r = Some (True, mess, pos, next_pos) in
             print_forum_message conf base r (Some s)
         | None -> print_forum_headers conf base ]
       }
