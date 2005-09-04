@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.67 2005-09-02 12:08:00 ddr Exp $ *)
+(* $Id: forum.ml,v 4.68 2005-09-04 03:05:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -228,14 +228,14 @@ value start_equiv_with case_sens s m i =
     | None -> None ]
 ;
 
-value html_highlight h s =
+value html_highlight case_sens h s =
   let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
   loop False 0 0 where rec loop in_tag i len =
     if i = String.length s then Buff.get len
     else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
     else if s.[i] = '<' then loop True (i + 1) (Buff.store len s.[i])
     else
-      match start_equiv_with False h s i with
+      match start_equiv_with case_sens h s i with
       [ Some j -> loop False j (Buff.mstore len (ht i j))
       | None -> loop False (i + 1) (Buff.store len s.[i]) ]
 ;
@@ -349,7 +349,9 @@ and eval_message_text_var conf str so =
       let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
       let s =
         match so with
-        [ Some h -> html_highlight h s
+        [ Some h ->
+            let case_sens = p_getenv conf.env "c" = Some "on" in
+            html_highlight case_sens h s
         | None -> s ]
       in
       VVstring s
@@ -357,7 +359,9 @@ and eval_message_text_var conf str so =
       let s = string_with_macros conf [] str in
       let s =
         match so with
-        [ Some h -> html_highlight h s
+        [ Some h ->
+            let case_sens = p_getenv conf.env "c" = Some "on" in
+            html_highlight case_sens h s
         | None -> s ]
       in
       VVstring s
@@ -372,7 +376,9 @@ and eval_message_string_var conf str so =
       let s = no_html_tags str in
       let s =
         match so with
-        [ Some h -> html_highlight h s
+        [ Some h ->
+            let case_sens = p_getenv conf.env "c" = Some "on" in
+            html_highlight case_sens h s
         | None -> s ]
       in
       VVstring s
@@ -645,12 +651,14 @@ value print_del conf base =
 ;
 
 value in_message case_sens s m =
-  loop 0 where rec loop i =
+  loop False 0 where rec loop in_tag i =
     if i = String.length m then False
+    else if in_tag then loop (m.[i] <> '>') (i + 1)
+    else if m.[i] = '<' then loop True (i + 1)
     else
       match start_equiv_with case_sens s m i with
       [ Some _ -> True
-      | None -> loop (i + 1) ]
+      | None -> loop False (i + 1) ]
 ;
 
 value search_text conf base s =
