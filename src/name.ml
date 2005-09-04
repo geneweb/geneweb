@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.21 2005-09-04 18:51:50 ddr Exp $ *)
+(* $Id: name.ml,v 4.22 2005-09-04 23:31:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value utf_8_db = ref True;
@@ -97,7 +97,36 @@ value lower s =
         | 0xC5 ->
             let len =
               match Char.code s.[i+1] with
-              [ 0xA0 | 0xA1 -> Buff.store len 's'
+              [ 0x81 | 0x82 -> Buff.store len 'l'
+              | 0xA0 | 0xA1 -> Buff.store len 's'
+              | _ -> Buff.gstore len s i nbc ]
+            in
+            copy False (i + nbc) len
+        | 0xD0 ->
+            let len =
+              match Char.code s.[i+1] with
+              [ 0x90 | 0xB0 -> Buff.store len 'a'
+              | 0x91 | 0xB1 -> Buff.store len 'b'
+              | 0x92 | 0xB2 -> Buff.store len 'v'
+              | 0x93 | 0xB3 -> Buff.store len 'g'
+              | 0x95 | 0xB5 -> Buff.store len 'e'
+              | 0x97 | 0xB7 -> Buff.store len 'z'
+              | 0x98 | 0xB8 -> Buff.store len 'i'
+              | 0x9A | 0xBA -> Buff.store len 'k'
+              | 0x9B | 0xBB -> Buff.store len 'l'
+              | 0x9C | 0xBC -> Buff.store len 'm'
+              | 0x9D | 0xBD -> Buff.store len 'n'
+              | 0x9E | 0xBE -> Buff.store len 'o'
+              | _ -> Buff.gstore len s i nbc ]
+            in
+            copy False (i + nbc) len
+        | 0xD1 ->
+            let len =
+              match Char.code s.[i+1] with
+              [ 0x81 -> Buff.mstore len "s"
+              | 0x84 -> Buff.mstore len "f"
+              | 0x87 -> Buff.mstore len "tch"
+              | 0x8F -> Buff.mstore len "ya"
               | _ -> Buff.gstore len s i nbc ]
             in
             copy False (i + nbc) len
