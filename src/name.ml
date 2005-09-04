@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.20 2005-09-02 12:08:00 ddr Exp $ *)
+(* $Id: name.ml,v 4.21 2005-09-04 18:51:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value utf_8_db = ref True;
@@ -87,6 +87,20 @@ value lower s =
             [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' ->
                 copy False (i + 2) (Buff.store len c2)
             | _ -> copy (len <> 0) (i + 2) len ]
+        | 0xC4 ->
+            let len =
+              match Char.code s.[i+1] with
+              [ 0x8C | 0x8D -> Buff.store len 'c'
+              | _ -> Buff.gstore len s i nbc ]
+            in
+            copy False (i + nbc) len
+        | 0xC5 ->
+            let len =
+              match Char.code s.[i+1] with
+              [ 0xA0 | 0xA1 -> Buff.store len 's'
+              | _ -> Buff.gstore len s i nbc ]
+            in
+            copy False (i + nbc) len
         | c ->
             copy False (i + nbc) (Buff.gstore len s i nbc) ]
 ;
