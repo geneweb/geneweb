@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.69 2005-09-04 14:09:53 ddr Exp $ *)
+(* $Id: forum.ml,v 4.70 2005-09-05 16:21:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -26,23 +26,41 @@ module MF :
   sig
     type in_chan = 'abstract;
     type filename = 'abstract;
+    type pos = 'abstract;
     value filename_of_string : string -> filename;
     value open_in : filename -> in_chan;
-    value in_channel_length : in_chan -> int;
+    value first_pos : pos;
+    value last_pos : in_chan -> pos;
+    value not_a_pos : pos;
+    value prev_pos : pos -> pos;
+    value next_pos : pos -> pos;
+    value string_of_pos : pos -> string;
+    value pos_of_string : string -> pos;
     value input_char : in_chan -> char;
     value input_line : in_chan -> string;
-    value rpos_in : in_chan -> int;
-    value rseek_in : in_chan -> int -> unit;
+    value rpos_in : in_chan -> pos;
+    value rseek_in : in_chan -> pos -> unit;
     value close_in : in_chan -> unit;
     value extend : filename -> (out_channel -> unit) -> unit;
-    value patch : filename -> int -> string -> unit;
+    value patch : filename -> pos -> string -> unit;
   end =
   struct
     type in_chan = Pervasives.in_channel;
     type filename = string;
+    type pos = int;
     value filename_of_string x = x;
     value open_in = Pervasives.open_in_bin;
-    value in_channel_length = Pervasives.in_channel_length;
+    value first_pos = 0;
+    value last_pos = Pervasives.in_channel_length;
+    value not_a_pos = -1;
+    value prev_pos pos = pos - 1;
+    value next_pos pos = pos + 1;
+    value string_of_pos pos =
+      if pos = not_a_pos then "" else string_of_int pos
+    ;
+    value pos_of_string s =
+      try int_of_string s with [ Failure _ -> not_a_pos ]
+    ;
     value input_char = Pervasives.input_char;
     value input_line = Pervasives.input_line;
     value rpos_in ic = in_channel_length ic - pos_in ic;
@@ -244,17 +262,17 @@ value backward_pos conf pos =
   [ Some ic ->
       let sync_txt = "\nTime: " in
       let sync_txt_last = String.length sync_txt - 1 in
-      let ic_len = MF.in_channel_length ic in
+      let ic_len = MF.last_pos ic in
       let new_pos =
-        loop (pos + 1) sync_txt_last where rec loop new_pos i =
+        loop (MF.next_pos pos) sync_txt_last where rec loop new_pos i =
           if new_pos = ic_len && i = 1 then ic_len
           else if new_pos < ic_len then do {
             MF.rseek_in ic new_pos;
             let c = MF.input_char ic in
             if c = sync_txt.[i] then
-              if i = 0 then new_pos - 1
-              else loop (new_pos + 1) (i - 1)
-            else loop (new_pos + 1) sync_txt_last
+              if i = 0 then MF.prev_pos new_pos
+              else loop (MF.next_pos new_pos) (i - 1)
+            else loop (MF.next_pos new_pos) sync_txt_last
           }
           else pos
       in
@@ -269,8 +287,8 @@ value passwd_in_file conf =
 ;
 
 type env 'a =
-  [ Vmess of message and option message and int and int and option string
-  | Vpos of ref int
+  [ Vmess of message and option message and MF.pos and MF.pos and option string
+  | Vpos of ref MF.pos
   | Vother of 'a
   | Vnone ]
 ;
@@ -316,8 +334,7 @@ value rec eval_var conf base env xx loc =
   | ["message" :: sl] -> eval_message_var conf env sl
   | ["pos"] ->
       match get_env "pos" env with
-      [ Vpos r ->
-          if r.val < 0 then VVstring "" else VVstring (string_of_int r.val)
+      [ Vpos r -> VVstring (MF.string_of_pos r.val)
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_message_var conf env =
@@ -351,12 +368,12 @@ and eval_message_var conf env =
             [ Some (a, _, _, _) ->
                 if back_pos = pos then VVstring ""
                 else if not a then loop back_pos
-                else VVstring (string_of_int back_pos)
+                else VVstring (MF.string_of_pos back_pos)
             | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["pos"] ->
       match get_env "mess" env with
-      [ Vmess _ _ pos _ _ -> VVstring (string_of_int pos)
+      [ Vmess _ _ pos _ _ -> VVstring (MF.string_of_pos pos)
       | _ -> raise Not_found ]
   | ["prev_date" :: sl] ->
       match get_env "mess" env with
@@ -369,11 +386,11 @@ and eval_message_var conf env =
       match get_env "mess" env with
       [ Vmess _ _ pos next_pos _ ->
           loop next_pos where rec loop next_pos =
-            if next_pos > 0 then
+            if next_pos > MF.first_pos then
               match get_message conf next_pos with
               [ Some (a, _, next_pos, next_next_pos) ->
                   if not a then loop next_next_pos
-                  else VVstring (string_of_int next_pos)
+                  else VVstring (MF.string_of_pos next_pos)
               | None -> VVstring "" ]
             else VVstring ""
       | _ -> raise Not_found ]
@@ -463,9 +480,10 @@ value print_foreach conf base print_ast eval_expr =
     [ ["message"] -> print_foreach_message env el al
     | _ -> raise Not_found ]
   and print_foreach_message env el al =
+    let eval_pos_expr env e = MF.pos_of_string (eval_expr env () e) in
     let (to_pos, max_mess) =
       match el with
-      [ [[e1]; [e2]] -> (eval_int_expr env e1, eval_int_expr env e2)
+      [ [[e1]; [e2]] -> (eval_pos_expr env e1, eval_int_expr env e2)
       | _ -> raise Not_found ]
     in
     let fname = forum_file conf in
@@ -488,14 +506,14 @@ value print_foreach conf base print_ast eval_expr =
                     List.iter (print_ast env ()) al;
                     loop (Some mess) (i + 1);
                   }
-            | None -> -1 ]
+            | None -> MF.not_a_pos ]
         in
         do {
-          if to_pos < 0 then ()
+          if to_pos = MF.not_a_pos then ()
           else try MF.rseek_in ic to_pos with [ Sys_error _ -> () ];
           let pos = loop None 0 in
           match get_env "pos" env with
-          [ Vpos r -> r.val := if pos < 0 then -1 else pos
+          [ Vpos r -> r.val := pos
           | _ -> () ];
           MF.close_in ic;
         }
@@ -511,8 +529,8 @@ value print_forum_message conf base r so =
         if a then
           [("mess", Vmess mess None pos next_pos so);
            ("pos", Vpos (ref pos))]
-        else [("pos", Vpos (ref (-1)))]
-    | None -> [("pos", Vpos (ref (-1)))] ]
+        else [("pos", Vpos (ref MF.not_a_pos))]
+    | None -> [("pos", Vpos (ref MF.not_a_pos))] ]
   in
   Templ.interp conf base "forum" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
@@ -521,15 +539,15 @@ value print_forum_message conf base r so =
 
 value print conf base =
   let r =
-    match p_getint conf.env "p" with
-    [ Some pos -> get_message conf pos
+    match p_getenv conf.env "p" with
+    [ Some pos -> get_message conf (MF.pos_of_string pos)
     | None -> None ]
   in
   print_forum_message conf base r None
 ;
 
 value print_forum_headers conf base =
-  let env = [("pos", Vpos (ref (-1)))] in
+  let env = [("pos", Vpos (ref MF.not_a_pos))] in
   Templ.interp conf base "forum" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (print_foreach conf base) env ()
@@ -656,8 +674,8 @@ value delete_forum_message conf base pos =
 ;
 
 value print_del conf base =
-  match p_getint conf.env "p" with
-  [ Some pos -> delete_forum_message conf base pos
+  match p_getenv conf.env "p" with
+  [ Some pos -> delete_forum_message conf base (MF.pos_of_string pos)
   | None -> print_forum_headers conf base ]
 ;
 
@@ -690,9 +708,10 @@ value search_text conf base s =
         | None -> None ]
       in
       do {
-        match p_getint conf.env "p" with
+        match p_getenv conf.env "p" with
         [ Some pos ->
-            try MF.rseek_in ic (pos - 1) with [ Sys_error _ -> () ]
+            let pos = MF.pos_of_string pos in
+            try MF.rseek_in ic (MF.prev_pos pos) with [ Sys_error _ -> () ]
         | None -> () ];
         let messo = loop () in
         let next_pos = MF.rpos_in ic in
