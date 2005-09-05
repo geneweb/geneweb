@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.23 2005-09-05 00:57:07 ddr Exp $ *)
+(* $Id: name.ml,v 4.24 2005-09-05 02:21:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value utf_8_db = ref True;
@@ -129,6 +129,51 @@ value lower s =
               | _ -> Buff.gstore len s i nbc ]
             in
             copy False (i + nbc) len
+        | 0xCE ->
+            let len =
+              match Char.code s.[i+1] with
+              [ 0x91 | 0xB1 -> Buff.store len 'a'
+              | 0x92 | 0xB2 -> Buff.store len 'b'
+              | 0x93 | 0xB3 -> Buff.store len 'g'
+              | 0x94 | 0xB4 -> Buff.store len 'd'
+              | 0x95 | 0xB5 -> Buff.store len 'e'
+              | 0x96 | 0xB6 -> Buff.mstore len "dz"
+              | 0x97 | 0xB7 -> Buff.store len 'e'
+              | 0x98 | 0xB8 -> Buff.mstore len "th"
+              | 0x99 | 0xB9 -> Buff.store len 'i'
+              | 0x9A | 0xBA -> Buff.store len 'k'
+              | 0x9B | 0xBB -> Buff.store len 'l'
+              | 0x9C | 0xBC -> Buff.store len 'm'
+              | 0x9D | 0xBD -> Buff.store len 'n'
+              | 0x9E | 0xBE -> Buff.store len 'x'
+              | 0x9F | 0xBF -> Buff.store len 'o'
+              | 0xA0 -> Buff.store len 'p'
+              | 0xA1 -> Buff.store len 'r'
+              | 0xA2 | 0xA3 -> Buff.store len 's'
+              | 0xA4 -> Buff.store len 't'
+              | 0xA5 -> Buff.store len 'u'
+              | 0xA6 -> Buff.mstore len "ph"
+              | 0xA7 -> Buff.mstore len "kh"
+              | 0xA8 -> Buff.mstore len "ps"
+              | 0xA9 -> Buff.store len 'o'
+              | _ -> Buff.gstore len s i nbc ]
+            in
+            copy False (i + nbc) len
+        | 0xCF ->
+            let len =
+              match Char.code s.[i+1] with
+              [ 0x80 -> Buff.store len 'p'
+              | 0x81 -> Buff.store len 'r'
+              | 0x82 | 0x83 -> Buff.store len 's'
+              | 0x84 -> Buff.store len 't'
+              | 0x85 -> Buff.store len 'u'
+              | 0x86 -> Buff.mstore len "ph"
+              | 0x87 -> Buff.mstore len "kh"
+              | 0x88 -> Buff.mstore len "ps"
+              | 0x89 -> Buff.store len 'o'
+              | _ -> Buff.gstore len s i nbc ]
+            in
+            copy False (i + nbc) len
         | 0xD0 ->
             let len =
               match Char.code s.[i+1] with
@@ -136,7 +181,9 @@ value lower s =
               | 0x91 | 0xB1 -> Buff.store len 'b'
               | 0x92 | 0xB2 -> Buff.store len 'v'
               | 0x93 | 0xB3 -> Buff.store len 'g'
+              | 0x94 | 0xB4 -> Buff.store len 'd'
               | 0x95 | 0xB5 -> Buff.store len 'e'
+              | 0x96 | 0xB6 -> Buff.store len 'j'
               | 0x97 | 0xB7 -> Buff.store len 'z'
               | 0x98 | 0xB8 -> Buff.store len 'i'
               | 0x9A | 0xBA -> Buff.store len 'k'
@@ -144,15 +191,28 @@ value lower s =
               | 0x9C | 0xBC -> Buff.store len 'm'
               | 0x9D | 0xBD -> Buff.store len 'n'
               | 0x9E | 0xBE -> Buff.store len 'o'
+              | 0x9F | 0xBF -> Buff.store len 'p'
+              | 0xA0 -> Buff.store len 'r'
+              | 0xA1 -> Buff.store len 's'
+              | 0xA2 -> Buff.store len 't'
+              | 0xA3 -> Buff.store len 'u'
+              | 0xA4 -> Buff.store len 'f'
+              | 0xA7 -> Buff.mstore len "tch"
+              | 0xAE -> Buff.mstore len "you"
+              | 0xAF -> Buff.mstore len "ya"
               | _ -> Buff.gstore len s i nbc ]
             in
             copy False (i + nbc) len
         | 0xD1 ->
             let len =
               match Char.code s.[i+1] with
-              [ 0x81 -> Buff.mstore len "s"
-              | 0x84 -> Buff.mstore len "f"
+              [ 0x80 -> Buff.store len 'r'
+              | 0x81 -> Buff.store len 's'
+              | 0x82 -> Buff.store len 't'
+              | 0x83 -> Buff.store len 'u'
+              | 0x84 -> Buff.store len 'f'
               | 0x87 -> Buff.mstore len "tch"
+              | 0x8E -> Buff.mstore len "you"
               | 0x8F -> Buff.mstore len "ya"
               | _ -> Buff.gstore len s i nbc ]
             in
