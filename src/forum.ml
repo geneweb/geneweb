@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.73 2005-09-06 08:56:42 ddr Exp $ *)
+(* $Id: forum.ml,v 4.74 2005-09-06 12:29:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -53,7 +53,7 @@ module MF : MF =
     type pos = int;
     value filename_of_string x = x;
     value first_pos = 0;
-    value last_pos = Pervasives.in_channel_length;
+    value last_pos = in_channel_length;
     value not_a_pos = -1;
     value prev_pos pos = pos - 1;
     value next_pos pos = pos + 1;
@@ -265,17 +265,18 @@ value backward_pos conf pos =
   [ Some ic ->
       let sync_txt = "\nTime: " in
       let sync_txt_last = String.length sync_txt - 1 in
-      let ic_len = MF.last_pos ic in
+      let last_pos = MF.last_pos ic in
       let new_pos =
-        loop (MF.next_pos pos) sync_txt_last where rec loop new_pos i =
-          if new_pos = ic_len && i = 1 then ic_len
-          else if new_pos < ic_len then do {
+        loop pos sync_txt_last where rec loop new_pos i =
+          let new_pos = MF.next_pos new_pos in
+          if new_pos = last_pos && i = 1 then new_pos
+          else if new_pos < last_pos then do {
             MF.rseek_in ic new_pos;
             let c = MF.input_char ic in
             if c = sync_txt.[i] then
               if i = 0 then MF.prev_pos new_pos
-              else loop (MF.next_pos new_pos) (i - 1)
-            else loop (MF.next_pos new_pos) sync_txt_last
+              else loop new_pos (i - 1)
+            else loop new_pos sync_txt_last
           }
           else pos
       in
