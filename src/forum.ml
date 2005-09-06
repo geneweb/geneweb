@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.72 2005-09-06 02:17:23 ddr Exp $ *)
+(* $Id: forum.ml,v 4.73 2005-09-06 08:56:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -29,6 +29,8 @@ module type MF =
     type pos = 'abstract;
     value filename_of_string : string -> filename;
     value open_in : filename -> in_chan;
+    value first_pos : pos;
+    value last_pos : in_chan -> pos;
     value not_a_pos : pos;
     value prev_pos : pos -> pos;
     value next_pos : pos -> pos;
@@ -50,6 +52,8 @@ module MF : MF =
     type filename = string;
     type pos = int;
     value filename_of_string x = x;
+    value first_pos = 0;
+    value last_pos = Pervasives.in_channel_length;
     value not_a_pos = -1;
     value prev_pos pos = pos - 1;
     value next_pos pos = pos + 1;
@@ -261,17 +265,18 @@ value backward_pos conf pos =
   [ Some ic ->
       let sync_txt = "\nTime: " in
       let sync_txt_last = String.length sync_txt - 1 in
+      let ic_len = MF.last_pos ic in
       let new_pos =
         loop (MF.next_pos pos) sync_txt_last where rec loop new_pos i =
-          if
-            try do { MF.rseek_in ic new_pos; True } with
-            [ Sys_error _ -> False ]
-          then
+          if new_pos = ic_len && i = 1 then ic_len
+          else if new_pos < ic_len then do {
+            MF.rseek_in ic new_pos;
             let c = MF.input_char ic in
             if c = sync_txt.[i] then
               if i = 0 then MF.prev_pos new_pos
               else loop (MF.next_pos new_pos) (i - 1)
             else loop (MF.next_pos new_pos) sync_txt_last
+          }
           else pos
       in
       do { MF.close_in ic; new_pos }
@@ -384,11 +389,13 @@ and eval_message_var conf env =
       match get_env "mess" env with
       [ Vmess _ _ pos next_pos _ ->
           loop next_pos where rec loop next_pos =
-            match get_message conf next_pos with
-            [ Some (a, _, next_pos, next_next_pos) ->
-                if not a then loop next_next_pos
-                else VVstring (MF.string_of_pos next_pos)
-            | None -> VVstring "" ]
+            if next_pos > MF.first_pos then
+              match get_message conf next_pos with
+              [ Some (a, _, next_pos, next_next_pos) ->
+                  if not a then loop next_next_pos
+                  else VVstring (MF.string_of_pos next_pos)
+              | None -> VVstring "" ]
+            else VVstring ""
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
       match get_env "mess" env with
