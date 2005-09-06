@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.71 2005-09-06 01:06:14 ddr Exp $ *)
+(* $Id: forum.ml,v 4.72 2005-09-06 02:17:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -22,7 +22,7 @@ type message =
     m_mess : string }
 ;
 
-module MF :
+module type MF =
   sig
     type in_chan = 'abstract;
     type filename = 'abstract;
@@ -41,13 +41,15 @@ module MF :
     value close_in : in_chan -> unit;
     value extend : filename -> (out_channel -> unit) -> unit;
     value patch : filename -> pos -> string -> unit;
-  end =
+  end
+;
+
+module MF : MF =
   struct
-    type in_chan = Pervasives.in_channel;
+    type in_chan = in_channel;
     type filename = string;
     type pos = int;
     value filename_of_string x = x;
-    value open_in = Pervasives.open_in_bin;
     value not_a_pos = -1;
     value prev_pos pos = pos - 1;
     value next_pos pos = pos + 1;
@@ -57,11 +59,6 @@ module MF :
     value pos_of_string s =
       try int_of_string s with [ Failure _ -> not_a_pos ]
     ;
-    value input_char = Pervasives.input_char;
-    value input_line = Pervasives.input_line;
-    value rpos_in ic = in_channel_length ic - pos_in ic;
-    value rseek_in ic pos = seek_in ic (in_channel_length ic - pos);
-    value close_in = Pervasives.close_in;
     value extend fname f =
       let tmp = fname ^ "~" in
       let oc = open_out tmp in
@@ -105,6 +102,12 @@ module MF :
           }
       | None -> () ]
     ;
+    value open_in = open_in_bin;
+    value input_char = input_char;
+    value input_line = input_line;
+    value close_in = close_in;
+    value rpos_in ic = in_channel_length ic - pos_in ic;
+    value rseek_in ic pos = seek_in ic (in_channel_length ic - pos);
   end
 ;
 
