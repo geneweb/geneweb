@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.74 2005-09-06 12:29:40 ddr Exp $ *)
+(* $Id: forum.ml,v 4.75 2005-09-06 16:31:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -29,7 +29,6 @@ module type MF =
     type pos = 'abstract;
     value filename_of_string : string -> filename;
     value open_in : filename -> in_chan;
-    value first_pos : pos;
     value last_pos : in_chan -> pos;
     value not_a_pos : pos;
     value prev_pos : pos -> pos;
@@ -52,7 +51,6 @@ module MF : MF =
     type filename = string;
     type pos = int;
     value filename_of_string x = x;
-    value first_pos = 0;
     value last_pos = in_channel_length;
     value not_a_pos = -1;
     value prev_pos pos = pos - 1;
@@ -390,13 +388,11 @@ and eval_message_var conf env =
       match get_env "mess" env with
       [ Vmess _ _ pos next_pos _ ->
           loop next_pos where rec loop next_pos =
-            if next_pos > MF.first_pos then
-              match get_message conf next_pos with
-              [ Some (a, _, next_pos, next_next_pos) ->
-                  if not a then loop next_next_pos
-                  else VVstring (MF.string_of_pos next_pos)
-              | None -> VVstring "" ]
-            else VVstring ""
+            match get_message conf next_pos with
+            [ Some (a, _, next_pos, next_next_pos) ->
+                if not a then loop next_next_pos
+                else VVstring (MF.string_of_pos next_pos)
+            | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
       match get_env "mess" env with
