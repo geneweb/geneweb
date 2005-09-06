@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.75 2005-09-06 16:31:20 ddr Exp $ *)
+(* $Id: forum.ml,v 4.76 2005-09-06 20:00:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -45,7 +45,8 @@ module type MF =
   end
 ;
 
-module MF : MF =
+(*
+module MF1 : MF =
   struct
     type in_chan = in_channel;
     type filename = string;
@@ -112,6 +113,181 @@ module MF : MF =
     value rseek_in ic pos = seek_in ic (in_channel_length ic - pos);
   end
 ;
+*)
+
+module MF2 : MF =
+  struct
+    type in_chan = {
+      ic_fname : string;
+      ic_chan : mutable in_channel;
+      ic_ext : mutable int }
+    ;
+    type filename = string;
+    type pos = {
+      p_ord : mutable bool; (* True > False *)
+      p_ext : mutable int;
+      p_pos : mutable int }
+    ;
+    value filename_of_string x = x;
+    value last_pos ic =
+      {p_ord = True; p_ext = 0; p_pos = in_channel_length ic.ic_chan}
+    ;
+    value not_a_pos = {p_ord = False; p_ext = 0; p_pos = -1};
+    value prev_pos pos = {(pos) with p_pos = pos.p_pos - 1};
+    value next_pos pos = {(pos) with p_pos = pos.p_pos + 1};
+    value string_of_pos pos =
+      if pos = not_a_pos then ""
+      else if pos.p_ext = 0 then string_of_int pos.p_pos
+      else string_of_int pos.p_ext ^ "-" ^ string_of_int pos.p_pos
+    ;
+    value pos_of_string s =
+      try
+        let pos = int_of_string s in
+        if pos < 0 then not_a_pos else {p_ord = True; p_ext = 0; p_pos = pos}
+      with
+      [ Failure _ ->
+          try
+            Scanf.sscanf s "%d-%d"
+              (fun a b -> {p_ord = a = 0; p_ext = a; p_pos = b})
+          with
+          [ Scanf.Scan_failure _ -> not_a_pos ] ]
+    ;
+    value extend fname f =
+      let tmp = fname ^ "~" in
+      let oc = open_out tmp in
+      do {
+        try f oc with e -> do { close_out oc; raise e };
+        match try Some (open_in fname) with [ Sys_error _ -> None ] with
+        [ Some ic ->
+            do {
+              try while True do { output_char oc (input_char ic) } with
+              [ End_of_file -> () ];
+              close_in ic;
+            }
+        | None -> () ];
+        close_out oc;
+        try Sys.remove fname with [ Sys_error _ -> () ];
+        Sys.rename tmp fname;
+      }
+    ;
+    value patch fname pos str =
+      let fname =
+        if pos.p_ext = 0 then fname else fname ^ "." ^ string_of_int pos.p_ext
+      in
+      match try Some (open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          let tmp_fname = fname ^ "~" in
+          let oc = open_out tmp_fname in
+          let ic_len = in_channel_length ic in
+          do {
+            loop 0 where rec loop i =
+              if i = ic_len then ()
+              else
+                let c = input_char ic in
+                do {
+                  if i < ic_len - pos.p_pos ||
+                     i >= ic_len - pos.p_pos + String.length str
+                  then
+                    output_char oc c
+                  else output_char oc str.[i-ic_len+pos.p_pos];
+                  loop (i + 1);
+                };
+            close_in ic;
+            close_out oc;
+            try Sys.remove fname with [ Sys_error _ -> () ];
+            Sys.rename tmp_fname fname;
+          }
+      | None -> () ]
+    ;
+    value open_in fname =
+      {ic_fname = fname; ic_chan = open_in_bin fname; ic_ext = 0}
+    ;
+    value input_char ic = input_char ic.ic_chan;
+    value last_available_ext fname =
+      loop 1 where rec loop ext =
+        if Sys.file_exists (fname ^ "." ^ string_of_int ext) then loop (ext + 1)
+        else if ext = 1 then raise Not_found
+        else ext - 1
+    ;
+    value rec input_line ic =
+      try Pervasives.input_line ic.ic_chan with
+      [ End_of_file ->
+          let fnb =
+            if ic.ic_ext = 0 then
+              try last_available_ext ic.ic_fname with
+              [ Not_found -> raise End_of_file ]
+            else if ic.ic_ext = 1 then raise End_of_file
+            else ic.ic_ext - 1
+          in
+          let fn = ic.ic_fname ^ "." ^ string_of_int fnb in
+          let ic2 =
+            try open_in_bin fn with [ Sys_error _ -> raise End_of_file ]
+          in
+          do {
+            close_in ic.ic_chan;
+            ic.ic_chan := ic2;
+            ic.ic_ext := fnb;
+            input_line ic
+          } ]
+    ;
+    value rpos_in ic =
+      let pos = in_channel_length ic.ic_chan - pos_in ic.ic_chan in
+      {p_ord = ic.ic_ext = 0; p_ext = ic.ic_ext; p_pos = pos}
+    ;
+    value rec rseek_in ic pos =
+      if ic.ic_ext = pos.p_ext then
+        let len = in_channel_length ic.ic_chan in
+        if pos.p_pos < 0 then
+          if pos.p_ext > 1 then failwith "rseek_in: case not implemented 1"
+          else if pos.p_ext = 0 then
+            let fnb = 1 in
+            let fn = ic.ic_fname ^ "." ^ string_of_int fnb in
+            let ic2 =
+              try open_in_bin fn with [ Sys_error _ -> failwith "rseek_in" ]
+            in
+            let len = in_channel_length ic2 in
+            do {
+              close_in ic2;
+              pos.p_ord := fnb = 0;
+              pos.p_ext := fnb;
+              pos.p_pos := pos.p_pos + len;
+              rseek_in ic pos
+            }
+          else invalid_arg "rseek_in 1"
+        else if pos.p_pos > len then
+          if pos.p_ext >= 1 then do {
+            let ext =
+              let fn = ic.ic_fname ^ "." ^ string_of_int (ic.ic_ext + 1) in
+              if Sys.file_exists fn then ic.ic_ext + 1 else 0
+            in
+            pos.p_ord := ext = 0;
+            pos.p_ext := ext;
+            pos.p_pos := pos.p_pos - len;
+            rseek_in ic pos
+          }
+          else invalid_arg "rseek_in 2"
+        else seek_in ic.ic_chan (len - pos.p_pos)
+      else do {
+        let fn =
+          if pos.p_ext = 0 then ic.ic_fname
+          else ic.ic_fname ^ "." ^ string_of_int pos.p_ext
+        in
+        let ic2 =
+          try open_in_bin fn with [ Sys_error _ -> failwith "rseek_in" ]
+        in
+        do {
+          close_in ic.ic_chan;
+          ic.ic_chan := ic2;
+          ic.ic_ext := pos.p_ext;
+          rseek_in ic pos
+        }
+      }
+    ;
+    value close_in ic = close_in ic.ic_chan;
+  end
+;
+
+module MF = MF2;
 
 value forum_file conf =
   let fn = Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum" in
