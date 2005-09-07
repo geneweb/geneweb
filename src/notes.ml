@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.125 2005-08-19 02:51:39 ddr Exp $ *)
+(* $Id: notes.ml,v 4.126 2005-09-07 17:09:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -269,9 +269,10 @@ value update_notes_links_db conf fnotes s force =
               if List.mem lfname list_nt then list_nt else [lfname :: list_nt]
             in
             loop list_nt list_ind j
-        | NotesLinks.WLperson j key _ ->
+        | NotesLinks.WLperson j key _ txt ->
             let list_ind =
-              if List.mem key list_ind then list_ind else [key :: list_ind]
+              if List.mem_assoc key list_ind then list_ind
+              else [(key, txt) :: list_ind]
             in
             loop list_nt list_ind j
         | NotesLinks.WLnone -> loop list_nt list_ind (i + 1) ]

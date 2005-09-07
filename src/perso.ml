@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.202 2005-08-31 17:41:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.203 2005-09-07 17:09:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1453,7 +1453,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                 (fun (pg, (_, il)) ->
                    match pg with
                    [ NotesLinks.PgMisc pg ->
-                       if List.mem key il then
+                       if List.mem_assoc key il then
                          let (nenv, _) = Notes.read_notes base pg in
                          try let _ = List.assoc s nenv in raise Exit
                          with [ Not_found -> () ]
@@ -1478,19 +1478,36 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
               (fun str (pg, (_, il)) ->
                  match pg with
                  [ NotesLinks.PgMisc pg ->
-                     if List.mem key il then
+                     try
+                       let text = List.assoc key il in
                        let (nenv, _) = Notes.read_notes base pg in
-                       let v = try List.assoc s nenv with [ Not_found -> "" ] in
-                       if v = "" then str
-                       else
-                         let v = Util.nth_field v (Util.index_of_sex p.sex) in
-                         let str1 =
-                           Printf.sprintf
-                             "<a href=\"%sm=NOTES;f=%s\">%s</a>" (commd conf)
-                             pg v
+                       let v = List.assoc s nenv in
+                       let v =
+                         if text <> "" then text
+                         else if v = "" then raise Not_found
+                         else Util.nth_field v (Util.index_of_sex p.sex)
+                       in
+                       let str1 =
+                         let (a, b, c) =
+                           try
+                             let i = String.index v '{' in
+                             let j = String.index v '}' in
+                             let a = String.sub v 0 i in
+                             let b = String.sub v (i + 1) (j - i - 1) in
+                             let c =
+                               String.sub v (j + 1) (String.length v - j - 1)
+                             in
+                             (a, b, c)
+                           with
+                           [ Not_found -> ("", v, "") ]
                          in
-                         if str = "" then str1 else str ^ ", " ^ str1
-                     else str
+                         Printf.sprintf
+                           "%s<a href=\"%sm=NOTES;f=%s\">%s</a>%s" a
+                           (commd conf) pg b c
+                       in
+                       if str = "" then str1 else str ^ ", " ^ str1
+                     with
+                     [ Not_found -> str ]
                 | _ -> str ])
                "" db
           in
