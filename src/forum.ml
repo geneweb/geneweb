@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.76 2005-09-06 20:00:20 ddr Exp $ *)
+(* $Id: forum.ml,v 4.77 2005-09-07 02:41:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -203,22 +203,10 @@ module MF2 : MF =
       {ic_fname = fname; ic_chan = open_in_bin fname; ic_ext = 0}
     ;
     value input_char ic = input_char ic.ic_chan;
-    value last_available_ext fname =
-      loop 1 where rec loop ext =
-        if Sys.file_exists (fname ^ "." ^ string_of_int ext) then loop (ext + 1)
-        else if ext = 1 then raise Not_found
-        else ext - 1
-    ;
     value rec input_line ic =
       try Pervasives.input_line ic.ic_chan with
       [ End_of_file ->
-          let fnb =
-            if ic.ic_ext = 0 then
-              try last_available_ext ic.ic_fname with
-              [ Not_found -> raise End_of_file ]
-            else if ic.ic_ext = 1 then raise End_of_file
-            else ic.ic_ext - 1
-          in
+          let fnb = ic.ic_ext + 1 in
           let fn = ic.ic_fname ^ "." ^ string_of_int fnb in
           let ic2 =
             try open_in_bin fn with [ Sys_error _ -> raise End_of_file ]
@@ -237,29 +225,9 @@ module MF2 : MF =
     value rec rseek_in ic pos =
       if ic.ic_ext = pos.p_ext then
         let len = in_channel_length ic.ic_chan in
-        if pos.p_pos < 0 then
-          if pos.p_ext > 1 then failwith "rseek_in: case not implemented 1"
-          else if pos.p_ext = 0 then
-            let fnb = 1 in
-            let fn = ic.ic_fname ^ "." ^ string_of_int fnb in
-            let ic2 =
-              try open_in_bin fn with [ Sys_error _ -> failwith "rseek_in" ]
-            in
-            let len = in_channel_length ic2 in
-            do {
-              close_in ic2;
-              pos.p_ord := fnb = 0;
-              pos.p_ext := fnb;
-              pos.p_pos := pos.p_pos + len;
-              rseek_in ic pos
-            }
-          else invalid_arg "rseek_in 1"
-        else if pos.p_pos > len then
+        if pos.p_pos > len then
           if pos.p_ext >= 1 then do {
-            let ext =
-              let fn = ic.ic_fname ^ "." ^ string_of_int (ic.ic_ext + 1) in
-              if Sys.file_exists fn then ic.ic_ext + 1 else 0
-            in
+            let ext = ic.ic_ext - 1 in
             pos.p_ord := ext = 0;
             pos.p_ext := ext;
             pos.p_pos := pos.p_pos - len;
