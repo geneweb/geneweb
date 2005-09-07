@@ -1,9 +1,9 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.11 2005-08-19 01:39:29 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.12 2005-09-07 17:09:39 ddr Exp $ *)
 
 open Def;
 
-value magic_notes_links = "GWNL0006";
+value magic_notes_links = "GWNL0007";
 type page =
   [ PgInd of iper
   | PgNotes
@@ -11,7 +11,7 @@ type page =
   | PgWizard of string ]
 ;
 type key = (string * string * int);
-type notes_links_db = list (page * (list string * list key));
+type notes_links_db = list (page * (list string * list (key * string)));
 
 value char_dir_sep = ':';
 
@@ -35,7 +35,7 @@ value check_file_name s =
 
 type wiki_link =
   [ WLpage of int and (list string * string) and string and string and string
-  | WLperson of int and key and string
+  | WLperson of int and key and string and string
   | WLnone ]
 ;
 
@@ -74,6 +74,13 @@ value misc_notes_link s i =
           else loop (j + 1)
       in
       let b = String.sub s (i + 2) (j - i - 4) in
+      let (b, text) =
+        try
+          let i = String.rindex b ';' in
+          (String.sub b 0 i, String.sub b (i + 1) (String.length b - i - 1))
+        with
+        [ Not_found -> (b, "") ]
+      in
       try
         let k = 0 in
         let l = String.index_from b k '/' in
@@ -103,7 +110,7 @@ value misc_notes_link s i =
         in
         let fn = Name.lower fn in
         let sn = Name.lower sn in
-        WLperson j (fn, sn, oc) name
+        WLperson j (fn, sn, oc) name text
       with
       [ Not_found -> WLnone ]
   else WLnone
@@ -142,7 +149,10 @@ value share_strings db =
        in
        let list_nt = List.map (share ht) list_nt in
        let list_ind =
-         List.map (fun (fn, sn, oc) -> (share ht fn, share ht sn, oc)) list_ind
+         List.map
+           (fun ((fn, sn, oc), txt) ->
+              ((share ht fn, share ht sn, oc), share ht txt))
+           list_ind
        in
        (page, (list_nt, list_ind)))
     db
