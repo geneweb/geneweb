@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.203 2005-09-07 17:09:39 ddr Exp $ *)
+(* $Id: perso.ml,v 4.204 2005-09-07 20:57:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1481,11 +1481,19 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                      try
                        let text = List.assoc key il in
                        let (nenv, _) = Notes.read_notes base pg in
-                       let v = List.assoc s nenv in
                        let v =
-                         if text <> "" then text
-                         else if v = "" then raise Not_found
+                         let v = List.assoc s nenv in
+                         if v = "" then raise Not_found
                          else Util.nth_field v (Util.index_of_sex p.sex)
+                       in
+                       let v =
+                         if text <> "" then
+                           loop 0 0 where rec loop i len =
+                             if i = String.length text then Buff.get len
+                             else if text.[i] = '*' then
+                               loop (i + 1) (Buff.mstore len v)
+                             else loop (i + 1) (Buff.store len text.[i])
+                         else v
                        in
                        let str1 =
                          let (a, b, c) =

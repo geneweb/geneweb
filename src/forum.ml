@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.78 2005-09-07 16:08:41 ddr Exp $ *)
+(* $Id: forum.ml,v 4.79 2005-09-07 20:57:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -372,7 +372,7 @@ value read_message conf ic =
     in
     let accessible =
       if deleted then False
-      else if access = "priv" && not conf.wizard && not conf.friend then False
+      else if access <> "publ" && not conf.wizard && not conf.friend then False
       else True
     in
     Some (mess, accessible)
