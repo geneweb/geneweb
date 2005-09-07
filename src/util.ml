@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.156 2005-08-27 18:45:09 ddr Exp $ *)
+(* $Id: util.ml,v 4.157 2005-09-07 20:33:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -84,6 +84,13 @@ value rec capitale_utf_8 s =
   else
     let c = s.[0] in
     if c = '&' then amp_capitalize capitale_utf_8 s
+    else if c = '<' then
+      loop 1 where rec loop i =
+        if i = String.length s then s
+        else if s.[i] = '>' then
+          let s1 = String.sub s (i + 1) (String.length s - i - 1) in
+          String.sub s 0 (i + 1) ^ capitale_utf_8 s1
+        else loop (i + 1)
     else if Char.code c < 0b10000000 then String.capitalize s
     else if String.length s == 1 then s
     else if Char.code c == 0xC3 then
