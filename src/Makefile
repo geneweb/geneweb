@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.52 2005-09-04 23:36:56 ddr Exp $
+# $Id: Makefile,v 4.53 2005-09-07 03:18:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -40,11 +40,15 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt update_nldb.opt
 
 compilation.cmo: $(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 	$(MAKE) compilation.ml
-	$(OCAMLC) -pp camlp4r -c compilation.ml
+	@$(CAMLP4_COMM) compilation.ml -o compilation.ppo
+	$(OCAMLC) -c -impl compilation.ppo
+	$(RM) compilation.ppo
 
 compilation.cmx: $(GWD_OBJS1:.cmo=.cmx) $(GWD_OBJS2.cmo=.cmx) gwd.cmx
 	$(MAKE) compilation.ml
-	$(OCAMLOPT) -pp camlp4r -c compilation.ml
+	@$(CAMLP4_COMM) compilation.ml -o compilation.ppo
+	$(OCAMLOPT) -c -impl compilation.ppo
+	$(RM) compilation.ppo
 
 compilation.ml: always
 	> compilation.ml
