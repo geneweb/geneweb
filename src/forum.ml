@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.77 2005-09-07 02:41:38 ddr Exp $ *)
+(* $Id: forum.ml,v 4.78 2005-09-07 16:08:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -206,15 +206,15 @@ module MF2 : MF =
     value rec input_line ic =
       try Pervasives.input_line ic.ic_chan with
       [ End_of_file ->
-          let fnb = ic.ic_ext + 1 in
-          let fn = ic.ic_fname ^ "." ^ string_of_int fnb in
+          let ext = ic.ic_ext + 1 in
+          let fn = ic.ic_fname ^ "." ^ string_of_int ext in
           let ic2 =
             try open_in_bin fn with [ Sys_error _ -> raise End_of_file ]
           in
           do {
             close_in ic.ic_chan;
             ic.ic_chan := ic2;
-            ic.ic_ext := fnb;
+            ic.ic_ext := ext;
             input_line ic
           } ]
     ;
@@ -233,7 +233,7 @@ module MF2 : MF =
             pos.p_pos := pos.p_pos - len;
             rseek_in ic pos
           }
-          else invalid_arg "rseek_in 2"
+          else invalid_arg "rseek_in"
         else seek_in ic.ic_chan (len - pos.p_pos)
       else do {
         let fn =
