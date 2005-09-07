@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.61 2005-09-07 17:09:39 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.62 2005-09-07 20:33:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -126,7 +126,9 @@
   %if;has_image;<td>%end;
   <ul>
     %if;has_occupation;<li>%apply;capitalize(occupation)</li>%nl;%end;
-    %if;(has_linked_page.OCCU)<li>%linked_page.OCCU;</li>%nl;%end;
+    %if;(has_linked_page.OCCU)
+      <li>%apply;capitalize(linked_page.OCCU)</li>
+    %end;
     %if;has_birth_date;
       <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
@@ -302,9 +304,13 @@
 %if;(has_notes or has_linked_page.BNOTE or has_linked_page.NOTE)
   <h3><span class="highlight">[*note/notes]1</span></h3>
   <dl><dd>
-    %if;(has_linked_page.BNOTE)<p>%linked_page.BNOTE;.</p>%nl;%end;
+    %if;(has_linked_page.BNOTE)
+      <p>%apply;capitalize(linked_page.BNOTE).</p>
+    %end;
     %notes;
-    %if;(has_linked_page.NOTE)<p>%linked_page.NOTE;.</p>%nl;%end;
+    %if;(has_linked_page.NOTE)
+      <p>%apply;capitalize(linked_page.NOTE).</p>
+    %end;
   </dd></dl>
 %end;
 
