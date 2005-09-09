@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.126 2005-09-07 17:09:39 ddr Exp $ *)
+(* $Id: notes.ml,v 4.127 2005-09-09 07:41:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -262,6 +262,7 @@ value update_notes_links_db conf fnotes s force =
   let (list_nt, list_ind) =
     loop [] [] 0 where rec loop list_nt list_ind i =
       if i = slen then (list_nt, list_ind)
+      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind (i + 2)
       else
         match NotesLinks.misc_notes_link s i with
         [ NotesLinks.WLpage j _ lfname _ _ ->
