@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.14 2005-09-07 17:09:39 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.15 2005-09-09 07:41:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -17,6 +17,7 @@ value notes_links s =
   let slen = String.length s in
   loop [] [] 0 where rec loop list_nt list_ind i =
     if i = slen then (list_nt, list_ind)
+    else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind (i + 2)
     else
       match NotesLinks.misc_notes_link s i with
       [ NotesLinks.WLpage j _ lfname _ _ ->
