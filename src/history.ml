@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 4.42 2005-09-10 06:10:58 ddr Exp $ *)
+(* $Id: history.ml,v 4.43 2005-09-10 10:31:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -23,7 +23,7 @@ value ext_flags =
 ;
 
 type changed =
-  [ Rperson of string and string and int
+  [ Rperson of string and string and int and Adef.iper
   | Rnotes of option int and string ]
 ;
 
@@ -33,7 +33,7 @@ value gen_record conf base changed action =
     [ Some "yes" ->
         let item =
           match changed with
-          [ Rperson fn sn occ -> fn ^ "." ^ string_of_int occ ^ " " ^ sn
+          [ Rperson fn sn occ _ -> fn ^ "." ^ string_of_int occ ^ " " ^ sn
           | Rnotes (Some num) file ->
               let s = string_of_int num in
               if file = "" then s else file ^ "/" ^ s
@@ -59,7 +59,9 @@ value gen_record conf base changed action =
       [ Some comm ->
           let args =
             match changed with
-            [ Rperson fn sn occ -> [| fn; sn; string_of_int occ |]
+            [ Rperson fn sn occ ip ->
+                [| fn; sn; string_of_int occ;
+                   string_of_int (Adef.int_of_iper ip) |]
             | Rnotes (Some num) file -> [| file; string_of_int num |]
             | Rnotes None file -> [| file |] ]
           in
@@ -77,8 +79,8 @@ value gen_record conf base changed action =
   }
 ;
 
-value record conf base (fn, sn, occ) action =
-  gen_record conf base (Rperson fn sn occ) action
+value record conf base (fn, sn, occ, i) action =
+  gen_record conf base (Rperson fn sn occ i) action
 ;
 
 value record_notes conf base (num, file) action =

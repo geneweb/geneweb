@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 4.13 2005-06-03 12:17:55 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.14 2005-09-10 10:31:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -218,7 +218,7 @@ value effective_mod_merge conf base sp =
         let wl =
           UpdateIndOk.all_checks_person conf base p (aoi base p.cle_index) u
         in
-        let key = (sp.first_name, sp.surname, sp.occ) in
+        let key = (sp.first_name, sp.surname, sp.occ, sp.cle_index) in
         Util.commit_patches conf base;
         History.record conf base key "fp";
         Update.delete_topological_sort conf base;
