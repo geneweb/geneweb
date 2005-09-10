@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.39 2005-07-05 01:06:25 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.40 2005-09-10 10:31:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -581,7 +581,8 @@ value print conf base =
               if changes_done then Util.commit_patches conf base else ();
               if ok then do {
                 let key =
-                  (sou base p1.first_name, sou base p1.surname, p1.occ)
+                  (sou base p1.first_name, sou base p1.surname, p1.occ,
+                   p1.cle_index)
                 in
                 History.record conf base key "fp";
                 print_merged conf base p1;
@@ -634,7 +635,9 @@ value print_kill_ancestors conf base =
   [ Some "yes" ->
       match find_person_in_env conf base "" with
       [ Some p ->
-          let key = (sou base p.first_name, sou base p.surname, p.occ) in
+          let key =
+            (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+          in
           let nb_ind = ref 0 in
           let nb_fam = ref 0 in
           do {

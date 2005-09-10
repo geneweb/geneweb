@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.48 2005-08-27 18:45:09 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.49 2005-09-10 10:31:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -858,10 +858,10 @@ value print_add o_conf base =
       strip_family sfam sdes;
       let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
       let wl = all_checks_family conf base fam cpl des (scpl, sdes, None) in
-      let ((fn, sn, occ, _, _), act) =
+      let ((fn, sn, occ, _, _), i, act) =
         match p_getint conf.env "ip" with
         [ Some i ->
-            if Adef.int_of_iper (mother cpl) = i then ((mother scpl), "af")
+            if Adef.int_of_iper (mother cpl) = i then (mother scpl, i, "af")
             else
               let a = base.data.ascends.get i in
               match parents a with
@@ -871,12 +871,12 @@ value print_add o_conf base =
                     (sou base p.first_name, sou base p.surname, p.occ,
                      Update.Link, "")
                   in
-                  (key, "aa")
-              | _ -> ((father scpl), "af") ]
-        | _ -> ((father scpl), "af") ]
+                  (key, i, "aa")
+              | _ -> (father scpl, i, "af") ]
+        | _ -> (father scpl, -1, "af") ]
       in
       Util.commit_patches conf base;
-      History.record conf base (fn, sn, occ) act;
+      History.record conf base (fn, sn, occ, Adef.iper_of_int i) act;
       Update.delete_topological_sort conf base;
       print_add_ok conf base wl cpl des
     }
@@ -896,7 +896,7 @@ value print_del conf base =
           | _ -> (father cpl) ]
         in
         let p = poi base ip in
-        (sou base p.first_name, sou base p.surname, p.occ)
+        (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
       in
       do {
         if not (is_deleted_family fam) then do {
@@ -946,14 +946,16 @@ value print_mod o_conf base =
     let nfs = (parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in
     let wl = all_checks_family conf base fam cpl des (scpl, sdes, onfs) in
-    let (fn, sn, occ, _, _) =
+    let ((fn, sn, occ, _, _), ip) =
       match p_getint conf.env "ip" with
-      [ Some i when Adef.int_of_iper (mother cpl) = i -> (mother scpl)
-      | _ -> (father scpl) ]
+      [ Some i ->
+          let ip = Adef.iper_of_int i in
+          (if mother cpl = ip then mother scpl else father scpl, ip)
+      | None -> (father scpl, Adef.iper_of_int (-1)) ]
     in
     do {
       Util.commit_patches conf base;
-      History.record conf base (fn, sn, occ) "mf";
+      History.record conf base (fn, sn, occ, ip) "mf";
       Update.delete_topological_sort conf base;
       print_mod_ok conf base wl cpl des
     }
@@ -966,7 +968,9 @@ value print_inv conf base =
   [ (Some ip, Some ifam) ->
       let p = base.data.persons.get ip in
       let u = base.data.unions.get ip in
-      let k = (sou base p.first_name, sou base p.surname, p.occ) in
+      let k =
+        (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+      in
       try
         do {
           effective_inv conf base p.cle_index u (Adef.ifam_of_int ifam);
