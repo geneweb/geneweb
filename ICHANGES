@@ -9,6 +9,8 @@ version 4.10 and 01 Jul 2005, but there are a lot of them... I add
 them when I have some time (and some courage).
 
 * GeneWeb server or CGI (gwd)
+  - [04 Sep 05] Data base forum file can be splited in several files:
+    forum, forum.1, forum.2, and so on.
   - [27 Aug 05] In marriage relation kind added "no sex check married".
   - [22 Aug 05] Changed behaviour of displaying a surname : grouping
     branches when grandchildren have same name (and not children).

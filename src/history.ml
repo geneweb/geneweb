@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 4.41 2005-09-02 09:16:54 ddr Exp $ *)
+(* $Id: history.ml,v 4.42 2005-09-10 06:10:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -22,43 +22,67 @@ value ext_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
 ;
 
-value gen_record conf base item action =
-  let do_it =
+type changed =
+  [ Rperson of string and string and int
+  | Rnotes of option int and string ]
+;
+
+value gen_record conf base changed action =
+  do {
     match p_getenv conf.base_env "history" with
-    [ Some "yes" -> True
-    | _ -> False ]
-  in
-  if do_it then
-    let fname = file_name conf in
-    match
-      try Some (Secure.open_out_gen ext_flags 0o644 fname) with
-      [ Sys_error _ -> None ]
-    with
-    [ Some oc ->
-        let (hh, mm, ss) = conf.time in
-        do {
-          Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s\n"
-            conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-            action item;
-          close_out oc;
-        }
-    | None -> () ]
-  else ()
+    [ Some "yes" ->
+        let item =
+          match changed with
+          [ Rperson fn sn occ -> fn ^ "." ^ string_of_int occ ^ " " ^ sn
+          | Rnotes (Some num) file ->
+              let s = string_of_int num in
+              if file = "" then s else file ^ "/" ^ s
+          | Rnotes None file -> file ]
+        in
+        let fname = file_name conf in
+        match
+          try Some (Secure.open_out_gen ext_flags 0o644 fname) with
+          [ Sys_error _ -> None ]
+        with
+        [ Some oc ->
+            let (hh, mm, ss) = conf.time in
+            do {
+              Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s\n"
+                conf.today.year conf.today.month conf.today.day hh mm ss
+                conf.user action item;
+              close_out oc;
+            }
+        | None -> () ]
+    | _ -> () ];
+    IFDEF UNIX THEN
+      match p_getenv conf.base_env "notify_change" with
+      [ Some comm ->
+          let args =
+            match changed with
+            [ Rperson fn sn occ -> [| fn; sn; string_of_int occ |]
+            | Rnotes (Some num) file -> [| file; string_of_int num |]
+            | Rnotes None file -> [| file |] ]
+          in
+          let args = Array.append [| comm; conf.user; action |] args in
+          match Unix.fork () with
+          [ 0 ->
+              if Unix.fork () <> 0 then exit 0
+              else do {
+                try Unix.execvp comm args with _ -> ();
+                exit 0
+              }
+          | id -> ignore (Unix.waitpid [] id) ]
+      | None -> () ]
+    ELSE () END;
+  }
 ;
 
 value record conf base (fn, sn, occ) action =
-  gen_record conf base (fn ^ "." ^ string_of_int occ ^ " " ^ sn) action
+  gen_record conf base (Rperson fn sn occ) action
 ;
 
 value record_notes conf base (num, file) action =
-  let s =
-    match num with
-    [ Some num ->
-        let s = string_of_int num in
-        if file = "" then s else file ^ "/" ^ s
-    | None -> file ]
-  in
-  gen_record conf base s action
+  gen_record conf base (Rnotes num file) action
 ;
 
 (* Request for history printing *)
