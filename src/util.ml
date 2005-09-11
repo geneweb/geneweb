@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.157 2005-09-07 20:33:27 ddr Exp $ *)
+(* $Id: util.ml,v 4.158 2005-09-11 00:49:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1284,6 +1284,7 @@ value rec followed_by_ident_semi s i =
   else
     match s.[i] with
     [ 'a'..'z' | 'A'..'Z' -> followed_by_ident_semi s (i + 1)
+    | '#' | '0'..'9' -> followed_by_ident_semi s (i + 1)
     | ';' -> True
     | _ -> False ]
 ;
