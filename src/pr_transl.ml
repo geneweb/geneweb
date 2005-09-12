@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.12 2005-05-09 05:11:20 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.13 2005-09-12 08:20:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open MLast;
@@ -79,6 +79,8 @@ value rec module_expr =
   | <:module_expr< $me1$ $me2$ >> ->
       do { module_expr me1; module_expr me2; () }
   | <:module_expr< struct $list:sil$ end >> -> List.iter str_item sil
+  | <:module_expr< $uid:_$ >> -> ()
+  | <:module_expr< ($me$ : $_$) >> -> module_expr me
   | x -> not_impl "module_expr" x ]
 and str_item =
   fun
@@ -88,6 +90,7 @@ and str_item =
   | <:str_item< type $list:_$ >> -> ()
   | <:str_item< exception $_$ of $list:_$ >> -> ()
   | <:str_item< module $_$ = $me$ >> -> module_expr me
+  | <:str_item< module type $_$ = $_$ >> -> ()
   | <:str_item< $exp:e$ >> -> expr e
   | x -> not_impl "str_item" x ]
 ;
