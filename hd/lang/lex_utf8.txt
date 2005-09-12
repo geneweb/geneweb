@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.64 2005-09-03 02:09:42 ddr Exp $
+# $Id: lex_utf8.txt,v 1.65 2005-09-12 08:14:21 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -949,7 +949,7 @@ fi: serkku:g:--un
 fr: un cousin/une cousine
 he:  בן-דוד/ בת-דוד
 is: systkynabarn
-it: un cugino
+it: un cugino/una cugina
 lv: brālēns/māsīca
 nl: een neef/een nicht
 no: fetter/kusine
@@ -3189,7 +3189,7 @@ fi: n&auml;yt&auml; jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 he:  הצג רצועות  / רוחב רצועות  / חפיפה / ס"ה רוחב
 is: sýnt í hlutum/breidd hlutans/skörun hlutanna/öll breiddin
-it: visualizzare per segmenti/larghezza del segmento/superposizione/larghezza totale
+it: visualizzare per segmenti/larghezza del segmento/sovrapposizione/larghezza totale
 lv: rādīt pa loksnēm/loksnes platums/pārklājums/kopējais platums
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
@@ -3351,7 +3351,7 @@ fi: kihloissa
 fr: fianc&eacute;s
 he:  מאורסים
 is: trúlofuð
-it: fidanzarsi
+it: fidanzati
 lv: saderināti
 nl: verloofd
 no: forlovet
@@ -4419,7 +4419,7 @@ fi:
 fr: en
 he:   ב-
 is: í
-it: in
+it: nel
 lv: mēnesī
 nl: in
 no: i
@@ -5106,7 +5106,7 @@ fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
 is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
-it: loop nel data-base: %s e' antenato di se stesso
+it: loop nel data-base: %s è antenato(a) di se stesso(a)
 lv: cilpa datu bāzē: %s ir viņa/viņas pašas secis
 nl: kring in de database: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
@@ -5486,7 +5486,7 @@ fi: viesti/edellinen viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/messages pr&eacute;c&eacute;dents/message suivant
 he:  הודעה / הודעה קודמת / הודעה קודמת / הודעה הבאה
 is: skilaboð/fyrri skilaboð/fyrri skilaboð/næstu skilaboð
-it: messaggio/messaggio precedente/messaggio precedente/messaggio seguente
+it: messaggio/messaggio precedente/messaggi precedenti/messaggio seguente
 lv: ziņa/iepriekšējā ziņa/iepriekšējā ziņa/nākošā ziņa
 nl: bericht/vorig bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/forrige melding/neste melding
@@ -5501,6 +5501,7 @@ sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande
 bg: разни бележки
 en: miscellaneous notes
 fr: notes diverses
+it: note varie
 sv: blandade noteringar
 
     missing ancestors
@@ -6964,7 +6965,7 @@ fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 he:   אב מכיר / אם מכירה / הורים מכירים
 is: viðurkenndur faðir/viðurkennd móðir/viðurkennd foreldri
-it: padre avente riconosciuto/madre avente
+it: padre che ha riconosciuto/madre che ha riconosciuto/genitori che hanno riconosciuto
 lv: atzīts tēvs/māte/vecāki (?)
 nl: erkennende vader/erkennende moeder/erkennende ouders
 no: bekreftet far/bekreftet mor/bekreftede foreldre
@@ -6991,7 +6992,7 @@ fi: sukulaisuus/sukulaisuutta
 fr: relation/relations
 he:  יחסים
 is: skyldleiki/skyldleikar
-it: parentela
+it: relazione/relazioni
 lv: saistība/saistības
 nl: relatie/relaties
 no: forbindelse/forbindelser
@@ -7620,7 +7621,7 @@ fi: tilastotietoja
 fr: statistiques
 he:  נתונים סטטיסטים
 is: staða
-it: statistica
+it: statistiche
 lv: statistika
 nl: statistieken
 no: statistikk
@@ -7924,7 +7925,7 @@ fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
 he:  ה %d באריכות ימים
 is: %d sem lifði lengst
-it: %d avendo vissuto più a lungo
+it: i %d che hanno vissuto più a lungo
 lv: %d, kuri dzīvojuši visilgāk
 nl: de %d langst levende personen
 no: de %d som har levd lengst
