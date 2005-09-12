@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.245 2005-08-16 09:25:24 ddr Exp $
+# $Id: lexicon.txt,v 4.246 2005-09-12 08:27:19 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -973,7 +973,7 @@ fi: serkku:g:--un
 fr: un cousin/une cousine
 he:  áï-ãåã/ áú-ãåã
 is: systkynabarn
-it: un cugino
+it: un cugino/una cugina
 lv: brâlçns/mâsîca
 nl: een neef/een nicht
 no: fetter/kusine
@@ -3207,7 +3207,7 @@ fi: n&auml;yt&auml; jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 he:  äöâ øöåòåú  / øåçá øöåòåú  / çôéôä / ñ"ä øåçá
 is: sınt í hlutum/breidd hlutans/skörun hlutanna/öll breiddin
-it: visualizzare per segmenti/larghezza del segmento/superposizione/larghezza totale
+it: visualizzare per segmenti/larghezza del segmento/sovrapposizione/larghezza totale
 lv: râdît pa loksnçm/loksnes platums/pârklâjums/kopçjais platums
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
@@ -3369,7 +3369,7 @@ fi: kihloissa
 fr: fianc&eacute;s
 he:  îàåøñéí
 is: trúlofuğ
-it: fidanzarsi
+it: fidanzati
 lv: saderinâti
 nl: verloofd
 no: forlovet
@@ -4436,7 +4436,7 @@ fi:
 fr: en
 he:   á-
 is: í
-it: in
+it: nel
 lv: mçnesî
 nl: in
 no: i
@@ -5048,6 +5048,7 @@ sl: sorodstvo med
 sv: sl&auml;ktskap emellan
 
     linked pages
+bg: ñâúğçàíè ñòğàíèöè
 en: linked pages
 fr: pages liées
 sv: länkade sidor
@@ -5122,7 +5123,7 @@ fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  îòâì áîàâø äğúåğéí: %s  öàöà(ä) ìàöîå/ìàöîä
 is: villa í gagnagrunni: %s er sinn eigin forfağir/afkomandi
-it: loop nel data-base: %s e' antenato di se stesso
+it: loop nel data-base: %s è antenato(a) di se stesso(a)
 lv: cilpa datu bâzç: %s ir viòa/viòas pağas secis
 nl: kring in de database: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
@@ -5267,7 +5268,6 @@ ro: casatorie/casatorii
 ru: áğàê/áğàêè
 sl: poroke/poroke
 sv: &auml;ktenskap/&auml;ktenskap
-zh:  "éÒ
 
     married
 af: getroud
@@ -5502,7 +5502,7 @@ fi: viesti/edellinen viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/messages pr&eacute;c&eacute;dents/message suivant
 he:  äåãòä / äåãòä ÷åãîú / äåãòä ÷åãîú / äåãòä äáàä
 is: skilaboğ/fyrri skilaboğ/fyrri skilaboğ/næstu skilaboğ
-it: messaggio/messaggio precedente/messaggio precedente/messaggio seguente
+it: messaggio/messaggio precedente/messaggi precedenti/messaggio seguente
 lv: ziòa/iepriekğçjâ ziòa/iepriekğçjâ ziòa/nâkoğâ ziòa
 nl: bericht/vorig bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/forrige melding/neste melding
@@ -5514,8 +5514,10 @@ sl: sporoèilo/prej¹nje sporoèilo/prej¹nja sporoèila/naslednje sporoèilo
 sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     miscellaneous notes
+bg: ğàçíè áåëåæêè
 en: miscellaneous notes
 fr: notes diverses
+it: note varie
 sv: blandade noteringar
 
     missing ancestors
@@ -6974,7 +6976,7 @@ fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 he:   àá îëéø / àí îëéøä / äåøéí îëéøéí
 is: viğurkenndur fağir/viğurkennd móğir/viğurkennd foreldri
-it: padre avente riconosciuto/madre avente
+it: padre che ha riconosciuto/madre che ha riconosciuto/genitori che hanno riconosciuto
 lv: atzîts tçvs/mâte/vecâki (?)
 nl: erkennende vader/erkennende moeder/erkennende ouders
 no: bekreftet far/bekreftet mor/bekreftede foreldre
@@ -7001,7 +7003,7 @@ fi: sukulaisuus/sukulaisuutta
 fr: relation/relations
 he:  éçñéí
 is: skyldleiki/skyldleikar
-it: parentela
+it: relazione/relazioni
 lv: saistîba/saistîbas
 nl: relatie/relaties
 no: forbindelse/forbindelser
@@ -7148,6 +7150,10 @@ ro: relatie prin mariaj
 ru: ñâÿçü áğàêîì
 sl: sorodstvo preko poroke
 sv: sl&auml;ktskap genom &auml;ktenskap
+
+    search/case sensitive
+en: search/case sensitive
+fr: rechercher/sensible à la casse
 
     see
 af: sien
@@ -7626,7 +7632,7 @@ fi: tilastotietoja
 fr: statistiques
 he:  ğúåğéí ñèèéñèéí
 is: stağa
-it: statistica
+it: statistiche
 lv: statistika
 nl: statistieken
 no: statistikk
@@ -7929,7 +7935,7 @@ fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
 he:  ä %d áàøéëåú éîéí
 is: %d sem lifği lengst
-it: %d avendo vissuto più a lungo
+it: i %d che hanno vissuto più a lungo
 lv: %d, kuri dzîvojuği visilgâk
 nl: de %d langst levende personen
 no: de %d som har levd lengst
