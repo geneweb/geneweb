@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.7 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.8 2005-09-16 22:05:49 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -49,6 +49,7 @@ value substp mloc env =
   loop where rec loop =
     fun
     [ MLast.ExApp _ e1 e2 -> MLast.PaApp loc (loop e1) (loop e2)
+    | MLast.ExChr _ c -> MLast.PaChr loc c
     | MLast.ExLid _ x ->
         try MLast.PaAnt loc (List.assoc x env) with
         [ Not_found -> MLast.PaLid loc x ]

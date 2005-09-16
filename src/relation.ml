@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.84 2005-08-21 23:08:49 ddr Exp $ *)
+(* $Id: relation.ml,v 4.85 2005-09-16 22:05:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -230,9 +230,15 @@ value ind_set_of_relation_path conf base path =
 ;
 
 value print_relationship_dag conf base elem_txt vbar_txt path next_txt =
-  if p_getenv conf.env "old" = Some "on" then 
+  if p_getenv conf.env "new" <> Some "on" then 
     old_print_relationship_dag conf base elem_txt vbar_txt path next_txt
   else
+  (* This new version is bugged: when displaying e.g. a relationship
+     between a couple passing through other people, the couple family
+     link is added in the dag. Result: the two persons may be displayed
+     in the middle of the dag instead of its ends. Solution to be
+     found. In the mean time, the "old" version is displayed by
+     default (roglo 17 Sep 2005) *)
   let invert =
     match Util.p_getenv conf.env "invert" with
     [ Some "on" -> True
