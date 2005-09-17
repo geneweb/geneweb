@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 4.1 2005-03-01 04:14:23 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 4.2 2005-09-17 08:59:00 ddr Exp $ *)
 
 open MLast;
 
@@ -183,10 +183,12 @@ and str_item =
   | StExp _ e -> expr e
   | StExt _ _ t _ -> ctyp t
   | StMod _ _ me -> module_expr me
-  | StRecMod _ nmtmes -> list (fun (_, mt, me) -> do { module_expr me; module_type mt; }) nmtmes
+  | StRecMod _ nmtmes ->
+      list (fun (_, mt, me) -> do { module_expr me; module_type mt; }) nmtmes
   | StMty _ _ mt -> module_type mt
   | StOpn _ [s :: _] -> addmodule s
   | StTyp _ tdl -> list type_decl tdl
+  | StUse _ _ _ -> ()
   | StVal _ _ pel -> list let_binding pel
   | x -> not_impl "str_item" x ]
 and type_decl (_, _, t, _) = ctyp t
