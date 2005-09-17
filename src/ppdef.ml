@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.8 2005-09-16 22:05:49 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.9 2005-09-17 06:57:35 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -67,6 +67,55 @@ value substp mloc env =
              "this macro cannot be used in a pattern (see its definition)") ]
 ;
 
+value cannot_eval e =
+  let loc = MLast.loc_of_expr e in
+  Stdpp.raise_with_loc loc (Stream.Error "can't eval")
+;
+
+value rec eval =
+  fun
+  [ <:expr< Char.chr $e$ >> ->
+      match eval e with
+      [ <:expr< $int:i$ >> ->
+          let c = Char.escaped (Char.chr (int_of_string i)) in
+         <:expr< $chr:c$ >>
+      | e -> cannot_eval e ]
+  | <:expr< Char.code $e$ >> ->
+      match eval e with
+      [ <:expr< $chr:c$ >> ->
+          let i = string_of_int (Char.code (Token.eval_char c)) in
+         <:expr< $int:i$ >>
+      | e -> cannot_eval e ]
+  | <:expr< $op$ $x$ $y$ >> ->
+      let f = eval op in
+      let x = eval x in
+      let y = eval y in
+      match (f, x, y) with
+      [ (<:expr< $lid:"+"$ >>, <:expr< $int:x$ >>, <:expr< $int:y$ >>) ->
+          let x = int_of_string x in
+          let y = int_of_string y in
+          <:expr< $int:string_of_int (x + y)$ >>
+      | (<:expr< $lid:"-"$ >>, <:expr< $int:x$ >>, <:expr< $int:y$ >>) ->
+          let x = int_of_string x in
+          let y = int_of_string y in
+          <:expr< $int:string_of_int (x - y)$ >>
+      | _ -> cannot_eval op ]
+  | <:expr< $uid:x$ >> as e ->
+      try
+        match List.assoc x defined.val with
+        [ _ -> e ]
+      with
+      [ Not_found -> e ]
+  | <:expr< $lid:_$ >> | <:expr< $chr:_$ >> | <:expr< $int:_$ >> as e -> e
+  | e -> cannot_eval e ]
+;
+
+value may_eval =
+  fun
+  [ <:expr< EVAL $e$ >> -> eval e
+  | e -> e ]
+;
+
 value incorrect_number loc l1 l2 =
   Stdpp.raise_with_loc loc
     (Failure
@@ -101,7 +150,7 @@ value define eo x =
                   if List.length el = List.length sl then
                     let env = List.combine sl el in
                     let e = subst loc env e in
-                    Pcaml.expr_reloc (fun _ -> loc) (fst gloc) e
+                    may_eval (Pcaml.expr_reloc (fun _ -> loc) (fst gloc) e)
                   else
                     incorrect_number loc el sl ] ]
           ;
