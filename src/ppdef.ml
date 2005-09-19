@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.9 2005-09-17 06:57:35 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.10 2005-09-19 09:25:36 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -27,6 +27,7 @@ value defined = ref [];
 value is_defined i = List.mem_assoc i defined.val;
 
 value loc = Grammar.loc_of_token_interval 0 0;
+value _loc = loc;
 
 value subst mloc env =
   loop where rec loop =
