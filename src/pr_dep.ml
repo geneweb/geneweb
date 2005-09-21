@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 4.2 2005-09-17 08:59:00 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 4.3 2005-09-21 11:40:15 ddr Exp $ *)
 
 open MLast;
 
@@ -48,11 +48,20 @@ value rec ctyp =
   | TyMan _ t1 t2 -> do { ctyp t1; ctyp t2; }
   | TyOlb _ _ t -> ctyp t
   | TyQuo _ _ -> ()
-  | TyRec _ _ ldl -> list label_decl ldl
-  | TySum _ _ cdl -> list constr_decl cdl
   | TyTup _ tl -> list ctyp tl
   | TyVrn _ sbtll _ -> list variant sbtll
-  | x -> not_impl "ctyp" x ]
+  | x ->
+      IFDEF OCAML_309 THEN
+        match x with
+        [ TyRec _ ldl -> list label_decl ldl
+        | TySum _ cdl -> list constr_decl cdl
+        | x -> not_impl "ctyp" x ]
+      ELSE
+        match x with
+        [ TyRec _ _ ldl -> list label_decl ldl
+        | TySum _ _ cdl -> list constr_decl cdl
+        | x -> not_impl "ctyp" x ]
+      END ]
 and constr_decl (_, _, tl) = list ctyp tl
 and label_decl (_, _, _, t) = ctyp t
 and variant =

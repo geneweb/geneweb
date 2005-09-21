@@ -79,11 +79,11 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     updateInd.cmx updateIndOk.cmx util.cmx wiznotes.cmx \
     ../wserver/wserver.cmx family.cmi 
 family.cmi: config.cmi 
-forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi notes.cmi \
-    secure.cmi templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
+forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi name.cmi notes.cmi \
+    templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
     ../wserver/wserver.cmi 
-forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx notes.cmx \
-    secure.cmx templ.cmx templAst.cmi update.cmx util.cmx wiki.cmx \
+forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx notes.cmx \
+    templ.cmx templAst.cmi update.cmx util.cmx wiki.cmx \
     ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi secure.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx secure.cmx 
@@ -108,10 +108,10 @@ gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi iobase.cmi \
     notesLinks.cmo secure.cmi select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx iobase.cmx \
     notesLinks.cmx secure.cmx select.cmx 
-history.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi secure.cmi \
-    templ.cmi templAst.cmi util.cmi history.cmi 
-history.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx secure.cmx \
-    templ.cmx templAst.cmi util.cmx history.cmi 
+history.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi \
+    secure.cmi templ.cmi templAst.cmi util.cmi history.cmi 
+history.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
+    secure.cmx templ.cmx templAst.cmi util.cmx history.cmi 
 history.cmi: config.cmi def.cmi 
 image.cmo: config.cmi gutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
 image.cmx: config.cmi gutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 

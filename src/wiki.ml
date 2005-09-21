@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.51 2005-09-21 05:42:32 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.52 2005-09-21 11:40:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -167,7 +167,7 @@ use of database forum by ill-intentioned people to communicate)...
             sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
               (commd conf) mode fname anchor c text
           in
-          loop quot_lev j pos (Buff.mstore len t)
+          loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
             sprintf "<a name=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
