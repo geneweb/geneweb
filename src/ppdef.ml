@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.10 2005-09-19 09:25:36 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.11 2005-09-21 11:40:15 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -271,4 +271,8 @@ else ();
 
 if Sys.ocaml_version >= "3.08" then
   defined.val := [("OCAML_308", None) :: defined.val]
+else ();
+
+if Sys.ocaml_version >= "3.09" then
+  defined.val := [("OCAML_309", None) :: defined.val]
 else ();
