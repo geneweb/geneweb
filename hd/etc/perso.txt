@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.62 2005-09-07 20:33:27 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.63 2005-09-21 17:12:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -122,11 +122,11 @@
 %end;
 %if;(has_occupation or has_birth_date or has_birth_place or
      has_baptism_date or has_baptism_place or is_dead or is_buried or
-     is_cremated or has_consanguinity or has_linked_page.OCCU != "")
+     is_cremated or has_consanguinity or has_linked_page.OCCU)
   %if;has_image;<td>%end;
   <ul>
     %if;has_occupation;<li>%apply;capitalize(occupation)</li>%nl;%end;
-    %if;(has_linked_page.OCCU)
+    %if;has_linked_page.OCCU;
       <li>%apply;capitalize(linked_page.OCCU)</li>
     %end;
     %if;has_birth_date;
@@ -150,7 +150,7 @@
       <li>%apply;capitalize(died)
       %if;has_death_date; %on_death_date;%end;
       %if;has_death_place; -&nbsp;%death_place;%end;
-      %if;(has_linked_page.DEATH != "") %linked_page.DEATH;%end;</li>
+      %if;has_linked_page.DEATH; %linked_page.DEATH;%end;</li>
     %end;
     %if;computable_age;
       <li>[*age]: %age;</li>
