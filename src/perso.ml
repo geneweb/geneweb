@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.205 2005-09-21 05:42:32 ddr Exp $ *)
+(* $Id: perso.ml,v 4.206 2005-09-21 09:56:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -697,6 +697,54 @@ value build_surnames_list conf base v p =
          | x -> x ])
       list.val
   }
+;
+
+value linked_page_text conf base p s key str (pg, (_, il)) =
+  match pg with
+  [ NotesLinks.PgMisc pg ->
+      let list = List.map snd (List.filter (fun (k, _) -> k = key) il) in
+      List.fold_right
+        (fun text str ->
+           try
+             let (nenv, _) = Notes.read_notes base pg in
+             let v =
+               let v = List.assoc s nenv in
+               if v = "" then raise Not_found
+               else Util.nth_field v (Util.index_of_sex p.sex)
+             in
+             let v =
+               let text = text.NotesLinks.lnTxt in
+               if text <> "" then
+                 loop 0 0 where rec loop i len =
+                   if i = String.length text then Buff.get len
+                   else if text.[i] = '*' then
+                     loop (i + 1) (Buff.mstore len v)
+                   else loop (i + 1) (Buff.store len text.[i])
+               else v
+             in
+             let str1 =
+               let (a, b, c) =
+                 try
+                   let i = String.index v '{' in
+                   let j = String.index v '}' in
+                   let a = String.sub v 0 i in
+                   let b = String.sub v (i + 1) (j - i - 1) in
+                   let c =
+                     String.sub v (j + 1) (String.length v - j - 1)
+                   in
+                   (a, b, c)
+                 with
+                 [ Not_found -> ("", v, "") ]
+               in
+               Printf.sprintf
+                 "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
+                 (commd conf) pg text.NotesLinks.lnPos b c
+             in
+             if str = "" then str1 else str ^ ", " ^ str1
+           with
+           [ Not_found -> str ])
+        list str
+  | _ -> str ]
 ;
 
 (* Interpretation of template file *)
@@ -1473,53 +1521,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
             let sn = Name.lower (sou base p.surname) in
             (fn, sn, p.occ)
           in
-          let s =
-            List.fold_left
-              (fun str (pg, (_, il)) ->
-                 match pg with
-                 [ NotesLinks.PgMisc pg ->
-                     try
-                       let text = List.assoc key il in
-                       let (nenv, _) = Notes.read_notes base pg in
-                       let v =
-                         let v = List.assoc s nenv in
-                         if v = "" then raise Not_found
-                         else Util.nth_field v (Util.index_of_sex p.sex)
-                       in
-                       let v =
-                         let text = text.NotesLinks.lnTxt in
-                         if text <> "" then
-                           loop 0 0 where rec loop i len =
-                             if i = String.length text then Buff.get len
-                             else if text.[i] = '*' then
-                               loop (i + 1) (Buff.mstore len v)
-                             else loop (i + 1) (Buff.store len text.[i])
-                         else v
-                       in
-                       let str1 =
-                         let (a, b, c) =
-                           try
-                             let i = String.index v '{' in
-                             let j = String.index v '}' in
-                             let a = String.sub v 0 i in
-                             let b = String.sub v (i + 1) (j - i - 1) in
-                             let c =
-                               String.sub v (j + 1) (String.length v - j - 1)
-                             in
-                             (a, b, c)
-                           with
-                           [ Not_found -> ("", v, "") ]
-                         in
-                         Printf.sprintf
-                           "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
-                           (commd conf) pg text.NotesLinks.lnPos b c
-                       in
-                       if str = "" then str1 else str ^ ", " ^ str1
-                     with
-                     [ Not_found -> str ]
-                | _ -> str ])
-               "" db
-          in
+          let s = List.fold_left (linked_page_text conf base p s key) "" db in
           VVstring s
       | _ -> raise Not_found ]
   | ["mother" :: sl] ->

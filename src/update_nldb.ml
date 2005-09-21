@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 1.16 2005-09-21 05:42:32 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 1.17 2005-09-21 09:56:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -27,10 +27,8 @@ value notes_links s =
           loop list_nt list_ind pos j
       | NotesLinks.WLperson j key _ text ->
           let list_ind =
-            if List.mem_assoc key list_ind then list_ind
-            else
-              let link ={NotesLinks.lnTxt = text; NotesLinks.lnPos = pos} in
-              [(key, link) :: list_ind]
+            let link ={NotesLinks.lnTxt = text; NotesLinks.lnPos = pos} in
+            [(key, link) :: list_ind]
           in
           loop list_nt list_ind (pos + 1) j
       | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
