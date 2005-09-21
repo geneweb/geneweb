@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.204 2005-09-07 20:57:35 ddr Exp $ *)
+(* $Id: perso.ml,v 4.205 2005-09-21 05:42:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1487,6 +1487,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                          else Util.nth_field v (Util.index_of_sex p.sex)
                        in
                        let v =
+                         let text = text.NotesLinks.lnTxt in
                          if text <> "" then
                            loop 0 0 where rec loop i len =
                              if i = String.length text then Buff.get len
@@ -1510,8 +1511,8 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
                            [ Not_found -> ("", v, "") ]
                          in
                          Printf.sprintf
-                           "%s<a href=\"%sm=NOTES;f=%s\">%s</a>%s" a
-                           (commd conf) pg b c
+                           "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
+                           (commd conf) pg text.NotesLinks.lnPos b c
                        in
                        if str = "" then str1 else str ^ ", " ^ str1
                      with

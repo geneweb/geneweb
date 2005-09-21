@@ -1,9 +1,9 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.12 2005-09-07 17:09:39 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.13 2005-09-21 05:42:32 ddr Exp $ *)
 
 open Def;
 
-value magic_notes_links = "GWNL0007";
+value magic_notes_links = "GWNL0008";
 type page =
   [ PgInd of iper
   | PgNotes
@@ -11,7 +11,8 @@ type page =
   | PgWizard of string ]
 ;
 type key = (string * string * int);
-type notes_links_db = list (page * (list string * list (key * string)));
+type ind_link = { lnTxt : string; lnPos : int };
+type notes_links_db = list (page * (list string * list (key * ind_link)));
 
 value char_dir_sep = ':';
 
@@ -150,8 +151,9 @@ value share_strings db =
        let list_nt = List.map (share ht) list_nt in
        let list_ind =
          List.map
-           (fun ((fn, sn, oc), txt) ->
-              ((share ht fn, share ht sn, oc), share ht txt))
+           (fun ((fn, sn, oc), {lnTxt = txt; lnPos = pos}) ->
+              ((share ht fn, share ht sn, oc),
+               {lnTxt = share ht txt; lnPos = pos}))
            list_ind
        in
        (page, (list_nt, list_ind)))
