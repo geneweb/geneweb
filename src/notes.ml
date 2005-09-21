@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.127 2005-09-09 07:41:00 ddr Exp $ *)
+(* $Id: notes.ml,v 4.128 2005-09-21 05:42:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -87,7 +87,8 @@ value notes_links_db conf base eliminate_unlinked =
       (fun list (pg, (sl, il)) ->
          let pg =
            match pg with
-           [ NotesLinks.PgMisc f -> NotesLinks.PgMisc (Wiki.map_notes aliases f)
+           [ NotesLinks.PgMisc f ->
+               NotesLinks.PgMisc (Wiki.map_notes aliases f)
            | x -> x ]
          in
          let sl = List.map (Wiki.map_notes aliases) sl in
@@ -260,23 +261,25 @@ value print_mod conf base =
 value update_notes_links_db conf fnotes s force =
   let slen = String.length s in
   let (list_nt, list_ind) =
-    loop [] [] 0 where rec loop list_nt list_ind i =
+    loop [] [] 1 0 where rec loop list_nt list_ind pos i =
       if i = slen then (list_nt, list_ind)
-      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind (i + 2)
+      else if i + 1 < slen && s.[i] = '%' then loop list_nt list_ind pos (i + 2)
       else
         match NotesLinks.misc_notes_link s i with
         [ NotesLinks.WLpage j _ lfname _ _ ->
             let list_nt =
               if List.mem lfname list_nt then list_nt else [lfname :: list_nt]
             in
-            loop list_nt list_ind j
+            loop list_nt list_ind pos j
         | NotesLinks.WLperson j key _ txt ->
             let list_ind =
               if List.mem_assoc key list_ind then list_ind
-              else [(key, txt) :: list_ind]
+              else
+                let link = {NotesLinks.lnTxt = txt; NotesLinks.lnPos = pos} in
+                [(key, link) :: list_ind]
             in
-            loop list_nt list_ind j
-        | NotesLinks.WLnone -> loop list_nt list_ind (i + 1) ]
+            loop list_nt list_ind (pos + 1) j
+        | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
   in
   if not force && list_nt = [] && list_ind = [] then ()
   else

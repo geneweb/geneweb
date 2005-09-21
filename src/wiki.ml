@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.50 2005-09-07 17:09:39 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.51 2005-09-21 05:42:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -90,7 +90,7 @@ value str_start_with str i x =
 
 value syntax_links conf mode file_path s =
   let slen = String.length s in
-  loop 0 0 0 where rec loop quot_lev i len =
+  loop 0 1 0 0 where rec loop quot_lev pos i len =
     let (len, quot_lev) =
       if i = slen || List.exists (str_start_with s i) ["</li>"; "</p>"] then
         let len =
@@ -107,7 +107,7 @@ value syntax_links conf mode file_path s =
     else if
       s.[i] = '%' && i < slen - 1 && List.mem s.[i+1] ['['; ']'; '{'; '}'; ''']
     then
-      loop quot_lev (i + 2) (Buff.store len s.[i+1])
+      loop quot_lev pos (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '{' then
       let (b, j) =
         loop 0 (i + 1) where rec loop len j =
@@ -118,7 +118,7 @@ value syntax_links conf mode file_path s =
           else loop (Buff2.store len s.[j]) (j + 1)
       in
       let s = sprintf "<span class=\"highlight\">%s</span>" b in
-      loop quot_lev j (Buff.mstore len s)
+      loop quot_lev pos j (Buff.mstore len s)
 (*
 interesting idea, but perhaps dangerous (risk of hidden messages and
 use of database forum by ill-intentioned people to communicate)...
@@ -128,26 +128,26 @@ use of database forum by ill-intentioned people to communicate)...
       in
       let b = String.sub s (i + 2) (j - i - 3) in
       let (tb, _) = Translate.inline conf.lang '%' (String.make 1) b in
-      loop quot_lev j (Buff.mstore len tb)
+      loop quot_lev pos j (Buff.mstore len tb)
 *)
     else if
       i <= slen - 5 && s.[i] = ''' && s.[i+1] = ''' && s.[i+2] = ''' &&
       s.[i+3] = ''' && s.[i+4] = ''' && (quot_lev = 0 || quot_lev = 3)
     then
       let s = if quot_lev = 0 then "<i><b>" else "</b></i>" in
-      loop (3 - quot_lev) (i + 5) (Buff.mstore len s)
+      loop (3 - quot_lev) pos (i + 5) (Buff.mstore len s)
     else if
       i <= slen - 3 && s.[i] = ''' && s.[i+1] = ''' && s.[i+2] = ''' &&
       (quot_lev = 0 || quot_lev = 2)
     then
       let s = if quot_lev = 0 then "<b>" else "</b>" in
-      loop (2 - quot_lev) (i + 3) (Buff.mstore len s)
+      loop (2 - quot_lev) pos (i + 3) (Buff.mstore len s)
     else if
       i <= slen - 2 && s.[i] = ''' && s.[i+1] = ''' &&
       (quot_lev = 0 || quot_lev = 1)
     then
       let s = if quot_lev = 0 then "<i>" else "</i>" in
-      loop (1 - quot_lev) (i + 2) (Buff.mstore len s)
+      loop (1 - quot_lev) pos (i + 2) (Buff.mstore len s)
 
     else
       match NotesLinks.misc_notes_link s i with
@@ -167,15 +167,17 @@ use of database forum by ill-intentioned people to communicate)...
             sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
               (commd conf) mode fname anchor c text
           in
-          loop quot_lev j (Buff.mstore len t)
+          loop quot_lev j pos (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
-            sprintf "<a href=\"%sp=%s;n=%s%s\">%s</a>" (commd conf)
+            sprintf "<a name=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+              pos (commd conf)
               (code_varenv fn) (code_varenv sn)
               (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
           in
-          loop quot_lev j (Buff.mstore len t)
-      | NotesLinks.WLnone -> loop quot_lev (i + 1) (Buff.store len s.[i]) ]
+          loop quot_lev (pos + 1) j (Buff.mstore len t)
+      | NotesLinks.WLnone ->
+          loop quot_lev pos (i + 1) (Buff.store len s.[i]) ]
 ;
 
 value toc_list = ["__NOTOC__"; "__TOC__"; "__SHORT_TOC__"];
