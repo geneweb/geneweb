@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.33 2005-09-22 17:53:11 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.34 2005-09-22 17:59:09 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -26,6 +26,7 @@ function setDead()
 {
   document.forms%[0].death.value = "Death";
 }
+-->
 </script>
 
 %define;date(xlab,xvar,xdt,xcond)
