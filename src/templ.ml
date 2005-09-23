@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.109 2005-09-02 02:13:28 ddr Exp $ *)
+(* $Id: templ.ml,v 4.110 2005-09-23 09:44:56 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -742,7 +742,7 @@ and eval_transl_lexicon conf upp s c =
         let s2 =
           match nth with
           [ Some n -> Util.transl_nth conf s n
-          | None -> Util.transl conf s ]
+          | None -> Util.transl_decline conf s "" ]
         in
         Gutil.nominative s2
     | Some (s1, s2) ->
