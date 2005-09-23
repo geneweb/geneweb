@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.9 2005-08-25 18:57:51 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 1.10 2005-09-23 13:51:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -41,7 +41,7 @@
 </tr>
 <tr align="%left;">
   <td valign="top">
-    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify] (P)</a>
+    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify::] (P)</a>
     <br%/>
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
          and surname != "?")
@@ -53,7 +53,7 @@
       %end;
     %end;
     <br%/>
-    <a href="%prefix;m=DEL_IND;i=%index;">[*delete]</a>
+    <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
     <br%/>
     <br%/>
     <a href="%prefix;m=MRG;i=%index;">[*merge]</a>
