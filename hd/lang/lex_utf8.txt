@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.66 2005-09-19 09:25:36 ddr Exp $
+# $Id: lex_utf8.txt,v 1.67 2005-09-23 09:26:42 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5032,6 +5032,7 @@ sv: sl&auml;ktskap emellan
 
     linked pages
 bg: свързани страници
+ca: enllaços
 de: vernüpfte Seiten
 en: linked pages
 fr: pages liées
@@ -5502,6 +5503,7 @@ sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande
 
     miscellaneous notes
 bg: разни бележки
+ca: miscel·lània
 de: diverse Notizen
 en: miscellaneous notes
 fr: notes diverses
@@ -5595,6 +5597,7 @@ sv: m&aring;nader
 af: maanfase/nuwemaan/eerste kwartier/volmaan/laaste kwartier
 ar: همت عمر/نو موون/فيرست قورتر/فولّ موون/لت قورتر
 bg: лунна фаза/новолуние/първа четвърт/пълнолуние/последна четвърт
+ca: fase lunar/lluna nova/quart creixent/lluna plena/quart minvant
 cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
@@ -7147,6 +7150,7 @@ sl: sorodstvo preko poroke
 sv: sl&auml;ktskap genom &auml;ktenskap
 
     search/case sensitive
+ca: recerca/coincidir maj_min
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
 fr: rechercher/sensible à la casse
@@ -7842,6 +7846,7 @@ sv: de %d f&ouml;rnamnen
     the %d oldest couples perhaps still alive and engaged
 af: die %d oudste pare moontlik nog in lewe en verloof
 bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
+ca: les parelles més grans potser encara vives i juntes
 cs: %d nejstarších párů pravděpodobně žijících a zadaných
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
@@ -9077,6 +9082,7 @@ sv: användare/passord/avbryt
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
+ca: visualtza/mostra/sumari
 de: veranschaulichen/einblenden/ausblenden/Inhalt
 en: visualize/show/hide/summary
 fr: visualiser/afficher/masquer/sommaire
