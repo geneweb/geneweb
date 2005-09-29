@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.67 2005-09-23 09:26:42 ddr Exp $
+# $Id: lex_utf8.txt,v 1.68 2005-09-29 08:23:18 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7156,6 +7156,7 @@ en: search/case sensitive
 fr: rechercher/sensible à la casse
 nl: zoeken/hoofdlettergevoelig
 pt-br: procurar/diferencia maiúsculas
+sv: sök/skiftlägeskänslig
 
     see
 af: sien
