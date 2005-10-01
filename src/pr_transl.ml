@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.14 2005-10-01 08:04:10 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.15 2005-10-01 12:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open MLast;
@@ -33,10 +33,10 @@ value rec expr e =
     when List.mem f trace && List.mem g trace ->
       Printf.printf "%s\n" (token_eval_string loc s)
   | <:expr< $lid:x$ >> when List.mem x trace ->
-      do {
-        flush stdout;
-        Stdpp.raise_with_loc (MLast.loc_of_expr e) (Failure "Bad source")
-      }
+      let loc = MLast.loc_of_expr e in
+      let (fn, ln, bp, ep) = Stdpp.line_of_loc Pcaml.input_file.val loc in
+      Printf.printf "File \"%s\", line %d, characters %d-%d: bad source\n"
+        fn ln bp ep
   | <:expr< let $opt:_$ $list:pel$ in $e$ >> ->
       do { binding_list pel; expr e; () }
   | <:expr< fun [ $list:pel$ ] >> -> List.iter fun_binding pel
