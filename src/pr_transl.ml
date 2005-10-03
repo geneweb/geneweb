@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.16 2005-10-03 06:17:00 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.17 2005-10-03 12:47:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open MLast;
@@ -35,6 +35,7 @@ value rec expr e =
   | <:expr< $lid:x$ >> when List.mem x trace ->
       let loc = MLast.loc_of_expr e in
       let (fn, ln, bp, ep) = Stdpp.line_of_loc Pcaml.input_file.val loc in
+      let fn = if fn = "" then Pcaml.input_file.val else fn in
       Printf.printf "File \"%s\", line %d, characters %d-%d: bad source\n"
         fn ln bp ep
   | <:expr< let $opt:_$ $list:pel$ in $e$ >> ->
