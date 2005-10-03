@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.15 2005-10-01 12:39:40 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.16 2005-10-03 06:17:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open MLast;
@@ -57,7 +57,7 @@ value rec expr e =
   | <:expr< { $list:fel$ } >> -> List.iter (fun (_, e) -> expr e) fel
   | <:expr< { ($e$) with $list:fel$ } >> ->
       do { expr e; List.iter (fun (_, e) -> expr e) fel; () }
-  | <:expr< $_$ := $_$ >> -> ()
+  | <:expr< $_$ := $e$ >> -> expr e
   | <:expr< $_$.($_$) >> -> ()
   | <:expr< $_$.[$_$] >> -> ()
   | <:expr< $lid:_$ >> -> ()
