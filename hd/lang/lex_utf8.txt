@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.68 2005-09-29 08:23:18 ddr Exp $
+# $Id: lex_utf8.txt,v 1.69 2005-10-04 23:11:53 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -8519,6 +8519,10 @@ ru: целый список
 sl: celoten seznam
 sv: hela listan
 
+    this forum is moderated
+en: this forum is moderated
+fr: ce forum est modéré
+
     title/titles
 af: titel/titels
 bg: титла/титли
@@ -9364,3 +9368,11 @@ ro: trebuie intai sa unesti cele doua familii
 ru: вы должны сначала объединить 2 семьи
 sl: najprej morate združiti obe družini
 sv: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
+
+    your message is waiting for validation
+en: your message is waiting for validation
+fr: votre message est en attente de validation
+
+    validate/delete
+en: validate/delete
+fr: valider/supprimer

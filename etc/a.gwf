@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.26 2005-02-13 19:15:37 ddr Exp $
+# $Id: a.gwf,v 4.27 2005-10-04 23:11:53 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -46,6 +46,12 @@ wizard_passwd=
 # Alternative way for wizard entry: authorization file.
 # The file must hold lines of the form "user:password".
 wizard_passwd_file=
+
+# Wizards moderators file.
+# List of wizards moderating the database forum.
+# If empty or empty file, no moderation.
+# One wizard name by line.
+moderator_file=
 
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"

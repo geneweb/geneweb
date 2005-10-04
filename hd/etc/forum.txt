@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.17 2005-09-04 14:09:53 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.18 2005-10-04 23:11:53 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD")%nn;
@@ -67,6 +67,7 @@
     <h1 style="text-align:center" class="highlight">%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
+    %if;is_moderated_forum;<p><u>[*this forum is moderated].</u></p>%end;%nl;
     <form method="POST" action="%action;">
     <p>
       %hidden;
@@ -112,19 +113,36 @@
     %apply;search_form("false")
   %end;
   <ul>
-  <li><a href="%prefix;m=FORUM" accesskey="F">[*database forum] (F)</a></li>
-  <li>%if;(message.next_pos != "")
-         <a href="%prefix;m=FORUM;p=%message.next_pos;" accesskey="N">%nn;
-         [*message/previous message/previous messages/next message]3 (N)%nn;
-         </a>%nn;
-      %else;&nbsp;%end;</li>
-  <li>%if;(message.prev_pos != "")
-         <a href="%prefix;m=FORUM;p=%message.prev_pos;" accesskey="P">%nn;
-         [*message/previous message/previous messages/next message]1 (P)%nn;
-         </a>%nn;
-      %else;&nbsp;%end;</li>
+  <li>%nn;
+    <a href="%prefix;m=FORUM" accesskey="F">%nn;
+    [*database forum] (F)</a></li>
+  <li>%nn;
+    %if;(message.next_pos != "")
+       <a href="%prefix;m=FORUM;p=%message.next_pos;" accesskey="N">%nn;
+       [*message/previous message/previous messages/next message]3 (N)%nn;
+       </a>%nn;
+    %else;&nbsp;%end;</li>
+  <li>
+    %if;(message.prev_pos != "")
+       <a href="%prefix;m=FORUM;p=%message.prev_pos;" accesskey="P">%nn;
+       [*message/previous message/previous messages/next message]1 (P)%nn;
+       </a>%nn;
+    %else;&nbsp;%end;</li>
   </ul>
-  <p>
+  %let;col;%if;message.is_waiting; style="color:red"%end;%in;
+  %if;message.is_waiting;
+    <p>
+    <form method="POST" action="%action;">
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_VAL"%/>
+    <input type="hidden" name="p" value="%pos;"%/>
+    <input type="submit" name="v" value="%nn;[*validate/delete]0"%>
+    <input type="submit" name="d" value="%nn;[*validate/delete]1"%/>
+    </p>
+    </form>
+    </p>
+  %end;
+  <p%col;>
   <b>%message.ident;</b>
   %if;(message.email != "")%nn;
     <a href="mailto:%message.email;">%message.email;</a>%end;
@@ -139,7 +157,7 @@
   %end;
   <i>%message.time;</i>
   </p>
-  <dl><dd>
+  <dl%col;><dd>
     %if;(message.wiki = "on")%message.text.wiki;
     %else;%message.text.nowiki;%end;
   </dd></dl>
@@ -173,6 +191,7 @@
   %let;to;%if;(evar.to != "")%evar.to;%else;-1%end;%in;
   <table border="%border;">
   %foreach;message(to, len)
+    %let;col;%if;message.is_waiting; style="color:red"%end;%in;
     %if;(message.date != message.prev_date)
       %if;(message.prev_date != "" and
            message.date.month != message.prev_date.month)
@@ -180,12 +199,12 @@
       %end;
       <tr align="%left;"><td colspan="4">%message.date;</td></tr>
     %end;
-    <tr align="%left;">
+    <tr align="%left;"%col;>
     <td><tt>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
             &nbsp;</tt></td>
     <td><tt>%message.hour;</tt></td>
     <td><a href="%prefix;m=FORUM;p=%message.pos;
-         "%if;(message.prev_date = "") accesskey="1"%end;
+         "%if;(message.prev_date = "") accesskey="1"%end;%col;
 	 ><b>%message.ident.cut.26;
         </b></a></td>
     <td>%nn;

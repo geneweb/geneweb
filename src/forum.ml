@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.79 2005-09-07 20:57:35 ddr Exp $ *)
+(* $Id: forum.ml,v 4.80 2005-10-04 23:11:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -12,6 +12,7 @@ type message =
   { m_time : string;
     m_date : date;
     m_hour : string;
+    m_waiting : bool;
     m_ident : string;
     m_wizard : string;
     m_friend : string;
@@ -45,77 +46,7 @@ module type MF =
   end
 ;
 
-(*
-module MF1 : MF =
-  struct
-    type in_chan = in_channel;
-    type filename = string;
-    type pos = int;
-    value filename_of_string x = x;
-    value last_pos = in_channel_length;
-    value not_a_pos = -1;
-    value prev_pos pos = pos - 1;
-    value next_pos pos = pos + 1;
-    value string_of_pos pos =
-      if pos = not_a_pos then "" else string_of_int pos
-    ;
-    value pos_of_string s =
-      try int_of_string s with [ Failure _ -> not_a_pos ]
-    ;
-    value extend fname f =
-      let tmp = fname ^ "~" in
-      let oc = open_out tmp in
-      do {
-        try f oc with e -> do { close_out oc; raise e };
-        match try Some (open_in fname) with [ Sys_error _ -> None ] with
-        [ Some ic ->
-            do {
-              try while True do { output_char oc (input_char ic) } with
-              [ End_of_file -> () ];
-              close_in ic;
-            }
-        | None -> () ];
-        close_out oc;
-        try Sys.remove fname with [ Sys_error _ -> () ];
-        Sys.rename tmp fname;
-      }
-    ;
-    value patch fname pos str =
-      match try Some (open_in fname) with [ Sys_error _ -> None ] with
-      [ Some ic ->
-          let tmp_fname = fname ^ "~" in
-          let oc = open_out tmp_fname in
-          let ic_len = in_channel_length ic in
-          do {
-            loop 0 where rec loop i =
-              if i = ic_len then ()
-              else
-                let c = input_char ic in
-                do {
-                  if i < ic_len - pos || i >= ic_len - pos + String.length str
-                  then
-                    output_char oc c
-                  else output_char oc str.[i-ic_len+pos];
-                  loop (i + 1);
-                };
-            close_in ic;
-            close_out oc;
-            try Sys.remove fname with [ Sys_error _ -> () ];
-            Sys.rename tmp_fname fname;
-          }
-      | None -> () ]
-    ;
-    value open_in = open_in_bin;
-    value input_char = input_char;
-    value input_line = input_line;
-    value close_in = close_in;
-    value rpos_in ic = in_channel_length ic - pos_in ic;
-    value rseek_in ic pos = seek_in ic (in_channel_length ic - pos);
-  end
-;
-*)
-
-module MF2 : MF =
+module MF : MF =
   struct
     type in_chan = {
       ic_fname : string;
@@ -255,8 +186,6 @@ module MF2 : MF =
   end
 ;
 
-module MF = MF2;
-
 value forum_file conf =
   let fn = Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum" in
   MF.filename_of_string fn
@@ -348,6 +277,7 @@ value read_message conf ic =
       with
       [ Failure _ | Invalid_argument _ -> Dtext date ]
     in
+    let (moderator, s) = get_var ic "Moderator:" s in
     let (_, s) = get_var ic "From:" s in
     let (ident, s) = get_var ic "Ident:" s in
     let (wizard, s) = get_var ic "Wizard:" s in
@@ -365,9 +295,10 @@ value read_message conf ic =
           get_mess (Buff.mstore len s) (MF.input_line ic)
         else (Buff.get len, s)
     in
+    let waiting = String.length moderator > 0 && moderator.[0] = '.' in
     let mess =
-      {m_time = time; m_date = date; m_hour = hour; m_ident = ident;
-       m_wizard = wizard; m_friend = friend; m_email = email;
+      {m_time = time; m_waiting = waiting; m_date = date; m_hour = hour;
+       m_ident = ident; m_wizard = wizard; m_friend = friend; m_email = email;
        m_access = access; m_subject = subject; m_wiki = wiki; m_mess = mess}
     in
     let accessible =
@@ -382,9 +313,7 @@ value read_message conf ic =
 
 value get_message conf pos =
   let fname = forum_file conf in
-  match
-    try Some (MF.open_in fname) with [ Sys_error _ -> None ]
-  with
+  match try Some (MF.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do {
         MF.rseek_in ic pos;
@@ -474,9 +403,31 @@ value html_highlight case_sens h s =
       | None -> loop False (i + 1) (Buff.store len s.[i]) ]
 ;
 
+value moderators conf =
+  match p_getenv conf.base_env "moderator_file" with
+  [ None | Some "" -> []
+  | Some fname ->
+      let fname = Util.base_path [] fname in
+      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          let list =
+            loop [] where rec loop list =
+              match try Some (input_line ic) with [ End_of_file -> None ] with
+              [ Some line -> loop [line :: list]
+              | None -> List.rev list ]
+          in
+          do { close_in ic; list }
+      | None -> [] ] ]
+;
+
+value is_moderator conf =
+  conf.wizard && List.mem conf.user (moderators conf)
+;
+
 value rec eval_var conf base env xx loc =
   fun
   [ ["can_post"] -> VVbool (can_post conf)
+  | ["is_moderated_forum"] -> VVbool (moderators conf <> [])
   | ["message" :: sl] -> eval_message_var conf env sl
   | ["pos"] ->
       match get_env "pos" env with
@@ -505,16 +456,22 @@ and eval_message_var conf env =
       match get_env "mess" env with
       [ Vmess mess _ _ _ so -> eval_message_string_var conf mess.m_ident so sl
       | _ -> raise Not_found ]
+  | ["is_waiting"] ->
+      match get_env "mess" env with
+      [ Vmess mess _ _ _ _ -> VVbool mess.m_waiting
+      | _ -> raise Not_found ]
   | ["next_pos"] ->
       match get_env "mess" env with
       [ Vmess _ _ pos _ _ ->
           loop pos where rec loop pos =
             let back_pos = backward_pos conf pos in
             match get_message conf back_pos with
-            [ Some (a, _, _, _) ->
+            [ Some (acc, mess, _, _) ->
                 if back_pos = pos then VVstring ""
-                else if not a then loop back_pos
-                else VVstring (MF.string_of_pos back_pos)
+                else if acc && (not mess.m_waiting || is_moderator conf) then
+                  VVstring (MF.string_of_pos back_pos)
+                else
+                  loop back_pos
             | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["pos"] ->
@@ -533,9 +490,10 @@ and eval_message_var conf env =
       [ Vmess _ _ pos next_pos _ ->
           loop next_pos where rec loop next_pos =
             match get_message conf next_pos with
-            [ Some (a, _, next_pos, next_next_pos) ->
-                if not a then loop next_next_pos
-                else VVstring (MF.string_of_pos next_pos)
+            [ Some (acc, mess, next_pos, next_next_pos) ->
+                if acc && (not mess.m_waiting || is_moderator conf) then
+                  VVstring (MF.string_of_pos next_pos)
+                else loop next_next_pos
             | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
@@ -641,8 +599,8 @@ value print_foreach conf base print_ast eval_expr =
             let pos = MF.rpos_in ic in
             match read_message conf ic with
             [ Some (mess, accessible) ->
-                if not accessible then loop prev_mess i
-                else
+                if accessible && (not mess.m_waiting || is_moderator conf)
+                then
                   let next_pos = MF.rpos_in ic in
                   let vmess = Vmess mess prev_mess pos next_pos None in
                   let env = [("mess", vmess) :: env] in
@@ -650,6 +608,7 @@ value print_foreach conf base print_ast eval_expr =
                     List.iter (print_ast env ()) al;
                     loop (Some mess) (i + 1);
                   }
+                else loop prev_mess i
             | None -> MF.not_a_pos ]
         in
         do {
@@ -669,8 +628,8 @@ value print_foreach conf base print_ast eval_expr =
 value print_forum_message conf base r so =
   let env =
     match r with
-    [ Some (a, mess, pos, next_pos) ->
-        if a then
+    [ Some (acc, mess, pos, next_pos) ->
+        if acc && (not mess.m_waiting || is_moderator conf) then
           [("mess", Vmess mess None pos next_pos so);
            ("pos", Vpos (ref pos))]
         else [("pos", Vpos (ref MF.not_a_pos))]
@@ -712,7 +671,7 @@ value get1 conf key =
   [ Not_found -> failwith (key ^ " unbound") ]
 ;
 
-value forum_add conf base ident comm =
+value forum_add conf base moderated ident comm =
   let email = Gutil.strip_spaces (get conf "Email") in
   let subject = Gutil.strip_spaces (get conf "Subject") in
   let access =
@@ -729,6 +688,7 @@ value forum_add conf base ident comm =
          do {
            fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
              conf.today.year conf.today.month conf.today.day hh mm ss;
+           fprintf oc "Moderator: ....................\n";
            fprintf oc "From: %s\n" conf.from;
            fprintf oc "Ident: %s\n" ident;
            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
@@ -769,9 +729,16 @@ value print_add_ok conf base =
     in
     try
       do {
-        forum_add conf base ident comm;
+        let mods = moderators conf in
+        forum_add conf base (mods <> []) ident comm;
         header conf title;
         print_link_to_welcome conf True;
+        if mods <> [] then do {
+          Wserver.wprint "<p>%s. %s.</p>"
+            (capitale (transl conf "this forum is moderated"))
+            (capitale (transl conf "your message is waiting for validation"));
+        }
+        else ();
         Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
           (capitale (transl conf "database forum"));
         trailer conf;
@@ -822,6 +789,95 @@ value print_del conf base =
   [ Some pos -> delete_forum_message conf base (MF.pos_of_string pos)
   | None -> print_forum_headers conf base ]
 ;
+
+(* validate *)
+
+value set_validator conf base pos =
+  let fname = forum_file conf in
+  match try Some (MF.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      do {
+        MF.rseek_in ic pos;
+        let _ = MF.input_line ic in
+        let pos = MF.rpos_in ic in
+        let s = MF.input_line ic in
+        let (moderator, _) = get_var ic "Moderator:" s in
+        MF.close_in ic;
+        if moderator <> "" && moderator.[0] = '.' then do {
+          let m =
+            let len = String.length moderator in
+            if String.length conf.user < len - 1 then conf.user
+            else String.sub conf.user 0 (len - 1)
+          in           
+          MF.patch fname pos (sprintf "Moderator: /%s" m);
+          True
+        }
+        else False
+      }
+  | None -> False ]
+;
+
+value message_txt conf n =
+   transl_nth conf "message/previous message/previous messages/next message"
+     n
+;
+
+value print_valid_ok conf base pos del =
+  let mess =
+    if del then transl conf "message deleted"
+    else transl conf "message added"
+  in
+  let title _ = Wserver.wprint "%s" (capitale mess) in
+  let next_pos =
+    loop pos where rec loop pos =
+      let back_pos = backward_pos conf pos in
+      match get_message conf back_pos with
+      [ Some (acc, mess, _, _) ->
+          if back_pos = pos then None
+          else if acc then Some back_pos
+          else loop back_pos
+      | None -> None ]
+  in
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    match next_pos with
+    [ Some pos ->
+        Wserver.wprint "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
+         (MF.string_of_pos pos) (capitale (message_txt conf 3))
+    | None ->
+        Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+         (capitale (transl conf "database forum")) ];
+    trailer conf;
+  }
+;
+
+value valid_forum_message conf base pos =
+  match get_message conf pos with
+  [ Some (a, m, _, _) ->
+      if a && conf.wizard && List.mem conf.user (moderators conf) then do {
+        let del =
+          match p_getenv conf.env "d" with
+          [ Some "" | None -> False
+          | Some _ -> True ]
+        in
+        if set_validator conf base pos then do {
+          if del then forum_del conf base pos else ();
+          print_valid_ok conf base pos del;
+        }
+        else print_forum_headers conf base
+      }
+      else print_forum_headers conf base
+  | None -> print_forum_headers conf base ]
+;
+
+value print_valid conf base =
+  match p_getenv conf.env "p" with
+  [ Some pos -> valid_forum_message conf base (MF.pos_of_string pos)
+  | None -> print_forum_headers conf base ]
+;
+
+(* searching *)
 
 value in_message case_sens s m =
   loop False 0 where rec loop in_tag i =
