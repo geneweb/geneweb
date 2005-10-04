@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.53 2005-09-07 03:18:10 ddr Exp $
+# $Id: Makefile,v 4.54 2005-10-04 10:09:24 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -134,7 +134,7 @@ i18n: pr_transl.cmo always
 	sort | uniq | grep -v '^$$' > i18n
 
 ppdef:
-	$(MAKE) ppdef.cmo CAMLP4F= PPDEF=
+	$(MAKE) ppdef.cmo CAMLP4F="-loc loc" PPDEF=
 
 always:
 
