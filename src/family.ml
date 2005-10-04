@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.64 2005-09-02 07:53:51 ddr Exp $ *)
+(* $Id: family.ml,v 4.65 2005-10-04 23:11:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -390,6 +390,7 @@ value family_m conf base =
   | Some "FORUM_ADD_OK" -> Forum.print_add_ok conf base
   | Some "FORUM_DEL" -> Forum.print_del conf base
   | Some "FORUM_SEARCH" -> Forum.print_search conf base
+  | Some "FORUM_VAL" -> Forum.print_valid conf base
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
@@ -695,7 +696,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
 
 value this_request_updates_database conf =
   match p_getenv conf.env "m" with
-  [ Some ("FORUM_ADD_OK" | "FORUM_DEL") -> True
+  [ Some ("FORUM_ADD_OK" | "FORUM_DEL" | "FORUM_VAL") -> True
   | Some x when conf.wizard ->
       match x with
       [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
