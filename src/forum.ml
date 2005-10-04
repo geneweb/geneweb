@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.80 2005-10-04 23:11:53 ddr Exp $ *)
+(* $Id: forum.ml,v 4.81 2005-10-04 23:31:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -688,7 +688,8 @@ value forum_add conf base moderated ident comm =
          do {
            fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
              conf.today.year conf.today.month conf.today.day hh mm ss;
-           fprintf oc "Moderator: ....................\n";
+           if moderated then fprintf oc "Moderator: ....................\n"
+           else ();
            fprintf oc "From: %s\n" conf.from;
            fprintf oc "Ident: %s\n" ident;
            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
