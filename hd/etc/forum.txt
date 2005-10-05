@@ -1,10 +1,10 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.18 2005-10-04 23:11:53 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.19 2005-10-05 22:44:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
-    %if;(evar.m = "FORUM_ADD")%nn;
+    %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
       %if;can_post;
         [*add::message/previous message/previous messages/next message]0%nn;
       %else;
@@ -61,47 +61,120 @@
   </td></tr></table>
 %end;
 
-%if;(evar.m = "FORUM_ADD") 
+%if;(evar.m = "FORUM_ADD")
   %( add a message %)
   %if;can_post;
     <h1 style="text-align:center" class="highlight">%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
-    %if;is_moderated_forum;<p><u>[*this forum is moderated].</u></p>%end;%nl;
-    <form method="POST" action="%action;">
+    <table width="100%%"><tr><td align="center">
+    <table border="1"><tr><td>
+      <form method="POST" action="%action;">
+      <p>
+        %hidden;
+        <input type="hidden" name="m" value="FORUM_ADD_OK"%/>
+      </p>
+      <table border="%border;">
+      <tr align="%left;">
+        <td>[*ident/email/subject]0</td>
+        <td><input name="Ident" size="60" maxlength="200"%sp;
+             value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/
+             ><td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]1 ([optional])</td>
+        <td><input name="Email" size="60" maxlength="200" value=""%/><td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]2</td>
+        <td><input name="Subject" size="60" maxlength="200" value=""%/><td>
+      </tr>
+      </table>
+      <p>
+      [*message/previous message/previous messages/next message]0
+      <br%/>
+      <textarea name="Text" rows="15" cols="100"></textarea>
+      <br%/>
+      <input type="submit" name="visu"%sp;
+       value="[visualize/show/hide/summary]0"%/>
+      </p>
+      </form>
+    </td></tr></table>
+    </td></tr></table>
+  %else;
+    <h1 style="text-align:center" class="highlight">%nn;
+      [*incorrect request]
+    </h1>
+  %end;
+%elseif;(evar.m = "FORUM_ADD_OK")
+  %( visualize a message before post %)
+  %if;can_post;
+    <h1 style="text-align:center" class="highlight">%nn;
+      [*add::message/previous message/previous messages/next message]0%nn;
+    </h1>
     <p>
-      %hidden;
-      <input type="hidden" name="m" value="FORUM_ADD_OK"%/>
-    </p>
-    <table border="%border;">
-    <tr align="%left;">
-      <td>[*ident/email/subject]0</td>
-      <td><input name="Ident" size="60" maxlength="200"%sp;
-           value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/
-	   ><td>
-    </tr>
-    <tr align="%left;">
-      <td>[*ident/email/subject]1 ([optional])</td>
-      <td><input name="Email" size="60" maxlength="200" value=""%/><td>
-    </tr>
-    <tr align="%left;">
-      <td>[*ident/email/subject]2</td>
-      <td><input name="Subject" size="60" maxlength="200" value=""%/><td>
-    </tr>
-    </table>
-    <p>
-    [*message/previous message/previous messages/next message]0
-    <br%/>
-    <textarea name="Text" rows="15" cols="80"></textarea>
-    <br%/>
-    %if;(wizard or friend)
-      <input type="submit" name="publ_acc" value="[public]"%/>
-      <input type="submit" name="priv_acc" value="[private]"%/>
-    %else;
-      <input type="submit" value="Ok">
+    %if;(message.ident != "" and message.text != "")
+      <b>%message.ident;</b>
+      %if;(message.email != "")%nn;
+        <a href="mailto:%message.email;">%message.email;</a>%end;
+      <br%/>
+      %if;(message.subject != "")
+        <b>[*ident/email/subject]2: %message.subject;</b>
+        <br%/>
+      %end;
+      %if;(message.access = "priv")
+        <b>[*access]: [private]</b>
+        <br%/>
+      %end;
+      <i>%message.time;</i>
+      </p>
+      <dl><dd>
+        %message.text.wiki;
+      </dd></dl>
     %end;
-    </p>
-    </form>
+    <table width="100%%"><tr><td align="center">
+    <table border="1"><tr><td>
+      <form method="POST" action="%action;">
+      <p>
+        %hidden;
+        <input type="hidden" name="m" value="FORUM_ADD_OK"%/>
+      </p>
+      <table border="%border;">
+      <tr align="%left;">
+        <td>[*ident/email/subject]0</td>
+        <td><input name="Ident" size="60" maxlength="200"%sp;
+             value="%message.ident;"%/><td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]1 ([optional])</td>
+        <td><input name="Email" size="60" maxlength="200" value="%nn;
+             %message.email;"%/><td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]2</td>
+        <td><input name="Subject" size="60" maxlength="200" value="%nn;
+             %message.subject;"%/><td>
+      </tr>
+      </table>
+      <p>
+      [*message/previous message/previous messages/next message]0
+      <br%/>
+      <textarea name="Text" rows="15" cols="100">%message.text;</textarea>
+      <br%/>
+      <input type="submit" name="visu"%sp;
+       value="[visualize/show/hide/summary]0"%/>
+      %if;(message.ident != "" and message.text != "")
+        %if;(wizard or friend)
+          <input type="submit" name="publ_acc" value="[public]"%/>
+          <input type="submit" name="priv_acc" value="[private]"%/>
+        %else;
+          <input type="submit" value="Ok">
+        %end;
+      %end;
+      </p>
+      </form>
+    </td></tr></table>
+    </td></tr></table>
   %else;
     <h1 style="text-align:center" class="highlight">%nn;
       [*incorrect request]
