@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 1.8 2005-09-01 09:53:13 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 1.9 2005-10-05 11:54:49 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -228,14 +228,14 @@
         %end;
         %if;(evar.siblings = "on" and ancestor.is_female and ancestor.same = "")
           %( siblings %)
-          %foreach;ancestor.family;
-            %if;(family.index = ancestor.family.index)
-              %foreach;child;
-                %apply;child_notes("")
+          %if;(ancestor.index != self.index)
+            %foreach;ancestor.family;
+              %if;(family.index = ancestor.family.index)
+                %foreach;child;
+                  %apply;child_notes("")
+                %end;
               %end;
             %end;
-          %end;
-          %if;(ancestor.index != self.index)
             %( father's other families %)
             %foreach;ancestor.spouse.family;
               %if;(spouse.index != ancestor.index)
