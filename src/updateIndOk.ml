@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.38 2005-09-10 10:31:29 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.39 2005-10-05 21:44:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -188,21 +188,6 @@ value reconstitute_burial conf burial_place =
   | Some "Buried" -> Buried (Adef.codate_of_od d)
   | Some "Cremated" -> Cremated (Adef.codate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x) ]
-;
-
-value only_printable_or_nl s =
-  let s' = String.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
-      s'.[i] :=
-        if Gutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
-        else
-          match s.[i] with
-          [ ' '..'~' | '\160'..'\255' | '\n' -> s.[i]
-          | _ -> ' ' ]
-    };
-    strip_spaces s'
-  }
 ;
 
 value reconstitute_person conf =
