@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.159 2005-09-22 11:51:23 ddr Exp $ *)
+(* $Id: util.ml,v 4.160 2005-10-05 21:44:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2158,7 +2158,7 @@ value has_image conf base p =
   else False
 ;
 
-value only_printable s =
+value gen_only_printable or_nl s =
   let s' = String.create (String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
@@ -2167,11 +2167,15 @@ value only_printable s =
         else
           match s.[i] with
           [ ' '..'~' | '\160'..'\255' -> s.[i]
+          | '\n' -> if or_nl then '\n' else ' '
           | _ -> ' ' ]
     };
     strip_spaces s'
   }
 ;
+
+value only_printable_or_nl = gen_only_printable True;
+value only_printable = gen_only_printable False;
 
 value relation_type_text conf t n =
   match t with

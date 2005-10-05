@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.81 2005-10-04 23:31:24 ddr Exp $ *)
+(* $Id: forum.ml,v 4.82 2005-10-05 21:44:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -20,7 +20,7 @@ type message =
     m_access : string;
     m_subject : string;
     m_wiki : string;
-    m_mess : string }
+    m_text : string }
 ;
 
 module type MF =
@@ -299,7 +299,7 @@ value read_message conf ic =
     let mess =
       {m_time = time; m_waiting = waiting; m_date = date; m_hour = hour;
        m_ident = ident; m_wizard = wizard; m_friend = friend; m_email = email;
-       m_access = access; m_subject = subject; m_wiki = wiki; m_mess = mess}
+       m_access = access; m_subject = subject; m_wiki = wiki; m_text = mess}
     in
     let accessible =
       if deleted then False
@@ -502,7 +502,7 @@ and eval_message_var conf env =
       | _ -> raise Not_found ]
   | ["text" :: sl] ->
       match get_env "mess" env with
-      [ Vmess m _ _ _ so -> eval_message_text_var conf m.m_mess so sl
+      [ Vmess m _ _ _ so -> eval_message_text_var conf m.m_text so sl
       | _ -> raise Not_found ]
   | ["time" :: sl] ->
       match get_env "mess" env with
@@ -667,13 +667,10 @@ value get conf key =
 ;
 
 value get1 conf key =
-  try Wserver.gen_decode False (List.assoc key conf.env) with
-  [ Not_found -> failwith (key ^ " unbound") ]
+  only_printable_or_nl (Gutil.strip_all_trailing_spaces (get conf key))
 ;
 
-value forum_add conf base moderated ident comm =
-  let email = Gutil.strip_spaces (get conf "Email") in
-  let subject = Gutil.strip_spaces (get conf "Subject") in
+value forum_add conf base moderated mess =
   let access =
     if conf.wizard || conf.friend then
       match p_getenv conf.env "priv_acc" with
@@ -681,7 +678,7 @@ value forum_add conf base moderated ident comm =
       | None -> "publ" ]
     else "publ"
   in
-  if ident <> "" && comm <> "" then
+  if mess.m_ident <> "" && mess.m_text <> "" then
     MF.extend (forum_file conf)
       (fun oc ->
          let (hh, mm, ss) = conf.time in
@@ -691,7 +688,7 @@ value forum_add conf base moderated ident comm =
            if moderated then fprintf oc "Moderator: ....................\n"
            else ();
            fprintf oc "From: %s\n" conf.from;
-           fprintf oc "Ident: %s\n" ident;
+           fprintf oc "Ident: %s\n" mess.m_ident;
            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
            then
              fprintf oc "Wizard: %s\n" conf.user
@@ -699,18 +696,22 @@ value forum_add conf base moderated ident comm =
            if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
              fprintf oc "Friend: %s\n" conf.user
            else ();
-           if email <> "" then fprintf oc "Email: %s\n" email else ();
+           if mess.m_email <> "" then fprintf oc "Email: %s\n" mess.m_email
+           else ();
            fprintf oc "Access: %s\n" access;
-           let subject = if subject = "" then "-" else subject in
+           let subject =
+             if mess.m_subject = "" then "-" else mess.m_subject
+           in
            fprintf oc "Subject: %s\n" subject;
            fprintf oc "Wiki: on\n";
            fprintf oc "Text:\n";
+           let txt = mess.m_text in
            let rec loop i bol =
-             if i == String.length comm then ()
+             if i == String.length txt then ()
              else do {
                if bol then fprintf oc "  " else ();
-               if comm.[i] <> '\r' then output_char oc comm.[i] else ();
-               loop (i + 1) (comm.[i] = '\n')
+               if txt.[i] <> '\r' then output_char oc txt.[i] else ();
+               loop (i + 1) (txt.[i] = '\n')
              }
            in
            loop 0 True;
@@ -719,11 +720,36 @@ value forum_add conf base moderated ident comm =
   else ()
 ;
 
+value visualize conf base mess =
+  let vmess = Vmess mess None MF.not_a_pos MF.not_a_pos None in
+  let env = [("mess", vmess)] in
+  Templ.interp conf base "forum" (eval_var conf base)
+    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
+    get_vother set_vother (print_foreach conf base) env ()
+;
+
 value print_add_ok conf base =
-  let ident = Gutil.strip_spaces (get conf "Ident") in
-  let comm = Gutil.gen_strip_spaces False (get1 conf "Text") in
+  let mess =
+    let time =
+      let (hh, mm, ss) = conf.time in
+      sprintf "%04d-%02d-%02d %02d:%02d:%02d"
+        conf.today.year conf.today.month conf.today.day hh mm ss
+    in
+    let ident = Gutil.strip_spaces (get conf "Ident") in
+    let email = Gutil.strip_spaces (get conf "Email") in
+    let subject = Gutil.strip_spaces (get conf "Subject") in
+    let text = Gutil.gen_strip_spaces False (get1 conf "Text") in
+    {m_time = time; m_date = Dtext ""; m_hour = ""; m_waiting = False;
+     m_ident = ident; m_wizard = ""; m_friend = ""; m_email = email;
+     m_access = ""; m_subject = subject; m_wiki = ""; m_text = text}
+  in
   if not (can_post conf) then incorrect_request conf
-  else if ident = "" || comm = "" then print conf base
+  else if
+    match p_getenv conf.env "visu" with
+    [ Some _ -> True
+    | None -> False ]
+  then visualize conf base mess
+  else if mess.m_ident = "" || mess.m_text = "" then print conf base
   else
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "message added"))
@@ -731,7 +757,7 @@ value print_add_ok conf base =
     try
       do {
         let mods = moderators conf in
-        forum_add conf base (mods <> []) ident comm;
+        forum_add conf base (mods <> []) mess;
         header conf title;
         print_link_to_welcome conf True;
         if mods <> [] then do {
@@ -903,7 +929,7 @@ value search_text conf base s =
         [ Some (m, accessible) ->
             if accessible &&
                List.exists (in_message case_sens s)
-                 [m.m_ident; m.m_subject; m.m_time; m.m_mess]
+                 [m.m_ident; m.m_subject; m.m_time; m.m_text]
             then Some (m, pos)
             else loop ()
         | None -> None ]
