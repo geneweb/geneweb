@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.28 2005-06-24 15:20:56 ddr Exp $
+# $Id: Makefile,v 4.29 2005-10-05 11:25:50 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -12,7 +12,7 @@ include tools/Makefile.inc
 all:: opt
 
 out::
-	cd src; $(MAKE) ppdef.cmo PPDEF= CAMLP4F=
+	cd src; $(MAKE) ppdef
 	cd wserver; $(MAKE) all
 	cd dag2html; $(MAKE) out
 	cd src; $(MAKE) PREFIX=$(PREFIX) all
@@ -23,7 +23,7 @@ out::
 	cd gwtp; $(MAKE) all
 
 opt::
-	cd src; $(MAKE) ppdef.cmo PPDEF= CAMLP4F=
+	cd src; $(MAKE) ppdef
 	cd wserver; $(MAKE) opt
 	cd dag2html; $(MAKE) opt
 	cd src; $(MAKE) PREFIX=$(PREFIX) opt
