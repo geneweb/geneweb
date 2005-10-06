@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 4.52 2005-09-21 11:40:15 ddr Exp $ *)
+(* $Id: wiki.ml,v 4.53 2005-10-06 01:40:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -16,7 +16,9 @@ open Util;
    ** list ul/li item 2nd level
    ** list ul/li item 2nd level
    ...
-   : indentation
+   # list ol/li item
+   : indentation list dl/dd item
+   ; list dl dt item ; dd item
    ''italic''
    '''bold'''
    '''''bold+italic'''''
@@ -326,22 +328,37 @@ value rec tlsw_list tag1 tag2 lev list sl =
     loop list sl where rec loop list =
       fun
       [ [s1 :: ([s2 :: _] as sl)] ->
-          if String.length s2 > 0 && List.mem s2.[0] ['*'; '#'; ':'] then
+          if String.length s2 > 0 && List.mem s2.[0] ['*'; '#'; ':'; ';'] then
             let list = [tab lev btag2 ^ s1 :: list] in
             let (list, sl) = do_sub_list s2.[0] lev list sl in
             loop [tab lev etag2 :: list] sl
           else
-            loop [tab lev btag2 ^ s1 ^ etag2 :: list] sl
-      | [s] -> [tab lev btag2 ^ s ^ etag2 :: list]
+            let (s1, ss1) = sub_sub_list lev tag2 s1 in
+            loop [tab lev btag2 ^ s1 ^ etag2 ^ ss1 :: list] sl
+      | [s1] ->
+          let (s1, ss1) = sub_sub_list lev tag2 s1 in
+          [tab lev btag2 ^ s1 ^ etag2 ^ ss1 :: list]
       | [] -> list ]
   in
   [tab lev ("</" ^ tag1 ^ ">") :: list]
+and sub_sub_list lev tag2 s1 =
+  if tag2 = "dt" && String.contains s1 ':' then
+    let i = String.index s1 ':' in
+    let s = String.sub s1 0 i in
+    let ss =
+      "\n" ^ tab (lev + 1) "<dd>" ^
+      String.sub s1 (i + 1) (String.length s1 - i - 1) ^
+      "</dd>"
+    in
+    (s, ss)
+  else (s1, "")
 and do_sub_list prompt lev list sl =
   let (tag1, tag2) =
     match prompt with
     [ '*' -> ("ul", "li")
     | '#' -> ("ol", "li")
     | ':' -> ("dl", "dd")
+    | ';' -> ("dl", "dt")
     | _ -> assert False ]
   in
   let (list2, sl) =
@@ -357,7 +374,7 @@ and do_sub_list prompt lev list sl =
   let list = tlsw_list tag1 tag2 (lev + 1) list (List.rev list2) in
   match sl with
   [ [s :: _] ->
-      if String.length s > 0 && List.mem s.[0] ['*'; '#'; ':'] then
+      if String.length s > 0 && List.mem s.[0] ['*'; '#'; ':'; ';'] then
         do_sub_list s.[0] lev list sl
       else (list, sl)
   | [] -> (list, sl) ]
@@ -390,7 +407,9 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
           fun
           [ ["" :: sl] -> Some (parag, sl, True)
           | [s :: sl] ->
-              if List.mem s.[0] ['*'; '#'; ':'; '='] || List.mem s toc_list then
+              if List.mem s.[0] ['*'; '#'; ':'; ';'; '='] ||
+                 List.mem s toc_list
+              then
                 if parag = [] then None else Some (parag, [s :: sl], True)
               else if s.[0] = ' ' && parag = [] then
                loop2 [s] sl
@@ -423,6 +442,7 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
           [ '*' -> Some ("ul", "li")
           | '#' -> Some ("ol", "li")
           | ':' -> Some ("dl", "dd")
+          | ';' -> Some ("dl", "dt")
           | _ -> None ]
         else None
       in

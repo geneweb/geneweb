@@ -12,7 +12,7 @@ encoding. By re-creating the database, the new encoding is set.
 The new version number (5.00) is in honour of this new encoding.
 
 * New features : Wiki syntax and miscellaneous Notes
-  - [14 Jul 05] It is now possible to use a specific ("Wiki") syntax
+  - [06 Oct 05] It is now possible to use a specific ("Wiki") syntax
     inside database notes, individual notes, wizard notes and database
     forum. It is also possible to add new "miscelleneous notes". The
     syntax is close to the one used by Wikipedia (see Web). In database
@@ -28,7 +28,10 @@ The new version number (5.00) is in honour of this new encoding.
       are with a fixed size font.
     - Lines starting with one or several '*' are list items. The number
       of '*' is the list level (must start with one '*' then two '**' etc.)
+    - Lines starting with one or several '#' are numbered list items.
     - Lines starting with ':' are indented.
+    - Lines starting with ';' return to new line; if the line contain ':'
+      the part after that ':' is displayed indented in a new line
     - Text between '' are displayed in Italic.
     - Text between ''' are displayed in Bold.
     - Text between ''''' are displayed in Bold-Italic.
@@ -55,6 +58,7 @@ The new version number (5.00) is in honour of this new encoding.
       displayed.
 
 * GeneWeb server or CGI (gwd)
+  - [06 Oct 05] The database forum can be moderated.
   - [02 Sep 05] Added a "search" form in database forum.
   - [17 Aug 05] The pages "statistics", "history of updates", "database
     forum", "calendars", and some pages displaying relationship links by
