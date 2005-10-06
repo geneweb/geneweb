@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.19 2005-10-05 22:44:17 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.20 2005-10-06 00:44:40 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -151,7 +151,7 @@
              %message.email;"%/><td>
       </tr>
       <tr align="%left;">
-        <td>[*ident/email/subject]2</td>
+        <td>[*ident/email/subject]2 ([optional])</td>
         <td><input name="Subject" size="60" maxlength="200" value="%nn;
              %message.subject;"%/><td>
       </tr>
@@ -168,7 +168,7 @@
           <input type="submit" name="publ_acc" value="[public]"%/>
           <input type="submit" name="priv_acc" value="[private]"%/>
         %else;
-          <input type="submit" value="Ok">
+          <input type="submit" value="ok">
         %end;
       %end;
       </p>
