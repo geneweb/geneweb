@@ -312,6 +312,7 @@ the latest %d marriages
 the parents
 the spouse
 the whole list
+this forum is moderated
 title/titles
 to add a child to a family, use "%s"
 to the %s generation
@@ -332,6 +333,7 @@ unspecified
 up to
 update
 use "link" instead of "create"
+validate/delete
 visualize/show/hide/summary
 warnings
 with
@@ -343,3 +345,4 @@ year/month/day
 years old
 you must first merge
 you must first merge the 2 families
+your message is waiting for validation

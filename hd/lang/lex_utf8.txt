@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.69 2005-10-04 23:11:53 ddr Exp $
+# $Id: lex_utf8.txt,v 1.70 2005-10-07 09:40:12 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7150,6 +7150,7 @@ sl: sorodstvo preko poroke
 sv: sl&auml;ktskap genom &auml;ktenskap
 
     search/case sensitive
+bg: търсене/с различаване на главни и малки букви
 ca: recerca/coincidir maj_min
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
