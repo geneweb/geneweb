@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.39 2005-08-19 02:51:39 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.40 2005-10-07 15:31:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -59,9 +59,10 @@ value read_wizard_notes fname =
       let rec loop len =
         match try Some (input_char ic) with [ End_of_file -> None ] with
         [ Some c -> loop (Buff.store len c)
-        | None -> do { close_in ic; (Buff.get (max 0 (len - 1)), date) } ]
+        | None -> do { close_in ic; len } ]
       in
-      loop len
+      let len = loop len in
+      (Buff.get len, date)
   | None -> ("", 0.) ]
 ;
 
@@ -319,7 +320,8 @@ value print conf base =
         let wfile = wzfile (dir conf) wz in
         let (s, date) = read_wizard_notes wfile in
         let edit_opt =
-          if conf.wizard && conf.user = wz then Some ("WIZNOTES", code_varenv wz)
+          if conf.wizard && conf.user = wz then
+            Some ("WIZNOTES", code_varenv wz)
           else None
         in
         match p_getint conf.env "v" with
