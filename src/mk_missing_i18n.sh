@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml camlp4r.cma $0
 *) ".";
-(* $Id: mk_missing_i18n.sh,v 4.13 2005-02-05 18:47:12 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.14 2005-10-07 09:53:03 ddr Exp $ *)
 
 open Printf;
 
@@ -107,7 +107,10 @@ value header lang = printf "<a href=#%s>%s</a>\n" lang lang;
 
 do {
   printf "\
-<head><title>Missing phrases</title></head>
+<head>
+  <title>Missing phrases</title>
+  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">
+</head>
 <body background=\"images/gwback.jpg\">
 <h1>Missing phrases</h1>
 Here are the list of all languages with the missing phrases in the lexicon
