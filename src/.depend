@@ -80,10 +80,10 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     ../wserver/wserver.cmx family.cmi 
 family.cmi: config.cmi 
 forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi name.cmi notes.cmi \
-    templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
+    secure.cmi templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
     ../wserver/wserver.cmi 
 forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx notes.cmx \
-    templ.cmx templAst.cmi update.cmx util.cmx wiki.cmx \
+    secure.cmx templ.cmx templAst.cmi update.cmx util.cmx wiki.cmx \
     ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi secure.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx secure.cmx 
