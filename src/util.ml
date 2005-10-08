@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.160 2005-10-05 21:44:52 ddr Exp $ *)
+(* $Id: util.ml,v 4.161 2005-10-08 04:04:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -303,30 +303,6 @@ value fdecline conf w s =
 
 (* *)
 
-value no_html_tags s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-      [ '<' | '>' -> True
-      | _ -> need_code (i + 1) ]
-    else False
-  in
-  if need_code 0 then
-    let rec loop i len =
-      if i = String.length s then Buff.get len
-      else
-        let (len, next_i) =
-          match s.[i] with
-          [ '<' -> (Buff.mstore len "&lt;", i + 1)
-          | '>' -> (Buff.mstore len "&gt;", i + 1)
-          | c -> (Buff.store len c, i + 1) ]
-        in
-        loop next_i len
-    in
-    loop 0 0
-  else s
-;
-
 value begin_centered conf =
   Wserver.wprint
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
@@ -450,6 +426,30 @@ value quote_escaped s =
   in
   if need_code 0 then
     let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+  else s
+;
+
+value no_html_tags s =
+  let rec need_code i =
+    if i < String.length s then
+      match s.[i] with
+      [ '<' | '>' -> True
+      | _ -> need_code (i + 1) ]
+    else False
+  in
+  if need_code 0 then
+    let rec loop i len =
+      if i = String.length s then Buff.get len
+      else
+        let (len, next_i) =
+          match s.[i] with
+          [ '<' -> (Buff.mstore len "&lt;", i + 1)
+          | '>' -> (Buff.mstore len "&gt;", i + 1)
+          | c -> (Buff.store len c, i + 1) ]
+        in
+        loop next_i len
+    in
+    loop 0 0
   else s
 ;
 
