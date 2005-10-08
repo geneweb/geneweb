@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 4.82 2005-10-05 21:44:52 ddr Exp $ *)
+(* $Id: forum.ml,v 4.83 2005-10-08 04:04:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -560,7 +560,7 @@ and eval_message_string_var conf str so =
       try VVstring (no_html_tags (sp2nbsp (int_of_string s) str)) with
       [ Failure _ -> raise Not_found ]
   | [] ->
-      let s = no_html_tags str in
+      let s = quote_escaped str in
       let s =
         match so with
         [ Some h ->
