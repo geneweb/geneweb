@@ -1,5 +1,4 @@
-(* camlp4r *)
-(* $Id: ppdef.ml,v 4.11 2005-09-21 11:40:15 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.12 2005-10-09 14:45:17 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -91,15 +90,17 @@ value rec eval =
       let f = eval op in
       let x = eval x in
       let y = eval y in
-      match (f, x, y) with
-      [ (<:expr< $lid:"+"$ >>, <:expr< $int:x$ >>, <:expr< $int:y$ >>) ->
+      match (x, y) with
+      [ (<:expr< $int:x$ >>, <:expr< $int:y$ >>) ->
           let x = int_of_string x in
           let y = int_of_string y in
-          <:expr< $int:string_of_int (x + y)$ >>
-      | (<:expr< $lid:"-"$ >>, <:expr< $int:x$ >>, <:expr< $int:y$ >>) ->
-          let x = int_of_string x in
-          let y = int_of_string y in
-          <:expr< $int:string_of_int (x - y)$ >>
+          match f with
+          [ <:expr< $lid:"+"$ >> -> <:expr< $int:string_of_int (x + y)$ >>
+          | <:expr< $lid:"-"$ >> -> <:expr< $int:string_of_int (x - y)$ >>
+          | <:expr< $lid:"lor"$ >> ->
+              let s = Printf.sprintf "0o%o" (x lor y) in
+              <:expr< $int:s$ >>
+          | _ -> cannot_eval op ]
       | _ -> cannot_eval op ]
   | <:expr< $uid:x$ >> as e ->
       try
@@ -131,7 +132,8 @@ value define eo x =
     [ Some ([], e) ->
         EXTEND
           expr: LEVEL "simple"
-            [ [ UIDENT $x$ -> Pcaml.expr_reloc (fun _ -> loc) (fst gloc) e ] ]
+            [ [ UIDENT $x$ ->
+                  may_eval (Pcaml.expr_reloc (fun _ -> loc) (fst gloc) e) ] ]
           ;
           patt: LEVEL "simple"
             [ [ UIDENT $x$ ->
