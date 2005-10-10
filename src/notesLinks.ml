@@ -1,9 +1,9 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 1.13 2005-09-21 05:42:32 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 1.14 2005-10-10 10:49:50 ddr Exp $ *)
 
 open Def;
 
-value magic_notes_links = "GWNL0008";
+value magic_notes_links = "GWNL0009";
 type page =
   [ PgInd of iper
   | PgNotes
@@ -11,7 +11,7 @@ type page =
   | PgWizard of string ]
 ;
 type key = (string * string * int);
-type ind_link = { lnTxt : string; lnPos : int };
+type ind_link = { lnTxt : option string; lnPos : int };
 type notes_links_db = list (page * (list string * list (key * ind_link)));
 
 value char_dir_sep = ':';
@@ -36,7 +36,7 @@ value check_file_name s =
 
 type wiki_link =
   [ WLpage of int and (list string * string) and string and string and string
-  | WLperson of int and key and string and string
+  | WLperson of int and key and string and option string
   | WLnone ]
 ;
 
@@ -78,9 +78,10 @@ value misc_notes_link s i =
       let (b, text) =
         try
           let i = String.rindex b ';' in
-          (String.sub b 0 i, String.sub b (i + 1) (String.length b - i - 1))
+          (String.sub b 0 i,
+           Some (String.sub b (i + 1) (String.length b - i - 1)))
         with
-        [ Not_found -> (b, "") ]
+        [ Not_found -> (b, None) ]
       in
       try
         let k = 0 in
@@ -138,6 +139,12 @@ value share ht s =
   [ Not_found -> do { Hashtbl.add ht s s; s } ]
 ;
 
+value option f =
+  fun
+  [ Some x -> Some (f x)
+  | None -> None ]
+;
+
 value share_strings db =
   let ht = Hashtbl.create 103 in
   List.map
@@ -153,7 +160,7 @@ value share_strings db =
          List.map
            (fun ((fn, sn, oc), {lnTxt = txt; lnPos = pos}) ->
               ((share ht fn, share ht sn, oc),
-               {lnTxt = share ht txt; lnPos = pos}))
+               {lnTxt = option (share ht) txt; lnPos = pos}))
            list_ind
        in
        (page, (list_nt, list_ind)))
