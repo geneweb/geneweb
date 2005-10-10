@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.206 2005-09-21 09:56:59 ddr Exp $ *)
+(* $Id: perso.ml,v 4.207 2005-10-10 10:49:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -712,35 +712,39 @@ value linked_page_text conf base p s key str (pg, (_, il)) =
                if v = "" then raise Not_found
                else Util.nth_field v (Util.index_of_sex p.sex)
              in
-             let v =
-               let text = text.NotesLinks.lnTxt in
-               if text <> "" then
-                 loop 0 0 where rec loop i len =
-                   if i = String.length text then Buff.get len
-                   else if text.[i] = '*' then
-                     loop (i + 1) (Buff.mstore len v)
-                   else loop (i + 1) (Buff.store len text.[i])
-               else v
-             in
-             let str1 =
-               let (a, b, c) =
-                 try
-                   let i = String.index v '{' in
-                   let j = String.index v '}' in
-                   let a = String.sub v 0 i in
-                   let b = String.sub v (i + 1) (j - i - 1) in
-                   let c =
-                     String.sub v (j + 1) (String.length v - j - 1)
+             match text.NotesLinks.lnTxt with
+             [ Some "" -> str
+             | _ ->
+                 let str1 =
+                   let v =
+                     let text = text.NotesLinks.lnTxt in
+                     match text with
+                     [ Some text ->
+                         loop 0 0 where rec loop i len =
+                           if i = String.length text then Buff.get len
+                           else if text.[i] = '*' then
+                             loop (i + 1) (Buff.mstore len v)
+                           else loop (i + 1) (Buff.store len text.[i])
+                     | None -> v ]
                    in
-                   (a, b, c)
-                 with
-                 [ Not_found -> ("", v, "") ]
-               in
-               Printf.sprintf
-                 "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
-                 (commd conf) pg text.NotesLinks.lnPos b c
-             in
-             if str = "" then str1 else str ^ ", " ^ str1
+                   let (a, b, c) =
+                     try
+                       let i = String.index v '{' in
+                       let j = String.index v '}' in
+                       let a = String.sub v 0 i in
+                       let b = String.sub v (i + 1) (j - i - 1) in
+                       let c =
+                         String.sub v (j + 1) (String.length v - j - 1)
+                       in
+                       (a, b, c)
+                     with
+                     [ Not_found -> ("", v, "") ]
+                   in
+                   Printf.sprintf
+                     "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
+                     (commd conf) pg text.NotesLinks.lnPos b c
+                 in
+                 if str = "" then str1 else str ^ ", " ^ str1 ]
            with
            [ Not_found -> str ])
         list str
