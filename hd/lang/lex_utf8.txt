@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.71 2005-10-12 08:49:57 ddr Exp $
+# $Id: lex_utf8.txt,v 1.72 2005-10-12 09:04:55 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -9089,6 +9089,12 @@ ro: utilizator/parola/anulare
 sl: uporabnik/geslo/prekliči
 sv: användare/passord/avbryt
 
+    validate/delete
+de: Validieren/Verwerfen
+en: validate/delete
+fr: valider/supprimer
+it: conferma/elimina
+
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
 ca: visualtza/mostra/sumari
@@ -9374,10 +9380,6 @@ sl: najprej morate združiti obe družini
 sv: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
 
     your message is waiting for validation
+de: Ihre Nachricht erwartet Validierung
 en: your message is waiting for validation
 fr: votre message est en attente de validation
-
-    validate/delete
-en: validate/delete
-fr: valider/supprimer
-it: conferma/elimina
