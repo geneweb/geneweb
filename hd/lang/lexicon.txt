@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.246 2005-09-12 08:27:19 ddr Exp $
+# $Id: lexicon.txt,v 4.247 2005-10-12 08:49:58 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -1627,7 +1627,7 @@ fi: kaikki paikat
 fr: tous les domaines
 he:   ëì äî÷åîåú
 is: alla staği
-it: tutti i luogi
+it: tutti i luoghi
 lv: visi îpağumi
 nl: alle plaatsen
 no: alle steder
@@ -2962,7 +2962,7 @@ fi: tietokantafoorumi
 fr: forum de la base de donn&eacute;es
 he:  ãééåï òì îàâø äîéãä äúåìãåúé
 is: umræğur
-it: tribuna della base di dati
+it: forum della base di dati
 lv: datu bâzes "ziòojumu dçlis"
 nl: databank forum
 no: database forum
@@ -3288,7 +3288,7 @@ fi: ei yhteisten sukuhaarojen ryhmittely&auml;
 fr: ne pas regrouper les branches communes
 he:  ìà ìùìá òğôé îùôçä îùåúôéí
 is: ekki slá saman sameiginlegum ættingjum
-it: non ragruppare i rami comuni
+it: non raggruppare i rami comuni
 lv: negrupçt kopçjos zarus kopâ
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
@@ -5049,8 +5049,12 @@ sv: sl&auml;ktskap emellan
 
     linked pages
 bg: ñâúğçàíè ñòğàíèöè
+ca: enllaços
+de: vernüpfte Seiten
 en: linked pages
 fr: pages liées
+it: pagine collegate
+nl: gekoppelde paginapt-br: pÃ¡gina associadas
 sv: länkade sidor
 
     list/list (ancestors)
@@ -5515,9 +5519,13 @@ sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande
 
     miscellaneous notes
 bg: ğàçíè áåëåæêè
+ca: miscel·lània
+de: diverse Notizen
 en: miscellaneous notes
 fr: notes diverses
 it: note varie
+nl: diversen
+pt-br: notas diversas
 sv: blandade noteringar
 
     missing ancestors
@@ -5604,6 +5612,7 @@ sv: m&aring;nader
     moon age/new moon/first quarter/full moon/last quarter
 af: maanfase/nuwemaan/eerste kwartier/volmaan/laaste kwartier
 bg: ëóííà ôàçà/íîâîëóíèå/ïúğâà ÷åòâúğò/ïúëíîëóíèå/ïîñëåäíà ÷åòâúğò
+ca: fase lunar/lluna nova/quart creixent/lluna plena/quart minvant
 cs: mìsíèní fáze/nov/první ètvrt'/úplnìk/poslední ètvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
@@ -7152,8 +7161,15 @@ sl: sorodstvo preko poroke
 sv: sl&auml;ktskap genom &auml;ktenskap
 
     search/case sensitive
+bg: òúğñåíå/ñ ğàçëè÷àâàíå íà ãëàâíè è ìàëêè áóêâè
+ca: recerca/coincidir maj_min
+de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
 fr: rechercher/sensible à la casse
+it: ricerca/sensibile a maiuscole e minuscole
+nl: zoeken/hoofdlettergevoelig
+pt-br: procurar/diferencia maiÃºsculas
+sv: sök/skiftlägeskänslig
 
     see
 af: sien
@@ -7253,7 +7269,7 @@ fi: l&auml;het&auml;
 fr: envoyer
 he:  ùìç
 is: senda
-it: mandare
+it: inviare
 lv: sûtît
 nl: zenden +before
 no: send
@@ -7523,7 +7539,7 @@ fi: l&auml;hde/l&auml;hteet
 fr: source/sources
 he:  î÷åø/ î÷åøåú
 is: heimild/heimildir
-it: sorgente/sorgenti
+it: fonte/fonti
 lv: avots/avoti (pirmsâkums?)
 nl: bron/bronnen
 no: kilde/kilder
@@ -7843,6 +7859,7 @@ sv: de %d f&ouml;rnamnen
     the %d oldest couples perhaps still alive and engaged
 af: die %d oudste pare moontlik nog in lewe en verloof
 bg: íàé-îòäàâíàøíèòå %d äâîéêè îò åâåíòóàëíî îùå æèâè è ñãîäåíè ëèöà
+ca: les parelles més grans potser encara vives i juntes
 cs: %d nejstar¹ích párù pravdìpodobnì ¾ijících a zadanıch
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
@@ -8514,6 +8531,11 @@ ru: öåëûé ñïèñîê
 sl: celoten seznam
 sv: hela listan
 
+    this forum is moderated
+en: this forum is moderated
+fr: ce forum est modéré
+it: questo forum è moderato
+
     title/titles
 af: titel/titels
 bg: òèòëà/òèòëè
@@ -9078,10 +9100,12 @@ sv: användare/passord/avbryt
 
     visualize/show/hide/summary
 bg: äà ñå âèçóàëèçèğà/äà ñå ïîêàæå/äà ñå ñêğèå/ğåçşìå
+ca: visualtza/mostra/sumari
 de: veranschaulichen/einblenden/ausblenden/Inhalt
 en: visualize/show/hide/summary
 fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
+nl: visualiseren/tonen/verbergen/samenvatting
 pt: visualizar/mostrar/esconder/sumário
 sv: visualisera/visa/g&ouml;m/summering
 
@@ -9355,3 +9379,12 @@ ro: trebuie intai sa unesti cele doua familii
 ru: âû äîëæíû ñíà÷àëà îáúåäèíèòü 2 ñåìüè
 sl: najprej morate zdru¾iti obe dru¾ini
 sv: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
+
+    your message is waiting for validation
+en: your message is waiting for validation
+fr: votre message est en attente de validation
+
+    validate/delete
+en: validate/delete
+fr: valider/supprimer
+it: conferma/elimina

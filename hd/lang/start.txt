@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.76 2005-08-16 09:25:24 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.77 2005-10-12 08:49:58 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <!-- This file is kept by compatibility to allow displaying databases
        created before version 5.00. -->
@@ -327,7 +327,7 @@ fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
 fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
 he: ğååè áîàâø îéãä òì-éãé çéôåñ:
 is: Í şessum gagnagrunni getur şú leitağ:
-it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
+it: Per sfogliare questa base di dati, si pu&ograve; fare una ricerca:
 lv: Jûs variet meklçt ğinî datu bâzç:
 nl: Om deze databank te consulteren, kan u een opzoeking doen:
 no: For &aring; navigere i databasen, kan du s&oslash;ke:

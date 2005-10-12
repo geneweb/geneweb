@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.23 2005-08-07 22:38:29 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.24 2005-10-12 08:49:58 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -329,7 +329,7 @@ fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
 fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
 he: נווט במאגר מידה על-ידי חיפוס:
 is: Í þessum gagnagrunni getur þú leitað:
-it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
+it: Per sfogliare questa base di dati, si pu&ograve; fare una ricerca:
 lv: Jūs variet meklēt šinī datu bāzē:
 nl: Om deze databank te consulteren, kan u een opzoeking doen:
 no: For &aring; navigere i databasen, kan du s&oslash;ke:
