@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.70 2005-10-07 09:40:12 ddr Exp $
+# $Id: lex_utf8.txt,v 1.71 2005-10-12 08:49:57 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -1604,7 +1604,7 @@ fi: kaikki paikat
 fr: tous les domaines
 he:   כל המקומות
 is: alla staði
-it: tutti i luogi
+it: tutti i luoghi
 lv: visi īpašumi
 nl: alle plaatsen
 no: alle steder
@@ -2943,7 +2943,7 @@ fi: tietokantafoorumi
 fr: forum de la base de donn&eacute;es
 he:  דייון על מאגר המידה התולדותי
 is: umræður
-it: tribuna della base di dati
+it: forum della base di dati
 lv: datu bāzes "ziņojumu dēlis"
 nl: databank forum
 no: database forum
@@ -3270,7 +3270,7 @@ fi: ei yhteisten sukuhaarojen ryhmittely&auml;
 fr: ne pas regrouper les branches communes
 he:  לא לשלב ענפי משפחה משותפים
 is: ekki slá saman sameiginlegum ættingjum
-it: non ragruppare i rami comuni
+it: non raggruppare i rami comuni
 lv: negrupēt kopējos zarus kopā
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
@@ -5036,6 +5036,7 @@ ca: enllaços
 de: vernüpfte Seiten
 en: linked pages
 fr: pages liées
+it: pagine collegate
 nl: gekoppelde pagina’s
 pt-br: página associadas
 sv: länkade sidor
@@ -7155,6 +7156,7 @@ ca: recerca/coincidir maj_min
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
 fr: rechercher/sensible à la casse
+it: ricerca/sensibile a maiuscole e minuscole
 nl: zoeken/hoofdlettergevoelig
 pt-br: procurar/diferencia maiúsculas
 sv: sök/skiftlägeskänslig
@@ -7257,7 +7259,7 @@ fi: l&auml;het&auml;
 fr: envoyer
 he:  שלח
 is: senda
-it: mandare
+it: inviare
 lv: sūtīt
 nl: zenden +before
 no: send
@@ -7527,7 +7529,7 @@ fi: l&auml;hde/l&auml;hteet
 fr: source/sources
 he:  מקור/ מקורות
 is: heimild/heimildir
-it: sorgente/sorgenti
+it: fonte/fonti
 lv: avots/avoti (pirmsākums?)
 nl: bron/bronnen
 no: kilde/kilder
@@ -8523,6 +8525,7 @@ sv: hela listan
     this forum is moderated
 en: this forum is moderated
 fr: ce forum est modéré
+it: questo forum è moderato
 
     title/titles
 af: titel/titels
@@ -9377,3 +9380,4 @@ fr: votre message est en attente de validation
     validate/delete
 en: validate/delete
 fr: valider/supprimer
+it: conferma/elimina
