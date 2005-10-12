@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.72 2005-10-12 09:04:55 ddr Exp $
+# $Id: lex_utf8.txt,v 1.73 2005-10-12 09:09:59 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -8523,6 +8523,7 @@ sl: celoten seznam
 sv: hela listan
 
     this forum is moderated
+ca: aquest fòrum té moderador
 en: this forum is moderated
 fr: ce forum est modéré
 it: questo forum è moderato
@@ -9090,6 +9091,7 @@ sl: uporabnik/geslo/prekliči
 sv: användare/passord/avbryt
 
     validate/delete
+ca: validar/eliminar
 de: Validieren/Verwerfen
 en: validate/delete
 fr: valider/supprimer
