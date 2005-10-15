@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 1.20 2005-10-06 00:44:40 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 1.21 2005-10-15 03:22:05 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -86,7 +86,7 @@
         <td><input name="Email" size="60" maxlength="200" value=""%/><td>
       </tr>
       <tr align="%left;">
-        <td>[*ident/email/subject]2</td>
+        <td>[*ident/email/subject]2 ([optional])</td>
         <td><input name="Subject" size="60" maxlength="200" value=""%/><td>
       </tr>
       </table>
@@ -141,7 +141,8 @@
       </p>
       <table border="%border;">
       <tr align="%left;">
-        <td>[*ident/email/subject]0</td>
+        <td%if;(message.ident = "") style="color:red"%end;
+        >[*ident/email/subject]0</td>
         <td><input name="Ident" size="60" maxlength="200"%sp;
              value="%message.ident;"%/><td>
       </tr>
@@ -157,7 +158,8 @@
       </tr>
       </table>
       <p>
-      [*message/previous message/previous messages/next message]0
+      <span%if;(message.text = "") style="color:red"%end;>
+      [*message/previous message/previous messages/next message]0</span>
       <br%/>
       <textarea name="Text" rows="15" cols="100">%message.text;</textarea>
       <br%/>
