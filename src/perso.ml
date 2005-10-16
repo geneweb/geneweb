@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.207 2005-10-10 10:49:50 ddr Exp $ *)
+(* $Id: perso.ml,v 4.208 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -121,7 +121,7 @@ value name_equiv n1 n2 =
   n1 = n2 || n1 = Tmain && n2 = Tnone || n1 = Tnone && n2 = Tmain
 ;
 
-value nobility_titles_list conf p =
+value nobility_titles_list conf base p =
   let titles =
     List.fold_right
       (fun t l ->
@@ -139,7 +139,7 @@ value nobility_titles_list conf p =
              [(t.t_nth, t.t_name, t.t_ident, t.t_place,
                [(t_date_start, t_date_end)]) ::
               l] ])
-      p.titles []
+      (nobtit conf base p) []
   in
   List.fold_right
     (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
@@ -156,7 +156,7 @@ value nobility_titles_list conf p =
 (* obsolete; should be removed one day *)
 
 value string_of_titles conf base cap and_txt p =
-  let titles = nobility_titles_list conf p in
+  let titles = nobility_titles_list conf base p in
   List.fold_left
     (fun s t ->
        s ^ (if s = "" then "" else ",") ^ "\n" ^
@@ -1537,7 +1537,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
       | None ->
           warning_use_has_parents_before_parent loc "mother" (str_val "") ]
   | ["nobility_title" :: sl] ->
-      match Util.main_title base p with
+      match Util.main_title conf base p with
       [ Some t when p_auth ->
           let id = sou base t.t_ident in
           let pl = sou base t.t_place in
@@ -1645,7 +1645,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
   | "has_first_names_aliases" -> p.first_names_aliases <> []
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
-  | "has_nobility_titles" -> p_auth && p.titles <> []
+  | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
   | "has_notes" -> p_auth && sou base p.notes <> ""
   | "has_occupation" -> p_auth && sou base p.occupation <> ""
   | "has_parents" -> parents a <> None
@@ -1834,7 +1834,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "mother_age_at_birth" -> string_of_parent_age conf base ep mother
   | "misc_names" ->
       if p_auth then
-        let list = Gutil.person_misc_names base p in
+        let list = Gutil.person_misc_names base p (nobtit conf base) in
         let list =
           let first_name = p_first_name base p in
           let surname = p_surname base p in
@@ -1981,7 +1981,7 @@ and eval_str_family_field conf base env (f, _, _, _) loc =
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
   if p_auth then
-    match main_title base p with
+    match main_title conf base p with
     [ Some t -> titled_person_text conf base p t
     | None -> person_text conf base p ]
   else if conf.hide_names then "x x"
@@ -2415,7 +2415,7 @@ value print_foreach conf base print_ast eval_expr =
         }
   and print_foreach_nobility_title env al ((p, _, _, p_auth) as ep) =
     if p_auth then
-      let titles = nobility_titles_list conf p in
+      let titles = nobility_titles_list conf base p in
       list_iter_first
         (fun first x ->
            let env = [("nobility_title", Vtitle p x) :: env] in

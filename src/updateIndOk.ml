@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.39 2005-10-05 21:44:52 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.40 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -478,8 +478,8 @@ value effective_mod conf base sp =
         (Update.insert_string base) sp
     in
     np.related := op.related;
-    let op_misc_names = person_misc_names base op in
-    let np_misc_names = person_misc_names base np in
+    let op_misc_names = person_misc_names base op (nobtit conf base) in
+    let np_misc_names = person_misc_names base np (nobtit conf base) in
     List.iter
       (fun key ->
          if List.mem key op_misc_names then () else person_ht_add base key pi)
@@ -507,7 +507,7 @@ value effective_add conf base sp =
     base.func.patch_person pi np;
     base.func.patch_ascend pi na;
     base.func.patch_union pi nu;
-    let np_misc_names = person_misc_names base np in
+    let np_misc_names = person_misc_names base np (nobtit conf base) in
     List.iter (fun key -> person_ht_add base key pi) np_misc_names;
     (np, na)
   }
@@ -747,8 +747,8 @@ value print_mod o_conf base =
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.cle_index)
         (sou base p.notes) (p.notes <> op.notes);
       if op.surname <> p.surname || op.surnames_aliases <> p.surnames_aliases
-      || op.titles <> p.titles then
-        Update.update_misc_names_of_family base p u
+      || nobtit conf base op <> nobtit conf base p then
+        Update.update_misc_names_of_family conf base p u
       else ();
       let wl = all_checks_person conf base p (aoi base p.cle_index) u in
       let k = (sp.first_name, sp.surname, sp.occ, sp.cle_index) in

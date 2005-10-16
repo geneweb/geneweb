@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 4.14 2005-09-10 10:31:29 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.15 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -206,7 +206,7 @@ value effective_mod_merge conf base sp =
           else assert False;
           base.func.patch_couple ifam cpl;
         };
-        Update.update_misc_names_of_family base p u;
+        Update.update_misc_names_of_family conf base p u;
         base.func.patch_person p.cle_index p;
         if p2_family <> [| |] then do {
           u.family := Array.append u.family p2_family;

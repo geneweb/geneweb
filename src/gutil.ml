@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.47 2005-08-27 18:45:08 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.48 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -311,7 +311,7 @@ value surnames_pieces surname =
   loop 0 0 0
 ;
 
-value person_misc_names base p =
+value person_misc_names base p nobtit =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
   if first_name = "?" || surname = "?" then []
@@ -325,16 +325,16 @@ value person_misc_names base p =
                match t.t_name with
                [ Tmain | Tnone -> ()
                | Tname x -> tnl.val := [x :: tnl.val] ])
-            p.titles;
+            (nobtit p);
           tnl.val
         }
       in
-      if sou base p.public_name = "" || p.titles = [] then titles_names
+      if sou base p.public_name = "" || nobtit p = [] then titles_names
       else [p.public_name :: titles_names]
     in
     let first_names =
       let pn =
-        if sou base p.public_name <> "" && p.titles = [] then
+        if sou base p.public_name <> "" && nobtit p = [] then
           [p.public_name :: public_names]
         else public_names
       in
@@ -393,7 +393,7 @@ value person_misc_names base p =
              in
              List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
                first_names)
-        list p.titles
+        list (nobtit p)
     in
     let list =
       match parents (aoi base p.cle_index) with
@@ -410,7 +410,7 @@ value person_misc_names base p =
                else
                  List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
                    first_names)
-            list fath.titles
+            list (nobtit fath)
       | _ -> list ]
     in
     let list =
@@ -432,7 +432,7 @@ value person_is_key base p k =
     True
   else if
     List.exists (fun x -> k = Name.crush_lower x)
-      (person_misc_names base p) then
+      (person_misc_names base p (fun p -> p.titles)) then
     True
   else False
 ;

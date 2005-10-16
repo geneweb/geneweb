@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.161 2005-10-08 04:04:42 ddr Exp $ *)
+(* $Id: util.ml,v 4.162 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -474,15 +474,27 @@ value p_getint env label =
   | None -> None ]
 ;
 
-value parent_has_title base p =
+value nobtit conf base p =
+  match Lazy.force conf.allowed_titles with
+  [ [] -> p.titles
+  | allowed_titles ->
+      List.fold_right
+        (fun t l ->
+           let id = sou base t.t_ident in
+           let pl = sou base t.t_place in
+           if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
+        p.titles [] ]
+;
+
+value parent_has_title conf base p =
   let a = aoi base p.cle_index in
   match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (father cpl) in
       let moth = poi base (mother cpl) in
-      fath.access <> Private && fath.titles <> [] ||
-      moth.access <> Private && moth.titles <> []
+      fath.access <> Private && nobtit conf base fath <> [] ||
+      moth.access <> Private && nobtit conf base moth <> []
   | _ -> False ]
 ;
 
@@ -490,7 +502,7 @@ value authorized_age conf base p =
   if p.access = Public || conf.friend || conf.wizard then True
   else if
     conf.public_if_titles && p.access = IfTitles &&
-    (p.titles <> [] || parent_has_title base p) then
+    (nobtit conf base p <> [] || parent_has_title conf base p) then
     True
   else
     match
@@ -540,7 +552,9 @@ value is_old_person conf p =
 
 value fast_auth_age conf p =
   if conf.friend || conf.wizard || p.access = Public then True
-  else if conf.public_if_titles && p.access = IfTitles && p.titles <> [] then
+  else if
+    conf.public_if_titles && p.access = IfTitles && p.titles <> []
+  then
     True
   else is_old_person conf p
 ;
@@ -614,7 +628,7 @@ value know base p =
 
 value is_public conf base p =
   p.access = Public ||
-  conf.public_if_titles && p.access = IfTitles && p.titles <> [] ||
+  conf.public_if_titles && p.access = IfTitles && nobtit conf base p <> [] ||
   is_old_person conf p
 ;
 
@@ -660,12 +674,14 @@ value gen_person_text (p_first_name, p_surname) conf base p =
       | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | (n, []) -> n ]
     in
+(*
     let ali =
       match p.aliases with
       [ [alias :: _] -> " <em>(" ^ sou base alias ^ ")</em>"
       | _ -> "" ]
     in
-    beg ^ " " ^ p_surname base p ^ ali
+*)
+    beg ^ " " ^ p_surname base p (*^ ali*)
 ;
 
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
@@ -686,7 +702,8 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     base p
 =
   if is_hidden p then restricted_txt conf
-  else if check_acc && conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else if check_acc && conf.hide_names && not (fast_auth_age conf p) then
+    "x x"
   else
     let s =
       match (sou base p.public_name, p.qualifiers) with
@@ -695,12 +712,14 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
       | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
       | (_, []) -> p_first_name base p ]
     in
+(*
     let ali =
       match p.aliases with
       [ [alias :: _] -> " <em>(" ^ sou base alias ^ ")</em>"
       | _ -> "" ]
     in
-    s ^ ali
+*)
+    s (*^ ali*)
 ;
 
 value person_text = gen_person_text std_access;
@@ -712,15 +731,15 @@ value person_text_no_surn_no_acc_chk =
   gen_person_text_without_surname False std_access
 ;
 
-value main_title base p =
+value main_title conf base p =
   let rec find_main =
     fun
     [ [] -> None
     | [x :: l] -> if x.t_name == Tmain then Some x else find_main l ]
   in
-  match find_main p.titles with
+  match find_main (nobtit conf base p) with
   [ None ->
-      match p.titles with
+      match nobtit conf base p with
       [ [x :: _] -> Some x
       | _ -> None ]
   | x -> x ]
@@ -780,7 +799,7 @@ value no_reference conf base p s = s;
 
 value gen_person_title_text reference p_access conf base p =
   if authorized_age conf base p then
-    match main_title base p with
+    match main_title conf base p with
     [ Some t ->
         reference conf base p (titled_person_text conf base p t) ^
           one_title_text conf base p t
@@ -803,7 +822,7 @@ value referenced_person_text_without_surname conf base p =
 ;
 
 value gen_person_text_without_title p_access conf base p =
-  match main_title base p with
+  match main_title conf base p with
   [ Some t ->
       if t.t_place == p.surname then
         gen_person_text_without_surname True p_access conf base p
@@ -819,7 +838,7 @@ value person_text_without_title = gen_person_text_without_title std_access;
 
 value person_title conf base p =
   if authorized_age conf base p then
-    match main_title base p with
+    match main_title conf base p with
     [ Some t -> one_title_text conf base p t
     | None -> "" ]
   else ""
@@ -1045,8 +1064,8 @@ value url_no_index conf base =
     [ Some i ->
         if i >= 0 && i < base.data.persons.len then
           let p = pget conf base (Adef.iper_of_int i) in
-          if (conf.hide_names && not (fast_auth_age conf p))
-             || is_hidden p then None
+          if (conf.hide_names && not (fast_auth_age conf p)) || is_hidden p
+          then None
           else
             let f = scratch p.first_name in
             let s = scratch p.surname in
@@ -1640,8 +1659,7 @@ value parent conf base p a =
   match a.public_name with
   [ n when sou base n <> "" -> sou base n ^ person_title conf base a
   | _ ->
-      if conf.hide_names && not (fast_auth_age conf a) then
-        "x x"
+      if conf.hide_names && not (fast_auth_age conf a) then "x x"
       else
         p_first_name base a ^
           (if p.surname <> a.surname then " " ^ p_surname base a else "") ]

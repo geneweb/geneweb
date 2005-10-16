@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.65 2005-10-04 23:11:53 ddr Exp $ *)
+(* $Id: family.ml,v 4.66 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -7,19 +7,23 @@ open Gutil;
 open Config;
 open Util;
 
-value person_is_std_key base p k =
+value person_is_std_key conf base p k =
   let k = Name.strip_lower k in
   if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p) then
     True
   else if
-    List.exists (fun n -> Name.strip n = k) (person_misc_names base p) then
+    List.exists (fun n -> Name.strip n = k)
+      (person_misc_names base p (nobtit conf base))
+  then
     True
   else False
 ;
 
-value select_std_eq base pl k =
+value select_std_eq conf base pl k =
   List.fold_right
-    (fun p pl -> if person_is_std_key base p k then [p :: pl] else pl) pl []
+    (fun p pl ->
+       if person_is_std_key conf base p k then [p :: pl] else pl)
+    pl []
 ;
 
 value very_unknown conf =
@@ -168,7 +172,7 @@ value find_all conf base an =
              if is_hidden p then l else [p :: l])
         [] ipl
       in
-      let spl = select_std_eq base pl an in
+      let spl = select_std_eq conf base pl an in
       let pl =
         if spl = [] then
           if pl = [] then try_find_with_one_first_name conf base an else pl
@@ -221,7 +225,7 @@ value specify conf base n pl =
                 [ (Tname s, _) -> compare_and_add t s
                 | (_, pn) when sou base pn <> "" -> compare_and_add t pn
                 | _ -> () ])
-             p.titles;
+             (nobtit conf base p);
            (p, tl.val)
          })
       pl
@@ -461,7 +465,7 @@ value family_m conf base =
                 | [p] ->
                     if soza_acc ||
                        Gutil.person_of_key base n <> None ||
-                       person_is_std_key base p n
+                       person_is_std_key conf base p n
                     then
                       person_selected conf base p
                     else specify conf base n pl

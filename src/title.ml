@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 4.9 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: title.ml,v 4.10 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -43,7 +43,7 @@ value date_interval conf base t x =
                [ Some (Dgreg d _) -> set d
                | _ -> () ];
              })
-          x.titles;
+          (nobtit conf base x);
         match t with
         [ JustSelf -> ()
         | _ ->
@@ -176,7 +176,7 @@ value select_title_place conf base title place =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
-      List.iter (select x) x.titles
+      List.iter (select x) (nobtit conf base x)
     };
     (list.val, clean_title.val, clean_place.val)
   }
@@ -195,7 +195,7 @@ value select_all_with_place conf base place =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
-      List.iter (select x) x.titles
+      List.iter (select x) (nobtit conf base x)
     };
     (list.val, clean_place.val)
   }
@@ -218,7 +218,7 @@ value select_title conf base title =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
-      List.iter add_place x.titles
+      List.iter add_place (nobtit conf base x)
     };
     (list.val, clean_name.val)
   }
@@ -241,7 +241,7 @@ value select_place conf base place =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
-      List.iter add_title x.titles
+      List.iter add_title (nobtit conf base x)
     };
     (list.val, clean_name.val)
   }
@@ -256,7 +256,8 @@ value select_all proj conf base =
       else
         let x = pget conf base (Adef.iper_of_int i) in
         let s =
-          List.fold_left (fun s t -> S.add (sou base (proj t)) s) s x.titles
+          List.fold_left (fun s t -> S.add (sou base (proj t)) s) s
+            (nobtit conf base x)
         in
         loop (i + 1) s
   in

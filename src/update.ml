@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.43 2005-06-25 16:33:37 ddr Exp $ *)
+(* $Id: update.ml,v 4.44 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -81,7 +81,7 @@ value insert_string base s =
       do { base.func.patch_string i s; i } ]
 ;
 
-value update_misc_names_of_family base p u =
+value update_misc_names_of_family conf base p u =
   match p.sex with
   [ Male ->
       List.iter
@@ -95,7 +95,7 @@ value update_misc_names_of_family base p u =
                      if not (List.memq ip (person_ht_find_all base name)) then
                        person_ht_add base name ip
                      else ())
-                  (person_misc_names base (poi base ip)))
+                  (person_misc_names base (poi base ip) (nobtit conf base)))
              [mother cpl :: Array.to_list des.children])
         (Array.to_list u.family)
   | _ -> () ]
@@ -607,11 +607,11 @@ value print_create_conflict conf base p var =
   }
 ;
 
-value add_misc_names_for_new_persons base new_persons =
+value add_misc_names_for_new_persons conf base new_persons =
   List.iter
     (fun p ->
        List.iter (fun n -> person_ht_add base n p.cle_index)
-         (person_misc_names base p))
+         (person_misc_names base p (nobtit conf base)))
     new_persons
 ;
 

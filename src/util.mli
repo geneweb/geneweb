@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.49 2005-10-05 21:44:52 ddr Exp $ *)
+(* $Id: util.mli,v 4.50 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -37,6 +37,7 @@ value hidden_env : config -> unit;
 value authorized_age : config -> base -> person -> bool;
 value is_old_person : config -> person -> bool;
 value fast_auth_age : config -> person -> bool;
+value nobtit : config -> base -> person -> list title;
 
 value start_with_vowel : string -> bool;
 value know : base -> person -> bool;
@@ -86,7 +87,7 @@ value referenced_person_text : config -> base -> person -> string;
 value referenced_person_text_without_surname :
   config -> base -> person -> string;
 
-value main_title : base -> person -> option title;
+value main_title : config -> base -> person -> option title;
 value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
