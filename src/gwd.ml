@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.87 2005-10-16 03:03:01 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.88 2005-10-16 08:49:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -681,20 +681,22 @@ value http_preferred_language request =
     loop list
 ;
 
-value allowed_titles base_env () =
-  try
-    let fname = List.assoc "allowed_titles_file" base_env in
-    if fname = "" then []
-    else
-      let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
-      let list = ref [] in
-      do {
-        try while True do { list.val := [input_line ic :: list.val]; } with
-        [ End_of_file -> close_in ic ];
-        list.val
-      }
-  with
-  [ Not_found | Sys_error _ -> [] ]
+value allowed_titles env base_env () =
+  if p_getenv env "all_titles" = Some "on" then []
+  else
+    try
+      let fname = List.assoc "allowed_titles_file" base_env in
+      if fname = "" then []
+      else
+        let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
+        let list = ref [] in
+        do {
+          try while True do { list.val := [input_line ic :: list.val]; } with
+          [ End_of_file -> close_in ic ];
+          list.val
+        }
+    with
+    [ Not_found | Sys_error _ -> [] ]
 ;
 
 value make_conf cgi from_addr (addr, request) script_name contents env =
@@ -886,7 +888,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
     let is_rtl =
       try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
     in
-    let allowed_titles = Lazy.lazy_from_fun (allowed_titles base_env) in
+    let allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env) in
     let conf =
       {from = from_addr;
        wizard = wizard && not wizard_just_friend;
