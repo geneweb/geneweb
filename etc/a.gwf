@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.28 2005-10-16 03:03:01 ddr Exp $
+# $Id: a.gwf,v 4.29 2005-10-16 03:10:36 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -52,6 +52,10 @@ wizard_passwd_file=
 # If empty or empty file, no moderation.
 # One wizard name by line.
 moderator_file=
+
+# Notify change program (e.g. shell script) to be executed for each
+# database change.
+# notify_change=
 
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
