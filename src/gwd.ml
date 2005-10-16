@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.86 2005-07-20 15:23:10 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.87 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -681,6 +681,22 @@ value http_preferred_language request =
     loop list
 ;
 
+value allowed_titles base_env () =
+  try
+    let fname = List.assoc "allowed_titles_file" base_env in
+    if fname = "" then []
+    else
+      let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
+      let list = ref [] in
+      do {
+        try while True do { list.val := [input_line ic :: list.val]; } with
+        [ End_of_file -> close_in ic ];
+        list.val
+      }
+  with
+  [ Not_found | Sys_error _ -> [] ]
+;
+
 value make_conf cgi from_addr (addr, request) script_name contents env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
@@ -870,6 +886,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
     let is_rtl =
       try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
     in
+    let allowed_titles = Lazy.lazy_from_fun (allowed_titles base_env) in
     let conf =
       {from = from_addr;
        wizard = wizard && not wizard_just_friend;
@@ -925,7 +942,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
           else [("b", base_file ^ "_" ^ passwd)]) @
            (if lang = "" then [] else [("lang", lang)]) @
            (if from = "" then [] else [("opt", from)]);
-       base_env = base_env; request = request; lexicon = lexicon;
+       base_env = base_env;
+       allowed_titles = allowed_titles;
+       request = request; lexicon = lexicon;
        xhs =
          match p_getenv base_env "doctype" with
          [ Some "html-4.01" -> ""

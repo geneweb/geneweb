@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.54 2005-07-21 09:04:13 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.55 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1396,7 +1396,7 @@ value make_name_index base =
       if first_name <> "?" && surname <> "?" then
         let names =
           [Name.lower (first_name ^ " " ^ surname) ::
-           person_misc_names base p]
+           person_misc_names base p (fun p -> p.titles)]
         in
         add_names p.cle_index names
       else ();

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.13 2005-02-05 12:36:04 ddr Exp $ *)
+(* $Id: merge.ml,v 4.14 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -66,7 +66,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
                    (sou base p.surname);
                end;
                Wserver.wprint "%s" (Date.short_dates_text conf base p);
-               match main_title base p with
+               match main_title conf base p with
                [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
                | None -> () ];
                match parents (aoi base p.cle_index) with

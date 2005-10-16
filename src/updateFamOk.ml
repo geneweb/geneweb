@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.49 2005-09-10 10:31:29 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.50 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -515,8 +515,8 @@ value effective_mod conf base sfam scpl sdes =
            base.func.patch_ascend ip (find_asc ip)
          else ())
       ndes.children;
-    Update.add_misc_names_for_new_persons base created_p.val;
-    Update.update_misc_names_of_family base nfath nfath_u;
+    Update.add_misc_names_for_new_persons conf base created_p.val;
+    Update.update_misc_names_of_family conf base nfath nfath_u;
     update_related_witnesses base (Array.to_list ofam.witnesses)
       (Array.to_list nfam.witnesses) ncpl;
     (nfam, ncpl, ndes)
@@ -589,8 +589,8 @@ value effective_add conf base sfam scpl sdes =
                base.func.patch_ascend p.cle_index a
              } ])
       ndes.children;
-    Update.add_misc_names_for_new_persons base created_p.val;
-    Update.update_misc_names_of_family base nfath_p nfath_u;
+    Update.add_misc_names_for_new_persons conf base created_p.val;
+    Update.update_misc_names_of_family conf base nfath_p nfath_u;
     update_related_witnesses base [] (Array.to_list nfam.witnesses) ncpl;
     (nfam, ncpl, ndes)
   }

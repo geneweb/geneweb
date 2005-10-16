@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 4.9 2005-06-19 04:46:59 ddr Exp $ *)
+(* $Id: update.mli,v 4.10 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -16,8 +16,8 @@ value insert_person :
   config -> base -> string -> ref (list person) -> key -> Adef.iper
 ;
 value insert_string : base -> string -> Adef.istr;
-value add_misc_names_for_new_persons : base -> list person -> unit;
-value update_misc_names_of_family : base -> person -> union -> unit;
+value add_misc_names_for_new_persons : config -> base -> list person -> unit;
+value update_misc_names_of_family : config -> base -> person -> union -> unit;
 value delete_topological_sort_v : config -> base -> unit;
 value delete_topological_sort : config -> base -> unit;
 

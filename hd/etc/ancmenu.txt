@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.13 2005-06-16 19:43:19 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.14 2005-10-16 03:03:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -106,7 +106,7 @@
             <input type="radio" name="sosab" value="10" checked="checked"%/
           >10</label>
           <label><input type="radio" name="sosab" value="16"%/>16</label>
-          <br%/>
+          <br%/><br%/>
           <label>
             <input type="radio" name="t" value="G"%/>
             [*long display] (*)
@@ -122,7 +122,7 @@
             - [*note/notes]1
             <input type="checkbox" name="notes" value="on" checked="checked"%/>
           </label>
-          <br%/>
+          <br%/><br%/>
           <label>
             <input type="radio" name="t" value="T"%/>
             [*tree]
@@ -212,7 +212,7 @@
             <input type="radio" name="t" value="F"%/>
             [*surnames list]
           </label>
-          <br%/>
+          <br%/><br%/>
           <label>
             <input type="radio" name="t" value="M"%/>
             [*missing ancestors]

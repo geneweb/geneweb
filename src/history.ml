@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 4.43 2005-09-10 10:31:29 ddr Exp $ *)
+(* $Id: history.ml,v 4.44 2005-10-16 03:03:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -232,7 +232,7 @@ and eval_person_field_var conf base env p =
   | [] -> VVstring (simple_person_text conf base p)
   | _ -> VVstring "person..." ]
 and simple_person_text conf base p =
-  match main_title base p with
+  match main_title conf base p with
   [ Some t -> titled_person_text conf base p t
   | None -> person_text conf base p ]
 ;
