@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.46 2005-09-02 01:50:30 ddr Exp $ *)
+(* $Id: some.ml,v 4.47 2005-10-18 11:17:40 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -256,6 +256,7 @@ value print_branch conf base psn name =
                Array.length des.children <> 0 ||
                p.sex = Female &&
                she_has_children_with_her_name conf base p c el ||
+               p.sex = Male &&
                child_has_children_with_same_name base des name
              in
              let i = Adef.int_of_ifam ifam in
