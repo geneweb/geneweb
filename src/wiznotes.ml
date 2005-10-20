@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.40 2005-10-07 15:31:47 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.41 2005-10-20 13:48:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -30,7 +30,17 @@ value read_auth_file fname =
                   with
                   [ Not_found -> "" ]
                 in
-                [(String.sub line 0 i, wizname) :: data]
+                let (wizname, wizorder) =
+                  try
+                    let i = String.index wizname '/' in
+                    let l = String.length wizname in
+                    let w1 = String.sub wizname 0 i in
+                    let w2 = String.sub wizname (i + 1) (l - i - 1) in
+                    (w1 ^ " " ^ w2, w2 ^ w1)
+                  with
+                  [ Not_found -> (wizname, "~") ]
+                in
+                [(String.sub line 0 i, (wizname, wizorder)) :: data]
               with
               [ Not_found -> data ]
             in
@@ -105,9 +115,14 @@ value print_main conf base auth_file =
     Wserver.wprint "%s - %s" (capitale wiztxt)
       (Gutil.nominative (transl_nth conf "note/notes" 1))
   in
-  let wizdata = read_auth_file auth_file in
-  let wddir = dir conf in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
+  let wizdata =
+    let list = read_auth_file auth_file in
+    if by_alphab_order then
+      List.sort (fun (_, (_, o1)) (_, (_, o2)) -> compare o1 o2) list
+    else list
+  in
+  let wddir = dir conf in
   do {
     header conf title;
     print_link_to_welcome conf True;
@@ -122,24 +137,27 @@ value print_main conf base auth_file =
       tag "p" begin
         let _ =
           List.fold_left
-            (fun prev (wz, wname, wfile, stm) ->
+            (fun prev (wz, (wname, worder), wfile, stm) ->
                let tm = Unix.localtime stm in
                let wname = if wname = "" then wz else wname in
                do {
-                 Wserver.wprint "%s%t"
-                   (if prev = None then "" else ",\n")
-                   (fun _ ->
-                      if conf.wizard && conf.user = wz || wfile <> "" then
-                        Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
-                          (commd conf) (Util.code_varenv wz)
-                          (fun _ ->
-                             Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                               (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                               tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                               tm.Unix.tm_sec)
-                          wname
-                      else Wserver.wprint "%s" wname);
-                 Some tm
+                 Wserver.wprint "%s" (if prev = None then "" else ",\n");
+                 match prev with
+                 [ Some prev_worder when worder.[0] = prev_worder.[0] -> ()
+                 | _ ->
+                     if worder.[0] = '~' then ()
+                     else Wserver.wprint "<b>(%c)</b>\n" worder.[0] ];
+                 if conf.wizard && conf.user = wz || wfile <> "" then
+                   Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
+                     (commd conf) (Util.code_varenv wz)
+                     (fun _ ->
+                        Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                          (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                          tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                          tm.Unix.tm_sec)
+                     wname
+                 else Wserver.wprint "%s" wname;
+                 Some worder;
                })
             None list
         in
@@ -163,7 +181,7 @@ value print_main conf base auth_file =
       Wserver.wprint "<dl>\n<dt>";
       let _ =
         List.fold_left
-          (fun (spl, prev) (wz, wname, wfile, stm) ->
+          (fun (spl, prev) (wz, (wname, _), wfile, stm) ->
              let tm = Unix.localtime stm in
              let (new_item, spl) =
                match prev with
@@ -240,7 +258,7 @@ value wizard_page_title wz wizname h =
 value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
   let wizname =
     let wizdata = read_auth_file auth_file in
-    try List.assoc wz wizdata with
+    try fst (List.assoc wz wizdata) with
     [ Not_found -> wz ]
   in
   let title = wizard_page_title wz wizname in
