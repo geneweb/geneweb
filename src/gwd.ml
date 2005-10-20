@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.88 2005-10-16 08:49:54 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.89 2005-10-20 16:54:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -443,7 +443,7 @@ value match_auth_file auth_file uauth =
             if uauth = sauth then
               do {
                 close_in ic;
-                let username =
+                let s =
                   if i = String.length line then ""
                   else
                     try
@@ -451,6 +451,14 @@ value match_auth_file auth_file uauth =
                       String.sub line (i + 1) (j - i - 1)
                     with
                     [ Not_found -> "" ]
+                in
+                let username =
+                  try
+                    let i = String.index s '/' in
+                    let len = String.length s in
+                    String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
+                  with
+                  [ Not_found -> s ]
                 in
                 Some username
               }
