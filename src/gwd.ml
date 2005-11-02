@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.89 2005-10-20 16:54:42 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.90 2005-11-02 10:14:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -138,14 +138,30 @@ value copy_file fname =
         with _ ->
           ();
         close_in ic;
+        True
       }
-  | None -> () ]
+  | None -> False ]
 ;
 
 value http answer =
   do {
     Wserver.http answer;
     Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
+  }
+;
+
+value robots_txt from =
+  let oc = log_oc () in
+  do {
+    Printf.fprintf oc "Robot request\n";
+    flush_log oc;
+    Wserver.http "";
+    Wserver.wprint "Content-type: text/plain"; Util.nl (); Util.nl ();
+    if copy_file "robots.txt" then ()
+    else do {
+      Wserver.wprint "User-Agent: *"; nl ();
+      Wserver.wprint "Disallow: /"; nl ();
+    }
   }
 ;
 
@@ -161,7 +177,7 @@ value refuse_log from cgi =
     Util.nl ();
     Util.nl ();
     Wserver.wprint "Your access has been disconnected by administrator.\n";
-    copy_file "refuse.txt";
+    let _ : bool = copy_file "refuse.txt" in ();
   }
 ;
 
@@ -1282,7 +1298,8 @@ value connection cgi (addr, request) script_name contents =
           Unix.string_of_inet_addr iaddr ]
   in
   do {
-    if excluded from then refuse_log from cgi
+    if not cgi && script_name = "robots.txt" then robots_txt from
+    else if excluded from then refuse_log from cgi
     else
       let accept =
         if only_address.val = "" then True else only_address.val = from

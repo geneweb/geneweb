@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.25 2005-07-09 12:09:34 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.26 2005-11-02 10:14:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -324,22 +324,11 @@ value treat_connection tmout callback addr fd =
       in
       (request, script_name, contents)
     in
-    if script_name = "robots.txt" then do {
-      http "";
-      wprint "Content-type: text/plain"; nl (); nl ();
-      wprint "User-Agent: *"; nl ();
-      wprint "Disallow: /"; nl ();
-      wflush ();
-      Printf.eprintf "Robot request\n";
-      flush stderr;
-    }
-    else do {
-      try callback (addr, request) script_name contents with
-      [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
-      | exc -> print_err_exc exc ];
-      try wflush () with _ -> ();
-      try flush stderr with _ -> ();
-    };
+    try callback (addr, request) script_name contents with
+    [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
+    | exc -> print_err_exc exc ];
+    try wflush () with _ -> ();
+    try flush stderr with _ -> ();
   }
 ;
 
