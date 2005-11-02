@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.73 2005-10-12 09:09:59 ddr Exp $
+# $Id: lex_utf8.txt,v 1.74 2005-11-02 09:06:11 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5035,6 +5035,7 @@ bg: свързани страници
 ca: enllaços
 de: vernüpfte Seiten
 en: linked pages
+fi: linkkisivuja
 fr: pages liées
 it: pagine collegate
 nl: gekoppelde pagina’s
@@ -5507,6 +5508,7 @@ bg: разни бележки
 ca: miscel·lània
 de: diverse Notizen
 en: miscellaneous notes
+fi: sekalaisia huomautuksia
 fr: notes diverses
 it: note varie
 nl: diversen
@@ -7155,6 +7157,7 @@ bg: търсене/с различаване на главни и малки б�
 ca: recerca/coincidir maj_min
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
+fi: haku/tunnistaa merkkikoon
 fr: rechercher/sensible à la casse
 it: ricerca/sensibile a maiuscole e minuscole
 nl: zoeken/hoofdlettergevoelig
@@ -8524,7 +8527,9 @@ sv: hela listan
 
     this forum is moderated
 ca: aquest fòrum té moderador
+de: dieses Forum wird moderiert
 en: this forum is moderated
+fi: t&auml;m&auml; foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
 
@@ -9094,6 +9099,7 @@ sv: användare/passord/avbryt
 ca: validar/eliminar
 de: Validieren/Verwerfen
 en: validate/delete
+fi: tarkista/hylk&auml;&auml;
 fr: valider/supprimer
 it: conferma/elimina
 
@@ -9102,6 +9108,7 @@ bg: да се визуализира/да се покаже/да се скрие
 ca: visualtza/mostra/sumari
 de: veranschaulichen/einblenden/ausblenden/Inhalt
 en: visualize/show/hide/summary
+fi: kuvaa/n&auml;yt&auml;/piilota/yhteenveto
 fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
 nl: visualiseren/tonen/verbergen/samenvatting
@@ -9384,4 +9391,5 @@ sv: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
     your message is waiting for validation
 de: Ihre Nachricht erwartet Validierung
 en: your message is waiting for validation
+fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
