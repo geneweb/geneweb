@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.90 2005-11-02 10:14:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.91 2005-11-03 01:15:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -130,7 +130,7 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
 ;
 
 value copy_file fname =
-  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  match Util.open_etc_file fname with
   [ Some ic ->
       do {
         try
@@ -150,14 +150,14 @@ value http answer =
   }
 ;
 
-value robots_txt from =
+value robots_txt () =
   let oc = log_oc () in
   do {
     Printf.fprintf oc "Robot request\n";
     flush_log oc;
     Wserver.http "";
     Wserver.wprint "Content-type: text/plain"; Util.nl (); Util.nl ();
-    if copy_file "robots.txt" then ()
+    if copy_file "robots" then ()
     else do {
       Wserver.wprint "User-Agent: *"; nl ();
       Wserver.wprint "Disallow: /"; nl ();
@@ -177,7 +177,7 @@ value refuse_log from cgi =
     Util.nl ();
     Util.nl ();
     Wserver.wprint "Your access has been disconnected by administrator.\n";
-    let _ : bool = copy_file "refuse.txt" in ();
+    let _ : bool = copy_file "refuse" in ();
   }
 ;
 
@@ -1298,7 +1298,7 @@ value connection cgi (addr, request) script_name contents =
           Unix.string_of_inet_addr iaddr ]
   in
   do {
-    if not cgi && script_name = "robots.txt" then robots_txt from
+    if not cgi && script_name = "robots.txt" then robots_txt ()
     else if excluded from then refuse_log from cgi
     else
       let accept =
