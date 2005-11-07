@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.111 2005-09-23 13:51:10 ddr Exp $ *)
+(* $Id: templ.ml,v 4.112 2005-11-07 13:18:52 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -718,6 +718,33 @@ value eval_var_handled conf env sl =
   [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
+value apply_format conf nth s1 s2 =
+  let transl_nth_format s =
+    match nth with
+    [ Some n -> Util.ftransl_nth conf s n
+    | None -> Util.ftransl conf s ]
+  in
+  match Util.check_format "%t" s1 with
+  [ Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
+  | None ->
+      match Util.check_format "%s" s1 with
+      [ Some s3 -> Printf.sprintf (transl_nth_format s3) s2
+      | None ->
+          match Util.check_format "%d" s1 with
+          [ Some s3 ->
+              Printf.sprintf (transl_nth_format s3) (int_of_string s2)
+          | None ->
+              match Util.check_format "%s%s" s1 with
+              [ Some s3 ->
+                  let (s21, s22) =
+                    let i = String.index s2 ':' in
+                    (String.sub s2 0 i,
+                     String.sub s2 (i + 1) (String.length s2 - i - 1))
+                  in
+                  Printf.sprintf (transl_nth_format s3) s21 s22
+              | None -> raise Not_found ] ] ] ]
+;
+
 value rec eval_ast conf =
   fun
   [ Atext _ s -> s
@@ -766,25 +793,8 @@ and eval_transl_lexicon conf upp s c =
             Util.transl_decline conf s1 s2
           else if String.length s2 > 0 && s2.[0] = ':' then
             let s2 = String.sub s2 1 (String.length s2 - 1) in
-            let transl_nth_format s =
-              match nth with
-              [ Some n -> Util.ftransl_nth conf s n
-              | None -> Util.ftransl conf s ]
-            in
-            match Util.check_format "%t" s1 with
-            [ Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
-            | None ->
-                match Util.check_format "%s" s1 with
-                [ Some s3 -> Printf.sprintf (transl_nth_format s3) s2
-                | None ->
-                    match Util.check_format "%d" s1 with
-                    [ Some s3 ->
-                        try
-                          Printf.sprintf (transl_nth_format s3)
-                            (int_of_string s2)
-                        with
-                        [ Failure _ -> raise Not_found ]
-                    | None -> raise Not_found ] ] ]
+            try apply_format conf nth s1 s2 with
+            [ Failure _ -> raise Not_found ]
           else raise Not_found
         with
         [ Not_found ->
