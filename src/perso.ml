@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.208 2005-10-16 03:03:01 ddr Exp $ *)
+(* $Id: perso.ml,v 4.209 2005-11-07 13:18:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1126,16 +1126,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
       match get_env "surname_alias" env with
       [ Vstring s -> s
       | _ -> raise Not_found ]
-  | "witness_relation" ->
-      match get_env "fam" env with
-      [ Vfam _ (ip1, ip2, _) _ m_auth ->
-          if not m_auth then ""
-          else
-            Printf.sprintf
-              (ftransl conf "witness at marriage of %s and %s")
-              (referenced_person_title_text conf base (pget conf base ip1))
-              (referenced_person_title_text conf base (pget conf base ip2))
-      | _ -> raise Not_found ]
   | s ->
       loop
         [("evar_",
@@ -1281,6 +1271,11 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["witness_relation" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam f c d m ->
+          eval_witness_relation_var conf base env (f, c, d, m) loc sl
       | _ -> raise Not_found ]
   | sl -> eval_person_field_var conf base env ep loc sl ]
 and eval_item_field_var env ell =
@@ -1959,6 +1954,20 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else Name.lower (p_surname base p)
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
+and eval_witness_relation_var conf base env
+  ((fam, (ip1, ip2, _), _, m_auth) as fcd) loc =
+  fun
+  [ [] ->
+      if not m_auth then VVstring ""
+      else
+        let s =
+          Printf.sprintf
+            (ftransl conf "witness at marriage of %s and %s")
+            (referenced_person_title_text conf base (pget conf base ip1))
+            (referenced_person_title_text conf base (pget conf base ip2))
+        in
+        VVstring s
+  | sl -> eval_family_field_var conf base env fcd loc sl ]
 and eval_family_field_var conf base env
   ((fam, (ifath, imoth, _), _, m_auth) as fcd) loc
 =

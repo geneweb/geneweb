@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.63 2005-09-21 17:12:23 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.64 2005-11-07 13:18:52 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -207,6 +207,10 @@
   %end;
 %end;
 
+%define;witness_relation(him, her)
+  [*witness at marriage of %s and %s:::him:her]
+%end;
+
 %if;has_families;
   <h3 class="highlight">[*marriage/marriages]1 [and::child/children]1</h3>
   <ul>
@@ -295,7 +299,15 @@
     %end;
     %foreach;witness_relation;
       <li style="list-style-type:disc">%nn;
-        %apply;capitalize(witness_relation)%nn;
+        %apply;witness_relation%with;
+          %if;cancel_links;%witness_relation.father;
+          %else<a href="%prefix;%witness_relation.father.access;
+            ">%witness_relation.father;</a>%end;
+        %and;
+          %if;cancel_links;%witness_relation.mother;
+          %else<a href="%prefix;%witness_relation.mother.access;
+            ">%witness_relation.mother;</a>%end;
+        %end;
       </li>%nl;
     %end;
   </ul>
