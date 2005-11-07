@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.33 2005-08-16 21:39:02 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.34 2005-11-07 11:52:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -206,7 +206,7 @@ value spouse_text conf base end_sp ip ipl =
       | _ -> ("", "", None) ]
   | ([], _) ->
       match end_sp with
-      [ Some p -> (someone_text conf base p.cle_index, "", None)
+      [ Some p -> (someone_text conf base p.cle_index, "", Some p.cle_index)
       | _ -> ("", "", None) ]
   | _ -> ("", "", None) ]
 ;
