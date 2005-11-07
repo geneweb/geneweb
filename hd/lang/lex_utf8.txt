@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.74 2005-11-02 09:06:11 ddr Exp $
+# $Id: lex_utf8.txt,v 1.75 2005-11-07 10:47:48 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -1105,7 +1105,7 @@ da: en grandnev&oslash;/en grandniece
 de: ein:d:+em Gro&szlig;neffe:d:+n/eine:d:+r Gro&szlig;nichte
 en: a great-nephew/a great-niece
 eo: pranevo/pranevino
-es: un bissobrino/una bissobrina
+es: un sobrino nieto/una sobrina nieta
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
 fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tyt&auml;r:g:--t&auml;ren
 fr: un petit neveu/une petite ni&egrave;ce
@@ -5033,8 +5033,9 @@ sv: sl&auml;ktskap emellan
     linked pages
 bg: свързани страници
 ca: enllaços
-de: vernüpfte Seiten
+de: verknüpfte Seiten
 en: linked pages
+es: p&aacute;ginas enlazadas
 fi: linkkisivuja
 fr: pages liées
 it: pagine collegate
@@ -5508,6 +5509,7 @@ bg: разни бележки
 ca: miscel·lània
 de: diverse Notizen
 en: miscellaneous notes
+es: notas diversas
 fi: sekalaisia huomautuksia
 fr: notes diverses
 it: note varie
@@ -5605,6 +5607,7 @@ cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
+es: edad de la luna/luna nueva/cuarto cresciente/luna llena/cuarto menguante
 fi: kuun kierto/uusi kuu/ensimmäinen neljännes/täysikuu/viimeinen neljännes
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
 he: גיל הירח/ירח חדש/רביע ראשון/ירח מלא/רביע אחרון
@@ -7157,6 +7160,7 @@ bg: търсене/с различаване на главни и малки б�
 ca: recerca/coincidir maj_min
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
+es: buscar/fijarse en may&uacute;sculas&#047;men&uacute;sculas
 fi: haku/tunnistaa merkkikoon
 fr: rechercher/sensible à la casse
 it: ricerca/sensibile a maiuscole e minuscole
@@ -7856,9 +7860,10 @@ bg: най-отдавнашните %d двойки от евентуално о
 ca: les parelles més grans potser encara vives i juntes
 cs: %d nejstarších párů pravděpodobně žijících a zadaných
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
-de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
+de: die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
 eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
+es: los novios m&aacute;s viejos y quiz&aacute;s todav&iacute;a vivos
 et: %d vanimat paari kes on võib-olla veel elus ja kihlatud
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
@@ -8529,6 +8534,7 @@ sv: hela listan
 ca: aquest fòrum té moderador
 de: dieses Forum wird moderiert
 en: this forum is moderated
+es: este foro est&aacute; moderato
 fi: t&auml;m&auml; foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
@@ -9097,8 +9103,9 @@ sv: användare/passord/avbryt
 
     validate/delete
 ca: validar/eliminar
-de: Validieren/Verwerfen
+de: Best&auml;tigen/Verwerfen
 en: validate/delete
+es: validar/borrar
 fi: tarkista/hylk&auml;&auml;
 fr: valider/supprimer
 it: conferma/elimina
@@ -9106,8 +9113,9 @@ it: conferma/elimina
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
 ca: visualtza/mostra/sumari
-de: veranschaulichen/einblenden/ausblenden/Inhalt
+de: veranschaulichen/einblenden/ausblenden/Zusammenfassung
 en: visualize/show/hide/summary
+es: visualizar/mostrar/ocultar/resumen
 fi: kuvaa/n&auml;yt&auml;/piilota/yhteenveto
 fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
@@ -9230,7 +9238,7 @@ br: strobineller/strobinellerien/mignon/mignon
 ca: administrador/administrador/amic/amic
 cs: wizard/wizards/friend/friends
 da: bidragyder/bidragydere/betroet/betroet
-de: Wizard/Wizard/Freund/Freund
+de: Wizard/Wizards/Freund/Freunde
 en: wizard/wizards/friend/friends
 eo: sorĉisto/sorĉistoj/amiko/amikoj
 es: brujo/brujos/amigo/amigos
@@ -9389,7 +9397,8 @@ sl: najprej morate združiti obe družini
 sv: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
 
     your message is waiting for validation
-de: Ihre Nachricht erwartet Validierung
+de: deine Nachricht wartet auf ihre &Uuml;berpr&uuml;fung
 en: your message is waiting for validation
+es: tu mensaje espera su validaci&oacute;n
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
