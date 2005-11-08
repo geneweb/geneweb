@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 1.9 2005-10-05 11:54:49 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 1.10 2005-11-08 19:59:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -180,9 +180,11 @@
 %define;child_notes(spec)
   %if;(child.sosa_in_list = "" and
        (child.has_sources or child.has_notes))
-    <dt><a href="#%ancestor.sosa.v;" name="notes-%ancestor.sosa.v;
-    %if;("spec" != "")-spec%end;%apply;letter(child_cnt)"><b>%ancestor.sosa;
-    %if;("spec" != "")-spec%end;%apply;letter(child_cnt)</b></a>:</dt>
+    <dt><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;
+    %if;("spec" != "")-spec%end;
+    %apply;letter(child_cnt)"><b>%ancestor.anc_sosa;
+    %if;("spec" != "")-spec%end;
+    %apply;letter(child_cnt)</b></a>:</dt>
     <dd>
     %if;child.has_notes;
       <table><tr><td>%child.notes;</td></tr></table>
@@ -209,8 +211,9 @@
       %foreach;ancestor;
         %if;((ancestor.has_sources or ancestor.has_notes)
              and ancestor.same = "")
-          <dt><b><a href="#%ancestor.sosa.v;" name="notes-%ancestor.sosa.v;
-          ">%ancestor.sosa;</a></b>:</dt>
+          <dt><b><a href="#%ancestor.anc_sosa.v;
+          " name="notes-%ancestor.anc_sosa.v;
+          ">%ancestor.anc_sosa;</a></b>:</dt>
           <dd>
           %if;ancestor.has_notes;
             <table><tr><td>%ancestor.notes;</td></tr></table>
@@ -273,7 +276,7 @@
   %if;(evar.notes = "on" and
       (ancestor.has_sources or ancestor.has_notes))
     %[[*note/notes]0%sp;
-    <b><a href="#notes-%ancestor.sosa.v;">%ancestor.sosa;</a></b>%].
+    <b><a href="#notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>%].
   %end;
   %if;(evar.siblings = "on")
     %foreach;ancestor.family;
@@ -337,7 +340,7 @@
     %if;(evar.notes = "on" and
         (child.has_sources or child.has_notes))
       %[[*note/notes]0%sp;
-      <b><a href="#notes-%ancestor.sosa.v;
+      <b><a href="#notes-%ancestor.anc_sosa.v;
       %if;("spec" != "")-spec%end;
       %apply;letter(child_cnt)">%ancestor.sosa;
       %if;("spec" != "")-spec%end;
@@ -460,7 +463,7 @@
         %if;(ancestor.interval != "")%ancestor.interval;
         %else;
           %if;(ancestor.same = "")%incr_count;%end;
-          %ancestor.sosa;%sp;
+          %ancestor.anc_sosa;%sp;
           %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
           %apply;link%with;%ancestor.access;%and;
              %if;(ancestor.same != "")%ancestor.same;
@@ -493,9 +496,9 @@
       %lazy_force;
       %if;(ancestor.same = "")%incr_count;%end;
       <li%if;ancestor.has_parents; style="list-style-type:disc"%end;>%nn;
-      %if;(evar.sosab = 16)%ancestor.sosa.hexa;
-      %elseif;(evar.sosab = 8)%ancestor.sosa.octal;
-      %else;%ancestor.sosa;%end;%sp;
+      %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;
+      %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;
+      %else;%ancestor.anc_sosa;%end;%sp;
       %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
       %apply;link%with;%ancestor.access;%and;
          %if;(ancestor.same != "")%nn;
@@ -643,8 +646,8 @@
             %if;(dates_in_interval(ancestor.var) = "true")
               %lazy_force;
               <li>%sp;
-                %expr(ancestor.sosa.v * 2)
-                -%expr((ancestor.sosa.v * 2 + 1) % 10) -
+                %expr(ancestor.anc_sosa.v * 2)
+                -%expr((ancestor.anc_sosa.v * 2 + 1) % 10) -
               %if;(evar.ms != "on")
                 %apply;link(ancestor.access, ancestor)
               %else;
@@ -660,7 +663,7 @@
                  ancestor.father.surname = "?")
               %if;(dates_in_interval(ancestor.mother.var) = "true")
                 %lazy_force;
-                <li> %expr(ancestor.sosa.v * 2)%sp; -
+                <li> %expr(ancestor.anc_sosa.v * 2)%sp; -
                 %apply;a_of_b%with;
                   %apply;link(ancestor.father.access, [husband/wife]0)
                 %and;
@@ -675,7 +678,7 @@
                  ancestor.mother.surname = "?")
               %if;(dates_in_interval(ancestor.father.var) = "true")
                 %lazy_force;
-                <li> %expr(ancestor.sosa.v * 2 + 1)%sp; -
+                <li> %expr(ancestor.anc_sosa.v * 2 + 1)%sp; -
                 %apply;a_of_b%with;
                   %apply;link(ancestor.mother.access, [husband/wife]1)
                 %and;
@@ -706,12 +709,12 @@
       %foreach;ancestor;
         %if;(ancestor.same != "")
           <p>
-          <b><a name="%ancestor.sosa.v;">%ancestor.sosa;</a></b>:
+          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
           [see] <b><a href="#%ancestor.same;">%ancestor.same;</a></b>.
           </p>
         %else;
           <p>
-          <b><a name="%ancestor.sosa.v;">%ancestor.sosa;</a></b>
+          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
           %apply;long_display_ancestor_personal()
           </p>
           %if;(ancestor.index != self.index)
@@ -743,7 +746,7 @@
       %foreach;ancestor;
         %if;(ancestor.same = "" and ancestor.is_descendant)
           %lazy_force;
-          <li>%ancestor.sosa; -%sp;
+          <li>%ancestor.anc_sosa; -%sp;
           <a href="%prefix;%ancestor.access;">%ancestor;</a>%ancestor.dates;
           </li>
         %end;

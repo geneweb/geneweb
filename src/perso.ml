@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.209 2005-11-07 13:18:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.210 2005-11-08 19:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -791,7 +791,7 @@ type env 'a =
   | Vnldb of NotesLinks.notes_links_db
   | Vstring of string
   | Vsosa_ref of Lazy.t (option person)
-  | Vsosa of option (Num.t * person)
+  | Vsosa of ref (list (iper * option (Num.t * person)))
   | Vtitle of person and title_item
   | Vlazyp of ref (option string)
   | Vlazy of Lazy.t (env 'a)
@@ -883,6 +883,19 @@ value gen_string_of_img_sz max_wid max_hei conf base env (p, _, _, p_auth) =
 value string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid;
 value string_of_image_small_size = gen_string_of_img_sz 100 75;
 
+value get_sosa conf base env r p =
+  try List.assoc p.cle_index r.val with
+  [ Not_found -> do {
+      let s =
+        match get_env "sosa_ref" env with
+        [ Vsosa_ref v -> find_sosa conf base p v
+        | _ -> None ]
+      in
+      r.val := [(p.cle_index, s) :: r.val];
+      s
+    } ]
+;
+
 value make_ep conf base ip =
   let p = pget conf base ip in
   let a = aget conf base ip in
@@ -944,10 +957,6 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   | "has_relation_him" ->
       match get_env "rel" env with
       [ Vrel {r_fath = Some _} None -> True
-      | _ -> False ]
-  | "has_sosa" ->
-      match get_env "sosa" env with
-      [ Vsosa (Some _) -> True
       | _ -> False ]
   | "has_witnesses" ->
       match get_env "fam" env with
@@ -1244,13 +1253,6 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
           eval_relation_field_var conf base env (0, rt, ip, True) loc sl
       | _ -> raise Not_found ]
   | ["self" :: sl] -> eval_person_field_var conf base env ep loc sl
-  | ["sosa" :: sl] ->
-      match get_env "sosa" env with
-      [ Vsosa x ->
-          match x with
-          [ Some (n, p) -> VVstring (eval_num conf n sl)
-          | None -> VVstring "" ]
-      | _ -> raise Not_found ]
   | ["sosa_ref" :: sl] ->
       match get_env "sosa_ref" env with
       [ Vsosa_ref v ->
@@ -1398,7 +1400,7 @@ and eval_ancestor_field_var conf base env gp loc =
       match gp with
       [ GP_same _ n _ -> VVstring (eval_num conf n sl)
       | _ -> VVstring "" ]
-  | ["sosa" :: sl] ->
+  | ["anc_sosa" :: sl] ->
       match gp with
       [ GP_person n _ _ | GP_same n _ _ -> VVstring (eval_num conf n sl)
       | _ -> VVstring "" ]
@@ -1512,6 +1514,10 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           with
           [ Exit -> VVbool True ]
       | _ -> raise Not_found ]
+  | ["has_sosa"] ->
+      match get_env "sosa" env with
+      [ Vsosa r -> VVbool (get_sosa conf base env r p <> None)
+      | _ -> VVbool False ]
   | ["linked_page"; s] ->
       match get_env "nldb" env with
       [ Vnldb db ->
@@ -1540,6 +1546,13 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
       | _ -> VVstring "" ]
   | ["self" :: sl] ->
       eval_person_field_var conf base env ep loc sl
+  | ["sosa" :: sl] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match get_sosa conf base env x p with
+          [ Some (n, p) -> VVstring (eval_num conf n sl)
+          | None -> VVstring "" ]
+      | _ -> raise Not_found ]
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
@@ -1925,7 +1938,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "sosa_link" ->
       match get_env "sosa" env with
       [ Vsosa x ->
-          match x with
+          match get_sosa conf base env x p with
           [ Some (n, q) ->
               Printf.sprintf "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
                 (Adef.int_of_iper p.cle_index) (Adef.int_of_iper q.cle_index)
@@ -2690,7 +2703,6 @@ value interp_templ templ_fname conf base p =
       let sosa_ref () = Util.find_sosa_ref conf base in
       Lazy.lazy_from_fun sosa_ref
     in
-    let sosa () = Vsosa (find_sosa conf base p sosa_ref_l) in
     let desc_level_table_l =
       let dlt () = make_desc_level_table conf base (*infinite*)(limit_desc conf) p in
       Lazy.lazy_from_fun dlt
@@ -2710,7 +2722,7 @@ value interp_templ templ_fname conf base p =
      ("list", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));
-     ("sosa",  Vlazy (Lazy.lazy_from_fun sosa));
+     ("sosa",  Vsosa (ref []));
      ("sosa_ref", Vsosa_ref sosa_ref_l);
      ("max_anc_level", Vlazy (Lazy.lazy_from_fun mal));
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
