@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: desmenu.txt,v 1.8 2005-06-06 09:10:07 ddr Exp $ -->
+  <!-- $Id: desmenu.txt,v 1.9 2005-11-09 23:32:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -80,6 +80,7 @@
                 %apply;nth([nth (generation)], level)
               %end;
             %end;
+            %if;(level != 0) (%number_of_descendants;)%end;
           </option>
         %end;
       </select>
@@ -92,6 +93,13 @@
             <input type="radio" name="t" value="L" checked="checked"%/>
             [*list/list (ancestors)]0
           </label>
+          %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+            ([maximum] 12 [generation/generations]1)
+          %elseif;(
+            bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
+          )
+            ([maximum] %bvar.max_desc_level; [generation/generations]1)
+          %end;
           <br%/>
           <label>
             <input type="radio" name="t" value="M"%/>
