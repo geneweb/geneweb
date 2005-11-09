@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.53 2005-08-17 09:33:12 ddr Exp $ *)
+(* $Id: descend.ml,v 4.54 2005-11-09 23:32:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -240,6 +240,7 @@ end END;
 value display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let levt = Perso.make_desc_level_table conf base max_level ancestor in
+  let mark = Array.make (Array.length levt) False in
   let rec get_level level u list =
     List.fold_left
       (fun list ifam ->
@@ -248,14 +249,18 @@ value display_descendants_level conf base max_level ancestor =
          List.fold_left
            (fun list ix ->
               let x = pget conf base ix in
-              if level == max_level then
-                if p_first_name base x = "x" ||
-                   levt.(Adef.int_of_iper x.cle_index) != level then
-                  list
-                else [x :: list]
-              else if level < max_level then
-                get_level (succ level) (uget conf base ix) list
-              else list)
+              if mark.(Adef.int_of_iper x.cle_index) then list
+              else
+                let _ = mark.(Adef.int_of_iper x.cle_index) := True in
+                if levt.(Adef.int_of_iper x.cle_index) > max_level then list
+                else if level == max_level then
+                  if p_first_name base x = "x" ||
+                     levt.(Adef.int_of_iper x.cle_index) != level then
+                    list
+                  else [x :: list]
+                else if level < max_level then
+                  get_level (succ level) (uget conf base ix) list
+                else list)
            list (Array.to_list enfants))
       list (Array.to_list u.family)
   in

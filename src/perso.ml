@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.210 2005-11-08 19:59:59 ddr Exp $ *)
+(* $Id: perso.ml,v 4.211 2005-11-09 23:32:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -280,11 +280,12 @@ value limit_desc conf =
 
 value infinite = 10000;
 
+(*
 value make_desc_level_table conf base max_level p =
   let mark = Array.create base.data.persons.len False in
   let levt = Array.create base.data.persons.len infinite in
   let rec fill ip u lev =
-    if max_level == infinite && mark.(Adef.int_of_iper ip) then ()
+    if mark.(Adef.int_of_iper ip) then ()
     else do {
       mark.(Adef.int_of_iper ip) := True;
       if lev <= max_level then do {
@@ -302,6 +303,24 @@ value make_desc_level_table conf base max_level p =
   in
   do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
 ;
+*)
+
+value make_desc_level_table conf base max_level p =
+  let levt = Array.create base.data.persons.len infinite in
+  let rec fill ip u lev =
+    if levt.(Adef.int_of_iper ip) <= lev then ()
+    else if lev <= max_level then do {
+      levt.(Adef.int_of_iper ip) := lev;
+      Array.iter
+        (fun ifam ->
+           let ipl = (doi base ifam).children in
+           Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
+        u.family
+    }
+    else ()
+  in
+  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
+;
 
 value desc_level_max conf base desc_level_table_l =
   let levt = Lazy.force desc_level_table_l in
@@ -316,7 +335,10 @@ value desc_level_max conf base desc_level_table_l =
 ;
 
 value max_descendant_level conf base desc_level_table_l =
-  min (limit_desc conf) (desc_level_max conf base desc_level_table_l)
+(*
+  min (limit_desc conf)
+*)
+    (desc_level_max conf base desc_level_table_l)
 ;
 
 (* ancestors by list *)
@@ -1216,6 +1238,18 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       match get_env "item" env with
       [ Vslistlm [_ :: ell] -> eval_item_field_var env ell sl
       | _ -> raise Not_found ]
+  | ["number_of_descendants" :: sl] ->
+      match get_env "level" env with
+      [ Vint i ->
+          match get_env "desc_level_table" env with
+          [ Vdesclevtab t ->
+              let cnt =
+                Array.fold_left (fun cnt v -> if v <= i then cnt + 1 else cnt)
+                  0 (Lazy.force t)
+              in
+              VVstring (eval_num conf (Num.of_int (cnt - 1)) sl)
+          | _ -> raise Not_found ]
+      | _ -> raise Not_found ]  
   | ["parent" :: sl] ->
       match get_env "parent" env with
       [ Vind p a u ->
@@ -2704,12 +2738,12 @@ value interp_templ templ_fname conf base p =
       Lazy.lazy_from_fun sosa_ref
     in
     let desc_level_table_l =
-      let dlt () = make_desc_level_table conf base (*infinite*)(limit_desc conf) p in
+      let dlt () = make_desc_level_table conf base emal p in
       Lazy.lazy_from_fun dlt
     in
-    let mal () =  Vint (max_ancestor_level conf base p.cle_index emal + 1) in
-    let mcl () =  Vint (max_cousin_level conf base p) in
-    let mdl () =  Vint (max_descendant_level conf base desc_level_table_l) in
+    let mal () = Vint (max_ancestor_level conf base p.cle_index emal + 1) in
+    let mcl () = Vint (max_cousin_level conf base p) in
+    let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
       let fname = Filename.concat bdir "notes_links" in
