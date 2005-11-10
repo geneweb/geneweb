@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.211 2005-11-09 23:32:27 ddr Exp $ *)
+(* $Id: perso.ml,v 4.212 2005-11-10 12:17:16 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1238,6 +1238,10 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       match get_env "item" env with
       [ Vslistlm [_ :: ell] -> eval_item_field_var env ell sl
       | _ -> raise Not_found ]
+  | ["number_of_ancestors" :: sl] ->
+      match get_env "n" env with
+      [ Vint n -> VVstring (eval_num conf (Num.of_int (n - 1)) sl)
+      | _ -> raise Not_found ]
   | ["number_of_descendants" :: sl] ->
       match get_env "level" env with
       [ Vint i ->
@@ -2277,14 +2281,24 @@ value print_foreach conf base print_ast eval_expr =
       | _ -> raise Not_found ]
     in
     let mark = Array.create base.data.persons.len Num.zero in
-    loop [GP_person Num.one p.cle_index None] 1 where rec loop gpl i =
+    loop [GP_person Num.one p.cle_index None] 1 0 where rec loop gpl i n =
       if i > max_level then ()
       else
-        let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
+        let n =
+          List.fold_left
+            (fun n gp ->
+               match gp with
+               [ GP_person _ _ _ -> n + 1
+               | _ -> n ])
+            n gpl
+        in
+        let env =
+          [("gpl", Vgpl gpl); ("level", Vint i); ("n", Vint n) :: env]
+        in
         do {
           List.iter (print_ast env ep) al;
           let gpl = next_generation conf base mark gpl in
-          loop gpl (succ i)
+          loop gpl (succ i) n
         }
   and print_foreach_ancestor_level2 env al ((p, _, _, _) as ep) =
     let max_lev = "max_anc_level" in
