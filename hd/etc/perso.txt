@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.64 2005-11-07 13:18:52 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.65 2005-11-10 09:45:00 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -207,8 +207,8 @@
   %end;
 %end;
 
-%define;witness_relation(him, her)
-  [*witness at marriage of %s and %s:::him:her]
+%define;witness_relation(xxx, yyy)
+  [*witness at marriage of %s and %s:::xxx:yyy]
 %end;
 
 %if;has_families;
