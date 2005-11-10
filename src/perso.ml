@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.212 2005-11-10 12:17:16 ddr Exp $ *)
+(* $Id: perso.ml,v 4.213 2005-11-10 23:05:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -280,46 +280,22 @@ value limit_desc conf =
 
 value infinite = 10000;
 
-(*
-value make_desc_level_table conf base max_level p =
-  let mark = Array.create base.data.persons.len False in
-  let levt = Array.create base.data.persons.len infinite in
-  let rec fill ip u lev =
-    if mark.(Adef.int_of_iper ip) then ()
-    else do {
-      mark.(Adef.int_of_iper ip) := True;
-      if lev <= max_level then do {
-        if lev < levt.(Adef.int_of_iper ip) then
-          levt.(Adef.int_of_iper ip) := lev
-        else ();
-        Array.iter
-          (fun ifam ->
-             let ipl = (doi base ifam).children in
-             Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
-          u.family
-      }
-      else ()
-    }
-  in
-  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
-;
-*)
-
 value make_desc_level_table conf base max_level p =
   let levt = Array.create base.data.persons.len infinite in
-  let rec fill ip u lev =
+  let get = base.data.unions.get in
+  let rec fill ip lev =
     if levt.(Adef.int_of_iper ip) <= lev then ()
     else if lev <= max_level then do {
       levt.(Adef.int_of_iper ip) := lev;
       Array.iter
         (fun ifam ->
            let ipl = (doi base ifam).children in
-           Array.iter (fun ip -> fill ip (uget conf base ip) (succ lev)) ipl)
-        u.family
+           Array.iter (fun ip -> fill ip (succ lev)) ipl)
+        (get (Adef.int_of_iper ip)).family
     }
     else ()
   in
-  do { fill p.cle_index (uget conf base p.cle_index) 0; levt }
+  do { fill p.cle_index 0; levt }
 ;
 
 value desc_level_max conf base desc_level_table_l =
