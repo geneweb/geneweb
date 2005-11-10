@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 4.14 2005-10-16 03:03:01 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 4.15 2005-11-10 12:17:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -87,6 +87,7 @@
                 %apply;nth([nth (generation)], level)
               %end;
             %end;
+            %if;(level != 1) (%number_of_ancestors;)%end;
           </option>
         %end;
       </select>
