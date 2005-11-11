@@ -58,8 +58,8 @@ The new version number (5.00) is in honour of this new encoding.
       displayed.
 
 * GeneWeb server or CGI (gwd)
-  - [10 Nov 05] The descendants page displays the number of descendants
-    in the menu.
+  - [10 Nov 05] The ancestors and descendants page displays the number
+    of persons in the menu.
   - [16 Oct 05] Added a system for list of only allowed nobility titles.
   - [06 Oct 05] The database forum can be moderated.
   - [02 Sep 05] Added a "search" form in database forum.

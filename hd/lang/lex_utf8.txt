@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.75 2005-11-07 10:47:48 ddr Exp $
+# $Id: lex_utf8.txt,v 1.76 2005-11-11 06:35:26 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7860,7 +7860,7 @@ bg: най-отдавнашните %d двойки от евентуално о
 ca: les parelles més grans potser encara vives i juntes
 cs: %d nejstarších párů pravděpodobně žijících a zadaných
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
-de: die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
+de: die %d ältesten verlobten und möglicherweise noch lebenden Paare
 en: the %d oldest couples perhaps still alive and engaged
 eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
 es: los novios m&aacute;s viejos y quiz&aacute;s todav&iacute;a vivos
