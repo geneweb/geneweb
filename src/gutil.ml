@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.48 2005-10-16 03:03:01 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.49 2005-11-11 22:59:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1082,6 +1082,7 @@ value nbc c =
   else -1
 ;
 
+(*
 value utf_8_alphab_value s i =
   let c = s.[i] in
   if Char.code c < 0b11000000 then (c, i + 1)
@@ -1122,6 +1123,7 @@ value utf_8_alphab_value s i =
               (c, i + 1) ]
     | _ -> (c, i + 1) ]
 ;
+*)
 
 value alphabetic_utf_8 n1 n2 =
   let rec loop i1 i2 =
@@ -1129,6 +1131,7 @@ value alphabetic_utf_8 n1 n2 =
     else if i1 >= String.length n1 then -1
     else if i2 >= String.length n2 then 1
     else
+(*
       let c1 = String.unsafe_get n1 i1 in
       let c2 = String.unsafe_get n2 i2 in
       let (cv1, ii1) = utf_8_alphab_value n1 i1 in
@@ -1138,6 +1141,16 @@ value alphabetic_utf_8 n1 n2 =
         else (compare cv1 cv2, ii1, ii2)
       in
       if c = 0 then loop i1 i2 else c
+*)
+      let (cv1, ii1) = Name.unaccent_utf_8 n1 i1 in
+      let (cv2, ii2) = Name.unaccent_utf_8 n2 i2 in
+      let c =
+        if cv1 = cv2 then
+          compare (String.sub n1 i1 (ii1 - i1)) (String.sub n2 i2 (ii2 - i2))
+        else compare cv1 cv2
+      in
+      if c = 0 then loop ii1 ii2 else c
+(**)
   in
   if n1 = n2 then 0 else loop 0 0
 ;
