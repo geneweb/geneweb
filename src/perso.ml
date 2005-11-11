@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.214 2005-11-10 23:36:15 ddr Exp $ *)
+(* $Id: perso.ml,v 4.215 2005-11-11 06:35:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -280,50 +280,32 @@ value limit_desc conf =
 
 value infinite = 10000;
 
-(*
 value make_desc_level_table conf base max_level p =
   let levt = Array.create base.data.persons.len infinite in
   let get = base.data.unions.get in
-  let rec fill ip lev =
-    if levt.(Adef.int_of_iper ip) <= lev then ()
-    else if lev <= max_level then do {
-      levt.(Adef.int_of_iper ip) := lev;
-      Array.iter
-        (fun ifam ->
-           let ipl = (doi base ifam).children in
-           Array.iter (fun ip -> fill ip (succ lev)) ipl)
-        (get (Adef.int_of_iper ip)).family
-    }
-    else ()
+  let rec fill lev =
+    fun
+    [ [] -> ()
+    | ipl ->
+        let new_ipl =
+          List.fold_left
+            (fun ipl ip ->
+               if levt.(Adef.int_of_iper ip) <= lev then ipl
+               else if lev <= max_level then do {
+                 levt.(Adef.int_of_iper ip) := lev;
+                 Array.fold_left
+                   (fun ipl ifam ->
+                      let ipa = (doi base ifam).children in
+                      Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
+                   ipl (get (Adef.int_of_iper ip)).family
+               }
+               else ipl)
+            [] ipl
+        in
+        fill (succ lev) new_ipl ]
   in
-  do { fill p.cle_index 0; levt }
+  do { fill 0 [p.cle_index]; levt }
 ;
-*)
-value make_desc_level_table conf base max_level p =
-  let levt = Array.create base.data.persons.len infinite in
-  let get = base.data.unions.get in
-  let rec fill ipl lev =
-    let new_ipl =
-      List.fold_left
-        (fun ipl ip ->
-           if levt.(Adef.int_of_iper ip) <= lev then ipl
-           else if lev <= max_level then do {
-             levt.(Adef.int_of_iper ip) := lev;
-             Array.fold_left
-               (fun ipl ifam ->
-                  let ipa = (doi base ifam).children in
-                  Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
-               ipl (get (Adef.int_of_iper ip)).family
-           }
-           else ipl)
-        [] ipl
-    in
-    if new_ipl = [] then ()
-    else fill new_ipl (succ lev)
-  in
-  do { fill [p.cle_index] 0; levt }
-;
-(**)
 
 value desc_level_max conf base desc_level_table_l =
   let levt = Lazy.force desc_level_table_l in
