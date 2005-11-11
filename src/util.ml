@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.162 2005-10-16 03:03:01 ddr Exp $ *)
+(* $Id: util.ml,v 4.163 2005-11-11 20:00:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -865,10 +865,15 @@ value start_with s i p =
   String.lowercase (String.sub s i (String.length p)) = p
 ;
 
+value start_with2 s i p =
+  i + String.length p <= String.length s &&
+  String.sub s i (String.length p) = p
+;
+
 value get_particle base s =
   loop base.data.particles where rec loop =
     fun
-    [ [part :: parts] -> if start_with s 0 part then part else loop parts
+    [ [part :: parts] -> if start_with2 s 0 part then part else loop parts
     | [] -> "" ]
 ;
 
