@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.24 2005-05-25 00:55:26 ddr Exp $ *)
+(* $Id: alln.ml,v 4.25 2005-11-11 20:00:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -286,7 +286,6 @@ value print_frequency_any conf base is_surnames list len =
 
 (* selection *)
 
-(* version using the index *)
 value select_names conf base is_surnames ini =
   let iii =
     if is_surnames then base.func.persons_of_surname
