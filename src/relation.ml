@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.85 2005-09-16 22:05:49 ddr Exp $ *)
+(* $Id: relation.ml,v 4.86 2005-11-12 19:07:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -1475,7 +1475,7 @@ value multi_relation_next_txt conf pl2 lim assoc_txt =
              (sl, n - 1))
           (sl, List.length pl2) (List.rev pl2)
       in
-      let sl = ["m=RLM" :: sl] in
+      let sl = [commd conf; "m=RLM" :: sl] in
       String.concat "" sl ]
 ;
 
