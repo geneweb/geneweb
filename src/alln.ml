@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.25 2005-11-11 20:00:26 ddr Exp $ *)
+(* $Id: alln.ml,v 4.26 2005-11-13 12:54:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -129,7 +129,7 @@ value displayify s =
     loop 0 0 where rec loop i len =
       if i = String.length s then Buff.get len
       else
-        let nbc = Gutil.nbc s.[i] in
+        let nbc = Name.nbc s.[i] in
         if nbc < 0 || i + nbc > String.length s then
           Buff.get (Buff.mstore len "...")
         else loop (i + nbc) (Buff.gstore len s i nbc)

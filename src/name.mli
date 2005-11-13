@@ -1,4 +1,4 @@
-(* $Id: name.mli,v 4.6 2005-11-12 18:58:10 ddr Exp $ *)
+(* $Id: name.mli,v 4.7 2005-11-13 12:54:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value lower : string -> string;
@@ -38,5 +38,6 @@ value next_chars_if_equiv :
 ;
 
 value unaccent_utf_8 : bool -> string -> int -> (string * int);
+value nbc : char -> int;
 
 value utf_8_db : ref bool;

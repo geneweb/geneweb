@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.61 2005-08-21 23:08:49 ddr Exp $ *)
+(* $Id: dag.ml,v 4.62 2005-11-13 12:54:49 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -337,7 +337,7 @@ value displayed_next_char s i =
           in
           loop1 (i + 1)
       | c ->
-          if utf_8_db.val then Some (i, i + max 1 (Gutil.nbc c))
+          if utf_8_db.val then Some (i, i + max 1 (Name.nbc c))
           else Some (i, i + 1) ]
 ;
 
