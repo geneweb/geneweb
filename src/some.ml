@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.47 2005-10-18 11:17:40 ddr Exp $ *)
+(* $Id: some.ml,v 4.48 2005-11-13 12:54:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -459,7 +459,7 @@ value print_by_branch x conf base (pl, homonymes) =
 
 value first_char s =
   if Gutil.utf_8_db.val then
-    let len = Gutil.nbc s.[0] in
+    let len = Name.nbc s.[0] in
     if len < String.length s then String.sub s 0 len
     else s
   else String.sub s (initial s) 1

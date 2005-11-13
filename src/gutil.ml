@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.50 2005-11-12 18:58:10 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.51 2005-11-13 12:54:49 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1070,60 +1070,6 @@ value gen_strip_spaces strip_heading str =
 ;
 
 value strip_spaces = gen_strip_spaces True;
-
-value nbc c =
-  if Char.code c < 0b10000000 then 1
-  else if Char.code c < 0b10000000 then -1
-  else if Char.code c < 0b11100000 then 2
-  else if Char.code c < 0b11110000 then 3
-  else if Char.code c < 0b11111000 then 4
-  else if Char.code c < 0b11111100 then 5
-  else if Char.code c < 0b11111110 then 6
-  else -1
-;
-
-(*
-value utf_8_alphab_value s i =
-  let c = s.[i] in
-  if Char.code c < 0b11000000 then (c, i + 1)
-  else
-    match Char.code c with
-    [ 0xC3 ->
-        if i = String.length s - 1 then (c, i + 1)
-        else
-          match Char.code s.[i+1] with
-          [ 0x80 | 0x81 | 0x82 | 0x83 | 0x84 | 0x85 | 0x86 -> ('A', i + 2)
-          | 0x87 -> ('C', i + 2)
-          | 0x88 | 0x89 | 0x8A | 0x8B -> ('E', i + 2)
-          | 0x8C | 0x8D | 0x8E | 0x8F -> ('I', i + 2)
-          | 0x91 -> ('N', i + 2)
-          | 0x92 | 0x93 | 0x94 | 0x95 | 0x96 | 0x98 -> ('O', i + 2)
-          | 0x99 | 0x9A | 0x9B | 0x9C -> ('U', i + 2)
-          | 0x9F -> ('z', i + 2)
-          | 0xA0 | 0xA1 | 0xA2 | 0xA3 | 0xA4 | 0xA5 | 0xA6 -> ('a', i + 2)
-          | 0xA7 -> ('c', i + 2)
-          | 0xA8 | 0xA9 | 0xAA | 0xAB -> ('e', i + 2)
-          | 0xAC | 0xAD | 0xAE | 0xAF -> ('i', i + 2)
-          | 0xB1 -> ('n', i + 2)
-          | 0xB2 | 0xB3 | 0xB4 | 0xB5 | 0xB6 | 0xB8 -> ('o', i + 2)
-          | 0xB9 | 0xBA | 0xBB | 0xBC -> ('u', i + 2)
-          | 0xBF -> ('y', i + 2)
-          | c2 ->
-              let _ =
-                do {
-                  Printf.eprintf
-                    "not impl utf_8_alphab_value %02X%02X %s (%s)\n"
-                    (Char.code c) c2
-                    (iso_8859_1_of_utf_8
-                       (String.sub s i (String.length s - i)))
-                    (iso_8859_1_of_utf_8 s);
-                  flush stderr;
-                }
-              in
-              (c, i + 1) ]
-    | _ -> (c, i + 1) ]
-;
-*)
 
 value alphabetic_utf_8 n1 n2 =
   let rec loop i1 i2 =
