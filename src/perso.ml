@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.216 2005-11-11 20:00:26 ddr Exp $ *)
+(* $Id: perso.ml,v 4.217 2005-11-14 22:58:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2261,7 +2261,7 @@ value print_foreach conf base print_ast eval_expr =
       [ [[e]] -> eval_int_expr env ep e
       | [] ->
           match get_env "max_anc_level" env with
-          [ Vint n -> n - 1
+          [ Vint n -> n
           | _ -> 0 ]
       | _ -> raise Not_found ]
     in
