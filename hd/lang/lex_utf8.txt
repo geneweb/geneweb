@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.76 2005-11-11 06:35:26 ddr Exp $
+# $Id: lex_utf8.txt,v 1.77 2005-11-16 10:21:38 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -8538,6 +8538,7 @@ es: este foro est&aacute; moderato
 fi: t&auml;m&auml; foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
+sv: detta forum är ändrat
 
     title/titles
 af: titel/titels
@@ -9109,6 +9110,7 @@ es: validar/borrar
 fi: tarkista/hylk&auml;&auml;
 fr: valider/supprimer
 it: conferma/elimina
+sv: giltligt/tas bort
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
@@ -9402,3 +9404,4 @@ en: your message is waiting for validation
 es: tu mensaje espera su validaci&oacute;n
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
+sv: ditt meddelande väntar på giltighet
