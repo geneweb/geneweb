@@ -1,7 +1,9 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.41 2005-11-19 08:38:45 ddr Exp $ *)
+(* $Id: doc.ml,v 4.42 2005-11-19 12:48:16 ddr Exp $ *)
 
 open Config;
+
+value notify_change_wdoc = ref "";
 
 value start_with s i p =
   i + String.length p < String.length s &&
@@ -324,18 +326,18 @@ value commit_wdoc conf file_path fdoc s =
       output_char oc '\n';
       close_out oc;
       IFDEF UNIX THEN
-        match Util.p_getenv conf.base_env "notify_change_wdoc" with
-        [ Some comm ->
-            let args = [| comm; fname; conf.lang; fdoc |] in
-            match Unix.fork () with
-            [ 0 ->
-                if Unix.fork () <> 0 then exit 0
-                else do {
-                  try Unix.execvp comm args with _ -> ();
-                  exit 0
-                }
-            | id -> ignore (Unix.waitpid [] id) ]
-        | None -> () ]
+        if notify_change_wdoc.val <> "" then
+          let comm = notify_change_wdoc.val in
+          let args = [| comm; fname; conf.lang; fdoc |] in
+          match Unix.fork () with
+          [ 0 ->
+              if Unix.fork () <> 0 then exit 0
+              else do {
+                try Unix.execvp comm args with _ -> ();
+                exit 0
+              }
+          | id -> ignore (Unix.waitpid [] id) ]
+        else ()
       ELSE () END;
     }
   }

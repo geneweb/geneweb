@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.91 2005-11-03 01:15:05 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.92 2005-11-19 12:48:16 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1569,7 +1569,9 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
           ("-conn_tmout", Arg.Int (fun x -> conn_timeout.val := x),
            "<sec>\n       Connection timeout (default " ^
              string_of_int conn_timeout.val ^ "s; 0 means no limit)");
-          ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")]
+          ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.");
+          ("-chwd", Arg.String (fun s -> Doc.notify_change_wdoc.val := s),
+           "<comm>\n        Call command when wdoc changed")]
        ELSE
          [("-noproc", Arg.Set Wserver.noproc,
            "\n       Do not launch a process at each request.") ::
