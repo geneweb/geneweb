@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.77 2005-11-16 10:21:38 ddr Exp $
+# $Id: lex_utf8.txt,v 1.78 2005-11-24 08:16:58 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5040,6 +5040,7 @@ fi: linkkisivuja
 fr: pages liées
 it: pagine collegate
 nl: gekoppelde pagina’s
+no: linkede sider
 pt-br: página associadas
 sv: länkade sidor
 
@@ -5514,6 +5515,7 @@ fi: sekalaisia huomautuksia
 fr: notes diverses
 it: note varie
 nl: diversen
+no: diverse notater
 pt-br: notas diversas
 sv: blandade noteringar
 
@@ -7165,6 +7167,7 @@ fi: haku/tunnistaa merkkikoon
 fr: rechercher/sensible à la casse
 it: ricerca/sensibile a maiuscole e minuscole
 nl: zoeken/hoofdlettergevoelig
+no: søk/skiller mellom store og små bokstaver
 pt-br: procurar/diferencia maiúsculas
 sv: sök/skiftlägeskänslig
 
@@ -8538,6 +8541,7 @@ es: este foro est&aacute; moderato
 fi: t&auml;m&auml; foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
+no: dette forumet er endret
 sv: detta forum är ändrat
 
     title/titles
@@ -9110,6 +9114,7 @@ es: validar/borrar
 fi: tarkista/hylk&auml;&auml;
 fr: valider/supprimer
 it: conferma/elimina
+no: verifiser/slett
 sv: giltligt/tas bort
 
     visualize/show/hide/summary
@@ -9122,6 +9127,7 @@ fi: kuvaa/n&auml;yt&auml;/piilota/yhteenveto
 fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
 nl: visualiseren/tonen/verbergen/samenvatting
+no: visualiser/vis/skjul/summert
 pt: visualizar/mostrar/esconder/sumário
 sv: visualisera/visa/g&ouml;m/summering
 
@@ -9404,4 +9410,5 @@ en: your message is waiting for validation
 es: tu mensaje espera su validaci&oacute;n
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
+no: Beskjeden din avventer bekreftelse
 sv: ditt meddelande väntar på giltighet
