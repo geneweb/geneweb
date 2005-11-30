@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.46 2005-07-22 10:52:51 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.47 2005-11-30 02:08:16 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -394,10 +394,7 @@ value insert_person gen so =
            | n -> "." ^ string_of_int n ])
           (p_surname gen.g_base x)
       else ();
-(*
-      x.birth := Adef.codate_None;
-      x.death := DontKnowIfDead;
-*)
+      flush stdout;
       check_error gen
     }
     else gen.g_def.(Adef.int_of_iper ip) := True;
@@ -713,11 +710,19 @@ value persons_cache gen per_index_ic per_ic persons =
   let read_person_in_temp_file i =
     let mp = persons.(i) in
     do {
-      seek_in per_index_ic (Iovalue.sizeof_long * i);
-      let pos = input_binary_int per_index_ic in
-      seek_in per_ic pos;
       let p : person =
-        match input_char per_ic with
+        let c =
+          try
+            do {
+              seek_in per_index_ic (Iovalue.sizeof_long * i);
+              let pos = input_binary_int per_index_ic in
+              seek_in per_ic pos;
+              input_char per_ic
+            }
+          with
+          [ End_of_file -> 'U' ]
+        in
+        match c with
         [ 'D' -> input_item_value per_ic
         | 'U' ->
             let empty_string = Adef.istr_of_int 0 in
@@ -919,10 +924,11 @@ value link gwo_list bname =
     }
     else ();
     Hashtbl.clear gen.g_patch_p;
-    if not gen.g_errored then
-      if do_consang.val then ConsangAll.compute base True False else ()
-    else exit 2;
-    (base, gen.g_wiznotes)
+    if not gen.g_errored then do {
+      if do_consang.val then ConsangAll.compute base True False else ();
+      Some (base, gen.g_wiznotes)
+    }
+    else None;
   }
 ;
 
@@ -1057,14 +1063,21 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Iobase.lock_file out_file.val) with
       [ Accept ->
-          let (base, wiznotes) = link (List.rev gwo.val) out_file.val in
-          do {
-            Gc.compact ();
-            Iobase.output out_file.val base;
-            output_wizard_notes out_file.val wiznotes;
-            output_command_line out_file.val;
-            output_particles_file out_file.val base.data.particles;
-          }
+          match link (List.rev gwo.val) out_file.val with
+          [ Some (base, wiznotes) ->
+              do {
+                Gc.compact ();
+                Iobase.output out_file.val base;
+                output_wizard_notes out_file.val wiznotes;
+                output_command_line out_file.val;
+                output_particles_file out_file.val base.data.particles;
+              }
+          | None ->
+              do {
+                printf "Creation of database failed.\n";
+                flush stdout;
+                exit 2;
+              } ]
       | Refuse ->
           do {
             printf "Base is locked: cannot write it\n";
