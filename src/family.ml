@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.66 2005-10-16 03:03:01 ddr Exp $ *)
+(* $Id: family.ml,v 4.67 2005-12-04 01:19:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -420,6 +420,8 @@ value family_m conf base =
   | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
+  | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf
+  | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf
   | Some "MOD_WIZNOTES" -> Wiznotes.print_mod conf base
   | Some "MOD_WIZNOTES_OK" -> Wiznotes.print_mod_ok conf base
   | Some "MRG" when conf.wizard ->
@@ -512,6 +514,7 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> updmenu_print conf base p
       | _ -> very_unknown conf ]
+  | Some "WDOC" -> Doc.print_wdoc conf
   | Some "WIZNOTES" -> Wiznotes.print conf base
   | Some mode -> incorrect_request conf
   | None ->
@@ -627,8 +630,7 @@ value treat_request conf base log =
       p_getenv conf.env "opt",
       p_getenv conf.env "m")
    with
-   [ (Some s, _, _) ->
-        print_moved conf base s
+   [ (Some s, _, _) -> print_moved conf base s
    | (_, Some "no_index", _) -> print_no_index conf base
    | (_, _, Some "IM") -> Image.print conf base
    | _ ->
