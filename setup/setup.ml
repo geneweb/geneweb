@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.59 2005-04-11 08:30:40 ddr Exp $ *)
+(* $Id: setup.ml,v 4.60 2005-12-06 19:49:42 ddr Exp $ *)
 
 open Printf;
 
@@ -7,6 +7,7 @@ value port = ref 2316;
 value default_lang = ref "en";
 value setup_dir = ref ".";
 value lang_param = ref "";
+value only_file = ref "";
 
 value slashify s =
   let s1 = String.copy s in
@@ -316,6 +317,11 @@ value referer conf =
   Wserver.extract_param "referer: " '\r' conf.request
 ;
 
+value only_file_name () =
+  if only_file.val = "" then Filename.concat setup_dir.val "only.txt"
+  else only_file.val
+;
+
 value macro conf =
   fun
   [ '/' -> IFDEF UNIX THEN "/" ELSE "\\" END
@@ -332,6 +338,7 @@ value macro conf =
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> setup_dir.val
   | 'w' -> slashify (Sys.getcwd ())
+  | 'y' -> Filename.basename (only_file_name ())
   | '%' -> "%"
   | c -> "BAD MACRO " ^ String.make 1 c ]
 ;
@@ -1598,7 +1605,7 @@ value string_of_sockaddr =
 value local_addr = "127.0.0.1";
 
 value only_addr () =
-  let fname = Filename.concat setup_dir.val "only.txt" in
+  let fname = only_file_name () in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let v = try input_line ic with [ End_of_file -> local_addr ] in
@@ -1769,8 +1776,10 @@ value speclist =
     "<string>: default lang");
    ("-daemon", Arg.Set daemon, ": Unix daemon mode.");
    ("-p", Arg.Int (fun x -> port.val := x),
-    "<number>:\n       Select a port number (default = " ^
+    "<number>: Select a port number (default = " ^
       string_of_int port.val ^ "); > 1024 for normal users.");
+   ("-only", Arg.String (fun s -> only_file.val := s),
+    "<file>: File containing the only authorized address");
    ("-gd", Arg.String (fun x -> setup_dir.val := x),
     "<string>: gwsetup directory") ::
    IFDEF SYS_COMMAND THEN
