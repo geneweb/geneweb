@@ -37,6 +37,11 @@ them when I have some time (and some courage).
     influence in relationship links "shortest path" because of cleaning
     up the code by unifying parts coded differently.
 
+* Setup program (gwsetup)
+  - [06 Dec 05] Added option -only to set the file containing the
+    only address authorized to connect (default = "only.txt" in
+    directory set by option -gd).
+
 GeneWeb Version 4.10
 --------------------
 
