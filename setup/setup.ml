@@ -1,11 +1,12 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.60 2005-12-06 19:49:42 ddr Exp $ *)
+(* $Id: setup.ml,v 4.61 2005-12-06 21:25:07 ddr Exp $ *)
 
 open Printf;
 
 value port = ref 2316;
 value default_lang = ref "en";
 value setup_dir = ref ".";
+value bin_dir = ref "";
 value lang_param = ref "";
 value only_file = ref "";
 
@@ -336,7 +337,7 @@ value macro conf =
   | 'p' -> parameters conf.env
   | 'q' -> Version.txt
   | 'u' -> Filename.dirname (abs_setup_dir ())
-  | 'x' -> setup_dir.val
+  | 'x' -> stringify (Filename.concat bin_dir.val conf.comm)
   | 'w' -> slashify (Sys.getcwd ())
   | 'y' -> Filename.basename (only_file_name ())
   | '%' -> "%"
@@ -834,7 +835,7 @@ value infer_rc conf rc =
 
 value gwc conf =
   let rc =
-    let comm = stringify (Filename.concat setup_dir.val "gwc") in
+    let comm = stringify (Filename.concat bin_dir.val "gwc") in
     exec_f (comm ^ parameters conf.env)
   in
   let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
@@ -877,7 +878,7 @@ value gwb2ged = gwu_or_gwb2ged_check ".ged";
 
 value gwb2ged_or_gwu_1 ok_file conf =
   let rc =
-    let comm = stringify (Filename.concat setup_dir.val conf.comm) in
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
     exec_f (comm ^ parameters conf.env)
   in
   do {
@@ -1053,7 +1054,7 @@ value recover_2 conf =
       flush stderr;
       Sys.chdir dir;
       let c =
-        Filename.concat setup_dir.val src_to_new ^ " " ^ tmp ^ " -f -o " ^
+        Filename.concat bin_dir.val src_to_new ^ " " ^ tmp ^ " -f -o " ^
           out_file ^ " > " ^ "comm.log"
       in
       eprintf "$ %s\n" c;
@@ -1101,6 +1102,7 @@ value cleanup conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
+  let conf = {(conf) with comm = "."} in
   if in_base = "" then print_file conf "err_miss.htm"
   else print_file conf "cleanup1.htm"
 ;
@@ -1116,7 +1118,7 @@ value cleanup_1 conf =
     eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
     flush stderr;
     let c =
-      Filename.concat setup_dir.val "gwu" ^ " " ^ in_base ^ " -o tmp.gw"
+      Filename.concat bin_dir.val "gwu" ^ " " ^ in_base ^ " -o tmp.gw"
     in
     eprintf "$ %s\n" c;
     flush stderr;
@@ -1135,7 +1137,7 @@ value cleanup_1 conf =
     flush stderr;
     Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
     let c =
-      Filename.concat setup_dir.val "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
+      Filename.concat bin_dir.val "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
         " > comm.log "
     in
     eprintf "$ %s\n" c;
@@ -1215,6 +1217,7 @@ value merge conf =
     [ Some f -> strip_spaces f
     | _ -> "" ]
   in
+  let conf = {(conf) with comm = "."} in
   let bases = selected conf.env in
   if out_file = "" || List.length bases < 2 then
     print_file conf "err_miss.htm"
@@ -1240,7 +1243,7 @@ value merge_1 conf =
         [ [] -> 0
         | [b :: bases] ->
             let c =
-              Filename.concat setup_dir.val "gwu" ^ " " ^ b ^ " -o " ^ b ^
+              Filename.concat bin_dir.val "gwu" ^ " " ^ b ^ " -o " ^ b ^
                 ".gw"
             in
             do {
@@ -1254,7 +1257,7 @@ value merge_1 conf =
       if rc <> 0 then rc
       else do {
         let c =
-          Filename.concat setup_dir.val "gwc" ^
+          Filename.concat bin_dir.val "gwc" ^
             List.fold_left
               (fun s b ->
                  if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
@@ -1441,7 +1444,7 @@ value gwd_1 conf =
 
 value ged2gwb conf =
   let rc =
-    let comm = stringify (Filename.concat setup_dir.val conf.comm) in
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
     exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
   let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
@@ -1455,7 +1458,7 @@ value ged2gwb conf =
 
 value consang conf ok_file =
   let rc =
-    let comm = stringify (Filename.concat setup_dir.val conf.comm) in
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
     exec_f (comm ^ parameters conf.env)
   in
   do {
@@ -1781,7 +1784,9 @@ value speclist =
    ("-only", Arg.String (fun s -> only_file.val := s),
     "<file>: File containing the only authorized address");
    ("-gd", Arg.String (fun x -> setup_dir.val := x),
-    "<string>: gwsetup directory") ::
+    "<string>: gwsetup directory");
+   ("-bindir", Arg.String (fun x -> bin_dir.val := x),
+    "<string>: binary directory (default = value of option -gd)") ::
    IFDEF SYS_COMMAND THEN
      [("-wserver", Arg.String (fun _ -> ()), " (internal feature)")]
    ELSE [] END]
@@ -1817,6 +1822,7 @@ value intro () =
   in
   do {
     Argl.parse speclist anonfun usage;
+    if bin_dir.val = "" then bin_dir.val := setup_dir.val else ();
     default_lang.val := default_setup_lang;
     let (gwd_lang, setup_lang) =
       if daemon.val then
