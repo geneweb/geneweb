@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.42 2005-10-20 16:54:42 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.43 2005-12-11 17:54:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -33,10 +33,15 @@ value read_auth_file fname =
                 let (wizname, wizorder) =
                   try
                     let i = String.index wizname '/' in
+                    let j = String.rindex wizname '/' in
                     let l = String.length wizname in
                     let w1 = String.sub wizname 0 i in
-                    let w2 = String.sub wizname (i + 1) (l - i - 1) in
-                    (w1 ^ w2, w2 ^ w1)
+                    let w2 =
+                      if j > i then String.sub wizname (i + 1) (j - i - 1)
+                      else String.sub wizname (i + 1) (l - i - 1)
+                    in
+                    let w3 = String.sub wizname (j + 1) (l - j - 1) in
+                    (w1 ^ w2, w3 ^ w1 ^ w2)
                   with
                   [ Not_found -> (wizname, "~") ]
                 in
