@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.44 2005-10-16 03:03:01 ddr Exp $ *)
+(* $Id: update.ml,v 4.45 2005-12-11 17:54:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -22,26 +22,45 @@ value infer_death conf birth =
   | _ -> DontKnowIfDead ]
 ;
 
+value restrict_to_small_list el =
+  begin_list 0 [] el where rec begin_list n rl el =
+    if n > 25 then
+      end_list 0 [] (List.rev el) where rec end_list n sl el =
+        if n > 25 then List.rev_append rl [None :: sl]
+        else
+          match el with
+          [ [e :: el] -> end_list (n + 1) [Some e :: sl] el
+          | [] -> List.rev_append rl sl ]
+    else
+      match el with
+      [ [e :: el] -> begin_list (n + 1) [Some e :: rl] el
+      | [] -> List.rev rl ]
+;
+
 value print_same_name conf base p =
   match Gutil.find_same_name base p with
   [ [_] -> ()
   | pl ->
       do {
+        let pl = restrict_to_small_list pl in
         html_p conf;
         Wserver.wprint "%s:\n"
           (capitale (transl conf "persons having the same name"));
         tag "ul" begin
           List.iter
-            (fun p ->
-               do {
-                 html_li conf;
-                 stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
-                 begin
-                   Wserver.wprint "%s.%d %s" (p_first_name base p) p.occ
-                     (p_surname base p);
-                 end;
-                 Wserver.wprint "%s\n" (Date.short_dates_text conf base p)
-               })
+            (fun p -> do {
+               html_li conf;
+               match p with
+               [ Some p -> do {
+                   stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
+                   begin
+                     Wserver.wprint "%s.%d %s" (p_first_name base p) p.occ
+                       (p_surname base p);
+                   end;
+                   Wserver.wprint "%s\n" (Date.short_dates_text conf base p)
+                 }
+               | None -> Wserver.wprint "...\n" ]
+             })
             pl;
         end
       } ]

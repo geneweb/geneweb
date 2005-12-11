@@ -9,6 +9,8 @@ version 4.10 and 01 Jul 2005, but there are a lot of them... I add
 them when I have some time (and some courage).
 
 * GeneWeb server or CGI (gwd)
+  - [11 Dec 05] In update family form, when creating a new person, if
+    conflict, display now at most 50 persons.
   - [04 Sep 05] Data base forum file can be splited in several files:
     forum, forum.1, forum.2, and so on.
   - [27 Aug 05] In marriage relation kind added "no sex check married".
