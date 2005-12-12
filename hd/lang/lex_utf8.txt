@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.78 2005-11-24 08:16:58 ddr Exp $
+# $Id: lex_utf8.txt,v 1.79 2005-12-12 11:25:31 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5042,6 +5042,7 @@ it: pagine collegate
 nl: gekoppelde pagina’s
 no: linkede sider
 pt-br: página associadas
+ru: связанные страницы
 sv: länkade sidor
 
     list/list (ancestors)
@@ -5517,6 +5518,7 @@ it: note varie
 nl: diversen
 no: diverse notater
 pt-br: notas diversas
+ru: дополнительные заметки
 sv: blandade noteringar
 
     missing ancestors
@@ -7169,6 +7171,7 @@ it: ricerca/sensibile a maiuscole e minuscole
 nl: zoeken/hoofdlettergevoelig
 no: søk/skiller mellom store og små bokstaver
 pt-br: procurar/diferencia maiúsculas
+ru: поиск/регистрозависимый
 sv: sök/skiftlägeskänslig
 
     see
@@ -8542,6 +8545,7 @@ fi: t&auml;m&auml; foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
 no: dette forumet er endret
+ru: этот форум модерируется
 sv: detta forum är ändrat
 
     title/titles
@@ -9115,6 +9119,7 @@ fi: tarkista/hylk&auml;&auml;
 fr: valider/supprimer
 it: conferma/elimina
 no: verifiser/slett
+ru: проверить/удалить
 sv: giltligt/tas bort
 
     visualize/show/hide/summary
@@ -9129,6 +9134,7 @@ it: visualizza/mostra/nascondi/riassunto
 nl: visualiseren/tonen/verbergen/samenvatting
 no: visualiser/vis/skjul/summert
 pt: visualizar/mostrar/esconder/sumário
+ru: построить/показать/скрыть/общая
 sv: visualisera/visa/g&ouml;m/summering
 
     warnings
@@ -9411,4 +9417,5 @@ es: tu mensaje espera su validaci&oacute;n
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
 no: Beskjeden din avventer bekreftelse
+ru: ваше сообщение ожидает проверки 
 sv: ditt meddelande väntar på giltighet
