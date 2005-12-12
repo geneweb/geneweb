@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.45 2005-12-11 17:54:28 ddr Exp $ *)
+(* $Id: update.ml,v 4.46 2005-12-12 11:53:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -568,7 +568,8 @@ value text_of_var conf =
       | [: `'w'; `'i'; `'t'; `'n'; pos = parse_int 0 :] ->
           transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int pos
       | [: `'c'; `'h'; pos = parse_int 0 :] ->
-          transl_nth conf "child/children" 0 ^ " " ^ string_of_int pos
+          nominative (transl_nth conf "child/children" 0) ^ " " ^
+            string_of_int pos
       | [: :] -> var ] ]
 ;
 

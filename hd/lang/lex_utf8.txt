@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.80 2005-12-12 11:53:30 ddr Exp $
+# $Id: lex_utf8.txt,v 1.81 2005-12-12 11:55:39 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -6517,8 +6517,7 @@ cs: volitelně
 da: efter behag
 de: optional
 en: optional
-eo: nedevi
-ga
+eo: nedeviga
 es: opcional
 et: vabatahtlik
 fi: valittavissa
