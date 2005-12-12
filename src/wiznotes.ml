@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.43 2005-12-11 17:54:28 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.44 2005-12-12 01:48:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -12,7 +12,7 @@ value dir conf =
 
 value wzfile wddir wz = Filename.concat wddir (wz ^ ".txt");
 
-value read_auth_file fname =
+value read_auth_file base fname =
   let fname = Util.base_path [] fname in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -33,15 +33,10 @@ value read_auth_file fname =
                 let (wizname, wizorder) =
                   try
                     let i = String.index wizname '/' in
-                    let j = String.rindex wizname '/' in
-                    let l = String.length wizname in
                     let w1 = String.sub wizname 0 i in
-                    let w2 =
-                      if j > i then String.sub wizname (i + 1) (j - i - 1)
-                      else String.sub wizname (i + 1) (l - i - 1)
-                    in
-                    let w3 = String.sub wizname (j + 1) (l - j - 1) in
-                    (w1 ^ w2, w3 ^ w1 ^ w2)
+                    let l = String.length wizname in
+                    let w2 = String.sub wizname (i + 1) (l - i - 1) in
+                    (w1 ^ w2, w2 ^ w1)
                   with
                   [ Not_found -> (wizname, "~") ]
                 in
@@ -122,9 +117,10 @@ value print_main conf base auth_file =
   in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
   let wizdata =
-    let list = read_auth_file auth_file in
+    let list = read_auth_file base auth_file in
     if by_alphab_order then
-      List.sort (fun (_, (_, o1)) (_, (_, o2)) -> compare o1 o2) list
+      List.sort
+        (fun (_, (_, o1)) (_, (_, o2)) -> Gutil.alphabetic_order o1 o2) list
     else list
   in
   let wddir = dir conf in
@@ -260,9 +256,9 @@ value wizard_page_title wz wizname h =
      else "")
 ;
 
-value print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) =
+value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
   let wizname =
-    let wizdata = read_auth_file auth_file in
+    let wizdata = read_auth_file base auth_file in
     try fst (List.assoc wz wizdata) with
     [ Not_found -> wz ]
   in
@@ -350,7 +346,8 @@ value print conf base =
         match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf wz s cnt0
         | None ->
-            print_whole_wiznote conf auth_file edit_opt wz wfile (s, date) ]
+            print_whole_wiznote conf base auth_file edit_opt wz wfile
+              (s, date) ]
     | None -> print_main conf base auth_file ]
 ;
 
