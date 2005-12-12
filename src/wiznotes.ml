@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.44 2005-12-12 01:48:10 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.45 2005-12-12 11:36:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -168,10 +168,12 @@ value print_main conf base auth_file =
       let sep_period_list =
         [(fun tm -> tm.Unix.tm_mon,
           fun tm ->
+            let dmy =
+              {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
+               day = 0; prec = Sure; delta = 0}
+            in
             Wserver.wprint "%s"
-              (capitale (Date.code_dmy conf
-                 {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
-                  day = 0; prec = Sure; delta = 0})));
+              (capitale (Date.string_of_ondate conf (Dgreg dmy Dgregorian))));
          (fun tm -> tm.Unix.tm_year,
           fun tm -> Wserver.wprint "%d" (tm.Unix.tm_year + 1900))]
       in
@@ -292,7 +294,8 @@ value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
         {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
          year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
       in
-      Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n" (Date.code_dmy conf dmy)
+      Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
+        (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
         tm.Unix.tm_hour tm.Unix.tm_min
     }
     else ();
