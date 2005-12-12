@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.82 2005-12-12 13:40:24 ddr Exp $
+# $Id: lex_utf8.txt,v 1.83 2005-12-12 20:27:44 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7887,7 +7887,7 @@ pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
 pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
-ru: %d старейших живущих семей
+ru: старейшие %d пар возможно всё ещё живые и занятые
 sl: %d najstarejših morda še živih in zaročenih parov
 sv: de %d &auml;ldsta nu levande paren som kanske fortfarande &auml;r f&ouml;rlovade
 
