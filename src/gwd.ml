@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.95 2005-12-11 17:54:28 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.96 2005-12-12 01:48:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -471,8 +471,7 @@ value match_auth_file auth_file uauth =
                 let username =
                   try
                     let i = String.index s '/' in
-                    let j = String.rindex s '/' in
-                    let len = if j > i then j else String.length s in
+                    let len = String.length s in
                     String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
                   with
                   [ Not_found -> s ]
