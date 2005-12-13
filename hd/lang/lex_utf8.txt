@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $
+# $Id: lex_utf8.txt,v 5.1 2005-12-13 13:11:33 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -7762,7 +7762,7 @@ de: Nachname/Nachnamen
 en: surname/surnames
 eo: familia nomo/familiaj nomoj
 es: apellido/apellidos
-et: perekonnanimi/perekonnanimed
+et: perekonnanimi/perekonnanimed:k:+ega
 fi: sukunimi/sukunimet
 fr: patronyme/patronymes
 fr-cr: nom-fan-mille
@@ -9183,7 +9183,7 @@ de: mit
 en: with
 eo: kun
 es: con
-et: koos
+et: koos :k:
 fi: sek&auml;
 fr: avec
 he:  עם
