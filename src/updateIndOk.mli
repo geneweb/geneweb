@@ -1,4 +1,4 @@
-(* $Id: updateIndOk.mli,v 4.0 2001-03-16 19:35:09 ddr Exp $ *)
+(* $Id: updateIndOk.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Config;
 open Def;

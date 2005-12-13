@@ -1,4 +1,4 @@
-(* $Id: buff.ml,v 4.4 2005-06-07 20:15:22 ddr Exp $ *)
+(* $Id: buff.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 module Make (B : sig value buff : ref string; end) =
   struct

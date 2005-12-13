@@ -1,4 +1,4 @@
-(* $Id: dag2html.mli,v 1.10 2005-08-17 09:33:12 ddr Exp $ *)
+(* $Id: dag2html.mli,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =

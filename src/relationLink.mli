@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: relationLink.mli,v 4.2 2004-12-30 18:50:19 ddr Exp $ *)
+(* $Id: relationLink.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;

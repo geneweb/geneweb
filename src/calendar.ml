@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 4.7 2005-08-09 02:54:37 ddr Exp $ *)
+(* $Id: calendar.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.

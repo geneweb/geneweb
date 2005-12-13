@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.30 2005-12-12 11:25:31 ddr Exp $
+# $Id: Makefile,v 5.0 2005-12-13 11:51:26 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb

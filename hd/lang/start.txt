@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.77 2005-10-12 08:49:58 ddr Exp $ -->
+  <!-- $Id: start.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <!-- This file is kept by compatibility to allow displaying databases
        created before version 5.00. -->

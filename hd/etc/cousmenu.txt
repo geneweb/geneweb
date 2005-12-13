@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: cousmenu.txt,v 4.6 2005-05-29 06:34:42 ddr Exp $ -->
+  <!-- $Id: cousmenu.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;

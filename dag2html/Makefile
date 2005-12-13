@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2004-02-10 09:45:47 ddr Exp $
+# $Id: Makefile,v 5.0 2005-12-13 11:51:26 ddr Exp $
 
 BINDIR=/usr/local/bin
 MANDIR=/usr/local/share/man/man1

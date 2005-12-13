@@ -1,4 +1,4 @@
-(* $Id: calendar.mli,v 4.7 2005-08-09 02:54:37 ddr Exp $ *)
+(* $Id: calendar.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Def;
 

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.mli,v 4.4 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: translate.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value inline : string -> char -> (char -> string) -> string -> (string * bool);

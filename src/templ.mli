@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 4.29 2005-08-30 21:36:13 ddr Exp $ *)
+(* $Id: templ.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Config;
 open Def;

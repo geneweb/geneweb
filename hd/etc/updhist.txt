@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 1.2 2005-09-02 09:16:54 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*history of updates]</title>
   <meta name="ROBOTS" content="NONE"%/>

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: stats.txt,v 1.2 2005-08-22 09:51:42 ddr Exp $ -->
+  <!-- $Id: stats.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*statistics]</title>
   <meta name="ROBOTS" content="NONE"%/>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.112 2005-11-07 13:18:52 ddr Exp $ *)
+(* $Id: templ.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Config;
 open TemplAst;
