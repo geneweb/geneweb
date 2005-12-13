@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 5.1 2005-12-13 18:52:10 ddr Exp $ *)
+(* $Id: translate.ml,v 5.2 2005-12-13 20:28:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
@@ -248,7 +248,9 @@ value rec eval_shift s =
 ;
 
 value concat str =
-  let (set, str) = eval_set str in
-  let str = eval_app set str in
-  eval_shift str
+  if not (String.contains str '@') then (* optimisation *) str
+  else
+    let (set, str) = eval_set str in
+    let str = eval_app set str in
+    eval_shift str
 ;

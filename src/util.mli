@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: util.mli,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -130,7 +130,6 @@ value valid_format : format 'a 'b 'c -> string -> format 'a 'b 'c;
 
 value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;
-value transl_nth_def : config -> string -> int -> int -> string;
 value transl_decline : config -> string -> string -> string;
 value transl_a_of_b : config -> string -> string -> string;
 value transl_a_of_gr_eq_gen_lev : config -> string -> string -> string;

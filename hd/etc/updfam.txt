@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 5.1 2005-12-13 20:28:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -453,7 +453,7 @@
 
 <table border="1">
   <tr>
-    <td><label for="psrc">[*person/persons]1</label></td>
+    <td><label for="psrc">[[*person/persons]1]</label></td>
     <td>
       <input name="psrc" size="50" maxlength="200" value="%nn;
        %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/>

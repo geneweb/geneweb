@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $
+# $Id: lexicon.txt,v 5.1 2005-12-13 20:28:23 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -6682,7 +6682,7 @@ de: Person/Personen
 en: person/persons
 eo: persono:a:+n/personoj:a:+n
 es: persona/personas
-et: isik/isikud/isikut
+et: isik/isiku@(c?t:d)
 fi: henkil&ouml;/henkil&ouml;&auml;
 fr: personne/personnes
 he:  אדם/ אנשים

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: templ.ml,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -386,8 +386,11 @@ value parse_templ conf strm =
           else [Atext (bp - len, bp) (Buff2.get len) :: astl]
         in
         let a =
-          let (x, y, z) = lexicon_word strm in
-          Atransl (bp, Stream.count strm) x y z
+          let (upp, s, n) = lexicon_word strm in
+          if String.length s > 1 && (s.[0] = '[' || s.[0] = '@') then
+            let (astl, _) = parse_astl [] False 0 [] (Stream.of_string s) in
+            Aconcat (bp, Stream.count strm) astl
+          else Atransl (bp, Stream.count strm) upp s n
         in
         parse_astl [a :: astl] False 0 end_list strm
     | [: `c :] ->
@@ -450,9 +453,7 @@ value parse_templ conf strm =
           [ (_, "with", []) ->
               let all =
                 loop () where rec loop () =
-                  let (al, tok) =
-                    parse_astl [] False 0 ["and"; "end"] strm
-                  in
+                  let (al, tok) = parse_astl [] False 0 ["and"; "end"] strm in
                   match tok with
                   [ "and" -> [al :: loop ()]
                   | _ -> [al] ]
@@ -604,6 +605,7 @@ value rec subst sf =
         if Stream.peek strm <> None then Avar loc s1 sl1
         else Avar loc s2 (sl2 @ sl1)
   | Atransl loc b s c -> Atransl loc b (sf s) c
+  | Aconcat loc al -> Aconcat loc (List.map (subst sf) al)
   | Awid_hei s -> Awid_hei (sf s)
   | Aif e alt ale -> Aif (subst sf e) (substl sf alt) (substl sf ale)
   | Aforeach (loc, s, sl) pl al ->
@@ -870,6 +872,10 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
                 (Failure
                    ("unbound var \"" ^ String.concat "." [s :: sl] ^ "\"")) ] ]
   | Atransl _ upp s c -> VVstring (eval_transl conf upp s c)
+  | Aconcat _ al ->
+      let vl = List.map (eval_expr ceva) al in
+      let sl = List.map string_of_expr_val vl in
+      VVstring (String.concat "" sl)
   | Aapply loc s ell ->
       let vl =
         List.map
@@ -974,7 +980,7 @@ value eval_bool_expr conf (eval_var, eval_apply) e =
 value eval_string_expr conf (eval_var, eval_apply) e =
   try
     match eval_expr (conf, eval_var, eval_apply) e with
-    [ VVstring s -> s
+    [ VVstring s -> Translate.concat s
     | VVbool _ | VVother _ ->
         raise_with_loc (loc_of_expr e) (Failure "string value expected") ]
   with
