@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.1 2005-12-13 13:11:33 ddr Exp $
+# $Id: lex_utf8.txt,v 5.2 2005-12-13 13:25:47 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -6684,7 +6684,7 @@ de: Person/Personen
 en: person/persons
 eo: persono:a:+n/personoj:a:+n
 es: persona/personas
-et: isik/isikut
+et: isik/isikutd
 fi: henkil&ouml;/henkil&ouml;&auml;
 fr: personne/personnes
 he:  אדם/ אנשים
