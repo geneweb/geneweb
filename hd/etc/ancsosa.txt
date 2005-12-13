@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.1 2005-12-13 20:28:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -479,7 +479,7 @@
     %end;
   %end;
   </ul>
-  [*total]: %count; [person/persons]1
+  [*total]: %count; [[person/persons]1@(c)]
 %elseif;(evar.t = "N")
   %( short display %)
   <p>
@@ -517,7 +517,7 @@
     %end;
   %end;
   </ul>
-  [*total]: %count; [person/persons]1
+  [*total]: %count; [[person/persons]1@(c)]
 %elseif;(evar.t = "M" and evar.al = "on")
   %( missing ancestors alphabetically %)
   <p>

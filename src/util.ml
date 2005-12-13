@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: util.ml,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -152,15 +152,6 @@ value transl conf w =
 value transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
   [ Not_found -> tnf (nth_field w n) ]
-;
-
-value transl_nth_def conf w n def_n =
-  try
-    let w = Hashtbl.find conf.lexicon w in
-    let (i1, i2) = nth_field_abs w n in
-    if i2 == i1 then nth_field w def_n else String.sub w i1 (i2 - i1)
-  with
-  [ Not_found -> tnf (nth_field w def_n) ]
 ;
 
 value plus_decl s =

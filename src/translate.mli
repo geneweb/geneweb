@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.mli,v 5.1 2005-12-13 18:52:10 ddr Exp $ *)
+(* $Id: translate.mli,v 5.2 2005-12-13 20:28:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value inline : string -> char -> (char -> string) -> string -> (string * bool);
@@ -14,11 +14,14 @@ value language_name : string -> string -> string;
    this:
      - @(x) set the predicate "x"
      - @(xyz...) set the predicates x, y, z...
-     - @(expr) where expr is of the form "x?e1:e2", if predicate "x" then
-       e1 else e2 where e1 and e2 are either other "y?e3:e4" or a string
-       whose 2nd char is not "?"
-     - @(n--) where n is a number: moves the n previous words to the end
-       of the whole string.
+     - @(expr) where expr is of the form "x?e1:e2": if predicate "x" then
+       evaluates e1 else evaluates e2 where e1 and e2 are either another
+       expression "y?e3:e4" or a string (whose 2nd char is not "?").
+     - @(n--) where n is a number: move the n preceding words to the end
+       of the string.
+
+   Warning: this function makes obsolete many functions in "Util" taking
+   care of declinations using the system with :x:.
 *)
 
 value concat : string -> string;
