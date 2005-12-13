@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.61 2005-12-06 21:25:07 ddr Exp $ *)
+(* $Id: setup.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
 
 open Printf;
 

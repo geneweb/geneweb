@@ -1,4 +1,4 @@
-(* $Id: secure.ml,v 4.7 2005-05-12 20:14:24 ddr Exp $ *)
+(* $Id: secure.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 (* secure open; forbids to access anywhere in the machine;

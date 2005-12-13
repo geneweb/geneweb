@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_comm.sh,v 4.11 2002-01-09 11:58:01 ddr Exp $
+# $Id: camlp4_comm.sh,v 5.0 2005-12-13 11:51:27 ddr Exp $
 
 ARGS1=
 FILE=

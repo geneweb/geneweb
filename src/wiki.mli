@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: wiki.mli,v 4.10 2005-08-19 02:51:39 ddr Exp $ *)
+(* $Id: wiki.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notes.mli,v 4.15 2005-08-19 02:51:39 ddr Exp $ *)
+(* $Id: notes.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Config;
 open Def;

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 1.10 2005-09-23 13:51:10 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>

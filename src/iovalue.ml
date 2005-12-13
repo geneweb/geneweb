@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 4.6 2005-07-02 13:49:13 ddr Exp $ *)
+(* $Id: iovalue.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");

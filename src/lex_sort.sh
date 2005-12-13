@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: lex_sort.sh,v 4.2 2001-05-08 02:23:30 ddr Exp $ *)
+(* $Id: lex_sort.sh,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Printf
 

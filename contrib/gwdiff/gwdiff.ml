@@ -1,4 +1,4 @@
-(* $Id: gwdiff.ml,v 1.4 2002-02-03 19:02:48 ddr Exp $ *)
+(* $Id: gwdiff.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
 open Def;

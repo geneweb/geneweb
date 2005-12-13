@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.59 2005-08-27 18:48:32 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;

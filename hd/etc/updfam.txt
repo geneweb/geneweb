@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.54 2005-08-29 11:13:43 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>

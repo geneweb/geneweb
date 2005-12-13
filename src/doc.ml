@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 4.42 2005-11-19 12:48:16 ddr Exp $ *)
+(* $Id: doc.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
 
 open Config;
 
