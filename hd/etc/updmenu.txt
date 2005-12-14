@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 5.1 2005-12-14 11:25:15 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -56,7 +56,7 @@
     <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
     <br%/>
     <br%/>
-    <a href="%prefix;m=MRG;i=%index;">[*merge]</a>
+    <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
     <br%/>
     %if;(not has_parents and first_name != "?" and surname != "?")
       <br%/>
@@ -75,7 +75,7 @@
           <a href=%nn;
           "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
           ;ip=%index;">%nn;
-          [*merge]</a>
+          [*merge::]</a>
           <br%/>
         %end;
       %end;
