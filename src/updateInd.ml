@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.1 2005-12-14 10:41:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -305,7 +305,7 @@ and eval_relation_var conf base env r =
       | _ -> bool_val False ]
   | ["rt_foster_parent"] -> eval_is_relation_type FosterParent r
   | ["rt_godparent"] -> eval_is_relation_type GodParent r
-  | ["rt_regognition"] -> eval_is_relation_type Recognition r
+  | ["rt_recognition"] -> eval_is_relation_type Recognition r
   | _ -> raise Not_found ]
 and eval_person_var conf base env (fn, sn, oc, create, var) =
   fun
@@ -332,7 +332,8 @@ and eval_is_death_reason dr =
   | _ -> bool_val False ]
 and eval_is_relation_type rt =
   fun
-  [ Some {r_type = x} -> bool_val (x = rt)
+  [ Some {r_fath = None; r_moth = None} -> bool_val False
+  | Some {r_type = x} -> bool_val (x = rt)
   | _ -> bool_val False ]
 and eval_int_env var env =
   match get_env var env with
