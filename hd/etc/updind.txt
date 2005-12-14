@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 5.1 2005-12-14 10:41:54 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -415,11 +415,11 @@ function setDead()
   <tr>
   <td>
   <select name="rxx_type">
-  <option value="Undef"%if;relation.rt_empty); selected="selected"%end;
+  <option value="Undef"%if;relation.rt_empty; selected="selected"%end;
   > -</option>
   <option value="Adoption"%if;relation.rt_adoption; selected="selected"%end;
   >%sp;[*adoptive father/adoptive mother/adoptive parents]2</option>
-  <option value="Recognition"%if;relation.rt_regognition;%sp;
+  <option value="Recognition"%if;relation.rt_recognition;%sp;
    selected="selected"%end;>%sp;
     [*recognizing father/recognizing mother/recognizing parents]2</option>
   <option value="CandidateParent"%if;relation.rt_candidate_parent;%sp;
