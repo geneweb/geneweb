@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 5.2 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: translate.ml,v 5.3 2005-12-14 17:00:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
@@ -213,7 +213,8 @@ value rec eval_shift s =
               }
               else do {
                 let j =
-                  if t.[j - 1] <> ' ' then do { t.[j] := ' '; j + 1 } else j
+                  if j > 0 && t.[j - 1] <> ' ' then do { t.[j] := ' '; j + 1 }
+                  else j
                 in
                 String.blit s l t j len;
                 (i, j + len)
