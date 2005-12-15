@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.mli,v 5.2 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: translate.mli,v 5.3 2005-12-15 06:20:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value inline : string -> char -> (char -> string) -> string -> (string * bool);
@@ -19,6 +19,8 @@ value language_name : string -> string -> string;
        expression "y?e3:e4" or a string (whose 2nd char is not "?").
      - @(n--) where n is a number: move the n preceding words to the end
        of the string.
+     - @(@string) evaluates "@string" recursively; in particular, predicates
+       inside the string remain local.
 
    Warning: this function makes obsolete many functions in "Util" taking
    care of declinations using the system with :x:.
