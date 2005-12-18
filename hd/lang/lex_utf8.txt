@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.3 2005-12-13 20:28:23 ddr Exp $
+# $Id: lex_utf8.txt,v 5.4 2005-12-18 21:48:11 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -154,7 +154,7 @@ de: %1 von :d:%2
 en: %1 of %2
 eo: %1 de %2
 es: %1 de %2
-et: %2: %1
+et: :g:%2 %1
 fi: :g:%2 %1
 fr: %1 d[e']%2
 he: %1 של %2
@@ -8498,7 +8498,7 @@ de: der:d:dem Ehemann/die:d:der Ehefrau
 en: the spouse
 eo: la edzo/la edzino
 es: el esposo/la esposa
-et: :g: abikaasa
+et: abikaasa
 fi: puoliso
 fr: l'&eacute;poux/l'&eacute;pouse
 he:  בן הזוג/ בת הזוג
