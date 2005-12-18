@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.2 2005-12-14 23:30:26 ddr Exp $ *)
+(* $Id: util.ml,v 5.3 2005-12-18 21:48:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -208,6 +208,7 @@ value gen_decline2 wt s1 s2 =
             match string_of wt.[i + 4] with
             [ Some s -> (decline c s, i + 4)
             | None -> (":", i) ]
+(*
         | '[' ->
             try
               let j = String.index_from wt i ']' in
@@ -223,6 +224,7 @@ value gen_decline2 wt s1 s2 =
               else raise Not_found
             with
             [ Not_found -> ("[", i) ]
+*)
         | c -> (String.make 1 c, i) ]
       in
       s ^ loop (i + 1)
@@ -230,9 +232,11 @@ value gen_decline2 wt s1 s2 =
   loop 0
 ;
 
-value transl_a_of_b conf = gen_decline2 (transl_nth conf "%1 of %2" 0);
-value transl_a_of_gr_eq_gen_lev conf =
-  gen_decline2 (transl_nth conf "%1 of %2" 1)
+value transl_a_of_b conf x y =
+  gen_decline2 (transl_nth conf "%1 of %2" 0) x y
+;
+value transl_a_of_gr_eq_gen_lev conf x y =
+  gen_decline2 (transl_nth conf "%1 of %2" 1) x y
 ;
 
 value check_format ini_fmt (r : string) =

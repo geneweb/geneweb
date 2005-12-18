@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.1 2005-12-18 21:48:11 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -89,6 +89,7 @@ value utf_8_db = Name.utf_8_db;
 value utf_8_intern_byte c =
   utf_8_db.val && Char.code c >= 0x80 && Char.code c < 0xC0;
 
+(**)
 value decline_word case s ibeg iend =
   let i =
     loop ibeg where rec loop i =
@@ -142,6 +143,70 @@ value decline case s =
       | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
       | _ -> loop ibeg (i + 1) ]
 ;
+(*
+(* [decline] has been deprecated since version 5.00
+   compatibility code: *)
+value colon_to_at_word s ibeg iend =
+  let iendroot =
+    loop ibeg where rec loop i =
+      if i + 3 >= iend then iend
+      else if s.[i] = ':' && s.[i+2] = ':' then i
+      else loop (i + 1)
+  in
+  if iendroot = iend then String.sub s ibeg (iend - ibeg)
+  else
+    let (listdecl, maxd) =
+      loop [] 0 iendroot where rec loop list maxd i =
+        if i >= iend then (list, maxd)
+        else
+          let inext =
+            loop (i + 3) where rec loop i =
+              if i + 3 >= iend then iend
+              else if s.[i] = ':' && s.[i+2] = ':' then i
+              else loop (i + 1)
+          in
+          let (e, d) =
+            let i = i + 3 in
+            let j = inext in
+            if i < j && s.[i] = '+' then
+              (String.sub s (i + 1) (j - i - 1), 0)
+            else if i < j && s.[i] = '-' then
+              loop 1 (i + 1) where rec loop n i =
+                if i < j && s.[i] = '-' then loop (n + 1) (i + 1)
+                else (String.sub s i (j - i), n)
+            else (String.sub s i (j - i), iendroot - ibeg)
+          in
+          loop [(s.[i+1], e, d) :: list] (max d maxd) inext
+    in
+    let len = max 0 (iendroot - ibeg - maxd) in
+    let root = String.sub s ibeg len in
+    let s =
+      List.fold_left
+        (fun t (c, e, d) ->
+           Printf.sprintf "%c?%s%s" c e (if t = "" then "" else ":" ^ t))
+        (String.sub s (ibeg + len) (iendroot - ibeg - len)) listdecl
+    in
+    root ^ "@(" ^ s ^ ")"
+;
+
+value colon_to_at s =
+  loop 0 0 where rec loop ibeg i =
+    if i == String.length s then
+      if i == ibeg then "" else colon_to_at_word s ibeg i
+    else
+      match s.[i] with
+      [ ' ' | '<' | '/' as sep ->
+          colon_to_at_word s ibeg i ^ String.make 1 sep ^ loop (i + 1) (i + 1)
+      | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
+      | _ -> loop ibeg (i + 1) ]
+;
+
+value decline case s =
+  Printf.sprintf "@(@(%c)%s)" case
+    (if not (String.contains s ':') then s else colon_to_at s)
+;
+(* end compatibility code *)
+*)
 
 value nominative s =
   match rindex s ':' with

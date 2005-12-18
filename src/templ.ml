@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: templ.ml,v 5.2 2005-12-18 21:48:11 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -773,7 +773,7 @@ and eval_transl_lexicon conf upp s c =
           [ Some n -> Util.transl_nth conf s n
           | None -> Util.transl conf s ]
         in
-        Gutil.nominative s2
+        if c = "n" then s2 else Gutil.nominative s2
     | Some (s1, s2) ->
         try
           if String.length s2 > 0 && s2.[0] = '|' then
@@ -1229,7 +1229,7 @@ value interp
             Translate.language_name s (Util.transl conf " !languages")
         | ("nth", [VVstring s1; VVstring s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
-            Util.nth_field s1 n
+            Gutil.nominative (Util.nth_field s1 n)
         | _ ->
             try eval_predefined_apply env f vl with
             [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
