@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.3 2005-12-20 20:04:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -88,8 +88,6 @@ value utf_8_db = Name.utf_8_db;
 
 value utf_8_intern_byte c =
   utf_8_db.val && Char.code c >= 0x80 && Char.code c < 0xC0;
-
-DEFINE OLD;
 
 IFDEF OLD THEN declare
 value decline_word case s ibeg iend =

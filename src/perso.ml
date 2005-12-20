@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
+(* $Id: perso.ml,v 5.2 2005-12-20 20:04:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1911,7 +1911,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       | _ -> "" ]
   | "on_birth_date" ->
       match (p_auth, Adef.od_of_codate p.birth) with
-      [ (True, Some d) -> Util.translate_eval (Date.string_of_ondate conf d)
+      [ (True, Some d) -> Date.string_of_ondate conf d
       | _ -> "" ]
   | "on_burial_date" ->
       match p.burial with
@@ -1931,7 +1931,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match (p_auth, p.death) with
       [ (True, Death _ d) ->
           let d = Adef.date_of_cdate d in
-          Util.translate_eval (Date.string_of_ondate conf d)
+          Date.string_of_ondate conf d
       | _ -> "" ]
   | "prev_fam_father" ->
       match get_env "prev_fam" env with
@@ -2119,7 +2119,7 @@ value eval_transl conf env upp s c =
             | _ -> 0 ]
         | _ -> assert False ]
       in
-      let r = Gutil.nominative (Util.transl_nth conf s n) in
+      let r = Util.translate_eval (Util.transl_nth conf s n) in
       if upp then capitale r else r
   | _ ->
       Templ.eval_transl conf upp s c ]
@@ -2575,7 +2575,7 @@ value print_foreach conf base print_ast eval_expr =
           else [(typ1, src1) :: insert_loop typ src srcl]
       | [] -> [(typ, src)] ]
     in
-    let insert typ src srcl = insert_loop (nominative typ) src srcl in
+    let insert typ src srcl = insert_loop (Util.translate_eval typ) src srcl in
     let srcl = [] in
     let srcl =
       if not conf.hide_names || p_auth then

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: update.ml,v 5.1 2005-12-20 20:04:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -568,7 +568,7 @@ value text_of_var conf =
       | [: `'w'; `'i'; `'t'; `'n'; pos = parse_int 0 :] ->
           transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int pos
       | [: `'c'; `'h'; pos = parse_int 0 :] ->
-          nominative (transl_nth conf "child/children" 0) ^ " " ^
+          Util.translate_eval (transl_nth conf "child/children" 0) ^ " " ^
             string_of_int pos
       | [: :] -> var ] ]
 ;
@@ -701,7 +701,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             base.func.patch_ascend p.cle_index a;
             base.func.patch_union p.cle_index u;
             if f <> "?" && s <> "?" then do {
-              person_ht_add base (nominative (f ^ " " ^ s)) ip;
+              person_ht_add base (Util.translate_eval (f ^ " " ^ s)) ip;
               new_persons.val := [p :: new_persons.val]
             }
             else ();
