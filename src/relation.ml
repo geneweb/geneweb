@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: relation.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -834,7 +834,7 @@ value print_link_name conf base n p1 p2 sol =
       if x2 < x1 then transl_a_of_b conf s1 s2
       else transl_a_of_gr_eq_gen_lev conf s1 s2
     in
-    Wserver.wprint "%s.\n" (nominative s)
+    Wserver.wprint "%s.\n" (Util.translate_eval s)
   }
 ;
 
@@ -973,7 +973,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
                  (transl_nth conf "the spouse" (1 - index_of_sex p.sex)))
               s
         in
-        Wserver.wprint "%s\n" (nominative s)
+        Wserver.wprint "%s\n" (Util.translate_eval s)
       in
       tag "ul" begin
         tag "li" begin

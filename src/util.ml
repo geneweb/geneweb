@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.3 2005-12-18 21:48:11 ddr Exp $ *)
+(* $Id: util.ml,v 5.4 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -39,6 +39,15 @@ value start_with_vowel s =
   if String.length s > 0 then
     match Char.lowercase s.[0] with
     [ 'a' | 'e' | 'i' | 'o' | 'u' -> True
+    | _ -> False ]
+  else False
+;
+
+value start_with_hi_i s =
+  if String.length s > 0 then
+    match Char.lowercase s.[0] with
+    [ 'i' -> True
+    | 'h' -> String.length s > 1 && s.[1] = 'i'
     | _ -> False ]
   else False
 ;
@@ -171,7 +180,8 @@ value gen_decline wt s =
   if rindex wt '/' <> None then
     match rindex wt '/' with
     [ Some i ->
-        if String.length s > 0 && start_with_vowel s then
+        (* special case for Spanish *)
+        if String.length s > 0 && start_with_hi_i s then
           nth_field wt 1 ^ Gutil.decline 'n' s
         else nth_field wt 0 ^ Gutil.decline 'n' s1
     | None -> wt ^ Gutil.decline 'n' s1 ]
@@ -180,11 +190,14 @@ value gen_decline wt s =
     start ^ Gutil.decline wt.[len - 2] s
   else
     match plus_decl wt with
-    [ Some (start, " +before") -> if s = "" then start else s ^ " " ^ start
+    [ Some (start, " +before") ->
+        if s = "" then start else Gutil.decline 'n' s ^ " " ^ start
     | _ -> wt ^ Gutil.decline 'n' s1 ]
 ;
 
-value transl_decline conf w s = gen_decline (transl conf w) s;
+value transl_decline conf w s =
+  Translate.eval (gen_decline (transl conf w) s)
+;
 
 value gen_decline2 wt s1 s2 =
   let string_of =
@@ -208,7 +221,6 @@ value gen_decline2 wt s1 s2 =
             match string_of wt.[i + 4] with
             [ Some s -> (decline c s, i + 4)
             | None -> (":", i) ]
-(*
         | '[' ->
             try
               let j = String.index_from wt i ']' in
@@ -224,7 +236,6 @@ value gen_decline2 wt s1 s2 =
               else raise Not_found
             with
             [ Not_found -> ("[", i) ]
-*)
         | c -> (String.make 1 c, i) ]
       in
       s ^ loop (i + 1)
@@ -294,6 +305,8 @@ value ftransl_nth conf s p =
 value fdecline conf w s =
   valid_format w (gen_decline (Obj.magic w : string) s)
 ;
+
+value translate_eval s = Translate.eval (nominative s);
 
 (* *)
 

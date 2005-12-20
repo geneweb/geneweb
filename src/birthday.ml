@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -185,14 +185,12 @@ value print_birth_day conf base day_name fphrase wd dt list =
   | _ ->
       do {
         tag "p" begin
+          let txt =
+            transl_decline conf "on (weekday day month year)"
+              (transl_nth conf "(week day)" wd ^ " " ^ Date.code_dmy conf dt)
+          in
           Wserver.wprint fphrase
-            (capitale day_name ^ ",\n" ^
-             std_color conf
-                ("<b>" ^
-                   transl_decline conf "on (weekday day month year)"
-                     (transl_nth conf "(week day)" wd ^ " " ^
-                        Date.code_dmy conf dt) ^
-                   "</b>"))
+            (capitale day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
             (transl conf "the birthday");
           Wserver.wprint "...\n";
         end;
@@ -218,7 +216,8 @@ value propose_months conf mode =
                   begin
                     Wserver.wprint "%s"
                       (capitale
-                         (nominative (transl_nth conf "(month)" (i - 1))));
+                         (Util.translate_eval
+                            (transl_nth conf "(month)" (i - 1))));
                   end
                 };
               end;
@@ -252,14 +251,12 @@ value print_anniv conf base day_name fphrase wd dt list =
   | _ ->
       do {
         tag "p" begin
+          let txt =
+            transl_decline conf "on (weekday day month year)"
+              (transl_nth conf "(week day)" wd ^ " " ^ Date.code_dmy conf dt)
+          in
           Wserver.wprint fphrase
-            (capitale day_name ^ ",\n" ^
-             std_color conf
-                ("<b>" ^
-                   transl_decline conf "on (weekday day month year)"
-                     (transl_nth conf "(week day)" wd ^ " " ^
-                        Date.code_dmy conf dt) ^
-                   "</b>"))
+            (capitale day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
             (transl conf "the anniversary");
           Wserver.wprint "...\n";
         end;
@@ -447,7 +444,7 @@ value print_menu_birth conf base =
   gen_print_menu_birth conf base f_scan mode
 ;
 
-value print_menu_dead conf base =
+value gen_print_menu_dead conf base f_scan mode =
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl conf "anniversaries of dead people"))
@@ -460,56 +457,50 @@ value print_menu_dead conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    for i = 0 to base.data.persons.len - 1 do {
-      let p = pget conf base (Adef.iper_of_int i) in
-      match p.death with
-      [ NotDead | DontKnowIfDead -> ()
-      | _ ->
-          do {
-            match Adef.od_of_codate p.birth with
-            [ Some (Dgreg d _) ->
-                if d.prec = Sure && d.day <> 0 && d.month <> 0 then
-                  if match_dates conf base p d conf.today then
-                    list_tod.val :=
-                      [(p, d.year, DeBirth, referenced_person_title_text) ::
-                       list_tod.val]
-                  else if match_dates conf base p d tom then
-                    list_tom.val :=
-                      [(p, d.year, DeBirth, referenced_person_title_text) ::
-                       list_tom.val]
-                  else if match_dates conf base p d aft then
-                    list_aft.val :=
-                      [(p, d.year, DeBirth, referenced_person_title_text) ::
-                       list_aft.val]
-                  else ()
-                else ()
-            | _ -> () ];
-            match p.death with
-            [ Death dr d ->
-                match Adef.date_of_cdate d with
-                [ Dgreg d _ ->
-                    if d.prec = Sure && d.day <> 0 && d.month <> 0 then
-                      if match_dates conf base p d conf.today then
-                        list_tod.val :=
-                          [(p, d.year, DeDeath dr,
-                            referenced_person_title_text) ::
-                           list_tod.val]
-                      else if match_dates conf base p d tom then
-                        list_tom.val :=
-                          [(p, d.year, DeDeath dr,
-                            referenced_person_title_text) ::
-                           list_tom.val]
-                      else if match_dates conf base p d aft then
-                        list_aft.val :=
-                          [(p, d.year, DeDeath dr,
-                            referenced_person_title_text) ::
-                           list_aft.val]
-                      else ()
+    try
+      while True do {
+        let (p, txt_of) = f_scan () in
+        match p.death with
+        [ NotDead | DontKnowIfDead -> ()
+        | _ ->
+            do {
+              match Adef.od_of_codate p.birth with
+              [ Some (Dgreg d _) ->
+                  if d.prec = Sure && d.day <> 0 && d.month <> 0 then
+                    if match_dates conf base p d conf.today then
+                      list_tod.val :=
+                        [(p, d.year, DeBirth, txt_of) :: list_tod.val]
+                    else if match_dates conf base p d tom then
+                      list_tom.val :=
+                        [(p, d.year, DeBirth, txt_of) :: list_tom.val]
+                    else if match_dates conf base p d aft then
+                      list_aft.val :=
+                        [(p, d.year, DeBirth, txt_of) :: list_aft.val]
                     else ()
-                | _ -> () ]
-            | _ -> () ];
-          } ]
-    };
+                  else ()
+              | _ -> () ];
+              match p.death with
+              [ Death dr d ->
+                  match Adef.date_of_cdate d with
+                  [ Dgreg d _ ->
+                      if d.prec = Sure && d.day <> 0 && d.month <> 0 then
+                        if match_dates conf base p d conf.today then
+                          list_tod.val :=
+                            [(p, d.year, DeDeath dr, txt_of) :: list_tod.val]
+                        else if match_dates conf base p d tom then
+                          list_tom.val :=
+                            [(p, d.year, DeDeath dr, txt_of) :: list_tom.val]
+                        else if match_dates conf base p d aft then
+                          list_aft.val :=
+                            [(p, d.year, DeDeath dr, txt_of) :: list_aft.val]
+                        else ()
+                      else ()
+                  | _ -> () ]
+              | _ -> () ];
+            } ]
+      }
+    with
+    [ Not_found -> () ];
     List.iter
       (fun xx ->
          xx.val :=
@@ -525,11 +516,25 @@ value print_menu_dead conf base =
       (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
     Wserver.wprint "\n";
-    let mode () = xtag "input" "type=\"hidden\" name=\"m\" value=\"AD\"" in
     propose_months conf mode;
     Wserver.wprint "\n";
     trailer conf;
   }
+;
+
+value print_menu_dead conf base =
+  let i = ref (-1) in
+  let f_scan () =
+    do {
+      incr i;
+      if i.val < base.data.persons.len then
+        (pget conf base (Adef.iper_of_int i.val),
+         referenced_person_title_text)
+      else raise Not_found
+    }
+  in
+  let mode () = xtag "input" "type=\"hidden\" name=\"m\" value=\"AD\"" in
+  gen_print_menu_dead conf base f_scan mode
 ;
 
 value match_mar_dates conf base cpl d1 d2 =

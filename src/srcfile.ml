@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -196,7 +196,7 @@ value string_of_start_date conf =
         Dgreg {day = d; month = m; year = y; prec = Sure; delta = 0}
           Dgregorian
       in
-      Date.string_of_date conf d
+      Util.translate_eval (Date.string_of_date conf d)
   | _ -> r.start_date ]
 ;
 
@@ -308,7 +308,7 @@ value rec lexicon_translate conf base nomin strm first_c =
           in
           String.sub r 0 i ^ sa ^
             String.sub r (i + 2) (String.length r - i - 2)
-      | _ -> (if nomin then Gutil.nominative r else r) ^ c ]
+      | _ -> (if nomin then Util.translate_eval r else r) ^ c ]
   in
   if upp then capitale r else r
 ;

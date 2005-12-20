@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 5.4 2005-12-15 06:20:38 ddr Exp $ *)
+(* $Id: translate.ml,v 5.5 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
@@ -84,7 +84,7 @@ value language_name lang lang_def =
   loop 0 0
 ;
 
-(* concat *)
+(* eval *)
 
 value erase str i j =
   String.sub str 0 i ^ String.sub str j (String.length str - j)
@@ -248,14 +248,14 @@ value rec eval_shift s =
   loop False 0 0
 ;
 
-value rec concat str =
+value rec eval str =
   if not (String.contains str '@') then (* optimisation *) str
   else
-    let str = concat_rec str in
+    let str = eval_rec str in
     let (set, str) = eval_set str in
     let str = eval_app set str in
     eval_shift str
-and concat_rec str =
+and eval_rec str =
   loop str 0 where rec loop str i =
     if i = String.length str then str
     else if i + 3 < String.length str && str.[i] = '@' && str.[i+1] = '(' &&
@@ -273,7 +273,7 @@ and concat_rec str =
       in
       if j = String.length str then str
       else
-        let sstr = concat (String.sub str (i + 2) (j - i - 2)) in
+        let sstr = eval (String.sub str (i + 2) (j - i - 2)) in
         let k = i + String.length sstr in
         let str =
           String.sub str 0 i ^ sstr ^

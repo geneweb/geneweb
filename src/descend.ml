@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: descend.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 DEFINE OLD;
@@ -224,8 +224,7 @@ value display_descendants_upto conf base max_level p line =
     if count.val > 1 then do {
       tag "p" begin
         Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) count.val
-          (Translate.concat
-             ("@(c)" ^ nominative (transl_nth conf "person/persons" 1)));
+          (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
         if max_level > 1 then
           Wserver.wprint " (%s)" (transl conf "spouses not included")
         else ();
@@ -293,8 +292,7 @@ value display_descendants_level conf base max_level ancestor =
     Wserver.wprint "%s" (capitale (text_level conf max_level));
     if len.val > 1 then
       Wserver.wprint " (%d %s)" len.val
-        (Translate.concat
-           ("@(c)" ^ nominative (transl_nth conf "person/persons" 1)))
+        (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
     else ();
     Wserver.wprint ".\n";
     html_p conf;
@@ -651,8 +649,7 @@ value display_descendants_with_numbers conf base max_level ancestor =
     if total.val > 1 then do {
       html_p conf;
       Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) total.val
-        (Translate.concat
-           ("@(c)" ^ nominative (transl_nth conf "person/persons" 1)));
+        (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
       if max_level > 1 then
         Wserver.wprint " (%s)" (transl conf "spouses not included")
       else ();

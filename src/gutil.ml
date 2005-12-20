@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.1 2005-12-18 21:48:11 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -89,7 +89,9 @@ value utf_8_db = Name.utf_8_db;
 value utf_8_intern_byte c =
   utf_8_db.val && Char.code c >= 0x80 && Char.code c < 0xC0;
 
-(**)
+DEFINE OLD;
+
+IFDEF OLD THEN declare
 value decline_word case s ibeg iend =
   let i =
     loop ibeg where rec loop i =
@@ -143,7 +145,7 @@ value decline case s =
       | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
       | _ -> loop ibeg (i + 1) ]
 ;
-(*
+end ELSE declare
 (* [decline] has been deprecated since version 5.00
    compatibility code: *)
 value colon_to_at_word s ibeg iend =
@@ -206,7 +208,7 @@ value decline case s =
     (if not (String.contains s ':') then s else colon_to_at s)
 ;
 (* end compatibility code *)
-*)
+end END;
 
 value nominative s =
   match rindex s ':' with

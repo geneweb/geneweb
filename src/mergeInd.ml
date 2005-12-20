@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -214,7 +214,7 @@ value compatible_fam base fam1 fam2 =
 
 value propose_merge_ind conf base branches p1 p2 =
   let title h =
-    let s = Translate.concat (transl_nth conf "person/persons" 1) in
+    let s = transl_nth conf "person/persons" 1 in
     Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
   in
   do {

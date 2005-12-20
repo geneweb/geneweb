@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: forum.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -525,7 +525,7 @@ and eval_date_var conf date =
       match date with
       [ Dgreg d _ -> VVstring (string_of_int d.month)
       | _ -> VVstring "" ]
-  | [] -> VVstring (Date.string_of_date conf date)
+  | [] -> VVstring (Util.translate_eval (Date.string_of_date conf date))
   | _ -> raise Not_found ]
 and eval_message_text_var conf str so =
   fun

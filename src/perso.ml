@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: perso.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1911,7 +1911,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       | _ -> "" ]
   | "on_birth_date" ->
       match (p_auth, Adef.od_of_codate p.birth) with
-      [ (True, Some d) -> Date.string_of_ondate conf d
+      [ (True, Some d) -> Util.translate_eval (Date.string_of_ondate conf d)
       | _ -> "" ]
   | "on_burial_date" ->
       match p.burial with
@@ -1931,7 +1931,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match (p_auth, p.death) with
       [ (True, Death _ d) ->
           let d = Adef.date_of_cdate d in
-          Date.string_of_ondate conf d
+          Util.translate_eval (Date.string_of_ondate conf d)
       | _ -> "" ]
   | "prev_fam_father" ->
       match get_env "prev_fam" env with
