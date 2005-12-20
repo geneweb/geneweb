@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: notes.ml,v 5.1 2005-12-20 20:04:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -342,7 +342,8 @@ value print_misc_notes conf base =
   in
   let title h =
     Wserver.wprint "%s"
-      (if d = "" then capitale (nominative (transl conf "miscellaneous notes"))
+      (if d = "" then
+         capitale (Util.translate_eval (transl conf "miscellaneous notes"))
        else if h then "- " ^ d ^ " -"
        else "<tt>- " ^ d ^ " -</tt>")
   in
@@ -353,7 +354,8 @@ value print_misc_notes conf base =
          if String.length f >= String.length d then
            if String.sub f 0 (String.length d) = d then
              let r =
-               String.sub f (String.length d) (String.length f - String.length d)
+               String.sub f (String.length d)
+                 (String.length f - String.length d)
              in
              if d = "" || r <> "" && r.[0] = NotesLinks.char_dir_sep then
                let r =

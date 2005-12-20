@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.4 2005-12-20 01:28:33 ddr Exp $ *)
+(* $Id: util.ml,v 5.5 2005-12-20 20:04:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -240,7 +240,7 @@ value gen_decline2 wt s1 s2 =
       in
       s ^ loop (i + 1)
   in
-  loop 0
+  Translate.eval (loop 0)
 ;
 
 value transl_a_of_b conf x y =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: date.ml,v 5.1 2005-12-20 20:04:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 UNDEF OLD;
@@ -208,7 +208,7 @@ value gregorian_precision conf d =
       transl_nth conf "and" 0 ^ " " ^ string_of_on_dmy conf d2
 ;
 
-value string_of_ondate conf =
+value string_of_ondate_aux conf =
   fun
   [ Dgreg d Dgregorian ->
       let s = string_of_on_dmy conf d in
@@ -257,6 +257,10 @@ value string_of_ondate conf =
       [ Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s ]
   | Dtext t -> "(" ^ string_with_macros conf [] t ^ ")" ]
+;
+
+value string_of_ondate conf d =
+  Util.translate_eval (string_of_ondate_aux conf d)
 ;
 
 value string_of_date conf =
