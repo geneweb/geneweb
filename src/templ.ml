@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.2 2005-12-18 21:48:11 ddr Exp $ *)
+(* $Id: templ.ml,v 5.3 2005-12-20 01:28:33 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -807,6 +807,7 @@ and eval_transl_lexicon conf upp s c =
             in
             Util.transl_decline conf s1 s3 ] ]
   in
+  let r = Util.translate_eval r in
   if upp then Util.capitale r else r
 ;
 
@@ -980,7 +981,7 @@ value eval_bool_expr conf (eval_var, eval_apply) e =
 value eval_string_expr conf (eval_var, eval_apply) e =
   try
     match eval_expr (conf, eval_var, eval_apply) e with
-    [ VVstring s -> Translate.concat s
+    [ VVstring s -> Util.translate_eval s
     | VVbool _ | VVother _ ->
         raise_with_loc (loc_of_expr e) (Failure "string value expected") ]
   with
@@ -1229,7 +1230,7 @@ value interp
             Translate.language_name s (Util.transl conf " !languages")
         | ("nth", [VVstring s1; VVstring s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
-            Gutil.nominative (Util.nth_field s1 n)
+            Util.translate_eval (Util.nth_field s1 n)
         | _ ->
             try eval_predefined_apply env f vl with
             [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]

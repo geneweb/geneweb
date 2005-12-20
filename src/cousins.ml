@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -283,8 +283,7 @@ value print_cousins conf base p lev1 lev2 =
       if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
       else if cnt.val > 1 then
         Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
-          (Translate.concat
-             ("@(c)" ^ nominative (transl_nth conf "person/persons" 1)))
+          (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
       else ();
     end;
     trailer conf
@@ -300,7 +299,7 @@ value sosa_of_persons conf base =
           list ]
 ;
 
-value print_anniv conf base p level =
+value print_anniv conf base p dead_people level =
   let module S = Map.Make (struct type t = iper; value compare = compare; end)
   in
   let s_mem x m =
@@ -407,12 +406,17 @@ value print_anniv conf base p level =
       xtag "input" "type=\"hidden\" name=\"m\" value=\"C\"";
       xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
         (Adef.int_of_iper p.cle_index);
-      xtag "input" "type=\"hidden\" name=\"t\" value=\"AN\""
+      xtag "input" "type=\"hidden\" name=\"t\" value=\"%s\""
+        (if dead_people then "AD" else "AN")
     }
   in
   match p_getint conf.env "v" with
-  [ Some i -> Birthday.gen_print conf base i f_scan False
-  | _ -> Birthday.gen_print_menu_birth conf base f_scan mode ]
+  [ Some i -> Birthday.gen_print conf base i f_scan dead_people
+  | _ ->
+      if dead_people then
+        Birthday.gen_print_menu_dead conf base f_scan mode
+      else
+        Birthday.gen_print_menu_birth conf base f_scan mode ]
 ;
 
 value cousmenu_print = Perso.interp_templ "cousmenu";
@@ -431,8 +435,8 @@ value print conf base p =
         | None -> lev1 ]
       in
       print_cousins conf base p lev1 lev2
-  | (_, Some "AN") when conf.wizard || conf.friend ->
-      print_anniv conf base p max_lev
+  | (_, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
+      print_anniv conf base p (t = "AD") max_lev
   | _ ->
       cousmenu_print conf base p ]
 ;

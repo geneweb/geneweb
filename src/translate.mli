@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.mli,v 5.3 2005-12-15 06:20:38 ddr Exp $ *)
+(* $Id: translate.mli,v 5.4 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value inline : string -> char -> (char -> string) -> string -> (string * bool);
@@ -9,7 +9,8 @@ value inline : string -> char -> (char -> string) -> string -> (string * bool);
 value language_name : string -> string -> string;
     (* [Translate.language_name lang lang_def] *)
 
-(* [concat str] return a transformation of [str]. The input string may
+value eval : string -> string;
+(* [eval str] return a transformation of [str]. The input string may
    contain actions between "@(" and ")" whose contents are evaluated like
    this:
      - @(x) set the predicate "x"
@@ -25,5 +26,3 @@ value language_name : string -> string -> string;
    Warning: this function makes obsolete many functions in "Util" taking
    care of declinations using the system with :x:.
 *)
-
-value concat : string -> string;

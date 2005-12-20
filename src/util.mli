@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
+(* $Id: util.mli,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -140,6 +140,7 @@ value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;
 value nth_field : string -> int -> string;
 
 value cftransl : config -> string -> list string -> string;
+value translate_eval : string -> string;
 
 value std_color : config -> string -> string;
 
