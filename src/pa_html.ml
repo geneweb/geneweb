@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: pa_html.ml,v 5.1 2005-12-21 10:38:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Pcaml;
@@ -11,8 +11,8 @@ value rec unfold_apply list =
 ;
 
 value tag_encloser loc tag newl enewl a el =
-  let s = if newl then "\n" else "" in
-  let se = if newl || enewl then "\n" else "" in
+  let s = if newl then "\\n" else "" in
+  let se = if newl || enewl then "\\n" else "" in
   let e =
     let (frm, al) =
       match a with
@@ -35,7 +35,7 @@ value tag_encloser loc tag newl enewl a el =
 ;
 
 value tag_alone loc tag a =
-  let s = "\n" in
+  let s = "\\n" in
   let e =
     let (frm, al) =
       match a with
