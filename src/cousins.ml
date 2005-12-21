@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.3 2005-12-21 03:31:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -169,7 +169,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
                in
-               Wserver.wprint "%s" (capitale s);
+               Wserver.wprint "%s" (capitale (Util.translate_eval s));
                Wserver.wprint ":"
              }
            }
@@ -254,19 +254,19 @@ value print_cousins conf base p lev1 lev2 =
         transl_a_of_gr_eq_gen_lev conf
           (brother_label conf lev1) (txt_fun raw_access conf base p)
       in
-      Wserver.wprint "%s" (capitale s)
+      Wserver.wprint "%s" (capitale (Util.translate_eval s))
     else if lev1 == 2 && lev2 == 1 then
       let s =
         transl_a_of_b conf (transl conf "uncles and aunts")
           (txt_fun raw_access conf base p)
       in
-      Wserver.wprint "%s" (capitale s)
+      Wserver.wprint "%s" (capitale (Util.translate_eval s))
     else if lev1 == 1 && lev2 == 2 then
       let s =
         transl_a_of_gr_eq_gen_lev conf
           (transl conf "nephews and nieces") (txt_fun raw_access conf base p)
       in
-      Wserver.wprint "%s" (capitale s)
+      Wserver.wprint "%s" (capitale (Util.translate_eval s))
     else
       Wserver.wprint "%s %d / %s %d" (capitale (transl conf "ancestors")) lev1
         (capitale (transl conf "descendants")) lev2

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.2 2005-12-20 20:04:25 ddr Exp $ *)
+(* $Id: perso.ml,v 5.3 2005-12-21 03:31:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2696,8 +2696,9 @@ value print_foreach conf base print_ast eval_expr =
 value eval_predefined_apply conf env f vl =
   let vl = List.map (fun [ VVstring s -> s | _ -> raise Not_found ]) vl in
   match (f, vl) with
-  [ ("a_of_b", [s1; s2]) -> transl_a_of_b conf s1 s2
-  | ("a_of_b_gr_eq_lev", [s1; s2]) -> transl_a_of_gr_eq_gen_lev conf s1 s2
+  [ ("a_of_b", [s1; s2]) -> Util.translate_eval (transl_a_of_b conf s1 s2)
+  | ("a_of_b_gr_eq_lev", [s1; s2]) ->
+       Util.translate_eval (transl_a_of_gr_eq_gen_lev conf s1 s2)
   | ("add_in_sorted_list", sl) ->
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
