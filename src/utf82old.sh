@@ -38,6 +38,7 @@ function conv(t) { enc=t; disp() }
 /^no: / { conv("iso-8859-1") }
 /^pl: / { conv("iso-8859-2") }
 /^pt: / { conv("iso-8859-1") }
+/^pt-br: / { conv("iso-8859-1") }
 /^ru: / { conv("windows-1251") }
 /^sl: / { conv("iso-8859-2") }
 /^sv: / { conv("iso-8859-1") }
