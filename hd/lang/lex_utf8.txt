@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.5 2005-12-28 13:25:22 ddr Exp $
+# $Id: lex_utf8.txt,v 5.6 2005-12-28 13:28:20 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -40,10 +40,10 @@ br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/cs=tchekeg/da=daneg/de=a
 ca: af=africà/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pl=polac/pt=portuguès/pt-br=brasiler/ru=rus/sl=eslovè/sv=suec/zh=Xinès
 cs: af=afrikánština/bg=bulharština/cs=čeština/da=dánština/de=němčina/en=angličtina/eo=esperanto/es=španělština/fi=finština/fr=francouzština/he=hebrejština/is=islandština/it=italština/lv=lotyšština/nl=holandština/no=norština/pt=portugalština/pt-br=brasilština/ru=ruština/sv=švédština/zh=čínština
 da: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rum&aelig;nsk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
-de: af=Afrikaans/bg=Bulgarish/ca=Katalanisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ru=Russisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
+de: af=Afrikaans/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ro=Rumänisch/ru=Russisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
 en: af=Afrikaans/bg=Bulgarian/br=Breton/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
-es: af=Afrikaans/bg=Búlgaro/ca=Catalán/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/et=Estonio/fi=Fin&eacute;s/fr=Franc&eacute;s/he=Hebreo/is=Island&eacute;s/it=Italiano/lv=Lituano/nl=Neerland&eacute;s/no=Noruego/pl=Polaco/pt=Portug&eacute;s/pt-br=Portug&eacute;s de Brasil/ru=Ruso/sl=Esloveno/sv=Sueco/zh=Chino
+es: af=Afrikaans/bg=Búlgaro/br=Bret&oacute;n/ca=Catalán/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/et=Estonio/fi=Fin&eacute;s/fr=Franc&eacute;s/he=Hebreo/is=Island&eacute;s/it=Italiano/lv=Lituano/nl=Neerland&eacute;s/no=Noruego/pl=Polaco/pt=Portug&eacute;s/pt-br=Portug&eacute;s de Brasil/ro=Rumano/ru=Ruso/sl=Esloveno/sv=Sueco/zh=Chino
 et: af=afrikaani/bg=bulgaaria/br=bretooni/ca=katalaani/cs=tšehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sl=sloveenia/sv=rootsi/zh=hiina
 fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pl=puola/pt=portugali/pt-br=brasilianportugali/ru=venäjä/sv=ruotsi/zh=kiina
 fr: af=afrikaans/bg=bulgare/br=breton/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finnois/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ro=roumain/ru=russe/sl=slov&egrave;ne/sv=su&eacute;dois/zh=chinois
@@ -4875,7 +4875,7 @@ br: a zo an hevelep den !
 ca: és la mateixa persona
 cs: je ta samá osoba!
 da: det er den samme person!
-de: es ist dieselbe Person!
+de: es ist die selbe Person!
 en: it is the same person!
 eo: estas la sama persono!
 es: &iexcl;es la misma persona!
@@ -5043,6 +5043,7 @@ it: pagine collegate
 nl: gekoppelde pagina’s
 no: linkede sider
 pt-br: página associadas
+ro: pagini legate
 ru: связанные страницы
 sv: länkade sidor
 
@@ -5520,6 +5521,7 @@ it: note varie
 nl: diversen
 no: diverse notater
 pt-br: notas diversas
+ro: insemnari diverse
 ru: дополнительные заметки
 sv: blandade noteringar
 
@@ -7175,6 +7177,7 @@ it: ricerca/sensibile a maiuscole e minuscole
 nl: zoeken/hoofdlettergevoelig
 no: søk/skiller mellom store og små bokstaver
 pt-br: procurar/diferencia maiúsculas
+ro: cautare/sensibila la caz
 ru: поиск/регистрозависимый
 sv: sök/skiftlägeskänslig
 
@@ -7429,7 +7432,7 @@ br: a rankfe bezañ benel he reizh
 ca: hauria de ser de sexe femení
 cs: měla by být ženského pohlaví
 da: burde v&aelig;re kvinde
-de: müßte weiblichen Geschlechts sein
+de: müsste weiblichen Geschlechts sein
 en: should be female
 eo: devus esti ina
 es: deber&iacute;a ser de sexo feminino
@@ -7456,7 +7459,7 @@ br: a rankfe bezañ gourel e reizh
 ca: hauria de ser de sexe masculí
 cs: měl by být mužského pohlaví
 da: burde v&aelig;re mand
-de: müßte männlichen Geschlechts sein
+de: müsste männlichen Geschlechts sein
 en: should be male
 eo: devus esti maskla
 es: deber&iacute;a ser de sexo masculino
@@ -8551,6 +8554,7 @@ fi: tämä foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
 no: dette forumet er endret
+ro: acest forum este moderat
 ru: этот форум модерируется
 sv: detta forum är ändrat
 
@@ -9126,6 +9130,7 @@ fi: tarkista/hylkää
 fr: valider/supprimer
 it: conferma/elimina
 no: verifiser/slett
+ro: valideaza/sterge
 ru: проверить/удалить
 sv: giltligt/tas bort
 
@@ -9142,6 +9147,7 @@ it: visualizza/mostra/nascondi/riassunto
 nl: visualiseren/tonen/verbergen/samenvatting
 no: visualiser/vis/skjul/summert
 pt: visualizar/mostrar/esconder/sumário
+ro: vizualizeaza/arata/ascunde/sumar
 ru: построить/показать/скрыть/общая
 sv: visualisera/visa/göm/summering
 
@@ -9426,5 +9432,6 @@ et: teade ootab kinnitamist
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
 no: Beskjeden din avventer bekreftelse
+ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки 
 sv: ditt meddelande väntar på giltighet
