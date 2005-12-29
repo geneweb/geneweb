@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
+  <!-- $Id: start.txt,v 5.1 2005-12-29 14:59:52 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <!-- This file is kept by compatibility to allow displaying databases
        created before version 5.00. -->
@@ -209,7 +209,7 @@ eo: <a href="%sw=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (pasvorto)
 es: <a href="%sw=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (contrase&ntilde;a)
-et: Ligipääs
+et: Ligipääs:
     <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
 fi: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     kirjautuminen<br%/> (salasana)
@@ -252,7 +252,7 @@ de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br%/> (Passwort)
 en: <a href="%sw=f"><em>Friend</em></a> access<br%/> (password)
 eo: <a href="%sw=f">Aliro <em>amiko</em></a><br%/> (pasvorto)
 es: <a href="%sw=f">Entrada <em>amigo</em></a><br%/> (contrase&ntilde;a)
-et: Ligipääs <a href="%sw=f"><em>sõbrana</em></a><br%/> (parool)
+et: Ligipääs: <a href="%sw=f"><em>sõber</em></a><br%/> (parool)
 fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br%/> (salasana)
 fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br%/> (mot de passe).
 he: ëğéñä<a href="%sw=f"><em> îéåçñú </em></a>
@@ -283,7 +283,7 @@ de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
 en: Password, for <em>friend</em> or <em>wizard</em> access:
 eo: Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
 es: Contrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
-et: Parool, <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
+et: Parool <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
 fi: Salasana <em>Valittu</em> tai <em>Velho</em> kirjautumiseen:
 fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>magicien</em>:
 he: ñéñîä ìëğéñä <em> îéåçñú  </em> àå <em>ëâàåï</em>
@@ -700,7 +700,7 @@ es: <span class="highlight">mediante una</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
        avanzada</b></font></a>.
 et: <span class="highlight"></span>
-       <a href="%sm=H;v=advanced"><font color="%i"><b>täpsem 
+       <a href="%sm=H;v=advanced"><font color="%i"><b>laiendatud
        päring</b></font></a>.
 fi: <a href="%sm=H;v=advanced"><span class="highlight">erityishaulla</span></a>.
 fr: <span class="highlight"> par la</span>
