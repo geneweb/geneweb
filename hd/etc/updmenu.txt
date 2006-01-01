@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 5.1 2005-12-14 11:25:15 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2005 INRIA -->
+  <!-- $Id: updmenu.txt,v 5.2 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*update]</title>
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>

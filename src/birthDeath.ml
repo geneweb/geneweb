@@ -1,23 +1,11 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: birthDeath.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
-
-value before_date d d1 =
-  if d1.year < d.year then True
-  else if d1.year > d.year then False
-  else if d1.month < d.month then True
-  else if d1.month > d.month then False
-  else if d1.prec > d.prec then True
-  else if d1.prec < d.prec then False
-  else if d1.day < d.day then True
-  else if d1.day > d.day then False
-  else True
-;
 
 value select conf base get_date find_oldest =
   let module Q =
@@ -25,7 +13,7 @@ value select conf base get_date find_oldest =
       (struct
          type t = (Def.person * Def.dmy * Def.calendar);
          value leq (_, x, _) (_, y, _) =
-           if find_oldest then before_date x y else before_date y x
+           if find_oldest then Date.before_date x y else Date.before_date y x
          ;
        end)
   in
@@ -64,7 +52,7 @@ value select conf base get_date find_oldest =
       let p = pget conf base (Adef.iper_of_int i) in
       match get_date p with
       [ Some (Dgreg d cal) ->
-          if before_date d ref_date then loop q len (i + 1)
+          if Date.before_date d ref_date then loop q len (i + 1)
           else
             let e = (p, d, cal) in
             if len < n then loop (Q.add e q) (len + 1) (i + 1)
@@ -80,7 +68,7 @@ value select_family conf base get_date find_oldest =
       (struct
          type t = (Def.family * Def.dmy * Def.calendar);
          value leq (_, x, _) (_, y, _) =
-           if find_oldest then before_date x y else before_date y x;
+           if find_oldest then Date.before_date x y else Date.before_date y x;
        end)
   in
   let n =

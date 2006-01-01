@@ -3,7 +3,7 @@ OVERVIEW:
 GeneWeb is a genealogy software with a Web interface. It can be used
 off-line or as a Web service.
 
-This is the version 4.10
+This is the version 5.00
 
 To compile, you need the Objective Caml compiler which can be found at:
    http://caml.inria.fr/ocaml/
@@ -32,7 +32,7 @@ CONTENTS:
 
 COPYRIGHT:
 
-All files marked in this distribution are Copyright (c) 1998-2005 INRIA
+All files marked in this distribution are Copyright (c) 1998-2006 INRIA
 (Institut National de Recherche en Informatique et Automatique) and
 distributed under the conditions stated in file LICENSE. They can be
 freely redistributed for non-commercial purposes, provided the
@@ -40,8 +40,8 @@ copyright notice remains attached.
 
 INSTALLATION:
 
-You can compile on Unix, Windows NT/95/98/2000 or MacOS X machines. See the
-file INSTALL for installation instructions.
+You can compile on Unix, Windows or MacOS X machines. See the file INSTALL
+for installation instructions.
 
 HOME PAGE
 

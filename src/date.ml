@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.1 2005-12-20 20:04:25 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: date.ml,v 5.2 2006-01-01 05:35:07 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
 
@@ -12,6 +12,18 @@ open TemplAst;
 open Printf;
 
 value nbsp = "&nbsp;";
+
+value before_date d d1 =
+  if d1.year < d.year then True
+  else if d1.year > d.year then False
+  else if d1.month < d.month then True
+  else if d1.month > d.month then False
+  else if d1.prec > d.prec then True
+  else if d1.prec < d.prec then False
+  else if d1.day < d.day then True
+  else if d1.day > d.day then False
+  else True
+;
 
 value code_date conf encoding d m y =
   let apply_date_code =

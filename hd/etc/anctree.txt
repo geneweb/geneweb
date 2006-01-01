@@ -1,8 +1,8 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 5.0 2005-12-13 11:51:26 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2005 INRIA -->
+  <!-- $Id: anctree.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;

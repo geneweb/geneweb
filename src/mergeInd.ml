@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.2 2005-12-20 01:28:33 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: mergeInd.ml,v 5.3 2006-01-01 05:35:07 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;

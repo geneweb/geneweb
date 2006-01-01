@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: translate.mli,v 5.4 2005-12-20 01:28:33 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: translate.mli,v 5.5 2006-01-01 05:35:08 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 value inline : string -> char -> (char -> string) -> string -> (string * bool);
     (* [Translate.inline lang macro_char macro str] return the translation

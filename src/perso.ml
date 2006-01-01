@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.3 2005-12-21 03:31:05 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: perso.ml,v 5.4 2006-01-01 05:35:07 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;

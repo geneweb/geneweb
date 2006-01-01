@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: desmenu.txt,v 5.1 2005-12-13 13:11:33 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2005 INRIA -->
+  <!-- $Id: desmenu.txt,v 5.2 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;

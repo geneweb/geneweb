@@ -213,7 +213,7 @@ This command launches the {GeneWeb} "daemon". The command must
 display:
 
 <pre>
-     GeneWeb - Copyright (c) 1998-2005 INRIA
+     GeneWeb - Copyright (c) 1998-2006 INRIA
      Possible addresses:
 	http://localhost:2317/base
 	http://127.0.0.1:2317/base
