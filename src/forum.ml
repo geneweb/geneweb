@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.1 2005-12-20 01:28:33 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: forum.ml,v 5.2 2006-01-01 05:35:07 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
 open Config;

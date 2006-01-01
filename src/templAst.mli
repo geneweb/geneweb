@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: templAst.mli,v 5.1 2005-12-13 20:28:24 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: templAst.mli,v 5.2 2006-01-01 05:35:08 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 type ast =
   [ Atext of loc and string

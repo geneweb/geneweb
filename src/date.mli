@@ -1,5 +1,5 @@
-(* $Id: date.mli,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
-(* Copyright (c) 1998-2005 INRIA *)
+(* $Id: date.mli,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Config;
@@ -15,3 +15,5 @@ value short_marriage_date_text :
 value print_dates : config -> base -> person -> unit;
 value print_calendar : config -> base -> unit;
 value get_birth_death_date : person -> (option date * option date * bool);
+
+value before_date : dmy -> dmy -> bool;
