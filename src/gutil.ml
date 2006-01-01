@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.4 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.5 2006-01-01 21:15:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -325,8 +325,9 @@ value strictly_after d1 d2 =
 ;
 
 value designation base p =
-  let prenom = p_first_name base p in
-  let nom = p_surname base p in prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
+  let first_name = p_first_name base p in
+  let nom = p_surname base p in
+  iso_8859_1_of_utf_8 (first_name ^ "." ^ string_of_int p.occ ^ " " ^ nom)
 ;
 
 value father = Adef.father;
