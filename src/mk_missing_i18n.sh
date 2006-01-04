@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml camlp4r.cma $0
 *) ".";
-(* $Id: mk_missing_i18n.sh,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 5.1 2006-01-04 15:30:22 ddr Exp $ *)
 
 open Printf;
 
@@ -113,15 +113,25 @@ do {
 </head>
 <body background=\"images/gwback.jpg\">
 <h1>Missing phrases</h1>
+
+<p>
+Address of this page:
+<a href=\"http://www.geneweb.org/missing.utf8.html\">http://www.geneweb.org/missing.utf8.html</a>
+</p>
+
+<p>
 Here are the list of all languages with the missing phrases in the lexicon
 of the current version of <b><font color=#2f6400>GeneWeb</font></b>. The
 missing entries are displayed together with their English and French
 translations.
+</p>
 <p>
 If you want to collaborate, you can <a
 href=\"../email.html\">send me</a>
 the translations in
 the given language if you know it. Thanks.
+</p>
+
 <p align=center>
 <tt>
 ";

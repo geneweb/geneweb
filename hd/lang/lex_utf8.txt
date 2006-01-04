@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.9 2006-01-01 05:35:06 ddr Exp $
+# $Id: lex_utf8.txt,v 5.10 2006-01-04 15:30:22 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -5042,6 +5042,7 @@ fr: pages liées
 it: pagine collegate
 nl: gekoppelde pagina’s
 no: linkede sider
+pl: linki
 pt: páginas ligadas
 pt-br: página associadas
 ro: pagini legate
@@ -5521,6 +5522,7 @@ fr: notes diverses
 it: note varie
 nl: diversen
 no: diverse notater
+pl: pozostałe uwagi
 pt: notas diversas
 ro: insemnari diverse
 ru: дополнительные заметки
@@ -7177,6 +7179,7 @@ fr: rechercher/sensible à la casse
 it: ricerca/sensibile a maiuscole e minuscole
 nl: zoeken/hoofdlettergevoelig
 no: søk/skiller mellom store og små bokstaver
+pl: szukaj/wielkość liter ma znaczenie
 pt: pesquisar/sensível à capitulação
 pt-br: procurar/diferencia maiúsculas
 ro: cautare/sensibila la caz
@@ -8547,6 +8550,7 @@ sl: celoten seznam
 sv: hela listan
 
     this forum is moderated
+bg: този форум се модерира
 ca: aquest fòrum té moderador
 de: dieses Forum wird moderiert
 en: this forum is moderated
@@ -8556,6 +8560,7 @@ fi: tämä foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
 no: dette forumet er endret
+pl: forum jest moderowane
 pt: este fórum é moderado
 ro: acest forum este moderat
 ru: этот форум модерируется
@@ -9124,6 +9129,7 @@ sl: uporabnik/geslo/prekliči
 sv: användare/passord/avbryt
 
     validate/delete
+bg: да се потвърди/да се изтрие
 ca: validar/eliminar
 de: Bestätigen/Verwerfen
 en: validate/delete
@@ -9133,6 +9139,7 @@ fi: tarkista/hylkää
 fr: valider/supprimer
 it: conferma/elimina
 no: verifiser/slett
+pl: sprawdź/usuń
 pt: validar/eliminar
 ro: valideaza/sterge
 ru: проверить/удалить
@@ -9150,6 +9157,7 @@ fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
 nl: visualiseren/tonen/verbergen/samenvatting
 no: visualiser/vis/skjul/summert
+pl: wyświetl/pokaż/ukryj/podsumowanie
 pt: visualizar/mostrar/esconder/sumário
 ro: vizualizeaza/arata/ascunde/sumar
 ru: построить/показать/скрыть/общая
@@ -9429,6 +9437,8 @@ sl: najprej morate združiti obe družini
 sv: du måste först slå samman de 2 familjerna
 
     your message is waiting for validation
+bg: съобщението Ви очаква потвърждение
+ca: el vostre missatge està pendent de validació
 de: deine Nachricht wartet auf ihre Überprüfung
 en: your message is waiting for validation
 es: tu mensaje espera su validación
@@ -9436,6 +9446,7 @@ et: teade ootab kinnitamist
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
 no: Beskjeden din avventer bekreftelse
+pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки 
