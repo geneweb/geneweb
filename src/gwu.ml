@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.2 2006-01-11 10:57:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -71,9 +71,10 @@ value print_date_option oc =
   | None -> () ]
 ;
 
-value starting_char s =
+value starting_char no_num s =
   match s.[0] with
-  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' -> True
+  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' -> True
+  | '0'..'9' -> not no_num
   | '?' -> if s = "?" then True else False
   | _ -> False ]
 ;
@@ -93,7 +94,7 @@ value no_newlines s =
 
 value raw_output = ref False;
 
-value gen_correct_string no_colon s =
+value gen_correct_string no_num no_colon s =
   let s = strip_spaces s in
   let s =
     if Gutil.utf_8_db.val || raw_output.val then s
@@ -101,7 +102,7 @@ value gen_correct_string no_colon s =
   in
   loop 0 0 where rec loop i len =
     if i == String.length s then Buff.get len
-    else if len == 0 && not (starting_char s) then
+    else if len == 0 && not (starting_char no_num s) then
       loop i (Buff.store len '_')
     else
       match s.[i] with
@@ -118,11 +119,18 @@ value gen_correct_string no_colon s =
 ;
 
 value s_correct_string s =
-  let s = gen_correct_string False s in
+  let s = gen_correct_string False False s in
   if s = "" then "_" else s
 ;
+value s_correct_string_nonum s =
+  let s = gen_correct_string True False s in
+  if s = "" then "_" else s
+;
+
 value correct_string base is = s_correct_string (sou base is);
-value correct_string_no_colon base is = gen_correct_string True (sou base is);
+value correct_string_no_colon base is =
+  gen_correct_string False True (sou base is)
+;
 
 value has_infos_not_dates base p =
   p.first_names_aliases <> [] || p.surnames_aliases <> [] ||
@@ -324,7 +332,7 @@ value print_child oc base fam_surname csrc cbp p =
       ()
     else fprintf oc ".%d" p.occ;
     if p.surname <> fam_surname then
-      fprintf oc " %s" (s_correct_string (sou base p.surname))
+      fprintf oc " %s" (s_correct_string_nonum (sou base p.surname))
     else ();
     print_infos oc base True csrc cbp p;
     fprintf oc "\n"
