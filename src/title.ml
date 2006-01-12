@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: title.ml,v 5.2 2006-01-12 10:46:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -28,6 +28,9 @@ value date_interval conf base t x =
       in
       do {
         match Adef.od_of_codate x.birth with
+        [ Some (Dgreg d _) -> set d
+        | _ -> () ];
+        match Adef.od_of_codate x.baptism with
         [ Some (Dgreg d _) -> set d
         | _ -> () ];
         match date_of_death x.death with
@@ -105,7 +108,10 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
           if not (strictly_before_dmy d21 d12) then -1
           else if not (strictly_before_dmy d11 d22) then 1
           else if strictly_after_dmy d21 d11 then -1
-          else if strictly_after_dmy d22 d12 then -1 else 1
+(*
+          else if strictly_after_dmy d22 d12 then -1
+*)
+          else 1
       | _ ->
           match
             (date_interval conf base AddSpouse x1,
