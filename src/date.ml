@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.2 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: date.ml,v 5.3 2006-01-14 22:32:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -12,6 +12,11 @@ open TemplAst;
 open Printf;
 
 value nbsp = "&nbsp;";
+value death_symbol conf =
+  match p_getenv conf.base_env "death_symbol" with
+  [ Some x -> x
+  | None -> if utf_8_db.val then "\226\128\160" else "+" ]
+;
 
 value before_date d d1 =
   if d1.year < d.year then True
@@ -352,7 +357,8 @@ value short_dates_text conf base p =
       | _ ->
           match p.death with
           [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
-              if s = "" then "+" else s ^ nbsp ^ "+"
+              let d = death_symbol conf in
+              if s = "" then d else s ^ nbsp ^ d
           | _ -> s ] ]
     in
     let s =
