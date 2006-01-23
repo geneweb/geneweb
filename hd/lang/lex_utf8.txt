@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.10 2006-01-04 15:30:22 ddr Exp $
+# $Id: lex_utf8.txt,v 5.11 2006-01-23 10:27:26 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -5033,6 +5033,7 @@ sv: släktskap emellan
     linked pages
 bg: свързани страници
 ca: enllaços
+cs: spojený stránky
 de: verknüpfte Seiten
 en: linked pages
 es: páginas enlazadas
@@ -5513,6 +5514,7 @@ sv: meddelande/föregående meddelande/föregående meddelande/nästa meddelande
     miscellaneous notes
 bg: разни бележки
 ca: miscel·lània
+cs: rozmanitý poznámky
 de: diverse Notizen
 en: miscellaneous notes
 es: notas diversas
@@ -7170,6 +7172,7 @@ sv: släktskap genom äktenskap
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
 ca: recerca/coincidir maj_min
+cs: hledat/citlivý na velikost písma
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
 es: buscar/fijarse en mayúsculas&#047;menúsculas
@@ -8552,6 +8555,7 @@ sv: hela listan
     this forum is moderated
 bg: този форум се модерира
 ca: aquest fòrum té moderador
+cs: fórum je umírnìný
 de: dieses Forum wird moderiert
 en: this forum is moderated
 es: este foro está moderato
@@ -9131,6 +9135,7 @@ sv: användare/passord/avbryt
     validate/delete
 bg: да се потвърди/да се изтрие
 ca: validar/eliminar
+cs: ovìøit/výmaz
 de: Bestätigen/Verwerfen
 en: validate/delete
 es: validar/borrar
@@ -9148,6 +9153,7 @@ sv: giltligt/tas bort
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
 ca: visualtza/mostra/sumari
+cs: zviditelnit/ukázat/souhrnný
 de: veranschaulichen/einblenden/ausblenden/Zusammenfassung
 en: visualize/show/hide/summary
 es: visualizar/mostrar/ocultar/resumen
@@ -9439,6 +9445,7 @@ sv: du måste först slå samman de 2 familjerna
     your message is waiting for validation
 bg: съобщението Ви очаква потвърждение
 ca: el vostre missatge està pendent de validació
+cs: tvojá zpráva je èekající na potvrzení
 de: deine Nachricht wartet auf ihre Überprüfung
 en: your message is waiting for validation
 es: tu mensaje espera su validación
