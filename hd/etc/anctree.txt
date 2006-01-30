@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 5.2 2006-01-30 10:42:56 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 5.3 2006-01-30 10:52:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -81,7 +81,7 @@
       %if;(not is_first)
         <td colspan="1" align="center">%nn;
         %if;cell.is_right;
-          %if;(cell.family.marriage_date.year != "")
+          %if;(evar.marriage = "on" and cell.family.marriage_date.year != "")
             <i style="font-size:80%%">%nn;
             -&nbsp;%cell.family.marriage_date.year;&nbsp;-</i>
           %else;<tt>&nbsp;</tt>%end;
