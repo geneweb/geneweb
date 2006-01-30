@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 5.2 2006-01-30 10:52:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -150,6 +150,11 @@
           <label>
             - [*image/images]1
             <input type="checkbox" name="image" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*marriage/marriages]0
+            <input type="checkbox" name="marriage" value="on"%/>
           </label>
           <br%/>
           <label>
