@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 5.3 2006-01-30 10:52:10 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 5.4 2006-01-30 14:10:00 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -94,7 +94,8 @@
       %else;
         <a style="text-decoration:none" href="%prefix;
         m=A;t=T;v=%evar.v;;%cell.person.access;
-        %if;(evar.image="on");image=on%end;">|</a>%nn;
+        %if;(evar.image = "on");image=on%end;
+        %if;(evar.marriage = "on");marriage=on%end;">|</a>%nn;
       %end;
       </td>
     %end;
