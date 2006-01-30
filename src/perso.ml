@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.4 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: perso.ml,v 5.5 2006-01-30 10:42:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -489,19 +489,23 @@ value get_all_generations conf base p =
 *)
 
 type pos = [ Left | Right | Center | Alone ];
-type cell = [ Cell of person and pos and bool and int | Empty ];
+type cell =
+  [ Cell of person and option ifam and pos and bool and int
+  | Empty ]
+;
 
 value rec enrich lst1 lst2 =
   match (lst1, lst2) with
   [ (_, []) -> []
   | ([], lst) -> lst
-  | ([Cell _ Right _ s1 :: l1], [Cell p d u s2 :: l2]) ->
-      [Cell p d u (s1 + s2 + 1) :: enrich l1 l2]
-  | ([Cell _ Left _ s :: l1], [Cell p d u _ :: l2]) ->
-      enrich l1 [Cell p d u s :: l2]
-  | ([Cell _ _ _ s :: l1], [Cell p d u _ :: l2]) ->
-     [Cell p d u s :: enrich l1 l2]
-  | ([Empty :: l1], [Cell p d _ s :: l2]) -> [Cell p d False s :: enrich l1 l2]
+  | ([Cell _ _ Right _ s1 :: l1], [Cell p f d u s2 :: l2]) ->
+      [Cell p f d u (s1 + s2 + 1) :: enrich l1 l2]
+  | ([Cell _ _ Left _ s :: l1], [Cell p f d u _ :: l2]) ->
+      enrich l1 [Cell p f d u s :: l2]
+  | ([Cell _ _ _ _ s :: l1], [Cell p f d u _ :: l2]) ->
+     [Cell p f d u s :: enrich l1 l2]
+  | ([Empty :: l1], [Cell p f d _ s :: l2]) ->
+     [Cell p f d False s :: enrich l1 l2]
   | ([_ :: l1], [Empty :: l2]) -> [Empty :: enrich l1 l2] ]
 ;
     
@@ -530,7 +534,7 @@ value tree_generation_list conf base gv p =
       (fun po list ->
          match po with
          [ Empty -> [Empty :: list]
-         | Cell p _ _ _ ->
+         | Cell p _ _ _ _ ->
              match parents (aget conf base p.cle_index) with
              [ Some ifam ->
                  let cpl = coi base ifam in
@@ -542,17 +546,18 @@ value tree_generation_list conf base gv p =
                    let p = pget conf base (mother cpl) in
                    if know base p then Some p else None
                  in
+                 let fo = Some ifam in
                  match (fath, moth) with
                  [ (Some f, Some m) ->
-                     [Cell f Left True 1; Cell m Right True 1 :: list]
-                 | (Some f, None) -> [Cell f Alone True 1 :: list]
-                 | (None, Some m) -> [Cell m Alone True 1 :: list]
+                     [Cell f fo Left True 1; Cell m fo Right True 1 :: list]
+                 | (Some f, None) -> [Cell f fo Alone True 1 :: list]
+                 | (None, Some m) -> [Cell m fo Alone True 1 :: list]
                  | (None, None) -> [Empty :: list] ]
              | _ -> [Empty :: list] ] ])
       pol []
   in
   let gen =
-    loop (gv - 1) [Cell p Center True 1] [] where rec loop i gen list =
+    loop (gv - 1) [Cell p None Center True 1] [] where rec loop i gen list =
       if i == 0 then [gen :: list]
       else loop (i - 1) (next_gen gen) [gen :: list]
   in
@@ -908,6 +913,19 @@ value make_ep conf base ip =
   let a = aget conf base ip in
   let u = uget conf base ip in
   let p_auth = authorized_age conf base p in (p, a, u, p_auth)
+;
+
+value make_efam conf base ip ifam =
+  let cpl = coi base ifam in
+  let ifath = father cpl in
+  let imoth = mother cpl in
+  let ispouse = if ip = ifath then imoth else ifath in
+  let cpl = (ifath, imoth, ispouse) in
+  let m_auth =
+    authorized_age conf base (poi base ifath) &&
+    authorized_age conf base (poi base imoth)
+  in
+  (foi base ifam, cpl, doi base ifam, m_auth)
 ;
 
 value rec eval_var conf base env ep loc sl =
@@ -1329,10 +1347,16 @@ and eval_cell_field_var conf base env ep cell loc =
   [ ["colspan"] ->
       match cell with
       [ Empty -> VVstring "1"
-      | Cell _ _ _ s -> VVstring (string_of_int s) ]
+      | Cell _ _ _ _ s -> VVstring (string_of_int s) ]
+  | ["family" :: sl] ->
+      match cell with
+      [ Cell p (Some ifam) _ _ _ ->
+          let efam = make_efam conf base p.cle_index ifam in
+          eval_family_field_var conf base env efam loc sl
+      | _ -> VVstring "" ]
   | ["is_center"] ->
       match cell with
-      [ Cell _ Center _ _ -> VVbool True
+      [ Cell _ _ Center _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["is_empty"] ->
       match cell with
@@ -1340,19 +1364,19 @@ and eval_cell_field_var conf base env ep cell loc =
       | _ -> VVbool False ]
   | ["is_left"] ->
       match cell with
-      [ Cell _ Left _ _ -> VVbool True
+      [ Cell _ _ Left _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["is_right"] ->
       match cell with
-      [ Cell _ Right _ _ -> VVbool True
+      [ Cell _ _ Right _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["is_top"] ->
       match cell with
-      [ Cell _ _ False _ -> VVbool True
+      [ Cell _ _ _ False _ -> VVbool True
       | _ -> VVbool False ]
   | ["person" :: sl] ->
       match cell with
-      [ Cell p _ _ _ ->
+      [ Cell p _ _ _ _ ->
           let ep = make_ep conf base p.cle_index in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
@@ -2143,19 +2167,12 @@ value print_foreach conf base print_ast eval_expr =
           in
           match ip_ifamo with
           [ Some (ip, ifamo) ->
-              let ((_, _, _, p_auth) as ep) = make_ep conf base ip in
+              let ep = make_ep conf base ip in
               let efam =
                 match ifamo with
                 [ Some ifam ->
-                    let cpl = coi base ifam in
-                    let ifath = father cpl in
-                    let imoth = mother cpl in
-                    let ispouse = if ip = ifath then imoth else ifath in
-                    let cpl = (ifath, imoth, ispouse) in
-                    let m_auth =
-                      p_auth && authorized_age conf base (poi base ispouse)
-                    in
-                    Vfam (foi base ifam) cpl (doi base ifam) m_auth
+                    let (f, c, d, a) = make_efam conf base ip ifam in
+                    Vfam f c d a
                 | None -> efam ]
               in
               loop ep efam sl
@@ -2176,10 +2193,10 @@ value print_foreach conf base print_ast eval_expr =
           [ Some ifam ->
               let cpl = coi base ifam in
               let ((_, _, _, p_auth) as ep) = make_ep conf base (father cpl) in
-              let imoth = mother cpl in
-              let cpl = (father cpl, imoth, imoth) in
+              let ifath = father cpl in
+              let cpl = (ifath, mother cpl, ifath) in
               let m_auth =
-                p_auth && authorized_age conf base (poi base imoth)
+                p_auth && authorized_age conf base (poi base ifath)
               in
               let efam = Vfam (foi base ifam) cpl (doi base ifam) m_auth in
               loop ep efam sl
