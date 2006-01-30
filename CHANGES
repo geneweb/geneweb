@@ -58,8 +58,8 @@ The new version number (5.00) is in honour of this new encoding.
       displayed.
 
 * GeneWeb server or CGI (gwd)
-  - [30 Jan 06] In displaying ancestors by tree, added the marriage date
-    between the spouses.
+  - [30 Jan 06] In displaying ancestors by tree, added the ability
+    to have the marriage date between the spouses.
   - [10 Nov 05] The ancestors and descendants page displays the number
     of persons in the menu.
   - [16 Oct 05] Added a system for list of only allowed nobility titles.
