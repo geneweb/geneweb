@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.11 2006-01-23 10:27:26 ddr Exp $
+# $Id: lex_utf8.txt,v 5.12 2006-01-31 09:46:26 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -7892,7 +7892,7 @@ he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים 
 is: %d elstu pörin eru hugsanlega enn saman og á lífi
 it: le %d coppie più anziane forse ancora viventi e fidanzate
 lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
-nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
+nl: De %d oudste paren die mogelijk nog steeds in leven en verloofd zijn
 no: Det % eldste par som kanskje fremdeles er i live og forlovet
 pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
@@ -8563,6 +8563,7 @@ et: see foorum on modereeritav
 fi: tämä foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
+nl: dit forum wordt gemodereerd
 no: dette forumet er endret
 pl: forum jest moderowane
 pt: este fórum é moderado
@@ -9143,6 +9144,7 @@ et: kinnita/kustuta
 fi: tarkista/hylkää
 fr: valider/supprimer
 it: conferma/elimina
+nl: bevestig/verwijder
 no: verifiser/slett
 pl: sprawdź/usuń
 pt: validar/eliminar
@@ -9452,6 +9454,7 @@ es: tu mensaje espera su validación
 et: teade ootab kinnitamist
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
+nl: Uw bericht wacht op bevestiging
 no: Beskjeden din avventer bekreftelse
 pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
