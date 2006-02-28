@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.2 2006-02-28 14:47:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -243,6 +243,7 @@ IFDEF UNIX THEN
 value timeout tmout spid _ =
   do {
     Unix.kill spid Sys.sigkill;
+    Unix.kill spid Sys.sigterm;
     http "";
     wprint "Content-type: text/html; charset=iso-8859-1"; nl (); nl ();
     wprint "<head><title>Time out</title></head>\n";
