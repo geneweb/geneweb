@@ -13,6 +13,7 @@ function disp() {
     else if (enc == "lv")
         system("echo \"" $0 "\" | sed -e 's/Ä\\214/È/g' -e 's/Ä\\201/â/g' -e 's/Å\\206/ò/g' -e 's/Ä¼/ï/g' -e 's/Ä\\215/è/g' -e 's/Å¡/ð/g' -e 's/Å«/û/g' -e 's/Ä\\223/ç/g' -e 's/Ä¢/Ì/g' -e 's/Ä£/ì/g' -e 's/Ä¶/Í/g' -e 's/Ä«/î/g' -e 's/Ä·/í/g' -e 's/Ã¾/þ/g'")
     else system("echo \"" $0 "\" | iconv -f utf-8 -t " enc);
+    fflush(stdout);
     next;
 }
 function conv(t) { enc=t; disp() }
