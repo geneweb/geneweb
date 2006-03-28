@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.2 2006-02-28 14:47:28 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.3 2006-03-28 00:35:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -244,13 +244,21 @@ value timeout tmout spid _ =
   do {
     Unix.kill spid Sys.sigkill;
     Unix.kill spid Sys.sigterm;
-    http "";
-    wprint "Content-type: text/html; charset=iso-8859-1"; nl (); nl ();
-    wprint "<head><title>Time out</title></head>\n";
-    wprint "<body><h1>Time out</h1>\n";
-    wprint "Computation time > %d second(s)\n" tmout;
-    wprint "</body>\n";
-    wflush ();
+    let pid = Unix.fork () in
+    if pid = 0 then
+      if Unix.fork () = 0 then do {
+        http "";
+        wprint "Content-type: text/html; charset=iso-8859-1"; nl (); nl ();
+        wprint "<head><title>Time out</title></head>\n";
+        wprint "<body><h1>Time out</h1>\n";
+        wprint "Computation time > %d second(s)\n" tmout;
+        wprint "</body>\n";
+        wflush ();
+        exit 0;
+      }
+      else exit 0
+    else ();
+    let _ = Unix.waitpid [] pid in ();
     exit 2
   }
 END;
