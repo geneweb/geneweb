@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.12 2006-01-31 09:46:26 ddr Exp $
+# $Id: lex_utf8.txt,v 5.13 2006-04-28 09:53:23 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -5034,6 +5034,7 @@ sv: släktskap emellan
 bg: свързани страници
 ca: enllaços
 cs: spojený stránky
+da: lænkede sider
 de: verknüpfte Seiten
 en: linked pages
 es: páginas enlazadas
@@ -5515,6 +5516,7 @@ sv: meddelande/föregående meddelande/föregående meddelande/nästa meddelande
 bg: разни бележки
 ca: miscel·lània
 cs: rozmanitý poznámky
+da: diverse noter
 de: diverse Notizen
 en: miscellaneous notes
 es: notas diversas
@@ -5613,10 +5615,10 @@ sv: månader
 
     moon age/new moon/first quarter/full moon/last quarter
 af: maanfase/nuwemaan/eerste kwartier/volmaan/laaste kwartier
-ar: همت عمر/نو موون/فيرست قورتر/فولّ موون/لت قورتر
 bg: лунна фаза/новолуние/първа четвърт/пълнолуние/последна четвърт
 ca: fase lunar/lluna nova/quart creixent/lluna plena/quart minvant
 cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
+da: månefase/nymåne/tiltagende måne/fuldmåne/aftagende måne
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
@@ -7173,6 +7175,7 @@ sv: släktskap genom äktenskap
 bg: търсене/с различаване на главни и малки букви
 ca: recerca/coincidir maj_min
 cs: hledat/citlivý na velikost písma
+da: søg/følsom overfor store og små bogstaver
 de: suchen/Groß- &amp; Kleinschreibung beachten
 en: search/case sensitive
 es: buscar/fijarse en mayúsculas&#047;menúsculas
@@ -8556,6 +8559,7 @@ sv: hela listan
 bg: този форум се модерира
 ca: aquest fòrum té moderador
 cs: fórum je umírnìný
+da: dette forum er ændret
 de: dieses Forum wird moderiert
 en: this forum is moderated
 es: este foro está moderato
@@ -9137,6 +9141,7 @@ sv: användare/passord/avbryt
 bg: да се потвърди/да се изтрие
 ca: validar/eliminar
 cs: ovìøit/výmaz
+da: valider/slet
 de: Bestätigen/Verwerfen
 en: validate/delete
 es: validar/borrar
@@ -9156,6 +9161,7 @@ sv: giltligt/tas bort
 bg: да се визуализира/да се покаже/да се скрие/резюме
 ca: visualtza/mostra/sumari
 cs: zviditelnit/ukázat/souhrnný
+da: visualiser/vis/gem/opsummere
 de: veranschaulichen/einblenden/ausblenden/Zusammenfassung
 en: visualize/show/hide/summary
 es: visualizar/mostrar/ocultar/resumen
@@ -9448,6 +9454,7 @@ sv: du måste först slå samman de 2 familjerna
 bg: съобщението Ви очаква потвърждение
 ca: el vostre missatge està pendent de validació
 cs: tvojá zpráva je èekající na potvrzení
+da: din meddelelse venter på validering
 de: deine Nachricht wartet auf ihre Überprüfung
 en: your message is waiting for validation
 es: tu mensaje espera su validación
