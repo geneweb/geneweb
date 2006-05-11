@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.13 2006-04-28 09:53:23 ddr Exp $
+# $Id: lex_utf8.txt,v 5.14 2006-05-11 13:12:02 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2268,7 +2268,7 @@ nl: geboren
 no: født
 pl: urodzony/urodzona/urodzone
 pt: nascido/nascida/nascido(a)
-ro: nascut/nascuta/nascut
+ro: născut/născută/născut
 ru: родился/родилась
 sl: rojen/rojena
 sv: född

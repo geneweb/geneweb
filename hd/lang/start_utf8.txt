@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.2 2006-05-11 13:12:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -78,7 +78,7 @@ nl: Genealogische databank
 no: Genealogisk database
 pl: Genealogiczna baza danych
 pt: Base de Dados Geneal&oacute;gica
-ro: Basa de date genealogice
+ro: Baza de date genealogice
 ru: Генеaлогическая база данных
 sl: Genealoška baza podatkov
 sv: Genealogisk databas
@@ -169,7 +169,7 @@ pt: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
     actualmente %n pessoas.
 pt-br: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
     atualmente %n pessoas.
-ro: basa de date <span class="highlight">"%t"</span> contine %n persoane.
+ro: baza de date <span class="highlight">"%t"</span> conține %n persoane.
 ru: База данных <span class="highlight">"%t"</span> сейчас содержит %n человек.
 sl: Baza podatkov <span class="highlight">"%t"</span> vsebuje %n oseb.
 sv: Databasen <span class="highlight">"%t"</span> inneh&aring;ller nu
