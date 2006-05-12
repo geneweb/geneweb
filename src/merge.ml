@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: merge.ml,v 5.2 2006-05-12 11:48:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -73,13 +73,15 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
                [ Some ifam ->
                    let cpl = coi base ifam in
                    Wserver.wprint ",\n%s"
-                     (transl_a_of_b conf
-                        (transl_nth conf "son/daughter/child"
-                           (index_of_sex p.sex))
-                        (person_title_text conf base (poi base (father cpl)) ^
-                           " " ^ transl_nth conf "and" 0 ^ " " ^
-                           person_title_text conf base
-                             (poi base (mother cpl))))
+                     (Util.translate_eval
+                       (transl_a_of_b conf
+                          (transl_nth conf "son/daughter/child"
+                             (index_of_sex p.sex))
+                          (person_title_text conf base
+                             (poi base (father cpl)) ^
+                             " " ^ transl_nth conf "and" 0 ^ " " ^
+                             person_title_text conf base
+                               (poi base (mother cpl)))))
                | None -> () ];
                xtag "br";
              end;
