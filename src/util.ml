@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.7 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: util.ml,v 5.8 2006-05-16 12:22:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1689,8 +1689,9 @@ value print_parent conf base p fath moth =
   in
   let is = index_of_sex p.sex in
   Wserver.wprint "%s"
-    (transl_a_of_gr_eq_gen_lev conf
-       (transl_nth conf "son/daughter/child" is) s)
+    (translate_eval
+      (transl_a_of_gr_eq_gen_lev conf
+         (transl_nth conf "son/daughter/child" is) s))
 ;
 
 value specify_homonymous conf base p =
@@ -1738,18 +1739,20 @@ value specify_homonymous conf base p =
                      else "")
                 in
                 Wserver.wprint "%s"
-                  (transl_a_of_b conf
-                     (transl_nth conf "father/mother" is)
-                     (child_fn ^ child_sn))
+                  (translate_eval
+                     (transl_a_of_b conf
+                        (transl_nth conf "father/mother" is)
+                        (child_fn ^ child_sn)))
               else
                 let conjoint = pget conf base conjoint in
                 if p_first_name base conjoint <> "?" ||
                    p_surname base conjoint <> "?" then
                   Wserver.wprint "%s"
-                    (transl_a_of_b conf
-                       (transl_nth conf "husband/wife" is)
-                       (p_first_name base conjoint ^ " " ^
-                          p_surname base conjoint))
+                    (translate_eval
+                       (transl_a_of_b conf
+                          (transl_nth conf "husband/wife" is)
+                          (p_first_name base conjoint ^ " " ^
+                           p_surname base conjoint)))
                 else loop (i + 1)
             else Wserver.wprint "..."
           in
