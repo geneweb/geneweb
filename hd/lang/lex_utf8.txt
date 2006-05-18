@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.14 2006-05-11 13:12:02 ddr Exp $
+# $Id: lex_utf8.txt,v 5.15 2006-05-18 20:49:37 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1970,6 +1970,10 @@ ro: in acelas timp
 ru: в то же самое время
 sl: sočasno
 sv: samtidigt
+
+    average death age
+en: average death age
+fr: âge moyen de décès
 
     back
 af: terug
