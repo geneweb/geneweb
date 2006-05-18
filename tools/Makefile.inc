@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 5.0 2005-12-13 11:51:27 ddr Exp $
+# $Id: Makefile.inc,v 5.1 2006-05-18 20:49:37 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh $(PPDEF)
@@ -27,17 +27,17 @@ clean::
 .mli.cmi:
 	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppi
-	$(OCAMLC) $(OCAMLI) -I $(CAMLP4D) -c -intf $*.ppi
+	$(OCAMLC) $(OCAMLI) -I +camlp4 -c -intf $*.ppi
 	$(RM) $*.ppi
 
 .ml.cmo:
 	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I $(CAMLP4D) -c -impl $*.ppo
+	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I +camlp4 -c -impl $*.ppo
 	$(RM) $*.ppo
 
 .ml.cmx:
 	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLOPT) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
+	$(OCAMLOPT) $(OCAMLI) -I +camlp4 -c -impl $*.ppo
 	$(RM) $*.ppo

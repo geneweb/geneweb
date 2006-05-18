@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.2 2006-05-18 20:49:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -173,9 +173,9 @@ value print_death conf base =
     print_link_to_welcome conf True;
     if list <> [] then do {
       Wserver.wprint "<ul>\n";
-      let _ =
+      let (_, ages_sum, ages_nb) =
         List.fold_left
-          (fun last_month_txt (p, d, cal) ->
+          (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
              let month_txt =
                let d = {(d) with day = 0} in
                capitale (Date.string_of_date conf (Dgreg d cal))
@@ -188,6 +188,29 @@ value print_death conf base =
                  Wserver.wprint "<ul>\n";
                }
                else ();
+               let (age, ages_sum, ages_nb) =
+                 let sure d = d.prec = Sure in
+                 match Adef.od_of_codate p.birth with
+                 [ Some (Dgreg d1 _) ->
+                     if sure d1 && sure d && d1 <> d then
+                       let a = time_gone_by d1 d in
+                       let ages_sum =
+                         match p.sex with
+                         [ Male -> (fst ages_sum + a.year, snd ages_sum)
+                         | Female -> (fst ages_sum, snd ages_sum  + a.year)
+                         | Neuter -> ages_sum ]
+                       in
+                       let ages_nb =
+                         match p.sex with
+                         [ Male -> (fst ages_nb + 1, snd ages_nb)
+                         | Female -> (fst ages_nb, snd ages_nb + 1)
+                         | Neuter -> ages_nb ]
+                       in
+                       (Some a, ages_sum, ages_nb)
+                     else
+                       (None, ages_sum, ages_nb)
+                 | _ -> (None, ages_sum, ages_nb) ]
+               in
                stagn "li" begin
                  Wserver.wprint "<b>";
                  Wserver.wprint "%s" (referenced_person_text conf base p);
@@ -195,22 +218,35 @@ value print_death conf base =
                  Wserver.wprint ", %s <em>%s</em>"
                    (transl_nth conf "died" (index_of_sex p.sex))
                    (Date.string_of_ondate conf (Dgreg d cal));
-                 let sure d = d.prec = Sure in
-                 match Adef.od_of_codate p.birth with
-                 [ Some (Dgreg d1 _) ->
-                     if sure d1 && sure d && d1 <> d then do {
-                       let a = time_gone_by d1 d in
-                       Wserver.wprint " <em>(%s)</em>"
-                         (Date.string_of_age conf a);
-                     }
-                     else ()
-                 | _ -> () ];
+                 match age with
+                 [ Some a ->
+                     Wserver.wprint " <em>(%s)</em>"
+                       (Date.string_of_age conf a)
+                 | None -> () ];
                end;
-               month_txt
+               (month_txt, ages_sum, ages_nb)
              })
-          "" list
+          ("", (0, 0), (0, 0)) list
       in
       Wserver.wprint "</ul>\n</li>\n</ul>\n";
+      if fst ages_nb >= 3 then
+        Wserver.wprint "%s (%s) : %s<br%s>\n"
+          (capitale (transl conf "average death age"))
+          (transl_nth conf "M/F" 0)
+          (Date.string_of_age conf
+             {day = 0; month = 0; year = fst ages_sum / fst ages_nb;
+              delta = 0; prec = Sure})
+          conf.xhs
+      else ();
+      if snd ages_nb >= 3 then
+        Wserver.wprint "%s (%s) : %s<br%s>\n"
+          (capitale (transl conf "average death age"))
+          (transl_nth conf "M/F" 1)
+          (Date.string_of_age conf
+             {day = 0; month = 0; year = snd ages_sum / snd ages_nb;
+              delta = 0; prec = Sure})
+          conf.xhs
+      else ();
     }
     else ();
     trailer conf;
