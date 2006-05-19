@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: stats.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: stats.txt,v 5.2 2006-05-19 13:20:14 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*statistics]</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -31,7 +31,7 @@
 <h1 style="text-align:center" class="highlight">[*statistics]</h1>
 
 %define;births(nnn)[the latest %d births:::nnn]%end;
-%define;deaths(nnn)[the latest %d deaths:::nnn]%end;
+%define;deaths(nnn)[the latest %t deaths:::nnn]%end;
 %define;marriages(nnn)[the latest %d marriages:::nnn]%end;
 %define;engaged(nnn)
   [the %d oldest couples perhaps still alive and engaged:::nnn]%nn;
