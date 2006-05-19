@@ -1,11 +1,19 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.2 2006-05-18 20:49:37 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.3 2006-05-19 13:16:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
+
+value get_k conf =
+  match p_getint conf.env "k" with
+  [ Some x -> x
+  | _ ->
+      try int_of_string (List.assoc "latest_event" conf.base_env) with
+      [ Not_found | Failure _ -> 20 ] ]
+;
 
 value select conf base get_date find_oldest =
   let module Q =
@@ -17,14 +25,7 @@ value select conf base get_date find_oldest =
          ;
        end)
   in
-  let n =
-    match p_getint conf.env "k" with
-    [ Some x -> x
-    | _ ->
-        try int_of_string (List.assoc "latest_event" conf.base_env) with
-        [ Not_found | Failure _ -> 20 ] ]
-  in
-  let n = min (max 0 n) base.data.persons.len in
+  let n = min (max 0 (get_k conf)) base.data.persons.len in
   let ref_date =
     match p_getint conf.env "by" with
     [ Some by ->
@@ -71,14 +72,7 @@ value select_family conf base get_date find_oldest =
            if find_oldest then Date.before_date x y else Date.before_date y x;
        end)
   in
-  let n =
-    match p_getint conf.env "k" with
-    [ Some x -> x
-    | _ ->
-        try int_of_string (List.assoc "latest_event" conf.base_env) with
-        [ Not_found | Failure _ -> 20 ] ]
-  in
-  let n = min (max 0 n) base.data.families.len in
+  let n = min (max 0 (get_k conf)) base.data.families.len in
   let rec loop q len i =
     if i = base.data.families.len then
       let rec loop list q =
@@ -166,7 +160,8 @@ value get_death p =
 value print_death conf base =
   let (list, len) = select conf base get_death False in
   let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the latest %d deaths")) len
+    Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
+      (fun _ -> Wserver.wprint "%d" len)
   in
   do {
     header conf title;
@@ -247,6 +242,46 @@ value print_death conf base =
               delta = 0; prec = Sure})
           conf.xhs
       else ();
+      xtag "br";
+      tag "div" "align=\"center\"" begin
+        xtag "hr" "width=\"50%%\"";
+      end;
+      xtag "br";
+      let by =
+        match p_getenv conf.env "by" with
+        [ Some s -> s
+        | None -> string_of_int conf.today.year ]
+      in
+      let bm =
+        match p_getenv conf.env "bm" with
+        [ Some s -> s
+        | None -> string_of_int conf.today.month ]
+      in
+      let bd =
+        match p_getenv conf.env "bd" with
+        [ Some s -> s
+        | None -> string_of_int conf.today.day ]
+      in
+      tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+        tag "p" begin
+          Util.hidden_env conf;
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"LD\"";
+          Wserver.wprint
+            (fcapitale (ftransl conf "the latest %t deaths"))
+               (fun _ ->
+                  xtag "input"
+                    "name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"" len);
+          Wserver.wprint "\n... (%s...\n" (transl conf "before");
+          xtag "input"
+            "name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\"" by;
+          xtag "input"
+            "name=\"bm\" value=\"%s\" size=\"2\" maxlength=\"2\"" bm;
+          xtag "input"
+            "name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\"" bd;
+          Wserver.wprint ")\n";
+          xtag "input" "type=\"submit\" value=\"Ok\"";
+        end;
+      end;
     }
     else ();
     trailer conf;
@@ -452,7 +487,8 @@ value old_print_statistics conf base =
         end;
         stagn "li" begin
           Wserver.wprint "<a href=\"%sm=LD;k=%d\">" (commd conf) n;
-          Wserver.wprint (ftransl conf "the latest %d deaths") n;
+          Wserver.wprint (ftransl conf "the latest %t deaths")
+            (fun _ -> Wserver.wprint "%d" n);
           Wserver.wprint "</a>";
         end;
         stagn "li" begin
