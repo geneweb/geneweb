@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.3 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: descend.ml,v 5.4 2006-05-24 09:19:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -45,8 +45,9 @@ value text_level conf =
 value descendants_title conf base p h =
   let txt_fun = if h then gen_person_text_no_html else gen_person_text in
   let s =
-    transl_a_of_gr_eq_gen_lev conf
-      (transl conf "descendants") (txt_fun raw_access conf base p)
+    translate_eval
+      (transl_a_of_gr_eq_gen_lev conf
+         (transl conf "descendants") (txt_fun raw_access conf base p))
   in
   Wserver.wprint "%s" (capitale s)
 ;
