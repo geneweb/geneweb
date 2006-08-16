@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.18 2006-08-16 07:45:14 ddr Exp $
+# $Id: lex_utf8.txt,v 5.19 2006-08-16 08:03:31 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -935,7 +935,7 @@ sv: en bror/en syster/ett syskon
 
     a cousin
 af: 'n neef/'n niggie
-bg: братовчед/братовчедка
+bg: първи братовчед/първа братовчедка
 br: ur c'henderv/ur geniterv
 ca: un cosí/una cosina
 cs: bratranec/sestřenice
@@ -2826,7 +2826,7 @@ sv: fortsätt slå samman
 
     cousins
 af: neefs/niggies
-bg: братовчеди
+bg: първи братовчеди
 br: kendirvi
 ca: cosins
 cs: bratranci/sestřenice
