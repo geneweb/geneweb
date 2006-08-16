@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.2 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: relation.ml,v 5.3 2006-08-16 08:17:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -1121,8 +1121,9 @@ value print_propose_upto conf base p1 p2 rl =
         Wserver.wprint "<span style=\"font-size:80%%\">";
         Wserver.wprint "%s"
           (capitale
-             (transl_a_of_b conf (transl conf "ancestors")
-                (person_title_text conf base p)));
+             (translate_eval
+                (transl_a_of_b conf (transl conf "ancestors")
+                   (person_title_text conf base p))));
         Wserver.wprint " %s"
           (transl_decline conf "up to" (person_title_text conf base a));
         Wserver.wprint ":\n<em>%s\n" (transl conf "click");
