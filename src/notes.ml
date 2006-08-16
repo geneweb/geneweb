@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.2 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: notes.ml,v 5.3 2006-08-16 09:20:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -158,7 +158,9 @@ value notes_links_db conf base eliminate_unlinked =
         db2 []
     else db2
   in
-  List.sort (fun (s1, _) (s2, _) -> compare s1 s2) db2
+  List.sort
+    (fun (s1, _) (s2, _) -> alphabetic_order (Name.lower s1) (Name.lower s2))
+    db2
 ;
 
 value print_what_links conf base fnotes =
