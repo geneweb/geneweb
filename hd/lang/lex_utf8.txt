@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.19 2006-08-16 08:03:31 ddr Exp $
+# $Id: lex_utf8.txt,v 5.20 2006-08-16 08:06:05 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -7633,7 +7633,7 @@ sv: exklusive makar
 
     starting with
 af: beginnende met
-bg: започвайки с
+bg: с първа буква
 br: o kregiñ gant
 ca: començant per
 cs: počínaje
