@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.16 2006-05-19 13:16:54 ddr Exp $
+# $Id: lex_utf8.txt,v 5.17 2006-08-16 07:36:03 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -7856,7 +7856,7 @@ sv: text
 
     the %d first names
 af: die %d voorname
-bg: първите %d имена
+bg: %d собствени имена
 br: ar %d raganv
 ca: els %d noms
 cs: %d křestních jmen
