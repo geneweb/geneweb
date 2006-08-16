@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.17 2006-08-16 07:36:03 ddr Exp $
+# $Id: lex_utf8.txt,v 5.18 2006-08-16 07:45:14 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -215,7 +215,7 @@ he:    בני דודים לדרגה ה%s
 is: skyld í %s lið
 it: cugini di %s grado
 lv: %s brālēni/māsīcas
-nl: neven en nichten %s generaties verwijderd
+nl: neven en nichten in de %s graad
 no: %smenninger
 pl: kuzyni %s stopnia
 pt: primos em %s grau
@@ -897,7 +897,7 @@ he:  גיס/ גיסה
 is: mágur/mágkona
 it: un cognato/una cognata
 lv: svainis/svaine
-nl: een schoonbroer(zwager)/een schoonzus
+nl: een schoonbroer(zwager)/een schoonzuster
 no: svoger/svigerinne
 pl: szwagier/szwagierka
 pt: um cunhado/uma cunhada
@@ -924,7 +924,7 @@ he:   אח/ אחות/ אח(ות)
 is: bróðir/systir/systkyn
 it: un fratello/una sorella/un fratello o una sorella
 lv: brālis/māsa/a sibling
-nl: een broer/een zus/een broer of een zus
+nl: een broer/een zuster/een broer of een zuster
 no: bror/søster/søsken
 pl: brat/siostra/brat lub siostra
 pt: um irmão/uma irmã/um(a) irmão(ã)
@@ -978,7 +978,7 @@ he:   צאצא/ צאצאה
 is: afkomandi
 it: un discendente/una discendente
 lv: pēcnācējs
-nl: een nakomeling
+nl: een afstammeling
 no: etterkommer
 pl: potomek
 pt: um descendente/uma descendente
@@ -1167,7 +1167,7 @@ he:   חצי אח/ חצי אחות/ חצי אח(ות)
 is: hálfbróðir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
 lv: pusbrālis/pusmāsa/pusbērns
-nl: een broer/een zus/een broer of een zus
+nl: een halfbroer/een halfzuster/een halfbroer of halfzuster
 no: halvbror/halvsøster/halvsøsken
 pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
 pt: um meio-irmão/uma meia-irmã/um(a) meio(a) irmão(ã)
@@ -1194,7 +1194,7 @@ he:   אחיין/ אחיינית
 is: bróður(systur)sonur/bróður(systur)dóttir
 it: un nipote/una nipote
 lv: brāļa/māsas dēls/meita
-nl: een neef/een nicht
+nl: een neef/een nicht (oom- of tantezegger)
 no: nevø/niese
 pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
 pt: um sobrinho/uma sobrinha
@@ -1356,7 +1356,7 @@ he:  אב חורג/ אם חורגת/ הורים חורגים
 is: kjörfaðir/kjörmóðir/kjörforeldrar
 it: padre adottivo/madre adottiva/genitori adottivi
 lv: patēvs/pamāte/pavecāki adoptive parents
-nl: stiefvader/stiefmoeder/stiefouders
+nl: adoptiefvader/adoptiefmoeder/adoptiefouders
 no: adoptivfar/adoptivmor/adoptivforeldre
 pl: przybrany ojciec/przybrana matka/przybrani rodzice
 pt: pai adoptivo/mãe adoptiva/pais adoptivos
@@ -1412,7 +1412,7 @@ he:   בקשה מתקדמת
 is: nákvæmari leit
 it: richiesta avanzata
 lv: paplašinātā meklēšana pēc:
-nl: gedetailleerde opzoeking
+nl: gedetailleerd zoeken
 no: avansert søk
 pl: wyszukiwanie zaawansowane
 pt: pesquisa complexa
@@ -1852,7 +1852,7 @@ he:   ימי שנה
 is: merkisdagar
 it: anniversari
 lv: gadadienas
-nl: verjaardag
+nl: verjaardagen
 no: årsdager
 pl: rocznice
 pt: aniversários
@@ -1879,7 +1879,7 @@ he:   ימי שנה למוות
 is: ártíðir
 it: anniversari delle persone decedute
 lv: miršanas piemiņas dienas
-nl: verjaardag van overleden mensen
+nl: verjaardagen van overleden mensen
 no: årsdager for avdøde personer
 pl: rocznice urodzin i śmierci osób nieżyjących
 pt: aniversários das pessoas falecidas
@@ -1907,7 +1907,7 @@ he:   ימי נישואין
 is: brúðkaupsafmæli
 it: anniversari di matrimonio
 lv: kāzu dienas
-nl: huwelijksverjaardag
+nl: huwelijksverjaardagen
 no: bryllupsdager
 pl: rocznice ślubów
 pt: aniversários de casamento
@@ -1962,7 +1962,7 @@ he:   גם
 is: einnig
 it: nello stesso tempo
 lv: vienlaicīgi
-nl: terzeldertijd
+nl: tegelijkertijd
 no: samtidig
 pl: zarazem
 pt: ao mesmo tempo
@@ -1974,6 +1974,7 @@ sv: samtidigt
     average death age
 en: average death age
 fr: âge moyen de décès
+nl: gemiddelde leeftijd bij overlijden
 
     back
 af: terug
@@ -2405,7 +2406,7 @@ he:  בטל קשרי GeneWeb
 is: án GeneWeb tengla
 it: annullare i links
 lv: nerādīt GeneWeb saites
-nl: geen GeneWeb links
+nl: zonder GeneWeb links
 no: uten GeneWeb koblinger
 pl: pomiń łącza GeneWeb
 pt: cancelar os links Geneweb
@@ -2568,7 +2569,7 @@ he:  ולשנות בעצמך
 is: og breyttu því sjálf(ur)
 it: scieglietene un'altro
 lv: nomainiet to
-nl: verander het zelf
+nl: verander het nummer zelf
 no: endre det selv
 pl: zmień numer własnoręcznie
 pt: escolha outro
@@ -2595,7 +2596,7 @@ he:  סדר הילדים השתנה
 is: breytti röð barna
 it: ordine dei figli cambiato
 lv: mainīt bērnu secību
-nl: de volgorde der kinderen veranderd
+nl: volgorde van de kinderen veranderd
 no: rekkefølgen er endret for barna til
 pl: kolejność dzieci została zmieniona
 pt: mudar a ordem dos filhos
@@ -2895,7 +2896,7 @@ he:  עשה
 is: búa til
 it: creare
 lv: izveidot
-nl: creëren
+nl: aanmaken
 no: opprett
 pl: utwórz
 pt: criar
@@ -3030,7 +3031,7 @@ he:   מוות
 is: látin(n)
 it: morte
 lv: nāve
-nl: overlijden
+nl: overleden
 no: død
 pl: zgon
 pt: morte
@@ -3084,7 +3085,7 @@ he:   צאצאים
 is: afkomendur
 it: discendenti
 lv: pēcteči
-nl: nakomelingen
+nl: afstammelingen
 no: etterkommere
 pl: potomkowie
 pt: descendentes
@@ -3168,7 +3169,7 @@ he:   נעלם/ נעלמה
 is: hvarf
 it: scomparso/scomparsa/scomparso(a)
 lv: pazudis(usi) bez vēsts
-nl: verdwenen
+nl: vermist
 no: forsvunnet
 pl: zaginął/zaginęła/zaginięcie
 pt: desaparecido/desaparecida/desaparecido(a)
@@ -3195,7 +3196,7 @@ he:  הצג רצועות  / רוחב רצועות  / חפיפה / ס"ה רוחב
 is: sýnt í hlutum/breidd hlutans/skörun hlutanna/öll breiddin
 it: visualizzare per segmenti/larghezza del segmento/sovrapposizione/larghezza totale
 lv: rādīt pa loksnēm/loksnes platums/pārklājums/kopējais platums
-nl: weergave per snede/sneebreedte/doorsnede/totale breedte
+nl: weergave per segment/segmentbreedte/overlapping/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 pl: wyświetl w segmentach/szerokość segmentu/szerokość pokrywania się/szerokość całkowita
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
@@ -3712,7 +3713,7 @@ he:   המספר החופשי הראשון
 is: fyrsta lausa númer
 it: primo numero disponibile
 lv: pirmais brīvais skaitlis
-nl: eerste vrij nummer
+nl: eerste beschikbare nummer
 no: første ledige nummer
 pl: najniższy wolny numer
 pt: primeiro número livre
@@ -3853,7 +3854,7 @@ he:  לשמות הפרטיים בסדר אלף-בת
 is: fornöfn í stafrófsröð
 it: per il primo nome in ordine alfabetico
 lv: pa vārdiem alfabētiskā kārtībā
-nl: dit geeft de voornamen in alfabetische volgorde
+nl:  voor de voornamen in alfabetische volgorde
 no: alfabetisk på fornavn
 pl: aby zobaczyć imiona w porządku alfabetycznym
 pt: para obter os nomes próprios por ordem alfabética
@@ -4099,7 +4100,7 @@ he:   יום הולדת שמח
 is: til hamingju með afmælið !
 it: buon compleanno!
 lv: Laimīgu dzimšanas dienu!
-nl: van harte gefeliciteerd!
+nl: van harte gefeliciteerd met Uw verjaardag!
 no: gratulerer med dagen!
 pl: wszystkiego najlepszego w dniu urodzin!
 pt: feliz aniversário!
@@ -4126,7 +4127,7 @@ he:    עם ילדים
 is: börn
 it: da cui
 lv: bērni:
-nl: hieruit
+nl: en hun kinderen: 
 no: barn
 pl: dzieci:
 pt: tiveram
@@ -4208,7 +4209,7 @@ he:  רשימת העדכונים
 is: uppfærslusaga
 it: riassunto degli aggiornamenti
 lv: labojumu vēsture
-nl: lijst van wijzigingen
+nl: chroniek van wijzigingen
 no: oppdateringshistorie
 pl: rejestr zmian
 pt: historial das actualizações
@@ -4290,7 +4291,7 @@ he: ident/email/ נושא
 is: ident/email/um
 it: ident/email/oggetto
 lv: vārds/e-pasts/subjekts
-nl: naam/e-mail/onderwerp
+nl: identiteit/e-mail/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
 pt: ident/email/assunto
@@ -4317,7 +4318,7 @@ he:  אם בעל(ת) תואר
 is: ef titlar
 it: se titoli
 lv: ja ir tituli
-nl: als titels
+nl: indien titels
 no: hvis titler
 pl: jeśli z tytułem
 pt: se títulos
@@ -4398,7 +4399,7 @@ he:  תמונה
 is: mynd
 it: immagine/immagini
 lv: attēli
-nl: beeld
+nl: beeld/beelden
 no: bilde
 pl: ilustracja:a:-ę/ilustracje
 pt: imagem/imagens
@@ -4481,7 +4482,7 @@ he:  כלל בני זוג החסרים
 is: meðtaldir makar sem vantar
 it: includere i coniugi mancanti
 lv: ieskaitot iztrūkstošos dzīvesbiedrus
-nl: ontbrekende echtgenoten tonen
+nl: inclusief ontbrekende echtgenoten
 no: inkluder ukjente maker
 pl: pokaż brakujących małżonków
 pt: incluir os cônjugues que faltam
@@ -4508,7 +4509,7 @@ he:  בלל
 is: meðtaldar makar
 it: includere i coniugi
 lv: ieskaitot dzīvesbiedrus
-nl: echtgenoten tonen
+nl: inclusief echtgenoten
 no: inkluder maker
 pl: pokaż małżonków
 pt: incluir os cônjugues
@@ -4562,7 +4563,7 @@ he:  בתאריך שגוי
 is: vitlaus dagsetning
 it: data incorretta
 lv: nepareizs datums
-nl: verkeerde datum
+nl: incorrecte datum
 no: ugyldig dato
 pl: nieprawidłowa data
 pt: data incorrecta
@@ -4590,7 +4591,7 @@ he:  בקשה שגויה
 is: beiðni ekki rétt
 it: richiesta incorretta
 lv: kļūdains pieprasījums
-nl: verkeerd verzoek
+nl: incorrect verzoek
 no: ugyldig forespørsel
 pl: nieprawidłowe wyszukiwanie
 pt: consulta incorrecta
@@ -4645,7 +4646,7 @@ he:  מפתח הצאצאים
 is: skrá afkomenda
 it: indice dei discendenti
 lv: pēcnācēju saraksts
-nl: index van de nakomelingen
+nl: index van afstammelingen
 no: etterkommerindeks
 pl: lista potomków
 pt: índice dos descendentes
@@ -4672,7 +4673,7 @@ he:  מפתח בני הזוג שאינם צאצאים
 is: skrá make (ekki afkomenda)
 it: indice dei coniugi (non discendenti)
 lv: dzīvesbiedru saraksts (bez pēcnācējiem)
-nl: index van echtgenoten (geen nakomelingen)
+nl: index van echtgenoten (geen afstammelingen)
 no: ektefelleindeks
 pl: lista małżonków (nie będących potomkami)
 pt: índice dos cônjuges (não descendentes)
@@ -4726,7 +4727,7 @@ he:  ההחלפה בוצעה
 is: breyting gerð
 it: scambio fatto
 lv: pārslēgšana izpildīta
-nl: veranderd
+nl: verwisseld/veranderd
 no: rekkefølgen er endret
 pl: kolejność została zmieniona
 pt: inversão efectuada
@@ -4754,7 +4755,7 @@ he:  החלפה
 is: breyta röð
 it: scambiare
 lv: pārslēgt(?)
-nl: verander
+nl: verwisselen
 no: bytt rekkefølge
 pl: zmień kolejność
 pt: inverter
@@ -4835,7 +4836,7 @@ he:  הורה מאוד צעיר
 is: er mjög ungt foreldri
 it: è veramente un genitore molto giovane
 lv: ir ļoti jauns vecāks
-nl: is een jonge ouder
+nl: is werkelijk een zeer jonge ouder
 no: er en svært ung far/mor
 pl: jest bardzo młodym ojcem/jest bardzo młodą matką
 pt: é um pai demasiado jovem
@@ -4863,7 +4864,7 @@ he:   נלד אחרי ילדו/ נלדה אחרי ילדה
 is: er fædd eftir barn sitt
 it: sarebbe nato/a dopo i suoi figli
 lv: ir dzimis(usi) pēc saviem bērniem
-nl: wordt geboren na zijn/haar kind
+nl: werd geboren na zijn/haar kind
 no: er født etter sitt barn
 pl: jest urodzony/urodzona później niż swoje dziecko
 pt: nasceu depois do seu filho
@@ -4890,7 +4891,7 @@ he:  אותו האדם
 is: þetta er sama manneskjan !
 it: è la stessa persona!
 lv: tā ir viena un tā pati persona!
-nl: het is dezelfde persoon!
+nl: is dezelfde persoon!
 no: det er samme person!
 pl: to jest ta sama osoba!
 pt: é a mesma pessoa!
@@ -5025,7 +5026,7 @@ he:   קשר בין
 is: tengsl á milli
 it: legame tra
 lv: saite starp
-nl: connectie tussen
+nl: verband tussen
 no: slektskap mellom
 pl: więzy pokrewieństwa pomiędzy
 pt: relação entre
@@ -5046,7 +5047,7 @@ et: seotud leheküljed
 fi: linkkisivuja
 fr: pages liées
 it: pagine collegate
-nl: gekoppelde pagina’s
+nl: verbonden pagina's
 no: linkede sider
 pl: linki
 pt: páginas ligadas
@@ -5127,7 +5128,7 @@ he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
 is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
 it: loop nel data-base: %s è antenato(a) di se stesso(a)
 lv: cilpa datu bāzē: %s ir viņa/viņas pašas secis
-nl: kring in de database: %s is zijn/haar eigen voorouder
+nl: circulaire referentie in de database: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
 pl: pętla w bazie: %s jest swoim własnym przodkiem
 pt: referência circular no banco de dados: %s é seu próprio ancestral
@@ -5426,7 +5427,7 @@ he:  האיחוד בוצע
 is: sameiningu lokið
 it: fusione terminata
 lv: apvienošana paveikta
-nl: samenvoeging is gedaan
+nl: samenvoeging is uitgevoerd
 no: er slått sammen
 pl: scalenie zostało dokonane
 pt: fusão terminada
@@ -5480,7 +5481,7 @@ he:  הודעה נמחקה
 is: skilaboðum eytt
 it: messaggio cancellato
 lv: izdzēsta ziņa
-nl: boodschap verwijderd
+nl: bericht verwijderd
 no: melding fjernet
 pl: wiadomość usunięta
 pt: mensagem eliminada
@@ -5528,7 +5529,7 @@ et: mitmesugused märkused
 fi: sekalaisia huomautuksia
 fr: notes diverses
 it: note varie
-nl: diversen
+nl: diverse aantekeningen
 no: diverse notater
 pl: pozostałe uwagi
 pt: notas diversas
@@ -5747,7 +5748,7 @@ he:  השם %s בשימוש כבר ע"י %tאדם זה%t
 is: nafnið %s er þegar í %tnotkun af%t
 it: nome %s già utilizzato da %tquesta persona%t
 lv: vārds - %s jau ir %tšai personai%t
-nl: naam %s is al gebruikt door %tdeze persoon%t
+nl: de naam %s is al gebruikt door deze persoon%t
 no: navnet %s er alt i bruk av %tdenne personen%t
 pl: imię %s jest już używane przez %ttę osobę%t
 pt: apelido %s já utilizado por %testa pessoa%t
@@ -5802,7 +5803,7 @@ he:  אחיינים
 is: bræðra og systrabörn
 it: nipoti
 lv: brāļadēli/māsasdēli un brāļameitas/māsasmeitas
-nl: neven en nichten
+nl: neven en nichten (oom-, tantezegger)
 no: nevøer og nieser
 pl: bratankowie lub siostrzeńcy/bratanice lub siostrzenice
 pt: sobrinhos e sobrinhas
@@ -5829,7 +5830,7 @@ he:  אח(ות) צעיר(ה)
 is: næsta systkyni
 it: fratello seguente/sorella seguente/fratello o sorella seguente
 lv: nākošais brālis/nākošais māsa
-nl: volgende broer/volgende zus/volgende broer of zus
+nl: volgende broer/volgende zuster/volgende broer of zuster
 no: neste bror/neste søster/neste søsken
 pl: następny brat lub siostra
 pt: irmão seguinte/irmã seguinte/irmã(o) seguinte
@@ -5991,7 +5992,7 @@ he:  בלי לוודא מין
 is: ekki athuga kyn
 it: senza verifica del sesso
 lv: nepābaudīt dzimumus
-nl: geslachten niet verifiëren
+nl: geslacht niet geverifiëerd
 no: ikke kontroll av kjønn
 pl: ta sama płeć
 pt: não verificar os sexos
@@ -6100,7 +6101,7 @@ he:  הערה/ הערות
 is: athugasemd/athugasemdum
 it: nota/note
 lv: piezīme(s)
-nl: aantekening/aantekeningen
+nl: notitie/notities
 no: notat/notater
 pl: uwagi
 pt: nota/notas
@@ -6128,7 +6129,7 @@ he: רשימות עודכנו
 is: athugasemd gerð
 it: note modificate
 lv: pārveidotas piezīmes
-nl: notitities veranderd
+nl: notities veranderd
 no: notater er endret 
 pl: uwagi zmodyfikowane
 pt: notas modificadas
@@ -6347,7 +6348,7 @@ he:  בצד של %s
 is: á %s hlið
 it: dalla parte di %s
 lv: %s-jā pusē
-nl: aan de kant van %s
+nl: van %s's kant
 no: fra %ss slektside
 pl: ze strony osoby: %s
 pt: pelo lado de %s
@@ -6431,7 +6432,7 @@ he:  בן/בת יום
 is: dagsgamalt
 it: un giorno
 lv: vienu dienu vecs
-nl: een dag oud
+nl: één dag oud
 no: en dag gammel
 pl: w wieku 1 dnia
 pt: um dia
@@ -6458,7 +6459,7 @@ he:  בן/בת חודש
 is: mánaðar gamalt
 it: un mese
 lv: vienu mēnesi vecs
-nl: een maand oud
+nl: één maand oud
 no: en måned gammel
 pl: w wieku 1 miesiąca
 pt: um mês
@@ -6485,7 +6486,7 @@ he:  בן/בת שנה
 is: ársgamalt
 it: un anno
 lv: vienu gadu vecs
-nl: een jaar oud
+nl: één jaar oud
 no: ett år gammel
 pl: w wieku 1 roku
 pt: um ano
@@ -6786,7 +6787,7 @@ he:  אולי
 is: kannski
 it: forse
 lv: iespējams
-nl: waarschijnlijk
+nl: mogelijkerwijze
 no: kanskje
 pl: prawdopodobnie
 pt: possivelmente
@@ -6840,7 +6841,7 @@ he:   אח(ות) הגדול(ה)
 is: fyrra systkyn
 it: fratello precedente/sorella precedente/fratello o sorella precedente
 lv: iepriekšējais brālis/iepriekšējais māsa
-nl: vorige broer/vorige zus/vorige broer of zus
+nl: vorige broer/vorige zuster/vorige broer of zuster
 no: forrige bror/forrige søster/forrige søsken
 pl: poprzedni brat lub siostra
 pt: irmão precedente/irmã precedente/irmã(o) precedente
@@ -6867,7 +6868,7 @@ he:  פרטי
 is: einka
 it: riservato
 lv: privāts
-nl: privé
+nl: persoonlijk
 no: privat
 pl: bez danych osobowych
 pt: privado
@@ -7029,7 +7030,7 @@ he:  יחסים
 is: skyldleiki/skyldleikar
 it: relazione/relazioni
 lv: saistība/saistības
-nl: relatie/relaties
+nl: verwantschap/verwantschappen
 no: forbindelse/forbindelser
 pl: inne więzy
 pt: relação/relações
@@ -7083,7 +7084,7 @@ he:   חישוב יחס משפחתי
 is: reikna tengsl
 it: calcolo della parentela
 lv: radniecības aprēķināšana
-nl: verwantschap vaststellen
+nl: verwantschap bepalen
 no: slektskapsberegning
 pl: szukanie pokrewieństwa
 pt: cálculo de parentesco
@@ -7512,7 +7513,7 @@ he:  אחים
 is: systkyni
 it: fratelli
 lv: brāļi/māsas
-nl: broers en zussen
+nl: broers en zusters
 no: søsken
 pl: rodzeństwo
 pt: irmãos e irmãs
@@ -7593,7 +7594,7 @@ he:  פרט
 is: tilgreina
 it: specificare
 lv: noteikt
-nl: selecteer
+nl: specificeer
 no: velg
 pl: wybierz
 pt: especificar
@@ -7621,7 +7622,7 @@ he:  לא כולל בני זוג
 is: undanskildir makar
 it: coniugi esclusi
 lv: laulātie nav ietverti
-nl: echtgenoten weggelaten
+nl: zonder echtgenoten
 no: maker er utelatt
 pl: bez wliczania małżonków
 pt: cônjuges não incluídos
@@ -7817,7 +7818,7 @@ he:  רשימת שמות משפחה
 is: eftirnafna listi
 it: lista dei cognomi
 lv: uzvārdu saraksts
-nl: lijst van bijnamen
+nl: lijst van familienamen
 no: liste over etternavn
 pl: lista nazwisk
 pt: lista de apelidos
@@ -7899,7 +7900,7 @@ he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים 
 is: %d elstu pörin eru hugsanlega enn saman og á lífi
 it: le %d coppie più anziane forse ancora viventi e fidanzate
 lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
-nl: De %d oudste paren die mogelijk nog steeds in leven en verloofd zijn
+nl: De %d oudste, mogelijk nog in leven zijnde, verloofde paren
 no: Det % eldste par som kanskje fremdeles er i live og forlovet
 pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
@@ -7927,7 +7928,7 @@ he:  הזקן ה %d  שאולי עוד בחיים
 is: %d elsti sem kann að vera á lífi
 it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecākie iespējams vēl ir dzīvi
-nl: de %d oudsten, mogelijk nog in leven
+nl: de %d oudste, mogelijk nog in leven zijnde, personen
 no: de %d eldste som muligens lever
 pl: %d najstarszych osób (prawdopodobnie) żyjących
 pt: os %d mais velhos talvez ainda vivos
@@ -7982,7 +7983,7 @@ he:  ה %d באריכות ימים
 is: %d sem lifði lengst
 it: i %d che hanno vissuto più a lungo
 lv: %d, kuri dzīvojuši visilgāk
-nl: de %d langst levende personen
+nl: de %d personen die het langst geleefd hebben
 no: de %d som har levd lengst
 pl: %d osób, które żyły najdłużej
 pt: os %d que mais viveram
@@ -8036,7 +8037,7 @@ he:  יום השנה
 is: afmælisdagar
 it: l'anniversario
 lv: gadadiena
-nl: verjaardag
+nl: de verjaardag
 no: årsdagen
 pl: rocznica
 pt: o aniversário
@@ -8063,7 +8064,7 @@ he:  יום הנישואין
 is: brúðkaupsafmæli
 it: l'anniversario di matrimonio
 lv: kāzu diena
-nl: huwelijksverjaardag
+nl: de huwelijksverjaardag
 no: bryllupsdagen
 pl: rocznica ślubu
 pt: o aniversário de casamento
@@ -8090,7 +8091,7 @@ he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא �
 is: gagnagrunnurinn hefur breyst; gerðu "Back", "Reload", og settu aftur í formið
 it: la base è cambiata; fate "back", "reload" e rifate la scheda
 lv: datu bāzē ir veiktas izmaiņas; nospiediet "back", "reload", un aizpildiet formu
-nl: de informatie is veranderd; klik "back", "reload" en vul de details in
+nl: het bestand is veranderd; klik "back", "reload" en vul de details nogmaals in
 no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet på nytt
 pl: w bazie zostały dokonane zmiany; kliknij "wstecz" i "odśwież", a następnie ponownie wprowadź dane
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formulário
@@ -8253,7 +8254,7 @@ he:  הקובץ נעול זמנית: לחקות ולנסות שוב
 is: skjalið er læst í augnablikinu, reyndu aftur
 it: l'archivio è temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
 lv: datne pagaidām ir slēgta: lūdzu mēģiniet vēlreiz
-nl: de informatie is tijdelijk ontoegankelijk: probeer later
+nl: het bestand is tijdelijk niet toegankelijk: probeer later weer eens
 no: filen er midlertidig stengt: vent og prøv igjen
 pl: plik jest chwilowo niedostępny; spróbuj później, ewentualnie chwilę odczekaj
 pt: a base está temporariamente inacessível: por favor tente novamente. Se não funcionar, espere um momento
@@ -8280,7 +8281,7 @@ he:  הילדים של %t ו-%t לא בסדר נכון
 is: þessi börn %t og %t eru ekki í röð
 it: i seguenti figli di %t and %t non sono in ordine d'età
 lv: %t un %t sekojošais bērns nav secībā
-nl: de volgende kinderen van %t en %t staan niet in volgorde
+nl: de kinderen van %t en %t staan niet in de goede volgorde
 no: følgende barn av %t og %t er ikke i kronologisk rekkefølge
 pl: nastepujące dzieci (rodzice: %t i %t) nie są ułożone w porządku chronologicznym
 pt: os seguintes filhos de %t e %t não estão apresentados em ordem
@@ -8415,7 +8416,7 @@ he: %d הלידות האחרונות
 is: síðustu %d fæðingar
 it: le ultime %d nascite
 lv: pēdējie %d dzimušie
-nl: de laatste %d geboorten
+nl: de jongste %d geboorten
 no: de siste %d fødte
 pl: %d ostatnich narodzin
 pt: os %d nascimentos mais recentes
@@ -8442,7 +8443,7 @@ he: %t המתים האחרונים
 is: síðustu %t andlát
 it: le ultime %t morti
 lv: pēdējie %t mirušie
-nl: de %t recentste overlijdens
+nl: de %t recentste overledenen
 no: de siste %t døde
 pl: %t ostatnich zgonów
 pt: os %t óbitos mais recentes
@@ -8523,7 +8524,7 @@ he:  בן הזוג/ בת הזוג
 is: maki
 it: lo sposo/la sposa
 lv: laulātais
-nl: echtgenoot
+nl: echtgenoot/echtgenote
 no: maken
 pl: mąż/żona
 pt: o marido/a esposa
@@ -8550,7 +8551,7 @@ he:  כל הרשימה
 is: allan listann
 it: la lista intera
 lv: viss saraksts
-nl: de hele lijst
+nl: de volledige lijst
 no: hele listen
 pl: pełna lista
 pt: toda a lista
@@ -9029,7 +9030,7 @@ he:  לא מפורט
 is: ótilgreint
 it: non specificato
 lv: nenoteikts
-nl: onduidelijk
+nl: niet gespecificeerd
 no: uspesifisert
 pl: nieokreślone
 pt: não especificado
@@ -9056,7 +9057,7 @@ he:  עד
 is: upp að
 it: fino a
 lv: līdz
-nl: tot
+nl: tot aan
 no: opp til
 pl: do
 pt: até
@@ -9083,7 +9084,7 @@ he:  עדכן
 is: uppfæra
 it: aggiornamento
 lv: informācijas papildināšana
-nl: wijzigen
+nl: actualiseer
 no: oppdatere
 pl: aktualizacja
 pt: actualizar
@@ -9153,7 +9154,7 @@ et: kinnita/kustuta
 fi: tarkista/hylkää
 fr: valider/supprimer
 it: conferma/elimina
-nl: bevestig/verwijder
+nl: valideer/verwijder
 no: verifiser/slett
 pl: sprawdź/usuń
 pt: validar/eliminar
@@ -9307,7 +9308,7 @@ he:  כגאון / כגאון / מיוחסת / מיוחסת
 is: uppfæra/uppfæra/vinur/vinur
 it: wizard/wizard/amico/amico
 lv: wizard/wizard/friend/friends
-nl: tovenaar/tovenaar/vriend/vriend
+nl: beheerder/beheerder/vriend/vrienden
 no: Oppdaterings/Oppdaterings/venner/venner
 pl: wizard/wizard/friend/friends
 pt: feiticeiro/feiticeiros/amigo/amigos
@@ -9418,7 +9419,7 @@ he:  צריך לאחד קודם
 is: þú þarft fyrst að sameina
 it: dovete in primo luogo fondere
 lv: Jums vispirms ir jāapvieno
-nl: u moet eerst samenvoegen
+nl: eerst samenvoegen
 no: du må først slå sammen
 pl: musisz najpierw dokonać scalenia
 pt: tem que fundir primeiro
@@ -9445,7 +9446,7 @@ he:  צריך לאחד קודם את 2 המשפחות
 is: þú verður fyrst að sameina þessar 2 fjölskyldur
 it: dovete in primo luogo fondere le 2 famiglie
 lv: Jums vispirms ir jāpvieno 2 ģimenes
-nl: u moet de twee gezinnen eerst samenvoegen
+nl: eerst de twee gezinnen samenvoegen
 no: du må først slå sammen de 2 familiene
 pl: musisz najpierw scalić 2 rodziny
 pt: primeiro tem que fundir as 2 famílias
@@ -9465,7 +9466,7 @@ es: tu mensaje espera su validación
 et: teade ootab kinnitamist
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
-nl: Uw bericht wacht op bevestiging
+nl: uw bericht wacht op validatie
 no: Beskjeden din avventer bekreftelse
 pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
