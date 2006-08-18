@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.20 2006-08-16 08:06:05 ddr Exp $
+# $Id: lex_utf8.txt,v 5.21 2006-08-18 09:38:09 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -6388,7 +6388,7 @@ zh:  于
 
     on (weekday day month year)
 af:
-bg: в
+bg:
 br: d'ar
 ca:
 cs:
