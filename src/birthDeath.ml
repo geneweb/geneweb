@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.3 2006-05-19 13:16:54 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.4 2006-08-19 17:49:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -40,7 +40,7 @@ value select conf base get_date find_oldest =
           | None -> -1 ]
         in
         {day = bd; month = bm; year = by; prec = Sure; delta = 0}
-    | None -> {(conf.today) with year = 9999} ]
+    | None -> {day = 31; month = 13; year = max_int; prec = Sure; delta = 0} ]
   in
   let rec loop q len i =
     if i = base.data.persons.len then
