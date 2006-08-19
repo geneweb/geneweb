@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.4 2006-08-19 17:49:34 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.5 2006-08-19 19:16:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -39,8 +39,8 @@ value select conf base get_date find_oldest =
           [ Some x -> x
           | None -> -1 ]
         in
-        {day = bd; month = bm; year = by; prec = Sure; delta = 0}
-    | None -> {day = 31; month = 13; year = max_int; prec = Sure; delta = 0} ]
+        Some {day = bd; month = bm; year = by; prec = Sure; delta = 0}
+    | None -> None ]
   in
   let rec loop q len i =
     if i = base.data.persons.len then
@@ -53,7 +53,12 @@ value select conf base get_date find_oldest =
       let p = pget conf base (Adef.iper_of_int i) in
       match get_date p with
       [ Some (Dgreg d cal) ->
-          if Date.before_date d ref_date then loop q len (i + 1)
+          let aft =
+            match ref_date with
+            [ Some ref_date -> Date.before_date d ref_date
+            | None -> False ]
+          in
+          if aft then loop q len (i + 1)
           else
             let e = (p, d, cal) in
             if len < n then loop (Q.add e q) (len + 1) (i + 1)
