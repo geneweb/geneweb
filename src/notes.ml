@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.3 2006-08-16 09:20:11 ddr Exp $ *)
+(* $Id: notes.ml,v 5.4 2006-08-20 05:14:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -134,26 +134,30 @@ value notes_links_db conf base eliminate_unlinked =
       [] db
   in
   (* some kind of basic gc... *)
-  let rec is_referenced in_test s =
-    fun
-    [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _,
-        (sl, il)) ::
-       pgsll] ->
-        if List.mem s sl then True
-        else is_referenced in_test s pgsll
-    | [(NotesLinks.PgMisc s1, (sl, il)) :: pgsll] ->
-        if is_referenced in_test s pgsll then True
-        else if List.mem s sl then
-          if List.mem s1 in_test then False
-          else is_referenced [s :: in_test] s1 db
-        else False
-    | [] -> False ]
+  let is_referenced s db =
+    let mark = Hashtbl.create 1 in
+    loop s db where rec loop s db =
+      if Hashtbl.mem mark s then False
+      else
+        match db with
+        [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _,
+            (sl, il)) ::
+           pgsll] ->
+            if List.mem s sl then True else loop s pgsll
+        | [(NotesLinks.PgMisc s1, (sl, il)) :: pgsll] ->
+            if loop s pgsll then True
+            else if List.mem s sl then do {
+              Hashtbl.add mark s True;
+              loop s1 db
+            }
+            else False
+        | [] -> False ]
   in
   let db2 =
     if eliminate_unlinked then
       List.fold_right
         (fun (s, list) db2 ->
-           if is_referenced [] s db then [(s, list) :: db2]
+           if is_referenced s db then [(s, list) :: db2]
            else db2)
         db2 []
     else db2
