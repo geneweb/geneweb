@@ -1,4 +1,4 @@
-<!-- $Id: summary.txt,v 5.1 2006-08-20 05:14:56 ddr Exp $ -->
+<!-- $Id: summary.txt,v 5.2 2006-08-21 16:39:16 ddr Exp $ -->
 <style type="text/css">
 <!--
   div.summary ul { padding-left: 0; list-style-type: none }
@@ -21,6 +21,11 @@ function showTocToggle() {
     + '</a>)</span>');
   }
 }
+function setTocToggle() {
+  var cookiePos = document.cookie.indexOf("hidetoc=");
+  if (cookiePos > -1 && document.cookie.charAt(cookiePos + 8) == 1)
+    toggleToc();
+}
 function toggleToc() {
   var toc = document.getElementById('tocinside');
   var showlink = document.getElementById('showlink');
@@ -29,12 +34,14 @@ function toggleToc() {
     toc.style.display = tocWas;
     hidelink.style.display='';
     showlink.style.display='none';
+    document.cookie = "hidetoc=0";
   }
   else {
     tocWas = toc.style.display;
     toc.style.display = 'none';
     hidelink.style.display='none';
     showlink.style.display='';
+    document.cookie = "hidetoc=1";
   }
 }
 -->

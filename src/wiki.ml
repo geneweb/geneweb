@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.2 2006-08-21 16:39:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -304,7 +304,12 @@ value summary_of_tlsw_lines conf short lines =
        List.rev_append rev_summary
          ["</div>";
           "</td></tr></table>";
-          "</dd></dl>"]]
+          "</dd></dl>";
+          "<script type=\"text/javascript\">";
+          "//<![CDATA[";
+          "setTocToggle()";
+          "//]]>";
+          "</script>"]]
     in
     (lines, sections_nums)
 ;
