@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.4 2006-08-20 05:14:56 ddr Exp $ *)
+(* $Id: notes.ml,v 5.5 2006-08-22 10:07:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -37,8 +37,10 @@ value print_whole_notes conf fnotes title s =
       else ()
     in      
     gen_print_link_to_welcome what_links_page conf True;
-    xtag "br";
-    xtag "br";
+    tag "p" begin
+      xtag "br";
+      xtag "br";
+    end;
     if title <> "" then
       Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
     else ();

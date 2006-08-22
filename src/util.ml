@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.8 2006-05-16 12:22:11 ddr Exp $ *)
+(* $Id: util.ml,v 5.9 2006-08-22 10:07:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1247,6 +1247,8 @@ value header_without_page_title conf title =
     .highlight { color: %s; font-weight: bold }
     hr { border: 0; margin: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
+    div.summary ul { padding-left: 0; list-style-type: none }
+    div.summary ul ul { padding-left: 1.618em }
   --></style>\n" conf.highlight;
     include_hed_trl conf None ".hed";
     Wserver.wprint "</head>\n";
@@ -1912,11 +1914,12 @@ value link_to_referer conf =
     let wid_hei =
       match image_size (image_file_name fname) with
       [ Some (wid, hei) ->
-          " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
+          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
+          string_of_int hei ^ "\""
       | None -> "" ]
     in
-    "<a href=\"" ^ referer ^ "\"><img src=\"" ^ image_prefix conf ^ "/" ^
-      fname ^ "\"" ^ wid_hei ^ " alt=\"&lt;&lt;\"></a>\n"
+    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\"%s></a>\n"
+      referer (image_prefix conf) fname wid_hei conf.xhs
   else ""
 ;
 

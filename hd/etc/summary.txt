@@ -1,10 +1,4 @@
-<!-- $Id: summary.txt,v 5.2 2006-08-21 16:39:16 ddr Exp $ -->
-<style type="text/css">
-<!--
-  div.summary ul { padding-left: 0; list-style-type: none }
-  div.summary ul ul { padding-left: 1.618em }
--->
-</style>
+<!-- $Id: summary.txt,v 5.3 2006-08-22 10:07:03 ddr Exp $ -->
 <!-- This code has been borrowed from Wikipedia -->
 <script type="text/javascript">
 <!--
