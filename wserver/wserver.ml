@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.3 2006-03-28 00:35:22 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.4 2006-08-22 15:40:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -559,7 +559,6 @@ let args = Sys.argv in
         in
         let _ = Unix.waitpid [] pid in
         let ic = open_in_bin sock_in.val in
-        let request = get_request (Stream.of_channel ic) in
         close_in ic
       END;
       let cleanup () =
