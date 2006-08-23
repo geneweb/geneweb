@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.2 2006-08-23 08:56:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -117,8 +117,8 @@
   <table border="%border;" width="90%%">
   <tr><td>
    <a href="%image_html_url;"><img
-    src="%image_url;"%image_size; border="0"
-    alt="[image/images]0"%/></a>
+    src="%image_url;"%image_size; style="border:0"
+    alt="[image/images]0"%/></a></td>
 %end;
 %if;(has_occupation or has_birth_date or has_birth_place or
      has_baptism_date or has_baptism_place or is_dead or is_buried or
@@ -174,7 +174,7 @@
   </ul>
 %end;
 %if;has_image;
-  </table>
+  </td></tr></table>
 %end;
 
 %if;has_parents;
