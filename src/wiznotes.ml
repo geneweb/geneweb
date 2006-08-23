@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.3 2006-08-23 11:52:25 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.4 2006-08-23 16:12:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -288,15 +288,16 @@ value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
       end;
     end;
     if Sys.file_exists wfile then do {
-      html_p conf;
       let tm = Unix.localtime date in
       let dmy =
         {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
          year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
       in
-      Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
-        (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
-        tm.Unix.tm_hour tm.Unix.tm_min
+      tag "p" begin
+        Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
+          (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
+          tm.Unix.tm_hour tm.Unix.tm_min;
+      end
     }
     else ();
     trailer conf
