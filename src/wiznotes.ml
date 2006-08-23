@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.2 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.3 2006-08-23 11:52:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -251,10 +251,11 @@ value print_main conf base auth_file =
   }
 ;
 
-value wizard_page_title wz wizname h =
+value wizard_page_title conf wz wizname h =
   Wserver.wprint "%s%s" wizname
     (if wz <> wizname && not h then
-       "<br><font size=\"-1\">(" ^ wz ^ ")</font>"
+       "<br" ^ conf.xhs ^ "><span style=\"font-size:50%\">(" ^ wz ^
+       ")</span>"
      else "")
 ;
 
@@ -264,7 +265,7 @@ value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
     try fst (List.assoc wz wizdata) with
     [ Not_found -> wz ]
   in
-  let title = wizard_page_title wz wizname in
+  let title = wizard_page_title conf wz wizname in
   do {
     header_no_page_title conf title;
     print_link_to_welcome conf True;
@@ -274,7 +275,6 @@ value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
     match Util.open_etc_file "summary" with
     [ Some ic -> Templ.copy_from_templ conf [] ic
     | None -> () ];
-    html_p conf;
     tag "table" "border=\"0\" width=\"100%%\"" begin
       tag "tr" begin
         tag "td" begin
@@ -371,7 +371,7 @@ value print_mod conf base =
         let wz = Filename.basename wz in
         let can_edit = conf.wizard && conf.user = wz in
         if can_edit then
-          let title = wizard_page_title wz wz in
+          let title = wizard_page_title conf wz wz in
           let wfile = wzfile (dir conf) wz in
           let (s, _) = read_wizard_notes wfile in
           Wiki.print_mod_page conf "WIZNOTES" wz title [] s

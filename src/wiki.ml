@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.2 2006-08-21 16:39:16 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.3 2006-08-23 11:52:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -110,6 +110,8 @@ value syntax_links conf mode file_path s =
       s.[i] = '%' && i < slen - 1 && List.mem s.[i+1] ['['; ']'; '{'; '}'; ''']
     then
       loop quot_lev pos (i + 2) (Buff.store len s.[i+1])
+    else if s.[i] = '%' && i < slen - 1 && s.[i+1] = '/' then
+      loop quot_lev pos (i + 2) (Buff.mstore len conf.xhs)
     else if s.[i] = '{' then
       let (b, j) =
         loop 0 (i + 1) where rec loop len j =
@@ -172,7 +174,7 @@ use of database forum by ill-intentioned people to communicate)...
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
-            sprintf "<a name=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+            sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
               pos (commd conf)
               (code_varenv fn) (code_varenv sn)
               (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
@@ -465,15 +467,16 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
               | [] -> ("", []) ]
             in
             let s =
-              sprintf "<h%d>%s%s%s</h%d>" slev section_num
-                (String.sub s slev (len-2*slev))
-                (if slev <= 3 then "<hr" ^ conf.xhs ^ ">" else "") slev
+             let style =
+               if slev <= 3 then " style=\"border-bottom: solid 1px\""
+               else ""
+             in
+             sprintf "<h%d%s>%s%s</h%d>" slev style section_num
+               (String.sub s slev (len-2*slev)) slev
             in
             let list =
               if wlo <> None then
-                let s =
-                  sprintf "<p><a name=\"a_%d\" id=\"a_%d\"></a></p>" cnt cnt
-                in
+                let s = sprintf "<p><a id=\"a_%d\"></a></p>" cnt in
                 [s:: list]
               else list
             in
@@ -484,7 +487,7 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
                   [s :: list]
               | None -> list ]
             in
-            hotl conf wlo (cnt + 1) edit_opt sections_nums list [""; s :: sl]
+            hotl conf wlo (cnt + 1) edit_opt sections_nums list [s :: sl]
           else
             hotl conf wlo cnt edit_opt sections_nums [s :: list] sl ]
   | [] -> List.rev list ]
