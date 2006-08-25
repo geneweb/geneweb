@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 5.3 2006-01-01 05:35:06 ddr Exp $
+# $Id: lexicon.txt,v 5.4 2006-08-25 09:54:30 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -72,7 +72,7 @@ de: af=Afrikaans/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/cs=Tschechisch/da=Dän
 en: af=Afrikaans/bg=Bulgarian/br=Breton/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
 es: af=Afrikaans/bg=Búlgaro/br=Bretón/ca=Catalán/cs=Checo/da=Danés/de=Alemán/en=Inglés/eo=Esperanto/es=Español/et=Estonio/fi=Finés/fr=Francés/he=Hebreo/is=Islandés/it=Italiano/lv=Lituano/nl=Neerlandés/no=Noruego/pl=Polaco/pt=Portugés/pt-br=Portugés de Brasil/ro=Rumano/ru=Ruso/sl=Esloveno/sv=Sueco/zh=Chino
-et: af=afrikaani/bg=bulgaaria/br=bretooni/ca=katalaani/cs=t&scaron;ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sl=sloveenia/sv=rootsi/zh=hiina
+et: af=afrikaani/bg=bulgaaria/br=bretooni/ca=katalaani/cs=t¨ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sl=sloveenia/sv=rootsi/zh=hiina
 fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pl=puola/pt=portugali/pt-br=brasilianportugali/ru=venäjä/sv=ruotsi/zh=kiina
 fr: af=afrikaans/bg=bulgare/br=breton/ca=catalan/cs=tchèque/da=danois/de=allemand/en=anglais/eo=espéranto/es=espagnol/et=estonien/fi=finnois/fr=français/he=hébreu/is=islandais/it=italien/lv=letton/nl=néerlandais/no=norvégien/pl=polonais/pt=portugais/pt-br=portugais-du-Brésil/ro=roumain/ru=russe/sl=slovène/sv=suédois/zh=chinois
 he: af=àôøé÷àğñ /cs=ö'ëéú /da=ãğéú /de=âøîğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /sv=ùååãéú/zh=ñéğéú 
@@ -243,7 +243,7 @@ he:    áğé ãåãéí ìãøâä ä%s
 is: skyld í %s liğ
 it: cugini di %s grado
 lv: %s brâlçni/mâsîcas
-nl: neven en nichten %s generaties verwijderd
+nl: neven en nichten in de %s graad
 no: %smenninger
 pl: kuzyni %s stopnia
 pt: primos em %s grau
@@ -618,7 +618,7 @@ eo: .
 es: .
 et: &nbsp;
 fi: .
-fr: <span style="font-size:50%"> </span>
+fr: &nbsp;
 he: ,
 is: .
 it: .
@@ -921,7 +921,7 @@ he:  âéñ/ âéñä
 is: mágur/mágkona
 it: un cognato/una cognata
 lv: svainis/svaine
-nl: een schoonbroer(zwager)/een schoonzus
+nl: een schoonbroer(zwager)/een schoonzuster
 no: svoger/svigerinne
 pl: szwagier/szwagierka
 pt: um cunhado/uma cunhada
@@ -948,7 +948,7 @@ he:   àç/ àçåú/ àç(åú)
 is: bróğir/systir/systkyn
 it: un fratello/una sorella/un fratello o una sorella
 lv: brâlis/mâsa/a sibling
-nl: een broer/een zus/een broer of een zus
+nl: een broer/een zuster/een broer of een zuster
 no: bror/søster/søsken
 pl: brat/siostra/brat lub siostra
 pt: um irmão/uma irmã/um(a) irmão(ã)
@@ -959,7 +959,7 @@ sv: en bror/en syster/ett syskon
 
     a cousin
 af: 'n neef/'n niggie
-bg: áğàòîâ÷åä/áğàòîâ÷åäêà
+bg: ïúğâè áğàòîâ÷åä/ïúğâà áğàòîâ÷åäêà
 br: ur c'henderv/ur geniterv
 ca: un cosí/una cosina
 cs: bratranec/sestøenice
@@ -1002,7 +1002,7 @@ he:   öàöà/ öàöàä
 is: afkomandi
 it: un discendente/una discendente
 lv: pçcnâcçjs
-nl: een nakomeling
+nl: een afstammeling
 no: etterkommer
 pl: potomek
 pt: um descendente/uma descendente
@@ -1191,7 +1191,7 @@ he:   çöé àç/ çöé àçåú/ çöé àç(åú)
 is: hálfbróğir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
 lv: pusbrâlis/pusmâsa/pusbçrns
-nl: een broer/een zus/een broer of een zus
+nl: een halfbroer/een halfzuster/een halfbroer of halfzuster
 no: halvbror/halvsøster/halvsøsken
 pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
 pt: um meio-irmão/uma meia-irmã/um(a) meio(a) irmão(ã)
@@ -1218,7 +1218,7 @@ he:   àçééï/ àçééğéú
 is: bróğur(systur)sonur/bróğur(systur)dóttir
 it: un nipote/una nipote
 lv: brâïa/mâsas dçls/meita
-nl: een neef/een nicht
+nl: een neef/een nicht (oom- of tantezegger)
 no: nevø/niese
 pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
 pt: um sobrinho/uma sobrinha
@@ -1380,7 +1380,7 @@ he:  àá çåøâ/ àí çåøâú/ äåøéí çåøâéí
 is: kjörfağir/kjörmóğir/kjörforeldrar
 it: padre adottivo/madre adottiva/genitori adottivi
 lv: patçvs/pamâte/pavecâki adoptive parents
-nl: stiefvader/stiefmoeder/stiefouders
+nl: adoptiefvader/adoptiefmoeder/adoptiefouders
 no: adoptivfar/adoptivmor/adoptivforeldre
 pl: przybrany ojciec/przybrana matka/przybrani rodzice
 pt: pai adoptivo/mãe adoptiva/pais adoptivos
@@ -1436,7 +1436,7 @@ he:   á÷ùä îú÷ãîú
 is: nákvæmari leit
 it: richiesta avanzata
 lv: paplağinâtâ meklçğana pçc:
-nl: gedetailleerde opzoeking
+nl: gedetailleerd zoeken
 no: avansert søk
 pl: wyszukiwanie zaawansowane
 pt: pesquisa complexa
@@ -1874,7 +1874,7 @@ he:   éîé ùğä
 is: merkisdagar
 it: anniversari
 lv: gadadienas
-nl: verjaardag
+nl: verjaardagen
 no: årsdager
 pl: rocznice
 pt: aniversários
@@ -1901,7 +1901,7 @@ he:   éîé ùğä ìîååú
 is: ártíğir
 it: anniversari delle persone decedute
 lv: mirğanas piemiòas dienas
-nl: verjaardag van overleden mensen
+nl: verjaardagen van overleden mensen
 no: årsdager for avdøde personer
 pl: rocznice urodzin i ¶mierci osób nie¿yj±cych
 pt: aniversários das pessoas falecidas
@@ -1929,7 +1929,7 @@ he:   éîé ğéùåàéï
 is: brúğkaupsafmæli
 it: anniversari di matrimonio
 lv: kâzu dienas
-nl: huwelijksverjaardag
+nl: huwelijksverjaardagen
 no: bryllupsdager
 pl: rocznice ¶lubów
 pt: aniversários de casamento
@@ -1984,7 +1984,7 @@ he:   âí
 is: einnig
 it: nello stesso tempo
 lv: vienlaicîgi
-nl: terzeldertijd
+nl: tegelijkertijd
 no: samtidig
 pl: zarazem
 pt: ao mesmo tempo
@@ -1992,6 +1992,11 @@ ro: in acelas timp
 ru: â òî æå ñàìîå âğåìÿ
 sl: soèasno
 sv: samtidigt
+
+    average death age
+en: average death age
+fr: âge moyen de décès
+nl: gemiddelde leeftijd bij overlijden
 
     back
 af: terug
@@ -2421,7 +2426,7 @@ he:  áèì ÷ùøé GeneWeb
 is: án GeneWeb tengla
 it: annullare i links
 lv: nerâdît GeneWeb saites
-nl: geen GeneWeb links
+nl: zonder GeneWeb links
 no: uten GeneWeb koblinger
 pl: pomiñ ³±cza GeneWeb
 pt: cancelar os links Geneweb
@@ -2584,7 +2589,7 @@ he:  åìùğåú áòöîê
 is: og breyttu şví sjálf(ur)
 it: scieglietene un'altro
 lv: nomainiet to
-nl: verander het zelf
+nl: verander het nummer zelf
 no: endre det selv
 pl: zmieñ numer w³asnorêcznie
 pt: escolha outro
@@ -2611,7 +2616,7 @@ he:  ñãø äéìãéí äùúğä
 is: breytti röğ barna
 it: ordine dei figli cambiato
 lv: mainît bçrnu secîbu
-nl: de volgorde der kinderen veranderd
+nl: volgorde van de kinderen veranderd
 no: rekkefølgen er endret for barna til
 pl: kolejno¶æ dzieci zosta³a zmieniona
 pt: mudar a ordem dos filhos
@@ -2840,7 +2845,7 @@ sv: fortsätt slå samman
 
     cousins
 af: neefs/niggies
-bg: áğàòîâ÷åäè
+bg: ïúğâè áğàòîâ÷åäè
 br: kendirvi
 ca: cosins
 cs: bratranci/sestøenice
@@ -2910,7 +2915,7 @@ he:  òùä
 is: búa til
 it: creare
 lv: izveidot
-nl: creëren
+nl: aanmaken
 no: opprett
 pl: utwórz
 pt: criar
@@ -3045,7 +3050,7 @@ he:   îååú
 is: látin(n)
 it: morte
 lv: nâve
-nl: overlijden
+nl: overleden
 no: død
 pl: zgon
 pt: morte
@@ -3099,7 +3104,7 @@ he:   öàöàéí
 is: afkomendur
 it: discendenti
 lv: pçcteèi
-nl: nakomelingen
+nl: afstammelingen
 no: etterkommere
 pl: potomkowie
 pt: descendentes
@@ -3182,7 +3187,7 @@ he:   ğòìí/ ğòìîä
 is: hvarf
 it: scomparso/scomparsa/scomparso(a)
 lv: pazudis(usi) bez vçsts
-nl: verdwenen
+nl: vermist
 no: forsvunnet
 pl: zagin±³/zaginê³a/zaginiêcie
 pt: desaparecido/desaparecida/desaparecido(a)
@@ -3209,7 +3214,7 @@ he:  äöâ øöåòåú  / øåçá øöåòåú  / çôéôä / ñ"ä øåçá
 is: sınt í hlutum/breidd hlutans/skörun hlutanna/öll breiddin
 it: visualizzare per segmenti/larghezza del segmento/sovrapposizione/larghezza totale
 lv: râdît pa loksnçm/loksnes platums/pârklâjums/kopçjais platums
-nl: weergave per snede/sneebreedte/doorsnede/totale breedte
+nl: weergave per segment/segmentbreedte/overlapping/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 pl: wy¶wietl w segmentach/szeroko¶æ segmentu/szeroko¶æ pokrywania siê/szeroko¶æ ca³kowita
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
@@ -3726,7 +3731,7 @@ he:   äîñôø äçåôùé äøàùåï
 is: fyrsta lausa númer
 it: primo numero disponibile
 lv: pirmais brîvais skaitlis
-nl: eerste vrij nummer
+nl: eerste beschikbare nummer
 no: første ledige nummer
 pl: najni¿szy wolny numer
 pt: primeiro número livre
@@ -3866,7 +3871,7 @@ he:  ìùîåú äôøèééí áñãø àìó-áú
 is: fornöfn í stafrófsröğ
 it: per il primo nome in ordine alfabetico
 lv: pa vârdiem alfabçtiskâ kârtîbâ
-nl: dit geeft de voornamen in alfabetische volgorde
+nl:  voor de voornamen in alfabetische volgorde
 no: alfabetisk på fornavn
 pl: aby zobaczyæ imiona w porz±dku alfabetycznym
 pt: para obter os nomes próprios por ordem alfabética
@@ -4112,7 +4117,7 @@ he:   éåí äåìãú ùîç
 is: til hamingju meğ afmæliğ !
 it: buon compleanno!
 lv: Laimîgu dzimğanas dienu!
-nl: van harte gefeliciteerd!
+nl: van harte gefeliciteerd met Uw verjaardag!
 no: gratulerer med dagen!
 pl: wszystkiego najlepszego w dniu urodzin!
 pt: feliz aniversário!
@@ -4139,7 +4144,7 @@ he:    òí éìãéí
 is: börn
 it: da cui
 lv: bçrni:
-nl: hieruit
+nl: en hun kinderen:
 no: barn
 pl: dzieci:
 pt: tiveram
@@ -4221,7 +4226,7 @@ he:  øùéîú äòãëåğéí
 is: uppfærslusaga
 it: riassunto degli aggiornamenti
 lv: labojumu vçsture
-nl: lijst van wijzigingen
+nl: chroniek van wijzigingen
 no: oppdateringshistorie
 pl: rejestr zmian
 pt: historial das actualizações
@@ -4303,7 +4308,7 @@ he: ident/email/ ğåùà
 is: ident/email/um
 it: ident/email/oggetto
 lv: vârds/e-pasts/subjekts
-nl: naam/e-mail/onderwerp
+nl: identiteit/e-mail/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
 pt: ident/email/assunto
@@ -4330,7 +4335,7 @@ he:  àí áòì(ú) úåàø
 is: ef titlar
 it: se titoli
 lv: ja ir tituli
-nl: als titels
+nl: indien titels
 no: hvis titler
 pl: je¶li z tytu³em
 pt: se títulos
@@ -4411,7 +4416,7 @@ he:  úîåğä
 is: mynd
 it: immagine/immagini
 lv: attçli
-nl: beeld
+nl: beeld/beelden
 no: bilde
 pl: ilustracja:a:-ê/ilustracje
 pt: imagem/imagens
@@ -4494,7 +4499,7 @@ he:  ëìì áğé æåâ äçñøéí
 is: meğtaldir makar sem vantar
 it: includere i coniugi mancanti
 lv: ieskaitot iztrûkstoğos dzîvesbiedrus
-nl: ontbrekende echtgenoten tonen
+nl: inclusief ontbrekende echtgenoten
 no: inkluder ukjente maker
 pl: poka¿ brakuj±cych ma³¿onków
 pt: incluir os cônjugues que faltam
@@ -4521,7 +4526,7 @@ he:  áìì
 is: meğtaldar makar
 it: includere i coniugi
 lv: ieskaitot dzîvesbiedrus
-nl: echtgenoten tonen
+nl: inclusief echtgenoten
 no: inkluder maker
 pl: poka¿ ma³¿onków
 pt: incluir os cônjugues
@@ -4575,7 +4580,7 @@ he:  áúàøéê ùâåé
 is: vitlaus dagsetning
 it: data incorretta
 lv: nepareizs datums
-nl: verkeerde datum
+nl: incorrecte datum
 no: ugyldig dato
 pl: nieprawid³owa data
 pt: data incorrecta
@@ -4603,7 +4608,7 @@ he:  á÷ùä ùâåéä
 is: beiğni ekki rétt
 it: richiesta incorretta
 lv: kïûdains pieprasîjums
-nl: verkeerd verzoek
+nl: incorrect verzoek
 no: ugyldig forespørsel
 pl: nieprawid³owe wyszukiwanie
 pt: consulta incorrecta
@@ -4658,7 +4663,7 @@ he:  îôúç äöàöàéí
 is: skrá afkomenda
 it: indice dei discendenti
 lv: pçcnâcçju saraksts
-nl: index van de nakomelingen
+nl: index van afstammelingen
 no: etterkommerindeks
 pl: lista potomków
 pt: índice dos descendentes
@@ -4685,7 +4690,7 @@ he:  îôúç áğé äæåâ ùàéğí öàöàéí
 is: skrá make (ekki afkomenda)
 it: indice dei coniugi (non discendenti)
 lv: dzîvesbiedru saraksts (bez pçcnâcçjiem)
-nl: index van echtgenoten (geen nakomelingen)
+nl: index van echtgenoten (geen afstammelingen)
 no: ektefelleindeks
 pl: lista ma³¿onków (nie bêd±cych potomkami)
 pt: índice dos cônjuges (não descendentes)

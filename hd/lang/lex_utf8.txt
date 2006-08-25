@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.23 2006-08-25 09:37:31 ddr Exp $
+# $Id: lex_utf8.txt,v 5.24 2006-08-25 09:54:30 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -4127,7 +4127,7 @@ he:    עם ילדים
 is: börn
 it: da cui
 lv: bērni:
-nl: en hun kinderen: 
+nl: en hun kinderen:
 no: barn
 pl: dzieci:
 pt: tiveram
