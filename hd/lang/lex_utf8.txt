@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.22 2006-08-18 09:42:54 ddr Exp $
+# $Id: lex_utf8.txt,v 5.23 2006-08-25 09:37:31 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -593,7 +593,7 @@ eo: .
 es: .
 et: &nbsp;
 fi: .
-fr: <span style="font-size:50%"> </span>
+fr: &nbsp;
 he: ,
 is: .
 it: .
