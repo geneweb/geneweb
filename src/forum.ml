@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.2 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: forum.ml,v 5.3 2006-08-25 08:43:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -243,6 +243,7 @@ value sp2nbsp lim s =
       let len =
         match s.[i] with
         [ ' ' -> Buff.mstore len "&nbsp;"
+        | '&' -> Buff.mstore len "&amp;"
         | x -> Buff.store len x ]
       in
       loop (i + 1) len
