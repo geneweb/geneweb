@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.2 2006-08-25 08:43:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -44,7 +44,8 @@
 
 %define;search_form(main)
   <table style="float:%right;"><tr><td align="%right;">
-  <form method="GET" action="%action;">
+  <form method="get" action="%action;">
+    <p>
     %hidden;
     <input type="hidden" name="m" value="FORUM_SEARCH"%/>
     %if;("main" != "true")
@@ -57,6 +58,7 @@
      %/>[search/case sensitive]1
     </label>
     <input type="submit" value="[*search/case sensitive]0"%/>
+    </p>
   </form>
   </td></tr></table>
 %end;
@@ -252,7 +254,7 @@
   <h1 style="text-align:center" class="highlight">[*database forum]</h1>
   %apply;search_form("true")
   %if;can_post;
-    <form method="GET" action="%action;">
+    <form method="get" action="%action;">
     <p>
     %hidden;
     <input type="hidden" name="m" value="FORUM_ADD"%/>
