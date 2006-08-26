@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.2 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.3 2006-08-26 06:51:51 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -135,14 +135,18 @@
   %if;(evar.cgl = "on")xx%else;<a href="%prefix;aa">xx</a>%end;
 %end;
 
+%define;my_link(aa, xx, rr)	
+  %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;	
+%end;
+
 %define;somebody(xx)
-  <b>%apply;link(xx.access, xx)</b>%nn;
+  <b>%apply;my_link(xx.access, xx, xx.is_restricted)</b>%nn;
   %apply;somebody_long_info("xx")
   %if;xx.has_occupation;, %xx.occupation;%end;
 %end;
 
 %define;somebody_spouse_parent(xx)
-  <b>%apply;link(spouse.xx.access, spouse.xx)</b>%nn;
+  <b>%apply;my_link(spouse.xx.access, spouse.xx, spouse.is_restricted)</b>%nn;
   %if;spouse.xx.has_nobility_titles;,
     <a href="%prefix;m=TT;sm=S;t=%spouse.xx.nobility_title.ident_key;
     ;p=%spouse.xx.nobility_title.place_key;">%nn;
@@ -306,7 +310,7 @@
 %end;
 
 %define;child_long_info(spec)
-  <b>%apply;link(child.access, child.child_name)</b>%nn;
+  <b>%apply;my_link(child.access, child.child_name, child.is_restricted)</b>%nn;
   %apply;somebody_long_info("child")
   %if;(child.sosa_in_list != "").
     %if;(evar.only != "on")[*see]%sp;
