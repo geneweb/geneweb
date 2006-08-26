@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.3 2006-08-26 07:05:26 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.4 2006-08-26 08:32:47 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -662,7 +662,7 @@ pt: por
 ro: cu
 sl: 
 sv: efter
-] [place] / [surname/surnames]0</b></span>
+] [place] / [surname/surnames]0</span>
 - [birth] <input type="checkbox" name="bi" value="on" checked="checked"%/>
 - [death] <input type="checkbox" name="de" value="on"%/>
 - [marriage/marriages]0 <input type="checkbox" name="ma" value="on"%/>
