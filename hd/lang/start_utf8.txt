@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.2 2006-05-11 13:12:02 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.3 2006-08-26 07:05:26 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -638,7 +638,7 @@ et: järgi
 
 <form method="get" action="%s">
 %h<input type="hidden" name="m" value="PS"%/>
-<font color="%i"><b>[
+<span class="highlight"> - [
 af: by
 bg: по
 br: dre
@@ -662,7 +662,7 @@ pt: por
 ro: cu
 sl: 
 sv: efter
-] [place] / [surname/surnames]0</b></font>
+] [place] / [surname/surnames]0</b></span>
 - [birth] <input type="checkbox" name="bi" value="on" checked="checked"%/>
 - [death] <input type="checkbox" name="de" value="on"%/>
 - [marriage/marriages]0 <input type="checkbox" name="ma" value="on"%/>
@@ -671,6 +671,7 @@ sv: efter
 
 %E%INshide_advanced_request;<li>
 
+<span class="highlight">-</span>
 [
 af: <span class="highlight">deur 'n</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>detail
