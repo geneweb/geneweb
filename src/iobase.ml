@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.2 2006-08-28 10:02:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -210,20 +210,27 @@ value hashtbl_right_assoc s ht =
 value index_of_string strings ic start_pos hash_len string_patches s =
   try Adef.istr_of_int (hashtbl_right_assoc s string_patches) with
   [ Not_found ->
-      let ia = Hashtbl.hash s mod hash_len in
-      do {
-        seek_in ic (start_pos + ia * int_size);
-        let i1 = input_binary_int ic in
-        let rec loop i =
-          if i == -1 then raise Not_found
-          else if strings.get i = s then Adef.istr_of_int i
-          else do {
-            seek_in ic (start_pos + (hash_len + i) * int_size);
-            loop (input_binary_int ic)
+      match (ic, hash_len) with
+      [ (Some ic, Some hash_len) ->
+          let ia = Hashtbl.hash s mod hash_len in
+          do {
+            seek_in ic (start_pos + ia * int_size);
+            let i1 = input_binary_int ic in
+            let rec loop i =
+              if i == -1 then raise Not_found
+              else if strings.get i = s then Adef.istr_of_int i
+              else do {
+                seek_in ic (start_pos + (hash_len + i) * int_size);
+                loop (input_binary_int ic)
+              }
+            in
+            loop i1
           }
-        in
-        loop i1
-      } ]
+      | _ -> do {
+          Printf.eprintf "Sorry. I really need string.inx\n";
+          flush stderr;
+          failwith "database access"
+        } ] ]
 ;
 
 (* Search index of a given surname or given first name in file strings.inx *)
@@ -376,25 +383,31 @@ value old_persons_of_first_name_or_surname base_data strings params =
             let bt = update_bt gistro bt in
             do { btr.val := Some bt; bt }
       | None ->
-          do {
-            seek_in ic2 start_pos;
+          match (ic2, start_pos) with
+          [ (Some ic2, Some start_pos) -> do {
+              seek_in ic2 start_pos;
 (*
 let ab1 = Gc.allocated_bytes () in
 *)
-            let bt : IstrTree.t (list iper) = input_value ic2 in
+              let bt : IstrTree.t (list iper) = input_value ic2 in
 (*
 let ab2 = Gc.allocated_bytes () in
 *)
-            let bt = update_bt gistro bt in
-            btr.val := Some bt;
+              let bt = update_bt gistro bt in
+              btr.val := Some bt;
 (*
 Printf.eprintf "*** old database created by version <= 4.09\n"; flush stderr;
 Printf.eprintf "*** using index allocating here %.0f bytes\n"
   (ab2 -. ab1);
 flush stderr;
 *)
-            bt
-          } ]
+              bt
+            }
+          | _ -> do {
+              Printf.eprintf "Sorry, I really need strings.inx.\n";
+              flush stderr;
+              failwith "database access"
+            } ] ]
   in
   let check_patches istr ipl =
     let ipl = ref ipl in
@@ -908,13 +921,19 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
           if i < 0 || i >= len then
             failwith
               ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
-          else do {
-            seek_in ic_acc (shift + Iovalue.sizeof_long * i);
-            let pos = input_binary_int ic_acc in
-            seek_in ic pos;
-            let v = Iovalue.input ic in
-            v_ext v
-          } ]
+          else
+            match ic_acc with
+            [ Some ic_acc -> do {
+                seek_in ic_acc (shift + Iovalue.sizeof_long * i);
+                let pos = input_binary_int ic_acc in
+                seek_in ic pos;
+                let v = Iovalue.input ic in
+                v_ext v
+              }
+            | None -> do {
+                Printf.eprintf "Sorry; I really need base.acc\n";
+                flush stderr;
+                failwith "cannot access database" } ] ]
   in
   do { r.array := array; r.get := gen_get; r }
 ;
@@ -1025,12 +1044,36 @@ value input bname =
   let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
-  let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
-  let ic2 = Secure.open_in_bin (Filename.concat bname "strings.inx") in
+  let ic_acc =
+    try Some (Secure.open_in_bin (Filename.concat bname "base.acc")) with
+    [ Sys_error _ -> do {
+        Printf.eprintf "File base.acc not found; trying to continue...\n";
+        flush stderr;
+        None } ]
+  in
+  let ic2 =
+    try Some (Secure.open_in_bin (Filename.concat bname "strings.inx")) with
+    [ Sys_error _ -> do {
+        Printf.eprintf "File strings.inx not found; trying to continue...\n";
+        flush stderr;
+        None } ]
+  in
   let ic2_string_start_pos = 3 * int_size in
-  let ic2_string_hash_len = input_binary_int ic2 in
-  let ic2_surname_start_pos = input_binary_int ic2 in
-  let ic2_first_name_start_pos = input_binary_int ic2 in
+  let ic2_string_hash_len =
+    match ic2 with
+    [ Some ic2 -> Some (input_binary_int ic2)
+    | None -> None ]
+  in
+  let ic2_surname_start_pos =
+    match ic2 with
+    [ Some ic2 -> Some (input_binary_int ic2)
+    | None -> None ]
+  in
+  let ic2_first_name_start_pos =
+    match ic2 with
+    [ Some ic2 -> Some (input_binary_int ic2)
+    | None -> None ]
+  in
   let shift = 0 in
   let persons =
     make_cache ic ic_acc shift persons_array_pos patches.h_person persons_len
@@ -1067,7 +1110,16 @@ value input bname =
       strings_len "strings"
   in
   let cleanup_ref =
-    ref (fun () -> do { close_in ic; close_in ic_acc; close_in ic2; })
+    ref
+      (fun () -> do {
+         close_in ic;
+         match ic_acc with
+         [ Some ic_acc -> close_in ic_acc
+         | None -> () ];
+         match ic2 with
+         [ Some ic2 -> close_in ic2
+         | None -> () ];
+       })
   in
   let cleanup () = cleanup_ref.val () in
   let commit_patches () =
