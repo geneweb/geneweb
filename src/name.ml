@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: name.ml,v 5.2 2006-08-28 11:57:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value utf_8_db = ref True;
@@ -263,10 +263,7 @@ value lower s =
     else (* start of utf-8 multi-byte char *)
       let len = if special then Buff.store len ' ' else len in
       let (t, j) = unaccent_utf_8 True s i in
-      match t.[0] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' ->
-          copy False j (Buff.mstore len t)
-      | _ -> copy (len <> 0) j len ]
+      copy False j (Buff.mstore len t)
 ;
 
 (* Name.abbrev *)
