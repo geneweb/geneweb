@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.2 2006-08-28 11:57:05 ddr Exp $ *)
+(* $Id: name.ml,v 5.3 2006-08-29 09:49:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value utf_8_db = ref True;
@@ -186,7 +186,7 @@ value unaccent_utf_8 lower s i =
           | 0x95 -> f "E"
           | 0x96 -> f "J"
           | 0x97 -> f "Z"
-          | 0x98 -> f "I"
+          | 0x98 | 0x99 -> f "I"
           | 0x9A -> f "K"
           | 0x9B -> f "L"
           | 0x9C -> f "M"
@@ -199,6 +199,8 @@ value unaccent_utf_8 lower s i =
           | 0xA3 -> f "U"
           | 0xA4 -> f "F"
           | 0xA7 -> f "TCH"
+          | 0xA8 -> f "CH"
+          | 0xAB -> f "Y"
           | 0xAE -> f "YOU"
           | 0xAF -> f "YA"
           | 0xB0 -> "a"
@@ -209,7 +211,7 @@ value unaccent_utf_8 lower s i =
           | 0xB5 -> "e"
           | 0xB6 -> "j"
           | 0xB7 -> "z"
-          | 0xB8 -> "i"
+          | 0xB8 | 0xB9 -> "i"
           | 0xBA -> "k"
           | 0xBB -> "l"
           | 0xBC -> "m"
@@ -225,6 +227,8 @@ value unaccent_utf_8 lower s i =
           | 0x83 -> "u"
           | 0x84 -> "f"
           | 0x87 -> "tch"
+          | 0x88 -> "ch"
+          | 0x8B -> "y"
           | 0x8E -> "you"
           | 0x8F -> "ya"
           | _ -> String.sub s i nbc ]
