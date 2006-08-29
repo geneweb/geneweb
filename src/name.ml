@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.3 2006-08-29 09:49:39 ddr Exp $ *)
+(* $Id: name.ml,v 5.4 2006-08-29 16:23:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value utf_8_db = ref True;
@@ -201,6 +201,7 @@ value unaccent_utf_8 lower s i =
           | 0xA7 -> f "TCH"
           | 0xA8 -> f "CH"
           | 0xAB -> f "Y"
+          | 0xAC -> f ""
           | 0xAE -> f "YOU"
           | 0xAF -> f "YA"
           | 0xB0 -> "a"
@@ -229,6 +230,7 @@ value unaccent_utf_8 lower s i =
           | 0x87 -> "tch"
           | 0x88 -> "ch"
           | 0x8B -> "y"
+          | 0x8C -> ""
           | 0x8E -> "you"
           | 0x8F -> "ya"
           | _ -> String.sub s i nbc ]
