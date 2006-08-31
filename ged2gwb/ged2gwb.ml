@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.1 2006-01-01 05:35:05 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.2 2006-08-31 09:38:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -32,7 +32,8 @@ type charset =
   [ Ansel
   | Ascii
   | Msdos
-  | MacIntosh ]
+  | MacIntosh
+  | Utf8 ]
 ;
 
 type case =
@@ -260,15 +261,13 @@ value ascii_of_macintosh s =
   }
 ;
 
-value ascii_of_string s =
-  let s =
-    match charset.val with
-    [ Ansel -> Ansel.to_iso_8859_1 s
-    | Ascii -> s
-    | Msdos -> ascii_of_msdos s
-    | MacIntosh -> ascii_of_macintosh s ]
-  in
-  Gutil.utf_8_of_iso_8859_1 s
+value utf8_of_string s =
+  match charset.val with
+  [ Ansel -> utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
+  | Ascii -> Gutil.utf_8_of_iso_8859_1 s
+  | Msdos -> Gutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
+  | MacIntosh -> Gutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
+  | Utf8 -> s ]
 ;
 
 value rec get_lev n =
@@ -278,8 +277,8 @@ value rec get_lev n =
         if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm
         else parse_text n r1 strm
       in
-      {rlab = rlab; rval = ascii_of_string rval;
-       rcont = ascii_of_string rcont; rsons = List.rev l; rpos = line_cnt.val;
+      {rlab = rlab; rval = utf8_of_string rval;
+       rcont = utf8_of_string rcont; rsons = List.rev l; rpos = line_cnt.val;
        rused = False}
 and parse_address n r1 =
   parser
@@ -1033,8 +1032,8 @@ value get_lev0 =
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] '1' ? "get lev list" :] ->
       let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
-      let rval = ascii_of_string rval in
-      let rcont = ascii_of_string r3 in
+      let rval = utf8_of_string rval in
+      let rcont = utf8_of_string r3 in
       {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
        rpos = line_cnt.val; rused = False}
 ;
@@ -1987,6 +1986,7 @@ value treat_header2 gen r =
           [ "ANSEL" -> charset.val := Ansel
           | "ASCII" | "IBMPC" -> charset.val := Ascii
           | "MACINTOSH" -> charset.val := MacIntosh
+          | "UTF-8" -> charset.val := Utf8
           | _ -> charset.val := Ascii ]
       | None -> () ] ]
 ;
