@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.3 2006-08-25 18:54:27 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.4 2006-08-31 17:45:22 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -120,7 +120,7 @@
 
 %define;descendants_by_list(xx, yy, curlev, maxlev)
   %if;(curlev = 0)<p>%nl;%end;
-  <b>%if;(evar.cgl = "on"  or xx.is_restricted)%yy;%else;
+  <b>%if;(evar.cgl = "on" or xx.is_restricted)%yy;%else;
   <a href="%prefix;%xx.access;">%yy;</a>%end;</b>%nn;
   %apply;somebody_long_info("xx")
   %if;(xx.desc_level > curlev)<i>, [see above]</i>%nn;
@@ -137,9 +137,9 @@
           %xx.is_male;
         %and;
           %if;(on_marriage_date != "") %on_marriage_date;%end;
-          %if;(marriage_place != ""), %marriage_place;, %end;
-        %end;%sp;
-      %end;
+          %if;(marriage_place != ""), %marriage_place;,%end;
+        %end;
+      %end;%nl;
       <b>%if;(evar.cgl = "on" or spouse.is_restricted)%spouse;%else;
       <a href="%prefix;%spouse.access;">%spouse;</a>%end;</b>%nn;
       %apply;somebody_long_info("spouse")
@@ -170,6 +170,7 @@
             %end;
           %end;
         %elseif;has_children;, ...
+	%else;.
         %end;
       %else;.%nl;
         %apply;lazy_print%with;<br%/>%nl;%end;
