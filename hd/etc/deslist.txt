@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.4 2006-08-31 17:45:22 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.5 2006-08-31 17:55:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -167,10 +167,10 @@
           %else;
             %if;(curlev = 0)%nl;</p>%nl;
             %else;%apply;lazy_print%with;<br%/>%nl;%end;
-            %end;
+            %end;.
           %end;
         %elseif;has_children;, ...
-	%else;.
+        %else;.
         %end;
       %else;.%nl;
         %apply;lazy_print%with;<br%/>%nl;%end;
