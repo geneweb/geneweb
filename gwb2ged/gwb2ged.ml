@@ -1,11 +1,17 @@
-(* $Id: gwb2ged.ml,v 5.1 2006-01-01 05:35:05 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.2 2006-08-31 09:56:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Printf;
 
-value ascii = ref True;
+type charset =
+  [ Ansel
+  | Ascii
+  | Utf8 ]
+;
+
+value charset = ref Utf8;
 value no_notes = ref False;
 
 value month_txt =
@@ -37,8 +43,14 @@ value ged_month cal m =
 ;
 
 value encode s =
-  let s = if Gutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s in
-  if ascii.val then s else Ansel.of_iso_8859_1 s
+  match charset.val with
+  [ Ansel ->
+      let s = if Gutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s in
+      Ansel.of_iso_8859_1 s
+  | Ascii ->
+      if Gutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s
+  | Utf8 ->
+      if Gutil.utf_8_db.val then s else Gutil.utf_8_of_iso_8859_1 s ]
 ;
 
 value max_len = 78;
@@ -119,8 +131,10 @@ value ged_header base oc ifile ofile =
     fprintf oc "1 GEDC\n";
     fprintf oc "2 VERS 5.5\n";
     fprintf oc "2 FORM LINEAGE-LINKED\n";
-    if ascii.val then fprintf oc "1 CHAR ASCII\n"
-    else fprintf oc "1 CHAR ANSEL\n";
+    match charset.val with
+    [ Ansel -> fprintf oc "1 CHAR ANSEL\n"
+    | Ascii -> fprintf oc "1 CHAR ASCII\n"
+    | Utf8 -> fprintf oc "1 CHAR UTF-8\n" ];
     if no_notes.val then ()
     else
       let s = base.data.bnotes.nread "" RnAll in
@@ -679,14 +693,12 @@ value speclist =
          do {
            arg_state.val := ASnone;
            match x with
-           [ "ASCII" -> ascii.val := True
-           | "ANSEL" -> ascii.val := False
+           [ "ASCII" -> charset.val := Ascii
+           | "ANSEL" -> charset.val := Ansel
+           | "UTF-8" -> charset.val := Utf8
            | _ -> raise (Arg.Bad "bad -charset value") ]
          }),
-    "\
-[ASCII|ANSEL]:
-     Set charset. Default is ASCII. Warning: value ANSEL works correctly only
-     on iso-8859-1 encoded databases.");
+    "[ASCII|ANSEL|UTF-8]: set charset; default is UTF-8.");
    ("-o",
     Arg.String (fun x -> do { ofile.val := x; arg_state.val := ASnone }),
     "<ged>: output file name (default: a.ged)");
