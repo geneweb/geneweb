@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.3 2006-01-14 22:32:11 ddr Exp $ *)
+(* $Id: date.ml,v 5.4 2006-08-31 17:45:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -229,7 +229,7 @@ value string_of_ondate_aux conf =
   fun
   [ Dgreg d Dgregorian ->
       let s = string_of_on_dmy conf d in
-      if d.day > 0 then
+      if d.day > 0 && not conf.cancel_links then
         sprintf
           "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
           (commd conf) d.year d.month d.day s
@@ -249,7 +249,7 @@ value string_of_ondate_aux conf =
         string_of_on_dmy conf d1 ^ year_prec ^ " " ^
           transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
-      if d1.day > 0 then
+      if d1.day > 0 && not conf.cancel_links then
         sprintf 
           "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
@@ -258,7 +258,7 @@ value string_of_ondate_aux conf =
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
       let s =
-        if d1.day > 0 then
+        if d1.day > 0 && not conf.cancel_links then
           sprintf
             "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
             (commd conf) d1.year d1.month d1.day s
