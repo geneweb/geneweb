@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 5.4 2006-08-25 09:54:30 ddr Exp $
+# $Id: lexicon.txt,v 5.5 2006-09-05 12:18:16 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -8425,32 +8425,32 @@ ru: %d ïîñëåäíèõ ğîæäåíèé
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
 
-    the latest %d deaths
-af: die laaste %d afsterwes
-bg: ïîñëåäíèòå %d óìèğàíèÿ
-br: ar %d tremenvan diwezhañ
-ca: les %d defuncions més recents
-cs: posledních %d úmrtí
-da: de seneste %d dødsfald
-de: die letzten %d Ableben
-en: the latest %d deaths
-eo: la lastaj %d mortoj
-es: las %d muertes más recientes
-et: viimased %d surma
-fi: viimeiset %d kuolemantapausta
-fr: les %d derniers décès
-he: %d äîúéí äàçøåğéí
-is: síğustu %d andlát
-it: le ultime %d morti
-lv: pçdçjie %d miruğie
-nl: de %d recentste overlijdens
-no: de siste %d døde
-pl: %d ostatnich zgonów
-pt: os %d óbitos mais recentes
-ro: ultimi %d decedati
-ru: %d ïîñëåäíèõ ñìåğòåé
-sl: zadnjih %d smrti
-sv: de senaste %d avlidna
+    the latest %t deaths
+af: die laaste %t afsterwes
+bg: ïîñëåäíèòå %t óìèğàíèÿ
+br: ar %t tremenvan diwezhañ
+ca: les %t defuncions més recents
+cs: posledních %t úmrtí
+da: de seneste %t dødsfald
+de: die letzten %t Ableben
+en: the latest %t deaths
+eo: la lastaj %t mortoj
+es: las %t muertes más recientes
+et: viimased %t surma
+fi: viimeiset %t kuolemantapausta
+fr: les %t derniers décès
+he: %t äîúéí äàçøåğéí
+is: síğustu %t andlát
+it: le ultime %t morti
+lv: pçdçjie %t miruğie
+nl: de %t recentste overlijdens
+no: de siste %t døde
+pl: %t ostatnich zgonów
+pt: os %t óbitos mais recentes
+ro: ultimi %t decedati
+ru: %t ïîñëåäíèõ ñìåğòåé
+sl: zadnjih %t smrti
+sv: de senaste %t avlidna
 
     the latest %d marriages
 af: die laaste %d huwelike
