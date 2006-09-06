@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.2 2006-08-31 09:38:54 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.3 2006-09-06 20:13:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -944,15 +944,17 @@ value lowercase_name s =
       let c = s.[i] in
       let (c, uncap) =
         match c with
-        [ 'a'..'z' | 'ß'..'ý' ->
+        [ 'a'..'z' ->
             (if uncap then c
              else Char.chr (Char.code c - Char.code 'a' + Char.code 'A'),
              True)
-        | 'A'..'Z' | 'À'..'Ý' ->
+        | 'A'..'Z' ->
             (if not uncap then c
              else Char.chr (Char.code c - Char.code 'A' + Char.code 'a'),
              True)
-        | c -> (c, particle s (i + 1)) ]
+        | c ->
+            if Char.code c < 128 then (c, particle s (i + 1))
+            else (c, uncap) ]
       in
       s.[i] := c;
       loop uncap (i + 1)
