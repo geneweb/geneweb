@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.9 2006-08-22 10:07:03 ddr Exp $ *)
+(* $Id: util.ml,v 5.10 2006-09-08 21:18:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -102,11 +102,20 @@ value rec capitale_utf_8 s =
         else loop (i + 1)
     else if Char.code c < 0b10000000 then String.capitalize s
     else if String.length s == 1 then s
-    else if Char.code c == 0xC3 then
-      let c1 = Char.uppercase (Char.chr (Char.code s.[1] + 0x40)) in
-      String.make 1 c ^ String.make 1 (Char.chr (Char.code c1 - 0x40)) ^
-        String.sub s 2 (String.length s - 2)
-    else s
+    else
+      match Char.code c with
+      [ 0xC3 ->
+          let c1 = Char.uppercase (Char.chr (Char.code s.[1] + 0x40)) in
+          sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
+            (String.sub s 2 (String.length s - 2))
+      | 0xD0 when Char.code s.[1] >= 0xB0 -> (* cyrillic lowercase *)
+          let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
+          sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+      | 0xD1 when Char.code s.[1] < 0x90 -> (* cyrillic lowercase again *)
+          let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
+          sprintf "%c%c%s" (Char.chr 0xD0) c1
+            (String.sub s 2 (String.length s - 2))
+      | _ -> s ]
 ;
 
 value index_of_next_char s i =
