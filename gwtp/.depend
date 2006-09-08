@@ -8,3 +8,5 @@ iolight.cmo: ../src/buff.cmo ../src/def.cmi ../src/iovalue.cmi \
     ../src/secure.cmi 
 iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/iovalue.cmx \
     ../src/secure.cmx 
+recover.cmo: ../src/iobase.cmi iolight.cmo 
+recover.cmx: ../src/iobase.cmx iolight.cmx 
