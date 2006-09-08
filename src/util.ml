@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.10 2006-09-08 21:18:57 ddr Exp $ *)
+(* $Id: util.ml,v 5.11 2006-09-08 21:28:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -107,6 +107,9 @@ value rec capitale_utf_8 s =
       [ 0xC3 ->
           let c1 = Char.uppercase (Char.chr (Char.code s.[1] + 0x40)) in
           sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
+            (String.sub s 2 (String.length s - 2))
+      | 0xC5 when Char.code s.[1] = 0x93 -> (* oe *)
+          sprintf "%c%c%s" c (Char.chr 0x92)
             (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 -> (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
