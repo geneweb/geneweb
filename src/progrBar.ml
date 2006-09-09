@@ -1,4 +1,4 @@
-(* $Id: progrBar.ml,v 5.1 2006-09-09 18:27:44 ddr Exp $ *)
+(* $Id: progrBar.ml,v 5.2 2006-09-09 23:33:03 ddr Exp $ *)
 
 value size = 60;
 value draw_rep = 5;
@@ -7,7 +7,7 @@ value empty = '.';
 value full = ref '#';
 
 value draw_len = String.length draw;
-value cnt = size * draw_rep * draw_len;
+value pb_cnt = size * draw_rep * draw_len;
 
 value start () =
   do {
@@ -23,8 +23,8 @@ value run cnt max_cnt =
     for i = already_disp + 1 to to_disp do {
       Printf.eprintf "%c" full.val
     };
-    let already_disp = cnt * cnt / max_cnt in
-    let to_disp = (cnt + 1) * cnt / max_cnt in
+    let already_disp = cnt * pb_cnt / max_cnt in
+    let to_disp = (cnt + 1) * pb_cnt / max_cnt in
     if cnt = max_cnt - 1 then Printf.eprintf " \008"
     else if to_disp > already_disp then
       let k = to_disp mod draw_len in
