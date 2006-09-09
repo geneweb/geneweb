@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.2 2006-09-09 18:27:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -25,53 +25,9 @@ value relationship base tab ip1 ip2 =
   fst (Consang.relationship_and_links base tab False ip1 ip2)
 ;
 
-value progr_bar_size = 60;
-value progr_bar_draw_rep = 5;
-value progr_bar_draw = "|/-\\";
-value progr_bar_empty = '.';
-value progr_bar_full = '#';
-
-value progr_bar_draw_len = String.length progr_bar_draw;
-value progr_bar_cnt =
-  progr_bar_size * progr_bar_draw_rep * progr_bar_draw_len
-;
-
-value start_progr_bar () =
-  do {
-    for i = 1 to progr_bar_size do { Printf.eprintf "%c" progr_bar_empty };
-    Printf.eprintf "\013"
-  }
-;
-
-value run_progr_bar cnt max_cnt =
-  do {
-    let already_disp = cnt * progr_bar_size / max_cnt in
-    let to_disp = (cnt + 1) * progr_bar_size / max_cnt in
-    for i = already_disp + 1 to to_disp do {
-      Printf.eprintf "%c" progr_bar_full
-    };
-    let already_disp = cnt * progr_bar_cnt / max_cnt in
-    let to_disp = (cnt + 1) * progr_bar_cnt / max_cnt in
-    if cnt = max_cnt - 1 then Printf.eprintf " \008"
-    else if to_disp > already_disp then
-      let k = to_disp mod progr_bar_draw_len in
-      let k = if k < 0 then progr_bar_draw_len + k else k in
-      Printf.eprintf "%c\008" progr_bar_draw.[k]
-    else ();
-    flush stderr;
-  }
-;
-
-value finish_progr_bar () =
-  do {
-    Printf.eprintf "\n";
-    flush stderr;
-  }
-;
-
 value trace quiet cnt max_cnt =
   do {
-    if quiet then run_progr_bar (max_cnt - cnt) max_cnt
+    if quiet then ProgrBar.run (max_cnt - cnt) max_cnt
     else do {
       Printf.eprintf "%7d\008\008\008\008\008\008\008" cnt;
       flush stderr;
@@ -112,7 +68,7 @@ value compute base from_scratch quiet =
     let most = ref None in
     Printf.eprintf "To do: %d persons\n" max_cnt;
     if max_cnt = 0 then ()
-    else if quiet then start_progr_bar ()
+    else if quiet then ProgrBar.start ()
     else Printf.eprintf "Computing consanguinity...";
     flush stderr;
     let running = ref True in
@@ -167,7 +123,7 @@ value compute base from_scratch quiet =
       }
     };
     if max_cnt = 0 then ()
-    else if quiet then finish_progr_bar ()
+    else if quiet then ProgrBar.finish ()
     else Printf.eprintf " done   \n";
     flush stderr;
   }

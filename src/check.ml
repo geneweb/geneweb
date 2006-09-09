@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: check.ml,v 5.2 2006-09-09 18:27:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -184,17 +184,17 @@ value update_stats base current_year s p =
 value check_base_aux base error warning changed_p =
   do {
     Printf.eprintf "check persons\n";
-    ConsangAll.start_progr_bar ();
+    ProgrBar.start ();
     for i = 0 to base.data.persons.len - 1 do {
-      ConsangAll.run_progr_bar i base.data.persons.len;
+      ProgrBar.run i base.data.persons.len;
       let p = base.data.persons.get i in
       if check_person base error warning p then changed_p p else ()
     };
-    ConsangAll.finish_progr_bar ();
+    ProgrBar.finish ();
     Printf.eprintf "check families\n";
-    ConsangAll.start_progr_bar ();
+    ProgrBar.start ();
     for i = 0 to base.data.families.len - 1 do {
-      ConsangAll.run_progr_bar i base.data.families.len;
+      ProgrBar.run i base.data.families.len;
       let fam = base.data.families.get i in
       if is_deleted_family fam then ()
       else
@@ -202,7 +202,7 @@ value check_base_aux base error warning changed_p =
         let des = base.data.descends.get i in
         check_family base error warning fam cpl des
     };
-    ConsangAll.finish_progr_bar ();
+    ProgrBar.finish ();
     check_noloop base error;
   }
 ;

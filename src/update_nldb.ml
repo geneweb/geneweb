@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.2 2006-09-09 18:27:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -32,48 +32,6 @@ value notes_links s =
           in
           loop list_nt list_ind (pos + 1) j
       | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
-;
-
-value progr_bar_size = 60;
-value progr_bar_draw_rep = 5;
-value progr_bar_draw = "|/-\\";
-value progr_bar_empty = '.';
-value progr_bar_full = '*';
-
-value progr_bar_draw_len = String.length progr_bar_draw;
-value progr_bar_cnt = progr_bar_size * progr_bar_draw_rep * progr_bar_draw_len;
-
-value start_progr_bar () =
-  do {
-    for i = 1 to progr_bar_size do { Printf.eprintf "%c" progr_bar_empty };
-    Printf.eprintf "\013"
-  }
-;
-
-value run_progr_bar cnt max_cnt =
-  do {
-    let already_disp = cnt * progr_bar_size / max_cnt in
-    let to_disp = (cnt + 1) * progr_bar_size / max_cnt in
-    for i = already_disp + 1 to to_disp do {
-      Printf.eprintf "%c" progr_bar_full
-    };
-    let already_disp = cnt * progr_bar_cnt / max_cnt in
-    let to_disp = (cnt + 1) * progr_bar_cnt / max_cnt in
-    if cnt = max_cnt - 1 then Printf.eprintf " \008"
-    else if to_disp > already_disp then
-      let k = to_disp mod progr_bar_draw_len in
-      let k = if k < 0 then progr_bar_draw_len + k else k in
-      Printf.eprintf "%c\008" progr_bar_draw.[k]
-    else ();
-    flush stderr;
-  }
-;
-
-value finish_progr_bar () =
-  do {
-    Printf.eprintf "\n";
-    flush stderr;
-  }
 ;
 
 value read_file_contents fname =
@@ -168,7 +126,8 @@ value compute base bdir =
     loop Filename.current_dir_name "";
     Printf.eprintf "--- individual notes\n";
     flush stderr;
-    start_progr_bar ();
+    ProgrBar.full.val := '*';
+    ProgrBar.start ();
     for i = 0 to len - 1 do {
       let p = base.data.persons.get i in
       let list = notes_links (Gutil.sou base p.notes) in
@@ -176,9 +135,9 @@ value compute base bdir =
       else
         let pg = NotesLinks.PgInd (Adef.iper_of_int i) in
         NotesLinks.update_db bdir pg list;
-      run_progr_bar i len
+      ProgrBar.run i len
     };
-    finish_progr_bar ();
+    ProgrBar.finish ();
   }
 ;
 
