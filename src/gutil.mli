@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.2 2006-09-09 18:27:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -148,5 +148,4 @@ value remove_dir : string -> unit;
 value mkdir_p : string -> unit;
 
 (* for compatibility databases version <= 4.10 which are not in utf-8 *)
-
 value utf_8_db : ref bool;
