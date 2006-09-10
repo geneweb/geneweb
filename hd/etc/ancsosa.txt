@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.3 2006-08-26 06:51:51 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.4 2006-09-10 16:19:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -233,7 +233,8 @@
           %end;
           </dd>
         %end;
-        %if;(evar.siblings = "on" and ancestor.is_female and ancestor.same = "")
+        %if;(evar.siblings = "on" and
+	     ancestor.is_female and ancestor.same = "")
           %( siblings %)
           %if;(ancestor.index != self.index)
             %foreach;ancestor.family;
@@ -310,7 +311,8 @@
 %end;
 
 %define;child_long_info(spec)
-  <b>%apply;my_link(child.access, child.child_name, child.is_restricted)</b>%nn;
+  <b>%apply;my_link(child.access, child.child_name, child.is_restricted)%nn;
+  </b>%nn;
   %apply;somebody_long_info("child")
   %if;(child.sosa_in_list != "").
     %if;(evar.only != "on")[*see]%sp;
@@ -751,7 +753,8 @@
         %if;(ancestor.same = "" and ancestor.is_descendant)
           %lazy_force;
           <li>%ancestor.anc_sosa; -%sp;
-          <a href="%prefix;%ancestor.access;">%ancestor;</a>%ancestor.dates;
+          <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
+	  %ancestor.title;%ancestor.dates;
           </li>
         %end;
       %end;
