@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.2 2006-09-10 21:17:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -669,12 +669,10 @@ value insert_syntax fname gen =
   | Wnotes wizid str -> insert_wiznote fname gen wizid str ]
 ;
 
-value insert_comp_families gen (x, separate, shift) =
-(**)
-  let _ = do { Printf.eprintf "%s " x; flush stderr; } in
-(**)
-  let ic = open_in_bin x in
+value insert_comp_families gen run (x, separate, shift) =
   do {
+    run ();
+    let ic = open_in_bin x in
     check_magic x ic;
     gen.g_separate := separate;
     gen.g_shift := shift;
@@ -870,15 +868,18 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
 ;
 
 value link gwo_list bname =
-  let gwb_dir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  let tmp_dir =
+    let d =
+      if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+    in
+    Filename.concat "gw_tmp" d
   in
-  let tmp_per_index = Filename.concat gwb_dir "gwc_per_index" in
-  let tmp_per = Filename.concat gwb_dir "gwc_per" in
-  let tmp_fam_index = Filename.concat gwb_dir "gwc_fam_index" in
-  let tmp_fam = Filename.concat gwb_dir "gwc_fam" in
+  let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
+  let tmp_per = Filename.concat tmp_dir "gwc_per" in
+  let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
+  let tmp_fam = Filename.concat tmp_dir "gwc_fam" in
   do {
-    try Unix.mkdir gwb_dir 0o755 with _ -> ();
+    try Gutil.mkdir_p tmp_dir with _ -> ();
     let gen =
       {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
        g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
@@ -902,8 +903,24 @@ value link gwo_list bname =
     IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
     IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
     IFDEF UNIX THEN Sys.remove tmp_fam ELSE () END;
-    List.iter (insert_comp_families gen) gwo_list;
-    Printf.eprintf "\n"; flush stderr;
+    let ngwo = List.length gwo_list in
+    let run =
+      if ngwo < 10 then fun () -> ()
+      else if ngwo < 60 then
+        fun () -> do { Printf.eprintf "."; flush stderr; }
+      else do {
+        let bar_cnt = ref 0 in
+        let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
+        ProgrBar.empty.val := 'o';
+        ProgrBar.full.val := '*';
+        ProgrBar.start ();
+        run
+      }
+    in
+    List.iter (insert_comp_families gen run) gwo_list;
+    if ngwo < 10 then ()
+    else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
+    else ProgrBar.finish ();
     close_out gen.g_per_index;
     close_out gen.g_per;
     close_out gen.g_fam_index;
