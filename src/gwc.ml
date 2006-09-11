@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.2 2006-09-10 21:17:30 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.3 2006-09-11 10:10:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -867,19 +867,12 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
   {data = base_data; func = base_func}
 ;
 
-value link gwo_list bname =
-  let tmp_dir =
-    let d =
-      if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-    in
-    Filename.concat "gw_tmp" d
-  in
+value link gwo_list tmp_dir =
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
   let tmp_fam = Filename.concat tmp_dir "gwc_fam" in
   do {
-    try Gutil.mkdir_p tmp_dir with _ -> ();
     let gen =
       {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
        g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
@@ -1079,8 +1072,17 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       }
       else ();
       lock (Iobase.lock_file out_file.val) with
-      [ Accept ->
-          match link (List.rev gwo.val) out_file.val with
+      [ Accept -> do {
+          let tmp_dir =
+            let d =
+              let bname = out_file.val in
+              if Filename.check_suffix bname ".gwb" then bname
+              else bname ^ ".gwb"
+            in
+            Filename.concat "gw_tmp" d
+          in
+          try Gutil.mkdir_p tmp_dir with _ -> ();
+          match link (List.rev gwo.val) tmp_dir with
           [ Some (base, wiznotes) ->
               do {
                 Gc.compact ();
@@ -1088,6 +1090,8 @@ The database \"%s\" already exists. Use option -f to overwrite it.
                 output_wizard_notes out_file.val wiznotes;
                 output_command_line out_file.val;
                 output_particles_file out_file.val base.data.particles;
+                try Gutil.remove_dir tmp_dir with _ -> ();
+                try Unix.rmdir "gw_tmp" with _ -> ();
               }
           | None ->
               do {
@@ -1095,6 +1099,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
                 flush stdout;
                 exit 2;
               } ]
+        }
       | Refuse ->
           do {
             printf "Base is locked: cannot write it\n";
