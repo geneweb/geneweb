@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: surname.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: surname.txt,v 5.2 2006-09-13 08:44:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[surname/surnames]0: %surname;</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -9,7 +9,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>
 %base_header;

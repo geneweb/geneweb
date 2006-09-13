@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 5.4 2006-01-30 14:10:00 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 5.5 2006-09-13 08:44:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -17,7 +17,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>
 %base_header;
