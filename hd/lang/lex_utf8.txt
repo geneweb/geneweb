@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.25 2006-09-13 13:17:57 ddr Exp $
+# $Id: lex_utf8.txt,v 5.26 2006-09-13 13:33:01 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -8425,33 +8425,6 @@ ru: %d последних рождений
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
 
-    the latest %t deaths
-af: die laaste %t afsterwes
-bg: последните %t умирания
-br: ar %t tremenvan diwezhañ
-ca: les %t defuncions més recents
-cs: posledních %t úmrtí
-da: de seneste %t dødsfald
-de: die letzten %t Ableben
-en: the latest %t deaths
-eo: la lastaj %t mortoj
-es: las %t muertes más recientes
-et: viimased %t surma
-fi: viimeiset %t kuolemantapausta
-fr: les %t derniers décès
-he: %t המתים האחרונים
-is: síðustu %t andlát
-it: le ultime %t morti
-lv: pēdējie %t mirušie
-nl: de %t recentste overledenen
-no: de siste %t døde
-pl: %t ostatnich zgonów
-pt: os %t óbitos mais recentes
-ro: ultimi %t decedati
-ru: %t последних смертей
-sl: zadnjih %t smrti
-sv: de senaste %t avlidna
-
     the latest %d marriages
 af: die laaste %d huwelike
 bg: последните %d брака
@@ -8478,6 +8451,33 @@ ro: ultimi %d insurati
 ru: последние %d браков
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
+
+    the latest %t deaths
+af: die laaste %t afsterwes
+bg: последните %t умирания
+br: ar %t tremenvan diwezhañ
+ca: les %t defuncions més recents
+cs: posledních %t úmrtí
+da: de seneste %t dødsfald
+de: die letzten %t Ableben
+en: the latest %t deaths
+eo: la lastaj %t mortoj
+es: las %t muertes más recientes
+et: viimased %t surma
+fi: viimeiset %t kuolemantapausta
+fr: les %t derniers décès
+he: %t המתים האחרונים
+is: síðustu %t andlát
+it: le ultime %t morti
+lv: pēdējie %t mirušie
+nl: de %t recentste overledenen
+no: de siste %t døde
+pl: %t ostatnich zgonów
+pt: os %t óbitos mais recentes
+ro: ultimi %t decedati
+ru: %t последних смертей
+sl: zadnjih %t smrti
+sv: de senaste %t avlidna
 
     the parents
 af: die ouers

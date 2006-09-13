@@ -70,6 +70,7 @@ anniversaries of dead people
 anniversaries of marriage
 are
 at the same time
+average death age
 back
 baptism
 baptized
@@ -307,8 +308,8 @@ the grandparents
 the great-grandchildren
 the great-grandparents
 the latest %d births
-the latest %d deaths
 the latest %d marriages
+the latest %t deaths
 the parents
 the spouse
 the whole list
