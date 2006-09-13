@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.2 2006-08-25 08:43:26 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.3 2006-09-13 08:44:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -23,7 +23,7 @@
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
     .found { color: black; background-color: #afa;font-weight:bold }
-    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>
 %base_header;

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.4 2006-09-10 16:19:19 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.5 2006-09-13 08:44:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -23,7 +23,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>
 %base_header;

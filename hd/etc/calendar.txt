@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: calendar.txt,v 5.3 2006-08-25 09:37:31 ddr Exp $ -->
+  <!-- $Id: calendar.txt,v 5.4 2006-09-13 08:44:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="ROBOTS" content="NONE"%/>
@@ -9,7 +9,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; margin: 0; border-bottom: 1px solid }
+    hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>
 %base_header;
