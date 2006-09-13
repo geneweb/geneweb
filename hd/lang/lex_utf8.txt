@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.24 2006-08-25 09:54:30 ddr Exp $
+# $Id: lex_utf8.txt,v 5.25 2006-09-13 13:17:57 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -7926,7 +7926,7 @@ fi: %d vanhinta ehkä vielä elävää
 fr: les %d les plus âgés peut-être encore vivants
 he:  הזקן ה %d  שאולי עוד בחיים
 is: %d elsti sem kann að vera á lífi
-it: i%d più vecchi possono essere ancora viventi
+it: %d più anziani che possono essere ancora viventi
 lv: %d visvecākie iespējams vēl ir dzīvi
 nl: de %d oudste, mogelijk nog in leven zijnde, personen
 no: de %d eldste som muligens lever
@@ -9466,6 +9466,7 @@ es: tu mensaje espera su validación
 et: teade ootab kinnitamist
 fi: viestisi odottaa tarkistusta 
 fr: votre message est en attente de validation
+it: il vostro messaggio è in attesa di convalida
 nl: uw bericht wacht op validatie
 no: Beskjeden din avventer bekreftelse
 pl: twoja wiadomość czeka na potwierdzenie
