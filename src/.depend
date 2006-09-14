@@ -92,10 +92,10 @@ gutil.cmx: adef.cmx buff.cmx def.cmi name.cmx gutil.cmi
 gutil.cmi: adef.cmi def.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmo def.cmi gutil.cmi \
     gwcomp.cmo iobase.cmi iovalue.cmi lock.cmi name.cmi notesLinks.cmo \
-    secure.cmi 
+    progrBar.cmi secure.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
     gwcomp.cmx iobase.cmx iovalue.cmx lock.cmx name.cmx notesLinks.cmx \
-    secure.cmx 
+    progrBar.cmx secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
