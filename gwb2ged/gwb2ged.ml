@@ -1,8 +1,9 @@
-(* $Id: gwb2ged.ml,v 5.2 2006-08-31 09:56:25 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
+open Gwdb;
 open Printf;
 
 type charset =

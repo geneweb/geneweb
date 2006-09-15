@@ -1,7 +1,8 @@
-(* $Id: gutil.ml,v 5.5 2006-01-01 21:15:09 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.6 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
+open Gwdb;
 
 value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);

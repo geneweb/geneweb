@@ -1,11 +1,12 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.5 2006-08-19 19:16:39 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.6 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
+open Gwdb;
 open Util;
-open Config;
 
 value get_k conf =
   match p_getint conf.env "k" with
@@ -19,7 +20,7 @@ value select conf base get_date find_oldest =
   let module Q =
     Pqueue.Make
       (struct
-         type t = (Def.person * Def.dmy * Def.calendar);
+         type t = (Gwdb.person * Def.dmy * Def.calendar);
          value leq (_, x, _) (_, y, _) =
            if find_oldest then Date.before_date x y else Date.before_date y x
          ;
@@ -72,7 +73,7 @@ value select_family conf base get_date find_oldest =
   let module QF =
     Pqueue.Make
       (struct
-         type t = (Def.family * Def.dmy * Def.calendar);
+         type t = (Gwdb.family * Def.dmy * Def.calendar);
          value leq (_, x, _) (_, y, _) =
            if find_oldest then Date.before_date x y else Date.before_date y x;
        end)
