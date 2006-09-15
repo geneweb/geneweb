@@ -1,8 +1,9 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.2 2006-09-09 18:27:44 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
+open Gwdb;
 
 value fname = ref "";
 

@@ -1,12 +1,13 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.5 2006-01-30 10:42:56 ddr Exp $ *)
+(* $Id: perso.ml,v 5.6 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
-open Util;
-open Config;
+open Gwdb;
 open TemplAst;
+open Util;
 
 value max_im_wid = 240;
 value max_im_hei = 240;

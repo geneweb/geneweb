@@ -1,17 +1,17 @@
-(* $Id: gwdb.mli,v 5.1 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.2 2006-09-15 11:49:15 ddr Exp $ *)
 
-open Def;
+open Adef;
 
-type person = gen_person iper istr;
-type ascend = gen_ascend ifam;
-type union = gen_union ifam;
+type person = Def.gen_person iper istr;
+type ascend = Def.gen_ascend ifam;
+type union = Def.gen_union ifam;
 
-type family = gen_family iper istr;
-type couple = gen_couple iper;
-type descend = gen_descend iper;
+type family = Def.gen_family iper istr;
+type couple = Def.gen_couple iper;
+type descend = Def.gen_descend iper;
 
-type relation = gen_relation iper istr;
-type title = gen_title istr;
+type relation = Def.gen_relation iper istr;
+type title = Def.gen_title istr;
 
 type rn_mode = [ RnAll | Rn1Ch | Rn1Ln ];
 

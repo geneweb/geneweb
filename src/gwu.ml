@@ -1,8 +1,9 @@
-(* $Id: gwu.ml,v 5.2 2006-01-11 10:57:43 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
+open Gwdb;
 open Printf;
 
 type mfam =

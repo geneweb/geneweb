@@ -1,10 +1,11 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.2 2006-01-12 10:46:59 ddr Exp $ *)
+(* $Id: title.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
+open Gwdb;
 open Util;
 
 type date_search = [ JustSelf | AddSpouse | AddChildren ];

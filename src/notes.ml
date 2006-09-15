@@ -1,10 +1,10 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.5 2006-08-22 10:07:03 ddr Exp $ *)
+(* $Id: notes.ml,v 5.6 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
-open Def;
 open Gutil;
+open Gwdb;
 open Util;
 
 value file_path conf fname =

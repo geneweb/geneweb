@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: place.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
+open Gwdb;
 open Util;
-open Config;
 
 value fold_place inverted s =
   let rec loop iend list i ibeg =
