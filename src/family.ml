@@ -1,10 +1,11 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: family.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
-open Config;
+open Gwdb;
 open Util;
 
 value person_is_std_key conf base p k =

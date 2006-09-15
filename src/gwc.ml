@@ -1,10 +1,11 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.3 2006-09-11 10:10:07 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Gwcomp;
+open Gwdb;
 open Printf;
 
 type gen_min_person 'person 'string =
@@ -791,7 +792,7 @@ value empty_base : cbase =
    c_bnotes = {nread = fun _ _ -> ""; norigin_file = ""; efiles _ = []}}
 ;
 
-value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
+value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Gwdb.base =
 (**)
   let _ =
     do {

@@ -1,14 +1,15 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.4 2006-05-24 09:19:57 ddr Exp $ *)
+(* $Id: descend.ml,v 5.5 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
 
 open Config;
 open Def;
-open Gutil;
-open Util;
 open Dag2html;
+open Gutil;
+open Gwdb;
+open Util;
 
 value limit_by_tree conf =
   match p_getint conf.base_env "max_desc_tree" with

@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 5.1 2006-01-01 05:35:06 ddr Exp $ *)
+(* $Id: gwtp.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Printf;
@@ -651,8 +651,8 @@ value make_temp env b =
     flush stdout;
     let base = Iolight.input bdir in
     printf "\n";
-    printf "persons: %d\n" base.Def.data.Def.persons.Def.len;
-    printf "families: %d\n\n" base.Def.data.Def.families.Def.len;
+    printf "persons: %d\n" base.Gwdb.data.Gwdb.persons.Gwdb.len;
+    printf "families: %d\n\n" base.Gwdb.data.Gwdb.families.Gwdb.len;
     flush stdout;
     Secure.set_base_dir (Filename.dirname bdir);
     Iobase.output bdir base;

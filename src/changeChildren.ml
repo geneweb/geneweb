@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
-open Config;
+open Gwdb;
 open Util;
 
 value print_child_person conf base p =
