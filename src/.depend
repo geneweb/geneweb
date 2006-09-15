@@ -104,7 +104,7 @@ gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
 gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     family.cmx gutil.cmx image.cmx lock.cmx relationLink.cmx robot.cmx \
     secure.cmx srcfile.cmx util.cmx version.cmx ../wserver/wserver.cmx 
-gwdb.cmi: def.cmi 
+gwdb.cmi: adef.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi notesLinks.cmo secure.cmi select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx gwdb.cmi \

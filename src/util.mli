@@ -1,8 +1,9 @@
-(* $Id: util.mli,v 5.3 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: util.mli,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Def;
 open Config;
+open Def;
+open Gwdb;
 
 value add_lang_path : string -> unit;
 value add_doc_path : string -> unit;

@@ -1,12 +1,13 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
-open Util;
-open Config;
+open Gwdb;
 open TemplAst;
+open Util;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
 

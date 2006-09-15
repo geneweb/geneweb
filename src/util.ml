@@ -1,10 +1,11 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.12 2006-09-13 08:44:46 ddr Exp $ *)
+(* $Id: util.ml,v 5.13 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Def;
 open Config;
+open Def;
 open Gutil;
+open Gwdb;
 open Printf;
 
 value sharelib =

@@ -1,12 +1,13 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: some.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
-open Config;
-open Util;
+open Gwdb;
 open TemplAst;
+open Util;
 
 value not_found conf txt x =
   let title _ = Wserver.wprint "%s: \"%s\"" (capitale txt) x in

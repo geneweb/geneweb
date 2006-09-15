@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 5.2 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
-open Util;
 open Gutil;
+open Gwdb;
+open Util;
 
 value need_differences_selection conf base fam1 fam2 =
   let need_selection proj =

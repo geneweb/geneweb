@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.3 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
-open Util;
 open Gutil;
+open Gwdb;
+open Util;
 
 value print_differences conf base branches p1 p2 =
   let gen_string_field chk1 chk2 str_orig title name proj =
