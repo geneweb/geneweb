@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.10 2006-09-16 21:05:12 ddr Exp $ *)
+(* $Id: def.mli,v 5.11 2006-09-16 21:33:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -120,7 +120,7 @@ type gen_person 'person 'string =
 
 type gen_ascend 'family =
   { parents : option 'family;
-    consang : mutable Adef.fix }
+    consang : Adef.fix }
 ;
 
 type gen_union 'family =
