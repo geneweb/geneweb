@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.6 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.7 2006-09-16 03:16:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -900,7 +900,7 @@ value related_sex_is_coherent base warning p_ref =
       (Some p_ref.sex) p_ref.related
   in
   match new_sex with
-  [ Some g -> if p_ref.sex != g then do { p_ref.sex := g; False } else True
+  [ Some g -> if p_ref.sex != g then False else True
   | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
 

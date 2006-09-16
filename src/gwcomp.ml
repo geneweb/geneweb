@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.3 2006-09-16 02:15:39 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.4 2006-09-16 03:16:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -546,7 +546,7 @@ value create_person () =
 
 value bogus_def p n o = p = "?" || n = "?";
 
-value set_infos fn sn occ comm_psources comm_birth_place str u l =
+value set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let (first_names_aliases, l) = get_fst_names_aliases str l in
   let (surnames_aliases, l) = get_surnames_aliases str l in
   let (public_name, l) = get_pub_name str l in
@@ -592,7 +592,7 @@ value set_infos fn sn occ comm_psources comm_birth_place str u l =
   let (burial_src, l) = get_field "#rs" l in
   let u =
     {first_name = fn; surname = sn; occ = occ;
-     rparents = u.rparents; related = u.related; sex = u.sex; notes = u.notes;
+     rparents = u.rparents; related = u.related; sex = sex; notes = u.notes;
      cle_index = u.cle_index; first_names_aliases = first_names_aliases;
      surnames_aliases = surnames_aliases; public_name = public_name;
      image = image; qualifiers = qualifiers; aliases = aliases;
@@ -625,12 +625,12 @@ value parse_parent str l =
     (Undefined key, np, l)
   else do {
     let u = create_person () in
-    let (u, l) = set_infos pp np op "" "" str u l in
+    let (u, l) = set_infos pp np op u.sex "" "" str u l in
     (Defined u, np, l)
   }
 ;
 
-value parse_child str surname csrc cbp l =
+value parse_child str surname sex csrc cbp l =
   let u = create_person () in
   let (prenom, occ, l) = get_fst_name str l in
   do {
@@ -645,7 +645,7 @@ value parse_child str surname csrc cbp l =
           | _ -> get_name str l ]
       | _ -> (surname, []) ]
     in
-    set_infos prenom nom occ csrc cbp str u l
+    set_infos prenom nom occ sex csrc cbp str u l
   }
 ;
 
@@ -798,9 +798,8 @@ value read_family ic fname =
                 match read_line ic with
                 [ Some (str, ["-" :: l]) ->
                     let (sex, l) = get_optional_sexe l in
-                    let (child, l) = parse_child str surname csrc cbp l in
+                    let (child, l) = parse_child str surname sex csrc cbp l in
                     do {
-                      child.sex := sex;
                       if l <> [] then failwith str
                       else loop [child :: children]
                     }

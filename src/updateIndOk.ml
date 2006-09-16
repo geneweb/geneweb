@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.5 2006-09-16 01:09:35 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.6 2006-09-16 03:16:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -499,11 +499,10 @@ value effective_add conf base sp =
     let created_p = ref [] in
     let np =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
-        (Update.insert_string base) sp
+        (Update.insert_string base) {(sp) with cle_index = pi}
     in
     let na = no_ascend () in
     let nu = {family = [| |]} in
-    np.cle_index := pi;
     base.func.patch_person pi np;
     base.func.patch_ascend pi na;
     base.func.patch_union pi nu;
