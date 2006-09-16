@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.4 2006-09-16 12:51:14 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.5 2006-09-16 20:15:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -134,8 +134,6 @@ value set_mother : gen_couple 'a -> 'a -> unit;
 value parents : gen_ascend 'a -> option 'a;
 value consang : gen_ascend 'a -> Adef.fix;
 value no_ascend : unit -> gen_ascend 'a;
-value set_parents : gen_ascend 'a -> option 'a -> unit;
-value set_consang : gen_ascend 'a -> Adef.fix -> unit;
 
 value find_free_occ : base -> string -> string -> int -> int;
 

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.4 2006-09-16 20:15:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -13,7 +13,7 @@ value rec clear_descend_consang base mark ifam =
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
          let a = aoi base ip in
-         set_consang a no_consang;
+         a.consang := no_consang;
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
          Array.iter (clear_descend_consang base mark) u.family
@@ -58,7 +58,7 @@ value compute base from_scratch quiet =
     else ();
     for i = 0 to base.data.ascends.len - 1 do {
       let a = base.data.ascends.get i in
-      if from_scratch then set_consang a no_consang
+      if from_scratch then a.consang := no_consang
       else
         match parents a with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := consang a
@@ -93,7 +93,7 @@ value compute base from_scratch quiet =
                   in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
-                  set_consang a (Adef.fix_of_float consang);
+                  a.consang := Adef.fix_of_float consang;
                   consang_tab.(Adef.int_of_ifam ifam) := Gutil.consang a;
                   if not quiet then
                     let better =
@@ -112,13 +112,13 @@ value compute base from_scratch quiet =
                 }
                 else running.val := True
               else do {
-                trace quiet cnt.val max_cnt; decr cnt; set_consang a pconsang
+                trace quiet cnt.val max_cnt; decr cnt; a.consang := pconsang
               }
           | None ->
               do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                set_consang a (Adef.fix_of_float 0.0)
+                a.consang := Adef.fix_of_float 0.0
               } ]
         else ()
       }

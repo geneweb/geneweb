@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.5 2006-09-16 10:08:20 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.6 2006-09-16 20:15:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -492,9 +492,9 @@ value effective_mod conf base sfam scpl sdes =
       (fun ip ->
          let a = find_asc ip in
          do {
-           set_parents a None;
+           a.parents := None;
            if not (array_memq ip ndes.children) then
-             set_consang a (Adef.fix (-1))
+             a.consang := Adef.fix (-1)
            else ()
          })
       odes.children;
@@ -505,9 +505,9 @@ value effective_mod conf base sfam scpl sdes =
          [ Some _ -> print_err_parents conf base (poi base ip)
          | None ->
              do {
-               set_parents a (Some fi);
+               a.parents := Some fi;
                if not (array_memq ip odes.children) || not same_parents then
-                 set_consang a (Adef.fix (-1))
+                 a.consang := Adef.fix (-1)
                else ()
              } ])
       ndes.children;
@@ -598,11 +598,8 @@ value effective_add conf base sfam scpl sdes =
          match parents a with
          [ Some _ -> print_err_parents conf base p
          | None ->
-             do {
-               set_parents a (Some fi);
-               set_consang a (Adef.fix (-1));
-               base.func.patch_ascend p.cle_index a
-             } ])
+             let a = {parents = Some fi; consang = Adef.fix (-1)} in
+             base.func.patch_ascend p.cle_index a ])
       ndes.children;
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
@@ -637,12 +634,8 @@ value kill_family base fam ip =
 ;
 
 value kill_parents base ip =
-  let a = aoi base ip in
-  do {
-    set_parents a None;
-    set_consang a (Adef.fix (-1));
-    base.func.patch_ascend ip a
-  }
+  let a = {parents = None; consang = Adef.fix (-1)} in
+  base.func.patch_ascend ip a
 ;
 
 value effective_del conf base fam = do {

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.7 2006-09-16 12:51:14 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.8 2006-09-16 20:15:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -562,7 +562,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          let a = aoi gen.g_base ix in
          do {
            verif_parents_non_deja_definis gen ix pere mere;
-           set_parents a (Some (Adef.ifam_of_int i));
+           a.parents := Some (Adef.ifam_of_int i);
          })
       children;
   }
