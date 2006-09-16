@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.8 2006-09-16 20:15:06 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.9 2006-09-16 21:05:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -559,10 +559,11 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     notice_sex gen mere moth_sex;
     Array.iter
       (fun ix ->
-         let a = aoi gen.g_base ix in
+         let a = gen.g_base.c_ascends.(Adef.int_of_iper ix) in
          do {
            verif_parents_non_deja_definis gen ix pere mere;
-           a.parents := Some (Adef.ifam_of_int i);
+           let a = {(a) with parents = Some (Adef.ifam_of_int i)} in
+           gen.g_base.c_ascends.(Adef.int_of_iper ix) := a
          })
       children;
   }

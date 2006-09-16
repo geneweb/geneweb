@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.9 2006-09-16 20:15:05 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.10 2006-09-16 21:05:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1809,10 +1809,14 @@ value add_fam_norm gen r adop_list =
            let ip = per_index gen r.rval in
            if List.mem_assoc ip adop_list then
              match gen.g_per.arr.(Adef.int_of_iper ip) with
-             [ Right3 _ a _ ->
+             [ Right3 p a u ->
                  match parents a with
                  [ Some ifam ->
-                     if ifam = i then do { a.parents := None; ipl }
+                     if ifam = i then do {
+                       let a = {(a) with parents = None} in
+                       gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
+                       ipl
+                     }
                      else [ip :: ipl]
                  | None -> [ip :: ipl] ]
              | _ -> [ip :: ipl] ]
@@ -2219,7 +2223,8 @@ value add_parents_to_isolated gen =
             [ Right3 fam cpl des -> do {
                 let des = {children = [| p.cle_index |]} in
                 gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
-                a.parents := Some ifam;
+                let a = {(a) with parents = Some ifam} in
+                gen.g_per.arr.(i) := Right3 p a u
               }
             | _ -> () ];
           }
@@ -2335,16 +2340,17 @@ value array_memq x a =
     else loop (i + 1)
 ;
 
-value check_parents_children base descends =
+value check_parents_children base ascends descends =
   let to_delete = ref [] in
   let fam_to_delete = ref [] in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let a = base.data.ascends.get i in
-      match parents a with
+      let a = ascends.(i) in
+      match a.parents with
       [ Some ifam ->
           let fam = foi base ifam in
-          if fam.fam_index == Adef.ifam_of_int (-1) then a.parents := None
+          if fam.fam_index == Adef.ifam_of_int (-1) then
+            ascends.(i) := {(a) with parents = None}
           else
             let cpl = coi base ifam in
             let des = doi base ifam in
@@ -2361,7 +2367,7 @@ value check_parents_children base descends =
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              a.parents := None
+              ascends.(i) := {(a) with parents = None}
             }
       | None -> () ];
       fam_to_delete.val := [];
@@ -2422,9 +2428,9 @@ value check_parents_children base descends =
       let cpl = base.data.couples.get i in
       let des = descends.(i) in
       for j = 0 to Array.length des.children - 1 do {
-        let a = aoi base des.children.(j) in
+        let a = ascends.(Adef.int_of_iper des.children.(j)) in
         let p = poi base des.children.(j) in
-        match parents a with
+        match a.parents with
         [ Some ifam ->
             if Adef.int_of_ifam ifam <> i then do {
               fprintf log_oc.val "Other parents for %s\n"
@@ -2451,7 +2457,8 @@ value check_parents_children base descends =
               fprintf log_oc.val "=> added parents\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              a.parents := Some fam.fam_index
+              let a = {(a) with parents = Some fam.fam_index} in
+              ascends.(Adef.int_of_iper des.children.(j)) := a
             } ]
       };
       if to_delete.val <> [] then
@@ -2621,7 +2628,7 @@ value finish_base base =
       else ()
     };
     check_parents_sex base persons;
-    check_parents_children base descends;
+    check_parents_children base ascends descends;
     if try_negative_dates.val then negative_dates base persons families
     else ();
     Check.check_base base
