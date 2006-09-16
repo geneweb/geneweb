@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.7 2006-09-16 10:08:20 ddr Exp $ *)
+(* $Id: def.mli,v 5.8 2006-09-16 16:16:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -65,8 +65,8 @@ type relation_type =
 
 type gen_relation 'person 'string =
   { r_type : relation_type;
-    r_fath : mutable option 'person;
-    r_moth : mutable option 'person;
+    r_fath : option 'person;
+    r_moth : option 'person;
     r_sources : 'string }
 ;
 
