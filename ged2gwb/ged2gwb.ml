@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.7 2006-09-16 10:08:20 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.8 2006-09-16 18:21:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1257,9 +1257,12 @@ value adop_parent gen ip r =
   let i = per_index gen r.rval in
   match gen.g_per.arr.(Adef.int_of_iper i) with
   [ Left3 _ -> None
-  | Right3 p _ _ ->
+  | Right3 p a u ->
       do {
-        if List.memq ip p.related then () else p.related := [ip :: p.related];
+        if List.memq ip p.related then ()
+        else
+          let p = {(p) with related = [ip :: p.related]} in
+          gen.g_per.arr.(Adef.int_of_iper i) := Right3 p a u;
         Some p.cle_index
       } ]
 ;
@@ -2105,9 +2108,11 @@ value pass2 gen fname =
     List.iter
       (fun (ipp, ip) ->
          match gen.g_per.arr.(Adef.int_of_iper ipp) with
-         [ Right3 p _ _ ->
+         [ Right3 p a u ->
              if List.memq ip p.related then ()
-             else p.related := [ip :: p.related]
+             else
+               let p = {(p) with related = [ip :: p.related]} in
+               gen.g_per.arr.(Adef.int_of_iper ipp) := Right3 p a u
          | _ -> () ])
       gen.g_godp;
     close_in ic
@@ -2154,10 +2159,14 @@ value pass3 gen fname =
                (gen.g_per.arr.(Adef.int_of_iper (father cpl)),
                 gen.g_per.arr.(Adef.int_of_iper ip))
              with
-             [ (Right3 pfath _ _, Right3 p _ _) ->
+             [ (Right3 pfath _ _, Right3 p a u) ->
                  do {
                    if List.memq (father cpl) p.related then ()
-                   else p.related := [(father cpl) :: p.related];
+                   else
+                     let p =
+                       {(p) with related = [(father cpl) :: p.related]}
+                     in
+                     gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
                    fam.witnesses := Array.append fam.witnesses [| ip |]
                  }
              | _ -> () ]

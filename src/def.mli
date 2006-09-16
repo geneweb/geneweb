@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.8 2006-09-16 16:16:58 ddr Exp $ *)
+(* $Id: def.mli,v 5.9 2006-09-16 18:21:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -97,7 +97,7 @@ type gen_person 'person 'string =
     surnames_aliases : list 'string;
     titles : list (gen_title 'string);
     rparents : list (gen_relation 'person 'string);
-    related : mutable list iper;
+    related : list iper;
     occupation : 'string;
     sex : sex;
     access : access;
