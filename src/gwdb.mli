@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.2 2006-09-15 11:49:15 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.3 2006-09-16 10:08:20 ddr Exp $ *)
 
 open Adef;
 
@@ -16,9 +16,9 @@ type title = Def.gen_title istr;
 type rn_mode = [ RnAll | Rn1Ch | Rn1Ln ];
 
 type notes =
-  { nread : mutable string -> rn_mode -> string;
-    norigin_file : mutable string;
-    efiles  : mutable unit -> list string }
+  { nread : string -> rn_mode -> string;
+    norigin_file : string;
+    efiles : unit -> list string }
 ;
 
 type cache 'a =

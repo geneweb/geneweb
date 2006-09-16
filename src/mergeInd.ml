@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.6 2006-09-16 02:15:39 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.7 2006-09-16 10:08:20 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -395,20 +395,24 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
 value effective_merge_fam conf base fam1 fam2 p1 p2 =
   let des1 = doi base fam1.fam_index in
   let des2 = doi base fam2.fam_index in
+  let fam1 =
+    {(fam1) with
+     marriage =
+       if fam1.marriage = Adef.codate_None then fam2.marriage
+       else fam1.marriage;
+     marriage_place =
+       if fam1.marriage_place = Adef.istr_of_int 0 then fam2.marriage_place
+       else fam1.marriage_place;
+     marriage_src =
+       if fam1.marriage_src = Adef.istr_of_int 0 then fam2.marriage_src
+       else fam1.marriage_src;
+     fsources =
+       if fam1.fsources = Adef.istr_of_int 0 then fam2.fsources
+       else fam1.fsources}
+  in
   do {
-    if fam1.marriage = Adef.codate_None then fam1.marriage := fam2.marriage
-    else ();
-    if fam1.marriage_place = Adef.istr_of_int 0 then
-      fam1.marriage_place := fam2.marriage_place
-    else ();
-    if fam1.marriage_src = Adef.istr_of_int 0 then
-      fam1.marriage_src := fam2.marriage_src
-    else ();
-    if fam1.fsources = Adef.istr_of_int 0 then
-      fam1.fsources := fam2.fsources
-    else ();
     base.func.patch_family fam1.fam_index fam1;
-    des1.children := Array.append des1.children des2.children;
+    let des1 = {children = Array.append des1.children des2.children} in
     base.func.patch_descend fam1.fam_index des1;
     for i = 0 to Array.length des2.children - 1 do {
       let ip = des2.children.(i) in
@@ -416,7 +420,7 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
       set_parents a (Some fam1.fam_index);
       base.func.patch_ascend ip a;
     };
-    des2.children := [| |];
+    let des2 = {children = [| |]} in
     base.func.patch_descend fam2.fam_index des2;
     UpdateFamOk.effective_del conf base fam2;
   }
