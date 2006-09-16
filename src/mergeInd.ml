@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.5 2006-09-16 00:23:19 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.6 2006-09-16 02:15:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -309,39 +309,44 @@ value effective_merge_ind conf base p1 p2 =
       base.func.patch_union p2.cle_index u2;
     }
     else ();
-    if p2.sex <> Neuter then p1.sex := p2.sex else ();
-    if p1.birth = Adef.codate_None then p1.birth := p2.birth else ();
-    if p1.birth_place = Adef.istr_of_int 0 then
-      p1.birth_place := p2.birth_place
-    else ();
-    if p1.birth_src = Adef.istr_of_int 0 then
-      p1.birth_src := p2.birth_src
-    else ();
-    if p1.baptism = Adef.codate_None then p1.baptism := p2.baptism else ();
-    if p1.baptism_place = Adef.istr_of_int 0 then
-      p1.baptism_place := p2.baptism_place
-    else ();
-    if p1.baptism_src = Adef.istr_of_int 0 then
-      p1.baptism_src := p2.baptism_src
-    else ();
-    if p1.death = DontKnowIfDead then p1.death := p2.death else ();
-    if p1.death_place = Adef.istr_of_int 0 then
-      p1.death_place := p2.death_place
-    else ();
-    if p1.death_src = Adef.istr_of_int 0 then
-      p1.death_src := p2.death_src
-    else ();
-    if p1.burial = UnknownBurial then p1.burial := p2.burial else ();
-    if p1.burial_place = Adef.istr_of_int 0 then
-      p1.burial_place := p2.burial_place
-    else ();
-    if p1.burial_src = Adef.istr_of_int 0 then
-      p1.burial_src := p2.burial_src
-    else ();
-    if p1.occupation = Adef.istr_of_int 0 then
-      p1.occupation := p2.occupation
-    else ();
-    if p1.notes = Adef.istr_of_int 0 then p1.notes := p2.notes else ();
+    let p1 =
+      {(p1) with
+       sex = if p2.sex <> Neuter then p2.sex else p1.sex;
+       birth = if p1.birth = Adef.codate_None then p2.birth else p1.birth;
+       birth_place =
+         if p1.birth_place = Adef.istr_of_int 0 then p2.birth_place
+         else p1.birth_place;
+       birth_src =
+         if p1.birth_src = Adef.istr_of_int 0 then p2.birth_src
+         else p1.birth_src;
+       baptism =
+         if p1.baptism = Adef.codate_None then p2.baptism else p1.baptism;
+       baptism_place =
+         if p1.baptism_place = Adef.istr_of_int 0 then p2.baptism_place
+         else p1.baptism_place;
+       baptism_src =
+         if p1.baptism_src = Adef.istr_of_int 0 then p2.baptism_src
+         else p1.baptism_src;
+       death = if p1.death = DontKnowIfDead then p2.death else p1.death;
+       death_place =
+         if p1.death_place = Adef.istr_of_int 0 then p2.death_place
+         else p1.death_place;
+       death_src =
+         if p1.death_src = Adef.istr_of_int 0 then p2.death_src
+         else p1.death_src;
+       burial = if p1.burial = UnknownBurial then p2.burial else p1.burial;
+       burial_place =
+         if p1.burial_place = Adef.istr_of_int 0 then p2.burial_place
+         else p1.burial_place;
+       burial_src =
+         if p1.burial_src = Adef.istr_of_int 0 then p2.burial_src
+         else p1.burial_src;
+       occupation =
+         if p1.occupation = Adef.istr_of_int 0 then p2.occupation
+         else p1.occupation;
+       notes =
+         if p1.notes = Adef.istr_of_int 0 then p2.notes else p1.notes}
+    in
     let p2 = UpdateIndOk.effective_del conf base p2 in
     base.func.patch_person p1.cle_index p1;
     base.func.patch_person p2.cle_index p2;

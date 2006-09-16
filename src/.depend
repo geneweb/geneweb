@@ -152,12 +152,6 @@ mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi gwdb.cmi history.cmi \
 mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmi history.cmx \
     merge.cmx mergeInd.cmx update.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
-mini_gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmo def.cmi gutil.cmi \
-    gwcomp.cmo iobase.cmi iovalue.cmi lock.cmi name.cmi notesLinks.cmo \
-    progrBar.cmi secure.cmi 
-mini_gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
-    gwcomp.cmx iobase.cmx iovalue.cmx lock.cmx name.cmx notesLinks.cmx \
-    progrBar.cmx secure.cmx 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo gutil.cmi iobase.cmi \
     lock.cmi secure.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gutil.cmx iobase.cmx \
@@ -312,7 +306,6 @@ mergeFam.cmo mergeFam.cmx: pa_html.cmo
 mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
 mergeInd.cmo mergeInd.cmx: pa_html.cmo pa_lock.cmo
 mergeIndOk.cmo mergeIndOk.cmx: pa_html.cmo
-mini_gwc.cmo mini_gwc.cmx: pa_lock.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 notes.cmo notes.cmx: pa_html.cmo
 place.cmo place.cmx: pa_html.cmo
