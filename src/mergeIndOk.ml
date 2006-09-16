@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.3 2006-09-16 00:23:19 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.4 2006-09-16 16:16:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -143,31 +143,37 @@ value effective_mod_merge conf base sp =
           (fun ipc ->
              let pc = poi base ipc in
              let uc = uoi base ipc in
-             let mod_p = ref False in
-             do {
-               List.iter
-                 (fun r ->
-                    do {
+             let (rparents, mod_p) =
+               List.fold_right
+                 (fun r (rparents, mod_p) ->
+                    let (r, mod_p) =
                       match r.r_fath with
-                      [ Some ip when ip = p2.cle_index ->
-                          do {
-                            r.r_fath := Some p.cle_index;
-                            mod_p.val := True;
-                            if List.memq ipc p.related then ()
-                            else p.related := [ipc :: p.related];
-                          }
-                      | _ -> () ];
+                      [ Some ip when ip = p2.cle_index -> do {
+                          if List.memq ipc p.related then ()
+                          else p.related := [ipc :: p.related];
+                          let r = {(r) with r_fath = Some p.cle_index} in
+                          (r, True)
+                        }
+                      | _ -> (r, mod_p) ]
+                    in
+                    let (r, mod_p) =
                       match r.r_moth with
-                      [ Some ip when ip = p2.cle_index ->
-                          do {
-                            r.r_moth := Some p.cle_index;
-                            mod_p.val := True;
-                            if List.memq ipc p.related then ()
-                            else p.related := [ipc :: p.related];
-                          }
-                      | _ -> () ];
-                    })
-                 pc.rparents;
+                      [ Some ip when ip = p2.cle_index -> do {
+                          if List.memq ipc p.related then ()
+                          else p.related := [ipc :: p.related];
+                          let r = {(r) with r_moth = Some p.cle_index} in
+                          (r, True)
+                        }
+                      | _ -> (r, mod_p) ]
+                    in
+                    ([r :: rparents], mod_p))
+                 pc.rparents ([], False)
+             in
+             do {
+               if mod_p then
+                 let pc = {(pc) with rparents = rparents} in
+                 base.func.patch_person ipc pc
+               else ();
                for i = 0 to Array.length uc.family - 1 do {
                  let fam = foi base uc.family.(i) in
                  if array_memq p2.cle_index fam.witnesses then do {
@@ -176,7 +182,6 @@ value effective_mod_merge conf base sp =
                        fam.witnesses.(j) := p.cle_index;
                        if List.memq ipc p.related then ()
                        else p.related := [ipc :: p.related];
-                       ()
                      }
                      else ()
                    };
@@ -184,7 +189,6 @@ value effective_mod_merge conf base sp =
                  }
                  else ()
                };
-               if mod_p.val then base.func.patch_person ipc pc else ();
              })
           rel_chil;
         for i = 0 to Array.length p2_family - 1 do {
