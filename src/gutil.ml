@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.8 2006-09-16 12:51:14 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.9 2006-09-16 20:15:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -346,8 +346,6 @@ value set_mother = Adef.set_mother;
 value parents asc = asc.parents;
 value consang asc = asc.consang;
 value no_ascend () = {parents = None; consang = Adef.fix (-1)};
-value set_parents asc v = asc.parents := v;
-value set_consang asc v = asc.consang := v;
 
 value spouse ip cpl =
   if ip == father cpl then mother cpl

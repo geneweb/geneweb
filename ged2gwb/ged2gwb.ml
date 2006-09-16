@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.8 2006-09-16 18:21:31 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.9 2006-09-16 20:15:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1750,10 +1750,10 @@ value add_indi gen r =
      burial_src = add_string gen burial_src;
      notes = add_string gen (notes ^ ext_notes);
      psources = add_string gen psources; cle_index = ip}
-  and ascend = no_ascend ()
-  and union = {family = Array.of_list family} in
+  in
+  let ascend = {parents = parents; consang = Adef.fix (-1)} in
+  let union = {family = Array.of_list family} in
   do {
-    set_parents ascend parents;
     gen.g_per.arr.(Adef.int_of_iper ip) := Right3 person ascend union;
     match find_field "ADOP" r.rsons with
     [ Some r ->
@@ -1812,7 +1812,7 @@ value add_fam_norm gen r adop_list =
              [ Right3 _ a _ ->
                  match parents a with
                  [ Some ifam ->
-                     if ifam = i then do { set_parents a None; ipl }
+                     if ifam = i then do { a.parents := None; ipl }
                      else [ip :: ipl]
                  | None -> [ip :: ipl] ]
              | _ -> [ip :: ipl] ]
@@ -2219,7 +2219,7 @@ value add_parents_to_isolated gen =
             [ Right3 fam cpl des -> do {
                 let des = {children = [| p.cle_index |]} in
                 gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
-                set_parents a (Some ifam);
+                a.parents := Some ifam;
               }
             | _ -> () ];
           }
@@ -2344,7 +2344,7 @@ value check_parents_children base descends =
       match parents a with
       [ Some ifam ->
           let fam = foi base ifam in
-          if fam.fam_index == Adef.ifam_of_int (-1) then set_parents a None
+          if fam.fam_index == Adef.ifam_of_int (-1) then a.parents := None
           else
             let cpl = coi base ifam in
             let des = doi base ifam in
@@ -2361,7 +2361,7 @@ value check_parents_children base descends =
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              set_parents a None
+              a.parents := None
             }
       | None -> () ];
       fam_to_delete.val := [];
@@ -2451,7 +2451,7 @@ value check_parents_children base descends =
               fprintf log_oc.val "=> added parents\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              set_parents a (Some fam.fam_index)
+              a.parents := Some fam.fam_index
             } ]
       };
       if to_delete.val <> [] then
