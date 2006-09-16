@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.4 2006-09-16 02:15:39 ddr Exp $ *)
+(* $Id: def.mli,v 5.5 2006-09-16 03:16:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -99,23 +99,23 @@ type gen_person 'person 'string =
     rparents : mutable list (gen_relation 'person 'string);
     related : mutable list iper;
     occupation : 'string;
-    sex : mutable sex;
+    sex : sex;
     access : access;
-    birth : mutable codate;
+    birth : codate;
     birth_place : 'string;
     birth_src : 'string;
     baptism : codate;
     baptism_place : 'string;
     baptism_src : 'string;
-    death : mutable death;
+    death : death;
     death_place : 'string;
     death_src : 'string;
     burial : burial;
     burial_place : 'string;
     burial_src : 'string;
-    notes : mutable 'string;
+    notes : 'string;
     psources : 'string;
-    cle_index : mutable iper }
+    cle_index : iper }
 ;
 
 type gen_ascend 'family =
