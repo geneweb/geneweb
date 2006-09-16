@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.3 2006-09-16 02:15:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -252,9 +252,12 @@ value change_child conf base parent_surname ip =
     let ipl = person_ht_find_all base key in
     check_conflict conf base p key new_occ ipl;
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
-    p.first_name := Update.insert_string base new_first_name;
-    p.surname := Update.insert_string base new_surname;
-    p.occ := new_occ;
+    let p =
+      {(p) with
+       first_name = Update.insert_string base new_first_name;
+       surname = Update.insert_string base new_surname;
+       occ = new_occ}
+    in
     base.func.patch_person p.cle_index p;
     person_ht_add base key p.cle_index;
     let np_misc_names = person_misc_names base p (nobtit conf base) in

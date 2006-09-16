@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.5 2006-09-16 02:15:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -708,49 +708,42 @@ value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
 value persons_cache gen per_index_ic per_ic persons =
   let read_person_in_temp_file i =
     let mp = persons.(i) in
-    do {
-      let p : person =
-        let c =
-          try
-            do {
-              seek_in per_index_ic (Iovalue.sizeof_long * i);
-              let pos = input_binary_int per_index_ic in
-              seek_in per_ic pos;
-              input_char per_ic
-            }
-          with
-          [ End_of_file -> 'U' ]
-        in
-        match c with
-        [ 'D' -> input_item_value per_ic
-        | 'U' ->
-            let empty_string = Adef.istr_of_int 0 in
-            {first_name = empty_string; surname = empty_string;
-             occ = 0; image = empty_string; first_names_aliases = [];
-             surnames_aliases = []; public_name = empty_string;
-             qualifiers = [];
-             aliases = []; titles = []; rparents = []; related = [];
-             occupation = empty_string; sex = Neuter; access = IfTitles;
-             birth = Adef.codate_None; birth_place = empty_string;
-             birth_src = empty_string; baptism = Adef.codate_None;
-             baptism_place = empty_string; baptism_src = empty_string;
-             death = DontKnowIfDead; death_place = empty_string;
-             death_src = empty_string; burial = UnknownBurial;
-             burial_place = empty_string; burial_src = empty_string;
-             notes = empty_string; psources = empty_string;
-             cle_index = Adef.iper_of_int 0}
-        | _ -> assert False ]
+    let p : person =
+      let c =
+        try
+          do {
+            seek_in per_index_ic (Iovalue.sizeof_long * i);
+            let pos = input_binary_int per_index_ic in
+            seek_in per_ic pos;
+            input_char per_ic
+          }
+        with
+        [ End_of_file -> 'U' ]
       in
-      p.first_name := mp.m_first_name;
-      p.surname := mp.m_surname;
-      p.occ := mp.m_occ;
-      p.rparents := mp.m_rparents;
-      p.related := mp.m_related;
-      p.sex := mp.m_sex;
-      p.notes := mp.m_notes;
-      p.cle_index := Adef.iper_of_int i;
-      p
-    }
+      match c with
+      [ 'D' -> input_item_value per_ic
+      | 'U' ->
+          let empty_string = Adef.istr_of_int 0 in
+          {first_name = empty_string; surname = empty_string;
+           occ = 0; image = empty_string; first_names_aliases = [];
+           surnames_aliases = []; public_name = empty_string;
+           qualifiers = [];
+           aliases = []; titles = []; rparents = []; related = [];
+           occupation = empty_string; sex = Neuter; access = IfTitles;
+           birth = Adef.codate_None; birth_place = empty_string;
+           birth_src = empty_string; baptism = Adef.codate_None;
+           baptism_place = empty_string; baptism_src = empty_string;
+           death = DontKnowIfDead; death_place = empty_string;
+           death_src = empty_string; burial = UnknownBurial;
+           burial_place = empty_string; burial_src = empty_string;
+           notes = empty_string; psources = empty_string;
+           cle_index = Adef.iper_of_int 0}
+      | _ -> assert False ]
+    in
+    {(p) with
+     first_name = mp.m_first_name; surname = mp.m_surname;
+     occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
+     sex = mp.m_sex; notes = mp.m_notes; cle_index = Adef.iper_of_int i}
   in
   let get_fun i =
     try Hashtbl.find gen.g_patch_p i with

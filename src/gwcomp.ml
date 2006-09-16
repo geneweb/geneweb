@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.2 2006-09-16 01:09:35 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.3 2006-09-16 02:15:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -546,7 +546,7 @@ value create_person () =
 
 value bogus_def p n o = p = "?" || n = "?";
 
-value set_infos str u l =
+value set_infos fn sn occ comm_psources comm_birth_place str u l =
   let (first_names_aliases, l) = get_fst_names_aliases str l in
   let (surnames_aliases, l) = get_surnames_aliases str l in
   let (public_name, l) = get_pub_name str l in
@@ -591,15 +591,15 @@ value set_infos str u l =
   let (burial_place, l) = get_field "#rp" l in
   let (burial_src, l) = get_field "#rs" l in
   let u =
-    {first_name = u.first_name; surname = u.surname; occ = u.occ;
+    {first_name = fn; surname = sn; occ = occ;
      rparents = u.rparents; related = u.related; sex = u.sex; notes = u.notes;
      cle_index = u.cle_index; first_names_aliases = first_names_aliases;
      surnames_aliases = surnames_aliases; public_name = public_name;
      image = image; qualifiers = qualifiers; aliases = aliases;
      titles = titles; access = access; occupation = occupation;
-     psources = if psources <> "" then psources else u.psources;
+     psources = if psources <> "" then psources else comm_psources;
      birth = naissance;
-     birth_place = if birth_place <> "" then birth_place else u.birth_place;
+     birth_place = if birth_place <> "" then birth_place else comm_birth_place;
      birth_src = birth_src; baptism = baptism;
      baptism_place = baptism_place; baptism_src = bapt_src;
      death = mort; death_place = death_place; death_src = death_src;
@@ -625,10 +625,7 @@ value parse_parent str l =
     (Undefined key, np, l)
   else do {
     let u = create_person () in
-    u.surname := np;
-    u.first_name := pp;
-    u.occ := op;
-    let (u, l) = set_infos str u l in
+    let (u, l) = set_infos pp np op "" "" str u l in
     (Defined u, np, l)
   }
 ;
@@ -637,8 +634,6 @@ value parse_child str surname csrc cbp l =
   let u = create_person () in
   let (prenom, occ, l) = get_fst_name str l in
   do {
-    u.first_name := prenom;
-    u.occ := occ;
     let (nom, l) =
       match l with
       [ ["?" :: _] -> get_name str l
@@ -650,10 +645,7 @@ value parse_child str surname csrc cbp l =
           | _ -> get_name str l ]
       | _ -> (surname, []) ]
     in
-    u.surname := nom;
-    u.psources := csrc;
-    u.birth_place := cbp;
-    set_infos str u l
+    set_infos prenom nom occ csrc cbp str u l
   }
 ;
 
