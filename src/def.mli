@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.5 2006-09-16 03:16:05 ddr Exp $ *)
+(* $Id: def.mli,v 5.6 2006-09-16 03:59:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -51,12 +51,12 @@ type access = [ IfTitles | Public | Private ];
 
 type gen_title_name 'string = [ Tmain | Tname of 'string | Tnone ];
 type gen_title 'string =
-  { t_name : mutable gen_title_name 'string;
-    t_ident : mutable 'string;
-    t_place : mutable 'string;
-    t_date_start : mutable codate;
-    t_date_end : mutable codate;
-    t_nth : mutable int }
+  { t_name : gen_title_name 'string;
+    t_ident : 'string;
+    t_place : 'string;
+    t_date_start : codate;
+    t_date_end : codate;
+    t_nth : int }
 ;
 
 type relation_type =
@@ -64,10 +64,10 @@ type relation_type =
 ;
 
 type gen_relation 'person 'string =
-  { r_type : mutable relation_type;
+  { r_type : relation_type;
     r_fath : mutable option 'person;
     r_moth : mutable option 'person;
-    r_sources : mutable 'string }
+    r_sources : 'string }
 ;
 
 type sex = [ Male | Female | Neuter ];
@@ -86,9 +86,9 @@ type sex = [ Male | Female | Neuter ];
 (* person *)
 
 type gen_person 'person 'string =
-  { first_name : mutable 'string;
-    surname : mutable 'string;
-    occ : mutable int;
+  { first_name : 'string;
+    surname : 'string;
+    occ : int;
     image : 'string;
     public_name : 'string;
     qualifiers : list 'string;
@@ -96,7 +96,7 @@ type gen_person 'person 'string =
     first_names_aliases : list 'string;
     surnames_aliases : list 'string;
     titles : list (gen_title 'string);
-    rparents : mutable list (gen_relation 'person 'string);
+    rparents : list (gen_relation 'person 'string);
     related : mutable list iper;
     occupation : 'string;
     sex : sex;

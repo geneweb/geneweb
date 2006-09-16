@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.5 2006-09-16 03:16:05 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.6 2006-09-16 03:59:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1275,7 +1275,7 @@ value adop_parent gen ip r =
 value set_adop_fam gen ip which_parent fath moth =
   match gen.g_per.arr.(Adef.int_of_iper ip) with
   [ Left3 _ -> ()
-  | Right3 per _ _ ->
+  | Right3 per asc uni ->
       let r_fath =
         match (which_parent, fath) with
         [ ("HUSB" | "BOTH", Some r) -> adop_parent gen ip r
@@ -1290,7 +1290,8 @@ value set_adop_fam gen ip which_parent fath moth =
         {r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
          r_sources = string_empty}
       in
-      per.rparents := [r :: per.rparents] ]
+      let per = {(per) with rparents = [r :: per.rparents]} in
+      gen.g_per.arr.(Adef.int_of_iper ip) := Right3 per asc uni ]
 ;
 
 value forward_godp gen ip rval =
@@ -2629,16 +2630,16 @@ value finish_base base =
       let u = unions.(i) in
       if parents a <> None && Array.length u.family != 0 ||
          p.notes <> string_empty
-      then do {
-        if sou base p.first_name = "?" then do {
-          p.first_name := string_x; p.occ := i
-        }
-        else ();
-        if sou base p.surname = "?" then do {
-          p.surname := string_x; p.occ := i
-        }
-        else ()
-      }
+      then
+        let (fn, occ) =
+          if sou base p.first_name = "?" then (string_x, i)
+          else (p.first_name, p.occ)
+        in
+        let (sn, occ) =
+          if sou base p.surname = "?" then (string_x, i)
+          else (p.surname, occ)
+        in
+        persons.(i) := {(p) with first_name = fn; surname = sn; occ = occ}
       else ()
     };
     check_parents_sex base persons;
