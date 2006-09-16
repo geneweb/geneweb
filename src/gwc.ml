@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.5 2006-09-16 02:15:39 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.6 2006-09-16 10:08:20 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -27,7 +27,7 @@ type cbase =
     c_couples : mutable array couple;
     c_descends : mutable array descend;
     c_strings : mutable array string;
-    c_bnotes : notes }
+    c_bnotes : mutable notes }
 ;
 
 type gen =
@@ -596,7 +596,7 @@ value insert_notes fname gen key str =
       } ]
 ;
 
-value insert_bnotes fname gen nfname str =
+value insert_bnotes fname gen nfname str = do {
   let old_nread = gen.g_base.c_bnotes.nread in
   let nfname =
     if nfname = "" then ""
@@ -605,16 +605,17 @@ value insert_bnotes fname gen nfname str =
       [ Some (dl, f) -> List.fold_right Filename.concat dl f
       | None -> "bad" ]
   in
-  do {
-    gen.g_base.c_bnotes.nread :=
-      fun f n -> if f = nfname then str else old_nread f n;
-    gen.g_base.c_bnotes.norigin_file := fname;
-    if nfname <> "" then
-      let efiles = gen.g_base.c_bnotes.efiles () in
-      gen.g_base.c_bnotes.efiles := fun () -> [nfname :: efiles]
-    else ();
-  }
-;
+  let bnotes =
+    {nread f n = if f = nfname then str else old_nread f n;
+     norigin_file = fname;
+     efiles =
+       if nfname <> "" then
+         let efiles = gen.g_base.c_bnotes.efiles () in
+         fun () -> [nfname :: efiles]
+       else gen.g_base.c_bnotes.efiles}
+  in
+  gen.g_base.c_bnotes := bnotes;
+};
 
 value insert_wiznote fname gen wizid str =
   gen.g_wiznotes := [(wizid, str) :: gen.g_wiznotes]

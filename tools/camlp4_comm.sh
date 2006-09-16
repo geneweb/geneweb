@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_comm.sh,v 5.0 2005-12-13 11:51:27 ddr Exp $
+# $Id: camlp4_comm.sh,v 5.1 2006-09-16 10:08:20 ddr Exp $
 
 ARGS1=
 FILE=
@@ -13,11 +13,11 @@ done
 
 head -1 $FILE >/dev/null || exit 1
 
-set - `head -1 $FILE`
+set - $(head -1 $FILE)
 if test "$2" = "camlp4r" -o "$2" = "camlp4o" -o "$2" = "camlp4"; then
 	COMM="$2"
 	shift; shift
-	ARGS2=`echo $* | sed -e "s/[()*]//g"`
+	ARGS2=$(echo $* | sed -e "s/[()*]//g")
 else
 	COMM=camlp4r
 	ARGS2=

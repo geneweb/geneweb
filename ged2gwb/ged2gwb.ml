@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.6 2006-09-16 03:59:15 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.7 2006-09-16 10:08:20 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -911,14 +911,6 @@ value infer_death birth =
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]
 ;
-
-(*
-value make_title gen (title, place) =
-  {t_name = Tnone; t_ident = add_string gen title;
-   t_place = add_string gen place; t_date_start = Adef.codate_None;
-   t_date_end = Adef.codate_None; t_nth = 0}
-;
-*)
 
 value string_ini_eq s1 i s2 =
   loop i 0 where rec loop i j =
@@ -2215,11 +2207,11 @@ value add_parents_to_isolated gen =
               "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn;
             let ifam = phony_fam gen in
             match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
-            [ Right3 fam cpl des ->
-                do {
-                  des.children := [| p.cle_index |];
-                  set_parents a (Some ifam);
-                }
+            [ Right3 fam cpl des -> do {
+                let des = {children = [| p.cle_index |]} in
+                gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
+                set_parents a (Some ifam);
+              }
             | _ -> () ];
           }
         else ()
@@ -2334,7 +2326,7 @@ value array_memq x a =
     else loop (i + 1)
 ;
 
-value check_parents_children base =
+value check_parents_children base descends =
   let to_delete = ref [] in
   let fam_to_delete = ref [] in
   do {
@@ -2419,7 +2411,7 @@ value check_parents_children base =
       to_delete.val := [];
       let fam = base.data.families.get i in
       let cpl = base.data.couples.get i in
-      let des = base.data.descends.get i in
+      let des = descends.(i) in
       for j = 0 to Array.length des.children - 1 do {
         let a = aoi base des.children.(j) in
         let p = poi base des.children.(j) in
@@ -2459,37 +2451,9 @@ value check_parents_children base =
             (fun ip l -> if List.memq ip to_delete.val then l else [ip :: l])
             (Array.to_list des.children) []
         in
-        des.children := Array.of_list l
+        descends.(i) := {children = Array.of_list l}
       else ()
     }
-  }
-;
-
-value kill_family base fam ip =
-  let u = uoi base ip in
-  let l =
-    List.fold_right
-      (fun ifam ifaml ->
-         if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
-      (Array.to_list u.family) []
-  in
-  u.family := Array.of_list l
-;
-
-value kill_parents base ip =
-  let a = aoi base ip in
-  set_parents a None
-;
-
-value effective_del_fam base fam cpl des =
-  do {
-    kill_family base fam (father cpl);
-    kill_family base fam (mother cpl);
-    Array.iter (kill_parents base) des.children;
-    set_father cpl (Adef.iper_of_int (-1));
-    set_mother cpl (Adef.iper_of_int (-1));
-    des.children := [| |];
-    fam.fam_index := Adef.ifam_of_int (-1)
   }
 ;
 
@@ -2551,7 +2515,7 @@ value neg_year_cdate cd =
   Adef.cdate_of_date (neg_year (Adef.date_of_cdate cd))
 ;
 
-value rec negative_date_ancestors base persons i =
+value rec negative_date_ancestors base persons families i = do {
   let p = persons.(i) in
   let p =
     {(p) with
@@ -2564,34 +2528,39 @@ value rec negative_date_ancestors base persons i =
        [ Death dr cd2 -> Death dr (neg_year_cdate cd2)
        | _ -> p.death ]}
   in
-  do {
-    persons.(i) := p;
-    let u = uoi base p.cle_index in
-    for i = 0 to Array.length u.family - 1 do {
-      let fam = foi base u.family.(i) in
-      match Adef.od_of_codate fam.marriage with
-      [ Some d -> fam.marriage := Adef.codate_of_od (Some (neg_year d))
-      | None -> () ]
-    };
-    let a = aoi base p.cle_index in
-    match parents a with
-    [ Some ifam ->
-        let cpl = coi base ifam in
-        do {
-          negative_date_ancestors base persons (Adef.int_of_iper (father cpl));
-          negative_date_ancestors base persons (Adef.int_of_iper (mother cpl))
-        }
-    | _ -> () ]
-  }
-;
+  persons.(i) := p;
+  let u = uoi base p.cle_index in
+  for i = 0 to Array.length u.family - 1 do {
+    let j = Adef.int_of_ifam u.family.(i) in
+    let fam = families.(j) in
+    match Adef.od_of_codate fam.marriage with
+    [ Some d ->
+        let fam =
+          {(fam) with marriage = Adef.codate_of_od (Some (neg_year d))}
+        in
+        families.(j) := fam
+    | None -> () ]
+  };
+  let a = aoi base p.cle_index in
+  match parents a with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      do {
+        negative_date_ancestors base persons families
+          (Adef.int_of_iper (father cpl));
+        negative_date_ancestors base persons families
+          (Adef.int_of_iper (mother cpl))
+      }
+  | _ -> () ]
+};
 
-value negative_dates base persons =
+value negative_dates base persons families =
   for i = 0 to base.data.persons.len - 1 do {
     let p = persons.(i) in
     match (Adef.od_of_codate p.birth, date_of_death p.death) with
     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
         if year_of d1 > 0 && year_of d2 > 0 && strictly_before_dmy d2 d1 then
-          negative_date_ancestors base persons i
+          negative_date_ancestors base persons families i
         else ()
     | _ -> () ]
   }
@@ -2612,7 +2581,7 @@ value finish_base base =
           (fun ip -> Adef.od_of_codate persons.(Adef.int_of_iper ip).birth)
           (Array.to_list des.children)
       in
-      des.children := Array.of_list children
+      descends.(i) := {children = Array.of_list children}
     };
     for i = 0 to Array.length unions - 1 do {
       let u = unions.(i) in
@@ -2643,8 +2612,9 @@ value finish_base base =
       else ()
     };
     check_parents_sex base persons;
-    check_parents_children base;
-    if try_negative_dates.val then negative_dates base persons else ();
+    check_parents_children base descends;
+    if try_negative_dates.val then negative_dates base persons families
+    else ();
     Check.check_base base
       (fun x ->
          do {

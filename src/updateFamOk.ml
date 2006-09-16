@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.4 2006-09-16 03:59:15 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.5 2006-09-16 10:08:20 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -232,10 +232,9 @@ value strip_array_persons pl =
 ;
 
 value strip_family fam des =
-  do {
-    des.children := strip_array_persons des.children;
-    fam.witnesses := strip_array_persons fam.witnesses
-  }
+  let fam = {(fam) with witnesses = strip_array_persons fam.witnesses} in
+  let des = {children = strip_array_persons des.children} in
+  (fam, des)
 ;
 
 value print_err_parents conf base p =
@@ -447,13 +446,16 @@ value effective_mod conf base sfam scpl sdes =
     else (nfath, nmoth)
   in
   do {
-    if (father ncpl) == (mother ncpl) then print_err conf base else ();
-    if sfam.origin_file = "" then 
-      nfam.origin_file :=
-        if sou base ofam.origin_file <> "" then ofam.origin_file
-        else infer_origin_file conf base fi ncpl ndes
-    else ();
-    nfam.fam_index := fi;
+    if father ncpl == mother ncpl then print_err conf base else ();
+    let nfam =
+      {(nfam) with
+       origin_file =
+         if sfam.origin_file = "" then 
+           if sou base ofam.origin_file <> "" then ofam.origin_file
+           else infer_origin_file conf base fi ncpl ndes
+         else nfam.origin_file;
+       fam_index = fi}
+    in
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
     base.func.patch_descend fi ndes;
@@ -580,9 +582,8 @@ value effective_add conf base sfam scpl sdes =
     else if (father ncpl) == (mother ncpl) then print_err conf base
     else (nfath_p, nmoth_p)
   in
+  let nfam = {(nfam) with fam_index = fi; origin_file = origin_file} in
   do {
-    nfam.fam_index := fi;
-    nfam.origin_file := origin_file;
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
     base.func.patch_descend fi ndes;
@@ -644,25 +645,26 @@ value kill_parents base ip =
   }
 ;
 
-value effective_del conf base fam =
+value effective_del conf base fam = do {
   let ifam = fam.fam_index in
   let cpl = coi base ifam in
   let des = doi base ifam in
-  do {
-    kill_family base fam (father cpl);
-    kill_family base fam (mother cpl);
-    Array.iter (kill_parents base) des.children;
-    set_father cpl (Adef.iper_of_int (-1));
-    set_mother cpl (Adef.iper_of_int (-1));
-    fam.witnesses := [| |];
-    des.children := [| |];
-    fam.comment := Update.insert_string base "";
-    fam.fam_index := Adef.ifam_of_int (-1);
-    base.func.patch_family ifam fam;
-    base.func.patch_couple ifam cpl;
-    base.func.patch_descend ifam des
-  }
-;
+  kill_family base fam (father cpl);
+  kill_family base fam (mother cpl);
+  Array.iter (kill_parents base) des.children;
+  set_father cpl (Adef.iper_of_int (-1));
+  set_mother cpl (Adef.iper_of_int (-1));
+  let fam =
+    {(fam) with
+     witnesses = [| |];
+     comment = Update.insert_string base "";
+     fam_index = Adef.ifam_of_int (-1)}
+  in
+  let des = {children = [| |]} in
+  base.func.patch_family ifam fam;
+  base.func.patch_couple ifam cpl;
+  base.func.patch_descend ifam des
+};
 
 value array_forall2 f a1 a2 =
   if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
@@ -869,7 +871,7 @@ value print_add o_conf base =
     else if forbidden_disconnected conf sfam scpl sdes then
       print_error_disconnected conf
     else do {
-      strip_family sfam sdes;
+      let (sfam, sdes) = strip_family sfam sdes in
       let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
       let wl = all_checks_family conf base fam cpl des (scpl, sdes, None) in
       let ((fn, sn, occ, _, _), i, act) =
@@ -940,7 +942,9 @@ value print_mod_aux conf base callback =
     if digest = raw_get conf "digest" then
       if ext || redisp then
         UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
-      else do { strip_family sfam sdes; callback sfam scpl sdes }
+      else
+        let (sfam, sdes) = strip_family sfam sdes in
+        callback sfam scpl sdes
     else Update.error_digest conf
   with
   [ Update.ModErr -> () ]
