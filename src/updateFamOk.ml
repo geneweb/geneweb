@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.3 2006-09-16 03:16:05 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.4 2006-09-16 03:59:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -382,10 +382,9 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
          if List.memq ip ofam_witn then ippl
          else
            let p = poi base ip in
-           if not (List.mem (father ncpl) p.related) then do {
-             p.related := [(father ncpl) :: p.related];
+           if not (List.mem (father ncpl) p.related) then
+             let p = {(p) with related = [(father ncpl) :: p.related]} in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           }
            else ippl)
       mod_ippl nfam_witn
   in
@@ -394,11 +393,12 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
       (fun ippl ip ->
          if List.memq ip nfam_witn then ippl
          else
-           let p = poi base ip in
-           if List.mem (father ncpl) p.related then do {
-             p.related := List.filter ( \<> (father ncpl)) p.related;
+           let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
+           if List.mem (father ncpl) p.related then
+             let p =
+               {(p) with related = List.filter ( \<> (father ncpl)) p.related}
+             in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           }
            else ippl)
       mod_ippl ofam_witn
   in

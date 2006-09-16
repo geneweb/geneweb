@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.6 2006-09-16 03:16:05 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.7 2006-09-16 03:59:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -429,25 +429,24 @@ value update_relation_parents base op np =
          if List.mem ip op_rparents then ippl
          else
            let p = poi base ip in
-           if not (List.mem pi p.related) then do {
-             p.related := [pi :: p.related];
+           if not (List.mem pi p.related) then
+             let p = {(p) with related = [pi :: p.related]} in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           }
            else ippl)
       mod_ippl np_rparents
   in
   let mod_ippl =
     List.fold_left
       (fun ippl ip ->
-         let p = poi base ip in
          if List.mem ip np_rparents ||
             np.sex = Male && is_witness_at_marriage base ip np then
            ippl
-         else if List.mem pi p.related then do {
-           p.related := List.filter ( \<> pi) p.related;
-           if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-         }
-         else ippl)
+         else
+           let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
+           if List.mem pi p.related then
+             let p = {(p) with related = List.filter ( \<> pi) p.related} in
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
       mod_ippl op_rparents
   in
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
@@ -477,7 +476,7 @@ value effective_mod conf base sp =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
         (Update.insert_string base) sp
     in
-    np.related := op.related;
+    let np = {(np) with related = op.related} in
     let op_misc_names = person_misc_names base op (nobtit conf base) in
     let np_misc_names = person_misc_names base np (nobtit conf base) in
     List.iter
