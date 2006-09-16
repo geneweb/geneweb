@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.4 2006-09-16 00:23:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -526,48 +526,29 @@ value array_except v a =
 value effective_del conf base p =
   let none = Update.insert_string base "?" in
   let empty = Update.insert_string base "" in
-  let asc = aoi base p.cle_index in
+  let ip = p.cle_index in
+  let asc = aoi base ip in
   do {
     match parents asc with
     [ Some ifam ->
         let des = doi base ifam in
         do {
-          des.children := array_except p.cle_index des.children;
+          des.children := array_except ip des.children;
           set_parents asc None;
           set_consang asc (Adef.fix (-1));
           base.func.patch_descend ifam des;
-          base.func.patch_ascend p.cle_index asc;
-          ()
+          base.func.patch_ascend ip asc;
         }
     | None -> () ];
-    p.first_name := none;
-    p.surname := none;
-    p.occ := 0;
-    p.image := empty;
-    p.public_name := empty;
-    p.qualifiers := [];
-    p.aliases := [];
-    p.first_names_aliases := [];
-    p.surnames_aliases := [];
-    p.titles := [];
-    p.rparents := [];
-    p.related := [];
-    p.occupation := empty;
-    p.access := IfTitles;
-    p.birth := Adef.codate_None;
-    p.birth_place := empty;
-    p.birth_src := empty;
-    p.baptism := Adef.codate_None;
-    p.baptism_place := empty;
-    p.baptism_src := empty;
-    p.death := DontKnowIfDead;
-    p.death_place := empty;
-    p.death_src := empty;
-    p.burial := UnknownBurial;
-    p.burial_place := empty;
-    p.burial_src := empty;
-    p.notes := empty;
-    p.psources := empty;
+    {first_name = none; surname = none; occ = 0; image = empty;
+     public_name = empty; qualifiers = []; aliases = []; sex = p.sex;
+     first_names_aliases = []; surnames_aliases = []; titles = [];
+     rparents = []; related = []; occupation = empty; access = IfTitles;
+     birth = Adef.codate_None; birth_place = empty; birth_src = empty;
+     baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
+     death = DontKnowIfDead; death_place = empty; death_src = empty;
+     burial = UnknownBurial; burial_place = empty; burial_src = empty;
+     notes = empty; psources = empty; cle_index = ip}
   }
 ;
 
@@ -704,7 +685,7 @@ value print_del conf base =
         (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
       in
       do {
-        effective_del conf base p;
+        let p = effective_del conf base p in
         base.func.patch_person p.cle_index p;
         Notes.update_notes_links_db conf (NotesLinks.PgInd p.cle_index)
           "" True;

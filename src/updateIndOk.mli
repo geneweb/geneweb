@@ -1,10 +1,10 @@
-(* $Id: updateIndOk.mli,v 5.1 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: updateIndOk.mli,v 5.2 2006-09-16 00:23:19 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gwdb;
 
-value effective_del : config -> base -> person -> unit;
+value effective_del : config -> base -> person -> person;
 value effective_mod :
   config -> base -> gen_person Update.key string -> person;
 value all_checks_person :
