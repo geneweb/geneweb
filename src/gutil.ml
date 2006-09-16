@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.7 2006-09-16 03:16:05 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.8 2006-09-16 12:51:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -819,61 +819,77 @@ value titles_after_birth base warning p t =
   }
 ;
 
-value try_to_fix_relation_sex base warning p_ref =
-  do {
-    let p_index = Some p_ref.cle_index in
-    let fixed = ref 0 in
-    let not_fixed = ref 0 in
-    List.iter
-      (fun ip ->
-        let p = poi base ip in
-        List.iter
-          (fun rel ->
-             match (p_index = rel.r_fath, p_index = rel.r_moth) with
-             [ (True, False) ->
-                 if p_ref.sex = Female then
-                   match rel.r_moth with
-                   [ Some ip ->
-                       let oth_p = poi base ip in
-                       if oth_p.sex = Male then do {
-                         rel.r_fath := rel.r_moth;
-                         rel.r_moth := p_index;
-                         incr fixed;
-                       }
-                       else incr not_fixed
-                   | None ->
-                       do {
-                         rel.r_fath := None;
-                         rel.r_moth := p_index;
-                         incr fixed;
-                       } ]
-                 else ()
-             | (False, True) ->
-                 if p_ref.sex = Male then
-                   match rel.r_fath with
-                   [ Some ip ->
-                       let oth_p = poi base ip in
-                       if oth_p.sex = Female then do {
-                         rel.r_moth := rel.r_fath;
-                         rel.r_fath := p_index;
-                         incr fixed;
-                       }
-                       else incr not_fixed
-                   | None ->
-                       do {
-                         rel.r_moth := None;
-                         rel.r_fath := p_index;
-                         incr fixed;
-                       } ]
-                  else ()
-              | (False, False) -> ()
-              | (True, True) -> incr not_fixed ])
-          p.rparents)
-      p_ref.related;
-    warning (IncoherentSex p_ref fixed.val not_fixed.val);
-    fixed.val > 0
-  }
-;
+value try_to_fix_relation_sex base warning p_ref = do {
+  let p_index = Some p_ref.cle_index in
+  let fixed = ref 0 in
+  let not_fixed = ref 0 in
+  let changed_related =
+    List.fold_right
+      (fun ip changed_related ->
+         let p = poi base ip in
+         let (rparents, changed, not_changed) =
+           List.fold_right
+             (fun rel (rparents, changed, not_changed) ->
+                let (rel, changed, not_changed) =
+                  match (p_index = rel.r_fath, p_index = rel.r_moth) with
+                  [ (True, False) ->
+                      if p_ref.sex = Female then
+                        match rel.r_moth with
+                        [ Some ip ->
+                            let oth_p = poi base ip in
+                            if oth_p.sex = Male then
+                              let rel =
+                                {(rel) with
+                                 r_fath = rel.r_moth; r_moth = p_index}
+                              in
+                              (rel, changed + 1, not_changed)
+                            else
+                              (rel, changed, not_changed + 1)
+                        | None ->
+                            let rel =
+                              {(rel) with r_fath = None; r_moth = p_index}
+                            in
+                            (rel, changed + 1, not_changed) ]
+                      else (rel, changed, not_changed)
+                  | (False, True) ->
+                      if p_ref.sex = Male then
+                        match rel.r_fath with
+                        [ Some ip ->
+                            let oth_p = poi base ip in
+                            if oth_p.sex = Female then
+                              let rel =
+                                {(rel) with
+                                 r_moth = rel.r_fath; r_fath = p_index}
+                              in
+                              (rel, changed + 1, not_changed)
+                            else
+                              (rel, changed, not_changed + 1)
+                        | None ->
+                            let rel =
+                              {(rel) with r_moth = None; r_fath = p_index}
+                            in
+                            (rel, changed + 1, not_changed) ]
+                      else (rel, changed, not_changed)
+                  | (False, False) -> (rel, changed, not_changed)
+                  | (True, True) -> (rel, changed, not_changed + 1) ]
+                in
+                ([rel :: rparents], changed, not_changed))
+             p.rparents ([], 0, 0)
+         in
+         let _ = do {
+           fixed.val := fixed.val + changed;
+           not_fixed.val := not_fixed.val + not_changed
+         }
+         in
+         if changed > 0 then
+           let p = {(p) with rparents = rparents} in
+           [(ip, p) :: changed_related]
+         else changed_related)
+      p_ref.related []
+  in
+  warning (IncoherentSex p_ref fixed.val not_fixed.val);
+  if fixed.val > 0 then Some changed_related else None
+};
 
 value related_sex_is_coherent base warning p_ref =
   let p_index = Some p_ref.cle_index in
@@ -900,7 +916,9 @@ value related_sex_is_coherent base warning p_ref =
       (Some p_ref.sex) p_ref.related
   in
   match new_sex with
-  [ Some g -> if p_ref.sex != g then False else True
+  [ Some g ->
+      if p_ref.sex != g then Some [(p_ref.cle_index, {(p_ref) with sex = g})]
+      else None
   | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
 
@@ -1075,14 +1093,11 @@ value check_family base error warning fam cpl des =
   }
 ;
 
-value check_person base error warning p =
-  do {
-    birth_before_death base warning p;
-    List.iter (titles_after_birth base warning p) p.titles;
-    let c = related_sex_is_coherent base warning p in
-    not c
-  }
-;
+value check_person base error warning p = do {
+  birth_before_death base warning p;
+  List.iter (titles_after_birth base warning p) p.titles;
+  related_sex_is_coherent base warning p
+};
 
 value is_deleted_family fam = fam.fam_index = Adef.ifam_of_int (-1);
 

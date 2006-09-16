@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: check.ml,v 5.4 2006-09-16 12:51:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -189,7 +189,9 @@ value check_base_aux base error warning changed_p =
     for i = 0 to base.data.persons.len - 1 do {
       ProgrBar.run i base.data.persons.len;
       let p = base.data.persons.get i in
-      if check_person base error warning p then changed_p p else ()
+      match check_person base error warning p with
+      [ Some ippl -> List.iter changed_p ippl
+      | None -> () ]
     };
     ProgrBar.finish ();
     Printf.eprintf "check families\n";

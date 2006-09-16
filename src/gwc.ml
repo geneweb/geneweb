@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.6 2006-09-16 10:08:20 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.7 2006-09-16 12:51:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -918,8 +918,9 @@ value link gwo_list tmp_dir =
     Hashtbl.clear gen.g_local_names;
     Gc.compact ();
     let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
-    let changed_p p =
-      let i = Adef.int_of_iper p.cle_index in
+    Hashtbl.clear gen.g_patch_p;
+    let changed_p (ip, p) =
+      let i = Adef.int_of_iper ip in
       Hashtbl.replace gen.g_patch_p i p
     in
     if do_check.val && gen.g_pcnt > 0 then do {
@@ -928,7 +929,6 @@ value link gwo_list tmp_dir =
       flush stdout;
     }
     else ();
-    Hashtbl.clear gen.g_patch_p;
     if not gen.g_errored then do {
       if do_consang.val then ConsangAll.compute base True False else ();
       Some (base, gen.g_wiznotes)

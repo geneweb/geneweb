@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.4 2006-09-16 12:51:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -88,7 +88,8 @@ type warning 'person =
 type base_warning = warning person;
 
 value check_person :
-  base -> (base_error -> unit) -> (base_warning -> unit) -> person -> bool
+  base -> (base_error -> unit) -> (base_warning -> unit) -> person ->
+    option (list (iper * person))
 ;
 
 value check_family :
