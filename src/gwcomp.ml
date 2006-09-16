@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.2 2006-09-16 01:09:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -547,74 +547,66 @@ value create_person () =
 value bogus_def p n o = p = "?" || n = "?";
 
 value set_infos str u l =
-  let (nl, l) = get_fst_names_aliases str l in
-  do {
-    u.first_names_aliases := nl;
-    let (nl, l) = get_surnames_aliases str l in
-    u.surnames_aliases := nl;
-    let (n, l) = get_pub_name str l in
-    u.public_name := n;
-    let (n, l) = get_image str l in
-    u.image := n;
-    let (nl, l) = get_qualifiers str l in
-    u.qualifiers := nl;
-    let (nl, l) = get_aliases str l in
-    u.aliases := nl;
-    let (tl, l) = get_titles str l in
-    u.titles := tl;
-    let (n, l) = get_access str l in
-    u.access := n;
-    let (n, l) = get_occu str l in
-    u.occupation := n;
-    let (n, l) = get_sources str l in
-    if n <> "" then u.psources := n else ();
-    let (naissance, l) = get_optional_birthdate l in
-    let (birth_place, l) = get_field "#bp" l in
-    let (birth_src, l) = get_field "#bs" l in
-    let (baptism, l) = get_optional_baptdate l in
-    let (baptism_place, l) =
-      let (pp, l) = get_field "#pp" l in
-      if pp = "" then get_field "#bp" l else (pp, l)
-    in
-    let (bapt_src, l) = get_field "#ps" l in
-    let (mort, l) = get_optional_deathdate l in
-    let (death_place, l) = get_field "#dp" l in
-    let (death_src, l) = get_field "#ds" l in
-    let mort =
-      match (naissance, mort) with
-      [ (None, _) | (_, Some _) | (Some None, _) ->
-          match mort with
-          [ Some m -> m
-          | None -> DontKnowIfDead ]
-      | (Some _, None) -> NotDead ]
-    in
-    let naissance =
-      match naissance with
-      [ None -> Adef.codate_None
-      | Some x -> Adef.codate_of_od x ]
-    in
-    let baptism =
-      match baptism with
-      [ None -> Adef.codate_None
-      | Some x -> Adef.codate_of_od x ]
-    in
-    u.birth := naissance;
-    if birth_place <> "" then u.birth_place := birth_place else ();
-    u.birth_src := birth_src;
-    u.baptism := baptism;
-    u.baptism_place := baptism_place;
-    u.baptism_src := bapt_src;
-    u.death := mort;
-    u.death_place := death_place;
-    u.death_src := death_src;
-    let (burial, l) = get_burial l in
-    u.burial := burial;
-    let (burial_place, l) = get_field "#rp" l in
-    let (burial_src, l) = get_field "#rs" l in
-    u.burial_place := burial_place;
-    u.burial_src := burial_src;
-    l
-  }
+  let (first_names_aliases, l) = get_fst_names_aliases str l in
+  let (surnames_aliases, l) = get_surnames_aliases str l in
+  let (public_name, l) = get_pub_name str l in
+  let (image, l) = get_image str l in
+  let (qualifiers, l) = get_qualifiers str l in
+  let (aliases, l) = get_aliases str l in
+  let (titles, l) = get_titles str l in
+  let (access, l) = get_access str l in
+  let (occupation, l) = get_occu str l in
+  let (psources, l) = get_sources str l in
+  let (naissance, l) = get_optional_birthdate l in
+  let (birth_place, l) = get_field "#bp" l in
+  let (birth_src, l) = get_field "#bs" l in
+  let (baptism, l) = get_optional_baptdate l in
+  let (baptism_place, l) =
+    let (pp, l) = get_field "#pp" l in
+    if pp = "" then get_field "#bp" l else (pp, l)
+  in
+  let (bapt_src, l) = get_field "#ps" l in
+  let (mort, l) = get_optional_deathdate l in
+  let (death_place, l) = get_field "#dp" l in
+  let (death_src, l) = get_field "#ds" l in
+  let mort =
+    match (naissance, mort) with
+    [ (None, _) | (_, Some _) | (Some None, _) ->
+        match mort with
+        [ Some m -> m
+        | None -> DontKnowIfDead ]
+    | (Some _, None) -> NotDead ]
+  in
+  let naissance =
+    match naissance with
+    [ None -> Adef.codate_None
+    | Some x -> Adef.codate_of_od x ]
+  in
+  let baptism =
+    match baptism with
+    [ None -> Adef.codate_None
+    | Some x -> Adef.codate_of_od x ]
+  in
+  let (burial, l) = get_burial l in
+  let (burial_place, l) = get_field "#rp" l in
+  let (burial_src, l) = get_field "#rs" l in
+  let u =
+    {first_name = u.first_name; surname = u.surname; occ = u.occ;
+     rparents = u.rparents; related = u.related; sex = u.sex; notes = u.notes;
+     cle_index = u.cle_index; first_names_aliases = first_names_aliases;
+     surnames_aliases = surnames_aliases; public_name = public_name;
+     image = image; qualifiers = qualifiers; aliases = aliases;
+     titles = titles; access = access; occupation = occupation;
+     psources = if psources <> "" then psources else u.psources;
+     birth = naissance;
+     birth_place = if birth_place <> "" then birth_place else u.birth_place;
+     birth_src = birth_src; baptism = baptism;
+     baptism_place = baptism_place; baptism_src = bapt_src;
+     death = mort; death_place = death_place; death_src = death_src;
+     burial = burial; burial_place = burial_place;
+     burial_src = burial_src}
+  in
+  (u, l)
 ;
 
 value parse_parent str l =
@@ -636,7 +628,7 @@ value parse_parent str l =
     u.surname := np;
     u.first_name := pp;
     u.occ := op;
-    let l = set_infos str u l in
+    let (u, l) = set_infos str u l in
     (Defined u, np, l)
   }
 ;
@@ -661,8 +653,7 @@ value parse_child str surname csrc cbp l =
     u.surname := nom;
     u.psources := csrc;
     u.birth_place := cbp;
-    let l = set_infos str u l in
-    (u, l)
+    set_infos str u l
   }
 ;
 

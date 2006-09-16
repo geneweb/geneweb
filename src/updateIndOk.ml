@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.4 2006-09-16 00:23:19 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.5 2006-09-16 01:09:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -292,15 +292,14 @@ value error_person conf base p err =
 value strip_list = List.filter (fun s -> s <> "");
 
 value strip_person p =
-  do {
-    p.first_names_aliases := strip_list p.first_names_aliases;
-    p.surnames_aliases := strip_list p.surnames_aliases;
-    p.qualifiers := strip_list p.qualifiers;
-    p.aliases := strip_list p.aliases;
-    p.titles := List.filter (fun t -> t.t_ident <> "") p.titles;
-    p.rparents :=
-      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents;
-  }
+  {(p) with
+   first_names_aliases = strip_list p.first_names_aliases;
+   surnames_aliases = strip_list p.surnames_aliases;
+   qualifiers = strip_list p.qualifiers;
+   aliases = strip_list p.aliases;
+   titles = List.filter (fun t -> t.t_ident <> "") p.titles;
+   rparents =
+     List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 ;
 
 value print_conflict conf base p =
@@ -659,7 +658,7 @@ value print_add o_conf base =
     in
     if ext || redisp then UpdateInd.print_update_ind conf base sp ""
     else do {
-      strip_person sp;
+      let sp = strip_person sp in
       match check_person conf base sp with
       [ Some err -> error_person conf base sp err
       | None ->
@@ -708,7 +707,7 @@ value print_mod_aux conf base callback =
     if digest = raw_get conf "digest" then
       if ext || redisp then UpdateInd.print_update_ind conf base p digest
       else do {
-        strip_person p;
+        let p = strip_person p in
         match check_person conf base p with
         [ Some err -> error_person conf base p err
         | None -> callback p ]
