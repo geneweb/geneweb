@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.6 2006-09-16 20:15:06 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.7 2006-09-16 21:05:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -477,8 +477,8 @@ value effective_mod conf base sfam scpl sdes =
       }
       else ()
     };
+    let cache = Hashtbl.create 101 in
     let find_asc =
-      let cache = Hashtbl.create 101 in
       fun ip ->
         try Hashtbl.find cache ip with
         [ Not_found ->
@@ -491,12 +491,13 @@ value effective_mod conf base sfam scpl sdes =
     Array.iter
       (fun ip ->
          let a = find_asc ip in
-         do {
-           a.parents := None;
-           if not (array_memq ip ndes.children) then
-             a.consang := Adef.fix (-1)
-           else ()
-         })
+         let a =
+           {parents = None;
+            consang =
+              if not (array_memq ip ndes.children) then Adef.fix (-1)
+              else a.consang}
+         in
+         Hashtbl.replace cache ip a)
       odes.children;
     Array.iter
       (fun ip ->
@@ -504,12 +505,14 @@ value effective_mod conf base sfam scpl sdes =
          match parents a with
          [ Some _ -> print_err_parents conf base (poi base ip)
          | None ->
-             do {
-               a.parents := Some fi;
-               if not (array_memq ip odes.children) || not same_parents then
-                 a.consang := Adef.fix (-1)
-               else ()
-             } ])
+             let a =
+               {parents = Some fi;
+                consang =
+                  if not (array_memq ip odes.children) || not same_parents
+                  then Adef.fix (-1)
+                  else a.consang}
+             in
+             Hashtbl.replace cache ip a ])
       ndes.children;
     Array.iter
       (fun ip ->
