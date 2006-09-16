@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.5 2006-09-16 00:23:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -342,7 +342,7 @@ value effective_merge_ind conf base p1 p2 =
       p1.occupation := p2.occupation
     else ();
     if p1.notes = Adef.istr_of_int 0 then p1.notes := p2.notes else ();
-    UpdateIndOk.effective_del conf base p2;
+    let p2 = UpdateIndOk.effective_del conf base p2 in
     base.func.patch_person p1.cle_index p1;
     base.func.patch_person p2.cle_index p2;
     Notes.update_notes_links_db conf (NotesLinks.PgInd p1.cle_index)
@@ -612,7 +612,7 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
     | None -> () ];
     if included_self then do {
       let ip = p.cle_index in
-      UpdateIndOk.effective_del conf base p;
+      let p = UpdateIndOk.effective_del conf base p in
       base.func.patch_person ip p;
       incr nb_ind;
     }
