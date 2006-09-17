@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.3 2006-09-16 10:08:20 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.4 2006-09-17 09:41:38 ddr Exp $ *)
 
 open Adef;
 
@@ -35,8 +35,8 @@ type istr_iper_index =
 ;
 
 type visible_cache =
-  { v_write : mutable unit -> unit;
-    v_get : mutable (person -> bool) -> int -> bool }
+  { v_write : unit -> unit;
+    v_get : (person -> bool) -> int -> bool }
 ;
 
 type base_data =

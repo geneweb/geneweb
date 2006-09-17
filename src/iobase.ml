@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.4 2006-09-17 09:41:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -670,7 +670,6 @@ type visible_state = [ VsNone | VsTrue | VsFalse ];
 value make_visible_cache bname persons =
   let visible_ref = ref None in
   let fname = Filename.concat bname "restrict" in
-  let r = { v_write = fun []; v_get = fun [] } in
   let read_or_create_visible () =
     let visible =
       match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
@@ -728,7 +727,7 @@ value make_visible_cache bname persons =
       | VsFalse -> False ]
     else fct (persons.get i)
   in
-  do { r.v_write := v_write; r.v_get := v_get; r }
+  { v_write = v_write; v_get = v_get }
 ;
 
 (* Input *)
