@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.12 2006-09-17 07:54:36 ddr Exp $ *)
+(* $Id: def.mli,v 5.13 2006-09-17 08:17:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -124,7 +124,7 @@ type gen_ascend 'family =
 ;
 
 type gen_union 'family =
-  { family : mutable array 'family }
+  { family : array 'family }
 ;
 
 (* family *)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.8 2006-09-16 20:15:06 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.9 2006-09-17 08:17:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -302,9 +302,9 @@ value effective_merge_ind conf base p1 p2 =
         base.func.patch_couple ifam cpl;
       };
       let u1 = uoi base p1.cle_index in
-      u1.family := Array.append u1.family u2.family;
+      let u1 = {family = Array.append u1.family u2.family} in
       base.func.patch_union p1.cle_index u1;
-      u2.family := [| |];
+      let u2 = {family = [| |]} in
       base.func.patch_union p2.cle_index u2;
     }
     else ();

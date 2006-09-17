@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.12 2006-09-17 07:54:36 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.13 2006-09-17 08:17:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1781,27 +1781,23 @@ value add_fam_norm gen r adop_list =
     match gen.g_per.arr.(Adef.int_of_iper fath) with
     [ Left3 lab -> ()
     | Right3 p a u ->
-        do {
+        let u =
           if not (List.memq i (Array.to_list u.family)) then
-            u.family := Array.append u.family [| i |]
-          else ();
-          if p.sex = Neuter then
-            let p = {(p) with sex = Male} in
-            gen.g_per.arr.(Adef.int_of_iper fath) := Right3 p a u
-          else ()
-        } ];
+            {family = Array.append u.family [| i |]}
+          else u
+        in
+        let p = if p.sex = Neuter then {(p) with sex = Male} else p in
+        gen.g_per.arr.(Adef.int_of_iper fath) := Right3 p a u ];
     match gen.g_per.arr.(Adef.int_of_iper moth) with
     [ Left3 lab -> ()
     | Right3 p a u ->
-        do {
+        let u =
           if not (List.memq i (Array.to_list u.family)) then
-            u.family := Array.append u.family [| i |]
-          else ();
-          if p.sex = Neuter then
-            let p = {(p) with sex = Female} in
-            gen.g_per.arr.(Adef.int_of_iper moth) := Right3 p a u
-          else ()
-        } ];
+            {family = Array.append u.family [| i |]}
+          else u
+        in
+        let p = if p.sex = Neuter then {(p) with sex = Female} else p in
+        gen.g_per.arr.(Adef.int_of_iper moth) := Right3 p a u ];
     let children =
       let rl = find_all_fields "CHIL" r.rsons in
       List.fold_right
@@ -2344,7 +2340,7 @@ value array_memq x a =
     else loop (i + 1)
 ;
 
-value check_parents_children base ascends descends =
+value check_parents_children base ascends unions descends =
   let to_delete = ref [] in
   let fam_to_delete = ref [] in
   do {
@@ -2375,7 +2371,7 @@ value check_parents_children base ascends descends =
             }
       | None -> () ];
       fam_to_delete.val := [];
-      let u = base.data.unions.get i in
+      let u = unions.(i) in
       for j = 0 to Array.length u.family - 1 do {
         let cpl = coi base u.family.(j) in
         if Adef.iper_of_int i <> (father cpl) &&
@@ -2397,13 +2393,13 @@ value check_parents_children base ascends descends =
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
             fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
-            (uoi base (father cpl)).family := [| |];
+            unions.(Adef.int_of_iper (father cpl)) := {family = [| |]};
             set_father cpl (Adef.iper_of_int i);
           }
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
             fprintf log_oc.val
               "However, the wife is unknown, I set her as wife\n";
-            (uoi base (mother cpl)).family := [| |];
+            unions.(Adef.int_of_iper (mother cpl)) := {family = [| |]};
             set_mother cpl (Adef.iper_of_int i);
           }
           else do {
@@ -2423,7 +2419,7 @@ value check_parents_children base ascends descends =
                else ([x :: list], i + 1))
             ([], 0) (Array.to_list u.family)
         in
-        u.family := Array.of_list (List.rev list)
+        unions.(i) := {family = Array.of_list (List.rev list)}
       else ()
     };
     for i = 0 to base.data.families.len - 1 do {
@@ -2612,7 +2608,7 @@ value finish_base base =
              Adef.od_of_codate families.(Adef.int_of_ifam ifam).marriage)
           (Array.to_list u.family)
       in
-      u.family := Array.of_list family
+      unions.(i) := {family = Array.of_list family}
     };
     for i = 0 to Array.length persons - 1 do {
       let p = persons.(i) in
@@ -2633,7 +2629,7 @@ value finish_base base =
       else ()
     };
     check_parents_sex base persons families;
-    check_parents_children base ascends descends;
+    check_parents_children base ascends unions descends;
     if try_negative_dates.val then negative_dates base persons families
     else ();
     Check.check_base base
