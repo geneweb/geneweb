@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.4 2006-09-17 09:41:38 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.5 2006-09-17 13:56:19 ddr Exp $ *)
 
 open Adef;
 
@@ -22,8 +22,8 @@ type notes =
 ;
 
 type cache 'a =
-  { array : mutable unit -> array 'a;
-    get : mutable int -> 'a;
+  { array : unit -> array 'a;
+    get : int -> 'a;
     len : mutable int;
     clear_array : unit -> unit }
 ;

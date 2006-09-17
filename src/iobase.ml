@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.5 2006-09-17 09:59:45 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.6 2006-09-17 13:56:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -909,34 +909,33 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
                   flush stderr;
                   failwith "cannot access database" } ] ] ]
   in
-  let r =
-    {array = fun []; get = gen_get; len = max len plenr.val;
+  let rec r =
+    {array () =
+       match tab.val with
+       [ Some x -> x
+       | None ->
+           do {
+             IFDEF UNIX THEN
+               if verbose.val then do {
+                 Printf.eprintf "*** read %s%s\n" name
+                   (if cleared.val then " (again)" else "");
+                 flush stderr;
+               }
+               else ()
+             ELSE () END;
+             do {
+               seek_in ic array_pos;
+               let v = input_value ic in
+               let v = v_arr_ext v in
+               let t = apply_patches v v_ext patches r.len in
+               tab.val := Some t;
+               t
+             }
+           } ];
+     get = gen_get; len = max len plenr.val;
      clear_array = fun _ -> do { cleared.val := True; tab.val := None }}
   in
-  let array () =
-    match tab.val with
-    [ Some x -> x
-    | None ->
-        do {
-          IFDEF UNIX THEN
-            if verbose.val then do {
-              Printf.eprintf "*** read %s%s\n" name
-                (if cleared.val then " (again)" else "");
-              flush stderr;
-            }
-            else ()
-          ELSE () END;
-          do {
-            seek_in ic array_pos;
-            let v = input_value ic in
-            let v = v_arr_ext v in
-            let t = apply_patches v v_ext patches r.len in
-            tab.val := Some t;
-            t
-          }
-        } ]
-  in
-  do { r.array := array; r }
+  r
 ;
 
 value input_patches bname =
