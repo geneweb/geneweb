@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.11 2006-09-16 21:33:00 ddr Exp $ *)
+(* $Id: def.mli,v 5.12 2006-09-17 07:54:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -133,8 +133,8 @@ type gen_family 'person 'string =
   { marriage : codate;
     marriage_place : 'string;
     marriage_src : 'string;
-    witnesses : mutable array 'person;
-    relation : mutable relation_kind;
+    witnesses : array 'person;
+    relation : relation_kind;
     divorce : divorce;
     comment : 'string;
     origin_file : 'string;
