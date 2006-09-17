@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.8 2006-09-17 06:47:48 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.9 2006-09-17 08:17:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -474,7 +474,7 @@ value effective_mod conf base sfam scpl sdes =
     for i = 0 to Array.length oarr - 1 do {
       if not (array_memq oarr.(i) narr) then do {
         let ou = uoi base oarr.(i) in
-        ou.family := family_exclude ou.family ofam.fam_index;
+        let ou = {family = family_exclude ou.family ofam.fam_index} in
         base.func.patch_union oarr.(i) ou
       }
       else ()
@@ -482,7 +482,7 @@ value effective_mod conf base sfam scpl sdes =
     for i = 0 to Array.length narr - 1 do {
       if not (array_memq narr.(i) oarr) then do {
         let nu = uoi base narr.(i) in
-        nu.family := Array.append nu.family [| fi |];
+        let nu = {family = Array.append nu.family [| fi |]} in
         base.func.patch_union narr.(i) nu;
       }
       else ()
@@ -600,8 +600,8 @@ value effective_add conf base sfam scpl sdes =
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
     base.func.patch_descend fi ndes;
-    nfath_u.family := Array.append nfath_u.family [| fi |];
-    nmoth_u.family := Array.append nmoth_u.family [| fi |];
+    let nfath_u = {family = Array.append nfath_u.family [| fi |]} in
+    let nmoth_u = {family = Array.append nmoth_u.family [| fi |]} in
     base.func.patch_union (father ncpl) nfath_u;
     base.func.patch_union (mother ncpl) nmoth_u;
     Array.iter
@@ -629,10 +629,8 @@ value effective_inv conf base ip u ifam =
         else [ifam1 :: loop [ifam2 :: ifaml]]
     | _ -> do { incorrect_request conf; raise Update.ModErr } ]
   in
-  do {
-    u.family := Array.of_list (loop (Array.to_list u.family));
-    base.func.patch_union ip u
-  }
+  let u = {family = Array.of_list (loop (Array.to_list u.family))} in
+  base.func.patch_union ip u
 ;
 
 value kill_family base fam ip =
@@ -643,7 +641,8 @@ value kill_family base fam ip =
          if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
       (Array.to_list u.family) []
   in
-  do { u.family := Array.of_list l; base.func.patch_union ip u }
+  let u = {family = Array.of_list l} in
+  base.func.patch_union ip u
 ;
 
 value kill_parents base ip =
