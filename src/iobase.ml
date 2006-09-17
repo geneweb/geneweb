@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.4 2006-09-17 09:41:38 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.5 2006-09-17 09:59:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -883,8 +883,34 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
   in
   let tab = ref None in
   let cleared = ref False in
+  let gen_get i =
+    match tab.val with
+    [ Some x -> x.(i)
+    | None ->
+        try
+          let v = Hashtbl.find patches i in
+          v_ext v
+        with
+        [ Not_found ->
+            if i < 0 || i >= len then
+              failwith
+                ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
+            else
+              match ic_acc with
+              [ Some ic_acc -> do {
+                  seek_in ic_acc (shift + Iovalue.sizeof_long * i);
+                  let pos = input_binary_int ic_acc in
+                  seek_in ic pos;
+                  let v = Iovalue.input ic in
+                  v_ext v
+                }
+              | None -> do {
+                  Printf.eprintf "Sorry; I really need base.acc\n";
+                  flush stderr;
+                  failwith "cannot access database" } ] ] ]
+  in
   let r =
-    {array = fun []; get = fun []; len = max len plenr.val;
+    {array = fun []; get = gen_get; len = max len plenr.val;
      clear_array = fun _ -> do { cleared.val := True; tab.val := None }}
   in
   let array () =
@@ -910,32 +936,7 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
           }
         } ]
   in
-  let gen_get i =
-    if tab.val <> None then (r.array ()).(i)
-    else
-      try
-        let v = Hashtbl.find patches i in
-        v_ext v
-      with
-      [ Not_found ->
-          if i < 0 || i >= len then
-            failwith
-              ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
-          else
-            match ic_acc with
-            [ Some ic_acc -> do {
-                seek_in ic_acc (shift + Iovalue.sizeof_long * i);
-                let pos = input_binary_int ic_acc in
-                seek_in ic pos;
-                let v = Iovalue.input ic in
-                v_ext v
-              }
-            | None -> do {
-                Printf.eprintf "Sorry; I really need base.acc\n";
-                flush stderr;
-                failwith "cannot access database" } ] ]
-  in
-  do { r.array := array; r.get := gen_get; r }
+  do { r.array := array; r }
 ;
 
 value input_patches bname =
@@ -1504,11 +1505,8 @@ value count_error computed found =
 ;
 
 value cache_of tab =
-  let c =
-    {array = fun _ -> tab; get = fun []; len = Array.length tab;
-     clear_array = fun _ -> ()}
-  in
-  do { c.get := fun i -> (c.array ()).(i); c }
+  {array = fun _ -> tab; get = fun i -> tab.(i); len = Array.length tab;
+   clear_array = fun _ -> ()}
 ;
 
 value create_name_index oc_inx oc_inx_acc base =
