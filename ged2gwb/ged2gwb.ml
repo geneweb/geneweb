@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.10 2006-09-16 21:05:12 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.11 2006-09-17 06:47:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2158,7 +2158,7 @@ value pass3 gen fname =
     List.iter
       (fun (ifam, ip) ->
          match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
-         [ Right3 fam cpl _ ->
+         [ Right3 fam cpl des ->
              match
                (gen.g_per.arr.(Adef.int_of_iper (father cpl)),
                 gen.g_per.arr.(Adef.int_of_iper ip))
@@ -2171,7 +2171,11 @@ value pass3 gen fname =
                        {(p) with related = [(father cpl) :: p.related]}
                      in
                      gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
-                   fam.witnesses := Array.append fam.witnesses [| ip |]
+                   let fam =
+                     {(fam) with
+                      witnesses = Array.append fam.witnesses [| ip |]}
+                   in
+                   gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des
                  }
              | _ -> () ]
          | _ -> () ])

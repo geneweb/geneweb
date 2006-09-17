@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.7 2006-09-16 21:05:12 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.8 2006-09-17 06:47:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -435,12 +435,22 @@ value effective_mod conf base sfam scpl sdes =
       let nfath =
         match nfath.sex with
         [ Female -> print_err_father_sex conf base nfath
-        | _ -> {(nfath) with sex = Male} ]
+        | Male -> nfath
+        | Neuter -> do {
+            let nfath = {(nfath) with sex = Male} in
+            base.func.patch_person nfath.cle_index nfath;
+            nfath
+          } ]
       in
       let nmoth =
         match nmoth.sex with
         [ Male -> print_err_mother_sex conf base nmoth
-        | _ -> {(nmoth) with sex = Female} ]
+        | Female -> nmoth
+        | Neuter -> do {
+            let nmoth = {(nmoth) with sex = Female} in
+            base.func.patch_person nmoth.cle_index nmoth;
+            nmoth
+          } ]
       in
       (nfath, nmoth)
     else (nfath, nmoth)
