@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.10 2006-09-17 08:17:57 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.11 2006-09-17 09:59:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -704,11 +704,8 @@ value do_consang = ref False;
 value pr_stats = ref False;
 
 value cache_of tab =
-  let c =
-    {array = fun _ -> tab; get = fun []; len = Array.length tab;
-     clear_array = fun _ -> ()}
-  in
-  do { c.get := fun i -> (c.array ()).(i); c }
+  {array = fun _ -> tab; get = fun i -> tab.(i); len = Array.length tab;
+   clear_array = fun _ -> ()}
 ;
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};

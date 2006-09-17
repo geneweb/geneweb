@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.13 2006-09-17 08:17:57 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.14 2006-09-17 09:59:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2299,10 +2299,8 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
 ;
 
 value cache_of tab =
-  let c =
-    {array _ = tab; get = fun []; len = Array.length tab; clear_array x = x}
-  in
-  do { c.get := fun i -> (c.array ()).(i); c }
+  {array _ = tab; get = fun i -> tab.(i); len = Array.length tab;
+   clear_array x = x}
 ;
 
 value make_base (persons, families, strings, bnotes) =
