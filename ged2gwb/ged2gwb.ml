@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.11 2006-09-17 06:47:48 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.12 2006-09-17 07:54:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2484,10 +2484,10 @@ value string_of_sex =
   | Neuter -> "N" ]
 ;
 
-value check_parents_sex base persons =
+value check_parents_sex base persons families =
   for i = 0 to base.data.couples.len - 1 do {
     let cpl = base.data.couples.get i in
-    let fam = base.data.families.get i in
+    let fam = families.(i) in
     let ifath = father cpl in
     let imoth = mother cpl in
     let fath = poi base ifath in
@@ -2504,7 +2504,8 @@ value check_parents_sex base persons =
           (designation base moth)
       else ();
       flush log_oc.val;
-      fam.relation := NoSexesCheckNotMarried
+      let fam = {(fam) with relation = NoSexesCheckNotMarried} in
+      families.(i) := fam;
     }
     else do {
       persons.(Adef.int_of_iper ifath) := {(fath) with sex = Male};
@@ -2631,7 +2632,7 @@ value finish_base base =
         persons.(i) := {(p) with first_name = fn; surname = sn; occ = occ}
       else ()
     };
-    check_parents_sex base persons;
+    check_parents_sex base persons families;
     check_parents_children base ascends descends;
     if try_negative_dates.val then negative_dates base persons families
     else ();
