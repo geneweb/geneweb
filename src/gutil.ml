@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.9 2006-09-16 20:15:05 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.10 2006-09-18 12:45:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -215,8 +215,8 @@ value nominative s =
   | _ -> s ]
 ;
 
-value p_first_name base p = nominative (sou base p.first_name);
-value p_surname base p = nominative (sou base p.surname);
+value p_first_name base p = nominative (sou base (get_first_name p));
+value p_surname base p = nominative (sou base (get_surname p));
 
 value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
@@ -328,7 +328,8 @@ value strictly_after d1 d2 =
 value designation base p =
   let first_name = p_first_name base p in
   let nom = p_surname base p in
-  iso_8859_1_of_utf_8 (first_name ^ "." ^ string_of_int p.occ ^ " " ^ nom)
+  iso_8859_1_of_utf_8
+    (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 ;
 
 value father = Adef.father;
@@ -394,32 +395,32 @@ value person_misc_names base p nobtit =
           tnl.val
         }
       in
-      if sou base p.public_name = "" || nobtit p = [] then titles_names
-      else [p.public_name :: titles_names]
+      if sou base (get_public_name p) = "" || nobtit p = [] then titles_names
+      else [get_public_name p :: titles_names]
     in
     let first_names =
       let pn =
-        if sou base p.public_name <> "" && nobtit p = [] then
-          [p.public_name :: public_names]
+        if sou base (get_public_name p) <> "" && nobtit p = [] then
+          [get_public_name p :: public_names]
         else public_names
       in
-      [first_name :: List.map (sou base) (p.first_names_aliases @ pn)]
+      [first_name :: List.map (sou base) (get_first_names_aliases p @ pn)]
     in
     let surnames =
       [surname ::
        surnames_pieces surname @
-         List.map (sou base) (p.surnames_aliases @ p.qualifiers)]
+         List.map (sou base) (get_surnames_aliases p @ get_qualifiers p)]
     in
     let surnames =
-      if p.sex == Female then
-        let u = uoi base p.cle_index in
+      if get_sex p == Female then
+        let u = uoi base (get_cle_index p) in
         List.fold_left
           (fun list ifam ->
              let cpl = coi base ifam in
              let husband = poi base (father cpl) in
              let husband_surname = p_surname base husband in
              let husband_surnames_aliases =
-               List.map (sou base) husband.surnames_aliases
+               List.map (sou base) (get_surnames_aliases husband)
              in
              if p_surname base husband = "?" then
                husband_surnames_aliases @ list
@@ -442,7 +443,7 @@ value person_misc_names base p nobtit =
     in
     let list =
       let first_names =
-        [first_name :: List.map (sou base) p.first_names_aliases]
+        [first_name :: List.map (sou base) (get_first_names_aliases p)]
       in
       List.fold_left
         (fun list t ->
@@ -453,7 +454,7 @@ value person_misc_names base p nobtit =
                match t.t_name with
                [ Tname f -> [sou base f :: first_names]
                | Tmain | Tnone ->
-                   let f = sou base p.public_name in
+                   let f = sou base (get_public_name p) in
                    if f = "" then first_names else [f :: first_names] ]
              in
              List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
@@ -461,12 +462,12 @@ value person_misc_names base p nobtit =
         list (nobtit p)
     in
     let list =
-      match parents (aoi base p.cle_index) with
+      match parents (aoi base (get_cle_index p)) with
       [ Some ifam ->
           let cpl = coi base ifam in
           let fath = poi base (father cpl) in
           let first_names =
-            [first_name :: List.map (sou base) p.first_names_aliases]
+            [first_name :: List.map (sou base) (get_first_names_aliases p)]
           in
           List.fold_left
             (fun list t ->
@@ -479,7 +480,7 @@ value person_misc_names base p nobtit =
       | _ -> list ]
     in
     let list =
-      List.fold_left (fun list s -> [sou base s :: list]) list p.aliases
+      List.fold_left (fun list s -> [sou base s :: list]) list (get_aliases p)
     in
     let fn = Name.lower (first_name ^ " " ^ surname) in
     List.fold_left
@@ -497,7 +498,7 @@ value person_is_key base p k =
     True
   else if
     List.exists (fun x -> k = Name.crush_lower x)
-      (person_misc_names base p (fun p -> p.titles)) then
+      (person_misc_names base p get_titles) then
     True
   else False
 ;
@@ -514,9 +515,11 @@ value person_ht_find_unique base first_name surname occ =
       fun
       [ [ip :: ipl] ->
           let p = poi base ip in
-          if occ == p.occ && first_name = Name.lower (p_first_name base p) &&
-             surname = Name.lower (p_surname base p) then
-            p.cle_index
+          if occ == get_occ p &&
+             first_name = Name.lower (p_first_name base p) &&
+             surname = Name.lower (p_surname base p)
+          then
+            get_cle_index p
           else find ipl
       | _ -> raise Not_found ]
     in
@@ -589,7 +592,7 @@ value find_same_name base p =
          else pl)
       [] ipl
   in
-  List.sort (fun p1 p2 -> compare p1.occ p2.occ) pl
+  List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
 ;
 
 (* check base *)
@@ -717,8 +720,8 @@ value arabian_of_roman s =
 value child_born_after_his_parent base error warning x iparent =
   let parent = poi base iparent in
   match
-    (Adef.od_of_codate parent.birth, Adef.od_of_codate x.birth,
-     date_of_death x.death)
+    (Adef.od_of_codate (get_birth parent), Adef.od_of_codate (get_birth x),
+     date_of_death (get_death x))
   with
   [ (Some (Dgreg g1 _ as d1), Some (Dgreg g2 _ as d2), _) ->
       if strictly_after d1 d2 then warning (ParentBornAfterChild parent x)
@@ -734,7 +737,7 @@ value child_born_after_his_parent base error warning x iparent =
 ;
 
 value born_after_his_elder_sibling base error warning x np ifam des =
-  match (np, Adef.od_of_codate x.birth, x.death) with
+  match (np, Adef.od_of_codate (get_birth x), get_death x) with
   [ (None, _, _) -> ()
   | (Some (elder, d1), Some d2, _) ->
       if strictly_after d1 d2 then
@@ -750,7 +753,7 @@ value born_after_his_elder_sibling base error warning x np ifam des =
 
 value child_born_before_mother_death base warning x imoth =
   let mother = poi base imoth in
-  match (Adef.od_of_codate x.birth, mother.death) with
+  match (Adef.od_of_codate (get_birth x), get_death mother) with
   [ (Some d1, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
       if strictly_after d1 d2 then
@@ -760,13 +763,14 @@ value child_born_before_mother_death base warning x imoth =
 ;
 
 value child_has_sex warning child =
-  if child.sex = Neuter then warning (UndefinedSex child)
-  else ()
+  if get_sex child = Neuter then warning (UndefinedSex child) else ()
 ;
 
 value possible_father base warning x ifath =
   let father = poi base ifath in
-  match (Adef.od_of_codate x.birth, date_of_death father.death) with
+  match
+    (Adef.od_of_codate (get_birth x), date_of_death (get_death father))
+  with
   [ (Some (Dgreg {prec = Before} _), _) |
     (_, Some (Dgreg {prec = After} _)) ->
       ()
@@ -783,7 +787,7 @@ value possible_father base warning x ifath =
 ;
 
 value birth_before_death base warning p =
-  match (Adef.od_of_codate p.birth, p.death) with
+  match (Adef.od_of_codate (get_birth p), get_death p) with
   [ (Some d1, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
       if strictly_after d1 d2 then warning (BirthAfterDeath p) else ()
@@ -798,7 +802,7 @@ value titles_after_birth base warning p t =
     [ (Some d1, Some d2) ->
         if strictly_after d1 d2 then warning (TitleDatesError p t) else ()
     | _ -> () ];
-    match Adef.od_of_codate p.birth with
+    match Adef.od_of_codate (get_birth p) with
     [ Some d1 ->
         do {
           match t_date_start with
@@ -818,7 +822,7 @@ value titles_after_birth base warning p t =
 ;
 
 value try_to_fix_relation_sex base warning p_ref = do {
-  let p_index = Some p_ref.cle_index in
+  let p_index = Some (get_cle_index p_ref) in
   let fixed = ref 0 in
   let not_fixed = ref 0 in
   let changed_related =
@@ -831,11 +835,11 @@ value try_to_fix_relation_sex base warning p_ref = do {
                 let (rel, changed, not_changed) =
                   match (p_index = rel.r_fath, p_index = rel.r_moth) with
                   [ (True, False) ->
-                      if p_ref.sex = Female then
+                      if get_sex p_ref = Female then
                         match rel.r_moth with
                         [ Some ip ->
                             let oth_p = poi base ip in
-                            if oth_p.sex = Male then
+                            if get_sex oth_p = Male then
                               let rel =
                                 {(rel) with
                                  r_fath = rel.r_moth; r_moth = p_index}
@@ -850,11 +854,11 @@ value try_to_fix_relation_sex base warning p_ref = do {
                             (rel, changed + 1, not_changed) ]
                       else (rel, changed, not_changed)
                   | (False, True) ->
-                      if p_ref.sex = Male then
+                      if get_sex p_ref = Male then
                         match rel.r_fath with
                         [ Some ip ->
                             let oth_p = poi base ip in
-                            if oth_p.sex = Female then
+                            if get_sex oth_p = Female then
                               let rel =
                                 {(rel) with
                                  r_moth = rel.r_fath; r_fath = p_index}
@@ -872,7 +876,7 @@ value try_to_fix_relation_sex base warning p_ref = do {
                   | (True, True) -> (rel, changed, not_changed + 1) ]
                 in
                 ([rel :: rparents], changed, not_changed))
-             p.rparents ([], 0, 0)
+             (get_rparents p) ([], 0, 0)
          in
          let _ = do {
            fixed.val := fixed.val + changed;
@@ -880,17 +884,20 @@ value try_to_fix_relation_sex base warning p_ref = do {
          }
          in
          if changed > 0 then
-           let p = {(p) with rparents = rparents} in
+           let p =
+             person_of_gen_person
+               {(gen_person_of_person p) with rparents = rparents}
+           in
            [(ip, p) :: changed_related]
          else changed_related)
-      p_ref.related []
+      (get_related p_ref) []
   in
   warning (IncoherentSex p_ref fixed.val not_fixed.val);
   if fixed.val > 0 then Some changed_related else None
 };
 
 value related_sex_is_coherent base warning p_ref =
-  let p_index = Some p_ref.cle_index in
+  let p_index = Some (get_cle_index p_ref) in
   let merge_sex g1 g2 =
     match (g1, g2) with
     [ (Some Male, Some Male) -> Some Male
@@ -910,12 +917,19 @@ value related_sex_is_coherent base warning p_ref =
       sex rparents
   in
   let new_sex =
-    List.fold_left (fun g ip -> let p = poi base ip in check_sex g p.rparents)
-      (Some p_ref.sex) p_ref.related
+    List.fold_left
+      (fun g ip ->
+         let p = poi base ip in
+         check_sex g (get_rparents p))
+      (Some (get_sex p_ref)) (get_related p_ref)
   in
   match new_sex with
   [ Some g ->
-      if p_ref.sex != g then Some [(p_ref.cle_index, {(p_ref) with sex = g})]
+      if get_sex p_ref != g then
+        let p =
+          person_of_gen_person {(gen_person_of_person p_ref) with sex = g}
+        in
+        Some [(get_cle_index p_ref, p)]
       else None
   | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
@@ -925,13 +939,13 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
   match Adef.od_of_codate fam.marriage with
   [ Some d2 ->
       do {
-        match Adef.od_of_codate p.birth with
+        match Adef.od_of_codate (get_birth p) with
         [ Some d1 ->
             if strictly_before d2 d1 then
               warning (MarriageDateBeforeBirth p)
             else ()
         | _ -> () ];
-        match p.death with
+        match get_death p with
         [ Death _ d3 ->
             let d3 = Adef.date_of_cdate d3 in
             if strictly_after d2 d3 then warning (MarriageDateAfterDeath p)
@@ -967,9 +981,9 @@ value semi_sort base a before comp di =
     else
       let p1 = poi base a.(i) in
       let d1 =
-        match Adef.od_of_codate p1.birth with
+        match Adef.od_of_codate (get_birth p1) with
         [ Some d1 -> Some d1
-        | None -> Adef.od_of_codate p1.baptism ]
+        | None -> Adef.od_of_codate (get_baptism p1) ]
       in
       match d1 with
       [ Some d1 ->
@@ -978,9 +992,9 @@ value semi_sort base a before comp di =
             else
               let p2 = poi base a.(j) in
               let d2 =
-                match Adef.od_of_codate p2.birth with
+                match Adef.od_of_codate (get_birth p2) with
                 [ Some d2 -> Some d2
-                | None -> Adef.od_of_codate p2.baptism ]
+                | None -> Adef.od_of_codate (get_baptism p2) ]
               in
               match d2 with
               [ Some d2 ->
@@ -988,8 +1002,8 @@ value semi_sort base a before comp di =
                     let j =
                       match sex_interm_sib with
                       [ Some s ->
-                          if s = p1.sex then None
-                          else if s = p2.sex then Some j
+                          if s = get_sex p1 then None
+                          else if s = get_sex p2 then Some j
                           else None
                       | None -> Some j ]
                     in
@@ -1001,9 +1015,9 @@ value semi_sort base a before comp di =
                             else
                               let p3 = poi base a.(k) in
                               let d3 =
-                                match Adef.od_of_codate p3.birth with
+                                match Adef.od_of_codate (get_birth p3) with
                                 [ Some d3 -> Some d3
-                                | None -> Adef.od_of_codate p3.baptism ]
+                                | None -> Adef.od_of_codate (get_baptism p3) ]
                               in
                               match d3 with
                               [ Some d3 ->
@@ -1031,9 +1045,9 @@ value semi_sort base a before comp di =
               | None ->
                   match sex_interm_sib with
                   [ Some s ->
-                      if s = p2.sex then loop_j sex_interm_sib (j - di)
+                      if s = get_sex p2 then loop_j sex_interm_sib (j - di)
                       else loop (i + di)
-                  | None -> loop_j (Some p2.sex) (j - di) ] ]
+                  | None -> loop_j (Some (get_sex p2)) (j - di) ] ]
       | None -> loop (i + di) ]
 ;
 
@@ -1054,13 +1068,13 @@ value check_family base error warning fam cpl des =
   let fath = poi base (father cpl) in
   let moth = poi base (mother cpl) in
   do {
-    match fath.sex with
+    match get_sex fath with
     [ Male -> birth_before_death base warning fath
     | Female | Neuter ->
         if fam.relation = NoSexesCheckNotMarried
         || fam.relation = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson fath) ];
-    match moth.sex with
+    match get_sex moth with
     [ Female -> birth_before_death base warning moth
     | Male | Neuter ->
         if fam.relation = NoSexesCheckNotMarried ||
@@ -1081,7 +1095,7 @@ value check_family base error warning fam cpl des =
              child_born_before_mother_death base warning child (mother cpl);
              possible_father base warning child (father cpl);
              child_has_sex warning child;
-             match Adef.od_of_codate child.birth with
+             match Adef.od_of_codate (get_birth child) with
              [ Some d -> Some (child, d)
              | _ -> np ]
            })
@@ -1093,7 +1107,7 @@ value check_family base error warning fam cpl des =
 
 value check_person base error warning p = do {
   birth_before_death base warning p;
-  List.iter (titles_after_birth base warning p) p.titles;
+  List.iter (titles_after_birth base warning p) (get_titles p);
   related_sex_is_coherent base warning p
 };
 
@@ -1306,8 +1320,8 @@ value sort_person_list base pl =
   List.sort
     (fun p1 p2 ->
        match
-         (Adef.od_of_codate p1.birth, p1.death, Adef.od_of_codate p2.birth,
-          p2.death)
+         (Adef.od_of_codate (get_birth p1), get_death p1,
+          Adef.od_of_codate (get_birth p2), get_death p2)
        with
        [ (Some d1, _, Some d2, _) -> if strictly_before d1 d2 then -1 else 1
        | (Some d1, _, _, Death _ d2) ->
@@ -1328,7 +1342,7 @@ value sort_person_list base pl =
              let c =
                alphabetic (p_first_name base p1) (p_first_name base p2)
              in
-             if c == 0 then compare p1.occ p2.occ else c
+             if c == 0 then compare (get_occ p1) (get_occ p2) else c
            else c ])
     pl
 ;
@@ -1342,10 +1356,10 @@ value find_free_occ base f s i =
       fun
       [ [ip :: ipl] ->
           let p = poi base ip in
-          if not (List.mem p.occ list) &&
+          if not (List.mem (get_occ p) list) &&
              first_name = Name.lower (p_first_name base p) &&
              surname = Name.lower (p_surname base p) then
-            loop [p.occ :: list] ipl
+            loop [get_occ p :: list] ipl
           else loop list ipl
       | [] -> list ]
   in

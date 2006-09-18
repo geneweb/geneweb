@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.6 2006-09-18 12:45:28 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.1 2006-09-18 12:45:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -81,22 +81,23 @@ type base =
     func : base_func }
 ;
 
-value get_aliases : db_person 'p 's -> list 's;
-value get_baptism : db_person 'p 's -> codate;
-value get_birth : db_person 'p 's -> codate;
-value get_cle_index : db_person 'p 's -> iper;
-value get_death : db_person 'p 's -> Def.death;
-value get_first_name : db_person 'p 's -> 's;
-value get_first_names_aliases : db_person 'p 's -> list 's;
-value get_occ : db_person 'p 's -> int;
-value get_public_name : db_person 'p 's -> 's;
-value get_qualifiers : db_person 'p 's -> list 's;
-value get_related : db_person 'p 's -> list iper;
-value get_rparents : db_person 'p 's -> list (Def.gen_relation 'p 's);
-value get_sex : db_person 'p 's -> Def.sex;
-value get_surname : db_person 'p 's -> 's;
-value get_surnames_aliases : db_person 'p 's -> list 's;
-value get_titles : db_person 'p 's -> list (Def.gen_title 's);
+value get_aliases p = p.Def.aliases;
+value get_baptism p = p.Def.baptism;
+value get_birth p = p.Def.birth;
+value get_cle_index p = p.Def.cle_index;
+value get_death p = p.Def.death;
+value get_first_name p = p.Def.first_name;
+value get_first_names_aliases p = p.Def.first_names_aliases;
+value get_occ p = p.Def.occ;
+value get_public_name p = p.Def.public_name;
+value get_qualifiers p = p.Def.qualifiers;
+value get_related p = p.Def.related;
+value get_rparents p = p.Def.rparents;
+value get_sex p = p.Def.sex;
+value get_surname p = p.Def.surname;
+value get_surnames_aliases p = p.Def.surnames_aliases;
+value get_titles p = p.Def.titles;
 
-value person_of_gen_person : Def.gen_person 'p 's -> db_person 'p 's;
-value gen_person_of_person : db_person 'p 's -> Def.gen_person 'p 's;
+value person_of_gen_person p = p;
+value gen_person_of_person p = p;
+
