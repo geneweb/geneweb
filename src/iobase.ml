@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.6 2006-09-17 13:56:19 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.7 2006-09-18 14:29:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -368,9 +368,10 @@ value old_persons_of_first_name_or_surname base_data strings params =
                let ipera =
                  try IstrTree.find istr bt.val with [ Not_found -> [] ]
                in
-               if List.memq p.cle_index ipera then ()
+               if List.memq (get_cle_index p) ipera then ()
                else
-                 bt.val := IstrTree.add istr [p.cle_index :: ipera] bt.val)
+                 bt.val :=
+                   IstrTree.add istr [get_cle_index p :: ipera] bt.val)
           person_patches;
         if gistro = None then completed.val := True else ();
         bt.val
@@ -416,8 +417,8 @@ flush stderr;
       Hashtbl.iter
         (fun i p ->
            if List.memq (Adef.iper_of_int i) ipl.val then
-             if compare_istr_fun base_data istr p.first_name == 0 ||
-                compare_istr_fun base_data istr p.surname == 0 then
+             if compare_istr_fun base_data istr (get_first_name p) == 0 ||
+                compare_istr_fun base_data istr (get_surname p) == 0 then
                ()
              else ipl.val := list_remove_elemq (Adef.iper_of_int i) ipl.val
            else ())
@@ -498,8 +499,8 @@ flush stderr;
         (fun i p ->
            let istr1 = proj p in
            if istr1 <> istr then ()
-           else if List.memq p.cle_index ipera.val then ()
-           else ipera.val := [p.cle_index :: ipera.val])
+           else if List.memq (get_cle_index p) ipera.val then ()
+           else ipera.val := [get_cle_index p :: ipera.val])
         person_patches;
       ipera.val
     }
@@ -633,18 +634,18 @@ value strings_of_fsname bname strings (_, person_patches) =
       Hashtbl.iter
         (fun _ p ->
            do {
-             if not (List.memq p.first_name l.val) then
-               let s1 = strings.get (Adef.int_of_istr p.first_name) in
+             if not (List.memq (get_first_name p) l.val) then
+               let s1 = strings.get (Adef.int_of_istr (get_first_name p)) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
-                 l.val := [p.first_name :: l.val]
+                 l.val := [get_first_name p :: l.val]
                else ()
              else ();
-             if not (List.memq p.surname l.val) then
-               let s1 = strings.get (Adef.int_of_istr p.surname) in
+             if not (List.memq (get_surname p) l.val) then
+               let s1 = strings.get (Adef.int_of_istr (get_surname p)) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
-                 l.val := [p.surname :: l.val]
+                 l.val := [get_surname p :: l.val]
                else ()
              else ();
            })
@@ -1294,11 +1295,11 @@ value input bname =
          (snd patches.h_string);
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_surname_start_pos, fun p -> p.surname, snd patches.h_person,
+         (ic2, ic2_surname_start_pos, get_surname, snd patches.h_person,
           "snames.inx", "snames.dat", bname);
      persons_of_first_name =
        persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
+         (ic2, ic2_first_name_start_pos, get_first_name,
           snd patches.h_person, "fnames.inx", "fnames.dat", bname);
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
@@ -1359,8 +1360,10 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
-      let a = try IstrTree.find p.surname bt.val with [ Not_found -> [] ] in
-      bt.val := IstrTree.add p.surname [p.cle_index :: a] bt.val
+      let a =
+        try IstrTree.find (get_surname p) bt.val with [ Not_found -> [] ]
+      in
+      bt.val := IstrTree.add (get_surname p) [get_cle_index p :: a] bt.val
     };
     (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
        i.e. the created database can be still read by these versions but this
@@ -1397,8 +1400,10 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
-      let a = try IstrTree.find p.first_name bt.val with [ Not_found -> [] ] in
-      bt.val := IstrTree.add p.first_name [p.cle_index :: a] bt.val
+      let a =
+        try IstrTree.find (get_first_name p) bt.val with [ Not_found -> [] ]
+      in
+      bt.val := IstrTree.add (get_first_name p) [get_cle_index p :: a] bt.val
     };
     (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
        i.e. the created database can be still read by these versions but this
@@ -1448,9 +1453,9 @@ value make_name_index base =
       if first_name <> "?" && surname <> "?" then
         let names =
           [Name.lower (first_name ^ " " ^ surname) ::
-           person_misc_names base p (fun p -> p.titles)]
+           person_misc_names base p get_titles]
         in
-        add_names p.cle_index names
+        add_names (get_cle_index p) names
       else ();
     };
     t
@@ -1533,14 +1538,14 @@ value make_strings_of_fsname base =
       let p = base.data.persons.get i in
       let first_name = p_first_name base p in
       let surname = p_surname base p in
-      if first_name <> "?" then add_name t first_name p.first_name else ();
+      if first_name <> "?" then add_name t first_name (get_first_name p)
+      else ();
       if surname <> "?" then do {
-        add_name t surname p.surname;
-        List.iter (fun sp -> add_name t sp p.surname)
+        add_name t surname (get_surname p);
+        List.iter (fun sp -> add_name t sp (get_surname p))
           (surnames_pieces surname);
       }
       else ();
-      ()
     };
     t
   }
