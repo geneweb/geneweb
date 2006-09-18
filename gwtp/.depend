@@ -1,12 +1,12 @@
 gwtp.cmo: ../src/buff.cmo ../src/gutil.cmi ../src/gwdb.cmi httpEnv.cmo \
     ../src/iobase.cmi iolight.cmo ../src/lock.cmi ../src/secure.cmi \
     ../src/translate.cmi 
-gwtp.cmx: ../src/buff.cmx ../src/gutil.cmx ../src/gwdb.cmi httpEnv.cmx \
+gwtp.cmx: ../src/buff.cmx ../src/gutil.cmx ../src/gwdb.cmx httpEnv.cmx \
     ../src/iobase.cmx iolight.cmx ../src/lock.cmx ../src/secure.cmx \
     ../src/translate.cmx 
 iolight.cmo: ../src/buff.cmo ../src/def.cmi ../src/gwdb.cmi \
     ../src/iovalue.cmi ../src/secure.cmi 
-iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/gwdb.cmi \
+iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/gwdb.cmx \
     ../src/iovalue.cmx ../src/secure.cmx 
 recover.cmo: ../src/iobase.cmi iolight.cmo 
 recover.cmx: ../src/iobase.cmx iolight.cmx 
