@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: update.ml,v 5.4 2006-09-18 20:37:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -55,8 +55,8 @@ value print_same_name conf base p =
                [ Some p -> do {
                    stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
                    begin
-                     Wserver.wprint "%s.%d %s" (p_first_name base p) p.occ
-                       (p_surname base p);
+                     Wserver.wprint "%s.%d %s" (p_first_name base p)
+                       (get_occ p) (p_surname base p);
                    end;
                    Wserver.wprint "%s\n" (Date.short_dates_text conf base p)
                  }
@@ -102,7 +102,7 @@ value insert_string base s =
 ;
 
 value update_misc_names_of_family conf base p u =
-  match p.sex with
+  match get_sex p with
   [ Male ->
       List.iter
         (fun ifam ->
@@ -140,22 +140,24 @@ value delete_topological_sort conf base =
 
 value print_someone conf base p =
   Wserver.wprint "%s%s %s" (p_first_name base p)
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ) (p_surname base p)
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+    (p_surname base p)
 ;
 
 value print_first_name conf base p =
   Wserver.wprint "%s%s" (p_first_name base p)
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 ;
 
 value print_someone_strong conf base p =
   Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ) (p_surname base p)
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+    (p_surname base p)
 ;
 
 value print_first_name_strong conf base p =
   Wserver.wprint "<strong>%s%s</strong>" (p_first_name base p)
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 ;
 
 value print_error conf base =
@@ -163,7 +165,7 @@ value print_error conf base =
   [ AlreadyDefined p ->
       Wserver.wprint
         (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-        ("\"" ^ p_first_name base p ^ "." ^ string_of_int p.occ ^ " " ^
+        ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
            p_surname base p ^ "\"")
         (fun _ ->
            Wserver.wprint "<a href=\"%s%s\">" (commd conf)
@@ -182,13 +184,14 @@ value print_error conf base =
 value print_someone_ref conf base p =
   Wserver.wprint "<a href=\"%s%s\">\n%s%s %s</a>" (commd conf)
     (acces conf base p) (p_first_name base p)
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ) (p_surname base p)
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+    (p_surname base p)
 ;
 
 value someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
     p_first_name base p ^
-    (if p.occ = 0 then "" else "." ^ string_of_int p.occ) ^ " " ^
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p)) ^ " " ^
     p_surname base p ^ "</a>"
 ;
 
@@ -231,7 +234,8 @@ value print_warning conf base =
                let p = poi base ip in
                do {
                  html_li conf;
-                 if p.surname = fath.surname then print_first_name conf base p
+                 if get_surname p = get_surname fath then
+                   print_first_name conf base p
                  else print_someone conf base p;
                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
                  Wserver.wprint "\n"
@@ -247,7 +251,7 @@ value print_warning conf base =
                let p = poi base ip in
                do {
                  html_li conf;
-                 if p.surname = fath.surname then
+                 if get_surname p = get_surname fath then
                    print_first_name_ref conf base p
                  else print_someone_ref conf base p;
                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
@@ -581,7 +585,7 @@ value print_create_conflict conf base p var =
     rheader conf title;
     Wserver.wprint
       (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int p.occ ^ " " ^
+      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
          p_surname base p ^ "\" (" ^ text ^ ")")
       (fun _ ->
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
@@ -631,7 +635,7 @@ value print_create_conflict conf base p var =
 value add_misc_names_for_new_persons conf base new_persons =
   List.iter
     (fun p ->
-       List.iter (fun n -> person_ht_add base n p.cle_index)
+       List.iter (fun n -> person_ht_add base n (get_cle_index p))
          (person_misc_names base p (nobtit conf base)))
     new_persons
 ;
@@ -676,31 +680,32 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             | _ -> (infer_death conf birth, "") ]
           in
           let p =
-            {first_name = insert_string base f;
-             surname = insert_string base s; occ = o; image = empty_string;
-             first_names_aliases = []; surnames_aliases = [];
-             public_name = empty_string; qualifiers = []; aliases = [];
-             titles = []; rparents = []; related = [];
-             occupation = empty_string; sex = sex; access = IfTitles;
-             birth = Adef.codate_of_od birth;
-             birth_place = insert_string base birth_place;
-             birth_src = empty_string; baptism = Adef.codate_of_od baptism;
-             baptism_place = insert_string base baptism_place;
-             baptism_src = empty_string;
-             death = death; death_place = insert_string base death_place;
-             death_src = empty_string; burial = UnknownBurial;
-             burial_place = empty_string; burial_src = empty_string;
-             notes = empty_string;
-             psources =
-               if f = "?" || s = "?" then empty_string
-               else insert_string base (only_printable src);
-             cle_index = ip}
+            person_of_gen_person
+              {first_name = insert_string base f;
+               surname = insert_string base s; occ = o; image = empty_string;
+               first_names_aliases = []; surnames_aliases = [];
+               public_name = empty_string; qualifiers = []; aliases = [];
+               titles = []; rparents = []; related = [];
+               occupation = empty_string; sex = sex; access = IfTitles;
+               birth = Adef.codate_of_od birth;
+               birth_place = insert_string base birth_place;
+               birth_src = empty_string; baptism = Adef.codate_of_od baptism;
+               baptism_place = insert_string base baptism_place;
+               baptism_src = empty_string;
+               death = death; death_place = insert_string base death_place;
+               death_src = empty_string; burial = UnknownBurial;
+               burial_place = empty_string; burial_src = empty_string;
+               notes = empty_string;
+               psources =
+                 if f = "?" || s = "?" then empty_string
+                 else insert_string base (only_printable src);
+               cle_index = ip}
           and a = no_ascend ()
           and u = {family = [| |]} in
           do {
-            base.func.patch_person p.cle_index p;
-            base.func.patch_ascend p.cle_index a;
-            base.func.patch_union p.cle_index u;
+            base.func.patch_person (get_cle_index p) p;
+            base.func.patch_ascend (get_cle_index p) a;
+            base.func.patch_union (get_cle_index p) u;
             if f <> "?" && s <> "?" then do {
               person_ht_add base (Util.translate_eval (f ^ " " ^ s)) ip;
               new_persons.val := [p :: new_persons.val]
