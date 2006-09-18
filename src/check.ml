@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.4 2006-09-16 12:51:14 ddr Exp $ *)
+(* $Id: check.ml,v 5.5 2006-09-18 19:05:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -109,7 +109,7 @@ type stats =
 ;
 
 value birth_year p =
-  match Adef.od_of_codate p.birth with
+  match Adef.od_of_codate (get_birth p) with
   [ Some d ->
       match d with
       [ Dgreg {year = y; prec = Sure} _ -> Some y
@@ -118,7 +118,7 @@ value birth_year p =
 ;
 
 value death_year current_year p =
-  match p.death with
+  match get_death p with
   [ Death _ d ->
       match Adef.date_of_cdate d with
       [ Dgreg {year = y; prec = Sure} _ -> Some y
@@ -129,7 +129,7 @@ value death_year current_year p =
 
 value update_stats base current_year s p =
   do {
-    match p.sex with
+    match get_sex p with
     [ Male -> s.men := s.men + 1
     | Female -> s.women := s.women + 1
     | Neuter -> s.neutre := s.neutre + 1 ];
@@ -140,15 +140,15 @@ value update_stats base current_year s p =
     [ (Some y1, Some y2) ->
         let age = y2 - y1 in
         do {
-          if age > fst s.oldest_dead && p.death <> NotDead then
+          if age > fst s.oldest_dead && get_death p <> NotDead then
             s.oldest_dead := (age, p)
           else ();
-          if age > fst s.oldest_still_alive && p.death = NotDead then
+          if age > fst s.oldest_still_alive && get_death p = NotDead then
             s.oldest_still_alive := (age, p)
           else ();
         }
     | _ -> () ];
-    match (birth_year p, parents (aoi base p.cle_index)) with
+    match (birth_year p, parents (aoi base (get_cle_index p))) with
     [ (Some y2, Some ifam) ->
         let cpl = coi base ifam in
         do {
