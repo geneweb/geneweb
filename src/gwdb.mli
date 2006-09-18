@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.8 2006-09-18 20:24:25 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.9 2006-09-18 21:48:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -85,17 +85,24 @@ value get_access : db_person 'p 's -> Def.access;
 value get_aliases : db_person 'p 's -> list 's;
 value get_baptism : db_person 'p 's -> codate;
 value get_baptism_place : db_person 'p 's -> 's;
+value get_baptism_src : db_person 'p 's -> 's;
 value get_birth : db_person 'p 's -> codate;
 value get_birth_place : db_person 'p 's -> 's;
+value get_birth_src : db_person 'p 's -> 's;
 value get_burial : db_person 'p 's -> Def.burial;
 value get_burial_place : db_person 'p 's -> 's;
+value get_burial_src : db_person 'p 's -> 's;
 value get_cle_index : db_person 'p 's -> iper;
 value get_death : db_person 'p 's -> Def.death;
 value get_death_place : db_person 'p 's -> 's;
+value get_death_src : db_person 'p 's -> 's;
 value get_first_name : db_person 'p 's -> 's;
 value get_first_names_aliases : db_person 'p 's -> list 's;
 value get_image : db_person 'p 's -> 's;
+value get_notes : db_person 'p 's -> 's;
 value get_occ : db_person 'p 's -> int;
+value get_occupation : db_person 'p 's -> 's;
+value get_psources : db_person 'p 's -> 's;
 value get_public_name : db_person 'p 's -> 's;
 value get_qualifiers : db_person 'p 's -> list 's;
 value get_related : db_person 'p 's -> list iper;
