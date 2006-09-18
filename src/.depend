@@ -46,10 +46,12 @@ dag.cmx: buff.cmx config.cmi ../dag2html/dag2html.cmx date.cmx def.cmi \
     gutil.cmx gwdb.cmx name.cmx num.cmx templ.cmx templAst.cmi util.cmx \
     ../wserver/wserver.cmx dag.cmi 
 dag.cmi: config.cmi ../dag2html/dag2html.cmi def.cmi gwdb.cmi 
-date.cmo: adef.cmi buff.cmo calendar.cmi config.cmi def.cmi gutil.cmi num.cmi \
-    templ.cmi templAst.cmi util.cmi ../wserver/wserver.cmi date.cmi 
-date.cmx: adef.cmx buff.cmx calendar.cmx config.cmi def.cmi gutil.cmx num.cmx \
-    templ.cmx templAst.cmi util.cmx ../wserver/wserver.cmx date.cmi 
+date.cmo: adef.cmi buff.cmo calendar.cmi config.cmi def.cmi gutil.cmi \
+    gwdb.cmi num.cmi templ.cmi templAst.cmi util.cmi ../wserver/wserver.cmi \
+    date.cmi 
+date.cmx: adef.cmx buff.cmx calendar.cmx config.cmi def.cmi gutil.cmx \
+    gwdb.cmx num.cmx templ.cmx templAst.cmi util.cmx ../wserver/wserver.cmx \
+    date.cmi 
 date.cmi: config.cmi def.cmi gwdb.cmi 
 def.cmi: adef.cmi 
 descend.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
