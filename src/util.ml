@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.13 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: util.ml,v 5.14 2006-09-18 20:03:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -496,38 +496,38 @@ value p_getint env label =
 
 value nobtit conf base p =
   match Lazy.force conf.allowed_titles with
-  [ [] -> p.titles
+  [ [] -> get_titles p
   | allowed_titles ->
       List.fold_right
         (fun t l ->
            let id = sou base t.t_ident in
            let pl = sou base t.t_place in
            if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
-        p.titles [] ]
+        (get_titles p) [] ]
 ;
 
 value parent_has_title conf base p =
-  let a = aoi base p.cle_index in
+  let a = aoi base (get_cle_index p) in
   match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (father cpl) in
       let moth = poi base (mother cpl) in
-      fath.access <> Private && nobtit conf base fath <> [] ||
-      moth.access <> Private && nobtit conf base moth <> []
+      get_access fath <> Private && nobtit conf base fath <> [] ||
+      get_access moth <> Private && nobtit conf base moth <> []
   | _ -> False ]
 ;
 
 value authorized_age conf base p =
-  if p.access = Public || conf.friend || conf.wizard then True
+  if get_access p = Public || conf.friend || conf.wizard then True
   else if
-    conf.public_if_titles && p.access = IfTitles &&
+    conf.public_if_titles && get_access p = IfTitles &&
     (nobtit conf base p <> [] || parent_has_title conf base p) then
     True
   else
     match
-      (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism, p.death,
-       date_of_death p.death)
+      (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
+       get_death p, date_of_death (get_death p))
     with
     [ (_, _, NotDead, _) when conf.private_years > 0 -> False
     | (Some (Dgreg d _), _, _, _) ->
@@ -537,9 +537,9 @@ value authorized_age conf base p =
     | (_, _, _, Some (Dgreg d _)) ->
         let a = time_gone_by d conf.today in a.year > conf.private_years
     | (None, None, DontKnowIfDead, None) ->
-        p.access <> Private && conf.public_if_no_date
+        get_access p <> Private && conf.public_if_no_date
     | _ ->
-        let u = uoi base p.cle_index in
+        let u = uoi base (get_cle_index p) in
         let rec loop i =
           if i >= Array.length u.family then False
           else
@@ -555,8 +555,8 @@ value authorized_age conf base p =
 
 value is_old_person conf p =
   match
-    (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism, p.death,
-     date_of_death p.death)
+    (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
+     get_death p, date_of_death (get_death p))
   with
   [ (_, _, NotDead, _) when conf.private_years > 0 -> False
   | (Some (Dgreg d _), _, _, _) ->
@@ -566,14 +566,14 @@ value is_old_person conf p =
   | (_, _, _, Some (Dgreg d _)) ->
       let a = time_gone_by d conf.today in a.year > conf.private_years
   | (None, None, DontKnowIfDead, None) ->
-      p.access <> Private && conf.public_if_no_date
+      get_access p <> Private && conf.public_if_no_date
   | _ -> False ]
 ;
 
 value fast_auth_age conf p =
-  if conf.friend || conf.wizard || p.access = Public then True
+  if conf.friend || conf.wizard || get_access p = Public then True
   else if
-    conf.public_if_titles && p.access = IfTitles && p.titles <> []
+    conf.public_if_titles && get_access p = IfTitles && get_titles p <> []
   then
     True
   else is_old_person conf p
@@ -582,7 +582,7 @@ value fast_auth_age conf p =
 value is_restricted (conf : config) base ip =
   let quest_string = Adef.istr_of_int 1 in
   let fct p =
-    p.surname <> quest_string && p.first_name <> quest_string &&
+    get_surname p <> quest_string && get_first_name p <> quest_string &&
     not (fast_auth_age conf p)
   in  
   if conf.use_restrict then
@@ -593,41 +593,23 @@ value is_restricted (conf : config) base ip =
 value empty_string = Adef.istr_of_int 0;
 
 value is_hidden p =
-  p.surname = empty_string
+  get_surname p = empty_string
 ;
 
 value pget (conf : config) base ip =
   if is_restricted conf base ip then
-    { first_name = empty_string;
-      surname = empty_string;
-      occ = 0;
-      image = empty_string;
-      first_names_aliases = [];
-      surnames_aliases = [];
-      public_name = empty_string;
-      qualifiers = [];
-      titles = [];
-      rparents = [];
-      related = [];
-      aliases = [];
-      occupation = empty_string;
-      sex = Neuter;
-      access = Private;
-      birth = Adef.codate_None;
-      birth_place = empty_string;
-      birth_src = empty_string;
-      baptism = Adef.codate_None;
-      baptism_place = empty_string;
-      baptism_src = empty_string;
-      death = DontKnowIfDead;
-      death_place = empty_string;
-      death_src = empty_string;
-      burial = UnknownBurial;
-      burial_place = empty_string;
-      burial_src = empty_string;
-      notes = empty_string;
-      psources = empty_string;
-      cle_index = ip }
+    person_of_gen_person
+      {first_name = empty_string; surname = empty_string; occ = 0;
+       image = empty_string; first_names_aliases = []; surnames_aliases = [];
+       public_name = empty_string; qualifiers = []; titles = []; rparents = [];
+       related = []; aliases = []; occupation = empty_string; sex = Neuter;
+       access = Private; birth = Adef.codate_None; birth_place = empty_string;
+       birth_src = empty_string; baptism = Adef.codate_None;
+       baptism_place = empty_string; baptism_src = empty_string;
+       death = DontKnowIfDead; death_place = empty_string;
+       death_src = empty_string; burial = UnknownBurial;
+       burial_place = empty_string; burial_src = empty_string;
+       notes = empty_string; psources = empty_string; cle_index = ip}
   else base.data.persons.get (Adef.int_of_iper ip)
 ;
 
@@ -643,12 +625,13 @@ value uget (conf : config) base ip =
 ;
 
 value know base p =
-  sou base p.first_name <> "?" || sou base p.surname <> "?"
+  sou base (get_first_name p) <> "?" || sou base (get_surname p) <> "?"
 ;
 
 value is_public conf base p =
-  p.access = Public ||
-  conf.public_if_titles && p.access = IfTitles && nobtit conf base p <> [] ||
+  get_access p = Public ||
+  conf.public_if_titles && get_access p = IfTitles &&
+    nobtit conf base p <> [] ||
   is_old_person conf p
 ;
 
@@ -665,10 +648,12 @@ value acces_n conf base n x =
   else if accessible_by_key conf base x first_name surname then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
-      (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
+      (if get_occ x > 0 then ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+       else "")
   else
-    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper x.cle_index) ^
-    (if conf.wizard && x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ
+    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_cle_index x)) ^
+    (if conf.wizard && get_occ x > 0 then
+       ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
 ;
 
@@ -677,7 +662,8 @@ value acces conf base x = acces_n conf base "" x;
 type p_access = (base -> person -> string * base -> person -> string);
 value std_access = (p_first_name, p_surname);
 value raw_access =
-  (fun base p -> sou base p.first_name, fun base p -> sou base p.surname)
+  (fun base p -> sou base (get_first_name p),
+   fun base p -> sou base (get_surname p))
 ;
 
 value restricted_txt conf = ".....";
@@ -687,7 +673,7 @@ value gen_person_text (p_first_name, p_surname) conf base p =
   else if conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
     let beg =
-      match (sou base p.public_name, p.qualifiers) with
+      match (sou base (get_public_name p), get_qualifiers p) with
       [ ("", [nn :: _]) ->
           p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
       | ("", []) -> p_first_name base p
@@ -709,7 +695,7 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   else if conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
     let beg =
-      match (sou base p.public_name, p.qualifiers) with
+      match (sou base (get_public_name p), get_qualifiers p) with
       [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
       | ("", []) -> p_first_name base p
       | (n, [nn :: _]) -> n ^ " " ^ sou base nn
@@ -726,7 +712,7 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     "x x"
   else
     let s =
-      match (sou base p.public_name, p.qualifiers) with
+      match (sou base (get_public_name p), get_qualifiers p) with
       [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | (n, []) when n <> "" -> n
       | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
@@ -771,12 +757,12 @@ value titled_person_text conf base p t =
   let elen = String.length estate in
   let slen = String.length surname in
   if Name.strip_lower estate = Name.strip_lower surname then
-    match (t.t_name, p.qualifiers) with
+    match (t.t_name, get_qualifiers p) with
     [ (Tname n, []) -> sou base n
     | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
     | _ -> person_text_without_surname conf base p ]
   else if elen < slen && String.sub surname (slen - elen) elen = estate then
-    match (t.t_name, p.qualifiers) with
+    match (t.t_name, get_qualifiers p) with
     [ (Tname n, []) -> sou base n
     | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
     | _ ->
@@ -789,7 +775,7 @@ value titled_person_text conf base p t =
     match t.t_name with
     [ Tname s ->
         let s = sou base s in
-        match p.qualifiers with
+        match get_qualifiers p with
         [ [] -> s
         | [nn :: _] -> s ^ " <em>" ^ sou base nn ^ "</em>" ]
     | _ -> person_text conf base p ]
@@ -844,10 +830,10 @@ value referenced_person_text_without_surname conf base p =
 value gen_person_text_without_title p_access conf base p =
   match main_title conf base p with
   [ Some t ->
-      if t.t_place == p.surname then
+      if t.t_place == get_surname p then
         gen_person_text_without_surname True p_access conf base p
       else
-        match (t.t_name, p.qualifiers) with
+        match (t.t_name, get_qualifiers p) with
         [ (Tname s, [nn :: _]) -> sou base s ^ " <em>" ^ sou base nn ^ "</em>"
         | (Tname s, _) -> sou base s
         | _ -> gen_person_text p_access conf base p ]
@@ -1092,9 +1078,9 @@ value url_no_index conf base =
           if (conf.hide_names && not (fast_auth_age conf p)) || is_hidden p
           then None
           else
-            let f = scratch p.first_name in
-            let s = scratch p.surname in
-            let oc = string_of_int p.occ in
+            let f = scratch (get_first_name p) in
+            let s = scratch (get_surname p) in
+            let oc = string_of_int (get_occ p) in
             Some (f, s, oc)
         else None
     | None -> None ]
@@ -1107,11 +1093,11 @@ value url_no_index conf base =
           else
             let cpl = base.data.couples.get i in
             let p = pget conf base (father cpl) in
-            let f = scratch p.first_name in
-            let s = scratch p.surname in
+            let f = scratch (get_first_name p) in
+            let s = scratch (get_surname p) in
             if f = "" || s = "" then None
             else
-              let oc = string_of_int p.occ in
+              let oc = string_of_int (get_occ p) in
               let u = uget conf base (father cpl) in
               let n =
                 loop 0 where rec loop k =
@@ -1683,13 +1669,14 @@ value print_alphab_list conf crit print_elem liste =
 ;
 
 value parent conf base p a =
-  match a.public_name with
+  match get_public_name a with
   [ n when sou base n <> "" -> sou base n ^ person_title conf base a
   | _ ->
       if conf.hide_names && not (fast_auth_age conf a) then "x x"
       else
         p_first_name base a ^
-          (if p.surname <> a.surname then " " ^ p_surname base a else "") ]
+          (if get_surname p <> get_surname a then " " ^ p_surname base a
+           else "") ]
 ;
 
 value print_parent conf base p fath moth =
@@ -1702,7 +1689,7 @@ value print_parent conf base p fath moth =
           parent conf base p moth
     | _ -> "" ]
   in
-  let is = index_of_sex p.sex in
+  let is = index_of_sex (get_sex p) in
   Wserver.wprint "%s"
     (translate_eval
       (transl_a_of_gr_eq_gen_lev conf
@@ -1710,15 +1697,15 @@ value print_parent conf base p fath moth =
 ;
 
 value specify_homonymous conf base p =
-  let is = index_of_sex p.sex in
-  match (p.public_name, p.qualifiers) with
+  let is = index_of_sex (get_sex p) in
+  match (get_public_name p, get_qualifiers p) with
   [ (n, [nn :: _]) when sou base n <> "" ->
       Wserver.wprint "%s <em>%s</em>" (sou base n) (sou base nn)
   | (_, [nn :: _]) ->
       Wserver.wprint "%s <em>%s</em>" (p_first_name base p) (sou base nn)
   | (n, []) when sou base n <> "" -> Wserver.wprint "%s" (sou base n)
   | (_, []) ->
-      let a = aget conf base p.cle_index in
+      let a = aget conf base (get_cle_index p) in
       let ifam =
         match parents a with
         [ Some ifam ->
@@ -1736,11 +1723,13 @@ value specify_homonymous conf base p =
       in
       match ifam with
       [ Some (None, None) | None ->
-          let u = uget conf base p.cle_index in
+          let u = uget conf base (get_cle_index p) in
           let rec loop i =
             if i < Array.length u.family then
               let des = doi base u.family.(i) in
-              let conjoint = spouse p.cle_index (coi base u.family.(i)) in
+              let conjoint =
+                spouse (get_cle_index p) (coi base u.family.(i))
+              in
               let ct = des.children in
               if Array.length ct > 0 then
                 let enfant = pget conf base ct.(0) in
@@ -1749,7 +1738,7 @@ value specify_homonymous conf base p =
                     ("x", " x")
                   else
                     (p_first_name base enfant,
-                     if p.surname <> enfant.surname then
+                     if get_surname p <> get_surname enfant then
                        " " ^ p_surname base enfant
                      else "")
                 in
@@ -2019,7 +2008,7 @@ value find_person_in_env conf base suff =
                 (fun x ->
                    Name.lower (p_first_name base x) = Name.lower p &&
                    Name.lower (p_surname base x) = Name.lower n &&
-                   x.occ == occ)
+                   get_occ x == occ)
                 xl
             in
             if not conf.hide_names || authorized_age conf base r then Some r
@@ -2120,7 +2109,7 @@ value branch_of_sosa conf base ip n =
               else loop [(ip, sp) :: ipl] (mother cpl) Female nl
           | _ -> None ] ]
     in
-    loop [] ip (pget conf base ip).sex (expand [] n)
+    loop [] ip (get_sex (pget conf base ip)) (expand [] n)
   }
 ;
 
@@ -2148,7 +2137,8 @@ value default_image_name_of_key fnam surn occ =
 ;
 
 value default_image_name base p =
-  default_image_name_of_key (p_first_name base p) (p_surname base p) p.occ
+  default_image_name_of_key (p_first_name base p) (p_surname base p)
+    (get_occ p)
 ;
 
 value auto_image_file conf base p =
@@ -2162,7 +2152,7 @@ value auto_image_file conf base p =
 
 value image_and_size conf base p image_size =
   if not conf.no_image && authorized_age conf base p then
-    match sou base p.image with
+    match sou base (get_image p) with
     [ "" ->
         match auto_image_file conf base p with
         [ Some f -> Some (True, f, image_size f None)
@@ -2203,7 +2193,7 @@ value image_and_size conf base p image_size =
 
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
-    p.image <> Adef.istr_of_int 0 || auto_image_file conf base p <> None
+    get_image p <> Adef.istr_of_int 0 || auto_image_file conf base p <> None
   else False
 ;
 
@@ -2264,25 +2254,27 @@ value wprint_hidden_person conf base pref p =
   if accessible_by_key conf base p first_name surname then do {
     wprint_hidden conf pref "p" (Name.lower first_name);
     wprint_hidden conf pref "n" (Name.lower surname);
-    if p.occ > 0 then wprint_hidden conf pref "oc" (string_of_int p.occ)
+    if get_occ p > 0 then
+      wprint_hidden conf pref "oc" (string_of_int (get_occ p))
     else ();
   }
   else
-    wprint_hidden conf pref "i" (string_of_int (Adef.int_of_iper p.cle_index))
+    wprint_hidden conf pref "i"
+      (string_of_int (Adef.int_of_iper (get_cle_index p)))
 ;
 
 exception Ok;
 
 value has_nephews_or_nieces conf base p =
   try
-    let a = aget conf base p.cle_index in
+    let a = aget conf base (get_cle_index p) in
     match parents a with
     [ Some ifam ->
         let des = doi base ifam in
         do {
           Array.iter
             (fun ip ->
-               if ip == p.cle_index then ()
+               if ip == get_cle_index p then ()
                else
                  Array.iter
                    (fun ifam ->
@@ -2354,7 +2346,7 @@ value print_pre_right sz txt =
 ;
 
 value of_course_died conf p =
-  match Adef.od_of_codate p.birth with
+  match Adef.od_of_codate (get_birth p) with
   [ Some (Dgreg d _) -> conf.today.year - d.year > 120
   | _ -> False ]
 ;

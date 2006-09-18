@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.6 2006-09-18 12:45:28 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.7 2006-09-18 20:03:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -81,6 +81,7 @@ type base =
     func : base_func }
 ;
 
+value get_access : db_person 'p 's -> Def.access;
 value get_aliases : db_person 'p 's -> list 's;
 value get_baptism : db_person 'p 's -> codate;
 value get_birth : db_person 'p 's -> codate;
@@ -88,6 +89,7 @@ value get_cle_index : db_person 'p 's -> iper;
 value get_death : db_person 'p 's -> Def.death;
 value get_first_name : db_person 'p 's -> 's;
 value get_first_names_aliases : db_person 'p 's -> list 's;
+value get_image : db_person 'p 's -> 's;
 value get_occ : db_person 'p 's -> int;
 value get_public_name : db_person 'p 's -> 's;
 value get_qualifiers : db_person 'p 's -> list 's;

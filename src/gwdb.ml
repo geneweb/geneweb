@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.1 2006-09-18 12:45:28 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.2 2006-09-18 20:03:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -81,6 +81,7 @@ type base =
     func : base_func }
 ;
 
+value get_access p = p.Def.access;
 value get_aliases p = p.Def.aliases;
 value get_baptism p = p.Def.baptism;
 value get_birth p = p.Def.birth;
@@ -88,6 +89,7 @@ value get_cle_index p = p.Def.cle_index;
 value get_death p = p.Def.death;
 value get_first_name p = p.Def.first_name;
 value get_first_names_aliases p = p.Def.first_names_aliases;
+value get_image p = p.Def.image;
 value get_occ p = p.Def.occ;
 value get_public_name p = p.Def.public_name;
 value get_qualifiers p = p.Def.qualifiers;
@@ -100,4 +102,3 @@ value get_titles p = p.Def.titles;
 
 value person_of_gen_person p = p;
 value gen_person_of_person p = p;
-
