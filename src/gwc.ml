@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.11 2006-09-17 09:59:45 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.12 2006-09-18 19:27:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -422,32 +422,34 @@ value insert_person gen so =
     if not gen.g_errored then do {
       let empty_string = unique_string gen "" in
       let x =
-        {first_name = empty_string; surname = empty_string;
-         occ = 0; image = unique_string gen so.image;
-         first_names_aliases =
-           List.map (unique_string gen) so.first_names_aliases;
-         surnames_aliases = List.map (unique_string gen) so.surnames_aliases;
-         public_name = unique_string gen so.public_name;
-         qualifiers = List.map (unique_string gen) so.qualifiers;
-         aliases = List.map (unique_string gen) so.aliases;
-         titles = List.map (title_unique_string gen) so.titles;
-         rparents = []; related = [];
-         occupation = unique_string gen so.occupation;
-         sex = Neuter; access = so.access;
-         birth = so.birth; birth_place = unique_string gen so.birth_place;
-         birth_src =  unique_string gen so.birth_src;
-         baptism = so.baptism;
-         baptism_place = unique_string gen so.baptism_place;
-         baptism_src = unique_string gen so.baptism_src;
-         death = so.death; death_place = unique_string gen so.death_place;
-         death_src = unique_string gen so.death_src; burial = so.burial;
-         burial_place = unique_string gen so.burial_place;
-         burial_src = unique_string gen so.burial_src;
-         notes = empty_string;
-         psources =
-           unique_string gen
-             (if so.psources = "" then default_source.val else so.psources);
-         cle_index = ip}
+        person_of_gen_person
+          {first_name = empty_string; surname = empty_string;
+           occ = 0; image = unique_string gen so.image;
+           first_names_aliases =
+             List.map (unique_string gen) so.first_names_aliases;
+           surnames_aliases =
+             List.map (unique_string gen) so.surnames_aliases;
+           public_name = unique_string gen so.public_name;
+           qualifiers = List.map (unique_string gen) so.qualifiers;
+           aliases = List.map (unique_string gen) so.aliases;
+           titles = List.map (title_unique_string gen) so.titles;
+           rparents = []; related = [];
+           occupation = unique_string gen so.occupation;
+           sex = Neuter; access = so.access;
+           birth = so.birth; birth_place = unique_string gen so.birth_place;
+           birth_src =  unique_string gen so.birth_src;
+           baptism = so.baptism;
+           baptism_place = unique_string gen so.baptism_place;
+           baptism_src = unique_string gen so.baptism_src;
+           death = so.death; death_place = unique_string gen so.death_place;
+           death_src = unique_string gen so.death_src; burial = so.burial;
+           burial_place = unique_string gen so.burial_place;
+           burial_src = unique_string gen so.burial_src;
+           notes = empty_string;
+           psources =
+             unique_string gen
+               (if so.psources = "" then default_source.val else so.psources);
+           cle_index = ip}
       in
       seek_out gen.g_per_index (Iovalue.sizeof_long * Adef.int_of_iper ip);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
@@ -729,26 +731,28 @@ value persons_cache gen per_index_ic per_ic persons =
       [ 'D' -> input_item_value per_ic
       | 'U' ->
           let empty_string = Adef.istr_of_int 0 in
-          {first_name = empty_string; surname = empty_string;
-           occ = 0; image = empty_string; first_names_aliases = [];
-           surnames_aliases = []; public_name = empty_string;
-           qualifiers = [];
-           aliases = []; titles = []; rparents = []; related = [];
-           occupation = empty_string; sex = Neuter; access = IfTitles;
-           birth = Adef.codate_None; birth_place = empty_string;
-           birth_src = empty_string; baptism = Adef.codate_None;
-           baptism_place = empty_string; baptism_src = empty_string;
-           death = DontKnowIfDead; death_place = empty_string;
-           death_src = empty_string; burial = UnknownBurial;
-           burial_place = empty_string; burial_src = empty_string;
-           notes = empty_string; psources = empty_string;
-           cle_index = Adef.iper_of_int 0}
+          person_of_gen_person
+            {first_name = empty_string; surname = empty_string;
+             occ = 0; image = empty_string; first_names_aliases = [];
+             surnames_aliases = []; public_name = empty_string;
+             qualifiers = [];
+             aliases = []; titles = []; rparents = []; related = [];
+             occupation = empty_string; sex = Neuter; access = IfTitles;
+             birth = Adef.codate_None; birth_place = empty_string;
+             birth_src = empty_string; baptism = Adef.codate_None;
+             baptism_place = empty_string; baptism_src = empty_string;
+             death = DontKnowIfDead; death_place = empty_string;
+             death_src = empty_string; burial = UnknownBurial;
+             burial_place = empty_string; burial_src = empty_string;
+             notes = empty_string; psources = empty_string;
+             cle_index = Adef.iper_of_int 0}
       | _ -> assert False ]
     in
-    {(p) with
-     first_name = mp.m_first_name; surname = mp.m_surname;
-     occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
-     sex = mp.m_sex; notes = mp.m_notes; cle_index = Adef.iper_of_int i}
+    person_of_gen_person
+      {(gen_person_of_person p) with
+       first_name = mp.m_first_name; surname = mp.m_surname;
+       occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
+       sex = mp.m_sex; notes = mp.m_notes; cle_index = Adef.iper_of_int i}
   in
   let get_fun i =
     try Hashtbl.find gen.g_patch_p i with
