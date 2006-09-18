@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.1 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: dag.ml,v 5.2 2006-09-18 20:50:37 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -65,7 +65,7 @@ value get_dag_elems conf base =
     [ (Some p, Some s) ->
         let set =
           match
-            Util.branch_of_sosa conf base p.cle_index (Num.of_string s)
+            Util.branch_of_sosa conf base (get_cle_index p) (Num.of_string s)
           with
           [ Some ipsl ->
               List.fold_left (fun set (ip, _) -> Pset.add ip set) set ipsl
