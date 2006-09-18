@@ -1,15 +1,16 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.4 2006-08-31 17:45:22 ddr Exp $ *)
+(* $Id: date.ml,v 5.5 2006-09-18 20:24:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
 
+open Config;
 open Def;
 open Util;
 open Gutil;
-open Config;
-open TemplAst;
+open Gwdb;
 open Printf;
+open TemplAst;
 
 value nbsp = "&nbsp;";
 value death_symbol conf =
@@ -325,15 +326,15 @@ value year_text d =
 
 value get_birth_death_date p =
   let (birth_date, approx) =
-    match Adef.od_of_codate p.birth with
-    [ None -> (Adef.od_of_codate p.baptism, True)
+    match Adef.od_of_codate (get_birth p) with
+    [ None -> (Adef.od_of_codate (get_baptism p), True)
     | x -> (x, False) ]
   in
   let (death_date, approx) =
-    match date_of_death p.death with
+    match date_of_death (get_death p) with
     [ Some d -> (Some d, approx)
     | _ ->
-        match p.burial with
+        match get_burial p with
         [ Buried cd -> (Adef.od_of_codate cd, True)
         | Cremated cd -> (Adef.od_of_codate cd, True)
         | _ -> (None, approx) ] ]
@@ -353,9 +354,9 @@ value short_dates_text conf base p =
     let s =
       match (birth_date, death_date) with
       [ (Some _, Some _) -> s ^ "-"
-      | (Some _, None) -> if p.death = NotDead then s ^ "-" else s
+      | (Some _, None) -> if get_death p = NotDead then s ^ "-" else s
       | _ ->
-          match p.death with
+          match get_death p with
           [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
               let d = death_symbol conf in
               if s = "" then d else s ^ nbsp ^ d
@@ -383,10 +384,10 @@ value string_of_place conf pl = Util.string_with_macros conf [] pl;
 
 value print_dates conf base p =
   let cap s = ", " ^ s in
-  let is = index_of_sex p.sex in
+  let is = index_of_sex (get_sex p) in
   do {
-    let birth_place = sou base p.birth_place in
-    match Adef.od_of_codate p.birth with
+    let birth_place = sou base (get_birth_place p) in
+    match Adef.od_of_codate (get_birth p)with
     [ Some d ->
         do {
           Wserver.wprint "%s " (cap (transl_nth conf "born" is));
@@ -400,8 +401,8 @@ value print_dates conf base p =
     if birth_place <> "" then
       Wserver.wprint "%s" (string_of_place conf birth_place)
     else ();
-    let baptism = Adef.od_of_codate p.baptism in
-    let baptism_place = sou base p.baptism_place in
+    let baptism = Adef.od_of_codate (get_baptism p) in
+    let baptism_place = sou base (get_baptism_place p) in
     match baptism with
     [ Some d ->
         do {
@@ -417,8 +418,8 @@ value print_dates conf base p =
     if baptism_place <> "" then
       Wserver.wprint "%s" (string_of_place conf baptism_place)
     else ();
-    let death_place = sou base p.death_place in
-    match p.death with
+    let death_place = sou base (get_death_place p) in
+    match get_death p with
     [ Death dr d ->
         let dr_w =
           match dr with
@@ -440,7 +441,7 @@ value print_dates conf base p =
           if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
         }
     | DeadDontKnowWhen ->
-        match (death_place, p.burial) with
+        match (death_place, get_burial p) with
         [ ("", Buried _ | Cremated _) -> ()
         | _ ->
             if death_place <> "" || not (of_course_died conf p) then do {
@@ -453,7 +454,7 @@ value print_dates conf base p =
       Wserver.wprint "%s" (string_of_place conf death_place)
     else ();
     let burial_date_place cod =
-      let place = sou base p.burial_place in
+      let place = sou base (get_burial_place p) in
       do {
          match Adef.od_of_codate cod with
          [ Some d ->
@@ -467,7 +468,7 @@ value print_dates conf base p =
          else ();
       }
     in
-    match p.burial with
+    match get_burial p with
     [ Buried cod ->
         do {
           Wserver.wprint "%s" (cap (transl_nth conf "buried" is));
