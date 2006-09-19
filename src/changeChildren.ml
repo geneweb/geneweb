@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.3 2006-09-16 02:15:39 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.4 2006-09-19 17:37:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -11,8 +11,8 @@ open Util;
 value print_child_person conf base p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
-  let occ = p.occ in
-  let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
+  let occ = get_occ p in
+  let var = "c" ^ string_of_int (Adef.int_of_iper (get_cle_index p)) in
   tag "table" "border=\"1\"" begin
     tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
@@ -57,7 +57,10 @@ value select_children_of base u =
 value digest_children base ipl =
   let l =
     List.map
-      (fun ip -> let p = poi base ip in (p.first_name, p.surname, p.occ)) ipl
+      (fun ip ->
+         let p = poi base ip in
+         (get_first_name p, get_surname p, get_occ p))
+      ipl
   in
   Iovalue.digest l
 ;
@@ -106,7 +109,7 @@ value print_change conf base p u =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\""
-          (Adef.int_of_iper p.cle_index);
+          (Adef.int_of_iper (get_cle_index p));
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\"";
       end;
@@ -190,10 +193,10 @@ value check_conflict conf base p key new_occ ipl =
   List.iter
     (fun ip ->
        let p1 = poi base ip in
-       if p1.cle_index <> p.cle_index &&
+       if get_cle_index p1 <> get_cle_index p &&
           Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
             name &&
-          p1.occ = new_occ then
+          get_occ p1 = new_occ then
           do {
          print_conflict conf base p1; raise Update.ModErr
        }
@@ -225,7 +228,7 @@ value rename_image_file conf base p (nfn, nsn, noc) =
 
 value change_child conf base parent_surname ip =
   let p = poi base ip in
-  let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
+  let var = "c" ^ string_of_int (Adef.int_of_iper (get_cle_index p)) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
     [ Some x -> only_printable x
@@ -246,22 +249,24 @@ value change_child conf base parent_surname ip =
     error_person conf base p (transl conf "first name missing")
   else if
     new_first_name <> p_first_name base p ||
-    new_surname <> p_surname base p || new_occ <> p.occ
+    new_surname <> p_surname base p || new_occ <> get_occ p
   then do {
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = person_ht_find_all base key in
     check_conflict conf base p key new_occ ipl;
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     let p =
-      {(p) with
-       first_name = Update.insert_string base new_first_name;
-       surname = Update.insert_string base new_surname;
-       occ = new_occ}
+      person_of_gen_person
+        {(gen_person_of_person p) with
+         first_name = Update.insert_string base new_first_name;
+         surname = Update.insert_string base new_surname;
+         occ = new_occ}
     in
-    base.func.patch_person p.cle_index p;
-    person_ht_add base key p.cle_index;
+    base.func.patch_person (get_cle_index p) p;
+    person_ht_add base key (get_cle_index p);
     let np_misc_names = person_misc_names base p (nobtit conf base) in
-    List.iter (fun key -> person_ht_add base key p.cle_index) np_misc_names;
+    List.iter (fun key -> person_ht_add base key (get_cle_index p))
+      np_misc_names;
   }
   else ()
 ;
@@ -275,7 +280,8 @@ value print_change_ok conf base p u =
       List.iter (change_child conf base parent_surname) ipl;
       Util.commit_patches conf base;
       let key =
-        (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+        (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+         get_cle_index p)
       in
       History.record conf base key "cn";
       print_change_done conf base p u;
