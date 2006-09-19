@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.5 2006-09-19 19:51:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -14,7 +14,7 @@ value print_anniversary_day conf base dead_people liste =
   tag "ul" begin
     List.iter
       (fun (p, a, date_event, txt_of) ->
-         let is = index_of_sex p.sex in
+         let is = index_of_sex (get_sex p) in
          tag "li" begin
            Wserver.wprint "%s\n" (txt_of conf base p);
            if not dead_people then Wserver.wprint " <em>%d</em>\n" a
@@ -51,7 +51,7 @@ value gen_print conf base mois f_scan dead_people =
       while True do {
         let (p, txt_of) = f_scan () in
         if not dead_people then
-          match (Adef.od_of_codate p.birth, p.death) with
+          match (Adef.od_of_codate (get_birth p), get_death p) with
           [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
               if d.prec = Sure && d.day <> 0 && d.month <> 0 &&
                  d.month = mois && d.delta = 0 then
@@ -63,11 +63,11 @@ value gen_print conf base mois f_scan dead_people =
               else ()
           | _ -> () ]
         else
-          match p.death with
+          match get_death p with
           [ NotDead | DontKnowIfDead -> ()
           | _ ->
               do {
-                match Adef.od_of_codate p.birth with
+                match Adef.od_of_codate (get_birth p) with
                 [ Some (Dgreg dt _) ->
                     if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 &&
                        dt.month = mois && dt.delta = 0 then
@@ -78,7 +78,7 @@ value gen_print conf base mois f_scan dead_people =
                       else ()
                     else ()
                 | _ -> () ];
-                match p.death with
+                match get_death p with
                 [ Death dr d ->
                     match Adef.date_of_cdate d with
                     [ Dgreg dt _ ->
@@ -140,7 +140,7 @@ value print_anniversary_list conf base dead_people dt liste =
            }
            else do {
              Wserver.wprint "%s" (txt_of conf base p);
-             match p.death with
+             match get_death p with
              [ NotDead ->
                  do {
                    Wserver.wprint " <em>";
@@ -394,7 +394,7 @@ value gen_print_menu_birth conf base f_scan mode =
     try
       while True do {
         let (p, txt_of) = f_scan () in
-        match (Adef.od_of_codate p.birth, p.death) with
+        match (Adef.od_of_codate (get_birth p), get_death p) with
         [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
             if d.prec = Sure && d.day <> 0 && d.month <> 0 then
               if match_dates conf base p d conf.today then
@@ -461,11 +461,11 @@ value gen_print_menu_dead conf base f_scan mode =
     try
       while True do {
         let (p, txt_of) = f_scan () in
-        match p.death with
+        match get_death p with
         [ NotDead | DontKnowIfDead -> ()
         | _ ->
             do {
-              match Adef.od_of_codate p.birth with
+              match Adef.od_of_codate (get_birth p) with
               [ Some (Dgreg d _) ->
                   if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                     if match_dates conf base p d conf.today then
@@ -480,7 +480,7 @@ value gen_print_menu_dead conf base f_scan mode =
                     else ()
                   else ()
               | _ -> () ];
-              match p.death with
+              match get_death p with
               [ Death dr d ->
                   match Adef.date_of_cdate d with
                   [ Dgreg d _ ->
