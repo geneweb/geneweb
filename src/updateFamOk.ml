@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.9 2006-09-17 08:17:57 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.10 2006-09-19 06:00:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -381,8 +381,12 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
          if List.memq ip ofam_witn then ippl
          else
            let p = poi base ip in
-           if not (List.mem (father ncpl) p.related) then
-             let p = {(p) with related = [(father ncpl) :: p.related]} in
+           if not (List.mem (father ncpl) (get_related p)) then
+             let p =
+               person_of_gen_person
+                 {(gen_person_of_person p) with
+                  related = [father ncpl :: get_related p]}
+             in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl nfam_witn
@@ -393,9 +397,11 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
          if List.memq ip nfam_witn then ippl
          else
            let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
-           if List.mem (father ncpl) p.related then
+           if List.mem (father ncpl) (get_related p) then
              let p =
-               {(p) with related = List.filter ( \<> (father ncpl)) p.related}
+               person_of_gen_person
+                 {(gen_person_of_person p) with
+                  related = List.filter ( \<> (father ncpl)) (get_related p)}
              in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
@@ -433,22 +439,28 @@ value effective_mod conf base sfam scpl sdes =
     if sfam.relation <> NoSexesCheckNotMarried &&
        sfam.relation <> NoSexesCheckMarried then
       let nfath =
-        match nfath.sex with
+        match get_sex nfath with
         [ Female -> print_err_father_sex conf base nfath
         | Male -> nfath
         | Neuter -> do {
-            let nfath = {(nfath) with sex = Male} in
-            base.func.patch_person nfath.cle_index nfath;
+            let nfath =
+              person_of_gen_person
+                {(gen_person_of_person nfath) with sex = Male}
+            in
+            base.func.patch_person (get_cle_index nfath) nfath;
             nfath
           } ]
       in
       let nmoth =
-        match nmoth.sex with
+        match get_sex nmoth with
         [ Male -> print_err_mother_sex conf base nmoth
         | Female -> nmoth
         | Neuter -> do {
-            let nmoth = {(nmoth) with sex = Female} in
-            base.func.patch_person nmoth.cle_index nmoth;
+            let nmoth =
+              person_of_gen_person
+                {(gen_person_of_person nmoth) with sex = Female}
+            in
+            base.func.patch_person (get_cle_index nmoth) nmoth;
             nmoth
           } ]
       in
@@ -572,21 +584,27 @@ value effective_add conf base sfam scpl sdes =
     if sfam.relation <> NoSexesCheckNotMarried &&
        sfam.relation <> NoSexesCheckMarried then
       let nfath_p =
-        match nfath_p.sex with
+        match get_sex nfath_p with
         [ Female -> print_err_father_sex conf base nfath_p
         | Male -> nfath_p
         | _ -> do {
-            let nfath_p = {(nfath_p) with sex = Male} in
+            let nfath_p =
+              person_of_gen_person
+                {(gen_person_of_person nfath_p) with sex = Male}
+            in
             base.func.patch_person (father ncpl) nfath_p;
             nfath_p
           } ]
       in
       let nmoth_p =
-        match nmoth_p.sex with
+        match get_sex nmoth_p with
         [ Male -> print_err_mother_sex conf base nmoth_p
         | Female -> nmoth_p
         | _ -> do {
-            let nmoth_p = {(nmoth_p) with sex = Female} in
+            let nmoth_p =
+              person_of_gen_person
+                {(gen_person_of_person nmoth_p) with sex = Female}
+            in
             base.func.patch_person (mother ncpl) nmoth_p;
             nmoth_p
           } ]
@@ -612,7 +630,7 @@ value effective_add conf base sfam scpl sdes =
          [ Some _ -> print_err_parents conf base p
          | None ->
              let a = {parents = Some fi; consang = Adef.fix (-1)} in
-             base.func.patch_ascend p.cle_index a ])
+             base.func.patch_ascend (get_cle_index p) a ])
       ndes.children;
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
@@ -889,8 +907,8 @@ value print_add o_conf base =
               [ Some x when x = fam.fam_index ->
                   let p = base.data.persons.get i in
                   let key =
-                    (sou base p.first_name, sou base p.surname, p.occ,
-                     Update.Link, "")
+                    (sou base (get_first_name p), sou base (get_surname p),
+                     get_occ p, Update.Link, "")
                   in
                   (key, i, "aa")
               | _ -> (father scpl, i, "af") ]
@@ -917,7 +935,8 @@ value print_del conf base =
           | _ -> (father cpl) ]
         in
         let p = poi base ip in
-        (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+        (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+         get_cle_index p)
       in
       do {
         if not (is_deleted_family fam) then do {
@@ -992,11 +1011,12 @@ value print_inv conf base =
       let p = base.data.persons.get ip in
       let u = base.data.unions.get ip in
       let k =
-        (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+        (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+         get_cle_index p)
       in
       try
         do {
-          effective_inv conf base p.cle_index u (Adef.ifam_of_int ifam);
+          effective_inv conf base (get_cle_index p) u (Adef.ifam_of_int ifam);
           Util.commit_patches conf base;
           History.record conf base k "if";
           print_inv_ok conf base p
