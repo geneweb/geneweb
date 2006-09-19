@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: relation.ml,v 5.5 2006-09-19 19:06:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -447,7 +447,9 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
 ;
 
 value print_shortest_path conf base p1 p2 =
-  if p1.cle_index = p2.cle_index then do {
+  let ip1 = get_cle_index p1 in
+  let ip2 = get_cle_index p2 in
+  if ip1 = ip2 then do {
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "relationship"))
     in
@@ -477,7 +479,7 @@ value print_shortest_path conf base p1 p2 =
                   [ Some n -> n
                   | None -> 0 ]
                 in
-                let u = uget conf base p.cle_index in
+                let u = uget conf base (get_cle_index p) in
                 let list =
                   if n < Array.length u.family then [u.family.(n) :: list]
                   else list
@@ -488,8 +490,6 @@ value print_shortest_path conf base p1 p2 =
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "relationship"))
     in
-    let ip1 = p1.cle_index in
-    let ip2 = p2.cle_index in
     match get_shortest_path_relation conf base ip1 ip2 excl_faml with
     [ Some (path, ifam) ->
         print_relation_path conf base ip1 ip2 path ifam excl_faml
@@ -557,7 +557,7 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
       in
       loop1 (Array.to_list (uget conf base ip).family)
   in
-  loop anc.cle_index x
+  loop (get_cle_index anc) x
 ;
 
 value parents_label conf base info =
@@ -568,7 +568,7 @@ value parents_label conf base info =
       let is =
         if nb_fields txt = 2 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then 0 else 1
+          [ [ip1] -> if get_sex (pget conf base ip1) = Male then 0 else 1
           | _ -> (* must be a bug *) 0 ]
         else 0
       in
@@ -578,7 +578,7 @@ value parents_label conf base info =
       let is =
         if nb_fields txt = 2 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then 0 else 1
+          [ [ip1] -> if get_sex (pget conf base ip1) = Male then 0 else 1
           | _ -> (* must be a bug *) 0 ]
         else 0
       in
@@ -605,7 +605,8 @@ value ancestor_label conf base info x sex =
       let is =
         if nb_fields txt = 6 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 3
+          [ [ip1] ->
+              if get_sex (pget conf base ip1) = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -618,7 +619,8 @@ value ancestor_label conf base info x sex =
       let is =
         if nb_fields txt = 6 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 3
+          [ [ip1] ->
+              if get_sex (pget conf base ip1) = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -637,7 +639,7 @@ value child_in_law_label conf sex_child sex_parent =
 ;
 
 value descendant_label conf base info x p =
-  let is = index_of_sex p.sex in
+  let is = index_of_sex (get_sex p) in
   match x with
   [ 1 -> transl_nth conf "a son/a daughter/a child" is
   | 2 ->
@@ -646,7 +648,8 @@ value descendant_label conf base info x p =
         if nb_fields txt = 6 then
           let info = (info, fun r -> r.Consang.lens2) in
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 3
+          [ [ip1] ->
+              if get_sex (pget conf base ip1) = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -662,9 +665,9 @@ value descendant_label conf base info x p =
           match get_piece_of_branch conf base info (1, 2) with
           [ [ip1; ip2] ->
               let is =
-                if (pget conf base ip1).sex = Male then is else is + 6
+                if get_sex (pget conf base ip1) = Male then is else is + 6
               in
-              if (pget conf base ip2).sex = Male then is else is + 3
+              if get_sex (pget conf base ip2) = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -700,7 +703,7 @@ value brother_in_law_label conf brother_sex self_sex =
 ;
 
 value uncle_label conf base info x p =
-  let is = index_of_sex p.sex in
+  let is = index_of_sex (get_sex p) in
   match x with
   [ 1 ->
       let txt = transl conf "an uncle/an aunt" in
@@ -708,7 +711,8 @@ value uncle_label conf base info x p =
         if nb_fields txt == 4 then
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 2
+          [ [ip1] ->
+              if get_sex (pget conf base ip1) = Male then is else is + 2
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -719,7 +723,8 @@ value uncle_label conf base info x p =
         if nb_fields txt == 4 then
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 2
+          [ [ip1] ->
+              if get_sex (pget conf base ip1) = Male then is else is + 2
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -731,7 +736,7 @@ value uncle_label conf base info x p =
 ;
 
 value nephew_label conf x p =
-  let is = index_of_sex p.sex in
+  let is = index_of_sex (get_sex p) in
   match x with
   [ 1 -> transl_nth conf "a nephew/a niece" is
   | 2 -> transl_nth conf "a great-nephew/a great-niece" is
@@ -742,7 +747,8 @@ value nephew_label conf x p =
 ;
 
 value same_parents conf base p1 p2 =
-  parents (aget conf base p1.cle_index) = parents (aget conf base p2.cle_index)
+  parents (aget conf base (get_cle_index p1)) =
+  parents (aget conf base (get_cle_index p2))
 ;
 
 value print_link_name conf base n p1 p2 sol =
@@ -772,20 +778,23 @@ value print_link_name conf base n p1 p2 sol =
       let sp2 = pp2 <> None in
       if x2 == 0 then
         if sp1 && x1 == 1 then
-          (parent_in_law_label conf ini_p1.sex ini_p2.sex, False, sp2)
+          (parent_in_law_label conf (get_sex ini_p1) (get_sex ini_p2),
+           False, sp2)
         else
           let info = ((info, x1), fun r -> r.Consang.lens1) in
-          (ancestor_label conf base info x1 p2.sex, sp1, sp2)
+          (ancestor_label conf base info x1 (get_sex p2), sp1, sp2)
       else if x1 == 0 then
         if sp2 && x2 == 1 then
-          (child_in_law_label conf ini_p2.sex ini_p1.sex, sp1, False)
+          (child_in_law_label conf (get_sex ini_p2) (get_sex ini_p1), sp1,
+           False)
         else (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
       else if x2 == x1 then
         if x2 == 1 && not (same_parents conf base p2 p1) then
-          (half_brother_label conf p2.sex, sp1, sp2)
-        else if x2 == 1 && (sp2 || sp1) && p2.sex <> Neuter then
-          (brother_in_law_label conf ini_p2.sex ini_p1.sex, False, False)
-        else (brother_label conf x1 p2.sex, sp1, sp2)
+          (half_brother_label conf (get_sex p2), sp1, sp2)
+        else if x2 == 1 && (sp2 || sp1) && get_sex p2 <> Neuter then
+          (brother_in_law_label conf (get_sex ini_p2) (get_sex ini_p1), False,
+           False)
+        else (brother_label conf x1 (get_sex p2), sp1, sp2)
       else if x2 == 1 then
         (uncle_label conf base (info, x1) (x1 - x2) p2, sp1, sp2)
       else if x1 == 1 then (nephew_label conf (x2 - x1) p2, sp1, sp2)
@@ -793,7 +802,7 @@ value print_link_name conf base n p1 p2 sol =
         let s =
           let info = ((info, x1), fun r -> r.Consang.lens1) in
           transl_a_of_gr_eq_gen_lev conf
-            (brother_label conf x2 p2.sex)
+            (brother_label conf x2 (get_sex p2))
             (ancestor_label conf base info (x1 - x2) Neuter)
         in
         (s, sp1, sp2)
@@ -807,7 +816,8 @@ value print_link_name conf base n p1 p2 sol =
             else
               let info = ((info, x2), fun r -> r.Consang.lens2) in
               match get_piece_of_branch conf base info (x2 - x1, x2 - x1) with
-              [ [ip2] -> if (pget conf base ip2).sex = Male then sm else sf
+              [ [ip2] ->
+                  if get_sex (pget conf base ip2) = Male then sm else sf
               | _ -> sm ]
           in
           transl_a_of_gr_eq_gen_lev conf d s
@@ -817,13 +827,13 @@ value print_link_name conf base n p1 p2 sol =
     let s =
       if sp2 then
         transl_a_of_gr_eq_gen_lev conf
-          (transl_nth conf "the spouse" (index_of_sex p2.sex)) s
+          (transl_nth conf "the spouse" (index_of_sex (get_sex p2))) s
       else s
     in
     let s =
       if sp1 then
         transl_a_of_gr_eq_gen_lev conf s
-          (transl_nth conf "the spouse" (1 - index_of_sex p1.sex))
+          (transl_nth conf "the spouse" (1 - index_of_sex (get_sex p1)))
       else s
     in
     let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in
@@ -961,7 +971,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
       let lab proj x =
         let info = (((reltab, list), x), proj) in
         match list with
-        [ [(a, _)] -> ancestor_label conf base info x a.sex
+        [ [(a, _)] -> ancestor_label conf base info x (get_sex a)
         | _ -> parents_label conf base info x ]
       in
       let print pp p alab =
@@ -971,7 +981,8 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
           else
             transl_a_of_gr_eq_gen_lev conf
               (transl_a_of_b conf alab
-                 (transl_nth conf "the spouse" (1 - index_of_sex p.sex)))
+                 (transl_nth conf "the spouse"
+                    (1 - index_of_sex (get_sex p))))
               s
         in
         Wserver.wprint "%s\n" (Util.translate_eval s)
@@ -1012,13 +1023,13 @@ value print_dag_links conf base p1 p2 rl =
          List.fold_left
            (fun anc_map (p, n) ->
               let (pp1, pp2, nn, nt, maxlev) =
-                try M.find p.cle_index anc_map with
+                try M.find (get_cle_index p) anc_map with
                 [ Not_found -> (pp1, pp2, 0, 0, 0) ]
               in
               if nn >= max_br then anc_map
               else
                 let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
-                M.add p.cle_index v anc_map)
+                M.add (get_cle_index p) v anc_map)
            anc_map list)
       M.empty rl
   in
@@ -1067,7 +1078,7 @@ value print_dag_links conf base p1 p2 rl =
                (fun (l1, l2) (_, _, (x1, x2, list), _) ->
                   List.fold_left
                     (fun (l1, l2) (a, _) ->
-                       if a.cle_index = ip then
+                       if get_cle_index a = ip then
                          let l1 = if List.mem x1 l1 then l1 else [x1 :: l1] in
                          let l2 = if List.mem x2 l2 then l2 else [x2 :: l2] in
                          (l1, l2)
@@ -1136,10 +1147,10 @@ value print_propose_upto conf base p1 p2 rl =
   | _ -> () ]
 ;
 
-value compute_simple_relationship conf base tstab p1 p2 =
+value compute_simple_relationship conf base tstab ip1 ip2 =
   let tab = Consang.make_relationship_info base tstab in
   let (relationship, ancestors) =
-    Consang.relationship_and_links base tab True p1.cle_index p2.cle_index
+    Consang.relationship_and_links base tab True ip1 ip2
   in
   if ancestors = [] then None
   else
@@ -1196,12 +1207,13 @@ value compute_simple_relationship conf base tstab p1 p2 =
 ;
 
 value known_spouses_list conf base p excl_p =
-  let u = uget conf base p.cle_index in
+  let u = uget conf base (get_cle_index p) in
   List.fold_left
     (fun spl ifam ->
-       let sp = pget conf base (spouse p.cle_index (coi base ifam)) in
-       if sou base sp.first_name <> "?" && sou base sp.surname <> "?" &&
-          sp.cle_index <> excl_p.cle_index
+       let sp = pget conf base (spouse (get_cle_index p) (coi base ifam)) in
+       if sou base (get_first_name sp) <> "?" &&
+          sou base (get_surname sp) <> "?" &&
+          get_cle_index sp <> get_cle_index excl_p
        then
          [sp :: spl]
        else spl)
@@ -1228,7 +1240,10 @@ value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
     (fun p1 sl ->
        List.fold_right
          (fun p2 sl ->
-            let sol = compute_simple_relationship conf base tstab p1 p2 in
+            let sol =
+              compute_simple_relationship conf base tstab (get_cle_index p1)
+                (get_cle_index p2)
+            in
             match sol with
             [ Some (rl, total, _, reltab) ->
                 let s = List.map (fun r -> (f_sp1 p1, f_sp2 p2, r)) rl in
@@ -1242,7 +1257,9 @@ value sp p = Some p;
 value no_sp p = None;
 
 value compute_relationship conf base by_marr p1 p2 =
-  if p1.cle_index == p2.cle_index then None
+  let ip1 = get_cle_index p1 in
+  let ip2 = get_cle_index p2 in
+  if ip1 == ip2 then None
   else
     (* optimization to be used 1/ if database not too big or 2/ running
     on machines with much memory *)
@@ -1252,7 +1269,7 @@ value compute_relationship conf base by_marr p1 p2 =
 *)
     (**)
     let tstab = Util.create_topological_sort conf base in
-    let sol = compute_simple_relationship conf base tstab p1 p2 in
+    let sol = compute_simple_relationship conf base tstab ip1 ip2 in
     let sol_by_marr =
       if by_marr then
         let spl1 = known_spouses_list conf base p1 p2 in
@@ -1297,7 +1314,7 @@ value compute_relationship conf base by_marr p1 p2 =
 ;
 
 value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
-  let ip = a.cle_index in
+  let ip = get_cle_index a in
   let sp1 =
     match pp1 with
     [ Some _ -> Some p1
@@ -1318,8 +1335,8 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
     [ Some p2 -> p2
     | _ -> p2 ]
   in
-  let ip1 = p1.cle_index in
-  let ip2 = p2.cle_index in
+  let ip1 = get_cle_index p1 in
+  let ip2 = get_cle_index p2 in
   let dist = RelationLink.make_dist_tab conf base ip (max l1 l2 + 1) in
   let b1 = RelationLink.find_first_branch conf base dist ip l1 ip1 Neuter in
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
@@ -1335,9 +1352,9 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
             | Some x -> " bgcolor=" ^ x ] ]
       in
       let info =
-        {ip = ip; sp = a.sex; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2; c1 = 1;
-         c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None; sp1 = sp1;
-         sp2 = sp2; bd = bd; td_prop = td_prop}
+        {ip = ip; sp = get_sex a; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
+         c1 = 1; c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None;
+         sp1 = sp1; sp2 = sp2; bd = bd; td_prop = td_prop}
       in
       if List.mem (b1, b2) found.val then ()
       else do {
@@ -1396,7 +1413,7 @@ value print_main_relationship conf base long p1 p2 rel =
     | Some x -> conf.senv := conf.senv @ [("color", code_varenv x)] ];
     match rel with
     [ None ->
-        if p1.cle_index == p2.cle_index then
+        if get_cle_index p1 == get_cle_index p2 then
           Wserver.wprint "%s\n"
             (capitale (transl conf "it is the same person!"))
         else
@@ -1406,8 +1423,8 @@ value print_main_relationship conf base long p1 p2 rel =
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]))
     | Some (rl, total, relationship) ->
-        let a1 = aget conf base p1.cle_index in
-        let a2 = aget conf base p2.cle_index in
+        let a1 = aget conf base (get_cle_index p1) in
+        let a2 = aget conf base (get_cle_index p2) in
         let all_by_marr =
           List.for_all
             (fun
@@ -1465,14 +1482,14 @@ value multi_relation_next_txt conf pl2 lim assoc_txt =
           (fun (sl, n) p ->
              let sl =
                try
-                 let t = Hashtbl.find assoc_txt p.cle_index in
+                 let t = Hashtbl.find assoc_txt (get_cle_index p) in
                  [";t"; string_of_int n; "="; t :: sl]
                with
                [ Not_found -> sl ]
              in
              let sl =
                [";i"; string_of_int n; "=";
-                string_of_int (Adef.int_of_iper p.cle_index) :: sl]
+                string_of_int (Adef.int_of_iper (get_cle_index p)) :: sl]
              in
              (sl, n - 1))
           (sl, List.length pl2) (List.rev pl2)
@@ -1515,8 +1532,8 @@ value print_multi_relation conf base pl lim assoc_txt =
     loop [] pl1 where rec loop path =
       fun
       [ [p1 :: ([p2 :: _] as pl)] ->
-          let ip1 = p1.cle_index in
-          let ip2 = p2.cle_index in
+          let ip1 = get_cle_index p1 in
+          let ip2 = get_cle_index p2 in
           match get_shortest_path_relation conf base ip1 ip2 [] with
           [ Some (path1, _) ->
               let path =
@@ -1536,7 +1553,7 @@ value print_multi_relation conf base pl lim assoc_txt =
     let elem_txt p =
       Dag.Item p
         (try
-           let t = Hashtbl.find assoc_txt p.cle_index in
+           let t = Hashtbl.find assoc_txt (get_cle_index p) in
            "<b>(" ^ t ^ ")</b>"
          with
          [ Not_found -> "" ])
@@ -1591,7 +1608,7 @@ value print_multi conf base =
       [ Some p ->
           do {
             match p_getenv conf.env ("t" ^ k) with
-            [ Some x -> Hashtbl.add assoc_txt p.cle_index x
+            [ Some x -> Hashtbl.add assoc_txt (get_cle_index p) x
             | None -> () ];
             loop [p :: pl] (i + 1)
           }
