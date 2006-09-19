@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.4 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.5 2006-09-19 20:02:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Config;
 open Def;
 open Gutil;
+open Gwdb;
 open Util;
-open Config;
 
 value default_max_cnt = 2000;
 
@@ -50,8 +51,7 @@ value merge_siblings l1 l2 =
   List.rev l
 ;
 
-value siblings conf base p =
-  let ip = p.cle_index in
+value siblings conf base ip =
   match parents (aget conf base ip) with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -128,7 +128,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   then
     print_nospouse ()
   else
-    let u = Array.to_list (uget conf base p2.cle_index).family in
+    let u = Array.to_list (uget conf base (get_cle_index p2)).family in
     match u with
     [ [] -> print_nospouse ()
     | _ ->
@@ -137,7 +137,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
             (fun a ifam ->
                let cpl = coi base ifam in
                let sp =
-                 if p2.sex = Female then pget conf base (father cpl)
+                 if get_sex p2 = Female then pget conf base (father cpl)
                  else pget conf base (mother cpl)
                in
                let _ = print_spouse sp a in
@@ -154,7 +154,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
       (fun (ip, ia_asex, rev_br) ->
          let p = pget conf base ip in
          let u = uget conf base ip in
-         let br = List.rev [(ip, p.sex) :: rev_br] in
+         let br = List.rev [(ip, get_sex p) :: rev_br] in
          let is_valid_rel = br_inter_is_empty ini_br br in
          if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev u
          then do {
@@ -176,7 +176,8 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
            else ();
            let children =
              List.map
-               (fun ip -> (ip, ia_asex, [(p.cle_index, p.sex) :: rev_br]))
+               (fun ip ->
+                  (ip, ia_asex, [(get_cle_index p, get_sex p) :: rev_br]))
                (children_of base u)
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
@@ -195,7 +196,7 @@ value sibling_has_desc_lev conf base lev (ip, _) =
 ;
 
 value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
-  let sib = siblings conf base a in
+  let sib = siblings conf base (get_cle_index a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then do {
     if lev1 > 1 then do {
       Wserver.wprint "<li>\n";
@@ -225,7 +226,7 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
       loop first_sosa False where rec loop sosa some =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
           let some =
-            match Util.branch_of_sosa conf base p.cle_index sosa with
+            match Util.branch_of_sosa conf base (get_cle_index p) sosa with
             [ Some ([(ia, _) :: _] as br) ->
                 print_cousins_side_of conf base max_cnt (pget conf base ia) p
                   br lev1 lev2 ||
@@ -295,7 +296,7 @@ value sosa_of_persons conf base =
     fun
     [ [] -> n
     | [ip :: list] ->
-        loop (if (pget conf base ip).sex = Male then 2 * n else 2 * n + 1)
+        loop (if get_sex (pget conf base ip) = Male then 2 * n else 2 * n + 1)
           list ]
 ;
 
@@ -342,7 +343,7 @@ value print_anniv conf base p dead_people level =
            value leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2;
          end)
     in
-    let a = P.add (p.cle_index, 0, 1) P.empty in
+    let a = P.add (get_cle_index p, 0, 1) P.empty in
     let rec loop set a =
       if P.is_empty a then set
       else
@@ -405,7 +406,7 @@ value print_anniv conf base p dead_people level =
     do {
       xtag "input" "type=\"hidden\" name=\"m\" value=\"C\"";
       xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-        (Adef.int_of_iper p.cle_index);
+        (Adef.int_of_iper (get_cle_index p));
       xtag "input" "type=\"hidden\" name=\"t\" value=\"%s\""
         (if dead_people then "AD" else "AN")
     }
