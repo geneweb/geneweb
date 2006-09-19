@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 5.3 2006-09-19 20:54:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -126,14 +126,14 @@ value advanced_search conf base max_answers =
   let test_person p u =
     if test "sex"
          (fun
-          [ "M" -> p.sex = Male
-          | "F" -> p.sex = Female
+          [ "M" -> get_sex p = Male
+          | "F" -> get_sex p = Female
           | _ -> True ]) &&
-       test_date p "birth" (fun () -> Adef.od_of_codate p.birth) &&
-       test_date p "bapt" (fun () -> Adef.od_of_codate p.baptism) &&
+       test_date p "birth" (fun () -> Adef.od_of_codate (get_birth p)) &&
+       test_date p "bapt" (fun () -> Adef.od_of_codate (get_baptism p)) &&
        test_auth p "death"
          (fun d ->
-            match (d, p.death) with
+            match (d, get_death p) with
             [ ("Dead", NotDead | DontKnowIfDead) -> False
             | ("Dead", _) -> True
             | ("NotDead", NotDead) -> True
@@ -141,12 +141,12 @@ value advanced_search conf base max_answers =
             | _ -> True ]) &&
        test_date p "death"
          (fun () ->
-            match p.death with
+            match get_death p with
             [ Death _ cd -> Some (Adef.date_of_cdate cd)
             | _ -> None ]) &&
        test_date p "burial"
          (fun () ->
-            match p.burial with
+            match get_burial p with
             [ Buried cod -> Adef.od_of_codate cod
             | Cremated cod -> Adef.od_of_codate cod
             | _ -> None ]) &&
@@ -158,15 +158,15 @@ value advanced_search conf base max_answers =
           | "N" -> u.family = [| |]
           | _ -> True ]) &&
        test_auth p "birth_place"
-         (fun x -> name_incl x (sou base p.birth_place)) &&
+         (fun x -> name_incl x (sou base (get_birth_place p))) &&
        test_auth p "bapt_place"
-         (fun x -> name_incl x (sou base p.baptism_place)) &&
+         (fun x -> name_incl x (sou base (get_baptism_place p))) &&
        test_auth p "death_place"
-         (fun x -> name_incl x (sou base p.death_place)) &&
+         (fun x -> name_incl x (sou base (get_death_place p))) &&
        test_auth p "burial_place"
-         (fun x -> name_incl x (sou base p.burial_place)) &&
-       test_auth p "occu" (fun x -> name_incl x (sou base p.occupation)) then
-       do {
+         (fun x -> name_incl x (sou base (get_burial_place p))) &&
+       test_auth p "occu" (fun x -> name_incl x (sou base (get_occupation p)))
+    then do {
       list.val := [p :: list.val]; incr len;
     }
     else ()
@@ -176,10 +176,10 @@ value advanced_search conf base max_answers =
       let (slist, _) =
         if gets "first_name" <> "" then
           Some.persons_of_fsname conf base base.func.persons_of_first_name.find
-            (fun x -> x.first_name) (gets "first_name")
+            get_first_name (gets "first_name")
         else
           Some.persons_of_fsname conf base base.func.persons_of_surname.find
-            (fun x -> x.surname) (gets "surname")
+            get_surname (gets "surname")
       in
       let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
       List.iter
