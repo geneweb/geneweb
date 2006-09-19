@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 5.1 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: sendImage.ml,v 5.2 2006-09-19 18:07:01 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -60,7 +60,7 @@ value print_send_image conf base p =
         let fn = p_first_name base p in
         let sn = p_surname base p in
         Wserver.wprint ": ";
-        Wserver.wprint "%s.%d %s" fn p.occ sn
+        Wserver.wprint "%s.%d %s" fn (get_occ p) sn
       }
     }
   in
@@ -74,7 +74,7 @@ value print_send_image conf base p =
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper p.cle_index);
+          (Adef.int_of_iper (get_cle_index p));
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
         Wserver.wprint "%s:\n" (capitale (transl conf "file"));
         xtag "input" "\
@@ -100,7 +100,7 @@ value print conf base =
       let p = base.data.persons.get ip in
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      if sou base p.image <> "" || fn = "?" || sn = "?" then
+      if sou base (get_image p) <> "" || fn = "?" || sn = "?" then
         incorrect_request conf
       else print_send_image conf base p
   | _ -> incorrect_request conf ]
@@ -119,7 +119,8 @@ value print_delete_image conf base p =
         let fn = p_first_name base p in
         let sn = p_surname base p in
         let occ =
-          if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index else p.occ
+          if fn = "?" || sn = "?" then Adef.int_of_iper (get_cle_index p)
+          else get_occ p
         in
         Wserver.wprint ": ";
         Wserver.wprint "%s.%d %s" fn occ sn
@@ -132,9 +133,10 @@ value print_delete_image conf base p =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
+      Wserver.wprint
+        "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
       Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
-        (Adef.int_of_iper p.cle_index);
+        (Adef.int_of_iper (get_cle_index p));
       Wserver.wprint "\n";
       html_p conf;
       Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
@@ -148,7 +150,7 @@ value print_del conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
       let p = base.data.persons.get ip in
-      if sou base p.image <> "" then incorrect_request conf
+      if sou base (get_image p) <> "" then incorrect_request conf
       else
         match auto_image_file conf base p with
         [ Some _ -> print_delete_image conf base p
@@ -295,7 +297,8 @@ value effective_send_ok conf base p file =
     else ();
     write_file (fname ^ typ) content;
     let key =
-      (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+      (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+       get_cle_index p)
     in
     History.record conf base key "si";
     print_sent conf base p
@@ -348,7 +351,8 @@ value effective_delete_ok conf base p =
       move_file_to_old conf ".png" fname bfname
     else incorrect conf;
     let key =
-      (sou base p.first_name, sou base p.surname, p.occ, p.cle_index)
+      (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+       get_cle_index p)
     in
     History.record conf base key "di";
     print_deleted conf base p
