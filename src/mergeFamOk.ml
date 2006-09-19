@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.3 2006-09-19 11:35:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -20,7 +20,8 @@ value merge_strings base is1 sep is2 =
 
 value sorp base ip =
   let p = poi base ip in
-  (sou base p.first_name, sou base p.surname, p.occ, Update.Link, "")
+  (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+   Update.Link, "")
 ;
 
 value merge_witnesses base wit1 wit2 =
