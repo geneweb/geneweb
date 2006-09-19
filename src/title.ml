@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.4 2006-09-19 20:54:07 ddr Exp $ *)
+(* $Id: title.ml,v 5.5 2006-09-19 21:14:20 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -51,12 +51,12 @@ value date_interval conf base t x =
         match t with
         [ JustSelf -> ()
         | _ ->
-            let u = uget conf base x.cle_index in
+            let u = uget conf base (get_cle_index x) in
             Array.iter
               (fun ifam ->
                  let fam = foi base ifam in
                  let md = fam.marriage in
-                 let conj = spouse x.cle_index (coi base ifam) in
+                 let conj = spouse (get_cle_index x) (coi base ifam) in
                  do {
                    match Adef.od_of_codate md with
                    [ Some (Dgreg d _) -> set d
@@ -79,10 +79,10 @@ value date_interval conf base t x =
 
 value compare_title_dates conf base (x1, t1) (x2, t2) =
   match
-    ((x1.birth, Adef.od_of_codate t1.t_date_start,
-      Adef.od_of_codate t1.t_date_end, x1.death),
-     (x2.birth, Adef.od_of_codate t2.t_date_start,
-      Adef.od_of_codate t2.t_date_end, x2.death))
+    ((get_birth x1, Adef.od_of_codate t1.t_date_start,
+      Adef.od_of_codate t1.t_date_end, get_death x1),
+     (get_birth x2, Adef.od_of_codate t2.t_date_start,
+      Adef.od_of_codate t2.t_date_end, get_death x2))
   with
   [ ((_, Some (Dgreg d1 _), _, _), (_, Some (Dgreg d2 _), _, _)) ->
       if strictly_before_dmy d1 d2 then -1
@@ -293,7 +293,7 @@ value give_access_someone conf base (x, t) list =
     if has_dates then Wserver.wprint "</em>: " else ();
     if List.memq x list then Wserver.wprint "<em>"
     else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
-    match (t.t_name, x.public_name, x.qualifiers) with
+    match (t.t_name, get_public_name x, get_qualifiers x) with
     [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
         Wserver.wprint "%s <em>%s</em> %s" (sou base pn) (sou base nn)
           (p_surname base x)
@@ -395,7 +395,7 @@ value print_title_place_list conf base t p list =
               (fun i (p, n) ->
                  do {
                    Wserver.wprint ";i%d=%d;t%d=%d" i
-                     (Adef.int_of_iper p.cle_index) i n;
+                     (Adef.int_of_iper (get_cle_index p)) i n;
                    i + 1
                  })
               1 list
