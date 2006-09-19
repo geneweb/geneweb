@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: select.ml,v 5.3 2006-09-19 21:48:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -6,10 +6,10 @@ open Gutil;
 open Gwdb;
 
 value is_censored_person threshold p =
-  match Adef.od_of_codate p.birth with
+  match Adef.od_of_codate (get_birth p) with
   [ Some date ->
       match date with
-      [ Dgreg dmy _ -> dmy.year >= threshold && p.access != Public
+      [ Dgreg dmy _ -> dmy.year >= threshold && get_access p != Public
       | _ -> False ]
   | None -> False ]
 ;
@@ -325,8 +325,8 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
       let des = base.data.descends.get i in
       let fath = poi base (father cpl) in
       let moth = poi base (mother cpl) in
-      if Name.strip_lower (sou base fath.surname) = surname ||
-         Name.strip_lower (sou base moth.surname) = surname
+      if Name.strip_lower (sou base (get_surname fath)) = surname ||
+         Name.strip_lower (sou base (get_surname moth)) = surname
       then do {
         fam_tab.(i) := True;
         per_tab.(Adef.int_of_iper (father cpl)) := True;
@@ -335,7 +335,7 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
           (fun ic ->
              let p = poi base ic in
              if not per_tab.(Adef.int_of_iper ic) &&
-                Name.strip_lower (sou base p.surname) = surname
+                Name.strip_lower (sou base (get_surname p)) = surname
              then
                per_tab.(Adef.int_of_iper ic) := True
              else ())
