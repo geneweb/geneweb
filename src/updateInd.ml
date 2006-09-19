@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.4 2006-09-19 05:17:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -14,9 +14,10 @@ value bogus_person_index = Adef.iper_of_int (-1);
 value string_person_of base p =
   let fp ip =
     let p = poi base ip in
-    (sou base p.first_name, sou base p.surname, p.occ, Update.Link, "")
+    (sou base (get_first_name p), sou base (get_surname p), get_occ p,
+     Update.Link, "")
   in
-  Gutil.map_person_ps fp (sou base) p
+  Gutil.map_person_ps fp (sou base) (gen_person_of_person p)
 ;
 
 (* Interpretation of template file 'updind.txt' *)
