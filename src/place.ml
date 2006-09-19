@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: place.ml,v 5.3 2006-09-19 10:26:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -58,10 +58,10 @@ value get_all conf base =
   let ht = Hashtbl.create 5003 in
   let ht_add istr p =
     let (cnt, _) =
-      try Hashtbl.find ht (istr, p.surname) with
+      try Hashtbl.find ht (istr, get_surname p) with
       [ Not_found ->
-          let cnt = (ref 0, p.cle_index) in
-          do { Hashtbl.add ht (istr, p.surname) cnt; cnt } ]
+          let cnt = (ref 0, get_cle_index p) in
+          do { Hashtbl.add ht (istr, get_surname p) cnt; cnt } ]
     in
     incr cnt
   in
@@ -74,10 +74,10 @@ value get_all conf base =
         if i = base.data.persons.len then ()
         else do {
           let p = pget conf base (Adef.iper_of_int i) in
-          let pl_bi = if add_birth then p.birth_place else empty in
-          let pl_bp = if add_birth then p.baptism_place else empty in
-          let pl_de = if add_death then p.death_place else empty in
-          let pl_bu = if add_death then p.burial_place else empty in
+          let pl_bi = if add_birth then get_birth_place p else empty in
+          let pl_bp = if add_birth then get_baptism_place p else empty in
+          let pl_de = if add_death then get_death_place p else empty in
+          let pl_bu = if add_death then get_burial_place p else empty in
           if pl_bi == empty && pl_bp == empty && pl_de == empty &&
              pl_bu == empty ||
              not (fast_auth_age conf p)
