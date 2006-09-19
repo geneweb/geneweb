@@ -129,9 +129,9 @@ iovalue.cmo: iovalue.cmi
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
-merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
+merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi util.cmi \
     ../wserver/wserver.cmi merge.cmi 
-merge.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
+merge.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx util.cmx \
     ../wserver/wserver.cmx merge.cmi 
 merge.cmi: config.cmi gwdb.cmi 
 mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
