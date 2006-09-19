@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: some.ml,v 5.3 2006-09-19 20:43:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -96,7 +96,8 @@ value first_name_print_list conf base x1 xl liste =
            match alphabetic (p_surname base x1) (p_surname base x2) with
            [ 0 ->
                match
-                 (Adef.od_of_codate x1.birth, Adef.od_of_codate x2.birth)
+                 (Adef.od_of_codate (get_birth x1),
+                  Adef.od_of_codate (get_birth x2))
                with
                [ (Some d1, Some d2) -> if d1 strictly_after d2 then -1 else 1
                | (Some d1, _) -> 1
@@ -175,7 +176,8 @@ value persons_of_absolute_first_name conf base x =
          let iperl =
            List.fold_left
              (fun iperl iper ->
-                if (pget conf base iper).first_name = istr then [iper :: iperl]
+                if get_first_name (pget conf base iper) = istr then
+                  [iper :: iperl]
                 else iperl)
              [] iperl
          in
@@ -191,7 +193,7 @@ value first_name_print conf base x =
     else if x = "" then ([], fun [])
     else
       persons_of_fsname conf base base.func.persons_of_first_name.find
-        (fun x -> x.first_name) x
+        get_first_name x
   in
   let list =
     List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl)))
@@ -242,22 +244,22 @@ value print_branch conf base psn name =
   let cln = Name.crush_lower name in
   loop True where rec loop is_first_lev lev p =
     do {
-      let u = uget conf base p.cle_index in
+      let u = uget conf base (get_cle_index p) in
       let family_list =
         List.map
           (fun ifam ->
              let fam = foi base ifam in
              let des = doi base ifam in
-             let c = spouse p.cle_index (coi base ifam) in
+             let c = spouse (get_cle_index p) (coi base ifam) in
              let el = des.children in
              let c = pget conf base c in
              let down =
-               p.sex = Male &&
+               get_sex p = Male &&
                (Name.crush_lower (p_surname base p) = cln || is_first_lev) &&
                Array.length des.children <> 0 ||
-               p.sex = Female &&
+               get_sex p = Female &&
                she_has_children_with_her_name conf base p c el ||
-               p.sex = Male &&
+               get_sex p = Male &&
                child_has_children_with_same_name base des name
              in
              let i = Adef.int_of_ifam ifam in
@@ -339,8 +341,8 @@ value print_by_branch x conf base (pl, homonymes) =
     match p_getenv conf.env "order" with
     [ Some "d" ->
         let born_before p1 p2 =
-          match (Adef.od_of_codate p1.birth,
-                 Adef.od_of_codate p2.birth) with
+          match (Adef.od_of_codate (get_birth p1),
+                 Adef.od_of_codate (get_birth p2)) with
           [ (Some d1, Some d2) ->
               if d2 strictly_after d1 then -1 else 1
           | (_, None) -> -1
@@ -422,7 +424,7 @@ value print_by_branch x conf base (pl, homonymes) =
              }
              else ();
              if br = None || br = Some n then
-               match parents (aget conf base p.cle_index) with
+               match parents (aget conf base (get_cle_index p)) with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    tag "dd" begin
@@ -475,7 +477,8 @@ value print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-           if List.memq p.surname list then list else [p.surname :: list])
+           if List.memq (get_surname p) list then list
+           else [get_surname p :: list])
         [] liste
     in
     let list = List.map (fun s -> sou base s) list in List.sort compare list
@@ -487,7 +490,7 @@ value print_family_alphabetic x conf base liste =
            match
              alphabetic1 (p_first_name base x2) (p_first_name base x1)
            with
-           [ 0 -> compare x1.occ x2.occ
+           [ 0 -> compare (get_occ x1) (get_occ x2)
            | n -> n ])
         liste
     in
@@ -527,7 +530,7 @@ value has_at_least_2_children_with_surname conf base des surname =
     if i == Array.length des.children then False
     else
       let p = pget conf base des.children.(i) in
-      if p.surname == surname then
+      if get_surname p == surname then
         if cnt == 1 then True else loop (cnt + 1) (i + 1)
       else loop cnt (i + 1)
 ;
@@ -544,23 +547,25 @@ value select_ancestors conf base name_inj ipl =
            let ifath = father cpl in
            let fath = pget conf base ifath in
            let moth = pget conf base (mother cpl) in
-           let s = str_inj p.surname in
-           if str_inj fath.surname <> s && str_inj moth.surname <> s &&
-              not (List.memq ip ipl) then
+           let s = str_inj (get_surname p) in
+           if str_inj (get_surname fath) <> s &&
+              str_inj (get_surname moth) <> s &&
+              not (List.memq ip ipl)
+           then
              if List.memq ifath ipl then ipl
              else
                let grandfath_same_surname =
                  match parents (aoi base ifath) with
                  [ Some igfam ->
                      let gfath = poi base (father (coi base igfam)) in
-                     str_inj gfath.surname = s
+                     str_inj (get_surname gfath) = s
                  | None -> False ]
                in
                if grandfath_same_surname then ipl
                else if
                  not (is_hidden fath) &&
                  has_at_least_2_children_with_surname conf base (doi base ifam)
-                 p.surname
+                 (get_surname p)
                then
                  [ifath :: ipl]
                else [ip :: ipl]
@@ -579,7 +584,8 @@ value persons_of_absolute_surname conf base x =
          let iperl =
            List.fold_left
              (fun iperl iper ->
-                if (pget conf base iper).surname = istr then [iper :: iperl]
+                if get_surname (pget conf base iper) = istr then
+                  [iper :: iperl]
                 else iperl)
              [] iperl
          in
@@ -595,7 +601,7 @@ value old_surname_print conf base not_found_fun x =
     else if x = "" then ([], fun [])
     else
       persons_of_fsname conf base base.func.persons_of_surname.find
-        (fun x -> x.surname) x
+        get_surname x
   in
   let (iperl, strl) =
     List.fold_right
@@ -686,18 +692,18 @@ and eval_person_var conf base p =
   fun
   [ ["access"] -> VVstring (acces conf base p)
   | ["father" :: sl] ->
-      match parents (aget conf base p.cle_index) with
+      match parents (aget conf base (get_cle_index p)) with
       [ Some ifam ->
           let p = pget conf base (father (coi base ifam)) in
           eval_person_var conf base p sl
       | None -> raise Not_found ]
   | ["has_parents"] ->
-      match parents (aget conf base p.cle_index) with
+      match parents (aget conf base (get_cle_index p)) with
       [ Some _ -> VVbool True
       | None -> VVbool False ]
   | ["is_restricted"] -> VVbool (is_hidden p)
   | ["mother" :: sl] ->
-      match parents (aget conf base p.cle_index) with
+      match parents (aget conf base (get_cle_index p)) with
       [ Some ifam ->
           let p = pget conf base (mother (coi base ifam)) in
           eval_person_var conf base p sl
@@ -759,7 +765,7 @@ value surname_print_2 conf base x =
     else if x = "" then ([], fun [])
     else
       persons_of_fsname conf base base.func.persons_of_surname.find
-        (fun x -> x.surname) x
+        get_surname x
   in
   let (iperl, strl) =
     List.fold_right
@@ -780,8 +786,8 @@ value surname_print_2 conf base x =
       match p_getenv conf.env "order" with
       [ Some "d" ->
           let born_before p1 p2 =
-            match (Adef.od_of_codate p1.birth,
-                   Adef.od_of_codate p2.birth) with
+            match (Adef.od_of_codate (get_birth p1),
+                   Adef.od_of_codate (get_birth p2)) with
             [ (Some d1, Some d2) ->
                 if d2 strictly_after d1 then -1 else 1
             | (_, None) -> -1
