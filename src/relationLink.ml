@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.3 2006-09-19 18:21:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -207,7 +207,9 @@ value spouse_text conf base end_sp ip ipl =
       | _ -> ("", "", None) ]
   | ([], _) ->
       match end_sp with
-      [ Some p -> (someone_text conf base p.cle_index, "", Some p.cle_index)
+      [ Some p ->
+          (someone_text conf base (get_cle_index p), "",
+           Some (get_cle_index p))
       | _ -> ("", "", None) ]
   | _ -> ("", "", None) ]
 ;
@@ -648,11 +650,11 @@ value print_relation_no_dag conf base po ip1 ip2 =
   let params =
     match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
     [ (Some p, Some l1, Some l2) ->
-        let ip = p.cle_index in
+        let ip = get_cle_index p in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
-        Some (ip, (pget conf base ip).sex, dist, b1, b2, 1, 1)
+        Some (ip, get_sex (pget conf base ip), dist, b1, b2, 1, 1)
     | _ ->
         match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
         [ (Some b1str, Some b2str) ->
@@ -721,8 +723,8 @@ value print_relation_no_dag conf base po ip1 ip2 =
   | _ -> incorrect_request conf ]
 ;
 
-value print_relation_dag conf base a p1 p2 l1 l2 =
-  let ia = a.cle_index in
+value print_relation_dag conf base a ip1 ip2 l1 l2 =
+  let ia = get_cle_index a in
   let add_branches dist set n ip l =
     let b = find_first_branch conf base dist ia l ip Neuter in
     let rec loop set n b =
@@ -733,7 +735,8 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
             let set =
               List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
             in
-            loop set (n + 1) (find_next_branch conf base dist ia a.sex b)
+            loop set (n + 1)
+              (find_next_branch conf base dist ia (get_sex a) b)
         | None -> (set, n) ]
     in
     loop set n b
@@ -745,8 +748,8 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
            List.fold_left
              (fun set l2 ->
                 let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
-                let (set, n) = add_branches dist set 0 p1.cle_index l1 in
-                let (set, n) = add_branches dist set n p2.cle_index l2 in
+                let (set, n) = add_branches dist set 0 ip1 l1 in
+                let (set, n) = add_branches dist set n ip2 l2 in
                 set)
              set l2)
         (Dag.Pset.add ia Dag.Pset.empty) l1
@@ -755,9 +758,9 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
       List.fold_right
         (fun (ip, s) spl ->
            match find_person_in_env conf base s with
-           [ Some sp -> [(ip, (sp.cle_index, None)) :: spl]
+           [ Some sp -> [(ip, (get_cle_index sp, None)) :: spl]
            | None -> spl ])
-        [(p1.cle_index, "3"); (p2.cle_index, "4")] []
+        [(ip1, "3"); (ip2, "4")] []
     in
     let elem_txt p = Dag.Item p "" in
     let vbar_txt ip = "" in
@@ -788,8 +791,11 @@ value print_relation conf base p1 p2 =
   let po = find_person_in_env conf base "" in
   match (p_getenv conf.env "dag", po, l1, l2) with
   [ (Some "on", Some p, Some l1, Some l2) ->
-      print_relation_dag conf base p p1 p2 (int_list l1) (int_list l2)
-  | _ -> print_relation_no_dag conf base po p1.cle_index p2.cle_index ]
+      print_relation_dag conf base p (get_cle_index p1) (get_cle_index p2)
+        (int_list l1) (int_list l2)
+  | _ ->
+      print_relation_no_dag conf base po (get_cle_index p1)
+        (get_cle_index p2) ]
 ;
 
 value print conf base =
