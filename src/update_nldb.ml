@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.4 2006-09-19 19:39:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -131,7 +131,7 @@ value compute base bdir =
     ProgrBar.start ();
     for i = 0 to len - 1 do {
       let p = base.data.persons.get i in
-      let list = notes_links (Gutil.sou base p.notes) in
+      let list = notes_links (Gutil.sou base (get_notes p)) in
       if list = ([], []) then ()
       else
         let pg = NotesLinks.PgInd (Adef.iper_of_int i) in

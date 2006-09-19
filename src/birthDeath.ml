@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.6 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.7 2006-09-19 19:45:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -105,7 +105,7 @@ value select_family conf base get_date find_oldest =
 
 value print_birth conf base =
   let (list, len) =
-    select conf base (fun p -> Adef.od_of_codate p.birth) False
+    select conf base (fun p -> Adef.od_of_codate (get_birth p)) False
   in
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
@@ -145,7 +145,7 @@ value print_birth conf base =
                    (Date.string_of_date conf (Dgreg d cal))
                else
                  Wserver.wprint "%s <em>%s</em>.\n"
-                   (transl_nth conf "born" (index_of_sex p.sex))
+                   (transl_nth conf "born" (index_of_sex (get_sex p)))
                    (Date.string_of_ondate conf (Dgreg d cal));
              end;
              (month_txt, future)
@@ -157,14 +157,14 @@ value print_birth conf base =
   }
 ;
 
-value get_death p =
-  match p.death with
+value death_date p =
+  match get_death p with
   [ Death _ cd -> Some (Adef.date_of_cdate cd)
   | _ -> None ]
 ;
 
 value print_death conf base =
-  let (list, len) = select conf base get_death False in
+  let (list, len) = select conf base death_date False in
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
       (fun _ -> Wserver.wprint "%d" len)
@@ -191,18 +191,18 @@ value print_death conf base =
                else ();
                let (age, ages_sum, ages_nb) =
                  let sure d = d.prec = Sure in
-                 match Adef.od_of_codate p.birth with
+                 match Adef.od_of_codate (get_birth p) with
                  [ Some (Dgreg d1 _) ->
                      if sure d1 && sure d && d1 <> d then
                        let a = time_gone_by d1 d in
                        let ages_sum =
-                         match p.sex with
+                         match get_sex p with
                          [ Male -> (fst ages_sum + a.year, snd ages_sum)
                          | Female -> (fst ages_sum, snd ages_sum  + a.year)
                          | Neuter -> ages_sum ]
                        in
                        let ages_nb =
-                         match p.sex with
+                         match get_sex p with
                          [ Male -> (fst ages_nb + 1, snd ages_nb)
                          | Female -> (fst ages_nb, snd ages_nb + 1)
                          | Neuter -> ages_nb ]
@@ -217,7 +217,7 @@ value print_death conf base =
                  Wserver.wprint "%s" (referenced_person_text conf base p);
                  Wserver.wprint "</b>";
                  Wserver.wprint ", %s <em>%s</em>"
-                   (transl_nth conf "died" (index_of_sex p.sex))
+                   (transl_nth conf "died" (index_of_sex (get_sex p)))
                    (Date.string_of_ondate conf (Dgreg d cal));
                  match age with
                  [ Some a ->
@@ -301,10 +301,10 @@ value print_oldest_alive conf base =
     | _ -> 0 ]
   in
   let get_oldest_alive p =
-    match p.death with
-    [ NotDead -> Adef.od_of_codate p.birth
+    match get_death p with
+    [ NotDead -> Adef.od_of_codate (get_birth p)
     | DontKnowIfDead when limit > 0 ->
-        match Adef.od_of_codate p.birth with
+        match Adef.od_of_codate (get_birth p) with
         [ Some (Dgreg d _) as x when conf.today.year - d.year <= limit -> x
         | _ -> None ]
     | _ -> None ]
@@ -324,9 +324,9 @@ value print_oldest_alive conf base =
              Wserver.wprint "<b>%s</b>,\n"
                (referenced_person_text conf base p);
              Wserver.wprint "%s <em>%s</em>"
-               (transl_nth conf "born" (index_of_sex p.sex))
+               (transl_nth conf "born" (index_of_sex (get_sex p)))
                (Date.string_of_ondate conf (Dgreg d cal));
-             if p.death = NotDead && d.prec = Sure then do {
+             if get_death p = NotDead && d.prec = Sure then do {
                let a = time_gone_by d conf.today in
                Wserver.wprint " <em>(%s)</em>" (Date.string_of_age conf a);
              }
@@ -342,7 +342,7 @@ value print_oldest_alive conf base =
 value print_longest_lived conf base =
   let get_longest p =
     if Util.fast_auth_age conf p then
-      match (Adef.od_of_codate p.birth, p.death) with
+      match (Adef.od_of_codate (get_birth p), get_death p) with
       [ (Some (Dgreg bd _), Death _ cd) ->
           match Adef.date_of_cdate cd with
           [ Dgreg dd _ -> Some (Dgreg (time_gone_by bd dd) Dgregorian)
@@ -459,7 +459,7 @@ value print_oldest_engagements conf base =
            let cpl = coi base fam.fam_index in
            let husb = poi base (father cpl) in
            let wife = poi base (mother cpl) in
-           match (husb.death, wife.death) with
+           match (get_death husb, get_death wife) with
            [ (NotDead | DontKnowIfDead, NotDead | DontKnowIfDead) ->
                Adef.od_of_codate fam.marriage
            | _ -> None ]

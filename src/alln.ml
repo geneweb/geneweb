@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.4 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: alln.ml,v 5.5 2006-09-19 19:40:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -312,7 +312,8 @@ value select_names conf base is_surnames ini =
                        if base.func.is_patched_person ip then
                          let p = poi base ip in
                          let isn =
-                           if is_surnames then p.surname else p.first_name
+                           if is_surnames then get_surname p
+                           else get_first_name p
                          in
                          if isn = istr then [ip :: l] else l
                        else [ip :: l])
