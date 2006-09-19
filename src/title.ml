@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: title.ml,v 5.4 2006-09-19 20:54:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -28,15 +28,15 @@ value date_interval conf base t x =
         }
       in
       do {
-        match Adef.od_of_codate x.birth with
+        match Adef.od_of_codate (get_birth x) with
         [ Some (Dgreg d _) -> set d
         | _ -> () ];
-        match Adef.od_of_codate x.baptism with
+        match Adef.od_of_codate (get_baptism x) with
         [ Some (Dgreg d _) -> set d
         | _ -> () ];
-        match date_of_death x.death with
+        match date_of_death (get_death x) with
         [ Some (Dgreg d _) -> set d
-        | _ -> if x.death = NotDead then set conf.today else () ];
+        | _ -> if get_death x = NotDead then set conf.today else () ];
         List.iter
           (fun t ->
              do {
