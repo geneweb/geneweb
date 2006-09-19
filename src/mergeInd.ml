@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.10 2006-09-19 12:05:02 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.11 2006-09-19 13:36:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -270,21 +270,20 @@ value propose_merge_ind conf base branches p1 p2 =
   }
 ;
 
-value reparent_ind base p1 p2 =
-  let a1 = aoi base (get_cle_index p1) in
-  let a2 = aoi base (get_cle_index p2) in
+value reparent_ind base ip1 ip2 =
+  let a1 = aoi base ip1 in
+  let a2 = aoi base ip2 in
   match (parents a1, parents a2) with
   [ (None, Some ifam) ->
       let des = doi base ifam in
       do {
         let rec replace i =
-          if des.children.(i) = get_cle_index p2 then
-            des.children.(i) := get_cle_index p1
+          if des.children.(i) = ip2 then des.children.(i) := ip1
           else replace (i + 1)
         in
         replace 0;
         let a1 = {parents = Some ifam; consang = Adef.fix (-1)} in
-        base.func.patch_ascend (get_cle_index p1) a1;
+        base.func.patch_ascend ip1 a1;
         base.func.patch_descend ifam des;
       }
   | _ -> () ]
@@ -292,7 +291,7 @@ value reparent_ind base p1 p2 =
 
 value effective_merge_ind conf base p1 p2 =
   do {
-    reparent_ind base p1 p2;
+    reparent_ind base (get_cle_index p1) (get_cle_index p2);
     let u2 = uoi base (get_cle_index p2) in
     if Array.length u2.family <> 0 then do {
       for i = 0 to Array.length u2.family - 1 do {
