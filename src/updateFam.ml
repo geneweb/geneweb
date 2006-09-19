@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.3 2006-09-19 05:48:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -19,10 +19,11 @@ value default_source conf =
 
 value person_key base ip =
   let p = poi base ip in
-  let first_name = sou base p.first_name in
-  let surname = sou base p.surname in
+  let first_name = sou base (get_first_name p) in
+  let surname = sou base (get_surname p) in
   let occ =
-    if first_name = "?" || surname = "?" then Adef.int_of_iper ip else p.occ
+    if first_name = "?" || surname = "?" then Adef.int_of_iper ip
+    else get_occ p
   in
   (first_name, surname, occ, Update.Link, "")
 ;
@@ -446,7 +447,7 @@ value print_inv1 conf base p fam1 fam2 =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper p.cle_index);
+          (Adef.int_of_iper (get_cle_index p));
         xtag "input" "type=\"hidden\" name=\"f\" value=\"%d\""
           (Adef.int_of_ifam fam2.fam_index);
         xtag "input" "type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"";
@@ -466,19 +467,19 @@ value print_add conf base =
     [ Some i ->
         let p = base.data.persons.get i in
         let fath =
-          if p.sex = Male ||
-             p.sex = Neuter && p_getenv conf.env "sex" = Some "M" then
-            person_key base p.cle_index
+          if get_sex p = Male ||
+             get_sex p = Neuter && p_getenv conf.env "sex" = Some "M" then
+            person_key base (get_cle_index p)
           else ("", "", 0, Update.Create Male None, "")
         in
         let moth =
-          if p.sex = Female ||
-             p.sex = Neuter && p_getenv conf.env "sex" = Some "F" then
-            person_key base p.cle_index
+          if get_sex p = Female ||
+             get_sex p = Neuter && p_getenv conf.env "sex" = Some "F" then
+            person_key base (get_cle_index p)
           else ("", "", 0, Update.Create Female None, "")
         in
         let digest =
-          string_of_int (Array.length (uoi base p.cle_index).family)
+          string_of_int (Array.length (uoi base (get_cle_index p)).family)
         in
         (fath, moth, digest)
     | None ->
@@ -506,12 +507,12 @@ value print_add_parents conf base =
          fam_index = bogus_family_index}
       and cpl =
         couple conf.multi_parents
-          ("", sou base p.surname, 0, Update.Create Neuter None, "")
+          ("", sou base (get_surname p), 0, Update.Create Neuter None, "")
           ("", "", 0, Update.Create Neuter None, "")
       and des =
         {children =
-           [| (sou base p.first_name, sou base p.surname, p.occ, Update.Link,
-               "") |]}
+           [| (sou base (get_first_name p), sou base (get_surname p),
+               get_occ p, Update.Link, "") |]}
       in
       print_update_fam conf base (fam, cpl, des) ""
   | _ -> incorrect_request conf ]
