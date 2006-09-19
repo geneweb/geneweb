@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: family.ml,v 5.3 2006-09-19 21:22:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -80,7 +80,7 @@ value compact_list conf base xl =
     List.fold_right
       (fun p pl ->
          match pl with
-         [ [p1 :: _] when p.cle_index == p1.cle_index -> pl
+         [ [p1 :: _] when get_cle_index p == get_cle_index p1 -> pl
          | _ -> [p :: pl] ])
       pl []
   in
@@ -107,7 +107,7 @@ value try_find_with_one_first_name conf base n =
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let (list, _) =
         Some.persons_of_fsname conf base base.func.persons_of_surname.find
-          (fun x -> x.surname) sn
+          get_surname sn
       in
       let pl =
         List.fold_left
@@ -116,7 +116,7 @@ value try_find_with_one_first_name conf base n =
                (fun pl ip ->
                   let p = pget conf base ip in
                   let fn1 =
-                    Name.abbrev (Name.lower (sou base p.first_name))
+                    Name.abbrev (Name.lower (sou base (get_first_name p)))
                   in
                   if List.mem fn (cut_words fn1) then [p :: pl] else pl)
                pl ipl)
@@ -151,7 +151,7 @@ value find_all conf base an =
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
       if n <> Num.zero then
-        match Util.branch_of_sosa conf base p.cle_index n with
+        match Util.branch_of_sosa conf base (get_cle_index p) n with
         [ Some [(ip, _) :: _] -> ([pget conf base ip], True)
         | _ -> ([], False) ]
       else ([], False)
@@ -213,7 +213,7 @@ value specify conf base n pl =
            let pn = sou base pn in
            if Name.crush_lower pn = n then add_tl t
            else
-             match p.qualifiers with
+             match get_qualifiers p with
              [ [nn :: _] ->
                  let nn = sou base nn in
                  if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t else ()
@@ -222,7 +222,7 @@ value specify conf base n pl =
          do {
            List.iter
              (fun t ->
-                match (t.t_name, p.public_name) with
+                match (t.t_name, get_public_name p) with
                 [ (Tname s, _) -> compare_and_add t s
                 | (_, pn) when sou base pn <> "" -> compare_and_add t pn
                 | _ -> () ])
@@ -254,7 +254,7 @@ value specify conf base n pl =
                } ];
            Wserver.wprint "%s" (Date.short_dates_text conf base p);
            if authorized_age conf base p then
-             match p.first_names_aliases with
+             match get_first_names_aliases p with
              [ [] -> ()
              | fnal ->
                  do {
@@ -273,10 +273,12 @@ value specify conf base n pl =
              List.fold_right
                (fun ifam spouses ->
                   let cpl = coi base ifam in
-                  let spouse = pget conf base (spouse p.cle_index cpl) in
+                  let spouse =
+                    pget conf base (spouse (get_cle_index p) cpl)
+                  in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)
-               (Array.to_list (uget conf base p.cle_index).family) []
+               (Array.to_list (uget conf base (get_cle_index p)).family) []
            in
            match spouses with
            [ [] -> ()
@@ -556,8 +558,8 @@ value extract_henv conf base =
           if Util.accessible_by_key conf base p first_name surname then
             [("pz", code_varenv (Name.lower first_name));
              ("nz", code_varenv (Name.lower surname));
-             ("ocz", string_of_int p.occ)]
-          else [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
+             ("ocz", string_of_int (get_occ p))]
+          else [("iz", string_of_int (Adef.int_of_iper (get_cle_index p)))]
         in
         conf.henv := conf.henv @ x
     | None -> () ];
