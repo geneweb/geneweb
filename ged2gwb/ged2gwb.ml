@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.20 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.21 2006-09-20 20:10:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2379,7 +2379,7 @@ value array_memq x a =
     else loop (i + 1)
 ;
 
-value check_parents_children base ascends unions descends =
+value check_parents_children base ascends unions couples descends =
   let to_delete = ref [] in
   let fam_to_delete = ref [] in
   do {
@@ -2416,7 +2416,7 @@ value check_parents_children base ascends unions descends =
       fam_to_delete.val := [];
       let u = unions.(i) in
       for j = 0 to Array.length (get_family u) - 1 do {
-        let cpl = coi base (get_family u).(j) in
+        let cpl = couples.(Adef.int_of_ifam (get_family u).(j)) in
         if Adef.iper_of_int i <> get_father cpl &&
            Adef.iper_of_int i <> get_mother cpl
         then do {
@@ -2438,14 +2438,22 @@ value check_parents_children base ascends unions descends =
               "However, the husband is unknown, I set him as husband\n";
             unions.(Adef.int_of_iper (get_father cpl)) :=
               union_of_gen_union {family = [| |]};
-            set_father cpl (Adef.iper_of_int i);
+            let cpl =
+              couple_of_gen_couple
+                (couple False (Adef.iper_of_int i) (get_mother cpl))
+            in
+            couples.(Adef.int_of_ifam (get_family u).(j)) := cpl;
           }
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
             fprintf log_oc.val
               "However, the wife is unknown, I set her as wife\n";
-            unions.(Adef.int_of_iper (mother cpl)) :=
+            unions.(Adef.int_of_iper (get_mother cpl)) :=
               union_of_gen_union {family = [| |]};
-            set_mother cpl (Adef.iper_of_int i);
+            let cpl =
+              couple_of_gen_couple
+                (couple False (get_father cpl) (Adef.iper_of_int i))
+            in
+            couples.(Adef.int_of_ifam (get_family u).(j)) := cpl;
           }
           else do {
             fprintf log_oc.val "=> deleted this family for him/her\n";
@@ -2482,9 +2490,9 @@ value check_parents_children base ascends unions descends =
               fprintf log_oc.val "Other parents for %s\n"
                 (designation base p);
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base (father cpl)));
+                (designation base (poi base (get_father cpl)));
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base (mother cpl)));
+                (designation base (poi base (get_mother cpl)));
               fprintf log_oc.val "=> deleted in this family\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2497,9 +2505,9 @@ value check_parents_children base ascends unions descends =
                 "%s has no parents but is the child of\n"
                 (designation base p);
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base (father cpl)));
+                (designation base (poi base (get_father cpl)));
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base (mother cpl)));
+                (designation base (poi base (get_mother cpl)));
               fprintf log_oc.val "=> added parents\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2534,8 +2542,8 @@ value check_parents_sex base persons families =
   for i = 0 to base.data.couples.len - 1 do {
     let cpl = base.data.couples.get i in
     let fam = families.(i) in
-    let ifath = father cpl in
-    let imoth = mother cpl in
+    let ifath = get_father cpl in
+    let imoth = get_mother cpl in
     let fath = poi base ifath in
     let moth = poi base imoth in
     if get_relation fam = NoSexesCheckNotMarried
@@ -2624,9 +2632,9 @@ value rec negative_date_ancestors base persons families i = do {
       let cpl = coi base ifam in
       do {
         negative_date_ancestors base persons families
-          (Adef.int_of_iper (father cpl));
+          (Adef.int_of_iper (get_father cpl));
         negative_date_ancestors base persons families
-          (Adef.int_of_iper (mother cpl))
+          (Adef.int_of_iper (get_mother cpl))
       }
   | _ -> () ]
 };
@@ -2648,6 +2656,7 @@ value finish_base base =
   let ascends = base.data.ascends.array () in
   let unions = base.data.unions.array () in
   let families = base.data.families.array () in
+  let couples = base.data.couples.array () in
   let descends = base.data.descends.array () in
   let _ = base.data.strings.array () in
   do {
@@ -2694,7 +2703,7 @@ value finish_base base =
       else ()
     };
     check_parents_sex base persons families;
-    check_parents_children base ascends unions descends;
+    check_parents_children base ascends unions couples descends;
     if try_negative_dates.val then negative_dates base persons families
     else ();
     Check.check_base base

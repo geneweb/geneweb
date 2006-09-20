@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.15 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.16 2006-09-20 20:10:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -341,8 +341,6 @@ value parent multi parent =
   if not multi then Adef.parent parent else Adef.multi_parent parent
 ;
 value parent_array = Adef.parent_array;
-value set_father = Adef.set_father;
-value set_mother = Adef.set_mother;
 
 value no_ascend () =
   ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}

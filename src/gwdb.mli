@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.20 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.21 2006-09-20 20:10:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -8,7 +8,7 @@ type db_ascend 'family = 'abstract;
 type db_union 'family = 'abstract;
 
 type db_family 'person 'string = 'abstract;
-type db_couple 'person = Def.gen_couple 'person;
+type db_couple 'person = 'abstract;
 
 type person = db_person iper istr;
 type ascend = db_ascend ifam;
