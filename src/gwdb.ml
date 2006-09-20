@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.9 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.10 2006-09-20 14:13:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -7,11 +7,13 @@ type db_person 'person 'string = Def.gen_person 'person 'string;
 type db_ascend 'family = Def.gen_ascend 'family;
 type db_union 'family = Def.gen_union 'family;
 
+type db_family 'person 'string = Def.gen_family 'person 'string;
+
 type person = db_person iper istr;
 type ascend = db_ascend ifam;
 type union = db_union ifam;
 
-type family = Def.gen_family iper istr;
+type family = db_family iper istr;
 type couple = Def.gen_couple iper;
 type descend = Def.gen_descend iper;
 
@@ -126,3 +128,9 @@ value gen_ascend_of_ascend a = a;
 value get_family u = u.Def.family;
 
 value union_of_gen_union u = u;
+
+value get_fam_index f = f.Def.fam_index;
+value get_marriage f = f.Def.marriage;
+value get_relation f = f.Def.relation;
+
+value family_of_gen_family f = f;
