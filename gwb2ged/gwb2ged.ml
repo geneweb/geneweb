@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.6 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.7 2006-09-20 17:22:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -464,7 +464,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
            List.iter
              (fun ifam ->
                 let fam = foi base ifam in
-                if array_memq (get_cle_index per) fam.witnesses then
+                if array_memq (get_cle_index per) (get_witnesses fam) then
                   ged_witness fam_sel oc ifam
                 else ())
              (Array.to_list (get_family (uoi base ic)))
@@ -496,28 +496,28 @@ value ged_note base oc per =
 
 value ged_marriage base oc fam =
   match
-    (Adef.od_of_codate fam.marriage, sou base fam.marriage_place,
-     fam.relation)
+    (Adef.od_of_codate (get_marriage fam), sou base (get_marriage_place fam),
+     get_relation fam)
   with
   [ (None, "", Married | Engaged) -> ()
   | (d, pl, _) ->
       do {
         fprintf oc "1 %s"
-          (if fam.relation = Engaged then "ENGA" else "MARR");
+          (if get_relation fam = Engaged then "ENGA" else "MARR");
         let typ =
-          if fam.relation = NoSexesCheckNotMarried
-          || fam.relation = NoSexesCheckMarried then "gay"
+          if get_relation fam = NoSexesCheckNotMarried
+          || get_relation fam = NoSexesCheckMarried then "gay"
           else ""
         in
-        ged_ev_detail oc 2 typ d pl (sou base fam.marriage_src);
-        if fam.relation = NotMarried then
+        ged_ev_detail oc 2 typ d pl (sou base (get_marriage_src fam));
+        if get_relation fam = NotMarried then
           fprintf oc "2 PLAC unmarried\n"
         else ();
       } ]
 ;
 
 value ged_divorce base oc fam =
-  match fam.divorce with
+  match get_divorce fam with
   [ NotDivorced -> ()
   | Separated -> ()
   | Divorced cd ->
@@ -532,13 +532,13 @@ value ged_child base (per_sel, fam_sel) oc chil =
 ;
 
 value ged_fsource base oc fam =
-  match sou base fam.fsources with
+  match sou base (get_fsources fam) with
   [ "" -> ()
   | s -> fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
 value ged_comment base oc fam =
-  match sou base fam.comment with
+  match sou base (get_comment fam) with
   [ "" -> ()
   | s -> fprintf oc "1 NOTE %s\n" (encode s) ]
 ;
@@ -585,12 +585,16 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
     ged_marriage base oc fam;
     ged_divorce base oc fam;
-    if has_personal_infos base (poi base (father cpl)) (aoi base (father cpl)) &&
-       per_sel (father cpl) then
+    if has_personal_infos base (poi base (father cpl))
+         (aoi base (father cpl)) &&
+       per_sel (father cpl)
+    then
       fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (father cpl) + 1)
     else ();
-    if has_personal_infos base (poi base (mother cpl)) (aoi base (mother cpl)) &&
-       per_sel (mother cpl) then
+    if has_personal_infos base (poi base (mother cpl))
+         (aoi base (mother cpl)) &&
+       per_sel (mother cpl)
+    then
       fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (mother cpl) + 1)
     else ();
     Array.iter (ged_child base sel oc) des.children;

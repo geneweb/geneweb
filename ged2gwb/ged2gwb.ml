@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.18 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.19 2006-09-20 17:22:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -878,10 +878,11 @@ value unknown_fam gen i =
   let father = phony_per gen Male in
   let mother = phony_per gen Female in
   let f =
-    {marriage = Adef.codate_None; marriage_place = empty;
-     marriage_src = empty; witnesses = [| |]; relation = Married;
-     divorce = NotDivorced; comment = empty; origin_file = empty;
-     fsources = empty; fam_index = Adef.ifam_of_int i}
+    family_of_gen_family
+      {marriage = Adef.codate_None; marriage_place = empty;
+       marriage_src = empty; witnesses = [| |]; relation = Married;
+       divorce = NotDivorced; comment = empty; origin_file = empty;
+       fsources = empty; fam_index = Adef.ifam_of_int i}
   and c = couple False father mother
   and d = {children = [| |]} in
   (f, c, d)
@@ -1975,12 +1976,13 @@ value add_fam_norm gen r adop_list =
       }
     in
     let fam =
-      {marriage = Adef.codate_of_od marr;
-       marriage_place = add_string gen marr_place;
-       marriage_src = add_string gen marr_src; witnesses = witnesses;
-       relation = relation; divorce = div; comment = add_string gen comment;
-       origin_file = string_empty; fsources = add_string gen fsources;
-       fam_index = i}
+      family_of_gen_family
+        {marriage = Adef.codate_of_od marr;
+         marriage_place = add_string gen marr_place;
+         marriage_src = add_string gen marr_src; witnesses = witnesses;
+         relation = relation; divorce = div; comment = add_string gen comment;
+         origin_file = string_empty; fsources = add_string gen fsources;
+         fam_index = i}
     and cpl = couple False fath moth
     and des = {children = Array.of_list children} in
     gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
@@ -2201,8 +2203,9 @@ value pass3 gen fname =
                      in
                      gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
                    let fam =
-                     {(fam) with
-                      witnesses = Array.append fam.witnesses [| ip |]}
+                     family_of_gen_family
+                       {(gen_family_of_family fam) with
+                        witnesses = Array.append (get_witnesses fam) [| ip |]}
                    in
                    gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des
                  }
@@ -2385,7 +2388,7 @@ value check_parents_children base ascends unions descends =
       match get_parents a with
       [ Some ifam ->
           let fam = foi base ifam in
-          if fam.fam_index == Adef.ifam_of_int (-1) then
+          if get_fam_index fam == Adef.ifam_of_int (-1) then
             ascends.(i) :=
               ascend_of_gen_ascend
                 {(gen_ascend_of_ascend a) with parents = None}
@@ -2502,7 +2505,8 @@ value check_parents_children base ascends unions descends =
               flush log_oc.val;
               let a =
                 ascend_of_gen_ascend
-                  {(gen_ascend_of_ascend a) with parents = Some fam.fam_index}
+                  {(gen_ascend_of_ascend a) with
+                   parents = Some (get_fam_index fam)}
               in
               ascends.(Adef.int_of_iper des.children.(j)) := a
             } ]
@@ -2534,8 +2538,8 @@ value check_parents_sex base persons families =
     let imoth = mother cpl in
     let fath = poi base ifath in
     let moth = poi base imoth in
-    if fam.relation = NoSexesCheckNotMarried
-    || fam.relation = NoSexesCheckMarried then ()
+    if get_relation fam = NoSexesCheckNotMarried
+    || get_relation fam = NoSexesCheckMarried then ()
     else if get_sex fath = Female || get_sex moth = Male then do {
       if get_sex fath = Female then
         fprintf log_oc.val "Warning - husband with female sex: %s\n"
@@ -2546,7 +2550,10 @@ value check_parents_sex base persons families =
           (designation base moth)
       else ();
       flush log_oc.val;
-      let fam = {(fam) with relation = NoSexesCheckNotMarried} in
+      let fam =
+        family_of_gen_family
+          {(gen_family_of_family fam) with relation = NoSexesCheckNotMarried}
+      in
       families.(i) := fam;
     }
     else do {
@@ -2601,10 +2608,12 @@ value rec negative_date_ancestors base persons families i = do {
   for i = 0 to Array.length (get_family u) - 1 do {
     let j = Adef.int_of_ifam (get_family u).(i) in
     let fam = families.(j) in
-    match Adef.od_of_codate fam.marriage with
+    match Adef.od_of_codate (get_marriage fam) with
     [ Some d ->
         let fam =
-          {(fam) with marriage = Adef.codate_of_od (Some (neg_year d))}
+          family_of_gen_family
+            {(gen_family_of_family fam) with
+             marriage = Adef.codate_of_od (Some (neg_year d))}
         in
         families.(j) := fam
     | None -> () ]
@@ -2657,7 +2666,8 @@ value finish_base base =
       let family =
         sort_by_date
           (fun ifam ->
-             Adef.od_of_codate families.(Adef.int_of_ifam ifam).marriage)
+             Adef.od_of_codate
+               (get_marriage families.(Adef.int_of_ifam ifam)))
           (Array.to_list (get_family u))
       in
       unions.(i) := union_of_gen_union {family = Array.of_list family}
