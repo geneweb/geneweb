@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.11 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.12 2006-09-20 11:51:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -514,10 +514,11 @@ value effective_mod conf base sfam scpl sdes =
       (fun ip ->
          let a = find_asc ip in
          let a =
-           {parents = None;
-            consang =
-              if not (array_memq ip ndes.children) then Adef.fix (-1)
-              else a.consang}
+           ascend_of_gen_ascend
+             {parents = None;
+              consang =
+                if not (array_memq ip ndes.children) then Adef.fix (-1)
+                else get_consang a}
          in
          Hashtbl.replace cache ip a)
       odes.children;
@@ -528,11 +529,12 @@ value effective_mod conf base sfam scpl sdes =
          [ Some _ -> print_err_parents conf base (poi base ip)
          | None ->
              let a =
-               {parents = Some fi;
-                consang =
-                  if not (array_memq ip odes.children) || not same_parents
-                  then Adef.fix (-1)
-                  else a.consang}
+               ascend_of_gen_ascend
+                 {parents = Some fi;
+                  consang =
+                    if not (array_memq ip odes.children) || not same_parents
+                    then Adef.fix (-1)
+                    else get_consang a}
              in
              Hashtbl.replace cache ip a ])
       ndes.children;
@@ -629,7 +631,10 @@ value effective_add conf base sfam scpl sdes =
          match get_parents a with
          [ Some _ -> print_err_parents conf base p
          | None ->
-             let a = {parents = Some fi; consang = Adef.fix (-1)} in
+             let a =
+               ascend_of_gen_ascend
+                 {parents = Some fi; consang = Adef.fix (-1)}
+             in
              base.func.patch_ascend (get_cle_index p) a ])
       ndes.children;
     Update.add_misc_names_for_new_persons conf base created_p.val;
@@ -664,7 +669,7 @@ value kill_family base fam ip =
 ;
 
 value kill_parents base ip =
-  let a = {parents = None; consang = Adef.fix (-1)} in
+  let a = ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)} in
   base.func.patch_ascend ip a
 ;
 

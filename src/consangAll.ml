@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.7 2006-09-20 11:30:01 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.8 2006-09-20 11:51:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -98,7 +98,11 @@ value compute base from_scratch quiet =
                   in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
-                  let a = {(a) with consang = Adef.fix_of_float consang} in
+                  let a =
+                    ascend_of_gen_ascend
+                      {(gen_ascend_of_ascend a) with
+                       consang = Adef.fix_of_float consang}
+                  in
                   ascends.(i) := a;
                   consang_tab.(Adef.int_of_ifam ifam) := get_consang a;
                   if not quiet then
@@ -120,13 +124,18 @@ value compute base from_scratch quiet =
               else do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                ascends.(i) := {(a) with consang = pconsang}
+                ascends.(i) :=
+                  ascend_of_gen_ascend
+                    {(gen_ascend_of_ascend a) with consang = pconsang}
               }
           | None ->
               do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                ascends.(i) := {(a) with consang = Adef.fix_of_float 0.0}
+                ascends.(i) :=
+                  ascend_of_gen_ascend
+                    {(gen_ascend_of_ascend a) with
+                     consang = Adef.fix_of_float 0.0}
               } ]
         else ()
       }
