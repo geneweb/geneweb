@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.7 2006-09-19 13:36:38 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.8 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -133,12 +133,12 @@ value effective_mod_merge conf base sp =
       let p2 = base.data.persons.get i2 in
       let u2 = base.data.unions.get i2 in
       let rel_chil = get_related p2 in
-      let p2_family = u2.family in
+      let p2_family = get_family u2 in
       do {
         MergeInd.reparent_ind base sp.cle_index (get_cle_index p2);
         let p2 = UpdateIndOk.effective_del conf base p2 in
         base.func.patch_person (get_cle_index p2) p2;
-        let u2 = {family = [| |]} in
+        let u2 = union_of_gen_union {family = [| |]} in
         base.func.patch_union (get_cle_index p2) u2;
         let p = UpdateIndOk.effective_mod conf base sp in
         let u = uoi base (get_cle_index p) in
@@ -192,9 +192,10 @@ value effective_mod_merge conf base sp =
                  let (p_related, mod_p) =
                    loop (p_related, mod_p) 0
                    where rec loop (p_related, mod_p) i =
-                     if i = Array.length uc.family then (p_related, mod_p)
+                     if i = Array.length (get_family uc) then
+                       (p_related, mod_p)
                      else
-                       let fam = foi base uc.family.(i) in
+                       let fam = foi base (get_family uc).(i) in
                        let (p_related, mod_p) =
                          if array_memq (get_cle_index p2) fam.witnesses
                          then do {
@@ -260,7 +261,10 @@ value effective_mod_merge conf base sp =
         Update.update_misc_names_of_family conf base p u;
         base.func.patch_person (get_cle_index p) p;
         if p2_family <> [| |] then do {
-          let u = {family = Array.append u.family p2_family} in
+          let u =
+            union_of_gen_union
+              {family = Array.append (get_family u) p2_family}
+          in
           base.func.patch_union (get_cle_index p) u;
         }
         else ();

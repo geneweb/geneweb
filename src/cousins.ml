@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.7 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -32,7 +32,7 @@ value children_of base u =
     (fun ifam list ->
        let des = doi base ifam in
        Array.to_list des.children @ list)
-    (Array.to_list u.family) []
+    (Array.to_list (get_family u)) []
 ;
 
 value siblings_by conf base iparent ip =
@@ -76,7 +76,7 @@ value rec has_desc_lev conf base lev u =
          List.exists
            (fun ip -> has_desc_lev conf base (lev - 1) (uget conf base ip))
            (Array.to_list des.children))
-      (Array.to_list u.family)
+      (Array.to_list (get_family u))
 ;
 
 value br_inter_is_empty b1 b2 =
@@ -128,7 +128,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   then
     print_nospouse ()
   else
-    let u = Array.to_list (uget conf base (get_cle_index p2)).family in
+    let u = Array.to_list (get_family (uget conf base (get_cle_index p2))) in
     match u with
     [ [] -> print_nospouse ()
     | _ ->
@@ -316,7 +316,7 @@ value print_anniv conf base p dead_people level =
       let set = S.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
-        let u = (uget conf base ip).family in
+        let u = get_family (uget conf base ip) in
         let down_br = [ip :: down_br] in
         let rec loop set i =
           if i = Array.length u then set
@@ -368,7 +368,7 @@ value print_anniv conf base p dead_people level =
   let set =
     S.fold
       (fun ip (up_sosa, down_br) set ->
-         let u = (uget conf base ip).family in
+         let u = get_family (uget conf base ip) in
          let set = S.add ip (up_sosa, down_br, None) set in
          if Array.length u = 0 then set
          else

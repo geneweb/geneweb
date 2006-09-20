@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.3 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: dag.ml,v 5.4 2006-09-20 12:35:43 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -110,7 +110,7 @@ value make_dag conf base set =
                   (fun chil ip ->
                      try [M.find ip map :: chil] with [ Not_found -> chil ])
                   chil des.children)
-             [] u.family
+             [] (get_family u)
          in
          let chil = List.rev chil in
          {pare = pare; valu = Left ip; chil = chil})
@@ -122,7 +122,7 @@ value make_dag conf base set =
       else
         match nodes.(i) with
         [ {valu = Left ip; chil = chil} ->
-            let ifaml = Array.to_list (uoi base ip).family in
+            let ifaml = Array.to_list (get_family (uoi base ip)) in
             let (nodes, n) =
               loop nodes ifaml where rec loop nodes =
                 fun

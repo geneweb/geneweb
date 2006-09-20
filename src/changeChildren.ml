@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.4 2006-09-19 17:37:08 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.5 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -51,7 +51,7 @@ value select_children_of base u =
        let des = doi base ifam in
        List.fold_right (fun ip ipl -> [ip :: ipl])
          (Array.to_list des.children) ipl)
-    (Array.to_list u.family) []
+    (Array.to_list (get_family u)) []
 ;
 
 value digest_children base ipl =
@@ -153,7 +153,7 @@ value print_children_list conf base u =
                   Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
                 })
              des.children)
-        u.family;
+        (get_family u);
     end;
   }
 ;

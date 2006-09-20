@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.13 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.14 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -295,9 +295,9 @@ value effective_merge_ind conf base p1 p2 =
   do {
     reparent_ind base (get_cle_index p1) (get_cle_index p2);
     let u2 = uoi base (get_cle_index p2) in
-    if Array.length u2.family <> 0 then do {
-      for i = 0 to Array.length u2.family - 1 do {
-        let ifam = u2.family.(i) in
+    if Array.length (get_family u2) <> 0 then do {
+      for i = 0 to Array.length (get_family u2) - 1 do {
+        let ifam = (get_family u2).(i) in
         let cpl = coi base ifam in
         if get_cle_index p2 = father cpl then
           set_father cpl (get_cle_index p1)
@@ -307,9 +307,12 @@ value effective_merge_ind conf base p1 p2 =
         base.func.patch_couple ifam cpl;
       };
       let u1 = uoi base (get_cle_index p1) in
-      let u1 = {family = Array.append u1.family u2.family} in
+      let u1 =
+        union_of_gen_union
+          {family = Array.append (get_family u1) (get_family u2)}
+      in
       base.func.patch_union (get_cle_index p1) u1;
-      let u2 = {family = [| |]} in
+      let u2 = union_of_gen_union {family = [| |]} in
       base.func.patch_union (get_cle_index p2) u2;
     }
     else ();

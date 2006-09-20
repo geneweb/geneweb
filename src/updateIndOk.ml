@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.13 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.14 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -382,7 +382,7 @@ value check_sex_married conf base sp op =
         (fun ifam ->
            let r = (foi base ifam).relation in
            r = NoSexesCheckNotMarried || r = NoSexesCheckMarried)
-        (Array.to_list u.family)
+        (Array.to_list (get_family u))
     in
     if no_check then () else print_cannot_change_sex conf base op
   else ()
@@ -415,7 +415,7 @@ value is_witness_at_marriage base ip p =
   let u = uoi base ip in
   List.exists
     (fun ifam -> let fam = foi base ifam in array_memq ip fam.witnesses)
-    (Array.to_list u.family)
+    (Array.to_list (get_family u))
 ;
 
 value update_relation_parents base op np =
@@ -510,7 +510,7 @@ value effective_add conf base sp =
     in
     let np = person_of_gen_person np in
     let na = no_ascend () in
-    let nu = {family = [| |]} in
+    let nu = union_of_gen_union {family = [| |]} in
     base.func.patch_person pi np;
     base.func.patch_ascend pi na;
     base.func.patch_union pi nu;
@@ -613,7 +613,7 @@ value all_checks_person conf base p a u =
       (fun ifam ->
          Gutil.check_family base error warning (foi base ifam) (coi base ifam)
            (doi base ifam))
-      u.family;
+      (get_family u);
     List.iter
       (fun
        [ ChangedOrderOfChildren ifam des _ -> base.func.patch_descend ifam des

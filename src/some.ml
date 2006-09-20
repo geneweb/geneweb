@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.4 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: some.ml,v 5.5 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -235,7 +235,7 @@ value child_has_children_with_same_name base des name =
             List.exists
               (fun ip -> p_surname base (poi base ip) = name)
               (Array.to_list (doi base ifam).children))
-         (Array.to_list (uoi base ip).family))
+         (Array.to_list (get_family (uoi base ip))))
     (Array.to_list des.children)
 ;
 
@@ -265,7 +265,7 @@ value print_branch conf base psn name =
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.memq i unsel_list) in
              (fam, des, c, if down then Some (string_of_int i, sel) else None))
-          (Array.to_list u.family)
+          (Array.to_list (get_family u))
       in
       let select =
         match family_list with
@@ -284,7 +284,7 @@ value print_branch conf base psn name =
       Wserver.wprint "</strong>";
       Wserver.wprint "%s" (Date.short_dates_text conf base p);
       Wserver.wprint "\n";
-      if Array.length u.family == 0 then ()
+      if Array.length (get_family u) == 0 then ()
       else
         let _ =
           List.fold_left

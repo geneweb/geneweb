@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.4 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: select.ml,v 5.5 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -37,7 +37,7 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
            censor_family base per_tab fam_tab flag threshold f True;
            censor_person base per_tab fam_tab flag threshold p True
          })
-      uni.family
+      (get_family uni)
   in
   let censor_descendants f =
     let des = base.data.descends.get f in
@@ -51,7 +51,7 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
     let uni = base.data.unions.get p in
     Array.fold_left
       (fun check ifam -> fam_tab.(Adef.int_of_ifam ifam) = 0 && check) True
-      uni.family
+      (get_family uni)
   in
   let censor_spouse iper =
     let p = Adef.int_of_iper iper in
@@ -173,7 +173,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
                            })
                         [(father cpl); (mother cpl)]
                     })
-                 (uoi base ip).family
+                 (get_family (uoi base ip))
              })
           des.children
       in
@@ -184,7 +184,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
                flag_family base per_tab fam_tab flag ifam;
                add_siblings_marriages ifam
              })
-          (uoi base iparent).family
+          (get_family(uoi base iparent))
       in
       let anc_flag = 4 in
       let rec ancestors_loop iper =
@@ -268,7 +268,7 @@ value select_descendants
                else ();
                Array.iter (loop (succ lev)) (doi base ifam).children
              })
-          (uoi base iper).family
+          (get_family (uoi base iper))
       }
   in
   loop 0 iper
@@ -299,8 +299,8 @@ value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
          if tab.(Adef.int_of_iper ip) = des_mark then ()
          else do {
            let u = uoi base ip in
-           for i = 0 to Array.length u.family - 1 do {
-             let ifam = u.family.(i) in
+           for i = 0 to Array.length (get_family u) - 1 do {
+             let ifam = (get_family u).(i) in
              fam_tab.(Adef.int_of_ifam ifam) :=
                fam_tab.(Adef.int_of_ifam ifam) lor 1;
              let des = doi base ifam in

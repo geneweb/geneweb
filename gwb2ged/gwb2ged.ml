@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.5 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.6 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -467,7 +467,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
                 if array_memq (get_cle_index per) fam.witnesses then
                   ged_witness fam_sel oc ifam
                 else ())
-             (Array.to_list (uoi base ic).family)
+             (Array.to_list (get_family (uoi base ic)))
          else ())
       (get_related per);
   }
@@ -567,7 +567,7 @@ value ged_ind_record base sel oc i =
     ged_ind_ev_str base sel oc per;
     ged_ind_attr_str base oc per;
     ged_famc base sel oc asc;
-    Array.iter (ged_fams base sel oc) uni.family;
+    Array.iter (ged_fams base sel oc) (get_family uni);
     ged_asso base sel oc per;
     ged_psource base oc per;
     ged_multimedia_link base oc per;

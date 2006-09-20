@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.12 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.13 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -428,7 +428,7 @@ value person_misc_names base p nobtit =
                [husband_surname ::
                 surnames_pieces husband_surname @ husband_surnames_aliases @
                   list])
-          surnames (Array.to_list u.family)
+          surnames (Array.to_list (get_family u))
       else surnames
     in
     let list = [] in
