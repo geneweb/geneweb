@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.12 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.13 2006-09-20 11:51:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -282,7 +282,9 @@ value reparent_ind base ip1 ip2 =
           else replace (i + 1)
         in
         replace 0;
-        let a1 = {parents = Some ifam; consang = Adef.fix (-1)} in
+        let a1 =
+          ascend_of_gen_ascend {parents = Some ifam; consang = Adef.fix (-1)}
+        in
         base.func.patch_ascend ip1 a1;
         base.func.patch_descend ifam des;
       }
@@ -429,7 +431,10 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
     base.func.patch_descend fam1.fam_index des1;
     for i = 0 to Array.length des2.children - 1 do {
       let ip = des2.children.(i) in
-      let a = {parents = Some fam1.fam_index; consang = Adef.fix (-1)} in
+      let a =
+        ascend_of_gen_ascend
+          {parents = Some fam1.fam_index; consang = Adef.fix (-1)}
+      in
       base.func.patch_ascend ip a;
     };
     let des2 = {children = [| |]} in

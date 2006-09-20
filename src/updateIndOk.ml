@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.12 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.13 2006-09-20 11:51:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -538,7 +538,9 @@ value effective_del conf base p = do {
   [ Some ifam ->
       let des = doi base ifam in
       let des = {children = array_except ip des.children} in
-      let asc = {parents = None; consang = Adef.fix (-1)} in
+      let asc =
+        ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
+      in
       do {
         base.func.patch_descend ifam des;
         base.func.patch_ascend ip asc;

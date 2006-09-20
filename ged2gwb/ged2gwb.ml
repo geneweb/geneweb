@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.16 2006-09-20 11:15:12 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.17 2006-09-20 11:51:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1762,7 +1762,9 @@ value add_indi gen r =
        notes = add_string gen (notes ^ ext_notes);
        psources = add_string gen psources; cle_index = ip}
   in
-  let ascend = {parents = parents; consang = Adef.fix (-1)} in
+  let ascend =
+    ascend_of_gen_ascend {parents = parents; consang = Adef.fix (-1)}
+  in
   let union = {family = Array.of_list family} in
   do {
     gen.g_per.arr.(Adef.int_of_iper ip) := Right3 person ascend union;
@@ -1828,7 +1830,10 @@ value add_fam_norm gen r adop_list =
                  match get_parents a with
                  [ Some ifam ->
                      if ifam = i then do {
-                       let a = {(a) with parents = None} in
+                       let a =
+                         ascend_of_gen_ascend
+                           {(gen_ascend_of_ascend a) with parents = None}
+                       in
                        gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
                        ipl
                      }
@@ -2253,7 +2258,10 @@ value add_parents_to_isolated gen =
             [ Right3 fam cpl des -> do {
                 let des = {children = [| get_cle_index p |]} in
                 gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
-                let a = {(a) with parents = Some ifam} in
+                let a =
+                  ascend_of_gen_ascend
+                    {(gen_ascend_of_ascend a) with parents = Some ifam}
+                in
                 gen.g_per.arr.(i) := Right3 p a u
               }
             | _ -> () ];
@@ -2374,11 +2382,13 @@ value check_parents_children base ascends unions descends =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let a = ascends.(i) in
-      match a.parents with
+      match get_parents a with
       [ Some ifam ->
           let fam = foi base ifam in
           if fam.fam_index == Adef.ifam_of_int (-1) then
-            ascends.(i) := {(a) with parents = None}
+            ascends.(i) :=
+              ascend_of_gen_ascend
+                {(gen_ascend_of_ascend a) with parents = None}
           else
             let cpl = coi base ifam in
             let des = doi base ifam in
@@ -2395,7 +2405,9 @@ value check_parents_children base ascends unions descends =
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              ascends.(i) := {(a) with parents = None}
+              ascends.(i) :=
+                ascend_of_gen_ascend
+                  {(gen_ascend_of_ascend a) with parents = None}
             }
       | None -> () ];
       fam_to_delete.val := [];
@@ -2458,7 +2470,7 @@ value check_parents_children base ascends unions descends =
       for j = 0 to Array.length des.children - 1 do {
         let a = ascends.(Adef.int_of_iper des.children.(j)) in
         let p = poi base des.children.(j) in
-        match a.parents with
+        match get_parents a with
         [ Some ifam ->
             if Adef.int_of_ifam ifam <> i then do {
               fprintf log_oc.val "Other parents for %s\n"
@@ -2485,7 +2497,10 @@ value check_parents_children base ascends unions descends =
               fprintf log_oc.val "=> added parents\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              let a = {(a) with parents = Some fam.fam_index} in
+              let a =
+                ascend_of_gen_ascend
+                  {(gen_ascend_of_ascend a) with parents = Some fam.fam_index}
+              in
               ascends.(Adef.int_of_iper des.children.(j)) := a
             } ]
       };
