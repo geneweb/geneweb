@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.8 2006-09-20 11:58:05 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.9 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -122,3 +122,7 @@ value get_parents a = a.Def.parents;
 
 value ascend_of_gen_ascend a = a;
 value gen_ascend_of_ascend a = a;
+
+value get_family u = u.Def.family;
+
+value union_of_gen_union u = u;

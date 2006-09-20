@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.12 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.13 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -323,10 +323,10 @@ value family_exclude pfams efam =
 value infer_origin_file_from_other_marriages conf base ifam ip =
   let u = uoi base ip in
   let rec loop i =
-    if i = Array.length u.family then None
-    else if u.family.(i) = ifam then loop (i + 1)
+    if i = Array.length (get_family u) then None
+    else if (get_family u).(i) = ifam then loop (i + 1)
     else
-      let r = (foi base u.family.(i)).origin_file in
+      let r = (foi base (get_family u).(i)).origin_file in
       if sou base r <> "" then Some r else loop (i + 1)
   in
   loop 0
@@ -357,7 +357,7 @@ value infer_origin_file conf base ifam ncpl ndes =
               if i == Array.length ndes.children then
                 Update.insert_string base ""
               else
-                let cifams = (uoi base ndes.children.(i)).family in
+                let cifams = get_family (uoi base ndes.children.(i)) in
                 if Array.length cifams == 0 then loop (i + 1)
                 else if sou base (foi base cifams.(0)).origin_file <> "" then
                   (foi base cifams.(0)).origin_file
@@ -486,7 +486,10 @@ value effective_mod conf base sfam scpl sdes =
     for i = 0 to Array.length oarr - 1 do {
       if not (array_memq oarr.(i) narr) then do {
         let ou = uoi base oarr.(i) in
-        let ou = {family = family_exclude ou.family ofam.fam_index} in
+        let ou =
+          union_of_gen_union
+            {family = family_exclude (get_family ou) ofam.fam_index}
+        in
         base.func.patch_union oarr.(i) ou
       }
       else ()
@@ -494,7 +497,10 @@ value effective_mod conf base sfam scpl sdes =
     for i = 0 to Array.length narr - 1 do {
       if not (array_memq narr.(i) oarr) then do {
         let nu = uoi base narr.(i) in
-        let nu = {family = Array.append nu.family [| fi |]} in
+        let nu =
+          union_of_gen_union
+            {family = Array.append (get_family nu) [| fi |]}
+        in
         base.func.patch_union narr.(i) nu;
       }
       else ()
@@ -620,8 +626,14 @@ value effective_add conf base sfam scpl sdes =
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
     base.func.patch_descend fi ndes;
-    let nfath_u = {family = Array.append nfath_u.family [| fi |]} in
-    let nmoth_u = {family = Array.append nmoth_u.family [| fi |]} in
+    let nfath_u =
+      union_of_gen_union
+        {family = Array.append (get_family nfath_u) [| fi |]}
+    in
+    let nmoth_u =
+      union_of_gen_union
+        {family = Array.append (get_family nmoth_u) [| fi |]}
+    in
     base.func.patch_union (father ncpl) nfath_u;
     base.func.patch_union (mother ncpl) nmoth_u;
     Array.iter
@@ -652,7 +664,10 @@ value effective_inv conf base ip u ifam =
         else [ifam1 :: loop [ifam2 :: ifaml]]
     | _ -> do { incorrect_request conf; raise Update.ModErr } ]
   in
-  let u = {family = Array.of_list (loop (Array.to_list u.family))} in
+  let u =
+    union_of_gen_union
+      {family = Array.of_list (loop (Array.to_list (get_family u)))}
+  in
   base.func.patch_union ip u
 ;
 
@@ -662,9 +677,9 @@ value kill_family base fam ip =
     List.fold_right
       (fun ifam ifaml ->
          if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
-      (Array.to_list u.family) []
+      (Array.to_list (get_family u)) []
   in
-  let u = {family = Array.of_list l} in
+  let u = union_of_gen_union {family = Array.of_list l} in
   base.func.patch_union ip u
 ;
 
@@ -888,7 +903,7 @@ value print_add o_conf base =
     let digest =
       match p_getint conf.env "ip" with
       [ Some ip ->
-          string_of_int (Array.length (base.data.unions.get ip).family)
+          string_of_int (Array.length (get_family (base.data.unions.get ip)))
       | None -> "" ]
     in
     let sdigest = raw_get conf "digest" in

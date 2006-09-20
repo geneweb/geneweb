@@ -1,11 +1,11 @@
-(* $Id: gwdb.mli,v 5.15 2006-09-20 11:58:05 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.16 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
 
 type db_person 'person 'string = 'abstract;
 type db_ascend 'family = 'abstract;
-type db_union 'family = Def.gen_union 'family;
+type db_union 'family = 'abstract;
 
 type person = db_person iper istr;
 type ascend = db_ascend ifam;
@@ -122,3 +122,7 @@ value get_consang : db_ascend 'f -> Adef.fix;
 
 value ascend_of_gen_ascend : Def.gen_ascend 'f -> db_ascend 'f;
 value gen_ascend_of_ascend : db_ascend 'f -> Def.gen_ascend 'f;
+
+value get_family : db_union 'f -> array 'f;
+
+value union_of_gen_union : Def.gen_union 'f -> db_union 'f;

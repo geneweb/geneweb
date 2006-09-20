@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.3 2006-09-19 05:48:14 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.4 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -479,7 +479,8 @@ value print_add conf base =
           else ("", "", 0, Update.Create Female None, "")
         in
         let digest =
-          string_of_int (Array.length (uoi base (get_cle_index p)).family)
+          string_of_int
+            (Array.length (get_family (uoi base (get_cle_index p))))
         in
         (fath, moth, digest)
     | None ->
@@ -551,7 +552,7 @@ value print_inv conf base =
   [ (Some ip, Some ifam) ->
       let u = base.data.unions.get ip in
       match
-        find_families (Adef.ifam_of_int ifam) (Array.to_list u.family)
+        find_families (Adef.ifam_of_int ifam) (Array.to_list (get_family u))
       with
       [ Some (ifam1, ifam2) ->
           let p = base.data.persons.get ip in

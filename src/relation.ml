@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: relation.ml,v 5.7 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -292,7 +292,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let elem_txt p = Dag.Item p "" in
     let vbar_txt ip =
       let u = uget conf base ip in
-      let excl_faml = Array.to_list u.family @ excl_faml in
+      let excl_faml = Array.to_list (get_family u) @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
@@ -337,7 +337,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (doi base fam).children) children)
-              (Array.to_list (uget conf base (father cpl)).family) []
+              (Array.to_list (get_family (uget conf base (father cpl)))) []
         in
         let result =
           result @
@@ -350,7 +350,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (doi base fam).children) children)
-              (Array.to_list (uget conf base (mother cpl)).family) []
+              (Array.to_list (get_family (uget conf base (mother cpl)))) []
         in
         result
       }
@@ -369,7 +369,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                  [((father cpl), Mate, ifam); ((mother cpl), Mate, ifam)] @
                  nb
              })
-          (Array.to_list (uget conf base iper).family) []
+          (Array.to_list (get_family (uget conf base iper))) []
       in
       let result =
         result @
@@ -481,7 +481,8 @@ value print_shortest_path conf base p1 p2 =
                 in
                 let u = uget conf base (get_cle_index p) in
                 let list =
-                  if n < Array.length u.family then [u.family.(n) :: list]
+                  if n < Array.length (get_family u) then
+                    [(get_family u).(n) :: list]
                   else list
                 in
                 loop list (i + 1)
@@ -555,7 +556,7 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
             loop2 (Array.to_list (doi base ifam).children)
         | [] -> [] ]
       in
-      loop1 (Array.to_list (uget conf base ip).family)
+      loop1 (Array.to_list (get_family (uget conf base ip)))
   in
   loop (get_cle_index anc) x
 ;
@@ -1217,7 +1218,7 @@ value known_spouses_list conf base p excl_p =
        then
          [sp :: spl]
        else spl)
-    [] (Array.to_list u.family)
+    [] (Array.to_list (get_family u))
 ;
 
 value merge_relations rl1 rl2 =

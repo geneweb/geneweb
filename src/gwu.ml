@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.5 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.6 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -392,7 +392,7 @@ value print_witness oc base gen p =
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
-    if Array.length u.family = 0 && get_parents a = None &&
+    if Array.length (get_family u) = 0 && get_parents a = None &&
        not gen.mark.(Adef.int_of_iper (get_cle_index p))
     then do {
       gen.mark.(Adef.int_of_iper (get_cle_index p)) := True;
@@ -633,7 +633,7 @@ value print_notes oc base gen ml =
 value is_isolated base p =
   match get_parents (aoi base (get_cle_index p)) with
   [ Some _ -> False
-  | None -> Array.length (uoi base (get_cle_index p)).family = 0 ]
+  | None -> Array.length (get_family (uoi base (get_cle_index p))) = 0 ]
 ;
 
 value is_definition_for_parent base p =
@@ -717,7 +717,7 @@ value print_relation_parent oc base mark defined_p p =
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
-    if Array.length u.family = 0 && get_parents a = None &&
+    if Array.length (get_family u) = 0 && get_parents a = None &&
        not mark.(Adef.int_of_iper (get_cle_index p))
     then do {
       mark.(Adef.int_of_iper (get_cle_index p)) := True;
@@ -870,7 +870,7 @@ value connected_families base fam_sel fam cpl =
         if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
           let u = uoi base ip in
-          let ifaml1 = Array.to_list u.family in
+          let ifaml1 = Array.to_list (get_family u) in
           let ifaml1 = filter fam_sel ifaml1 in
           let ifaml = merge_families ifaml ifaml1 in
           let ipl =
@@ -939,8 +939,8 @@ value rec find_ancestors base surn p list =
 value mark_branch base mark surn p =
   loop True p where rec loop top p =
     let u = uoi base (get_cle_index p) in
-    for i = 0 to Array.length u.family - 1 do {
-      let ifam = u.family.(i) in
+    for i = 0 to Array.length (get_family u) - 1 do {
+      let ifam = (get_family u).(i) in
       match mark.(Adef.int_of_ifam ifam) with
       [ NotScanned ->
           let ifaml =
@@ -995,13 +995,13 @@ value scan_connex_component base test_action len ifam =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (uoi base (father cpl)).family
+        len (get_family (uoi base (father cpl)))
     in
     let len =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (uoi base (mother cpl)).family
+        len (get_family (uoi base (mother cpl)))
     in
     let len =
       match get_parents (aoi base (father cpl)) with
@@ -1017,7 +1017,7 @@ value scan_connex_component base test_action len ifam =
     let len =
       Array.fold_left
         (fun len ip ->
-           Array.fold_left (test_action loop) len (uoi base ip).family)
+           Array.fold_left (test_action loop) len (get_family (uoi base ip)))
         len children
     in
     len

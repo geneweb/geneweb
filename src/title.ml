@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.5 2006-09-19 21:14:20 ddr Exp $ *)
+(* $Id: title.ml,v 5.6 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -69,7 +69,7 @@ value date_interval conf base t x =
                          des.children
                    | _ -> () ];
                  })
-              u.family ];
+              (get_family u) ];
       }
     in
     loop t x;

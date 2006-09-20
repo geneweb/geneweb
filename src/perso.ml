@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.8 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: perso.ml,v 5.9 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 value has_children base u =
   List.exists
     (fun ifam -> let des = doi base ifam in Array.length des.children > 0)
-    (Array.to_list u.family)
+    (Array.to_list (get_family u))
 ;
 
 value string_of_marriage_text conf base fam =
@@ -298,7 +298,7 @@ value make_desc_level_table conf base max_level p =
                    (fun ipl ifam ->
                       let ipa = (doi base ifam).children in
                       Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
-                   ipl (get (Adef.int_of_iper ip)).family
+                   ipl (get_family (get (Adef.int_of_iper ip)))
                }
                else ipl)
             [] ipl
@@ -587,7 +587,7 @@ value get_date_place conf base auth_for_all_anc p =
           (fun d ifam ->
              if d <> None then d
              else Adef.od_of_codate (foi base ifam).marriage)
-          d1 (Array.to_list (uget conf base (get_cle_index p)).family)
+          d1 (Array.to_list (get_family (uget conf base (get_cle_index p))))
     in
     let d2 =
       match get_death p with
@@ -620,7 +620,7 @@ value get_date_place conf base auth_for_all_anc p =
             (fun pl ifam ->
                if pl <> "" then pl
                else sou base (foi base ifam).marriage_place)
-            pl (Array.to_list (uget conf base (get_cle_index p)).family)
+            pl (Array.to_list (get_family (uget conf base (get_cle_index p))))
       in
       pl
     in
@@ -1687,7 +1687,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
           List.exists
             (fun ifam ->
              let des = doi base ifam in Array.length des.children > 0)
-          (Array.to_list u.family) ]
+          (Array.to_list (get_family u)) ]
   | "has_consanguinity" ->
       p_auth && get_consang a != Adef.fix (-1) && get_consang a != Adef.fix 0
   | "has_cremation_date" ->
@@ -1702,7 +1702,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       [ Death _ _ -> p_auth
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
-  | "has_families" -> Array.length u.family > 0
+  | "has_families" -> Array.length (get_family u) > 0
   | "has_first_names_aliases" -> get_first_names_aliases p <> []
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
@@ -1743,7 +1743,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
              let fam = foi base ifam in
              p_auth && sou base fam.marriage_src <> "" ||
              sou base fam.fsources <> "")
-          (Array.to_list u.family)
+          (Array.to_list (get_family u))
   | "has_surnames_aliases" -> get_surnames_aliases p <> []
   | "is_buried" ->
       match get_burial p with
@@ -1880,8 +1880,8 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
             else do {
               tab.(i) := True;
               let u = uget conf base (get_cle_index p) in
-              for i = 0 to Array.length u.family - 1 do {
-                let des = doi base u.family.(i) in
+              for i = 0 to Array.length (get_family u) - 1 do {
+                let des = doi base (get_family u).(i) in
                 for i = 0 to Array.length des.children - 1 do {
                   mark_descendants (len + 1) (pget conf base des.children.(i))
                 }
@@ -1918,10 +1918,10 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           let n =
             List.fold_left
               (fun n ifam -> n + Array.length (doi base ifam).children) 0
-              (Array.to_list u.family)
+              (Array.to_list (get_family u))
           in
           string_of_int n ]
-  | "nb_families" -> string_of_int (Array.length u.family)
+  | "nb_families" -> string_of_int (Array.length (get_family u))
   | "notes" ->
       if p_auth then
         let env = [('i', fun () -> Util.default_image_name base p)] in
@@ -2446,9 +2446,9 @@ value print_foreach conf base print_ast eval_expr =
         }
   and print_foreach_family env al ini_ep (p, _, u, _) =
     loop None 0 where rec loop prev i =
-      if i = Array.length u.family then ()
+      if i = Array.length (get_family u) then ()
       else
-        let ifam = u.family.(i) in
+        let ifam = (get_family u).(i) in
         let fam = foi base ifam in
         let cpl = coi base ifam in
         let des = doi base ifam in
@@ -2631,7 +2631,8 @@ value print_foreach conf base print_ast eval_expr =
         (fun (srcl, i) ifam ->
            let fam = foi base ifam in
            let lab =
-             if Array.length u.family == 1 then "" else " " ^ string_of_int i
+             if Array.length (get_family u) == 1 then ""
+             else " " ^ string_of_int i
            in
            let srcl =
              if p_auth then
@@ -2641,7 +2642,7 @@ value print_foreach conf base print_ast eval_expr =
            in
            let src_typ = transl_nth conf "family/families" 0 in
            (insert (src_typ ^ lab) fam.fsources srcl, i + 1))
-        (srcl, 1) u.family
+        (srcl, 1) (get_family u)
     in
     let print_src (src_typ, src) =
       let s = sou base src in
@@ -2688,7 +2689,7 @@ value print_foreach conf base print_ast eval_expr =
                        if array_memq (get_cle_index p) fam.witnesses then
                          list.val := [(ifam, fam) :: list.val]
                        else ())
-                    (uget conf base ic).family
+                    (get_family (uget conf base ic))
                 else ();
                 make_list icl
               }

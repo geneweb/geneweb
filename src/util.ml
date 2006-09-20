@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.16 2006-09-20 11:58:05 ddr Exp $ *)
+(* $Id: util.ml,v 5.17 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -541,9 +541,9 @@ value authorized_age conf base p =
     | _ ->
         let u = uoi base (get_cle_index p) in
         let rec loop i =
-          if i >= Array.length u.family then False
+          if i >= Array.length (get_family u) then False
           else
-            let fam = foi base u.family.(i) in
+            let fam = foi base (get_family u).(i) in
             match Adef.od_of_codate fam.marriage with
             [ Some (Dgreg d _) ->
                 let a = time_gone_by d conf.today in
@@ -619,8 +619,7 @@ value aget (conf : config) base ip =
 ;
 
 value uget (conf : config) base ip =
-  if is_restricted conf base ip then
-    { family = [| |] }
+  if is_restricted conf base ip then union_of_gen_union {family = [| |]}
   else base.data.unions.get (Adef.int_of_iper ip)
 ;
 
@@ -1101,7 +1100,8 @@ value url_no_index conf base =
               let u = uget conf base (father cpl) in
               let n =
                 loop 0 where rec loop k =
-                  if u.family.(k) == Adef.ifam_of_int i then string_of_int k
+                  if (get_family u).(k) == Adef.ifam_of_int i then
+                    string_of_int k
                   else loop (k + 1)
               in
               Some (f, s, oc, n)
@@ -1725,10 +1725,10 @@ value specify_homonymous conf base p =
       [ Some (None, None) | None ->
           let u = uget conf base (get_cle_index p) in
           let rec loop i =
-            if i < Array.length u.family then
-              let des = doi base u.family.(i) in
+            if i < Array.length (get_family u) then
+              let des = doi base (get_family u).(i) in
               let conjoint =
-                spouse (get_cle_index p) (coi base u.family.(i))
+                spouse (get_cle_index p) (coi base (get_family u).(i))
               in
               let ct = des.children in
               if Array.length ct > 0 then
@@ -2281,7 +2281,7 @@ value has_nephews_or_nieces conf base p =
                       if Array.length (doi base ifam).children > 0 then
                         raise Ok
                       else ())
-                   (uget conf base ip).family)
+                   (get_family (uget conf base ip)))
             des.children;
           False
         }

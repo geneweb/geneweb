@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.8 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.9 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -18,7 +18,7 @@ value rec clear_descend_consang base ascends mark ifam =
              {(gen_ascend_of_ascend a) with consang = no_consang};
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
-         Array.iter (clear_descend_consang base ascends mark) u.family
+         Array.iter (clear_descend_consang base ascends mark) (get_family u)
        }
        else ())
     des.children
@@ -55,7 +55,8 @@ value compute base from_scratch quiet =
           List.iter
             (fun ip ->
                let u = uoi base ip in
-               Array.iter (clear_descend_consang base ascends mark) u.family)
+               Array.iter (clear_descend_consang base ascends mark)
+                 (get_family u))
             list ]
     else ();
     for i = 0 to base.data.ascends.len - 1 do {

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.14 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.15 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -150,7 +150,7 @@ value make_person gen p n occ =
      m_occ = occ; m_rparents = []; m_related = []; m_sex = Neuter;
      m_notes = empty_string}
   and a = no_ascend ()
-  and u = {family = [| |]} in
+  and u = union_of_gen_union {family = [| |]} in
   (p, a, u)
 ;
 
@@ -556,11 +556,13 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     gen.g_base.c_descends.(gen.g_fcnt) := des;
     gen.g_fcnt := gen.g_fcnt + 1;
     let fath_uni =
-      {family = Array.append fath_uni.family [| Adef.ifam_of_int i |]}
+      union_of_gen_union
+        {family = Array.append (get_family fath_uni) [| Adef.ifam_of_int i |]}
     in
     gen.g_base.c_unions.(Adef.int_of_iper ipere) := fath_uni;
     let moth_uni =
-      {family = Array.append moth_uni.family [| Adef.ifam_of_int i |]}
+      union_of_gen_union
+        {family = Array.append (get_family moth_uni) [| Adef.ifam_of_int i |]}
     in
     gen.g_base.c_unions.(Adef.int_of_iper imere) := moth_uni;
     notice_sex gen pere fath_sex;

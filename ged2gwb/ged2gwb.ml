@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.17 2006-09-20 11:51:07 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.18 2006-09-20 12:35:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -858,7 +858,7 @@ value unknown_per gen i sex =
        burial = UnknownBurial; burial_place = empty; burial_src = empty;
        notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
   and a = no_ascend ()
-  and u = {family = [| |]} in
+  and u = union_of_gen_union {family = [| |]} in
   (p, a, u)
 ;
 
@@ -1765,7 +1765,7 @@ value add_indi gen r =
   let ascend =
     ascend_of_gen_ascend {parents = parents; consang = Adef.fix (-1)}
   in
-  let union = {family = Array.of_list family} in
+  let union = union_of_gen_union {family = Array.of_list family} in
   do {
     gen.g_per.arr.(Adef.int_of_iper ip) := Right3 person ascend union;
     match find_field "ADOP" r.rsons with
@@ -1795,8 +1795,8 @@ value add_fam_norm gen r adop_list =
     [ Left3 lab -> ()
     | Right3 p a u ->
         let u =
-          if not (List.memq i (Array.to_list u.family)) then
-            {family = Array.append u.family [| i |]}
+          if not (List.memq i (Array.to_list (get_family u))) then
+            union_of_gen_union {family = Array.append (get_family u) [| i |]}
           else u
         in
         let p =
@@ -1809,8 +1809,8 @@ value add_fam_norm gen r adop_list =
     [ Left3 lab -> ()
     | Right3 p a u ->
         let u =
-          if not (List.memq i (Array.to_list u.family)) then
-            {family = Array.append u.family [| i |]}
+          if not (List.memq i (Array.to_list (get_family u))) then
+            union_of_gen_union {family = Array.append (get_family u) [| i |]}
           else u
         in
         let p =
@@ -2243,7 +2243,7 @@ value add_parents_to_isolated gen =
     match gen.g_per.arr.(i) with
     [ Right3 p a u ->
         if get_parents a = None &&
-           Array.length u.family = 0 && get_rparents p = [] &&
+           Array.length (get_family u) = 0 && get_rparents p = [] &&
            get_related p = []
         then
           let fn = gen.g_str.arr.(Adef.int_of_istr (get_first_name p)) in
@@ -2412,8 +2412,8 @@ value check_parents_children base ascends unions descends =
       | None -> () ];
       fam_to_delete.val := [];
       let u = unions.(i) in
-      for j = 0 to Array.length u.family - 1 do {
-        let cpl = coi base u.family.(j) in
+      for j = 0 to Array.length (get_family u) - 1 do {
+        let cpl = coi base (get_family u).(j) in
         if Adef.iper_of_int i <> (father cpl) &&
            Adef.iper_of_int i <> (mother cpl)
         then do {
@@ -2433,13 +2433,15 @@ value check_parents_children base ascends unions descends =
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
             fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
-            unions.(Adef.int_of_iper (father cpl)) := {family = [| |]};
+            unions.(Adef.int_of_iper (father cpl)) :=
+              union_of_gen_union {family = [| |]};
             set_father cpl (Adef.iper_of_int i);
           }
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
             fprintf log_oc.val
               "However, the wife is unknown, I set her as wife\n";
-            unions.(Adef.int_of_iper (mother cpl)) := {family = [| |]};
+            unions.(Adef.int_of_iper (mother cpl)) :=
+              union_of_gen_union {family = [| |]};
             set_mother cpl (Adef.iper_of_int i);
           }
           else do {
@@ -2457,9 +2459,10 @@ value check_parents_children base ascends unions descends =
             (fun (list, i) x ->
                if List.mem i fam_to_delete.val then (list, i + 1)
                else ([x :: list], i + 1))
-            ([], 0) (Array.to_list u.family)
+            ([], 0) (Array.to_list (get_family u))
         in
-        unions.(i) := {family = Array.of_list (List.rev list)}
+        unions.(i) :=
+          union_of_gen_union {family = Array.of_list (List.rev list)}
       else ()
     };
     for i = 0 to base.data.families.len - 1 do {
@@ -2595,8 +2598,8 @@ value rec negative_date_ancestors base persons families i = do {
   in
   persons.(i) := p;
   let u = uoi base (get_cle_index p) in
-  for i = 0 to Array.length u.family - 1 do {
-    let j = Adef.int_of_ifam u.family.(i) in
+  for i = 0 to Array.length (get_family u) - 1 do {
+    let j = Adef.int_of_ifam (get_family u).(i) in
     let fam = families.(j) in
     match Adef.od_of_codate fam.marriage with
     [ Some d ->
@@ -2655,15 +2658,15 @@ value finish_base base =
         sort_by_date
           (fun ifam ->
              Adef.od_of_codate families.(Adef.int_of_ifam ifam).marriage)
-          (Array.to_list u.family)
+          (Array.to_list (get_family u))
       in
-      unions.(i) := {family = Array.of_list family}
+      unions.(i) := union_of_gen_union {family = Array.of_list family}
     };
     for i = 0 to Array.length persons - 1 do {
       let p = persons.(i) in
       let a = ascends.(i) in
       let u = unions.(i) in
-      if get_parents a <> None && Array.length u.family != 0 ||
+      if get_parents a <> None && Array.length (get_family u) != 0 ||
          get_notes p <> string_empty
       then
         let (fn, occ) =
