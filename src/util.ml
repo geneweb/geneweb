@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.15 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: util.ml,v 5.16 2006-09-20 11:58:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1070,7 +1070,7 @@ value get_request_string conf = get_request_string_aux conf.cgi conf.request;
 
 value url_no_index conf base =
   let scratch s = code_varenv (Name.lower (sou base s)) in
-  let get_person v =
+  let get_a_person v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
         if i >= 0 && i < base.data.persons.len then
@@ -1085,7 +1085,7 @@ value url_no_index conf base =
         else None
     | None -> None ]
   in
-  let get_family v =
+  let get_a_family v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
         if i >= 0 && i < base.data.families.len then
@@ -1123,13 +1123,13 @@ value url_no_index conf base =
           new_fam_env k v (fun x -> x ^ k) l
       | [kv :: l] -> [kv :: loop l] ]
     and new_env k v c l =
-      match get_person v with
+      match get_a_person v with
       [ Some (f, s, oc) ->
           if oc = "0" then [(c "p", f); (c "n", s) :: loop l]
           else [(c "p", f); (c "n", s); (c "oc", oc) :: loop l]
       | None -> [(k, v) :: loop l] ]
     and new_fam_env k v c l =
-      match get_family v with
+      match get_a_family v with
       [ Some (f, s, oc, n) ->
           let l = loop l in
           let l = if n = "0" then l else [(c "f", n) :: l] in
