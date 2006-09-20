@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.5 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: some.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -428,14 +428,14 @@ value print_by_branch x conf base (pl, homonymes) =
                [ Some ifam ->
                    let cpl = coi base ifam in
                    tag "dd" begin
-                     let pp = pget conf base (father cpl) in
+                     let pp = pget conf base (get_father cpl) in
                      if is_hidden pp then
                        Wserver.wprint "&lt;&lt;"
                      else
                        let href = Util.acces conf base pp in
                        wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n&amp;\n";
-                     let pp = pget conf base (mother cpl) in
+                     let pp = pget conf base (get_mother cpl) in
                      if is_hidden pp then
                        Wserver.wprint "&lt;&lt;"
                      else
@@ -544,9 +544,9 @@ value select_ancestors conf base name_inj ipl =
        match get_parents a with
        [ Some ifam ->
            let cpl = coi base ifam in
-           let ifath = father cpl in
+           let ifath = get_father cpl in
            let fath = pget conf base ifath in
-           let moth = pget conf base (mother cpl) in
+           let moth = pget conf base (get_mother cpl) in
            let s = str_inj (get_surname p) in
            if str_inj (get_surname fath) <> s &&
               str_inj (get_surname moth) <> s &&
@@ -557,7 +557,7 @@ value select_ancestors conf base name_inj ipl =
                let grandfath_same_surname =
                  match get_parents (aoi base ifath) with
                  [ Some igfam ->
-                     let gfath = poi base (father (coi base igfam)) in
+                     let gfath = poi base (get_father (coi base igfam)) in
                      str_inj (get_surname gfath) = s
                  | None -> False ]
                in
@@ -694,7 +694,7 @@ and eval_person_var conf base p =
   | ["father" :: sl] ->
       match get_parents (aget conf base (get_cle_index p)) with
       [ Some ifam ->
-          let p = pget conf base (father (coi base ifam)) in
+          let p = pget conf base (get_father (coi base ifam)) in
           eval_person_var conf base p sl
       | None -> raise Not_found ]
   | ["has_parents"] ->
@@ -705,7 +705,7 @@ and eval_person_var conf base p =
   | ["mother" :: sl] ->
       match get_parents (aget conf base (get_cle_index p)) with
       [ Some ifam ->
-          let p = pget conf base (mother (coi base ifam)) in
+          let p = pget conf base (get_mother (coi base ifam)) in
           eval_person_var conf base p sl
       | None -> raise Not_found ]
   | ["var"] -> VVother (eval_person_var conf base p)

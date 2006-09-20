@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.14 2006-09-20 14:13:13 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.15 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -349,11 +349,8 @@ value no_ascend () =
 ;
 
 value spouse ip cpl =
-  if ip == father cpl then mother cpl
-(*
-  else if ip == mother cpl then father cpl
-*)
-  else father cpl
+  if ip == get_father cpl then get_mother cpl
+  else get_father cpl
 ;
 
 value saints = ["saint"; "sainte"];
@@ -417,7 +414,7 @@ value person_misc_names base p nobtit =
         List.fold_left
           (fun list ifam ->
              let cpl = coi base ifam in
-             let husband = poi base (father cpl) in
+             let husband = poi base (get_father cpl) in
              let husband_surname = p_surname base husband in
              let husband_surnames_aliases =
                List.map (sou base) (get_surnames_aliases husband)
@@ -465,7 +462,7 @@ value person_misc_names base p nobtit =
       match get_parents (aoi base (get_cle_index p)) with
       [ Some ifam ->
           let cpl = coi base ifam in
-          let fath = poi base (father cpl) in
+          let fath = poi base (get_father cpl) in
           let first_names =
             [first_name :: List.map (sou base) (get_first_names_aliases p)]
           in
@@ -631,8 +628,8 @@ value check_noloop base error =
         do {
           match get_parents (base.data.ascends.get i) with
           [ Some fam ->
-              let fath = father (coi base fam) in
-              let moth = mother (coi base fam) in
+              let fath = get_father (coi base fam) in
+              let moth = get_mother (coi base fam) in
               do {
                 tab.(i) := BeingVisited;
                 noloop (Adef.int_of_iper fath);
@@ -665,7 +662,7 @@ value check_noloop_for_person_list base error ipl =
               let cpl = coi base ifam in
               do {
                 tab.(i) := BeingVisited;
-                Array.iter noloop (parent_array cpl);
+                Array.iter noloop (get_parent_array cpl);
               }
           | None -> () ];
           tab.(i) := Visited;
@@ -958,8 +955,10 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
 value check_normal_marriage_date base error warning fam =
   let cpl = coi base (get_fam_index fam) in
   do {
-    check_normal_marriage_date_for_someone base error warning fam (father cpl);
-    check_normal_marriage_date_for_someone base error warning fam (mother cpl);
+    check_normal_marriage_date_for_someone base error warning fam
+      (get_father cpl);
+    check_normal_marriage_date_for_someone base error warning fam
+      (get_mother cpl);
   }
 ;
 
@@ -1065,8 +1064,8 @@ value sort_children base warning ifam des =
 
 value check_family base error warning fam cpl des =
   let ifam = get_fam_index fam in
-  let fath = poi base (father cpl) in
-  let moth = poi base (mother cpl) in
+  let fath = poi base (get_father cpl) in
+  let moth = poi base (get_mother cpl) in
   do {
     match get_sex fath with
     [ Male -> birth_before_death base warning fath
@@ -1090,10 +1089,13 @@ value check_family base error warning fam cpl des =
              birth_before_death base warning child;
              born_after_his_elder_sibling base error warning child np ifam
                des;
-             child_born_after_his_parent base error warning child (father cpl);
-             child_born_after_his_parent base error warning child (mother cpl);
-             child_born_before_mother_death base warning child (mother cpl);
-             possible_father base warning child (father cpl);
+             child_born_after_his_parent base error warning child
+               (get_father cpl);
+             child_born_after_his_parent base error warning child
+               (get_mother cpl);
+             child_born_before_mother_death base warning child
+               (get_mother cpl);
+             possible_father base warning child (get_father cpl);
              child_has_sex warning child;
              match Adef.od_of_codate (get_birth child) with
              [ Some d -> Some (child, d)

@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: check.ml,v 5.7 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -45,15 +45,15 @@ value print_base_warning oc base =
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
       fprintf oc "Changed order of children of %s and %s\n"
-        (designation base (poi base (father cpl)))
-        (designation base (poi base (mother cpl)))
+        (designation base (poi base (get_father cpl)))
+        (designation base (poi base (get_mother cpl)))
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = coi base ifam in
       do {
         fprintf oc
           "The following children of\n  %s\nand\n  %s\nare not in order:\n"
-          (designation base (poi base (father cpl)))
-          (designation base (poi base (mother cpl)));
+          (designation base (poi base (get_father cpl)))
+          (designation base (poi base (get_mother cpl)));
         fprintf oc "- %s\n" (designation base elder);
         fprintf oc "- %s\n" (designation base x)
       }
@@ -152,27 +152,27 @@ value update_stats base current_year s p =
     [ (Some y2, Some ifam) ->
         let cpl = coi base ifam in
         do {
-          match birth_year (poi base (father cpl)) with
+          match birth_year (poi base (get_father cpl)) with
           [ Some y1 ->
               let age = y2 - y1 in
               do {
                 if age > fst s.oldest_father then
-                  s.oldest_father := (age, poi base (father cpl))
+                  s.oldest_father := (age, poi base (get_father cpl))
                 else ();
                 if age < fst s.youngest_father then
-                  s.youngest_father := (age, poi base (father cpl))
+                  s.youngest_father := (age, poi base (get_father cpl))
                 else ();
               }
           | _ -> () ];
-          match birth_year (poi base (mother cpl)) with
+          match birth_year (poi base (get_mother cpl)) with
           [ Some y1 ->
               let age = y2 - y1 in
               do {
                 if age > fst s.oldest_mother then
-                  s.oldest_mother := (age, poi base (mother cpl))
+                  s.oldest_mother := (age, poi base (get_mother cpl))
                 else ();
                 if age < fst s.youngest_mother then
-                  s.youngest_mother := (age, poi base (mother cpl))
+                  s.youngest_mother := (age, poi base (get_mother cpl))
                 else ();
               }
           | _ -> () ];

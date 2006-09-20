@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.4 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: place.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -104,8 +104,8 @@ value get_all conf base =
             let pl_ma = get_marriage_place fam in
             if pl_ma <> empty then
               let cpl = coi base (get_fam_index fam) in
-              let fath = pget conf base (father cpl) in
-              let moth = pget conf base (mother cpl) in
+              let fath = pget conf base (get_father cpl) in
+              let moth = pget conf base (get_mother cpl) in
               if fast_auth_age conf fath && fast_auth_age conf moth then do {
                 ht_add pl_ma fath; ht_add pl_ma moth
               }

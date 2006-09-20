@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.6 2006-09-20 16:28:36 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.7 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -284,8 +284,8 @@ value print_marriage conf base month =
         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _)
           when d <> 0 && m <> 0 ->
             let cpl = base.data.couples.get i in
-            let father = pget conf base (father cpl) in
-            let mother = pget conf base (mother cpl) in
+            let father = pget conf base (get_father cpl) in
+            let mother = pget conf base (get_mother cpl) in
             if m == month &&
                authorized_age conf base father && not (is_hidden father) &&
                authorized_age conf base mother && not (is_hidden mother) then
@@ -309,11 +309,11 @@ value print_marriage conf base month =
                    html_li conf;
                    Wserver.wprint "%s"
                      (referenced_person_title_text conf base
-                        (pget conf base (father fam)));
+                        (pget conf base (get_father fam)));
                    Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
                    Wserver.wprint "%s"
                      (referenced_person_title_text conf base
-                        (pget conf base (mother fam)));
+                        (pget conf base (get_mother fam)));
                    Wserver.wprint ", <em>%s %d</em>\n"
                      (transl conf "in (year)") year;
                  })
@@ -333,11 +333,11 @@ value print_anniversaries_of_marriage conf base y list =
          stagn "li" begin
            Wserver.wprint "%s\n"
              (referenced_person_title_text conf base
-                (pget conf base (father fam)));
+                (pget conf base (get_father fam)));
            Wserver.wprint "%s\n" (transl_nth conf "and" 0);
            Wserver.wprint "%s"
              (referenced_person_title_text conf base
-                (pget conf base (mother fam)));
+                (pget conf base (get_mother fam)));
            Wserver.wprint ", <em>%s %d\n(" (transl conf "in (year)") year;
            Wserver.wprint (ftransl conf "%d years ago")
              (conf.today.year - year);
@@ -540,13 +540,13 @@ value print_menu_dead conf base =
 
 value match_mar_dates conf base cpl d1 d2 =
   if d1.day == d2.day && d1.month == d2.month then
-    authorized_age conf base (pget conf base (father cpl)) &&
-    authorized_age conf base (pget conf base (mother cpl))
+    authorized_age conf base (pget conf base (get_father cpl)) &&
+    authorized_age conf base (pget conf base (get_mother cpl))
   else if
     d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
     not (leap_year d2.year) then
-    authorized_age conf base (pget conf base (father cpl)) &&
-    authorized_age conf base (pget conf base (mother cpl))
+    authorized_age conf base (pget conf base (get_father cpl)) &&
+    authorized_age conf base (pget conf base (get_mother cpl))
   else False
 ;
 
@@ -579,8 +579,8 @@ value print_menu_marriage conf base =
             in
             let cpl = base.data.couples.get i in
             if conf.use_restrict then
-              let father = pget conf base (father cpl) in
-              let mother = pget conf base (mother cpl) in
+              let father = pget conf base (get_father cpl) in
+              let mother = pget conf base (get_mother cpl) in
               if not (is_hidden father) && not (is_hidden mother) then
                 update_list cpl
               else ()

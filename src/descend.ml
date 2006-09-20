@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.9 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: descend.ml,v 5.10 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -59,7 +59,7 @@ value named_like_father conf base ip =
   match get_parents a with
   [ Some ifam ->
       get_surname (pget conf base ip) =
-        get_surname (pget conf base (father (coi base ifam)))
+        get_surname (pget conf base (get_father (coi base ifam)))
   | _ -> False ]
 ;
 
@@ -400,7 +400,7 @@ value labelled conf base marks max_lev lev ip =
                  Array.length (get_family u) <> 0 &&
                  not (close_to_end conf base marks max_lev lev e))
               (Array.to_list el))
-         (Array.to_list (get_family (uget conf base (father cpl))))
+         (Array.to_list (get_family (uget conf base (get_father cpl))))
    | _ -> False ])
 ;
 

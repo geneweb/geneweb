@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.19 2006-09-20 17:22:39 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.20 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -883,7 +883,7 @@ value unknown_fam gen i =
        marriage_src = empty; witnesses = [| |]; relation = Married;
        divorce = NotDivorced; comment = empty; origin_file = empty;
        fsources = empty; fam_index = Adef.ifam_of_int i}
-  and c = couple False father mother
+  and c = couple_of_gen_couple (couple False father mother)
   and d = {children = [| |]} in
   (f, c, d)
 ;
@@ -1983,7 +1983,7 @@ value add_fam_norm gen r adop_list =
          relation = relation; divorce = div; comment = add_string gen comment;
          origin_file = string_empty; fsources = add_string gen fsources;
          fam_index = i}
-    and cpl = couple False fath moth
+    and cpl = couple_of_gen_couple (couple False fath moth)
     and des = {children = Array.of_list children} in
     gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
   }
@@ -2189,17 +2189,17 @@ value pass3 gen fname =
          match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
          [ Right3 fam cpl des ->
              match
-               (gen.g_per.arr.(Adef.int_of_iper (father cpl)),
+               (gen.g_per.arr.(Adef.int_of_iper (get_father cpl)),
                 gen.g_per.arr.(Adef.int_of_iper ip))
              with
              [ (Right3 pfath _ _, Right3 p a u) ->
                  do {
-                   if List.memq (father cpl) (get_related p) then ()
+                   if List.memq (get_father cpl) (get_related p) then ()
                    else
                      let p =
                        person_of_gen_person
                          {(gen_person_of_person p) with
-                          related = [(father cpl) :: get_related p]}
+                          related = [get_father cpl :: get_related p]}
                      in
                      gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
                    let fam =
@@ -2402,9 +2402,9 @@ value check_parents_children base ascends unions descends =
                 "%s is not the child of his/her parents\n"
                 (designation base p);
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base (father cpl)));
+                (designation base (poi base (get_father cpl)));
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base (mother cpl)));
+                (designation base (poi base (get_mother cpl)));
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2417,18 +2417,18 @@ value check_parents_children base ascends unions descends =
       let u = unions.(i) in
       for j = 0 to Array.length (get_family u) - 1 do {
         let cpl = coi base (get_family u).(j) in
-        if Adef.iper_of_int i <> (father cpl) &&
-           Adef.iper_of_int i <> (mother cpl)
+        if Adef.iper_of_int i <> get_father cpl &&
+           Adef.iper_of_int i <> get_mother cpl
         then do {
           fprintf log_oc.val
             "%s is spouse in this family but neither husband nor wife:\n"
             (designation base (base.data.persons.get i));
           fprintf log_oc.val "- %s\n"
-            (designation base (poi base (father cpl)));
+            (designation base (poi base (get_father cpl)));
           fprintf log_oc.val "- %s\n"
-            (designation base (poi base (mother cpl)));
-          let fath = poi base (father cpl) in
-          let moth = poi base (mother cpl) in
+            (designation base (poi base (get_mother cpl)));
+          let fath = poi base (get_father cpl) in
+          let moth = poi base (get_mother cpl) in
           let ffn = sou base (get_first_name fath) in
           let fsn = sou base (get_surname fath) in
           let mfn = sou base (get_first_name moth) in
@@ -2436,7 +2436,7 @@ value check_parents_children base ascends unions descends =
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
             fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
-            unions.(Adef.int_of_iper (father cpl)) :=
+            unions.(Adef.int_of_iper (get_father cpl)) :=
               union_of_gen_union {family = [| |]};
             set_father cpl (Adef.iper_of_int i);
           }

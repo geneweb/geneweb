@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.7 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.8 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -864,7 +864,7 @@ value rec filter f =
 ;
 
 value connected_families base fam_sel fam cpl =
-  loop [(get_fam_index fam)] [] [(father cpl)]
+  loop [(get_fam_index fam)] [] [get_father cpl]
   where rec loop ifaml ipl_scanned =
     fun
     [ [ip :: ipl] ->
@@ -878,7 +878,7 @@ value connected_families base fam_sel fam cpl =
             List.fold_right
               (fun ifam ipl ->
                  let cpl = coi base ifam in
-                 [(father cpl); (mother cpl) :: ipl])
+                 [get_father cpl; get_mother cpl :: ipl])
               ifaml1 ipl
           in
           loop ifaml [ip :: ipl_scanned] ipl
@@ -921,8 +921,8 @@ value rec find_ancestors base surn p list =
   match get_parents (aoi base (get_cle_index p)) with
   [ Some ifam ->
       let cpl = coi base ifam in
-      let fath = poi base (father cpl) in
-      let moth = poi base (mother cpl) in
+      let fath = poi base (get_father cpl) in
+      let moth = poi base (get_mother cpl) in
       if get_surname fath <> surn && get_surname moth <> surn then [p :: list]
       else
         let list =
@@ -996,21 +996,21 @@ value scan_connex_component base test_action len ifam =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family (uoi base (father cpl)))
+        len (get_family (uoi base (get_father cpl)))
     in
     let len =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family (uoi base (mother cpl)))
+        len (get_family (uoi base (get_mother cpl)))
     in
     let len =
-      match get_parents (aoi base (father cpl)) with
+      match get_parents (aoi base (get_father cpl)) with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
     let len =
-      match get_parents (aoi base (mother cpl)) with
+      match get_parents (aoi base (get_mother cpl)) with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
@@ -1054,8 +1054,8 @@ value mark_one_connex_component base mark ifam =
   else do {
     eprintf "%s: group of size %d not included\n" origin_file len;
     let cpl = coi base ifam in
-    eprintf "    %s + %s\n" (designation base (poi base (father cpl)))
-      (designation base (poi base (mother cpl)));
+    eprintf "    %s + %s\n" (designation base (poi base (get_father cpl)))
+      (designation base (poi base (get_mother cpl)));
     flush stderr;
     set_mark Scanned
   }
@@ -1180,8 +1180,8 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
                let cpl = coi base ifam in
                let des = doi base ifam in
                let m =
-                 {m_fam = fam; m_fath = poi base (father cpl);
-                  m_moth = poi base (mother cpl);
+                 {m_fam = fam; m_fath = poi base (get_father cpl);
+                  m_moth = poi base (get_mother cpl);
                   m_chil = Array.map (fun ip -> poi base ip) des.children}
                in
                if empty_family base m then do {

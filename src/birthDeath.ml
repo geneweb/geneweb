@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.8 2006-09-20 16:28:36 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.9 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -406,13 +406,13 @@ value print_marr_or_eng conf base title list len =
                stagn "b" begin
                  Wserver.wprint "%s"
                    (referenced_person_text conf base
-                      (pget conf base (father cpl)));
+                      (pget conf base (get_father cpl)));
                end;
                Wserver.wprint "%s\n" (transl_nth conf "and" 0);
                stag "b" begin
                  Wserver.wprint "%s"
                    (referenced_person_text conf base
-                      (pget conf base (mother cpl)));
+                      (pget conf base (get_mother cpl)));
                end;
                Wserver.wprint ",\n";
                if future then
@@ -458,8 +458,8 @@ value print_oldest_engagements conf base =
       (fun fam ->
          if get_relation fam == Engaged then
            let cpl = coi base (get_fam_index fam) in
-           let husb = poi base (father cpl) in
-           let wife = poi base (mother cpl) in
+           let husb = poi base (get_father cpl) in
+           let wife = poi base (get_mother cpl) in
            match (get_death husb, get_death wife) with
            [ (NotDead | DontKnowIfDead, NotDead | DontKnowIfDead) ->
                Adef.od_of_codate (get_marriage fam)

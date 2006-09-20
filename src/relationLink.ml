@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.5 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -83,8 +83,8 @@ value make_dist_tab conf base ia maxlev =
         match get_parents (aget conf base (Adef.iper_of_int k)) with
         [ Some ifam ->
             let cpl = coi base ifam in
-            let dfath = dist.(Adef.int_of_iper (father cpl)) in
-            let dmoth = dist.(Adef.int_of_iper (mother cpl)) in
+            let dfath = dist.(Adef.int_of_iper (get_father cpl)) in
+            let dmoth = dist.(Adef.int_of_iper (get_mother cpl)) in
             do {
               dist.(k).dmin := min dfath.dmin dmoth.dmin + 1;
               dist.(k).dmax := max dfath.dmax dmoth.dmax + 1;
@@ -107,9 +107,9 @@ value find_first_branch conf base (dmin, dmax) ia =
       match get_parents (aget conf base ip) with
       [ Some ifam ->
           let cpl = coi base ifam in
-          match find [(ip, sp) :: br] (len - 1) (father cpl) Male with
+          match find [(ip, sp) :: br] (len - 1) (get_father cpl) Male with
           [ Some _ as r -> r
-          | None -> find [(ip, sp) :: br] (len - 1) (mother cpl) Female ]
+          | None -> find [(ip, sp) :: br] (len - 1) (get_mother cpl) Female ]
       | None -> None ]
 ;
 
@@ -125,8 +125,8 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
             match get_parents (aget conf base ip) with
             [ Some ifam ->
                 let cpl = coi base ifam in
-                next_branch_same_len conf base dist False missing (mother cpl)
-                  Female ipl
+                next_branch_same_len conf base dist False missing
+                  (get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len" ]
         | Neuter -> assert False ] ]
   else if missing == 0 then Some (ia, sa, ipl)
@@ -136,8 +136,8 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
     match get_parents (aget conf base ia) with
     [ Some ifam ->
         let cpl = coi base ifam in
-        next_branch_same_len conf base dist False (missing - 1) (father cpl) Male
-          [(ia, sa) :: ipl]
+        next_branch_same_len conf base dist False (missing - 1)
+          (get_father cpl) Male [(ia, sa) :: ipl]
     | None -> next_branch_same_len conf base dist True missing ia sa ipl ]
 ;
 
@@ -160,8 +160,8 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
             match get_parents (aget conf base ip) with
             [ Some ifam ->
                 let cpl = coi base ifam in
-                prev_branch_same_len conf base dist False missing (father cpl)
-                  Male ipl
+                prev_branch_same_len conf base dist False missing
+                  (get_father cpl) Male ipl
             | _ -> failwith "prev_branch_same_len" ]
         | Neuter -> assert False ] ]
   else if missing == 0 then Some (ia, sa, ipl)
@@ -171,8 +171,8 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
     match get_parents (aget conf base ia) with
     [ Some ifam ->
         let cpl = coi base ifam in
-        prev_branch_same_len conf base dist False (missing - 1) (mother cpl)
-          Female [(ia, sa) :: ipl]
+        prev_branch_same_len conf base dist False (missing - 1)
+          (get_mother cpl) Female [(ia, sa) :: ipl]
     | None -> prev_branch_same_len conf base dist True missing ia sa ipl ]
 ;
 
@@ -198,10 +198,10 @@ value spouse_text conf base end_sp ip ipl =
       [ Some ifam ->
           let c = coi base ifam in
           let fam = foi base ifam in
-          let sp = if ip = (father c) then (mother c) else (father c) in
+          let sp = if ip = get_father c then get_mother c else get_father c in
           let d =
             Date.short_marriage_date_text conf base fam
-              (pget conf base (father c)) (pget conf base (mother c))
+              (pget conf base (get_father c)) (pget conf base (get_mother c))
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> ("", "", None) ]
@@ -423,16 +423,20 @@ value other_parent_text_if_same conf base info =
           let cpl1 = coi base ifam1 in
           let cpl2 = coi base ifam2 in
           let other_parent =
-            if (father cpl1) = info.ip then
-              if (mother cpl1) = (mother cpl2) then Some (mother cpl1) else None
-            else if (father cpl1) = (father cpl2) then Some (father cpl1)
+            if get_father cpl1 = info.ip then
+              if get_mother cpl1 = get_mother cpl2 then
+                Some (get_mother cpl1)
+              else None
+            else if get_father cpl1 = get_father cpl2 then
+              Some (get_father cpl1)
             else None
           in
           match other_parent with
           [ Some ip ->
               let d =
                 Date.short_marriage_date_text conf base (foi base ifam1)
-                  (pget conf base (father cpl1)) (pget conf base (mother cpl1))
+                  (pget conf base (get_father cpl1))
+                  (pget conf base (get_mother cpl1))
               in
               Some ("&amp;" ^ d ^ " " ^ someone_text conf base ip, ip)
           | _ -> None ]

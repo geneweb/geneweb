@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.5 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -33,7 +33,10 @@ value string_family_of conf base fam cpl des =
     Gutil.map_family_ps (person_key base) (sou base)
       (gen_family_of_family fam)
   in
-  let scpl = Gutil.map_couple_p conf.multi_parents (person_key base) cpl in
+  let scpl =
+    Gutil.map_couple_p conf.multi_parents (person_key base)
+      (gen_couple_of_couple cpl)
+  in
   let sdes = Gutil.map_descend_p (person_key base) des in
   (sfam, scpl, sdes)
 ;
@@ -435,14 +438,14 @@ value print_inv1 conf base p fam1 fam2 =
       (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
       tag "li" begin
-        Update.print_someone conf base (poi base (father cpl1));
+        Update.print_someone conf base (poi base (get_father cpl1));
         Wserver.wprint " %s " (transl_nth conf "and" 0);
-        Update.print_someone conf base (poi base (mother cpl1));
+        Update.print_someone conf base (poi base (get_mother cpl1));
       end;
       tag "li" begin
-        Update.print_someone conf base (poi base (father cpl2));
+        Update.print_someone conf base (poi base (get_father cpl2));
         Wserver.wprint " %s " (transl_nth conf "and" 0);
-        Update.print_someone conf base (poi base (mother cpl2));
+        Update.print_someone conf base (poi base (get_mother cpl2));
       end;
     end;
     Wserver.wprint "\n";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.4 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -82,7 +82,7 @@ value print_merge conf base =
       in
       let scpl =
         Gutil.map_couple_p conf.multi_parents (UpdateFam.person_key base)
-          (coi base sfam.fam_index)
+          (gen_couple_of_couple (coi base sfam.fam_index))
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
   | _ -> incorrect_request conf ]
@@ -132,7 +132,7 @@ value effective_mod_merge conf base sfam scpl sdes =
           match p_getint conf.env "ip" with
           [ Some i ->
               let ip = Adef.iper_of_int i in
-              (if mother cpl = ip then mother scpl else father scpl, ip)
+              (if get_mother cpl = ip then mother scpl else father scpl, ip)
           | None -> (father scpl, Adef.iper_of_int (-1)) ]
         in
         Util.commit_patches conf base;
