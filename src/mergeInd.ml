@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.15 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.16 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -299,12 +299,14 @@ value effective_merge_ind conf base p1 p2 =
       for i = 0 to Array.length (get_family u2) - 1 do {
         let ifam = (get_family u2).(i) in
         let cpl = coi base ifam in
-        if get_cle_index p2 = father cpl then
-          set_father cpl (get_cle_index p1)
-        else if get_cle_index p2 = mother cpl then
-          set_mother cpl (get_cle_index p1)
-        else assert False;
-        base.func.patch_couple ifam cpl;
+        let cpl =
+          if get_cle_index p2 = get_father cpl then
+            couple False (get_cle_index p1) (get_mother cpl)
+          else if get_cle_index p2 = get_mother cpl then
+            couple False (get_father cpl) (get_cle_index p1)
+          else assert False
+        in
+        base.func.patch_couple ifam (couple_of_gen_couple cpl);
       };
       let u1 = uoi base (get_cle_index p1) in
       let u1 =
@@ -504,24 +506,24 @@ value rec try_merge conf base branches ip1 ip2 changes_done =
         let cpl2 = coi base ifam2 in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            if (father cpl1) = (father cpl2) then (True, changes_done)
+            if get_father cpl1 = get_father cpl2 then (True, changes_done)
             else
-              try_merge conf base branches (father cpl1) (father cpl2)
+              try_merge conf base branches (get_father cpl1) (get_father cpl2)
                 changes_done
           else (False, changes_done)
         in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            if (mother cpl1) = (mother cpl2) then (True, changes_done)
+            if get_mother cpl1 = get_mother cpl2 then (True, changes_done)
             else
-              try_merge conf base branches (mother cpl1) (mother cpl2)
+              try_merge conf base branches (get_mother cpl1) (get_mother cpl2)
                 changes_done
           else (False, changes_done)
         in
         let (ok_so_far, changes_done) =
           if ok_so_far then
-            merge_fam conf base branches ifam1 ifam2 (father cpl1) (mother cpl1)
-              changes_done
+            merge_fam conf base branches ifam1 ifam2 (get_father cpl1)
+              (get_mother cpl1) changes_done
           else (False, changes_done)
         in
         (ok_so_far, changes_done)
@@ -551,7 +553,8 @@ value is_ancestor base ip1 ip2 =
       visited.(Adef.int_of_iper ip) := True;
       match get_parents (aoi base ip) with
       [ Some ifam ->
-          let cpl = coi base ifam in loop (father cpl) || loop (mother cpl)
+          let cpl = coi base ifam in
+          loop (get_father cpl) || loop (get_mother cpl)
       | None -> False ]
     }
   in
@@ -631,8 +634,10 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
     [ Some ifam ->
         let cpl = coi base ifam in
         do {
-          kill_ancestors conf base True (poi base (father cpl)) nb_ind nb_fam;
-          kill_ancestors conf base True (poi base (mother cpl)) nb_ind nb_fam;
+          kill_ancestors conf base True (poi base (get_father cpl)) nb_ind
+            nb_fam;
+          kill_ancestors conf base True (poi base (get_mother cpl)) nb_ind
+            nb_fam;
           UpdateFamOk.effective_del conf base (foi base ifam);
           incr nb_fam;
         }

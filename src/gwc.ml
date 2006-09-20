@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.16 2006-09-20 14:13:13 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.17 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -138,7 +138,9 @@ value unique_string gen x =
 
 value no_family gen =
   let _ (*empty*) = unique_string gen "" in
-  let cpl = couple False (Adef.iper_of_int 0) (Adef.iper_of_int 0)
+  let cpl =
+    couple_of_gen_couple
+      (Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0))
   and des = {children = [| |]} in
   (cpl, des)
 ;
@@ -472,8 +474,8 @@ value verif_parents_non_deja_definis gen ix pere mere =
   match get_parents (aoi gen.g_base ix) with
   [ Some ifam ->
       let cpl = coi gen.g_base ifam in
-      let p = (father cpl) in
-      let m = (mother cpl) in
+      let p = get_father cpl in
+      let m = get_mother cpl in
       do {
         printf "
 I cannot add \"%s\", child of
@@ -546,7 +548,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          divorce = fo.divorce; comment = comment;
          origin_file = unique_string gen fo.origin_file; fsources = fsources;
          fam_index = Adef.ifam_of_int i}
-    and cpl = couple False ipere imere
+    and cpl = couple_of_gen_couple (couple False ipere imere)
     and des = {children = children} in
     let fath_uni = uoi gen.g_base ipere in
     let moth_uni = uoi gen.g_base imere in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.4 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: dag.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -97,8 +97,10 @@ value make_dag conf base set =
            match get_parents (aget conf base ip) with
            [ Some ifam ->
                let c = coi base ifam in
-               let l = try [M.find (mother c) map] with [ Not_found -> [] ] in
-               try [M.find (father c) map :: l] with [ Not_found -> l ]
+               let l =
+                 try [M.find (get_mother c) map] with [ Not_found -> [] ]
+               in
+               try [M.find (get_father c) map :: l] with [ Not_found -> l ]
            | None -> [] ]
          in
          let chil =
@@ -868,12 +870,12 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                        match get_parents (aget conf base cip) with
                        [ Some ifam ->
                            let cpl = coi base ifam in
-                           if ip == (father cpl) then
-                             if List.mem_assoc (mother cpl) list then list
-                             else [((mother cpl), Some ifam) :: list]
-                           else if ip == (mother cpl) then
-                             if List.mem_assoc (father cpl) list then list
-                             else [((father cpl), Some ifam) :: list]
+                           if ip == get_father cpl then
+                             if List.mem_assoc (get_mother cpl) list then list
+                             else [(get_mother cpl, Some ifam) :: list]
+                           else if ip == get_mother cpl then
+                             if List.mem_assoc (get_father cpl) list then list
+                             else [(get_father cpl, Some ifam) :: list]
                            else list
                        | None -> list ]
                    | Right _ -> list ])

@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.3 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: consang.ml,v 5.4 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -67,8 +67,8 @@ value topological_sort base aoi =
       match get_parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
-          let ifath = Adef.int_of_iper (father cpl) in
-          let imoth = Adef.int_of_iper (mother cpl) in
+          let ifath = Adef.int_of_iper (get_father cpl) in
+          let imoth = Adef.int_of_iper (get_mother cpl) in
           do {
             tab.(ifath) := tab.(ifath) + 1; tab.(imoth) := tab.(imoth) + 1
           }
@@ -90,8 +90,8 @@ value topological_sort base aoi =
                  match get_parents a with
                  [ Some ifam ->
                      let cpl = coi base ifam in
-                     let ifath = Adef.int_of_iper (father cpl) in
-                     let imoth = Adef.int_of_iper (mother cpl) in
+                     let ifath = Adef.int_of_iper (get_father cpl) in
+                     let imoth = Adef.int_of_iper (get_mother cpl) in
                      do {
                        tab.(ifath) := tab.(ifath) - 1;
                        tab.(imoth) := tab.(imoth) - 1;
@@ -254,9 +254,9 @@ value relationship_and_links base ri b ip1 ip2 =
             let cpl = coi base ifam in
             do {
               treat_parent (Adef.iper_of_int u) tu
-                (Adef.int_of_iper (father cpl));
+                (Adef.int_of_iper (get_father cpl));
               treat_parent (Adef.iper_of_int u) tu
-                (Adef.int_of_iper (mother cpl))
+                (Adef.int_of_iper (get_mother cpl))
             }
         | _ -> () ]
       }

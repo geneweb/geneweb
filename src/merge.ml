@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.4 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: merge.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -81,10 +81,10 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
                           (transl_nth conf "son/daughter/child"
                              (index_of_sex (get_sex p)))
                           (person_title_text conf base
-                             (poi base (father cpl)) ^
+                             (poi base (get_father cpl)) ^
                              " " ^ transl_nth conf "and" 0 ^ " " ^
                              person_title_text conf base
-                               (poi base (mother cpl)))))
+                               (poi base (get_mother cpl)))))
                | None -> () ];
                xtag "br";
              end;

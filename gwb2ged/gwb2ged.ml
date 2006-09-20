@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.7 2006-09-20 17:22:39 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.8 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -585,17 +585,17 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
     ged_marriage base oc fam;
     ged_divorce base oc fam;
-    if has_personal_infos base (poi base (father cpl))
-         (aoi base (father cpl)) &&
-       per_sel (father cpl)
+    if has_personal_infos base (poi base (get_father cpl))
+         (aoi base (get_father cpl)) &&
+       per_sel (get_father cpl)
     then
-      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (father cpl) + 1)
+      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father cpl) + 1)
     else ();
-    if has_personal_infos base (poi base (mother cpl))
-         (aoi base (mother cpl)) &&
-       per_sel (mother cpl)
+    if has_personal_infos base (poi base (get_mother cpl))
+         (aoi base (get_mother cpl)) &&
+       per_sel (get_mother cpl)
     then
-      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (mother cpl) + 1)
+      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother cpl) + 1)
     else ();
     Array.iter (ged_child base sel oc) des.children;
     ged_fsource base oc fam;

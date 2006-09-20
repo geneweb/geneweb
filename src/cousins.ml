@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.7 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.8 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -56,12 +56,12 @@ value siblings conf base ip =
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath_sib =
-        List.map (fun ip -> (ip, ((father cpl), Male)))
-          (siblings_by conf base (father cpl) ip)
+        List.map (fun ip -> (ip, (get_father cpl, Male)))
+          (siblings_by conf base (get_father cpl) ip)
       in
       let moth_sib =
-        List.map (fun ip -> (ip, ((mother cpl), Female)))
-          (siblings_by conf base (mother cpl) ip)
+        List.map (fun ip -> (ip, (get_mother cpl, Female)))
+          (siblings_by conf base (get_mother cpl) ip)
       in
       merge_siblings fath_sib moth_sib
   | None -> [] ]
@@ -137,8 +137,8 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
             (fun a ifam ->
                let cpl = coi base ifam in
                let sp =
-                 if get_sex p2 = Female then pget conf base (father cpl)
-                 else pget conf base (mother cpl)
+                 if get_sex p2 = Female then pget conf base (get_father cpl)
+                 else pget conf base (get_mother cpl)
                in
                let _ = print_spouse sp a in
                False)
@@ -357,8 +357,8 @@ value print_anniv conf base p dead_people level =
                 let cpl = coi base ifam in
                 let n = n + 1 in
                 let up_sosa = 2 * up_sosa in
-                let a = P.add ((father cpl), n, up_sosa) a in
-                P.add ((mother cpl), n, up_sosa + 1) a
+                let a = P.add (get_father cpl, n, up_sosa) a in
+                P.add (get_mother cpl, n, up_sosa + 1) a
             | None -> a ]
           in
           loop set a

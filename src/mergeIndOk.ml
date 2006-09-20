@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.9 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.10 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -239,25 +239,27 @@ value effective_mod_merge conf base sp =
           let ifam = p2_family.(i) in
           let fam = foi base ifam in
           let cpl = coi base ifam in
-          if get_cle_index p2 = father cpl then do {
-            set_father cpl (get_cle_index p);
-            Array.iter
-              (fun ip ->
-                 let w = poi base ip in
-                 if not (List.memq (get_cle_index p) (get_related w)) then
-                   let w =
-                     person_of_gen_person
-                       {(gen_person_of_person w) with
-                        related = [get_cle_index p :: get_related w]}
-                   in
-                   base.func.patch_person ip w
-                 else ())
-              (get_witnesses fam);
-          }
-          else if get_cle_index p2 = mother cpl then
-            set_mother cpl (get_cle_index p)
-          else assert False;
-          base.func.patch_couple ifam cpl;
+          let cpl =
+            if get_cle_index p2 = get_father cpl then do {
+              Array.iter
+                (fun ip ->
+                   let w = poi base ip in
+                   if not (List.memq (get_cle_index p) (get_related w)) then
+                     let w =
+                       person_of_gen_person
+                         {(gen_person_of_person w) with
+                          related = [get_cle_index p :: get_related w]}
+                     in
+                     base.func.patch_person ip w
+                   else ())
+                (get_witnesses fam);
+              couple False (get_cle_index p) (get_mother cpl)
+            }
+            else if get_cle_index p2 = get_mother cpl then
+              couple False (get_father cpl) (get_cle_index p)
+            else assert False
+          in
+          base.func.patch_couple ifam (couple_of_gen_couple cpl);
         };
         Update.update_misc_names_of_family conf base p u;
         base.func.patch_person (get_cle_index p) p;

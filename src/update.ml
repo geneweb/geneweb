@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.5 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: update.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -116,7 +116,7 @@ value update_misc_names_of_family conf base p u =
                        person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip) (nobtit conf base)))
-             [mother cpl :: Array.to_list des.children])
+             [get_mother cpl :: Array.to_list des.children])
         (Array.to_list (get_family u))
   | _ -> () ]
 ;
@@ -215,8 +215,8 @@ value print_warning conf base =
         (fun _ -> print_someone_strong conf base p)
   | ChangedOrderOfChildren ifam des before ->
       let cpl = coi base ifam in
-      let fath = poi base (father cpl) in
-      let moth = poi base (mother cpl) in
+      let fath = poi base (get_father cpl) in
+      let moth = poi base (get_mother cpl) in
       do {
         Wserver.wprint "%s\n"
           (capitale (transl conf "changed order of children"));
@@ -268,8 +268,10 @@ value print_warning conf base =
           (fcapitale
              (ftransl conf
                 "the following children of %t and %t are not in order"))
-          (fun _ -> print_someone_strong conf base (poi base (father cpl)))
-          (fun _ -> print_someone_strong conf base (poi base (mother cpl)));
+          (fun _ ->
+             print_someone_strong conf base (poi base (get_father cpl)))
+          (fun _ ->
+             print_someone_strong conf base (poi base (get_mother cpl)));
         Wserver.wprint ":\n";
         Wserver.wprint "<ul>\n";
         html_li conf;

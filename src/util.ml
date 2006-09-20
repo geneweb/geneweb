@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.18 2006-09-20 16:28:38 ddr Exp $ *)
+(* $Id: util.ml,v 5.19 2006-09-20 19:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -511,8 +511,8 @@ value parent_has_title conf base p =
   match get_parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
-      let fath = poi base (father cpl) in
-      let moth = poi base (mother cpl) in
+      let fath = poi base (get_father cpl) in
+      let moth = poi base (get_mother cpl) in
       get_access fath <> Private && nobtit conf base fath <> [] ||
       get_access moth <> Private && nobtit conf base moth <> []
   | _ -> False ]
@@ -1091,13 +1091,13 @@ value url_no_index conf base =
           if is_deleted_family (base.data.families.get i) then None
           else
             let cpl = base.data.couples.get i in
-            let p = pget conf base (father cpl) in
+            let p = pget conf base (get_father cpl) in
             let f = scratch (get_first_name p) in
             let s = scratch (get_surname p) in
             if f = "" || s = "" then None
             else
               let oc = string_of_int (get_occ p) in
-              let u = uget conf base (father cpl) in
+              let u = uget conf base (get_father cpl) in
               let n =
                 loop 0 where rec loop k =
                   if (get_family u).(k) == Adef.ifam_of_int i then
@@ -1711,11 +1711,11 @@ value specify_homonymous conf base p =
         [ Some ifam ->
             let cpl = coi base ifam in
             let fath =
-              let fath = pget conf base (father cpl) in
+              let fath = pget conf base (get_father cpl) in
               if p_first_name base fath = "?" then None else Some fath
             in
             let moth =
-              let moth = pget conf base (mother cpl) in
+              let moth = pget conf base (get_mother cpl) in
               if p_first_name base moth = "?" then None else Some moth
             in
             Some (fath, moth)
@@ -2105,8 +2105,9 @@ value branch_of_sosa conf base ip n =
           match get_parents (aget conf base ip) with
           [ Some ifam ->
               let cpl = coi base ifam in
-              if goto_fath then loop [(ip, sp) :: ipl] (father cpl) Male nl
-              else loop [(ip, sp) :: ipl] (mother cpl) Female nl
+              if goto_fath then
+                loop [(ip, sp) :: ipl] (get_father cpl) Male nl
+              else loop [(ip, sp) :: ipl] (get_mother cpl) Female nl
           | _ -> None ] ]
     in
     loop [] ip (get_sex (pget conf base ip)) (expand [] n)
