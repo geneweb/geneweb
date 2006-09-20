@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.14 2006-09-17 09:59:45 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.15 2006-09-20 09:07:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -847,15 +847,16 @@ value unknown_per gen i sex =
   let empty = string_empty in
   let what = string_quest in
   let p =
-    {first_name = what; surname = what; occ = i; public_name = empty;
-     image = empty; qualifiers = []; aliases = []; first_names_aliases = [];
-     surnames_aliases = []; titles = []; rparents = []; related = [];
-     occupation = empty; sex = sex; access = IfTitles;
-     birth = Adef.codate_None; birth_place = empty; birth_src = empty;
-     baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
-     death = DontKnowIfDead; death_place = empty; death_src = empty;
-     burial = UnknownBurial; burial_place = empty; burial_src = empty;
-     notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
+    person_of_gen_person
+      {first_name = what; surname = what; occ = i; public_name = empty;
+       image = empty; qualifiers = []; aliases = []; first_names_aliases = [];
+       surnames_aliases = []; titles = []; rparents = []; related = [];
+       occupation = empty; sex = sex; access = IfTitles;
+       birth = Adef.codate_None; birth_place = empty; birth_src = empty;
+       baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
+       death = DontKnowIfDead; death_place = empty; death_src = empty;
+       burial = UnknownBurial; burial_place = empty; burial_src = empty;
+       notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
   and a = no_ascend ()
   and u = {family = [| |]} in
   (p, a, u)
@@ -1259,11 +1260,14 @@ value adop_parent gen ip r =
   [ Left3 _ -> None
   | Right3 p a u ->
       do {
-        if List.memq ip p.related then ()
+        if List.memq ip (get_related p) then ()
         else
-          let p = {(p) with related = [ip :: p.related]} in
+          let p =
+            person_of_gen_person
+              {(gen_person_of_person p) with related = [ip :: get_related p]}
+          in
           gen.g_per.arr.(Adef.int_of_iper i) := Right3 p a u;
-        Some p.cle_index
+        Some (get_cle_index p)
       } ]
 ;
 
@@ -1285,7 +1289,10 @@ value set_adop_fam gen ip which_parent fath moth =
         {r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
          r_sources = string_empty}
       in
-      let per = {(per) with rparents = [r :: per.rparents]} in
+      let per =
+        person_of_gen_person
+          {(gen_person_of_person per) with rparents = [r :: get_rparents per]}
+      in
       gen.g_per.arr.(Adef.int_of_iper ip) := Right3 per asc uni ]
 ;
 
@@ -1729,27 +1736,31 @@ value add_indi gen r =
     else text
   in
   let person =
-    {first_name = add_string gen first_name; surname = add_string gen surname;
-     occ = occ; public_name = add_string gen public_name;
-     image = add_string gen image;
-     qualifiers = if qualifier <> "" then [add_string gen qualifier] else [];
-     aliases = List.map (add_string gen) aliases;
-     first_names_aliases = List.map (add_string gen) first_names_aliases;
-     surnames_aliases = List.map (add_string gen) surname_aliases;
-     titles = titles; rparents = rparents; related = [];
-     occupation = add_string gen occupation; sex = sex;
-     access =
-       if no_public_if_titles.val && titles <> [] then Private else IfTitles;
-     birth = birth; birth_place = add_string gen birth_place;
-     birth_src = add_string gen birth_src; baptism = bapt;
-     baptism_place = add_string gen bapt_place;
-     baptism_src = add_string gen bapt_src; death = death;
-     death_place = add_string gen death_place;
-     death_src = add_string gen death_src; burial = burial;
-     burial_place = add_string gen burial_place;
-     burial_src = add_string gen burial_src;
-     notes = add_string gen (notes ^ ext_notes);
-     psources = add_string gen psources; cle_index = ip}
+    person_of_gen_person
+      {first_name = add_string gen first_name;
+       surname = add_string gen surname;
+       occ = occ; public_name = add_string gen public_name;
+       image = add_string gen image;
+       qualifiers =
+         if qualifier <> "" then [add_string gen qualifier] else [];
+       aliases = List.map (add_string gen) aliases;
+       first_names_aliases = List.map (add_string gen) first_names_aliases;
+       surnames_aliases = List.map (add_string gen) surname_aliases;
+       titles = titles; rparents = rparents; related = [];
+       occupation = add_string gen occupation; sex = sex;
+       access =
+         if no_public_if_titles.val && titles <> [] then Private
+         else IfTitles;
+       birth = birth; birth_place = add_string gen birth_place;
+       birth_src = add_string gen birth_src; baptism = bapt;
+       baptism_place = add_string gen bapt_place;
+       baptism_src = add_string gen bapt_src; death = death;
+       death_place = add_string gen death_place;
+       death_src = add_string gen death_src; burial = burial;
+       burial_place = add_string gen burial_place;
+       burial_src = add_string gen burial_src;
+       notes = add_string gen (notes ^ ext_notes);
+       psources = add_string gen psources; cle_index = ip}
   in
   let ascend = {parents = parents; consang = Adef.fix (-1)} in
   let union = {family = Array.of_list family} in
@@ -1786,7 +1797,11 @@ value add_fam_norm gen r adop_list =
             {family = Array.append u.family [| i |]}
           else u
         in
-        let p = if p.sex = Neuter then {(p) with sex = Male} else p in
+        let p =
+          if get_sex p = Neuter then
+            person_of_gen_person {(gen_person_of_person p) with sex = Male}
+          else p
+        in
         gen.g_per.arr.(Adef.int_of_iper fath) := Right3 p a u ];
     match gen.g_per.arr.(Adef.int_of_iper moth) with
     [ Left3 lab -> ()
@@ -1796,7 +1811,11 @@ value add_fam_norm gen r adop_list =
             {family = Array.append u.family [| i |]}
           else u
         in
-        let p = if p.sex = Neuter then {(p) with sex = Female} else p in
+        let p =
+          if get_sex p = Neuter then
+            person_of_gen_person {(gen_person_of_person p) with sex = Female}
+          else p
+        in
         gen.g_per.arr.(Adef.int_of_iper moth) := Right3 p a u ];
     let children =
       let rl = find_all_fields "CHIL" r.rsons in
@@ -1930,14 +1949,17 @@ value add_fam_norm gen r adop_list =
       match gen.g_per.arr.(Adef.int_of_iper iper) with
       [ Left3 _ -> ()
       | Right3 p a u ->
-          let notes = gen.g_str.arr.(Adef.int_of_istr p.notes) in
+          let notes = gen.g_str.arr.(Adef.int_of_istr (get_notes p)) in
           let notes =
             if notes = "" then ext_sources ^ ext_notes 
             else if ext_sources = "" then notes ^ "\n" ^ ext_notes
             else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
           in
           let new_notes = add_string gen notes in
-          let p = {(p) with notes = new_notes} in
+          let p =
+            person_of_gen_person
+              {(gen_person_of_person p) with notes = new_notes}
+          in
           gen.g_per.arr.(Adef.int_of_iper iper) := Right3 p a u ]
     in
     let _ =
@@ -2109,9 +2131,13 @@ value pass2 gen fname =
       (fun (ipp, ip) ->
          match gen.g_per.arr.(Adef.int_of_iper ipp) with
          [ Right3 p a u ->
-             if List.memq ip p.related then ()
+             if List.memq ip (get_related p) then ()
              else
-               let p = {(p) with related = [ip :: p.related]} in
+               let p =
+                 person_of_gen_person
+                   {(gen_person_of_person p) with
+                    related = [ip :: get_related p]}
+               in
                gen.g_per.arr.(Adef.int_of_iper ipp) := Right3 p a u
          | _ -> () ])
       gen.g_godp;
@@ -2161,10 +2187,12 @@ value pass3 gen fname =
              with
              [ (Right3 pfath _ _, Right3 p a u) ->
                  do {
-                   if List.memq (father cpl) p.related then ()
+                   if List.memq (father cpl) (get_related p) then ()
                    else
                      let p =
-                       {(p) with related = [(father cpl) :: p.related]}
+                       person_of_gen_person
+                         {(gen_person_of_person p) with
+                          related = [(father cpl) :: get_related p]}
                      in
                      gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
                    let fam =
@@ -2209,19 +2237,21 @@ value add_parents_to_isolated gen =
   for i = 0 to gen.g_per.tlen - 1 do {
     match gen.g_per.arr.(i) with
     [ Right3 p a u ->
-        if parents a = None && Array.length u.family = 0 && p.rparents = [] &&
-           p.related = []
+        if parents a = None &&
+           Array.length u.family = 0 && get_rparents p = [] &&
+           get_related p = []
         then
-          let fn = gen.g_str.arr.(Adef.int_of_istr p.first_name) in
-          let sn = gen.g_str.arr.(Adef.int_of_istr p.surname) in
+          let fn = gen.g_str.arr.(Adef.int_of_istr (get_first_name p)) in
+          let sn = gen.g_str.arr.(Adef.int_of_istr (get_surname p)) in
           if fn = "?" && sn = "?" then ()
           else do {
             fprintf log_oc.val
-              "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn;
+              "Adding parents to isolated person: %s.%d %s\n" fn (get_occ p)
+              sn;
             let ifam = phony_fam gen in
             match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
             [ Right3 fam cpl des -> do {
-                let des = {children = [| p.cle_index |]} in
+                let des = {children = [| get_cle_index p |]} in
                 gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
                 let a = {(a) with parents = Some ifam} in
                 gen.g_per.arr.(i) := Right3 p a u
@@ -2384,10 +2414,10 @@ value check_parents_children base ascends unions descends =
             (designation base (poi base (mother cpl)));
           let fath = poi base (father cpl) in
           let moth = poi base (mother cpl) in
-          let ffn = sou base fath.first_name in
-          let fsn = sou base fath.surname in
-          let mfn = sou base moth.first_name in
-          let msn = sou base moth.surname in
+          let ffn = sou base (get_first_name fath) in
+          let fsn = sou base (get_surname fath) in
+          let mfn = sou base (get_first_name moth) in
+          let msn = sou base (get_surname moth) in
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
             fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
@@ -2440,7 +2470,7 @@ value check_parents_children base ascends unions descends =
               fprintf log_oc.val "=> deleted in this family\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              to_delete.val := [p.cle_index :: to_delete.val]
+              to_delete.val := [get_cle_index p :: to_delete.val]
             }
             else ()
         | None ->
@@ -2488,12 +2518,12 @@ value check_parents_sex base persons families =
     let moth = poi base imoth in
     if fam.relation = NoSexesCheckNotMarried
     || fam.relation = NoSexesCheckMarried then ()
-    else if fath.sex = Female || moth.sex = Male then do {
-      if fath.sex = Female then
+    else if get_sex fath = Female || get_sex moth = Male then do {
+      if get_sex fath = Female then
         fprintf log_oc.val "Warning - husband with female sex: %s\n"
           (designation base fath)
       else ();
-      if moth.sex = Male then
+      if get_sex moth = Male then
         fprintf log_oc.val "Warning - wife with male sex: %s\n"
           (designation base moth)
       else ();
@@ -2502,8 +2532,12 @@ value check_parents_sex base persons families =
       families.(i) := fam;
     }
     else do {
-      persons.(Adef.int_of_iper ifath) := {(fath) with sex = Male};
-      persons.(Adef.int_of_iper imoth) := {(moth) with sex = Female};
+      persons.(Adef.int_of_iper ifath) :=
+        person_of_gen_person
+          {(gen_person_of_person fath) with sex = Male};
+      persons.(Adef.int_of_iper imoth) :=
+        person_of_gen_person
+          {(gen_person_of_person moth) with sex = Female};
     }
   }
 ;
@@ -2533,18 +2567,19 @@ value neg_year_cdate cd =
 value rec negative_date_ancestors base persons families i = do {
   let p = persons.(i) in
   let p =
-    {(p) with
-     birth =
-       match Adef.od_of_codate p.birth with
-       [ Some d1 -> Adef.codate_of_od (Some (neg_year d1))
-       | _ -> p.birth ];
-     death =
-       match p.death with
-       [ Death dr cd2 -> Death dr (neg_year_cdate cd2)
-       | _ -> p.death ]}
+    person_of_gen_person
+      {(gen_person_of_person p) with
+       birth =
+         match Adef.od_of_codate (get_birth p) with
+         [ Some d1 -> Adef.codate_of_od (Some (neg_year d1))
+         | _ -> get_birth p ];
+       death =
+         match get_death p with
+         [ Death dr cd2 -> Death dr (neg_year_cdate cd2)
+         | _ -> get_death p ]}
   in
   persons.(i) := p;
-  let u = uoi base p.cle_index in
+  let u = uoi base (get_cle_index p) in
   for i = 0 to Array.length u.family - 1 do {
     let j = Adef.int_of_ifam u.family.(i) in
     let fam = families.(j) in
@@ -2556,7 +2591,7 @@ value rec negative_date_ancestors base persons families i = do {
         families.(j) := fam
     | None -> () ]
   };
-  let a = aoi base p.cle_index in
+  let a = aoi base (get_cle_index p) in
   match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -2572,7 +2607,7 @@ value rec negative_date_ancestors base persons families i = do {
 value negative_dates base persons families =
   for i = 0 to base.data.persons.len - 1 do {
     let p = persons.(i) in
-    match (Adef.od_of_codate p.birth, date_of_death p.death) with
+    match (Adef.od_of_codate (get_birth p), date_of_death (get_death p)) with
     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
         if year_of d1 > 0 && year_of d2 > 0 && strictly_before_dmy d2 d1 then
           negative_date_ancestors base persons families i
@@ -2593,7 +2628,8 @@ value finish_base base =
       let des = descends.(i) in
       let children =
         sort_by_date
-          (fun ip -> Adef.od_of_codate persons.(Adef.int_of_iper ip).birth)
+          (fun ip ->
+             Adef.od_of_codate (get_birth persons.(Adef.int_of_iper ip)))
           (Array.to_list des.children)
       in
       descends.(i) := {children = Array.of_list children}
@@ -2613,17 +2649,20 @@ value finish_base base =
       let a = ascends.(i) in
       let u = unions.(i) in
       if parents a <> None && Array.length u.family != 0 ||
-         p.notes <> string_empty
+         get_notes p <> string_empty
       then
         let (fn, occ) =
-          if sou base p.first_name = "?" then (string_x, i)
-          else (p.first_name, p.occ)
+          if sou base (get_first_name p) = "?" then (string_x, i)
+          else (get_first_name p, get_occ p)
         in
         let (sn, occ) =
-          if sou base p.surname = "?" then (string_x, i)
-          else (p.surname, occ)
+          if sou base (get_surname p) = "?" then (string_x, i)
+          else (get_surname p, occ)
         in
-        persons.(i) := {(p) with first_name = fn; surname = sn; occ = occ}
+        persons.(i) :=
+          person_of_gen_person
+            {(gen_person_of_person p) with
+             first_name = fn; surname = sn; occ = occ}
       else ()
     };
     check_parents_sex base persons families;

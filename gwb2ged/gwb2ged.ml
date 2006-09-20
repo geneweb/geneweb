@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.4 2006-09-20 09:07:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -152,8 +152,8 @@ value sub_string_index s t =
 ;
 
 value ged_1st_name base p =
-  let fn = sou base p.first_name in
-  match p.first_names_aliases with
+  let fn = sou base (get_first_name p) in
+  match get_first_names_aliases p with
   [ [n :: _] ->
       let fna = sou base n in
       match sub_string_index fna fn with
@@ -176,24 +176,24 @@ value ged_name base oc per =
   do {
     fprintf oc "1 NAME %s /%s/\n"
       (encode (Gutil.nominative (ged_1st_name base per)))
-      (encode (Gutil.nominative (sou base per.surname)));
-    let n = sou base per.public_name in
+      (encode (Gutil.nominative (sou base (get_surname per))));
+    let n = sou base (get_public_name per) in
     if n <> "" then fprintf oc "2 GIVN %s\n" (encode n) else ();
-    match per.qualifiers with
+    match get_qualifiers per with
     [ [nn :: _] -> fprintf oc "2 NICK %s\n" (encode (sou base nn))
     | [] -> () ];
-    match per.surnames_aliases with
+    match get_surnames_aliases per with
     [ [] -> ()
     | list ->
         let list = List.map (fun n -> encode (sou base n)) list in
         fprintf oc "2 SURN %s\n" (string_of_list list) ];
     List.iter (fun s -> fprintf oc "1 NAME %s\n" (encode (sou base s)))
-      per.aliases;
+      (get_aliases per);
   }
 ;
 
 value ged_sex base oc per =
-  match per.sex with
+  match get_sex per with
   [ Male -> fprintf oc "1 SEX M\n"
   | Female -> fprintf oc "1 SEX F\n"
   | Neuter -> () ]
@@ -277,7 +277,7 @@ value ged_adoption base (per_sel, fam_sel) oc per r =
   if sel then do {
     fprintf oc "1 ADOP Y\n";
     adop_fam_list.val :=
-      [(r.r_fath, r.r_moth, per.cle_index) :: adop_fam_list.val];
+      [(r.r_fath, r.r_moth, get_cle_index per) :: adop_fam_list.val];
     incr adop_fam_cnt;
     fprintf oc "2 FAMC @F%d@\n"
       (base.data.families.len + adop_fam_cnt.val);
@@ -306,9 +306,9 @@ value ged_fam_adop base oc i (fath, moth, child) =
 
 value ged_ind_ev_str base sel oc per =
   do {
-    let pl = sou base per.birth_place in
-    let src = sou base per.birth_src in
-    match (Adef.od_of_codate per.birth, pl) with
+    let pl = sou base (get_birth_place per) in
+    let src = sou base (get_birth_src per) in
+    match (Adef.od_of_codate (get_birth per), pl) with
     [ (None, "") -> ()
     | (None, pl) ->
         do {
@@ -321,18 +321,18 @@ value ged_ind_ev_str base sel oc per =
     List.iter
       (fun r ->
          if r.r_type = Adoption then ged_adoption base sel oc per r else ())
-      per.rparents;
-    let pl = sou base per.baptism_place in
-    let src = sou base per.baptism_src in
-    match (Adef.od_of_codate per.baptism, pl) with
+      (get_rparents per);
+    let pl = sou base (get_baptism_place per) in
+    let src = sou base (get_baptism_src per) in
+    match (Adef.od_of_codate (get_baptism per), pl) with
     [ (None, "") -> ()
     | (od, pl) ->
         do {
           fprintf oc "1 BAPM"; ged_ev_detail oc 2 "" od pl src;
         } ];
-    let pl = sou base per.death_place in
-    let src = sou base per.death_src in
-    match per.death with
+    let pl = sou base (get_death_place per) in
+    let src = sou base (get_death_src per) in
+    match get_death per with
     [ NotDead -> ()
     | Death dr cd ->
         do {
@@ -344,9 +344,9 @@ value ged_ind_ev_str base sel oc per =
           fprintf oc "1 DEAT"; ged_ev_detail oc 2 "" None pl src;
         }
     | DontKnowIfDead -> fprintf oc "1 DEAT\n" ];
-    let pl = sou base per.burial_place in
-    let src = sou base per.burial_src in
-    match per.burial with
+    let pl = sou base (get_burial_place per) in
+    let src = sou base (get_burial_src per) in
+    match get_burial per with
     [ UnknownBurial -> ()
     | Buried cod ->
         do {
@@ -396,7 +396,7 @@ value ged_title base oc per tit =
         } ];
     match tit.t_name with
     [ Tmain ->
-        fprintf oc "2 NOTE %s\n" (encode (sou base per.public_name))
+        fprintf oc "2 NOTE %s\n" (encode (sou base (get_public_name per)))
     | Tname n -> fprintf oc "2 NOTE %s\n" (encode (sou base n))
     | Tnone -> () ];
   }
@@ -404,10 +404,10 @@ value ged_title base oc per tit =
 
 value ged_ind_attr_str base oc per =
   do {
-    match sou base per.occupation with
+    match sou base (get_occupation per) with
     [ "" -> ()
     | occu -> fprintf oc "1 OCCU %s\n" (encode occu) ];
-    List.iter (ged_title base oc per) per.titles;
+    List.iter (ged_title base oc per) (get_titles per);
   }
 ;
 
@@ -456,31 +456,31 @@ value ged_asso base (per_sel, fam_sel) oc per =
            ged_godparent per_sel oc "GODM" r.r_moth;
          }
          else ())
-      per.rparents;
+      (get_rparents per);
     List.iter
       (fun ic ->
          let c = poi base ic in
-         if c.sex = Male then
+         if get_sex c = Male then
            List.iter
              (fun ifam ->
                 let fam = foi base ifam in
-                if array_memq per.cle_index fam.witnesses then
+                if array_memq (get_cle_index per) fam.witnesses then
                   ged_witness fam_sel oc ifam
                 else ())
              (Array.to_list (uoi base ic).family)
          else ())
-      per.related;
+      (get_related per);
   }
 ;
 
 value ged_psource base oc per =
-  match sou base per.psources with
+  match sou base (get_psources per) with
   [ "" -> ()
   | s -> fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
 value ged_multimedia_link base oc per =
-  match sou base per.image with
+  match sou base (get_image per) with
   [ "" -> ()
   | s ->
       do {
@@ -489,7 +489,7 @@ value ged_multimedia_link base oc per =
 ;
 
 value ged_note base oc per =
-  match sou base per.notes with
+  match sou base (get_notes per) with
   [ "" -> ()
   | s -> display_note oc s ]
 ;
@@ -545,13 +545,14 @@ value ged_comment base oc fam =
 
 value has_personal_infos base per asc =
   if parents asc <> None then True
-  else if sou base per.first_name <> "?" then True
-  else if sou base per.surname <> "?" then True
-  else if per.birth <> Adef.codate_None then True
-  else if sou base per.birth_place <> "" then True
-  else if per.death <> NotDead && per.death <> DontKnowIfDead then True
-  else if sou base per.occupation <> "" then True
-  else if per.titles <> [] then True
+  else if sou base (get_first_name per) <> "?" then True
+  else if sou base (get_surname per) <> "?" then True
+  else if get_birth per <> Adef.codate_None then True
+  else if sou base (get_birth_place per) <> "" then True
+  else if get_death per <> NotDead && get_death per <> DontKnowIfDead then
+    True
+  else if sou base (get_occupation per) <> "" then True
+  else if get_titles per <> [] then True
   else False
 ;
 
