@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: consang.ml,v 5.3 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -64,7 +64,7 @@ value topological_sort base aoi =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let a = aoi base (Adef.iper_of_int i) in
-      match parents a with
+      match get_parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ifath = Adef.int_of_iper (father cpl) in
@@ -87,7 +87,7 @@ value topological_sort base aoi =
                do {
                  tab.(i) := tval;
                  incr cnt;
-                 match parents a with
+                 match get_parents a with
                  [ Some ifam ->
                      let cpl = coi base ifam in
                      let ifath = Adef.int_of_iper (father cpl) in
@@ -149,7 +149,8 @@ value insert_branch_len ip lens (len, n, ipl) =
 ;
 
 value consang_of p =
-  if consang p == no_consang then 0.0 else Adef.float_of_fix (consang p)
+  if get_consang p == no_consang then 0.0
+  else Adef.float_of_fix (get_consang p)
 ;
 
 value relationship_and_links base ri b ip1 ip2 =
@@ -248,7 +249,7 @@ value relationship_and_links base ri b ip1 ip2 =
           tops.val := [u :: tops.val]; tu.elim_ancestors := True
         }
         else ();
-        match parents a with
+        match get_parents a with
         [ Some ifam ->
             let cpl = coi base ifam in
             do {

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.15 2006-09-20 09:07:06 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.16 2006-09-20 11:15:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1825,7 +1825,7 @@ value add_fam_norm gen r adop_list =
            if List.mem_assoc ip adop_list then
              match gen.g_per.arr.(Adef.int_of_iper ip) with
              [ Right3 p a u ->
-                 match parents a with
+                 match get_parents a with
                  [ Some ifam ->
                      if ifam = i then do {
                        let a = {(a) with parents = None} in
@@ -2237,7 +2237,7 @@ value add_parents_to_isolated gen =
   for i = 0 to gen.g_per.tlen - 1 do {
     match gen.g_per.arr.(i) with
     [ Right3 p a u ->
-        if parents a = None &&
+        if get_parents a = None &&
            Array.length u.family = 0 && get_rparents p = [] &&
            get_related p = []
         then
@@ -2592,7 +2592,7 @@ value rec negative_date_ancestors base persons families i = do {
     | None -> () ]
   };
   let a = aoi base (get_cle_index p) in
-  match parents a with
+  match get_parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
       do {
@@ -2648,7 +2648,7 @@ value finish_base base =
       let p = persons.(i) in
       let a = ascends.(i) in
       let u = unions.(i) in
-      if parents a <> None && Array.length u.family != 0 ||
+      if get_parents a <> None && Array.length u.family != 0 ||
          get_notes p <> string_empty
       then
         let (fn, occ) =

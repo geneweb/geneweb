@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.5 2006-09-19 20:02:16 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -52,7 +52,7 @@ value merge_siblings l1 l2 =
 ;
 
 value siblings conf base ip =
-  match parents (aget conf base ip) with
+  match get_parents (aget conf base ip) with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath_sib =
@@ -352,7 +352,7 @@ value print_anniv conf base p dead_people level =
         if n >= level then set
         else
           let a =
-            match parents (aget conf base ip) with
+            match get_parents (aget conf base ip) with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 let n = n + 1 in

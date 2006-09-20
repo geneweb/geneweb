@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.11 2006-09-19 13:36:38 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.12 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -273,7 +273,7 @@ value propose_merge_ind conf base branches p1 p2 =
 value reparent_ind base ip1 ip2 =
   let a1 = aoi base ip1 in
   let a2 = aoi base ip2 in
-  match (parents a1, parents a2) with
+  match (get_parents a1, get_parents a2) with
   [ (None, Some ifam) ->
       let des = doi base ifam in
       do {
@@ -486,7 +486,7 @@ value rec try_merge conf base branches ip1 ip2 changes_done =
   let a2 = aoi base ip2 in
   let ok_so_far = True in
   let (ok_so_far, changes_done) =
-    match (parents a1, parents a2) with
+    match (get_parents a1, get_parents a2) with
     [ (Some ifam1, Some ifam2) when ifam1 <> ifam2 ->
         let branches = [(ip1, ip2) :: branches] in
         let cpl1 = coi base ifam1 in
@@ -538,7 +538,7 @@ value is_ancestor base ip1 ip2 =
     else if ip = ip1 then True
     else do {
       visited.(Adef.int_of_iper ip) := True;
-      match parents (aoi base ip) with
+      match get_parents (aoi base ip) with
       [ Some ifam ->
           let cpl = coi base ifam in loop (father cpl) || loop (mother cpl)
       | None -> False ]
@@ -616,7 +616,7 @@ value print conf base =
 
 value rec kill_ancestors conf base included_self p nb_ind nb_fam =
   do {
-    match parents (aoi base (get_cle_index p)) with
+    match get_parents (aoi base (get_cle_index p)) with
     [ Some ifam ->
         let cpl = coi base ifam in
         do {

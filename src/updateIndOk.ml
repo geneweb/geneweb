@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.11 2006-09-19 05:38:04 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.12 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -534,7 +534,7 @@ value effective_del conf base p = do {
   let empty = Update.insert_string base "" in
   let ip = get_cle_index p in
   let asc = aoi base ip in
-  match parents asc with
+  match get_parents asc with
   [ Some ifam ->
       let des = doi base ifam in
       let des = {children = array_except ip des.children} in
@@ -602,7 +602,7 @@ value all_checks_person conf base p a u =
   do {
     let _ : option _ = Gutil.check_person base error warning p in
     relation_sex_is_coherent base warning p;
-    match parents a with
+    match get_parents a with
     [ Some ifam ->
         Gutil.check_family base error warning (foi base ifam) (coi base ifam)
           (doi base ifam)

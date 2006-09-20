@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.4 2006-09-19 21:48:03 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.5 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -299,7 +299,7 @@ type gen =
 value print_parent oc base gen fam p =
   let a = aoi base (get_cle_index p) in
   let has_printed_parents =
-    match parents a with
+    match get_parents a with
     [ Some ifam -> gen.fam_sel ifam
     | None -> False ]
   in
@@ -392,7 +392,7 @@ value print_witness oc base gen p =
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
-    if Array.length u.family = 0 && parents a = None &&
+    if Array.length u.family = 0 && get_parents a = None &&
        not gen.mark.(Adef.int_of_iper (get_cle_index p))
     then do {
       gen.mark.(Adef.int_of_iper (get_cle_index p)) := True;
@@ -500,14 +500,14 @@ value get_persons_with_notes base m list =
   let moth = m.m_moth in
   let list =
     match
-      (sou base (get_notes fath), parents (aoi base (get_cle_index fath)))
+      (sou base (get_notes fath), get_parents (aoi base (get_cle_index fath)))
     with
     [ ("", _) | (_, Some _) -> list
     | _ -> [fath :: list] ]
   in
   let list =
     match
-      (sou base (get_notes moth), parents (aoi base (get_cle_index moth)))
+      (sou base (get_notes moth), get_parents (aoi base (get_cle_index moth)))
     with
     [ ("", _) | (_, Some _) -> list
     | _ -> [moth :: list] ]
@@ -631,13 +631,13 @@ value print_notes oc base gen ml =
 ;
 
 value is_isolated base p =
-  match parents (aoi base (get_cle_index p)) with
+  match get_parents (aoi base (get_cle_index p)) with
   [ Some _ -> False
   | None -> Array.length (uoi base (get_cle_index p)).family = 0 ]
 ;
 
 value is_definition_for_parent base p =
-  match parents (aoi base (get_cle_index p)) with
+  match get_parents (aoi base (get_cle_index p)) with
   [ Some _ -> False
   | None -> True ]
 ;
@@ -678,12 +678,16 @@ value get_persons_with_relations base m list =
   let fath = m.m_fath in
   let moth = m.m_moth in
   let list =
-    match (get_rparents fath, parents (aoi base (get_cle_index fath))) with
+    match
+      (get_rparents fath, get_parents (aoi base (get_cle_index fath)))
+    with
     [ ([], _) | (_, Some _) -> list
     | _ -> [(fath, False) :: list] ]
   in
   let list =
-    match (get_rparents moth, parents (aoi base (get_cle_index moth))) with
+    match
+      (get_rparents moth, get_parents (aoi base (get_cle_index moth)))
+    with
     [ ([], _) | (_, Some _) -> list
     | _ -> [(moth, False) :: list] ]
   in
@@ -691,7 +695,7 @@ value get_persons_with_relations base m list =
     List.fold_right
       (fun ip list ->
          let p = poi base ip in
-         match (get_rparents p, parents (aoi base (get_cle_index p))) with
+         match (get_rparents p, get_parents (aoi base (get_cle_index p))) with
          [ ([], _) | (_, Some _) -> list
          | ([{r_fath = Some x} :: _], _) when x <> get_cle_index m.m_fath ->
              list
@@ -713,7 +717,7 @@ value print_relation_parent oc base mark defined_p p =
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
-    if Array.length u.family = 0 && parents a = None &&
+    if Array.length u.family = 0 && get_parents a = None &&
        not mark.(Adef.int_of_iper (get_cle_index p))
     then do {
       mark.(Adef.int_of_iper (get_cle_index p)) := True;
@@ -913,7 +917,7 @@ type separate =
 ;
 
 value rec find_ancestors base surn p list =
-  match parents (aoi base (get_cle_index p)) with
+  match get_parents (aoi base (get_cle_index p)) with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (father cpl) in
@@ -1000,12 +1004,12 @@ value scan_connex_component base test_action len ifam =
         len (uoi base (mother cpl)).family
     in
     let len =
-      match parents (aoi base (father cpl)) with
+      match get_parents (aoi base (father cpl)) with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
     let len =
-      match parents (aoi base (mother cpl)) with
+      match get_parents (aoi base (mother cpl)) with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in

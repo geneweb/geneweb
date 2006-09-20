@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.3 2006-09-19 18:21:55 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.4 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -80,7 +80,7 @@ value make_dist_tab conf base ia maxlev =
       while not (Pq.is_empty q.val) do {
         let (k, nq) = Pq.take q.val in
         q.val := nq;
-        match parents (aget conf base (Adef.iper_of_int k)) with
+        match get_parents (aget conf base (Adef.iper_of_int k)) with
         [ Some ifam ->
             let cpl = coi base ifam in
             let dfath = dist.(Adef.int_of_iper (father cpl)) in
@@ -104,7 +104,7 @@ value find_first_branch conf base (dmin, dmax) ia =
     else if len == 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
-      match parents (aget conf base ip) with
+      match get_parents (aget conf base ip) with
       [ Some ifam ->
           let cpl = coi base ifam in
           match find [(ip, sp) :: br] (len - 1) (father cpl) Male with
@@ -122,7 +122,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
         [ Female ->
             next_branch_same_len conf base dist True (missing + 1) ip sp ipl1
         | Male ->
-            match parents (aget conf base ip) with
+            match get_parents (aget conf base ip) with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 next_branch_same_len conf base dist False missing (mother cpl)
@@ -133,7 +133,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist True missing ia sa ipl
   else
-    match parents (aget conf base ia) with
+    match get_parents (aget conf base ia) with
     [ Some ifam ->
         let cpl = coi base ifam in
         next_branch_same_len conf base dist False (missing - 1) (father cpl) Male
@@ -157,7 +157,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
         [ Male ->
             prev_branch_same_len conf base dist True (missing + 1) ip sp ipl1
         | Female ->
-            match parents (aget conf base ip) with
+            match get_parents (aget conf base ip) with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 prev_branch_same_len conf base dist False missing (father cpl)
@@ -168,7 +168,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist True missing ia sa ipl
   else
-    match parents (aget conf base ia) with
+    match get_parents (aget conf base ia) with
     [ Some ifam ->
         let cpl = coi base ifam in
         prev_branch_same_len conf base dist False (missing - 1) (mother cpl)
@@ -194,7 +194,7 @@ value spouse_text conf base end_sp ip ipl =
   match (ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt")) with
   [ ([(ips, _) :: _], (Some "on", _) | (_, Some "spouse")) ->
       let a = aget conf base ips in
-      match parents a with
+      match get_parents a with
       [ Some ifam ->
           let c = coi base ifam in
           let fam = foi base ifam in
@@ -416,7 +416,9 @@ value print_prev_next_2 conf base info pb nb =
 value other_parent_text_if_same conf base info =
   match (info.b1, info.b2) with
   [ ([(sib1, _) :: _], [(sib2, _) :: _]) ->
-      match (parents (aget conf base sib1), parents (aget conf base sib2)) with
+      match
+        (get_parents (aget conf base sib1), get_parents (aget conf base sib2))
+      with
       [ (Some ifam1, Some ifam2) ->
           let cpl1 = coi base ifam1 in
           let cpl2 = coi base ifam2 in
