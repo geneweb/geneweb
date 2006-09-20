@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.13 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.14 2006-09-20 14:13:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -936,7 +936,7 @@ value related_sex_is_coherent base warning p_ref =
 
 value check_normal_marriage_date_for_someone base error warning fam ip =
   let p = poi base ip in
-  match Adef.od_of_codate fam.marriage with
+  match Adef.od_of_codate (get_marriage fam) with
   [ Some d2 ->
       do {
         match Adef.od_of_codate (get_birth p) with
@@ -956,7 +956,7 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
 ;
 
 value check_normal_marriage_date base error warning fam =
-  let cpl = coi base fam.fam_index in
+  let cpl = coi base (get_fam_index fam) in
   do {
     check_normal_marriage_date_for_someone base error warning fam (father cpl);
     check_normal_marriage_date_for_someone base error warning fam (mother cpl);
@@ -1064,21 +1064,21 @@ value sort_children base warning ifam des =
 ;
 
 value check_family base error warning fam cpl des =
-  let ifam = fam.fam_index in
+  let ifam = get_fam_index fam in
   let fath = poi base (father cpl) in
   let moth = poi base (mother cpl) in
   do {
     match get_sex fath with
     [ Male -> birth_before_death base warning fath
     | Female | Neuter ->
-        if fam.relation = NoSexesCheckNotMarried
-        || fam.relation = NoSexesCheckMarried then ()
+        if get_relation fam = NoSexesCheckNotMarried
+        || get_relation fam = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson fath) ];
     match get_sex moth with
     [ Female -> birth_before_death base warning moth
     | Male | Neuter ->
-        if fam.relation = NoSexesCheckNotMarried ||
-           fam.relation = NoSexesCheckMarried then ()
+        if get_relation fam = NoSexesCheckNotMarried ||
+           get_relation fam = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson moth) ];
     check_normal_marriage_date base error warning fam;
     sort_children base warning ifam des;
@@ -1111,7 +1111,7 @@ value check_person base error warning p = do {
   related_sex_is_coherent base warning p
 };
 
-value is_deleted_family fam = fam.fam_index = Adef.ifam_of_int (-1);
+value is_deleted_family fam = get_fam_index fam = Adef.ifam_of_int (-1);
 
 value strip_all_trailing_spaces s =
   let b = Buffer.create (String.length s) in

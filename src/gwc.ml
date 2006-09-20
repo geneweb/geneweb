@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.15 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.16 2006-09-20 14:13:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -538,13 +538,14 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     new_ifam gen;
     let i = gen.g_fcnt in
     let fam =
-      {marriage = fo.marriage;
-       marriage_place = unique_string gen fo.marriage_place;
-       marriage_src = unique_string gen fo.marriage_src;
-       witnesses = Array.of_list witl; relation = fo.relation;
-       divorce = fo.divorce; comment = comment;
-       origin_file = unique_string gen fo.origin_file; fsources = fsources;
-       fam_index = Adef.ifam_of_int i}
+      family_of_gen_family
+        {marriage = fo.marriage;
+         marriage_place = unique_string gen fo.marriage_place;
+         marriage_src = unique_string gen fo.marriage_src;
+         witnesses = Array.of_list witl; relation = fo.relation;
+         divorce = fo.divorce; comment = comment;
+         origin_file = unique_string gen fo.origin_file; fsources = fsources;
+         fam_index = Adef.ifam_of_int i}
     and cpl = couple False ipere imere
     and des = {children = children} in
     let fath_uni = uoi gen.g_base ipere in
