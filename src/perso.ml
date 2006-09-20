@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.9 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: perso.ml,v 5.10 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -20,8 +20,8 @@ value has_children base u =
 ;
 
 value string_of_marriage_text conf base fam =
-  let marriage = Adef.od_of_codate fam.marriage in
-  let marriage_place = sou base fam.marriage_place in
+  let marriage = Adef.od_of_codate (get_marriage fam) in
+  let marriage_place = sou base (get_marriage_place fam) in
   let s =
     match marriage with
     [ Some d -> " " ^ Date.string_of_ondate conf d
@@ -586,7 +586,7 @@ value get_date_place conf base auth_for_all_anc p =
         List.fold_left
           (fun d ifam ->
              if d <> None then d
-             else Adef.od_of_codate (foi base ifam).marriage)
+             else Adef.od_of_codate (get_marriage (foi base ifam)))
           d1 (Array.to_list (get_family (uget conf base (get_cle_index p))))
     in
     let d2 =
@@ -619,7 +619,7 @@ value get_date_place conf base auth_for_all_anc p =
           List.fold_left
             (fun pl ifam ->
                if pl <> "" then pl
-               else sou base (foi base ifam).marriage_place)
+               else sou base (get_marriage_place (foi base ifam)))
             pl (Array.to_list (get_family (uget conf base (get_cle_index p))))
       in
       pl
@@ -947,28 +947,29 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
   [ "are_divorced" ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          match fam.divorce with
+          match get_divorce fam with
           [ Divorced _ -> True
           | _ -> False ]
       | _ -> raise Not_found ]
   | "are_engaged" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ _ -> fam.relation = Engaged
+      [ Vfam fam _ _ _ -> get_relation fam = Engaged
       | _ -> raise Not_found ]
   | "are_married" ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          fam.relation = Married || fam.relation = NoSexesCheckMarried
+          get_relation fam = Married || get_relation fam = NoSexesCheckMarried
       | _ -> raise Not_found ]
   | "are_not_married" ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          fam.relation = NotMarried || fam.relation = NoSexesCheckNotMarried
+          get_relation fam = NotMarried ||
+          get_relation fam = NoSexesCheckNotMarried
       | _ -> raise Not_found ]
   | "are_separated" ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          match fam.divorce with
+          match get_divorce fam with
           [ Separated -> True
           | _ -> False ]
       | _ -> raise Not_found ]
@@ -978,7 +979,7 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "has_comment" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ m_auth -> m_auth && sou base fam.comment <> ""
+      [ Vfam fam _ _ m_auth -> m_auth && sou base (get_comment fam) <> ""
       | _ -> raise Not_found ]
   | "has_relation_her" ->
       match get_env "rel" env with
@@ -990,7 +991,7 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> False ]
   | "has_witnesses" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ m_auth -> m_auth && Array.length fam.witnesses > 0
+      [ Vfam fam _ _ m_auth -> m_auth && Array.length (get_witnesses fam) > 0
       | _ -> raise Not_found ]
   | "is_first" ->
       match get_env "first" env with
@@ -1002,13 +1003,13 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
       | _ -> raise Not_found ]
   | "is_no_mention" ->
       match get_env "fam" env with
-      [ Vfam fam _ _ _ -> fam.relation = NoMention
+      [ Vfam fam _ _ _ -> get_relation fam = NoMention
       | _ -> raise Not_found ]
   | "is_no_sexes_check" ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          fam.relation = NoSexesCheckNotMarried ||
-          fam.relation = NoSexesCheckMarried
+          get_relation fam = NoSexesCheckNotMarried ||
+          get_relation fam = NoSexesCheckMarried
       | _ -> raise Not_found ]
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "is_sibling_after" -> get_env "pos" env = Vstring "next"
@@ -1034,7 +1035,8 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "comment" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
-          if m_auth then string_with_macros conf [] (sou base fam.comment)
+          if m_auth then
+            string_with_macros conf [] (sou base (get_comment fam))
           else ""
       | _ -> raise Not_found ]
   | "count" ->
@@ -1044,7 +1046,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "divorce_date" ->
       match get_env "fam" env with
       [ Vfam fam (_, _, isp) _ m_auth ->
-          match fam.divorce with
+          match get_divorce fam with
           [ Divorced d ->
               let d = Adef.od_of_codate d in
               match d with
@@ -1080,7 +1082,8 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
  | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
-          if m_auth then string_of_place conf base fam.marriage_place else ""
+          if m_auth then string_of_place conf base (get_marriage_place fam)
+          else ""
       | _ -> raise Not_found ]
   | "max_anc_level" ->
       match get_env "max_anc_level" env with
@@ -1115,14 +1118,14 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
   | "on_marriage_date" ->
       match get_env "fam" env with
       [ Vfam fam _ _ m_auth ->
-          match (m_auth, Adef.od_of_codate fam.marriage) with
+          match (m_auth, Adef.od_of_codate (get_marriage fam)) with
           [ (True, Some s) -> Date.string_of_ondate conf s
           | _ -> "" ] 
       | _ -> raise Not_found ]
   | "origin_file" ->
       if conf.wizard then
         match get_env "fam" env with
-        [ Vfam fam _ _ _ -> sou base fam.origin_file
+        [ Vfam fam _ _ _ -> sou base (get_origin_file fam)
         | _ -> "" ]
       else raise Not_found
   | "prefix_no_iz" ->
@@ -1609,7 +1612,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          let cpl = coi base fam.fam_index in
+          let cpl = coi base (get_fam_index fam) in
           let ip = Gutil.spouse (get_cle_index p) cpl in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
@@ -1741,8 +1744,8 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
         List.exists
           (fun ifam ->
              let fam = foi base ifam in
-             p_auth && sou base fam.marriage_src <> "" ||
-             sou base fam.fsources <> "")
+             p_auth && sou base (get_marriage_src fam) <> "" ||
+             sou base (get_fsources fam) <> "")
           (Array.to_list (get_family u))
   | "has_surnames_aliases" -> get_surnames_aliases p <> []
   | "is_buried" ->
@@ -1849,7 +1852,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
-          Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
+          Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam (get_fam_index fam))
             (Adef.int_of_iper (get_cle_index p))
       | _ -> raise Not_found ]
   | "father_age_at_birth" -> string_of_parent_age conf base ep father
@@ -1971,7 +1974,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       | _ -> raise Not_found ]
   | "prev_fam_index" ->
       match get_env "prev_fam" env with
-      [ Vfam fam _ _ _ -> string_of_int (Adef.int_of_ifam fam.fam_index)
+      [ Vfam fam _ _ _ -> string_of_int (Adef.int_of_ifam (get_fam_index fam))
       | _ -> raise Not_found ]
   | "prev_fam_mother" ->
       match get_env "prev_fam" env with
@@ -2045,7 +2048,7 @@ and eval_family_field_var conf base env
       let ep = make_ep conf base ifath in
       eval_person_field_var conf base env ep loc sl
   | ["marriage_date" :: sl] ->
-      match Adef.od_of_codate fam.marriage with
+      match Adef.od_of_codate (get_marriage fam) with
       [ Some d when m_auth -> eval_date_field_var d sl
       | _ -> VVstring "" ]
   | ["mother" :: sl] ->
@@ -2055,7 +2058,7 @@ and eval_family_field_var conf base env
   | _ -> raise Not_found ]
 and eval_str_family_field conf base env (f, _, _, _) loc =
   fun
-  [ "index" -> string_of_int (Adef.int_of_ifam f.fam_index)
+  [ "index" -> string_of_int (Adef.int_of_ifam (get_fam_index f))
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
   if p_auth then
@@ -2150,7 +2153,8 @@ value eval_transl conf env upp s c =
                 | _ -> 2 ] ]
         | "w" ->
             match get_env "fam" env with
-            [ Vfam fam _ _ _ -> if Array.length fam.witnesses = 1 then 0 else 1
+            [ Vfam fam _ _ _ ->
+                if Array.length (get_witnesses fam) = 1 then 0 else 1
             | _ -> 0 ]
         | _ -> assert False ]
       in
@@ -2637,11 +2641,11 @@ value print_foreach conf base print_ast eval_expr =
            let srcl =
              if p_auth then
                let src_typ = transl_nth conf "marriage/marriages" 0 in
-               insert (src_typ ^ lab) fam.marriage_src srcl
+               insert (src_typ ^ lab) (get_marriage_src fam) srcl
              else srcl
            in
            let src_typ = transl_nth conf "family/families" 0 in
-           (insert (src_typ ^ lab) fam.fsources srcl, i + 1))
+           (insert (src_typ ^ lab) (get_fsources fam) srcl, i + 1))
         (srcl, 1) (get_family u)
     in
     let print_src (src_typ, src) =
@@ -2671,7 +2675,7 @@ value print_foreach conf base print_ast eval_expr =
              let env = [("witness", Vind p a u) :: env] in
              let env = [("first", Vbool first) :: env] in
              List.iter (print_ast env ep) al)
-          (Array.to_list fam.witnesses)
+          (Array.to_list (get_witnesses fam))
     | _ -> () ]
   and print_foreach_witness_relation env al ((p, _, _, _) as ep) =
     let list =
@@ -2686,7 +2690,8 @@ value print_foreach conf base print_ast eval_expr =
                   Array.iter
                     (fun ifam ->
                        let fam = foi base ifam in
-                       if array_memq (get_cle_index p) fam.witnesses then
+                       if array_memq (get_cle_index p) (get_witnesses fam)
+                       then
                          list.val := [(ifam, fam) :: list.val]
                        else ())
                     (get_family (uget conf base ic))
@@ -2701,7 +2706,8 @@ value print_foreach conf base print_ast eval_expr =
       List.sort
         (fun (_, fam1) (_, fam2) ->
            match
-             (Adef.od_of_codate fam1.marriage, Adef.od_of_codate fam2.marriage)
+             (Adef.od_of_codate (get_marriage fam1),
+              Adef.od_of_codate (get_marriage fam2))
            with
            [ (Some d1, Some d2) ->
                if strictly_before d1 d2 then -1
@@ -2817,7 +2823,7 @@ value print conf base p =
     else
       let src =
         match get_parents (aget conf base (get_cle_index p)) with
-        [ Some ifam -> sou base (foi base ifam).origin_file
+        [ Some ifam -> sou base (get_origin_file (foi base ifam))
         | None -> "" ]
       in
       try Some (src, List.assoc ("passwd_" ^ src) conf.base_env) with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.3 2006-09-19 11:35:22 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.4 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -44,18 +44,22 @@ value reconstitute conf base fam1 des1 fam2 des2 =
     | _ -> if null x1 then x2 else x1 ]
   in
   let fam =
-    {marriage = field "marriage" (fun f -> f.marriage) ( \= Adef.codate_None);
+    {marriage = field "marriage" get_marriage ( \= Adef.codate_None);
      marriage_place =
-       field "marriage_place" (fun f -> sou base f.marriage_place) ( \= "");
+       field "marriage_place" (fun f -> sou base (get_marriage_place f))
+         ( \= "");
      marriage_src =
-       merge_strings base fam1.marriage_src ", " fam2.marriage_src;
-     witnesses = merge_witnesses base fam1.witnesses fam2.witnesses;
-     relation = field "relation" (fun f -> f.relation) ( \= Married);
-     divorce = field "divorce" (fun f -> f.divorce) ( \= NotDivorced);
-     comment = merge_strings base fam1.comment ", " fam2.comment;
-     origin_file = sou base fam1.origin_file;
-     fsources = merge_strings base fam1.fsources ", " fam2.fsources;
-     fam_index = fam1.fam_index}
+       merge_strings base (get_marriage_src fam1) ", "
+         (get_marriage_src fam2);
+     witnesses =
+       merge_witnesses base (get_witnesses fam1) (get_witnesses fam2);
+     relation = field "relation" get_relation ( \= Married);
+     divorce = field "divorce" get_divorce ( \= NotDivorced);
+     comment = merge_strings base (get_comment fam1) ", " (get_comment fam2);
+     origin_file = sou base (get_origin_file fam1);
+     fsources =
+       merge_strings base (get_fsources fam1) ", " (get_fsources fam2);
+     fam_index = get_fam_index fam1}
   in
   let des =
     {children =

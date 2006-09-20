@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.4 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.5 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -29,7 +29,10 @@ value person_key base ip =
 ;
 
 value string_family_of conf base fam cpl des =
-  let sfam = Gutil.map_family_ps (person_key base) (sou base) fam in
+  let sfam =
+    Gutil.map_family_ps (person_key base) (sou base)
+      (gen_family_of_family fam)
+  in
   let scpl = Gutil.map_couple_p conf.multi_parents (person_key base) cpl in
   let sdes = Gutil.map_descend_p (person_key base) des in
   (sfam, scpl, sdes)
@@ -405,7 +408,7 @@ value print_del1 conf base fam =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_ifam fam.fam_index);
+          (Adef.int_of_ifam (get_fam_index fam));
         match p_getenv conf.env "ip" with
         [ Some ip -> xtag "input" "type=\"hidden\" name=\"ip\" value=\"%s\"" ip
         | None -> () ];
@@ -424,8 +427,8 @@ value print_inv1 conf base p fam1 fam2 =
   let title _ =
     Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
   in
-  let cpl1 = coi base fam1.fam_index in
-  let cpl2 = coi base fam2.fam_index in
+  let cpl1 = coi base (get_fam_index fam1) in
+  let cpl2 = coi base (get_fam_index fam2) in
   do {
     header conf title;
     Wserver.wprint "%s:"
@@ -449,7 +452,7 @@ value print_inv1 conf base p fam1 fam2 =
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_cle_index p));
         xtag "input" "type=\"hidden\" name=\"f\" value=\"%d\""
-          (Adef.int_of_ifam fam2.fam_index);
+          (Adef.int_of_ifam (get_fam_index fam2));
         xtag "input" "type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"";
       end;
       tag "p" begin

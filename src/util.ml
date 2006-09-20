@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.17 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: util.ml,v 5.18 2006-09-20 16:28:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -544,7 +544,7 @@ value authorized_age conf base p =
           if i >= Array.length (get_family u) then False
           else
             let fam = foi base (get_family u).(i) in
-            match Adef.od_of_codate fam.marriage with
+            match Adef.od_of_codate (get_marriage fam) with
             [ Some (Dgreg d _) ->
                 let a = time_gone_by d conf.today in
                 a.year > conf.private_years
@@ -2353,7 +2353,7 @@ value of_course_died conf p =
 
 value relation_txt conf sex fam =
   let is = index_of_sex sex in
-  match fam.relation with
+  match get_relation fam with
   [ NotMarried | NoSexesCheckNotMarried ->
       ftransl_nth conf "relationship%t to" is
   | Married | NoSexesCheckMarried -> ftransl_nth conf "married%t to" is

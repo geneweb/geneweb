@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.14 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.15 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -207,12 +207,12 @@ value compatible_ind base p1 p2 =
 ;
 
 value compatible_fam base fam1 fam2 =
-  compatible_codates fam1.marriage fam2.marriage &&
-  compatible_strings fam1.marriage_place fam2.marriage_place &&
-  Array.length fam2.witnesses = 0 &&
-  compatible_relation_kinds fam1.relation fam2.relation &&
-  compatible_divorces fam1.divorce fam2.divorce &&
-  compatible_strings fam1.fsources fam2.fsources
+  compatible_codates (get_marriage fam1) (get_marriage fam2) &&
+  compatible_strings (get_marriage_place fam1) (get_marriage_place fam2) &&
+  Array.length (get_witnesses fam2) = 0 &&
+  compatible_relation_kinds (get_relation fam1) (get_relation fam2) &&
+  compatible_divorces (get_divorce fam1) (get_divorce fam2) &&
+  compatible_strings (get_fsources fam1) (get_fsources fam2)
 ;
 
 value propose_merge_ind conf base branches p1 p2 =
@@ -411,37 +411,40 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
 ;
 
 value effective_merge_fam conf base fam1 fam2 p1 p2 =
-  let des1 = doi base fam1.fam_index in
-  let des2 = doi base fam2.fam_index in
+  let des1 = doi base (get_fam_index fam1) in
+  let des2 = doi base (get_fam_index fam2) in
   let fam1 =
-    {(fam1) with
-     marriage =
-       if fam1.marriage = Adef.codate_None then fam2.marriage
-       else fam1.marriage;
-     marriage_place =
-       if fam1.marriage_place = Adef.istr_of_int 0 then fam2.marriage_place
-       else fam1.marriage_place;
-     marriage_src =
-       if fam1.marriage_src = Adef.istr_of_int 0 then fam2.marriage_src
-       else fam1.marriage_src;
-     fsources =
-       if fam1.fsources = Adef.istr_of_int 0 then fam2.fsources
-       else fam1.fsources}
+    family_of_gen_family
+      {(gen_family_of_family fam1) with
+       marriage =
+         if get_marriage fam1 = Adef.codate_None then get_marriage fam2
+         else get_marriage fam1;
+       marriage_place =
+         if get_marriage_place fam1 = Adef.istr_of_int 0 then
+           get_marriage_place fam2
+         else get_marriage_place fam1;
+       marriage_src =
+         if get_marriage_src fam1 = Adef.istr_of_int 0 then
+           get_marriage_src fam2
+         else get_marriage_src fam1;
+       fsources =
+         if get_fsources fam1 = Adef.istr_of_int 0 then get_fsources fam2
+         else get_fsources fam1}
   in
   do {
-    base.func.patch_family fam1.fam_index fam1;
+    base.func.patch_family (get_fam_index fam1) fam1;
     let des1 = {children = Array.append des1.children des2.children} in
-    base.func.patch_descend fam1.fam_index des1;
+    base.func.patch_descend (get_fam_index fam1) des1;
     for i = 0 to Array.length des2.children - 1 do {
       let ip = des2.children.(i) in
       let a =
         ascend_of_gen_ascend
-          {parents = Some fam1.fam_index; consang = Adef.fix (-1)}
+          {parents = Some (get_fam_index fam1); consang = Adef.fix (-1)}
       in
       base.func.patch_ascend ip a;
     };
     let des2 = {children = [| |]} in
-    base.func.patch_descend fam2.fam_index des2;
+    base.func.patch_descend (get_fam_index fam2) des2;
     UpdateFamOk.effective_del conf base fam2;
   }
 ;

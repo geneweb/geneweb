@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.14 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.15 2006-09-20 16:28:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -380,7 +380,7 @@ value check_sex_married conf base sp op =
     let no_check =
       List.for_all
         (fun ifam ->
-           let r = (foi base ifam).relation in
+           let r = get_relation (foi base ifam) in
            r = NoSexesCheckNotMarried || r = NoSexesCheckMarried)
         (Array.to_list (get_family u))
     in
@@ -414,7 +414,7 @@ value rparents_of p =
 value is_witness_at_marriage base ip p =
   let u = uoi base ip in
   List.exists
-    (fun ifam -> let fam = foi base ifam in array_memq ip fam.witnesses)
+    (fun ifam -> let fam = foi base ifam in array_memq ip (get_witnesses fam))
     (Array.to_list (get_family u))
 ;
 

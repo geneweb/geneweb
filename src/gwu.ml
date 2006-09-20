@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.6 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.7 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -412,8 +412,8 @@ value print_family oc base gen m =
     fprintf oc "fam ";
     print_parent oc base gen fam m.m_fath;
     fprintf oc " +";
-    print_date_option oc (Adef.od_of_codate fam.marriage);
-    match fam.relation with
+    print_date_option oc (Adef.od_of_codate (get_marriage fam));
+    match get_relation fam with
     [ NotMarried -> fprintf oc " #nm"
     | Married -> ()
     | Engaged -> fprintf oc " #eng"
@@ -434,9 +434,9 @@ value print_family oc base gen m =
         in
         fprintf oc " #nsckm %c%c" (c m.m_fath) (c m.m_moth)
     | NoMention -> fprintf oc " #noment" ];
-    print_if_no_empty oc base "#mp" fam.marriage_place;
-    print_if_no_empty oc base "#ms" fam.marriage_src;
-    match fam.divorce with
+    print_if_no_empty oc base "#mp" (get_marriage_place fam);
+    print_if_no_empty oc base "#ms" (get_marriage_src fam);
+    match get_divorce fam with
     [ NotDivorced -> ()
     | Separated -> fprintf oc " #sep"
     | Divorced d ->
@@ -459,10 +459,10 @@ value print_family oc base gen m =
            fprintf oc "\n"
          }
          else ())
-      fam.witnesses;
-    match sou base fam.fsources with
+      (get_witnesses fam);
+    match sou base (get_fsources fam) with
     [ "" -> ()
-    | s -> fprintf oc "src %s\n" (correct_string base fam.fsources) ];
+    | s -> fprintf oc "src %s\n" (correct_string base (get_fsources fam)) ];
     let csrc =
       match common_children_sources base m.m_chil with
       [ Some s -> do { fprintf oc "csrc %s\n" (s_correct_string s); s }
@@ -473,7 +473,7 @@ value print_family oc base gen m =
       [ Some s -> do { fprintf oc "cbp %s\n" (s_correct_string s); s }
       | _ -> "" ]
     in
-    match fam.comment with
+    match get_comment fam with
     [ txt when sou base txt <> "" ->
         fprintf oc "comm %s\n" (no_newlines (sou base txt))
     | _ -> () ];
@@ -491,7 +491,7 @@ value print_family oc base gen m =
             m.m_chil;
           fprintf oc "end\n"
         } ];
-    gen.fam_done.(Adef.int_of_ifam fam.fam_index) := True
+    gen.fam_done.(Adef.int_of_ifam (get_fam_index fam)) := True
   }
 ;
 
@@ -700,7 +700,7 @@ value get_persons_with_relations base m list =
          | ([{r_fath = Some x} :: _], _) when x <> get_cle_index m.m_fath ->
              list
          | _ -> [(p, False) :: list] ])
-      (Array.to_list m.m_fam.witnesses) list
+      (Array.to_list (get_witnesses m.m_fam)) list
   in
   List.fold_right
     (fun p list ->
@@ -864,7 +864,8 @@ value rec filter f =
 ;
 
 value connected_families base fam_sel fam cpl =
-  loop [fam.fam_index] [] [(father cpl)] where rec loop ifaml ipl_scanned =
+  loop [(get_fam_index fam)] [] [(father cpl)]
+  where rec loop ifaml ipl_scanned =
     fun
     [ [ip :: ipl] ->
         if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
@@ -1024,10 +1025,10 @@ value scan_connex_component base test_action len ifam =
 ;
 
 value mark_one_connex_component base mark ifam =
-  let origin_file = sou base (foi base ifam).origin_file in
+  let origin_file = sou base (get_origin_file (foi base ifam)) in
   let test_action loop len ifam =
     if mark.(Adef.int_of_ifam ifam) == NotScanned &&
-       sou base (foi base ifam).origin_file = origin_file
+       sou base (get_origin_file (foi base ifam)) = origin_file
     then do {
       mark.(Adef.int_of_ifam ifam) := BeingScanned; loop (len + 1) ifam
     }
@@ -1066,7 +1067,7 @@ value mark_connex_components base mark fam =
       mark_one_connex_component base mark ifam
     else ()
   in
-  scan_connex_component base test_action () fam.fam_index
+  scan_connex_component base test_action () (get_fam_index fam)
 ;
 
 value add_small_connex_components base mark =
@@ -1166,11 +1167,11 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
       let cpl = base.data.couples.get i in
       if is_deleted_family fam then ()
       else if gen.fam_done.(i) then ()
-      else if gen.fam_sel fam.fam_index then
+      else if gen.fam_sel (get_fam_index fam) then
         let ifaml = connected_families base gen.fam_sel fam cpl in
         let (oc, first) =
-          if to_separate fam.fam_index then (out_oc, out_oc_first)
-          else origin_file (sou base fam.origin_file)
+          if to_separate (get_fam_index fam) then (out_oc, out_oc_first)
+          else origin_file (sou base (get_origin_file fam))
         in
         let ml =
           List.fold_right
@@ -1184,7 +1185,9 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
                   m_chil = Array.map (fun ip -> poi base ip) des.children}
                in
                if empty_family base m then do {
-                 gen.fam_done.(Adef.int_of_ifam m.m_fam.fam_index) := True; ml
+                 gen.fam_done.(Adef.int_of_ifam (get_fam_index m.m_fam)) :=
+                   True;
+                 ml
                }
                else [m :: ml])
             ifaml []
