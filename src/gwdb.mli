@@ -1,9 +1,9 @@
-(* $Id: gwdb.mli,v 5.9 2006-09-18 21:48:07 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.10 2006-09-20 09:07:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
 
-type db_person 'person 'string = Def.gen_person 'person 'string;
+type db_person 'person 'string = 'abstract;
 
 type person = db_person iper istr;
 type ascend = Def.gen_ascend ifam;
