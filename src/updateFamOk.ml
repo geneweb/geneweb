@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.10 2006-09-19 06:00:52 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.11 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -347,7 +347,7 @@ value infer_origin_file conf base ifam ncpl ndes =
     | None ->
         let afath = aoi base (father ncpl) in
         let amoth = aoi base (mother ncpl) in
-        match (parents afath, parents amoth) with
+        match (get_parents afath, get_parents amoth) with
         [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
             (foi base if1).origin_file
         | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
@@ -524,7 +524,7 @@ value effective_mod conf base sfam scpl sdes =
     Array.iter
       (fun ip ->
          let a = find_asc ip in
-         match parents a with
+         match get_parents a with
          [ Some _ -> print_err_parents conf base (poi base ip)
          | None ->
              let a =
@@ -626,7 +626,7 @@ value effective_add conf base sfam scpl sdes =
       (fun ip ->
          let a = aoi base ip in
          let p = poi base ip in
-         match parents a with
+         match get_parents a with
          [ Some _ -> print_err_parents conf base p
          | None ->
              let a = {parents = Some fi; consang = Adef.fix (-1)} in
@@ -903,7 +903,7 @@ value print_add o_conf base =
             if Adef.int_of_iper (mother cpl) = i then (mother scpl, i, "af")
             else
               let a = base.data.ascends.get i in
-              match parents a with
+              match get_parents a with
               [ Some x when x = fam.fam_index ->
                   let p = base.data.persons.get i in
                   let key =

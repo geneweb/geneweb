@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.12 2006-09-18 19:27:01 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.13 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -469,7 +469,7 @@ value insert_somebody gen =
 
 value verif_parents_non_deja_definis gen ix pere mere =
   let x = poi gen.g_base ix in
-  match parents (aoi gen.g_base ix) with
+  match get_parents (aoi gen.g_base ix) with
   [ Some ifam ->
       let cpl = coi gen.g_base ifam in
       let p = (father cpl) in

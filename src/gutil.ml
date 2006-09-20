@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.10 2006-09-18 12:45:28 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.11 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -344,8 +344,6 @@ value parent_array = Adef.parent_array;
 value set_father = Adef.set_father;
 value set_mother = Adef.set_mother;
 
-value parents asc = asc.parents;
-value consang asc = asc.consang;
 value no_ascend () = {parents = None; consang = Adef.fix (-1)};
 
 value spouse ip cpl =
@@ -462,7 +460,7 @@ value person_misc_names base p nobtit =
         list (nobtit p)
     in
     let list =
-      match parents (aoi base (get_cle_index p)) with
+      match get_parents (aoi base (get_cle_index p)) with
       [ Some ifam ->
           let cpl = coi base ifam in
           let fath = poi base (father cpl) in
@@ -629,7 +627,7 @@ value check_noloop base error =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match parents (base.data.ascends.get i) with
+          match get_parents (base.data.ascends.get i) with
           [ Some fam ->
               let fath = father (coi base fam) in
               let moth = mother (coi base fam) in
@@ -660,7 +658,7 @@ value check_noloop_for_person_list base error ipl =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match parents (aoi base ip) with
+          match get_parents (aoi base ip) with
           [ Some ifam ->
               let cpl = coi base ifam in
               do {

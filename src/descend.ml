@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.6 2006-09-19 19:30:23 ddr Exp $ *)
+(* $Id: descend.ml,v 5.7 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -56,7 +56,7 @@ value descendants_title conf base p h =
 IFDEF OLD THEN declare
 value named_like_father conf base ip =
   let a = aget conf base ip in
-  match parents a with
+  match get_parents a with
   [ Some ifam ->
       get_surname (pget conf base ip) =
         get_surname (pget conf base (father (coi base ifam)))
@@ -387,7 +387,7 @@ value labelled conf base marks max_lev lev ip =
   let a = aget conf base ip in
   let u = uget conf base ip in
   Array.length u.family <> 0 &&
-  (match parents a with
+  (match get_parents a with
    [ Some ifam ->
        let cpl = coi base ifam in
        List.exists

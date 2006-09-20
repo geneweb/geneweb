@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.5 2006-09-18 19:05:28 ddr Exp $ *)
+(* $Id: check.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -148,7 +148,7 @@ value update_stats base current_year s p =
           else ();
         }
     | _ -> () ];
-    match (birth_year p, parents (aoi base (get_cle_index p))) with
+    match (birth_year p, get_parents (aoi base (get_cle_index p))) with
     [ (Some y2, Some ifam) ->
         let cpl = coi base ifam in
         do {

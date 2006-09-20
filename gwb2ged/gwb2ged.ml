@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.4 2006-09-20 09:07:06 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.5 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -412,7 +412,7 @@ value ged_ind_attr_str base oc per =
 ;
 
 value ged_famc base (per_sel, fam_sel) oc asc =
-  match parents asc with
+  match get_parents asc with
   [ Some ifam ->
       if fam_sel ifam then
         fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam + 1)
@@ -544,7 +544,7 @@ value ged_comment base oc fam =
 ;
 
 value has_personal_infos base per asc =
-  if parents asc <> None then True
+  if get_parents asc <> None then True
   else if sou base (get_first_name per) <> "?" then True
   else if sou base (get_surname per) <> "?" then True
   else if get_birth per <> Adef.codate_None then True

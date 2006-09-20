@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.5 2006-09-19 19:06:56 ddr Exp $ *)
+(* $Id: relation.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -89,7 +89,7 @@ value add_missing_parents_of_siblings conf base indl =
                     match ind.di_val with
                     [ Some ip ->
                         let ip =
-                          match parents (aget conf base ip) with
+                          match get_parents (aget conf base ip) with
                           [ Some ifam -> father (coi base ifam)
                           | None -> assert False ]
                         in
@@ -202,7 +202,7 @@ end END;
 value add_common_parent base ip1 ip2 set =
   let a1 = aoi base ip1 in
   let a2 = aoi base ip2 in
-  match (parents a1, parents a2) with
+  match (get_parents a1, get_parents a2) with
   [ (Some ifam1, Some ifam2) ->
       let cpl1 = coi base ifam1 in
       let cpl2 = coi base ifam2 in
@@ -373,7 +373,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
       in
       let result =
         result @
-          (match parents (aget conf base iper) with
+          (match get_parents (aget conf base iper) with
            [ Some ifam -> parse_fam ifam
            | _ -> [] ])
       in
@@ -747,8 +747,8 @@ value nephew_label conf x p =
 ;
 
 value same_parents conf base p1 p2 =
-  parents (aget conf base (get_cle_index p1)) =
-  parents (aget conf base (get_cle_index p2))
+  get_parents (aget conf base (get_cle_index p1)) =
+  get_parents (aget conf base (get_cle_index p2))
 ;
 
 value print_link_name conf base n p1 p2 sol =
@@ -1454,8 +1454,8 @@ value print_main_relationship conf base long p1 p2 rel =
           end;
           if long then () else print_dag_links conf base p1 p2 rl;
           if not all_by_marr && authorized_age conf base p1 &&
-             authorized_age conf base p2 && (consang a1) != Adef.fix (-1) &&
-             consang a2 != Adef.fix (-1)
+             authorized_age conf base p2 && get_consang a1 != Adef.fix (-1) &&
+             get_consang a2 != Adef.fix (-1)
           then
             tag "p" begin
               Wserver.wprint "<em>%s: %s%%</em>"

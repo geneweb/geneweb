@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.3 2006-09-19 20:43:59 ddr Exp $ *)
+(* $Id: some.ml,v 5.4 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -424,7 +424,7 @@ value print_by_branch x conf base (pl, homonymes) =
              }
              else ();
              if br = None || br = Some n then
-               match parents (aget conf base (get_cle_index p)) with
+               match get_parents (aget conf base (get_cle_index p)) with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    tag "dd" begin
@@ -541,7 +541,7 @@ value select_ancestors conf base name_inj ipl =
     (fun ipl ip ->
        let p = pget conf base ip in
        let a = aget conf base ip in
-       match parents a with
+       match get_parents a with
        [ Some ifam ->
            let cpl = coi base ifam in
            let ifath = father cpl in
@@ -555,7 +555,7 @@ value select_ancestors conf base name_inj ipl =
              if List.memq ifath ipl then ipl
              else
                let grandfath_same_surname =
-                 match parents (aoi base ifath) with
+                 match get_parents (aoi base ifath) with
                  [ Some igfam ->
                      let gfath = poi base (father (coi base igfam)) in
                      str_inj (get_surname gfath) = s
@@ -692,18 +692,18 @@ and eval_person_var conf base p =
   fun
   [ ["access"] -> VVstring (acces conf base p)
   | ["father" :: sl] ->
-      match parents (aget conf base (get_cle_index p)) with
+      match get_parents (aget conf base (get_cle_index p)) with
       [ Some ifam ->
           let p = pget conf base (father (coi base ifam)) in
           eval_person_var conf base p sl
       | None -> raise Not_found ]
   | ["has_parents"] ->
-      match parents (aget conf base (get_cle_index p)) with
+      match get_parents (aget conf base (get_cle_index p)) with
       [ Some _ -> VVbool True
       | None -> VVbool False ]
   | ["is_restricted"] -> VVbool (is_hidden p)
   | ["mother" :: sl] ->
-      match parents (aget conf base (get_cle_index p)) with
+      match get_parents (aget conf base (get_cle_index p)) with
       [ Some ifam ->
           let p = pget conf base (mother (coi base ifam)) in
           eval_person_var conf base p sl

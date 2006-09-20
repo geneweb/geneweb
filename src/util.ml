@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.14 2006-09-18 20:03:13 ddr Exp $ *)
+(* $Id: util.ml,v 5.15 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -508,7 +508,7 @@ value nobtit conf base p =
 
 value parent_has_title conf base p =
   let a = aoi base (get_cle_index p) in
-  match parents a with
+  match get_parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (father cpl) in
@@ -1707,7 +1707,7 @@ value specify_homonymous conf base p =
   | (_, []) ->
       let a = aget conf base (get_cle_index p) in
       let ifam =
-        match parents a with
+        match get_parents a with
         [ Some ifam ->
             let cpl = coi base ifam in
             let fath =
@@ -2102,7 +2102,7 @@ value branch_of_sosa conf base ip n =
       fun
       [ [] -> Some [(ip, sp) :: ipl]
       | [goto_fath :: nl] ->
-          match parents (aget conf base ip) with
+          match get_parents (aget conf base ip) with
           [ Some ifam ->
               let cpl = coi base ifam in
               if goto_fath then loop [(ip, sp) :: ipl] (father cpl) Male nl
@@ -2268,7 +2268,7 @@ exception Ok;
 value has_nephews_or_nieces conf base p =
   try
     let a = aget conf base (get_cle_index p) in
-    match parents a with
+    match get_parents a with
     [ Some ifam ->
         let des = doi base ifam in
         do {

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.5 2006-09-16 21:33:00 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -60,10 +60,10 @@ value compute base from_scratch quiet =
       let a = ascends.(i) in
       if from_scratch then ascends.(i) := {(a) with consang = no_consang}
       else
-        match parents a with
-        [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := consang a
+        match get_parents a with
+        [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := get_consang a
         | None -> () ];
-      if consang a == no_consang then incr cnt else ()
+      if get_consang a == no_consang then incr cnt else ()
     };
     let max_cnt = cnt.val in
     let most = ref None in
@@ -77,17 +77,17 @@ value compute base from_scratch quiet =
       running.val := False;
       for i = 0 to base.data.ascends.len - 1 do {
         let a = ascends.(i) in
-        if consang a == no_consang then
-          match parents a with
+        if get_consang a == no_consang then
+          match get_parents a with
           [ Some ifam ->
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
               if pconsang == no_consang then
                 let cpl = coi base ifam in
                 let fath = aoi base (father cpl) in
                 let moth = aoi base (mother cpl) in
-                if consang fath != no_consang &&
-                   consang moth != no_consang then
-                   do {
+                if get_consang fath != no_consang &&
+                   get_consang moth != no_consang
+                then do {
                   let consang =
                     relationship base tab (father cpl) (mother cpl)
                   in
@@ -95,11 +95,11 @@ value compute base from_scratch quiet =
                   decr cnt;
                   let a = {(a) with consang = Adef.fix_of_float consang} in
                   ascends.(i) := a;
-                  consang_tab.(Adef.int_of_ifam ifam) := Gutil.consang a;
+                  consang_tab.(Adef.int_of_ifam ifam) := get_consang a;
                   if not quiet then
                     let better =
                       match most.val with
-                      [ Some m -> Gutil.consang a > Gutil.consang m
+                      [ Some m -> get_consang a > get_consang m
                       | None -> True ]
                     in
                     if better then do {
