@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.3 2006-09-19 10:26:31 ddr Exp $ *)
+(* $Id: place.ml,v 5.4 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -101,9 +101,9 @@ value get_all conf base =
           let fam = base.data.families.get i in
           if is_deleted_family fam then ()
           else
-            let pl_ma = fam.marriage_place in
+            let pl_ma = get_marriage_place fam in
             if pl_ma <> empty then
-              let cpl = coi base fam.fam_index in
+              let cpl = coi base (get_fam_index fam) in
               let fath = pget conf base (father cpl) in
               let moth = pget conf base (mother cpl) in
               if fast_auth_age conf fath && fast_auth_age conf moth then do {

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.8 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: descend.ml,v 5.9 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -80,7 +80,7 @@ value display_married conf base first fam p spouse =
     let occu = sou base (get_occupation spouse) in
     if auth && occu <> "" then Wserver.wprint ", %s" occu else ();
     if auth then
-      match fam.divorce with
+      match get_divorce fam with
       [ NotDivorced -> ()
       | Separated -> Wserver.wprint ",\n%s" (transl conf "separated")
       | Divorced cod ->
@@ -1184,7 +1184,7 @@ value print_aboville conf base max_level p =
               if authorized_age conf base p &&
                  authorized_age conf base spouse then
                 let fam = foi base (get_family u).(i) in
-                match Adef.od_of_codate fam.marriage with
+                match Adef.od_of_codate (get_marriage fam) with
                 [ Some (Dgreg d _) ->
                     "<font size=\"-2\"><em>" ^ Date.year_text d ^ "</em></font>"
                 | _ -> "" ]

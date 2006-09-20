@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.8 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.9 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -197,18 +197,19 @@ value effective_mod_merge conf base sp =
                      else
                        let fam = foi base (get_family uc).(i) in
                        let (p_related, mod_p) =
-                         if array_memq (get_cle_index p2) fam.witnesses
+                         if array_memq (get_cle_index p2) (get_witnesses fam)
                          then do {
                            let (p_related, mod_p) =
                              loop (p_related, mod_p) 0
                              where rec loop (p_related, mod_p) j =
-                               if j = Array.length fam.witnesses then
+                               if j = Array.length (get_witnesses fam) then
                                  (p_related, mod_p)
                                else
                                let (p_related, mod_p) =
-                                 if fam.witnesses.(j) == get_cle_index p2
+                                 if (get_witnesses fam).(j) ==
+                                    get_cle_index p2
                                  then do {
-                                   fam.witnesses.(j) := get_cle_index p;
+                                   (get_witnesses fam).(j) := get_cle_index p;
                                    if List.memq ipc p_related then
                                      (p_related, mod_p)
                                    else ([ipc :: p_related], True)
@@ -217,7 +218,7 @@ value effective_mod_merge conf base sp =
                                in
                                loop (p_related, mod_p) (j + 1)
                            in
-                           base.func.patch_family fam.fam_index fam;
+                           base.func.patch_family (get_fam_index fam) fam;
                            (p_related, mod_p)
                          }
                          else (p_related, mod_p)
@@ -251,7 +252,7 @@ value effective_mod_merge conf base sp =
                    in
                    base.func.patch_person ip w
                  else ())
-              fam.witnesses;
+              (get_witnesses fam);
           }
           else if get_cle_index p2 = mother cpl then
             set_mother cpl (get_cle_index p)

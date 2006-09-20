@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 5.4 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -15,7 +15,7 @@ value need_differences_selection conf base fam1 fam2 =
   in
   need_selection
     (fun fam ->
-       match fam.relation with
+       match get_relation fam with
        [ Married -> "married"
        | NotMarried -> "not married"
        | Engaged -> "engaged"
@@ -24,13 +24,13 @@ value need_differences_selection conf base fam1 fam2 =
        | NoMention -> "no mention" ]) ||
   need_selection
     (fun fam ->
-       match Adef.od_of_codate fam.marriage with
+       match Adef.od_of_codate (get_marriage fam) with
        [ None -> ""
        | Some d -> Date.string_of_ondate conf d ]) ||
-  need_selection (fun fam -> sou base fam.marriage_place) ||
+  need_selection (fun fam -> sou base (get_marriage_place fam)) ||
   need_selection
     (fun fam ->
-       match fam.divorce with
+       match get_divorce fam with
        [ NotDivorced -> "not divorced"
        | Separated -> "separated"
        | Divorced cod ->
@@ -47,7 +47,8 @@ value print_differences conf base branches fam1 fam2 =
       Wserver.wprint "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         html_li conf;
-        Wserver.wprint "<input type=\"radio\" name=\"%s\" value=\"1\" checked>\n"
+        Wserver.wprint
+          "<input type=\"radio\" name=\"%s\" value=\"1\" checked>\n"
           name;
         Wserver.wprint "%s\n" x1;
         html_li conf;
@@ -61,19 +62,22 @@ value print_differences conf base branches fam1 fam2 =
     Util.hidden_env conf;
     Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
     Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
-      (Adef.int_of_ifam fam1.fam_index);
+      (Adef.int_of_ifam (get_fam_index fam1));
     Wserver.wprint "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
-      (Adef.int_of_ifam fam2.fam_index);
+      (Adef.int_of_ifam (get_fam_index fam2));
     match p_getenv conf.env "ip" with
-    [ Some ip -> Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
+    [ Some ip ->
+        Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
     | None -> () ];
     let rec loop =
       fun
       [ [(ip1, ip2)] ->
           do {
-            Wserver.wprint "<input type=\"hidden\" name=\"ini1\" value=\"%d\">\n"
+            Wserver.wprint
+              "<input type=\"hidden\" name=\"ini1\" value=\"%d\">\n"
               (Adef.int_of_iper ip1);
-            Wserver.wprint "<input type=\"hidden\" name=\"ini2\" value=\"%d\">\n"
+            Wserver.wprint
+              "<input type=\"hidden\" name=\"ini2\" value=\"%d\">\n"
               (Adef.int_of_iper ip2);
           }
       | [_ :: branches] -> loop branches
@@ -83,7 +87,7 @@ value print_differences conf base branches fam1 fam2 =
     html_p conf;
     string_field (transl_nth conf "relation/relations" 0) "relation"
       (fun fam ->
-         match fam.relation with
+         match get_relation fam with
          [ Married -> transl conf "married"
          | NotMarried -> transl conf "not married"
          | Engaged -> transl conf "engaged"
@@ -94,16 +98,16 @@ value print_differences conf base branches fam1 fam2 =
       (Util.translate_eval (transl_nth conf "marriage/marriages" 0))
       "marriage"
       (fun fam ->
-         match Adef.od_of_codate fam.marriage with
+         match Adef.od_of_codate (get_marriage fam) with
          [ None -> ""
          | Some d -> Date.string_of_ondate conf d ]);
     string_field
       (Util.translate_eval (transl_nth conf "marriage/marriages" 0) ^ " / " ^
          transl conf "place")
-      "marriage_place" (fun fam -> sou base fam.marriage_place);
+      "marriage_place" (fun fam -> sou base (get_marriage_place fam));
     string_field (transl conf "divorce") "divorce"
       (fun fam ->
-         match fam.divorce with
+         match get_divorce fam with
          [ NotDivorced -> transl conf "not divorced"
          | Separated -> transl conf "separated"
          | Divorced cod ->
@@ -131,9 +135,9 @@ value merge_fam1 conf base fam1 fam2 =
 ;
 
 value merge_fam conf base fam1 fam2 =
-  let cpl1 = coi base fam1.fam_index in
-  let cpl2 = coi base fam2.fam_index in
-  if (father cpl1) = (father cpl2) && (mother cpl1) = (mother cpl2) then
+  let cpl1 = coi base (get_fam_index fam1) in
+  let cpl2 = coi base (get_fam_index fam2) in
+  if father cpl1 = father cpl2 && mother cpl1 = mother cpl2 then
     if need_differences_selection conf base fam1 fam2 then
       merge_fam1 conf base fam1 fam2
     else MergeFamOk.print_merge conf base

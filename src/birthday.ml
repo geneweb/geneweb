@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.5 2006-09-19 19:51:18 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.6 2006-09-20 16:28:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -280,7 +280,7 @@ value print_marriage conf base month =
       let fam = base.data.families.get i in
       if is_deleted_family fam then ()
       else
-        match Adef.od_of_codate fam.marriage with
+        match Adef.od_of_codate (get_marriage fam) with
         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _)
           when d <> 0 && m <> 0 ->
             let cpl = base.data.couples.get i in
@@ -566,7 +566,7 @@ value print_menu_marriage conf base =
       let fam = base.data.families.get i in
       if is_deleted_family fam then ()
       else
-        match Adef.od_of_codate fam.marriage with
+        match Adef.od_of_codate (get_marriage fam) with
         [ Some (Dgreg d _) when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
             let update_list cpl =
               if match_mar_dates conf base cpl d conf.today then

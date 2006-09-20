@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.7 2006-09-19 19:45:22 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.8 2006-09-20 16:28:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -387,7 +387,7 @@ value print_marr_or_eng conf base title list len =
              let d = {(d) with day = 0} in
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
-           let cpl = coi base fam.fam_index in
+           let cpl = coi base (get_fam_index fam) in
            let future = strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
@@ -420,7 +420,7 @@ value print_marr_or_eng conf base title list len =
                    (Date.string_of_date conf (Dgreg d cal))
                else
                  Wserver.wprint "%s <em>%s</em>."
-                   (match fam.relation with
+                   (match get_relation fam with
                     [ NotMarried | NoSexesCheckNotMarried ->
                         transl_nth conf "relation/relations" 0
                     | Married | NoSexesCheckMarried -> transl conf "married"
@@ -441,7 +441,8 @@ value print_marriage conf base =
   let (list, len) =
     select_family conf base
       (fun fam ->
-         if fam.relation == Married then Adef.od_of_codate fam.marriage
+         if get_relation fam == Married then
+           Adef.od_of_codate (get_marriage fam)
          else None)
       False
   in
@@ -455,13 +456,13 @@ value print_oldest_engagements conf base =
   let (list, len) =
     select_family conf base
       (fun fam ->
-         if fam.relation == Engaged then
-           let cpl = coi base fam.fam_index in
+         if get_relation fam == Engaged then
+           let cpl = coi base (get_fam_index fam) in
            let husb = poi base (father cpl) in
            let wife = poi base (mother cpl) in
            match (get_death husb, get_death wife) with
            [ (NotDead | DontKnowIfDead, NotDead | DontKnowIfDead) ->
-               Adef.od_of_codate fam.marriage
+               Adef.od_of_codate (get_marriage fam)
            | _ -> None ]
          else None)
       True

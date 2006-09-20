@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.10 2006-09-20 14:13:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.11 2006-09-20 16:28:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -129,8 +129,16 @@ value get_family u = u.Def.family;
 
 value union_of_gen_union u = u;
 
+value get_comment f = f.Def.comment;
+value get_divorce f = f.Def.divorce;
 value get_fam_index f = f.Def.fam_index;
+value get_fsources f = f.Def.fsources;
 value get_marriage f = f.Def.marriage;
+value get_marriage_place f = f.Def.marriage_place;
+value get_marriage_src f = f.Def.marriage_src;
+value get_origin_file f = f.Def.origin_file;
 value get_relation f = f.Def.relation;
+value get_witnesses f = f.Def.witnesses;
 
 value family_of_gen_family f = f;
+value gen_family_of_family f = f;

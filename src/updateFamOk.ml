@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.13 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.14 2006-09-20 16:28:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -326,7 +326,7 @@ value infer_origin_file_from_other_marriages conf base ifam ip =
     if i = Array.length (get_family u) then None
     else if (get_family u).(i) = ifam then loop (i + 1)
     else
-      let r = (foi base (get_family u).(i)).origin_file in
+      let r = get_origin_file (foi base (get_family u).(i)) in
       if sou base r <> "" then Some r else loop (i + 1)
   in
   loop 0
@@ -348,10 +348,12 @@ value infer_origin_file conf base ifam ncpl ndes =
         let afath = aoi base (father ncpl) in
         let amoth = aoi base (mother ncpl) in
         match (get_parents afath, get_parents amoth) with
-        [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
-            (foi base if1).origin_file
-        | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
-            (foi base if2).origin_file
+        [ (Some if1, _)
+          when sou base (get_origin_file (foi base if1)) <> "" ->
+            (get_origin_file (foi base if1))
+        | (_, Some if2)
+          when sou base (get_origin_file (foi base if2)) <> "" ->
+            (get_origin_file (foi base if2))
         | _ ->
             let rec loop i =
               if i == Array.length ndes.children then
@@ -359,8 +361,10 @@ value infer_origin_file conf base ifam ncpl ndes =
               else
                 let cifams = get_family (uoi base ndes.children.(i)) in
                 if Array.length cifams == 0 then loop (i + 1)
-                else if sou base (foi base cifams.(0)).origin_file <> "" then
-                  (foi base cifams.(0)).origin_file
+                else if
+                  sou base (get_origin_file (foi base cifams.(0))) <> ""
+                then
+                  get_origin_file (foi base cifams.(0))
                 else loop (i + 1)
             in
             loop 0 ] ]
@@ -470,13 +474,15 @@ value effective_mod conf base sfam scpl sdes =
   do {
     if father ncpl == mother ncpl then print_err conf base else ();
     let nfam =
-      {(nfam) with
-       origin_file =
-         if sfam.origin_file = "" then 
-           if sou base ofam.origin_file <> "" then ofam.origin_file
-           else infer_origin_file conf base fi ncpl ndes
-         else nfam.origin_file;
-       fam_index = fi}
+      family_of_gen_family
+        {(nfam) with
+         origin_file =
+           if sfam.origin_file = "" then 
+             if sou base (get_origin_file ofam) <> "" then
+               get_origin_file ofam
+             else infer_origin_file conf base fi ncpl ndes
+           else nfam.origin_file;
+         fam_index = fi}
     in
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
@@ -488,7 +494,7 @@ value effective_mod conf base sfam scpl sdes =
         let ou = uoi base oarr.(i) in
         let ou =
           union_of_gen_union
-            {family = family_exclude (get_family ou) ofam.fam_index}
+            {family = family_exclude (get_family ou) (get_fam_index ofam)}
         in
         base.func.patch_union oarr.(i) ou
       }
@@ -558,8 +564,8 @@ value effective_mod conf base sfam scpl sdes =
       ndes.children;
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath nfath_u;
-    update_related_witnesses base (Array.to_list ofam.witnesses)
-      (Array.to_list nfam.witnesses) ncpl;
+    update_related_witnesses base (Array.to_list (get_witnesses ofam))
+      (Array.to_list (get_witnesses nfam)) ncpl;
     (nfam, ncpl, ndes)
   }
 ;
@@ -621,7 +627,10 @@ value effective_add conf base sfam scpl sdes =
     else if (father ncpl) == (mother ncpl) then print_err conf base
     else (nfath_p, nmoth_p)
   in
-  let nfam = {(nfam) with fam_index = fi; origin_file = origin_file} in
+  let nfam =
+    family_of_gen_family
+      {(nfam) with fam_index = fi; origin_file = origin_file}
+  in
   do {
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
@@ -651,7 +660,8 @@ value effective_add conf base sfam scpl sdes =
       ndes.children;
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
-    update_related_witnesses base [] (Array.to_list nfam.witnesses) ncpl;
+    update_related_witnesses base [] (Array.to_list (get_witnesses nfam))
+      ncpl;
     (nfam, ncpl, ndes)
   }
 ;
@@ -676,7 +686,7 @@ value kill_family base fam ip =
   let l =
     List.fold_right
       (fun ifam ifaml ->
-         if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
+         if ifam == get_fam_index fam then ifaml else [ifam :: ifaml])
       (Array.to_list (get_family u)) []
   in
   let u = union_of_gen_union {family = Array.of_list l} in
@@ -689,7 +699,7 @@ value kill_parents base ip =
 ;
 
 value effective_del conf base fam = do {
-  let ifam = fam.fam_index in
+  let ifam = get_fam_index fam in
   let cpl = coi base ifam in
   let des = doi base ifam in
   kill_family base fam (father cpl);
@@ -698,10 +708,11 @@ value effective_del conf base fam = do {
   set_father cpl (Adef.iper_of_int (-1));
   set_mother cpl (Adef.iper_of_int (-1));
   let fam =
-    {(fam) with
-     witnesses = [| |];
-     comment = Update.insert_string base "";
-     fam_index = Adef.ifam_of_int (-1)}
+    family_of_gen_family
+      {(gen_family_of_family fam) with
+       witnesses = [| |];
+       comment = Update.insert_string base "";
+       fam_index = Adef.ifam_of_int (-1)}
   in
   let des = {children = [| |]} in
   base.func.patch_family ifam fam;
@@ -924,7 +935,7 @@ value print_add o_conf base =
             else
               let a = base.data.ascends.get i in
               match get_parents a with
-              [ Some x when x = fam.fam_index ->
+              [ Some x when x = get_fam_index fam ->
                   let p = base.data.persons.get i in
                   let key =
                     (sou base (get_first_name p), sou base (get_surname p),
