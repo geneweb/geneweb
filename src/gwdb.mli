@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.12 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.13 2006-09-20 11:30:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -118,3 +118,6 @@ value gen_person_of_person : db_person 'p 's -> Def.gen_person 'p 's;
 
 value get_parents : db_ascend 'f -> option 'f;
 value get_consang : db_ascend 'f -> Adef.fix;
+
+value ascend_of_gen_ascend : Def.gen_ascend 'f -> db_ascend 'f;
+value gen_ascend_of_ascend : db_ascend 'f -> Def.gen_ascend 'f;

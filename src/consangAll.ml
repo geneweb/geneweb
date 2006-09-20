@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.7 2006-09-20 11:30:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -13,7 +13,9 @@ value rec clear_descend_consang base ascends mark ifam =
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
          let a = ascends.(Adef.int_of_iper ip) in
-         ascends.(Adef.int_of_iper ip) := {(a) with consang = no_consang};
+         ascends.(Adef.int_of_iper ip) :=
+           ascend_of_gen_ascend
+             {(gen_ascend_of_ascend a) with consang = no_consang};
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
          Array.iter (clear_descend_consang base ascends mark) u.family
@@ -58,7 +60,10 @@ value compute base from_scratch quiet =
     else ();
     for i = 0 to base.data.ascends.len - 1 do {
       let a = ascends.(i) in
-      if from_scratch then ascends.(i) := {(a) with consang = no_consang}
+      if from_scratch then
+        ascends.(i) :=
+          ascend_of_gen_ascend
+            {(gen_ascend_of_ascend a) with consang = no_consang}
       else
         match get_parents a with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := get_consang a
