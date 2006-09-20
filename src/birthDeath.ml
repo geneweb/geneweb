@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.9 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.10 2006-09-20 20:17:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -79,6 +79,22 @@ value select_family conf base get_date find_oldest =
        end)
   in
   let n = min (max 0 (get_k conf)) base.data.families.len in
+  let ref_date =
+    match p_getint conf.env "by" with
+    [ Some by ->
+        let bm =
+          match p_getint conf.env "bm" with
+          [ Some x -> x
+          | None -> -1 ]
+        in
+        let bd =
+          match p_getint conf.env "bd" with
+          [ Some x -> x
+          | None -> -1 ]
+        in
+        Some {day = bd; month = bm; year = by; prec = Sure; delta = 0}
+    | None -> None ]
+  in
   let rec loop q len i =
     if i = base.data.families.len then
       let rec loop list q =
@@ -88,17 +104,21 @@ value select_family conf base get_date find_oldest =
       loop [] q
     else
       let fam = base.data.families.get i in
-      let (q, len) =
-        if Gutil.is_deleted_family fam then (q, len)
-        else
-          match get_date fam with
-          [ Some (Dgreg d cal) ->
+      if Gutil.is_deleted_family fam then loop q len (i + 1)
+      else
+        match get_date fam with
+        [ Some (Dgreg d cal) ->
+            let aft =
+              match ref_date with
+              [ Some ref_date -> Date.before_date d ref_date
+              | None -> False ]
+            in
+            if aft then loop q len (i + 1)
+            else
               let e = (fam, d, cal) in
-              if len < n then (QF.add e q, len + 1)
-              else (snd (QF.take (QF.add e q)), len)
-          | _ -> (q, len) ]
-      in
-      loop q len (i + 1)
+              if len < n then loop (QF.add e q) (len + 1) (i + 1)
+              else loop (snd (QF.take (QF.add e q))) len (i + 1)
+        | _ -> loop q len (i + 1) ]
   in
   loop QF.empty 0 0
 ;
