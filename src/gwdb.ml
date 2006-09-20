@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.6 2006-09-20 11:15:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.7 2006-09-20 11:30:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -116,5 +116,8 @@ value get_titles p = p.Def.titles;
 value person_of_gen_person p = p;
 value gen_person_of_person p = p;
 
-value get_consang asc = asc.Def.consang;
-value get_parents asc = asc.Def.parents;
+value get_consang a = a.Def.consang;
+value get_parents a = a.Def.parents;
+
+value ascend_of_gen_ascend a = a;
+value gen_ascend_of_ascend a = a;
