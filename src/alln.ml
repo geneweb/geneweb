@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.5 2006-09-19 19:40:28 ddr Exp $ *)
+(* $Id: alln.ml,v 5.6 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -363,7 +363,7 @@ value compare2 s1 s2 =
 ;
 
 value print_frequency conf base is_surnames =
-  let _ = base.data.strings.array () in
+  let () = base.data.strings.load_array () in
   let list =
     let (list, _) = select_names conf base is_surnames "" in
     List.sort
@@ -389,7 +389,7 @@ value print_alphabetic conf base is_surnames =
   in
   let _ =
     if fast || String.length ini < 2 then
-      let _ = base.data.strings.array () in ()
+      let () = base.data.strings.load_array () in ()
     else ()
   in
   let all =
@@ -480,8 +480,7 @@ value print_short conf base is_surnames =
     | _ -> "" ]
   in
   let _ =
-    if String.length ini < 2 then let _ = base.data.strings.array () in ()
-    else ()
+    if String.length ini < 2 then base.data.strings.load_array () else ()
   in
   let list =
     let (list, sorted) = select_names conf base is_surnames ini in

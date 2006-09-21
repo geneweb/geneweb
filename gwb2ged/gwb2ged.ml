@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.10 2006-09-21 03:28:14 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.11 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -631,17 +631,12 @@ value gwb2ged base ifile ofile anc desc mem =
     | None -> None ]
   in
   do {
-    if not mem then
-(*
-      let _ = base.data.persons.array () in
-*)
-      let _ = base.data.ascends.array () in
-      let _ = base.data.unions.array () in
-      let _ = base.data.couples.array () in
-(*
-      let _ = base.data.families.array () in
-*)
-      let _ = base.data.descends.array () in ()
+    if not mem then do {
+      base.data.ascends.load_array ();
+      base.data.unions.load_array ();
+      base.data.couples.load_array ();
+      base.data.descends.load_array ();
+    }
     else ();
     let oc = if ofile = "" then stdout else open_out ofile in
     let ((per_sel, fam_sel) as sel) =

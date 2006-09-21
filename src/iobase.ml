@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.8 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.9 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -910,31 +910,30 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
                   flush stderr;
                   failwith "cannot access database" } ] ] ]
   in
-  let rec r =
-    {array () =
-       match tab.val with
-       [ Some x -> x
-       | None ->
-           do {
-             IFDEF UNIX THEN
-               if verbose.val then do {
-                 Printf.eprintf "*** read %s%s\n" name
-                   (if cleared.val then " (again)" else "");
-                 flush stderr;
-               }
-               else ()
-             ELSE () END;
-             do {
-               seek_in ic array_pos;
-               let v = input_value ic in
-               let v = v_arr_ext v in
-               let t = apply_patches v v_ext patches r.len in
-               tab.val := Some t;
-               t
-             }
-           } ];
-     get = gen_get; len = max len plenr.val;
-     clear_array = fun _ -> do { cleared.val := True; tab.val := None }}
+  let rec array () =
+    match tab.val with
+    [ Some x -> x
+    | None -> do {
+        IFDEF UNIX THEN
+          if verbose.val then do {
+            Printf.eprintf "*** read %s%s\n" name
+              (if cleared.val then " (again)" else "");
+            flush stderr;
+          }
+          else ()
+        ELSE () END;
+        seek_in ic array_pos;
+        let v = input_value ic in
+        let v = v_arr_ext v in
+        let t = apply_patches v v_ext patches r.len in
+        tab.val := Some t;
+        t
+      } ]
+  and r =
+    {load_array () = let _ = array in (); get = gen_get;
+     set i v = (array ()).(i) := v; len = max len plenr.val;
+     array_obj = array;
+     clear_array () = do { cleared.val := True; tab.val := None }}
   in
   r
 ;
@@ -1323,7 +1322,7 @@ value is_prime a =
 value rec prime_after n = if is_prime n then n else prime_after (n + 1);
 
 value output_strings_hash oc2 base =
-  let strings_array = base.data.strings.array () in
+  let strings_array = base.data.strings.array_obj () in
   let taba =
     Array.create
       (min Sys.max_array_length
@@ -1333,7 +1332,7 @@ value output_strings_hash oc2 base =
   let tabl = Array.create (Array.length strings_array) (-1) in
   do {
     for i = 0 to Array.length strings_array - 1 do {
-      let ia = Hashtbl.hash strings_array.(i) mod Array.length taba in
+      let ia = Hashtbl.hash (base.data.strings.get i) mod Array.length taba in
       tabl.(i) := taba.(ia);
       taba.(ia) := i;
     };
@@ -1509,8 +1508,8 @@ value count_error computed found =
 ;
 
 value cache_of tab =
-  {array = fun _ -> tab; get = fun i -> tab.(i); len = Array.length tab;
-   clear_array = fun _ -> ()}
+  {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
+   len = Array.length tab; array_obj _ = tab; clear_array () = ()}
 ;
 
 value create_name_index oc_inx oc_inx_acc base =
@@ -1649,18 +1648,13 @@ value gen_output no_patches bname base =
     let tmp_strings_inx = Filename.concat bname "1strings.inx" in
     let tmp_notes = Filename.concat bname "1notes" in
     let tmp_notes_d = Filename.concat bname "1notes_d" in
-    if not no_patches then
-(*
-      let _ = base.data.persons.array () in
-*)
-      let _ = base.data.ascends.array () in
-      let _ = base.data.unions.array () in
-(*
-      let _ = base.data.families.array () in
-*)
-      let _ = base.data.couples.array () in
-      let _ = base.data.descends.array () in
-      let _ = base.data.strings.array () in ()
+    if not no_patches then do {
+      base.data.ascends.load_array ();
+      base.data.unions.load_array ();
+      base.data.couples.load_array ();
+      base.data.descends.load_array ();
+      base.data.strings.load_array ();
+    }
     else ();
     let oc = Secure.open_out_bin tmp_base in
     let oc_acc = Secure.open_out_bin tmp_base_acc in
@@ -1669,7 +1663,7 @@ value gen_output no_patches bname base =
       do {
         Printf.eprintf "*** saving %s array\n" arrname;
         flush stderr;
-        match try Some (arr.array ()) with [ Failure _ -> None ] with
+        match try Some (arr.array_obj ()) with [ Failure _ -> None ] with
         [ Some a -> output_value_no_sharing oc a
         | None -> output_array_no_sharing oc arr ];
         let epos = output_array_access oc_acc arr bpos in
