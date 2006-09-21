@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: some.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -234,9 +234,9 @@ value child_has_children_with_same_name base des name =
          (fun ifam ->
             List.exists
               (fun ip -> p_surname base (poi base ip) = name)
-              (Array.to_list (doi base ifam).children))
+              (Array.to_list (get_children (doi base ifam))))
          (Array.to_list (get_family (uoi base ip))))
-    (Array.to_list des.children)
+    (Array.to_list (get_children des))
 ;
 
 value print_branch conf base psn name =
@@ -251,12 +251,12 @@ value print_branch conf base psn name =
              let fam = foi base ifam in
              let des = doi base ifam in
              let c = spouse (get_cle_index p) (coi base ifam) in
-             let el = des.children in
+             let el = get_children des in
              let c = pget conf base c in
              let down =
                get_sex p = Male &&
                (Name.crush_lower (p_surname base p) = cln || is_first_lev) &&
-               Array.length des.children <> 0 ||
+               Array.length (get_children des) <> 0 ||
                get_sex p = Female &&
                she_has_children_with_her_name conf base p c el ||
                get_sex p = Male &&
@@ -323,7 +323,7 @@ value print_branch conf base psn name =
                        tag "dl" begin
                          List.iter
                            (fun e -> loop False (succ lev) (pget conf base e))
-                           (Array.to_list des.children);
+                           (Array.to_list (get_children des));
                        end;
                        False
                      }
@@ -527,9 +527,9 @@ value print_family_alphabetic x conf base liste =
 
 value has_at_least_2_children_with_surname conf base des surname =
   loop 0 0 where rec loop cnt i =
-    if i == Array.length des.children then False
+    if i == Array.length (get_children des) then False
     else
-      let p = pget conf base des.children.(i) in
+      let p = pget conf base (get_children des).(i) in
       if get_surname p == surname then
         if cnt == 1 then True else loop (cnt + 1) (i + 1)
       else loop cnt (i + 1)
@@ -564,8 +564,8 @@ value select_ancestors conf base name_inj ipl =
                if grandfath_same_surname then ipl
                else if
                  not (is_hidden fath) &&
-                 has_at_least_2_children_with_surname conf base (doi base ifam)
-                 (get_surname p)
+                 has_at_least_2_children_with_surname conf base
+                   (doi base ifam) (get_surname p)
                then
                  [ifath :: ipl]
                else [ip :: ipl]

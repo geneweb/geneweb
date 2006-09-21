@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.10 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.11 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -21,7 +21,7 @@ value rec clear_descend_consang base ascends mark ifam =
          Array.iter (clear_descend_consang base ascends mark) (get_family u)
        }
        else ())
-    des.children
+    (get_children des)
 ;
 
 value relationship base tab ip1 ip2 =

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.8 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -953,7 +953,7 @@ value mark_branch base mark surn p =
               (fun list ifam ->
                  let desc = doi base ifam in
                  Array.fold_left (fun list ip -> [poi base ip :: list]) list
-                   desc.children)
+                   (get_children desc))
               [] ifaml
           in
           if top || List.exists (fun p -> get_surname p = surn) children
@@ -1014,7 +1014,7 @@ value scan_connex_component base test_action len ifam =
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
-    let children = (doi base ifam).children in
+    let children = get_children (doi base ifam) in
     let len =
       Array.fold_left
         (fun len ip ->
@@ -1182,7 +1182,8 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
                let m =
                  {m_fam = fam; m_fath = poi base (get_father cpl);
                   m_moth = poi base (get_mother cpl);
-                  m_chil = Array.map (fun ip -> poi base ip) des.children}
+                  m_chil =
+                    Array.map (fun ip -> poi base ip) (get_children des)}
                in
                if empty_family base m then do {
                  gen.fam_done.(Adef.int_of_ifam (get_fam_index m.m_fam)) :=

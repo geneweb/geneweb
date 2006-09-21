@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.19 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: util.ml,v 5.20 2006-09-21 02:04:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1730,7 +1730,7 @@ value specify_homonymous conf base p =
               let conjoint =
                 spouse (get_cle_index p) (coi base (get_family u).(i))
               in
-              let ct = des.children in
+              let ct = get_children des in
               if Array.length ct > 0 then
                 let enfant = pget conf base ct.(0) in
                 let (child_fn, child_sn) =
@@ -2279,11 +2279,11 @@ value has_nephews_or_nieces conf base p =
                else
                  Array.iter
                    (fun ifam ->
-                      if Array.length (doi base ifam).children > 0 then
+                      if Array.length (get_children (doi base ifam)) > 0 then
                         raise Ok
                       else ())
                    (get_family (uget conf base ip)))
-            des.children;
+            (get_children des);
           False
         }
     | _ -> False ]

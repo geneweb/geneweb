@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.21 2006-09-20 20:10:12 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.22 2006-09-21 02:04:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -884,7 +884,7 @@ value unknown_fam gen i =
        divorce = NotDivorced; comment = empty; origin_file = empty;
        fsources = empty; fam_index = Adef.ifam_of_int i}
   and c = couple_of_gen_couple (couple False father mother)
-  and d = {children = [| |]} in
+  and d = descend_of_gen_descend {children = [| |]} in
   (f, c, d)
 ;
 
@@ -1984,7 +1984,7 @@ value add_fam_norm gen r adop_list =
          origin_file = string_empty; fsources = add_string gen fsources;
          fam_index = i}
     and cpl = couple_of_gen_couple (couple False fath moth)
-    and des = {children = Array.of_list children} in
+    and des = descend_of_gen_descend {children = Array.of_list children} in
     gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
   }
 ;
@@ -2259,7 +2259,10 @@ value add_parents_to_isolated gen =
             let ifam = phony_fam gen in
             match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
             [ Right3 fam cpl des -> do {
-                let des = {children = [| get_cle_index p |]} in
+                let des =
+                  descend_of_gen_descend
+                    {children = [| get_cle_index p |]}
+                in
                 gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
                 let a =
                   ascend_of_gen_ascend
@@ -2395,7 +2398,7 @@ value check_parents_children base ascends unions couples descends =
           else
             let cpl = coi base ifam in
             let des = doi base ifam in
-            if array_memq (Adef.iper_of_int i) des.children then ()
+            if array_memq (Adef.iper_of_int i) (get_children des) then ()
             else do {
               let p = base.data.persons.get i in
               fprintf log_oc.val
@@ -2481,9 +2484,9 @@ value check_parents_children base ascends unions couples descends =
       let fam = base.data.families.get i in
       let cpl = base.data.couples.get i in
       let des = descends.(i) in
-      for j = 0 to Array.length des.children - 1 do {
-        let a = ascends.(Adef.int_of_iper des.children.(j)) in
-        let p = poi base des.children.(j) in
+      for j = 0 to Array.length (get_children des) - 1 do {
+        let a = ascends.(Adef.int_of_iper (get_children des).(j)) in
+        let p = poi base (get_children des).(j) in
         match get_parents a with
         [ Some ifam ->
             if Adef.int_of_ifam ifam <> i then do {
@@ -2516,16 +2519,16 @@ value check_parents_children base ascends unions couples descends =
                   {(gen_ascend_of_ascend a) with
                    parents = Some (get_fam_index fam)}
               in
-              ascends.(Adef.int_of_iper des.children.(j)) := a
+              ascends.(Adef.int_of_iper (get_children des).(j)) := a
             } ]
       };
       if to_delete.val <> [] then
         let l =
           List.fold_right
             (fun ip l -> if List.memq ip to_delete.val then l else [ip :: l])
-            (Array.to_list des.children) []
+            (Array.to_list (get_children des)) []
         in
-        descends.(i) := {children = Array.of_list l}
+        descends.(i) := descend_of_gen_descend {children = Array.of_list l}
       else ()
     }
   }
@@ -2666,9 +2669,10 @@ value finish_base base =
         sort_by_date
           (fun ip ->
              Adef.od_of_codate (get_birth persons.(Adef.int_of_iper ip)))
-          (Array.to_list des.children)
+          (Array.to_list (get_children des))
       in
-      descends.(i) := {children = Array.of_list children}
+      descends.(i) :=
+        descend_of_gen_descend {children = Array.of_list children}
     };
     for i = 0 to Array.length unions - 1 do {
       let u = unions.(i) in

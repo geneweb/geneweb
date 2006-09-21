@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.16 2006-09-20 20:10:12 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.17 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1051,9 +1051,9 @@ value semi_sort base a before comp di =
 value sort_children base warning ifam des =
   let before = ref None in
   do {
-    semi_sort base des.children before strictly_before 1 1;
-    semi_sort base des.children before strictly_after ~-1 1;
-    semi_sort base des.children before strictly_before 1 1;
+    semi_sort base (get_children des) before strictly_before 1 1;
+    semi_sort base (get_children des) before strictly_after ~-1 1;
+    semi_sort base (get_children des) before strictly_before 1 1;
     match before.val with
     [ None -> ()
     | Some a -> warning (ChangedOrderOfChildren ifam des a) ];
@@ -1099,7 +1099,7 @@ value check_family base error warning fam cpl des =
              [ Some d -> Some (child, d)
              | _ -> np ]
            })
-        None (Array.to_list des.children)
+        None (Array.to_list (get_children des))
     in
     ();
   }

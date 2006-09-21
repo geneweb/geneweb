@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.8 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -597,7 +597,7 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
     then
       fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother cpl) + 1)
     else ();
-    Array.iter (ged_child base sel oc) des.children;
+    Array.iter (ged_child base sel oc) (get_children des);
     ged_fsource base oc fam;
     ged_comment base oc fam;
   }

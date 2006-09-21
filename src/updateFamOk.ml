@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.15 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.16 2006-09-21 02:04:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -356,10 +356,10 @@ value infer_origin_file conf base ifam ncpl ndes =
             (get_origin_file (foi base if2))
         | _ ->
             let rec loop i =
-              if i == Array.length ndes.children then
+              if i == Array.length (get_children ndes) then
                 Update.insert_string base ""
               else
-                let cifams = get_family (uoi base ndes.children.(i)) in
+                let cifams = get_family (uoi base (get_children ndes).(i)) in
                 if Array.length cifams == 0 then loop (i + 1)
                 else if
                   sou base (get_origin_file (foi base cifams.(0))) <> ""
@@ -436,7 +436,8 @@ value effective_mod conf base sfam scpl sdes =
       (Update.insert_string base) sfam
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    descend_of_gen_descend
+      (map_descend_p (Update.insert_person conf base psrc created_p) sdes)
   in
   let nfath = poi base (get_father ncpl) in
   let nmoth = poi base (get_mother ncpl) in
@@ -531,11 +532,11 @@ value effective_mod conf base sfam scpl sdes =
            ascend_of_gen_ascend
              {parents = None;
               consang =
-                if not (array_memq ip ndes.children) then Adef.fix (-1)
+                if not (array_memq ip (get_children ndes)) then Adef.fix (-1)
                 else get_consang a}
          in
          Hashtbl.replace cache ip a)
-      odes.children;
+      (get_children odes);
     Array.iter
       (fun ip ->
          let a = find_asc ip in
@@ -546,24 +547,25 @@ value effective_mod conf base sfam scpl sdes =
                ascend_of_gen_ascend
                  {parents = Some fi;
                   consang =
-                    if not (array_memq ip odes.children) || not same_parents
+                    if not (array_memq ip (get_children odes)) ||
+                       not same_parents
                     then Adef.fix (-1)
                     else get_consang a}
              in
              Hashtbl.replace cache ip a ])
-      ndes.children;
+      (get_children ndes);
     Array.iter
       (fun ip ->
-         if not (array_memq ip ndes.children) then
+         if not (array_memq ip (get_children ndes)) then
            base.func.patch_ascend ip (find_asc ip)
          else ())
-      odes.children;
+      (get_children odes);
     Array.iter
       (fun ip ->
-         if not (array_memq ip odes.children) || not same_parents then
+         if not (array_memq ip (get_children odes)) || not same_parents then
            base.func.patch_ascend ip (find_asc ip)
          else ())
-      ndes.children;
+      (get_children ndes);
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath nfath_u;
     update_related_witnesses base (Array.to_list (get_witnesses ofam))
@@ -590,7 +592,8 @@ value effective_add conf base sfam scpl sdes =
       (Update.insert_string base) sfam
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p) sdes
+    descend_of_gen_descend
+      (map_descend_p (Update.insert_person conf base psrc created_p) sdes)
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base (get_father ncpl) in
@@ -660,7 +663,7 @@ value effective_add conf base sfam scpl sdes =
                  {parents = Some fi; consang = Adef.fix (-1)}
              in
              base.func.patch_ascend (get_cle_index p) a ])
-      ndes.children;
+      (get_children ndes);
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
     update_related_witnesses base [] (Array.to_list (get_witnesses nfam))
@@ -707,7 +710,7 @@ value effective_del conf base fam = do {
   let des = doi base ifam in
   kill_family base fam (get_father cpl);
   kill_family base fam (get_mother cpl);
-  Array.iter (kill_parents base) des.children;
+  Array.iter (kill_parents base) (get_children des);
   let cpl =
     couple_of_gen_couple
       (couple False (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
@@ -719,7 +722,7 @@ value effective_del conf base fam = do {
        comment = Update.insert_string base "";
        fam_index = Adef.ifam_of_int (-1)}
   in
-  let des = {children = [| |]} in
+  let des = descend_of_gen_descend {children = [| |]} in
   base.func.patch_family ifam fam;
   base.func.patch_couple ifam cpl;
   base.func.patch_descend ifam des
@@ -815,7 +818,7 @@ value print_family conf base wl cpl des =
     Wserver.wprint "\n%s"
       (referenced_person_text conf base (poi base (get_mother cpl)));
     Wserver.wprint "</ul>\n";
-    if des.children <> [| |] then do {
+    if get_children des <> [| |] then do {
       html_p conf;
       Wserver.wprint "<ul>\n";
       Array.iter
@@ -826,7 +829,7 @@ value print_family conf base wl cpl des =
                (referenced_person_text conf base (poi base ip));
              Wserver.wprint "\n"
            })
-        des.children;
+        (get_children des);
       Wserver.wprint "</ul>\n"
     }
     else ();
@@ -1015,7 +1018,7 @@ value print_mod_aux conf base callback =
 value family_structure conf base ifam =
   let cpl = coi base ifam in
   let des = doi base ifam in
-  (get_parent_array cpl, des.children)
+  (get_parent_array cpl, get_children des)
 ;
 
 value print_mod o_conf base =
@@ -1023,7 +1026,7 @@ value print_mod o_conf base =
   let callback sfam scpl sdes =
     let ofs = family_structure conf base sfam.fam_index in
     let (fam, cpl, des) = effective_mod conf base sfam scpl sdes in
-    let nfs = (get_parent_array cpl, des.children) in
+    let nfs = (get_parent_array cpl, get_children des) in
     let onfs = Some (ofs, nfs) in
     let wl = all_checks_family conf base fam cpl des (scpl, sdes, onfs) in
     let ((fn, sn, occ, _, _), ip) =
