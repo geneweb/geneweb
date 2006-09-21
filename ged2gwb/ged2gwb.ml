@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.24 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.25 2006-09-21 16:20:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2387,14 +2387,14 @@ value check_parents_children base ascends unions couples descends =
   let fam_to_delete = ref [] in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let a = ascends.get i in
+      let a = ascends.(i) in
       match get_parents a with
       [ Some ifam ->
           let fam = foi base ifam in
           if get_fam_index fam == Adef.ifam_of_int (-1) then
-            ascends.set i
-              (ascend_of_gen_ascend
-                 {(gen_ascend_of_ascend a) with parents = None})
+            ascends.(i) :=
+              ascend_of_gen_ascend
+                {(gen_ascend_of_ascend a) with parents = None}
           else
             let cpl = coi base ifam in
             let des = doi base ifam in
@@ -2411,15 +2411,15 @@ value check_parents_children base ascends unions couples descends =
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              ascends.set i
-                (ascend_of_gen_ascend
-                   {(gen_ascend_of_ascend a) with parents = None})
+              ascends.(i) :=
+                ascend_of_gen_ascend
+                  {(gen_ascend_of_ascend a) with parents = None}
             }
       | None -> () ];
       fam_to_delete.val := [];
-      let u = unions.get i in
+      let u = unions.(i) in
       for j = 0 to Array.length (get_family u) - 1 do {
-        let cpl = couples.get (Adef.int_of_ifam (get_family u).(j)) in
+        let cpl = couples.(Adef.int_of_ifam (get_family u).(j)) in
         if Adef.iper_of_int i <> get_father cpl &&
            Adef.iper_of_int i <> get_mother cpl
         then do {
@@ -2439,24 +2439,24 @@ value check_parents_children base ascends unions couples descends =
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
             fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
-            unions.set (Adef.int_of_iper (get_father cpl))
-              (union_of_gen_union {family = [| |]});
+            unions.(Adef.int_of_iper (get_father cpl)) :=
+              union_of_gen_union {family = [| |]};
             let cpl =
               couple_of_gen_couple
                 (couple False (Adef.iper_of_int i) (get_mother cpl))
             in
-            couples.set (Adef.int_of_ifam (get_family u).(j)) cpl;
+            couples.(Adef.int_of_ifam (get_family u).(j)) := cpl;
           }
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
             fprintf log_oc.val
               "However, the wife is unknown, I set her as wife\n";
-            unions.set (Adef.int_of_iper (get_mother cpl))
-              (union_of_gen_union {family = [| |]});
+            unions.(Adef.int_of_iper (get_mother cpl)) :=
+              union_of_gen_union {family = [| |]};
             let cpl =
               couple_of_gen_couple
                 (couple False (get_father cpl) (Adef.iper_of_int i))
             in
-            couples.set (Adef.int_of_ifam (get_family u).(j)) cpl;
+            couples.(Adef.int_of_ifam (get_family u).(j)) := cpl;
           }
           else do {
             fprintf log_oc.val "=> deleted this family for him/her\n";
@@ -2475,17 +2475,17 @@ value check_parents_children base ascends unions couples descends =
                else ([x :: list], i + 1))
             ([], 0) (Array.to_list (get_family u))
         in
-        unions.set i
-          (union_of_gen_union {family = Array.of_list (List.rev list)})
+        unions.(i) :=
+          union_of_gen_union {family = Array.of_list (List.rev list)}
       else ()
     };
     for i = 0 to base.data.families.len - 1 do {
       to_delete.val := [];
       let fam = foi base (Adef.ifam_of_int i) in
       let cpl = coi base (Adef.ifam_of_int i) in
-      let des = descends.get i in
+      let des = descends.(i) in
       for j = 0 to Array.length (get_children des) - 1 do {
-        let a = ascends.get (Adef.int_of_iper (get_children des).(j)) in
+        let a = ascends.(Adef.int_of_iper (get_children des).(j)) in
         let p = poi base (get_children des).(j) in
         match get_parents a with
         [ Some ifam ->
@@ -2519,7 +2519,7 @@ value check_parents_children base ascends unions couples descends =
                   {(gen_ascend_of_ascend a) with
                    parents = Some (get_fam_index fam)}
               in
-              ascends.set (Adef.int_of_iper (get_children des).(j)) a
+              ascends.(Adef.int_of_iper (get_children des).(j)) := a
             } ]
       };
       if to_delete.val <> [] then
@@ -2528,7 +2528,7 @@ value check_parents_children base ascends unions couples descends =
             (fun ip l -> if List.memq ip to_delete.val then l else [ip :: l])
             (Array.to_list (get_children des)) []
         in
-        descends.set i (descend_of_gen_descend {children = Array.of_list l})
+        descends.(i) := descend_of_gen_descend {children = Array.of_list l}
       else ()
     }
   }
@@ -2544,7 +2544,7 @@ value string_of_sex =
 value check_parents_sex base persons families =
   for i = 0 to base.data.couples.len - 1 do {
     let cpl = coi base (Adef.ifam_of_int i) in
-    let fam = families.get i in
+    let fam = families.(i) in
     let ifath = get_father cpl in
     let imoth = get_mother cpl in
     let fath = poi base ifath in
@@ -2565,15 +2565,15 @@ value check_parents_sex base persons families =
         family_of_gen_family
           {(gen_family_of_family fam) with relation = NoSexesCheckNotMarried}
       in
-      families.set i fam;
+      families.(i) := fam;
     }
     else do {
-      persons.set (Adef.int_of_iper ifath)
-        (person_of_gen_person
-           {(gen_person_of_person fath) with sex = Male});
-      persons.set (Adef.int_of_iper imoth)
-        (person_of_gen_person
-           {(gen_person_of_person moth) with sex = Female});
+      persons.(Adef.int_of_iper ifath) :=
+        person_of_gen_person
+          {(gen_person_of_person fath) with sex = Male};
+      persons.(Adef.int_of_iper imoth) :=
+        person_of_gen_person
+          {(gen_person_of_person moth) with sex = Female};
     }
   }
 ;
@@ -2601,7 +2601,7 @@ value neg_year_cdate cd =
 ;
 
 value rec negative_date_ancestors base persons families i = do {
-  let p = persons.get i in
+  let p = persons.(i) in
   let p =
     person_of_gen_person
       {(gen_person_of_person p) with
@@ -2614,11 +2614,11 @@ value rec negative_date_ancestors base persons families i = do {
          [ Death dr cd2 -> Death dr (neg_year_cdate cd2)
          | _ -> get_death p ]}
   in
-  persons.set i p;
+  persons.(i) := p;
   let u = uoi base (get_cle_index p) in
   for i = 0 to Array.length (get_family u) - 1 do {
     let j = Adef.int_of_ifam (get_family u).(i) in
-    let fam = families.get j in
+    let fam = families.(j) in
     match Adef.od_of_codate (get_marriage fam) with
     [ Some d ->
         let fam =
@@ -2626,7 +2626,7 @@ value rec negative_date_ancestors base persons families i = do {
             {(gen_family_of_family fam) with
              marriage = Adef.codate_of_od (Some (neg_year d))}
         in
-        families.set j fam
+        families.(j) := fam
     | None -> () ]
   };
   let a = aoi base (get_cle_index p) in
@@ -2644,7 +2644,7 @@ value rec negative_date_ancestors base persons families i = do {
 
 value negative_dates base persons families =
   for i = 0 to base.data.persons.len - 1 do {
-    let p = persons.get i in
+    let p = persons.(i) in
     match (Adef.od_of_codate (get_birth p), date_of_death (get_death p)) with
     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
         if year_of d1 > 0 && year_of d2 > 0 && strictly_before_dmy d2 d1 then
@@ -2654,47 +2654,34 @@ value negative_dates base persons families =
   }
 ;
 
-value finish_base base = do {
-  let pobj = base.data.persons.array_obj () in
-  base.data.ascends.load_array ();
-  let uobj = base.data.unions.array_obj () in
-  base.data.families.load_array ();
-  base.data.couples.load_array ();
-  let dobj = base.data.descends.array_obj () in
-  base.data.strings.load_array ();
-  let persons = base.data.persons in
-  let ascends = base.data.ascends in
-  let unions = base.data.unions in
-  let families = base.data.families in
-  let couples = base.data.couples in
-  let descends = base.data.descends in
-  for i = 0 to Array.length dobj - 1 do {
-    let des = descends.get i in
+value finish_base base (persons, families, _, _) = do {
+  let (persons, ascends, unions) = persons in
+  let (families, couples, descends) = families in
+  for i = 0 to Array.length descends - 1 do {
+    let des = descends.(i) in
     let children =
       sort_by_date
         (fun ip ->
-           Adef.od_of_codate
-             (get_birth (persons.get (Adef.int_of_iper ip))))
+           Adef.od_of_codate (get_birth persons.(Adef.int_of_iper ip)))
         (Array.to_list (get_children des))
     in
-    descends.set i
-      (descend_of_gen_descend {children = Array.of_list children})
+    descends.(i) :=
+      descend_of_gen_descend {children = Array.of_list children}
   };
-  for i = 0 to Array.length uobj - 1 do {
-    let u = unions.get i in
+  for i = 0 to Array.length unions - 1 do {
+    let u = unions.(i) in
     let family =
       sort_by_date
         (fun ifam ->
-           Adef.od_of_codate
-             (get_marriage (families.get (Adef.int_of_ifam ifam))))
+           Adef.od_of_codate (get_marriage families.(Adef.int_of_ifam ifam)))
         (Array.to_list (get_family u))
     in
-    unions.set i (union_of_gen_union {family = Array.of_list family})
+    unions.(i) := union_of_gen_union {family = Array.of_list family}
   };
-  for i = 0 to Array.length pobj - 1 do {
-    let p = persons.get i in
-    let a = ascends.get i in
-    let u = unions.get i in
+  for i = 0 to Array.length persons - 1 do {
+    let p = persons.(i) in
+    let a = ascends.(i) in
+    let u = unions.(i) in
     if get_parents a <> None && Array.length (get_family u) != 0 ||
        get_notes p <> string_empty
     then
@@ -2706,10 +2693,10 @@ value finish_base base = do {
         if sou base (get_surname p) = "?" then (string_x, i)
         else (get_surname p, occ)
       in
-      persons.set i
-        (person_of_gen_person
-           {(gen_person_of_person p) with
-            first_name = fn; surname = sn; occ = occ})
+      persons.(i) :=
+        person_of_gen_person
+          {(gen_person_of_person p) with
+           first_name = fn; surname = sn; occ = occ}
     else ()
   };
   check_parents_sex base persons families;
@@ -2890,7 +2877,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
     Gc.compact ();
     let arrays = make_subarrays arrays in
     let base = make_base arrays in
-    finish_base base;
+    finish_base base arrays;
     lock Iobase.lock_file out_file.val with
     [ Accept ->
         do {
