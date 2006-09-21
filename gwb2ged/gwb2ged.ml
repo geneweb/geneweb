@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.10 2006-09-21 03:28:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -557,9 +557,9 @@ value has_personal_infos base per asc =
 ;
 
 value ged_ind_record base sel oc i =
-  let per = base.data.persons.get i in
-  let asc = base.data.ascends.get i in
-  let uni = base.data.unions.get i in
+  let per = poi base (Adef.iper_of_int i) in
+  let asc = aoi base (Adef.iper_of_int i) in
+  let uni = uoi base (Adef.iper_of_int i) in
   if has_personal_infos base per asc then do {
     fprintf oc "0 @I%d@ INDI\n" (i + 1);
     ged_name base oc per;
@@ -577,11 +577,11 @@ value ged_ind_record base sel oc i =
 ;
 
 value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
-  let fam = base.data.families.get i in
+  let fam = foi base (Adef.ifam_of_int i) in
   if is_deleted_family fam then ()
   else do {
-    let cpl = base.data.couples.get i in
-    let des = base.data.descends.get i in
+    let cpl = coi base (Adef.ifam_of_int i) in
+    let des = doi base (Adef.ifam_of_int i) in
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
     ged_marriage base oc fam;
     ged_divorce base oc fam;

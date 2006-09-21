@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.7 2006-09-18 14:29:58 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.8 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1399,7 +1399,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
   let bt = ref IstrTree.empty in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let a =
         try IstrTree.find (get_first_name p) bt.val with [ Not_found -> [] ]
       in
@@ -1447,7 +1447,7 @@ value make_name_index base =
   in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let first_name = p_first_name base p in
       let surname = p_surname base p in
       if first_name <> "?" && surname <> "?" then
@@ -1535,7 +1535,7 @@ value make_strings_of_fsname base =
   let t = Array.create table_size [| |] in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let first_name = p_first_name base p in
       let surname = p_surname base p in
       if first_name <> "?" then add_name t first_name (get_first_name p)

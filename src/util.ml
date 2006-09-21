@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.20 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: util.ml,v 5.21 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -610,17 +610,16 @@ value pget (conf : config) base ip =
        death_src = empty_string; burial = UnknownBurial;
        burial_place = empty_string; burial_src = empty_string;
        notes = empty_string; psources = empty_string; cle_index = ip}
-  else base.data.persons.get (Adef.int_of_iper ip)
+  else poi base ip
 ;
 
 value aget (conf : config) base ip =
-  if is_restricted conf base ip then no_ascend ()
-  else base.data.ascends.get (Adef.int_of_iper ip)
+  if is_restricted conf base ip then no_ascend () else aoi base ip
 ;
 
 value uget (conf : config) base ip =
   if is_restricted conf base ip then union_of_gen_union {family = [| |]}
-  else base.data.unions.get (Adef.int_of_iper ip)
+  else uoi base ip
 ;
 
 value know base p =
@@ -1088,9 +1087,9 @@ value url_no_index conf base =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
         if i >= 0 && i < base.data.families.len then
-          if is_deleted_family (base.data.families.get i) then None
+          if is_deleted_family (foi base (Adef.ifam_of_int i)) then None
           else
-            let cpl = base.data.couples.get i in
+            let cpl = coi base (Adef.ifam_of_int i) in
             let p = pget conf base (get_father cpl) in
             let f = scratch (get_first_name p) in
             let s = scratch (get_surname p) in

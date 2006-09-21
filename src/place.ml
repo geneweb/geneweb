@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: place.ml,v 5.6 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -98,7 +98,7 @@ value get_all conf base =
       let rec loop i =
         if i = base.data.families.len then ()
         else do {
-          let fam = base.data.families.get i in
+          let fam = foi base (Adef.ifam_of_int i) in
           if is_deleted_family fam then ()
           else
             let pl_ma = get_marriage_place fam in

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.10 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1073,7 +1073,7 @@ value mark_connex_components base mark fam =
 value add_small_connex_components base mark =
   for i = 0 to base.data.families.len - 1 do {
     if mark.(i) = ToSeparate then
-      let fam = base.data.families.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
       mark_connex_components base mark fam
     else ()
   }
@@ -1163,8 +1163,8 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
   in
   do {
     for i = 0 to base.data.families.len - 1 do {
-      let fam = base.data.families.get i in
-      let cpl = base.data.couples.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
+      let cpl = coi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else if gen.fam_done.(i) then ()
       else if gen.fam_sel (get_fam_index fam) then

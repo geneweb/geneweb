@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.8 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -473,7 +473,7 @@ value print_add conf base =
   let (fath, moth, digest) =
     match p_getint conf.env "ip" with
     [ Some i ->
-        let p = base.data.persons.get i in
+        let p = poi base (Adef.iper_of_int i) in
         let fath =
           if get_sex p = Male ||
              get_sex p = Neuter && p_getenv conf.env "sex" = Some "M" then
@@ -508,7 +508,7 @@ value print_add conf base =
 value print_add_parents conf base =
   match p_getint conf.env "ip" with
   [ Some i ->
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let fam =
         {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
          witnesses = [| |]; relation = Married; divorce = NotDivorced;
@@ -558,12 +558,12 @@ value rec find_families ifam =
 value print_inv conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam) ->
-      let u = base.data.unions.get ip in
+      let u = uoi base (Adef.iper_of_int ip) in
       match
         find_families (Adef.ifam_of_int ifam) (Array.to_list (get_family u))
       with
       [ Some (ifam1, ifam2) ->
-          let p = base.data.persons.get ip in
+          let p = poi base (Adef.iper_of_int ip) in
           print_inv1 conf base p (foi base ifam1) (foi base ifam2)
       | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]

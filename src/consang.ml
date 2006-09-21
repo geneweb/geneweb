@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.4 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: consang.ml,v 5.5 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -237,7 +237,7 @@ value relationship_and_links base ri b ip1 ip2 =
     in
     let treat_ancestor u =
       let tu = reltab.(u) in
-      let a = base.data.ascends.get u in
+      let a = aoi base (Adef.iper_of_int u) in
       let contribution =
         tu.weight1 *. tu.weight2 -. tu.relationship *. (1.0 +. consang_of a)
       in

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.13 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.14 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -156,3 +156,13 @@ value get_children d = d.Def.children;
 
 value descend_of_gen_descend d = d;
 value gen_descend_of_descend d = d;
+
+value poi base i = base.data.persons.get (Adef.int_of_iper i);
+value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
+value uoi base i = base.data.unions.get (Adef.int_of_iper i);
+
+value foi base i = base.data.families.get (Adef.int_of_ifam i);
+value coi base i = base.data.couples.get (Adef.int_of_ifam i);
+value doi base i = base.data.descends.get (Adef.int_of_ifam i);
+
+value sou base i = base.data.strings.get (Adef.int_of_istr i);

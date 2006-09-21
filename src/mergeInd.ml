@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.17 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.18 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -581,12 +581,12 @@ value error_loop conf base p =
 value print conf base =
   let p1 =
     match p_getint conf.env "i" with
-    [ Some i1 -> Some (base.data.persons.get i1)
+    [ Some i1 -> Some (poi base (Adef.iper_of_int i1))
     | None -> None ]
   in
   let p2 =
     match p_getint conf.env "i2" with
-    [ Some i2 -> Some (base.data.persons.get i2)
+    [ Some i2 -> Some (poi base (Adef.iper_of_int i2))
     | None ->
         match (p_getenv conf.env "select", p_getenv conf.env "n") with
         [ (Some "input" | None, Some n) ->
@@ -595,7 +595,7 @@ value print conf base =
             [ [ip2] -> Some (poi base ip2)
             | _ -> None ]
         | (Some x, Some "" | None) ->
-            Some (base.data.persons.get (int_of_string x))
+            Some (poi base (Adef.iper_of_int (int_of_string x)))
         | _ -> None ] ]
   in
   match (p1, p2) with

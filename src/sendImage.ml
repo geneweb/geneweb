@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 5.2 2006-09-19 18:07:01 ddr Exp $ *)
+(* $Id: sendImage.ml,v 5.3 2006-09-21 03:28:15 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -97,7 +97,7 @@ type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
 value print conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
-      let p = base.data.persons.get ip in
+      let p = poi base (Adef.iper_of_int ip) in
       let fn = p_first_name base p in
       let sn = p_surname base p in
       if sou base (get_image p) <> "" || fn = "?" || sn = "?" then
@@ -149,7 +149,7 @@ value print_delete_image conf base p =
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
-      let p = base.data.persons.get ip in
+      let p = poi base (Adef.iper_of_int ip) in
       if sou base (get_image p) <> "" then incorrect_request conf
       else
         match auto_image_file conf base p with
@@ -311,7 +311,7 @@ value print_send_ok conf base =
       let s = raw_get conf "i" in
       try int_of_string s with [ Failure _ -> incorrect conf ]
     in
-    let p = base.data.persons.get ip in
+    let p = poi base (Adef.iper_of_int ip) in
     let digest = Update.digest_person p in
     if digest = raw_get conf "digest" then
       let file = raw_get conf "file" in
@@ -363,7 +363,7 @@ value print_del_ok conf base =
   try
     match p_getint conf.env "i" with
     [ Some ip ->
-        let p = base.data.persons.get ip in
+        let p = poi base (Adef.iper_of_int ip) in
         effective_delete_ok conf base p
     | None -> incorrect conf ]
   with

@@ -1,18 +1,8 @@
-(* $Id: gutil.ml,v 5.17 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.18 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
-
-value poi base i = base.data.persons.get (Adef.int_of_iper i);
-value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
-value uoi base i = base.data.unions.get (Adef.int_of_iper i);
-
-value foi base i = base.data.families.get (Adef.int_of_ifam i);
-value coi base i = base.data.couples.get (Adef.int_of_ifam i);
-value doi base i = base.data.descends.get (Adef.int_of_ifam i);
-
-value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
 value rindex s c =
   pos (String.length s - 1) where rec pos i =
@@ -624,7 +614,7 @@ value check_noloop base error =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match get_parents (base.data.ascends.get i) with
+          match get_parents (aoi base (Adef.iper_of_int i)) with
           [ Some fam ->
               let fath = get_father (coi base fam) in
               let moth = get_mother (coi base fam) in
@@ -637,7 +627,7 @@ value check_noloop base error =
           | None -> () ];
           tab.(i) := Visited;
         }
-    | BeingVisited -> error (OwnAncestor (base.data.persons.get i))
+    | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
     | Visited -> () ]
   in
   for i = 0 to base.data.persons.len - 1 do {

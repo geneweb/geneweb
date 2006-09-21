@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.7 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: check.ml,v 5.8 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -188,7 +188,7 @@ value check_base_aux base error warning changed_p =
     ProgrBar.start ();
     for i = 0 to base.data.persons.len - 1 do {
       ProgrBar.run i base.data.persons.len;
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       match check_person base error warning p with
       [ Some ippl -> List.iter changed_p ippl
       | None -> () ]
@@ -198,11 +198,11 @@ value check_base_aux base error warning changed_p =
     ProgrBar.start ();
     for i = 0 to base.data.families.len - 1 do {
       ProgrBar.run i base.data.families.len;
-      let fam = base.data.families.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else
-        let cpl = base.data.couples.get i in
-        let des = base.data.descends.get i in
+        let cpl = coi base (Adef.ifam_of_int i) in
+        let des = doi base (Adef.ifam_of_int i) in
         check_family base error warning fam cpl des
     };
     ProgrBar.finish ();
@@ -212,8 +212,8 @@ value check_base_aux base error warning changed_p =
 
 value check_base base error warning def changed_p pr_stats =
   let s =
-    let y = (1000, base.data.persons.get 0) in
-    let o = (0, base.data.persons.get 0) in
+    let y = (1000, poi base (Adef.iper_of_int 0)) in
+    let o = (0, poi base (Adef.iper_of_int 0)) in
     {men = 0; women = 0; neutre = 0; noname = 0; oldest_father = o;
      oldest_mother = o; youngest_father = y; youngest_mother = y;
      oldest_dead = o; oldest_still_alive = o}
@@ -222,7 +222,7 @@ value check_base base error warning def changed_p pr_stats =
   do {
     check_base_aux base error warning changed_p;
     for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       if not (def i) then
         printf "Undefined: %s\n" (designation base p)
       else ();
