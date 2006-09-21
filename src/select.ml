@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: select.ml,v 5.8 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -21,7 +21,7 @@ value is_censored_couple base threshold cpl =
 ;
 
 value censor_person base per_tab fam_tab flag threshold p no_check =
-  let ps = base.data.persons.get p in
+  let ps = poi base (Adef.iper_of_int p) in
   if no_check || is_censored_person threshold ps then
     per_tab.(p) := per_tab.(p) lor flag
   else ()
@@ -29,7 +29,7 @@ value censor_person base per_tab fam_tab flag threshold p no_check =
 
 value rec censor_family base per_tab fam_tab flag threshold i no_check =
   let censor_unions p =
-    let uni = base.data.unions.get p in
+    let uni = uoi base (Adef.iper_of_int p) in
     Array.iter
       (fun ifam ->
          let f = Adef.int_of_ifam ifam in
@@ -40,7 +40,7 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
       (get_family uni)
   in
   let censor_descendants f =
-    let des = base.data.descends.get f in
+    let des = doi base (Adef.ifam_of_int f) in
     Array.iter
       (fun iper ->
          let ip = Adef.int_of_iper iper in
@@ -48,7 +48,7 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
       (get_children des)
   in
   let all_families_censored p =
-    let uni = base.data.unions.get p in
+    let uni = uoi base (Adef.iper_of_int p) in
     Array.fold_left
       (fun check ifam -> fam_tab.(Adef.int_of_ifam ifam) = 0 && check) True
       (get_family uni)
@@ -60,10 +60,10 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
   in
   if fam_tab.(i) <> 0 then ()
   else
-    let fam = base.data.families.get i in
+    let fam = foi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
     else
-      let cpl = base.data.couples.get i in
+      let cpl = coi base (Adef.ifam_of_int i) in
       if no_check || is_censored_couple base threshold cpl then do {
         fam_tab.(i) := fam_tab.(i) lor flag;
         censor_spouse (get_father cpl);
@@ -93,8 +93,8 @@ value restrict_base base per_tab fam_tab flag =
       else ()
     };
     for i = 0 to base.data.families.len - 1 do {
-      let des = base.data.descends.get i in
-      let cpl = base.data.couples.get i in
+      let des = doi base (Adef.ifam_of_int i) in
+      let cpl = coi base (Adef.ifam_of_int i) in
       let des_visible =
         Array.fold_left
           (fun check iper -> check || per_tab.(Adef.int_of_iper iper) = 0)
@@ -318,11 +318,11 @@ value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
 value select_surname base per_tab fam_tab no_spouses_parents surname =
   let surname = Name.strip_lower surname in
   for i = 0 to base.data.families.len - 1 do {
-    let fam = base.data.families.get i in
-    let cpl = base.data.couples.get i in
+    let fam = foi base (Adef.ifam_of_int i) in
+    let cpl = coi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
     else
-      let des = base.data.descends.get i in
+      let des = doi base (Adef.ifam_of_int i) in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
       if Name.strip_lower (sou base (get_surname fath)) = surname ||

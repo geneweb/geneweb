@@ -1,18 +1,8 @@
-(* $Id: gutil.mli,v 5.8 2006-09-20 20:10:12 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.9 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
-
-value poi : base -> iper -> person;
-value aoi : base -> iper -> ascend;
-value uoi : base -> iper -> union;
-
-value foi : base -> ifam -> family;
-value coi : base -> ifam -> couple;
-value doi : base -> ifam -> descend;
-
-value sou : base -> istr -> string;
 
 value decline : char -> string -> string;
 value nominative : string -> string;

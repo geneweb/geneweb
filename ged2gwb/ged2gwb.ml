@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.22 2006-09-21 02:04:46 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.23 2006-09-21 03:28:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2400,7 +2400,7 @@ value check_parents_children base ascends unions couples descends =
             let des = doi base ifam in
             if array_memq (Adef.iper_of_int i) (get_children des) then ()
             else do {
-              let p = base.data.persons.get i in
+              let p = poi base (Adef.iper_of_int i) in
               fprintf log_oc.val
                 "%s is not the child of his/her parents\n"
                 (designation base p);
@@ -2425,7 +2425,7 @@ value check_parents_children base ascends unions couples descends =
         then do {
           fprintf log_oc.val
             "%s is spouse in this family but neither husband nor wife:\n"
-            (designation base (base.data.persons.get i));
+            (designation base (poi base (Adef.iper_of_int i)));
           fprintf log_oc.val "- %s\n"
             (designation base (poi base (get_father cpl)));
           fprintf log_oc.val "- %s\n"
@@ -2481,8 +2481,8 @@ value check_parents_children base ascends unions couples descends =
     };
     for i = 0 to base.data.families.len - 1 do {
       to_delete.val := [];
-      let fam = base.data.families.get i in
-      let cpl = base.data.couples.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
+      let cpl = coi base (Adef.ifam_of_int i) in
       let des = descends.(i) in
       for j = 0 to Array.length (get_children des) - 1 do {
         let a = ascends.(Adef.int_of_iper (get_children des).(j)) in
@@ -2543,7 +2543,7 @@ value string_of_sex =
 
 value check_parents_sex base persons families =
   for i = 0 to base.data.couples.len - 1 do {
-    let cpl = base.data.couples.get i in
+    let cpl = coi base (Adef.ifam_of_int i) in
     let fam = families.(i) in
     let ifath = get_father cpl in
     let imoth = get_mother cpl in

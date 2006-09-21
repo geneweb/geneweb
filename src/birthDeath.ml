@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.10 2006-09-20 20:17:22 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.11 2006-09-21 03:28:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -103,7 +103,7 @@ value select_family conf base get_date find_oldest =
       in
       loop [] q
     else
-      let fam = base.data.families.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
       if Gutil.is_deleted_family fam then loop q len (i + 1)
       else
         match get_date fam with

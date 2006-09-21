@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.7 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.8 2006-09-21 03:28:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -277,13 +277,13 @@ value print_marriage conf base month =
     header conf title;
     print_link_to_welcome conf True;
     for i = 0 to base.data.families.len - 1 do {
-      let fam = base.data.families.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else
         match Adef.od_of_codate (get_marriage fam) with
         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _)
           when d <> 0 && m <> 0 ->
-            let cpl = base.data.couples.get i in
+            let cpl = coi base (Adef.ifam_of_int i) in
             let father = pget conf base (get_father cpl) in
             let mother = pget conf base (get_mother cpl) in
             if m == month &&
@@ -563,7 +563,7 @@ value print_menu_marriage conf base =
     header conf title;
     print_link_to_welcome conf True;
     for i = 0 to base.data.families.len - 1 do {
-      let fam = base.data.families.get i in
+      let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else
         match Adef.od_of_codate (get_marriage fam) with
@@ -577,7 +577,7 @@ value print_menu_marriage conf base =
                 list_aft.val := [(cpl, d.year) :: list_aft.val]
               else ()
             in
-            let cpl = base.data.couples.get i in
+            let cpl = coi base (Adef.ifam_of_int i) in
             if conf.use_restrict then
               let father = pget conf base (get_father cpl) in
               let mother = pget conf base (get_mother cpl) in

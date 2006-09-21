@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.12 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: perso.ml,v 5.13 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -288,7 +288,7 @@ value infinite = 10000;
 
 value make_desc_level_table conf base max_level p =
   let levt = Array.create base.data.persons.len infinite in
-  let get = base.data.unions.get in
+  let get = uoi base in
   let rec fill lev =
     fun
     [ [] -> ()
@@ -303,7 +303,7 @@ value make_desc_level_table conf base max_level p =
                    (fun ipl ifam ->
                       let ipa = get_children (doi base ifam) in
                       Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
-                   ipl (get_family (get (Adef.int_of_iper ip)))
+                   ipl (get_family (get ip))
                }
                else ipl)
             [] ipl

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.16 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.17 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -689,7 +689,7 @@ value print_add o_conf base =
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let k =
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
          get_cle_index p)

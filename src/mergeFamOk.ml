@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.6 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.7 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -72,13 +72,13 @@ value reconstitute conf base fam1 des1 fam2 des2 =
 value print_merge conf base =
   match (p_getint conf.env "i", p_getint conf.env "i2") with
   [ (Some f1, Some f2) ->
-      let fam1 = base.data.families.get f1 in
-      let des1 = base.data.descends.get f1 in
-      let fam2 = base.data.families.get f2 in
-      let des2 = base.data.descends.get f2 in
+      let fam1 = foi base (Adef.ifam_of_int f1) in
+      let des1 = doi base (Adef.ifam_of_int f1) in
+      let fam2 = foi base (Adef.ifam_of_int f2) in
+      let des2 = doi base (Adef.ifam_of_int f2) in
       let (sfam, sdes) = reconstitute conf base fam1 des1 fam2 des2 in
       let digest =
-        Update.digest_family fam1 (base.data.couples.get f1) des1
+        Update.digest_family fam1 (coi base (Adef.ifam_of_int f1)) des1
       in
       let scpl =
         Gutil.map_couple_p conf.multi_parents (UpdateFam.person_key base)
@@ -96,8 +96,8 @@ value print_mod_merge_ok conf base wl cpl des =
     UpdateFamOk.print_family conf base wl cpl des;
     match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
     [ (Some ini1, Some ini2) ->
-        let p1 = base.data.persons.get ini1 in
-        let p2 = base.data.persons.get ini2 in
+        let p1 = poi base (Adef.iper_of_int ini1) in
+        let p2 = poi base (Adef.iper_of_int ini2) in
         do {
           Wserver.wprint "\n";
           html_p conf;
@@ -118,7 +118,7 @@ value print_mod_merge_ok conf base wl cpl des =
 value effective_mod_merge conf base sfam scpl sdes =
   match p_getint conf.env "i2" with
   [ Some i2 ->
-      let fam2 = base.data.families.get i2 in
+      let fam2 = foi base (Adef.ifam_of_int i2) in
       do {
         UpdateFamOk.effective_del conf base fam2;
         let (fam, cpl, des) =

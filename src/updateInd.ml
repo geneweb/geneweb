@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.4 2006-09-19 05:17:40 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.5 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -441,7 +441,7 @@ value print_add conf base =
 value print_mod conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let digest = Update.digest_person p in
       print_update_ind conf base (string_person_of base p) digest
   | _ -> incorrect_request conf ]
@@ -450,7 +450,7 @@ value print_mod conf base =
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       print_del1 conf base (string_person_of base p)
   | _ -> incorrect_request conf ]
 ;

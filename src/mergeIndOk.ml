@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.10 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.11 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -90,8 +90,8 @@ value reconstitute conf base p1 p2 =
 value print_merge conf base =
   match (p_getint conf.env "i1", p_getint conf.env "i2") with
   [ (Some i1, Some i2) ->
-      let p1 = base.data.persons.get i1 in
-      let p2 = base.data.persons.get i2 in
+      let p1 = poi base (Adef.iper_of_int i1) in
+      let p2 = poi base (Adef.iper_of_int i2) in
       let p = reconstitute conf base p1 p2 in
       let digest = Update.digest_person p1 in
       UpdateInd.print_update_ind conf base p digest
@@ -108,8 +108,8 @@ value print_mod_merge_ok conf base wl p =
     Update.print_warnings conf base wl;
     match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
     [ (Some ini1, Some ini2) ->
-        let p1 = base.data.persons.get ini1 in
-        let p2 = base.data.persons.get ini2 in
+        let p1 = poi base (Adef.iper_of_int ini1) in
+        let p2 = poi base (Adef.iper_of_int ini2) in
         do {
           Wserver.wprint "\n";
           html_p conf;
@@ -130,8 +130,8 @@ value print_mod_merge_ok conf base wl p =
 value effective_mod_merge conf base sp =
   match p_getint conf.env "i2" with
   [ Some i2 ->
-      let p2 = base.data.persons.get i2 in
-      let u2 = base.data.unions.get i2 in
+      let p2 = poi base (Adef.iper_of_int i2) in
+      let u2 = uoi base (Adef.iper_of_int i2) in
       let rel_chil = get_related p2 in
       let p2_family = get_family u2 in
       do {

@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.22 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.23 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -156,3 +156,13 @@ value get_children : db_descend 'p -> array 'p;
 
 value descend_of_gen_descend : Def.gen_descend 'p -> db_descend 'p;
 value gen_descend_of_descend : db_descend 'p -> Def.gen_descend 'p;
+
+value poi : base -> iper -> person;
+value aoi : base -> iper -> ascend;
+value uoi : base -> iper -> union;
+
+value foi : base -> ifam -> family;
+value coi : base -> ifam -> couple;
+value doi : base -> ifam -> descend;
+
+value sou : base -> istr -> string;

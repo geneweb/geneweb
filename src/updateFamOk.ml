@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.16 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.17 2006-09-21 03:28:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -868,7 +868,7 @@ value print_del_ok conf base wl =
     print_link_to_welcome conf True;
     match p_getint conf.env "ip" with
     [ Some i ->
-        let p = base.data.persons.get i in
+        let p = poi base (Adef.iper_of_int i) in
         tag "ul" begin
           Wserver.wprint "<li>\n";
           Wserver.wprint "%s\n"
@@ -922,7 +922,8 @@ value print_add o_conf base =
     let digest =
       match p_getint conf.env "ip" with
       [ Some ip ->
-          string_of_int (Array.length (get_family (base.data.unions.get ip)))
+          string_of_int
+            (Array.length (get_family (uoi base (Adef.iper_of_int ip))))
       | None -> "" ]
     in
     let sdigest = raw_get conf "digest" in
@@ -942,10 +943,10 @@ value print_add o_conf base =
             if Adef.int_of_iper (get_mother cpl) = i then
               (mother scpl, i, "af")
             else
-              let a = base.data.ascends.get i in
+              let a = aoi base (Adef.iper_of_int i) in
               match get_parents a with
               [ Some x when x = get_fam_index fam ->
-                  let p = base.data.persons.get i in
+                  let p = poi base (Adef.iper_of_int i) in
                   let key =
                     (sou base (get_first_name p), sou base (get_surname p),
                      get_occ p, Update.Link, "")
@@ -1049,8 +1050,8 @@ value print_mod o_conf base =
 value print_inv conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam) ->
-      let p = base.data.persons.get ip in
-      let u = base.data.unions.get ip in
+      let p = poi base (Adef.iper_of_int ip) in
+      let u = uoi base (Adef.iper_of_int ip) in
       let k =
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
          get_cle_index p)
