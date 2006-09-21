@@ -1,23 +1,15 @@
-(* $Id: gwdb.mli,v 5.24 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.25 2006-09-21 19:13:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
 
-type db_person 'person 'string = 'abstract;
-type db_ascend 'family = 'abstract;
-type db_union 'family = 'abstract;
+type person = 'abstract;
+type ascend = 'abstract;
+type union = 'abstract;
 
-type db_family 'person 'string = 'abstract;
-type db_couple 'person = 'abstract;
-type db_descend 'person = 'abstract;
-
-type person = db_person iper istr;
-type ascend = db_ascend ifam;
-type union = db_union ifam;
-
-type family = db_family iper istr;
-type couple = db_couple iper;
-type descend = db_descend iper;
+type family = 'abstract;
+type couple = 'abstract;
+type descend = 'abstract;
 
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
@@ -89,75 +81,75 @@ type base =
     func : base_func }
 ;
 
-value get_access : db_person 'p 's -> Def.access;
-value get_aliases : db_person 'p 's -> list 's;
-value get_baptism : db_person 'p 's -> codate;
-value get_baptism_place : db_person 'p 's -> 's;
-value get_baptism_src : db_person 'p 's -> 's;
-value get_birth : db_person 'p 's -> codate;
-value get_birth_place : db_person 'p 's -> 's;
-value get_birth_src : db_person 'p 's -> 's;
-value get_burial : db_person 'p 's -> Def.burial;
-value get_burial_place : db_person 'p 's -> 's;
-value get_burial_src : db_person 'p 's -> 's;
-value get_cle_index : db_person 'p 's -> iper;
-value get_death : db_person 'p 's -> Def.death;
-value get_death_place : db_person 'p 's -> 's;
-value get_death_src : db_person 'p 's -> 's;
-value get_first_name : db_person 'p 's -> 's;
-value get_first_names_aliases : db_person 'p 's -> list 's;
-value get_image : db_person 'p 's -> 's;
-value get_notes : db_person 'p 's -> 's;
-value get_occ : db_person 'p 's -> int;
-value get_occupation : db_person 'p 's -> 's;
-value get_psources : db_person 'p 's -> 's;
-value get_public_name : db_person 'p 's -> 's;
-value get_qualifiers : db_person 'p 's -> list 's;
-value get_related : db_person 'p 's -> list iper;
-value get_rparents : db_person 'p 's -> list (Def.gen_relation 'p 's);
-value get_sex : db_person 'p 's -> Def.sex;
-value get_surname : db_person 'p 's -> 's;
-value get_surnames_aliases : db_person 'p 's -> list 's;
-value get_titles : db_person 'p 's -> list (Def.gen_title 's);
+value get_access : person -> Def.access;
+value get_aliases : person -> list istr;
+value get_baptism : person -> codate;
+value get_baptism_place : person -> istr;
+value get_baptism_src : person -> istr;
+value get_birth : person -> codate;
+value get_birth_place : person -> istr;
+value get_birth_src : person -> istr;
+value get_burial : person -> Def.burial;
+value get_burial_place : person -> istr;
+value get_burial_src : person -> istr;
+value get_cle_index : person -> iper;
+value get_death : person -> Def.death;
+value get_death_place : person -> istr;
+value get_death_src : person -> istr;
+value get_first_name : person -> istr;
+value get_first_names_aliases : person -> list istr;
+value get_image : person -> istr;
+value get_notes : person -> istr;
+value get_occ : person -> int;
+value get_occupation : person -> istr;
+value get_psources : person -> istr;
+value get_public_name : person -> istr;
+value get_qualifiers : person -> list istr;
+value get_related : person -> list iper;
+value get_rparents : person -> list relation;
+value get_sex : person -> Def.sex;
+value get_surname : person -> istr;
+value get_surnames_aliases : person -> list istr;
+value get_titles : person -> list title;
 
-value person_of_gen_person : Def.gen_person 'p 's -> db_person 'p 's;
-value gen_person_of_person : db_person 'p 's -> Def.gen_person 'p 's;
+value person_of_gen_person : Def.gen_person iper istr -> person;
+value gen_person_of_person : person -> Def.gen_person iper istr;
 
-value get_parents : db_ascend 'f -> option 'f;
-value get_consang : db_ascend 'f -> Adef.fix;
+value get_parents : ascend -> option ifam;
+value get_consang : ascend -> Adef.fix;
 
-value ascend_of_gen_ascend : Def.gen_ascend 'f -> db_ascend 'f;
-value gen_ascend_of_ascend : db_ascend 'f -> Def.gen_ascend 'f;
+value ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
+value gen_ascend_of_ascend : ascend -> Def.gen_ascend ifam;
 
-value get_family : db_union 'f -> array 'f;
+value get_family : union -> array ifam;
 
-value union_of_gen_union : Def.gen_union 'f -> db_union 'f;
+value union_of_gen_union : Def.gen_union ifam -> union;
 
-value get_comment : db_family 'p 's -> 's;
-value get_divorce : db_family 'p 's -> Def.divorce;
-value get_fam_index : db_family 'p 's -> ifam;
-value get_fsources : db_family 'p 's -> 's;
-value get_marriage : db_family 'p 's -> codate;
-value get_marriage_place : db_family 'p 's -> 's;
-value get_marriage_src : db_family 'p 's -> 's;
-value get_origin_file : db_family 'p 's -> 's;
-value get_relation : db_family 'p 's -> Def.relation_kind;
-value get_witnesses : db_family 'p 's -> array 'p;
+value get_comment : family -> istr;
+value get_divorce : family -> Def.divorce;
+value get_fam_index : family -> ifam;
+value get_fsources : family -> istr;
+value get_marriage : family -> codate;
+value get_marriage_place : family -> istr;
+value get_marriage_src : family -> istr;
+value get_origin_file : family -> istr;
+value get_relation : family -> Def.relation_kind;
+value get_witnesses : family -> array iper;
 
-value family_of_gen_family : Def.gen_family 'p 's -> db_family 'p 's;
-value gen_family_of_family : db_family 'p 's -> Def.gen_family 'p 's;
+value family_of_gen_family : Def.gen_family iper istr -> family;
+value gen_family_of_family : family -> Def.gen_family iper istr;
 
-value get_father : db_couple 'p -> 'p;
-value get_mother : db_couple 'p -> 'p;
-value get_parent_array : db_couple 'p -> array 'p;
+value get_father : couple -> iper;
+value get_mother : couple -> iper;
+value get_parent_array : couple -> array iper;
 
-value gen_couple_of_couple : db_couple 'p -> Def.gen_couple 'p;
-value couple_of_gen_couple : Def.gen_couple 'p -> db_couple 'p;
+value gen_couple_of_couple : couple -> Def.gen_couple iper;
+value couple_of_gen_couple : Def.gen_couple iper -> couple;
 
-value get_children : db_descend 'p -> array 'p;
+value get_children : descend -> array iper;
 
-value descend_of_gen_descend : Def.gen_descend 'p -> db_descend 'p;
-value gen_descend_of_descend : db_descend 'p -> Def.gen_descend 'p;
+value descend_of_gen_descend : Def.gen_descend iper -> descend;
+value gen_descend_of_descend : descend -> Def.gen_descend iper;
 
 value poi : base -> iper -> person;
 value aoi : base -> iper -> ascend;
