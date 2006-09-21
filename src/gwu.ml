@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.10 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.11 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1490,15 +1490,12 @@ value main () =
       else in_file.val ^ ".gwb"
     in
     let src_oc_list = ref [] in
-    let _ = base.data.ascends.array () in
-    let _ = base.data.strings.array () in
+    let () = base.data.ascends.load_array () in
+    let () = base.data.strings.load_array () in
     if not mem.val then
-(*
-      let _ = base.data.families.array () in
-*)
-      let _ = base.data.couples.array () in
-      let _ = base.data.unions.array () in
-      let _ = base.data.descends.array () in
+      let () = base.data.couples.load_array () in
+      let () = base.data.unions.load_array () in
+      let () = base.data.descends.load_array () in
       ()
     else ();
     let out_oc =

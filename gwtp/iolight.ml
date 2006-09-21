@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 5.3 2006-09-17 13:56:19 ddr Exp $ *)
+(* $Id: iolight.ml,v 5.4 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -68,28 +68,26 @@ value input_4_10_array ic pos len =
 
 value make_cache ic shift array_pos patches len name =
   let tab = ref None in
-  let rec r =
-    {array () =
-       match tab.val with
-       [ Some x -> x
-       | None ->
-           do {
-             Printf.eprintf "*** read %s\n" name;
-             flush stderr;
-             do {
-               seek_in ic array_pos;
-               let v =
-                 try input_value ic with
-                 [ Failure _ -> input_4_10_array ic array_pos len ]
-               in
-               let t = apply_patches v patches.val r.len in
-               tab.val := Some t;
-               t
-             }
-           } ];
-     get i = (r.array ()).(i);
-     len = patch_len len patches.val;
-     clear_array = fun _ -> tab.val := None}
+  let rec array () =
+    match tab.val with
+    [ Some x -> x
+    | None -> do {
+        Printf.eprintf "*** read %s\n" name;
+        flush stderr;
+        seek_in ic array_pos;
+        let v =
+          try input_value ic with
+          [ Failure _ -> input_4_10_array ic array_pos len ]
+        in
+        let t = apply_patches v patches.val r.len in
+        tab.val := Some t;
+        t
+      } ]
+  and r =
+    {load_array () = let _ = array () in ();
+     get i = (array ()).(i); set i v = (array ()).(i) := v;
+     len = patch_len len patches.val; array_obj = array;
+     clear_array () = tab.val := None}
   in
   r
 ;

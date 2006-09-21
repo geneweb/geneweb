@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.14 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.15 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -31,9 +31,11 @@ type notes =
 ;
 
 type cache 'a =
-  { array : unit -> array 'a;
+  { load_array : unit -> unit;
     get : int -> 'a;
+    set : int -> 'a -> unit;
     len : mutable int;
+    array_obj : unit -> array 'a;
     clear_array : unit -> unit }
 ;
 
