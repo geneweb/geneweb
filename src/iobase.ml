@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.10 2006-09-21 12:31:12 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.11 2006-09-21 19:30:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -871,7 +871,9 @@ value array_ext phony fa =
       failwith "this is a GeneWeb base, but not compatible; please upgrade"
 ;
 
-value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
+value make_cache ic ic_acc shift array_pos (plenr, patches) len name
+  input_array input_item
+=
   let v_ext v =
     if name = "persons" then ext phony_person v
     else if name = "families" then ext phony_family v
@@ -902,7 +904,7 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
                   seek_in ic_acc (shift + Iovalue.sizeof_long * i);
                   let pos = input_binary_int ic_acc in
                   seek_in ic pos;
-                  let v = Iovalue.input ic in
+                  let v = input_item ic in
                   v_ext v
                 }
               | None -> do {
@@ -923,7 +925,7 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
           else ()
         ELSE () END;
         seek_in ic array_pos;
-        let v = input_value ic in
+        let v = input_array ic in
         let v = v_arr_ext v in
         let t = apply_patches v v_ext patches r.len in
         tab.val := Some t;
@@ -1077,37 +1079,50 @@ value input bname =
   let shift = 0 in
   let persons =
     make_cache ic ic_acc shift persons_array_pos patches.h_person persons_len
-      "persons"
+      "persons" (input_value : _ -> array person)
+      (Iovalue.input : _ -> person)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
     make_cache ic ic_acc shift ascends_array_pos patches.h_ascend persons_len
-      "ascends"
+      "ascends" (input_value : _ -> array ascend)
+      (Iovalue.input : _ -> ascend)
+
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
     make_cache ic ic_acc shift unions_array_pos patches.h_union persons_len
-      "unions"
+      "unions" (input_value : _ -> array union)
+      (Iovalue.input : _ -> union)
+
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
     make_cache ic ic_acc shift families_array_pos patches.h_family
-      families_len "families"
+      families_len "families" (input_value : _ -> array family)
+      (Iovalue.input : _ -> family)
+
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
     make_cache ic ic_acc shift couples_array_pos patches.h_couple
-      families_len "couples"
+      families_len "couples" (input_value : _ -> array couple)
+      (Iovalue.input : _ -> couple)
+
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
     make_cache ic ic_acc shift descends_array_pos patches.h_descend
-      families_len "descends"
+      families_len "descends" (input_value : _ -> array descend)
+      (Iovalue.input : _ -> descend)
+
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
     make_cache ic ic_acc shift strings_array_pos patches.h_string
-      strings_len "strings"
+      strings_len "strings" (input_value : _ -> array string)
+      (Iovalue.input : _ -> string)
+
   in
   let cleanup_ref =
     ref
