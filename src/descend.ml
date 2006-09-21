@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.10 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: descend.ml,v 5.11 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -167,7 +167,7 @@ value display_descendants_upto conf base max_level p line =
              if line = Neuter || line = Male && get_sex p <> Female ||
                 line = Female && get_sex p <> Male || level = 1
              then
-               List.map (pget conf base) (Array.to_list des.children)
+               List.map (pget conf base) (Array.to_list (get_children des))
              else []
            in
            do {
@@ -176,7 +176,7 @@ value display_descendants_upto conf base max_level p line =
                if children <> [] then
                  Wserver.wprint ", <em>%s</em>"
                    (transl conf "having as children")
-               else if Array.length des.children <> 0 then
+               else if Array.length (get_children des) <> 0 then
                  Wserver.wprint ", ..."
                else Wserver.wprint ".";
                Wserver.wprint "\n";
@@ -247,7 +247,7 @@ value display_descendants_level conf base max_level ancestor =
     List.fold_left
       (fun list ifam ->
          let des = doi base ifam in
-         let enfants = des.children in
+         let enfants = get_children des in
          List.fold_left
            (fun list ix ->
               let x = pget conf base ix in
@@ -324,7 +324,7 @@ value mark_descendants conf base marks max_lev ip =
       marks.(Adef.int_of_iper ip) := True;
       Array.iter
         (fun ifam ->
-           let el = (doi base ifam).children in
+           let el = get_children (doi base ifam) in
            Array.iter (fun e -> loop (succ lev) e (uget conf base e)) el)
         (get_family u)
     }
@@ -340,7 +340,7 @@ value label_descendants conf base marks paths max_lev =
           (fun cnt ifam ->
              let des = doi base ifam in
              let c = spouse (get_cle_index p) (coi base ifam) in
-             let el = des.children in
+             let el = get_children des in
              List.fold_left
                (fun cnt e ->
                   do {
@@ -371,7 +371,7 @@ value close_to_end conf base marks max_lev lev p =
         (fun ifam ->
            let des = doi base ifam in
            let c = spouse (get_cle_index p) (coi base ifam) in
-           let el = des.children in
+           let el = get_children des in
            if get_sex p == Male || not marks.(Adef.int_of_iper c) then
              if dlev == close_lev then Array.length el = 0
              else
@@ -392,7 +392,7 @@ value labelled conf base marks max_lev lev ip =
        let cpl = coi base ifam in
        List.exists
          (fun ifam ->
-            let el = (doi base ifam).children in
+            let el = get_children (doi base ifam) in
             List.exists
               (fun ie ->
                  let e = pget conf base ie in
@@ -457,7 +457,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              let fam = foi base ifam in
              let des = doi base ifam in
              let c = spouse (get_cle_index p) (coi base ifam) in
-             let el = des.children in
+             let el = get_children des in
              let c = pget conf base c in
              do {
                if need_br then html_br conf else ();
@@ -487,7 +487,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                  let fam = foi base ifam in
                                  let des = doi base ifam in
                                  let c1 = spouse ie (coi base ifam) in
-                                 let el = des.children in
+                                 let el = get_children des in
                                  let c1 = pget conf base c1 in
                                  do {
                                    if not first then do {
@@ -538,7 +538,7 @@ value print_family conf base marks paths max_lev lev p =
            let fam = foi base ifam in
            let des = doi base ifam in
            let c = spouse (get_cle_index p) (coi base ifam) in
-           let el = des.children in
+           let el = get_children des in
            let c = pget conf base c in
            do {
              stag "strong" begin
@@ -567,7 +567,7 @@ value print_family conf base marks paths max_lev lev p =
                                let fam = foi base ifam in
                                let des = doi base ifam in
                                let c = spouse ie (coi base ifam) in
-                               let el = des.children in
+                               let el = get_children des in
                                let c = pget conf base c in
                                do {
                                  display_spouse conf base marks paths fam e
@@ -604,7 +604,7 @@ value print_families conf base marks paths max_lev =
         (fun ifam ->
            let des = doi base ifam in
            let c = spouse (get_cle_index p) (coi base ifam) in
-           let el = des.children in
+           let el = get_children des in
            let c = pget conf base c in
            if get_sex p == Male ||
               not marks.(Adef.int_of_iper (get_cle_index c))
@@ -858,7 +858,8 @@ value print_someone conf base p =
 
 value children_of conf base ip =
   List.fold_right
-    (fun ifam children -> Array.to_list (doi base ifam).children @ children)
+    (fun ifam children ->
+       Array.to_list (get_children (doi base ifam)) @ children)
     (Array.to_list (get_family (uget conf base ip))) []
 ;
 
@@ -915,11 +916,11 @@ value make_tree_hts conf base gv p =
       List.fold_left (fun n ifam -> fam_nb_column n v (doi base ifam)) n
         (Array.to_list (get_family u))
   and fam_nb_column n v des =
-    if Array.length des.children = 0 then n + 1
+    if Array.length (get_children des) = 0 then n + 1
     else
       List.fold_left
         (fun n iper -> nb_column n (v - 1) (uget conf base iper)) n
-        (Array.to_list des.children)
+        (Array.to_list (get_children des))
   in
   let vertical_bar_txt v tdl po =
     let tdl =
@@ -953,7 +954,7 @@ value make_tree_hts conf base gv p =
                 in
                 let des = doi base ifam in
                 let td =
-                  if Array.length des.children = 0 then
+                  if Array.length (get_children des) = 0 then
                     (1, LeftA, TDnothing)
                   else
                     let ncol = fam_nb_column 0 (v - 1) des in
@@ -982,17 +983,17 @@ value make_tree_hts conf base gv p =
                 in
                 let des = doi base ifam in
                 let tdl =
-                  if Array.length des.children = 0 then
+                  if Array.length (get_children des) = 0 then
                     [(1, LeftA, TDnothing) :: tdl]
-                  else if Array.length des.children = 1 then
-                    let u = uget conf base des.children.(0) in
+                  else if Array.length (get_children des) = 1 then
+                    let u = uget conf base (get_children des).(0) in
                     let ncol = nb_column 0 (v - 1) u in
                     [(2 * ncol - 1, CenterA, TDbar None) :: tdl]
                   else
                     let rec loop tdl i =
-                      if i = Array.length des.children then tdl
+                      if i = Array.length (get_children des) then tdl
                       else
-                        let iper = des.children.(i) in
+                        let iper = (get_children des).(i) in
                         let u = uget conf base iper in
                         let tdl =
                           if i > 0 then
@@ -1003,7 +1004,9 @@ value make_tree_hts conf base gv p =
                         let ncol = nb_column 0 (v - 1) u in
                         let align =
                           if i == 0 then RightA
-                          else if i == Array.length des.children - 1 then
+                          else if
+                            i == Array.length (get_children des) - 1
+                          then
                             LeftA
                           else CenterA
                         in
@@ -1107,13 +1110,13 @@ value make_tree_hts conf base gv p =
                List.fold_right
                  (fun ifam gen ->
                     let des = doi base ifam in
-                    if Array.length des.children = 0 then [None :: gen]
+                    if Array.length (get_children des) = 0 then [None :: gen]
                     else
                       let age_auth =
                         List.for_all
                           (fun ip ->
                              authorized_age conf base (pget conf base ip))
-                          (Array.to_list des.children)
+                          (Array.to_list (get_children des))
                       in
                       List.fold_right
                         (fun iper gen ->
@@ -1122,7 +1125,7 @@ value make_tree_hts conf base gv p =
                               age_auth)
                            in
                            [Some g :: gen])
-                        (Array.to_list des.children) gen)
+                        (Array.to_list (get_children des)) gen)
                  (Array.to_list (get_family u)) gen
          | None -> [None :: gen] ])
       gen []
@@ -1202,11 +1205,11 @@ value print_aboville conf base max_level p =
             else
               let des = doi base (get_family u).(i) in
               let rec loop_chil cnt_chil j =
-                if j == Array.length des.children then
+                if j == Array.length (get_children des) then
                   loop_fam cnt_chil (i + 1)
                 else do {
                   loop_ind (lev + 1) (lab ^ string_of_int cnt_chil ^ ".")
-                    (pget conf base des.children.(j));
+                    (pget conf base (get_children des).(j));
                   loop_chil (cnt_chil + 1) (j + 1)
                 }
               in

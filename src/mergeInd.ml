@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.16 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.17 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -278,7 +278,7 @@ value reparent_ind base ip1 ip2 =
       let des = doi base ifam in
       do {
         let rec replace i =
-          if des.children.(i) = ip2 then des.children.(i) := ip1
+          if (get_children des).(i) = ip2 then (get_children des).(i) := ip1
           else replace (i + 1)
         in
         replace 0;
@@ -435,17 +435,20 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
   in
   do {
     base.func.patch_family (get_fam_index fam1) fam1;
-    let des1 = {children = Array.append des1.children des2.children} in
+    let des1 =
+      descend_of_gen_descend
+        {children = Array.append (get_children des1) (get_children des2)}
+    in
     base.func.patch_descend (get_fam_index fam1) des1;
-    for i = 0 to Array.length des2.children - 1 do {
-      let ip = des2.children.(i) in
+    for i = 0 to Array.length (get_children des2) - 1 do {
+      let ip = (get_children des2).(i) in
       let a =
         ascend_of_gen_ascend
           {parents = Some (get_fam_index fam1); consang = Adef.fix (-1)}
       in
       base.func.patch_ascend ip a;
     };
-    let des2 = {children = [| |]} in
+    let des2 = descend_of_gen_descend {children = [| |]} in
     base.func.patch_descend (get_fam_index fam2) des2;
     UpdateFamOk.effective_del conf base fam2;
   }

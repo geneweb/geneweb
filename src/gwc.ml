@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.17 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.18 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -141,7 +141,7 @@ value no_family gen =
   let cpl =
     couple_of_gen_couple
       (Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0))
-  and des = {children = [| |]} in
+  and des = descend_of_gen_descend {children = [| |]} in
   (cpl, des)
 ;
 
@@ -549,7 +549,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          origin_file = unique_string gen fo.origin_file; fsources = fsources;
          fam_index = Adef.ifam_of_int i}
     and cpl = couple_of_gen_couple (couple False ipere imere)
-    and des = {children = children} in
+    and des = descend_of_gen_descend {children = children} in
     let fath_uni = uoi gen.g_base ipere in
     let moth_uni = uoi gen.g_base imere in
     seek_out gen.g_fam_index (Iovalue.sizeof_long * i);

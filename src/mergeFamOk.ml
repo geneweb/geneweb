@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.6 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -64,7 +64,7 @@ value reconstitute conf base fam1 des1 fam2 des2 =
   let des =
     {children =
        Array.map (UpdateFam.person_key base)
-         (Array.append des1.children des2.children)}
+         (Array.append (get_children des1) (get_children des2))}
   in
   (fam, des)
 ;

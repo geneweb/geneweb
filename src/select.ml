@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: select.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -45,7 +45,7 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
       (fun iper ->
          let ip = Adef.int_of_iper iper in
          if per_tab.(ip) <> 0 then () else censor_unions ip)
-      des.children
+      (get_children des)
   in
   let all_families_censored p =
     let uni = base.data.unions.get p in
@@ -98,7 +98,7 @@ value restrict_base base per_tab fam_tab flag =
       let des_visible =
         Array.fold_left
           (fun check iper -> check || per_tab.(Adef.int_of_iper iper) = 0)
-          False des.children
+          False (get_children des)
       in
       let cpl_not_visible =
         per_tab.(Adef.int_of_iper (get_father cpl)) <> 0 ||
@@ -175,7 +175,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
                     })
                  (get_family (uoi base ip))
              })
-          des.children
+          (get_children des)
       in
       let add_siblings iparent =
         Array.iter
@@ -266,7 +266,7 @@ value select_descendants
                  [ Some ifam -> select_family ifam (coi base ifam)
                  | None -> () ]
                else ();
-               Array.iter (loop (succ lev)) (doi base ifam).children
+               Array.iter (loop (succ lev)) (get_children (doi base ifam))
              })
           (get_family (uoi base iper))
       }
@@ -304,8 +304,8 @@ value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
              fam_tab.(Adef.int_of_ifam ifam) :=
                fam_tab.(Adef.int_of_ifam ifam) lor 1;
              let des = doi base ifam in
-             for i = 0 to Array.length des.children - 1 do {
-               loop des.children.(i);
+             for i = 0 to Array.length (get_children des) - 1 do {
+               loop (get_children des).(i);
              };
            };
            tab.(Adef.int_of_iper ip) := des_mark;
@@ -339,7 +339,7 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
              then
                per_tab.(Adef.int_of_iper ic) := True
              else ())
-          des.children;
+          (get_children des);
         if no_spouses_parents then ()
         else
           List.iter

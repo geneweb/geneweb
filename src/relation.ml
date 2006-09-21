@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.8 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: relation.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -326,7 +326,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
           result @
             List.fold_right
               (fun child children -> [(child, Sibling, ifam) :: children])
-              (Array.to_list (doi base ifam).children) []
+              (Array.to_list (get_children (doi base ifam))) []
         in
         let result =
           result @
@@ -338,7 +338,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                    List.fold_right
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
-                     (Array.to_list (doi base fam).children) children)
+                     (Array.to_list (get_children (doi base fam))) children)
               (Array.to_list (get_family (uget conf base (get_father cpl))))
               []
         in
@@ -352,7 +352,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                    List.fold_right
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
-                     (Array.to_list (doi base fam).children) children)
+                     (Array.to_list (get_children (doi base fam))) children)
               (Array.to_list (get_family (uget conf base (get_mother cpl))))
               []
         in
@@ -369,7 +369,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                mark_fam.(Adef.int_of_ifam ifam) := True;
                List.fold_right
                  (fun child children -> [(child, Child, ifam) :: children])
-                 (Array.to_list (doi base ifam).children)
+                 (Array.to_list (get_children (doi base ifam)))
                  [(get_father cpl, Mate, ifam);
                   (get_mother cpl, Mate, ifam)] @
                  nb
@@ -558,7 +558,7 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
                   else loop2 ipl
               | [] -> loop1 ifaml ]
             in
-            loop2 (Array.to_list (doi base ifam).children)
+            loop2 (Array.to_list (get_children (doi base ifam)))
         | [] -> [] ]
       in
       loop1 (Array.to_list (get_family (uget conf base ip)))

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.6 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: update.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -116,7 +116,7 @@ value update_misc_names_of_family conf base p u =
                        person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip) (nobtit conf base)))
-             [get_mother cpl :: Array.to_list des.children])
+             [get_mother cpl :: Array.to_list (get_children des)])
         (Array.to_list (get_family u))
   | _ -> () ]
 ;
@@ -257,7 +257,7 @@ value print_warning conf base =
                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
                  Wserver.wprint "\n"
                })
-            des.children;
+            (get_children des);
         end;
         Wserver.wprint "</ul>"
       }

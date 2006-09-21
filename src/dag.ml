@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: dag.ml,v 5.6 2006-09-21 02:04:47 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -111,7 +111,7 @@ value make_dag conf base set =
                 Array.fold_left
                   (fun chil ip ->
                      try [M.find ip map :: chil] with [ Not_found -> chil ])
-                  chil des.children)
+                  chil (get_children des))
              [] (get_family u)
          in
          let chil = List.rev chil in

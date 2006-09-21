@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.11 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: perso.ml,v 5.12 2006-09-21 02:04:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -15,7 +15,9 @@ value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
 value has_children base u =
   List.exists
-    (fun ifam -> let des = doi base ifam in Array.length des.children > 0)
+    (fun ifam ->
+       let des = doi base ifam in
+       Array.length (get_children des) > 0)
     (Array.to_list (get_family u))
 ;
 
@@ -299,7 +301,7 @@ value make_desc_level_table conf base max_level p =
                  levt.(Adef.int_of_iper ip) := lev;
                  Array.fold_left
                    (fun ipl ifam ->
-                      let ipa = (doi base ifam).children in
+                      let ipa = get_children (doi base ifam) in
                       Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
                    ipl (get_family (get (Adef.int_of_iper ip)))
                }
@@ -1688,11 +1690,11 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
   | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
   | "has_children" ->
       match get_env "fam" env with
-      [ Vfam _ _ des _ -> Array.length des.children > 0
+      [ Vfam _ _ des _ -> Array.length (get_children des) > 0
       | _ ->
           List.exists
             (fun ifam ->
-             let des = doi base ifam in Array.length des.children > 0)
+             let des = doi base ifam in Array.length (get_children des) > 0)
           (Array.to_list (get_family u)) ]
   | "has_consanguinity" ->
       p_auth && get_consang a != Adef.fix (-1) && get_consang a != Adef.fix 0
@@ -1731,7 +1733,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       else p_auth && (get_rparents p <> [] || get_related p <> [])
   | "has_siblings" ->
       match get_parents a with
-      [ Some ifam -> Array.length (doi base ifam).children > 1
+      [ Some ifam -> Array.length (get_children (doi base ifam)) > 1
       | None -> False ]
   | "has_sources" ->
       if conf.hide_names && not p_auth then False
@@ -1888,8 +1890,9 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
               let u = uget conf base (get_cle_index p) in
               for i = 0 to Array.length (get_family u) - 1 do {
                 let des = doi base (get_family u).(i) in
-                for i = 0 to Array.length des.children - 1 do {
-                  mark_descendants (len + 1) (pget conf base des.children.(i))
+                for i = 0 to Array.length (get_children des) - 1 do {
+                  mark_descendants (len + 1)
+                  (pget conf base (get_children des).(i))
                 }
               }
             }
@@ -1919,12 +1922,13 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       else ""
   | "nb_children" ->
       match get_env "fam" env with
-      [ Vfam _ _ des _ -> string_of_int (Array.length des.children)
+      [ Vfam _ _ des _ -> string_of_int (Array.length (get_children des))
       | _ ->
           let n =
             List.fold_left
-              (fun n ifam -> n + Array.length (doi base ifam).children) 0
-              (Array.to_list (get_family u))
+              (fun n ifam ->
+                 n + Array.length (get_children (doi base ifam)))
+              0 (Array.to_list (get_family u))
           in
           string_of_int n ]
   | "nb_families" -> string_of_int (Array.length (get_family u))
@@ -2402,7 +2406,7 @@ value print_foreach conf base print_ast eval_expr =
     [ Vfam _ _ des _ ->
         let auth =
           List.for_all (fun ip -> authorized_age conf base (pget conf base ip))
-            (Array.to_list des.children)
+            (Array.to_list (get_children des))
         in
         let env = [("auth", Vbool auth) :: env] in
         let n =
@@ -2412,8 +2416,8 @@ value print_foreach conf base print_ast eval_expr =
             | _ -> assert False ]
           in
           let rec loop i =
-            if i = Array.length des.children then -2
-            else if des.children.(i) = get_cle_index p then i
+            if i = Array.length (get_children des) then -2
+            else if (get_children des).(i) = get_cle_index p then i
             else loop (i + 1)
           in
           loop 0
@@ -2439,7 +2443,7 @@ value print_foreach conf base print_ast eval_expr =
                (p, a, u, p_auth)
              in
              List.iter (print_ast env ep) al)
-          des.children
+          (get_children des)
     | _ -> () ]
   and print_foreach_descendant_level env al ep =
     let max_level =
