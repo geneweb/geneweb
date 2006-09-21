@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.21 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: util.ml,v 5.22 2006-09-21 12:27:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2037,8 +2037,8 @@ value find_sosa_ref conf base =
 value create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   [ Some "no_tsfile" ->
-      let _ = base.data.ascends.array () in
-      let _ = base.data.couples.array () in
+      let () = base.data.ascends.load_array () in
+      let () = base.data.couples.load_array () in
       Consang.topological_sort base (aget conf)
   | Some "no_tstab" -> Array.create base.data.persons.len 0
   | _ ->
@@ -2066,8 +2066,8 @@ value create_topological_sort conf base =
           match r with
           [ Some tstab -> tstab
           | None ->
-              let _ = base.data.ascends.array () in
-              let _ = base.data.couples.array () in
+              let () = base.data.ascends.load_array () in
+              let () = base.data.couples.load_array () in
               let tstab = Consang.topological_sort base (aget conf) in
               do {
                 if conf.use_restrict then
@@ -2086,8 +2086,8 @@ value create_topological_sort conf base =
                 tstab
               } ]
       | Refuse ->
-          let _ = base.data.ascends.array () in
-          let _ = base.data.couples.array () in
+          let () = base.data.ascends.load_array () in
+          let () = base.data.couples.load_array () in
           Consang.topological_sort base (aget conf) ] ]
 ;
 
