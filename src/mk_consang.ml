@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.2 2006-09-22 12:40:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -61,13 +61,13 @@ value main () =
             exit 2
           } ]
     in
-    lock (Iobase.lock_file fname.val) with
+    lock (Gutil.lock_file fname.val) with
     [ Accept -> f ()
     | Refuse ->
         do {
           Printf.eprintf "Base is locked. Waiting... ";
           flush stderr;
-          lock_wait (Iobase.lock_file fname.val) with
+          lock_wait (Gutil.lock_file fname.val) with
           [ Accept -> do { Printf.eprintf "Ok\n"; flush stderr; f () }
           | Refuse ->
               do {

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.18 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.19 2006-09-22 12:40:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1411,6 +1411,24 @@ value input_lexicon lang ht open_fname =
   [ Sys_error _ -> () ]
 ;
 
+value input_particles fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop [] 0 where rec loop list len =
+        match try Some (input_char ic) with [ End_of_file -> None ] with
+        [ Some '_' -> loop list (Buff.store len ' ')
+        | Some '\n' ->
+            loop (if len = 0 then list else [Buff.get len :: list]) 0
+        | Some '\r' -> loop list len
+        | Some c -> loop list (Buff.store len c)
+        | None ->
+            do {
+              close_in ic;
+              List.rev (if len = 0 then list else [Buff.get len :: list])
+            } ]
+  | None -> [] ]
+;
+
 value remove_file f = try Sys.remove f with [ Sys_error _ -> () ];
 value rec remove_dir d =
   do {
@@ -1433,4 +1451,13 @@ value mkdir_p x =
       if y <> x && String.length y < String.length x then loop y else ();
       try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
     }
+;
+
+value lock_file bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then
+      Filename.chop_suffix bname ".gwb"
+    else bname
+  in
+  bname ^ ".lck"
 ;

@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.13 2006-09-22 07:12:57 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.14 2006-09-22 12:40:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1007,30 +1007,14 @@ value patches_of_patches_ht patches =
   }
 ;
 
-value input_particles fname =
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      loop [] 0 where rec loop list len =
-        match try Some (input_char ic) with [ End_of_file -> None ] with
-        [ Some '_' -> loop list (Buff.store len ' ')
-        | Some '\n' ->
-            loop (if len = 0 then list else [Buff.get len :: list]) 0
-        | Some '\r' -> loop list len
-        | Some c -> loop list (Buff.store len c)
-        | None ->
-            do {
-              close_in ic;
-              List.rev (if len = 0 then list else [Buff.get len :: list])
-            } ]
-  | None -> [] ]
-;
-
 value input bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let patches = input_patches bname in
-  let particles = input_particles (Filename.concat bname "particles.txt") in
+  let particles =
+    Gutil.input_particles (Filename.concat bname "particles.txt")
+  in
   let ic =
     let ic = Secure.open_in_bin (Filename.concat bname "base") in
     do { check_magic ic; ic }
