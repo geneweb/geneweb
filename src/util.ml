@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.23 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: util.ml,v 5.24 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -507,7 +507,7 @@ value nobtit conf base p =
 ;
 
 value parent_has_title conf base p =
-  let a = aoi base (get_cle_index p) in
+  let a = aoi base (get_key_index p) in
   match get_parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -539,7 +539,7 @@ value authorized_age conf base p =
     | (None, None, DontKnowIfDead, None) ->
         get_access p <> Private && conf.public_if_no_date
     | _ ->
-        let u = uoi base (get_cle_index p) in
+        let u = uoi base (get_key_index p) in
         let rec loop i =
           if i >= Array.length (get_family u) then False
           else
@@ -609,7 +609,7 @@ value pget (conf : config) base ip =
        death = DontKnowIfDead; death_place = empty_string;
        death_src = empty_string; burial = UnknownBurial;
        burial_place = empty_string; burial_src = empty_string;
-       notes = empty_string; psources = empty_string; cle_index = ip}
+       notes = empty_string; psources = empty_string; key_index = ip}
   else poi base ip
 ;
 
@@ -649,7 +649,7 @@ value acces_n conf base n x =
       (if get_occ x > 0 then ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
        else "")
   else
-    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_cle_index x)) ^
+    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_key_index x)) ^
     (if conf.wizard && get_occ x > 0 then
        ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
@@ -1704,7 +1704,7 @@ value specify_homonymous conf base p =
       Wserver.wprint "%s <em>%s</em>" (p_first_name base p) (sou base nn)
   | (n, []) when sou base n <> "" -> Wserver.wprint "%s" (sou base n)
   | (_, []) ->
-      let a = aget conf base (get_cle_index p) in
+      let a = aget conf base (get_key_index p) in
       let ifam =
         match get_parents a with
         [ Some ifam ->
@@ -1722,12 +1722,12 @@ value specify_homonymous conf base p =
       in
       match ifam with
       [ Some (None, None) | None ->
-          let u = uget conf base (get_cle_index p) in
+          let u = uget conf base (get_key_index p) in
           let rec loop i =
             if i < Array.length (get_family u) then
               let des = doi base (get_family u).(i) in
               let conjoint =
-                spouse (get_cle_index p) (coi base (get_family u).(i))
+                spouse (get_key_index p) (coi base (get_family u).(i))
               in
               let ct = get_children des in
               if Array.length ct > 0 then
@@ -2260,21 +2260,21 @@ value wprint_hidden_person conf base pref p =
   }
   else
     wprint_hidden conf pref "i"
-      (string_of_int (Adef.int_of_iper (get_cle_index p)))
+      (string_of_int (Adef.int_of_iper (get_key_index p)))
 ;
 
 exception Ok;
 
 value has_nephews_or_nieces conf base p =
   try
-    let a = aget conf base (get_cle_index p) in
+    let a = aget conf base (get_key_index p) in
     match get_parents a with
     [ Some ifam ->
         let des = doi base ifam in
         do {
           Array.iter
             (fun ip ->
-               if ip == get_cle_index p then ()
+               if ip == get_key_index p then ()
                else
                  Array.iter
                    (fun ifam ->

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.11 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -277,7 +277,7 @@ value ged_adoption base (per_sel, fam_sel) oc per r =
   if sel then do {
     fprintf oc "1 ADOP Y\n";
     adop_fam_list.val :=
-      [(r.r_fath, r.r_moth, get_cle_index per) :: adop_fam_list.val];
+      [(r.r_fath, r.r_moth, get_key_index per) :: adop_fam_list.val];
     incr adop_fam_cnt;
     fprintf oc "2 FAMC @F%d@\n"
       (base.data.families.len + adop_fam_cnt.val);
@@ -464,7 +464,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
            List.iter
              (fun ifam ->
                 let fam = foi base ifam in
-                if array_memq (get_cle_index per) (get_witnesses fam) then
+                if array_memq (get_key_index per) (get_witnesses fam) then
                   ged_witness fam_sel oc ifam
                 else ())
              (Array.to_list (get_family (uoi base ic)))

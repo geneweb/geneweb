@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.17 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.18 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -454,7 +454,7 @@ value effective_mod conf base sfam scpl sdes =
               person_of_gen_person
                 {(gen_person_of_person nfath) with sex = Male}
             in
-            base.func.patch_person (get_cle_index nfath) nfath;
+            base.func.patch_person (get_key_index nfath) nfath;
             nfath
           } ]
       in
@@ -467,7 +467,7 @@ value effective_mod conf base sfam scpl sdes =
               person_of_gen_person
                 {(gen_person_of_person nmoth) with sex = Female}
             in
-            base.func.patch_person (get_cle_index nmoth) nmoth;
+            base.func.patch_person (get_key_index nmoth) nmoth;
             nmoth
           } ]
       in
@@ -662,7 +662,7 @@ value effective_add conf base sfam scpl sdes =
                ascend_of_gen_ascend
                  {parents = Some fi; consang = Adef.fix (-1)}
              in
-             base.func.patch_ascend (get_cle_index p) a ])
+             base.func.patch_ascend (get_key_index p) a ])
       (get_children ndes);
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
@@ -978,7 +978,7 @@ value print_del conf base =
         in
         let p = poi base ip in
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_cle_index p)
+         get_key_index p)
       in
       do {
         if not (is_deleted_family fam) then do {
@@ -1054,11 +1054,11 @@ value print_inv conf base =
       let u = uoi base (Adef.iper_of_int ip) in
       let k =
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_cle_index p)
+         get_key_index p)
       in
       try
         do {
-          effective_inv conf base (get_cle_index p) u (Adef.ifam_of_int ifam);
+          effective_inv conf base (get_key_index p) u (Adef.ifam_of_int ifam);
           Util.commit_patches conf base;
           History.record conf base k "if";
           print_inv_ok conf base p

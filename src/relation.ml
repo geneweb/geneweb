@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: relation.ml,v 5.10 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -452,8 +452,8 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
 ;
 
 value print_shortest_path conf base p1 p2 =
-  let ip1 = get_cle_index p1 in
-  let ip2 = get_cle_index p2 in
+  let ip1 = get_key_index p1 in
+  let ip2 = get_key_index p2 in
   if ip1 = ip2 then do {
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "relationship"))
@@ -484,7 +484,7 @@ value print_shortest_path conf base p1 p2 =
                   [ Some n -> n
                   | None -> 0 ]
                 in
-                let u = uget conf base (get_cle_index p) in
+                let u = uget conf base (get_key_index p) in
                 let list =
                   if n < Array.length (get_family u) then
                     [(get_family u).(n) :: list]
@@ -563,7 +563,7 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
       in
       loop1 (Array.to_list (get_family (uget conf base ip)))
   in
-  loop (get_cle_index anc) x
+  loop (get_key_index anc) x
 ;
 
 value parents_label conf base info =
@@ -753,8 +753,8 @@ value nephew_label conf x p =
 ;
 
 value same_parents conf base p1 p2 =
-  get_parents (aget conf base (get_cle_index p1)) =
-  get_parents (aget conf base (get_cle_index p2))
+  get_parents (aget conf base (get_key_index p1)) =
+  get_parents (aget conf base (get_key_index p2))
 ;
 
 value print_link_name conf base n p1 p2 sol =
@@ -1029,13 +1029,13 @@ value print_dag_links conf base p1 p2 rl =
          List.fold_left
            (fun anc_map (p, n) ->
               let (pp1, pp2, nn, nt, maxlev) =
-                try M.find (get_cle_index p) anc_map with
+                try M.find (get_key_index p) anc_map with
                 [ Not_found -> (pp1, pp2, 0, 0, 0) ]
               in
               if nn >= max_br then anc_map
               else
                 let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
-                M.add (get_cle_index p) v anc_map)
+                M.add (get_key_index p) v anc_map)
            anc_map list)
       M.empty rl
   in
@@ -1084,7 +1084,7 @@ value print_dag_links conf base p1 p2 rl =
                (fun (l1, l2) (_, _, (x1, x2, list), _) ->
                   List.fold_left
                     (fun (l1, l2) (a, _) ->
-                       if get_cle_index a = ip then
+                       if get_key_index a = ip then
                          let l1 = if List.mem x1 l1 then l1 else [x1 :: l1] in
                          let l2 = if List.mem x2 l2 then l2 else [x2 :: l2] in
                          (l1, l2)
@@ -1213,13 +1213,13 @@ value compute_simple_relationship conf base tstab ip1 ip2 =
 ;
 
 value known_spouses_list conf base p excl_p =
-  let u = uget conf base (get_cle_index p) in
+  let u = uget conf base (get_key_index p) in
   List.fold_left
     (fun spl ifam ->
-       let sp = pget conf base (spouse (get_cle_index p) (coi base ifam)) in
+       let sp = pget conf base (spouse (get_key_index p) (coi base ifam)) in
        if sou base (get_first_name sp) <> "?" &&
           sou base (get_surname sp) <> "?" &&
-          get_cle_index sp <> get_cle_index excl_p
+          get_key_index sp <> get_key_index excl_p
        then
          [sp :: spl]
        else spl)
@@ -1247,8 +1247,8 @@ value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
        List.fold_right
          (fun p2 sl ->
             let sol =
-              compute_simple_relationship conf base tstab (get_cle_index p1)
-                (get_cle_index p2)
+              compute_simple_relationship conf base tstab (get_key_index p1)
+                (get_key_index p2)
             in
             match sol with
             [ Some (rl, total, _, reltab) ->
@@ -1263,8 +1263,8 @@ value sp p = Some p;
 value no_sp p = None;
 
 value compute_relationship conf base by_marr p1 p2 =
-  let ip1 = get_cle_index p1 in
-  let ip2 = get_cle_index p2 in
+  let ip1 = get_key_index p1 in
+  let ip2 = get_key_index p2 in
   if ip1 == ip2 then None
   else
     (* optimization to be used 1/ if database not too big or 2/ running
@@ -1320,7 +1320,7 @@ value compute_relationship conf base by_marr p1 p2 =
 ;
 
 value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
-  let ip = get_cle_index a in
+  let ip = get_key_index a in
   let sp1 =
     match pp1 with
     [ Some _ -> Some p1
@@ -1341,8 +1341,8 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
     [ Some p2 -> p2
     | _ -> p2 ]
   in
-  let ip1 = get_cle_index p1 in
-  let ip2 = get_cle_index p2 in
+  let ip1 = get_key_index p1 in
+  let ip2 = get_key_index p2 in
   let dist = RelationLink.make_dist_tab conf base ip (max l1 l2 + 1) in
   let b1 = RelationLink.find_first_branch conf base dist ip l1 ip1 Neuter in
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
@@ -1419,7 +1419,7 @@ value print_main_relationship conf base long p1 p2 rel =
     | Some x -> conf.senv := conf.senv @ [("color", code_varenv x)] ];
     match rel with
     [ None ->
-        if get_cle_index p1 == get_cle_index p2 then
+        if get_key_index p1 == get_key_index p2 then
           Wserver.wprint "%s\n"
             (capitale (transl conf "it is the same person!"))
         else
@@ -1429,8 +1429,8 @@ value print_main_relationship conf base long p1 p2 rel =
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]))
     | Some (rl, total, relationship) ->
-        let a1 = aget conf base (get_cle_index p1) in
-        let a2 = aget conf base (get_cle_index p2) in
+        let a1 = aget conf base (get_key_index p1) in
+        let a2 = aget conf base (get_key_index p2) in
         let all_by_marr =
           List.for_all
             (fun
@@ -1488,14 +1488,14 @@ value multi_relation_next_txt conf pl2 lim assoc_txt =
           (fun (sl, n) p ->
              let sl =
                try
-                 let t = Hashtbl.find assoc_txt (get_cle_index p) in
+                 let t = Hashtbl.find assoc_txt (get_key_index p) in
                  [";t"; string_of_int n; "="; t :: sl]
                with
                [ Not_found -> sl ]
              in
              let sl =
                [";i"; string_of_int n; "=";
-                string_of_int (Adef.int_of_iper (get_cle_index p)) :: sl]
+                string_of_int (Adef.int_of_iper (get_key_index p)) :: sl]
              in
              (sl, n - 1))
           (sl, List.length pl2) (List.rev pl2)
@@ -1538,8 +1538,8 @@ value print_multi_relation conf base pl lim assoc_txt =
     loop [] pl1 where rec loop path =
       fun
       [ [p1 :: ([p2 :: _] as pl)] ->
-          let ip1 = get_cle_index p1 in
-          let ip2 = get_cle_index p2 in
+          let ip1 = get_key_index p1 in
+          let ip2 = get_key_index p2 in
           match get_shortest_path_relation conf base ip1 ip2 [] with
           [ Some (path1, _) ->
               let path =
@@ -1559,7 +1559,7 @@ value print_multi_relation conf base pl lim assoc_txt =
     let elem_txt p =
       Dag.Item p
         (try
-           let t = Hashtbl.find assoc_txt (get_cle_index p) in
+           let t = Hashtbl.find assoc_txt (get_key_index p) in
            "<b>(" ^ t ^ ")</b>"
          with
          [ Not_found -> "" ])
@@ -1614,7 +1614,7 @@ value print_multi conf base =
       [ Some p ->
           do {
             match p_getenv conf.env ("t" ^ k) with
-            [ Some x -> Hashtbl.add assoc_txt (get_cle_index p) x
+            [ Some x -> Hashtbl.add assoc_txt (get_key_index p) x
             | None -> () ];
             loop [p :: pl] (i + 1)
           }

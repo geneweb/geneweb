@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.8 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.9 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -455,7 +455,7 @@ value print_inv1 conf base p fam1 fam2 =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper (get_cle_index p));
+          (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"hidden\" name=\"f\" value=\"%d\""
           (Adef.int_of_ifam (get_fam_index fam2));
         xtag "input" "type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"";
@@ -477,18 +477,18 @@ value print_add conf base =
         let fath =
           if get_sex p = Male ||
              get_sex p = Neuter && p_getenv conf.env "sex" = Some "M" then
-            person_key base (get_cle_index p)
+            person_key base (get_key_index p)
           else ("", "", 0, Update.Create Male None, "")
         in
         let moth =
           if get_sex p = Female ||
              get_sex p = Neuter && p_getenv conf.env "sex" = Some "F" then
-            person_key base (get_cle_index p)
+            person_key base (get_key_index p)
           else ("", "", 0, Update.Create Female None, "")
         in
         let digest =
           string_of_int
-            (Array.length (get_family (uoi base (get_cle_index p))))
+            (Array.length (get_family (uoi base (get_key_index p))))
         in
         (fath, moth, digest)
     | None ->

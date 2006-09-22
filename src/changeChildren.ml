@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.6 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.7 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -12,7 +12,7 @@ value print_child_person conf base p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
   let occ = get_occ p in
-  let var = "c" ^ string_of_int (Adef.int_of_iper (get_cle_index p)) in
+  let var = "c" ^ string_of_int (Adef.int_of_iper (get_key_index p)) in
   tag "table" "border=\"1\"" begin
     tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
@@ -109,7 +109,7 @@ value print_change conf base p u =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\""
-          (Adef.int_of_iper (get_cle_index p));
+          (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\"";
       end;
@@ -193,7 +193,7 @@ value check_conflict conf base p key new_occ ipl =
   List.iter
     (fun ip ->
        let p1 = poi base ip in
-       if get_cle_index p1 <> get_cle_index p &&
+       if get_key_index p1 <> get_key_index p &&
           Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
             name &&
           get_occ p1 = new_occ then
@@ -228,7 +228,7 @@ value rename_image_file conf base p (nfn, nsn, noc) =
 
 value change_child conf base parent_surname ip =
   let p = poi base ip in
-  let var = "c" ^ string_of_int (Adef.int_of_iper (get_cle_index p)) in
+  let var = "c" ^ string_of_int (Adef.int_of_iper (get_key_index p)) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
     [ Some x -> only_printable x
@@ -262,10 +262,10 @@ value change_child conf base parent_surname ip =
          surname = Update.insert_string base new_surname;
          occ = new_occ}
     in
-    base.func.patch_person (get_cle_index p) p;
-    person_ht_add base key (get_cle_index p);
+    base.func.patch_person (get_key_index p) p;
+    person_ht_add base key (get_key_index p);
     let np_misc_names = person_misc_names base p (nobtit conf base) in
-    List.iter (fun key -> person_ht_add base key (get_cle_index p))
+    List.iter (fun key -> person_ht_add base key (get_key_index p))
       np_misc_names;
   }
   else ()
@@ -281,7 +281,7 @@ value print_change_ok conf base p u =
       Util.commit_patches conf base;
       let key =
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_cle_index p)
+         get_key_index p)
       in
       History.record conf base key "cn";
       print_change_done conf base p u;

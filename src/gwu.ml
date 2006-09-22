@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.11 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -297,15 +297,15 @@ type gen =
 ;
 
 value print_parent oc base gen fam p =
-  let a = aoi base (get_cle_index p) in
+  let a = aoi base (get_key_index p) in
   let has_printed_parents =
     match get_parents a with
     [ Some ifam -> gen.fam_sel ifam
     | None -> False ]
   in
   let first_parent_definition =
-    if gen.mark.(Adef.int_of_iper (get_cle_index p)) then False
-    else do { gen.mark.(Adef.int_of_iper (get_cle_index p)) := True; True }
+    if gen.mark.(Adef.int_of_iper (get_key_index p)) then False
+    else do { gen.mark.(Adef.int_of_iper (get_key_index p)) := True; True }
   in
   let pr = not has_printed_parents && first_parent_definition in
   let has_infos = if pr then has_infos base p else False in
@@ -386,16 +386,16 @@ value empty_family base m =
 ;
 
 value print_witness oc base gen p =
-  let a = aoi base (get_cle_index p) in
-  let u = uoi base (get_cle_index p) in
+  let a = aoi base (get_key_index p) in
+  let u = uoi base (get_key_index p) in
   do {
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
     if Array.length (get_family u) = 0 && get_parents a = None &&
-       not gen.mark.(Adef.int_of_iper (get_cle_index p))
+       not gen.mark.(Adef.int_of_iper (get_key_index p))
     then do {
-      gen.mark.(Adef.int_of_iper (get_cle_index p)) := True;
+      gen.mark.(Adef.int_of_iper (get_key_index p)) := True;
       if has_infos base p then print_infos oc base False "" "" p
       else fprintf oc " 0";
       match sou base (get_notes p) with
@@ -485,7 +485,7 @@ value print_family oc base gen m =
           fprintf oc "beg\n";
           Array.iter
             (fun p ->
-               if gen.per_sel (get_cle_index p) then
+               if gen.per_sel (get_key_index p) then
                  print_child oc base fam_surname csrc cbp p
                else ())
             m.m_chil;
@@ -500,14 +500,14 @@ value get_persons_with_notes base m list =
   let moth = m.m_moth in
   let list =
     match
-      (sou base (get_notes fath), get_parents (aoi base (get_cle_index fath)))
+      (sou base (get_notes fath), get_parents (aoi base (get_key_index fath)))
     with
     [ ("", _) | (_, Some _) -> list
     | _ -> [fath :: list] ]
   in
   let list =
     match
-      (sou base (get_notes moth), get_parents (aoi base (get_cle_index moth)))
+      (sou base (get_notes moth), get_parents (aoi base (get_key_index moth)))
     with
     [ ("", _) | (_, Some _) -> list
     | _ -> [moth :: list] ]
@@ -613,8 +613,8 @@ value rec list_memf f x =
   | [a :: l] -> f x a || list_memf f x l ]
 ;
 
-value eq_key p1 p2 = get_cle_index p1 == get_cle_index p2;
-value eq_key_fst (p1, _) (p2, _) = get_cle_index p1 == get_cle_index p2;
+value eq_key p1 p2 = get_key_index p1 == get_key_index p2;
+value eq_key_fst (p1, _) (p2, _) = get_key_index p1 == get_key_index p2;
 
 value print_notes oc base gen ml =
   let pl = List.fold_right (get_persons_with_notes base) ml gen.notes_pl_p in
@@ -624,20 +624,20 @@ value print_notes oc base gen ml =
   in
   List.iter
     (fun p ->
-       if gen.per_sel (get_cle_index p) then
+       if gen.per_sel (get_key_index p) then
          print_notes_for_person oc base gen p
        else ())
     pl
 ;
 
 value is_isolated base p =
-  match get_parents (aoi base (get_cle_index p)) with
+  match get_parents (aoi base (get_key_index p)) with
   [ Some _ -> False
-  | None -> Array.length (get_family (uoi base (get_cle_index p))) = 0 ]
+  | None -> Array.length (get_family (uoi base (get_key_index p))) = 0 ]
 ;
 
 value is_definition_for_parent base p =
-  match get_parents (aoi base (get_cle_index p)) with
+  match get_parents (aoi base (get_key_index p)) with
   [ Some _ -> False
   | None -> True ]
 ;
@@ -648,10 +648,10 @@ value get_isolated_related base m list =
     if List.mem_assq p list then list
     else if is_isolated base p then
       match get_rparents p with
-      [ [{r_fath = Some x} :: _] when x = get_cle_index p_relation ->
+      [ [{r_fath = Some x} :: _] when x = get_key_index p_relation ->
           list @ [(p, True)]
       | [{r_fath = None; r_moth = Some x} :: _]
-        when x = get_cle_index p_relation ->
+        when x = get_key_index p_relation ->
           list @ [(p, True)]
       | _ -> list ]
     else list
@@ -679,14 +679,14 @@ value get_persons_with_relations base m list =
   let moth = m.m_moth in
   let list =
     match
-      (get_rparents fath, get_parents (aoi base (get_cle_index fath)))
+      (get_rparents fath, get_parents (aoi base (get_key_index fath)))
     with
     [ ([], _) | (_, Some _) -> list
     | _ -> [(fath, False) :: list] ]
   in
   let list =
     match
-      (get_rparents moth, get_parents (aoi base (get_cle_index moth)))
+      (get_rparents moth, get_parents (aoi base (get_key_index moth)))
     with
     [ ([], _) | (_, Some _) -> list
     | _ -> [(moth, False) :: list] ]
@@ -695,9 +695,9 @@ value get_persons_with_relations base m list =
     List.fold_right
       (fun ip list ->
          let p = poi base ip in
-         match (get_rparents p, get_parents (aoi base (get_cle_index p))) with
+         match (get_rparents p, get_parents (aoi base (get_key_index p))) with
          [ ([], _) | (_, Some _) -> list
-         | ([{r_fath = Some x} :: _], _) when x <> get_cle_index m.m_fath ->
+         | ([{r_fath = Some x} :: _], _) when x <> get_key_index m.m_fath ->
              list
          | _ -> [(p, False) :: list] ])
       (Array.to_list (get_witnesses m.m_fam)) list
@@ -711,16 +711,16 @@ value get_persons_with_relations base m list =
 ;
 
 value print_relation_parent oc base mark defined_p p =
-  let a = aoi base (get_cle_index p) in
-  let u = uoi base (get_cle_index p) in
+  let a = aoi base (get_key_index p) in
+  let u = uoi base (get_key_index p) in
   do {
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
     if Array.length (get_family u) = 0 && get_parents a = None &&
-       not mark.(Adef.int_of_iper (get_cle_index p))
+       not mark.(Adef.int_of_iper (get_key_index p))
     then do {
-      mark.(Adef.int_of_iper (get_cle_index p)) := True;
+      mark.(Adef.int_of_iper (get_key_index p)) := True;
       if has_infos base p then print_infos oc base False "" "" p
       else fprintf oc " 0";
       defined_p.val := [p :: defined_p.val]
@@ -832,7 +832,7 @@ value print_relations oc base gen ml =
     | [(p, if_def) :: pl] ->
         let def_p = ref [] in
         do {
-          if get_rparents p <> [] && gen.per_sel (get_cle_index p) then do {
+          if get_rparents p <> [] && gen.per_sel (get_key_index p) then do {
             print_relations_for_person oc base gen def_p if_def p;
             List.iter (print_notes_for_person oc base gen) def_p.val
           }
@@ -918,7 +918,7 @@ type separate =
 ;
 
 value rec find_ancestors base surn p list =
-  match get_parents (aoi base (get_cle_index p)) with
+  match get_parents (aoi base (get_key_index p)) with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (get_father cpl) in
@@ -939,7 +939,7 @@ value rec find_ancestors base surn p list =
 
 value mark_branch base mark surn p =
   loop True p where rec loop top p =
-    let u = uoi base (get_cle_index p) in
+    let u = uoi base (get_key_index p) in
     for i = 0 to Array.length (get_family u) - 1 do {
       let ifam = (get_family u).(i) in
       match mark.(Adef.int_of_ifam ifam) with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: update.ml,v 5.8 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -637,7 +637,7 @@ value print_create_conflict conf base p var =
 value add_misc_names_for_new_persons conf base new_persons =
   List.iter
     (fun p ->
-       List.iter (fun n -> person_ht_add base n (get_cle_index p))
+       List.iter (fun n -> person_ht_add base n (get_key_index p))
          (person_misc_names base p (nobtit conf base)))
     new_persons
 ;
@@ -701,13 +701,13 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                psources =
                  if f = "?" || s = "?" then empty_string
                  else insert_string base (only_printable src);
-               cle_index = ip}
+               key_index = ip}
           and a = no_ascend ()
           and u = union_of_gen_union {family = [| |]} in
           do {
-            base.func.patch_person (get_cle_index p) p;
-            base.func.patch_ascend (get_cle_index p) a;
-            base.func.patch_union (get_cle_index p) u;
+            base.func.patch_person (get_key_index p) p;
+            base.func.patch_ascend (get_key_index p) a;
+            base.func.patch_union (get_key_index p) u;
             if f <> "?" && s <> "?" then do {
               person_ht_add base (Util.translate_eval (f ^ " " ^ s)) ip;
               new_persons.val := [p :: new_persons.val]

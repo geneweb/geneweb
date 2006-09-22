@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 5.5 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: family.ml,v 5.6 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -80,7 +80,7 @@ value compact_list conf base xl =
     List.fold_right
       (fun p pl ->
          match pl with
-         [ [p1 :: _] when get_cle_index p == get_cle_index p1 -> pl
+         [ [p1 :: _] when get_key_index p == get_key_index p1 -> pl
          | _ -> [p :: pl] ])
       pl []
   in
@@ -151,7 +151,7 @@ value find_all conf base an =
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
       if n <> Num.zero then
-        match Util.branch_of_sosa conf base (get_cle_index p) n with
+        match Util.branch_of_sosa conf base (get_key_index p) n with
         [ Some [(ip, _) :: _] -> ([pget conf base ip], True)
         | _ -> ([], False) ]
       else ([], False)
@@ -274,11 +274,11 @@ value specify conf base n pl =
                (fun ifam spouses ->
                   let cpl = coi base ifam in
                   let spouse =
-                    pget conf base (spouse (get_cle_index p) cpl)
+                    pget conf base (spouse (get_key_index p) cpl)
                   in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)
-               (Array.to_list (get_family (uget conf base (get_cle_index p))))
+               (Array.to_list (get_family (uget conf base (get_key_index p))))
                []
            in
            match spouses with
@@ -560,7 +560,7 @@ value extract_henv conf base =
             [("pz", code_varenv (Name.lower first_name));
              ("nz", code_varenv (Name.lower surname));
              ("ocz", string_of_int (get_occ p))]
-          else [("iz", string_of_int (Adef.int_of_iper (get_cle_index p)))]
+          else [("iz", string_of_int (Adef.int_of_iper (get_key_index p)))]
         in
         conf.henv := conf.henv @ x
     | None -> () ];

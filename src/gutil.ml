@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.20 2006-09-22 19:26:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.21 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -401,7 +401,7 @@ value person_misc_names base p nobtit =
     in
     let surnames =
       if get_sex p == Female then
-        let u = uoi base (get_cle_index p) in
+        let u = uoi base (get_key_index p) in
         List.fold_left
           (fun list ifam ->
              let cpl = coi base ifam in
@@ -450,7 +450,7 @@ value person_misc_names base p nobtit =
         list (nobtit p)
     in
     let list =
-      match get_parents (aoi base (get_cle_index p)) with
+      match get_parents (aoi base (get_key_index p)) with
       [ Some ifam ->
           let cpl = coi base ifam in
           let fath = poi base (get_father cpl) in
@@ -507,7 +507,7 @@ value person_ht_find_unique base first_name surname occ =
              first_name = Name.lower (p_first_name base p) &&
              surname = Name.lower (p_surname base p)
           then
-            get_cle_index p
+            get_key_index p
           else find ipl
       | _ -> raise Not_found ]
     in
@@ -810,7 +810,7 @@ value titles_after_birth base warning p t =
 ;
 
 value try_to_fix_relation_sex base warning p_ref = do {
-  let p_index = Some (get_cle_index p_ref) in
+  let p_index = Some (get_key_index p_ref) in
   let fixed = ref 0 in
   let not_fixed = ref 0 in
   let changed_related =
@@ -885,7 +885,7 @@ value try_to_fix_relation_sex base warning p_ref = do {
 };
 
 value related_sex_is_coherent base warning p_ref =
-  let p_index = Some (get_cle_index p_ref) in
+  let p_index = Some (get_key_index p_ref) in
   let merge_sex g1 g2 =
     match (g1, g2) with
     [ (Some Male, Some Male) -> Some Male
@@ -917,7 +917,7 @@ value related_sex_is_coherent base warning p_ref =
         let p =
           person_of_gen_person {(gen_person_of_person p_ref) with sex = g}
         in
-        Some [(get_cle_index p_ref, p)]
+        Some [(get_key_index p_ref, p)]
       else None
   | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
@@ -1276,7 +1276,7 @@ value map_person_ps fp fs p =
    death = p.death; death_place = fs p.death_place;
    death_src = fs p.death_src; burial = p.burial;
    burial_place = fs p.burial_place; burial_src = fs p.burial_src;
-   notes = fs p.notes; psources = fs p.psources; cle_index = p.cle_index}
+   notes = fs p.notes; psources = fs p.psources; key_index = p.key_index}
 ;
 
 value map_family_ps fp fs fam =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.11 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -84,7 +84,7 @@ value reconstitute conf base p1 p2 =
      merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
    notes = cat_strings base (get_notes p1) "<br>\n" (get_notes p2);
    psources = merge_strings base (get_psources p1) ", " (get_psources p2);
-   cle_index = get_cle_index p1}
+   key_index = get_key_index p1}
 ;
 
 value print_merge conf base =
@@ -135,13 +135,13 @@ value effective_mod_merge conf base sp =
       let rel_chil = get_related p2 in
       let p2_family = get_family u2 in
       do {
-        MergeInd.reparent_ind base sp.cle_index (get_cle_index p2);
+        MergeInd.reparent_ind base sp.key_index (get_key_index p2);
         let p2 = UpdateIndOk.effective_del conf base p2 in
-        base.func.patch_person (get_cle_index p2) p2;
+        base.func.patch_person (get_key_index p2) p2;
         let u2 = union_of_gen_union {family = [| |]} in
-        base.func.patch_union (get_cle_index p2) u2;
+        base.func.patch_union (get_key_index p2) u2;
         let p = UpdateIndOk.effective_mod conf base sp in
-        let u = uoi base (get_cle_index p) in
+        let u = uoi base (get_key_index p) in
         let (p_related, mod_p) =
           List.fold_right
             (fun ipc (p_related, mod_p) ->
@@ -152,28 +152,28 @@ value effective_mod_merge conf base sp =
                    (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
                       let (r, mod_pc, p_related, mod_p) =
                         match r.r_fath with
-                        [ Some ip when ip = get_cle_index p2 ->
+                        [ Some ip when ip = get_key_index p2 ->
                             let (p_related, mod_p) =
                               if List.memq ipc p_related then
                                 (p_related, mod_p)
                               else ([ipc :: p_related], True)
                             in
                             let r =
-                              {(r) with r_fath = Some (get_cle_index p)}
+                              {(r) with r_fath = Some (get_key_index p)}
                             in
                             (r, True, p_related, mod_p)
                         | _ -> (r, mod_pc, p_related, mod_p) ]
                       in
                       let (r, mod_pc, p_related, mod_p) =
                         match r.r_moth with
-                        [ Some ip when ip = get_cle_index p2 ->
+                        [ Some ip when ip = get_key_index p2 ->
                             let (p_related, mod_p) =
                               if List.memq ipc p_related then
                                 (p_related, mod_p)
                               else ([ipc :: p_related], True)
                             in
                             let r =
-                              {(r) with r_moth = Some (get_cle_index p)}
+                              {(r) with r_moth = Some (get_key_index p)}
                             in
                             (r, True, p_related, mod_p)
                         | _ -> (r, mod_pc, p_related, mod_p) ]
@@ -197,7 +197,7 @@ value effective_mod_merge conf base sp =
                      else
                        let fam = foi base (get_family uc).(i) in
                        let (p_related, mod_p) =
-                         if array_memq (get_cle_index p2) (get_witnesses fam)
+                         if array_memq (get_key_index p2) (get_witnesses fam)
                          then do {
                            let (p_related, mod_p) =
                              loop (p_related, mod_p) 0
@@ -207,9 +207,9 @@ value effective_mod_merge conf base sp =
                                else
                                let (p_related, mod_p) =
                                  if (get_witnesses fam).(j) ==
-                                    get_cle_index p2
+                                    get_key_index p2
                                  then do {
-                                   (get_witnesses fam).(j) := get_cle_index p;
+                                   (get_witnesses fam).(j) := get_key_index p;
                                    if List.memq ipc p_related then
                                      (p_related, mod_p)
                                    else ([ipc :: p_related], True)
@@ -240,44 +240,44 @@ value effective_mod_merge conf base sp =
           let fam = foi base ifam in
           let cpl = coi base ifam in
           let cpl =
-            if get_cle_index p2 = get_father cpl then do {
+            if get_key_index p2 = get_father cpl then do {
               Array.iter
                 (fun ip ->
                    let w = poi base ip in
-                   if not (List.memq (get_cle_index p) (get_related w)) then
+                   if not (List.memq (get_key_index p) (get_related w)) then
                      let w =
                        person_of_gen_person
                          {(gen_person_of_person w) with
-                          related = [get_cle_index p :: get_related w]}
+                          related = [get_key_index p :: get_related w]}
                      in
                      base.func.patch_person ip w
                    else ())
                 (get_witnesses fam);
-              couple False (get_cle_index p) (get_mother cpl)
+              couple False (get_key_index p) (get_mother cpl)
             }
-            else if get_cle_index p2 = get_mother cpl then
-              couple False (get_father cpl) (get_cle_index p)
+            else if get_key_index p2 = get_mother cpl then
+              couple False (get_father cpl) (get_key_index p)
             else assert False
           in
           base.func.patch_couple ifam (couple_of_gen_couple cpl);
         };
         Update.update_misc_names_of_family conf base p u;
-        base.func.patch_person (get_cle_index p) p;
+        base.func.patch_person (get_key_index p) p;
         if p2_family <> [| |] then do {
           let u =
             union_of_gen_union
               {family = Array.append (get_family u) p2_family}
           in
-          base.func.patch_union (get_cle_index p) u;
+          base.func.patch_union (get_key_index p) u;
         }
         else ();
         Gutil.check_noloop_for_person_list base (Update.error conf base)
-          [get_cle_index p];
+          [get_key_index p];
         let wl =
           UpdateIndOk.all_checks_person conf base p
-            (aoi base (get_cle_index p)) u
+            (aoi base (get_key_index p)) u
         in
-        let key = (sp.first_name, sp.surname, sp.occ, sp.cle_index) in
+        let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
         Util.commit_patches conf base;
         History.record conf base key "fp";
         Update.delete_topological_sort conf base;

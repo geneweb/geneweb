@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.7 2006-09-21 02:04:48 ddr Exp $ *)
+(* $Id: some.ml,v 5.8 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -244,13 +244,13 @@ value print_branch conf base psn name =
   let cln = Name.crush_lower name in
   loop True where rec loop is_first_lev lev p =
     do {
-      let u = uget conf base (get_cle_index p) in
+      let u = uget conf base (get_key_index p) in
       let family_list =
         List.map
           (fun ifam ->
              let fam = foi base ifam in
              let des = doi base ifam in
-             let c = spouse (get_cle_index p) (coi base ifam) in
+             let c = spouse (get_key_index p) (coi base ifam) in
              let el = get_children des in
              let c = pget conf base c in
              let down =
@@ -424,7 +424,7 @@ value print_by_branch x conf base (pl, homonymes) =
              }
              else ();
              if br = None || br = Some n then
-               match get_parents (aget conf base (get_cle_index p)) with
+               match get_parents (aget conf base (get_key_index p)) with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    tag "dd" begin
@@ -692,18 +692,18 @@ and eval_person_var conf base p =
   fun
   [ ["access"] -> VVstring (acces conf base p)
   | ["father" :: sl] ->
-      match get_parents (aget conf base (get_cle_index p)) with
+      match get_parents (aget conf base (get_key_index p)) with
       [ Some ifam ->
           let p = pget conf base (get_father (coi base ifam)) in
           eval_person_var conf base p sl
       | None -> raise Not_found ]
   | ["has_parents"] ->
-      match get_parents (aget conf base (get_cle_index p)) with
+      match get_parents (aget conf base (get_key_index p)) with
       [ Some _ -> VVbool True
       | None -> VVbool False ]
   | ["is_restricted"] -> VVbool (is_hidden p)
   | ["mother" :: sl] ->
-      match get_parents (aget conf base (get_cle_index p)) with
+      match get_parents (aget conf base (get_key_index p)) with
       [ Some ifam ->
           let p = pget conf base (get_mother (coi base ifam)) in
           eval_person_var conf base p sl

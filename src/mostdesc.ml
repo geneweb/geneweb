@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 5.2 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Gutil;
@@ -72,8 +72,8 @@ value most_desc base p =
   let entered = Array.create base.data.persons.len False in
   let q = ref Pq.empty in
   do {
-    q.val := Pq.add p.cle_index q.val;
-    tab.(Adef.int_of_iper p.cle_index) := Num.one;
+    q.val := Pq.add p.key_index q.val;
+    tab.(Adef.int_of_iper p.key_index) := Num.one;
     while not (Pq.is_empty q.val) do {
       let (ip, nq) = Pq.take q.val in
       q.val := nq;
