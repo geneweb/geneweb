@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.11 2006-09-21 19:30:50 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.12 2006-09-22 01:01:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -668,7 +668,7 @@ value lock_file bname =
 
 type visible_state = [ VsNone | VsTrue | VsFalse ];
 
-value make_visible_cache bname persons =
+value make_visible_record_access bname persons =
   let visible_ref = ref None in
   let fname = Filename.concat bname "restrict" in
   let read_or_create_visible () =
@@ -871,7 +871,7 @@ value array_ext phony fa =
       failwith "this is a GeneWeb base, but not compatible; please upgrade"
 ;
 
-value make_cache ic ic_acc shift array_pos (plenr, patches) len name
+value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
   input_array input_item
 =
   let v_ext v =
@@ -1078,48 +1078,48 @@ value input bname =
   in
   let shift = 0 in
   let persons =
-    make_cache ic ic_acc shift persons_array_pos patches.h_person persons_len
-      "persons" (input_value : _ -> array person)
+    make_record_access ic ic_acc shift persons_array_pos patches.h_person
+      persons_len "persons" (input_value : _ -> array person)
       (Iovalue.input : _ -> person)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_cache ic ic_acc shift ascends_array_pos patches.h_ascend persons_len
-      "ascends" (input_value : _ -> array ascend)
+    make_record_access ic ic_acc shift ascends_array_pos patches.h_ascend
+      persons_len "ascends" (input_value : _ -> array ascend)
       (Iovalue.input : _ -> ascend)
 
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_cache ic ic_acc shift unions_array_pos patches.h_union persons_len
-      "unions" (input_value : _ -> array union)
+    make_record_access ic ic_acc shift unions_array_pos patches.h_union
+      persons_len "unions" (input_value : _ -> array union)
       (Iovalue.input : _ -> union)
 
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_cache ic ic_acc shift families_array_pos patches.h_family
+    make_record_access ic ic_acc shift families_array_pos patches.h_family
       families_len "families" (input_value : _ -> array family)
       (Iovalue.input : _ -> family)
 
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_cache ic ic_acc shift couples_array_pos patches.h_couple
+    make_record_access ic ic_acc shift couples_array_pos patches.h_couple
       families_len "couples" (input_value : _ -> array couple)
       (Iovalue.input : _ -> couple)
 
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_cache ic ic_acc shift descends_array_pos patches.h_descend
+    make_record_access ic ic_acc shift descends_array_pos patches.h_descend
       families_len "descends" (input_value : _ -> array descend)
       (Iovalue.input : _ -> descend)
 
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
-    make_cache ic ic_acc shift strings_array_pos patches.h_string
+    make_record_access ic ic_acc shift strings_array_pos patches.h_string
       strings_len "strings" (input_value : _ -> array string)
       (Iovalue.input : _ -> string)
 
@@ -1297,7 +1297,7 @@ value input bname =
   in
   let base_data =
     {persons = persons; ascends = ascends; unions = unions;
-     visible = make_visible_cache bname persons;
+     visible = make_visible_record_access bname persons;
      families = families; couples = couples; descends = descends;
      strings = strings; particles = particles; bnotes = bnotes}
   in
@@ -1522,7 +1522,7 @@ value count_error computed found =
   }
 ;
 
-value cache_of tab =
+value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
    len = Array.length tab; array_obj _ = tab; clear_array () = ()}
 ;
@@ -1532,7 +1532,7 @@ value create_name_index oc_inx oc_inx_acc base =
   let bpos = pos_out oc_inx in
   do {
     output_value_no_sharing oc_inx (ni : name_index_data);
-    let epos = output_array_access oc_inx_acc (cache_of ni) bpos in
+    let epos = output_array_access oc_inx_acc (record_access_of ni) bpos in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
   }
@@ -1570,7 +1570,7 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   let bpos = pos_out oc_inx in
   do {
     output_value_no_sharing oc_inx (t : strings_of_fsname);
-    let epos = output_array_access oc_inx_acc (cache_of t) bpos in
+    let epos = output_array_access oc_inx_acc (record_access_of t) bpos in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
   }

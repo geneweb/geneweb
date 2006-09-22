@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.25 2006-09-21 16:20:58 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.26 2006-09-22 01:01:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2342,7 +2342,7 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
   (persons, families, strings, g_bnot)
 ;
 
-value cache_of tab =
+value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
    len = Array.length tab; array_obj _ = tab; clear_array () = ()}
 ;
@@ -2355,11 +2355,11 @@ value make_base (persons, families, strings, bnotes) =
      efiles _ = []}
   in
   let base_data =
-    {persons = cache_of persons; ascends = cache_of ascends;
-     unions = cache_of unions; families = cache_of families;
+    {persons = record_access_of persons; ascends = record_access_of ascends;
+     unions = record_access_of unions; families = record_access_of families;
      visible = { v_write = fun []; v_get = fun [] };
-     couples = cache_of couples; descends = cache_of descends;
-     strings = cache_of strings; particles = []; bnotes = bnotes}
+     couples = record_access_of couples; descends = record_access_of descends;
+     strings = record_access_of strings; particles = []; bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
