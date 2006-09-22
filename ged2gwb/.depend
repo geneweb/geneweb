@@ -1,8 +1,8 @@
 ged2gwb.cmo: ../src/adef.cmi ../src/ansel.cmo ../src/argl.cmo ../src/buff.cmo \
     ../src/calendar.cmi ../src/check.cmo ../src/def.cmi ../src/gutil.cmi \
-    ../src/gwdb.cmi ../src/iobase.cmi ../src/lock.cmi ../src/name.cmi \
+    ../src/gwdb.cmi ../src/lock.cmi ../src/name.cmi ../src/outbase.cmi \
     ../src/secure.cmi 
 ged2gwb.cmx: ../src/adef.cmx ../src/ansel.cmx ../src/argl.cmx ../src/buff.cmx \
     ../src/calendar.cmx ../src/check.cmx ../src/def.cmi ../src/gutil.cmx \
-    ../src/gwdb.cmx ../src/iobase.cmx ../src/lock.cmx ../src/name.cmx \
+    ../src/gwdb.cmx ../src/lock.cmx ../src/name.cmx ../src/outbase.cmx \
     ../src/secure.cmx 

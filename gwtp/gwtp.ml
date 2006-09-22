@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: gwtp.ml,v 5.3 2006-09-22 19:26:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Printf;
@@ -655,7 +655,7 @@ value make_temp env b =
     printf "families: %d\n\n" base.Gwdb.data.Gwdb.families.Gwdb.len;
     flush stdout;
     Secure.set_base_dir (Filename.dirname bdir);
-    Iobase.output bdir base;
+    Outbase.output bdir base;
     flush stdout;
   }
 ;

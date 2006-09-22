@@ -93,11 +93,11 @@ gutil.cmo: adef.cmi buff.cmo def.cmi gwdb.cmi name.cmi gutil.cmi
 gutil.cmx: adef.cmx buff.cmx def.cmi gwdb.cmx name.cmx gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmo def.cmi gutil.cmi \
-    gwcomp.cmo gwdb.cmi iobase.cmi iovalue.cmi lock.cmi name.cmi \
-    notesLinks.cmo progrBar.cmi secure.cmi 
+    gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi name.cmi notesLinks.cmo \
+    outbase.cmi progrBar.cmi secure.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
-    gwcomp.cmx gwdb.cmx iobase.cmx iovalue.cmx lock.cmx name.cmx \
-    notesLinks.cmx progrBar.cmx secure.cmx 
+    gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx name.cmx notesLinks.cmx \
+    outbase.cmx progrBar.cmx secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
@@ -124,7 +124,7 @@ iobase.cmo: adef.cmi btree.cmo buff.cmo def.cmi gutil.cmi gwdb.cmi \
     iovalue.cmi name.cmi secure.cmi iobase.cmi 
 iobase.cmx: adef.cmx btree.cmx buff.cmx def.cmi gutil.cmx gwdb.cmx \
     iovalue.cmx name.cmx secure.cmx iobase.cmi 
-iobase.cmi: gwdb.cmi 
+iobase.cmi: def.cmi gwdb.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
@@ -157,9 +157,9 @@ mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmx history.cmx \
     merge.cmx mergeInd.cmx update.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo gutil.cmi iobase.cmi \
-    lock.cmi secure.cmi 
+    lock.cmi outbase.cmi secure.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gutil.cmx iobase.cmx \
-    lock.cmx secure.cmx 
+    lock.cmx outbase.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi iobase.cmi \
     name.cmi num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
@@ -177,6 +177,11 @@ notesLinks.cmo: def.cmi name.cmi
 notesLinks.cmx: def.cmi name.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
+outbase.cmo: adef.cmi btree.cmo def.cmi gutil.cmi gwdb.cmi iobase.cmi \
+    iovalue.cmi name.cmi secure.cmi outbase.cmi 
+outbase.cmx: adef.cmx btree.cmx def.cmi gutil.cmx gwdb.cmx iobase.cmx \
+    iovalue.cmx name.cmx secure.cmx outbase.cmi 
+outbase.cmi: gwdb.cmi 
 perso.cmo: adef.cmi buff.cmo config.cmi dag.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi name.cmi notes.cmi notesLinks.cmo num.cmi srcfile.cmi templ.cmi \
     templAst.cmi util.cmi wiki.cmi perso.cmi 

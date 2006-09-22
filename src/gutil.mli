@@ -1,8 +1,11 @@
-(* $Id: gutil.mli,v 5.10 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.11 2006-09-22 19:26:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
+
+value verbose : ref bool;
+value int_size : int;
 
 value decline : char -> string -> string;
 value nominative : string -> string;
@@ -133,6 +136,7 @@ value remove_file : string -> unit;
 value remove_dir : string -> unit;
 value mkdir_p : string -> unit;
 value lock_file : string -> string;
+value output_value_no_sharing : out_channel -> _ -> unit;
 
 (* for compatibility databases version <= 4.10 which are not in utf-8 *)
 value utf_8_db : ref bool;
