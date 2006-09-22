@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.22 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: util.ml,v 5.23 2006-09-22 12:40:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2043,7 +2043,7 @@ value create_topological_sort conf base =
   | Some "no_tstab" -> Array.create base.data.persons.len 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
-      lock (Iobase.lock_file bfile) with
+      lock (Gutil.lock_file bfile) with
       [ Accept ->
           let tstab_file =
             if conf.use_restrict then Filename.concat bfile "tstab_visitor"

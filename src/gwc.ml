@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.20 2006-09-22 01:01:35 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.21 2006-09-22 12:40:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -798,7 +798,7 @@ value input_particles part_file =
      "von und zu "; "von "; "zu "; "zur ";
      "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
      "VON UND ZU "; "VON "; "ZU "; "ZUR "]
-  else Iobase.input_particles part_file
+  else Gutil.input_particles part_file
 ;
 
 value empty_base : cbase =
@@ -1088,7 +1088,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
         exit 2
       }
       else ();
-      lock (Iobase.lock_file out_file.val) with
+      lock (Gutil.lock_file out_file.val) with
       [ Accept -> do {
           let tmp_dir =
             let d =

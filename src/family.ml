@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 5.4 2006-09-20 12:35:43 ddr Exp $ *)
+(* $Id: family.ml,v 5.5 2006-09-22 12:40:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -720,7 +720,7 @@ value this_request_updates_database conf =
 value treat_request_on_base conf log =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   if this_request_updates_database conf then
-    lock Iobase.lock_file bfile with
+    lock Gutil.lock_file bfile with
     [ Accept -> treat_request_on_possibly_locked_base conf bfile log
     | Refuse -> Update.error_locked conf ]
   else treat_request_on_possibly_locked_base conf bfile log
