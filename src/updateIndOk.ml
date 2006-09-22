@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.17 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.18 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -193,7 +193,7 @@ value reconstitute_burial conf burial_place =
 
 value reconstitute_person conf =
   let ext = False in
-  let cle_index =
+  let key_index =
     match p_getenv conf.env "i" with
     [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
@@ -269,7 +269,7 @@ value reconstitute_person conf =
      burial_place = burial_place;
      burial_src = only_printable (get conf "burial_src");
      notes = notes; psources = psources;
-     cle_index = Adef.iper_of_int cle_index}
+     key_index = Adef.iper_of_int key_index}
   in
   (p, ext)
 ;
@@ -365,7 +365,7 @@ value check_conflict conf base sp ipl =
   List.iter
     (fun ip ->
        let p1 = poi base ip in
-       if get_cle_index p1 <> sp.cle_index &&
+       if get_key_index p1 <> sp.key_index &&
           Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
             name &&
           get_occ p1 = sp.occ then
@@ -376,7 +376,7 @@ value check_conflict conf base sp ipl =
 
 value check_sex_married conf base sp op =
   if sp.sex <> get_sex op then
-    let u = uoi base (get_cle_index op) in
+    let u = uoi base (get_key_index op) in
     let no_check =
       List.for_all
         (fun ifam ->
@@ -421,7 +421,7 @@ value is_witness_at_marriage base ip p =
 value update_relation_parents base op np =
   let op_rparents = rparents_of op in
   let np_rparents = rparents_of np in
-  let pi = get_cle_index np in
+  let pi = get_key_index np in
   let mod_ippl = [] in
   let mod_ippl =
     List.fold_left
@@ -461,7 +461,7 @@ value update_relation_parents base op np =
 ;
 
 value effective_mod conf base sp =
-  let pi = sp.cle_index in
+  let pi = sp.key_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
   let ofn = p_first_name base op in
@@ -506,7 +506,7 @@ value effective_add conf base sp =
     let created_p = ref [] in
     let np =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
-        (Update.insert_string base) {(sp) with cle_index = pi}
+        (Update.insert_string base) {(sp) with key_index = pi}
     in
     let np = person_of_gen_person np in
     let na = no_ascend () in
@@ -532,7 +532,7 @@ value array_except v a =
 value effective_del conf base p = do {
   let none = Update.insert_string base "?" in
   let empty = Update.insert_string base "" in
-  let ip = get_cle_index p in
+  let ip = get_key_index p in
   let asc = aoi base ip in
   match get_parents asc with
   [ Some ifam ->
@@ -558,7 +558,7 @@ value effective_del conf base p = do {
      baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
      death = DontKnowIfDead; death_place = empty; death_src = empty;
      burial = UnknownBurial; burial_place = empty; burial_src = empty;
-     notes = empty; psources = empty; cle_index = ip}
+     notes = empty; psources = empty; key_index = ip}
 };
 
 value print_mod_ok conf base wl p =
@@ -673,9 +673,9 @@ value print_add o_conf base =
       [ Some err -> error_person conf base sp err
       | None ->
           let (p, a) = effective_add conf base sp in
-          let u = uoi base (get_cle_index p) in
+          let u = uoi base (get_key_index p) in
           let wl = all_checks_person conf base p a u in
-          let k = (sp.first_name, sp.surname, sp.occ, get_cle_index p) in
+          let k = (sp.first_name, sp.surname, sp.occ, get_key_index p) in
           do {
             Util.commit_patches conf base;
             History.record conf base k "ap";
@@ -692,12 +692,12 @@ value print_del conf base =
       let p = poi base (Adef.iper_of_int i) in
       let k =
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_cle_index p)
+         get_key_index p)
       in
       do {
         let p = effective_del conf base p in
-        base.func.patch_person (get_cle_index p) p;
-        Notes.update_notes_links_db conf (NotesLinks.PgInd (get_cle_index p))
+        base.func.patch_person (get_key_index p) p;
+        Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p))
           "" True;
         Util.commit_patches conf base;
         History.record conf base k "dp";
@@ -714,7 +714,7 @@ value print_mod_aux conf base callback =
       [ Some _ -> True
       | _ -> False ]
     in
-    let digest = Update.digest_person (poi base p.cle_index) in
+    let digest = Update.digest_person (poi base p.key_index) in
     if digest = raw_get conf "digest" then
       if ext || redisp then UpdateInd.print_update_ind conf base p digest
       else do {
@@ -732,11 +732,11 @@ value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
   let callback sp =
     let p = effective_mod conf base sp in
-    let op = poi base (get_cle_index p) in
-    let u = uoi base (get_cle_index p) in
+    let op = poi base (get_key_index p) in
+    let u = uoi base (get_key_index p) in
     do {
-      base.func.patch_person (get_cle_index p) p;
-      Notes.update_notes_links_db conf (NotesLinks.PgInd (get_cle_index p))
+      base.func.patch_person (get_key_index p) p;
+      Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p))
         (sou base (get_notes p)) (get_notes p <> get_notes op);
       if get_surname op <> get_surname p ||
          get_surnames_aliases op <> get_surnames_aliases p ||
@@ -744,8 +744,8 @@ value print_mod o_conf base =
       then
         Update.update_misc_names_of_family conf base p u
       else ();
-      let wl = all_checks_person conf base p (aoi base (get_cle_index p)) u in
-      let k = (sp.first_name, sp.surname, sp.occ, sp.cle_index) in
+      let wl = all_checks_person conf base p (aoi base (get_key_index p)) u in
+      let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
       Util.commit_patches conf base;
       History.record conf base k "mp";
       let quest_string = Adef.istr_of_int 1 in

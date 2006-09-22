@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.4 2006-09-16 03:16:05 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.5 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -541,7 +541,7 @@ value create_person () =
    baptism_place = ""; baptism_src = ""; death = DontKnowIfDead;
    death_place = ""; death_src = ""; burial = UnknownBurial;
    burial_place = ""; burial_src = ""; notes = ""; psources = "";
-   cle_index = Adef.iper_of_int (-1)}
+   key_index = Adef.iper_of_int (-1)}
 ;
 
 value bogus_def p n o = p = "?" || n = "?";
@@ -593,7 +593,7 @@ value set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let u =
     {first_name = fn; surname = sn; occ = occ;
      rparents = u.rparents; related = u.related; sex = sex; notes = u.notes;
-     cle_index = u.cle_index; first_names_aliases = first_names_aliases;
+     key_index = u.key_index; first_names_aliases = first_names_aliases;
      surnames_aliases = surnames_aliases; public_name = public_name;
      image = image; qualifiers = qualifiers; aliases = aliases;
      titles = titles; access = access; occupation = occupation;
@@ -738,12 +738,12 @@ value read_family ic fname =
   fun
   [ Some (_, ["encoding:"; "utf-8"]) -> F_enc_utf_8
   | Some (str, ["fam" :: l]) ->
-      let (cle_pere, surname, l) = parse_parent str l in
+      let (fath_key, surname, l) = parse_parent str l in
       let (relation_ss, marriage, marr_place, marr_src, divorce, l) =
         get_mar_date str l
       in
       let (relation, fath_sex, moth_sex) = relation_ss in
-      let (cle_mere, _, l) = parse_parent str l in
+      let (moth_key, _, l) = parse_parent str l in
       do {
         if l <> [] then failwith str else ();
         let line = read_line ic in
@@ -783,7 +783,7 @@ value read_family ic fname =
           | Some (str, ["cbp" :: _]) -> failwith str
           | _ -> ("", line) ]
         in
-        let co = couple False cle_pere cle_mere in
+        let co = couple False fath_key moth_key in
         let (comm, line) =
           match line with
           [ Some (str, ["comm" :: _]) ->

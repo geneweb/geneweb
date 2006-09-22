@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.1 2006-09-22 19:26:59 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.2 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -179,7 +179,7 @@ value make_name_index base =
           [Name.lower (first_name ^ " " ^ surname) ::
            person_misc_names base p get_titles]
         in
-        add_names (get_cle_index p) names
+        add_names (get_key_index p) names
       else ();
     };
     t
@@ -289,7 +289,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
       let a =
         try IstrTree.find (get_surname p) bt.val with [ Not_found -> [] ]
       in
-      bt.val := IstrTree.add (get_surname p) [get_cle_index p :: a] bt.val
+      bt.val := IstrTree.add (get_surname p) [get_key_index p :: a] bt.val
     };
     (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
        i.e. the created database can be still read by these versions but this
@@ -332,7 +332,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
       let a =
         try IstrTree.find (get_first_name p) bt.val with [ Not_found -> [] ]
       in
-      bt.val := IstrTree.add (get_first_name p) [get_cle_index p :: a] bt.val
+      bt.val := IstrTree.add (get_first_name p) [get_key_index p :: a] bt.val
     };
     (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
        i.e. the created database can be still read by these versions but this

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.28 2006-09-22 19:26:59 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.29 2006-09-22 23:47:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -856,7 +856,7 @@ value unknown_per gen i sex =
        baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
        death = DontKnowIfDead; death_place = empty; death_src = empty;
        burial = UnknownBurial; burial_place = empty; burial_src = empty;
-       notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
+       notes = empty; psources = empty; key_index = Adef.iper_of_int i}
   and a = no_ascend ()
   and u = union_of_gen_union {family = [| |]} in
   (p, a, u)
@@ -1268,7 +1268,7 @@ value adop_parent gen ip r =
               {(gen_person_of_person p) with related = [ip :: get_related p]}
           in
           gen.g_per.arr.(Adef.int_of_iper i) := Right3 p a u;
-        Some (get_cle_index p)
+        Some (get_key_index p)
       } ]
 ;
 
@@ -1761,7 +1761,7 @@ value add_indi gen r =
        burial_place = add_string gen burial_place;
        burial_src = add_string gen burial_src;
        notes = add_string gen (notes ^ ext_notes);
-       psources = add_string gen psources; cle_index = ip}
+       psources = add_string gen psources; key_index = ip}
   in
   let ascend =
     ascend_of_gen_ascend {parents = parents; consang = Adef.fix (-1)}
@@ -2261,7 +2261,7 @@ value add_parents_to_isolated gen =
             [ Right3 fam cpl des -> do {
                 let des =
                   descend_of_gen_descend
-                    {children = [| get_cle_index p |]}
+                    {children = [| get_key_index p |]}
                 in
                 gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des;
                 let a =
@@ -2499,7 +2499,7 @@ value check_parents_children base ascends unions couples descends =
               fprintf log_oc.val "=> deleted in this family\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              to_delete.val := [get_cle_index p :: to_delete.val]
+              to_delete.val := [get_key_index p :: to_delete.val]
             }
             else ()
         | None ->
@@ -2615,7 +2615,7 @@ value rec negative_date_ancestors base persons families i = do {
          | _ -> get_death p ]}
   in
   persons.(i) := p;
-  let u = uoi base (get_cle_index p) in
+  let u = uoi base (get_key_index p) in
   for i = 0 to Array.length (get_family u) - 1 do {
     let j = Adef.int_of_ifam (get_family u).(i) in
     let fam = families.(j) in
@@ -2629,7 +2629,7 @@ value rec negative_date_ancestors base persons families i = do {
         families.(j) := fam
     | None -> () ]
   };
-  let a = aoi base (get_cle_index p) in
+  let a = aoi base (get_key_index p) in
   match get_parents a with
   [ Some ifam ->
       let cpl = coi base ifam in

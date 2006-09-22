@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.26 2006-09-22 01:01:35 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.27 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -92,13 +92,13 @@ value get_birth_src : person -> istr;
 value get_burial : person -> Def.burial;
 value get_burial_place : person -> istr;
 value get_burial_src : person -> istr;
-value get_cle_index : person -> iper;
 value get_death : person -> Def.death;
 value get_death_place : person -> istr;
 value get_death_src : person -> istr;
 value get_first_name : person -> istr;
 value get_first_names_aliases : person -> list istr;
 value get_image : person -> istr;
+value get_key_index : person -> iper;
 value get_notes : person -> istr;
 value get_occ : person -> int;
 value get_occupation : person -> istr;

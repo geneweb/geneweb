@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.5 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.6 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -114,7 +114,7 @@ value rec eval_var conf base env p loc =
   | ["has_surnames_aliases"] -> bool_val (p.surnames_aliases <> [])
   | ["has_titles"] -> bool_val (p.titles <> [])
   | ["image"] -> str_val (quote_escaped p.image)
-  | ["index"] -> str_val (string_of_int (Adef.int_of_iper p.cle_index))
+  | ["index"] -> str_val (string_of_int (Adef.int_of_iper p.key_index))
   | ["is_female"] -> bool_val (p.sex = Female)
   | ["is_male"] -> bool_val (p.sex = Male)
   | ["not_dead"] -> bool_val (p.death = NotDead)
@@ -415,7 +415,7 @@ value print_del1 conf base p =
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper p.cle_index);
+          (Adef.int_of_iper p.key_index);
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
     end;
@@ -433,7 +433,7 @@ value print_add conf base =
      baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
      death = DontKnowIfDead; death_place = ""; death_src = "";
      burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
-     psources = ""; cle_index = bogus_person_index}
+     psources = ""; key_index = bogus_person_index}
   in
   print_update_ind conf base p ""
 ;

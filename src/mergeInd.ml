@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.18 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.19 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -33,9 +33,9 @@ value print_differences conf base branches p1 p2 =
       Util.hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\"";
       xtag "input" "type=\"hidden\" name=\"i1\" value=\"%d\""
-        (Adef.int_of_iper (get_cle_index p1));
+        (Adef.int_of_iper (get_key_index p1));
       xtag "input" "type=\"hidden\" name=\"i2\" value=\"%d\""
-        (Adef.int_of_iper (get_cle_index p2));
+        (Adef.int_of_iper (get_key_index p2));
       loop branches where rec loop =
         fun
         [ [(ip1, ip2)] ->
@@ -262,7 +262,7 @@ value propose_merge_ind conf base branches p1 p2 =
                  end;
                end;
              })
-          [(get_cle_index p1, get_cle_index p2) :: branches];
+          [(get_key_index p1, get_key_index p2) :: branches];
       end;
     }
     else ();
@@ -293,29 +293,29 @@ value reparent_ind base ip1 ip2 =
 
 value effective_merge_ind conf base p1 p2 =
   do {
-    reparent_ind base (get_cle_index p1) (get_cle_index p2);
-    let u2 = uoi base (get_cle_index p2) in
+    reparent_ind base (get_key_index p1) (get_key_index p2);
+    let u2 = uoi base (get_key_index p2) in
     if Array.length (get_family u2) <> 0 then do {
       for i = 0 to Array.length (get_family u2) - 1 do {
         let ifam = (get_family u2).(i) in
         let cpl = coi base ifam in
         let cpl =
-          if get_cle_index p2 = get_father cpl then
-            couple False (get_cle_index p1) (get_mother cpl)
-          else if get_cle_index p2 = get_mother cpl then
-            couple False (get_father cpl) (get_cle_index p1)
+          if get_key_index p2 = get_father cpl then
+            couple False (get_key_index p1) (get_mother cpl)
+          else if get_key_index p2 = get_mother cpl then
+            couple False (get_father cpl) (get_key_index p1)
           else assert False
         in
         base.func.patch_couple ifam (couple_of_gen_couple cpl);
       };
-      let u1 = uoi base (get_cle_index p1) in
+      let u1 = uoi base (get_key_index p1) in
       let u1 =
         union_of_gen_union
           {family = Array.append (get_family u1) (get_family u2)}
       in
-      base.func.patch_union (get_cle_index p1) u1;
+      base.func.patch_union (get_key_index p1) u1;
       let u2 = union_of_gen_union {family = [| |]} in
-      base.func.patch_union (get_cle_index p2) u2;
+      base.func.patch_union (get_key_index p2) u2;
     }
     else ();
     let p1 =
@@ -368,9 +368,9 @@ value effective_merge_ind conf base p1 p2 =
            else get_notes p1}
     in
     let p2 = UpdateIndOk.effective_del conf base p2 in
-    base.func.patch_person (get_cle_index p1) p1;
-    base.func.patch_person (get_cle_index p2) p2;
-    Notes.update_notes_links_db conf (NotesLinks.PgInd (get_cle_index p1))
+    base.func.patch_person (get_key_index p1) p1;
+    base.func.patch_person (get_key_index p2) p2;
+    Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p1))
       (sou base (get_notes p1)) True;
   }
 ;
@@ -600,26 +600,26 @@ value print conf base =
   in
   match (p1, p2) with
   [ (Some p1, Some p2) ->
-      if get_cle_index p1 = get_cle_index p2 then same_person conf
+      if get_key_index p1 = get_key_index p2 then same_person conf
       else if
         get_sex p1 <> get_sex p2 && get_sex p1 <> Neuter &&
         get_sex p2 <> Neuter
       then
         different_sexes conf
-      else if is_ancestor base (get_cle_index p1) (get_cle_index p2) then
+      else if is_ancestor base (get_key_index p1) (get_key_index p2) then
         error_loop conf base p2
-      else if is_ancestor base (get_cle_index p2) (get_cle_index p1) then
+      else if is_ancestor base (get_key_index p2) (get_key_index p1) then
         error_loop conf base p1
       else
         let (ok, changes_done) =
-          try_merge conf base [] (get_cle_index p1) (get_cle_index p2) False
+          try_merge conf base [] (get_key_index p1) (get_key_index p2) False
         in
         do {
           if changes_done then Util.commit_patches conf base else ();
           if ok then do {
             let key =
               (sou base (get_first_name p1), sou base (get_surname p1),
-               get_occ p1, get_cle_index p1)
+               get_occ p1, get_key_index p1)
             in
             History.record conf base key "fp";
             print_merged conf base p1;
@@ -633,7 +633,7 @@ value print conf base =
 
 value rec kill_ancestors conf base included_self p nb_ind nb_fam =
   do {
-    match get_parents (aoi base (get_cle_index p)) with
+    match get_parents (aoi base (get_key_index p)) with
     [ Some ifam ->
         let cpl = coi base ifam in
         do {
@@ -646,7 +646,7 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
         }
     | None -> () ];
     if included_self then do {
-      let ip = get_cle_index p in
+      let ip = get_key_index p in
       let p = UpdateIndOk.effective_del conf base p in
       base.func.patch_person ip p;
       incr nb_ind;
@@ -673,7 +673,7 @@ value print_kill_ancestors conf base =
       [ Some p ->
           let key =
             (sou base (get_first_name p), sou base (get_surname p),
-             get_occ p, get_cle_index p)
+             get_occ p, get_key_index p)
           in
           let nb_ind = ref 0 in
           let nb_fam = ref 0 in

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.13 2006-09-17 08:17:57 ddr Exp $ *)
+(* $Id: def.mli,v 5.14 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -115,7 +115,7 @@ type gen_person 'person 'string =
     burial_src : 'string;
     notes : 'string;
     psources : 'string;
-    cle_index : iper }
+    key_index : iper }
 ;
 
 type gen_ascend 'family =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.9 2006-09-21 02:04:47 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.10 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -128,7 +128,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   then
     print_nospouse ()
   else
-    let u = Array.to_list (get_family (uget conf base (get_cle_index p2))) in
+    let u = Array.to_list (get_family (uget conf base (get_key_index p2))) in
     match u with
     [ [] -> print_nospouse ()
     | _ ->
@@ -177,7 +177,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
            let children =
              List.map
                (fun ip ->
-                  (ip, ia_asex, [(get_cle_index p, get_sex p) :: rev_br]))
+                  (ip, ia_asex, [(get_key_index p, get_sex p) :: rev_br]))
                (children_of base u)
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
@@ -196,7 +196,7 @@ value sibling_has_desc_lev conf base lev (ip, _) =
 ;
 
 value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
-  let sib = siblings conf base (get_cle_index a) in
+  let sib = siblings conf base (get_key_index a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then do {
     if lev1 > 1 then do {
       Wserver.wprint "<li>\n";
@@ -226,7 +226,7 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
       loop first_sosa False where rec loop sosa some =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
           let some =
-            match Util.branch_of_sosa conf base (get_cle_index p) sosa with
+            match Util.branch_of_sosa conf base (get_key_index p) sosa with
             [ Some ([(ia, _) :: _] as br) ->
                 print_cousins_side_of conf base max_cnt (pget conf base ia) p
                   br lev1 lev2 ||
@@ -343,7 +343,7 @@ value print_anniv conf base p dead_people level =
            value leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2;
          end)
     in
-    let a = P.add (get_cle_index p, 0, 1) P.empty in
+    let a = P.add (get_key_index p, 0, 1) P.empty in
     let rec loop set a =
       if P.is_empty a then set
       else
@@ -406,7 +406,7 @@ value print_anniv conf base p dead_people level =
     do {
       xtag "input" "type=\"hidden\" name=\"m\" value=\"C\"";
       xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-        (Adef.int_of_iper (get_cle_index p));
+        (Adef.int_of_iper (get_key_index p));
       xtag "input" "type=\"hidden\" name=\"t\" value=\"%s\""
         (if dead_people then "AD" else "AN")
     }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.22 2006-09-22 19:26:59 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.23 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -451,7 +451,7 @@ value insert_person gen so =
            psources =
              unique_string gen
                (if so.psources = "" then default_source.val else so.psources);
-           cle_index = ip}
+           key_index = ip}
       in
       seek_out gen.g_per_index (Iovalue.sizeof_long * Adef.int_of_iper ip);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
@@ -469,7 +469,7 @@ value insert_somebody gen =
   | Defined so -> insert_person gen so ]
 ;
 
-value verif_parents_non_deja_definis gen ix pere mere =
+value check_parents_not_already_defined gen ix fath moth =
   let x = poi gen.g_base ix in
   match get_parents (aoi gen.g_base ix) with
   [ Some ifam ->
@@ -484,8 +484,8 @@ I cannot add \"%s\", child of
 because this persons still exists as child of
     - \"%s\"
     - \"%s\".
-" (designation gen.g_base x) (designation gen.g_base pere)
-          (designation gen.g_base mere)
+" (designation gen.g_base x) (designation gen.g_base fath)
+          (designation gen.g_base moth)
           (designation gen.g_base (poi gen.g_base p))
           (designation gen.g_base (poi gen.g_base m));
         flush stdout;
@@ -509,16 +509,16 @@ value notice_sex gen p s =
 ;
 
 value insert_family gen co fath_sex moth_sex witl fo deo =
-  let (pere, ipere) = insert_somebody gen (father co) in
-  let (mere, imere) = insert_somebody gen (mother co) in
+  let (fath, ifath) = insert_somebody gen (father co) in
+  let (moth, imoth) = insert_somebody gen (mother co) in
   let witl =
     List.map
       (fun (wit, sex) ->
          let (p, ip) = insert_somebody gen wit in
          do {
            notice_sex gen p sex;
-           if not (List.mem ipere p.m_related) then
-             p.m_related := [ipere :: p.m_related]
+           if not (List.mem ifath p.m_related) then
+             p.m_related := [ifath :: p.m_related]
            else ();
            ip
          })
@@ -548,10 +548,10 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          divorce = fo.divorce; comment = comment;
          origin_file = unique_string gen fo.origin_file; fsources = fsources;
          fam_index = Adef.ifam_of_int i}
-    and cpl = couple_of_gen_couple (couple False ipere imere)
+    and cpl = couple_of_gen_couple (couple False ifath imoth)
     and des = descend_of_gen_descend {children = children} in
-    let fath_uni = uoi gen.g_base ipere in
-    let moth_uni = uoi gen.g_base imere in
+    let fath_uni = uoi gen.g_base ifath in
+    let moth_uni = uoi gen.g_base imoth in
     seek_out gen.g_fam_index (Iovalue.sizeof_long * i);
     output_binary_int gen.g_fam_index (pos_out gen.g_fam);
     output_item_value gen.g_fam (fam : family);
@@ -562,19 +562,19 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
       union_of_gen_union
         {family = Array.append (get_family fath_uni) [| Adef.ifam_of_int i |]}
     in
-    gen.g_base.c_unions.(Adef.int_of_iper ipere) := fath_uni;
+    gen.g_base.c_unions.(Adef.int_of_iper ifath) := fath_uni;
     let moth_uni =
       union_of_gen_union
         {family = Array.append (get_family moth_uni) [| Adef.ifam_of_int i |]}
     in
-    gen.g_base.c_unions.(Adef.int_of_iper imere) := moth_uni;
-    notice_sex gen pere fath_sex;
-    notice_sex gen mere moth_sex;
+    gen.g_base.c_unions.(Adef.int_of_iper imoth) := moth_uni;
+    notice_sex gen fath fath_sex;
+    notice_sex gen moth moth_sex;
     Array.iter
       (fun ix ->
          let a = gen.g_base.c_ascends.(Adef.int_of_iper ix) in
          do {
-           verif_parents_non_deja_definis gen ix pere mere;
+           check_parents_not_already_defined gen ix fath moth;
            let a =
              ascend_of_gen_ascend
                {(gen_ascend_of_ascend a) with
@@ -754,14 +754,14 @@ value persons_record_access gen per_index_ic per_ic persons =
              death_src = empty_string; burial = UnknownBurial;
              burial_place = empty_string; burial_src = empty_string;
              notes = empty_string; psources = empty_string;
-             cle_index = Adef.iper_of_int 0}
+             key_index = Adef.iper_of_int 0}
       | _ -> assert False ]
     in
     person_of_gen_person
       {(gen_person_of_person p) with
        first_name = mp.m_first_name; surname = mp.m_surname;
        occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
-       sex = mp.m_sex; notes = mp.m_notes; cle_index = Adef.iper_of_int i}
+       sex = mp.m_sex; notes = mp.m_notes; key_index = Adef.iper_of_int i}
   in
   let get_fun i =
     try Hashtbl.find gen.g_patch_p i with

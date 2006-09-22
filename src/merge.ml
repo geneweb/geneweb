@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.5 2006-09-20 19:36:30 ddr Exp $ *)
+(* $Id: merge.ml,v 5.6 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -26,7 +26,7 @@ value print conf base p =
   let list =
     List.fold_right
       (fun p1 pl ->
-         if get_cle_index p1 = get_cle_index p then pl else [p1 :: pl])
+         if get_key_index p1 = get_key_index p then pl else [p1 :: pl])
       list []
   in
   do {
@@ -37,7 +37,7 @@ value print conf base p =
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_IND\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper (get_cle_index p));
+          (Adef.int_of_iper (get_key_index p));
         Wserver.wprint "%s " (capitale (transl_decline conf "with" ""));
         if list <> [] then do {
           Wserver.wprint ":";
@@ -61,7 +61,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
            tag "tr" "align=\"%s\"" conf.left begin
              tag "td" "valign=\"top\"" begin
                xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
-                 (Adef.int_of_iper (get_cle_index p));
+                 (Adef.int_of_iper (get_key_index p));
              end;
              tag "td" begin
                stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
@@ -72,7 +72,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
                match main_title conf base p with
                [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
                | None -> () ];
-               match get_parents (aoi base (get_cle_index p)) with
+               match get_parents (aoi base (get_key_index p)) with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    Wserver.wprint ",\n%s"

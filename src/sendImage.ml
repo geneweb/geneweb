@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 5.3 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: sendImage.ml,v 5.4 2006-09-22 23:47:15 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -74,7 +74,7 @@ value print_send_image conf base p =
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper (get_cle_index p));
+          (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
         Wserver.wprint "%s:\n" (capitale (transl conf "file"));
         xtag "input" "\
@@ -119,7 +119,7 @@ value print_delete_image conf base p =
         let fn = p_first_name base p in
         let sn = p_surname base p in
         let occ =
-          if fn = "?" || sn = "?" then Adef.int_of_iper (get_cle_index p)
+          if fn = "?" || sn = "?" then Adef.int_of_iper (get_key_index p)
           else get_occ p
         in
         Wserver.wprint ": ";
@@ -136,7 +136,7 @@ value print_delete_image conf base p =
       Wserver.wprint
         "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
       Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
-        (Adef.int_of_iper (get_cle_index p));
+        (Adef.int_of_iper (get_key_index p));
       Wserver.wprint "\n";
       html_p conf;
       Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
@@ -298,7 +298,7 @@ value effective_send_ok conf base p file =
     write_file (fname ^ typ) content;
     let key =
       (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-       get_cle_index p)
+       get_key_index p)
     in
     History.record conf base key "si";
     print_sent conf base p
@@ -352,7 +352,7 @@ value effective_delete_ok conf base p =
     else incorrect conf;
     let key =
       (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-       get_cle_index p)
+       get_key_index p)
     in
     History.record conf base key "di";
     print_deleted conf base p

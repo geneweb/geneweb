@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.6 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: place.ml,v 5.7 2006-09-22 23:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -60,7 +60,7 @@ value get_all conf base =
     let (cnt, _) =
       try Hashtbl.find ht (istr, get_surname p) with
       [ Not_found ->
-          let cnt = (ref 0, get_cle_index p) in
+          let cnt = (ref 0, get_key_index p) in
           do { Hashtbl.add ht (istr, get_surname p) cnt; cnt } ]
     in
     incr cnt

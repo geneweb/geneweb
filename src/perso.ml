@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.13 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: perso.ml,v 5.14 2006-09-22 23:47:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -176,11 +176,11 @@ value find_sosa_aux conf base a p =
     fun
     [ [] -> Left []
     | [(z, ip) :: zil] ->
-        if ip = get_cle_index a then Right z
+        if ip = get_key_index a then Right z
         else if mark.(Adef.int_of_iper ip) then gene_find zil
         else do {
           mark.(Adef.int_of_iper ip) := True;
-          if tstab.(Adef.int_of_iper (get_cle_index a)) <=
+          if tstab.(Adef.int_of_iper (get_key_index a)) <=
                tstab.(Adef.int_of_iper ip) then
             gene_find zil
           else
@@ -204,13 +204,13 @@ value find_sosa_aux conf base a p =
     | Left zil -> find zil
     | Right z -> Some (z, p) ]
   in
-  find [(Num.one, get_cle_index p)]
+  find [(Num.one, get_key_index p)]
 ;
 (* Male version
 value find_sosa_aux conf base a p =
   let mark = Array.create base.data.persons.len False in
   let rec find z ip =
-    if ip = a.cle_index then Some z
+    if ip = a.key_index then Some z
     else if mark.(Adef.int_of_iper ip) then None
     else do {
       mark.(Adef.int_of_iper ip) := True;
@@ -225,16 +225,16 @@ value find_sosa_aux conf base a p =
       | None -> None ]
     }
   in
-  find Num.one (get_cle_index p)
+  find Num.one (get_key_index p)
 ;
 *)
 
 value find_sosa conf base a sosa_ref_l =
   match Lazy.force sosa_ref_l with
   [ Some p ->
-      if get_cle_index a = get_cle_index p then Some (Num.one, p)
+      if get_key_index a = get_key_index p then Some (Num.one, p)
       else
-        let u = uget conf base (get_cle_index a) in
+        let u = uget conf base (get_key_index a) in
         if has_children base u then find_sosa_aux conf base a p else None
   | None -> None ]
 ;
@@ -269,7 +269,7 @@ value max_cousin_level conf base p =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
     [ Not_found | Failure _ -> default_max_cousin_lev ]
   in
-  max_ancestor_level conf base (get_cle_index p) max_lev + 1
+  max_ancestor_level conf base (get_key_index p) max_lev + 1
 ;
 
 value limit_anc_by_tree conf =
@@ -310,7 +310,7 @@ value make_desc_level_table conf base max_level p =
         in
         fill (succ lev) new_ipl ]
   in
-  do { fill 0 [get_cle_index p]; levt }
+  do { fill 0 [get_key_index p]; levt }
 ;
 
 value desc_level_max conf base desc_level_table_l =
@@ -468,7 +468,7 @@ value get_all_generations conf base p =
     else gpll
   in
   let gpll =
-    get_generations 1 [] [GP_person Num.one (get_cle_index p) None]
+    get_generations 1 [] [GP_person Num.one (get_key_index p) None]
   in
   let gpll = List.rev gpll in
   List.flatten gpll
@@ -543,7 +543,7 @@ value tree_generation_list conf base gv p =
          match po with
          [ Empty -> [Empty :: list]
          | Cell p _ _ _ _ ->
-             match get_parents (aget conf base (get_cle_index p)) with
+             match get_parents (aget conf base (get_key_index p)) with
              [ Some ifam ->
                  let cpl = coi base ifam in
                  let fath =
@@ -592,7 +592,7 @@ value get_date_place conf base auth_for_all_anc p =
           (fun d ifam ->
              if d <> None then d
              else Adef.od_of_codate (get_marriage (foi base ifam)))
-          d1 (Array.to_list (get_family (uget conf base (get_cle_index p))))
+          d1 (Array.to_list (get_family (uget conf base (get_key_index p))))
     in
     let d2 =
       match get_death p with
@@ -625,7 +625,7 @@ value get_date_place conf base auth_for_all_anc p =
             (fun pl ifam ->
                if pl <> "" then pl
                else sou base (get_marriage_place (foi base ifam)))
-            pl (Array.to_list (get_family (uget conf base (get_cle_index p))))
+            pl (Array.to_list (get_family (uget conf base (get_key_index p))))
       in
       pl
     in
@@ -670,14 +670,14 @@ value build_surnames_list conf base v p =
     r.val := (fst r.val, [sosa :: snd r.val])
   in
   let rec loop lev sosa p surn dp =
-    if mark.(Adef.int_of_iper (get_cle_index p)) = 0 then ()
+    if mark.(Adef.int_of_iper (get_key_index p)) = 0 then ()
     else if lev = v then
       if conf.hide_names && not (fast_auth_age conf p) then ()
       else add_surname sosa p surn dp
     else do {
-      mark.(Adef.int_of_iper (get_cle_index p)) :=
-        mark.(Adef.int_of_iper (get_cle_index p)) - 1;
-      match get_parents (aget conf base (get_cle_index p)) with
+      mark.(Adef.int_of_iper (get_key_index p)) :=
+        mark.(Adef.int_of_iper (get_key_index p)) - 1;
+      match get_parents (aget conf base (get_key_index p)) with
       [ Some ifam ->
           let cpl = coi base ifam in
           let fath = pget conf base (get_father cpl) in
@@ -906,14 +906,14 @@ value string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid;
 value string_of_image_small_size = gen_string_of_img_sz 100 75;
 
 value get_sosa conf base env r p =
-  try List.assoc (get_cle_index p) r.val with
+  try List.assoc (get_key_index p) r.val with
   [ Not_found -> do {
       let s =
         match get_env "sosa_ref" env with
         [ Vsosa_ref v -> find_sosa conf base p v
         | _ -> None ]
       in
-      r.val := [(get_cle_index p, s) :: r.val];
+      r.val := [(get_key_index p, s) :: r.val];
       s
     } ]
 ;
@@ -1288,14 +1288,14 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   | ["pvar"; v :: sl] ->
       match find_person_in_env conf base v with
       [ Some p ->
-          let ep = make_ep conf base (get_cle_index p) in
+          let ep = make_ep conf base (get_key_index p) in
           eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
           eval_relation_field_var conf base env
-            (index_of_sex (get_sex p), rt, get_cle_index p, False) loc sl
+            (index_of_sex (get_sex p), rt, get_key_index p, False) loc sl
       | _ -> raise Not_found ]
   | ["relation_her" :: sl] ->
       match get_env "rel" env with
@@ -1313,7 +1313,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       [ Vsosa_ref v ->
           match Lazy.force v with
           [ Some p ->
-              let ep = make_ep conf base (get_cle_index p) in
+              let ep = make_ep conf base (get_key_index p) in
               eval_person_field_var conf base env ep loc sl
           | None -> raise Not_found ]
       | _ -> raise Not_found ]
@@ -1365,7 +1365,7 @@ and eval_cell_field_var conf base env ep cell loc =
   | ["family" :: sl] ->
       match cell with
       [ Cell p (Some ifam) _ _ _ ->
-          let efam = make_efam conf base (get_cle_index p) ifam in
+          let efam = make_efam conf base (get_key_index p) ifam in
           eval_family_field_var conf base env efam loc sl
       | _ -> VVstring "" ]
   | ["is_center"] ->
@@ -1391,7 +1391,7 @@ and eval_cell_field_var conf base env ep cell loc =
   | ["person" :: sl] ->
       match cell with
       [ Cell p _ _ _ _ ->
-          let ep = make_ep conf base (get_cle_index p) in
+          let ep = make_ep conf base (get_key_index p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
@@ -1504,7 +1504,7 @@ and eval_anc_by_surnl_field_var conf base env ep
       let (p, _, _, _) = ep in
       VVstring (acces_n conf base "1" p ^ str)
   | sl ->
-      let ep = make_ep conf base (get_cle_index p) in
+      let ep = make_ep conf base (get_key_index p) in
       eval_person_field_var conf base env ep loc sl ]
 and eval_num conf n =
   fun
@@ -1618,7 +1618,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
           let cpl = coi base (get_fam_index fam) in
-          let ip = Gutil.spouse (get_cle_index p) cpl in
+          let ip = Gutil.spouse (get_key_index p) cpl in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
@@ -1767,7 +1767,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       | _ -> False ]
   | "is_descendant" ->
       match get_env "desc_mark" env with
-      [ Vdmark r -> r.val.(Adef.int_of_iper (get_cle_index p))
+      [ Vdmark r -> r.val.(Adef.int_of_iper (get_key_index p))
       | _ -> raise Not_found ]
   | "is_female" -> get_sex p = Female
   | "is_invisible" ->
@@ -1841,14 +1841,14 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match get_env "desc_level_table" env with
       [ Vdesclevtab levt ->
           let levt = Lazy.force levt in
-          string_of_int (levt.(Adef.int_of_iper (get_cle_index p)))
+          string_of_int (levt.(Adef.int_of_iper (get_key_index p)))
       | _ -> raise Not_found ]
   | "set_infinite_desc_level" ->
       match get_env "desc_level_table" env with
       [ Vdesclevtab levt ->
           let levt = Lazy.force levt in
           do {
-            levt.(Adef.int_of_iper (get_cle_index p)) := infinite;
+            levt.(Adef.int_of_iper (get_key_index p)) := infinite;
             ""
           }
       | _ -> raise Not_found ]
@@ -1858,7 +1858,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match get_env "fam" env with
       [ Vfam fam _ _ _ ->
           Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam (get_fam_index fam))
-            (Adef.int_of_iper (get_cle_index p))
+            (Adef.int_of_iper (get_key_index p))
       | _ -> raise Not_found ]
   | "father_age_at_birth" -> string_of_parent_age conf base ep get_father
   | "first_name" ->
@@ -1876,18 +1876,18 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "image_url" -> string_of_image_url conf base env ep False
   | "ind_access" ->
       (* deprecated since 5.00: rather use "i=%index;" *)
-      "i=" ^ string_of_int (Adef.int_of_iper (get_cle_index p))
-  | "index" -> string_of_int (Adef.int_of_iper (get_cle_index p))
+      "i=" ^ string_of_int (Adef.int_of_iper (get_key_index p))
+  | "index" -> string_of_int (Adef.int_of_iper (get_key_index p))
   | "mark_descendants" ->
       match get_env "desc_mark" env with
       [ Vdmark r ->
           let tab = Array.create base.data.persons.len False in
           let rec mark_descendants len p =
-            let i = Adef.int_of_iper (get_cle_index p) in
+            let i = Adef.int_of_iper (get_key_index p) in
             if tab.(i) then ()
             else do {
               tab.(i) := True;
-              let u = uget conf base (get_cle_index p) in
+              let u = uget conf base (get_key_index p) in
               for i = 0 to Array.length (get_family u) - 1 do {
                 let des = doi base (get_family u).(i) in
                 for i = 0 to Array.length (get_children des) - 1 do {
@@ -1996,7 +1996,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "sosa_in_list" ->
       match get_env "all_gp" env with
       [ Vallgp all_gp ->
-          match get_link all_gp (get_cle_index p) with
+          match get_link all_gp (get_key_index p) with
           [ Some (GP_person s _ _) -> Num.to_string s
           | _ -> "" ]
       | _ -> raise Not_found ]
@@ -2006,8 +2006,8 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           match get_sosa conf base env x p with
           [ Some (n, q) ->
               Printf.sprintf "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
-                (Adef.int_of_iper (get_cle_index p))
-                (Adef.int_of_iper (get_cle_index q))
+                (Adef.int_of_iper (get_key_index p))
+                (Adef.int_of_iper (get_key_index q))
                 (Num.to_string n)
           | None -> "" ]
       | _ -> raise Not_found ] 
@@ -2309,7 +2309,7 @@ value print_foreach conf base print_ast eval_expr =
       | _ -> raise Not_found ]
     in
     let mark = Array.create base.data.persons.len Num.zero in
-    loop [GP_person Num.one (get_cle_index p) None] 1 0 where rec loop gpl i n =
+    loop [GP_person Num.one (get_key_index p) None] 1 0 where rec loop gpl i n =
       if i > max_level then ()
       else
         let n =
@@ -2336,7 +2336,7 @@ value print_foreach conf base print_ast eval_expr =
       | _ -> 0 ]
     in
     let mark = Array.create base.data.persons.len Num.zero in
-    loop [GP_person Num.one (get_cle_index p) None] 1 where rec loop gpl i =
+    loop [GP_person Num.one (get_key_index p) None] 1 where rec loop gpl i =
       if i > max_level then ()
       else
         let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
@@ -2417,7 +2417,7 @@ value print_foreach conf base print_ast eval_expr =
           in
           let rec loop i =
             if i = Array.length (get_children des) then -2
-            else if (get_children des).(i) = get_cle_index p then i
+            else if (get_children des).(i) = get_key_index p then i
             else loop (i + 1)
           in
           loop 0
@@ -2469,7 +2469,7 @@ value print_foreach conf base print_ast eval_expr =
         let des = doi base ifam in
         let ifath = get_father cpl in
         let imoth = get_mother cpl in
-        let ispouse = spouse (get_cle_index p) cpl in
+        let ispouse = spouse (get_key_index p) cpl in
         let cpl = (ifath, imoth, ispouse) in
         let m_auth =
            authorized_age conf base (poi base ifath) &&
@@ -2561,10 +2561,10 @@ value print_foreach conf base print_ast eval_expr =
                fun
                [ [r :: rl] ->
                    match r.r_fath with
-                   [ Some ip when ip = get_cle_index p -> [(c, r) :: list]
+                   [ Some ip when ip = get_key_index p -> [(c, r) :: list]
                    | _ ->
                        match r.r_moth with
-                       [ Some ip when ip = get_cle_index p -> [(c, r) :: list]
+                       [ Some ip when ip = get_key_index p -> [(c, r) :: list]
                        | _ -> loop rl ] ]
                | [] -> list ])
           [] (get_related p)
@@ -2701,7 +2701,7 @@ value print_foreach conf base print_ast eval_expr =
                   Array.iter
                     (fun ifam ->
                        let fam = foi base ifam in
-                       if array_memq (get_cle_index p) (get_witnesses fam)
+                       if array_memq (get_key_index p) (get_witnesses fam)
                        then
                          list.val := [(ifam, fam) :: list.val]
                        else ())
@@ -2778,8 +2778,8 @@ value eval_predefined_apply conf env f vl =
 
 value interp_templ templ_fname conf base p =
   let _ = do { template_file.val := templ_fname ^ ".txt"; } in
-  let a = aget conf base (get_cle_index p) in
-  let u = uget conf base (get_cle_index p)in
+  let a = aget conf base (get_key_index p) in
+  let u = uget conf base (get_key_index p)in
   let ep = (p, a, u, authorized_age conf base p) in
   let emal =
     match p_getint conf.env "v" with
@@ -2796,7 +2796,7 @@ value interp_templ templ_fname conf base p =
       Lazy.lazy_from_fun dlt
     in
     let mal () =
-      Vint (max_ancestor_level conf base (get_cle_index p) emal + 1)
+      Vint (max_ancestor_level conf base (get_key_index p) emal + 1)
     in
     let mcl () = Vint (max_cousin_level conf base p) in
     let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
@@ -2833,7 +2833,7 @@ value print conf base p =
     if conf.wizard || conf.friend then None
     else
       let src =
-        match get_parents (aget conf base (get_cle_index p)) with
+        match get_parents (aget conf base (get_key_index p)) with
         [ Some ifam -> sou base (get_origin_file (foi base ifam))
         | None -> "" ]
       in
@@ -2856,7 +2856,7 @@ value limit_by_tree conf =
 value print_ancestors_dag conf base v p =
   let v = min (limit_by_tree conf) v in
   let set =
-    loop Dag.Pset.empty v (get_cle_index p) where rec loop set lev ip =
+    loop Dag.Pset.empty v (get_key_index p) where rec loop set lev ip =
       let set = Dag.Pset.add ip set in
       if lev <= 1 then set
       else
