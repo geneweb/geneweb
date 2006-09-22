@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.16 2006-09-21 19:13:57 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.17 2006-09-22 01:01:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -22,7 +22,7 @@ type notes =
     efiles : unit -> list string }
 ;
 
-type cache 'a =
+type record_access 'a =
   { load_array : unit -> unit;
     get : int -> 'a;
     set : int -> 'a -> unit;
@@ -37,20 +37,20 @@ type istr_iper_index =
     next : istr -> istr }
 ;
 
-type visible_cache =
+type visible_record_access =
   { v_write : unit -> unit;
     v_get : (person -> bool) -> int -> bool }
 ;
 
 type base_data =
-  { persons : cache person;
-    ascends : cache ascend;
-    unions : cache union;
-    visible : visible_cache;
-    families : cache family;
-    couples : cache couple;
-    descends : cache descend;
-    strings : cache string;
+  { persons : record_access person;
+    ascends : record_access ascend;
+    unions : record_access union;
+    visible : visible_record_access;
+    families : record_access family;
+    couples : record_access couple;
+    descends : record_access descend;
+    strings : record_access string;
     particles : list string;
     bnotes : notes }
 ;

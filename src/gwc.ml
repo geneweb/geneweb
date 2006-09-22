@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.19 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.20 2006-09-22 01:01:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -714,14 +714,14 @@ value force = ref False;
 value do_consang = ref False;
 value pr_stats = ref False;
 
-value cache_of tab =
+value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
    len = Array.length tab; array_obj _ = tab; clear_array () = ()}
 ;
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
 
-value persons_cache gen per_index_ic per_ic persons =
+value persons_record_access gen per_index_ic per_ic persons =
   let read_person_in_temp_file i =
     let mp = persons.(i) in
     let p : person =
@@ -776,7 +776,7 @@ value persons_cache gen per_index_ic per_ic persons =
 
 value part_file = ref "";
 
-value families_cache fam_index_ic fam_ic len =
+value families_record_access fam_index_ic fam_ic len =
   let get_fun i =
     do {
       seek_in fam_index_ic (Iovalue.sizeof_long * i);
@@ -862,13 +862,14 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Gwdb.base =
   let particles = input_particles part_file.val in
   let bnotes = gen.g_base.c_bnotes in
   let base_data =
-    {persons = persons_cache gen per_index_ic per_ic persons;
-     ascends = cache_of ascends;
-     unions = cache_of unions;
-     families = families_cache fam_index_ic fam_ic gen.g_fcnt;
+    {persons = persons_record_access gen per_index_ic per_ic persons;
+     ascends = record_access_of ascends;
+     unions = record_access_of unions;
+     families = families_record_access fam_index_ic fam_ic gen.g_fcnt;
      visible = { v_write = fun []; v_get = fun [] };
-     couples = cache_of couples; descends = cache_of descends;
-     strings = cache_of strings; particles = particles; bnotes = bnotes}
+     couples = record_access_of couples; descends = record_access_of descends;
+     strings = record_access_of strings; particles = particles;
+     bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];

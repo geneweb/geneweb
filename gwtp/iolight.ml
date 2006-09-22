@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 5.4 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: iolight.ml,v 5.5 2006-09-22 01:01:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -66,7 +66,7 @@ value input_4_10_array ic pos len =
   }
 ;
 
-value make_cache ic shift array_pos patches len name =
+value make_record_access ic shift array_pos patches len name =
   let tab = ref None in
   let rec array () =
     match tab.val with
@@ -128,36 +128,37 @@ value input bname =
   let norigin_file = input_value ic in
   let shift = 0 in
   let persons =
-    make_cache ic shift persons_array_pos patches.p_person persons_len
+    make_record_access ic shift persons_array_pos patches.p_person persons_len
       "persons"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_cache ic shift ascends_array_pos patches.p_ascend persons_len
+    make_record_access ic shift ascends_array_pos patches.p_ascend persons_len
       "ascends"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_cache ic shift unions_array_pos patches.p_union persons_len "unions"
+    make_record_access ic shift unions_array_pos patches.p_union persons_len
+      "unions"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_cache ic shift families_array_pos patches.p_family families_len
-      "families"
+    make_record_access ic shift families_array_pos patches.p_family
+      families_len "families"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_cache ic shift couples_array_pos patches.p_couple families_len
+    make_record_access ic shift couples_array_pos patches.p_couple families_len
       "couples"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_cache ic shift descends_array_pos patches.p_descend families_len
-      "descends"
+    make_record_access ic shift descends_array_pos patches.p_descend
+      families_len "descends"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
-    make_cache ic shift strings_array_pos patches.p_string strings_len
+    make_record_access ic shift strings_array_pos patches.p_string strings_len
       "strings"
   in
   let cleanup () = close_in ic in
