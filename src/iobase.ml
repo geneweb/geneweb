@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.12 2006-09-22 01:01:35 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.13 2006-09-22 07:12:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1351,17 +1351,15 @@ value output_strings_hash oc2 base =
       tabl.(i) := taba.(ia);
       taba.(ia) := i;
     };
-    do {
-      output_binary_int oc2 (Array.length taba);
-      output_binary_int oc2 0;
-      output_binary_int oc2 0;
-      for i = 0 to Array.length taba - 1 do {
-        output_binary_int oc2 taba.(i)
-      };
-      for i = 0 to Array.length tabl - 1 do {
-        output_binary_int oc2 tabl.(i)
-      };
-    }
+    output_binary_int oc2 (Array.length taba);
+    output_binary_int oc2 0;
+    output_binary_int oc2 0;
+    for i = 0 to Array.length taba - 1 do {
+      output_binary_int oc2 taba.(i)
+    };
+    for i = 0 to Array.length tabl - 1 do {
+      output_binary_int oc2 tabl.(i)
+    };
   }
 ;
 
