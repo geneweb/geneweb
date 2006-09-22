@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.2 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.3 2006-09-22 19:26:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -12,7 +12,7 @@ value speclist =
   [("-q", Arg.Set quiet, ": quiet mode");
    ("-i", Arg.Set indexes, ": build the indexes again");
    ("-scratch", Arg.Set scratch, ": from scratch");
-   ("-mem", Arg.Set Iobase.save_mem,
+   ("-mem", Arg.Set Outbase.save_mem,
     ": Save memory, but slower when rewritting database");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock database.")]
 ;
@@ -28,7 +28,7 @@ value simple_output bname base =
     in
     not (Sys.file_exists (Filename.concat bname "patches"))
   in
-  Iobase.gen_output (no_patches && not indexes.val) bname base
+  Outbase.gen_output (no_patches && not indexes.val) bname base
 ;
 
 value main () =

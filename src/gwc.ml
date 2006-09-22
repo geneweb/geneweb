@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.21 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.22 2006-09-22 19:26:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1032,7 +1032,7 @@ value speclist =
      <str> Set the source field for persons and families without source data");
    ("-part", Arg.String (fun s -> part_file.val := s), "\
      <file> Particles file (default = predefined particles)");
-   ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
+   ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
    ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.")]
 ;
@@ -1103,7 +1103,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
           [ Some (base, wiznotes) ->
               do {
                 Gc.compact ();
-                Iobase.output out_file.val base;
+                Outbase.output out_file.val base;
                 output_wizard_notes out_file.val wiznotes;
                 output_command_line out_file.val;
                 output_particles_file out_file.val base.data.particles;

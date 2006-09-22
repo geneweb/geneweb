@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.27 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.28 2006-09-22 19:26:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2881,7 +2881,8 @@ The database \"%s\" already exists. Use option -f to overwrite it.
     lock Gutil.lock_file out_file.val with
     [ Accept ->
         do {
-          Iobase.output out_file.val base; output_command_line out_file.val
+          Outbase.output out_file.val base;
+          output_command_line out_file.val
         }
     | Refuse ->
         do {

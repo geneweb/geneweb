@@ -1,8 +1,11 @@
-(* $Id: gutil.ml,v 5.19 2006-09-22 12:40:35 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.20 2006-09-22 19:26:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
+
+value verbose = ref True;
+value int_size = 4;
 
 value rindex s c =
   pos (String.length s - 1) where rec pos i =
@@ -1460,4 +1463,8 @@ value lock_file bname =
     else bname
   in
   bname ^ ".lck"
+;
+
+value output_value_no_sharing oc v =
+  Marshal.to_channel oc v [Marshal.No_sharing]
 ;
