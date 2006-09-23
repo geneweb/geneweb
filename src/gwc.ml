@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.24 2006-09-23 01:00:47 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.25 2006-09-23 01:18:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -137,7 +137,7 @@ value unique_string gen x =
 ;
 
 value no_family gen =
-  let _ (*empty*) = unique_string gen "" in
+  let _ = unique_string gen "" in
   let cpl =
     couple_of_gen_couple
       (Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0))
