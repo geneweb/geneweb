@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.23 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.24 2006-09-23 01:00:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -164,10 +164,10 @@ value new_iper gen =
     let asc_arr = gen.g_base.c_ascends in
     let uni_arr = gen.g_base.c_unions in
     let new_size = 2 * Array.length per_arr + 1 in
-    let (per_bidon, asc_bidon, uni_bidon) = no_person gen in
-    let new_per_arr = Array.create new_size per_bidon in
-    let new_asc_arr = Array.create new_size asc_bidon in
-    let new_uni_arr = Array.create new_size uni_bidon in
+    let (phony_per, phony_asc, phony_uni) = no_person gen in
+    let new_per_arr = Array.create new_size phony_per in
+    let new_asc_arr = Array.create new_size phony_asc in
+    let new_uni_arr = Array.create new_size phony_uni in
     let new_def = Array.create new_size False in
     Array.blit per_arr 0 new_per_arr 0 (Array.length per_arr);
     gen.g_base.c_persons := new_per_arr;
