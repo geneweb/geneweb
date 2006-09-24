@@ -1,8 +1,9 @@
-(* $Id: mostdesc.ml,v 5.2 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 5.3 2006-09-24 10:56:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Gutil;
 open Def;
+open Gutil;
+open Gwdb;
 
 value print_result base tab =
   let m_val = ref Num.zero in
@@ -40,7 +41,7 @@ value print_result base tab =
           (fun i ->
              let p = base.data.persons.get i in
              do {
-               Printf.printf "- %s.%d %s\n" (p_first_name base p) p.occ
+               Printf.printf "- %s.%d %s\n" (p_first_name base p) (get_occ p)
                  (p_surname base p);
                flush stdout;
              })
@@ -53,8 +54,8 @@ value print_result base tab =
 ;
 
 value most_desc base p =
-  let _ = base.data.ascends.array () in
-  let _ = base.data.couples.array () in
+  let _ = base.data.ascends.load_array () in
+  let _ = base.data.couples.load_array () in
   let id = Consang.topological_sort base aoi in
   let module Pq =
     Pqueue.Make
@@ -66,23 +67,23 @@ value most_desc base p =
 (*
   let _ = base.data.persons.array () in
 *)
-  let _ = base.data.descends.array () in
-  let _ = base.data.unions.array () in
+  let _ = base.data.descends.load_array () in
+  let _ = base.data.unions.load_array () in
   let tab = Array.create base.data.persons.len Num.zero in
   let entered = Array.create base.data.persons.len False in
   let q = ref Pq.empty in
   do {
-    q.val := Pq.add p.key_index q.val;
-    tab.(Adef.int_of_iper p.key_index) := Num.one;
+    q.val := Pq.add (get_key_index p) q.val;
+    tab.(Adef.int_of_iper (get_key_index p)) := Num.one;
     while not (Pq.is_empty q.val) do {
       let (ip, nq) = Pq.take q.val in
       q.val := nq;
       let u = uoi base ip in
       let n = tab.(Adef.int_of_iper ip) in
-      for i = 0 to Array.length u.family - 1 do {
-        let des = doi base u.family.(i) in
-        for j = 0 to Array.length des.children - 1 do {
-          let ip = des.children.(j) in
+      for i = 0 to Array.length (get_family u) - 1 do {
+        let des = doi base (get_family u).(i) in
+        for j = 0 to Array.length (get_children des) - 1 do {
+          let ip = (get_children des).(j) in
           tab.(Adef.int_of_iper ip) := Num.add tab.(Adef.int_of_iper ip) n;
           if not entered.(Adef.int_of_iper ip) then do {
             q.val := Pq.add ip q.val;
