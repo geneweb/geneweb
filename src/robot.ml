@@ -1,12 +1,12 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.3 2006-09-24 10:42:20 ddr Exp $ *)
+(* $Id: robot.ml,v 5.4 2006-09-24 14:32:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Util;
 open Printf;
 
-value magic_robot = "GWRB0003";
+value magic_robot = "GWRB0004";
 
 module W = Map.Make (struct type t = string; value compare = compare; end);
 
@@ -14,7 +14,7 @@ type norfriwiz = [ Normal | Friend | Wizard ];
 
 type excl =
   { excl : mutable list (string * ref int);
-    who : mutable W.t (list float * float * int * norfriwiz);
+    who : mutable W.t (list float * float * int * string * norfriwiz);
     max_conn : mutable (int * string) }
 ;
 
@@ -46,7 +46,7 @@ value purge_who tm xcl sec =
   let sec = float sec in
   let to_remove =
     W.fold
-      (fun k (v, _, _, _) l ->
+      (fun k (v, _, _, _, _) l ->
          match v with
          [ [tm0 :: _] -> if tm -. tm0 > sec then [k :: l] else l
          | [] -> [k :: l] ])
@@ -118,8 +118,9 @@ value check oc tm from max_call sec conf suicide =
     | None ->
         do {
           purge_who tm xcl sec;
-          let (r, _, _, _) =
-            try W.find from xcl.who with [ Not_found -> ([], tm, 0, nfw) ]
+          let (r, _, _, _, _) =
+            try W.find from xcl.who with
+            [ Not_found -> ([], tm, 0, "", nfw) ]
           in
           let (cnt, tml, tm0) =
             let sec = float sec in
@@ -136,7 +137,8 @@ value check oc tm from max_call sec conf suicide =
             count 1 [] r
           in
           let r = List.rev tml in
-          xcl.who := W.add from ([tm :: r], tm0, cnt, nfw) xcl.who;
+          xcl.who :=
+            W.add from ([tm :: r], tm0, cnt, conf.bname, nfw) xcl.who;
           let refused =
             if suicide || cnt > max_call then do {
               fprintf oc "--- %s is a robot" from;
@@ -169,7 +171,7 @@ value check oc tm from max_call sec conf suicide =
           else ();
           let (list, nconn) =
             W.fold
-              (fun k (_, tm, nb, _) (list, nconn) ->
+              (fun k (_, tm, nb, _, _) (list, nconn) ->
                  do {
                    if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
                    else ();
@@ -205,10 +207,12 @@ value check oc tm from max_call sec conf suicide =
     | None -> () ];
     if refused then robot_error conf.cgi from max_call sec else ();
     W.fold
-      (fun _ (_, _, _, nfw) (c, cw, cf) ->
-         let cw = if nfw = Wizard then cw + 1 else cw in
-         let cf = if nfw = Friend then cf + 1 else cf in
-         (c + 1, cw, cf))
+      (fun _ (_, _, _, bname, nfw) (c, cw, cf) ->
+         if bname = conf.bname then
+           let cw = if nfw = Wizard then cw + 1 else cw in
+           let cf = if nfw = Friend then cf + 1 else cf in
+           (c + 1, cw, cf)
+         else (c, cw, cf))
       xcl.who (0, 0, 0)
   }
 ;
