@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: robot.ml,v 5.2 2006-09-24 08:38:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -197,6 +197,7 @@ value check oc tm from max_call sec cgi suicide =
     with
     [ Some oc -> do { output_excl oc xcl; close_out oc; }
     | None -> () ];
-    if refused then robot_error cgi from max_call sec else ()
+    if refused then robot_error cgi from max_call sec else ();
+    W.fold (fun _ _ c -> c + 1) xcl.who 0
   }
 ;

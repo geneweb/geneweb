@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.5 2006-09-08 09:54:59 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.6 2006-09-24 08:38:08 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -939,7 +939,10 @@ sl: %q dostopov, %c od teh na to stran, od %d.
 sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 zh: 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
-]</div>
+]%IC<br%/>[
+en: Now, %C persons are connected.
+fr: En ce moment, %C personnes sont connectées.
+]%E</div>
 %Il<p>%E
 
 </td></tr></table>
