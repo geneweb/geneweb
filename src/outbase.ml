@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.2 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.3 2006-09-24 08:10:03 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -285,7 +285,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
   let bt = ref IstrTree.empty in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
+      let p = poi base (Adef.iper_of_int i) in
       let a =
         try IstrTree.find (get_surname p) bt.val with [ Not_found -> [] ]
       in
