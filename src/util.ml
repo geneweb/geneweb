@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.26 2006-09-24 10:42:20 ddr Exp $ *)
+(* $Id: util.ml,v 5.27 2006-09-24 11:47:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1554,13 +1554,13 @@ value print_copyright conf =
       fun _ ->
         let (c, cw, cf) = conf.n_connect in
         if c > 0 then
-          "- " ^ sprintf "%s: %d" (transl conf "connections") c ^
+          "- " ^ sprintf "%s %d" (transl conf "connections") c ^
           (if cw > 0 then
-             sprintf ", %s: %d"
+             sprintf ", %s %d"
                (transl_nth conf "wizard/wizards/friend/friends" 1) cw
            else "") ^
           (if cf > 0 then
-             sprintf ", %s: %d"
+             sprintf ", %s %d"
                (transl_nth conf "wizard/wizards/friend/friends" 3) cf
            else "")
         else "");
