@@ -1,16 +1,16 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.6 2006-09-24 16:29:13 ddr Exp $ *)
+(* $Id: robot.ml,v 5.7 2006-09-24 18:08:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Util;
 open Printf;
 
-value magic_robot = "GWRB0005";
+value magic_robot = "GWRB0006";
 
 module W = Map.Make (struct type t = string; value compare = compare; end);
 
-type norfriwiz = [ Normal | Friend | Wizard ];
+type norfriwiz = [ Normal | Friend of string | Wizard of string ];
 
 type excl =
   { excl : mutable list (string * ref int);
@@ -96,7 +96,7 @@ value min_disp_req = ref 6;
 
 value check oc tm from max_call sec conf suicide =
   let nfw =
-    if conf.wizard then Wizard else if conf.friend then Friend else Normal
+    if conf.wizard then Wizard conf.user else if conf.friend then Friend conf.user else Normal
   in
   let (xcl, fname) = robot_excl () in
   let refused =
@@ -209,9 +209,10 @@ value check oc tm from max_call sec conf suicide =
     W.fold
       (fun _ (_, _, _, (bname, nfw)) (c, cw, cf) ->
          if bname = conf.bname && bname <> "" then
-           let cw = if nfw = Wizard then cw + 1 else cw in
-           let cf = if nfw = Friend then cf + 1 else cf in
-           (c + 1, cw, cf)
+	   match nfw with
+	   [ Wizard _ -> (c + 1, cw + 1, cf)
+	   | Friend _ -> (c + 1, cw, cf + 1)
+           | Normal -> (c + 1, cw, cf) ]
          else (c, cw, cf))
       xcl.who (0, 0, 0)
   }
