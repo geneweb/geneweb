@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.7 2006-09-24 18:08:06 ddr Exp $ *)
+(* $Id: robot.ml,v 5.8 2006-09-24 22:14:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -207,13 +207,15 @@ value check oc tm from max_call sec conf suicide =
     | None -> () ];
     if refused then robot_error conf.cgi from max_call sec else ();
     W.fold
-      (fun _ (_, _, _, (bname, nfw)) (c, cw, cf) ->
+      (fun _ (_, _, _, (bname, nfw)) (c, cw, cf, wl) ->
          if bname = conf.bname && bname <> "" then
 	   match nfw with
-	   [ Wizard _ -> (c + 1, cw + 1, cf)
-	   | Friend _ -> (c + 1, cw, cf + 1)
-           | Normal -> (c + 1, cw, cf) ]
-         else (c, cw, cf))
-      xcl.who (0, 0, 0)
+	   [ Wizard n ->
+	       if List.mem n wl then (c, cw, cf, wl)
+	       else (c + 1, cw + 1, cf, [n :: wl])
+	   | Friend _ -> (c + 1, cw, cf + 1, wl)
+           | Normal -> (c + 1, cw, cf, wl) ]
+         else (c, cw, cf, wl))
+      xcl.who (0, 0, 0, [])
   }
 ;
