@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.28 2006-09-24 10:42:19 ddr Exp $
+# $Id: lex_utf8.txt,v 5.29 2006-09-24 16:20:58 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -8934,6 +8934,10 @@ ro: arbore
 ru: дерево
 sl: drevo
 sv: träd
+
+    try again
+en: try again
+fr: réessayer
 
     uncles and aunts
 af: ooms en tantes

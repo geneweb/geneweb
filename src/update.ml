@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.8 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: update.ml,v 5.9 2006-09-24 16:20:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -399,10 +399,32 @@ value error_locked conf =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Wserver.wprint
-      (fcapitale
-         (ftransl conf "the file is temporarily locked: please try again"));
-    Wserver.wprint ".\n";
+    tag "p" begin
+      Wserver.wprint
+        (fcapitale
+           (ftransl conf "the file is temporarily locked: please try again"));
+      Wserver.wprint ".\n";
+    end;
+    tag "p" begin
+      tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+        List.iter
+          (fun (x, v) ->
+             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+               (quote_escaped (decode_varenv v)))
+          (conf.henv @ conf.env);
+        xtag "input" "type=\"submit\" value=\"%s\""
+          (capitale (transl conf "try again"));
+      end;
+      tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+        List.iter
+          (fun (x, v) ->
+             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+               (quote_escaped (decode_varenv v)))
+          conf.henv;
+        xtag "input" "type=\"submit\" value=\"%s\""
+          (capitale (transl_nth conf "user/password/cancel" 2));
+      end;
+    end;
     trailer conf
   }
 ;
