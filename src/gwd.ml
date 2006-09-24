@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.2 2006-09-24 08:38:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -989,6 +989,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          match Util.p_getint env "border" with
          [ Some i -> i
          | None -> 0 ];
+       n_connect = -1;
        today =
          {day = tm.Unix.tm_mday; month = succ tm.Unix.tm_mon;
           year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
@@ -1014,7 +1015,8 @@ value log_and_robot_check conf auth from request script_name contents =
               [ Some (cnt, sec) ->
                   let s = "suicide" in
                   let suicide = Util.p_getenv conf.env s <> None in
-                  Robot.check oc tm from cnt sec conf.cgi suicide
+                  conf.n_connect :=
+                    Robot.check oc tm from cnt sec conf.cgi suicide
               | _ -> () ];
               if conf.cgi && log_file.val = "" then ()
               else log oc tm conf from auth request script_name contents;

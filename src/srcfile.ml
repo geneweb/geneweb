@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.3 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.4 2006-09-24 08:38:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -225,6 +225,7 @@ value macro conf base =
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int r.welcome_cnt)
+  | 'C' -> string_of_int conf.n_connect
   | 'd' -> string_of_start_date conf
   | 'D' -> (count conf).start_date
   | 'e' -> conf.charset
@@ -356,6 +357,7 @@ value rec copy_from_stream conf base strm mode =
     [ 'N' -> not (if_expr (Stream.next strm))
     | 'a' -> conf.auth_file <> ""
     | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
+    | 'C' -> conf.n_connect > 0
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
