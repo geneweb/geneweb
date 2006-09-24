@@ -100,6 +100,7 @@ click
 click on "%s"
 color
 comment
+connections
 consanguinity
 continue merging
 cousins
@@ -327,6 +328,7 @@ today
 tomorrow
 total
 tree
+try again
 uncles and aunts
 undefined sex for %t
 unknown person
@@ -334,6 +336,7 @@ unspecified
 up to
 update
 use "link" instead of "create"
+user/password/cancel
 validate/delete
 visualize/show/hide/summary
 warnings
