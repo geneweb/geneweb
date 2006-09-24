@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.27 2006-09-24 11:47:15 ddr Exp $ *)
+(* $Id: util.ml,v 5.28 2006-09-24 22:14:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1552,18 +1552,20 @@ value print_copyright conf =
         else s ^ " - " ^ setup_link conf);
      ('O',
       fun _ ->
-        let (c, cw, cf) = conf.n_connect in
-        if c > 0 then
-          "- " ^ sprintf "%s %d" (transl conf "connections") c ^
-          (if cw > 0 then
-             sprintf ", %s %d"
-               (transl_nth conf "wizard/wizards/friend/friends" 1) cw
-           else "") ^
-          (if cf > 0 then
-             sprintf ", %s %d"
-               (transl_nth conf "wizard/wizards/friend/friends" 3) cf
-           else "")
-        else "");
+        match conf.n_connect with
+        [ Some (c, cw, cf, _) ->
+            if c > 0 then
+              "- " ^ sprintf "%s %d" (transl conf "connections") c ^
+              (if cw > 0 then
+                 sprintf ", %s %d"
+                   (transl_nth conf "wizard/wizards/friend/friends" 1) cw
+               else "") ^
+              (if cf > 0 then
+                 sprintf ", %s %d"
+                   (transl_nth conf "wizard/wizards/friend/friends" 3) cf
+               else "")
+            else ""
+	| None -> "" ]);
      ('/', fun _ -> conf.xhs)]
   in
   match open_etc_file "copyr" with
