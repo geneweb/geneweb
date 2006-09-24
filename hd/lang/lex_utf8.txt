@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.27 2006-09-24 08:52:06 ddr Exp $
+# $Id: lex_utf8.txt,v 5.28 2006-09-24 10:42:19 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2770,9 +2770,9 @@ ru: комментарий
 sl: komentar
 sv: kommentar
 
-    connections: %d
-en: connections: %d
-fr: connexions : %d
+    connections
+en: connections
+fr: connexions
 
     consanguinity
 af: bloedverwantskap
