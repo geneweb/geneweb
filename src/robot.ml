@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.5 2006-09-24 16:20:58 ddr Exp $ *)
+(* $Id: robot.ml,v 5.6 2006-09-24 16:29:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -208,7 +208,7 @@ value check oc tm from max_call sec conf suicide =
     if refused then robot_error conf.cgi from max_call sec else ();
     W.fold
       (fun _ (_, _, _, (bname, nfw)) (c, cw, cf) ->
-         if bname = conf.bname then
+         if bname = conf.bname && bname <> "" then
            let cw = if nfw = Wizard then cw + 1 else cw in
            let cf = if nfw = Friend then cf + 1 else cf in
            (c + 1, cw, cf)
