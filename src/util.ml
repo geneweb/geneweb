@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.24 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: util.ml,v 5.25 2006-09-24 08:52:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1550,6 +1550,11 @@ value print_copyright conf =
         in
         if not conf.setup_link then s
         else s ^ " - " ^ setup_link conf);
+     ('O',
+      fun _ ->
+        if conf.n_connect > 0 then
+          "- " ^ sprintf (ftransl conf "connections: %d") conf.n_connect
+        else "");
      ('/', fun _ -> conf.xhs)]
   in
   match open_etc_file "copyr" with
