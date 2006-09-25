@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.9 2006-09-24 16:20:58 ddr Exp $ *)
+(* $Id: update.ml,v 5.10 2006-09-25 05:52:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -405,24 +405,32 @@ value error_locked conf =
            (ftransl conf "the file is temporarily locked: please try again"));
       Wserver.wprint ".\n";
     end;
-    tag "p" begin
-      tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-        List.iter
-          (fun (x, v) ->
-             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-               (quote_escaped (decode_varenv v)))
-          (conf.henv @ conf.env);
-        xtag "input" "type=\"submit\" value=\"%s\""
-          (capitale (transl conf "try again"));
-      end;
-      tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-        List.iter
-          (fun (x, v) ->
-             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-               (quote_escaped (decode_varenv v)))
-          conf.henv;
-        xtag "input" "type=\"submit\" value=\"%s\""
-          (capitale (transl_nth conf "user/password/cancel" 2));
+    tag "table" begin
+      tag "tr" begin
+        tag "td" begin
+          tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+            List.iter
+              (fun (x, v) ->
+                 xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+                   (quote_escaped (decode_varenv v)))
+              (conf.henv @ conf.env);
+            (* just to see in the traces... *)
+            xtag "input" "type=\"hidden\" name=\"retry\" value=\"yes\"";
+            xtag "input" "type=\"submit\" value=\"%s\""
+              (capitale (transl conf "try again"));
+          end;
+        end;
+        tag "td" begin
+          tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+            List.iter
+              (fun (x, v) ->
+                 xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+                   (quote_escaped (decode_varenv v)))
+              conf.henv;
+            xtag "input" "type=\"submit\" value=\"%s\""
+              (capitale (transl_nth conf "user/password/cancel" 2));
+          end;
+        end;
       end;
     end;
     trailer conf
