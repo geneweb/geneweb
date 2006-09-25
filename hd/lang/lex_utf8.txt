@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.30 2006-09-25 12:28:10 ddr Exp $
+# $Id: lex_utf8.txt,v 5.31 2006-09-25 13:21:47 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2772,6 +2772,7 @@ sv: kommentar
 
     connections
 en: connections
+fi: yhteyksien määrä
 fr: connexions
 
     consanguinity
