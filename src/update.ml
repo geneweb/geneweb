@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.12 2006-09-25 10:25:47 ddr Exp $ *)
+(* $Id: update.ml,v 5.13 2006-09-25 12:42:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -430,6 +430,15 @@ value error_locked conf =
                  xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
                    (quote_escaped (decode_varenv v)))
               conf.henv;
+            let ip =
+              match p_getenv conf.env "ip" with
+              [ Some ip -> Some ip
+              | None -> p_getenv conf.env "i" ]
+            in
+            match ip with
+            [ Some n ->
+                xtag "input" "type=\"hidden\" name=\"i\" value=\"%s\"" n
+            | None -> () ];
             xtag "input" "type=\"submit\" value=\"%s\""
               (capitale (transl_nth conf "user/password/cancel" 2));
           end;
