@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.5 2006-09-25 10:25:47 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.6 2006-09-25 12:07:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -429,10 +429,11 @@ value connected_wizards_ok conf (_, _, _, wl) = do {
   in
   header conf title;
   print_link_to_welcome conf True;
+  let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
   let wddir = dir conf in
   tag "ul" begin
     List.iter
-      (fun wz ->
+      (fun (wz, _) ->
          let (wfile, stm) = wiznote_date (wzfile wddir wz) in
          let tm = Unix.localtime stm in
          tag "li" begin
