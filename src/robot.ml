@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.10 2006-09-25 12:07:12 ddr Exp $ *)
+(* $Id: robot.ml,v 5.11 2006-09-25 16:14:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -184,8 +184,8 @@ value check oc tm from max_call sec conf suicide =
           let (list, nconn) =
             W.fold
               (fun k w (list, nconn) ->
-		 let tm = w.oldest_time in
-		 let nb = w.nb_connect in
+                 let tm = w.oldest_time in
+                 let nb = w.nb_connect in
                  do {
                    if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
                    else ();
@@ -223,11 +223,11 @@ value check oc tm from max_call sec conf suicide =
     W.fold
       (fun _ w (c, cw, cf, wl) ->
          if w.nb_connect > 2 && w.nbase = conf.bname && w.nbase <> "" then
-	   match w.utype with
-	   [ Wizard n ->
-	       if List.mem_assoc n wl then (c, cw, cf, wl)
-	       else (c + 1, cw + 1, cf, [(n, List.hd w.acc_times) :: wl])
-	   | Friend _ -> (c + 1, cw, cf + 1, wl)
+           match w.utype with
+           [ Wizard n ->
+               if List.mem_assoc n wl then (c, cw, cf, wl)
+               else (c + 1, cw + 1, cf, [(n, List.hd w.acc_times) :: wl])
+           | Friend _ -> (c + 1, cw, cf + 1, wl)
            | Normal -> (c + 1, cw, cf, wl) ]
          else (c, cw, cf, wl))
       xcl.who (0, 0, 0, [])

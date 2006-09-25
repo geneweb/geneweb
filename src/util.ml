@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.29 2006-09-25 10:25:47 ddr Exp $ *)
+(* $Id: util.ml,v 5.30 2006-09-25 16:14:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1558,18 +1558,22 @@ value print_copyright conf =
               "- " ^ sprintf "%s %d" (transl conf "connections") c ^
               (if cw > 0 then
                  sprintf ", %s %s"
-		   (transl_nth conf "wizard/wizards/friend/friends" 1)
+                   (transl_nth conf "wizard/wizards/friend/friends" 1)
+(* functionnality suspended... considered as "indiscreete"...
                    (if conf.wizard then
                       sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>" (commd conf)
                          cw
-                    else sprintf "%d" cw)
+                    else
+                      sprintf "%d" cw)
+*)
+                   (string_of_int cw)
                else "") ^
               (if cf > 0 then
                  sprintf ", %s %d"
                    (transl_nth conf "wizard/wizards/friend/friends" 3) cf
                else "")
             else ""
-	| None -> "" ]);
+        | None -> "" ]);
      ('/', fun _ -> conf.xhs)]
   in
   match open_etc_file "copyr" with

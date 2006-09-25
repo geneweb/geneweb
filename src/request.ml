@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.2 2006-09-25 10:25:47 ddr Exp $ *)
+(* $Id: request.ml,v 5.3 2006-09-25 16:14:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -379,7 +379,9 @@ value family_m conf base =
   | Some "CAL" -> Date.print_calendar conf base
   | Some "CHG_CHN" when conf.wizard -> ChangeChildren.print conf base
   | Some "CHG_CHN_OK" when conf.wizard -> ChangeChildren.print_ok conf base
+(* functionnality suspended... considered as "indiscreete"...
   | Some "CONN_WIZ" when conf.wizard -> Wiznotes.connected_wizards conf base
+*)
   | Some "D" ->
       match find_person_in_env conf base "" with
       [ Some p -> Descend.print conf base p
