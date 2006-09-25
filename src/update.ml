@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.11 2006-09-25 09:22:06 ddr Exp $ *)
+(* $Id: update.ml,v 5.12 2006-09-25 10:25:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -411,8 +411,10 @@ value error_locked conf =
           tag "form" "method=\"post\" action=\"%s\"" conf.command begin
             List.iter
               (fun (x, v) ->
-                 xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-                   (quote_escaped (decode_varenv v)))
+                 if x = "retry" then ()
+                 else
+                   xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+                     (quote_escaped (decode_varenv v)))
               (conf.henv @ conf.env);
             (* just to see in the traces... *)
             xtag "input" "type=\"hidden\" name=\"retry\" value=\"%s\""
