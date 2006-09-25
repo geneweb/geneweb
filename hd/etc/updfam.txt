@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 5.2 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 5.3 2006-09-25 19:30:56 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -24,6 +24,126 @@
 <body%body_prop;>
 %message_to_wizard;
 
+<script type="text/javascript">
+<!--
+function changeCalendar(e,v,m,c) {
+  var mv = m;
+  switch (m) {
+  case "VD": mv = 1; break;
+  case "BR": mv = 2; break;
+  case "FM": mv = 3; break;
+  case "NI": mv = 4; break;
+  case "PL": mv = 5; break;
+  case "VT": mv = 6; break;
+  case "GE": mv = 7; break;
+  case "FL": mv = 8; break;
+  case "PR": mv = 9; break;
+  case "ME": mv = 10; break;
+  case "TH": mv = 11; break;
+  case "FT": mv = 12; break;
+  case "JC": mv = 13; break;
+  }
+  switch(c.options[c.selectedIndex].value) {
+  case 'G':
+  case 'J':
+    document.getElementById(e).innerHTML = '\
+<select name="' + v + '">\
+<option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;
+[(month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;
+[(month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected="selected"' : '') + '>%nn;
+[(month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected="selected"' : '') + '>%nn;
+[(month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected="selected"' : '') + '>%nn;
+[(month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected="selected"' : '') + '>%nn;
+[(month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected="selected"' : '') + '>%nn;
+[(month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected="selected"' : '') + '>%nn;
+[(month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected="selected"' : '') + '>%nn;
+[(month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected="selected"' : '') + '>%nn;
+[(month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected="selected"' : '') + '>%nn;
+[(month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected="selected"' : '') + '>%nn;
+[(month)]11</option>\
+</select>\
+';
+    break;
+  case 'F':
+    document.getElementById(e).innerHTML = '\
+<select name="' + v + '">\
+<option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]11</option>\
+<option value="13"' + (mv == 13 ? ' selected="selected"' : '') + '>%nn;
+[(french revolution month)]12</option>\
+</select>\
+';
+    break;
+  case 'H':
+    document.getElementById(e).innerHTML = '\
+<select name="' + v + '">\
+<option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]11</option>\
+<option value="13"' + (mv == 13 ? ' selected="selected"' : '') + '>%nn;
+[(hebrew month)]12</option>\
+</select>\
+';
+    break;
+  }
+}
+-->
+</script>
+
 %define;date(xlab,xvar,xdate)
   <table border="1">
     <tr>
@@ -35,8 +155,8 @@
           <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
           </label><label>
           [year/month/day]1
-          <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
-          </label><label>
+          <span id="xvar_mm_sel"><input name="xvar_mm" size="2"%sp;
+           maxlength="2" value="%xdate.month;"xcond%/></span></label>
           [year/month/day]0
           <input name="xvar_yyyy" size="6" maxlength="6"%sp;
            value="%xdate.year;"%/>
@@ -48,8 +168,8 @@
            value="%xdate.year;"%/>
           </label><label>
           [year/month/day]1
-          <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
-          </label><label>
+          <span id="xvar_mm_sel"><input name="xvar_mm" size="2"%sp;
+           maxlength="2" value="%xdate.month;"xcond%/></span></label>
           [year/month/day]2
           <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
           </label>
@@ -65,7 +185,8 @@
   <table border="1">
     <tr>
       <td>[*calendar/calendars]0
-        <select name="xvar_cal">
+        <select name="xvar_cal" onchange=%nn;
+         "changeCalendar('xvar_mm_sel','xvar_mm','%xdate.month;',this)">
           <option value="G"%if;(xdate.calendar = "gregorian")%sp;
            selected="selected"%end;>[*gregorian/julian/french/hebrew]0</option>
           <option value="J"%if;(xdate.calendar = "julian")%sp;
