@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.6 2006-09-25 12:07:12 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.7 2006-09-25 16:14:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -422,6 +422,7 @@ value print_mod_ok conf base =
       file_path False
 ;
 
+(* functionnality suspended... considered as "indiscreet"...
 value connected_wizards_ok conf (_, _, _, wl) = do {
   let title _ =
     Wserver.wprint "%s"
@@ -458,3 +459,4 @@ value connected_wizards conf base =
   [ Some x -> connected_wizards_ok conf x
   | None -> incorrect_request conf ]
 ;
+*)
