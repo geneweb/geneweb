@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.4 2006-09-24 22:14:20 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.5 2006-09-25 09:21:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1143,7 +1143,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                  [ Some n when n <> "" -> print_renamed conf n
                  | _ ->
                      do {
-                       Family.treat_request_on_base conf
+                       Request.treat_request_on_base conf
                          (log_file.val, log_oc, flush_log);
                        if sleep > 0 then Unix.sleep sleep else ();
                      } ] ] ]
