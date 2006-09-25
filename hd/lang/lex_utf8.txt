@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.29 2006-09-24 16:20:58 ddr Exp $
+# $Id: lex_utf8.txt,v 5.30 2006-09-25 12:28:10 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -8937,6 +8937,7 @@ sv: träd
 
     try again
 en: try again
+fi: yritä uudestaan
 fr: réessayer
 
     uncles and aunts
