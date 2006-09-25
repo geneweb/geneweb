@@ -1,20 +1,28 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.9 2006-09-25 09:22:06 ddr Exp $ *)
+(* $Id: robot.ml,v 5.10 2006-09-25 12:07:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Util;
 open Printf;
 
-value magic_robot = "GWRB0006";
+value magic_robot = "GWRB0007";
 
 module W = Map.Make (struct type t = string; value compare = compare; end);
 
 type norfriwiz = [ Normal | Friend of string | Wizard of string ];
 
+type who =
+  { acc_times : list float;
+    oldest_time : float;
+    nb_connect : int;
+    nbase : string;
+    utype : norfriwiz }
+;
+
 type excl =
   { excl : mutable list (string * ref int);
-    who : mutable W.t (list float * float * int * (string * norfriwiz));
+    who : mutable W.t who;
     max_conn : mutable (int * string) }
 ;
 
@@ -46,8 +54,8 @@ value purge_who tm xcl sec =
   let sec = float sec in
   let to_remove =
     W.fold
-      (fun k (v, _, _, _) l ->
-         match v with
+      (fun k who l ->
+         match who.acc_times with
          [ [tm0 :: _] -> if tm -. tm0 > sec then [k :: l] else l
          | [] -> [k :: l] ])
       xcl.who []
@@ -96,7 +104,9 @@ value min_disp_req = ref 6;
 
 value check oc tm from max_call sec conf suicide =
   let nfw =
-    if conf.wizard then Wizard conf.user else if conf.friend then Friend conf.user else Normal
+    if conf.wizard then Wizard conf.user
+    else if conf.friend then Friend conf.user
+    else Normal
   in
   let (xcl, fname) = robot_excl () in
   let refused =
@@ -118,9 +128,8 @@ value check oc tm from max_call sec conf suicide =
     | None ->
         do {
           purge_who tm xcl sec;
-          let (r, _, _, _) =
-            try W.find from xcl.who with
-            [ Not_found -> ([], tm, 0, ("", Normal)) ]
+          let r =
+            try (W.find from xcl.who).acc_times with [ Not_found -> [] ]
           in
           let (cnt, tml, tm0) =
             let sec = float sec in
@@ -138,7 +147,10 @@ value check oc tm from max_call sec conf suicide =
           in
           let r = List.rev tml in
           xcl.who :=
-            W.add from ([tm :: r], tm0, cnt, (conf.bname, nfw)) xcl.who;
+            W.add from
+              {acc_times = [tm :: r]; oldest_time = tm0; nb_connect = cnt;
+               nbase = conf.bname; utype = nfw}
+              xcl.who;
           let refused =
             if suicide || cnt > max_call then do {
               fprintf oc "--- %s is a robot" from;
@@ -171,7 +183,9 @@ value check oc tm from max_call sec conf suicide =
           else ();
           let (list, nconn) =
             W.fold
-              (fun k (_, tm, nb, _) (list, nconn) ->
+              (fun k w (list, nconn) ->
+		 let tm = w.oldest_time in
+		 let nb = w.nb_connect in
                  do {
                    if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
                    else ();
@@ -207,12 +221,12 @@ value check oc tm from max_call sec conf suicide =
     | None -> () ];
     if refused then robot_error conf.cgi from max_call sec else ();
     W.fold
-      (fun _ (_, _, cnt, (bname, nfw)) (c, cw, cf, wl) ->
-         if cnt > 2 && bname = conf.bname && bname <> "" then
-	   match nfw with
+      (fun _ w (c, cw, cf, wl) ->
+         if w.nb_connect > 2 && w.nbase = conf.bname && w.nbase <> "" then
+	   match w.utype with
 	   [ Wizard n ->
-	       if List.mem n wl then (c, cw, cf, wl)
-	       else (c + 1, cw + 1, cf, [n :: wl])
+	       if List.mem_assoc n wl then (c, cw, cf, wl)
+	       else (c + 1, cw + 1, cf, [(n, List.hd w.acc_times) :: wl])
 	   | Friend _ -> (c + 1, cw, cf + 1, wl)
            | Normal -> (c + 1, cw, cf, wl) ]
          else (c, cw, cf, wl))
