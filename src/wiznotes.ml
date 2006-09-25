@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.4 2006-08-23 16:12:43 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.5 2006-09-25 10:25:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -420,4 +420,40 @@ value print_mod_ok conf base =
     let file_path = Notes.file_path conf in
     Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
       file_path False
+;
+
+value connected_wizards_ok conf (_, _, _, wl) = do {
+  let title _ =
+    Wserver.wprint "%s"
+      (capitale (transl_nth conf "wizard/wizards/friend/friends" 1))
+  in
+  header conf title;
+  print_link_to_welcome conf True;
+  let wddir = dir conf in
+  tag "ul" begin
+    List.iter
+      (fun wz ->
+         let (wfile, stm) = wiznote_date (wzfile wddir wz) in
+         let tm = Unix.localtime stm in
+         tag "li" begin
+           if wfile <> "" then
+             Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
+               (commd conf) (Util.code_varenv wz)
+               (fun _ ->
+                  Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                    (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                    tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                    tm.Unix.tm_sec)
+               wz
+           else Wserver.wprint "%s" wz;
+         end)
+      wl;
+  end;
+  trailer conf;
+};
+
+value connected_wizards conf base =
+  match conf.n_connect with
+  [ Some x -> connected_wizards_ok conf x
+  | None -> incorrect_request conf ]
 ;
