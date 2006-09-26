@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.11 2006-09-21 03:28:14 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.12 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -26,7 +26,7 @@ value select conf base get_date find_oldest =
          ;
        end)
   in
-  let n = min (max 0 (get_k conf)) base.data.persons.len in
+  let n = min (max 0 (get_k conf)) (nb_of_persons base) in
   let ref_date =
     match p_getint conf.env "by" with
     [ Some by ->
@@ -44,7 +44,7 @@ value select conf base get_date find_oldest =
     | None -> None ]
   in
   let rec loop q len i =
-    if i = base.data.persons.len then
+    if i = nb_of_persons base then
       let rec loop list q =
         if Q.is_empty q then (list, len)
         else let (e, q) = Q.take q in loop [e :: list] q
@@ -78,7 +78,7 @@ value select_family conf base get_date find_oldest =
            if find_oldest then Date.before_date x y else Date.before_date y x;
        end)
   in
-  let n = min (max 0 (get_k conf)) base.data.families.len in
+  let n = min (max 0 (get_k conf)) (nb_of_families base) in
   let ref_date =
     match p_getint conf.env "by" with
     [ Some by ->
@@ -96,7 +96,7 @@ value select_family conf base get_date find_oldest =
     | None -> None ]
   in
   let rec loop q len i =
-    if i = base.data.families.len then
+    if i = nb_of_families base then
       let rec loop list q =
         if QF.is_empty q then (list, len)
         else let (e, q) = QF.take q in loop [e :: list] q

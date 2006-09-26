@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: descend.ml,v 5.13 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -635,8 +635,8 @@ value display_descendants_with_numbers conf base max_level ancestor =
            (transl_a_of_gr_eq_gen_lev conf
               (transl conf "descendants") (person_text conf base ancestor)))
   in
-  let marks = Array.create base.data.persons.len False in
-  let paths = Array.create base.data.persons.len [] in
+  let marks = Array.create (nb_of_persons base) False in
+  let paths = Array.create (nb_of_persons base) [] in
   do {
     header conf title;
     total.val := 0;
@@ -787,12 +787,12 @@ value display_descendant_index conf base max_level ancestor =
   in
   do {
     header conf title;
-    let marks = Array.create base.data.persons.len False in
-    let paths = Array.create base.data.persons.len [] in
+    let marks = Array.create (nb_of_persons base) False in
+    let paths = Array.create (nb_of_persons base) [] in
     mark_descendants conf base marks max_level (get_key_index ancestor);
     label_descendants conf base marks paths max_level ancestor;
     let list = ref [] in
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       if paths.(i) <> [] then
         let p = pget conf base (Adef.iper_of_int i) in
         if p_first_name base p <> "?" && p_surname base p <> "?" &&
@@ -815,12 +815,12 @@ value display_spouse_index conf base max_level ancestor =
   in
   do {
     header conf title;
-    let marks = Array.create base.data.persons.len False in
-    let paths = Array.create base.data.persons.len [] in
+    let marks = Array.create (nb_of_persons base) False in
+    let paths = Array.create (nb_of_persons base) [] in
     mark_descendants conf base marks max_level (get_key_index ancestor);
     label_descendants conf base marks paths max_level ancestor;
     let list = ref [] in
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       if paths.(i) <> [] then
         let p = pget conf base (Adef.iper_of_int i) in
         let u = uget conf base (Adef.iper_of_int i) in

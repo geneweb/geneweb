@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.3 2006-09-25 16:14:11 ddr Exp $ *)
+(* $Id: request.ml,v 5.4 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -55,7 +55,7 @@ value relation_print conf base p =
     [ Some i ->
         do {
           conf.senv := [];
-          if i >= 0 && i < base.data.persons.len then
+          if i >= 0 && i < nb_of_persons base then
             Some (pget conf base (Adef.iper_of_int i))
           else None
         }

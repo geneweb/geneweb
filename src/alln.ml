@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.6 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: alln.ml,v 5.7 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -120,7 +120,7 @@ value print_title conf base is_surnames ini len =
       Wserver.wprint " %s %s" (transl conf "starting with")
         (capitalize_if_not_utf8 ini)
     else
-      Wserver.wprint " (%d %s)" base.data.persons.len
+      Wserver.wprint " (%d %s)" (nb_of_persons base)
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
   }
 ;

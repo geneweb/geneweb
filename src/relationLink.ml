@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.9 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.10 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -56,7 +56,7 @@ value make_dist_tab conf base ia maxlev =
         (struct type t = int; value leq x y = not (tsort_leq tstab x y); end)
     in
     let default = {dmin = infinity; dmax = 0; mark = False} in
-    let dist = Array.create base.data.persons.len default in
+    let dist = Array.create (nb_of_persons base) default in
     let q = ref Pq.empty in
     let add_children ip =
       let u = uget conf base ip in

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.21 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.22 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -478,7 +478,7 @@ value person_misc_names base p nobtit =
       [] list
 ;
 
-value person_ht_add base s ip = base.func.patch_name s ip;
+value person_ht_add base s ip = patch_name base s ip;
 
 value person_is_key base p k =
   let k = Name.crush_lower k in
@@ -612,7 +612,7 @@ type base_warning = warning person;
 type visit = [ NotVisited | BeingVisited | Visited ];
 
 value check_noloop base error =
-  let tab = Array.create base.data.persons.len NotVisited in
+  let tab = Array.create (nb_of_persons base) NotVisited in
   let rec noloop i =
     match tab.(i) with
     [ NotVisited ->
@@ -633,7 +633,7 @@ value check_noloop base error =
     | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
     | Visited -> () ]
   in
-  for i = 0 to base.data.persons.len - 1 do {
+  for i = 0 to nb_of_persons base - 1 do {
     match tab.(i) with
     [ NotVisited -> noloop i
     | BeingVisited -> failwith "check_noloop algorithm error"
@@ -642,7 +642,7 @@ value check_noloop base error =
 ;
 
 value check_noloop_for_person_list base error ipl =
-  let tab = Array.create base.data.persons.len NotVisited in
+  let tab = Array.create (nb_of_persons base) NotVisited in
   let rec noloop ip =
     let i = Adef.int_of_iper ip in
     match tab.(i) with

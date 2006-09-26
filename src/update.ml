@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.13 2006-09-25 12:42:01 ddr Exp $ *)
+(* $Id: update.ml,v 5.14 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -97,8 +97,8 @@ value print_err_unknown conf base (f, s, o) =
 value insert_string base s =
   try base.func.index_of_string s with
   [ Not_found ->
-      let i = Adef.istr_of_int base.data.strings.len in
-      do { base.func.patch_string i s; i } ]
+      let i = Adef.istr_of_int (nb_of_strings base) in
+      do { patch_string base i s; i } ]
 ;
 
 value update_misc_names_of_family conf base p u =
@@ -691,7 +691,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
   [ Create sex info ->
       try
         if f = "?" || s = "?" then
-          if o <= 0 || o >= base.data.persons.len then raise Not_found
+          if o <= 0 || o >= nb_of_persons base then raise Not_found
           else
             let ip = Adef.iper_of_int o in
             let p = poi base ip in
@@ -703,7 +703,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
-          let ip = Adef.iper_of_int base.data.persons.len in
+          let ip = Adef.iper_of_int (nb_of_persons base) in
           let empty_string = insert_string base "" in
           let (birth, birth_place, baptism, baptism_place) =
             match info with
@@ -747,9 +747,9 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           and a = no_ascend ()
           and u = union_of_gen_union {family = [| |]} in
           do {
-            base.func.patch_person (get_key_index p) p;
-            base.func.patch_ascend (get_key_index p) a;
-            base.func.patch_union (get_key_index p) u;
+            patch_person base (get_key_index p) p;
+            patch_ascend base (get_key_index p) a;
+            patch_union base (get_key_index p) u;
             if f <> "?" && s <> "?" then do {
               person_ht_add base (Util.translate_eval (f ^ " " ^ s)) ip;
               new_persons.val := [p :: new_persons.val]
@@ -759,7 +759,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           } ]
   | Link ->
       if f = "?" || s = "?" then
-        if o < 0 || o >= base.data.persons.len then
+        if o < 0 || o >= nb_of_persons base then
           print_err_unknown conf base (f, s, o)
         else
           let ip = Adef.iper_of_int o in

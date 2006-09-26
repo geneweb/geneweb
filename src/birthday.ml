@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.8 2006-09-21 03:28:14 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.9 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -163,7 +163,7 @@ value f_scan conf base =
   fun () ->
     do {
       incr i;
-      if i.val < base.data.persons.len then
+      if i.val < nb_of_persons base then
         (pget conf base (Adef.iper_of_int i.val),
          referenced_person_title_text)
       else raise Not_found
@@ -276,7 +276,7 @@ value print_marriage conf base month =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    for i = 0 to base.data.families.len - 1 do {
+    for i = 0 to nb_of_families base - 1 do {
       let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else
@@ -435,7 +435,7 @@ value print_menu_birth conf base =
   let f_scan () =
     do {
       incr i;
-      if i.val < base.data.persons.len then
+      if i.val < nb_of_persons base then
         (pget conf base (Adef.iper_of_int i.val),
          referenced_person_title_text)
       else raise Not_found
@@ -528,7 +528,7 @@ value print_menu_dead conf base =
   let f_scan () =
     do {
       incr i;
-      if i.val < base.data.persons.len then
+      if i.val < nb_of_persons base then
         (pget conf base (Adef.iper_of_int i.val),
          referenced_person_title_text)
       else raise Not_found
@@ -562,7 +562,7 @@ value print_menu_marriage conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    for i = 0 to base.data.families.len - 1 do {
+    for i = 0 to nb_of_families base - 1 do {
       let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else

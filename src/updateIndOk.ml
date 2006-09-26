@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.18 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.19 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -457,7 +457,7 @@ value update_relation_parents base op np =
            else ippl)
       mod_ippl op_rparents
   in
-  List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
+  List.iter (fun (ip, p) -> patch_person base ip p) mod_ippl
 ;
 
 value effective_mod conf base sp =
@@ -497,7 +497,7 @@ value effective_mod conf base sp =
 ;
 
 value effective_add conf base sp =
-  let pi = Adef.iper_of_int base.data.persons.len in
+  let pi = Adef.iper_of_int (nb_of_persons base) in
   let key = Util.translate_eval (sp.first_name ^ " " ^ sp.surname) in
   let ipl = person_ht_find_all base key in
   do {
@@ -511,9 +511,9 @@ value effective_add conf base sp =
     let np = person_of_gen_person np in
     let na = no_ascend () in
     let nu = union_of_gen_union {family = [| |]} in
-    base.func.patch_person pi np;
-    base.func.patch_ascend pi na;
-    base.func.patch_union pi nu;
+    patch_person base pi np;
+    patch_ascend base pi na;
+    patch_union base pi nu;
     let np_misc_names = person_misc_names base np (nobtit conf base) in
     List.iter (fun key -> person_ht_add base key pi) np_misc_names;
     (np, na)
@@ -545,8 +545,8 @@ value effective_del conf base p = do {
         ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
       in
       do {
-        base.func.patch_descend ifam des;
-        base.func.patch_ascend ip asc;
+        patch_descend base ifam des;
+        patch_ascend base ip asc;
       }
   | None -> () ];
   person_of_gen_person
@@ -619,7 +619,7 @@ value all_checks_person conf base p a u =
       (get_family u);
     List.iter
       (fun
-       [ ChangedOrderOfChildren ifam des _ -> base.func.patch_descend ifam des
+       [ ChangedOrderOfChildren ifam des _ -> patch_descend base ifam des
        | _ -> () ])
       wl.val;
     List.rev wl.val
@@ -696,7 +696,7 @@ value print_del conf base =
       in
       do {
         let p = effective_del conf base p in
-        base.func.patch_person (get_key_index p) p;
+        patch_person base (get_key_index p) p;
         Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p))
           "" True;
         Util.commit_patches conf base;
@@ -735,7 +735,7 @@ value print_mod o_conf base =
     let op = poi base (get_key_index p) in
     let u = uoi base (get_key_index p) in
     do {
-      base.func.patch_person (get_key_index p) p;
+      patch_person base (get_key_index p) p;
       Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p))
         (sou base (get_notes p)) (get_notes p <> get_notes op);
       if get_surname op <> get_surname p ||

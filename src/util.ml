@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.30 2006-09-25 16:14:11 ddr Exp $ *)
+(* $Id: util.ml,v 5.31 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -950,7 +950,7 @@ value base_len n =
   let n = base_path [] (n ^ ".gwb") in
   match try Some (Iobase.input n) with [ Sys_error _ -> None ] with
   [ Some base ->
-      let len = base.data.persons.len in
+      let len = nb_of_persons base in
       do { base.func.cleanup (); string_of_int len }
   | _ -> "?" ]
 ;
@@ -1071,7 +1071,7 @@ value url_no_index conf base =
   let get_a_person v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
-        if i >= 0 && i < base.data.persons.len then
+        if i >= 0 && i < nb_of_persons base then
           let p = pget conf base (Adef.iper_of_int i) in
           if (conf.hide_names && not (fast_auth_age conf p)) || is_hidden p
           then None
@@ -1086,7 +1086,7 @@ value url_no_index conf base =
   let get_a_family v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
-        if i >= 0 && i < base.data.families.len then
+        if i >= 0 && i < nb_of_families base then
           if is_deleted_family (foi base (Adef.ifam_of_int i)) then None
           else
             let cpl = coi base (Adef.ifam_of_int i) in
@@ -2002,7 +2002,7 @@ value incorrect_request conf =
 value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with
   [ Some i ->
-      if i >= 0 && i < base.data.persons.len then
+      if i >= 0 && i < nb_of_persons base then
         let p = pget conf base (Adef.iper_of_int i) in
         if is_hidden p then None
         else Some p
@@ -2064,7 +2064,7 @@ value create_topological_sort conf base =
       let () = base.data.ascends.load_array () in
       let () = base.data.couples.load_array () in
       Consang.topological_sort base (aget conf)
-  | Some "no_tstab" -> Array.create base.data.persons.len 0
+  | Some "no_tstab" -> Array.create (nb_of_persons base) 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
       lock (Gutil.lock_file bfile) with

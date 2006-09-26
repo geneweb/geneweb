@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.5 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: consang.ml,v 5.6 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -58,11 +58,11 @@ exception TopologicalSortError of person;
 *)
 
 value topological_sort base aoi =
-  let tab = Array.create base.data.persons.len 0 in
+  let tab = Array.create (nb_of_persons base) 0 in
   let todo = ref [] in
   let cnt = ref 0 in
   do {
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let a = aoi base (Adef.iper_of_int i) in
       match get_parents a with
       [ Some ifam ->
@@ -74,7 +74,7 @@ value topological_sort base aoi =
           }
       | _ -> () ]
     };
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       if tab.(i) == 0 then todo.val := [i :: todo.val] else ()
     };
     let rec loop tval list =
@@ -112,7 +112,7 @@ value topological_sort base aoi =
         loop (tval + 1) new_list
     in
     loop 0 todo.val;
-    if cnt.val <> base.data.persons.len then
+    if cnt.val <> nb_of_persons base then
       Gutil.check_noloop base
         (fun
          [ OwnAncestor p -> raise (TopologicalSortError p)
@@ -129,7 +129,7 @@ value phony_rel =
 ;
 
 value make_relationship_info base tstab =
-  let tab = Array.create base.data.persons.len phony_rel in
+  let tab = Array.create (nb_of_persons base) phony_rel in
   {tstab = tstab; reltab = tab; queue = [| |]}
 ;
 
