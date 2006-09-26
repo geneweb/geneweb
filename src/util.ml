@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.31 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: util.ml,v 5.32 2006-09-26 17:10:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1559,14 +1559,11 @@ value print_copyright conf =
               (if cw > 0 then
                  sprintf ", %s %s"
                    (transl_nth conf "wizard/wizards/friend/friends" 1)
-(* functionnality suspended... considered as "indiscreete"...
                    (if conf.wizard then
                       sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>" (commd conf)
                          cw
                     else
-                      sprintf "%d" cw)
-*)
-                   (string_of_int cw)
+                      string_of_int cw)
                else "") ^
               (if cf > 0 then
                  sprintf ", %s %d"
