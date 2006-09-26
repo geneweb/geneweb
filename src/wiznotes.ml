@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.7 2006-09-25 16:14:11 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.8 2006-09-26 17:10:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -422,19 +422,37 @@ value print_mod_ok conf base =
       file_path False
 ;
 
-(* functionnality suspended... considered as "indiscreet"...
-value connected_wizards_ok conf (_, _, _, wl) = do {
+value wizard_allowing wddir =
+  let fname = Filename.concat wddir "connected.allow" in
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop [] where rec loop list =
+        match try Some (input_line ic) with [ End_of_file -> None ] with
+        [ Some wname -> loop [wname :: list]
+        | None -> do { close_in ic; list } ]
+  | None -> [] ]
+;
+
+value connected_wizards_ok conf base (_, _, _, wl) = do {
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl_nth conf "wizard/wizards/friend/friends" 1))
   in
   header conf title;
   print_link_to_welcome conf True;
-  let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
   let wddir = dir conf in
+  let allowed = wizard_allowing wddir in
+  let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
+  let (wl, not_everybody) =
+     List.fold_left
+       (fun (list, not_everybody) (wz, _) ->
+          if List.mem wz allowed then ([wz :: list], not_everybody)
+          else (list, True))
+       ([], False) (List.rev wl)
+  in
   tag "ul" begin
     List.iter
-      (fun (wz, _) ->
+      (fun wz ->
          let (wfile, stm) = wiznote_date (wzfile wddir wz) in
          let tm = Unix.localtime stm in
          tag "li" begin
@@ -450,13 +468,13 @@ value connected_wizards_ok conf (_, _, _, wl) = do {
            else Wserver.wprint "%s" wz;
          end)
       wl;
+    if not_everybody then tag "li" begin Wserver.wprint "..."; end else ();
   end;
   trailer conf;
 };
 
 value connected_wizards conf base =
   match conf.n_connect with
-  [ Some x -> connected_wizards_ok conf x
+  [ Some x -> connected_wizards_ok conf base x
   | None -> incorrect_request conf ]
 ;
-*)
