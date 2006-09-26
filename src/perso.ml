@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.14 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: perso.ml,v 5.15 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -171,7 +171,7 @@ value string_of_titles conf base cap and_txt p =
 
 value find_sosa_aux conf base a p =
   let tstab = Util.create_topological_sort conf base in
-  let mark = Array.create base.data.persons.len False in
+  let mark = Array.create (nb_of_persons base) False in
   let rec gene_find =
     fun
     [ [] -> Left []
@@ -241,7 +241,7 @@ value find_sosa conf base a sosa_ref_l =
 
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
-  let mark = Array.create base.data.persons.len False in
+  let mark = Array.create (nb_of_persons base) False in
   let rec loop level ip =
     if mark.(Adef.int_of_iper ip) then ()
     else do {
@@ -287,7 +287,7 @@ value limit_desc conf =
 value infinite = 10000;
 
 value make_desc_level_table conf base max_level p =
-  let levt = Array.create base.data.persons.len infinite in
+  let levt = Array.create (nb_of_persons base) infinite in
   let get = uoi base in
   let rec fill lev =
     fun
@@ -457,7 +457,7 @@ value get_all_generations conf base p =
     [ Some v -> v + 1
     | None -> 0 ]
   in
-  let mark = Array.create base.data.persons.len Num.zero in
+  let mark = Array.create (nb_of_persons base) Num.zero in
   let rec get_generations level gpll gpl =
     let gpll = [gpl :: gpll] in
     if level < max_level then
@@ -658,7 +658,7 @@ value merge_date_place conf base surn ((d1, d2, pl), auth) p =
 
 value build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
-  let mark = Array.create base.data.persons.len 5 in
+  let mark = Array.create (nb_of_persons base) 5 in
   let auth = conf.wizard || conf.friend in
   let add_surname sosa p surn dp =
     let r =
@@ -1202,7 +1202,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
   | ["base"; "nb_persons"] ->
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
-           (Num.of_int base.data.persons.len))
+           (Num.of_int (nb_of_persons base)))
   | ["cell" :: sl] ->
       match get_env "cell" env with
       [ Vcell cell -> eval_cell_field_var conf base env ep cell loc sl
@@ -1881,7 +1881,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "mark_descendants" ->
       match get_env "desc_mark" env with
       [ Vdmark r ->
-          let tab = Array.create base.data.persons.len False in
+          let tab = Array.create (nb_of_persons base) False in
           let rec mark_descendants len p =
             let i = Adef.int_of_iper (get_key_index p) in
             if tab.(i) then ()
@@ -2308,7 +2308,7 @@ value print_foreach conf base print_ast eval_expr =
           | _ -> 0 ]
       | _ -> raise Not_found ]
     in
-    let mark = Array.create base.data.persons.len Num.zero in
+    let mark = Array.create (nb_of_persons base) Num.zero in
     loop [GP_person Num.one (get_key_index p) None] 1 0 where rec loop gpl i n =
       if i > max_level then ()
       else
@@ -2335,14 +2335,14 @@ value print_foreach conf base print_ast eval_expr =
       [ Vint n -> n
       | _ -> 0 ]
     in
-    let mark = Array.create base.data.persons.len Num.zero in
+    let mark = Array.create (nb_of_persons base) Num.zero in
     loop [GP_person Num.one (get_key_index p) None] 1 where rec loop gpl i =
       if i > max_level then ()
       else
         let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
         do {
           List.iter (print_ast env ep) al;
-          for i = 0 to base.data.persons.len - 1 do { mark.(i) := Num.zero };
+          for i = 0 to nb_of_persons base - 1 do { mark.(i) := Num.zero };
           let gpl = next_generation2 conf base mark gpl in
           loop gpl (succ i)
         }

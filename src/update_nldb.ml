@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.5 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.6 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -51,7 +51,7 @@ value compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
   in
-  let len = base.data.persons.len in
+  let len = nb_of_persons base in
   do {
     Printf.eprintf "--- database notes\n";
     flush stderr;

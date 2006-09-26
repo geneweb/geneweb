@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.9 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: title.ml,v 5.10 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -181,7 +181,7 @@ value select_title_place conf base title place =
     else ()
   in
   do {
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter (select x) (nobtit conf base x)
     };
@@ -200,7 +200,7 @@ value select_all_with_place conf base place =
     else ()
   in
   do {
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter (select x) (nobtit conf base x)
     };
@@ -223,7 +223,7 @@ value select_title conf base title =
     else ()
   in
   do {
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter add_place (nobtit conf base x)
     };
@@ -246,7 +246,7 @@ value select_place conf base place =
     else ()
   in
   do {
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter add_title (nobtit conf base x)
     };
@@ -259,7 +259,7 @@ value select_all proj conf base =
   let module S = Set.Make O in
   let s =
     loop 0 S.empty where rec loop i s =
-      if i = base.data.persons.len then s
+      if i = nb_of_persons base then s
       else
         let x = pget conf base (Adef.iper_of_int i) in
         let s =

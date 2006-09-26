@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.18 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.19 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -160,3 +160,16 @@ value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value doi base i = base.data.descends.get (Adef.int_of_ifam i);
 
 value sou base i = base.data.strings.get (Adef.int_of_istr i);
+
+value nb_of_persons base = base.data.persons.len;
+value nb_of_families base = base.data.families.len;
+value nb_of_strings base = base.data.strings.len;
+
+value patch_person base = base.func.patch_person;
+value patch_ascend base = base.func.patch_ascend;
+value patch_union base = base.func.patch_union;
+value patch_family base = base.func.patch_family;
+value patch_descend base = base.func.patch_descend;
+value patch_couple base = base.func.patch_couple;
+value patch_name base = base.func.patch_name;
+value patch_string base = base.func.patch_string;

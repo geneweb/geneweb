@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.18 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.19 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -412,7 +412,7 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
            else ippl)
       mod_ippl ofam_witn
   in
-  List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
+  List.iter (fun (ip, p) -> patch_person base ip p) mod_ippl
 ;
 
 value effective_mod conf base sfam scpl sdes =
@@ -454,7 +454,7 @@ value effective_mod conf base sfam scpl sdes =
               person_of_gen_person
                 {(gen_person_of_person nfath) with sex = Male}
             in
-            base.func.patch_person (get_key_index nfath) nfath;
+            patch_person base (get_key_index nfath) nfath;
             nfath
           } ]
       in
@@ -467,7 +467,7 @@ value effective_mod conf base sfam scpl sdes =
               person_of_gen_person
                 {(gen_person_of_person nmoth) with sex = Female}
             in
-            base.func.patch_person (get_key_index nmoth) nmoth;
+            patch_person base (get_key_index nmoth) nmoth;
             nmoth
           } ]
       in
@@ -487,9 +487,9 @@ value effective_mod conf base sfam scpl sdes =
            else nfam.origin_file;
          fam_index = fi}
     in
-    base.func.patch_family fi nfam;
-    base.func.patch_couple fi ncpl;
-    base.func.patch_descend fi ndes;
+    patch_family base fi nfam;
+    patch_couple base fi ncpl;
+    patch_descend base fi ndes;
     let oarr = get_parent_array ocpl in
     let narr = get_parent_array ncpl in
     for i = 0 to Array.length oarr - 1 do {
@@ -499,7 +499,7 @@ value effective_mod conf base sfam scpl sdes =
           union_of_gen_union
             {family = family_exclude (get_family ou) (get_fam_index ofam)}
         in
-        base.func.patch_union oarr.(i) ou
+        patch_union base oarr.(i) ou
       }
       else ()
     };
@@ -510,7 +510,7 @@ value effective_mod conf base sfam scpl sdes =
           union_of_gen_union
             {family = Array.append (get_family nu) [| fi |]}
         in
-        base.func.patch_union narr.(i) nu;
+        patch_union base narr.(i) nu;
       }
       else ()
     };
@@ -557,13 +557,13 @@ value effective_mod conf base sfam scpl sdes =
     Array.iter
       (fun ip ->
          if not (array_memq ip (get_children ndes)) then
-           base.func.patch_ascend ip (find_asc ip)
+           patch_ascend base ip (find_asc ip)
          else ())
       (get_children odes);
     Array.iter
       (fun ip ->
          if not (array_memq ip (get_children odes)) || not same_parents then
-           base.func.patch_ascend ip (find_asc ip)
+           patch_ascend base ip (find_asc ip)
          else ())
       (get_children ndes);
     Update.add_misc_names_for_new_persons conf base created_p.val;
@@ -575,7 +575,7 @@ value effective_mod conf base sfam scpl sdes =
 ;
 
 value effective_add conf base sfam scpl sdes =
-  let fi = Adef.ifam_of_int base.data.families.len in
+  let fi = Adef.ifam_of_int (nb_of_families base) in
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
@@ -612,7 +612,7 @@ value effective_add conf base sfam scpl sdes =
               person_of_gen_person
                 {(gen_person_of_person nfath_p) with sex = Male}
             in
-            base.func.patch_person (get_father ncpl) nfath_p;
+            patch_person base (get_father ncpl) nfath_p;
             nfath_p
           } ]
       in
@@ -625,7 +625,7 @@ value effective_add conf base sfam scpl sdes =
               person_of_gen_person
                 {(gen_person_of_person nmoth_p) with sex = Female}
             in
-            base.func.patch_person (get_mother ncpl) nmoth_p;
+            patch_person base (get_mother ncpl) nmoth_p;
             nmoth_p
           } ]
       in
@@ -638,9 +638,9 @@ value effective_add conf base sfam scpl sdes =
       {(nfam) with fam_index = fi; origin_file = origin_file}
   in
   do {
-    base.func.patch_family fi nfam;
-    base.func.patch_couple fi ncpl;
-    base.func.patch_descend fi ndes;
+    patch_family base fi nfam;
+    patch_couple base fi ncpl;
+    patch_descend base fi ndes;
     let nfath_u =
       union_of_gen_union
         {family = Array.append (get_family nfath_u) [| fi |]}
@@ -649,8 +649,8 @@ value effective_add conf base sfam scpl sdes =
       union_of_gen_union
         {family = Array.append (get_family nmoth_u) [| fi |]}
     in
-    base.func.patch_union (get_father ncpl) nfath_u;
-    base.func.patch_union (get_mother ncpl) nmoth_u;
+    patch_union base (get_father ncpl) nfath_u;
+    patch_union base (get_mother ncpl) nmoth_u;
     Array.iter
       (fun ip ->
          let a = aoi base ip in
@@ -662,7 +662,7 @@ value effective_add conf base sfam scpl sdes =
                ascend_of_gen_ascend
                  {parents = Some fi; consang = Adef.fix (-1)}
              in
-             base.func.patch_ascend (get_key_index p) a ])
+             patch_ascend base (get_key_index p) a ])
       (get_children ndes);
     Update.add_misc_names_for_new_persons conf base created_p.val;
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
@@ -684,7 +684,7 @@ value effective_inv conf base ip u ifam =
     union_of_gen_union
       {family = Array.of_list (loop (Array.to_list (get_family u)))}
   in
-  base.func.patch_union ip u
+  patch_union base ip u
 ;
 
 value kill_family base fam ip =
@@ -696,12 +696,12 @@ value kill_family base fam ip =
       (Array.to_list (get_family u)) []
   in
   let u = union_of_gen_union {family = Array.of_list l} in
-  base.func.patch_union ip u
+  patch_union base ip u
 ;
 
 value kill_parents base ip =
   let a = ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)} in
-  base.func.patch_ascend ip a
+  patch_ascend base ip a
 ;
 
 value effective_del conf base fam = do {
@@ -723,9 +723,9 @@ value effective_del conf base fam = do {
        fam_index = Adef.ifam_of_int (-1)}
   in
   let des = descend_of_gen_descend {children = [| |]} in
-  base.func.patch_family ifam fam;
-  base.func.patch_couple ifam cpl;
-  base.func.patch_descend ifam des
+  patch_family base ifam fam;
+  patch_couple base ifam cpl;
+  patch_descend base ifam des
 };
 
 value array_forall2 f a1 a2 =

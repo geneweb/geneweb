@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.19 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.20 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -285,8 +285,8 @@ value reparent_ind base ip1 ip2 =
         let a1 =
           ascend_of_gen_ascend {parents = Some ifam; consang = Adef.fix (-1)}
         in
-        base.func.patch_ascend ip1 a1;
-        base.func.patch_descend ifam des;
+        patch_ascend base ip1 a1;
+        patch_descend base ifam des;
       }
   | _ -> () ]
 ;
@@ -306,16 +306,16 @@ value effective_merge_ind conf base p1 p2 =
             couple False (get_father cpl) (get_key_index p1)
           else assert False
         in
-        base.func.patch_couple ifam (couple_of_gen_couple cpl);
+        patch_couple base ifam (couple_of_gen_couple cpl);
       };
       let u1 = uoi base (get_key_index p1) in
       let u1 =
         union_of_gen_union
           {family = Array.append (get_family u1) (get_family u2)}
       in
-      base.func.patch_union (get_key_index p1) u1;
+      patch_union base (get_key_index p1) u1;
       let u2 = union_of_gen_union {family = [| |]} in
-      base.func.patch_union (get_key_index p2) u2;
+      patch_union base (get_key_index p2) u2;
     }
     else ();
     let p1 =
@@ -368,8 +368,8 @@ value effective_merge_ind conf base p1 p2 =
            else get_notes p1}
     in
     let p2 = UpdateIndOk.effective_del conf base p2 in
-    base.func.patch_person (get_key_index p1) p1;
-    base.func.patch_person (get_key_index p2) p2;
+    patch_person base (get_key_index p1) p1;
+    patch_person base (get_key_index p2) p2;
     Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p1))
       (sou base (get_notes p1)) True;
   }
@@ -434,22 +434,22 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
          else get_fsources fam1}
   in
   do {
-    base.func.patch_family (get_fam_index fam1) fam1;
+    patch_family base (get_fam_index fam1) fam1;
     let des1 =
       descend_of_gen_descend
         {children = Array.append (get_children des1) (get_children des2)}
     in
-    base.func.patch_descend (get_fam_index fam1) des1;
+    patch_descend base (get_fam_index fam1) des1;
     for i = 0 to Array.length (get_children des2) - 1 do {
       let ip = (get_children des2).(i) in
       let a =
         ascend_of_gen_ascend
           {parents = Some (get_fam_index fam1); consang = Adef.fix (-1)}
       in
-      base.func.patch_ascend ip a;
+      patch_ascend base ip a;
     };
     let des2 = descend_of_gen_descend {children = [| |]} in
-    base.func.patch_descend (get_fam_index fam2) des2;
+    patch_descend base (get_fam_index fam2) des2;
     UpdateFamOk.effective_del conf base fam2;
   }
 ;
@@ -548,7 +548,7 @@ value print_merged conf base p =
 ;
 
 value is_ancestor base ip1 ip2 =
-  let visited = Array.create base.data.persons.len False in
+  let visited = Array.create (nb_of_persons base) False in
   let rec loop ip =
     if visited.(Adef.int_of_iper ip) then False
     else if ip = ip1 then True
@@ -648,7 +648,7 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
     if included_self then do {
       let ip = get_key_index p in
       let p = UpdateIndOk.effective_del conf base p in
-      base.func.patch_person ip p;
+      patch_person base ip p;
       incr nb_ind;
     }
     else ();

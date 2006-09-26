@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.5 2006-09-24 08:52:07 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.6 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -243,7 +243,7 @@ value macro conf base =
       [ Not_found -> "20" ]
   | 'n' ->
       string_of_num (transl conf "(thousand separator)")
-        (Num.of_int base.data.persons.len)
+        (Num.of_int (nb_of_persons base))
   | 'N' ->
       let s = base.data.bnotes.nread "" Rn1Ln in
       let len = String.length s in

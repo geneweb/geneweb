@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.13 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -137,9 +137,9 @@ value effective_mod_merge conf base sp =
       do {
         MergeInd.reparent_ind base sp.key_index (get_key_index p2);
         let p2 = UpdateIndOk.effective_del conf base p2 in
-        base.func.patch_person (get_key_index p2) p2;
+        patch_person base (get_key_index p2) p2;
         let u2 = union_of_gen_union {family = [| |]} in
-        base.func.patch_union (get_key_index p2) u2;
+        patch_union base (get_key_index p2) u2;
         let p = UpdateIndOk.effective_mod conf base sp in
         let u = uoi base (get_key_index p) in
         let (p_related, mod_p) =
@@ -187,7 +187,7 @@ value effective_mod_merge conf base sp =
                      person_of_gen_person
                        {(gen_person_of_person pc) with rparents = pc_rparents}
                    in
-                   base.func.patch_person ipc pc
+                   patch_person base ipc pc
                  else ();
                  let (p_related, mod_p) =
                    loop (p_related, mod_p) 0
@@ -218,7 +218,7 @@ value effective_mod_merge conf base sp =
                                in
                                loop (p_related, mod_p) (j + 1)
                            in
-                           base.func.patch_family (get_fam_index fam) fam;
+                           patch_family base (get_fam_index fam) fam;
                            (p_related, mod_p)
                          }
                          else (p_related, mod_p)
@@ -250,7 +250,7 @@ value effective_mod_merge conf base sp =
                          {(gen_person_of_person w) with
                           related = [get_key_index p :: get_related w]}
                      in
-                     base.func.patch_person ip w
+                     patch_person base ip w
                    else ())
                 (get_witnesses fam);
               couple False (get_key_index p) (get_mother cpl)
@@ -259,16 +259,16 @@ value effective_mod_merge conf base sp =
               couple False (get_father cpl) (get_key_index p)
             else assert False
           in
-          base.func.patch_couple ifam (couple_of_gen_couple cpl);
+          patch_couple base ifam (couple_of_gen_couple cpl);
         };
         Update.update_misc_names_of_family conf base p u;
-        base.func.patch_person (get_key_index p) p;
+        patch_person base (get_key_index p) p;
         if p2_family <> [| |] then do {
           let u =
             union_of_gen_union
               {family = Array.append (get_family u) p2_family}
           in
-          base.func.patch_union (get_key_index p) u;
+          patch_union base (get_key_index p) u;
         }
         else ();
         Gutil.check_noloop_for_person_list base (Update.error conf base)

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.13 2006-09-21 12:27:34 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.14 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -45,11 +45,11 @@ value compute base from_scratch quiet =
   let tab =
     Consang.make_relationship_info base (Consang.topological_sort base aoi)
   in
-  let consang_tab = Array.create base.data.families.len no_consang in
+  let consang_tab = Array.create (nb_of_families base) no_consang in
   let cnt = ref 0 in
   do {
     if not from_scratch then
-      let mark = Array.create base.data.ascends.len False in
+      let mark = Array.create (nb_of_persons base) False in
       match base.func.patched_ascends () with
       [ [] -> ()
       | list ->
@@ -60,7 +60,7 @@ value compute base from_scratch quiet =
                  (get_family u))
             list ]
     else ();
-    for i = 0 to base.data.ascends.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let a = ascends.get i in
       if from_scratch then
         ascends.set i
@@ -82,7 +82,7 @@ value compute base from_scratch quiet =
     let running = ref True in
     while running.val do {
       running.val := False;
-      for i = 0 to base.data.ascends.len - 1 do {
+      for i = 0 to nb_of_persons base - 1 do {
         let a = ascends.get i in
         if get_consang a == no_consang then
           match get_parents a with

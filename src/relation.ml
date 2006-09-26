@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.10 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: relation.ml,v 5.11 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -306,8 +306,8 @@ type node =
 ;
 
 value get_shortest_path_relation conf base ip1 ip2 excl_faml =
-  let mark_per = Array.create base.data.persons.len NotVisited in
-  let mark_fam = Array.create base.data.families.len False in
+  let mark_per = Array.create (nb_of_persons base) NotVisited in
+  let mark_fam = Array.create (nb_of_families base) False in
   do {
     List.iter
       (fun i ->

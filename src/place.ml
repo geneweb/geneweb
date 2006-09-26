@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.7 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: place.ml,v 5.8 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -71,7 +71,7 @@ value get_all conf base =
   do {
     if add_birth || add_death then
       let rec loop i =
-        if i = base.data.persons.len then ()
+        if i = nb_of_persons base then ()
         else do {
           let p = pget conf base (Adef.iper_of_int i) in
           let pl_bi = if add_birth then get_birth_place p else empty in
@@ -96,7 +96,7 @@ value get_all conf base =
     else ();
     if add_marriage then
       let rec loop i =
-        if i = base.data.families.len then ()
+        if i = nb_of_families base then ()
         else do {
           let fam = foi base (Adef.ifam_of_int i) in
           if is_deleted_family fam then ()

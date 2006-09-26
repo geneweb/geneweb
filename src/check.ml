@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.9 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: check.ml,v 5.10 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -186,8 +186,8 @@ value check_base_aux base error warning changed_p =
   do {
     Printf.eprintf "check persons\n";
     ProgrBar.start ();
-    for i = 0 to base.data.persons.len - 1 do {
-      ProgrBar.run i base.data.persons.len;
+    for i = 0 to nb_of_persons base - 1 do {
+      ProgrBar.run i (nb_of_persons base);
       let p = poi base (Adef.iper_of_int i) in
       match check_person base error warning p with
       [ Some ippl -> List.iter changed_p ippl
@@ -196,8 +196,8 @@ value check_base_aux base error warning changed_p =
     ProgrBar.finish ();
     Printf.eprintf "check families\n";
     ProgrBar.start ();
-    for i = 0 to base.data.families.len - 1 do {
-      ProgrBar.run i base.data.families.len;
+    for i = 0 to nb_of_families base - 1 do {
+      ProgrBar.run i (nb_of_families base);
       let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else
@@ -221,7 +221,7 @@ value check_base base error warning def changed_p pr_stats =
   let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
   do {
     check_base_aux base error warning changed_p;
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       let p = poi base (Adef.iper_of_int i) in
       if not (def i) then
         printf "Undefined: %s\n" (designation base p)

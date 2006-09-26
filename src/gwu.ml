@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.13 2006-09-26 03:54:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1071,7 +1071,7 @@ value mark_connex_components base mark fam =
 ;
 
 value add_small_connex_components base mark =
-  for i = 0 to base.data.families.len - 1 do {
+  for i = 0 to nb_of_families base - 1 do {
     if mark.(i) = ToSeparate then
       let fam = foi base (Adef.ifam_of_int i) in
       mark_connex_components base mark fam
@@ -1083,13 +1083,13 @@ value separate base =
   match List.rev separate_list.val with
   [ [] -> fun _ -> False
   | list ->
-      let mark = Array.create base.data.families.len NotScanned in
+      let mark = Array.create (nb_of_families base) NotScanned in
       do {
         List.iter (mark_someone base mark) list;
         add_small_connex_components base mark;
         let len =
           loop 0 0 where rec loop len i =
-            if i = base.data.families.len then len
+            if i = nb_of_families base then len
             else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
             else loop len (i + 1)
         in
@@ -1151,18 +1151,18 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
           } ]
   in
   let gen =
-    let mark = Array.create base.data.persons.len False in
+    let mark = Array.create (nb_of_persons base) False in
     let (per_sel, fam_sel) =
       Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
         censor.val with_siblings.val maxlev.val
     in
-    let fam_done = Array.create base.data.families.len False in
+    let fam_done = Array.create (nb_of_families base) False in
     {mark = mark; per_sel = per_sel; fam_sel = fam_sel;
      fam_done = fam_done; notes_pl_p = []; ext_files = [];
      notes_alias = notes_aliases in_dir}
   in
   do {
-    for i = 0 to base.data.families.len - 1 do {
+    for i = 0 to nb_of_families base - 1 do {
       let fam = foi base (Adef.ifam_of_int i) in
       let cpl = coi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
