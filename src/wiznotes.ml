@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.11 2006-09-27 10:39:50 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.12 2006-09-27 12:31:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -448,6 +448,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
     else wl
   in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
+  let is_visible = List.mem conf.user allowed in
   tag "ul" begin
     let not_everybody =
       List.fold_left
@@ -457,7 +458,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
              let (wfile, stm) = wiznote_date (wzfile wddir wz) in
              let tm = Unix.localtime stm in
              tag "li" "style=\"list-style-type:%s\""
-               (if wz = conf.user && not (List.mem wz allowed) then "circle"
+               (if wz = conf.user && not is_visible then "circle"
                 else "disc")
              begin
                if wfile <> "" then
@@ -474,11 +475,11 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                if wz = conf.user then do {
                  Wserver.wprint ":\n%s;"
                    (transl_nth conf "you are visible/you are not visible"
-                      (if List.mem wz allowed then 0 else 1));
+                      (if is_visible then 0 else 1));
                  Wserver.wprint
                    " %s %s%s%s %s" (transl conf "click")
-                   (Printf.sprintf "<a href=\"%sm=TOGG_WIZ_VIS\">"
-                      (commd conf))
+                   (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS;v=%d\">"
+                      (commd conf) (if is_visible then 0 else 1))
                    (transl conf "here") "</a>" (transl conf "to change");
                  Wserver.wprint ".";
                }
@@ -500,31 +501,35 @@ value connected_wizards conf base =
   | None -> incorrect_request conf ]
 ;
 
-value do_toggle_wizard_visibility conf base x = do {
+value do_change_wizard_visibility conf base x set_vis = do {
   let wddir = dir conf in
   let allowed = wizard_allowing wddir in
-  let tmp_file = Filename.concat wddir "1connected.allow" in
-  let oc = Secure.open_out tmp_file in
-  let found =
-    List.fold_left
-      (fun found wz ->
-         if wz = conf.user then True
-         else do {
-           Printf.fprintf oc "%s\n" wz;
-           found
-         })
-      False allowed
-  in
-  if not found then Printf.fprintf oc "%s\n" conf.user else ();
-  close_out oc;
-  let file = Filename.concat wddir "connected.allow" in
-  Gutil.remove_file file;
-  Sys.rename tmp_file file;
+  let is_visible = List.mem conf.user allowed in
+  if not set_vis && not is_visible || set_vis && is_visible then ()
+  else do {
+    let tmp_file = Filename.concat wddir "1connected.allow" in
+    let oc = Secure.open_out tmp_file in
+    let found =
+      List.fold_left
+        (fun found wz ->
+           if wz = conf.user && not set_vis then True
+           else do {
+             Printf.fprintf oc "%s\n" wz;
+             found
+           })
+        False allowed
+    in
+    if not found && set_vis then Printf.fprintf oc "%s\n" conf.user else ();
+    close_out oc;
+    let file = Filename.concat wddir "connected.allow" in
+    Gutil.remove_file file;
+    Sys.rename tmp_file file;
+  };
   do_connected_wizards conf base x
 };
 
-value toggle_wizard_visibility conf base =
-  match conf.n_connect with
-  [ Some x -> do_toggle_wizard_visibility conf base x
-  | None -> incorrect_request conf ]
+value change_wizard_visibility conf base =
+  match (conf.n_connect, p_getint conf.env "v") with
+  [ (Some x, Some vis) -> do_change_wizard_visibility conf base x (vis <> 0)
+  | _ -> incorrect_request conf ]
 ;
