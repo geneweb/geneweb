@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.15 2006-09-27 20:26:10 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.16 2006-09-27 21:29:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -585,10 +585,10 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
   let is_visible = List.mem conf.user allowed in
   tag "ul" begin
-    let not_everybody =
+    let (not_everybody, _) =
       List.fold_left
-        (fun not_everybody (wz, tm_user) ->
-           if wz <> conf.user && not (List.mem wz allowed) then True
+        (fun (not_everybody, first) (wz, tm_user) ->
+           if wz <> conf.user && not (List.mem wz allowed) then (True, first)
            else do {
              let (wfile, stm) = wiznote_date (wzfile wddir wz) in
              let tm = Unix.localtime stm in
@@ -598,7 +598,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
              begin
                if wfile <> "" then
                  Wserver.wprint
-                   "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> (%.0fs)"
+                   "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> - %.0fs%s"
                    (commd conf) (Util.code_varenv wz)
                    (fun _ ->
                       Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
@@ -606,6 +606,10 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                         tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                         tm.Unix.tm_sec)
                    wz (tm_now -. tm_user)
+                   (if first then
+                      " <span style=\"font-size:80%\">(" ^
+                      transl conf "since the last click" ^ ")</span>"
+                    else "")
                else Wserver.wprint "%s" wz;
                if wz = conf.user then do {
                  Wserver.wprint ":\n%s;"
@@ -621,9 +625,9 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                else ();
                Wserver.wprint "\n";
              end;
-             not_everybody
+             (not_everybody, False)
            })
-        False wl
+        (False, True) wl
     in
     if not_everybody then tag "li" begin Wserver.wprint "..."; end else ();
   end;
