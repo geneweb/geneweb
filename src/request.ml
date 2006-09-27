@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.6 2006-09-27 10:07:44 ddr Exp $ *)
+(* $Id: request.ml,v 5.7 2006-09-27 12:31:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -514,8 +514,8 @@ value family_m conf base =
       [ Some f -> Srcfile.print_source conf base f
       | _ -> Util.incorrect_request conf ]
   | Some "STAT" -> BirthDeath.print_statistics conf base
-  | Some "TOGG_WIZ_VIS" when conf.wizard ->
-      Wiznotes.toggle_wizard_visibility conf base
+  | Some "CHANGE_WIZ_VIS" when conf.wizard ->
+      Wiznotes.change_wizard_visibility conf base
   | Some "TT" -> Title.print conf base
   | Some "U" when conf.wizard ->
       match find_person_in_env conf base "" with
@@ -716,7 +716,7 @@ value this_request_updates_database conf =
         "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" | "KILL_ANC" |
         "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" | "MRG_IND" |
         "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK" |
-        "TOGG_WIZ_VIS" -> True
+        "CHANGE_WIZ_VIS" -> True
       | _ -> False ]
   | _ -> False ]
 ;
