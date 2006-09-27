@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.5 2006-09-26 17:10:52 ddr Exp $ *)
+(* $Id: request.ml,v 5.6 2006-09-27 10:07:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -514,6 +514,8 @@ value family_m conf base =
       [ Some f -> Srcfile.print_source conf base f
       | _ -> Util.incorrect_request conf ]
   | Some "STAT" -> BirthDeath.print_statistics conf base
+  | Some "TOGG_WIZ_VIS" when conf.wizard ->
+      Wiznotes.toggle_wizard_visibility conf base
   | Some "TT" -> Title.print conf base
   | Some "U" when conf.wizard ->
       match find_person_in_env conf base "" with
@@ -713,15 +715,23 @@ value this_request_updates_database conf =
       [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
         "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" | "KILL_ANC" |
         "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" | "MRG_IND" |
-        "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK" -> True
+        "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK" |
+        "TOGG_WIZ_VIS" -> True
       | _ -> False ]
   | _ -> False ]
 ;
 
+(*
+type t = [ Accept | Refuse ];
+*)
 value treat_request_on_base conf log =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   if this_request_updates_database conf then
+(**)
     lock Gutil.lock_file bfile with
+(*
+    match if Sys.file_exists "refuse" then Refuse else Accept with
+*)
     [ Accept -> treat_request_on_possibly_locked_base conf bfile log
     | Refuse -> Update.error_locked conf ]
   else treat_request_on_possibly_locked_base conf bfile log

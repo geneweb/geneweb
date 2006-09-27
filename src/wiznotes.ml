@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.9 2006-09-27 09:22:33 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.10 2006-09-27 10:07:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -433,7 +433,7 @@ value wizard_allowing wddir =
   | None -> [] ]
 ;
 
-value connected_wizards_ok conf base (_, _, _, wl) = do {
+value do_connected_wizards conf base (_, _, _, wl) = do {
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl_nth conf "wizard/wizards/friend/friends" 1))
@@ -443,32 +443,45 @@ value connected_wizards_ok conf base (_, _, _, wl) = do {
   let wddir = dir conf in
   let allowed = wizard_allowing wddir in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
-  let (wl, not_everybody) =
-     List.fold_left
-       (fun (list, not_everybody) (wz, tm) ->
-          if List.mem wz allowed then ([(wz, tm) :: list], not_everybody)
-          else (list, True))
-       ([], False) (List.rev wl)
-  in
   let tm_now = Unix.time () in
   tag "ul" begin
-    List.iter
-      (fun (wz, tm_user) ->
-         let (wfile, stm) = wiznote_date (wzfile wddir wz) in
-         let tm = Unix.localtime stm in
-         tag "li" begin
-           if wfile <> "" then
-             Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> (%.0fs)"
-               (commd conf) (Util.code_varenv wz)
-               (fun _ ->
-                  Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                    (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                    tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                    tm.Unix.tm_sec)
-               wz (tm_now -. tm_user)
-           else Wserver.wprint "%s" wz;
-         end)
-      wl;
+    let not_everybody =
+      List.fold_left
+        (fun not_everybody (wz, tm_user) ->
+           if wz <> conf.user && not (List.mem wz allowed) then True
+           else do {
+             let (wfile, stm) = wiznote_date (wzfile wddir wz) in
+             let tm = Unix.localtime stm in
+             tag "li" begin
+               if wfile <> "" then
+                 Wserver.wprint
+                   "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> (%.0fs)"
+                   (commd conf) (Util.code_varenv wz)
+                   (fun _ ->
+                      Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                        tm.Unix.tm_sec)
+                   wz (tm_now -. tm_user)
+               else Wserver.wprint "%s" wz;
+               if wz = conf.user then do {
+                 Wserver.wprint ":\n%s;"
+                   (transl_nth conf "you are visible/you are not visible"
+                      (if List.mem wz allowed then 0 else 1));
+                 Wserver.wprint
+                   " %s %s%s%s %s" (transl conf "click")
+                   (Printf.sprintf "<a href=\"%sm=TOGG_WIZ_VIS\">"
+                      (commd conf))
+                   (transl conf "here") "</a>" (transl conf "to change");
+                 Wserver.wprint ".";
+               }
+               else ();
+               Wserver.wprint "\n";
+             end;
+             not_everybody
+           })
+        False wl
+    in
     if not_everybody then tag "li" begin Wserver.wprint "..."; end else ();
   end;
   trailer conf;
@@ -476,6 +489,35 @@ value connected_wizards_ok conf base (_, _, _, wl) = do {
 
 value connected_wizards conf base =
   match conf.n_connect with
-  [ Some x -> connected_wizards_ok conf base x
+  [ Some x -> do_connected_wizards conf base x
+  | None -> incorrect_request conf ]
+;
+
+value do_toggle_wizard_visibility conf base x = do {
+  let wddir = dir conf in
+  let allowed = List.sort compare (wizard_allowing wddir) in
+  let tmp_file = Filename.concat wddir "1connected.allow" in
+  let oc = Secure.open_out tmp_file in
+  let found =
+    List.fold_left
+      (fun found wz ->
+         if wz = conf.user then True
+         else do {
+           Printf.fprintf oc "%s\n" wz;
+           found
+         })
+      False allowed
+  in
+  if not found then Printf.fprintf oc "%s\n" conf.user else ();
+  close_out oc;
+  let file = Filename.concat wddir "connected.allow" in
+  Gutil.remove_file file;
+  Sys.rename tmp_file file;
+  do_connected_wizards conf base x
+};
+
+value toggle_wizard_visibility conf base =
+  match conf.n_connect with
+  [ Some x -> do_toggle_wizard_visibility conf base x
   | None -> incorrect_request conf ]
 ;
