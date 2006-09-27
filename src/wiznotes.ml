@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.10 2006-09-27 10:07:44 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.11 2006-09-27 10:39:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -429,7 +429,7 @@ value wizard_allowing wddir =
       loop [] where rec loop list =
         match try Some (input_line ic) with [ End_of_file -> None ] with
         [ Some wname -> loop [wname :: list]
-        | None -> do { close_in ic; list } ]
+        | None -> do { close_in ic; List.rev list } ]
   | None -> [] ]
 ;
 
@@ -440,10 +440,14 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
   in
   header conf title;
   print_link_to_welcome conf True;
+  let tm_now = Unix.time () in
   let wddir = dir conf in
   let allowed = wizard_allowing wddir in
+  let wl =
+    if not (List.mem_assoc conf.user wl) then [(conf.user, tm_now) :: wl]
+    else wl
+  in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
-  let tm_now = Unix.time () in
   tag "ul" begin
     let not_everybody =
       List.fold_left
@@ -452,7 +456,10 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
            else do {
              let (wfile, stm) = wiznote_date (wzfile wddir wz) in
              let tm = Unix.localtime stm in
-             tag "li" begin
+             tag "li" "style=\"list-style-type:%s\""
+               (if wz = conf.user && not (List.mem wz allowed) then "circle"
+                else "disc")
+             begin
                if wfile <> "" then
                  Wserver.wprint
                    "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> (%.0fs)"
@@ -495,7 +502,7 @@ value connected_wizards conf base =
 
 value do_toggle_wizard_visibility conf base x = do {
   let wddir = dir conf in
-  let allowed = List.sort compare (wizard_allowing wddir) in
+  let allowed = wizard_allowing wddir in
   let tmp_file = Filename.concat wddir "1connected.allow" in
   let oc = Secure.open_out tmp_file in
   let found =
