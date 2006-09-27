@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.13 2006-09-27 18:21:40 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.14 2006-09-27 18:58:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -144,16 +144,17 @@ value dispatch_in_columns ncol list =
 ;
 
 value print_wizards_by_alphabetic_order conf list =
-if p_getenv conf.env "old" <> Some "on" then
+if p_getenv conf.env "old" <> Some "on" then do {
   let (len_list, list) =
     let ncols =
       match p_getint conf.env "ncols" with
       [ Some n -> max 1 n
-      | None -> 3 ]
+      | None -> if List.length list < 10 then 1 else 3 ]
     in
     dispatch_in_columns ncols list
   in
-  tag "table" "width=\"100%%\"" begin
+  Util.begin_centered conf;
+  tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
     tag "tr" "valign=\"top\"" begin
       Wserver.wprint "<td>\n";
       let _ =
@@ -171,7 +172,7 @@ if p_getenv conf.env "old" <> Some "on" then
                      [ ItemChar c -> do {
                          if not top then Wserver.wprint "</ul>\n" else ();
                          Wserver.wprint "<h3 style=\"border-bottom: \
-                           solid 1px\">%c</h3>\n" c.[0];
+                           dotted 1px\">%c</h3>\n" c.[0];
                          Wserver.wprint "<ul>\n";
                        }
                      | ItemRule _ -> ()
@@ -222,7 +223,9 @@ if p_getenv conf.env "old" <> Some "on" then
       in
       Wserver.wprint "</ul>\n</td>\n";
     end;
-  end
+  end;
+  Util.end_centered conf;
+}
 else
   tag "p" begin
     let _ =
