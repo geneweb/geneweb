@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.14 2006-09-27 18:58:57 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.15 2006-09-27 20:26:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -109,7 +109,7 @@ value wiznote_date wfile =
 
 type item 'a =
   [ ItemChar of string
-  | ItemRule of int
+  | ItemSpace of int
   | ItemWiz of 'a ]
 ;
 
@@ -122,7 +122,7 @@ value dispatch_in_columns ncol list =
            match prev with
            [ Some prev_ord when ord.[0] = prev_ord.[0] -> (rlist, len)
            | _ ->
-               ([ItemRule 1; ItemRule 2; ItemChar ord :: rlist],
+               ([ItemSpace 1; ItemSpace 2; ItemChar ord :: rlist],
                 len + 3) ]
          in
          let rlist = [ItemWiz wiz :: rlist] in
@@ -137,7 +137,7 @@ value dispatch_in_columns ncol list =
         let len_i = (len + ncol / 2) / ncol in
         match List.nth list (cum_len + len_i - 1) with
         [ ItemChar c -> len_i + 3
-        | ItemRule n -> len_i + n
+        | ItemSpace n -> len_i + n
         | ItemWiz (wz, _, _, _) -> len_i ]
       in
       loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
@@ -159,11 +159,12 @@ if p_getenv conf.env "old" <> Some "on" then do {
       Wserver.wprint "<td>\n";
       let _ =
         List.fold_left
-          (fun list len ->
-             loop True len list where rec loop top n list =
+          (fun (list, prev_char) len ->
+             loop prev_char True len list
+             where rec loop prev_char top n list =
                if n = 0 then do {
                  Wserver.wprint "</ul>\n</td>\n<td>\n";
-                 list
+                 (list, prev_char)
                }
                else
                  match list with
@@ -175,10 +176,16 @@ if p_getenv conf.env "old" <> Some "on" then do {
                            dotted 1px\">%c</h3>\n" c.[0];
                          Wserver.wprint "<ul>\n";
                        }
-                     | ItemRule _ -> ()
+                     | ItemSpace _ -> ()
                      | ItemWiz (wz, (wname, (_, islash)), wfile, stm) -> do {
                          let tm = Unix.localtime stm in
-                         if top then Wserver.wprint "<ul>\n" else ();
+                         if top then do {
+                           Wserver.wprint "<h3 style=\"border-bottom: \
+                             dotted 1px\">%c (%s)</h3>\n"
+                             prev_char.[0] (transl conf "continuated");
+                           Wserver.wprint "<ul>\n";
+                         }
+                         else ();
                          let with_link =
                            conf.wizard && conf.user = wz || wfile <> ""
                          in
@@ -216,10 +223,15 @@ if p_getenv conf.env "old" <> Some "on" then do {
                          end;
                          Wserver.wprint "\n";
                        } ];
-                     loop False (n - 1) list
+                     let prev_char =
+                       match item with
+                       [ ItemChar c -> c
+                       | _ -> prev_char ]
+                     in
+                     loop prev_char False (n - 1) list
                    }
-                 | [] -> [] ])
-          list len_list
+                 | [] -> ([], prev_char) ])
+          (list, " ") len_list
       in
       Wserver.wprint "</ul>\n</td>\n";
     end;

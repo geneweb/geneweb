@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.32 2006-09-27 10:07:44 ddr Exp $
+# $Id: lex_utf8.txt,v 5.33 2006-09-27 20:26:10 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2805,6 +2805,10 @@ ro: consanguinitate
 ru: родство
 sl: krvno sorodstvo
 sv: blodsband
+
+    continuated
+en: continuated
+fr: suite
 
     continue merging
 af: gaan voort met die samevoeging
