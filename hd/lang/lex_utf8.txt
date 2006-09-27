@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.33 2006-09-27 20:26:10 ddr Exp $
+# $Id: lex_utf8.txt,v 5.34 2006-09-27 21:29:08 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -7534,6 +7534,10 @@ ro: frati/surori
 ru: братья или сесты
 sl: bratje in sestre
 sv: syskon
+
+    since the last click
+en: since the last click
+fr: depuis le dernier clic
 
     son/daughter/child
 af: seun/dogter/kind
