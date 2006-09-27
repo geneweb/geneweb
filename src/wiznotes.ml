@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.16 2006-09-27 21:29:08 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.17 2006-09-27 21:39:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -156,17 +156,17 @@ if p_getenv conf.env "old" <> Some "on" then do {
   Util.begin_centered conf;
   tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
     tag "tr" "valign=\"top\"" begin
-      Wserver.wprint "<td>\n";
       let _ =
         List.fold_left
           (fun (list, prev_char) len ->
              loop prev_char True len list
              where rec loop prev_char top n list =
                if n = 0 then do {
-                 Wserver.wprint "</ul>\n</td>\n<td>\n";
+                 Wserver.wprint "</ul>\n</td>\n";
                  (list, prev_char)
                }
-               else
+               else do {
+                 if top then Wserver.wprint "<td>\n" else ();
                  match list with
                  [ [item :: list] -> do {
                      match item with
@@ -230,10 +230,11 @@ if p_getenv conf.env "old" <> Some "on" then do {
                      in
                      loop prev_char False (n - 1) list
                    }
-                 | [] -> ([], prev_char) ])
+                 | [] -> ([], prev_char) ];
+               })
           (list, " ") len_list
       in
-      Wserver.wprint "</ul>\n</td>\n";
+      ();
     end;
   end;
   Util.end_centered conf;
