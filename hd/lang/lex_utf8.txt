@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.31 2006-09-25 13:21:47 ddr Exp $
+# $Id: lex_utf8.txt,v 5.32 2006-09-27 10:07:44 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -61,6 +61,10 @@ ru: af=африканский/bg=болгарский/ca=каталанский/
 sl: af=afrikaanščina/ca=katalonščina/cs=češčina/da=danščina/de=nemščina/en=angleščina/eo=esperanto/es=španščina/et=estonščina/fi=finščina/fr=francoščina/he=hebrejščina/is=islandščina/it=italijanščina/lv=litvanščina/nl=nizozemščina/no=norveščina/pl=poljščina/pt=portugalščina/pt-br=brazilska-portugalščina/ru=ruščina/sl=slovenščina/sv=švedščina/zh=kitajščina
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: fr=法语/zh=中文
+
+    to change
+en: to change
+fr: pour changer
 
      to see the first branch
 af:  om die eerste staak te sien
@@ -9410,6 +9414,10 @@ ru: лет
 sl: let
 sv: år
 zh:  岁
+
+    you are visible/you are not visible
+en: you are visible/you are not visible
+fr: vous êtes visible/vous n'êtes pas visible
 
     you must first merge
 af: jy moet eers saamvoeg
