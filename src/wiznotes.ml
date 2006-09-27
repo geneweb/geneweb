@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.8 2006-09-26 17:10:52 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.9 2006-09-27 09:22:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -445,26 +445,27 @@ value connected_wizards_ok conf base (_, _, _, wl) = do {
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
   let (wl, not_everybody) =
      List.fold_left
-       (fun (list, not_everybody) (wz, _) ->
-          if List.mem wz allowed then ([wz :: list], not_everybody)
+       (fun (list, not_everybody) (wz, tm) ->
+          if List.mem wz allowed then ([(wz, tm) :: list], not_everybody)
           else (list, True))
        ([], False) (List.rev wl)
   in
+  let tm_now = Unix.time () in
   tag "ul" begin
     List.iter
-      (fun wz ->
+      (fun (wz, tm_user) ->
          let (wfile, stm) = wiznote_date (wzfile wddir wz) in
          let tm = Unix.localtime stm in
          tag "li" begin
            if wfile <> "" then
-             Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
+             Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> (%.0fs)"
                (commd conf) (Util.code_varenv wz)
                (fun _ ->
                   Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
                     (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
                     tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                     tm.Unix.tm_sec)
-               wz
+               wz (tm_now -. tm_user)
            else Wserver.wprint "%s" wz;
          end)
       wl;
