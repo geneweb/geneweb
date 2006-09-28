@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.17 2006-09-27 21:39:52 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.18 2006-09-28 20:24:53 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -597,21 +597,25 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                (if wz = conf.user && not is_visible then "circle"
                 else "disc")
              begin
+               let sec =
+                 let d = tm_now -. tm_user in
+                 if d = 0.0 then "" else Printf.sprintf " - %.0fs" d
+               in
                if wfile <> "" then
                  Wserver.wprint
-                   "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a> - %.0fs%s"
+                   "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>%s%s"
                    (commd conf) (Util.code_varenv wz)
                    (fun _ ->
                       Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
                         (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
                         tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                         tm.Unix.tm_sec)
-                   wz (tm_now -. tm_user)
+                   wz sec
                    (if first then
                       " <span style=\"font-size:80%\">(" ^
                       transl conf "since the last click" ^ ")</span>"
                     else "")
-               else Wserver.wprint "%s" wz;
+               else Wserver.wprint "%s%s" wz sec;
                if wz = conf.user then do {
                  Wserver.wprint ":\n%s;"
                    (transl_nth conf "you are visible/you are not visible"
