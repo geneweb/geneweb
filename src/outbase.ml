@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.3 2006-09-24 08:10:03 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.4 2006-09-29 18:42:44 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -69,14 +69,15 @@ flush stderr;
 ;
 
 value output_value_header_size = 20;
-value array_header_size arr = if arr.len < 8 then 1 else 5;
+value array_header_size arr_len = if arr_len < 8 then 1 else 5;
 
-value output_array_access oc arr pos =
-  loop (pos + output_value_header_size + array_header_size arr) 0 where rec
-  loop pos i =
-    if i == arr.len then pos
+value output_array_access oc arr_get arr_len pos =
+  loop (pos + output_value_header_size + array_header_size arr_len) 0
+  where rec loop pos i =
+    if i == arr_len then pos
     else do {
-      output_binary_int oc pos; loop (pos + Iovalue.size (arr.get i)) (i + 1)
+      output_binary_int oc pos;
+      loop (pos + Iovalue.size (arr_get i)) (i + 1)
     }
 ;
 
@@ -186,17 +187,14 @@ value make_name_index base =
   }
 ;
 
-value record_access_of tab =
-  {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
-   len = Array.length tab; array_obj _ = tab; clear_array () = ()}
-;
-
 value create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
   let bpos = pos_out oc_inx in
   do {
     output_value_no_sharing oc_inx (ni : Iobase.name_index_data);
-    let epos = output_array_access oc_inx_acc (record_access_of ni) bpos in
+    let epos =
+      output_array_access oc_inx_acc (Array.get ni) (Array.length ni) bpos
+    in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
   }
@@ -234,7 +232,9 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   let bpos = pos_out oc_inx in
   do {
     output_value_no_sharing oc_inx (t : Iobase.strings_of_fsname);
-    let epos = output_array_access oc_inx_acc (record_access_of t) bpos in
+    let epos =
+      output_array_access oc_inx_acc (Array.get t) (Array.length t) bpos
+    in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
   }
@@ -395,7 +395,7 @@ value gen_output no_patches bname base =
         match try Some (arr.array_obj ()) with [ Failure _ -> None ] with
         [ Some a -> output_value_no_sharing oc a
         | None -> output_array_no_sharing oc arr ];
-        let epos = output_array_access oc_acc arr bpos in
+        let epos = output_array_access oc_acc arr.get arr.len bpos in
         if epos <> pos_out oc then count_error epos (pos_out oc) else ()
       }
     in
