@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.18 2006-09-28 20:24:53 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.19 2006-09-29 14:07:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -182,7 +182,7 @@ if p_getenv conf.env "old" <> Some "on" then do {
                          if top then do {
                            Wserver.wprint "<h3 style=\"border-bottom: \
                              dotted 1px\">%c (%s)</h3>\n"
-                             prev_char.[0] (transl conf "continuated");
+                             prev_char.[0] (transl conf "continued");
                            Wserver.wprint "<ul>\n";
                          }
                          else ();

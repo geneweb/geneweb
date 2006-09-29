@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.35 2006-09-29 02:44:48 ddr Exp $
+# $Id: lex_utf8.txt,v 5.36 2006-09-29 14:07:36 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2807,10 +2807,6 @@ ru: родство
 sl: krvno sorodstvo
 sv: blodsband
 
-    continuated
-en: continuated
-fr: suite
-
     continue merging
 af: gaan voort met die samevoeging
 bg: да продължи обединяването
@@ -2837,6 +2833,10 @@ ro: continua unificarea
 ru: продолжить объединение
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
+
+    continued
+en: continued
+fr: suite
 
     cousins
 af: neefs/niggies
