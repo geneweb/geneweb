@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.19 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.20 2006-09-29 20:45:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -173,3 +173,5 @@ value patch_descend base = base.func.patch_descend;
 value patch_couple base = base.func.patch_couple;
 value patch_name base = base.func.patch_name;
 value patch_string base = base.func.patch_string;
+
+value persons_of_name base = base.func.persons_of_name;

@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.28 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.29 2006-09-29 20:45:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -173,3 +173,5 @@ value patch_descend : base -> ifam -> descend -> unit;
 value patch_couple : base -> ifam -> couple -> unit;
 value patch_name : base -> string -> iper -> unit;
 value patch_string : base -> istr -> string -> unit;
+
+value persons_of_name : base -> string -> list iper;

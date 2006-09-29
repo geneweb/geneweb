@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.22 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.23 2006-09-29 20:45:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -496,7 +496,7 @@ value person_ht_find_unique base first_name surname occ =
   else
     let first_name = nominative first_name in
     let surname = nominative surname in
-    let ipl = base.func.persons_of_name (first_name ^ " " ^ surname) in
+    let ipl = persons_of_name base (first_name ^ " " ^ surname) in
     let first_name = Name.lower first_name in
     let surname = Name.lower surname in
     let rec find =
@@ -551,7 +551,7 @@ value person_ht_find_all base s =
   [ Some p ->
       [p]
   | _ ->
-      let ipl = base.func.persons_of_name s in
+      let ipl = persons_of_name base s in
       let rec select =
         fun
         [ [ip :: ipl] ->
@@ -1341,7 +1341,7 @@ value sort_person_list base pl =
 ;
 
 value find_free_occ base f s i =
-  let ipl = base.func.persons_of_name (f ^ " " ^ s) in
+  let ipl = persons_of_name base (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
   let list_occ =
