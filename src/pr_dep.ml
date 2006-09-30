@@ -1,5 +1,7 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.1 2006-09-30 02:23:38 ddr Exp $ *)
+
+#load "q_MLast.cmo";
 
 open MLast;
 
@@ -110,8 +112,8 @@ and expr =
   | ExApp _ e1 e2 -> do { expr e1; expr e2; }
   | ExAre _ e1 e2 -> do { expr e1; expr e2; }
   | ExArr _ el -> list expr el
-  | ExAsf _ -> ()
-  | ExAsr _ e -> do { expr e; }
+  | <:expr< assert False >> -> ()
+  | <:expr< assert $e$ >> -> expr e
   | ExAss _ e1 e2 -> do { expr e1; expr e2; }
   | ExChr _ _ -> ()
   | ExCoe _ e t1 t2 -> do { expr e; option ctyp t1; ctyp t2 }
@@ -119,9 +121,6 @@ and expr =
   | ExFun _ pwel -> list match_case pwel
   | ExIfe _ e1 e2 e3 -> do { expr e1; expr e2; expr e3; }
   | ExInt _ _ -> ()
-  | ExInt32 _ _ -> ()
-  | ExInt64 _ _ -> ()
-  | ExNativeInt _ _ -> ()
   | ExFlo _ _ -> ()
   | ExLab _ _ eo -> option expr eo
   | ExLaz _ e -> expr e
@@ -168,7 +167,6 @@ and sig_item =
   | SgExc _ _ tl -> list ctyp tl
   | SgExt _ _ t _ -> ctyp t
   | SgMod _ _ mt -> module_type mt
-  | SgRecMod _ mts -> list (fun (_, mt) -> module_type mt) mts
   | SgMty _ _ mt -> module_type mt
   | SgOpn _ [s :: _] -> addmodule s
   | SgTyp _ tdl -> list type_decl tdl
@@ -192,8 +190,6 @@ and str_item =
   | StExp _ e -> expr e
   | StExt _ _ t _ -> ctyp t
   | StMod _ _ me -> module_expr me
-  | StRecMod _ nmtmes ->
-      list (fun (_, mt, me) -> do { module_expr me; module_type mt; }) nmtmes
   | StMty _ _ mt -> module_type mt
   | StOpn _ [s :: _] -> addmodule s
   | StTyp _ tdl -> list type_decl tdl
