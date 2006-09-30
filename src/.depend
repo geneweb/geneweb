@@ -4,10 +4,10 @@ advSearchOk.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
     name.cmi some.cmo util.cmi ../wserver/wserver.cmi 
 advSearchOk.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     name.cmx some.cmx util.cmx ../wserver/wserver.cmx 
-alln.cmo: buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi iobase.cmi mutil.cmi \
-    name.cmi util.cmi ../wserver/wserver.cmi 
-alln.cmx: buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx iobase.cmx mutil.cmx \
-    name.cmx util.cmx ../wserver/wserver.cmx 
+alln.cmo: buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi mutil.cmi name.cmi \
+    util.cmi ../wserver/wserver.cmi 
+alln.cmx: buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx mutil.cmx name.cmx \
+    util.cmx ../wserver/wserver.cmx 
 birthDeath.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
     pqueue.cmi templ.cmi util.cmi ../wserver/wserver.cmi 
 birthDeath.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \

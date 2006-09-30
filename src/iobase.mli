@@ -1,4 +1,4 @@
-(* $Id: iobase.mli,v 5.5 2006-09-30 16:12:36 ddr Exp $ *)
+(* $Id: iobase.mli,v 5.6 2006-09-30 19:23:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -9,7 +9,6 @@ type strings_of_fsname = array (array istr);
 
 value input : string -> base;
 
-value name_key : string -> string;
 value check_magic : in_channel -> unit;
 value magic_gwb : string;
 value magic_gwb_iso_8859_1 : string;

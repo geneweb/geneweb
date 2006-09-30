@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.21 2006-09-30 19:23:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -156,17 +156,6 @@ value index_of_string strings ic start_pos hash_len string_patches s =
           flush stderr;
           failwith "database access"
         } ] ]
-;
-
-(* Search index of a given surname or given first name in file strings.inx *)
-
-value name_key s =
-  let i = Mutil.initial s in
-  let s =
-    if i == 0 then s
-    else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
-  in
-  Name.lower s
 ;
 
 value initial s =
