@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.21 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -388,9 +388,7 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
            let p = poi base ip in
            if not (List.mem (get_father ncpl) (get_related p)) then
              let p =
-               person_of_gen_person
-                 {(gen_person_of_person p) with
-                  related = [get_father ncpl :: get_related p]}
+               person_with_related p [get_father ncpl :: get_related p]
              in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
@@ -404,10 +402,8 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
            let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
            if List.mem (get_father ncpl) (get_related p) then
              let p =
-               person_of_gen_person
-                 {(gen_person_of_person p) with
-                  related =
-                    List.filter ( \<> (get_father ncpl)) (get_related p)}
+               person_with_related p
+                 (List.filter ( \<> (get_father ncpl)) (get_related p))
              in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
@@ -451,10 +447,7 @@ value effective_mod conf base sfam scpl sdes =
         [ Female -> print_err_father_sex conf base nfath
         | Male -> nfath
         | Neuter -> do {
-            let nfath =
-              person_of_gen_person
-                {(gen_person_of_person nfath) with sex = Male}
-            in
+            let nfath = person_with_sex nfath Male in
             patch_person base (get_key_index nfath) nfath;
             nfath
           } ]
@@ -464,10 +457,7 @@ value effective_mod conf base sfam scpl sdes =
         [ Male -> print_err_mother_sex conf base nmoth
         | Female -> nmoth
         | Neuter -> do {
-            let nmoth =
-              person_of_gen_person
-                {(gen_person_of_person nmoth) with sex = Female}
-            in
+            let nmoth = person_with_sex nmoth Female in
             patch_person base (get_key_index nmoth) nmoth;
             nmoth
           } ]
@@ -609,10 +599,7 @@ value effective_add conf base sfam scpl sdes =
         [ Female -> print_err_father_sex conf base nfath_p
         | Male -> nfath_p
         | _ -> do {
-            let nfath_p =
-              person_of_gen_person
-                {(gen_person_of_person nfath_p) with sex = Male}
-            in
+            let nfath_p = person_with_sex nfath_p Male in
             patch_person base (get_father ncpl) nfath_p;
             nfath_p
           } ]
@@ -622,10 +609,7 @@ value effective_add conf base sfam scpl sdes =
         [ Male -> print_err_mother_sex conf base nmoth_p
         | Female -> nmoth_p
         | _ -> do {
-            let nmoth_p =
-              person_of_gen_person
-                {(gen_person_of_person nmoth_p) with sex = Female}
-            in
+            let nmoth_p = person_with_sex nmoth_p Female in
             patch_person base (get_mother ncpl) nmoth_p;
             nmoth_p
           } ]

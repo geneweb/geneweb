@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.14 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.15 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -184,10 +184,7 @@ value effective_mod_merge conf base sp =
                in
                do {
                  if mod_pc then
-                   let pc =
-                     person_of_gen_person
-                       {(gen_person_of_person pc) with rparents = pc_rparents}
-                   in
+                   let pc = person_with_rparents pc pc_rparents in
                    patch_person base ipc pc
                  else ();
                  let (p_related, mod_p) =
@@ -230,12 +227,7 @@ value effective_mod_merge conf base sp =
                })
             rel_chil (get_related p, False)
         in
-        let p =
-          if mod_p then
-            person_of_gen_person
-              {(gen_person_of_person p) with related = p_related}
-          else p
-        in
+        let p = if mod_p then person_with_related p p_related else p in
         for i = 0 to Array.length p2_family - 1 do {
           let ifam = p2_family.(i) in
           let fam = foi base ifam in
@@ -247,9 +239,8 @@ value effective_mod_merge conf base sp =
                    let w = poi base ip in
                    if not (List.memq (get_key_index p) (get_related w)) then
                      let w =
-                       person_of_gen_person
-                         {(gen_person_of_person w) with
-                          related = [get_key_index p :: get_related w]}
+                       person_with_related w
+                         [get_key_index p :: get_related w]
                      in
                      patch_person base ip w
                    else ())

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.25 2006-09-30 18:58:19 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.26 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -113,14 +113,21 @@ value get_surname p = p.Def.surname;
 value get_surnames_aliases p = p.Def.surnames_aliases;
 value get_titles p = p.Def.titles;
 
+value person_with_key p fn sn oc =
+  {(p) with first_name = fn; surname = sn; occ = oc}
+;
+value person_with_related p r = {(p) with related = r};
+value person_with_rparents p r = {(p) with rparents = r};
+value person_with_sex p s = {(p) with sex = s};
 value person_of_gen_person p = p;
 value gen_person_of_person p = p;
 
 value get_consang a = a.Def.consang;
 value get_parents a = a.Def.parents;
 
+value ascend_with_consang a c = {parents = a.parents; consang = c};
+value ascend_with_parents a p = {parents = p; consang = a.consang};
 value ascend_of_gen_ascend a = a;
-value gen_ascend_of_ascend a = a;
 
 value get_family u = u.Def.family;
 

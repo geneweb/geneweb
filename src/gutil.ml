@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.25 2006-09-30 18:58:19 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.26 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -594,10 +594,7 @@ value try_to_fix_relation_sex base warning p_ref = do {
          }
          in
          if changed > 0 then
-           let p =
-             person_of_gen_person
-               {(gen_person_of_person p) with rparents = rparents}
-           in
+           let p = person_with_rparents p rparents in
            [(ip, p) :: changed_related]
          else changed_related)
       (get_related p_ref) []
@@ -636,9 +633,7 @@ value related_sex_is_coherent base warning p_ref =
   match new_sex with
   [ Some g ->
       if get_sex p_ref != g then
-        let p =
-          person_of_gen_person {(gen_person_of_person p_ref) with sex = g}
-        in
+        let p = person_with_sex p_ref g in
         Some [(get_key_index p_ref, p)]
       else None
   | None -> try_to_fix_relation_sex base warning p_ref ]

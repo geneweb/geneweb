@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.37 2006-09-30 10:07:57 ddr Exp $
+# $Id: lex_utf8.txt,v 5.38 2006-09-30 21:51:50 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1976,7 +1976,7 @@ sl: sočasno
 sv: samtidigt
 
     average death age
-de: Durschnittliches Sterbealter
+de: Durchschnittliches Sterbealter
 en: average death age
 et: keskmine eluiga
 fr: âge moyen de décès
