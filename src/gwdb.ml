@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.22 2006-09-30 10:46:45 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.23 2006-09-30 10:56:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -175,6 +175,7 @@ value patch_string base = base.func.patch_string;
 value commit_patches base = base.func.commit_patches ();
 value commit_notes base = base.func.commit_notes;
 value is_patched_person base = base.func.is_patched_person;
+value patched_ascends base = base.func.patched_ascends ();
 
 value persons_of_name base = base.func.persons_of_name;
 value persons_of_first_name base = base.func.persons_of_first_name;
