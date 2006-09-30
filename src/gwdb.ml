@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.20 2006-09-29 20:45:41 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.21 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -173,5 +173,28 @@ value patch_descend base = base.func.patch_descend;
 value patch_couple base = base.func.patch_couple;
 value patch_name base = base.func.patch_name;
 value patch_string base = base.func.patch_string;
+value commit_patches base = base.func.commit_patches ();
+value commit_notes base = base.func.commit_notes;
+value is_patched_person base = base.func.is_patched_person;
 
 value persons_of_name base = base.func.persons_of_name;
+value persons_of_first_name base = base.func.persons_of_first_name;
+value persons_of_surname base = base.func.persons_of_surname;
+
+value base_visible_get base = base.data.visible.v_get;
+value base_visible_write base = base.data.visible.v_write ();
+value base_index_of_string base = base.func.index_of_string;
+value base_particles base = base.data.particles;
+value base_strings_of_fsname base = base.func.strings_of_fsname;
+value base_cleanup base = base.func.cleanup ();
+
+value load_ascends_array base = base.data.ascends.load_array ();
+value load_unions_array base = base.data.unions.load_array ();
+value load_couples_array base = base.data.couples.load_array ();
+value load_descends_array base = base.data.descends.load_array ();
+value load_strings_array base = base.data.strings.load_array ();
+
+value base_notes_read base fn = base.data.bnotes.nread fn RnAll;
+value base_notes_read_first_line base fn = base.data.bnotes.nread fn Rn1Ln;
+value base_notes_read_first_char base fn = base.data.bnotes.nread fn Rn1Ch;
+value base_notes_origin_file base = base.data.bnotes.norigin_file;

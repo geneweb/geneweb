@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.7 2006-09-25 16:14:11 ddr Exp $ *)
+(* $Id: notes.ml,v 5.8 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -21,7 +21,7 @@ value path_of_fnotes fnotes =
 
 value read_notes base fnotes =
   let fnotes = path_of_fnotes fnotes in
-  let s = base.data.bnotes.nread fnotes RnAll in
+  let s = base_notes_read base fnotes in
   Wiki.split_title_and_text s
 ;
 
@@ -301,7 +301,7 @@ value commit_notes conf base fnotes s =
   let fname = path_of_fnotes fnotes in
   do {
     Gutil.mkdir_p (Filename.dirname (file_path conf fname));
-    try base.func.commit_notes fname s with
+    try commit_notes base fname s with
     [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
     History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
     update_notes_links_db conf pg s True;

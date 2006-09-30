@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.7 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: alln.ml,v 5.8 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -289,8 +289,8 @@ value print_frequency_any conf base is_surnames list len =
 
 value select_names conf base is_surnames ini =
   let iii =
-    if is_surnames then base.func.persons_of_surname
-    else base.func.persons_of_first_name
+    if is_surnames then persons_of_surname base
+    else persons_of_first_name base
   in
   let list =
     let start_k = Gutil.tr '_' ' ' ini in
@@ -309,7 +309,7 @@ value select_names conf base is_surnames ini =
                 let my_list =
                   List.fold_left
                     (fun l ip ->
-                       if base.func.is_patched_person ip then
+                       if is_patched_person base ip then
                          let p = poi base ip in
                          let isn =
                            if is_surnames then get_surname p
@@ -363,7 +363,7 @@ value compare2 s1 s2 =
 ;
 
 value print_frequency conf base is_surnames =
-  let () = base.data.strings.load_array () in
+  let () = load_strings_array base in
   let list =
     let (list, _) = select_names conf base is_surnames "" in
     List.sort
@@ -388,9 +388,7 @@ value print_alphabetic conf base is_surnames =
     p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
   in
   let _ =
-    if fast || String.length ini < 2 then
-      let () = base.data.strings.load_array () in ()
-    else ()
+    if fast || String.length ini < 2 then load_strings_array base else ()
   in
   let all =
     match p_getenv conf.env "o" with
@@ -480,7 +478,7 @@ value print_short conf base is_surnames =
     | _ -> "" ]
   in
   let _ =
-    if String.length ini < 2 then base.data.strings.load_array () else ()
+    if String.length ini < 2 then load_strings_array base else ()
   in
   let list =
     let (list, sorted) = select_names conf base is_surnames ini in
