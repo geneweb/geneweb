@@ -94,8 +94,8 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi def.cmi gwdb.cmi 
-gwdb.cmx: adef.cmx def.cmi gwdb.cmi 
+gwdb.cmo: adef.cmi def.cmi mutil.cmi name.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx def.cmi mutil.cmx name.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi mutil.cmi notesLinks.cmo secure.cmi select.cmo 
@@ -167,10 +167,10 @@ notesLinks.cmo: def.cmi name.cmi
 notesLinks.cmx: def.cmi name.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-outbase.cmo: adef.cmi btree.cmo def.cmi gutil.cmi gwdb.cmi iobase.cmi \
-    iovalue.cmi mutil.cmi name.cmi secure.cmi outbase.cmi 
-outbase.cmx: adef.cmx btree.cmx def.cmi gutil.cmx gwdb.cmx iobase.cmx \
-    iovalue.cmx mutil.cmx name.cmx secure.cmx outbase.cmi 
+outbase.cmo: adef.cmi btree.cmo def.cmi gwdb.cmi iobase.cmi iovalue.cmi \
+    mutil.cmi name.cmi secure.cmi outbase.cmi 
+outbase.cmx: adef.cmx btree.cmx def.cmi gwdb.cmx iobase.cmx iovalue.cmx \
+    mutil.cmx name.cmx secure.cmx outbase.cmi 
 outbase.cmi: gwdb.cmi 
 perso.cmo: adef.cmi buff.cmo config.cmi dag.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi mutil.cmi name.cmi notes.cmi notesLinks.cmo num.cmi srcfile.cmi \

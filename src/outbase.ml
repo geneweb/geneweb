@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.8 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.9 2006-09-30 18:58:19 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -181,7 +181,7 @@ value make_name_index base =
       if first_name <> "?" && surname <> "?" then
         let names =
           [Name.lower (first_name ^ " " ^ surname) ::
-           Gutil.person_misc_names base p get_titles]
+           Gwdb.person_misc_names base p get_titles]
         in
         add_names (get_key_index p) names
       else ();

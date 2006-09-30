@@ -1,11 +1,8 @@
-(* $Id: gutil.mli,v 5.12 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.13 2006-09-30 18:58:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
-
-value p_first_name : base -> person -> string;
-value p_surname : base -> person -> string;
 
 value is_deleted_family : family -> bool;
 value spouse : iper -> couple -> iper;
@@ -16,9 +13,6 @@ value person_ht_add : base -> string -> iper -> unit;
 value person_ht_find_all : base -> string -> list iper;
 value person_ht_find_unique : base -> string -> string -> int -> iper;
 value person_of_key : base -> string -> option iper;
-value person_misc_names :
-  base -> person -> (person -> list title) -> list string
-;
 value find_same_name : base -> person -> list person;
 
 value leap_year : int -> bool;
