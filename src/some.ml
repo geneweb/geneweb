@@ -1,11 +1,12 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.9 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: some.ml,v 5.10 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open TemplAst;
 open Util;
 
@@ -188,7 +189,7 @@ value persons_of_absolute_first_name conf base x =
 
 value first_name_print conf base x =
   let (list, _) =
-    if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_first_name conf base x, fun [])
     else if x = "" then ([], fun [])
     else
@@ -461,7 +462,7 @@ value print_by_branch x conf base (pl, homonymes) =
 ;
 
 value first_char s =
-  if Gutil.utf_8_db.val then
+  if Mutil.utf_8_db.val then
     let len = Name.nbc s.[0] in
     if len < String.length s then String.sub s 0 len
     else s
@@ -596,7 +597,7 @@ value persons_of_absolute_surname conf base x =
 
 value old_surname_print conf base not_found_fun x =
   let (l, name_inj) =
-    if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
     else
@@ -760,7 +761,7 @@ value print_foreach print_ast eval_expr =
 
 value surname_print_2 conf base x =
   let (l, name_inj) =
-    if Gutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
     else

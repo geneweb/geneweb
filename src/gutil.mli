@@ -1,14 +1,8 @@
-(* $Id: gutil.mli,v 5.11 2006-09-22 19:26:59 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.12 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
-
-value verbose : ref bool;
-value int_size : int;
-
-value decline : char -> string -> string;
-value nominative : string -> string;
 
 value p_first_name : base -> person -> string;
 value p_surname : base -> person -> string;
@@ -100,16 +94,11 @@ value gen_strip_spaces : bool -> string -> string;
 value alphabetic_utf_8 : string -> string -> int;
 value alphabetic : string -> string -> int;
 value alphabetic_order : string -> string -> int;
-value initial : string -> int;
 value strip_all_trailing_spaces : string -> string;
 value tr : char -> char -> string -> string;
 
-value rindex : string -> char -> option int;
 value lindex : string -> char -> option int;
-value array_memq : 'a -> array 'a -> bool;
 value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
-
-value surnames_pieces : string -> list string;
 
 value arg_list_of_string : string -> list string;
 
@@ -127,16 +116,8 @@ value find_free_occ : base -> string -> string -> int -> int;
 
 value input_lexicon :
   string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;
-value input_particles : string -> list string;
 
 value utf_8_of_iso_8859_1 : string -> string;
 value iso_8859_1_of_utf_8 : string -> string;
 
-value remove_file : string -> unit;
-value remove_dir : string -> unit;
-value mkdir_p : string -> unit;
 value lock_file : string -> string;
-value output_value_no_sharing : out_channel -> _ -> unit;
-
-(* for compatibility databases version <= 4.10 which are not in utf-8 *)
-value utf_8_db : ref bool;

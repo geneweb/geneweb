@@ -1,9 +1,9 @@
-(* $Id: outbase.ml,v 5.7 2006-09-30 16:12:36 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.8 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
+open Mutil;
 
 value save_mem = ref False;
 value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
@@ -157,6 +157,9 @@ value just_copy bname what oc oc_acc =
   }
 ;
 
+value p_first_name base p = nominative (sou base (get_first_name p));
+value p_surname base p = nominative (sou base (get_surname p));
+
 value make_name_index base =
   let t = Array.create Iobase.table_size [| |] in
   let add_name key valu =
@@ -178,7 +181,7 @@ value make_name_index base =
       if first_name <> "?" && surname <> "?" then
         let names =
           [Name.lower (first_name ^ " " ^ surname) ::
-           person_misc_names base p get_titles]
+           Gutil.person_misc_names base p get_titles]
         in
         add_names (get_key_index p) names
       else ();

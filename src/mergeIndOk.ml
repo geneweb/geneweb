@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.13 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.14 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Util;
 
 value rec merge_lists l1 =

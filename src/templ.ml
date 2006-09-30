@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.3 2005-12-20 01:28:33 ddr Exp $ *)
+(* $Id: templ.ml,v 5.4 2006-09-30 18:07:33 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -773,7 +773,7 @@ and eval_transl_lexicon conf upp s c =
           [ Some n -> Util.transl_nth conf s n
           | None -> Util.transl conf s ]
         in
-        if c = "n" then s2 else Gutil.nominative s2
+        if c = "n" then s2 else Mutil.nominative s2
     | Some (s1, s2) ->
         try
           if String.length s2 > 0 && s2.[0] = '|' then

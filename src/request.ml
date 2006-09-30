@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.9 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: request.ml,v 5.10 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -669,7 +669,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
   match try Left (Iobase.input bfile) with e -> Right e with
   [ Left base ->
       do {
-        if Gutil.utf_8_db.val then ()
+        if Mutil.utf_8_db.val then ()
         else do {
           Hashtbl.clear conf.lexicon;
           let fname = Filename.concat "lang" "lexicon.txt" in

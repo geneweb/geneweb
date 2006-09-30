@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.7 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: dag.ml,v 5.8 2006-09-30 18:07:33 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -8,6 +8,7 @@ open Dag2html;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Printf;
 open TemplAst;
 open Util;

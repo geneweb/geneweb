@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.19 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Util;
 
 value raw_get conf key =

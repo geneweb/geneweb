@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.9 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: place.ml,v 5.10 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -28,7 +28,7 @@ value fold_place inverted s =
   in
   let (iend, rest) =
     if String.length s > 0 && s.[String.length s - 1] == ')' then
-      match Gutil.rindex s '(' with
+      match Mutil.rindex s '(' with
       [ Some i when i < String.length s - 2 ->
           let j =
             loop (i - 1) where rec loop i =
