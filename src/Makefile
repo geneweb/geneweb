@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.5 2006-09-30 18:07:33 ddr Exp $
+# $Id: Makefile,v 5.6 2006-09-30 18:45:55 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -12,8 +12,8 @@ GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo select.cmo calendar.cmo notesLinks.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
-MOSTDESC_OBJS=adef.cmo buff.cmo name.cmo gwdb.cmo gutil.cmo iovalue.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo adef.cmo buff.cmo name.cmo gwdb.cmo gutil.cmo btree.cmo iovalue.cmo secure.cmo iobase.cmo fpla.cmo
+MOSTDESC_OBJS=adef.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo iovalue.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo adef.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo iovalue.cmo secure.cmo iobase.cmo fpla.cmo
 UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo mutil.cmo gwdb.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
 
 all:: out
