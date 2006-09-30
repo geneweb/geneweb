@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.29 2006-09-22 23:47:13 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.30 2006-09-30 10:46:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2343,8 +2343,8 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
 ;
 
 value record_access_of tab =
-  {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
-   len = Array.length tab; array_obj _ = tab; clear_array () = ()}
+  {load_array () = (); get i = tab.(i); len = Array.length tab;
+   array_obj _ = tab; clear_array () = ()}
 ;
 
 value make_base (persons, families, strings, bnotes) =

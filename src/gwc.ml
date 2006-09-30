@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.25 2006-09-23 01:18:16 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.26 2006-09-30 10:46:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -715,8 +715,8 @@ value do_consang = ref False;
 value pr_stats = ref False;
 
 value record_access_of tab =
-  {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
-   len = Array.length tab; array_obj _ = tab; clear_array () = ()}
+  {load_array () = (); get i = tab.(i); len = Array.length tab;
+   array_obj _ = tab; clear_array () = ()}
 ;
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
@@ -767,9 +767,7 @@ value persons_record_access gen per_index_ic per_ic persons =
     try Hashtbl.find gen.g_patch_p i with
     [ Not_found -> read_person_in_temp_file i ]
   in
-  {load_array () = (); get = get_fun;
-   set _ _ = failwith "bug: setting persons array item";
-   len = Array.length persons;
+  {load_array () = (); get = get_fun; len = Array.length persons;
    array_obj _ = failwith "bug: accessing persons array";
    clear_array () = ()}
 ;
@@ -786,8 +784,7 @@ value families_record_access fam_index_ic fam_ic len =
       fam
     }
   in
-  {load_array () = (); get = get_fun;
-   set _ _ = failwith "bug: accessing person array item"; len = len;
+  {load_array () = (); get = get_fun; len = len;
    array_obj _ = failwith "bug: accessing family array";
    clear_array () = ()}
 ;

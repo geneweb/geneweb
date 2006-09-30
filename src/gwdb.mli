@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.30 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.31 2006-09-30 10:46:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -25,7 +25,6 @@ type notes =
 type record_access 'a =
   { load_array : unit -> unit;
     get : int -> 'a;
-    set : int -> 'a -> unit;
     len : mutable int;
     array_obj : unit -> array 'a;
     clear_array : unit -> unit }

@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 5.5 2006-09-22 01:01:35 ddr Exp $ *)
+(* $Id: iolight.ml,v 5.6 2006-09-30 10:46:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -84,8 +84,7 @@ value make_record_access ic shift array_pos patches len name =
         t
       } ]
   and r =
-    {load_array () = let _ = array () in ();
-     get i = (array ()).(i); set i v = (array ()).(i) := v;
+    {load_array () = let _ = array () in (); get i = (array ()).(i);
      len = patch_len len patches.val; array_obj = array;
      clear_array () = tab.val := None}
   in
