@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.15 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.16 2006-09-30 10:56:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -49,7 +49,7 @@ value compute base from_scratch quiet =
   do {
     if not from_scratch then
       let mark = Array.create (nb_of_persons base) False in
-      match base.func.patched_ascends () with
+      match patched_ascends base with
       [ [] -> ()
       | list ->
           List.iter

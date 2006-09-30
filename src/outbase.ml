@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.5 2006-09-30 10:27:02 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.6 2006-09-30 10:56:18 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -534,7 +534,7 @@ value gen_output no_patches bname base =
         else ();
         raise e
       };
-    base.func.cleanup ();
+    base_cleanup base;
     remove_file (Filename.concat bname "base");
     Sys.rename tmp_base (Filename.concat bname "base");
     remove_file (Filename.concat bname "base.acc");
