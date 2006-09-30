@@ -1,7 +1,9 @@
-(* $Id: gwdb.ml,v 5.24 2006-09-30 16:12:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.25 2006-09-30 18:58:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
+open Def;
+open Mutil;
 
 type person = Def.gen_person iper istr;
 type ascend = Def.gen_ascend ifam;
@@ -200,3 +202,119 @@ value base_notes_read base fn = base.data.bnotes.nread fn RnAll;
 value base_notes_read_first_line base fn = base.data.bnotes.nread fn Rn1Ln;
 value base_notes_read_first_char base fn = base.data.bnotes.nread fn Rn1Ch;
 value base_notes_origin_file base = base.data.bnotes.norigin_file;
+
+value p_first_name base p = nominative (sou base (get_first_name p));
+value p_surname base p = nominative (sou base (get_surname p));
+
+value person_misc_names base p nobtit =
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
+  if first_name = "?" || surname = "?" then []
+  else
+    let public_names =
+      let titles_names =
+        let tnl = ref [] in
+        do {
+          List.iter
+            (fun t ->
+               match t.t_name with
+               [ Tmain | Tnone -> ()
+               | Tname x -> tnl.val := [x :: tnl.val] ])
+            (nobtit p);
+          tnl.val
+        }
+      in
+      if sou base (get_public_name p) = "" || nobtit p = [] then titles_names
+      else [get_public_name p :: titles_names]
+    in
+    let first_names =
+      let pn =
+        if sou base (get_public_name p) <> "" && nobtit p = [] then
+          [get_public_name p :: public_names]
+        else public_names
+      in
+      [first_name :: List.map (sou base) (get_first_names_aliases p @ pn)]
+    in
+    let surnames =
+      [surname ::
+       surnames_pieces surname @
+         List.map (sou base) (get_surnames_aliases p @ get_qualifiers p)]
+    in
+    let surnames =
+      if get_sex p == Female then
+        let u = uoi base (get_key_index p) in
+        List.fold_left
+          (fun list ifam ->
+             let cpl = coi base ifam in
+             let husband = poi base (get_father cpl) in
+             let husband_surname = p_surname base husband in
+             let husband_surnames_aliases =
+               List.map (sou base) (get_surnames_aliases husband)
+             in
+             if p_surname base husband = "?" then
+               husband_surnames_aliases @ list
+             else
+               [husband_surname ::
+                surnames_pieces husband_surname @ husband_surnames_aliases @
+                  list])
+          surnames (Array.to_list (get_family u))
+      else surnames
+    in
+    let list = [] in
+    let list =
+      List.fold_left (fun list s -> [sou base s :: list]) list public_names
+    in
+    let list =
+      List.fold_left
+        (fun list f ->
+           List.fold_left (fun list s -> [f ^ " " ^ s :: list]) list surnames)
+        list first_names
+    in
+    let list =
+      let first_names =
+        [first_name :: List.map (sou base) (get_first_names_aliases p)]
+      in
+      List.fold_left
+        (fun list t ->
+           let s = sou base t.t_place in
+           if s = "" then list
+           else
+             let first_names =
+               match t.t_name with
+               [ Tname f -> [sou base f :: first_names]
+               | Tmain | Tnone ->
+                   let f = sou base (get_public_name p) in
+                   if f = "" then first_names else [f :: first_names] ]
+             in
+             List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
+               first_names)
+        list (nobtit p)
+    in
+    let list =
+      match get_parents (aoi base (get_key_index p)) with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let fath = poi base (get_father cpl) in
+          let first_names =
+            [first_name :: List.map (sou base) (get_first_names_aliases p)]
+          in
+          List.fold_left
+            (fun list t ->
+               let s = sou base t.t_place in
+               if s = "" then list
+               else
+                 List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
+                   first_names)
+            list (nobtit fath)
+      | _ -> list ]
+    in
+    let list =
+      List.fold_left (fun list s -> [sou base s :: list]) list (get_aliases p)
+    in
+    let fn = Name.lower (first_name ^ " " ^ surname) in
+    List.fold_left
+      (fun list s ->
+         let s = Name.lower s in
+         if s = fn || List.mem s list then list else [s :: list])
+      [] list
+;
