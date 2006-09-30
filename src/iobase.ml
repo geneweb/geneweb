@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.16 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.17 2006-09-30 10:46:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -852,8 +852,7 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
       } ]
   and r =
     {load_array () = let _ = array () in (); get = gen_get;
-     set i v = (array ()).(i) := v; len = max len plenr.val;
-     array_obj = array;
+     len = max len plenr.val; array_obj = array;
      clear_array () = do { cleared.val := True; tab.val := None }}
   in
   r
