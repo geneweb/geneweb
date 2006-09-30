@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 5.2 2006-09-24 10:56:59 ddr Exp $ *)
+(* $Id: fpla.ml,v 5.3 2006-09-30 10:27:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -8,8 +8,8 @@ open Gwdb;
 open Printf;
 
 value make_table base =
-  let _ = base.data.ascends.load_array () in
-  let _ = base.data.couples.load_array () in
+  let _ = load_ascends_array base in
+  let _ = load_couples_array base in
   let fpla = Array.create base.data.ascends.len None in
   let cnt = ref base.data.ascends.len in
   do {
