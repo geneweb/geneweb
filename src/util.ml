@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.33 2006-09-28 20:24:11 ddr Exp $ *)
+(* $Id: util.ml,v 5.34 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -585,8 +585,7 @@ value is_restricted (conf : config) base ip =
     get_surname p <> quest_string && get_first_name p <> quest_string &&
     not (fast_auth_age conf p)
   in  
-  if conf.use_restrict then
-    base.data.visible.v_get fct (Adef.int_of_iper ip)
+  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
   else False 
 ;
 
@@ -875,7 +874,7 @@ value start_with2 s i p =
 ;
 
 value get_particle base s =
-  loop base.data.particles where rec loop =
+  loop (base_particles base) where rec loop =
     fun
     [ [part :: parts] -> if start_with2 s 0 part then part else loop parts
     | [] -> "" ]
@@ -951,7 +950,7 @@ value base_len n =
   match try Some (Iobase.input n) with [ Sys_error _ -> None ] with
   [ Some base ->
       let len = nb_of_persons base in
-      do { base.func.cleanup (); string_of_int len }
+      do { base_cleanup base; string_of_int len }
   | _ -> "?" ]
 ;
 
@@ -2063,8 +2062,8 @@ value find_sosa_ref conf base =
 value create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   [ Some "no_tsfile" ->
-      let () = base.data.ascends.load_array () in
-      let () = base.data.couples.load_array () in
+      let () = load_ascends_array base in
+      let () = load_couples_array base in
       Consang.topological_sort base (aget conf)
   | Some "no_tstab" -> Array.create (nb_of_persons base) 0
   | _ ->
@@ -2092,13 +2091,11 @@ value create_topological_sort conf base =
           match r with
           [ Some tstab -> tstab
           | None ->
-              let () = base.data.ascends.load_array () in
-              let () = base.data.couples.load_array () in
+              let () = load_ascends_array base in
+              let () = load_couples_array base in
               let tstab = Consang.topological_sort base (aget conf) in
               do {
-                if conf.use_restrict then
-                  base.data.visible.v_write ()
-                else ();
+                if conf.use_restrict then base_visible_write base else ();
                 match
                   try Some (Secure.open_out_bin tstab_file) with
                   [ Sys_error _ -> None ]
@@ -2112,8 +2109,8 @@ value create_topological_sort conf base =
                 tstab
               } ]
       | Refuse ->
-          let () = base.data.ascends.load_array () in
-          let () = base.data.couples.load_array () in
+          let () = load_ascends_array base in
+          let () = load_couples_array base in
           Consang.topological_sort base (aget conf) ] ]
 ;
 
@@ -2455,7 +2452,7 @@ value update_wf_trace conf fname =
 
 value commit_patches conf base =
   do {
-    base.func.commit_patches ();
+    commit_patches base;
     conf.henv :=
       List.map
         (fun (k, v) ->

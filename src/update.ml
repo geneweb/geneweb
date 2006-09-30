@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.14 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: update.ml,v 5.15 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -95,7 +95,7 @@ value print_err_unknown conf base (f, s, o) =
 ;
 
 value insert_string base s =
-  try base.func.index_of_string s with
+  try base_index_of_string base s with
   [ Not_found ->
       let i = Adef.istr_of_int (nb_of_strings base) in
       do { patch_string base i s; i } ]

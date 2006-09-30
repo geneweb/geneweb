@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.6 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.7 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -55,7 +55,7 @@ value compute base bdir =
   do {
     Printf.eprintf "--- database notes\n";
     flush stderr;
-    let list = notes_links (base.data.bnotes.nread "" RnAll) in
+    let list = notes_links (base_notes_read base "") in
     if list = ([], []) then ()
     else 
       let pg = NotesLinks.PgNotes in
@@ -99,7 +99,7 @@ value compute base bdir =
             if Filename.check_suffix file ".txt" then do {
               let fnotes = Filename.chop_suffix file ".txt" in
               let file = Filename.concat dir fnotes in
-              let list = notes_links (base.data.bnotes.nread file RnAll) in
+              let list = notes_links (base_notes_read base file) in
               if list = ([], []) then ()
               else do {
                 let fnotes =

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.13 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.14 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1205,8 +1205,8 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
       else ()
     };
     if not no_notes.val then do {
-      let s = base.data.bnotes.nread "" RnAll in
-      let (oc, first) = origin_file base.data.bnotes.norigin_file in
+      let s = base_notes_read base "" in
+      let (oc, first) = origin_file (base_notes_origin_file base) in
       if s <> "" then do {
         if not first.val then fprintf oc "\n" else ();
         first.val := False;
@@ -1244,7 +1244,7 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
               [ Some (dl, f) -> List.fold_right Filename.concat dl f
               | None -> "bad" ]
             in
-            let s = base.data.bnotes.nread fn RnAll in
+            let s = base_notes_read base fn in
             let files =
               add_linked_files gen (fun _ -> sprintf "extended page \"%s\"" f)
                 s files
@@ -1259,7 +1259,7 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
              [ Some (dl, f) -> List.fold_right Filename.concat dl f
              | None -> "bad" ]
            in
-           let s = base.data.bnotes.nread fn RnAll in
+           let s = base_notes_read base fn in
            if s <> "" then do {
              if not first.val then fprintf oc "\n" else ();
              first.val := False;
@@ -1490,12 +1490,12 @@ value main () =
       else in_file.val ^ ".gwb"
     in
     let src_oc_list = ref [] in
-    let () = base.data.ascends.load_array () in
-    let () = base.data.strings.load_array () in
+    let () = load_ascends_array base in
+    let () = load_strings_array base in
     if not mem.val then
-      let () = base.data.couples.load_array () in
-      let () = base.data.unions.load_array () in
-      let () = base.data.descends.load_array () in
+      let () = load_couples_array base in
+      let () = load_unions_array base in
+      let () = load_descends_array base in
       ()
     else ();
     let out_oc =

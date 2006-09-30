@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.12 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.13 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -138,7 +138,7 @@ value ged_header base oc ifile ofile =
     | Utf8 -> fprintf oc "1 CHAR UTF-8\n" ];
     if no_notes.val then ()
     else
-      let s = base.data.bnotes.nread "" RnAll in
+      let s = base_notes_read base "" in
       if s = "" then () else display_note oc s;
   }
 ;
@@ -279,8 +279,7 @@ value ged_adoption base (per_sel, fam_sel) oc per r =
     adop_fam_list.val :=
       [(r.r_fath, r.r_moth, get_key_index per) :: adop_fam_list.val];
     incr adop_fam_cnt;
-    fprintf oc "2 FAMC @F%d@\n"
-      (base.data.families.len + adop_fam_cnt.val);
+    fprintf oc "2 FAMC @F%d@\n" (nb_of_families base + adop_fam_cnt.val);
     fprintf oc "3 ADOP ";
     match (r.r_fath, r.r_moth) with
     [ (Some _, None) -> fprintf oc "HUSB"
@@ -632,10 +631,10 @@ value gwb2ged base ifile ofile anc desc mem =
   in
   do {
     if not mem then do {
-      base.data.ascends.load_array ();
-      base.data.unions.load_array ();
-      base.data.couples.load_array ();
-      base.data.descends.load_array ();
+      load_ascends_array base;
+      load_unions_array base;
+      load_couples_array base;
+      load_descends_array base;
     }
     else ();
     let oc = if ofile = "" then stdout else open_out ofile in
@@ -645,18 +644,18 @@ value gwb2ged base ifile ofile anc desc mem =
     in
     ged_header base oc ifile ofile;
     flush oc;
-    for i = 0 to base.data.persons.len - 1 do {
+    for i = 0 to nb_of_persons base - 1 do {
       if per_sel (Adef.iper_of_int i) then ged_ind_record base sel oc i
       else ()
     };
-    for i = 0 to base.data.families.len - 1 do {
+    for i = 0 to nb_of_families base - 1 do {
       if fam_sel (Adef.ifam_of_int i) then ged_fam_record base sel oc i
       else ()
     };
     let _ =
       List.fold_right
         (fun adop i -> do { ged_fam_adop base oc i adop; i + 1 })
-        adop_fam_list.val (base.data.families.len + 1)
+        adop_fam_list.val (nb_of_families base + 1)
     in
     fprintf oc "0 TRLR\n";
     flush oc;

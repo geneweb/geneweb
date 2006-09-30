@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.8 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: place.ml,v 5.9 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -66,7 +66,7 @@ value get_all conf base =
     incr cnt
   in
   let empty =
-    try base.func.index_of_string "" with [ Not_found -> Adef.istr_of_int 0 ]
+    try base_index_of_string base "" with [ Not_found -> Adef.istr_of_int 0 ]
   in
   do {
     if add_birth || add_death then

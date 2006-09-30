@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.8 2006-09-28 20:24:11 ddr Exp $ *)
+(* $Id: request.ml,v 5.9 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -106,7 +106,7 @@ value try_find_with_one_first_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let (list, _) =
-        Some.persons_of_fsname conf base base.func.persons_of_surname.find
+        Some.persons_of_fsname conf base (persons_of_surname base).find
           get_surname sn
       in
       let pl =
@@ -680,8 +680,8 @@ value treat_request_on_possibly_locked_base conf bfile log =
             [ Not_found -> "iso-8859-1" ];
         };
         try treat_request conf base log with exc ->
-          do { base.func.cleanup (); raise exc };
-        base.func.cleanup ();
+          do { base_cleanup base; raise exc };
+        base_cleanup base;
       }
   | Right e ->
       let transl conf w =

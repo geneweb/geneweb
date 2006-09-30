@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.9 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: select.ml,v 5.10 2006-09-30 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -88,7 +88,7 @@ value restrict_base base per_tab fam_tab flag =
   do {
     for i = 0 to nb_of_persons base - 1 do {
       let fct p = False in
-      if base.data.visible.v_get fct i then
+      if base_visible_get base fct i then
         let _ = per_tab.(i) := per_tab.(i) lor flag in ()
       else ()
     };
