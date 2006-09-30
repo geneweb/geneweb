@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.27 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.28 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -576,11 +576,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          let a = gen.g_base.c_ascends.(Adef.int_of_iper ix) in
          do {
            check_parents_not_already_defined gen ix fath moth;
-           let a =
-             ascend_of_gen_ascend
-               {(gen_ascend_of_ascend a) with
-                parents = Some (Adef.ifam_of_int i)}
-           in
+           let a = ascend_with_parents a (Some (Adef.ifam_of_int i)) in
            gen.g_base.c_ascends.(Adef.int_of_iper ix) := a
          })
       children;

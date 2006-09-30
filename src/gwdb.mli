@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.34 2006-09-30 18:58:19 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.35 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -111,14 +111,19 @@ value get_surname : person -> istr;
 value get_surnames_aliases : person -> list istr;
 value get_titles : person -> list title;
 
+value person_with_key : person -> istr -> istr -> int -> person;
+value person_with_related : person -> list iper -> person;
+value person_with_rparents : person -> list relation -> person;
+value person_with_sex : person -> Def.sex -> person;
 value person_of_gen_person : Def.gen_person iper istr -> person;
 value gen_person_of_person : person -> Def.gen_person iper istr;
 
 value get_parents : ascend -> option ifam;
 value get_consang : ascend -> Adef.fix;
 
+value ascend_with_consang : ascend -> Adef.fix -> ascend;
+value ascend_with_parents : ascend -> option ifam -> ascend;
 value ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
-value gen_ascend_of_ascend : ascend -> Def.gen_ascend ifam;
 
 value get_family : union -> array ifam;
 
@@ -142,8 +147,8 @@ value get_father : couple -> iper;
 value get_mother : couple -> iper;
 value get_parent_array : couple -> array iper;
 
-value gen_couple_of_couple : couple -> Def.gen_couple iper;
 value couple_of_gen_couple : Def.gen_couple iper -> couple;
+value gen_couple_of_couple : couple -> Def.gen_couple iper;
 
 value get_children : descend -> array iper;
 

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.17 2006-09-30 16:12:36 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.18 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -13,9 +13,7 @@ value rec clear_descend_consang base ascends mark ifam =
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
          let a = ascends.(Adef.int_of_iper ip) in
-         ascends.(Adef.int_of_iper ip) :=
-           ascend_of_gen_ascend
-             {(gen_ascend_of_ascend a) with consang = no_consang};
+         ascends.(Adef.int_of_iper ip) := ascend_with_consang a no_consang;
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
          Array.iter (clear_descend_consang base ascends mark) (get_family u)
@@ -61,10 +59,7 @@ value compute base from_scratch quiet =
     else ();
     for i = 0 to nb_of_persons base - 1 do {
       let a = ascends.(i) in
-      if from_scratch then
-        ascends.(i) :=
-          ascend_of_gen_ascend
-            {(gen_ascend_of_ascend a) with consang = no_consang}
+      if from_scratch then ascends.(i) := ascend_with_consang a no_consang
       else
         match get_parents a with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := get_consang a
@@ -99,11 +94,7 @@ value compute base from_scratch quiet =
                   in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
-                  let a =
-                    ascend_of_gen_ascend
-                      {(gen_ascend_of_ascend a) with
-                       consang = Adef.fix_of_float consang}
-                  in
+                  let a = ascend_with_consang a (Adef.fix_of_float consang) in
                   ascends.(i) := a;
                   consang_tab.(Adef.int_of_ifam ifam) := get_consang a;
                   if not quiet then
@@ -126,18 +117,13 @@ value compute base from_scratch quiet =
               else do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                ascends.(i) :=
-                  ascend_of_gen_ascend
-                    {(gen_ascend_of_ascend a) with consang = pconsang}
+                ascends.(i) := ascend_with_consang a pconsang
               }
           | None ->
               do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                ascends.(i) :=
-                  ascend_of_gen_ascend
-                    {(gen_ascend_of_ascend a) with
-                     consang = Adef.fix_of_float 0.0}
+                ascends.(i) := ascend_with_consang a (Adef.fix_of_float 0.0)
               } ]
         else ()
       }

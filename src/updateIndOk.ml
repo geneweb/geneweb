@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.21 2006-09-30 21:48:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -431,11 +431,7 @@ value update_relation_parents base op np =
          else
            let p = poi base ip in
            if not (List.mem pi (get_related p)) then
-             let p =
-               person_of_gen_person
-                 {(gen_person_of_person p) with
-                  related = [pi :: get_related p]}
-             in
+             let p = person_with_related p [pi :: get_related p] in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl np_rparents
@@ -450,9 +446,7 @@ value update_relation_parents base op np =
            let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
            if List.mem pi (get_related p) then
              let p =
-               person_of_gen_person
-                 {(gen_person_of_person p) with
-                  related = List.filter ( \<> pi) (get_related p)}
+               person_with_related p (List.filter ( \<> pi) (get_related p))
              in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
