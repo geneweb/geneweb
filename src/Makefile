@@ -1,20 +1,20 @@
-# $Id: Makefile,v 5.6 2006-09-30 18:45:55 ddr Exp $
+# $Id: Makefile,v 5.7 2006-09-30 19:18:31 ddr Exp $
 
 include ../tools/Makefile.inc
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
-GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo gwc.cmo
-CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo templ.cmo date.cmo update.cmo notesLinks.cmo wiki.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
+GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo gwdb.cmo gutil.cmo iobase.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo gwc.cmo
+CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo gwdb.cmo gutil.cmo iobase.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo mk_consang.cmo
+GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo gwdb.cmo gutil.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo templ.cmo date.cmo update.cmo notesLinks.cmo wiki.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo doc.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
-GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo select.cmo calendar.cmo notesLinks.cmo gwu.cmo
+GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo gwdb.cmo gutil.cmo iobase.cmo select.cmo calendar.cmo notesLinks.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
-MOSTDESC_OBJS=adef.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo iovalue.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo adef.cmo buff.cmo name.cmo mutil.cmo gwdb.cmo gutil.cmo btree.cmo iovalue.cmo secure.cmo iobase.cmo fpla.cmo
-UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo mutil.cmo gwdb.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
+MOSTDESC_OBJS=adef.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo gwdb.cmo gutil.cmo iovalue.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo adef.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo gwdb.cmo gutil.cmo iovalue.cmo iobase.cmo fpla.cmo
+UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo mutil.cmo btree.cmo iovalue.cmo gwdb.cmo gutil.cmo iobase.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
 
 all:: out
 
