@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.21 2006-09-30 21:17:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -599,7 +599,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
              begin
                let sec =
                  let d = tm_now -. tm_user in
-                 if d = 0.0 then "" else Printf.sprintf " - %.0fs" d
+                 if d = 0.0 then "" else Printf.sprintf " - %.0f s" d
                in
                if wfile <> "" then
                  Wserver.wprint
