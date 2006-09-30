@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.4 2006-09-29 18:42:44 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.5 2006-09-30 10:27:02 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -378,11 +378,11 @@ value gen_output no_patches bname base =
     let tmp_notes = Filename.concat bname "1notes" in
     let tmp_notes_d = Filename.concat bname "1notes_d" in
     if not no_patches then do {
-      base.data.ascends.load_array ();
-      base.data.unions.load_array ();
-      base.data.couples.load_array ();
-      base.data.descends.load_array ();
-      base.data.strings.load_array ();
+      load_ascends_array base;
+      load_unions_array base;
+      load_couples_array base;
+      load_descends_array base;
+      load_strings_array base;
     }
     else ();
     let oc = Secure.open_out_bin tmp_base in

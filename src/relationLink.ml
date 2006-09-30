@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.10 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.11 2006-09-30 10:27:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -47,8 +47,8 @@ value make_dist_tab conf base ia maxlev =
     (* optimization to be used 1/ if database not too big or 2/ running
     on machines with much memory *)
 (*
-    let () = base.data.unions.load_array () in
-    let () = base.data.descends.load_array () in
+    let () = load_unions_array base in
+    let () = load_descends_array base in
 *)
     let tstab = Util.create_topological_sort conf base in
     let module Pq =
