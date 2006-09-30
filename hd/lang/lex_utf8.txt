@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.36 2006-09-29 14:07:36 ddr Exp $
+# $Id: lex_utf8.txt,v 5.37 2006-09-30 10:07:57 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1976,6 +1976,7 @@ sl: sočasno
 sv: samtidigt
 
     average death age
+de: Durschnittliches Sterbealter
 en: average death age
 et: keskmine eluiga
 fr: âge moyen de décès
@@ -2776,6 +2777,7 @@ sl: komentar
 sv: kommentar
 
     connections
+de: Verbindungen
 en: connections
 fi: yhteyksien määrä
 fr: connexions
@@ -8950,6 +8952,7 @@ sl: drevo
 sv: träd
 
     try again
+de: Nocheinmal versuchen
 en: try again
 fi: yritä uudestaan
 fr: réessayer
