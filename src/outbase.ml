@@ -1,8 +1,9 @@
-(* $Id: outbase.ml,v 5.9 2006-09-30 18:58:19 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.10 2006-09-30 19:27:01 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
 open Gwdb;
+open Iobase;
 open Mutil;
 
 value save_mem = ref False;
@@ -95,7 +96,7 @@ value just_copy bname what oc oc_acc =
     flush stderr;
     let ic =
       let ic = Secure.open_in_bin (Filename.concat bname "base") in
-      do { Iobase.check_magic ic; ic }
+      do { check_magic ic; ic }
     in
     let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
     let persons_len = input_binary_int ic in
@@ -161,7 +162,7 @@ value p_first_name base p = nominative (sou base (get_first_name p));
 value p_surname base p = nominative (sou base (get_surname p));
 
 value make_name_index base =
-  let t = Array.create Iobase.table_size [| |] in
+  let t = Array.create table_size [| |] in
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
@@ -181,7 +182,7 @@ value make_name_index base =
       if first_name <> "?" && surname <> "?" then
         let names =
           [Name.lower (first_name ^ " " ^ surname) ::
-           Gwdb.person_misc_names base p get_titles]
+           person_misc_names base p get_titles]
         in
         add_names (get_key_index p) names
       else ();
@@ -194,7 +195,7 @@ value create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
   let bpos = pos_out oc_inx in
   do {
-    output_value_no_sharing oc_inx (ni : Iobase.name_index_data);
+    output_value_no_sharing oc_inx (ni : name_index_data);
     let epos =
       output_array_access oc_inx_acc (Array.get ni) (Array.length ni) bpos
     in
@@ -211,7 +212,7 @@ value add_name t key valu =
 ;
 
 value make_strings_of_fsname base =
-  let t = Array.create Iobase.table_size [| |] in
+  let t = Array.create table_size [| |] in
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let p = poi base (Adef.iper_of_int i) in
@@ -234,7 +235,7 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   let t = make_strings_of_fsname base in
   let bpos = pos_out oc_inx in
   do {
-    output_value_no_sharing oc_inx (t : Iobase.strings_of_fsname);
+    output_value_no_sharing oc_inx (t : strings_of_fsname);
     let epos =
       output_array_access oc_inx_acc (Array.get t) (Array.length t) bpos
     in
@@ -282,7 +283,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
     Btree.Make
       (struct
          type t = istr;
-         value compare = Iobase.compare_istr base;
+         value compare = compare_istr base;
        end)
   in
   let bt = ref IstrTree.empty in
@@ -325,7 +326,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
     Btree.Make
       (struct
          type t = istr;
-         value compare = Iobase.compare_istr base;
+         value compare = compare_istr base;
        end)
   in
   let bt = ref IstrTree.empty in
@@ -405,8 +406,7 @@ value gen_output no_patches bname base =
     try
       do {
         output_string oc
-          (if utf_8_db.val then Iobase.magic_gwb
-           else Iobase.magic_gwb_iso_8859_1);
+          (if utf_8_db.val then magic_gwb else magic_gwb_iso_8859_1);
         output_binary_int oc base.data.persons.len;
         output_binary_int oc base.data.families.len;
         output_binary_int oc base.data.strings.len;

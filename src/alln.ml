@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.9 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: alln.ml,v 5.10 2006-09-30 19:23:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -101,7 +101,7 @@ value new_name_key base s =
 ;
 
 value name_key_compatible base s =
-  if Mutil.utf_8_db.val then new_name_key base s else Iobase.name_key s
+  if Mutil.utf_8_db.val then new_name_key base s else Mutil.name_key s
 ;
 
 (* print *)

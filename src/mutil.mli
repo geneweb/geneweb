@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.1 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.2 2006-09-30 19:23:41 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size : int;
@@ -17,6 +17,7 @@ value remove_dir : string -> unit;
 
 value output_value_no_sharing : out_channel -> 'a -> unit;
 
+value name_key : string -> string;
 value initial : string -> int;
 value input_particles : string -> list string;
 value surnames_pieces : string -> list string;

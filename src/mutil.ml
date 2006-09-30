@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.1 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.2 2006-09-30 19:23:41 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -178,6 +178,15 @@ value initial n =
       match n.[i] with
       [ 'A'..'Z' | 'À'..'Ý' -> i
       | _ -> loop (succ i) ]
+;
+
+value name_key s =
+  let i = initial s in
+  let s =
+    if i == 0 then s
+    else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
+  in
+  Name.lower s
 ;
 
 value input_particles fname =
