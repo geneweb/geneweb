@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.17 2006-09-30 10:46:45 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.18 2006-09-30 12:15:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -292,10 +292,10 @@ value old_persons_of_first_name_or_surname base_data strings params =
                let ipera =
                  try IstrTree.find istr bt.val with [ Not_found -> [] ]
                in
-               if List.memq (get_key_index p) ipera then ()
+               if List.memq (Adef.iper_of_int i) ipera then ()
                else
                  bt.val :=
-                   IstrTree.add istr [get_key_index p :: ipera] bt.val)
+                   IstrTree.add istr [Adef.iper_of_int i :: ipera] bt.val)
           person_patches;
         if gistro = None then completed.val := True else ();
         bt.val
@@ -423,8 +423,8 @@ flush stderr;
         (fun i p ->
            let istr1 = proj p in
            if istr1 <> istr then ()
-           else if List.memq (get_key_index p) ipera.val then ()
-           else ipera.val := [get_key_index p :: ipera.val])
+           else if List.memq (Adef.iper_of_int i) ipera.val then ()
+           else ipera.val := [Adef.iper_of_int i :: ipera.val])
         person_patches;
       ipera.val
     }
