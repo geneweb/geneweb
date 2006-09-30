@@ -1,4 +1,4 @@
-(* $Id: iobase.mli,v 5.4 2006-09-22 19:26:59 ddr Exp $ *)
+(* $Id: iobase.mli,v 5.5 2006-09-30 16:12:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -14,4 +14,4 @@ value check_magic : in_channel -> unit;
 value magic_gwb : string;
 value magic_gwb_iso_8859_1 : string;
 value table_size : int;
-value compare_istr_fun : base_data -> istr -> istr -> int;
+value compare_istr : base -> istr -> istr -> int;

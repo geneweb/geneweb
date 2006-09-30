@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.18 2006-09-30 12:15:00 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.19 2006-09-30 16:12:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -262,6 +262,8 @@ value compare_istr_fun base_data is1 is2 =
     compare_names base_data (base_data.strings.get (Adef.int_of_istr is1))
       (base_data.strings.get (Adef.int_of_istr is2))
 ;
+
+value compare_istr base = compare_istr_fun base.data;
 
 value rec list_remove_elemq x =
   fun

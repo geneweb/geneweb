@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.16 2006-09-30 10:56:18 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.17 2006-09-30 16:12:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -39,7 +39,7 @@ value trace quiet cnt max_cnt =
 ;
 
 value compute base from_scratch quiet =
-  let ascends = base.data.ascends.array_obj () in
+  let ascends = ascends_array base in
   let () = load_couples_array base in
   let tab =
     Consang.make_relationship_info base (Consang.topological_sort base aoi)

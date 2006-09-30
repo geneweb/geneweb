@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.6 2006-09-30 10:56:18 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.7 2006-09-30 16:12:36 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -279,7 +279,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
     Btree.Make
       (struct
          type t = istr;
-         value compare = Iobase.compare_istr_fun base.data;
+         value compare = Iobase.compare_istr base;
        end)
   in
   let bt = ref IstrTree.empty in
@@ -322,7 +322,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
     Btree.Make
       (struct
          type t = istr;
-         value compare = Iobase.compare_istr_fun base.data;
+         value compare = Iobase.compare_istr base;
        end)
   in
   let bt = ref IstrTree.empty in
