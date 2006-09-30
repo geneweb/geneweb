@@ -1,10 +1,9 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 5.6 2006-09-21 03:28:15 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 5.7 2006-09-30 18:45:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Util;
 
