@@ -1,11 +1,12 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.15 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: perso.ml,v 5.16 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open TemplAst;
 open Util;
 

@@ -1,12 +1,13 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.5 2006-09-25 09:21:30 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.6 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
-open Util;
+open Mutil;
 open Printf;
+open Util;
 
 value green_color = "#2f6400";
 value selected_addr = ref None;

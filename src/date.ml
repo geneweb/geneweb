@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.6 2006-09-20 16:28:37 ddr Exp $ *)
+(* $Id: date.ml,v 5.7 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -9,6 +9,7 @@ open Def;
 open Util;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Printf;
 open TemplAst;
 

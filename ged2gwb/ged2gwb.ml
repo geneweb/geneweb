@@ -1,10 +1,11 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.30 2006-09-30 10:46:45 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.31 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Printf;
 
 value log_oc = ref stdout;

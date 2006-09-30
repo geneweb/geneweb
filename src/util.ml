@@ -1,11 +1,12 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.34 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: util.ml,v 5.35 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Printf;
 
 value sharelib =
@@ -123,13 +124,13 @@ value rec capitale_utf_8 s =
 ;
 
 value index_of_next_char s i =
-  if Gutil.utf_8_db.val then
+  if Mutil.utf_8_db.val then
     min (String.length s) (i + max 1 (Name.nbc s.[i]))
   else i + 1
 ;
 
 value capitale s =
-  if Gutil.utf_8_db.val then capitale_utf_8 s
+  if Mutil.utf_8_db.val then capitale_utf_8 s
   else capitale_iso_8859_1 s
 ;
 
@@ -195,17 +196,17 @@ value gen_decline wt s =
     [ Some i ->
         (* special case for Spanish *)
         if String.length s > 0 && start_with_hi_i s then
-          nth_field wt 1 ^ Gutil.decline 'n' s
-        else nth_field wt 0 ^ Gutil.decline 'n' s1
-    | None -> wt ^ Gutil.decline 'n' s1 ]
+          nth_field wt 1 ^ Mutil.decline 'n' s
+        else nth_field wt 0 ^ Mutil.decline 'n' s1
+    | None -> wt ^ Mutil.decline 'n' s1 ]
   else if len >= 3 && wt.[len - 3] == ':' && wt.[len - 1] == ':' then
     let start = String.sub wt 0 (len - 3) in
-    start ^ Gutil.decline wt.[len - 2] s
+    start ^ Mutil.decline wt.[len - 2] s
   else
     match plus_decl wt with
     [ Some (start, " +before") ->
-        if s = "" then start else Gutil.decline 'n' s ^ " " ^ start
-    | _ -> wt ^ Gutil.decline 'n' s1 ]
+        if s = "" then start else Mutil.decline 'n' s ^ " " ^ start
+    | _ -> wt ^ Mutil.decline 'n' s1 ]
 ;
 
 value transl_decline conf w s =
@@ -1544,7 +1545,7 @@ value print_copyright conf =
   let env =
     [('s', fun _ -> commd conf);
      ('c', fun _ -> compilation_time conf);
-     ('C', fun _ -> if Gutil.utf_8_db.val then "&copy;" else "(c)");
+     ('C', fun _ -> if Mutil.utf_8_db.val then "&copy;" else "(c)");
      ('d',
       fun _ ->
         let s =
@@ -2225,7 +2226,7 @@ value gen_only_printable or_nl s =
   do {
     for i = 0 to String.length s - 1 do {
       s'.[i] :=
-        if Gutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
+        if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
         else
           match s.[i] with
           [ ' '..'~' | '\160'..'\255' -> s.[i]

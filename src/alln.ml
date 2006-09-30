@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.8 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: alln.ml,v 5.9 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Util;
 
 value default_max_cnt = 2000;
@@ -73,22 +74,22 @@ value combine_by_count list =
 
 value alphab_string conf base is_surname s =
   if is_surname then
-    if Gutil.utf_8_db.val then
+    if Mutil.utf_8_db.val then
       surname_end base s ^ surname_begin base s
     else old_surname_end s ^ old_surname_begin s
   else s
 ;
 
 value lower_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else Name.lower s
+  if Mutil.utf_8_db.val then s else Name.lower s
 ;
 
 value capitalize_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else String.capitalize s
+  if Mutil.utf_8_db.val then s else String.capitalize s
 ;
 
 value lowercase_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else String.lowercase s
+  if Mutil.utf_8_db.val then s else String.lowercase s
 ;
 
 value new_name_key base s =
@@ -100,7 +101,7 @@ value new_name_key base s =
 ;
 
 value name_key_compatible base s =
-  if Gutil.utf_8_db.val then new_name_key base s else Iobase.name_key s
+  if Mutil.utf_8_db.val then new_name_key base s else Iobase.name_key s
 ;
 
 (* print *)
@@ -126,7 +127,7 @@ value print_title conf base is_surnames ini len =
 ;
 
 value displayify s =
-  if Gutil.utf_8_db.val then
+  if Mutil.utf_8_db.val then
     loop 0 0 where rec loop i len =
       if i = String.length s then Buff.get len
       else
@@ -355,11 +356,11 @@ value select_names conf base is_surnames ini =
          if cnt >= lim then [(k, s, cnt) :: list] else list)
       [] list
   in
-  (list, if Gutil.utf_8_db.val then False else True)
+  (list, if Mutil.utf_8_db.val then False else True)
 ;
 
 value compare2 s1 s2 =
-  if Gutil.utf_8_db.val then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2
+  if Mutil.utf_8_db.val then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2
 ;
 
 value print_frequency conf base is_surnames =

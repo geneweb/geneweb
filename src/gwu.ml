@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.14 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.15 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -98,7 +98,7 @@ value raw_output = ref False;
 value gen_correct_string no_num no_colon s =
   let s = strip_spaces s in
   let s =
-    if Gutil.utf_8_db.val || raw_output.val then s
+    if Mutil.utf_8_db.val || raw_output.val then s
     else Gutil.utf_8_of_iso_8859_1 s
   in
   loop 0 0 where rec loop i len =

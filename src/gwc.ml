@@ -1,11 +1,12 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.26 2006-09-30 10:46:45 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.27 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Gwcomp;
 open Gwdb;
+open Mutil;
 open Printf;
 
 type gen_min_person 'person 'string =
@@ -795,7 +796,7 @@ value input_particles part_file =
      "von und zu "; "von "; "zu "; "zur ";
      "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
      "VON UND ZU "; "VON "; "ZU "; "ZUR "]
-  else Gutil.input_particles part_file
+  else Mutil.input_particles part_file
 ;
 
 value empty_base : cbase =
@@ -970,7 +971,7 @@ value output_wizard_notes bname wiznotes =
   in
   let wizdir = Filename.concat bdir "wiznotes" in
   do {
-    Gutil.remove_dir wizdir;
+    Mutil.remove_dir wizdir;
     if wiznotes = [] then ()
     else
       do {
@@ -1095,7 +1096,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
             in
             Filename.concat "gw_tmp" d
           in
-          try Gutil.mkdir_p tmp_dir with _ -> ();
+          try Mutil.mkdir_p tmp_dir with _ -> ();
           match link (List.rev gwo.val) tmp_dir with
           [ Some (base, wiznotes) ->
               do {
@@ -1104,7 +1105,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
                 output_wizard_notes out_file.val wiznotes;
                 output_command_line out_file.val;
                 output_particles_file out_file.val base.data.particles;
-                try Gutil.remove_dir tmp_dir with _ -> ();
+                try Mutil.remove_dir tmp_dir with _ -> ();
                 try Unix.rmdir "gw_tmp" with _ -> ();
               }
           | None ->

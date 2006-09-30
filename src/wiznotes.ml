@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.19 2006-09-29 14:07:36 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -666,7 +666,7 @@ value do_change_wizard_visibility conf base x set_vis = do {
     if not found && set_vis then Printf.fprintf oc "%s\n" conf.user else ();
     close_out oc;
     let file = Filename.concat wddir "connected.allow" in
-    Gutil.remove_file file;
+    Mutil.remove_file file;
     Sys.rename tmp_file file;
   };
   do_connected_wizards conf base x

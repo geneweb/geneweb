@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.13 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: descend.ml,v 5.14 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -9,6 +9,7 @@ open Def;
 open Dag2html;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Util;
 
 value limit_by_tree conf =

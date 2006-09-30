@@ -1,9 +1,9 @@
-(* $Id: iobase.ml,v 5.19 2006-09-30 16:12:36 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.20 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
+open Mutil;
 
 value magic_gwb = "GnWb0020";
 value magic_gwb_iso_8859_1 = "GnWb001y";
@@ -161,7 +161,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
 (* Search index of a given surname or given first name in file strings.inx *)
 
 value name_key s =
-  let i = Gutil.initial s in
+  let i = Mutil.initial s in
   let s =
     if i == 0 then s
     else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
@@ -715,9 +715,9 @@ value check_magic =
   fun ic ->
     do {
       really_input ic b 0 (String.length b);
-      Gutil.utf_8_db.val := True;
+      Mutil.utf_8_db.val := True;
       if b <> magic_gwb then
-        if b = magic_gwb_iso_8859_1 then Gutil.utf_8_db.val := False
+        if b = magic_gwb_iso_8859_1 then Mutil.utf_8_db.val := False
         else if String.sub magic_gwb 0 4 = String.sub b 0 4 then
           failwith "this is a GeneWeb base, but not compatible"
         else
@@ -933,7 +933,7 @@ value input bname =
   in
   let patches = input_patches bname in
   let particles =
-    Gutil.input_particles (Filename.concat bname "particles.txt")
+    Mutil.input_particles (Filename.concat bname "particles.txt")
   in
   let ic =
     let ic = Secure.open_in_bin (Filename.concat bname "base") in

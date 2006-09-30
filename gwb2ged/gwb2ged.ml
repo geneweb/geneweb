@@ -1,9 +1,10 @@
-(* $Id: gwb2ged.ml,v 5.13 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.14 2006-09-30 18:07:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Printf;
 
 type charset =
@@ -46,12 +47,12 @@ value ged_month cal m =
 value encode s =
   match charset.val with
   [ Ansel ->
-      let s = if Gutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s in
+      let s = if Mutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s in
       Ansel.of_iso_8859_1 s
   | Ascii ->
-      if Gutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s
+      if Mutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s
   | Utf8 ->
-      if Gutil.utf_8_db.val then s else Gutil.utf_8_of_iso_8859_1 s ]
+      if Mutil.utf_8_db.val then s else Gutil.utf_8_of_iso_8859_1 s ]
 ;
 
 value max_len = 78;
@@ -175,8 +176,8 @@ value string_of_list =
 value ged_name base oc per =
   do {
     fprintf oc "1 NAME %s /%s/\n"
-      (encode (Gutil.nominative (ged_1st_name base per)))
-      (encode (Gutil.nominative (sou base (get_surname per))));
+      (encode (Mutil.nominative (ged_1st_name base per)))
+      (encode (Mutil.nominative (sou base (get_surname per))));
     let n = sou base (get_public_name per) in
     if n <> "" then fprintf oc "2 GIVN %s\n" (encode n) else ();
     match get_qualifiers per with
