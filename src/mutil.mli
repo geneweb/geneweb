@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.4 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.5 2006-10-01 14:31:08 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size : int;
@@ -26,3 +26,4 @@ value input_particles : string -> list string;
 value surnames_pieces : string -> list string;
 
 value utf_8_of_iso_8859_1 : string -> string;
+value iso_8859_1_of_utf_8 : string -> string;
