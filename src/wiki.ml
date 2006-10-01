@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.6 2006-10-01 16:07:10 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.7 2006-10-01 16:10:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -682,10 +682,12 @@ value print_mod_view_page conf can_edit mode fname title env s =
           let digest = Iovalue.digest s in
           xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
         else ();
+        begin_centered conf;
         stagn "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"" begin
           if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
           else ();
         end;
+        end_centered conf;
       end;
       if can_edit then
         tag "p" begin
