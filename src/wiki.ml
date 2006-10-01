@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.9 2006-10-01 17:33:55 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.10 2006-10-01 18:24:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -558,7 +558,7 @@ value html_with_summary_of_tlsw conf mode file_path edit_opt s =
   in
   if lines_before_summary <> [] || lines = [] then
     let s2 = string_of_modify_link conf 0 (s = "") edit_opt in
-    s2 ^ "<p><br/></p>\n" ^ s
+    s2 ^ "<p><br" ^ conf.xhs ^ "></p>\n" ^ s
   else s
 ;
 

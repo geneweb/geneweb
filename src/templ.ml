@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.4 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: templ.ml,v 5.5 2006-10-01 18:24:44 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -833,6 +833,7 @@ value templ_eval_var conf =
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
   | ["wizard"] -> VVbool conf.wizard
+  | ["manitou"] -> VVbool conf.manitou
   | _ -> raise Not_found ]
 ;
 
