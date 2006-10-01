@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.11 2006-09-25 16:14:11 ddr Exp $ *)
+(* $Id: robot.ml,v 5.12 2006-10-01 09:59:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -225,8 +225,14 @@ value check oc tm from max_call sec conf suicide =
          if w.nb_connect > 2 && w.nbase = conf.bname && w.nbase <> "" then
            match w.utype with
            [ Wizard n ->
-               if List.mem_assoc n wl then (c, cw, cf, wl)
-               else (c + 1, cw + 1, cf, [(n, List.hd w.acc_times) :: wl])
+               let at = List.hd w.acc_times in
+               if List.mem_assoc n wl then
+                 let at_old = List.assoc n wl in
+                 if at > at_old then
+                   let wl = List.remove_assoc n wl in
+                   (c, cw, cf, [(n, at) :: wl])
+                 else (c, cw, cf, wl)
+               else (c + 1, cw + 1, cf, [(n, at) :: wl])
            | Friend _ -> (c + 1, cw, cf + 1, wl)
            | Normal -> (c + 1, cw, cf, wl) ]
          else (c, cw, cf, wl))
