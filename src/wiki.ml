@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.5 2006-10-01 15:57:59 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.6 2006-10-01 16:07:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -653,15 +653,18 @@ value print_mod_view_page conf can_edit mode fname title env s =
   let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
   do {
     header conf title;
-    tag "div" "style=\"float:%s;margin-%s:5px\"" conf.right conf.left begin
-      stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
-        (if has_v then ";v=" ^ string_of_int v else "") sfn
-      begin
-        Wserver.wprint "(%s)\n" (message_txt conf 0);
-      end;
-    end;
-    print_link_to_welcome conf False;
-    if has_v then print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
+    if can_edit then
+      tag "div" "style=\"float:%s;margin-%s:5px\"" conf.right conf.left begin
+        stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
+          (if has_v then ";v=" ^ string_of_int v else "") sfn
+        begin
+          Wserver.wprint "(%s)\n" (message_txt conf 0);
+        end;
+      end
+    else ();
+    print_link_to_welcome conf (if can_edit then False else True);
+    if can_edit && has_v then
+      print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
     else ();
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
