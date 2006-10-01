@@ -1,9 +1,10 @@
-(* $Id: consangAll.ml,v 5.18 2006-09-30 21:48:46 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.19 2006-10-01 12:19:53 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
+
+value designation = Gutil.designation;
 
 value no_consang = Adef.fix (-1);
 
