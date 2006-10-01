@@ -1,11 +1,10 @@
-(* $Id: consang.ml,v 5.6 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: consang.ml,v 5.7 2006-10-01 11:30:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
 open Def;
 open Gwdb;
-open Gutil;
 
 type anc_stat = [ MaybeAnc | IsAnc ];
 

@@ -25,8 +25,9 @@ changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
 changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx iovalue.cmx name.cmx update.cmx util.cmx \
     ../wserver/wserver.cmx 
-check.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi progrBar.cmi 
-check.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx progrBar.cmx 
+check.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi progrBar.cmi check.cmi 
+check.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx progrBar.cmx check.cmi 
+check.cmi: adef.cmi def.cmi gutil.cmi gwdb.cmi 
 compilation.cmo: date.cmi def.cmi util.cmi 
 compilation.cmx: date.cmx def.cmi util.cmx 
 config.cmi: def.cmi 
@@ -78,7 +79,7 @@ fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx iobase.cmx secure.cmx
 gutil.cmo: adef.cmi buff.cmo def.cmi gwdb.cmi mutil.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx buff.cmx def.cmi gwdb.cmx mutil.cmx name.cmx gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
-gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmi def.cmi gutil.cmi \
+gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi def.cmi gutil.cmi \
     gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
     notesLinks.cmo outbase.cmi progrBar.cmi secure.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \

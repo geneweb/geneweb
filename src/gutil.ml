@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.26 2006-09-30 21:48:46 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.27 2006-10-01 11:30:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -307,29 +307,8 @@ value find_same_name base p =
 
 (* check base *)
 
-type error 'person =
-  [ AlreadyDefined of 'person
-  | OwnAncestor of 'person
-  | BadSexOfMarriedPerson of 'person ]
-;
 type base_error = error person;
-
-type warning 'person =
-  [ BirthAfterDeath of 'person
-  | IncoherentSex of 'person and int and int
-  | ChangedOrderOfChildren of ifam and descend and array iper
-  | ChildrenNotInOrder of ifam and descend and 'person and 'person
-  | DeadTooEarlyToBeFather of 'person and 'person
-  | MarriageDateAfterDeath of 'person
-  | MarriageDateBeforeBirth of 'person
-  | MotherDeadAfterChildBirth of 'person and 'person
-  | ParentBornAfterChild of 'person and 'person
-  | ParentTooYoung of 'person and Def.dmy
-  | TitleDatesError of 'person and title
-  | UndefinedSex of 'person
-  | YoungForMarriage of 'person and Def.dmy ]
-;
-type base_warning = warning person;
+type base_warning = warning person descend title;
 
 type visit = [ NotVisited | BeingVisited | Visited ];
 

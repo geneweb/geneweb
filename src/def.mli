@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.14 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: def.mli,v 5.15 2006-10-01 11:30:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -146,4 +146,26 @@ type gen_couple 'person = Adef.gen_couple 'person;
 
 type gen_descend 'person =
   { children : array 'person }
+;
+
+type error 'person =
+  [ AlreadyDefined of 'person
+  | OwnAncestor of 'person
+  | BadSexOfMarriedPerson of 'person ]
+;
+
+type warning 'person 'descend 'title =
+  [ BirthAfterDeath of 'person
+  | IncoherentSex of 'person and int and int
+  | ChangedOrderOfChildren of ifam and 'descend and array iper
+  | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
+  | DeadTooEarlyToBeFather of 'person and 'person
+  | MarriageDateAfterDeath of 'person
+  | MarriageDateBeforeBirth of 'person
+  | MotherDeadAfterChildBirth of 'person and 'person
+  | ParentBornAfterChild of 'person and 'person
+  | ParentTooYoung of 'person and dmy
+  | TitleDatesError of 'person and 'title
+  | UndefinedSex of 'person
+  | YoungForMarriage of 'person and dmy ]
 ;

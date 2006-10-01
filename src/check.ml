@@ -1,8 +1,7 @@
-(* $Id: check.ml,v 5.10 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: check.ml,v 5.11 2006-10-01 11:30:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
 open Printf;
 
@@ -14,6 +13,13 @@ value feminin =
 ;
 
 (* Printing check errors *)
+
+value designation = Gutil.designation;
+value year_of = Gutil.year_of;
+value check_person = Gutil.check_person;
+value check_family = Gutil.check_family;
+value check_noloop = Gutil.check_noloop;
+value is_deleted_family = Gutil.is_deleted_family;
 
 value print_base_error oc base =
   fun
