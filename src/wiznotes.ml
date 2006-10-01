@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.22 2006-10-01 15:57:59 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.23 2006-10-01 18:24:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -143,8 +143,7 @@ value dispatch_in_columns ncol list =
       loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
 ;
 
-value print_wizards_by_alphabetic_order conf list =
-if p_getenv conf.env "old" <> Some "on" then do {
+value print_wizards_by_alphabetic_order conf list = do {
   let (len_list, list) =
     let ncols =
       match p_getint conf.env "ncols" with
@@ -187,7 +186,8 @@ if p_getenv conf.env "old" <> Some "on" then do {
                          }
                          else ();
                          let with_link =
-                           conf.wizard && conf.user = wz || wfile <> ""
+                           conf.wizard && conf.user = wz || wfile <> "" ||
+                           conf.manitou
                          in
                          stag "li" begin
                            if with_link then
@@ -238,38 +238,7 @@ if p_getenv conf.env "old" <> Some "on" then do {
     end;
   end;
   Util.end_centered conf;
-}
-else
-  tag "p" begin
-    let _ =
-      List.fold_left
-        (fun prev (wz, (wname, (worder, _)), wfile, stm) ->
-           let tm = Unix.localtime stm in
-           let wname = if wname = "" then wz else wname in
-           do {
-             Wserver.wprint "%s" (if prev = None then "" else ",\n");
-             match prev with
-             [ Some prev_worder when worder.[0] = prev_worder.[0] -> ()
-             | _ ->
-                 if worder.[0] = '~' then ()
-                 else Wserver.wprint "<b>(%c)</b>\n" worder.[0] ];
-             if conf.wizard && conf.user = wz || wfile <> "" then
-               Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
-                 (commd conf) (Util.code_varenv wz)
-                 (fun _ ->
-                    Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                      (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                      tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                      tm.Unix.tm_sec)
-                 wname
-             else Wserver.wprint "%s" wname;
-             Some worder;
-           })
-        None list
-    in
-    Wserver.wprint "\n";
-  end
-;
+};
 
 value print_wizards_by_date conf list = do {
   let sep_period_list =
@@ -448,7 +417,7 @@ value print_part_wiznote conf wz s cnt0 =
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
     let file_path = Notes.file_path conf in
-    let can_edit = conf.wizard && conf.user = wz in
+    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
     Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES"
       (code_varenv wz) cnt0 lines;
     Util.trailer conf;
@@ -479,7 +448,8 @@ value print conf base =
         let wfile = wzfile (dir conf) wz in
         let (s, date) = read_wizard_notes wfile in
         let edit_opt =
-          Some (conf.wizard && conf.user = wz, "WIZNOTES", code_varenv wz)
+          let can_edit = conf.wizard && conf.user = wz || conf.manitou in
+          Some (can_edit, "WIZNOTES", code_varenv wz)
         in
         match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf wz s cnt0
@@ -504,7 +474,7 @@ value print_mod conf base =
     match p_getenv conf.env "f" with
     [ Some wz ->
         let wz = Filename.basename wz in
-        let can_edit = conf.wizard && conf.user = wz in
+        let can_edit = conf.wizard && conf.user = wz || conf.manitou in
         if can_edit then
           let title = wizard_page_title conf wz wz in
           let wfile = wzfile (dir conf) wz in
@@ -565,7 +535,8 @@ value print_mod_ok conf base =
       | None -> "nobody" ]
     in
     let edit_mode wz =
-      if conf.wizard && conf.user = wz then Some "WIZNOTES" else None
+      if conf.wizard && conf.user = wz || conf.manitou then Some "WIZNOTES"
+      else None
     in
     let mode = "NOTES" in
     let read_string wz =
@@ -574,8 +545,8 @@ value print_mod_ok conf base =
     let commit = commit_wiznotes in
     let string_filter = string_with_macros conf [] in
     let file_path = Notes.file_path conf in
-    Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
-      file_path False
+    Wiki.print_mod_ok conf edit_mode mode fname read_string commit
+      string_filter file_path False
 ;
 
 value wizard_allowing wddir =

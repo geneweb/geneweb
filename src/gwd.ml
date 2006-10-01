@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.6 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.7 2006-10-01 18:24:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -869,7 +869,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
                     (True, False, True, "")
                   else
                   match match_auth friend_passwd friend_passwd_file uauth with
-                    [ Some username -> (True, False, True, username)
+                  [ Some username -> (True, False, True, username)
                   | None -> (True, False, False, "") ] ] ]
     in
     let user =
@@ -914,8 +914,13 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
     in
     let allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env) in
+    let manitou =
+      try user <> "" && List.assoc "manitou" base_env = user with
+      [ Not_found -> False ]
+    in
     let conf =
       {from = from_addr;
+       manitou = manitou;
        wizard = wizard && not wizard_just_friend;
        friend = friend || wizard_just_friend && wizard;
        just_friend_wizard = wizard && wizard_just_friend;
