@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.29 2006-10-01 10:21:59 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.30 2006-10-01 10:46:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -152,7 +152,7 @@ value make_person gen p n occ =
     {m_first_name = unique_string gen p; m_surname = unique_string gen n;
      m_occ = occ; m_rparents = []; m_related = []; m_sex = Neuter;
      m_notes = empty_string}
-  and a = no_ascend ()
+  and a = ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
   and u = union_of_gen_union {family = [| |]} in
   (p, a, u)
 ;
@@ -800,7 +800,7 @@ value empty_base : cbase =
    c_bnotes = {nread = fun _ _ -> ""; norigin_file = ""; efiles _ = []}}
 ;
 
-value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Gwdb.base =
+value linked_base gen per_index_ic per_ic fam_index_ic fam_ic =
 (**)
   let _ =
     do {
