@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.31 2006-10-01 10:52:04 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.32 2006-10-01 11:30:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -62,7 +62,7 @@ value set_error base gen x =
 
 value set_warning base =
   fun
-  [ Gutil.UndefinedSex _ -> ()
+  [ UndefinedSex _ -> ()
   | x ->
       do {
         printf "\nWarning: ";
