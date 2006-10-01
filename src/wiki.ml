@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.8 2006-10-01 17:02:54 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.9 2006-10-01 17:33:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -324,8 +324,8 @@ value string_of_modify_link conf cnt empty =
         sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
           (if empty then "<p>"
            else
-             "<div style=\"float:" ^ conf.right ^ ";margin-" ^ conf.left ^
-             ":3em\">")
+             sprintf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">"
+               conf.right conf.left)
           (commd conf) mode_pref mode cnt (if sfn = "" then "" else ";f=" ^ sfn)
           (if can_edit then transl_decline conf "modify" ""
            else transl conf "view source")
