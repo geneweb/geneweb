@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.15 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.16 2006-10-01 14:31:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -47,10 +47,10 @@ value ged_month cal m =
 value encode s =
   match charset.val with
   [ Ansel ->
-      let s = if Mutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s in
+      let s = if Mutil.utf_8_db.val then Mutil.iso_8859_1_of_utf_8 s else s in
       Ansel.of_iso_8859_1 s
   | Ascii ->
-      if Mutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s
+      if Mutil.utf_8_db.val then Mutil.iso_8859_1_of_utf_8 s else s
   | Utf8 ->
       if Mutil.utf_8_db.val then s else Mutil.utf_8_of_iso_8859_1 s ]
 ;

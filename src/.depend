@@ -34,9 +34,9 @@ config.cmi: def.cmi
 consang.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi consang.cmi 
 consang.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx consang.cmi 
 consang.cmi: def.cmi gwdb.cmi 
-consangAll.cmo: adef.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi progrBar.cmi \
+consangAll.cmo: adef.cmi consang.cmi def.cmi gwdb.cmi mutil.cmi progrBar.cmi \
     consangAll.cmi 
-consangAll.cmx: adef.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx progrBar.cmx \
+consangAll.cmx: adef.cmx consang.cmx def.cmi gwdb.cmx mutil.cmx progrBar.cmx \
     consangAll.cmi 
 consangAll.cmi: gwdb.cmi 
 cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \

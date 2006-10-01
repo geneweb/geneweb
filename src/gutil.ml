@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.29 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.30 2006-10-01 14:31:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -22,19 +22,6 @@ value list_iter_first f al =
 value string_sub s i len =
   let i = min (String.length s) (max 0 i) in
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
-;
-
-value iso_8859_1_of_utf_8 s =
-  loop 0 0 where rec loop i len =
-    if i == String.length s then Buff.get len
-    else
-      let c = s.[i] in
-      match Char.code c with
-      [ 0xC2 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len s.[i+1])
-      | 0xC3 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len (Char.chr (Char.code s.[i+1] + 0x40)))
-      | _ -> loop (i + 1) (Buff.store len c) ]
 ;
 
 value utf_8_intern_byte c =
