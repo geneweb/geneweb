@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.32 2006-09-30 21:48:46 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.33 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -2839,7 +2839,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
     let arrays = make_subarrays arrays in
     let base = make_base arrays in
     finish_base base arrays;
-    lock Gutil.lock_file out_file.val with
+    lock Mutil.lock_file out_file.val with
     [ Accept ->
         do {
           Outbase.output out_file.val base;

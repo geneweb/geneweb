@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.32 2006-10-01 11:30:07 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.33 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1000,7 +1000,7 @@ value output_particles_file bname particles =
   in
   let oc = open_out (Filename.concat bdir "particles.txt") in
   do {
-    List.iter (fun s -> fprintf oc "%s\n" (Gutil.tr ' ' '_' s)) particles;
+    List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
     close_out oc;
   }
 ;
@@ -1080,7 +1080,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
         exit 2
       }
       else ();
-      lock (Gutil.lock_file out_file.val) with
+      lock (Mutil.lock_file out_file.val) with
       [ Accept -> do {
           let tmp_dir =
             let d =

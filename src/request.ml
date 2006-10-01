@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.10 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: request.ml,v 5.11 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -728,7 +728,7 @@ value treat_request_on_base conf log =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   if this_request_updates_database conf then
 (**)
-    lock Gutil.lock_file bfile with
+    lock Mutil.lock_file bfile with
 (*
     match if Sys.file_exists "refuse" then Refuse else Accept with
 *)

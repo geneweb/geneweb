@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.2 2006-09-30 19:23:41 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.3 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size : int;
@@ -7,6 +7,7 @@ value utf_8_db : ref bool;
 
 value rindex : string -> char -> option int;
 value array_memq : 'a -> array 'a -> bool;
+value tr : char -> char -> string -> string;
 
 value decline : char -> string -> string;
 value nominative : string -> string;
@@ -14,6 +15,7 @@ value nominative : string -> string;
 value remove_file : string -> unit;
 value mkdir_p : string -> unit;
 value remove_dir : string -> unit;
+value lock_file : string -> string;
 
 value output_value_no_sharing : out_channel -> 'a -> unit;
 
