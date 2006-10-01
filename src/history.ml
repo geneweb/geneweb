@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.3 2006-09-18 20:44:06 ddr Exp $ *)
+(* $Id: history.ml,v 5.4 2006-10-01 19:04:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -31,7 +31,7 @@ type changed =
 value gen_record conf base changed action =
   do {
     match p_getenv conf.base_env "history" with
-    [ Some "yes" ->
+    [ Some "yes" when not conf.manitou ->
         let item =
           match changed with
           [ Rperson fn sn occ _ -> fn ^ "." ^ string_of_int occ ^ " " ^ sn

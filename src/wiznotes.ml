@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.23 2006-10-01 18:24:44 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.24 2006-10-01 19:04:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -580,7 +580,9 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
     let (not_everybody, _) =
       List.fold_left
         (fun (not_everybody, first) (wz, tm_user) ->
-           if wz <> conf.user && not (List.mem wz allowed) then (True, first)
+           if wz <> conf.user && not (List.mem wz allowed) &&
+              not conf.manitou
+           then (True, first)
            else do {
              let (wfile, stm) = wiznote_date (wzfile wddir wz) in
              let tm = Unix.localtime stm in
@@ -608,7 +610,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                     else "")
                else Wserver.wprint "%s%s" wz sec;
                if wz = conf.user then do {
-                 Wserver.wprint ":\n%s;"
+                 Wserver.wprint " :\n%s;"
                    (transl_nth conf "you are visible/you are not visible"
                       (if is_visible then 0 else 1));
                  Wserver.wprint
@@ -618,6 +620,9 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                    (transl conf "here") "</a>" (transl conf "to change");
                  Wserver.wprint ".";
                }
+               else if conf.manitou && not (List.mem wz allowed) then
+                 Wserver.wprint " :\n%s;"
+                   (transl_nth conf "you are visible/you are not visible" 1)
                else ();
                Wserver.wprint "\n";
              end;
