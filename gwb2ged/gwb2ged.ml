@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.14 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.15 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -52,7 +52,7 @@ value encode s =
   | Ascii ->
       if Mutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s
   | Utf8 ->
-      if Mutil.utf_8_db.val then s else Gutil.utf_8_of_iso_8859_1 s ]
+      if Mutil.utf_8_db.val then s else Mutil.utf_8_of_iso_8859_1 s ]
 ;
 
 value max_len = 78;

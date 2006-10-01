@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.28 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.29 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -22,20 +22,6 @@ value list_iter_first f al =
 value string_sub s i len =
   let i = min (String.length s) (max 0 i) in
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
-;
-
-value utf_8_of_iso_8859_1 str =
-  loop 0 0 where rec loop i len =
-    if i = String.length str then Buff.get len
-    else
-      let c = str.[i] in
-      if Char.code c < 0x80 then loop (i + 1) (Buff.store len c)
-      else if Char.code c < 0xC0 then
-        let len = Buff.store len (Char.chr 0xC2) in
-        loop (i + 1) (Buff.store len c)
-      else 
-        let len = Buff.store len (Char.chr 0xC3) in
-        loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
 ;
 
 value iso_8859_1_of_utf_8 s =
@@ -788,32 +774,6 @@ value check_person base error warning p = do {
 };
 
 value is_deleted_family fam = get_fam_index fam = Adef.ifam_of_int (-1);
-
-value strip_all_trailing_spaces s =
-  let b = Buffer.create (String.length s) in
-  let len =
-    loop (String.length s - 1) where rec loop i =
-      if i < 0 then 0
-      else
-        match s.[i] with
-        [ ' ' | '\t' | '\r' | '\n' -> loop (i - 1)
-        | _ -> i + 1 ]
-  in
-  loop 0 where rec loop i =
-    if i = len then Buffer.contents b
-    else
-      match s.[i] with
-      [ '\r' -> loop (i + 1)
-      | ' ' | '\t' ->
-          loop0 (i + 1) where rec loop0 j =
-            if j = len then Buffer.contents b
-            else
-              match s.[j] with
-              [ ' ' | '\t' | '\r' -> loop0 (j + 1)
-              | '\n' -> loop j
-              | _ -> do { Buffer.add_char b s.[i]; loop (i + 1) } ]
-      | c -> do { Buffer.add_char b c; loop (i + 1) } ]
-;
 
 value gen_strip_spaces strip_heading str =
   let start =
