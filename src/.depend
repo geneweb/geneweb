@@ -79,12 +79,12 @@ fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx iobase.cmx secure.cmx
 gutil.cmo: adef.cmi buff.cmo def.cmi gwdb.cmi mutil.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx buff.cmx def.cmi gwdb.cmx mutil.cmx name.cmx gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
-gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi def.cmi gutil.cmi \
-    gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
-    notesLinks.cmo outbase.cmi progrBar.cmi secure.cmi 
-gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
-    gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
-    notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
+gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi def.cmi gwcomp.cmo \
+    gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi notesLinks.cmo \
+    outbase.cmi progrBar.cmi secure.cmi 
+gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gwcomp.cmx \
+    gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx notesLinks.cmx \
+    outbase.cmx progrBar.cmx secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
@@ -146,9 +146,9 @@ mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmx history.cmx \
     merge.cmx mergeInd.cmx mutil.cmx update.cmx updateInd.cmx updateIndOk.cmx \
     util.cmx ../wserver/wserver.cmx 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gutil.cmi iobase.cmi \
-    lock.cmi outbase.cmi secure.cmi 
+    lock.cmi mutil.cmi outbase.cmi secure.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gutil.cmx iobase.cmx \
-    lock.cmx outbase.cmx secure.cmx 
+    lock.cmx mutil.cmx outbase.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi name.cmi num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx \

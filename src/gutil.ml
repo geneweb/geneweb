@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.27 2006-10-01 11:30:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.28 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -22,19 +22,6 @@ value list_iter_first f al =
 value string_sub s i len =
   let i = min (String.length s) (max 0 i) in
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
-;
-
-value tr c1 c2 s =
-  match rindex s c1 with
-  [ Some _ ->
-      let s' = String.create (String.length s) in
-      do {
-        for i = 0 to String.length s - 1 do {
-          s'.[i] := if s.[i] = c1 then c2 else s.[i]
-        };
-        s'
-      }
-  | None -> s ]
 ;
 
 value utf_8_of_iso_8859_1 str =
@@ -1099,13 +1086,4 @@ value input_lexicon lang ht open_fname =
       do { close_in ic; raise e }
   with
   [ Sys_error _ -> () ]
-;
-
-value lock_file bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then
-      Filename.chop_suffix bname ".gwb"
-    else bname
-  in
-  bname ^ ".lck"
 ;

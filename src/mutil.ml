@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.2 2006-09-30 19:23:41 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.3 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -167,6 +167,15 @@ value rec remove_dir d =
   }
 ;
 
+value lock_file bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then
+      Filename.chop_suffix bname ".gwb"
+    else bname
+  in
+  bname ^ ".lck"
+;
+
 value output_value_no_sharing oc v =
   Marshal.to_channel oc v [Marshal.No_sharing]
 ;
@@ -226,4 +235,17 @@ value surnames_pieces surname =
     else loop i0 iw (i + 1)
   in
   loop 0 0 0
+;
+
+value tr c1 c2 s =
+  match rindex s c1 with
+  [ Some _ ->
+      let s' = String.create (String.length s) in
+      do {
+        for i = 0 to String.length s - 1 do {
+          s'.[i] := if s.[i] = c1 then c2 else s.[i]
+        };
+        s'
+      }
+  | None -> s ]
 ;

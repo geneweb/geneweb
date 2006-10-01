@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.10 2006-09-30 19:23:41 ddr Exp $ *)
+(* $Id: alln.ml,v 5.11 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -196,7 +196,7 @@ value print_alphabetic_all conf base is_surnames ini list len =
         (fun (ini_k, _) ->
            let ini = capitalize_if_not_utf8 ini_k in
            stagn "a" "href=\"#%s\"" ini begin
-             Wserver.wprint "%s" (Gutil.tr '_' ' ' ini);
+             Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
            end)
       list;
     end;
@@ -206,7 +206,7 @@ value print_alphabetic_all conf base is_surnames ini list len =
            let ini = capitalize_if_not_utf8 ini_k in
            tag "li" begin
              stagn "a" "id=\"%s\"" ini_k begin
-               Wserver.wprint "%s" (Gutil.tr '_' ' ' ini);
+               Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
              end;
              tag "ul" begin
                List.iter
@@ -294,7 +294,7 @@ value select_names conf base is_surnames ini =
     else persons_of_first_name base
   in
   let list =
-    let start_k = Gutil.tr '_' ' ' ini in
+    let start_k = Mutil.tr '_' ' ' ini in
     match
       try Some (iii.cursor (capitalize_if_not_utf8 start_k)) with
       [ Not_found -> None ]
@@ -434,7 +434,7 @@ value print_alphabetic_short conf base is_surnames ini list len =
           (fun (ini_k, _) ->
              let ini = capitalize_if_not_utf8 ini_k in
              stagn "a" "href=\"#%s\"" ini begin
-               Wserver.wprint "%s" (Gutil.tr '_' ' ' ini);
+               Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
              end)
         list;
       end

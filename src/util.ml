@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.35 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: util.ml,v 5.36 2006-10-01 11:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2069,7 +2069,7 @@ value create_topological_sort conf base =
   | Some "no_tstab" -> Array.create (nb_of_persons base) 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
-      lock (Gutil.lock_file bfile) with
+      lock (Mutil.lock_file bfile) with
       [ Accept ->
           let tstab_file =
             if conf.use_restrict then Filename.concat bfile "tstab_visitor"
@@ -2152,7 +2152,7 @@ value sosa_of_branch ipl =
   }
 ;
 
-value space_to_unders = Gutil.tr ' ' '_';
+value space_to_unders = Mutil.tr ' ' '_';
 
 value default_image_name_of_key fnam surn occ =
   let f = space_to_unders (Name.lower fnam) in
