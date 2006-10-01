@@ -1,10 +1,8 @@
-(* $Id: consangAll.ml,v 5.19 2006-10-01 12:19:53 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.20 2006-10-01 12:20:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
-
-value designation = Gutil.designation;
 
 value no_consang = Adef.fix (-1);
 
@@ -107,7 +105,8 @@ value compute base from_scratch quiet =
                     if better then do {
                       Printf.eprintf "\nMax consanguinity %g for %s... "
                         consang
-                          (designation base (poi base (Adef.iper_of_int i)));
+                          (Gutil.designation base
+                             (poi base (Adef.iper_of_int i)));
                       flush stderr;
                       most.val := Some a
                     }
