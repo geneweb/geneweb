@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.15 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.16 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -67,7 +67,6 @@ value gen_strip_spaces : bool -> string -> string;
 value alphabetic_utf_8 : string -> string -> int;
 value alphabetic : string -> string -> int;
 value alphabetic_order : string -> string -> int;
-value strip_all_trailing_spaces : string -> string;
 
 value lindex : string -> char -> option int;
 value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
@@ -89,5 +88,4 @@ value find_free_occ : base -> string -> string -> int -> int;
 value input_lexicon :
   string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;
 
-value utf_8_of_iso_8859_1 : string -> string;
 value iso_8859_1_of_utf_8 : string -> string;

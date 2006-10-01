@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.3 2006-08-25 08:43:26 ddr Exp $ *)
+(* $Id: forum.ml,v 5.4 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -668,7 +668,7 @@ value get conf key =
 ;
 
 value get1 conf key =
-  only_printable_or_nl (Gutil.strip_all_trailing_spaces (get conf key))
+  only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf key))
 ;
 
 value forum_add conf base moderated mess =

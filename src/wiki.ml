@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.3 2006-08-23 11:52:25 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.4 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -822,7 +822,7 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
         in
         let sub_part =
           match Util.p_getenv conf.env "notes" with
-          [ Some v -> Gutil.strip_all_trailing_spaces v
+          [ Some v -> Mutil.strip_all_trailing_spaces v
           | None -> failwith "notes unbound" ]
         in
         let digest =

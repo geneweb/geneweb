@@ -1,8 +1,7 @@
-(* $Id: gwcomp.ml,v 5.5 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.6 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
-open Gutil;
 
 value magic_gwo = "GnWo000o";
 
@@ -193,7 +192,7 @@ value input_a_line (ic, encoding) =
   let line = input_line0 ic in
    match encoding with
    [ E_utf_8 -> line
-   | E_iso_8859_1 -> Gutil.utf_8_of_iso_8859_1 line ]
+   | E_iso_8859_1 -> Mutil.utf_8_of_iso_8859_1 line ]
 ;
 
 value rec input_real_line ic =
@@ -702,7 +701,7 @@ value read_notes ic =
     with
     [ End_of_file -> failwith "end of file" ]
   in
-  strip_all_trailing_spaces notes
+  Mutil.strip_all_trailing_spaces notes
 ;
 
 (* from version 5.00 *)
@@ -724,7 +723,7 @@ value read_notes_db ic end_txt =
     with
     [ End_of_file -> failwith "end of file" ]
   in
-  strip_all_trailing_spaces notes
+  Mutil.strip_all_trailing_spaces notes
 ;
 
 type read_family 'a =
@@ -783,7 +782,7 @@ value read_family ic fname =
           | Some (str, ["cbp" :: _]) -> failwith str
           | _ -> ("", line) ]
         in
-        let co = couple False fath_key moth_key in
+        let co = Adef.couple fath_key moth_key in
         let (comm, line) =
           match line with
           [ Some (str, ["comm" :: _]) ->

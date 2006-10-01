@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.33 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.34 2006-10-01 12:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -266,9 +266,9 @@ value ascii_of_macintosh s =
 value utf8_of_string s =
   match charset.val with
   [ Ansel -> utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
-  | Ascii -> Gutil.utf_8_of_iso_8859_1 s
-  | Msdos -> Gutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
-  | MacIntosh -> Gutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
+  | Ascii -> Mutil.utf_8_of_iso_8859_1 s
+  | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
+  | MacIntosh -> Mutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
   | Utf8 -> s ]
 ;
 
