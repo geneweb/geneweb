@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.4 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.5 2006-10-01 15:57:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -316,15 +316,22 @@ value summary_of_tlsw_lines conf short lines =
     (lines, sections_nums)
 ;
 
-value string_of_modify_link conf cnt mode sfn empty =
-  sprintf "%s(<a href=\"%sm=MOD_%s;v=%d%s\">%s</a>)%s\n"
-    (if empty then "<p>"
-     else
-       "<div style=\"float:" ^ conf.right ^ ";margin-" ^ conf.left ^
-       ":3em\">")
-    (commd conf) mode cnt (if sfn = "" then "" else ";f=" ^ sfn)
-    (transl_decline conf "modify" "")
-    (if empty then "</p>" else "</div>")
+value string_of_modify_link conf cnt empty =
+  fun
+  [ Some (can_edit, mode, sfn) ->
+      if conf.wizard then
+        let mode_pref = if can_edit then "MOD" else "VIEW" in
+        sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
+          (if empty then "<p>"
+           else
+             "<div style=\"float:" ^ conf.right ^ ";margin-" ^ conf.left ^
+             ":3em\">")
+          (commd conf) mode_pref mode cnt (if sfn = "" then "" else ";f=" ^ sfn)
+          (if can_edit then transl_decline conf "modify" ""
+           else transl conf "view source")
+          (if empty then "</p>" else "</div>")
+      else ""
+  | None -> "" ]
 ;
 
 value rec tlsw_list tag1 tag2 lev list sl =
@@ -481,11 +488,8 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
               else list
             in
             let list =
-              match edit_opt with
-              [ Some (mode, sfn) ->
-                  let s = string_of_modify_link conf cnt mode sfn False in
-                  [s :: list]
-              | None -> list ]
+              let s = string_of_modify_link conf cnt False edit_opt in
+              if s = "" then list else [s :: list]
             in
             hotl conf wlo (cnt + 1) edit_opt sections_nums list [s :: sl]
           else
@@ -552,12 +556,10 @@ value html_with_summary_of_tlsw conf mode file_path edit_opt s =
       (String.concat "\n"
         (lines_before_summary @ summary @ lines_after_summary))
   in
-  match edit_opt with
-  [ Some (mode, sub_fname) ->
-      if lines_before_summary <> [] || lines = [] then
-        string_of_modify_link conf 0 mode sub_fname (s = "") ^ s
-      else s
-  | None -> s ]
+  if lines_before_summary <> [] || lines = [] then
+    let s2 = string_of_modify_link conf 0 (s = "") edit_opt in
+    s2 ^ s
+  else s
 ;
 
 value rev_extract_sub_part s v =
@@ -617,10 +619,8 @@ value print_sub_part_text conf file_path mode edit_opt cnt0 lines =
   let s = syntax_links conf mode file_path s in
   let s =
     if cnt0 < first_cnt then
-      match edit_opt with
-      [ Some (edit_mode, sub_fname) ->
-          string_of_modify_link conf 0 edit_mode sub_fname (s = "") ^ s
-      | None -> s ]
+      let s2 = string_of_modify_link conf 0 (s = "") edit_opt in
+      s2 ^ s
     else s
   in
   Wserver.wprint "%s\n" s
@@ -628,7 +628,7 @@ value print_sub_part_text conf file_path mode edit_opt cnt0 lines =
 
 value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
     lines =
-  let edit_opt = if can_edit then Some (edit_mode, sub_fname) else None in
+  let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   do {
     print_sub_part_links conf edit_mode sfn cnt0 (lines = []);
@@ -636,8 +636,11 @@ value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
   }
 ;
 
-value print_mod_page conf mode fname title env s =
-  let s = List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s in
+value print_mod_view_page conf can_edit mode fname title env s =
+  let s =
+    List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s
+  in
+  let mode_pref = if can_edit then "MOD_" else "VIEW_" in
   let (has_v, v) =
     match p_getint conf.env "v" with
     [ Some v -> (True, v)
@@ -658,28 +661,34 @@ value print_mod_page conf mode fname title env s =
       end;
     end;
     print_link_to_welcome conf False;
-    if has_v then print_sub_part_links conf ("MOD_" ^mode) sfn v is_empty
+    if has_v then print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
     else ();
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
-        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"" mode;
+        if can_edit then
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"" mode
+        else ();
         if has_v then
           xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
         else ();
         if fname <> "" then
           xtag "input" "type=\"hidden\" name=\"f\" value=\"%s\"" fname
         else ();
-        let digest = Iovalue.digest s in
-        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
-        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"110\"" begin
+        if can_edit then
+          let digest = Iovalue.digest s in
+          xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
+        else ();
+        stagn "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"" begin
           if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
           else ();
         end;
       end;
-      tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
-      end;
+      if can_edit then
+        tag "p" begin
+          xtag "input" "type=\"submit\" value=\"Ok\"";
+        end
+      else ();
     end;
     trailer conf;
   }

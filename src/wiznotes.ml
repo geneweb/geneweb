@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.21 2006-09-30 21:17:18 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.22 2006-10-01 15:57:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -479,9 +479,7 @@ value print conf base =
         let wfile = wzfile (dir conf) wz in
         let (s, date) = read_wizard_notes wfile in
         let edit_opt =
-          if conf.wizard && conf.user = wz then
-            Some ("WIZNOTES", code_varenv wz)
-          else None
+          Some (conf.wizard && conf.user = wz, "WIZNOTES", code_varenv wz)
         in
         match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf wz s cnt0
@@ -511,8 +509,30 @@ value print_mod conf base =
           let title = wizard_page_title conf wz wz in
           let wfile = wzfile (dir conf) wz in
           let (s, _) = read_wizard_notes wfile in
-          Wiki.print_mod_page conf "WIZNOTES" wz title [] s
+          Wiki.print_mod_view_page conf True "WIZNOTES" wz title [] s
         else incorrect_request conf
+    | None -> incorrect_request conf ]
+;
+
+value print_view conf base =
+  let auth_file =
+    match
+      (p_getenv conf.base_env "wizard_descr_file",
+       p_getenv conf.base_env "wizard_passwd_file")
+    with
+    [ (Some "" | None, Some "" | None) -> ""
+    | (Some auth_file, _) -> auth_file
+    | (_, Some auth_file) -> auth_file ]
+  in
+  if auth_file = "" then incorrect_request conf
+  else
+    match p_getenv conf.env "f" with
+    [ Some wz ->
+        let wz = Filename.basename wz in
+        let title = wizard_page_title conf wz wz in
+        let wfile = wzfile (dir conf) wz in
+        let (s, _) = read_wizard_notes wfile in
+        Wiki.print_mod_view_page conf False "WIZNOTES" wz title [] s
     | None -> incorrect_request conf ]
 ;
 
