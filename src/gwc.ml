@@ -1,9 +1,8 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.30 2006-10-01 10:46:14 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.31 2006-10-01 10:52:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
-open Gutil;
 open Gwcomp;
 open Gwdb;
 open Mutil;
@@ -63,7 +62,7 @@ value set_error base gen x =
 
 value set_warning base =
   fun
-  [ UndefinedSex _ -> ()
+  [ Gutil.UndefinedSex _ -> ()
   | x ->
       do {
         printf "\nWarning: ";
@@ -510,8 +509,8 @@ value notice_sex gen p s =
 ;
 
 value insert_family gen co fath_sex moth_sex witl fo deo =
-  let (fath, ifath) = insert_somebody gen (father co) in
-  let (moth, imoth) = insert_somebody gen (mother co) in
+  let (fath, ifath) = insert_somebody gen (Adef.father co) in
+  let (moth, imoth) = insert_somebody gen (Adef.mother co) in
   let witl =
     List.map
       (fun (wit, sex) ->
@@ -549,7 +548,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          divorce = fo.divorce; comment = comment;
          origin_file = unique_string gen fo.origin_file; fsources = fsources;
          fam_index = Adef.ifam_of_int i}
-    and cpl = couple_of_gen_couple (couple False ifath imoth)
+    and cpl = couple_of_gen_couple (Adef.couple ifath imoth)
     and des = descend_of_gen_descend {children = children} in
     let fath_uni = uoi gen.g_base ifath in
     let moth_uni = uoi gen.g_base imoth in
