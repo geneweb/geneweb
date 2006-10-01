@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.38 2006-09-30 21:51:50 ddr Exp $
+# $Id: lex_utf8.txt,v 5.39 2006-10-01 15:57:59 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -9187,6 +9187,10 @@ pt: validar/eliminar
 ro: valideaza/sterge
 ru: проверить/удалить
 sv: giltligt/tas bort
+
+    view source
+en: view source
+fr: voir source
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме

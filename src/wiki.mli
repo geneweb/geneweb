@@ -1,14 +1,15 @@
 (* camlp4r *)
-(* $Id: wiki.mli,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: wiki.mli,v 5.2 2006-10-01 15:57:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 
-value syntax_links : config -> string -> (string -> string) -> string -> string;
+value syntax_links :
+  config -> string -> (string -> string) -> string -> string;
 
 value html_of_tlsw : config -> string -> list string;
 value html_with_summary_of_tlsw :
-  config -> string -> (string -> string) -> option (string * string) ->
+  config -> string -> (string -> string) -> option (bool * string * string) ->
     string -> string;
 
 value extract_sub_part : string -> int -> list string;
@@ -17,9 +18,9 @@ value split_title_and_text : string -> (list (string * string) * string);
 value print_sub_part :
   config -> bool -> (string -> string) -> string -> string -> string -> int ->
     list string -> unit;
-value print_mod_page :
-  config -> string -> string -> (bool -> unit) -> list (string * string) ->
-    string -> unit;
+value print_mod_view_page :
+  config -> bool -> string -> string -> (bool -> unit) ->
+    list (string * string) -> string -> unit;
 value print_mod_ok :
   config -> (string -> option string) -> string -> (option string -> string) ->
     (string -> (list (string * string) * string)) ->

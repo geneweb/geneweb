@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.9 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: notes.ml,v 5.10 2006-10-01 15:57:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -50,8 +50,10 @@ value print_whole_notes conf fnotes title s =
     | None -> () ];
     let file_path = file_path conf in
     let s = string_with_macros conf [] s in
-    let edit_opt = if conf.wizard then Some ("NOTES", fnotes) else None in
-    let s = Wiki.html_with_summary_of_tlsw conf "NOTES" file_path edit_opt s in
+    let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
+    let s =
+      Wiki.html_with_summary_of_tlsw conf "NOTES" file_path edit_opt s
+    in
     Wserver.wprint "%s\n" s;
     trailer conf;
   }
@@ -264,7 +266,7 @@ value print_mod conf base =
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (env, s) = read_notes base fnotes in
-  Wiki.print_mod_page conf "NOTES" fnotes title env s
+  Wiki.print_mod_view_page conf True "NOTES" fnotes title env s
 ;
 
 value update_notes_links_db conf fnotes s force =
