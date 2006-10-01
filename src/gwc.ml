@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.28 2006-09-30 21:48:46 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.29 2006-10-01 10:21:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -721,7 +721,7 @@ value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
 value persons_record_access gen per_index_ic per_ic persons =
   let read_person_in_temp_file i =
     let mp = persons.(i) in
-    let p : person =
+    let p =
       let c =
         try
           do {
@@ -737,25 +737,24 @@ value persons_record_access gen per_index_ic per_ic persons =
       [ 'D' -> input_item_value per_ic
       | 'U' ->
           let empty_string = Adef.istr_of_int 0 in
-          person_of_gen_person
-            {first_name = empty_string; surname = empty_string;
-             occ = 0; image = empty_string; first_names_aliases = [];
-             surnames_aliases = []; public_name = empty_string;
-             qualifiers = [];
-             aliases = []; titles = []; rparents = []; related = [];
-             occupation = empty_string; sex = Neuter; access = IfTitles;
-             birth = Adef.codate_None; birth_place = empty_string;
-             birth_src = empty_string; baptism = Adef.codate_None;
-             baptism_place = empty_string; baptism_src = empty_string;
-             death = DontKnowIfDead; death_place = empty_string;
-             death_src = empty_string; burial = UnknownBurial;
-             burial_place = empty_string; burial_src = empty_string;
-             notes = empty_string; psources = empty_string;
-             key_index = Adef.iper_of_int 0}
+          {first_name = empty_string; surname = empty_string;
+           occ = 0; image = empty_string; first_names_aliases = [];
+           surnames_aliases = []; public_name = empty_string;
+           qualifiers = [];
+           aliases = []; titles = []; rparents = []; related = [];
+           occupation = empty_string; sex = Neuter; access = IfTitles;
+           birth = Adef.codate_None; birth_place = empty_string;
+           birth_src = empty_string; baptism = Adef.codate_None;
+           baptism_place = empty_string; baptism_src = empty_string;
+           death = DontKnowIfDead; death_place = empty_string;
+           death_src = empty_string; burial = UnknownBurial;
+           burial_place = empty_string; burial_src = empty_string;
+           notes = empty_string; psources = empty_string;
+           key_index = Adef.iper_of_int 0}
       | _ -> assert False ]
     in
     person_of_gen_person
-      {(gen_person_of_person p) with
+      {(p) with
        first_name = mp.m_first_name; surname = mp.m_surname;
        occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
        sex = mp.m_sex; notes = mp.m_notes; key_index = Adef.iper_of_int i}
