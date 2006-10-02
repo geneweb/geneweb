@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.6 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.7 2006-10-02 15:11:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -51,7 +51,7 @@ value main () =
     else ();
     Secure.set_base_dir (Filename.dirname fname.val);
     let f () =
-      let base = Gwdb.input_base fname.val in
+      let base = Gwdb.make_base (Iobase.input fname.val) in
       try
         do {
           Sys.catch_break True;

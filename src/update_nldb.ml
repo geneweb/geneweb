@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.8 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.9 2006-10-02 15:11:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -153,7 +153,7 @@ value main () =
     }
     else ();
     Secure.set_base_dir (Filename.dirname fname.val);
-    let base = Gwdb.input_base fname.val in
+    let base = Gwdb.make_base (Iobase.input fname.val) in
     do {
       Sys.catch_break True;
       try compute base fname.val with
