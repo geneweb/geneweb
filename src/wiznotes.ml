@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.24 2006-10-01 19:04:33 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.25 2006-10-02 01:56:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -587,7 +587,9 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
              let (wfile, stm) = wiznote_date (wzfile wddir wz) in
              let tm = Unix.localtime stm in
              tag "li" "style=\"list-style-type:%s\""
-               (if wz = conf.user && not is_visible then "circle"
+               (if wz = conf.user && not is_visible ||
+                   conf.manitou && not (List.mem wz allowed)
+                then "circle"
                 else "disc")
              begin
                let sec =
@@ -620,9 +622,6 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                    (transl conf "here") "</a>" (transl conf "to change");
                  Wserver.wprint ".";
                }
-               else if conf.manitou && not (List.mem wz allowed) then
-                 Wserver.wprint " :\n%s;"
-                   (transl_nth conf "you are visible/you are not visible" 1)
                else ();
                Wserver.wprint "\n";
              end;
