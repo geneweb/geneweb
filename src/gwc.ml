@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.35 2006-10-02 15:11:38 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.36 2006-10-02 19:09:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -712,8 +712,9 @@ value do_consang = ref False;
 value pr_stats = ref False;
 
 value record_access_of tab =
-  {load_array () = (); get i = tab.(i); len = Array.length tab;
-   array_obj _ = tab; clear_array () = ()}
+  {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
+   output_array oc = output_value_no_sharing oc (tab : array _);
+   len = Array.length tab; clear_array () = ()}
 ;
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
@@ -762,9 +763,11 @@ value persons_record_access gen per_index_ic per_ic persons =
     try Hashtbl.find gen.g_patch_p i with
     [ Not_found -> read_person_in_temp_file i ]
   in
-  {load_array () = (); get = get_fun; len = Array.length persons;
-   array_obj _ = failwith "bug: accessing persons array";
-   clear_array () = ()}
+  let len = Array.length persons in
+  {load_array () = (); get = get_fun;
+   set i v = failwith "bug: setting persons array";
+   output_array oc = Mutil.output_array_no_sharing oc get_fun len;
+   len = len; clear_array () = ()}
 ;
 
 value part_file = ref "";
@@ -779,9 +782,10 @@ value families_record_access fam_index_ic fam_ic len =
       fam
     }
   in
-  {load_array () = (); get = get_fun; len = len;
-   array_obj _ = failwith "bug: accessing family array";
-   clear_array () = ()}
+  {load_array () = (); get = get_fun;
+   set i v = failwith "bug: setting family array";
+   output_array oc = output_array_no_sharing oc get_fun len;
+   len = len; clear_array () = ()}
 ;
 
 value input_particles part_file =
