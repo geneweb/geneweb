@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.11 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.12 2006-10-02 18:14:52 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -377,16 +377,17 @@ value is_prime a =
 value rec prime_after n = if is_prime n then n else prime_after (n + 1);
 
 value output_strings_hash oc2 base =
-  let strings_array = base.data.strings.array_obj () in
+  let () = base.data.strings.load_array () in
+  let strings_array = base.data.strings in
   let taba =
     Array.create
       (min Sys.max_array_length
-        (prime_after (max 2 (10 * Array.length strings_array))))
+        (prime_after (max 2 (10 * strings_array.len))))
       (-1)
   in
-  let tabl = Array.create (Array.length strings_array) (-1) in
+  let tabl = Array.create strings_array.len (-1) in
   do {
-    for i = 0 to Array.length strings_array - 1 do {
+    for i = 0 to strings_array.len - 1 do {
       let ia = Hashtbl.hash (base.data.strings.get i) mod Array.length taba in
       tabl.(i) := taba.(ia);
       taba.(ia) := i;
