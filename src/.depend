@@ -25,14 +25,16 @@ changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
 changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx iovalue.cmx name.cmx update.cmx util.cmx \
     ../wserver/wserver.cmx 
-check.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi progrBar.cmi check.cmi 
-check.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx progrBar.cmx check.cmi 
+check.cmo: adef.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi progrBar.cmi \
+    check.cmi 
+check.cmx: adef.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx progrBar.cmx \
+    check.cmi 
 check.cmi: adef.cmi def.cmi gutil.cmi gwdb.cmi 
 compilation.cmo: date.cmi def.cmi util.cmi 
 compilation.cmx: date.cmx def.cmi util.cmx 
 config.cmi: def.cmi 
-consang.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi consang.cmi 
-consang.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx consang.cmi 
+consang.cmo: adef.cmi def.cmi gwdb.cmi consang.cmi 
+consang.cmx: adef.cmx def.cmi gwdb.cmx consang.cmi 
 consang.cmi: def.cmi gwdb.cmi 
 consangAll.cmo: adef.cmi consang.cmi def.cmi gwdb.cmi mutil.cmi progrBar.cmi \
     consangAll.cmi 
@@ -139,15 +141,15 @@ mergeInd.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
 mergeInd.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx merge.cmx mergeFam.cmx notes.cmx notesLinks.cmx \
     updateFamOk.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
-mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi gwdb.cmi history.cmi \
-    merge.cmi mergeInd.cmo mutil.cmi update.cmi updateInd.cmi updateIndOk.cmi \
-    util.cmi ../wserver/wserver.cmi 
-mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmx history.cmx \
-    merge.cmx mergeInd.cmx mutil.cmx update.cmx updateInd.cmx updateIndOk.cmx \
-    util.cmx ../wserver/wserver.cmx 
-mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gutil.cmi iobase.cmi \
+mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi \
+    history.cmi merge.cmi mergeInd.cmo mutil.cmi update.cmi updateInd.cmi \
+    updateIndOk.cmi util.cmi ../wserver/wserver.cmi 
+mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx gwdb.cmx \
+    history.cmx merge.cmx mergeInd.cmx mutil.cmx update.cmx updateInd.cmx \
+    updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
+mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gwdb.cmi iobase.cmi \
     lock.cmi mutil.cmi outbase.cmi secure.cmi 
-mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gutil.cmx iobase.cmx \
+mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gwdb.cmx iobase.cmx \
     lock.cmx mutil.cmx outbase.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi name.cmi num.cmi pqueue.cmi secure.cmi 
@@ -266,10 +268,12 @@ updateFam.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx gwdb.cmx \
     templ.cmx templAst.cmi update.cmx util.cmx ../wserver/wserver.cmx \
     updateFam.cmi 
 updateFam.cmi: config.cmi def.cmi gwdb.cmi update.cmi 
-updateFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi gwdb.cmi history.cmi \
-    mutil.cmi update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
-updateFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmx history.cmx \
-    mutil.cmx update.cmx updateFam.cmx util.cmx ../wserver/wserver.cmx 
+updateFamOk.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi \
+    history.cmi mutil.cmi update.cmi updateFam.cmi util.cmi \
+    ../wserver/wserver.cmi 
+updateFamOk.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx gwdb.cmx \
+    history.cmx mutil.cmx update.cmx updateFam.cmx util.cmx \
+    ../wserver/wserver.cmx 
 updateInd.cmo: adef.cmi calendar.cmi config.cmi def.cmi gutil.cmi gwdb.cmi \
     templ.cmi templAst.cmi update.cmi util.cmi ../wserver/wserver.cmi \
     updateInd.cmi 

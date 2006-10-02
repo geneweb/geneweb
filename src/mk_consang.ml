@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.4 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.5 2006-10-02 02:50:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -31,6 +31,13 @@ value simple_output bname base =
   Outbase.gen_output (no_patches && not indexes.val) bname base
 ;
 
+value designation base p =
+  let first_name = Gwdb.p_first_name base p in
+  let nom = Gwdb.p_surname base p in
+  Mutil.iso_8859_1_of_utf_8
+    (first_name ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " " ^ nom)
+;
+
 value main () =
   do {
     Argl.parse speclist anonfun errmsg;
@@ -56,7 +63,7 @@ value main () =
           do {
             Printf.printf
               "\nError: loop in database, %s is his/her own ancestor.\n"
-              (Gutil.designation base p);
+              (designation base p);
             flush stdout;
             exit 2
           } ]

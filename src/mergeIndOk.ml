@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.15 2006-09-30 21:48:46 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.16 2006-10-02 02:50:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -263,7 +263,7 @@ value effective_mod_merge conf base sp =
           patch_union base (get_key_index p) u;
         }
         else ();
-        Gutil.check_noloop_for_person_list base (Update.error conf base)
+        Consang.check_noloop_for_person_list base (Update.error conf base)
           [get_key_index p];
         let wl =
           UpdateIndOk.all_checks_person conf base p

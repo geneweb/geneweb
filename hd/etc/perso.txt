@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.2 2006-08-23 08:56:36 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.3 2006-10-02 02:50:38 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -168,7 +168,7 @@
     %if;computable_death_age;
       <li>[*age at death:] %death_age;</li>%nl;
     %end;
-    %if;(has_consanguinity and bvar.show_consang != "no")
+    %if;(has_consanguinity and (bvar.show_consang != "no" or manitou))
       <li>[*consanguinity]: %consanguinity;</li>%nl;
     %end;
   </ul>
