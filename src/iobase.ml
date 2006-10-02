@@ -1,9 +1,16 @@
-(* $Id: iobase.ml,v 5.21 2006-09-30 19:23:41 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.22 2006-10-02 14:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Dbdisk;
 open Def;
-open Gwdb;
 open Mutil;
+
+type person = dsk_person;
+type ascend = dsk_ascend;
+type union = dsk_union;
+type family = dsk_family;
+type couple = dsk_couple;
+type descend = dsk_descend;
 
 value magic_gwb = "GnWb0020";
 value magic_gwb_iso_8859_1 = "GnWb001y";
@@ -326,14 +333,16 @@ flush stderr;
               failwith "database access"
             } ] ]
   in
+  let compare = compare_istr_fun base_data in
   let check_patches istr ipl =
     let ipl = ref ipl in
     do {
       Hashtbl.iter
         (fun i p ->
            if List.memq (Adef.iper_of_int i) ipl.val then
-             if compare_istr_fun base_data istr (get_first_name p) == 0 ||
-                compare_istr_fun base_data istr (get_surname p) == 0 then
+             if compare istr p.first_name == 0 ||
+                compare istr p.surname == 0
+             then
                ()
              else ipl.val := list_remove_elemq (Adef.iper_of_int i) ipl.val
            else ())
@@ -348,7 +357,8 @@ flush stderr;
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         compare_names base_data str (strings.get (Adef.int_of_istr key)))
+         compare_names base_data str
+           (strings.get (Adef.int_of_istr key)))
       (bt None)
   in
   let next key = IstrTree.next key (bt None) in
@@ -444,7 +454,8 @@ flush stderr;
   let cursor str =
     IstrTree.key_after
       (fun key ->
-         compare_names base_data str (strings.get (Adef.int_of_istr key)))
+         compare_names base_data str
+           (strings.get (Adef.int_of_istr key)))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -544,18 +555,18 @@ value strings_of_fsname bname strings (_, person_patches) =
       Hashtbl.iter
         (fun _ p ->
            do {
-             if not (List.memq (get_first_name p) l.val) then
-               let s1 = strings.get (Adef.int_of_istr (get_first_name p)) in
+             if not (List.memq p.first_name l.val) then
+               let s1 = strings.get (Adef.int_of_istr p.first_name) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
-                 l.val := [get_first_name p :: l.val]
+                 l.val := [p.first_name :: l.val]
                else ()
              else ();
-             if not (List.memq (get_surname p) l.val) then
-               let s1 = strings.get (Adef.int_of_istr (get_surname p)) in
+             if not (List.memq p.surname l.val) then
+               let s1 = strings.get (Adef.int_of_istr p.surname) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
-                 l.val := [get_surname p :: l.val]
+                 l.val := [p.surname :: l.val]
                else ()
              else ();
            })
@@ -1202,11 +1213,11 @@ value input bname =
          (snd patches.h_string);
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_surname_start_pos, get_surname, snd patches.h_person,
-          "snames.inx", "snames.dat", bname);
+         (ic2, ic2_surname_start_pos, fun p -> p.surname,
+          snd patches.h_person, "snames.inx", "snames.dat", bname);
      persons_of_first_name =
        persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_first_name_start_pos, get_first_name,
+         (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
           snd patches.h_person, "fnames.inx", "fnames.dat", bname);
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;

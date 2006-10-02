@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.36 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: util.ml,v 5.37 2006-10-02 14:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -948,7 +948,7 @@ value base_path pref bname =
 
 value base_len n =
   let n = base_path [] (n ^ ".gwb") in
-  match try Some (Iobase.input n) with [ Sys_error _ -> None ] with
+  match try Some (Gwdb.input_base n) with [ Sys_error _ -> None ] with
   [ Some base ->
       let len = nb_of_persons base in
       do { base_cleanup base; string_of_int len }

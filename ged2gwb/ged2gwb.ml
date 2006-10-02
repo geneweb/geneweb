@@ -1,12 +1,120 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.34 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.35 2006-10-02 14:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Dbdisk;
 open Def;
-open Gutil;
-open Gwdb;
 open Mutil;
 open Printf;
+
+type person = dsk_person;
+type ascend = dsk_ascend;
+type union = dsk_union;
+type family = dsk_family;
+type couple = dsk_couple;
+type descend = dsk_descend;
+
+value get_access p = p.Def.access;
+value get_aliases p = p.Def.aliases;
+value get_baptism p = p.Def.baptism;
+value get_baptism_place p = p.Def.baptism_place;
+value get_baptism_src p = p.Def.baptism_src;
+value get_birth p = p.Def.birth;
+value get_birth_place p = p.Def.birth_place;
+value get_birth_src p = p.Def.birth_src;
+value get_burial p = p.Def.burial;
+value get_burial_place p = p.Def.burial_place;
+value get_burial_src p = p.Def.burial_src;
+value get_death p = p.Def.death;
+value get_death_place p = p.Def.death_place;
+value get_death_src p = p.Def.death_src;
+value get_first_name p = p.Def.first_name;
+value get_first_names_aliases p = p.Def.first_names_aliases;
+value get_image p = p.Def.image;
+value get_key_index p = p.Def.key_index;
+value get_notes p = p.Def.notes;
+value get_occ p = p.Def.occ;
+value get_occupation p = p.Def.occupation;
+value get_psources p = p.Def.psources;
+value get_public_name p = p.Def.public_name;
+value get_qualifiers p = p.Def.qualifiers;
+value get_related p = p.Def.related;
+value get_rparents p = p.Def.rparents;
+value get_sex p = p.Def.sex;
+value get_surname p = p.Def.surname;
+value get_surnames_aliases p = p.Def.surnames_aliases;
+value get_titles p = p.Def.titles;
+
+value person_with_key p fn sn oc =
+  {(p) with first_name = fn; surname = sn; occ = oc}
+;
+value person_with_related p r = {(p) with related = r};
+value person_with_rparents p r = {(p) with rparents = r};
+value person_with_sex p s = {(p) with sex = s};
+value person_of_gen_person p = p;
+value gen_person_of_person p = p;
+
+value get_consang a = a.Def.consang;
+value get_parents a = a.Def.parents;
+
+value ascend_with_consang a c = {parents = a.parents; consang = c};
+value ascend_with_parents a p = {parents = p; consang = a.consang};
+value ascend_of_gen_ascend a = a;
+
+value get_family u = u.Def.family;
+
+value union_of_gen_union u = u;
+
+value get_comment f = f.Def.comment;
+value get_divorce f = f.Def.divorce;
+value get_fam_index f = f.Def.fam_index;
+value get_fsources f = f.Def.fsources;
+value get_marriage f = f.Def.marriage;
+value get_marriage_place f = f.Def.marriage_place;
+value get_marriage_src f = f.Def.marriage_src;
+value get_origin_file f = f.Def.origin_file;
+value get_relation f = f.Def.relation;
+value get_witnesses f = f.Def.witnesses;
+
+value family_of_gen_family f = f;
+value gen_family_of_family f = f;
+
+value get_father c = Adef.father c;
+value get_mother c = Adef.mother c;
+value get_parent_array c = Adef.parent_array c;
+
+value gen_couple_of_couple c = c;
+value couple_of_gen_couple c = c;
+
+value get_children d = d.Def.children;
+
+value descend_of_gen_descend d = d;
+value gen_descend_of_descend d = d;
+
+value poi base i = base.data.persons.get (Adef.int_of_iper i);
+value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
+value uoi base i = base.data.unions.get (Adef.int_of_iper i);
+
+value foi base i = base.data.families.get (Adef.int_of_ifam i);
+value coi base i = base.data.couples.get (Adef.int_of_ifam i);
+value doi base i = base.data.descends.get (Adef.int_of_ifam i);
+
+value sou base i = base.data.strings.get (Adef.int_of_istr i);
+
+value p_first_name base p = nominative (sou base p.first_name);
+value p_surname base p = nominative (sou base p.surname);
+value designation base p =
+  let prenom = p_first_name base p in
+  let nom = p_surname base p in
+  prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
+;
+
+value couple _ x y = Adef.couple x y;
+
+value strictly_after = Gutil.strictly_after;
+value strictly_before_dmy = Gutil.strictly_before_dmy;
+value date_of_death = Gutil.date_of_death;
+value year_of = Gutil.year_of;
 
 value log_oc = ref stdout;
 
@@ -858,7 +966,7 @@ value unknown_per gen i sex =
        death = DontKnowIfDead; death_place = empty; death_src = empty;
        burial = UnknownBurial; burial_place = empty; burial_src = empty;
        notes = empty; psources = empty; key_index = Adef.iper_of_int i}
-  and a = no_ascend ()
+  and a = ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
   and u = union_of_gen_union {family = [| |]} in
   (p, a, u)
 ;
@@ -2664,6 +2772,7 @@ value finish_base base (persons, families, _, _) = do {
   check_parents_children base ascends unions couples descends;
   if try_negative_dates.val then negative_dates base persons families
   else ();
+  let base = Gwdb.base_of_dsk base in
   Check.check_base base
      (fun x ->
         do {

@@ -1,12 +1,19 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.33 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.34 2006-10-02 14:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Dbdisk;
 open Def;
 open Gwcomp;
-open Gwdb;
 open Mutil;
 open Printf;
+
+type person = dsk_person;
+type ascend = dsk_ascend;
+type union = dsk_union;
+type family = dsk_family;
+type couple = dsk_couple;
+type descend = dsk_descend;
 
 type gen_min_person 'person 'string =
   { m_first_name : mutable 'string;
@@ -138,10 +145,8 @@ value unique_string gen x =
 
 value no_family gen =
   let _ = unique_string gen "" in
-  let cpl =
-    couple_of_gen_couple
-      (Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0))
-  and des = descend_of_gen_descend {children = [| |]} in
+  let cpl = Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0)
+  and des = {children = [| |]} in
   (cpl, des)
 ;
 
@@ -151,8 +156,8 @@ value make_person gen p n occ =
     {m_first_name = unique_string gen p; m_surname = unique_string gen n;
      m_occ = occ; m_rparents = []; m_related = []; m_sex = Neuter;
      m_notes = empty_string}
-  and a = ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
-  and u = union_of_gen_union {family = [| |]} in
+  and a = {parents = None; consang = Adef.fix (-1)}
+  and u = {family = [| |]} in
   (p, a, u)
 ;
 
@@ -424,34 +429,33 @@ value insert_person gen so =
     if not gen.g_errored then do {
       let empty_string = unique_string gen "" in
       let x =
-        person_of_gen_person
-          {first_name = empty_string; surname = empty_string;
-           occ = 0; image = unique_string gen so.image;
-           first_names_aliases =
-             List.map (unique_string gen) so.first_names_aliases;
-           surnames_aliases =
-             List.map (unique_string gen) so.surnames_aliases;
-           public_name = unique_string gen so.public_name;
-           qualifiers = List.map (unique_string gen) so.qualifiers;
-           aliases = List.map (unique_string gen) so.aliases;
-           titles = List.map (title_unique_string gen) so.titles;
-           rparents = []; related = [];
-           occupation = unique_string gen so.occupation;
-           sex = Neuter; access = so.access;
-           birth = so.birth; birth_place = unique_string gen so.birth_place;
-           birth_src =  unique_string gen so.birth_src;
-           baptism = so.baptism;
-           baptism_place = unique_string gen so.baptism_place;
-           baptism_src = unique_string gen so.baptism_src;
-           death = so.death; death_place = unique_string gen so.death_place;
-           death_src = unique_string gen so.death_src; burial = so.burial;
-           burial_place = unique_string gen so.burial_place;
-           burial_src = unique_string gen so.burial_src;
-           notes = empty_string;
-           psources =
-             unique_string gen
-               (if so.psources = "" then default_source.val else so.psources);
-           key_index = ip}
+        {first_name = empty_string; surname = empty_string;
+         occ = 0; image = unique_string gen so.image;
+         first_names_aliases =
+           List.map (unique_string gen) so.first_names_aliases;
+         surnames_aliases =
+           List.map (unique_string gen) so.surnames_aliases;
+         public_name = unique_string gen so.public_name;
+         qualifiers = List.map (unique_string gen) so.qualifiers;
+         aliases = List.map (unique_string gen) so.aliases;
+         titles = List.map (title_unique_string gen) so.titles;
+         rparents = []; related = [];
+         occupation = unique_string gen so.occupation;
+         sex = Neuter; access = so.access;
+         birth = so.birth; birth_place = unique_string gen so.birth_place;
+         birth_src =  unique_string gen so.birth_src;
+         baptism = so.baptism;
+         baptism_place = unique_string gen so.baptism_place;
+         baptism_src = unique_string gen so.baptism_src;
+         death = so.death; death_place = unique_string gen so.death_place;
+         death_src = unique_string gen so.death_src; burial = so.burial;
+         burial_place = unique_string gen so.burial_place;
+         burial_src = unique_string gen so.burial_src;
+         notes = empty_string;
+         psources =
+           unique_string gen
+             (if so.psources = "" then default_source.val else so.psources);
+         key_index = ip}
       in
       seek_out gen.g_per_index (Iovalue.sizeof_long * Adef.int_of_iper ip);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
@@ -471,11 +475,11 @@ value insert_somebody gen =
 
 value check_parents_not_already_defined gen ix fath moth =
   let x = poi gen.g_base ix in
-  match get_parents (aoi gen.g_base ix) with
+  match (aoi gen.g_base ix).parents with
   [ Some ifam ->
       let cpl = coi gen.g_base ifam in
-      let p = get_father cpl in
-      let m = get_mother cpl in
+      let p = Adef.father cpl in
+      let m = Adef.mother cpl in
       do {
         printf "
 I cannot add \"%s\", child of
@@ -540,16 +544,15 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     new_ifam gen;
     let i = gen.g_fcnt in
     let fam =
-      family_of_gen_family
-        {marriage = fo.marriage;
-         marriage_place = unique_string gen fo.marriage_place;
-         marriage_src = unique_string gen fo.marriage_src;
-         witnesses = Array.of_list witl; relation = fo.relation;
-         divorce = fo.divorce; comment = comment;
-         origin_file = unique_string gen fo.origin_file; fsources = fsources;
-         fam_index = Adef.ifam_of_int i}
-    and cpl = couple_of_gen_couple (Adef.couple ifath imoth)
-    and des = descend_of_gen_descend {children = children} in
+      {marriage = fo.marriage;
+       marriage_place = unique_string gen fo.marriage_place;
+       marriage_src = unique_string gen fo.marriage_src;
+       witnesses = Array.of_list witl; relation = fo.relation;
+       divorce = fo.divorce; comment = comment;
+       origin_file = unique_string gen fo.origin_file; fsources = fsources;
+       fam_index = Adef.ifam_of_int i}
+    and cpl = Adef.couple ifath imoth
+    and des = {children = children} in
     let fath_uni = uoi gen.g_base ifath in
     let moth_uni = uoi gen.g_base imoth in
     seek_out gen.g_fam_index (Iovalue.sizeof_long * i);
@@ -559,13 +562,11 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     gen.g_base.c_descends.(gen.g_fcnt) := des;
     gen.g_fcnt := gen.g_fcnt + 1;
     let fath_uni =
-      union_of_gen_union
-        {family = Array.append (get_family fath_uni) [| Adef.ifam_of_int i |]}
+      {family = Array.append fath_uni.family [| Adef.ifam_of_int i |]}
     in
     gen.g_base.c_unions.(Adef.int_of_iper ifath) := fath_uni;
     let moth_uni =
-      union_of_gen_union
-        {family = Array.append (get_family moth_uni) [| Adef.ifam_of_int i |]}
+      {family = Array.append moth_uni.family [| Adef.ifam_of_int i |]}
     in
     gen.g_base.c_unions.(Adef.int_of_iper imoth) := moth_uni;
     notice_sex gen fath fath_sex;
@@ -575,7 +576,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          let a = gen.g_base.c_ascends.(Adef.int_of_iper ix) in
          do {
            check_parents_not_already_defined gen ix fath moth;
-           let a = ascend_with_parents a (Some (Adef.ifam_of_int i)) in
+           let a = {(a) with parents = Some (Adef.ifam_of_int i)} in
            gen.g_base.c_ascends.(Adef.int_of_iper ix) := a
          })
       children;
@@ -752,11 +753,10 @@ value persons_record_access gen per_index_ic per_ic persons =
            key_index = Adef.iper_of_int 0}
       | _ -> assert False ]
     in
-    person_of_gen_person
-      {(p) with
-       first_name = mp.m_first_name; surname = mp.m_surname;
-       occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
-       sex = mp.m_sex; notes = mp.m_notes; key_index = Adef.iper_of_int i}
+    {(p) with
+     first_name = mp.m_first_name; surname = mp.m_surname;
+     occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
+     sex = mp.m_sex; notes = mp.m_notes; key_index = Adef.iper_of_int i}
   in
   let get_fun i =
     try Hashtbl.find gen.g_patch_p i with
@@ -934,9 +934,11 @@ value link gwo_list tmp_dir =
     let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
     Hashtbl.clear gen.g_patch_p;
     let changed_p (ip, p) =
+      let p = Gwdb.gen_person_of_person p in
       let i = Adef.int_of_iper ip in
       Hashtbl.replace gen.g_patch_p i p
     in
+    let base = Gwdb.base_of_dsk base in
     if do_check.val && gen.g_pcnt > 0 then do {
       Check.check_base base (set_error base gen) (set_warning base)
         (fun i -> gen.g_def.(i)) changed_p pr_stats.val;
@@ -1095,10 +1097,10 @@ The database \"%s\" already exists. Use option -f to overwrite it.
           [ Some (base, wiznotes) ->
               do {
                 Gc.compact ();
-                Outbase.output out_file.val base;
+                Gwdb.apply_base (Outbase.output out_file.val) base;
                 output_wizard_notes out_file.val wiznotes;
                 output_command_line out_file.val;
-                output_particles_file out_file.val base.data.particles;
+                output_particles_file out_file.val (Gwdb.base_particles base);
                 try Mutil.remove_dir tmp_dir with _ -> ();
                 try Unix.rmdir "gw_tmp" with _ -> ();
               }

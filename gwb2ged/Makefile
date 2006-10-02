@@ -1,9 +1,9 @@
-# $Id: Makefile,v 5.2 2006-09-30 18:07:33 ddr Exp $
+# $Id: Makefile,v 5.3 2006-10-02 14:39:01 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../src
-SRC_OBJS=../src/argl.cmo ../src/adef.cmo ../src/buff.cmo ../src/name.cmo ../src/ansel.cmo ../src/mutil.cmo ../src/gwdb.cmo ../src/gutil.cmo ../src/iovalue.cmo ../src/btree.cmo ../src/secure.cmo ../src/iobase.cmo ../src/select.cmo ../src/version.cmo ../src/calendar.cmo
+SRC_OBJS=../src/argl.cmo ../src/adef.cmo ../src/buff.cmo ../src/name.cmo ../src/ansel.cmo ../src/mutil.cmo ../src/secure.cmo ../src/iovalue.cmo ../src/btree.cmo ../src/iobase.cmo ../src/gwdb.cmo ../src/gutil.cmo ../src/select.cmo ../src/version.cmo ../src/calendar.cmo
 OBJS=$(SRC_OBJS) gwb2ged.cmo
 
 all:: out
