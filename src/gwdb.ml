@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.27 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.28 2006-10-02 15:11:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -269,6 +269,5 @@ value person_misc_names base p nobtit =
       [] list
 ;
 
-value base_of_dsk base = base;
-value input_base = Iobase.input;
 value apply_base f base = f base;
+value make_base base = base;

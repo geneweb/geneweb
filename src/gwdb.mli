@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.36 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.37 2006-10-02 15:11:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -155,6 +155,5 @@ value person_misc_names :
   base -> person -> (person -> list title) -> list string
 ;
 
-value input_base : string -> base;
 value apply_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
-value base_of_dsk : Dbdisk.dsk_base -> base;
+value make_base : Dbdisk.dsk_base -> base;
