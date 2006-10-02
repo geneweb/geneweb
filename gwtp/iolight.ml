@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 5.7 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: iolight.ml,v 5.8 2006-10-02 19:09:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -92,7 +92,8 @@ value make_record_access ic shift array_pos patches len name =
       } ]
   and r =
     {load_array () = let _ = array () in (); get i = (array ()).(i);
-     len = patch_len len patches.val; array_obj = array;
+     set i v = (array ()).(i) := v; len = patch_len len patches.val;
+     output_array oc = Mutil.output_value_no_sharing oc (array () : array _);
      clear_array () = tab.val := None}
   in
   r

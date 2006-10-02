@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.22 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: iobase.ml,v 5.23 2006-10-02 19:09:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -854,7 +854,8 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
       } ]
   and r =
     {load_array () = let _ = array () in (); get = gen_get;
-     len = max len plenr.val; array_obj = array;
+     set i v = (array ()).(i) := v; len = max len plenr.val;
+     output_array oc = output_value_no_sharing oc (array () : array _);
      clear_array () = do { cleared.val := True; tab.val := None }}
   in
   r

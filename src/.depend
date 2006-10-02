@@ -156,8 +156,8 @@ mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi name.cmi num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx \
     iobase.cmx name.cmx num.cmx pqueue.cmx secure.cmx 
-mutil.cmo: buff.cmo name.cmi mutil.cmi 
-mutil.cmx: buff.cmx name.cmx mutil.cmi 
+mutil.cmo: buff.cmo iovalue.cmi name.cmi mutil.cmi 
+mutil.cmx: buff.cmx iovalue.cmx name.cmx mutil.cmi 
 name.cmo: buff.cmo name.cmi 
 name.cmx: buff.cmx name.cmi 
 notes.cmo: buff.cmo config.cmi date.cmi gutil.cmi gwdb.cmi history.cmi \

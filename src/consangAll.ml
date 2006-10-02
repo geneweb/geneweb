@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.21 2006-10-01 14:31:08 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.22 2006-10-02 19:09:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -13,13 +13,13 @@ value designation base p =
     (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 ;
 
-value rec clear_descend_consang base ascends mark ifam =
+value rec clear_descend_consang base ((aget, aset) as ascends) mark ifam =
   let des = doi base ifam in
   Array.iter
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
-         let a = ascends.(Adef.int_of_iper ip) in
-         ascends.(Adef.int_of_iper ip) := ascend_with_consang a no_consang;
+         let a = aget (Adef.int_of_iper ip) in
+         aset (Adef.int_of_iper ip) (ascend_with_consang a no_consang);
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
          Array.iter (clear_descend_consang base ascends mark) (get_family u)
@@ -43,8 +43,9 @@ value trace quiet cnt max_cnt =
 ;
 
 value compute base from_scratch quiet =
-  let ascends = ascends_array base in
+  let () = load_ascends_array base in
   let () = load_couples_array base in
+  let ascends = ascends_array base in
   let tab =
     Consang.make_relationship_info base (Consang.topological_sort base aoi)
   in
@@ -64,8 +65,8 @@ value compute base from_scratch quiet =
             list ]
     else ();
     for i = 0 to nb_of_persons base - 1 do {
-      let a = ascends.(i) in
-      if from_scratch then ascends.(i) := ascend_with_consang a no_consang
+      let a = fst ascends i in
+      if from_scratch then snd ascends i (ascend_with_consang a no_consang)
       else
         match get_parents a with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := get_consang a
@@ -83,7 +84,7 @@ value compute base from_scratch quiet =
     while running.val do {
       running.val := False;
       for i = 0 to nb_of_persons base - 1 do {
-        let a = ascends.(i) in
+        let a = fst ascends i in
         if get_consang a == no_consang then
           match get_parents a with
           [ Some ifam ->
@@ -101,7 +102,7 @@ value compute base from_scratch quiet =
                   trace quiet cnt.val max_cnt;
                   decr cnt;
                   let a = ascend_with_consang a (Adef.fix_of_float consang) in
-                  ascends.(i) := a;
+                  snd ascends i a;
                   consang_tab.(Adef.int_of_ifam ifam) := get_consang a;
                   if not quiet then
                     let better =
@@ -123,13 +124,13 @@ value compute base from_scratch quiet =
               else do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                ascends.(i) := ascend_with_consang a pconsang
+                snd ascends i (ascend_with_consang a pconsang)
               }
           | None ->
               do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                ascends.(i) := ascend_with_consang a (Adef.fix_of_float 0.0)
+                snd ascends i (ascend_with_consang a (Adef.fix_of_float 0.0))
               } ]
         else ()
       }

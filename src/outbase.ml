@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.12 2006-10-02 18:14:52 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.13 2006-10-02 19:09:18 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -14,66 +14,10 @@ value load_strings_array base = base.data.strings.load_array ();
 value base_cleanup base = base.func.cleanup ();
 
 value save_mem = ref False;
-value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
 
 value trace s =
   if verbose.val then do { Printf.eprintf "*** %s\n" s; flush stderr }
   else ()
-;
-
-value output_array_no_sharing oc arr =
-  do {
-    let pos = pos_out oc in
-    (* magic number *)
-    for i = 0 to 3 do { output_byte oc intext_magic_number.(i); };
-
-    (* room for block length *)
-    output_binary_int oc 0;
-    (* room for obj counter *)
-    output_binary_int oc 0;
-    (* room for size_32 *)
-    output_binary_int oc 0;
-    (* room for size_64 *)
-    output_binary_int oc 0;
-
-    let pos_start = pos_out oc in
-    Iovalue.size_32.val := 0;
-    Iovalue.size_64.val := 0;
-    Iovalue.output_block_header oc 0 arr.len;
-    for i = 0 to arr.len - 1 do {
-      Iovalue.output oc (arr.get i);
-    };
-    let pos_end = pos_out oc in
-    let size_32 = Iovalue.size_32.val in
-    let size_64 = Iovalue.size_64.val in
-
-    (* block_length *)
-    seek_out oc (pos + 4);
-    output_binary_int oc (pos_end - pos_start);
-    (* obj counter is zero because no_sharing *)
-    output_binary_int oc 0;
-    (* size_32 *)
-    output_binary_int oc size_32;
-    (* size_64 *)
-    output_binary_int oc size_64;
-    seek_out oc pos_end;
-(*
-Printf.eprintf "check with marshal %d\n" arr.len;
-flush stderr;
-let array = Array.init arr.len arr.get in
-let s = Marshal.to_string array [Marshal.No_sharing] in
-let sign_extend_shift = (Iovalue.sizeof_long - 1) * 8 - 1 in
-let sign_extend x = (x lsl sign_extend_shift) asr sign_extend_shift in
-let glop i =
-  Obj.magic ((sign_extend (Char.code s.[i])) lsl 24 + Char.code s.[i+1] lsl 16 + Char.code s.[i+2] lsl 8 + Char.code s.[i+3])
-in
-Printf.eprintf "block length %d %d\n" (glop 4) (pos_end - pos_start);
-Printf.eprintf "obj counter %d %d\n" (glop 8) 0;
-Printf.eprintf "size_32 %d %d\n" (glop 12) size_32;
-Printf.eprintf "size_64 %d %d\n" (glop 16) size_64;
-flush stderr;
-*)
-  }
 ;
 
 value output_value_header_size = 20;
@@ -522,9 +466,7 @@ value gen_output no_patches bname base =
       do {
         Printf.eprintf "*** saving %s array\n" arrname;
         flush stderr;
-        match try Some (arr.array_obj ()) with [ Failure _ -> None ] with
-        [ Some a -> output_value_no_sharing oc a
-        | None -> output_array_no_sharing oc arr ];
+        arr.output_array oc;
         let epos = output_array_access oc_acc arr.get arr.len bpos in
         if epos <> pos_out oc then count_error epos (pos_out oc) else ()
       }
@@ -544,7 +486,7 @@ value gen_output no_patches bname base =
         output_binary_int oc 0;
         output_binary_int oc 0;
         output_binary_int oc 0;
-        output_value_no_sharing oc base.data.bnotes.norigin_file;
+        output_value_no_sharing oc (base.data.bnotes.norigin_file : string);
         let persons_array_pos = pos_out oc in
         if not no_patches then output_array "persons" base.data.persons
         else just_copy bname "persons" oc oc_acc;

@@ -1,4 +1,4 @@
-(* $Id: dbdisk.mli,v 5.1 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.2 2006-10-02 19:09:18 ddr Exp $ *)
 
 open Def;
 
@@ -20,8 +20,9 @@ type notes =
 type record_access 'a =
   { load_array : unit -> unit;
     get : int -> 'a;
+    set : int -> 'a -> unit;
     len : mutable int;
-    array_obj : unit -> array 'a;
+    output_array : out_channel -> unit;
     clear_array : unit -> unit }
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.37 2006-10-02 15:11:38 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.38 2006-10-02 19:09:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -141,7 +141,7 @@ value load_couples_array : base -> unit;
 value load_descends_array : base -> unit;
 value load_strings_array : base -> unit;
 
-value ascends_array : base -> array ascend;
+value ascends_array : base -> (int -> ascend * int -> ascend -> unit);
 
 value base_notes_read : base -> string -> string;
 value base_notes_read_first_line : base -> string -> string;
