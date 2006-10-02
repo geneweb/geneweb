@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.13 2006-10-02 01:56:00 ddr Exp $ *)
+(* $Id: robot.ml,v 5.14 2006-10-02 02:01:53 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -227,8 +227,8 @@ value check oc tm from max_call sec conf suicide =
            [ Wizard n ->
                let at = List.hd w.acc_times in
                if List.mem_assoc n wl then
-                 let at_old = List.assoc n wl in
-                 if at > at_old then
+                 let old_at = List.assoc n wl in
+                 if at > old_at then
                    let wl = List.remove_assoc n wl in
                    (c, cw, cf, [(n, at) :: wl])
                  else (c, cw, cf, wl)
