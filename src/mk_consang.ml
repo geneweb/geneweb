@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.5 2006-10-02 02:50:38 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.6 2006-10-02 14:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -28,7 +28,8 @@ value simple_output bname base =
     in
     not (Sys.file_exists (Filename.concat bname "patches"))
   in
-  Outbase.gen_output (no_patches && not indexes.val) bname base
+  Gwdb.apply_base (Outbase.gen_output (no_patches && not indexes.val) bname)
+    base
 ;
 
 value designation base p =
@@ -50,7 +51,7 @@ value main () =
     else ();
     Secure.set_base_dir (Filename.dirname fname.val);
     let f () =
-      let base = Iobase.input fname.val in
+      let base = Gwdb.input_base fname.val in
       try
         do {
           Sys.catch_break True;

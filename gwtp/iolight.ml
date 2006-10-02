@@ -1,8 +1,15 @@
-(* $Id: iolight.ml,v 5.6 2006-09-30 10:46:45 ddr Exp $ *)
+(* $Id: iolight.ml,v 5.7 2006-10-02 14:39:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
+open Dbdisk;
 open Def;
-open Gwdb;
+
+type person = dsk_person;
+type ascend = dsk_ascend;
+type union = dsk_union;
+type family = dsk_family;
+type couple = dsk_couple;
+type descend = dsk_descend;
 
 value magic_gwb = "GnWb0020";
 
