@@ -1,24 +1,23 @@
-(* $Id: check.ml,v 5.12 2006-10-02 02:50:38 ddr Exp $ *)
+(* $Id: check.ml,v 5.13 2006-10-02 03:15:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
 open Printf;
 
-value feminin =
-  fun
-  [ Male -> ""
-  | Female -> "e"
-  | Neuter -> "(e)" ]
-;
-
 (* Printing check errors *)
 
-value designation = Gutil.designation;
-value year_of = Gutil.year_of;
 value check_person = Gutil.check_person;
 value check_family = Gutil.check_family;
-value is_deleted_family = Gutil.is_deleted_family;
+
+value is_deleted_family fam = get_fam_index fam = Adef.ifam_of_int (-1);
+
+value designation base p =
+  let first_name = p_first_name base p in
+  let nom = p_surname base p in
+  Mutil.iso_8859_1_of_utf_8
+    (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
+;
 
 value print_base_error oc base =
   fun
@@ -87,7 +86,7 @@ value print_base_warning oc base =
         (designation base parent) (designation base child)
   | ParentTooYoung p a ->
       fprintf oc "%s was parent at age of %d\n" (designation base p)
-        (year_of a)
+        a.year
   | TitleDatesError p t ->
       do {
         fprintf oc "%s\n" (designation base p);
@@ -97,7 +96,7 @@ value print_base_warning oc base =
   | UndefinedSex _ ->
       ()
   | YoungForMarriage p a ->
-      fprintf oc "%s married at age %d\n" (designation base p) (year_of a) ]
+      fprintf oc "%s married at age %d\n" (designation base p) a.year ]
 ;      
 
 type stats =
