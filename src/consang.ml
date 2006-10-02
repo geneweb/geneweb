@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.7 2006-10-01 11:30:07 ddr Exp $ *)
+(* $Id: consang.ml,v 5.8 2006-10-02 02:50:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -44,6 +44,37 @@ value half x = x *. 0.5;
 
 value mark = ref 0;
 value new_mark () = do { incr mark; mark.val };
+
+type visit = [ NotVisited | BeingVisited | Visited ];
+
+value check_noloop base error =
+  let tab = Array.create (nb_of_persons base) NotVisited in
+  let rec noloop i =
+    match tab.(i) with
+    [ NotVisited ->
+        do {
+          match get_parents (aoi base (Adef.iper_of_int i)) with
+          [ Some fam ->
+              let fath = get_father (coi base fam) in
+              let moth = get_mother (coi base fam) in
+              do {
+                tab.(i) := BeingVisited;
+                noloop (Adef.int_of_iper fath);
+                noloop (Adef.int_of_iper moth);
+              }
+          | None -> () ];
+          tab.(i) := Visited;
+        }
+    | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
+    | Visited -> () ]
+  in
+  for i = 0 to nb_of_persons base - 1 do {
+    match tab.(i) with
+    [ NotVisited -> noloop i
+    | BeingVisited -> failwith "check_noloop algorithm error"
+    | Visited -> () ]
+  }
+;
 
 exception TopologicalSortError of person;
 
@@ -112,13 +143,36 @@ value topological_sort base aoi =
     in
     loop 0 todo.val;
     if cnt.val <> nb_of_persons base then
-      Gutil.check_noloop base
+      check_noloop base
         (fun
          [ OwnAncestor p -> raise (TopologicalSortError p)
          | _ -> assert False ])
     else ();
     tab
   }
+;
+
+value check_noloop_for_person_list base error ipl =
+  let tab = Array.create (nb_of_persons base) NotVisited in
+  let rec noloop ip =
+    let i = Adef.int_of_iper ip in
+    match tab.(i) with
+    [ NotVisited ->
+        do {
+          match get_parents (aoi base ip) with
+          [ Some ifam ->
+              let cpl = coi base ifam in
+              do {
+                tab.(i) := BeingVisited;
+                Array.iter noloop (get_parent_array cpl);
+              }
+          | None -> () ];
+          tab.(i) := Visited;
+        }
+    | BeingVisited -> error (OwnAncestor (poi base ip))
+    | Visited -> () ]
+  in
+  List.iter noloop ipl
 ;
 
 value phony_rel =

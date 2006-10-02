@@ -1,4 +1,4 @@
-(* $Id: consang.mli,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: consang.mli,v 5.3 2006-10-02 02:50:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -31,3 +31,8 @@ value make_relationship_info : base -> array int -> relationship_info;
 
 value relationship_and_links :
   base -> relationship_info -> bool -> iper -> iper -> (float * list int);
+
+value check_noloop : base -> (error person -> unit) -> unit;
+value check_noloop_for_person_list :
+  base -> (error person -> unit) -> list iper -> unit
+;

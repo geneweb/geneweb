@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.17 2006-10-01 14:31:08 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.18 2006-10-02 02:50:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -55,11 +55,6 @@ value check_person :
 value check_family :
   base -> (base_error -> unit) -> (base_warning -> unit) -> family ->
     couple -> descend -> unit
-;
-
-value check_noloop : base -> (base_error -> unit) -> unit;
-value check_noloop_for_person_list :
-  base -> (base_error -> unit) -> list iper -> unit
 ;
 
 value strip_spaces : string -> string;
