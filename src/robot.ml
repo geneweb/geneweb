@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.12 2006-10-01 09:59:38 ddr Exp $ *)
+(* $Id: robot.ml,v 5.13 2006-10-02 01:56:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -222,7 +222,7 @@ value check oc tm from max_call sec conf suicide =
     if refused then robot_error conf.cgi from max_call sec else ();
     W.fold
       (fun _ w (c, cw, cf, wl) ->
-         if w.nb_connect > 2 && w.nbase = conf.bname && w.nbase <> "" then
+         if w.nbase = conf.bname && w.nbase <> "" then
            match w.utype with
            [ Wizard n ->
                let at = List.hd w.acc_times in
@@ -233,8 +233,12 @@ value check oc tm from max_call sec conf suicide =
                    (c, cw, cf, [(n, at) :: wl])
                  else (c, cw, cf, wl)
                else (c + 1, cw + 1, cf, [(n, at) :: wl])
-           | Friend _ -> (c + 1, cw, cf + 1, wl)
-           | Normal -> (c + 1, cw, cf, wl) ]
+           | Friend _ ->
+               if w.nb_connect > 2 then (c + 1, cw, cf + 1, wl)
+               else (c, cw, cf, wl)
+           | Normal ->
+               if w.nb_connect > 2 then (c + 1, cw, cf, wl)
+               else (c, cw, cf, wl) ]
          else (c, cw, cf, wl))
       xcl.who (0, 0, 0, [])
   }
