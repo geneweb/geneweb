@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.31 2006-10-03 10:27:47 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.32 2006-10-03 13:54:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -6,13 +6,13 @@ open Dbdisk;
 open Def;
 open Mutil;
 
-type person = Def.gen_person iper istr;
-type ascend = Def.gen_ascend ifam;
-type union = Def.gen_union ifam;
+type person = dsk_person;
+type ascend = dsk_ascend;
+type union = dsk_union;
 
-type family = Def.gen_family iper istr;
-type couple = Def.gen_couple iper;
-type descend = Def.gen_descend iper;
+type family = dsk_family;
+type couple = dsk_couple;
+type descend = dsk_descend;
 
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
