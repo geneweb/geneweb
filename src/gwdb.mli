@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.39 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.40 2006-10-03 10:27:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -14,11 +14,7 @@ type descend = 'abstract;
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
 
-type istr_iper_index =
-  { find : istr -> list iper;
-    cursor : string -> istr;
-    next : istr -> istr }
-;
+type string_person_index = 'abstract;
 
 type base = 'abstract;
 
@@ -125,8 +121,12 @@ value is_patched_person : base -> iper -> bool;
 value patched_ascends : base -> list iper;
 
 value persons_of_name : base -> string -> list iper;
-value persons_of_first_name : base -> istr_iper_index;
-value persons_of_surname : base -> istr_iper_index;
+value persons_of_first_name : base -> string_person_index;
+value persons_of_surname : base -> string_person_index;
+
+value spi_cursor : string_person_index -> string -> istr;
+value spi_find : string_person_index -> istr -> list iper;
+value spi_next : string_person_index -> istr -> istr;
 
 value base_visible_get : base -> (person -> bool) -> int -> bool;
 value base_visible_write : base -> unit;

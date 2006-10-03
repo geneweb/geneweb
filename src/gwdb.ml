@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.30 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.31 2006-10-03 10:27:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -17,7 +17,7 @@ type descend = Def.gen_descend iper;
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
 
-type istr_iper_index = Dbdisk.istr_iper_index ==
+type string_person_index = Dbdisk.string_person_index ==
   { find : istr -> list iper;
     cursor : string -> istr;
     next : istr -> istr }
@@ -132,6 +132,10 @@ value patched_ascends base = base.func.patched_ascends ();
 value persons_of_name base = base.func.persons_of_name;
 value persons_of_first_name base = base.func.persons_of_first_name;
 value persons_of_surname base = base.func.persons_of_surname;
+
+value spi_cursor spi = spi.cursor;
+value spi_find spi = spi.find;
+value spi_next spi = spi.next;
 
 value base_visible_get base = base.data.visible.v_get;
 value base_visible_write base = base.data.visible.v_write ();

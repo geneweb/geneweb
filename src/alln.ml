@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.11 2006-10-01 11:50:25 ddr Exp $ *)
+(* $Id: alln.ml,v 5.12 2006-10-03 10:27:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -296,7 +296,7 @@ value select_names conf base is_surnames ini =
   let list =
     let start_k = Mutil.tr '_' ' ' ini in
     match
-      try Some (iii.cursor (capitalize_if_not_utf8 start_k)) with
+      try Some (spi_cursor iii (capitalize_if_not_utf8 start_k)) with
       [ Not_found -> None ]
     with
     [ Some istr ->
@@ -306,7 +306,7 @@ value select_names conf base is_surnames ini =
           if string_start_with ini k then
             let list =
               if s <> "?" then
-                let my_list = iii.find istr in
+                let my_list = spi_find iii istr in
                 let my_list =
                   List.fold_left
                     (fun l ip ->
@@ -339,7 +339,7 @@ value select_names conf base is_surnames ini =
                   | [] -> [(k, s, cnt)] ]
               else list
             in
-            match try Some (iii.next istr) with [ Not_found -> None ] with
+            match try Some (spi_next iii istr) with [ Not_found -> None ] with
             [ Some istr -> loop istr list
             | None -> list ]
           else list
