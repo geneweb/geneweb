@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.36 2006-10-02 19:09:18 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.37 2006-10-03 03:42:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -655,8 +655,8 @@ value insert_relation_parent gen ip s k =
 
 value insert_relation gen ip r =
   {r_type = r.r_type;
-   r_fath = map_option (insert_relation_parent gen ip Neuter) r.r_fath;
-   r_moth = map_option (insert_relation_parent gen ip Neuter) r.r_moth;
+   r_fath = map_option (insert_relation_parent gen ip Male) r.r_fath;
+   r_moth = map_option (insert_relation_parent gen ip Female) r.r_moth;
    r_sources = unique_string gen r.r_sources}
 ;
 
@@ -735,7 +735,7 @@ value persons_record_access gen per_index_ic per_ic persons =
         [ End_of_file -> 'U' ]
       in
       match c with
-      [ 'D' -> input_item_value per_ic
+      [ 'D' -> (input_item_value per_ic : person)
       | 'U' ->
           let empty_string = Adef.istr_of_int 0 in
           {first_name = empty_string; surname = empty_string;

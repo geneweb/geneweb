@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.38 2006-10-02 15:11:38 ddr Exp $ *)
+(* $Id: util.ml,v 5.39 2006-10-03 03:42:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -496,15 +496,13 @@ value p_getint env label =
 ;
 
 value nobtit conf base p =
-  match Lazy.force conf.allowed_titles with
-  [ [] -> get_titles p
-  | allowed_titles ->
-      List.fold_right
-        (fun t l ->
-           let id = sou base t.t_ident in
-           let pl = sou base t.t_place in
-           if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
-        (get_titles p) [] ]
+  Gwdb.apply_person (Gwdb.apply_base (Dutil.dsk_nobtit conf) base) p
+;
+
+value person_misc_names conf base p =
+  Gwdb.apply_person
+    (Gwdb.apply_base Dutil.dsk_person_misc_names base) p
+    (Gwdb.apply_base (Dutil.dsk_nobtit conf) base)
 ;
 
 value parent_has_title conf base p =

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.31 2006-10-02 02:50:38 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.32 2006-10-03 03:42:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -168,7 +168,9 @@ value person_is_key base p k =
     True
   else if
     List.exists (fun x -> k = Name.crush_lower x)
-      (person_misc_names base p get_titles) then
+      (Gwdb.apply_person (Gwdb.apply_base Dutil.dsk_person_misc_names base) p
+         (fun p -> p.titles))
+  then
     True
   else False
 ;
