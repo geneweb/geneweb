@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.10 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: some.ml,v 5.11 2006-10-03 10:27:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -173,7 +173,7 @@ value persons_of_absolute_first_name conf base x =
     (fun istr l ->
        let str = sou base istr in
        if str = x then
-         let iperl = (persons_of_first_name base).find istr in
+         let iperl = spi_find (persons_of_first_name base) istr in
          let iperl =
            List.fold_left
              (fun iperl iper ->
@@ -193,7 +193,7 @@ value first_name_print conf base x =
       (persons_of_absolute_first_name conf base x, fun [])
     else if x = "" then ([], fun [])
     else
-      persons_of_fsname conf base (persons_of_first_name base).find
+      persons_of_fsname conf base (spi_find (persons_of_first_name base))
         get_first_name x
   in
   let list =
@@ -581,7 +581,7 @@ value persons_of_absolute_surname conf base x =
     (fun istr l ->
        let str = sou base istr in
        if str = x then
-         let iperl = (persons_of_surname base).find istr in
+         let iperl = spi_find (persons_of_surname base) istr in
          let iperl =
            List.fold_left
              (fun iperl iper ->
@@ -601,7 +601,7 @@ value old_surname_print conf base not_found_fun x =
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
     else
-      persons_of_fsname conf base (persons_of_surname base).find
+      persons_of_fsname conf base (spi_find (persons_of_surname base))
         get_surname x
   in
   let (iperl, strl) =
@@ -765,7 +765,7 @@ value surname_print_2 conf base x =
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
     else
-      persons_of_fsname conf base (persons_of_surname base).find
+      persons_of_fsname conf base (spi_find (persons_of_surname base))
         get_surname x
   in
   let (iperl, strl) =
