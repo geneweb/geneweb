@@ -1,9 +1,9 @@
-# $Id: Makefile,v 5.6 2006-10-02 15:14:54 ddr Exp $
+# $Id: Makefile,v 5.7 2006-10-03 03:42:33 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../src
-GWTP_OTHER=../src/lock.cmo ../src/buff.cmo ../src/name.cmo ../src/iovalue.cmo ../src/adef.cmo ../src/mutil.cmo ../src/gwdb.cmo ../src/gutil.cmo ../src/btree.cmo ../src/secure.cmo ../src/iobase.cmo ../src/outbase.cmo ../src/translate.cmo
+GWTP_OTHER=../src/lock.cmo ../src/buff.cmo ../src/name.cmo ../src/iovalue.cmo ../src/adef.cmo ../src/mutil.cmo ../src/gwdb.cmo ../src/dutil.cmo ../src/gutil.cmo ../src/btree.cmo ../src/secure.cmo ../src/iobase.cmo ../src/outbase.cmo ../src/translate.cmo
 GWTP_OBJS=httpEnv.cmo iolight.cmo gwtp.cmo
 OBJS=$(GWTP_OTHER) $(GWTP_OBJS)
 RECOVER_OBJS=$(GWTP_OTHER) iolight.cmo recover.cmo

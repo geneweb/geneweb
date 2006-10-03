@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.14 2006-10-02 15:11:38 ddr Exp $ *)
+(* $Id: request.ml,v 5.15 2006-10-03 03:42:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -14,7 +14,7 @@ value person_is_std_key conf base p k =
     True
   else if
     List.exists (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
+      (Util.person_misc_names conf base p)
   then
     True
   else False

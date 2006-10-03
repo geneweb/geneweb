@@ -71,6 +71,11 @@ doc.cmo: buff.cmo config.cmi notesLinks.cmo secure.cmi templ.cmi templAst.cmi \
     util.cmi wiki.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi notesLinks.cmx secure.cmx templ.cmx templAst.cmi \
     util.cmx wiki.cmx ../wserver/wserver.cmx 
+dutil.cmo: adef.cmi config.cmi dbdisk.cmi def.cmi mutil.cmi name.cmi \
+    dutil.cmi 
+dutil.cmx: adef.cmx config.cmi dbdisk.cmi def.cmi mutil.cmx name.cmx \
+    dutil.cmi 
+dutil.cmi: config.cmi dbdisk.cmi 
 forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi mutil.cmi name.cmi \
     notes.cmi secure.cmi templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
     ../wserver/wserver.cmi 
@@ -79,8 +84,10 @@ forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx mutil.cmx name.cmx \
     ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi gwdb.cmi iobase.cmi secure.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx iobase.cmx secure.cmx 
-gutil.cmo: adef.cmi buff.cmo def.cmi gwdb.cmi mutil.cmi name.cmi gutil.cmi 
-gutil.cmx: adef.cmx buff.cmx def.cmi gwdb.cmx mutil.cmx name.cmx gutil.cmi 
+gutil.cmo: adef.cmi buff.cmo def.cmi dutil.cmi gwdb.cmi mutil.cmi name.cmi \
+    gutil.cmi 
+gutil.cmx: adef.cmx buff.cmx def.cmi dutil.cmx gwdb.cmx mutil.cmx name.cmx \
+    gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
     gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
@@ -98,8 +105,8 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi dbdisk.cmi def.cmi mutil.cmi name.cmi gwdb.cmi 
-gwdb.cmx: adef.cmx dbdisk.cmi def.cmi mutil.cmx name.cmx gwdb.cmi 
+gwdb.cmo: adef.cmi dbdisk.cmi def.cmi mutil.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx dbdisk.cmi def.cmi mutil.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi mutil.cmi notesLinks.cmo secure.cmi select.cmo 
@@ -171,10 +178,10 @@ notesLinks.cmo: def.cmi name.cmi
 notesLinks.cmx: def.cmi name.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-outbase.cmo: adef.cmi btree.cmo dbdisk.cmi def.cmi iobase.cmi iovalue.cmi \
-    mutil.cmi name.cmi secure.cmi outbase.cmi 
-outbase.cmx: adef.cmx btree.cmx dbdisk.cmi def.cmi iobase.cmx iovalue.cmx \
-    mutil.cmx name.cmx secure.cmx outbase.cmi 
+outbase.cmo: adef.cmi btree.cmo dbdisk.cmi def.cmi dutil.cmi iobase.cmi \
+    iovalue.cmi mutil.cmi name.cmi secure.cmi outbase.cmi 
+outbase.cmx: adef.cmx btree.cmx dbdisk.cmi def.cmi dutil.cmx iobase.cmx \
+    iovalue.cmx mutil.cmx name.cmx secure.cmx outbase.cmi 
 outbase.cmi: dbdisk.cmi 
 perso.cmo: adef.cmi buff.cmo config.cmi dag.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi mutil.cmi name.cmi notes.cmi notesLinks.cmo num.cmi srcfile.cmi \
@@ -293,12 +300,14 @@ update_nldb.cmo: adef.cmi argl.cmo buff.cmo def.cmi gwdb.cmi iobase.cmi \
     notesLinks.cmo progrBar.cmi secure.cmi 
 update_nldb.cmx: adef.cmx argl.cmx buff.cmx def.cmi gwdb.cmx iobase.cmx \
     notesLinks.cmx progrBar.cmx secure.cmx 
-util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi \
-    gwlib.cmo iobase.cmi lock.cmi mutil.cmi name.cmi num.cmi secure.cmi \
-    translate.cmi version.cmo ../wserver/wserver.cmi util.cmi 
-util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx gwdb.cmx \
-    gwlib.cmx iobase.cmx lock.cmx mutil.cmx name.cmx num.cmx secure.cmx \
-    translate.cmx version.cmx ../wserver/wserver.cmx util.cmi 
+util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi dutil.cmi \
+    gutil.cmi gwdb.cmi gwlib.cmo iobase.cmi lock.cmi mutil.cmi name.cmi \
+    num.cmi secure.cmi translate.cmi version.cmo ../wserver/wserver.cmi \
+    util.cmi 
+util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi dutil.cmx \
+    gutil.cmx gwdb.cmx gwlib.cmx iobase.cmx lock.cmx mutil.cmx name.cmx \
+    num.cmx secure.cmx translate.cmx version.cmx ../wserver/wserver.cmx \
+    util.cmi 
 util.cmi: config.cmi def.cmi gwdb.cmi num.cmi 
 wiki.cmo: buff.cmo config.cmi gutil.cmi iovalue.cmi mutil.cmi notesLinks.cmo \
     secure.cmi update.cmi util.cmi ../wserver/wserver.cmi wiki.cmi 

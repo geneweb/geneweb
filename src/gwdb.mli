@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.38 2006-10-02 19:09:18 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.39 2006-10-03 03:42:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -151,9 +151,6 @@ value base_notes_origin_file : base -> string;
 value p_first_name : base -> person -> string;
 value p_surname : base -> person -> string;
 
-value person_misc_names :
-  base -> person -> (person -> list title) -> list string
-;
-
 value apply_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
+value apply_person : (Dbdisk.dsk_person -> 'a) -> person -> 'a;
 value make_base : Dbdisk.dsk_base -> base;
