@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.43 2006-10-04 10:43:56 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.44 2006-10-04 11:28:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -159,6 +159,9 @@ value p_surname : base -> person -> string;
 
 value open_base : string -> base;
 value close_base : base -> unit;
+
+(**/**)
+(** For database builders *)
 
 value apply_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
 value base_of_dsk_base : Dbdisk.dsk_base -> base;
