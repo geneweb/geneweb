@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.33 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.34 2006-10-04 10:22:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -150,6 +150,7 @@ value load_couples_array base = base.data.couples.load_array ();
 value load_descends_array base = base.data.descends.load_array ();
 value load_strings_array base = base.data.strings.load_array ();
 
+value persons_array base = (base.data.persons.get, base.data.persons.set);
 value ascends_array base = (base.data.ascends.get, base.data.ascends.set);
 
 value base_notes_read base fn = base.data.bnotes.nread fn RnAll;
