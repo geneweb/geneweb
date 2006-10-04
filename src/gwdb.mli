@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.44 2006-10-04 11:28:00 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.45 2006-10-04 13:21:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -134,6 +134,7 @@ value base_visible_write : base -> unit;
 value base_index_of_string : base -> string -> istr;
 value base_particles : base -> list string;
 value base_strings_of_fsname : base -> string -> list istr;
+value base_cleanup : base -> unit;
 
 value load_ascends_array : base -> unit;
 value load_unions_array : base -> unit;
@@ -157,11 +158,8 @@ value nobtit : config -> base -> person -> list title;
 value p_first_name : base -> person -> string;
 value p_surname : base -> person -> string;
 
-value open_base : string -> base;
-value close_base : base -> unit;
-
 (**/**)
 (** For database builders *)
 
-value apply_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
 value base_of_dsk_base : Dbdisk.dsk_base -> base;
+value apply_as_dsk_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;

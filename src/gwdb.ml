@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.35 2006-10-04 10:43:56 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.36 2006-10-04 13:21:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -142,6 +142,7 @@ value base_visible_write base = base.data.visible.v_write ();
 value base_index_of_string base = base.func.index_of_string;
 value base_particles base = base.data.particles;
 value base_strings_of_fsname base = base.func.strings_of_fsname;
+value base_cleanup base = base.func.cleanup ();
 
 value load_ascends_array base = base.data.ascends.load_array ();
 value load_unions_array base = base.data.unions.load_array ();
@@ -163,8 +164,5 @@ value p_surname base p = nominative (sou base (get_surname p));
 value nobtit = Dutil.dsk_nobtit;
 value person_misc_names = Dutil.dsk_person_misc_names;
 
-value open_base = Iobase.input;
-value close_base base = base.func.cleanup ();
-
-value apply_base f base = f base;
 value base_of_dsk_base base = base;
+value apply_as_dsk_base f base = f base;

@@ -84,8 +84,10 @@ forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx mutil.cmx name.cmx \
     ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi gwdb.cmi iobase.cmi secure.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx iobase.cmx secure.cmx 
-gutil.cmo: adef.cmi buff.cmo def.cmi gwdb.cmi mutil.cmi name.cmi gutil.cmi 
-gutil.cmx: adef.cmx buff.cmx def.cmi gwdb.cmx mutil.cmx name.cmx gutil.cmi 
+gutil.cmo: adef.cmi buff.cmo def.cmi gwdb.cmi iobase.cmi mutil.cmi name.cmi \
+    gutil.cmi 
+gutil.cmx: adef.cmx buff.cmx def.cmi gwdb.cmx iobase.cmx mutil.cmx name.cmx \
+    gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
     gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
@@ -103,10 +105,8 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi dbdisk.cmi def.cmi dutil.cmi iobase.cmi mutil.cmi \
-    gwdb.cmi 
-gwdb.cmx: adef.cmx dbdisk.cmi def.cmi dutil.cmx iobase.cmx mutil.cmx \
-    gwdb.cmi 
+gwdb.cmo: adef.cmi dbdisk.cmi def.cmi dutil.cmi mutil.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx dbdisk.cmi def.cmi dutil.cmx mutil.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi config.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmo secure.cmi select.cmo 
@@ -155,10 +155,10 @@ mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi \
 mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx merge.cmx mergeInd.cmx mutil.cmx update.cmx updateInd.cmx \
     updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
-mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gwdb.cmi lock.cmi \
-    mutil.cmi outbase.cmi secure.cmi 
-mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gwdb.cmx lock.cmx \
-    mutil.cmx outbase.cmx secure.cmx 
+mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gwdb.cmi iobase.cmi \
+    lock.cmi mutil.cmi outbase.cmi secure.cmi 
+mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gwdb.cmx iobase.cmx \
+    lock.cmx mutil.cmx outbase.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi gwdb.cmi \
     iobase.cmi name.cmi num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx \
@@ -296,10 +296,10 @@ updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmx history.cmx \
     mutil.cmx name.cmx notes.cmx notesLinks.cmx update.cmx updateInd.cmx \
     util.cmx ../wserver/wserver.cmx updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi gwdb.cmi update.cmi 
-update_nldb.cmo: adef.cmi argl.cmo buff.cmo def.cmi gwdb.cmi notesLinks.cmo \
-    progrBar.cmi secure.cmi 
-update_nldb.cmx: adef.cmx argl.cmx buff.cmx def.cmi gwdb.cmx notesLinks.cmx \
-    progrBar.cmx secure.cmx 
+update_nldb.cmo: adef.cmi argl.cmo buff.cmo def.cmi gwdb.cmi iobase.cmi \
+    notesLinks.cmo progrBar.cmi secure.cmi 
+update_nldb.cmx: adef.cmx argl.cmx buff.cmx def.cmi gwdb.cmx iobase.cmx \
+    notesLinks.cmx progrBar.cmx secure.cmx 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
     gwdb.cmi gwlib.cmo lock.cmi mutil.cmi name.cmi num.cmi secure.cmi \
     translate.cmi version.cmo ../wserver/wserver.cmi util.cmi 
