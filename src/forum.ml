@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.4 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: forum.ml,v 5.5 2006-10-04 20:16:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -799,7 +799,7 @@ value delete_forum_message conf base pos =
   match get_message conf pos with
   [ Some (a, m, _, _) ->
       if a && conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
-        passwd_in_file conf
+        passwd_in_file conf || conf.manitou
       then
         try
           do {
