@@ -1,9 +1,9 @@
-(* $Id: outbase.ml,v 5.14 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.15 2006-10-04 21:26:12 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
+open Dutil;
 open Def;
-open Iobase;
 open Mutil;
 
 value load_ascends_array base = base.data.ascends.load_array ();
@@ -108,12 +108,6 @@ value just_copy bname what oc oc_acc =
     loop 0;
   }
 ;
-
-value poi base i = base.data.persons.get (Adef.int_of_iper i);
-value sou base i = base.data.strings.get (Adef.int_of_istr i);
-
-value p_first_name base p = nominative (sou base p.first_name);
-value p_surname base p = nominative (sou base p.surname);
 
 value make_name_index base =
   let t = Array.create table_size [| |] in
@@ -237,7 +231,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
     Btree.Make
       (struct
          type t = istr;
-         value compare = compare_istr base;
+         value compare = compare_istr_fun base.data;
        end)
   in
   let bt = ref IstrTree.empty in
@@ -280,7 +274,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
     Btree.Make
       (struct
          type t = istr;
-         value compare = compare_istr base;
+         value compare = compare_istr_fun base.data;
        end)
   in
   let bt = ref IstrTree.empty in

@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.6 2006-10-02 19:09:18 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.7 2006-10-04 21:26:12 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -358,4 +358,39 @@ Printf.eprintf "size_64 %d %d\n" (glop 16) size_64;
 flush stderr;
 *)
   }
+;
+
+value roman_of_arabian n =
+  let build one five ten =
+    fun
+    [ 0 -> ""
+    | 1 -> one
+    | 2 -> one ^ one
+    | 3 -> one ^ one ^ one
+    | 4 -> one ^ five
+    | 5 -> five
+    | 6 -> five ^ one
+    | 7 -> five ^ one ^ one
+    | 8 -> five ^ one ^ one ^ one
+    | _ -> one ^ ten ]
+  in
+  build "M" "M" "M" (n / 1000 mod 10) ^ build "C" "D" "M" (n / 100 mod 10) ^
+    build "X" "L" "C" (n / 10 mod 10) ^ build "I" "V" "X" (n mod 10)
+;
+
+value arabian_of_roman s =
+  let decode_digit one five ten r =
+    loop 0 where rec loop cnt i =
+      if i >= String.length s then (10 * r + cnt, i)
+      else if s.[i] = one then loop (cnt + 1) (i + 1)
+      else if s.[i] = five then
+        if cnt = 0 then loop 5 (i + 1) else (10 * r + 5 - cnt, i + 1)
+      else if s.[i] = ten then (10 * r + 10 - cnt, i + 1)
+      else (10 * r + cnt, i)
+  in
+  let (r, i) = decode_digit 'M' 'M' 'M' 0 0 in
+  let (r, i) = decode_digit 'C' 'D' 'M' r i in
+  let (r, i) = decode_digit 'X' 'L' 'C' r i in
+  let (r, i) = decode_digit 'I' 'V' 'X' r i in
+  if i = String.length s then r else raise Not_found
 ;

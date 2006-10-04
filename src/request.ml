@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.19 2006-10-04 13:21:43 ddr Exp $ *)
+(* $Id: request.ml,v 5.20 2006-10-04 21:26:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -141,7 +141,7 @@ value name_with_roman_number str =
                     loop (10 * n + Char.code c - Char.code '0') (i + 1)
                 | _ -> (n, i) ]
           in
-          loop True (Buff.mstore len (roman_of_arabian n)) i
+          loop True (Buff.mstore len (Mutil.roman_of_arabian n)) i
       | c -> loop found (Buff.store len c) (i + 1) ]
 ;
 
