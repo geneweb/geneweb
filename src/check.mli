@@ -1,5 +1,7 @@
-(* $Id: check.mli,v 5.2 2006-10-04 11:56:35 ddr Exp $ *)
+(* $Id: check.mli,v 5.3 2006-10-04 11:57:50 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
+
+(* checking database ; independant from its disk implementation *)
 
 open Gwdb;
 
