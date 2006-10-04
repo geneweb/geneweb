@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.33 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.34 2006-10-04 13:21:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -980,3 +980,6 @@ value input_lexicon lang ht open_fname =
   with
   [ Sys_error _ -> () ]
 ;
+
+value open_base bname = Gwdb.base_of_dsk_base (Iobase.input bname);
+value close_base base = Gwdb.base_cleanup base;

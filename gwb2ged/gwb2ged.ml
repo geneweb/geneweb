@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.19 2006-10-04 10:43:56 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.20 2006-10-04 13:21:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -794,7 +794,7 @@ value main () =
     }
     else ();
     match
-      try Some (Gwdb.open_base ifile.val) with [ Sys_error _ -> None ]
+      try Some (Gutil.open_base ifile.val) with [ Sys_error _ -> None ]
     with
     [ Some base -> gwb2ged base ifile.val ofile.val anc desc mem.val
     | None ->

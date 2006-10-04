@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.18 2006-10-04 10:43:56 ddr Exp $ *)
+(* $Id: request.ml,v 5.19 2006-10-04 13:21:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -667,7 +667,7 @@ value treat_request conf base log =
 ;
 
 value treat_request_on_possibly_locked_base conf bfile log =
-  match try Left (Gwdb.open_base bfile) with e -> Right e with
+  match try Left (Gutil.open_base bfile) with e -> Right e with
   [ Left base ->
       do {
         if Mutil.utf_8_db.val then ()
