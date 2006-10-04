@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.20 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.21 2006-10-04 21:26:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -17,9 +17,6 @@ value person_ht_find_all : base -> string -> list iper;
 value person_ht_find_unique : base -> string -> string -> int -> iper;
 value person_of_key : base -> string -> option iper;
 value find_same_name : base -> person -> list person;
-
-value roman_of_arabian : int -> string;
-value arabian_of_roman : string -> int;
 
 value designation : base -> person -> string;
 

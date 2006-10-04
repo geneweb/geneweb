@@ -78,7 +78,7 @@ dutil.cmo: adef.cmi config.cmi dbdisk.cmi def.cmi mutil.cmi name.cmi \
     dutil.cmi 
 dutil.cmx: adef.cmx config.cmi dbdisk.cmi def.cmi mutil.cmx name.cmx \
     dutil.cmi 
-dutil.cmi: config.cmi dbdisk.cmi 
+dutil.cmi: config.cmi dbdisk.cmi def.cmi 
 forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi mutil.cmi name.cmi \
     notes.cmi secure.cmi templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
     ../wserver/wserver.cmi 
@@ -122,11 +122,11 @@ history.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
 history.cmi: config.cmi def.cmi gwdb.cmi 
 image.cmo: config.cmi gutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
 image.cmx: config.cmi gutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 
-iobase.cmo: adef.cmi btree.cmo buff.cmo dbdisk.cmi def.cmi iovalue.cmi \
-    mutil.cmi name.cmi secure.cmi iobase.cmi 
-iobase.cmx: adef.cmx btree.cmx buff.cmx dbdisk.cmi def.cmi iovalue.cmx \
-    mutil.cmx name.cmx secure.cmx iobase.cmi 
-iobase.cmi: dbdisk.cmi def.cmi 
+iobase.cmo: adef.cmi btree.cmo buff.cmo dbdisk.cmi def.cmi dutil.cmi \
+    iovalue.cmi mutil.cmi name.cmi secure.cmi iobase.cmi 
+iobase.cmx: adef.cmx btree.cmx buff.cmx dbdisk.cmi def.cmi dutil.cmx \
+    iovalue.cmx mutil.cmx name.cmx secure.cmx iobase.cmi 
+iobase.cmi: dbdisk.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
@@ -181,10 +181,10 @@ notesLinks.cmo: def.cmi name.cmi
 notesLinks.cmx: def.cmi name.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-outbase.cmo: adef.cmi btree.cmo dbdisk.cmi def.cmi dutil.cmi iobase.cmi \
-    iovalue.cmi mutil.cmi name.cmi secure.cmi outbase.cmi 
-outbase.cmx: adef.cmx btree.cmx dbdisk.cmi def.cmi dutil.cmx iobase.cmx \
-    iovalue.cmx mutil.cmx name.cmx secure.cmx outbase.cmi 
+outbase.cmo: adef.cmi btree.cmo dbdisk.cmi def.cmi dutil.cmi iovalue.cmi \
+    mutil.cmi name.cmi secure.cmi outbase.cmi 
+outbase.cmx: adef.cmx btree.cmx dbdisk.cmi def.cmi dutil.cmx iovalue.cmx \
+    mutil.cmx name.cmx secure.cmx outbase.cmi 
 outbase.cmi: dbdisk.cmi 
 perso.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi dag.cmi date.cmi \
     def.cmi gutil.cmi gwdb.cmi mutil.cmi name.cmi notes.cmi notesLinks.cmo \

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.39 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.40 2006-10-04 21:26:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -621,7 +621,7 @@ value date_value_recover = Grammar.Entry.create date_g "date value";
 
 value is_roman_int x =
   try
-    let _ = Gutil.arabian_of_roman x in
+    let _ = Mutil.arabian_of_roman x in
     True
   with
   [ Not_found -> False ]
@@ -629,7 +629,7 @@ value is_roman_int x =
 
 value roman_int =
   let p =
-    parser [: `("ID", x) when is_roman_int x :] -> Gutil.arabian_of_roman x
+    parser [: `("ID", x) when is_roman_int x :] -> Mutil.arabian_of_roman x
   in
   Grammar.Entry.of_parser date_g "roman int" p
 ;

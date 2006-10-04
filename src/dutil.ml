@@ -1,10 +1,17 @@
-(* $Id: dutil.ml,v 5.1 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.2 2006-10-04 21:26:12 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Config;
 open Dbdisk;
 open Def;
 open Mutil;
+
+type name_index_data = array (array iper);
+type strings_of_fsname = array (array istr);
+
+value magic_gwb = "GnWb0020";
+value magic_gwb_iso_8859_1 = "GnWb001y";
+value table_size = 0x3fff;
 
 value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
@@ -138,4 +145,105 @@ value dsk_nobtit conf base p =
            let pl = sou base t.t_place in
            if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
         p.titles [] ]
+;
+
+value check_magic =
+  let b = String.create (String.length magic_gwb) in
+  fun ic ->
+    do {
+      really_input ic b 0 (String.length b);
+      Mutil.utf_8_db.val := True;
+      if b <> magic_gwb then
+        if b = magic_gwb_iso_8859_1 then Mutil.utf_8_db.val := False
+        else if String.sub magic_gwb 0 4 = String.sub b 0 4 then
+          failwith "this is a GeneWeb base, but not compatible"
+        else
+          failwith "this is not a GeneWeb base, or it is a very old version"
+      else ()
+    }
+;
+
+value unaccent =
+  fun
+  [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
+  | 'ç' -> 'c'
+  | 'è' | 'é' | 'ê' | 'ë' -> 'e'
+  | 'ì' | 'í' | 'î' | 'ï' -> 'i'
+  | 'ð' -> 'd'
+  | 'ñ' -> 'n'
+  | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
+  | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
+  | 'ý' | 'ÿ' -> 'y'
+  | 'þ' -> 'p'
+  | c -> c ]
+;
+
+value compare_names_1 s1 s2 =
+  let compare_aux e1 e2 =
+    loop where rec loop i1 i2 =
+      if i1 == e1 && i2 == e2 then 0
+      else if i1 == e1 then -1
+      else if i2 == e2 then 1
+      else
+        let c1 = unaccent (Char.lowercase s1.[i1]) in
+        let c2 = unaccent (Char.lowercase s2.[i2]) in
+        match (c1, c2) with
+        [ ('a'..'z', 'a'..'z') ->
+            if c1 < c2 then -1
+            else if c1 > c2 then 1
+            else loop (i1 + 1) (i2 + 1)
+        | ('a'..'z', _) -> 1
+        | (_, 'a'..'z') -> -1
+        | _ -> loop (i1 + 1) (i2 + 1) ]
+  in
+  if s1 = s2 then 0
+  else
+    let i1 = initial s1 in
+    let i2 = initial s2 in
+    match compare_aux (String.length s1) (String.length s2) i1 i2 with
+    [ 0 -> compare_aux i1 i2 0 0
+    | x -> x ]
+;
+
+value start_with ini s =
+  loop 0 0 where rec loop i j =
+    if i = String.length ini then True
+    else if j = String.length s then False
+    else if String.unsafe_get ini i = String.unsafe_get s j then
+      loop (i + 1) (j + 1)
+    else False
+;
+
+value get_particle s =
+  loop where rec loop =
+    fun
+    [ [part :: parts] -> if start_with part s then part else loop parts
+    | [] -> "" ]
+;
+
+value compare_part particles s1 s2 =
+  let p1 = get_particle s1 particles in
+  let p2 = get_particle s2 particles in
+  loop (String.length p1) (String.length p2) where rec loop i1 i2 =
+    if i1 = String.length s1 && i2 = String.length s2 then compare p1 p2
+    else if i1 = String.length s1 then -1
+    else if i2 = String.length s2 then 1
+    else
+      let c1 = String.unsafe_get s1 i1 in
+      let c2 = String.unsafe_get s2 i2 in
+      if c1 < c2 then -1
+      else if c1 > c2 then 1
+      else loop (i1 + 1) (i2 + 1)
+;
+
+value compare_names base_data s1 s2 =
+  if utf_8_db.val then compare_part base_data.particles s1 s2
+  else compare_names_1 s1 s2
+;
+
+value compare_istr_fun base_data is1 is2 =
+  if is1 == is2 then 0
+  else
+    compare_names base_data (base_data.strings.get (Adef.int_of_istr is1))
+      (base_data.strings.get (Adef.int_of_istr is2))
 ;
