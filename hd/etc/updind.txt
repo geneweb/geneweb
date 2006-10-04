@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 5.3 2006-09-25 19:30:56 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 5.4 2006-10-04 17:30:35 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -49,6 +49,8 @@ function changeCalendar(e,v,m,c) {
   case 'J':
     document.getElementById(e).innerHTML = '\
 <select name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected="selected"' : '') + '>%nn;
+-</option>\
 <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;
 [(month)]0</option>\
 <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;
@@ -79,6 +81,8 @@ function changeCalendar(e,v,m,c) {
   case 'F':
     document.getElementById(e).innerHTML = '\
 <select name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected="selected"' : '') + '>%nn;
+-</option>\
 <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;
 [(french revolution month)]0</option>\
 <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;
@@ -111,6 +115,8 @@ function changeCalendar(e,v,m,c) {
   case 'H':
     document.getElementById(e).innerHTML = '\
 <select name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected="selected"' : '') + '>%nn;
+-</option>\
 <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;
 [(hebrew month)]0</option>\
 <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;
