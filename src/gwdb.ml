@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.32 2006-10-03 13:54:05 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.33 2006-10-04 09:42:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -160,6 +160,8 @@ value base_notes_origin_file base = base.data.bnotes.norigin_file;
 value p_first_name base p = nominative (sou base (get_first_name p));
 value p_surname base p = nominative (sou base (get_surname p));
 
+value nobtit = Dutil.dsk_nobtit;
+value person_misc_names = Dutil.dsk_person_misc_names;
+
 value apply_base f base = f base;
-value apply_person f p = f p;
 value make_base base = base;

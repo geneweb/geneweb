@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.5 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: util.mli,v 5.6 2006-10-04 09:42:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -38,8 +38,6 @@ value hidden_env : config -> unit;
 value authorized_age : config -> base -> person -> bool;
 value is_old_person : config -> person -> bool;
 value fast_auth_age : config -> person -> bool;
-value nobtit : config -> base -> person -> list title;
-value person_misc_names : config -> base -> person -> list string;
 
 value start_with_vowel : string -> bool;
 value know : base -> person -> bool;

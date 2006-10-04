@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 5.1 2006-09-30 02:23:38 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.2 2006-10-04 09:42:30 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 
@@ -273,7 +273,7 @@ value print_depend target_file deps =
           fun
           [ [] -> print_string "\n"
           | [dep :: rem] ->
-              if pos + String.length dep <= 77 then do {
+              if pos + String.length dep <= 76 then do {
                 print_string dep;
                 print_string " ";
                 print_items (pos + String.length dep + 1) rem

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.18 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: perso.ml,v 5.19 2006-10-04 09:42:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1907,7 +1907,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother
   | "misc_names" ->
       if p_auth then
-        let list = Util.person_misc_names conf base p in
+        let list = Gwdb.person_misc_names base p (Gwdb.nobtit conf base) in
         let list =
           let first_name = p_first_name base p in
           let surname = p_surname base p in
