@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 5.10 2006-09-26 03:54:21 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: title.ml,v 5.11 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -22,8 +22,8 @@ value date_interval conf base t x =
     let rec loop t x =
       let set d =
         do {
-          if strictly_before_dmy d d1.val then d1.val := d else ();
-          if strictly_after_dmy d d2.val then d2.val := d else ();
+          if CheckItem.strictly_before_dmy d d1.val then d1.val := d else ();
+          if CheckItem.strictly_after_dmy d d2.val then d2.val := d else ();
           found.val := True;
         }
       in
@@ -34,7 +34,7 @@ value date_interval conf base t x =
         match Adef.od_of_codate (get_baptism x) with
         [ Some (Dgreg d _) -> set d
         | _ -> () ];
-        match date_of_death (get_death x) with
+        match CheckItem.date_of_death (get_death x) with
         [ Some (Dgreg d _) -> set d
         | _ -> if get_death x = NotDead then set conf.today else () ];
         List.iter
@@ -85,20 +85,22 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
       Adef.od_of_codate t2.t_date_end, get_death x2))
   with
   [ ((_, Some (Dgreg d1 _), _, _), (_, Some (Dgreg d2 _), _, _)) ->
-      if strictly_before_dmy d1 d2 then -1
-      else if year_of d1 == year_of d2 then
+      if CheckItem.strictly_before_dmy d1 d2 then -1
+      else if d1.year == d2.year then
         match
           (Adef.od_of_codate t1.t_date_end, Adef.od_of_codate t2.t_date_end)
         with
-        [ (Some d1, Some d2) -> if d1 avant d2 then -1 else 1
+        [ (Some d1, Some d2) ->
+            if not (CheckItem.strictly_after d1 d2) then -1 else 1
         | _ -> -1 ]
       else 1
-  | ((_, _, Some d1, _), (_, _, Some d2, _)) -> if d2 apres d1 then -1 else 1
+  | ((_, _, Some d1, _), (_, _, Some d2, _)) ->
+      if not (CheckItem.strictly_before d2 d1) then -1 else 1
   | ((_, _, _, Death _ d1), (_, Some d2, _, _))
-    when not (d2 strictly_before Adef.date_of_cdate d1) ->
+    when not (CheckItem.strictly_before d2 (Adef.date_of_cdate d1)) ->
       -1
   | ((_, Some d1, _, _), (_, _, _, Death _ d2))
-    when not (d1 strictly_before Adef.date_of_cdate d2) ->
+    when not (CheckItem.strictly_before d1 (Adef.date_of_cdate d2)) ->
       1
   | _ ->
       match
@@ -106,11 +108,11 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
          date_interval conf base JustSelf x2)
       with
       [ (Some (d11, d12), Some (d21, d22)) ->
-          if not (strictly_before_dmy d21 d12) then -1
-          else if not (strictly_before_dmy d11 d22) then 1
-          else if strictly_after_dmy d21 d11 then -1
+          if not (CheckItem.strictly_before_dmy d21 d12) then -1
+          else if not (CheckItem.strictly_before_dmy d11 d22) then 1
+          else if CheckItem.strictly_after_dmy d21 d11 then -1
 (*
-          else if strictly_after_dmy d22 d12 then -1
+          else if CheckItem.strictly_after_dmy d22 d12 then -1
 *)
           else 1
       | _ ->
@@ -119,18 +121,20 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
              date_interval conf base AddSpouse x2)
           with
           [ (Some (d11, d12), Some (d21, d22)) ->
-              if not (strictly_before_dmy d21 d12) then -1
-              else if not (strictly_before_dmy d11 d22) then 1
-              else if not (strictly_before_dmy d22 d12) then -1 else 1
+              if not (CheckItem.strictly_before_dmy d21 d12) then -1
+              else if not (CheckItem.strictly_before_dmy d11 d22) then 1
+              else if not (CheckItem.strictly_before_dmy d22 d12) then -1
+              else 1
           | _ ->
               match
                 (date_interval conf base AddChildren x1,
                  date_interval conf base AddChildren x2)
               with
               [ (Some (d11, d12), Some (d21, d22)) ->
-                  if not (strictly_before_dmy d21 d12) then -1
-                  else if not (strictly_before_dmy d11 d22) then 1
-                  else if not (strictly_before_dmy d22 d12) then -1 else 1
+                  if not (CheckItem.strictly_before_dmy d21 d12) then -1
+                  else if not (CheckItem.strictly_before_dmy d11 d22) then 1
+                  else if not (CheckItem.strictly_before_dmy d22 d12) then -1
+                  else 1
               | (Some _, None) -> -1
               | (None, Some _) -> 1
               | (None, None) -> -1 ] ] ] ]
@@ -285,10 +289,10 @@ value give_access_someone conf base (x, t) list =
   do {
     if has_dates then Wserver.wprint "<em>" else ();
     match t_date_start with
-    [ Some (Dgreg d _) -> Wserver.wprint "%d" (year_of d)
+    [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
     | _ -> () ];
     match t_date_end with
-    [ Some (Dgreg d _) -> Wserver.wprint "-%d" (year_of d)
+    [ Some (Dgreg d _) -> Wserver.wprint "-%d" d.year
     | _ -> () ];
     if has_dates then Wserver.wprint "</em>: " else ();
     if List.memq x list then Wserver.wprint "<em>"

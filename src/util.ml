@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.42 2006-10-04 13:21:43 ddr Exp $ *)
+(* $Id: util.ml,v 5.43 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -516,15 +516,18 @@ value authorized_age conf base p =
   else
     match
       (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-       get_death p, date_of_death (get_death p))
+       get_death p, CheckItem.date_of_death (get_death p))
     with
     [ (_, _, NotDead, _) when conf.private_years > 0 -> False
     | (Some (Dgreg d _), _, _, _) ->
-        let a = time_gone_by d conf.today in a.year > conf.private_years
+        let a = CheckItem.time_elapsed d conf.today in
+        a.year > conf.private_years
     | (_, Some (Dgreg d _), _, _) ->
-        let a = time_gone_by d conf.today in a.year > conf.private_years
+        let a = CheckItem.time_elapsed d conf.today in
+        a.year > conf.private_years
     | (_, _, _, Some (Dgreg d _)) ->
-        let a = time_gone_by d conf.today in a.year > conf.private_years
+        let a = CheckItem.time_elapsed d conf.today in
+        a.year > conf.private_years
     | (None, None, DontKnowIfDead, None) ->
         get_access p <> Private && conf.public_if_no_date
     | _ ->
@@ -535,7 +538,7 @@ value authorized_age conf base p =
             let fam = foi base (get_family u).(i) in
             match Adef.od_of_codate (get_marriage fam) with
             [ Some (Dgreg d _) ->
-                let a = time_gone_by d conf.today in
+                let a = CheckItem.time_elapsed d conf.today in
                 a.year > conf.private_years
             | _ -> loop (i + 1) ]
         in
@@ -545,15 +548,18 @@ value authorized_age conf base p =
 value is_old_person conf p =
   match
     (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-     get_death p, date_of_death (get_death p))
+     get_death p, CheckItem.date_of_death (get_death p))
   with
   [ (_, _, NotDead, _) when conf.private_years > 0 -> False
   | (Some (Dgreg d _), _, _, _) ->
-      let a = time_gone_by d conf.today in a.year > conf.private_years
+      let a = CheckItem.time_elapsed d conf.today in
+      a.year > conf.private_years
   | (_, Some (Dgreg d _), _, _) ->
-      let a = time_gone_by d conf.today in a.year > conf.private_years
+      let a = CheckItem.time_elapsed d conf.today in
+      a.year > conf.private_years
   | (_, _, _, Some (Dgreg d _)) ->
-      let a = time_gone_by d conf.today in a.year > conf.private_years
+      let a = CheckItem.time_elapsed d conf.today in
+      a.year > conf.private_years
   | (None, None, DontKnowIfDead, None) ->
       get_access p <> Private && conf.public_if_no_date
   | _ -> False ]
