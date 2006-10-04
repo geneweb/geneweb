@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 5.11 2006-10-03 10:27:47 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: some.ml,v 5.12 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -100,7 +100,8 @@ value first_name_print_list conf base x1 xl liste =
                  (Adef.od_of_codate (get_birth x1),
                   Adef.od_of_codate (get_birth x2))
                with
-               [ (Some d1, Some d2) -> if d1 strictly_after d2 then -1 else 1
+               [ (Some d1, Some d2) ->
+                   if CheckItem.strictly_after d1 d2 then -1 else 1
                | (Some d1, _) -> 1
                | _ -> -1 ]
            | n -> -n  ])
@@ -345,7 +346,7 @@ value print_by_branch x conf base (pl, homonymes) =
           match (Adef.od_of_codate (get_birth p1),
                  Adef.od_of_codate (get_birth p2)) with
           [ (Some d1, Some d2) ->
-              if d2 strictly_after d1 then -1 else 1
+              if CheckItem.strictly_after d2 d1 then -1 else 1
           | (_, None) -> -1
           | (None, _) -> 1 ]
         in
@@ -790,7 +791,7 @@ value surname_print_2 conf base x =
             match (Adef.od_of_codate (get_birth p1),
                    Adef.od_of_codate (get_birth p2)) with
             [ (Some d1, Some d2) ->
-                if d2 strictly_after d1 then -1 else 1
+                if CheckItem.strictly_after d2 d1 then -1 else 1
             | (_, None) -> -1
             | (None, _) -> 1 ]
           in

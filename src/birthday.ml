@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.9 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.10 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -234,7 +234,7 @@ value propose_months conf mode =
 
 value day_after d =
   let (day, r) =
-    if d.day >= nb_days_in_month d.month d.year then (1, 1)
+    if d.day >= CheckItem.nb_days_in_month d.month d.year then (1, 1)
     else (succ d.day, 0)
   in
   let (month, r) = if d.month + r > 12 then (1, 1) else (d.month + r, 0) in
@@ -376,7 +376,7 @@ value match_dates conf base p d1 d2 =
   if d1.day == d2.day && d1.month == d2.month then authorized_age conf base p
   else if
     d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
-    not (leap_year d2.year) then
+    not (CheckItem.leap_year d2.year) then
     authorized_age conf base p
   else False
 ;
@@ -544,7 +544,7 @@ value match_mar_dates conf base cpl d1 d2 =
     authorized_age conf base (pget conf base (get_mother cpl))
   else if
     d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
-    not (leap_year d2.year) then
+    not (CheckItem.leap_year d2.year) then
     authorized_age conf base (pget conf base (get_father cpl)) &&
     authorized_age conf base (pget conf base (get_mother cpl))
   else False

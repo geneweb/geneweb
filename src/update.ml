@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.17 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: update.ml,v 5.18 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ type key = (string * string * int * create * string);
 value infer_death conf birth =
   match birth with
   [ Some (Dgreg d _) ->
-      let a = Gutil.year_of (Gutil.time_gone_by d conf.today) in
+      let a = (CheckItem.time_elapsed d conf.today).year in
       if a > 120 then DeadDontKnowWhen
       else if a <= 80 then NotDead
       else DontKnowIfDead
@@ -572,7 +572,8 @@ value reconstitute_date_dmy conf var =
 ;
 
 value check_greg_day conf d =
-  if d.day > nb_days_in_month d.month d.year then bad_date conf d else ()
+  if d.day > CheckItem.nb_days_in_month d.month d.year then bad_date conf d
+  else ()
 ;
 
 value reconstitute_date conf var =

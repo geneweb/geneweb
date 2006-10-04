@@ -1,4 +1,4 @@
-(* $Id: updateIndOk.mli,v 5.2 2006-09-16 00:23:19 ddr Exp $ *)
+(* $Id: updateIndOk.mli,v 5.3 2006-10-04 14:17:54 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -8,7 +8,7 @@ value effective_del : config -> base -> person -> person;
 value effective_mod :
   config -> base -> gen_person Update.key string -> person;
 value all_checks_person :
-  config -> base -> person -> ascend -> union -> list Gutil.base_warning;
+  config -> base -> person -> ascend -> union -> list CheckItem.base_warning;
 value print_mod_aux :
   config -> base -> (gen_person Update.key string -> unit) -> unit;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.12 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.13 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -141,7 +141,7 @@ value print_birth conf base =
              let d = {(d) with day = 0} in
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
-           let future = strictly_after_dmy d conf.today in
+           let future = CheckItem.strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
                Wserver.wprint "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
@@ -214,7 +214,7 @@ value print_death conf base =
                  match Adef.od_of_codate (get_birth p) with
                  [ Some (Dgreg d1 _) ->
                      if sure d1 && sure d && d1 <> d then
-                       let a = time_gone_by d1 d in
+                       let a = CheckItem.time_elapsed d1 d in
                        let ages_sum =
                          match get_sex p with
                          [ Male -> (fst ages_sum + a.year, snd ages_sum)
@@ -347,7 +347,7 @@ value print_oldest_alive conf base =
                (transl_nth conf "born" (index_of_sex (get_sex p)))
                (Date.string_of_ondate conf (Dgreg d cal));
              if get_death p = NotDead && d.prec = Sure then do {
-               let a = time_gone_by d conf.today in
+               let a = CheckItem.time_elapsed d conf.today in
                Wserver.wprint " <em>(%s)</em>" (Date.string_of_age conf a);
              }
              else ();
@@ -365,7 +365,8 @@ value print_longest_lived conf base =
       match (Adef.od_of_codate (get_birth p), get_death p) with
       [ (Some (Dgreg bd _), Death _ cd) ->
           match Adef.date_of_cdate cd with
-          [ Dgreg dd _ -> Some (Dgreg (time_gone_by bd dd) Dgregorian)
+          [ Dgreg dd _ ->
+              Some (Dgreg (CheckItem.time_elapsed bd dd) Dgregorian)
           | _ -> None ]
       | _ -> None ]
     else None
@@ -408,7 +409,7 @@ value print_marr_or_eng conf base title list len =
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
            let cpl = coi base (get_fam_index fam) in
-           let future = strictly_after_dmy d conf.today in
+           let future = CheckItem.strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
                Wserver.wprint "</ul>\n</li>\n</ul>\n<ul>\n";

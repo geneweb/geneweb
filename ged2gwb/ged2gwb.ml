@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.38 2006-10-04 10:43:56 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.39 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -111,10 +111,10 @@ value designation base p =
 
 value couple _ x y = Adef.couple x y;
 
-value strictly_after = Gutil.strictly_after;
-value strictly_before_dmy = Gutil.strictly_before_dmy;
-value date_of_death = Gutil.date_of_death;
-value year_of = Gutil.year_of;
+value strictly_after = CheckItem.strictly_after;
+value strictly_before_dmy = CheckItem.strictly_before_dmy;
+value date_of_death = CheckItem.date_of_death;
+value year_of d = d.year;
 
 value log_oc = ref stdout;
 

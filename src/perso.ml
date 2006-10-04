@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.19 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: perso.ml,v 5.20 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -609,7 +609,8 @@ value get_date_place conf base auth_for_all_anc p =
       else
         match d2 with
         [ Some (Dgreg d _)
-          when (time_gone_by d conf.today).year > conf.private_years ->
+          when (CheckItem.time_elapsed d conf.today).year >
+               conf.private_years ->
             True
         | _ -> False ]
     in
@@ -1655,7 +1656,8 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
           if d.prec = Sure && get_death p = NotDead then
             d.day = conf.today.day && d.month = conf.today.month &&
             d.year < conf.today.year ||
-            not (leap_year conf.today.year) && d.day = 29 && d.month = 2 &&
+            not (CheckItem.leap_year conf.today.year) &&
+              d.day = 29 && d.month = 2 &&
             conf.today.day = 1 && conf.today.month = 3
           else False
       | _ -> False ]
@@ -1672,7 +1674,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
         [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
            Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
           when d1 <> d2 ->
-            let a = time_gone_by d1 d2 in
+            let a = CheckItem.time_elapsed d1 d2 in
             a.year > 0 ||
             a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
         | _ -> False ]
@@ -1785,7 +1787,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "age" ->
       match (p_auth, Adef.od_of_codate (get_birth p), get_death p) with
       [ (True, Some (Dgreg d _), NotDead) ->
-          let a = time_gone_by d conf.today in
+          let a = CheckItem.time_elapsed d conf.today in
           Date.string_of_age conf a
       | _ -> "" ]
   | "alias" ->
@@ -1828,7 +1830,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
            Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
           when d1 <> d2 ->
-            let a = time_gone_by d1 d2 in
+            let a = CheckItem.time_elapsed d1 d2 in
             let s =
               if not approx && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
@@ -2118,7 +2120,7 @@ and string_of_parent_age conf base (p, a, _, p_auth) parent =
           (Adef.od_of_codate (get_birth pp), Adef.od_of_codate (get_birth p))
         with
         [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
-            Date.string_of_age conf (time_gone_by d1 d2)
+            Date.string_of_age conf (CheckItem.time_elapsed d1 d2)
         | _ -> "" ]
       else ""
   | None -> raise Not_found ]
@@ -2585,7 +2587,7 @@ value print_foreach conf base print_ast eval_expr =
              in
              match (d1, d2) with
              [ (Some d1, Some d2) ->
-                 if strictly_before d1 d2 then -1 else 1
+                 if CheckItem.strictly_before d1 d2 then -1 else 1
              | _ -> -1 ])
         (List.rev list)
       in
@@ -2722,8 +2724,8 @@ value print_foreach conf base print_ast eval_expr =
               Adef.od_of_codate (get_marriage fam2))
            with
            [ (Some d1, Some d2) ->
-               if strictly_before d1 d2 then -1
-               else if strictly_before d2 d1 then 1
+               if CheckItem.strictly_before d1 d2 then -1
+               else if CheckItem.strictly_before d2 d1 then 1
                else 0
            | _ -> 0 ])
         list

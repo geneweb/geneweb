@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.22 2006-10-02 02:50:38 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.23 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -774,7 +774,7 @@ value all_checks_family conf base fam cpl des scdo =
       Consang.check_noloop_for_person_list base error
         (Array.to_list (get_parent_array cpl))
     else ();
-    Gutil.check_family base error warning fam cpl des;
+    CheckItem.family base error warning fam cpl des;
     List.rev wl.val
   }
 ;

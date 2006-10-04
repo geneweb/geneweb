@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: update.mli,v 5.3 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -23,9 +23,9 @@ value delete_topological_sort_v : config -> base -> unit;
 value delete_topological_sort : config -> base -> unit;
 
 value print_return : config -> unit;
-value print_error : config -> base -> Gutil.base_error -> unit;
-value print_warnings : config -> base -> list Gutil.base_warning -> unit;
-value error : config -> base -> Gutil.base_error -> 'a;
+value print_error : config -> base -> CheckItem.base_error -> unit;
+value print_warnings : config -> base -> list CheckItem.base_warning -> unit;
+value error : config -> base -> CheckItem.base_error -> 'a;
 
 value error_locked : config -> unit;
 value error_digest : config -> unit;

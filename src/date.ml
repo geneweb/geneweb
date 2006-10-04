@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.7 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: date.ml,v 5.8 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -317,7 +317,7 @@ value year_text d =
     | About | Maybe -> "ca "
     | _ -> "" ]
   in
-  let s = s ^ string_of_int (year_of d) in
+  let s = s ^ string_of_int d.year in
   match d.prec with
   [ After -> s ^ "/"
   | OrYear x -> s ^ "/" ^ string_of_int x
@@ -332,7 +332,7 @@ value get_birth_death_date p =
     | x -> (x, False) ]
   in
   let (death_date, approx) =
-    match date_of_death (get_death p) with
+    match CheckItem.date_of_death (get_death p) with
     [ Some d -> (Some d, approx)
     | _ ->
         match get_burial p with
@@ -486,7 +486,7 @@ value print_dates conf base p =
     [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
        Some (Dgreg ({prec = Sure | About | Maybe} as d2) _))
       when d1 <> d2 ->
-        let a = time_gone_by d1 d2 in
+        let a = CheckItem.time_elapsed d1 d2 in
         if a.year < 0 || a.year = 0 && a.month = 0 then ()
         else do {
           Wserver.wprint "\n(";

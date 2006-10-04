@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.13 2006-10-02 03:15:46 ddr Exp $ *)
+(* $Id: check.ml,v 5.14 2006-10-04 14:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -6,9 +6,6 @@ open Gwdb;
 open Printf;
 
 (* Printing check errors *)
-
-value check_person = Gutil.check_person;
-value check_family = Gutil.check_family;
 
 value is_deleted_family fam = get_fam_index fam = Adef.ifam_of_int (-1);
 
@@ -193,7 +190,7 @@ value check_base_aux base error warning changed_p =
     for i = 0 to nb_of_persons base - 1 do {
       ProgrBar.run i (nb_of_persons base);
       let p = poi base (Adef.iper_of_int i) in
-      match check_person base error warning p with
+      match CheckItem.person base error warning p with
       [ Some ippl -> List.iter changed_p ippl
       | None -> () ]
     };
@@ -207,7 +204,7 @@ value check_base_aux base error warning changed_p =
       else
         let cpl = coi base (Adef.ifam_of_int i) in
         let des = doi base (Adef.ifam_of_int i) in
-        check_family base error warning fam cpl des
+        CheckItem.family base error warning fam cpl des
     };
     ProgrBar.finish ();
     Consang.check_noloop base error;
