@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.17 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: request.ml,v 5.18 2006-10-04 10:43:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -667,7 +667,7 @@ value treat_request conf base log =
 ;
 
 value treat_request_on_possibly_locked_base conf bfile log =
-  match try Left (Gwdb.make_base (Iobase.input bfile)) with e -> Right e with
+  match try Left (Gwdb.open_base bfile) with e -> Right e with
   [ Left base ->
       do {
         if Mutil.utf_8_db.val then ()
@@ -681,8 +681,8 @@ value treat_request_on_possibly_locked_base conf bfile log =
             [ Not_found -> "iso-8859-1" ];
         };
         try treat_request conf base log with exc ->
-          do { base_cleanup base; raise exc };
-        base_cleanup base;
+          do { close_base base; raise exc };
+        close_base base;
       }
   | Right e ->
       let transl conf w =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.37 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.38 2006-10-04 10:43:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -942,7 +942,7 @@ value link gwo_list tmp_dir =
       let i = Adef.int_of_iper ip in
       Hashtbl.replace gen.g_patch_p i p
     in
-    let base = Gwdb.make_base base in
+    let base = Gwdb.base_of_dsk_base base in
     if do_check.val && gen.g_pcnt > 0 then do {
       Check.check_base base (set_error base gen) (set_warning base)
         (fun i -> gen.g_def.(i)) changed_p pr_stats.val;

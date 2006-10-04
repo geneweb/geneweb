@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.18 2006-10-02 15:11:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.19 2006-10-04 10:43:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1484,7 +1484,7 @@ value main () =
         }
       else None
     in
-    let base = Gwdb.make_base (Iobase.input in_file.val) in
+    let base = Gwdb.open_base in_file.val in
     let in_dir =
       if Filename.check_suffix in_file.val ".gwb" then in_file.val
       else in_file.val ^ ".gwb"
