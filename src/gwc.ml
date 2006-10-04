@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.38 2006-10-04 10:43:56 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.39 2006-10-04 11:56:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -935,15 +935,15 @@ value link gwo_list tmp_dir =
     Hashtbl.clear gen.g_names;
     Hashtbl.clear gen.g_local_names;
     Gc.compact ();
-    let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
+    let dsk_base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
     Hashtbl.clear gen.g_patch_p;
-    let changed_p (ip, p) =
-      let p = Gwdb.gen_person_of_person p in
-      let i = Adef.int_of_iper ip in
-      Hashtbl.replace gen.g_patch_p i p
-    in
-    let base = Gwdb.base_of_dsk_base base in
+    let base = Gwdb.base_of_dsk_base dsk_base in
     if do_check.val && gen.g_pcnt > 0 then do {
+      let changed_p (ip, p) =
+        let p = Gwdb.gen_person_of_person p in
+        let i = Adef.int_of_iper ip in
+        Hashtbl.replace gen.g_patch_p i p
+      in
       Check.check_base base (set_error base gen) (set_warning base)
         (fun i -> gen.g_def.(i)) changed_p pr_stats.val;
       flush stdout;
@@ -951,7 +951,7 @@ value link gwo_list tmp_dir =
     else ();
     if not gen.g_errored then do {
       if do_consang.val then ConsangAll.compute base True False else ();
-      Some (base, gen.g_wiznotes)
+      Some (dsk_base, gen.g_wiznotes)
     }
     else None;
   }
@@ -1098,13 +1098,13 @@ The database \"%s\" already exists. Use option -f to overwrite it.
           in
           try Mutil.mkdir_p tmp_dir with _ -> ();
           match link (List.rev gwo.val) tmp_dir with
-          [ Some (base, wiznotes) ->
+          [ Some (dsk_base, wiznotes) ->
               do {
                 Gc.compact ();
-                Gwdb.apply_base (Outbase.output out_file.val) base;
+                Outbase.output out_file.val dsk_base;
                 output_wizard_notes out_file.val wiznotes;
                 output_command_line out_file.val;
-                output_particles_file out_file.val (Gwdb.base_particles base);
+                output_particles_file out_file.val dsk_base.data.particles;
                 try Mutil.remove_dir tmp_dir with _ -> ();
                 try Unix.rmdir "gw_tmp" with _ -> ();
               }
