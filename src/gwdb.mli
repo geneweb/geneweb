@@ -1,7 +1,8 @@
-(* $Id: gwdb.mli,v 5.40 2006-10-03 10:27:47 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.41 2006-10-04 09:42:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
+open Config;
 
 type person = 'abstract;
 type ascend = 'abstract;
@@ -148,9 +149,13 @@ value base_notes_read_first_line : base -> string -> string;
 value base_notes_read_first_char : base -> string -> string;
 value base_notes_origin_file : base -> string;
 
+value person_misc_names :
+  base -> person -> (person -> list title) -> list string
+;
+value nobtit : config -> base -> person -> list title;
+
 value p_first_name : base -> person -> string;
 value p_surname : base -> person -> string;
 
 value apply_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
-value apply_person : (Dbdisk.dsk_person -> 'a) -> person -> 'a;
 value make_base : Dbdisk.dsk_base -> base;

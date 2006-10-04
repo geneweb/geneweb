@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.39 2006-10-03 03:42:33 ddr Exp $ *)
+(* $Id: util.ml,v 5.40 2006-10-04 09:42:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -493,16 +493,6 @@ value p_getint env label =
       try Some (int_of_string (strip_spaces s)) with
       [ Failure _ -> None ]
   | None -> None ]
-;
-
-value nobtit conf base p =
-  Gwdb.apply_person (Gwdb.apply_base (Dutil.dsk_nobtit conf) base) p
-;
-
-value person_misc_names conf base p =
-  Gwdb.apply_person
-    (Gwdb.apply_base Dutil.dsk_person_misc_names base) p
-    (Gwdb.apply_base (Dutil.dsk_nobtit conf) base)
 ;
 
 value parent_has_title conf base p =
