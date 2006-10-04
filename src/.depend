@@ -29,7 +29,7 @@ check.cmo: adef.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi mutil.cmi \
     progrBar.cmi check.cmi 
 check.cmx: adef.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx mutil.cmx \
     progrBar.cmx check.cmi 
-check.cmi: adef.cmi def.cmi gutil.cmi gwdb.cmi 
+check.cmi: def.cmi gutil.cmi gwdb.cmi 
 compilation.cmo: date.cmi def.cmi util.cmi 
 compilation.cmx: date.cmx def.cmi util.cmx 
 config.cmi: def.cmi 
