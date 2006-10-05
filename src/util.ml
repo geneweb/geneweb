@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.43 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: util.ml,v 5.44 2006-10-05 04:32:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1293,10 +1293,11 @@ value header_no_page_title conf title =
   }
 ;
 
-value http_string s i =
-  if start_with s i "http://" then
+value http_string conf s i =
+  let http = "http://" in
+  if start_with s i http then
     let j =
-      loop (i + String.length "http://") where rec loop j =
+      loop (i + String.length http) where rec loop j =
         if j < String.length s then
           match s.[j] with
           [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '/' | ':' |
@@ -1305,9 +1306,25 @@ value http_string s i =
           | _ -> j ]
         else j
     in
-    match s.[j - 1] with
-    [ ':' | ';' | '.' -> Some (j - 1)
-    | _ -> Some j ]
+    let j =
+      match s.[j - 1] with
+      [ ':' | ';' | '.' -> j - 1
+      | _ -> j ]
+    in
+    let s =
+      let s = String.sub s i (j - i) in
+      (* heuristic to detect accesses inside the database *)
+      let p = "http://" ^ get_server_string conf ^ "/" in
+      if start_with s 0 p then
+        let suff =
+          if conf.wizard || conf.just_friend_wizard then "w"
+          else if conf.friend then "f"
+          else ""
+        in
+        s ^ ";w=" ^ suff
+      else s
+    in
+    Some (s, j)
   else None
 ;
 
@@ -1484,9 +1501,8 @@ value string_with_macros conf env s =
             let tt = if s.[i] = '>' then Out else In_norm in
             do { Buffer.add_char buff s.[i]; loop tt (i + 1) }
         | Out ->
-            match http_string s i with
-            [ Some j ->
-                let x = String.sub s i (j - i) in
+            match http_string conf s i with
+            [ Some (x, j) ->
                 do {
                   bprintf buff "<a href=\"%s\">" x;
                   expand_ampersand buff x;
