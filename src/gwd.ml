@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.7 2006-10-01 18:24:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.8 2006-10-06 12:14:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ value redirected_addr = ref None;
 value wizard_passwd = ref "";
 value friend_passwd = ref "";
 value wizard_just_friend = ref False;
-value only_address = ref "";
+value only_addresses = ref [];
 value cgi = ref False;
 value default_lang = ref "fr";
 value setup_link = ref False;
@@ -187,8 +187,12 @@ value only_log from cgi =
   do {
     let tm = Unix.localtime (Unix.time ()) in
     fprintf_date oc tm;
-    fprintf oc " Connection refused from %s (only %s)\n" from
-      only_address.val;
+    fprintf oc " Connection refused from %s " from;
+    fprintf oc "(only ";
+    list_iter_first
+      (fun first s -> fprintf oc "%s%s" (if not first then "," else "") s)
+      only_addresses.val;
+    fprintf oc ")\n";
     flush_log oc;
     if not cgi then http "" else ();
     Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
@@ -1307,7 +1311,8 @@ value connection cgi (addr, request) script_name contents =
     else if excluded from then refuse_log from cgi
     else
       let accept =
-        if only_address.val = "" then True else only_address.val = from
+        if only_addresses.val = [] then True
+        else List.mem from only_addresses.val
       in
       if not accept then only_log from cgi
       else
@@ -1542,7 +1547,8 @@ value main () =
         "<lang>\n       Set a default language (default: fr).");
        ("-blang", Arg.Set choose_browser_lang,
         "\n       Select the user browser language if any.");
-       ("-only", Arg.String (fun x -> only_address.val := x),
+       ("-only",
+        Arg.String (fun x -> only_addresses.val := [x :: only_addresses.val]),
         "<address>\n       Only inet address accepted.");
        ("-auth", Arg.String (fun x -> auth_file.val := x), "\
 <file>
