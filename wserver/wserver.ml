@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.4 2006-08-22 15:40:30 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.5 2006-10-06 15:17:27 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -467,6 +467,7 @@ value accept_connection tmout max_clients callback s =
     else wait_available max_clients s
     END;
     let (t, addr) = Unix.accept s in
+    if Sys.file_exists "STOP_SERVER" then exit 0 else ();
     Unix.setsockopt t Unix.SO_KEEPALIVE True;
     IFDEF NOFORK THEN
       let cleanup () =
