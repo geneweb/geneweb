@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 5.1 2006-01-01 05:35:06 ddr Exp $ *)
+(* $Id: setup.ml,v 5.2 2006-10-06 15:46:44 ddr Exp $ *)
 
 open Printf;
 
@@ -1826,11 +1826,11 @@ value intro () =
     default_lang.val := default_setup_lang;
     let (gwd_lang, setup_lang) =
       if daemon.val then
-        let setup_lang =
-          if String.length lang_param.val < 2 then default_setup_lang
-          else lang_param.val
-        in
         IFDEF UNIX THEN do {
+          let setup_lang =
+            if String.length lang_param.val < 2 then default_setup_lang
+            else lang_param.val
+          in
           printf "To start, open location http://localhost:%d/\n"
             port.val;
           flush stdout;
