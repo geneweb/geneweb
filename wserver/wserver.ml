@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.5 2006-10-06 15:17:27 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.6 2006-10-06 18:42:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -460,6 +460,17 @@ value skip_possible_remaining_chars fd =
   }
 ;
 
+value check_stopping () =
+  if Sys.file_exists "STOP_SERVER" then do {
+    flush stdout;
+    Printf.eprintf "\nServer stopped by presence of file STOP_SERVER.\n";
+    Printf.eprintf "Remove that file to allow servers to run again.\n";
+    flush stderr;
+    exit 0
+  }
+  else ()
+;
+
 value accept_connection tmout max_clients callback s =
   do {
     IFDEF NOFORK THEN wait_and_compact s
@@ -467,7 +478,7 @@ value accept_connection tmout max_clients callback s =
     else wait_available max_clients s
     END;
     let (t, addr) = Unix.accept s in
-    if Sys.file_exists "STOP_SERVER" then exit 0 else ();
+    check_stopping ();
     Unix.setsockopt t Unix.SO_KEEPALIVE True;
     IFDEF NOFORK THEN
       let cleanup () =
@@ -624,15 +635,16 @@ value f addr_opt port tmout max_clients g =
       }
       ELSE () END
   | None ->
-      let addr =
-        match addr_opt with
-        [ Some addr ->
-            try Unix.inet_addr_of_string addr with
-            [ Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0) ]
-        | None -> Unix.inet_addr_any ]
-      in
-      let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
       do {
+        check_stopping ();
+        let addr =
+          match addr_opt with
+          [ Some addr ->
+              try Unix.inet_addr_of_string addr with
+              [ Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0) ]
+          | None -> Unix.inet_addr_any ]
+        in
+        let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
         Unix.setsockopt s Unix.SO_REUSEADDR True;
         Unix.bind s (Unix.ADDR_INET addr port);
         Unix.listen s 4;
