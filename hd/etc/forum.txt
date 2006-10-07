@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.4 2006-10-01 18:24:44 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.5 2006-10-07 12:57:51 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -219,6 +219,10 @@
     </form>
     </p>
   %end;
+  %if;(evar.m != "FORUM_VIEW")
+    <div style="font-size:80%%;float:%right;;margin-%left;:3em">(<a%sp;
+    href="%prefix;m=FORUM_VIEW;p=%message.pos;">[view source]</a>)</div>
+  %end;
   <p%col;>
   <b>%message.ident;</b>
   %if;(message.email != "")%nn;
@@ -235,7 +239,10 @@
   <i>%message.time;</i>
   </p>
   <dl%col;><dd>
-    %if;(message.wiki = "on")%message.text.wiki;
+    %if;(evar.m = "FORUM_VIEW")
+      <textarea rows="15" cols="100" readonly="readonly">%message.text.raw;
+      </textarea>
+    %elseif;(message.wiki = "on")%message.text.wiki;
     %else;%message.text.nowiki;%end;
   </dd></dl>
   %if;(message.wizard != "" and wizard and user.ident = message.wizard or
