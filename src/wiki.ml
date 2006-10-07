@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.10 2006-10-01 18:24:44 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.11 2006-10-07 12:57:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -683,7 +683,9 @@ value print_mod_view_page conf can_edit mode fname title env s =
           xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
         else ();
         begin_centered conf;
-        stagn "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"" begin
+        stagn "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"%s"
+          (if can_edit then "" else " readonly=\"readonly\"")
+        begin
           if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
           else ();
         end;

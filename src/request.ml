@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.20 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: request.ml,v 5.21 2006-10-07 12:57:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -400,6 +400,7 @@ value family_m conf base =
   | Some "FORUM_DEL" -> Forum.print_del conf base
   | Some "FORUM_SEARCH" -> Forum.print_search conf base
   | Some "FORUM_VAL" -> Forum.print_valid conf base
+  | Some "FORUM_VIEW" -> Forum.print conf base
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
