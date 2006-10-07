@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.25 2006-10-02 01:56:00 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.26 2006-10-07 09:18:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -357,11 +357,7 @@ value print_main conf base auth_file =
 ;
 
 value wizard_page_title conf wz wizname h =
-  Wserver.wprint "%s%s" wizname
-    (if wz <> wizname && not h then
-       "<br" ^ conf.xhs ^ "><span style=\"font-size:50%\">(" ^ wz ^
-       ")</span>"
-     else "")
+  Wserver.wprint "%s" wizname
 ;
 
 value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
