@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.6 2006-10-07 12:57:51 ddr Exp $ *)
+(* $Id: forum.ml,v 5.7 2006-10-07 16:26:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -553,7 +553,7 @@ and eval_message_text_var conf str so =
         | None -> s ]
       in
       VVstring s
-  | ["raw"] -> VVstring str
+  | ["raw"] -> VVstring (quote_escaped str)
   | sl ->
       eval_message_string_var conf str so sl ]
 and eval_message_string_var conf str so =
