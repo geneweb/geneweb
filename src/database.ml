@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 5.24 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: database.ml,v 5.1 2006-10-08 05:33:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -818,7 +818,7 @@ value patches_of_patches_ht patches =
   }
 ;
 
-value input bname =
+value opendb bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in

@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 5.4 2006-09-30 10:27:02 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 5.5 2006-10-08 05:33:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -23,8 +23,8 @@ value print_result base tab =
       if m_list.val <> [] then do {
         m_list.val :=
           let f i1 i2 =
-            let p1 = base.data.persons.get i1 in
-            let p2 = base.data.persons.get i2 in
+            let p1 = poi base (Adef.iper_of_int i1) in
+            let p2 = poi base (Adef.iper_of_int i2) in
             let s1 = Name.abbrev (Name.lower (p_surname base p1)) in
             let s2 = Name.abbrev (Name.lower (p_surname base p2)) in
             if s1 < s2 then -1
@@ -39,7 +39,7 @@ value print_result base tab =
         print_newline ();
         List.iter
           (fun i ->
-             let p = base.data.persons.get i in
+             let p = poi base (Adef.iper_of_int i) in
              do {
                Printf.printf "- %s.%d %s\n" (p_first_name base p) (get_occ p)
                  (p_surname base p);
@@ -69,8 +69,8 @@ value most_desc base p =
 *)
   let _ = load_descends_array base in
   let _ = load_unions_array base in
-  let tab = Array.create base.data.persons.len Num.zero in
-  let entered = Array.create base.data.persons.len False in
+  let tab = Array.create (nb_of_persons base) Num.zero in
+  let entered = Array.create (nb_of_persons base) False in
   let q = ref Pq.empty in
   do {
     q.val := Pq.add (get_key_index p) q.val;
@@ -129,7 +129,7 @@ value main () =
     }
     else ();
     Secure.set_base_dir (Filename.dirname bname.val);
-    let base = Iobase.input bname.val in
+    let base = Gutil.open_base bname.val in
     let ip =
       Gutil.person_ht_find_unique base p_fname.val p_sname.val p_num.val
     in
