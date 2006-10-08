@@ -1,11 +1,11 @@
 (* camlp4r *)
-(* $Id: recover.ml,v 5.1 2006-05-12 10:16:24 ddr Exp $ *)
+(* $Id: recover.ml,v 5.2 2006-10-08 05:33:16 ddr Exp $ *)
 
 open Printf;
 
 value recover db =
   let base = Iolight.input db in
-  Iobase.output "a" base
+  Outbase.output "a" base
 ;
 
 value database = ref "";

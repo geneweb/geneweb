@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 5.3 2006-09-30 10:27:02 ddr Exp $ *)
+(* $Id: fpla.ml,v 5.4 2006-10-08 05:33:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -10,8 +10,8 @@ open Printf;
 value make_table base =
   let _ = load_ascends_array base in
   let _ = load_couples_array base in
-  let fpla = Array.create base.data.ascends.len None in
-  let cnt = ref base.data.ascends.len in
+  let fpla = Array.create (nb_of_persons base) None in
+  let cnt = ref (nb_of_persons base) in
   do {
     while cnt.val > 0 do {
       Array.iteri
@@ -73,7 +73,7 @@ value main () =
   do {
     Argl.parse speclist (fun s -> bname.val := s) usage;
     Secure.set_base_dir (Filename.dirname bname.val);
-    let base = Iobase.input bname.val in
+    let base = Gutil.open_base bname.val in
     first_parentless_ancestor base
   }
 ;
