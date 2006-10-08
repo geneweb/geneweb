@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.11 2006-10-07 12:57:51 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.12 2006-10-08 07:22:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -654,12 +654,16 @@ value print_mod_view_page conf can_edit mode fname title env s =
   do {
     header conf title;
     if can_edit then
-      tag "div" "style=\"float:%s;margin-%s:5px\"" conf.right conf.left begin
+      tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
+        conf.left
+      begin
+        Wserver.wprint "(";
         stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
           (if has_v then ";v=" ^ string_of_int v else "") sfn
         begin
-          Wserver.wprint "(%s)\n" (message_txt conf 0);
+          Wserver.wprint "%s" (message_txt conf 0);
         end;
+        Wserver.wprint ")\n";
       end
     else ();
     print_link_to_welcome conf (if can_edit then False else True);
