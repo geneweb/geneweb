@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.20 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.21 2006-10-09 17:57:53 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -622,6 +622,7 @@ value print conf base =
                get_occ p1, get_key_index p1)
             in
             History.record conf base key "fp";
+            Update.delete_topological_sort conf base;
             print_merged conf base p1;
           }
           else ();
