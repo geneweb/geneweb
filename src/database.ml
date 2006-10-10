@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.1 2006-10-08 05:33:16 ddr Exp $ *)
+(* $Id: database.ml,v 5.2 2006-10-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1008,13 +1008,19 @@ value opendb bname =
       Hashtbl.replace (snd patches.h_descend) i c;
     }
   in
-  let patch_string i s =
-    let i = Adef.int_of_istr i in
-    do {
-      strings.len := max strings.len (i + 1);
-      (fst patches.h_string).val := strings.len;
-      Hashtbl.replace (snd patches.h_string) i s;
-    }
+  let index_of_string =
+    index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
+      (snd patches.h_string)
+  in
+  let insert_string s =
+    try index_of_string s with
+    [ Not_found -> do {
+        let i = strings.len in
+        strings.len := max strings.len (i + 1);
+        (fst patches.h_string).val := i;
+        Hashtbl.replace (snd patches.h_string) i s;
+        Adef.istr_of_int i
+      } ]
   in
   let patch_name s ip =
     let s = Name.crush_lower s in
@@ -1099,9 +1105,6 @@ value opendb bname =
   let base_func =
     {persons_of_name = persons_of_name bname (snd patches.h_name);
      strings_of_fsname = strings_of_fsname bname strings patches.h_person;
-     index_of_string =
-       index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
-         (snd patches.h_string);
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_surname_start_pos, fun p -> p.surname,
@@ -1113,7 +1116,7 @@ value opendb bname =
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
      patch_couple = patch_couple; patch_descend = patch_descend;
-     patch_string = patch_string; patch_name = patch_name;
+     patch_name = patch_name; insert_string = insert_string;
      commit_patches = commit_patches;
      patched_ascends = patched_ascends;
      is_patched_person = is_patched_person;
