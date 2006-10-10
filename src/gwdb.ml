@@ -1,10 +1,12 @@
-(* $Id: gwdb.ml,v 5.39 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.40 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
 open Dbdisk;
 open Def;
 open Mutil;
+
+type istr = dsk_istr;
 
 type person = dsk_person;
 type ascend = dsk_ascend;
@@ -14,8 +16,8 @@ type family = dsk_family;
 type couple = dsk_couple;
 type descend = dsk_descend;
 
-type relation = Def.gen_relation iper istr;
-type title = Def.gen_title istr;
+type relation = Def.gen_relation iper dsk_istr;
+type title = Def.gen_title dsk_istr;
 
 type string_person_index = Dbdisk.string_person_index ==
   { find : istr -> list iper;
@@ -25,8 +27,8 @@ type string_person_index = Dbdisk.string_person_index ==
 
 type base = Dbdisk.dsk_base;
 
-value is_empty_string istr = Adef.int_of_istr istr = 0;
-value is_quest_string istr = Adef.int_of_istr istr = 1;
+value is_empty_string istr = istr.istr = 0;
+value is_quest_string istr = istr.istr = 1;
 
 value get_access p = p.Def.access;
 value get_aliases p = p.Def.aliases;
@@ -76,7 +78,7 @@ value ascend_with_parents a p = {parents = p; consang = a.consang};
 value ascend_of_gen_ascend a = a;
 
 value empty_person ip =
-  let empty_string = Adef.istr_of_int 0 in
+  let empty_string = {istr = 0} in
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
@@ -128,7 +130,7 @@ value foi base i = base.data.families.get (Adef.int_of_ifam i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value doi base i = base.data.descends.get (Adef.int_of_ifam i);
 
-value sou base i = base.data.strings.get (Adef.int_of_istr i);
+value sou base i = base.data.strings.get i.istr;
 
 value nb_of_persons base = base.data.persons.len;
 value nb_of_families base = base.data.families.len;
@@ -182,3 +184,4 @@ value person_misc_names = Dutil.dsk_person_misc_names;
 
 value base_of_dsk_base base = base;
 value apply_as_dsk_base f base = f base;
+value dsk_person_of_person p = p;

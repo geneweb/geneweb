@@ -1,4 +1,4 @@
-(* $Id: dutil.ml,v 5.3 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.4 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Config;
@@ -7,7 +7,7 @@ open Def;
 open Mutil;
 
 type name_index_data = array (array iper);
-type strings_of_fsname = array (array Adef.istr);
+type strings_of_fsname = array (array dsk_istr);
 
 value magic_gwb = "GnWb0020";
 value magic_gwb_iso_8859_1 = "GnWb001y";
@@ -17,7 +17,7 @@ value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
 value uoi base i = base.data.unions.get (Adef.int_of_iper i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
-value sou base i = base.data.strings.get (Adef.int_of_istr i);
+value sou base i = base.data.strings.get i.istr;
 
 value p_first_name base p = nominative (sou base p.first_name);
 value p_surname base p = nominative (sou base p.surname);
@@ -244,6 +244,6 @@ value compare_names base_data s1 s2 =
 value compare_istr_fun base_data is1 is2 =
   if is1 == is2 then 0
   else
-    compare_names base_data (base_data.strings.get (Adef.int_of_istr is1))
-      (base_data.strings.get (Adef.int_of_istr is2))
+    compare_names base_data (base_data.strings.get is1.istr)
+      (base_data.strings.get is2.istr)
 ;
