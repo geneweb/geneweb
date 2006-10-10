@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.3 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: database.ml,v 5.4 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -133,7 +133,7 @@ value hashtbl_right_assoc s ht =
 ;
 
 value index_of_string strings ic start_pos hash_len string_patches s =
-  try Adef.istr_of_int (hashtbl_right_assoc s string_patches) with
+  try {istr = hashtbl_right_assoc s string_patches} with
   [ Not_found ->
       match (ic, hash_len) with
       [ (Some ic, Some hash_len) ->
@@ -143,7 +143,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
             let i1 = input_binary_int ic in
             let rec loop i =
               if i == -1 then raise Not_found
-              else if strings.get i = s then Adef.istr_of_int i
+              else if strings.get i = s then {istr = i}
               else do {
                 seek_in ic (start_pos + (hash_len + i) * int_size);
                 loop (input_binary_int ic)
@@ -181,7 +181,7 @@ value old_persons_of_first_name_or_surname base_data strings params =
   let module IstrTree =
     Btree.Make
       (struct
-         type t = Adef.istr;
+         type t = dsk_istr;
          value compare = compare_istr_fun base_data;
        end)
   in
@@ -265,9 +265,7 @@ flush stderr;
   in
   let cursor str =
     IstrTree.key_after
-      (fun key ->
-         compare_names base_data str
-           (strings.get (Adef.int_of_istr key)))
+      (fun key -> compare_names base_data str (strings.get key.istr))
       (bt None)
   in
   let next key = IstrTree.next key (bt None) in
@@ -279,7 +277,7 @@ value new_persons_of_first_name_or_surname base_data strings params =
   let module IstrTree =
     Btree.Make
       (struct
-         type t = Adef.istr;
+         type t = dsk_istr;
          value compare = compare_istr_fun base_data;
        end)
   in
@@ -365,9 +363,7 @@ flush stderr;
   in
   let cursor str =
     IstrTree.key_after
-      (fun key ->
-         compare_names base_data str
-           (strings.get (Adef.int_of_istr key)))
+      (fun key -> compare_names base_data str (strings.get key.istr))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -443,7 +439,7 @@ value strings_of_fsname bname strings (_, person_patches) =
             let pos = input_binary_int ic_inx_acc in
             close_in ic_inx_acc;
             seek_in ic_inx pos;
-            (Iovalue.input ic_inx : array Adef.istr)
+            (Iovalue.input ic_inx : array dsk_istr)
           }
         else (* compatibility *)
           let a =
@@ -468,14 +464,14 @@ value strings_of_fsname bname strings (_, person_patches) =
         (fun _ p ->
            do {
              if not (List.memq p.first_name l.val) then
-               let s1 = strings.get (Adef.int_of_istr p.first_name) in
+               let s1 = strings.get p.first_name.istr in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.first_name :: l.val]
                else ()
              else ();
              if not (List.memq p.surname l.val) then
-               let s1 = strings.get (Adef.int_of_istr p.surname) in
+               let s1 = strings.get p.surname.istr in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.surname :: l.val]
@@ -1025,7 +1021,7 @@ value opendb bname =
         strings.len := max strings.len (i + 1);
         (fst patches.h_string).val := i;
         Hashtbl.replace (snd patches.h_string) i s;
-        Adef.istr_of_int i
+        {istr = i}
       } ]
   in
   let patch_name s ip =

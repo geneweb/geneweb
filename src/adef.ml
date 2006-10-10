@@ -1,9 +1,8 @@
-(* $Id: adef.ml,v 5.2 2006-09-20 20:10:12 ddr Exp $ *)
+(* $Id: adef.ml,v 5.3 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type iper = int;
 type ifam = int;
-type istr = int;
 type fix = int;
 
 value float_of_fix x = float x /. 1000000.0;
@@ -15,8 +14,6 @@ external int_of_iper : iper -> int = "%identity";
 external iper_of_int : int -> iper = "%identity";
 external int_of_ifam : ifam -> int = "%identity";
 external ifam_of_int : int -> ifam = "%identity";
-external int_of_istr : istr -> int = "%identity";
-external istr_of_int : int -> istr = "%identity";
 
 type date =
   [ Dgreg of dmy and calendar

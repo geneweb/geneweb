@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.21 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: perso.ml,v 5.22 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -822,7 +822,7 @@ type env 'a =
   | Vother of 'a
   | Vnone ]
 and title_item =
-  (int * gen_title_name Adef.istr * Adef.istr * list Adef.istr *
+  (int * gen_title_name istr * istr * list istr *
    list (option date * option date))
 ;
 

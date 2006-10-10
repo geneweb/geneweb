@@ -1,8 +1,10 @@
-(* $Id: gwdb.mli,v 5.48 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.49 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
 open Config;
+
+type istr = 'abstract;
 
 type person = 'abstract;
 type ascend = 'abstract;
@@ -165,3 +167,4 @@ value p_surname : base -> person -> string;
 
 value base_of_dsk_base : Dbdisk.dsk_base -> base;
 value apply_as_dsk_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
+value dsk_person_of_person : person -> Dbdisk.dsk_person;

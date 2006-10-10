@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.41 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.42 2006-10-10 21:46:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -25,7 +25,7 @@ type gen_min_person 'person 'string =
     m_notes : mutable 'string }
 ;
 
-type min_person = gen_min_person iper Adef.istr;
+type min_person = gen_min_person iper dsk_istr;
 
 type cbase =
   { c_persons : mutable array min_person;
@@ -38,7 +38,7 @@ type cbase =
 ;
 
 type gen =
-  { g_strings : mutable Hashtbl.t string Adef.istr;
+  { g_strings : mutable Hashtbl.t string dsk_istr;
     g_names : mutable Hashtbl.t int iper;
     g_local_names : mutable Hashtbl.t (int * int) iper;
     g_pcnt : mutable int;
@@ -83,7 +83,7 @@ value poi base i = base.c_persons.(Adef.int_of_iper i);
 value aoi base i = base.c_ascends.(Adef.int_of_iper i);
 value uoi base i = base.c_unions.(Adef.int_of_iper i);
 value coi base i = base.c_couples.(Adef.int_of_ifam i);
-value sou base i = base.c_strings.(Adef.int_of_istr i);
+value sou base i = base.c_strings.(i.istr);
 value p_first_name base p = nominative (sou base p.m_first_name);
 value p_surname base p = nominative (sou base p.m_surname);
 value designation base p =
@@ -135,7 +135,7 @@ value unique_string gen x =
           gen.g_base.c_strings := new_arr;
         }
         else ();
-        let u = Adef.istr_of_int gen.g_scnt in
+        let u = {istr = gen.g_scnt} in
         gen.g_base.c_strings.(gen.g_scnt) := x;
         gen.g_scnt := gen.g_scnt + 1;
         Hashtbl.add gen.g_strings x u;
@@ -737,7 +737,7 @@ value persons_record_access gen per_index_ic per_ic persons =
       match c with
       [ 'D' -> (input_item_value per_ic : person)
       | 'U' ->
-          let empty_string = Adef.istr_of_int 0 in
+          let empty_string = {istr = 0} in
           {first_name = empty_string; surname = empty_string;
            occ = 0; image = empty_string; first_names_aliases = [];
            surnames_aliases = []; public_name = empty_string;
@@ -903,8 +903,8 @@ value link gwo_list tmp_dir =
     let fam_ic = open_in_bin tmp_fam in
     let istr_empty = unique_string gen "" in
     let istr_quest = unique_string gen "?" in
-    assert (istr_empty = Adef.istr_of_int 0);
-    assert (istr_quest = Adef.istr_of_int 1);
+    assert (istr_empty = {istr = 0});
+    assert (istr_quest = {istr = 1});
     IFDEF UNIX THEN Sys.remove tmp_per_index ELSE () END;
     IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
     IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
@@ -940,7 +940,7 @@ value link gwo_list tmp_dir =
     let base = Gwdb.base_of_dsk_base dsk_base in
     if do_check.val && gen.g_pcnt > 0 then do {
       let changed_p (ip, p) =
-        let p = Gwdb.gen_person_of_person p in
+        let p = Gwdb.dsk_person_of_person p in
         let i = Adef.int_of_iper ip in
         Hashtbl.replace gen.g_patch_p i p
       in
