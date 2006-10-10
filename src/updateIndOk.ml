@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.25 2006-10-10 18:48:26 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.26 2006-10-10 19:59:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -477,7 +477,7 @@ value effective_mod conf base sp =
     let created_p = ref [] in
     let np =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
-        (Update.insert_string base) sp
+        (Gwdb.insert_string base) sp
     in
     let np = person_of_gen_person {(np) with related = get_related op} in
     let op_misc_names = person_misc_names base op (nobtit conf base) in
@@ -501,7 +501,7 @@ value effective_add conf base sp =
     let created_p = ref [] in
     let np =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
-        (Update.insert_string base) {(sp) with key_index = pi}
+        (Gwdb.insert_string base) {(sp) with key_index = pi}
     in
     let np = person_of_gen_person np in
     let na = no_ascend () in
@@ -525,8 +525,8 @@ value array_except v a =
 ;
 
 value effective_del conf base p = do {
-  let none = Update.insert_string base "?" in
-  let empty = Update.insert_string base "" in
+  let none = Gwdb.insert_string base "?" in
+  let empty = Gwdb.insert_string base "" in
   let ip = get_key_index p in
   let asc = aoi base ip in
   match get_parents asc with

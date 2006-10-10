@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.19 2006-10-10 19:46:10 ddr Exp $ *)
+(* $Id: update.ml,v 5.20 2006-10-10 19:59:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -93,8 +93,6 @@ value print_err_unknown conf base (f, s, o) =
     raise ModErr
   }
 ;
-
-value insert_string = Gwdb.insert_string;
 
 value update_misc_names_of_family conf base p u =
   match get_sex p with
@@ -700,7 +698,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int (nb_of_persons base) in
-          let empty_string = insert_string base "" in
+          let empty_string = Gwdb.insert_string base "" in
           let (birth, birth_place, baptism, baptism_place) =
             match info with
             [ Some (b, bpl, _, _, _) ->
@@ -721,24 +719,25 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           in
           let p =
             person_of_gen_person
-              {first_name = insert_string base f;
-               surname = insert_string base s; occ = o; image = empty_string;
+              {first_name = Gwdb.insert_string base f;
+               surname = Gwdb.insert_string base s; occ = o;
+               image = empty_string;
                first_names_aliases = []; surnames_aliases = [];
                public_name = empty_string; qualifiers = []; aliases = [];
                titles = []; rparents = []; related = [];
                occupation = empty_string; sex = sex; access = IfTitles;
                birth = Adef.codate_of_od birth;
-               birth_place = insert_string base birth_place;
+               birth_place = Gwdb.insert_string base birth_place;
                birth_src = empty_string; baptism = Adef.codate_of_od baptism;
-               baptism_place = insert_string base baptism_place;
-               baptism_src = empty_string;
-               death = death; death_place = insert_string base death_place;
+               baptism_place = Gwdb.insert_string base baptism_place;
+               baptism_src = empty_string; death = death;
+               death_place = Gwdb.insert_string base death_place;
                death_src = empty_string; burial = UnknownBurial;
                burial_place = empty_string; burial_src = empty_string;
                notes = empty_string;
                psources =
                  if f = "?" || s = "?" then empty_string
-                 else insert_string base (only_printable src);
+                 else Gwdb.insert_string base (only_printable src);
                key_index = ip}
           and a = no_ascend ()
           and u = union_of_gen_union {family = [| |]} in

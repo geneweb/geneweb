@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.23 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.24 2006-10-10 19:59:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -358,7 +358,7 @@ value infer_origin_file conf base ifam ncpl ndes =
         | _ ->
             let rec loop i =
               if i == Array.length (get_children ndes) then
-                Update.insert_string base ""
+                Gwdb.insert_string base ""
               else
                 let cifams = get_family (uoi base (get_children ndes).(i)) in
                 if Array.length cifams == 0 then loop (i + 1)
@@ -430,7 +430,7 @@ value effective_mod conf base sfam scpl sdes =
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string base) sfam
+      (Gwdb.insert_string base) sfam
   in
   let ndes =
     descend_of_gen_descend
@@ -580,7 +580,7 @@ value effective_add conf base sfam scpl sdes =
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string base) sfam
+      (Gwdb.insert_string base) sfam
   in
   let ndes =
     descend_of_gen_descend
@@ -704,7 +704,7 @@ value effective_del conf base fam = do {
     family_of_gen_family
       {(gen_family_of_family fam) with
        witnesses = [| |];
-       comment = Update.insert_string base "";
+       comment = Gwdb.insert_string base "";
        fam_index = Adef.ifam_of_int (-1)}
   in
   let des = descend_of_gen_descend {children = [| |]} in
