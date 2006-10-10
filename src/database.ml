@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.2 2006-10-10 19:46:10 ddr Exp $ *)
+(* $Id: database.ml,v 5.3 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -180,7 +180,10 @@ value old_persons_of_first_name_or_surname base_data strings params =
   let (ic2, start_pos, proj, person_patches, _, _, _) = params in
   let module IstrTree =
     Btree.Make
-      (struct type t = istr; value compare = compare_istr_fun base_data; end)
+      (struct
+         type t = Adef.istr;
+         value compare = compare_istr_fun base_data;
+       end)
   in
   let bt =
     let btr = ref None in
@@ -275,7 +278,10 @@ value new_persons_of_first_name_or_surname base_data strings params =
   let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
   let module IstrTree =
     Btree.Make
-      (struct type t = istr; value compare = compare_istr_fun base_data; end)
+      (struct
+         type t = Adef.istr;
+         value compare = compare_istr_fun base_data;
+       end)
   in
   let fname_dat = Filename.concat bname names_dat in
   let bt =
@@ -437,7 +443,7 @@ value strings_of_fsname bname strings (_, person_patches) =
             let pos = input_binary_int ic_inx_acc in
             close_in ic_inx_acc;
             seek_in ic_inx pos;
-            (Iovalue.input ic_inx : array istr)
+            (Iovalue.input ic_inx : array Adef.istr)
           }
         else (* compatibility *)
           let a =

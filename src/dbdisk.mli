@@ -1,15 +1,15 @@
-(* $Id: dbdisk.mli,v 5.5 2006-10-10 19:46:10 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.6 2006-10-10 21:04:58 ddr Exp $ *)
 
 open Def;
 
-type dsk_person = gen_person iper istr;
+type dsk_person = gen_person iper Adef.istr;
 type dsk_ascend = gen_ascend ifam;
 type dsk_union = gen_union ifam;
-type dsk_family = gen_family iper istr;
+type dsk_family = gen_family iper Adef.istr;
 type dsk_couple = gen_couple iper;
 type dsk_descend = gen_descend iper;
 
-type dsk_title = gen_title istr;
+type dsk_title = gen_title Adef.istr;
 
 type rn_mode = [ RnAll | Rn1Ch | Rn1Ln ];
 
@@ -29,9 +29,9 @@ type record_access 'a =
 ;
 
 type string_person_index =
-  { find : istr -> list iper;
-    cursor : string -> istr;
-    next : istr -> istr }
+  { find : Adef.istr -> list iper;
+    cursor : string -> Adef.istr;
+    next : Adef.istr -> Adef.istr }
 ;
 
 type visible_record_access =
@@ -54,7 +54,7 @@ type base_data =
 
 type base_func =
   { persons_of_name : string -> list iper;
-    strings_of_fsname : string -> list istr;
+    strings_of_fsname : string -> list Adef.istr;
     persons_of_surname : string_person_index;
     persons_of_first_name : string_person_index;
     patch_person : iper -> dsk_person -> unit;
@@ -64,7 +64,7 @@ type base_func =
     patch_couple : ifam -> dsk_couple -> unit;
     patch_descend : ifam -> dsk_descend -> unit;
     patch_name : string -> iper -> unit;
-    insert_string : string -> istr;
+    insert_string : string -> Adef.istr;
     commit_patches : unit -> unit;
     commit_notes : string -> string -> unit;
     patched_ascends : unit -> list iper;

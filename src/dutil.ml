@@ -1,4 +1,4 @@
-(* $Id: dutil.ml,v 5.2 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.3 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Config;
@@ -7,7 +7,7 @@ open Def;
 open Mutil;
 
 type name_index_data = array (array iper);
-type strings_of_fsname = array (array istr);
+type strings_of_fsname = array (array Adef.istr);
 
 value magic_gwb = "GnWb0020";
 value magic_gwb_iso_8859_1 = "GnWb001y";

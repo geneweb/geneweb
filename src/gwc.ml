@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.40 2006-10-10 19:46:10 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.41 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -25,7 +25,7 @@ type gen_min_person 'person 'string =
     m_notes : mutable 'string }
 ;
 
-type min_person = gen_min_person iper istr;
+type min_person = gen_min_person iper Adef.istr;
 
 type cbase =
   { c_persons : mutable array min_person;
@@ -38,7 +38,7 @@ type cbase =
 ;
 
 type gen =
-  { g_strings : mutable Hashtbl.t string istr;
+  { g_strings : mutable Hashtbl.t string Adef.istr;
     g_names : mutable Hashtbl.t int iper;
     g_local_names : mutable Hashtbl.t (int * int) iper;
     g_pcnt : mutable int;

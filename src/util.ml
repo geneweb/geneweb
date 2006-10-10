@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.45 2006-10-10 18:48:26 ddr Exp $ *)
+(* $Id: util.ml,v 5.46 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -584,25 +584,10 @@ value is_restricted (conf : config) base ip =
   else False 
 ;
 
-value empty_string = Adef.istr_of_int 0;
-
 value is_hidden p = is_empty_string (get_surname p);
 
 value pget (conf : config) base ip =
-  if is_restricted conf base ip then
-    person_of_gen_person
-      {first_name = empty_string; surname = empty_string; occ = 0;
-       image = empty_string; first_names_aliases = []; surnames_aliases = [];
-       public_name = empty_string; qualifiers = []; titles = []; rparents = [];
-       related = []; aliases = []; occupation = empty_string; sex = Neuter;
-       access = Private; birth = Adef.codate_None; birth_place = empty_string;
-       birth_src = empty_string; baptism = Adef.codate_None;
-       baptism_place = empty_string; baptism_src = empty_string;
-       death = DontKnowIfDead; death_place = empty_string;
-       death_src = empty_string; burial = UnknownBurial;
-       burial_place = empty_string; burial_src = empty_string;
-       notes = empty_string; psources = empty_string; key_index = ip}
-  else poi base ip
+  if is_restricted conf base ip then Gwdb.empty_person ip else poi base ip
 ;
 
 value aget (conf : config) base ip =

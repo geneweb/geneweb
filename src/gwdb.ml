@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.38 2006-10-10 19:46:10 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.39 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -74,6 +74,21 @@ value get_parents a = a.Def.parents;
 value ascend_with_consang a c = {parents = a.parents; consang = c};
 value ascend_with_parents a p = {parents = p; consang = a.consang};
 value ascend_of_gen_ascend a = a;
+
+value empty_person ip =
+  let empty_string = Adef.istr_of_int 0 in
+  {first_name = empty_string; surname = empty_string; occ = 0;
+   image = empty_string; first_names_aliases = []; surnames_aliases = [];
+   public_name = empty_string; qualifiers = []; titles = []; rparents = [];
+   related = []; aliases = []; occupation = empty_string; sex = Neuter;
+   access = Private; birth = Adef.codate_None; birth_place = empty_string;
+   birth_src = empty_string; baptism = Adef.codate_None;
+   baptism_place = empty_string; baptism_src = empty_string;
+   death = DontKnowIfDead; death_place = empty_string;
+   death_src = empty_string; burial = UnknownBurial;
+   burial_place = empty_string; burial_src = empty_string;
+   notes = empty_string; psources = empty_string; key_index = ip}
+;
 
 value get_family u = u.Def.family;
 
