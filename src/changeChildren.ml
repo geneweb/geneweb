@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.11 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.12 2006-10-10 19:59:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -257,8 +257,8 @@ value change_child conf base parent_surname ip =
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     let p =
       person_with_key p
-        (Update.insert_string base new_first_name)
-        (Update.insert_string base new_surname)
+        (Gwdb.insert_string base new_first_name)
+        (Gwdb.insert_string base new_surname)
         new_occ
     in
     patch_person base (get_key_index p) p;
