@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.44 2006-10-05 04:32:01 ddr Exp $ *)
+(* $Id: util.ml,v 5.45 2006-10-10 18:48:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -575,9 +575,9 @@ value fast_auth_age conf p =
 ;
 
 value is_restricted (conf : config) base ip =
-  let quest_string = Adef.istr_of_int 1 in
   let fct p =
-    get_surname p <> quest_string && get_first_name p <> quest_string &&
+    not (is_quest_string (get_surname p)) &&
+    not (is_quest_string (get_first_name p)) &&
     not (fast_auth_age conf p)
   in  
   if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
@@ -586,9 +586,7 @@ value is_restricted (conf : config) base ip =
 
 value empty_string = Adef.istr_of_int 0;
 
-value is_hidden p =
-  get_surname p = empty_string
-;
+value is_hidden p = is_empty_string (get_surname p);
 
 value pget (conf : config) base ip =
   if is_restricted conf base ip then
@@ -2229,7 +2227,7 @@ value image_and_size conf base p image_size =
 
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
-    get_image p <> Adef.istr_of_int 0 || auto_image_file conf base p <> None
+    not (is_empty_string (get_image p)) || auto_image_file conf base p <> None
   else False
 ;
 
