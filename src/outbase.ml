@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.15 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.16 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -230,7 +230,7 @@ value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
   let module IstrTree =
     Btree.Make
       (struct
-         type t = istr;
+         type t = Adef.istr;
          value compare = compare_istr_fun base.data;
        end)
   in
@@ -273,7 +273,7 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
   let module IstrTree =
     Btree.Make
       (struct
-         type t = istr;
+         type t = Adef.istr;
          value compare = compare_istr_fun base.data;
        end)
   in

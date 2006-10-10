@@ -1,11 +1,11 @@
-(* $Id: def.mli,v 5.16 2006-10-04 02:49:08 ddr Exp $ *)
+(* $Id: def.mli,v 5.17 2006-10-10 21:04:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;
-type istr = Adef.istr;
+
 type cdate = Adef.cdate;
 type codate = Adef.codate;
 
