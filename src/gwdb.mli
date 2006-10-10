@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.46 2006-10-10 18:48:26 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.47 2006-10-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -109,7 +109,6 @@ value sou : base -> istr -> string;
 
 value nb_of_persons : base -> int;
 value nb_of_families : base -> int;
-value nb_of_strings : base -> int;
 
 value patch_person : base -> iper -> person -> unit;
 value patch_ascend : base -> iper -> ascend -> unit;
@@ -118,7 +117,7 @@ value patch_family : base -> ifam -> family -> unit;
 value patch_descend : base -> ifam -> descend -> unit;
 value patch_couple : base -> ifam -> couple -> unit;
 value patch_name : base -> string -> iper -> unit;
-value patch_string : base -> istr -> string -> unit;
+value insert_string : base -> string -> istr;
 value commit_patches : base -> unit;
 value commit_notes : base -> string -> string -> unit;
 value is_patched_person : base -> iper -> bool;
@@ -134,7 +133,6 @@ value spi_next : string_person_index -> istr -> istr;
 
 value base_visible_get : base -> (person -> bool) -> int -> bool;
 value base_visible_write : base -> unit;
-value base_index_of_string : base -> string -> istr;
 value base_particles : base -> list string;
 value base_strings_of_fsname : base -> string -> list istr;
 value base_cleanup : base -> unit;

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.37 2006-10-10 18:48:26 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.38 2006-10-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -117,7 +117,6 @@ value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
 value nb_of_persons base = base.data.persons.len;
 value nb_of_families base = base.data.families.len;
-value nb_of_strings base = base.data.strings.len;
 
 value patch_person base = base.func.patch_person;
 value patch_ascend base = base.func.patch_ascend;
@@ -126,7 +125,7 @@ value patch_family base = base.func.patch_family;
 value patch_descend base = base.func.patch_descend;
 value patch_couple base = base.func.patch_couple;
 value patch_name base = base.func.patch_name;
-value patch_string base = base.func.patch_string;
+value insert_string base = base.func.insert_string;
 value commit_patches base = base.func.commit_patches ();
 value commit_notes base = base.func.commit_notes;
 value is_patched_person base = base.func.is_patched_person;
@@ -142,7 +141,6 @@ value spi_next spi = spi.next;
 
 value base_visible_get base = base.data.visible.v_get;
 value base_visible_write base = base.data.visible.v_write ();
-value base_index_of_string base = base.func.index_of_string;
 value base_particles base = base.data.particles;
 value base_strings_of_fsname base = base.func.strings_of_fsname;
 value base_cleanup base = base.func.cleanup ();

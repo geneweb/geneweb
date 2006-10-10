@@ -1,4 +1,4 @@
-(* $Id: dbdisk.mli,v 5.4 2006-10-03 10:27:47 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.5 2006-10-10 19:46:10 ddr Exp $ *)
 
 open Def;
 
@@ -55,7 +55,6 @@ type base_data =
 type base_func =
   { persons_of_name : string -> list iper;
     strings_of_fsname : string -> list istr;
-    index_of_string : string -> istr;
     persons_of_surname : string_person_index;
     persons_of_first_name : string_person_index;
     patch_person : iper -> dsk_person -> unit;
@@ -64,8 +63,8 @@ type base_func =
     patch_family : ifam -> dsk_family -> unit;
     patch_couple : ifam -> dsk_couple -> unit;
     patch_descend : ifam -> dsk_descend -> unit;
-    patch_string : istr -> string -> unit;
     patch_name : string -> iper -> unit;
+    insert_string : string -> istr;
     commit_patches : unit -> unit;
     commit_notes : string -> string -> unit;
     patched_ascends : unit -> list iper;
