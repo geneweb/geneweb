@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.21 2006-10-09 17:57:53 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.22 2006-10-10 18:48:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -169,7 +169,7 @@ value compatible_burials b1 b2 =
 ;
 
 value compatible_strings s1 s2 =
-  s1 = s2 || s2 = Adef.istr_of_int 0 || s1 = Adef.istr_of_int 0;
+  s1 = s2 || is_empty_string s2 || is_empty_string s1;
 
 value compatible_divorces d1 d2 = d1 = d2;
 
@@ -326,45 +326,43 @@ value effective_merge_ind conf base p1 p2 =
            if get_birth p1 = Adef.codate_None then get_birth p2
            else get_birth p1;
          birth_place =
-           if get_birth_place p1 = Adef.istr_of_int 0 then get_birth_place p2
+           if is_empty_string (get_birth_place p1) then get_birth_place p2
            else get_birth_place p1;
          birth_src =
-           if get_birth_src p1 = Adef.istr_of_int 0 then get_birth_src p2
+           if is_empty_string (get_birth_src p1) then get_birth_src p2
            else get_birth_src p1;
          baptism =
            if get_baptism p1 = Adef.codate_None then get_baptism p2
            else get_baptism p1;
          baptism_place =
-           if get_baptism_place p1 = Adef.istr_of_int 0 then
-             get_baptism_place p2
+           if is_empty_string (get_baptism_place p1) then get_baptism_place p2
            else get_baptism_place p1;
          baptism_src =
-           if get_baptism_src p1 = Adef.istr_of_int 0 then get_baptism_src p2
+           if is_empty_string (get_baptism_src p1) then get_baptism_src p2
            else get_baptism_src p1;
          death =
            if get_death p1 = DontKnowIfDead then get_death p2
            else get_death p1;
          death_place =
-           if get_death_place p1 = Adef.istr_of_int 0 then get_death_place p2
+           if is_empty_string (get_death_place p1) then get_death_place p2
            else get_death_place p1;
          death_src =
-           if get_death_src p1 = Adef.istr_of_int 0 then get_death_src p2
+           if is_empty_string (get_death_src p1) then get_death_src p2
            else get_death_src p1;
          burial =
            if get_burial p1 = UnknownBurial then get_burial p2
            else get_burial p1;
          burial_place =
-           if get_burial_place p1 = Adef.istr_of_int 0 then
-             get_burial_place p2
+           if is_empty_string (get_burial_place p1) then get_burial_place p2
            else get_burial_place p1;
          burial_src =
-           if get_burial_src p1 = Adef.istr_of_int 0 then get_burial_src p2
+           if is_empty_string (get_burial_src p1) then get_burial_src p2
            else get_burial_src p1;
          occupation =
-           if get_occupation p1 = Adef.istr_of_int 0 then get_occupation p2
+           if is_empty_string (get_occupation p1) then get_occupation p2
            else get_occupation p1;
          notes =
-           if get_notes p1 = Adef.istr_of_int 0 then get_notes p2
+           if is_empty_string (get_notes p1) then get_notes p2
            else get_notes p1}
     in
     let p2 = UpdateIndOk.effective_del conf base p2 in
@@ -422,15 +420,15 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
          if get_marriage fam1 = Adef.codate_None then get_marriage fam2
          else get_marriage fam1;
        marriage_place =
-         if get_marriage_place fam1 = Adef.istr_of_int 0 then
+         if is_empty_string (get_marriage_place fam1) then
            get_marriage_place fam2
          else get_marriage_place fam1;
        marriage_src =
-         if get_marriage_src fam1 = Adef.istr_of_int 0 then
+         if is_empty_string (get_marriage_src fam1) then
            get_marriage_src fam2
          else get_marriage_src fam1;
        fsources =
-         if get_fsources fam1 = Adef.istr_of_int 0 then get_fsources fam2
+         if is_empty_string (get_fsources fam1) then get_fsources fam2
          else get_fsources fam1}
   in
   do {

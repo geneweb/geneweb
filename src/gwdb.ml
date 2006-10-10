@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.36 2006-10-04 13:21:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.37 2006-10-10 18:48:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -24,6 +24,9 @@ type string_person_index = Dbdisk.string_person_index ==
 ;
 
 type base = Dbdisk.dsk_base;
+
+value is_empty_string istr = Adef.int_of_istr istr = 0;
+value is_quest_string istr = Adef.int_of_istr istr = 1;
 
 value get_access p = p.Def.access;
 value get_aliases p = p.Def.aliases;
