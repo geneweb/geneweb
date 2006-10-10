@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.10 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: place.ml,v 5.11 2006-10-10 19:10:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -65,29 +65,27 @@ value get_all conf base =
     in
     incr cnt
   in
-  let empty =
-    try base_index_of_string base "" with [ Not_found -> Adef.istr_of_int 0 ]
-  in
   do {
     if add_birth || add_death then
       let rec loop i =
         if i = nb_of_persons base then ()
         else do {
           let p = pget conf base (Adef.iper_of_int i) in
-          let pl_bi = if add_birth then get_birth_place p else empty in
-          let pl_bp = if add_birth then get_baptism_place p else empty in
-          let pl_de = if add_death then get_death_place p else empty in
-          let pl_bu = if add_death then get_burial_place p else empty in
-          if pl_bi == empty && pl_bp == empty && pl_de == empty &&
-             pl_bu == empty ||
-             not (fast_auth_age conf p)
+          let pl_bi = get_birth_place p in
+          let pl_bp = get_baptism_place p in
+          let pl_de = get_death_place p in
+          let pl_bu = get_burial_place p in
+          if (not add_birth || is_empty_string pl_bi) &&
+             (not add_birth || is_empty_string pl_bp) &&
+             (not add_death || is_empty_string pl_de) &&
+             (not add_death || is_empty_string pl_bu)
           then
             ()
           else do {
-            if pl_bi != empty then ht_add pl_bi p else ();
-            if pl_bp != empty then ht_add pl_bp p else ();
-            if pl_de != empty then ht_add pl_de p else ();
-            if pl_bu != empty then ht_add pl_bu p else ()
+            if not (is_empty_string pl_bi) then ht_add pl_bi p else ();
+            if not (is_empty_string pl_bp) then ht_add pl_bp p else ();
+            if not (is_empty_string pl_de) then ht_add pl_de p else ();
+            if not (is_empty_string pl_bu) then ht_add pl_bu p else ()
           };
           loop (i + 1)
         }
@@ -102,7 +100,7 @@ value get_all conf base =
           if is_deleted_family fam then ()
           else
             let pl_ma = get_marriage_place fam in
-            if pl_ma <> empty then
+            if not (is_empty_string pl_ma) then
               let cpl = coi base (get_fam_index fam) in
               let fath = pget conf base (get_father cpl) in
               let moth = pget conf base (get_mother cpl) in
