@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.42 2006-10-10 21:46:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.43 2006-10-10 22:06:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -99,7 +99,7 @@ value foi base i = base.data.families.get (Adef.int_of_ifam i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value doi base i = base.data.descends.get (Adef.int_of_ifam i);
 
-value sou base i = base.data.strings.get i.istr;
+value sou base i = base.data.strings.get i;
 
 value p_first_name base p = nominative (sou base p.first_name);
 value p_surname base p = nominative (sou base p.surname);
@@ -905,8 +905,8 @@ value add_string gen s =
         assume_tab "gen.g_str" gen.g_str "";
         gen.g_str.arr.(i) := s;
         gen.g_str.tlen := gen.g_str.tlen + 1;
-        Hashtbl.add gen.g_hstr s {istr = i};
-        {istr = i}
+        Hashtbl.add gen.g_hstr s i;
+        i
       } ]
 ;        
 
@@ -948,9 +948,9 @@ value fam_index gen lab =
       } ]
 ;
 
-value string_empty = {istr = 0};
-value string_quest = {istr = 1};
-value string_x = {istr = 2};
+value string_empty = 0;
+value string_quest = 1;
+value string_x = 2;
 
 value unknown_per gen i sex =
   let empty = string_empty in
@@ -2047,7 +2047,7 @@ value add_fam_norm gen r adop_list =
       match gen.g_per.arr.(Adef.int_of_iper iper) with
       [ Left3 _ -> ()
       | Right3 p a u ->
-          let notes = gen.g_str.arr.((get_notes p).istr) in
+          let notes = gen.g_str.arr.(get_notes p) in
           let notes =
             if notes = "" then ext_sources ^ ext_notes 
             else if ext_sources = "" then notes ^ "\n" ^ ext_notes
@@ -2336,8 +2336,8 @@ value add_parents_to_isolated gen =
            Array.length (get_family u) = 0 && get_rparents p = [] &&
            get_related p = []
         then
-          let fn = gen.g_str.arr.((get_first_name p).istr) in
-          let sn = gen.g_str.arr.((get_surname p).istr) in
+          let fn = gen.g_str.arr.(get_first_name p) in
+          let sn = gen.g_str.arr.(get_surname p) in
           if fn = "?" && sn = "?" then ()
           else do {
             fprintf log_oc.val
