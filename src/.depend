@@ -67,7 +67,7 @@ date.cmx: adef.cmx buff.cmx calendar.cmx checkItem.cmx config.cmi def.cmi \
     gutil.cmx gwdb.cmx mutil.cmx num.cmx templ.cmx templAst.cmi util.cmx \
     ../wserver/wserver.cmx date.cmi 
 date.cmi: config.cmi def.cmi gwdb.cmi 
-dbdisk.cmi: def.cmi 
+dbdisk.cmi: adef.cmi def.cmi 
 def.cmi: adef.cmi 
 descend.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
     def.cmi gutil.cmi gwdb.cmi mutil.cmi perso.cmi util.cmi \

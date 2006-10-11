@@ -1,8 +1,9 @@
-(* $Id: adef.mli,v 5.3 2006-10-10 21:46:35 ddr Exp $ *)
+(* $Id: adef.mli,v 5.4 2006-10-11 05:16:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type iper = 'a;
 type ifam = 'a;
+type istr = 'a;
 type fix = 'a;
 type cdate = 'a;
 type codate = 'a;
@@ -42,6 +43,8 @@ external int_of_iper : iper -> int = "%identity";
 external iper_of_int : int -> iper = "%identity";
 external int_of_ifam : ifam -> int = "%identity";
 external ifam_of_int : int -> ifam = "%identity";
+external int_of_istr : istr -> int = "%identity";
+external istr_of_int : int -> istr = "%identity";
 
 exception Request_failure of string;
 
