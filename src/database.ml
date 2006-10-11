@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.5 2006-10-10 22:06:00 ddr Exp $ *)
+(* $Id: database.ml,v 5.6 2006-10-11 05:16:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -133,7 +133,7 @@ value hashtbl_right_assoc s ht =
 ;
 
 value index_of_string strings ic start_pos hash_len string_patches s =
-  try hashtbl_right_assoc s string_patches with
+  try Adef.istr_of_int (hashtbl_right_assoc s string_patches) with
   [ Not_found ->
       match (ic, hash_len) with
       [ (Some ic, Some hash_len) ->
@@ -143,7 +143,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
             let i1 = input_binary_int ic in
             let rec loop i =
               if i == -1 then raise Not_found
-              else if strings.get i = s then i
+              else if strings.get i = s then Adef.istr_of_int i
               else do {
                 seek_in ic (start_pos + (hash_len + i) * int_size);
                 loop (input_binary_int ic)
@@ -265,7 +265,8 @@ flush stderr;
   in
   let cursor str =
     IstrTree.key_after
-      (fun key -> compare_names base_data str (strings.get key))
+      (fun key ->
+         compare_names base_data str (strings.get (Adef.int_of_istr key)))
       (bt None)
   in
   let next key = IstrTree.next key (bt None) in
@@ -363,7 +364,8 @@ flush stderr;
   in
   let cursor str =
     IstrTree.key_after
-      (fun key -> compare_names base_data str (strings.get key))
+      (fun key ->
+         compare_names base_data str (strings.get (Adef.int_of_istr key)))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -464,14 +466,14 @@ value strings_of_fsname bname strings (_, person_patches) =
         (fun _ p ->
            do {
              if not (List.memq p.first_name l.val) then
-               let s1 = strings.get p.first_name in
+               let s1 = strings.get (Adef.int_of_istr p.first_name) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.first_name :: l.val]
                else ()
              else ();
              if not (List.memq p.surname l.val) then
-               let s1 = strings.get p.surname in
+               let s1 = strings.get (Adef.int_of_istr p.surname) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.surname :: l.val]
@@ -1021,7 +1023,7 @@ value opendb bname =
         strings.len := max strings.len (i + 1);
         (fst patches.h_string).val := i;
         Hashtbl.replace (snd patches.h_string) i s;
-        i
+        Adef.istr_of_int i
       } ]
   in
   let patch_name s ip =

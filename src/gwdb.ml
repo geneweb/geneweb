@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.41 2006-10-10 22:06:01 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.42 2006-10-11 05:16:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -27,8 +27,8 @@ type string_person_index = Dbdisk.string_person_index ==
 
 type base = Dbdisk.dsk_base;
 
-value is_empty_string istr = istr = 0;
-value is_quest_string istr = istr = 1;
+value is_empty_string istr = istr = Adef.istr_of_int 0;
+value is_quest_string istr = istr = Adef.istr_of_int 1;
 
 value get_access p = p.Def.access;
 value get_aliases p = p.Def.aliases;
@@ -78,7 +78,7 @@ value ascend_with_parents a p = {parents = p; consang = a.consang};
 value ascend_of_gen_ascend a = a;
 
 value empty_person ip =
-  let empty_string = 0 in
+  let empty_string = Adef.istr_of_int 0 in
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
@@ -130,7 +130,7 @@ value foi base i = base.data.families.get (Adef.int_of_ifam i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value doi base i = base.data.descends.get (Adef.int_of_ifam i);
 
-value sou base i = base.data.strings.get i;
+value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
 value nb_of_persons base = base.data.persons.len;
 value nb_of_families base = base.data.families.len;

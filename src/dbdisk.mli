@@ -1,8 +1,8 @@
-(* $Id: dbdisk.mli,v 5.8 2006-10-10 22:06:00 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.9 2006-10-11 05:16:57 ddr Exp $ *)
 
 open Def;
 
-type dsk_istr = int;
+type dsk_istr = Adef.istr;
 
 type dsk_person = gen_person iper dsk_istr;
 type dsk_ascend = gen_ascend ifam;
