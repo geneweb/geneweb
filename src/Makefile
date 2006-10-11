@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.17 2006-10-08 05:33:16 ddr Exp $
+# $Id: Makefile,v 5.18 2006-10-11 05:43:55 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -30,7 +30,7 @@ out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out update_nldb.out 
 	cp update_nldb.out update_nldb
 
 opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt update_nldb.opt
-	$(RM) gwd consang gwd gwu
+	$(RM) gwc consang gwd gwu
 	cp gwc.opt gwc
 	cp consang.opt consang
 	cp gwd.opt gwd
