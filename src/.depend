@@ -92,6 +92,9 @@ forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx mutil.cmx name.cmx \
     ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi gwdb.cmi secure.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx secure.cmx 
+futil.cmo: adef.cmi def.cmi futil.cmi 
+futil.cmx: adef.cmx def.cmi futil.cmi 
+futil.cmi: def.cmi 
 gutil.cmo: adef.cmi buff.cmo checkItem.cmi database.cmi def.cmi gwdb.cmi \
     mutil.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx buff.cmx checkItem.cmx database.cmx def.cmi gwdb.cmx \
@@ -140,11 +143,11 @@ mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gwdb.cmi mergeFamOk.cmo \
     util.cmi ../wserver/wserver.cmi 
 mergeFam.cmx: adef.cmx config.cmi date.cmx def.cmi gwdb.cmx mergeFamOk.cmx \
     util.cmx ../wserver/wserver.cmx 
-mergeFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi gwdb.cmi history.cmi \
-    merge.cmi update.cmi updateFam.cmi updateFamOk.cmo util.cmi \
+mergeFamOk.cmo: adef.cmi config.cmi def.cmi futil.cmi gutil.cmi gwdb.cmi \
+    history.cmi merge.cmi update.cmi updateFam.cmi updateFamOk.cmo util.cmi \
     ../wserver/wserver.cmi 
-mergeFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx gwdb.cmx history.cmx \
-    merge.cmx update.cmx updateFam.cmx updateFamOk.cmx util.cmx \
+mergeFamOk.cmx: adef.cmx config.cmi def.cmi futil.cmx gutil.cmx gwdb.cmx \
+    history.cmx merge.cmx update.cmx updateFam.cmx updateFamOk.cmx util.cmx \
     ../wserver/wserver.cmx 
 mergeInd.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
     history.cmi merge.cmi mergeFam.cmo notes.cmi notesLinks.cmo update.cmi \
@@ -152,12 +155,12 @@ mergeInd.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
 mergeInd.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx merge.cmx mergeFam.cmx notes.cmx notesLinks.cmx update.cmx \
     updateFamOk.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
-mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi gwdb.cmi \
-    history.cmi merge.cmi mergeInd.cmo mutil.cmi update.cmi updateInd.cmi \
-    updateIndOk.cmi util.cmi ../wserver/wserver.cmi 
-mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx gwdb.cmx \
-    history.cmx merge.cmx mergeInd.cmx mutil.cmx update.cmx updateInd.cmx \
-    updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
+mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi futil.cmi gutil.cmi \
+    gwdb.cmi history.cmi merge.cmi mergeInd.cmo mutil.cmi update.cmi \
+    updateInd.cmi updateIndOk.cmi util.cmi ../wserver/wserver.cmi 
+mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi futil.cmx gutil.cmx \
+    gwdb.cmx history.cmx merge.cmx mergeInd.cmx mutil.cmx update.cmx \
+    updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi database.cmi gwdb.cmi \
     lock.cmi mutil.cmi outbase.cmi secure.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx database.cmx gwdb.cmx \
@@ -276,32 +279,34 @@ update.cmx: adef.cmx calendar.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx iovalue.cmx util.cmx ../wserver/wserver.cmx \
     update.cmi 
 update.cmi: adef.cmi checkItem.cmi config.cmi def.cmi gwdb.cmi 
-updateFam.cmo: adef.cmi calendar.cmi config.cmi def.cmi gutil.cmi gwdb.cmi \
-    templ.cmi templAst.cmi update.cmi util.cmi ../wserver/wserver.cmi \
-    updateFam.cmi 
-updateFam.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx gwdb.cmx \
-    templ.cmx templAst.cmi update.cmx util.cmx ../wserver/wserver.cmx \
-    updateFam.cmi 
+updateFam.cmo: adef.cmi calendar.cmi config.cmi def.cmi futil.cmi gutil.cmi \
+    gwdb.cmi templ.cmi templAst.cmi update.cmi util.cmi \
+    ../wserver/wserver.cmi updateFam.cmi 
+updateFam.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gutil.cmx \
+    gwdb.cmx templ.cmx templAst.cmi update.cmx util.cmx \
+    ../wserver/wserver.cmx updateFam.cmi 
 updateFam.cmi: config.cmi def.cmi gwdb.cmi update.cmi 
 updateFamOk.cmo: adef.cmi checkItem.cmi config.cmi consang.cmi def.cmi \
-    gutil.cmi gwdb.cmi history.cmi mutil.cmi update.cmi updateFam.cmi \
-    util.cmi ../wserver/wserver.cmi 
+    futil.cmi gutil.cmi gwdb.cmi history.cmi mutil.cmi update.cmi \
+    updateFam.cmi util.cmi ../wserver/wserver.cmi 
 updateFamOk.cmx: adef.cmx checkItem.cmx config.cmi consang.cmx def.cmi \
-    gutil.cmx gwdb.cmx history.cmx mutil.cmx update.cmx updateFam.cmx \
-    util.cmx ../wserver/wserver.cmx 
-updateInd.cmo: adef.cmi calendar.cmi config.cmi def.cmi gutil.cmi gwdb.cmi \
+    futil.cmx gutil.cmx gwdb.cmx history.cmx mutil.cmx update.cmx \
+    updateFam.cmx util.cmx ../wserver/wserver.cmx 
+updateInd.cmo: adef.cmi calendar.cmi config.cmi def.cmi futil.cmi gwdb.cmi \
     templ.cmi templAst.cmi update.cmi util.cmi ../wserver/wserver.cmi \
     updateInd.cmi 
-updateInd.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx gwdb.cmx \
+updateInd.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gwdb.cmx \
     templ.cmx templAst.cmi update.cmx util.cmx ../wserver/wserver.cmx \
     updateInd.cmi 
 updateInd.cmi: config.cmi def.cmi gwdb.cmi update.cmi 
-updateIndOk.cmo: adef.cmi checkItem.cmi config.cmi def.cmi gutil.cmi \
-    gwdb.cmi history.cmi mutil.cmi name.cmi notes.cmi notesLinks.cmo \
-    update.cmi updateInd.cmi util.cmi ../wserver/wserver.cmi updateIndOk.cmi 
-updateIndOk.cmx: adef.cmx checkItem.cmx config.cmi def.cmi gutil.cmx \
-    gwdb.cmx history.cmx mutil.cmx name.cmx notes.cmx notesLinks.cmx \
-    update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx updateIndOk.cmi 
+updateIndOk.cmo: adef.cmi checkItem.cmi config.cmi def.cmi futil.cmi \
+    gutil.cmi gwdb.cmi history.cmi mutil.cmi name.cmi notes.cmi \
+    notesLinks.cmo update.cmi updateInd.cmi util.cmi ../wserver/wserver.cmi \
+    updateIndOk.cmi 
+updateIndOk.cmx: adef.cmx checkItem.cmx config.cmi def.cmi futil.cmx \
+    gutil.cmx gwdb.cmx history.cmx mutil.cmx name.cmx notes.cmx \
+    notesLinks.cmx update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx \
+    updateIndOk.cmi 
 updateIndOk.cmi: checkItem.cmi config.cmi def.cmi gwdb.cmi update.cmi 
 update_nldb.cmo: adef.cmi argl.cmo buff.cmo database.cmi def.cmi gwdb.cmi \
     notesLinks.cmo progrBar.cmi secure.cmi 

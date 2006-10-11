@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.21 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.22 2006-10-11 19:52:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -20,19 +20,6 @@ value find_same_name : base -> person -> list person;
 
 value designation : base -> person -> string;
 
-value map_title_strings : ('a -> 'b) -> gen_title 'a -> gen_title 'b;
-value map_relation_ps :
-  ('a -> 'c) -> ('b -> 'd) -> gen_relation 'a 'b -> gen_relation 'c 'd
-;
-value map_person_ps :
-  ('a -> 'c) -> ('b -> 'd) -> gen_person 'a 'b -> gen_person 'c 'd
-;
-value map_family_ps :
-  ('a -> 'c) -> ('b -> 'd) -> gen_family 'a 'b -> gen_family 'c 'd
-;
-value map_couple_p : bool -> ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
-value map_descend_p : ('a -> 'b) -> gen_descend 'a -> gen_descend 'b;
-
 value strip_spaces : string -> string;
 value gen_strip_spaces : bool -> string -> string;
 value alphabetic_utf_8 : string -> string -> int;
@@ -49,7 +36,6 @@ value sort_person_list : base -> list person -> list person;
 value father : gen_couple 'a -> 'a;
 value mother : gen_couple 'a -> 'a;
 value couple : bool -> 'a -> 'a -> gen_couple 'a;
-value parent : bool -> array 'a -> gen_couple 'a;
 value parent_array : gen_couple 'a -> array 'a;
 
 value no_ascend : unit -> ascend;

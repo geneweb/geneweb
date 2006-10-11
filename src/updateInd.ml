@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.7 2006-09-30 18:45:55 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.8 2006-10-11 19:52:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ value string_person_of base p =
     (sou base (get_first_name p), sou base (get_surname p), get_occ p,
      Update.Link, "")
   in
-  Gutil.map_person_ps fp (sou base) (gen_person_of_person p)
+  Futil.map_person_ps fp (sou base) (gen_person_of_person p)
 ;
 
 (* Interpretation of template file 'updind.txt' *)
