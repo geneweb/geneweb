@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.1 2006-10-12 10:25:49 ddr Exp $ *)
+(* $Id: launch.ml,v 1.2 2006-10-12 11:06:09 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -9,13 +9,15 @@ type state =
     config_env : mutable list (string * string);
     bin_dir : mutable string;
     sys_dir : mutable string;
+    port : mutable int;
+    browser : mutable option string;
     bases_dir : mutable string;
     server_running : mutable bool }
 ;
 
 value config_file = Filename.concat "gw" "config.txt";
 
-value port = 6264;
+value default_port = 2317;
 value default_bin_dir = "../src";
 value default_sys_dir = "../hd";
 value default_bases_dir = "../../gwbases";
@@ -63,21 +65,21 @@ value exec prog args out err =
   Unix.create_process prog (Array.of_list [prog :: args]) Unix.stdin out err
 ;
 
-value close_server () = do {
+value close_server state = do {
   eprintf "Closing..."; flush stderr;
   (* If the server detects the presence of the file STOP_SERVER, it stops *)
   let oc = open_out "STOP_SERVER" in
   close_out oc;
   (* Send a phony connection to unblock it. *)
   let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
-  try Unix.connect s (Unix.ADDR_INET Unix.inet_addr_loopback port) with
+  try Unix.connect s (Unix.ADDR_INET Unix.inet_addr_loopback state.port) with
   [ Unix.Unix_error _ _ _ -> () ];
   try Unix.close s with
   [ Unix.Unix_error _ _ _ -> () ];
   eprintf "\n"; flush stderr;
 };
 
-value browse browser dbn () =
+value browse browser port dbn () =
   let pid =
     match browser with
     [ Some browser ->
@@ -98,7 +100,7 @@ value browse browser dbn () =
 ;
 
 value close_app state = do {
-  if state.server_running then close_server () else ();
+  if state.server_running then close_server state else ();
 };
 
 value window_centering win = do {
@@ -120,25 +122,7 @@ value window_centering win = do {
   (frame2, main_frame)
 };
 
-value continue_with_browser state browser = do {
-  match browser with
-  [ Some browser -> eprintf "browser = %s\n" browser
-  | None -> eprintf "no browser\n" ];
-  flush stderr;
-  match browser with
-  [ Some browser ->
-      let config_env_browser =
-        try List.assoc "browser" state.config_env with
-        [ Not_found -> "" ]
-      in
-      if browser <> "" && browser <> config_env_browser then do {
-        state.config_env :=
-          List.filter (fun (v, _) -> v <> "browser") state.config_env @
-          [("browser", browser)];
-        write_config_env state.config_env
-      }
-      else ()
-  | None -> () ];
+value finish state = do {
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
@@ -159,7 +143,8 @@ value continue_with_browser state browser = do {
          let frame = Frame.create run_frame [] in
          let blab = Label.create frame [Text dbn] in
          let bbut =
-           Button.create frame [Text "Browse"; Command (browse browser dbn)]
+           Button.create frame
+             [Text "Browse"; Command (browse state.browser state.port dbn)]
          in
          pack [blab] [Side Side_Left];
          pack [bbut] [Side Side_Right];
@@ -195,8 +180,9 @@ value continue_with_bases_dir state bases_dir = do {
   try Sys.remove "STOP_SERVER" with [ Sys_error _ -> () ];
   let server_pid =
     exec (Filename.concat state.bin_dir "gwd")
-      ["-p"; sprintf "%d" port; "-only"; "localhost"; "-only"; "127.0.0.1";
-       "-only"; only; "-hd"; state.sys_dir; "-bd"; bases_dir; "-blang"] fd fd
+      ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
+       "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd"; bases_dir;
+       "-blang"] fd fd
   in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
   if pid = 0 then ()
@@ -208,6 +194,65 @@ value continue_with_bases_dir state bases_dir = do {
     exit 2;
   };
   state.server_running := True;
+  finish state;
+};
+
+value continue_with_browser state browser = do {
+  match browser with
+  [ Some browser -> eprintf "browser = %s\n" browser
+  | None -> eprintf "no browser\n" ];
+  flush stderr;
+  match browser with
+  [ Some browser ->
+      let config_env_browser =
+        try List.assoc "browser" state.config_env with
+        [ Not_found -> "" ]
+      in
+      if browser <> "" && browser <> config_env_browser then do {
+        state.config_env :=
+          List.filter (fun (v, _) -> v <> "browser") state.config_env @
+          [("browser", browser)];
+        write_config_env state.config_env
+      }
+      else ()
+  | None -> () ];
+  state.browser := browser;
+  try
+    continue_with_bases_dir state (List.assoc "bases_dir" state.config_env)
+  with
+  [ Not_found -> do {
+      let (frame, gframe) = window_centering state.tk_win in
+      let tit = Label.create frame [Text "Databases directory:"] in
+      let lab = Label.create frame [Text default_bases_dir] in
+      let but =
+        Button.create frame
+          [Text "OK";
+           Command
+             (fun () -> do {
+                Pack.forget [gframe];
+                continue_with_bases_dir state default_bases_dir
+              })]
+      in
+      pack [tit; lab; but] [];
+    } ]
+};
+
+value continue_with_port state port = do {
+  eprintf "port = %d\n" port;
+  flush stderr;
+  let config_env_port =
+    try int_of_string (List.assoc "port" state.config_env) with
+    [ Failure _ | Not_found -> 0 ]
+  in
+  if port <> config_env_port || not (Sys.file_exists config_file)
+  then do {
+    state.config_env :=
+      List.filter (fun (v, _) -> v <> "port") state.config_env @
+      [("port", string_of_int port)];
+    write_config_env state.config_env
+  }
+  else ();
+  state.port := port;
   try
     continue_with_browser state
       (Some (List.assoc "browser" state.config_env))
@@ -286,19 +331,20 @@ value continue_with_sys_dir state sys_dir = do {
   else ();
   state.sys_dir := sys_dir;
   try
-    continue_with_bases_dir state (List.assoc "bases_dir" state.config_env)
+    continue_with_port state
+      (int_of_string (List.assoc "port" state.config_env))
   with
   [ Not_found -> do {
       let (frame, gframe) = window_centering state.tk_win in
-      let tit = Label.create frame [Text "Databases directory:"] in
-      let lab = Label.create frame [Text default_bases_dir] in
+      let tit = Label.create frame [Text "Port:"] in
+      let lab = Label.create frame [Text (string_of_int default_port)] in
       let but =
         Button.create frame
           [Text "OK";
            Command
              (fun () -> do {
                 Pack.forget [gframe];
-                continue_with_bases_dir state default_bases_dir
+                continue_with_port state default_port
               })]
       in
       pack [tit; lab; but] [];
@@ -346,7 +392,7 @@ value main () = do {
   let win = openTk () in
   let state =
     {config_env = config_env; tk_win = win; bin_dir = ""; sys_dir = "";
-     bases_dir = ""; server_running = False}
+     port = 0; browser = None; bases_dir = ""; server_running = False}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 300 200;
