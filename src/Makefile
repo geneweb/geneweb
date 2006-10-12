@@ -1,20 +1,20 @@
-# $Id: Makefile,v 5.19 2006-10-11 19:52:35 ddr Exp $
+# $Id: Makefile,v 5.20 2006-10-12 03:05:26 ddr Exp $
 
 include ../tools/Makefile.inc
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
-GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo gwdb.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo gwc.cmo
-CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo gwdb.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo templ.cmo date.cmo update.cmo notesLinks.cmo wiki.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo futil.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
+GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo futil.cmo gwdb.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo gwc.cmo
+CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo futil.cmo gwdb.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo mk_consang.cmo
+GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo futil.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo templ.cmo date.cmo update.cmo notesLinks.cmo wiki.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo doc.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
-GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo calendar.cmo notesLinks.cmo gwu.cmo
+GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo futil.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo calendar.cmo notesLinks.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
-MOSTDESC_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo dutil.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo dutil.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo fpla.cmo
-UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo mutil.cmo btree.cmo dutil.cmo database.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
+MOSTDESC_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo dutil.cmo futil.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo dutil.cmo futil.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo fpla.cmo
+UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo mutil.cmo btree.cmo dutil.cmo database.cmo futil.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
 
 all:: out
 
