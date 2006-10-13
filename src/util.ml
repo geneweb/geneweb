@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.46 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: util.ml,v 5.47 2006-10-13 18:44:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -508,7 +508,7 @@ value parent_has_title conf base p =
 ;
 
 value authorized_age conf base p =
-  if get_access p = Public || conf.friend || conf.wizard then True
+  if conf.wizard || conf.friend || get_access p = Public then True
   else if
     conf.public_if_titles && get_access p = IfTitles &&
     (nobtit conf base p <> [] || parent_has_title conf base p) then
