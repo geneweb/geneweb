@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.2 2006-10-12 11:06:09 ddr Exp $ *)
+(* $Id: launch.ml,v 1.3 2006-10-13 01:43:58 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -396,9 +396,6 @@ value main () = do {
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 300 200;
-(*
-  Wm.maxsize_set state.tk_win 300 200;
-*)
   try continue_with_bin_dir state (List.assoc "bin_dir" config_env) with
   [ Not_found -> do {
       let (frame, gframe) = window_centering win in
