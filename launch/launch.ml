@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.3 2006-10-13 01:43:58 ddr Exp $ *)
+(* $Id: launch.ml,v 1.4 2006-10-13 13:01:56 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -143,8 +143,9 @@ value finish state = do {
          let frame = Frame.create run_frame [] in
          let blab = Label.create frame [Text dbn] in
          let bbut =
+           let bn = Filename.chop_extension dbn in
            Button.create frame
-             [Text "Browse"; Command (browse state.browser state.port dbn)]
+             [Text "Browse"; Command (browse state.browser state.port bn)]
          in
          pack [blab] [Side Side_Left];
          pack [bbut] [Side Side_Right];
