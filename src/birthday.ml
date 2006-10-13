@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.10 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.11 2006-10-13 13:01:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -432,10 +432,11 @@ value gen_print_menu_birth conf base f_scan mode =
 
 value print_menu_birth conf base =
   let i = ref (-1) in
+  let nb_per = nb_of_persons base in
   let f_scan () =
     do {
       incr i;
-      if i.val < nb_of_persons base then
+      if i.val < nb_per then
         (pget conf base (Adef.iper_of_int i.val),
          referenced_person_title_text)
       else raise Not_found
