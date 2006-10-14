@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.10 2006-10-14 16:28:00 ddr Exp $ *)
+(* $Id: launch.ml,v 1.11 2006-10-14 18:21:42 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -131,12 +131,12 @@ value tk_getOpenDir initialdir =
   if res = "" then initialdir else res
 ;
 
-value continue with_f state title v def select to_string from_string prev =
+value config state title v def select to_string from_string prev next =
   match
     try Some (from_string (v ())) with
     [ Failure _ | Not_found -> None ]
   with
-  [ Some v -> with_f state v
+  [ Some v -> next state v
   | None -> do {
       let (frame, gframe) = window_centering state.tk_win in
       let tit = Label.create frame [Text (title ())] in
@@ -155,7 +155,7 @@ value continue with_f state title v def select to_string from_string prev =
         [ Some d -> do {
             bind sel ev_seq BindRemove;
             Pack.forget [gframe];
-            with_f state d
+            next state d
           }
         | None -> () ]
       in
@@ -194,7 +194,28 @@ value continue with_f state title v def select to_string from_string prev =
     } ]
 ;
 
-value finish state = do {
+value launch_server state = do {
+  let only = Unix.gethostname () in
+  let fd =
+    Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o644
+  in
+  try Sys.remove "STOP_SERVER" with [ Sys_error _ -> () ];
+  let server_pid =
+    exec (Filename.concat state.bin_dir "gwd")
+      ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
+       "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
+       state.bases_dir; "-blang"] fd fd
+  in
+  let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
+  if pid = 0 then ()
+  else do {
+    eprintf "Cannot launch the server:";
+    eprintf " perhaps another server is running.\n";
+    eprintf "You must close it, if you want to try again.\n";
+    flush stderr;
+    exit 2;
+  };
+  state.server_running := True;
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
@@ -229,69 +250,8 @@ value finish state = do {
   pack [wbut] [Fill Fill_X];
 };
 
-value with_bases_dir state bases_dir = do {
-  eprintf "bases_dir = %s\n" bases_dir;
-  flush stderr;
-  let config_env_bases_dir =
-    try List.assoc "bases_dir" state.config_env with
-    [ Not_found -> "" ]
-  in
-  if bases_dir <> config_env_bases_dir || not (Sys.file_exists config_file)
-  then do {
-    state.config_env :=
-      List.filter (fun (v, _) -> v <> "bases_dir") state.config_env @
-      [("bases_dir", bases_dir)];
-    write_config_env state.config_env
-  }
-  else ();
-  state.bases_dir := bases_dir;
-  mkdir_p bases_dir;
-  let only = Unix.gethostname () in
-  let fd =
-    Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o644
-  in
-  try Sys.remove "STOP_SERVER" with [ Sys_error _ -> () ];
-  let server_pid =
-    exec (Filename.concat state.bin_dir "gwd")
-      ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
-       "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd"; bases_dir;
-       "-blang"] fd fd
-  in
-  let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
-  if pid = 0 then ()
-  else do {
-    eprintf "Cannot launch the server:";
-    eprintf " perhaps another server is running.\n";
-    eprintf "You must close it, if you want to try again.\n";
-    flush stderr;
-    exit 2;
-  };
-  state.server_running := True;
-  finish state;
-};
-
-value with_browser state browser = do {
-  match browser with
-  [ Some browser -> eprintf "browser = %s\n" browser
-  | None -> eprintf "no browser\n" ];
-  flush stderr;
-  match browser with
-  [ Some browser ->
-      let config_env_browser =
-        try List.assoc "browser" state.config_env with
-        [ Not_found -> "" ]
-      in
-      if browser <> "" && browser <> config_env_browser then do {
-        state.config_env :=
-          List.filter (fun (v, _) -> v <> "browser") state.config_env @
-          [("browser", browser)];
-        write_config_env state.config_env
-      }
-      else ()
-  | None -> () ];
-  state.browser := browser;
-
-  continue with_bases_dir state (fun () -> "Databases directory:")
+value config_bases_dir state = do {
+  config state (fun () -> "Databases directory:")
     (fun () -> List.assoc "bases_dir" state.config_env) default_bases_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
@@ -308,24 +268,28 @@ value with_browser state browser = do {
        sframe
      })
     (fun s -> s) (fun s -> s) (Some (fun () -> ()))
+    (fun state bases_dir -> do {
+       eprintf "bases_dir = %s\n" bases_dir;
+       flush stderr;
+       let config_env_bases_dir =
+         try List.assoc "bases_dir" state.config_env with
+         [ Not_found -> "" ]
+       in
+       if bases_dir <> config_env_bases_dir || not (Sys.file_exists config_file)
+       then do {
+         state.config_env :=
+           List.filter (fun (v, _) -> v <> "bases_dir") state.config_env @
+           [("bases_dir", bases_dir)];
+         write_config_env state.config_env
+       }
+       else ();
+       state.bases_dir := bases_dir;
+       mkdir_p bases_dir;
+       launch_server state
+     })
 };
 
-value with_port state port = do {
-  eprintf "port = %d\n" port;
-  flush stderr;
-  let config_env_port =
-    try int_of_string (List.assoc "port" state.config_env) with
-    [ Failure _ | Not_found -> 0 ]
-  in
-  if port <> config_env_port || not (Sys.file_exists config_file)
-  then do {
-    state.config_env :=
-      List.filter (fun (v, _) -> v <> "port") state.config_env @
-      [("port", string_of_int port)];
-    write_config_env state.config_env
-  }
-  else ();
-  state.port := port;
+value config_browser state = do {
   let default_sys_bin_dir =
     match Sys.os_type with
     [ "Win32" | "Cygwin" -> "C:\\Program Files"
@@ -427,30 +391,36 @@ value with_port state port = do {
     let s = if s = "other:" then "" else s in
     if s = "" then None else Some s
   in
-  continue with_browser state
+  config state
     (fun () -> if Lazy.force browsers = [] then "Browser:" else "Browser(s):")
     (fun () -> List.assoc "browser" state.config_env)
     None select to_string from_string (Some (fun () -> ()))
+    (fun state browser -> do {
+       match browser with
+       [ Some browser -> eprintf "browser = %s\n" browser
+       | None -> eprintf "no browser\n" ];
+       flush stderr;
+       match browser with
+       [ Some browser ->
+           let config_env_browser =
+             try List.assoc "browser" state.config_env with
+             [ Not_found -> "" ]
+           in
+           if browser <> "" && browser <> config_env_browser then do {
+             state.config_env :=
+               List.filter (fun (v, _) -> v <> "browser") state.config_env @
+               [("browser", browser)];
+             write_config_env state.config_env
+           }
+           else ()
+       | None -> () ];
+       state.browser := browser;
+       config_bases_dir state
+     })
 };
 
-value with_sys_dir state sys_dir = do {
-  eprintf "sys_dir = %s\n" sys_dir;
-  flush stderr;
-  let config_env_sys_dir =
-    try List.assoc "sys_dir" state.config_env with
-    [ Not_found -> "" ]
-  in
-  if sys_dir <> config_env_sys_dir || not (Sys.file_exists config_file)
-  then do {
-    state.config_env :=
-      List.filter (fun (v, _) -> v <> "sys_dir") state.config_env @
-      [("sys_dir", sys_dir)];
-    write_config_env state.config_env
-  }
-  else ();
-  state.sys_dir := sys_dir;
-
-  continue with_port state (fun () -> "Port:")
+value config_port state = do {
+  config state (fun () -> "Port:")
     (fun () -> List.assoc "port" state.config_env) default_port
     (fun frame var -> do {
        let ent = Entry.create frame [TextWidth 5; TextVariable var] in
@@ -462,26 +432,28 @@ value with_sys_dir state sys_dir = do {
        let i = int_of_string s in
        if i < 1024 then failwith "bad value" else i)
     (Some (fun () -> ()))
+    (fun state port -> do {
+       eprintf "port = %d\n" port;
+       flush stderr;
+       let config_env_port =
+         try int_of_string (List.assoc "port" state.config_env) with
+         [ Failure _ | Not_found -> 0 ]
+       in
+       if port <> config_env_port || not (Sys.file_exists config_file)
+       then do {
+         state.config_env :=
+           List.filter (fun (v, _) -> v <> "port") state.config_env @
+           [("port", string_of_int port)];
+         write_config_env state.config_env
+       }
+       else ();
+       state.port := port;
+       config_browser state
+     })
 };
 
-value with_bin_dir state bin_dir = do {
-  eprintf "bin_dir = %s\n" bin_dir;
-  flush stderr;
-  let config_env_bin_dir =
-    try List.assoc "bin_dir" state.config_env with
-    [ Not_found -> "" ]
-  in
-  if bin_dir <> config_env_bin_dir || not (Sys.file_exists config_file)
-  then do {
-    state.config_env :=
-      List.filter (fun (v, _) -> v <> "bin_dir") state.config_env @
-      [("bin_dir", bin_dir)];
-    write_config_env state.config_env
-  }
-  else ();
-  state.bin_dir := bin_dir;
-
-  continue with_sys_dir state (fun () -> "GeneWeb system directory:")
+value config_sys_dir state = do {
+  config state (fun () -> "GeneWeb system directory:")
     (fun () -> List.assoc "sys_dir" state.config_env)
     default_sys_dir
     (fun frame var -> do {
@@ -498,12 +470,30 @@ value with_bin_dir state bin_dir = do {
        pack [lab; but] [];
        sframe
      })
-    (fun s -> s) (fun s -> s)
-    (Some (fun () -> ()))
+    (fun s -> s) (fun s -> s) (Some (fun () -> ()))
+    (fun state sys_dir -> do {
+       eprintf "sys_dir = %s\n" sys_dir;
+       flush stderr;
+       let config_env_sys_dir =
+         try List.assoc "sys_dir" state.config_env with
+         [ Not_found -> "" ]
+       in
+       if sys_dir <> config_env_sys_dir || not (Sys.file_exists config_file)
+       then do {
+         state.config_env :=
+           List.filter (fun (v, _) -> v <> "sys_dir") state.config_env @
+           [("sys_dir", sys_dir)];
+         write_config_env state.config_env
+       }
+       else ();
+       state.sys_dir := sys_dir;
+       config_port state
+     })
 };
 
-value start state =
-  continue with_bin_dir state (fun () -> "GeneWeb binary directory:")
+value config_bin_dir state =
+  config
+    state (fun () -> "GeneWeb binary directory:")
     (fun () -> List.assoc "bin_dir" state.config_env) default_bin_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
@@ -520,6 +510,24 @@ value start state =
        sframe
      })
     (fun s -> s) (fun s -> s) None
+    (fun state bin_dir -> do {
+       eprintf "bin_dir = %s\n" bin_dir;
+       flush stderr;
+       let config_env_bin_dir =
+         try List.assoc "bin_dir" state.config_env with
+         [ Not_found -> "" ]
+       in
+       if bin_dir <> config_env_bin_dir || not (Sys.file_exists config_file)
+       then do {
+         state.config_env :=
+           List.filter (fun (v, _) -> v <> "bin_dir") state.config_env @
+           [("bin_dir", bin_dir)];
+         write_config_env state.config_env
+       }
+       else ();
+       state.bin_dir := bin_dir;
+       config_sys_dir state
+     })
 ;
 
 value main () = do {
@@ -532,7 +540,7 @@ value main () = do {
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
 
-  start state;
+  config_bin_dir state;
 
   Sys.catch_break True;
   try mainLoop () with [ Sys.Break -> () ];
