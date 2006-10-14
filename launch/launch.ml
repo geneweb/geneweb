@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.8 2006-10-14 12:02:04 ddr Exp $ *)
+(* $Id: launch.ml,v 1.9 2006-10-14 12:43:07 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -307,11 +307,12 @@ value with_port state port = do {
   in
 
   let browsers () =
+    let defbrofil =
+      try Sys.getenv "DEFAULT_BROWSERS_FILE" with
+      [ Not_found -> Filename.concat "gw" "browsers.txt" ]
+    in
     let browsers =
-      match
-        try Some (open_in (Filename.concat "gw" "browsers.txt")) with
-        [ Sys_error _ -> None ]
-      with
+      match try Some (open_in defbrofil) with [ Sys_error _ -> None ] with
       [ Some ic ->
           loop [] where rec loop list =
             match try Some (input_line ic) with [ End_of_file -> None ] with
