@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.7 2006-10-14 11:19:27 ddr Exp $ *)
+(* $Id: launch.ml,v 1.8 2006-10-14 12:02:04 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -139,7 +139,7 @@ value continue with_f state title v default select to_string from_string =
   [ Some v -> with_f state v
   | None -> do {
       let (frame, gframe) = window_centering state.tk_win in
-      let tit = Label.create frame [Text title] in
+      let tit = Label.create frame [Text (title ())] in
       let var = Textvariable.create () in
       Textvariable.set var (to_string default);
 
@@ -265,7 +265,7 @@ value with_browser state browser = do {
   | None -> () ];
   state.browser := browser;
 
-  continue with_bases_dir state "Databases directory:"
+  continue with_bases_dir state (fun () -> "Databases directory:")
     (fun () -> List.assoc "bases_dir" state.config_env) default_bases_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
@@ -300,131 +300,110 @@ value with_port state port = do {
   }
   else ();
   state.port := port;
+  let default_sys_bin_dir =
+    match Sys.os_type with
+    [ "Win32" | "Cygwin" -> "C:\\Program Files"
+    | _ -> "/usr/bin" ]
+  in
 
-  match
-    try Some (List.assoc "browser" state.config_env) with
-    [ Not_found -> None ]
-  with
-  [ Some v -> with_browser state (Some v)
-  | None -> do {
-      let (frame, gframe) = window_centering state.tk_win in
+  let browsers () =
+    let browsers =
+      match
+        try Some (open_in (Filename.concat "gw" "browsers.txt")) with
+        [ Sys_error _ -> None ]
+      with
+      [ Some ic ->
+          loop [] where rec loop list =
+            match try Some (input_line ic) with [ End_of_file -> None ] with
+            [ Some name -> loop [name :: list]
+            | None -> do { close_in ic; list } ]
+      | None -> [] ]
+    in
+    let default_browsers =
+      match Sys.os_type with
+      [ "Win32" | "Cygwin" ->
+          ["C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+           "C:\\Program Files\\Internet Explorer\\iexplore.exe"]
+      | _ ->
+          ["/usr/bin/firefox"; "/usr/bin/mozilla"] ]
+    in
+    List.filter Sys.file_exists (List.rev_append browsers default_browsers)
+  in
+  let browsers = lazy (browsers ()) in
+  let other_browser_var = lazy (Textvariable.create ()) in
 
-      let browsers =
-        match
-          try Some (open_in (Filename.concat "gw" "browsers.txt")) with
-          [ Sys_error _ -> None ]
-        with
-        [ Some ic ->
-            loop [] where rec loop list =
-              match try Some (input_line ic) with [ End_of_file -> None ] with
-              [ Some name -> loop [name :: list]
-              | None -> do { close_in ic; list } ]
-        | None -> [] ]
-      in
-      let default_browsers =
-        match Sys.os_type with
-        [ "Win32" | "Cygwin" ->
-            ["C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-             "C:\\Program Files\\Internet Explorer\\iexplore.exe"]
-        | _ ->
-            ["/usr/bin/firefox"; "/usr/bin/mozilla"] ]
-      in
-      let default_sys_bin_dir =
-        match Sys.os_type with
-        [ "Win32" | "Cygwin" -> "C:\\Program Files"
-        | _ -> "/usr/bin" ]
-      in
-      let browsers =
-        List.filter Sys.file_exists
-          (List.rev_append browsers default_browsers)
-      in
-      let title = if browsers = [] then "Browser:" else "Browser(s):" in
-
-      let tit = Label.create frame [Text title] in
-      let var = Textvariable.create () in
-      Textvariable.set var "";
-
-      let other_browser_var = Textvariable.create () in
-      let other_browser_dir = Textvariable.create () in
-      Textvariable.set other_browser_dir default_sys_bin_dir;
-
-      let select frame var = do {
-        let sframe = Frame.create frame [] in
-        let list =
-          if browsers = [] then do {
-            let bro = Label.create sframe [TextVariable other_browser_var] in
-            Textvariable.set var "other";
-            bro
-          }
-          else do {
-            let list = Frame.create sframe [] in
-            List.iter
-              (fun fn -> do {
-                 let frad = Frame.create list [] in
-                 let rad =
-                   Radiobutton.create frad [Text fn; Variable var; Value fn]
-                 in
-                 pack [rad] [Side Side_Left];
-                 pack [frad] [Fill Fill_X];
-               })
-               browsers;
-            let frad = Frame.create list [] in
-            Textvariable.set other_browser_var "other:";
-            let rad =
-              Radiobutton.create frad
-                [TextVariable other_browser_var; Variable var; Value "other"]
-            in
-            pack [rad] [Side Side_Left];
-            pack [frad] [Fill Fill_X];
-            Textvariable.set var (List.hd browsers);
-            list
-          }
-        in
-        let but =
-          Button.create sframe
-            [Text "Select";
-             Command
-               (fun () -> do {
-                  Textvariable.set var "other";
-                  let ini_dir = Textvariable.get other_browser_dir in
-                  let br = Tk.getOpenFile [InitialDir ini_dir] in
-                  if br <> "" then do {
-                    Textvariable.set other_browser_var br;
-                    Textvariable.set other_browser_dir (Filename.dirname br);
-                  }
-                  else ();
-                })]
-        in
-        pack [list; but] [];
-        sframe
+  let select frame var = do {
+    let browsers = Lazy.force browsers in
+    let other_browser_var = Lazy.force other_browser_var in
+    let other_browser_dir = Textvariable.create () in
+    Textvariable.set other_browser_dir default_sys_bin_dir;
+    let sframe = Frame.create frame [] in
+    let list =
+      if browsers = [] then do {
+        let bro = Label.create sframe [TextVariable other_browser_var] in
+        Textvariable.set var "other";
+        bro
       }
-      in
-
-      let sel = select frame var in
-      Focus.force sel;
-
-      let ev_seq = [([], KeyPressDetail "Return")] in
-      let kont () = do {
-        let b =
-          let b = Textvariable.get var in
-          let b =
-            if b = "other" then Textvariable.get other_browser_var
-            else b
-          in
-          if b = "other:" then "" else b
+      else do {
+        let list = Frame.create sframe [] in
+        List.iter
+          (fun fn -> do {
+             let frad = Frame.create list [] in
+             let rad =
+               Radiobutton.create frad [Text fn; Variable var; Value fn]
+             in
+             pack [rad] [Side Side_Left];
+             pack [frad] [Fill Fill_X];
+           })
+           browsers;
+        let frad = Frame.create list [] in
+        Textvariable.set other_browser_var "other:";
+        let rad =
+          Radiobutton.create frad
+            [TextVariable other_browser_var; Variable var; Value "other"]
         in
-        bind sel ev_seq BindRemove;
-        Pack.forget [gframe];
-        with_browser state (if b = "" then None else Some b)
+        pack [rad] [Side Side_Left];
+        pack [frad] [Fill Fill_X];
+        Textvariable.set var (List.hd browsers);
+        list
       }
-      in
-      bind sel ev_seq (BindSet [] (fun _ -> kont ()));
-
-      let but =
-        Button.create frame [Text "OK"; Default Active; Command kont]
-      in
-      pack [tit; sel; but] [];
-    } ];
+    in
+    let but =
+      Button.create sframe
+        [Text "Select";
+         Command
+           (fun () -> do {
+              Textvariable.set var "other";
+              let ini_dir = Textvariable.get other_browser_dir in
+              let br = Tk.getOpenFile [InitialDir ini_dir] in
+              if br <> "" then do {
+                Textvariable.set other_browser_var br;
+                Textvariable.set other_browser_dir (Filename.dirname br);
+              }
+              else ();
+            })]
+    in
+    pack [list; but] [];
+    sframe
+  }
+  in
+  let to_string =
+    fun
+    [ Some s -> s
+    | None -> "" ]
+  in
+  let from_string s =
+    let s =
+      if s = "other" then Textvariable.get (Lazy.force other_browser_var)
+      else s
+    in
+    let s = if s = "other:" then "" else s in
+    if s = "" then None else Some s
+  in
+  continue with_browser state
+    (fun () -> if Lazy.force browsers = [] then "Browser:" else "Browser(s):")
+    (fun () -> List.assoc "browser" state.config_env)
+    None select to_string from_string
 };
 
 value with_sys_dir state sys_dir = do {
@@ -444,7 +423,7 @@ value with_sys_dir state sys_dir = do {
   else ();
   state.sys_dir := sys_dir;
 
-  continue with_port state "Port:"
+  continue with_port state (fun () -> "Port:")
     (fun () -> List.assoc "port" state.config_env) default_port
     (fun frame var -> do {
        let ent = Entry.create frame [TextWidth 5; TextVariable var] in
@@ -474,7 +453,7 @@ value with_bin_dir state bin_dir = do {
   else ();
   state.bin_dir := bin_dir;
 
-  continue with_sys_dir state "GeneWeb system directory:"
+  continue with_sys_dir state (fun () -> "GeneWeb system directory:")
     (fun () -> List.assoc "sys_dir" state.config_env)
     default_sys_dir
     (fun frame var -> do {
@@ -504,7 +483,7 @@ value main () = do {
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
 
-  continue with_bin_dir state "GeneWeb binary directory:"
+  continue with_bin_dir state (fun () -> "GeneWeb binary directory:")
     (fun () -> List.assoc "bin_dir" config_env) default_bin_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
