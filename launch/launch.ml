@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.11 2006-10-14 18:21:42 ddr Exp $ *)
+(* $Id: launch.ml,v 1.12 2006-10-14 19:46:47 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -16,11 +16,6 @@ type state =
 ;
 
 value config_file = Filename.concat "gw" "config.txt";
-
-value default_port = 2317;
-value default_bin_dir = "../src";
-value default_sys_dir = "../hd";
-value default_bases_dir = "../../gwbases";
 
 value read_config_env () =
   match try Some (open_in config_file) with [ Sys_error _ -> None ] with
@@ -131,12 +126,12 @@ value tk_getOpenDir initialdir =
   if res = "" then initialdir else res
 ;
 
-value config state title v def select to_string from_string prev next =
+value config state title v def select to_string from_string set prev next =
   match
     try Some (from_string (v ())) with
     [ Failure _ | Not_found -> None ]
   with
-  [ Some v -> next state v
+  [ Some v -> do { set state v; next state }
   | None -> do {
       let (frame, gframe) = window_centering state.tk_win in
       let tit = Label.create frame [Text (title ())] in
@@ -147,7 +142,7 @@ value config state title v def select to_string from_string prev next =
       Focus.force sel;
 
       let ev_seq = [([], KeyPressDetail "Return")] in
-      let kont () =
+      let kont f state _ =
         match
           try Some (from_string (Textvariable.get var)) with
           [ Failure _ -> None ]
@@ -155,40 +150,43 @@ value config state title v def select to_string from_string prev next =
         [ Some d -> do {
             bind sel ev_seq BindRemove;
             Pack.forget [gframe];
-            next state d
+            set state d;
+            f state
           }
         | None -> () ]
       in
-      bind sel ev_seq (BindSet [] (fun _ -> kont ()));
+      bind sel ev_seq (BindSet [] (kont next state));
 
       let buts =
         match prev with
-        [ Some prev -> do {
+        [ Some (prev_var, prev) -> do {
             let buts = Frame.create frame [] in
             let but1 =
               Button.create buts
                 [Text "Prev";
                  Command
                    (fun () -> do {
-                      eprintf "Button \"prev\" not yet implemented\n";
-                      flush stderr;
-                      if True then () else
                       bind sel ev_seq BindRemove;
-                      if True then () else
-                      Pack.forget [gframe];
-                      if True then () else
-                      prev ()
+                      Pack.forget [gframe]; 
+                      let state =
+                        {(state) with
+                         config_env =
+                           List.remove_assoc prev_var state.config_env}
+                      in
+                      kont prev state ()
                     })]
             in
             let but2 =
-              Button.create buts [Text "Next"; Default Active; Command kont]
+              Button.create buts
+                [Text "Next"; Default Active; Command (kont next state)]
             in
             pack [but1] [Side Side_Left];
             pack [but2] [Side Side_Right];
             buts
           }
         | None ->
-            Button.create frame [Text "Next"; Default Active; Command kont] ]
+            Button.create frame
+              [Text "Next"; Default Active; Command (kont next state)] ]
       in
       pack [tit; sel; buts] [];
     } ]
@@ -250,9 +248,9 @@ value launch_server state = do {
   pack [wbut] [Fill Fill_X];
 };
 
-value config_bases_dir state = do {
+value rec config_bases_dir state =
   config state (fun () -> "Databases directory:")
-    (fun () -> List.assoc "bases_dir" state.config_env) default_bases_dir
+    (fun () -> List.assoc "bases_dir" state.config_env) state.bases_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
@@ -267,8 +265,11 @@ value config_bases_dir state = do {
        pack [lab; but] [];
        sframe
      })
-    (fun s -> s) (fun s -> s) (Some (fun () -> ()))
-    (fun state bases_dir -> do {
+    (fun s -> s) (fun s -> s)
+    (fun state bases_dir -> state.bases_dir := bases_dir)
+    (Some ("browser", config_browser))
+    (fun state -> do {
+       let bases_dir = state.bases_dir in
        eprintf "bases_dir = %s\n" bases_dir;
        flush stderr;
        let config_env_bases_dir =
@@ -283,19 +284,16 @@ value config_bases_dir state = do {
          write_config_env state.config_env
        }
        else ();
-       state.bases_dir := bases_dir;
        mkdir_p bases_dir;
        launch_server state
      })
-};
 
-value config_browser state = do {
+and config_browser state =
   let default_sys_bin_dir =
     match Sys.os_type with
     [ "Win32" | "Cygwin" -> "C:\\Program Files"
     | _ -> "/usr/bin" ]
   in
-
   let browsers () =
     let defbrofil =
       try Sys.getenv "DEFAULT_BROWSERS_FILE" with
@@ -348,14 +346,20 @@ value config_browser state = do {
            })
            browsers;
         let frad = Frame.create list [] in
-        Textvariable.set other_browser_var "other:";
+        Textvariable.set other_browser_var
+          (match state.browser with
+           [ Some s -> if List.mem s browsers then "other:" else s
+           | None -> "other:" ]);
         let rad =
           Radiobutton.create frad
             [TextVariable other_browser_var; Variable var; Value "other"]
         in
         pack [rad] [Side Side_Left];
         pack [frad] [Fill Fill_X];
-        Textvariable.set var (List.hd browsers);
+        Textvariable.set var
+          (match state.browser with
+           [ Some s -> if List.mem s browsers then s else "other"
+           | None -> List.hd browsers ]);
         list
       }
     in
@@ -394,8 +398,11 @@ value config_browser state = do {
   config state
     (fun () -> if Lazy.force browsers = [] then "Browser:" else "Browser(s):")
     (fun () -> List.assoc "browser" state.config_env)
-    None select to_string from_string (Some (fun () -> ()))
-    (fun state browser -> do {
+    None select to_string from_string
+    (fun state browser -> state.browser := browser)
+    (Some ("port", config_port))
+    (fun state -> do {
+       let browser = state.browser in
        match browser with
        [ Some browser -> eprintf "browser = %s\n" browser
        | None -> eprintf "no browser\n" ];
@@ -414,14 +421,12 @@ value config_browser state = do {
            }
            else ()
        | None -> () ];
-       state.browser := browser;
        config_bases_dir state
      })
-};
 
-value config_port state = do {
+and config_port state =
   config state (fun () -> "Port:")
-    (fun () -> List.assoc "port" state.config_env) default_port
+    (fun () -> List.assoc "port" state.config_env) state.port
     (fun frame var -> do {
        let ent = Entry.create frame [TextWidth 5; TextVariable var] in
        Entry.selection_to ent End;
@@ -431,8 +436,10 @@ value config_port state = do {
     (fun s ->
        let i = int_of_string s in
        if i < 1024 then failwith "bad value" else i)
-    (Some (fun () -> ()))
-    (fun state port -> do {
+    (fun state port -> state.port := port)
+    (Some ("sys_dir", config_sys_dir))
+    (fun state -> do {
+       let port = state.port in
        eprintf "port = %d\n" port;
        flush stderr;
        let config_env_port =
@@ -447,15 +454,12 @@ value config_port state = do {
          write_config_env state.config_env
        }
        else ();
-       state.port := port;
        config_browser state
      })
-};
 
-value config_sys_dir state = do {
+and config_sys_dir state =
   config state (fun () -> "GeneWeb system directory:")
-    (fun () -> List.assoc "sys_dir" state.config_env)
-    default_sys_dir
+    (fun () -> List.assoc "sys_dir" state.config_env) state.sys_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
@@ -470,8 +474,11 @@ value config_sys_dir state = do {
        pack [lab; but] [];
        sframe
      })
-    (fun s -> s) (fun s -> s) (Some (fun () -> ()))
-    (fun state sys_dir -> do {
+    (fun s -> s) (fun s -> s)
+    (fun state sys_dir -> state.sys_dir := sys_dir)
+    (Some ("bin_dir", config_bin_dir))
+    (fun state -> do {
+       let sys_dir = state.sys_dir in
        eprintf "sys_dir = %s\n" sys_dir;
        flush stderr;
        let config_env_sys_dir =
@@ -486,15 +493,13 @@ value config_sys_dir state = do {
          write_config_env state.config_env
        }
        else ();
-       state.sys_dir := sys_dir;
        config_port state
      })
-};
 
-value config_bin_dir state =
+and config_bin_dir state =
   config
     state (fun () -> "GeneWeb binary directory:")
-    (fun () -> List.assoc "bin_dir" state.config_env) default_bin_dir
+    (fun () -> List.assoc "bin_dir" state.config_env) state.bin_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
@@ -509,8 +514,11 @@ value config_bin_dir state =
        pack [lab; but] [];
        sframe
      })
-    (fun s -> s) (fun s -> s) None
-    (fun state bin_dir -> do {
+    (fun s -> s) (fun s -> s)
+    (fun state bin_dir -> state.bin_dir := bin_dir)
+    None
+    (fun state -> do {
+       let bin_dir = state.bin_dir in
        eprintf "bin_dir = %s\n" bin_dir;
        flush stderr;
        let config_env_bin_dir =
@@ -525,17 +533,24 @@ value config_bin_dir state =
          write_config_env state.config_env
        }
        else ();
-       state.bin_dir := bin_dir;
        config_sys_dir state
      })
 ;
+
+value default_bin_dir = "../src";
+value default_sys_dir = "../hd";
+value default_port = 2317;
+value default_browser = None;
+value default_bases_dir = "../../gwbases";
 
 value main () = do {
   let config_env = read_config_env () in
   let win = openTk () in
   let state =
-    {config_env = config_env; tk_win = win; bin_dir = ""; sys_dir = "";
-     port = 0; browser = None; bases_dir = ""; server_running = False}
+    {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
+     sys_dir = default_sys_dir; port = default_port;
+     browser = default_browser; bases_dir = default_bases_dir;
+     server_running = False}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
