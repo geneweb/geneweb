@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.9 2006-10-14 12:43:07 ddr Exp $ *)
+(* $Id: launch.ml,v 1.10 2006-10-14 16:28:00 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -131,7 +131,7 @@ value tk_getOpenDir initialdir =
   if res = "" then initialdir else res
 ;
 
-value continue with_f state title v default select to_string from_string =
+value continue with_f state title v def select to_string from_string prev =
   match
     try Some (from_string (v ())) with
     [ Failure _ | Not_found -> None ]
@@ -141,7 +141,7 @@ value continue with_f state title v default select to_string from_string =
       let (frame, gframe) = window_centering state.tk_win in
       let tit = Label.create frame [Text (title ())] in
       let var = Textvariable.create () in
-      Textvariable.set var (to_string default);
+      Textvariable.set var (to_string def);
 
       let sel = select frame var in
       Focus.force sel;
@@ -161,10 +161,36 @@ value continue with_f state title v default select to_string from_string =
       in
       bind sel ev_seq (BindSet [] (fun _ -> kont ()));
 
-      let but =
-        Button.create frame [Text "OK"; Default Active; Command kont]
+      let buts =
+        match prev with
+        [ Some prev -> do {
+            let buts = Frame.create frame [] in
+            let but1 =
+              Button.create buts
+                [Text "Prev";
+                 Command
+                   (fun () -> do {
+                      eprintf "Button \"prev\" not yet implemented\n";
+                      flush stderr;
+                      if True then () else
+                      bind sel ev_seq BindRemove;
+                      if True then () else
+                      Pack.forget [gframe];
+                      if True then () else
+                      prev ()
+                    })]
+            in
+            let but2 =
+              Button.create buts [Text "Next"; Default Active; Command kont]
+            in
+            pack [but1] [Side Side_Left];
+            pack [but2] [Side Side_Right];
+            buts
+          }
+        | None ->
+            Button.create frame [Text "Next"; Default Active; Command kont] ]
       in
-      pack [tit; sel; but] [];
+      pack [tit; sel; buts] [];
     } ]
 ;
 
@@ -281,7 +307,7 @@ value with_browser state browser = do {
        pack [lab; but] [];
        sframe
      })
-    (fun s -> s) (fun s -> s)
+    (fun s -> s) (fun s -> s) (Some (fun () -> ()))
 };
 
 value with_port state port = do {
@@ -404,7 +430,7 @@ value with_port state port = do {
   continue with_browser state
     (fun () -> if Lazy.force browsers = [] then "Browser:" else "Browser(s):")
     (fun () -> List.assoc "browser" state.config_env)
-    None select to_string from_string
+    None select to_string from_string (Some (fun () -> ()))
 };
 
 value with_sys_dir state sys_dir = do {
@@ -435,6 +461,7 @@ value with_sys_dir state sys_dir = do {
     (fun s ->
        let i = int_of_string s in
        if i < 1024 then failwith "bad value" else i)
+    (Some (fun () -> ()))
 };
 
 value with_bin_dir state bin_dir = do {
@@ -472,20 +499,12 @@ value with_bin_dir state bin_dir = do {
        sframe
      })
     (fun s -> s) (fun s -> s)
+    (Some (fun () -> ()))
 };
 
-value main () = do {
-  let config_env = read_config_env () in
-  let win = openTk () in
-  let state =
-    {config_env = config_env; tk_win = win; bin_dir = ""; sys_dir = "";
-     port = 0; browser = None; bases_dir = ""; server_running = False}
-  in
-  Encoding.system_set "utf-8";
-  Wm.minsize_set state.tk_win 400 300;
-
+value start state =
   continue with_bin_dir state (fun () -> "GeneWeb binary directory:")
-    (fun () -> List.assoc "bin_dir" config_env) default_bin_dir
+    (fun () -> List.assoc "bin_dir" state.config_env) default_bin_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
@@ -500,7 +519,20 @@ value main () = do {
        pack [lab; but] [];
        sframe
      })
-    (fun s -> s) (fun s -> s);
+    (fun s -> s) (fun s -> s) None
+;
+
+value main () = do {
+  let config_env = read_config_env () in
+  let win = openTk () in
+  let state =
+    {config_env = config_env; tk_win = win; bin_dir = ""; sys_dir = "";
+     port = 0; browser = None; bases_dir = ""; server_running = False}
+  in
+  Encoding.system_set "utf-8";
+  Wm.minsize_set state.tk_win 400 300;
+
+  start state;
 
   Sys.catch_break True;
   try mainLoop () with [ Sys.Break -> () ];
