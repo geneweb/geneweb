@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.6 2006-10-14 10:08:40 ddr Exp $ *)
+(* $Id: launch.ml,v 1.7 2006-10-14 11:19:27 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -144,6 +144,7 @@ value continue with_f state title v default select to_string from_string =
       Textvariable.set var (to_string default);
 
       let sel = select frame var in
+      Focus.force sel;
 
       let ev_seq = [([], KeyPressDetail "Return")] in
       let kont () =
@@ -307,6 +308,7 @@ value with_port state port = do {
   [ Some v -> with_browser state (Some v)
   | None -> do {
       let (frame, gframe) = window_centering state.tk_win in
+
       let browsers =
         match
           try Some (open_in (Filename.concat "gw" "browsers.txt")) with
@@ -336,77 +338,92 @@ value with_port state port = do {
         List.filter Sys.file_exists
           (List.rev_append browsers default_browsers)
       in
-
       let title = if browsers = [] then "Browser:" else "Browser(s):" in
-      let tit = Label.create frame [Text title] in
-      pack [tit] [];
 
+      let tit = Label.create frame [Text title] in
       let var = Textvariable.create () in
       Textvariable.set var "";
+
       let other_browser_var = Textvariable.create () in
       let other_browser_dir = Textvariable.create () in
       Textvariable.set other_browser_dir default_sys_bin_dir;
 
-      if browsers = [] then do {
-        let bro = Label.create frame [TextVariable other_browser_var] in
-        Textvariable.set var "other";
-        pack [bro] []
-      }
-      else do {
-        List.iter
-          (fun fn -> do {
-             let sframe = Frame.create frame [] in
-             let rad =
-               Radiobutton.create sframe [Text fn; Variable var; Value fn]
-             in
-             pack [rad] [Side Side_Left];
-             pack [sframe] [Fill Fill_X];
-           })
-           browsers;
+      let select frame var = do {
         let sframe = Frame.create frame [] in
-        Textvariable.set other_browser_var "other:";
-        let rad =
-          Radiobutton.create sframe
-            [TextVariable other_browser_var; Variable var; Value "other"]
+        let list =
+          if browsers = [] then do {
+            let bro = Label.create sframe [TextVariable other_browser_var] in
+            Textvariable.set var "other";
+            bro
+          }
+          else do {
+            let list = Frame.create sframe [] in
+            List.iter
+              (fun fn -> do {
+                 let frad = Frame.create list [] in
+                 let rad =
+                   Radiobutton.create frad [Text fn; Variable var; Value fn]
+                 in
+                 pack [rad] [Side Side_Left];
+                 pack [frad] [Fill Fill_X];
+               })
+               browsers;
+            let frad = Frame.create list [] in
+            Textvariable.set other_browser_var "other:";
+            let rad =
+              Radiobutton.create frad
+                [TextVariable other_browser_var; Variable var; Value "other"]
+            in
+            pack [rad] [Side Side_Left];
+            pack [frad] [Fill Fill_X];
+            Textvariable.set var (List.hd browsers);
+            list
+          }
         in
-        pack [rad] [Side Side_Left];
-        pack [sframe] [Fill Fill_X];
-        Textvariable.set var (List.hd browsers);
-      };
-      let but =
-        Button.create frame
-          [Text "Select";
-           Command
-             (fun () -> do {
-                Textvariable.set var "other";
-                let ini_dir = Textvariable.get other_browser_dir in
-                let br = Tk.getOpenFile [InitialDir ini_dir] in
-                if br <> "" then do {
-                  Textvariable.set other_browser_var br;
-                  Textvariable.set other_browser_dir (Filename.dirname br);
-                }
-                else ();
-              })]
+        let but =
+          Button.create sframe
+            [Text "Select";
+             Command
+               (fun () -> do {
+                  Textvariable.set var "other";
+                  let ini_dir = Textvariable.get other_browser_dir in
+                  let br = Tk.getOpenFile [InitialDir ini_dir] in
+                  if br <> "" then do {
+                    Textvariable.set other_browser_var br;
+                    Textvariable.set other_browser_dir (Filename.dirname br);
+                  }
+                  else ();
+                })]
+        in
+        pack [list; but] [];
+        sframe
+      }
       in
-      pack [but] [];
-      let but =
-        Button.create frame
-          [Text "OK"; Default Active;
-           Command
-             (fun () -> do {
-                let b =
-                  let b = Textvariable.get var in
-                  let b =
-                    if b = "other" then Textvariable.get other_browser_var
-                    else b
-                  in
-                  if b = "other:" then "" else b
-                in
-                Pack.forget [gframe];
-                with_browser state (if b = "" then None else Some b)
-              })]
+
+      let sel = select frame var in
+      Focus.force sel;
+
+      let ev_seq = [([], KeyPressDetail "Return")] in
+      let kont () = do {
+        let b =
+          let b = Textvariable.get var in
+          let b =
+            if b = "other" then Textvariable.get other_browser_var
+            else b
+          in
+          if b = "other:" then "" else b
+        in
+        bind sel ev_seq BindRemove;
+        Pack.forget [gframe];
+        with_browser state (if b = "" then None else Some b)
+      }
       in
-      pack [but] [];
+      bind sel ev_seq (BindSet [] (fun _ -> kont ()));
+
+      let but =
+        Button.create frame [Text "OK"; Default Active; Command kont]
+      in
+      pack [tit; sel; but] [];
     } ];
 };
 
@@ -429,7 +446,11 @@ value with_sys_dir state sys_dir = do {
 
   continue with_port state "Port:"
     (fun () -> List.assoc "port" state.config_env) default_port
-    (fun frame var -> Entry.create frame [TextWidth 5; TextVariable var])
+    (fun frame var -> do {
+       let ent = Entry.create frame [TextWidth 5; TextVariable var] in
+       Entry.selection_to ent End;
+       ent
+     })
     string_of_int
     (fun s ->
        let i = int_of_string s in
