@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.4 2006-10-13 13:01:56 ddr Exp $ *)
+(* $Id: launch.ml,v 1.5 2006-10-14 04:33:36 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -122,6 +122,46 @@ value window_centering win = do {
   (frame2, main_frame)
 };
 
+value tk_getOpenDir initialdir =
+  let res =
+    Protocol.tkEval
+      [| Protocol.TkToken "tk_chooseDirectory";
+         Protocol.TkToken "-initialdir"; Protocol.TkToken initialdir |]
+  in
+  if res = "" then initialdir else res
+;
+
+value continue with_f state title v default select to_string from_string =
+  match
+    try Some (from_string (v ())) with
+    [ Failure _ | Not_found -> None ]
+  with
+  [ Some v -> with_f state v
+  | None -> do {
+      let (frame, gframe) = window_centering state.tk_win in
+      let tit = Label.create frame [Text title] in
+      let var = Textvariable.create () in
+      Textvariable.set var (to_string default);
+      let sel = select frame var in
+      let but =
+        Button.create frame
+          [Text "OK";
+           Command
+             (fun () ->
+                match
+                  try Some (from_string (Textvariable.get var)) with
+                  [ Failure _ -> None ]
+                with
+                [ Some d -> do {
+                    Pack.forget [gframe];
+                    with_f state d
+                  }
+                | None -> () ])]
+      in
+      pack [tit; sel; but] [];
+    } ]
+;
+
 value finish state = do {
   let databases =
     List.sort compare
@@ -157,7 +197,7 @@ value finish state = do {
   pack [wbut] [Fill Fill_X];
 };
 
-value continue_with_bases_dir state bases_dir = do {
+value with_bases_dir state bases_dir = do {
   eprintf "bases_dir = %s\n" bases_dir;
   flush stderr;
   let config_env_bases_dir =
@@ -198,7 +238,7 @@ value continue_with_bases_dir state bases_dir = do {
   finish state;
 };
 
-value continue_with_browser state browser = do {
+value with_browser state browser = do {
   match browser with
   [ Some browser -> eprintf "browser = %s\n" browser
   | None -> eprintf "no browser\n" ];
@@ -218,27 +258,27 @@ value continue_with_browser state browser = do {
       else ()
   | None -> () ];
   state.browser := browser;
-  try
-    continue_with_bases_dir state (List.assoc "bases_dir" state.config_env)
-  with
-  [ Not_found -> do {
-      let (frame, gframe) = window_centering state.tk_win in
-      let tit = Label.create frame [Text "Databases directory:"] in
-      let lab = Label.create frame [Text default_bases_dir] in
-      let but =
-        Button.create frame
-          [Text "OK";
-           Command
-             (fun () -> do {
-                Pack.forget [gframe];
-                continue_with_bases_dir state default_bases_dir
-              })]
-      in
-      pack [tit; lab; but] [];
-    } ]
+
+  continue with_bases_dir state "Databases directory:"
+    (fun () -> List.assoc "bases_dir" state.config_env) default_bases_dir
+    (fun frame var -> do {
+       let sframe = Frame.create frame [] in
+       let lab = Label.create sframe [TextVariable var] in
+       let but =
+         Button.create sframe
+           [Text "Select";
+            Command
+              (fun () ->
+                 let d = Textvariable.get var in
+                 Textvariable.set var (tk_getOpenDir d))]
+       in
+       pack [lab; but] [];
+       sframe
+     })
+    (fun s -> s) (fun s -> s)
 };
 
-value continue_with_port state port = do {
+value with_port state port = do {
   eprintf "port = %d\n" port;
   flush stderr;
   let config_env_port =
@@ -254,11 +294,13 @@ value continue_with_port state port = do {
   }
   else ();
   state.port := port;
-  try
-    continue_with_browser state
-      (Some (List.assoc "browser" state.config_env))
+
+  match
+    try Some (List.assoc "browser" state.config_env) with
+    [ Not_found -> None ]
   with
-  [ Not_found -> do {
+  [ Some v -> with_browser state (Some v)
+  | None -> do {
       let browsers =
         match
           try Some (open_in (Filename.concat "gw" "browsers.txt")) with
@@ -279,43 +321,88 @@ value continue_with_port state port = do {
         | _ ->
             ["/usr/bin/firefox"; "/usr/bin/mozilla"] ]
       in
+      let default_sys_bin_dir =
+        match Sys.os_type with
+        [ "Win32" | "Cygwin" -> "C:\\Program Files"
+        | _ -> "/usr/bin" ]
+      in
       let browsers =
         List.filter Sys.file_exists
           (List.rev_append browsers default_browsers)
       in
       let (frame, gframe) = window_centering state.tk_win in
-      if browsers = [] then
-        let lab = Label.create frame [Text "No default browser"] in
-        pack [lab] []
+      let browser_var = Textvariable.create () in
+      Textvariable.set browser_var "";
+      let other_browser_var = Textvariable.create () in
+      let other_browser_dir = Textvariable.create () in
+      Textvariable.set other_browser_dir default_sys_bin_dir;
+      if browsers = [] then do {
+        let lab = Label.create frame [Text "Browser:"] in
+        let bro = Label.create frame [TextVariable other_browser_var] in
+        Textvariable.set browser_var "other";
+        pack [lab; bro] []
+      }
       else do {
         let txt = Label.create frame [Text "Browser(s):"] in
         pack [txt] [Side Side_Top];
         List.iter
           (fun fn -> do {
-             let frame1 = Frame.create frame [] in
-             let blab = Label.create frame1 [Text fn] in
-             pack [blab] [Side Side_Left];
-             pack [frame1] [Side Side_Top; Fill Fill_X];
+             let sframe = Frame.create frame [] in
+             let rad =
+               Radiobutton.create sframe
+                 [Text fn; Variable browser_var; Value fn]
+             in
+             pack [rad] [Side Side_Left];
+             pack [sframe] [Fill Fill_X];
            })
            browsers;
+        let sframe = Frame.create frame [] in
+        Textvariable.set other_browser_var "other:";
+        let rad =
+          Radiobutton.create sframe
+            [TextVariable other_browser_var; Variable browser_var;
+             Value "other"]
+        in
+        pack [rad] [Side Side_Left];
+        pack [sframe] [Fill Fill_X];
+        Textvariable.set browser_var (List.hd browsers);
       };
+      let but =
+        Button.create frame
+          [Text "Select";
+           Command
+             (fun () -> do {
+                Textvariable.set browser_var "other";
+                let ini_dir = Textvariable.get other_browser_dir in
+                let br = Tk.getOpenFile [InitialDir ini_dir] in
+                if br <> "" then do {
+                  Textvariable.set other_browser_var br;
+                  Textvariable.set other_browser_dir (Filename.dirname br);
+                }
+                else ();
+              })]
+      in
+      pack [but] [];
       let but =
         Button.create frame
           [Text "OK";
            Command
              (fun () -> do {
+                let b = Textvariable.get browser_var in
+                let b =
+                  if b = "other" then Textvariable.get other_browser_var
+                  else b
+                in
+                let b = if b = "other:" then "" else b in
                 Pack.forget [gframe];
-                continue_with_browser state
-                  (match browsers with
-                   [ [b :: _] -> Some b
-                   | [] -> None ])
+                with_browser state (if b = "" then None else Some b)
               })]
       in
       pack [but] [];
     } ];
 };
 
-value continue_with_sys_dir state sys_dir = do {
+value with_sys_dir state sys_dir = do {
   eprintf "sys_dir = %s\n" sys_dir;
   flush stderr;
   let config_env_sys_dir =
@@ -331,28 +418,14 @@ value continue_with_sys_dir state sys_dir = do {
   }
   else ();
   state.sys_dir := sys_dir;
-  try
-    continue_with_port state
-      (int_of_string (List.assoc "port" state.config_env))
-  with
-  [ Not_found -> do {
-      let (frame, gframe) = window_centering state.tk_win in
-      let tit = Label.create frame [Text "Port:"] in
-      let lab = Label.create frame [Text (string_of_int default_port)] in
-      let but =
-        Button.create frame
-          [Text "OK";
-           Command
-             (fun () -> do {
-                Pack.forget [gframe];
-                continue_with_port state default_port
-              })]
-      in
-      pack [tit; lab; but] [];
-    } ]
+
+  continue with_port state "Port:"
+    (fun () -> List.assoc "port" state.config_env) default_port
+    (fun frame var -> Entry.create frame [TextWidth 5; TextVariable var])
+    string_of_int int_of_string
 };
 
-value continue_with_bin_dir state bin_dir = do {
+value with_bin_dir state bin_dir = do {
   eprintf "bin_dir = %s\n" bin_dir;
   flush stderr;
   let config_env_bin_dir =
@@ -368,24 +441,25 @@ value continue_with_bin_dir state bin_dir = do {
   }
   else ();
   state.bin_dir := bin_dir;
-  try
-    continue_with_sys_dir state (List.assoc "sys_dir" state.config_env)
-  with
-  [ Not_found -> do {
-      let (frame, gframe) = window_centering state.tk_win in
-      let tit = Label.create frame [Text "GeneWeb system directory:"] in
-      let lab = Label.create frame [Text default_sys_dir] in
-      let but =
-        Button.create frame
-          [Text "OK";
-           Command
-             (fun () -> do {
-                Pack.forget [gframe];
-                continue_with_sys_dir state default_sys_dir
-              })]
-      in
-      pack [tit; lab; but] [];
-    } ]
+
+  continue with_sys_dir state "GeneWeb system directory:"
+    (fun () -> List.assoc "sys_dir" state.config_env)
+    default_sys_dir
+    (fun frame var -> do {
+       let sframe = Frame.create frame [] in
+       let lab = Label.create sframe [TextVariable var] in
+       let but =
+         Button.create sframe
+           [Text "Select";
+            Command
+              (fun () ->
+                 let d = Textvariable.get var in
+                 Textvariable.set var (tk_getOpenDir d))]
+       in
+       pack [lab; but] [];
+       sframe
+     })
+    (fun s -> s) (fun s -> s)
 };
 
 value main () = do {
@@ -396,23 +470,26 @@ value main () = do {
      port = 0; browser = None; bases_dir = ""; server_running = False}
   in
   Encoding.system_set "utf-8";
-  Wm.minsize_set state.tk_win 300 200;
-  try continue_with_bin_dir state (List.assoc "bin_dir" config_env) with
-  [ Not_found -> do {
-      let (frame, gframe) = window_centering win in
-      let tit = Label.create frame [Text "GeneWeb binary directory:"] in
-      let lab = Label.create frame [Text default_bin_dir] in
-      let but =
-        Button.create frame
-          [Text "OK";
-           Command
-             (fun () -> do {
-                Pack.forget [gframe];
-                continue_with_bin_dir state default_bin_dir
-              })]
-      in
-      pack [tit; lab; but] [];
-    } ];
+  Wm.minsize_set state.tk_win 400 300;
+
+  continue with_bin_dir state "GeneWeb binary directory:"
+    (fun () -> List.assoc "bin_dir" config_env) default_bin_dir
+    (fun frame var -> do {
+       let sframe = Frame.create frame [] in
+       let lab = Label.create sframe [TextVariable var] in
+       let but =
+         Button.create sframe
+           [Text "Select";
+            Command
+              (fun () ->
+                 let d = Textvariable.get var in
+                 Textvariable.set var (tk_getOpenDir d))]
+       in
+       pack [lab; but] [];
+       sframe
+     })
+    (fun s -> s) (fun s -> s);
+
   Sys.catch_break True;
   try mainLoop () with [ Sys.Break -> () ];
   close_app state;
