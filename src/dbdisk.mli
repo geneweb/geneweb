@@ -1,4 +1,4 @@
-(* $Id: dbdisk.mli,v 5.10 2006-10-15 05:40:11 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.11 2006-10-15 12:39:19 ddr Exp $ *)
 
 open Def;
 
@@ -55,7 +55,8 @@ type base_data =
 ;
 
 type base_func =
-  { persons_of_name : string -> list iper;
+  { person_of_key : string -> string -> int -> option iper;
+    persons_of_name : string -> list iper;
     strings_of_fsname : string -> list dsk_istr;
     persons_of_surname : string_person_index;
     persons_of_first_name : string_person_index;

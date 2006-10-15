@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.39 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.40 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -64,29 +64,6 @@ value person_is_key base p k =
   else False
 ;
 
-value person_of_key base first_name surname occ =
-  if first_name = "?" || surname = "?" then raise Not_found
-  else
-    let first_name = nominative first_name in
-    let surname = nominative surname in
-    let ipl = persons_of_name base (first_name ^ " " ^ surname) in
-    let first_name = Name.lower first_name in
-    let surname = Name.lower surname in
-    let rec find =
-      fun
-      [ [ip :: ipl] ->
-          let p = poi base ip in
-          if occ == get_occ p &&
-             first_name = Name.lower (p_first_name base p) &&
-             surname = Name.lower (p_surname base p)
-          then
-            get_key_index p
-          else find ipl
-      | _ -> raise Not_found ]
-    in
-    find ipl
-;
-
 value find_num s i =
   loop i i where rec loop start i =
     if i == String.length s then None
@@ -112,17 +89,13 @@ value split_key s =
 ;
 
 value person_of_string_key base s =
-  try
-    let (first_name, occ, surname) = split_key s in
-    Some (person_of_key base first_name surname occ)
-  with
-  [ Not_found -> None ]
+  let (first_name, occ, surname) = split_key s in
+  person_of_key base first_name surname occ
 ;
 
 value person_ht_find_all base s =
   match person_of_string_key base s with
-  [ Some p ->
-      [p]
+  [ Some p -> [p]
   | _ ->
       let ipl = persons_of_name base s in
       let rec select =

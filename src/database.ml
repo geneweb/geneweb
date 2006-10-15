@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.7 2006-10-15 05:40:11 ddr Exp $ *)
+(* $Id: database.ml,v 5.8 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -822,6 +822,30 @@ value patches_of_patches_ht patches =
   }
 ;
 
+value person_of_key persons strings persons_of_name first_name surname occ =
+  if first_name = "?" || surname = "?" then None
+  else
+    let first_name = nominative first_name in
+    let surname = nominative surname in
+    let ipl = persons_of_name (first_name ^ " " ^ surname) in
+    let first_name = Name.lower first_name in
+    let surname = Name.lower surname in
+    let rec find =
+      fun
+      [ [ip :: ipl] ->
+          let p = persons.get (Adef.int_of_iper ip) in
+          if occ == p.occ &&
+             first_name =
+               Name.lower (strings.get (Adef.int_of_istr p.first_name)) &&
+             surname = Name.lower (strings.get (Adef.int_of_istr p.surname))
+          then
+            Some ip
+          else find ipl
+      | _ -> None ]
+    in
+    find ipl
+;
+
 value opendb bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1105,8 +1129,10 @@ value opendb bname =
      families = families; couples = couples; descends = descends;
      strings = strings; particles = particles; bnotes = bnotes}
   in
+  let persons_of_name = persons_of_name bname (snd patches.h_name) in
   let base_func =
-    {persons_of_name = persons_of_name bname (snd patches.h_name);
+    {person_of_key = person_of_key persons strings persons_of_name;
+     persons_of_name = persons_of_name;
      strings_of_fsname = strings_of_fsname bname strings patches.h_person;
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings

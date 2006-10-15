@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.21 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: update.ml,v 5.22 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -692,8 +692,9 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             if p_first_name base p = f && p_surname base p = s then ip
             else raise Not_found
         else
-          let ip = person_of_key base f s o in
-          print_create_conflict conf base (poi base ip) var
+          match person_of_key base f s o with
+          [ Some ip -> print_create_conflict conf base (poi base ip) var
+          | None -> raise Not_found ]
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
@@ -762,8 +763,9 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           if p_first_name base p = f && p_surname base p = s then ip
           else print_err_unknown conf base (f, s, o)
       else
-        try person_of_key base f s o with
-        [ Not_found -> print_err_unknown conf base (f, s, o) ] ]
+        match person_of_key base f s o with
+        [ Some ip -> ip
+        | None -> print_err_unknown conf base (f, s, o) ] ]
 ;
 
 value rec update_conf_env field p occ o_env n_env =

@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.50 2006-10-15 05:40:11 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.51 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -126,6 +126,7 @@ value commit_notes : base -> string -> string -> unit;
 value is_patched_person : base -> iper -> bool;
 value patched_ascends : base -> list iper;
 
+value person_of_key : base -> string -> string -> int -> option iper;
 value persons_of_name : base -> string -> list iper;
 value persons_of_first_name : base -> string_person_index;
 value persons_of_surname : base -> string_person_index;

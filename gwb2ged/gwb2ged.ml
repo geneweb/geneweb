@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.21 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.22 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -604,14 +604,14 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
 ;
 
 value find_person base p1 po p2 =
-  try Gutil.person_of_key base p1 p2 po with
-  [ Not_found ->
-      do {
-        printf "Not found: %s%s %s\n" p1
-          (if po == 0 then "" else " " ^ string_of_int po) p2;
-        flush stdout;
-        exit 2
-      } ]
+  match person_of_key base p1 p2 po with
+  [ Some ip -> ip
+  | None -> do {
+      printf "Not found: %s%s %s\n" p1
+        (if po == 0 then "" else " " ^ string_of_int po) p2;
+      flush stdout;
+      exit 2
+    } ]
 ;
 
 value surnames = ref [];

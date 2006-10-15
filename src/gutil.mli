@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.23 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.24 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -14,7 +14,6 @@ value split_key : string -> (string * int * string);
 
 value person_ht_add : base -> string -> iper -> unit;
 value person_ht_find_all : base -> string -> list iper;
-value person_of_key : base -> string -> string -> int -> iper;
 value person_of_string_key : base -> string -> option iper;
 value find_same_name : base -> person -> list person;
 

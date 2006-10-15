@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.44 2006-10-11 05:16:57 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.45 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -2447,7 +2447,8 @@ value make_base (persons, families, strings, bnotes) =
      strings = record_access_of strings; particles = []; bnotes = bnotes}
   in
   let base_func =
-    {persons_of_name = fun []; strings_of_fsname = fun [];
+    {person_of_key = fun []; persons_of_name = fun [];
+     strings_of_fsname = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
      patch_person = fun []; patch_ascend = fun [];
