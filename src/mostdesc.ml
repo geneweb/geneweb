@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 5.5 2006-10-08 05:33:16 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 5.6 2006-10-15 11:27:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -130,9 +130,7 @@ value main () =
     else ();
     Secure.set_base_dir (Filename.dirname bname.val);
     let base = Gutil.open_base bname.val in
-    let ip =
-      Gutil.person_ht_find_unique base p_fname.val p_sname.val p_num.val
-    in
+    let ip = Gutil.person_of_key base p_fname.val p_sname.val p_num.val in
     most_desc base (poi base ip)
   }
 ;
