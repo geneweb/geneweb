@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.40 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.41 2006-10-15 12:50:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -83,14 +83,16 @@ value split_key s =
       [ Some (occ, j) ->
           let first_name = String.sub s 0 i in
           let surname = String.sub s j (String.length s - j) in
-          (first_name, occ, surname)
-      | None -> raise Not_found ]
-  | None -> raise Not_found ]
+          Some (first_name, occ, surname)
+      | None -> None ]
+  | None -> None ]
 ;
 
 value person_of_string_key base s =
-  let (first_name, occ, surname) = split_key s in
-  person_of_key base first_name surname occ
+  match split_key s with
+  [ Some (first_name, occ, surname) ->
+      person_of_key base first_name surname occ
+  | None -> None ]
 ;
 
 value person_ht_find_all base s =
