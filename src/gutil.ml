@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.38 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.39 2006-10-15 11:27:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -64,7 +64,7 @@ value person_is_key base p k =
   else False
 ;
 
-value person_ht_find_unique base first_name surname occ =
+value person_of_key base first_name surname occ =
   if first_name = "?" || surname = "?" then raise Not_found
   else
     let first_name = nominative first_name in
@@ -111,16 +111,16 @@ value split_key s =
   | None -> raise Not_found ]
 ;
 
-value person_of_key base s =
+value person_of_string_key base s =
   try
     let (first_name, occ, surname) = split_key s in
-    Some (person_ht_find_unique base first_name surname occ)
+    Some (person_of_key base first_name surname occ)
   with
   [ Not_found -> None ]
 ;
 
 value person_ht_find_all base s =
-  match person_of_key base s with
+  match person_of_string_key base s with
   [ Some p ->
       [p]
   | _ ->
