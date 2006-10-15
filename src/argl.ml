@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: argl.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Printf;
@@ -70,8 +70,8 @@ value action_arg s sl =
 
 value common_start s1 s2 =
   loop 0 where rec loop i =
-    if i == String.length s1 || i == String.length s2 then i
-    else if s1.[i] == s2.[i] then loop (i + 1)
+    if i = String.length s1 || i = String.length s2 then i
+    else if s1.[i] = s2.[i] then loop (i + 1)
     else i
 ;
 
@@ -79,7 +79,7 @@ value rec parse_arg s sl =
   fun
   [ [(name, action, _) :: spec_list] ->
       let i = common_start s name in
-      if i == String.length name then
+      if i = String.length name then
         try action_arg (String.sub s i (String.length s - i)) sl action with
         [ Arg.Bad _ -> parse_arg s sl spec_list ]
       else parse_arg s sl spec_list
@@ -136,7 +136,7 @@ value parse_list spec_list anonfun errmsg list =
 value parse spec_list anonfun errmsg =
   let remaining_args =
     List.rev (loop [] (Arg.current.val + 1)) where rec loop l i =
-      if i == Array.length Sys.argv then l
+      if i = Array.length Sys.argv then l
       else
         let s =
           let s = Sys.argv.(i) in

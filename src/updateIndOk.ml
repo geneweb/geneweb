@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.27 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.28 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -416,7 +416,7 @@ value rparents_of p =
 value is_witness_at_marriage base ip p =
   let u = uoi base ip in
   List.exists
-    (fun ifam -> let fam = foi base ifam in array_memq ip (get_witnesses fam))
+    (fun ifam -> let fam = foi base ifam in array_mem ip (get_witnesses fam))
     (Array.to_list (get_family u))
 ;
 
@@ -463,7 +463,7 @@ value effective_mod conf base sp =
   let ofn = p_first_name base op in
   let osn = p_surname base op in
   do {
-    if ofn = sp.first_name && osn = sp.surname && get_occ op == sp.occ then ()
+    if ofn = sp.first_name && osn = sp.surname && get_occ op = sp.occ then ()
     else do {
       let ipl = person_ht_find_all base key in
       check_conflict conf base sp ipl;
@@ -518,7 +518,7 @@ value effective_add conf base sp =
 
 value array_except v a =
   loop 0 where rec loop i =
-    if i == Array.length a then a
+    if i = Array.length a then a
     else if a.(i) = v then
       Array.append (Array.sub a 0 i)
         (Array.sub a (i + 1) (Array.length a - i - 1))

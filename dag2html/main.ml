@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
+(* $Id: main.ml,v 5.1 2006-10-15 15:39:38 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -10,7 +10,7 @@ value version = "1.02-exp";
 value strip_spaces str =
   let start =
     loop 0 where rec loop i =
-      if i == String.length str then i
+      if i = String.length str then i
       else
         match str.[i] with
         [ ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
@@ -18,13 +18,13 @@ value strip_spaces str =
   in
   let stop =
     loop (String.length str - 1) where rec loop i =
-      if i == -1 then i + 1
+      if i = -1 then i + 1
       else
         match str.[i] with
         [ ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
         | _ -> i + 1 ]
   in
-  if start == 0 && stop == String.length str then str
+  if start = 0 && stop = String.length str then str
   else if start > stop then ""
   else String.sub str start (stop - start)
 ;

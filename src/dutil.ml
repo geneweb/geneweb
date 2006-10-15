@@ -1,4 +1,4 @@
-(* $Id: dutil.ml,v 5.6 2006-10-11 05:16:58 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Config;
@@ -57,7 +57,7 @@ value dsk_person_misc_names base p nobtit =
          List.map (sou base) (p.surnames_aliases @ p.qualifiers)]
     in
     let surnames =
-      if p.sex == Female then
+      if p.sex = Female then
         let u = uoi base p.key_index in
         List.fold_left
           (fun list ifam ->
@@ -181,9 +181,9 @@ value unaccent =
 value compare_names_1 s1 s2 =
   let compare_aux e1 e2 =
     loop where rec loop i1 i2 =
-      if i1 == e1 && i2 == e2 then 0
-      else if i1 == e1 then -1
-      else if i2 == e2 then 1
+      if i1 = e1 && i2 = e2 then 0
+      else if i1 = e1 then -1
+      else if i2 = e2 then 1
       else
         let c1 = unaccent (Char.lowercase s1.[i1]) in
         let c2 = unaccent (Char.lowercase s2.[i2]) in
@@ -242,7 +242,7 @@ value compare_names base_data s1 s2 =
 ;
 
 value compare_istr_fun base_data is1 is2 =
-  if is1 == is2 then 0
+  if is1 = is2 then 0
   else
     compare_names base_data (base_data.strings.get (Adef.int_of_istr is1))
       (base_data.strings.get (Adef.int_of_istr is2))

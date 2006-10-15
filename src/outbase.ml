@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.17 2006-10-10 21:46:35 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.18 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -26,7 +26,7 @@ value array_header_size arr_len = if arr_len < 8 then 1 else 5;
 value output_array_access oc arr_get arr_len pos =
   loop (pos + output_value_header_size + array_header_size arr_len) 0
   where rec loop pos i =
-    if i == arr_len then pos
+    if i = arr_len then pos
     else do {
       output_binary_int oc pos;
       loop (pos + Iovalue.size (arr_get i)) (i + 1)
@@ -114,7 +114,7 @@ value make_name_index base =
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
-    if array_memq valu t.(i) then ()
+    if array_mem valu t.(i) then ()
     else t.(i) := Array.append [| valu |] t.(i)
   in
   let rec add_names ip =
@@ -155,7 +155,7 @@ value create_name_index oc_inx oc_inx_acc base =
 value add_name t key valu =
   let key = Name.crush_lower key in
   let i = Hashtbl.hash key mod Array.length t in
-  if array_memq valu t.(i) then ()
+  if array_mem valu t.(i) then ()
   else t.(i) := Array.append [| valu |] t.(i)
 ;
 
@@ -193,7 +193,7 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
 
 value is_prime a =
   loop 2 where rec loop b =
-    if a / b < b then True else if a mod b == 0 then False else loop (b + 1)
+    if a / b < b then True else if a mod b = 0 then False else loop (b + 1)
 ;
 
 value rec prime_after n = if is_prime n then n else prime_after (n + 1);

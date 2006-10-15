@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.45 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.46 2006-10-15 15:39:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -468,15 +468,15 @@ value rec ident_slash len =
 value strip c str =
   let start =
     loop 0 where rec loop i =
-      if i == String.length str then i
-      else if str.[i] == c then loop (i + 1)
+      if i = String.length str then i
+      else if str.[i] = c then loop (i + 1)
       else i
   in
   let stop =
     loop (String.length str - 1) where rec loop i =
-      if i == -1 then i + 1 else if str.[i] == c then loop (i - 1) else i + 1
+      if i = -1 then i + 1 else if str.[i] = c then loop (i - 1) else i + 1
   in
-  if start == 0 && stop == String.length str then str
+  if start = 0 && stop = String.length str then str
   else if start >= stop then ""
   else String.sub str start (stop - start)
 ;
@@ -888,7 +888,7 @@ type gen =
 ;
 
 value assume_tab name tab none =
-  if tab.tlen == Array.length tab.arr then do {
+  if tab.tlen = Array.length tab.arr then do {
     let new_len = 2 * Array.length tab.arr + 1 in
     let new_arr = Array.create new_len none in
     Array.blit tab.arr 0 new_arr 0 (Array.length tab.arr);
@@ -1025,9 +1025,9 @@ value infer_death birth =
 
 value string_ini_eq s1 i s2 =
   loop i 0 where rec loop i j =
-    if j == String.length s2 then True
-    else if i == String.length s1 then False
-    else if s1.[i] == s2.[j] then loop (i + 1) (j + 1)
+    if j = String.length s2 then True
+    else if i = String.length s1 then False
+    else if s1.[i] = s2.[j] then loop (i + 1) (j + 1)
     else False
 ;
 
@@ -1042,7 +1042,7 @@ value particle s i =
 value lowercase_name s =
   let s = String.copy s in
   let rec loop uncap i =
-    if i == String.length s then s
+    if i = String.length s then s
     else do {
       let c = s.[i] in
       let (c, uncap) =
@@ -1068,7 +1068,7 @@ value lowercase_name s =
 
 value look_like_a_number s =
   loop 0 where rec loop i =
-    if i == String.length s then True
+    if i = String.length s then True
     else
       match s.[i] with
       [ '0'..'9' -> loop (i + 1)
@@ -1082,13 +1082,13 @@ value is_a_name_char =
 ;
 
 value rec next_word_pos s i =
-  if i == String.length s then i
+  if i = String.length s then i
   else if is_a_name_char s.[i] then i
   else next_word_pos s (i + 1)
 ;
 
 value rec next_sep_pos s i =
-  if i == String.length s then String.length s
+  if i = String.length s then String.length s
   else if is_a_name_char s.[i] then next_sep_pos s (i + 1)
   else i
 ;
@@ -1099,7 +1099,7 @@ value public_name_word =
 
 value rec is_a_public_name s i =
   let i = next_word_pos s i in
-  if i == String.length s then False
+  if i = String.length s then False
   else
     let j = next_sep_pos s i in
     if j > i then
@@ -1114,7 +1114,7 @@ value rec is_a_public_name s i =
 value lowercase_public_name s =
   loop 0 0 where rec loop len k =
     let i = next_word_pos s k in
-    if i == String.length s then Buff.get len
+    if i = String.length s then Buff.get len
     else
       let j = next_sep_pos s i in
       if j > i then
@@ -1183,7 +1183,7 @@ value extract_notes gen rl =
          (fun r lines ->
             do {
               r.rused := True;
-              if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] == '@' then
+              if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] = '@' then
                 let addr = extract_addr r.rval in
                 match find_notes_record gen addr with
                 [ Some r ->
@@ -1209,7 +1209,7 @@ value rebuild_text r =
        let _ = do { e.rused := True } in
        let n = e.rval in
        let end_spc =
-         if String.length n > 1 && n.[String.length n - 1] == ' ' then " "
+         if String.length n > 1 && n.[String.length n - 1] = ' ' then " "
          else ""
        in
        let n = strip_spaces n in
@@ -1245,9 +1245,9 @@ value treat_notes gen rl =
   let notes =
     List.fold_left
       (fun s (lab, n) ->
-         let spc = String.length n > 0 && n.[0] == ' ' in
+         let spc = String.length n > 0 && n.[0] = ' ' in
          let end_spc =
-           String.length n > 1 && n.[String.length n - 1] == ' '
+           String.length n > 1 && n.[String.length n - 1] = ' '
          in
          let n = strip_spaces n in
          if s = "" then n ^ (if end_spc then " " else "")
@@ -1290,8 +1290,8 @@ value decode_title s =
   let i2 = p_index_from s (i1 + 1) ',' in
   let title = strip_sub s 0 i1 in
   let (place, nth) =
-    if i1 == String.length s then ("", 0)
-    else if i2 == String.length s then
+    if i1 = String.length s then ("", 0)
+    else if i2 = String.length s then
       let s1 = strip_sub s (i1 + 1) (i2 - i1 - 1) in
       try ("", int_of_string s1) with [ Failure _ -> (s1, 0) ]
     else
@@ -1305,7 +1305,7 @@ value decode_title s =
 
 value list_of_string s =
   loop 0 0 [] where rec loop i len list =
-    if i == String.length s then List.rev [Buff.get len :: list]
+    if i = String.length s then List.rev [Buff.get len :: list]
     else
       match s.[i] with
       [ ',' -> loop (i + 1) 0 [Buff.get len :: list]
@@ -1370,7 +1370,7 @@ value adop_parent gen ip r =
   [ Left3 _ -> None
   | Right3 p a u ->
       do {
-        if List.memq ip (get_related p) then ()
+        if List.mem ip (get_related p) then ()
         else
           let p = person_with_related p [ip :: get_related p] in
           gen.g_per.arr.(Adef.int_of_iper i) := Right3 p a u;
@@ -1552,7 +1552,7 @@ value add_indi gen r =
           if extract_public_names.val || extract_first_names.val then
             let i = next_word_pos f 0 in
             let j = next_sep_pos f i in
-            if j == String.length f then (f, pn, fal)
+            if j = String.length f then (f, pn, fal)
             else
               let fn = String.sub f i (j - i) in
               if pn = "" && extract_public_names.val then
@@ -1899,7 +1899,7 @@ value add_fam_norm gen r adop_list =
     [ Left3 lab -> ()
     | Right3 p a u ->
         let u =
-          if not (List.memq i (Array.to_list (get_family u))) then
+          if not (List.mem i (Array.to_list (get_family u))) then
             union_of_gen_union {family = Array.append (get_family u) [| i |]}
           else u
         in
@@ -1909,7 +1909,7 @@ value add_fam_norm gen r adop_list =
     [ Left3 lab -> ()
     | Right3 p a u ->
         let u =
-          if not (List.memq i (Array.to_list (get_family u))) then
+          if not (List.mem i (Array.to_list (get_family u))) then
             union_of_gen_union {family = Array.append (get_family u) [| i |]}
           else u
         in
@@ -2014,7 +2014,7 @@ value add_fam_norm gen r adop_list =
     in
     let comment =
       match find_field "NOTE" r.rsons with
-      [ Some r -> if r.rval <> "" && r.rval.[0] == '@' then "" else r.rval
+      [ Some r -> if r.rval <> "" && r.rval.[0] = '@' then "" else r.rval
       | None -> "" ]
     in
     let (fsources, fsources_nt) =
@@ -2208,7 +2208,7 @@ value pass2 gen fname =
         (fun i ->
            try
              let c = input_char ic in
-             do { if c == '\n' then incr line_cnt else (); Some c }
+             do { if c = '\n' then incr line_cnt else (); Some c }
            with
            [ End_of_file -> None ])
     in
@@ -2230,7 +2230,7 @@ value pass2 gen fname =
       (fun (ipp, ip) ->
          match gen.g_per.arr.(Adef.int_of_iper ipp) with
          [ Right3 p a u ->
-             if List.memq ip (get_related p) then ()
+             if List.mem ip (get_related p) then ()
              else
                let p = person_with_related p [ip :: get_related p] in
                gen.g_per.arr.(Adef.int_of_iper ipp) := Right3 p a u
@@ -2249,7 +2249,7 @@ value pass3 gen fname =
         (fun i ->
            try
              let c = input_char ic in
-             do { if c == '\n' then incr line_cnt else (); Some c }
+             do { if c = '\n' then incr line_cnt else (); Some c }
            with
            [ End_of_file -> None ])
     in
@@ -2282,7 +2282,7 @@ value pass3 gen fname =
              with
              [ (Right3 pfath _ _, Right3 p a u) ->
                  do {
-                   if List.memq (get_father cpl) (get_related p) then ()
+                   if List.mem (get_father cpl) (get_related p) then ()
                    else
                      let p =
                        person_with_related p
@@ -2462,8 +2462,8 @@ value make_base (persons, families, strings, bnotes) =
 
 value array_memq x a =
   loop 0 where rec loop i =
-    if i == Array.length a then False
-    else if x == a.(i) then True
+    if i = Array.length a then False
+    else if x = a.(i) then True
     else loop (i + 1)
 ;
 
@@ -2476,7 +2476,7 @@ value check_parents_children base ascends unions couples descends =
       match get_parents a with
       [ Some ifam ->
           let fam = foi base ifam in
-          if get_fam_index fam == Adef.ifam_of_int (-1) then
+          if get_fam_index fam = Adef.ifam_of_int (-1) then
             ascends.(i) := ascend_with_parents a None
           else
             let cpl = coi base ifam in
@@ -2602,7 +2602,7 @@ value check_parents_children base ascends unions couples descends =
       if to_delete.val <> [] then
         let l =
           List.fold_right
-            (fun ip l -> if List.memq ip to_delete.val then l else [ip :: l])
+            (fun ip l -> if List.mem ip to_delete.val then l else [ip :: l])
             (Array.to_list (get_children des)) []
         in
         descends.(i) := descend_of_gen_descend {children = Array.of_list l}

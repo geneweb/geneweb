@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.12 2006-09-30 18:45:55 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -98,8 +98,8 @@ value make_dist_tab conf base ia maxlev =
 
 value find_first_branch conf base (dmin, dmax) ia =
   find [] where rec find br len ip sp =
-    if ip == ia then if len == 0 then Some br else None
-    else if len == 0 then None
+    if ip = ia then if len = 0 then Some br else None
+    else if len = 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
       match get_parents (aget conf base ip) with
@@ -127,7 +127,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
                   (get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len" ]
         | Neuter -> assert False ] ]
-  else if missing == 0 then Some (ia, sa, ipl)
+  else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist True missing ia sa ipl
   else
@@ -142,7 +142,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
 value find_next_branch conf base dist ia sa ipl =
   loop ia sa ipl where rec loop ia1 sa1 ipl =
     match next_branch_same_len conf base dist True 0 ia1 sa1 ipl with
-    [ Some (ia1, sa1, ipl) -> if ia == ia1 then Some ipl else loop ia1 sa1 ipl
+    [ Some (ia1, sa1, ipl) -> if ia = ia1 then Some ipl else loop ia1 sa1 ipl
     | _ -> None ]
 ;
 
@@ -162,7 +162,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
                   (get_father cpl) Male ipl
             | _ -> failwith "prev_branch_same_len" ]
         | Neuter -> assert False ] ]
-  else if missing == 0 then Some (ia, sa, ipl)
+  else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist True missing ia sa ipl
   else
@@ -177,7 +177,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
 value find_prev_branch conf base dist ia sa ipl =
   loop ia sa ipl where rec loop ia1 sa1 ipl =
     match prev_branch_same_len conf base dist True 0 ia1 sa1 ipl with
-    [ Some (ia1, sa1, ipl) -> if ia == ia1 then Some ipl else loop ia1 sa1 ipl
+    [ Some (ia1, sa1, ipl) -> if ia = ia1 then Some ipl else loop ia1 sa1 ipl
     | _ -> None ]
 ;
 
@@ -669,7 +669,7 @@ value print_relation_no_dag conf base po ip1 ip2 =
                branch_of_sosa conf base ip2 n2)
             with
             [ (Some [(ia1, sa1) :: b1], Some [(ia2, sa2) :: b2]) ->
-                if ia1 == ia2 then
+                if ia1 = ia2 then
                   let c1 =
                     match p_getint conf.env "c1" with
                     [ Some n -> n
@@ -699,13 +699,13 @@ value print_relation_no_dag conf base po ip1 ip2 =
         if c1 <= 1 then None else find_prev_branch conf base dist ip sp b1
       in
       let nb1 =
-        if c1 == 0 then None else find_next_branch conf base dist ip sp b1
+        if c1 = 0 then None else find_next_branch conf base dist ip sp b1
       in
       let pb2 =
         if c2 <= 1 then None else find_prev_branch conf base dist ip sp b2
       in
       let nb2 =
-        if c2 == 0 then None else find_next_branch conf base dist ip sp b2
+        if c2 = 0 then None else find_next_branch conf base dist ip sp b2
       in
       let sp1 = find_person_in_env conf base "3" in
       let sp2 = find_person_in_env conf base "4" in

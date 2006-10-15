@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.8 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: database.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -142,7 +142,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
             seek_in ic (start_pos + ia * int_size);
             let i1 = input_binary_int ic in
             let rec loop i =
-              if i == -1 then raise Not_found
+              if i = -1 then raise Not_found
               else if strings.get i = s then Adef.istr_of_int i
               else do {
                 seek_in ic (start_pos + (hash_len + i) * int_size);
@@ -160,7 +160,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
 
 value initial s =
   loop 0 where rec loop i =
-    if i == String.length s then 0
+    if i = String.length s then 0
     else
       match s.[i] with
       [ 'A'..'Z' | 'À'..'İ' -> i
@@ -169,7 +169,7 @@ value initial s =
 
 value rec list_remove_elemq x =
   fun
-  [ [y :: l] -> if x == y then l else [y :: list_remove_elemq x l]
+  [ [y :: l] -> if x = y then l else [y :: list_remove_elemq x l]
   | [] -> [] ]
 ;
 
@@ -199,7 +199,7 @@ value old_persons_of_first_name_or_surname base_data strings params =
                let ipera =
                  try IstrTree.find istr bt.val with [ Not_found -> [] ]
                in
-               if List.memq (Adef.iper_of_int i) ipera then ()
+               if List.mem (Adef.iper_of_int i) ipera then ()
                else
                  bt.val :=
                    IstrTree.add istr [Adef.iper_of_int i :: ipera] bt.val)
@@ -248,9 +248,9 @@ flush stderr;
     do {
       Hashtbl.iter
         (fun i p ->
-           if List.memq (Adef.iper_of_int i) ipl.val then
-             if compare istr p.first_name == 0 ||
-                compare istr p.surname == 0
+           if List.mem (Adef.iper_of_int i) ipl.val then
+             if compare istr p.first_name = 0 ||
+                compare istr p.surname = 0
              then
                ()
              else ipl.val := list_remove_elemq (Adef.iper_of_int i) ipl.val
@@ -335,7 +335,7 @@ flush stderr;
         (fun i p ->
            let istr1 = proj p in
            if istr1 <> istr then ()
-           else if List.memq (Adef.iper_of_int i) ipera.val then ()
+           else if List.mem (Adef.iper_of_int i) ipera.val then ()
            else ipera.val := [Adef.iper_of_int i :: ipera.val])
         person_patches;
       ipera.val
@@ -465,14 +465,14 @@ value strings_of_fsname bname strings (_, person_patches) =
       Hashtbl.iter
         (fun _ p ->
            do {
-             if not (List.memq p.first_name l.val) then
+             if not (List.mem p.first_name l.val) then
                let s1 = strings.get (Adef.int_of_istr p.first_name) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
                  l.val := [p.first_name :: l.val]
                else ()
              else ();
-             if not (List.memq p.surname l.val) then
+             if not (List.mem p.surname l.val) then
                let s1 = strings.get (Adef.int_of_istr p.surname) in
                let s1 = nominative s1 in
                if s = Name.crush_lower s1 then
@@ -834,7 +834,7 @@ value person_of_key persons strings persons_of_name first_name surname occ =
       fun
       [ [ip :: ipl] ->
           let p = persons.get (Adef.int_of_iper ip) in
-          if occ == p.occ &&
+          if occ = p.occ &&
              first_name =
                Name.lower (strings.get (Adef.int_of_istr p.first_name)) &&
              surname = Name.lower (strings.get (Adef.int_of_istr p.surname))
@@ -1055,7 +1055,7 @@ value opendb bname =
     let i = Hashtbl.hash s in
     try
       let ipl = Hashtbl.find (snd patches.h_name) i in
-      if List.memq ip ipl then ()
+      if List.mem ip ipl then ()
       else Hashtbl.replace (snd patches.h_name) i [ip :: ipl]
     with
     [ Not_found -> Hashtbl.add (snd patches.h_name) i [ip] ]

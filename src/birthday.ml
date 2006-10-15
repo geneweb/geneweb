@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.11 2006-10-13 13:01:11 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.12 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -286,7 +286,7 @@ value print_marriage conf base month =
             let cpl = coi base (Adef.ifam_of_int i) in
             let father = pget conf base (get_father cpl) in
             let mother = pget conf base (get_mother cpl) in
-            if m == month &&
+            if m = month &&
                authorized_age conf base father && not (is_hidden father) &&
                authorized_age conf base mother && not (is_hidden mother) then
               tab.(pred d) := [(cpl, y) :: tab.(pred d)]
@@ -373,9 +373,9 @@ value print_marriage_day conf base day_name fphrase wd dt list =
 ;
 
 value match_dates conf base p d1 d2 =
-  if d1.day == d2.day && d1.month == d2.month then authorized_age conf base p
+  if d1.day = d2.day && d1.month = d2.month then authorized_age conf base p
   else if
-    d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
+    d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3 &&
     not (CheckItem.leap_year d2.year) then
     authorized_age conf base p
   else False
@@ -540,11 +540,11 @@ value print_menu_dead conf base =
 ;
 
 value match_mar_dates conf base cpl d1 d2 =
-  if d1.day == d2.day && d1.month == d2.month then
+  if d1.day = d2.day && d1.month = d2.month then
     authorized_age conf base (pget conf base (get_father cpl)) &&
     authorized_age conf base (pget conf base (get_mother cpl))
   else if
-    d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
+    d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3 &&
     not (CheckItem.leap_year d2.year) then
     authorized_age conf base (pget conf base (get_father cpl)) &&
     authorized_age conf base (pget conf base (get_mother cpl))

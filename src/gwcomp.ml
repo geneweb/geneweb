@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.6 2006-10-01 12:05:07 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -25,13 +25,13 @@ value copy_decode s i1 i2 =
   let len =
     loop 0 i1 where rec loop len i =
       if i >= i2 then len
-      else if i == i2 - 1 then len + 1
-      else if s.[i] == '\\' then loop (len + 1) (i + 2)
+      else if i = i2 - 1 then len + 1
+      else if s.[i] = '\\' then loop (len + 1) (i + 2)
       else loop (len + 1) (i + 1)
   in
   let rec loop_copy t i j =
     if i >= i2 then t
-    else if i == i2 - 1 && s.[i] <> '_' then do { t.[j] := s.[i]; t }
+    else if i = i2 - 1 && s.[i] <> '_' then do { t.[j] := s.[i]; t }
     else do {
       let (c, i) =
         match s.[i] with
@@ -51,21 +51,21 @@ value fields str =
     if i < String.length str then
       match str.[i] with
       [ ' ' | '\t' ->
-          if beg == i then loop (succ beg) (succ i)
+          if beg = i then loop (succ beg) (succ i)
           else [copy_decode str beg i :: loop (succ i) (succ i)]
       | _ -> loop beg (succ i) ]
-    else if beg == i then []
+    else if beg = i then []
     else [copy_decode str beg i]
 ;
 
 value date_of_string s i =
   let champ i =
     let (neg, i) =
-      if i < String.length s && s.[i] == '-' then (True, i + 1)
+      if i < String.length s && s.[i] = '-' then (True, i + 1)
       else (False, i)
     in
     let rec loop i n =
-      if i == String.length s then (if neg then - n else n, i)
+      if i = String.length s then (if neg then - n else n, i)
       else
         match s.[i] with
         [ '0'..'9' as c ->
@@ -75,7 +75,7 @@ value date_of_string s i =
     loop i 0
   in
   let skip_slash i =
-    if i < String.length s && s.[i] == '/' then Some (succ i) else None
+    if i < String.length s && s.[i] = '/' then Some (succ i) else None
   in
   let (precision, i) =
     match s.[i] with
@@ -87,7 +87,7 @@ value date_of_string s i =
   in
   let (undefined, year, i) =
     let (year, j) = champ i in
-    if j = i + 1 && s.[i] == '0' then (True, year, j) else (False, year, j)
+    if j = i + 1 && s.[i] = '0' then (True, year, j) else (False, year, j)
   in
   let error () = failwith ("date_of_string " ^ s) in
   let date =
@@ -100,7 +100,7 @@ value date_of_string s i =
             let day = month in
             let month = year in
             let (year, i) = champ i in
-            if year == 0 then if i == String.length s then None else error ()
+            if year = 0 then if i = String.length s then None else error ()
             else if month < 1 || month > 13 then error ()
             else if day < 1 || day > 31 then error ()
             else
@@ -110,7 +110,7 @@ value date_of_string s i =
               in
               Some (Dgreg d Dgregorian, i)
         | None ->
-            if year == 0 then None
+            if year = 0 then None
             else if month < 1 || month > 13 then error ()
             else
               let d =
@@ -120,8 +120,8 @@ value date_of_string s i =
               Some (Dgreg d Dgregorian, i) ]
     | None ->
         if undefined then
-          if i == String.length s then None
-          else if s.[i] == '(' && s.[String.length s - 1] == ')' then
+          if i = String.length s then None
+          else if s.[i] = '(' && s.[String.length s - 1] = ')' then
             let txt = String.sub s (i + 1) (String.length s - i - 2) in
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
@@ -134,12 +134,12 @@ value date_of_string s i =
   let date =
     match date with
     [ Some ((Dgreg d cal as dt), i) ->
-        if i == String.length s then Some (dt, i)
-        else if s.[i] == '|' then
+        if i = String.length s then Some (dt, i)
+        else if s.[i] = '|' then
           let (y2, i) = champ (succ i) in
           Some (Dgreg {(d) with prec = OrYear y2} cal, i)
         else if
-          i + 1 < String.length s && s.[i] == '.' && s.[i + 1] == '.' then
+          i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
           let (y2, i) = champ (i + 2) in
           Some (Dgreg {(d) with prec = YearInt y2} cal, i)
         else Some (dt, i)
@@ -149,7 +149,7 @@ value date_of_string s i =
   let date =
     match date with
     [ Some (Dgreg d _, i) ->
-        if i == String.length s then Some (Dgreg d Dgregorian, i)
+        if i = String.length s then Some (Dgreg d Dgregorian, i)
         else
           match s.[i] with
           [ 'G' -> Some (Dgreg d Dgregorian, i + 1)
@@ -166,7 +166,7 @@ value date_of_string s i =
     | d -> d ]
   in
   match date with
-  [ Some (dt, i) -> if i == String.length s then Some dt else error ()
+  [ Some (dt, i) -> if i = String.length s then Some dt else error ()
   | None -> None ]
 ;
 
@@ -182,7 +182,7 @@ value input_line0 ic =
   let line = input_line ic in
   do {
      incr line_cnt;
-    if String.length line > 0 && line.[String.length line - 1] == '\r' then
+    if String.length line > 0 && line.[String.length line - 1] = '\r' then
       String.sub line 0 (String.length line - 1)
     else line
   }
@@ -197,14 +197,14 @@ value input_a_line (ic, encoding) =
 
 value rec input_real_line ic =
   let x = input_a_line ic in
-  if x = "" || x.[0] == '#' then input_real_line ic else x
+  if x = "" || x.[0] = '#' then input_real_line ic else x
 ;
 
 value get_optional_birthdate l =
   match l with
   [ [x :: l'] ->
       let i = 0 in
-      if x.[i] == '!' then (None, l)
+      if x.[i] = '!' then (None, l)
       else
         match x.[i] with
         [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
@@ -217,7 +217,7 @@ value get_optional_baptdate l =
   match l with
   [ [x :: l'] ->
       let i = 0 in
-      if x.[i] == '!' then
+      if x.[i] = '!' then
         let i = succ i in
         match x.[i] with
         [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
@@ -289,9 +289,9 @@ value cut_space x =
   if len = 0 then x
   else if x = " " then ""
   else
-    let start = if x.[0] == ' ' then 1 else 0 in
-    let stop = if x.[len - 1] == ' ' then len - 1 else len in
-    if start == 0 && stop == len then x else String.sub x start (stop - start)
+    let start = if x.[0] = ' ' then 1 else 0 in
+    let stop = if x.[len - 1] = ' ' then len - 1 else len in
+    if start = 0 && stop = len then x else String.sub x start (stop - start)
 ;
 
 value get_field lab l =
@@ -309,7 +309,7 @@ value get_optional_sexe =
 
 value make_int str x =
   loop False 0 where rec loop found n i =
-    if i == String.length x then if found then n else raise Not_found
+    if i = String.length x then if found then n else raise Not_found
     else
       match x.[i] with
       [ '0'..'9' as c ->
@@ -339,7 +339,7 @@ value get_fst_name str l =
 value rec get_fst_names_aliases str l =
   match l with
   [ [x :: l'] ->
-      if x.[0] == '{' && x.[String.length x - 1] == '}' then
+      if x.[0] = '{' && x.[String.length x - 1] = '}' then
         let n = String.sub x 1 (String.length x - 2) in
         let (nl, l) = get_fst_names_aliases str l' in ([cut_space n :: nl], l)
       else ([], l)
@@ -382,7 +382,7 @@ value get_name str l =
 value get_pub_name str l =
   match l with
   [ [x :: l'] ->
-      if x.[0] == '(' && x.[String.length x - 1] == ')' then
+      if x.[0] = '(' && x.[String.length x - 1] = ')' then
         let a = String.sub x 1 (String.length x - 2) in (cut_space a, l')
       else ("", l)
   | _ -> ("", l) ]
@@ -394,7 +394,7 @@ value get_image str l =
       do {
         let x = cut_space x in
         for i = 0 to String.length x - 1 do {
-          if x.[i] == ' ' then x.[i] := '_' else ()
+          if x.[i] = ' ' then x.[i] := '_' else ()
         };
         (x, l')
       }
@@ -467,7 +467,7 @@ value scan_title t =
 value rec get_titles str l =
   match l with
   [ [x :: l'] ->
-      if x.[0] == '[' && x.[String.length x - 1] == ']' then
+      if x.[0] = '[' && x.[String.length x - 1] = ']' then
         let t = String.sub x 1 (String.length x - 2) in
         let t = scan_title t in
         let (al, l') = get_titles str l' in
@@ -515,7 +515,7 @@ value get_mar_date str =
       let (src, l) = get_field "#ms" l in
       let (divorce, l) =
         match l with
-        [ [x :: l] when x.[0] == '-' ->
+        [ [x :: l] when x.[0] = '-' ->
             if String.length x > 1 then
               (Divorced (Adef.codate_of_od (date_of_string x 1)), l)
             else (Divorced Adef.codate_None, l)

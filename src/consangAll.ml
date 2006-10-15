@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.22 2006-10-02 19:09:18 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.23 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -71,7 +71,7 @@ value compute base from_scratch quiet =
         match get_parents a with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := get_consang a
         | None -> () ];
-      if get_consang a == no_consang then incr cnt else ()
+      if get_consang a = no_consang then incr cnt else ()
     };
     let max_cnt = cnt.val in
     let most = ref None in
@@ -85,11 +85,11 @@ value compute base from_scratch quiet =
       running.val := False;
       for i = 0 to nb_of_persons base - 1 do {
         let a = fst ascends i in
-        if get_consang a == no_consang then
+        if get_consang a = no_consang then
           match get_parents a with
           [ Some ifam ->
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
-              if pconsang == no_consang then
+              if pconsang = no_consang then
                 let cpl = coi base ifam in
                 let fath = aoi base (get_father cpl) in
                 let moth = aoi base (get_mother cpl) in

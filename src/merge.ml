@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.6 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: merge.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -10,7 +10,7 @@ open Util;
 
 value print_someone conf base p =
   Wserver.wprint "%s%s %s" (p_first_name base p)
-    (if get_occ p == 0 then "" else "." ^ string_of_int (get_occ p))
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 ;
 

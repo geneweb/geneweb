@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.7 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.8 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size : int;
@@ -6,7 +6,7 @@ value verbose : ref bool;
 value utf_8_db : ref bool;
 
 value rindex : string -> char -> option int;
-value array_memq : 'a -> array 'a -> bool;
+value array_mem : 'a -> array 'a -> bool;
 value tr : char -> char -> string -> string;
 value strip_all_trailing_spaces : string -> string;
 

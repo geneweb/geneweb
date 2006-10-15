@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.13 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.14 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -462,7 +462,7 @@ value print_marriage conf base =
   let (list, len) =
     select_family conf base
       (fun fam ->
-         if get_relation fam == Married then
+         if get_relation fam = Married then
            Adef.od_of_codate (get_marriage fam)
          else None)
       False
@@ -477,7 +477,7 @@ value print_oldest_engagements conf base =
   let (list, len) =
     select_family conf base
       (fun fam ->
-         if get_relation fam == Engaged then
+         if get_relation fam = Engaged then
            let cpl = coi base (get_fam_index fam) in
            let husb = poi base (get_father cpl) in
            let wife = poi base (get_mother cpl) in

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.22 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.23 2006-10-15 15:39:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -72,7 +72,7 @@ value next_char_pair_overflows s len i =
 value br = "<br>";
 
 value rec display_note_aux oc s len i =
-  if i == String.length s then fprintf oc "\n"
+  if i = String.length s then fprintf oc "\n"
   else
     let c = if s.[i] = '\n' then ' ' else s.[i] in
     if i <= String.length s - String.length br &&
@@ -80,13 +80,12 @@ value rec display_note_aux oc s len i =
        do {
       fprintf oc "\n2 CONT ";
       let i = i + String.length br in
-      let i = if i < String.length s && s.[i] == '\n' then i + 1 else i in
+      let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
       display_note_aux oc s (String.length "2 CONT ") i
     }
-    else
-      if
-      len == max_len || c <> ' ' && next_char_pair_overflows s len i then
-      do {
+    else if
+      len = max_len || c <> ' ' && next_char_pair_overflows s len i
+    then do {
       fprintf oc "\n2 CONC %c" c;
       display_note_aux oc s (String.length "2 CONC .") (i + 1)
     }
@@ -464,7 +463,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
            List.iter
              (fun ifam ->
                 let fam = foi base ifam in
-                if array_memq (get_key_index per) (get_witnesses fam) then
+                if array_mem (get_key_index per) (get_witnesses fam) then
                   ged_witness fam_sel oc ifam
                 else ())
              (Array.to_list (get_family (uoi base ic)))
@@ -608,7 +607,7 @@ value find_person base p1 po p2 =
   [ Some ip -> ip
   | None -> do {
       printf "Not found: %s%s %s\n" p1
-        (if po == 0 then "" else " " ^ string_of_int po) p2;
+        (if po = 0 then "" else " " ^ string_of_int po) p2;
       flush stdout;
       exit 2
     } ]

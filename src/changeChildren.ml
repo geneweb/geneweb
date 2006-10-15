@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.12 2006-10-10 19:59:33 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -29,7 +29,7 @@ value print_child_person conf base p =
       end;
       tag "td" begin
         xtag "input" "name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s" var
-          (if occ == 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
+          (if occ = 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
       end;
     end;
     tag "tr" "align=\"%s\"" conf.left begin

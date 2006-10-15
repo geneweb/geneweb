@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.10 2006-09-22 23:47:14 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.11 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -250,19 +250,19 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
 value print_cousins conf base p lev1 lev2 =
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-    if lev1 == lev2 then
+    if lev1 = lev2 then
       let s =
         transl_a_of_gr_eq_gen_lev conf
           (brother_label conf lev1) (txt_fun raw_access conf base p)
       in
       Wserver.wprint "%s" (capitale (Util.translate_eval s))
-    else if lev1 == 2 && lev2 == 1 then
+    else if lev1 = 2 && lev2 = 1 then
       let s =
         transl_a_of_b conf (transl conf "uncles and aunts")
           (txt_fun raw_access conf base p)
       in
       Wserver.wprint "%s" (capitale (Util.translate_eval s))
-    else if lev1 == 1 && lev2 == 2 then
+    else if lev1 = 1 && lev2 = 2 then
       let s =
         transl_a_of_gr_eq_gen_lev conf
           (transl conf "nephews and nieces") (txt_fun raw_access conf base p)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.1 2006-10-01 15:57:59 ddr Exp $ *)
+(* $Id: doc.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
 
 open Config;
 
@@ -69,7 +69,7 @@ value url_is_implicit n =
 
 value copy conf pref_doc pref_img s =
   loop 0 where rec loop i =
-    if i == String.length s then ()
+    if i = String.length s then ()
     else if last_is s i "<a href=" then do {
       let i = do { Wserver.wprint "="; i + 1 } in
       let i = if s.[i] = '"' then do { Wserver.wprint "\""; i + 1 } else i in
@@ -108,8 +108,8 @@ value copy conf pref_doc pref_img s =
 
 value mac_name_of_url_name s =
   loop 0 0 where rec loop i len =
-    if i == String.length s then Buff.get len
-    else if s.[i] == '/' then loop (Buff.store len ':') (i + 1)
+    if i = String.length s then Buff.get len
+    else if s.[i] = '/' then loop (Buff.store len ':') (i + 1)
     else loop (Buff.store len s.[i]) (i + 1)
 ;
 

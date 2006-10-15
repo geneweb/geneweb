@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.17 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.18 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -156,7 +156,7 @@ value effective_mod_merge conf base sp =
                         match r.r_fath with
                         [ Some ip when ip = get_key_index p2 ->
                             let (p_related, mod_p) =
-                              if List.memq ipc p_related then
+                              if List.mem ipc p_related then
                                 (p_related, mod_p)
                               else ([ipc :: p_related], True)
                             in
@@ -170,7 +170,7 @@ value effective_mod_merge conf base sp =
                         match r.r_moth with
                         [ Some ip when ip = get_key_index p2 ->
                             let (p_related, mod_p) =
-                              if List.memq ipc p_related then
+                              if List.mem ipc p_related then
                                 (p_related, mod_p)
                               else ([ipc :: p_related], True)
                             in
@@ -196,7 +196,7 @@ value effective_mod_merge conf base sp =
                      else
                        let fam = foi base (get_family uc).(i) in
                        let (p_related, mod_p) =
-                         if array_memq (get_key_index p2) (get_witnesses fam)
+                         if array_mem (get_key_index p2) (get_witnesses fam)
                          then do {
                            let (p_related, mod_p) =
                              loop (p_related, mod_p) 0
@@ -205,11 +205,10 @@ value effective_mod_merge conf base sp =
                                  (p_related, mod_p)
                                else
                                let (p_related, mod_p) =
-                                 if (get_witnesses fam).(j) ==
-                                    get_key_index p2
+                                 if (get_witnesses fam).(j) = get_key_index p2
                                  then do {
                                    (get_witnesses fam).(j) := get_key_index p;
-                                   if List.memq ipc p_related then
+                                   if List.mem ipc p_related then
                                      (p_related, mod_p)
                                    else ([ipc :: p_related], True)
                                  }
@@ -238,7 +237,7 @@ value effective_mod_merge conf base sp =
               Array.iter
                 (fun ip ->
                    let w = poi base ip in
-                   if not (List.memq (get_key_index p) (get_related w)) then
+                   if not (List.mem (get_key_index p) (get_related w)) then
                      let w =
                        person_with_related w
                          [get_key_index p :: get_related w]

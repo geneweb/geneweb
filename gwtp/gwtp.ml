@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 5.4 2006-10-02 14:39:01 ddr Exp $ *)
+(* $Id: gwtp.ml,v 5.5 2006-10-15 15:39:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -152,8 +152,8 @@ value template_fname env fname =
 
 value lindex s c =
   pos 0 where rec pos i =
-    if i == String.length s then None
-    else if s.[i] == c then Some i
+    if i = String.length s then None
+    else if s.[i] = c then Some i
     else pos (i + 1)
 ;
 
@@ -334,7 +334,7 @@ value remove_dir_contents dir =
 value html_escaped s =
   let s = String.escaped s in
   let rec loop i len =
-    if i == String.length s then Buff.get len
+    if i = String.length s then Buff.get len
     else
       let len =
         match s.[i] with
@@ -1048,9 +1048,9 @@ value gwtp_download str env b tok =
             while True do {
               let f = Unix.readdir dh in
               let st = Unix.stat (Filename.concat bdir f) in
-              if st.Unix.st_kind == Unix.S_REG &&
-                 f.[String.length f - 1] <> '~' then
-                 do {
+              if st.Unix.st_kind = Unix.S_REG &&
+                 f.[String.length f - 1] <> '~'
+              then do {
                 printf "<li><tt>";
                 printf "<a href=\"%s?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
                   (cgi_script_name ()) b tok f f;

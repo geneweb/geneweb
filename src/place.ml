@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.11 2006-10-10 19:10:08 ddr Exp $ *)
+(* $Id: place.ml,v 5.12 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -10,7 +10,7 @@ open Util;
 
 value fold_place inverted s =
   let rec loop iend list i ibeg =
-    if i == iend then
+    if i = iend then
       if i > ibeg then [String.sub s ibeg (i - ibeg) :: list] else list
     else
       let (list, ibeg) =
@@ -27,7 +27,7 @@ value fold_place inverted s =
       loop iend list (i + 1) ibeg
   in
   let (iend, rest) =
-    if String.length s > 0 && s.[String.length s - 1] == ')' then
+    if String.length s > 0 && s.[String.length s - 1] = ')' then
       match Mutil.rindex s '(' with
       [ Some i when i < String.length s - 2 ->
           let j =

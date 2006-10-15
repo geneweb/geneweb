@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.12 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: some.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -111,7 +111,7 @@ value first_name_print_list conf base x1 xl liste =
       (fun l x ->
          let px = p_surname base x in
          match l with
-         [ [(p, l1) :: l] when alphabetic px p == 0 -> [(p, [x :: l1]) :: l]
+         [ [(p, l1) :: l] when alphabetic px p = 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
       [] l
   in
@@ -265,7 +265,7 @@ value print_branch conf base psn name =
                child_has_children_with_same_name base des name
              in
              let i = Adef.int_of_ifam ifam in
-             let sel = not (List.memq i unsel_list) in
+             let sel = not (List.mem i unsel_list) in
              (fam, des, c, if down then Some (string_of_int i, sel) else None))
           (Array.to_list (get_family u))
       in
@@ -274,7 +274,7 @@ value print_branch conf base psn name =
         [ [(_, _, _, select) :: _] -> select
         | _ -> None ]
       in
-      if lev == 0 then () else Wserver.wprint "<dd>\n";
+      if lev = 0 then () else Wserver.wprint "<dd>\n";
       Util.print_selection_bullet conf select;
       Wserver.wprint "<strong>";
       Wserver.wprint "%s"
@@ -286,14 +286,14 @@ value print_branch conf base psn name =
       Wserver.wprint "</strong>";
       Wserver.wprint "%s" (Date.short_dates_text conf base p);
       Wserver.wprint "\n";
-      if Array.length (get_family u) == 0 then ()
+      if Array.length (get_family u) = 0 then ()
       else
         let _ =
           List.fold_left
             (fun first (fam, des, c, select) ->
                do {
                  if not first then do {
-                   if lev == 0 then Wserver.wprint "<br>\n"
+                   if lev = 0 then Wserver.wprint "<br>\n"
                    else Wserver.wprint "</dd><dd>\n";
                    Util.print_selection_bullet conf select;
                    Wserver.wprint "<em>";
@@ -334,7 +334,7 @@ value print_branch conf base psn name =
             True family_list
         in
         ();
-      if lev == 0 then () else Wserver.wprint "</dd>\n";
+      if lev = 0 then () else Wserver.wprint "</dd>\n";
     }
 ;
 
@@ -479,7 +479,7 @@ value print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-           if List.memq (get_surname p) list then list
+           if List.mem (get_surname p) list then list
            else [get_surname p :: list])
         [] liste
     in
@@ -500,7 +500,7 @@ value print_family_alphabetic x conf base liste =
       (fun l x ->
          let px = p_first_name base x in
          match l with
-         [ [(p, l1) :: l] when alphabetic1 px p == 0 -> [(p, [x :: l1]) :: l]
+         [ [(p, l1) :: l] when alphabetic1 px p = 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
       [] l
   in
@@ -529,11 +529,11 @@ value print_family_alphabetic x conf base liste =
 
 value has_at_least_2_children_with_surname conf base des surname =
   loop 0 0 where rec loop cnt i =
-    if i == Array.length (get_children des) then False
+    if i = Array.length (get_children des) then False
     else
       let p = pget conf base (get_children des).(i) in
-      if get_surname p == surname then
-        if cnt == 1 then True else loop (cnt + 1) (i + 1)
+      if get_surname p = surname then
+        if cnt = 1 then True else loop (cnt + 1) (i + 1)
       else loop cnt (i + 1)
 ;
 
@@ -552,9 +552,9 @@ value select_ancestors conf base name_inj ipl =
            let s = str_inj (get_surname p) in
            if str_inj (get_surname fath) <> s &&
               str_inj (get_surname moth) <> s &&
-              not (List.memq ip ipl)
+              not (List.mem ip ipl)
            then
-             if List.memq ifath ipl then ipl
+             if List.mem ifath ipl then ipl
              else
                let grandfath_same_surname =
                  match get_parents (aoi base ifath) with

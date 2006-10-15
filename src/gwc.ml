@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.45 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.46 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -127,7 +127,7 @@ value unique_string gen x =
   try Hashtbl.find gen.g_strings x with
   [ Not_found ->
       do {
-        if gen.g_scnt == Array.length gen.g_base.c_strings then do {
+        if gen.g_scnt = Array.length gen.g_base.c_strings then do {
           let arr = gen.g_base.c_strings in
           let new_size = 2 * Array.length arr + 1 in
           let new_arr = Array.create new_size (no_string gen) in
@@ -164,7 +164,7 @@ value make_person gen p n occ =
 value no_person gen = make_person gen "" "" 0;
 
 value new_iper gen =
-  if gen.g_pcnt == Array.length gen.g_base.c_persons then do {
+  if gen.g_pcnt = Array.length gen.g_base.c_persons then do {
     let per_arr = gen.g_base.c_persons in
     let asc_arr = gen.g_base.c_ascends in
     let uni_arr = gen.g_base.c_unions in
@@ -187,7 +187,7 @@ value new_iper gen =
 ;
 
 value new_ifam gen =
-  if gen.g_fcnt == Array.length gen.g_base.c_couples then do {
+  if gen.g_fcnt = Array.length gen.g_base.c_couples then do {
     let cpl_arr = gen.g_base.c_couples in
     let des_arr = gen.g_base.c_descends in
     let new_size = 2 * Array.length cpl_arr + 1 in
@@ -236,7 +236,7 @@ value find_person_by_global_name gen first_name surname occ =
     | [ip :: ipl] ->
         let p = poi gen.g_base ip in
         if Name.lower (p_first_name gen.g_base p) = first_name &&
-           Name.lower (p_surname gen.g_base p) = surname && p.m_occ == occ then
+           Name.lower (p_surname gen.g_base p) = surname && p.m_occ = occ then
           ip
         else loop ipl ]
   in
@@ -503,8 +503,8 @@ because this persons still exists as child of
 ;
 
 value notice_sex gen p s =
-  if p.m_sex == Neuter then p.m_sex := s
-  else if p.m_sex == s || s == Neuter then ()
+  if p.m_sex = Neuter then p.m_sex := s
+  else if p.m_sex = s || s = Neuter then ()
   else do {
     printf "\nInconcistency about the sex of\n  %s %s\n"
       (p_first_name gen.g_base p) (p_surname gen.g_base p);
@@ -596,7 +596,7 @@ value insert_notes fname gen key str =
       if sou gen.g_base p.m_notes <> "" then do {
         printf "\nFile \"%s\"\n" fname;
         printf "Notes already defined for \"%s%s %s\"\n"
-          key.pk_first_name (if occ == 0 then "" else "." ^ string_of_int occ)
+          key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         check_error gen
       }
@@ -605,7 +605,7 @@ value insert_notes fname gen key str =
       do {
         printf "File \"%s\"\n" fname;
         printf "*** warning: undefined person: \"%s%s %s\"\n"
-          key.pk_first_name (if occ == 0 then "" else "." ^ string_of_int occ)
+          key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         flush stdout;
       } ]
@@ -666,7 +666,7 @@ value insert_relations fname gen sb sex rl =
     printf "\nFile \"%s\"\n" fname;
     printf "Relations already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
-      (if p.m_occ == 0 then "" else "." ^ string_of_int p.m_occ)
+      (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
     check_error gen
   }

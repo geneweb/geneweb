@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.4 2006-08-29 16:23:37 ddr Exp $ *)
+(* $Id: name.ml,v 5.5 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value utf_8_db = ref True;
@@ -256,7 +256,7 @@ value next_chars_if_equiv s i t j =
 
 value lower s =
   copy False 0 0 where rec copy special i len =
-    if i == String.length s then Buff.get len
+    if i = String.length s then Buff.get len
     else if not utf_8_db.val || Char.code s.[i] < 0x80 then
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
@@ -282,13 +282,13 @@ value abbrev_list =
 ;
 
 value rec is_word s i p ip =
-  if ip == String.length p then
-    if i == String.length s then True
+  if ip = String.length p then
+    if i = String.length s then True
     else if s.[i] = ' ' then True
     else False
   else
-    if i == String.length s then False
-    else if s.[i] == p.[ip] then is_word s (i+1) p (ip+1)
+    if i = String.length s then False
+    else if s.[i] = p.[ip] then is_word s (i+1) p (ip+1)
     else False
 ;
 
@@ -319,8 +319,8 @@ value abbrev s =
 
 value strip s =
   copy 0 0 where rec copy i len =
-    if i == String.length s then Buff.get len
-    else if s.[i] == ' ' then copy (i + 1) len
+    if i = String.length s then Buff.get len
+    else if s.[i] = ' ' then copy (i + 1) len
     else copy (i + 1) (Buff.store len s.[i])
 ;
 
@@ -328,20 +328,20 @@ value strip s =
 
 value roman_number s i =
   let rec loop i =
-    if i == String.length s then Some i
-    else if s.[i] == ' ' then Some i
+    if i = String.length s then Some i
+    else if s.[i] = ' ' then Some i
     else
       match s.[i] with
       [ 'i' | 'v' | 'x' | 'l' -> loop (i + 1)
       | _ -> None ]
   in
-  if i == 0 || s.[i-1] == ' ' then loop i else None
+  if i = 0 || s.[i-1] = ' ' then loop i else None
 ;
 
 value crush s =
   copy 0 0 True where rec copy i len first_vowel =
-    if i == String.length s then Buff.get len
-    else if s.[i] == ' ' then copy (i + 1) len True
+    if i = String.length s then Buff.get len
+    else if s.[i] = ' ' then copy (i + 1) len True
     else
       match roman_number s i with
       [ Some j ->
@@ -355,12 +355,12 @@ value crush s =
               copy (i + 1) len False
           | 'h' ->
               let len =
-                if i > 0 && s.[i-1] == 'p' then Buff.store (len - 1) 'f'
+                if i > 0 && s.[i-1] = 'p' then Buff.store (len - 1) 'f'
                 else len
               in
               copy (i + 1) len first_vowel
           | 's' | 'z' when
-            utf_8_db.val && (i == String.length s - 1 || s.[i + 1] == ' ') ->
+            utf_8_db.val && (i = String.length s - 1 || s.[i + 1] = ' ') ->
               let len =
                 loop (i - 1) (len - 1) where rec loop i len =
                   if i > 0 && len > 0 && s.[i] = Buff.buff.val.[len] &&
@@ -369,10 +369,10 @@ value crush s =
                   else len + 1
               in
               copy (i + 1) len False
-          | 's' when i == String.length s - 1 || s.[i + 1] == ' ' ->
+          | 's' when i = String.length s - 1 || s.[i + 1] = ' ' ->
               copy (i + 1) len False
           | c ->
-              if i > 0 && s.[i-1] == c then copy (i + 1) len False
+              if i > 0 && s.[i-1] = c then copy (i + 1) len False
               else
                 let c =
                   match c with

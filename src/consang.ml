@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.8 2006-10-02 02:50:38 ddr Exp $ *)
+(* $Id: consang.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -105,7 +105,7 @@ value topological_sort base aoi =
       | _ -> () ]
     };
     for i = 0 to nb_of_persons base - 1 do {
-      if tab.(i) == 0 then todo.val := [i :: todo.val] else ()
+      if tab.(i) = 0 then todo.val := [i :: todo.val] else ()
     };
     let rec loop tval list =
       if list = [] then ()
@@ -126,11 +126,11 @@ value topological_sort base aoi =
                        tab.(ifath) := tab.(ifath) - 1;
                        tab.(imoth) := tab.(imoth) - 1;
                        let new_list =
-                         if tab.(ifath) == 0 then [ifath :: new_list]
+                         if tab.(ifath) = 0 then [ifath :: new_list]
                          else new_list
                        in
                        let new_list =
-                         if tab.(imoth) == 0 then [imoth :: new_list]
+                         if tab.(imoth) = 0 then [imoth :: new_list]
                          else new_list
                        in
                        new_list
@@ -190,7 +190,7 @@ value rec insert_branch_len_rec ((len, n, ip) as x) =
   fun
   [ [] -> [(len, n, [ip])]
   | [((len1, n1, ipl1) as y) :: lens] ->
-      if len == len1 then
+      if len = len1 then
         let n2 = n + n1 in
         let n2 = if n < 0 || n1 < 0 || n2 < 0 then -1 else n2 in
         [(len1, n2, [ip :: ipl1]) :: lens]
@@ -202,14 +202,14 @@ value insert_branch_len ip lens (len, n, ipl) =
 ;
 
 value consang_of p =
-  if get_consang p == no_consang then 0.0
+  if get_consang p = no_consang then 0.0
   else Adef.float_of_fix (get_consang p)
 ;
 
 value relationship_and_links base ri b ip1 ip2 =
   let i1 = Adef.int_of_iper ip1 in
   let i2 = Adef.int_of_iper ip2 in
-  if i1 == i2 then (1.0, [])
+  if i1 = i2 then (1.0, [])
   else do {
     let reltab = ri.reltab in
     let tstab = ri.tstab in
@@ -295,8 +295,8 @@ value relationship_and_links base ri b ip1 ip2 =
         tu.weight1 *. tu.weight2 -. tu.relationship *. (1.0 +. consang_of a)
       in
       do {
-        if tu.anc_stat1 == IsAnc then decr nb_anc1 else ();
-        if tu.anc_stat2 == IsAnc then decr nb_anc2 else ();
+        if tu.anc_stat1 = IsAnc then decr nb_anc1 else ();
+        if tu.anc_stat2 = IsAnc then decr nb_anc2 else ();
         relationship.val := relationship.val +. contribution;
         if b && contribution <> 0.0 && not tu.elim_ancestors then do {
           tops.val := [u :: tops.val]; tu.elim_ancestors := True

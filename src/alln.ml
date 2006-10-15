@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.12 2006-10-03 10:27:47 ddr Exp $ *)
+(* $Id: alln.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -15,10 +15,10 @@ value default_max_cnt = 2000;
 
 value string_start_with ini s =
   loop 0 0 where rec loop i1 i2 =
-    if i1 == String.length ini then True
-    else if i2 == String.length s then
-      if ini.[i1] == '_' then loop (i1 + 1) i2 else False
-    else if s.[i2] == ini.[i1] || s.[i2] == ' ' && ini.[i1] == '_' then
+    if i1 = String.length ini then True
+    else if i2 = String.length s then
+      if ini.[i1] = '_' then loop (i1 + 1) i2 else False
+    else if s.[i2] = ini.[i1] || s.[i2] = ' ' && ini.[i1] = '_' then
       loop (i1 + 1) (i2 + 1)
     else False
 ;
@@ -36,7 +36,7 @@ value combine_by_ini ini list =
           in
           do {
             for i = 0 to String.length ini_k - 1 do {
-              if ini_k.[i] == ' ' then ini_k.[i] := '_' else ()
+              if ini_k.[i] = ' ' then ini_k.[i] := '_' else ()
             };
             let new_list =
               if ini_k = "_" then new_list

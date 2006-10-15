@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.9 2006-10-15 05:40:11 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.10 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -277,7 +277,7 @@ value rec lexicon_translate conf base nomin strm first_c =
     loop 0 first_c where rec loop len c =
       if c = ']' then
         let s = Lbuff.get len in
-        if len > 0 && s.[0] == '*' then (True, String.sub s 1 (len - 1))
+        if len > 0 && s.[0] = '*' then (True, String.sub s 1 (len - 1))
         else (False, s)
       else loop (Lbuff.store len c) (Stream.next strm)
   in
@@ -297,10 +297,10 @@ value rec lexicon_translate conf base nomin strm first_c =
           let sa =
             loop 0 where rec loop len =
               let c = Stream.next strm in
-              if c == ')' then Lbuff.get len
+              if c = ')' then Lbuff.get len
               else
                 let len =
-                  if c == '%' then
+                  if c = '%' then
                     let c = Stream.next strm in
                     Lbuff.mstore len (macro conf base c)
                   else Lbuff.store len c

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.4 2006-10-01 19:04:33 ddr Exp $ *)
+(* $Id: history.ml,v 5.5 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -99,7 +99,7 @@ value buff_get_rev len =
 
 value rev_input_char ic (rbuff, rpos) pos =
   do {
-    if rpos.val == 0 then do {
+    if rpos.val = 0 then do {
       if String.length rbuff.val < 65536 then
         let len =
           if rbuff.val = "" then 1024 else 2 * String.length rbuff.val

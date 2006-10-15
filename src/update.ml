@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.22 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: update.ml,v 5.23 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -105,7 +105,7 @@ value update_misc_names_of_family conf base p u =
              (fun ip ->
                 List.iter
                   (fun name ->
-                     if not (List.memq ip (person_ht_find_all base name)) then
+                     if not (List.mem ip (person_ht_find_all base name)) then
                        person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip) (nobtit conf base)))

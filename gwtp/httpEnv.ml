@@ -1,4 +1,4 @@
-(* $Id: httpEnv.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 5.1 2006-10-15 15:39:38 ddr Exp $ *)
 
 open Printf;
 
@@ -45,10 +45,10 @@ value decode s =
   in
   let rec strip_heading_and_trailing_spaces s =
     if String.length s > 0 then
-      if s.[0] == ' ' then
+      if s.[0] = ' ' then
         strip_heading_and_trailing_spaces
           (String.sub s 1 (String.length s - 1))
-      else if s.[String.length s - 1] == ' ' then
+      else if s.[String.length s - 1] = ' ' then
         strip_heading_and_trailing_spaces
           (String.sub s 0 (String.length s - 1))
       else s
@@ -114,21 +114,21 @@ value encode s =
 (* Env from a string *)
 
 value rec skip_spaces s i =
-  if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1) else i
+  if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 ;
 
 value create_env s =
   let rec get_assoc beg i =
-    if i == String.length s then
-      if i == beg then [] else [String.sub s beg (i - beg)]
-    else if s.[i] == ';' || s.[i] == '&' then
+    if i = String.length s then
+      if i = beg then [] else [String.sub s beg (i - beg)]
+    else if s.[i] = ';' || s.[i] = '&' then
       let next_i = skip_spaces s (succ i) in
       [String.sub s beg (i - beg) :: get_assoc next_i next_i]
     else get_assoc beg (succ i)
   in
   let rec separate i s =
     if i = String.length s then (s, "")
-    else if s.[i] == '=' then
+    else if s.[i] = '=' then
       (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
     else separate (succ i) s
   in
@@ -147,7 +147,7 @@ value is_multipart_form =
     let rec loop i =
       if i >= String.length content_type then False
       else if i >= String.length s then True
-      else if content_type.[i] == Char.lowercase s.[i] then loop (i + 1)
+      else if content_type.[i] = Char.lowercase s.[i] then loop (i + 1)
       else False
     in
     loop 0
@@ -158,9 +158,9 @@ value extract_boundary content_type =
 ;
 
 value strip_quotes s =
-  let i0 = if String.length s > 0 && s.[0] == '"' then 1 else 0 in
+  let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
   let i1 =
-    if String.length s > 0 && s.[String.length s - 1] == '"' then
+    if String.length s > 0 && s.[String.length s - 1] = '"' then
       String.length s - 1
     else String.length s
   in
@@ -169,14 +169,14 @@ value strip_quotes s =
 
 value extract_multipart boundary str =
   let rec skip_nl i =
-    if i < String.length str && str.[i] == '\r' then skip_nl (i + 1)
-    else if i < String.length str && str.[i] == '\n' then i + 1
+    if i < String.length str && str.[i] = '\r' then skip_nl (i + 1)
+    else if i < String.length str && str.[i] = '\n' then i + 1
     else i
   in
   let next_line i =
     let i = skip_nl i in
     let rec loop s i =
-      if i == String.length str || str.[i] == '\n' || str.[i] == '\r' then
+      if i = String.length str || str.[i] = '\n' || str.[i] = '\r' then
         (s, i)
       else loop (s ^ String.make 1 str.[i]) (i + 1)
     in
@@ -184,7 +184,7 @@ value extract_multipart boundary str =
   in
   let boundary = "--" ^ boundary in
   let rec loop list i =
-    if i == String.length str then list
+    if i = String.length str then list
     else
       let (s, i) = next_line i in
       if s = boundary then

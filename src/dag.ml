@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.8 2006-09-30 18:07:33 ddr Exp $ *)
+(* $Id: dag.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -871,10 +871,10 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                        match get_parents (aget conf base cip) with
                        [ Some ifam ->
                            let cpl = coi base ifam in
-                           if ip == get_father cpl then
+                           if ip = get_father cpl then
                              if List.mem_assoc (get_mother cpl) list then list
                              else [(get_mother cpl, Some ifam) :: list]
-                           else if ip == get_mother cpl then
+                           else if ip = get_mother cpl then
                              if List.mem_assoc (get_father cpl) list then list
                              else [(get_father cpl, Some ifam) :: list]
                            else list

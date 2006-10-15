@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.7 2006-10-07 16:26:40 ddr Exp $ *)
+(* $Id: forum.ml,v 5.8 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -195,12 +195,12 @@ value forum_file conf =
 
 value match_strings regexp s =
   loop 0 0 where rec loop i j =
-    if i == String.length regexp && j == String.length s then True
-    else if i == String.length regexp then False
-    else if j == String.length s then False
+    if i = String.length regexp && j = String.length s then True
+    else if i = String.length regexp then False
+    else if j = String.length s then False
     else if regexp.[i] = s.[j] then loop (i + 1) (j + 1)
     else if regexp.[i] = '*' then
-      if i + 1 == String.length regexp then True
+      if i + 1 = String.length regexp then True
       else if regexp.[i + 1] = s.[j] then loop (i + 2) (j + 1)
       else loop i (j + 1)
     else False
@@ -709,7 +709,7 @@ value forum_add conf base moderated mess =
            fprintf oc "Text:\n";
            let txt = mess.m_text in
            let rec loop i bol =
-             if i == String.length txt then ()
+             if i = String.length txt then ()
              else do {
                if bol then fprintf oc "  " else ();
                if txt.[i] <> '\r' then output_char oc txt.[i] else ();

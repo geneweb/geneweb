@@ -1,4 +1,4 @@
-(* $Id: buff.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: buff.ml,v 5.1 2006-10-15 15:39:39 ddr Exp $ *)
 
 module Make (B : sig value buff : ref string; end) =
   struct
@@ -14,12 +14,13 @@ module Make (B : sig value buff : ref string; end) =
     ;
     value mstore len s =
       add_rec len 0 where rec add_rec len i =
-        if i == String.length s then len else add_rec (store len s.[i]) (succ i)
+        if i = String.length s then len
+        else add_rec (store len s.[i]) (succ i)
     ;
     value gstore len s si slen =
       let iend = si + slen in
       add_rec len si where rec add_rec len i =
-        if i == iend || i == String.length s then len
+        if i = iend || i = String.length s then len
         else add_rec (store len s.[i]) (succ i)
     ;
     value get len = String.sub buff.val 0 len;
