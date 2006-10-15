@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.22 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.23 2006-10-15 13:36:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1120,7 +1120,7 @@ value censor = ref 0;
 value with_siblings = ref False;
 value maxlev = ref (-1);
 
-value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
+value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
   let to_separate = separate base in
   let anc =
     match anc with
@@ -1142,13 +1142,14 @@ value gwu base in_dir out_dir out_oc src_oc_list anc desc ancdesc =
     if out_dir = "" then (out_oc, out_oc_first)
     else if fname = "" then (out_oc, out_oc_first)
     else
-      try List.assoc fname src_oc_list.val with
+      try Hashtbl.find src_oc_ht fname with
       [ Not_found ->
           let oc = open_out (Filename.concat out_dir fname) in
           let x = (oc, ref True) in
           do {
             if raw_output.val then () else fprintf oc "encoding: utf-8\n\n";
-            src_oc_list.val := [(fname, x) :: src_oc_list.val]; x
+            Hashtbl.add src_oc_ht fname x;
+            x
           } ]
   in
   let gen =
@@ -1490,7 +1491,7 @@ value main () =
       if Filename.check_suffix in_file.val ".gwb" then in_file.val
       else in_file.val ^ ".gwb"
     in
-    let src_oc_list = ref [] in
+    let src_oc_ht = Hashtbl.create 1009 in
     let () = load_ascends_array base in
     let () = load_strings_array base in
     if not mem.val then
@@ -1503,9 +1504,9 @@ value main () =
       if out_file.val = "" then stdout else open_out out_file.val
     in
     if raw_output.val then () else fprintf out_oc "encoding: utf-8\n\n";
-    gwu base in_dir out_dir.val out_oc src_oc_list anc desc ancdesc;
-    List.iter (fun (src, (oc, _)) -> do { flush oc; close_out oc })
-      src_oc_list.val;
+    gwu base in_dir out_dir.val out_oc src_oc_ht anc desc ancdesc;
+    Hashtbl.iter (fun _ (oc, _) -> do { flush oc; close_out oc })
+      src_oc_ht;
     flush out_oc;
     if out_file.val = "" then () else close_out out_oc
   }
