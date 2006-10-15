@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.41 2006-10-15 12:50:48 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.42 2006-10-15 14:19:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -95,21 +95,24 @@ value person_of_string_key base s =
   | None -> None ]
 ;
 
+value person_not_a_key_find_all base s =
+  let ipl = persons_of_name base s in
+  let rec select =
+    fun
+    [ [ip :: ipl] ->
+        if person_is_key base (poi base ip) s then
+          let ipl = select ipl in
+          if List.mem ip ipl then ipl else [ip :: ipl]
+        else select ipl
+    | [] -> [] ]
+  in
+  select ipl
+;
+
 value person_ht_find_all base s =
   match person_of_string_key base s with
   [ Some p -> [p]
-  | _ ->
-      let ipl = persons_of_name base s in
-      let rec select =
-        fun
-        [ [ip :: ipl] ->
-            if person_is_key base (poi base ip) s then
-              let ipl = select ipl in
-              if List.mem ip ipl then ipl else [ip :: ipl]
-            else select ipl
-        | [] -> [] ]
-      in
-      select ipl ]
+  | None -> person_not_a_key_find_all base s ]
 ;
 
 value find_same_name base p =

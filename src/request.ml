@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.23 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: request.ml,v 5.24 2006-10-15 14:19:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -156,38 +156,54 @@ value find_all conf base an =
         | _ -> ([], False) ]
       else ([], False)
   | _ ->
-      let ipl = person_ht_find_all base an in
-      let (an, ipl) =
-        if ipl = [] then
-          match name_with_roman_number an with
-          [ Some an1 ->
-              let ipl = person_ht_find_all base an1 in
-              if ipl = [] then (an, []) else (an1, ipl)
-          | None -> (an, ipl) ]
-        else (an, ipl)
-      in
-      let pl = 
-        List.fold_left
-          (fun l ip ->
-             let p = pget conf base ip in
-             if is_hidden p then l else [p :: l])
-        [] ipl
-      in
-      let spl = select_std_eq conf base pl an in
-      let pl =
-        if spl = [] then
-          if pl = [] then try_find_with_one_first_name conf base an else pl
-        else spl
-      in
-      let pl =
-        if not conf.wizard && not conf.friend && conf.hide_names then
-          List.fold_right
-            (fun p pl ->
-               if Util.fast_auth_age conf p then [p :: pl] else pl)
-            pl []
-        else pl
-      in
-      (compact_list conf base pl, False) ]
+      match person_of_string_key base an with
+      [ Some ip ->
+          let pl = 
+            let p = pget conf base ip in
+            if is_hidden p then [] else [p]
+          in
+          let pl =
+            if not conf.wizard && not conf.friend && conf.hide_names then
+              List.fold_right
+                (fun p pl ->
+                   if Util.fast_auth_age conf p then [p :: pl] else pl)
+                pl []
+            else pl
+          in
+          (pl, False)
+      | None ->
+          let ipl = person_not_a_key_find_all base an in
+          let (an, ipl) =
+            if ipl = [] then
+              match name_with_roman_number an with
+              [ Some an1 ->
+                  let ipl = person_ht_find_all base an1 in
+                  if ipl = [] then (an, []) else (an1, ipl)
+              | None -> (an, ipl) ]
+            else (an, ipl)
+          in
+          let pl = 
+            List.fold_left
+              (fun l ip ->
+                 let p = pget conf base ip in
+                 if is_hidden p then l else [p :: l])
+            [] ipl
+          in
+          let spl = select_std_eq conf base pl an in
+          let pl =
+            if spl = [] then
+              if pl = [] then try_find_with_one_first_name conf base an else pl
+            else spl
+          in
+          let pl =
+            if not conf.wizard && not conf.friend && conf.hide_names then
+              List.fold_right
+                (fun p pl ->
+                   if Util.fast_auth_age conf p then [p :: pl] else pl)
+                pl []
+            else pl
+          in
+          (compact_list conf base pl, False) ] ]
 ;
 
 value specify conf base n pl =
@@ -464,7 +480,7 @@ value family_m conf base =
           | _ ->
               if n = "" then unknown conf n
               else
-                let (pl, soza_acc) = find_all conf base n in
+                let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 [ [] ->
                     do {
@@ -472,7 +488,7 @@ value family_m conf base =
                       Some.surname_print conf base unknown n
                     }
                 | [p] ->
-                    if soza_acc ||
+                    if sosa_acc ||
                        Gutil.person_of_string_key base n <> None ||
                        person_is_std_key conf base p n
                     then
