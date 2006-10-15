@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.11 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: title.ml,v 5.12 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -86,7 +86,7 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
   with
   [ ((_, Some (Dgreg d1 _), _, _), (_, Some (Dgreg d2 _), _, _)) ->
       if CheckItem.strictly_before_dmy d1 d2 then -1
-      else if d1.year == d2.year then
+      else if d1.year = d2.year then
         match
           (Adef.od_of_codate t1.t_date_end, Adef.od_of_codate t2.t_date_end)
         with
@@ -141,7 +141,7 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
 ;
 
 value compare_title_order conf base (x1, t1) (x2, t2) =
-  if t1.t_nth == 0 || t2.t_nth == 0 || t1.t_nth = t2.t_nth then
+  if t1.t_nth = 0 || t2.t_nth = 0 || t1.t_nth = t2.t_nth then
     compare_title_dates conf base (x1, t1) (x2, t2)
   else compare t1.t_nth t2.t_nth
 ;
@@ -295,7 +295,7 @@ value give_access_someone conf base (x, t) list =
     [ Some (Dgreg d _) -> Wserver.wprint "-%d" d.year
     | _ -> () ];
     if has_dates then Wserver.wprint "</em>: " else ();
-    if List.memq x list then Wserver.wprint "<em>"
+    if List.mem x list then Wserver.wprint "<em>"
     else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
     match (t.t_name, get_public_name x, get_qualifiers x) with
     [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
@@ -316,7 +316,7 @@ value give_access_someone conf base (x, t) list =
         (if t.t_nth >= 100 then string_of_int t.t_nth
          else transl_nth conf "nth" t.t_nth)
     else ();
-    if List.memq x list then Wserver.wprint "</em>"
+    if List.mem x list then Wserver.wprint "</em>"
     else Wserver.wprint "</a>";
   }
 ;

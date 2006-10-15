@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.8 2006-10-06 12:14:25 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -51,7 +51,7 @@ value is_multipart_form =
     let rec loop i =
       if i >= String.length content_type then False
       else if i >= String.length s then True
-      else if content_type.[i] == Char.lowercase s.[i] then loop (i + 1)
+      else if content_type.[i] = Char.lowercase s.[i] then loop (i + 1)
       else False
     in
     loop 0
@@ -219,7 +219,7 @@ value refuse_auth conf from auth auth_type =
 
 value index_from c s =
   loop where rec loop i =
-    if i == String.length s then i else if s.[i] == c then i else loop (i + 1)
+    if i = String.length s then i else if s.[i] = c then i else loop (i + 1)
 ;
 
 value index c s = index_from c s 0;
@@ -270,7 +270,7 @@ value alias_lang lang =
 
 value rec cut_at_equal i s =
   if i = String.length s then (s, "")
-  else if s.[i] == '=' then
+  else if s.[i] = '=' then
     (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
   else cut_at_equal (succ i) s
 ;
@@ -630,7 +630,7 @@ value set_token utm from_addr base_file acc user =
 
 value index_not_name s =
   loop 0 where rec loop i =
-    if i == String.length s then i
+    if i = String.length s then i
     else
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
@@ -691,7 +691,7 @@ value http_preferred_language request =
     let s = String.lowercase v in
     let list =
       loop [] 0 0 where rec loop list i len =
-        if i == String.length s then List.rev [Buff.get len :: list]
+        if i = String.length s then List.rev [Buff.get len :: list]
         else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
         else loop list (i + 1) (Buff.store len s.[i])
     in
@@ -1163,20 +1163,20 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
 value chop_extension name =
   loop (String.length name - 1) where rec loop i =
     if i < 0 then name
-    else if name.[i] == '.' then String.sub name 0 i
-    else if name.[i] == '/' then name
-    else if name.[i] == '\\' then name
+    else if name.[i] = '.' then String.sub name 0 i
+    else if name.[i] = '/' then name
+    else if name.[i] = '\\' then name
     else loop (i - 1)
 ;
 
 value match_strings regexp s =
   loop 0 0 where rec loop i j =
-    if i == String.length regexp && j == String.length s then True
-    else if i == String.length regexp then False
-    else if j == String.length s then False
+    if i = String.length regexp && j = String.length s then True
+    else if i = String.length regexp then False
+    else if j = String.length s then False
     else if regexp.[i] = s.[j] then loop (i + 1) (j + 1)
     else if regexp.[i] = '*' then
-      if i + 1 == String.length regexp then True
+      if i + 1 = String.length regexp then True
       else if regexp.[i + 1] = s.[j] then loop (i + 2) (j + 1)
       else loop i (j + 1)
     else False
@@ -1220,9 +1220,9 @@ value image_request cgi script_name env =
 ;
 
 value strip_quotes s =
-  let i0 = if String.length s > 0 && s.[0] == '"' then 1 else 0 in
+  let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
   let i1 =
-    if String.length s > 0 && s.[String.length s - 1] == '"' then
+    if String.length s > 0 && s.[String.length s - 1] = '"' then
       String.length s - 1
     else String.length s
   in
@@ -1231,14 +1231,14 @@ value strip_quotes s =
 
 value extract_multipart boundary str =
   let rec skip_nl i =
-    if i < String.length str && str.[i] == '\r' then skip_nl (i + 1)
-    else if i < String.length str && str.[i] == '\n' then i + 1
+    if i < String.length str && str.[i] = '\r' then skip_nl (i + 1)
+    else if i < String.length str && str.[i] = '\n' then i + 1
     else i
   in
   let next_line i =
     let i = skip_nl i in
     let rec loop s i =
-      if i == String.length str || str.[i] == '\n' || str.[i] == '\r' then
+      if i = String.length str || str.[i] = '\n' || str.[i] = '\r' then
         (s, i)
       else loop (s ^ String.make 1 str.[i]) (i + 1)
     in
@@ -1246,7 +1246,7 @@ value extract_multipart boundary str =
   in
   let boundary = "--" ^ boundary in
   let rec loop i =
-    if i == String.length str then []
+    if i = String.length str then []
     else
       let (s, i) = next_line i in
       if s = boundary then

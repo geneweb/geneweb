@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.24 2006-10-15 14:19:51 ddr Exp $ *)
+(* $Id: request.ml,v 5.25 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -80,7 +80,7 @@ value compact_list conf base xl =
     List.fold_right
       (fun p pl ->
          match pl with
-         [ [p1 :: _] when get_key_index p == get_key_index p1 -> pl
+         [ [p1 :: _] when get_key_index p = get_key_index p1 -> pl
          | _ -> [p :: pl] ])
       pl []
   in
@@ -92,10 +92,10 @@ value cut_words str =
     if i < String.length str then
       match str.[i] with
       [ ' ' ->
-          if beg == i then loop (succ beg) (succ i)
+          if beg = i then loop (succ beg) (succ i)
           else [String.sub str beg (i - beg) :: loop (succ i) (succ i)]
       | _ -> loop beg (succ i) ]
-    else if beg == i then []
+    else if beg = i then []
     else [String.sub str beg (i - beg)]
 ;
 
@@ -128,13 +128,13 @@ value try_find_with_one_first_name conf base n =
 
 value name_with_roman_number str =
   loop False 0 0 where rec loop found len i =
-    if i == String.length str then if found then Some (Buff.get len) else None
+    if i = String.length str then if found then Some (Buff.get len) else None
     else
       match str.[i] with
       [ '0'..'9' as c ->
           let (n, i) =
             loop (Char.code c - Char.code '0') (i + 1) where rec loop n i =
-              if i == String.length str then (n, i)
+              if i = String.length str then (n, i)
               else
                 match str.[i] with
                 [ '0'..'9' as c ->

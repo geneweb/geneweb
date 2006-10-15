@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 5.2 2006-10-06 15:46:44 ddr Exp $ *)
+(* $Id: setup.ml,v 5.3 2006-10-15 15:39:38 ddr Exp $ *)
 
 open Printf;
 
@@ -158,7 +158,7 @@ value strip_control_m s =
 value strip_spaces str =
   let start =
     loop 0 where rec loop i =
-      if i == String.length str then i
+      if i = String.length str then i
       else
         match str.[i] with
         [ ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
@@ -166,13 +166,13 @@ value strip_spaces str =
   in
   let stop =
     loop (String.length str - 1) where rec loop i =
-      if i == -1 then i + 1
+      if i = -1 then i + 1
       else
         match str.[i] with
         [ ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
         | _ -> i + 1 ]
   in
-  if start == 0 && stop == String.length str then str
+  if start = 0 && stop = String.length str then str
   else if start > stop then ""
   else String.sub str start (stop - start)
 ;
@@ -189,21 +189,21 @@ value p_getenv env label =
 value s_getenv env label = try getenv env label with [ Not_found -> "" ];
 
 value rec skip_spaces s i =
-  if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1) else i
+  if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 ;
 
 value create_env s =
   let rec get_assoc beg i =
-    if i == String.length s then
-      if i == beg then [] else [String.sub s beg (i - beg)]
-    else if s.[i] == ';' || s.[i] == '&' then
+    if i = String.length s then
+      if i = beg then [] else [String.sub s beg (i - beg)]
+    else if s.[i] = ';' || s.[i] = '&' then
       let next_i = skip_spaces s (succ i) in
       [String.sub s beg (i - beg) :: get_assoc next_i next_i]
     else get_assoc beg (succ i)
   in
   let rec separate i s =
     if i = String.length s then (s, "")
-    else if s.[i] == '=' then
+    else if s.[i] = '=' then
       (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
     else separate (succ i) s
   in
@@ -556,7 +556,7 @@ and print_selector conf print =
   let list =
     let sel =
       IFDEF WIN95 THEN
-        if String.length sel = 3 && sel.[1] == ':' && sel.[2] == '\\' then
+        if String.length sel = 3 && sel.[1] = ':' && sel.[2] = '\\' then
           sel ^ "."
         else sel
       ELSE sel END
@@ -1618,8 +1618,8 @@ value only_addr () =
 
 value lindex s c =
   pos 0 where rec pos i =
-    if i == String.length s then None
-    else if s.[i] == c then Some i
+    if i = String.length s then None
+    else if s.[i] = c then Some i
     else pos (i + 1)
 ;
 

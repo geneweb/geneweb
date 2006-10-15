@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.10 2006-09-30 09:59:38 ddr Exp $ *)
+(* $Id: select.ml,v 5.11 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -365,21 +365,21 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
   let threshold = 1900 + tm.Unix.tm_year - censor in
   match (anc, desc, ancdesc) with
   [ (None, None, None) ->
-      if censor <> 0 || censor == -1 then
+      if censor <> 0 || censor = -1 then
         let per_tab = Array.create (nb_of_persons base) 0 in
         let fam_tab = Array.create (nb_of_families base) 0 in
         let _ =
-          if censor == -1 then restrict_base base per_tab fam_tab 1      
+          if censor = -1 then restrict_base base per_tab fam_tab 1      
           else censor_base base per_tab fam_tab 1 threshold
         in
-        (fun i -> per_tab.(Adef.int_of_iper i) == 0,
-         fun i -> fam_tab.(Adef.int_of_ifam i) == 0)
+        (fun i -> per_tab.(Adef.int_of_iper i) = 0,
+         fun i -> fam_tab.(Adef.int_of_ifam i) = 0)
       else (fun _ -> True, fun _ -> True)
   | (None, None, Some iadper) ->
       let per_tab = Array.create (nb_of_persons base) 0 in
       let fam_tab = Array.create (nb_of_families base) 0 in
       let _ =
-        if censor == -1 then restrict_base base per_tab fam_tab 4
+        if censor = -1 then restrict_base base per_tab fam_tab 4
         else if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
         else ()
       in
@@ -397,7 +397,7 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
       let per_tab = Array.create (nb_of_persons base) 0 in
       let fam_tab = Array.create (nb_of_families base) 0 in
       let _ =
-        if censor == -1 then restrict_base base per_tab fam_tab 4
+        if censor = -1 then restrict_base base per_tab fam_tab 4
         else if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
         else ()
       in
@@ -405,23 +405,23 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
       [ (Some iaper, None) ->
           do {
             select_ancestors base per_tab fam_tab with_siblings 1 iaper;
-            (fun i -> per_tab.(Adef.int_of_iper i) == 1,
-             fun i -> fam_tab.(Adef.int_of_ifam i) == 1)
+            (fun i -> per_tab.(Adef.int_of_iper i) = 1,
+             fun i -> fam_tab.(Adef.int_of_ifam i) = 1)
           }
       | (None, Some idper) ->
           do {
             select_descendants base per_tab fam_tab no_spouses_parents 1
               idper maxlev;
-            (fun i -> per_tab.(Adef.int_of_iper i) == 1,
-             fun i -> fam_tab.(Adef.int_of_ifam i) == 1)
+            (fun i -> per_tab.(Adef.int_of_iper i) = 1,
+             fun i -> fam_tab.(Adef.int_of_ifam i) = 1)
           }
       | (Some iaper, Some idper) ->
           do {
             select_ancestors base per_tab fam_tab False 1 iaper;
             select_descendants base per_tab fam_tab no_spouses_parents 2
               idper maxlev;
-            (fun i -> per_tab.(Adef.int_of_iper i) == 3,
-             fun i -> fam_tab.(Adef.int_of_ifam i) == 3)
+            (fun i -> per_tab.(Adef.int_of_iper i) = 3,
+             fun i -> fam_tab.(Adef.int_of_ifam i) = 3)
           }
       | _ -> assert False ] ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.14 2006-10-02 02:01:53 ddr Exp $ *)
+(* $Id: robot.ml,v 5.15 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -114,7 +114,7 @@ value check oc tm from max_call sec conf suicide =
     [ Some att ->
         do {
           incr att;
-          if att.val mod max_call == 0 then do {
+          if att.val mod max_call = 0 then do {
             fprintf_date oc (Unix.localtime tm);
             fprintf oc "\n";
             fprintf oc "  From: %s\n" from;

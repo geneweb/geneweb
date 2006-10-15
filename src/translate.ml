@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 5.6 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: translate.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
@@ -47,7 +47,7 @@ value inline lang macro_char macro s =
                     in
                     loop (Buff.store len '\n') j
                   else (Buff.get len, j)
-                else if s.[j] == macro_char then
+                else if s.[j] = macro_char then
                   loop (Buff.mstore len (macro s.[j + 1])) (j + 2)
                 else loop (Buff.store len s.[j]) (j + 1)
               in
@@ -72,12 +72,12 @@ value language_name lang lang_def =
   let str = lang_def in
   let len = String.length lang in
   let rec loop beg i =
-    if i == String.length str && i == beg then lang
-    else if i == String.length str || str.[i] == '/' then
+    if i = String.length str && i = beg then lang
+    else if i = String.length str || str.[i] = '/' then
       if i > beg + len + 1 && str.[beg + len] = '=' &&
          String.sub str beg len = lang then
         String.sub str (beg + len + 1) (i - beg - len - 1)
-      else if i == String.length str then lang
+      else if i = String.length str then lang
       else loop (i + 1) (i + 1)
     else loop beg (i + 1)
   in

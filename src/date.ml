@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.8 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: date.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -306,7 +306,7 @@ value string_of_age conf a =
         string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
       else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
-      else if d == 1 then transl conf "one day old"
+      else if d = 1 then transl conf "one day old"
       else "0" ]
 ;
 

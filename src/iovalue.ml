@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: iovalue.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -56,7 +56,7 @@ value rec input_loop ifuns ic =
     | code -> failwith (Printf.sprintf "input bad code 0x%x" code) ]
 and input_block ifuns ic tag size =
   let v =
-    if tag == 0 then Obj.magic (Array.create size (Obj.magic 0))
+    if tag = 0 then Obj.magic (Array.create size (Obj.magic 0))
     else Obj.new_block tag size
   in
   do {
@@ -129,8 +129,8 @@ value rec output_loop ofuns oc x =
       ofuns.output_binary_int oc (Obj.magic x);
     }
   else
-    if Obj.tag x == fun_tag then failwith "Iovalue.output <fun>"
-    else if Obj.tag x == string_tag then do {
+    if Obj.tag x = fun_tag then failwith "Iovalue.output <fun>"
+    else if Obj.tag x = string_tag then do {
       let len = String.length (Obj.magic x) in
       if len < 0x20 then
         ofuns.output_byte oc (<<PREFIX_SMALL_STRING>> + len)
@@ -146,7 +146,7 @@ value rec output_loop ofuns oc x =
       size_32.val := size_32.val + 1 + (len + 4) / 4;
       size_64.val := size_64.val + 1 + (len + 8) / 8;
     }
-    else if Obj.tag x == float_tag then
+    else if Obj.tag x = float_tag then
       failwith "Iovalue.output: floats not implemented"
     else do {
       gen_output_block_header ofuns oc (Obj.tag x) (Obj.size x);
@@ -197,7 +197,7 @@ value dput_char c =
   }
 ;
 value rec dput_int i =
-  if i == 0 then ()
+  if i = 0 then ()
   else do {
     dput_char (Char.chr (Char.code '0' + i mod 10));
     dput_int (i / 10);
@@ -229,9 +229,9 @@ value rec digest_loop v =
   if not (Obj.is_block v) then
     let n = (Obj.magic v : int) in
     do { dput_char 'I'; dput_int n }
-  else if Obj.size v == 0 then
+  else if Obj.size v = 0 then
     do { dput_char 'T'; dput_int (Obj.tag v) }
-  else if Obj.tag v == string_tag then do {
+  else if Obj.tag v = string_tag then do {
     let s = (Obj.magic v : string) in
     dput_char 'S'; dput_int (String.length s);
     dput_char '/'; dput_string s;
@@ -242,7 +242,7 @@ value rec digest_loop v =
     digest_fields v 0;
   }
 and digest_fields v i =
-  if i == Obj.size v then ()
+  if i = Obj.size v then ()
   else do { digest_loop (Obj.field v i); digest_fields v (i + 1) }
 ;
 

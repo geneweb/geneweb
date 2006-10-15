@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.23 2006-10-15 13:36:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.24 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -10,7 +10,7 @@ type mfam =
   { m_fam : family; m_fath : person; m_moth : person; m_chil : array person }
 ;
 
-value soy y = if y == 0 then "-0" else string_of_int y;
+value soy y = if y = 0 then "-0" else string_of_int y;
 
 value print_date_dmy oc d =
   do {
@@ -20,8 +20,8 @@ value print_date_dmy oc d =
     | Before -> fprintf oc "<"
     | After -> fprintf oc ">"
     | _ -> () ];
-    if (*d.day == 0 &&*) d.month == 0 then fprintf oc "%s" (soy d.year)
-    else if d.day == 0 then fprintf oc "%d/%s" d.month (soy d.year)
+    if (*d.day = 0 &&*) d.month = 0 then fprintf oc "%s" (soy d.year)
+    else if d.day = 0 then fprintf oc "%d/%s" d.month (soy d.year)
     else fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
     match d.prec with
     [ OrYear y -> fprintf oc "|%s" (soy y)
@@ -102,13 +102,13 @@ value gen_correct_string no_num no_colon s =
     else Mutil.utf_8_of_iso_8859_1 s
   in
   loop 0 0 where rec loop i len =
-    if i == String.length s then Buff.get len
-    else if len == 0 && not (starting_char no_num s) then
+    if i = String.length s then Buff.get len
+    else if len = 0 && not (starting_char no_num s) then
       loop i (Buff.store len '_')
     else
       match s.[i] with
       [ ' ' | '\n' | '\t' ->
-          if i == String.length s - 1 then Buff.get len
+          if i = String.length s - 1 then Buff.get len
           else loop (i + 1) (Buff.store len '_')
       | '_' | '\\' -> loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
       | ':' when no_colon ->
@@ -314,7 +314,7 @@ value print_parent oc base gen fam p =
   do {
     fprintf oc "%s %s%s" (s_correct_string surname)
       (s_correct_string first_name)
-      (if get_occ p == 0 || first_name = "?" || surname = "?" then ""
+      (if get_occ p = 0 || first_name = "?" || surname = "?" then ""
        else "." ^ string_of_int (get_occ p));
     if pr then
       if has_infos then print_infos oc base False "" "" p
@@ -332,7 +332,7 @@ value print_child oc base fam_surname csrc cbp p =
     | Female -> fprintf oc " f"
     | _ -> () ];
     fprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
-    if get_occ p == 0 || p_first_name base p = "?" || p_surname base p = "?"
+    if get_occ p = 0 || p_first_name base p = "?" || p_surname base p = "?"
     then
       ()
     else fprintf oc ".%d" (get_occ p);
@@ -375,7 +375,7 @@ value common_children_birth_place = common_children get_birth_place;
 
 value array_forall f a =
   loop 0 where rec loop i =
-    if i == Array.length a then True
+    if i = Array.length a then True
     else if f a.(i) then loop (i + 1)
     else False
 ;
@@ -597,7 +597,7 @@ value print_notes_for_person oc base gen p =
   if notes <> "" && surn <> "?" && fnam <> "?" then do {
     fprintf oc "\n";
     fprintf oc "notes %s %s%s\n" surn fnam
-      (if get_occ p == 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
     fprintf oc "beg\n";
     fprintf oc "%s\n" notes;
     fprintf oc "end notes\n";
@@ -613,8 +613,8 @@ value rec list_memf f x =
   | [a :: l] -> f x a || list_memf f x l ]
 ;
 
-value eq_key p1 p2 = get_key_index p1 == get_key_index p2;
-value eq_key_fst (p1, _) (p2, _) = get_key_index p1 == get_key_index p2;
+value eq_key p1 p2 = get_key_index p1 = get_key_index p2;
+value eq_key_fst (p1, _) (p2, _) = get_key_index p1 = get_key_index p2;
 
 value print_notes oc base gen ml =
   let pl = List.fold_right (get_persons_with_notes base) ml gen.notes_pl_p in
@@ -800,7 +800,7 @@ value print_relations_for_person oc base gen def_p is_definition p =
   if surn <> "?" && fnam <> "?" && exist_relation then do {
     fprintf oc "\n";
     fprintf oc "rel %s %s%s" surn fnam
-      (if get_occ p == 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
     if is_definition then do {
       if has_infos base p then print_infos oc base False "" "" p
       else fprintf oc " 0";
@@ -846,12 +846,12 @@ value print_relations oc base gen ml =
 value rec merge_families ifaml1f ifaml2f =
   match (ifaml1f, ifaml2f) with
   [ ([ifam1 :: ifaml1], [ifam2 :: ifaml2]) ->
-      let m1 = List.memq ifam1 ifaml2 in
-      let m2 = List.memq ifam2 ifaml1 in
+      let m1 = List.mem ifam1 ifaml2 in
+      let m2 = List.mem ifam2 ifaml1 in
       if m1 && m2 then merge_families ifaml1 ifaml2
       else if m1 then [ifam2 :: merge_families ifaml1f ifaml2]
       else if m2 then [ifam1 :: merge_families ifaml1 ifaml2f]
-      else if ifam1 == ifam2 then [ifam1 :: merge_families ifaml1 ifaml2]
+      else if ifam1 = ifam2 then [ifam1 :: merge_families ifaml1 ifaml2]
       else [ifam1; ifam2 :: merge_families ifaml1 ifaml2]
   | (ifaml1, []) -> ifaml1
   | ([], ifaml2) -> ifaml2 ]
@@ -868,7 +868,7 @@ value connected_families base fam_sel fam cpl =
   where rec loop ifaml ipl_scanned =
     fun
     [ [ip :: ipl] ->
-        if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
+        if List.mem ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
           let u = uoi base ip in
           let ifaml1 = Array.to_list (get_family u) in
@@ -891,7 +891,7 @@ value find_person base p1 po p2 =
   | None ->
       do {
         printf "Not found: %s%s %s\n" p1
-          (if po == 0 then "" else " " ^ string_of_int po) p2;
+          (if po = 0 then "" else " " ^ string_of_int po) p2;
         flush stdout;
         exit 2
       } ]
@@ -1028,7 +1028,7 @@ value scan_connex_component base test_action len ifam =
 value mark_one_connex_component base mark ifam =
   let origin_file = sou base (get_origin_file (foi base ifam)) in
   let test_action loop len ifam =
-    if mark.(Adef.int_of_ifam ifam) == NotScanned &&
+    if mark.(Adef.int_of_ifam ifam) = NotScanned &&
        sou base (get_origin_file (foi base ifam)) = origin_file
     then do {
       mark.(Adef.int_of_ifam ifam) := BeingScanned; loop (len + 1) ifam
@@ -1039,7 +1039,7 @@ value mark_one_connex_component base mark ifam =
   let len = 1 + scan_connex_component base test_action 0 ifam in
   let set_mark x =
     let test_action loop () ifam =
-      if mark.(Adef.int_of_ifam ifam) == BeingScanned then do {
+      if mark.(Adef.int_of_ifam ifam) = BeingScanned then do {
         mark.(Adef.int_of_ifam ifam) := x; loop () ifam
       }
       else ()
@@ -1064,7 +1064,7 @@ value mark_one_connex_component base mark ifam =
 
 value mark_connex_components base mark fam =
   let test_action loop len ifam =
-    if mark.(Adef.int_of_ifam ifam) == NotScanned then
+    if mark.(Adef.int_of_ifam ifam) = NotScanned then
       mark_one_connex_component base mark ifam
     else ()
   in
@@ -1096,7 +1096,7 @@ value separate base =
         in
         eprintf "*** extracted %d families\n" len;
         flush stderr;
-        fun ifam -> mark.(Adef.int_of_ifam ifam) == ToSeparate
+        fun ifam -> mark.(Adef.int_of_ifam ifam) = ToSeparate
       } ]
 ;
 

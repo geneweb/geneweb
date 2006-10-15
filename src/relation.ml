@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.11 2006-09-26 03:54:21 ddr Exp $ *)
+(* $Id: relation.ml,v 5.12 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -124,9 +124,9 @@ value dag_fam_list_of_ind_list indl =
   List.fold_left
     (fun faml ind ->
        let faml =
-         if List.memq ind.di_famc faml then faml else [ind.di_famc :: faml]
+         if List.mem ind.di_famc faml then faml else [ind.di_famc :: faml]
        in
-       if List.memq ind.di_fams faml then faml else [ind.di_fams :: faml])
+       if List.mem ind.di_fams faml then faml else [ind.di_fams :: faml])
     [] indl
 ;
 
@@ -282,7 +282,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
 ;
 
 value print_relation_path conf base ip1 ip2 path ifam excl_faml =
-  if path == [] then do {
+  if path = [] then do {
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "relationship"))
     in
@@ -418,7 +418,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                         loop2 [iper :: result] neighbourslist
                       }
                   | Visited (s, v, f) ->
-                      if s == source then loop2 result neighbourslist
+                      if s = source then loop2 result neighbourslist
                       else
                         let p1 = make_path [(iper, fl)] vertex in
                         let p2 = make_path [(iper, f)] v in
@@ -433,7 +433,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
         | [] -> Right newvertexlist ]
     in
     let rec width_search queue1 visited1 queue2 visited2 =
-      if queue1 == [] || queue2 == [] then None
+      if queue1 = [] || queue2 = [] then None
       else if visited1 > visited2 then
         let visited2 = visited2 + List.length queue2 in
         match one_step_further False queue2 with
@@ -526,15 +526,15 @@ value print_shortest_path conf base p1 p2 =
 
 value nb_fields s =
   loop 1 0 where rec loop cnt i =
-    if i == String.length s then cnt
-    else if s.[i] == '/' then loop (cnt + 1) (i + 1)
+    if i = String.length s then cnt
+    else if s.[i] = '/' then loop (cnt + 1) (i + 1)
     else loop cnt (i + 1)
 ;
 
 value rec belongs_to_branch ip dist =
   fun
   [ [(n, _, ipl) :: lens] ->
-      if n = dist && List.memq ip ipl then True
+      if n = dist && List.mem ip ipl then True
       else belongs_to_branch ip dist lens
   | [] -> False ]
 ;
@@ -714,7 +714,7 @@ value uncle_label conf base info x p =
   [ 1 ->
       let txt = transl conf "an uncle/an aunt" in
       let is =
-        if nb_fields txt == 4 then
+        if nb_fields txt = 4 then
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
           [ [ip1] ->
@@ -726,7 +726,7 @@ value uncle_label conf base info x p =
   | 2 ->
       let txt = transl conf "a great-uncle/a great-aunt" in
       let is =
-        if nb_fields txt == 4 then
+        if nb_fields txt = 4 then
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
           [ [ip1] ->
@@ -782,28 +782,28 @@ value print_link_name conf base n p1 p2 sol =
       in
       let sp1 = pp1 <> None in
       let sp2 = pp2 <> None in
-      if x2 == 0 then
-        if sp1 && x1 == 1 then
+      if x2 = 0 then
+        if sp1 && x1 = 1 then
           (parent_in_law_label conf (get_sex ini_p1) (get_sex ini_p2),
            False, sp2)
         else
           let info = ((info, x1), fun r -> r.Consang.lens1) in
           (ancestor_label conf base info x1 (get_sex p2), sp1, sp2)
-      else if x1 == 0 then
-        if sp2 && x2 == 1 then
+      else if x1 = 0 then
+        if sp2 && x2 = 1 then
           (child_in_law_label conf (get_sex ini_p2) (get_sex ini_p1), sp1,
            False)
         else (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
-      else if x2 == x1 then
-        if x2 == 1 && not (same_parents conf base p2 p1) then
+      else if x2 = x1 then
+        if x2 = 1 && not (same_parents conf base p2 p1) then
           (half_brother_label conf (get_sex p2), sp1, sp2)
-        else if x2 == 1 && (sp2 || sp1) && get_sex p2 <> Neuter then
+        else if x2 = 1 && (sp2 || sp1) && get_sex p2 <> Neuter then
           (brother_in_law_label conf (get_sex ini_p2) (get_sex ini_p1), False,
            False)
         else (brother_label conf x1 (get_sex p2), sp1, sp2)
-      else if x2 == 1 then
+      else if x2 = 1 then
         (uncle_label conf base (info, x1) (x1 - x2) p2, sp1, sp2)
-      else if x1 == 1 then (nephew_label conf (x2 - x1) p2, sp1, sp2)
+      else if x1 = 1 then (nephew_label conf (x2 - x1) p2, sp1, sp2)
       else if x2 < x1 then
         let s =
           let info = ((info, x1), fun r -> r.Consang.lens1) in
@@ -863,7 +863,7 @@ value wprint_num conf n =
 value string_of_big_int conf i =
   let sep = transl conf "(thousand separator)" in
   let rec glop i =
-    if i == 0 then ""
+    if i = 0 then ""
     else
       let s = glop (i / 1000) in
       if s = "" then string_of_int (i mod 1000)
@@ -1009,7 +1009,7 @@ value print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   do {
     tag "p" begin print_link_name conf base n p1 p2 sol; end;
-    if x1 == 0 || x2 == 0 then
+    if x1 = 0 || x2 = 0 then
       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
     else print_solution_not_ancestor conf base long p1 p2 sol;
     Wserver.wprint "\n"
@@ -1128,12 +1128,12 @@ value print_dag_links conf base p1 p2 rl =
 
 value print_propose_upto conf base p1 p2 rl =
   match rl with
-  [ [(None, None, (x1, x2, _), _) :: _] when x1 == 0 || x2 == 0 ->
+  [ [(None, None, (x1, x2, _), _) :: _] when x1 = 0 || x2 = 0 ->
       let maxlen =
         List.fold_right
           (fun (_, _, (x1, x2, _), _) maxlen -> max maxlen (max x1 x2)) rl 0
       in
-      let (p, a) = if x1 == 0 then (p2, p1) else (p1, p2) in
+      let (p, a) = if x1 = 0 then (p2, p1) else (p1, p2) in
       do {
         html_p conf;
         Wserver.wprint "<span style=\"font-size:80%%\">";
@@ -1204,7 +1204,7 @@ value compute_simple_relationship conf base tstab ip1 ip2 =
       List.fold_left
         (fun l (len1, len2, sol) ->
            match l with
-           [ [(l1, l2, sols) :: l] when len1 == l1 && len2 == l2 ->
+           [ [(l1, l2, sols) :: l] when len1 = l1 && len2 = l2 ->
                [(l1, l2, [sol :: sols]) :: l]
            | _ -> [(len1, len2, [sol]) :: l] ])
         [] rl
@@ -1265,7 +1265,7 @@ value no_sp p = None;
 value compute_relationship conf base by_marr p1 p2 =
   let ip1 = get_key_index p1 in
   let ip2 = get_key_index p2 in
-  if ip1 == ip2 then None
+  if ip1 = ip2 then None
   else
     (* optimization to be used 1/ if database not too big or 2/ running
     on machines with much memory *)
@@ -1292,10 +1292,10 @@ value compute_relationship conf base by_marr p1 p2 =
           | _ -> combine_relationship conf base tstab spl1 [p2] sp no_sp sl ]
         in
         match (sol, sl) with
-        [ (Some ([(x1, x2, _) :: _], _, _, _), _) when x1 == 0 || x2 == 0 ->
+        [ (Some ([(x1, x2, _) :: _], _, _, _), _) when x1 = 0 || x2 = 0 ->
             sl
         | (_, [([(_, _, (x1, x2, _)) :: _], _, _) :: _])
-          when x1 == 0 || x2 == 0 ->
+          when x1 = 0 || x2 = 0 ->
             sl
         | _ -> combine_relationship conf base tstab spl1 spl2 sp sp sl ]
       else []
@@ -1419,7 +1419,7 @@ value print_main_relationship conf base long p1 p2 rel =
     | Some x -> conf.senv := conf.senv @ [("color", code_varenv x)] ];
     match rel with
     [ None ->
-        if get_key_index p1 == get_key_index p2 then
+        if get_key_index p1 = get_key_index p2 then
           Wserver.wprint "%s\n"
             (capitale (transl conf "it is the same person!"))
         else

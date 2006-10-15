@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.5 2006-10-01 18:24:44 ddr Exp $ *)
+(* $Id: templ.ml,v 5.6 2006-10-15 15:39:39 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -510,7 +510,7 @@ value open_templ conf name =
     try
       let s = List.assoc "template" conf.base_env in
       let rec loop list i len =
-        if i == String.length s then List.rev [Buff.get len :: list]
+        if i = String.length s then List.rev [Buff.get len :: list]
         else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
         else loop list (i + 1) (Buff.store len s.[i])
       in

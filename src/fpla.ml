@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 5.4 2006-10-08 05:33:16 ddr Exp $ *)
+(* $Id: fpla.ml,v 5.5 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -16,7 +16,7 @@ value make_table base =
     while cnt.val > 0 do {
       Array.iteri
         (fun i v ->
-           if v == None then
+           if v = None then
              let ip = Adef.iper_of_int i in
              match get_parents (aoi base ip) with
              [ Some ifam ->

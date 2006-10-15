@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.22 2006-10-10 21:46:35 ddr Exp $ *)
+(* $Id: perso.ml,v 5.23 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -518,7 +518,7 @@ value rec enrich lst1 lst2 =
   | ([_ :: l1], [Empty :: l2]) -> [Empty :: enrich l1 l2] ]
 ;
     
-value is_empty = List.for_all (\== Empty);
+value is_empty = List.for_all (\= Empty);
      
 value rec enrich_tree lst =
   match lst with
@@ -567,7 +567,7 @@ value tree_generation_list conf base gv p =
   in
   let gen =
     loop (gv - 1) [Cell p None Center True 1] [] where rec loop i gen list =
-      if i == 0 then [gen :: list]
+      if i = 0 then [gen :: list]
       else loop (i - 1) (next_gen gen) [gen :: list]
   in
   enrich_tree gen
@@ -1665,7 +1665,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       if p_auth then
         match (Adef.od_of_codate (get_birth p), get_death p) with
         [ (Some (Dgreg d _), NotDead) ->
-            not (d.day == 0 && d.month == 0 && d.prec <> Sure)
+            not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | _ -> False ]
       else False
   | "computable_death_age" ->
@@ -2649,7 +2649,7 @@ value print_foreach conf base print_ast eval_expr =
         (fun (srcl, i) ifam ->
            let fam = foi base ifam in
            let lab =
-             if Array.length (get_family u) == 1 then ""
+             if Array.length (get_family u) = 1 then ""
              else " " ^ string_of_int i
            in
            let srcl =
@@ -2704,7 +2704,7 @@ value print_foreach conf base print_ast eval_expr =
                   Array.iter
                     (fun ifam ->
                        let fam = foi base ifam in
-                       if array_memq (get_key_index p) (get_witnesses fam)
+                       if array_mem (get_key_index p) (get_witnesses fam)
                        then
                          list.val := [(ifam, fam) :: list.val]
                        else ())

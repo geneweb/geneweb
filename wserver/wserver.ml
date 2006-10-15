@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.6 2006-10-06 18:42:33 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -58,10 +58,10 @@ value gen_decode strip_spaces s =
   in
   let rec strip_heading_and_trailing_spaces s =
     if String.length s > 0 then
-      if s.[0] == ' ' then
+      if s.[0] = ' ' then
         strip_heading_and_trailing_spaces
           (String.sub s 1 (String.length s - 1))
-      else if s.[String.length s - 1] == ' ' then
+      else if s.[String.length s - 1] = ' ' then
         strip_heading_and_trailing_spaces
           (String.sub s 0 (String.length s - 1))
       else s
@@ -230,11 +230,11 @@ value get_request strm =
   let rec loop len =
     parser
     [ [: `'\010'; s :] ->
-        if len == 0 then []
+        if len = 0 then []
         else let str = get_buff len in [str :: loop 0 s]
     | [: `'\013'; s :] -> loop len s
     | [: `c; s :] -> loop (store len c) s
-    | [: :] -> if len == 0 then [] else [get_buff len] ]
+    | [: :] -> if len = 0 then [] else [get_buff len] ]
   in
   loop 0 strm
 ;
@@ -357,7 +357,7 @@ value copy_what_necessary t oc =
              if len.val > 0 then output oc buff 0 len.val else ();
            }
            else ();
-           if len.val == 0 then None
+           if len.val = 0 then None
            else do { incr i; Some buff.[i.val - 1] }
          })
   in
@@ -588,7 +588,7 @@ let args = Sys.argv in
           try
             loop () where rec loop () =
               let len = input ic buff 0 (String.length buff) in
-              if len == 0 then ()
+              if len = 0 then ()
               else do {
                 loop_write 0 where rec loop_write i =
                   let olen = Unix.write t buff i (len - i) in

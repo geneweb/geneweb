@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: num.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type t = array int;
@@ -22,8 +22,8 @@ value gt x y =
 value twice x =
   let l =
     loop 0 0 where rec loop i r =
-      if i == Array.length x then
-        if r == 0 then [] else [r]
+      if i = Array.length x then
+        if r = 0 then [] else [r]
       else
         let v = x.(i) lsl 1 + r in
         [v land (base - 1) :: loop (i + 1) (if v >= base then 1 else 0)]
@@ -35,7 +35,7 @@ value half x =
     loop (Array.length x - 1) 0 [] where rec loop i r v =
       if i < 0 then v
       else
-        let rd = if x.(i) land 1 == 0 then 0 else base / 2 in
+        let rd = if x.(i) land 1 = 0 then 0 else base / 2 in
         let v =
           let d = r + x.(i) / 2 in
           if d = 0 && v = [] then v else [d :: v]
@@ -45,14 +45,14 @@ value half x =
   Array.of_list l
 ;
 value even x =
-  if Array.length x == 0 then True
-  else x.(0) land 1 == 0
+  if Array.length x = 0 then True
+  else x.(0) land 1 = 0
 ;
 value inc x n =
   let l =
     loop 0 n where rec loop i r =
-      if i == Array.length x then
-        if r == 0 then [] else [r]
+      if i = Array.length x then
+        if r = 0 then [] else [r]
       else
         let d = x.(i) + r in
         [d mod base :: loop (i + 1) (d / base)]
@@ -63,7 +63,7 @@ value add x y =
   let l =
     loop 0 0 where rec loop i r =
       if i >= Array.length x && i >= Array.length y then
-        if r == 0 then [] else [r]
+        if r = 0 then [] else [r]
       else
         let (d, r) =
           let xi = if i >= Array.length x then 0 else x.(i) in
@@ -81,13 +81,13 @@ value normalize =
     [ [] -> []
     | [x :: l] ->
         let r = loop l in
-        if x == 0 && r = [] then r else [x :: r] ]
+        if x = 0 && r = [] then r else [x :: r] ]
 ;
 value sub x y =
   let l =
     loop 0 0 where rec loop i r =
       if i >= Array.length x && i >= Array.length y then
-        if r == 0 then []
+        if r = 0 then []
         else invalid_arg "Num.sub"
       else
         let (d, r) =
@@ -105,8 +105,8 @@ value mul0 x n =
   else
     let l =
       loop 0 0 where rec loop i r =
-        if i == Array.length x then
-          if r == 0 then [] else [r]
+        if i = Array.length x then
+          if r = 0 then [] else [r]
         else
           let d = x.(i) * n + r in
           [d mod base :: loop (i + 1) (d / base)]
@@ -137,12 +137,12 @@ value div x n =
 ;    
 value modl x n =
   let r = sub x (mul0 (div x n) n) in
-  if Array.length r == 0 then 0 else r.(0)
+  if Array.length r = 0 then 0 else r.(0)
 ;
 
 value of_int i =
   if i < 0 then invalid_arg "Num.of_int"
-  else if i == 0 then zero
+  else if i = 0 then zero
   else if i < base then [| i |]
   else [| i mod base; i / base |]
 ;
@@ -202,7 +202,7 @@ value to_string = to_string_sep_base "" 10;
 
 value of_string s =
   loop zero 0 where rec loop n i =
-    if i == String.length s then n
+    if i = String.length s then n
     else
       match s.[i] with
       [ '0'..'9' ->

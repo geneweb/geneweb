@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.25 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.26 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -316,7 +316,7 @@ propri&eacute;taire de cette base de donn&eacute;es.
 value family_exclude pfams efam =
   let pfaml =
     List.fold_right
-      (fun fam faml -> if fam == efam then faml else [fam :: faml])
+      (fun fam faml -> if fam = efam then faml else [fam :: faml])
       (Array.to_list pfams) []
   in
   Array.of_list pfaml
@@ -358,11 +358,11 @@ value infer_origin_file conf base ifam ncpl ndes =
             (get_origin_file (foi base if2))
         | _ ->
             let rec loop i =
-              if i == Array.length (get_children ndes) then
+              if i = Array.length (get_children ndes) then
                 Gwdb.insert_string base ""
               else
                 let cifams = get_family (uoi base (get_children ndes).(i)) in
-                if Array.length cifams == 0 then loop (i + 1)
+                if Array.length cifams = 0 then loop (i + 1)
                 else if
                   sou base (get_origin_file (foi base cifams.(0))) <> ""
                 then
@@ -384,7 +384,7 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
   let mod_ippl =
     List.fold_left
       (fun ippl ip ->
-         if List.memq ip ofam_witn then ippl
+         if List.mem ip ofam_witn then ippl
          else
            let p = poi base ip in
            if not (List.mem (get_father ncpl) (get_related p)) then
@@ -398,7 +398,7 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
   let mod_ippl =
     List.fold_left
       (fun ippl ip ->
-         if List.memq ip nfam_witn then ippl
+         if List.mem ip nfam_witn then ippl
          else
            let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
            if List.mem (get_father ncpl) (get_related p) then
@@ -467,7 +467,7 @@ value effective_mod conf base sfam scpl sdes =
     else (nfath, nmoth)
   in
   do {
-    if get_father ncpl == get_mother ncpl then print_err conf base else ();
+    if get_father ncpl = get_mother ncpl then print_err conf base else ();
     let nfam =
       family_of_gen_family
         {(nfam) with
@@ -485,7 +485,7 @@ value effective_mod conf base sfam scpl sdes =
     let oarr = get_parent_array ocpl in
     let narr = get_parent_array ncpl in
     for i = 0 to Array.length oarr - 1 do {
-      if not (array_memq oarr.(i) narr) then do {
+      if not (array_mem oarr.(i) narr) then do {
         let ou = uoi base oarr.(i) in
         let ou =
           union_of_gen_union
@@ -496,7 +496,7 @@ value effective_mod conf base sfam scpl sdes =
       else ()
     };
     for i = 0 to Array.length narr - 1 do {
-      if not (array_memq narr.(i) oarr) then do {
+      if not (array_mem narr.(i) oarr) then do {
         let nu = uoi base narr.(i) in
         let nu =
           union_of_gen_union
@@ -524,7 +524,7 @@ value effective_mod conf base sfam scpl sdes =
            ascend_of_gen_ascend
              {parents = None;
               consang =
-                if not (array_memq ip (get_children ndes)) then Adef.fix (-1)
+                if not (array_mem ip (get_children ndes)) then Adef.fix (-1)
                 else get_consang a}
          in
          Hashtbl.replace cache ip a)
@@ -539,7 +539,7 @@ value effective_mod conf base sfam scpl sdes =
                ascend_of_gen_ascend
                  {parents = Some fi;
                   consang =
-                    if not (array_memq ip (get_children odes)) ||
+                    if not (array_mem ip (get_children odes)) ||
                        not same_parents
                     then Adef.fix (-1)
                     else get_consang a}
@@ -548,13 +548,13 @@ value effective_mod conf base sfam scpl sdes =
       (get_children ndes);
     Array.iter
       (fun ip ->
-         if not (array_memq ip (get_children ndes)) then
+         if not (array_mem ip (get_children ndes)) then
            patch_ascend base ip (find_asc ip)
          else ())
       (get_children odes);
     Array.iter
       (fun ip ->
-         if not (array_memq ip (get_children odes)) || not same_parents then
+         if not (array_mem ip (get_children odes)) || not same_parents then
            patch_ascend base ip (find_asc ip)
          else ())
       (get_children ndes);
@@ -616,7 +616,7 @@ value effective_add conf base sfam scpl sdes =
           } ]
       in
       (nfath_p, nmoth_p)
-    else if get_father ncpl == get_mother ncpl then print_err conf base
+    else if get_father ncpl = get_mother ncpl then print_err conf base
     else (nfath_p, nmoth_p)
   in
   let nfam =
@@ -678,7 +678,7 @@ value kill_family base fam ip =
   let l =
     List.fold_right
       (fun ifam ifaml ->
-         if ifam == get_fam_index fam then ifaml else [ifam :: ifaml])
+         if ifam = get_fam_index fam then ifaml else [ifam :: ifaml])
       (Array.to_list (get_family u)) []
   in
   let u = union_of_gen_union {family = Array.of_list l} in
@@ -718,7 +718,7 @@ value array_forall2 f a1 a2 =
   if Array.length a1 <> Array.length a2 then invalid_arg "array_forall2"
   else
     loop 0 where rec loop i =
-      if i == Array.length a1 then True
+      if i = Array.length a1 then True
       else if f a1.(i) a2.(i) then loop (i + 1)
       else False
 ;
@@ -737,7 +737,7 @@ value is_a_link =
 ;
 
 value is_created_or_already_there ochil_arr nchil schil =
-  not (is_a_link schil) || array_memq nchil ochil_arr
+  not (is_a_link schil) || array_mem nchil ochil_arr
 ;
 
 (* need_check_noloop: optimization

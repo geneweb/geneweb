@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.47 2006-10-13 18:44:31 ddr Exp $ *)
+(* $Id: util.ml,v 5.48 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -79,7 +79,7 @@ value amp_capitalize capitale s =
 ;
 
 value rec capitale_iso_8859_1 s =
-  if String.length s == 0 then ""
+  if String.length s = 0 then ""
   else
     match s.[0] with
     [ 'a'..'z' | 'à'..'ö' | 'ø'..'ý' ->
@@ -91,7 +91,7 @@ value rec capitale_iso_8859_1 s =
 ;
 
 value rec capitale_utf_8 s =
-  if String.length s == 0 then ""
+  if String.length s = 0 then ""
   else
     let c = s.[0] in
     if c = '&' then amp_capitalize capitale_utf_8 s
@@ -103,7 +103,7 @@ value rec capitale_utf_8 s =
           String.sub s 0 (i + 1) ^ capitale_utf_8 s1
         else loop (i + 1)
     else if Char.code c < 0b10000000 then String.capitalize s
-    else if String.length s == 1 then s
+    else if String.length s = 1 then s
     else
       match Char.code c with
       [ 0xC3 ->
@@ -140,7 +140,7 @@ value fcapitale (a : format 'a 'b 'c) : format 'a 'b 'c =
 
 value nth_field_abs w n =
   let rec start i n =
-    if n == 0 then i
+    if n = 0 then i
     else if i < String.length w then
       match w.[i] with
       [ '<' -> start (i + 2) n
@@ -161,7 +161,7 @@ value nth_field_abs w n =
 
 value nth_field w n =
   let (i1, i2) = nth_field_abs w n in
-  let (i1, i2) = if i2 == i1 then nth_field_abs w 0 else (i1, i2) in
+  let (i1, i2) = if i2 = i1 then nth_field_abs w 0 else (i1, i2) in
   String.sub w i1 (i2 - i1)
 ;
 
@@ -180,7 +180,7 @@ value transl_nth conf w n =
 value plus_decl s =
   match rindex s '+' with
   [ Some i ->
-      if i > 0 && s.[i - 1] == ' ' then
+      if i > 0 && s.[i - 1] = ' ' then
         let start = String.sub s 0 (i - 1) in
         let decl = String.sub s (i - 1) (String.length s - (i - 1)) in
         Some (start, decl)
@@ -199,7 +199,7 @@ value gen_decline wt s =
           nth_field wt 1 ^ Mutil.decline 'n' s
         else nth_field wt 0 ^ Mutil.decline 'n' s1
     | None -> wt ^ Mutil.decline 'n' s1 ]
-  else if len >= 3 && wt.[len - 3] == ':' && wt.[len - 1] == ':' then
+  else if len >= 3 && wt.[len - 3] = ':' && wt.[len - 1] = ':' then
     let start = String.sub wt 0 (len - 3) in
     start ^ Mutil.decline wt.[len - 2] s
   else
@@ -275,9 +275,9 @@ value check_format ini_fmt (r : string) =
       | (_, _, '%', _) -> loop (i + 1) j
       | _ -> loop (i + 1) (j + 1) ]
     else if i < String.length s - 1 then
-      if s.[i] == '%' then None else loop (i + 1) j
+      if s.[i] = '%' then None else loop (i + 1) j
     else if j < String.length r - 1 then
-      if r.[j] == '%' then None else loop i (j + 1)
+      if r.[j] = '%' then None else loop i (j + 1)
     else
       Some (Obj.magic r : format 'a 'b 'c)
   in
@@ -296,12 +296,12 @@ value cftransl conf fmt =
     fun
     [ [] -> String.sub fmt i (String.length fmt - i)
     | [a :: al] as gal ->
-        if i + 4 < String.length fmt && fmt.[i] == ':' &&
-           fmt.[i + 2] == ':' && fmt.[i + 3] == '%' && fmt.[i + 4] == 's' then
+        if i + 4 < String.length fmt && fmt.[i] = ':' &&
+           fmt.[i + 2] = ':' && fmt.[i + 3] = '%' && fmt.[i + 4] = 's' then
           decline fmt.[i + 1] a ^ loop (i + 5) al
         else if
-          i + 1 < String.length fmt && fmt.[i] == '%' &&
-          fmt.[i + 1] == 's' then
+          i + 1 < String.length fmt && fmt.[i] = '%' &&
+          fmt.[i + 1] = 's' then
           nominative a ^ loop (i + 2) al
         else if i < String.length fmt then
           String.make 1 fmt.[i] ^ loop (i + 1) gal
@@ -716,7 +716,7 @@ value main_title conf base p =
   let rec find_main =
     fun
     [ [] -> None
-    | [x :: l] -> if x.t_name == Tmain then Some x else find_main l ]
+    | [x :: l] -> if x.t_name = Tmain then Some x else find_main l ]
   in
   match find_main (nobtit conf base p) with
   [ None ->
@@ -805,7 +805,7 @@ value referenced_person_text_without_surname conf base p =
 value gen_person_text_without_title p_access conf base p =
   match main_title conf base p with
   [ Some t ->
-      if t.t_place == get_surname p then
+      if t.t_place = get_surname p then
         gen_person_text_without_surname True p_access conf base p
       else
         match (t.t_name, get_qualifiers p) with
@@ -827,18 +827,18 @@ value person_title conf base p =
 
 value old_surname_begin n =
   let i = initial n in
-  if i == 0 then ""
+  if i = 0 then ""
   else
     let i =
       strip_spaces i where rec strip_spaces i =
-        if i >= 1 && n.[i - 1] == ' ' then strip_spaces (pred i) else i
+        if i >= 1 && n.[i - 1] = ' ' then strip_spaces (pred i) else i
     in
     " (" ^ String.sub n 0 i ^ ")"
 ;
 
 value old_surname_end n =
   let i = initial n in
-  if i == 0 then n else String.sub n i (String.length n - i)
+  if i = 0 then n else String.sub n i (String.length n - i)
 ;
 
 value start_with s i p =
@@ -872,21 +872,21 @@ value surname_end base s =
 ;
 
 value rec skip_spaces s i =
-  if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1) else i
+  if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 ;
 
 value create_env s =
   let rec get_assoc beg i =
-    if i == String.length s then
-      if i == beg then [] else [String.sub s beg (i - beg)]
-    else if s.[i] == ';' || s.[i] == '&' then
+    if i = String.length s then
+      if i = beg then [] else [String.sub s beg (i - beg)]
+    else if s.[i] = ';' || s.[i] = '&' then
       let next_i = skip_spaces s (succ i) in
       [String.sub s beg (i - beg) :: get_assoc next_i next_i]
     else get_assoc beg (succ i)
   in
   let rec separate i s =
     if i = String.length s then (s, "")
-    else if s.[i] == '=' then
+    else if s.[i] = '=' then
       (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
     else separate (succ i) s
   in
@@ -1083,7 +1083,7 @@ value url_no_index conf base =
               let u = uget conf base (get_father cpl) in
               let n =
                 loop 0 where rec loop k =
-                  if (get_family u).(k) == Adef.ifam_of_int i then
+                  if (get_family u).(k) = Adef.ifam_of_int i then
                     string_of_int k
                   else loop (k + 1)
               in
@@ -1099,10 +1099,10 @@ value url_no_index conf base =
       | [("dsrc" | "escache" | "oc" | "templ", _) :: l] -> loop l
       | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
       | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
-      | [(k, v) :: l] when String.length k == 2 && k.[0] == 'i' ->
+      | [(k, v) :: l] when String.length k = 2 && k.[0] = 'i' ->
           let c = String.make 1 k.[1] in new_env k v (fun x -> x ^ c) l
       | [(k, v) :: l]
-        when String.length k > 2 && k.[0] == 'e' && k.[1] == 'f' ->
+        when String.length k > 2 && k.[0] = 'e' && k.[1] = 'f' ->
           new_fam_env k v (fun x -> x ^ k) l
       | [kv :: l] -> [kv :: loop l] ]
     and new_env k v c l =
@@ -1413,7 +1413,7 @@ value filter_html_tags s =
 
 value get_variable s i =
   loop 0 i where rec loop len i =
-    if i == String.length s then (Buff.get len, i)
+    if i = String.length s then (Buff.get len, i)
     else
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c ->
@@ -1791,11 +1791,11 @@ value string_of_decimal_num conf f =
   let s = my_string_of_float f in
   let b = Buffer.create 20 in
   let rec loop i =
-    if i == String.length s then Buffer.contents b
+    if i = String.length s then Buffer.contents b
     else do {
       match s.[i] with
       [ '.' ->
-          if i == String.length s - 1 then ()
+          if i = String.length s - 1 then ()
           else Buffer.add_string b (transl conf "(decimal separator)")
       | x -> Buffer.add_char b x ];
       loop (i + 1)
@@ -2028,7 +2028,7 @@ value find_person_in_env conf base suff =
                 (fun x ->
                    Name.lower (p_first_name base x) = Name.lower p &&
                    Name.lower (p_surname base x) = Name.lower n &&
-                   get_occ x == occ)
+                   get_occ x = occ)
                 xl
             in
             if not conf.hide_names || authorized_age conf base r then Some r
@@ -2293,7 +2293,7 @@ value has_nephews_or_nieces conf base p =
         do {
           Array.iter
             (fun ip ->
-               if ip == get_key_index p then ()
+               if ip = get_key_index p then ()
                else
                  Array.iter
                    (fun ifam ->

@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.7 2006-10-04 21:26:12 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.8 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -10,10 +10,10 @@ value rindex s c =
     if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
 ;
 
-value array_memq x a =
+value array_mem x a =
   loop 0 where rec loop i =
-    if i == Array.length a then False
-    else if x == a.(i) then True
+    if i = Array.length a then False
+    else if x = a.(i) then True
     else loop (i + 1)
 ;
 
@@ -22,30 +22,30 @@ value decline_word case s ibeg iend =
   let i =
     loop ibeg where rec loop i =
       if i + 3 > iend then ibeg
-      else if s.[i] == ':' && s.[i + 1] == case && s.[i + 2] == ':' then i + 3
+      else if s.[i] = ':' && s.[i + 1] = case && s.[i + 2] = ':' then i + 3
       else loop (i + 1)
   in
   let j =
     loop i where rec loop i =
       if i + 3 > iend then iend
-      else if s.[i] == ':' && s.[i + 2] == ':' then i
+      else if s.[i] = ':' && s.[i + 2] = ':' then i
       else loop (i + 1)
   in
   if i = ibeg then String.sub s ibeg (j - ibeg)
-  else if s.[i] == '+' then
+  else if s.[i] = '+' then
     let k =
       loop ibeg where rec loop i =
-        if i == iend then i else if s.[i] == ':' then i else loop (i + 1)
+        if i = iend then i else if s.[i] = ':' then i else loop (i + 1)
     in
     let i = i + 1 in string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
-  else if s.[i] == '-' then
+  else if s.[i] = '-' then
     let k =
       loop ibeg where rec loop i =
-        if i == iend then i else if s.[i] == ':' then i else loop (i + 1)
+        if i = iend then i else if s.[i] = ':' then i else loop (i + 1)
     in
     let (i, cnt) =
       loop i 0 where rec loop i cnt =
-        if i < iend && s.[i] == '-' then
+        if i < iend && s.[i] = '-' then
           let cnt =
             loop (cnt + 1) where rec loop cnt =
               if k - cnt = ibeg then cnt
@@ -61,8 +61,8 @@ value decline_word case s ibeg iend =
 
 value decline case s =
   loop 0 0 where rec loop ibeg i =
-    if i == String.length s then
-      if i == ibeg then "" else decline_word case s ibeg i
+    if i = String.length s then
+      if i = ibeg then "" else decline_word case s ibeg i
     else
       match s.[i] with
       [ ' ' | '<' | '/' as sep ->
@@ -119,8 +119,8 @@ value colon_to_at_word s ibeg iend =
 
 value colon_to_at s =
   loop 0 0 where rec loop ibeg i =
-    if i == String.length s then
-      if i == ibeg then "" else colon_to_at_word s ibeg i
+    if i = String.length s then
+      if i = ibeg then "" else colon_to_at_word s ibeg i
     else
       match s.[i] with
       [ ' ' | '<' | '/' as sep ->
@@ -182,7 +182,7 @@ value output_value_no_sharing oc v =
 
 value initial n =
   loop 0 where rec loop i =
-    if i == String.length n then 0
+    if i = String.length n then 0
     else
       match n.[i] with
       [ 'A'..'Z' | 'À'..'Ý' -> i
@@ -192,7 +192,7 @@ value initial n =
 value name_key s =
   let i = initial s in
   let s =
-    if i == 0 then s
+    if i = 0 then s
     else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
   in
   Name.lower s
@@ -224,9 +224,9 @@ value surnames_pieces surname =
     if i1 > i0 then [String.sub surname i0 (i1 - i0)] else []
   in
   let rec loop i0 iw i =
-    if i == String.length surname then
-      if i0 == 0 then [] else if i > i0 + 3 then flush i0 i else []
-    else if surname.[i] == ' ' then
+    if i = String.length surname then
+      if i0 = 0 then [] else if i > i0 + 3 then flush i0 i else []
+    else if surname.[i] = ' ' then
       if i > iw + 3 then
         let w = String.sub surname iw (i - iw) in
         if List.mem w saints then loop i0 (i + 1) (i + 1)
@@ -266,7 +266,7 @@ value utf_8_of_iso_8859_1 str =
 
 value iso_8859_1_of_utf_8 s =
   loop 0 0 where rec loop i len =
-    if i == String.length s then Buff.get len
+    if i = String.length s then Buff.get len
     else
       let c = s.[i] in
       match Char.code c with

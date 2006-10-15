@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.1 2006-10-04 14:20:35 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.2 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -17,13 +17,13 @@ value common_prec p1 p2 =
 ;
 
 value leap_year a =
-  if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
+  if a mod 100 = 0 then a / 100 mod 4 = 0 else a mod 4 = 0
 ;
 
 value nb_days_in_month =
   let tb = [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |] in
   fun m a ->
-    if m == 2 && leap_year a then 29
+    if m = 2 && leap_year a then 29
     else if m >= 1 && m <= 12 then tb.(m - 1)
     else 0
 ;

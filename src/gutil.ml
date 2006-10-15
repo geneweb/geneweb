@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.42 2006-10-15 14:19:51 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.43 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -7,8 +7,8 @@ open Mutil;
 
 value lindex s c =
   pos 0 where rec pos i =
-    if i == String.length s then None
-    else if s.[i] == c then Some i
+    if i = String.length s then None
+    else if s.[i] = c then Some i
     else pos (i + 1)
 ;
 
@@ -46,7 +46,7 @@ value no_ascend () =
 ;
 
 value spouse ip cpl =
-  if ip == get_father cpl then get_mother cpl
+  if ip = get_father cpl then get_mother cpl
   else get_father cpl
 ;
 
@@ -66,12 +66,12 @@ value person_is_key base p k =
 
 value find_num s i =
   loop i i where rec loop start i =
-    if i == String.length s then None
+    if i = String.length s then None
     else
       match s.[i] with
       [ '0'..'9' -> loop start (i + 1)
       | c ->
-          if i == start then
+          if i = start then
             if c = ' ' then loop (start + 1) (start + 1) else None
           else Some (int_of_string (String.sub s start (i - start)), i) ]
 ;
@@ -140,7 +140,7 @@ value gen_strip_spaces strip_heading str =
   let start =
     if strip_heading then
       loop 0 where rec loop i =
-        if i == String.length str then i
+        if i = String.length str then i
         else
           match str.[i] with
           [ ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
@@ -149,13 +149,13 @@ value gen_strip_spaces strip_heading str =
   in
   let stop =
     loop (String.length str - 1) where rec loop i =
-      if i == -1 then i + 1
+      if i = -1 then i + 1
       else
         match str.[i] with
         [ ' ' | '\r' | '\n' | '\t' -> loop (i - 1)
         | _ -> i + 1 ]
   in
-  if start == 0 && stop == String.length str then str
+  if start = 0 && stop = String.length str then str
   else if start > stop then ""
   else String.sub str start (stop - start)
 ;
@@ -204,9 +204,9 @@ value alphabetic_value =
 
 value alphabetic_iso_8859_1 n1 n2 =
   let rec loop i1 i2 =
-    if i1 == String.length n1 && i2 == String.length n2 then i1 - i2
-    else if i1 == String.length n1 then -1
-    else if i2 == String.length n2 then 1
+    if i1 = String.length n1 && i2 = String.length n2 then i1 - i2
+    else if i1 = String.length n1 then -1
+    else if i2 = String.length n2 then 1
     else
       let c1 = n1.[i1] in
       let c2 = n2.[i2] in
@@ -231,15 +231,15 @@ value alphabetic_order n1 n2 =
 
 value arg_list_of_string line =
   loop [] 0 0 None where rec loop list i len quote =
-    if i == String.length line then
-      if len == 0 then List.rev list else List.rev [Buff.get len :: list]
+    if i = String.length line then
+      if len = 0 then List.rev list else List.rev [Buff.get len :: list]
     else
       match (quote, line.[i]) with
       [ (Some c1, c2) ->
-          if c1 == c2 then loop list (i + 1) len None
+          if c1 = c2 then loop list (i + 1) len None
           else loop list (i + 1) (Buff.store len c2) quote
       | (None, ' ') ->
-          let list = if len == 0 then list else [Buff.get len :: list] in
+          let list = if len = 0 then list else [Buff.get len :: list] in
           loop list (i + 1) 0 quote
       | (None, ('"' | ''' as c)) -> loop list (i + 1) 0 (Some c)
       | (None, c) -> loop list (i + 1) (Buff.store len c) None ]
@@ -271,11 +271,11 @@ value sort_person_list base pl =
        | (_, _, _, Death _ _) -> -1
        | _ ->
            let c = alphabetic (p_surname base p1) (p_surname base p2) in
-           if c == 0 then
+           if c = 0 then
              let c =
                alphabetic (p_first_name base p1) (p_first_name base p2)
              in
-             if c == 0 then compare (get_occ p1) (get_occ p2) else c
+             if c = 0 then compare (get_occ p1) (get_occ p2) else c
            else c ])
     pl
 ;

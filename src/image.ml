@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 5.1 2006-01-01 05:35:07 ddr Exp $ *)
+(* $Id: image.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -28,7 +28,7 @@ value print_image_type cgi fname itype =
       do {
         content cgi itype len fname;
         let rec loop len =
-          if len == 0 then ()
+          if len = 0 then ()
           else do {
             let olen = min (String.length buf) len in
             really_input ic buf 0 olen;

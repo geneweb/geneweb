@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: advSearchOk.ml,v 5.8 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -38,7 +38,7 @@ value name_eq x y = Name.abbrev (Name.lower x) = Name.abbrev (Name.lower y);
 
 value rec skip_spaces x i =
   if i = String.length x then i
-  else if String.unsafe_get x i == ' ' then skip_spaces x (i + 1)
+  else if String.unsafe_get x i = ' ' then skip_spaces x (i + 1)
   else i
 ;
 
@@ -50,14 +50,14 @@ value rec skip_no_spaces x i =
 
 value string_incl x y =
   loop 0 where rec loop j_ini =
-    if j_ini == String.length y then False
+    if j_ini = String.length y then False
     else
       let rec loop1 i j =
-        if i == String.length x then
-          if j == String.length y then True else String.unsafe_get y j == ' '
+        if i = String.length x then
+          if j = String.length y then True else String.unsafe_get y j = ' '
         else if
           j < String.length y &&
-          String.unsafe_get x i == String.unsafe_get y j then
+          String.unsafe_get x i = String.unsafe_get y j then
           loop1 (i + 1) (j + 1)
         else loop (skip_spaces y (skip_no_spaces y j_ini))
       in
@@ -204,7 +204,7 @@ value print_result conf base max_answers (list, len) =
     Wserver.wprint "\n";
     html_p conf;
   }
-  else if len == 0 then
+  else if len = 0 then
     Wserver.wprint "%s\n" (capitale (transl conf "no match"))
   else
     tag "ul" begin
