@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: database.ml,v 5.10 2006-10-15 20:21:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -47,7 +47,7 @@ type descend = dsk_descend;
        strings offsets   : array of binary_ints
 
     names.inx - index for names, strings of first names and surnames
-       2nd index offset : binary_int
+       offset to 2nd index : binary_int
        1st index (names) : value
          array, length = "table_size", associating:
           - a hash value of a "crushed" (module "Name") name (modulo length)
