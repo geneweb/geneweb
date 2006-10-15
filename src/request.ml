@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.22 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: request.ml,v 5.23 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -337,8 +337,9 @@ value make_senv conf base =
         | None -> 0 ]
       in
       let ip =
-        try person_of_key base vp vn voc with
-        [ Not_found -> do { incorrect_request conf; raise Exit } ]
+        match person_of_key base vp vn voc with
+        [ Some ip -> ip
+        | None -> do { incorrect_request conf; raise Exit } ]
       in
       let vi = string_of_int (Adef.int_of_iper ip) in set_senv conf vm vi
   | _ -> () ]

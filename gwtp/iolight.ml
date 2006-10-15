@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 5.10 2006-10-15 05:40:11 ddr Exp $ *)
+(* $Id: iolight.ml,v 5.11 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -224,7 +224,8 @@ value input bname =
      strings = strings; particles = []; bnotes = bnotes}
   in
   let base_func =
-    {persons_of_name = fun []; strings_of_fsname = fun [];
+    {person_of_key = fun []; persons_of_name = fun [];
+     strings_of_fsname = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
      patch_person = fun []; patch_ascend = fun [];

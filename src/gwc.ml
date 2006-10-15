@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.44 2006-10-11 05:16:58 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.45 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -868,7 +868,8 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic =
      bnotes = bnotes}
   in
   let base_func =
-    {persons_of_name = fun []; strings_of_fsname = fun [];
+    {person_of_key = fun [];
+     persons_of_name = fun []; strings_of_fsname = fun [];
      persons_of_surname = no_istr_iper_index;
      persons_of_first_name = no_istr_iper_index;
      patch_person = fun []; patch_ascend = fun []; patch_union = fun [];

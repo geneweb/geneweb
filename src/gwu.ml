@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.21 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.22 2006-10-15 12:39:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -886,8 +886,9 @@ value connected_families base fam_sel fam cpl =
 ;
 
 value find_person base p1 po p2 =
-  try Gutil.person_of_key base p1 p2 po with
-  [ Not_found ->
+  match person_of_key base p1 p2 po with
+  [ Some ip -> ip
+  | None ->
       do {
         printf "Not found: %s%s %s\n" p1
           (if po == 0 then "" else " " ^ string_of_int po) p2;
