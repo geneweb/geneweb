@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.24 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.25 2006-10-15 12:50:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -9,8 +9,6 @@ value close_base : base -> unit;
 
 value is_deleted_family : family -> bool;
 value spouse : iper -> couple -> iper;
-
-value split_key : string -> (string * int * string);
 
 value person_ht_add : base -> string -> iper -> unit;
 value person_ht_find_all : base -> string -> list iper;
