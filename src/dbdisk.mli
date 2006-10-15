@@ -1,4 +1,4 @@
-(* $Id: dbdisk.mli,v 5.9 2006-10-11 05:16:57 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.10 2006-10-15 05:40:11 ddr Exp $ *)
 
 open Def;
 
@@ -13,7 +13,7 @@ type dsk_descend = gen_descend iper;
 
 type dsk_title = gen_title dsk_istr;
 
-type rn_mode = [ RnAll | Rn1Ch | Rn1Ln ];
+type rn_mode = [ RnAll | Rn1Ln | RnDeg ];
 
 type notes =
   { nread : string -> rn_mode -> string;
