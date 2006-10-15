@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.42 2006-10-11 05:16:58 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.43 2006-10-15 05:40:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -173,7 +173,7 @@ value ascends_array base = (base.data.ascends.get, base.data.ascends.set);
 
 value base_notes_read base fn = base.data.bnotes.nread fn RnAll;
 value base_notes_read_first_line base fn = base.data.bnotes.nread fn Rn1Ln;
-value base_notes_read_first_char base fn = base.data.bnotes.nread fn Rn1Ch;
+value base_notes_are_empty base fn = base.data.bnotes.nread fn RnDeg = "";
 value base_notes_origin_file base = base.data.bnotes.norigin_file;
 
 value p_first_name base p = nominative (sou base (get_first_name p));

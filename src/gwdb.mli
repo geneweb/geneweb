@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.49 2006-10-10 21:46:35 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.50 2006-10-15 05:40:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -151,7 +151,7 @@ value ascends_array : base -> (int -> ascend * int -> ascend -> unit);
 
 value base_notes_read : base -> string -> string;
 value base_notes_read_first_line : base -> string -> string;
-value base_notes_read_first_char : base -> string -> string;
+value base_notes_are_empty : base -> string -> bool;
 value base_notes_origin_file : base -> string;
 
 value person_misc_names :

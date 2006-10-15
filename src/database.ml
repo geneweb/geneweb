@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.6 2006-10-11 05:16:57 ddr Exp $ *)
+(* $Id: database.ml,v 5.7 2006-10-15 05:40:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1045,23 +1045,22 @@ value opendb bname =
       try Some (Secure.open_in (Filename.concat bname fname)) with
       [ Sys_error _ -> None ]
     with
-    [ Some ic ->
-        let len = ref 0 in
-        do {
-          try
-            while True do {
-              let c = input_char ic in
-              len.val := Buff.store len.val c;
-              match rn_mode with
-              [ Rn1Ch -> raise Exit
-              | Rn1Ln -> if c = '\n' then do { decr len; raise Exit } else ()
-              | RnAll -> () ];
-            }
-          with
-          [ Exit | End_of_file -> () ];
-          close_in ic;
-          Buff.get len.val
-        }
+    [ Some ic -> do {
+        let str =
+          match rn_mode with
+          [ RnDeg -> if in_channel_length ic = 0 then "" else " "
+          | Rn1Ln -> try input_line ic with [ End_of_file -> "" ]
+          | RnAll ->
+              loop 0 where rec loop len =
+                match
+                  try Some (input_char ic) with [ End_of_file -> None ]
+                with
+                [ Some c -> loop (Buff.store len c)
+                | _ -> Buff.get len ] ]
+        in
+        close_in ic;
+        str
+      }
     | None -> "" ]
   in
   let commit_notes fnotes s =
