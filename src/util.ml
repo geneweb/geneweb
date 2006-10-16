@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.48 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: util.ml,v 5.49 2006-10-16 20:09:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2014,27 +2014,12 @@ value find_person_in_env conf base suff =
             [ Some oc -> oc
             | None -> 0 ]
           in
-          let k = p ^ " " ^ n in
-          let xl =
-            List.fold_left
-              (fun l ip ->
-                 let p = pget conf base ip in
-                 if is_hidden p then l else [p :: l])
-            [] (person_ht_find_all base k)
-          in
-          try
-            let r =
-              List.find
-                (fun x ->
-                   Name.lower (p_first_name base x) = Name.lower p &&
-                   Name.lower (p_surname base x) = Name.lower n &&
-                   get_occ x = occ)
-                xl
-            in
-            if not conf.hide_names || authorized_age conf base r then Some r
-            else None
-          with
-          [ Not_found -> None ]
+          match person_of_key base p n occ with
+          [ Some ip ->
+              let p = poi base ip in
+              if not conf.hide_names || authorized_age conf base p then Some p
+              else None
+          | None -> None ]
       | _ -> None ] ]
 ;
 
