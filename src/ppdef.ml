@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 5.2 2006-10-16 15:17:17 ddr Exp $ *)
+(* $Id: ppdef.ml,v 5.3 2006-10-16 15:25:00 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -84,7 +84,7 @@ value rec eval =
   | <:expr< Char.code $e$ >> ->
       match eval e with
       [ <:expr< $chr:c$ >> ->
-          let i = string_of_int (Char.code (Token.eval_char loc c)) in
+          let i = string_of_int (Char.code (Token.eval_char c)) in
          <:expr< $int:i$ >>
       | e -> cannot_eval e ]
   | <:expr< $op$ $x$ $y$ >> ->
