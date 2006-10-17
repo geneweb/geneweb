@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 5.2 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.3 2006-10-17 12:51:41 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 
@@ -166,7 +166,12 @@ and sig_item =
   [ SgDcl _ sil -> list sig_item sil
   | SgExc _ _ tl -> list ctyp tl
   | SgExt _ _ t _ -> ctyp t
-  | SgMod _ _ mt -> module_type mt
+  | SgMod _ _ x ->
+      IFDEF CAMLP4S THEN
+        list (fun (_, mt) -> module_type mt) x
+      ELSE
+        module_type x
+      END
   | SgMty _ _ mt -> module_type mt
   | SgOpn _ [s :: _] -> addmodule s
   | SgTyp _ tdl -> list type_decl tdl
@@ -189,7 +194,12 @@ and str_item =
   | StExc _ _ tl _ -> list ctyp tl
   | StExp _ e -> expr e
   | StExt _ _ t _ -> ctyp t
-  | StMod _ _ me -> module_expr me
+  | StMod _ _ x ->
+      IFDEF CAMLP4S THEN
+        list (fun (_, me) -> module_expr me) x
+      ELSE
+        module_expr x
+      END
   | StMty _ _ mt -> module_type mt
   | StOpn _ [s :: _] -> addmodule s
   | StTyp _ tdl -> list type_decl tdl
