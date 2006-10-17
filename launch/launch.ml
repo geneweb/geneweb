@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.12 2006-10-14 19:46:47 ddr Exp $ *)
+(* $Id: launch.ml,v 1.13 2006-10-17 12:10:09 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -62,8 +62,11 @@ value exec prog args out err =
 
 value close_server state = do {
   eprintf "Closing..."; flush stderr;
-  (* If the server detects the presence of the file STOP_SERVER, it stops *)
-  let oc = open_out "STOP_SERVER" in
+  (* Making a (empty) file STOP_SERVER to make the server stop. *)
+  let stop_server =
+    List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
+  in
+  let oc = open_out stop_server in
   close_out oc;
   (* Send a phony connection to unblock it. *)
   let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
@@ -197,7 +200,10 @@ value launch_server state = do {
   let fd =
     Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o644
   in
-  try Sys.remove "STOP_SERVER" with [ Sys_error _ -> () ];
+  let stop_server =
+    List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
+  in
+  try Sys.remove stop_server with [ Sys_error _ -> () ];
   let server_pid =
     exec (Filename.concat state.bin_dir "gwd")
       ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.10 2006-10-17 12:10:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1501,7 +1501,8 @@ value make_cnt_dir x =
 value main () =
   do {
     IFDEF WIN95 THEN do {
-      Wserver.sock_in.val := "gwd.sin"; Wserver.sock_out.val := "gwd.sou";
+      Wserver.sock_in.val := "gwd.sin";
+      Wserver.sock_out.val := "gwd.sou";
     }
     ELSE () END;
     let usage =
@@ -1626,6 +1627,9 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
     if Util.cnt_dir.val = Filename.current_dir_name then
       Util.cnt_dir.val := Secure.base_dir ()
     else ();
+    Wserver.stop_server.val :=
+      List.fold_left Filename.concat Util.cnt_dir.val ["cnt"; "STOP_SERVER"]
+    ;
     let (query, cgi) =
       try (Sys.getenv "QUERY_STRING", True) with
       [ Not_found -> ("", cgi.val) ]
