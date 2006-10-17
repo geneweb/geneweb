@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.10 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.11 2006-10-17 05:41:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -28,17 +28,18 @@ value person_key base ip =
   (first_name, surname, occ, Update.Link, "")
 ;
 
-value string_family_of conf base fam cpl des =
+value string_family_of conf base ifam =
   let sfam =
     Futil.map_family_ps (person_key base) (sou base)
-      (gen_family_of_family fam)
+      (gen_family_of_family (foi base ifam))
   in
   let scpl =
     Futil.map_couple_p conf.multi_parents (person_key base)
-      (gen_couple_of_couple cpl)
+      (gen_couple_of_couple (coi base ifam))
   in
   let sdes =
-    Futil.map_descend_p (person_key base) (gen_descend_of_descend des)
+    Futil.map_descend_p (person_key base)
+      (gen_descend_of_descend (doi base ifam))
   in
   (sfam, scpl, sdes)
 ;
@@ -530,12 +531,9 @@ value print_add_parents conf base =
 value print_mod conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let fam = foi base (Adef.ifam_of_int i) in
-      let cpl = coi base (Adef.ifam_of_int i) in
-      let des = doi base (Adef.ifam_of_int i) in
-      let (sfam, scpl, sdes) = string_family_of conf base fam cpl des in
-      let digest = Update.digest_family fam cpl des in
-      print_update_fam conf base (sfam, scpl, sdes) digest
+      let sfam = string_family_of conf base (Adef.ifam_of_int i) in
+      let digest = Update.digest_family sfam in
+      print_update_fam conf base sfam digest
   | _ -> incorrect_request conf ]
 ;
 

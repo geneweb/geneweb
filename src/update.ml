@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.23 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: update.ml,v 5.24 2006-10-17 05:41:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -458,9 +458,7 @@ the base has changed; do \"back\", \"reload\", and refill the form"));
 ;
 
 value digest_person (p : person) = Iovalue.digest p;
-value digest_family (fam : family) (cpl : couple) (des : descend) =
-  Iovalue.digest (fam, cpl, des)
-;
+value digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des);
 
 value get var key env =
   match p_getenv env (var ^ "_" ^ key) with
