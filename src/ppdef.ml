@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 5.3 2006-10-16 15:25:00 ddr Exp $ *)
+(* $Id: ppdef.ml,v 5.4 2006-10-17 12:51:41 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -22,7 +22,7 @@ value rec list_remove x =
   | [] -> [] ]
 ;
 
-value defined = ref [];
+value defined = ref (IFDEF CAMLP4S THEN [("CAMLP4S", None)] ELSE [] END);
 
 value is_defined i = List.mem_assoc i defined.val;
 
