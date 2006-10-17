@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.1 2006-10-17 13:03:52 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.2 2006-10-17 13:58:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -643,10 +643,11 @@ value link gwo_list bname =
     Printf.eprintf "scnt %d\n" gen.g_scnt;
     flush stderr;
 
+    Mutil.mkdir_p bdir;
     let dir = Filename.concat bdir "base_d" in
     let old_dir = Filename.concat bdir "base_d~" in
     Mutil.remove_dir old_dir;
-    Sys.rename dir old_dir;
+    try Sys.rename dir old_dir with [ Sys_error _ -> () ];
     Sys.rename (Filename.concat tmp_dir "base_d") dir;
     Mutil.remove_dir old_dir;
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
