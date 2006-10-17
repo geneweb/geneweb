@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.45 2006-10-17 13:03:52 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.46 2006-10-17 18:22:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -659,6 +659,11 @@ value patched_ascends base =
   | Base2 _ -> failwith "not impl patched_ascends" ]
 ;
 
+type key =
+  [ Key of Adef.istr and Adef.istr and int
+  | Key0 of Adef.istr and Adef.istr (* to save memory space *) ]
+;
+
 type bucketlist 'a 'b =
   [ Empty
   | Cons of 'a and 'b and bucketlist 'a 'b ]
@@ -679,6 +684,11 @@ value hashtbl_find ic_hta ic_ht alen key = do {
   let bl : bucketlist _ _ = Iovalue.input ic_ht in
   hashtbl_find_rec key bl
 };
+
+value key_hashtbl_find ic_hta ic_ht alen (fn, sn, oc) =
+  let key = if oc = 0 then Key0 fn sn else Key fn sn oc in
+  hashtbl_find ic_hta ic_ht alen key
+;
 
 value person2_of_key (dir, _) fn sn oc =
   let person_of_key_d = Filename.concat dir "person_of_key" in
@@ -717,7 +727,7 @@ value person2_of_key (dir, _) fn sn oc =
     in
     let alen = input_binary_int ic_hta in
     let res =
-      try (hashtbl_find ic_hta ic_ht alen (ifn, isn, oc) : iper)
+      try (key_hashtbl_find ic_hta ic_ht alen (ifn, isn, oc) : iper)
       with exn -> do {
         close_in ic_hta;
         close_in ic_ht;
