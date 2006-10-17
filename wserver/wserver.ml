@@ -1,15 +1,18 @@
-(* $Id: wserver.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.8 2006-10-17 10:46:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
+
+open Printf;
 
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
+value stop_server = ref "STOP_SERVER";
 value noproc = ref False;
 
 value wserver_oc =
   do { set_binary_mode_out stdout True; ref stdout }
 ;
 
-value wprint fmt = Printf.fprintf wserver_oc.val fmt;
+value wprint fmt = fprintf wserver_oc.val fmt;
 value wflush () = flush wserver_oc.val;
 
 value hexa_digit x =
@@ -386,12 +389,12 @@ value cleanup_sons () =
          [ Unix.Unix_error _ _ _ as exc ->
              do {
                if cleanup_verbose.val then do {
-                 Printf.eprintf "*** Why error on waitpid %d?\n" p;
+                 eprintf "*** Why error on waitpid %d?\n" p;
                  flush stderr;
                  print_exc exc;
-                 Printf.eprintf "[";
-                 List.iter (fun p -> Printf.eprintf " %d" p) pids.val;
-                 Printf.eprintf "]\n";
+                 eprintf "[";
+                 List.iter (fun p -> eprintf " %d" p) pids.val;
+                 eprintf "]\n";
                  flush stderr;
                  cleanup_verbose.val := False;
                }
@@ -412,12 +415,12 @@ value wait_available max_clients s =
         if List.length pids.val >= m then
 (*
 let tm = Unix.localtime (Unix.time ()) in
-let _ = do { Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "%d clients running; waiting...\n" m; flush stderr; } in
+let _ = do { eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; eprintf "%d clients running; waiting...\n" m; flush stderr; } in
 *)
           let (pid, _) = Unix.wait () in
 (*
 let tm = Unix.localtime (Unix.time ()) in
-let _ = do { Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "ok: place for another client\n"; flush stderr; } in
+let _ = do { eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; eprintf "ok: place for another client\n"; flush stderr; } in
 *)
           pids.val := list_remove pid pids.val
         else ();
@@ -428,7 +431,7 @@ let _ = do { Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday 
           if pids.val <> [] && not stop_verbose.val then do {
             stop_verbose.val := True;
             let tm = Unix.localtime (Unix.time ()) in
-Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup (%d)\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val) (List.hd pids.val); flush stderr; ()
+eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup (%d)\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val) (List.hd pids.val); flush stderr; ()
           }
           else ();
         };
@@ -438,9 +441,9 @@ END;
 
 value wait_and_compact s =
   if Unix.select [s] [] [] 15.0 = ([], [], []) then do {
-    Printf.eprintf "Compacting... "; flush stderr;
+    eprintf "Compacting... "; flush stderr;
     Gc.compact ();
-    Printf.eprintf "Ok\n"; flush stderr;
+    eprintf "Ok\n"; flush stderr;
   }
   else ()
 ;
@@ -461,10 +464,10 @@ value skip_possible_remaining_chars fd =
 ;
 
 value check_stopping () =
-  if Sys.file_exists "STOP_SERVER" then do {
+  if Sys.file_exists stop_server.val then do {
     flush stdout;
-    Printf.eprintf "\nServer stopped by presence of file STOP_SERVER.\n";
-    Printf.eprintf "Remove that file to allow servers to run again.\n";
+    eprintf "\nServer stopped by presence of file %s.\n" stop_server.val;
+    eprintf "Remove that file to allow servers to run again.\n";
     flush stderr;
     exit 0
   }
@@ -527,7 +530,7 @@ value accept_connection tmout max_clients callback s =
             else pids.val := [id :: pids.val];
           }
       | None ->
-          do { Unix.close t; Printf.eprintf "Fork failed\n"; flush stderr } ]
+          do { Unix.close t; eprintf "Fork failed\n"; flush stderr } ]
     ELSE do {
       let oc = open_out_bin sock_in.val in
       let cleanup () = try close_out oc with _ -> () in
@@ -652,11 +655,11 @@ value f addr_opt port tmout max_clients g =
         ELSIFDEF UNIX THEN let _ = Unix.nice 1 in ()
         ELSE () END;
         let tm = Unix.localtime (Unix.time ()) in
-        Printf.eprintf "Ready %4d-%02d-%02d %02d:%02d port"
+        eprintf "Ready %4d-%02d-%02d %02d:%02d port"
           (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
           tm.Unix.tm_hour tm.Unix.tm_min;
-        Printf.eprintf " %d" port;
-        Printf.eprintf "...\n";
+        eprintf " %d" port;
+        eprintf "...\n";
         flush stderr;
         while True do {
           try accept_connection tmout max_clients g s with
