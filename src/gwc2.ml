@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.2 2006-10-17 13:58:39 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.3 2006-10-17 18:22:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -17,13 +17,18 @@ type file_field 'a =
   (out_channel * out_channel * ref int * ref int * 'a -> Obj.t)
 ;
 
+type key =
+  [ Key of Adef.istr and Adef.istr and int
+  | Key0 of Adef.istr and Adef.istr (* to save memory space *) ]
+;
+
 type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
 
     g_strings : Hashtbl.t string Adef.istr;
-    g_index_of_key : Hashtbl.t (Adef.istr * Adef.istr * int) iper;
+    g_index_of_key : Hashtbl.t key iper;
     g_person_fields : list (file_field (gen_person iper string));
     g_family_fields : list (file_field family);
     g_person_parents : (Iochan.t * out_channel);
@@ -331,11 +336,20 @@ value empty_person =
    psources = ""; key_index = Adef.iper_of_int 0}
 ;
 
+value key_hashtbl_add ht (fn, sn, oc) v =
+  let k = if oc = 0 then Key0 fn sn else Key fn sn oc in
+  Hashtbl.add ht k v
+;
+value key_hashtbl_find ht (fn, sn, oc) =
+  let k = if oc = 0 then Key0 fn sn else Key fn sn oc in
+  Hashtbl.find ht k
+;
+
 value insert_person1 gen so = do {
   if so.first_name <> "?" && so.surname <> "?" then do {
     let fn = unique_key_string gen so.first_name in
     let sn = unique_key_string gen so.surname in
-    Hashtbl.add gen.g_index_of_key (fn, sn, so.occ)
+    key_hashtbl_add gen.g_index_of_key (fn, sn, so.occ)
       (Adef.iper_of_int gen.g_pcnt);
     List.iter (output_field so) gen.g_person_fields;
     Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
@@ -349,7 +363,7 @@ value insert_person1 gen so = do {
 
 value insert_undefined2 gen key fn sn = do {
   if key.pk_first_name <> "?" && key.pk_surname <> "?" then
-    Hashtbl.add gen.g_index_of_key (fn, sn, key.pk_occ)
+    key_hashtbl_add gen.g_index_of_key (fn, sn, key.pk_occ)
       (Adef.iper_of_int gen.g_pcnt)
   else ();
   if do_check.val then do {
@@ -376,7 +390,7 @@ value get_person2 gen so =
   if so.first_name <> "?" && so.surname <> "?" then do {
     let fn = unique_key_string gen so.first_name in
     let sn = unique_key_string gen so.surname in
-    try Hashtbl.find gen.g_index_of_key (fn, sn, so.occ) with
+    try key_hashtbl_find gen.g_index_of_key (fn, sn, so.occ) with
     [ Not_found ->
         failwith
           (sprintf "*** bug not found %s.%d %s" so.first_name so.occ
@@ -396,7 +410,7 @@ value get_person2 gen so =
 value get_undefined2 gen key =
   let fn = unique_key_string gen key.pk_first_name in
   let sn = unique_key_string gen key.pk_surname in
-  try Hashtbl.find gen.g_index_of_key (fn, sn, key.pk_occ) with
+  try key_hashtbl_find gen.g_index_of_key (fn, sn, key.pk_occ) with
   [ Not_found -> insert_undefined2 gen key fn sn ]
 ;
 
@@ -583,6 +597,8 @@ value link gwo_list bname =
     else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
     else ProgrBar.finish ();
 
+Gc.compact ();
+
     let run =
       if ngwo < 10 then fun () -> ()
       else if ngwo < 60 then
@@ -605,6 +621,7 @@ value link gwo_list bname =
     List.iter (close_out_field gen.g_fcnt) family_fields;
     Iochan.close (fst person_unions);
     close_out (snd person_unions);
+    Gc.compact ();
 
     let person_of_key_d = 
       List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_key"]
@@ -617,8 +634,7 @@ value link gwo_list bname =
     let oc_ht =
       open_out_bin (Filename.concat person_of_key_d "iper_of_key.ht")
     in
-    output_hashtbl oc_hta oc_ht
-      (gen.g_index_of_key : Hashtbl.t (Adef.istr * Adef.istr * int) iper);
+    output_hashtbl oc_hta oc_ht (gen.g_index_of_key : Hashtbl.t key iper);
     close_out oc_hta;
     close_out oc_ht;
     Hashtbl.clear gen.g_index_of_key;
@@ -633,7 +649,6 @@ value link gwo_list bname =
     close_out oc_hta;
     close_out oc_ht;
     Hashtbl.clear gen.g_strings;
-
     Gc.compact ();
 
     optim_person_fields tmp_dir;
