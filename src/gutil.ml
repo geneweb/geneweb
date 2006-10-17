@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.43 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.44 2006-10-17 13:03:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -354,5 +354,15 @@ value input_lexicon lang ht open_fname =
   [ Sys_error _ -> () ]
 ;
 
-value open_base bname = Gwdb.base_of_dsk_base (Database.opendb bname);
+value open_base bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  if Sys.file_exists (Filename.concat bname "base_d") then do {
+    Printf.eprintf "*** database new implementation\n";
+    flush stderr; 
+    Gwdb.base_of_base2 bname
+  }
+  else Gwdb.base_of_dsk_base (Database.opendb bname)
+;
 value close_base base = Gwdb.base_cleanup base;

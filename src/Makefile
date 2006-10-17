@@ -1,10 +1,11 @@
-# $Id: Makefile,v 5.21 2006-10-17 12:51:41 ddr Exp $
+# $Id: Makefile,v 5.22 2006-10-17 13:03:52 ddr Exp $
 
 include ../tools/Makefile.inc
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo futil.cmo gwdb.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo gwc.cmo
+GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo iochan.cmo futil.cmo gwc2.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo futil.cmo gwdb.cmo outbase.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo mk_consang.cmo
 GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo dutil.cmo database.cmo futil.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo templ.cmo date.cmo update.cmo notesLinks.cmo wiki.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo doc.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo
@@ -21,22 +22,24 @@ all:: out
 out:: gwlib.ml
 opt:: gwlib.ml
 
-out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out update_nldb.out i18n_check.out
-	$(RM) gwc consang gwd gwu
+out:: def.syn.cmo ansel.cmo gwc.out gwc2.out consang.out gwd.out gwu.out update_nldb.out i18n_check.out
+	$(RM) gwc gwc2 consang gwd gwu
 	cp gwc.out gwc
+	cp gwc2.out gwc2
 	cp consang.out consang
 	cp gwd.out gwd
 	cp gwu.out gwu
 	cp update_nldb.out update_nldb
 
-opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt update_nldb.opt
+opt:: def.syn.cmo ansel.cmx gwc.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt
 	$(RM) gwc consang gwd gwu
 	cp gwc.opt gwc
+	cp gwc2.opt gwc2
 	cp consang.opt consang
 	cp gwd.opt gwd
 	cp gwu.opt gwu
 	cp update_nldb.opt update_nldb
-	$(STRIP) gwc consang gwd gwu update_nldb
+	$(STRIP) gwc gwc2 consang gwd gwu update_nldb
 
 compilation.cmo: $(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 	$(MAKE) compilation.ml
@@ -58,7 +61,7 @@ compilation.ml: always
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
 
 clean::
-	$(RM) gwc consang gwd gwu update_nldb gwlib.ml
+	$(RM) gwc gwc2 consang gwd gwu update_nldb gwlib.ml
 
 gwlib.ml:
 	echo "value prefix =" > gwlib.ml
@@ -72,6 +75,12 @@ gwc.out: $(GWC_OBJS)
 
 gwc.opt: $(GWC_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(GWC_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc.opt
+
+gwc2.out: $(GWC2_OBJS)
+	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC2_OBJS) $(LIBUNIX) -o gwc2.out
+
+gwc2.opt: $(GWC2_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(GWC2_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc2.opt
 
 consang.out: $(CONSANG_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(CONSANG_OBJS) -o consang.out
