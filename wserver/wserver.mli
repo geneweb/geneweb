@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: wserver.mli,v 5.2 2006-10-17 10:46:27 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -57,6 +57,14 @@ value get_request_and_content : Stream.t char -> (list string * string);
 
 value sock_in : ref string;
 value sock_out : ref string;
+    (* Names of the files used in windows implementation to communicate
+       http requests and html answers. Default "wserver.sin" and
+       "wserver.sou". Can have relative or absolute paths. *)
+value stop_server : ref string;
+    (* Name of the file whose presence tells the server to stop (at least
+       one request is necessary to unfreeze the server to make it check
+       that this file exits. Default "STOP_SERVER". Can have relative
+       or absolute path. *)
 value noproc : ref bool;
 
 (* Example:
