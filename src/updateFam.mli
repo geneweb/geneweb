@@ -1,4 +1,4 @@
-(* $Id: updateFam.mli,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: updateFam.mli,v 5.3 2006-10-17 05:41:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -19,3 +19,7 @@ value print_inv : config -> base -> unit;
 value print_add_parents : config -> base -> unit;
 
 value person_key : base -> iper -> Update.key;
+value string_family_of :
+  config -> base -> ifam ->
+    (gen_family Update.key string * gen_couple Update.key *
+     gen_descend Update.key);

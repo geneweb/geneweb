@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.8 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.9 2006-10-17 05:41:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -78,7 +78,10 @@ value print_merge conf base =
       let des2 = doi base (Adef.ifam_of_int f2) in
       let (sfam, sdes) = reconstitute conf base fam1 des1 fam2 des2 in
       let digest =
-        Update.digest_family fam1 (coi base (Adef.ifam_of_int f1)) des1
+        let ini_sfam =
+          UpdateFam.string_family_of conf base (Adef.ifam_of_int f1)
+        in
+        Update.digest_family ini_sfam
       in
       let scpl =
         Futil.map_couple_p conf.multi_parents (UpdateFam.person_key base)

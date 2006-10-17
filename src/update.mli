@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 5.4 2006-10-10 19:59:33 ddr Exp $ *)
+(* $Id: update.mli,v 5.5 2006-10-17 05:41:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -30,7 +30,8 @@ value error_locked : config -> unit;
 value error_digest : config -> unit;
 
 value digest_person : person -> Digest.t;
-value digest_family : family -> couple -> descend -> Digest.t;
+value digest_family :
+  (gen_family key string * gen_couple key * gen_descend key) -> Digest.t;
 
 value reconstitute_date : config -> string -> option date;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.26 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.27 2006-10-17 05:41:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -988,8 +988,8 @@ value print_mod_aux conf base callback =
       | _ -> False ]
     in
     let digest =
-      Update.digest_family (foi base sfam.fam_index)
-        (coi base sfam.fam_index) (doi base sfam.fam_index)
+      let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
+      Update.digest_family ini_sfam
     in
     if digest = raw_get conf "digest" then
       if ext || redisp then
