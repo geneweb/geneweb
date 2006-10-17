@@ -106,6 +106,10 @@ gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
     gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
     notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
+gwc2.cmo: adef.cmi argl.cmo def.cmi futil.cmi gwcomp.cmo iochan.cmo \
+    iovalue.cmi lock.cmi mutil.cmi name.cmi progrBar.cmi secure.cmi 
+gwc2.cmx: adef.cmx argl.cmx def.cmi futil.cmx gwcomp.cmx iochan.cmx \
+    iovalue.cmx lock.cmx mutil.cmx name.cmx progrBar.cmx secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi mutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi mutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
@@ -116,8 +120,10 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi dbdisk.cmi def.cmi dutil.cmi mutil.cmi gwdb.cmi 
-gwdb.cmx: adef.cmx dbdisk.cmi def.cmi dutil.cmx mutil.cmx gwdb.cmi 
+gwdb.cmo: adef.cmi buff.cmo dbdisk.cmi def.cmi dutil.cmi futil.cmi \
+    iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx buff.cmx dbdisk.cmi def.cmi dutil.cmx futil.cmx \
+    iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi config.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmo secure.cmi select.cmo 
@@ -341,6 +347,7 @@ date.cmo date.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
 doc.cmo doc.cmx: pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
+gwc2.cmo gwc2.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
 iovalue.cmo iovalue.cmx: q_codes.cmo
 merge.cmo merge.cmx: pa_html.cmo
