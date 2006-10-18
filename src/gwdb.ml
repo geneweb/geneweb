@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.49 2006-10-18 21:11:57 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.50 2006-10-18 21:59:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -761,7 +761,7 @@ value persons_of_first_name base =
 value persons_of_surname base =
   match base with
   [ Base base -> Spi base.func.persons_of_surname
-  | Base2 _ -> failwith "not impl persons_of_surname" ]
+  | Base2 _ -> Spi2 ]
 ;
 
 value spi_cursor spi s =
@@ -820,7 +820,15 @@ value base_strings_of_first_name base s =
 value base_strings_of_surname base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 _ -> failwith (sprintf "not impl base_strings_of_surname %s" s) ]
+  | Base2 ((bn, cache) as bnc) -> do {
+      let (f1, f2, f) = ("person", "surname", "string_of_crush.ht") in
+      let ic = open_in_bin (List.fold_left Filename.concat bn [f1; f2; f]) in
+      let ht : Hashtbl.t string int = input_value ic in
+      close_in ic;
+      let k = Name.crush_lower s in
+      let posl = Hashtbl.find_all ht k in
+      List.map (fun pos -> Istr2 bnc (f1, f2) pos) posl
+    } ]
 ;
 value base_cleanup base =
   match base with
