@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.52 2006-10-17 13:03:52 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.53 2006-10-18 02:56:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -138,7 +138,8 @@ value spi_next : string_person_index -> istr -> istr;
 value base_visible_get : base -> (person -> bool) -> int -> bool;
 value base_visible_write : base -> unit;
 value base_particles : base -> list string;
-value base_strings_of_fsname : base -> string -> list istr;
+value base_strings_of_first_name : base -> string -> list istr;
+value base_strings_of_surname : base -> string -> list istr;
 value base_cleanup : base -> unit;
 
 value load_ascends_array : base -> unit;
