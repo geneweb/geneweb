@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.25 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: request.ml,v 5.26 2006-10-18 02:56:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -106,8 +106,8 @@ value try_find_with_one_first_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let (list, _) =
-        Some.persons_of_fsname conf base (spi_find (persons_of_surname base))
-          get_surname sn
+        Some.persons_of_fsname conf base base_strings_of_surname
+          (spi_find (persons_of_surname base)) get_surname sn
       in
       let pl =
         List.fold_left

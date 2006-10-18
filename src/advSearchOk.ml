@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: advSearchOk.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 5.10 2006-10-18 02:56:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -175,11 +175,11 @@ value advanced_search conf base max_answers =
     if gets "first_name" <> "" || gets "surname" <> "" then
       let (slist, _) =
         if gets "first_name" <> "" then
-          Some.persons_of_fsname conf base
+          Some.persons_of_fsname conf base base_strings_of_first_name
             (spi_find (persons_of_first_name base)) get_first_name
             (gets "first_name")
         else
-          Some.persons_of_fsname conf base
+          Some.persons_of_fsname conf base base_strings_of_surname
             (spi_find (persons_of_surname base)) get_surname
             (gets "surname")
       in

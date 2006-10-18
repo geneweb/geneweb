@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: some.ml,v 5.14 2006-10-18 02:56:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -25,7 +25,7 @@ value surname_not_found conf =
   not_found conf (transl conf "surname not found")
 ;
 
-value persons_of_fsname conf base find proj x =
+value persons_of_fsname conf base base_strings_of_fsname find proj x =
   let istrl = base_strings_of_fsname base x in
   let l =
     let x = Name.crush_lower x in
@@ -169,7 +169,7 @@ value rec merge_insert ((sstr, (strl, iperl)) as x) =
 ;
 
 value persons_of_absolute_first_name conf base x =
-  let istrl = base_strings_of_fsname base x in
+  let istrl = base_strings_of_first_name base x in
   List.fold_right
     (fun istr l ->
        let str = sou base istr in
@@ -194,8 +194,8 @@ value first_name_print conf base x =
       (persons_of_absolute_first_name conf base x, fun [])
     else if x = "" then ([], fun [])
     else
-      persons_of_fsname conf base (spi_find (persons_of_first_name base))
-        get_first_name x
+      persons_of_fsname conf base base_strings_of_first_name
+        (spi_find (persons_of_first_name base)) get_first_name x
   in
   let list =
     List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl)))
@@ -577,7 +577,7 @@ value select_ancestors conf base name_inj ipl =
 ;
 
 value persons_of_absolute_surname conf base x =
-  let istrl = base_strings_of_fsname base x in
+  let istrl = base_strings_of_surname base x in
   List.fold_right
     (fun istr l ->
        let str = sou base istr in
@@ -602,8 +602,8 @@ value old_surname_print conf base not_found_fun x =
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
     else
-      persons_of_fsname conf base (spi_find (persons_of_surname base))
-        get_surname x
+      persons_of_fsname conf base base_strings_of_surname
+        (spi_find (persons_of_surname base)) get_surname x
   in
   let (iperl, strl) =
     List.fold_right
@@ -766,8 +766,8 @@ value surname_print_2 conf base x =
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
     else
-      persons_of_fsname conf base (spi_find (persons_of_surname base))
-        get_surname x
+      persons_of_fsname conf base base_strings_of_surname
+        (spi_find (persons_of_surname base)) get_surname x
   in
   let (iperl, strl) =
     List.fold_right

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.46 2006-10-17 18:22:25 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.47 2006-10-18 02:56:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -755,7 +755,10 @@ value persons_of_name base =
 value persons_of_first_name base =
   match base with
   [ Base base -> base.func.persons_of_first_name
-  | Base2 _ -> failwith "not impl person_of_first_name" ]
+  | Base2 _ ->
+     {find _ = failwith "not impl persons_of_first_name.find";
+      cursor _ = failwith "not impl persons_of_first_name.cursor";
+      next _ = failwith "not impl persons_of_first_name.next"} ]
 ;
 value persons_of_surname base =
   match base with
@@ -782,10 +785,15 @@ value base_particles base =
   [ Base base -> base.data.particles
   | Base2 _ -> failwith "not impl base_particles" ]
 ;
-value base_strings_of_fsname base s =
+value base_strings_of_first_name base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 _ -> failwith "not impl base_strings_of_fsnames" ]
+  | Base2 _ -> failwith (sprintf "not impl base_strings_of_first_name %s" s) ]
+;
+value base_strings_of_surname base s =
+  match base with
+  [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
+  | Base2 _ -> failwith (sprintf "not impl base_strings_of_surname %s" s) ]
 ;
 value base_cleanup base =
   match base with
