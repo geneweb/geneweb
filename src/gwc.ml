@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.46 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.47 2006-10-18 21:59:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -530,9 +530,9 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
   in
   let children =
     Array.map
-      (fun cle ->
-         let (e, ie) = insert_person gen cle in
-         do { notice_sex gen e cle.sex; ie })
+      (fun key ->
+         let (e, ie) = insert_person gen key in
+         do { notice_sex gen e key.sex; ie })
       deo.children
   in
   let comment = unique_string gen fo.comment in

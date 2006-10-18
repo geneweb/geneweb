@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.4 2006-10-18 20:50:25 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.5 2006-10-18 21:59:28 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -309,52 +309,66 @@ value optim_person_fields tmp_dir =
      ("rparents", optim_type_list_relation)]
 ;
 
-value string_of_crush_index tmp_dir = do {
-  let field = "first_name" in
-  let field_d =
-    List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
-  in
-  let ic_dat = open_in_bin (Filename.concat field_d "data") in
-  eprintf "string_of_crush %s..." field;
-  flush stderr;
-  let ht = Hashtbl.create 1 in
-  loop 0 where rec loop pos =
-    match try Some (Iovalue.input ic_dat) with [ End_of_file -> None ] with
-    [ Some s -> do {
-        let k = Name.crush_lower s in
-        let posl = Hashtbl.find_all ht k in
-        if List.mem pos posl then () else Hashtbl.add ht k pos;
-        loop (pos_in ic_dat)
-      }
-    | None -> () ];
-  close_in ic_dat;
-  let oc_ht = open_out_bin (Filename.concat field_d "string_of_crush.ht") in
-  output_value oc_ht ht;
-  close_out oc_ht;
-  eprintf "\n";
-  flush stderr;
-};
+value string_of_crush_index tmp_dir =
+  List.iter
+    (fun field -> do {
+       let field_d =
+         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+       in
+       let ic_dat = open_in_bin (Filename.concat field_d "data") in
+       eprintf "string_of_crush %s..." field;
+       flush stderr;
+       let ht = Hashtbl.create 1 in
+       loop 0 where rec loop pos =
+         match
+           try Some (Iovalue.input ic_dat) with [ End_of_file -> None ]
+         with
+         [ Some s -> do {
+             let k = Name.crush_lower s in
+             let posl = Hashtbl.find_all ht k in
+             if List.mem pos posl then () else Hashtbl.add ht k pos;
+             loop (pos_in ic_dat)
+           }
+         | None -> () ];
+       close_in ic_dat;
+       let oc_ht =
+         open_out_bin (Filename.concat field_d "string_of_crush.ht")
+       in
+       output_value oc_ht ht;
+       close_out oc_ht;
+       eprintf "\n";
+       flush stderr;
+    })
+   ["first_name"; "surname"]
+;
 
-value person_of_string_index tmp_dir = do {
-  let field = "first_name" in
-  let field_d =
-    List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
-  in
-  let ic_acc = open_in_bin (Filename.concat field_d "access") in
-  eprintf "person_of_string %s..." field;
-  flush stderr;
-  let ht = Hashtbl.create 1 in
-  loop 0 where rec loop i =
-    match try Some (input_binary_int ic_acc) with [ End_of_file -> None ] with
-    [ Some pos -> do { Hashtbl.add ht pos i; loop (i + 1) }
-    | None -> () ];
-  close_in ic_acc;
-  let oc_ht = open_out_bin (Filename.concat field_d "person_of_string.ht") in
-  output_value oc_ht ht;
-  close_out oc_ht;
-  eprintf "\n";
-  flush stderr;
-};
+value person_of_string_index tmp_dir =
+  List.iter
+    (fun field -> do {
+       let field_d =
+         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+       in
+       let ic_acc = open_in_bin (Filename.concat field_d "access") in
+       eprintf "person_of_string %s..." field;
+       flush stderr;
+       let ht = Hashtbl.create 1 in
+       loop 0 where rec loop i =
+         match
+           try Some (input_binary_int ic_acc) with [ End_of_file -> None ]
+         with
+         [ Some pos -> do { Hashtbl.add ht pos i; loop (i + 1) }
+         | None -> () ];
+       close_in ic_acc;
+       let oc_ht =
+         open_out_bin (Filename.concat field_d "person_of_string.ht")
+       in
+       output_value oc_ht ht;
+       close_out oc_ht;
+       eprintf "\n";
+       flush stderr;
+     })
+    ["first_name"; "surname"]
+;
 
 value unique_key_string gen s =
   let s = Name.lower (Mutil.nominative s) in
@@ -457,10 +471,12 @@ value get_undefined2 gen key =
   [ Not_found -> insert_undefined2 gen key fn sn ]
 ;
 
-value insert_somebody1 gen =
+value insert_somebody1 gen sex =
   fun
   [ Undefined key -> ()
-  | Defined so -> insert_person1 gen so ]
+  | Defined so ->
+      let so = {(so) with sex = sex} in
+      insert_person1 gen so ]
 ;
 
 value get_somebody2 gen =
@@ -470,9 +486,9 @@ value get_somebody2 gen =
 ;
 
 value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
-  let _ifath = insert_somebody1 gen (Adef.father co) in
-  let _imoth = insert_somebody1 gen (Adef.mother co) in
-  Array.iter (fun cle -> insert_person1 gen cle) deo.children;
+  let _ifath = insert_somebody1 gen fath_sex (Adef.father co) in
+  let _imoth = insert_somebody1 gen moth_sex (Adef.mother co) in
+  Array.iter (fun key -> insert_person1 gen key) deo.children;
 };
 
 value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
