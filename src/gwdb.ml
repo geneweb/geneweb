@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.47 2006-10-18 02:56:45 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.48 2006-10-18 20:50:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -46,10 +46,15 @@ type descend =
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
 
-type string_person_index = Dbdisk.string_person_index ==
-  { find : dsk_istr -> list iper;
-    cursor : string -> dsk_istr;
-    next : dsk_istr -> dsk_istr }
+type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
+  { find : 'istr -> list iper;
+    cursor : string -> 'istr;
+    next : 'istr -> 'istr }
+;
+
+type string_person_index =
+  [ Spi of gen_string_person_index dsk_istr
+  | Spi2 ]
 ;
 
 type base =
@@ -108,12 +113,14 @@ value get_field bn i path =
 value is_empty_string =
   fun
   [ Istr istr -> istr = Adef.istr_of_int 0
-  | Istr2 bn path i _ -> get_field_acc bn i path = 0 ]
+  | Istr2 bn path i False -> get_field_acc bn i path = 0
+  | Istr2 bn path pos True -> failwith "not impl is_empty_string" ]
 ;
 value is_quest_string =
   fun
   [ Istr istr -> istr = Adef.istr_of_int 1
-  | Istr2 bn path i _ -> get_field_acc bn i path = 1 ]
+  | Istr2 bn path i False -> get_field_acc bn i path = 1
+  | Istr2 bn path pos True -> failwith "not impl is_quest_string" ]
 ;
 
 value get_access =
@@ -195,7 +202,10 @@ value get_death_src =
 value get_first_name =
   fun
   [ Person p -> Istr p.Def.first_name
-  | Person2 bn i -> Istr2 bn ("person", "first_name") i False ]
+  | Person2 bnc i ->
+      let path = ("person", "first_name") in
+      let pos = get_field_acc bnc i path in
+      Istr2 bnc path pos True ]
 ;
 value get_first_names_aliases =
   fun
@@ -754,21 +764,37 @@ value persons_of_name base =
 ;
 value persons_of_first_name base =
   match base with
-  [ Base base -> base.func.persons_of_first_name
-  | Base2 _ ->
-     {find _ = failwith "not impl persons_of_first_name.find";
-      cursor _ = failwith "not impl persons_of_first_name.cursor";
-      next _ = failwith "not impl persons_of_first_name.next"} ]
+  [ Base base -> Spi base.func.persons_of_first_name
+  | Base2 _ -> Spi2 ]
 ;
 value persons_of_surname base =
   match base with
-  [ Base base -> base.func.persons_of_surname
+  [ Base base -> Spi base.func.persons_of_surname
   | Base2 _ -> failwith "not impl persons_of_surname" ]
 ;
 
-value spi_cursor spi s = Istr (spi.cursor s);
-value spi_find spi s = spi.find (un_istr s);
-value spi_next spi s = Istr (spi.next (un_istr s));
+value spi_cursor spi s =
+  match spi with
+  [ Spi spi -> Istr (spi.cursor s)
+  | Spi2 -> failwith "not impl spi_cursor" ]
+;
+value spi_find spi s =
+  match (spi, s) with
+  [ (Spi spi, Istr s) -> spi.find s
+  | (Spi2, Istr2 (bn, _) (f1, f2) pos True) -> do {
+      let f = "person_of_string.ht" in
+      let ic = open_in_bin (List.fold_left Filename.concat bn [f1; f2; f]) in
+      let ht : Hashtbl.t int iper = input_value ic in
+      close_in ic;
+      Hashtbl.find_all ht pos
+    }
+  | _ -> failwith "not impl spi_find" ]
+;
+value spi_next spi s =
+  match (spi, s) with
+  [ (Spi spi, Istr s) -> Istr (spi.next s)
+  | _ -> failwith "not impl spi_next" ]
+;
 
 value base_visible_get base f =
   match base with
@@ -783,12 +809,22 @@ value base_visible_write base =
 value base_particles base =
   match base with
   [ Base base -> base.data.particles
-  | Base2 _ -> failwith "not impl base_particles" ]
+  | Base2 (bn, _) ->
+      Mutil.input_particles (Filename.concat bn "../particles.txt") ]
+
 ;
 value base_strings_of_first_name base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 _ -> failwith (sprintf "not impl base_strings_of_first_name %s" s) ]
+  | Base2 ((bn, cache) as bnc) -> do {
+      let (f1, f2, f) = ("person", "first_name", "string_of_crush.ht") in
+      let ic = open_in_bin (List.fold_left Filename.concat bn [f1; f2; f]) in
+      let ht : Hashtbl.t string int = input_value ic in
+      close_in ic;
+      let k = Name.crush_lower s in
+      let posl = Hashtbl.find_all ht k in
+      List.map (fun pos -> Istr2 bnc (f1, f2) pos True) posl
+    } ]
 ;
 value base_strings_of_surname base s =
   match base with

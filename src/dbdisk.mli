@@ -1,4 +1,4 @@
-(* $Id: dbdisk.mli,v 5.11 2006-10-15 12:39:19 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.12 2006-10-18 20:50:25 ddr Exp $ *)
 
 open Def;
 
@@ -30,10 +30,10 @@ type record_access 'a =
     clear_array : unit -> unit }
 ;
 
-type string_person_index =
-  { find : dsk_istr -> list iper;
-    cursor : string -> dsk_istr;
-    next : dsk_istr -> dsk_istr }
+type string_person_index 'istr =
+  { find : 'istr -> list iper;
+    cursor : string -> 'istr;
+    next : 'istr -> 'istr }
 ;
 
 type visible_record_access =
@@ -58,8 +58,8 @@ type base_func =
   { person_of_key : string -> string -> int -> option iper;
     persons_of_name : string -> list iper;
     strings_of_fsname : string -> list dsk_istr;
-    persons_of_surname : string_person_index;
-    persons_of_first_name : string_person_index;
+    persons_of_surname : string_person_index dsk_istr;
+    persons_of_first_name : string_person_index dsk_istr;
     patch_person : iper -> dsk_person -> unit;
     patch_ascend : iper -> dsk_ascend -> unit;
     patch_union : iper -> dsk_union -> unit;
