@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.3 2006-10-17 18:22:25 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.4 2006-10-18 20:50:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -268,7 +268,7 @@ value optim_type_list_relation field_d ic oc oc_str ht = do {
   close_out oc_ext;
 };
 
-value optim_person_fields tmp_dir = do {
+value optim_person_fields tmp_dir =
   List.iter
     (fun (field, optim_type) -> do {
        let field_d =
@@ -283,10 +283,6 @@ value optim_person_fields tmp_dir = do {
        seek_in ic 25;
 
        optim_type field_d ic oc_acc2 oc_dat2 ht;
-
-       let oc_hash = open_out_bin (Filename.concat field_d "hash") in
-       output_value oc_hash (ht : Hashtbl.t string int);
-       close_out oc_hash;
 
        close_out oc_dat2;
        close_out oc_acc2;
@@ -310,7 +306,54 @@ value optim_person_fields tmp_dir = do {
      ("qualifiers", optim_type_list_string);
      ("surnames_aliases", optim_type_list_string);
      ("titles", optim_type_list_title);
-     ("rparents", optim_type_list_relation)];
+     ("rparents", optim_type_list_relation)]
+;
+
+value string_of_crush_index tmp_dir = do {
+  let field = "first_name" in
+  let field_d =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+  in
+  let ic_dat = open_in_bin (Filename.concat field_d "data") in
+  eprintf "string_of_crush %s..." field;
+  flush stderr;
+  let ht = Hashtbl.create 1 in
+  loop 0 where rec loop pos =
+    match try Some (Iovalue.input ic_dat) with [ End_of_file -> None ] with
+    [ Some s -> do {
+        let k = Name.crush_lower s in
+        let posl = Hashtbl.find_all ht k in
+        if List.mem pos posl then () else Hashtbl.add ht k pos;
+        loop (pos_in ic_dat)
+      }
+    | None -> () ];
+  close_in ic_dat;
+  let oc_ht = open_out_bin (Filename.concat field_d "string_of_crush.ht") in
+  output_value oc_ht ht;
+  close_out oc_ht;
+  eprintf "\n";
+  flush stderr;
+};
+
+value person_of_string_index tmp_dir = do {
+  let field = "first_name" in
+  let field_d =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+  in
+  let ic_acc = open_in_bin (Filename.concat field_d "access") in
+  eprintf "person_of_string %s..." field;
+  flush stderr;
+  let ht = Hashtbl.create 1 in
+  loop 0 where rec loop i =
+    match try Some (input_binary_int ic_acc) with [ End_of_file -> None ] with
+    [ Some pos -> do { Hashtbl.add ht pos i; loop (i + 1) }
+    | None -> () ];
+  close_in ic_acc;
+  let oc_ht = open_out_bin (Filename.concat field_d "person_of_string.ht") in
+  output_value oc_ht ht;
+  close_out oc_ht;
+  eprintf "\n";
+  flush stderr;
 };
 
 value unique_key_string gen s =
@@ -652,6 +695,8 @@ Gc.compact ();
     Gc.compact ();
 
     optim_person_fields tmp_dir;
+    string_of_crush_index tmp_dir;
+    person_of_string_index tmp_dir;
 
     Printf.eprintf "pcnt %d\n" gen.g_pcnt;
     Printf.eprintf "fcnt %d\n" gen.g_fcnt;
@@ -711,6 +756,15 @@ value output_command_line bname =
     fprintf oc "\n";
     close_out oc;
   }
+;
+
+value input_particles part_file =
+  if part_file = "" then
+    ["af "; "d'"; "dal "; "de "; "di "; "du "; "of "; "van ";
+     "von und zu "; "von "; "zu "; "zur ";
+     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
+     "VON UND ZU "; "VON "; "ZU "; "ZUR "]
+  else Mutil.input_particles part_file
 ;
 
 value output_particles_file bname particles =
@@ -800,7 +854,11 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       }
       else ();
       lock (Mutil.lock_file out_file.val) with
-      [ Accept -> link (List.rev gwo.val) out_file.val
+      [ Accept -> do {
+          link (List.rev gwo.val) out_file.val;
+          let particles = input_particles part_file.val in
+          output_particles_file out_file.val particles;
+        }
       | Refuse ->
           do {
             printf "Base is locked: cannot write it\n";
