@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.13 2006-10-17 12:10:09 ddr Exp $ *)
+(* $Id: launch.ml,v 1.14 2006-10-18 01:20:05 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -77,7 +77,7 @@ value close_server state = do {
   eprintf "\n"; flush stderr;
 };
 
-value browse browser port dbn () =
+value browse browser port dbn =
   let pid =
     match browser with
     [ Some browser ->
@@ -129,6 +129,10 @@ value tk_getOpenDir initialdir =
   if res = "" then initialdir else res
 ;
 
+value button_create wid params comm =
+  Button.create wid [Command comm :: params]
+;
+
 value config state title v def select to_string from_string set prev next =
   match
     try Some (from_string (v ())) with
@@ -142,54 +146,43 @@ value config state title v def select to_string from_string set prev next =
       Textvariable.set var (to_string def);
 
       let sel = select frame var in
-      Focus.force sel;
-
-      let ev_seq = [([], KeyPressDetail "Return")] in
-      let kont f state _ =
+      let kont f state =
         match
           try Some (from_string (Textvariable.get var)) with
           [ Failure _ -> None ]
         with
         [ Some d -> do {
-            bind sel ev_seq BindRemove;
             Pack.forget [gframe];
             set state d;
             f state
           }
         | None -> () ]
       in
-      bind sel ev_seq (BindSet [] (kont next state));
 
       let buts =
         match prev with
         [ Some (prev_var, prev) -> do {
             let buts = Frame.create frame [] in
-            let but1 =
-              Button.create buts
-                [Text "Prev";
-                 Command
-                   (fun () -> do {
-                      bind sel ev_seq BindRemove;
-                      Pack.forget [gframe]; 
-                      let state =
-                        {(state) with
-                         config_env =
-                           List.remove_assoc prev_var state.config_env}
-                      in
-                      kont prev state ()
-                    })]
+            let kont_prev () = do {
+              Pack.forget [gframe]; 
+              let state =
+                {(state) with
+                 config_env =
+                   List.remove_assoc prev_var state.config_env}
+              in
+              kont prev state
+            }
             in
+            let but1 = button_create buts [Text "Prev"] kont_prev in
             let but2 =
-              Button.create buts
-                [Text "Next"; Default Active; Command (kont next state)]
+              button_create buts [Text "Next"] (fun _ -> kont next state)
             in
             pack [but1] [Side Side_Left];
             pack [but2] [Side Side_Right];
             buts
           }
         | None ->
-            Button.create frame
-              [Text "Next"; Default Active; Command (kont next state)] ]
+            button_create frame [Text "Next"] (fun _ -> kont next state) ]
       in
       pack [tit; sel; buts] [];
     } ]
@@ -237,12 +230,13 @@ value launch_server state = do {
     pack [txt] [];
     List.iter
       (fun dbn -> do {
+         let bn = Filename.chop_extension dbn in
          let frame = Frame.create run_frame [] in
          let blab = Label.create frame [Text dbn] in
          let bbut =
-           let bn = Filename.chop_extension dbn in
            Button.create frame
-             [Text "Browse"; Command (browse state.browser state.port bn)]
+             [Text "Browse";
+              Command (fun _ -> browse state.browser state.port bn)]
          in
          pack [blab] [Side Side_Left];
          pack [bbut] [Side Side_Right];
@@ -261,12 +255,10 @@ value rec config_bases_dir state =
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
        let but =
-         Button.create sframe
-           [Text "Select";
-            Command
-              (fun () ->
-                 let d = Textvariable.get var in
-                 Textvariable.set var (tk_getOpenDir d))]
+         button_create sframe [Text "Select"]
+           (fun () ->
+              let d = Textvariable.get var in
+              Textvariable.set var (tk_getOpenDir d))
        in
        pack [lab; but] [];
        sframe
@@ -370,19 +362,17 @@ and config_browser state =
       }
     in
     let but =
-      Button.create sframe
-        [Text "Select";
-         Command
-           (fun () -> do {
-              Textvariable.set var "other";
-              let ini_dir = Textvariable.get other_browser_dir in
-              let br = Tk.getOpenFile [InitialDir ini_dir] in
-              if br <> "" then do {
-                Textvariable.set other_browser_var br;
-                Textvariable.set other_browser_dir (Filename.dirname br);
-              }
-              else ();
-            })]
+      button_create sframe [Text "Select"]
+        (fun () -> do {
+           Textvariable.set var "other";
+           let ini_dir = Textvariable.get other_browser_dir in
+           let br = Tk.getOpenFile [InitialDir ini_dir] in
+           if br <> "" then do {
+             Textvariable.set other_browser_var br;
+             Textvariable.set other_browser_dir (Filename.dirname br);
+           }
+           else ();
+         })
     in
     pack [list; but] [];
     sframe
@@ -470,12 +460,10 @@ and config_sys_dir state =
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
        let but =
-         Button.create sframe
-           [Text "Select";
-            Command
-              (fun () ->
-                 let d = Textvariable.get var in
-                 Textvariable.set var (tk_getOpenDir d))]
+         button_create sframe [Text "Select"]
+           (fun () ->
+              let d = Textvariable.get var in
+              Textvariable.set var (tk_getOpenDir d))
        in
        pack [lab; but] [];
        sframe
@@ -510,12 +498,10 @@ and config_bin_dir state =
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
        let but =
-         Button.create sframe
-           [Text "Select";
-            Command
-              (fun () ->
-                 let d = Textvariable.get var in
-                 Textvariable.set var (tk_getOpenDir d))]
+         button_create sframe [Text "Select"]
+           (fun () ->
+              let d = Textvariable.get var in
+              Textvariable.set var (tk_getOpenDir d))
        in
        pack [lab; but] [];
        sframe
