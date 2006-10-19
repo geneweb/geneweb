@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.6 2006-10-19 10:08:08 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.7 2006-10-19 11:06:11 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -68,7 +68,9 @@ and bucketlist 'a 'b =
   | Cons of 'a and 'b and bucketlist 'a 'b ]
 ;
 
-value output_hashtbl oc_hta oc_ht ht = do {
+value output_hashtbl dir file ht = do {
+  let oc_ht = open_out_bin (Filename.concat dir file) in
+  let oc_hta = open_out_bin (Filename.concat dir (file ^ "a")) in
   let ht : hashtbl_t 'a 'b = Obj.magic (ht : Hashtbl.t 'a 'b) in
   output_binary_int oc_hta (Array.length ht.data);
   for i = 0 to 3 do { output_byte oc_ht intext_magic_number.(i); };
@@ -95,6 +97,8 @@ value output_hashtbl oc_hta oc_ht ht = do {
   output_binary_int oc_ht 0;
   output_binary_int oc_ht Iovalue.size_32.val;
   output_binary_int oc_ht Iovalue.size_64.val;
+  close_out oc_hta;
+  close_out oc_ht;
 };
 
 value open_out_field tmp_dir (name, valu) = do {
@@ -309,7 +313,7 @@ value optim_person_fields tmp_dir =
      ("rparents", optim_type_list_relation)]
 ;
 
-value string_of_crush_index tmp_dir =
+value make_string_of_crush_index tmp_dir =
   List.iter
     (fun field -> do {
        let field_d =
@@ -331,22 +335,14 @@ value string_of_crush_index tmp_dir =
            }
          | None -> () ];
        close_in ic_dat;
-       let oc_ht =
-         open_out_bin (Filename.concat field_d "string_of_crush.ht")
-       in
-       let oc_hta =
-         open_out_bin (Filename.concat field_d "string_of_crush.hta")
-       in
-       output_hashtbl oc_hta oc_ht ht;
-       close_out oc_hta;
-       close_out oc_ht;
+       output_hashtbl field_d "string_of_crush.ht" ht;
        eprintf "\n";
        flush stderr;
     })
    ["first_name"; "surname"]
 ;
 
-value person_of_string_index tmp_dir =
+value make_person_of_string_index tmp_dir =
   List.iter
     (fun field -> do {
        let field_d =
@@ -363,15 +359,7 @@ value person_of_string_index tmp_dir =
          [ Some pos -> do { Hashtbl.add ht pos i; loop (i + 1) }
          | None -> () ];
        close_in ic_acc;
-       let oc_ht =
-         open_out_bin (Filename.concat field_d "person_of_string.ht")
-       in
-       let oc_hta =
-         open_out_bin (Filename.concat field_d "person_of_string.hta")
-       in
-       output_hashtbl oc_hta oc_ht ht;
-       close_out oc_hta;
-       close_out oc_ht;
+       output_hashtbl field_d "person_of_string.ht" ht;
        eprintf "\n";
        flush stderr;
      })
@@ -695,32 +683,18 @@ Gc.compact ();
     in
     try Mutil.mkdir_p person_of_key_d with _ -> ();
 
-    let oc_hta =
-      open_out_bin (Filename.concat person_of_key_d "iper_of_key.hta")
-    in
-    let oc_ht =
-      open_out_bin (Filename.concat person_of_key_d "iper_of_key.ht")
-    in
-    output_hashtbl oc_hta oc_ht (gen.g_index_of_key : Hashtbl.t key iper);
-    close_out oc_hta;
-    close_out oc_ht;
+    output_hashtbl person_of_key_d "iper_of_key.ht"
+      (gen.g_index_of_key : Hashtbl.t key iper);
     Hashtbl.clear gen.g_index_of_key;
 
-    let oc_hta =
-      open_out_bin (Filename.concat person_of_key_d "istr_of_string.hta")
-    in
-    let oc_ht =
-      open_out_bin (Filename.concat person_of_key_d "istr_of_string.ht")
-    in
-    output_hashtbl oc_hta oc_ht (gen.g_strings : Hashtbl.t string Adef.istr);
-    close_out oc_hta;
-    close_out oc_ht;
+    output_hashtbl person_of_key_d "istr_of_string.ht"
+      (gen.g_strings : Hashtbl.t string Adef.istr);
     Hashtbl.clear gen.g_strings;
     Gc.compact ();
 
     optim_person_fields tmp_dir;
-    string_of_crush_index tmp_dir;
-    person_of_string_index tmp_dir;
+    make_string_of_crush_index tmp_dir;
+    make_person_of_string_index tmp_dir;
 
     Printf.eprintf "pcnt %d\n" gen.g_pcnt;
     Printf.eprintf "fcnt %d\n" gen.g_fcnt;
