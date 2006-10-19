@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.50 2006-10-18 21:59:29 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.51 2006-10-19 10:08:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -677,67 +677,59 @@ value rec hashtbl_find_rec key =
       if compare key k = 0 then d else hashtbl_find_rec key rest ]
 ;
 
-value hashtbl_find ic_hta ic_ht alen key = do {
+value hashtbl_find dir file key = do {
+  let ic_ht = open_in_bin (Filename.concat dir file) in
+  let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
+  let alen = input_binary_int ic_hta in
   let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
   seek_in ic_hta pos;
   let pos = input_binary_int ic_hta in
+  close_in ic_hta;
   seek_in ic_ht pos;
   let bl : bucketlist _ _ = Iovalue.input ic_ht in
+  close_in ic_ht;
   hashtbl_find_rec key bl
 };
 
-value key_hashtbl_find ic_hta ic_ht alen (fn, sn, oc) =
+value hashtbl_find_all dir file key = do {
+  let rec find_in_bucket =
+    fun
+    [ Empty -> []
+    | Cons k d rest ->
+        if compare k key = 0 then [d :: find_in_bucket rest]
+        else find_in_bucket rest ]
+  in
+  let ic_ht = open_in_bin (Filename.concat dir file) in
+  let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
+  let alen = input_binary_int ic_hta in
+  let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
+  seek_in ic_hta pos;
+  let pos = input_binary_int ic_hta in
+  close_in ic_hta;
+  seek_in ic_ht pos;
+  let bl : bucketlist _ _ = Iovalue.input ic_ht in
+  close_in ic_ht;
+  find_in_bucket bl
+};
+
+value key_hashtbl_find dir file (fn, sn, oc) =
   let key = if oc = 0 then Key0 fn sn else Key fn sn oc in
-  hashtbl_find ic_hta ic_ht alen key
+  hashtbl_find dir file key
 ;
 
 value person2_of_key (dir, _) fn sn oc =
   let person_of_key_d = Filename.concat dir "person_of_key" in
   try do {
-    let (ifn, isn) = do {
+    let ifn =
       let fn = Name.lower (nominative fn) in
+      hashtbl_find person_of_key_d "istr_of_string.ht" fn
+    in
+    let isn =
       let sn = Name.lower (nominative sn) in
-      let ic_hta =
-        open_in_bin (Filename.concat person_of_key_d "istr_of_string.hta")
-      in
-      let ic_ht =
-        open_in_bin (Filename.concat person_of_key_d "istr_of_string.ht")
-      in
-      let alen = input_binary_int ic_hta in
-      let res =
-        try
-          let ifn : Adef.istr = hashtbl_find ic_hta ic_ht alen fn in
-          let isn : Adef.istr = hashtbl_find ic_hta ic_ht alen sn in
-          (ifn, isn)
-        with exn -> do {
-          close_in ic_hta;
-          close_in ic_ht;
-          raise exn
-        }
-      in
-      close_in ic_hta;
-      close_in ic_ht;
-      res
-    }
+      hashtbl_find person_of_key_d "istr_of_string.ht" sn
     in
-    let ic_hta =
-      open_in_bin (Filename.concat person_of_key_d "iper_of_key.hta")
-    in
-    let ic_ht =
-      open_in_bin (Filename.concat person_of_key_d "iper_of_key.ht")
-    in
-    let alen = input_binary_int ic_hta in
-    let res =
-      try (key_hashtbl_find ic_hta ic_ht alen (ifn, isn, oc) : iper)
-      with exn -> do {
-        close_in ic_hta;
-        close_in ic_ht;
-        raise exn
-      }
-    in
-    close_in ic_hta;
-    close_in ic_ht;
-    Some res
+    let key = (ifn, isn, oc) in
+    Some (key_hashtbl_find person_of_key_d "iper_of_key.ht" key : iper)
   }
   with
   [ Not_found -> None ]
@@ -773,11 +765,8 @@ value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
   | (Spi2, Istr2 (bn, _) (f1, f2) pos) -> do {
-      let f = "person_of_string.ht" in
-      let ic = open_in_bin (List.fold_left Filename.concat bn [f1; f2; f]) in
-      let ht : Hashtbl.t int iper = input_value ic in
-      close_in ic;
-      Hashtbl.find_all ht pos
+      let dir = List.fold_left Filename.concat bn [f1; f2] in
+      hashtbl_find_all dir "person_of_string.ht" pos
     }
   | _ -> failwith "not impl spi_find" ]
 ;
@@ -808,12 +797,10 @@ value base_strings_of_first_name base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
   | Base2 ((bn, cache) as bnc) -> do {
-      let (f1, f2, f) = ("person", "first_name", "string_of_crush.ht") in
-      let ic = open_in_bin (List.fold_left Filename.concat bn [f1; f2; f]) in
-      let ht : Hashtbl.t string int = input_value ic in
-      close_in ic;
+      let (f1, f2) = ("person", "first_name") in
       let k = Name.crush_lower s in
-      let posl = Hashtbl.find_all ht k in
+      let dir = List.fold_left Filename.concat bn [f1; f2] in
+      let posl = hashtbl_find_all dir "string_of_crush.ht" k in
       List.map (fun pos -> Istr2 bnc (f1, f2) pos) posl
     } ]
 ;
@@ -821,12 +808,10 @@ value base_strings_of_surname base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
   | Base2 ((bn, cache) as bnc) -> do {
-      let (f1, f2, f) = ("person", "surname", "string_of_crush.ht") in
-      let ic = open_in_bin (List.fold_left Filename.concat bn [f1; f2; f]) in
-      let ht : Hashtbl.t string int = input_value ic in
-      close_in ic;
+      let (f1, f2) = ("person", "surname") in
       let k = Name.crush_lower s in
-      let posl = Hashtbl.find_all ht k in
+      let dir = List.fold_left Filename.concat bn [f1; f2] in
+      let posl = hashtbl_find_all dir "string_of_crush.ht" k in
       List.map (fun pos -> Istr2 bnc (f1, f2) pos) posl
     } ]
 ;
