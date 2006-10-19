@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: date.ml,v 5.10 2006-10-19 12:38:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -15,7 +15,10 @@ open TemplAst;
 
 value nbsp = "&nbsp;";
 value death_symbol conf =
-  match p_getenv conf.base_env "death_symbol" with
+  match
+    try Some (List.assoc "death_symbol" conf.base_env) with
+    [ Not_found -> None ]
+  with
   [ Some x -> x
   | None -> if utf_8_db.val then "\226\128\160" else "+" ]
 ;
