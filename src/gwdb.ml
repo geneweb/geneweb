@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.51 2006-10-19 10:08:08 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.52 2006-10-19 18:18:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -735,6 +735,53 @@ value person2_of_key (dir, _) fn sn oc =
   [ Not_found -> None ]
 ;
 
+value strings2_of_fsname (bn, _) f s =
+  let k = Name.crush_lower s in
+  let dir = List.fold_left Filename.concat bn ["person"; f] in
+  hashtbl_find_all dir "string_of_crush.ht" k
+;
+
+module Pset = Set.Make (struct type t = iper; value compare = compare; end);
+
+value persons2_of_name ((bn, _) as bnc) s = do {
+  let s = Name.lower s in
+  let slen = String.length s in
+  let fsl =
+    loop [] 1 where rec loop list i =
+      if i >= slen then list
+      else if s.[i] = ' ' then
+        let f = String.sub s 0 i in
+        let s = String.sub s (i + 1) (slen - i - 1) in
+        loop [(f, s) :: list] (i + 1)
+      else loop list (i + 1)
+  in
+  let pset =
+    let fdir = List.fold_left Filename.concat bn ["person"; "first_name"] in
+    let sdir = List.fold_left Filename.concat bn ["person"; "surname"] in
+    List.fold_left
+      (fun set (f, s) ->
+         let fposl = strings2_of_fsname bnc "first_name" f in
+         let sposl = strings2_of_fsname bnc "surname" s in
+         let set1 =
+           List.fold_left
+             (fun set pos ->
+                let ipl = hashtbl_find_all fdir "person_of_string.ht" pos in
+                List.fold_right Pset.add ipl set)
+             Pset.empty fposl
+         in
+         let set2 =
+           List.fold_left
+             (fun set pos ->
+                let ipl = hashtbl_find_all sdir "person_of_string.ht" pos in
+                List.fold_right Pset.add ipl set)
+             Pset.empty sposl
+         in
+         Pset.union (Pset.inter set1 set2) set)
+      Pset.empty fsl
+  in
+  Pset.elements pset
+};
+
 value person_of_key base =
   match base with
   [ Base base -> base.func.person_of_key
@@ -743,7 +790,7 @@ value person_of_key base =
 value persons_of_name base =
   match base with
   [ Base base -> base.func.persons_of_name
-  | Base2 _ -> failwith "not impl persons_of_name" ]
+  | Base2 bnc -> persons2_of_name bnc ]
 ;
 value persons_of_first_name base =
   match base with
@@ -793,27 +840,20 @@ value base_particles base =
       Mutil.input_particles (Filename.concat bn "../particles.txt") ]
 
 ;
+
 value base_strings_of_first_name base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 ((bn, cache) as bnc) -> do {
-      let (f1, f2) = ("person", "first_name") in
-      let k = Name.crush_lower s in
-      let dir = List.fold_left Filename.concat bn [f1; f2] in
-      let posl = hashtbl_find_all dir "string_of_crush.ht" k in
-      List.map (fun pos -> Istr2 bnc (f1, f2) pos) posl
-    } ]
+  | Base2 bnc ->
+      let posl = strings2_of_fsname bnc "first_name" s in
+      List.map (fun pos -> Istr2 bnc ("person", "first_name") pos) posl ]
 ;
 value base_strings_of_surname base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 ((bn, cache) as bnc) -> do {
-      let (f1, f2) = ("person", "surname") in
-      let k = Name.crush_lower s in
-      let dir = List.fold_left Filename.concat bn [f1; f2] in
-      let posl = hashtbl_find_all dir "string_of_crush.ht" k in
-      List.map (fun pos -> Istr2 bnc (f1, f2) pos) posl
-    } ]
+  | Base2 bnc ->
+      let posl = strings2_of_fsname bnc "surname" s in
+      List.map (fun pos -> Istr2 bnc ("person", "surname") pos) posl ]
 ;
 value base_cleanup base =
   match base with
