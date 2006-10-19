@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.5 2006-10-18 21:59:28 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.6 2006-10-19 10:08:08 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -334,7 +334,11 @@ value string_of_crush_index tmp_dir =
        let oc_ht =
          open_out_bin (Filename.concat field_d "string_of_crush.ht")
        in
-       output_value oc_ht ht;
+       let oc_hta =
+         open_out_bin (Filename.concat field_d "string_of_crush.hta")
+       in
+       output_hashtbl oc_hta oc_ht ht;
+       close_out oc_hta;
        close_out oc_ht;
        eprintf "\n";
        flush stderr;
@@ -362,7 +366,11 @@ value person_of_string_index tmp_dir =
        let oc_ht =
          open_out_bin (Filename.concat field_d "person_of_string.ht")
        in
-       output_value oc_ht ht;
+       let oc_hta =
+         open_out_bin (Filename.concat field_d "person_of_string.hta")
+       in
+       output_hashtbl oc_hta oc_ht ht;
+       close_out oc_hta;
        close_out oc_ht;
        eprintf "\n";
        flush stderr;
