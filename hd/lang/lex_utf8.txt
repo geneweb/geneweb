@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.39 2006-10-01 15:57:59 ddr Exp $
+# $Id: lex_utf8.txt,v 5.40 2006-10-19 12:56:53 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2781,6 +2781,7 @@ de: Verbindungen
 en: connections
 fi: yhteyksien määrä
 fr: connexions
+nl: connecties
 
     consanguinity
 af: bloedverwantskap
@@ -8956,6 +8957,7 @@ de: Nocheinmal versuchen
 en: try again
 fi: yritä uudestaan
 fr: réessayer
+nl: opnieuw proberen
 
     uncles and aunts
 af: ooms en tantes
