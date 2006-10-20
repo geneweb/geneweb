@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.26 2006-10-07 09:18:48 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.27 2006-10-20 14:14:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -343,15 +343,22 @@ value print_main conf base auth_file =
            (wz, wname, wfile, wnote))
         wizdata
     in
-    if by_alphab_order then print_wizards_by_alphabetic_order conf list
+    if by_alphab_order then do {
+      tag "p" begin
+        Wserver.wprint "<em style=\"font-size:80%%\">\n";
+        Wserver.wprint "%s " (capitale (transl conf "click"));
+        Wserver.wprint "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
+          (transl conf "here");
+        Wserver.wprint "%s"
+          (transl conf "for the list by dates of last modification");
+        Wserver.wprint ".</em>\n";
+      end;
+      print_wizards_by_alphabetic_order conf list
+    }
     else print_wizards_by_date conf list;
     tag "p" begin
       Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
     end;
-    if by_alphab_order then
-      Wserver.wprint "<p>\n<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n</p>\n"
-        (commd conf) (transl conf "history of updates")
-    else ();
     trailer conf
   }
 ;

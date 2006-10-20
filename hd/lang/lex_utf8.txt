@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.41 2006-10-20 05:33:57 ddr Exp $
+# $Id: lex_utf8.txt,v 5.42 2006-10-20 14:14:57 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -3881,6 +3881,10 @@ ro: prenume in ordine alfabetica
 ru: чтобы упорядочить имена по алфавиту
 sl: za lastna imena po abecednem redu
 sv: för förnamnen i bokstavsordning
+
+    for the list by dates of last modification
+en: for the list by dates of last modification
+fr: pour la liste par date de dernière modification
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
