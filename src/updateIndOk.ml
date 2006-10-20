@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.28 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.29 2006-10-20 05:29:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -481,8 +481,8 @@ value effective_mod conf base sp =
         (Gwdb.insert_string base) sp
     in
     let np = person_of_gen_person {(np) with related = get_related op} in
-    let op_misc_names = person_misc_names base op (nobtit conf base) in
-    let np_misc_names = person_misc_names base np (nobtit conf base) in
+    let op_misc_names = person_misc_names base op get_titles in
+    let np_misc_names = person_misc_names base np get_titles in
     List.iter
       (fun key ->
          if List.mem key op_misc_names then () else person_ht_add base key pi)
@@ -510,7 +510,7 @@ value effective_add conf base sp =
     patch_person base pi np;
     patch_ascend base pi na;
     patch_union base pi nu;
-    let np_misc_names = person_misc_names base np (nobtit conf base) in
+    let np_misc_names = person_misc_names base np get_titles in
     List.iter (fun key -> person_ht_add base key pi) np_misc_names;
     (np, na)
   }

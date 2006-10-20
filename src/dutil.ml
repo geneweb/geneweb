@@ -1,7 +1,6 @@
-(* $Id: dutil.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.8 2006-10-20 05:29:43 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
-open Config;
 open Dbdisk;
 open Def;
 open Mutil;
@@ -133,18 +132,6 @@ value dsk_person_misc_names base p nobtit =
          let s = Name.lower s in
          if s = fn || List.mem s list then list else [s :: list])
       [] list
-;
-
-value dsk_nobtit conf base p =
-  match Lazy.force conf.allowed_titles with
-  [ [] -> p.titles
-  | allowed_titles ->
-      List.fold_right
-        (fun t l ->
-           let id = sou base t.t_ident in
-           let pl = sou base t.t_place in
-           if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
-        p.titles [] ]
 ;
 
 value check_magic =
