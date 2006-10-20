@@ -1,7 +1,8 @@
-(* $Id: gwdb.ml,v 5.52 2006-10-19 18:18:08 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.53 2006-10-20 05:29:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
+open Config;
 open Dbdisk;
 open Def;
 open Futil;
@@ -963,21 +964,16 @@ value p_first_name base p = nominative (sou base (get_first_name p));
 value p_surname base p = nominative (sou base (get_surname p));
 
 value nobtit conf base p =
-  match (base, p) with
-  [ (Base base, Person p) ->
-      List.map (map_title_strings (fun s -> Istr s))
-        (Dutil.dsk_nobtit conf base p)
-  | (Base2 _, Person2 bn i) ->
-      let pos = get_field_acc bn i ("person", "titles") in
-      if pos = -1 then []
-      else
-        let list =
-          get_field_data bn pos ("person", "titles") "data2.ext"
-        in
-        List.map
-          (map_title_strings (fun pos -> Istr2 bn ("person", "titles") pos))
-          list
-  | _ -> assert False ]
+  let list = get_titles p in
+  match Lazy.force conf.allowed_titles with
+  [ [] -> list
+  | allowed_titles ->
+      List.fold_right
+        (fun t l ->
+           let id = sou base t.t_ident in
+           let pl = sou base t.t_place in
+           if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
+        list [] ]
 ;
 
 value person_misc_names base p tit =

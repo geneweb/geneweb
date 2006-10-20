@@ -1,7 +1,6 @@
-(* $Id: dutil.mli,v 5.4 2006-10-10 21:46:35 ddr Exp $ *)
+(* $Id: dutil.mli,v 5.5 2006-10-20 05:29:43 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
-open Config;
 open Dbdisk;
 
 type name_index_data = array (array Def.iper);
@@ -17,8 +16,6 @@ value compare_names : Dbdisk.base_data -> string -> string -> int;
 
 value dsk_person_misc_names :
   dsk_base -> dsk_person -> (dsk_person -> list dsk_title) -> list string;
-
-value dsk_nobtit : config -> dsk_base -> dsk_person -> list dsk_title;
 
 value poi : dsk_base -> Def.iper -> dsk_person;
 value sou : dsk_base -> dsk_istr -> string;

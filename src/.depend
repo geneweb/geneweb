@@ -79,11 +79,9 @@ doc.cmo: buff.cmo config.cmi notesLinks.cmo secure.cmi templ.cmi \
     templAst.cmi util.cmi wiki.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi notesLinks.cmx secure.cmx templ.cmx \
     templAst.cmi util.cmx wiki.cmx ../wserver/wserver.cmx 
-dutil.cmo: adef.cmi config.cmi dbdisk.cmi def.cmi mutil.cmi name.cmi \
-    dutil.cmi 
-dutil.cmx: adef.cmx config.cmi dbdisk.cmi def.cmi mutil.cmx name.cmx \
-    dutil.cmi 
-dutil.cmi: config.cmi dbdisk.cmi def.cmi 
+dutil.cmo: adef.cmi dbdisk.cmi def.cmi mutil.cmi name.cmi dutil.cmi 
+dutil.cmx: adef.cmx dbdisk.cmi def.cmi mutil.cmx name.cmx dutil.cmi 
+dutil.cmi: dbdisk.cmi def.cmi 
 forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi mutil.cmi name.cmi \
     notes.cmi secure.cmi templ.cmi templAst.cmi update.cmi util.cmi wiki.cmi \
     ../wserver/wserver.cmi 
@@ -120,10 +118,10 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi buff.cmo dbdisk.cmi def.cmi dutil.cmi futil.cmi \
-    iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
-gwdb.cmx: adef.cmx buff.cmx dbdisk.cmi def.cmi dutil.cmx futil.cmx \
-    iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
+gwdb.cmo: adef.cmi buff.cmo config.cmi dbdisk.cmi def.cmi dutil.cmi \
+    futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx buff.cmx config.cmi dbdisk.cmi def.cmi dutil.cmx \
+    futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi config.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmo secure.cmi select.cmo 

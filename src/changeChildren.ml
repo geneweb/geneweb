@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.14 2006-10-20 05:29:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -263,7 +263,7 @@ value change_child conf base parent_surname ip =
     in
     patch_person base (get_key_index p) p;
     person_ht_add base key (get_key_index p);
-    let np_misc_names = person_misc_names base p (nobtit conf base) in
+    let np_misc_names = person_misc_names base p get_titles in
     List.iter (fun key -> person_ht_add base key (get_key_index p))
       np_misc_names;
   }
