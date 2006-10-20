@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.53 2006-10-20 05:29:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.54 2006-10-20 20:12:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -981,8 +981,19 @@ value person_misc_names base p tit =
   [ (Base base, Person p) ->
       Dutil.dsk_person_misc_names base p
         (fun p -> List.map (map_title_strings un_istr) (tit (Person p)))
-  | (Base2 _, _) -> failwith "not impl person_misc_names"
-  | _ -> assert False ]
+  | (_, p) ->
+      let fn = p_first_name base p in
+      let sn = p_surname base p in
+      let list = [Name.lower (fn ^ " " ^ sn)] in
+      if get_sex p = Female then
+        let ip = get_key_index p in
+        List.fold_left
+          (fun list ifam ->
+             let ifath = get_father (coi base ifam) in
+             let sn = p_surname base (poi base ifath) in
+             [Name.lower (fn ^ " " ^ sn) :: list])
+          list (Array.to_list (get_family (uoi base ip)))
+      else list ]
 ;
 
 value base_of_dsk_base base = Base base;
