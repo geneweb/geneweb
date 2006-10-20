@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.14 2006-10-18 01:20:05 ddr Exp $ *)
+(* $Id: launch.ml,v 1.15 2006-10-20 18:25:04 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -188,37 +188,13 @@ value config state title v def select to_string from_string set prev next =
     } ]
 ;
 
-value launch_server state = do {
-  let only = Unix.gethostname () in
-  let fd =
-    Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o644
-  in
-  let stop_server =
-    List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
-  in
-  try Sys.remove stop_server with [ Sys_error _ -> () ];
-  let server_pid =
-    exec (Filename.concat state.bin_dir "gwd")
-      ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
-       "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
-       state.bases_dir; "-blang"] fd fd
-  in
-  let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
-  if pid = 0 then ()
-  else do {
-    eprintf "Cannot launch the server:";
-    eprintf " perhaps another server is running.\n";
-    eprintf "You must close it, if you want to try again.\n";
-    flush stderr;
-    exit 2;
-  };
-  state.server_running := True;
+value rec show_main state = do {
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
          (Array.to_list (Sys.readdir state.bases_dir)))
   in
-  let (run_frame, _) = window_centering state.tk_win in
+  let (run_frame, gframe) = window_centering state.tk_win in
   let txt = Label.create run_frame [Text "Server is running..."] in
   pack [txt] [];
   if databases = [] then do {
@@ -244,8 +220,86 @@ value launch_server state = do {
        })
       databases;
   };
+  let cbut =
+    Button.create run_frame
+      [Text "Create a new database";
+       Command
+         (fun _ -> do {
+            Pack.forget [gframe];
+            new_database state;
+          })]
+  in
   let wbut = Button.create run_frame [Text "Quit"; Command closeTk] in
-  pack [wbut] [Fill Fill_X];
+  pack [cbut; wbut] [Fill Fill_X];
+}
+
+and new_database state = do {
+  let (frame, gframe) = window_centering state.tk_win in
+  let tit = Label.create frame [Text "Enter the name:"] in
+  let var = Textvariable.create () in
+  Textvariable.set var "";
+  let sel = Entry.create frame [TextWidth 10; TextVariable var] in
+  let buts = do {
+    let buts = Frame.create frame [] in
+    let but1 =
+      button_create buts [Text "Cancel"]
+        (fun _ -> do {
+           Pack.forget [gframe];
+           show_main state;
+         })
+    in
+    let but2 =
+      button_create buts [Text "OK"]
+        (fun _ ->
+           let s = Textvariable.get var in
+           if s = "" then ()
+           else
+             loop 0 where rec loop i =
+               if i = String.length s then do {
+                 Unix.mkdir (Filename.concat state.bases_dir (s ^ ".gwb"))
+                   0o644;
+                 Pack.forget [gframe];
+                 show_main state;
+               }
+               else
+                 match s.[i] with
+                 [ 'a'..'z' | 'A'..'Z' | '-' | '0'..'9' -> loop (i + 1)
+                 | _ -> () ])
+    in
+    pack [but1] [Side Side_Left];
+    pack [but2] [Side Side_Right];
+    buts
+  }
+  in
+  pack [tit; sel; buts] [];
+};
+
+value launch_server state = do {
+  let only = Unix.gethostname () in
+  let fd =
+    Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o644
+  in
+  let stop_server =
+    List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
+  in
+  try Sys.remove stop_server with [ Sys_error _ -> () ];
+  let server_pid =
+    exec (Filename.concat state.bin_dir "gwd")
+      ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
+       "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
+       state.bases_dir; "-blang"] fd fd
+  in
+  let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
+  if pid = 0 then ()
+  else do {
+    eprintf "Cannot launch the server:";
+    eprintf " perhaps another server is running.\n";
+    eprintf "You must close it, if you want to try again.\n";
+    flush stderr;
+    exit 2;
+  };
+  state.server_running := True;
+  show_main state;
 };
 
 value rec config_bases_dir state =
