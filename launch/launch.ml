@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.15 2006-10-20 18:25:04 ddr Exp $ *)
+(* $Id: launch.ml,v 1.16 2006-10-20 18:36:41 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -256,10 +256,14 @@ and new_database state = do {
            else
              loop 0 where rec loop i =
                if i = String.length s then do {
-                 Unix.mkdir (Filename.concat state.bases_dir (s ^ ".gwb"))
-                   0o644;
-                 Pack.forget [gframe];
-                 show_main state;
+                 let db = Filename.concat state.bases_dir s in
+                 if Sys.file_exists (db ^ ".gwb") then ()
+                 else do {
+                   let comm = Filename.concat state.bin_dir "gwc" in
+                   let _ = Sys.command (sprintf "\"%s\" -o %s" comm db) in
+                   Pack.forget [gframe];
+                   show_main state;
+                 }
                }
                else
                  match s.[i] with
