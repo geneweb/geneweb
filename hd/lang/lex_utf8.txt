@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.40 2006-10-19 12:56:53 ddr Exp $
+# $Id: lex_utf8.txt,v 5.41 2006-10-20 05:33:57 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2779,6 +2779,7 @@ sv: kommentar
     connections
 de: Verbindungen
 en: connections
+et: ühendused
 fi: yhteyksien määrä
 fr: connexions
 nl: connecties
@@ -8955,6 +8956,7 @@ sv: träd
     try again
 de: Nocheinmal versuchen
 en: try again
+et: proovi uuesti
 fi: yritä uudestaan
 fr: réessayer
 nl: opnieuw proberen
