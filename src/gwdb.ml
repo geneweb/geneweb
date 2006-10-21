@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.54 2006-10-20 20:12:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.55 2006-10-21 02:24:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -976,24 +976,39 @@ value nobtit conf base p =
         list [] ]
 ;
 
+value husbands base p =
+  let u = uoi base (get_key_index p) in
+  List.map
+    (fun ifam ->
+       let cpl = coi base ifam in
+       let husband = poi base (get_father cpl) in
+       let husband_surname = p_surname base husband in
+       let husband_surnames_aliases =
+         List.map (sou base) (get_surnames_aliases husband)
+       in
+       (husband_surname, husband_surnames_aliases))
+    (Array.to_list (get_family u))
+;
+
+value father_titles_places base p nobtit =
+  match get_parents (aoi base (get_key_index p)) with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      let fath = poi base (get_father cpl) in
+      List.map (fun t -> sou base t.t_place) (nobtit fath)
+  | None -> [] ]
+;
+
 value person_misc_names base p tit =
-  match (base, p) with
-  [ (Base base, Person p) ->
-      Dutil.dsk_person_misc_names base p
-        (fun p -> List.map (map_title_strings un_istr) (tit (Person p)))
-  | (_, p) ->
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
-      let list = [Name.lower (fn ^ " " ^ sn)] in
-      if get_sex p = Female then
-        let ip = get_key_index p in
-        List.fold_left
-          (fun list ifam ->
-             let ifath = get_father (coi base ifam) in
-             let sn = p_surname base (poi base ifath) in
-             [Name.lower (fn ^ " " ^ sn) :: list])
-          list (Array.to_list (get_family (uoi base ip)))
-      else list ]
+  let sou = sou base in
+  Dutil.gen_person_misc_names (sou (get_first_name p))
+    (sou (get_surname p)) (sou (get_public_name p))
+    (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
+    (List.map sou (get_first_names_aliases p))
+    (List.map sou (get_surnames_aliases p))
+    (List.map (Futil.map_title_strings sou) (tit p))
+    (if get_sex p = Female then husbands base p else [])
+    (father_titles_places base p tit)
 ;
 
 value base_of_dsk_base base = Base base;
