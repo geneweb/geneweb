@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.9 2006-10-21 10:35:25 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.10 2006-10-21 11:47:56 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -440,7 +440,7 @@ value make_name_index tmp_dir nbper = do {
          (f, (ic_acc, ic_dat)))
       [("person", "first_name"); ("person", "surname");
        ("person", "public_name"); ("person", "sex"); ("person", "family");
-       ("family", "father")]
+       ("family", "father"); ("person", "parents")]
   in
   let ic3_list =
     List.map
@@ -492,6 +492,26 @@ value make_name_index tmp_dir nbper = do {
       else []
     }
   in
+  let get_parents =
+    let (ic_acc, ic_dat) = List.assoc "parents" ic2_list in
+    fun i -> do {
+      seek_in ic_acc (4 * i);
+      let pos = input_binary_int ic_acc in
+      if pos = -1 then None
+      else do {
+        seek_in ic_dat pos;
+        Some (Iovalue.input ic_dat)
+      }
+    }
+  in
+  let get_father_titles_places i = do {
+    match get_parents i with
+    [ Some ifam ->
+        let ifath = get_father ifam in
+        List.map (fun t -> t.t_place) (get_titles ifath)
+    | None -> [] ]
+  }
+  in
   let ht = Hashtbl.create 1 in
   ProgrBar.start ();
   for i = 0 to nbper - 1 do {
@@ -500,7 +520,7 @@ value make_name_index tmp_dir nbper = do {
       Futil.gen_person_misc_names (get_first_name i) (get_surname i)
         (get_public_name i) (get_qualifiers i) (get_aliases i)
         (get_first_names_aliases i) (get_surnames_aliases i)
-        (get_titles i) (get_husbands i) []
+        (get_titles i) (get_husbands i) (get_father_titles_places i)
     in
     List.iter (fun s -> Hashtbl.add ht (Name.crush_lower s) i) names;
   };
@@ -832,6 +852,8 @@ value link gwo_list bname =
     List.iter (close_out_field gen.g_fcnt) family_fields;
     Iochan.close (fst person_unions);
     close_out (snd person_unions);
+    Iochan.close (fst person_parents);
+    close_out (snd person_parents);
     Gc.compact ();
 
     let person_of_key_d = 

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.57 2006-10-21 10:35:25 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.58 2006-10-21 11:47:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -75,8 +75,7 @@ value get_field_acc (bn, cache) i (f1, f2) = do {
       } ]
   in
   seek_in ic (4 * i);
-  let pos = input_binary_int ic in
-  pos
+  input_binary_int ic
 };
 
 value get_field_data (bn, cache) pos (f1, f2) data = do {
@@ -91,8 +90,7 @@ value get_field_data (bn, cache) pos (f1, f2) data = do {
       } ]
   in
   seek_in ic pos;
-  let r = Iovalue.input ic in
-  r
+  Iovalue.input ic
 };
 
 value get_field_2_data (bn, cache_chan) pos (f1, f2) data = do {
