@@ -1,4 +1,4 @@
-(* $Id: dutil.mli,v 5.6 2006-10-21 02:24:57 ddr Exp $ *)
+(* $Id: dutil.mli,v 5.7 2006-10-21 09:13:13 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -16,10 +16,6 @@ value compare_names : Dbdisk.base_data -> string -> string -> int;
 
 value dsk_person_misc_names :
   dsk_base -> dsk_person -> (dsk_person -> list dsk_title) -> list string;
-value gen_person_misc_names :
-  string -> string -> string -> list string -> list string -> list string ->
-    list string -> list (Def.gen_title string) ->
-    list (string * list string) -> list string -> list string;
 
 value poi : dsk_base -> Def.iper -> dsk_person;
 value sou : dsk_base -> dsk_istr -> string;

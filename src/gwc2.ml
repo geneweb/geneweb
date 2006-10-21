@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.7 2006-10-19 11:06:11 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.8 2006-10-21 09:13:13 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -366,6 +366,105 @@ value make_person_of_string_index tmp_dir =
     ["first_name"; "surname"]
 ;
 
+value read_string_field (ic_acc, ic_dat) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  seek_in ic_dat pos;
+  (Iovalue.input ic_dat : string)
+};
+
+value read_string_list_field (ic_acc, ic_dat, ic_str) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  if pos = -1 then []
+  else do {
+    seek_in ic_dat pos;
+    let posl : list int = Iovalue.input ic_dat in
+    List.map
+      (fun pos -> do {
+         seek_in ic_str pos;
+         (Iovalue.input ic_str : string)
+       })
+      posl
+  }
+};
+
+value make_name_index tmp_dir nbper = do {
+  eprintf "name index...\n";
+  flush stderr;
+  let person_d =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
+  in
+  let ic_list =
+    List.map
+      (fun f ->
+         let d = Filename.concat person_d f in
+         let fn_acc = Filename.concat d "access" in
+         let fn_dat = Filename.concat d "data" in
+         let ic_acc = open_in_bin fn_acc in
+         let ic_dat = open_in_bin fn_dat in
+         (f, (ic_acc, ic_dat)))
+      ["first_name"; "surname"; "public_name"]
+  in
+  let ic_list_list =
+    List.map
+      (fun f ->
+         let d = Filename.concat person_d f in
+         let fn_acc = Filename.concat d "access" in
+         let ic_acc = open_in_bin fn_acc in
+         let fn_dat = Filename.concat d "data2.ext" in
+         let ic_dat = open_in_bin fn_dat in
+         let fn_str = Filename.concat d "data" in
+         let ic_str = open_in_bin fn_str in
+         (f, (ic_acc, ic_dat, ic_str)))
+      ["qualifiers"; "aliases"; "first_names_aliases"; "surnames_aliases"]
+  in
+  let get_first_name = read_string_field (List.assoc "first_name" ic_list) in
+  let get_surname = read_string_field (List.assoc "surname" ic_list) in
+  let get_public_name =
+    read_string_field (List.assoc "public_name" ic_list)
+  in
+  let get_qualifiers =
+    read_string_list_field (List.assoc "qualifiers" ic_list_list)
+  in
+  let get_aliases =
+    read_string_list_field (List.assoc "aliases" ic_list_list)
+  in
+  let get_first_names_aliases =
+    read_string_list_field (List.assoc "first_names_aliases" ic_list_list)
+  in
+  let get_surnames_aliases =
+    read_string_list_field (List.assoc "surnames_aliases" ic_list_list)
+  in
+  let ht = Hashtbl.create 1 in
+  ProgrBar.start ();
+  for i = 0 to nbper - 1 do {
+    ProgrBar.run i nbper;
+    let names =
+      Futil.gen_person_misc_names (get_first_name i) (get_surname i)
+        (get_public_name i) (get_qualifiers i) (get_aliases i)
+        (get_first_names_aliases i) (get_surnames_aliases i) [] [] []
+    in
+    List.iter (fun s -> Hashtbl.add ht (Name.crush_lower s) i) names;
+  };
+  ProgrBar.finish ();
+  List.iter
+    (fun (_, (ic_acc, ic_dat)) -> do { close_in ic_acc; close_in ic_dat })
+    ic_list;
+  List.iter
+    (fun (_, (ic_acc, ic_dat, ic_str)) -> do {
+       close_in ic_acc;
+       close_in ic_dat;
+       close_in ic_str
+     })
+    ic_list_list;
+  let dir =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_name"]
+  in
+  Mutil.mkdir_p dir;
+  output_hashtbl dir "person_of_name.ht" ht;
+};
+
 value unique_key_string gen s =
   let s = Name.lower (Mutil.nominative s) in
   try Hashtbl.find gen.g_strings s with
@@ -652,7 +751,7 @@ value link gwo_list bname =
     else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
     else ProgrBar.finish ();
 
-Gc.compact ();
+    Gc.compact ();
 
     let run =
       if ngwo < 10 then fun () -> ()
@@ -695,6 +794,7 @@ Gc.compact ();
     optim_person_fields tmp_dir;
     make_string_of_crush_index tmp_dir;
     make_person_of_string_index tmp_dir;
+    make_name_index tmp_dir gen.g_pcnt;
 
     Printf.eprintf "pcnt %d\n" gen.g_pcnt;
     Printf.eprintf "fcnt %d\n" gen.g_fcnt;
