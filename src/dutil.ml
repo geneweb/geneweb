@@ -1,4 +1,4 @@
-(* $Id: dutil.ml,v 5.9 2006-10-21 02:24:57 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.10 2006-10-21 09:13:13 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -20,96 +20,6 @@ value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
 value p_first_name base p = nominative (sou base p.first_name);
 value p_surname base p = nominative (sou base p.surname);
-
-value gen_person_misc_names first_name surname public_name qualifiers aliases
-    first_names_aliases surnames_aliases titles husbands
-    father_titles_places =
-  let first_name = nominative first_name in
-  let surname = nominative surname in
-  if first_name = "?" || surname = "?" then []
-  else
-    let public_names =
-      let titles_names =
-        let tnl = ref [] in
-        do {
-          List.iter
-            (fun t ->
-               match t.t_name with
-               [ Tmain | Tnone -> ()
-               | Tname x -> tnl.val := [x :: tnl.val] ])
-            titles;
-          tnl.val
-        }
-      in
-      if public_name = "" || titles = [] then titles_names
-      else [public_name :: titles_names]
-    in
-    let first_names =
-      let pn =
-        if public_name <> "" && titles = [] then [public_name :: public_names]
-        else public_names
-      in
-      [first_name :: first_names_aliases @ pn]
-    in
-    let surnames =
-      [surname :: surnames_pieces surname @ surnames_aliases @ qualifiers]
-    in
-    let surnames =
-      List.fold_left
-        (fun list (husband_surname, husband_surnames_aliases) ->
-           let husband_surname = nominative husband_surname in
-           if husband_surname = "?" then husband_surnames_aliases @ list
-           else
-             [husband_surname ::
-              surnames_pieces husband_surname @ husband_surnames_aliases @
-                list])
-        surnames husbands
-    in
-    let list = public_names in
-    let list =
-      List.fold_left
-        (fun list f ->
-           List.fold_left (fun list s -> [f ^ " " ^ s :: list]) list surnames)
-        list first_names
-    in
-    let list =
-      let first_names = [first_name :: first_names_aliases] in
-      List.fold_left
-        (fun list t ->
-           let s = t.t_place in
-           if s = "" then list
-           else
-             let first_names =
-               match t.t_name with
-               [ Tname f -> [f :: first_names]
-               | Tmain | Tnone ->
-                   let f = public_name in
-                   if f = "" then first_names else [f :: first_names] ]
-             in
-             List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
-               first_names)
-        list titles
-    in
-    let list =
-      if father_titles_places = [] then list
-      else
-        let first_names = [first_name :: first_names_aliases] in
-        List.fold_left
-          (fun list s ->
-             if s = "" then list
-             else
-               List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
-                 first_names)
-          list father_titles_places
-    in
-    let list = List.rev_append aliases list in
-    let fn = Name.lower (first_name ^ " " ^ surname) in
-    List.fold_left
-      (fun list s ->
-         let s = Name.lower s in
-         if s = fn || List.mem s list then list else [s :: list])
-      [] list
-;
 
 value husbands base p =
   let u = uoi base p.key_index in
@@ -136,8 +46,8 @@ value father_titles_places base p nobtit =
 
 value dsk_person_misc_names base p nobtit =
   let sou = sou base in
-  gen_person_misc_names (sou p.first_name) (sou p.surname) (sou p.public_name)
-    (List.map sou p.qualifiers) (List.map sou p.aliases)
+  Futil.gen_person_misc_names (sou p.first_name) (sou p.surname)
+    (sou p.public_name) (List.map sou p.qualifiers) (List.map sou p.aliases)
     (List.map sou p.first_names_aliases) (List.map sou p.surnames_aliases)
     (List.map (Futil.map_title_strings sou) (nobtit p))
     (if p.sex = Female then husbands base p else [])

@@ -1,4 +1,4 @@
-(* $Id: futil.mli,v 5.1 2006-10-11 19:52:35 ddr Exp $ *)
+(* $Id: futil.mli,v 5.2 2006-10-21 09:13:13 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -17,3 +17,8 @@ value map_couple_p : bool -> ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
 value map_descend_p : ('a -> 'b) -> gen_descend 'a -> gen_descend 'b;
 
 value parent : bool -> array 'a -> gen_couple 'a;
+
+value gen_person_misc_names :
+  string -> string -> string -> list string -> list string -> list string ->
+    list string -> list (Def.gen_title string) ->
+    list (string * list string) -> list string -> list string;

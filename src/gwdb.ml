@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.55 2006-10-21 02:24:57 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.56 2006-10-21 09:13:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1001,7 +1001,7 @@ value father_titles_places base p nobtit =
 
 value person_misc_names base p tit =
   let sou = sou base in
-  Dutil.gen_person_misc_names (sou (get_first_name p))
+  Futil.gen_person_misc_names (sou (get_first_name p))
     (sou (get_surname p)) (sou (get_public_name p))
     (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
     (List.map sou (get_first_names_aliases p))
