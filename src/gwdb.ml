@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.56 2006-10-21 09:13:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.57 2006-10-21 10:35:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -742,46 +742,10 @@ value strings2_of_fsname (bn, _) f s =
   hashtbl_find_all dir "string_of_crush.ht" k
 ;
 
-module Pset = Set.Make (struct type t = iper; value compare = compare; end);
-
-value persons2_of_name ((bn, _) as bnc) s = do {
-  let s = Name.lower s in
-  let slen = String.length s in
-  let fsl =
-    loop [] 1 where rec loop list i =
-      if i >= slen then list
-      else if s.[i] = ' ' then
-        let f = String.sub s 0 i in
-        let s = String.sub s (i + 1) (slen - i - 1) in
-        loop [(f, s) :: list] (i + 1)
-      else loop list (i + 1)
-  in
-  let pset =
-    let fdir = List.fold_left Filename.concat bn ["person"; "first_name"] in
-    let sdir = List.fold_left Filename.concat bn ["person"; "surname"] in
-    List.fold_left
-      (fun set (f, s) ->
-         let fposl = strings2_of_fsname bnc "first_name" f in
-         let sposl = strings2_of_fsname bnc "surname" s in
-         let set1 =
-           List.fold_left
-             (fun set pos ->
-                let ipl = hashtbl_find_all fdir "person_of_string.ht" pos in
-                List.fold_right Pset.add ipl set)
-             Pset.empty fposl
-         in
-         let set2 =
-           List.fold_left
-             (fun set pos ->
-                let ipl = hashtbl_find_all sdir "person_of_string.ht" pos in
-                List.fold_right Pset.add ipl set)
-             Pset.empty sposl
-         in
-         Pset.union (Pset.inter set1 set2) set)
-      Pset.empty fsl
-  in
-  Pset.elements pset
-};
+value persons2_of_name (bn, _) s =
+  let dir = Filename.concat bn "person_of_name" in
+  hashtbl_find_all dir "person_of_name.ht" (Name.crush_lower s)
+;
 
 value person_of_key base =
   match base with
