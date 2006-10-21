@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.8 2006-10-21 09:13:13 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.9 2006-10-21 10:35:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -373,6 +373,13 @@ value read_string_field (ic_acc, ic_dat) i = do {
   (Iovalue.input ic_dat : string)
 };
 
+value read_int_field (ic_acc, ic_dat) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  seek_in ic_dat pos;
+  (Iovalue.input ic_dat : int)
+};
+
 value read_string_list_field (ic_acc, ic_dat, ic_str) i = do {
   seek_in ic_acc (4 * i);
   let pos = input_binary_int ic_acc in
@@ -389,27 +396,56 @@ value read_string_list_field (ic_acc, ic_dat, ic_str) i = do {
   }
 };
 
+value read_int_array_field (ic_acc, ic_dat) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  loop [] pos where rec loop list pos =
+    if pos = -1 then Array.of_list list
+    else do {
+      seek_in ic_dat pos;
+      let i = Iovalue.input ic_dat in
+      loop [i :: list] (Iovalue.input ic_dat)
+    }
+};
+
+value read_title_list_field (ic_acc, ic_dat, ic_str) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  if pos = -1 then []
+  else do {
+    seek_in ic_dat pos;
+    let tl : list (gen_title int) = Iovalue.input ic_dat in
+    List.map
+      (map_title_strings
+        (fun pos -> do {
+           seek_in ic_str pos;
+           (Iovalue.input ic_str : string)
+         }))
+      tl
+  }
+};
+
 value make_name_index tmp_dir nbper = do {
   eprintf "name index...\n";
   flush stderr;
-  let person_d =
-    List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
-  in
-  let ic_list =
+  let base_d = Filename.concat tmp_dir "base_d" in
+  let ic2_list =
     List.map
-      (fun f ->
-         let d = Filename.concat person_d f in
+      (fun (d, f) ->
+         let d = List.fold_left Filename.concat base_d [d; f] in
          let fn_acc = Filename.concat d "access" in
          let fn_dat = Filename.concat d "data" in
          let ic_acc = open_in_bin fn_acc in
          let ic_dat = open_in_bin fn_dat in
          (f, (ic_acc, ic_dat)))
-      ["first_name"; "surname"; "public_name"]
+      [("person", "first_name"); ("person", "surname");
+       ("person", "public_name"); ("person", "sex"); ("person", "family");
+       ("family", "father")]
   in
-  let ic_list_list =
+  let ic3_list =
     List.map
       (fun f ->
-         let d = Filename.concat person_d f in
+         let d = List.fold_left Filename.concat base_d ["person"; f] in
          let fn_acc = Filename.concat d "access" in
          let ic_acc = open_in_bin fn_acc in
          let fn_dat = Filename.concat d "data2.ext" in
@@ -417,24 +453,44 @@ value make_name_index tmp_dir nbper = do {
          let fn_str = Filename.concat d "data" in
          let ic_str = open_in_bin fn_str in
          (f, (ic_acc, ic_dat, ic_str)))
-      ["qualifiers"; "aliases"; "first_names_aliases"; "surnames_aliases"]
+      ["qualifiers"; "aliases"; "first_names_aliases"; "surnames_aliases";
+       "titles"]
   in
-  let get_first_name = read_string_field (List.assoc "first_name" ic_list) in
-  let get_surname = read_string_field (List.assoc "surname" ic_list) in
+  let get_first_name = read_string_field (List.assoc "first_name" ic2_list) in
+  let get_surname = read_string_field (List.assoc "surname" ic2_list) in
   let get_public_name =
-    read_string_field (List.assoc "public_name" ic_list)
+    read_string_field (List.assoc "public_name" ic2_list)
   in
   let get_qualifiers =
-    read_string_list_field (List.assoc "qualifiers" ic_list_list)
+    read_string_list_field (List.assoc "qualifiers" ic3_list)
   in
-  let get_aliases =
-    read_string_list_field (List.assoc "aliases" ic_list_list)
-  in
+  let get_aliases = read_string_list_field (List.assoc "aliases" ic3_list) in
   let get_first_names_aliases =
-    read_string_list_field (List.assoc "first_names_aliases" ic_list_list)
+    read_string_list_field (List.assoc "first_names_aliases" ic3_list)
   in
   let get_surnames_aliases =
-    read_string_list_field (List.assoc "surnames_aliases" ic_list_list)
+    read_string_list_field (List.assoc "surnames_aliases" ic3_list)
+  in
+  let get_titles = read_title_list_field (List.assoc "titles" ic3_list) in
+  let get_family = read_int_array_field (List.assoc "family" ic2_list) in
+  let get_father = read_int_field (List.assoc "father" ic2_list) in
+  let get_husbands =
+    let (ic_acc, ic_dat) = List.assoc "sex" ic2_list in
+    fun i -> do {
+      seek_in ic_acc (4 * i);
+      let pos = input_binary_int ic_acc in
+      seek_in ic_dat pos;
+      let sex : sex = Iovalue.input ic_dat in
+      if sex = Female then
+        List.map
+          (fun ifam ->
+             let husb = get_father ifam in
+             let husb_surname = get_surname husb in
+             let husb_surn_ali = get_surnames_aliases husb in
+             (husb_surname, husb_surn_ali))
+          (Array.to_list (get_family i))
+      else []
+    }
   in
   let ht = Hashtbl.create 1 in
   ProgrBar.start ();
@@ -443,21 +499,22 @@ value make_name_index tmp_dir nbper = do {
     let names =
       Futil.gen_person_misc_names (get_first_name i) (get_surname i)
         (get_public_name i) (get_qualifiers i) (get_aliases i)
-        (get_first_names_aliases i) (get_surnames_aliases i) [] [] []
+        (get_first_names_aliases i) (get_surnames_aliases i)
+        (get_titles i) (get_husbands i) []
     in
     List.iter (fun s -> Hashtbl.add ht (Name.crush_lower s) i) names;
   };
   ProgrBar.finish ();
   List.iter
     (fun (_, (ic_acc, ic_dat)) -> do { close_in ic_acc; close_in ic_dat })
-    ic_list;
+    ic2_list;
   List.iter
     (fun (_, (ic_acc, ic_dat, ic_str)) -> do {
        close_in ic_acc;
        close_in ic_dat;
        close_in ic_str
      })
-    ic_list_list;
+    ic3_list;
   let dir =
     List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_name"]
   in
