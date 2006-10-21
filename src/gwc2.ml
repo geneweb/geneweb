@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.10 2006-10-21 11:47:56 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.11 2006-10-21 15:25:15 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -167,7 +167,9 @@ value person_fields_arr =
   ("burial", fun so -> Obj.repr so.burial);
   ("burial_place", fun so -> Obj.repr so.burial_place);
   ("burial_src", fun so -> Obj.repr so.burial_src);
+(*
   ("notes", fun so -> Obj.repr so.notes);
+*)
   ("psources", fun so -> Obj.repr so.psources)]
 ;
 
@@ -274,12 +276,12 @@ value optim_type_list_relation field_d ic oc oc_str ht = do {
 
 value optim_person_fields tmp_dir =
   List.iter
-    (fun (field, optim_type) -> do {
+    (fun (f1, f2, optim_type) -> do {
        let field_d =
-         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+         List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
        in
        let ic = open_in_bin (Filename.concat field_d "data") in
-       eprintf "%s..." field;
+       eprintf "%s..." f2;
        flush stderr;
        let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
        let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
@@ -300,17 +302,32 @@ value optim_person_fields tmp_dir =
          ["data"; "access"];
        Printf.eprintf "\n"; flush stderr
      })
-    [("baptism_place", optim_type_string); ("birth_place", optim_type_string);
-     ("first_name", optim_type_string); ("image", optim_type_string);
-     ("occupation", optim_type_string); ("public_name", optim_type_string);
-     ("surname", optim_type_string);
+    [("person", "baptism_place", optim_type_string);
+     ("person", "baptism_src", optim_type_string);
+     ("person", "birth_place", optim_type_string);
+     ("person", "birth_src", optim_type_string);
+     ("person", "burial_place", optim_type_string);
+     ("person", "burial_src", optim_type_string);
+     ("family", "comment", optim_type_string);
+     ("person", "death_place", optim_type_string);
+     ("person", "death_src", optim_type_string);
+     ("person", "first_name", optim_type_string);
+     ("family", "fsources", optim_type_string);
+     ("person", "image", optim_type_string);
+     ("family", "marriage_place", optim_type_string);
+     ("family", "marriage_src", optim_type_string);
+     ("person", "occupation", optim_type_string);
+     ("family", "origin_file", optim_type_string);
+     ("person", "psources", optim_type_string);
+     ("person", "public_name", optim_type_string);
+     ("person", "surname", optim_type_string);
 
-     ("aliases", optim_type_list_string);
-     ("first_names_aliases", optim_type_list_string);
-     ("qualifiers", optim_type_list_string);
-     ("surnames_aliases", optim_type_list_string);
-     ("titles", optim_type_list_title);
-     ("rparents", optim_type_list_relation)]
+     ("person", "aliases", optim_type_list_string);
+     ("person", "first_names_aliases", optim_type_list_string);
+     ("person", "qualifiers", optim_type_list_string);
+     ("person", "surnames_aliases", optim_type_list_string);
+     ("person", "titles", optim_type_list_title);
+     ("person", "rparents", optim_type_list_relation)]
 ;
 
 value make_string_of_crush_index tmp_dir =
@@ -705,7 +722,12 @@ value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
   gen.g_fcnt := gen.g_fcnt + 1
 };
 
-value insert_gwo_1 fname gen =
+value insert_notes2 gen key str =
+  let _ip = get_undefined2 gen key in
+  ()
+;
+
+value insert_gwo_1 gen =
   fun
   [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
   | Notes key str -> ()
@@ -714,10 +736,10 @@ value insert_gwo_1 fname gen =
   | Wnotes wizid str -> () ]
 ;
 
-value insert_gwo_2 fname gen =
+value insert_gwo_2 gen =
   fun
   [ Family cpl fs ms witl fam des -> insert_family2 gen cpl fs ms witl fam des
-  | Notes key str -> ()
+  | Notes key str -> insert_notes2 gen key str
   | Relations sb sex rl -> ()
   | Bnotes nfname str -> ()
   | Wnotes wizid str -> () ]
@@ -728,11 +750,11 @@ value insert_comp_families1 gen run (x, separate, shift) =
     run ();
     let ic = open_in_bin x in
     check_magic x ic;
-    let src : string = input_value ic in
+    let _ : string = input_value ic in
     try
       while True do {
         let fam : syntax_o = input_value ic in
-        insert_gwo_1 src gen fam
+        insert_gwo_1 gen fam
       }
     with
     [ End_of_file -> close_in ic ]
@@ -744,11 +766,11 @@ value insert_comp_families2 gen run (x, separate, shift) =
     run ();
     let ic = open_in_bin x in
     check_magic x ic;
-    let src : string = input_value ic in
+    let _ : string = input_value ic in
     try
       while True do {
         let fam : syntax_o = input_value ic in
-        insert_gwo_2 src gen fam
+        insert_gwo_2 gen fam
       }
     with
     [ End_of_file -> close_in ic ]
