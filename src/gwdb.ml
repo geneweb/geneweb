@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.65 2006-10-22 16:03:15 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.66 2006-10-22 16:26:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -586,7 +586,7 @@ value sou base i =
   match (base, i) with
   [ (Base base, Istr i) -> base.data.strings.get (Adef.int_of_istr i)
   | (Base2 _, Istr2 bn f pos) ->
-      if pos = -1 then "" else get_field_data bn pos f "data"
+      if pos = -1 || pos = 0 then "" else get_field_data bn pos f "data"
   | _ -> assert False ]
 ;
 
