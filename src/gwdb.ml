@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.64 2006-10-22 15:44:18 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.65 2006-10-22 16:03:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -10,7 +10,7 @@ open Mutil;
 open Printf;
 
 type cache =
-  { chan : mutable list ((string * string * string) * in_channel) }
+  { chan : mutable Hashtbl.t (string * string * string) in_channel }
 ;
 
 type istr =
@@ -65,12 +65,12 @@ type base =
 
 value get_field_acc (bn, cache) i (f1, f2) = do {
   let ic =
-    try List.assoc (f1, f2, "access") cache.chan with
+    try Hashtbl.find cache.chan (f1, f2, "access") with
     [ Not_found -> do {
         let ic =
           open_in_bin (List.fold_left Filename.concat bn [f1; f2; "access"])
         in
-        cache.chan := [((f1, f2, "access"), ic) :: cache.chan];
+        Hashtbl.add cache.chan (f1, f2, "access") ic;
         ic
       } ]
   in
@@ -80,12 +80,12 @@ value get_field_acc (bn, cache) i (f1, f2) = do {
 
 value get_field_data (bn, cache) pos (f1, f2) data = do {
   let ic =
-    try List.assoc (f1, f2, data) cache.chan with
+    try Hashtbl.find cache.chan (f1, f2, data) with
     [ Not_found -> do {
         let ic =
           open_in_bin (List.fold_left Filename.concat bn [f1; f2; data])
         in
-        cache.chan := [((f1, f2, data), ic) :: cache.chan];
+        Hashtbl.add cache.chan (f1, f2, data) ic;
         ic
       } ]
   in
@@ -95,12 +95,12 @@ value get_field_data (bn, cache) pos (f1, f2) data = do {
 
 value get_field_2_data (bn, cache) pos (f1, f2) data = do {
   let ic =
-    try List.assoc (f1, f2, data) cache.chan with
+    try Hashtbl.find cache.chan (f1, f2, data) with
     [ Not_found -> do {
         let ic =
           open_in_bin (List.fold_left Filename.concat bn [f1; f2; data])
         in
-        cache.chan := [((f1, f2, data), ic) :: cache.chan];
+        Hashtbl.add cache.chan (f1, f2, data) ic;
         ic
       } ]
   in
@@ -837,7 +837,7 @@ value base_cleanup base =
   match base with
   [ Base base -> base.func.cleanup ()
   | Base2 (bn, cache) ->
-      List.iter (fun ((f1, f2, f), ic) -> close_in ic) cache.chan ]
+      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) cache.chan ]
 ;
 
 value load_ascends_array base =
@@ -1012,7 +1012,7 @@ value base_of_base2 bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  Base2 (Filename.concat bname "base_d", {chan = []})
+  Base2 (Filename.concat bname "base_d", {chan = Hashtbl.create 1})
 ;
 
 value dsk_person_of_person =
