@@ -1,4 +1,4 @@
-(* $Id: iochan.ml,v 5.2 2006-10-22 08:38:16 ddr Exp $ *)
+(* $Id: iochan.ml,v 5.3 2006-10-22 09:42:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 type t = {iofd : Unix.file_descr; iopos : mutable int};
@@ -85,7 +85,7 @@ value seek ioc pos =
   }
 ;
 
-value seek_last ioc = do {
+value seek_end ioc = do {
   let pos = Unix.lseek ioc.iofd 0 Unix.SEEK_END in
   ioc.iopos := pos;
   pos
