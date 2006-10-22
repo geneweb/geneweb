@@ -1,4 +1,4 @@
-(* $Id: iochan.ml,v 5.1 2006-10-17 13:03:52 ddr Exp $ *)
+(* $Id: iochan.ml,v 5.2 2006-10-22 08:38:16 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 type t = {iofd : Unix.file_descr; iopos : mutable int};
@@ -12,14 +12,45 @@ value openfile fname trunc =
 ;
 
 value ib = String.make 4 ' ';
+
+value input_byte ioc =
+  let ret = Unix.read ioc.iofd ib 0 1 in
+  if ret <> 1 then failwith "Iochan.input_byte"
+  else do {
+    ioc.iopos := ioc.iopos + 1;
+    Char.code ib.[0]
+  }
+;
+
 value input_binary_int ioc = do {
   let ret = Unix.read ioc.iofd ib 0 4 in
-  if ret <> 4 then raise End_of_file else ();
+  if ret <> 4 then failwith "Iochan.input_binary_int" else ();
   ioc.iopos := ioc.iopos + 4;
   Char.code ib.[0] lsl 24 +
   Char.code ib.[1] lsl 16 +
   Char.code ib.[2] lsl 8 +
   Char.code ib.[3]
+};
+
+value input ioc buff start len =
+  let ret = Unix.read ioc.iofd buff start len in
+  if ret <> len then failwith "Iochan.input"
+  else ioc.iopos := ioc.iopos + len
+;
+
+value iochan_in_funs =
+  {Iovalue.input_byte = input_byte;
+   input_binary_int = input_binary_int;
+   input = input}
+;
+
+value input_value_no_header = Iovalue.gen_input iochan_in_funs;
+
+value output_byte ioc w = do {
+  ib.[0] := Char.chr (w land 0xFF);
+  let len = Unix.write ioc.iofd ib 0 1 in
+  if len <> 1 then failwith "iochan_output_byte" else ();
+  ioc.iopos := ioc.iopos + 1;
 };
 
 value output_binary_int ioc w = do {
@@ -32,6 +63,20 @@ value output_binary_int ioc w = do {
   ioc.iopos := ioc.iopos + 4;
 };
 
+value output ioc buff start len =
+  let ret = Unix.write ioc.iofd buff start len in
+  if ret <> len then failwith "Iochan.output"
+  else ioc.iopos := ioc.iopos + len
+;
+
+value iochan_out_funs =
+  {Iovalue.output_byte = output_byte;
+   output_binary_int = output_binary_int;
+   output = output}
+;
+
+value output_value_no_header ioc v = Iovalue.gen_output iochan_out_funs ioc v;
+
 value seek ioc pos =
   if ioc.iopos = pos then ()
   else do {
@@ -39,5 +84,11 @@ value seek ioc pos =
     ioc.iopos := pos;
   }
 ;
+
+value seek_last ioc = do {
+  let pos = Unix.lseek ioc.iofd 0 Unix.SEEK_END in
+  ioc.iopos := pos;
+  pos
+};
 
 value close ioc = Unix.close ioc.iofd;
