@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.67 2006-10-22 17:27:42 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.68 2006-10-22 19:13:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -133,7 +133,7 @@ value make_istr2 bnc path i = Istr2 bnc path (get_field_acc bnc i path);
 value is_empty_string =
   fun
   [ Istr istr -> istr = Adef.istr_of_int 0
-  | Istr2 bn path pos -> pos = 0 ]
+  | Istr2 bn path pos -> pos = Db2.empty_string_pos ]
 ;
 value is_quest_string =
   fun
@@ -599,7 +599,8 @@ value sou base i =
   match (base, i) with
   [ (Base base, Istr i) -> base.data.strings.get (Adef.int_of_istr i)
   | (Base2 _, Istr2 bn f pos) ->
-      if pos = -1 || pos = 0 then "" else get_field_data bn pos f "data"
+      if pos = -1 || pos = Db2.empty_string_pos then ""
+      else get_field_data bn pos f "data"
   | _ -> assert False ]
 ;
 
