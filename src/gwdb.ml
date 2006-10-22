@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.60 2006-10-22 08:38:16 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.61 2006-10-22 09:08:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -836,7 +836,9 @@ value base_cleanup base =
 value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
-  | Base2 _ -> failwith "not impl load_ascends_array" ]
+  | Base2 _ ->
+      let _ = do { eprintf "not impl load_ascends_array\n"; flush stderr } in
+      () ]
 ;
 value load_unions_array base =
   match base with
@@ -846,7 +848,9 @@ value load_unions_array base =
 value load_couples_array base =
   match base with
   [ Base base -> base.data.couples.load_array ()
-  | Base2 _ -> failwith "not impl load_couples_array" ]
+  | Base2 _ ->
+      let _ = do { eprintf "not impl load_couples_array\n"; flush stderr } in
+      () ]
 ;
 value load_descends_array base =
   match base with
