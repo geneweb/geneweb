@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.66 2006-10-22 16:26:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.67 2006-10-22 17:27:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -9,39 +9,40 @@ open Futil;
 open Mutil;
 open Printf;
 
-type cache =
-  { chan : mutable Hashtbl.t (string * string * string) in_channel }
+type db2 =
+  { bdir : string;
+    cache : Hashtbl.t (string * string * string) in_channel }
 ;
 
 type istr =
   [ Istr of dsk_istr
-  | Istr2 of (string * cache) and (string * string) and int ]
+  | Istr2 of db2 and (string * string) and int ]
 ;
 
 type person =
   [ Person of dsk_person
-  | Person2 of (string * cache) and int ]
+  | Person2 of db2 and int ]
 ;
 type ascend =
   [ Ascend of dsk_ascend
-  | Ascend2 of (string * cache) and int ]
+  | Ascend2 of db2 and int ]
 ;
 type union =
   [ Union of dsk_union
-  | Union2 of (string * cache) and int ]
+  | Union2 of db2 and int ]
 ;
 
 type family =
   [ Family of dsk_family
-  | Family2 of (string * cache) and int ]
+  | Family2 of db2 and int ]
 ;
 type couple =
   [ Couple of dsk_couple
-  | Couple2 of (string * cache) and int ]
+  | Couple2 of db2 and int ]
 ;
 type descend =
   [ Descend of dsk_descend
-  | Descend2 of (string * cache) and int ]
+  | Descend2 of db2 and int ]
 ;
 
 type relation = Def.gen_relation iper istr;
@@ -60,50 +61,62 @@ type string_person_index =
 
 type base =
   [ Base of Dbdisk.dsk_base
-  | Base2 of (string * cache) ]
+  | Base2 of db2 ]
 ;
 
-value get_field_acc (bn, cache) i (f1, f2) = do {
+value get_field_acc db2 i (f1, f2) = do {
   let ic =
-    try Hashtbl.find cache.chan (f1, f2, "access") with
+    try Hashtbl.find db2.cache (f1, f2, "access") with
     [ Not_found -> do {
         let ic =
-          open_in_bin (List.fold_left Filename.concat bn [f1; f2; "access"])
+          open_in_bin (List.fold_left Filename.concat db2.bdir
+            [f1; f2; "access"])
         in
-        Hashtbl.add cache.chan (f1, f2, "access") ic;
+        Hashtbl.add db2.cache (f1, f2, "access") ic;
         ic
       } ]
   in
+(*
+let _ = do { Printf.eprintf "acc %d %s %s \n" i f1 f2; flush stderr; } in
+*)
   seek_in ic (4 * i);
   input_binary_int ic
 };
 
-value get_field_data (bn, cache) pos (f1, f2) data = do {
+value get_field_data db2 pos (f1, f2) data = do {
   let ic =
-    try Hashtbl.find cache.chan (f1, f2, data) with
+    try Hashtbl.find db2.cache (f1, f2, data) with
     [ Not_found -> do {
         let ic =
-          open_in_bin (List.fold_left Filename.concat bn [f1; f2; data])
+          open_in_bin
+            (List.fold_left Filename.concat db2.bdir [f1; f2; data])
         in
-        Hashtbl.add cache.chan (f1, f2, data) ic;
+        Hashtbl.add db2.cache (f1, f2, data) ic;
         ic
       } ]
   in
+(*
+let _ = do { Printf.eprintf "dat %d %s %s \n" pos f1 f2; flush stderr; } in
+*)
   seek_in ic pos;
   Iovalue.input ic
 };
 
-value get_field_2_data (bn, cache) pos (f1, f2) data = do {
+value get_field_2_data db2 pos (f1, f2) data = do {
   let ic =
-    try Hashtbl.find cache.chan (f1, f2, data) with
+    try Hashtbl.find db2.cache (f1, f2, data) with
     [ Not_found -> do {
         let ic =
-          open_in_bin (List.fold_left Filename.concat bn [f1; f2; data])
+          open_in_bin
+            (List.fold_left Filename.concat db2.bdir [f1; f2; data])
         in
-        Hashtbl.add cache.chan (f1, f2, data) ic;
+        Hashtbl.add db2.cache (f1, f2, data) ic;
         ic
       } ]
   in
+(*
+let _ = do { Printf.eprintf "dat2 %d %s %s \n" pos f1 f2; flush stderr; } in
+*)
   seek_in ic pos;
   let r = Iovalue.input ic in
   let s = Iovalue.input ic in
@@ -593,7 +606,7 @@ value sou base i =
 value nb_of_persons base =
   match base with
   [ Base base -> base.data.persons.len
-  | Base2 (dir, _) ->
+  | Base2 {bdir = dir} ->
       let fname =
         List.fold_left Filename.concat dir ["person"; "sex"; "access"]
       in
@@ -603,7 +616,7 @@ value nb_of_persons base =
 value nb_of_families base =
   match base with
   [ Base base -> base.data.families.len
-  | Base2 (dir, _) ->
+  | Base2 {bdir = dir} ->
       let fname =
         List.fold_left Filename.concat dir ["family"; "marriage"; "access"]
       in
@@ -731,7 +744,7 @@ value key_hashtbl_find dir file (fn, sn, oc) =
   hashtbl_find dir file key
 ;
 
-value person2_of_key (dir, _) fn sn oc =
+value person2_of_key {bdir = dir} fn sn oc =
   let person_of_key_d = Filename.concat dir "person_of_key" in
   try do {
     let ifn =
@@ -749,13 +762,13 @@ value person2_of_key (dir, _) fn sn oc =
   [ Not_found -> None ]
 ;
 
-value strings2_of_fsname (bn, _) f s =
+value strings2_of_fsname {bdir = bn} f s =
   let k = Name.crush_lower s in
   let dir = List.fold_left Filename.concat bn ["person"; f] in
   hashtbl_find_all dir "string_of_crush.ht" k
 ;
 
-value persons2_of_name (bn, _) s =
+value persons2_of_name {bdir = bn} s =
   let dir = Filename.concat bn "person_of_name" in
   hashtbl_find_all dir "person_of_name.ht" (Name.crush_lower s)
 ;
@@ -789,7 +802,7 @@ value spi_cursor spi s =
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2, Istr2 (bn, _) (f1, f2) pos) -> do {
+  | (Spi2, Istr2 {bdir = bn} (f1, f2) pos) -> do {
       let dir = List.fold_left Filename.concat bn [f1; f2] in
       hashtbl_find_all dir "person_of_string.ht" pos
     }
@@ -814,7 +827,7 @@ value base_visible_write base =
 value base_particles base =
   match base with
   [ Base base -> base.data.particles
-  | Base2 (bn, _) ->
+  | Base2 {bdir = bn} ->
       Mutil.input_particles (Filename.concat bn "../particles.txt") ]
 
 ;
@@ -836,8 +849,8 @@ value base_strings_of_surname base s =
 value base_cleanup base =
   match base with
   [ Base base -> base.func.cleanup ()
-  | Base2 (bn, cache) ->
-      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) cache.chan ]
+  | Base2 db2 ->
+      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache ]
 ;
 
 value load_ascends_array base =
@@ -929,17 +942,17 @@ value read_notes bname fnotes rn_mode =
 value base_notes_read base fn =
   match base with
   [ Base base -> base.data.bnotes.nread fn RnAll
-  | Base2 (bn, _) -> read_notes (Filename.dirname bn) fn RnAll ]
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fn RnAll ]
 ;
 value base_notes_read_first_line base fn =
   match base with
   [ Base base -> base.data.bnotes.nread fn Rn1Ln
-  | Base2 (bn, _) -> read_notes (Filename.dirname bn) fn Rn1Ln ]
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fn Rn1Ln ]
 ;
 value base_notes_are_empty base fn =
   match base with
   [ Base base -> base.data.bnotes.nread fn RnDeg = ""
-  | Base2 (bn, _) -> read_notes (Filename.dirname bn) fn RnDeg = "" ]
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fn RnDeg = "" ]
 ;
 value base_notes_origin_file base =
   match base with
@@ -1012,7 +1025,7 @@ value base_of_base2 bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  Base2 (Filename.concat bname "base_d", {chan = Hashtbl.create 1})
+  Base2 {bdir = Filename.concat bname "base_d"; cache = Hashtbl.create 1}
 ;
 
 value dsk_person_of_person =
