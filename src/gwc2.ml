@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.15 2006-10-22 18:25:32 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.16 2006-10-22 19:13:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -204,9 +204,10 @@ value family_fields_arr =
    ("children", fun so -> Obj.repr so.des.children)]
 ;
 
-value str_pos oc_str ht s =
+value str_pos oc_str ht item_cnt s =
   try Hashtbl.find ht s with
   [ Not_found -> do {
+      incr item_cnt;
       let pos = pos_out oc_str in
       Iovalue.output oc_str s;
       Hashtbl.add ht s pos;
@@ -215,31 +216,37 @@ value str_pos oc_str ht s =
 ;
 
 value optim_type_string field_d ic oc oc_str ht = do {
-  let istr_empty = str_pos oc_str ht "" in
-  let istr_quest = str_pos oc_str ht "?" in
-  (* istr_empty and istr_quest must be in consistency with
-     Gwdb.is_empty_string and Gwdb.is_quest_string *)
-  assert (istr_empty = 0);
-  assert (istr_quest = 1);
+  let header_pos = create_output_value_header oc_str in
+  Iovalue.output_block_header oc_str 0 phony_min_size;
+  let nb_items = ref 0 in
+  let istr_empty = str_pos oc_str ht nb_items "" in
+  let istr_quest = str_pos oc_str ht nb_items "?" in
+  assert (istr_empty = Db2.empty_string_pos);
+  assert (istr_quest = Db2.quest_string_pos);
   try
     while True do {
       let s : string = Iovalue.input ic in
-      let pos = str_pos oc_str ht s in
+      let pos = str_pos oc_str ht nb_items s in
       output_binary_int oc pos
     }
   with
-  [ End_of_file -> () ]
+  [ End_of_file -> () ];
+  Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
+  Iovalue.size_64.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
+  patch_output_value_header oc_str header_pos;
+  Iovalue.output_block_header oc_str 0 nb_items.val;
 };
 
 value optim_type_list_string field_d ic oc oc_str ht = do {
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
   try
+    let items_cnt = ref 0 in
     while True do {
       let sl : list string = Iovalue.input ic in
       match sl with
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
-          let sl = List.map (str_pos oc_str ht) sl in
+          let sl = List.map (str_pos oc_str ht items_cnt) sl in
           Iovalue.output oc_ext (sl : list int)
         }
       | [] ->
@@ -253,12 +260,15 @@ value optim_type_list_string field_d ic oc oc_str ht = do {
 value optim_type_list_title field_d ic oc oc_str ht = do {
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
   try
+    let items_cnt = ref 0 in
     while True do {
       let tl : list (gen_title string) = Iovalue.input ic in
       match tl with
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
-          let tl = List.map (map_title_strings (str_pos oc_str ht)) tl in
+          let tl =
+            List.map (map_title_strings (str_pos oc_str ht items_cnt)) tl
+          in
           Iovalue.output oc_ext (tl : list (gen_title int))
         }
       | [] ->
@@ -334,7 +344,8 @@ value make_string_of_crush_index tmp_dir =
        eprintf "string_of_crush %s..." field;
        flush stderr;
        let ht = Hashtbl.create 1 in
-       loop 0 where rec loop pos =
+       seek_in ic_dat Db2.empty_string_pos;
+       loop Db2.empty_string_pos where rec loop pos =
          match
            try Some (Iovalue.input ic_dat) with [ End_of_file -> None ]
          with
