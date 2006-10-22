@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.59 2006-10-22 00:00:48 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.60 2006-10-22 08:38:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -265,7 +265,15 @@ value get_qualifiers =
 value get_related =
   fun
   [ Person p -> p.Def.related
-  | Person2 bn i -> get_field bn i ("person", "related") ]
+  | Person2 bn i ->
+      let pos = get_field_acc bn i ("person", "related") in
+      loop [] pos where rec loop list pos =
+        if pos = -1 then list
+        else
+          let (ip, pos) =
+            get_field_2_data bn pos ("person", "related") "data"
+          in
+          loop [ip :: list] pos ]
 ;
 value get_rparents =
   fun

@@ -104,7 +104,7 @@ gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
     gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
     notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
-gwc2.cmo: adef.cmi argl.cmo def.cmi futil.cmi gwcomp.cmo iochan.cmo \
+gwc2.cmo: adef.cmi argl.cmo def.cmi futil.cmi gwcomp.cmo iochan.cmi \
     iovalue.cmi lock.cmi mutil.cmi name.cmi progrBar.cmi secure.cmi 
 gwc2.cmx: adef.cmx argl.cmx def.cmi futil.cmx gwcomp.cmx iochan.cmx \
     iovalue.cmx lock.cmx mutil.cmx name.cmx progrBar.cmx secure.cmx 
@@ -134,6 +134,8 @@ history.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
 history.cmi: config.cmi def.cmi gwdb.cmi 
 image.cmo: config.cmi gutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
 image.cmx: config.cmi gutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 
+iochan.cmo: iovalue.cmi iochan.cmi 
+iochan.cmx: iovalue.cmx iochan.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
