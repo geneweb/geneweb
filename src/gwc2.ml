@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.14 2006-10-22 09:42:39 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.15 2006-10-22 18:25:32 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -14,7 +14,12 @@ type family =
 ;
 
 type file_field 'a =
-  (out_channel * out_channel * ref int * ref int * 'a -> Obj.t)
+  { oc_dat : out_channel;
+    oc_acc : out_channel;
+    start_pos : (int * int);
+    sz32 : mutable int;
+    sz64 : mutable int;
+    valu : 'a -> Obj.t }
 ;
 
 type key =
@@ -83,21 +88,34 @@ and bucketlist 'a 'b =
   | Cons of 'a and 'b and bucketlist 'a 'b ]
 ;
 
+value create_output_value_header oc = do {
+  for i = 0 to 3 do { output_byte oc intext_magic_number.(i); };
+  let pos_header = pos_out oc in
+  output_binary_int oc 0;
+  output_binary_int oc 0;
+  output_binary_int oc 0;
+  output_binary_int oc 0;
+  Iovalue.size_32.val := 0;
+  Iovalue.size_64.val := 0;
+  (pos_header, pos_out oc)
+};
+
+value patch_output_value_header oc (pos_header, pos_start) = do {
+  let pos_end = pos_out oc in
+  seek_out oc pos_header;
+  output_binary_int oc (pos_end - pos_start);
+  output_binary_int oc 0;
+  output_binary_int oc Iovalue.size_32.val;
+  output_binary_int oc Iovalue.size_64.val;
+};
+
 value output_hashtbl dir file ht = do {
   let oc_ht = open_out_bin (Filename.concat dir file) in
   let oc_hta = open_out_bin (Filename.concat dir (file ^ "a")) in
   let ht : hashtbl_t 'a 'b = Obj.magic (ht : Hashtbl.t 'a 'b) in
   output_binary_int oc_hta (Array.length ht.data);
-  for i = 0 to 3 do { output_byte oc_ht intext_magic_number.(i); };
-  let pos = pos_out oc_ht in
-  output_binary_int oc_ht 0;
-  output_binary_int oc_ht 0;
-  output_binary_int oc_ht 0;
-  output_binary_int oc_ht 0;
-  Iovalue.size_32.val := 0;
-  Iovalue.size_64.val := 0;
 
-  let pos_start = pos_out oc_ht in
+  let pos_start = create_output_value_header oc_ht in
   Iovalue.output_block_header oc_ht 0 2;
   Iovalue.output oc_ht ht.size;
   Iovalue.output_block_header oc_ht 0 (Array.length ht.data);
@@ -105,13 +123,8 @@ value output_hashtbl dir file ht = do {
     output_binary_int oc_hta (pos_out oc_ht);
     Iovalue.output oc_ht ht.data.(i);
   };
-  let pos_end = pos_out oc_ht in
+  patch_output_value_header oc_ht pos_start;
 
-  seek_out oc_ht pos;
-  output_binary_int oc_ht (pos_end - pos_start);
-  output_binary_int oc_ht 0;
-  output_binary_int oc_ht Iovalue.size_32.val;
-  output_binary_int oc_ht Iovalue.size_64.val;
   close_out oc_hta;
   close_out oc_ht;
 };
@@ -121,37 +134,30 @@ value open_out_field tmp_dir (name, valu) = do {
   try Mutil.mkdir_p d with _ -> ();
   let oc_dat = open_out_bin (Filename.concat d "data") in
   let oc_acc = open_out_bin (Filename.concat d "access") in
-  for i = 0 to 3 do { output_byte oc_dat intext_magic_number.(i); };
-  output_binary_int oc_dat 0;
-  output_binary_int oc_dat 0;
-  output_binary_int oc_dat 0;
-  output_binary_int oc_dat 0;
-  Iovalue.size_32.val := 0;
-  Iovalue.size_64.val := 0;
+
+  let start_pos = create_output_value_header oc_dat in
   Iovalue.output_block_header oc_dat 0 phony_min_size;
-  (oc_dat, oc_acc, ref Iovalue.size_32.val, ref Iovalue.size_64.val, valu)
+  {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
+   sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
+   valu = valu}
 };
 
-value output_field so (oc_dat, oc_acc, sz32, sz64, valu) = do {
-  output_binary_int oc_acc (pos_out oc_dat);
-  Iovalue.size_32.val := sz32.val;
-  Iovalue.size_64.val := sz64.val;
-  Iovalue.output oc_dat (valu so);
-  sz32.val := Iovalue.size_32.val;
-  sz64.val := Iovalue.size_64.val;
+value output_field so ff = do {
+  output_binary_int ff.oc_acc (pos_out ff.oc_dat);
+  Iovalue.size_32.val := ff.sz32;
+  Iovalue.size_64.val := ff.sz64;
+  Iovalue.output ff.oc_dat (ff.valu so);
+  ff.sz32 := Iovalue.size_32.val;
+  ff.sz64 := Iovalue.size_64.val;
 };
 
-value close_out_field nb_items (oc_dat, oc_acc, sz32, sz64, evalu) = do {
-  close_out oc_acc;
-  let pos_start = 20 in
-  let pos_end = pos_out oc_dat in
-  seek_out oc_dat 4;
-  output_binary_int oc_dat (pos_end - pos_start);
-  output_binary_int oc_dat 0;
-  output_binary_int oc_dat (sz32.val - phony_min_size + nb_items);
-  output_binary_int oc_dat (sz64.val - phony_min_size + nb_items);
-  Iovalue.output_block_header oc_dat 0 nb_items;
-  close_out oc_dat;
+value close_out_field nb_items ff = do {
+  close_out ff.oc_acc;
+  Iovalue.size_32.val := ff.sz32 - phony_min_size + nb_items;
+  Iovalue.size_64.val := ff.sz64 - phony_min_size + nb_items;
+  patch_output_value_header ff.oc_dat ff.start_pos;
+  Iovalue.output_block_header ff.oc_dat 0 nb_items;
+  close_out ff.oc_dat;
 };
 
 value person_fields_arr =
