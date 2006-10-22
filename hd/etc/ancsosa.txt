@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.5 2006-09-13 08:44:45 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.6 2006-10-22 19:33:27 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -716,7 +716,7 @@
         %if;(ancestor.same != "")
           <p>
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
-          [see] <b><a href="#%ancestor.same;">%ancestor.same;</a></b>.
+          [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
           </p>
         %else;
           <p>
