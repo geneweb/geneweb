@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.62 2006-10-22 09:42:39 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.63 2006-10-22 10:57:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -844,7 +844,9 @@ value load_ascends_array base =
 value load_unions_array base =
   match base with
   [ Base base -> base.data.unions.load_array ()
-  | Base2 _ -> failwith "not impl load_unions_array" ]
+  | Base2 _ ->
+      let _ = do { eprintf "not impl load_unions_array\n"; flush stderr } in
+      () ]
 ;
 value load_couples_array base =
   match base with
@@ -856,12 +858,16 @@ value load_couples_array base =
 value load_descends_array base =
   match base with
   [ Base base -> base.data.descends.load_array ()
-  | Base2 _ -> failwith "not impl load_descends_array" ]
+  | Base2 _ ->
+      let _ = do { eprintf "not impl load_descends_array\n"; flush stderr } in
+      () ]
 ;
 value load_strings_array base =
   match base with
   [ Base base -> base.data.strings.load_array ()
-  | Base2 _ -> failwith "not impl load_string_array" ]
+  | Base2 _ ->
+      let _ = do { eprintf "not impl load_ascends_array\n"; flush stderr } in
+      () ]
 ;
 
 value persons_array base =
@@ -932,7 +938,10 @@ value base_notes_are_empty base fn =
 value base_notes_origin_file base =
   match base with
   [ Base base -> base.data.bnotes.norigin_file
-  | Base2 _ -> failwith "not impl base_notes_origin_file" ]
+  | Base2 _ ->
+      let _ = do {
+        eprintf "not impl base_notes_origin_file\n"; flush stderr } in
+      "" ]
 ;
 
 value p_first_name base p = nominative (sou base (get_first_name p));
