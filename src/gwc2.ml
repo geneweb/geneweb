@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.11 2006-10-21 15:25:15 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.12 2006-10-22 00:00:48 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -32,13 +32,26 @@ type gen =
     g_person_fields : list (file_field (gen_person iper string));
     g_family_fields : list (file_field family);
     g_person_parents : (Iochan.t * out_channel);
-    g_person_unions : (Iochan.t * out_channel) }
+    g_person_unions : (Iochan.t * out_channel);
+    g_person_rparents : (Iochan.t * out_channel)}
 ;
 
 value int_size = 4;
 
 value default_source = ref "";
 value do_check = ref True;
+
+value map_option f =
+  fun
+  [ Some x -> Some (f x)
+  | None -> None ]
+;
+
+value iter_option f =
+  fun
+  [ Some x -> f x
+  | None -> () ]
+;
 
 value check_magic =
   let b = String.create (String.length magic_gwo) in
@@ -150,7 +163,6 @@ value person_fields_arr =
   ("first_names_aliases", fun so -> Obj.repr so.first_names_aliases);
   ("surnames_aliases", fun so -> Obj.repr so.surnames_aliases);
   ("titles", fun so -> Obj.repr so.titles);
-  ("rparents", fun so -> Obj.repr so.rparents);
   ("related", fun so -> Obj.repr so.related);
   ("occupation", fun so -> Obj.repr so.occupation);
   ("sex", fun so -> Obj.repr so.sex);
@@ -167,9 +179,9 @@ value person_fields_arr =
   ("burial", fun so -> Obj.repr so.burial);
   ("burial_place", fun so -> Obj.repr so.burial_place);
   ("burial_src", fun so -> Obj.repr so.burial_src);
-(*
+(**)
   ("notes", fun so -> Obj.repr so.notes);
-*)
+(**)
   ("psources", fun so -> Obj.repr so.psources)]
 ;
 
@@ -253,27 +265,6 @@ value optim_type_list_title field_d ic oc oc_str ht = do {
   close_out oc_ext;
 };
 
-value optim_type_list_relation field_d ic oc oc_str ht = do {
-  let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
-  try
-    while True do {
-      let tl : list (gen_relation 'a string) = Iovalue.input ic in
-      match tl with
-      [ [_ :: _] -> do {
-          output_binary_int oc (pos_out oc_ext);
-          let tl =
-            List.map (map_relation_ps (fun x -> x) (str_pos oc_str ht)) tl
-          in
-          Iovalue.output oc_ext (tl : list (gen_relation 'a int))
-        }
-      | [] ->
-          output_binary_int oc (-1) ]
-    }
-  with
-  [ End_of_file -> () ];
-  close_out oc_ext;
-};
-
 value optim_person_fields tmp_dir =
   List.iter
     (fun (f1, f2, optim_type) -> do {
@@ -326,8 +317,7 @@ value optim_person_fields tmp_dir =
      ("person", "first_names_aliases", optim_type_list_string);
      ("person", "qualifiers", optim_type_list_string);
      ("person", "surnames_aliases", optim_type_list_string);
-     ("person", "titles", optim_type_list_title);
-     ("person", "rparents", optim_type_list_relation)]
+     ("person", "titles", optim_type_list_title)]
 ;
 
 value make_string_of_crush_index tmp_dir =
@@ -602,12 +592,14 @@ value insert_person1 gen so = do {
     Iochan.output_binary_int (fst gen.g_person_parents) (-1);
     Iochan.seek (fst gen.g_person_unions) (int_size * gen.g_pcnt);
     Iochan.output_binary_int (fst gen.g_person_unions) (-1);
+    Iochan.seek (fst gen.g_person_rparents) (int_size * gen.g_pcnt);
+    Iochan.output_binary_int (fst gen.g_person_rparents) (-1);
     gen.g_pcnt := gen.g_pcnt + 1;
   }
   else ();
 };
 
-value insert_undefined2 gen key fn sn = do {
+value insert_undefined2 gen key fn sn sex = do {
   if key.pk_first_name <> "?" && key.pk_surname <> "?" then
     key_hashtbl_add gen.g_index_of_key (fn, sn, key.pk_occ)
       (Adef.iper_of_int gen.g_pcnt)
@@ -621,13 +613,15 @@ value insert_undefined2 gen key fn sn = do {
   let so =
     {(empty_person) with
      first_name = key.pk_first_name; surname = key.pk_surname;
-     occ = key.pk_occ}
+     occ = key.pk_occ; sex = sex}
   in
   List.iter (output_field so) gen.g_person_fields;
   Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
   Iochan.output_binary_int (fst gen.g_person_parents) (-1);
   Iochan.seek (fst gen.g_person_unions) (int_size * gen.g_pcnt);
   Iochan.output_binary_int (fst gen.g_person_unions) (-1);
+  Iochan.seek (fst gen.g_person_rparents) (int_size * gen.g_pcnt);
+  Iochan.output_binary_int (fst gen.g_person_rparents) (-1);
   gen.g_pcnt := gen.g_pcnt + 1;
   Adef.iper_of_int (gen.g_pcnt - 1)
 };
@@ -648,16 +642,18 @@ value get_person2 gen so =
     Iochan.output_binary_int (fst gen.g_person_parents) (-1);
     Iochan.seek (fst gen.g_person_unions) (int_size * gen.g_pcnt);
     Iochan.output_binary_int (fst gen.g_person_unions) (-1);
+    Iochan.seek (fst gen.g_person_rparents) (int_size * gen.g_pcnt);
+    Iochan.output_binary_int (fst gen.g_person_rparents) (-1);
     gen.g_pcnt := gen.g_pcnt + 1;
     Adef.iper_of_int (gen.g_pcnt - 1)
   }
 ;
 
-value get_undefined2 gen key =
+value get_undefined2 gen key sex =
   let fn = unique_key_string gen key.pk_first_name in
   let sn = unique_key_string gen key.pk_surname in
   try key_hashtbl_find gen.g_index_of_key (fn, sn, key.pk_occ) with
-  [ Not_found -> insert_undefined2 gen key fn sn ]
+  [ Not_found -> insert_undefined2 gen key fn sn sex ]
 ;
 
 value insert_somebody1 gen sex =
@@ -668,9 +664,9 @@ value insert_somebody1 gen sex =
       insert_person1 gen so ]
 ;
 
-value get_somebody2 gen =
+value get_somebody2 gen sex =
   fun
-  [ Undefined key -> get_undefined2 gen key
+  [ Undefined key -> get_undefined2 gen key sex
   | Defined so -> get_person2 gen so ]
 ;
 
@@ -681,8 +677,8 @@ value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
 };
 
 value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
-  let ifath = get_somebody2 gen (Adef.father co) in
-  let imoth = get_somebody2 gen (Adef.mother co) in
+  let ifath = get_somebody2 gen fath_sex (Adef.father co) in
+  let imoth = get_somebody2 gen moth_sex (Adef.mother co) in
   let children = Array.map (fun key -> get_person2 gen key) deo.children in
   let fam =
     {fam ={(fo) with witnesses = [| |]};
@@ -723,15 +719,49 @@ value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
 };
 
 value insert_notes2 gen key str =
-  let _ip = get_undefined2 gen key in
+  let _ip = get_undefined2 gen key Neuter in
   ()
 ;
+
+value insert_relation_parent1 gen sex k =
+  insert_somebody1 gen sex k
+;
+
+value insert_relation1 gen r = do {
+  iter_option (insert_relation_parent1 gen Male) r.r_fath;
+  iter_option (insert_relation_parent1 gen Female) r.r_moth;
+};
+
+value insert_relations1 gen sb sex rl = do {
+  insert_somebody1 gen sex sb;
+  List.iter (insert_relation1 gen) rl
+};
+
+value insert_relation_parent2 gen ip sex k =
+  get_somebody2 gen sex k
+;
+
+value insert_relation2 gen ip r =
+  let r_fath = map_option (insert_relation_parent2 gen ip Male) r.r_fath in
+  let r_moth = map_option (insert_relation_parent2 gen ip Female) r.r_moth in
+  {r_type = r.r_type; r_fath = r_fath; r_moth = r_moth;
+   r_sources = 0}
+;
+
+value insert_relations2 gen sb sex rl = do {
+  let ip = get_somebody2 gen sex sb in
+  let rl = List.map (insert_relation2 gen ip) rl in
+  let pos = pos_out (snd gen.g_person_rparents) in
+  Iovalue.output (snd gen.g_person_rparents) rl;
+  Iochan.seek (fst gen.g_person_rparents) (int_size * Adef.int_of_iper ip);
+  Iochan.output_binary_int (fst gen.g_person_rparents) pos;
+};
 
 value insert_gwo_1 gen =
   fun
   [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
   | Notes key str -> ()
-  | Relations sb sex rl -> ()
+  | Relations sb sex rl -> insert_relations1 gen sb sex rl
   | Bnotes nfname str -> ()
   | Wnotes wizid str -> () ]
 ;
@@ -740,7 +770,7 @@ value insert_gwo_2 gen =
   fun
   [ Family cpl fs ms witl fam des -> insert_family2 gen cpl fs ms witl fam des
   | Notes key str -> insert_notes2 gen key str
-  | Relations sb sex rl -> ()
+  | Relations sb sex rl -> insert_relations2 gen sb sex rl
   | Bnotes nfname str -> ()
   | Wnotes wizid str -> () ]
 ;
@@ -813,6 +843,13 @@ value link gwo_list bname =
        open_out_bin (Filename.concat d "data"))
     }
     in
+    let person_rparents = do {
+      let d = Filename.concat person_d "rparents" in
+      try Mutil.mkdir_p d with _ -> ();
+      (Iochan.openfile (Filename.concat d "access") True,
+       open_out_bin (Filename.concat d "data"))
+    }
+    in
     let family_fields = do {
       let family_d =
         List.fold_left Filename.concat tmp_dir ["base_d"; "family"]
@@ -828,7 +865,8 @@ value link gwo_list bname =
        g_person_fields = person_fields;
        g_family_fields = family_fields;
        g_person_parents = person_parents;
-       g_person_unions = person_unions}
+       g_person_unions = person_unions;
+       g_person_rparents = person_rparents}
     in
     let ngwo = List.length gwo_list in
     let run =
@@ -872,6 +910,8 @@ value link gwo_list bname =
 
     List.iter (close_out_field gen.g_pcnt) person_fields;
     List.iter (close_out_field gen.g_fcnt) family_fields;
+    Iochan.close (fst person_rparents);
+    close_out (snd person_rparents);
     Iochan.close (fst person_unions);
     close_out (snd person_unions);
     Iochan.close (fst person_parents);

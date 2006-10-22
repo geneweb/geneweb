@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.58 2006-10-21 11:47:56 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.59 2006-10-22 00:00:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -272,10 +272,10 @@ value get_rparents =
   [ Person p ->
       List.map (fun r -> map_relation_ps (fun x -> x) (fun i -> Istr i) r)
         p.Def.rparents
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "rparents") in
+  | Person2 bnc i ->
+      let pos = get_field_acc bnc i ("person", "rparents") in
       if pos = -1 then []
-      else failwith "not impl get_rparents" ]
+      else get_field_data bnc pos ("person", "rparents") "data" ]
 ;
 value get_sex =
   fun
