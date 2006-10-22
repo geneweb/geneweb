@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.63 2006-10-22 10:57:37 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.64 2006-10-22 15:44:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -93,14 +93,20 @@ value get_field_data (bn, cache) pos (f1, f2) data = do {
   Iovalue.input ic
 };
 
-value get_field_2_data (bn, cache_chan) pos (f1, f2) data = do {
+value get_field_2_data (bn, cache) pos (f1, f2) data = do {
   let ic =
-    open_in_bin (List.fold_left Filename.concat bn [f1; f2; data])
+    try List.assoc (f1, f2, data) cache.chan with
+    [ Not_found -> do {
+        let ic =
+          open_in_bin (List.fold_left Filename.concat bn [f1; f2; data])
+        in
+        cache.chan := [((f1, f2, data), ic) :: cache.chan];
+        ic
+      } ]
   in
   seek_in ic pos;
   let r = Iovalue.input ic in
   let s = Iovalue.input ic in
-  close_in ic;
   (r, s)
 };
 
@@ -866,7 +872,7 @@ value load_strings_array base =
   match base with
   [ Base base -> base.data.strings.load_array ()
   | Base2 _ ->
-      let _ = do { eprintf "not impl load_ascends_array\n"; flush stderr } in
+      let _ = do { eprintf "not impl load_strings_array\n"; flush stderr } in
       () ]
 ;
 
