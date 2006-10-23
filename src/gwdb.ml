@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.69 2006-10-23 02:22:42 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.70 2006-10-23 10:38:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -287,7 +287,7 @@ value get_related =
   | Person2 bn i ->
       let pos = get_field_acc bn i ("person", "related") in
       loop [] pos where rec loop list pos =
-        if pos = -1 then list
+        if pos = -1 then List.rev list
         else
           let (ip, pos) =
             get_field_2_data bn pos ("person", "related") "data"
