@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.53 2006-10-18 02:56:45 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.54 2006-10-23 13:16:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -66,8 +66,6 @@ value gen_person_of_person : person -> Def.gen_person iper istr;
 value get_parents : ascend -> option ifam;
 value get_consang : ascend -> Adef.fix;
 
-value ascend_with_consang : ascend -> Adef.fix -> ascend;
-value ascend_with_parents : ascend -> option ifam -> ascend;
 value ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
 
 value get_family : union -> array ifam;
@@ -149,7 +147,8 @@ value load_descends_array : base -> unit;
 value load_strings_array : base -> unit;
 
 value persons_array : base -> (int -> person * int -> person -> unit);
-value ascends_array : base -> (int -> ascend * int -> ascend -> unit);
+value ascends_array :
+  base -> (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit);
 
 value base_notes_read : base -> string -> string;
 value base_notes_read_first_line : base -> string -> string;

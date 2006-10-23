@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.70 2006-10-23 10:38:42 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.71 2006-10-23 13:16:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -413,16 +413,6 @@ value get_parents =
       else Some (get_field_data bn pos ("person", "parents") "data") ]
 ;
 
-value ascend_with_consang a c =
-  match a with
-  [ Ascend a -> Ascend {parents = a.parents; consang = c}
-  | Ascend2 _ _ -> failwith "not impl ascend_with_consang" ]
-;
-value ascend_with_parents a p =
-  match a with
-  [ Ascend a -> Ascend {parents = p; consang = a.consang}
-  | Ascend2 _ _ -> failwith "not impl ascend_with_consang" ]
-;
 value ascend_of_gen_ascend a = Ascend a;
 
 value empty_person ip =
@@ -895,13 +885,13 @@ value persons_array base =
 value ascends_array base =
   match base with
   [ Base base ->
-      let get i = Ascend (base.data.ascends.get i) in
-      let set i =
-        fun
-        [ Ascend a -> base.data.ascends.set i a
-        | Ascend2 _ _ -> assert False ]
+      let fget i = (base.data.ascends.get i).parents in
+      let cget i = (base.data.ascends.get i).consang in
+      let cset i v =
+        base.data.ascends.set i
+          {(base.data.ascends.get i) with consang = v}
       in
-      (get, set)
+      (fget, cget, cset)
   | Base2 _ -> failwith "not impl ascends_array" ]
 ;
 
