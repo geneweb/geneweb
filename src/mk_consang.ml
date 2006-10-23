@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.10 2006-10-08 05:33:16 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.11 2006-10-23 03:45:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -39,6 +39,18 @@ value designation base p =
     (first_name ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " " ^ nom)
 ;
 
+value open_base bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  if Sys.file_exists (Filename.concat bname "base_d") then do {
+    Printf.eprintf "*** database new implementation\n";
+    flush stderr; 
+    Gwdb.base_of_base2 bname
+  }
+  else Gwdb.base_of_dsk_base (Database.opendb bname)
+;
+
 value main () =
   do {
     Argl.parse speclist anonfun errmsg;
@@ -51,7 +63,7 @@ value main () =
     else ();
     Secure.set_base_dir (Filename.dirname fname.val);
     let f () =
-      let base = Gwdb.base_of_dsk_base (Database.opendb fname.val) in
+      let base = open_base fname.val in
       try
         do {
           Sys.catch_break True;
