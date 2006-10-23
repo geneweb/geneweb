@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.19 2006-10-23 11:47:54 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.20 2006-10-23 20:51:59 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -115,6 +115,11 @@ value output_hashtbl dir file ht = do {
   let ht : hashtbl_t 'a 'b = Obj.magic (ht : Hashtbl.t 'a 'b) in
   output_binary_int oc_hta (Array.length ht.data);
 
+  (* we could alternatively use Iovalue.output_array_access, the
+     advantage would be that we could use output_value into the first
+     file .ht and making the access into the second file .hta, this is
+     probably faster, but the drawback is that we must know exactly
+     where the array starts *)
   let pos_start = create_output_value_header oc_ht in
   Iovalue.output_block_header oc_ht 0 2;
   Iovalue.output oc_ht ht.size;
