@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.46 2006-10-15 15:39:38 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.47 2006-10-23 12:36:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -57,7 +57,6 @@ value gen_person_of_person p = p;
 value get_consang a = a.Def.consang;
 value get_parents a = a.Def.parents;
 
-value ascend_with_consang a c = {parents = a.parents; consang = c};
 value ascend_with_parents a p = {parents = p; consang = a.consang};
 value ascend_of_gen_ascend a = a;
 
