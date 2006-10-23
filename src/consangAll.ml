@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.23 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.24 2006-10-23 13:16:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -13,13 +13,13 @@ value designation base p =
     (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 ;
 
-value rec clear_descend_consang base ((aget, aset) as ascends) mark ifam =
+value rec clear_descend_consang base ascends mark ifam =
+  let (fget, cget, cset) = ascends in
   let des = doi base ifam in
   Array.iter
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
-         let a = aget (Adef.int_of_iper ip) in
-         aset (Adef.int_of_iper ip) (ascend_with_consang a no_consang);
+         cset (Adef.int_of_iper ip) no_consang;
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
          Array.iter (clear_descend_consang base ascends mark) (get_family u)
@@ -46,6 +46,7 @@ value compute base from_scratch quiet =
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let ascends = ascends_array base in
+  let (fget, cget, cset) = ascends in
   let tab =
     Consang.make_relationship_info base (Consang.topological_sort base aoi)
   in
@@ -65,13 +66,13 @@ value compute base from_scratch quiet =
             list ]
     else ();
     for i = 0 to nb_of_persons base - 1 do {
-      let a = fst ascends i in
-      if from_scratch then snd ascends i (ascend_with_consang a no_consang)
+      let cg = cget i in
+      if from_scratch then cset i no_consang
       else
-        match get_parents a with
-        [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := get_consang a
+        match fget i with
+        [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := cg
         | None -> () ];
-      if get_consang a = no_consang then incr cnt else ()
+      if cg = no_consang then incr cnt else ()
     };
     let max_cnt = cnt.val in
     let most = ref None in
@@ -84,9 +85,8 @@ value compute base from_scratch quiet =
     while running.val do {
       running.val := False;
       for i = 0 to nb_of_persons base - 1 do {
-        let a = fst ascends i in
-        if get_consang a = no_consang then
-          match get_parents a with
+        if cget i = no_consang then
+          match fget i with
           [ Some ifam ->
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
               if pconsang = no_consang then
@@ -101,13 +101,13 @@ value compute base from_scratch quiet =
                   in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
-                  let a = ascend_with_consang a (Adef.fix_of_float consang) in
-                  snd ascends i a;
-                  consang_tab.(Adef.int_of_ifam ifam) := get_consang a;
+                  let cg = Adef.fix_of_float consang in
+                  cset i cg;
+                  consang_tab.(Adef.int_of_ifam ifam) := cg;
                   if not quiet then
                     let better =
                       match most.val with
-                      [ Some m -> get_consang a > get_consang m
+                      [ Some m -> cg > cget m
                       | None -> True ]
                     in
                     if better then do {
@@ -115,7 +115,7 @@ value compute base from_scratch quiet =
                         consang
                           (designation base (poi base (Adef.iper_of_int i)));
                       flush stderr;
-                      most.val := Some a
+                      most.val := Some i
                     }
                     else ()
                   else ()
@@ -124,13 +124,13 @@ value compute base from_scratch quiet =
               else do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                snd ascends i (ascend_with_consang a pconsang)
+                cset i pconsang;
               }
           | None ->
               do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                snd ascends i (ascend_with_consang a (Adef.fix_of_float 0.0))
+                cset i (Adef.fix_of_float 0.0);
               } ]
         else ()
       }
