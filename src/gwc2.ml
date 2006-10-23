@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.16 2006-10-22 19:13:25 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.17 2006-10-23 02:15:17 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -701,14 +701,16 @@ value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
   let _ifath = insert_somebody1 gen fath_sex (Adef.father co) in
   let _imoth = insert_somebody1 gen moth_sex (Adef.mother co) in
   Array.iter (fun key -> insert_person1 gen key) deo.children;
+  List.iter (fun (so, sex) -> insert_somebody1 gen sex so) witl;
 };
 
 value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
   let ifath = get_somebody2 gen fath_sex (Adef.father co) in
   let imoth = get_somebody2 gen moth_sex (Adef.mother co) in
   let children = Array.map (fun key -> get_person2 gen key) deo.children in
+  let witn = List.map (fun (so, sex) -> get_somebody2 gen sex so) witl in
   let fam =
-    {fam ={(fo) with witnesses = [| |]};
+    {fam ={(fo) with witnesses = Array.of_list witn};
      cpl = Adef.couple ifath imoth;
      des = {children = children}}
   in
