@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.18 2006-10-23 10:23:51 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.19 2006-10-23 11:47:54 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -538,11 +538,16 @@ value make_name_index tmp_dir nbper = do {
   ProgrBar.start ();
   for i = 0 to nbper - 1 do {
     ProgrBar.run i nbper;
+    let first_name = get_first_name i in
+    let surname = get_surname i in
     let names =
-      Futil.gen_person_misc_names (get_first_name i) (get_surname i)
-        (get_public_name i) (get_qualifiers i) (get_aliases i)
-        (get_first_names_aliases i) (get_surnames_aliases i)
-        (get_titles i) (get_husbands i) (get_father_titles_places i)
+      let names =
+        Futil.gen_person_misc_names first_name surname
+          (get_public_name i) (get_qualifiers i) (get_aliases i)
+          (get_first_names_aliases i) (get_surnames_aliases i)
+          (get_titles i) (get_husbands i) (get_father_titles_places i)
+      in
+      [Name.lower (first_name ^ " " ^ surname) :: names]
     in
     List.iter (fun s -> Hashtbl.add ht (Name.crush_lower s) i) names;
   };
