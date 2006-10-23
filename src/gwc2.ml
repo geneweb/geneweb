@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.17 2006-10-23 02:15:17 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.18 2006-10-23 10:23:51 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -649,7 +649,7 @@ value insert_undefined2 gen key fn sn sex = do {
   Adef.iper_of_int (gen.g_pcnt - 1)
 };
 
-value get_person2 gen so =
+value get_person2 gen so sex =
   if so.first_name <> "?" && so.surname <> "?" then do {
     let fn = unique_key_string gen so.first_name in
     let sn = unique_key_string gen so.surname in
@@ -660,6 +660,7 @@ value get_person2 gen so =
              so.surname) ]
   }
   else do {
+    let so = if so.sex = Neuter then {(so) with sex = sex} else so in
     List.iter (output_field so) gen.g_person_fields;
     Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
     Iochan.output_binary_int (fst gen.g_person_parents) (-1);
@@ -694,7 +695,7 @@ value insert_somebody1 gen sex =
 value get_somebody2 gen sex =
   fun
   [ Undefined key -> get_undefined2 gen key sex
-  | Defined so -> get_person2 gen so ]
+  | Defined so -> get_person2 gen so sex ]
 ;
 
 value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
@@ -707,7 +708,9 @@ value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
 value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
   let ifath = get_somebody2 gen fath_sex (Adef.father co) in
   let imoth = get_somebody2 gen moth_sex (Adef.mother co) in
-  let children = Array.map (fun key -> get_person2 gen key) deo.children in
+  let children =
+    Array.map (fun key -> get_person2 gen key Neuter) deo.children
+  in
   let witn = List.map (fun (so, sex) -> get_somebody2 gen sex so) witl in
   let fam =
     {fam ={(fo) with witnesses = Array.of_list witn};
