@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.25 2006-10-23 14:28:30 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.26 2006-10-23 18:26:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -13,8 +13,7 @@ value designation base p =
     (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
 ;
 
-value rec clear_descend_consang base ascends mark ifam =
-  let (fget, cget, cset) = ascends in
+value rec clear_descend_consang base cset mark ifam =
   let des = doi base ifam in
   Array.iter
     (fun ip ->
@@ -22,7 +21,7 @@ value rec clear_descend_consang base ascends mark ifam =
          cset (Adef.int_of_iper ip) no_consang;
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
-         Array.iter (clear_descend_consang base ascends mark) (get_family u)
+         Array.iter (clear_descend_consang base cset mark) (get_family u)
        }
        else ())
     (get_children des)
@@ -45,8 +44,7 @@ value trace quiet cnt max_cnt =
 value compute base from_scratch quiet =
   let () = load_ascends_array base in
   let () = load_couples_array base in
-  let ascends = ascends_array base in
-  let (fget, cget, cset) = ascends in
+  let (fget, cget, cset) = ascends_array base in
   let tab =
     Consang.make_relationship_info base (Consang.topological_sort base aoi)
   in
@@ -61,7 +59,7 @@ value compute base from_scratch quiet =
           List.iter
             (fun ip ->
                let u = uoi base ip in
-               Array.iter (clear_descend_consang base ascends mark)
+               Array.iter (clear_descend_consang base cset mark)
                  (get_family u))
             list ]
     else ();
