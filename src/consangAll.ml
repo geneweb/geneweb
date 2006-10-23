@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.26 2006-10-23 18:26:06 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.27 2006-10-23 20:06:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -41,16 +41,16 @@ value trace quiet cnt max_cnt =
   }
 ;
 
-value compute base from_scratch quiet =
+value compute base from_scratch quiet = do {
   let () = load_ascends_array base in
   let () = load_couples_array base in
-  let (fget, cget, cset) = ascends_array base in
-  let tab =
-    Consang.make_relationship_info base (Consang.topological_sort base aoi)
-  in
-  let consang_tab = Array.create (nb_of_families base) no_consang in
-  let cnt = ref 0 in
-  do {
+  let (fget, cget, cset, carray) = ascends_array base in
+  try do {
+    let tab =
+      Consang.make_relationship_info base (Consang.topological_sort base aoi)
+    in
+    let consang_tab = Array.create (nb_of_families base) no_consang in
+    let cnt = ref 0 in
     if not from_scratch then
       let mark = Array.create (nb_of_persons base) False in
       match patched_ascends base with
@@ -136,4 +136,7 @@ value compute base from_scratch quiet =
     else Printf.eprintf " done   \n";
     flush stderr;
   }
-;
+  with
+  [ Sys.Break -> do { Printf.eprintf "\n"; flush stderr; () } ];
+  carray
+};

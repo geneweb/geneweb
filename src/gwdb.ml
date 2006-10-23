@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.72 2006-10-23 14:28:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.73 2006-10-23 20:06:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -897,7 +897,7 @@ value ascends_array base =
         base.data.ascends.set i
           {(base.data.ascends.get i) with consang = v}
       in
-      (fget, cget, cset)
+      (fget, cget, cset, None)
   | Base2 db2 ->
       let cg_fname =
         List.fold_left Filename.concat db2.bdir ["person"; "consang"; "data"]
@@ -906,13 +906,36 @@ value ascends_array base =
         match
           try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ]
         with
-        [ Some ic -> failwith "not impl ascends_array"
+        [ Some ic -> do {
+            let tab = input_value ic in
+            close_in ic;
+            tab
+          }
         | None -> Array.make (nb_of_persons base) no_consang ]
       in
       let fget i = get_parents (Ascend2 db2 i) in
       let cget i = cg_tab.(i) in
       let cset i v = cg_tab.(i) := v in
-      (fget, cget, cset) ]
+      (fget, cget, cset, Some cg_tab) ]
+;
+
+value output_consang_tab base tab =
+  match base with
+  [ Base _ -> do { eprintf "error Gwdb.output_consang_tab\n"; flush stdout }
+  | Base2 db2 -> do {
+      let dir =
+        List.fold_left Filename.concat db2.bdir ["person"; "consang"]
+      in
+      Mutil.mkdir_p dir;
+      let oc = open_out_bin (Filename.concat dir "data") in
+      output_value oc tab;
+      close_out oc;
+      let oc = open_out_bin (Filename.concat dir "access") in
+      let _ : int =
+        Iovalue.output_array_access oc (Array.get tab) (Array.length tab) 0
+      in
+      close_out oc;
+    } ]
 ;
 
 value read_notes bname fnotes rn_mode =

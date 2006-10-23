@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.47 2006-10-18 21:59:28 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.48 2006-10-23 20:06:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -951,7 +951,9 @@ value link gwo_list tmp_dir =
     }
     else ();
     if not gen.g_errored then do {
-      if do_consang.val then ConsangAll.compute base True False else ();
+      if do_consang.val then
+        let _ : option _ = ConsangAll.compute base True False in ()
+        else ();
       Some (dsk_base, gen.g_wiznotes)
     }
     else None;
