@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.11 2006-10-23 03:45:50 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.12 2006-10-23 20:06:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value fname = ref "";
@@ -21,15 +21,18 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 ;
 
-value simple_output bname base =
-  let no_patches =
-    let bname =
-      if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-    in
-    not (Sys.file_exists (Filename.concat bname "patches"))
-  in
-  Gwdb.apply_as_dsk_base
-    (Outbase.gen_output (no_patches && not indexes.val) bname) base
+value simple_output bname base carray =
+  match carray with
+  [ Some tab -> Gwdb.output_consang_tab base tab
+  | None ->
+      let no_patches =
+        let bname =
+          if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+        in
+        not (Sys.file_exists (Filename.concat bname "patches"))
+      in
+      Gwdb.apply_as_dsk_base
+        (Outbase.gen_output (no_patches && not indexes.val) bname) base ]
 ;
 
 value designation base p =
@@ -67,9 +70,8 @@ value main () =
       try
         do {
           Sys.catch_break True;
-          try ConsangAll.compute base scratch.val quiet.val with
-          [ Sys.Break -> do { Printf.eprintf "\n"; flush stderr; () } ];
-          simple_output fname.val base;
+          let carray = ConsangAll.compute base scratch.val quiet.val in
+          simple_output fname.val base carray;
         }
       with
       [ Consang.TopologicalSortError p ->

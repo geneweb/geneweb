@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 5.3 2006-10-16 19:10:06 ddr Exp $ *)
+(* $Id: iovalue.ml,v 5.4 2006-10-23 20:06:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -248,4 +248,17 @@ value digest v =
     digest_loop (Obj.repr v);
     string_code (Digest.substring dbuf.val 0 dlen.val)
   }
+;
+
+value output_value_header_size = 20;
+value array_header_size arr_len = if arr_len < 8 then 1 else 5;
+
+value output_array_access oc arr_get arr_len pos =
+  loop (pos + output_value_header_size + array_header_size arr_len) 0
+  where rec loop pos i =
+    if i = arr_len then pos
+    else do {
+      output_binary_int oc pos;
+      loop (pos + size (arr_get i)) (i + 1)
+    }
 ;

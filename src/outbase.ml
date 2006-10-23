@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.18 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.19 2006-10-23 20:06:31 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -18,19 +18,6 @@ value save_mem = ref False;
 value trace s =
   if verbose.val then do { Printf.eprintf "*** %s\n" s; flush stderr }
   else ()
-;
-
-value output_value_header_size = 20;
-value array_header_size arr_len = if arr_len < 8 then 1 else 5;
-
-value output_array_access oc arr_get arr_len pos =
-  loop (pos + output_value_header_size + array_header_size arr_len) 0
-  where rec loop pos i =
-    if i = arr_len then pos
-    else do {
-      output_binary_int oc pos;
-      loop (pos + Iovalue.size (arr_get i)) (i + 1)
-    }
 ;
 
 value count_error computed found =
@@ -145,7 +132,8 @@ value create_name_index oc_inx oc_inx_acc base =
   do {
     output_value_no_sharing oc_inx (ni : name_index_data);
     let epos =
-      output_array_access oc_inx_acc (Array.get ni) (Array.length ni) bpos
+      Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
+        bpos
     in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
@@ -184,7 +172,8 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   do {
     output_value_no_sharing oc_inx (t : strings_of_fsname);
     let epos =
-      output_array_access oc_inx_acc (Array.get t) (Array.length t) bpos
+      Iovalue.output_array_access oc_inx_acc (Array.get t) (Array.length t)
+        bpos
     in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
@@ -345,7 +334,7 @@ value gen_output no_patches bname base =
         Printf.eprintf "*** saving %s array\n" arrname;
         flush stderr;
         arr.output_array oc;
-        let epos = output_array_access oc_acc arr.get arr.len bpos in
+        let epos = Iovalue.output_array_access oc_acc arr.get arr.len bpos in
         if epos <> pos_out oc then count_error epos (pos_out oc) else ()
       }
     in
