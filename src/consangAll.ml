@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.24 2006-10-23 13:16:09 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.25 2006-10-23 14:28:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -91,14 +91,12 @@ value compute base from_scratch quiet =
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
               if pconsang = no_consang then
                 let cpl = coi base ifam in
-                let fath = aoi base (get_father cpl) in
-                let moth = aoi base (get_mother cpl) in
-                if get_consang fath != no_consang &&
-                   get_consang moth != no_consang
+                let ifath = get_father cpl in
+                let imoth = get_mother cpl in
+                if cget (Adef.int_of_iper ifath) != no_consang &&
+                   cget (Adef.int_of_iper imoth) != no_consang
                 then do {
-                  let consang =
-                    relationship base tab (get_father cpl) (get_mother cpl)
-                  in
+                  let consang = relationship base tab ifath imoth in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
                   let cg = Adef.fix_of_float consang in

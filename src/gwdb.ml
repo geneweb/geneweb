@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.71 2006-10-23 13:16:09 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.72 2006-10-23 14:28:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -399,10 +399,14 @@ value gen_person_of_person =
        key_index = get_key_index p} ]
 ;
 
+value no_consang = Adef.fix (-1);
+
 value get_consang =
   fun
   [ Ascend a -> a.Def.consang
-  | Ascend2 bn i -> Adef.fix (-1) ]
+  | Ascend2 db2 i ->
+      try get_field db2 i ("person", "consang") with
+      [ Sys_error _ -> no_consang ] ]
 ;
 value get_parents =
   fun
@@ -675,7 +679,9 @@ value is_patched_person base =
 value patched_ascends base =
   match base with
   [ Base base -> base.func.patched_ascends ()
-  | Base2 _ -> failwith "not impl patched_ascends" ]
+  | Base2 _ ->
+      let _ = do { eprintf "not impl patched_ascends\n"; flush stderr; } in
+      [] ]
 ;
 
 type key =
@@ -892,7 +898,21 @@ value ascends_array base =
           {(base.data.ascends.get i) with consang = v}
       in
       (fget, cget, cset)
-  | Base2 _ -> failwith "not impl ascends_array" ]
+  | Base2 db2 ->
+      let cg_fname =
+        List.fold_left Filename.concat db2.bdir ["person"; "consang"; "data"]
+      in
+      let cg_tab =
+        match
+          try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ]
+        with
+        [ Some ic -> failwith "not impl ascends_array"
+        | None -> Array.make (nb_of_persons base) no_consang ]
+      in
+      let fget i = get_parents (Ascend2 db2 i) in
+      let cget i = cg_tab.(i) in
+      let cset i v = cg_tab.(i) := v in
+      (fget, cget, cset) ]
 ;
 
 value read_notes bname fnotes rn_mode =
