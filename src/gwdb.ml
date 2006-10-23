@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.68 2006-10-22 19:13:25 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.69 2006-10-23 02:22:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -857,37 +857,27 @@ value base_cleanup base =
 value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
-  | Base2 _ ->
-      let _ = do { eprintf "not impl load_ascends_array\n"; flush stderr } in
-      () ]
+  | Base2 _ -> (* optimization not possible in that db system *) () ]
 ;
 value load_unions_array base =
   match base with
   [ Base base -> base.data.unions.load_array ()
-  | Base2 _ ->
-      let _ = do { eprintf "not impl load_unions_array\n"; flush stderr } in
-      () ]
+  | Base2 _ -> (* optimization not possible in that db system *) () ]
 ;
 value load_couples_array base =
   match base with
   [ Base base -> base.data.couples.load_array ()
-  | Base2 _ ->
-      let _ = do { eprintf "not impl load_couples_array\n"; flush stderr } in
-      () ]
+  | Base2 _ -> (* optimization not possible in that db system *) () ]
 ;
 value load_descends_array base =
   match base with
   [ Base base -> base.data.descends.load_array ()
-  | Base2 _ ->
-      let _ = do { eprintf "not impl load_descends_array\n"; flush stderr } in
-      () ]
+  | Base2 _ -> (* optimization not possible in that db system *) () ]
 ;
 value load_strings_array base =
   match base with
   [ Base base -> base.data.strings.load_array ()
-  | Base2 _ ->
-      let _ = do { eprintf "not impl load_strings_array\n"; flush stderr } in
-      () ]
+  | Base2 _ -> (* optimization not possible in that db system *) () ]
 ;
 
 value persons_array base =
