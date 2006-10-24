@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.77 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.78 2006-10-24 18:20:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -85,6 +85,15 @@ type base =
   | Base2 of db2 ]
 ;
 
+value eq_istr i1 i2 =
+  match (i1, i2) with
+  [ (Istr i1, Istr i2) -> Adef.int_of_istr i1 = Adef.int_of_istr i2
+  | (Istr2 _ (f11, f12) i1, Istr2 _ (f21, f22) i2) ->
+      i1 = i2 && f11 = f21 && f12 = f22
+  | (Istr2New _ s1, Istr2New _ s2) -> s1 = s2
+  | _ -> failwith "eq_istr" ]
+;
+
 value get_field_acc db2 i (f1, f2) = do {
   let ic =
     try Hashtbl.find db2.cache_chan (f1, f2, "access") with
@@ -153,13 +162,13 @@ value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
 
 value is_empty_string =
   fun
-  [ Istr istr -> istr = Adef.istr_of_int 0
+  [ Istr istr -> Adef.int_of_istr istr = 0
   | Istr2 db2 path pos -> pos = Db2.empty_string_pos
   | Istr2New db2 s -> s = "" ]
 ;
 value is_quest_string =
   fun
-  [ Istr istr -> istr = Adef.istr_of_int 1
+  [ Istr istr -> Adef.int_of_istr istr = 1
   | Istr2 db2 path pos -> failwith "not impl is_quest_string"
   | Istr2New db2 s -> s = "?" ]
 ;

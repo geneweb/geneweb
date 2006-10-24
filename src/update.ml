@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.27 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: update.ml,v 5.28 2006-10-24 18:20:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -227,7 +227,7 @@ value print_warning conf base =
                let p = poi base ip in
                do {
                  html_li conf;
-                 if get_surname p = get_surname fath then
+                 if eq_istr (get_surname p) (get_surname fath) then
                    print_first_name conf base p
                  else print_someone conf base p;
                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
@@ -244,7 +244,7 @@ value print_warning conf base =
                let p = poi base ip in
                do {
                  html_li conf;
-                 if get_surname p = get_surname fath then
+                 if eq_istr (get_surname p) (get_surname fath) then
                    print_first_name_ref conf base p
                  else print_someone_ref conf base p;
                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
