@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.24 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.25 2006-10-24 19:27:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -307,7 +307,7 @@ value effective_merge_ind conf base p1 p2 =
             couple False (get_father cpl) (get_key_index p1)
           else assert False
         in
-        patch_couple base ifam (couple_of_gen_couple cpl);
+        patch_couple base ifam (couple_of_gen_couple base cpl);
       };
       let u1 = uoi base (get_key_index p1) in
       let u1 =
@@ -435,7 +435,7 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
   do {
     patch_family base (get_fam_index fam1) fam1;
     let des1 =
-      descend_of_gen_descend
+      descend_of_gen_descend base
         {children = Array.append (get_children des1) (get_children des2)}
     in
     patch_descend base (get_fam_index fam1) des1;
@@ -447,7 +447,7 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
       in
       patch_ascend base ip a;
     };
-    let des2 = descend_of_gen_descend {children = [| |]} in
+    let des2 = descend_of_gen_descend base {children = [| |]} in
     patch_descend base (get_fam_index fam2) des2;
     UpdateFamOk.effective_del conf base fam2;
   }

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.78 2006-10-24 18:20:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.79 2006-10-24 19:27:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -59,11 +59,13 @@ type family =
 ;
 type couple =
   [ Couple of dsk_couple
-  | Couple2 of db2 and int ]
+  | Couple2 of db2 and int
+  | Couple2Gen of db2 and gen_couple iper ]
 ;
 type descend =
   [ Descend of dsk_descend
-  | Descend2 of db2 and int ]
+  | Descend2 of db2 and int
+  | Descend2Gen of db2 and gen_descend iper ]
 ;
 
 type relation = Def.gen_relation iper istr;
@@ -649,12 +651,14 @@ value gen_family_of_family =
 value get_father =
   fun
   [ Couple c -> Adef.father c
-  | Couple2 db2 i -> get_field db2 i ("family", "father") ]
+  | Couple2 db2 i -> get_field db2 i ("family", "father")
+  | Couple2Gen db2 c -> Adef.father c ]
 ;
 value get_mother =
   fun
   [ Couple c -> Adef.mother c
-  | Couple2 db2 i -> get_field db2 i ("family", "mother") ]
+  | Couple2 db2 i -> get_field db2 i ("family", "mother")
+  | Couple2Gen db2 c -> Adef.mother c ]
 ;
 value get_parent_array =
   fun
@@ -662,27 +666,41 @@ value get_parent_array =
   | Couple2 db2 i ->
       let p1 = get_field db2 i ("family", "father") in
       let p2 = get_field db2 i ("family", "mother") in
-      [| p1; p2 |] ]
+      [| p1; p2 |]
+  | Couple2Gen db2 c -> Adef.parent_array c ]
 ;
 
-value couple_of_gen_couple c = Couple c;
+value couple_of_gen_couple base c =
+  match base with
+  [ Base _ -> Couple c
+  | Base2 db2 -> Couple2Gen db2 c ]
+;
+
 value gen_couple_of_couple =
   fun
   [ Couple c -> c
-  | Couple2 _ _ as c -> couple (get_father c) (get_mother c) ]
+  | Couple2 _ _ as c -> couple (get_father c) (get_mother c)
+  | Couple2Gen db2 c -> c ]
 ;
 
 value get_children =
   fun
   [ Descend d -> d.Def.children
-  | Descend2 db2 i -> get_field db2 i ("family", "children") ]
+  | Descend2 db2 i -> get_field db2 i ("family", "children")
+  | Descend2Gen db2 d -> d.Def.children ]
 ;
 
-value descend_of_gen_descend d = Descend d;
+value descend_of_gen_descend base d =
+  match base with
+  [ Base _ -> Descend d
+  | Base2 db2 -> Descend2Gen db2 d ]
+;
+
 value gen_descend_of_descend =
   fun
   [ Descend d -> d
-  | Descend2 _ _ as d -> {children = get_children d} ]
+  | Descend2 _ _ as d -> {children = get_children d}
+  | Descend2Gen db2 d -> d ]
 ;
 
 value poi base i =
@@ -717,12 +735,16 @@ value foi base i =
 value coi base i =
   match base with
   [ Base base -> Couple (base.data.couples.get (Adef.int_of_ifam i))
-  | Base2 db2 -> Couple2 db2 (Adef.int_of_ifam i) ]
+  | Base2 db2 ->
+      try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple.pa_ht i) with
+      [ Not_found -> Couple2 db2 (Adef.int_of_ifam i) ] ]
 ;
 value doi base i =
   match base with
   [ Base base -> Descend (base.data.descends.get (Adef.int_of_ifam i))
-  | Base2 db2 -> Descend2 db2 (Adef.int_of_ifam i) ]
+  | Base2 db2 ->
+      try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend.pa_ht i) with
+      [ Not_found -> Descend2 db2 (Adef.int_of_ifam i) ] ]
 ;
 
 value sou base i =
@@ -787,11 +809,15 @@ value patch_family base ifam f =
 value patch_descend base ifam d =
   match (base, d) with
   [ (Base base, Descend d) -> base.func.patch_descend ifam d
+  | (Base2 _, Descend2Gen db2 d) ->
+      Hashtbl.replace db2.patches.h_descend.pa_ht ifam d
   | _ -> failwith "not impl patch_descend" ]
 ;
 value patch_couple base ifam c =
   match (base, c) with
   [ (Base base, Couple c) -> base.func.patch_couple ifam c
+  | (Base2 _, Couple2Gen db2 c) ->
+      Hashtbl.replace db2.patches.h_couple.pa_ht ifam c
   | _ -> failwith "not impl patch_couple" ]
 ;
 value patch_name base s ip =

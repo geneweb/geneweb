@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.28 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.29 2006-10-24 19:27:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -426,7 +426,7 @@ value effective_mod conf base sfam scpl sdes =
     | None -> "" ]
   in
   let ncpl =
-    couple_of_gen_couple
+    couple_of_gen_couple base
       (map_couple_p conf.multi_parents
          (Update.insert_person conf base psrc created_p) scpl)
   in
@@ -435,7 +435,7 @@ value effective_mod conf base sfam scpl sdes =
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    descend_of_gen_descend
+    descend_of_gen_descend base
       (map_descend_p (Update.insert_person conf base psrc created_p) sdes)
   in
   let nfath = poi base (get_father ncpl) in
@@ -575,7 +575,7 @@ value effective_add conf base sfam scpl sdes =
     | None -> "" ]
   in
   let ncpl =
-    couple_of_gen_couple
+    couple_of_gen_couple base
       (map_couple_p conf.multi_parents
          (Update.insert_person conf base psrc created_p) scpl)
   in
@@ -584,7 +584,7 @@ value effective_add conf base sfam scpl sdes =
       (Gwdb.insert_string base) sfam
   in
   let ndes =
-    descend_of_gen_descend
+    descend_of_gen_descend base
       (map_descend_p (Update.insert_person conf base psrc created_p) sdes)
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
@@ -697,7 +697,7 @@ value effective_del conf base fam = do {
   kill_family base fam (get_mother cpl);
   Array.iter (kill_parents base) (get_children des);
   let cpl =
-    couple_of_gen_couple
+    couple_of_gen_couple base
       (couple False (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
   in
   let fam =
@@ -707,7 +707,7 @@ value effective_del conf base fam = do {
        comment = Gwdb.insert_string base "";
        fam_index = Adef.ifam_of_int (-1)}
   in
-  let des = descend_of_gen_descend {children = [| |]} in
+  let des = descend_of_gen_descend base {children = [| |]} in
   patch_family base ifam fam;
   patch_couple base ifam cpl;
   patch_descend base ifam des
