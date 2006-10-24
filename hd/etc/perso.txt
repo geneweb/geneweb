@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.3 2006-10-02 02:50:38 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.4 2006-10-24 03:55:06 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -219,7 +219,7 @@
     %apply;married_to%with;
       %if;(marriage_place = "")
         %if;(on_marriage_date = "")
-        %else; <em>%on_marriage_date</em>%end;
+        %else; <em>%on_marriage_date;</em>%end;
       %else;
         %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
         %else; <em>%on_marriage_date;, %marriage_place, </em>%end;
