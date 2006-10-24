@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.58 2006-10-24 18:20:36 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.59 2006-10-24 19:27:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -96,12 +96,12 @@ value get_father : couple -> iper;
 value get_mother : couple -> iper;
 value get_parent_array : couple -> array iper;
 
-value couple_of_gen_couple : Def.gen_couple iper -> couple;
+value couple_of_gen_couple : base -> Def.gen_couple iper -> couple;
 value gen_couple_of_couple : couple -> Def.gen_couple iper;
 
 value get_children : descend -> array iper;
 
-value descend_of_gen_descend : Def.gen_descend iper -> descend;
+value descend_of_gen_descend : base -> Def.gen_descend iper -> descend;
 value gen_descend_of_descend : descend -> Def.gen_descend iper;
 
 value poi : base -> iper -> person;
