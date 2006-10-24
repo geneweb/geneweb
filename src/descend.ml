@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.15 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: descend.ml,v 5.16 2006-10-24 18:20:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -59,8 +59,8 @@ value named_like_father conf base ip =
   let a = aget conf base ip in
   match get_parents a with
   [ Some ifam ->
-      get_surname (pget conf base ip) =
-        get_surname (pget conf base (get_father (coi base ifam)))
+      eq_istr (get_surname (pget conf base ip))
+        (get_surname (pget conf base (get_father (coi base ifam))))
   | _ -> False ]
 ;
 
@@ -149,7 +149,8 @@ value display_descendants_upto conf base max_level p line =
   let count = ref 0 in
   let always_surname =
     match p_getenv conf.env "alwsurn" with
-    [ Some x -> x = "yes"
+    [ Some "yes" -> True
+    | Some _ -> False
     | None ->
         try List.assoc "always_surname" conf.base_env = "yes" with
         [ Not_found -> False ] ]
