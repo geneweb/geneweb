@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.23 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: perso.ml,v 5.24 2006-10-24 03:55:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1122,13 +1122,6 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
           in
           string_of_int n
       | _ -> raise Not_found ]
-  | "on_marriage_date" ->
-      match get_env "fam" env with
-      [ Vfam fam _ _ m_auth ->
-          match (m_auth, Adef.od_of_codate (get_marriage fam)) with
-          [ (True, Some s) -> Date.string_of_ondate conf s
-          | _ -> "" ] 
-      | _ -> raise Not_found ]
   | "origin_file" ->
       if conf.wizard then
         match get_env "fam" env with
@@ -1273,6 +1266,13 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
               VVstring (eval_num conf (Num.of_int (cnt - 1)) sl)
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]  
+  | ["on_marriage_date" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ m_auth ->
+          match (m_auth, Adef.od_of_codate (get_marriage fam)) with
+          [ (True, Some d) -> eval_on_date_field_var conf d sl
+          | _ -> VVstring "" ] 
+      | _ -> raise Not_found ]
   | ["parent" :: sl] ->
       match get_env "parent" env with
       [ Vind p a u ->
@@ -1631,6 +1631,16 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           try str_val (eval_str_person_field conf base env ep s) with
           [ Not_found -> obsolete_eval conf base env ep loc s ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
+  | _ -> raise Not_found ]
+and eval_on_date_field_var conf d =
+  fun
+  [ ["year"] ->
+      match d with
+      [ Dgreg dmy cal ->
+          let dmy = {(dmy) with day = 0; month = 0} in
+          VVstring (Date.string_of_ondate conf (Dgreg dmy cal))
+      | _ -> VVstring "" ]
+  | [] -> VVstring (Date.string_of_ondate conf d)
   | _ -> raise Not_found ]
 and eval_date_field_var d =
   fun
