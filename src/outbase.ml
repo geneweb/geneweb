@@ -1,4 +1,4 @@
-(* $Id: outbase.ml,v 5.19 2006-10-23 20:06:31 ddr Exp $ *)
+(* $Id: outbase.ml,v 5.20 2006-10-24 02:20:10 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -11,7 +11,7 @@ value load_unions_array base = base.data.unions.load_array ();
 value load_couples_array base = base.data.couples.load_array ();
 value load_descends_array base = base.data.descends.load_array ();
 value load_strings_array base = base.data.strings.load_array ();
-value base_cleanup base = base.func.cleanup ();
+value close_base base = base.func.cleanup ();
 
 value save_mem = ref False;
 
@@ -472,7 +472,7 @@ value gen_output no_patches bname base =
         else ();
         raise e
       };
-    base_cleanup base;
+    close_base base;
     remove_file (Filename.concat bname "base");
     Sys.rename tmp_base (Filename.concat bname "base");
     remove_file (Filename.concat bname "base.acc");

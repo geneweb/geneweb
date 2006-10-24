@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.73 2006-10-23 20:06:31 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.74 2006-10-24 02:20:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -16,12 +16,14 @@ type db2 =
 
 type istr =
   [ Istr of dsk_istr
-  | Istr2 of db2 and (string * string) and int ]
+  | Istr2 of db2 and (string * string) and int
+  | Istr2New of db2 and string ]
 ;
 
 type person =
   [ Person of dsk_person
-  | Person2 of db2 and int ]
+  | Person2 of db2 and int
+  | Person2Gen of db2 and gen_person iper istr ]
 ;
 type ascend =
   [ Ascend of dsk_ascend
@@ -123,225 +125,257 @@ let _ = do { Printf.eprintf "dat2 %d %s %s \n" pos f1 f2; flush stderr; } in
   (r, s)
 };
 
-value get_field bn i path =
-  let pos = get_field_acc bn i path in
-  get_field_data bn pos path "data"
+value get_field db2 i path =
+  let pos = get_field_acc db2 i path in
+  get_field_data db2 pos path "data"
 ;
 
-value make_istr2 bnc path i = Istr2 bnc path (get_field_acc bnc i path);
+value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
 
 value is_empty_string =
   fun
   [ Istr istr -> istr = Adef.istr_of_int 0
-  | Istr2 bn path pos -> pos = Db2.empty_string_pos ]
+  | Istr2 db2 path pos -> pos = Db2.empty_string_pos
+  | Istr2New db2 s -> s = "" ]
 ;
 value is_quest_string =
   fun
   [ Istr istr -> istr = Adef.istr_of_int 1
-  | Istr2 bn path pos -> failwith "not impl is_quest_string" ]
+  | Istr2 db2 path pos -> failwith "not impl is_quest_string"
+  | Istr2New db2 s -> s = "?" ]
 ;
 
 value get_access =
   fun
   [ Person p -> p.Def.access
-  | Person2 bn i -> get_field bn i ("person", "access") ]
+  | Person2 db2 i -> get_field db2 i ("person", "access")
+  | Person2Gen db2 p -> p.Def.access ]
 ;
 value get_aliases =
   fun
   [ Person p -> List.map (fun i -> Istr i) p.Def.aliases
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "aliases") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "aliases") in
       if pos = -1 then []
       else
-        let list = get_field_data bn pos ("person", "aliases") "data2.ext" in
-        List.map (fun pos -> Istr2 bn ("person", "aliases") pos) list ]
+        let list = get_field_data db2 pos ("person", "aliases") "data2.ext" in
+        List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list
+  | Person2Gen db2 p -> p.Def.aliases ]
 ;
 value get_baptism =
   fun
   [ Person p -> p.Def.baptism
-  | Person2 bn i -> get_field bn i ("person", "baptism") ]
+  | Person2 db2 i -> get_field db2 i ("person", "baptism")
+  | Person2Gen db2 p -> p.Def.baptism ]
 ;
 value get_baptism_place =
   fun
   [ Person p -> Istr p.Def.baptism_place
-  | Person2 bnc i -> make_istr2 bnc ("person", "baptism_place") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "baptism_place") i
+  | Person2Gen db2 p -> p.Def.baptism_place ]
 ;
 value get_baptism_src =
   fun
   [ Person p -> Istr p.Def.baptism_src
-  | Person2 bnc i -> make_istr2 bnc ("person", "baptism_src") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "baptism_src") i
+  | Person2Gen db2 p -> p.Def.baptism_src ]
 ;
 value get_birth =
   fun
   [ Person p -> p.Def.birth
-  | Person2 bn i -> get_field bn i ("person", "birth") ]
+  | Person2 db2 i -> get_field db2 i ("person", "birth")
+  | Person2Gen db2 p -> p.Def.birth ]
 ;
 value get_birth_place =
   fun
   [ Person p -> Istr p.Def.birth_place
-  | Person2 bnc i -> make_istr2 bnc ("person", "birth_place") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "birth_place") i
+  | Person2Gen db2 p -> p.Def.birth_place ]
 ;
 value get_birth_src =
   fun
   [ Person p -> Istr p.Def.birth_src
-  | Person2 bnc i -> make_istr2 bnc ("person", "birth_src") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "birth_src") i
+  | Person2Gen db2 p -> p.Def.birth_src ]
 ;
 value get_burial =
   fun
   [ Person p -> p.Def.burial
-  | Person2 bn i -> get_field bn i ("person", "burial") ]
+  | Person2 db2 i -> get_field db2 i ("person", "burial")
+  | Person2Gen db2 p -> p.Def.burial ]
 ;
 value get_burial_place =
   fun
   [ Person p -> Istr p.Def.burial_place
-  | Person2 bnc i -> make_istr2 bnc ("person", "burial_place") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "burial_place") i
+  | Person2Gen db2 p -> p.Def.burial_place ]
 ;
 value get_burial_src =
   fun
   [ Person p -> Istr p.Def.burial_src
-  | Person2 bnc i -> make_istr2 bnc ("person", "burial_src") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "burial_src") i
+  | Person2Gen db2 p -> p.Def.burial_src ]
 ;
 value get_death =
   fun
   [ Person p -> p.Def.death
-  | Person2 bn i -> get_field bn i ("person", "death") ]
+  | Person2 db2 i -> get_field db2 i ("person", "death")
+  | Person2Gen db2 p -> p.Def.death ]
 ;
 value get_death_place =
   fun
   [ Person p -> Istr p.Def.death_place
-  | Person2 bnc i -> make_istr2 bnc ("person", "death_place") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "death_place") i
+  | Person2Gen db2 p -> p.Def.death_place ]
 ;
 value get_death_src =
   fun
   [ Person p -> Istr p.Def.death_src
-  | Person2 bnc i -> make_istr2 bnc ("person", "death_src") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "death_src") i
+  | Person2Gen db2 p -> p.Def.death_src ]
 ;
 value get_first_name =
   fun
   [ Person p -> Istr p.Def.first_name
-  | Person2 bnc i -> make_istr2 bnc ("person", "first_name") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "first_name") i
+  | Person2Gen db2 p -> p.Def.first_name ]
 ;
 value get_first_names_aliases =
   fun
   [ Person p -> List.map (fun i -> Istr i) p.Def.first_names_aliases
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "first_names_aliases") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "first_names_aliases") in
       if pos = -1 then []
       else
         let list =
-          get_field_data bn pos ("person", "first_names_aliases") "data2.ext"
+          get_field_data db2 pos ("person", "first_names_aliases") "data2.ext"
         in
-        List.map (fun pos -> Istr2 bn ("person", "first_names_aliases") pos)
-          list ]
+        List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
+          list
+  | Person2Gen db2 p -> p.Def.first_names_aliases ]
 ;
 value get_image =
   fun
   [ Person p -> Istr p.Def.image
-  | Person2 bnc i -> make_istr2 bnc ("person", "image") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "image") i
+  | Person2Gen db2 p -> p.Def.image ]
 ;
 value get_key_index =
   fun
   [ Person p -> p.Def.key_index
-  | Person2 _ i -> Adef.iper_of_int i ]
+  | Person2 _ i -> Adef.iper_of_int i
+  | Person2Gen db2 p -> p.Def.key_index ]
 ;
 value get_notes =
   fun
   [ Person p -> Istr p.Def.notes
-  | Person2 bnc i -> make_istr2 bnc ("person", "notes") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "notes") i
+  | Person2Gen db2 p -> p.Def.notes ]
 ;
 value get_occ =
   fun
   [ Person p -> p.Def.occ
-  | Person2 bn i -> get_field bn i ("person", "occ") ]
+  | Person2 db2 i -> get_field db2 i ("person", "occ")
+  | Person2Gen db2 p -> p.Def.occ ]
 ;
 value get_occupation =
   fun
   [ Person p -> Istr p.Def.occupation
-  | Person2 bnc i -> make_istr2 bnc ("person", "occupation") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "occupation") i
+  | Person2Gen db2 p -> p.Def.occupation ]
 ;
 value get_psources =
   fun
   [ Person p -> Istr p.Def.psources
-  | Person2 bnc i -> make_istr2 bnc ("person", "psources") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "psources") i
+  | Person2Gen db2 p -> p.Def.psources ]
 ;
 value get_public_name =
   fun
   [ Person p -> Istr p.Def.public_name
-  | Person2 bnc i -> make_istr2 bnc ("person", "public_name") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "public_name") i
+  | Person2Gen db2 p -> p.Def.public_name ]
 ;
 value get_qualifiers =
   fun
   [ Person p -> List.map (fun i -> Istr i) p.Def.qualifiers
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "qualifiers") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "qualifiers") in
       if pos = -1 then []
       else
         let list =
-          get_field_data bn pos ("person", "qualifiers") "data2.ext"
+          get_field_data db2 pos ("person", "qualifiers") "data2.ext"
         in
-        List.map (fun pos -> Istr2 bn ("person", "qualifiers") pos) list ]
+        List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list
+  | Person2Gen db2 p -> p.Def.qualifiers ]
 ;
 value get_related =
   fun
   [ Person p -> p.Def.related
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "related") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "related") in
       loop [] pos where rec loop list pos =
         if pos = -1 then List.rev list
         else
           let (ip, pos) =
-            get_field_2_data bn pos ("person", "related") "data"
+            get_field_2_data db2 pos ("person", "related") "data"
           in
-          loop [ip :: list] pos ]
+          loop [ip :: list] pos
+  | Person2Gen db2 p -> p.Def.related ]
 ;
 value get_rparents =
   fun
   [ Person p ->
       List.map (fun r -> map_relation_ps (fun x -> x) (fun i -> Istr i) r)
         p.Def.rparents
-  | Person2 bnc i ->
-      let pos = get_field_acc bnc i ("person", "rparents") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "rparents") in
       if pos = -1 then []
-      else get_field_data bnc pos ("person", "rparents") "data" ]
+      else get_field_data db2 pos ("person", "rparents") "data"
+  | Person2Gen db2 p -> p.Def.rparents ]
 ;
 value get_sex =
   fun
   [ Person p -> p.Def.sex
-  | Person2 bn i -> get_field bn i ("person", "sex") ]
+  | Person2 db2 i -> get_field db2 i ("person", "sex")
+  | Person2Gen db2 p -> p.Def.sex ]
 ;
 value get_surname =
   fun
   [ Person p -> Istr p.Def.surname
-  | Person2 bnc i -> make_istr2 bnc ("person", "surname") i ]
+  | Person2 db2 i -> make_istr2 db2 ("person", "surname") i
+  | Person2Gen db2 p -> p.Def.surname ]
 ;
 value get_surnames_aliases =
   fun
   [ Person p -> List.map (fun i -> Istr i) p.Def.surnames_aliases
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "surnames_aliases") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "surnames_aliases") in
       if pos = -1 then []
       else
         let list =
-          get_field_data bn pos ("person", "surnames_aliases") "data2.ext"
+          get_field_data db2 pos ("person", "surnames_aliases") "data2.ext"
         in
         List.map
-          (fun pos -> Istr2 bn ("person", "surnames_aliases") pos) list ]
+          (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos) list
+  | Person2Gen db2 p -> p.Def.surnames_aliases ]
 ;
 value get_titles =
   fun
   [ Person p ->
       List.map (fun t -> map_title_strings (fun i -> Istr i) t)
         p.Def.titles
-  | Person2 bn i ->
-      let pos = get_field_acc bn i ("person", "titles") in
+  | Person2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "titles") in
       if pos = -1 then []
       else
         let list =
-          get_field_data bn pos ("person", "titles") "data2.ext"
+          get_field_data db2 pos ("person", "titles") "data2.ext"
         in
         List.map
-          (map_title_strings (fun pos -> Istr2 bn ("person", "titles") pos))
-          list ]
+          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
+          list
+  | Person2Gen db2 p -> p.Def.titles ]
 ;
 
 value person_with_key p fn sn oc =
@@ -353,13 +387,15 @@ value person_with_key p fn sn oc =
 value person_with_related p r =
   match p with
   [ Person p -> Person {(p) with related = r}
-  | Person2 _ _ -> failwith "not impl person_with_key" ]
+  | Person2 _ _ -> failwith "not impl person_with_key"
+  | Person2Gen _ _ -> failwith "not impl person_with_key (gen)" ]
 ;
 
 value un_istr =
   fun
   [ Istr i -> i
-  | Istr2 _ _ i -> failwith "un_istr" ]
+  | Istr2 _ _ i -> failwith "un_istr"
+  | Istr2New _ _ -> failwith "un_istr" ]
 ;
 
 value person_with_rparents p r =
@@ -367,16 +403,19 @@ value person_with_rparents p r =
   [ Person p ->
       let r = List.map (map_relation_ps (fun p -> p) un_istr) r in
       Person {(p) with rparents = r}
-  | Person2 _ _ -> failwith "not impl person_with_rparents" ]
+  | Person2 _ _ -> failwith "not impl person_with_rparents"
+  | Person2Gen _ _ -> failwith "not impl person_with_rparents (gen)" ]
 ;
 value person_with_sex p s =
   match p with
   [ Person p -> Person {(p) with sex = s}
-  | Person2 _ _ -> failwith "not impl person_with_sex" ]
+  | Person2 _ _ -> failwith "not impl person_with_sex"
+  | Person2Gen _ _ -> failwith "not impl person_with_sex (gen)" ]
 ;
-value person_of_gen_person p =
-  let p = map_person_ps (fun p -> p) un_istr p in
-  Person p
+value person_of_gen_person base p =
+  match base with
+  [ Base base -> Person (map_person_ps (fun p -> p) un_istr p)
+  | Base2 db2 -> Person2Gen db2 p ]
 ;
 value gen_person_of_person =
   fun
@@ -396,7 +435,8 @@ value gen_person_of_person =
        death_src = get_death_src p; burial = get_burial p;
        burial_place = get_burial_place p; burial_src = get_burial_src p;
        notes = get_notes p; psources = get_psources p;
-       key_index = get_key_index p} ]
+       key_index = get_key_index p}
+  | Person2Gen _ _ -> failwith "not impl gen_person_of_person (gen)" ]
 ;
 
 value no_consang = Adef.fix (-1);
@@ -411,10 +451,10 @@ value get_consang =
 value get_parents =
   fun
   [ Ascend a -> a.Def.parents
-  | Ascend2 bn i ->
-      let pos = get_field_acc bn i ("person", "parents") in
+  | Ascend2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "parents") in
       if pos = -1 then None
-      else Some (get_field_data bn pos ("person", "parents") "data") ]
+      else Some (get_field_data db2 pos ("person", "parents") "data") ]
 ;
 
 value ascend_of_gen_ascend a = Ascend a;
@@ -440,13 +480,13 @@ value empty_person ip =
 value get_family =
   fun
   [ Union u -> u.Def.family
-  | Union2 bn i ->
-      let pos = get_field_acc bn i ("person", "family") in
+  | Union2 db2 i ->
+      let pos = get_field_acc db2 i ("person", "family") in
       loop [] pos where rec loop list pos =
         if pos = -1 then Array.of_list list
         else
           let (ifam, pos) =
-            get_field_2_data bn pos ("person", "family") "data"
+            get_field_2_data db2 pos ("person", "family") "data"
           in
           loop [ifam :: list] pos ]
 ;
@@ -456,12 +496,12 @@ value union_of_gen_union u = Union u;
 value get_comment =
   fun
   [ Family f -> Istr f.Def.comment
-  | Family2 bnc i -> make_istr2 bnc ("family", "comment") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "comment") i ]
 ;
 value get_divorce =
   fun
   [ Family f -> f.Def.divorce
-  | Family2 bn i -> get_field bn i ("family", "divorce") ]
+  | Family2 db2 i -> get_field db2 i ("family", "divorce") ]
 ;
 value get_fam_index =
   fun
@@ -471,37 +511,37 @@ value get_fam_index =
 value get_fsources =
   fun
   [ Family f -> Istr f.Def.fsources
-  | Family2 bnc i -> make_istr2 bnc ("family", "fsources") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "fsources") i ]
 ;
 value get_marriage =
   fun
   [ Family f -> f.Def.marriage
-  | Family2 bn i -> get_field bn i ("family", "marriage") ]
+  | Family2 db2 i -> get_field db2 i ("family", "marriage") ]
 ;
 value get_marriage_place =
   fun
   [ Family f -> Istr f.Def.marriage_place
-  | Family2 bnc i -> make_istr2 bnc ("family", "marriage_place") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_place") i ]
 ;
 value get_marriage_src =
   fun
   [ Family f -> Istr f.Def.marriage_src
-  | Family2 bnc i -> make_istr2 bnc ("family", "marriage_src") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_src") i ]
 ;
 value get_origin_file =
   fun
   [ Family f -> Istr f.Def.origin_file
-  | Family2 bnc i -> make_istr2 bnc ("family", "origin_file") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "origin_file") i ]
 ;
 value get_relation =
   fun
   [ Family f -> f.Def.relation
-  | Family2 bn i -> get_field bn i ("family", "relation") ]
+  | Family2 db2 i -> get_field db2 i ("family", "relation") ]
 ;
 value get_witnesses =
   fun
   [ Family f -> f.Def.witnesses
-  | Family2 bn i -> get_field bn i ("family", "witnesses") ]
+  | Family2 db2 i -> get_field db2 i ("family", "witnesses") ]
 ;
 
 value family_of_gen_family f =
@@ -521,19 +561,19 @@ value gen_family_of_family =
 value get_father =
   fun
   [ Couple c -> Adef.father c
-  | Couple2 bn i -> get_field bn i ("family", "father") ]
+  | Couple2 db2 i -> get_field db2 i ("family", "father") ]
 ;
 value get_mother =
   fun
   [ Couple c -> Adef.mother c
-  | Couple2 bn i -> get_field bn i ("family", "mother") ]
+  | Couple2 db2 i -> get_field db2 i ("family", "mother") ]
 ;
 value get_parent_array =
   fun
   [ Couple c -> Adef.parent_array c
-  | Couple2 bn i ->
-      let p1 = get_field bn i ("family", "father") in
-      let p2 = get_field bn i ("family", "mother") in
+  | Couple2 db2 i ->
+      let p1 = get_field db2 i ("family", "father") in
+      let p2 = get_field db2 i ("family", "mother") in
       [| p1; p2 |] ]
 ;
 
@@ -547,7 +587,7 @@ value gen_couple_of_couple =
 value get_children =
   fun
   [ Descend d -> d.Def.children
-  | Descend2 bn i -> get_field bn i ("family", "children") ]
+  | Descend2 db2 i -> get_field db2 i ("family", "children") ]
 ;
 
 value descend_of_gen_descend d = Descend d;
@@ -592,9 +632,10 @@ value doi base i =
 value sou base i =
   match (base, i) with
   [ (Base base, Istr i) -> base.data.strings.get (Adef.int_of_istr i)
-  | (Base2 _, Istr2 bn f pos) ->
+  | (Base2 _, Istr2 db2 f pos) ->
       if pos = -1 || pos = Db2.empty_string_pos then ""
-      else get_field_data bn pos f "data"
+      else get_field_data db2 pos f "data"
+  | (Base2 _, Istr2New db2 s) -> s
   | _ -> assert False ]
 ;
 
@@ -622,7 +663,8 @@ value nb_of_families base =
 value patch_person base ip p =
   match (base, p) with
   [ (Base base, Person p) -> base.func.patch_person ip p
-  | (Base2 _, _) -> failwith "not impl patch_person"
+  | (Base2 _, Person2 _ _) -> failwith "not impl patch_person"
+  | (Base2 _, Person2Gen db2 p) -> failwith "not impl patch_person (gen)"
   | _ -> assert False ]
 ;
 value patch_ascend base ip a =
@@ -659,7 +701,7 @@ value patch_name base =
 value insert_string base s =
   match base with
   [ Base base -> Istr (base.func.insert_string s)
-  | Base2 _ -> failwith "not impl insert_string" ]
+  | Base2 db2 -> Istr2New db2 s ]
 ;
 value commit_patches base =
   match base with
@@ -759,26 +801,26 @@ value person2_of_key {bdir = dir} fn sn oc =
   [ Not_found -> None ]
 ;
 
-value strings2_of_fsname {bdir = bn} f s =
+value strings2_of_fsname db2 f s =
   let k = Name.crush_lower s in
-  let dir = List.fold_left Filename.concat bn ["person"; f] in
+  let dir = List.fold_left Filename.concat db2.bdir ["person"; f] in
   hashtbl_find_all dir "string_of_crush.ht" k
 ;
 
-value persons2_of_name {bdir = bn} s =
-  let dir = Filename.concat bn "person_of_name" in
+value persons2_of_name db2 s =
+  let dir = Filename.concat db2.bdir "person_of_name" in
   hashtbl_find_all dir "person_of_name.ht" (Name.crush_lower s)
 ;
 
 value person_of_key base =
   match base with
   [ Base base -> base.func.person_of_key
-  | Base2 bn -> person2_of_key bn ]
+  | Base2 db2 -> person2_of_key db2 ]
 ;
 value persons_of_name base =
   match base with
   [ Base base -> base.func.persons_of_name
-  | Base2 bnc -> persons2_of_name bnc ]
+  | Base2 db2 -> persons2_of_name db2 ]
 ;
 value persons_of_first_name base =
   match base with
@@ -799,8 +841,8 @@ value spi_cursor spi s =
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2, Istr2 {bdir = bn} (f1, f2) pos) -> do {
-      let dir = List.fold_left Filename.concat bn [f1; f2] in
+  | (Spi2, Istr2 db2 (f1, f2) pos) -> do {
+      let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
       hashtbl_find_all dir "person_of_string.ht" pos
     }
   | _ -> failwith "not impl spi_find" ]
@@ -824,30 +866,23 @@ value base_visible_write base =
 value base_particles base =
   match base with
   [ Base base -> base.data.particles
-  | Base2 {bdir = bn} ->
-      Mutil.input_particles (Filename.concat bn "../particles.txt") ]
-
+  | Base2 db2 ->
+      Mutil.input_particles (Filename.concat db2.bdir "../particles.txt") ]
 ;
 
 value base_strings_of_first_name base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 bnc ->
-      let posl = strings2_of_fsname bnc "first_name" s in
-      List.map (fun pos -> Istr2 bnc ("person", "first_name") pos) posl ]
+  | Base2 db2 ->
+      let posl = strings2_of_fsname db2 "first_name" s in
+      List.map (fun pos -> Istr2 db2 ("person", "first_name") pos) posl ]
 ;
 value base_strings_of_surname base s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 bnc ->
-      let posl = strings2_of_fsname bnc "surname" s in
-      List.map (fun pos -> Istr2 bnc ("person", "surname") pos) posl ]
-;
-value base_cleanup base =
-  match base with
-  [ Base base -> base.func.cleanup ()
   | Base2 db2 ->
-      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache ]
+      let posl = strings2_of_fsname db2 "surname" s in
+      List.map (fun pos -> Istr2 db2 ("person", "surname") pos) posl ]
 ;
 
 value load_ascends_array base =
@@ -883,7 +918,8 @@ value persons_array base =
       let set i =
         fun
         [ Person p -> base.data.persons.set i p
-        | Person2 _ _ -> assert False ]
+        | Person2 _ _ -> assert False
+        | Person2Gen _ _ -> assert False ]
       in
       (get, set)
   | Base2 _ -> failwith "not impl persons_array" ]
@@ -1045,6 +1081,13 @@ value apply_as_dsk_base f base =
   | Base2 _ -> failwith "not impl apply_as_dsk_base" ]
 ;
 
+value dsk_person_of_person =
+  fun
+  [ Person p -> p
+  | Person2 _ _ -> failwith "not impl dsk_person_of_person"
+  | Person2Gen _ _ -> failwith "not impl dsk_person_of_person (gen)" ]
+;
+
 value base_of_base2 bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1052,8 +1095,20 @@ value base_of_base2 bname =
   Base2 {bdir = Filename.concat bname "base_d"; cache = Hashtbl.create 1}
 ;
 
-value dsk_person_of_person =
-  fun
-  [ Person p -> p
-  | Person2 _ _ -> failwith "not impl dsk_person_of_person" ]
+value open_base bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  if Sys.file_exists (Filename.concat bname "base_d") then do {
+    Printf.eprintf "*** database new implementation\n";
+    flush stderr; 
+    base_of_base2 bname
+  }
+  else base_of_dsk_base (Database.opendb bname)
+;
+
+value close_base base =
+  match base with
+  [ Base base -> base.func.cleanup ()
+  | Base2 db2 -> Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache ]
 ;

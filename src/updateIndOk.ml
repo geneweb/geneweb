@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.29 2006-10-20 05:29:43 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.30 2006-10-24 02:20:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -480,7 +480,7 @@ value effective_mod conf base sp =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
         (Gwdb.insert_string base) sp
     in
-    let np = person_of_gen_person {(np) with related = get_related op} in
+    let np = person_of_gen_person base {(np) with related = get_related op} in
     let op_misc_names = person_misc_names base op get_titles in
     let np_misc_names = person_misc_names base np get_titles in
     List.iter
@@ -504,7 +504,7 @@ value effective_add conf base sp =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
         (Gwdb.insert_string base) {(sp) with key_index = pi}
     in
-    let np = person_of_gen_person np in
+    let np = person_of_gen_person base np in
     let na = no_ascend () in
     let nu = union_of_gen_union {family = [| |]} in
     patch_person base pi np;
@@ -545,7 +545,7 @@ value effective_del conf base p = do {
         patch_ascend base ip asc;
       }
   | None -> () ];
-  person_of_gen_person
+  person_of_gen_person base
     {first_name = none; surname = none; occ = 0; image = empty;
      public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
      first_names_aliases = []; surnames_aliases = []; titles = [];

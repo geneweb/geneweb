@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.25 2006-10-20 05:29:43 ddr Exp $ *)
+(* $Id: update.ml,v 5.26 2006-10-24 02:20:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -717,7 +717,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             | _ -> (infer_death conf birth, "") ]
           in
           let p =
-            person_of_gen_person
+            person_of_gen_person base
               {first_name = Gwdb.insert_string base f;
                surname = Gwdb.insert_string base s; occ = o;
                image = empty_string;
