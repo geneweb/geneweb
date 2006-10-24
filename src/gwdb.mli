@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.55 2006-10-23 20:06:31 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.56 2006-10-24 02:20:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -20,6 +20,9 @@ type title = Def.gen_title istr;
 type string_person_index = 'abstract;
 
 type base = 'abstract;
+
+value open_base : string -> base;
+value close_base : base -> unit;
 
 value is_empty_string : istr -> bool;
 value is_quest_string : istr -> bool;
@@ -60,7 +63,7 @@ value person_with_key : person -> istr -> istr -> int -> person;
 value person_with_related : person -> list iper -> person;
 value person_with_rparents : person -> list relation -> person;
 value person_with_sex : person -> Def.sex -> person;
-value person_of_gen_person : Def.gen_person iper istr -> person;
+value person_of_gen_person : base -> Def.gen_person iper istr -> person;
 value gen_person_of_person : person -> Def.gen_person iper istr;
 
 value get_parents : ascend -> option ifam;
@@ -139,7 +142,6 @@ value base_visible_write : base -> unit;
 value base_particles : base -> list string;
 value base_strings_of_first_name : base -> string -> list istr;
 value base_strings_of_surname : base -> string -> list istr;
-value base_cleanup : base -> unit;
 
 value load_ascends_array : base -> unit;
 value load_unions_array : base -> unit;
@@ -172,5 +174,3 @@ value p_surname : base -> person -> string;
 value base_of_dsk_base : Dbdisk.dsk_base -> base;
 value apply_as_dsk_base : (Dbdisk.dsk_base -> 'a) -> base -> 'a;
 value dsk_person_of_person : person -> Dbdisk.dsk_person;
-
-value base_of_base2 : string -> base;

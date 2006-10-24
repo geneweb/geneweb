@@ -93,10 +93,10 @@ fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx secure.cmx
 futil.cmo: adef.cmi def.cmi mutil.cmi name.cmi futil.cmi 
 futil.cmx: adef.cmx def.cmi mutil.cmx name.cmx futil.cmi 
 futil.cmi: def.cmi 
-gutil.cmo: adef.cmi buff.cmo checkItem.cmi database.cmi def.cmi gwdb.cmi \
-    mutil.cmi name.cmi gutil.cmi 
-gutil.cmx: adef.cmx buff.cmx checkItem.cmx database.cmx def.cmi gwdb.cmx \
-    mutil.cmx name.cmx gutil.cmi 
+gutil.cmo: adef.cmi buff.cmo checkItem.cmi def.cmi gwdb.cmi mutil.cmi \
+    name.cmi gutil.cmi 
+gutil.cmx: adef.cmx buff.cmx checkItem.cmx def.cmi gwdb.cmx mutil.cmx \
+    name.cmx gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
     gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
@@ -118,10 +118,10 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi buff.cmo config.cmi db2.cmo dbdisk.cmi def.cmi futil.cmi \
-    iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
-gwdb.cmx: adef.cmx buff.cmx config.cmi db2.cmx dbdisk.cmi def.cmi futil.cmx \
-    iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
+gwdb.cmo: adef.cmi buff.cmo config.cmi database.cmi db2.cmo dbdisk.cmi \
+    def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx buff.cmx config.cmi database.cmx db2.cmx dbdisk.cmi \
+    def.cmi futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi config.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmo secure.cmi select.cmo 

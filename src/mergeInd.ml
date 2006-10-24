@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.22 2006-10-10 18:48:26 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.23 2006-10-24 02:20:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -319,7 +319,7 @@ value effective_merge_ind conf base p1 p2 =
     }
     else ();
     let p1 =
-      person_of_gen_person
+      person_of_gen_person base
         {(gen_person_of_person p1) with
          sex = if get_sex p2 <> Neuter then get_sex p2 else get_sex p1;
          birth =
