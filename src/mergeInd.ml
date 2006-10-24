@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.23 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.24 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -283,7 +283,8 @@ value reparent_ind base ip1 ip2 =
         in
         replace 0;
         let a1 =
-          ascend_of_gen_ascend {parents = Some ifam; consang = Adef.fix (-1)}
+          ascend_of_gen_ascend base
+            {parents = Some ifam; consang = Adef.fix (-1)}
         in
         patch_ascend base ip1 a1;
         patch_descend base ifam des;
@@ -310,11 +311,11 @@ value effective_merge_ind conf base p1 p2 =
       };
       let u1 = uoi base (get_key_index p1) in
       let u1 =
-        union_of_gen_union
+        union_of_gen_union base
           {family = Array.append (get_family u1) (get_family u2)}
       in
       patch_union base (get_key_index p1) u1;
-      let u2 = union_of_gen_union {family = [| |]} in
+      let u2 = union_of_gen_union base {family = [| |]} in
       patch_union base (get_key_index p2) u2;
     }
     else ();
@@ -414,7 +415,7 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
   let des1 = doi base (get_fam_index fam1) in
   let des2 = doi base (get_fam_index fam2) in
   let fam1 =
-    family_of_gen_family
+    family_of_gen_family base
       {(gen_family_of_family fam1) with
        marriage =
          if get_marriage fam1 = Adef.codate_None then get_marriage fam2
@@ -441,7 +442,7 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
     for i = 0 to Array.length (get_children des2) - 1 do {
       let ip = (get_children des2).(i) in
       let a =
-        ascend_of_gen_ascend
+        ascend_of_gen_ascend base
           {parents = Some (get_fam_index fam1); consang = Adef.fix (-1)}
       in
       patch_ascend base ip a;

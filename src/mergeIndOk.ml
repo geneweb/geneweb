@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.18 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.19 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -140,7 +140,7 @@ value effective_mod_merge conf base sp =
         MergeInd.reparent_ind base sp.key_index (get_key_index p2);
         let p2 = UpdateIndOk.effective_del conf base p2 in
         patch_person base (get_key_index p2) p2;
-        let u2 = union_of_gen_union {family = [| |]} in
+        let u2 = union_of_gen_union base {family = [| |]} in
         patch_union base (get_key_index p2) u2;
         let p = UpdateIndOk.effective_mod conf base sp in
         let u = uoi base (get_key_index p) in
@@ -257,7 +257,7 @@ value effective_mod_merge conf base sp =
         patch_person base (get_key_index p) p;
         if p2_family <> [| |] then do {
           let u =
-            union_of_gen_union
+            union_of_gen_union base
               {family = Array.append (get_family u) p2_family}
           in
           patch_union base (get_key_index p) u;

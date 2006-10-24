@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.56 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.57 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -69,11 +69,11 @@ value gen_person_of_person : person -> Def.gen_person iper istr;
 value get_parents : ascend -> option ifam;
 value get_consang : ascend -> Adef.fix;
 
-value ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
+value ascend_of_gen_ascend : base -> Def.gen_ascend ifam -> ascend;
 
 value get_family : union -> array ifam;
 
-value union_of_gen_union : Def.gen_union ifam -> union;
+value union_of_gen_union : base -> Def.gen_union ifam -> union;
 
 value get_comment : family -> istr;
 value get_divorce : family -> Def.divorce;
@@ -86,7 +86,9 @@ value get_origin_file : family -> istr;
 value get_relation : family -> Def.relation_kind;
 value get_witnesses : family -> array iper;
 
-value family_of_gen_family : Def.gen_family iper istr -> family;
+value family_with_origin_file : family -> istr -> ifam -> family;
+
+value family_of_gen_family : base -> Def.gen_family iper istr -> family;
 value gen_family_of_family : family -> Def.gen_family iper istr;
 
 value get_father : couple -> iper;

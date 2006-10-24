@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.30 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.31 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -505,8 +505,8 @@ value effective_add conf base sp =
         (Gwdb.insert_string base) {(sp) with key_index = pi}
     in
     let np = person_of_gen_person base np in
-    let na = no_ascend () in
-    let nu = union_of_gen_union {family = [| |]} in
+    let na = no_ascend base in
+    let nu = union_of_gen_union base {family = [| |]} in
     patch_person base pi np;
     patch_ascend base pi na;
     patch_union base pi nu;
@@ -538,7 +538,7 @@ value effective_del conf base p = do {
           {children = array_except ip (get_children des)}
       in
       let asc =
-        ascend_of_gen_ascend {parents = None; consang = Adef.fix (-1)}
+        ascend_of_gen_ascend base {parents = None; consang = Adef.fix (-1)}
       in
       do {
         patch_descend base ifam des;
