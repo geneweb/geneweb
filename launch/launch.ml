@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.16 2006-10-20 18:36:41 ddr Exp $ *)
+(* $Id: launch.ml,v 1.17 2006-10-24 03:08:37 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -15,6 +15,7 @@ type state =
     server_running : mutable bool }
 ;
 
+value trace = ref False;
 value config_file = Filename.concat "gw" "config.txt";
 
 value read_config_env () =
@@ -281,7 +282,10 @@ and new_database state = do {
 value launch_server state = do {
   let only = Unix.gethostname () in
   let fd =
-    Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o644
+    if trace.val then Unix.stdout
+    else
+      Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC]
+        0o644
   in
   let stop_server =
     List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
@@ -593,7 +597,14 @@ value default_port = 2317;
 value default_browser = None;
 value default_bases_dir = "../../gwbases";
 
+value speclist = [("-trace", Arg.Set trace, " Trace server")];
+value anon_fun s =
+  raise (Arg.Bad (sprintf "Don't know what to do with %s" s))
+;
+value usage_msg = "Usage: launch [option]";
+
 value main () = do {
+  Arg.parse (Arg.align speclist) anon_fun usage_msg;
   let config_env = read_config_env () in
   let win = openTk () in
   let state =
