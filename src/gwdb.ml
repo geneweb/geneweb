@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.75 2006-10-24 03:24:23 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.76 2006-10-24 10:56:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -328,15 +328,17 @@ value get_related =
 value get_rparents =
   fun
   [ Person p ->
-      List.map (fun r -> map_relation_ps (fun x -> x) (fun i -> Istr i) r)
-        p.Def.rparents
+      List.map (map_relation_ps (fun x -> x) (fun i -> Istr i)) p.Def.rparents
   | Person2 db2 i ->
       let pos = get_field_acc db2 i ("person", "rparents") in
       if pos = -1 then []
-      else get_field_data db2 pos ("person", "rparents") "data"
+      else
+        let rl = get_field_data db2 pos ("person", "rparents") "data" in
+        List.map (* field "r_sources" is actually unused *)
+          (map_relation_ps (fun x -> x) (fun _ -> Istr2 db2 ("", "") (-1)))
+          rl
   | Person2Gen db2 p ->
-      List.map
-        (fun r -> map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s) r)
+      List.map (map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s))
         p.Def.rparents ]
 ;
 value get_sex =
@@ -434,6 +436,7 @@ value person_of_gen_person base p =
       let p = map_person_ps (fun p -> p) un_istr2 p in
       Person2Gen db2 p ]
 ;
+
 value gen_person_of_person =
   fun
   [ Person p -> map_person_ps (fun p -> p) (fun s -> Istr s) p
