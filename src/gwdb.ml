@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.79 2006-10-24 19:27:42 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.80 2006-10-24 20:14:27 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -9,19 +9,16 @@ open Futil;
 open Mutil;
 open Printf;
 
-type patches_ht 'a 'b =
-  { pa_len : mutable int;
-    pa_ht : Hashtbl.t 'a 'b }
-;
-
 type patches =
-  { h_person : patches_ht iper (gen_person iper string);
-    h_ascend : patches_ht iper (gen_ascend ifam);
-    h_union : patches_ht iper (gen_union ifam);
-    h_family : patches_ht ifam (gen_family iper string);
-    h_couple : patches_ht ifam (gen_couple iper);
-    h_descend : patches_ht ifam (gen_descend iper);
-    h_name : patches_ht int (list iper) }
+  { max_per : mutable int;
+    max_fam : mutable int;
+    h_person : Hashtbl.t iper (gen_person iper string);
+    h_ascend : Hashtbl.t iper (gen_ascend ifam);
+    h_union : Hashtbl.t iper (gen_union ifam);
+    h_family : Hashtbl.t ifam (gen_family iper string);
+    h_couple : Hashtbl.t ifam (gen_couple iper);
+    h_descend : Hashtbl.t ifam (gen_descend iper);
+    h_name : Hashtbl.t string (list iper) }
 ;
 
 type db2 =
@@ -624,8 +621,8 @@ value family_with_origin_file f orf fi =
         else get_field_data db2 pos path "data"
       in
       Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
-  | (Family2Gen _ _, Istr2New _ _) ->
-      failwith "not impl family_with_origin_file (new)"
+  | (Family2Gen db2 f, Istr2New _ orf) ->
+      Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
   | _ -> assert False ]
 ;
 
@@ -707,21 +704,21 @@ value poi base i =
   match base with
   [ Base base -> Person (base.data.persons.get (Adef.int_of_iper i))
   | Base2 db2 ->
-      try Person2Gen db2 (Hashtbl.find db2.patches.h_person.pa_ht i) with
+      try Person2Gen db2 (Hashtbl.find db2.patches.h_person i) with
       [ Not_found -> Person2 db2 (Adef.int_of_iper i) ] ]
 ;
 value aoi base i =
   match base with
   [ Base base -> Ascend (base.data.ascends.get (Adef.int_of_iper i))
   | Base2 db2 ->
-      try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend.pa_ht i) with
+      try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend i) with
       [ Not_found -> Ascend2 db2 (Adef.int_of_iper i) ] ]
 ;
 value uoi base i =
   match base with
   [ Base base -> Union (base.data.unions.get (Adef.int_of_iper i))
   | Base2 db2 ->
-      try Union2Gen db2 (Hashtbl.find db2.patches.h_union.pa_ht i) with
+      try Union2Gen db2 (Hashtbl.find db2.patches.h_union i) with
       [ Not_found -> Union2 db2 (Adef.int_of_iper i) ] ]
 ;
 
@@ -729,21 +726,21 @@ value foi base i =
   match base with
   [ Base base -> Family (base.data.families.get (Adef.int_of_ifam i))
   | Base2 db2 ->
-      try Family2Gen db2 (Hashtbl.find db2.patches.h_family.pa_ht i) with
+      try Family2Gen db2 (Hashtbl.find db2.patches.h_family i) with
       [ Not_found -> Family2 db2 (Adef.int_of_ifam i) ] ]
 ;
 value coi base i =
   match base with
   [ Base base -> Couple (base.data.couples.get (Adef.int_of_ifam i))
   | Base2 db2 ->
-      try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple.pa_ht i) with
+      try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple i) with
       [ Not_found -> Couple2 db2 (Adef.int_of_ifam i) ] ]
 ;
 value doi base i =
   match base with
   [ Base base -> Descend (base.data.descends.get (Adef.int_of_ifam i))
   | Base2 db2 ->
-      try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend.pa_ht i) with
+      try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend i) with
       [ Not_found -> Descend2 db2 (Adef.int_of_ifam i) ] ]
 ;
 
@@ -760,79 +757,103 @@ value sou base i =
 value nb_of_persons base =
   match base with
   [ Base base -> base.data.persons.len
-  | Base2 {bdir = dir} ->
-      let fname =
-        List.fold_left Filename.concat dir ["person"; "sex"; "access"]
-      in
-      let st = Unix.lstat fname in
-      st.Unix.st_size / 4 ]
+  | Base2 db2 ->
+      if db2.patches.max_per > 0 then db2.patches.max_per
+      else
+        let fname =
+          List.fold_left Filename.concat db2.bdir ["person"; "sex"; "access"]
+        in
+        let st = Unix.lstat fname in
+        st.Unix.st_size / 4 ]
 ;
+
 value nb_of_families base =
   match base with
   [ Base base -> base.data.families.len
-  | Base2 {bdir = dir} ->
-      let fname =
-        List.fold_left Filename.concat dir ["family"; "marriage"; "access"]
-      in
-      let st = Unix.lstat fname in
-      st.Unix.st_size / 4 ]
+  | Base2 db2 ->
+      if db2.patches.max_fam > 0 then db2.patches.max_fam
+      else
+        let fname =
+          List.fold_left Filename.concat db2.bdir
+            ["family"; "marriage"; "access"]
+        in
+        let st = Unix.lstat fname in
+        st.Unix.st_size / 4 ]
 ;
 
 value patch_person base ip p =
   match (base, p) with
   [ (Base base, Person p) -> base.func.patch_person ip p
-  | (Base2 _, Person2Gen db2 p) ->
-      Hashtbl.replace db2.patches.h_person.pa_ht ip p
+  | (Base2 _, Person2Gen db2 p) -> do {
+      Hashtbl.replace db2.patches.h_person ip p;
+      db2.patches.max_per :=
+        max (Adef.int_of_iper ip + 1) db2.patches.max_per;
+    }
   | _ -> assert False ]
 ;
 value patch_ascend base ip a =
   match (base, a) with
   [ (Base base, Ascend a) -> base.func.patch_ascend ip a
-  | (Base2 _, Ascend2Gen db2 a) ->
-      Hashtbl.replace db2.patches.h_ascend.pa_ht ip a
+  | (Base2 _, Ascend2Gen db2 a) -> do {
+      Hashtbl.replace db2.patches.h_ascend ip a;
+      db2.patches.max_per :=
+        max (Adef.int_of_iper ip + 1) db2.patches.max_per;
+    }
   | _ -> assert False ]
 ;
 value patch_union base ip u =
   match (base, u) with
   [ (Base base, Union u) -> base.func.patch_union ip u
-  | (Base2 _, Union2Gen db2 u) ->
-      Hashtbl.replace db2.patches.h_union.pa_ht ip u
+  | (Base2 _, Union2Gen db2 u) -> do {
+      Hashtbl.replace db2.patches.h_union ip u;
+      db2.patches.max_per :=
+        max (Adef.int_of_iper ip + 1) db2.patches.max_per;
+    }
   | _ -> failwith "not impl patch_union" ]
 ;
+
 value patch_family base ifam f =
   match (base, f) with
   [ (Base base, Family f) -> base.func.patch_family ifam f
-  | (Base2 _, Family2Gen db2 f) ->
-      Hashtbl.replace db2.patches.h_family.pa_ht ifam f
+  | (Base2 _, Family2Gen db2 f) -> do {
+      Hashtbl.replace db2.patches.h_family ifam f;
+      db2.patches.max_fam :=
+        max (Adef.int_of_ifam ifam + 1) db2.patches.max_fam;
+    }
   | _ -> failwith "not impl patch_family" ]
 ;
 value patch_descend base ifam d =
   match (base, d) with
   [ (Base base, Descend d) -> base.func.patch_descend ifam d
-  | (Base2 _, Descend2Gen db2 d) ->
-      Hashtbl.replace db2.patches.h_descend.pa_ht ifam d
+  | (Base2 _, Descend2Gen db2 d) -> do {
+      Hashtbl.replace db2.patches.h_descend ifam d;
+      db2.patches.max_fam :=
+        max (Adef.int_of_ifam ifam + 1) db2.patches.max_fam;
+    }
   | _ -> failwith "not impl patch_descend" ]
 ;
 value patch_couple base ifam c =
   match (base, c) with
   [ (Base base, Couple c) -> base.func.patch_couple ifam c
-  | (Base2 _, Couple2Gen db2 c) ->
-      Hashtbl.replace db2.patches.h_couple.pa_ht ifam c
+  | (Base2 _, Couple2Gen db2 c) -> do {
+      Hashtbl.replace db2.patches.h_couple ifam c;
+      db2.patches.max_fam :=
+        max (Adef.int_of_ifam ifam + 1) db2.patches.max_fam;
+    }
   | _ -> failwith "not impl patch_couple" ]
 ;
+
 value patch_name base s ip =
   match base with
   [ Base base -> base.func.patch_name s ip
   | Base2 db2 ->
       let s = Name.crush_lower s in
-      let i = Hashtbl.hash s in
-      let ht = db2.patches.h_name.pa_ht in
+      let ht = db2.patches.h_name in
       try
-        let ipl = Hashtbl.find ht i in
-        if List.mem ip ipl then ()
-        else Hashtbl.replace ht i [ip :: ipl]
+        let ipl = Hashtbl.find ht s in
+        if List.mem ip ipl then () else Hashtbl.replace ht s [ip :: ipl]
       with
-      [ Not_found -> Hashtbl.add ht i [ip] ] ]
+      [ Not_found -> Hashtbl.add ht s [ip] ] ]
 
 ;
 value insert_string base s =
@@ -928,8 +949,8 @@ value key_hashtbl_find dir file (fn, sn, oc) =
   hashtbl_find dir file key
 ;
 
-value person2_of_key {bdir = dir} fn sn oc =
-  let person_of_key_d = Filename.concat dir "person_of_key" in
+value person2_of_key db2 fn sn oc =
+  let person_of_key_d = Filename.concat db2.bdir "person_of_key" in
   try do {
     let ifn =
       let fn = Name.lower (nominative fn) in
@@ -953,8 +974,11 @@ value strings2_of_fsname db2 f s =
 ;
 
 value persons2_of_name db2 s =
+  let s = Name.crush_lower s in
   let dir = Filename.concat db2.bdir "person_of_name" in
-  hashtbl_find_all dir "person_of_name.ht" (Name.crush_lower s)
+  List.rev_append
+    (try Hashtbl.find db2.patches.h_name s with [ Not_found -> [] ])
+    (hashtbl_find_all dir "person_of_name.ht" s)
 ;
 
 value person_of_key base =
@@ -1247,8 +1271,9 @@ value base_of_base2 bname =
         ht
       }
     | None ->
-        let empty_patch () = {pa_len = 0; pa_ht = Hashtbl.create 1} in
-        {h_person = empty_patch (); h_ascend = empty_patch ();
+        let empty_patch () = Hashtbl.create 1 in
+        {max_per = 0; max_fam = 0;
+         h_person = empty_patch (); h_ascend = empty_patch ();
          h_union = empty_patch (); h_family = empty_patch ();
          h_couple = empty_patch (); h_descend = empty_patch ();
          h_name = empty_patch ()} ]
