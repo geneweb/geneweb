@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.74 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.75 2006-10-24 03:24:23 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -11,7 +11,8 @@ open Printf;
 
 type db2 =
   { bdir : string;
-    cache : Hashtbl.t (string * string * string) in_channel }
+    cache_chan : Hashtbl.t (string * string * string) in_channel;
+    patches : Hashtbl.t iper (gen_person iper string) }
 ;
 
 type istr =
@@ -23,7 +24,7 @@ type istr =
 type person =
   [ Person of dsk_person
   | Person2 of db2 and int
-  | Person2Gen of db2 and gen_person iper istr ]
+  | Person2Gen of db2 and gen_person iper string ]
 ;
 type ascend =
   [ Ascend of dsk_ascend
@@ -68,13 +69,13 @@ type base =
 
 value get_field_acc db2 i (f1, f2) = do {
   let ic =
-    try Hashtbl.find db2.cache (f1, f2, "access") with
+    try Hashtbl.find db2.cache_chan (f1, f2, "access") with
     [ Not_found -> do {
         let ic =
           open_in_bin (List.fold_left Filename.concat db2.bdir
             [f1; f2; "access"])
         in
-        Hashtbl.add db2.cache (f1, f2, "access") ic;
+        Hashtbl.add db2.cache_chan (f1, f2, "access") ic;
         ic
       } ]
   in
@@ -87,13 +88,13 @@ let _ = do { Printf.eprintf "acc %d %s %s \n" i f1 f2; flush stderr; } in
 
 value get_field_data db2 pos (f1, f2) data = do {
   let ic =
-    try Hashtbl.find db2.cache (f1, f2, data) with
+    try Hashtbl.find db2.cache_chan (f1, f2, data) with
     [ Not_found -> do {
         let ic =
           open_in_bin
             (List.fold_left Filename.concat db2.bdir [f1; f2; data])
         in
-        Hashtbl.add db2.cache (f1, f2, data) ic;
+        Hashtbl.add db2.cache_chan (f1, f2, data) ic;
         ic
       } ]
   in
@@ -106,13 +107,13 @@ let _ = do { Printf.eprintf "dat %d %s %s \n" pos f1 f2; flush stderr; } in
 
 value get_field_2_data db2 pos (f1, f2) data = do {
   let ic =
-    try Hashtbl.find db2.cache (f1, f2, data) with
+    try Hashtbl.find db2.cache_chan (f1, f2, data) with
     [ Not_found -> do {
         let ic =
           open_in_bin
             (List.fold_left Filename.concat db2.bdir [f1; f2; data])
         in
-        Hashtbl.add db2.cache (f1, f2, data) ic;
+        Hashtbl.add db2.cache_chan (f1, f2, data) ic;
         ic
       } ]
   in
@@ -160,7 +161,7 @@ value get_aliases =
       else
         let list = get_field_data db2 pos ("person", "aliases") "data2.ext" in
         List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list
-  | Person2Gen db2 p -> p.Def.aliases ]
+  | Person2Gen db2 p -> List.map (fun s -> Istr2New db2 s) p.Def.aliases ]
 ;
 value get_baptism =
   fun
@@ -172,13 +173,13 @@ value get_baptism_place =
   fun
   [ Person p -> Istr p.Def.baptism_place
   | Person2 db2 i -> make_istr2 db2 ("person", "baptism_place") i
-  | Person2Gen db2 p -> p.Def.baptism_place ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.baptism_place ]
 ;
 value get_baptism_src =
   fun
   [ Person p -> Istr p.Def.baptism_src
   | Person2 db2 i -> make_istr2 db2 ("person", "baptism_src") i
-  | Person2Gen db2 p -> p.Def.baptism_src ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.baptism_src ]
 ;
 value get_birth =
   fun
@@ -190,13 +191,13 @@ value get_birth_place =
   fun
   [ Person p -> Istr p.Def.birth_place
   | Person2 db2 i -> make_istr2 db2 ("person", "birth_place") i
-  | Person2Gen db2 p -> p.Def.birth_place ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.birth_place ]
 ;
 value get_birth_src =
   fun
   [ Person p -> Istr p.Def.birth_src
   | Person2 db2 i -> make_istr2 db2 ("person", "birth_src") i
-  | Person2Gen db2 p -> p.Def.birth_src ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.birth_src ]
 ;
 value get_burial =
   fun
@@ -208,13 +209,13 @@ value get_burial_place =
   fun
   [ Person p -> Istr p.Def.burial_place
   | Person2 db2 i -> make_istr2 db2 ("person", "burial_place") i
-  | Person2Gen db2 p -> p.Def.burial_place ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.burial_place ]
 ;
 value get_burial_src =
   fun
   [ Person p -> Istr p.Def.burial_src
   | Person2 db2 i -> make_istr2 db2 ("person", "burial_src") i
-  | Person2Gen db2 p -> p.Def.burial_src ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.burial_src ]
 ;
 value get_death =
   fun
@@ -226,19 +227,19 @@ value get_death_place =
   fun
   [ Person p -> Istr p.Def.death_place
   | Person2 db2 i -> make_istr2 db2 ("person", "death_place") i
-  | Person2Gen db2 p -> p.Def.death_place ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.death_place ]
 ;
 value get_death_src =
   fun
   [ Person p -> Istr p.Def.death_src
   | Person2 db2 i -> make_istr2 db2 ("person", "death_src") i
-  | Person2Gen db2 p -> p.Def.death_src ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.death_src ]
 ;
 value get_first_name =
   fun
   [ Person p -> Istr p.Def.first_name
   | Person2 db2 i -> make_istr2 db2 ("person", "first_name") i
-  | Person2Gen db2 p -> p.Def.first_name ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.first_name ]
 ;
 value get_first_names_aliases =
   fun
@@ -252,13 +253,14 @@ value get_first_names_aliases =
         in
         List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
           list
-  | Person2Gen db2 p -> p.Def.first_names_aliases ]
+  | Person2Gen db2 p ->
+      List.map (fun s -> Istr2New db2 s) p.Def.first_names_aliases ]
 ;
 value get_image =
   fun
   [ Person p -> Istr p.Def.image
   | Person2 db2 i -> make_istr2 db2 ("person", "image") i
-  | Person2Gen db2 p -> p.Def.image ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.image ]
 ;
 value get_key_index =
   fun
@@ -270,7 +272,7 @@ value get_notes =
   fun
   [ Person p -> Istr p.Def.notes
   | Person2 db2 i -> make_istr2 db2 ("person", "notes") i
-  | Person2Gen db2 p -> p.Def.notes ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.notes ]
 ;
 value get_occ =
   fun
@@ -282,19 +284,19 @@ value get_occupation =
   fun
   [ Person p -> Istr p.Def.occupation
   | Person2 db2 i -> make_istr2 db2 ("person", "occupation") i
-  | Person2Gen db2 p -> p.Def.occupation ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.occupation ]
 ;
 value get_psources =
   fun
   [ Person p -> Istr p.Def.psources
   | Person2 db2 i -> make_istr2 db2 ("person", "psources") i
-  | Person2Gen db2 p -> p.Def.psources ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.psources ]
 ;
 value get_public_name =
   fun
   [ Person p -> Istr p.Def.public_name
   | Person2 db2 i -> make_istr2 db2 ("person", "public_name") i
-  | Person2Gen db2 p -> p.Def.public_name ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.public_name ]
 ;
 value get_qualifiers =
   fun
@@ -307,7 +309,7 @@ value get_qualifiers =
           get_field_data db2 pos ("person", "qualifiers") "data2.ext"
         in
         List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list
-  | Person2Gen db2 p -> p.Def.qualifiers ]
+  | Person2Gen db2 p -> List.map (fun s -> Istr2New db2 s) p.Def.qualifiers ]
 ;
 value get_related =
   fun
@@ -332,7 +334,10 @@ value get_rparents =
       let pos = get_field_acc db2 i ("person", "rparents") in
       if pos = -1 then []
       else get_field_data db2 pos ("person", "rparents") "data"
-  | Person2Gen db2 p -> p.Def.rparents ]
+  | Person2Gen db2 p ->
+      List.map
+        (fun r -> map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s) r)
+        p.Def.rparents ]
 ;
 value get_sex =
   fun
@@ -344,7 +349,7 @@ value get_surname =
   fun
   [ Person p -> Istr p.Def.surname
   | Person2 db2 i -> make_istr2 db2 ("person", "surname") i
-  | Person2Gen db2 p -> p.Def.surname ]
+  | Person2Gen db2 p -> Istr2New db2 p.Def.surname ]
 ;
 value get_surnames_aliases =
   fun
@@ -358,7 +363,8 @@ value get_surnames_aliases =
         in
         List.map
           (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos) list
-  | Person2Gen db2 p -> p.Def.surnames_aliases ]
+  | Person2Gen db2 p ->
+      List.map (fun s -> Istr2New db2 s) p.Def.surnames_aliases ]
 ;
 value get_titles =
   fun
@@ -375,7 +381,9 @@ value get_titles =
         List.map
           (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
           list
-  | Person2Gen db2 p -> p.Def.titles ]
+  | Person2Gen db2 p ->
+      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
+        p.Def.titles ]
 ;
 
 value person_with_key p fn sn oc =
@@ -398,6 +406,13 @@ value un_istr =
   | Istr2New _ _ -> failwith "un_istr" ]
 ;
 
+value un_istr2 =
+  fun
+  [ Istr _ -> failwith "un_istr2 1"
+  | Istr2 _ _ _ -> failwith "un_istr2 2"
+  | Istr2New _ s -> s ]
+;
+
 value person_with_rparents p r =
   match p with
   [ Person p ->
@@ -415,7 +430,9 @@ value person_with_sex p s =
 value person_of_gen_person base p =
   match base with
   [ Base base -> Person (map_person_ps (fun p -> p) un_istr p)
-  | Base2 db2 -> Person2Gen db2 p ]
+  | Base2 db2 ->
+      let p = map_person_ps (fun p -> p) un_istr2 p in
+      Person2Gen db2 p ]
 ;
 value gen_person_of_person =
   fun
@@ -436,7 +453,8 @@ value gen_person_of_person =
        burial_place = get_burial_place p; burial_src = get_burial_src p;
        notes = get_notes p; psources = get_psources p;
        key_index = get_key_index p}
-  | Person2Gen _ _ -> failwith "not impl gen_person_of_person (gen)" ]
+  | Person2Gen db2 p ->
+      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p ]
 ;
 
 value no_consang = Adef.fix (-1);
@@ -600,33 +618,35 @@ value gen_descend_of_descend =
 value poi base i =
   match base with
   [ Base base -> Person (base.data.persons.get (Adef.int_of_iper i))
-  | Base2 fn -> Person2 fn (Adef.int_of_iper i) ]
+  | Base2 db2 ->
+      try Person2Gen db2 (Hashtbl.find db2.patches i) with
+      [ Not_found -> Person2 db2 (Adef.int_of_iper i) ] ]
 ;
 value aoi base i =
   match base with
   [ Base base -> Ascend (base.data.ascends.get (Adef.int_of_iper i))
-  | Base2 fn -> Ascend2 fn (Adef.int_of_iper i) ]
+  | Base2 db2 -> Ascend2 db2 (Adef.int_of_iper i) ]
 ;
 value uoi base i =
   match base with
   [ Base base -> Union (base.data.unions.get (Adef.int_of_iper i))
-  | Base2 fn -> Union2 fn (Adef.int_of_iper i) ]
+  | Base2 db2 -> Union2 db2 (Adef.int_of_iper i) ]
 ;
 
 value foi base i =
   match base with
   [ Base base -> Family (base.data.families.get (Adef.int_of_ifam i))
-  | Base2 fn -> Family2 fn (Adef.int_of_ifam i) ]
+  | Base2 db2 -> Family2 db2 (Adef.int_of_ifam i) ]
 ;
 value coi base i =
   match base with
   [ Base base -> Couple (base.data.couples.get (Adef.int_of_ifam i))
-  | Base2 fn -> Couple2 fn (Adef.int_of_ifam i) ]
+  | Base2 db2 -> Couple2 db2 (Adef.int_of_ifam i) ]
 ;
 value doi base i =
   match base with
   [ Base base -> Descend (base.data.descends.get (Adef.int_of_ifam i))
-  | Base2 fn -> Descend2 fn (Adef.int_of_ifam i) ]
+  | Base2 db2 -> Descend2 db2 (Adef.int_of_ifam i) ]
 ;
 
 value sou base i =
@@ -664,7 +684,7 @@ value patch_person base ip p =
   match (base, p) with
   [ (Base base, Person p) -> base.func.patch_person ip p
   | (Base2 _, Person2 _ _) -> failwith "not impl patch_person"
-  | (Base2 _, Person2Gen db2 p) -> failwith "not impl patch_person (gen)"
+  | (Base2 _, Person2Gen db2 p) -> Hashtbl.replace db2.patches ip p
   | _ -> assert False ]
 ;
 value patch_ascend base ip a =
@@ -706,7 +726,15 @@ value insert_string base s =
 value commit_patches base =
   match base with
   [ Base base -> base.func.commit_patches ()
-  | Base2 _ -> failwith "not impl commit_patches" ]
+  | Base2 db2 -> do {
+      let fname = Filename.concat db2.bdir "patches" in
+      let oc = open_out_bin (fname ^ "1") in
+      output_value oc db2.patches;
+      close_out oc;
+      remove_file (fname ^ "~");
+      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+      Sys.rename (fname ^ "1") fname
+    } ]
 ;
 value commit_notes base =
   match base with
@@ -999,20 +1027,20 @@ value read_notes bname fnotes rn_mode =
     }
   | None -> "" ]
 ;
-value base_notes_read base fn =
+value base_notes_read base db2 =
   match base with
-  [ Base base -> base.data.bnotes.nread fn RnAll
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fn RnAll ]
+  [ Base base -> base.data.bnotes.nread db2 RnAll
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 RnAll ]
 ;
-value base_notes_read_first_line base fn =
+value base_notes_read_first_line base db2 =
   match base with
-  [ Base base -> base.data.bnotes.nread fn Rn1Ln
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fn Rn1Ln ]
+  [ Base base -> base.data.bnotes.nread db2 Rn1Ln
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 Rn1Ln ]
 ;
-value base_notes_are_empty base fn =
+value base_notes_are_empty base db2 =
   match base with
-  [ Base base -> base.data.bnotes.nread fn RnDeg = ""
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fn RnDeg = "" ]
+  [ Base base -> base.data.bnotes.nread db2 RnDeg = ""
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 RnDeg = "" ]
 ;
 value base_notes_origin_file base =
   match base with
@@ -1092,7 +1120,18 @@ value base_of_base2 bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  Base2 {bdir = Filename.concat bname "base_d"; cache = Hashtbl.create 1}
+  let bdir = Filename.concat bname "base_d" in
+  let patches =
+    let patch_fname = Filename.concat bdir "patches" in
+    match try Some (open_in_bin patch_fname) with [ Sys_error _ -> None ] with
+    [ Some ic -> do {
+        let ht = input_value ic in
+        close_in ic;
+        ht
+      }
+    | None -> Hashtbl.create 1 ]
+  in
+  Base2 {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches}
 ;
 
 value open_base bname =
@@ -1110,5 +1149,6 @@ value open_base bname =
 value close_base base =
   match base with
   [ Base base -> base.func.cleanup ()
-  | Base2 db2 -> Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache ]
+  | Base2 db2 ->
+      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan ]
 ;
