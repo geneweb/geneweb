@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.76 2006-10-24 10:56:56 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.77 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -9,10 +9,25 @@ open Futil;
 open Mutil;
 open Printf;
 
+type patches_ht 'a 'b =
+  { pa_len : mutable int;
+    pa_ht : Hashtbl.t 'a 'b }
+;
+
+type patches =
+  { h_person : patches_ht iper (gen_person iper string);
+    h_ascend : patches_ht iper (gen_ascend ifam);
+    h_union : patches_ht iper (gen_union ifam);
+    h_family : patches_ht ifam (gen_family iper string);
+    h_couple : patches_ht ifam (gen_couple iper);
+    h_descend : patches_ht ifam (gen_descend iper);
+    h_name : patches_ht int (list iper) }
+;
+
 type db2 =
   { bdir : string;
     cache_chan : Hashtbl.t (string * string * string) in_channel;
-    patches : Hashtbl.t iper (gen_person iper string) }
+    patches : patches }
 ;
 
 type istr =
@@ -28,16 +43,19 @@ type person =
 ;
 type ascend =
   [ Ascend of dsk_ascend
-  | Ascend2 of db2 and int ]
+  | Ascend2 of db2 and int
+  | Ascend2Gen of db2 and gen_ascend ifam ]
 ;
 type union =
   [ Union of dsk_union
-  | Union2 of db2 and int ]
+  | Union2 of db2 and int
+  | Union2Gen of db2 and gen_union ifam ]
 ;
 
 type family =
   [ Family of dsk_family
-  | Family2 of db2 and int ]
+  | Family2 of db2 and int
+  | Family2Gen of db2 and gen_family iper string ]
 ;
 type couple =
   [ Couple of dsk_couple
@@ -427,14 +445,13 @@ value person_with_sex p s =
   match p with
   [ Person p -> Person {(p) with sex = s}
   | Person2 _ _ -> failwith "not impl person_with_sex"
-  | Person2Gen _ _ -> failwith "not impl person_with_sex (gen)" ]
+  | Person2Gen db2 p -> Person2Gen db2 {(p) with sex = s} ]
 ;
+
 value person_of_gen_person base p =
   match base with
-  [ Base base -> Person (map_person_ps (fun p -> p) un_istr p)
-  | Base2 db2 ->
-      let p = map_person_ps (fun p -> p) un_istr2 p in
-      Person2Gen db2 p ]
+  [ Base _ -> Person (map_person_ps (fun p -> p) un_istr p)
+  | Base2 db2 -> Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p) ]
 ;
 
 value gen_person_of_person =
@@ -467,7 +484,8 @@ value get_consang =
   [ Ascend a -> a.Def.consang
   | Ascend2 db2 i ->
       try get_field db2 i ("person", "consang") with
-      [ Sys_error _ -> no_consang ] ]
+      [ Sys_error _ -> no_consang ]
+  | Ascend2Gen _ a -> a.Def.consang ]
 ;
 value get_parents =
   fun
@@ -475,10 +493,15 @@ value get_parents =
   | Ascend2 db2 i ->
       let pos = get_field_acc db2 i ("person", "parents") in
       if pos = -1 then None
-      else Some (get_field_data db2 pos ("person", "parents") "data") ]
+      else Some (get_field_data db2 pos ("person", "parents") "data")
+  | Ascend2Gen _ a -> a.Def.parents ]
 ;
 
-value ascend_of_gen_ascend a = Ascend a;
+value ascend_of_gen_ascend base a =
+  match base with
+  [ Base _ -> Ascend a
+  | Base2 db2 -> Ascend2Gen db2 a ]
+;
 
 value empty_person ip =
   let empty_string = Adef.istr_of_int 0 in
@@ -509,66 +532,98 @@ value get_family =
           let (ifam, pos) =
             get_field_2_data db2 pos ("person", "family") "data"
           in
-          loop [ifam :: list] pos ]
+          loop [ifam :: list] pos
+  | Union2Gen db2 u -> u.Def.family ]
 ;
 
-value union_of_gen_union u = Union u;
+value union_of_gen_union base u =
+  match base with
+  [ Base _ -> Union u
+  | Base2 db2 -> Union2Gen db2 u ]
+;
 
 value get_comment =
   fun
   [ Family f -> Istr f.Def.comment
-  | Family2 db2 i -> make_istr2 db2 ("family", "comment") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "comment") i
+  | Family2Gen db2 f -> Istr2New db2 f.Def.comment ]
 ;
 value get_divorce =
   fun
   [ Family f -> f.Def.divorce
-  | Family2 db2 i -> get_field db2 i ("family", "divorce") ]
+  | Family2 db2 i -> get_field db2 i ("family", "divorce")
+  | Family2Gen db2 f -> f.Def.divorce ]
 ;
 value get_fam_index =
   fun
   [ Family f -> f.Def.fam_index
-  | Family2 _ i -> Adef.ifam_of_int i ]
+  | Family2 _ i -> Adef.ifam_of_int i
+  | Family2Gen db2 f -> f.Def.fam_index ]
 ;
 value get_fsources =
   fun
   [ Family f -> Istr f.Def.fsources
-  | Family2 db2 i -> make_istr2 db2 ("family", "fsources") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "fsources") i
+  | Family2Gen db2 f -> Istr2New db2 f.Def.fsources ]
 ;
 value get_marriage =
   fun
   [ Family f -> f.Def.marriage
-  | Family2 db2 i -> get_field db2 i ("family", "marriage") ]
+  | Family2 db2 i -> get_field db2 i ("family", "marriage")
+  | Family2Gen db2 f -> f.Def.marriage ]
 ;
 value get_marriage_place =
   fun
   [ Family f -> Istr f.Def.marriage_place
-  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_place") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_place") i
+  | Family2Gen db2 f -> Istr2New db2 f.Def.marriage_place ]
 ;
 value get_marriage_src =
   fun
   [ Family f -> Istr f.Def.marriage_src
-  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_src") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_src") i
+  | Family2Gen db2 f -> Istr2New db2 f.Def.marriage_src ]
 ;
 value get_origin_file =
   fun
   [ Family f -> Istr f.Def.origin_file
-  | Family2 db2 i -> make_istr2 db2 ("family", "origin_file") i ]
+  | Family2 db2 i -> make_istr2 db2 ("family", "origin_file") i
+  | Family2Gen db2 f -> Istr2New db2 f.Def.origin_file ]
 ;
 value get_relation =
   fun
   [ Family f -> f.Def.relation
-  | Family2 db2 i -> get_field db2 i ("family", "relation") ]
+  | Family2 db2 i -> get_field db2 i ("family", "relation")
+  | Family2Gen db2 f -> f.Def.relation ]
 ;
 value get_witnesses =
   fun
   [ Family f -> f.Def.witnesses
-  | Family2 db2 i -> get_field db2 i ("family", "witnesses") ]
+  | Family2 db2 i -> get_field db2 i ("family", "witnesses")
+  | Family2Gen db2 f -> f.Def.witnesses ]
 ;
 
-value family_of_gen_family f =
-  let f = map_family_ps (fun p -> p) un_istr f in
-  Family f
+value family_with_origin_file f orf fi =
+  match (f, orf) with
+  [ (Family f, Istr orf) ->
+      Family {(f) with origin_file = orf; fam_index = fi}
+  | (Family2Gen db2 f, Istr2 _ path pos) ->
+      let orf =
+        if pos = -1 || pos = Db2.empty_string_pos then ""
+        else get_field_data db2 pos path "data"
+      in
+      Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
+  | (Family2Gen _ _, Istr2New _ _) ->
+      failwith "not impl family_with_origin_file (new)"
+  | _ -> assert False ]
 ;
+
+value family_of_gen_family base f =
+  match base with
+  [ Base _ -> Family (map_family_ps (fun p -> p) un_istr f)
+  | Base2 db2 -> Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f) ]
+;
+
 value gen_family_of_family =
   fun
   [ Family f -> map_family_ps (fun p -> p) (fun s -> Istr s) f
@@ -577,8 +632,11 @@ value gen_family_of_family =
        marriage_src = get_marriage_src f; witnesses = get_witnesses f;
        relation = get_relation f; divorce = get_divorce f;
        comment = get_comment f; origin_file = get_origin_file f;
-       fsources = get_fsources f; fam_index = get_fam_index f} ]
+       fsources = get_fsources f; fam_index = get_fam_index f}
+  | Family2Gen db2 f ->
+      map_family_ps (fun p -> p) (fun s -> Istr2New db2 s) f ]
 ;
+
 value get_father =
   fun
   [ Couple c -> Adef.father c
@@ -622,24 +680,30 @@ value poi base i =
   match base with
   [ Base base -> Person (base.data.persons.get (Adef.int_of_iper i))
   | Base2 db2 ->
-      try Person2Gen db2 (Hashtbl.find db2.patches i) with
+      try Person2Gen db2 (Hashtbl.find db2.patches.h_person.pa_ht i) with
       [ Not_found -> Person2 db2 (Adef.int_of_iper i) ] ]
 ;
 value aoi base i =
   match base with
   [ Base base -> Ascend (base.data.ascends.get (Adef.int_of_iper i))
-  | Base2 db2 -> Ascend2 db2 (Adef.int_of_iper i) ]
+  | Base2 db2 ->
+      try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend.pa_ht i) with
+      [ Not_found -> Ascend2 db2 (Adef.int_of_iper i) ] ]
 ;
 value uoi base i =
   match base with
   [ Base base -> Union (base.data.unions.get (Adef.int_of_iper i))
-  | Base2 db2 -> Union2 db2 (Adef.int_of_iper i) ]
+  | Base2 db2 ->
+      try Union2Gen db2 (Hashtbl.find db2.patches.h_union.pa_ht i) with
+      [ Not_found -> Union2 db2 (Adef.int_of_iper i) ] ]
 ;
 
 value foi base i =
   match base with
   [ Base base -> Family (base.data.families.get (Adef.int_of_ifam i))
-  | Base2 db2 -> Family2 db2 (Adef.int_of_ifam i) ]
+  | Base2 db2 ->
+      try Family2Gen db2 (Hashtbl.find db2.patches.h_family.pa_ht i) with
+      [ Not_found -> Family2 db2 (Adef.int_of_ifam i) ] ]
 ;
 value coi base i =
   match base with
@@ -686,24 +750,29 @@ value nb_of_families base =
 value patch_person base ip p =
   match (base, p) with
   [ (Base base, Person p) -> base.func.patch_person ip p
-  | (Base2 _, Person2 _ _) -> failwith "not impl patch_person"
-  | (Base2 _, Person2Gen db2 p) -> Hashtbl.replace db2.patches ip p
+  | (Base2 _, Person2Gen db2 p) ->
+      Hashtbl.replace db2.patches.h_person.pa_ht ip p
   | _ -> assert False ]
 ;
 value patch_ascend base ip a =
   match (base, a) with
   [ (Base base, Ascend a) -> base.func.patch_ascend ip a
-  | (Base2 _, _) -> failwith "not impl patch_ascend"
+  | (Base2 _, Ascend2Gen db2 a) ->
+      Hashtbl.replace db2.patches.h_ascend.pa_ht ip a
   | _ -> assert False ]
 ;
 value patch_union base ip u =
   match (base, u) with
   [ (Base base, Union u) -> base.func.patch_union ip u
+  | (Base2 _, Union2Gen db2 u) ->
+      Hashtbl.replace db2.patches.h_union.pa_ht ip u
   | _ -> failwith "not impl patch_union" ]
 ;
 value patch_family base ifam f =
   match (base, f) with
   [ (Base base, Family f) -> base.func.patch_family ifam f
+  | (Base2 _, Family2Gen db2 f) ->
+      Hashtbl.replace db2.patches.h_family.pa_ht ifam f
   | _ -> failwith "not impl patch_family" ]
 ;
 value patch_descend base ifam d =
@@ -716,10 +785,20 @@ value patch_couple base ifam c =
   [ (Base base, Couple c) -> base.func.patch_couple ifam c
   | _ -> failwith "not impl patch_couple" ]
 ;
-value patch_name base =
+value patch_name base s ip =
   match base with
-  [ Base base -> base.func.patch_name
-  | Base2 _ -> failwith "not impl patch_name" ]
+  [ Base base -> base.func.patch_name s ip
+  | Base2 db2 ->
+      let s = Name.crush_lower s in
+      let i = Hashtbl.hash s in
+      let ht = db2.patches.h_name.pa_ht in
+      try
+        let ipl = Hashtbl.find ht i in
+        if List.mem ip ipl then ()
+        else Hashtbl.replace ht i [ip :: ipl]
+      with
+      [ Not_found -> Hashtbl.add ht i [ip] ] ]
+
 ;
 value insert_string base s =
   match base with
@@ -1132,7 +1211,12 @@ value base_of_base2 bname =
         close_in ic;
         ht
       }
-    | None -> Hashtbl.create 1 ]
+    | None ->
+        let empty_patch () = {pa_len = 0; pa_ht = Hashtbl.create 1} in
+        {h_person = empty_patch (); h_ascend = empty_patch ();
+         h_union = empty_patch (); h_family = empty_patch ();
+         h_couple = empty_patch (); h_descend = empty_patch ();
+         h_name = empty_patch ()} ]
   in
   Base2 {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches}
 ;

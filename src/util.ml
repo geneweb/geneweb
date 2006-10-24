@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.50 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: util.ml,v 5.51 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -591,11 +591,11 @@ value pget (conf : config) base ip =
 ;
 
 value aget (conf : config) base ip =
-  if is_restricted conf base ip then no_ascend () else aoi base ip
+  if is_restricted conf base ip then no_ascend base else aoi base ip
 ;
 
 value uget (conf : config) base ip =
-  if is_restricted conf base ip then union_of_gen_union {family = [| |]}
+  if is_restricted conf base ip then union_of_gen_union base {family = [| |]}
   else uoi base ip
 ;
 

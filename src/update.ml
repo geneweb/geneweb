@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.26 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: update.ml,v 5.27 2006-10-24 14:59:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -738,8 +738,8 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                  if f = "?" || s = "?" then empty_string
                  else Gwdb.insert_string base (only_printable src);
                key_index = ip}
-          and a = no_ascend ()
-          and u = union_of_gen_union {family = [| |]} in
+          and a = no_ascend base
+          and u = union_of_gen_union base {family = [| |]} in
           do {
             patch_person base (get_key_index p) p;
             patch_ascend base (get_key_index p) a;
