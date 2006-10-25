@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 5.2 2006-10-11 05:43:55 ddr Exp $
+# $Id: Makefile.inc,v 5.3 2006-10-25 17:25:39 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh $(PPDEF)
@@ -15,6 +15,7 @@ RM=/bin/rm -f
 EXE=
 STATIC=-ccopt -static
 STATIC=
+TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
 
 all::
 opt::
@@ -25,19 +26,19 @@ clean::
 .SUFFIXES: .ml .cmo .mli .cmi .cmx
 
 .mli.cmi:
-	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
+	@$(TEST_DIR)
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppi
 	$(OCAMLC) $(OCAMLI) -I +camlp4 -c -intf $*.ppi
 	$(RM) $*.ppi
 
 .ml.cmo:
-	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
+	@$(TEST_DIR)
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
 	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I +camlp4 -c -impl $*.ppo
 	$(RM) $*.ppo
 
 .ml.cmx:
-	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
+	@$(TEST_DIR)
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
 	$(OCAMLOPT) $(OCAMLI) -I +camlp4 -c -impl $*.ppo
 	$(RM) $*.ppo
