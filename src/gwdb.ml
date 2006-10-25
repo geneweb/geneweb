@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.80 2006-10-24 20:14:27 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.81 2006-10-25 03:50:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -18,6 +18,7 @@ type patches =
     h_family : Hashtbl.t ifam (gen_family iper string);
     h_couple : Hashtbl.t ifam (gen_couple iper);
     h_descend : Hashtbl.t ifam (gen_descend iper);
+    h_key : Hashtbl.t (string * string * int) iper;
     h_name : Hashtbl.t string (list iper) }
 ;
 
@@ -856,11 +857,23 @@ value patch_name base s ip =
       [ Not_found -> Hashtbl.add ht s [ip] ] ]
 
 ;
+
+value patch_key base ip fn sn occ =
+  match base with
+  [ Base _ -> ()
+  | Base2 db2 ->
+let _ = do { Printf.eprintf "patch_key %s.%d %s\n" fn occ sn; flush stderr; } in
+      let fn = Name.lower (nominative fn) in
+      let sn = Name.lower (nominative sn) in
+      Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip ]
+;
+
 value insert_string base s =
   match base with
   [ Base base -> Istr (base.func.insert_string s)
   | Base2 db2 -> Istr2New db2 s ]
 ;
+
 value commit_patches base =
   match base with
   [ Base base -> base.func.commit_patches ()
@@ -950,21 +963,19 @@ value key_hashtbl_find dir file (fn, sn, oc) =
 ;
 
 value person2_of_key db2 fn sn oc =
-  let person_of_key_d = Filename.concat db2.bdir "person_of_key" in
-  try do {
-    let ifn =
-      let fn = Name.lower (nominative fn) in
-      hashtbl_find person_of_key_d "istr_of_string.ht" fn
-    in
-    let isn =
-      let sn = Name.lower (nominative sn) in
-      hashtbl_find person_of_key_d "istr_of_string.ht" sn
-    in
-    let key = (ifn, isn, oc) in
-    Some (key_hashtbl_find person_of_key_d "iper_of_key.ht" key : iper)
-  }
-  with
-  [ Not_found -> None ]
+  let fn = Name.lower (nominative fn) in
+  let sn = Name.lower (nominative sn) in
+  try Some (Hashtbl.find db2.patches.h_key (fn, sn, oc)) with
+  [ Not_found ->
+      let person_of_key_d = Filename.concat db2.bdir "person_of_key" in
+      try do {
+        let ifn = hashtbl_find person_of_key_d "istr_of_string.ht" fn in
+        let isn = hashtbl_find person_of_key_d "istr_of_string.ht" sn in
+        let key = (ifn, isn, oc) in
+        Some (key_hashtbl_find person_of_key_d "iper_of_key.ht" key : iper)
+      }
+      with
+      [ Not_found -> None ] ]
 ;
 
 value strings2_of_fsname db2 f s =
@@ -1007,6 +1018,7 @@ value spi_cursor spi s =
   [ Spi spi -> Istr (spi.cursor s)
   | Spi2 -> failwith "not impl spi_cursor" ]
 ;
+
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
@@ -1016,6 +1028,7 @@ value spi_find spi s =
     }
   | _ -> failwith "not impl spi_find" ]
 ;
+
 value spi_next spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> Istr (spi.next s)
@@ -1271,12 +1284,12 @@ value base_of_base2 bname =
         ht
       }
     | None ->
-        let empty_patch () = Hashtbl.create 1 in
+        let empty_ht () = Hashtbl.create 1 in
         {max_per = 0; max_fam = 0;
-         h_person = empty_patch (); h_ascend = empty_patch ();
-         h_union = empty_patch (); h_family = empty_patch ();
-         h_couple = empty_patch (); h_descend = empty_patch ();
-         h_name = empty_patch ()} ]
+         h_person = empty_ht (); h_ascend = empty_ht ();
+         h_union = empty_ht (); h_family = empty_ht ();
+         h_couple = empty_ht (); h_descend = empty_ht ();
+         h_key = empty_ht (); h_name = empty_ht ()} ]
   in
   Base2 {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches}
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.28 2006-10-24 18:20:36 ddr Exp $ *)
+(* $Id: update.ml,v 5.29 2006-10-25 03:50:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -745,7 +745,10 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             patch_ascend base (get_key_index p) a;
             patch_union base (get_key_index p) u;
             if f <> "?" && s <> "?" then do {
-              person_ht_add base (Util.translate_eval (f ^ " " ^ s)) ip;
+              let fn = Util.translate_eval f in
+              let sn = Util.translate_eval s in
+              patch_key base ip fn sn o;
+              person_ht_add base (fn ^ " " ^ sn) ip;
               new_persons.val := [p :: new_persons.val]
             }
             else ();
