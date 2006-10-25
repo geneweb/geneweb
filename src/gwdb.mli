@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.59 2006-10-24 19:27:42 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.60 2006-10-25 03:50:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -123,6 +123,7 @@ value patch_union : base -> iper -> union -> unit;
 value patch_family : base -> ifam -> family -> unit;
 value patch_descend : base -> ifam -> descend -> unit;
 value patch_couple : base -> ifam -> couple -> unit;
+value patch_key : base -> iper -> string -> string -> int -> unit;
 value patch_name : base -> string -> iper -> unit;
 value insert_string : base -> string -> istr;
 value commit_patches : base -> unit;

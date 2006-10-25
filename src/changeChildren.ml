@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.14 2006-10-20 05:29:43 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.15 2006-10-25 03:50:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -261,8 +261,9 @@ value change_child conf base parent_surname ip =
         (Gwdb.insert_string base new_surname)
         new_occ
     in
-    patch_person base (get_key_index p) p;
-    person_ht_add base key (get_key_index p);
+    patch_person base ip p;
+    patch_key base ip new_first_name new_surname new_occ;
+    person_ht_add base key ip;
     let np_misc_names = person_misc_names base p get_titles in
     List.iter (fun key -> person_ht_add base key (get_key_index p))
       np_misc_names;
