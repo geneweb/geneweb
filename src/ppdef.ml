@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 5.4 2006-10-17 12:51:41 ddr Exp $ *)
+(* $Id: ppdef.ml,v 5.5 2006-10-25 18:44:32 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -126,6 +126,8 @@ value incorrect_number loc l1 l2 =
           (List.length l2) (List.length l1)))
 ;
 
+value first_pos = IFDEF CAMLP4S THEN Stdpp.first_pos ELSE fst END;
+
 value define eo x =
   do {
     let gloc = loc in
@@ -134,12 +136,13 @@ value define eo x =
         EXTEND
           expr: LEVEL "simple"
             [ [ UIDENT $x$ ->
-                  may_eval (Pcaml.expr_reloc (fun _ -> loc) (fst gloc) e) ] ]
+                  may_eval
+                    (Pcaml.expr_reloc (fun _ -> loc) (first_pos gloc) e) ] ]
           ;
           patt: LEVEL "simple"
             [ [ UIDENT $x$ ->
                   let p = substp loc [] e in
-                  Pcaml.patt_reloc (fun _ -> loc) (fst gloc) p ] ]
+                  Pcaml.patt_reloc (fun _ -> loc) (first_pos gloc) p ] ]
           ;
         END
     | Some (sl, e) ->
@@ -154,7 +157,8 @@ value define eo x =
                   if List.length el = List.length sl then
                     let env = List.combine sl el in
                     let e = subst loc env e in
-                    may_eval (Pcaml.expr_reloc (fun _ -> loc) (fst gloc) e)
+                    may_eval (Pcaml.expr_reloc (fun _ -> loc)
+                      (first_pos gloc) e)
                   else
                     incorrect_number loc el sl ] ]
           ;
@@ -168,7 +172,7 @@ value define eo x =
                   if List.length pl = List.length sl then
                     let env = List.combine sl pl in
                     let p = substp loc env e in
-                    Pcaml.patt_reloc (fun _ -> loc) (fst gloc) p
+                    Pcaml.patt_reloc (fun _ -> loc) (first_pos gloc) p
                   else
                     incorrect_number loc pl sl ] ]
           ;
