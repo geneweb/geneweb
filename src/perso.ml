@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.25 2006-10-25 10:00:53 ddr Exp $ *)
+(* $Id: perso.ml,v 5.26 2006-10-25 10:13:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1591,6 +1591,13 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           in
           let s = List.fold_left (linked_page_text conf base p s key) "" db in
           VVstring s
+      | _ -> raise Not_found ]
+  | ["marriage_date" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ True ->
+          match Adef.od_of_codate (get_marriage fam) with
+          [ Some d -> eval_date_field_var d sl
+          | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["mother" :: sl] ->
       match get_parents a with
