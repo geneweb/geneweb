@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.28 2006-10-26 14:23:47 ddr Exp $ *)
+(* $Id: perso.ml,v 5.29 2006-10-26 14:26:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1646,7 +1646,7 @@ and eval_date_field_var d =
   fun
   [ ["year"] ->
       match d with
-      [ Dgreg dmy _ -> VVstring (year_text dmy)
+      [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
       | _ -> VVstring "" ]
   | _ -> raise Not_found ]
 and eval_nobility_title_field_var (id, pl) =
