@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.16 2006-10-24 18:20:36 ddr Exp $ *)
+(* $Id: descend.ml,v 5.17 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -415,8 +415,8 @@ value label_of_path paths p =
 
 value print_child conf base p1 p2 e = do {
   stag "strong" begin
-    if get_sex p1 = Male && get_surname e = get_surname p1 ||
-       get_sex p2 = Male && get_surname e = get_surname p2
+    if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
+       get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
     then
       Wserver.wprint "%s"
         (referenced_person_text_without_surname conf base e)
@@ -427,8 +427,9 @@ value print_child conf base p1 p2 e = do {
 
 value print_repeat_child conf base p1 p2 e =
   stag "em" begin
-    if get_sex p1 = Male && get_surname e = get_surname p1 ||
-       get_sex p2 = Male && get_surname e = get_surname p2 then
+    if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
+       get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
+    then
       Wserver.wprint "%s" (person_text_without_surname conf base e)
     else Wserver.wprint "%s" (person_text conf base e);
   end
@@ -762,7 +763,7 @@ value sort_and_display conf base paths precision list =
              (fun pll p ->
                 match pll with
                 [ [([p1 :: _] as pl) :: pll]
-                  when get_first_name p1 = get_first_name p ->
+                  when eq_istr (get_first_name p1) (get_first_name p) ->
                     [[p :: pl] :: pll]
                 | _ -> [[p] :: pll] ])
              [] pl

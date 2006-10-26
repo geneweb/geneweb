@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 5.3 2006-10-25 17:25:39 ddr Exp $
+# $Id: Makefile.inc,v 5.4 2006-10-26 14:06:36 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh $(PPDEF)
@@ -21,7 +21,7 @@ all::
 opt::
 
 clean::
-	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.a *.obj *.lib *.lck *.bak *~ .#*
+	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.a *.obj *.lib *.lck *.bak *~ .#* *.annot
 
 .SUFFIXES: .ml .cmo .mli .cmi .cmx
 

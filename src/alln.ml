@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: alln.ml,v 5.14 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -316,7 +316,7 @@ value select_names conf base is_surnames ini =
                            if is_surnames then get_surname p
                            else get_first_name p
                          in
-                         if isn = istr then [ip :: l] else l
+                         if eq_istr isn istr then [ip :: l] else l
                        else [ip :: l])
                     [] my_list
                 in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.25 2006-10-24 19:27:42 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.26 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -169,7 +169,7 @@ value compatible_burials b1 b2 =
 ;
 
 value compatible_strings s1 s2 =
-  s1 = s2 || is_empty_string s2 || is_empty_string s1;
+  eq_istr s1 s2 || is_empty_string s2 || is_empty_string s1;
 
 value compatible_divorces d1 d2 = d1 = d2;
 
@@ -182,7 +182,8 @@ value compatible_titles t1 t2 = t1 = t2 || t2 = [];
 value compatible_strings_lists sl1 sl2 = sl2 = [] || sl1 = sl2;
 
 value compatible_ind base p1 p2 =
-  get_first_name p1 = get_first_name p2 && get_surname p1 = get_surname p2 &&
+  eq_istr (get_first_name p1) (get_first_name p2) &&
+  eq_istr (get_surname p1) (get_surname p2) &&
   compatible_strings (get_image p1) (get_image p2) &&
   compatible_strings (get_public_name p1) (get_public_name p2) &&
   compatible_strings_lists (get_qualifiers p1) (get_qualifiers p2) &&

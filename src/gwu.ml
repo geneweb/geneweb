@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.25 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.26 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -336,7 +336,7 @@ value print_child oc base fam_surname csrc cbp p =
     then
       ()
     else fprintf oc ".%d" (get_occ p);
-    if get_surname p <> fam_surname then
+    if not (eq_istr (get_surname p) fam_surname) then
       fprintf oc " %s" (s_correct_string_nonum (sou base (get_surname p)))
     else ();
     print_infos oc base True csrc cbp p;
@@ -924,14 +924,18 @@ value rec find_ancestors base surn p list =
       let cpl = coi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
-      if get_surname fath <> surn && get_surname moth <> surn then [p :: list]
+      if not (eq_istr (get_surname fath) surn) &&
+         not (eq_istr (get_surname moth) surn)
+      then [p :: list]
       else
         let list =
-          if get_surname fath = surn then find_ancestors base surn fath list
+          if eq_istr (get_surname fath) surn then
+            find_ancestors base surn fath list
           else list
         in
         let list =
-          if get_surname moth = surn then find_ancestors base surn moth list
+          if eq_istr (get_surname moth) surn then
+            find_ancestors base surn moth list
           else list
         in
         list
@@ -957,7 +961,8 @@ value mark_branch base mark surn p =
                    (get_children desc))
               [] ifaml
           in
-          if top || List.exists (fun p -> get_surname p = surn) children
+          if top ||
+             List.exists (fun p -> eq_istr (get_surname p) surn) children
           then do {
             List.iter (fun ifam -> mark.(Adef.int_of_ifam ifam) := ToSeparate)
               ifaml;
