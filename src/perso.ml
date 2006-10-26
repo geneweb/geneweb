@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.26 2006-10-25 10:13:18 ddr Exp $ *)
+(* $Id: perso.ml,v 5.27 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -135,7 +135,7 @@ value nobility_titles_list conf base p =
          [ [(nth, name, title, place, dates) :: rl]
            when
              not conf.is_rtl && nth = t.t_nth && name_equiv name t.t_name &&
-             title = t.t_ident && place = t.t_place ->
+             eq_istr title t.t_ident && eq_istr place t.t_place ->
              [(nth, name, title, place,
                [(t_date_start, t_date_end) :: dates]) ::
               rl]
@@ -151,7 +151,7 @@ value nobility_titles_list conf base p =
        [ [(nth, name, title, places, dates) :: rl]
          when
            not conf.is_rtl && nth = t_nth && name_equiv name t_name &&
-           title = t_ident && dates = t_dates ->
+           eq_istr title t_ident && dates = t_dates ->
            [(nth, name, title, [t_place :: places], dates) :: rl]
        | _ -> [(t_nth, t_name, t_ident, [t_place], t_dates) :: l] ])
     titles []
@@ -639,11 +639,11 @@ value merge_date_place conf base surn ((d1, d2, pl), auth) p =
   let ((pd1, pd2, ppl), auth) = get_date_place conf base auth p in
   let nd1 =
     if pd1 <> None then pd1
-    else if get_surname p = surn then if pd2 <> None then pd2 else d1
+    else if eq_istr (get_surname p) surn then if pd2 <> None then pd2 else d1
     else None
   in
   let nd2 =
-    if get_surname p = surn then
+    if eq_istr (get_surname p) surn then
       if d2 <> None then d2
       else if d1 <> None then d1
       else if pd1 <> None then pd2
@@ -653,7 +653,8 @@ value merge_date_place conf base surn ((d1, d2, pl), auth) p =
     else d1
   in
   let pl =
-    if ppl <> "" then ppl else if get_surname p = surn then pl else ""
+    if ppl <> "" then ppl else if eq_istr (get_surname p) surn then pl
+    else ""
   in
   ((nd1, nd2, pl), auth)
 ;
@@ -685,7 +686,9 @@ value build_surnames_list conf base v p =
           let fath = pget conf base (get_father cpl) in
           let moth = pget conf base (get_mother cpl) in
           do {
-            if surn <> get_surname fath && surn <> get_surname moth then
+            if not (eq_istr surn (get_surname fath)) &&
+               not (eq_istr surn (get_surname moth))
+            then
               add_surname sosa p surn dp
             else ();
             let sosa = Num.twice sosa in

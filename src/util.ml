@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.51 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: util.ml,v 5.52 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -805,7 +805,7 @@ value referenced_person_text_without_surname conf base p =
 value gen_person_text_without_title p_access conf base p =
   match main_title conf base p with
   [ Some t ->
-      if t.t_place = get_surname p then
+      if eq_istr t.t_place (get_surname p) then
         gen_person_text_without_surname True p_access conf base p
       else
         match (t.t_name, get_qualifiers p) with
@@ -1695,7 +1695,8 @@ value parent conf base p a =
       if conf.hide_names && not (fast_auth_age conf a) then "x x"
       else
         p_first_name base a ^
-          (if get_surname p <> get_surname a then " " ^ p_surname base a
+          (if not (eq_istr (get_surname p) (get_surname a)) then
+             " " ^ p_surname base a
            else "") ]
 ;
 
@@ -1758,7 +1759,8 @@ value specify_homonymous conf base p =
                     ("x", " x")
                   else
                     (p_first_name base enfant,
-                     if get_surname p <> get_surname enfant then
+                     if not (eq_istr (get_surname p) (get_surname enfant))
+                     then
                        " " ^ p_surname base enfant
                      else "")
                 in

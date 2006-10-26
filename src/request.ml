@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.27 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: request.ml,v 5.28 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -218,7 +218,9 @@ value specify conf base n pl =
              let rec add_rec =
                fun
                [ [t1 :: tl1] ->
-                   if t1.t_ident = t.t_ident && t1.t_place = t.t_place then
+                   if eq_istr t1.t_ident t.t_ident &&
+                      eq_istr t1.t_place t.t_place
+                   then
                      [t1 :: tl1]
                    else [t1 :: add_rec tl1]
                | [] -> [t] ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.33 2006-10-25 03:50:28 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.34 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -739,8 +739,8 @@ value print_mod o_conf base =
     do {
       patch_person base (get_key_index p) p;
       Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p))
-        (sou base (get_notes p)) (get_notes p <> get_notes op);
-      if get_surname op <> get_surname p ||
+        (sou base (get_notes p)) (not (eq_istr (get_notes p) (get_notes op)));
+      if not (eq_istr (get_surname op) (get_surname p)) ||
          get_surnames_aliases op <> get_surnames_aliases p ||
          nobtit conf base op <> nobtit conf base p
       then

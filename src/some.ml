@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.15 2006-10-18 03:12:50 ddr Exp $ *)
+(* $Id: some.ml,v 5.16 2006-10-26 14:06:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -38,7 +38,8 @@ value persons_of_fsname conf base base_strings_of_fsname find proj x =
            let iperl =
              List.fold_left
                (fun iperl iper ->
-                  if proj (pget conf base iper) = istr then [iper :: iperl]
+                  if eq_istr (proj (pget conf base iper)) istr then
+                    [iper :: iperl]
                   else iperl)
                [] iperl
            in
@@ -178,7 +179,7 @@ value persons_of_absolute_first_name conf base x =
          let iperl =
            List.fold_left
              (fun iperl iper ->
-                if get_first_name (pget conf base iper) = istr then
+                if eq_istr (get_first_name (pget conf base iper)) istr then
                   [iper :: iperl]
                 else iperl)
              [] iperl
@@ -532,7 +533,7 @@ value has_at_least_2_children_with_surname conf base des surname =
     if i = Array.length (get_children des) then False
     else
       let p = pget conf base (get_children des).(i) in
-      if get_surname p = surname then
+      if eq_istr (get_surname p) surname then
         if cnt = 1 then True else loop (cnt + 1) (i + 1)
       else loop cnt (i + 1)
 ;
@@ -586,7 +587,7 @@ value persons_of_absolute_surname conf base x =
          let iperl =
            List.fold_left
              (fun iperl iper ->
-                if get_surname (pget conf base iper) = istr then
+                if eq_istr (get_surname (pget conf base iper)) istr then
                   [iper :: iperl]
                 else iperl)
              [] iperl
