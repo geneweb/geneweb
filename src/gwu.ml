@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.27 2006-10-28 14:40:16 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.28 2006-10-28 19:37:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1266,18 +1266,19 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
              [ Some (dl, f) -> List.fold_right Filename.concat dl f
              | None -> "bad" ]
            in
-           let s = base_notes_read base fn in
+           let s = strip_spaces (base_notes_read base fn) in
            if s <> "" then do {
              if not first.val then fprintf oc "\n" else ();
              first.val := False;
              fprintf oc "# extended page \"%s\" used by:\n" f;
-             List.iter (fun f -> fprintf oc "#  - %s\n" f) (List.rev r.val);
+             List.iter (fun f -> fprintf oc "#  - %s\n" f)
+               (List.sort compare r.val);
              fprintf oc "page-ext %s\n" f;
              rs_printf oc s;
              fprintf oc "\nend page-ext\n";
            }
            else ())
-        (List.rev gen.ext_files);
+        (List.sort compare gen.ext_files);
       try
         let files = Sys.readdir (Filename.concat in_dir "wiznotes") in
         do {
@@ -1289,7 +1290,7 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
               let wfile =
                 List.fold_right Filename.concat [in_dir; "wiznotes"] file
               in
-              let s = read_file_contents wfile in
+              let s = strip_spaces (read_file_contents wfile) in
               fprintf oc "\nwizard-note %s\n" wizid;
               rs_printf oc s;
               fprintf oc "\nend wizard-note\n";
