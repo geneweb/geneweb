@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.42 2006-10-20 14:14:57 ddr Exp $
+# $Id: lex_utf8.txt,v 5.43 2006-10-28 10:37:30 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1976,6 +1976,7 @@ sl: sočasno
 sv: samtidigt
 
     average death age
+bg: средна продължителност на живота
 de: Durchschnittliches Sterbealter
 en: average death age
 et: keskmine eluiga
@@ -2777,6 +2778,7 @@ sl: komentar
 sv: kommentar
 
     connections
+bg: потребителски връзки
 de: Verbindungen
 en: connections
 et: ühendused
@@ -3883,6 +3885,7 @@ sl: za lastna imena po abecednem redu
 sv: för förnamnen i bokstavsordning
 
     for the list by dates of last modification
+bg: за списъка по дати на последно изменение
 en: for the list by dates of last modification
 fr: pour la liste par date de dernière modification
 
@@ -8958,6 +8961,7 @@ sl: drevo
 sv: träd
 
     try again
+bg: опитайте отново
 de: Nocheinmal versuchen
 en: try again
 et: proovi uuesti
