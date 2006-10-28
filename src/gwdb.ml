@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.81 2006-10-25 03:50:28 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.82 2006-10-28 12:13:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -77,7 +77,7 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
 
 type string_person_index =
   [ Spi of gen_string_person_index dsk_istr
-  | Spi2 ]
+  | Spi2 of bool ]
 ;
 
 type base =
@@ -862,7 +862,6 @@ value patch_key base ip fn sn occ =
   match base with
   [ Base _ -> ()
   | Base2 db2 ->
-let _ = do { Printf.eprintf "patch_key %s.%d %s\n" fn occ sn; flush stderr; } in
       let fn = Name.lower (nominative fn) in
       let sn = Name.lower (nominative sn) in
       Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip ]
@@ -1005,27 +1004,39 @@ value persons_of_name base =
 value persons_of_first_name base =
   match base with
   [ Base base -> Spi base.func.persons_of_first_name
-  | Base2 _ -> Spi2 ]
+  | Base2 _ -> Spi2 True ]
 ;
 value persons_of_surname base =
   match base with
   [ Base base -> Spi base.func.persons_of_surname
-  | Base2 _ -> Spi2 ]
+  | Base2 _ -> Spi2 False ]
 ;
 
 value spi_cursor spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 -> failwith "not impl spi_cursor" ]
+  | Spi2 _ -> failwith "not impl spi_cursor" ]
 ;
 
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2, Istr2 db2 (f1, f2) pos) -> do {
+  | (Spi2 _, Istr2 db2 (f1, f2) pos) -> do {
       let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
       hashtbl_find_all dir "person_of_string.ht" pos
     }
+  | (Spi2 is_first_name, Istr2New db2 s) ->
+      let proj =
+        if is_first_name then fun p -> p.first_name else fun p -> p.surname
+      in
+      Hashtbl.fold
+        (fun _ iper iperl ->
+           try
+             let p = Hashtbl.find db2.patches.h_person iper in
+             if proj p = s then [iper :: iperl] else iperl
+           with
+           [ Not_found -> iperl ])
+        db2.patches.h_key []
   | _ -> failwith "not impl spi_find" ]
 ;
 
@@ -1052,19 +1063,35 @@ value base_particles base =
       Mutil.input_particles (Filename.concat db2.bdir "../particles.txt") ]
 ;
 
-value base_strings_of_first_name base s =
+value base_strings_of_first_name_or_surname base field proj s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
   | Base2 db2 ->
-      let posl = strings2_of_fsname db2 "first_name" s in
-      List.map (fun pos -> Istr2 db2 ("person", "first_name") pos) posl ]
+      let posl = strings2_of_fsname db2 field s in
+      let istrl =
+        List.map (fun pos -> Istr2 db2 ("person", field) pos) posl
+      in
+      let s = Name.crush_lower s in
+      Hashtbl.fold
+        (fun _ iper istrl ->
+           try
+             let p = Hashtbl.find db2.patches.h_person iper in
+             if Name.crush_lower (proj p) = s then
+               [Istr2New db2 (proj p) :: istrl]
+             else istrl
+           with
+           [ Not_found -> istrl ])
+        db2.patches.h_key istrl ]
 ;
+
+value base_strings_of_first_name base s =
+  base_strings_of_first_name_or_surname base "first_name"
+    (fun p -> p.first_name) s
+;
+
 value base_strings_of_surname base s =
-  match base with
-  [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
-  | Base2 db2 ->
-      let posl = strings2_of_fsname db2 "surname" s in
-      List.map (fun pos -> Istr2 db2 ("person", "surname") pos) posl ]
+  base_strings_of_first_name_or_surname base "surname"
+    (fun p -> p.surname) s
 ;
 
 value load_ascends_array base =
