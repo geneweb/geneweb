@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.28 2006-10-28 19:37:29 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.29 2006-10-28 19:51:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -601,7 +601,10 @@ value print_notes_for_person oc base gen p =
     fprintf oc "beg\n";
     fprintf oc "%s\n" notes;
     fprintf oc "end notes\n";
-    let f _ = sprintf "person \"%s\"" (Gutil.designation base p) in
+    let f _ =
+      sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_occ p)
+        (p_surname base p)
+    in
     ignore (add_linked_files gen f notes [] : list _)
   }
   else ()
