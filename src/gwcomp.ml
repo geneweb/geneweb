@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.8 2006-10-28 16:01:49 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -390,14 +390,7 @@ value get_pub_name str l =
 
 value get_image str l =
   match l with
-  [ ["#image" | "#photo"; x :: l'] ->
-      do {
-        let x = cut_space x in
-        for i = 0 to String.length x - 1 do {
-          if x.[i] = ' ' then x.[i] := '_' else ()
-        };
-        (x, l')
-      }
+  [ ["#image" | "#photo"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
