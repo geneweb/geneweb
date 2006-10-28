@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.26 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.27 2006-10-28 14:40:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -882,7 +882,7 @@ value connected_families base fam_sel fam cpl =
               ifaml1 ipl
           in
           loop ifaml [ip :: ipl_scanned] ipl
-    | [] -> ifaml ]
+    | [] -> List.sort compare ifaml ]
 ;
 
 value find_person base p1 po p2 =
