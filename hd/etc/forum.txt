@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.5 2006-10-07 12:57:51 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.6 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -17,7 +17,7 @@
       %message.subject.cut.50;%nn;
     %end;
   </title>
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
