@@ -105,9 +105,11 @@ gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
     gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
     notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
 gwc2.cmo: adef.cmi argl.cmo db2.cmo def.cmi futil.cmi gwcomp.cmo iochan.cmi \
-    iovalue.cmi lock.cmi mutil.cmi name.cmi progrBar.cmi secure.cmi 
+    iovalue.cmi lock.cmi mutil.cmi name.cmi notesLinks.cmo progrBar.cmi \
+    secure.cmi 
 gwc2.cmx: adef.cmx argl.cmx db2.cmx def.cmi futil.cmx gwcomp.cmx iochan.cmx \
-    iovalue.cmx lock.cmx mutil.cmx name.cmx progrBar.cmx secure.cmx 
+    iovalue.cmx lock.cmx mutil.cmx name.cmx notesLinks.cmx progrBar.cmx \
+    secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi mutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi mutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
@@ -167,10 +169,10 @@ mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi futil.cmi gutil.cmi \
 mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi futil.cmx gutil.cmx \
     gwdb.cmx history.cmx merge.cmx mergeInd.cmx mutil.cmx update.cmx \
     updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
-mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi database.cmi gwdb.cmi \
-    lock.cmi mutil.cmi outbase.cmi secure.cmi 
-mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx database.cmx gwdb.cmx \
-    lock.cmx mutil.cmx outbase.cmx secure.cmx 
+mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gwdb.cmi lock.cmi \
+    mutil.cmi outbase.cmi secure.cmi 
+mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gwdb.cmx lock.cmx \
+    mutil.cmx outbase.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi gwdb.cmi \
     name.cmi num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx \
@@ -314,10 +316,10 @@ updateIndOk.cmx: adef.cmx checkItem.cmx config.cmi def.cmi futil.cmx \
     notesLinks.cmx update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx \
     updateIndOk.cmi 
 updateIndOk.cmi: checkItem.cmi config.cmi def.cmi gwdb.cmi update.cmi 
-update_nldb.cmo: adef.cmi argl.cmo buff.cmo database.cmi def.cmi gwdb.cmi \
-    notesLinks.cmo progrBar.cmi secure.cmi 
-update_nldb.cmx: adef.cmx argl.cmx buff.cmx database.cmx def.cmi gwdb.cmx \
-    notesLinks.cmx progrBar.cmx secure.cmx 
+update_nldb.cmo: adef.cmi argl.cmo buff.cmo def.cmi gwdb.cmi notesLinks.cmo \
+    progrBar.cmi secure.cmi 
+update_nldb.cmx: adef.cmx argl.cmx buff.cmx def.cmi gwdb.cmx notesLinks.cmx \
+    progrBar.cmx secure.cmx 
 util.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi consang.cmi def.cmi \
     gutil.cmi gwdb.cmi gwlib.cmo lock.cmi mutil.cmi name.cmi num.cmi \
     secure.cmi translate.cmi version.cmo ../wserver/wserver.cmi util.cmi 

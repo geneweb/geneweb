@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.20 2006-10-23 20:51:59 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.21 2006-10-29 14:05:45 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -31,6 +31,7 @@ type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
+    g_tmp_dir : string;
 
     g_strings : Hashtbl.t string Adef.istr;
     g_index_of_key : Hashtbl.t key iper;
@@ -816,12 +817,32 @@ value insert_rparents2 gen sb sex rl = do {
   Iochan.output_binary_int (fst gen.g_person_rparents) pos;
 };
 
+value insert_bnotes1 gen nfname str = do {
+  let nfname =
+    if nfname = "" then "notes"
+    else
+      let f =
+        match NotesLinks.check_file_name nfname with
+        [ Some (dl, f) -> List.fold_right Filename.concat dl f
+        | None -> "bad" ]
+      in
+      Filename.concat "notes_d" (f ^ ".txt")
+  in
+  let nfname =
+    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; nfname]
+  in
+  Mutil.mkdir_p (Filename.dirname nfname);
+  let oc = Secure.open_out nfname in
+  output_string oc str;
+  close_out oc;
+};
+
 value insert_gwo_1 gen =
   fun
   [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
   | Notes key str -> ()
   | Relations sb sex rl -> insert_rparents1 gen sb sex rl
-  | Bnotes nfname str -> ()
+  | Bnotes nfname str -> insert_bnotes1 gen nfname str
   | Wnotes wizid str -> () ]
 ;
 
@@ -880,6 +901,7 @@ value link gwo_list bname =
   in
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   do {
+    Mutil.remove_dir tmp_dir;
     try Mutil.mkdir_p tmp_dir with _ -> ();
     let person_d =
       List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
@@ -932,7 +954,7 @@ value link gwo_list bname =
     }
     in
     let gen =
-      {g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
+      {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_tmp_dir = tmp_dir;
        g_strings = Hashtbl.create 1;
        g_index_of_key = Hashtbl.create 1;
        g_person_fields = person_fields;
