@@ -1,11 +1,11 @@
 (* camlp4r *)
-(* $Id: notes.mli,v 5.1 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: notes.mli,v 5.2 2006-10-29 20:49:57 ddr Exp $ *)
 
 open Config;
 open Gwdb;
 open NotesLinks;
 
-value file_path : config -> string -> string;
+value file_path : config -> base -> string -> string;
 value read_notes : base -> string -> (list (string * string) * string);
 
 value print : config -> base -> unit;

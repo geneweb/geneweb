@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.27 2006-10-20 14:14:57 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.28 2006-10-29 20:49:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -388,8 +388,8 @@ value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
         tag "td" begin
           let s = string_with_macros conf [] s in
           let s =
-            Wiki.html_with_summary_of_tlsw conf "NOTES" (Notes.file_path conf)
-              edit_opt s
+            Wiki.html_with_summary_of_tlsw conf "NOTES"
+              (Notes.file_path conf base) edit_opt s
           in
           Wserver.wprint "%s\n" s;
         end;
@@ -412,14 +412,14 @@ value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
   }
 ;
 
-value print_part_wiznote conf wz s cnt0 =
+value print_part_wiznote conf base wz s cnt0 =
   let title = wz in
   do {
     Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
     let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
-    let file_path = Notes.file_path conf in
+    let file_path = Notes.file_path conf base in
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
     Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES"
       (code_varenv wz) cnt0 lines;
@@ -455,7 +455,7 @@ value print conf base =
           Some (can_edit, "WIZNOTES", code_varenv wz)
         in
         match p_getint conf.env "v" with
-        [ Some cnt0 -> print_part_wiznote conf wz s cnt0
+        [ Some cnt0 -> print_part_wiznote conf base wz s cnt0
         | None ->
             print_whole_wiznote conf base auth_file edit_opt wz wfile
               (s, date) ]
@@ -547,7 +547,7 @@ value print_mod_ok conf base =
     in
     let commit = commit_wiznotes in
     let string_filter = string_with_macros conf [] in
-    let file_path = Notes.file_path conf in
+    let file_path = Notes.file_path conf base in
     Wiki.print_mod_ok conf edit_mode mode fname read_string commit
       string_filter file_path False
 ;

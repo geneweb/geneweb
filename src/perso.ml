@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.29 2006-10-26 14:26:17 ddr Exp $ *)
+(* $Id: perso.ml,v 5.30 2006-10-29 20:49:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1951,7 +1951,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         let s = sou base (get_notes p) in
         let s =
           let lines = Wiki.html_of_tlsw conf s in
-          Wiki.syntax_links conf "NOTES" (Notes.file_path conf)
+          Wiki.syntax_links conf "NOTES" (Notes.file_path conf base)
             (String.concat "\n" lines)
         in
         string_with_macros conf env s
