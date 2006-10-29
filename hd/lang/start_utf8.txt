@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.7 2006-09-24 08:52:07 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.8 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -32,7 +32,7 @@ sv: Genealogi
 ] - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%o/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %i; font-weight: bold }

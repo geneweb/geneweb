@@ -1,10 +1,10 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: wdoc.txt,v 5.1 2006-01-01 05:35:05 ddr Exp $ -->
+  <!-- $Id: wdoc.txt,v 5.2 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%title;</title>
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--

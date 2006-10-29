@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.52 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: util.ml,v 5.53 2006-10-29 12:08:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1217,7 +1217,7 @@ value header_without_page_title conf title =
     Wserver.wprint "  <title>";
     title True;
     Wserver.wprint "</title>\n";
-    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\"%s>\n" conf.xhs;
+    Wserver.wprint "  <meta name=\"robots\" content=\"none\"%s>\n" conf.xhs;
     Wserver.wprint "  <meta http-equiv=\"Content-Type\" \
                       content=\"text/html; charset=%s\"%s>\n"
       conf.charset conf.xhs;

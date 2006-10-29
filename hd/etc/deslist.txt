@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.6 2006-09-13 08:44:45 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.7 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -12,7 +12,7 @@
       %sp;%surname;
     %end;
   </title>
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--

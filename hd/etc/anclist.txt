@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: anclist.txt,v 5.2 2006-09-13 08:44:45 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 5.3 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -15,7 +15,7 @@
       %end;
     %end;
   </title>
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--

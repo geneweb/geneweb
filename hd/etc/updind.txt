@@ -1,9 +1,9 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 5.4 2006-10-04 17:30:35 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 5.5 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")

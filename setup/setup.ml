@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 5.3 2006-10-15 15:39:38 ddr Exp $ *)
+(* $Id: setup.ml,v 5.4 2006-10-29 12:08:34 ddr Exp $ *)
 
 open Printf;
 
@@ -104,7 +104,7 @@ value header_no_page_title conf title =
 \"http://www.w3.org/TR/REC-html40/loose.dtd\">
 ";
     Wserver.wprint "<head>\n";
-    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
+    Wserver.wprint "  <meta name=\"robots\" content=\"none\">\n";
     Wserver.wprint "  <title>";
     title True;
     Wserver.wprint "</title>\n";

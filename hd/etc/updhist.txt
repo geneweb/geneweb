@@ -1,10 +1,10 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.3 2006-09-13 08:44:45 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.4 2006-10-29 12:08:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
-  <meta name="ROBOTS" content="NONE"%/>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
