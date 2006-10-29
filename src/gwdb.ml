@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.82 2006-10-28 12:13:47 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.83 2006-10-29 14:05:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1188,6 +1188,7 @@ value read_notes bname fnotes rn_mode =
     if fnotes = "" then "notes"
     else Filename.concat "notes_d" (fnotes ^ ".txt")
   in
+  let fname = Filename.concat "base_d" fname in
   match
     try Some (Secure.open_in (Filename.concat bname fname)) with
     [ Sys_error _ -> None ]

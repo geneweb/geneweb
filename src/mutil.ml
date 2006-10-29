@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.8 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.9 2006-10-29 14:05:45 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -147,7 +147,7 @@ value remove_file f = try Sys.remove f with [ Sys_error _ -> () ];
 value mkdir_p x =
   loop x where rec loop x =
     do  {
-      let y = Filename.dirname x;
+      let y = Filename.dirname x in
       if y <> x && String.length y < String.length x then loop y else ();
       try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
     }
