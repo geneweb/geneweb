@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.12 2006-10-08 05:33:16 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.13 2006-10-29 09:21:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -153,7 +153,7 @@ value main () =
     }
     else ();
     Secure.set_base_dir (Filename.dirname fname.val);
-    let base = Gwdb.base_of_dsk_base (Database.opendb fname.val) in
+    let base = Gwdb.open_base fname.val in
     do {
       Sys.catch_break True;
       try compute base fname.val with
@@ -163,4 +163,3 @@ value main () =
 ;
 
 Printexc.catch main ();
-
