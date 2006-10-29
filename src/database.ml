@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.11 2006-10-29 09:21:48 ddr Exp $ *)
+(* $Id: database.ml,v 5.12 2006-10-29 10:21:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -995,7 +995,7 @@ value opendb bname =
     output_value_no_sharing oc9 (patches : Old.patches);
 *)
     output_string oc9 magic_patch;
-    output_value_no_sharing oc9 (patches : patches_ht);
+    output_value oc9 (patches : patches_ht);
 (**)
     close_out oc9;
     try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
