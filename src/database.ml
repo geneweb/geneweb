@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.14 2006-10-29 11:52:59 ddr Exp $ *)
+(* $Id: database.ml,v 5.15 2006-10-29 11:57:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -755,71 +755,65 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
   r
 ;
 
-value input_patches bname =
-  let patches =
-    match
-      try
-        Some (Secure.open_in_bin (Filename.concat bname "patches"))
-      with _ -> None
-    with
-    [ Some ic -> let p = input_value ic in do { close_in ic; p }
-    | None ->
-        {Old.p_person = ref []; Old.p_ascend = ref []; Old.p_union = ref [];
-         Old.p_family = ref []; Old.p_couple = ref []; Old.p_descend = ref [];
-         Old.p_string = ref []; Old.p_name = ref []} ]
-  in
-  let ht =
-    {h_person = (ref 0, Hashtbl.create 101);
-     h_ascend = (ref 0, Hashtbl.create 101);
-     h_union = (ref 0, Hashtbl.create 101);
-     h_family = (ref 0, Hashtbl.create 101);
-     h_couple = (ref 0, Hashtbl.create 101);
-     h_descend = (ref 0, Hashtbl.create 101);
-     h_string = (ref 0, Hashtbl.create 101);
-     h_name = Hashtbl.create 101}
-  in
-  let add (ir, ht) (k, v) =
-    do {
-      if k >= ir.val then ir.val := k + 1 else ();
-      Hashtbl.add ht k v;
-    }
-  in
-  do {
-    List.iter (add ht.h_person) patches.Old.p_person.val;
-    List.iter (add ht.h_ascend) patches.Old.p_ascend.val;
-    List.iter (add ht.h_union) patches.Old.p_union.val;
-    List.iter (add ht.h_family) patches.Old.p_family.val;
-    List.iter (add ht.h_couple) patches.Old.p_couple.val;
-    List.iter (add ht.h_descend) patches.Old.p_descend.val;
-    List.iter (add ht.h_string) patches.Old.p_string.val;
-    List.iter (add (ref 0, ht.h_name)) patches.Old.p_name.val;
-    ht
-   }
+value magic_patch = "GnPa0001";
+value check_patch_magic =
+  let b = String.create (String.length magic_patch) in
+  fun ic -> do {
+    really_input ic b 0 (String.length b);
+    b = magic_patch
+  }
 ;
 
-value patches_of_patches_ht patches =
-  let p =
-    {Old.p_person = ref [];
-     Old.p_ascend = ref [];
-     Old.p_union = ref [];
-     Old.p_family = ref [];
-     Old.p_couple = ref [];
-     Old.p_descend = ref [];
-     Old.p_string = ref [];
-     Old.p_name = ref []}
-  in
-  let add r k v = r.val := [(k, v) :: r.val] in
-  do {
-    Hashtbl.iter (add p.Old.p_person) (snd patches.h_person);
-    Hashtbl.iter (add p.Old.p_ascend) (snd patches.h_ascend);
-    Hashtbl.iter (add p.Old.p_union) (snd patches.h_union);
-    Hashtbl.iter (add p.Old.p_family) (snd patches.h_family);
-    Hashtbl.iter (add p.Old.p_couple) (snd patches.h_couple);
-    Hashtbl.iter (add p.Old.p_descend) (snd patches.h_descend);
-    Hashtbl.iter (add p.Old.p_string) (snd patches.h_string);
-    Hashtbl.iter (add p.Old.p_name) (snd (ref 0, patches.h_name));
-    p
-  }
+value input_patches bname =
+  match
+    try Some (Secure.open_in_bin (Filename.concat bname "patches")) with _ ->
+      None
+  with
+  [ Some ic -> do {
+      let r =
+        if check_patch_magic ic then (input_value ic : patches_ht)
+        else do {
+          (* old implementation of patches *)
+          seek_in ic 0;
+          let patches : Old.patches = input_value ic in
+          let ht =
+            {h_person = (ref 0, Hashtbl.create 1);
+             h_ascend = (ref 0, Hashtbl.create 1);
+             h_union = (ref 0, Hashtbl.create 1);
+             h_family = (ref 0, Hashtbl.create 1);
+             h_couple = (ref 0, Hashtbl.create 1);
+             h_descend = (ref 0, Hashtbl.create 1);
+             h_string = (ref 0, Hashtbl.create 1);
+             h_name = Hashtbl.create 1}
+          in
+          let add (ir, ht) (k, v) = do {
+            if k >= ir.val then ir.val := k + 1 else ();
+            Hashtbl.add ht k v;
+          }
+          in
+          List.iter (add ht.h_person) patches.Old.p_person.val;
+          List.iter (add ht.h_ascend) patches.Old.p_ascend.val;
+          List.iter (add ht.h_union) patches.Old.p_union.val;
+          List.iter (add ht.h_family) patches.Old.p_family.val;
+          List.iter (add ht.h_couple) patches.Old.p_couple.val;
+          List.iter (add ht.h_descend) patches.Old.p_descend.val;
+          List.iter (add ht.h_string) patches.Old.p_string.val;
+          List.iter (add (ref 0, ht.h_name)) patches.Old.p_name.val;
+          ht
+        }
+      in
+      close_in ic;
+      r
+    }
+  | None ->
+      {h_person = (ref 0, Hashtbl.create 1);
+       h_ascend = (ref 0, Hashtbl.create 1);
+       h_union = (ref 0, Hashtbl.create 1);
+       h_family = (ref 0, Hashtbl.create 1);
+       h_couple = (ref 0, Hashtbl.create 1);
+       h_descend = (ref 0, Hashtbl.create 1);
+       h_string = (ref 0, Hashtbl.create 1);
+       h_name = Hashtbl.create 1} ]
 ;
 
 value person_of_key persons strings persons_of_name first_name surname occ =
@@ -960,22 +954,21 @@ value opendb bname =
        })
   in
   let cleanup () = cleanup_ref.val () in
-  let commit_patches () =
+  let commit_patches () = do {
     let tmp_fname = Filename.concat bname "1patches" in
     let fname = Filename.concat bname "patches" in
-    do {
-      let oc9 =
-        try Secure.open_out_bin tmp_fname with
-        [ Sys_error _ ->
-            raise (Adef.Request_failure "the database is not writable") ]
-      in
-      let patches = patches_of_patches_ht patches in
-      remove_file (fname ^ "~");
-      output_value_no_sharing oc9 (patches : Old.patches);
-      close_out oc9;
-      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
-      try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
-    }
+    let oc9 =
+      try Secure.open_out_bin tmp_fname with
+      [ Sys_error _ ->
+          raise (Adef.Request_failure "the database is not writable") ]
+    in
+    output_string oc9 magic_patch;
+    output_value_no_sharing oc9 (patches : patches_ht);
+    close_out oc9;
+    remove_file (fname ^ "~");
+    try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+    try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
+  }
   in
   let patched_ascends () =
     let r = ref [] in
