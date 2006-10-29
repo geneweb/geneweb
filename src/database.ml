@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.13 2006-10-29 11:16:57 ddr Exp $ *)
+(* $Id: database.ml,v 5.14 2006-10-29 11:52:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -602,7 +602,7 @@ type patches_ht =
     h_couple : (ref int * Hashtbl.t int couple);
     h_descend : (ref int * Hashtbl.t int descend);
     h_string : (ref int * Hashtbl.t int string);
-    h_name : (ref int * Hashtbl.t int (list iper)) }
+    h_name : Hashtbl.t int (list iper) }
 ;
 
 module Old =
@@ -776,7 +776,7 @@ value input_patches bname =
      h_couple = (ref 0, Hashtbl.create 101);
      h_descend = (ref 0, Hashtbl.create 101);
      h_string = (ref 0, Hashtbl.create 101);
-     h_name = (ref 0, Hashtbl.create 101)}
+     h_name = Hashtbl.create 101}
   in
   let add (ir, ht) (k, v) =
     do {
@@ -792,7 +792,7 @@ value input_patches bname =
     List.iter (add ht.h_couple) patches.Old.p_couple.val;
     List.iter (add ht.h_descend) patches.Old.p_descend.val;
     List.iter (add ht.h_string) patches.Old.p_string.val;
-    List.iter (add ht.h_name) patches.Old.p_name.val;
+    List.iter (add (ref 0, ht.h_name)) patches.Old.p_name.val;
     ht
    }
 ;
@@ -817,7 +817,7 @@ value patches_of_patches_ht patches =
     Hashtbl.iter (add p.Old.p_couple) (snd patches.h_couple);
     Hashtbl.iter (add p.Old.p_descend) (snd patches.h_descend);
     Hashtbl.iter (add p.Old.p_string) (snd patches.h_string);
-    Hashtbl.iter (add p.Old.p_name) (snd patches.h_name);
+    Hashtbl.iter (add p.Old.p_name) (snd (ref 0, patches.h_name));
     p
   }
 ;
@@ -1045,7 +1045,7 @@ value opendb bname =
     [ Not_found -> do {
         let i = strings.len in
         strings.len := max strings.len (i + 1);
-        (fst patches.h_string).val := i;
+        (fst patches.h_string).val := strings.len;
         Hashtbl.replace (snd patches.h_string) i s;
         Adef.istr_of_int i
       } ]
@@ -1054,11 +1054,11 @@ value opendb bname =
     let s = Name.crush_lower s in
     let i = Hashtbl.hash s in
     try
-      let ipl = Hashtbl.find (snd patches.h_name) i in
+      let ipl = Hashtbl.find patches.h_name i in
       if List.mem ip ipl then ()
-      else Hashtbl.replace (snd patches.h_name) i [ip :: ipl]
+      else Hashtbl.replace patches.h_name i [ip :: ipl]
     with
-    [ Not_found -> Hashtbl.add (snd patches.h_name) i [ip] ]
+    [ Not_found -> Hashtbl.add patches.h_name i [ip] ]
   in
   let read_notes fnotes rn_mode =
     let fname =
@@ -1129,7 +1129,7 @@ value opendb bname =
      families = families; couples = couples; descends = descends;
      strings = strings; particles = particles; bnotes = bnotes}
   in
-  let persons_of_name = persons_of_name bname (snd patches.h_name) in
+  let persons_of_name = persons_of_name bname patches.h_name in
   let base_func =
     {person_of_key = person_of_key persons strings persons_of_name;
      persons_of_name = persons_of_name;
