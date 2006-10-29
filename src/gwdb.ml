@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.83 2006-10-29 14:05:45 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.84 2006-10-29 20:49:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1231,6 +1231,12 @@ value base_notes_origin_file base =
       let _ = do {
         eprintf "not impl base_notes_origin_file\n"; flush stderr } in
       "" ]
+;
+value base_notes_file_path base fname =
+  let f = Filename.concat "notes_d" (fname ^ ".txt") in
+  match base with
+  [ Base _ -> f
+  | Base2 _ -> Filename.concat "base_d" f ]
 ;
 
 value p_first_name base p = nominative (sou base (get_first_name p));

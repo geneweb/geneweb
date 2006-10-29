@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.8 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: forum.ml,v 5.9 2006-10-29 20:49:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -429,13 +429,13 @@ value rec eval_var conf base env xx loc =
   fun
   [ ["can_post"] -> VVbool (can_post conf)
   | ["is_moderated_forum"] -> VVbool (moderators conf <> [])
-  | ["message" :: sl] -> eval_message_var conf env sl
+  | ["message" :: sl] -> eval_message_var conf base env sl
   | ["pos"] ->
       match get_env "pos" env with
       [ Vpos r -> VVstring (MF.string_of_pos r.val)
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
-and eval_message_var conf env =
+and eval_message_var conf base env =
   fun
   [ ["access"] ->
       match get_env "mess" env with
@@ -503,11 +503,11 @@ and eval_message_var conf env =
       | _ -> raise Not_found ]
   | ["text" :: sl] ->
       match get_env "mess" env with
-      [ Vmess m _ _ _ so -> eval_message_text_var conf m.m_text so sl
+      [ Vmess m _ _ _ so -> eval_message_text_var conf base m.m_text so sl
       | _ -> raise Not_found ]
   | ["time" :: sl] ->
       match get_env "mess" env with
-      [ Vmess m _ _ _ so -> eval_message_text_var conf m.m_time so sl
+      [ Vmess m _ _ _ so -> eval_message_text_var conf base m.m_time so sl
       | _ -> raise Not_found ]
   | ["wiki"] ->
       match get_env "mess" env with
@@ -528,13 +528,13 @@ and eval_date_var conf date =
       | _ -> VVstring "" ]
   | [] -> VVstring (Util.translate_eval (Date.string_of_date conf date))
   | _ -> raise Not_found ]
-and eval_message_text_var conf str so =
+and eval_message_text_var conf base str so =
   fun
   [ ["wiki"] ->
       let s = string_with_macros conf [] str in
       let lines = Wiki.html_of_tlsw conf s in
       let s = String.concat "\n" lines in
-      let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf) s in
+      let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf base) s in
       let s =
         match so with
         [ Some h ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.10 2006-10-01 15:57:59 ddr Exp $ *)
+(* $Id: notes.ml,v 5.11 2006-10-29 20:49:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -8,10 +8,9 @@ open Gwdb;
 open Mutil;
 open Util;
 
-value file_path conf fname =
-  List.fold_right Filename.concat
-    [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"]
-    (fname ^ ".txt")
+value file_path conf base fname =
+  Util.base_path []
+    (Filename.concat (conf.bname ^ ".gwb") (base_notes_file_path base fname))
 ;
 
 value path_of_fnotes fnotes =
@@ -26,7 +25,7 @@ value read_notes base fnotes =
   Wiki.split_title_and_text s
 ;
 
-value print_whole_notes conf fnotes title s =
+value print_whole_notes conf base fnotes title s =
   do {
     header_no_page_title conf
       (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
@@ -48,7 +47,7 @@ value print_whole_notes conf fnotes title s =
     match Util.open_etc_file "summary" with
     [ Some ic -> Templ.copy_from_templ conf [] ic
     | None -> () ];
-    let file_path = file_path conf in
+    let file_path = file_path conf base in
     let s = string_with_macros conf [] s in
     let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
     let s =
@@ -59,7 +58,7 @@ value print_whole_notes conf fnotes title s =
   }
 ;
 
-value print_notes_part conf fnotes title s cnt0 =
+value print_notes_part conf base fnotes title s cnt0 =
   do {
     header_no_page_title conf
       (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
@@ -76,7 +75,7 @@ value print_notes_part conf fnotes title s cnt0 =
     let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let mode = "NOTES" in
-    let file_path = file_path conf in
+    let file_path = file_path conf base in
     Wiki.print_sub_part conf conf.wizard file_path mode mode fnotes cnt0 lines;
     trailer conf;
   }
@@ -250,8 +249,8 @@ value print conf base =
       let (nenv, s) = read_notes base fnotes in
       let title = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
       match p_getint conf.env "v" with
-      [ Some cnt0 -> print_notes_part conf fnotes title s cnt0
-      | None -> print_whole_notes conf fnotes title s ] ]
+      [ Some cnt0 -> print_notes_part conf base fnotes title s cnt0
+      | None -> print_whole_notes conf base fnotes title s ] ]
 ;
 
 value print_mod conf base =
@@ -303,7 +302,7 @@ value commit_notes conf base fnotes s =
   in
   let fname = path_of_fnotes fnotes in
   do {
-    Mutil.mkdir_p (Filename.dirname (file_path conf fname));
+    Mutil.mkdir_p (Filename.dirname (file_path conf base fname));
     try commit_notes base fname s with
     [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
     History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
@@ -322,7 +321,7 @@ value print_mod_ok conf base =
   let read_string = read_notes base in
   let commit conf = commit_notes conf base in
   let string_filter = string_with_macros conf [] in
-  let file_path = file_path conf in
+  let file_path = file_path conf base in
   Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
     file_path True
 ;
@@ -416,7 +415,7 @@ value print_misc_notes conf base =
                    else "<em>" ^ begin_text_without_html_tags 50 s ^ "</em>"
                  in
                  let c =
-                   let f = file_path conf (path_of_fnotes f) in
+                   let f = file_path conf base (path_of_fnotes f) in
                    if Sys.file_exists f then "" else " style=\"color:red\""
                  in
                  tag "li" "style=\"list-style-type:circle\"" begin
