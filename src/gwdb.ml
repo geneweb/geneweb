@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.85 2006-10-30 11:16:00 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.86 2006-10-30 14:24:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1224,14 +1224,21 @@ value base_notes_are_empty base db2 =
   [ Base base -> base.data.bnotes.nread db2 RnDeg = ""
   | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 RnDeg = "" ]
 ;
+
 value base_notes_origin_file base =
   match base with
   [ Base base -> base.data.bnotes.norigin_file
-  | Base2 _ ->
-      let _ = do {
-        eprintf "not impl base_notes_origin_file\n"; flush stderr } in
-      "" ]
+  | Base2 db2 ->
+      let fname = Filename.concat db2.bdir "notes_of.txt" in
+      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic -> do {
+          let r = input_line ic in
+          close_in ic;
+          r
+        }
+      | None -> "" ] ]
 ;
+
 value base_notes_file_path base fname =
   let f = Filename.concat "notes_d" (fname ^ ".txt") in
   match base with
