@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.61 2006-10-29 20:49:57 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.62 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -164,6 +164,7 @@ value base_notes_read_first_line : base -> string -> string;
 value base_notes_are_empty : base -> string -> bool;
 value base_notes_origin_file : base -> string;
 value base_notes_file_path : base -> string -> string;
+value base_wiznotes_dir : base -> string;
 
 value person_misc_names :
   base -> person -> (person -> list title) -> list string

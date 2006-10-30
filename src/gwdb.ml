@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.86 2006-10-30 14:24:31 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.87 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1244,6 +1244,12 @@ value base_notes_file_path base fname =
   match base with
   [ Base _ -> f
   | Base2 _ -> Filename.concat "base_d" f ]
+;
+
+value base_wiznotes_dir base =
+  match base with
+  [ Base _ -> "wiznotes"
+  | Base2 _ -> Filename.concat "base_d" "wiznotes_d" ]
 ;
 
 value p_first_name base p = nominative (sou base (get_first_name p));

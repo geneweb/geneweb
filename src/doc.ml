@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: doc.ml,v 5.3 2006-10-30 21:11:09 ddr Exp $ *)
 
 open Config;
 
@@ -343,7 +343,7 @@ value commit_wdoc conf file_path fdoc s =
   }
 ;
 
-value print_mod_wdoc_ok conf =
+value print_mod_wdoc_ok conf base =
   let fname =
     fun
     [ Some f -> if NotesLinks.check_file_name f <> None then f else "index"
@@ -352,7 +352,7 @@ value print_mod_wdoc_ok conf =
   let edit_mode _ = if conf.wizard then Some "WDOC" else None in
   let mode = "WDOC" in
   let read_string = read_wdoc conf.lang in
-  let commit = commit_wdoc conf in
+  let commit = commit_wdoc conf base in
   let string_filter = Util.filter_html_tags in
   let file_path = wdoc_file_path conf.lang in
   Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: wiki.mli,v 5.2 2006-10-01 15:57:59 ddr Exp $ *)
+(* $Id: wiki.mli,v 5.3 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -24,7 +24,7 @@ value print_mod_view_page :
 value print_mod_ok :
   config -> (string -> option string) -> string -> (option string -> string) ->
     (string -> (list (string * string) * string)) ->
-    (config -> string -> string -> unit) -> (string -> string) ->
+    (string -> string -> unit) -> (string -> string) ->
     (string -> string) -> bool -> unit;
 
 value notes_aliases : config -> list (string * string);

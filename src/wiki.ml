@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.12 2006-10-08 07:22:46 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.13 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -858,7 +858,7 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
             | None -> sub_part ]
           in
           do {
-            if s <> old_string then commit conf fname s else ();
+            if s <> old_string then commit fname s else ();
             let sub_part = string_filter sub_part in
             print_ok conf file_path mode edit_mode fname title_is_1st sub_part;
           }

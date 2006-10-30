@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.28 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: request.ml,v 5.29 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -446,7 +446,7 @@ value family_m conf base =
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
   | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf
-  | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf
+  | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base
   | Some "MOD_WIZNOTES" -> Wiznotes.print_mod conf base
   | Some "MOD_WIZNOTES_OK" -> Wiznotes.print_mod_ok conf base
   | Some "MRG" when conf.wizard ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.24 2006-10-30 20:27:28 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.25 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -855,7 +855,7 @@ value write_file_contents fname text = do {
 
 value insert_wiznotes1 gen wizid str = do {
   let wizdir =
-    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes"]
+    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes_d"]
   in
   Mutil.mkdir_p wizdir;
   let fname = Filename.concat wizdir wizid ^ ".txt" in
