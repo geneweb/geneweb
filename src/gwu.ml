@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.29 2006-10-28 19:51:08 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.30 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -1227,14 +1227,17 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
       }
       else ();
       try
-        let files = Sys.readdir (Filename.concat in_dir "wiznotes") in
+        let files =
+          Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
+        in
         do {
           Array.sort compare files;
           for i = 0 to Array.length files - 1 do {
             let file = files.(i) in
             if Filename.check_suffix file ".txt" then do {
               let wfile =
-                List.fold_right Filename.concat [in_dir; "wiznotes"] file
+                List.fold_left Filename.concat in_dir
+                  [base_wiznotes_dir base; file]
               in
               let s = read_file_contents wfile in
               ignore (add_linked_files gen
@@ -1283,7 +1286,9 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
            else ())
         (List.sort compare gen.ext_files);
       try
-        let files = Sys.readdir (Filename.concat in_dir "wiznotes") in
+        let files =
+          Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
+        in
         do {
           Array.sort compare files;
           for i = 0 to Array.length files - 1 do {
@@ -1291,7 +1296,8 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
             if Filename.check_suffix file ".txt" then do {
               let wizid = Filename.chop_suffix file ".txt" in
               let wfile =
-                List.fold_right Filename.concat [in_dir; "wiznotes"] file
+                List.fold_left Filename.concat in_dir
+                  [base_wiznotes_dir base; file]
               in
               let s = strip_spaces (read_file_contents wfile) in
               fprintf oc "\nwizard-note %s\n" wizid;

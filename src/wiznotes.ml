@@ -1,13 +1,14 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.29 2006-10-30 03:14:11 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.30 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Util;
 open Def;
 
-value dir conf =
-  Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "wiznotes"
+value dir conf base =
+  Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
+    (Gwdb.base_wiznotes_dir base)
 ;
 
 value wzfile wddir wz = Filename.concat wddir (wz ^ ".txt");
@@ -361,7 +362,7 @@ value print_main conf base auth_file =
         list
     else list
   in
-  let wddir = dir conf in
+  let wddir = dir conf base in
   do {
     header conf title;
     print_link_to_welcome conf True;
@@ -374,7 +375,7 @@ value print_main conf base auth_file =
     in
     let old_list =
       match
-        try Some (Sys.readdir (dir conf)) with [ Sys_error _ -> None ]
+        try Some (Sys.readdir (dir conf base)) with [ Sys_error _ -> None ]
       with
       [ Some arr ->
           List.fold_left
@@ -492,7 +493,7 @@ value print conf base =
     match f with
     [ Some wz ->
         let wz = Filename.basename wz in
-        let wfile = wzfile (dir conf) wz in
+        let wfile = wzfile (dir conf base) wz in
         let (s, date) = read_wizard_notes wfile in
         let edit_opt =
           let can_edit = conf.wizard && conf.user = wz || conf.manitou in
@@ -524,7 +525,7 @@ value print_mod conf base =
         let can_edit = conf.wizard && conf.user = wz || conf.manitou in
         if can_edit then
           let title = wizard_page_title conf wz wz in
-          let wfile = wzfile (dir conf) wz in
+          let wfile = wzfile (dir conf base) wz in
           let (s, _) = read_wizard_notes wfile in
           Wiki.print_mod_view_page conf True "WIZNOTES" wz title [] s
         else incorrect_request conf
@@ -547,14 +548,14 @@ value print_view conf base =
     [ Some wz ->
         let wz = Filename.basename wz in
         let title = wizard_page_title conf wz wz in
-        let wfile = wzfile (dir conf) wz in
+        let wfile = wzfile (dir conf base) wz in
         let (s, _) = read_wizard_notes wfile in
         Wiki.print_mod_view_page conf False "WIZNOTES" wz title [] s
     | None -> incorrect_request conf ]
 ;
 
-value commit_wiznotes conf wz s =
-  let wddir = dir conf in
+value commit_wiznotes conf base wz s =
+  let wddir = dir conf base in
   let fname = wzfile wddir wz in
   do {
     try Unix.mkdir wddir 0o755 with [ Unix.Unix_error _ _ _ -> () ];
@@ -587,9 +588,9 @@ value print_mod_ok conf base =
     in
     let mode = "NOTES" in
     let read_string wz =
-      ([], fst (read_wizard_notes (wzfile (dir conf) wz)))
+      ([], fst (read_wizard_notes (wzfile (dir conf base) wz)))
     in
-    let commit = commit_wiznotes in
+    let commit = commit_wiznotes conf base in
     let string_filter = string_with_macros conf [] in
     let file_path = Notes.file_path conf base in
     Wiki.print_mod_ok conf edit_mode mode fname read_string commit
@@ -615,7 +616,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
   header conf title;
   print_link_to_welcome conf True;
   let tm_now = Unix.time () in
-  let wddir = dir conf in
+  let wddir = dir conf base in
   let allowed = wizard_allowing wddir in
   let wl =
     if not (List.mem_assoc conf.user wl) then [(conf.user, tm_now) :: wl]
@@ -688,7 +689,7 @@ value connected_wizards conf base =
 ;
 
 value do_change_wizard_visibility conf base x set_vis = do {
-  let wddir = dir conf in
+  let wddir = dir conf base in
   let allowed = wizard_allowing wddir in
   let is_visible = List.mem conf.user allowed in
   if not set_vis && not is_visible || set_vis && is_visible then ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.11 2006-10-29 20:49:57 ddr Exp $ *)
+(* $Id: notes.ml,v 5.12 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -319,7 +319,7 @@ value print_mod_ok conf base =
   let edit_mode _ = if conf.wizard then Some "NOTES" else None in
   let mode = "NOTES" in
   let read_string = read_notes base in
-  let commit conf = commit_notes conf base in
+  let commit = commit_notes conf base in
   let string_filter = string_with_macros conf [] in
   let file_path = file_path conf base in
   Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter

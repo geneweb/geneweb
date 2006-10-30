@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.13 2006-10-29 09:21:48 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.14 2006-10-30 21:11:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -63,14 +63,15 @@ value compute base bdir =
     Printf.eprintf "--- wizard notes\n";
     flush stderr;
     try
-      let files = Sys.readdir (Filename.concat bdir "wiznotes") in
+      let files = Sys.readdir (base_wiznotes_dir base) in
       do {
         for i = 0 to Array.length files - 1 do {
           let file = files.(i) in
           if Filename.check_suffix file ".txt" then do {
             let wizid = Filename.chop_suffix file ".txt" in
             let wfile =
-              List.fold_right Filename.concat [bdir; "wiznotes"] file
+              List.fold_left Filename.concat bdir
+                [base_wiznotes_dir base; file]
             in
             let list = notes_links (read_file_contents wfile) in
             if list = ([], []) then ()
