@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.21 2006-10-29 14:05:45 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.22 2006-10-30 11:16:00 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -819,7 +819,7 @@ value insert_rparents2 gen sb sex rl = do {
 
 value insert_bnotes1 gen nfname str = do {
   let nfname =
-    if nfname = "" then "notes"
+    if nfname = "" then "notes.txt"
     else
       let f =
         match NotesLinks.check_file_name nfname with
@@ -966,6 +966,11 @@ value link gwo_list bname =
        g_person_notes = person_notes}
     in
     let ngwo = List.length gwo_list in
+    if ngwo >= 10 then do {
+      eprintf "pass 1: creating persons...\n";
+      flush stderr
+    }
+    else ();
     let run =
       if ngwo < 10 then fun () -> ()
       else if ngwo < 60 then
@@ -987,6 +992,11 @@ value link gwo_list bname =
 
     Gc.compact ();
 
+    if ngwo >= 10 then do {
+      eprintf "pass 2: creating families...\n";
+      flush stderr
+    }
+    else ();
     let run =
       if ngwo < 10 then fun () -> ()
       else if ngwo < 60 then
