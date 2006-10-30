@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.22 2006-10-30 11:16:00 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.23 2006-10-30 14:24:31 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -817,32 +817,42 @@ value insert_rparents2 gen sb sex rl = do {
   Iochan.output_binary_int (fst gen.g_person_rparents) pos;
 };
 
-value insert_bnotes1 gen nfname str = do {
+value insert_bnotes1 gen srcfile notesname str = do {
   let nfname =
-    if nfname = "" then "notes.txt"
+    if notesname = "" then "notes"
     else
       let f =
-        match NotesLinks.check_file_name nfname with
+        match NotesLinks.check_file_name notesname with
         [ Some (dl, f) -> List.fold_right Filename.concat dl f
         | None -> "bad" ]
       in
-      Filename.concat "notes_d" (f ^ ".txt")
+      Filename.concat "notes_d" f
   in
-  let nfname =
-    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; nfname]
+  let fname =
+    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; nfname ^ ".txt"]
   in
-  Mutil.mkdir_p (Filename.dirname nfname);
-  let oc = Secure.open_out nfname in
+  Mutil.mkdir_p (Filename.dirname fname);
+  let oc = Secure.open_out fname in
   output_string oc str;
   close_out oc;
+  if notesname = "" then do {
+    let fname =
+      List.fold_left Filename.concat gen.g_tmp_dir
+        ["base_d"; "notes_of.txt"]
+    in
+    let oc = Secure.open_out fname in
+    fprintf oc "%s\n" srcfile;
+    close_out oc;
+  }
+  else ();
 };
 
-value insert_gwo_1 gen =
+value insert_gwo_1 gen srcfile =
   fun
   [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
   | Notes key str -> ()
   | Relations sb sex rl -> insert_rparents1 gen sb sex rl
-  | Bnotes nfname str -> insert_bnotes1 gen nfname str
+  | Bnotes nfname str -> insert_bnotes1 gen srcfile nfname str
   | Wnotes wizid str -> () ]
 ;
 
@@ -860,11 +870,11 @@ value insert_comp_families1 gen run (x, separate, shift) =
     run ();
     let ic = open_in_bin x in
     check_magic x ic;
-    let _ : string = input_value ic in
+    let srcfile : string = input_value ic in
     try
       while True do {
         let fam : syntax_o = input_value ic in
-        insert_gwo_1 gen fam
+        insert_gwo_1 gen srcfile fam
       }
     with
     [ End_of_file -> close_in ic ]
