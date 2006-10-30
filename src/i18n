@@ -70,7 +70,7 @@ anniversaries of dead people
 anniversaries of marriage
 are
 at the same time
-average death age
+average age at death
 back
 baptism
 baptized
@@ -103,6 +103,7 @@ comment
 connections
 consanguinity
 continue merging
+continued
 cousins
 cousins (general term)
 create
@@ -141,6 +142,7 @@ first name missing
 first name not found
 first name/first names
 for the first names by alphabetic order
+for the list by dates of last modification
 foster father/foster mother/foster parents
 foster son/foster daughter/foster child
 generation/generations
@@ -276,6 +278,7 @@ shortest path
 should be female
 should be male
 siblings
+since the last click
 son/daughter/child
 source/sources
 specify
@@ -317,6 +320,7 @@ the whole list
 this forum is moderated
 title/titles
 to add a child to a family, use "%s"
+to change
 to the %s generation
 to the children
 to the grandchildren
@@ -338,6 +342,7 @@ update
 use "link" instead of "create"
 user/password/cancel
 validate/delete
+view source
 visualize/show/hide/summary
 warnings
 with
@@ -347,6 +352,7 @@ wizard/wizards/friend/friends
 would be his/her own ancestor
 year/month/day
 years old
+you are visible/you are not visible
 you must first merge
 you must first merge the 2 families
 your message is waiting for validation

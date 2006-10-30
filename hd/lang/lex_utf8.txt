@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.43 2006-10-28 10:37:30 ddr Exp $
+# $Id: lex_utf8.txt,v 5.44 2006-10-30 11:31:33 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1975,10 +1975,11 @@ ru: в то же самое время
 sl: sočasno
 sv: samtidigt
 
-    average death age
+    average age at death
 bg: средна продължителност на живота
+da: gennemsnitlig alder ved død
 de: Durchschnittliches Sterbealter
-en: average death age
+en: average age at death
 et: keskmine eluiga
 fr: âge moyen de décès
 nl: gemiddelde leeftijd bij overlijden
@@ -2779,6 +2780,7 @@ sv: kommentar
 
     connections
 bg: потребителски връзки
+da: forbindelser
 de: Verbindungen
 en: connections
 et: ühendused
@@ -8962,6 +8964,7 @@ sv: träd
 
     try again
 bg: опитайте отново
+da: prøv igen
 de: Nocheinmal versuchen
 en: try again
 et: proovi uuesti
