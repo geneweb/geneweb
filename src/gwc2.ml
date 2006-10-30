@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.23 2006-10-30 14:24:31 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.24 2006-10-30 20:27:28 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -847,13 +847,28 @@ value insert_bnotes1 gen srcfile notesname str = do {
   else ();
 };
 
+value write_file_contents fname text = do {
+  let oc = open_out fname in
+  output_string oc text;
+  close_out oc;
+};
+
+value insert_wiznotes1 gen wizid str = do {
+  let wizdir =
+    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes"]
+  in
+  Mutil.mkdir_p wizdir;
+  let fname = Filename.concat wizdir wizid ^ ".txt" in
+  write_file_contents fname str;
+};
+
 value insert_gwo_1 gen srcfile =
   fun
   [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
   | Notes key str -> ()
   | Relations sb sex rl -> insert_rparents1 gen sb sex rl
   | Bnotes nfname str -> insert_bnotes1 gen srcfile nfname str
-  | Wnotes wizid str -> () ]
+  | Wnotes wizid str -> insert_wiznotes1 gen wizid str ]
 ;
 
 value insert_gwo_2 gen =
@@ -1075,34 +1090,6 @@ value link gwo_list bname =
   }
 ;
 
-value write_file_contents fname text =
-  let oc = open_out fname in
-  do {
-    output_string oc text;
-    close_out oc;
-  }
-;
-
-value output_wizard_notes bname wiznotes =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
-  let wizdir = Filename.concat bdir "wiznotes" in
-  do {
-    Mutil.remove_dir wizdir;
-    if wiznotes = [] then ()
-    else
-      do {
-        try Unix.mkdir wizdir 0o755 with _ -> ();
-        List.iter
-          (fun (wizid, text) ->
-             let fname = Filename.concat wizdir wizid ^ ".txt" in
-             write_file_contents fname text)
-          wiznotes;
-      }
-  }
-;
-
 value output_command_line bname =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1216,6 +1203,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       lock (Mutil.lock_file out_file.val) with
       [ Accept -> do {
           link (List.rev gwo.val) out_file.val;
+          output_command_line out_file.val;
           let particles = input_particles part_file.val in
           output_particles_file out_file.val particles;
         }
