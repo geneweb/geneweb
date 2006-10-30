@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.25 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.26 2006-10-30 21:22:43 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -221,7 +221,7 @@ value str_pos oc_str ht item_cnt s =
     } ]
 ;
 
-value optim_type_string field_d ic oc oc_str ht = do {
+value compress_type_string field_d ic oc oc_str ht = do {
   let header_pos = create_output_value_header oc_str in
   Iovalue.output_block_header oc_str 0 phony_min_size;
   let nb_items = ref 0 in
@@ -243,7 +243,7 @@ value optim_type_string field_d ic oc oc_str ht = do {
   Iovalue.output_block_header oc_str 0 nb_items.val;
 };
 
-value optim_type_list_string field_d ic oc oc_str ht = do {
+value compress_type_list_string field_d ic oc oc_str ht = do {
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
   try
     let items_cnt = ref 0 in
@@ -263,7 +263,7 @@ value optim_type_list_string field_d ic oc oc_str ht = do {
   close_out oc_ext;
 };
 
-value optim_type_list_title field_d ic oc oc_str ht = do {
+value compress_type_list_title field_d ic oc oc_str ht = do {
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
   try
     let items_cnt = ref 0 in
@@ -285,21 +285,21 @@ value optim_type_list_title field_d ic oc oc_str ht = do {
   close_out oc_ext;
 };
 
-value optim_person_fields tmp_dir =
+value compress_person_fields tmp_dir =
   List.iter
-    (fun (f1, f2, optim_type) -> do {
+    (fun (f1, f2, compress_type) -> do {
        let field_d =
          List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
        in
        let ic = open_in_bin (Filename.concat field_d "data") in
-       eprintf "%s..." f2;
+       eprintf "compressing %s..." f2;
        flush stderr;
        let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
        let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
        let ht : Hashtbl.t string int = Hashtbl.create 1 in
        seek_in ic 25;
 
-       optim_type field_d ic oc_acc2 oc_dat2 ht;
+       compress_type field_d ic oc_acc2 oc_dat2 ht;
 
        close_out oc_dat2;
        close_out oc_acc2;
@@ -313,31 +313,31 @@ value optim_person_fields tmp_dir =
          ["data"; "access"];
        Printf.eprintf "\n"; flush stderr
      })
-    [("person", "baptism_place", optim_type_string);
-     ("person", "baptism_src", optim_type_string);
-     ("person", "birth_place", optim_type_string);
-     ("person", "birth_src", optim_type_string);
-     ("person", "burial_place", optim_type_string);
-     ("person", "burial_src", optim_type_string);
-     ("family", "comment", optim_type_string);
-     ("person", "death_place", optim_type_string);
-     ("person", "death_src", optim_type_string);
-     ("person", "first_name", optim_type_string);
-     ("family", "fsources", optim_type_string);
-     ("person", "image", optim_type_string);
-     ("family", "marriage_place", optim_type_string);
-     ("family", "marriage_src", optim_type_string);
-     ("person", "occupation", optim_type_string);
-     ("family", "origin_file", optim_type_string);
-     ("person", "psources", optim_type_string);
-     ("person", "public_name", optim_type_string);
-     ("person", "surname", optim_type_string);
+    [("person", "baptism_place", compress_type_string);
+     ("person", "baptism_src", compress_type_string);
+     ("person", "birth_place", compress_type_string);
+     ("person", "birth_src", compress_type_string);
+     ("person", "burial_place", compress_type_string);
+     ("person", "burial_src", compress_type_string);
+     ("family", "comment", compress_type_string);
+     ("person", "death_place", compress_type_string);
+     ("person", "death_src", compress_type_string);
+     ("person", "first_name", compress_type_string);
+     ("family", "fsources", compress_type_string);
+     ("person", "image", compress_type_string);
+     ("family", "marriage_place", compress_type_string);
+     ("family", "marriage_src", compress_type_string);
+     ("person", "occupation", compress_type_string);
+     ("family", "origin_file", compress_type_string);
+     ("person", "psources", compress_type_string);
+     ("person", "public_name", compress_type_string);
+     ("person", "surname", compress_type_string);
 
-     ("person", "aliases", optim_type_list_string);
-     ("person", "first_names_aliases", optim_type_list_string);
-     ("person", "qualifiers", optim_type_list_string);
-     ("person", "surnames_aliases", optim_type_list_string);
-     ("person", "titles", optim_type_list_title)]
+     ("person", "aliases", compress_type_list_string);
+     ("person", "first_names_aliases", compress_type_list_string);
+     ("person", "qualifiers", compress_type_list_string);
+     ("person", "surnames_aliases", compress_type_list_string);
+     ("person", "titles", compress_type_list_title)]
 ;
 
 value make_string_of_crush_index tmp_dir =
@@ -1068,7 +1068,7 @@ value link gwo_list bname =
     Hashtbl.clear gen.g_strings;
     Gc.compact ();
 
-    optim_person_fields tmp_dir;
+    compress_person_fields tmp_dir;
     make_string_of_crush_index tmp_dir;
     make_person_of_string_index tmp_dir;
     make_name_index tmp_dir gen.g_pcnt;
