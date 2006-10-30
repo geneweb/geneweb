@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.14 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.15 2006-10-30 11:31:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -252,7 +252,7 @@ value print_death conf base =
       Wserver.wprint "</ul>\n</li>\n</ul>\n";
       if fst ages_nb >= 3 then
         Wserver.wprint "%s (%s) : %s<br%s>\n"
-          (capitale (transl conf "average death age"))
+          (capitale (transl conf "average age at death"))
           (transl_nth conf "M/F" 0)
           (Date.string_of_age conf
              {day = 0; month = 0; year = fst ages_sum / fst ages_nb;
@@ -261,7 +261,7 @@ value print_death conf base =
       else ();
       if snd ages_nb >= 3 then
         Wserver.wprint "%s (%s) : %s<br%s>\n"
-          (capitale (transl conf "average death age"))
+          (capitale (transl conf "average age at death"))
           (transl_nth conf "M/F" 1)
           (Date.string_of_age conf
              {day = 0; month = 0; year = snd ages_sum / snd ages_nb;
