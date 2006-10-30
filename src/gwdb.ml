@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.84 2006-10-29 20:49:57 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.85 2006-10-30 11:16:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1185,7 +1185,7 @@ value output_consang_tab base tab =
 
 value read_notes bname fnotes rn_mode =
   let fname =
-    if fnotes = "" then "notes"
+    if fnotes = "" then "notes.txt"
     else Filename.concat "notes_d" (fnotes ^ ".txt")
   in
   let fname = Filename.concat "base_d" fname in
