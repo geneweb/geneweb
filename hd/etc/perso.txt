@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.5 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.6 2006-10-30 21:46:06 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -155,6 +155,9 @@
     %if;computable_age;
       <li>[*age]: %age;</li>
     %end;
+    %if;computable_death_age;
+      <li>[*age at death:] %death_age;</li>%nl;
+    %end;
     %if;is_buried;
       <li>%apply;capitalize(nth([buried],sex))
       %if;has_burial_date; %on_burial_date;%end;
@@ -164,9 +167,6 @@
       <li>%apply;capitalize(nth([cremated],sex))
       %if;has_cremation_date; %on_cremation_date;%end;
       %if;has_cremation_place; -&nbsp;%cremation_place;%end;</li>
-    %end;
-    %if;computable_death_age;
-      <li>[*age at death:] %death_age;</li>%nl;
     %end;
     %if;(has_consanguinity and (bvar.show_consang != "no" or manitou))
       <li>[*consanguinity]: %consanguinity;</li>%nl;
