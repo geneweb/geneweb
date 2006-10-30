@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.15 2006-10-29 11:57:22 ddr Exp $ *)
+(* $Id: database.ml,v 5.16 2006-10-30 09:48:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -580,20 +580,6 @@ value apply_patches tab f patches plen =
   }
 ;
 
-(*
-value rec patch_len len =
-  fun
-  [ [] -> len
-  | [(i, _) :: l] -> patch_len (max len (i + 1)) l ]
-;
-*)
-
-(* patches data; should be saved instead of Old.patches, but not done yet
-   for backward compatibility; in case of major change, it can be done
-   and module Old deleted; think of output_value_no_sharing which may
-   not be good for this type (anyway I think not useful for the file
-   patches) *)
-
 type patches_ht =
   { h_person : (ref int * Hashtbl.t int person);
     h_ascend : (ref int * Hashtbl.t int ascend);
@@ -604,6 +590,10 @@ type patches_ht =
     h_string : (ref int * Hashtbl.t int string);
     h_name : Hashtbl.t int (list iper) }
 ;
+
+(* Old structure of file "patches", kept for backward compatibility.
+   After conversion, a new change will be saved with a magic number
+   (magic_patch) and a record "patch_ht" above. *)
 
 module Old =
   struct
