@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.28 2006-10-29 20:49:57 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.29 2006-10-30 03:14:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -314,6 +314,35 @@ value print_wizards_by_date conf list = do {
   Wserver.wprint "</dd></dl>\n"
 };
 
+value print_old_wizards conf list =
+  if list = [] then ()
+  else do {
+    tag "dl" begin
+      tag "dd" "style=\"list-style-type:circle\"" begin
+        Wserver.wprint "%s..." (transl_nth conf "and" 0);
+        tag "dl" begin
+          tag "dd" begin
+            Gutil.list_iter_first
+              (fun first wz -> do {
+                 if not first then Wserver.wprint ",\n" else ();
+                 stag "a" "href=\"%sm=WIZNOTES;f=%s\"" (commd conf)
+                   (Util.code_varenv wz)
+                 begin
+                   for i = 0 to String.length wz - 1 do {
+                     if wz.[i] = ' ' then Wserver.wprint "&nbsp;"
+                     else Wserver.wprint "%c" wz.[i];
+                   };
+                 end
+               })
+              list;
+            Wserver.wprint "\n";
+          end;
+        end;
+      end;
+    end;
+  }
+;
+
 value print_main conf base auth_file =
   let wiztxt =
     Util.translate_eval (transl_nth conf "wizard/wizards/friend/friends" 1)
@@ -343,6 +372,20 @@ value print_main conf base auth_file =
            (wz, wname, wfile, wnote))
         wizdata
     in
+    let old_list =
+      match
+        try Some (Sys.readdir (dir conf)) with [ Sys_error _ -> None ]
+      with
+      [ Some arr ->
+          List.fold_left
+            (fun list fname ->
+               if Filename.check_suffix fname ".txt" then
+                 let n = Filename.chop_extension fname in
+                 if List.mem_assoc n wizdata then list else [n :: list]
+               else list)
+            [] (Array.to_list arr)
+      | None -> [] ]
+    in
     if by_alphab_order then do {
       tag "p" begin
         Wserver.wprint "<em style=\"font-size:80%%\">\n";
@@ -353,12 +396,13 @@ value print_main conf base auth_file =
           (transl conf "for the list by dates of last modification");
         Wserver.wprint ".</em>\n";
       end;
-      print_wizards_by_alphabetic_order conf list
+      print_wizards_by_alphabetic_order conf list;
     }
     else print_wizards_by_date conf list;
     tag "p" begin
       Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
     end;
+    if by_alphab_order then print_old_wizards conf old_list else ();
     trailer conf
   }
 ;
