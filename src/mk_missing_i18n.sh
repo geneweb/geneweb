@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml camlp4r.cma $0
 *) ".";
-(* $Id: mk_missing_i18n.sh,v 5.2 2006-10-30 11:31:33 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 5.3 2006-10-31 14:12:03 ddr Exp $ *)
 
 open Printf;
 
@@ -79,7 +79,8 @@ value check first lang =
           printf "    %s\n" line;
           List.iter
             (fun (lang, transl) ->
-               printf "%s:%s\n" lang (if transl = "" then " " else transl))
+               printf "%s:%s\n" lang
+                 (if transl = "" then " ..." else transl))
             list;
           printf "\n";
           has_missing.val := True
