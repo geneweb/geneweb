@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.14 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.15 2006-10-31 05:34:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -89,7 +89,7 @@ value compute base bdir =
     [ Sys_error _ -> () ];
     Printf.eprintf "--- misc notes\n";
     flush stderr;
-    let ndir = Filename.concat bdir "notes_d" in
+    let ndir = Filename.concat bdir (base_notes_dir base) in
     let rec loop dir name =
       try
         let cdir = Filename.concat ndir dir in
