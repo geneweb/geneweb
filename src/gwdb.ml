@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.89 2006-10-31 12:00:10 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.90 2006-10-31 14:01:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -27,6 +27,7 @@ type db2 =
     cache_chan : Hashtbl.t (string * string * string) in_channel;
     patches : patches;
     parents_array : mutable option (array (option ifam));
+    consang_array : mutable option (array Adef.fix);
     father_array : mutable option (array iper);
     mother_array : mutable option (array iper) }
 ;
@@ -495,8 +496,11 @@ value get_consang =
   fun
   [ Ascend a -> a.Def.consang
   | Ascend2 db2 i ->
-      try get_field db2 i ("person", "consang") with
-      [ Sys_error _ -> no_consang ]
+      match db2.consang_array with
+      [ Some tab -> tab.(i)
+      | None ->
+          try get_field db2 i ("person", "consang") with
+          [ Sys_error _ -> no_consang ] ]
   | Ascend2Gen _ a -> a.Def.consang ]
 ;
 
@@ -1134,23 +1138,41 @@ let _ = do { eprintf "load %s ok\n" f2; flush stderr; } in
   }
 ;
 
+value parents_array2 db2 nb =
+  load_array2 db2.bdir nb "person" "parents"
+    (fun ic_dat pos ->
+       if pos = -1 then None
+       else do {
+         seek_in ic_dat pos;
+         Some (Iovalue.input ic_dat : ifam)
+       })
+;
+
+value consang_array2 db2 nb =
+  let cg_fname =
+    List.fold_left Filename.concat db2.bdir ["person"; "consang"; "data"]
+  in
+  match try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ] with
+  [ Some ic -> do {
+      let tab = input_value ic in
+      close_in ic;
+      tab
+    }
+  | None -> Array.make nb no_consang ]
+;
+
 value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
-  | Base2 db2 ->
+  | Base2 db2 -> do {
+     let nb = nb_of_persons base in
       match db2.parents_array with
       [ Some _ -> ()
-      | None ->
-          let tab =
-            load_array2 db2.bdir (nb_of_persons base) "person" "parents"
-              (fun ic_dat pos ->
-                 if pos = -1 then None
-                 else do {
-                   seek_in ic_dat pos;
-                   Some (Iovalue.input ic_dat : ifam)
-                 })
-          in
-          db2.parents_array := Some tab ] ]
+      | None -> db2.parents_array := Some (parents_array2 db2 nb) ];
+      match db2.consang_array with
+      [ Some _ -> ()
+      | None -> db2.consang_array := Some (consang_array2 db2 nb) ];
+    } ]
 ;
 
 value load_unions_array base =
@@ -1226,19 +1248,11 @@ value ascends_array base =
       in
       (fget, cget, cset, None)
   | Base2 db2 ->
-      let cg_fname =
-        List.fold_left Filename.concat db2.bdir ["person"; "consang"; "data"]
-      in
+      let nb = nb_of_persons base in
       let cg_tab =
-        match
-          try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ]
-        with
-        [ Some ic -> do {
-            let tab = input_value ic in
-            close_in ic;
-            tab
-          }
-        | None -> Array.make (nb_of_persons base) no_consang ]
+        match db2.consang_array with
+        [ Some tab -> tab
+        | None -> consang_array2 db2 nb ]
       in
       let fget i = get_parents (Ascend2 db2 i) in
       let cget i = cg_tab.(i) in
@@ -1421,7 +1435,8 @@ value base_of_base2 bname =
   in
   Base2
     {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches;
-     parents_array = None; father_array = None; mother_array = None}
+     parents_array = None; consang_array = None;
+     father_array = None; mother_array = None}
 ;
 
 value open_base bname =
