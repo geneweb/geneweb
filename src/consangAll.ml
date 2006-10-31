@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.27 2006-10-23 20:06:31 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.28 2006-10-31 12:00:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -47,7 +47,8 @@ value compute base from_scratch quiet = do {
   let (fget, cget, cset, carray) = ascends_array base in
   try do {
     let tab =
-      Consang.make_relationship_info base (Consang.topological_sort base aoi)
+      let ts = Consang.topological_sort base aoi in
+      Consang.make_relationship_info base ts
     in
     let consang_tab = Array.create (nb_of_families base) no_consang in
     let cnt = ref 0 in
@@ -64,13 +65,17 @@ value compute base from_scratch quiet = do {
             list ]
     else ();
     for i = 0 to nb_of_persons base - 1 do {
-      let cg = cget i in
-      if from_scratch then cset i no_consang
-      else
+      if from_scratch then do {
+        cset i no_consang;
+        incr cnt;
+      }
+      else do {
+        let cg = cget i in
         match fget i with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := cg
         | None -> () ];
-      if cg = no_consang then incr cnt else ()
+        if cg = no_consang then incr cnt else ()
+      };
     };
     let max_cnt = cnt.val in
     let most = ref None in
