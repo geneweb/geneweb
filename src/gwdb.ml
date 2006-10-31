@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.87 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.88 2006-10-31 05:34:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1239,11 +1239,10 @@ value base_notes_origin_file base =
       | None -> "" ] ]
 ;
 
-value base_notes_file_path base fname =
-  let f = Filename.concat "notes_d" (fname ^ ".txt") in
+value base_notes_dir base =
   match base with
-  [ Base _ -> f
-  | Base2 _ -> Filename.concat "base_d" f ]
+  [ Base _ -> "notes_d"
+  | Base2 _ -> Filename.concat "base_d" "notes_d" ]
 ;
 
 value base_wiznotes_dir base =

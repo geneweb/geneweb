@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.12 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: notes.ml,v 5.13 2006-10-31 05:34:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -10,7 +10,8 @@ open Util;
 
 value file_path conf base fname =
   Util.base_path []
-    (Filename.concat (conf.bname ^ ".gwb") (base_notes_file_path base fname))
+    (List.fold_left Filename.concat (conf.bname ^ ".gwb")
+       [base_notes_dir base; fname ^ ".txt"])
 ;
 
 value path_of_fnotes fnotes =
