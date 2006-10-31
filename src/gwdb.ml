@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.88 2006-10-31 05:34:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.89 2006-10-31 12:00:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -25,7 +25,10 @@ type patches =
 type db2 =
   { bdir : string;
     cache_chan : Hashtbl.t (string * string * string) in_channel;
-    patches : patches }
+    patches : patches;
+    parents_array : mutable option (array (option ifam));
+    father_array : mutable option (array iper);
+    mother_array : mutable option (array iper) }
 ;
 
 type istr =
@@ -99,8 +102,8 @@ value get_field_acc db2 i (f1, f2) = do {
     try Hashtbl.find db2.cache_chan (f1, f2, "access") with
     [ Not_found -> do {
         let ic =
-          open_in_bin (List.fold_left Filename.concat db2.bdir
-            [f1; f2; "access"])
+          open_in_bin
+            (List.fold_left Filename.concat db2.bdir [f1; f2; "access"])
         in
         Hashtbl.add db2.cache_chan (f1, f2, "access") ic;
         ic
@@ -496,13 +499,17 @@ value get_consang =
       [ Sys_error _ -> no_consang ]
   | Ascend2Gen _ a -> a.Def.consang ]
 ;
+
 value get_parents =
   fun
   [ Ascend a -> a.Def.parents
   | Ascend2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "parents") in
-      if pos = -1 then None
-      else Some (get_field_data db2 pos ("person", "parents") "data")
+      match db2.parents_array with
+      [ Some tab -> tab.(i)
+      | None ->
+          let pos = get_field_acc db2 i ("person", "parents") in
+          if pos = -1 then None
+          else Some (get_field_data db2 pos ("person", "parents") "data") ]
   | Ascend2Gen _ a -> a.Def.parents ]
 ;
 
@@ -649,15 +656,23 @@ value gen_family_of_family =
 value get_father =
   fun
   [ Couple c -> Adef.father c
-  | Couple2 db2 i -> get_field db2 i ("family", "father")
+  | Couple2 db2 i ->
+      match db2.father_array with
+      [ Some tab -> tab.(i)
+      | None -> get_field db2 i ("family", "father") ]
   | Couple2Gen db2 c -> Adef.father c ]
 ;
+
 value get_mother =
   fun
   [ Couple c -> Adef.mother c
-  | Couple2 db2 i -> get_field db2 i ("family", "mother")
+  | Couple2 db2 i ->
+      match db2.mother_array with
+      [ Some tab -> tab.(i)
+      | None -> get_field db2 i ("family", "mother") ]
   | Couple2Gen db2 c -> Adef.mother c ]
 ;
+
 value get_parent_array =
   fun
   [ Couple c -> Adef.parent_array c
@@ -1094,30 +1109,96 @@ value base_strings_of_surname base s =
     (fun p -> p.surname) s
 ;
 
+value load_array2 bdir nb f1 f2 get =
+  if nb = 0 then [| |]
+  else do {
+(*
+let _ = do { eprintf "start load %s arr\n" f2; flush stderr; } in
+*)
+    let ic_acc =
+      open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "access"])
+    in
+    let ic_dat =
+      open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "data"])
+    in
+    let tab = Array.create nb (get ic_dat (input_binary_int ic_acc)) in
+    for i = 1 to nb - 1 do {
+      tab.(i) := get ic_dat (input_binary_int ic_acc);
+    };
+    close_in ic_dat;
+    close_in ic_acc;
+(*
+let _ = do { eprintf "load %s ok\n" f2; flush stderr; } in
+*)
+    tab
+  }
+;
+
 value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
-  | Base2 _ -> (* optimization not possible in that db system *) () ]
+  | Base2 db2 ->
+      match db2.parents_array with
+      [ Some _ -> ()
+      | None ->
+          let tab =
+            load_array2 db2.bdir (nb_of_persons base) "person" "parents"
+              (fun ic_dat pos ->
+                 if pos = -1 then None
+                 else do {
+                   seek_in ic_dat pos;
+                   Some (Iovalue.input ic_dat : ifam)
+                 })
+          in
+          db2.parents_array := Some tab ] ]
 ;
+
 value load_unions_array base =
   match base with
   [ Base base -> base.data.unions.load_array ()
-  | Base2 _ -> (* optimization not possible in that db system *) () ]
+  | Base2 _ -> () ]
 ;
+
 value load_couples_array base =
   match base with
   [ Base base -> base.data.couples.load_array ()
-  | Base2 _ -> (* optimization not possible in that db system *) () ]
+  | Base2 db2 -> do {
+      let nb = nb_of_families base in
+      match db2.father_array with
+      [ Some _ -> ()
+      | None ->
+          let tab =
+            load_array2 db2.bdir nb "family" "father"
+              (fun ic_dat pos -> do {
+                 seek_in ic_dat pos;
+                 Iovalue.input ic_dat
+               })
+          in
+          db2.father_array := Some tab ];
+      match db2.mother_array with
+      [ Some _ -> ()
+      | None ->
+          let tab =
+            load_array2 db2.bdir nb "family" "mother"
+              (fun ic_dat pos -> do {
+                 seek_in ic_dat pos;
+                 Iovalue.input ic_dat
+               })
+          in
+          db2.mother_array := Some tab ]
+    } ]
 ;
+
 value load_descends_array base =
   match base with
   [ Base base -> base.data.descends.load_array ()
-  | Base2 _ -> (* optimization not possible in that db system *) () ]
+  | Base2 _ -> () ]
 ;
+
 value load_strings_array base =
   match base with
   [ Base base -> base.data.strings.load_array ()
-  | Base2 _ -> (* optimization not possible in that db system *) () ]
+  | Base2 _ -> () ]
 ;
 
 value persons_array base =
@@ -1133,6 +1214,7 @@ value persons_array base =
       (get, set)
   | Base2 _ -> failwith "not impl persons_array" ]
 ;
+
 value ascends_array base =
   match base with
   [ Base base ->
@@ -1337,7 +1419,9 @@ value base_of_base2 bname =
          h_couple = empty_ht (); h_descend = empty_ht ();
          h_key = empty_ht (); h_name = empty_ht ()} ]
   in
-  Base2 {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches}
+  Base2
+    {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches;
+     parents_array = None; father_array = None; mother_array = None}
 ;
 
 value open_base bname =
