@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.31 2006-10-31 05:34:44 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.32 2006-10-31 05:56:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -521,9 +521,7 @@ value get_persons_with_notes base m list =
 ;
 
 value notes_aliases bdir =
-  let fname =
-    List.fold_left Filename.concat bdir ["notes_d"; "notes.alias"]
-  in
+  let fname = Filename.concat bdir "notes.alias" in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       loop [] where rec loop list =

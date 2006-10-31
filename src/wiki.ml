@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.13 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.14 2006-10-31 05:56:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -55,8 +55,8 @@ value notes_aliases conf =
     match p_getenv conf.base_env "notes_alias_file" with
     [ Some f -> Util.base_path [] f
     | None ->
-        List.fold_right Filename.concat
-          [Util.base_path [] (conf.bname ^ ".gwb"); "notes_d"] "notes.alias" ]
+        Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
+          "notes.alias" ]
   in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
