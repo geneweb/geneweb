@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.44 2006-10-30 11:31:33 ddr Exp $
+# $Id: lex_utf8.txt,v 5.45 2006-10-31 14:08:05 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2843,6 +2843,7 @@ sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
 
     continued
+da: fortsat
 en: continued
 fr: suite
 
@@ -3886,9 +3887,10 @@ ru: чтобы упорядочить имена по алфавиту
 sl: za lastna imena po abecednem redu
 sv: för förnamnen i bokstavsordning
 
-    for the list by dates of last modification
+    for the list ordered by the date of the last modification
 bg: за списъка по дати на последно изменение
-en: for the list by dates of last modification
+da: for en liste sorteret efter datoen for seneste ændring
+en: for the list ordered by the date of the last modification
 fr: pour la liste par date de dernière modification
 
     foster father/foster mother/foster parents
@@ -7550,6 +7552,7 @@ sl: bratje in sestre
 sv: syskon
 
     since the last click
+da: siden det sidste klik
 en: since the last click
 fr: depuis le dernier clic
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.30 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.31 2006-10-31 14:08:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -394,7 +394,8 @@ value print_main conf base auth_file =
         Wserver.wprint "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
           (transl conf "here");
         Wserver.wprint "%s"
-          (transl conf "for the list by dates of last modification");
+          (transl conf
+             "for the list ordered by the date of the last modification");
         Wserver.wprint ".</em>\n";
       end;
       print_wizards_by_alphabetic_order conf list;
