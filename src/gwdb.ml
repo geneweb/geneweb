@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.90 2006-10-31 14:01:42 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.91 2006-11-01 08:56:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -89,15 +89,6 @@ type base =
   | Base2 of db2 ]
 ;
 
-value eq_istr i1 i2 =
-  match (i1, i2) with
-  [ (Istr i1, Istr i2) -> Adef.int_of_istr i1 = Adef.int_of_istr i2
-  | (Istr2 _ (f11, f12) i1, Istr2 _ (f21, f22) i2) ->
-      i1 = i2 && f11 = f21 && f12 = f22
-  | (Istr2New _ s1, Istr2New _ s2) -> s1 = s2
-  | _ -> failwith "eq_istr" ]
-;
-
 value get_field_acc db2 i (f1, f2) = do {
   let ic =
     try Hashtbl.find db2.cache_chan (f1, f2, "access") with
@@ -160,6 +151,22 @@ let _ = do { Printf.eprintf "dat2 %d %s %s \n" pos f1 f2; flush stderr; } in
 value get_field db2 i path =
   let pos = get_field_acc db2 i path in
   get_field_data db2 pos path "data"
+;
+
+value string_of_istr2 db2 f pos =
+  if pos = -1 || pos = Db2.empty_string_pos then ""
+  else get_field_data db2 pos f "data"
+;
+
+value eq_istr i1 i2 =
+  match (i1, i2) with
+  [ (Istr i1, Istr i2) -> Adef.int_of_istr i1 = Adef.int_of_istr i2
+  | (Istr2 _ (f11, f12) i1, Istr2 _ (f21, f22) i2) ->
+      i1 = i2 && f11 = f21 && f12 = f22
+  | (Istr2New _ s1, Istr2New _ s2) -> s1 = s2
+  | (Istr2 db2 f pos, Istr2New _ s2) -> string_of_istr2 db2 f pos = s2
+  | (Istr2New _ s1, Istr2 db2 f pos) -> s1 = string_of_istr2 db2 f pos
+  | _ -> failwith "eq_istr" ]
 ;
 
 value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
@@ -767,9 +774,7 @@ value doi base i =
 value sou base i =
   match (base, i) with
   [ (Base base, Istr i) -> base.data.strings.get (Adef.int_of_istr i)
-  | (Base2 _, Istr2 db2 f pos) ->
-      if pos = -1 || pos = Db2.empty_string_pos then ""
-      else get_field_data db2 pos f "data"
+  | (Base2 _, Istr2 db2 f pos) -> string_of_istr2 db2 f pos
   | (Base2 _, Istr2New db2 s) -> s
   | _ -> assert False ]
 ;
@@ -880,10 +885,15 @@ value patch_name base s ip =
 value patch_key base ip fn sn occ =
   match base with
   [ Base _ -> ()
-  | Base2 db2 ->
+  | Base2 db2 -> do {
+      Hashtbl.iter
+        (fun key ip1 ->
+           if ip = ip1 then Hashtbl.remove db2.patches.h_key key else ())
+        db2.patches.h_key;
       let fn = Name.lower (nominative fn) in
       let sn = Name.lower (nominative sn) in
-      Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip ]
+      Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
+    }]
 ;
 
 value insert_string base s =
@@ -1423,6 +1433,7 @@ value base_of_base2 bname =
     [ Some ic -> do {
         let ht = input_value ic in
         close_in ic;
+        flush stderr;
         ht
       }
     | None ->

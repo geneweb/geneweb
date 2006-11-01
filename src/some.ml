@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.16 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: some.ml,v 5.17 2006-11-01 08:56:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -480,7 +480,7 @@ value print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-           if List.mem (get_surname p) list then list
+           if List.exists (eq_istr (get_surname p)) list then list
            else [get_surname p :: list])
         [] liste
     in
