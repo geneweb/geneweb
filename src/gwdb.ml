@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.94 2006-11-01 18:02:14 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.95 2006-11-01 18:16:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1493,6 +1493,46 @@ value res_fam = Hashtbl.create 1;
 value res_cpl = Hashtbl.create 1;
 value res_des = Hashtbl.create 1;
 
+value string_escaped s =
+  let n = ref 0 in
+  do {
+    for i = 0 to String.length s - 1 do {
+      n.val :=
+        n.val +
+          (match String.unsafe_get s i with
+           [ '"' | '\\' | '\n' | '\t' -> 2
+           | c -> 1 ])
+    };
+    if n.val = String.length s then s
+    else do {
+      let s' = String.create n.val in
+      n.val := 0;
+      for i = 0 to String.length s - 1 do {
+        match String.unsafe_get s i with
+        [ '"' | '\\' as c -> do {
+            String.unsafe_set s' n.val '\\';
+            incr n;
+            String.unsafe_set s' n.val c
+          }
+        | '\n' -> do {
+	    String.unsafe_set s' n.val '\\';
+	    incr n;
+	    String.unsafe_set s' n.val 'n'
+	  }
+        | '\t' -> do {
+            String.unsafe_set s' n.val '\\';
+            incr n;
+            String.unsafe_set s' n.val 't'
+          }
+        | c ->
+            String.unsafe_set s' n.val c ];
+        incr n
+      };
+      s'
+    }
+  }
+;
+
 value poi base i = do {
   let p = poi base i in
   if patches_file.val <> "" then do {
@@ -1555,7 +1595,7 @@ value patch_couple base ifam c = do {
 
 value print_string_field base oc name v =
   let v = sou base v in
-  if v <> "" then fprintf oc "    %s: \"%s\"\n"  name (String.escaped v)
+  if v <> "" then fprintf oc "    %s: \"%s\"\n"  name (string_escaped v)
   else ()
 ;
 
@@ -1566,7 +1606,7 @@ value print_string_list_field base oc name v =
     Mutil.list_iter_first
       (fun first v ->
          fprintf oc "%s\"%s\"" (if first then "" else ", ")
-           (String.escaped v))
+           (string_escaped v))
       v;
     fprintf oc "]\n";
   }
@@ -1594,8 +1634,8 @@ value print_diff_string_field base oc name get p1 p2 =
   let v2 = sou base (get p2) in
   if v1 <> v2 then do {
     fprintf oc "    %s\n" name;
-    fprintf oc "      bef: \"%s\"\n" (String.escaped v1);
-    fprintf oc "      aft: \"%s\"\n" (String.escaped v2);
+    fprintf oc "      bef: \"%s\"\n" (string_escaped v1);
+    fprintf oc "      aft: \"%s\"\n" (string_escaped v2);
   }
   else ()
 ;
