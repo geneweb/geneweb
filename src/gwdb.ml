@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.95 2006-11-01 18:16:22 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.96 2006-11-01 19:31:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1593,16 +1593,56 @@ value patch_couple base ifam c = do {
   patch_couple base ifam c;
 };
 
-value print_string_field base oc name v =
-  let v = sou base v in
-  if v <> "" then fprintf oc "    %s: \"%s\"\n"  name (string_escaped v)
+value print_string_field oc tab name get ref v =
+  let ref = get ref in
+  let v = get v in
+  if v <> ref then fprintf oc "    %s%s: \"%s\"\n"  tab name
+    (string_escaped v)
   else ()
 ;
 
-value print_string_list_field base oc name v =
-  let v = List.map (sou base) v in
-  if v <> [] then do {
-    fprintf oc "    qualifiers: [";
+value code_dmy d =
+  if d.day = 0 then
+    if d.month = 0 then sprintf "%4d" d.year
+    else sprintf "%4d-%02d" d.year d.month
+  else sprintf "%4d-%02d-%02d" d.year d.month d.day
+;
+
+value string_of_prec_dmy s d =
+  match d.prec with
+  [ Sure -> s
+  | About -> "~" ^ s
+  | Before -> "<" ^ s
+  | After -> ">" ^ s
+  | Maybe -> "?" ^ s
+  | OrYear z -> s ^ " " ^ "or" ^ " " ^ string_of_int z
+  | YearInt z -> "bet " ^ s ^ " and " ^ string_of_int z ]
+;
+
+value string_of_dmy d = string_of_prec_dmy (code_dmy d) d;
+
+value string_of_date =
+  fun
+  [ Dgreg d _ -> string_of_dmy d
+  | Dtext t -> "(" ^ t ^ ")" ]
+;
+
+value print_codate_field oc tab name get ref v =
+  let ref = get ref in
+  let v = get v in
+  if v <> ref then
+    fprintf oc "    %s%s: %s\n" tab name
+      (match Adef.od_of_codate v with
+       [ Some d -> string_of_date d
+       | None -> "-" ])
+  else ()
+;
+
+value print_string_list_field oc tab name get ref v =
+  let ref = get ref in
+  let v = get v in
+  if v <> ref then do {
+    fprintf oc "    %s: [" name;
     Mutil.list_iter_first
       (fun first v ->
          fprintf oc "%s\"%s\"" (if first then "" else ", ")
@@ -1613,69 +1653,77 @@ value print_string_list_field base oc name v =
   else ()
 ;
 
-value print_not_default_per base oc ip = do {
-  let p = Hashtbl.find res_per ip in
-  print_string_field base oc "first_name" (get_first_name p);
-  print_string_field base oc "surname" (get_surname p);
-  let x = get_occ p in
-  if x <> 0 then fprintf oc "    occ: %d\n" x else ();
-  print_string_field base oc "image" (get_image p);
-  print_string_field base oc "public_name" (get_public_name p);
-  print_string_list_field base oc "qualifiers" (get_qualifiers p);
-  print_string_list_field base oc "aliases" (get_aliases p);
-  print_string_list_field base oc "first_names_aliases"
-    (get_first_names_aliases p);
-  print_string_list_field base oc "surnames_aliases" (get_surnames_aliases p);
-  fprintf oc "    ...\n";
+value print_diff_per oc tab ref p = do {
+  print_string_field oc tab "first_name" (fun p -> p.first_name) ref p;
+  print_string_field oc tab "surname" (fun p -> p.surname) ref p;
+  if p.occ <> 0 then fprintf oc "    %socc: %d\n" tab p.occ else ();
+  print_string_field oc tab "image" (fun p -> p.image) ref p;
+  print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
+  print_string_list_field oc tab "qualifiers" (fun p -> p.qualifiers) ref p;
+  print_string_list_field oc tab "aliases" (fun p -> p.aliases) ref p;
+  print_string_list_field oc tab "first_names_aliases"
+    (fun p -> p.first_names_aliases) ref p;
+  print_string_list_field oc tab "surnames_aliases"
+    (fun p -> p.surnames_aliases) ref p;
+  fprintf oc "    %s...\n" tab;
+  print_string_field oc tab "occupation" (fun p -> p.occupation) ref p;
+  fprintf oc "    %s...\n" tab;
+  print_codate_field oc tab "birth" (fun p -> p.birth) ref p;
+  print_string_field oc tab "birth_place" (fun p -> p.birth_place) ref p;
+  print_string_field oc tab "birth_src" (fun p -> p.birth_src) ref p;
+  print_codate_field oc tab "baptism" (fun p -> p.baptism) ref p;
+  print_string_field oc tab "baptism_place" (fun p -> p.baptism_place) ref p;
+  print_string_field oc tab "baptism_src" (fun p -> p.baptism_src) ref p;
+  fprintf oc "    %s...\n" tab;
+  print_string_field oc tab "death_place" (fun p -> p.death_place) ref p;
+  print_string_field oc tab "death_src" (fun p -> p.death_src) ref p;
+  fprintf oc "    %s...\n" tab;
+  print_string_field oc tab "burial_place" (fun p -> p.burial_place) ref p;
+  print_string_field oc tab "burial_src" (fun p -> p.burial_src) ref p;
+  print_string_field oc tab "notes" (fun p -> p.notes) ref p;
+  print_string_field oc tab "sources" (fun p -> p.psources) ref p;
 };
 
-value print_diff_string_field base oc name get p1 p2 =
-  let v1 = sou base (get p1) in
-  let v2 = sou base (get p2) in
-  if v1 <> v2 then do {
-    fprintf oc "    %s\n" name;
-    fprintf oc "      bef: \"%s\"\n" (string_escaped v1);
-    fprintf oc "      aft: \"%s\"\n" (string_escaped v2);
-  }
-  else ()
-;
-
-value print_diff_per base oc ip = do {
-  let p1 = Hashtbl.find ini_per ip in
-  let p2 = Hashtbl.find res_per ip in
-  print_diff_string_field base oc "first_name" get_first_name p1 p2;
-  print_diff_string_field base oc "surname" get_surname p1 p2;
-  fprintf oc "    some diff fields...\n";
-  print_diff_string_field base oc "image" get_image p1 p2;
-  print_diff_string_field base oc "public_name" get_public_name p1 p2;
-  fprintf oc "    some diff fields...\n";
-  print_diff_string_field base oc "occupation" get_occupation p1 p2;
-  fprintf oc "    some diff fields...\n";
-  print_diff_string_field base oc "birth_place" get_birth_place p1 p2;
-  print_diff_string_field base oc "birth_src" get_birth_src p1 p2;
-  fprintf oc "    some diff fields...\n";
-  print_diff_string_field base oc "baptism_place" get_baptism_place p1 p2;
-  print_diff_string_field base oc "baptism_src" get_baptism_src p1 p2;
-  fprintf oc "    some diff fields...\n";
-  print_diff_string_field base oc "death_place" get_death_place p1 p2;
-  print_diff_string_field base oc "death_src" get_death_src p1 p2;
-  fprintf oc "    some diff fields...\n";
-  print_diff_string_field base oc "burial_place" get_burial_place p1 p2;
-  print_diff_string_field base oc "burial_src" get_burial_src p1 p2;
-  print_diff_string_field base oc "notes" get_notes p1 p2;
-  print_diff_string_field base oc "psources" get_psources p1 p2;
+value print_diff_fam oc tab ref fam = do {
+  print_codate_field oc tab "marriage" (fun (f, _, _) -> f.marriage) ref fam;
+  print_string_field oc tab "marriage_place"
+    (fun (f, _, _) -> f.marriage_place) ref fam;
+  print_string_field oc tab "marriage_src"
+    (fun (f, _, _) -> f.marriage_src) ref fam;
+  fprintf oc "    %s...\n" tab;
+  print_string_field oc tab "comment" (fun (f, _, _) -> f.comment) ref fam;
+  print_string_field oc tab "origin_file" (fun (f, _, _) -> f.origin_file)
+    ref fam;
+  print_string_field oc tab "sources" (fun (f, _, _) -> f.fsources) ref fam;
+  fprintf oc "    %s...\n" tab;
 };
-
-value print_not_default_fam oc ifam =
-  fprintf oc "    not default fields\n"
-;
-
-value print_diff_fam oc ifam =
-  fprintf oc "    diff fields\n"
-;
 
 module IpSet = Set.Make (struct type t = iper; value compare = compare; end);
 module IfSet = Set.Make (struct type t = ifam; value compare = compare; end);
+
+value default_per =
+  {first_name = ""; surname = ""; occ = 0; image = "";
+   first_names_aliases = []; surnames_aliases = []; public_name = "";
+   qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
+   occupation = ""; sex = Neuter; access = IfTitles;
+   birth = Adef.codate_None; birth_place = ""; birth_src = "";
+   baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
+   death = DontKnowIfDead; death_place = ""; death_src = "";
+   burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
+   psources = ""; key_index = Adef.iper_of_int 0}
+;
+
+value default_fam =
+  {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
+   witnesses = [| |]; relation = Married; divorce = NotDivorced;
+   comment = ""; origin_file = ""; fsources = "";
+   fam_index = Adef.ifam_of_int 0}
+;
+value default_cpl =
+  couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1))
+;
+value default_des = {children = [| |]};
+value default_fcd = (default_fam, default_cpl, default_des);
 
 value commit_patches base = do {
   if patches_file.val <> "" then do {
@@ -1699,7 +1747,21 @@ value commit_patches base = do {
          let is_new = not (Hashtbl.mem ini_per ip) in
          fprintf oc "  person P-%d%s\n" (Adef.int_of_iper ip)
            (if is_new then " (new)" else "");
-         (if is_new then print_not_default_per else print_diff_per) base oc ip
+         let p2 =
+           map_person_ps (fun ip -> ip) (sou base)
+             (gen_person_of_person (Hashtbl.find res_per ip))
+         in
+         if is_new then print_diff_per oc "" default_per p2
+         else do {
+           let p1 =
+             map_person_ps (fun ip -> ip) (sou base)
+               (gen_person_of_person (Hashtbl.find ini_per ip))
+           in
+           fprintf oc "    before\n";
+           print_diff_per oc "  " p2 p1;
+           fprintf oc "    after\n";
+           print_diff_per oc "  " p1 p2;
+         }
        })
       per_set;
     IfSet.iter
@@ -1711,7 +1773,35 @@ value commit_patches base = do {
          in
          fprintf oc "  family F-%d%s\n" (Adef.int_of_ifam ifam)
            (if is_new then " (new)" else "");
-         (if is_new then print_not_default_fam else print_diff_fam) oc ifam
+         let fcd2 =
+           (try
+              map_family_ps (fun ip -> ip) (sou base)
+                (gen_family_of_family (Hashtbl.find res_fam ifam))
+            with
+            [ Not_found -> default_fam ],
+            try gen_couple_of_couple (Hashtbl.find res_cpl ifam) with
+            [ Not_found -> default_cpl ],
+            try gen_descend_of_descend (Hashtbl.find res_des ifam) with
+            [ Not_found -> default_des ])
+         in
+         if is_new then print_diff_fam oc "" default_fcd fcd2
+         else do {
+           let fcd1 =
+             (try
+                map_family_ps (fun ip -> ip) (sou base)
+                  (gen_family_of_family (Hashtbl.find ini_fam ifam))
+              with
+              [ Not_found -> default_fam ],
+              try gen_couple_of_couple (Hashtbl.find ini_cpl ifam) with
+              [ Not_found -> default_cpl ],
+              try gen_descend_of_descend (Hashtbl.find ini_des ifam) with
+              [ Not_found -> default_des ])
+           in
+           fprintf oc "    before\n";
+           print_diff_fam oc "  " fcd2 fcd1;
+           fprintf oc "    after\n";
+           print_diff_fam oc "  " fcd1 fcd2;
+         }
        })
       fam_set;
     close_out oc;
