@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.28 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.29 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -22,7 +22,6 @@ value alphabetic : string -> string -> int;
 value alphabetic_order : string -> string -> int;
 
 value lindex : string -> char -> option int;
-value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
 
 value arg_list_of_string : string -> list string;
 

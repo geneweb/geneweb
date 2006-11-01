@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.20 2006-11-01 11:50:40 ddr Exp $ *)
+(* $Id: some.ml,v 5.21 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -125,7 +125,7 @@ value first_name_print_list conf base x1 xl liste =
   let title h =
     if h || p_getenv conf.env "t" = Some "A" then Wserver.wprint "%s" x1
     else
-      Gutil.list_iter_first
+      Mutil.list_iter_first
         (fun first x ->
            Wserver.wprint "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)

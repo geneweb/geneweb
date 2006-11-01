@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.31 2006-10-31 14:08:05 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.32 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -323,7 +323,7 @@ value print_old_wizards conf list =
         Wserver.wprint "%s..." (transl_nth conf "and" 0);
         tag "dl" begin
           tag "dd" begin
-            Gutil.list_iter_first
+            Mutil.list_iter_first
               (fun first wz -> do {
                  if not first then Wserver.wprint ",\n" else ();
                  stag "a" "href=\"%sm=WIZNOTES;f=%s\"" (commd conf)

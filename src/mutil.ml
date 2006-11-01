@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.10 2006-11-01 10:48:29 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.11 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -15,6 +15,13 @@ value array_mem x a =
     if i = Array.length a then False
     else if x = a.(i) then True
     else loop (i + 1)
+;
+
+value list_iter_first f al =
+  let _ =
+    List.fold_left (fun first a -> let () = f first a in False) True al
+  in
+  ()
 ;
 
 IFDEF OLD THEN declare
