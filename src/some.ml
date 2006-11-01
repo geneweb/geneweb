@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.17 2006-11-01 08:56:37 ddr Exp $ *)
+(* $Id: some.ml,v 5.18 2006-11-01 10:48:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -26,15 +26,21 @@ value surname_not_found conf =
 ;
 
 value persons_of_fsname conf base base_strings_of_fsname find proj x =
+  (* list of strings index corresponding to the crushed lower first name
+     or surname "x" *)
   let istrl = base_strings_of_fsname base x in
+  (* selecting the persons who have this first name or surname *)
   let l =
     let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
          let str = nominative (sou base istr) in
          if Name.crush_lower str = x ||
-            List.mem x (List.map Name.crush_lower (surnames_pieces str)) then
+            List.mem x (List.map Name.crush_lower (surnames_pieces str))
+         then
            let iperl = find istr in
+           (* maybe they are not the good ones because of changes in the
+              database; checking... *)
            let iperl =
              List.fold_left
                (fun iperl iper ->
@@ -123,7 +129,7 @@ value first_name_print_list conf base x1 xl liste =
         (fun first x ->
            Wserver.wprint "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
-      xl
+        (StrSet.elements xl)
   in
   do {
     header conf title;
@@ -150,8 +156,10 @@ value select_first_name conf base n list =
            html_li conf;
            Wserver.wprint "<a href=\"%sm=P;v=%s\">" (commd conf)
              (code_varenv sstr);
-           Wserver.wprint "%s" (List.hd strl);
-           List.iter (fun s -> Wserver.wprint ", %s" s) (List.tl strl);
+           list_iter_first
+             (fun first str ->
+                Wserver.wprint "%s%s" (if first then "" else ", ") str)
+             (StrSet.elements strl);
            Wserver.wprint "</a>\n";
          })
       list;
@@ -165,7 +173,7 @@ value rec merge_insert ((sstr, (strl, iperl)) as x) =
   [ [((sstr1, (strl1, iperl1)) as y) :: l] ->
       if sstr < sstr1 then [x; y :: l]
       else if sstr > sstr1 then [y :: merge_insert x l]
-      else [(sstr, (strl @ strl1, iperl @ iperl1)) :: l]
+      else [(sstr, (StrSet.union strl strl1, iperl @ iperl1)) :: l]
   | [] -> [x] ]
 ;
 
@@ -199,7 +207,9 @@ value first_name_print conf base x =
         (spi_find (persons_of_first_name base)) get_first_name x
   in
   let list =
-    List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl)))
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
@@ -610,7 +620,14 @@ value old_surname_print conf base not_found_fun x =
     List.fold_right
       (fun (str, istr, iperl1) (iperl, strl) ->
          let len = List.length iperl1 in
-         (iperl1 @ iperl, [(str, len) :: strl]))
+         let strl =
+           try
+             let len1 = List.assoc str strl in
+             [(str, len + len1) :: List.remove_assoc str strl]
+           with
+           [ Not_found -> [(str, len) :: strl] ]
+         in
+         (iperl1 @ iperl, strl))
       l ([], [])
   in
   match p_getenv conf.env "o" with
