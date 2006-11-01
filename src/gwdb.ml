@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.92 2006-11-01 10:48:29 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.93 2006-11-01 11:50:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -435,8 +435,8 @@ value person_with_key p fn sn oc =
 value person_with_related p r =
   match p with
   [ Person p -> Person {(p) with related = r}
-  | Person2 _ _ -> failwith "not impl person_with_key"
-  | Person2Gen _ _ -> failwith "not impl person_with_key (gen)" ]
+  | Person2 _ _ -> failwith "not impl person_with_related"
+  | Person2Gen _ _ -> failwith "not impl person_with_related (gen)" ]
 ;
 
 value un_istr =

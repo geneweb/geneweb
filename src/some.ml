@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.19 2006-11-01 10:56:18 ddr Exp $ *)
+(* $Id: some.ml,v 5.20 2006-11-01 11:50:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -610,6 +610,8 @@ value persons_of_absolute_surname conf base x =
     istrl []
 ;
 
+module PerSet = Set.Make (struct type t = iper; value compare = compare; end);
+
 value old_surname_print conf base not_found_fun x =
   let (l, name_inj) =
     if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
@@ -630,9 +632,10 @@ value old_surname_print conf base not_found_fun x =
            with
            [ Not_found -> [(str, len) :: strl] ]
          in
-         (iperl1 @ iperl, strl))
-      l ([], [])
+         (List.fold_right PerSet.add iperl1 iperl, strl))
+      l (PerSet.empty, [])
   in
+  let iperl = PerSet.elements iperl in
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let pl =
