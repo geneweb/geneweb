@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.12 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: title.ml,v 5.13 2006-11-01 10:48:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Mutil;
 open Util;
 
 type date_search = [ JustSelf | AddSpouse | AddChildren ];
@@ -259,20 +260,18 @@ value select_place conf base place =
 ;
 
 value select_all proj conf base =
-  let module O = struct type t = string; value compare = compare; end in
-  let module S = Set.Make O in
   let s =
-    loop 0 S.empty where rec loop i s =
+    loop 0 StrSet.empty where rec loop i s =
       if i = nb_of_persons base then s
       else
         let x = pget conf base (Adef.iper_of_int i) in
         let s =
-          List.fold_left (fun s t -> S.add (sou base (proj t)) s) s
+          List.fold_left (fun s t -> StrSet.add (sou base (proj t)) s) s
             (nobtit conf base x)
         in
         loop (i + 1) s
   in
-  S.elements s
+  StrSet.elements s
 ;
 
 value select_all_titles = select_all (fun t -> t.t_ident);

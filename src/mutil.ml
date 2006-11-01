@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.9 2006-10-29 14:05:45 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.10 2006-11-01 10:48:29 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -393,4 +393,8 @@ value arabian_of_roman s =
   let (r, i) = decode_digit 'X' 'L' 'C' r i in
   let (r, i) = decode_digit 'I' 'V' 'X' r i in
   if i = String.length s then r else raise Not_found
+;
+
+module StrSet =
+  Set.Make (struct type t = string; value compare = compare; end)
 ;
