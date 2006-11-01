@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.18 2006-11-01 10:48:29 ddr Exp $ *)
+(* $Id: some.ml,v 5.19 2006-11-01 10:56:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -494,7 +494,11 @@ value print_family_alphabetic x conf base liste =
            else [get_surname p :: list])
         [] liste
     in
-    let list = List.map (fun s -> sou base s) list in List.sort compare list
+    let set =
+      List.fold_left (fun set istr -> StrSet.add (sou base istr) set)
+        StrSet.empty list
+    in
+    List.sort compare (StrSet.elements set)
   in
   let liste =
     let l =
@@ -523,11 +527,10 @@ value print_family_alphabetic x conf base liste =
           if h || List.length homonymes = 1 then x
           else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv x ^ ";t=A") x
         in
-        do {
-          Wserver.wprint "%s" (access (List.hd homonymes));
-          List.iter (fun x -> Wserver.wprint ", %s" (access x))
-            (List.tl homonymes);
-        }
+        list_iter_first
+          (fun first x ->
+             Wserver.wprint "%s%s" (if first then "" else ", ") (access x))
+          homonymes
       in
       do {
         header conf title;
