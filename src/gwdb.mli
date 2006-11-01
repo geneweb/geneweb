@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.63 2006-10-31 05:34:44 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.64 2006-11-01 18:02:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -173,6 +173,8 @@ value nobtit : config -> base -> person -> list title;
 
 value p_first_name : base -> person -> string;
 value p_surname : base -> person -> string;
+
+value record_changes_in_file : string -> unit;
 
 (**/**)
 (** For database builders *)

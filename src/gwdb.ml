@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.93 2006-11-01 11:50:40 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.94 2006-11-01 18:02:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -734,6 +734,7 @@ value poi base i =
       try Person2Gen db2 (Hashtbl.find db2.patches.h_person i) with
       [ Not_found -> Person2 db2 (Adef.int_of_iper i) ] ]
 ;
+
 value aoi base i =
   match base with
   [ Base base -> Ascend (base.data.ascends.get (Adef.int_of_iper i))
@@ -741,6 +742,7 @@ value aoi base i =
       try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend i) with
       [ Not_found -> Ascend2 db2 (Adef.int_of_iper i) ] ]
 ;
+
 value uoi base i =
   match base with
   [ Base base -> Union (base.data.unions.get (Adef.int_of_iper i))
@@ -756,6 +758,7 @@ value foi base i =
       try Family2Gen db2 (Hashtbl.find db2.patches.h_family i) with
       [ Not_found -> Family2 db2 (Adef.int_of_ifam i) ] ]
 ;
+
 value coi base i =
   match base with
   [ Base base -> Couple (base.data.couples.get (Adef.int_of_ifam i))
@@ -763,6 +766,7 @@ value coi base i =
       try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple i) with
       [ Not_found -> Couple2 db2 (Adef.int_of_ifam i) ] ]
 ;
+
 value doi base i =
   match base with
   [ Base base -> Descend (base.data.descends.get (Adef.int_of_ifam i))
@@ -816,6 +820,7 @@ value patch_person base ip p =
     }
   | _ -> assert False ]
 ;
+
 value patch_ascend base ip a =
   match (base, a) with
   [ (Base base, Ascend a) -> base.func.patch_ascend ip a
@@ -826,6 +831,7 @@ value patch_ascend base ip a =
     }
   | _ -> assert False ]
 ;
+
 value patch_union base ip u =
   match (base, u) with
   [ (Base base, Union u) -> base.func.patch_union ip u
@@ -847,6 +853,7 @@ value patch_family base ifam f =
     }
   | _ -> failwith "not impl patch_family" ]
 ;
+
 value patch_descend base ifam d =
   match (base, d) with
   [ (Base base, Descend d) -> base.func.patch_descend ifam d
@@ -857,6 +864,7 @@ value patch_descend base ifam d =
     }
   | _ -> failwith "not impl patch_descend" ]
 ;
+
 value patch_couple base ifam c =
   match (base, c) with
   [ (Base base, Couple c) -> base.func.patch_couple ifam c
@@ -915,6 +923,7 @@ value commit_patches base =
       Sys.rename (fname ^ "1") fname
     } ]
 ;
+
 value commit_notes base =
   match base with
   [ Base base -> base.func.commit_notes
@@ -1468,3 +1477,205 @@ value close_base base =
   | Base2 db2 ->
       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan ]
 ;
+
+(* Traces of changes *)
+
+value patches_file = ref "";
+value record_changes_in_file v = patches_file.val := v;
+
+value ini_per = Hashtbl.create 1;
+value ini_fam = Hashtbl.create 1;
+value ini_cpl = Hashtbl.create 1;
+value ini_des = Hashtbl.create 1;
+
+value res_per = Hashtbl.create 1;
+value res_fam = Hashtbl.create 1;
+value res_cpl = Hashtbl.create 1;
+value res_des = Hashtbl.create 1;
+
+value poi base i = do {
+  let p = poi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_per i || Hashtbl.mem res_per i then ()
+    else Hashtbl.add ini_per i p;
+  }
+  else ();
+  p
+};
+
+value foi base i = do {
+  let f = foi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_fam i || Hashtbl.mem res_fam i then ()
+    else Hashtbl.add ini_fam i f;
+  }
+  else ();
+  f
+};
+
+value coi base i = do {
+  let c = coi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_cpl i || Hashtbl.mem res_cpl i then ()
+    else Hashtbl.add ini_cpl i c;
+  }
+  else ();
+  c
+};
+
+value doi base i = do {
+  let d = doi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_des i || Hashtbl.mem res_des i then ()
+    else Hashtbl.add ini_des i d;
+  }
+  else ();
+  d
+};
+
+value patch_person base ip p = do {
+  if patches_file.val <> "" then Hashtbl.replace res_per ip p else ();
+  patch_person base ip p;
+};
+
+value patch_family base ifam f = do {
+  if patches_file.val <> "" then Hashtbl.replace res_fam ifam f else ();
+  patch_family base ifam f;
+};
+
+value patch_descend base ifam d = do {
+  if patches_file.val <> "" then Hashtbl.replace res_des ifam d else ();
+  patch_descend base ifam d;
+};
+
+value patch_couple base ifam c = do {
+  if patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
+  patch_couple base ifam c;
+};
+
+value print_string_field base oc name v =
+  let v = sou base v in
+  if v <> "" then fprintf oc "    %s: \"%s\"\n"  name (String.escaped v)
+  else ()
+;
+
+value print_string_list_field base oc name v =
+  let v = List.map (sou base) v in
+  if v <> [] then do {
+    fprintf oc "    qualifiers: [";
+    Mutil.list_iter_first
+      (fun first v ->
+         fprintf oc "%s\"%s\"" (if first then "" else ", ")
+           (String.escaped v))
+      v;
+    fprintf oc "]\n";
+  }
+  else ()
+;
+
+value print_not_default_per base oc ip = do {
+  let p = Hashtbl.find res_per ip in
+  print_string_field base oc "first_name" (get_first_name p);
+  print_string_field base oc "surname" (get_surname p);
+  let x = get_occ p in
+  if x <> 0 then fprintf oc "    occ: %d\n" x else ();
+  print_string_field base oc "image" (get_image p);
+  print_string_field base oc "public_name" (get_public_name p);
+  print_string_list_field base oc "qualifiers" (get_qualifiers p);
+  print_string_list_field base oc "aliases" (get_aliases p);
+  print_string_list_field base oc "first_names_aliases"
+    (get_first_names_aliases p);
+  print_string_list_field base oc "surnames_aliases" (get_surnames_aliases p);
+  fprintf oc "    ...\n";
+};
+
+value print_diff_string_field base oc name get p1 p2 =
+  let v1 = sou base (get p1) in
+  let v2 = sou base (get p2) in
+  if v1 <> v2 then do {
+    fprintf oc "    %s\n" name;
+    fprintf oc "      bef: \"%s\"\n" (String.escaped v1);
+    fprintf oc "      aft: \"%s\"\n" (String.escaped v2);
+  }
+  else ()
+;
+
+value print_diff_per base oc ip = do {
+  let p1 = Hashtbl.find ini_per ip in
+  let p2 = Hashtbl.find res_per ip in
+  print_diff_string_field base oc "first_name" get_first_name p1 p2;
+  print_diff_string_field base oc "surname" get_surname p1 p2;
+  fprintf oc "    some diff fields...\n";
+  print_diff_string_field base oc "image" get_image p1 p2;
+  print_diff_string_field base oc "public_name" get_public_name p1 p2;
+  fprintf oc "    some diff fields...\n";
+  print_diff_string_field base oc "occupation" get_occupation p1 p2;
+  fprintf oc "    some diff fields...\n";
+  print_diff_string_field base oc "birth_place" get_birth_place p1 p2;
+  print_diff_string_field base oc "birth_src" get_birth_src p1 p2;
+  fprintf oc "    some diff fields...\n";
+  print_diff_string_field base oc "baptism_place" get_baptism_place p1 p2;
+  print_diff_string_field base oc "baptism_src" get_baptism_src p1 p2;
+  fprintf oc "    some diff fields...\n";
+  print_diff_string_field base oc "death_place" get_death_place p1 p2;
+  print_diff_string_field base oc "death_src" get_death_src p1 p2;
+  fprintf oc "    some diff fields...\n";
+  print_diff_string_field base oc "burial_place" get_burial_place p1 p2;
+  print_diff_string_field base oc "burial_src" get_burial_src p1 p2;
+  print_diff_string_field base oc "notes" get_notes p1 p2;
+  print_diff_string_field base oc "psources" get_psources p1 p2;
+};
+
+value print_not_default_fam oc ifam =
+  fprintf oc "    not default fields\n"
+;
+
+value print_diff_fam oc ifam =
+  fprintf oc "    diff fields\n"
+;
+
+module IpSet = Set.Make (struct type t = iper; value compare = compare; end);
+module IfSet = Set.Make (struct type t = ifam; value compare = compare; end);
+
+value commit_patches base = do {
+  if patches_file.val <> "" then do {
+    let oc =
+      open_out_gen [Open_wronly; Open_append; Open_creat] 0o777
+        patches_file.val
+    in
+    fprintf oc "commit\n";
+    let per_set =
+      Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per IpSet.empty
+    in
+    let fam_set =
+      let set = IfSet.empty in
+      let set = Hashtbl.fold (fun ip _ -> IfSet.add ip) res_fam set in
+      let set = Hashtbl.fold (fun ip _ -> IfSet.add ip) res_cpl set in
+      let set = Hashtbl.fold (fun ip _ -> IfSet.add ip) res_des set in
+      set
+    in
+    IpSet.iter
+      (fun ip -> do {
+         let is_new = not (Hashtbl.mem ini_per ip) in
+         fprintf oc "  person P-%d%s\n" (Adef.int_of_iper ip)
+           (if is_new then " (new)" else "");
+         (if is_new then print_not_default_per else print_diff_per) base oc ip
+       })
+      per_set;
+    IfSet.iter
+      (fun ifam -> do {
+         let is_new =
+           not
+             (Hashtbl.mem ini_fam ifam || Hashtbl.mem ini_cpl ifam ||
+              Hashtbl.mem ini_des ifam)
+         in
+         fprintf oc "  family F-%d%s\n" (Adef.int_of_ifam ifam)
+           (if is_new then " (new)" else "");
+         (if is_new then print_not_default_fam else print_diff_fam) oc ifam
+       })
+      fam_set;
+    close_out oc;
+  }
+  else ();
+  commit_patches base;
+};

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.30 2006-11-01 16:59:59 ddr Exp $ *)
+(* $Id: request.ml,v 5.31 2006-11-01 18:02:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -753,7 +753,15 @@ value treat_request_on_base conf log =
 (*
     match if Sys.file_exists "refuse" then Refuse else Accept with
 *)
-    [ Accept -> treat_request_on_possibly_locked_base conf bfile log
+    [ Accept -> do {
+        match
+          try Some (List.assoc "recfile" conf.base_env) with
+          [ Not_found -> None ]
+        with
+        [ Some "" | None -> ()
+        | Some f -> Gwdb.record_changes_in_file f ];
+        treat_request_on_possibly_locked_base conf bfile log
+      }
     | Refuse -> Update.error_locked conf ]
   else treat_request_on_possibly_locked_base conf bfile log
 ;
