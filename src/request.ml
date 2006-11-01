@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.29 2006-10-30 21:11:10 ddr Exp $ *)
+(* $Id: request.ml,v 5.30 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -277,7 +277,7 @@ value specify conf base n pl =
              | fnal ->
                  do {
                    Wserver.wprint "\n<em>(";
-                   Gutil.list_iter_first
+                   Mutil.list_iter_first
                      (fun first fna ->
                         do {
                           if not first then Wserver.wprint ", " else ();

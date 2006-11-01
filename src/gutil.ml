@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.46 2006-10-24 14:59:16 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.47 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -10,13 +10,6 @@ value lindex s c =
     if i = String.length s then None
     else if s.[i] = c then Some i
     else pos (i + 1)
-;
-
-value list_iter_first f al =
-  let _ =
-    List.fold_left (fun first a -> let () = f first a in False) True al
-  in
-  ()
 ;
 
 value string_sub s i len =

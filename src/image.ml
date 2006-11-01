@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 5.2 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: image.ml,v 5.3 2006-11-01 16:59:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -91,7 +91,7 @@ value print_html conf base =
       (Util.transl_nth conf "image/images" 0);
     Wserver.wprint "</head>\n<body>\n";
     Wserver.wprint "<img src=\"%s" (commd conf);
-    Gutil.list_iter_first
+    Mutil.list_iter_first
       (fun first (k, v) ->
          let v = if k = "m" then "IM" else v in
          Wserver.wprint "%s%s=%s" (if first then "" else ";") k v)
