@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 5.4 2006-10-02 02:50:38 ddr Exp $
+# $Id: a.gwf,v 5.5 2006-11-01 18:02:14 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -69,6 +69,9 @@ moderator_file=
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
 wizard_just_friend=no
+
+# Text file recording the changes
+# recfile=
 
 # Generates pages with DOCTYPE HTML 4.01 (default XHTML 1.1)
 # doctype=html-4.01
