@@ -134,8 +134,8 @@ history.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi \
 history.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx secure.cmx templ.cmx templAst.cmi util.cmx history.cmi 
 history.cmi: config.cmi def.cmi gwdb.cmi 
-image.cmo: config.cmi gutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
-image.cmx: config.cmi gutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 
+image.cmo: config.cmi mutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
+image.cmx: config.cmi mutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 
 iochan.cmo: iovalue.cmi iochan.cmi 
 iochan.cmx: iovalue.cmx iochan.cmi 
 iovalue.cmo: iovalue.cmi 
