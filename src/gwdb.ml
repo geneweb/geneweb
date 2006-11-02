@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.101 2006-11-02 04:26:59 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.102 2006-11-02 06:20:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1689,8 +1689,8 @@ value print_iper_list_field oc tab name get ref v =
     else
       Mutil.list_iter_first
         (fun first (fn, sn, occ, ip) -> do {
-           fprintf oc "    %s%-14s" tab
-             (if first then (fill 14 name) else "");
+           fprintf oc "    %s%-16s" tab
+             (if first then (fill 16 name) else "");
            if Adef.int_of_iper ip < 0 then fprintf oc "-"
            else
              fprintf oc "P-%d %s" (Adef.int_of_iper ip)
