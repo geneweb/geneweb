@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.107 2006-11-02 17:34:19 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.108 2006-11-02 17:52:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1500,7 +1500,7 @@ value string_escaped s =
       n.val :=
         n.val +
           (match String.unsafe_get s i with
-           [ '"' | '\\' | '\n' | '\t' -> 2
+           [ '\\' | '\n' | '\t' -> 2
            | c -> 1 ])
     };
     if n.val = String.length s then s
@@ -1509,7 +1509,7 @@ value string_escaped s =
       n.val := 0;
       for i = 0 to String.length s - 1 do {
         match String.unsafe_get s i with
-        [ '"' | '\\' as c -> do {
+        [ '\\' as c -> do {
             String.unsafe_set s' n.val '\\';
             incr n;
             String.unsafe_set s' n.val c
@@ -1681,12 +1681,13 @@ value print_string_list_field oc tab name get ref v =
   else ()
 ;
 
-value print_iper_list_field oc tab name get ref v =
+value print_iper_list_field oc tab name1 name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then
     if v = [] then fprintf oc "    %sno %s\n" tab name
     else
+      let name = if List.length v = 1 then name1 else name in
       Mutil.list_iter_first
         (fun first (fn, sn, occ, ip) -> do {
            fprintf oc "    %s%s" tab (fill (if first then name else ""));
@@ -1784,7 +1785,7 @@ value print_diff_per oc tab ref p = do {
 value print_diff_fam oc tab ref fam = do {
   print_iper_field oc tab "father" (fun (_, c, _) -> Adef.father c) ref fam;
   print_iper_field oc tab "mother" (fun (_, c, _) -> Adef.mother c) ref fam;
-  print_iper_list_field oc tab "children"
+  print_iper_list_field oc tab "child" "children"
     (fun (_, _, d) -> Array.to_list d.children) ref fam;
   print_codate_field oc tab "marriage" (fun (f, _, _) -> f.marriage) ref fam;
   print_string_field oc tab "marriage_place"
