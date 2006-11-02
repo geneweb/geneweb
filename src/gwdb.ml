@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.98 2006-11-02 02:49:35 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.99 2006-11-02 03:18:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1593,14 +1593,6 @@ value patch_couple base ifam c = do {
   patch_couple base ifam c;
 };
 
-value print_string_field oc tab name get ref v =
-  let ref = get ref in
-  let v = get v in
-  if v <> ref then fprintf oc "    %s%s: \"%s\"\n"  tab name
-    (string_escaped v)
-  else ()
-;
-
 value code_dmy d =
   if d.day = 0 then
     if d.month = 0 then sprintf "%4d" d.year
@@ -1627,11 +1619,19 @@ value string_of_date =
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
+value print_string_field oc tab name get ref v =
+  let ref = get ref in
+  let v = get v in
+  if v <> ref then fprintf oc "    %s%-15s \"%s\"\n"  tab name
+    (string_escaped v)
+  else ()
+;
+
 value print_codate_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then
-    fprintf oc "    %s%s: %s\n" tab name
+    fprintf oc "    %s%-15s %s\n" tab name
       (match Adef.od_of_codate v with
        [ Some d -> string_of_date d
        | None -> "-" ])
@@ -1642,7 +1642,7 @@ value print_iper_field oc tab name get ref v =
   let (_, _, _, ref) = get ref in
   let (fn, sn, occ, v) = get v in
   if v <> ref then do {
-    fprintf oc "    %s%s: " tab name;
+    fprintf oc "    %s%-15s " tab name;
     if Adef.int_of_iper v < 0 then fprintf oc "-"
     else fprintf oc "P-%d (%s.%d %s)" (Adef.int_of_iper v) fn occ sn;
     fprintf oc "\n";
@@ -1654,7 +1654,7 @@ value print_string_list_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then do {
-    fprintf oc "    %s%s: [" tab name;
+    fprintf oc "    %s%-15s [" tab name;
     Mutil.list_iter_first
       (fun first v ->
          fprintf oc "%s\"%s\"" (if first then "" else "; ")
@@ -1669,7 +1669,7 @@ value print_iper_list_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then do {
-    fprintf oc "    %s%s:\n" tab name;
+    fprintf oc "    %s%s\n" tab name;
     List.iter
       (fun (fn, sn, occ, ip) -> do {
          fprintf oc "      %s" tab;
@@ -1771,11 +1771,11 @@ value default_cpl =
 value default_des = {children = [| |]};
 value default_fcd = (default_fam, default_cpl, default_des);
 
-value person_key base ip =
+value person_key base ht_per ip =
   if Adef.int_of_iper ip < 0 then ("", "", 0, ip)
   else
     let p =
-      match try Some (Hashtbl.find res_per ip) with [ Not_found -> None ] with
+      match try Some (Hashtbl.find ht_per ip) with [ Not_found -> None ] with
       [ Some p -> p
       | None -> poi base ip ]
     in
@@ -1790,7 +1790,7 @@ value commit_patches base = do {
       open_out_gen [Open_wronly; Open_append; Open_creat] 0o777
         patches_file.val
     in
-    fprintf oc "commit\n";
+    fprintf oc "\ncommit\n";
     let per_set =
       Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per IpSet.empty
     in
@@ -1808,21 +1808,21 @@ value commit_patches base = do {
              (Hashtbl.mem ini_fam ifam || Hashtbl.mem ini_cpl ifam ||
               Hashtbl.mem ini_des ifam)
          in
-         fprintf oc "  family F-%d%s\n" (Adef.int_of_ifam ifam)
+         fprintf oc "\n  family F-%d%s\n" (Adef.int_of_ifam ifam)
            (if is_new then " (new)" else "");
          let fcd_from_ht (ht_fam, ht_cpl, ht_des) =
            (try
-              map_family_ps (person_key base) (sou base)
+              map_family_ps (person_key base ini_per) (sou base)
                 (gen_family_of_family (Hashtbl.find ht_fam ifam))
             with
             [ Not_found -> default_fam ],
             try
-              map_couple_p False (person_key base)
+              map_couple_p False (person_key base ini_per)
                 (gen_couple_of_couple (Hashtbl.find ht_cpl ifam))
             with
             [ Not_found -> default_cpl ],
             try
-              map_descend_p (person_key base)
+              map_descend_p (person_key base ini_per)
                 (gen_descend_of_descend (Hashtbl.find ht_des ifam))
             with
             [ Not_found -> default_des ])
@@ -1841,16 +1841,16 @@ value commit_patches base = do {
     IpSet.iter
       (fun ip -> do {
          let is_new = not (Hashtbl.mem ini_per ip) in
-         fprintf oc "  person P-%d%s\n" (Adef.int_of_iper ip)
+         fprintf oc "\n  person P-%d%s\n" (Adef.int_of_iper ip)
            (if is_new then " (new)" else "");
          let p2 =
-           map_person_ps (person_key base) (sou base)
+           map_person_ps (person_key base res_per) (sou base)
              (gen_person_of_person (Hashtbl.find res_per ip))
          in
          if is_new then print_diff_per oc "" default_per p2
          else do {
            let p1 =
-             map_person_ps (person_key base) (sou base)
+             map_person_ps (person_key base res_per) (sou base)
                (gen_person_of_person (Hashtbl.find ini_per ip))
            in
            fprintf oc "    before\n";
