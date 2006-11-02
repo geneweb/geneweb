@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.97 2006-11-01 20:38:05 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.98 2006-11-02 02:49:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1641,9 +1641,12 @@ value print_codate_field oc tab name get ref v =
 value print_iper_field oc tab name get ref v =
   let (_, _, _, ref) = get ref in
   let (fn, sn, occ, v) = get v in
-  if v <> ref then
-    fprintf oc "    %s%s: P-%d (%s.%d %s)\n" tab name
-      (Adef.int_of_iper v) fn occ sn
+  if v <> ref then do {
+    fprintf oc "    %s%s: " tab name;
+    if Adef.int_of_iper v < 0 then fprintf oc "-"
+    else fprintf oc "P-%d (%s.%d %s)" (Adef.int_of_iper v) fn occ sn;
+    fprintf oc "\n";
+  }
   else ()
 ;
 
@@ -1668,9 +1671,12 @@ value print_iper_list_field oc tab name get ref v =
   if v <> ref then do {
     fprintf oc "    %s%s:\n" tab name;
     List.iter
-      (fun (fn, sn, occ, v) ->
-         fprintf oc "      %sP-%d (%s.%d %s)\n" tab
-           (Adef.int_of_iper v) fn occ sn)
+      (fun (fn, sn, occ, ip) -> do {
+         fprintf oc "      %s" tab;
+	 if Adef.int_of_iper ip < 0 then fprintf oc "-"
+	 else fprintf oc "P-%d (%s.%d %s)" (Adef.int_of_iper ip) fn occ sn;
+	 fprintf oc "\n";
+       })
       v;
   }
   else ()
@@ -1766,14 +1772,16 @@ value default_des = {children = [| |]};
 value default_fcd = (default_fam, default_cpl, default_des);
 
 value person_key base ip =
-  let p =
-    match try Some (Hashtbl.find res_per ip) with [ Not_found -> None ] with
-    [ Some p -> p
-    | None -> poi base ip ]
-  in
-  (Name.lower (nominative (sou base (get_first_name p))),
-   Name.lower (nominative (sou base (get_surname p))),
-   get_occ p, ip)
+  if Adef.int_of_iper ip < 0 then ("", "", 0, ip)
+  else
+    let p =
+      match try Some (Hashtbl.find res_per ip) with [ Not_found -> None ] with
+      [ Some p -> p
+      | None -> poi base ip ]
+    in
+    (Name.lower (nominative (sou base (get_first_name p))),
+     Name.lower (nominative (sou base (get_surname p))),
+     get_occ p, ip)
 ;
 
 value commit_patches base = do {
