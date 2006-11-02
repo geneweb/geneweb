@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.106 2006-11-02 17:08:11 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.107 2006-11-02 17:34:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1619,10 +1619,10 @@ value string_of_date =
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
-value string_of_codate v =
+value string_of_codate if_d if_nd v =
   match Adef.od_of_codate v with
-  [ Some d -> " " ^ string_of_date d
-  | None -> "" ]
+  [ Some d -> if_d ^ string_of_date d
+  | None -> if_nd ]
 ;
 
 value string_key fn occ sn =
@@ -1650,10 +1650,7 @@ value print_codate_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then
-    fprintf oc "    %s%s%s\n" tab (fill name)
-      (match Adef.od_of_codate v with
-       [ Some d -> string_of_date d
-       | None -> "-" ])
+    fprintf oc "    %s%s%s\n" tab (fill name) (string_of_codate "" "-" v)
   else ()
 ;
 
@@ -1717,7 +1714,20 @@ value print_diff_per oc tab ref p = do {
   print_string_list_field oc tab "surnames_aliases"
     (fun p -> p.surnames_aliases) ref p;
   if p.titles <> ref.titles then
-    fprintf oc "    %s...(titles)\n" tab
+    if p.titles = [] then fprintf oc "    %sno %s\n" tab "titles"
+    else
+      Mutil.list_iter_first
+        (fun first tit -> do { 
+           fprintf oc "    %s%s" tab (fill (if first then "titles" else ""));
+           fprintf oc "%s/"
+             (match tit.t_name with
+              [ Tmain -> "*" | Tname n -> n | Tnone -> "" ]);
+           fprintf oc "%s/%s/%s/%s/%s\n" tit.t_ident tit.t_place
+             (string_of_codate "" "" tit.t_date_start)
+             (string_of_codate "" "" tit.t_date_end)
+             (if tit.t_nth = 0 then "" else string_of_int tit.t_nth);
+         })
+        p.titles
   else ();
   if p.rparents <> ref.rparents then
     fprintf oc "    %s...(rparents)\n" tab
@@ -1762,8 +1772,8 @@ value print_diff_per oc tab ref p = do {
     fprintf oc "    %s%s\n" tab
       (match p.burial with
        [ UnknownBurial -> fill "burial" ^ "-"
-       | Buried cd -> fill "buried" ^ string_of_codate cd
-       | Cremated cd -> fill "cremated" ^ string_of_codate cd ])
+       | Buried cd -> fill "buried" ^ string_of_codate " " "" cd
+       | Cremated cd -> fill "cremated" ^ string_of_codate " " "" cd ])
   else ();
   print_string_field oc tab "burial_place" (fun p -> p.burial_place) ref p;
   print_string_field oc tab "burial_src" (fun p -> p.burial_src) ref p;
