@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.99 2006-11-02 03:18:19 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.100 2006-11-02 03:48:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1515,10 +1515,10 @@ value string_escaped s =
             String.unsafe_set s' n.val c
           }
         | '\n' -> do {
-	    String.unsafe_set s' n.val '\\';
-	    incr n;
-	    String.unsafe_set s' n.val 'n'
-	  }
+            String.unsafe_set s' n.val '\\';
+            incr n;
+            String.unsafe_set s' n.val 'n'
+          }
         | '\t' -> do {
             String.unsafe_set s' n.val '\\';
             incr n;
@@ -1622,7 +1622,7 @@ value string_of_date =
 value print_string_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
-  if v <> ref then fprintf oc "    %s%-15s \"%s\"\n"  tab name
+  if v <> ref then fprintf oc "    %s%-15s %s\n"  tab name
     (string_escaped v)
   else ()
 ;
@@ -1638,13 +1638,18 @@ value print_codate_field oc tab name get ref v =
   else ()
 ;
 
+value string_key fn occ sn =
+  sprintf "[[%s/%s%s]]" fn sn
+    (if occ = 0 then "" else "/" ^ string_of_int occ)
+;
+
 value print_iper_field oc tab name get ref v =
   let (_, _, _, ref) = get ref in
   let (fn, sn, occ, v) = get v in
   if v <> ref then do {
     fprintf oc "    %s%-15s " tab name;
     if Adef.int_of_iper v < 0 then fprintf oc "-"
-    else fprintf oc "P-%d (%s.%d %s)" (Adef.int_of_iper v) fn occ sn;
+    else fprintf oc "P-%-8d %s" (Adef.int_of_iper v) (string_key fn occ sn);
     fprintf oc "\n";
   }
   else ()
@@ -1657,7 +1662,7 @@ value print_string_list_field oc tab name get ref v =
     fprintf oc "    %s%-15s [" tab name;
     Mutil.list_iter_first
       (fun first v ->
-         fprintf oc "%s\"%s\"" (if first then "" else "; ")
+         fprintf oc "%s%s" (if first then "" else "; ")
            (string_escaped v))
       v;
     fprintf oc "]\n";
@@ -1668,24 +1673,29 @@ value print_string_list_field oc tab name get ref v =
 value print_iper_list_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
-  if v <> ref then do {
-    fprintf oc "    %s%s\n" tab name;
-    List.iter
-      (fun (fn, sn, occ, ip) -> do {
-         fprintf oc "      %s" tab;
-	 if Adef.int_of_iper ip < 0 then fprintf oc "-"
-	 else fprintf oc "P-%d (%s.%d %s)" (Adef.int_of_iper ip) fn occ sn;
-	 fprintf oc "\n";
-       })
-      v;
-  }
+  if v <> ref then
+    if v = [] then fprintf oc "    %sno %s\n" tab name
+    else do {
+      fprintf oc "    %s%s\n" tab name;
+      List.iter
+        (fun (fn, sn, occ, ip) -> do {
+           fprintf oc "      %s" tab;
+           if Adef.int_of_iper ip < 0 then fprintf oc "-"
+           else
+             fprintf oc "P-%d %s" (Adef.int_of_iper ip)
+               (string_key fn occ sn);
+           fprintf oc "\n";
+         })
+        v;
+    }
   else ()
 ;
 
 value print_diff_per oc tab ref p = do {
   print_string_field oc tab "first_name" (fun p -> p.first_name) ref p;
   print_string_field oc tab "surname" (fun p -> p.surname) ref p;
-  if p.occ <> ref.occ then fprintf oc "    %socc: %d\n" tab p.occ else ();
+  if p.occ <> ref.occ then fprintf oc "    %s%-15s %d\n" tab "occ" p.occ
+  else ();
   print_string_field oc tab "image" (fun p -> p.image) ref p;
   print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
   print_string_list_field oc tab "qualifiers" (fun p -> p.qualifiers) ref p;
@@ -1698,11 +1708,11 @@ value print_diff_per oc tab ref p = do {
   if p.rparents <> ref.rparents then fprintf oc "    %s...\n" tab else ();
   print_string_field oc tab "occupation" (fun p -> p.occupation) ref p;
   if p.sex <> ref.sex then
-    fprintf oc "    %ssex: %s\n" tab
+    fprintf oc "    %s%-15s %s\n" tab "sex"
       (match p.sex with [ Male -> "M" | Female -> "F" | Neuter -> "?" ])
   else ();
   if p.access <> ref.access then
-    fprintf oc "    %saccess: %s\n" tab
+    fprintf oc "    %s%-15s %s\n" tab "access"
       (match p.access with
        [ IfTitles -> "if-titles" | Public -> "public" | Private -> "private" ])
   else ();
@@ -1841,8 +1851,11 @@ value commit_patches base = do {
     IpSet.iter
       (fun ip -> do {
          let is_new = not (Hashtbl.mem ini_per ip) in
-         fprintf oc "\n  person P-%d%s\n" (Adef.int_of_iper ip)
-           (if is_new then " (new)" else "");
+         let (fn, sn, occ, _) =
+           person_key base (if is_new then res_per else ini_per) ip
+         in
+         fprintf oc "\n  person P-%-8d %s%s\n" (Adef.int_of_iper ip)
+           (string_key fn occ sn) (if is_new then " (new)" else "");
          let p2 =
            map_person_ps (person_key base res_per) (sou base)
              (gen_person_of_person (Hashtbl.find res_per ip))
