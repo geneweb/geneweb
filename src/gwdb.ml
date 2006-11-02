@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.104 2006-11-02 13:10:33 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.105 2006-11-02 14:43:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1619,14 +1619,15 @@ value string_of_date =
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
+value string_of_codate v =
+  match Adef.od_of_codate v with
+  [ Some d -> " " ^ string_of_date d
+  | None -> "" ]
+;
+
 value string_key fn occ sn =
-(*
-  sprintf "[[%s/%s%s]]" fn sn
-    (if occ = 0 then "" else "/" ^ string_of_int occ)
-*)
   sprintf "= %s/%s%s" fn sn
     (if occ = 0 then "" else "/" ^ string_of_int occ)
-(**)
 ;
 
 value fill_n = 20;
@@ -1741,14 +1742,28 @@ value print_diff_per oc tab ref p = do {
     fprintf oc "    %s%s%s\n" tab (fill "death")
       (match p.death with
        [ NotDead -> "not dead"
-       | Death dr cd -> "dead ..."
+       | Death dr cd ->
+           let drs =
+             match dr with
+             [ Killed -> " (killed)"
+             | Murdered -> " (murdered)"
+             | Executed -> " (executed)"
+             | Disappeared -> " (disappeared)"
+             | Unspecified -> "" ] 
+           in
+           string_of_date (Adef.date_of_cdate cd) ^ drs
        | DeadYoung -> "dead young"
        | DeadDontKnowWhen -> "dead"
        | DontKnowIfDead -> "don't know if dead" ])
   else ();
   print_string_field oc tab "death_place" (fun p -> p.death_place) ref p;
   print_string_field oc tab "death_src" (fun p -> p.death_src) ref p;
-  if p.burial <> ref.burial then fprintf oc "    %s... (burial)\n" tab
+  if p.burial <> ref.burial then
+    fprintf oc "    %s%s\n" tab
+      (match p.burial with
+       [ UnknownBurial -> "-"
+       | Buried cd -> fill "buried" ^ string_of_codate cd
+       | Cremated cd -> fill "cremated" ^ string_of_codate cd ])
   else ();
   print_string_field oc tab "burial_place" (fun p -> p.burial_place) ref p;
   print_string_field oc tab "burial_src" (fun p -> p.burial_src) ref p;
