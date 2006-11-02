@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.105 2006-11-02 14:43:57 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.106 2006-11-02 17:08:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1761,7 +1761,7 @@ value print_diff_per oc tab ref p = do {
   if p.burial <> ref.burial then
     fprintf oc "    %s%s\n" tab
       (match p.burial with
-       [ UnknownBurial -> "-"
+       [ UnknownBurial -> fill "burial" ^ "-"
        | Buried cd -> fill "buried" ^ string_of_codate cd
        | Cremated cd -> fill "cremated" ^ string_of_codate cd ])
   else ();
