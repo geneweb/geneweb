@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.103 2006-11-02 11:04:04 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.104 2006-11-02 13:10:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1629,16 +1629,18 @@ value string_key fn occ sn =
 (**)
 ;
 
-value fill n s =
+value fill_n = 20;
+
+value fill s =
   let slen = String.length s in
-  let f = if slen < n then String.make (n - slen) '.' else "" in
+  let f = if slen < fill_n then String.make (fill_n - slen) '.' else "." in
   s ^ f
 ;
 
 value print_string_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
-  if v <> ref then fprintf oc "    %s%s%s\n" tab (fill 16 name)
+  if v <> ref then fprintf oc "    %s%s%s\n" tab (fill name)
     (string_escaped v)
   else ()
 ;
@@ -1647,7 +1649,7 @@ value print_codate_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then
-    fprintf oc "    %s%s%s\n" tab (fill 16 name)
+    fprintf oc "    %s%s%s\n" tab (fill name)
       (match Adef.od_of_codate v with
        [ Some d -> string_of_date d
        | None -> "-" ])
@@ -1658,7 +1660,7 @@ value print_iper_field oc tab name get ref v =
   let (_, _, _, ref) = get ref in
   let (fn, sn, occ, v) = get v in
   if v <> ref then do {
-    fprintf oc "    %s%s" tab (fill 16 name);
+    fprintf oc "    %s%s" tab (fill name);
     if Adef.int_of_iper v < 0 then fprintf oc "-"
     else fprintf oc "P-%d %s" (Adef.int_of_iper v) (string_key fn occ sn);
     fprintf oc "\n";
@@ -1670,7 +1672,7 @@ value print_string_list_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then do {
-    fprintf oc "    %s%s[" tab (fill 16 name);
+    fprintf oc "    %s%s[" tab (fill name);
     Mutil.list_iter_first
       (fun first v ->
          fprintf oc "%s%s" (if first then "" else "; ")
@@ -1689,8 +1691,7 @@ value print_iper_list_field oc tab name get ref v =
     else
       Mutil.list_iter_first
         (fun first (fn, sn, occ, ip) -> do {
-           fprintf oc "    %s%-16s" tab
-             (if first then (fill 16 name) else "");
+           fprintf oc "    %s%s" tab (fill (if first then name else ""));
            if Adef.int_of_iper ip < 0 then fprintf oc "-"
            else
              fprintf oc "P-%d %s" (Adef.int_of_iper ip)
@@ -1704,7 +1705,7 @@ value print_iper_list_field oc tab name get ref v =
 value print_diff_per oc tab ref p = do {
   print_string_field oc tab "first_name" (fun p -> p.first_name) ref p;
   print_string_field oc tab "surname" (fun p -> p.surname) ref p;
-  if p.occ <> ref.occ then fprintf oc "    %s%s%d\n" tab (fill 16 "occ") p.occ
+  if p.occ <> ref.occ then fprintf oc "    %s%s%d\n" tab (fill "occ") p.occ
   else ();
   print_string_field oc tab "image" (fun p -> p.image) ref p;
   print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
@@ -1714,15 +1715,19 @@ value print_diff_per oc tab ref p = do {
     (fun p -> p.first_names_aliases) ref p;
   print_string_list_field oc tab "surnames_aliases"
     (fun p -> p.surnames_aliases) ref p;
-  if p.titles <> ref.titles then fprintf oc "    %s...\n" tab else ();
-  if p.rparents <> ref.rparents then fprintf oc "    %s...\n" tab else ();
+  if p.titles <> ref.titles then
+    fprintf oc "    %s...(titles)\n" tab
+  else ();
+  if p.rparents <> ref.rparents then
+    fprintf oc "    %s...(rparents)\n" tab
+  else ();
   print_string_field oc tab "occupation" (fun p -> p.occupation) ref p;
   if p.sex <> ref.sex then
-    fprintf oc "    %s%s%s\n" tab (fill 16 "sex")
+    fprintf oc "    %s%s%s\n" tab (fill "sex")
       (match p.sex with [ Male -> "M" | Female -> "F" | Neuter -> "?" ])
   else ();
   if p.access <> ref.access then
-    fprintf oc "    %s%s%s\n" tab (fill 16 "access")
+    fprintf oc "    %s%s%s\n" tab (fill "access")
       (match p.access with
        [ IfTitles -> "if-titles" | Public -> "public" | Private -> "private" ])
   else ();
@@ -1732,10 +1737,19 @@ value print_diff_per oc tab ref p = do {
   print_codate_field oc tab "baptism" (fun p -> p.baptism) ref p;
   print_string_field oc tab "baptism_place" (fun p -> p.baptism_place) ref p;
   print_string_field oc tab "baptism_src" (fun p -> p.baptism_src) ref p;
-  if p.death <> ref.death then fprintf oc "    %s...\n" tab else ();
+  if p.death <> ref.death then
+    fprintf oc "    %s%s%s\n" tab (fill "death")
+      (match p.death with
+       [ NotDead -> "not dead"
+       | Death dr cd -> "dead ..."
+       | DeadYoung -> "dead young"
+       | DeadDontKnowWhen -> "dead"
+       | DontKnowIfDead -> "don't know if dead" ])
+  else ();
   print_string_field oc tab "death_place" (fun p -> p.death_place) ref p;
   print_string_field oc tab "death_src" (fun p -> p.death_src) ref p;
-  if p.burial <> ref.burial then fprintf oc "    %s...\n" tab else ();
+  if p.burial <> ref.burial then fprintf oc "    %s... (burial)\n" tab
+  else ();
   print_string_field oc tab "burial_place" (fun p -> p.burial_place) ref p;
   print_string_field oc tab "burial_src" (fun p -> p.burial_src) ref p;
   print_string_field oc tab "notes" (fun p -> p.notes) ref p;
@@ -1754,9 +1768,15 @@ value print_diff_fam oc tab ref fam = do {
     (fun (f, _, _) -> f.marriage_src) ref fam;
   let (f, _, _) = fam in
   let (rf, _, _) = ref in
-  if f.witnesses <> rf.witnesses then fprintf oc "    %s...\n" tab else ();
-  if f.relation <> rf.relation then fprintf oc "    %s...\n" tab else ();
-  if f.divorce <> rf.divorce then fprintf oc "    %s...\n" tab else ();
+  if f.witnesses <> rf.witnesses then
+    fprintf oc "    %s... (witnesses)\n" tab
+  else ();
+  if f.relation <> rf.relation then
+    fprintf oc "    %s... (relation kind)\n" tab
+  else ();
+  if f.divorce <> rf.divorce then
+    fprintf oc "    %s... (divorce)\n" tab
+  else ();
   print_string_field oc tab "comment" (fun (f, _, _) -> f.comment) ref fam;
   print_string_field oc tab "origin_file" (fun (f, _, _) -> f.origin_file)
     ref fam;
@@ -1807,7 +1827,7 @@ value person_key base ht_per ip =
 value commit_patches conf base = do {
   if patches_file.val <> "" then do {
     let oc =
-      open_out_gen [Open_wronly; Open_append; Open_creat] 0o777
+      open_out_gen [Open_wronly; Open_append; Open_creat] 0o666
         patches_file.val
     in
     let (hh, mm, ss) = conf.time in
