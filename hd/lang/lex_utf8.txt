@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.45 2006-10-31 14:08:05 ddr Exp $
+# $Id: lex_utf8.txt,v 5.46 2006-11-02 15:03:16 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1983,6 +1983,7 @@ en: average age at death
 et: keskmine eluiga
 fr: âge moyen de décès
 nl: gemiddelde leeftijd bij overlijden
+pl: średni wiek śmierci
 
     back
 af: terug
@@ -2787,6 +2788,7 @@ et: ühendused
 fi: yhteyksien määrä
 fr: connexions
 nl: connecties
+pl: połączenie
 
     consanguinity
 af: bloedverwantskap
@@ -2846,6 +2848,7 @@ sv: fortsätt slå samman
 da: fortsat
 en: continued
 fr: suite
+pl: ciąg dalszy
 
     cousins
 af: neefs/niggies
@@ -3892,6 +3895,7 @@ bg: за списъка по дати на последно изменение
 da: for en liste sorteret efter datoen for seneste ændring
 en: for the list ordered by the date of the last modification
 fr: pour la liste par date de dernière modification
+pl: aby oglądać listę według daty ostatniej modyfikacji
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
@@ -7555,6 +7559,7 @@ sv: syskon
 da: siden det sidste klik
 en: since the last click
 fr: depuis le dernier clic
+pl: od ostatniego kliknięcia
 
     son/daughter/child
 af: seun/dogter/kind
@@ -7936,7 +7941,7 @@ it: le %d coppie più anziane forse ancora viventi e fidanzate
 lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
 nl: De %d oudste, mogelijk nog in leven zijnde, verloofde paren
 no: Det % eldste par som kanskje fremdeles er i live og forlovet
-pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
+pl: %d najstarszych par prawdopodobnie jeszcze zyjących i pozostających zaręczeni
 pt: o %d mais velho casal talvez ainda vivo e noivado
 pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
