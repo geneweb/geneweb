@@ -1,4 +1,4 @@
-(* $Id: futil.mli,v 5.2 2006-10-21 09:13:13 ddr Exp $ *)
+(* $Id: futil.mli,v 5.3 2006-11-03 20:51:59 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -7,9 +7,12 @@ value map_title_strings : ('a -> 'b) -> gen_title 'a -> gen_title 'b;
 value map_relation_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_relation 'a 'b -> gen_relation 'c 'd
 ;
+
 value map_person_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_person 'a 'b -> gen_person 'c 'd
 ;
+value map_union_f : ('a -> 'b) -> gen_union 'a -> gen_union 'b;
+
 value map_family_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_family 'a 'b -> gen_family 'c 'd
 ;
