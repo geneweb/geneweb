@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.110 2006-11-03 01:27:51 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.111 2006-11-03 02:24:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1625,7 +1625,21 @@ value string_of_codate if_d if_nd v =
   | None -> if_nd ]
 ;
 
-value string_key fn occ sn = sprintf "%s.%d %s" fn occ sn;
+value string_of_per (fn, sn, occ, ip) =
+  if Adef.int_of_iper ip < 0 then "(nobody)"
+  else
+    sprintf "%s.%d %s" (if fn = "" then "?" else fn)
+      (if fn = "" || sn = "" then Adef.int_of_iper ip else occ)
+      (if sn = "" then "?" else sn)
+;
+
+value string_of_fam (fam, cpl, des) ifam =
+  if Adef.int_of_ifam ifam < 0 then "(deleted)"
+  else
+    let fath = Adef.father cpl in
+    let moth = Adef.mother cpl in
+    sprintf "%s + %s" (string_of_per fath) (string_of_per moth)
+;
 
 value fill_n = 21;
 
@@ -1651,17 +1665,13 @@ value print_codate_field oc tab name get ref v =
   else ()
 ;
 
-value print_iper_field oc tab name get ref v =
-  let (_, _, _, ref) = get ref in
+value print_iper_field oc tab name get v = do {
   let (fn, sn, occ, v) = get v in
-  if v <> ref then do {
-    fprintf oc "    %s%s" tab (fill name);
-    if Adef.int_of_iper v < 0 then fprintf oc "-"
-    else fprintf oc "%s" (string_key fn occ sn);
-    fprintf oc "\n";
-  }
-  else ()
-;
+  fprintf oc "    %s%s" tab (fill name);
+  if Adef.int_of_iper v < 0 then fprintf oc "-"
+  else fprintf oc "%s" (string_of_per (fn, sn, occ, v));
+  fprintf oc "\n";
+};
 
 value print_list_field print_item oc tab name1 name get ref v =
   let ref = get ref in
@@ -1688,7 +1698,7 @@ value print_iper_list_field =
   print_list_field
     (fun oc (fn, sn, occ, ip) ->
        if Adef.int_of_iper ip < 0 then fprintf oc "-"
-       else fprintf oc "%s" (string_key fn occ sn))
+       else fprintf oc "%s" (string_of_per (fn, sn, occ, ip)))
 ;
 
 value print_diff_per oc tab ref p = do {
@@ -1767,9 +1777,12 @@ value print_diff_per oc tab ref p = do {
   print_string_field oc tab "sources" (fun p -> p.psources) ref p;
 };
 
-value print_diff_fam oc tab ref fam = do {
-  print_iper_field oc tab "father" (fun (_, c, _) -> Adef.father c) ref fam;
-  print_iper_field oc tab "mother" (fun (_, c, _) -> Adef.mother c) ref fam;
+value print_diff_fam oc tab parents_already_printed ref fam = do {
+  if parents_already_printed then ()
+  else do {
+    print_iper_field oc tab "father" (fun (_, c, _) -> Adef.father c) fam;
+    print_iper_field oc tab "mother" (fun (_, c, _) -> Adef.mother c) fam;
+  };
   print_iper_list_field oc tab "child" "children"
     (fun (_, _, d) -> Array.to_list d.children) ref fam;
   print_codate_field oc tab "marriage" (fun (f, _, _) -> f.marriage) ref fam;
@@ -1861,8 +1874,6 @@ value commit_patches conf base = do {
              (Hashtbl.mem ini_fam ifam || Hashtbl.mem ini_cpl ifam ||
               Hashtbl.mem ini_des ifam)
          in
-         fprintf oc "\n  family F-%d%s\n" (Adef.int_of_ifam ifam)
-           (if is_new then " (new)" else "");
          let fcd_from_ht (ht_fam, ht_cpl, ht_des) =
            (try
               map_family_ps (person_key base ini_per) (sou base)
@@ -1881,13 +1892,19 @@ value commit_patches conf base = do {
             [ Not_found -> default_des ])
          in
          let fcd2 = fcd_from_ht (res_fam, res_cpl, res_des) in
-         if is_new then print_diff_fam oc "" default_fcd fcd2
+         if is_new then do {
+           fprintf oc "\n  family = %s (new)\n" (string_of_fam fcd2 ifam);
+           print_diff_fam oc "" True default_fcd fcd2
+         }
          else do {
            let fcd1 = fcd_from_ht (ini_fam, ini_cpl, ini_des) in
+           let s1 = string_of_fam fcd1 ifam in
+           let s2 = string_of_fam fcd2 ifam in
+           fprintf oc "\n  family%s\n" (if s1 = s2 then " = " ^ s1 else "");
            fprintf oc "    before\n";
-           print_diff_fam oc "  " fcd2 fcd1;
+           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1;
            fprintf oc "    after\n";
-           print_diff_fam oc "  " fcd1 fcd2;
+           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2;
          }
        })
       fam_set;
@@ -1897,7 +1914,7 @@ value commit_patches conf base = do {
          let (fn, sn, occ, _) =
            person_key base (if is_new then res_per else ini_per) ip
          in
-         fprintf oc "\n  person = %s%s\n" (string_key fn occ sn)
+         fprintf oc "\n  person = %s%s\n" (string_of_per (fn, sn, occ, ip))
            (if is_new then " (new)" else "");
          let p2 =
            map_person_ps (person_key base res_per) (sou base)
