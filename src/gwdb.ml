@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.113 2006-11-03 11:15:45 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.114 2006-11-03 20:51:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -567,6 +567,13 @@ value union_of_gen_union base u =
   match base with
   [ Base _ -> Union u
   | Base2 db2 -> Union2Gen db2 u ]
+;
+
+value gen_union_of_union =
+  fun
+  [ Union u -> u
+  | Union2 _ _ as u -> {family = get_family u}
+  | Union2Gen db2 u -> u ]
 ;
 
 value get_comment =
@@ -1484,11 +1491,13 @@ value patches_file = ref "";
 value record_changes_in_file v = patches_file.val := v;
 
 value ini_per = Hashtbl.create 1;
+value ini_uni = Hashtbl.create 1;
 value ini_fam = Hashtbl.create 1;
 value ini_cpl = Hashtbl.create 1;
 value ini_des = Hashtbl.create 1;
 
 value res_per = Hashtbl.create 1;
+value res_uni = Hashtbl.create 1;
 value res_fam = Hashtbl.create 1;
 value res_cpl = Hashtbl.create 1;
 value res_des = Hashtbl.create 1;
@@ -1532,66 +1541,6 @@ value string_escaped s =
     }
   }
 ;
-
-value poi base i = do {
-  let p = poi base i in
-  if patches_file.val <> "" then do {
-    if Hashtbl.mem ini_per i || Hashtbl.mem res_per i then ()
-    else Hashtbl.add ini_per i p;
-  }
-  else ();
-  p
-};
-
-value foi base i = do {
-  let f = foi base i in
-  if patches_file.val <> "" then do {
-    if Hashtbl.mem ini_fam i || Hashtbl.mem res_fam i then ()
-    else Hashtbl.add ini_fam i f;
-  }
-  else ();
-  f
-};
-
-value coi base i = do {
-  let c = coi base i in
-  if patches_file.val <> "" then do {
-    if Hashtbl.mem ini_cpl i || Hashtbl.mem res_cpl i then ()
-    else Hashtbl.add ini_cpl i c;
-  }
-  else ();
-  c
-};
-
-value doi base i = do {
-  let d = doi base i in
-  if patches_file.val <> "" then do {
-    if Hashtbl.mem ini_des i || Hashtbl.mem res_des i then ()
-    else Hashtbl.add ini_des i d;
-  }
-  else ();
-  d
-};
-
-value patch_person base ip p = do {
-  if patches_file.val <> "" then Hashtbl.replace res_per ip p else ();
-  patch_person base ip p;
-};
-
-value patch_family base ifam f = do {
-  if patches_file.val <> "" then Hashtbl.replace res_fam ifam f else ();
-  patch_family base ifam f;
-};
-
-value patch_descend base ifam d = do {
-  if patches_file.val <> "" then Hashtbl.replace res_des ifam d else ();
-  patch_descend base ifam d;
-};
-
-value patch_couple base ifam c = do {
-  if patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
-  patch_couple base ifam c;
-};
 
 value code_dmy d =
   if d.day = 0 then
@@ -1673,7 +1622,9 @@ value print_iper_field oc tab name get v = do {
   fprintf oc "\n";
 };
 
-value print_list_field print_item oc tab name1 name get ref v addch =
+type diff_kind = [ New | Bef | Aft ];
+
+value print_list_field print_item oc tab name1 name get ref v dk =
   let ref = get ref in
   let v = get v in
   if v <> ref then
@@ -1682,11 +1633,19 @@ value print_list_field print_item oc tab name1 name get ref v addch =
       let name = if List.length v = 1 then name1 else name in
       let a1 = Array.of_list ref in
       let a2 = Array.of_list v in
-      let (d1, d2) = Diff.f a1 a2 in
+      let d2 =
+        match dk with
+        [ New -> [| |]
+        | Bef -> snd (Diff.f a1 a2)
+        | Aft -> fst (Diff.f a2 a1) ]
+      in
       for i = 0 to Array.length a2 - 1 do {
         fprintf oc "    %s%s" tab (fill (if i = 0 then name else ""));
         print_item oc a2.(i);
-        if d2.(i) then fprintf oc "%s" addch else ();
+        match dk with
+        [ New -> ()
+        | Bef -> if d2.(i) then fprintf oc " -" else ()
+        | Aft -> if d2.(i) then fprintf oc " +" else () ];
         fprintf oc "\n";
       }
   else ()
@@ -1703,7 +1662,9 @@ value print_iper_list_field =
        else fprintf oc "%s" (string_of_per (fn, sn, occ, ip)))
 ;
 
-value print_diff_per oc tab ref p addch = do {
+value print_diff_per oc tab refpu pu dk = do {
+  let (ref, refu) = refpu in
+  let (p, u) = pu in
   print_string_field oc tab "first_name" (fun p -> p.first_name) ref p;
   print_string_field oc tab "surname" (fun p -> p.surname) ref p;
   if p.occ <> ref.occ then fprintf oc "    %s%s%d\n" tab (fill "occ") p.occ
@@ -1711,13 +1672,13 @@ value print_diff_per oc tab ref p addch = do {
   print_string_field oc tab "image" (fun p -> p.image) ref p;
   print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
   print_string_list_field oc tab "qualifier" "qualifiers"
-    (fun p -> p.qualifiers) ref p addch;
+    (fun p -> p.qualifiers) ref p dk;
   print_string_list_field oc tab "alias" "aliases" (fun p -> p.aliases) ref p
-    addch;
+    dk;
   print_string_list_field oc tab "first_name_alias" "first_names_aliases"
-    (fun p -> p.first_names_aliases) ref p addch;
+    (fun p -> p.first_names_aliases) ref p dk;
   print_string_list_field oc tab "surname_alias" "surnames_aliases"
-    (fun p -> p.surnames_aliases) ref p addch;
+    (fun p -> p.surnames_aliases) ref p dk;
   print_list_field
     (fun oc tit ->
        fprintf oc "%s/%s/%s/%s/%s/%s"
@@ -1727,10 +1688,24 @@ value print_diff_per oc tab ref p addch = do {
          (if tit.t_nth = 0 then "" else string_of_int tit.t_nth)
          (match tit.t_name with
           [ Tmain -> "*" | Tname n -> n | Tnone -> "" ]))
-     oc tab "title" "titles" (fun p -> p.titles) ref p addch;
-  if p.rparents <> ref.rparents then
-    fprintf oc "    %s... (rparents)\n" tab
-  else ();
+    oc tab "title" "titles" (fun p -> p.titles) ref p dk;
+  print_list_field
+    (fun oc r ->
+       fprintf oc "%s/%s/%s/%s"
+         (match r.r_type with
+          [ Adoption -> "adop"
+          | Recognition -> "reco"
+          | CandidateParent -> "candp"
+          | GodParent -> "godp"
+          | FosterParent -> "fostp" ])
+         (match r.r_fath with
+          [ Some p -> string_of_per p
+          | None -> "" ])
+         (match r.r_moth with
+          [ Some p -> string_of_per p
+          | None -> "" ])
+         r.r_sources)
+    oc tab "relation" "relations" (fun p -> p.rparents) ref p dk;
   print_string_field oc tab "occupation" (fun p -> p.occupation) ref p;
   if p.sex <> ref.sex then
     fprintf oc "    %s%s%s\n" tab (fill "sex")
@@ -1778,16 +1753,19 @@ value print_diff_per oc tab ref p addch = do {
   print_string_field oc tab "burial_src" (fun p -> p.burial_src) ref p;
   print_string_field oc tab "notes" (fun p -> p.notes) ref p;
   print_string_field oc tab "sources" (fun p -> p.psources) ref p;
+  print_list_field (fun oc spouse -> fprintf oc "%s" (string_of_per spouse))
+    oc tab "union" "unions" (fun (_, u) -> Array.to_list u.family)
+    refpu pu dk;
 };
 
-value print_diff_fam oc tab parents_already_printed ref fam addch = do {
+value print_diff_fam oc tab parents_already_printed ref fam dk = do {
   if parents_already_printed then ()
   else do {
     print_iper_field oc tab "father" (fun (_, c, _) -> Adef.father c) fam;
     print_iper_field oc tab "mother" (fun (_, c, _) -> Adef.mother c) fam;
   };
   print_iper_list_field oc tab "child" "children"
-    (fun (_, _, d) -> Array.to_list d.children) ref fam addch;
+    (fun (_, _, d) -> Array.to_list d.children) ref fam dk;
   print_codate_field oc tab "marriage" (fun (f, _, _) -> f.marriage) ref fam;
   print_string_field oc tab "marriage_place"
     (fun (f, _, _) -> f.marriage_place) ref fam;
@@ -1795,9 +1773,8 @@ value print_diff_fam oc tab parents_already_printed ref fam addch = do {
     (fun (f, _, _) -> f.marriage_src) ref fam;
   let (f, _, _) = fam in
   let (rf, _, _) = ref in
-  if f.witnesses <> rf.witnesses then
-    fprintf oc "    %s... (witnesses)\n" tab
-  else ();
+  print_iper_list_field oc tab "witness" "witnesses"
+    (fun (f, _, _) -> Array.to_list f.witnesses) ref fam dk;
   if f.relation <> rf.relation then
     fprintf oc "    %s%s\n" tab
       (match f.relation with
@@ -1831,6 +1808,8 @@ value default_per =
    burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
    psources = ""; key_index = Adef.iper_of_int 0}
 ;
+value default_uni = {family = [| |]};
+value default_pu = (default_per, default_uni);
 
 value default_fam =
   {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
@@ -1865,10 +1844,13 @@ value commit_patches conf base = do {
         patches_file.val
     in
     let (hh, mm, ss) = conf.time in
-    fprintf oc "\ncommit \"%s\" %4d-%02d-%02d %02d:%02d:%02d\n" conf.user
-      conf.today.year conf.today.month conf.today.day hh mm ss;
+    fprintf oc "\ncommit %4d-%02d-%02d %02d:%02d:%02d \"%s\"\n"
+      conf.today.year conf.today.month conf.today.day hh mm ss conf.user;
     let per_set =
-      Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per IpSet.empty
+      let set = IpSet.empty in
+      let set = Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per set in
+      let set = Hashtbl.fold (fun ip _ -> IpSet.add ip) res_uni set in
+      set
     in
     let fam_set =
       let set = IfSet.empty in
@@ -1904,7 +1886,7 @@ value commit_patches conf base = do {
          let fcd2 = fcd_from_ht (res_fam, res_cpl, res_des) in
          if is_new then do {
            fprintf oc "\n  family = %s (new)\n" (string_of_fam fcd2 ifam);
-           print_diff_fam oc "" True default_fcd fcd2 "";
+           print_diff_fam oc "" True default_fcd fcd2 New;
          }
          else do {
            let fcd1 = fcd_from_ht (ini_fam, ini_cpl, ini_des) in
@@ -1912,34 +1894,54 @@ value commit_patches conf base = do {
            let s2 = string_of_fam fcd2 ifam in
            fprintf oc "\n  family%s\n" (if s1 = s2 then " = " ^ s1 else "");
            fprintf oc "    before\n";
-           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1 " -";
+           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1 Bef;
            fprintf oc "    after\n";
-           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2 " +";
+           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2 Aft;
          }
        })
       fam_set;
     IpSet.iter
       (fun ip -> do {
-         let is_new = not (Hashtbl.mem ini_per ip) in
+         let is_new =
+           not (Hashtbl.mem ini_per ip || Hashtbl.mem ini_uni ip)
+         in
          let (fn, sn, occ, _) =
            person_key base (if is_new then res_per else ini_per) ip
          in
          fprintf oc "\n  person = %s%s\n" (string_of_per (fn, sn, occ, ip))
            (if is_new then " (new)" else "");
-         let p2 =
-           map_person_ps (person_key base res_per) (sou base)
-             (gen_person_of_person (Hashtbl.find res_per ip))
+         let spouse ip cpl =
+           let s = get_father cpl in
+           if ip = s then get_mother cpl else s
          in
-         if is_new then print_diff_per oc "" default_per p2 ""
+         let pu_from_ht (ht_per, ht_uni) =
+           (try
+              map_person_ps (person_key base ini_per) (sou base)
+                (gen_person_of_person
+                   (try Hashtbl.find ht_per ip with
+                    [ Not_found ->
+                        if is_new then raise Not_found else poi base ip ]))
+            with
+            [ Not_found -> default_per ],
+            try
+              map_union_f
+                (fun ifam ->
+                   person_key base ini_per (spouse ip (coi base ifam)))
+                (gen_union_of_union
+                   (try Hashtbl.find ht_uni ip with
+                    [ Not_found ->
+                        if is_new then raise Not_found else uoi base ip ]))
+            with
+            [ Not_found -> default_uni ])
+         in
+         let pu2 = pu_from_ht (res_per, res_uni) in
+         if is_new then print_diff_per oc "" default_pu pu2 New
          else do {
-           let p1 =
-             map_person_ps (person_key base res_per) (sou base)
-               (gen_person_of_person (Hashtbl.find ini_per ip))
-           in
+           let pu1 = pu_from_ht (ini_per, ini_uni) in
            fprintf oc "    before\n";
-           print_diff_per oc "  " p2 p1 " -";
+           print_diff_per oc "  " pu2 pu1 Bef;
            fprintf oc "    after\n";
-           print_diff_per oc "  " p1 p2 " +";
+           print_diff_per oc "  " pu1 pu2 Aft;
          }
        })
       per_set;
@@ -1947,4 +1949,79 @@ value commit_patches conf base = do {
   }
   else ();
   commit_patches base;
+};
+
+value poi base i = do {
+  let p = poi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_per i || Hashtbl.mem res_per i then ()
+    else Hashtbl.add ini_per i p;
+  }
+  else ();
+  p
+};
+
+value uoi base i = do {
+  let u = uoi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_uni i || Hashtbl.mem res_uni i then ()
+    else Hashtbl.add ini_uni i u;
+  }
+  else ();
+  u
+};
+
+value foi base i = do {
+  let f = foi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_fam i || Hashtbl.mem res_fam i then ()
+    else Hashtbl.add ini_fam i f;
+  }
+  else ();
+  f
+};
+
+value coi base i = do {
+  let c = coi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_cpl i || Hashtbl.mem res_cpl i then ()
+    else Hashtbl.add ini_cpl i c;
+  }
+  else ();
+  c
+};
+
+value doi base i = do {
+  let d = doi base i in
+  if patches_file.val <> "" then do {
+    if Hashtbl.mem ini_des i || Hashtbl.mem res_des i then ()
+    else Hashtbl.add ini_des i d;
+  }
+  else ();
+  d
+};
+
+value patch_person base ip p = do {
+  if patches_file.val <> "" then Hashtbl.replace res_per ip p else ();
+  patch_person base ip p;
+};
+
+value patch_union base ip u = do {
+  if patches_file.val <> "" then Hashtbl.replace res_uni ip u else ();
+  patch_union base ip u;
+};
+
+value patch_family base ifam f = do {
+  if patches_file.val <> "" then Hashtbl.replace res_fam ifam f else ();
+  patch_family base ifam f;
+};
+
+value patch_descend base ifam d = do {
+  if patches_file.val <> "" then Hashtbl.replace res_des ifam d else ();
+  patch_descend base ifam d;
+};
+
+value patch_couple base ifam c = do {
+  if patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
+  patch_couple base ifam c;
 };

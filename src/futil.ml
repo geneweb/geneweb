@@ -1,4 +1,4 @@
-(* $Id: futil.ml,v 5.2 2006-10-21 09:13:13 ddr Exp $ *)
+(* $Id: futil.ml,v 5.3 2006-11-03 20:51:59 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Adef;
@@ -48,6 +48,8 @@ value map_person_ps fp fs p =
    burial_place = fs p.burial_place; burial_src = fs p.burial_src;
    notes = fs p.notes; psources = fs p.psources; key_index = p.key_index}
 ;
+
+value map_union_f ff u = {family = Array.map ff u.family};
 
 value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
