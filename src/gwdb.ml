@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.108 2006-11-02 17:52:15 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.109 2006-11-03 01:19:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1630,7 +1630,7 @@ value string_key fn occ sn =
     (if occ = 0 then "" else "/" ^ string_of_int occ)
 ;
 
-value fill_n = 20;
+value fill_n = 21;
 
 value fill s =
   let slen = String.length s in
@@ -1666,39 +1666,33 @@ value print_iper_field oc tab name get ref v =
   else ()
 ;
 
-value print_string_list_field oc tab name get ref v =
-  let ref = get ref in
-  let v = get v in
-  if v <> ref then do {
-    fprintf oc "    %s%s[" tab (fill name);
-    Mutil.list_iter_first
-      (fun first v ->
-         fprintf oc "%s%s" (if first then "" else "; ")
-           (string_escaped v))
-      v;
-    fprintf oc "]\n";
-  }
-  else ()
-;
-
-value print_iper_list_field oc tab name1 name get ref v =
+value print_list_field print_item oc tab name1 name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then
-    if v = [] then fprintf oc "    %sno %s\n" tab name
+    if v = [] then fprintf oc "    %sno %s\n" tab name1
     else
       let name = if List.length v = 1 then name1 else name in
       Mutil.list_iter_first
-        (fun first (fn, sn, occ, ip) -> do {
+        (fun first it -> do {
            fprintf oc "    %s%s" tab (fill (if first then name else ""));
-           if Adef.int_of_iper ip < 0 then fprintf oc "-"
-           else
-             fprintf oc "P-%d %s" (Adef.int_of_iper ip)
-               (string_key fn occ sn);
-           fprintf oc "\n";
+           print_item oc it;
+	   fprintf oc "\n"
          })
         v
   else ()
+;
+
+value print_string_list_field =
+  print_list_field (fun oc s -> fprintf oc "%s" (string_escaped s))
+;
+
+value print_iper_list_field =
+  print_list_field
+    (fun oc (fn, sn, occ, ip) ->
+       if Adef.int_of_iper ip < 0 then fprintf oc "-"
+       else
+         fprintf oc "P-%d %s" (Adef.int_of_iper ip) (string_key fn occ sn))
 ;
 
 value print_diff_per oc tab ref p = do {
@@ -1708,30 +1702,25 @@ value print_diff_per oc tab ref p = do {
   else ();
   print_string_field oc tab "image" (fun p -> p.image) ref p;
   print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
-  print_string_list_field oc tab "qualifiers" (fun p -> p.qualifiers) ref p;
-  print_string_list_field oc tab "aliases" (fun p -> p.aliases) ref p;
-  print_string_list_field oc tab "first_names_aliases"
+  print_string_list_field oc tab "qualifier" "qualifiers"
+    (fun p -> p.qualifiers) ref p;
+  print_string_list_field oc tab "alias" "aliases" (fun p -> p.aliases) ref p;
+  print_string_list_field oc tab "first_name_alias" "first_names_aliases"
     (fun p -> p.first_names_aliases) ref p;
-  print_string_list_field oc tab "surnames_aliases"
+  print_string_list_field oc tab "surname_alias" "surnames_aliases"
     (fun p -> p.surnames_aliases) ref p;
-  if p.titles <> ref.titles then
-    if p.titles = [] then fprintf oc "    %sno %s\n" tab "titles"
-    else
-      Mutil.list_iter_first
-        (fun first tit -> do { 
-           fprintf oc "    %s%s" tab (fill (if first then "titles" else ""));
-           fprintf oc "%s/"
-             (match tit.t_name with
-              [ Tmain -> "*" | Tname n -> n | Tnone -> "" ]);
-           fprintf oc "%s/%s/%s/%s/%s\n" tit.t_ident tit.t_place
-             (string_of_codate "" "" tit.t_date_start)
-             (string_of_codate "" "" tit.t_date_end)
-             (if tit.t_nth = 0 then "" else string_of_int tit.t_nth);
-         })
-        p.titles
-  else ();
+  print_list_field
+    (fun oc tit ->
+       fprintf oc "%s/%s/%s/%s/%s/%s"
+         (match tit.t_name with
+          [ Tmain -> "*" | Tname n -> n | Tnone -> "" ])
+         tit.t_ident tit.t_place
+         (string_of_codate "" "" tit.t_date_start)
+         (string_of_codate "" "" tit.t_date_end)
+         (if tit.t_nth = 0 then "" else string_of_int tit.t_nth))
+     oc tab "title" "titles" (fun p -> p.titles) ref p;
   if p.rparents <> ref.rparents then
-    fprintf oc "    %s...(rparents)\n" tab
+    fprintf oc "    %s... (rparents)\n" tab
   else ();
   print_string_field oc tab "occupation" (fun p -> p.occupation) ref p;
   if p.sex <> ref.sex then
