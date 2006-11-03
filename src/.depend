@@ -75,6 +75,8 @@ descend.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
 descend.cmx: adef.cmx config.cmi dag.cmx ../dag2html/dag2html.cmx date.cmx \
     def.cmi gutil.cmx gwdb.cmx mutil.cmx perso.cmx util.cmx \
     ../wserver/wserver.cmx 
+diff.cmo: diff.cmi 
+diff.cmx: diff.cmi 
 doc.cmo: buff.cmo config.cmi notesLinks.cmo secure.cmi templ.cmi \
     templAst.cmi util.cmi wiki.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi notesLinks.cmx secure.cmx templ.cmx \
@@ -121,9 +123,11 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
 gwdb.cmo: adef.cmi buff.cmo config.cmi database.cmi db2.cmo dbdisk.cmi \
-    def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
+    def.cmi diff.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi \
+    gwdb.cmi 
 gwdb.cmx: adef.cmx buff.cmx config.cmi database.cmx db2.cmx dbdisk.cmi \
-    def.cmi futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
+    def.cmi diff.cmx futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx \
+    gwdb.cmi 
 gwdb.cmi: adef.cmi config.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmo secure.cmi select.cmo 

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.111 2006-11-03 02:24:39 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.112 2006-11-03 10:31:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1673,20 +1673,22 @@ value print_iper_field oc tab name get v = do {
   fprintf oc "\n";
 };
 
-value print_list_field print_item oc tab name1 name get ref v =
+value print_list_field print_item oc tab name1 name get ref v addch =
   let ref = get ref in
   let v = get v in
   if v <> ref then
     if v = [] then fprintf oc "    %sno %s\n" tab name1
     else
       let name = if List.length v = 1 then name1 else name in
-      Mutil.list_iter_first
-        (fun first it -> do {
-           fprintf oc "    %s%s" tab (fill (if first then name else ""));
-           print_item oc it;
-           fprintf oc "\n";
-         })
-        v
+      let a1 = Array.of_list ref in
+      let a2 = Array.of_list v in
+      let (d1, d2) = Diff.f a1 a2 in
+      for i = 0 to Array.length a2 - 1 do {
+        fprintf oc "    %s%s" tab (fill (if i = 0 then name else ""));
+        print_item oc a2.(i);
+        if d2.(i) then fprintf oc " %c" addch else ();
+        fprintf oc "\n";
+      }
   else ()
 ;
 
@@ -1701,7 +1703,7 @@ value print_iper_list_field =
        else fprintf oc "%s" (string_of_per (fn, sn, occ, ip)))
 ;
 
-value print_diff_per oc tab ref p = do {
+value print_diff_per oc tab ref p addch = do {
   print_string_field oc tab "first_name" (fun p -> p.first_name) ref p;
   print_string_field oc tab "surname" (fun p -> p.surname) ref p;
   if p.occ <> ref.occ then fprintf oc "    %s%s%d\n" tab (fill "occ") p.occ
@@ -1709,22 +1711,23 @@ value print_diff_per oc tab ref p = do {
   print_string_field oc tab "image" (fun p -> p.image) ref p;
   print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
   print_string_list_field oc tab "qualifier" "qualifiers"
-    (fun p -> p.qualifiers) ref p;
-  print_string_list_field oc tab "alias" "aliases" (fun p -> p.aliases) ref p;
+    (fun p -> p.qualifiers) ref p addch;
+  print_string_list_field oc tab "alias" "aliases" (fun p -> p.aliases) ref p
+    addch;
   print_string_list_field oc tab "first_name_alias" "first_names_aliases"
-    (fun p -> p.first_names_aliases) ref p;
+    (fun p -> p.first_names_aliases) ref p addch;
   print_string_list_field oc tab "surname_alias" "surnames_aliases"
-    (fun p -> p.surnames_aliases) ref p;
+    (fun p -> p.surnames_aliases) ref p addch;
   print_list_field
     (fun oc tit ->
        fprintf oc "%s/%s/%s/%s/%s/%s"
-         (match tit.t_name with
-          [ Tmain -> "*" | Tname n -> n | Tnone -> "" ])
          tit.t_ident tit.t_place
          (string_of_codate "" "" tit.t_date_start)
          (string_of_codate "" "" tit.t_date_end)
-         (if tit.t_nth = 0 then "" else string_of_int tit.t_nth))
-     oc tab "title" "titles" (fun p -> p.titles) ref p;
+         (if tit.t_nth = 0 then "" else string_of_int tit.t_nth)
+         (match tit.t_name with
+          [ Tmain -> "*" | Tname n -> n | Tnone -> "" ]))
+     oc tab "title" "titles" (fun p -> p.titles) ref p addch;
   if p.rparents <> ref.rparents then
     fprintf oc "    %s... (rparents)\n" tab
   else ();
@@ -1777,14 +1780,14 @@ value print_diff_per oc tab ref p = do {
   print_string_field oc tab "sources" (fun p -> p.psources) ref p;
 };
 
-value print_diff_fam oc tab parents_already_printed ref fam = do {
+value print_diff_fam oc tab parents_already_printed ref fam addch = do {
   if parents_already_printed then ()
   else do {
     print_iper_field oc tab "father" (fun (_, c, _) -> Adef.father c) fam;
     print_iper_field oc tab "mother" (fun (_, c, _) -> Adef.mother c) fam;
   };
   print_iper_list_field oc tab "child" "children"
-    (fun (_, _, d) -> Array.to_list d.children) ref fam;
+    (fun (_, _, d) -> Array.to_list d.children) ref fam addch;
   print_codate_field oc tab "marriage" (fun (f, _, _) -> f.marriage) ref fam;
   print_string_field oc tab "marriage_place"
     (fun (f, _, _) -> f.marriage_place) ref fam;
@@ -1894,7 +1897,7 @@ value commit_patches conf base = do {
          let fcd2 = fcd_from_ht (res_fam, res_cpl, res_des) in
          if is_new then do {
            fprintf oc "\n  family = %s (new)\n" (string_of_fam fcd2 ifam);
-           print_diff_fam oc "" True default_fcd fcd2
+           print_diff_fam oc "" True default_fcd fcd2 '+'
          }
          else do {
            let fcd1 = fcd_from_ht (ini_fam, ini_cpl, ini_des) in
@@ -1902,9 +1905,9 @@ value commit_patches conf base = do {
            let s2 = string_of_fam fcd2 ifam in
            fprintf oc "\n  family%s\n" (if s1 = s2 then " = " ^ s1 else "");
            fprintf oc "    before\n";
-           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1;
+           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1 '-';
            fprintf oc "    after\n";
-           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2;
+           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2 '+';
          }
        })
       fam_set;
@@ -1920,16 +1923,16 @@ value commit_patches conf base = do {
            map_person_ps (person_key base res_per) (sou base)
              (gen_person_of_person (Hashtbl.find res_per ip))
          in
-         if is_new then print_diff_per oc "" default_per p2
+         if is_new then print_diff_per oc "" default_per p2 '+'
          else do {
            let p1 =
              map_person_ps (person_key base res_per) (sou base)
                (gen_person_of_person (Hashtbl.find ini_per ip))
            in
            fprintf oc "    before\n";
-           print_diff_per oc "  " p2 p1;
+           print_diff_per oc "  " p2 p1 '-';
            fprintf oc "    after\n";
-           print_diff_per oc "  " p1 p2;
+           print_diff_per oc "  " p1 p2 '+';
          }
        })
       per_set;
