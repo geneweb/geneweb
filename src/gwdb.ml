@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.112 2006-11-03 10:31:18 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.113 2006-11-03 11:15:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1686,7 +1686,7 @@ value print_list_field print_item oc tab name1 name get ref v addch =
       for i = 0 to Array.length a2 - 1 do {
         fprintf oc "    %s%s" tab (fill (if i = 0 then name else ""));
         print_item oc a2.(i);
-        if d2.(i) then fprintf oc " %c" addch else ();
+        if d2.(i) then fprintf oc "%s" addch else ();
         fprintf oc "\n";
       }
   else ()
@@ -1799,7 +1799,14 @@ value print_diff_fam oc tab parents_already_printed ref fam addch = do {
     fprintf oc "    %s... (witnesses)\n" tab
   else ();
   if f.relation <> rf.relation then
-    fprintf oc "    %s... (relation kind)\n" tab
+    fprintf oc "    %s%s\n" tab
+      (match f.relation with
+       [ Married -> "married"
+       | NotMarried -> "not married"
+       | Engaged -> "engaged"
+       | NoSexesCheckNotMarried -> "not married (no sexes check)"
+       | NoMention -> "-"
+       | NoSexesCheckMarried -> "married (no sexes check)" ])
   else ();
   if f.divorce <> rf.divorce then
     fprintf oc "    %s... (divorce)\n" tab
@@ -1897,7 +1904,7 @@ value commit_patches conf base = do {
          let fcd2 = fcd_from_ht (res_fam, res_cpl, res_des) in
          if is_new then do {
            fprintf oc "\n  family = %s (new)\n" (string_of_fam fcd2 ifam);
-           print_diff_fam oc "" True default_fcd fcd2 '+'
+           print_diff_fam oc "" True default_fcd fcd2 "";
          }
          else do {
            let fcd1 = fcd_from_ht (ini_fam, ini_cpl, ini_des) in
@@ -1905,9 +1912,9 @@ value commit_patches conf base = do {
            let s2 = string_of_fam fcd2 ifam in
            fprintf oc "\n  family%s\n" (if s1 = s2 then " = " ^ s1 else "");
            fprintf oc "    before\n";
-           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1 '-';
+           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1 " -";
            fprintf oc "    after\n";
-           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2 '+';
+           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2 " +";
          }
        })
       fam_set;
@@ -1923,16 +1930,16 @@ value commit_patches conf base = do {
            map_person_ps (person_key base res_per) (sou base)
              (gen_person_of_person (Hashtbl.find res_per ip))
          in
-         if is_new then print_diff_per oc "" default_per p2 '+'
+         if is_new then print_diff_per oc "" default_per p2 ""
          else do {
            let p1 =
              map_person_ps (person_key base res_per) (sou base)
                (gen_person_of_person (Hashtbl.find ini_per ip))
            in
            fprintf oc "    before\n";
-           print_diff_per oc "  " p2 p1 '-';
+           print_diff_per oc "  " p2 p1 " -";
            fprintf oc "    after\n";
-           print_diff_per oc "  " p1 p2 '+';
+           print_diff_per oc "  " p1 p2 " +";
          }
        })
       per_set;
