@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.109 2006-11-03 01:19:02 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.110 2006-11-03 01:27:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1625,10 +1625,7 @@ value string_of_codate if_d if_nd v =
   | None -> if_nd ]
 ;
 
-value string_key fn occ sn =
-  sprintf "= %s/%s%s" fn sn
-    (if occ = 0 then "" else "/" ^ string_of_int occ)
-;
+value string_key fn occ sn = sprintf "%s.%d %s" fn occ sn;
 
 value fill_n = 21;
 
@@ -1660,7 +1657,7 @@ value print_iper_field oc tab name get ref v =
   if v <> ref then do {
     fprintf oc "    %s%s" tab (fill name);
     if Adef.int_of_iper v < 0 then fprintf oc "-"
-    else fprintf oc "P-%d %s" (Adef.int_of_iper v) (string_key fn occ sn);
+    else fprintf oc "%s" (string_key fn occ sn);
     fprintf oc "\n";
   }
   else ()
@@ -1677,7 +1674,7 @@ value print_list_field print_item oc tab name1 name get ref v =
         (fun first it -> do {
            fprintf oc "    %s%s" tab (fill (if first then name else ""));
            print_item oc it;
-	   fprintf oc "\n"
+           fprintf oc "\n";
          })
         v
   else ()
@@ -1691,8 +1688,7 @@ value print_iper_list_field =
   print_list_field
     (fun oc (fn, sn, occ, ip) ->
        if Adef.int_of_iper ip < 0 then fprintf oc "-"
-       else
-         fprintf oc "P-%d %s" (Adef.int_of_iper ip) (string_key fn occ sn))
+       else fprintf oc "%s" (string_key fn occ sn))
 ;
 
 value print_diff_per oc tab ref p = do {
@@ -1901,8 +1897,8 @@ value commit_patches conf base = do {
          let (fn, sn, occ, _) =
            person_key base (if is_new then res_per else ini_per) ip
          in
-         fprintf oc "\n  person P-%d %s%s\n" (Adef.int_of_iper ip)
-           (string_key fn occ sn) (if is_new then " (new)" else "");
+         fprintf oc "\n  person = %s%s\n" (string_key fn occ sn)
+           (if is_new then " (new)" else "");
          let p2 =
            map_person_ps (person_key base res_per) (sou base)
              (gen_person_of_person (Hashtbl.find res_per ip))
