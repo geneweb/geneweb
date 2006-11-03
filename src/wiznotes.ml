@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.32 2006-11-01 16:59:59 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.33 2006-11-03 22:09:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -598,8 +598,8 @@ value print_mod_ok conf base =
       string_filter file_path False
 ;
 
-value wizard_allowing wddir =
-  let fname = Filename.concat wddir "connected.allow" in
+value wizard_denying wddir =
+  let fname = Filename.concat wddir "connected.deny" in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       loop [] where rec loop list =
@@ -618,26 +618,25 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
   print_link_to_welcome conf True;
   let tm_now = Unix.time () in
   let wddir = dir conf base in
-  let allowed = wizard_allowing wddir in
+  let denying = wizard_denying wddir in
   let wl =
     if not (List.mem_assoc conf.user wl) then [(conf.user, tm_now) :: wl]
     else wl
   in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
-  let is_visible = List.mem conf.user allowed in
+  let is_visible = not (List.mem conf.user denying) in
   tag "ul" begin
     let (not_everybody, _) =
       List.fold_left
         (fun (not_everybody, first) (wz, tm_user) ->
-           if wz <> conf.user && not (List.mem wz allowed) &&
-              not conf.manitou
+           if wz <> conf.user && List.mem wz denying && not conf.manitou
            then (True, first)
            else do {
              let (wfile, stm) = wiznote_date (wzfile wddir wz) in
              let tm = Unix.localtime stm in
              tag "li" "style=\"list-style-type:%s\""
                (if wz = conf.user && not is_visible ||
-                   conf.manitou && not (List.mem wz allowed)
+                   conf.manitou && List.mem wz denying
                 then "circle"
                 else "disc")
              begin
@@ -691,25 +690,26 @@ value connected_wizards conf base =
 
 value do_change_wizard_visibility conf base x set_vis = do {
   let wddir = dir conf base in
-  let allowed = wizard_allowing wddir in
-  let is_visible = List.mem conf.user allowed in
+  let denying = wizard_denying wddir in
+  let is_visible = not (List.mem conf.user denying) in
   if not set_vis && not is_visible || set_vis && is_visible then ()
   else do {
-    let tmp_file = Filename.concat wddir "1connected.allow" in
+    let tmp_file = Filename.concat wddir "1connected.deny" in
     let oc = Secure.open_out tmp_file in
     let found =
       List.fold_left
         (fun found wz ->
-           if wz = conf.user && not set_vis then True
+           if wz = conf.user && set_vis then True
            else do {
              Printf.fprintf oc "%s\n" wz;
              found
            })
-        False allowed
+        False denying
     in
-    if not found && set_vis then Printf.fprintf oc "%s\n" conf.user else ();
+    if not found && not set_vis then Printf.fprintf oc "%s\n" conf.user
+    else ();
     close_out oc;
-    let file = Filename.concat wddir "connected.allow" in
+    let file = Filename.concat wddir "connected.deny" in
     Mutil.remove_file file;
     Sys.rename tmp_file file;
   };
