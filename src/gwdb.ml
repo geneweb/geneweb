@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.115 2006-11-04 13:30:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.116 2006-11-04 18:55:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1628,7 +1628,7 @@ value print_list_field print_item oc tab name1 name get ref v dk =
   let ref = get ref in
   let v = get v in
   if v <> ref then
-    if v = [] then fprintf oc "    %sno %s\n" tab name1
+    if v = [] then fprintf oc "    %s%s\n" tab (fill name1)
     else
       let name = if List.length v = 1 then name1 else name in
       let a1 = Array.of_list ref in
