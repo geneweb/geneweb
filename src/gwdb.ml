@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.114 2006-11-03 20:51:59 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.115 2006-11-04 13:30:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1610,14 +1610,14 @@ value print_codate_field oc tab name get ref v =
   let ref = get ref in
   let v = get v in
   if v <> ref then
-    fprintf oc "    %s%s%s\n" tab (fill name) (string_of_codate "" "-" v)
+    fprintf oc "    %s%s%s\n" tab (fill name) (string_of_codate "" "" v)
   else ()
 ;
 
 value print_iper_field oc tab name get v = do {
   let (fn, sn, occ, v) = get v in
   fprintf oc "    %s%s" tab (fill name);
-  if Adef.int_of_iper v < 0 then fprintf oc "-"
+  if Adef.int_of_iper v < 0 then fprintf oc ""
   else fprintf oc "%s" (string_of_per (fn, sn, occ, v));
   fprintf oc "\n";
 };
@@ -1658,7 +1658,7 @@ value print_string_list_field =
 value print_iper_list_field =
   print_list_field
     (fun oc (fn, sn, occ, ip) ->
-       if Adef.int_of_iper ip < 0 then fprintf oc "-"
+       if Adef.int_of_iper ip < 0 then fprintf oc ""
        else fprintf oc "%s" (string_of_per (fn, sn, occ, ip)))
 ;
 
@@ -1716,10 +1716,10 @@ value print_diff_per oc tab refpu pu dk = do {
       (match p.access with
        [ IfTitles -> "if-titles" | Public -> "public" | Private -> "private" ])
   else ();
-  print_codate_field oc tab "birth" (fun p -> p.birth) ref p;
+  print_codate_field oc tab "birth_date" (fun p -> p.birth) ref p;
   print_string_field oc tab "birth_place" (fun p -> p.birth_place) ref p;
   print_string_field oc tab "birth_src" (fun p -> p.birth_src) ref p;
-  print_codate_field oc tab "baptism" (fun p -> p.baptism) ref p;
+  print_codate_field oc tab "baptism_date" (fun p -> p.baptism) ref p;
   print_string_field oc tab "baptism_place" (fun p -> p.baptism_place) ref p;
   print_string_field oc tab "baptism_src" (fun p -> p.baptism_src) ref p;
   if p.death <> ref.death then
@@ -1738,14 +1738,14 @@ value print_diff_per oc tab refpu pu dk = do {
            string_of_date (Adef.date_of_cdate cd) ^ drs
        | DeadYoung -> "dead young"
        | DeadDontKnowWhen -> "dead"
-       | DontKnowIfDead -> "don't know if dead" ])
+       | DontKnowIfDead -> "" ])
   else ();
   print_string_field oc tab "death_place" (fun p -> p.death_place) ref p;
   print_string_field oc tab "death_src" (fun p -> p.death_src) ref p;
   if p.burial <> ref.burial then
     fprintf oc "    %s%s\n" tab
       (match p.burial with
-       [ UnknownBurial -> fill "burial" ^ "-"
+       [ UnknownBurial -> fill "burial"
        | Buried cd -> fill "buried" ^ string_of_codate " " "" cd
        | Cremated cd -> fill "cremated" ^ string_of_codate " " "" cd ])
   else ();
@@ -1766,7 +1766,8 @@ value print_diff_fam oc tab parents_already_printed ref fam dk = do {
   };
   print_iper_list_field oc tab "child" "children"
     (fun (_, _, d) -> Array.to_list d.children) ref fam dk;
-  print_codate_field oc tab "marriage" (fun (f, _, _) -> f.marriage) ref fam;
+  print_codate_field oc tab "marriage_date" (fun (f, _, _) -> f.marriage)
+    ref fam;
   print_string_field oc tab "marriage_place"
     (fun (f, _, _) -> f.marriage_place) ref fam;
   print_string_field oc tab "marriage_src"
@@ -1844,8 +1845,9 @@ value commit_patches conf base = do {
         patches_file.val
     in
     let (hh, mm, ss) = conf.time in
-    fprintf oc "\ncommit %4d-%02d-%02d %02d:%02d:%02d \"%s\"\n"
-      conf.today.year conf.today.month conf.today.day hh mm ss conf.user;
+    fprintf oc "\ncommit %4d-%02d-%02d %02d:%02d:%02d \"%s\"%s\n"
+      conf.today.year conf.today.month conf.today.day hh mm ss conf.user
+      (try " " ^ List.assoc "m" conf.env with [ Not_found -> "" ]);
     let per_set =
       let set = IpSet.empty in
       let set = Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per set in
