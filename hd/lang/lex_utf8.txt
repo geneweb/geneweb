@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.46 2006-11-02 15:03:16 ddr Exp $
+# $Id: lex_utf8.txt,v 5.47 2006-11-04 13:46:40 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -3065,6 +3065,10 @@ ro: deces
 ru: смерть
 sl: smrti
 sv: död
+
+    deconnect
+en: deconnect
+fr: déconnecter
 
     delete
 af: verwyder
