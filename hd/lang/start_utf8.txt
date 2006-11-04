@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.8 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.9 2006-11-04 13:46:40 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -48,9 +48,11 @@ sv: Genealogi
  src="%o/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
 </td>
 %I&wNf<td align="%R"
-valign="top"><em>([wizard/wizards/friend/friends]0%U)</em></td>
+valign="top"><em>[wizard/wizards/friend/friends]0%U</em>
+<span style="font-size:70%%">(<a href="%sw=">[deconnect]</a>)</span></td>
 %E%I&fNw<td align="%R"
-valign="top"><em>([wizard/wizards/friend/friends]2)</em></td>
+valign="top"><em>[wizard/wizards/friend/friends]2</em>
+<span style="font-size:70%%">(<a href="%sw=">[deconnect]</a>)</span></td>
 %E<td align="%R" valign="top" style="width: 16px">%w</td>
 </tr><tr>
 <td align="center" colspan="%I|&wNf&fNw2%E%I&|Nwf|Nfw1%E">
