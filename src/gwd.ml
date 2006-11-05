@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.12 2006-11-05 13:44:17 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.13 2006-11-05 17:21:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -728,6 +728,11 @@ value allowed_titles env base_env () =
     [ Not_found | Sys_error _ -> [] ]
 ;
 
+value start_with s i p =
+  i + String.length p <= String.length s &&
+  String.sub s i (String.length p) = p
+;
+
 value authorization cgi from_addr request base_env passwd access_type utm
     base_file command =
   let wizard_passwd =
@@ -748,8 +753,11 @@ value authorization cgi from_addr request base_env passwd access_type utm
     let auth = Wserver.extract_param "authorization: " '\r' request in
     if auth = "" then ""
     else
-      let i = String.length "Basic " in
-      Base64.decode (String.sub auth i (String.length auth - i))
+      let s = "Basic " in
+      if start_with auth 0 s then
+        let i = String.length s in
+        Base64.decode (String.sub auth i (String.length auth - i))
+      else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let (ok, wizard, friend, username) =
