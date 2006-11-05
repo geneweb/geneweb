@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.13 2006-11-05 17:21:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.14 2006-11-05 18:29:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -796,15 +796,15 @@ value authorization cgi from_addr request base_env passwd access_type utm
                 | None -> (True, False, False, "") ] ] ]
   in
   let user =
-    match lindex uauth ':' with
-    [ Some i ->
-        let s = String.sub uauth 0 i in
-        if s = wizard_passwd || s = friend_passwd then "" else s
-    | None ->
-        match access_type with
-        [ ATwizard user -> user
-        | ATfriend user -> user
-        | _ -> "" ] ]
+    match access_type with
+    [ ATwizard user -> user
+    | ATfriend user -> user
+    | _ ->
+        match lindex uauth ':' with
+        [ Some i ->
+            let s = String.sub uauth 0 i in
+            if s = wizard_passwd || s = friend_passwd then "" else s
+        | None -> "" ] ]
   in
   let (command, passwd) =
     match access_type with
@@ -864,19 +864,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
         in
         let access_type =
           match passwd with
-          [ "" ->
-             if not cgi then ATnone
-             else
-               let mode = try Sys.getenv "GW_MODE" with [ Not_found -> "" ] in
-               let r_user =
-                 try Sys.getenv "REMOTE_USER" with [ Not_found -> "" ]
-               in
-               match (mode, r_user) with
-               [ (_, "") -> ATnone
-               | ("F", u) -> ATfriend u
-               | ("W", u) -> ATwizard u
-               | _ -> ATnone ]                  
-          | "w" | "f" -> ATnone
+          [ "" | "w" | "f" -> ATnone
           | _ -> get_token True utm from_addr base_passwd ]
         in
         (passwd, env, access_type)
