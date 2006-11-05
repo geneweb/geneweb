@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.10 2006-10-17 12:10:09 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.11 2006-11-05 10:23:24 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -728,7 +728,7 @@ value allowed_titles env base_env () =
     [ Not_found | Sys_error _ -> [] ]
 ;
 
-value make_conf cgi from_addr (addr, request) script_name contents env =
+value make_conf cgi from_addr (addr, request) script_name contents env = do {
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let (command, base_file, passwd, env, access_type) =
@@ -796,220 +796,213 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
     | (x, env) -> ("", [("opt", x) :: env]) ]
   in
   let (threshold_test, env) = extract_assoc "threshold" env in
-  do {
-    if threshold_test <> "" then
-      RelationLink.threshold.val := int_of_string threshold_test
-    else ();
-    let (sleep, env) =
-      let (x, env) = extract_assoc "sleep" env in
-      (if x = "" then 0 else int_of_string x, env)
-    in
-    let base_env = read_base_env cgi base_file in
-    let default_lang =
-      try
-        let x = List.assoc "default_lang" base_env in
-        if x = "" then default_lang.val else x
-      with
-      [ Not_found -> default_lang.val ]
-    in
-    let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-    let wizard_passwd =
-      try List.assoc "wizard_passwd" base_env with
-      [ Not_found -> wizard_passwd.val ]
-    in
-    let wizard_passwd_file =
-      try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
-    in
-    let friend_passwd =
-      try List.assoc "friend_passwd" base_env with
-      [ Not_found -> friend_passwd.val ]
-    in
-    let friend_passwd_file =
-      try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
-    in
-    let wizard_just_friend =
-      if wizard_just_friend.val then True
-      else
-        try List.assoc "wizard_just_friend" base_env = "yes" with
-        [ Not_found -> False ]
-    in
-    let passwd1 =
-      let auth = Wserver.extract_param "authorization: " '\r' request in
-      if auth = "" then ""
-      else
-        let i = String.length "Basic " in
-        Base64.decode (String.sub auth i (String.length auth - i))
-    in
-    let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-    let (ok, wizard, friend, username) =
-      match access_type with
-      [ ATwizard user -> (True, True, False, "")
-      | ATfriend user -> (True, False, True, "")
-      | ATnormal -> (True, False, False, "")
-      | ATnone | ATset ->
-          if not cgi && (passwd = "w" || passwd = "f") then
-            if passwd = "w" then
-              if wizard_passwd = "" && wizard_passwd_file = "" then
-                (True, True, friend_passwd = "", "")
-              else
-                match match_auth wizard_passwd wizard_passwd_file uauth with
-                [ Some username -> (True, True, False, username)
-                | None -> (False, False, False, "") ]
-            else if passwd = "f" then
-              if friend_passwd = "" && friend_passwd_file = "" then
-                (True, False, True, "")
-              else
+  if threshold_test <> "" then
+    RelationLink.threshold.val := int_of_string threshold_test
+  else ();
+  let (sleep, env) =
+    let (x, env) = extract_assoc "sleep" env in
+    (if x = "" then 0 else int_of_string x, env)
+  in
+  let base_env = read_base_env cgi base_file in
+  let default_lang =
+    try
+      let x = List.assoc "default_lang" base_env in
+      if x = "" then default_lang.val else x
+    with
+    [ Not_found -> default_lang.val ]
+  in
+  let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
+  let wizard_passwd =
+    try List.assoc "wizard_passwd" base_env with
+    [ Not_found -> wizard_passwd.val ]
+  in
+  let wizard_passwd_file =
+    try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let friend_passwd =
+    try List.assoc "friend_passwd" base_env with
+    [ Not_found -> friend_passwd.val ]
+  in
+  let friend_passwd_file =
+    try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let wizard_just_friend =
+    if wizard_just_friend.val then True
+    else
+      try List.assoc "wizard_just_friend" base_env = "yes" with
+      [ Not_found -> False ]
+  in
+  let passwd1 =
+    let auth = Wserver.extract_param "authorization: " '\r' request in
+    if auth = "" then ""
+    else
+      let i = String.length "Basic " in
+      Base64.decode (String.sub auth i (String.length auth - i))
+  in
+  let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
+  let (ok, wizard, friend, username) =
+    match access_type with
+    [ ATwizard user -> (True, True, False, "")
+    | ATfriend user -> (True, False, True, "")
+    | ATnormal -> (True, False, False, "")
+    | ATnone | ATset ->
+        if not cgi && (passwd = "w" || passwd = "f") then
+          if passwd = "w" then
+            if wizard_passwd = "" && wizard_passwd_file = "" then
+              (True, True, friend_passwd = "", "")
+            else
+              match match_auth wizard_passwd wizard_passwd_file uauth with
+              [ Some username -> (True, True, False, username)
+              | None -> (False, False, False, "") ]
+          else if passwd = "f" then
+            if friend_passwd = "" && friend_passwd_file = "" then
+              (True, False, True, "")
+            else
+              match match_auth friend_passwd friend_passwd_file uauth with
+              [ Some username -> (True, False, True, username)
+              | None -> (False, False, False, "") ]
+          else assert False
+        else if wizard_passwd = "" && wizard_passwd_file = "" then
+          (True, True, friend_passwd = "", "")
+        else
+           match match_auth wizard_passwd wizard_passwd_file uauth with
+           [ Some username -> (True, True, False, username)
+           | _ ->
+                if friend_passwd = "" && friend_passwd_file = "" then
+                  (True, False, True, "")
+                else
                 match match_auth friend_passwd friend_passwd_file uauth with
                 [ Some username -> (True, False, True, username)
-                | None -> (False, False, False, "") ]
-            else assert False
-          else if wizard_passwd = "" && wizard_passwd_file = "" then
-            (True, True, friend_passwd = "", "")
-          else
-             match match_auth wizard_passwd wizard_passwd_file uauth with
-             [ Some username -> (True, True, False, username)
-             | _ ->
-                  if friend_passwd = "" && friend_passwd_file = "" then
-                    (True, False, True, "")
-                  else
-                  match match_auth friend_passwd friend_passwd_file uauth with
-                  [ Some username -> (True, False, True, username)
-                  | None -> (True, False, False, "") ] ] ]
-    in
-    let user =
-      match lindex uauth ':' with
-      [ Some i ->
-          let s = String.sub uauth 0 i in
-          if s = wizard_passwd || s = friend_passwd then "" else s
-      | None ->
-          match access_type with
-          [ ATwizard user -> user
-          | ATfriend user -> user
-          | _ -> "" ] ]
-    in
-    let (command, passwd) =
-      match access_type with
-      [ ATset ->
-          if wizard then
-            let pwd_id = set_token utm from_addr base_file 'w' user in
-            if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-          else if friend then
-            let pwd_id = set_token utm from_addr base_file 'f' user in
-            if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-          else if cgi then (command, "")
-          else (base_file, "")
-      | ATnormal -> if cgi then (command, "") else (base_file, "")
-      | _ ->
-          if cgi then (command, passwd)
-          else if passwd = "" then (base_file, "")
-          else (base_file ^ "_" ^ passwd, passwd) ]
-    in
-    let passwd1 =
-      match lindex passwd1 ':' with
-      [ Some i -> String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
-      | None -> passwd ]
-    in
-    let cancel_links =
-      match Util.p_getenv env "cgl" with
-      [ Some "on" -> True
-      | _ -> False ]
-    in
-    let is_rtl =
-      try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
-    in
-    let allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env) in
-    let manitou =
-      try user <> "" && List.assoc "manitou" base_env = user with
-      [ Not_found -> False ]
-    in
-    let conf =
-      {from = from_addr;
-       manitou = manitou;
-       wizard = wizard && not wizard_just_friend;
-       friend = friend || wizard_just_friend && wizard;
-       just_friend_wizard = wizard && wizard_just_friend;
-       user = user; username = username;
-       passwd = passwd1; cgi = cgi; command = command;
-       indep_command = (if cgi then command else "geneweb") ^ "?";
-       highlight =
-         try List.assoc "highlight_color" base_env with
-         [ Not_found -> green_color ];
-       lang = if lang = "" then default_lang else lang;
-       default_lang = default_lang;
-       multi_parents =
-         try List.assoc "multi_parents" base_env = "yes" with
+                | None -> (True, False, False, "") ] ] ]
+  in
+  let user =
+    match lindex uauth ':' with
+    [ Some i ->
+        let s = String.sub uauth 0 i in
+        if s = wizard_passwd || s = friend_passwd then "" else s
+    | None ->
+        match access_type with
+        [ ATwizard user -> user
+        | ATfriend user -> user
+        | _ -> "" ] ]
+  in
+  let (command, passwd) =
+    match access_type with
+    [ ATset ->
+        if wizard then
+          let pwd_id = set_token utm from_addr base_file 'w' user in
+          if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+        else if friend then
+          let pwd_id = set_token utm from_addr base_file 'f' user in
+          if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+        else if cgi then (command, "")
+        else (base_file, "")
+    | ATnormal -> if cgi then (command, "") else (base_file, "")
+    | _ ->
+        if cgi then (command, passwd)
+        else if passwd = "" then (base_file, "")
+        else (base_file ^ "_" ^ passwd, passwd) ]
+  in
+  let passwd1 =
+    match lindex passwd1 ':' with
+    [ Some i -> String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
+    | None -> passwd ]
+  in
+  let is_rtl =
+    try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
+  in
+  let conf =
+    {from = from_addr;
+     manitou =
+       try user <> "" && List.assoc "manitou" base_env = user with
+       [ Not_found -> False ];
+     wizard = wizard && not wizard_just_friend;
+     friend = friend || wizard_just_friend && wizard;
+     just_friend_wizard = wizard && wizard_just_friend;
+     user = user; username = username;
+     passwd = passwd1; cgi = cgi; command = command;
+     indep_command = (if cgi then command else "geneweb") ^ "?";
+     highlight =
+       try List.assoc "highlight_color" base_env with
+       [ Not_found -> green_color ];
+     lang = if lang = "" then default_lang else lang;
+     default_lang = default_lang;
+     multi_parents =
+       try List.assoc "multi_parents" base_env = "yes" with
+       [ Not_found -> False ];
+     can_send_image =
+       try List.assoc "can_send_image" base_env <> "no" with
+       [ Not_found -> True ];
+     public_if_titles =
+       try List.assoc "public_if_titles" base_env = "yes" with
+       [ Not_found -> False ];
+     public_if_no_date =
+       try List.assoc "public_if_no_date" base_env = "yes" with
+       [ Not_found -> False ];
+     cancel_links =
+       match Util.p_getenv env "cgl" with
+       [ Some "on" -> True
+       | _ -> False ];
+     setup_link = setup_link.val;
+     access_by_key =
+       try List.assoc "access_by_key" base_env = "yes" with
+       [ Not_found -> wizard && friend ];
+     private_years =
+       try int_of_string (List.assoc "private_years" base_env) with
+       [ Not_found | Failure _ -> 150 ];
+     hide_names =
+       if wizard || friend then False
+       else
+         try List.assoc "hide_private_names" base_env = "yes" with
          [ Not_found -> False ];
-       can_send_image =
-         try List.assoc "can_send_image" base_env <> "no" with
-         [ Not_found -> True ];
-       public_if_titles =
-         try List.assoc "public_if_titles" base_env = "yes" with
+     use_restrict =
+       if wizard || friend then False
+       else
+         try List.assoc "use_restrict" base_env = "yes" with
          [ Not_found -> False ];
-       public_if_no_date =
-         try List.assoc "public_if_no_date" base_env = "yes" with
+     no_image =
+       if wizard || friend then False
+       else
+         try List.assoc "no_image_for_visitor" base_env = "yes" with
          [ Not_found -> False ];
-       cancel_links = cancel_links;
-       setup_link = setup_link.val;
-       access_by_key =
-         try List.assoc "access_by_key" base_env = "yes" with
-         [ Not_found -> wizard && friend ];
-       private_years =
-         try int_of_string (List.assoc "private_years" base_env) with
-         [ Not_found | Failure _ -> 150 ];
-       hide_names =
-         if wizard || friend then False
-         else
-           try List.assoc "hide_private_names" base_env = "yes" with
-           [ Not_found -> False ];
-       use_restrict =
-         if wizard || friend then False
-         else
-           try List.assoc "use_restrict" base_env = "yes" with
-           [ Not_found -> False ];
-       no_image =
-         if wizard || friend then False
-         else
-           try List.assoc "no_image_for_visitor" base_env = "yes" with
-           [ Not_found -> False ];
-       bname = base_file; env = env; senv = [];
-       henv =
-         (if not cgi then []
-          else if passwd = "" then [("b", base_file)]
-          else [("b", base_file ^ "_" ^ passwd)]) @
-           (if lang = "" then [] else [("lang", lang)]) @
-           (if from = "" then [] else [("opt", from)]);
-       base_env = base_env;
-       allowed_titles = allowed_titles;
-       request = request; lexicon = lexicon;
-       xhs =
-         match p_getenv base_env "doctype" with
-         [ Some "html-4.01" -> ""
-         | _ -> " /" ];
-       charset = "utf-8";
-       is_rtl = is_rtl;
-       left = if is_rtl then "right" else "left";
-       right = if is_rtl then "left" else "right";
-       auth_file =
-         try
-           let x = List.assoc "auth_file" base_env in
-           if x = "" then auth_file.val else Util.base_path [] x
-         with
-         [ Not_found -> auth_file.val ];
-       border =
-         match Util.p_getint env "border" with
-         [ Some i -> i
-         | None -> 0 ];
-       n_connect = None;
-       today =
-         {day = tm.Unix.tm_mday; month = succ tm.Unix.tm_mon;
-          year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
-       today_wd = tm.Unix.tm_wday;
-       time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
-       ctime = utm}
-    in
-    (conf, sleep, if not ok then Some (passwd, uauth) else None)
-  }
-;
+     bname = base_file; env = env; senv = [];
+     henv =
+       (if not cgi then []
+        else if passwd = "" then [("b", base_file)]
+        else [("b", base_file ^ "_" ^ passwd)]) @
+         (if lang = "" then [] else [("lang", lang)]) @
+         (if from = "" then [] else [("opt", from)]);
+     base_env = base_env;
+     allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env);
+     request = request; lexicon = lexicon;
+     xhs =
+       match p_getenv base_env "doctype" with
+       [ Some "html-4.01" -> ""
+       | _ -> " /" ];
+     charset = "utf-8";
+     is_rtl = is_rtl;
+     left = if is_rtl then "right" else "left";
+     right = if is_rtl then "left" else "right";
+     auth_file =
+       try
+         let x = List.assoc "auth_file" base_env in
+         if x = "" then auth_file.val else Util.base_path [] x
+       with
+       [ Not_found -> auth_file.val ];
+     border =
+       match Util.p_getint env "border" with
+       [ Some i -> i
+       | None -> 0 ];
+     n_connect = None;
+     today =
+       {day = tm.Unix.tm_mday; month = succ tm.Unix.tm_mon;
+        year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
+     today_wd = tm.Unix.tm_wday;
+     time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
+     ctime = utm}
+  in
+  (conf, sleep, if not ok then Some (passwd, uauth) else None)
+};
 
 value log_and_robot_check conf auth from request script_name contents =
   if conf.cgi && log_file.val = "" && robot_xcl.val = None then ()
