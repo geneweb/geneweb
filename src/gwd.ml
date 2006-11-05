@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.11 2006-11-05 10:23:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.12 2006-11-05 13:44:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -728,6 +728,101 @@ value allowed_titles env base_env () =
     [ Not_found | Sys_error _ -> [] ]
 ;
 
+value authorization cgi from_addr request base_env passwd access_type utm
+    base_file command =
+  let wizard_passwd =
+    try List.assoc "wizard_passwd" base_env with
+    [ Not_found -> wizard_passwd.val ]
+  in
+  let wizard_passwd_file =
+    try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let friend_passwd =
+    try List.assoc "friend_passwd" base_env with
+    [ Not_found -> friend_passwd.val ]
+  in
+  let friend_passwd_file =
+    try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let passwd1 =
+    let auth = Wserver.extract_param "authorization: " '\r' request in
+    if auth = "" then ""
+    else
+      let i = String.length "Basic " in
+      Base64.decode (String.sub auth i (String.length auth - i))
+  in
+  let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
+  let (ok, wizard, friend, username) =
+    match access_type with
+    [ ATwizard user -> (True, True, False, "")
+    | ATfriend user -> (True, False, True, "")
+    | ATnormal -> (True, False, False, "")
+    | ATnone | ATset ->
+        if not cgi && (passwd = "w" || passwd = "f") then
+          if passwd = "w" then
+            if wizard_passwd = "" && wizard_passwd_file = "" then
+              (True, True, friend_passwd = "", "")
+            else
+              match match_auth wizard_passwd wizard_passwd_file uauth with
+              [ Some username -> (True, True, False, username)
+              | None -> (False, False, False, "") ]
+          else if passwd = "f" then
+            if friend_passwd = "" && friend_passwd_file = "" then
+              (True, False, True, "")
+            else
+              match match_auth friend_passwd friend_passwd_file uauth with
+              [ Some username -> (True, False, True, username)
+              | None -> (False, False, False, "") ]
+          else assert False
+        else if wizard_passwd = "" && wizard_passwd_file = "" then
+          (True, True, friend_passwd = "", "")
+        else
+           match match_auth wizard_passwd wizard_passwd_file uauth with
+           [ Some username -> (True, True, False, username)
+           | _ ->
+                if friend_passwd = "" && friend_passwd_file = "" then
+                  (True, False, True, "")
+                else
+                match match_auth friend_passwd friend_passwd_file uauth with
+                [ Some username -> (True, False, True, username)
+                | None -> (True, False, False, "") ] ] ]
+  in
+  let user =
+    match lindex uauth ':' with
+    [ Some i ->
+        let s = String.sub uauth 0 i in
+        if s = wizard_passwd || s = friend_passwd then "" else s
+    | None ->
+        match access_type with
+        [ ATwizard user -> user
+        | ATfriend user -> user
+        | _ -> "" ] ]
+  in
+  let (command, passwd) =
+    match access_type with
+    [ ATset ->
+        if wizard then
+          let pwd_id = set_token utm from_addr base_file 'w' user in
+          if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+        else if friend then
+          let pwd_id = set_token utm from_addr base_file 'f' user in
+          if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
+        else if cgi then (command, "")
+        else (base_file, "")
+    | ATnormal -> if cgi then (command, "") else (base_file, "")
+    | _ ->
+        if cgi then (command, passwd)
+        else if passwd = "" then (base_file, "")
+        else (base_file ^ "_" ^ passwd, passwd) ]
+  in
+  let passwd1 =
+    match lindex passwd1 ':' with
+    [ Some i -> String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
+    | None -> passwd ]
+  in
+  (ok, command, passwd, passwd1, user, username, wizard, friend, uauth)
+;
+
 value make_conf cgi from_addr (addr, request) script_name contents env = do {
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
@@ -812,101 +907,15 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     [ Not_found -> default_lang.val ]
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  let wizard_passwd =
-    try List.assoc "wizard_passwd" base_env with
-    [ Not_found -> wizard_passwd.val ]
-  in
-  let wizard_passwd_file =
-    try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
-  in
-  let friend_passwd =
-    try List.assoc "friend_passwd" base_env with
-    [ Not_found -> friend_passwd.val ]
-  in
-  let friend_passwd_file =
-    try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
+  let (ok, command, passwd, passwd1, user, username, wizard, friend, uauth) =
+    authorization cgi from_addr request base_env passwd access_type utm
+      base_file command
   in
   let wizard_just_friend =
     if wizard_just_friend.val then True
     else
       try List.assoc "wizard_just_friend" base_env = "yes" with
       [ Not_found -> False ]
-  in
-  let passwd1 =
-    let auth = Wserver.extract_param "authorization: " '\r' request in
-    if auth = "" then ""
-    else
-      let i = String.length "Basic " in
-      Base64.decode (String.sub auth i (String.length auth - i))
-  in
-  let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
-  let (ok, wizard, friend, username) =
-    match access_type with
-    [ ATwizard user -> (True, True, False, "")
-    | ATfriend user -> (True, False, True, "")
-    | ATnormal -> (True, False, False, "")
-    | ATnone | ATset ->
-        if not cgi && (passwd = "w" || passwd = "f") then
-          if passwd = "w" then
-            if wizard_passwd = "" && wizard_passwd_file = "" then
-              (True, True, friend_passwd = "", "")
-            else
-              match match_auth wizard_passwd wizard_passwd_file uauth with
-              [ Some username -> (True, True, False, username)
-              | None -> (False, False, False, "") ]
-          else if passwd = "f" then
-            if friend_passwd = "" && friend_passwd_file = "" then
-              (True, False, True, "")
-            else
-              match match_auth friend_passwd friend_passwd_file uauth with
-              [ Some username -> (True, False, True, username)
-              | None -> (False, False, False, "") ]
-          else assert False
-        else if wizard_passwd = "" && wizard_passwd_file = "" then
-          (True, True, friend_passwd = "", "")
-        else
-           match match_auth wizard_passwd wizard_passwd_file uauth with
-           [ Some username -> (True, True, False, username)
-           | _ ->
-                if friend_passwd = "" && friend_passwd_file = "" then
-                  (True, False, True, "")
-                else
-                match match_auth friend_passwd friend_passwd_file uauth with
-                [ Some username -> (True, False, True, username)
-                | None -> (True, False, False, "") ] ] ]
-  in
-  let user =
-    match lindex uauth ':' with
-    [ Some i ->
-        let s = String.sub uauth 0 i in
-        if s = wizard_passwd || s = friend_passwd then "" else s
-    | None ->
-        match access_type with
-        [ ATwizard user -> user
-        | ATfriend user -> user
-        | _ -> "" ] ]
-  in
-  let (command, passwd) =
-    match access_type with
-    [ ATset ->
-        if wizard then
-          let pwd_id = set_token utm from_addr base_file 'w' user in
-          if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-        else if friend then
-          let pwd_id = set_token utm from_addr base_file 'f' user in
-          if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-        else if cgi then (command, "")
-        else (base_file, "")
-    | ATnormal -> if cgi then (command, "") else (base_file, "")
-    | _ ->
-        if cgi then (command, passwd)
-        else if passwd = "" then (base_file, "")
-        else (base_file ^ "_" ^ passwd, passwd) ]
-  in
-  let passwd1 =
-    match lindex passwd1 ':' with
-    [ Some i -> String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
-    | None -> passwd ]
   in
   let is_rtl =
     try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
