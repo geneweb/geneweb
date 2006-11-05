@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.5 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: name.ml,v 5.6 2006-11-05 00:19:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value utf_8_db = ref True;
@@ -233,6 +233,92 @@ value unaccent_utf_8 lower s i =
           | 0x8C -> ""
           | 0x8E -> "you"
           | 0x8F -> "ya"
+          | _ -> String.sub s i nbc ]
+      | 0xD4 ->
+          (* Armenian *)
+          match Char.code s.[i+1] with
+          [ 0xB1 -> f "A"
+          | 0xB2 -> f "B"
+          | 0xB3 -> f "G"
+          | 0xB4 -> f "D"
+          | 0xB5 -> f "E"
+          | 0xB6 -> f "Z"
+          | 0xB7 -> f "E"
+          | 0xB8 -> f "E"
+          | 0xB9 -> f "T"
+          | 0xBA -> f "Z"
+          | 0xBB -> f "I"
+          | 0xBC -> f "L"
+          | 0xBD -> f "X"
+          | 0xBE -> f "C"
+          | 0xBF -> f "K"
+          | _ -> String.sub s i nbc ]
+      | 0xD5 ->
+          match Char.code s.[i+1] with
+          [ 0x80 -> f "H"
+          | 0x81 -> f "J"
+          | 0x82 -> f "L"
+          | 0x83 -> f "C"
+          | 0x84 -> f "M"
+          | 0x85 -> f "Y"
+          | 0x86 -> f "N"
+          | 0x87 -> f "S"
+          | 0x88 -> f "O"
+          | 0x89 -> f "C"
+          | 0x8A -> f "P"
+          | 0x8B -> f "J"
+          | 0x8C -> f "R"
+          | 0x8D -> f "S"
+          | 0x8E -> f "V"
+          | 0x8F -> f "T"
+          | 0x90 -> f "R"
+          | 0x91 -> f "C"
+          | 0x92 -> f "W"
+          | 0x93 -> f "P"
+          | 0x94 -> f "K"
+          | 0x95 -> f "O"
+          | 0x96 -> f "F"
+          | 0xA1 -> "a"
+          | 0xA2 -> "b"
+          | 0xA3 -> "g"
+          | 0xA4 -> "d"
+          | 0xA5 -> "e"
+          | 0xA6 -> "z"
+          | 0xA7 -> "e"
+          | 0xA8 -> "e"
+          | 0xA9 -> "t"
+          | 0xAA -> "z"
+          | 0xAB -> "i"
+          | 0xAC -> "l"
+          | 0xAD -> "x"
+          | 0xAE -> "c"
+          | 0xAF -> "k"
+          | 0xB0 -> "h"
+          | 0xB1 -> "j"
+          | 0xB2 -> "l"
+          | 0xB3 -> "c"
+          | 0xB4 -> "m"
+          | 0xB5 -> "y"
+          | 0xB6 -> "n"
+          | 0xB7 -> "s"
+          | 0xB8 -> "o"
+          | 0xB9 -> "c"
+          | 0xBA -> "p"
+          | 0xBB -> "j"
+          | 0xBC -> "r"
+          | 0xBD -> "s"
+          | 0xBE -> "v"
+          | 0xBF -> "t"
+          | _ -> String.sub s i nbc ]
+      | 0xD6 ->
+          match Char.code s.[i+1] with
+          [ 0x80 -> "r"
+          | 0x81 -> "c"
+          | 0x82 -> "w"
+          | 0x83 -> "p"
+          | 0x84 -> "k"
+          | 0x85 -> "o"
+          | 0x86 -> "f"
           | _ -> String.sub s i nbc ]
       | c ->
           String.sub s i nbc ]
