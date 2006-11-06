@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.27 2006-11-03 10:31:18 ddr Exp $
+# $Id: Makefile,v 5.28 2006-11-06 13:16:17 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -16,22 +16,24 @@ PROBOT_OBJS=probot.cmo
 MOSTDESC_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo futil.cmo dutil.cmo db2.cmo diff.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo futil.cmo dutil.cmo db2.cmo diff.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo fpla.cmo
 UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo mutil.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
+CHECK_BASE_OBJS=buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo secure.cmo dutil.cmo btree.cmo database.cmo db2.cmo gwdb.cmo progrBar.cmo checkItem.cmo consang.cmo check.cmo check_base.cmo
 
 all:: out
 
 out:: gwlib.ml
 opt:: gwlib.ml
 
-out:: def.syn.cmo ansel.cmo gwc.out gwc2.out consang.out gwd.out gwu.out update_nldb.out i18n_check.out
-	$(RM) gwc gwc2 consang gwd gwu
+out:: def.syn.cmo ansel.cmo gwc.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out i18n_check.out
+	$(RM) gwc gwc2 consang gwd gwu check_base
 	cp gwc.out gwc
 	cp gwc2.out gwc2
 	cp consang.out consang
 	cp gwd.out gwd
 	cp gwu.out gwu
 	cp update_nldb.out update_nldb
+	cp check_base.out check_base
 
-opt:: def.syn.cmo ansel.cmx gwc.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt
+opt:: def.syn.cmo ansel.cmx gwc.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	$(RM) gwc consang gwd gwu
 	cp gwc.opt gwc
 	cp gwc2.opt gwc2
@@ -39,7 +41,8 @@ opt:: def.syn.cmo ansel.cmx gwc.opt gwc2.opt consang.opt gwd.opt gwu.opt update_
 	cp gwd.opt gwd
 	cp gwu.opt gwu
 	cp update_nldb.opt update_nldb
-	$(STRIP) gwc gwc2 consang gwd gwu update_nldb
+	cp check_base.opt check_base
+	$(STRIP) gwc gwc2 consang gwd gwu update_nldb check_base
 
 compilation.cmo: $(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 	$(MAKE) compilation.ml
@@ -125,6 +128,12 @@ update_nldb.out: $(UPDATE_NLDB_OBJS)
 
 update_nldb.opt: $(UPDATE_NLDB_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(UPDATE_NLDB_OBJS:.cmo=.cmx) -o update_nldb.opt
+
+check_base.out: $(CHECK_BASE_OBJS)
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(CHECK_BASE_OBJS) -o check_base.out
+
+check_base.opt: $(CHECK_BASE_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(CHECK_BASE_OBJS:.cmo=.cmx) -o check_base.opt
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out

@@ -33,6 +33,8 @@ check.cmi: checkItem.cmi def.cmi gwdb.cmi
 checkItem.cmo: adef.cmi def.cmi gwdb.cmi checkItem.cmi 
 checkItem.cmx: adef.cmx def.cmi gwdb.cmx checkItem.cmi 
 checkItem.cmi: adef.cmi def.cmi gwdb.cmi 
+check_base.cmo: check.cmi def.cmi gwdb.cmi 
+check_base.cmx: check.cmx def.cmi gwdb.cmx 
 compilation.cmo: date.cmi def.cmi util.cmi 
 compilation.cmx: date.cmx def.cmi util.cmx 
 config.cmi: def.cmi 
