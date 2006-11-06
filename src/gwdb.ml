@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.116 2006-11-04 18:55:51 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.117 2006-11-06 13:46:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1838,16 +1838,19 @@ value person_key base ht_per ip =
      get_occ p, ip)
 ;
 
-value commit_patches conf base = do {
+value commit_patches confo base = do {
   if patches_file.val <> "" then do {
     let oc =
       open_out_gen [Open_wronly; Open_append; Open_creat] 0o666
         patches_file.val
     in
-    let (hh, mm, ss) = conf.time in
-    fprintf oc "\ncommit %4d-%02d-%02d %02d:%02d:%02d \"%s\"%s\n"
-      conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-      (try " " ^ List.assoc "m" conf.env with [ Not_found -> "" ]);
+    match confo with
+    [ Some conf ->
+        let (hh, mm, ss) = conf.time in
+        fprintf oc "\ncommit %4d-%02d-%02d %02d:%02d:%02d \"%s\"%s\n"
+          conf.today.year conf.today.month conf.today.day hh mm ss conf.user
+          (try " " ^ List.assoc "m" conf.env with [ Not_found -> "" ])
+    | None -> () ];
     let per_set =
       let set = IpSet.empty in
       let set = Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per set in
