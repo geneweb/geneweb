@@ -1,11 +1,19 @@
-(* $Id: config.mli,v 5.8 2006-11-06 04:06:26 ddr Exp $ *)
+(* $Id: config.mli,v 5.9 2006-11-06 11:14:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 
 type auth_scheme_kind =
-  [ Basic of string
+  [ NoAuth
+  | TokenAuth of token_auth_scheme
+  | HttpAuth of http_auth_scheme ]
+and token_auth_scheme =
+  { ts_user : string; ts_pass : string }
+and http_auth_scheme =
+  [ Basic of basic_auth_scheme
   | Digest of string and string and string and string ]
+and basic_auth_scheme =
+  { bs_realm : string; bs_user : string; bs_pass : string }
 ;
 
 type config =
