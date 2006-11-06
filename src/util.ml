@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.55 2006-11-06 03:26:45 ddr Exp $ *)
+(* $Id: util.ml,v 5.56 2006-11-06 04:06:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2296,9 +2296,18 @@ value has_nephews_or_nieces conf base p =
   [ Ok -> True ]
 ;
 
-value is_that_password conf passwd =
+value h s = Digest.to_hex (Digest.string s);
+
+value is_that_user_and_password conf user passwd =
   match conf.auth_scheme with
-  [ Basic passwd1 -> passwd = passwd1 ]
+  [ Basic passwd1 -> passwd = passwd1
+  | Digest realm meth uri response ->
+      let that_response_would_be =
+        h (h (sprintf "%s:%s:%s" user realm passwd) ^ "::" ^
+           h (sprintf "%s:%s" meth uri))
+        (* ex: h (h "u:Friend bar:w" ^ "::" ^ f "GET:/bar?lang=en;w=f") *)
+      in
+      that_response_would_be = response ]
 ;
 
 value browser_doesnt_have_tables conf =
