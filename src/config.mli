@@ -1,7 +1,9 @@
-(* $Id: config.mli,v 5.6 2006-10-01 18:24:44 ddr Exp $ *)
+(* $Id: config.mli,v 5.7 2006-11-06 03:26:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
+
+type auth_scheme_kind = [ Basic of string ];
 
 type config =
   { from : string;
@@ -10,8 +12,8 @@ type config =
     friend : bool;
     just_friend_wizard : bool;
     user : string;
-    passwd : string;
     username : string;
+    auth_scheme : auth_scheme_kind;
     cgi : bool;
     command : string;
     indep_command : string;

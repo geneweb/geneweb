@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.6 2006-10-04 09:42:30 ddr Exp $ *)
+(* $Id: util.mli,v 5.7 2006-11-06 03:26:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -207,6 +207,8 @@ value doctype : config -> string;
 
 value begin_centered : config -> unit;
 value end_centered : config -> unit;
+
+value is_that_password : config -> string -> bool;
 
 (* Printing for browsers without tables *)
 

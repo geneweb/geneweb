@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.14 2006-11-05 18:29:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.15 2006-11-06 03:26:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -828,7 +828,7 @@ value authorization cgi from_addr request base_env passwd access_type utm
     [ Some i -> String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
     | None -> passwd ]
   in
-  (ok, command, passwd, passwd1, user, username, wizard, friend, uauth)
+  (ok, command, passwd, Basic passwd1, user, username, wizard, friend, uauth)
 ;
 
 value make_conf cgi from_addr (addr, request) script_name contents env = do {
@@ -925,7 +925,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      friend = friend || wizard_just_friend && wizard;
      just_friend_wizard = wizard && wizard_just_friend;
      user = user; username = username;
-     passwd = passwd1; cgi = cgi; command = command;
+     auth_scheme = passwd1; cgi = cgi; command = command;
      indep_command = (if cgi then command else "geneweb") ^ "?";
      highlight =
        try List.assoc "highlight_color" base_env with
