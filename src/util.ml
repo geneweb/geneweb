@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.54 2006-11-02 11:04:04 ddr Exp $ *)
+(* $Id: util.ml,v 5.55 2006-11-06 03:26:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2294,6 +2294,11 @@ value has_nephews_or_nieces conf base p =
     | _ -> False ]
   with
   [ Ok -> True ]
+;
+
+value is_that_password conf passwd =
+  match conf.auth_scheme with
+  [ Basic passwd1 -> passwd = passwd1 ]
 ;
 
 value browser_doesnt_have_tables conf =
