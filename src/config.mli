@@ -1,9 +1,12 @@
-(* $Id: config.mli,v 5.7 2006-11-06 03:26:45 ddr Exp $ *)
+(* $Id: config.mli,v 5.8 2006-11-06 04:06:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 
-type auth_scheme_kind = [ Basic of string ];
+type auth_scheme_kind =
+  [ Basic of string
+  | Digest of string and string and string and string ]
+;
 
 type config =
   { from : string;
