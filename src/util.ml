@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.56 2006-11-06 04:06:26 ddr Exp $ *)
+(* $Id: util.ml,v 5.57 2006-11-06 11:14:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2300,8 +2300,10 @@ value h s = Digest.to_hex (Digest.string s);
 
 value is_that_user_and_password conf user passwd =
   match conf.auth_scheme with
-  [ Basic passwd1 -> passwd = passwd1
-  | Digest realm meth uri response ->
+  [ NoAuth -> False
+  | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass
+  | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
+  | HttpAuth (Digest realm meth uri response) ->
       let that_response_would_be =
         h (h (sprintf "%s:%s:%s" user realm passwd) ^ "::" ^
            h (sprintf "%s:%s" meth uri))
