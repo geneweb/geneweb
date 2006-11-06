@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.58 2006-11-06 13:46:43 ddr Exp $ *)
+(* $Id: util.ml,v 5.59 2006-11-06 19:57:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2298,18 +2298,18 @@ value has_nephews_or_nieces conf base p =
 
 value h s = Digest.to_hex (Digest.string s);
 
-value is_that_user_and_password conf user passwd =
-  match conf.auth_scheme with
+value is_that_user_and_password auth_scheme user passwd =
+  match auth_scheme with
   [ NoAuth -> False
   | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass
   | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
-  | HttpAuth (Digest realm meth uri response) ->
+  | HttpAuth (Digest ds) ->
       let that_response_would_be =
-        h (h (sprintf "%s:%s:%s" user realm passwd) ^ "::" ^
-           h (sprintf "%s:%s" meth uri))
+        h (h (sprintf "%s:%s:%s" user ds.ds_realm passwd) ^ "::" ^
+           h (sprintf "%s:%s" ds.ds_meth ds.ds_uri))
         (* ex: h (h "u:Friend bar:w" ^ "::" ^ f "GET:/bar?lang=en;w=f") *)
       in
-      that_response_would_be = response ]
+      that_response_would_be = ds.ds_response ]
 ;
 
 value browser_doesnt_have_tables conf =
