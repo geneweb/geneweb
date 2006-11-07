@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.9 2006-11-06 19:57:25 ddr Exp $ *)
+(* $Id: util.mli,v 5.10 2006-11-07 20:53:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -208,6 +208,7 @@ value doctype : config -> string;
 value begin_centered : config -> unit;
 value end_centered : config -> unit;
 
+value authenticate_nonce : string -> string;
 value is_that_user_and_password :
   auth_scheme_kind -> string -> string -> bool;
 

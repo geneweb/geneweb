@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.20 2006-11-07 15:32:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.21 2006-11-07 20:53:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -431,12 +431,12 @@ value unauth_server conf passwd =
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
     if use_auth_digest_scheme.val then
-      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"" typ conf.bname
+      let tm = sprintf "%.0f" (Unix.time ()) in
+      let nonce = authenticate_nonce tm in
+      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\",nonce=\"%s\""
+        typ conf.bname nonce
     else
-      let tm = Unix.time () in
-      let nonce = Digest.to_hex (Digest.string (string_of_float tm)) in
-      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\",nonce=\"%s\""
-        typ conf.bname nonce;
+      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
     Util.nl ();
     let url =
@@ -864,7 +864,6 @@ value authorization cgi from_addr request base_env passwd access_type utm
                  ds_uri = uri;
                  ds_response = get_digenv "response"}
               in
-let _ = do { Printf.eprintf "* response = %s\n" ds.ds_response; flush stderr; } in
               let asch = HttpAuth (Digest ds) in
               if passwd = "w" && wizard_passwd <> "" then
                 if is_that_user_and_password asch user wizard_passwd then

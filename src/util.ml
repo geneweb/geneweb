@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.61 2006-11-07 15:32:36 ddr Exp $ *)
+(* $Id: util.ml,v 5.62 2006-11-07 20:53:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2296,7 +2296,36 @@ value has_nephews_or_nieces conf base p =
   [ Ok -> True ]
 ;
 
+value nonce_private_key () =
+  let fname =
+    List.fold_left Filename.concat cnt_dir.val ["cnt"; "nonce_gen_key"]
+  in
+  let v =
+    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    [ Some ic -> do {
+        let v = try input_line ic with [ End_of_file -> "" ] in
+        close_in ic;
+        v
+      }
+    | None -> "" ]
+  in
+  if v = "" then do {
+    Random.self_init ();
+    let v = string_of_int (Random.bits ()) in
+    let oc = open_out fname in
+    output_string oc (v ^ "\n");
+    close_out oc;
+    v
+  }
+  else v
+;
+
 value h s = Digest.to_hex (Digest.string s);
+value max_login_time = 60.0; (* short, just for testing *)
+
+value authenticate_nonce tm =
+  tm ^ " " ^ h (tm ^ ":" ^ nonce_private_key ())
+;
 
 value is_that_user_and_password auth_scheme user passwd =
   match auth_scheme with
@@ -2311,7 +2340,37 @@ value is_that_user_and_password auth_scheme user passwd =
         (* ex: h (h "u:Friend bar:xyzzy" ^ ":nonce:" ^
                h "GET:/bar?lang=en;w=f") *)
       in
-      that_response_would_be = ds.ds_response ]
+      if that_response_would_be = ds.ds_response then do {
+        match
+          try Some (String.index ds.ds_nonce ' ') with [ Not_found -> None ]
+        with
+        [ Some i ->
+            let stm = String.sub ds.ds_nonce 0 i in
+            let my_nonce = authenticate_nonce stm in
+            if ds.ds_nonce <> my_nonce then do {
+              Printf.eprintf
+                "*** login '%s' failed: server private-key changed\n"
+                user;
+              flush stderr;
+              False
+            }
+            else
+              let oldness =
+                Unix.time () -.
+                  try float_of_string stm with [ Failure _ -> 0.0 ]
+              in
+              if oldness <= max_login_time then True
+              else do {
+                Printf.eprintf "*** login '%s' expired: %.0f s > %.0f s\n"
+                  user oldness max_login_time;
+                flush stderr;
+                False
+              }
+        | None ->
+            let _ = do { Printf.eprintf "nonce fail 2\n"; flush stderr; } in
+            False ]
+      }
+      else False ]
 ;
 
 value browser_doesnt_have_tables conf =
