@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.10 2006-11-04 20:26:05 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.11 2006-11-07 03:33:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -49,7 +49,8 @@ sv: Genealogi
 </td>
 %I&wNf<td align="%R"
 valign="top"><em>[wizard/wizards/friend/friends]0%U</em>
-<span style="font-size:70%%">(<a href="%sw=">[deconnect]</a>)</span></td>
+%IN|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a
+href="%sw=">[deconnect]</a>)</span>%E</td>
 %E%I&fNw<td align="%R"
 valign="top"><em>[wizard/wizards/friend/friends]2</em>
 %I|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a

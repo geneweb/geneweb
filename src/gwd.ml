@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.17 2006-11-06 14:56:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.18 2006-11-07 03:33:23 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -736,6 +736,44 @@ value start_with s i p =
   String.sub s i (String.length p) = p
 ;
 
+value parse_digest s =
+  let rec parse_main =
+    parser
+    [ [: s = ident; _ = spaces; kvl = key_eq_val_list :] ->
+        if s = "Digest" then kvl else []
+    | [: :] -> [] ]
+  and ident =
+    parser
+    [ [: `('A'..'Z' | 'a'..'z' as c); len = ident_kont (Buff.store 0 c) :] ->
+        Buff.get len ]
+  and ident_kont len =
+    parser
+    [ [: `('A'..'Z' | 'a'..'z' as c); s :] -> ident_kont (Buff.store len c) s
+    | [: :] -> len ]
+  and spaces =
+    parser
+    [ [: `' '; a = spaces :] -> a
+    | [: :] -> () ]
+  and key_eq_val_list =
+    parser
+    [ [: kv = key_eq_val; kvl = key_eq_val_list_kont :] -> [kv :: kvl]
+    | [: :] -> [] ]
+  and key_eq_val_list_kont =
+    parser
+    [ [: `','; _ = spaces; kv = key_eq_val; kvl = key_eq_val_list_kont :] ->
+        [kv :: kvl]
+    | [: :] -> [] ]
+  and key_eq_val =
+    parser
+    [ [: k = ident; `'='; `'"'; v = string 0; _ = spaces :] -> (k, v) ]
+  and string len =
+    parser
+    [ [: `'"' :] -> Buff.get len
+    | [: `c; s :] -> string (Buff.store len c) s ]
+  in
+  parse_main (Stream.of_string s)
+;
+
 value authorization cgi from_addr request base_env passwd access_type utm
     base_file command =
   match access_type with
@@ -778,10 +816,32 @@ value authorization cgi from_addr request base_env passwd access_type utm
       in
       if use_auth_digest_scheme.val then
         let command = if cgi then command else base_file in
-        if passwd = "w" || passwd = "f" then
+        if wizard_passwd = "" && wizard_passwd_file = "" then
+          (True, command, "", NoAuth, "", "", True, friend_passwd = "", "")
+        else if passwd = "w" || passwd = "f" then
           let auth = Wserver.extract_param "authorization: " '\r' request in
           if start_with auth 0 "Digest " then
-            failwith (sprintf "not implemented %s" auth)
+            let is_get = Wserver.extract_param "GET /" ' ' request <> "" in
+            let digenv = parse_digest auth in
+            let get_digenv s =
+              try List.assoc s digenv with [ Not_found -> "" ]
+            in
+            let user = get_digenv "username" in
+            let ds =
+              {ds_realm = get_digenv "realm";
+               ds_meth = if is_get then "GET" else "POST";
+               ds_uri = get_digenv "uri";
+               ds_response = get_digenv "response"}
+            in
+            let asch = HttpAuth (Digest ds) in
+            if wizard_passwd <> "" then
+              if is_that_user_and_password asch user wizard_passwd then
+                (True, command ^ "_w", passwd, asch, user, "", True, False,
+                 "")
+              else
+                (False, command, passwd, asch, user, "", False, False, "")
+            else
+              failwith (sprintf "not impl (2) %s %b" auth is_get)
           else
             (False, command, passwd, NoAuth, "", "", False, False, "")
         else
