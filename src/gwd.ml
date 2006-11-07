@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.19 2006-11-07 05:12:43 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.20 2006-11-07 15:32:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -433,7 +433,10 @@ value unauth_server conf passwd =
     if use_auth_digest_scheme.val then
       Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"" typ conf.bname
     else
-      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
+      let tm = Unix.time () in
+      let nonce = Digest.to_hex (Digest.string (string_of_float tm)) in
+      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\",nonce=\"%s\""
+        typ conf.bname nonce;
     Util.nl ();
     Util.nl ();
     let url =
@@ -856,14 +859,22 @@ value authorization cgi from_addr request base_env passwd access_type utm
               let user = get_digenv "username" in
               let ds =
                 {ds_realm = get_digenv "realm";
+                 ds_nonce = get_digenv "nonce";
                  ds_meth = meth;
                  ds_uri = uri;
                  ds_response = get_digenv "response"}
               in
+let _ = do { Printf.eprintf "* response = %s\n" ds.ds_response; flush stderr; } in
               let asch = HttpAuth (Digest ds) in
-              if wizard_passwd <> "" then
+              if passwd = "w" && wizard_passwd <> "" then
                 if is_that_user_and_password asch user wizard_passwd then
                   (True, command ^ "_w", passwd, asch, user, "", True, False,
+                   "")
+                else
+                  (False, command, passwd, asch, user, "", False, False, "")
+              else if passwd = "f" && friend_passwd <> "" then
+                if is_that_user_and_password asch user friend_passwd then
+                  (True, command ^ "_f", passwd, asch, user, "", False, True,
                    "")
                 else
                   (False, command, passwd, asch, user, "", False, False, "")
@@ -1686,6 +1697,8 @@ value main () =
 <file>
        Authorization file to restrict access. The file must hold lines
        of the form \"user:password\".");
+       ("-digest", Arg.Set use_auth_digest_scheme, "\n       \
+        Use Digest authorization scheme (more secure on passwords)");
        ("-log", Arg.String (fun x -> log_file.val := x),
         "<file>\n       Redirect log trace to this file.");
        ("-robot_xcl", Arg.String robot_exclude_arg, "\
