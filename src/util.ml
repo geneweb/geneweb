@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.59 2006-11-06 19:57:25 ddr Exp $ *)
+(* $Id: util.ml,v 5.60 2006-11-07 05:12:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2305,9 +2305,10 @@ value is_that_user_and_password auth_scheme user passwd =
   | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
   | HttpAuth (Digest ds) ->
       let that_response_would_be =
-        h (h (sprintf "%s:%s:%s" user ds.ds_realm passwd) ^ "::" ^
-           h (sprintf "%s:%s" ds.ds_meth ds.ds_uri))
-        (* ex: h (h "u:Friend bar:w" ^ "::" ^ f "GET:/bar?lang=en;w=f") *)
+        let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
+        let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
+        h (h a1 ^ "::" ^ h a2)
+        (* ex: h (h "u:Friend bar:xyzzy" ^ "::" ^ h "GET:/bar?lang=en;w=f") *)
       in
       that_response_would_be = ds.ds_response ]
 ;

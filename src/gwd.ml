@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.18 2006-11-07 03:33:23 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.19 2006-11-07 05:12:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -415,13 +415,25 @@ value general_welcome conf =
   | None -> propose_base conf ]
 ;
 
+value bad_request () = do {
+  Wserver.http "400 Bad Request";
+  Util.nl ();
+  Wserver.wprint "\
+<html><head>
+<title>400 Bad Request</title>
+</head><body>
+<h1>400 Bad Request</h1>
+</body>\n";
+};
+
 value unauth_server conf passwd =
   let typ = if passwd = "w" then "Wizard" else "Friend" in
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
-    Wserver.wprint "WWW-Authenticate: %s realm=\"%s %s\""
-      (if use_auth_digest_scheme.val then "Digest" else "Basic") typ
-      conf.bname;
+    if use_auth_digest_scheme.val then
+      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"" typ conf.bname
+    else
+      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
     Util.nl ();
     let url =
@@ -821,27 +833,42 @@ value authorization cgi from_addr request base_env passwd access_type utm
         else if passwd = "w" || passwd = "f" then
           let auth = Wserver.extract_param "authorization: " '\r' request in
           if start_with auth 0 "Digest " then
-            let is_get = Wserver.extract_param "GET /" ' ' request <> "" in
+            (* W3C - RFC 2617 - Jun 1999 *)
+            let (meth, request_uri) =
+              match Wserver.extract_param "GET " ' ' request with
+              [ "" -> ("POST", Wserver.extract_param "POST " ' ' request)
+              | s -> ("GET", s) ]
+            in
             let digenv = parse_digest auth in
             let get_digenv s =
               try List.assoc s digenv with [ Not_found -> "" ]
             in
-            let user = get_digenv "username" in
-            let ds =
-              {ds_realm = get_digenv "realm";
-               ds_meth = if is_get then "GET" else "POST";
-               ds_uri = get_digenv "uri";
-               ds_response = get_digenv "response"}
-            in
-            let asch = HttpAuth (Digest ds) in
-            if wizard_passwd <> "" then
-              if is_that_user_and_password asch user wizard_passwd then
-                (True, command ^ "_w", passwd, asch, user, "", True, False,
-                 "")
-              else
-                (False, command, passwd, asch, user, "", False, False, "")
+            let uri = get_digenv "uri" in
+            if uri <> request_uri then do {
+              Printf.eprintf "Bad Request:\n";
+              Printf.eprintf "  request-uri = %s\n" request_uri;
+              Printf.eprintf "   answer-uri = %s\n" uri;
+              flush stderr;
+              bad_request ();
+              exit 0;
+            }
             else
-              failwith (sprintf "not impl (2) %s %b" auth is_get)
+              let user = get_digenv "username" in
+              let ds =
+                {ds_realm = get_digenv "realm";
+                 ds_meth = meth;
+                 ds_uri = uri;
+                 ds_response = get_digenv "response"}
+              in
+              let asch = HttpAuth (Digest ds) in
+              if wizard_passwd <> "" then
+                if is_that_user_and_password asch user wizard_passwd then
+                  (True, command ^ "_w", passwd, asch, user, "", True, False,
+                   "")
+                else
+                  (False, command, passwd, asch, user, "", False, False, "")
+              else
+                failwith (sprintf "not impl (2) %s %s" auth meth)
           else
             (False, command, passwd, NoAuth, "", "", False, False, "")
         else
