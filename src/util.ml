@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.62 2006-11-07 20:53:58 ddr Exp $ *)
+(* $Id: util.ml,v 5.63 2006-11-08 05:55:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2320,6 +2320,8 @@ value nonce_private_key () =
   else v
 ;
 
+type refused_reason = [ RR_no_match | RR_expired ];
+
 value h s = Digest.to_hex (Digest.string s);
 value max_login_time = 60.0; (* short, just for testing *)
 
@@ -2327,11 +2329,15 @@ value authenticate_nonce tm =
   tm ^ " " ^ h (tm ^ ":" ^ nonce_private_key ())
 ;
 
-value is_that_user_and_password auth_scheme user passwd =
+value check_user_and_password auth_scheme user passwd =
   match auth_scheme with
-  [ NoAuth -> False
-  | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass
-  | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
+  [ NoAuth -> Some RR_no_match
+  | TokenAuth ts ->
+      if user = ts.ts_user && passwd = ts.ts_pass then None
+      else Some RR_no_match
+  | HttpAuth (Basic bs) ->
+      if user = bs.bs_user && passwd = bs.bs_pass then None
+      else Some RR_no_match
   | HttpAuth (Digest ds) ->
       let that_response_would_be =
         let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
@@ -2352,25 +2358,25 @@ value is_that_user_and_password auth_scheme user passwd =
                 "*** login '%s' failed: server private-key changed\n"
                 user;
               flush stderr;
-              False
+              Some (RR_no_match)
             }
             else
               let oldness =
                 Unix.time () -.
                   try float_of_string stm with [ Failure _ -> 0.0 ]
               in
-              if oldness <= max_login_time then True
+              if oldness <= max_login_time then None
               else do {
                 Printf.eprintf "*** login '%s' expired: %.0f s > %.0f s\n"
                   user oldness max_login_time;
                 flush stderr;
-                False
+                Some RR_expired
               }
         | None ->
             let _ = do { Printf.eprintf "nonce fail 2\n"; flush stderr; } in
-            False ]
+            Some RR_no_match ]
       }
-      else False ]
+      else Some RR_no_match ]
 ;
 
 value browser_doesnt_have_tables conf =
