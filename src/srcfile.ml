@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.14 2006-11-06 19:57:25 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.15 2006-11-08 05:55:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -98,7 +98,8 @@ value set_wizard_and_friend_traces conf =
       [ Not_found -> "" ]
     in
     if fpf <> "" &&
-       not (is_that_user_and_password conf.auth_scheme conf.user fp)
+       check_user_and_password conf.auth_scheme conf.user fp =
+         Some RR_no_match
     then
       let fname = adm_file (conf.bname ^ "_f.txt") in
       update_wf_trace conf fname
