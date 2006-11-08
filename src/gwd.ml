@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.22 2006-11-08 05:55:01 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.23 2006-11-08 06:05:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -426,17 +426,12 @@ value bad_request () = do {
 </body>\n";
 };
 
-value unauth_server conf passwd refused_reason =
+value unauth_server conf passwd =
   let typ = if passwd = "w" then "Wizard" else "Friend" in
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
     if use_auth_digest_scheme.val then
-      let tm = sprintf "%.0f" (Unix.time ()) in
-      let nonce = authenticate_nonce tm in
-      Wserver.wprint
-        "WWW-Authenticate: Digest realm=\"%s %s\",nonce=\"%s\"%s"
-        typ conf.bname nonce
-        (if refused_reason = RR_expired then ",stale=\"true\"" else "")        
+      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"" typ conf.bname
     else
       Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
@@ -801,7 +796,7 @@ value authorization cgi from_addr request base_env passwd access_type utm
         else (base_file ^ "_" ^ passwd, passwd)
       in
       let auth_scheme = TokenAuth {ts_user = user; ts_pass = passwd} in
-      (None, command, passwd, auth_scheme, user, "", True, False, "")
+      (True, command, passwd, auth_scheme, user, "", True, False, "")
   | ATfriend user ->
       let (command, passwd) =
         if cgi then (command, passwd)
@@ -809,12 +804,12 @@ value authorization cgi from_addr request base_env passwd access_type utm
         else (base_file ^ "_" ^ passwd, passwd)
       in
       let auth_scheme = TokenAuth {ts_user = user; ts_pass = passwd} in
-      (None, command, passwd, auth_scheme, user, "", False, True, "")
+      (True, command, passwd, auth_scheme, user, "", False, True, "")
   | ATnormal ->
       let (command, passwd) =
         if cgi then (command, "") else (base_file, "")
       in
-      (None, command, passwd, NoAuth, "", "", False, False, "")
+      (True, command, passwd, NoAuth, "", "", False, False, "")
   | ATnone | ATset ->
       let wizard_passwd =
         try List.assoc "wizard_passwd" base_env with
@@ -833,7 +828,7 @@ value authorization cgi from_addr request base_env passwd access_type utm
       if use_auth_digest_scheme.val then
         let command = if cgi then command else base_file in
         if wizard_passwd = "" && wizard_passwd_file = "" then
-          (None, command, "", NoAuth, "", "", True, friend_passwd = "",
+          (True, command, "", NoAuth, "", "", True, friend_passwd = "",
            "")
         else if passwd = "w" || passwd = "f" then
           let auth = Wserver.extract_param "authorization: " '\r' request in
@@ -860,32 +855,28 @@ value authorization cgi from_addr request base_env passwd access_type utm
             else
               let user = get_digenv "username" in
               let ds =
-                {ds_realm = get_digenv "realm";
-                 ds_nonce = get_digenv "nonce";
-                 ds_meth = meth;
-                 ds_uri = uri;
+                {ds_realm = get_digenv "realm"; ds_meth = meth; ds_uri = uri;
                  ds_response = get_digenv "response"}
               in
               let asch = HttpAuth (Digest ds) in
               if passwd = "w" && wizard_passwd <> "" then
-                let r = check_user_and_password asch user wizard_passwd in
-                if r = None then
-                  (r, command ^ "_w", passwd, asch, user, "", True, False, "")
+                if is_that_user_and_password asch user wizard_passwd then
+                  (True, command ^ "_w", passwd, asch, user, "", True, False,
+                   "")
                 else
-                  (r, command, passwd, asch, user, "", False, False, "")
+                  (False, command, passwd, asch, user, "", False, False, "")
               else if passwd = "f" && friend_passwd <> "" then
-                let r = check_user_and_password asch user friend_passwd in
-                if r = None then
-                  (r, command ^ "_f", passwd, asch, user, "", False, True, "")
+                if is_that_user_and_password asch user friend_passwd then
+                  (True, command ^ "_f", passwd, asch, user, "", False, True,
+                   "")
                 else
-                  (r, command, passwd, asch, user, "", False, False, "")
+                  (False, command, passwd, asch, user, "", False, False, "")
               else
                 failwith (sprintf "not impl (2) %s %s" auth meth)
           else
-            (Some RR_no_match, command, passwd, NoAuth, "", "", False,
-             False, "")
+            (False, command, passwd, NoAuth, "", "", False, False, "")
         else
-          (None, command, "", NoAuth, "", "", False, False, "")
+          (True, command, "", NoAuth, "", "", False, False, "")
       else
         let passwd1 =
           let auth = Wserver.extract_param "authorization: " '\r' request in
@@ -973,7 +964,6 @@ value authorization cgi from_addr request base_env passwd access_type utm
               in
               HttpAuth (Basic {bs_realm = realm; bs_user = u; bs_pass = p})
         in
-        let ok = if ok then None else Some RR_no_match in
         (ok, command, passwd, auth_scheme, user, username, wizard, friend,
          uauth) ]
 ;
@@ -1153,10 +1143,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
      ctime = utm}
   in
-  (conf, sleep,
-   match ok with
-   [ None -> None
-   | Some rr -> Some (passwd, uauth, rr) ])
+  (conf, sleep, if ok then None else Some (passwd, uauth))
 };
 
 value log_and_robot_check conf auth from request script_name contents =
@@ -1273,7 +1260,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                 if x = "" then "GeneWeb service" else "database " ^ conf.bname
               in
               refuse_auth conf from auth auth_type
-        | (_, _, Some (passwd, uauth, auth_stat)) ->
+        | (_, _, Some (passwd, uauth)) ->
             if is_robot from then Robot.robot_error cgi from 0 0
             else do {
               let tm = Unix.time () in
@@ -1286,7 +1273,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                     flush_log oc;
                   }
               | Refuse -> () ];
-              unauth_server conf passwd auth_stat;
+              unauth_server conf passwd;
             }
         | _ ->
             match mode with
