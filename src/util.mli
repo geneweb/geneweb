@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.11 2006-11-08 05:55:01 ddr Exp $ *)
+(* $Id: util.mli,v 5.12 2006-11-08 06:05:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -208,11 +208,8 @@ value doctype : config -> string;
 value begin_centered : config -> unit;
 value end_centered : config -> unit;
 
-type refused_reason = [ RR_no_match | RR_expired ];
-
-value authenticate_nonce : string -> string;
-value check_user_and_password :
-  auth_scheme_kind -> string -> string -> option refused_reason;
+value is_that_user_and_password :
+  auth_scheme_kind -> string -> string -> bool;
 
 (* Printing for browsers without tables *)
 
