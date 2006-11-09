@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.48 2006-11-09 11:18:46 ddr Exp $
+# $Id: lex_utf8.txt,v 5.49 2006-11-09 18:10:10 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2851,6 +2851,7 @@ da: fortsat
 en: continued
 fr: suite
 pl: ciąg dalszy
+sv: forts
 
     cousins
 af: neefs/niggies
