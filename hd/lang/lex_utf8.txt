@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.47 2006-11-04 13:46:40 ddr Exp $
+# $Id: lex_utf8.txt,v 5.48 2006-11-09 11:18:46 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1984,6 +1984,7 @@ et: keskmine eluiga
 fr: âge moyen de décès
 nl: gemiddelde leeftijd bij overlijden
 pl: średni wiek śmierci
+sv: medelålder vid dödstillfället
 
     back
 af: terug
@@ -2789,6 +2790,7 @@ fi: yhteyksien määrä
 fr: connexions
 nl: connecties
 pl: połączenie
+sv: kopplingar
 
     consanguinity
 af: bloedverwantskap
@@ -3900,6 +3902,7 @@ da: for en liste sorteret efter datoen for seneste ændring
 en: for the list ordered by the date of the last modification
 fr: pour la liste par date de dernière modification
 pl: aby oglądać listę według daty ostatniej modyfikacji
+sv: för listan över sista ändringsdatum
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
@@ -7564,6 +7567,7 @@ da: siden det sidste klik
 en: since the last click
 fr: depuis le dernier clic
 pl: od ostatniego kliknięcia
+sv: från senaste klick
 
     son/daughter/child
 af: seun/dogter/kind
