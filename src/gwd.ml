@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.23 2006-11-08 06:05:14 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.24 2006-11-09 19:35:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -786,6 +786,180 @@ value parse_digest s =
   parse_main (Stream.of_string s)
 ;
 
+value basic_authorization cgi from_addr request base_env passwd access_type
+    utm base_file command =
+  let wizard_passwd =
+    try List.assoc "wizard_passwd" base_env with
+    [ Not_found -> wizard_passwd.val ]
+  in
+  let wizard_passwd_file =
+    try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let friend_passwd =
+    try List.assoc "friend_passwd" base_env with
+    [ Not_found -> friend_passwd.val ]
+  in
+  let friend_passwd_file =
+    try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let passwd1 =
+    let auth = Wserver.extract_param "authorization: " '\r' request in
+    if auth = "" then ""
+    else
+      let s = "Basic " in
+      if start_with auth 0 s then
+        let i = String.length s in
+        Base64.decode (String.sub auth i (String.length auth - i))
+      else ""
+  in
+  let uauth =
+    if passwd = "w" || passwd = "f" then passwd1 else passwd
+  in
+  let (ok, wizard, friend, username) =
+    if not cgi && (passwd = "w" || passwd = "f") then
+      if passwd = "w" then
+        if wizard_passwd = "" && wizard_passwd_file = "" then
+          (True, True, friend_passwd = "", "")
+        else
+          match match_auth wizard_passwd wizard_passwd_file uauth with
+          [ Some username -> (True, True, False, username)
+          | None -> (False, False, False, "") ]
+      else if passwd = "f" then
+        if friend_passwd = "" && friend_passwd_file = "" then
+          (True, False, True, "")
+        else
+          match match_auth friend_passwd friend_passwd_file uauth with
+          [ Some username -> (True, False, True, username)
+          | None -> (False, False, False, "") ]
+      else assert False
+    else if wizard_passwd = "" && wizard_passwd_file = "" then
+      (True, True, friend_passwd = "", "")
+    else
+       match match_auth wizard_passwd wizard_passwd_file uauth with
+       [ Some username -> (True, True, False, username)
+       | _ ->
+            if friend_passwd = "" && friend_passwd_file = "" then
+              (True, False, True, "")
+            else
+              match match_auth friend_passwd friend_passwd_file uauth with
+              [ Some username -> (True, False, True, username)
+              | None -> (True, False, False, "") ] ]
+  in
+  let user =
+    match lindex uauth ':' with
+    [ Some i ->
+        let s = String.sub uauth 0 i in
+        if s = wizard_passwd || s = friend_passwd then "" else s
+    | None -> "" ]
+  in
+  let (command, passwd) =
+    if access_type = ATset then
+      if wizard then
+        let pwd_id = set_token utm from_addr base_file 'w' user in
+        if cgi then (command, pwd_id)
+        else (base_file ^ "_" ^ pwd_id, "")
+      else if friend then
+        let pwd_id = set_token utm from_addr base_file 'f' user in
+        if cgi then (command, pwd_id)
+        else (base_file ^ "_" ^ pwd_id, "")
+      else if cgi then (command, "")
+      else (base_file, "")
+    else
+      if cgi then (command, passwd)
+      else if passwd = "" then (base_file, "")
+      else (base_file ^ "_" ^ passwd, passwd)
+  in
+  let auth_scheme =
+    if not wizard && not friend then NoAuth
+    else
+      let realm =
+        if wizard then "Wizard " ^ base_file else "Friend " ^ base_file
+      in
+        let (u, p) =
+          match lindex passwd1 ':' with
+          [ Some i ->
+              let u = String.sub passwd1 0 i in
+              let p =
+                String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
+              in
+              (u, p)
+          | None -> ("", passwd) ]
+        in
+        HttpAuth (Basic {bs_realm = realm; bs_user = u; bs_pass = p})
+  in
+  (ok, command, passwd, auth_scheme, user, username, wizard, friend, uauth)
+;
+
+value digest_authorization cgi request base_env passwd base_file command =
+  let wizard_passwd =
+    try List.assoc "wizard_passwd" base_env with
+    [ Not_found -> wizard_passwd.val ]
+  in
+  let wizard_passwd_file =
+    try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
+  in
+  let friend_passwd =
+    try List.assoc "friend_passwd" base_env with
+    [ Not_found -> friend_passwd.val ]
+  in
+(*
+  let friend_passwd_file =
+    try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
+  in
+*)
+  let command = if cgi then command else base_file in
+  if wizard_passwd = "" && wizard_passwd_file = "" then
+    (True, command, "", NoAuth, "", "", True, friend_passwd = "",
+     "")
+  else if passwd = "w" || passwd = "f" then
+    let auth = Wserver.extract_param "authorization: " '\r' request in
+    if start_with auth 0 "Digest " then
+      (* W3C - RFC 2617 - Jun 1999 *)
+      let (meth, request_uri) =
+        match Wserver.extract_param "GET " ' ' request with
+        [ "" -> ("POST", Wserver.extract_param "POST " ' ' request)
+        | s -> ("GET", s) ]
+      in
+      let digenv = parse_digest auth in
+      let get_digenv s =
+        try List.assoc s digenv with [ Not_found -> "" ]
+      in
+      let uri = get_digenv "uri" in
+      if uri <> request_uri then do {
+        Printf.eprintf "Bad Request:\n";
+        Printf.eprintf "  request-uri = %s\n" request_uri;
+        Printf.eprintf "   answer-uri = %s\n" uri;
+        flush stderr;
+        bad_request ();
+        exit 0;
+      }
+      else
+        let user = get_digenv "username" in
+        let ds =
+          {ds_realm = get_digenv "realm"; ds_meth = meth; ds_uri = uri;
+           ds_response = get_digenv "response"}
+        in
+        let asch = HttpAuth (Digest ds) in
+        if passwd = "w" && wizard_passwd <> "" then
+          if is_that_user_and_password asch user wizard_passwd then
+            (True, command ^ "_w", passwd, asch, user, "", True, False,
+             "")
+          else
+            (False, command, passwd, asch, user, "", False, False, "")
+        else if passwd = "f" && friend_passwd <> "" then
+          if is_that_user_and_password asch user friend_passwd then
+            (True, command ^ "_f", passwd, asch, user, "", False, True,
+             "")
+          else
+            (False, command, passwd, asch, user, "", False, False, "")
+        else
+          failwith (sprintf "not impl (2) %s %s" auth meth)
+    else
+      (False, command, passwd, NoAuth, "", "", False, False, "")
+  else
+    (True, command, "", NoAuth, "", "", False, False, "")
+;
+
 value authorization cgi from_addr request base_env passwd access_type utm
     base_file command =
   match access_type with
@@ -811,161 +985,11 @@ value authorization cgi from_addr request base_env passwd access_type utm
       in
       (True, command, passwd, NoAuth, "", "", False, False, "")
   | ATnone | ATset ->
-      let wizard_passwd =
-        try List.assoc "wizard_passwd" base_env with
-        [ Not_found -> wizard_passwd.val ]
-      in
-      let wizard_passwd_file =
-        try List.assoc "wizard_passwd_file" base_env with [ Not_found -> "" ]
-      in
-      let friend_passwd =
-        try List.assoc "friend_passwd" base_env with
-        [ Not_found -> friend_passwd.val ]
-      in
-      let friend_passwd_file =
-        try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
-      in
       if use_auth_digest_scheme.val then
-        let command = if cgi then command else base_file in
-        if wizard_passwd = "" && wizard_passwd_file = "" then
-          (True, command, "", NoAuth, "", "", True, friend_passwd = "",
-           "")
-        else if passwd = "w" || passwd = "f" then
-          let auth = Wserver.extract_param "authorization: " '\r' request in
-          if start_with auth 0 "Digest " then
-            (* W3C - RFC 2617 - Jun 1999 *)
-            let (meth, request_uri) =
-              match Wserver.extract_param "GET " ' ' request with
-              [ "" -> ("POST", Wserver.extract_param "POST " ' ' request)
-              | s -> ("GET", s) ]
-            in
-            let digenv = parse_digest auth in
-            let get_digenv s =
-              try List.assoc s digenv with [ Not_found -> "" ]
-            in
-            let uri = get_digenv "uri" in
-            if uri <> request_uri then do {
-              Printf.eprintf "Bad Request:\n";
-              Printf.eprintf "  request-uri = %s\n" request_uri;
-              Printf.eprintf "   answer-uri = %s\n" uri;
-              flush stderr;
-              bad_request ();
-              exit 0;
-            }
-            else
-              let user = get_digenv "username" in
-              let ds =
-                {ds_realm = get_digenv "realm"; ds_meth = meth; ds_uri = uri;
-                 ds_response = get_digenv "response"}
-              in
-              let asch = HttpAuth (Digest ds) in
-              if passwd = "w" && wizard_passwd <> "" then
-                if is_that_user_and_password asch user wizard_passwd then
-                  (True, command ^ "_w", passwd, asch, user, "", True, False,
-                   "")
-                else
-                  (False, command, passwd, asch, user, "", False, False, "")
-              else if passwd = "f" && friend_passwd <> "" then
-                if is_that_user_and_password asch user friend_passwd then
-                  (True, command ^ "_f", passwd, asch, user, "", False, True,
-                   "")
-                else
-                  (False, command, passwd, asch, user, "", False, False, "")
-              else
-                failwith (sprintf "not impl (2) %s %s" auth meth)
-          else
-            (False, command, passwd, NoAuth, "", "", False, False, "")
-        else
-          (True, command, "", NoAuth, "", "", False, False, "")
+        digest_authorization cgi request base_env passwd base_file command
       else
-        let passwd1 =
-          let auth = Wserver.extract_param "authorization: " '\r' request in
-          if auth = "" then ""
-          else
-            let s = "Basic " in
-            if start_with auth 0 s then
-              let i = String.length s in
-              Base64.decode (String.sub auth i (String.length auth - i))
-            else ""
-        in
-        let uauth =
-          if passwd = "w" || passwd = "f" then passwd1 else passwd
-        in
-        let (ok, wizard, friend, username) =
-          if not cgi && (passwd = "w" || passwd = "f") then
-            if passwd = "w" then
-              if wizard_passwd = "" && wizard_passwd_file = "" then
-                (True, True, friend_passwd = "", "")
-              else
-                match match_auth wizard_passwd wizard_passwd_file uauth with
-                [ Some username -> (True, True, False, username)
-                | None -> (False, False, False, "") ]
-            else if passwd = "f" then
-              if friend_passwd = "" && friend_passwd_file = "" then
-                (True, False, True, "")
-              else
-                match match_auth friend_passwd friend_passwd_file uauth with
-                [ Some username -> (True, False, True, username)
-                | None -> (False, False, False, "") ]
-            else assert False
-          else if wizard_passwd = "" && wizard_passwd_file = "" then
-            (True, True, friend_passwd = "", "")
-          else
-             match match_auth wizard_passwd wizard_passwd_file uauth with
-             [ Some username -> (True, True, False, username)
-             | _ ->
-                  if friend_passwd = "" && friend_passwd_file = "" then
-                    (True, False, True, "")
-                  else
-                  match match_auth friend_passwd friend_passwd_file uauth with
-                  [ Some username -> (True, False, True, username)
-                  | None -> (True, False, False, "") ] ]
-        in
-        let user =
-          match lindex uauth ':' with
-          [ Some i ->
-              let s = String.sub uauth 0 i in
-              if s = wizard_passwd || s = friend_passwd then "" else s
-          | None -> "" ]
-        in
-        let (command, passwd) =
-          if access_type = ATset then
-            if wizard then
-              let pwd_id = set_token utm from_addr base_file 'w' user in
-              if cgi then (command, pwd_id)
-              else (base_file ^ "_" ^ pwd_id, "")
-            else if friend then
-              let pwd_id = set_token utm from_addr base_file 'f' user in
-              if cgi then (command, pwd_id)
-              else (base_file ^ "_" ^ pwd_id, "")
-            else if cgi then (command, "")
-            else (base_file, "")
-          else
-            if cgi then (command, passwd)
-            else if passwd = "" then (base_file, "")
-            else (base_file ^ "_" ^ passwd, passwd)
-        in
-        let auth_scheme =
-          if not wizard && not friend then NoAuth
-          else
-            let realm =
-              if wizard then "Wizard " ^ base_file else "Friend " ^ base_file
-            in
-              let (u, p) =
-                match lindex passwd1 ':' with
-                [ Some i ->
-                    let u = String.sub passwd1 0 i in
-                    let p =
-                      String.sub passwd1 (i + 1)
-                        (String.length passwd1 - i - 1)
-                    in
-                    (u, p)
-                | None -> ("", passwd) ]
-              in
-              HttpAuth (Basic {bs_realm = realm; bs_user = u; bs_pass = p})
-        in
-        (ok, command, passwd, auth_scheme, user, username, wizard, friend,
-         uauth) ]
+        basic_authorization cgi from_addr request base_env passwd access_type
+          utm base_file command ]
 ;
 
 value make_conf cgi from_addr (addr, request) script_name contents env = do {
@@ -1706,8 +1730,8 @@ value main () =
 s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
 <addr>
        Send a message to say that this service has been redirected to <addr>");
-       ("-trace_failed_passwd", Arg.Set trace_failed_passwd,
-        "\n       Print the failed passwords in log");
+       ("-trace_failed_passwd", Arg.Set trace_failed_passwd, "\n       \
+Print the failed passwords in log (except if option -digest is set) ");
        ("-nolock", Arg.Set Lock.no_lock_flag,
         "\n       Do not lock files before writing.") ::
        IFDEF UNIX THEN
