@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.31 2006-11-01 18:02:14 ddr Exp $ *)
+(* $Id: request.ml,v 5.32 2006-11-09 13:17:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -601,6 +601,9 @@ value extract_henv conf base =
     | None -> () ];
     match p_getenv conf.env "alwsurn" with
     [ Some x -> conf.henv := conf.henv @ [("alwsurn", x)]
+    | None -> () ];
+    match p_getenv conf.env "size" with
+    [ Some x -> conf.henv := conf.henv @ [("size", x)]
     | None -> () ];
   }
 ;
