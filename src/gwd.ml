@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.24 2006-11-09 19:35:28 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.25 2006-11-09 20:44:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -812,9 +812,7 @@ value basic_authorization cgi from_addr request base_env passwd access_type
         Base64.decode (String.sub auth i (String.length auth - i))
       else ""
   in
-  let uauth =
-    if passwd = "w" || passwd = "f" then passwd1 else passwd
-  in
+  let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let (ok, wizard, friend, username) =
     if not cgi && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
@@ -909,8 +907,7 @@ value digest_authorization cgi request base_env passwd base_file command =
 *)
   let command = if cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
-    (True, command, "", NoAuth, "", "", True, friend_passwd = "",
-     "")
+    (True, command, "", NoAuth, "", "", True, friend_passwd = "", "")
   else if passwd = "w" || passwd = "f" then
     let auth = Wserver.extract_param "authorization: " '\r' request in
     if start_with auth 0 "Digest " then
@@ -921,9 +918,7 @@ value digest_authorization cgi request base_env passwd base_file command =
         | s -> ("GET", s) ]
       in
       let digenv = parse_digest auth in
-      let get_digenv s =
-        try List.assoc s digenv with [ Not_found -> "" ]
-      in
+      let get_digenv s = try List.assoc s digenv with [ Not_found -> "" ] in
       let uri = get_digenv "uri" in
       if uri <> request_uri then do {
         Printf.eprintf "Bad Request:\n";
@@ -942,14 +937,12 @@ value digest_authorization cgi request base_env passwd base_file command =
         let asch = HttpAuth (Digest ds) in
         if passwd = "w" && wizard_passwd <> "" then
           if is_that_user_and_password asch user wizard_passwd then
-            (True, command ^ "_w", passwd, asch, user, "", True, False,
-             "")
+            (True, command ^ "_w", passwd, asch, user, "", True, False, "")
           else
             (False, command, passwd, asch, user, "", False, False, "")
         else if passwd = "f" && friend_passwd <> "" then
           if is_that_user_and_password asch user friend_passwd then
-            (True, command ^ "_f", passwd, asch, user, "", False, True,
-             "")
+            (True, command ^ "_f", passwd, asch, user, "", False, True, "")
           else
             (False, command, passwd, asch, user, "", False, False, "")
         else
