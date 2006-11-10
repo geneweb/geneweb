@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.12 2006-11-08 06:05:14 ddr Exp $ *)
+(* $Id: util.mli,v 5.13 2006-11-10 04:36:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -226,3 +226,9 @@ value unselected_bullets : config -> list int;
 value short_f_month : int -> string;
 
 value compilation_time_hook : ref (config -> string);
+
+(* Reading password file *)
+
+type auth_user = {au_user : string; au_passwd : string; au_info : string};
+
+value read_gen_auth_file : string -> list auth_user;

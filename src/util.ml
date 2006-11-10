@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.64 2006-11-08 06:05:14 ddr Exp $ *)
+(* $Id: util.ml,v 5.65 2006-11-10 04:36:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2528,4 +2528,44 @@ value short_f_month m =
   | 12 -> "FT"
   | 13 -> "JC"
   | _ -> "" ]
+;
+
+(* reading password file *)
+
+type auth_user = {au_user : string; au_passwd : string; au_info : string};
+
+value read_gen_auth_file fname =
+  let fname = base_path [] fname in
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let rec loop data =
+        match try Some (input_line ic) with [ End_of_file -> None ] with
+        [ Some line ->
+            let data =
+              match
+                try Some (String.index line ':') with [ Not_found -> None ]
+              with
+              [ Some i ->
+                  let user = String.sub line 0 i in
+                  match
+                    try Some (String.index_from line (i + 1) ':') with
+                    [ Not_found -> None ]
+                  with
+                  [ Some j ->
+                      let passwd = String.sub line (i + 1) (j - i - 1) in
+                      let rest =
+                        String.sub line (j + 1) (String.length line - j - 1)
+                      in
+                      let au =
+                        {au_user = user; au_passwd = passwd; au_info = rest}
+                      in
+                      [au :: data]
+                  | None -> data ]
+              | None -> data ]
+            in
+            loop data
+        | None -> do { close_in ic; List.rev data } ]
+      in
+      loop []
+  | None -> [] ]
 ;
