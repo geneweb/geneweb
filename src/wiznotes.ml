@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.33 2006-11-03 22:09:13 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.34 2006-11-10 04:36:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -13,43 +13,29 @@ value dir conf base =
 
 value wzfile wddir wz = Filename.concat wddir (wz ^ ".txt");
 
-value read_auth_file base fname =
-  let fname = Util.base_path [] fname in
-  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      let rec loop data =
-        match try Some (input_line ic) with [ End_of_file -> None ] with
-        [ Some line ->
-            let data =
-              try
-                let i = String.index line ':' in
-                let wizname =
-                  try
-                    let j = String.index_from line (i + 1) ':' in
-                    let k = String.index_from line (j + 1) ':' in
-                    String.sub line (j + 1) (k - j - 1)
-                  with
-                  [ Not_found -> "" ]
-                in
-                let (wizname, wizorder, islash) =
-                  try
-                    let i = String.index wizname '/' in
-                    let w1 = String.sub wizname 0 i in
-                    let l = String.length wizname in
-                    let w2 = String.sub wizname (i + 1) (l - i - 1) in
-                    (w1 ^ w2, w2 ^ w1, i)
-                  with
-                  [ Not_found -> (wizname, "~", -1) ]
-                in
-                [(String.sub line 0 i, (wizname, (wizorder, islash))) :: data]
-              with
-              [ Not_found -> data ]
-            in
-            loop data
-        | None -> do { close_in ic; List.rev data } ]
-      in
-      loop []
-  | None -> [] ]
+value read_auth_file fname =
+  let data = read_gen_auth_file fname in
+  List.map
+    (fun au ->
+       let wizname =
+         try
+           let k = String.index au.au_info ':' in
+           String.sub au.au_info 0 k
+         with
+         [ Not_found -> "" ]
+       in
+       let (wizname, wizorder, islash) =
+         try
+           let i = String.index wizname '/' in
+           let w1 = String.sub wizname 0 i in
+           let l = String.length wizname in
+           let w2 = String.sub wizname (i + 1) (l - i - 1) in
+           (w1 ^ w2, w2 ^ w1, i)
+         with
+         [ Not_found -> (wizname, "~", -1) ]
+       in
+       (au.au_user, (wizname, (wizorder, islash))))
+    data
 ;
 
 value read_wizard_notes fname =
@@ -354,7 +340,7 @@ value print_main conf base auth_file =
   in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
   let wizdata =
-    let list = read_auth_file base auth_file in
+    let list = read_auth_file auth_file in
     if by_alphab_order then
       List.sort
         (fun (_, (_, (o1, _))) (_, (_, (o2, _))) ->
@@ -415,7 +401,7 @@ value wizard_page_title conf wz wizname h =
 
 value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
   let wizname =
-    let wizdata = read_auth_file base auth_file in
+    let wizdata = read_auth_file auth_file in
     try fst (List.assoc wz wizdata) with
     [ Not_found -> wz ]
   in
