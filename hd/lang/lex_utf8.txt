@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.49 2006-11-09 18:10:10 ddr Exp $
+# $Id: lex_utf8.txt,v 5.50 2006-11-10 16:23:28 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2847,6 +2847,7 @@ sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
 
     continued
+bg: следва
 da: fortsat
 en: continued
 fr: suite
@@ -7564,6 +7565,7 @@ sl: bratje in sestre
 sv: syskon
 
     since the last click
+bg: от последното щракване
 da: siden det sidste klik
 en: since the last click
 fr: depuis le dernier clic
