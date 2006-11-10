@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.32 2006-10-31 05:56:01 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.33 2006-11-10 17:18:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -852,8 +852,11 @@ value rec merge_families ifaml1f ifaml2f =
       if m1 && m2 then merge_families ifaml1 ifaml2
       else if m1 then [ifam2 :: merge_families ifaml1f ifaml2]
       else if m2 then [ifam1 :: merge_families ifaml1 ifaml2f]
-      else if ifam1 = ifam2 then [ifam1 :: merge_families ifaml1 ifaml2]
-      else [ifam1; ifam2 :: merge_families ifaml1 ifaml2]
+      else if ifam2 < ifam1 then
+        [ifam2; ifam1 :: merge_families ifaml1 ifaml2]
+      else if ifam1 < ifam2 then
+        [ifam1; ifam2 :: merge_families ifaml1 ifaml2]
+      else [ifam1 :: merge_families ifaml1 ifaml2]
   | (ifaml1, []) -> ifaml1
   | ([], ifaml2) -> ifaml2 ]
 ;
@@ -883,7 +886,7 @@ value connected_families base fam_sel fam cpl =
               ifaml1 ipl
           in
           loop ifaml [ip :: ipl_scanned] ipl
-    | [] -> List.sort compare ifaml ]
+    | [] -> ifaml ]
 ;
 
 value find_person base p1 po p2 =
