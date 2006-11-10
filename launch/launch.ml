@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.17 2006-10-24 03:08:37 ddr Exp $ *)
+(* $Id: launch.ml,v 1.18 2006-11-10 04:52:24 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -291,11 +291,26 @@ value launch_server state = do {
     List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
   in
   try Sys.remove stop_server with [ Sys_error _ -> () ];
+  let rest_of_args =
+    try
+      let v = List.assoc "gwd_args" state.config_env in
+      if v = "" then []
+      else
+        loop 0 0 [] where rec loop ibeg i list =
+          if i = String.length v then
+            List.rev [String.sub v ibeg (i - ibeg) :: list]
+          else if v.[i] = ' ' then
+            let a = String.sub v ibeg (i - ibeg) in
+            loop (i + 1) (i + 1) [a :: list]
+          else loop ibeg (i + 1) list
+    with
+    [ Not_found -> [] ]
+  in
   let server_pid =
     exec (Filename.concat state.bin_dir "gwd")
       ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
        "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
-       state.bases_dir; "-blang"] fd fd
+       state.bases_dir; "-blang" :: rest_of_args] fd fd
   in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
   if pid = 0 then ()
