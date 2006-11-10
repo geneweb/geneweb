@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.26 2006-11-10 20:37:29 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.27 2006-11-10 21:50:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -459,32 +459,28 @@ value match_auth_file auth_file uauth =
   if auth_file = "" then None
   else
     let aul = read_gen_auth_file auth_file in
-    match
-      try
-        Some
-          (List.find (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth) aul)
-      with
-      [ Not_found -> None ]
-    with
-    [ Some au -> do {
-        let s =
-          try
-            let i = String.index au.au_info ':' in
-            String.sub au.au_info 0 i
-          with
-          [ Not_found -> "" ]
-        in
-        let username =
-          try
-            let i = String.index s '/' in
-            let len = String.length s in
-            String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
-          with
-          [ Not_found -> s ]
-        in
-        Some username
-      }
-    | None -> None ]
+    loop aul where rec loop =
+      fun
+      [ [au :: aul] ->
+          if au.au_user ^ ":" ^ au.au_passwd = uauth then
+            let s =
+              try
+                let i = String.index au.au_info ':' in
+                String.sub au.au_info 0 i
+              with
+              [ Not_found -> "" ]
+            in
+            let username =
+              try
+                let i = String.index s '/' in
+                let len = String.length s in
+                String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
+              with
+              [ Not_found -> s ]
+            in
+            Some username
+          else loop aul
+      | [] -> None ]
 ;
 
 value match_simple_passwd sauth uauth =
