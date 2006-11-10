@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.25 2006-11-09 20:44:43 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.26 2006-11-10 20:37:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -458,51 +458,32 @@ value unauth_server conf passwd =
 value match_auth_file auth_file uauth =
   if auth_file = "" then None
   else
-    let auth_file = Util.base_path [] auth_file in
-    match try Some (Secure.open_in auth_file) with [ Sys_error _ -> None ] with
-    [ Some ic ->
-        try
-          let rec loop () =
-            let line = input_line ic in
-            let sauth = line in
-            let (sauth, i) =
-              try
-                let i = String.index sauth ':' in
-                let i =
-                  try String.index_from sauth (i + 1) ':' with
-                  [ Not_found -> String.length sauth ]
-                in
-                (String.sub sauth 0 i, i)
-              with
-              [ Not_found -> (uauth ^ "a" (* <> auth *), String.length sauth) ]
-            in
-            if uauth = sauth then
-              do {
-                close_in ic;
-                let s =
-                  if i = String.length line then ""
-                  else
-                    try
-                      let j = String.index_from line (i + 1) ':' in
-                      String.sub line (i + 1) (j - i - 1)
-                    with
-                    [ Not_found -> "" ]
-                in
-                let username =
-                  try
-                    let i = String.index s '/' in
-                    let len = String.length s in
-                    String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
-                  with
-                  [ Not_found -> s ]
-                in
-                Some username
-              }
-            else loop ()
-          in
-          loop ()
-        with
-        [ End_of_file -> do { close_in ic; None } ]
+    let aul = read_gen_auth_file auth_file in
+    match
+      try
+        Some
+          (List.find (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth) aul)
+      with
+      [ Not_found -> None ]
+    with
+    [ Some au -> do {
+        let s =
+          try
+            let i = String.index au.au_info ':' in
+            String.sub au.au_info 0 i
+          with
+          [ Not_found -> "" ]
+        in
+        let username =
+          try
+            let i = String.index s '/' in
+            let len = String.length s in
+            String.sub s 0 i ^ String.sub s (i + 1) (len - i - 1)
+          with
+          [ Not_found -> s ]
+        in
+        Some username
+      }
     | None -> None ]
 ;
 
