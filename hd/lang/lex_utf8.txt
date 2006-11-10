@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.51 2006-11-10 17:36:06 ddr Exp $
+# $Id: lex_utf8.txt,v 5.52 2006-11-10 17:37:27 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2854,6 +2854,7 @@ bg: следва
 da: fortsat
 en: continued
 fr: suite
+it: seguito
 pl: ciąg dalszy
 sv: forts
 
