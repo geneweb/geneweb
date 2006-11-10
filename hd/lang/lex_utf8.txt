@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.50 2006-11-10 16:23:28 ddr Exp $
+# $Id: lex_utf8.txt,v 5.51 2006-11-10 17:36:06 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -65,6 +65,7 @@ zh: fr=法语/zh=中文
     to change
 en: to change
 fr: pour changer
+it: per cambiare
 
      to see the first branch
 af:  om die eerste staak te sien
@@ -1982,6 +1983,7 @@ de: Durchschnittliches Sterbealter
 en: average age at death
 et: keskmine eluiga
 fr: âge moyen de décès
+it: età media di morte
 nl: gemiddelde leeftijd bij overlijden
 pl: średni wiek śmierci
 sv: medelålder vid dödstillfället
@@ -2788,6 +2790,7 @@ en: connections
 et: ühendused
 fi: yhteyksien määrä
 fr: connexions
+it: connessioni
 nl: connecties
 pl: połączenie
 sv: kopplingar
@@ -3903,6 +3906,7 @@ bg: за списъка по дати на последно изменение
 da: for en liste sorteret efter datoen for seneste ændring
 en: for the list ordered by the date of the last modification
 fr: pour la liste par date de dernière modification
+it: per la lista ordinata secondo la data dell'ultima modifica
 pl: aby oglądać listę według daty ostatniej modyfikacji
 sv: för listan över sista ändringsdatum
 
@@ -3922,7 +3926,7 @@ fi: kasvatusisä/kasvatusäiti/kasvatusvanhemmat
 fr: père nourricier/mère nourricière/parents nourriciers
 he:   אב חורג/ אם חורגת/ הורים חורגים
 is: fóstur foreldri
-it: padre adottivo/madre adottiva/genitori adottivi
+it: padre facente funzioni/madre facente funzioni/genitori facenti funzioni
 lv: audþu tēvs/māte/vecāki
 nl: pleegvader/pleegmoeder/pleegouders
 no: fosterfar/fostermor/fosterforeldre
@@ -7569,6 +7573,7 @@ bg: от последното щракване
 da: siden det sidste klik
 en: since the last click
 fr: depuis le dernier clic
+it: dall'ultimo click
 pl: od ostatniego kliknięcia
 sv: från senaste klick
 
