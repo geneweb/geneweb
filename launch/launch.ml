@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.18 2006-11-10 04:52:24 ddr Exp $ *)
+(* $Id: launch.ml,v 1.19 2006-11-11 11:31:39 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -306,12 +306,17 @@ value launch_server state = do {
     with
     [ Not_found -> [] ]
   in
-  let server_pid =
-    exec (Filename.concat state.bin_dir "gwd")
-      ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
-       "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
-       state.bases_dir; "-blang" :: rest_of_args] fd fd
+  let comm = Filename.concat state.bin_dir "gwd" in
+  let args =
+    ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
+     "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
+     state.bases_dir; "-blang" :: rest_of_args]
   in
+  eprintf "%s" comm;
+  List.iter (fun a -> eprintf " %s" a) args;
+  eprintf "\n";
+  flush stderr;
+  let server_pid = exec comm args fd fd in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
   if pid = 0 then ()
   else do {
