@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.35 2006-11-08 06:05:14 ddr Exp $ *)
+(* $Id: perso.ml,v 5.36 2006-11-11 08:03:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2855,7 +2855,8 @@ value print conf base p =
   in
   match passwd with
   [ Some (src, passwd)
-    when is_that_user_and_password conf.auth_scheme "" passwd = False ->
+    when is_that_user_and_password conf.ctime conf.auth_scheme "" passwd =
+         False ->
       Util.unauthorized conf src
   | _ ->
       interp_templ "perso" conf base p ]
