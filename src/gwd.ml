@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.32 2006-11-11 15:34:29 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.33 2006-11-11 17:23:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -491,7 +491,7 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
     Wserver.wprint
       "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ
       conf.bname (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
-      (if ar.ar_can_stale then ",stale=\"true\"" else "")
+      (if ar.ar_can_stale then ",stale=true" else "")
   else
     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
   Util.nl ();
@@ -972,90 +972,80 @@ value digest_authorization cgi request base_env passwd utm base_file command =
     let auth = Wserver.extract_param "authorization: " '\r' request in
     if start_with auth 0 "Digest " then
       (* W3C - RFC 2617 - Jun 1999 *)
-      let (meth, request_uri) =
+      let meth =
         match Wserver.extract_param "GET " ' ' request with
-        [ "" -> ("POST", Wserver.extract_param "POST " ' ' request)
-        | s -> ("GET", s) ]
+        [ "" -> "POST"
+        | s -> "GET" ]
       in
 let _ = trace_auth base_env (fun oc -> fprintf oc "\nauth = \"%s\"\n" auth) in
       let digenv = parse_digest auth in
       let get_digenv s = try List.assoc s digenv with [ Not_found -> "" ] in
-      let uri = get_digenv "uri" in
-      if uri <> request_uri then do {
-        Printf.eprintf "Bad Request:\n";
-        Printf.eprintf "  request-uri = %s\n" request_uri;
-        Printf.eprintf "   answer-uri = %s\n" uri;
-        flush stderr;
-        bad_request ();
-        exit 0;
-      }
-      else
-        let user = get_digenv "username" in
-        let ds =
-          {ds_realm = get_digenv "realm"; ds_nonce = get_digenv "nonce";
-           ds_meth = meth; ds_uri = uri; ds_qop = get_digenv "qop";
-           ds_nc = get_digenv "nc"; ds_cnonce = get_digenv "cnonce";
-           ds_response = get_digenv "response"}
-        in
-        let nonce = digest_nonce utm in
+      let user = get_digenv "username" in
+      let ds =
+        {ds_realm = get_digenv "realm"; ds_nonce = get_digenv "nonce";
+         ds_meth = meth; ds_uri = get_digenv "uri"; ds_qop = get_digenv "qop";
+         ds_nc = get_digenv "nc"; ds_cnonce = get_digenv "cnonce";
+         ds_response = get_digenv "response"}
+      in
+      let nonce = digest_nonce utm in
 let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n" fprintf_date (Unix.localtime utm) (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) request) passwd nonce ds.ds_meth ds.ds_uri) in
-        let asch = HttpAuth (Digest ds) in
-        let bad_nonce_report =
-          {ar_ok = False; ar_command = command; ar_passwd = passwd;
-           ar_scheme = NoAuth; ar_user = ""; ar_name = "";
-           ar_wizard = False; ar_friend = False; ar_uauth = "";
-           ar_can_stale = True}
-        in
-        if passwd = "w" then
-          if wizard_passwd <> "" &&
-             is_that_user_and_password asch user wizard_passwd
-          then
-            if ds.ds_nonce <> nonce then bad_nonce_report
-            else
-              {ar_ok = True; ar_command = command ^ "_w"; ar_passwd = passwd;
-               ar_scheme = asch; ar_user = user; ar_name = "";
-               ar_wizard = True; ar_friend = False; ar_uauth = "";
-               ar_can_stale = False}
+      let asch = HttpAuth (Digest ds) in
+      let bad_nonce_report =
+        {ar_ok = False; ar_command = command; ar_passwd = passwd;
+         ar_scheme = NoAuth; ar_user = ""; ar_name = "";
+         ar_wizard = False; ar_friend = False; ar_uauth = "";
+         ar_can_stale = True}
+      in
+      if passwd = "w" then
+        if wizard_passwd <> "" &&
+           is_that_user_and_password asch user wizard_passwd
+        then
+          if ds.ds_nonce <> nonce then bad_nonce_report
           else
-            match digest_match_auth_file asch wizard_passwd_file with
-            [ Some username ->
-                if ds.ds_nonce <> nonce then bad_nonce_report
-                else
-                  {ar_ok = True; ar_command = command ^ "_w";
-                   ar_passwd = passwd; ar_scheme = asch; ar_user = user;
-                   ar_name = username; ar_wizard = True; ar_friend = False;
-                   ar_uauth = ""; ar_can_stale = False}
-            | None ->
-                {ar_ok = False; ar_command = command; ar_passwd = passwd;
-                 ar_scheme = asch; ar_user = user; ar_name = "";
-                 ar_wizard = False; ar_friend = False; ar_uauth = "";
-                 ar_can_stale = False} ]
-        else if passwd = "f" then
-          if friend_passwd <> "" &&
-             is_that_user_and_password asch user friend_passwd
-          then
-            if ds.ds_nonce <> nonce then bad_nonce_report
-            else
-              {ar_ok = True; ar_command = command ^ "_f"; ar_passwd = passwd;
-               ar_scheme = asch; ar_user = user; ar_name = "";
-               ar_wizard = False; ar_friend = True; ar_uauth = "";
-               ar_can_stale = False}
-          else
-            match digest_match_auth_file asch friend_passwd_file with
-            [ Some username ->
-                if ds.ds_nonce <> nonce then bad_nonce_report
-                else
-                  {ar_ok = True; ar_command = command ^ "_f";
-                   ar_passwd = passwd; ar_scheme = asch; ar_user = user;
-                   ar_name = username; ar_wizard = False; ar_friend = True;
-                   ar_uauth = ""; ar_can_stale = False}
-            | None ->
-                {ar_ok = False; ar_command = command; ar_passwd = passwd;
-                 ar_scheme = asch; ar_user = user; ar_name = "";
-                 ar_wizard = False; ar_friend = False; ar_uauth = "";
-                 ar_can_stale = False} ]
+            {ar_ok = True; ar_command = command ^ "_w"; ar_passwd = passwd;
+             ar_scheme = asch; ar_user = user; ar_name = "";
+             ar_wizard = True; ar_friend = False; ar_uauth = "";
+             ar_can_stale = False}
         else
-          failwith (sprintf "not impl (2) %s %s" auth meth)
+          match digest_match_auth_file asch wizard_passwd_file with
+          [ Some username ->
+              if ds.ds_nonce <> nonce then bad_nonce_report
+              else
+                {ar_ok = True; ar_command = command ^ "_w";
+                 ar_passwd = passwd; ar_scheme = asch; ar_user = user;
+                 ar_name = username; ar_wizard = True; ar_friend = False;
+                 ar_uauth = ""; ar_can_stale = False}
+          | None ->
+              {ar_ok = False; ar_command = command; ar_passwd = passwd;
+               ar_scheme = asch; ar_user = user; ar_name = "";
+               ar_wizard = False; ar_friend = False; ar_uauth = "";
+               ar_can_stale = False} ]
+      else if passwd = "f" then
+        if friend_passwd <> "" &&
+           is_that_user_and_password asch user friend_passwd
+        then
+          if ds.ds_nonce <> nonce then bad_nonce_report
+          else
+            {ar_ok = True; ar_command = command ^ "_f"; ar_passwd = passwd;
+             ar_scheme = asch; ar_user = user; ar_name = "";
+             ar_wizard = False; ar_friend = True; ar_uauth = "";
+             ar_can_stale = False}
+        else
+          match digest_match_auth_file asch friend_passwd_file with
+          [ Some username ->
+              if ds.ds_nonce <> nonce then bad_nonce_report
+              else
+                {ar_ok = True; ar_command = command ^ "_f";
+                 ar_passwd = passwd; ar_scheme = asch; ar_user = user;
+                 ar_name = username; ar_wizard = False; ar_friend = True;
+                 ar_uauth = ""; ar_can_stale = False}
+          | None ->
+              {ar_ok = False; ar_command = command; ar_passwd = passwd;
+               ar_scheme = asch; ar_user = user; ar_name = "";
+               ar_wizard = False; ar_friend = False; ar_uauth = "";
+               ar_can_stale = False} ]
+      else
+        failwith (sprintf "not impl (2) %s %s" auth meth)
     else
       {ar_ok = False; ar_command = command; ar_passwd = passwd;
        ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = False;
