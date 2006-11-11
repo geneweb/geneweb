@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.68 2006-11-11 15:34:29 ddr Exp $ *)
+(* $Id: util.ml,v 5.69 2006-11-11 21:17:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2305,16 +2305,18 @@ value is_that_user_and_password auth_scheme user passwd =
   | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass
   | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
   | HttpAuth (Digest ds) ->
-      let that_response_would_be =
-        let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
-        let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
-        if ds.ds_qop = "auth" || ds.ds_qop = "auth-int" then
-          h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ ds.ds_nc ^ ":" ^
-             ds.ds_cnonce ^ ":" ^ ds.ds_qop ^ ":" ^ h a2)
-        else
-          h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ h a2)
-      in
-      that_response_would_be = ds.ds_response ]
+      if user <> ds.ds_username then False
+      else
+        let that_response_would_be =
+          let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
+          let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
+          if ds.ds_qop = "auth" || ds.ds_qop = "auth-int" then
+            h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ ds.ds_nc ^ ":" ^
+               ds.ds_cnonce ^ ":" ^ ds.ds_qop ^ ":" ^ h a2)
+          else
+            h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ h a2)
+        in
+        that_response_would_be = ds.ds_response ]
 ;
 
 value browser_doesnt_have_tables conf =
