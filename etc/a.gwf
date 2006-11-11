@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 5.5 2006-11-01 18:02:14 ddr Exp $
+# $Id: a.gwf,v 5.6 2006-11-11 07:17:41 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -52,6 +52,7 @@ wizard_passwd_file=
 # - edit any wizard's notes
 # - see all connected wizards
 # - always see consanguinities
+# - stay wizard even when wizard_just_friend is set
 # Hir changes in database are not recorded in the history.
 #   The variable must contain the wizard's user name:
 # manitou=
