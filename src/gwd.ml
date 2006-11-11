@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.33 2006-11-11 17:23:25 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.34 2006-11-11 19:06:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -113,23 +113,29 @@ value log oc tm conf from gauth request script_name contents =
   }
 ;
 
-value log_passwd_failed passwd uauth oc tm from request base_file =
+type auth_report =
+  { ar_ok : bool; ar_command : string; ar_passwd : string;
+    ar_scheme : auth_scheme_kind; ar_user : string; ar_name : string;
+    ar_wizard : bool; ar_friend : bool; ar_uauth : string;
+    ar_can_stale : bool }
+;
+
+value log_passwd_failed ar oc tm from request base_file = do {
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
-  do {
-    let tm = Unix.localtime tm in fprintf_date oc tm;
-    fprintf oc " (%d)" (Unix.getpid ());
-    fprintf oc " %s_%s" base_file passwd;
-    fprintf oc " => failed";
-    if trace_failed_passwd.val then
-      fprintf oc " (%s)" (String.escaped uauth)
-    else ();
-    fprintf oc "\n";
-    fprintf oc "  From: %s\n" from;
-    fprintf oc "  Agent: %s\n" user_agent;
-    if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
-  }
-;
+  let tm = Unix.localtime tm in fprintf_date oc tm;
+  fprintf oc " (%d)" (Unix.getpid ());
+  fprintf oc " %s_%s" base_file ar.ar_passwd;
+  fprintf oc " => failed";
+  if trace_failed_passwd.val then
+    fprintf oc " (%s)" (String.escaped ar.ar_uauth)
+  else ();
+  fprintf oc "\n";
+  fprintf oc "  User: %s\n" ar.ar_user;
+  fprintf oc "  From: %s\n" from;
+  fprintf oc "  Agent: %s\n" user_agent;
+  if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
+};
 
 value copy_file fname =
   match Util.open_etc_file fname with
@@ -474,13 +480,6 @@ value trace_auth base_env f = do {
   }
   else ();
 };
-
-type auth_report =
-  { ar_ok : bool; ar_command : string; ar_passwd : string;
-    ar_scheme : auth_scheme_kind; ar_user : string; ar_name : string;
-    ar_wizard : bool; ar_friend : bool; ar_uauth : string;
-    ar_can_stale : bool }
-;
 
 value unauth_server conf ar =  do {
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
@@ -1396,13 +1395,11 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
             else do {
               let tm = Unix.time () in
               lock_wait Srcfile.adm_file "gwd.lck" with
-              [ Accept ->
+              [ Accept -> do {
                   let oc = log_oc () in
-                  do {
-                    log_passwd_failed ar.ar_passwd ar.ar_uauth oc tm from
-                      request conf.bname;
-                    flush_log oc;
-                  }
+                  log_passwd_failed ar oc tm from request conf.bname;
+                  flush_log oc;
+                }
               | Refuse -> () ];
               unauth_server conf ar;
             }
