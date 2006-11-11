@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.66 2006-11-11 08:03:38 ddr Exp $ *)
+(* $Id: util.ml,v 5.67 2006-11-11 11:07:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2299,24 +2299,19 @@ value has_nephews_or_nieces conf base p =
 value h s = Digest.to_hex (Digest.string s);
 value max_login_time = 60.0; (* short, just for testing *)
 
-value digest_nonce tm = "abc";
-
-value is_that_user_and_password tm auth_scheme user passwd =
+value is_that_user_and_password auth_scheme user passwd =
   match auth_scheme with
   [ NoAuth -> False
   | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass
   | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
   | HttpAuth (Digest ds) ->
-      if ds.ds_nonce <> digest_nonce tm then False
-      else
-        let that_response_would_be =
-          let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
-          let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
-          h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ h a2)
-          (* ex: h (h "u:Friend bar:xyzzy" ^ "::" ^
-                 h "GET:/bar?lang=en;w=f") *)
-        in
-        that_response_would_be = ds.ds_response ]
+      let that_response_would_be =
+        let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
+        let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
+        h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ h a2)
+        (* ex: h (h "u:Friend bar:xyzzy" ^ "::" ^ h "GET:/bar?lang=en;w=f") *)
+      in
+      that_response_would_be = ds.ds_response ]
 ;
 
 value browser_doesnt_have_tables conf =

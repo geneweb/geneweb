@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.29 2006-11-11 08:03:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.30 2006-11-11 11:07:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -426,6 +426,8 @@ value bad_request () = do {
 </body>\n";
 };
 
+value digest_nonce tm = "abc";
+
 value unauth_server conf passwd =
   let typ = if passwd = "w" then "Wizard" else "Friend" in
   do {
@@ -490,9 +492,9 @@ value basic_match_auth_file uauth =
   gen_match_auth_file (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth)
 ;
 
-value digest_match_auth_file tm asch =
+value digest_match_auth_file asch =
   gen_match_auth_file
-    (fun au -> is_that_user_and_password tm asch au.au_user au.au_passwd)
+    (fun au -> is_that_user_and_password asch au.au_user au.au_passwd)
 ;
 
 value match_simple_passwd sauth uauth =
@@ -924,13 +926,15 @@ value digest_authorization cgi request base_env passwd utm base_file command =
            ds_meth = meth; ds_uri = uri; ds_response = get_digenv "response"}
         in
         let asch = HttpAuth (Digest ds) in
-        if passwd = "w" then
+        if ds.ds_nonce <> digest_nonce utm then
+          (False, command, passwd, asch, user, "", False, False, "")
+        else if passwd = "w" then
           if wizard_passwd <> "" &&
-             is_that_user_and_password utm asch user wizard_passwd
+             is_that_user_and_password asch user wizard_passwd
           then
             (True, command ^ "_w", passwd, asch, user, "", True, False, "")
           else
-            match digest_match_auth_file utm asch wizard_passwd_file with
+            match digest_match_auth_file asch wizard_passwd_file with
             [ Some username ->
                 (True, command ^ "_w", passwd, asch, user, username, True,
                  False, "")
@@ -938,11 +942,11 @@ value digest_authorization cgi request base_env passwd utm base_file command =
                 (False, command, passwd, asch, user, "", False, False, "") ]
         else if passwd = "f" then
           if friend_passwd <> "" &&
-             is_that_user_and_password utm asch user friend_passwd
+             is_that_user_and_password asch user friend_passwd
           then
             (True, command ^ "_f", passwd, asch, user, "", False, True, "")
           else
-            match digest_match_auth_file utm asch friend_passwd_file with
+            match digest_match_auth_file asch friend_passwd_file with
             [ Some username ->
                 (True, command ^ "_f", passwd, asch, user, username, False,
                  True, "")
