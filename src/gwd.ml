@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.31 2006-11-11 11:32:55 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.32 2006-11-11 15:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -463,37 +463,56 @@ value nonce_private_key =
 ;
 value digest_nonce tm = Lazy.force nonce_private_key;
 
-value unauth_server conf passwd =
-  let typ = if passwd = "w" then "Wizard" else "Friend" in
-  do {
-    Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
-    if use_auth_digest_scheme.val then
-      let nonce = digest_nonce conf.ctime in
-      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"%s" typ
-        conf.bname
-        (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
-    else
-      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
-    Util.nl ();
-    Util.nl ();
-    let url =
-      conf.bname ^ "?" ^
-        List.fold_left
-          (fun s (k, v) ->
-             if s = "" then k ^ "=" ^ v else s ^ "&" ^ k ^ "=" ^ v)
-          "" conf.env
+value trace_auth base_env f = do {
+  if List.mem_assoc "trace_auth" base_env then do {
+    let oc =
+      open_out_gen [Open_wronly; Open_append; Open_creat] 0o777
+        "trace_auth.txt"
     in
-    Wserver.wprint "\
+    f oc;
+    close_out oc
+  }
+  else ();
+};
+
+type auth_report =
+  { ar_ok : bool; ar_command : string; ar_passwd : string;
+    ar_scheme : auth_scheme_kind; ar_user : string; ar_name : string;
+    ar_wizard : bool; ar_friend : bool; ar_uauth : string;
+    ar_can_stale : bool }
+;
+
+value unauth_server conf ar =  do {
+  let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
+  Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
+  if use_auth_digest_scheme.val then
+    let nonce = digest_nonce conf.ctime in
+let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun oc -> fprintf oc "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n" fprintf_date tm (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) conf.request) ar.ar_passwd nonce ar.ar_can_stale) in
+    Wserver.wprint
+      "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ
+      conf.bname (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
+      (if ar.ar_can_stale then ",stale=\"true\"" else "")
+  else
+    Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
+  Util.nl ();
+  Util.nl ();
+  let url =
+    conf.bname ^ "?" ^
+      List.fold_left
+        (fun s (k, v) ->
+           if s = "" then k ^ "=" ^ v else s ^ "&" ^ k ^ "=" ^ v)
+        "" conf.env
+  in
+  Wserver.wprint "\
 <html><head>
 <title>%s access failed for database %s</title>
 </head>
 " typ conf.bname;
-    Wserver.wprint "<body><h1>%s access failed for database %s</h1>"
-      typ conf.bname;
-    Wserver.wprint "Return to <a href=\"%s\">welcome page</a>\n" url;
-    Wserver.wprint "</body></html>\n";
-  }
-;
+  Wserver.wprint "<body><h1>%s access failed for database %s</h1>"
+    typ conf.bname;
+  Wserver.wprint "Return to <a href=\"%s\">welcome page</a>\n" url;
+  Wserver.wprint "</body></html>\n";
+};
 
 value gen_match_auth_file test_user_and_password auth_file =
   if auth_file = "" then None
@@ -803,11 +822,20 @@ value parse_digest s =
     | [: :] -> [] ]
   and key_eq_val =
     parser
-    [ [: k = ident; `'='; `'"'; v = string 0; _ = spaces :] -> (k, v) ]
+    [ [: k = ident; `'='; v = val_or_str :] -> (k, v) ]
+  and val_or_str =
+    parser
+    [ [: `'"'; v = string 0; _ = spaces :] -> v
+    | [: v = any_val 0; _ = spaces :] -> v ]
   and string len =
     parser
     [ [: `'"' :] -> Buff.get len
     | [: `c; s :] -> string (Buff.store len c) s ]
+  and any_val len =
+    parser
+    [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '-' as c); s :] ->
+        any_val (Buff.store len c) s
+    | [: :] -> Buff.get len ]
   in
   parse_main (Stream.of_string s)
 ;
@@ -913,7 +941,10 @@ value basic_authorization cgi from_addr request base_env passwd access_type
         in
         HttpAuth (Basic {bs_realm = realm; bs_user = u; bs_pass = p})
   in
-  (ok, command, passwd, auth_scheme, user, username, wizard, friend, uauth)
+  {ar_ok = ok; ar_command = command; ar_passwd = passwd;
+   ar_scheme = auth_scheme; ar_user = user; ar_name = username;
+   ar_wizard = wizard; ar_friend = friend; ar_uauth = uauth;
+   ar_can_stale = False}
 ;
 
 value digest_authorization cgi request base_env passwd utm base_file command =
@@ -933,7 +964,10 @@ value digest_authorization cgi request base_env passwd utm base_file command =
   in
   let command = if cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
-    (True, command, "", NoAuth, "", "", True, friend_passwd = "", "")
+    {ar_ok = True; ar_command = command; ar_passwd = "";
+     ar_scheme = NoAuth; ar_user = ""; ar_name = "";
+     ar_wizard = True; ar_friend = friend_passwd = ""; ar_uauth = "";
+     ar_can_stale = False}
   else if passwd = "w" || passwd = "f" then
     let auth = Wserver.extract_param "authorization: " '\r' request in
     if start_with auth 0 "Digest " then
@@ -943,6 +977,7 @@ value digest_authorization cgi request base_env passwd utm base_file command =
         [ "" -> ("POST", Wserver.extract_param "POST " ' ' request)
         | s -> ("GET", s) ]
       in
+let _ = trace_auth base_env (fun oc -> fprintf oc "\nauth = \"%s\"\n" auth) in
       let digenv = parse_digest auth in
       let get_digenv s = try List.assoc s digenv with [ Not_found -> "" ] in
       let uri = get_digenv "uri" in
@@ -958,41 +993,77 @@ value digest_authorization cgi request base_env passwd utm base_file command =
         let user = get_digenv "username" in
         let ds =
           {ds_realm = get_digenv "realm"; ds_nonce = get_digenv "nonce";
-           ds_meth = meth; ds_uri = uri; ds_response = get_digenv "response"}
+           ds_meth = meth; ds_uri = uri; ds_qop = get_digenv "qop";
+           ds_nc = get_digenv "nc"; ds_cnonce = get_digenv "cnonce";
+           ds_response = get_digenv "response"}
         in
+        let nonce = digest_nonce utm in
+let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- meth: \"%s\"\n- uri: \"%s\"\n" fprintf_date (Unix.localtime utm) (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) request) passwd nonce ds.ds_meth ds.ds_uri) in
         let asch = HttpAuth (Digest ds) in
-        if ds.ds_nonce <> digest_nonce utm then
-          (False, command, passwd, asch, user, "", False, False, "")
-        else if passwd = "w" then
+        let bad_nonce_report =
+          {ar_ok = False; ar_command = command; ar_passwd = passwd;
+           ar_scheme = NoAuth; ar_user = ""; ar_name = "";
+           ar_wizard = False; ar_friend = False; ar_uauth = "";
+           ar_can_stale = True}
+        in
+        if passwd = "w" then
           if wizard_passwd <> "" &&
              is_that_user_and_password asch user wizard_passwd
           then
-            (True, command ^ "_w", passwd, asch, user, "", True, False, "")
+            if ds.ds_nonce <> nonce then bad_nonce_report
+            else
+              {ar_ok = True; ar_command = command ^ "_w"; ar_passwd = passwd;
+               ar_scheme = asch; ar_user = user; ar_name = "";
+               ar_wizard = True; ar_friend = False; ar_uauth = "";
+               ar_can_stale = False}
           else
             match digest_match_auth_file asch wizard_passwd_file with
             [ Some username ->
-                (True, command ^ "_w", passwd, asch, user, username, True,
-                 False, "")
+                if ds.ds_nonce <> nonce then bad_nonce_report
+                else
+                  {ar_ok = True; ar_command = command ^ "_w";
+                   ar_passwd = passwd; ar_scheme = asch; ar_user = user;
+                   ar_name = username; ar_wizard = True; ar_friend = False;
+                   ar_uauth = ""; ar_can_stale = False}
             | None ->
-                (False, command, passwd, asch, user, "", False, False, "") ]
+                {ar_ok = False; ar_command = command; ar_passwd = passwd;
+                 ar_scheme = asch; ar_user = user; ar_name = "";
+                 ar_wizard = False; ar_friend = False; ar_uauth = "";
+                 ar_can_stale = False} ]
         else if passwd = "f" then
           if friend_passwd <> "" &&
              is_that_user_and_password asch user friend_passwd
           then
-            (True, command ^ "_f", passwd, asch, user, "", False, True, "")
+            if ds.ds_nonce <> nonce then bad_nonce_report
+            else
+              {ar_ok = True; ar_command = command ^ "_f"; ar_passwd = passwd;
+               ar_scheme = asch; ar_user = user; ar_name = "";
+               ar_wizard = False; ar_friend = True; ar_uauth = "";
+               ar_can_stale = False}
           else
             match digest_match_auth_file asch friend_passwd_file with
             [ Some username ->
-                (True, command ^ "_f", passwd, asch, user, username, False,
-                 True, "")
+                if ds.ds_nonce <> nonce then bad_nonce_report
+                else
+                  {ar_ok = True; ar_command = command ^ "_f";
+                   ar_passwd = passwd; ar_scheme = asch; ar_user = user;
+                   ar_name = username; ar_wizard = False; ar_friend = True;
+                   ar_uauth = ""; ar_can_stale = False}
             | None ->
-                (False, command, passwd, asch, user, "", False, False, "") ]
+                {ar_ok = False; ar_command = command; ar_passwd = passwd;
+                 ar_scheme = asch; ar_user = user; ar_name = "";
+                 ar_wizard = False; ar_friend = False; ar_uauth = "";
+                 ar_can_stale = False} ]
         else
           failwith (sprintf "not impl (2) %s %s" auth meth)
     else
-      (False, command, passwd, NoAuth, "", "", False, False, "")
+      {ar_ok = False; ar_command = command; ar_passwd = passwd;
+       ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = False;
+       ar_friend = False; ar_uauth = ""; ar_can_stale = False}
   else
-    (True, command, "", NoAuth, "", "", False, False, "")
+    {ar_ok = True; ar_command = command; ar_passwd = "";
+     ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = False;
+     ar_friend = False; ar_uauth = ""; ar_can_stale = False}
 ;
 
 value authorization cgi from_addr request base_env passwd access_type utm
@@ -1005,7 +1076,10 @@ value authorization cgi from_addr request base_env passwd access_type utm
         else (base_file ^ "_" ^ passwd, passwd)
       in
       let auth_scheme = TokenAuth {ts_user = user; ts_pass = passwd} in
-      (True, command, passwd, auth_scheme, user, "", True, False, "")
+      {ar_ok = True; ar_command = command; ar_passwd = passwd;
+       ar_scheme = auth_scheme; ar_user = user; ar_name = "";
+       ar_wizard = True; ar_friend = False; ar_uauth = "";
+       ar_can_stale = False}
   | ATfriend user ->
       let (command, passwd) =
         if cgi then (command, passwd)
@@ -1013,12 +1087,17 @@ value authorization cgi from_addr request base_env passwd access_type utm
         else (base_file ^ "_" ^ passwd, passwd)
       in
       let auth_scheme = TokenAuth {ts_user = user; ts_pass = passwd} in
-      (True, command, passwd, auth_scheme, user, "", False, True, "")
+      {ar_ok = True; ar_command = command; ar_passwd = passwd;
+       ar_scheme = auth_scheme; ar_user = user; ar_name = "";
+       ar_wizard = False; ar_friend = True; ar_uauth = "";
+       ar_can_stale = False}
   | ATnormal ->
       let (command, passwd) =
         if cgi then (command, "") else (base_file, "")
       in
-      (True, command, passwd, NoAuth, "", "", False, False, "")
+      {ar_ok = True; ar_command = command; ar_passwd = passwd;
+       ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = False;
+       ar_friend = False; ar_uauth = ""; ar_can_stale = False}
   | ATnone | ATset ->
       if use_auth_digest_scheme.val then
         digest_authorization cgi request base_env passwd utm base_file command
@@ -1099,7 +1178,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     [ Not_found -> default_lang.val ]
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  let (ok, command, passwd, passwd1, user, username, wizard, friend, uauth) =
+  let ar =
     authorization cgi from_addr request base_env passwd access_type utm
       base_file command
   in
@@ -1113,19 +1192,19 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
   in
   let manitou =
-    try user <> "" && List.assoc "manitou" base_env = user with
+    try ar.ar_user <> "" && List.assoc "manitou" base_env = ar.ar_user with
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
   let conf =
     {from = from_addr;
      manitou = manitou;
-     wizard = wizard && not wizard_just_friend;
-     friend = friend || wizard_just_friend && wizard;
-     just_friend_wizard = wizard && wizard_just_friend;
-     user = user; username = username;
-     auth_scheme = passwd1; cgi = cgi; command = command;
-     indep_command = (if cgi then command else "geneweb") ^ "?";
+     wizard = ar.ar_wizard && not wizard_just_friend;
+     friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
+     just_friend_wizard = ar.ar_wizard && wizard_just_friend;
+     user = ar.ar_user; username = ar.ar_name;
+     auth_scheme = ar.ar_scheme; cgi = cgi; command = ar.ar_command;
+     indep_command = (if cgi then ar.ar_command else "geneweb") ^ "?";
      highlight =
        try List.assoc "highlight_color" base_env with
        [ Not_found -> green_color ];
@@ -1150,30 +1229,30 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      setup_link = setup_link.val;
      access_by_key =
        try List.assoc "access_by_key" base_env = "yes" with
-       [ Not_found -> wizard && friend ];
+       [ Not_found -> ar.ar_wizard && ar.ar_friend ];
      private_years =
        try int_of_string (List.assoc "private_years" base_env) with
        [ Not_found | Failure _ -> 150 ];
      hide_names =
-       if wizard || friend then False
+       if ar.ar_wizard || ar.ar_friend then False
        else
          try List.assoc "hide_private_names" base_env = "yes" with
          [ Not_found -> False ];
      use_restrict =
-       if wizard || friend then False
+       if ar.ar_wizard || ar.ar_friend then False
        else
          try List.assoc "use_restrict" base_env = "yes" with
          [ Not_found -> False ];
      no_image =
-       if wizard || friend then False
+       if ar.ar_wizard || ar.ar_friend then False
        else
          try List.assoc "no_image_for_visitor" base_env = "yes" with
          [ Not_found -> False ];
      bname = base_file; env = env; senv = [];
      henv =
        (if not cgi then []
-        else if passwd = "" then [("b", base_file)]
-        else [("b", base_file ^ "_" ^ passwd)]) @
+        else if ar.ar_passwd = "" then [("b", base_file)]
+        else [("b", base_file ^ "_" ^ ar.ar_passwd)]) @
          (if lang = "" then [] else [("lang", lang)]) @
          (if from = "" then [] else [("opt", from)]);
      base_env = base_env;
@@ -1205,7 +1284,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
      ctime = utm}
   in
-  (conf, sleep, if ok then None else Some (passwd, uauth))
+  (conf, sleep, ar)
 };
 
 value log_and_robot_check conf auth from request script_name contents =
@@ -1322,7 +1401,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                 if x = "" then "GeneWeb service" else "database " ^ conf.bname
               in
               refuse_auth conf from auth auth_type
-        | (_, _, Some (passwd, uauth)) ->
+        | (_, _, ({ar_ok = False} as ar)) ->
             if is_robot from then Robot.robot_error cgi from 0 0
             else do {
               let tm = Unix.time () in
@@ -1330,12 +1409,12 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
               [ Accept ->
                   let oc = log_oc () in
                   do {
-                    log_passwd_failed passwd uauth oc tm from request
-                      conf.bname;
+                    log_passwd_failed ar.ar_passwd ar.ar_uauth oc tm from
+                      request conf.bname;
                     flush_log oc;
                   }
               | Refuse -> () ];
-              unauth_server conf passwd;
+              unauth_server conf ar;
             }
         | _ ->
             match mode with
