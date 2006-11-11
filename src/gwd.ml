@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.28 2006-11-11 07:17:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.29 2006-11-11 08:03:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -431,7 +431,10 @@ value unauth_server conf passwd =
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
     if use_auth_digest_scheme.val then
-      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"" typ conf.bname
+      let nonce = digest_nonce conf.ctime in
+      Wserver.wprint "WWW-Authenticate: Digest realm=\"%s %s\"%s" typ
+        conf.bname
+        (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
     else
       Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
@@ -455,14 +458,14 @@ value unauth_server conf passwd =
   }
 ;
 
-value match_auth_file auth_file uauth =
+value gen_match_auth_file test_user_and_password auth_file =
   if auth_file = "" then None
   else
     let aul = read_gen_auth_file auth_file in
     loop aul where rec loop =
       fun
       [ [au :: aul] ->
-          if au.au_user ^ ":" ^ au.au_passwd = uauth then
+          if test_user_and_password au then
             let s =
               try
                 let i = String.index au.au_info ':' in
@@ -483,6 +486,15 @@ value match_auth_file auth_file uauth =
       | [] -> None ]
 ;
 
+value basic_match_auth_file uauth =
+  gen_match_auth_file (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth)
+;
+
+value digest_match_auth_file tm asch =
+  gen_match_auth_file
+    (fun au -> is_that_user_and_password tm asch au.au_user au.au_passwd)
+;
+
 value match_simple_passwd sauth uauth =
   match lindex sauth ':' with
   [ Some _ -> sauth = uauth
@@ -493,9 +505,9 @@ value match_simple_passwd sauth uauth =
       | None -> sauth = uauth ] ]
 ;
 
-value match_auth passwd auth_file uauth =
+value basic_match_auth passwd auth_file uauth =
   if passwd <> "" && match_simple_passwd passwd uauth then Some ""
-  else match_auth_file auth_file uauth
+  else basic_match_auth_file uauth auth_file
 ;
 
 type access_type =
@@ -796,27 +808,29 @@ value basic_authorization cgi from_addr request base_env passwd access_type
         if wizard_passwd = "" && wizard_passwd_file = "" then
           (True, True, friend_passwd = "", "")
         else
-          match match_auth wizard_passwd wizard_passwd_file uauth with
+          match basic_match_auth wizard_passwd wizard_passwd_file uauth with
           [ Some username -> (True, True, False, username)
           | None -> (False, False, False, "") ]
       else if passwd = "f" then
         if friend_passwd = "" && friend_passwd_file = "" then
           (True, False, True, "")
         else
-          match match_auth friend_passwd friend_passwd_file uauth with
+          match basic_match_auth friend_passwd friend_passwd_file uauth with
           [ Some username -> (True, False, True, username)
           | None -> (False, False, False, "") ]
       else assert False
     else if wizard_passwd = "" && wizard_passwd_file = "" then
       (True, True, friend_passwd = "", "")
     else
-       match match_auth wizard_passwd wizard_passwd_file uauth with
+       match basic_match_auth wizard_passwd wizard_passwd_file uauth with
        [ Some username -> (True, True, False, username)
        | _ ->
             if friend_passwd = "" && friend_passwd_file = "" then
               (True, False, True, "")
             else
-              match match_auth friend_passwd friend_passwd_file uauth with
+              match
+                basic_match_auth friend_passwd friend_passwd_file uauth
+              with
               [ Some username -> (True, False, True, username)
               | None -> (True, False, False, "") ] ]
   in
@@ -865,7 +879,7 @@ value basic_authorization cgi from_addr request base_env passwd access_type
   (ok, command, passwd, auth_scheme, user, username, wizard, friend, uauth)
 ;
 
-value digest_authorization cgi request base_env passwd base_file command =
+value digest_authorization cgi request base_env passwd utm base_file command =
   let wizard_passwd =
     try List.assoc "wizard_passwd" base_env with
     [ Not_found -> wizard_passwd.val ]
@@ -877,11 +891,9 @@ value digest_authorization cgi request base_env passwd base_file command =
     try List.assoc "friend_passwd" base_env with
     [ Not_found -> friend_passwd.val ]
   in
-(*
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
   in
-*)
   let command = if cgi then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
     (True, command, "", NoAuth, "", "", True, friend_passwd = "", "")
@@ -908,20 +920,34 @@ value digest_authorization cgi request base_env passwd base_file command =
       else
         let user = get_digenv "username" in
         let ds =
-          {ds_realm = get_digenv "realm"; ds_meth = meth; ds_uri = uri;
-           ds_response = get_digenv "response"}
+          {ds_realm = get_digenv "realm"; ds_nonce = get_digenv "nonce";
+           ds_meth = meth; ds_uri = uri; ds_response = get_digenv "response"}
         in
         let asch = HttpAuth (Digest ds) in
-        if passwd = "w" && wizard_passwd <> "" then
-          if is_that_user_and_password asch user wizard_passwd then
+        if passwd = "w" then
+          if wizard_passwd <> "" &&
+             is_that_user_and_password utm asch user wizard_passwd
+          then
             (True, command ^ "_w", passwd, asch, user, "", True, False, "")
           else
-            (False, command, passwd, asch, user, "", False, False, "")
-        else if passwd = "f" && friend_passwd <> "" then
-          if is_that_user_and_password asch user friend_passwd then
+            match digest_match_auth_file utm asch wizard_passwd_file with
+            [ Some username ->
+                (True, command ^ "_w", passwd, asch, user, username, True,
+                 False, "")
+            | None ->
+                (False, command, passwd, asch, user, "", False, False, "") ]
+        else if passwd = "f" then
+          if friend_passwd <> "" &&
+             is_that_user_and_password utm asch user friend_passwd
+          then
             (True, command ^ "_f", passwd, asch, user, "", False, True, "")
           else
-            (False, command, passwd, asch, user, "", False, False, "")
+            match digest_match_auth_file utm asch friend_passwd_file with
+            [ Some username ->
+                (True, command ^ "_f", passwd, asch, user, username, False,
+                 True, "")
+            | None ->
+                (False, command, passwd, asch, user, "", False, False, "") ]
         else
           failwith (sprintf "not impl (2) %s %s" auth meth)
     else
@@ -956,7 +982,7 @@ value authorization cgi from_addr request base_env passwd access_type utm
       (True, command, passwd, NoAuth, "", "", False, False, "")
   | ATnone | ATset ->
       if use_auth_digest_scheme.val then
-        digest_authorization cgi request base_env passwd base_file command
+        digest_authorization cgi request base_env passwd utm base_file command
       else
         basic_authorization cgi from_addr request base_env passwd access_type
           utm base_file command ]
