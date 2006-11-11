@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.34 2006-11-11 19:06:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.35 2006-11-11 21:17:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -420,17 +420,6 @@ value general_welcome conf =
       }
   | None -> propose_base conf ]
 ;
-
-value bad_request () = do {
-  Wserver.http "400 Bad Request";
-  Util.nl ();
-  Wserver.wprint "\
-<html><head>
-<title>400 Bad Request</title>
-</head><body>
-<h1>400 Bad Request</h1>
-</body>\n";
-};
 
 value nonce_private_key =
   Lazy.lazy_from_fun
@@ -979,10 +968,11 @@ value digest_authorization cgi request base_env passwd utm base_file command =
 let _ = trace_auth base_env (fun oc -> fprintf oc "\nauth = \"%s\"\n" auth) in
       let digenv = parse_digest auth in
       let get_digenv s = try List.assoc s digenv with [ Not_found -> "" ] in
-      let user = get_digenv "username" in
+      let _user = get_digenv "username" in
       let ds =
-        {ds_realm = get_digenv "realm"; ds_nonce = get_digenv "nonce";
-         ds_meth = meth; ds_uri = get_digenv "uri"; ds_qop = get_digenv "qop";
+        {ds_username = get_digenv "username"; ds_realm = get_digenv "realm";
+         ds_nonce = get_digenv "nonce"; ds_meth = meth;
+         ds_uri = get_digenv "uri"; ds_qop = get_digenv "qop";
          ds_nc = get_digenv "nc"; ds_cnonce = get_digenv "cnonce";
          ds_response = get_digenv "response"}
       in
@@ -997,12 +987,12 @@ let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- reque
       in
       if passwd = "w" then
         if wizard_passwd <> "" &&
-           is_that_user_and_password asch user wizard_passwd
+           is_that_user_and_password asch ds.ds_username wizard_passwd
         then
           if ds.ds_nonce <> nonce then bad_nonce_report
           else
             {ar_ok = True; ar_command = command ^ "_w"; ar_passwd = passwd;
-             ar_scheme = asch; ar_user = user; ar_name = "";
+             ar_scheme = asch; ar_user = ds.ds_username; ar_name = "";
              ar_wizard = True; ar_friend = False; ar_uauth = "";
              ar_can_stale = False}
         else
@@ -1011,22 +1001,23 @@ let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- reque
               if ds.ds_nonce <> nonce then bad_nonce_report
               else
                 {ar_ok = True; ar_command = command ^ "_w";
-                 ar_passwd = passwd; ar_scheme = asch; ar_user = user;
-                 ar_name = username; ar_wizard = True; ar_friend = False;
-                 ar_uauth = ""; ar_can_stale = False}
+                 ar_passwd = passwd; ar_scheme = asch;
+                 ar_user = ds.ds_username; ar_name = username;
+                 ar_wizard = True; ar_friend = False; ar_uauth = "";
+                 ar_can_stale = False}
           | None ->
               {ar_ok = False; ar_command = command; ar_passwd = passwd;
-               ar_scheme = asch; ar_user = user; ar_name = "";
+               ar_scheme = asch; ar_user = ds.ds_username; ar_name = "";
                ar_wizard = False; ar_friend = False; ar_uauth = "";
                ar_can_stale = False} ]
       else if passwd = "f" then
         if friend_passwd <> "" &&
-           is_that_user_and_password asch user friend_passwd
+           is_that_user_and_password asch ds.ds_username friend_passwd
         then
           if ds.ds_nonce <> nonce then bad_nonce_report
           else
             {ar_ok = True; ar_command = command ^ "_f"; ar_passwd = passwd;
-             ar_scheme = asch; ar_user = user; ar_name = "";
+             ar_scheme = asch; ar_user = ds.ds_username; ar_name = "";
              ar_wizard = False; ar_friend = True; ar_uauth = "";
              ar_can_stale = False}
         else
@@ -1035,12 +1026,13 @@ let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- reque
               if ds.ds_nonce <> nonce then bad_nonce_report
               else
                 {ar_ok = True; ar_command = command ^ "_f";
-                 ar_passwd = passwd; ar_scheme = asch; ar_user = user;
-                 ar_name = username; ar_wizard = False; ar_friend = True;
-                 ar_uauth = ""; ar_can_stale = False}
+                 ar_passwd = passwd; ar_scheme = asch;
+                 ar_user = ds.ds_username; ar_name = username;
+                 ar_wizard = False; ar_friend = True; ar_uauth = "";
+                 ar_can_stale = False}
           | None ->
               {ar_ok = False; ar_command = command; ar_passwd = passwd;
-               ar_scheme = asch; ar_user = user; ar_name = "";
+               ar_scheme = asch; ar_user = ds.ds_username; ar_name = "";
                ar_wizard = False; ar_friend = False; ar_uauth = "";
                ar_can_stale = False} ]
       else
