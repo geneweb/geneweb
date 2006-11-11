@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 5.13 2006-11-11 08:03:38 ddr Exp $ *)
+(* $Id: config.mli,v 5.14 2006-11-11 15:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -15,7 +15,8 @@ and http_auth_scheme =
 and basic_auth_scheme =
   { bs_realm : string; bs_user : string; bs_pass : string }
 and digest_auth_scheme =
-  { ds_realm : string; ds_nonce : string; ds_meth : string; ds_uri : string;
+  { ds_realm : string; ds_nonce : string; ds_meth : string; ds_uri : string; 
+    ds_qop : string; ds_nc : string; ds_cnonce : string;
     ds_response : string }
 ;
 
