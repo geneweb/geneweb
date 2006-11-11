@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.14 2006-11-11 08:03:38 ddr Exp $ *)
+(* $Id: util.mli,v 5.15 2006-11-11 11:07:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -230,6 +230,5 @@ type auth_user = {au_user : string; au_passwd : string; au_info : string};
 
 value read_gen_auth_file : string -> list auth_user;
 
-value digest_nonce : float -> string;
 value is_that_user_and_password :
-  float -> auth_scheme_kind -> string -> string -> bool;
+  auth_scheme_kind -> string -> string -> bool;
