@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.69 2006-11-11 21:17:34 ddr Exp $ *)
+(* $Id: util.ml,v 5.70 2006-11-12 20:27:53 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2546,26 +2546,26 @@ value read_gen_auth_file fname =
       let rec loop data =
         match try Some (input_line ic) with [ End_of_file -> None ] with
         [ Some line ->
+            let len = String.length line in
             let data =
               match
                 try Some (String.index line ':') with [ Not_found -> None ]
               with
               [ Some i ->
                   let user = String.sub line 0 i in
-                  match
-                    try Some (String.index_from line (i + 1) ':') with
-                    [ Not_found -> None ]
-                  with
-                  [ Some j ->
-                      let passwd = String.sub line (i + 1) (j - i - 1) in
-                      let rest =
-                        String.sub line (j + 1) (String.length line - j - 1)
-                      in
-                      let au =
-                        {au_user = user; au_passwd = passwd; au_info = rest}
-                      in
-                      [au :: data]
-                  | None -> data ]
+                  let j =
+                    try String.index_from line (i + 1) ':' with
+                    [ Not_found -> len ]
+                  in
+                  let passwd = String.sub line (i + 1) (j - i - 1) in
+                  let rest =
+                    if j = len then ""
+                    else String.sub line (j + 1) (len - j - 1)
+                  in
+                  let au =
+                    {au_user = user; au_passwd = passwd; au_info = rest}
+                  in
+                  [au :: data]
               | None -> data ]
             in
             loop data
