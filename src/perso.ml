@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.37 2006-11-11 11:07:46 ddr Exp $ *)
+(* $Id: perso.ml,v 5.38 2006-11-12 22:26:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2570,15 +2570,17 @@ value print_foreach conf base print_ast eval_expr =
         List.fold_left
           (fun list ic ->
              let c = pget conf base ic in
-             loop (get_rparents c) where rec loop =
+             loop list (get_rparents c) where rec loop list =
                fun
                [ [r :: rl] ->
                    match r.r_fath with
-                   [ Some ip when ip = get_key_index p -> [(c, r) :: list]
+                   [ Some ip when ip = get_key_index p ->
+                       loop [(c, r) :: list] rl
                    | _ ->
                        match r.r_moth with
-                       [ Some ip when ip = get_key_index p -> [(c, r) :: list]
-                       | _ -> loop rl ] ]
+                       [ Some ip when ip = get_key_index p ->
+                           loop [(c, r) :: list] rl
+                       | _ -> loop list rl ] ]
                | [] -> list ])
           [] (get_related p)
       in
