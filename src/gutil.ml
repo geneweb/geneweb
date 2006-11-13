@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.47 2006-11-01 16:59:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.48 2006-11-13 21:20:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -70,15 +70,16 @@ value find_num s i =
 ;
 
 value split_key s =
-  match lindex s '.' with
-  [ Some i ->
+  loop 0 where rec loop i =
+    if i = String.length s then None
+    else if s.[i] = '.' then
       match find_num s (i + 1) with
       [ Some (occ, j) ->
           let first_name = String.sub s 0 i in
           let surname = String.sub s j (String.length s - j) in
           Some (first_name, occ, surname)
-      | None -> None ]
-  | None -> None ]
+      | None -> loop (i + 1) ]
+    else loop (i + 1)
 ;
 
 value person_of_string_key base s =
