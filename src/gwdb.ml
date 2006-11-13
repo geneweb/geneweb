@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.118 2006-11-13 16:04:17 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.119 2006-11-13 20:27:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -23,7 +23,8 @@ type patches =
 ;
 
 type db2 =
-  { bdir : string;
+  { foo : unit -> unit; (* to prevent usage of "=" in the program *)
+    bdir : string;
     cache_chan : Hashtbl.t (string * string * string) in_channel;
     patches : patches;
     parents_array : mutable option (array (option ifam));
@@ -1455,7 +1456,7 @@ value base_of_base2 bname =
   in
   Base2
     {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches;
-     parents_array = None; consang_array = None;
+     parents_array = None; consang_array = None; foo () = ();
      father_array = None; mother_array = None}
 ;
 
