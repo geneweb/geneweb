@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.19 2006-11-11 11:31:39 ddr Exp $ *)
+(* $Id: launch.ml,v 1.20 2006-11-13 07:22:19 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -12,6 +12,7 @@ type state =
     port : mutable int;
     browser : mutable option string;
     bases_dir : mutable string;
+    digest_auth : mutable bool;
     server_running : mutable bool }
 ;
 
@@ -230,8 +231,63 @@ value rec show_main state = do {
             new_database state;
           })]
   in
+  let obut =
+    Button.create run_frame
+      [Text "Change options";
+       Command
+         (fun _ -> do {
+            Pack.forget [gframe];
+            change_options state;
+          })]
+  in
   let wbut = Button.create run_frame [Text "Quit"; Command closeTk] in
-  pack [cbut; wbut] [Fill Fill_X];
+  pack [cbut; obut; wbut] [Fill Fill_X];
+}
+
+and change_options state = do {
+  let (frame, gframe) = window_centering state.tk_win in
+
+  let opt3 = Frame.create frame [] in
+  let lab3 = Label.create opt3 [Text "HTTP Authentication:"] in
+  let tv = Textvariable.create () in
+  let val31 =
+    Radiobutton.create opt3
+      [Text "basic"; Value "basic"; Variable tv]
+  in
+  let val32 =
+    Radiobutton.create opt3
+      [Text "digest"; Value "digest"; Variable tv]
+  in
+  Textvariable.set tv (if state.digest_auth then "digest" else "basic");
+  pack [lab3] [Side Side_Left];
+  pack [val31; val32] [Side Side_Right];
+  pack [opt3] [Fill Fill_X];
+
+  let buts = do {
+    let buts = Frame.create frame [] in
+    let but1 =
+      button_create buts [Text "Cancel"]
+        (fun _ -> do {
+           Pack.forget [gframe];
+           show_main state;
+         })
+    in
+    let but2 =
+      button_create buts [Text "Apply"]
+        (fun _ -> do {
+           state.digest_auth := Textvariable.get tv = "digest";
+           Pack.forget [gframe];
+           close_server state;
+           Unix.sleep 1;
+           launch_server state;
+         })
+    in
+    pack [but1] [Side Side_Left];
+    pack [but2] [Side Side_Right];
+    buts
+  }
+  in
+  pack [(*tit; sel;*) buts] [];
 }
 
 and new_database state = do {
@@ -277,9 +333,9 @@ and new_database state = do {
   }
   in
   pack [tit; sel; buts] [];
-};
+}
 
-value launch_server state = do {
+and launch_server state = do {
   let only = Unix.gethostname () in
   let fd =
     if trace.val then Unix.stdout
@@ -305,6 +361,9 @@ value launch_server state = do {
           else loop ibeg (i + 1) list
     with
     [ Not_found -> [] ]
+  in
+  let rest_of_args =
+    if state.digest_auth then ["-digest" :: rest_of_args] else rest_of_args
   in
   let comm = Filename.concat state.bin_dir "gwd" in
   let args =
@@ -631,7 +690,7 @@ value main () = do {
     {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
      sys_dir = default_sys_dir; port = default_port;
      browser = default_browser; bases_dir = default_bases_dir;
-     server_running = False}
+     digest_auth = False; server_running = False}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
