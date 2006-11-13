@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.117 2006-11-06 13:46:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.118 2006-11-13 16:04:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -551,15 +551,7 @@ value empty_person ip =
 value get_family =
   fun
   [ Union u -> u.Def.family
-  | Union2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "family") in
-      loop [] pos where rec loop list pos =
-        if pos = -1 then Array.of_list list
-        else
-          let (ifam, pos) =
-            get_field_2_data db2 pos ("person", "family") "data"
-          in
-          loop [ifam :: list] pos
+  | Union2 db2 i -> get_field db2 i ("person", "family")
   | Union2Gen db2 u -> u.Def.family ]
 ;
 
@@ -1191,7 +1183,8 @@ value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
   | Base2 db2 -> do {
-     let nb = nb_of_persons base in
+      eprintf "*** loading ascends array\n"; flush stderr;
+      let nb = nb_of_persons base in
       match db2.parents_array with
       [ Some _ -> ()
       | None -> db2.parents_array := Some (parents_array2 db2 nb) ];
