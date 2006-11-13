@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.26 2006-10-30 21:22:43 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.27 2006-11-13 16:04:17 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -19,6 +19,7 @@ type file_field 'a =
     start_pos : (int * int);
     sz32 : mutable int;
     sz64 : mutable int;
+    item_cnt : mutable int;
     valu : 'a -> Obj.t }
 ;
 
@@ -138,14 +139,15 @@ value output_hashtbl dir file ht = do {
 value open_out_field tmp_dir (name, valu) = do {
   let d = Filename.concat tmp_dir name in
   try Mutil.mkdir_p d with _ -> ();
+
   let oc_dat = open_out_bin (Filename.concat d "data") in
   let oc_acc = open_out_bin (Filename.concat d "access") in
-
   let start_pos = create_output_value_header oc_dat in
   Iovalue.output_block_header oc_dat 0 phony_min_size;
+  assert (pos_out oc_dat = Db2.first_item_pos);
   {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
    sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
-   valu = valu}
+   item_cnt = 0; valu = valu}
 };
 
 value output_field so ff = do {
@@ -155,14 +157,15 @@ value output_field so ff = do {
   Iovalue.output ff.oc_dat (ff.valu so);
   ff.sz32 := Iovalue.size_32.val;
   ff.sz64 := Iovalue.size_64.val;
+  ff.item_cnt := ff.item_cnt + 1;
 };
 
-value close_out_field nb_items ff = do {
+value close_out_field ff = do {
   close_out ff.oc_acc;
-  Iovalue.size_32.val := ff.sz32 - phony_min_size + nb_items;
-  Iovalue.size_64.val := ff.sz64 - phony_min_size + nb_items;
+  Iovalue.size_32.val := ff.sz32 - phony_min_size + ff.item_cnt;
+  Iovalue.size_64.val := ff.sz64 - phony_min_size + ff.item_cnt;
   patch_output_value_header ff.oc_dat ff.start_pos;
-  Iovalue.output_block_header ff.oc_dat 0 nb_items;
+  Iovalue.output_block_header ff.oc_dat 0 ff.item_cnt;
   close_out ff.oc_dat;
 };
 
@@ -209,6 +212,116 @@ value family_fields_arr =
    ("mother", fun so -> Obj.repr (Adef.mother so.cpl));
    ("children", fun so -> Obj.repr so.des.children)]
 ;
+
+value make_string_of_crush_index tmp_dir =
+  List.iter
+    (fun field -> do {
+       let field_d =
+         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+       in
+       let ic_dat = open_in_bin (Filename.concat field_d "data") in
+       eprintf "string_of_crush %s..." field;
+       flush stderr;
+       let ht = Hashtbl.create 1 in
+       seek_in ic_dat Db2.empty_string_pos;
+       loop Db2.empty_string_pos where rec loop pos =
+         match
+           try Some (Iovalue.input ic_dat) with [ End_of_file -> None ]
+         with
+         [ Some s -> do {
+             let k = Name.crush_lower s in
+             let posl = Hashtbl.find_all ht k in
+             if List.mem pos posl then () else Hashtbl.add ht k pos;
+             loop (pos_in ic_dat)
+           }
+         | None -> () ];
+       close_in ic_dat;
+       output_hashtbl field_d "string_of_crush.ht" ht;
+       eprintf "\n";
+       flush stderr;
+    })
+   ["first_name"; "surname"]
+;
+
+value make_person_of_string_index tmp_dir =
+  List.iter
+    (fun field -> do {
+       let field_d =
+         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+       in
+       let ic_acc = open_in_bin (Filename.concat field_d "access") in
+       eprintf "person_of_string %s..." field;
+       flush stderr;
+       let ht = Hashtbl.create 1 in
+       loop 0 where rec loop i =
+         match
+           try Some (input_binary_int ic_acc) with [ End_of_file -> None ]
+         with
+         [ Some pos -> do { Hashtbl.add ht pos i; loop (i + 1) }
+         | None -> () ];
+       close_in ic_acc;
+       output_hashtbl field_d "person_of_string.ht" ht;
+       eprintf "\n";
+       flush stderr;
+     })
+    ["first_name"; "surname"]
+;
+
+value read_field (ic_acc, ic_dat) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  seek_in ic_dat pos;
+  Iovalue.input ic_dat
+};
+
+value read_string_field : _ -> _ -> string = read_field;
+value read_int_field : _ -> _ -> int = read_field;
+value read_array_int_field : _ -> _ -> array int = read_field;
+
+value read_string_list_field (ic_acc, ic_dat, ic_str) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  if pos = -1 then []
+  else do {
+    seek_in ic_dat pos;
+    let posl : list int = Iovalue.input ic_dat in
+    List.map
+      (fun pos -> do {
+         seek_in ic_str pos;
+         (Iovalue.input ic_str : string)
+       })
+      posl
+  }
+};
+
+value read_int_array_field (ic_acc, ic_dat) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  loop [] pos where rec loop list pos =
+    if pos = -1 then Array.of_list list
+    else do {
+      seek_in ic_dat pos;
+      let i = Iovalue.input ic_dat in
+      loop [i :: list] (Iovalue.input ic_dat)
+    }
+};
+
+value read_title_list_field (ic_acc, ic_dat, ic_str) i = do {
+  seek_in ic_acc (4 * i);
+  let pos = input_binary_int ic_acc in
+  if pos = -1 then []
+  else do {
+    seek_in ic_dat pos;
+    let tl : list (gen_title int) = Iovalue.input ic_dat in
+    List.map
+      (map_title_strings
+        (fun pos -> do {
+           seek_in ic_str pos;
+           (Iovalue.input ic_str : string)
+         }))
+      tl
+  }
+};
 
 value str_pos oc_str ht item_cnt s =
   try Hashtbl.find ht s with
@@ -285,7 +398,7 @@ value compress_type_list_title field_d ic oc oc_str ht = do {
   close_out oc_ext;
 };
 
-value compress_person_fields tmp_dir =
+value compress_fields tmp_dir =
   List.iter
     (fun (f1, f2, compress_type) -> do {
        let field_d =
@@ -297,7 +410,7 @@ value compress_person_fields tmp_dir =
        let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
        let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
        let ht : Hashtbl.t string int = Hashtbl.create 1 in
-       seek_in ic 25;
+       seek_in ic Db2.first_item_pos;
 
        compress_type field_d ic oc_acc2 oc_dat2 ht;
 
@@ -340,118 +453,55 @@ value compress_person_fields tmp_dir =
      ("person", "titles", compress_type_list_title)]
 ;
 
-value make_string_of_crush_index tmp_dir =
-  List.iter
-    (fun field -> do {
-       let field_d =
-         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
-       in
-       let ic_dat = open_in_bin (Filename.concat field_d "data") in
-       eprintf "string_of_crush %s..." field;
-       flush stderr;
-       let ht = Hashtbl.create 1 in
-       seek_in ic_dat Db2.empty_string_pos;
-       loop Db2.empty_string_pos where rec loop pos =
-         match
-           try Some (Iovalue.input ic_dat) with [ End_of_file -> None ]
-         with
-         [ Some s -> do {
-             let k = Name.crush_lower s in
-             let posl = Hashtbl.find_all ht k in
-             if List.mem pos posl then () else Hashtbl.add ht k pos;
-             loop (pos_in ic_dat)
-           }
-         | None -> () ];
-       close_in ic_dat;
-       output_hashtbl field_d "string_of_crush.ht" ht;
-       eprintf "\n";
-       flush stderr;
-    })
-   ["first_name"; "surname"]
-;
+value reorder_type_list_int field_d ic_acc ic_dat ff = do {
+  let item_cnt = ref 0 in
+  try
+    while True do {
+      let x = read_int_array_field (ic_acc, ic_dat) item_cnt.val in
+      output_field x ff;
+      incr item_cnt;
+    }
+  with
+  [ End_of_file -> () ];
+};
 
-value make_person_of_string_index tmp_dir =
+value reorder_fields tmp_dir =
   List.iter
-    (fun field -> do {
+    (fun (f1, f2, reorder_type) -> do {
        let field_d =
-         List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
+         List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
        in
        let ic_acc = open_in_bin (Filename.concat field_d "access") in
-       eprintf "person_of_string %s..." field;
+       let ic_dat = open_in_bin (Filename.concat field_d "data") in
+       eprintf "reordering %s..." f2;
        flush stderr;
-       let ht = Hashtbl.create 1 in
-       loop 0 where rec loop i =
-         match
-           try Some (input_binary_int ic_acc) with [ End_of_file -> None ]
-         with
-         [ Some pos -> do { Hashtbl.add ht pos i; loop (i + 1) }
-         | None -> () ];
+       let ff = do {
+         let oc_dat = open_out_bin (Filename.concat field_d "data2") in
+         let oc_acc = open_out_bin (Filename.concat field_d "access2") in
+         let start_pos = create_output_value_header oc_dat in
+         Iovalue.output_block_header oc_dat 0 phony_min_size;
+         assert (pos_out oc_dat = Db2.first_item_pos);
+         {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
+          sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
+          item_cnt = 0; valu = Obj.repr}
+       }
+       in
+       reorder_type field_d ic_acc ic_dat ff;
+
+       close_out_field ff;
+       close_in ic_dat;
        close_in ic_acc;
-       output_hashtbl field_d "person_of_string.ht" ht;
-       eprintf "\n";
-       flush stderr;
+       List.iter
+         (fun n -> do {
+            let f = Filename.concat field_d n in
+            Mutil.remove_file f;
+            Sys.rename (Filename.concat field_d (n ^ "2")) f;
+          })
+         ["data"; "access"];
+       Printf.eprintf "\n"; flush stderr
      })
-    ["first_name"; "surname"]
+    [("person", "family", reorder_type_list_int)]
 ;
-
-value read_string_field (ic_acc, ic_dat) i = do {
-  seek_in ic_acc (4 * i);
-  let pos = input_binary_int ic_acc in
-  seek_in ic_dat pos;
-  (Iovalue.input ic_dat : string)
-};
-
-value read_int_field (ic_acc, ic_dat) i = do {
-  seek_in ic_acc (4 * i);
-  let pos = input_binary_int ic_acc in
-  seek_in ic_dat pos;
-  (Iovalue.input ic_dat : int)
-};
-
-value read_string_list_field (ic_acc, ic_dat, ic_str) i = do {
-  seek_in ic_acc (4 * i);
-  let pos = input_binary_int ic_acc in
-  if pos = -1 then []
-  else do {
-    seek_in ic_dat pos;
-    let posl : list int = Iovalue.input ic_dat in
-    List.map
-      (fun pos -> do {
-         seek_in ic_str pos;
-         (Iovalue.input ic_str : string)
-       })
-      posl
-  }
-};
-
-value read_int_array_field (ic_acc, ic_dat) i = do {
-  seek_in ic_acc (4 * i);
-  let pos = input_binary_int ic_acc in
-  loop [] pos where rec loop list pos =
-    if pos = -1 then Array.of_list list
-    else do {
-      seek_in ic_dat pos;
-      let i = Iovalue.input ic_dat in
-      loop [i :: list] (Iovalue.input ic_dat)
-    }
-};
-
-value read_title_list_field (ic_acc, ic_dat, ic_str) i = do {
-  seek_in ic_acc (4 * i);
-  let pos = input_binary_int ic_acc in
-  if pos = -1 then []
-  else do {
-    seek_in ic_dat pos;
-    let tl : list (gen_title int) = Iovalue.input ic_dat in
-    List.map
-      (map_title_strings
-        (fun pos -> do {
-           seek_in ic_str pos;
-           (Iovalue.input ic_str : string)
-         }))
-      tl
-  }
-};
 
 value make_name_index tmp_dir nbper = do {
   eprintf "name index...\n";
@@ -500,7 +550,7 @@ value make_name_index tmp_dir nbper = do {
     read_string_list_field (List.assoc "surnames_aliases" ic3_list)
   in
   let get_titles = read_title_list_field (List.assoc "titles" ic3_list) in
-  let get_family = read_int_array_field (List.assoc "family" ic2_list) in
+  let get_family = read_array_int_field (List.assoc "family" ic2_list) in
   let get_father = read_int_field (List.assoc "father" ic2_list) in
   let get_husbands =
     let (ic_acc, ic_dat) = List.assoc "sex" ic2_list in
@@ -1040,8 +1090,8 @@ value link gwo_list bname =
     else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
     else ProgrBar.finish ();
 
-    List.iter (close_out_field gen.g_pcnt) person_fields;
-    List.iter (close_out_field gen.g_fcnt) family_fields;
+    List.iter close_out_field person_fields;
+    List.iter close_out_field family_fields;
     Iochan.close (fst person_notes);
     close_out (snd person_notes);
     Iochan.close (fst person_related);
@@ -1068,7 +1118,8 @@ value link gwo_list bname =
     Hashtbl.clear gen.g_strings;
     Gc.compact ();
 
-    compress_person_fields tmp_dir;
+    compress_fields tmp_dir;
+    reorder_fields tmp_dir;
     make_string_of_crush_index tmp_dir;
     make_person_of_string_index tmp_dir;
     make_name_index tmp_dir gen.g_pcnt;
