@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.119 2006-11-13 20:27:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.120 2006-11-13 21:28:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -23,12 +23,13 @@ type patches =
 ;
 
 type db2 =
-  { foo : unit -> unit; (* to prevent usage of "=" in the program *)
+  { phony : unit -> unit; (* to prevent usage of "=" in the program *)
     bdir : string;
     cache_chan : Hashtbl.t (string * string * string) in_channel;
     patches : patches;
     parents_array : mutable option (array (option ifam));
     consang_array : mutable option (array Adef.fix);
+    family_array : mutable option (array (array ifam));
     father_array : mutable option (array iper);
     mother_array : mutable option (array iper) }
 ;
@@ -552,7 +553,10 @@ value empty_person ip =
 value get_family =
   fun
   [ Union u -> u.Def.family
-  | Union2 db2 i -> get_field db2 i ("person", "family")
+  | Union2 db2 i ->
+      match db2.family_array with
+      [ Some tab -> tab.(i)
+      | None -> get_field db2 i ("person", "family") ]
   | Union2Gen db2 u -> u.Def.family ]
 ;
 
@@ -1180,6 +1184,16 @@ value consang_array2 db2 nb =
   | None -> Array.make nb no_consang ]
 ;
 
+value family_array2 db2 nb = do {
+  let fname =
+    List.fold_left Filename.concat db2.bdir ["person"; "family"; "data"]
+  in
+  let ic = open_in_bin fname in
+  let tab = input_value ic in
+  close_in ic;
+  tab
+};
+
 value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
@@ -1198,7 +1212,13 @@ value load_ascends_array base =
 value load_unions_array base =
   match base with
   [ Base base -> base.data.unions.load_array ()
-  | Base2 _ -> () ]
+  | Base2 db2 -> do {
+      eprintf "*** loading unions array\n"; flush stderr;
+      let nb = nb_of_persons base in
+      match db2.family_array with
+      [ Some _ -> ()
+      | None -> db2.family_array := Some (family_array2 db2 nb) ];
+    } ]
 ;
 
 value load_couples_array base =
@@ -1456,8 +1476,8 @@ value base_of_base2 bname =
   in
   Base2
     {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches;
-     parents_array = None; consang_array = None; foo () = ();
-     father_array = None; mother_array = None}
+     parents_array = None; consang_array = None; family_array = None;
+     father_array = None; mother_array = None; phony () = ()}
 ;
 
 value open_base bname =
