@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.20 2006-11-13 07:22:19 ddr Exp $ *)
+(* $Id: launch.ml,v 1.21 2006-11-13 12:37:46 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -12,6 +12,7 @@ type state =
     port : mutable int;
     browser : mutable option string;
     bases_dir : mutable string;
+    browser_lang : mutable bool;
     digest_auth : mutable bool;
     server_running : mutable bool }
 ;
@@ -47,7 +48,7 @@ value mkdir_p x =
     do  {
       let y = Filename.dirname x;
       if y <> x && String.length y < String.length x then loop y else ();
-      try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+      try Unix.mkdir x 0o777 with [ Unix.Unix_error _ _ _ -> () ];
     }
 ;
 
@@ -247,18 +248,32 @@ value rec show_main state = do {
 and change_options state = do {
   let (frame, gframe) = window_centering state.tk_win in
 
+  let opt2 = Frame.create frame [] in
+  let lab2 = Label.create opt2 [Text "Select browser language if any:"] in
+  let tv2 = Textvariable.create () in
+  let val21 =
+    Radiobutton.create opt2 [Text "yes"; Value "yes"; Variable tv2]
+  in
+  let val22 =
+    Radiobutton.create opt2 [Text "no"; Value "no"; Variable tv2]
+  in
+  Textvariable.set tv2 (if state.browser_lang then "yes" else "no");
+  pack [lab2] [Side Side_Left];
+  pack [val21; val22] [Side Side_Right];
+  pack [opt2] [Fill Fill_X];
+
   let opt3 = Frame.create frame [] in
   let lab3 = Label.create opt3 [Text "HTTP Authentication:"] in
-  let tv = Textvariable.create () in
+  let tv3 = Textvariable.create () in
   let val31 =
     Radiobutton.create opt3
-      [Text "basic"; Value "basic"; Variable tv]
+      [Text "basic"; Value "basic"; Variable tv3]
   in
   let val32 =
     Radiobutton.create opt3
-      [Text "digest"; Value "digest"; Variable tv]
+      [Text "digest"; Value "digest"; Variable tv3]
   in
-  Textvariable.set tv (if state.digest_auth then "digest" else "basic");
+  Textvariable.set tv3 (if state.digest_auth then "digest" else "basic");
   pack [lab3] [Side Side_Left];
   pack [val31; val32] [Side Side_Right];
   pack [opt3] [Fill Fill_X];
@@ -275,7 +290,8 @@ and change_options state = do {
     let but2 =
       button_create buts [Text "Apply"]
         (fun _ -> do {
-           state.digest_auth := Textvariable.get tv = "digest";
+           state.browser_lang := Textvariable.get tv2 = "yes";
+           state.digest_auth := Textvariable.get tv3 = "digest";
            Pack.forget [gframe];
            close_server state;
            Unix.sleep 1;
@@ -341,7 +357,7 @@ and launch_server state = do {
     if trace.val then Unix.stdout
     else
       Unix.openfile "gwd.log" [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC]
-        0o644
+        0o666
   in
   let stop_server =
     List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
@@ -365,11 +381,14 @@ and launch_server state = do {
   let rest_of_args =
     if state.digest_auth then ["-digest" :: rest_of_args] else rest_of_args
   in
+  let rest_of_args =
+    if state.browser_lang then ["-blang" :: rest_of_args] else rest_of_args
+  in
   let comm = Filename.concat state.bin_dir "gwd" in
   let args =
     ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
      "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
-     state.bases_dir; "-blang" :: rest_of_args]
+     state.bases_dir :: rest_of_args]
   in
   eprintf "%s" comm;
   List.iter (fun a -> eprintf " %s" a) args;
@@ -690,7 +709,7 @@ value main () = do {
     {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
      sys_dir = default_sys_dir; port = default_port;
      browser = default_browser; bases_dir = default_bases_dir;
-     digest_auth = False; server_running = False}
+     browser_lang = True; digest_auth = False; server_running = False}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
