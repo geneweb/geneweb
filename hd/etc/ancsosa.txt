@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.7 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.8 2006-11-14 08:37:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -183,18 +183,19 @@
 
 %define;child_notes(spec)
   %if;(child.sosa_in_list = "" and
-       (child.has_sources or child.has_notes))
+       (evar.src = "on" and child.has_sources or
+        evar.notes = "on" and child.has_notes))
     <dt><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;
     %if;("spec" != "")-spec%end;
     %apply;letter(child_cnt)"><b>%ancestor.anc_sosa;
     %if;("spec" != "")-spec%end;
     %apply;letter(child_cnt)</b></a>:</dt>
     <dd>
-    %if;child.has_notes;
+    %if;(evar.notes = "on" and child.has_notes)
       <table><tr><td>%child.notes;</td></tr></table>
       <br%/>
     %end;
-    %if;child.has_sources;
+    %if;(evar.src = "on" and child.has_sources)
       <em style="font-size:80%%">[*source/sources]1:<br%/>
       %foreach;child.source;
         - %source_type;: %source;<br%/>
@@ -207,23 +208,24 @@
 %end;
 
 %define;long_display_notes()
-  <h3>[*note/notes]1</h3>
+  <h3>%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
   <dl>
   %foreach;ancestor_level;
     %if;(evar.v != "" and level <= evar.v
          and (evar.only != "on" or level = evar.v))
       %foreach;ancestor;
-        %if;((ancestor.has_sources or ancestor.has_notes)
+        %if;((evar.src = "on" and ancestor.has_sources or
+              evar.notes = "on" and ancestor.has_notes)
              and ancestor.same = "")
           <dt><b><a href="#%ancestor.anc_sosa.v;
           " name="notes-%ancestor.anc_sosa.v;
           ">%ancestor.anc_sosa;</a></b>:</dt>
           <dd>
-          %if;ancestor.has_notes;
+          %if;(evar.notes = "on" and ancestor.has_notes)
             <table><tr><td>%ancestor.notes;</td></tr></table>
             <br%/>
           %end;
-          %if;ancestor.has_sources;
+          %if;(evar.src = "on" and ancestor.has_sources)
             <em style="font-size:80%%">[*source/sources]1:<br%/>
             %foreach;ancestor.source;
               - %source_type;: %source;<br%/>
@@ -278,9 +280,10 @@
     <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;
     </a></b>.
   %end;
-  %if;(evar.notes = "on" and
-      (ancestor.has_sources or ancestor.has_notes))
-    %[[*note/notes]0%sp;
+  %if;(evar.notes = "on" and ancestor.has_notes or
+       evar.src = "on" and ancestor.has_sources)
+    %if;(evar.notes = "on")%[[*note/notes]0%sp;
+    %else;%[[*source/sources]1%sp;%end;
     <b><a href="#notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>%].
   %end;
   %if;(evar.siblings = "on")
@@ -343,12 +346,13 @@
       %if;are_divorced;[*divorced]0%divorce_date;.%nl;
       %elseif;are_separated;[*separated]0.%nl;%end;
     %end;
-    %if;(evar.notes = "on" and
-        (child.has_sources or child.has_notes))
-      %[[*note/notes]0%sp;
+    %if;(evar.notes = "on" and child.has_notes or
+         evar.src = "on" and child.has_sources)
+      %if;(evar.notes = "on")%[[*note/notes]0%sp;
+      %else;%[[*source/sources]1%sp;%end;
       <b><a href="#notes-%ancestor.anc_sosa.v;
       %if;("spec" != "")-spec%end;
-      %apply;letter(child_cnt)">%ancestor.sosa;
+      %apply;letter(child_cnt)">%ancestor.anc_sosa;
       %if;("spec" != "")-spec%end;
       %apply;letter(child_cnt)</a></b>%].
     %end;
@@ -733,7 +737,7 @@
       <br%/>
     %end;
   %end;
-  %if;(evar.notes = "on")
+  %if;(evar.notes = "on" or evar.src = "on")
     <p><hr%/></p>
     <p>
     %apply;long_display_notes()
