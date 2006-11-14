@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.38 2006-11-12 22:26:16 ddr Exp $ *)
+(* $Id: perso.ml,v 5.39 2006-11-14 08:37:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2629,7 +2629,7 @@ value print_foreach conf base print_ast eval_expr =
     let rec insert_loop typ src =
       fun
       [ [(typ1, src1) :: srcl] ->
-          if src = src1 then [(typ1 ^ ", " ^ typ, src1) :: srcl]
+          if eq_istr src src1 then [(typ1 ^ ", " ^ typ, src1) :: srcl]
           else [(typ1, src1) :: insert_loop typ src srcl]
       | [] -> [(typ, src)] ]
     in

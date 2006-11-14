@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 5.4 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 5.5 2006-11-14 08:37:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -122,6 +122,11 @@
           <label>
             - [*note/notes]1
             <input type="checkbox" name="notes" value="on" checked="checked"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*source/sources]1
+            <input type="checkbox" name="src" value="on" checked="checked"%/>
           </label>
           <br%/><br%/>
           <label>
