@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.120 2006-11-13 21:28:06 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.121 2006-11-14 13:17:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -31,7 +31,8 @@ type db2 =
     consang_array : mutable option (array Adef.fix);
     family_array : mutable option (array (array ifam));
     father_array : mutable option (array iper);
-    mother_array : mutable option (array iper) }
+    mother_array : mutable option (array iper);
+    children_array : mutable option (array (array iper)) }
 ;
 
 type istr =
@@ -714,7 +715,10 @@ value gen_couple_of_couple =
 value get_children =
   fun
   [ Descend d -> d.Def.children
-  | Descend2 db2 i -> get_field db2 i ("family", "children")
+  | Descend2 db2 i ->
+      match db2.children_array with
+      [ Some tab -> tab.(i)
+      | None -> get_field db2 i ("family", "children") ]
   | Descend2Gen db2 d -> d.Def.children ]
 ;
 
@@ -1184,7 +1188,7 @@ value consang_array2 db2 nb =
   | None -> Array.make nb no_consang ]
 ;
 
-value family_array2 db2 nb = do {
+value family_array2 db2 = do {
   let fname =
     List.fold_left Filename.concat db2.bdir ["person"; "family"; "data"]
   in
@@ -1212,19 +1216,20 @@ value load_ascends_array base =
 value load_unions_array base =
   match base with
   [ Base base -> base.data.unions.load_array ()
-  | Base2 db2 -> do {
-      eprintf "*** loading unions array\n"; flush stderr;
-      let nb = nb_of_persons base in
+  | Base2 db2 ->
       match db2.family_array with
       [ Some _ -> ()
-      | None -> db2.family_array := Some (family_array2 db2 nb) ];
-    } ]
+      | None -> do {
+          eprintf "*** loading unions array\n"; flush stderr;
+          db2.family_array := Some (family_array2 db2)
+        } ] ]
 ;
 
 value load_couples_array base =
   match base with
   [ Base base -> base.data.couples.load_array ()
   | Base2 db2 -> do {
+      eprintf "*** loading couples array\n"; flush stderr;
       let nb = nb_of_families base in
       match db2.father_array with
       [ Some _ -> ()
@@ -1251,10 +1256,26 @@ value load_couples_array base =
     } ]
 ;
 
+value children_array2 db2 = do {
+  let fname =
+    List.fold_left Filename.concat db2.bdir ["family"; "children"; "data"]
+  in
+  let ic = open_in_bin fname in
+  let tab = input_value ic in
+  close_in ic;
+  tab
+};
+
 value load_descends_array base =
   match base with
   [ Base base -> base.data.descends.load_array ()
-  | Base2 _ -> () ]
+  | Base2 db2 ->
+      match db2.children_array with
+      [ Some _ -> ()
+      | None -> do {
+          eprintf "*** loading descends array\n"; flush stderr;
+          db2.children_array := Some (children_array2 db2)
+        } ] ]
 ;
 
 value load_strings_array base =
@@ -1477,7 +1498,8 @@ value base_of_base2 bname =
   Base2
     {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches;
      parents_array = None; consang_array = None; family_array = None;
-     father_array = None; mother_array = None; phony () = ()}
+     father_array = None; mother_array = None; children_array = None;
+     phony () = ()}
 ;
 
 value open_base bname =
