@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.11 2006-10-17 05:41:29 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.12 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -401,7 +401,7 @@ value print_update_fam conf base fcd digest =
   | _ -> incorrect_request conf ]
 ;
 
-value print_del1 conf base fam =
+value print_del1 conf base ifam =
   let title _ =
     let s = transl_nth conf "family/families" 0 in
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
@@ -414,7 +414,7 @@ value print_del1 conf base fam =
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_ifam (get_fam_index fam));
+          (Adef.int_of_ifam ifam);
         match p_getenv conf.env "ip" with
         [ Some ip -> xtag "input" "type=\"hidden\" name=\"ip\" value=\"%s\"" ip
         | None -> () ];
@@ -429,12 +429,12 @@ value print_del1 conf base fam =
   }
 ;
 
-value print_inv1 conf base p fam1 fam2 =
+value print_inv1 conf base p ifam1 ifam2 =
   let title _ =
     Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
   in
-  let cpl1 = coi base (get_fam_index fam1) in
-  let cpl2 = coi base (get_fam_index fam2) in
+  let cpl1 = coi base ifam1 in
+  let cpl2 = coi base ifam2 in
   do {
     header conf title;
     Wserver.wprint "%s:"
@@ -458,7 +458,7 @@ value print_inv1 conf base p fam1 fam2 =
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"hidden\" name=\"f\" value=\"%d\""
-          (Adef.int_of_ifam (get_fam_index fam2));
+          (Adef.int_of_ifam ifam2);
         xtag "input" "type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"";
       end;
       tag "p" begin
@@ -539,9 +539,7 @@ value print_mod conf base =
 
 value print_del conf base =
   match p_getint conf.env "i" with
-  [ Some i ->
-      let fam = foi base (Adef.ifam_of_int i) in
-      print_del1 conf base fam
+  [ Some i -> print_del1 conf base (Adef.ifam_of_int i)
   | _ -> incorrect_request conf ]
 ;
 
@@ -562,7 +560,7 @@ value print_inv conf base =
       with
       [ Some (ifam1, ifam2) ->
           let p = poi base (Adef.iper_of_int ip) in
-          print_inv1 conf base p (foi base ifam1) (foi base ifam2)
+          print_inv1 conf base p ifam1 ifam2
       | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;

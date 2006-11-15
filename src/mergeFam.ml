@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 5.7 2006-09-30 18:45:55 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 5.8 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -38,7 +38,7 @@ value need_differences_selection conf base fam1 fam2 =
            | None -> "divorced" ] ])
 ;
 
-value print_differences conf base branches fam1 fam2 =
+value print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   let string_field title name proj =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
@@ -61,9 +61,9 @@ value print_differences conf base branches fam1 fam2 =
     Util.hidden_env conf;
     Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
     Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
-      (Adef.int_of_ifam (get_fam_index fam1));
+      (Adef.int_of_ifam ifam1);
     Wserver.wprint "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
-      (Adef.int_of_ifam (get_fam_index fam2));
+      (Adef.int_of_ifam ifam2);
     match p_getenv conf.env "ip" with
     [ Some ip ->
         Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
@@ -133,13 +133,13 @@ value merge_fam1 conf base fam1 fam2 =
   }
 ;
 
-value merge_fam conf base fam1 fam2 =
-  let cpl1 = coi base (get_fam_index fam1) in
-  let cpl2 = coi base (get_fam_index fam2) in
+value merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
+  let cpl1 = coi base ifam1 in
+  let cpl2 = coi base ifam2 in
   if get_father cpl1 = get_father cpl2 && get_mother cpl1 = get_mother cpl2
   then
     if need_differences_selection conf base fam1 fam2 then
-      merge_fam1 conf base fam1 fam2
+      merge_fam1 conf base (ifam1, fam1) (ifam2, fam2)
     else MergeFamOk.print_merge conf base
   else incorrect_request conf
 ;
@@ -147,8 +147,10 @@ value merge_fam conf base fam1 fam2 =
 value print conf base =
   match (p_getint conf.env "i", p_getint conf.env "i2") with
   [ (Some f1, Some f2) ->
-      let fam1 = foi base (Adef.ifam_of_int f1) in
-      let fam2 = foi base (Adef.ifam_of_int f2) in
-      merge_fam conf base fam1 fam2
+      let ifam1 = Adef.ifam_of_int f1 in
+      let ifam2 = Adef.ifam_of_int f2 in
+      let fam1 = foi base ifam1 in
+      let fam2 = foi base ifam2 in
+      merge_fam conf base (ifam1, fam1) (ifam2, fam2)
   | _ -> incorrect_request conf ]
 ;

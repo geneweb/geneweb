@@ -1,10 +1,9 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.15 2006-10-30 11:31:33 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.16 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Util;
 
@@ -73,8 +72,8 @@ value select_family conf base get_date find_oldest =
   let module QF =
     Pqueue.Make
       (struct
-         type t = (Gwdb.family * Def.dmy * Def.calendar);
-         value leq (_, x, _) (_, y, _) =
+         type t = (Adef.ifam * Gwdb.family * Def.dmy * Def.calendar);
+         value leq (_, _, x, _) (_, _, y, _) =
            if find_oldest then Date.before_date x y else Date.before_date y x;
        end)
   in
@@ -104,9 +103,9 @@ value select_family conf base get_date find_oldest =
       loop [] q
     else
       let fam = foi base (Adef.ifam_of_int i) in
-      if Gutil.is_deleted_family fam then loop q len (i + 1)
+      if is_deleted_family fam then loop q len (i + 1)
       else
-        match get_date fam with
+        match get_date (Adef.ifam_of_int i) fam with
         [ Some (Dgreg d cal) ->
             let aft =
               match ref_date with
@@ -115,7 +114,7 @@ value select_family conf base get_date find_oldest =
             in
             if aft then loop q len (i + 1)
             else
-              let e = (fam, d, cal) in
+              let e = (Adef.ifam_of_int i, fam, d, cal) in
               if len < n then loop (QF.add e q) (len + 1) (i + 1)
               else loop (snd (QF.take (QF.add e q))) len (i + 1)
         | _ -> loop q len (i + 1) ]
@@ -403,12 +402,12 @@ value print_marr_or_eng conf base title list len =
     Wserver.wprint "<ul>\n";
     let _ =
       List.fold_left
-        (fun (last_month_txt, was_future) (fam, d, cal) ->
+        (fun (last_month_txt, was_future) (ifam, fam, d, cal) ->
            let month_txt =
              let d = {(d) with day = 0} in
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
-           let cpl = coi base (get_fam_index fam) in
+           let cpl = coi base ifam in
            let future = CheckItem.strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
@@ -461,7 +460,7 @@ value print_marr_or_eng conf base title list len =
 value print_marriage conf base =
   let (list, len) =
     select_family conf base
-      (fun fam ->
+      (fun ifam fam ->
          if get_relation fam = Married then
            Adef.od_of_codate (get_marriage fam)
          else None)
@@ -476,9 +475,9 @@ value print_marriage conf base =
 value print_oldest_engagements conf base =
   let (list, len) =
     select_family conf base
-      (fun fam ->
+      (fun ifam fam ->
          if get_relation fam = Engaged then
-           let cpl = coi base (get_fam_index fam) in
+           let cpl = coi base ifam in
            let husb = poi base (get_father cpl) in
            let wife = poi base (get_mother cpl) in
            match (get_death husb, get_death wife) with

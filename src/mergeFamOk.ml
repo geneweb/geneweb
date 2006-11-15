@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.10 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.11 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -34,7 +34,7 @@ value merge_witnesses base wit1 wit2 =
   Array.of_list list
 ;
 
-value reconstitute conf base fam1 des1 fam2 des2 =
+value reconstitute conf base ifam1 fam1 des1 fam2 des2 =
   let field name proj null =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
@@ -59,7 +59,7 @@ value reconstitute conf base fam1 des1 fam2 des2 =
      origin_file = sou base (get_origin_file fam1);
      fsources =
        merge_strings base (get_fsources fam1) ", " (get_fsources fam2);
-     fam_index = get_fam_index fam1}
+     fam_index = ifam1}
   in
   let des =
     {children =
@@ -72,15 +72,14 @@ value reconstitute conf base fam1 des1 fam2 des2 =
 value print_merge conf base =
   match (p_getint conf.env "i", p_getint conf.env "i2") with
   [ (Some f1, Some f2) ->
-      let fam1 = foi base (Adef.ifam_of_int f1) in
-      let des1 = doi base (Adef.ifam_of_int f1) in
+      let ifam1 = Adef.ifam_of_int f1 in
+      let fam1 = foi base ifam1 in
+      let des1 = doi base ifam1 in
       let fam2 = foi base (Adef.ifam_of_int f2) in
       let des2 = doi base (Adef.ifam_of_int f2) in
-      let (sfam, sdes) = reconstitute conf base fam1 des1 fam2 des2 in
+      let (sfam, sdes) = reconstitute conf base ifam1 fam1 des1 fam2 des2 in
       let digest =
-        let ini_sfam =
-          UpdateFam.string_family_of conf base (Adef.ifam_of_int f1)
-        in
+        let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
         Update.digest_family ini_sfam
       in
       let scpl =
@@ -121,14 +120,15 @@ value print_mod_merge_ok conf base wl cpl des =
 value effective_mod_merge conf base sfam scpl sdes =
   match p_getint conf.env "i2" with
   [ Some i2 ->
-      let fam2 = foi base (Adef.ifam_of_int i2) in
+      let ifam2 = Adef.ifam_of_int i2 in
+      let fam2 = foi base ifam2 in
       do {
-        UpdateFamOk.effective_del conf base fam2;
-        let (fam, cpl, des) =
+        UpdateFamOk.effective_del conf base (ifam2, fam2);
+        let (ifam, fam, cpl, des) =
           UpdateFamOk.effective_mod conf base sfam scpl sdes
         in
         let wl =
-          UpdateFamOk.all_checks_family conf base fam cpl des
+          UpdateFamOk.all_checks_family conf base ifam fam cpl des
             (scpl, sdes, None (* should be Some *))
         in
         let ((fn, sn, occ, _, _), ip) =

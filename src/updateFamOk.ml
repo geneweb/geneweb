@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.29 2006-10-24 19:27:42 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.30 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -489,7 +489,7 @@ value effective_mod conf base sfam scpl sdes =
         let ou = uoi base oarr.(i) in
         let ou =
           union_of_gen_union base
-            {family = family_exclude (get_family ou) (get_fam_index ofam)}
+            {family = family_exclude (get_family ou) fi}
         in
         patch_union base oarr.(i) ou
       }
@@ -562,7 +562,7 @@ value effective_mod conf base sfam scpl sdes =
     Update.update_misc_names_of_family conf base nfath nfath_u;
     update_related_witnesses base (Array.to_list (get_witnesses ofam))
       (Array.to_list (get_witnesses nfam)) ncpl;
-    (nfam, ncpl, ndes)
+    (fi, nfam, ncpl, ndes)
   }
 ;
 
@@ -653,7 +653,7 @@ value effective_add conf base sfam scpl sdes =
     Update.update_misc_names_of_family conf base nfath_p nfath_u;
     update_related_witnesses base [] (Array.to_list (get_witnesses nfam))
       ncpl;
-    (nfam, ncpl, ndes)
+    (fi, nfam, ncpl, ndes)
   }
 ;
 
@@ -672,12 +672,12 @@ value effective_inv conf base ip u ifam =
   patch_union base ip u
 ;
 
-value kill_family base fam ip =
+value kill_family base ifam1 ip =
   let u = uoi base ip in
   let l =
     List.fold_right
       (fun ifam ifaml ->
-         if ifam = get_fam_index fam then ifaml else [ifam :: ifaml])
+         if ifam = ifam1 then ifaml else [ifam :: ifaml])
       (Array.to_list (get_family u)) []
   in
   let u = union_of_gen_union base {family = Array.of_list l} in
@@ -689,12 +689,11 @@ value kill_parents base ip =
   patch_ascend base ip a
 ;
 
-value effective_del conf base fam = do {
-  let ifam = get_fam_index fam in
+value effective_del conf base (ifam, fam) = do {
   let cpl = coi base ifam in
   let des = doi base ifam in
-  kill_family base fam (get_father cpl);
-  kill_family base fam (get_mother cpl);
+  kill_family base ifam (get_father cpl);
+  kill_family base ifam (get_mother cpl);
   Array.iter (kill_parents base) (get_children des);
   let cpl =
     couple_of_gen_couple base
@@ -765,7 +764,7 @@ value need_check_noloop (scpl, sdes, onfs) =
   else False
 ;
 
-value all_checks_family conf base fam cpl des scdo =
+value all_checks_family conf base ifam fam cpl des scdo =
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
@@ -774,7 +773,7 @@ value all_checks_family conf base fam cpl des scdo =
       Consang.check_noloop_for_person_list base error
         (Array.to_list (get_parent_array cpl))
     else ();
-    CheckItem.family base error warning fam cpl des;
+    CheckItem.family base error warning ifam fam cpl des;
     List.rev wl.val
   }
 ;
@@ -920,8 +919,10 @@ value print_add o_conf base =
       print_error_disconnected conf
     else do {
       let (sfam, sdes) = strip_family sfam sdes in
-      let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
-      let wl = all_checks_family conf base fam cpl des (scpl, sdes, None) in
+      let (ifam, fam, cpl, des) = effective_add conf base sfam scpl sdes in
+      let wl =
+        all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
+      in
       let ((fn, sn, occ, _, _), i, act) =
         match p_getint conf.env "ip" with
         [ Some i ->
@@ -930,7 +931,7 @@ value print_add o_conf base =
             else
               let a = aoi base (Adef.iper_of_int i) in
               match get_parents a with
-              [ Some x when x = get_fam_index fam ->
+              [ Some x when x = ifam ->
                   let p = poi base (Adef.iper_of_int i) in
                   let key =
                     (sou base (get_first_name p), sou base (get_surname p),
@@ -952,9 +953,10 @@ value print_add o_conf base =
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let fam = foi base (Adef.ifam_of_int i) in
+      let ifam = Adef.ifam_of_int i in
+      let fam = foi base ifam in
       let k =
-        let cpl = coi base (Adef.ifam_of_int i) in
+        let cpl = coi base ifam in
         let ip =
           match p_getint conf.env "ip" with
           [ Some i when Adef.int_of_iper (get_mother cpl) = i ->
@@ -967,7 +969,7 @@ value print_del conf base =
       in
       do {
         if not (is_deleted_family fam) then do {
-          effective_del conf base fam;
+          effective_del conf base (ifam, fam);
           Util.commit_patches conf base;
           History.record conf base k "df";
           Update.delete_topological_sort conf base
@@ -1011,10 +1013,12 @@ value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
     let ofs = family_structure conf base sfam.fam_index in
-    let (fam, cpl, des) = effective_mod conf base sfam scpl sdes in
+    let (ifam, fam, cpl, des) = effective_mod conf base sfam scpl sdes in
     let nfs = (get_parent_array cpl, get_children des) in
     let onfs = Some (ofs, nfs) in
-    let wl = all_checks_family conf base fam cpl des (scpl, sdes, onfs) in
+    let wl =
+      all_checks_family conf base ifam fam cpl des (scpl, sdes, onfs)
+    in
     let ((fn, sn, occ, _, _), ip) =
       match p_getint conf.env "ip" with
       [ Some i ->
