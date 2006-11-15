@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.2 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.3 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -276,15 +276,13 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
   | None -> () ]
 ;
 
-value check_normal_marriage_date base error warning fam =
-  let cpl = coi base (get_fam_index fam) in
-  do {
-    check_normal_marriage_date_for_someone base error warning fam
-      (get_father cpl);
-    check_normal_marriage_date_for_someone base error warning fam
-      (get_mother cpl);
-  }
-;
+value check_normal_marriage_date base error warning (ifam, fam) = do {
+  let cpl = coi base ifam in
+  check_normal_marriage_date_for_someone base error warning fam
+    (get_father cpl);
+  check_normal_marriage_date_for_someone base error warning fam
+    (get_mother cpl);
+};
 
 (*
  * Semi sort children by birth dates.
@@ -471,8 +469,7 @@ value person base error warning p = do {
   related_sex_is_coherent base warning p
 };
 
-value family base error warning fam cpl des =
-  let ifam = get_fam_index fam in
+value family base error warning ifam fam cpl des =
   let fath = poi base (get_father cpl) in
   let moth = poi base (get_mother cpl) in
   do {
@@ -488,7 +485,7 @@ value family base error warning fam cpl des =
         if get_relation fam = NoSexesCheckNotMarried ||
            get_relation fam = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson moth) ];
-    check_normal_marriage_date base error warning fam;
+    check_normal_marriage_date base error warning (ifam, fam);
     sort_children base warning ifam des;
     let _ =
       List.fold_left

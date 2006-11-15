@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.14 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: check.ml,v 5.15 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -6,8 +6,6 @@ open Gwdb;
 open Printf;
 
 (* Printing check errors *)
-
-value is_deleted_family fam = get_fam_index fam = Adef.ifam_of_int (-1);
 
 value designation base p =
   let first_name = p_first_name base p in
@@ -199,12 +197,13 @@ value check_base_aux base error warning changed_p =
     ProgrBar.start ();
     for i = 0 to nb_of_families base - 1 do {
       ProgrBar.run i (nb_of_families base);
-      let fam = foi base (Adef.ifam_of_int i) in
+      let ifam = Adef.ifam_of_int i in
+      let fam = foi base ifam in
       if is_deleted_family fam then ()
       else
-        let cpl = coi base (Adef.ifam_of_int i) in
-        let des = doi base (Adef.ifam_of_int i) in
-        CheckItem.family base error warning fam cpl des
+        let cpl = coi base ifam in
+        let des = doi base ifam in
+        CheckItem.family base error warning ifam fam cpl des
     };
     ProgrBar.finish ();
     Consang.check_noloop base error;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.26 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.27 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -412,9 +412,9 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   }
 ;
 
-value effective_merge_fam conf base fam1 fam2 p1 p2 =
-  let des1 = doi base (get_fam_index fam1) in
-  let des2 = doi base (get_fam_index fam2) in
+value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 =
+  let des1 = doi base ifam1 in
+  let des2 = doi base ifam2 in
   let fam1 =
     family_of_gen_family base
       {(gen_family_of_family fam1) with
@@ -434,23 +434,23 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
          else get_fsources fam1}
   in
   do {
-    patch_family base (get_fam_index fam1) fam1;
+    patch_family base ifam1 fam1;
     let des1 =
       descend_of_gen_descend base
         {children = Array.append (get_children des1) (get_children des2)}
     in
-    patch_descend base (get_fam_index fam1) des1;
+    patch_descend base ifam1 des1;
     for i = 0 to Array.length (get_children des2) - 1 do {
       let ip = (get_children des2).(i) in
       let a =
         ascend_of_gen_ascend base
-          {parents = Some (get_fam_index fam1); consang = Adef.fix (-1)}
+          {parents = Some ifam1; consang = Adef.fix (-1)}
       in
       patch_ascend base ip a;
     };
     let des2 = descend_of_gen_descend base {children = [| |]} in
-    patch_descend base (get_fam_index fam2) des2;
-    UpdateFamOk.effective_del conf base fam2;
+    patch_descend base ifam2 des2;
+    UpdateFamOk.effective_del conf base (ifam2, fam2);
   }
 ;
 
@@ -460,10 +460,11 @@ value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
   let fam1 = foi base ifam1 in
   let fam2 = foi base ifam2 in
   if compatible_fam base fam1 fam2 then do {
-    effective_merge_fam conf base fam1 fam2 p1 p2; (True, True)
+    effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2;
+    (True, True)
   }
   else do {
-    propose_merge_fam conf base branches fam1 fam2 p1 p2;
+    propose_merge_fam conf base branches (ifam1, fam1) (ifam2, fam2) p1 p2;
     (False, changes_done)
   }
 ;
@@ -642,7 +643,7 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
             nb_fam;
           kill_ancestors conf base True (poi base (get_mother cpl)) nb_ind
             nb_fam;
-          UpdateFamOk.effective_del conf base (foi base ifam);
+          UpdateFamOk.effective_del conf base (ifam, foi base ifam);
           incr nb_fam;
         }
     | None -> () ];

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.48 2006-11-13 21:20:45 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.49 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -127,8 +127,6 @@ value find_same_name base p =
   in
   List.sort (fun p1 p2 -> compare (get_occ p1) (get_occ p2)) pl
 ;
-
-value is_deleted_family fam = get_fam_index fam = Adef.ifam_of_int (-1);
 
 value gen_strip_spaces strip_heading str =
   let start =

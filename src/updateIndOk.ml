@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.35 2006-11-01 08:56:37 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.36 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -613,13 +613,13 @@ value all_checks_person conf base p a u =
     relation_sex_is_coherent base warning p;
     match get_parents a with
     [ Some ifam ->
-        CheckItem.family base error warning (foi base ifam) (coi base ifam)
-          (doi base ifam)
+        CheckItem.family base error warning ifam (foi base ifam)
+          (coi base ifam) (doi base ifam)
     | _ -> () ];
     Array.iter
       (fun ifam ->
-         CheckItem.family base error warning (foi base ifam) (coi base ifam)
-           (doi base ifam))
+         CheckItem.family base error warning ifam (foi base ifam)
+           (coi base ifam) (doi base ifam))
       (get_family u);
     List.iter
       (fun

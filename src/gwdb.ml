@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.121 2006-11-14 13:17:46 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.122 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -586,12 +586,14 @@ value get_divorce =
   | Family2 db2 i -> get_field db2 i ("family", "divorce")
   | Family2Gen db2 f -> f.Def.divorce ]
 ;
-value get_fam_index =
+
+value is_deleted_family =
   fun
-  [ Family f -> f.Def.fam_index
-  | Family2 _ i -> Adef.ifam_of_int i
-  | Family2Gen db2 f -> f.Def.fam_index ]
+  [ Family f -> f.Def.fam_index = Adef.ifam_of_int (-1)
+  | Family2 _ i -> False (* not yet implemented *)
+  | Family2Gen db2 f -> f.Def.fam_index = Adef.ifam_of_int (-1) ]
 ;
+
 value get_fsources =
   fun
   [ Family f -> Istr f.Def.fsources
@@ -659,12 +661,12 @@ value family_of_gen_family base f =
 value gen_family_of_family =
   fun
   [ Family f -> map_family_ps (fun p -> p) (fun s -> Istr s) f
-  | Family2 _ _ as f ->
+  | Family2 _ i as f ->
       {marriage = get_marriage f; marriage_place = get_marriage_place f;
        marriage_src = get_marriage_src f; witnesses = get_witnesses f;
        relation = get_relation f; divorce = get_divorce f;
        comment = get_comment f; origin_file = get_origin_file f;
-       fsources = get_fsources f; fam_index = get_fam_index f}
+       fsources = get_fsources f; fam_index = Adef.ifam_of_int i}
   | Family2Gen db2 f ->
       map_family_ps (fun p -> p) (fun s -> Istr2New db2 s) f ]
 ;

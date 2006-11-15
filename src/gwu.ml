@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.33 2006-11-10 17:18:05 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.34 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -7,7 +7,8 @@ open Gwdb;
 open Printf;
 
 type mfam =
-  { m_fam : family; m_fath : person; m_moth : person; m_chil : array person }
+  { m_ifam : ifam; m_fam : family; m_fath : person; m_moth : person;
+    m_chil : array person }
 ;
 
 value soy y = if y = 0 then "-0" else string_of_int y;
@@ -491,7 +492,7 @@ value print_family oc base gen m =
             m.m_chil;
           fprintf oc "end\n"
         } ];
-    gen.fam_done.(Adef.int_of_ifam (get_fam_index fam)) := True
+    gen.fam_done.(Adef.int_of_ifam m.m_ifam) := True
   }
 ;
 
@@ -867,8 +868,8 @@ value rec filter f =
   | [] -> [] ]
 ;
 
-value connected_families base fam_sel fam cpl =
-  loop [(get_fam_index fam)] [] [get_father cpl]
+value connected_families base fam_sel ifam cpl =
+  loop [ifam] [] [get_father cpl]
   where rec loop ifaml ipl_scanned =
     fun
     [ [ip :: ipl] ->
@@ -954,8 +955,7 @@ value mark_branch base mark surn p =
       match mark.(Adef.int_of_ifam ifam) with
       [ NotScanned ->
           let ifaml =
-            connected_families base (fun _ -> True) (foi base ifam)
-              (coi base ifam)
+            connected_families base (fun _ -> True) ifam (coi base ifam)
           in
           let children =
             List.fold_left
@@ -1071,20 +1071,19 @@ value mark_one_connex_component base mark ifam =
   }
 ;
 
-value mark_connex_components base mark fam =
+value mark_connex_components base mark ifam =
   let test_action loop len ifam =
     if mark.(Adef.int_of_ifam ifam) = NotScanned then
       mark_one_connex_component base mark ifam
     else ()
   in
-  scan_connex_component base test_action () (get_fam_index fam)
+  scan_connex_component base test_action () ifam
 ;
 
 value add_small_connex_components base mark =
   for i = 0 to nb_of_families base - 1 do {
     if mark.(i) = ToSeparate then
-      let fam = foi base (Adef.ifam_of_int i) in
-      mark_connex_components base mark fam
+      mark_connex_components base mark (Adef.ifam_of_int i)
     else ()
   }
 ;
@@ -1174,14 +1173,15 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
   in
   do {
     for i = 0 to nb_of_families base - 1 do {
-      let fam = foi base (Adef.ifam_of_int i) in
-      let cpl = coi base (Adef.ifam_of_int i) in
+      let ifam = Adef.ifam_of_int i in
+      let fam = foi base ifam in
+      let cpl = coi base ifam in
       if is_deleted_family fam then ()
       else if gen.fam_done.(i) then ()
-      else if gen.fam_sel (get_fam_index fam) then
-        let ifaml = connected_families base gen.fam_sel fam cpl in
+      else if gen.fam_sel ifam then
+        let ifaml = connected_families base gen.fam_sel ifam cpl in
         let (oc, first) =
-          if to_separate (get_fam_index fam) then (out_oc, out_oc_first)
+          if to_separate ifam then (out_oc, out_oc_first)
           else origin_file (sou base (get_origin_file fam))
         in
         let ml =
@@ -1191,14 +1191,14 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
                let cpl = coi base ifam in
                let des = doi base ifam in
                let m =
-                 {m_fam = fam; m_fath = poi base (get_father cpl);
+                 {m_ifam = ifam; m_fam = fam;
+                  m_fath = poi base (get_father cpl);
                   m_moth = poi base (get_mother cpl);
                   m_chil =
                     Array.map (fun ip -> poi base ip) (get_children des)}
                in
                if empty_family base m then do {
-                 gen.fam_done.(Adef.int_of_ifam (get_fam_index m.m_fam)) :=
-                   True;
+                 gen.fam_done.(Adef.int_of_ifam m.m_ifam) := True;
                  ml
                }
                else [m :: ml])

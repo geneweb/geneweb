@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.21 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.22 2006-11-15 11:49:48 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -194,7 +194,8 @@ value effective_mod_merge conf base sp =
                      if i = Array.length (get_family uc) then
                        (p_related, mod_p)
                      else
-                       let fam = foi base (get_family uc).(i) in
+                       let ifam = (get_family uc).(i) in
+                       let fam = foi base ifam in
                        let (p_related, mod_p) =
                          if array_mem (get_key_index p2) (get_witnesses fam)
                          then do {
@@ -216,7 +217,7 @@ value effective_mod_merge conf base sp =
                                in
                                loop (p_related, mod_p) (j + 1)
                            in
-                           patch_family base (get_fam_index fam) fam;
+                           patch_family base ifam fam;
                            (p_related, mod_p)
                          }
                          else (p_related, mod_p)
