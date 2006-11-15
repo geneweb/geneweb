@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.30 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.31 2006-11-15 15:22:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -695,21 +695,7 @@ value effective_del conf base (ifam, fam) = do {
   kill_family base ifam (get_father cpl);
   kill_family base ifam (get_mother cpl);
   Array.iter (kill_parents base) (get_children des);
-  let cpl =
-    couple_of_gen_couple base
-      (couple False (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-  in
-  let fam =
-    family_of_gen_family base
-      {(gen_family_of_family fam) with
-       witnesses = [| |];
-       comment = Gwdb.insert_string base "";
-       fam_index = Adef.ifam_of_int (-1)}
-  in
-  let des = descend_of_gen_descend base {children = [| |]} in
-  patch_family base ifam fam;
-  patch_couple base ifam cpl;
-  patch_descend base ifam des
+  delete_family base ifam;
 };
 
 value array_forall2 f a1 a2 =

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.122 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.123 2006-11-15 15:22:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -10,8 +10,8 @@ open Mutil;
 open Printf;
 
 type patches =
-  { max_per : mutable int;
-    max_fam : mutable int;
+  { nb_per : mutable int;
+    nb_fam : mutable int;
     h_person : Hashtbl.t iper (gen_person iper string);
     h_ascend : Hashtbl.t iper (gen_ascend ifam);
     h_union : Hashtbl.t iper (gen_union ifam);
@@ -587,13 +587,6 @@ value get_divorce =
   | Family2Gen db2 f -> f.Def.divorce ]
 ;
 
-value is_deleted_family =
-  fun
-  [ Family f -> f.Def.fam_index = Adef.ifam_of_int (-1)
-  | Family2 _ i -> False (* not yet implemented *)
-  | Family2Gen db2 f -> f.Def.fam_index = Adef.ifam_of_int (-1) ]
-;
-
 value get_fsources =
   fun
   [ Family f -> Istr f.Def.fsources
@@ -796,28 +789,13 @@ value sou base i =
 value nb_of_persons base =
   match base with
   [ Base base -> base.data.persons.len
-  | Base2 db2 ->
-      if db2.patches.max_per > 0 then db2.patches.max_per
-      else
-        let fname =
-          List.fold_left Filename.concat db2.bdir ["person"; "sex"; "access"]
-        in
-        let st = Unix.lstat fname in
-        st.Unix.st_size / 4 ]
+  | Base2 db2 -> db2.patches.nb_per ]
 ;
 
 value nb_of_families base =
   match base with
   [ Base base -> base.data.families.len
-  | Base2 db2 ->
-      if db2.patches.max_fam > 0 then db2.patches.max_fam
-      else
-        let fname =
-          List.fold_left Filename.concat db2.bdir
-            ["family"; "marriage"; "access"]
-        in
-        let st = Unix.lstat fname in
-        st.Unix.st_size / 4 ]
+  | Base2 db2 -> db2.patches.nb_fam ]
 ;
 
 value patch_person base ip p =
@@ -825,8 +803,7 @@ value patch_person base ip p =
   [ (Base base, Person p) -> base.func.patch_person ip p
   | (Base2 _, Person2Gen db2 p) -> do {
       Hashtbl.replace db2.patches.h_person ip p;
-      db2.patches.max_per :=
-        max (Adef.int_of_iper ip + 1) db2.patches.max_per;
+      db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
     }
   | _ -> assert False ]
 ;
@@ -836,8 +813,7 @@ value patch_ascend base ip a =
   [ (Base base, Ascend a) -> base.func.patch_ascend ip a
   | (Base2 _, Ascend2Gen db2 a) -> do {
       Hashtbl.replace db2.patches.h_ascend ip a;
-      db2.patches.max_per :=
-        max (Adef.int_of_iper ip + 1) db2.patches.max_per;
+      db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
     }
   | _ -> assert False ]
 ;
@@ -847,8 +823,7 @@ value patch_union base ip u =
   [ (Base base, Union u) -> base.func.patch_union ip u
   | (Base2 _, Union2Gen db2 u) -> do {
       Hashtbl.replace db2.patches.h_union ip u;
-      db2.patches.max_per :=
-        max (Adef.int_of_iper ip + 1) db2.patches.max_per;
+      db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
     }
   | _ -> failwith "not impl patch_union" ]
 ;
@@ -858,8 +833,8 @@ value patch_family base ifam f =
   [ (Base base, Family f) -> base.func.patch_family ifam f
   | (Base2 _, Family2Gen db2 f) -> do {
       Hashtbl.replace db2.patches.h_family ifam f;
-      db2.patches.max_fam :=
-        max (Adef.int_of_ifam ifam + 1) db2.patches.max_fam;
+      db2.patches.nb_fam :=
+        max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
     }
   | _ -> failwith "not impl patch_family" ]
 ;
@@ -869,8 +844,8 @@ value patch_descend base ifam d =
   [ (Base base, Descend d) -> base.func.patch_descend ifam d
   | (Base2 _, Descend2Gen db2 d) -> do {
       Hashtbl.replace db2.patches.h_descend ifam d;
-      db2.patches.max_fam :=
-        max (Adef.int_of_ifam ifam + 1) db2.patches.max_fam;
+      db2.patches.nb_fam :=
+        max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
     }
   | _ -> failwith "not impl patch_descend" ]
 ;
@@ -880,8 +855,8 @@ value patch_couple base ifam c =
   [ (Base base, Couple c) -> base.func.patch_couple ifam c
   | (Base2 _, Couple2Gen db2 c) -> do {
       Hashtbl.replace db2.patches.h_couple ifam c;
-      db2.patches.max_fam :=
-        max (Adef.int_of_ifam ifam + 1) db2.patches.max_fam;
+      db2.patches.nb_fam :=
+        max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
     }
   | _ -> failwith "not impl patch_couple" ]
 ;
@@ -918,6 +893,32 @@ value insert_string base s =
   match base with
   [ Base base -> Istr (base.func.insert_string s)
   | Base2 db2 -> Istr2New db2 s ]
+;
+
+value delete_family base ifam = do {
+  let cpl =
+    couple_of_gen_couple base
+      (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+  in
+  let fam =
+    let empty = insert_string base "" in
+    family_of_gen_family base
+      {marriage = codate_None; marriage_place = empty; marriage_src = empty;
+       relation = Married; divorce = NotDivorced; witnesses = [| |];
+       comment = empty; origin_file = empty; fsources = empty;
+       fam_index = Adef.ifam_of_int (-1)}
+  in
+  let des = descend_of_gen_descend base {children = [| |]} in
+  patch_family base ifam fam;
+  patch_couple base ifam cpl;
+  patch_descend base ifam des
+};
+
+value is_deleted_family =
+  fun
+  [ Family f -> f.Def.fam_index = Adef.ifam_of_int (-1)
+  | Family2 _ i -> False (* not yet implemented *)
+  | Family2Gen db2 f -> f.Def.fam_index = Adef.ifam_of_int (-1) ]
 ;
 
 value commit_patches base =
@@ -1490,8 +1491,24 @@ value base_of_base2 bname =
         ht
       }
     | None ->
+        let nb_per =
+          let fname =
+            List.fold_left Filename.concat bdir
+              ["person"; "sex"; "access"]
+          in
+          let st = Unix.lstat fname in
+          st.Unix.st_size / 4
+        in
+        let nb_fam =
+          let fname =
+            List.fold_left Filename.concat bdir
+              ["family"; "marriage"; "access"]
+          in
+          let st = Unix.lstat fname in
+          st.Unix.st_size / 4
+        in
         let empty_ht () = Hashtbl.create 1 in
-        {max_per = 0; max_fam = 0;
+        {nb_per = nb_per; nb_fam = nb_fam;
          h_person = empty_ht (); h_ascend = empty_ht ();
          h_union = empty_ht (); h_family = empty_ht ();
          h_couple = empty_ht (); h_descend = empty_ht ();
