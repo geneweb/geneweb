@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.67 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.68 2006-11-15 15:22:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -86,8 +86,6 @@ value get_origin_file : family -> istr;
 value get_relation : family -> Def.relation_kind;
 value get_witnesses : family -> array iper;
 
-value is_deleted_family : family -> bool;
-
 value family_with_origin_file : family -> istr -> ifam -> family;
 
 value family_of_gen_family : base -> Def.gen_family iper istr -> family;
@@ -132,6 +130,9 @@ value commit_notes : base -> string -> string -> unit;
 value is_patched_person : base -> iper -> bool;
 value patched_ascends : base -> list iper;
 value output_consang_tab : base -> array Adef.fix -> unit;
+
+value delete_family : base -> ifam -> unit;
+value is_deleted_family : family -> bool;
 
 value person_of_key : base -> string -> string -> int -> option iper;
 value persons_of_name : base -> string -> list iper;
