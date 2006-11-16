@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.123 2006-11-15 15:22:56 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.124 2006-11-16 02:33:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -84,7 +84,7 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
 
 type string_person_index =
   [ Spi of gen_string_person_index dsk_istr
-  | Spi2 of bool ]
+  | Spi2 of db2 and bool ]
 ;
 
 type base =
@@ -104,9 +104,6 @@ value get_field_acc db2 i (f1, f2) = do {
         ic
       } ]
   in
-(*
-let _ = do { Printf.eprintf "acc %d %s %s \n" i f1 f2; flush stderr; } in
-*)
   seek_in ic (4 * i);
   input_binary_int ic
 };
@@ -123,9 +120,6 @@ value get_field_data db2 pos (f1, f2) data = do {
         ic
       } ]
   in
-(*
-let _ = do { Printf.eprintf "dat %d %s %s \n" pos f1 f2; flush stderr; } in
-*)
   seek_in ic pos;
   Iovalue.input ic
 };
@@ -1053,28 +1047,69 @@ value persons_of_name base =
 value persons_of_first_name base =
   match base with
   [ Base base -> Spi base.func.persons_of_first_name
-  | Base2 _ -> Spi2 True ]
+  | Base2 db2 -> Spi2 db2 True ]
 ;
 value persons_of_surname base =
   match base with
   [ Base base -> Spi base.func.persons_of_surname
-  | Base2 _ -> Spi2 False ]
+  | Base2 db2 -> Spi2 db2 False ]
+;
+
+value start_with s p =
+  String.length p < String.length s &&
+  String.sub s 0 (String.length p) = p
 ;
 
 value spi_cursor spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 _ -> failwith "not impl spi_cursor" ]
+  | Spi2 db2 is_first_name ->
+      let f1 = "person" in
+      let f2 = if is_first_name then "first_name" else "surname" in
+      let pos = do {
+        (* first pos in (f1, f2, "data") starting with that string *)
+        let fname =
+          List.fold_right Filename.concat [db2.bdir; f1; f2] "data"
+        in
+        let ic = open_in_bin fname in
+        seek_in ic Db2.first_item_pos;
+        let pos =
+          loop None Db2.first_item_pos where rec loop r pos =
+            match
+              try Some (Iovalue.input ic : string) with
+              [ End_of_file -> None ]
+            with
+            [ Some a ->
+                if a = s then pos
+                else
+                  let r =
+                    if start_with a s then
+                      match r with
+                      [ Some (a1, pos1) -> if a1 < a then r else Some (a, pos)
+                      | None -> Some (a, pos) ]
+                    else r
+                  in
+                  loop r (pos_in ic)
+            | None ->
+                match r with
+                [ Some (a, pos) -> pos
+                | None -> do { close_in ic; raise Not_found } ] ]
+        in
+        close_in ic;
+        pos
+      }
+      in
+      Istr2 db2 (f1, f2) pos ]
 ;
 
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2 _, Istr2 db2 (f1, f2) pos) -> do {
+  | (Spi2 _ _, Istr2 db2 (f1, f2) pos) -> do {
       let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
       hashtbl_find_all dir "person_of_string.ht" pos
     }
-  | (Spi2 is_first_name, Istr2New db2 s) ->
+  | (Spi2 _ is_first_name, Istr2New db2 s) ->
       let proj =
         if is_first_name then fun p -> p.first_name else fun p -> p.surname
       in

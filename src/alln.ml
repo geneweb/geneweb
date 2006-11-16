@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.14 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: alln.ml,v 5.15 2006-11-16 02:33:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -303,6 +303,7 @@ value select_names conf base is_surnames ini =
         loop istr [] where rec loop istr list =
           let s = nominative (sou base istr) in
           let k = name_key_compatible base s in
+let _ = do { Printf.eprintf "to be completed %s\n" s; flush stderr; } in
           if string_start_with ini k then
             let list =
               if s <> "?" then
