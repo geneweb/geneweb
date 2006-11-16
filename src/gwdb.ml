@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.126 2006-11-16 10:21:38 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.127 2006-11-16 10:23:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -117,20 +117,7 @@ value get_field_data db2 pos (f1, f2) data = do {
 };
 
 value get_field_2_data db2 pos (f1, f2) data = do {
-  let ic =
-    try Hashtbl.find db2.cache_chan (f1, f2, data) with
-    [ Not_found -> do {
-        let ic =
-          open_in_bin
-            (List.fold_left Filename.concat db2.bdir [f1; f2; data])
-        in
-        Hashtbl.add db2.cache_chan (f1, f2, data) ic;
-        ic
-      } ]
-  in
-(*
-let _ = do { Printf.eprintf "dat2 %d %s %s \n" pos f1 f2; flush stderr; } in
-*)
+  let ic = fast_open_in_bin db2 f1 f2 data in
   seek_in ic pos;
   let r = Iovalue.input ic in
   let s = Iovalue.input ic in
