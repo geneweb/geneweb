@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.125 2006-11-16 10:07:10 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.126 2006-11-16 10:21:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -92,34 +92,26 @@ type base =
   | Base2 of db2 ]
 ;
 
+value fast_open_in_bin db2 f1 f2 f =
+  try Hashtbl.find db2.cache_chan (f1, f2, f) with
+  [ Not_found -> do {
+      let ic =
+        open_in_bin
+          (List.fold_left Filename.concat db2.bdir [f1; f2; f])
+      in
+      Hashtbl.add db2.cache_chan (f1, f2, f) ic;
+      ic
+    } ]
+;
+
 value get_field_acc db2 i (f1, f2) = do {
-  let ic =
-    try Hashtbl.find db2.cache_chan (f1, f2, "access") with
-    [ Not_found -> do {
-        let ic =
-          open_in_bin
-            (List.fold_left Filename.concat db2.bdir [f1; f2; "access"])
-        in
-        Hashtbl.add db2.cache_chan (f1, f2, "access") ic;
-        ic
-      } ]
-  in
+  let ic = fast_open_in_bin db2 f1 f2 "access" in
   seek_in ic (4 * i);
   input_binary_int ic
 };
 
 value get_field_data db2 pos (f1, f2) data = do {
-  let ic =
-    try Hashtbl.find db2.cache_chan (f1, f2, data) with
-    [ Not_found -> do {
-        let ic =
-          open_in_bin
-            (List.fold_left Filename.concat db2.bdir [f1; f2; data])
-        in
-        Hashtbl.add db2.cache_chan (f1, f2, data) ic;
-        ic
-      } ]
-  in
+  let ic = fast_open_in_bin db2 f1 f2 data in
   seek_in ic pos;
   Iovalue.input ic
 };
@@ -934,11 +926,15 @@ value commit_notes base =
   [ Base base -> base.func.commit_notes
   | Base2 _ -> failwith "not impl commit_notes" ]
 ;
-value is_patched_person base =
+
+value is_patched_person base ip =
   match base with
-  [ Base base -> base.func.is_patched_person
-  | Base2 _ -> failwith "not impl is_patched_person" ]
+  [ Base base -> base.func.is_patched_person ip
+  | Base2 _ ->
+      let _ = do { eprintf "not impl is_patched_person\n"; flush stderr; } in
+      False ]
 ;
+
 value patched_ascends base =
   match base with
   [ Base base -> base.func.patched_ascends ()
@@ -1063,48 +1059,43 @@ value start_with s p =
 value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 db2 is_first_name ->
+  | Spi2 db2 is_first_name -> do {
       let f1 = "person" in
       let f2 = if is_first_name then "first_name" else "surname" in
-      let pos = do {
-        (* first pos in (f1, f2, "data") starting with that string *)
-        let fname =
-          List.fold_right Filename.concat [db2.bdir; f1; f2] "data"
-        in
-        let ic = open_in_bin fname in
-        seek_in ic Db2.first_item_pos;
-        let pos =
-          loop None Db2.first_item_pos where rec loop r pos =
-            match
-              try Some (Iovalue.input ic : string) with
-              [ End_of_file -> None ]
-            with
-            [ Some a ->
-                if a = s then pos
-                else
-                  let r =
-                    if start_with a s then
-                      match r with
-                      [ Some (a1, pos1) -> if a1 < a then r else Some (a, pos)
-                      | None -> Some (a, pos) ]
-                    else r
-                  in
-                  loop r (pos_in ic)
-            | None ->
-                match r with
-                [ Some (a, pos) -> pos
-                | None -> do { close_in ic; raise Not_found } ] ]
-        in
-        close_in ic;
-        pos
-      }
+      (* first pos in (f1, f2, "data") starting with that string *)
+      let ic = fast_open_in_bin db2 f1 f2 "data" in
+      seek_in ic Db2.first_item_pos;
+      let pos =
+        loop None Db2.first_item_pos where rec loop r pos =
+          match
+            try Some (Iovalue.input ic : string) with
+            [ End_of_file -> None ]
+          with
+          [ Some a ->
+              if a = s then pos
+              else
+                let r =
+                  if start_with a s then
+                    match r with
+                    [ Some (a1, pos1) -> if a1 < a then r else Some (a, pos)
+                    | None -> Some (a, pos) ]
+                  else r
+                in
+                loop r (pos_in ic)
+          | None ->
+              match r with
+              [ Some (a, pos) -> pos
+              | None -> raise Not_found ] ]
       in
-      Istr2 db2 (f1, f2) pos ]
+      Istr2 db2 (f1, f2) pos
+    } ]
 ;
 
 value spi_next spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> Istr (spi.next s)
+  | (Spi2 db2 is_first_name, Istr2 _ (f1, f2) pos) ->
+      failwith "not impl spi_next 1"
   | _ -> failwith "not impl spi_next" ]
 ;
 
