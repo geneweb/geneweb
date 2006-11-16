@@ -1,9 +1,7 @@
-(* $Id: fpla.ml,v 5.5 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: fpla.ml,v 5.6 2006-11-16 00:30:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 (* First Parentless Ancestor *)
 
-open Def;
-open Gutil;
 open Gwdb;
 open Printf;
 
@@ -73,7 +71,7 @@ value main () =
   do {
     Argl.parse speclist (fun s -> bname.val := s) usage;
     Secure.set_base_dir (Filename.dirname bname.val);
-    let base = Gutil.open_base bname.val in
+    let base = Gwdb.open_base bname.val in
     first_parentless_ancestor base
   }
 ;

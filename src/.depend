@@ -92,8 +92,8 @@ forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi mutil.cmi name.cmi \
 forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx mutil.cmx name.cmx \
     notes.cmx secure.cmx templ.cmx templAst.cmi update.cmx util.cmx wiki.cmx \
     ../wserver/wserver.cmx 
-fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi gwdb.cmi secure.cmi 
-fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx gwdb.cmx secure.cmx 
+fpla.cmo: adef.cmi argl.cmo gwdb.cmi secure.cmi 
+fpla.cmx: adef.cmx argl.cmx gwdb.cmx secure.cmx 
 futil.cmo: adef.cmi def.cmi mutil.cmi name.cmi futil.cmi 
 futil.cmx: adef.cmx def.cmi mutil.cmx name.cmx futil.cmi 
 futil.cmi: def.cmi 
@@ -179,10 +179,10 @@ mk_consang.cmo: argl.cmo consang.cmi consangAll.cmi gwdb.cmi lock.cmi \
     mutil.cmi outbase.cmi secure.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gwdb.cmx lock.cmx \
     mutil.cmx outbase.cmx secure.cmx 
-mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi gwdb.cmi \
-    name.cmi num.cmi pqueue.cmi secure.cmi 
-mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx gwdb.cmx \
-    name.cmx num.cmx pqueue.cmx secure.cmx 
+mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gwdb.cmi name.cmi \
+    num.cmi pqueue.cmi secure.cmi 
+mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gwdb.cmx name.cmx \
+    num.cmx pqueue.cmx secure.cmx 
 mutil.cmo: buff.cmo iovalue.cmi name.cmi mutil.cmi 
 mutil.cmx: buff.cmx iovalue.cmx name.cmx mutil.cmi 
 name.cmo: buff.cmo name.cmi 

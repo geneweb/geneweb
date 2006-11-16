@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.28 2006-11-06 13:16:17 ddr Exp $
+# $Id: Makefile,v 5.29 2006-11-16 00:30:32 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -13,8 +13,8 @@ GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo calendar.cmo notesLinks.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
-MOSTDESC_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo futil.cmo dutil.cmo db2.cmo diff.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo secure.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo adef.cmo futil.cmo dutil.cmo db2.cmo diff.cmo gwdb.cmo btree.cmo database.cmo checkItem.cmo gutil.cmo fpla.cmo
+MOSTDESC_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo db2.cmo gwdb.cmo consang.cmo pqueue.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo db2.cmo gwdb.cmo fpla.cmo
 UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo mutil.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
 CHECK_BASE_OBJS=buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo secure.cmo dutil.cmo btree.cmo database.cmo db2.cmo gwdb.cmo progrBar.cmo checkItem.cmo consang.cmo check.cmo check_base.cmo
 
