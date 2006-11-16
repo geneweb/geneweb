@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.128 2006-11-16 10:26:58 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.129 2006-11-16 11:39:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -915,11 +915,19 @@ value commit_notes base =
   | Base2 _ -> failwith "not impl commit_notes" ]
 ;
 
+value ok_I_know = ref False;
 value is_patched_person base ip =
   match base with
   [ Base base -> base.func.is_patched_person ip
   | Base2 _ ->
-      let _ = do { eprintf "not impl is_patched_person\n"; flush stderr; } in
+      let _ =
+        if ok_I_know.val then ()
+        else do {
+          ok_I_know.val := True;
+          eprintf "not impl is_patched_person\n";
+          flush stderr;
+        }
+      in
       False ]
 ;
 
@@ -1082,8 +1090,32 @@ value spi_first spi s =
 value spi_next spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> Istr (spi.next s)
-  | (Spi2 db2 is_first_name, Istr2 _ (f1, f2) pos) ->
-      failwith "not impl spi_next 1"
+  | (Spi2 db2 _, Istr2 _ (f1, f2) prev_pos) ->
+      let prev_s = get_field_data db2 prev_pos (f1, f2) "data" in
+      let ic =
+        fast_open_in_bin_and_seek db2 f1 f2 "data" Db2.first_item_pos
+      in
+      let pos =
+        loop None Db2.first_item_pos where rec loop r pos =
+          match
+            try Some (Iovalue.input ic : string) with
+            [ End_of_file -> None ]
+          with
+          [ Some a ->
+              if a <= prev_s then loop r (pos_in ic)
+              else
+                let r =
+                  match r with
+                  [ Some (a1, pos1) -> if a1 < a then r else Some (a, pos)
+                  | None -> Some (a, pos) ]
+                in
+                loop r (pos_in ic)
+          | None ->
+              match r with
+              [ Some (a, pos) -> pos
+              | None -> raise Not_found ] ]
+      in
+      Istr2 db2 (f1, f2) pos
   | _ -> failwith "not impl spi_next" ]
 ;
 
