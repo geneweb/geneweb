@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.36 2006-11-12 11:17:06 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.37 2006-11-16 11:58:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1093,7 +1093,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
       let has_passwd = List.mem_assoc "w" env in
       let (x, env) = extract_assoc "w" env in
       if has_passwd then
-        (x, env, if x = "w" || x = "f" then ATnone else ATset)
+        (x, env, if x = "w" || x = "f" || x = "" then ATnone else ATset)
       else
         let passwd =
           if ip = String.length base_passwd then ""
