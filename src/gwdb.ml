@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.127 2006-11-16 10:23:17 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.128 2006-11-16 10:26:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -92,37 +92,38 @@ type base =
   | Base2 of db2 ]
 ;
 
-value fast_open_in_bin db2 f1 f2 f =
-  try Hashtbl.find db2.cache_chan (f1, f2, f) with
-  [ Not_found -> do {
-      let ic =
-        open_in_bin
-          (List.fold_left Filename.concat db2.bdir [f1; f2; f])
-      in
-      Hashtbl.add db2.cache_chan (f1, f2, f) ic;
-      ic
-    } ]
+value fast_open_in_bin_and_seek db2 f1 f2 f pos = do {
+  let ic =
+    try Hashtbl.find db2.cache_chan (f1, f2, f) with
+    [ Not_found -> do {
+        let ic =
+          open_in_bin
+            (List.fold_left Filename.concat db2.bdir [f1; f2; f])
+        in
+        Hashtbl.add db2.cache_chan (f1, f2, f) ic;
+        ic
+      } ]
+  in
+  seek_in ic pos;
+  ic
+};
+
+value get_field_acc db2 i (f1, f2) =
+  let ic = fast_open_in_bin_and_seek db2 f1 f2 "access" (4 * i) in
+  input_binary_int ic
 ;
 
-value get_field_acc db2 i (f1, f2) = do {
-  let ic = fast_open_in_bin db2 f1 f2 "access" in
-  seek_in ic (4 * i);
-  input_binary_int ic
-};
-
-value get_field_data db2 pos (f1, f2) data = do {
-  let ic = fast_open_in_bin db2 f1 f2 data in
-  seek_in ic pos;
+value get_field_data db2 pos (f1, f2) data =
+  let ic = fast_open_in_bin_and_seek db2 f1 f2 data pos in
   Iovalue.input ic
-};
+;
 
-value get_field_2_data db2 pos (f1, f2) data = do {
-  let ic = fast_open_in_bin db2 f1 f2 data in
-  seek_in ic pos;
+value get_field_2_data db2 pos (f1, f2) data =
+  let ic = fast_open_in_bin_and_seek db2 f1 f2 data pos in
   let r = Iovalue.input ic in
   let s = Iovalue.input ic in
   (r, s)
-};
+;
 
 value get_field db2 i path =
   let pos = get_field_acc db2 i path in
@@ -1046,12 +1047,13 @@ value start_with s p =
 value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 db2 is_first_name -> do {
+  | Spi2 db2 is_first_name ->
       let f1 = "person" in
       let f2 = if is_first_name then "first_name" else "surname" in
       (* first pos in (f1, f2, "data") starting with that string *)
-      let ic = fast_open_in_bin db2 f1 f2 "data" in
-      seek_in ic Db2.first_item_pos;
+      let ic =
+        fast_open_in_bin_and_seek db2 f1 f2 "data" Db2.first_item_pos
+      in
       let pos =
         loop None Db2.first_item_pos where rec loop r pos =
           match
@@ -1074,8 +1076,7 @@ value spi_first spi s =
               [ Some (a, pos) -> pos
               | None -> raise Not_found ] ]
       in
-      Istr2 db2 (f1, f2) pos
-    } ]
+      Istr2 db2 (f1, f2) pos ]
 ;
 
 value spi_next spi s =
