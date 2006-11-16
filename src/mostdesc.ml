@@ -1,8 +1,7 @@
-(* $Id: mostdesc.ml,v 5.6 2006-10-15 11:27:22 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 5.7 2006-11-16 00:30:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
 
 value print_result base tab =
@@ -129,9 +128,10 @@ value main () =
     }
     else ();
     Secure.set_base_dir (Filename.dirname bname.val);
-    let base = Gutil.open_base bname.val in
-    let ip = Gutil.person_of_key base p_fname.val p_sname.val p_num.val in
-    most_desc base (poi base ip)
+    let base = Gwdb.open_base bname.val in
+    match Gwdb.person_of_key base p_fname.val p_sname.val p_num.val with
+    [ Some ip -> most_desc base (poi base ip)
+    | None -> raise Not_found ]
   }
 ;
 
