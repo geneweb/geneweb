@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.129 2006-11-16 11:39:00 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.130 2006-11-16 14:12:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -84,7 +84,7 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
 
 type string_person_index =
   [ Spi of gen_string_person_index dsk_istr
-  | Spi2 of db2 and bool ]
+  | Spi2 of db2 and bool and array (string * int) and ref int ]
 ;
 
 type base =
@@ -1036,15 +1036,42 @@ value persons_of_name base =
   [ Base base -> base.func.persons_of_name
   | Base2 db2 -> persons2_of_name db2 ]
 ;
+
+value persons_of_first_name_or_surname2 db2 is_first_name = do {
+  let f1 = "person" in
+  let f2 = if is_first_name then "first_name" else "surname" in
+  let f = "data" in
+  let ic = fast_open_in_bin_and_seek db2 f1 f2 f Db2.first_item_pos in
+  let (list, len) =
+    loop [] 0 Db2.first_item_pos where rec loop list len pos =
+      match
+        try Some (Iovalue.input ic : string) with
+        [ End_of_file -> None ]
+      with
+      [ Some s ->
+          let list = [(s, pos) :: list] in
+          loop list (len + 1) (pos_in ic)
+      | None -> (list, len) ]
+  in
+  let list = List.sort compare list in
+  let a = Array.make len ("", 0) in
+  loop 0 list where rec loop i =
+    fun
+    [ [] -> ()
+    | [s_pos :: list] -> do { a.(i) := s_pos; loop (i + 1) list } ];
+  Spi2 db2 is_first_name a (ref 0)
+};
+
 value persons_of_first_name base =
   match base with
   [ Base base -> Spi base.func.persons_of_first_name
-  | Base2 db2 -> Spi2 db2 True ]
+  | Base2 db2 -> persons_of_first_name_or_surname2 db2 True ]
 ;
+
 value persons_of_surname base =
   match base with
   [ Base base -> Spi base.func.persons_of_surname
-  | Base2 db2 -> Spi2 db2 False ]
+  | Base2 db2 -> persons_of_first_name_or_surname2 db2 False ]
 ;
 
 value start_with s p =
@@ -1055,78 +1082,41 @@ value start_with s p =
 value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 db2 is_first_name ->
-      let f1 = "person" in
+  | Spi2 db2 is_first_name arr curr -> do {
+      let (pos, i) =
+        loop 0 where rec loop i =
+          if i == Array.length arr then raise Not_found
+          else
+            let (s1, pos) = arr.(i) in
+            if s1 >= s then (pos, i) else loop (i + 1)
+      in
+      curr.val := i;
       let f2 = if is_first_name then "first_name" else "surname" in
-      (* first pos in (f1, f2, "data") starting with that string *)
-      let ic =
-        fast_open_in_bin_and_seek db2 f1 f2 "data" Db2.first_item_pos
-      in
-      let pos =
-        loop None Db2.first_item_pos where rec loop r pos =
-          match
-            try Some (Iovalue.input ic : string) with
-            [ End_of_file -> None ]
-          with
-          [ Some a ->
-              if a = s then pos
-              else
-                let r =
-                  if start_with a s then
-                    match r with
-                    [ Some (a1, pos1) -> if a1 < a then r else Some (a, pos)
-                    | None -> Some (a, pos) ]
-                  else r
-                in
-                loop r (pos_in ic)
-          | None ->
-              match r with
-              [ Some (a, pos) -> pos
-              | None -> raise Not_found ] ]
-      in
-      Istr2 db2 (f1, f2) pos ]
+      Istr2 db2 ("person", f2) pos
+    } ]
 ;
 
 value spi_next spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> Istr (spi.next s)
-  | (Spi2 db2 _, Istr2 _ (f1, f2) prev_pos) ->
-      let prev_s = get_field_data db2 prev_pos (f1, f2) "data" in
-      let ic =
-        fast_open_in_bin_and_seek db2 f1 f2 "data" Db2.first_item_pos
-      in
-      let pos =
-        loop None Db2.first_item_pos where rec loop r pos =
-          match
-            try Some (Iovalue.input ic : string) with
-            [ End_of_file -> None ]
-          with
-          [ Some a ->
-              if a <= prev_s then loop r (pos_in ic)
-              else
-                let r =
-                  match r with
-                  [ Some (a1, pos1) -> if a1 < a then r else Some (a, pos)
-                  | None -> Some (a, pos) ]
-                in
-                loop r (pos_in ic)
-          | None ->
-              match r with
-              [ Some (a, pos) -> pos
-              | None -> raise Not_found ] ]
-      in
-      Istr2 db2 (f1, f2) pos
+  | (Spi2 db2 _ arr curr, Istr2 _ (f1, f2) _) ->
+      let i = curr.val + 1 in
+      if i = Array.length arr then raise Not_found
+      else do {
+        curr.val := i;
+        Istr2 db2 (f1, f2) (snd arr.(i))
+      }
   | _ -> failwith "not impl spi_next" ]
 ;
 
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2 _ _, Istr2 db2 (f1, f2) pos) -> do {
+  | (Spi2 _ _ _ _, Istr2 db2 (f1, f2) pos) -> do {
       let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
       hashtbl_find_all dir "person_of_string.ht" pos
     }
-  | (Spi2 _ is_first_name, Istr2New db2 s) ->
+  | (Spi2 _ is_first_name _ _, Istr2New db2 s) ->
       let proj =
         if is_first_name then fun p -> p.first_name else fun p -> p.surname
       in
