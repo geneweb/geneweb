@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.130 2006-11-16 14:12:42 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.131 2006-11-16 15:17:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -82,9 +82,17 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
     next : 'istr -> 'istr }
 ;
 
+type string_person_index2 =
+  { is_first_name : bool;
+    table : array (string * int);
+    index_of_first_char : array int;
+    ini : mutable string;
+    curr : mutable int }
+;
+
 type string_person_index =
   [ Spi of gen_string_person_index dsk_istr
-  | Spi2 of db2 and bool and array (string * int) and ref int ]
+  | Spi2 of db2 and string_person_index2 ]
 ;
 
 type base =
@@ -1055,11 +1063,20 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
   in
   let list = List.sort compare list in
   let a = Array.make len ("", 0) in
+  let iofc = Array.make 256 (-1) in
   loop 0 list where rec loop i =
     fun
     [ [] -> ()
-    | [s_pos :: list] -> do { a.(i) := s_pos; loop (i + 1) list } ];
-  Spi2 db2 is_first_name a (ref 0)
+    | [((s, _) as s_pos) :: list] -> do {
+        a.(i) := s_pos;
+        if String.length s > 0 && iofc.(Char.code s.[0]) = -1 then
+          iofc.(Char.code s.[0]) := i
+        else ();
+        loop (i + 1) list
+      } ];
+  Spi2 db2
+    {is_first_name = is_first_name; table = a; index_of_first_char = iofc;
+     ini = ""; curr = 0}
 };
 
 value persons_of_first_name base =
@@ -1082,29 +1099,41 @@ value start_with s p =
 value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 db2 is_first_name arr curr -> do {
+  | Spi2 db2 spi -> do {
       let (pos, i) =
         loop 0 where rec loop i =
-          if i == Array.length arr then raise Not_found
+          if i == Array.length spi.table then raise Not_found
           else
-            let (s1, pos) = arr.(i) in
+            let (s1, pos) = spi.table.(i) in
             if s1 >= s then (pos, i) else loop (i + 1)
       in
-      curr.val := i;
-      let f2 = if is_first_name then "first_name" else "surname" in
+      spi.ini := s;
+      spi.curr := i;
+      let f2 = if spi.is_first_name then "first_name" else "surname" in
       Istr2 db2 ("person", f2) pos
     } ]
 ;
 
-value spi_next spi s =
-  match (spi, s) with
+value spi_next spi istr =
+  match (spi, istr) with
   [ (Spi spi, Istr s) -> Istr (spi.next s)
-  | (Spi2 db2 _ arr curr, Istr2 _ (f1, f2) _) ->
-      let i = curr.val + 1 in
-      if i = Array.length arr then raise Not_found
+  | (Spi2 db2 spi, Istr2 _ (f1, f2) _) ->
+      let i =
+        if spi.ini = "" then
+          let s = fst spi.table.(spi.curr) in
+          if s = "" then spi.curr + 1 + 1
+          else
+            loop (Char.code s.[0] + 1) where rec loop j =
+              if j = 256 then raise Not_found
+              else
+                let i = spi.index_of_first_char.(j) in
+                if i < 0 then loop (j + 1) else i
+        else spi.curr + 1
+      in
+      if i = Array.length spi.table then raise Not_found
       else do {
-        curr.val := i;
-        Istr2 db2 (f1, f2) (snd arr.(i))
+        spi.curr := i;
+        Istr2 db2 (f1, f2) (snd spi.table.(i))
       }
   | _ -> failwith "not impl spi_next" ]
 ;
@@ -1112,13 +1141,14 @@ value spi_next spi s =
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2 _ _ _ _, Istr2 db2 (f1, f2) pos) -> do {
+  | (Spi2 _ _, Istr2 db2 (f1, f2) pos) -> do {
       let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
       hashtbl_find_all dir "person_of_string.ht" pos
     }
-  | (Spi2 _ is_first_name _ _, Istr2New db2 s) ->
+  | (Spi2 _ spi, Istr2New db2 s) ->
       let proj =
-        if is_first_name then fun p -> p.first_name else fun p -> p.surname
+        if spi.is_first_name then fun p -> p.first_name
+        else fun p -> p.surname
       in
       Hashtbl.fold
         (fun _ iper iperl ->
