@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.124 2006-11-16 02:33:59 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.125 2006-11-16 10:07:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1060,7 +1060,7 @@ value start_with s p =
   String.sub s 0 (String.length p) = p
 ;
 
-value spi_cursor spi s =
+value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
   | Spi2 db2 is_first_name ->
@@ -1102,6 +1102,12 @@ value spi_cursor spi s =
       Istr2 db2 (f1, f2) pos ]
 ;
 
+value spi_next spi s =
+  match (spi, s) with
+  [ (Spi spi, Istr s) -> Istr (spi.next s)
+  | _ -> failwith "not impl spi_next" ]
+;
+
 value spi_find spi s =
   match (spi, s) with
   [ (Spi spi, Istr s) -> spi.find s
@@ -1122,12 +1128,6 @@ value spi_find spi s =
            [ Not_found -> iperl ])
         db2.patches.h_key []
   | _ -> failwith "not impl spi_find" ]
-;
-
-value spi_next spi s =
-  match (spi, s) with
-  [ (Spi spi, Istr s) -> Istr (spi.next s)
-  | _ -> failwith "not impl spi_next" ]
 ;
 
 value base_visible_get base f =
