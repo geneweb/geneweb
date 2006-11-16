@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.29 2006-11-16 00:30:32 ddr Exp $
+# $Id: Makefile,v 5.30 2006-11-16 09:08:04 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -159,7 +159,7 @@ always:
 depend:
 	$(MAKE) ppdef pr_dep.cmo def.syn.cmo gwlib.ml
 	$(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
-	export LC_ALL=C; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
+	export LC_ALL=C; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
 	mv .depend.new .depend
 
 include .depend
