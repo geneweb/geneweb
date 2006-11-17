@@ -1,4 +1,4 @@
-(* $Id: dutil.ml,v 5.10 2006-10-21 09:13:13 ddr Exp $ *)
+(* $Id: dutil.ml,v 5.11 2006-11-17 02:36:18 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Dbdisk;
@@ -112,39 +112,8 @@ value compare_names_1 s1 s2 =
     | x -> x ]
 ;
 
-value start_with ini s =
-  loop 0 0 where rec loop i j =
-    if i = String.length ini then True
-    else if j = String.length s then False
-    else if String.unsafe_get ini i = String.unsafe_get s j then
-      loop (i + 1) (j + 1)
-    else False
-;
-
-value get_particle s =
-  loop where rec loop =
-    fun
-    [ [part :: parts] -> if start_with part s then part else loop parts
-    | [] -> "" ]
-;
-
-value compare_part particles s1 s2 =
-  let p1 = get_particle s1 particles in
-  let p2 = get_particle s2 particles in
-  loop (String.length p1) (String.length p2) where rec loop i1 i2 =
-    if i1 = String.length s1 && i2 = String.length s2 then compare p1 p2
-    else if i1 = String.length s1 then -1
-    else if i2 = String.length s2 then 1
-    else
-      let c1 = String.unsafe_get s1 i1 in
-      let c2 = String.unsafe_get s2 i2 in
-      if c1 < c2 then -1
-      else if c1 > c2 then 1
-      else loop (i1 + 1) (i2 + 1)
-;
-
 value compare_names base_data s1 s2 =
-  if utf_8_db.val then compare_part base_data.particles s1 s2
+  if utf_8_db.val then compare_after_particle base_data.particles s1 s2
   else compare_names_1 s1 s2
 ;
 
