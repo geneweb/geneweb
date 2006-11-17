@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.131 2006-11-16 15:17:43 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.132 2006-11-17 02:36:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -85,7 +85,7 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
 type string_person_index2 =
   { is_first_name : bool;
     table : array (string * int);
-    index_of_first_char : array int;
+    index_of_first_char : list (string * int);
     ini : mutable string;
     curr : mutable int }
 ;
@@ -1045,10 +1045,18 @@ value persons_of_name base =
   | Base2 db2 -> persons2_of_name db2 ]
 ;
 
+value start_with s p =
+  String.length p < String.length s &&
+  String.sub s 0 (String.length p) = p
+;
+
 value persons_of_first_name_or_surname2 db2 is_first_name = do {
   let f1 = "person" in
   let f2 = if is_first_name then "first_name" else "surname" in
   let f = "data" in
+  let particles =
+    Mutil.input_particles (Filename.concat db2.bdir "particles.txt")
+  in
   let ic = fast_open_in_bin_and_seek db2 f1 f2 f Db2.first_item_pos in
   let (list, len) =
     loop [] 0 Db2.first_item_pos where rec loop list len pos =
@@ -1057,23 +1065,47 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
         [ End_of_file -> None ]
       with
       [ Some s ->
+          let s =
+            try
+              let part = List.find (start_with s) particles in
+              let plen = String.length part in
+              String.sub s plen (String.length s - plen) ^ " (" ^
+              part ^ ")"
+            with
+            [ Not_found -> s ]
+          in
           let list = [(s, pos) :: list] in
           loop list (len + 1) (pos_in ic)
       | None -> (list, len) ]
   in
   let list = List.sort compare list in
   let a = Array.make len ("", 0) in
-  let iofc = Array.make 256 (-1) in
-  loop 0 list where rec loop i =
-    fun
-    [ [] -> ()
-    | [((s, _) as s_pos) :: list] -> do {
-        a.(i) := s_pos;
-        if String.length s > 0 && iofc.(Char.code s.[0]) = -1 then
-          iofc.(Char.code s.[0]) := i
-        else ();
-        loop (i + 1) list
-      } ];
+  let iofc =
+    loop [] 0 list where rec loop rev_iofc i =
+      fun
+      [ [] -> List.rev rev_iofc
+      | [((s, _) as s_pos) :: list] -> do {
+          a.(i) := s_pos;
+          let rev_iofc =
+            match rev_iofc with
+            [ [(prev_s, _) :: _] ->
+                if prev_s = "" then [(s, i) :: rev_iofc]
+                else
+                  let prev_nbc = Name.nbc prev_s.[0] in
+                  let nbc = Name.nbc s.[0] in
+                  if prev_nbc = nbc && nbc > 0 &&
+                     nbc <= String.length prev_s &&
+                     nbc <= String.length s &&
+                     String.sub prev_s 0 nbc = String.sub s 0 nbc
+                  then
+                    rev_iofc
+                  else
+                    [(s, i) :: rev_iofc]
+            | [] -> [s_pos] ]
+          in
+          loop rev_iofc (i + 1) list
+        } ]
+  in
   Spi2 db2
     {is_first_name = is_first_name; table = a; index_of_first_char = iofc;
      ini = ""; curr = 0}
@@ -1091,21 +1123,45 @@ value persons_of_surname base =
   | Base2 db2 -> persons_of_first_name_or_surname2 db2 False ]
 ;
 
-value start_with s p =
-  String.length p < String.length s &&
-  String.sub s 0 (String.length p) = p
-;
-
 value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
   | Spi2 db2 spi -> do {
+(*
+      This optimisation is interesting only in an implementation (later) when
+      spi.table in on disk, not in memory, since it allow to go directly to
+      the first interesting item of the table, instead of reading the table
+      from the beginning. Otherwise, with a table on memory, we save no much
+      time.
+
+      let i =
+        (* to be faster, go directly to the first string starting with
+           the same char *)
+        if s = "" then 0
+        else
+          let nbc = Name.nbc s.[0] in
+          loop spi.index_of_first_char where rec loop =
+            fun
+            [ [(s1, i1) :: list] ->
+                if s1 = "" then loop list
+                else
+                  let nbc1 = Name.nbc s1.[0] in
+                  if nbc = nbc1 && nbc > 0 && nbc <= String.length s &&
+                     nbc <= String.length s1 &&
+                     String.sub s 0 nbc = String.sub s1 0 nbc
+                  then i1
+                  else loop list
+            | [] -> raise Not_found ]
+      in
+*)
+      let i = 0 in
+(**)
       let (pos, i) =
-        loop 0 where rec loop i =
+        loop i where rec loop i =
           if i == Array.length spi.table then raise Not_found
           else
             let (s1, pos) = spi.table.(i) in
-            if s1 >= s then (pos, i) else loop (i + 1)
+            if start_with s1 s then (pos, i) else loop (i + 1)
       in
       spi.ini := s;
       spi.curr := i;
@@ -1121,13 +1177,13 @@ value spi_next spi istr =
       let i =
         if spi.ini = "" then
           let s = fst spi.table.(spi.curr) in
-          if s = "" then spi.curr + 1 + 1
+          if s = "" then spi.curr + 1
           else
-            loop (Char.code s.[0] + 1) where rec loop j =
-              if j = 256 then raise Not_found
-              else
-                let i = spi.index_of_first_char.(j) in
-                if i < 0 then loop (j + 1) else i
+            loop spi.index_of_first_char where rec loop =
+              fun
+              [ [(s1, _) :: ([(_, i2) :: _] as list)] ->
+                  if s = s1 then i2 else loop list
+              | [] | [_] -> raise Not_found ]
         else spi.curr + 1
       in
       if i = Array.length spi.table then raise Not_found
@@ -1175,7 +1231,7 @@ value base_particles base =
   match base with
   [ Base base -> base.data.particles
   | Base2 db2 ->
-      Mutil.input_particles (Filename.concat db2.bdir "../particles.txt") ]
+      Mutil.input_particles (Filename.concat db2.bdir "particles.txt") ]
 ;
 
 value base_strings_of_first_name_or_surname base field proj s =

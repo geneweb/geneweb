@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.16 2006-11-16 10:07:10 ddr Exp $ *)
+(* $Id: alln.ml,v 5.17 2006-11-17 02:36:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -398,22 +398,19 @@ value print_alphabetic conf base is_surnames =
   in
   let list =
     if fast then
-      let list =
-        loop [] 'Z' where rec loop list c =
-          let list = [(String.make 1 c, "", 1) :: list] in
-          if c = 'A' then list else loop list (Char.chr (Char.code c - 1))
-      in
-      list
+      loop [] 'Z' where rec loop list c =
+        let list = [(String.make 1 c, "", 1) :: list] in
+        if c = 'A' then list else loop list (Char.chr (Char.code c - 1))
     else
       let (list, sorted) = select_names conf base is_surnames ini in
       if sorted then list
       else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
   in
-  let len = List.length list in
+  let len = if ini = "" then 0 else List.length list in
   if fast then
     let list = List.map (fun (s, _, _) -> (s, 1)) list in
     print_alphabetic_big conf base is_surnames ini list 1
-  else if len >= 50 then
+  else if len >= 50 || ini = "" then
     let list = combine_by_ini ini list in
     if all then print_alphabetic_all conf base is_surnames ini list len
     else print_alphabetic_big conf base is_surnames ini list len

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.27 2006-11-13 16:04:17 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.28 2006-11-17 02:36:18 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -1165,16 +1165,17 @@ value input_particles part_file =
   else Mutil.input_particles part_file
 ;
 
-value output_particles_file bname particles =
+value output_particles_file bname particles = do {
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  let oc = open_out (Filename.concat bdir "particles.txt") in
-  do {
-    List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
-    close_out oc;
-  }
-;
+  let fname =
+    List.fold_left Filename.concat bdir ["base_d"; "particles.txt"]
+  in
+  let oc = open_out fname in
+  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  close_out oc;
+};
 
 value separate = ref False;
 value shift = ref 0;

@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.10 2006-11-01 16:59:59 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.11 2006-11-17 02:36:18 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size : int;
@@ -32,5 +32,7 @@ value iso_8859_1_of_utf_8 : string -> string;
 
 value roman_of_arabian : int -> string;
 value arabian_of_roman : string -> int;
+
+value compare_after_particle : list string -> string -> string -> int;
 
 module StrSet : Set.S with type elt = string;
