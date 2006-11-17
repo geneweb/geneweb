@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.133 2006-11-17 14:36:49 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.134 2006-11-17 21:17:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -84,7 +84,6 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
 
 type string_person_index2 =
   { is_first_name : bool;
-    table : array (string * int);
     index_of_first_char : list (string * int);
     ini : mutable string;
     curr : mutable int }
@@ -1063,15 +1062,12 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
   let fdir = List.fold_left Filename.concat db2.bdir [f1; f2] in
   let index_dat_fname = Filename.concat fdir "index.dat" in
   let index_ini_fname = Filename.concat fdir "index.ini" in
-  let (a, iofc) =
-    if Sys.file_exists index_dat_fname then do {
-      let ic = open_in_bin index_dat_fname in
-      let a : array (string * int) = input_value ic in
-      close_in ic;
+  let iofc =
+    if Sys.file_exists index_ini_fname then do {
       let ic = open_in_bin index_ini_fname in
       let iofc : list (string * int) = input_value ic in
       close_in ic;
-      (a, iofc)
+      iofc
     }
     else do {
       let f = "data" in
@@ -1130,15 +1126,20 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
       let oc = open_out_bin index_dat_fname in
       output_value oc (a : array (string * int));
       close_out oc;
+      let oc = open_out_bin (Filename.concat fdir "index.acc") in
+      let _ : int =
+        Iovalue.output_array_access oc (Array.get a) (Array.length a) 0
+      in
+      close_out oc;
       let oc = open_out_bin index_ini_fname in
       output_value oc (iofc : list (string * int));
       close_out oc;
-      (a, iofc)
+      iofc
     }
   in
   Spi2 db2
-    {is_first_name = is_first_name; table = a; index_of_first_char = iofc;
-     ini = ""; curr = 0}
+    {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
+     curr = 0}
 };
 
 value persons_of_first_name base =
@@ -1157,13 +1158,6 @@ value spi_first spi s =
   match spi with
   [ Spi spi -> Istr (spi.cursor s)
   | Spi2 db2 spi -> do {
-(*
-      This optimisation is interesting only in an implementation (later) when
-      spi.table in on disk, not in memory, since it allow to go directly to
-      the first interesting item of the table, instead of reading the table
-      from the beginning. Otherwise, with a table on memory, we save no much
-      time.
-
       let i =
         (* to be faster, go directly to the first string starting with
            the same char *)
@@ -1183,20 +1177,22 @@ value spi_first spi s =
                   else loop list
             | [] -> raise Not_found ]
       in
-*)
-      let i = 0 in
-(**)
+      let f1 = "person" in
+      let f2 = if spi.is_first_name then "first_name" else "surname" in
+      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
+      let pos = input_binary_int ic in
+      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
       let (pos, i) =
-        loop i where rec loop i =
-          if i == Array.length spi.table then raise Not_found
-          else
-            let (s1, pos) = spi.table.(i) in
+        try
+          loop i where rec loop i =
+            let (s1, pos) : (string * int) = Iovalue.input ic in
             if start_with s1 s then (pos, i) else loop (i + 1)
+        with
+        [ End_of_file -> raise Not_found ]
       in
       spi.ini := s;
       spi.curr := i;
-      let f2 = if spi.is_first_name then "first_name" else "surname" in
-      Istr2 db2 ("person", f2) pos
+      Istr2 db2 (f1, f2) pos
     } ]
 ;
 
@@ -1206,21 +1202,23 @@ value spi_next spi istr =
   | (Spi2 db2 spi, Istr2 _ (f1, f2) _) ->
       let i =
         if spi.ini = "" then
-          let s = fst spi.table.(spi.curr) in
-          if s = "" then spi.curr + 1
-          else
-            loop spi.index_of_first_char where rec loop =
-              fun
-              [ [(s1, _) :: ([(_, i2) :: _] as list)] ->
-                  if s = s1 then i2 else loop list
-              | [] | [_] -> raise Not_found ]
+          loop spi.index_of_first_char where rec loop =
+            fun
+            [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
+                if spi.curr = i1 then i2 else loop list
+            | [] | [_] -> raise Not_found ]
         else spi.curr + 1
       in
-      if i = Array.length spi.table then raise Not_found
-      else do {
+      try do {
+        let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4) in
+        let pos = input_binary_int ic in
+        let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
+        let (s, pos) : (string * int) = Iovalue.input ic in
         spi.curr := i;
-        Istr2 db2 (f1, f2) (snd spi.table.(i))
+        Istr2 db2 (f1, f2) pos
       }
+      with
+      [ End_of_file -> raise Not_found ]
   | _ -> failwith "not impl spi_next" ]
 ;
 
