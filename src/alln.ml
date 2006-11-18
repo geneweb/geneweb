@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.18 2006-11-18 07:15:18 ddr Exp $ *)
+(* $Id: alln.ml,v 5.19 2006-11-18 07:33:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -145,7 +145,7 @@ value tr c1 s2 s =
     else loop (i + 1) (Buff.store len (String.unsafe_get s i))
 ;
 
-value print_alphabetic_big conf base is_surnames ini list len =
+value print_alphabetic_big conf base is_surnames ini list len too_big =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   do {
@@ -160,7 +160,7 @@ value print_alphabetic_big conf base is_surnames ini list len =
            end)
         list;
     end;
-    if len <= default_max_cnt then do {
+    if len <= default_max_cnt && not too_big then do {
       stagn "p" begin
         Wserver.wprint "%s:" (capitale (transl conf "the whole list"));
       end;
@@ -420,13 +420,13 @@ value print_alphabetic conf base is_surnames =
   in
   if fast then
     let list = List.map (fun (s, _, _) -> (s, 1)) list in
-    print_alphabetic_big conf base is_surnames ini list 1
+    print_alphabetic_big conf base is_surnames ini list 1 True
   else if len >= 50 || ini = "" then
     let list = combine_by_ini ini list in
     if all then
       if len > default_max_cnt then incorrect_request conf
       else print_alphabetic_all conf base is_surnames ini list len
-    else print_alphabetic_big conf base is_surnames ini list len
+    else print_alphabetic_big conf base is_surnames ini list len False
   else print_alphabetic_small conf base is_surnames ini list len
 ;
 
