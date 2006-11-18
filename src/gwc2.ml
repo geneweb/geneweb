@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.28 2006-11-17 02:36:18 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.29 2006-11-18 11:43:04 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -33,6 +33,7 @@ type gen =
     g_fcnt : mutable int;
     g_scnt : mutable int;
     g_tmp_dir : string;
+    g_particles : list string;
 
     g_strings : Hashtbl.t string Adef.istr;
     g_index_of_key : Hashtbl.t key iper;
@@ -625,6 +626,81 @@ value make_name_index tmp_dir nbper = do {
   output_hashtbl dir "person_of_name.ht" ht;
 };
 
+value start_with s p =
+  String.length p < String.length s &&
+  String.sub s 0 (String.length p) = p
+;
+
+value make_index gen f2 = do {
+  let f1 = "person" in
+  let bdir = Filename.concat gen.g_tmp_dir "base_d" in
+  let fdir = List.fold_left Filename.concat bdir [f1; f2] in
+  let index_dat_fname = Filename.concat fdir "index.dat" in
+  let index_ini_fname = Filename.concat fdir "index.ini" in
+  let data_fname = Filename.concat fdir "data" in
+  let ic = open_in_bin data_fname in
+  seek_in ic Db2.first_item_pos;
+  let (list, len) =
+    loop [] 0 Db2.first_item_pos where rec loop list len pos =
+      match
+        try Some (Iovalue.input ic : string) with
+        [ End_of_file -> None ]
+      with
+      [ Some s ->
+          let s =
+            try
+              let part = List.find (start_with s) gen.g_particles in
+              let plen = String.length part in
+              String.sub s plen (String.length s - plen) ^ " (" ^
+              part ^ ")"
+            with
+            [ Not_found -> s ]
+          in
+          let list = [(s, pos) :: list] in
+          loop list (len + 1) (pos_in ic)
+      | None -> (list, len) ]
+  in
+  let list = List.sort compare list in
+  let a = Array.make len ("", 0) in
+  let iofc =
+    loop [] 0 list where rec loop rev_iofc i =
+      fun
+      [ [] -> List.rev rev_iofc
+      | [((s, _) as s_pos) :: list] -> do {
+          a.(i) := s_pos;
+          let rev_iofc =
+            match rev_iofc with
+            [ [(prev_s, _) :: _] ->
+                if prev_s = "" then [(s, i) :: rev_iofc]
+                else
+                  let prev_nbc = Name.nbc prev_s.[0] in
+                  let nbc = Name.nbc s.[0] in
+                  if prev_nbc = nbc && nbc > 0 &&
+                     nbc <= String.length prev_s &&
+                     nbc <= String.length s &&
+                     String.sub prev_s 0 nbc = String.sub s 0 nbc
+                  then
+                    rev_iofc
+                  else
+                    [(s, i) :: rev_iofc]
+            | [] -> [s_pos] ]
+          in
+          loop rev_iofc (i + 1) list
+        } ]
+  in
+  let oc = open_out_bin index_dat_fname in
+  output_value oc (a : array (string * int));
+  close_out oc;
+  let oc = open_out_bin (Filename.concat fdir "index.acc") in
+  let _ : int =
+    Iovalue.output_array_access oc (Array.get a) (Array.length a) 0
+  in
+  close_out oc;
+  let oc = open_out_bin index_ini_fname in
+  output_value oc (iofc : list (string * int));
+  close_out oc;
+};
+
 value unique_key_string gen s =
   let s = Name.lower (Mutil.nominative s) in
   try Hashtbl.find gen.g_strings s with
@@ -970,6 +1046,24 @@ value pr_stats = ref False;
 
 value part_file = ref "";
 
+value input_particles part_file =
+  if part_file = "" then
+    ["af "; "d'"; "dal "; "de "; "di "; "du "; "of "; "van ";
+     "von und zu "; "von "; "zu "; "zur ";
+     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
+     "VON UND ZU "; "VON "; "ZU "; "ZUR "]
+  else Mutil.input_particles part_file
+;
+
+value output_particles_file tmp_dir particles = do {
+  let fname =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "particles.txt"]
+  in
+  let oc = open_out fname in
+  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  close_out oc;
+};
+
 value link gwo_list bname =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1030,6 +1124,7 @@ value link gwo_list bname =
     in
     let gen =
       {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_tmp_dir = tmp_dir;
+       g_particles = input_particles part_file.val;
        g_strings = Hashtbl.create 1;
        g_index_of_key = Hashtbl.create 1;
        g_person_fields = person_fields;
@@ -1123,6 +1218,10 @@ value link gwo_list bname =
     make_string_of_crush_index tmp_dir;
     make_person_of_string_index tmp_dir;
     make_name_index tmp_dir gen.g_pcnt;
+    make_index gen "first_name";
+    make_index gen "surname";
+
+    output_particles_file tmp_dir gen.g_particles;
 
     Printf.eprintf "pcnt %d\n" gen.g_pcnt;
     Printf.eprintf "fcnt %d\n" gen.g_fcnt;
@@ -1155,27 +1254,6 @@ value output_command_line bname =
     close_out oc;
   }
 ;
-
-value input_particles part_file =
-  if part_file = "" then
-    ["af "; "d'"; "dal "; "de "; "di "; "du "; "of "; "van ";
-     "von und zu "; "von "; "zu "; "zur ";
-     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
-     "VON UND ZU "; "VON "; "ZU "; "ZUR "]
-  else Mutil.input_particles part_file
-;
-
-value output_particles_file bname particles = do {
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
-  let fname =
-    List.fold_left Filename.concat bdir ["base_d"; "particles.txt"]
-  in
-  let oc = open_out fname in
-  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
-  close_out oc;
-};
 
 value separate = ref False;
 value shift = ref 0;
@@ -1256,8 +1334,6 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       [ Accept -> do {
           link (List.rev gwo.val) out_file.val;
           output_command_line out_file.val;
-          let particles = input_particles part_file.val in
-          output_particles_file out_file.val particles;
         }
       | Refuse ->
           do {
