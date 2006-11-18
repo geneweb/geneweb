@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.134 2006-11-17 21:17:08 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.135 2006-11-18 07:15:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1196,12 +1196,12 @@ value spi_first spi s =
     } ]
 ;
 
-value spi_next spi istr =
+value spi_next spi istr need_whole_list =
   match (spi, istr) with
-  [ (Spi spi, Istr s) -> Istr (spi.next s)
+  [ (Spi spi, Istr s) -> (Istr (spi.next s), 1)
   | (Spi2 db2 spi, Istr2 _ (f1, f2) _) ->
       let i =
-        if spi.ini = "" then
+        if spi.ini = "" && not need_whole_list then
           loop spi.index_of_first_char where rec loop =
             fun
             [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
@@ -1210,12 +1210,20 @@ value spi_next spi istr =
         else spi.curr + 1
       in
       try do {
-        let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4) in
-        let pos = input_binary_int ic in
-        let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
+        let ic =
+          if i = spi.curr + 1 then
+            Hashtbl.find db2.cache_chan (f1, f2, "index.dat")
+          else
+            let ic =
+              fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
+            in
+            let pos = input_binary_int ic in
+            fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
+        in
         let (s, pos) : (string * int) = Iovalue.input ic in
+        let dlen = i - spi.curr in
         spi.curr := i;
-        Istr2 db2 (f1, f2) pos
+        (Istr2 db2 (f1, f2) pos, dlen)
       }
       with
       [ End_of_file -> raise Not_found ]
