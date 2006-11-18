@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.70 2006-11-16 10:07:10 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.71 2006-11-18 07:15:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -141,7 +141,7 @@ value persons_of_surname : base -> string_person_index;
 
 value spi_first : string_person_index -> string -> istr;
   (* first [first/sur]name starting with that string *)
-value spi_next : string_person_index -> istr -> istr;
+value spi_next : string_person_index -> istr -> bool -> (istr * int);
   (* next [first/sur]name by alphabetical order *)
 value spi_find : string_person_index -> istr -> list iper;
   (* all persons having that [first/sur]name *)

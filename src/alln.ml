@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.17 2006-11-17 02:36:18 ddr Exp $ *)
+(* $Id: alln.ml,v 5.18 2006-11-18 07:15:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -160,28 +160,31 @@ value print_alphabetic_big conf base is_surnames ini list len =
            end)
         list;
     end;
-    stagn "p" begin
-      Wserver.wprint "%s:" (capitale (transl conf "the whole list"));
-    end;
-    tag "ul" begin
-      stagn "li" begin
-        stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
-          Wserver.wprint "%s" (transl conf "long display");
+    if len <= default_max_cnt then do {
+      stagn "p" begin
+        Wserver.wprint "%s:" (capitale (transl conf "the whole list"));
+      end;
+      tag "ul" begin
+        stagn "li" begin
+          stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
+            Wserver.wprint "%s" (transl conf "long display");
+          end;
+        end;
+        stagn "li" begin
+          stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
+            Wserver.wprint "%s" (transl conf "short display");
+          end;
+        end;
+        stagn "li" begin
+          stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
+              begin
+            Wserver.wprint "%s + %s" (transl conf "short display")
+              (transl conf "cancel GeneWeb links");
+          end;
         end;
       end;
-      stagn "li" begin
-        stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
-          Wserver.wprint "%s" (transl conf "short display");
-        end;
-      end;
-      stagn "li" begin
-        stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
-            begin
-          Wserver.wprint "%s + %s" (transl conf "short display")
-            (transl conf "cancel GeneWeb links");
-        end;
-      end;
-    end;
+    }
+    else ();
     trailer conf;
   }
 ;
@@ -288,23 +291,23 @@ value print_frequency_any conf base is_surnames list len =
 
 (* selection *)
 
-value select_names conf base is_surnames ini =
+value select_names conf base is_surnames ini need_whole_list =
   let iii =
     if is_surnames then persons_of_surname base
     else persons_of_first_name base
   in
-  let list =
+  let (list, len) =
     let start_k = Mutil.tr '_' ' ' ini in
     match
       try Some (spi_first iii (capitalize_if_not_utf8 start_k)) with
       [ Not_found -> None ]
     with
     [ Some istr ->
-        loop istr [] where rec loop istr list =
+        loop istr 0 [] where rec loop istr len list =
           let s = nominative (sou base istr) in
           let k = name_key_compatible base s in
           if string_start_with ini k then
-            let list =
+            let (list, len) =
               if s <> "?" then
                 let my_list = spi_find iii istr in
                 let my_list =
@@ -330,33 +333,37 @@ value select_names conf base is_surnames ini =
                   else my_list
                 in 
                 let cnt = List.length my_list in
-                if cnt = 0 then list
+                if cnt = 0 then (list, len)
                 else
                   match list with
                   [ [(k1, s1, cnt1) :: list1] ->
-                      if k = k1 then [(k1, s1, cnt1 + cnt) :: list1]
-                      else [(k, s, cnt) :: list]
-                  | [] -> [(k, s, cnt)] ]
-              else list
+                      if k = k1 then
+                        ([(k1, s1, cnt1 + cnt) :: list1], len - 1)
+                      else ([(k, s, cnt) :: list], len)
+                  | [] -> ([(k, s, cnt)], len) ]
+              else (list, len)
             in
-            match try Some (spi_next iii istr) with [ Not_found -> None ] with
-            [ Some istr -> loop istr list
-            | None -> list ]
-          else list
-    | None -> [] ]
+            match
+              try Some (spi_next iii istr need_whole_list) with
+              [ Not_found -> None ]
+            with
+            [ Some (istr, dlen) -> loop istr (len + dlen) list
+            | None -> (list, len) ]
+          else (list, len)
+    | None -> ([], 0) ]
   in
-  let list =
+  let (list, len) =
     let lim =
       match p_getint conf.env "atleast" with
       [ Some x -> x
       | None -> 0 ]
     in
     List.fold_left
-      (fun list (k, s, cnt) ->
-         if cnt >= lim then [(k, s, cnt) :: list] else list)
-      [] list
+      (fun (list, len) (k, s, cnt) ->
+         if cnt >= lim then ([(k, s, cnt) :: list], len) else (list, len - 1))
+      ([], len) list
   in
-  (list, if Mutil.utf_8_db.val then False else True)
+  (list, if Mutil.utf_8_db.val then False else True, len)
 ;
 
 value compare2 s1 s2 =
@@ -365,8 +372,8 @@ value compare2 s1 s2 =
 
 value print_frequency conf base is_surnames =
   let () = load_strings_array base in
+  let (list, _, len) = select_names conf base is_surnames "" True in
   let list =
-    let (list, _) = select_names conf base is_surnames "" in
     List.sort
       (fun (k1, _, cnt1) (k2, _, cnt2) ->
          if cnt1 > cnt2 then -1
@@ -374,7 +381,6 @@ value print_frequency conf base is_surnames =
          else compare2 k1 k2)
       list
   in
-  let len = List.length list in
   let list = combine_by_count list in
   print_frequency_any conf base is_surnames list len
 ;
@@ -396,23 +402,30 @@ value print_alphabetic conf base is_surnames =
     [ Some "A" -> True
     | _ -> False ]
   in
-  let list =
+  let (list, len) =
     if fast then
-      loop [] 'Z' where rec loop list c =
+      loop [] 0 'Z' where rec loop list len c =
         let list = [(String.make 1 c, "", 1) :: list] in
-        if c = 'A' then list else loop list (Char.chr (Char.code c - 1))
+        if c = 'A' then (list, len)
+        else loop list (len + 1) (Char.chr (Char.code c - 1))
     else
-      let (list, sorted) = select_names conf base is_surnames ini in
-      if sorted then list
-      else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
+      let (list, sorted, len) =
+        select_names conf base is_surnames ini all
+      in
+      let list =
+        if sorted then list
+        else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
+      in
+      (list, len)
   in
-  let len = if ini = "" then 0 else List.length list in
   if fast then
     let list = List.map (fun (s, _, _) -> (s, 1)) list in
     print_alphabetic_big conf base is_surnames ini list 1
   else if len >= 50 || ini = "" then
     let list = combine_by_ini ini list in
-    if all then print_alphabetic_all conf base is_surnames ini list len
+    if all then
+      if len > default_max_cnt then incorrect_request conf
+      else print_alphabetic_all conf base is_surnames ini list len
     else print_alphabetic_big conf base is_surnames ini list len
   else print_alphabetic_small conf base is_surnames ini list len
 ;
@@ -478,14 +491,15 @@ value print_short conf base is_surnames =
   let _ =
     if String.length ini < 2 then load_strings_array base else ()
   in
-  let list =
-    let (list, sorted) = select_names conf base is_surnames ini in
-    if sorted then list
-    else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
-  in
-  let len = List.length list in
-  let list = combine_by_ini ini list in
-  print_alphabetic_short conf base is_surnames ini list len
+  let (list, sorted, len) = select_names conf base is_surnames ini True in
+  if len > default_max_cnt then incorrect_request conf
+  else
+    let list =
+      if sorted then list
+      else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
+    in
+    let list = combine_by_ini ini list in
+    print_alphabetic_short conf base is_surnames ini list len
 ;
 
 (* main *)
