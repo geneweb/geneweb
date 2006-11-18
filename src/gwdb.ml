@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.135 2006-11-18 07:15:18 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.136 2006-11-18 11:43:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1060,83 +1060,10 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
   let f1 = "person" in
   let f2 = if is_first_name then "first_name" else "surname" in
   let fdir = List.fold_left Filename.concat db2.bdir [f1; f2] in
-  let index_dat_fname = Filename.concat fdir "index.dat" in
   let index_ini_fname = Filename.concat fdir "index.ini" in
-  let iofc =
-    if Sys.file_exists index_ini_fname then do {
-      let ic = open_in_bin index_ini_fname in
-      let iofc : list (string * int) = input_value ic in
-      close_in ic;
-      iofc
-    }
-    else do {
-      let f = "data" in
-      let particles =
-        Mutil.input_particles (Filename.concat db2.bdir "particles.txt")
-      in
-      let ic = fast_open_in_bin_and_seek db2 f1 f2 f Db2.first_item_pos in
-      let (list, len) =
-        loop [] 0 Db2.first_item_pos where rec loop list len pos =
-          match
-            try Some (Iovalue.input ic : string) with
-            [ End_of_file -> None ]
-          with
-          [ Some s ->
-              let s =
-                try
-                  let part = List.find (start_with s) particles in
-                  let plen = String.length part in
-                  String.sub s plen (String.length s - plen) ^ " (" ^
-                  part ^ ")"
-                with
-                [ Not_found -> s ]
-              in
-              let list = [(s, pos) :: list] in
-              loop list (len + 1) (pos_in ic)
-          | None -> (list, len) ]
-      in
-      let list = List.sort compare list in
-      let a = Array.make len ("", 0) in
-      let iofc =
-        loop [] 0 list where rec loop rev_iofc i =
-          fun
-          [ [] -> List.rev rev_iofc
-          | [((s, _) as s_pos) :: list] -> do {
-              a.(i) := s_pos;
-              let rev_iofc =
-                match rev_iofc with
-                [ [(prev_s, _) :: _] ->
-                    if prev_s = "" then [(s, i) :: rev_iofc]
-                    else
-                      let prev_nbc = Name.nbc prev_s.[0] in
-                      let nbc = Name.nbc s.[0] in
-                      if prev_nbc = nbc && nbc > 0 &&
-                         nbc <= String.length prev_s &&
-                         nbc <= String.length s &&
-                         String.sub prev_s 0 nbc = String.sub s 0 nbc
-                      then
-                        rev_iofc
-                      else
-                        [(s, i) :: rev_iofc]
-                | [] -> [s_pos] ]
-              in
-              loop rev_iofc (i + 1) list
-            } ]
-      in
-      let oc = open_out_bin index_dat_fname in
-      output_value oc (a : array (string * int));
-      close_out oc;
-      let oc = open_out_bin (Filename.concat fdir "index.acc") in
-      let _ : int =
-        Iovalue.output_array_access oc (Array.get a) (Array.length a) 0
-      in
-      close_out oc;
-      let oc = open_out_bin index_ini_fname in
-      output_value oc (iofc : list (string * int));
-      close_out oc;
-      iofc
-    }
-  in
+  let ic = open_in_bin index_ini_fname in
+  let iofc : list (string * int) = input_value ic in
+  close_in ic;
   Spi2 db2
     {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
      curr = 0}
