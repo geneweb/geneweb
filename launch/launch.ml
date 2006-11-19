@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.21 2006-11-13 12:37:46 ddr Exp $ *)
+(* $Id: launch.ml,v 1.22 2006-11-19 10:27:56 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -241,8 +241,19 @@ value rec show_main state = do {
             change_options state;
           })]
   in
+  let rbut =
+    Button.create run_frame
+      [Text "Restart";
+       Command
+         (fun _ -> do {
+            Pack.forget [gframe];
+            close_server state;
+            Unix.sleep 1;
+            launch_server state;
+          })]
+  in
   let wbut = Button.create run_frame [Text "Quit"; Command closeTk] in
-  pack [cbut; obut; wbut] [Fill Fill_X];
+  pack [cbut; obut; rbut; wbut] [Fill Fill_X];
 }
 
 and change_options state = do {
