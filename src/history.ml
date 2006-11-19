@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.7 2006-11-19 20:25:03 ddr Exp $ *)
+(* $Id: history.ml,v 5.8 2006-11-19 21:13:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -191,9 +191,16 @@ value rec eval_var conf base env xx loc =
       match get_env "info" env with
       [ Vinfo _ _ _ _ s -> VVstring (possibly_highlight env s)
       | _ -> raise Not_found ]
-  | ["note"; "page"] ->
+  | ["note"; "page" :: sl] ->
       match get_env "info" env with
-      [ Vinfo _ _ _ (HI_notes pg _) _ -> VVstring pg
+      [ Vinfo _ _ _ (HI_notes s _) _ ->
+          let s =
+            match sl with
+            [ ["v"] -> s
+            | [] -> possibly_highlight env s
+            | _ -> raise Not_found ]
+          in
+          VVstring s
       | _ -> raise Not_found ]
   | ["note"; "part"] ->
       match get_env "info" env with

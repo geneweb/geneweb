@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.6 2006-11-19 20:25:03 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.7 2006-11-19 21:13:01 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none"%/>
@@ -92,7 +92,7 @@
         <a href="%prefix;%person.access;">%person;</a>%person.title;
         %person.dates;
       %elseif;is_note;
-        - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page;%end;
+        - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page.v;%end;
         %if;(note.part != "");v=%note.part;%end;">
         <i>%if;(note.page = "")[note/notes]1%else;%[%note.page;%]%end;
         </i></a>
