@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.34 2006-11-10 04:36:33 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.35 2006-11-19 13:56:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -330,6 +330,56 @@ value print_old_wizards conf list =
   }
 ;
 
+value wizard_list_from_dir conf base =
+  match
+    try Some (Sys.readdir (dir conf base)) with [ Sys_error _ -> None ]
+  with
+  [ Some arr ->
+      List.fold_left
+        (fun list fname ->
+           if Filename.check_suffix fname ".txt" then
+             let n = Filename.chop_extension fname in
+             [n :: list]
+           else list)
+        [] (Array.to_list arr)
+  | None -> [] ]
+;
+
+value print_search_form conf from_wiz =
+  tag "table" begin
+    tag "tr" begin
+      tag "td" "align=\"%s\"" conf.right begin
+        tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+          tag "p" begin
+            hidden_env conf;
+            xtag "input"
+              "type=\"hidden\" name=\"m\" value=\"WIZNOTES_SEARCH\"";
+            xtag "input"
+              "name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\""
+              (match p_getenv conf.env "s" with
+               [ Some s -> quote_escaped s
+               | None -> "" ]);
+            if from_wiz <> "" then
+              xtag "input" "type=\"hidden\" name=\"z\" value=\"%s\"" from_wiz
+            else ();
+            xtag "br";
+            tag "label" begin
+              xtag "input" "type=\"checkbox\" name=\"c\" value=\"on\"%s"
+                (match p_getenv conf.env "c" with
+                 [ Some "on" -> " checked=\"checked\""
+                 | Some _ | None -> "" ]);
+              Wserver.wprint "%s\n"
+                (transl_nth conf "search/case sensitive" 1);
+            end;
+            xtag "input" "type=\"submit\" value=\"%s\""
+              (capitale (transl_nth conf "search/case sensitive" 0));
+          end;
+        end;
+      end;
+    end;
+  end
+;
+
 value print_main conf base auth_file =
   let wiztxt =
     Util.translate_eval (transl_nth conf "wizard/wizards/friend/friends" 1)
@@ -350,8 +400,11 @@ value print_main conf base auth_file =
   in
   let wddir = dir conf base in
   do {
-    header conf title;
+    Util.header_no_page_title conf title; (* mouais... *)
     print_link_to_welcome conf True;
+    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+    title False;
+    Wserver.wprint "</h1>\n";
     let list =
       List.map
         (fun (wz, wname) ->
@@ -360,18 +413,8 @@ value print_main conf base auth_file =
         wizdata
     in
     let old_list =
-      match
-        try Some (Sys.readdir (dir conf base)) with [ Sys_error _ -> None ]
-      with
-      [ Some arr ->
-          List.fold_left
-            (fun list fname ->
-               if Filename.check_suffix fname ".txt" then
-                 let n = Filename.chop_extension fname in
-                 if List.mem_assoc n wizdata then list else [n :: list]
-               else list)
-            [] (Array.to_list arr)
-      | None -> [] ]
+      let list = wizard_list_from_dir conf base in
+      List.filter (fun n -> not (List.mem_assoc n wizdata)) list
     in
     if by_alphab_order then do {
       tag "p" begin
@@ -390,7 +433,11 @@ value print_main conf base auth_file =
     tag "p" begin
       Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
     end;
-    if by_alphab_order then print_old_wizards conf old_list else ();
+    if by_alphab_order then do {
+      print_old_wizards conf old_list;
+      print_search_form conf "";
+    }
+    else ();
     trailer conf
   }
 ;
@@ -399,50 +446,55 @@ value wizard_page_title conf wz wizname h =
   Wserver.wprint "%s" wizname
 ;
 
-value print_whole_wiznote conf base auth_file edit_opt wz wfile (s, date) =
+value print_whole_wiznote conf base auth_file wz wfile (s, date) = do {
   let wizname =
     let wizdata = read_auth_file auth_file in
     try fst (List.assoc wz wizdata) with
     [ Not_found -> wz ]
   in
+  let edit_opt =
+    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
+    Some (can_edit, "WIZNOTES", code_varenv wz)
+  in
   let title = wizard_page_title conf wz wizname in
-  do {
-    header_no_page_title conf title;
-    print_link_to_welcome conf True;
-    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
-    title False;
-    Wserver.wprint "</h1>\n";
-    match Util.open_etc_file "summary" with
-    [ Some ic -> Templ.copy_from_templ conf [] ic
-    | None -> () ];
-    tag "table" "border=\"0\" width=\"100%%\"" begin
-      tag "tr" begin
-        tag "td" begin
-          let s = string_with_macros conf [] s in
-          let s =
-            Wiki.html_with_summary_of_tlsw conf "NOTES"
-              (Notes.file_path conf base) edit_opt s
-          in
-          Wserver.wprint "%s\n" s;
-        end;
+  header_no_page_title conf title;
+  print_link_to_welcome conf True;
+  Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+  title False;
+  Wserver.wprint "</h1>\n";
+  match Util.open_etc_file "summary" with
+  [ Some ic -> Templ.copy_from_templ conf [] ic
+  | None -> () ];
+  tag "table" "border=\"0\" width=\"100%%\"" begin
+    tag "tr" begin
+      tag "td" begin
+        let s = string_with_macros conf [] s in
+        let s =
+          Wiki.html_with_summary_of_tlsw conf "NOTES"
+            (Notes.file_path conf base) edit_opt s
+        in
+        Wserver.wprint "%s\n" s;
       end;
     end;
-    if Sys.file_exists wfile then do {
-      let tm = Unix.localtime date in
-      let dmy =
-        {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
-         year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
-      in
-      tag "p" begin
-        Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
-          (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
-          tm.Unix.tm_hour tm.Unix.tm_min;
-      end
-    }
-    else ();
-    trailer conf
+  end;
+  if Sys.file_exists wfile then do {
+    let tm = Unix.localtime date in
+    let dmy =
+      {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
+       year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
+    in
+    tag "p" begin
+      Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
+        (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
+        tm.Unix.tm_hour tm.Unix.tm_min;
+    end
   }
-;
+  else ();
+  match p_getenv conf.env "m" with
+  [ Some "WIZNOTES_SEARCH" -> print_search_form conf wz
+  | Some _ | None -> () ];
+  trailer conf
+};
 
 value print_part_wiznote conf base wz s cnt0 =
   let title = wz in
@@ -459,16 +511,18 @@ value print_part_wiznote conf base wz s cnt0 =
   }
 ;
 
+value wizard_auth_file_name conf =
+  match
+    (p_getenv conf.base_env "wizard_descr_file",
+     p_getenv conf.base_env "wizard_passwd_file")
+  with
+  [ (Some "" | None, Some "" | None) -> ""
+  | (Some auth_file, _) -> auth_file
+  | (_, Some auth_file) -> auth_file ]
+;
+
 value print conf base =
-  let auth_file =
-    match
-      (p_getenv conf.base_env "wizard_descr_file",
-       p_getenv conf.base_env "wizard_passwd_file")
-    with
-    [ (Some "" | None, Some "" | None) -> ""
-    | (Some auth_file, _) -> auth_file
-    | (_, Some auth_file) -> auth_file ]
-  in
+  let auth_file = wizard_auth_file_name conf in
   if auth_file = "" then incorrect_request conf
   else
     let f =
@@ -482,15 +536,9 @@ value print conf base =
         let wz = Filename.basename wz in
         let wfile = wzfile (dir conf base) wz in
         let (s, date) = read_wizard_notes wfile in
-        let edit_opt =
-          let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-          Some (can_edit, "WIZNOTES", code_varenv wz)
-        in
         match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf base wz s cnt0
-        | None ->
-            print_whole_wiznote conf base auth_file edit_opt wz wfile
-              (s, date) ]
+        | None -> print_whole_wiznote conf base auth_file wz wfile (s, date) ]
     | None -> print_main conf base auth_file ]
 ;
 
@@ -706,4 +754,91 @@ value change_wizard_visibility conf base =
   match (conf.n_connect, p_getint conf.env "v") with
   [ (Some x, Some vis) -> do_change_wizard_visibility conf base x (vis <> 0)
   | _ -> incorrect_request conf ]
+;
+
+(* searching *)
+
+value start_equiv_with case_sens s m i =
+  let rec test i j =
+    if j = String.length s then Some i
+    else if i = String.length m then None
+    else if case_sens then
+      if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+    else
+      match Name.next_chars_if_equiv m i s j with
+      [ Some (i, j) -> test i j
+      | None -> None ]
+  in
+  if case_sens then
+    if m.[i] = s.[0] then test (i + 1) 1 else None
+  else
+    match Name.next_chars_if_equiv m i s 0 with
+    [ Some (i, j) -> test i j
+    | None -> None ]
+;
+
+value in_notes case_sens s m =
+  loop False 0 where rec loop in_tag i =
+    if i = String.length m then False
+    else if in_tag then loop (m.[i] <> '>') (i + 1)
+    else if m.[i] = '<' then loop True (i + 1)
+    else
+      match start_equiv_with case_sens s m i with
+      [ Some _ -> True
+      | None -> loop False (i + 1) ]
+;
+
+value html_highlight case_sens h s =
+  let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
+  loop False 0 0 where rec loop in_tag i len =
+    if i = String.length s then Buff.get len
+    else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
+    else if s.[i] = '<' then loop True (i + 1) (Buff.store len s.[i])
+    else
+      match start_equiv_with case_sens h s i with
+      [ Some j -> loop False j (Buff.mstore len (ht i j))
+      | None -> loop False (i + 1) (Buff.store len s.[i]) ]
+;
+
+value print_found_wiznote conf base wz wfile (s, date) =
+  let auth_file = wizard_auth_file_name conf in
+  print_whole_wiznote conf base auth_file wz wfile (s, date)
+;
+
+value search_text conf base s =
+  let s = if s = "" then " " else s in
+  let list =
+    let list = wizard_list_from_dir conf base in
+    let list = List.sort compare list in
+    match p_getenv conf.env "z" with
+    [ Some "" | None -> list
+    | Some wz ->
+        loop list where rec loop =
+          fun
+          [ [wz1 :: list] -> if wz = wz1 then list else loop list
+          | [] -> [] ] ]
+  in
+  let case_sens = p_getenv conf.env "c" = Some "on" in
+  let wizo =
+    loop list where rec loop =
+      fun
+      [ [] -> None
+      | [wz :: list] ->
+          let wz = Filename.basename wz in
+          let wfile = wzfile (dir conf base) wz in
+          let (nt, dt) = read_wizard_notes wfile in
+          if in_notes case_sens s nt then Some (wz, wfile, nt, dt)
+          else loop list ]
+  in
+  match wizo with
+  [ Some (wz, wf, nt, dt) ->
+      let nt = html_highlight case_sens s nt in
+      print_found_wiznote conf base wz wf (nt, dt)
+  | None -> print conf base ]
+;
+
+value print_search conf base =
+  match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
+  [ Some s -> search_text conf base (Wserver.gen_decode False s)
+  | None -> print conf base ]
 ;
