@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.4 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.5 2006-11-19 19:53:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none"%/>
@@ -9,6 +9,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <style type="text/css"><!--
     .highlight { color: %highlight;; font-weight: bold }
+    .found { color: black; background-color: #afa;font-weight:bold }
     hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>
@@ -25,6 +26,26 @@
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%define;search_form()
+  <table><tr><td align="%right;">
+  <form method="get" action="%action;">
+    <p>
+    %hidden;
+    <input type="hidden" name="m" value="HIST_SEARCH"%/>
+    <input type="hidden" name="k" value="%evar.k;"%/>
+    <input type="hidden" name="pos" value="%pos;"%/>
+    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+    <label>
+    <input type="checkbox" name="c" value="on"%nn;
+     %if;("main" != "true" and evar.c = "on") checked="checked"%end;
+     %/>[search/case sensitive]1
+    </label>
+    <input type="submit" value="[*search/case sensitive]0"%/>
+    </p>
+  </form>
   </td></tr></table>
 %end;
 
@@ -59,7 +80,8 @@
       (%apply;update_text(update.var)
       %if;(user != "")
         %sp;<i>-%sp;
-        %if;(wiz = "")<a href="%prefix;m=HIST;k=%kk;;wiz=%user;">%user;</a>%nn;
+        %if;(wiz = "")<a href="%prefix;m=HIST;k=%kk;
+             ;wiz=%user.v;">%user;</a>%nn;
         %else;%user;%end;
         </i>%nn;
       %end;) ...
@@ -99,6 +121,8 @@
   </p>
   </form>
 %end;
+
+%apply;search_form()
 
 <div>
 <a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
