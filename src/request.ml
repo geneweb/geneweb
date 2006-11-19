@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.32 2006-11-09 13:17:37 ddr Exp $ *)
+(* $Id: request.ml,v 5.33 2006-11-19 13:56:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -544,6 +544,7 @@ value family_m conf base =
   | Some "VIEW_WIZNOTES" when conf.wizard -> Wiznotes.print_view conf base
   | Some "WDOC" -> Doc.print_wdoc conf
   | Some "WIZNOTES" -> Wiznotes.print conf base
+  | Some "WIZNOTES_SEARCH" -> Wiznotes.print_search conf base
   | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with

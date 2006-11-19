@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.70 2006-11-12 20:27:53 ddr Exp $ *)
+(* $Id: util.ml,v 5.71 2006-11-19 13:56:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1227,6 +1227,7 @@ value header_without_page_title conf title =
     Wserver.wprint "  \
   <style type=\"text/css\"><!--
     .highlight { color: %s; font-weight: bold }
+    .found { color: black; background-color: #afa;font-weight:bold }
     hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
     div.summary ul { padding-left: 0; list-style-type: none }
