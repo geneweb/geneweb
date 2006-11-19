@@ -238,7 +238,7 @@ request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
     mergeIndOk.cmo mutil.cmi name.cmi notes.cmi num.cmi perso.cmi place.cmo \
     relation.cmo relationLink.cmi secure.cmi sendImage.cmo some.cmo \
     srcfile.cmi title.cmo update.cmi updateFam.cmi updateFamOk.cmo \
-    updateInd.cmi updateIndOk.cmi util.cmi wiznotes.cmo \
+    updateInd.cmi updateIndOk.cmi util.cmi wiznotes.cmi \
     ../wserver/wserver.cmi request.cmi 
 request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     buff.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx date.cmx \
@@ -268,7 +268,7 @@ some.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \
     ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
     history.cmi lock.cmi mutil.cmi notesLinks.cmo num.cmi secure.cmi \
-    translate.cmi util.cmi version.cmo wiznotes.cmo ../wserver/wserver.cmi \
+    translate.cmi util.cmi version.cmo wiznotes.cmi ../wserver/wserver.cmi \
     srcfile.cmi 
 srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx lock.cmx mutil.cmx notesLinks.cmx num.cmx secure.cmx \
@@ -340,10 +340,11 @@ wiki.cmx: buff.cmx config.cmi gutil.cmx iovalue.cmx mutil.cmx notesLinks.cmx \
 wiki.cmi: config.cmi 
 wiznotes.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notes.cmi notesLinks.cmo secure.cmi templ.cmi util.cmi \
-    wiki.cmi ../wserver/wserver.cmi 
+    wiki.cmi ../wserver/wserver.cmi wiznotes.cmi 
 wiznotes.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     mutil.cmx notes.cmx notesLinks.cmx secure.cmx templ.cmx util.cmx \
-    wiki.cmx ../wserver/wserver.cmx 
+    wiki.cmx ../wserver/wserver.cmx wiznotes.cmi 
+wiznotes.cmi: config.cmi gwdb.cmi 
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo
 alln.cmo alln.cmx: pa_html.cmo
 birthDeath.cmo birthDeath.cmx: def.syn.cmo pa_html.cmo
