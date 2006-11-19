@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.136 2006-11-18 11:43:04 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.137 2006-11-19 05:56:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -9,9 +9,13 @@ open Futil;
 open Mutil;
 open Printf;
 
+value magic_patch = "GwPt0001";
+
 type patches =
   { nb_per : mutable int;
     nb_fam : mutable int;
+    nb_per_ini : int;
+    nb_fam_ini : int;
     h_person : Hashtbl.t iper (gen_person iper string);
     h_ascend : Hashtbl.t iper (gen_ascend ifam);
     h_union : Hashtbl.t iper (gen_union ifam);
@@ -908,6 +912,7 @@ value commit_patches base =
   | Base2 db2 -> do {
       let fname = Filename.concat db2.bdir "patches" in
       let oc = open_out_bin (fname ^ "1") in
+      output_string oc magic_patch;
       output_value oc db2.patches;
       close_out oc;
       remove_file (fname ^ "~");
@@ -1222,12 +1227,9 @@ value base_strings_of_surname base s =
     (fun p -> p.surname) s
 ;
 
-value load_array2 bdir nb f1 f2 get =
+value load_array2 bdir nb_ini nb f1 f2 get =
   if nb = 0 then [| |]
   else do {
-(*
-let _ = do { eprintf "start load %s arr\n" f2; flush stderr; } in
-*)
     let ic_acc =
       open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "access"])
     in
@@ -1235,27 +1237,29 @@ let _ = do { eprintf "start load %s arr\n" f2; flush stderr; } in
       open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "data"])
     in
     let tab = Array.create nb (get ic_dat (input_binary_int ic_acc)) in
-    for i = 1 to nb - 1 do {
+    for i = 1 to nb_ini - 1 do {
       tab.(i) := get ic_dat (input_binary_int ic_acc);
     };
     close_in ic_dat;
     close_in ic_acc;
-(*
-let _ = do { eprintf "load %s ok\n" f2; flush stderr; } in
-*)
     tab
   }
 ;
 
-value parents_array2 db2 nb =
-  load_array2 db2.bdir nb "person" "parents"
-    (fun ic_dat pos ->
-       if pos = -1 then None
-       else do {
-         seek_in ic_dat pos;
-         Some (Iovalue.input ic_dat : ifam)
-       })
-;
+value parents_array2 db2 nb_ini nb = do {
+  let arr =
+    load_array2 db2.bdir nb_ini nb "person" "parents"
+      (fun ic_dat pos ->
+         if pos = -1 then None
+         else do {
+           seek_in ic_dat pos;
+           Some (Iovalue.input ic_dat : ifam)
+         })
+  in
+  Hashtbl.iter (fun i a -> arr.(Adef.int_of_iper i) := a.parents)
+    db2.patches.h_ascend;
+  arr
+};
 
 value consang_array2 db2 nb =
   let cg_fname =
@@ -1285,10 +1289,11 @@ value load_ascends_array base =
   [ Base base -> base.data.ascends.load_array ()
   | Base2 db2 -> do {
       eprintf "*** loading ascends array\n"; flush stderr;
-      let nb = nb_of_persons base in
+      let nb = db2.patches.nb_per in
+      let nb_ini = db2.patches.nb_per_ini in
       match db2.parents_array with
       [ Some _ -> ()
-      | None -> db2.parents_array := Some (parents_array2 db2 nb) ];
+      | None -> db2.parents_array := Some (parents_array2 db2 nb_ini nb) ];
       match db2.consang_array with
       [ Some _ -> ()
       | None -> db2.consang_array := Some (consang_array2 db2 nb) ];
@@ -1312,29 +1317,35 @@ value load_couples_array base =
   [ Base base -> base.data.couples.load_array ()
   | Base2 db2 -> do {
       eprintf "*** loading couples array\n"; flush stderr;
-      let nb = nb_of_families base in
+      let nb = db2.patches.nb_fam in
       match db2.father_array with
       [ Some _ -> ()
-      | None ->
+      | None -> do {
           let tab =
-            load_array2 db2.bdir nb "family" "father"
+            load_array2 db2.bdir db2.patches.nb_fam_ini nb "family" "father"
               (fun ic_dat pos -> do {
                  seek_in ic_dat pos;
                  Iovalue.input ic_dat
                })
           in
-          db2.father_array := Some tab ];
+          Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := father c)
+            db2.patches.h_couple;
+          db2.father_array := Some tab
+        } ];
       match db2.mother_array with
       [ Some _ -> ()
-      | None ->
+      | None -> do {
           let tab =
-            load_array2 db2.bdir nb "family" "mother"
+            load_array2 db2.bdir db2.patches.nb_fam_ini nb "family" "mother"
               (fun ic_dat pos -> do {
                  seek_in ic_dat pos;
                  Iovalue.input ic_dat
                })
           in
-          db2.mother_array := Some tab ]
+          Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := mother c)
+            db2.patches.h_couple;
+          db2.mother_array := Some tab
+        } ]
     } ]
 ;
 
@@ -1555,6 +1566,13 @@ value dsk_person_of_person =
   | Person2Gen _ _ -> failwith "not impl dsk_person_of_person (gen)" ]
 ;
 
+value check_magic ic magic id = do {
+  let b = String.create (String.length magic) in
+  really_input ic b 0 (String.length b);
+  if b <> magic then failwith (sprintf "bad %s magic number" id)
+  else ();
+};
+
 value base_of_base2 bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1564,10 +1582,11 @@ value base_of_base2 bname =
     let patch_fname = Filename.concat bdir "patches" in
     match try Some (open_in_bin patch_fname) with [ Sys_error _ -> None ] with
     [ Some ic -> do {
-        let ht = input_value ic in
+        check_magic ic magic_patch "patch";
+        let p = input_value ic in
         close_in ic;
         flush stderr;
-        ht
+        p
       }
     | None ->
         let nb_per =
@@ -1588,6 +1607,7 @@ value base_of_base2 bname =
         in
         let empty_ht () = Hashtbl.create 1 in
         {nb_per = nb_per; nb_fam = nb_fam;
+         nb_per_ini = nb_per; nb_fam_ini = nb_fam;
          h_person = empty_ht (); h_ascend = empty_ht ();
          h_union = empty_ht (); h_family = empty_ht ();
          h_couple = empty_ht (); h_descend = empty_ht ();
@@ -1621,8 +1641,8 @@ value close_base base =
 
 (* Traces of changes *)
 
-value patches_file = ref "";
-value record_changes_in_file v = patches_file.val := v;
+value trace_patches_file = ref "";
+value record_changes_in_file v = trace_patches_file.val := v;
 
 value ini_per = Hashtbl.create 1;
 value ini_uni = Hashtbl.create 1;
@@ -1973,10 +1993,10 @@ value person_key base ht_per ip =
 ;
 
 value commit_patches confo base = do {
-  if patches_file.val <> "" then do {
+  if trace_patches_file.val <> "" then do {
     let oc =
       open_out_gen [Open_wronly; Open_append; Open_creat] 0o666
-        patches_file.val
+        trace_patches_file.val
     in
     match confo with
     [ Some conf ->
@@ -2092,7 +2112,7 @@ value commit_patches confo base = do {
 
 value poi base i = do {
   let p = poi base i in
-  if patches_file.val <> "" then do {
+  if trace_patches_file.val <> "" then do {
     if Hashtbl.mem ini_per i || Hashtbl.mem res_per i then ()
     else Hashtbl.add ini_per i p;
   }
@@ -2102,7 +2122,7 @@ value poi base i = do {
 
 value uoi base i = do {
   let u = uoi base i in
-  if patches_file.val <> "" then do {
+  if trace_patches_file.val <> "" then do {
     if Hashtbl.mem ini_uni i || Hashtbl.mem res_uni i then ()
     else Hashtbl.add ini_uni i u;
   }
@@ -2112,7 +2132,7 @@ value uoi base i = do {
 
 value foi base i = do {
   let f = foi base i in
-  if patches_file.val <> "" then do {
+  if trace_patches_file.val <> "" then do {
     if Hashtbl.mem ini_fam i || Hashtbl.mem res_fam i then ()
     else Hashtbl.add ini_fam i f;
   }
@@ -2122,7 +2142,7 @@ value foi base i = do {
 
 value coi base i = do {
   let c = coi base i in
-  if patches_file.val <> "" then do {
+  if trace_patches_file.val <> "" then do {
     if Hashtbl.mem ini_cpl i || Hashtbl.mem res_cpl i then ()
     else Hashtbl.add ini_cpl i c;
   }
@@ -2132,7 +2152,7 @@ value coi base i = do {
 
 value doi base i = do {
   let d = doi base i in
-  if patches_file.val <> "" then do {
+  if trace_patches_file.val <> "" then do {
     if Hashtbl.mem ini_des i || Hashtbl.mem res_des i then ()
     else Hashtbl.add ini_des i d;
   }
@@ -2141,26 +2161,26 @@ value doi base i = do {
 };
 
 value patch_person base ip p = do {
-  if patches_file.val <> "" then Hashtbl.replace res_per ip p else ();
+  if trace_patches_file.val <> "" then Hashtbl.replace res_per ip p else ();
   patch_person base ip p;
 };
 
 value patch_union base ip u = do {
-  if patches_file.val <> "" then Hashtbl.replace res_uni ip u else ();
+  if trace_patches_file.val <> "" then Hashtbl.replace res_uni ip u else ();
   patch_union base ip u;
 };
 
 value patch_family base ifam f = do {
-  if patches_file.val <> "" then Hashtbl.replace res_fam ifam f else ();
+  if trace_patches_file.val <> "" then Hashtbl.replace res_fam ifam f else ();
   patch_family base ifam f;
 };
 
 value patch_descend base ifam d = do {
-  if patches_file.val <> "" then Hashtbl.replace res_des ifam d else ();
+  if trace_patches_file.val <> "" then Hashtbl.replace res_des ifam d else ();
   patch_descend base ifam d;
 };
 
 value patch_couple base ifam c = do {
-  if patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
+  if trace_patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
   patch_couple base ifam c;
 };
