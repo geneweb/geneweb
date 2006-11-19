@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.36 2006-11-19 14:05:14 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.37 2006-11-19 14:18:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -446,7 +446,7 @@ value wizard_page_title conf wz wizname h =
   Wserver.wprint "%s" wizname
 ;
 
-value print_whole_wiznote conf base auth_file wz wfile (s, date) = do {
+value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
   let wizname =
     let wizdata = read_auth_file auth_file in
     try fst (List.assoc wz wizdata) with
@@ -472,6 +472,11 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) = do {
         let s =
           Wiki.html_with_summary_of_tlsw conf "NOTES"
             (Notes.file_path conf base) edit_opt s
+        in
+        let s =
+          match ho with
+          [ Some (case_sens, h) -> html_highlight case_sens h s
+          | None -> s ]
         in
         Wserver.wprint "%s\n" s;
       end;
@@ -538,7 +543,8 @@ value print conf base =
         let (s, date) = read_wizard_notes wfile in
         match p_getint conf.env "v" with
         [ Some cnt0 -> print_part_wiznote conf base wz s cnt0
-        | None -> print_whole_wiznote conf base auth_file wz wfile (s, date) ]
+        | None ->
+            print_whole_wiznote conf base auth_file wz wfile (s, date) None ]
     | None -> print_main conf base auth_file ]
 ;
 
@@ -758,11 +764,6 @@ value change_wizard_visibility conf base =
 
 (* searching *)
 
-value print_found_wiznote conf base wz wfile (s, date) =
-  let auth_file = wizard_auth_file_name conf in
-  print_whole_wiznote conf base auth_file wz wfile (s, date)
-;
-
 value search_text conf base s =
   let s = if s = "" then " " else s in
   let list =
@@ -790,8 +791,9 @@ value search_text conf base s =
   in
   match wizo with
   [ Some (wz, wf, nt, dt) ->
-      let nt = html_highlight case_sens s nt in
-      print_found_wiznote conf base wz wf (nt, dt)
+      let auth_file = wizard_auth_file_name conf in
+      print_whole_wiznote conf base auth_file wz wf (nt, dt)
+         (Some (case_sens, s))
   | None -> print conf base ]
 ;
 
