@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.71 2006-11-19 13:56:33 ddr Exp $ *)
+(* $Id: util.ml,v 5.72 2006-11-19 14:05:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2574,4 +2574,46 @@ value read_gen_auth_file fname =
       in
       loop []
   | None -> [] ]
+;
+
+value start_equiv_with case_sens s m i =
+  let rec test i j =
+    if j = String.length s then Some i
+    else if i = String.length m then None
+    else if case_sens then
+      if m.[i] = s.[j] then test (i + 1) (j + 1) else None
+    else
+      match Name.next_chars_if_equiv m i s j with
+      [ Some (i, j) -> test i j
+      | None -> None ]
+  in
+  if case_sens then
+    if m.[i] = s.[0] then test (i + 1) 1 else None
+  else
+    match Name.next_chars_if_equiv m i s 0 with
+    [ Some (i, j) -> test i j
+    | None -> None ]
+;
+
+value in_text case_sens s m =
+  loop False 0 where rec loop in_tag i =
+    if i = String.length m then False
+    else if in_tag then loop (m.[i] <> '>') (i + 1)
+    else if m.[i] = '<' then loop True (i + 1)
+    else
+      match start_equiv_with case_sens s m i with
+      [ Some _ -> True
+      | None -> loop False (i + 1) ]
+;
+
+value html_highlight case_sens h s =
+  let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
+  loop False 0 0 where rec loop in_tag i len =
+    if i = String.length s then Buff.get len
+    else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
+    else if s.[i] = '<' then loop True (i + 1) (Buff.store len s.[i])
+    else
+      match start_equiv_with case_sens h s i with
+      [ Some j -> loop False j (Buff.mstore len (ht i j))
+      | None -> loop False (i + 1) (Buff.store len s.[i]) ]
 ;
