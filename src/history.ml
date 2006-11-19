@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.6 2006-11-19 19:53:34 ddr Exp $ *)
+(* $Id: history.ml,v 5.7 2006-11-19 20:25:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -246,7 +246,7 @@ and eval_person_field_var conf base env p =
   [ ["access"] -> VVstring (Util.acces conf base p)
   | ["dates"] -> VVstring (Date.short_dates_text conf base p)
   | ["title"] -> VVstring (person_title conf base p)
-  | [] -> VVstring (simple_person_text conf base p)
+  | [] -> VVstring (possibly_highlight env (simple_person_text conf base p))
   | _ -> VVstring "person..." ]
 and simple_person_text conf base p =
   match main_title conf base p with
@@ -414,7 +414,9 @@ value search_text conf base s =
 ;
 
 value print_search conf base =
-  match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
-  [ Some s -> search_text conf base (Wserver.gen_decode False s)
-  | None -> print conf base ]
+  if conf.wizard || conf.friend then
+    match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
+    [ Some s -> search_text conf base (Wserver.gen_decode False s)
+    | None -> print conf base ]
+  else print conf base
 ;
