@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.137 2006-11-19 05:56:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.138 2006-11-19 10:28:27 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -418,8 +418,13 @@ value person_with_key p fn sn oc =
   match (p, fn, sn) with
   [ (Person p, Istr fn, Istr sn) ->
       Person {(p) with first_name = fn; surname = sn; occ = oc}
-  | _ -> failwith "not impl person_with_key" ]
+  | (Person2 db2 i, Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
+      failwith "not impl person_with_key 1"
+  | (Person2Gen db2 p, Istr2New _ fn, Istr2New _ sn) ->
+      Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+  | _ -> failwith "not impl person_with_key 2" ]
 ;
+
 value person_with_related p r =
   match p with
   [ Person p -> Person {(p) with related = r}
