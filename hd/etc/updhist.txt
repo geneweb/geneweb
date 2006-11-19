@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.5 2006-11-19 19:53:34 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.6 2006-11-19 20:25:03 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none"%/>
@@ -36,7 +36,9 @@
     %hidden;
     <input type="hidden" name="m" value="HIST_SEARCH"%/>
     <input type="hidden" name="k" value="%evar.k;"%/>
-    <input type="hidden" name="pos" value="%pos;"%/>
+    %if;(evar.m = "HIST_SEARCH")
+      <input type="hidden" name="pos" value="%pos;"%/>
+    %end;
     <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
     <label>
     <input type="checkbox" name="c" value="on"%nn;
@@ -122,7 +124,7 @@
   </form>
 %end;
 
-%apply;search_form()
+%if;(wizard or friend)%apply;search_form()%end;
 
 <div>
 <a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
