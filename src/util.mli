@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.15 2006-11-11 11:07:46 ddr Exp $ *)
+(* $Id: util.mli,v 5.16 2006-11-19 14:05:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -232,3 +232,8 @@ value read_gen_auth_file : string -> list auth_user;
 
 value is_that_user_and_password :
   auth_scheme_kind -> string -> string -> bool;
+
+(* Searching *)
+
+value in_text : bool -> string -> string -> bool;
+value html_highlight : bool -> string -> string -> string;

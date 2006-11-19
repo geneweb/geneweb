@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.9 2006-10-29 20:49:57 ddr Exp $ *)
+(* $Id: forum.ml,v 5.10 2006-11-19 14:05:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -372,37 +372,6 @@ type env 'a =
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
-
-value start_equiv_with case_sens s m i =
-  let rec test i j =
-    if j = String.length s then Some i
-    else if i = String.length m then None
-    else if case_sens then
-      if m.[i] = s.[j] then test (i + 1) (j + 1) else None
-    else
-      match Name.next_chars_if_equiv m i s j with
-      [ Some (i, j) -> test i j
-      | None -> None ]
-  in
-  if case_sens then
-    if m.[i] = s.[0] then test (i + 1) 1 else None
-  else
-    match Name.next_chars_if_equiv m i s 0 with
-    [ Some (i, j) -> test i j
-    | None -> None ]
-;
-
-value html_highlight case_sens h s =
-  let ht i j = "<span class=\"found\">" ^ String.sub s i (j - i) ^ "</span>" in
-  loop False 0 0 where rec loop in_tag i len =
-    if i = String.length s then Buff.get len
-    else if in_tag then loop (s.[i] <> '>') (i + 1) (Buff.store len s.[i])
-    else if s.[i] = '<' then loop True (i + 1) (Buff.store len s.[i])
-    else
-      match start_equiv_with case_sens h s i with
-      [ Some j -> loop False j (Buff.mstore len (ht i j))
-      | None -> loop False (i + 1) (Buff.store len s.[i]) ]
-;
 
 value moderators conf =
   match p_getenv conf.base_env "moderator_file" with
@@ -908,17 +877,6 @@ value print_valid conf base =
 
 (* searching *)
 
-value in_message case_sens s m =
-  loop False 0 where rec loop in_tag i =
-    if i = String.length m then False
-    else if in_tag then loop (m.[i] <> '>') (i + 1)
-    else if m.[i] = '<' then loop True (i + 1)
-    else
-      match start_equiv_with case_sens s m i with
-      [ Some _ -> True
-      | None -> loop False (i + 1) ]
-;
-
 value search_text conf base s =
   let s = if s = "" then " " else s in
   let fname = forum_file conf in
@@ -930,7 +888,7 @@ value search_text conf base s =
         match read_message conf ic with
         [ Some (m, accessible) ->
             if accessible &&
-               List.exists (in_message case_sens s)
+               List.exists (in_text case_sens s)
                  [m.m_ident; m.m_subject; m.m_time; m.m_text]
             then Some (m, pos)
             else loop ()
