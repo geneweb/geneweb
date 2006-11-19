@@ -1,4 +1,4 @@
-(* $Id: history.mli,v 5.2 2006-09-15 11:45:37 ddr Exp $ *)
+(* $Id: history.mli,v 5.3 2006-11-19 19:53:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -11,3 +11,4 @@ value record :
 ;
 value record_notes : config -> base -> (option int * string) -> string -> unit;
 value print : config -> base -> unit;
+value print_search : config -> base -> unit;

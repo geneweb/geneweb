@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.5 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: history.ml,v 5.6 2006-11-19 19:53:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -160,6 +160,7 @@ type hist_item =
 type env 'a =
   [ Vinfo of string and string and string and hist_item and string
   | Vpos of ref int
+  | Vhigh of bool and string and int
   | Vother of 'a
   | Vnone ]
 ;
@@ -167,6 +168,14 @@ type env 'a =
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
+
+value possibly_highlight env s =
+  match get_env "high" env with
+  [ Vhigh case_sens h _ ->
+      if in_text case_sens h s then html_highlight case_sens h s
+      else s
+  | _ -> s ]
+;
 
 value rec eval_var conf base env xx loc =
   fun
@@ -180,7 +189,7 @@ value rec eval_var conf base env xx loc =
       | _ -> VVbool False ]
   | ["key"] ->
       match get_env "info" env with
-      [ Vinfo _ _ _ _ k -> VVstring k
+      [ Vinfo _ _ _ _ s -> VVstring (possibly_highlight env s)
       | _ -> raise Not_found ]
   | ["note"; "page"] ->
       match get_env "info" env with
@@ -209,15 +218,22 @@ value rec eval_var conf base env xx loc =
       | _ -> VVstring "" ]
   | ["time"] ->
       match get_env "info" env with
-      [ Vinfo s _ _ _ _ -> VVstring s
+      [ Vinfo s _ _ _ _ -> VVstring (possibly_highlight env s)
       | _ -> raise Not_found ]
   | ["update" :: sl] ->
       match get_env "info" env with
       [ Vinfo _ u _ _ _ -> eval_string u sl
       | _ -> raise Not_found ]
-  | ["user"] ->
+  | ["user" :: sl] ->
       match get_env "info" env with
-      [ Vinfo _ _ u _ _ -> VVstring u
+      [ Vinfo _ _ s _ _ ->
+          let s =
+            match sl with
+            [ ["v"] -> s
+            | [] -> possibly_highlight env s
+            | _ -> raise Not_found ]
+          in
+          VVstring s
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_string s =
@@ -259,8 +275,11 @@ value print_foreach conf base print_ast eval_expr =
             [ [[e1]; [e2]; [e3]] ->
                 let k = eval_int_expr env xx e1 in
                 let pos =
-                  try eval_int_expr env xx e2 with
-                  [ Not_found -> in_channel_length ic ]
+                  match get_env "high" env with
+                  [ Vhigh _ _ pos -> pos
+                  | _ ->
+                      try eval_int_expr env xx e2 with
+                      [ Not_found -> in_channel_length ic ] ]
                 in
                 let wiz = eval_expr env xx e3 in
                 (k, pos, wiz)
@@ -334,9 +353,68 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
-value print conf base =
-  let env = [("pos", Vpos (ref 0))] in
+value gen_print conf base h =
+  let env =
+    let env = [("pos", Vpos (ref 0))] in
+    match h with
+    [ Some (case_sens, h, pos) -> [("high", Vhigh case_sens h pos) :: env]
+    | None -> env ]
+  in
   Templ.interp conf base "updhist" (eval_var conf base)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (print_foreach conf base) env ()
+;
+
+value print conf base = gen_print conf base None;
+
+(* searching *)
+
+value search_text conf base s =
+  let s = if s = "" then " " else s in
+  let case_sens = p_getenv conf.env "c" = Some "on" in
+  let found =
+    match
+      try Some (Secure.open_in_bin (file_name conf))
+      with [ Sys_error _ -> None ]
+    with
+    [ Some ic ->
+        let pos =
+          match p_getint conf.env "pos" with
+          [ Some pos -> pos
+          | None -> in_channel_length ic ]
+        in
+        let vv = (ref "", ref 0) in
+        loop pos where rec loop pos =
+          match
+            try Some (rev_input_line ic pos vv) with
+            [ Begin_of_file -> None ]
+          with
+          [ Some (line, pos2) ->
+              match line_fields line with
+              [ Some (time, user, action, keyo) ->
+                  let key =
+                    match keyo with
+                    [ Some key -> key
+                    | None -> "" ]
+                  in
+                  if in_text case_sens s time || in_text case_sens s user ||
+                     in_text case_sens s key
+                  then Some pos
+                  else loop pos2
+              | None -> None ]
+          | None -> None ]
+    | None -> None ]
+  in
+  let h =
+    match found with
+    [ Some pos -> Some (case_sens, s, pos)
+    | None -> None ]
+  in
+  gen_print conf base h
+;
+
+value print_search conf base =
+  match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
+  [ Some s -> search_text conf base (Wserver.gen_decode False s)
+  | None -> print conf base ]
 ;
