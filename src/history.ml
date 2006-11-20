@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.8 2006-11-19 21:13:01 ddr Exp $ *)
+(* $Id: history.ml,v 5.9 2006-11-20 10:38:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -160,7 +160,7 @@ type hist_item =
 type env 'a =
   [ Vinfo of string and string and string and hist_item and string
   | Vpos of ref int
-  | Vhigh of bool and string and int
+  | Vsearch of option (bool * string * int)
   | Vother of 'a
   | Vnone ]
 ;
@@ -170,8 +170,8 @@ value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
 value possibly_highlight env s =
-  match get_env "high" env with
-  [ Vhigh case_sens h _ ->
+  match get_env "search" env with
+  [ Vsearch (Some (case_sens, h, _)) ->
       if in_text case_sens h s then html_highlight case_sens h s
       else s
   | _ -> s ]
@@ -183,6 +183,10 @@ value rec eval_var conf base env xx loc =
       match get_env "info" env with
       [ Vinfo _ _ _ (HI_ind p) _ -> VVstring (p_first_name base p)
       | _ -> VVstring "" ]
+  | ["found"] ->
+      match get_env "search" env with
+      [ Vsearch (Some _) -> VVbool True
+      | _ -> VVbool False ]
   | ["is_note"] ->
       match get_env "info" env with
       [ Vinfo _ _ _ (HI_notes _ _) _ -> VVbool True
@@ -282,8 +286,9 @@ value print_foreach conf base print_ast eval_expr =
             [ [[e1]; [e2]; [e3]] ->
                 let k = eval_int_expr env xx e1 in
                 let pos =
-                  match get_env "high" env with
-                  [ Vhigh _ _ pos -> pos
+                  match get_env "search" env with
+                  [ Vsearch (Some (_, _, pos)) -> pos
+                  | Vsearch None -> in_channel_length ic
                   | _ ->
                       try eval_int_expr env xx e2 with
                       [ Not_found -> in_channel_length ic ] ]
@@ -360,11 +365,11 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
-value gen_print conf base h =
+value gen_print conf base hoo =
   let env =
     let env = [("pos", Vpos (ref 0))] in
-    match h with
-    [ Some (case_sens, h, pos) -> [("high", Vhigh case_sens h pos) :: env]
+    match hoo with
+    [ Some ho -> [("search", Vsearch ho) :: env]
     | None -> env ]
   in
   Templ.interp conf base "updhist" (eval_var conf base)
@@ -417,7 +422,7 @@ value search_text conf base s =
     [ Some pos -> Some (case_sens, s, pos)
     | None -> None ]
   in
-  gen_print conf base h
+  gen_print conf base (Some h)
 ;
 
 value print_search conf base =
