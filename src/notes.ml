@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.13 2006-10-31 05:34:44 ddr Exp $ *)
+(* $Id: notes.ml,v 5.14 2006-11-20 02:56:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -26,38 +26,84 @@ value read_notes base fnotes =
   Wiki.split_title_and_text s
 ;
 
-value print_whole_notes conf base fnotes title s =
-  do {
-    header_no_page_title conf
-      (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
-    let what_links_page () =
-      if fnotes <> "" then
-        stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
-          Wserver.wprint "(%s)" (transl conf "linked pages");
-        end
-      else ()
-    in      
-    gen_print_link_to_welcome what_links_page conf True;
-    tag "p" begin
-      xtag "br";
-      xtag "br";
+value print_search_form conf from_note =
+  tag "table" begin
+    tag "tr" begin
+      tag "td" "align=\"%s\"" conf.right begin
+        tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+          tag "p" begin
+            hidden_env conf;
+            xtag "input"
+              "type=\"hidden\" name=\"m\" value=\"MISC_NOTES_SEARCH\"";
+            xtag "input"
+              "name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\""
+              (match p_getenv conf.env "s" with
+               [ Some s -> quote_escaped s
+               | None -> "" ]);
+            if from_note <> "" then
+              xtag "input" "type=\"hidden\" name=\"z\" value=\"%s\"" from_note
+            else ();
+            xtag "br";
+            tag "label" begin
+              xtag "input" "type=\"checkbox\" name=\"c\" value=\"on\"%s"
+                (match p_getenv conf.env "c" with
+                 [ Some "on" -> " checked=\"checked\""
+                 | Some _ | None -> "" ]);
+              Wserver.wprint "%s\n"
+                (transl_nth conf "search/case sensitive" 1);
+            end;
+            xtag "input" "type=\"submit\" value=\"%s\""
+              (capitale (transl_nth conf "search/case sensitive" 0));
+          end;
+        end;
+      end;
     end;
-    if title <> "" then
-      Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
-    else ();
-    match Util.open_etc_file "summary" with
-    [ Some ic -> Templ.copy_from_templ conf [] ic
-    | None -> () ];
-    let file_path = file_path conf base in
-    let s = string_with_macros conf [] s in
-    let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
-    let s =
-      Wiki.html_with_summary_of_tlsw conf "NOTES" file_path edit_opt s
-    in
-    Wserver.wprint "%s\n" s;
-    trailer conf;
-  }
+  end
 ;
+
+value print_whole_notes conf base fnotes title s ho = do {
+  header_no_page_title conf
+    (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
+  let what_links_page () =
+    if fnotes <> "" then
+      stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
+        Wserver.wprint "(%s)" (transl conf "linked pages");
+      end
+    else ()
+  in      
+  gen_print_link_to_welcome what_links_page conf True;
+  tag "p" begin
+    xtag "br";
+    xtag "br";
+  end;
+  if title <> "" then
+    let title =
+      match ho with
+      [ Some (case_sens, h) -> html_highlight case_sens h title
+      | None -> title ]
+    in
+    Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
+  else ();
+  match Util.open_etc_file "summary" with
+  [ Some ic -> Templ.copy_from_templ conf [] ic
+  | None -> () ];
+  let file_path = file_path conf base in
+  let s = string_with_macros conf [] s in
+  let edit_opt = Some (conf.wizard, "NOTES", fnotes) in
+  let s =
+    Wiki.html_with_summary_of_tlsw conf "NOTES" file_path edit_opt s
+  in
+  let s =
+    match ho with
+    [ Some (case_sens, h) -> html_highlight case_sens h s
+    | None -> s ]
+  in
+  Wserver.wprint "%s\n" s;
+  match ho with
+  [ Some _ -> print_search_form conf fnotes
+  | None -> () ];
+  trailer conf;
+};
 
 value print_notes_part conf base fnotes title s cnt0 =
   do {
@@ -251,7 +297,7 @@ value print conf base =
       let title = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
       match p_getint conf.env "v" with
       [ Some cnt0 -> print_notes_part conf base fnotes title s cnt0
-      | None -> print_whole_notes conf base fnotes title s ] ]
+      | None -> print_whole_notes conf base fnotes title s None ] ]
 ;
 
 value print_mod conf base =
@@ -442,6 +488,45 @@ value print_misc_notes conf base =
           db;
       end
     else ();
+    print_search_form conf "";
     trailer conf;
   }
+;
+
+(* searching *)
+
+value search_text conf base s =
+  let s = if s = "" then " " else s in
+  let case_sens = p_getenv conf.env "c" = Some "on" in
+  let db =
+    let db = notes_links_db conf base True in
+    match p_getenv conf.env "z" with
+    [ Some "" | None -> db
+    | Some f ->
+        loop db where rec loop =
+          fun
+          [ [(fnotes, _) :: list] -> if f = fnotes then list else loop list
+          | [] -> [] ] ]
+  in
+  let noteo =
+    loop db where rec loop =
+      fun
+      [ [(fnotes, _) :: list] ->
+          let (nenv, nt) = read_notes base fnotes in
+          let tit = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
+          if in_text case_sens s tit || in_text case_sens s nt then
+            Some (fnotes, tit, nt)
+          else loop list
+      | [] -> None ]
+  in
+  match noteo with
+  [ Some (fnotes, tit, nt) ->
+      print_whole_notes conf base fnotes tit nt (Some (case_sens, s))
+  | None -> print_misc_notes conf base ]
+;
+
+value print_misc_notes_search conf base =
+  match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
+  [ Some s -> search_text conf base (Wserver.gen_decode False s)
+  | None -> print_misc_notes conf base ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notes.mli,v 5.2 2006-10-29 20:49:57 ddr Exp $ *)
+(* $Id: notes.mli,v 5.3 2006-11-20 02:56:51 ddr Exp $ *)
 
 open Config;
 open Gwdb;
@@ -14,3 +14,4 @@ value update_notes_links_db : config -> page -> string -> bool -> unit;
 value print_mod_ok : config -> base -> unit;
 
 value print_misc_notes : config -> base -> unit;
+value print_misc_notes_search : config -> base -> unit;

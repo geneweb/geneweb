@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.37 2006-11-19 14:18:16 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.38 2006-11-20 02:56:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -766,6 +766,7 @@ value change_wizard_visibility conf base =
 
 value search_text conf base s =
   let s = if s = "" then " " else s in
+  let case_sens = p_getenv conf.env "c" = Some "on" in
   let list =
     let list = wizard_list_from_dir conf base in
     let list = List.sort compare list in
@@ -777,7 +778,6 @@ value search_text conf base s =
           [ [wz1 :: list] -> if wz = wz1 then list else loop list
           | [] -> [] ] ]
   in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
   let wizo =
     loop list where rec loop =
       fun

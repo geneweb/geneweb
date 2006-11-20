@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.138 2006-11-19 10:28:27 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.139 2006-11-20 02:56:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1464,15 +1464,15 @@ value read_notes bname fnotes rn_mode =
     }
   | None -> "" ]
 ;
-value base_notes_read base db2 =
+value base_notes_read base fnotes =
   match base with
-  [ Base base -> base.data.bnotes.nread db2 RnAll
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 RnAll ]
+  [ Base base -> base.data.bnotes.nread fnotes RnAll
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes RnAll ]
 ;
-value base_notes_read_first_line base db2 =
+value base_notes_read_first_line base fnotes =
   match base with
-  [ Base base -> base.data.bnotes.nread db2 Rn1Ln
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 Rn1Ln ]
+  [ Base base -> base.data.bnotes.nread fnotes Rn1Ln
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes Rn1Ln ]
 ;
 value base_notes_are_empty base db2 =
   match base with
