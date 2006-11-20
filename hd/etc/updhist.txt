@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.7 2006-11-19 21:13:01 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.8 2006-11-20 10:38:31 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none"%/>
@@ -29,29 +29,34 @@
   </td></tr></table>
 %end;
 
-%define;search_form()
-  <table><tr><td align="%right;">
-  <form method="get" action="%action;">
-    <p>
-    %hidden;
-    <input type="hidden" name="m" value="HIST_SEARCH"%/>
-    <input type="hidden" name="k" value="%evar.k;"%/>
-    %if;(evar.m = "HIST_SEARCH")
-      <input type="hidden" name="pos" value="%pos;"%/>
-    %end;
-    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
-    <label>
-    <input type="checkbox" name="c" value="on"%nn;
-     %if;("main" != "true" and evar.c = "on") checked="checked"%end;
-     %/>[search/case sensitive]1
-    </label>
-    <input type="submit" value="[*search/case sensitive]0"%/>
-    </p>
-  </form>
-  </td></tr></table>
+%define;search_form(xxx)
+  %if;(wizard or friend)
+    <table%if;("xxx" = "right") style="float:%right;"%end;
+     ><tr><td align="%right;">
+    <form method="get" action="%action;">
+      <p>
+      %hidden;
+      <input type="hidden" name="m" value="HIST_SEARCH"%/>
+      <input type="hidden" name="k" value="%evar.k;"%/>
+      %if;(evar.m = "HIST_SEARCH" and found)
+        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;"%/>
+      %end;
+      <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+      <label>
+      <input type="checkbox" name="c" value="on"%nn;
+       %if;("main" != "true" and evar.c = "on") checked="checked"%end;
+       %/>[search/case sensitive]1
+      </label>
+      <input type="submit" value="[*search/case sensitive]0"%/>
+      </p>
+    </form>
+    </td></tr></table>
+  %end;
 %end;
 
 <h1 style="text-align:center" class="highlight">[*history of updates]</h1>
+
+%if;(evar.m != "HIST_SEARCH" or not found)%apply;search_form("right")%end;
 
 %define;update_text(uu)
   %if;(uu = "ap")[add::person/persons]0%nn;
@@ -124,7 +129,7 @@
   </form>
 %end;
 
-%if;(wizard or friend)%apply;search_form()%end;
+%if;(evar.m = "HIST_SEARCH" and found)%apply;search_form("left")%end;
 
 <div>
 <a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
