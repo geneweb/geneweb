@@ -1,5 +1,6 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 5.0 2005-12-13 11:51:27 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 5.1 2006-11-20 03:58:58 ddr Exp $ *)
+(* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 
