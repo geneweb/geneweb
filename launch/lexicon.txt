@@ -1,5 +1,9 @@
-# $Id: lexicon.txt,v 1.1 2006-11-20 11:41:55 ddr Exp $
+# $Id: lexicon.txt,v 1.2 2006-11-20 11:55:17 ddr Exp $
 # Copyright (c) 2006 INRIA
+
+    Apply
+en: Apply
+fr: Appliquer
 
     Available databases:
 en: Available databases:
@@ -25,6 +29,10 @@ fr: Créer une nouvelle base
 en: Enter the name:
 fr: Entrer le nom :
 
+    HTTP Authentication:
+en: HTTP Authentication:
+fr: Authentification HTTP :
+
     OK
 en: OK
 fr: D'accord
@@ -37,6 +45,26 @@ fr: Quitter
 en: Restart
 fr: Redémarrer
 
+    Select browser language if any:
+en: Select browser language if any:
+fr: Selectionner la langue du navigateur :
+
     Server is running...
 en: Server is running...
 fr: Le serveur tourne... 
+
+    basic
+en: basic
+fr: basique
+
+    digest
+en: digest
+fr: digest
+
+    no
+en: no
+fr: non
+
+    yes
+en: yes
+fr: oui
