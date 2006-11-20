@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.23 2006-11-20 11:41:55 ddr Exp $ *)
+(* $Id: launch.ml,v 1.24 2006-11-20 13:18:27 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -217,16 +217,18 @@ value config state title v def select to_string from_string set prev next =
               kont prev state
             }
             in
-            let but1 = button_create buts [Text "Prev"] kont_prev in
+            let but1 = button_create buts [Text (transl "Prev")] kont_prev in
             let but2 =
-              button_create buts [Text "Next"] (fun _ -> kont next state)
+              button_create buts [Text (transl "Next")]
+                (fun _ -> kont next state)
             in
             pack [but1] [Side Side_Left];
             pack [but2] [Side Side_Right];
             buts
           }
         | None ->
-            button_create frame [Text "Next"] (fun _ -> kont next state) ]
+            button_create frame [Text (transl "Next")]
+              (fun _ -> kont next state) ]
       in
       pack [tit; sel; buts] [];
     } ]
@@ -242,7 +244,7 @@ value rec show_main state = do {
   let txt = Label.create run_frame [Text (transl "Server is running...")] in
   pack [txt] [];
   if databases = [] then do {
-    let txt = Label.create run_frame [Text "No databases."] in
+    let txt = Label.create run_frame [Text (transl "No databases.")] in
     pack [txt] [];
   }
   else do {
@@ -465,13 +467,13 @@ and launch_server state = do {
 };
 
 value rec config_bases_dir state =
-  config state (fun () -> "Databases directory:")
+  config state (fun () -> transl "Databases directory:")
     (fun () -> List.assoc "bases_dir" state.config_env) state.bases_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
        let but =
-         button_create sframe [Text "Select"]
+         button_create sframe [Text (transl "Select")]
            (fun () ->
               let d = Textvariable.get var in
               Textvariable.set var (tk_getOpenDir d))
@@ -562,8 +564,8 @@ and config_browser state =
         let frad = Frame.create list [] in
         Textvariable.set other_browser_var
           (match state.browser with
-           [ Some s -> if List.mem s browsers then "other:" else s
-           | None -> "other:" ]);
+           [ Some s -> if List.mem s browsers then transl "other:" else s
+           | None -> transl "other:" ]);
         let rad =
           Radiobutton.create frad
             [TextVariable other_browser_var; Variable var; Value "other"]
@@ -578,7 +580,7 @@ and config_browser state =
       }
     in
     let but =
-      button_create sframe [Text "Select"]
+      button_create sframe [Text (transl "Select")]
         (fun () -> do {
            Textvariable.set var "other";
            let ini_dir = Textvariable.get other_browser_dir in
@@ -604,11 +606,13 @@ and config_browser state =
       if s = "other" then Textvariable.get (Lazy.force other_browser_var)
       else s
     in
-    let s = if s = "other:" then "" else s in
+    let s = if s = "other" then "" else s in
     if s = "" then None else Some s
   in
   config state
-    (fun () -> if Lazy.force browsers = [] then "Browser:" else "Browser(s):")
+    (fun () ->
+       if Lazy.force browsers = [] then transl "Browser:"
+       else transl "Browser(s):")
     (fun () -> List.assoc "browser" state.config_env)
     None select to_string from_string
     (fun state browser -> state.browser := browser)
@@ -637,7 +641,7 @@ and config_browser state =
      })
 
 and config_port state =
-  config state (fun () -> "Port:")
+  config state (fun () -> transl "Port:")
     (fun () -> List.assoc "port" state.config_env) state.port
     (fun frame var -> do {
        let ent = Entry.create frame [TextWidth 5; TextVariable var] in
@@ -670,13 +674,13 @@ and config_port state =
      })
 
 and config_sys_dir state =
-  config state (fun () -> "GeneWeb system directory:")
+  config state (fun () -> transl "GeneWeb system directory:")
     (fun () -> List.assoc "sys_dir" state.config_env) state.sys_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
        let but =
-         button_create sframe [Text "Select"]
+         button_create sframe [Text (transl "Select")]
            (fun () ->
               let d = Textvariable.get var in
               Textvariable.set var (tk_getOpenDir d))
@@ -708,13 +712,13 @@ and config_sys_dir state =
 
 and config_bin_dir state =
   config
-    state (fun () -> "GeneWeb binary directory:")
+    state (fun () -> transl "GeneWeb binary directory:")
     (fun () -> List.assoc "bin_dir" state.config_env) state.bin_dir
     (fun frame var -> do {
        let sframe = Frame.create frame [] in
        let lab = Label.create sframe [TextVariable var] in
        let but =
-         button_create sframe [Text "Select"]
+         button_create sframe [Text (transl "Select")]
            (fun () ->
               let d = Textvariable.get var in
               Textvariable.set var (tk_getOpenDir d))

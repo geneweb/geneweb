@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.2 2006-11-20 11:55:17 ddr Exp $
+# $Id: lexicon.txt,v 1.3 2006-11-20 13:18:27 ddr Exp $
 # Copyright (c) 2006 INRIA
 
     Apply
@@ -13,6 +13,14 @@ fr: Bases disponibles :
 en: Browse
 fr: Naviguer
 
+    Browser:
+en: Browser:
+fr: Navigateur :
+
+    Browser(s):
+en: Browser(s):
+fr: Navigateur(s) :
+
     Cancel
 en: Cancel
 fr: Annuler
@@ -25,17 +33,45 @@ fr: Changer les options
 en: Create a new database
 fr: Créer une nouvelle base
 
+    Databases directory:
+en: Databases directory:
+fr: Répertoire des bases :
+
     Enter the name:
 en: Enter the name:
 fr: Entrer le nom :
+
+    GeneWeb binary directory:
+en: GeneWeb binary directory:
+fr: Répertoire des binaires de GeneWeb :
+
+    GeneWeb system directory:
+en: GeneWeb system directory:
+fr: Répertoire système de GeneWeb :
 
     HTTP Authentication:
 en: HTTP Authentication:
 fr: Authentification HTTP :
 
+    Next
+en: Next
+fr: Suivant
+
+    No databases.
+en: No databases.
+fr: Pas de bases.
+
     OK
 en: OK
 fr: D'accord
+
+    Port:
+en: Port:
+fr: Port :
+
+    Prev
+en: Prev
+fr: Précédent
 
     Quit
 en: Quit
@@ -44,6 +80,10 @@ fr: Quitter
     Restart
 en: Restart
 fr: Redémarrer
+
+    Select
+en: Select
+fr: Selectionner
 
     Select browser language if any:
 en: Select browser language if any:
@@ -64,6 +104,10 @@ fr: digest
     no
 en: no
 fr: non
+
+    other:
+en: other:
+fr: autre :
 
     yes
 en: yes
