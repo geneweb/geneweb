@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.9 2006-11-20 10:38:31 ddr Exp $ *)
+(* $Id: history.ml,v 5.10 2006-11-20 11:41:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -136,7 +136,7 @@ value line_fields line =
   if String.length line > String.length line_tpl then
     let time = String.sub line 0 19 in
     let (user, i) =
-      match (line.[20], Gutil.lindex line ']') with
+      match (line.[20], Mutil.lindex line ']') with
       [ ('[', Some i) ->
           let user = String.sub line 21 (i - 21) in (user, i + 2)
       | _ -> ("", 20) ]

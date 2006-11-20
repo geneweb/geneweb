@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 5.5 2006-10-15 15:39:38 ddr Exp $ *)
+(* $Id: gwtp.ml,v 5.6 2006-11-20 11:41:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -160,7 +160,7 @@ value lindex s c =
 value input_lexicon lang =
   let ht = Hashtbl.create 501 in
   do {
-    Gutil.input_lexicon lang ht
+    Mutil.input_lexicon lang ht
       (fun () ->
          open_in
            (List.fold_right Filename.concat [gwtp_etc.val; "lang"]

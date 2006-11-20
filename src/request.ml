@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.35 2006-11-20 02:56:51 ddr Exp $ *)
+(* $Id: request.ml,v 5.36 2006-11-20 11:41:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -101,7 +101,7 @@ value cut_words str =
 
 value try_find_with_one_first_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in
-  match lindex n1 ' ' with
+  match Mutil.lindex n1 ' ' with
   [ Some i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
@@ -700,7 +700,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
         else do {
           Hashtbl.clear conf.lexicon;
           let fname = Filename.concat "lang" "lexicon.txt" in
-          Gutil.input_lexicon conf.lang conf.lexicon
+          Mutil.input_lexicon conf.lang conf.lexicon
             (fun () -> Secure.open_in (Util.search_in_lang_path fname));
           conf.charset :=
             try Hashtbl.find conf.lexicon " !charset" with

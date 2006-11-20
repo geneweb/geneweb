@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.22 2006-11-19 10:27:56 ddr Exp $ *)
+(* $Id: launch.ml,v 1.23 2006-11-20 11:41:55 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -19,6 +19,47 @@ type state =
 
 value trace = ref False;
 value config_file = Filename.concat "gw" "config.txt";
+value lexicon_file = ref "lexicon.txt";
+value lexicon_mtime = ref 0.0;
+
+value input_lexicon lang = do {
+  let ht = Hashtbl.create 501 in
+  Mutil.input_lexicon lang ht (fun () -> open_in lexicon_file.val);
+  ht
+};
+
+value unfreeze_lexicon =
+  let lexicon = ref None in
+  fun lang -> do {
+    if Sys.file_exists lexicon_file.val then
+      let stbuf = Unix.stat lexicon_file.val in
+      if stbuf.Unix.st_mtime > lexicon_mtime.val then do {
+        lexicon.val := None;
+        lexicon_mtime.val := stbuf.Unix.st_mtime;
+      }
+      else ()
+    else ();
+    match lexicon.val with
+    [ Some lex -> lex
+    | None -> do {
+        let lex = input_lexicon lang in
+        lexicon.val := Some lex;
+        lex
+      } ]
+};
+
+value default_lang =
+  try Sys.getenv "LC_ALL" with
+  [ Not_found ->
+      try Sys.getenv "LC_MESSAGES" with
+      [ Not_found -> try Sys.getenv "LANG" with [ Not_found -> "en" ] ] ]
+;
+value lang = ref default_lang;
+
+value transl w =
+  let lexicon = unfreeze_lexicon lang.val in
+  try Hashtbl.find lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+;
 
 value read_config_env () =
   match try Some (open_in config_file) with [ Sys_error _ -> None ] with
@@ -198,23 +239,23 @@ value rec show_main state = do {
          (Array.to_list (Sys.readdir state.bases_dir)))
   in
   let (run_frame, gframe) = window_centering state.tk_win in
-  let txt = Label.create run_frame [Text "Server is running..."] in
+  let txt = Label.create run_frame [Text (transl "Server is running...")] in
   pack [txt] [];
   if databases = [] then do {
     let txt = Label.create run_frame [Text "No databases."] in
     pack [txt] [];
   }
   else do {
-    let txt = Label.create run_frame [Text "Available databases:"] in
+    let txt = Label.create run_frame [Text (transl "Available databases:")] in
     pack [txt] [];
     List.iter
       (fun dbn -> do {
          let bn = Filename.chop_extension dbn in
          let frame = Frame.create run_frame [] in
-         let blab = Label.create frame [Text dbn] in
+         let blab = Label.create frame [Text ("- " ^ bn ^ " -")] in
          let bbut =
            Button.create frame
-             [Text "Browse";
+             [Text (transl "Browse");
               Command (fun _ -> browse state.browser state.port bn)]
          in
          pack [blab] [Side Side_Left];
@@ -225,7 +266,7 @@ value rec show_main state = do {
   };
   let cbut =
     Button.create run_frame
-      [Text "Create a new database";
+      [Text (transl "Create a new database");
        Command
          (fun _ -> do {
             Pack.forget [gframe];
@@ -234,7 +275,7 @@ value rec show_main state = do {
   in
   let obut =
     Button.create run_frame
-      [Text "Change options";
+      [Text (transl "Change options");
        Command
          (fun _ -> do {
             Pack.forget [gframe];
@@ -243,7 +284,7 @@ value rec show_main state = do {
   in
   let rbut =
     Button.create run_frame
-      [Text "Restart";
+      [Text (transl "Restart");
        Command
          (fun _ -> do {
             Pack.forget [gframe];
@@ -252,7 +293,9 @@ value rec show_main state = do {
             launch_server state;
           })]
   in
-  let wbut = Button.create run_frame [Text "Quit"; Command closeTk] in
+  let wbut =
+    Button.create run_frame [Text (transl "Quit"); Command closeTk]
+  in
   pack [cbut; obut; rbut; wbut] [Fill Fill_X];
 }
 
@@ -260,13 +303,15 @@ and change_options state = do {
   let (frame, gframe) = window_centering state.tk_win in
 
   let opt2 = Frame.create frame [] in
-  let lab2 = Label.create opt2 [Text "Select browser language if any:"] in
+  let lab2 =
+    Label.create opt2 [Text (transl "Select browser language if any:")]
+  in
   let tv2 = Textvariable.create () in
   let val21 =
-    Radiobutton.create opt2 [Text "yes"; Value "yes"; Variable tv2]
+    Radiobutton.create opt2 [Text (transl "yes"); Value "yes"; Variable tv2]
   in
   let val22 =
-    Radiobutton.create opt2 [Text "no"; Value "no"; Variable tv2]
+    Radiobutton.create opt2 [Text (transl "no"); Value "no"; Variable tv2]
   in
   Textvariable.set tv2 (if state.browser_lang then "yes" else "no");
   pack [lab2] [Side Side_Left];
@@ -274,15 +319,15 @@ and change_options state = do {
   pack [opt2] [Fill Fill_X];
 
   let opt3 = Frame.create frame [] in
-  let lab3 = Label.create opt3 [Text "HTTP Authentication:"] in
+  let lab3 = Label.create opt3 [Text (transl "HTTP Authentication:")] in
   let tv3 = Textvariable.create () in
   let val31 =
     Radiobutton.create opt3
-      [Text "basic"; Value "basic"; Variable tv3]
+      [Text (transl "basic"); Value "basic"; Variable tv3]
   in
   let val32 =
     Radiobutton.create opt3
-      [Text "digest"; Value "digest"; Variable tv3]
+      [Text (transl "digest"); Value "digest"; Variable tv3]
   in
   Textvariable.set tv3 (if state.digest_auth then "digest" else "basic");
   pack [lab3] [Side Side_Left];
@@ -292,14 +337,14 @@ and change_options state = do {
   let buts = do {
     let buts = Frame.create frame [] in
     let but1 =
-      button_create buts [Text "Cancel"]
+      button_create buts [Text (transl "Cancel")]
         (fun _ -> do {
            Pack.forget [gframe];
            show_main state;
          })
     in
     let but2 =
-      button_create buts [Text "Apply"]
+      button_create buts [Text (transl "Apply")]
         (fun _ -> do {
            state.browser_lang := Textvariable.get tv2 = "yes";
            state.digest_auth := Textvariable.get tv3 = "digest";
@@ -319,21 +364,21 @@ and change_options state = do {
 
 and new_database state = do {
   let (frame, gframe) = window_centering state.tk_win in
-  let tit = Label.create frame [Text "Enter the name:"] in
+  let tit = Label.create frame [Text (transl "Enter the name:")] in
   let var = Textvariable.create () in
   Textvariable.set var "";
   let sel = Entry.create frame [TextWidth 10; TextVariable var] in
   let buts = do {
     let buts = Frame.create frame [] in
     let but1 =
-      button_create buts [Text "Cancel"]
+      button_create buts [Text (transl "Cancel")]
         (fun _ -> do {
            Pack.forget [gframe];
            show_main state;
          })
     in
     let but2 =
-      button_create buts [Text "OK"]
+      button_create buts [Text (transl "OK")]
         (fun _ ->
            let s = Textvariable.get var in
            if s = "" then ()

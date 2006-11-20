@@ -1,8 +1,8 @@
-gwtp.cmo: ../src/buff.cmo ../src/dbdisk.cmi ../src/gutil.cmi httpEnv.cmo \
-    iolight.cmo ../src/lock.cmi ../src/outbase.cmi ../src/secure.cmi \
+gwtp.cmo: ../src/buff.cmo ../src/dbdisk.cmi httpEnv.cmo iolight.cmo \
+    ../src/lock.cmi ../src/mutil.cmi ../src/outbase.cmi ../src/secure.cmi \
     ../src/translate.cmi 
-gwtp.cmx: ../src/buff.cmx ../src/dbdisk.cmi ../src/gutil.cmx httpEnv.cmx \
-    iolight.cmx ../src/lock.cmx ../src/outbase.cmx ../src/secure.cmx \
+gwtp.cmx: ../src/buff.cmx ../src/dbdisk.cmi httpEnv.cmx iolight.cmx \
+    ../src/lock.cmx ../src/mutil.cmx ../src/outbase.cmx ../src/secure.cmx \
     ../src/translate.cmx 
 iolight.cmo: ../src/buff.cmo ../src/dbdisk.cmi ../src/def.cmi \
     ../src/iovalue.cmi ../src/mutil.cmi ../src/secure.cmi 

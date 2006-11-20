@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.38 2006-11-17 09:44:07 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.39 2006-11-20 11:41:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -243,7 +243,7 @@ value input_lexicon lang =
   let ht = Hashtbl.create 501 in
   let fname = Filename.concat "lang" "lex_utf8.txt" in
   do {
-    Gutil.input_lexicon lang ht
+    Mutil.input_lexicon lang ht
       (fun () -> Secure.open_in (Util.search_in_lang_path fname));
     ht
   }
@@ -260,7 +260,7 @@ value alias_lang lang =
         let lang =
           try
             let rec loop line =
-              match Gutil.lindex line '=' with
+              match Mutil.lindex line '=' with
               [ Some i ->
                   if lang = String.sub line 0 i then
                     String.sub line (i + 1) (String.length line - i - 1)

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 5.30 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.31 2006-11-20 11:41:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -20,8 +20,6 @@ value alphabetic_utf_8 : string -> string -> int;
 value alphabetic : string -> string -> int;
 value alphabetic_order : string -> string -> int;
 
-value lindex : string -> char -> option int;
-
 value arg_list_of_string : string -> list string;
 
 value sort_person_list : base -> list person -> list person;
@@ -34,6 +32,3 @@ value parent_array : gen_couple 'a -> array 'a;
 value no_ascend : base -> ascend;
 
 value find_free_occ : base -> string -> string -> int -> int;
-
-value input_lexicon :
-  string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;

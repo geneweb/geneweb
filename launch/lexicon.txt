@@ -1,0 +1,42 @@
+# $Id: lexicon.txt,v 1.1 2006-11-20 11:41:55 ddr Exp $
+# Copyright (c) 2006 INRIA
+
+    Available databases:
+en: Available databases:
+fr: Bases disponibles :
+
+    Browse
+en: Browse
+fr: Naviguer
+
+    Cancel
+en: Cancel
+fr: Annuler
+
+    Change options
+en: Change options
+fr: Changer les options
+
+    Create a new database
+en: Create a new database
+fr: Créer une nouvelle base
+
+    Enter the name:
+en: Enter the name:
+fr: Entrer le nom :
+
+    OK
+en: OK
+fr: D'accord
+
+    Quit
+en: Quit
+fr: Quitter
+
+    Restart
+en: Restart
+fr: Redémarrer
+
+    Server is running...
+en: Server is running...
+fr: Le serveur tourne... 
