@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.15 2006-11-20 13:40:10 ddr Exp $ *)
+(* $Id: notes.ml,v 5.16 2006-11-20 17:07:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -40,9 +40,10 @@ value print_search_form conf from_note =
               (match p_getenv conf.env "s" with
                [ Some s -> quote_escaped s
                | None -> "" ]);
-            if from_note <> "" then
-              xtag "input" "type=\"hidden\" name=\"z\" value=\"%s\"" from_note
-            else ();
+            match from_note with
+            [ Some n ->
+                xtag "input" "type=\"hidden\" name=\"z\" value=\"%s\"" n
+            | None -> () ];
             xtag "br";
             tag "label" begin
               xtag "input" "type=\"checkbox\" name=\"c\" value=\"on\"%s"
@@ -100,7 +101,7 @@ value print_whole_notes conf base fnotes title s ho = do {
   in
   Wserver.wprint "%s\n" s;
   match ho with
-  [ Some _ -> print_search_form conf fnotes
+  [ Some _ -> print_search_form conf (Some fnotes)
   | None -> () ];
   trailer conf;
 };
@@ -488,7 +489,7 @@ value print_misc_notes conf base =
           db;
       end
     else ();
-    if d = "" then print_search_form conf "" else ();
+    if d = "" then print_search_form conf None else ();
     trailer conf;
   }
 ;
@@ -500,18 +501,19 @@ value search_text conf base s =
   let case_sens = p_getenv conf.env "c" = Some "on" in
   let db =
     let db = notes_links_db conf base True in
+    let db = ["" :: List.map fst db] in
     match p_getenv conf.env "z" with
-    [ Some "" | None -> db
+    [ None -> db
     | Some f ->
         loop db where rec loop =
           fun
-          [ [(fnotes, _) :: list] -> if f = fnotes then list else loop list
+          [ [fnotes :: list] -> if f = fnotes then list else loop list
           | [] -> [] ] ]
   in
   let noteo =
     loop db where rec loop =
       fun
-      [ [(fnotes, _) :: list] ->
+      [ [fnotes :: list] ->
           let (nenv, nt) = read_notes base fnotes in
           let tit = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
           if in_text case_sens s tit || in_text case_sens s nt then
