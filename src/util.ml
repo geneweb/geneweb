@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.72 2006-11-19 14:05:14 ddr Exp $ *)
+(* $Id: util.ml,v 5.73 2006-11-20 03:58:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2595,11 +2595,17 @@ value start_equiv_with case_sens s m i =
     | None -> None ]
 ;
 
-value in_text case_sens s m =
+value rec in_text case_sens s m =
   loop False 0 where rec loop in_tag i =
     if i = String.length m then False
     else if in_tag then loop (m.[i] <> '>') (i + 1)
     else if m.[i] = '<' then loop True (i + 1)
+    else if m.[i] = '[' && i + 1 < String.length m && m.[i+1] = '[' then
+      match NotesLinks.misc_notes_link m i with
+      [ NotesLinks.WLpage j _ _ _ text
+      | NotesLinks.WLperson j _ text _ ->
+          if in_text case_sens s text then True else loop False j
+      | NotesLinks.WLnone -> loop False (i + 1) ]
     else
       match start_equiv_with case_sens s m i with
       [ Some _ -> True
