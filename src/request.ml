@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.34 2006-11-19 19:53:34 ddr Exp $ *)
+(* $Id: request.ml,v 5.35 2006-11-20 02:56:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -440,6 +440,7 @@ value family_m conf base =
       BirthDeath.print_marriage conf base
   | Some "LEX" -> Srcfile.print_lexicon conf base
   | Some "MISC_NOTES" -> Notes.print_misc_notes conf base
+  | Some "MISC_NOTES_SEARCH" -> Notes.print_misc_notes_search conf base
   | Some "MOD_FAM" when conf.wizard -> UpdateFam.print_mod conf base
   | Some "MOD_FAM_OK" when conf.wizard -> UpdateFamOk.print_mod conf base
   | Some "MOD_IND" when conf.wizard -> UpdateInd.print_mod conf base
