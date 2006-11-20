@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.25 2006-11-20 13:21:56 ddr Exp $ *)
+(* $Id: launch.ml,v 1.26 2006-11-20 13:26:07 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -19,20 +19,20 @@ type state =
 
 value trace = ref False;
 value config_file = Filename.concat "gw" "config.txt";
-value lexicon_file = ref "lexicon.txt";
+value lexicon_file = Filename.concat "gw" "launch_lex.txt";
 value lexicon_mtime = ref 0.0;
 
 value input_lexicon lang = do {
   let ht = Hashtbl.create 501 in
-  Mutil.input_lexicon lang ht (fun () -> open_in lexicon_file.val);
+  Mutil.input_lexicon lang ht (fun () -> open_in lexicon_file);
   ht
 };
 
 value unfreeze_lexicon =
   let lexicon = ref None in
   fun lang ->
-    if Sys.file_exists lexicon_file.val then do {
-      let stbuf = Unix.stat lexicon_file.val in
+    if Sys.file_exists lexicon_file then do {
+      let stbuf = Unix.stat lexicon_file in
       if stbuf.Unix.st_mtime > lexicon_mtime.val then do {
         lexicon.val := None;
         lexicon_mtime.val := stbuf.Unix.st_mtime;
@@ -494,7 +494,8 @@ value rec config_bases_dir state =
          try List.assoc "bases_dir" state.config_env with
          [ Not_found -> "" ]
        in
-       if bases_dir <> config_env_bases_dir || not (Sys.file_exists config_file)
+       if bases_dir <> config_env_bases_dir ||
+          not (Sys.file_exists config_file)
        then do {
          state.config_env :=
            List.filter (fun (v, _) -> v <> "bases_dir") state.config_env @
