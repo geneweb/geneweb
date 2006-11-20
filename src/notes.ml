@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.14 2006-11-20 02:56:51 ddr Exp $ *)
+(* $Id: notes.ml,v 5.15 2006-11-20 13:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -488,7 +488,7 @@ value print_misc_notes conf base =
           db;
       end
     else ();
-    print_search_form conf "";
+    if d = "" then print_search_form conf "" else ();
     trailer conf;
   }
 ;
