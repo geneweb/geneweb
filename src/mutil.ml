@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.13 2006-11-20 11:41:56 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.14 2006-11-20 13:31:36 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
@@ -450,7 +450,10 @@ value input_lexicon lang ht open_fname =
     let derived_lang =
       match lindex lang '-' with
       [ Some i -> String.sub lang 0 i
-      | _ -> "" ]
+      | None ->
+          match lindex lang '_' with
+          [ Some i -> String.sub lang 0 i
+          | None -> "" ] ]
     in
     try
       do {
