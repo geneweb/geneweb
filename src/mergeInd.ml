@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.27 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.28 2006-11-20 23:20:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -375,14 +375,55 @@ value effective_merge_ind conf base p1 p2 =
   }
 ;
 
+value is_ancestor base ip1 ip2 =
+  let visited = Array.create (nb_of_persons base) False in
+  let rec loop ip =
+    if visited.(Adef.int_of_iper ip) then False
+    else if ip = ip1 then True
+    else do {
+      visited.(Adef.int_of_iper ip) := True;
+      match get_parents (aoi base ip) with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          loop (get_father cpl) || loop (get_mother cpl)
+      | None -> False ]
+    }
+  in
+  loop ip2
+;
+
+value error_loop conf base p =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do {
+    rheader conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
+      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+      (p_surname base p);
+    Wserver.wprint "\n%s\n" (transl conf "would be his/her own ancestor");
+    Wserver.wprint "\n";
+    trailer conf;
+  }
+;
+
 value merge_ind conf base branches ip1 ip2 changes_done =
   let p1 = poi base ip1 in
   let p2 = poi base ip2 in
-  if compatible_ind base p1 p2 then do {
-    effective_merge_ind conf base p1 p2; (True, True)
+  if is_ancestor base ip1 ip2 then do {
+    error_loop conf base p2;
+    (False, False)
+  }
+  else if is_ancestor base ip2 ip1 then do {
+    error_loop conf base p1;
+    (False, False)
+  }
+  else if compatible_ind base p1 p2 then do {
+    effective_merge_ind conf base p1 p2;
+    (True, True)
   }
   else do {
-    propose_merge_ind conf base branches p1 p2; (False, changes_done)
+    propose_merge_ind conf base branches p1 p2;
+    (False, changes_done)
   }
 ;
 
@@ -543,37 +584,6 @@ value print_merged conf base p =
     header conf title;
     print_link_to_welcome conf True;
     Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Wserver.wprint "\n";
-    trailer conf;
-  }
-;
-
-value is_ancestor base ip1 ip2 =
-  let visited = Array.create (nb_of_persons base) False in
-  let rec loop ip =
-    if visited.(Adef.int_of_iper ip) then False
-    else if ip = ip1 then True
-    else do {
-      visited.(Adef.int_of_iper ip) := True;
-      match get_parents (aoi base ip) with
-      [ Some ifam ->
-          let cpl = coi base ifam in
-          loop (get_father cpl) || loop (get_mother cpl)
-      | None -> False ]
-    }
-  in
-  loop ip2
-;
-
-value error_loop conf base p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    print_link_to_welcome conf True;
-    Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-      (p_surname base p);
-    Wserver.wprint "\n%s\n" (transl conf "would be his/her own ancestor");
     Wserver.wprint "\n";
     trailer conf;
   }
