@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.24 2006-11-20 13:18:27 ddr Exp $ *)
+(* $Id: launch.ml,v 1.25 2006-11-20 13:21:56 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -30,23 +30,24 @@ value input_lexicon lang = do {
 
 value unfreeze_lexicon =
   let lexicon = ref None in
-  fun lang -> do {
-    if Sys.file_exists lexicon_file.val then
+  fun lang ->
+    if Sys.file_exists lexicon_file.val then do {
       let stbuf = Unix.stat lexicon_file.val in
       if stbuf.Unix.st_mtime > lexicon_mtime.val then do {
         lexicon.val := None;
         lexicon_mtime.val := stbuf.Unix.st_mtime;
       }
-      else ()
-    else ();
-    match lexicon.val with
-    [ Some lex -> lex
-    | None -> do {
-        let lex = input_lexicon lang in
-        lexicon.val := Some lex;
-        lex
-      } ]
-};
+      else ();
+      match lexicon.val with
+      [ Some lex -> Some lex
+      | None -> do {
+          let lex = input_lexicon lang in
+          lexicon.val := Some lex;
+          Some lex
+        } ]
+    }
+    else None
+;
 
 value default_lang =
   try Sys.getenv "LC_ALL" with
@@ -57,8 +58,9 @@ value default_lang =
 value lang = ref default_lang;
 
 value transl w =
-  let lexicon = unfreeze_lexicon lang.val in
-  try Hashtbl.find lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+  match unfreeze_lexicon lang.val with
+  [ Some lex -> try Hashtbl.find lex w with [ Not_found -> "[" ^ w ^ "]" ]
+  | None -> w ]
 ;
 
 value read_config_env () =
