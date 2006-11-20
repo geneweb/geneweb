@@ -1,9 +1,16 @@
-(* $Id: mutil.ml,v 5.12 2006-11-17 02:36:18 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.13 2006-11-20 11:41:56 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size = 4;
 value verbose = ref True;
 value utf_8_db = Name.utf_8_db;
+
+value lindex s c =
+  pos 0 where rec pos i =
+    if i = String.length s then None
+    else if s.[i] = c then Some i
+    else pos (i + 1)
+;
 
 value rindex s c =
   pos (String.length s - 1) where rec pos i =
@@ -435,4 +442,54 @@ value compare_after_particle particles s1 s2 =
       if c1 < c2 then -1
       else if c1 > c2 then 1
       else loop (i1 + 1) (i2 + 1)
+;
+
+value input_lexicon lang ht open_fname =
+  try
+    let ic = open_fname () in
+    let derived_lang =
+      match lindex lang '-' with
+      [ Some i -> String.sub lang 0 i
+      | _ -> "" ]
+    in
+    try
+      do {
+        try
+          while True do {
+            let k =
+              find_key (input_line ic) where rec find_key line =
+                if String.length line < 4 then find_key (input_line ic)
+                else if String.sub line 0 4 <> "    " then
+                  find_key (input_line ic)
+                else line
+            in
+            let k = String.sub k 4 (String.length k - 4) in
+            let rec loop line =
+              match lindex line ':' with
+              [ Some i ->
+                  let line_lang = String.sub line 0 i in
+                  do {
+                    if line_lang = lang ||
+                       line_lang = derived_lang && not (Hashtbl.mem ht k) then
+                      let v =
+                        if i + 1 = String.length line then ""
+                        else
+                          String.sub line (i + 2) (String.length line - i - 2)
+                      in
+                      Hashtbl.add ht k v
+                    else ();
+                    loop (input_line ic)
+                  }
+              | None -> () ]
+            in
+            loop (input_line ic)
+          }
+        with
+        [ End_of_file -> () ];
+        close_in ic;
+      }
+    with e ->
+      do { close_in ic; raise e }
+  with
+  [ Sys_error _ -> () ]
 ;

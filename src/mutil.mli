@@ -1,10 +1,11 @@
-(* $Id: mutil.mli,v 5.11 2006-11-17 02:36:18 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.12 2006-11-20 11:41:56 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 value int_size : int;
 value verbose : ref bool;
 value utf_8_db : ref bool;
 
+value lindex : string -> char -> option int;
 value rindex : string -> char -> option int;
 value array_mem : 'a -> array 'a -> bool;
 value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
@@ -34,5 +35,8 @@ value roman_of_arabian : int -> string;
 value arabian_of_roman : string -> int;
 
 value compare_after_particle : list string -> string -> string -> int;
+
+value input_lexicon :
+  string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;
 
 module StrSet : Set.S with type elt = string;

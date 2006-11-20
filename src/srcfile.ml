@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.18 2006-11-11 11:07:46 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.19 2006-11-20 11:41:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -294,7 +294,7 @@ value rec lexicon_translate conf base nomin strm first_c =
         (lexicon_translate conf base False strm (Stream.next strm))
     else
       let r = Util.transl_nth conf s n in
-      match Gutil.lindex r '%' with
+      match Mutil.lindex r '%' with
       [ Some i when c = "(" ->
           let sa =
             loop 0 where rec loop len =
