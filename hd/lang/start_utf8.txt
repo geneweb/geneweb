@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.15 2006-11-21 16:16:58 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.16 2006-11-21 18:40:53 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -36,10 +36,11 @@ sv: Genealogi
   <link rel="shortcut icon" href="%o/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %i; font-weight: bold }
-    .lang { width: 100%% }
-    .lang ul { margin: 0 }
-    .lang li { display: inline }
-    .lang-tit { font-size: 80%% }
+    #lang .tit { font-size: 80%% }
+    #lang .con { width: 100%% }
+    #lang ul { margin: 0 }
+    #lang li { display: inline }
+    #content { }
   --></style>
 %j</head>
 <body%b>
@@ -99,6 +100,8 @@ zh: 网络家谱
 <br%/>
 
 %rversion
+
+<div id="content">
 
 %Vmotd;
 
@@ -1032,5 +1035,7 @@ zh: 本站使用的术语
 ]</a></em></span></p>
 
 <br%/>
+
+</div>
 
 </div>

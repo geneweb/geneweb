@@ -10,7 +10,9 @@ function WorkOnBrowser() {
 }
 // --></script>
 
-<div class="lang-tit"><em>[
+<div id="lang">
+
+<div class="tit"><em>[
 af: Taalvoorkeur/Language preference:
 ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
 bg: Можете да изберете друг език за съобщения измежду следните:
@@ -39,7 +41,7 @@ sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em></div>
 
-<div class="lang">
+<div class="con">
 <ul>
 <li><a title="%uaf;" href="%glang=af"
  onmouseover="if (WorkOnBrowser()) iaf.src='%o/t-af.png'"
@@ -177,6 +179,8 @@ sv: Du kan välja ett annat språk bland de följande:
 <img src="%o/l-zh.jpg" width="36" height="22" alt="%uzh;" id="izh"
  style="border: 0"%/></a></li>
 </ul>
+</div>
+
 </div>%Ij
 
 <p><strong><font color=red>[
