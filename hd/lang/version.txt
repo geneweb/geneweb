@@ -47,137 +47,137 @@ sv: Du kan välja ett annat språk bland de följande:
  onmouseover="if (WorkOnBrowser()) iaf.src='%o/t-af.png'"
  onmouseout="iaf.src='%o/l-af.jpg'">
 <img src="%o/l-af.jpg" width="36" height="22" alt="%uaf;" id="iaf"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uaf;</span></a></li>
 <li><a title="%ubg;" href="%glang=bg"
  onmouseover="if (WorkOnBrowser()) ibg.src='%o/t-bg.png'"
  onmouseout="ibg.src='%o/l-bg.jpg'">
 <img src="%o/l-bg.jpg" width="36" height="22" alt="%ubg;" id="ibg"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ubg;</span></a></li>
 <li><a title="%ubr;" href="%glang=br"
  onmouseover="if (WorkOnBrowser()) ibr.src='%o/t-br.png'"
  onmouseout="ibr.src='%o/l-br.jpg'">
 <img src="%o/l-br.jpg" width="36" height="22" alt="%ubr;" id="ibr"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ubr;</span></a></li>
 <li><a title="%uca;" href="%glang=ca"
  onmouseover="if (WorkOnBrowser()) ica.src='%o/t-ca.png'"
  onmouseout="ica.src='%o/l-ca.jpg'">
 <img src="%o/l-ca.jpg" width="36" height="22" alt="%uca;" id="ica"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uca;</span></a></li>
 <li><a title="%ucs;" href="%glang=cs"
  onmouseover="if (WorkOnBrowser()) ics.src='%o/t-cs.png'"
  onmouseout="ics.src='%o/l-cs.jpg'">
 <img src="%o/l-cs.jpg" width="36" height="22" alt="%ucs;" id="ics"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ucs;</span></a></li>
 <li><a title="%uda;" href="%glang=da"
  onmouseover="if (WorkOnBrowser()) ida.src='%o/t-da.png'"
  onmouseout="ida.src='%o/l-da.jpg'">
 <img src="%o/l-da.jpg" width="36" height="22" alt="%uda;" id="ida"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uda;</span></a></li>
 <li><a title="%ude;" href="%glang=de"
  onmouseover="if (WorkOnBrowser()) ide.src='%o/t-de.png'"
  onmouseout="ide.src='%o/l-de.jpg'">
 <img src="%o/l-de.jpg" width="36" height="22" alt="%ude;" id="ide"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ude;</span></a></li>
 <li><a title="%uen;" href="%glang=en"
  onmouseover="if (WorkOnBrowser()) ien.src='%o/t-en.png'"
  onmouseout="ien.src='%o/l-en.jpg'">
 <img src="%o/l-en.jpg" width="36" height="22" alt="%uen;" id="ien"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uen;</span></a></li>
 <li><a title="%ueo;" href="%glang=eo"
  onmouseover="if (WorkOnBrowser()) ieo.src='%o/t-eo.png'"
  onmouseout="ieo.src='%o/l-eo.jpg'">
 <img src="%o/l-eo.jpg" width="36" height="22" alt="%ueo;" id="ieo"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ueo;</span></a></li>
 <li><a title="%ues;" href="%glang=es"
  onmouseover="if (WorkOnBrowser()) ies.src='%o/t-es.png'"
  onmouseout="ies.src='%o/l-es.jpg'">
 <img src="%o/l-es.jpg" width="36" height="22" alt="%ues;" id="ies"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ues;</span></a></li>
 <li><a title="%uet;" href="%glang=et"
  onmouseover="if (WorkOnBrowser()) iet.src='%o/t-et.png'"
  onmouseout="iet.src='%o/l-et.jpg'">
 <img src="%o/l-et.jpg" width="36" height="22" alt="%uet;" id="iet"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uet;</span></a></li>
 <li><a title="%ufi;" href="%glang=fi"
  onmouseover="if (WorkOnBrowser()) ifi.src='%o/t-fi.png'"
  onmouseout="ifi.src='%o/l-fi.jpg'">
 <img src="%o/l-fi.jpg" width="36" height="22" alt="%ufi;" id="ifi"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ufi;</span></a></li>
 <li><a title="%ufr;" href="%glang=fr"
  onmouseover="if (WorkOnBrowser()) ifr.src='%o/t-fr.png'"
  onmouseout="ifr.src='%o/l-fr.jpg'">
 <img src="%o/l-fr.jpg" width="36" height="22" alt="%ufr;" id="ifr"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ufr;</span></a></li>
 <li><a title="%uhe;" href="%glang=he"
  onmouseover="if (WorkOnBrowser()) ihe.src='%o/t-he.png'"
  onmouseout="ihe.src='%o/l-he.jpg'">
 <img src="%o/l-he.jpg" width="36" height="22" alt="%uhe;" id="ihe"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uhe;</span></a></li>
 <li><a title="%uis;" href="%glang=is"
  onmouseover="if (WorkOnBrowser()) iis.src='%o/t-is.png'"
  onmouseout="iis.src='%o/l-is.jpg'">
 <img src="%o/l-is.jpg" width="36" height="22" alt="%uis;" id="iis"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uis;</span></a></li>
 <li><a title="%uit;" href="%glang=it"
  onmouseover="if (WorkOnBrowser()) iit.src='%o/t-it.png'"
  onmouseout="iit.src='%o/l-it.jpg'">
 <img src="%o/l-it.jpg" width="36" height="22" alt="%uit;" id="iit"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uit;</span></a></li>
 <li><a title="%ulv;" href="%glang=lv"
  onmouseover="if (WorkOnBrowser()) ilv.src='%o/t-lv.png'"
  onmouseout="ilv.src='%o/l-lv.jpg'">
 <img src="%o/l-lv.jpg" width="36" height="22" alt="%ulv;" id="ilv"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%ulv;</span></a></li>
 <li><a title="%unl;" href="%glang=nl"
  onmouseover="if (WorkOnBrowser()) inl.src='%o/t-nl.png'"
  onmouseout="inl.src='%o/l-nl.jpg'">
 <img src="%o/l-nl.jpg" width="36" height="22" alt="%unl;" id="inl"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%unl;</span></a></li>
 <li><a title="%uno;" href="%glang=no"
  onmouseover="if (WorkOnBrowser()) ino.src='%o/t-no.png'"
  onmouseout="ino.src='%o/l-no.jpg'">
 <img src="%o/l-no.jpg" width="36" height="22" alt="%uno;" id="ino"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uno;</span></a></li>
 <li><a title="%upl;" href="%glang=pl"
  onmouseover="if (WorkOnBrowser()) ipl.src='%o/t-pl.png'"
  onmouseout="ipl.src='%o/l-pl.jpg'">
 <img src="%o/l-pl.jpg" width="36" height="22" alt="%upl;" id="ipl"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%upl;</span></a></li>
 <li><a title="%upt;" href="%glang=pt"
  onmouseover="if (WorkOnBrowser()) ipt.src='%o/t-pt.png'"
  onmouseout="ipt.src='%o/l-pt.jpg'">
 <img src="%o/l-pt.jpg" width="36" height="22" alt="%upt;" id="ipt"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%upt;</span></a></li>
 <li><a title="%upt-br;" href="%glang=pt-br"
  onmouseover="if (WorkOnBrowser()) ipt_br.src='%o/t-pt.png'"
  onmouseout="ipt_br.src='%o/l-pt-br.jpg'">
 <img src="%o/l-pt-br.jpg" width="36" height="22" alt="%upt-br;" id="ipt_br"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%upt-br;</span></a></li>
 <li><a title="%uro;" href="%glang=ro"
  onmouseover="if (WorkOnBrowser()) iro.src='%o/t-ro.png'"
  onmouseout="iro.src='%o/l-ro.jpg'">
 <img src="%o/l-ro.jpg" width="36" height="22" alt="%uro;" id="iro"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uro;</span></a></li>
 <li><a title="%uru;" href="%glang=ru"
  onmouseover="if (WorkOnBrowser()) iru.src='%o/t-ru.png'"
  onmouseout="iru.src='%o/l-ru.jpg'">
 <img src="%o/l-ru.jpg" width="36" height="22" alt="%uru;" id="iru"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uru;</span></a></li>
 <li><a title="%usl;" href="%glang=sl"
  onmouseover="if (WorkOnBrowser()) isl.src='%o/t-sl.png'"
  onmouseout="isl.src='%o/l-sl.jpg'">
 <img src="%o/l-sl.jpg" width="36" height="22" alt="%usl;" id="isl"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%usl;</span></a></li>
 <li><a title="%usv;" href="%glang=sv"
  onmouseover="if (WorkOnBrowser()) isv.src='%o/t-sv.png'"
  onmouseout="isv.src='%o/l-sv.jpg'">
 <img src="%o/l-sv.jpg" width="36" height="22" alt="%usv;" id="isv"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%usv;</span></a></li>
 <li><a title="%uzh;" href="%glang=zh"
  onmouseover="if (WorkOnBrowser()) izh.src='%o/t-zh.png'"
  onmouseout="izh.src='%o/l-zh.jpg'">
 <img src="%o/l-zh.jpg" width="36" height="22" alt="%uzh;" id="izh"
- style="border: 0"%/></a></li>
+ style="border: 0"%/><span>%uzh;</span></a></li>
 </ul>
 </div>
 
