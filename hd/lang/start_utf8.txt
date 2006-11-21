@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.14 2006-11-21 15:37:07 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.15 2006-11-21 16:16:58 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -39,6 +39,7 @@ sv: Genealogi
     .lang { width: 100%% }
     .lang ul { margin: 0 }
     .lang li { display: inline }
+    .lang-tit { font-size: 80%% }
   --></style>
 %j</head>
 <body%b>
@@ -94,37 +95,6 @@ zh: 网络家谱
 </td>
 </tr>
 </table>
-
-<br%/>
-
-<span style="font-size: 80%%"><em>[
-af: Taalvoorkeur/Language preference:
-ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
-bg: Можете да изберете друг език за съобщения измежду следните:
-br: Dibab a c'hellit ur yezh all etre ar re-mañ:
-ca: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
-cs: Zvolte jazyk pro prohlížení databáze:
-da: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
-    f&oslash;lgende:
-de: Du kannst eine der folgenden Sprachen f&uuml;r die Anzeige ausw&auml;hlen:
-en: You can select another displaying language among the following ones:
-eo: Vi povas elekti alian lingvon inter la sekvantajn:
-es: Puede seleccionar uno de los idiomas siguientes:
-et: Võid valida ka mõne muu keele järgnevatest:
-fi: Voit valita jonkin muun kielen allaolevista:
-fr: Vous pouvez sélectionner une autre langue d'affichage
-    parmi les suivantes:
-it: Potete scegliere un'altra lingua fra le seguenti:
-is: Þú getur valið milli eftirfarandi tungumála:
-lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
-nl: U kunt een andere taal kiezen uit een van de volgende mogelijkheden:
-no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
-    f&oslash;lgende:
-pl: Możesz wybrać inny język spośród następujących:
-ro: poti sa alegi una din urmatoarele limbi pentru afisaj
-sl: Lahko izberete drug jezik:
-sv: Du kan välja ett annat språk bland de följande:
-]</em></span>
 
 <br%/>
 
