@@ -270,11 +270,13 @@ some.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx mutil.cmx name.cmx templ.cmx templAst.cmi util.cmx \
     ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gwdb.cmi history.cmi \
-    lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi translate.cmi \
-    util.cmi version.cmo wiznotes.cmi ../wserver/wserver.cmi srcfile.cmi 
+    lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi templ.cmi \
+    translate.cmi util.cmi version.cmo wiznotes.cmi ../wserver/wserver.cmi \
+    srcfile.cmi 
 srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gwdb.cmx history.cmx \
-    lock.cmx mutil.cmx notesLinks.cmx num.cmx secure.cmx translate.cmx \
-    util.cmx version.cmx wiznotes.cmx ../wserver/wserver.cmx srcfile.cmi 
+    lock.cmx mutil.cmx notesLinks.cmx num.cmx secure.cmx templ.cmx \
+    translate.cmx util.cmx version.cmx wiznotes.cmx ../wserver/wserver.cmx \
+    srcfile.cmi 
 srcfile.cmi: config.cmi gwdb.cmi 
 templ.cmo: buff.cmo config.cmi mutil.cmi secure.cmi templAst.cmi \
     translate.cmi util.cmi ../wserver/wserver.cmi templ.cmi 
