@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.1 2006-11-22 15:30:17 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.2 2006-11-22 19:02:06 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -273,7 +273,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       <tr align="%left;">
         <td align="center">
           <p>
-            [
+            %apply;interp([
 af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
 ar: قاعدة المعلومات <span class="highlight">"%t"</span> تحوي إلى يومنا %n فرد
 bg: Базата от данни <span class="highlight">"%t"</span> в момента съдържа
@@ -297,7 +297,7 @@ et: Andmebaas <span class="highlight">"%t"</span> sisaldab andmeid %n
 fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
     henkil&ouml;&auml;.
 fr: La base de donn&eacute;es <span class="highlight">"%base.name;"%sq;
-    </span> contient actuellement %n personnes.
+    </span> contient actuellement %base.nb_persons; personnes.
 fr-cr: Ni atchuèlement %n nhon-m, fan-m, yiche adan chagement
        <span class="highlight">"%t"</span> ta-la
 he: במאגר המידע <span class="highlight">"%t"</span> יש %n אנשים.
@@ -320,102 +320,115 @@ sl: Baza podatkov <span class="highlight">"%t"</span> vsebuje %n oseb.
 sv: Databasen <span class="highlight">"%t"</span> inneh&aring;ller nu
     %n personer.
 zh: 现有 %n 人在数据库中。
-]%In
+])%sq;
+          %if;base.has_notes;%nl;
             <br%/>
-            (<a href="%sm=NOTES">[note/notes]1</a>%N)%E
-            %I&|pwizard_passwd_file;pwizard_descr_file;|wo<br%/>
-            (<a href="%sm=WIZNOTES">[wizard/wizards/friend/friends]1</a>)%E
-            %Im<br%/>
-            (<a href="%sm=MISC_NOTES">[miscellaneous notes]...</a>)%E
-          </p>%I&NwNj%I&NcNa
+            (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)%sq;
+          %end;%sq;
+          %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
+               and (wizard or wiznotes_dir_exists))%nl;
+            <br%/>
+            (<a href="%prefix;m=WIZNOTES">[wizard/wizards/friend/friends]1%sq;
+            </a>)%sq;
+          %end;%sq;
+          %if;has_misc_notes;%nl;
+            <br%/>
+            (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)%sq;
+          %end;%nl;
+          </p>%sq;
+      %if;(not wizard and not just_friend_wizard)
+        %if;(not cgi and bvar.auth_file = "")
           <table border="0" width="70%">
             <tr align="%left;">
               <td align="center">
                 [
-af: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
+af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
     (password)
 bg: Достъп като
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
+    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (парола)
 br: mont e-barzh evel
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
+    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (ger-tremen)
 ca: acc&eacute;s
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
+    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (clau)
-cs: <a href="%sw=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
+cs: <a href="%prefix;w=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
     přístup<br%/> (heslo)
-da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
-de: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br%/>
+da: <a href="%prefix;w=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
+de: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br%/>
     (Passwort)
-en: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
+en: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
     (password)
-eo: <a href="%sw=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br%/>
+eo: <a href="%prefix;w=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (pasvorto)
-es: <a href="%sw=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br%/>
+es: <a href="%prefix;w=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (contrase&ntilde;a)
 et: Ligipääs:
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
-fi: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
+    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
+fi: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     kirjautuminen<br%/> (salasana)
 fr: acc&egrave;s <a %P
-    href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> %P
+    href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> %P
     (mot de passe).
-he: כניסה  <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>
-is: <a href="%sw=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
-it: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
+he: כניסה  <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>
+is: <a href="%prefix;w=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
+it: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
     (password)
-lv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
+lv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
     (password)
 nl: Toegang als
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
+    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (wachtwoord)
-no: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br%/>
+no: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br%/>
     (passord)
-pl: <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostęp<br%/>
+pl: <a href="%prefix;w=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostęp<br%/>
     (hasło)
-pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
+pt: Entrada <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (palavra chave)
 ro: Acces pentru
-    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
+    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (parola)
 sl: Urejanje kot
-    <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a>
+    <a href="%prefix;w=w"><em>"[wizard/wizards/friend/friends]0"</em></a>
     (geslo)
-sv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
+sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     tilltr&auml;de<br%/> (passord)
 ]<br%/>
-              </td>%INf
+              </td>
+            %if;(not friend)
               <td align="center">
                 [
-af: <a href="%sw=f"><em>Vriend</em></a> toegang<br%/> (password)
-bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br%/> (парола)
-br: mont e-barzh evel <a href="%sw=f"><em>mignon</em></a><br%/> (ger-tremen)
-ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br%/> (clau)
-cs: <a href="%sw=f">{<em>"Friend"</em></a> přístup<br%/> (heslo)
-da: <a href="%sw=f"><em>Betroet adgang</em></a><br%/> (adgangskode)
-de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br%/> (Passwort)
-en: <a href="%sw=f"><em>Friend</em></a> access<br%/> (password)
-eo: <a href="%sw=f">Aliro <em>amiko</em></a><br%/> (pasvorto)
-es: <a href="%sw=f">Entrada <em>amigo</em></a><br%/> (contrase&ntilde;a)
-et: Ligipääs: <a href="%sw=f"><em>sõber</em></a><br%/> (parool)
-fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br%/> (salasana)
-fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br%/> (mot de passe).
-he: כניסה<a href="%sw=f"><em> מיוחסת </em></a>
-is: <a href="%sw=f"><em>Vina</em></a> aðgangur<br%/> (aðgangsorð)
-it: <a href="%sw=f"><em>amico</em></a> access<br%/> (password)
-lv: <a href="%sw=f"><em>Friend</em></a> access<br%/> (password)
-nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br%/> (wachtwoord)
-no: <a href="%sw=f"><em>Venners</em></a> adgang<br%/> (passord)
-pl: <a href="%sw=f"><em>"Friend"</em></a> dostęp<br%/> (hasło)
-pt: Entrada <a href="%sw=f"><em>amigo</em></a><br%/> (palavra chave)
-ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br%/> (parola)
-sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br%/> (geslo)
-sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
+af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
+bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
+br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a><br%/> (ger-tremen)
+ca: acc&eacute;s <a href="%prefix;w=f"><em>amic</em></a><br%/> (clau)
+cs: <a href="%prefix;w=f">{<em>"Friend"</em></a> přístup<br%/> (heslo)
+da: <a href="%prefix;w=f"><em>Betroet adgang</em></a><br%/> (adgangskode)
+de: <a href="%prefix;w=f"><em>Freund</em></a>-Zugang<br%/> (Passwort)
+en: <a href="%prefix;w=f"><em>Friend</em></a> access<br%/> (password)
+eo: <a href="%prefix;w=f">Aliro <em>amiko</em></a><br%/> (pasvorto)
+es: <a href="%prefix;w=f">Entrada <em>amigo</em></a><br%/> (contrase&ntilde;a)
+et: Ligipääs: <a href="%prefix;w=f"><em>sõber</em></a><br%/> (parool)
+fi: <a href="%prefix;w=f"><em>Valittu</em></a> kirjautuminen<br%/> (salasana)
+fr: acc&egrave;s <a href="%prefix;w=f"><em>ami</em></a><br%/> (mot de passe).
+he: כניסה<a href="%prefix;w=f"><em> מיוחסת </em></a>
+is: <a href="%prefix;w=f"><em>Vina</em></a> aðgangur<br%/> (aðgangsorð)
+it: <a href="%prefix;w=f"><em>amico</em></a> access<br%/> (password)
+lv: <a href="%prefix;w=f"><em>Friend</em></a> access<br%/> (password)
+nl: Toegang als <a href="%prefix;w=f"><em>vriend</em></a><br%/> (wachtwoord)
+no: <a href="%prefix;w=f"><em>Venners</em></a> adgang<br%/> (passord)
+pl: <a href="%prefix;w=f"><em>"Friend"</em></a> dostęp<br%/> (hasło)
+pt: Entrada <a href="%prefix;w=f"><em>amigo</em></a><br%/> (palavra chave)
+ro: Acces pentru <a href="%prefix;w=f"><em>amici</em></a><br%/> (parola)
+sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
+sv: <a href="%prefix;w=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
 ]
-              </td>%E
+              </td>
+            %end;
             </tr>
-          </table>%E%I|ca
+          </table>
+        %else;
           <table border="0">
             <tr align="%left;">
               <td align="center">
@@ -453,12 +466,14 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
                 </form>
               </td>
             </tr>
-          </table>%E
-          <br%/>%E
+          </table>
+        %end;
+          <br%/>
+      %end;%nl;
           <table border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td align="%left;">
-                [
+                %apply;interp([
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 ar: بإمكانك البحث في هذه القاعدة:
 bg: Можете да използвате тази база от данни за търсене:
@@ -472,7 +487,7 @@ eo: Por navigi en ĉi tiu datenbazo, vi povas fari vian serĉon:
 es: Para navegar en esta base de datos, puede hacer su búsqueda:
 et: Navigeeri andmebaasis:
 fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
-fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez %P
+fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez%sp;
     effectuer votre recherche:
 fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
 he: נווט במאגר מידה על-ידי חיפוס:
@@ -488,7 +503,7 @@ ru: Чтобы найти в этой базе данных, Вы можете �
 sl: Da bi pregledali vašo bazo podatkov, lahko iščete:
 sv: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 zh:
-]
+])%nl;
                 <br%/>
                 <ul style="list-style:none">
                   <li>
@@ -593,7 +608,7 @@ zh: 根据名衔
 ]</span>%INl<br%/>%E
                             <input name="t" size="14"
                              maxlength="200"%/></label>%INl<br%/>%E
-                            (<a href="%sm=TT;t=">[all the titles]</a>)<br%/>
+                            (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
                           </td>
                           <td>...</td>
                           <td>
@@ -603,7 +618,7 @@ en:
 ]</span>%INl<br%/>%E
                             <input name="p" size="25"
                              maxlength="200"%/></label>%INl<br%/>%E
-                            (<a href="%sm=TT;p=*">[all the estates]</a>)
+                            (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
                           </td>
                           <td>
                             <input type="submit" value="Ok"%/>
@@ -804,7 +819,7 @@ et: järgi
                     </form>
                   </li>%Ispropose_place_surnames;
                   <li>
-                    <form method="get" action="%s">
+                    <form method="get" action="%prefix;">
                       %h%P
                       <input type="hidden" name="m" value="PS"%/>
                       <span class="highlight"> - [
@@ -846,77 +861,77 @@ sv: efter
                     <span class="highlight">-</span>
                     [
 af: <span class="highlight">deur 'n</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>detail
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>detail
        navraag</b></font></a>.
 bg: <span class="highlight">чрез</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>разширено
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>разширено
        търсене</b></font></a>.
 br: <span class="highlight"> dre ar</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>klask
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>klask
        a-raokaet</b></font></a>.
 ca: <span class="highlight">per la</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>consulta
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>consulta
        avançada</b></font></a>.
 cs: <span class="highlight">lze také zadat</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>rozšířený
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>rozšířený
        dotaz</b></font></a>.
 da: <span class="highlight">ved</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>avanceret
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avanceret
        søgning</b></font></a>.
 de: <span class="highlight">mit der</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>erweiterten
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>erweiterten
        Suche</b></font></a>.
 en: <span class="highlight">by the</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>advanced
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>advanced
        request</b></font></a>.
 eo: <span class="highlight">per la</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>serĉado
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>serĉado
        progresata</b></font></a>.
 es: <span class="highlight">mediante una</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>consulta
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>consulta
        avanzada</b></font></a>.
 et: <span class="highlight"></span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>laiendatud 
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>laiendatud 
        päring</b></font></a>.
-fi: <a href="%sm=H;v=advanced"><span class="highlight">erityishaulla</span></a>.
+fi: <a href="%prefix;m=H;v=advanced"><span class="highlight">erityishaulla</span></a>.
 fr: <span class="highlight"> par la</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>requ&ecirc;te
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>requ&ecirc;te
         &eacute;volu&eacute;e</b></font></a>.
 he: <span class="highlight">ע"י </span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>
        בקשה מתקדמת</b></font></a>.
 is: <span class="highlight">eftir </span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>frekari
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>frekari
        óskum</b></font></a>.
 it: <span class="highlight">per la</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>richiesta
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>richiesta
        avanzata</b></font></a>.
 lv: <span class="highlight">meklēt pēc</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>citiem
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>citiem
        parametriem</b></font></a>.
 nl: <span class="highlight">via een</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>gedetailleerde
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>gedetailleerde
        opzoeking</b></font></a>.
 no: <span class="highlight">gjennom</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>avansert
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avansert
        s&oslash;king</b></font></a>.
 pl: <span class="highlight">skorzystać z</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>wyszukiwania
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>wyszukiwania
        zaawansowanego</b></font></a>.
 pt: <span class="highlight">por</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>pesquisa
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>pesquisa
        complexa</b></font></a>.
 ro: <span class="highlight">prin</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>specificare
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>specificare
        complexa</b></font></a>.
 ru: <span class="highlight">через</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>расширенный
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>расширенный
        запрос</b></font></a>.
 sl: <span class="highlight">s pomočjo</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>naprednega iskanja
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>naprednega iskanja
        </b></font></a>.
 sv: <span class="highlight">genom</span>
-       <a href="%sm=H;v=advanced"><font color="%highlight;"><b>avancerad
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avancerad
        s&ouml;kning</b></font></a>.
 ]
                   </li>%E
@@ -963,7 +978,7 @@ zh:
                     <td>
                       <ul style="list-style:inside">%Ispropose_add_family;
                         <li>
-                          <a href="%sm=ADD_FAM">[
+                          <a href="%prefix;m=ADD_FAM">[
 af: 'n familie byvoeg
 bg: да добавите семейство
 br: ouzhpennañ ur familh
@@ -997,7 +1012,7 @@ zh: 增加家庭记录
                     <td align="%left;">
                       <ul style="list-style:inside">%E%E%INn
                         <li>
-                          <a href="%sm=MOD_NOTES">[
+                          <a href="%prefix;m=MOD_NOTES">[
 af: die notas wysig
 bg: да промените бележките
 br: kemm an notennoù
@@ -1070,29 +1085,29 @@ zh:
                     <td valign="top">
                       <ul style="list-style:inside">
                         <li>
-                          <a href="%sm=AN">[birthdays]</a>
+                          <a href="%prefix;m=AN">[birthdays]</a>
                         </li>
                         <li>
-                          <a href="%sm=AD">[anniversaries of dead people]</a>
+                          <a href="%prefix;m=AD">[anniversaries of dead people]</a>
                         </li>
                         <li>
-                          <a href="%sm=AM">[anniversaries of marriage]</a>
+                          <a href="%prefix;m=AM">[anniversaries of marriage]</a>
                         </li>
                         <li>
-                          <a href="%sm=STAT">[statistics]</a>
+                          <a href="%prefix;m=STAT">[statistics]</a>
                         </li>
                       </ul>
                     </td>
                     <td valign="top">
                       <ul style="list-style:inside">%Ih
                         <li>
-                          <a href="%sm=HIST;k=20">[history of updates]</a>
+                          <a href="%prefix;m=HIST;k=20">[history of updates]</a>
                         </li>%E
                         <li>
-                          <a href="%sm=CAL">[calendar/calendars]1</a>
+                          <a href="%prefix;m=CAL">[calendar/calendars]1</a>
                         </li>
                         <li>
-                          <a href="%sm=FORUM">[database forum]</a>
+                          <a href="%prefix;m=FORUM">[database forum]</a>
                         </li>
                       </ul>
                     </td>
@@ -1151,81 +1166,81 @@ zh: 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d�
                 [
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
-    href="%sescache=0">link</a>.
+    href="%prefix;escache=0">link</a>.
 bg: Ако Вашият браузър не актуализира автоматично страниците, които
     са модифицирани (принуждавайки Ви да ги презареждате Вие),
-    опитайте се да тръгнете от <a href="%sescache=0">тази
+    опитайте се да тръгнете от <a href="%prefix;escache=0">тази
     препратка</a>.
 br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha
     dre-se emañ ret deoc'h "nevesaat ar bajenn"), klakit merdeiñ gant al
     liamm-mañ.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
-    la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
+    la p&agrave;gina), proveu de navegar des d'<a href="%prefix;escache=0">aquest
     altre lloc</a>.
 cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
     (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
-    href="%sescache=0">tento odkaz</a>.
+    href="%prefix;escache=0">tento odkaz</a>.
 da: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
     (n&oslash;dvendigg&oslash;r genindl&aelig;sning af det aktuelle
-    dokument), pr&oslash;v da at navigere <a href="%sescache=0">herfra</a>.
+    dokument), pr&oslash;v da at navigere <a href="%prefix;escache=0">herfra</a>.
 de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
     (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken),
-    bitte <a href="%sescache=0">hier</a> klicken.
+    bitte <a href="%prefix;escache=0">hier</a> klicken.
 en: If your browser does not automatically update the modified pages (forcing
     you to do "reload current document"), try navigating from <a
-    href="%sescache=0">this link</a>.
+    href="%prefix;escache=0">this link</a>.
 eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
     (se vi devas fari "reŝarĝi kurantan dokumenton"), provu ekde <a
-    href="%sescache=0">ĉi tiu legilo</a>.
+    href="%prefix;escache=0">ĉi tiu legilo</a>.
 es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas
     automaticamente, favor de usar esta conexi&oacute;n:
-    <a href="%sescache=0">hier</a>.
+    <a href="%prefix;escache=0">hier</a>.
 et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
     (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
-    navigeerimist <a href="%sescache=0">sellest viitest</a>.
+    navigeerimist <a href="%prefix;escache=0">sellest viitest</a>.
 fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja
     sivuja (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen
-    dokumentti") kokeile <a href="%sescache=0">t&auml;t&auml; linkki&auml;</a>.
+    dokumentti") kokeile <a href="%prefix;escache=0">t&auml;t&auml; linkki&auml;</a>.
 fr: Si votre navigateur ne met pas &agrave; jour automatiquement %P
     les pages modifi&eacute;es (vous obligeant &agrave; faire "actualiser %P
     la page"), essayez la navigation &agrave; partir de %P
-    <a href="%sescache=0">ce lien</a>.
+    <a href="%prefix;escache=0">ce lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
-    <a href="%sescache=0">þetta</a>.
+    <a href="%prefix;escache=0">þetta</a>.
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
     (obbligandovi a fare « aggiorna »), provate a partire da
-    <a href="%sescache=0">questo collegamento</a>.
+    <a href="%prefix;escache=0">questo collegamento</a>.
 lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
     veiktajām izmaiņām (tādējādi radot Jums nepieciešamību "pārlādēt
     tekošo dokumentu"), tad pamēģiniet uzklikšķināt <a
-    href="%sescache=0">šeit</a>.
+    href="%prefix;escache=0">šeit</a>.
 nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
     alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
-    <a href="%sescache=0">deze link</a>.
+    <a href="%prefix;escache=0">deze link</a>.
 no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
     oppfrisking av den aktuelle siden), prøv da å navigere <a
-    href="%sescache=0">herfra</a>.
+    href="%prefix;escache=0">herfra</a>.
 pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron 
     (zmuszając cię do ich ręcznego odświeżania), kliknij <a
-    href="%sescache=0">tutaj</a>.
+    href="%prefix;escache=0">tutaj</a>.
 pt: Se o seu <i>browser</i> n&atilde;o actualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
     "reload current document"), tente navegar desde <a
-    href="%sescache=0">este link</a>.
+    href="%prefix;escache=0">este link</a>.
 pt-br: Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
     "reload current document"), tente navegar desde <a
-    href="%sescache=0">este link</a>.
+    href="%prefix;escache=0">este link</a>.
 ro: daca pagina modificata nu este actualizata in mod automat (trebue sa
     fortezi "reload current document") navigeaza cu acest
-    <a href="%sescache=0">link</a>
+    <a href="%prefix;escache=0">link</a>
 sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
     "reload current document"), kliknite <a
-    href="%sescache=0">tukaj</a>.
+    href="%prefix;escache=0">tukaj</a>.
 sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
-    navigera <a href="%sescache=0">härifrån</a>.
+    navigera <a href="%prefix;escache=0">härifrån</a>.
 ]
               </td>
             </tr>
@@ -1236,7 +1251,7 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     <br%/>
     <p style="text-align: %right;">
       <span style="font-size: 80%%"><em><a
-       href="%sm=LEX">[
+       href="%prefix;m=LEX">[
 bg: лексикон
 br: geriaoueg
 ca: L&egrave;xic
