@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.38 2006-11-20 02:56:51 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.39 2006-11-22 12:42:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -22,7 +22,7 @@ value read_auth_file fname =
            let k = String.index au.au_info ':' in
            String.sub au.au_info 0 k
          with
-         [ Not_found -> "" ]
+         [ Not_found -> au.au_user ]
        in
        let (wizname, wizorder, islash) =
          try
@@ -32,7 +32,7 @@ value read_auth_file fname =
            let w2 = String.sub wizname (i + 1) (l - i - 1) in
            (w1 ^ w2, w2 ^ w1, i)
          with
-         [ Not_found -> (wizname, "~", -1) ]
+         [ Not_found -> (wizname, wizname, 0) ]
        in
        (au.au_user, (wizname, (wizorder, islash))))
     data
