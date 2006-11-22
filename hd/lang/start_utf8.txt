@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.19 2006-11-22 02:52:58 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.20 2006-11-22 03:21:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -43,6 +43,7 @@ sv: Genealogi
     #lang li { display: inline }
     #lang li span { display: none }
 /*
+    #lang .title { display : none }
     #lang { width: 15%%; position: relative; float: %L; text-align: %L }
     #lang li img { display: none }
     #content { margin-left: 15%%; width: auto }
@@ -60,8 +61,9 @@ sv: Genealogi
       </td>
       %I&wNf<td align="%R"
       valign="top"><em>[wizard/wizards/friend/friends]0%U</em>
-      %I&|pwizard_passwd;pwizard_passwd_file;|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a
-      href="%sw=">[deconnect]</a>)</span>%E</td>
+      %I|pwizard_passwd;pwizard_passwd_file;
+      %I|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a
+      href="%sw=">[deconnect]</a>)</span>%E%E</td>
       %E%I&fNw<td align="%R"
       valign="top"><em>[wizard/wizards/friend/friends]2</em>
       %I|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a
@@ -109,9 +111,9 @@ zh: 网络家谱
     </tr>
   </table>
   <br%/>
-  %rversion
+%rversion
   <div id="content">
-%Vmotd;
+%Vmotd;%P
     <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
       <tr align="%L">
         <td align="center">
@@ -139,7 +141,8 @@ et: Andmebaas <span class="highlight">"%t"</span> sisaldab andmeid %n
     isiku kohta.
 fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
     henkil&ouml;&auml;.
-fr: La base de donn&eacute;es <span class="highlight">"%t"</span> contient actuellement %n personnes.
+fr: La base de donn&eacute;es <span class="highlight">"%t"</span> %P
+    contient actuellement %n personnes.
 fr-cr: Ni atchuèlement %n nhon-m, fan-m, yiche adan chagement
        <span class="highlight">"%t"</span> ta-la
 he: במאגר המידע <span class="highlight">"%t"</span> יש %n אנשים.
@@ -200,7 +203,9 @@ et: Ligipääs:
     <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
 fi: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     kirjautuminen<br%/> (salasana)
-fr: acc&egrave;s <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (mot de passe).
+fr: acc&egrave;s <a %P
+    href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> %P
+    (mot de passe).
 he: כניסה  <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>
 is: <a href="%sw=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
 it: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
@@ -260,7 +265,8 @@ sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
             <tr align="%L">
               <td align="center">
                 <form method="post" action="%f">
-%h[
+                  %h%P
+                  [
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
     <em>администратор</em>:
@@ -311,7 +317,8 @@ eo: Por navigi en ĉi tiu datenbazo, vi povas fari vian serĉon:
 es: Para navegar en esta base de datos, puede hacer su búsqueda:
 et: Navigeeri andmebaasis:
 fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
-fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer votre recherche:
+fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez %P
+    effectuer votre recherche:
 fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
 he: נווט במאגר מידה על-ידי חיפוס:
 is: Í þessum gagnagrunni getur þú leitað:
@@ -332,7 +339,7 @@ zh:
                   <li>
                     <form method="get" action="%f">
                       <p>
-                        %h
+                        %h%P
                         <input type="hidden" name="m" value="NG"%/>
                         <label><span class="highlight">- [
 af: per persoon
@@ -399,7 +406,7 @@ zh: 搜索：
                             <span class="highlight">-&nbsp;</span>
                           </td>
                           <td>
-                            %h
+                            %h%P
                             <input type="hidden" name="m" value="TT"%/>
                             <label><span class="highlight">[
 af: by title
@@ -453,7 +460,7 @@ en:
                   <li>
                     <form method="get" action="%f">
                       <p>
-                        %h
+                        %h%P
                         <span class="highlight">- </span>[
 af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
@@ -643,7 +650,7 @@ et: järgi
                   </li>%Ispropose_place_surnames;
                   <li>
                     <form method="get" action="%s">
-                      %h
+                      %h%P
                       <input type="hidden" name="m" value="PS"%/>
                       <span class="highlight"> - [
 af: by
@@ -994,7 +1001,9 @@ bg: Ако Вашият браузър не актуализира автома�
     са модифицирани (принуждавайки Ви да ги презареждате Вие),
     опитайте се да тръгнете от <a href="%sescache=0">тази
     препратка</a>.
-br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha dre-se emañ ret deoc'h "nevesaat ar bajenn"), klakit merdeiñ gant al liamm-mañ.
+br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha
+    dre-se emañ ret deoc'h "nevesaat ar bajenn"), klakit merdeiñ gant al
+    liamm-mañ.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
@@ -1023,9 +1032,9 @@ et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
 fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja
     sivuja (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen
     dokumentti") kokeile <a href="%sescache=0">t&auml;t&auml; linkki&auml;</a>.
-fr: Si votre navigateur ne met pas &agrave; jour automatiquement
-    les pages modifi&eacute;es (vous obligeant &agrave; faire "actualiser
-    la page"), essayez la navigation &agrave; partir de
+fr: Si votre navigateur ne met pas &agrave; jour automatiquement %P
+    les pages modifi&eacute;es (vous obligeant &agrave; faire "actualiser %P
+    la page"), essayez la navigation &agrave; partir de %P
     <a href="%sescache=0">ce lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
     <a href="%sescache=0">þetta</a>.
