@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.18 2006-11-22 02:40:53 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 5.19 2006-11-22 02:52:58 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -108,15 +108,10 @@ zh: 网络家谱
       </td>
     </tr>
   </table>
-
   <br%/>
-
   %rversion
-
   <div id="content">
-
-    %Vmotd;
-
+%Vmotd;
     <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
       <tr align="%L">
         <td align="center">
@@ -174,9 +169,8 @@ zh: 现有 %n 人在数据库中。
             (<a href="%sm=WIZNOTES">[wizard/wizards/friend/friends]1</a>)%E
             %Im<br%/>
             (<a href="%sm=MISC_NOTES">[miscellaneous notes]...</a>)%E
-          </p>
-          %I&NwNj
-          %I&NcNa<table border="0" width="70%">
+          </p>%I&NwNj%I&NcNa
+          <table border="0" width="70%">
             <tr align="%L">
               <td align="center">
                 [
@@ -231,8 +225,8 @@ sl: Urejanje kot
 sv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     tilltr&auml;de<br%/> (passord)
 ]<br%/>
-              </td>
-              %INf<td align="center">
+              </td>%INf
+              <td align="center">
                 [
 af: <a href="%sw=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br%/> (парола)
@@ -259,10 +253,10 @@ ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br%/> (parola)
 sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br%/> (geslo)
 sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
 ]
-              </td>
-            %E</tr>
-          </table>%E
-          %I|ca<table border="0">
+              </td>%E
+            </tr>
+          </table>%E%I|ca
+          <table border="0">
             <tr align="%L">
               <td align="center">
                 <form method="post" action="%f">
@@ -298,11 +292,8 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
                 </form>
               </td>
             </tr>
-          </table>
-%E
-          <br%/>
-%E
-
+          </table>%E
+          <br%/>%E
           <table border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td align="%L">
@@ -1032,10 +1023,10 @@ et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
 fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja
     sivuja (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen
     dokumentti") kokeile <a href="%sescache=0">t&auml;t&auml; linkki&auml;</a>.
-fr: Si votre navigateur ne met pas &agrave; jour automatiquement les pages
-    modifi&eacute;es (vous obligeant &agrave; faire "actualiser la page"),
-    essayez la navigation &agrave; partir de <a href="%sescache=0">ce
-    lien</a>.
+fr: Si votre navigateur ne met pas &agrave; jour automatiquement
+    les pages modifi&eacute;es (vous obligeant &agrave; faire "actualiser
+    la page"), essayez la navigation &agrave; partir de
+    <a href="%sescache=0">ce lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
     <a href="%sescache=0">þetta</a>.
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
@@ -1080,7 +1071,8 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     </table>
     <br%/>
     <p style="text-align: %R">
-      <span style="font-size: 80%%"><em><a href="%sm=LEX">[
+      <span style="font-size: 80%%"><em><a
+       href="%sm=LEX">[
 bg: лексикон
 br: geriaoueg
 ca: L&egrave;xic

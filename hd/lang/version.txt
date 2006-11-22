@@ -64,7 +64,6 @@ sv: Du kan välja ett annat språk bland de följande:
            src="%o/l-br.jpg" width="36" height="22" alt="%ubr;"
            id="ibr" style="border: 0"%/><span>%ubr;</span></a>
         </li>
-
         <li>
           <a title="%uca;" href="%glang=ca"
            onmouseover="if (WorkOnBrowser()) ica.src='%o/t-ca.png'"
