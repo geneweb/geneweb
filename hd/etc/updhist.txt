@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.8 2006-11-20 10:38:31 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.9 2006-11-22 00:27:14 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none"%/>
@@ -18,21 +18,8 @@
 <body%body_prop;>
 %message_to_wizard;
 
-%if;not cancel_links;
-  <table style="float:%right;"><tr><td>
-    %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
-    %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
-  </td></tr></table>
-%end;
-
 %define;search_form(xxx)
   %if;(wizard or friend)
-    <table%if;("xxx" = "right") style="float:%right;"%end;
-     ><tr><td align="%right;">
     <form method="get" action="%action;">
       <p>
       %hidden;
@@ -50,13 +37,28 @@
       <input type="submit" value="[*search/case sensitive]0"%/>
       </p>
     </form>
-    </td></tr></table>
   %end;
+%end;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td align="%right;">
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+    %if;(evar.m != "HIST_SEARCH" or not found)
+      %apply;search_form("")
+    %end;
+  </td></tr></table>
 %end;
 
 <h1 style="text-align:center" class="highlight">[*history of updates]</h1>
 
-%if;(evar.m != "HIST_SEARCH" or not found)%apply;search_form("right")%end;
+%if;(not cancel_links and (evar.m != "HIST_SEARCH" or not found))
+  <br%/>
+%end;
 
 %define;update_text(uu)
   %if;(uu = "ap")[add::person/persons]0%nn;
