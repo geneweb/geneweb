@@ -1,10 +1,11 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.20 2006-11-22 03:21:30 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.21 2006-11-22 15:30:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gwdb;
+open TemplAst;
 open Util;
 
 type counter =
@@ -512,15 +513,37 @@ value print = gen_print True Lang;
 
 value print_source = gen_print True Source;
 
-value print_start conf base =
-  let fname =
-    if Sys.file_exists (lang_file_name conf conf.bname) then conf.bname
-    else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
-    else if Mutil.utf_8_db.val then "start_utf8"
-    else "start"
-  in
-  gen_print False Lang conf base fname
+(* welcome page *)
+
+value eval_var conf base env () loc =
+  fun
+  [ ["base"; "name"] -> VVstring conf.bname
+  | _ -> raise Not_found ]
 ;
+
+value get_vother x = Some x;
+value set_vother x = x;
+
+value eval_predefined_apply conf env f vl = raise Not_found;
+
+value print_start conf base new_templ =
+  if new_templ then do {
+    Templ.strip_heading_spaces.val := False;
+    Templ.interp conf base "welcome" (eval_var conf base)
+      (fun env -> Templ.eval_transl conf)
+      (eval_predefined_apply conf) get_vother set_vother (fun []) [] ()
+  }
+  else
+    let fname =
+      if Sys.file_exists (lang_file_name conf conf.bname) then conf.bname
+      else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
+      else if Mutil.utf_8_db.val then "start_utf8"
+      else "start"
+    in
+    gen_print False Lang conf base fname
+;
+
+(* lexicon (info) *)
 
 value print_lexicon conf base =
   let title _ = Wserver.wprint "Lexicon" in
