@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 5.7 2006-11-17 09:44:07 ddr Exp $
+# $Id: a.gwf,v 5.8 2006-11-22 12:54:45 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -44,7 +44,20 @@ friend_passwd_file=
 wizard_passwd=
 
 # Alternative way for wizard entry: authorization file.
-# The file must hold lines of the form "user:password".
+# The file must hold lines of the form either:
+#    user:password
+#    user:password:comment
+#    user:password:complete name:comment
+# The "complete name" is used in the page displaying the wizards by
+# alphabetic order and in wizard pages. If the wizard line contains
+# no complete name, the "user" is used.
+#   The alphabetic order can be changed by adding a slash in the "complete
+# name" at the position you want the alphabetic comparison take place. For
+# example, with "Daniel de /Rauglaudre" as "complete name", it is ordered
+# at letter "R" (like "Rauglaudre") and in the form:
+#    Rauglaudre (Daniel de)
+# but it his wizard page, it is displayed as "Daniel de Rauglaudre" without
+# the slash.
 wizard_passwd_file=
 
 # Manitou is a wizard who can:
