@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.7 2006-11-22 15:30:17 ddr Exp $ *)
+(* $Id: templ.ml,v 5.8 2006-11-22 19:02:06 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -831,12 +831,13 @@ value loc_of_expr =
 value templ_eval_var conf =
   fun
   [ ["cancel_links"] -> VVbool conf.cancel_links
+  | ["cgi"] -> VVbool conf.cgi
   | ["has_referer"] -> (* deprecated since version 5.00 *) 
       VVbool (Wserver.extract_param "referer: " '\n' conf.request <> "")
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
-  | ["wizard"] -> VVbool conf.wizard
   | ["manitou"] -> VVbool conf.manitou
+  | ["wizard"] -> VVbool conf.wizard
   | _ -> raise Not_found ]
 ;
 
@@ -1104,6 +1105,15 @@ value eval_subst loc f set_vother env xl vl a =
     | _ -> (env, Atext loc (f ^ ": bad # of params")) ]
 ;
 
+value squeeze_spaces s =
+  loop 0 where rec loop i =
+    if i = String.length s then ""
+    else
+      match s.[i] with
+      [ ' ' | '\n' | '\r' | '\t' -> loop (i + 1)
+      | _ -> String.sub s i (String.length s - i) ]
+;
+
 value print_apply loc f set_vother print_ast env ep gxl al gvl =
   let local_print_ast a =
     let (env, a) =
@@ -1126,14 +1136,7 @@ value print_apply loc f set_vother print_ast env ep gxl al gvl =
     fun
     [ [] -> ()
     | [Avar _ "sq" []; Atext loc s :: al] ->
-        let s =
-          loop 0 where rec loop i =
-            if i = String.length s then ""
-            else
-              match s.[i] with
-              [ ' ' | '\n' | '\r' | '\t' -> loop (i + 1)
-              | _ -> String.sub s i (String.length s - i) ]
-        in
+        let s = squeeze_spaces s in
         loop [Atext loc s :: al]
     | [a :: al] -> do { local_print_ast a; loop al } ]
 ;
@@ -1205,6 +1208,13 @@ value interp
   in
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
+  and eval_ast_list env ep =
+    fun
+    [ [] -> []
+    | [Avar _ "sq" []; Atext loc s :: al] ->
+        let s = squeeze_spaces s in
+        eval_ast_list env ep [Atext loc s :: al]
+    | [a :: al] -> [eval_ast env ep a :: eval_ast_list env ep al] ]
   and eval_ast_expr env ep =
     fun
     [ Atext _ s -> VVstring s
@@ -1242,7 +1252,7 @@ value interp
         [ ("capitalize", [VVstring s]) -> Util.capitale s
         | ("interp", [VVstring s]) ->
             let astl = parse_templ conf (Stream.of_string s) in
-            String.concat "" (List.map (eval_ast env ep) astl)
+            String.concat "" (eval_ast_list env ep astl)
         | ("language_name", [VVstring s]) ->
             Translate.language_name s (Util.transl conf " !languages")
         | ("nth", [VVstring s1; VVstring s2]) ->
@@ -1277,14 +1287,7 @@ value interp
     fun
     [ [] -> ()
     | [Avar _ "sq" []; Atext loc s :: al] ->
-        let s =
-          loop 0 where rec loop i =
-            if i = String.length s then ""
-            else
-              match s.[i] with
-              [ ' ' | '\n' | '\r' | '\t' -> loop (i + 1)
-              | _ -> String.sub s i (String.length s - i) ]
-        in
+        let s = squeeze_spaces s in
         print_ast_list env ep [Atext loc s :: al]
     | [a :: al] -> do {
         print_ast env ep a;

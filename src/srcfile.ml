@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.21 2006-11-22 15:30:17 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.22 2006-11-22 19:02:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -517,7 +517,23 @@ value print_source = gen_print True Source;
 
 value eval_var conf base env () loc =
   fun
-  [ ["base"; "name"] -> VVstring conf.bname
+  [ ["base"; "has_notes"] -> VVbool (not (base_notes_are_empty base ""))
+  | ["base"; "name"] -> VVstring conf.bname
+  | ["base"; "nb_persons"] ->
+      VVstring
+        (string_of_num (Util.transl conf "(thousand separator)")
+           (Num.of_int (nb_of_persons base)))
+  | ["base"; "title"] ->
+      let s = base_notes_read_first_line base "" in
+      let len = String.length s in
+      let s =
+        if len > 9 && String.sub s 0 5 = "<!-- " &&
+           String.sub s (len - 4) 4 = " -->"
+        then " : " ^ String.sub s 5 (String.length s - 9)
+        else ""
+      in
+      VVstring s
+  | ["has_misc_notes"] -> VVbool (notes_links conf <> [])
   | _ -> raise Not_found ]
 ;
 
