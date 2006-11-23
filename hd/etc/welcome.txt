@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.7 2006-11-23 09:49:31 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.8 2006-11-23 09:52:35 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -81,7 +81,7 @@ sv: Genealogi
   %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")%sq;
     %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")%nl;
       <span style="font-size:70%%">(<a %nl;
-      href="%sw=">[deconnect]</a>)</span>%sq;
+      href="%sw=">[disconnect]</a>)</span>%sq;
     %end;%sq;
   %end;</td>%sq;
 %end;%sq;
@@ -90,7 +90,7 @@ sv: Genealogi
       valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
       %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
         <span style="font-size:70%%">(<a
-         href="%sw=">[deconnect]</a>)</span>
+         href="%sw=">[disconnect]</a>)</span>
       %end;%nl;
       </td>%nn;
     %end;%nl;
