@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.9 2006-11-23 11:36:25 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.10 2006-11-23 14:01:47 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -285,52 +285,63 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
         <td align="center">
           <p>
             %apply;interp([
-af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
-ar: قاعدة المعلومات <span class="highlight">"%t"</span> تحوي إلى يومنا %n فرد
-bg: Базата от данни <span class="highlight">"%t"</span> в момента съдържа
-    сведения за %n души.
-br: Niver an dud a zo er bon roadoù <span class="highlight">"%t"</span>
-    bremañ a zo : %n.
-ca: La base de dades <span class="highlight">"%t"</span> cont&eacute;
-    actualment %n persones.
-cs: Databáze <span class="highlight">"%t"</span> obsahuje %n osob.
-da: Databasen <span class="highlight">"%t"</span> indeholder for
-    &oslash;jeblikket %n personer.
-de: Die Datenbank <span class="highlight">"%t"</span> enth&auml;lt z. Zt.
-    %n Personen.
-en: The database <span class="highlight">"%t"</span> now holds %n persons.
-eo: La datenbazo <span class="highlight">"%t"</span> enhavas nun %n
-    personojn.
-es: La base <span class="highlight">"%t"</span> contiene actualmente %n
-    personas.
-et: Andmebaas <span class="highlight">"%t"</span> sisaldab andmeid %n
-    isiku kohta.
-fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
-    henkil&ouml;&auml;.
+af: Die databasis <span class="highlight">"%base.name;"</span> bevat%sq;
+    tans %base.nb_persons; persone.
+ar: قاعدة المعلومات <span class="highlight">"%base.name;"</span> %sq;
+    تحوي إلى يومنا %base.nb_persons; فرد
+bg: Базата от данни <span class="highlight">"%base.name;"</span> %sq;
+    в момента съдържа сведения за %base.nb_persons; души.
+br: Niver an dud a zo er bon roadoù <span class="highlight">%sq;
+    "%base.name;"</span> bremañ a zo : %base.nb_persons;.
+ca: La base de dades <span class="highlight">"%base.name;"</span> %sq;
+    cont&eacute; actualment %base.nb_persons; persones.
+cs: Databáze <span class="highlight">"%base.name;"</span> obsahuje %sq;
+    %base.nb_persons; osob.
+da: Databasen <span class="highlight">"%base.name;"</span> indeholder %sq;
+    for &oslash;jeblikket %base.nb_persons; personer.
+de: Die Datenbank <span class="highlight">"%base.name;"</span> %sq;
+    enth&auml;lt z. Zt. %base.nb_persons; Personen.
+en: The database <span class="highlight">"%base.name;"</span> now %sq;
+    holds %base.nb_persons; persons.
+eo: La datenbazo <span class="highlight">"%base.name;"</span> enhavas %sq;
+    nun %base.nb_persons; personojn.
+es: La base <span class="highlight">"%base.name;"</span> contiene %sq;
+    actualmente %base.nb_persons; personas.
+et: Andmebaas <span class="highlight">"%base.name;"</span> sisaldab %sq;
+    andmeid %base.nb_persons; isiku kohta.
+fi: Tietokannassa <span class="highlight">"%base.name;"</span> on %sq;
+    nyt %base.nb_persons; henkil&ouml;&auml;.
 fr: La base de donn&eacute;es <span class="highlight">"%base.name;"%sq;
     </span> contient actuellement %base.nb_persons; personnes.
-fr-cr: Ni atchuèlement %n nhon-m, fan-m, yiche adan chagement
-       <span class="highlight">"%t"</span> ta-la
-he: במאגר המידע <span class="highlight">"%t"</span> יש %n אנשים.
-is: Gagnagrunnurinn <span class="highlight">"%t"</span> er nú með %n
-    einstaklinga skráða.
-it: La base di dati <span class="highlight">"%t"</span> contiene
-    attualmente %n persone.
-lv: Datu bāze <span class="highlight">"%t"</span> patreiz satur %n personas.
-nl: Deze databank <span class="highlight">"%t"</span> bevat nu %n personen.
-no: Databasen <span class="highlight">"%t"</span> inneholder n&aring; %n
-    personer.
-pl: Baza danych <span class="highlight">"%t"</span> zawiera obecnie osób: %n.
-pt: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
-    actualmente %n pessoas.
-pt-br: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
-    atualmente %n pessoas.
-ro: baza de date <span class="highlight">"%t"</span> conține %n persoane.
-ru: База данных <span class="highlight">"%t"</span> сейчас содержит %n человек.
-sl: Baza podatkov <span class="highlight">"%t"</span> vsebuje %n oseb.
-sv: Databasen <span class="highlight">"%t"</span> inneh&aring;ller nu
-    %n personer.
-zh: 现有 %n 人在数据库中。
+fr-cr: Ni atchuèlement %base.nb_persons; nhon-m, fan-m, yiche adan %sq;
+       chagement <span class="highlight">"%base.name;"</span> ta-la
+he: במאגר המידע <span class="highlight">"%base.name;"</span> יש %sq;
+    %base.nb_persons; אנשים.
+is: Gagnagrunnurinn <span class="highlight">"%base.name;"</span> er %sq;
+    nú með %base.nb_persons; einstaklinga skráða.
+it: La base di dati <span class="highlight">"%base.name;"</span> %sq;
+    contiene attualmente %base.nb_persons; persone.
+lv: Datu bāze <span class="highlight">"%base.name;"</span> patreiz %sq;
+    satur %base.nb_persons; personas.
+nl: Deze databank <span class="highlight">"%base.name;"</span> bevat %sq;
+    nu %base.nb_persons; personen.
+no: Databasen <span class="highlight">"%base.name;"</span> inneholder %sq;
+    n&aring; %base.nb_persons; personer.
+pl: Baza danych <span class="highlight">"%base.name;"</span> zawiera %sq;
+    obecnie osób: %base.nb_persons;.
+pt: A base de dados <span class="highlight">"%base.name;"</span> %sq;
+    cont&eacute;m actualmente %base.nb_persons; pessoas.
+pt-br: A base de dados <span class="highlight">"%base.name;"</span> %sq;
+       cont&eacute;m atualmente %base.nb_persons; pessoas.
+ro: baza de date <span class="highlight">"%base.name;"</span> conține %sq;
+    %base.nb_persons; persoane.
+ru: База данных <span class="highlight">"%base.name;"</span> сейчас %sq;
+    содержит %base.nb_persons; человек.
+sl: Baza podatkov <span class="highlight">"%base.name;"</span> %sq;
+    vsebuje %base.nb_persons; oseb.
+sv: Databasen <span class="highlight">"%base.name;"</span> %sq;
+    inneh&aring;ller nu %base.nb_persons; personer.
+zh: 现有 %base.nb_persons; 人在数据库中。
 ])%sq;
           %if;base.has_notes;%nl;
             <br%/>
@@ -353,58 +364,52 @@ zh: 现有 %n 人在数据库中。
             <tr align="%left;">
               <td align="center">
                 %apply;interp([
-af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
-    (password)
-bg: Достъп като
-    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (парола)
-br: mont e-barzh evel
-    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (ger-tremen)
-ca: acc&eacute;s
-    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (clau)
-cs: <a href="%prefix;w=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
+af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
+    </a> toegang<br%/> (password)
+bg: Достъп като <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+    </em></a><br%/> (парола)
+br: mont e-barzh evel <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends]0</em></a><br%/> (ger-tremen)
+ca: acc&eacute;s <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends]0</em></a><br%/> (clau)
+cs: <a href="%prefix;w=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>%sq;
     přístup<br%/> (heslo)
 da: <a href="%prefix;w=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
-de: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br%/>
-    (Passwort)
-en: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
-    (password)
-eo: <a href="%prefix;w=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (pasvorto)
-es: <a href="%prefix;w=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (contrase&ntilde;a)
-et: Ligipääs:
-    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
-fi: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
-    kirjautuminen<br%/> (salasana)
-fr: acc&egrave;s <a %sq;
-    href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>%sq;
-    <br%/> (mot de passe).
-he: כניסה  <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>
+de: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
+    </a>-Zugang<br%/> (Passwort)
+en: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+    </a> access<br%/> (password)
+eo: <a href="%prefix;w=w">Aliro <em>[wizard/wizards/friend/friends]0</em>%sq;
+    </a><br%/> (pasvorto)
+es: <a href="%prefix;w=w">Entrada <em>[wizard/wizards/friend/friends]0%sq;
+    </em></a><br%/> (contrase&ntilde;a)
+et: Ligipääs: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+    </em></a><br%/> (parool)
+fi: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+    </a> kirjautuminen<br%/> (salasana)
+fr: acc&egrave;s <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends]0</em></a><br%/> (mot de passe).
+he: כניסה  <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+    </em></a>
 is: <a href="%prefix;w=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
-it: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
-    (password)
-lv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
-    (password)
-nl: Toegang als
-    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (wachtwoord)
-no: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br%/>
-    (passord)
-pl: <a href="%prefix;w=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostęp<br%/>
-    (hasło)
-pt: Entrada <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (palavra chave)
-ro: Acces pentru
-    <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (parola)
-sl: Urejanje kot
-    <a href="%prefix;w=w"><em>"[wizard/wizards/friend/friends]0"</em></a>
-    (geslo)
-sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
-    tilltr&auml;de<br%/> (passord)
+it: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+    </a> access<br%/> (password)
+lv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+    </a> access<br%/> (password)
+nl: Toegang als <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+    </em></a><br%/> (wachtwoord)
+no: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
+    </a> adgang<br%/> (passord)
+pl: <a href="%prefix;w=w"><em>"[wizard/wizards/friend/friends]0"</em>%sq;
+    </a> dostęp<br%/> (hasło)
+pt: Entrada <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+    </em></a><br%/> (palavra chave)
+ro: Acces pentru <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends]0</em></a><br%/> (parola)
+sl: Urejanje kot <a href="%prefix;w=w"><em>"%sq;
+    [wizard/wizards/friend/friends]0"</em></a> (geslo)
+sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+    </a> tilltr&auml;de<br%/> (passord)
 ])<br%/>
               </td>%sq;
             %if;(not friend)
@@ -412,7 +417,8 @@ sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
                 [
 af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
-br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a><br%/> (ger-tremen)
+br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a>%sq;
+    <br%/> (ger-tremen)
 ca: acc&eacute;s <a href="%prefix;w=f"><em>amic</em></a><br%/> (clau)
 cs: <a href="%prefix;w=f">{<em>"Friend"</em></a> přístup<br%/> (heslo)
 da: <a href="%prefix;w=f"><em>Betroet adgang</em></a><br%/> (adgangskode)
@@ -444,7 +450,7 @@ sv: <a href="%prefix;w=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
             <tr align="%left;">
               <td align="center">
                 <form method="post" action="%action;">
-                  %h%P
+                  %hidden;
                   [
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
@@ -1150,40 +1156,60 @@ zh:
               <td>
                 <div>
                   %apply;interp([
-af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
-bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
-br: gweladennoù a zo bet : %q, er bajenn-mañ : %c, abaoe an deiz-mañ : %d.
-ca: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
-    del %d.
-cs: %q přístupů, z toho %c na tuto stránku, od %d.
-da: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
-de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
-en: There have been %q accesses, %c of them to this page, since %d.
-eo: Estis %q alirejoj, el kiuj %c al ĉi tiu paĝo, ekde la %d.
-es: Ha habido %q consultas, de las cuales %c corresponden a esta
-    p&aacute;gina, desde el %d.
-et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda, 
-    neist %c korda sellele lehele.
-fi: T&auml;h&auml;n menness&auml; %q tapahtumaa, joista %c t&auml;lle
-    sivulle %d j&auml;lkeen.
+af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle %sq;
+    aan hierdie blad, sedert %start_date;.
+bg: От %start_date; насам е имало %nb_accesses; посещения, от които %sq;
+    %nb_accesses_to_welcome; са на настоящата страница.
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ : %sq;
+    %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
+ca: Hi ha hagut %nb_accesses; consultes, de les quals %sq;
+    %nb_accesses_to_welcome; en aquesta p&agrave;gina, des del %start_date;.
+cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto %sq;
+    stránku, od %start_date;.
+da: Der har v&aelig;ret %nb_accesses; opslag, %nb_accesses_to_welcome; %sq;
+    af dem p&aring; denne side, siden %start_date;.
+de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon %sq;
+    %nb_accesses_to_welcome; auf diese Seite.
+en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome; %sq;
+    of them to this page, since %start_date;.
+eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al %sq;
+    ĉi tiu paĝo, ekde la %start_date;.
+es: Ha habido %nb_accesses; consultas, de las cuales %sq;
+    %nb_accesses_to_welcome; corresponden a esta p&aacute;gina, desde %sq;
+    el %start_date;.
+et: Alates andmebaasi loomise päevast (%start_date;) on selle poole %sq;
+    pöördutud %nb_accesses; korda, neist %nb_accesses_to_welcome; korda %sq;
+    sellele lehele.
+fi: T&auml;h&auml;n menness&auml; %nb_accesses; tapahtumaa, joista %sq;
+    %nb_accesses_to_welcome; t&auml;lle sivulle %start_date; j&auml;lkeen.
 fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; %sq;
     &agrave; cette page, depuis le %start_date;.
-he: היו %q כניסות, כולל %c כניסות לעמוד זה, מאז %d.
-is: Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
-it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
-lv: Kopš %D datu bāze ir apmeklēta %q reizes, %c no tiem ir bijuši šinī
-    lappusē. 
-nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
-    deze verwelkomingspagina.
-no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
-pl: Baza została od %d odwiedzona %q razy (w tym %c razy strona tytułowa).
-pt: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
-ro: Au avut loc %q accese din care %c pe aceatsa pagina din %d
-ru: Всего было %q обращений, из них %c к этой странице, начиная с %d.
-sl: %q dostopov, %c od teh na to stran, od %d.
-sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
-    sedan %d.
-zh: 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
+he: היו %nb_accesses; כניסות, כולל %nb_accesses_to_welcome; %sq;
+    כניסות לעמוד זה, מאז %start_date;.
+is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome; %sq;
+    af þeim á þessa síðu, síðan %start_date;.
+it: Dal %start_date; ci sono stati %nb_accesses; accessi, %sq;
+    %nb_accesses_to_welcome; dei quali a questa pagina.
+lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes, %sq;
+    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē. 
+nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal %sq;
+    bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
+no: Det har v&aelig;rt %nb_accesses; aksesser, %nb_accesses_to_welcome; %sq;
+    av dem til denne siden, siden %start_date;.
+pl: Baza została od %start_date; odwiedzona %nb_accesses; razy (w tym %sq;
+    %nb_accesses_to_welcome; razy strona tytułowa).
+pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome; %sq;
+    foram a esta p&aacute;gina, desde %start_date;.
+ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome; %sq;
+    pe aceatsa pagina din %start_date;
+ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome; %sq;
+    к этой странице, начиная с %start_date;.
+sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran, %sq;
+    od %start_date;.
+sv: Det har varit %nb_accesses; &aring;tkomster, %nb_accesses_to_welcome; %sq;
+    av dem till den h&auml;r sidan, sedan %start_date;.
+zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome; %sq;
+    次访问本主页， 自从 %start_date;。
 ])%nl;
                 </div>
               </td>
@@ -1205,14 +1231,15 @@ br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha
     liamm-mañ.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
-    la p&agrave;gina), proveu de navegar des d'<a href="%prefix;escache=0">aquest
-    altre lloc</a>.
+    la p&agrave;gina), proveu de navegar des d'<a href="%prefix;%sq;
+    escache=0">aquest altre lloc</a>.
 cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
     (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
     href="%prefix;escache=0">tento odkaz</a>.
 da: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
     (n&oslash;dvendigg&oslash;r genindl&aelig;sning af det aktuelle
-    dokument), pr&oslash;v da at navigere <a href="%prefix;escache=0">herfra</a>.
+    dokument), pr&oslash;v da at navigere <a href="%prefix;%sq;
+    escache=0">herfra</a>.
 de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
     (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken),
     bitte <a href="%prefix;escache=0">hier</a> klicken.
