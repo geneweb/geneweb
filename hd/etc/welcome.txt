@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.4 2006-11-23 02:29:22 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.5 2006-11-23 08:50:17 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -337,11 +337,11 @@ zh: 现有 %n 人在数据库中。
           %end;%nl;
           </p>%sq;
       %if;(not wizard and not just_friend_wizard)
-        %if;(not cgi and bvar.auth_file = "")
-          <table border="0" width="70%">
+        %if;(not cgi and bvar.auth_file = "")%nl;
+          <table border="0" width="70%%">
             <tr align="%left;">
               <td align="center">
-                [
+                %apply;interp([
 af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
     (password)
 bg: Достъп като
@@ -368,9 +368,9 @@ et: Ligipääs:
     <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> (parool)
 fi: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     kirjautuminen<br%/> (salasana)
-fr: acc&egrave;s <a %P
-    href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> %P
-    (mot de passe).
+fr: acc&egrave;s <a %sq;
+    href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>%sq;
+    <br%/> (mot de passe).
 he: כניסה  <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em></a>
 is: <a href="%prefix;w=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
 it: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br%/>
@@ -394,8 +394,8 @@ sl: Urejanje kot
     (geslo)
 sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em></a>
     tilltr&auml;de<br%/> (passord)
-]<br%/>
-              </td>
+])<br%/>
+              </td>%sq;
             %if;(not friend)
               <td align="center">
                 [
@@ -425,9 +425,9 @@ sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
 sv: <a href="%prefix;w=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
 ]
               </td>
-            %end;
+            %end;%nl;
             </tr>
-          </table>
+          </table>%sq;
         %else;
           <table border="0">
             <tr align="%left;">
@@ -467,8 +467,8 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
               </td>
             </tr>
           </table>
-        %end;
-          <br%/>
+        %end;%nl;
+          <br%/>%sq;
       %end;%nl;
           <table border="0" cellspacing="0" cellpadding="0">
             <tr>

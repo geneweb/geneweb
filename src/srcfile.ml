@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.23 2006-11-23 02:29:22 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.24 2006-11-23 08:50:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -515,6 +515,18 @@ value print_source = gen_print True Source;
 
 (* welcome page *)
 
+type env 'a =
+  [ Vsosa_ref of Lazy.t (option person)
+  | Vother of 'a
+  | Vnone ]
+;
+
+value get_env v env =
+  try List.assoc v env with [ Not_found -> Vnone ]
+;
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
+
 value eval_var conf base env () loc =
   fun
   [ ["base"; "has_notes"] -> VVbool (not (base_notes_are_empty base ""))
@@ -533,6 +545,10 @@ value eval_var conf base env () loc =
         else ""
       in
       VVstring s
+  | ["browsing_with_sosa_ref"] ->
+      match get_env "sosa_ref" env with
+      [ Vsosa_ref v -> VVbool (Lazy.force v <> None)
+      | _ -> raise Not_found ]
   | ["has_history"] -> VVbool (Sys.file_exists (History.file_name conf))
   | ["has_misc_notes"] -> VVbool (notes_links conf <> [])
   | ["nb_accesses"] ->
@@ -553,17 +569,21 @@ value eval_var conf base env () loc =
   | _ -> raise Not_found ]
 ;
 
-value get_vother x = Some x;
-value set_vother x = x;
-
 value eval_predefined_apply conf env f vl = raise Not_found;
 
 value print_start conf base new_templ =
   if new_templ then do {
+    let env =
+      let sosa_ref_l =
+        let sosa_ref () = Util.find_sosa_ref conf base in
+        Lazy.lazy_from_fun sosa_ref
+      in
+      [("sosa_ref", Vsosa_ref sosa_ref_l)]
+    in
     Templ.strip_heading_spaces.val := False;
     Templ.interp conf base "welcome" (eval_var conf base)
       (fun env -> Templ.eval_transl conf)
-      (eval_predefined_apply conf) get_vother set_vother (fun []) [] ()
+      (eval_predefined_apply conf) get_vother set_vother (fun []) env ()
   }
   else
     let fname =
