@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.22 2006-11-22 19:02:06 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.23 2006-11-23 02:29:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -533,7 +533,23 @@ value eval_var conf base env () loc =
         else ""
       in
       VVstring s
+  | ["has_history"] -> VVbool (Sys.file_exists (History.file_name conf))
   | ["has_misc_notes"] -> VVbool (notes_links conf <> [])
+  | ["nb_accesses"] ->
+      let r = count conf in
+      let s =
+        string_of_num (transl conf "(thousand separator)")
+          (Num.of_int (r.welcome_cnt + r.request_cnt))
+      in
+      VVstring s
+  | ["nb_accesses_to_welcome"] ->
+      let r = count conf in
+      let s =
+        string_of_num (transl conf "(thousand separator)")
+          (Num.of_int r.welcome_cnt)
+      in
+      VVstring s
+  | ["start_date"] -> VVstring (string_of_start_date conf)
   | _ -> raise Not_found ]
 ;
 
