@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.8 2006-11-23 09:52:35 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.9 2006-11-23 11:36:25 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -81,7 +81,7 @@ sv: Genealogi
   %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")%sq;
     %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")%nl;
       <span style="font-size:70%%">(<a %nl;
-      href="%sw=">[disconnect]</a>)</span>%sq;
+      href="%prefix;w=">[disconnect]</a>)</span>%sq;
     %end;%sq;
   %end;</td>%sq;
 %end;%sq;
@@ -90,11 +90,17 @@ sv: Genealogi
       valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
       %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
         <span style="font-size:70%%">(<a
-         href="%sw=">[disconnect]</a>)</span>
+         href="%prefix;w=">[disconnect]</a>)</span>
       %end;%nl;
       </td>%nn;
     %end;%nl;
-      <td align="%right;" valign="top" style="width: 16px">&nbsp;</td>
+      <td align="%right;" valign="top" style="width: 16px">%sq;
+      %if;(referer != "")
+        <a href="%referer;"><img
+         src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+      %else;&nbsp;%sq;
+      %end;%sq;
+     </td>
     </tr>
     <tr>
       <td align="center" colspan="%nn;%sq;
@@ -331,7 +337,7 @@ zh: 现有 %n 人在数据库中。
             (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)%sq;
           %end;%sq;
           %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
-               and (wizard or wiznotes_dir_exists))%nl;
+               and (wizard or wiznotes_dir_exists))%sq;
             <br%/>
             (<a href="%prefix;m=WIZNOTES">[wizard/wizards/friend/friends]1%sq;
             </a>)%sq;
