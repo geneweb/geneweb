@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.3 2006-11-23 01:41:49 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.4 2006-11-23 02:29:22 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -72,14 +72,14 @@ sv: Genealogi
       <td rowspan="2" style="width: 20%%">
         <a href="http://www.geneweb.org/"><img width="96" height="108"
          src="%image_prefix;/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
-      </td>%nn;
+      </td>%sq;
     %if;(wizard and not friend)%nl;
       <td align="%right;"
       valign="top"><em>[wizard/wizards/friend/friends]0%U</em>
       %I|pwizard_passwd;pwizard_passwd_file;
       %I|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a
       href="%sw=">[deconnect]</a>)</span>%E%E</td>
-    %end;
+    %end;%sq;
     %if;(friend and not wizard)%nl;
       <td align="%right;"
       valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
@@ -1103,7 +1103,8 @@ zh:
                           <a href="%prefix;m=AN">[birthdays]</a>
                         </li>
                         <li>
-                          <a href="%prefix;m=AD">[anniversaries of dead people]</a>
+                          <a href="%prefix;m=AD">%sq;
+                          [anniversaries of dead people]</a>
                         </li>
                         <li>
                           <a href="%prefix;m=AM">[anniversaries of marriage]</a>
@@ -1114,10 +1115,12 @@ zh:
                       </ul>
                     </td>
                     <td valign="top">
-                      <ul style="list-style:inside">%Ih
+                      <ul style="list-style:inside">%sq;
+                      %if;has_history;%nl;
                         <li>
                           <a href="%prefix;m=HIST;k=20">[history of updates]</a>
-                        </li>%E
+                        </li>%sq;
+                      %end;%nl;
                         <li>
                           <a href="%prefix;m=CAL">[calendar/calendars]1</a>
                         </li>
@@ -1135,7 +1138,7 @@ zh:
             <tr>
               <td>
                 <div>
-                  [
+                  %apply;interp([
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
 br: gweladennoù a zo bet : %q, er bajenn-mañ : %c, abaoe an deiz-mañ : %d.
@@ -1152,7 +1155,8 @@ et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda,
     neist %c korda sellele lehele.
 fi: T&auml;h&auml;n menness&auml; %q tapahtumaa, joista %c t&auml;lle
     sivulle %d j&auml;lkeen.
-fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
+fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; %sq;
+    &agrave; cette page, depuis le %start_date;.
 he: היו %q כניסות, כולל %c כניסות לעמוד זה, מאז %d.
 is: Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
 it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
@@ -1169,16 +1173,15 @@ sl: %q dostopov, %c od teh na to stran, od %d.
 sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 zh: 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
-]
-                </div>%Il
-                <p>%E
+])%nl;
+                </div>
               </td>
             </tr>
           </table>
           <table border="0">
             <tr>
               <td>
-                [
+                %apply;interp([
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
     href="%prefix;escache=0">link</a>.
@@ -1216,10 +1219,11 @@ et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
     navigeerimist <a href="%prefix;escache=0">sellest viitest</a>.
 fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja
     sivuja (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen
-    dokumentti") kokeile <a href="%prefix;escache=0">t&auml;t&auml; linkki&auml;</a>.
-fr: Si votre navigateur ne met pas &agrave; jour automatiquement %P
-    les pages modifi&eacute;es (vous obligeant &agrave; faire "actualiser %P
-    la page"), essayez la navigation &agrave; partir de %P
+    dokumentti") kokeile <a href="%prefix;escache=0">t&auml;t&auml;
+    linkki&auml;</a>.
+fr: Si votre navigateur ne met pas &agrave; jour automatiquement %sq;
+    les pages modifi&eacute;es (vous obligeant &agrave; faire "actualiser %sq;
+    la page"), essayez la navigation &agrave; partir de %sq;
     <a href="%prefix;escache=0">ce lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
     <a href="%prefix;escache=0">þetta</a>.
@@ -1256,7 +1260,7 @@ sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
 sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%prefix;escache=0">härifrån</a>.
-]
+])%nl;
               </td>
             </tr>
           </table>
@@ -1292,7 +1296,9 @@ zh: 本站使用的术语
     </p>
     <br%/>
   </div>
-</div>
+</div>%nl;%sq;
 
+%copyright;
+%base_trailer;
 </body>
 </html>
