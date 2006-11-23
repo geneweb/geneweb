@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.11 2006-11-23 14:14:50 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.12 2006-11-23 14:17:37 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -36,7 +36,7 @@ sv: Genealogi
   <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %highlight;; font-weight: bold }
-  %if;(evar.new_welcome = "foo")
+  %if;(evar.new_welcome != "foo")
     #lang .title { font-size: 80%% }
     #lang .content { width: 100%% }
     #lang ul { margin: 0 }
