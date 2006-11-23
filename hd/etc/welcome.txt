@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.5 2006-11-23 08:50:17 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.6 2006-11-23 09:27:00 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -75,10 +75,13 @@ sv: Genealogi
       </td>%sq;
     %if;(wizard and not friend)%nl;
       <td align="%right;"
-      valign="top"><em>[wizard/wizards/friend/friends]0%U</em>
-      %I|pwizard_passwd;pwizard_passwd_file;
-      %I|pfriend_passwd;pfriend_passwd_file;<span style="font-size:70%%">(<a
-      href="%sw=">[deconnect]</a>)</span>%E%E</td>
+      valign="top"><em>[wizard/wizards/friend/friends]0%sq;
+      %if;((wizard or just_friend_wizard) and user != "") : %user;%end;</em>
+      %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+        %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+          <span style="font-size:70%%">(<a href="%sw=">[deconnect]</a>)</span>
+        %end;
+      %end;</td>%sq;
     %end;%sq;
     %if;(friend and not wizard)%nl;
       <td align="%right;"
@@ -331,7 +334,7 @@ zh: 现有 %n 人在数据库中。
             (<a href="%prefix;m=WIZNOTES">[wizard/wizards/friend/friends]1%sq;
             </a>)%sq;
           %end;%sq;
-          %if;has_misc_notes;%nl;
+          %if;has_misc_notes;%sq;
             <br%/>
             (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)%sq;
           %end;%nl;
@@ -1023,7 +1026,7 @@ zh: 增加家庭记录
                     <td align="%left;">
                       <ul style="list-style:inside">%sq;
                       %end;%sq;
-                      %if;(not base.has_notes)
+                      %if;(not base.has_notes)%nl;
                         <li>
                           <a href="%prefix;m=MOD_NOTES">[
 af: die notas wysig
@@ -1052,7 +1055,7 @@ ru: изменить заметку
 sl: spremenite zapiske
 sv: &auml;ndra noteringar
 ]</a>
-                        </li>
+                        </li>%sq;
                       %end;%nl;
                       </ul>
                     </td>
