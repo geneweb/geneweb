@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.54 2006-11-22 03:21:30 ddr Exp $
+# $Id: lex_utf8.txt,v 5.55 2006-11-23 09:52:35 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -3074,10 +3074,6 @@ ru: смерть
 sl: smrti
 sv: död
 
-    deconnect
-en: deconnect
-fr: déconnecter
-
     delete
 af: verwyder
 bg: да няма
@@ -3215,6 +3211,10 @@ ro: a disparut
 ru: исчез/исчезла
 sl: izginil/izginila/izginil(a)
 sv: försvunnen
+
+    disconnect
+en: disconnect
+fr: déconnecter
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
