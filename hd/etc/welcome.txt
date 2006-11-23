@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.13 2006-11-23 18:54:11 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.14 2006-11-23 18:59:50 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -417,7 +417,7 @@ sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
               </td>%sq;
             %if;(not friend)
               <td align="center">
-                [
+                %apply;interp([
 af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
 br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a>%sq;
@@ -443,7 +443,7 @@ pt: Entrada <a href="%prefix;w=f"><em>amigo</em></a><br%/> (palavra chave)
 ro: Acces pentru <a href="%prefix;w=f"><em>amici</em></a><br%/> (parola)
 sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
 sv: <a href="%prefix;w=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
-]
+])
               </td>
             %end;%nl;
             </tr>
