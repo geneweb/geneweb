@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.14 2006-11-23 18:59:50 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.15 2006-11-23 19:51:09 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -39,13 +39,13 @@ sv: Genealogi
   %if;(evar.templ != "foo")
     #lang .title { font-size: 80%% }
     #lang .content { width: 100%% }
-    #lang ul { margin: 0 }
-    #lang li { display: inline }
-    #lang li span { display: none }
+    #lang a { display: inline }
+    #lang .item span { display: none }
   %else;
     #lang .title { display : none }
     #lang { width: 15%%; position: relative; float: left; text-align: left }
-    #lang li img { display: none }
+    #lang a { display: block }
+    #lang .item img { display: none }
     #content { margin-left: 15%%; width: auto }
   %end;
   --></style>
@@ -56,7 +56,8 @@ sv: Genealogi
 %define;language_link(xx,yy)%sq;
   %let;zz;%if;("yy" = "")xx%else;xx-yy%end;%in;%sq;
   %let;tt;%if;("yy" = "")xx%else;xx_yy%end;%in;%sq;
-  <a title="%apply;language_name(zz)" href="%prefix_base;lang=%zz;"
+  <a class="item" title="%apply;language_name(zz)"
+           href="%prefix_base;lang=%zz;"
            onmouseover="if (WorkOnBrowser())%sp;%sq;
            i%tt;.src='%image_prefix;/t-xx.png'"
            onmouseout="i%tt;.src='%image_prefix;/l-%zz;.jpg'"><img
@@ -95,7 +96,7 @@ sv: Genealogi
       </td>%nn;
     %end;%nl;
       <td align="%right;" valign="top" style="width: 16px">%sq;
-      <a href="%prefix_base;templ=%sq;
+      <a href="%prefix_base;lang=%evar.lang;;templ=%sq;
          %if;(evar.templ != "foo")foo%else;bar%end;" %sq;
          style="text-decoration:none">*</a>%sq;
       %if;(referer != "")
@@ -189,89 +190,33 @@ sv: Du kan välja ett annat språk bland de följande:
 ]</em>
     </div>
     <div class="content">
-      <ul>
-        <li>
-          %apply;language_link("af", "")
-        </li>
-        <li>
-          %apply;language_link("bg", "")
-        </li>
-        <li>
-          %apply;language_link("br", "")
-        </li>
-        <li>
-          %apply;language_link("ca", "")
-        </li>
-        <li>
-          %apply;language_link("cs", "")
-        </li>
-        <li>
-          %apply;language_link("da", "")
-        </li>
-        <li>
-          %apply;language_link("de", "")
-        </li>
-        <li>
-          %apply;language_link("en", "")
-        </li>
-        <li>
-          %apply;language_link("eo", "")
-        </li>
-        <li>
-          %apply;language_link("es", "")
-        </li>
-        <li>
-          %apply;language_link("et", "")
-        </li>
-        <li>
-          %apply;language_link("fi", "")
-        </li>
-        <li>
-          %apply;language_link("fr", "")
-        </li>
-        <li>
-          %apply;language_link("he", "")
-        </li>
-        <li>
-          %apply;language_link("is", "")
-        </li>
-        <li>
-          %apply;language_link("it", "")
-         </li>
-        <li>
-          %apply;language_link("lv", "")
-        </li>
-        <li>
-          %apply;language_link("nl", "")
-        </li>
-        <li>
-          %apply;language_link("no", "")
-        </li>
-        <li>
-          %apply;language_link("pl", "")
-        </li>
-        <li>
-          %apply;language_link("pt", "")
-        </li>
-        <li>
-          %apply;language_link("pt", "br")
-        </li>
-        <li>
-          %apply;language_link("ro", "")
-        </li>
-        <li>
-          %apply;language_link("ru", "")
-        </li>
-        <li>
-          %apply;language_link("sl", "")
-        </li>
-        <li>
-          %apply;language_link("sv", "")
-        </li>
-        <li>
-          %apply;language_link("zh", "")
-        </li>
-      </ul>
+      %apply;language_link("af", "")
+      %apply;language_link("bg", "")
+      %apply;language_link("br", "")
+      %apply;language_link("ca", "")
+      %apply;language_link("cs", "")
+      %apply;language_link("da", "")
+      %apply;language_link("de", "")
+      %apply;language_link("en", "")
+      %apply;language_link("eo", "")
+      %apply;language_link("es", "")
+      %apply;language_link("et", "")
+      %apply;language_link("fi", "")
+      %apply;language_link("fr", "")
+      %apply;language_link("he", "")
+      %apply;language_link("is", "")
+      %apply;language_link("it", "")
+      %apply;language_link("lv", "")
+      %apply;language_link("nl", "")
+      %apply;language_link("no", "")
+      %apply;language_link("pl", "")
+      %apply;language_link("pt", "")
+      %apply;language_link("pt", "br")
+      %apply;language_link("ro", "")
+      %apply;language_link("ru", "")
+      %apply;language_link("sl", "")
+      %apply;language_link("sv", "")
+      %apply;language_link("zh", "")
     </div>
   </div>
 %if;just_friend_wizard;
