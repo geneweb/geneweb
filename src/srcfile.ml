@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.24 2006-11-23 08:50:18 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.25 2006-11-23 18:54:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -571,8 +571,13 @@ value eval_var conf base env () loc =
 
 value eval_predefined_apply conf env f vl = raise Not_found;
 
-value print_start conf base new_templ =
-  if new_templ then do {
+value print_start conf base =
+  let new_welcome =
+    match p_getenv conf.base_env "old_welcome" with
+    [ Some "yes" -> False
+    | Some _ | None -> True ]
+  in
+  if new_welcome then do {
     let env =
       let sosa_ref_l =
         let sosa_ref () = Util.find_sosa_ref conf base in

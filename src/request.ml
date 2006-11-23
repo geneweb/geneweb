@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.38 2006-11-23 14:14:50 ddr Exp $ *)
+(* $Id: request.ml,v 5.39 2006-11-23 18:54:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -570,8 +570,8 @@ value print_no_index conf base =
 
 value special_vars =
   ["alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
-   "iz"; "log_cnl"; "log_pwd"; "log_uid"; "long"; "new_welcome"; "nz"; "ocz";
-   "pz"; "size"; "spouse"; "templ"]
+   "iz"; "log_cnl"; "log_pwd"; "log_uid"; "long"; "nz"; "ocz"; "pz"; "size";
+   "spouse"; "templ"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
@@ -676,9 +676,6 @@ value treat_request conf base log =
            let r = Srcfile.incr_welcome_counter conf in
            log_count conf log r;
            Srcfile.print_start conf base
-             (match p_getenv conf.env "new_welcome" with
-              [ Some "" | None -> False
-              | Some _ -> True ])
          }
          else do {
            let r = Srcfile.incr_request_counter conf in
