@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.2 2006-11-22 19:02:06 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.3 2006-11-23 01:41:49 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -432,7 +432,7 @@ sv: <a href="%prefix;w=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
           <table border="0">
             <tr align="%left;">
               <td align="center">
-                <form method="post" action="%f">
+                <form method="post" action="%action;">
                   %h%P
                   [
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
@@ -507,9 +507,9 @@ zh:
                 <br%/>
                 <ul style="list-style:none">
                   <li>
-                    <form method="get" action="%f">
+                    <form method="get" action="%action;">
                       <p>
-                        %h%P
+                        %hidden;
                         <input type="hidden" name="m" value="NG"%/>
                         <label><span class="highlight">- [
 af: per persoon
@@ -548,35 +548,38 @@ zh: 搜索：
                         <li>
                           <label><input type="radio" name="t" value="PN"
                            checked="checked" id="tPN"%/>
-                          <em>[first name/first names]</em>
-                          <em>[surname/surnames]</em> [or]
+                          <em>[first name/first names]0</em>
+                          <em>[surname/surnames]0</em> [or]
                           <em>[public name]</em> [or]
-                          <em>[alias]</em>%Iz [or]
-                          [<em>Sosa number</em> relative to %t](<br%/>%a)%E
+                          <em>[alias]</em>%sq;
+                          %if;browsing_with_sosa_ref; [or] %sq;
+                            [<em>Sosa number</em> relative to %t](<br%/>%a)
+                          %end;%nl;
                           </label>
                         </li>
                         <li>
                           <label><input type="radio" name="t" value="P"
                            id="tP"%/>
-                          <em>[first name/first names]</em></label>
+                          <em>[first name/first names]0</em></label>
                         </li>
                         <li>
                           <label><input type="radio" name="t" value="N"
                            id="tN"%/>
-                          <em>[surname/surnames]</em></label>
+                          <em>[surname/surnames]0</em></label>
                         </li>
                       </ul>
                     </form>
-                  </li>%Ispropose_titles;
+                  </li>%sq;
+                %if;(bvar.propose_titles != "no")%nl;
                   <li>
-                    <form method="get" action="%f">
+                    <form method="get" action="%action;">
                       <table border="0" cellpadding="0" cellspacing="0">
                         <tr>
                           <td valign="top">
                             <span class="highlight">-&nbsp;</span>
                           </td>
                           <td>
-                            %h%P
+                            %hidden;
                             <input type="hidden" name="m" value="TT"%/>
                             <label><span class="highlight">[
 af: by title
@@ -605,9 +608,9 @@ ru: по титулу
 sl: naziv:
 sv: efter titel
 zh: 根据名衔
-]</span>%INl<br%/>%E
+]</span><br%/>
                             <input name="t" size="14"
-                             maxlength="200"%/></label>%INl<br%/>%E
+                             maxlength="200"%/></label><br%/>
                             (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
                           </td>
                           <td>...</td>
@@ -615,9 +618,9 @@ zh: 根据名衔
                             <label><span class="highlight">[estate]0[
 da:  (dom&aelig;ne, sl&aelig;gt)
 en:
-]</span>%INl<br%/>%E
+]</span><br%/>
                             <input name="p" size="25"
-                             maxlength="200"%/></label>%INl<br%/>%E
+                             maxlength="200"%/></label><br%/>
                             (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
                           </td>
                           <td>
@@ -626,11 +629,12 @@ en:
                         </tr>
                       </table>
                     </form>
-                  </li>%E
+                  </li>%sq;
+                %end;%nl;
                   <li>
-                    <form method="get" action="%f">
+                    <form method="get" action="%action;">
                       <p>
-                        %h%P
+                        %hidden;
                         <span class="highlight">- </span>[
 af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
@@ -817,10 +821,11 @@ et: järgi
                         <input type="submit" value="Ok"%/>
                       </p>
                     </form>
-                  </li>%Ispropose_place_surnames;
+                  </li>%sq;
+                %if;(bvar.propose_place_surnames != "no")%nl;
                   <li>
                     <form method="get" action="%prefix;">
-                      %h%P
+                      %hidden;
                       <input type="hidden" name="m" value="PS"%/>
                       <span class="highlight"> - [
 af: by
@@ -856,7 +861,9 @@ sv: efter
                         <input type="checkbox" name="ma" value="on"%/>
                       - <input type="submit" value="Ok"%/>
                     </form>
-                  </li>%E%INshide_advanced_request;
+                  </li>%sq;
+                %end;%sq;
+                %if;(bvar.hide_advanced_request = "no")
                   <li>
                     <span class="highlight">-</span>
                     [
@@ -934,11 +941,14 @@ sv: <span class="highlight">genom</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avancerad
        s&ouml;kning</b></font></a>.
 ]
-                  </li>%E
+                  </li>
+                %end;%nl;
                 </ul>
               </td>
             </tr>
-          </table>%I&w|Nnspropose_add_family;
+          </table>%sq;
+        %if;(wizard and
+             (not base.has_notes or bvar.propose_add_family != "no"))%nl;
           <table border="0" cellspacing="0" cellpadding="0"
            style="text-align:center">
             <tr>
@@ -976,7 +986,8 @@ zh:
                 <table border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td>
-                      <ul style="list-style:inside">%Ispropose_add_family;
+                      <ul style="list-style:inside">%sq;
+                      %if;(bvar.propose_add_family != "no")%nl;
                         <li>
                           <a href="%prefix;m=ADD_FAM">[
 af: 'n familie byvoeg
@@ -1006,11 +1017,13 @@ sl: dodate družino
 sv: l&auml;gga till en familj
 zh: 增加家庭记录
 ]</a>
-                        </li>%INl
+                        </li>
                       </ul>
                     </td>
                     <td align="%left;">
-                      <ul style="list-style:inside">%E%E%INn
+                      <ul style="list-style:inside">%sq;
+                      %end;%sq;
+                      %if;(not base.has_notes)
                         <li>
                           <a href="%prefix;m=MOD_NOTES">[
 af: die notas wysig
@@ -1039,14 +1052,16 @@ ru: изменить заметку
 sl: spremenite zapiske
 sv: &auml;ndra noteringar
 ]</a>
-                        </li>%E
+                        </li>
+                      %end;%nl;
                       </ul>
                     </td>
                   </tr>
                 </table>
               </td>
             </tr>
-          </table>%E
+          </table>%sq;
+        %end;%nl;
           <table border="0" style="text-align:center">
             <tr>
               <td>

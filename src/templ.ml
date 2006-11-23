@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.8 2006-11-22 19:02:06 ddr Exp $ *)
+(* $Id: templ.ml,v 5.9 2006-11-23 01:41:49 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -765,7 +765,7 @@ and eval_transl_inline conf s =
   let (s, alt) =
     Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
   in
-  if alt then "[" ^ s ^ "]" else s
+  if alt && s <> "" then "[" ^ s ^ "]" else s
 and eval_transl_lexicon conf upp s c =
   let r =
     let nth = try Some (int_of_string c) with [ Failure _ -> None ] in
