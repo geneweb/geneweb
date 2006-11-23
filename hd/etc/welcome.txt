@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.6 2006-11-23 09:27:00 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.7 2006-11-23 09:49:31 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -52,7 +52,6 @@ sv: Genealogi
 %base_header;
 </head>
 <body%body_prop;>
-%message_to_wizard;
 
 %define;language_link(xx,yy)%sq;
   %let;zz;%if;("yy" = "")xx%else;xx-yy%end;%in;%sq;
@@ -73,16 +72,19 @@ sv: Genealogi
         <a href="http://www.geneweb.org/"><img width="96" height="108"
          src="%image_prefix;/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
       </td>%sq;
-    %if;(wizard and not friend)%nl;
+%if;(wizard and not friend)%nl;
       <td align="%right;"
       valign="top"><em>[wizard/wizards/friend/friends]0%sq;
-      %if;((wizard or just_friend_wizard) and user != "") : %user;%end;</em>
-      %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
-        %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-          <span style="font-size:70%%">(<a href="%sw=">[deconnect]</a>)</span>
-        %end;
-      %end;</td>%sq;
+    %if;((wizard or just_friend_wizard) and user.ident != "")%sq;
+        : %user.ident;%sq;
+    %end;</em>%sq;
+  %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")%sq;
+    %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")%nl;
+      <span style="font-size:70%%">(<a %nl;
+      href="%sw=">[deconnect]</a>)</span>%sq;
     %end;%sq;
+  %end;</td>%sq;
+%end;%sq;
     %if;(friend and not wizard)%nl;
       <td align="%right;"
       valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
