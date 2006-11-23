@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.37 2006-11-22 15:30:17 ddr Exp $ *)
+(* $Id: request.ml,v 5.38 2006-11-23 14:14:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -676,7 +676,9 @@ value treat_request conf base log =
            let r = Srcfile.incr_welcome_counter conf in
            log_count conf log r;
            Srcfile.print_start conf base
-             (p_getenv conf.env "new_welcome" = Some "on")
+             (match p_getenv conf.env "new_welcome" with
+              [ Some "" | None -> False
+              | Some _ -> True ])
          }
          else do {
            let r = Srcfile.incr_request_counter conf in
