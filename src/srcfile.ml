@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.25 2006-11-23 18:54:12 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.26 2006-11-24 09:32:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -566,6 +566,8 @@ value eval_var conf base env () loc =
       in
       VVstring s
   | ["start_date"] -> VVstring (string_of_start_date conf)
+  | ["wiznotes_dir_exists"] ->
+      VVbool (Sys.file_exists (Wiznotes.dir conf base))
   | _ -> raise Not_found ]
 ;
 
