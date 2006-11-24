@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.6 2006-10-30 21:46:06 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.7 2006-11-24 02:58:43 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -303,10 +303,12 @@
           %if;cancel_links;%witness_relation.father;
           %else<a href="%prefix;%witness_relation.father.access;
             ">%witness_relation.father;</a>%end;
+	  %witness_relation.father.title;%witness_relation.father.dates;
         %and;
           %if;cancel_links;%witness_relation.mother;
           %else<a href="%prefix;%witness_relation.mother.access;
             ">%witness_relation.mother;</a>%end;
+	  %witness_relation.mother.title;%witness_relation.mother.dates;
         %end;
       </li>%nl;
     %end;
