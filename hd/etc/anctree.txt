@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html>
 <head>
-  <!-- $Id: anctree.txt,v 5.6 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v 5.7 2006-11-24 10:22:44 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -125,23 +125,23 @@
 %define;male_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
-    <a href="%prefix;%xx.access">%xx;</a>%xx.dates;
+    <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
     %if;("xx" != "self")<br%/>|<br%/>%end;
-  %end;
+  %end;%nl;
 %end;
 
 %define;female_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
-    <a href="%prefix;%xx.access">%xx;</a>%xx.dates;
+    <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
     %if;("xx" != "self")<br%/>|<br%/>%end;
-  %end;
+  %end;%nl;
 %end;
 
 %if;(evar.t = "T")%nn;
-<div style="text-align:%right;">%nn;
-<a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
+  <div style="text-align:%right;">%nn;
+  <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
+  ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
 %end;
 
 %define;tree(xx)
