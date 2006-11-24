@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.29 2006-10-25 03:50:28 ddr Exp $ *)
+(* $Id: update.ml,v 5.30 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -143,7 +143,7 @@ value print_first_name conf base p =
 ;
 
 value print_someone_strong conf base p =
-  Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
+  Printf.sprintf "<strong>%s%s %s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 ;
@@ -161,14 +161,12 @@ value print_error conf base =
         ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
            p_surname base p ^ "\"")
         (fun _ ->
-           Wserver.wprint "<a href=\"%s%s\">" (commd conf)
+           Printf.sprintf "<a href=\"%s%s\">" (commd conf)
              (acces conf base p))
-        (fun _ -> Wserver.wprint "</a>.")
+        (fun _ -> "</a>.")
   | OwnAncestor p ->
-      do {
-        print_someone_strong conf base p;
-        Wserver.wprint "\n%s" (transl conf "would be his/her own ancestor")
-      }
+      Wserver.wprint "%s\n%s" (print_someone_strong conf base p)
+        (transl conf "would be his/her own ancestor")
   | BadSexOfMarriedPerson p ->
       Wserver.wprint "%s."
         (capitale (transl conf "cannot change sex of a married person")) ]
@@ -197,10 +195,8 @@ value print_warning conf base =
   [ BirthAfterDeath p ->
       Wserver.wprint (ftransl conf "%t died before his/her birth")
         (fun _ ->
-           do {
-             print_someone_strong conf base p;
-             Wserver.wprint "%s" (Date.short_dates_text conf base p)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
   | IncoherentSex p _ _ ->
       Wserver.wprint
         (fcapitale
@@ -281,66 +277,50 @@ value print_warning conf base =
         (ftransl conf "\
 %t is born more than 2 years after the death of his/her father %t")
         (fun _ ->
-           do {
-             print_someone_strong conf base child;
-             Wserver.wprint "%s" (Date.short_dates_text conf base child)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base child)
+             (Date.short_dates_text conf base child))
         (fun _ ->
-           do {
-             print_someone_strong conf base father;
-             Wserver.wprint "%s" (Date.short_dates_text conf base father)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base father)
+             (Date.short_dates_text conf base father))
   | MarriageDateAfterDeath p ->
       Wserver.wprint
         (fcapitale (ftransl conf "marriage of %t after his/her death"))
         (fun _ ->
-           do {
-             print_someone_strong conf base p;
-             Wserver.wprint "%s" (Date.short_dates_text conf base p)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
   | MarriageDateBeforeBirth p ->
       Wserver.wprint
         (fcapitale (ftransl conf "marriage of %t before his/her birth"))
         (fun _ ->
-           do {
-             print_someone_strong conf base p;
-             Wserver.wprint "%s" (Date.short_dates_text conf base p)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
   | MotherDeadAfterChildBirth mother child ->
       Wserver.wprint
         (ftransl conf "%t is born after the death of his/her mother %t")
         (fun _ ->
-           do {
-             print_someone_strong conf base child;
-             Wserver.wprint "%s" (Date.short_dates_text conf base child)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base child)
+             (Date.short_dates_text conf base child))
         (fun _ ->
-           do {
-             print_someone_strong conf base mother;
-             Wserver.wprint "%s" (Date.short_dates_text conf base mother)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base mother)
+             (Date.short_dates_text conf base mother))
   | ParentBornAfterChild p c ->
-      do {
-        print_someone_strong conf base p;
-        Wserver.wprint "\n%s\n" (transl conf "is born after his/her child");
-        print_someone_strong conf base c
-      }
+      Wserver.wprint "%s\n%s\n%s" (print_someone_strong conf base p)
+        (transl conf "is born after his/her child")
+        (print_someone_strong conf base c)
   | ParentTooYoung p a ->
       do {
-        print_someone_strong conf base p;
-        Wserver.wprint "\n%s\n" (transl conf "is a very young parent");
+        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+          (transl conf "is a very young parent");
         Wserver.wprint "(%s)" (Date.string_of_age conf a);
       }
   | TitleDatesError p t ->
       Wserver.wprint
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
         (fun _ ->
-           do {
-             print_someone_strong conf base p;
-             Wserver.wprint "%s" (Date.short_dates_text conf base p)
-           })
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
         (fun _ ->
-           Wserver.wprint "<strong>%s %s</strong> <em>%s-%s</em>"
+           Printf.sprintf "<strong>%s %s</strong> <em>%s-%s</em>"
              (sou base t.t_ident) (sou base t.t_place)
              (match Adef.od_of_codate t.t_date_start with
               [ Some d -> Date.string_of_date conf d
@@ -352,11 +332,10 @@ value print_warning conf base =
       Wserver.wprint (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> print_someone_strong conf base p)
   | YoungForMarriage p a ->
-      do {
-        print_someone_strong conf base p;
-        Wserver.wprint "\n";
+     do {
+        Wserver.wprint "%s\n" (print_someone_strong conf base p);
         Wserver.wprint (ftransl conf "married at age %t")
-          (fun _ -> Wserver.wprint "%s" (Date.string_of_age conf a))
+          (fun _ -> Date.string_of_age conf a);
       } ]
 ;
 
@@ -624,8 +603,8 @@ value print_create_conflict conf base p var =
       ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
          p_surname base p ^ "\" (" ^ text ^ ")")
       (fun _ ->
-         Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> Wserver.wprint "</a>.");
+         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      (fun _ -> "</a>.");
     html_p conf;
     let free_n =
       find_free_occ base (p_first_name base p) (p_surname base p) 0

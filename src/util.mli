@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.16 2006-11-19 14:05:14 ddr Exp $ *)
+(* $Id: util.mli,v 5.17 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -125,18 +125,20 @@ value old_surname_end : string -> string;
 
 value specify_homonymous : config -> base -> person -> unit;
 
-value check_format : format 'a 'b 'c -> string -> option (format 'a 'b 'c);
-value valid_format : format 'a 'b 'c -> string -> format 'a 'b 'c;
+type format2 'a 'b = format4 'a unit string 'b;
+
+value check_format : format2 'a 'b -> string -> option (format2 'a 'b);
+value valid_format : format2 'a 'b -> string -> format2 'a 'b;
 
 value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;
 value transl_decline : config -> string -> string -> string;
 value transl_a_of_b : config -> string -> string -> string;
 value transl_a_of_gr_eq_gen_lev : config -> string -> string -> string;
-value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
-value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
-value fdecline : config -> format 'a 'b 'c -> string -> format 'a 'b 'c;
-value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;
+value ftransl : config -> format2 'a 'b -> format2 'a 'b;
+value ftransl_nth : config -> format2 'a 'b -> int -> format2 'a 'b;
+value fdecline : config -> format2 'a 'b -> string -> format2 'a 'b;
+value fcapitale : format2 'a 'b -> format2 'a 'b;
 value nth_field : string -> int -> string;
 
 value cftransl : config -> string -> list string -> string;

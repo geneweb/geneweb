@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.39 2006-11-22 12:42:21 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.40 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -182,7 +182,7 @@ value print_wizards_by_alphabetic_order conf list = do {
                                "<a href=\"%sm=WIZNOTES;f=%s%t\">"
                                (commd conf) (Util.code_varenv wz)
                                (fun _ ->
-                                  Wserver.wprint
+                                  Printf.sprintf
                                    ";d=%d-%02d-%02d,%02d:%02d:%02d"
                                    (tm.Unix.tm_year + 1900)
                                    (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
@@ -284,15 +284,15 @@ value print_wizards_by_date conf list = do {
            (if prev = None || new_item then "" else ",\n")
            (fun _ ->
               if conf.wizard && conf.user = wz || wfile <> "" then
-                Wserver.wprint "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
+                Printf.sprintf "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
                   (commd conf) (Util.code_varenv wz)
                   (fun _ ->
-                     Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                     Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                        tm.Unix.tm_sec)
                   wname
-              else Wserver.wprint "%s" wname);
+              else wname);
          (spl, Some tm)
        })
       (sep_period_list, None) list
@@ -689,7 +689,7 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                    "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>%s%s"
                    (commd conf) (Util.code_varenv wz)
                    (fun _ ->
-                      Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                      Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
                         (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
                         tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                         tm.Unix.tm_sec)
