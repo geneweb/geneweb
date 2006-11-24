@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.6 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.7 2006-11-24 09:58:08 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -118,7 +118,7 @@
     %if;(message.ident != "" and message.text != "")
       <b>%message.ident;</b>
       %if;(message.email != "")%nn;
-        <a href="mailto:%message.email;">%message.email;</a>%end;
+        <a href="mailto:%message.email.v;">%message.email;</a>%end;
       <br%/>
       %if;(message.subject != "")
         <b>[*ident/email/subject]2: %message.subject;</b>
@@ -226,7 +226,7 @@
   <p%col;>
   <b>%message.ident;</b>
   %if;(message.email != "")%nn;
-    <a href="mailto:%message.email;">%message.email;</a>%end;
+    <a href="mailto:%message.email.v;">%message.email;</a>%end;
   <br%/>
   %if;(message.subject != "")
     <b>[*ident/email/subject]2: %message.subject;</b>
