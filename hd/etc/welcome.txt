@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.16 2006-11-23 20:05:38 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.17 2006-11-24 15:14:30 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -64,6 +64,10 @@ sv: Genealogi
            src="%image_prefix;/l-%zz;.jpg" width="36" height="22" alt=""
            id="i%tt;" style="border: 0"%/>%sq;
            <span>%apply;language_name(zz)</span></a>
+%end;
+
+%define;sosa_rel(xx)
+  [<em>Sosa number</em> relative to %t:::xx]
 %end;
 
 <div style="text-align: center">
@@ -516,7 +520,7 @@ zh: 搜索：
                           <em>[public name]</em> [or]
                           <em>[alias]</em>%sq;
                           %if;browsing_with_sosa_ref; [or] %sq;
-                            [<em>Sosa number</em> relative to %t](<br%/>%a)
+                            %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
                           %end;%nl;
                           </label>
                         </li>
