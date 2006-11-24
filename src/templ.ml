@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.13 2006-11-24 19:53:22 ddr Exp $ *)
+(* $Id: templ.ml,v 5.14 2006-11-24 20:32:41 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1156,51 +1156,6 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
     conf.env
 ;
 
-value b = Buffer.create 80;
-value ind_bol = ref 0;
-value ind_curr = ref 0;
-value bol = ref False;
-value after_less = ref False;
-value after_slash = ref False;
-value pretty_print s =
-  loop 0 where rec loop i =
-    if i = String.length s then ""
-    else if bol.val then
-      if s.[i] = ' ' || s.[i] = '\n' then loop (i + 1)
-      else do {
-        bol.val := False;
-        loop i;
-      }
-    else
-      match s.[i] with
-      [ '\n' -> do {
-          let ind = min ind_bol.val ind_curr.val in
-          let line = Buffer.contents b in
-          bol.val := True;
-          ind_bol.val := ind_curr.val;
-          Buffer.clear b;
-          String.make ind ' ' ^ line ^ "\n" ^ loop (i + 1)
-        }
-      | c -> do {
-          let after_less_v = after_less.val in
-          let after_slash_v = after_slash.val in
-          after_less.val := False;
-          after_slash.val := False;
-          match c with
-          [ '<' -> after_less.val := True
-          | '/' ->
-              if after_less_v then ind_curr.val := ind_curr.val - 2
-              else after_slash.val := True
-          | '!' -> ()
-          | '>' ->
-              if after_slash_v then ind_curr.val := ind_curr.val - 2 else ()
-          | c ->
-              if after_less_v then ind_curr.val := ind_curr.val + 2 else () ];
-          Buffer.add_char b c;
-          loop (i + 1)
-        } ]
-;
-
 value interp
   conf base fname eval_var eval_transl eval_predefined_apply get_vother
   set_vother print_foreach
@@ -1365,9 +1320,6 @@ value interp
         [ Some astl -> do {
             Util.html conf;
             Util.nl ();
-(*
-            Wserver.wrap_string.val := pretty_print;
-*)
             print_ast_list env ep astl;
           }
         | None ->
