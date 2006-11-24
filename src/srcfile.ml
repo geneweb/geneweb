@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.26 2006-11-24 09:32:43 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.27 2006-11-24 15:14:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -216,7 +216,7 @@ value macro conf base =
   fun
   [ 'a' ->
       match Util.find_sosa_ref conf base with
-      [ Some ip -> referenced_person_title_text conf base ip
+      [ Some p -> referenced_person_title_text conf base p
       | None -> "" ]
   | 'b' ->
       let s =
@@ -565,6 +565,13 @@ value eval_var conf base env () loc =
           (Num.of_int r.welcome_cnt)
       in
       VVstring s
+  | ["sosa_ref"] ->
+      match get_env "sosa_ref" env with
+      [ Vsosa_ref v ->
+          match Lazy.force v with
+          [ Some p -> VVstring (referenced_person_title_text conf base p)
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
   | ["start_date"] -> VVstring (string_of_start_date conf)
   | ["wiznotes_dir_exists"] ->
       VVbool (Sys.file_exists (Wiznotes.dir conf base))
