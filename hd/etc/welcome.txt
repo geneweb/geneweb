@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.17 2006-11-24 15:14:30 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.18 2006-11-24 19:31:35 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -36,18 +36,18 @@ sv: Genealogi
   <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %highlight;; font-weight: bold }
-  %if;(evar.templ != "foo")
-    #lang .title { font-size: 80%% }
-    #lang .content { width: 100%% }
-    #lang a { display: inline }
-    #lang .item span { display: none }
-  %else;
-    #lang .title { display : none }
-    #lang { width: 15%%; position: relative; float: left; text-align: left }
-    #lang a { display: block }
-    #lang .item img { display: none }
-    #content { margin-left: 15%%; width: auto }
-  %end;
+    %if;(evar.templ != "foo")
+      #lang .title { font-size: 80%% }
+      #lang .content { width: 100%% }
+      #lang a { display: inline }
+      #lang .item span { display: none }
+    %else;
+      #lang .title { display : none }
+      #lang { width: 15%%; position: relative; float: left; text-align: left }
+      #lang a { display: block }
+      #lang .item img { display: none }
+      #content { margin-left: 15%%; width: auto }
+    %end;
   --></style>
 %base_header;
 </head>
@@ -57,13 +57,13 @@ sv: Genealogi
   %let;zz;%if;("yy" = "")xx%else;xx-yy%end;%in;%sq;
   %let;tt;%if;("yy" = "")xx%else;xx_yy%end;%in;%sq;
   <a class="item" title="%apply;language_name(zz)"
-           href="%prefix_base;lang=%zz;"
-           onmouseover="if (WorkOnBrowser())%sp;%sq;
-           i%tt;.src='%image_prefix;/t-xx.png'"
-           onmouseout="i%tt;.src='%image_prefix;/l-%zz;.jpg'"><img
-           src="%image_prefix;/l-%zz;.jpg" width="36" height="22" alt=""
-           id="i%tt;" style="border: 0"%/>%sq;
-           <span>%apply;language_name(zz)</span></a>
+   href="%prefix_base;lang=%zz;"
+   onmouseover="if (WorkOnBrowser())%sp;%sq;
+   i%tt;.src='%image_prefix;/t-xx.png'"
+   onmouseout="i%tt;.src='%image_prefix;/l-%zz;.jpg'"><img
+   src="%image_prefix;/l-%zz;.jpg" width="36" height="22" alt=""
+   id="i%tt;" style="border: 0"%/>%sq;
+  <span>%apply;language_name(zz)</span></a>
 %end;
 
 %define;sosa_rel(xx)
@@ -77,32 +77,33 @@ sv: Genealogi
         <a href="http://www.geneweb.org/"><img width="96" height="108"
          src="%image_prefix;/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
       </td>%sq;
-%if;(wizard and not friend)%nl;
-      <td align="%right;"
-      valign="top"><em>[wizard/wizards/friend/friends]0%sq;
-    %if;((wizard or just_friend_wizard) and user.ident != "")%sq;
-        : %user.ident;%sq;
-    %end;</em>%sq;
-  %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")%sq;
-    %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")%nl;
-      <span style="font-size:70%%">(<a %nl;
-      href="%prefix;w=">[disconnect]</a>)</span>%sq;
-    %end;%sq;
-  %end;</td>%sq;
-%end;%sq;
-    %if;(friend and not wizard)%nl;
-      <td align="%right;"
-      valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
-      %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-        <span style="font-size:70%%">(<a
-         href="%prefix;w=">[disconnect]</a>)</span>
+      %if;(wizard and not friend)%nl;
+        <td align="%right;"
+        valign="top"><em>[wizard/wizards/friend/friends]0%sq;
+        %if;((wizard or just_friend_wizard) and user.ident != "")%sq;
+          : %user.ident;%sq;
+        %end;</em>%sq;
+        %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")%sq;
+          %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")%nl;
+            <span style="font-size:70%%">(<a %nl;
+            href="%prefix;w=">[disconnect]</a>)</span>%sq;
+          %end;
+        %end;
+        </td>
+      %end;
+      %if;(friend and not wizard)%nl;
+        <td align="%right;"
+        valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
+        %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+          <span style="font-size:70%%">(<a
+           href="%prefix;w=">[disconnect]</a>)</span>
+        %end;%nl;
+        </td>%nn;
       %end;%nl;
-      </td>%nn;
-    %end;%nl;
       <td align="%right;" valign="top" style="width: 16px">%sq;
       <a href="%prefix_base;lang=%evar.lang;;templ=%sq;
-         %if;(evar.templ != "foo")foo%else;bar%end;" %sq;
-         style="text-decoration:none">*</a>%sq;
+         %if;(evar.templ != "foo")foo%else;bar%end;"
+         style="text-decoration:none">*</a>%nl;
       %if;(referer != "")
         <a href="%referer;"><img
          src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
@@ -221,15 +222,15 @@ sv: Du kan välja ett annat språk bland de följande:
       %apply;language_link("zh", "")
     </div>
   </div>
-%if;just_friend_wizard;
-  <p><strong><font color=red>[
+  %if;just_friend_wizard;
+    <p><strong><font color=red>[
 en: Wizard rights are now suspended for maintenance.
 fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 ]</font></strong>
-  <p>
-%end;
+    <p>
+  %end;
   <div id="content">
-%apply;interp(bvar.motd2)
+    %apply;interp(bvar.motd2)
     <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
       <tr align="%left;">
         <td align="center">
@@ -237,83 +238,84 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
             %apply;interp([
 af: Die databasis <span class="highlight">"%base.name;"</span> bevat%sq;
     tans %base.nb_persons; persone.
-ar: قاعدة المعلومات <span class="highlight">"%base.name;"</span> %sq;
+ar: قاعدة المعلومات <span class="highlight">"%base.name;"</span>
     تحوي إلى يومنا %base.nb_persons; فرد
-bg: Базата от данни <span class="highlight">"%base.name;"</span> %sq;
+bg: Базата от данни <span class="highlight">"%base.name;"</span>
     в момента съдържа сведения за %base.nb_persons; души.
 br: Niver an dud a zo er bon roadoù <span class="highlight">%sq;
     "%base.name;"</span> bremañ a zo : %base.nb_persons;.
-ca: La base de dades <span class="highlight">"%base.name;"</span> %sq;
+ca: La base de dades <span class="highlight">"%base.name;"</span>
     conté actualment %base.nb_persons; persones.
-cs: Databáze <span class="highlight">"%base.name;"</span> obsahuje %sq;
+cs: Databáze <span class="highlight">"%base.name;"</span> obsahuje
     %base.nb_persons; osob.
-da: Databasen <span class="highlight">"%base.name;"</span> indeholder %sq;
+da: Databasen <span class="highlight">"%base.name;"</span> indeholder
     for øjeblikket %base.nb_persons; personer.
-de: Die Datenbank <span class="highlight">"%base.name;"</span> %sq;
+de: Die Datenbank <span class="highlight">"%base.name;"</span>
     enthält z. Zt. %base.nb_persons; Personen.
-en: The database <span class="highlight">"%base.name;"</span> now %sq;
+en: The database <span class="highlight">"%base.name;"</span> now
     holds %base.nb_persons; persons.
-eo: La datenbazo <span class="highlight">"%base.name;"</span> enhavas %sq;
+eo: La datenbazo <span class="highlight">"%base.name;"</span> enhavas
     nun %base.nb_persons; personojn.
-es: La base <span class="highlight">"%base.name;"</span> contiene %sq;
+es: La base <span class="highlight">"%base.name;"</span> contiene
     actualmente %base.nb_persons; personas.
-et: Andmebaas <span class="highlight">"%base.name;"</span> sisaldab %sq;
+et: Andmebaas <span class="highlight">"%base.name;"</span> sisaldab
     andmeid %base.nb_persons; isiku kohta.
-fi: Tietokannassa <span class="highlight">"%base.name;"</span> on %sq;
+fi: Tietokannassa <span class="highlight">"%base.name;"</span> on
     nyt %base.nb_persons; henkilöä.
 fr: La base de données <span class="highlight">"%base.name;"%sq;
     </span> contient actuellement %base.nb_persons; personnes.
-fr-cr: Ni atchuèlement %base.nb_persons; nhon-m, fan-m, yiche adan %sq;
+fr-cr: Ni atchuèlement %base.nb_persons; nhon-m, fan-m, yiche adan
        chagement <span class="highlight">"%base.name;"</span> ta-la
-he: במאגר המידע <span class="highlight">"%base.name;"</span> יש %sq;
+he: במאגר המידע <span class="highlight">"%base.name;"</span> יש
     %base.nb_persons; אנשים.
-is: Gagnagrunnurinn <span class="highlight">"%base.name;"</span> er %sq;
+is: Gagnagrunnurinn <span class="highlight">"%base.name;"</span> er
     nú með %base.nb_persons; einstaklinga skráða.
-it: La base di dati <span class="highlight">"%base.name;"</span> %sq;
+it: La base di dati <span class="highlight">"%base.name;"</span>
     contiene attualmente %base.nb_persons; persone.
-lv: Datu bāze <span class="highlight">"%base.name;"</span> patreiz %sq;
+lv: Datu bāze <span class="highlight">"%base.name;"</span> patreiz
     satur %base.nb_persons; personas.
-nl: Deze databank <span class="highlight">"%base.name;"</span> bevat %sq;
+nl: Deze databank <span class="highlight">"%base.name;"</span> bevat
     nu %base.nb_persons; personen.
-no: Databasen <span class="highlight">"%base.name;"</span> inneholder %sq;
+no: Databasen <span class="highlight">"%base.name;"</span> inneholder
     nå %base.nb_persons; personer.
-pl: Baza danych <span class="highlight">"%base.name;"</span> zawiera %sq;
+pl: Baza danych <span class="highlight">"%base.name;"</span> zawiera
     obecnie osób: %base.nb_persons;.
-pt: A base de dados <span class="highlight">"%base.name;"</span> %sq;
+pt: A base de dados <span class="highlight">"%base.name;"</span>
     contém actualmente %base.nb_persons; pessoas.
-pt-br: A base de dados <span class="highlight">"%base.name;"</span> %sq;
+pt-br: A base de dados <span class="highlight">"%base.name;"</span>
        contém atualmente %base.nb_persons; pessoas.
-ro: baza de date <span class="highlight">"%base.name;"</span> conține %sq;
+ro: baza de date <span class="highlight">"%base.name;"</span> conține
     %base.nb_persons; persoane.
-ru: База данных <span class="highlight">"%base.name;"</span> сейчас %sq;
+ru: База данных <span class="highlight">"%base.name;"</span> сейчас
     содержит %base.nb_persons; человек.
-sl: Baza podatkov <span class="highlight">"%base.name;"</span> %sq;
+sl: Baza podatkov <span class="highlight">"%base.name;"</span>
     vsebuje %base.nb_persons; oseb.
-sv: Databasen <span class="highlight">"%base.name;"</span> %sq;
+sv: Databasen <span class="highlight">"%base.name;"</span>
     innehåller nu %base.nb_persons; personer.
 zh: 现有 %base.nb_persons; 人在数据库中。
 ])%sq;
-          %if;base.has_notes;%nl;
-            <br%/>
-            (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)%sq;
-          %end;%sq;
-          %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
-               and (wizard or wiznotes_dir_exists))%sq;
-            <br%/>
-            (<a href="%prefix;m=WIZNOTES">[wizard/wizards/friend/friends]1%sq;
-            </a>)%sq;
-          %end;%sq;
-          %if;has_misc_notes;%sq;
-            <br%/>
-            (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)%sq;
-          %end;%nl;
+            %if;base.has_notes;%nl;
+              <br%/>
+              (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)%sq;
+            %end;%sq;
+            %if;((bvar.wizard_passwd_file != "" or
+                  bvar.wizard_descr_file != "")
+                 and (wizard or wiznotes_dir_exists))%sq;
+              <br%/>
+              (<a href="%prefix;m=WIZNOTES">%sq;
+              [wizard/wizards/friend/friends]1</a>)%sq;
+            %end;%sq;
+            %if;has_misc_notes;%sq;
+              <br%/>
+              (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)%sq;
+            %end;%nl;
           </p>%sq;
-      %if;(not wizard and not just_friend_wizard)
-        %if;(not cgi and bvar.auth_file = "")%nl;
-          <table border="0" width="70%%">
-            <tr align="%left;">
-              <td align="center">
-                %apply;interp([
+          %if;(not wizard and not just_friend_wizard)
+            %if;(not cgi and bvar.auth_file = "")%nl;
+              <table border="0" width="70%%">
+                <tr align="%left;">
+                  <td align="center">
+                    %apply;interp([
 af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
     </a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
@@ -361,10 +363,10 @@ sl: Urejanje kot <a href="%prefix;w=w"><em>"%sq;
 sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
     </a> tillträde<br%/> (passord)
 ])<br%/>
-              </td>%sq;
-            %if;(not friend)
-              <td align="center">
-                %apply;interp([
+                  </td>%sq;
+                  %if;(not friend)
+                    <td align="center">
+                      %apply;interp([
 af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
 br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a>%sq;
@@ -391,17 +393,17 @@ ro: Acces pentru <a href="%prefix;w=f"><em>amici</em></a><br%/> (parola)
 sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
 sv: <a href="%prefix;w=f"><em>Vän</em></a> tillträde<br%/> (passord)
 ])
-              </td>
-            %end;%nl;
-            </tr>
-          </table>%sq;
-        %else;
-          <table border="0">
-            <tr align="%left;">
-              <td align="center">
-                <form method="post" action="%action;">
-                  %hidden;
-                  [
+                    </td>
+                  %end;%nl;
+                </tr>
+              </table>%sq;
+            %else;
+              <table border="0">
+                <tr align="%left;">
+                  <td align="center">
+                    <form method="post" action="%action;">
+                      %hidden;
+                      [
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
     <em>администратор</em>:
@@ -428,15 +430,16 @@ ro: Parola, pentru acces de <em>amic</em> sau <em>magician</em>:
 sv: Passord, för <em>vänner</em> eller <em>administratör</em>
     tillträde:
 ]
-                  <input name="w" type="password" size="10" maxlength="200"%/>
-                  <input type="submit" value="Ok"%/>
-                </form>
-              </td>
-            </tr>
-          </table>
-        %end;%nl;
-          <br%/>%sq;
-      %end;%nl;
+                      <input name="w" type="password" size="10" %sq;
+                       maxlength="200"%/>
+                      <input type="submit" value="Ok"%/>
+                    </form>
+                  </td>
+                </tr>
+              </table>
+            %end;%nl;
+            <br%/>%sq;
+          %end;%nl;
           <table border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td align="%left;">
@@ -519,7 +522,7 @@ zh: 搜索：
                           <em>[surname/surnames]0</em> [or]
                           <em>[public name]</em> [or]
                           <em>[alias]</em>%sq;
-                          %if;browsing_with_sosa_ref; [or] %sq;
+                          %if;browsing_with_sosa_ref; [or]
                             %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
                           %end;%nl;
                           </label>
@@ -1107,59 +1110,59 @@ zh:
               <td>
                 <div>
                   %apply;interp([
-af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle %sq;
+af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
-bg: От %start_date; насам е имало %nb_accesses; посещения, от които %sq;
+bg: От %start_date; насам е имало %nb_accesses; посещения, от които
     %nb_accesses_to_welcome; са на настоящата страница.
-br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ : %sq;
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
     %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
-ca: Hi ha hagut %nb_accesses; consultes, de les quals %sq;
+ca: Hi ha hagut %nb_accesses; consultes, de les quals
     %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
-cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto %sq;
+cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto
     stránku, od %start_date;.
-da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome; %sq;
+da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome;
     af dem på denne side, siden %start_date;.
-de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon %sq;
+de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon
     %nb_accesses_to_welcome; auf diese Seite.
-en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome; %sq;
+en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome;
     of them to this page, since %start_date;.
-eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al %sq;
+eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al
     ĉi tiu paĝo, ekde la %start_date;.
-es: Ha habido %nb_accesses; consultas, de las cuales %sq;
-    %nb_accesses_to_welcome; corresponden a esta página, desde %sq;
+es: Ha habido %nb_accesses; consultas, de las cuales
+    %nb_accesses_to_welcome; corresponden a esta página, desde
     el %start_date;.
-et: Alates andmebaasi loomise päevast (%start_date;) on selle poole %sq;
-    pöördutud %nb_accesses; korda, neist %nb_accesses_to_welcome; korda %sq;
+et: Alates andmebaasi loomise päevast (%start_date;) on selle poole
+    pöördutud %nb_accesses; korda, neist %nb_accesses_to_welcome; korda
     sellele lehele.
-fi: Tähän mennessä %nb_accesses; tapahtumaa, joista %sq;
+fi: Tähän mennessä %nb_accesses; tapahtumaa, joista
     %nb_accesses_to_welcome; tälle sivulle %start_date; jälkeen.
-fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; %sq;
-    à cette page, depuis le %start_date;.
-he: היו %nb_accesses; כניסות, כולל %nb_accesses_to_welcome; %sq;
+fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; à
+    cette page, depuis le %start_date;.
+he: היו %nb_accesses; כניסות, כולל %nb_accesses_to_welcome;
     כניסות לעמוד זה, מאז %start_date;.
-is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome; %sq;
+is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
     af þeim á þessa síðu, síðan %start_date;.
-it: Dal %start_date; ci sono stati %nb_accesses; accessi, %sq;
+it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
-lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes, %sq;
+lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
     %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē. 
-nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal %sq;
+nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
     bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
-no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome; %sq;
+no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
     av dem til denne siden, siden %start_date;.
-pl: Baza została od %start_date; odwiedzona %nb_accesses; razy (w tym %sq;
+pl: Baza została od %start_date; odwiedzona %nb_accesses; razy (w tym
     %nb_accesses_to_welcome; razy strona tytułowa).
-pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome; %sq;
+pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome;
     foram a esta página, desde %start_date;.
-ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome; %sq;
+ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome;
     pe aceatsa pagina din %start_date;
-ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome; %sq;
+ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome;
     к этой странице, начиная с %start_date;.
-sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran, %sq;
+sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran,
     od %start_date;.
-sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome; %sq;
+sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
     av dem till den här sidan, sedan %start_date;.
-zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome; %sq;
+zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
 ])%nl;
                 </div>
@@ -1210,9 +1213,9 @@ fi: Mikäli selaimesi ei automaattisesti päivitä muutettuja
     sivuja (jolloin sinun täytyy "ladata uudelleen nykyinen
     dokumentti") kokeile <a href="%prefix;escache=0">tätä
     linkkiä</a>.
-fr: Si votre navigateur ne met pas à jour automatiquement %sq;
-    les pages modifiées (vous obligeant à faire "actualiser %sq;
-    la page"), essayez la navigation à partir de %sq;
+fr: Si votre navigateur ne met pas à jour automatiquement
+    les pages modifiées (vous obligeant à faire "actualiser
+    la page"), essayez la navigation à partir de
     <a href="%prefix;escache=0">ce lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
     <a href="%prefix;escache=0">þetta</a>.

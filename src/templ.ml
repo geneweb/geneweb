@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.11 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: templ.ml,v 5.12 2006-11-24 19:31:35 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -350,8 +350,6 @@ value strip_newlines_after_variables =
     | [] -> [] ]
 ;
 
-value strip_heading_spaces = ref True;
-
 value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser bp
@@ -396,9 +394,7 @@ value parse_templ conf strm =
         in
         parse_astl [a :: astl] False 0 end_list strm
     | [: `c :] ->
-        let empty_c =
-          if strip_heading_spaces.val then c = ' ' || c = '\t' else False
-        in
+        let empty_c = c = ' ' || c = '\t' in
         let len = if empty_c && bol then len else Buff2.store len c in
         let bol = empty_c && bol || c = '\n' in
         parse_astl astl bol len end_list strm
@@ -1160,89 +1156,49 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
     conf.env
 ;
 
-value bol = ref True;
-value ind = ref 0;
-value ind_to_add = ref 0;
+value b = Buffer.create 80;
+value ind_bol = ref 0;
+value ind_curr = ref 0;
+value bol = ref False;
 value after_less = ref False;
 value after_slash = ref False;
-
-value gliboc = lazy (open_out_gen [Open_append; Open_creat] 0o777 "glib");
-value glib s = do {
-  let oc = Lazy.force gliboc in
-  Printf.fprintf oc "«(%b,%d,%b,%b)%s»" bol.val ind.val after_less.val after_slash.val s;
-};
-
 value pretty_print s =
-  loop 0 0 where rec loop ibeg i =
-    if i = String.length s then String.sub s ibeg (i - ibeg)
+  loop 0 where rec loop i =
+    if i = String.length s then ""
     else if bol.val then
-      if s.[i] = ' ' then loop (i + 1) (i + 1)
-      else if s.[i] = '\n' then loop (i + 1) (i + 1)
+      if s.[i] = ' ' || s.[i] = '\n' then loop (i + 1)
       else do {
         bol.val := False;
-        loop i i
+        loop i;
       }
-    else do {
-      let ind_to_add_v = ind_to_add.val in
-      ind_to_add.val := 0;
-      let r =
-        match s.[i] with
-        [ '\n' -> do {
-            bol.val := True;
-            let ind_v = ind.val in
-            let rest = loop (i + 1) (i + 1) in
-            if rest = "" then do {
-              ind_to_add.val := ind_v;
-              String.sub s ibeg (i + 1 - ibeg)
-            }
-            else
-              let ind_v =
-                if String.length rest > 2 && rest.[0] = '<' && rest.[1] = '/'
-                then
-                  ind_v - 2
-                else ind_v
-              in
-              String.sub s ibeg (i + 1 - ibeg) ^
-              String.make ind_v ' ' ^
-              rest
-          }
-        | '<' -> do {
-            after_less.val := True;
-            loop ibeg (i + 1)
-          }
-        | '/' -> do {
-            if after_less.val then do {
-              ind.val := ind.val - 2;
-              after_less.val := False
-            }
-            else after_slash.val := True;
-            loop ibeg (i + 1)
-          }
-        | c -> do {
-            if after_less.val then do {
-              if c = '/' then ind.val := ind.val - 2
-              else if c = '!' then ()
-              else ind.val := ind.val + 2;
-              after_less.val := False
-            }
-            else if after_slash.val then do {
-              if c = '>' then ind.val := ind.val - 2 else ();
-              after_slash.val := False;
-            }
-            else ();
-            loop ibeg (i + 1)
-          } ]
-      in
-      if ind_to_add_v > 0 then
-        let ind_to_add_v =
-          if String.length r > 2 && r.[0] = '<' && r.[1] = '/' then
-            ind_to_add_v - 2
-          else
-            ind_to_add_v
-        in
-        String.make ind_to_add_v ' ' ^ r
-      else r
-    }
+    else
+      match s.[i] with
+      [ '\n' -> do {
+          let ind = min ind_bol.val ind_curr.val in
+          let line = Buffer.contents b in
+          bol.val := True;
+          ind_bol.val := ind_curr.val;
+          Buffer.clear b;
+          String.make ind ' ' ^ line ^ "\n" ^ loop (i + 1)
+        }
+      | c -> do {
+          let after_less_v = after_less.val in
+          let after_slash_v = after_slash.val in
+          after_less.val := False;
+          after_slash.val := False;
+          match c with
+          [ '<' -> after_less.val := True
+          | '/' ->
+              if after_less_v then ind_curr.val := ind_curr.val - 2
+              else after_slash.val := True
+          | '!' -> ()
+          | '>' ->
+              if after_slash_v then ind_curr.val := ind_curr.val - 2 else ()
+          | c ->
+              if after_less_v then ind_curr.val := ind_curr.val + 2 else () ];
+          Buffer.add_char b c;
+          loop (i + 1)
+        } ]
 ;
 
 value interp

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 5.2 2006-11-22 15:30:17 ddr Exp $ *)
+(* $Id: templ.mli,v 5.3 2006-11-24 19:31:35 ddr Exp $ *)
 
 open Config;
 open Gwdb;
@@ -11,7 +11,6 @@ type env 'a = list (string * 'a);
 value eval_transl : config -> bool -> string -> string -> string;
 value copy_from_templ : config -> list (string * string) -> in_channel -> unit;
 
-value strip_heading_spaces : ref bool;
 value interp :
   config -> base -> string ->
     (env 'a -> 'b -> loc -> list string -> expr_val 'b) ->
