@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.16 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.17 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -186,7 +186,7 @@ value print_death conf base =
   let (list, len) = select conf base death_date False in
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
-      (fun _ -> Wserver.wprint "%d" len)
+      (fun _ -> string_of_int len)
   in
   do {
     header conf title;
@@ -291,11 +291,13 @@ value print_death conf base =
         tag "p" begin
           Util.hidden_env conf;
           xtag "input" "type=\"hidden\" name=\"m\" value=\"LD\"";
-          Wserver.wprint
-            (fcapitale (ftransl conf "the latest %t deaths"))
-               (fun _ ->
-                  xtag "input"
-                    "name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"" len);
+          let ds =
+            Printf.sprintf
+              "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s"
+              len conf.xhs
+          in
+          Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
+            (fun _ -> ds);
           Wserver.wprint "\n... (%s...\n" (transl conf "before");
           xtag "input"
             "name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\"" by;
@@ -515,7 +517,7 @@ value old_print_statistics conf base =
         stagn "li" begin
           Wserver.wprint "<a href=\"%sm=LD;k=%d\">" (commd conf) n;
           Wserver.wprint (ftransl conf "the latest %t deaths")
-            (fun _ -> Wserver.wprint "%d" n);
+            (fun _ -> string_of_int n);
           Wserver.wprint "</a>";
         end;
         stagn "li" begin

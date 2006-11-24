@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.73 2006-11-20 03:58:58 ddr Exp $ *)
+(* $Id: util.ml,v 5.74 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -134,7 +134,9 @@ value capitale s =
   else capitale_iso_8859_1 s
 ;
 
-value fcapitale (a : format 'a 'b 'c) : format 'a 'b 'c =
+type format2 'a 'b = format4 'a unit string 'b;
+
+value fcapitale (a : format4 'a 'b 'c 'd) : format4 'a 'b 'c 'd =
   Obj.magic capitale a
 ;
 
@@ -265,7 +267,7 @@ value transl_a_of_gr_eq_gen_lev conf x y =
 ;
 
 value check_format ini_fmt (r : string) =
-  let s : string = Obj.magic (ini_fmt : format 'a 'b 'c) in
+  let s : string = Obj.magic (ini_fmt : format4 'a 'b 'c 'd) in
   let rec loop i j =
     if i < String.length s - 1 && j < String.length r - 1 then
       match (s.[i], s.[i + 1], r.[j], r.[j + 1]) with
@@ -279,7 +281,7 @@ value check_format ini_fmt (r : string) =
     else if j < String.length r - 1 then
       if r.[j] = '%' then None else loop i (j + 1)
     else
-      Some (Obj.magic r : format 'a 'b 'c)
+      Some (Obj.magic r : format4 'a 'b 'c 'd)
   in
   loop 0 0
 ;

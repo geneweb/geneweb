@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.31 2006-11-15 15:22:56 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.32 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -245,7 +245,7 @@ value print_err_parents conf base p =
     rheader conf title;
     Wserver.wprint "\n";
     Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
-      (fun _ -> Wserver.wprint "\n%s" (referenced_person_text conf base p));
+      (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
     Wserver.wprint "\n";
     html_p conf;
     tag "ul" begin

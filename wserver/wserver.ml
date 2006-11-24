@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.8 2006-10-17 10:46:26 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.9 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Printf;
@@ -12,7 +12,11 @@ value wserver_oc =
   do { set_binary_mode_out stdout True; ref stdout }
 ;
 
-value wprint fmt = fprintf wserver_oc.val fmt;
+value wrap_string = ref (fun s -> s);
+
+value wprint fmt =
+  ksprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
+;
 value wflush () = flush wserver_oc.val;
 
 value hexa_digit x =

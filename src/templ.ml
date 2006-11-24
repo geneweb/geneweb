@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.10 2006-11-23 20:56:19 ddr Exp $ *)
+(* $Id: templ.ml,v 5.11 2006-11-24 16:14:39 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1160,6 +1160,91 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
     conf.env
 ;
 
+value bol = ref True;
+value ind = ref 0;
+value ind_to_add = ref 0;
+value after_less = ref False;
+value after_slash = ref False;
+
+value gliboc = lazy (open_out_gen [Open_append; Open_creat] 0o777 "glib");
+value glib s = do {
+  let oc = Lazy.force gliboc in
+  Printf.fprintf oc "«(%b,%d,%b,%b)%s»" bol.val ind.val after_less.val after_slash.val s;
+};
+
+value pretty_print s =
+  loop 0 0 where rec loop ibeg i =
+    if i = String.length s then String.sub s ibeg (i - ibeg)
+    else if bol.val then
+      if s.[i] = ' ' then loop (i + 1) (i + 1)
+      else if s.[i] = '\n' then loop (i + 1) (i + 1)
+      else do {
+        bol.val := False;
+        loop i i
+      }
+    else do {
+      let ind_to_add_v = ind_to_add.val in
+      ind_to_add.val := 0;
+      let r =
+        match s.[i] with
+        [ '\n' -> do {
+            bol.val := True;
+            let ind_v = ind.val in
+            let rest = loop (i + 1) (i + 1) in
+            if rest = "" then do {
+              ind_to_add.val := ind_v;
+              String.sub s ibeg (i + 1 - ibeg)
+            }
+            else
+              let ind_v =
+                if String.length rest > 2 && rest.[0] = '<' && rest.[1] = '/'
+                then
+                  ind_v - 2
+                else ind_v
+              in
+              String.sub s ibeg (i + 1 - ibeg) ^
+              String.make ind_v ' ' ^
+              rest
+          }
+        | '<' -> do {
+            after_less.val := True;
+            loop ibeg (i + 1)
+          }
+        | '/' -> do {
+            if after_less.val then do {
+              ind.val := ind.val - 2;
+              after_less.val := False
+            }
+            else after_slash.val := True;
+            loop ibeg (i + 1)
+          }
+        | c -> do {
+            if after_less.val then do {
+              if c = '/' then ind.val := ind.val - 2
+              else if c = '!' then ()
+              else ind.val := ind.val + 2;
+              after_less.val := False
+            }
+            else if after_slash.val then do {
+              if c = '>' then ind.val := ind.val - 2 else ();
+              after_slash.val := False;
+            }
+            else ();
+            loop ibeg (i + 1)
+          } ]
+      in
+      if ind_to_add_v > 0 then
+        let ind_to_add_v =
+          if String.length r > 2 && r.[0] = '<' && r.[1] = '/' then
+            ind_to_add_v - 2
+          else
+            ind_to_add_v
+        in
+        String.make ind_to_add_v ' ' ^ r
+      else r
+    }
+;
+
 value interp
   conf base fname eval_var eval_transl eval_predefined_apply get_vother
   set_vother print_foreach
@@ -1324,6 +1409,7 @@ value interp
         [ Some astl -> do {
             Util.html conf;
             Util.nl ();
+            Wserver.wrap_string.val := pretty_print;
             print_ast_list env ep astl;
           }
         | None ->

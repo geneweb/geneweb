@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.17 2006-10-26 14:06:35 ddr Exp $ *)
+(* $Id: descend.ml,v 5.18 2006-11-24 16:14:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -67,11 +67,11 @@ value named_like_father conf base ip =
 value display_married conf base first fam p spouse =
   let auth = authorized_age conf base p && authorized_age conf base spouse in
   do {
-    Wserver.wprint (fcapitale (relation_txt conf (get_sex p) fam))
-      (fun _ ->
-         if auth then
-           Wserver.wprint "%s" (Perso.string_of_marriage_text conf base fam)
-         else ());
+    Wserver.wprint "%s"
+      (Printf.sprintf (fcapitale (relation_txt conf (get_sex p) fam))
+         (fun _ ->
+            if auth then Perso.string_of_marriage_text conf base fam
+            else ""));
     Wserver.wprint "\n";
     stag "strong" begin
       Wserver.wprint "%s"
