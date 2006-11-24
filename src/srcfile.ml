@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.28 2006-11-24 19:31:35 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.29 2006-11-24 20:32:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -586,7 +586,7 @@ value print_start conf base =
     [ Some "yes" -> False
     | Some _ | None -> True ]
   in
-  if new_welcome then
+  if new_welcome then do {
     let env =
       let sosa_ref_l =
         let sosa_ref () = Util.find_sosa_ref conf base in
@@ -594,9 +594,11 @@ value print_start conf base =
       in
       [("sosa_ref", Vsosa_ref sosa_ref_l)]
     in
+    Wserver.wrap_string.val := Util.xml_pretty_print;
     Templ.interp conf base "welcome" (eval_var conf base)
       (fun env -> Templ.eval_transl conf)
       (eval_predefined_apply conf) get_vother set_vother (fun []) env ()
+  }
   else
     let fname =
       if Sys.file_exists (lang_file_name conf conf.bname) then conf.bname

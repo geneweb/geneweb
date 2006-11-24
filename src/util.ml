@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.74 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: util.ml,v 5.75 2006-11-24 20:32:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2624,4 +2624,51 @@ value html_highlight case_sens h s =
       match start_equiv_with case_sens h s i with
       [ Some j -> loop False j (Buff.mstore len (ht i j))
       | None -> loop False (i + 1) (Buff.store len s.[i]) ]
+;
+
+(* Wrapper to pretty print the produced XHTML (see Wserver.wrap_string) *)
+
+value b = Buffer.create 80;
+value ind_bol = ref 0;
+value ind_curr = ref 0;
+value bol = ref False;
+value after_less = ref False;
+value after_slash = ref False;
+value xml_pretty_print s =
+  loop 0 where rec loop i =
+    if i = String.length s then ""
+    else if bol.val then
+      if s.[i] = ' ' || s.[i] = '\n' then loop (i + 1)
+      else do {
+        bol.val := False;
+        loop i;
+      }
+    else
+      match s.[i] with
+      [ '\n' -> do {
+          let ind = min ind_bol.val ind_curr.val in
+          let line = Buffer.contents b in
+          bol.val := True;
+          ind_bol.val := ind_curr.val;
+          Buffer.clear b;
+          String.make ind ' ' ^ line ^ "\n" ^ loop (i + 1)
+        }
+      | c -> do {
+          let after_less_v = after_less.val in
+          let after_slash_v = after_slash.val in
+          after_less.val := False;
+          after_slash.val := False;
+          match c with
+          [ '<' -> after_less.val := True
+          | '/' ->
+              if after_less_v then ind_curr.val := ind_curr.val - 2
+              else after_slash.val := True
+          | '!' -> ()
+          | '>' ->
+              if after_slash_v then ind_curr.val := ind_curr.val - 2 else ()
+          | c ->
+              if after_less_v then ind_curr.val := ind_curr.val + 2 else () ];
+          Buffer.add_char b c;
+          loop (i + 1)
+        } ]
 ;

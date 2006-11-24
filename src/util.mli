@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.17 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: util.mli,v 5.18 2006-11-24 20:32:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -239,3 +239,7 @@ value is_that_user_and_password :
 
 value in_text : bool -> string -> string -> bool;
 value html_highlight : bool -> string -> string -> string;
+
+(* Pretty print XHTML wrapper for Wserver.wrap_string *)
+
+value xml_pretty_print : string -> string;
