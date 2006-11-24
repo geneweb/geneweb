@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.12 2006-11-24 19:31:35 ddr Exp $ *)
+(* $Id: templ.ml,v 5.13 2006-11-24 19:53:22 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1365,7 +1365,9 @@ value interp
         [ Some astl -> do {
             Util.html conf;
             Util.nl ();
+(*
             Wserver.wrap_string.val := pretty_print;
+*)
             print_ast_list env ep astl;
           }
         | None ->
