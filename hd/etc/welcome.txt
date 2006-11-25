@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.19 2006-11-25 18:12:07 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.20 2006-11-25 19:59:23 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -41,14 +41,15 @@ sv: Genealogi
     #title-band > div { display: table-cell }
     #title { text-align: center; vertical-align: middle; width: 100%% }
     #title { color: %highlight; }
+    #lang { text-align: center }
     %if;(evar.templ != "foo")
       #lang .title { font-size: 80%% }
-      #lang .content { width: 100%% }
+      #lang .list { width: 100%% }
       #lang a { display: inline }
       #lang .item span { display: none }
     %else;
       #lang .title { display : none }
-      #lang { width: 15%%; position: relative; float: left; text-align: left }
+      #lang { width: 15%%; float: %left;; text-align: %left; }
       #lang a { display: block }
       #lang .item img { display: none }
       #content { margin-left: 15%%; width: auto }
@@ -57,6 +58,17 @@ sv: Genealogi
 %base_header;
 </head>
 <body%body_prop;>
+
+<script type="text/javascript"><!--
+  function WorkOnBrowser() {
+    if (navigator.appVersion.substring(0,3) >= 3.0 &&
+        navigator.appName == 'Netscape' ||
+        navigator.appVersion.substring(0,3) >= 4.0 &&
+        navigator.appName.substring(0,9) == 'Microsoft') return true;
+    else return false;
+  }
+  // -->
+</script>
 
 %define;language_link(xx,yy)%sq;
   %let;zz;%if;("yy" = "")xx%else;xx-yy%end;%in;%sq;
@@ -102,6 +114,7 @@ sv: Genealogi
     <a href="%referer;"><img%sp;
     src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
   %end;
+  <a href="%prefix_base;suicide=x"> </a>
 </div>
 
 <div id="title-band">
@@ -143,22 +156,9 @@ zh: 网络家谱
   </div>
 </div>
 
-<div style="text-align: center">
-  <br%/>
-  <a href="%prefix_base;suicide=x"> </a>
-  <script type="text/javascript"><!--
-    function WorkOnBrowser() {
-      if (navigator.appVersion.substring(0,3) >= 3.0 &&
-          navigator.appName == 'Netscape' ||
-          navigator.appVersion.substring(0,3) >= 4.0 &&
-          navigator.appName.substring(0,9) == 'Microsoft') return true;
-      else return false;
-    }
-    // -->
-  </script>
-  <div id="lang">
-    <div class="title">
-      <em>[
+<div id="lang">
+  <div class="title">
+    <em>[
 af: Taalvoorkeur/Language preference:
 ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
 bg: Можете да изберете друг език за съобщения измежду следните:
@@ -183,44 +183,48 @@ ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em>
-    </div>
-    <div class="content">
-      %apply;language_link("af", "")
-      %apply;language_link("bg", "")
-      %apply;language_link("br", "")
-      %apply;language_link("ca", "")
-      %apply;language_link("cs", "")
-      %apply;language_link("da", "")
-      %apply;language_link("de", "")
-      %apply;language_link("en", "")
-      %apply;language_link("eo", "")
-      %apply;language_link("es", "")
-      %apply;language_link("et", "")
-      %apply;language_link("fi", "")
-      %apply;language_link("fr", "")
-      %apply;language_link("he", "")
-      %apply;language_link("is", "")
-      %apply;language_link("it", "")
-      %apply;language_link("lv", "")
-      %apply;language_link("nl", "")
-      %apply;language_link("no", "")
-      %apply;language_link("pl", "")
-      %apply;language_link("pt", "")
-      %apply;language_link("pt", "br")
-      %apply;language_link("ro", "")
-      %apply;language_link("ru", "")
-      %apply;language_link("sl", "")
-      %apply;language_link("sv", "")
-      %apply;language_link("zh", "")
-    </div>
   </div>
-  %if;just_friend_wizard;
-    <p><strong><font color=red>[
+  <div class="list">
+    %apply;language_link("af", "")
+    %apply;language_link("bg", "")
+    %apply;language_link("br", "")
+    %apply;language_link("ca", "")
+    %apply;language_link("cs", "")
+    %apply;language_link("da", "")
+    %apply;language_link("de", "")
+    %apply;language_link("en", "")
+    %apply;language_link("eo", "")
+    %apply;language_link("es", "")
+    %apply;language_link("et", "")
+    %apply;language_link("fi", "")
+    %apply;language_link("fr", "")
+    %apply;language_link("he", "")
+    %apply;language_link("is", "")
+    %apply;language_link("it", "")
+    %apply;language_link("lv", "")
+    %apply;language_link("nl", "")
+    %apply;language_link("no", "")
+    %apply;language_link("pl", "")
+    %apply;language_link("pt", "")
+    %apply;language_link("pt", "br")
+    %apply;language_link("ro", "")
+    %apply;language_link("ru", "")
+    %apply;language_link("sl", "")
+    %apply;language_link("sv", "")
+    %apply;language_link("zh", "")
+  </div>
+</div>
+
+%if;just_friend_wizard;
+  <div style="color: red; font-weight: bold; text-align: center">
+    [
 en: Wizard rights are now suspended for maintenance.
 fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
-]</font></strong>
-    <p>
-  %end;
+]
+  </div>
+%end;
+
+<div>
   <div id="content">
     %apply;interp(bvar.motd2)
     <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
