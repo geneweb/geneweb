@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.20 2006-11-25 19:59:23 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.21 2006-11-25 21:30:19 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -41,23 +41,20 @@ sv: Genealogi
     #title-band > div { display: table-cell }
     #title { text-align: center; vertical-align: middle; width: 100%% }
     #title { color: %highlight; }
-    #lang { text-align: center }
-    %if;(evar.templ != "foo")
+    %if;(evar.templ != "random")
+      body { background: url('%image_prefix;/gwback.jpg') }
+      #lang { text-align: center }
       #lang .title { font-size: 80%% }
       #lang .list { width: 100%% }
       #lang a { display: inline }
       #lang .item span { display: none }
     %else;
-      #lang .title { display : none }
-      #lang { width: 15%%; float: %left;; text-align: %left; }
-      #lang a { display: block }
-      #lang .item img { display: none }
-      #content { margin-left: 15%%; width: auto }
+      %random_css;
     %end;
   --></style>
 %base_header;
 </head>
-<body%body_prop;>
+<body>
 
 <script type="text/javascript"><!--
   function WorkOnBrowser() {
@@ -108,7 +105,7 @@ sv: Genealogi
     %end;
   %end;
   <a href="%prefix_base;lang=%evar.lang;
-  ;templ=%if;(evar.templ != "foo")foo%else;bar%end;"%sp;
+   %if;(evar.templ != "random");templ=random%end;"%sp;
    style="text-decoration:none">*</a>
   %if;(referer != "")
     <a href="%referer;"><img%sp;

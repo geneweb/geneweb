@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.29 2006-11-24 20:32:41 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.30 2006-11-25 21:30:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -527,6 +527,53 @@ value get_env v env =
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
+value random_css conf =
+  let s1 =
+    if Random.int 2 = 0 then
+      Printf.sprintf "body { background: url('%s/gwback.jpg') }\n"
+        (image_prefix conf)
+    else
+      let (bg, fg, lnk, vlnk) =
+        let list =
+          [("#cf9", "#660", "#069", "#030");
+           ("#fc0", "#300", "#c00", "#606");
+           ("#9cc", "#006", "#00c", "#036");
+           ("#cc6", "#300", "#c00", "#030");
+           ("#ffe", "#000", "#069", "#900");
+           ("#ccc", "#000", "#00C", "#606");
+           ("#c9f", "#000", "#f03", "#606");
+           ("#fff", "#333", "#069", "#990");
+           ("#ff9", "#300", "#c00", "#333")]
+        in
+        List.nth list (Random.int (List.length list))
+      in
+      Printf.sprintf "\
+        body { background: %s; color: %s }
+        :link { color: %s }
+        :visited { color: %s }\n" bg fg lnk vlnk
+  in
+  let s2 =
+    let rlang = Random.int 3 in
+    if rlang < 2 then
+      Printf.sprintf "\
+        #lang .title { display : none }
+        #lang { width: 15%%; float: %s; text-align: %s }
+        #lang a { display: block; font-size: %s%% }
+        #lang .item img { display: none }
+        #content { margin-left: 15%%; width: auto }\n"
+        (if rlang = 0 then conf.left else conf.right)
+        (if rlang = 0 then conf.left else conf.right)
+        (if Random.int 2 = 0 then "100" else "70")
+    else "\
+      #lang { text-align: center }
+      #lang .title { font-size: 80% }
+      #lang .list { width: 100% }
+      #lang a { display: inline }
+      #lang .item span { display: none }\n"
+  in
+  s1 ^ s2
+;
+
 value eval_var conf base env () loc =
   fun
   [ ["base"; "has_notes"] -> VVbool (not (base_notes_are_empty base ""))
@@ -565,6 +612,10 @@ value eval_var conf base env () loc =
           (Num.of_int r.welcome_cnt)
       in
       VVstring s
+  | ["random_css"] -> do {
+      Random.self_init ();
+      VVstring (random_css conf)
+    }
   | ["sosa_ref"] ->
       match get_env "sosa_ref" env with
       [ Vsosa_ref v ->
