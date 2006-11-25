@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.18 2006-11-24 19:31:35 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.19 2006-11-25 18:12:07 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -36,6 +36,11 @@ sv: Genealogi
   <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %highlight;; font-weight: bold }
+    #user-info { float: %right; }
+    #title-band { display: table; width: 100%% }
+    #title-band > div { display: table-cell }
+    #title { text-align: center; vertical-align: middle; width: 100%% }
+    #title { color: %highlight; }
     %if;(evar.templ != "foo")
       #lang .title { font-size: 80%% }
       #lang .content { width: 100%% }
@@ -70,54 +75,43 @@ sv: Genealogi
   [<em>Sosa number</em> relative to %t:::xx]
 %end;
 
-<div style="text-align: center">
-  <table border="0" width="100%%">
-    <tr align="%left;">
-      <td rowspan="2" style="width: 20%%">
-        <a href="http://www.geneweb.org/"><img width="96" height="108"
-         src="%image_prefix;/gwlogo.png" style="border: 0" alt="GeneWeb"%/></a>
-      </td>%sq;
-      %if;(wizard and not friend)%nl;
-        <td align="%right;"
-        valign="top"><em>[wizard/wizards/friend/friends]0%sq;
-        %if;((wizard or just_friend_wizard) and user.ident != "")%sq;
-          : %user.ident;%sq;
-        %end;</em>%sq;
-        %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")%sq;
-          %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")%nl;
-            <span style="font-size:70%%">(<a %nl;
-            href="%prefix;w=">[disconnect]</a>)</span>%sq;
-          %end;
-        %end;
-        </td>
+<div id="user-info">
+  %if;(wizard and not friend)
+    <em>[wizard/wizards/friend/friends]0%sq;
+    %if;((wizard or just_friend_wizard) and user.ident != "")
+      : %user.ident;%sq;
+    %end;</em>
+    %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+      %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+        <span style="font-size:70%%">(<a
+         href="%prefix;w=">[disconnect]</a>)</span>
       %end;
-      %if;(friend and not wizard)%nl;
-        <td align="%right;"
-        valign="top"><em>[wizard/wizards/friend/friends]2</em>%nn;
-        %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-          <span style="font-size:70%%">(<a
-           href="%prefix;w=">[disconnect]</a>)</span>
-        %end;%nl;
-        </td>%nn;
-      %end;%nl;
-      <td align="%right;" valign="top" style="width: 16px">%sq;
-      <a href="%prefix_base;lang=%evar.lang;;templ=%sq;
-         %if;(evar.templ != "foo")foo%else;bar%end;"
-         style="text-decoration:none">*</a>%nl;
-      %if;(referer != "")
-        <a href="%referer;"><img
-         src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
-      %else;&nbsp;%sq;
-      %end;%sq;
-     </td>
-    </tr>
-    <tr>
-      <td align="center" colspan="%nn;%sq;
-       %if;(wizard and not friend or friend and not wizard)2%else;1%end;">
-        <table border="0">
-          <tr align="center">
-            <td align="center">
-              <h1><span style="color: %highlight;">[
+    %end;
+  %end;
+  %if;(friend and not wizard)
+    <em>[wizard/wizards/friend/friends]2</em>
+    %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+      <span style="font-size:70%%">(<a
+       href="%prefix;w=">[disconnect]</a>)</span>
+    %end;
+  %end;
+  <a href="%prefix_base;lang=%evar.lang;
+  ;templ=%if;(evar.templ != "foo")foo%else;bar%end;"%sp;
+   style="text-decoration:none">*</a>
+  %if;(referer != "")
+    <a href="%referer;"><img%sp;
+    src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+  %end;
+</div>
+
+<div id="title-band">
+  <div>
+    <a href="http://www.geneweb.org/"><img width="96" height="108"
+     src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
+     alt="GeneWeb"%/></a>
+  </div>
+  <div id="title">
+    <h1>[
 af: Genealogiese databasis
 ar: قاعدة المعلومات العائلية (جينيالوجيا)
 bg: Родословна база от данни
@@ -145,13 +139,11 @@ ru: Генеaлогическая база данных
 sl: Genealoška baza podatkov
 sv: Genealogisk databas
 zh: 网络家谱
-]</span></h1>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+]</h1>
+  </div>
+</div>
+
+<div style="text-align: center">
   <br%/>
   <a href="%prefix_base;suicide=x"> </a>
   <script type="text/javascript"><!--

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.14 2006-11-24 20:32:41 ddr Exp $ *)
+(* $Id: templ.ml,v 5.15 2006-11-25 18:12:07 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -828,11 +828,13 @@ value templ_eval_var conf =
   fun
   [ ["cancel_links"] -> VVbool conf.cancel_links
   | ["cgi"] -> VVbool conf.cgi
+  | ["false"] -> VVbool False
   | ["has_referer"] -> (* deprecated since version 5.00 *) 
       VVbool (Wserver.extract_param "referer: " '\n' conf.request <> "")
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
   | ["manitou"] -> VVbool conf.manitou
+  | ["true"] -> VVbool True
   | ["wizard"] -> VVbool conf.wizard
   | _ -> raise Not_found ]
 ;

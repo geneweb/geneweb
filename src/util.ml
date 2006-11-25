@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.75 2006-11-24 20:32:41 ddr Exp $ *)
+(* $Id: util.ml,v 5.76 2006-11-25 18:12:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2634,41 +2634,91 @@ value ind_curr = ref 0;
 value bol = ref False;
 value after_less = ref False;
 value after_slash = ref False;
+value tag = ref None;
+value stack_in_error = ref False;
+value tag_stack = ref [];
+value check_tag_stack c =
+  if stack_in_error.val then ()
+  else
+    match tag.val with
+    [ Some (tag1, topen, tag_found) ->
+        match c with
+        [ ' ' -> tag.val := Some (tag1, topen, True)
+        | '>' ->
+            if topen then do {
+              tag_stack.val := [tag1 :: tag_stack.val];
+              tag.val := None
+            }
+            else
+              match tag_stack.val with
+              [ [tag2 :: rest] ->
+                  if tag1 = tag2 then do {
+                    tag_stack.val := rest;
+                    tag.val := None
+                  }
+                  else do {
+                    Printf.eprintf "Tag <%s> ended by </%s>\n" tag2 tag1;
+                    stack_in_error.val := True;
+                  }
+              | [] -> do {
+                  Printf.eprintf "Ending tag not opened </%s>\n" tag1;
+                  stack_in_error.val := True;
+                } ]
+        | c ->
+            if tag_found then ()
+            else tag.val := Some (tag1 ^ String.make 1 c, topen, False) ] 
+    | None -> () ]
+;
 value xml_pretty_print s =
   loop 0 where rec loop i =
     if i = String.length s then ""
-    else if bol.val then
-      if s.[i] = ' ' || s.[i] = '\n' then loop (i + 1)
-      else do {
-        bol.val := False;
-        loop i;
-      }
-    else
-      match s.[i] with
-      [ '\n' -> do {
-          let ind = min ind_bol.val ind_curr.val in
-          let line = Buffer.contents b in
-          bol.val := True;
-          ind_bol.val := ind_curr.val;
-          Buffer.clear b;
-          String.make ind ' ' ^ line ^ "\n" ^ loop (i + 1)
+    else do {
+      if bol.val then
+        if s.[i] = ' ' || s.[i] = '\n' then loop (i + 1)
+        else do {
+          bol.val := False;
+          loop i;
         }
-      | c -> do {
-          let after_less_v = after_less.val in
-          let after_slash_v = after_slash.val in
-          after_less.val := False;
-          after_slash.val := False;
-          match c with
-          [ '<' -> after_less.val := True
-          | '/' ->
-              if after_less_v then ind_curr.val := ind_curr.val - 2
-              else after_slash.val := True
-          | '!' -> ()
-          | '>' ->
-              if after_slash_v then ind_curr.val := ind_curr.val - 2 else ()
-          | c ->
-              if after_less_v then ind_curr.val := ind_curr.val + 2 else () ];
-          Buffer.add_char b c;
-          loop (i + 1)
-        } ]
+      else
+        match s.[i] with
+        [ '\n' -> do {
+            check_tag_stack ' ';
+            let ind = min ind_bol.val ind_curr.val in
+            let line = Buffer.contents b in
+            bol.val := True;
+            ind_bol.val := ind_curr.val;
+            Buffer.clear b;
+            String.make (max 0 ind) ' ' ^ line ^ "\n" ^ loop (i + 1)
+          }
+        | c -> do {
+            let after_less_v = after_less.val in
+            let after_slash_v = after_slash.val in
+            after_less.val := False;
+            after_slash.val := False;
+            match c with
+            [ '<' -> do {
+                after_less.val := True;
+                tag.val := Some ("", True, False);
+              }
+            | '/' ->
+                if after_less_v then do {
+                  ind_curr.val := ind_curr.val - 2;
+                  tag.val := Some ("", False, False);
+                }
+                else after_slash.val := True
+            | '!' -> tag.val := None
+            | '>' ->
+                if after_slash_v then do {
+                  ind_curr.val := ind_curr.val - 2;
+                  tag.val := None
+                }
+                else check_tag_stack c
+            | c -> do {
+                check_tag_stack c;
+                if after_less_v then ind_curr.val := ind_curr.val + 2 else ();
+              } ];
+            Buffer.add_char b c;
+            loop (i + 1)
+          } ]
+    }
 ;
