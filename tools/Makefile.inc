@@ -1,10 +1,10 @@
-# $Id: Makefile.inc,v 5.4 2006-10-26 14:06:36 ddr Exp $
+# $Id: Makefile.inc,v 5.5 2006-11-25 18:54:52 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh $(PPDEF)
 CAMLP4F=-DUNIX
 PPDEF=$(TOP)/src/ppdef.cmo
-CAMLP4D=$$(camlp4 -where)
+CAMLP4D="$$(camlp4 -where)"
 LIBUNIX=-cclib -lunix
 OCAMLC=ocamlc.opt -warn-error A
 OCAMLOPT=ocamlopt.opt -warn-error A
