@@ -1,4 +1,4 @@
-/* $Id: random_css.txt,v 1.1 2006-11-27 13:23:21 ddr Exp $ */
+/* $Id: random_css.txt,v 1.2 2006-11-27 13:25:07 ddr Exp $ */
 /* Copyright (c) 2006 INRIA */
 
 %random.init;
@@ -54,3 +54,4 @@
 #lang a { display: block; font-size: %sz;%% }
 #lang .item img { display: none }
 #content { margin-%pos;: 15%%; width: auto }
+/* end random_css */

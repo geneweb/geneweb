@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.23 2006-11-27 11:32:43 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.24 2006-11-27 13:23:21 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -41,7 +41,8 @@ sv: Genealogi
     %else;
       #user-info { float: %right; }
       #title-band { display: table; width: 100%% }
-      #title-band > div { display: table-cell }
+      #title-band > * { display: table-row }
+      #title-band > * > * { display: table-cell }
       #title { text-align: center;; vertical-align: middle; width: 100%% }
       #title { color: %highlight; }
       #lang { text-align: center }
@@ -113,14 +114,16 @@ sv: Genealogi
   <a href="%prefix_base;suicide=x"> </a>
 </div>
 
-<div id="title-band">
-  <div>
-    <a href="http://www.geneweb.org/"><img width="96" height="108"
-     src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
-     alt="GeneWeb"%/></a>
-  </div>
-  <div id="title">
-    <h1>[
+%( IE seems not to recognize style "display: table"; must use a table %)
+<table cellpadding="0" cellspacing="0" id="title-band">
+  <tr>
+    <td>
+      <a href="http://www.geneweb.org/"><img width="96" height="108"
+       src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
+       alt="GeneWeb"%/></a>
+    </td>
+    <td id="title">
+      <h1>[
 af: Genealogiese databasis
 ar: قاعدة المعلومات العائلية (جينيالوجيا)
 bg: Родословна база от данни
@@ -149,8 +152,9 @@ sl: Genealoška baza podatkov
 sv: Genealogisk databas
 zh: 网络家谱
 ]</h1>
-  </div>
-</div>
+    </td>
+  </tr>
+</table>
 
 <div id="lang">
   <div class="title">
@@ -311,9 +315,11 @@ zh: 现有 %base.nb_persons; 人在数据库中。
 
 %if;(not wizard and not just_friend_wizard)
   %if;(not cgi and bvar.auth_file = "")
-    <div style="text-align: center; display: table; margin: auto">
-      <div style="display: table-row">
-        <div style="display: table-cell; padding: 1em 100px">
+    %( IE seems not to recognize style "display: table"; must use a table %)
+    <table cellpadding="0" cellspacing="0"%sp;
+     style="text-align: center; display: table; margin: auto">
+      <tr style="display: table-row">
+        <td style="display: table-cell; padding: 1em 100px">
           %apply;interp([
 af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
     </a> toegang<br%/> (password)
@@ -362,9 +368,9 @@ sl: Urejanje kot <a href="%prefix;w=w"><em>"%sq;
 sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
     </a> tillträde<br%/> (passord)
 ])%nl;
-        </div>
+        </td>
         %if;(not friend)
-          <div style="display: table-cell; padding: 1em 100px">
+          <td style="display: table-cell; padding: 1em 100px">
             %apply;interp([
 af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
@@ -392,10 +398,10 @@ ro: Acces pentru <a href="%prefix;w=f"><em>amici</em></a><br%/> (parola)
 sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
 sv: <a href="%prefix;w=f"><em>Vän</em></a> tillträde<br%/> (passord)
 ])%nl;
-          </div>
+          </td>
         %end;
-      </div>
-    </div>
+      </tr>
+    </table>
   %else;
     <div>
       <form method="post" action="%action;">
@@ -469,15 +475,19 @@ sv: För att navigera i denna databas, kan du söka:
 zh:
 ])%nl;
     </div>
-    <div style="display: table; margin: auto">
-      <ul style="list-style: none">
-        <li>
-          <div>
-            <form method="get" action="%action;">
+    %( IE seems not to recognize style "display: table"; must use a table %)
+    <table cellpadding="0" cellspacing="0"%sp;
+     style="display: table; margin: auto">
+      <tr style="display: table-row">
+        <td style="display: table-cell">
+          <ul style="list-style: none">
+            <li>
               <div>
-                %hidden;
-                <input type="hidden" name="m" value="NG"%/>
-                <label><span class="highlight">- [
+                <form method="get" action="%action;">
+                  <div>
+                    %hidden;
+                    <input type="hidden" name="m" value="NG"%/>
+                    <label><span class="highlight">- [
 af: per persoon
 ar: عن فرد
 bg: по име на човек
@@ -507,48 +517,48 @@ sl: osebo:
 sv: efter person
 zh: 搜索：
 ]</span>
-                <input name="n" size="40" maxlength="200"%/></label>
-                <input type="submit" value="Ok"%/>
+                    <input name="n" size="40" maxlength="200"%/></label>
+                    <input type="submit" value="Ok"%/>
+                  </div>
+                  <ul style="text-align: %left;">
+                    <li>
+                      <label><input type="radio" name="t" value="PN"
+                       checked="checked" id="tPN"%/>
+                      <em>[first name/first names]0</em>
+                      <em>[surname/surnames]0</em> [or]
+                      <em>[public name]</em> [or]
+                      <em>[alias]</em>%sq;
+                      %if;browsing_with_sosa_ref; [or]
+                        %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
+                      %end;%nl;
+                      </label>
+                    </li>
+                    <li>
+                      <label><input type="radio" name="t" value="P"
+                       id="tP"%/>
+                      <em>[first name/first names]0</em></label>
+                    </li>
+                    <li>
+                      <label><input type="radio" name="t" value="N"
+                       id="tN"%/>
+                      <em>[surname/surnames]0</em></label>
+                    </li>
+                 </ul>
+                </form>
               </div>
-              <ul style="text-align: %left;">
-                <li>
-                  <label><input type="radio" name="t" value="PN"
-                   checked="checked" id="tPN"%/>
-                  <em>[first name/first names]0</em>
-                  <em>[surname/surnames]0</em> [or]
-                  <em>[public name]</em> [or]
-                  <em>[alias]</em>%sq;
-                  %if;browsing_with_sosa_ref; [or]
-                    %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
-                  %end;%nl;
-                  </label>
-                </li>
-                <li>
-                  <label><input type="radio" name="t" value="P"
-                   id="tP"%/>
-                  <em>[first name/first names]0</em></label>
-                </li>
-                <li>
-                  <label><input type="radio" name="t" value="N"
-                   id="tN"%/>
-                  <em>[surname/surnames]0</em></label>
-                </li>
-             </ul>
-            </form>
-          </div>
-        </li>
-        %if;(bvar.propose_titles != "no")%nl;
-          <li>
-            <form method="get" action="%action;">
-              <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td valign="top">
-                    <span class="highlight">-&nbsp;</span>
-                  </td>
-                  <td align="%left;">
-                    %hidden;
-                    <input type="hidden" name="m" value="TT"%/>
-                    <label><span class="highlight">[
+            </li>
+            %if;(bvar.propose_titles != "no")%nl;
+              <li>
+                <form method="get" action="%action;">
+                  <table cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td valign="top">
+                        <span class="highlight">-&nbsp;</span>
+                      </td>
+                      <td align="%left;">
+                        %hidden;
+                        <input type="hidden" name="m" value="TT"%/>
+                        <label><span class="highlight">[
 af: by title
 bg: по титла
 br: dre ditl
@@ -576,31 +586,33 @@ sl: naziv:
 sv: efter titel
 zh: 根据名衔
 ]</span><br%/>
-                    <input name="t" size="14" maxlength="200"%/></label><br%/>
-                    (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
-                  </td>
-                  <td>...</td>
-                  <td align="%left;">
-                    <label><span class="highlight">[estate]0[
+                               <input name="t" size="14" maxlength="200"%/>%sq;
+                        </label><br%/>
+                               (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
+                             </td>
+                             <td>...</td>
+                             <td align="%left;">
+                               <label><span class="highlight">[estate]0[
 da:  (domæne, slægt)
 en:
 ]</span><br%/>
-                    <input name="p" size="25" maxlength="200"%/></label><br%/>
-                    (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
-                  </td>
-                  <td>
-                    <input type="submit" value="Ok"%/>
-                  </td>
-                </tr>
-              </table>
-            </form>
-          </li>
-        %end;
-        <li>
-          <form method="get" action="%action;">
-            <div>
-              %hidden;
-              <span class="highlight">- </span>[
+                        <input name="p" size="25" maxlength="200"%/>%sq;
+                        </label><br%/>
+                        (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
+                      </td>
+                      <td>
+                        <input type="submit" value="Ok"%/>
+                      </td>
+                    </tr>
+                  </table>
+                </form>
+              </li>
+            %end;
+            <li>
+              <form method="get" action="%action;">
+                <div>
+                  %hidden;
+                  <span class="highlight">- </span>[
 af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
 br: <span class="highlight">dre roll</span> an holl
@@ -629,8 +641,8 @@ sl: <span class="highlight">seznam</span> vseh
 sv: <span class="highlight">efter listan</span> av alla
 zh: 显示所的
 ]
-              <select name="m">
-                <option value="N" selected="selected">[
+                  <select name="m">
+                    <option value="N" selected="selected">[
 af: vanne
 bg: фамилни имена
 br: anvioù-familh
@@ -660,7 +672,7 @@ sl: priimkov
 sv: efternamn
 zh: 姓
 ]</option>
-                <option value="P">[
+                    <option value="P">[
 af: voorname
 bg: собствени имена
 br: raganvioù
@@ -689,8 +701,8 @@ sl: osebnih imen
 sv: förnamn
 zh: 名
 ]</option>
-              </select>
-              [
+                  </select>
+                  [
 af: volgens
 bg: ,&nbsp; подредени по
 br: dre
@@ -719,8 +731,8 @@ sl: po
 sv: sorterade i
 zh: 根据
 ]
-              <select name="tri">
-                <option value="A" selected="selected">[
+                  <select name="tri">
+                    <option value="A" selected="selected">[
 af: alfabeties volgorde
 bg: азбучен ред
 br: urzh al lizherenneg
@@ -749,7 +761,7 @@ sl: abecednem redu
 sv: bokstavsordning
 zh: 字母序
 ]</option>
-                <option value="F">[
+                    <option value="F">[
 af: frekwensie
 bg: честота на срещане
 br: stankted
@@ -778,21 +790,21 @@ sl: pogostosti
 sv: frekvensordning
 zh: 访问次数
 ]</option>
-              </select>
-              [
+                  </select>
+                  [
 en:
 et: järgi
 ]
-              <input type="submit" value="Ok"%/>
-            </div>
-          </form>
-        </li>
-        %if;(bvar.propose_place_surnames != "no")%nl;
-          <li>
-            <form method="get" action="%prefix;">
-              %hidden;
-              <input type="hidden" name="m" value="PS"%/>
-              <span class="highlight"> - [
+                  <input type="submit" value="Ok"%/>
+                </div>
+              </form>
+            </li>
+            %if;(bvar.propose_place_surnames != "no")%nl;
+              <li>
+                <form method="get" action="%prefix;">
+                  %hidden;
+                  <input type="hidden" name="m" value="PS"%/>
+                  <span class="highlight"> - [
 af: by
 bg: по
 br: dre
@@ -825,13 +837,13 @@ sv: efter
                       - [marriage/marriages]0
                         <input type="checkbox" name="ma" value="on"%/>
                       - <input type="submit" value="Ok"%/>
-            </form>
-          </li>
-        %end;
-        %if;(bvar.hide_advanced_request = "no")
-          <li>
-            <span class="highlight">-</span>
-            [
+                </form>
+              </li>
+            %end;
+            %if;(bvar.hide_advanced_request = "no")
+              <li>
+                <span class="highlight">-</span>
+                [
 af: <span class="highlight">deur 'n</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>detail
        navraag</b></font></a>.
@@ -907,10 +919,12 @@ sv: <span class="highlight">genom</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avancerad
        sökning</b></font></a>.
 ]
-          </li>
-        %end;
-      </ul>
-    </div>
+              </li>
+            %end;
+          </ul>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
 
@@ -945,10 +959,12 @@ sv: Du kan
 zh:
 ]
   </div>
-  <div style="text-align: center; display: table; margin: auto">
-    <div style="display: table-row">
+  %( IE seems not to recognize style "display: table"; must use a table %)
+  <table cellpadding="0" cellspacing="0"%sp;
+   style="text-align: center; display: table; margin: auto">
+    <tr style="display: table-row">
       %if;(bvar.propose_add_family != "no")
-        <div style="display: table-cell">
+        <td style="display: table-cell">
           <ul>
             <li>
               <a href="%prefix;m=ADD_FAM">[
@@ -981,10 +997,10 @@ zh: 增加家庭记录
 ]</a>
             </li>
           </ul>
-        </div>
+        </td>
       %end;
       %if;(not base.has_notes)
-        <div style="display: table-cell">
+        <td style="display: table-cell">
           <ul>
             <li>
               <a href="%prefix;m=MOD_NOTES">[
@@ -1016,10 +1032,10 @@ sv: ändra noteringar
 ]</a>
             </li>
           </ul>
-        </div>
+        </td>
       %end;
-    </div>
-  </div>
+    </tr>
+  </table>
 %end;
 
 <div style="text-align: center">
@@ -1053,9 +1069,11 @@ zh:
 ]
 </div>
 
-<div style="display: table; margin: auto; white-space:nowrap">
-  <div style="display: table-row">
-    <div style="display: table-cell">
+%( IE seems not to recognize style "display: table"; must use a table %)
+<table cellpadding="0" cellspacing="0"%sp;
+ style="display: table; margin: auto; white-space: nowrap">
+  <tr style="display: table-row">
+    <td style="display: table-cell">
       <ul>
         <li>
           <a href="%prefix;m=AN">[birthdays]</a>
@@ -1071,8 +1089,8 @@ zh:
           <a href="%prefix;m=STAT">[statistics]</a>
         </li>
       </ul>
-    </div>
-    <div style="display: table-cell">
+    </td>
+    <td style="display: table-cell">
       <ul>
       %if;has_history;%nl;
         <li>
@@ -1086,9 +1104,9 @@ zh:
           <a href="%prefix;m=FORUM">[database forum]</a>
         </li>
       </ul>
-    </div>
-  </div>
-</div>
+    </td>
+  </tr>
+</table>
 
 <div style="text-align: center">
   %apply;interp([
