@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.15 2006-11-25 18:12:07 ddr Exp $ *)
+(* $Id: templ.ml,v 5.16 2006-11-27 09:57:41 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1189,7 +1189,7 @@ value interp
   let print_var print_ast conf base env ep loc sl =
     match sl with
     [ ["include"; templ] ->
-        match  input conf templ with
+        match input conf templ with
         [ Some astl -> List.iter (print_ast env ep) astl
         | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
     | _ -> templ_print_var conf base (eval_var env ep loc) sl ]
