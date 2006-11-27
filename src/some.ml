@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.21 2006-11-01 16:59:59 ddr Exp $ *)
+(* $Id: some.ml,v 5.22 2006-11-27 09:57:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -349,6 +349,11 @@ value print_branch conf base psn name =
     }
 ;
 
+value alphabetic1 n1 n2 =
+  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2
+  else Gutil.alphabetic n1 n2
+;
+
 value print_by_branch x conf base (pl, homonymes) =
   let ancestors =
     match p_getenv conf.env "order" with
@@ -365,7 +370,7 @@ value print_by_branch x conf base (pl, homonymes) =
     | _ ->
         List.sort
           (fun p1 p2 ->
-             alphabetic (p_first_name base p1) (p_first_name base p2))
+             alphabetic1 (p_first_name base p1) (p_first_name base p2))
           pl ]
   in
   let len = List.length ancestors in
@@ -479,10 +484,6 @@ value first_char s =
     if len < String.length s then String.sub s 0 len
     else s
   else String.sub s (initial s) 1
-;
-
-value alphabetic1 n1 n2 =
-  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2 else Gutil.alphabetic n1 n2
 ;
 
 value print_family_alphabetic x conf base liste =

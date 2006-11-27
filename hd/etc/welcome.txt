@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.21 2006-11-25 21:30:19 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.22 2006-11-27 09:57:40 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -36,25 +36,24 @@ sv: Genealogi
   <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %highlight;; font-weight: bold }
-    #user-info { float: %right; }
-    #title-band { display: table; width: 100%% }
-    #title-band > div { display: table-cell }
-    #title { text-align: center; vertical-align: middle; width: 100%% }
-    #title { color: %highlight; }
-    %if;(evar.templ != "random")
-      body { background: url('%image_prefix;/gwback.jpg') }
+    %if;(evar.templ = "random")
+      %include.random_css;
+    %else;
+      #user-info { float: %right; }
+      #title-band { display: table; width: 100%% }
+      #title-band > div { display: table-cell }
+      #title { text-align: center;; vertical-align: middle; width: 100%% }
+      #title { color: %highlight; }
       #lang { text-align: center }
       #lang .title { font-size: 80%% }
       #lang .list { width: 100%% }
       #lang a { display: inline }
       #lang .item span { display: none }
-    %else;
-      %random_css;
     %end;
   --></style>
 %base_header;
 </head>
-<body>
+<body%if;(evar.templ != "random")%body_prop;%end;>
 
 <script type="text/javascript"><!--
   function WorkOnBrowser() {
@@ -221,14 +220,16 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
   </div>
 %end;
 
-<div>
-  <div id="content">
+%if;(bvar.motd2 != "")
+  <div>
     %apply;interp(bvar.motd2)
-    <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
-      <tr align="%left;">
-        <td align="center">
-          <p>
-            %apply;interp([
+  </div>
+%end;
+
+<div id="content">
+
+<div style="text-align: center; padding-top: 1em">
+  %apply;interp([
 af: Die databasis <span class="highlight">"%base.name;"</span> bevat%sq;
     tans %base.nb_persons; persone.
 ar: قاعدة المعلومات <span class="highlight">"%base.name;"</span>
@@ -286,29 +287,34 @@ sl: Baza podatkov <span class="highlight">"%base.name;"</span>
 sv: Databasen <span class="highlight">"%base.name;"</span>
     innehåller nu %base.nb_persons; personer.
 zh: 现有 %base.nb_persons; 人在数据库中。
-])%sq;
-            %if;base.has_notes;%nl;
-              <br%/>
-              (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)%sq;
-            %end;%sq;
-            %if;((bvar.wizard_passwd_file != "" or
-                  bvar.wizard_descr_file != "")
-                 and (wizard or wiznotes_dir_exists))%sq;
-              <br%/>
-              (<a href="%prefix;m=WIZNOTES">%sq;
-              [wizard/wizards/friend/friends]1</a>)%sq;
-            %end;%sq;
-            %if;has_misc_notes;%sq;
-              <br%/>
-              (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)%sq;
-            %end;%nl;
-          </p>%sq;
-          %if;(not wizard and not just_friend_wizard)
-            %if;(not cgi and bvar.auth_file = "")%nl;
-              <table border="0" width="70%%">
-                <tr align="%left;">
-                  <td align="center">
-                    %apply;interp([
+])
+</div>
+
+<div style="text-align: center">
+  %if;base.has_notes;
+    <div>
+      (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)
+    </div>
+  %end;
+  %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
+       and (wizard or wiznotes_dir_exists))
+    <div>
+      (<a href="%prefix;m=WIZNOTES">[wizard/wizards/friend/friends]1</a>)
+    </div>
+  %end;
+  %if;has_misc_notes;
+    <div>
+      (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)
+    </div>
+  %end;
+</div>
+
+%if;(not wizard and not just_friend_wizard)
+  %if;(not cgi and bvar.auth_file = "")
+    <div style="text-align: center; display: table; margin: auto">
+      <div style="display: table-row">
+        <div style="display: table-cell; padding: 1em 100px">
+          %apply;interp([
 af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
     </a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
@@ -355,11 +361,11 @@ sl: Urejanje kot <a href="%prefix;w=w"><em>"%sq;
     [wizard/wizards/friend/friends]0"</em></a> (geslo)
 sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
     </a> tillträde<br%/> (passord)
-])<br%/>
-                  </td>%sq;
-                  %if;(not friend)
-                    <td align="center">
-                      %apply;interp([
+])%nl;
+        </div>
+        %if;(not friend)
+          <div style="display: table-cell; padding: 1em 100px">
+            %apply;interp([
 af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
 bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
 br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a>%sq;
@@ -385,18 +391,16 @@ pt: Entrada <a href="%prefix;w=f"><em>amigo</em></a><br%/> (palavra chave)
 ro: Acces pentru <a href="%prefix;w=f"><em>amici</em></a><br%/> (parola)
 sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
 sv: <a href="%prefix;w=f"><em>Vän</em></a> tillträde<br%/> (passord)
-])
-                    </td>
-                  %end;%nl;
-                </tr>
-              </table>%sq;
-            %else;
-              <table border="0">
-                <tr align="%left;">
-                  <td align="center">
-                    <form method="post" action="%action;">
-                      %hidden;
-                      [
+])%nl;
+          </div>
+        %end;
+      </div>
+    </div>
+  %else;
+    <div>
+      <form method="post" action="%action;">
+        %hidden;
+        [
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
     <em>администратор</em>:
@@ -423,20 +427,17 @@ ro: Parola, pentru acces de <em>amic</em> sau <em>magician</em>:
 sv: Passord, för <em>vänner</em> eller <em>administratör</em>
     tillträde:
 ]
-                      <input name="w" type="password" size="10" %sq;
-                       maxlength="200"%/>
-                      <input type="submit" value="Ok"%/>
-                    </form>
-                  </td>
-                </tr>
-              </table>
-            %end;%nl;
-            <br%/>%sq;
-          %end;%nl;
-          <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-              <td align="%left;">
-                %apply;interp([
+        <input name="w" type="password" size="10" maxlength="200"%/>
+        <input type="submit" value="Ok"%/>
+      </form>
+    </div>
+  %end;
+%end;
+
+<div style="margin-top: 1em">
+  <div>
+    <div style="text-align: center">
+      %apply;interp([
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 ar: بإمكانك البحث في هذه القاعدة:
 bg: Можете да използвате тази база от данни за търсене:
@@ -467,14 +468,15 @@ sl: Da bi pregledali vašo bazo podatkov, lahko iščete:
 sv: För att navigera i denna databas, kan du söka:
 zh:
 ])%nl;
-                <br%/>
-                <ul style="list-style:none">
-                  <li>
-                    <form method="get" action="%action;">
-                      <p>
-                        %hidden;
-                        <input type="hidden" name="m" value="NG"%/>
-                        <label><span class="highlight">- [
+    </div>
+    <div style="display: table; margin: auto">
+      <ul style="list-style: none">
+        <li>
+          <div>
+            <form method="get" action="%action;">
+              %hidden;
+              <input type="hidden" name="m" value="NG"%/>
+              <label><span class="highlight">- [
 af: per persoon
 ar: عن فرد
 bg: по име на човек
@@ -504,47 +506,47 @@ sl: osebo:
 sv: efter person
 zh: 搜索：
 ]</span>
-                        <input name="n" size="40" maxlength="200"%/></label>
-                        <input type="submit" value="Ok"%/>
-                      </p>
-                      <ul>
-                        <li>
-                          <label><input type="radio" name="t" value="PN"
-                           checked="checked" id="tPN"%/>
-                          <em>[first name/first names]0</em>
-                          <em>[surname/surnames]0</em> [or]
-                          <em>[public name]</em> [or]
-                          <em>[alias]</em>%sq;
-                          %if;browsing_with_sosa_ref; [or]
-                            %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
-                          %end;%nl;
-                          </label>
-                        </li>
-                        <li>
-                          <label><input type="radio" name="t" value="P"
-                           id="tP"%/>
-                          <em>[first name/first names]0</em></label>
-                        </li>
-                        <li>
-                          <label><input type="radio" name="t" value="N"
-                           id="tN"%/>
-                          <em>[surname/surnames]0</em></label>
-                        </li>
-                      </ul>
-                    </form>
-                  </li>%sq;
-                %if;(bvar.propose_titles != "no")%nl;
-                  <li>
-                    <form method="get" action="%action;">
-                      <table border="0" cellpadding="0" cellspacing="0">
-                        <tr>
-                          <td valign="top">
-                            <span class="highlight">-&nbsp;</span>
-                          </td>
-                          <td>
-                            %hidden;
-                            <input type="hidden" name="m" value="TT"%/>
-                            <label><span class="highlight">[
+            <input name="n" size="40" maxlength="200"%/></label>
+            <input type="submit" value="Ok"%/>
+            <ul style="text-align: left">
+              <li>
+                <label><input type="radio" name="t" value="PN"
+                 checked="checked" id="tPN"%/>
+                <em>[first name/first names]0</em>
+                <em>[surname/surnames]0</em> [or]
+                <em>[public name]</em> [or]
+                <em>[alias]</em>%sq;
+                %if;browsing_with_sosa_ref; [or]
+                  %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
+                %end;%nl;
+                </label>
+              </li>
+              <li>
+                <label><input type="radio" name="t" value="P"
+                 id="tP"%/>
+                <em>[first name/first names]0</em></label>
+              </li>
+              <li>
+                <label><input type="radio" name="t" value="N"
+                 id="tN"%/>
+                <em>[surname/surnames]0</em></label>
+              </li>
+            </ul>
+          </form>
+        </div>
+      </li>
+      %if;(bvar.propose_titles != "no")%nl;
+        <li>
+          <form method="get" action="%action;">
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td valign="top">
+                  <span class="highlight">-&nbsp;</span>
+                </td>
+                <td>
+                  %hidden;
+                  <input type="hidden" name="m" value="TT"%/>
+                  <label><span class="highlight">[
 af: by title
 bg: по титла
 br: dre ditl
@@ -572,33 +574,31 @@ sl: naziv:
 sv: efter titel
 zh: 根据名衔
 ]</span><br%/>
-                            <input name="t" size="14"
-                             maxlength="200"%/></label><br%/>
-                            (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
-                          </td>
-                          <td>...</td>
-                          <td>
-                            <label><span class="highlight">[estate]0[
+                  <input name="t" size="14" maxlength="200"%/></label><br%/>
+                  (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
+                </td>
+                <td>...</td>
+                <td>
+                  <label><span class="highlight">[estate]0[
 da:  (domæne, slægt)
 en:
 ]</span><br%/>
-                            <input name="p" size="25"
-                             maxlength="200"%/></label><br%/>
-                            (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
-                          </td>
-                          <td>
-                            <input type="submit" value="Ok"%/>
-                          </td>
-                        </tr>
-                      </table>
-                    </form>
-                  </li>%sq;
-                %end;%nl;
-                  <li>
-                    <form method="get" action="%action;">
-                      <p>
-                        %hidden;
-                        <span class="highlight">- </span>[
+                  <input name="p" size="25" maxlength="200"%/></label><br%/>
+                  (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
+                </td>
+                <td>
+                  <input type="submit" value="Ok"%/>
+                </td>
+              </tr>
+            </table>
+          </form>
+        </li>
+      %end;
+      <li>
+        <form method="get" action="%action;">
+          <p>
+            %hidden;
+            <span class="highlight">- </span>[
 af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
 br: <span class="highlight">dre roll</span> an holl
@@ -627,8 +627,8 @@ sl: <span class="highlight">seznam</span> vseh
 sv: <span class="highlight">efter listan</span> av alla
 zh: 显示所的
 ]
-                        <select name="m">
-                          <option value="N" selected="selected">[
+            <select name="m">
+              <option value="N" selected="selected">[
 af: vanne
 bg: фамилни имена
 br: anvioù-familh
@@ -658,7 +658,7 @@ sl: priimkov
 sv: efternamn
 zh: 姓
 ]</option>
-                          <option value="P">[
+              <option value="P">[
 af: voorname
 bg: собствени имена
 br: raganvioù
@@ -687,8 +687,8 @@ sl: osebnih imen
 sv: förnamn
 zh: 名
 ]</option>
-                        </select>
-                        [
+            </select>
+            [
 af: volgens
 bg: ,&nbsp; подредени по
 br: dre
@@ -717,8 +717,8 @@ sl: po
 sv: sorterade i
 zh: 根据
 ]
-                        <select name="tri">
-                          <option value="A" selected="selected">[
+            <select name="tri">
+              <option value="A" selected="selected">[
 af: alfabeties volgorde
 bg: азбучен ред
 br: urzh al lizherenneg
@@ -747,7 +747,7 @@ sl: abecednem redu
 sv: bokstavsordning
 zh: 字母序
 ]</option>
-                          <option value="F">[
+              <option value="F">[
 af: frekwensie
 bg: честота на срещане
 br: stankted
@@ -776,21 +776,21 @@ sl: pogostosti
 sv: frekvensordning
 zh: 访问次数
 ]</option>
-                        </select>
+            </select>
 [
 en:
 et: järgi
 ]
-                        <input type="submit" value="Ok"%/>
-                      </p>
-                    </form>
-                  </li>%sq;
-                %if;(bvar.propose_place_surnames != "no")%nl;
-                  <li>
-                    <form method="get" action="%prefix;">
-                      %hidden;
-                      <input type="hidden" name="m" value="PS"%/>
-                      <span class="highlight"> - [
+            <input type="submit" value="Ok"%/>
+          </p>
+        </form>
+      </li>
+      %if;(bvar.propose_place_surnames != "no")%nl;
+        <li>
+          <form method="get" action="%prefix;">
+            %hidden;
+            <input type="hidden" name="m" value="PS"%/>
+            <span class="highlight"> - [
 af: by
 bg: по
 br: dre
@@ -823,13 +823,13 @@ sv: efter
                       - [marriage/marriages]0
                         <input type="checkbox" name="ma" value="on"%/>
                       - <input type="submit" value="Ok"%/>
-                    </form>
-                  </li>%sq;
-                %end;%sq;
-                %if;(bvar.hide_advanced_request = "no")
-                  <li>
-                    <span class="highlight">-</span>
-                    [
+          </form>
+        </li>
+      %end;
+      %if;(bvar.hide_advanced_request = "no")
+        <li>
+          <span class="highlight">-</span>
+          [
 af: <span class="highlight">deur 'n</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>detail
        navraag</b></font></a>.
@@ -905,20 +905,16 @@ sv: <span class="highlight">genom</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avancerad
        sökning</b></font></a>.
 ]
-                  </li>
-                %end;%nl;
-                </ul>
-              </td>
-            </tr>
-          </table>%sq;
-        %if;(wizard and
-             (not base.has_notes or bvar.propose_add_family != "no"))%nl;
-          <table border="0" cellspacing="0" cellpadding="0"
-           style="text-align:center">
-            <tr>
-              <td>
-                <div>
-                  [
+          </li>
+        %end;
+      </ul>
+    </div>
+  </div>
+</div>
+
+%if;(wizard and (not base.has_notes or bvar.propose_add_family != "no"))
+  <div style="text-align: center">
+    [
 af: Jy kan
 bg: Можете още
 br: Gellout a rit
@@ -946,14 +942,14 @@ sl: Lahko:
 sv: Du kan
 zh:
 ]
-                </div>
-                <table border="0" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td>
-                      <ul style="list-style:inside">%sq;
-                      %if;(bvar.propose_add_family != "no")%nl;
-                        <li>
-                          <a href="%prefix;m=ADD_FAM">[
+  </div>
+  <div style="text-align: center; display: table; margin: auto">
+    <div style="display: table-row">
+      %if;(bvar.propose_add_family != "no")
+        <div style="display: table-cell">
+          <ul>
+            <li>
+              <a href="%prefix;m=ADD_FAM">[
 af: 'n familie byvoeg
 bg: да добавите семейство
 br: ouzhpennañ ur familh
@@ -981,15 +977,15 @@ sl: dodate družino
 sv: lägga till en familj
 zh: 增加家庭记录
 ]</a>
-                        </li>
-                      </ul>
-                    </td>
-                    <td align="%left;">
-                      <ul style="list-style:inside">%sq;
-                      %end;%sq;
-                      %if;(not base.has_notes)%nl;
-                        <li>
-                          <a href="%prefix;m=MOD_NOTES">[
+            </li>
+          </ul>
+        </div>
+      %end;
+      %if;(not base.has_notes)
+        <div style="display: table-cell">
+          <ul>
+            <li>
+              <a href="%prefix;m=MOD_NOTES">[
 af: die notas wysig
 bg: да промените бележките
 br: kemm an notennoù
@@ -1016,21 +1012,16 @@ ru: изменить заметку
 sl: spremenite zapiske
 sv: ändra noteringar
 ]</a>
-                        </li>%sq;
-                      %end;%nl;
-                      </ul>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>%sq;
-        %end;%nl;
-          <table border="0" style="text-align:center">
-            <tr>
-              <td>
-                <div>
-                  [
+            </li>
+          </ul>
+        </div>
+      %end;
+    </div>
+  </div>
+%end;
+
+<div style="text-align: center">
+  [
 af: Jy kan ook kyk na
 bg: Можете също да се насочите към
 br: Gellout a rit ivez gweladenniñ
@@ -1058,51 +1049,47 @@ sl: Lahko pregledate:
 sv: Du kan också konsultera
 zh:
 ]
-                </div>
-                <table border="0" style="white-space:nowrap">
-                  <tr align="%left;">
-                    <td valign="top">
-                      <ul style="list-style:inside">
-                        <li>
-                          <a href="%prefix;m=AN">[birthdays]</a>
-                        </li>
-                        <li>
-                          <a href="%prefix;m=AD">%sq;
-                          [anniversaries of dead people]</a>
-                        </li>
-                        <li>
-                          <a href="%prefix;m=AM">[anniversaries of marriage]</a>
-                        </li>
-                        <li>
-                          <a href="%prefix;m=STAT">[statistics]</a>
-                        </li>
-                      </ul>
-                    </td>
-                    <td valign="top">
-                      <ul style="list-style:inside">%sq;
-                      %if;has_history;%nl;
-                        <li>
-                          <a href="%prefix;m=HIST;k=20">[history of updates]</a>
-                        </li>%sq;
-                      %end;%nl;
-                        <li>
-                          <a href="%prefix;m=CAL">[calendar/calendars]1</a>
-                        </li>
-                        <li>
-                          <a href="%prefix;m=FORUM">[database forum]</a>
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-          <table border="0">
-            <tr>
-              <td>
-                <div>
-                  %apply;interp([
+</div>
+
+<div style="display: table; margin: auto; white-space:nowrap">
+  <div style="display: table-row">
+    <div style="display: table-cell">
+      <ul>
+        <li>
+          <a href="%prefix;m=AN">[birthdays]</a>
+        </li>
+        <li>
+          <a href="%prefix;m=AD">%sq;
+          [anniversaries of dead people]</a>
+        </li>
+        <li>
+          <a href="%prefix;m=AM">[anniversaries of marriage]</a>
+        </li>
+        <li>
+          <a href="%prefix;m=STAT">[statistics]</a>
+        </li>
+      </ul>
+    </div>
+    <div style="display: table-cell">
+      <ul>
+      %if;has_history;%nl;
+        <li>
+          <a href="%prefix;m=HIST;k=20">[history of updates]</a>
+        </li>%sq;
+      %end;%nl;
+        <li>
+          <a href="%prefix;m=CAL">[calendar/calendars]1</a>
+        </li>
+        <li>
+          <a href="%prefix;m=FORUM">[database forum]</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center">
+  %apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
@@ -1117,7 +1104,7 @@ da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome;
     af dem på denne side, siden %start_date;.
 de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon
     %nb_accesses_to_welcome; auf diese Seite.
-en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome;
+en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome;%sp;
     of them to this page, since %start_date;.
 eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al
     ĉi tiu paĝo, ekde la %start_date;.
@@ -1158,14 +1145,10 @@ sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
 zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
 ])%nl;
-                </div>
-              </td>
-            </tr>
-          </table>
-          <table border="0">
-            <tr>
-              <td>
-                %apply;interp([
+</div>
+
+<div style="margin-top: 1em; padding: 0 120px">
+  %apply;interp([
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
     href="%prefix;escache=0">link</a>.
@@ -1246,16 +1229,10 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%prefix;escache=0">härifrån</a>.
 ])%nl;
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-    <br%/>
-    <p style="text-align: %right;">
-      <span style="font-size: 80%%"><em><a
-       href="%prefix;m=LEX">[
+</div>
+
+<div style="text-align: %right;; font-size: 80%%">
+  <em><a href="%prefix;m=LEX">[
 bg: лексикон
 br: geriaoueg
 ca: Lèxic
@@ -1277,11 +1254,10 @@ ro: lexicon
 sl: leksikon
 sv: lexikon
 zh: 本站使用的术语
-]</a></em></span>
-    </p>
-    <br%/>
-  </div>
-</div>%nl;%sq;
+]</a></em>
+</div>
+
+</div>
 
 %copyright;
 %base_trailer;
