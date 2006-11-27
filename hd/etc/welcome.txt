@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.24 2006-11-27 13:23:21 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.25 2006-11-27 13:47:05 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -1090,7 +1090,7 @@ zh:
         </li>
       </ul>
     </td>
-    <td style="display: table-cell">
+    <td style="display: table-cell" valign="top">
       <ul>
       %if;has_history;%nl;
         <li>
