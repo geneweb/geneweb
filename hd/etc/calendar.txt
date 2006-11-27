@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: calendar.txt,v 5.5 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: calendar.txt,v 5.6 2006-11-27 10:15:51 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
@@ -43,7 +43,7 @@
       %foreach;integer_range(1, vvv)
         <option value="%integer;"%nn;
          %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
-           %apply;capitalize%with;%apply;nth([lll]n, integer-1)%end;
+           %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
         </option>
       %end;
     </select>
@@ -115,19 +115,19 @@
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]0</th>
-  %apply;calendar("g", "gregorian", 12, "(month)", "year")
+  %apply;calendar("g", "gregorian", 12, [(month)], "year")
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]1</th>
-  %apply;calendar("j", "julian", 12, "(month)", "julian_year")
+  %apply;calendar("j", "julian", 12, [(month)], "julian_year")
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]2</th>
-  %apply;calendar("f", "french", 13, "(french revolution month)", "year")
+  %apply;calendar("f", "french", 13, [(french revolution month)], "year")
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]3</th>
-  %apply;calendar("h", "hebrew", 13, "(hebrew month)", "year")
+  %apply;calendar("h", "hebrew", 13, [(hebrew month)], "year")
   </tr>
   </table>
   </form>
