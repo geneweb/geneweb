@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updhist.txt,v 5.9 2006-11-22 00:27:14 ddr Exp $ -->
+  <!-- $Id: updhist.txt,v 5.10 2006-11-27 15:27:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none"%/>
@@ -48,16 +48,13 @@
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
-    %if;(evar.m != "HIST_SEARCH" or not found)
-      %apply;search_form("")
-    %end;
   </td></tr></table>
 %end;
 
 <h1 style="text-align:center" class="highlight">[*history of updates]</h1>
 
 %if;(not cancel_links and (evar.m != "HIST_SEARCH" or not found))
-  <br%/>
+  %apply;search_form("")
 %end;
 
 %define;update_text(uu)
