@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.55 2006-11-23 09:52:35 ddr Exp $
+# $Id: lex_utf8.txt,v 5.56 2006-11-27 10:18:24 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -2852,6 +2852,7 @@ sv: fortsätt slå samman
     continued
 bg: следва
 da: fortsat
+de: fortgesetzt
 en: continued
 fr: suite
 it: continua
@@ -3905,6 +3906,7 @@ sv: för förnamnen i bokstavsordning
     for the list ordered by the date of the last modification
 bg: за списъка по дати на последно изменение
 da: for en liste sorteret efter datoen for seneste ændring
+de: für eine, nach dem Datum der letzten Änderung geordnete Liste
 en: for the list ordered by the date of the last modification
 fr: pour la liste par date de dernière modification
 it: per la lista ordinata secondo la data dell'ultima modifica
@@ -7572,6 +7574,7 @@ sv: syskon
     since the last click
 bg: от последното щракване
 da: siden det sidste klik
+de: seit dem letzten click
 en: since the last click
 fr: depuis le dernier clic
 it: dall'ultimo click
