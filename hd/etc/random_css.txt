@@ -1,4 +1,4 @@
-/* $Id: random_css.txt,v 1.2 2006-11-27 13:25:07 ddr Exp $ */
+/* $Id: random_css.txt,v 1.3 2006-11-27 13:30:42 ddr Exp $ */
 /* Copyright (c) 2006 INRIA */
 
 %random.init;
@@ -10,12 +10,12 @@
 %let;f;%random.3;%in;
 %let;fs;%random.2;%in;
 #title { vertical-align: bottom%sq;
-  %if;(random.2 = 0); text-decoration: underline%end;
+  %if;(random.2 = 0); text-decoration: underline%end;%sq;
   %if;(f = 0);%sp;
-    font-family: Verdana, Arial, Helvetica, sans-serif;%sp;
-  %elseif;(f = 1);
+    font-family: Verdana, Arial, Helvetica, sans-serif%sq;
+  %elseif;(f = 1);%sp;
     font-family: Georgia, serif;%sp
-    font-variant: small-caps
+    font-variant: small-caps%sq;
   %end;
   %if;(fs = 0); font-style: italic%end; }
 #title { color: %highlight; }
