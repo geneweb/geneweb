@@ -1,0 +1,56 @@
+/* $Id: random_css.txt,v 1.1 2006-11-27 13:23:21 ddr Exp $ */
+/* Copyright (c) 2006 INRIA */
+
+%random.init;
+
+#user-info { float: %right; }
+#title-band { display: table; width: 100%% }
+#title-band > div { display: table-cell }
+#title { text-align: center; width: 100%% }
+%let;f;%random.3;%in;
+%let;fs;%random.2;%in;
+#title { vertical-align: bottom%sq;
+  %if;(random.2 = 0); text-decoration: underline%end;
+  %if;(f = 0);%sp;
+    font-family: Verdana, Arial, Helvetica, sans-serif;%sp;
+  %elseif;(f = 1);
+    font-family: Georgia, serif;%sp
+    font-variant: small-caps
+  %end;
+  %if;(fs = 0); font-style: italic%end; }
+#title { color: %highlight; }
+
+%let;r;%random.8;%in;
+%if;(r = 0)
+  body { background: #cf9; color: #660 }
+  :link { color: #069 } :visited { color: #030 }
+%elseif;(r = 1)
+  body { background: #fc0; color: #300 }
+  :link { color: #c00 } :visited { color: #606 }
+%elseif;(r = 2)
+  body { background: #9cc; color: #006 }
+  :link { color: #00c } :visited { color: #036 }
+%elseif;(r = 3)
+  body { background: #cc6; color: #300 }
+  :link { color: #c00 } :visited { color: #030 }
+%elseif;(r = 4)
+  body { background: #ffe; color: #000 }
+  :link { color: #069 } :visited { color: #900 }
+%elseif;(r = 5)
+  body { background: #ccc; color: #000 }
+  :link { color: #00c } :visited { color: #606 }
+%elseif;(r = 6)
+  body { background: #fff; color: #333 }
+  :link { color: #069 } :visited { color: #990 }
+%elseif;(r = 7)
+  body { background: #ff9; color: #300 }
+  :link { color: #c00 } :visited { color: #333 }
+%end;
+
+%let;pos;%if;(random.2 = 0)%left;%else;%right;%end;%in;
+%let;sz;%if;(random.2 = 0)100%else;70%end;%in;
+#lang .title { display : none }
+#lang { width: 15%%; float: %pos;; text-align: %pos; }
+#lang a { display: block; font-size: %sz;%% }
+#lang .item img { display: none }
+#content { margin-%pos;: 15%%; width: auto }
