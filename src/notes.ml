@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.16 2006-11-20 17:07:56 ddr Exp $ *)
+(* $Id: notes.ml,v 5.17 2006-11-27 15:11:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -343,20 +343,23 @@ value update_notes_links_db conf fnotes s force =
     NotesLinks.update_db bdir fnotes (list_nt, list_ind)
 ;
 
-value commit_notes conf base fnotes s =
+value commit_notes conf base fnotes s =  do {
   let pg =
     if fnotes = "" then NotesLinks.PgNotes
     else NotesLinks.PgMisc fnotes
   in
   let fname = path_of_fnotes fnotes in
-  do {
-    Mutil.mkdir_p (Filename.dirname (file_path conf base fname));
-    try commit_notes base fname s with
-    [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
-    History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
-    update_notes_links_db conf pg s True;
-  }
-;
+  let fpath =
+    List.fold_left Filename.concat
+      (Util.base_path [] (conf.bname ^ ".gwb"))
+      [base_notes_dir base; fname]
+  in
+  Mutil.mkdir_p (Filename.dirname fpath);
+  try Gwdb.commit_notes base fname s with
+  [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
+  History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
+  update_notes_links_db conf pg s True;
+};
 
 value print_mod_ok conf base =
   let fname =
