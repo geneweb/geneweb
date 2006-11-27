@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.22 2006-11-27 09:57:40 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.23 2006-11-27 11:32:43 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -474,9 +474,10 @@ zh:
         <li>
           <div>
             <form method="get" action="%action;">
-              %hidden;
-              <input type="hidden" name="m" value="NG"%/>
-              <label><span class="highlight">- [
+              <div>
+                %hidden;
+                <input type="hidden" name="m" value="NG"%/>
+                <label><span class="highlight">- [
 af: per persoon
 ar: عن فرد
 bg: по име на човек
@@ -506,47 +507,48 @@ sl: osebo:
 sv: efter person
 zh: 搜索：
 ]</span>
-            <input name="n" size="40" maxlength="200"%/></label>
-            <input type="submit" value="Ok"%/>
-            <ul style="text-align: left">
-              <li>
-                <label><input type="radio" name="t" value="PN"
-                 checked="checked" id="tPN"%/>
-                <em>[first name/first names]0</em>
-                <em>[surname/surnames]0</em> [or]
-                <em>[public name]</em> [or]
-                <em>[alias]</em>%sq;
-                %if;browsing_with_sosa_ref; [or]
-                  %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
-                %end;%nl;
-                </label>
-              </li>
-              <li>
-                <label><input type="radio" name="t" value="P"
-                 id="tP"%/>
-                <em>[first name/first names]0</em></label>
-              </li>
-              <li>
-                <label><input type="radio" name="t" value="N"
-                 id="tN"%/>
-                <em>[surname/surnames]0</em></label>
-              </li>
-            </ul>
-          </form>
-        </div>
-      </li>
-      %if;(bvar.propose_titles != "no")%nl;
-        <li>
-          <form method="get" action="%action;">
-            <table border="0" cellpadding="0" cellspacing="0">
-              <tr>
-                <td valign="top">
-                  <span class="highlight">-&nbsp;</span>
-                </td>
-                <td>
-                  %hidden;
-                  <input type="hidden" name="m" value="TT"%/>
-                  <label><span class="highlight">[
+                <input name="n" size="40" maxlength="200"%/></label>
+                <input type="submit" value="Ok"%/>
+              </div>
+              <ul style="text-align: %left;">
+                <li>
+                  <label><input type="radio" name="t" value="PN"
+                   checked="checked" id="tPN"%/>
+                  <em>[first name/first names]0</em>
+                  <em>[surname/surnames]0</em> [or]
+                  <em>[public name]</em> [or]
+                  <em>[alias]</em>%sq;
+                  %if;browsing_with_sosa_ref; [or]
+                    %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
+                  %end;%nl;
+                  </label>
+                </li>
+                <li>
+                  <label><input type="radio" name="t" value="P"
+                   id="tP"%/>
+                  <em>[first name/first names]0</em></label>
+                </li>
+                <li>
+                  <label><input type="radio" name="t" value="N"
+                   id="tN"%/>
+                  <em>[surname/surnames]0</em></label>
+                </li>
+             </ul>
+            </form>
+          </div>
+        </li>
+        %if;(bvar.propose_titles != "no")%nl;
+          <li>
+            <form method="get" action="%action;">
+              <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td valign="top">
+                    <span class="highlight">-&nbsp;</span>
+                  </td>
+                  <td align="%left;">
+                    %hidden;
+                    <input type="hidden" name="m" value="TT"%/>
+                    <label><span class="highlight">[
 af: by title
 bg: по титла
 br: dre ditl
@@ -574,31 +576,31 @@ sl: naziv:
 sv: efter titel
 zh: 根据名衔
 ]</span><br%/>
-                  <input name="t" size="14" maxlength="200"%/></label><br%/>
-                  (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
-                </td>
-                <td>...</td>
-                <td>
-                  <label><span class="highlight">[estate]0[
+                    <input name="t" size="14" maxlength="200"%/></label><br%/>
+                    (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
+                  </td>
+                  <td>...</td>
+                  <td align="%left;">
+                    <label><span class="highlight">[estate]0[
 da:  (domæne, slægt)
 en:
 ]</span><br%/>
-                  <input name="p" size="25" maxlength="200"%/></label><br%/>
-                  (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
-                </td>
-                <td>
-                  <input type="submit" value="Ok"%/>
-                </td>
-              </tr>
-            </table>
-          </form>
-        </li>
-      %end;
-      <li>
-        <form method="get" action="%action;">
-          <p>
-            %hidden;
-            <span class="highlight">- </span>[
+                    <input name="p" size="25" maxlength="200"%/></label><br%/>
+                    (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
+                  </td>
+                  <td>
+                    <input type="submit" value="Ok"%/>
+                  </td>
+                </tr>
+              </table>
+            </form>
+          </li>
+        %end;
+        <li>
+          <form method="get" action="%action;">
+            <div>
+              %hidden;
+              <span class="highlight">- </span>[
 af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
 br: <span class="highlight">dre roll</span> an holl
@@ -627,8 +629,8 @@ sl: <span class="highlight">seznam</span> vseh
 sv: <span class="highlight">efter listan</span> av alla
 zh: 显示所的
 ]
-            <select name="m">
-              <option value="N" selected="selected">[
+              <select name="m">
+                <option value="N" selected="selected">[
 af: vanne
 bg: фамилни имена
 br: anvioù-familh
@@ -658,7 +660,7 @@ sl: priimkov
 sv: efternamn
 zh: 姓
 ]</option>
-              <option value="P">[
+                <option value="P">[
 af: voorname
 bg: собствени имена
 br: raganvioù
@@ -687,8 +689,8 @@ sl: osebnih imen
 sv: förnamn
 zh: 名
 ]</option>
-            </select>
-            [
+              </select>
+              [
 af: volgens
 bg: ,&nbsp; подредени по
 br: dre
@@ -717,8 +719,8 @@ sl: po
 sv: sorterade i
 zh: 根据
 ]
-            <select name="tri">
-              <option value="A" selected="selected">[
+              <select name="tri">
+                <option value="A" selected="selected">[
 af: alfabeties volgorde
 bg: азбучен ред
 br: urzh al lizherenneg
@@ -747,7 +749,7 @@ sl: abecednem redu
 sv: bokstavsordning
 zh: 字母序
 ]</option>
-              <option value="F">[
+                <option value="F">[
 af: frekwensie
 bg: честота на срещане
 br: stankted
@@ -776,21 +778,21 @@ sl: pogostosti
 sv: frekvensordning
 zh: 访问次数
 ]</option>
-            </select>
-[
+              </select>
+              [
 en:
 et: järgi
 ]
-            <input type="submit" value="Ok"%/>
-          </p>
-        </form>
-      </li>
-      %if;(bvar.propose_place_surnames != "no")%nl;
-        <li>
-          <form method="get" action="%prefix;">
-            %hidden;
-            <input type="hidden" name="m" value="PS"%/>
-            <span class="highlight"> - [
+              <input type="submit" value="Ok"%/>
+            </div>
+          </form>
+        </li>
+        %if;(bvar.propose_place_surnames != "no")%nl;
+          <li>
+            <form method="get" action="%prefix;">
+              %hidden;
+              <input type="hidden" name="m" value="PS"%/>
+              <span class="highlight"> - [
 af: by
 bg: по
 br: dre
@@ -823,13 +825,13 @@ sv: efter
                       - [marriage/marriages]0
                         <input type="checkbox" name="ma" value="on"%/>
                       - <input type="submit" value="Ok"%/>
-          </form>
-        </li>
-      %end;
-      %if;(bvar.hide_advanced_request = "no")
-        <li>
-          <span class="highlight">-</span>
-          [
+            </form>
+          </li>
+        %end;
+        %if;(bvar.hide_advanced_request = "no")
+          <li>
+            <span class="highlight">-</span>
+            [
 af: <span class="highlight">deur 'n</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>detail
        navraag</b></font></a>.
