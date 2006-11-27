@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.76 2006-11-25 18:12:07 ddr Exp $ *)
+(* $Id: util.ml,v 5.77 2006-11-27 10:02:40 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2634,27 +2634,27 @@ value ind_curr = ref 0;
 value bol = ref False;
 value after_less = ref False;
 value after_slash = ref False;
-value tag = ref None;
+value curr_tag = ref None;
 value stack_in_error = ref False;
 value tag_stack = ref [];
 value check_tag_stack c =
   if stack_in_error.val then ()
   else
-    match tag.val with
+    match curr_tag.val with
     [ Some (tag1, topen, tag_found) ->
         match c with
-        [ ' ' -> tag.val := Some (tag1, topen, True)
+        [ ' ' -> curr_tag.val := Some (tag1, topen, True)
         | '>' ->
             if topen then do {
               tag_stack.val := [tag1 :: tag_stack.val];
-              tag.val := None
+              curr_tag.val := None
             }
             else
               match tag_stack.val with
               [ [tag2 :: rest] ->
                   if tag1 = tag2 then do {
                     tag_stack.val := rest;
-                    tag.val := None
+                    curr_tag.val := None
                   }
                   else do {
                     Printf.eprintf "Tag <%s> ended by </%s>\n" tag2 tag1;
@@ -2666,7 +2666,7 @@ value check_tag_stack c =
                 } ]
         | c ->
             if tag_found then ()
-            else tag.val := Some (tag1 ^ String.make 1 c, topen, False) ] 
+            else curr_tag.val := Some (tag1 ^ String.make 1 c, topen, False) ]
     | None -> () ]
 ;
 value xml_pretty_print s =
@@ -2698,19 +2698,19 @@ value xml_pretty_print s =
             match c with
             [ '<' -> do {
                 after_less.val := True;
-                tag.val := Some ("", True, False);
+                curr_tag.val := Some ("", True, False);
               }
             | '/' ->
                 if after_less_v then do {
                   ind_curr.val := ind_curr.val - 2;
-                  tag.val := Some ("", False, False);
+                  curr_tag.val := Some ("", False, False);
                 }
                 else after_slash.val := True
-            | '!' -> tag.val := None
+            | '!' -> curr_tag.val := None
             | '>' ->
                 if after_slash_v then do {
                   ind_curr.val := ind_curr.val - 2;
-                  tag.val := None
+                  curr_tag.val := None
                 }
                 else check_tag_stack c
             | c -> do {
