@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.15 2006-10-25 03:50:28 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.16 2006-11-28 18:46:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -59,7 +59,7 @@ value digest_children base ipl =
     List.map
       (fun ip ->
          let p = poi base ip in
-         (get_first_name p, get_surname p, get_occ p))
+         (sou base (get_first_name p), sou base (get_surname p), get_occ p))
       ipl
   in
   Iovalue.digest l

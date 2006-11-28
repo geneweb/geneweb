@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.139 2006-11-20 02:56:51 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.140 2006-11-28 18:46:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -414,17 +414,6 @@ value get_titles =
         p.Def.titles ]
 ;
 
-value person_with_key p fn sn oc =
-  match (p, fn, sn) with
-  [ (Person p, Istr fn, Istr sn) ->
-      Person {(p) with first_name = fn; surname = sn; occ = oc}
-  | (Person2 db2 i, Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
-      failwith "not impl person_with_key 1"
-  | (Person2Gen db2 p, Istr2New _ fn, Istr2New _ sn) ->
-      Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
-  | _ -> failwith "not impl person_with_key 2" ]
-;
-
 value person_with_related p r =
   match p with
   [ Person p -> Person {(p) with related = r}
@@ -774,6 +763,21 @@ value sou base i =
   | (Base2 _, Istr2 db2 f pos) -> string_of_istr2 db2 f pos
   | (Base2 _, Istr2New db2 s) -> s
   | _ -> assert False ]
+;
+
+value person_with_key p fn sn oc =
+  match (p, fn, sn) with
+  [ (Person p, Istr fn, Istr sn) ->
+      Person {(p) with first_name = fn; surname = sn; occ = oc}
+  | (Person2 db2 i, Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
+      failwith "not impl person_with_key 1"
+  | (Person2Gen db2 p, Istr2New _ fn, Istr2New _ sn) ->
+      Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+  | (Person2 db2 i,  Istr2New _ fn, Istr2New _ sn) ->
+      let p = gen_person_of_person (Person2 db2 i) in
+      let p = map_person_ps (fun ip -> ip) (sou (Base2 db2)) p in
+      Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+  | _ -> failwith "not impl person_with_key 2" ]
 ;
 
 value nb_of_persons base =
