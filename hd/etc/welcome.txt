@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.27 2006-11-28 16:12:27 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.28 2006-11-28 17:05:13 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -1167,7 +1167,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 ])%nl;
 </div>
 
-<div style="margin-top: 1em; padding: 0 120px">
+<div style="margin-top: 1em; padding: 0 20%%">
   %apply;interp([
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
