@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.22 2006-11-27 09:57:41 ddr Exp $ *)
+(* $Id: some.ml,v 5.23 2006-11-28 16:09:49 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -240,7 +240,12 @@ value she_has_children_with_her_name conf base wife husband children =
 
 value max_lev = 3;
 
-value child_has_children_with_same_name base des name =
+value has_children_with_that_name base des name =
+  List.exists (fun ip -> p_surname base (poi base ip) = name)
+    (Array.to_list (get_children des))
+;
+
+value child_has_children_with_that_name base des name =
   List.exists
     (fun ip ->
        List.exists
@@ -273,20 +278,21 @@ value print_branch conf base psn name =
                get_sex p = Female &&
                she_has_children_with_her_name conf base p c el ||
                get_sex p = Male &&
-               child_has_children_with_same_name base des name
+               (has_children_with_that_name base des name ||
+                child_has_children_with_that_name base des name)
              in
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.mem i unsel_list) in
              (fam, des, c, if down then Some (string_of_int i, sel) else None))
           (Array.to_list (get_family u))
       in
-      let select =
+      let first_select =
         match family_list with
         [ [(_, _, _, select) :: _] -> select
         | _ -> None ]
       in
       if lev = 0 then () else Wserver.wprint "<dd>\n";
-      Util.print_selection_bullet conf select;
+      Util.print_selection_bullet conf first_select;
       Wserver.wprint "<strong>";
       Wserver.wprint "%s"
         (Util.reference conf base p
