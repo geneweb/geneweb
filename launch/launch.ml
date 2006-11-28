@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.26 2006-11-20 13:26:07 ddr Exp $ *)
+(* $Id: launch.ml,v 1.27 2006-11-28 13:38:22 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -14,7 +14,7 @@ type state =
     bases_dir : mutable string;
     browser_lang : mutable bool;
     digest_auth : mutable bool;
-    server_running : mutable bool }
+    server_running : mutable option int }
 ;
 
 value trace = ref False;
@@ -106,22 +106,30 @@ value exec prog args out err =
   Unix.create_process prog (Array.of_list [prog :: args]) Unix.stdin out err
 ;
 
-value close_server state = do {
-  eprintf "Closing..."; flush stderr;
-  (* Making a (empty) file STOP_SERVER to make the server stop. *)
-  let stop_server =
-    List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
-  in
-  let oc = open_out stop_server in
-  close_out oc;
-  (* Send a phony connection to unblock it. *)
-  let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
-  try Unix.connect s (Unix.ADDR_INET Unix.inet_addr_loopback state.port) with
-  [ Unix.Unix_error _ _ _ -> () ];
-  try Unix.close s with
-  [ Unix.Unix_error _ _ _ -> () ];
-  eprintf "\n"; flush stderr;
-};
+value close_server state =
+  match state.server_running with
+  [ Some server_pid -> do {
+      eprintf "Closing..."; flush stderr;
+      (* Making a (empty) file STOP_SERVER to make the server stop. *)
+      let stop_server =
+        List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
+      in
+      let oc = open_out stop_server in
+      close_out oc;
+      (* Send a phony connection to unblock it. *)
+      let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
+      try
+        Unix.connect s (Unix.ADDR_INET Unix.inet_addr_loopback state.port)
+      with
+      [ Unix.Unix_error _ _ _ -> () ];
+      try Unix.close s with
+      [ Unix.Unix_error _ _ _ -> () ];
+      let _ : (int * _) = Unix.waitpid [] server_pid in
+      state.server_running := None;
+      eprintf "\n"; flush stderr;
+    }
+  | None -> () ]
+;
 
 value browse browser port dbn =
   let pid =
@@ -131,21 +139,17 @@ value browse browser port dbn =
           exec browser [sprintf "http://localhost:%d/%s" port dbn]
             Unix.stdout Unix.stderr
         in
-        let (pid, _) = Unix.waitpid [Unix.WNOHANG] browser_pid in
+        let (pid, _) = Unix.waitpid [] browser_pid in
         pid
     | None -> -1 ]
   in
-  if pid = 0 then ()
-  else do {
+  if pid = -1 then do {
     eprintf "Open http://localhost:%d/%s in your favorite browser.\n"
       port dbn;
     flush stderr;
   }
+  else ()
 ;
-
-value close_app state = do {
-  if state.server_running then close_server state else ();
-};
 
 value window_centering win = do {
   let main_frame = Frame.create win [] in
@@ -293,7 +297,6 @@ value rec show_main state = do {
          (fun _ -> do {
             Pack.forget [gframe];
             close_server state;
-            Unix.sleep 1;
             launch_server state;
           })]
   in
@@ -354,7 +357,6 @@ and change_options state = do {
            state.digest_auth := Textvariable.get tv3 = "digest";
            Pack.forget [gframe];
            close_server state;
-           Unix.sleep 1;
            launch_server state;
          })
     in
@@ -464,7 +466,7 @@ and launch_server state = do {
     flush stderr;
     exit 2;
   };
-  state.server_running := True;
+  state.server_running := Some server_pid;
   show_main state;
 };
 
@@ -772,7 +774,7 @@ value main () = do {
     {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
      sys_dir = default_sys_dir; port = default_port;
      browser = default_browser; bases_dir = default_bases_dir;
-     browser_lang = True; digest_auth = False; server_running = False}
+     browser_lang = True; digest_auth = False; server_running = None}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
@@ -781,7 +783,7 @@ value main () = do {
 
   Sys.catch_break True;
   try mainLoop () with [ Sys.Break -> () ];
-  close_app state;
+  close_server state;
   eprintf "Bye\n"; flush stderr;
 };
 
