@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.10 2006-11-24 19:39:02 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.11 2006-11-28 15:20:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Printf;
@@ -8,9 +8,7 @@ value sock_out = ref "wserver.sou";
 value stop_server = ref "STOP_SERVER";
 value noproc = ref False;
 
-value wserver_oc =
-  do { set_binary_mode_out stdout True; ref stdout }
-;
+value wserver_oc = ref stdout;
 
 value wrap_string = ref (fun s -> s);
 
@@ -175,7 +173,7 @@ value print_exc exc =
       }
   | x ->
       do {
-        prerr_string "Uncaught exception: ";
+        prerr_string "Wserver: uncaught exception: ";
         prerr_string (Obj.magic (Obj.field (Obj.field (Obj.repr x) 0) 0));
         if Obj.size (Obj.repr x) > 1 then do {
           prerr_char '(';
@@ -342,6 +340,7 @@ value treat_connection tmout callback addr fd =
     in
     try callback (addr, request) script_name contents with
     [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
+    | Sys_error "Broken pipe" -> ()
     | exc -> print_err_exc exc ];
     try wflush () with _ -> ();
     try flush stderr with _ -> ();
@@ -507,8 +506,7 @@ value accept_connection tmout max_clients callback s =
             try do {
               if max_clients = None && Unix.fork () <> 0 then exit 0 else ();
               Unix.close s;
-              Unix.dup2 t Unix.stdout;
-              Unix.dup2 t Unix.stdin;
+              wserver_oc.val := Unix.out_channel_of_descr t;
 (*  
    j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
               try Unix.close t with _ -> ();
@@ -670,6 +668,7 @@ value f addr_opt port tmout max_clients g =
           [ Unix.Unix_error Unix.ECONNRESET "accept" _ -> ()
           | Unix.Unix_error (Unix.EBADF | Unix.ENOTSOCK) "accept" _ as x ->
               (* oops! *) raise x
+          | Sys_error "Broken pipe" -> ()
           | exc -> print_err_exc exc ];
           try wflush () with [ Sys_error _ -> () ];
           try flush stdout with [ Sys_error _ -> () ];
