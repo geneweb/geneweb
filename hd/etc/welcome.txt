@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.26 2006-11-28 05:11:41 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.27 2006-11-28 16:12:27 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -520,7 +520,7 @@ zh: 搜索：
                     <input name="n" size="40" maxlength="200"%/></label>
                     <input type="submit" value="Ok"%/>
                   </div>
-                  <ul style="text-align: %left;">
+                  <ul style="text-align: %left;; list-style: none">
                     <li>
                       <label><input type="radio" name="t" value="PN"
                        checked="checked" id="tPN"%/>
