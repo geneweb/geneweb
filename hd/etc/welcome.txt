@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.25 2006-11-27 13:47:05 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.26 2006-11-28 05:11:41 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -480,8 +480,8 @@ zh:
      style="display: table; margin: auto">
       <tr style="display: table-row">
         <td style="display: table-cell">
-          <ul style="list-style: none">
-            <li>
+          <dl>
+            <dd>
               <div>
                 <form method="get" action="%action;">
                   <div>
@@ -546,9 +546,9 @@ zh: 搜索：
                  </ul>
                 </form>
               </div>
-            </li>
+            </dd>
             %if;(bvar.propose_titles != "no")%nl;
-              <li>
+              <dd>
                 <form method="get" action="%action;">
                   <table cellpadding="0" cellspacing="0">
                     <tr>
@@ -606,9 +606,9 @@ en:
                     </tr>
                   </table>
                 </form>
-              </li>
+              </dd>
             %end;
-            <li>
+            <dd>
               <form method="get" action="%action;">
                 <div>
                   %hidden;
@@ -798,9 +798,9 @@ et: järgi
                   <input type="submit" value="Ok"%/>
                 </div>
               </form>
-            </li>
+            </dd>
             %if;(bvar.propose_place_surnames != "no")%nl;
-              <li>
+              <dd>
                 <form method="get" action="%prefix;">
                   %hidden;
                   <input type="hidden" name="m" value="PS"%/>
@@ -838,10 +838,10 @@ sv: efter
                         <input type="checkbox" name="ma" value="on"%/>
                       - <input type="submit" value="Ok"%/>
                 </form>
-              </li>
+              </dd>
             %end;
             %if;(bvar.hide_advanced_request = "no")
-              <li>
+              <dd>
                 <span class="highlight">-</span>
                 [
 af: <span class="highlight">deur 'n</span>
@@ -919,9 +919,9 @@ sv: <span class="highlight">genom</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avancerad
        sökning</b></font></a>.
 ]
-              </li>
+              </dd>
             %end;
-          </ul>
+          </dl>
         </td>
       </tr>
     </table>
