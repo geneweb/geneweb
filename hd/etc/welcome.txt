@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.28 2006-11-28 17:05:13 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.29 2006-11-29 18:08:51 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -35,10 +35,10 @@ sv: Genealogi
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
   <style type="text/css"><!--
-    span.highlight { color: %highlight;; font-weight: bold }
     %if;(evar.templ = "random")
       %include.random_css;
     %else;
+      span.highlight { color: %highlight;; font-weight: bold }
       #user-info { float: %right; }
       #title-band { display: table; width: 100%% }
       #title-band > * { display: table-row }
