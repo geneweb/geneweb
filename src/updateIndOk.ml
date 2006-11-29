@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.37 2006-11-18 13:32:27 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.38 2006-11-29 10:16:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -474,9 +474,7 @@ value effective_mod conf base sp =
         Name.lower (nominative sp.surname) <> Name.lower osn)
     then do {
       patch_key base pi sp.first_name sp.surname sp.occ;
-      if Name.crush_lower (ofn ^ " " ^ osn) <> Name.crush_lower key then
-        person_ht_add base key pi
-      else ();
+      person_ht_add base key pi
     }
     else ();
     check_sex_married conf base sp op;
