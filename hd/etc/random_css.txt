@@ -1,10 +1,34 @@
-/* $Id: random_css.txt,v 1.4 2006-11-29 10:14:46 ddr Exp $ */
+/* $Id: random_css.txt,v 1.5 2006-11-29 17:17:19 ddr Exp $ */
 /* Copyright (c) 2006 INRIA */
+
+%define;bright_pastel_color()
+  %let;h;%random.255;%in;
+  %let;s;%random.64;%in;
+  %let;v;%expr(192 + random.64)%in;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%sq;
+%end;
+
+%define;dark_col()
+  %let;h;%random.255;%in;
+  %let;s;255%in;
+  %let;v;160%in;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%sq;
+%end;
 
 %random.init;
 
+%( cannot use apply;brigth_pastel_color: does not work... %)
+%let;h;%random.255;%in;
+%let;s;%random.64;%in;
+%let;v;%expr(192 + random.64)%in;
+%let;bg;
+  rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
+      %apply;blue_of_hsv(h, s, v))%in;
+
 #user-info { float: %right; }
-#title-band { display: table; width: 100%% }
+#title-band { display: table; width: 100%%; background: %bg;; padding: 5px }
 #title-band > div { display: table-cell }
 #title { text-align: center; width: 100%% }
 %let;f;%random.3;%in;
@@ -20,40 +44,18 @@
   %if;(fs = 0); font-style: italic%end; }
 #title { color: %highlight; }
 
-%let;r;%random.8;%in;
-%if;(r = 0)
-  body { background: #cf9; color: #660 }
-  :link { color: #069 } :visited { color: #030 }
-%elseif;(r = 1)
-  body { background: #fc0; color: #300 }
-  :link { color: #c00 } :visited { color: #606 }
-%elseif;(r = 2)
-  body { background: #9cc; color: #006 }
-  :link { color: #00c } :visited { color: #036 }
-%elseif;(r = 3)
-  body { background: #cc6; color: #300 }
-  :link { color: #c00 } :visited { color: #030 }
-%elseif;(r = 4)
-  body { background: #ffe; color: #000 }
-  :link { color: #069 } :visited { color: #900 }
-%elseif;(r = 5)
-  body { background: #ccc; color: #000 }
-  :link { color: #00c } :visited { color: #606 }
-%elseif;(r = 6)
-  body { background: #fff; color: #333 }
-  :link { color: #069 } :visited { color: #990 }
-%elseif;(r = 7)
-  body { background: #ff9; color: #300 }
-  :link { color: #c00 } :visited { color: #333 }
-%end;
+body { margin: 0; background: %apply;bright_pastel_color();%sp;
+       color: %apply;dark_col() }
+:link { color: %apply;dark_col() } :visited { color: %apply;dark_col() }
 
 %let;pos;%if;(random.2 = 0)%left;%else;%right;%end;%in;
 %let;sz;%if;(random.2 = 0)100%else;70%end;%in;
 #lang .title { display : none }
-#lang { width: 15%%; float: %pos;; text-align: %pos; }
+#lang { width: 10%%; float: %pos;; text-align: %pos;; background: %bg; }
+#lang { padding: 30px 10px 500px 10px }
 #lang a { display: block; font-size: %sz;%% }
 #lang a { text-decoration: none }
 #lang a:hover { text-decoration: underline }
 #lang .item img { display: none }
-#content { margin-%pos;: 15%%; width: auto }
+#content { margin-%pos;: 10%%; width: auto }
 /* end random_css */

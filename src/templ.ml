@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.16 2006-11-27 09:57:41 ddr Exp $ *)
+(* $Id: templ.ml,v 5.17 2006-11-29 17:17:19 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1158,6 +1158,39 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
     conf.env
 ;
 
+value float_rgb_of_hsv h s v =
+  let h = if h > 1. then 1. else if h < 0. then 0. else h in
+  let s = if s > 1. then 1. else if s < 0. then 0. else s in
+  let v = if v > 1. then 1. else if v < 0. then 0. else v in
+  let h = if h = 1.0 then 0. else h in
+  let h = h *. 6. in
+  let i = truncate h in
+  let f = h -. float i in
+  let p = v *. (1. -. s) in
+  let q = v *. (1. -. s *. f) in
+  let t = v *. (1. -. s *. (1. -. f)) in
+  match i with
+  [ 0 -> (v, t, p)
+  | 1 -> (q, v, p)
+  | 2 -> (p, v, t)
+  | 3 -> (p, q, v)
+  | 4 -> (t, p, v)
+  | 5 -> (v, p, q)
+  | _ -> assert False ]
+;
+
+value rgb_of_hsv h s v =
+  let (r, g, b) =
+    float_rgb_of_hsv (float h /. 256.) (float s /. 256.) (float v /. 256.)
+  in
+  (truncate (r *. 256.), truncate (g *. 256.), truncate (b *. 256.))
+;
+
+value rgb_of_str_hsv h s v =
+  let ios s = int_of_string s in
+  rgb_of_hsv (ios h) (ios s) (ios v)
+;
+
 value interp
   conf base fname eval_var eval_transl eval_predefined_apply get_vother
   set_vother print_foreach
@@ -1224,7 +1257,15 @@ value interp
         VVstring (eval_apply env ep loc f vl)
     | x -> VVstring (eval_expr env ep x) ]
   and eval_ast_expr_list env ep v =
-    match List.map (eval_ast_expr env ep) v with
+    let rec loop =
+      fun
+      [ [] -> []
+     | [Avar _ "sq" []; Atext loc s :: al] ->
+         let s = squeeze_spaces s in
+         loop [Atext loc s :: al]
+      | [a :: al] -> [eval_ast_expr env ep a :: loop al] ]
+    in
+    match loop v with
     [ [e] -> e
     | el ->
         let sl = List.map string_of_expr_val el in
@@ -1256,6 +1297,24 @@ value interp
         | ("nth", [VVstring s1; VVstring s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
             Util.translate_eval (Util.nth_field s1 n)
+        | ("red_of_hsv", [VVstring h; VVstring s; VVstring v]) ->
+            try
+              let (r, g, b) = rgb_of_str_hsv h s v in
+              string_of_int r
+            with
+            [ Failure _ -> "red_of_hsv bad params" ]
+        | ("green_of_hsv", [VVstring h; VVstring s; VVstring v]) ->
+            try
+              let (r, g, b) = rgb_of_str_hsv h s v in
+              string_of_int g
+            with
+            [ Failure _ -> "green_of_hsv bad params" ]
+        | ("blue_of_hsv", [VVstring h; VVstring s; VVstring v]) ->
+            try
+              let (r, g, b) = rgb_of_str_hsv h s v in
+              string_of_int b
+            with
+            [ Failure _ -> "blue_of_hsv bad params" ]
         | _ ->
             try eval_predefined_apply env f vl with
             [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
