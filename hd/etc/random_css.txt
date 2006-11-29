@@ -1,4 +1,4 @@
-/* $Id: random_css.txt,v 1.5 2006-11-29 17:17:19 ddr Exp $ */
+/* $Id: random_css.txt,v 1.6 2006-11-29 17:37:36 ddr Exp $ */
 /* Copyright (c) 2006 INRIA */
 
 %define;bright_pastel_color()
@@ -27,7 +27,7 @@
   rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
       %apply;blue_of_hsv(h, s, v))%in;
 
-#user-info { float: %right; }
+#user-info { float: %right;; padding: 10px }
 #title-band { display: table; width: 100%%; background: %bg;; padding: 5px }
 #title-band > div { display: table-cell }
 #title { text-align: center; width: 100%% }
@@ -48,10 +48,11 @@ body { margin: 0; background: %apply;bright_pastel_color();%sp;
        color: %apply;dark_col() }
 :link { color: %apply;dark_col() } :visited { color: %apply;dark_col() }
 
-%let;pos;%if;(random.2 = 0)%left;%else;%right;%end;%in;
+%let;pos1;%if;(random.2 = 0)%left;%else;%right;%end;%in;
+%let;pos2;%if;(random.2 = 0)%left;%else;%right;%end;%in;
 %let;sz;%if;(random.2 = 0)100%else;70%end;%in;
 #lang .title { display : none }
-#lang { width: 10%%; float: %pos;; text-align: %pos;; background: %bg; }
+#lang { width: 10%%; float: %pos1;; text-align: %pos2;; background: %bg; }
 #lang { padding: 30px 10px 500px 10px }
 #lang a { display: block; font-size: %sz;%% }
 #lang a { text-decoration: none }
