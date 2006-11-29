@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.29 2006-11-29 18:08:51 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.30 2006-11-29 20:48:16 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -50,6 +50,7 @@ sv: Genealogi
       #lang .list { width: 100%% }
       #lang a { display: inline }
       #lang .item span { display: none }
+      #content .subtitle { text-align: center }
     %end;
   --></style>
 %base_header;
@@ -294,7 +295,7 @@ zh: 现有 %base.nb_persons; 人在数据库中。
 ])
 </div>
 
-<div style="text-align: center">
+<div class="subtitle">
   %if;base.has_notes;
     <div>
       (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)

@@ -1,4 +1,4 @@
-/* $Id: random_css.txt,v 1.7 2006-11-29 20:15:35 ddr Exp $ */
+/* $Id: random_css.txt,v 1.8 2006-11-29 20:48:16 ddr Exp $ */
 /* Copyright (c) 2006 INRIA */
 
 %define;bright_pastel_color()
@@ -19,15 +19,15 @@
 
 %random.init;
 
-%( cannot use apply;bright_pastel_color: does not work... %)
 %let;h;%random.255;%in;
-%let;s;%random.64;%in;
+%let;s;%random.128;%in;
 %let;v;%expr(160 + random.96)%in;
 %let;bg;
   rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
       %apply;blue_of_hsv(h, s, v))%sq;
 %in;
-%let;v;%expr(v + 20)%in;
+%let;h;%expr(h - 40 + random.80)%in;
+%let;v;%expr(v + 10 + random.20)%in;
 %let;bg2;
   rgb(%apply;red_of_hsv(h, s, v),%apply;green_of_hsv(h, s, v),%sq;
       %apply;blue_of_hsv(h, s, v))%sq;
@@ -35,7 +35,6 @@
 
 #user-info { float: %right;; padding: 10px }
 #title-band { display: table; width: 100%%; background: %bg;; padding: 5px }
-#title-band > div { display: table-cell }
 %let;fs;%random.3;%in;
 %let;ph;%random.3;%in;
 %let;pv;%random.3;%in;
@@ -44,8 +43,7 @@
          vertical-align: %sq;
            %if;(ph != 1 and pv = 0)top%sq;
            %elseif;(pv = 1)bottom%sq;
-           %else;middle%end;
-         %if;(random.2 = 0); text-decoration: underline%end; }
+           %else;middle%end }
 #title { %sq;
   font-family:%sp;
     %let;f;%random.8;%in;
@@ -68,6 +66,19 @@
 body { margin: 0; background: %bg2;; color: %apply;dark_col() }
 :link { color: %apply;dark_col() } :visited { color: %apply;dark_col() }
 
+body {%sp;
+  font-family:%sp;
+    %let;f;%random.8;%in;
+    %if;(f = 0)Times New Roman, serif%sq;
+    %elseif;(f = 1)Trebuchet MS, sans-serif%sq;
+    %elseif;(f = 2)Arial, Helvetica, sans-serif%sq;
+    %elseif;(f = 3)Verdana, Arial, Helvetica, sans-serif%sq;
+    %elseif;(f = 4)Courier New, Courier, monospace%sq;
+    %elseif;(f = 5)Georgia, serif%sq;
+    %elseif;(f = 6)Tahoma, sans-serif%sq;
+    %elseif;(f = 7)Palatino, serif%sq;
+    %end; }
+
 %let;pos1;%if;(random.2 = 0)%left;%else;%right;%end;%in;
 %let;pos2;%if;(random.2 = 0)%left;%else;%right;%end;%in;
 %let;sz;%if;(random.2 = 0)100%else;70%end;%in;
@@ -78,5 +89,7 @@ body { margin: 0; background: %bg2;; color: %apply;dark_col() }
 #lang a { text-decoration: none }
 #lang a:hover { text-decoration: underline }
 #lang .item img { display: none }
-#content { margin-%pos1;: 12%%; width: auto }
+#content { margin-%pos1;: 12%%; width: auto;%sp;
+           font-size: %expr(90 + random.30)%% }
+#content .subtitle { text-align: center }
 /* end random_css */
