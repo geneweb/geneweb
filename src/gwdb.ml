@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.140 2006-11-28 18:46:22 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.141 2006-12-01 12:57:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1573,6 +1573,23 @@ value dsk_person_of_person =
   [ Person p -> p
   | Person2 _ _ -> failwith "not impl dsk_person_of_person"
   | Person2Gen _ _ -> failwith "not impl dsk_person_of_person (gen)" ]
+;
+
+value date_of_last_change bname base =
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let s =
+    match base with
+    [ Base _ ->
+        try Unix.stat (Filename.concat bdir "patches") with
+        [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
+    | Base2 db2 ->
+        let bdir = Filename.concat bdir "base_d" in
+        try Unix.stat (Filename.concat bdir "patches") with
+        [ Unix.Unix_error _ _ _ -> Unix.stat bdir ] ]
+  in
+  s.Unix.st_mtime
 ;
 
 value check_magic ic magic id = do {
