@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.59 2006-12-03 21:50:24 ddr Exp $
+# $Id: lex_utf8.txt,v 5.60 2006-12-03 22:08:53 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -6333,6 +6333,10 @@ ro: numar de ramuri
 ru: число ветвей
 sl: število vej
 sv: antal grenar
+
+    number of still living persons:
+en: number of still living persons:
+fr: nombre de personnes encore vivantes :
 
     occupation
 af: beroep
