@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.17 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.18 2006-12-03 21:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -566,3 +566,47 @@ value print_statistics conf base =
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (fun _ -> raise Not_found) [] ()
 ;
+
+value print_population_pyramid conf base = do {
+  let interval =
+    match p_getint conf.env "i" with
+    [ Some i -> max 5 i
+    | None -> 10 ]
+  in
+  let t = Array.create (100 / interval) 0 in
+  let s = ref 0 in
+  for i = 0 to nb_of_persons base - 1 do {
+    let p = poi base (Adef.iper_of_int i) in
+    if get_death p = NotDead then do {
+      match Adef.od_of_codate (get_birth p) with
+      [ Some (Dgreg dmy _) ->
+          let a = CheckItem.time_elapsed dmy conf.today in
+          let j = a.year / interval in
+          if j < Array.length t then t.(j) := t.(j) + 1
+          else s.val := s.val + 1
+      | Some (Dtext _) | None -> () ];
+    }
+    else ()
+  };
+  let title _ = Wserver.wprint "%s" (capitale "population pyramid") in
+  Util.header conf title;
+  tag "ul" begin
+    for i = 0 to Array.length t - 1 do {
+      tag "li" begin
+        Wserver.wprint "%s %d\n"
+          (Printf.sprintf
+             (fcapitale (ftransl conf "from %d to %d years old:"))
+             (i * interval) ((i + 1) * interval - 1))
+          t.(i);
+      end;
+    };
+    tag "li" begin
+      Wserver.wprint "%s %d\n"
+        (Printf.sprintf
+           (fcapitale (ftransl conf "greater than %d years old:"))
+           (Array.length t * interval))
+        s.val;
+    end;
+  end;
+  Util.trailer conf;
+};

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.17 2006-11-29 17:17:19 ddr Exp $ *)
+(* $Id: templ.ml,v 5.18 2006-12-03 21:50:24 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -673,6 +673,7 @@ and eval_simple_variable conf env =
   [ "action" -> conf.command
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
+  | "compilation_time" -> Util.compilation_time conf
   | "doctype" -> Util.doctype conf ^ "\n"
   | "doctype_transitional" ->
       let doctype =
@@ -695,6 +696,7 @@ and eval_simple_variable conf env =
   | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
   | "right" -> conf.right
   | "sp" -> " "
+  | "version" -> Version.txt
   | "/" -> conf.xhs
   | s -> List.assoc s env ]
 ;
