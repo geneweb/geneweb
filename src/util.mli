@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.19 2006-12-01 12:57:31 ddr Exp $ *)
+(* $Id: util.mli,v 5.20 2006-12-03 21:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -225,6 +225,7 @@ value unselected_bullets : config -> list int;
 value short_f_month : int -> string;
 
 value compilation_time_hook : ref (config -> string);
+value compilation_time : config -> string;
 
 (* Reading password file *)
 
