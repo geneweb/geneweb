@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.30 2006-11-29 20:48:16 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.31 2006-12-03 21:49:33 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -107,7 +107,9 @@ sv: Genealogi
   %end;
   <a href="%prefix_base;lang=%evar.lang;
    %if;(evar.templ != "random");templ=random%end;"%sp;
-   style="text-decoration:none">*</a>
+   style="text-decoration:none">o</a>
+  <a href="%prefix_base;lang=%evar.lang;;templ=exp"%sp;
+   style="text-decoration:none">+</a>
   %if;(referer != "")
     <a href="%referer;"><img%sp;
     src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
