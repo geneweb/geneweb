@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.18 2006-12-03 21:50:24 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.19 2006-12-03 22:08:53 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -588,25 +588,37 @@ value print_population_pyramid conf base = do {
     }
     else ()
   };
-  let title _ = Wserver.wprint "%s" (capitale "population pyramid") in
+  let string_of_nb n =
+    Num.to_string_sep (transl conf "(thousand separator)")
+      (Num.of_int n)
+  in
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "population pyramid"))
+  in
   Util.header conf title;
   tag "ul" begin
     for i = 0 to Array.length t - 1 do {
       tag "li" begin
-        Wserver.wprint "%s %d\n"
+        Wserver.wprint "%s %s\n"
           (Printf.sprintf
              (fcapitale (ftransl conf "from %d to %d years old:"))
              (i * interval) ((i + 1) * interval - 1))
-          t.(i);
+          (string_of_nb t.(i));
       end;
     };
     tag "li" begin
-      Wserver.wprint "%s %d\n"
+      Wserver.wprint "%s %s\n"
         (Printf.sprintf
            (fcapitale (ftransl conf "greater than %d years old:"))
            (Array.length t * interval))
-        s.val;
+        (string_of_nb s.val);
     end;
+  end;
+  let sum = Array.fold_left \+ s.val t in
+  tag "p" begin
+    Wserver.wprint "%s %s"
+      (capitale (transl conf "number of still living persons:"))
+      (string_of_nb sum);
   end;
   Util.trailer conf;
 };
