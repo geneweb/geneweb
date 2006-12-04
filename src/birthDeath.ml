@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.24 2006-12-04 04:04:00 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.25 2006-12-04 17:36:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -579,10 +579,8 @@ value print_population_pyramid conf base = do {
     | _ -> 0 ]
   in
   let nb_intervals = 150 /interval in
-  let men = Array.create nb_intervals 0 in
-  let wom = Array.create nb_intervals 0 in
-  let gmen = ref 0 in
-  let gwom = ref 0 in
+  let men = Array.create (nb_intervals + 1) 0 in
+  let wom = Array.create (nb_intervals + 1) 0 in
   for i = 0 to nb_of_persons base - 1 do {
     let p = poi base (Adef.iper_of_int i) in
     let sex = get_sex p in
@@ -591,14 +589,10 @@ value print_population_pyramid conf base = do {
       match Adef.od_of_codate (get_birth p) with
       [ Some (Dgreg dmy _) ->
           let a = CheckItem.time_elapsed dmy conf.today in
+          let j = min nb_intervals (a.year / interval) in
           if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
-            let j = a.year / interval in
-            if j < nb_intervals then
-              if sex = Male then men.(j) := men.(j) + 1
-              else wom.(j) := wom.(j) + 1
-            else
-              if sex = Male then gmen.val := gmen.val + 1
-              else gwom.val := gwom.val + 1
+            if sex = Male then men.(j) := men.(j) + 1
+            else wom.(j) := wom.(j) + 1
           else ()
       | Some (Dtext _) | None -> () ];
     }
@@ -623,21 +617,21 @@ value print_population_pyramid conf base = do {
         xtag "img" "src=\"%s/%s\"%s alt=\"%s\"%s"
           (Util.image_prefix conf) iname wid_hei
           (transl_nth conf "M/F" 1) conf.xhs
-      else ();
+      else Wserver.wprint "&nbsp;";
     end
   in
   Util.header conf title;
-  let max_men = Array.fold_left max gmen.val men in
-  let max_wom = Array.fold_left max gwom.val wom in
-  let max_hum = max 1 (max max_men max_wom) in
+  let max_hum =
+    let max_men = Array.fold_left max 0 men in
+    let max_wom = Array.fold_left max 0 wom in
+    max 1 (max max_men max_wom)
+  in
   let max_size = 70 in
   let first_interv =
-    if gmen.val > 0 || gwom.val > 0 then nb_intervals
-    else
-      loop (nb_intervals - 1) where rec loop i =
-        if i <= 0 then 0
-        else if men.(i) > 0 || wom.(i) > 0 then i
-        else loop (i - 1)
+    loop nb_intervals where rec loop i =
+      if i <= 0 then 0
+      else if men.(i) > 0 || wom.(i) > 0 then i
+      else loop (i - 1)
   in
   tag "div" begin
     let c = "cellspacing=\"0\" cellpadding=\"0\"" in
@@ -645,8 +639,8 @@ value print_population_pyramid conf base = do {
       "border=\"%d\"%s width=\"50%%\" style=\"margin: auto\"" conf.border c
     begin
       for i = first_interv downto 0 do {
-        let nb_men = if i = nb_intervals then gmen.val else men.(i) in
-        let nb_wom = if i = nb_intervals then gwom.val else wom.(i) in
+        let nb_men = men.(i) in
+        let nb_wom = wom.(i) in
         tag "tr" begin
           print_image i "male.png";
           tag "td" "align=\"right\"" begin
@@ -692,28 +686,8 @@ value print_population_pyramid conf base = do {
       };
     end;
   end;
-(*
-  tag "ul" begin
-    tag "li" begin
-      Wserver.wprint "%s %s/%s\n"
-        (Printf.sprintf
-           (fcapitale (ftransl conf "greater than %d years old:"))
-           (nb_intervals * interval))
-        (string_of_nb gmen.val) (string_of_nb gwom.val);
-    end;
-    for i =nb_intervals - 1 downto 0 do {
-      tag "li" begin
-        Wserver.wprint "%s %s/%s\n"
-          (Printf.sprintf
-             (fcapitale (ftransl conf "from %d to %d years old:"))
-             (i * interval) ((i + 1) * interval - 1))
-          (string_of_nb men.(i)) (string_of_nb wom.(i));
-      end;
-    };
-  end;
-*)
-  let sum_men = Array.fold_left \+ gmen.val men in
-  let sum_wom = Array.fold_left \+ gwom.val wom in
+  let sum_men = Array.fold_left \+ 0 men in
+  let sum_wom = Array.fold_left \+ 0 wom in
   tag "p" begin
     Wserver.wprint "%s %s"
       (capitale (transl conf "number of living persons:"))
