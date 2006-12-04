@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.27 2006-11-28 13:38:22 ddr Exp $ *)
+(* $Id: launch.ml,v 1.28 2006-12-04 13:32:58 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -395,7 +395,8 @@ and new_database state = do {
                  if Sys.file_exists (db ^ ".gwb") then ()
                  else do {
                    let comm = Filename.concat state.bin_dir "gwc" in
-                   let _ = Sys.command (sprintf "\"%s\" -o %s" comm db) in
+                   let pid = exec comm ["-o"; db] Unix.stdout Unix.stderr in
+                   let (_, _) = Unix.waitpid [] pid in
                    Pack.forget [gframe];
                    show_main state;
                  }
