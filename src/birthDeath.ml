@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.25 2006-12-04 17:36:41 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.26 2006-12-04 19:39:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -627,6 +627,7 @@ value print_population_pyramid conf base = do {
     max 1 (max max_men max_wom)
   in
   let max_size = 70 in
+  let band_size n = (2 * max_size * n + max_hum) / (2 * max_hum) in
   let first_interv =
     loop nb_intervals where rec loop i =
       if i <= 0 then 0
@@ -654,7 +655,7 @@ value print_population_pyramid conf base = do {
                 stagn "td" "style=\"background: blue\"" begin
                   if nb_men = 0 then ()
                   else
-                    let n = max 1 (max_size * nb_men / max_hum) in
+                    let n = max 1 (band_size nb_men) in
                     for j = 1 to n do { Wserver.wprint "&nbsp;"; };
                 end;
               end;
@@ -670,7 +671,7 @@ value print_population_pyramid conf base = do {
                 stagn "td" "style=\"background: red\"" begin
                   if nb_wom = 0 then ()
                   else
-                    let n = max 1 (max_size * nb_wom / max_hum) in
+                    let n = max 1 (band_size nb_wom) in
                     for j = 1 to n do { Wserver.wprint "&nbsp;"; };
                 end;
                 stagn "td" "style=\"font-size:70%%; font-style: italic\""
