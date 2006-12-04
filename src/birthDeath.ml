@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.19 2006-12-03 22:08:53 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.20 2006-12-04 02:36:01 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -570,20 +570,28 @@ value print_statistics conf base =
 value print_population_pyramid conf base = do {
   let interval =
     match p_getint conf.env "i" with
-    [ Some i -> max 5 i
-    | None -> 10 ]
+    [ Some i -> max 1 i
+    | None -> 5 ]
   in
-  let t = Array.create (100 / interval) 0 in
-  let s = ref 0 in
+  let nb_intervals = 100 /interval in
+  let men = Array.create nb_intervals 0 in
+  let wom = Array.create nb_intervals 0 in
+  let gmen = ref 0 in
+  let gwom = ref 0 in
   for i = 0 to nb_of_persons base - 1 do {
     let p = poi base (Adef.iper_of_int i) in
-    if get_death p = NotDead then do {
+    let sex = get_sex p in
+    if get_death p = NotDead && sex <> Neuter then do {
       match Adef.od_of_codate (get_birth p) with
       [ Some (Dgreg dmy _) ->
           let a = CheckItem.time_elapsed dmy conf.today in
           let j = a.year / interval in
-          if j < Array.length t then t.(j) := t.(j) + 1
-          else s.val := s.val + 1
+          if j < nb_intervals then
+            if sex = Male then men.(j) := men.(j) + 1
+            else wom.(j) := wom.(j) + 1
+          else
+            if sex = Male then gmen.val := gmen.val + 1
+            else gwom.val := gwom.val + 1
       | Some (Dtext _) | None -> () ];
     }
     else ()
@@ -596,29 +604,85 @@ value print_population_pyramid conf base = do {
     Wserver.wprint "%s" (capitale (transl conf "population pyramid"))
   in
   Util.header conf title;
+  let max_men = Array.fold_left max 1 men in
+  let max_wom = Array.fold_left max 1 wom in
+  let max_hum = max max_men max_wom in
+  let max_size = 70 in
+  tag "div" begin
+    let c = "cellspacing=\"0\" cellpadding=\"0\"" in
+    tag "table"
+      "border=\"%d\"%s width=\"50%%\" style=\"margin: auto\"" conf.border c
+    begin
+      for i = nb_intervals downto 0 do {
+        let nb_men = if i = nb_intervals then gmen.val else men.(i) in
+        let nb_wom = if i = nb_intervals then gwom.val else wom.(i) in
+        tag "tr" begin
+          tag "td" "align=\"right\"" begin
+            tag "table" "%s" c begin
+              tag "tr" begin
+                tag "td" "style=\"font-size:70%%; font-style: italic\"" begin
+                  if nb_men <> 0 then Wserver.wprint "%d&nbsp;" nb_men
+                  else ();
+                end;
+                tag "td" "style=\"background: blue\"" begin
+                  if nb_men = 0 then ()
+                  else
+                    let n = max 1 (max_size * nb_men / max_hum) in
+                    for j = 1 to n do { Wserver.wprint "&nbsp;"; };
+                end;
+              end;
+            end;
+          end;
+          tag "td" "align=\"center\"" begin
+            if i = nb_intervals then ()
+            else Wserver.wprint "%d" ((i + 1) * interval);
+          end;
+          tag "td" "align=\"left\"" begin
+            tag "table" "%s" c begin
+              tag "tr" begin
+                tag "td" "style=\"background: red\"" begin
+                  if nb_wom = 0 then ()
+                  else
+                    let n = max 1 (max_size * nb_wom / max_hum) in
+                    for j = 1 to n do { Wserver.wprint "&nbsp;"; };
+                end;
+                tag "td" "style=\"font-size:70%%; font-style: italic\"" begin
+                  if nb_wom <> 0 then Wserver.wprint "&nbsp;%d" nb_wom
+                  else ();
+                end;
+              end;
+            end;
+          end;
+        end;
+      };
+    end;
+  end;
+(*
   tag "ul" begin
-    for i = 0 to Array.length t - 1 do {
+    tag "li" begin
+      Wserver.wprint "%s %s/%s\n"
+        (Printf.sprintf
+           (fcapitale (ftransl conf "greater than %d years old:"))
+           (nb_intervals * interval))
+        (string_of_nb gmen.val) (string_of_nb gwom.val);
+    end;
+    for i =nb_intervals - 1 downto 0 do {
       tag "li" begin
-        Wserver.wprint "%s %s\n"
+        Wserver.wprint "%s %s/%s\n"
           (Printf.sprintf
              (fcapitale (ftransl conf "from %d to %d years old:"))
              (i * interval) ((i + 1) * interval - 1))
-          (string_of_nb t.(i));
+          (string_of_nb men.(i)) (string_of_nb wom.(i));
       end;
     };
-    tag "li" begin
-      Wserver.wprint "%s %s\n"
-        (Printf.sprintf
-           (fcapitale (ftransl conf "greater than %d years old:"))
-           (Array.length t * interval))
-        (string_of_nb s.val);
-    end;
   end;
-  let sum = Array.fold_left \+ s.val t in
+*)
+  let sum_men = Array.fold_left \+ gmen.val men in
+  let sum_wom = Array.fold_left \+ gwom.val wom in
   tag "p" begin
     Wserver.wprint "%s %s"
-      (capitale (transl conf "number of still living persons:"))
-      (string_of_nb sum);
+      (capitale (transl conf "number of living persons:"))
+      (string_of_nb (sum_men + sum_wom));
   end;
   Util.trailer conf;
 };
