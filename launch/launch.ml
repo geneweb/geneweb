@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.28 2006-12-04 13:32:58 ddr Exp $ *)
+(* $Id: launch.ml,v 1.29 2006-12-04 13:59:14 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -14,7 +14,8 @@ type state =
     bases_dir : mutable string;
     browser_lang : mutable bool;
     digest_auth : mutable bool;
-    server_running : mutable option int }
+    server_running : mutable option int;
+    waiting_pids : mutable list int }
 ;
 
 value trace = ref False;
@@ -131,16 +132,22 @@ value close_server state =
   | None -> () ]
 ;
 
-value browse browser port dbn =
+value clean_waiting_pids state =
+  state.waiting_pids :=
+    List.filter
+      (fun pid ->
+         let (r, _) = Unix.waitpid [Unix.WNOHANG] pid in
+  let _ = do { if r = pid then do { Printf.eprintf "--- pid ended %d\n" r; flush stderr } else () } in
+         r <> pid)
+      state.waiting_pids
+;
+
+value browse state browser port dbn = do {
   let pid =
     match browser with
     [ Some browser ->
-        let browser_pid =
-          exec browser [sprintf "http://localhost:%d/%s" port dbn]
-            Unix.stdout Unix.stderr
-        in
-        let (pid, _) = Unix.waitpid [] browser_pid in
-        pid
+        exec browser [sprintf "http://localhost:%d/%s" port dbn]
+          Unix.stdout Unix.stderr
     | None -> -1 ]
   in
   if pid = -1 then do {
@@ -148,8 +155,9 @@ value browse browser port dbn =
       port dbn;
     flush stderr;
   }
-  else ()
-;
+  else state.waiting_pids := [pid :: state.waiting_pids];
+  clean_waiting_pids state;
+};
 
 value window_centering win = do {
   let main_frame = Frame.create win [] in
@@ -241,6 +249,7 @@ value config state title v def select to_string from_string set prev next =
 ;
 
 value rec show_main state = do {
+  clean_waiting_pids state;
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
@@ -264,7 +273,7 @@ value rec show_main state = do {
          let bbut =
            Button.create frame
              [Text (transl "Browse");
-              Command (fun _ -> browse state.browser state.port bn)]
+              Command (fun _ -> browse state state.browser state.port bn)]
          in
          pack [blab] [Side Side_Left];
          pack [bbut] [Side Side_Right];
@@ -307,6 +316,7 @@ value rec show_main state = do {
 }
 
 and change_options state = do {
+  clean_waiting_pids state;
   let (frame, gframe) = window_centering state.tk_win in
 
   let opt2 = Frame.create frame [] in
@@ -369,6 +379,7 @@ and change_options state = do {
 }
 
 and new_database state = do {
+  clean_waiting_pids state;
   let (frame, gframe) = window_centering state.tk_win in
   let tit = Label.create frame [Text (transl "Enter the name:")] in
   let var = Textvariable.create () in
@@ -415,6 +426,7 @@ and new_database state = do {
 }
 
 and launch_server state = do {
+  clean_waiting_pids state;
   let only = Unix.gethostname () in
   let fd =
     if trace.val then Unix.stdout
@@ -775,7 +787,8 @@ value main () = do {
     {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
      sys_dir = default_sys_dir; port = default_port;
      browser = default_browser; bases_dir = default_bases_dir;
-     browser_lang = True; digest_auth = False; server_running = None}
+     browser_lang = True; digest_auth = False; server_running = None;
+     waiting_pids = []}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
