@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.22 2006-12-04 03:32:39 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.23 2006-12-04 03:53:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -573,7 +573,8 @@ value print_population_pyramid conf base = do {
     [ Some i -> max 1 i
     | None -> 5 ]
   in
-  let nb_intervals = 100 /interval in
+  let include_unknown = p_getenv conf.env "add_unknown" = Some "on" in
+  let nb_intervals = 150 /interval in
   let men = Array.create nb_intervals 0 in
   let wom = Array.create nb_intervals 0 in
   let gmen = ref 0 in
@@ -581,7 +582,10 @@ value print_population_pyramid conf base = do {
   for i = 0 to nb_of_persons base - 1 do {
     let p = poi base (Adef.iper_of_int i) in
     let sex = get_sex p in
-    if get_death p = NotDead && sex <> Neuter then do {
+    let dea = get_death p in
+    if (dea = NotDead || include_unknown && dea = DontKnowIfDead) &&
+       sex <> Neuter
+    then do {
       match Adef.od_of_codate (get_birth p) with
       [ Some (Dgreg dmy _) ->
           let a = CheckItem.time_elapsed dmy conf.today in
@@ -623,12 +627,20 @@ value print_population_pyramid conf base = do {
   let max_wom = Array.fold_left max gwom.val wom in
   let max_hum = max 1 (max max_men max_wom) in
   let max_size = 70 in
+  let first_interv =
+    if gmen.val > 0 || gwom.val > 0 then nb_intervals
+    else
+      loop (nb_intervals - 1) where rec loop i =
+        if i <= 0 then 0
+        else if men.(i) > 0 || wom.(i) > 0 then i
+        else loop (i - 1)
+  in
   tag "div" begin
     let c = "cellspacing=\"0\" cellpadding=\"0\"" in
     tag "table"
       "border=\"%d\"%s width=\"50%%\" style=\"margin: auto\"" conf.border c
     begin
-      for i = nb_intervals downto 0 do {
+      for i = first_interv downto 0 do {
         let nb_men = if i = nb_intervals then gmen.val else men.(i) in
         let nb_wom = if i = nb_intervals then gwom.val else wom.(i) in
         tag "tr" begin
