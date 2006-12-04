@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.23 2006-12-04 03:53:12 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.24 2006-12-04 04:04:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -573,7 +573,11 @@ value print_population_pyramid conf base = do {
     [ Some i -> max 1 i
     | None -> 5 ]
   in
-  let include_unknown = p_getenv conf.env "add_unknown" = Some "on" in
+  let limit =
+    match p_getint conf.env "lim" with
+    [ Some x -> x
+    | _ -> 0 ]
+  in
   let nb_intervals = 150 /interval in
   let men = Array.create nb_intervals 0 in
   let wom = Array.create nb_intervals 0 in
@@ -583,19 +587,19 @@ value print_population_pyramid conf base = do {
     let p = poi base (Adef.iper_of_int i) in
     let sex = get_sex p in
     let dea = get_death p in
-    if (dea = NotDead || include_unknown && dea = DontKnowIfDead) &&
-       sex <> Neuter
-    then do {
+    if sex <> Neuter then do {
       match Adef.od_of_codate (get_birth p) with
       [ Some (Dgreg dmy _) ->
           let a = CheckItem.time_elapsed dmy conf.today in
-          let j = a.year / interval in
-          if j < nb_intervals then
-            if sex = Male then men.(j) := men.(j) + 1
-            else wom.(j) := wom.(j) + 1
-          else
-            if sex = Male then gmen.val := gmen.val + 1
-            else gwom.val := gwom.val + 1
+          if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
+            let j = a.year / interval in
+            if j < nb_intervals then
+              if sex = Male then men.(j) := men.(j) + 1
+              else wom.(j) := wom.(j) + 1
+            else
+              if sex = Male then gmen.val := gmen.val + 1
+              else gwom.val := gwom.val + 1
+          else ()
       | Some (Dtext _) | None -> () ];
     }
     else ()
