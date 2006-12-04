@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.21 2006-12-04 03:08:12 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.22 2006-12-04 03:32:39 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -619,9 +619,9 @@ value print_population_pyramid conf base = do {
     end
   in
   Util.header conf title;
-  let max_men = Array.fold_left max 1 men in
-  let max_wom = Array.fold_left max 1 wom in
-  let max_hum = max max_men max_wom in
+  let max_men = Array.fold_left max gmen.val men in
+  let max_wom = Array.fold_left max gwom.val wom in
+  let max_hum = max 1 (max max_men max_wom) in
   let max_size = 70 in
   tag "div" begin
     let c = "cellspacing=\"0\" cellpadding=\"0\"" in
