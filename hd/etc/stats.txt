@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: stats.txt,v 5.5 2006-12-04 02:36:00 ddr Exp $ -->
+  <!-- $Id: stats.txt,v 5.6 2006-12-04 04:04:49 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*statistics]</title>
   <meta name="robots" content="none"%/>
@@ -49,12 +49,12 @@
   <li><a href="%prefix;m=OE;k=%n;">%apply;engaged(n)</a></li>
   <li><a href="%prefix;m=OA;k=%n;">%apply;alive(n)</a></li>
 %end;
-<li><a href="%prefix;m=LL;k=%n;">%apply;lived(n)</a></li>
+<li><a href="%prefix;m=LL;k=%n;;lim=0">%apply;lived(n)</a></li>
 </ul>
 
 %if;(wizard or friend)
   <ul>
-    <li><a href="%prefix;m=POP_PYR;i=5">[population pyramid]</a></li>
+    <li><a href="%prefix;m=POP_PYR;i=5;lim=0">[population pyramid]</a></li>
   </ul>
 %end;
 
