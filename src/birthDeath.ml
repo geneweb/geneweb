@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.20 2006-12-04 02:36:01 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.21 2006-12-04 03:08:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -603,6 +603,21 @@ value print_population_pyramid conf base = do {
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "population pyramid"))
   in
+  let print_image i iname =
+    tag "td" begin
+      if i = 0 then
+        let wid_hei =
+          match Util.image_size (Util.image_file_name iname) with
+          [ Some (wid, hei) ->
+              Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei
+          | None -> "" ]
+        in
+        xtag "img" "src=\"%s/%s\"%s alt=\"%s\"%s"
+          (Util.image_prefix conf) iname wid_hei
+          (transl_nth conf "M/F" 1) conf.xhs
+      else ();
+    end
+  in
   Util.header conf title;
   let max_men = Array.fold_left max 1 men in
   let max_wom = Array.fold_left max 1 wom in
@@ -617,14 +632,16 @@ value print_population_pyramid conf base = do {
         let nb_men = if i = nb_intervals then gmen.val else men.(i) in
         let nb_wom = if i = nb_intervals then gwom.val else wom.(i) in
         tag "tr" begin
+          print_image i "male.png";
           tag "td" "align=\"right\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
-                tag "td" "style=\"font-size:70%%; font-style: italic\"" begin
-                  if nb_men <> 0 then Wserver.wprint "%d&nbsp;" nb_men
-                  else ();
+                stagn "td" "style=\"font-size:70%%; font-style: italic\""
+                begin
+                  if nb_men <> 0 then Wserver.wprint "%d" nb_men else ();
+                  Wserver.wprint "&nbsp;";
                 end;
-                tag "td" "style=\"background: blue\"" begin
+                stagn "td" "style=\"background: blue\"" begin
                   if nb_men = 0 then ()
                   else
                     let n = max 1 (max_size * nb_men / max_hum) in
@@ -633,26 +650,28 @@ value print_population_pyramid conf base = do {
               end;
             end;
           end;
-          tag "td" "align=\"center\"" begin
-            if i = nb_intervals then ()
+          stagn "td" "align=\"center\"" begin
+            if i = nb_intervals then Wserver.wprint "&nbsp;"
             else Wserver.wprint "%d" ((i + 1) * interval);
           end;
           tag "td" "align=\"left\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
-                tag "td" "style=\"background: red\"" begin
+                stagn "td" "style=\"background: red\"" begin
                   if nb_wom = 0 then ()
                   else
                     let n = max 1 (max_size * nb_wom / max_hum) in
                     for j = 1 to n do { Wserver.wprint "&nbsp;"; };
                 end;
-                tag "td" "style=\"font-size:70%%; font-style: italic\"" begin
-                  if nb_wom <> 0 then Wserver.wprint "&nbsp;%d" nb_wom
-                  else ();
+                stagn "td" "style=\"font-size:70%%; font-style: italic\""
+                begin
+                  Wserver.wprint "&nbsp;";
+                  if nb_wom <> 0 then Wserver.wprint "%d" nb_wom else ();
                 end;
               end;
             end;
           end;
+          print_image i "female.png";
         end;
       };
     end;

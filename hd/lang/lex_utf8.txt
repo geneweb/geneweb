@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.61 2006-12-04 02:36:00 ddr Exp $
+# $Id: lex_utf8.txt,v 5.62 2006-12-04 03:08:11 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -3970,10 +3970,6 @@ ru: приемный сын/приемная дочь/приемный ребе�
 sl: rejenec/rejenka/rejenec
 sv: fosterson/fosterdotter/fosterbarn
 
-    from %d to %d years old:
-en: from %d to %d years old:
-fr: de %d à %d ans :
-
     generation/generations
 af: geslag/geslagte
 bg: поколение/поколения
@@ -4108,10 +4104,6 @@ ro: strabunici
 ru: прапрародители
 sl: prastari starši
 sv: gammel-farföräldrar/gammel-morföräldrar
-
-    greater than %d years old:
-en: greater than %d years old:
-fr: supérieur à %d ans :
 
     gregorian/julian/french/hebrew
 af: gregoriaans/juliaans/frans/hebreeus
