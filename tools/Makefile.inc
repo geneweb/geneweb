@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 5.5 2006-11-25 18:54:52 ddr Exp $
+# $Id: Makefile.inc,v 5.6 2006-12-05 11:06:36 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh $(PPDEF)
@@ -28,17 +28,17 @@ clean::
 .mli.cmi:
 	@$(TEST_DIR)
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppi
-	$(OCAMLC) $(OCAMLI) -I +camlp4 -c -intf $*.ppi
+	$(OCAMLC) $(OCAMLI) -I $(CAMLP4D) -c -intf $*.ppi
 	$(RM) $*.ppi
 
 .ml.cmo:
 	@$(TEST_DIR)
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I +camlp4 -c -impl $*.ppo
+	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I $(CAMLP4D) -c -impl $*.ppo
 	$(RM) $*.ppo
 
 .ml.cmx:
 	@$(TEST_DIR)
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLOPT) $(OCAMLI) -I +camlp4 -c -impl $*.ppo
+	$(OCAMLOPT) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
 	$(RM) $*.ppo
