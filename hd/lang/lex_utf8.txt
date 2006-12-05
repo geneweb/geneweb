@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.62 2006-12-04 03:08:11 ddr Exp $
+# $Id: lex_utf8.txt,v 5.63 2006-12-05 11:52:36 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1986,6 +1986,7 @@ fr: âge moyen de décès
 it: età media di morte
 nl: gemiddelde leeftijd bij overlijden
 pl: średni wiek śmierci
+ro: virsta media la deces
 sv: medelålder vid dödstillfället
 
     back
@@ -3215,8 +3216,10 @@ sv: försvunnen
 
     disconnect
 bg: да се прекъсне връзката
+de: abmelden
 en: disconnect
 fr: déconnecter
+ro: deconectare
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
@@ -6327,8 +6330,10 @@ sl: število vej
 sv: antal grenar
 
     number of living persons:
+de: Anzahl der lebenden Personen:
 en: number of living persons:
 fr: nombre de personnes vivantes :
+ro: numarul de persoane in viata:
 
     occupation
 af: beroep
@@ -6824,8 +6829,10 @@ sl: kraj
 sv: plats
 
     population pyramid
+de: Alterspyramide
 en: population pyramid
 fr: pyramide des âges
+ro: piramida demografică
 
     possibly (date)
 af: miskien
@@ -9484,8 +9491,10 @@ sv: år
 zh:  岁
 
     you are visible/you are not visible
+de: du bist sichtbar/du bist nicht sichtbar
 en: you are visible/you are not visible
 fr: vous êtes visible/vous n'êtes pas visible
+ro: tu esti vizibil/tu nu esti vizibil
 
     you must first merge
 af: jy moet eers saamvoeg
