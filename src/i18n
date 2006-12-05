@@ -233,6 +233,7 @@ nth (cousin)
 nth (generation)
 number
 number of branches
+number of living persons:
 occupation
 of the %s generation
 on %s's side
@@ -251,6 +252,7 @@ person modified
 person/persons
 persons having the same name
 place
+population pyramid
 possibly (date)
 precision
 previous sibling
