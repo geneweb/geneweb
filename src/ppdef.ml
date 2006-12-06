@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 5.5 2006-10-25 18:44:32 ddr Exp $ *)
+(* $Id: ppdef.ml,v 5.6 2006-12-06 13:52:43 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -32,36 +32,39 @@ value _loc = loc;
 value subst mloc env =
   loop where rec loop =
     fun
-    [ MLast.ExLet _ rf pel e ->
+    [ <:expr< let $opt:rf$ $list:pel$ in $e$ >> ->
         let pel = List.map (fun (p, e) -> (p, loop e)) pel in
-        MLast.ExLet loc rf pel (loop e)
-    | MLast.ExIfe _ e1 e2 e3 -> MLast.ExIfe loc (loop e1) (loop e2) (loop e3)
-    | MLast.ExApp _ e1 e2 -> MLast.ExApp loc (loop e1) (loop e2)
-    | MLast.ExLid _ x | MLast.ExUid _ x as e ->
-        try MLast.ExAnt loc (List.assoc x env) with [ Not_found -> e ]
-    | MLast.ExTup _ x -> MLast.ExTup loc (List.map loop x)
-    | MLast.ExRec _ pel None ->
+        <:expr< let $opt:rf$ $list:pel$ in $loop e$ >>
+    | <:expr< if $e1$ then $e2$ else $e3$ >> ->
+        <:expr< if $loop e1$ then $loop e2$ else $loop e3$ >>
+    | <:expr< $e1$ $e2$ >> ->
+        <:expr< $loop e1$ $loop e2$ >>
+    | <:expr< $lid:x$ >> | <:expr< $uid:x$ >> as e ->
+        try <:expr< $anti:List.assoc x env$ >> with [ Not_found -> e ]
+    | <:expr< ( $list:x$ ) >> ->
+        <:expr< ( $list:List.map loop x$ ) >>
+    | <:expr< { $list:pel$ } >> ->
         let pel = List.map (fun (p, e) -> (p, loop e)) pel in
-        MLast.ExRec loc pel None
+        <:expr< { $list:pel$ } >>
     | e -> e ]
 ;
 
 value substp mloc env =
   loop where rec loop =
     fun
-    [ MLast.ExApp _ e1 e2 -> MLast.PaApp loc (loop e1) (loop e2)
-    | MLast.ExChr _ c -> MLast.PaChr loc c
-    | MLast.ExLid _ x ->
-        try MLast.PaAnt loc (List.assoc x env) with
-        [ Not_found -> MLast.PaLid loc x ]
-    | MLast.ExUid _ x ->
-        try MLast.PaAnt loc (List.assoc x env) with
-        [ Not_found -> MLast.PaUid loc x ]
-    | MLast.ExInt _ x -> MLast.PaInt loc x
-    | MLast.ExTup _ x -> MLast.PaTup loc (List.map loop x)
-    | MLast.ExRec _ pel None ->
+    [ <:expr< $e1$ $e2$ >> -> <:patt< $loop e1$ $loop e2$ >>
+    | <:expr< $chr:c$ >> -> <:patt< $chr:c$ >>
+    | <:expr< $lid:x$ >> ->
+        try <:patt< $anti:List.assoc x env$ >> with
+        [ Not_found -> <:patt< $lid:x$ >> ]
+    | <:expr< $uid:x$ >> ->
+        try <:patt< $anti:List.assoc x env$ >> with
+        [ Not_found -> <:patt< $uid:x$ >> ]
+    | <:expr< $int:x$ >> -> <:patt< $int:x$ >>
+    | <:expr< ( $list:x$ ) >> -> <:patt< ( $list:List.map loop x$ ) >>
+    | <:expr< { $list:pel$ } >> ->
         let ppl = List.map (fun (p, e) -> (p, loop e)) pel in
-        MLast.PaRec loc ppl
+        <:patt< { $list:ppl$ } >>
     | x ->
         Stdpp.raise_with_loc mloc
           (Failure
