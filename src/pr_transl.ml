@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 5.2 2006-12-06 13:52:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open MLast;
@@ -97,7 +97,6 @@ and str_item =
   | <:str_item< module type $_$ = $_$ >> -> ()
   | <:str_item< $exp:e$ >> -> expr e
   | <:str_item< # $_$ $_$ >> -> ()
-  | MLast.StUse _ _ _ -> ()
   | x -> not_impl "str_item" x ]
 ;
 
