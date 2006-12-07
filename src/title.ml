@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.13 2006-11-01 10:48:29 ddr Exp $ *)
+(* $Id: title.ml,v 5.14 2006-12-07 05:05:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -148,7 +148,11 @@ value compare_title_order conf base (x1, t1) (x2, t2) =
 ;
 
 value my_alphabetic n1 n2 =
+(*
   compare (Name.abbrev (Name.lower n1)) (Name.abbrev (Name.lower n2))
+*)
+  compare (Name.lower n1) (Name.lower n2)
+(**)
 ;
 
 value string_list_uniq l =
@@ -163,11 +167,30 @@ value string_list_uniq l =
   List.rev l
 ;
 
+value string_cnt_list_uniq l =
+  let l =
+    List.fold_left
+      (fun l (e, c) ->
+         match l with
+         [ [] -> [(e, c)]
+         | [(x, d) :: l1] ->
+             if my_alphabetic e x = 0 then [(x, c + d) :: l1]
+             else [(e, c) :: l] ])
+      [] l
+  in
+  List.rev l
+;
+
 value compare_places p1 p2 = compare (Name.lower p1) (Name.lower p2);
 
 value compare_titles t1 t2 = my_alphabetic t1 t2;
+value compare_titles2 (t1, _) (t2, _) = my_alphabetic t1 t2;
 
+(*
 value strip_abbrev_lower s = Name.strip (Name.abbrev (Name.lower s));
+*)
+value strip_abbrev_lower s = Name.lower s;
+(**)
 
 value select_title_place conf base title place =
   let list = ref [] in
@@ -274,7 +297,28 @@ value select_all proj conf base =
   StrSet.elements s
 ;
 
-value select_all_titles = select_all (fun t -> t.t_ident);
+value select_all2 proj conf base = do {
+  let ht = Hashtbl.create 1 in
+  for i = 0 to nb_of_persons base - 1 do {
+    let x = pget conf base (Adef.iper_of_int i) in
+    List.iter
+      (fun t ->
+         let s = sou base (proj t) in
+         let cnt =
+           try Hashtbl.find ht s with
+           [ Not_found -> do {
+               let cnt = ref 0 in
+               Hashtbl.add ht s cnt;
+               cnt
+             } ]
+         in
+         incr cnt)
+      (nobtit conf base x);
+  };
+  Hashtbl.fold (fun s cnt list -> [(s, cnt.val) :: list]) ht []
+};
+
+value select_all_titles = select_all2 (fun t -> t.t_ident);
 value select_all_places = select_all (fun t -> t.t_place);
 
 value give_access_someone conf base (x, t) list =
@@ -490,13 +534,18 @@ value print_all_titles conf base =
   in
   let list =
     let l = select_all_titles conf base in
-    string_list_uniq (List.sort compare_titles l)
+    string_cnt_list_uniq (List.sort compare_titles2 l)
   in
   do {
     header conf title;
     tag "ul" begin
       List.iter
-        (fun t -> stagn "li" begin give_access_all_titles conf t; end) list;
+        (fun (t, cnt) ->
+           stagn "li" begin
+             give_access_all_titles conf t;
+             Wserver.wprint " (%d)" cnt;
+           end)
+        list;
     end;
     trailer conf;
   }
