@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.63 2006-12-05 11:52:36 ddr Exp $
+# $Id: lex_utf8.txt,v 5.64 2006-12-08 15:22:20 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -6330,6 +6330,7 @@ sl: število vej
 sv: antal grenar
 
     number of living persons:
+bg: брой на живите лица
 de: Anzahl der lebenden Personen:
 en: number of living persons:
 fr: nombre de personnes vivantes :
@@ -6829,6 +6830,7 @@ sl: kraj
 sv: plats
 
     population pyramid
+bg: възрастова пирамида
 de: Alterspyramide
 en: population pyramid
 fr: pyramide des âges
