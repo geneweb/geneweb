@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.40 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: perso.ml,v 5.41 2006-12-08 13:16:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -121,8 +121,15 @@ value string_of_title conf base and_txt p (nth, name, title, places, dates) =
   }
 ;
 
+value eq_title_names n1 n2 =
+  match (n1, n2) with
+  [ (Tname s1, Tname s2) -> eq_istr s1 s2
+  | (Tname _, _) | (_, Tname _) -> False
+  | _ -> n1 = n2 ]
+;
+
 value name_equiv n1 n2 =
-  n1 = n2 || n1 = Tmain && n2 = Tnone || n1 = Tnone && n2 = Tmain
+  eq_title_names n1 n2 || n1 = Tmain && n2 = Tnone || n1 = Tnone && n2 = Tmain
 ;
 
 value nobility_titles_list conf base p =
