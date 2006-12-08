@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.141 2006-12-01 12:57:31 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.142 2006-12-08 13:16:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1520,9 +1520,13 @@ value nobtit conf base p =
   | allowed_titles ->
       List.fold_right
         (fun t l ->
-           let id = sou base t.t_ident in
-           let pl = sou base t.t_place in
-           if List.mem (id ^ "/" ^ pl) allowed_titles then [t :: l] else l)
+           let id = Name.lower (sou base t.t_ident) in
+           let pl = Name.lower (sou base t.t_place) in
+           if List.mem (id ^ "/" ^ pl) allowed_titles ||
+              List.mem (id ^ "/*") allowed_titles
+           then
+             [t :: l]
+           else l)
         list [] ]
 ;
 
