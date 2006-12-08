@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.143 2006-12-08 18:17:56 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.144 2006-12-08 20:07:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1518,13 +1518,6 @@ value nobtit conf base p =
   match Lazy.force conf.allowed_titles with
   [ [] -> list
   | allowed_titles ->
-      let allowed_titles =
-        try
-          let t = List.assoc "extra_title" conf.env in
-          if t = "" then raise Not_found else [Name.lower t :: allowed_titles]
-        with
-        [ Not_found -> allowed_titles ]
-      in
       List.fold_right
         (fun t l ->
            let id = Name.lower (sou base t.t_ident) in

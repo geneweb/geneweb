@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.40 2006-12-08 13:16:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.41 2006-12-08 20:07:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -767,31 +767,38 @@ value allowed_titles env base_env () =
       else
         let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
         loop StrSet.empty where rec loop set =
-          match try Some (input_line ic) with [ End_of_file -> None ] with
-          [ Some line ->
-              let set =
-                if line = "" || line.[0] = ' ' || line.[0] = '#' then set
-                else
-                  let line =
-                    match
-                      try Some (String.index line '/') with
-                      [ Not_found -> None ]
-                    with
-                    [ Some i ->
-                        let len = String.length line in
-                        let tit = String.sub line 0 i in
-                        let pla = String.sub line (i + 1) (len - i - 1) in
-                        (if tit = "*" then tit else Name.lower tit) ^ "/" ^
-                        (if pla = "*" then pla else Name.lower pla)
-                    | None -> (Name.lower line ^ "/") ]
-                  in
-                  StrSet.add line set
+          let (line, eof) =
+            try (input_line ic, False) with [ End_of_file -> ("", True) ]
+          in
+          let set =
+            let line =
+              if eof then
+                try List.assoc "extra_title" env with
+                [ Not_found -> "" ]
+              else line
+            in
+            if line = "" || line.[0] = ' ' || line.[0] = '#' then set
+            else
+              let line =
+                match
+                  try Some (String.index line '/') with
+                  [ Not_found -> None ]
+                with
+                [ Some i ->
+                    let len = String.length line in
+                    let tit = String.sub line 0 i in
+                    let pla = String.sub line (i + 1) (len - i - 1) in
+                    (if tit = "*" then tit else Name.lower tit) ^ "/" ^
+                    (if pla = "*" then pla else Name.lower pla)
+                | None -> (Name.lower line ^ "/") ]
               in
-              loop set
-          | None -> do {
-              close_in ic;
-              StrSet.elements set
-            } ]
+              StrSet.add line set
+          in
+          if eof then do {
+            close_in ic;
+            StrSet.elements set
+          }
+          else loop set
     with
     [ Not_found | Sys_error _ -> [] ]
 ;
