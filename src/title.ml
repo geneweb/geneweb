@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.16 2006-12-08 14:48:14 ddr Exp $ *)
+(* $Id: title.ml,v 5.17 2006-12-08 15:01:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -241,7 +241,7 @@ value select_all_with_place conf base place =
 ;
 
 value select_title conf base title =
-  let list = ref [] in
+  let set = ref StrSet.empty in
   let clean_name = ref title in
   let all_names = ref [] in
   let absolute = p_getenv conf.env "a" = Some "A" in
@@ -252,9 +252,9 @@ value select_title conf base title =
        not absolute && strip_abbrev_lower tn = title2
     then do {
       let pn = sou base t.t_place in
-      if not (List.mem pn list.val) then do {
+      if not (StrSet.mem pn set.val) then do {
         clean_name.val := tn;
-        list.val := [pn :: list.val]
+        set.val := StrSet.add pn set.val;
       }
       else ();
       if not (List.mem tn all_names.val) then
@@ -268,7 +268,7 @@ value select_title conf base title =
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter add_place (nobtit conf base x)
     };
-    (list.val, clean_name.val, all_names.val)
+    (StrSet.elements set.val, clean_name.val, all_names.val)
   }
 ;
 
