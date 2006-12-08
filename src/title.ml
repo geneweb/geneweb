@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.14 2006-12-07 05:05:14 ddr Exp $ *)
+(* $Id: title.ml,v 5.15 2006-12-08 14:09:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -239,15 +239,24 @@ value select_all_with_place conf base place =
 value select_title conf base title =
   let list = ref [] in
   let clean_name = ref title in
-  let title = strip_abbrev_lower title in
+  let all_names = ref [] in
+  let absolute = p_getenv conf.env "a" = Some "A" in
+  let title2 = strip_abbrev_lower title in
   let add_place t =
     let tn = sou base t.t_ident in
-    if strip_abbrev_lower tn = title then
+    if absolute && tn = title ||
+       not absolute && strip_abbrev_lower tn = title2
+    then do {
       let pn = sou base t.t_place in
       if not (List.mem pn list.val) then do {
-        clean_name.val := tn; list.val := [pn :: list.val]
+        clean_name.val := tn;
+        list.val := [pn :: list.val]
       }
-      else ()
+      else ();
+      if not (List.mem tn all_names.val) then
+        all_names.val := [tn :: all_names.val]
+      else ();
+    }
     else ()
   in
   do {
@@ -255,7 +264,7 @@ value select_title conf base title =
       let x = pget conf base (Adef.iper_of_int i) in
       List.iter add_place (nobtit conf base x)
     };
-    (list.val, clean_name.val)
+    (list.val, clean_name.val, all_names.val)
   }
 ;
 
@@ -381,9 +390,11 @@ value give_access_title conf t p =
   }
 ;
 
-value give_access_all_titles conf t =
-  stag "a" "href=\"%sm=TT;sm=S;t=%s\"" (commd conf) (code_varenv t) begin
-    Wserver.wprint "%s" (capitale t);
+value give_access_all_titles conf t absolute =
+  stag "a" "href=\"%sm=TT;sm=S;t=%s%s\"" (commd conf) (code_varenv t)
+    (if absolute then ";a=A" else "")
+  begin
+    Wserver.wprint "%s" (if absolute then t else capitale t);
   end
 ;
 
@@ -488,8 +499,17 @@ value print_all_with_place conf base p =
   print_all_with_place_list conf base p list
 ;
 
-value print_places_list conf base t list =
-  let title _ = Wserver.wprint "%s" (capitale t) in
+value print_places_list conf base t t_equiv list =
+  let title _ =
+    if List.length t_equiv = 1 then Wserver.wprint "%s" (capitale t)
+    else
+      list_iter_first
+        (fun first t -> do {
+           Wserver.wprint "%s" (if first then "" else ", ");
+           give_access_all_titles conf t True;
+         })
+        t_equiv
+  in
   do {
     header conf title;
     tag "ul" begin
@@ -502,11 +522,11 @@ value print_places_list conf base t list =
 ;
 
 value print_places conf base t =
-  let (l, t) = select_title conf base t in
+  let (l, t, t_equiv) = select_title conf base t in
   let list = string_list_uniq (List.sort compare_places l) in
   match list with
   [ [p] -> print_title_place conf base t p
-  | _ -> print_places_list conf base t list ]
+  | _ -> print_places_list conf base t t_equiv list ]
 ;
 
 value print_titles conf base p =
@@ -542,7 +562,7 @@ value print_all_titles conf base =
       List.iter
         (fun (t, cnt) ->
            stagn "li" begin
-             give_access_all_titles conf t;
+             give_access_all_titles conf t False;
              Wserver.wprint " (%d)" cnt;
            end)
         list;
