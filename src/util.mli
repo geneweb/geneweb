@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.20 2006-12-03 21:50:24 ddr Exp $ *)
+(* $Id: util.mli,v 5.21 2006-12-09 04:24:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -244,3 +244,8 @@ value html_highlight : bool -> string -> string -> string;
 (* Pretty print XHTML wrapper for Wserver.wrap_string *)
 
 value xml_pretty_print : string -> string;
+
+(* Print list in columns with alphabetic order *)
+
+value wprint_in_columns :
+  config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;

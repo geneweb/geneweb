@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 5.79 2006-12-01 12:57:31 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: util.ml,v 5.80 2006-12-09 04:24:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2716,4 +2716,106 @@ value xml_pretty_print s =
             loop (i + 1)
           } ]
     }
+;
+
+(* Print list in columns with alphabetic order *)
+
+type item 'a =
+  [ ItemChar of string
+  | ItemSpace of int
+  | ItemElem of 'a ]
+;
+
+value dispatch_in_columns ncol list order =
+  let (rlist, len, _) =
+    List.fold_left
+      (fun (rlist, len, prev) elem ->
+         let ord = order elem in
+         let (rlist, len) =
+           match prev with
+           [ Some prev_ord when ord.[0] = prev_ord.[0] -> (rlist, len)
+           | _ ->
+               ([ItemSpace 1; ItemSpace 2; ItemChar ord :: rlist],
+                len + 3) ]
+         in
+         let rlist = [ItemElem elem :: rlist] in
+         (rlist, len + 1, Some ord))
+      ([], 0, None) list
+  in
+  let list = List.rev rlist in
+  loop [] len 0 ncol where rec loop len_list len cum_len ncol =
+    if ncol = 1 then (List.rev [len :: len_list], list)
+    else
+      let len_i =
+        let len_i = (len + ncol / 2) / ncol in
+        match List.nth list (cum_len + len_i - 1) with
+        [ ItemChar c -> len_i + 3
+        | ItemSpace n -> len_i + n
+        | ItemElem _ -> len_i ]
+      in
+      loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
+;
+
+value print_in_columns conf len_list list wprint_elem = do {
+  begin_centered conf;
+  tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
+    tag "tr" "valign=\"top\"" begin
+      let _ =
+        List.fold_left
+          (fun (list, prev_char) len ->
+             loop prev_char True len list
+             where rec loop prev_char top n list =
+               if n = 0 then do {
+                 Wserver.wprint "</ul>\n</td>\n";
+                 (list, prev_char)
+               }
+               else do {
+                 if top then Wserver.wprint "<td>\n" else ();
+                 match list with
+                 [ [item :: list] -> do {
+                     match item with
+                     [ ItemChar c -> do {
+                         if not top then Wserver.wprint "</ul>\n" else ();
+                         Wserver.wprint "<h3 style=\"border-bottom: \
+                           dotted 1px\">%c</h3>\n" c.[0];
+                         Wserver.wprint "<ul>\n";
+                       }
+                     | ItemSpace _ -> ()
+                     | ItemElem elem -> do {
+                         if top then do {
+                           Wserver.wprint "<h3 style=\"border-bottom: \
+                             dotted 1px\">%c (%s)</h3>\n"
+                             prev_char.[0] (transl conf "continued");
+                           Wserver.wprint "<ul>\n";
+                         }
+                         else ();
+                         stagn "li" begin wprint_elem elem; end
+                       } ];
+                     let prev_char =
+                       match item with
+                       [ ItemChar c -> c
+                       | _ -> prev_char ]
+                     in
+                     loop prev_char False (n - 1) list
+                   }
+                 | [] -> ([], prev_char) ];
+               })
+          (list, " ") len_list
+      in
+      ();
+    end;
+  end;
+  end_centered conf;
+};
+
+value wprint_in_columns conf order wprint_elem list =
+  let (len_list, list) =
+    let ncols =
+      match p_getint conf.env "ncols" with
+      [ Some n -> max 1 n
+      | None -> if List.length list < 10 then 1 else 3 ]
+    in
+    dispatch_in_columns ncols list order
+  in
+  print_in_columns conf len_list list wprint_elem
 ;
