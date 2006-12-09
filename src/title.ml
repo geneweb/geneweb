@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.20 2006-12-09 05:04:58 ddr Exp $ *)
+(* $Id: title.ml,v 5.21 2006-12-09 21:30:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -528,7 +528,8 @@ value print_places_list conf base t t_equiv list = do {
     stag "a" "href=\"%sm=TT;sm=S;t=%s;p=%s%s\"" (commd conf) (code_varenv t)
       (code_varenv p) (if absolute then ";a=A" else "")
     begin
-      Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p);
+      if p = "" then Wserver.wprint "..."
+      else Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p);
     end
   in
   header conf title;
