@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.82 2006-12-09 19:53:32 ddr Exp $ *)
+(* $Id: util.ml,v 5.83 2006-12-09 20:00:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2755,13 +2755,19 @@ value dispatch_in_columns ncol list order =
     else
       let len_i =
         let i = (len + ncol / 2) / ncol in
-        match List.nth list (cum_len + i - 1) with
-        [ ItemChar c -> i + 3
-        | ItemSpace 1 -> i
-        | ItemSpace 2 -> i + 2
-        | ItemSpace 3 -> i + 1
-        | ItemElem _ -> i
-        | _ -> assert False ]
+        loop (cum_len + i - 1) list where rec loop nth =
+          fun
+          [ [item :: list] ->
+              if nth = 0 then
+                match item with
+                [ ItemChar c -> i + 3
+                | ItemSpace 1 -> i
+                | ItemSpace 2 -> i + 2
+                | ItemSpace 3 -> i + 1
+                | ItemElem _ -> i
+                | _ -> assert False ]
+              else loop (nth - 1) list
+          | [] -> assert False ]
       in
       loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
 ;
