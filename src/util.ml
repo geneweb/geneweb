@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.80 2006-12-09 04:24:21 ddr Exp $ *)
+(* $Id: util.ml,v 5.81 2006-12-09 10:28:46 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2733,7 +2733,10 @@ value dispatch_in_columns ncol list order =
          let ord = order elem in
          let (rlist, len) =
            match prev with
-           [ Some prev_ord when ord.[0] = prev_ord.[0] -> (rlist, len)
+           [ Some prev_ord
+             when ord = prev_ord ||
+                  ord <> "" && prev_ord <> "" && ord.[0] = prev_ord.[0] ->
+               (rlist, len)
            | _ ->
                ([ItemSpace 1; ItemSpace 2; ItemChar ord :: rlist],
                 len + 3) ]
@@ -2777,15 +2780,18 @@ value print_in_columns conf len_list list wprint_elem = do {
                      [ ItemChar c -> do {
                          if not top then Wserver.wprint "</ul>\n" else ();
                          Wserver.wprint "<h3 style=\"border-bottom: \
-                           dotted 1px\">%c</h3>\n" c.[0];
+                           dotted 1px\">%s</h3>\n"
+                           (if c = "" then "..." else String.make 1 c.[0]);
                          Wserver.wprint "<ul>\n";
                        }
                      | ItemSpace _ -> ()
                      | ItemElem elem -> do {
                          if top then do {
                            Wserver.wprint "<h3 style=\"border-bottom: \
-                             dotted 1px\">%c (%s)</h3>\n"
-                             prev_char.[0] (transl conf "continued");
+                             dotted 1px\">%s (%s)</h3>\n"
+                             (if prev_char = "" then "..."
+                              else String.make 1 prev_char.[0])
+                             (transl conf "continued");
                            Wserver.wprint "<ul>\n";
                          }
                          else ();
