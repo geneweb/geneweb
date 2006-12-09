@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.19 2006-12-09 04:24:21 ddr Exp $ *)
+(* $Id: title.ml,v 5.20 2006-12-09 05:04:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -381,15 +381,6 @@ value give_access_someone conf base (x, t) list =
   }
 ;
 
-value give_access_place conf base t p = 
-  let absolute = p_getenv conf.env "a" = Some "A" in
-  stag "a" "href=\"%sm=TT;sm=S;t=%s;p=%s%s\"" (commd conf) (code_varenv t)
-    (code_varenv p) (if absolute then ";a=A" else "")
-  begin
-    Wserver.wprint "... %s" p;
-  end
-;
-
 value give_access_title conf t p =
   do {
     Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
@@ -419,7 +410,7 @@ value give_access_all_places conf t =
 value print_title_place_list conf base t p t_equiv list =
   let absolute = p_getenv conf.env "a" = Some "A" in
   let title h =
-    if h || absolute || List.length t_equiv = 1 then do {
+    if h || absolute then do {
       Wserver.wprint "%s" t;
       if p <> "" then Wserver.wprint " %s" p else ()
     }
@@ -519,7 +510,7 @@ value print_all_with_place conf base p =
   print_all_with_place_list conf base p list
 ;
 
-value print_places_list conf base t t_equiv list =
+value print_places_list conf base t t_equiv list = do {
   let title h =
     if h || List.length t_equiv = 1 then Wserver.wprint "%s" t
     else
@@ -530,16 +521,20 @@ value print_places_list conf base t t_equiv list =
          })
         t_equiv
   in
-  do {
-    header conf title;
-    tag "ul" begin
-      List.iter
-        (fun p -> stagn "li" begin give_access_place conf base t p; end)
-        list;
-    end;
-    trailer conf;
-  }
-;
+  let order s = capitale (Name.lower (surname_end base s)) in
+  let list = List.sort (fun s1 s2 -> compare (order s1) (order s2)) list in
+  let absolute = p_getenv conf.env "a" = Some "A" in
+  let wprint_elem p =
+    stag "a" "href=\"%sm=TT;sm=S;t=%s;p=%s%s\"" (commd conf) (code_varenv t)
+      (code_varenv p) (if absolute then ";a=A" else "")
+    begin
+      Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p);
+    end
+  in
+  header conf title;
+  wprint_in_columns conf order wprint_elem list;
+  trailer conf;
+};
 
 value print_places conf base t =
   let (l, t, t_equiv) = select_title conf base t in
@@ -587,7 +582,7 @@ value print_all_titles conf base = do {
   trailer conf;
 };
 
-value print_all_places conf base =
+value print_all_places conf base = do {
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "all the estates"))
   in
@@ -595,15 +590,13 @@ value print_all_places conf base =
     let l = select_all_places conf base in
     string_list_uniq (List.sort compare_places l)
   in
-  do {
-    header conf title;
-    Wserver.wprint "<ul>\n";
-    List.iter
-      (fun t -> do { html_li conf; give_access_all_places conf t; () }) list;
-    Wserver.wprint "</ul>\n";
-    trailer conf;
-  }
-;
+  header conf title;
+  Wserver.wprint "<ul>\n";
+  List.iter
+    (fun t -> do { html_li conf; give_access_all_places conf t; () }) list;
+  Wserver.wprint "</ul>\n";
+  trailer conf;
+};
 
 value print conf base =
   match
