@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.81 2006-12-09 10:28:46 ddr Exp $ *)
+(* $Id: util.ml,v 5.82 2006-12-09 19:53:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2738,7 +2738,11 @@ value dispatch_in_columns ncol list order =
                   ord <> "" && prev_ord <> "" && ord.[0] = prev_ord.[0] ->
                (rlist, len)
            | _ ->
-               ([ItemSpace 1; ItemSpace 2; ItemChar ord :: rlist],
+               let (rlist, len) =
+                 if len = 0 then (rlist, len)
+                 else ([ItemSpace 1 :: rlist], len + 1)
+               in
+               ([ItemSpace 3; ItemSpace 2; ItemChar ord :: rlist],
                 len + 3) ]
          in
          let rlist = [ItemElem elem :: rlist] in
@@ -2750,11 +2754,14 @@ value dispatch_in_columns ncol list order =
     if ncol = 1 then (List.rev [len :: len_list], list)
     else
       let len_i =
-        let len_i = (len + ncol / 2) / ncol in
-        match List.nth list (cum_len + len_i - 1) with
-        [ ItemChar c -> len_i + 3
-        | ItemSpace n -> len_i + n
-        | ItemElem _ -> len_i ]
+        let i = (len + ncol / 2) / ncol in
+        match List.nth list (cum_len + i - 1) with
+        [ ItemChar c -> i + 3
+        | ItemSpace 1 -> i
+        | ItemSpace 2 -> i + 2
+        | ItemSpace 3 -> i + 1
+        | ItemElem _ -> i
+        | _ -> assert False ]
       in
       loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
 ;
