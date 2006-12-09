@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.144 2006-12-08 20:07:02 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.145 2006-12-09 02:25:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1523,7 +1523,8 @@ value nobtit conf base p =
            let id = Name.lower (sou base t.t_ident) in
            let pl = Name.lower (sou base t.t_place) in
            if List.mem (id ^ "/" ^ pl) allowed_titles ||
-              List.mem (id ^ "/*") allowed_titles
+              List.mem (id ^ "/*") allowed_titles ||
+              List.mem ("*/" ^ pl) allowed_titles
            then
              [t :: l]
            else l)

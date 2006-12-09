@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.17 2006-12-08 15:01:38 ddr Exp $ *)
+(* $Id: title.ml,v 5.18 2006-12-09 02:25:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -508,7 +508,7 @@ value print_all_with_place conf base p =
 
 value print_places_list conf base t t_equiv list =
   let title h =
-    if List.length t_equiv = 1 then Wserver.wprint "%s" t
+    if h || List.length t_equiv = 1 then Wserver.wprint "%s" t
     else
       list_iter_first
         (fun first t -> do {
