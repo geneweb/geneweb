@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.40 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.41 2006-12-09 04:24:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -94,138 +94,48 @@ value wiznote_date wfile =
   | None -> ("", 0.) ]
 ;
 
-type item 'a =
-  [ ItemChar of string
-  | ItemSpace of int
-  | ItemWiz of 'a ]
-;
-
-value dispatch_in_columns ncol list =
-  let (rlist, len, _) =
-    List.fold_left
-      (fun (rlist, len, prev) wiz ->
-         let (_, (_, (ord, _)), _, _) = wiz in
-         let (rlist, len) =
-           match prev with
-           [ Some prev_ord when ord.[0] = prev_ord.[0] -> (rlist, len)
-           | _ ->
-               ([ItemSpace 1; ItemSpace 2; ItemChar ord :: rlist],
-                len + 3) ]
-         in
-         let rlist = [ItemWiz wiz :: rlist] in
-         (rlist, len + 1, Some ord))
-      ([], 0, None) list
-  in
-  let list = List.rev rlist in
-  loop [] len 0 ncol where rec loop len_list len cum_len ncol =
-    if ncol = 1 then (List.rev [len :: len_list], list)
-    else
-      let len_i =
-        let len_i = (len + ncol / 2) / ncol in
-        match List.nth list (cum_len + len_i - 1) with
-        [ ItemChar c -> len_i + 3
-        | ItemSpace n -> len_i + n
-        | ItemWiz (wz, _, _, _) -> len_i ]
-      in
-      loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
-;
-
-value print_wizards_by_alphabetic_order conf list = do {
-  let (len_list, list) =
-    let ncols =
-      match p_getint conf.env "ncols" with
-      [ Some n -> max 1 n
-      | None -> if List.length list < 10 then 1 else 3 ]
+value print_wizards_by_alphabetic_order conf list =
+  let wprint_elem (wz, (wname, (_, islash)), wfile, stm) = do {
+    let tm = Unix.localtime stm in
+    let with_link =
+      conf.wizard && conf.user = wz || wfile <> "" ||
+      conf.manitou
     in
-    dispatch_in_columns ncols list
-  in
-  Util.begin_centered conf;
-  tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
-    tag "tr" "valign=\"top\"" begin
-      let _ =
-        List.fold_left
-          (fun (list, prev_char) len ->
-             loop prev_char True len list
-             where rec loop prev_char top n list =
-               if n = 0 then do {
-                 Wserver.wprint "</ul>\n</td>\n";
-                 (list, prev_char)
-               }
-               else do {
-                 if top then Wserver.wprint "<td>\n" else ();
-                 match list with
-                 [ [item :: list] -> do {
-                     match item with
-                     [ ItemChar c -> do {
-                         if not top then Wserver.wprint "</ul>\n" else ();
-                         Wserver.wprint "<h3 style=\"border-bottom: \
-                           dotted 1px\">%c</h3>\n" c.[0];
-                         Wserver.wprint "<ul>\n";
-                       }
-                     | ItemSpace _ -> ()
-                     | ItemWiz (wz, (wname, (_, islash)), wfile, stm) -> do {
-                         let tm = Unix.localtime stm in
-                         if top then do {
-                           Wserver.wprint "<h3 style=\"border-bottom: \
-                             dotted 1px\">%c (%s)</h3>\n"
-                             prev_char.[0] (transl conf "continued");
-                           Wserver.wprint "<ul>\n";
-                         }
-                         else ();
-                         let with_link =
-                           conf.wizard && conf.user = wz || wfile <> "" ||
-                           conf.manitou
-                         in
-                         stag "li" begin
-                           if with_link then
-                             Wserver.wprint
-                               "<a href=\"%sm=WIZNOTES;f=%s%t\">"
-                               (commd conf) (Util.code_varenv wz)
-                               (fun _ ->
-                                  Printf.sprintf
-                                   ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                                   (tm.Unix.tm_year + 1900)
-                                   (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
-                                   tm.Unix.tm_hour tm.Unix.tm_min
-                                   tm.Unix.tm_sec)
-                           else ();
-                           if islash > 0 then
-                             let s1 =
-                               let islash =
-                                 if wname.[islash-1] = ' ' then
-                                   islash - 1
-                                 else islash
-                               in
-                               String.sub wname 0 islash
-                             in
-                             let s2 =
-                               String.sub wname islash
-                                 (String.length wname - islash)
-                             in
-                             Wserver.wprint "%s (%s)" s2 s1
-                           else
-                             Wserver.wprint "%s" wname;
-                           if with_link then Wserver.wprint "</a>"
-                           else ();
-                         end;
-                         Wserver.wprint "\n";
-                       } ];
-                     let prev_char =
-                       match item with
-                       [ ItemChar c -> c
-                       | _ -> prev_char ]
-                     in
-                     loop prev_char False (n - 1) list
-                   }
-                 | [] -> ([], prev_char) ];
-               })
-          (list, " ") len_list
+    if with_link then
+      Wserver.wprint
+        "<a href=\"%sm=WIZNOTES;f=%s%t\">"
+        (commd conf) (Util.code_varenv wz)
+        (fun _ ->
+           Printf.sprintf
+            ";d=%d-%02d-%02d,%02d:%02d:%02d"
+            (tm.Unix.tm_year + 1900)
+            (tm.Unix.tm_mon + 1) tm.Unix.tm_mday
+            tm.Unix.tm_hour tm.Unix.tm_min
+            tm.Unix.tm_sec)
+    else ();
+    if islash > 0 then
+      let s1 =
+        let islash =
+          if wname.[islash-1] = ' ' then
+            islash - 1
+          else islash
+        in
+        String.sub wname 0 islash
       in
-      ();
-    end;
-  end;
-  Util.end_centered conf;
-};
+      let s2 =
+        String.sub wname islash
+          (String.length wname - islash)
+      in
+      Wserver.wprint "%s (%s)" s2 s1
+    else
+      Wserver.wprint "%s" wname;
+    if with_link then Wserver.wprint "</a>"
+    else ()
+  }
+  in
+  let order (_, (_, (ord, _)), _, _) = ord in
+  wprint_in_columns conf order wprint_elem list
+;
 
 value print_wizards_by_date conf list = do {
   let sep_period_list =
