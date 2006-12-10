@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.83 2006-12-09 20:00:02 ddr Exp $ *)
+(* $Id: util.ml,v 5.84 2006-12-10 06:29:14 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2750,26 +2750,66 @@ value dispatch_in_columns ncol list order =
       ([], 0, None) list
   in
   let list = List.rev rlist in
-  loop [] len 0 ncol where rec loop len_list len cum_len ncol =
-    if ncol = 1 then (List.rev [len :: len_list], list)
+  (* I am not happy at all of that code... too complicated *)
+  loop [] [] list len 0 ncol
+  where rec loop len_list rlist list len cum_len ncol =
+    if ncol = 1 then (List.rev [len :: len_list], List.rev_append rlist list)
     else
-      let len_i =
-        let i = (len + ncol / 2) / ncol in
-        loop (cum_len + i - 1) list where rec loop nth =
+      let (len_i, rlist, list, len) =
+        let i = (2 * len + ncol) / (2 * ncol) in
+        loop i rlist len list where rec loop nth rlist len =
           fun
           [ [item :: list] ->
               if nth = 0 then
                 match item with
-                [ ItemChar c -> i + 3
-                | ItemSpace 1 -> i
-                | ItemSpace 2 -> i + 2
-                | ItemSpace 3 -> i + 1
-                | ItemElem _ -> i
+                [ ItemElem _ ->
+                    let rlist = [item :: rlist] in
+                    match list with
+                    [ [ItemElem _ :: _] ->
+                        (* not the last elem; add spaces for "continued" *)
+                        let list =
+                          [ItemSpace 4; ItemSpace 4; ItemSpace 4;
+                           ItemSpace 4 :: list]
+                        in
+                        (i, rlist, list, len + 3)
+                    | [ItemSpace 1 :: list] ->
+                        (* the last elem; remove the ending space *)
+                        (i, rlist, list, len - 1)
+                    | [] ->
+                        failwith "1"
+                    | _ ->
+                        failwith "2" ]
+                | ItemSpace 1 ->
+                    (* space ending an item; not necessary at end of column *)
+                    (i - 1, rlist, list, len - 1)
+                | ItemChar c ->
+                    match rlist with
+                    [ [ItemSpace 1 :: rlist] ->
+                        (* report to next column *)
+                        (i - 2, rlist, [item :: list], len)
+                    | _ -> assert False ]
+                | ItemSpace 2 ->
+                    match rlist with
+                    [ [ItemChar c; ItemSpace 1 :: rlist] ->
+                        (* report to next column *)
+                        let list = [ItemChar c; item :: list] in
+                        (i - 3, rlist, list, len + 1)
+                    | _ -> assert False ]
+                | ItemSpace 3 ->
+                    match list with
+                    [ [ItemElem elem :: _] ->
+                        (* add just the first element *)
+                        let (len_i, rlist, list, len) =
+                          loop 0 [item :: rlist] len list
+                        in
+                        (len_i + 1, rlist, list, len)
+                    | _ -> assert False ]
                 | _ -> assert False ]
-              else loop (nth - 1) list
+              else loop (nth - 1) [item :: rlist] (len - 1) list
           | [] -> assert False ]
       in
-      loop [len_i :: len_list] (len - len_i) (cum_len + len_i) (ncol - 1)
+      loop [len_i + 1 :: len_list] rlist list len (cum_len + len_i)
+        (ncol - 1)
 ;
 
 value print_in_columns conf len_list list wprint_elem = do {
@@ -2797,6 +2837,16 @@ value print_in_columns conf len_list list wprint_elem = do {
                            (if c = "" then "..." else String.make 1 c.[0]);
                          Wserver.wprint "<ul>\n";
                        }
+                     | ItemSpace 4 ->
+                         if top then do {
+                           Wserver.wprint "<h3 style=\"border-bottom: \
+                             dotted 1px\">%s (%s)</h3>\n"
+                             (if prev_char = "" then "..."
+                              else String.make 1 prev_char.[0])
+                             (transl conf "continued");
+                           Wserver.wprint "<ul>\n";
+                         }
+                         else ()
                      | ItemSpace _ -> ()
                      | ItemElem elem -> do {
                          if top then do {
