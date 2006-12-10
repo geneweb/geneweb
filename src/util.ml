@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.84 2006-12-10 06:29:14 ddr Exp $ *)
+(* $Id: util.ml,v 5.85 2006-12-10 12:25:23 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2720,96 +2720,59 @@ value xml_pretty_print s =
 
 (* Print list in columns with alphabetic order *)
 
-type item 'a =
-  [ ItemChar of string
-  | ItemSpace of int
-  | ItemElem of 'a ]
-;
+type elem_kind = [ HeadElem | ContElem | Elem ];
+value kind_size = fun [ HeadElem | ContElem -> 4 | Elem -> 1 ];
 
 value dispatch_in_columns ncol list order =
-  let (rlist, len, _) =
+  let rlist =
     List.fold_left
-      (fun (rlist, len, prev) elem ->
+      (fun rlist elem ->
          let ord = order elem in
-         let (rlist, len) =
-           match prev with
-           [ Some prev_ord
-             when ord = prev_ord ||
-                  ord <> "" && prev_ord <> "" && ord.[0] = prev_ord.[0] ->
-               (rlist, len)
-           | _ ->
-               let (rlist, len) =
-                 if len = 0 then (rlist, len)
-                 else ([ItemSpace 1 :: rlist], len + 1)
-               in
-               ([ItemSpace 3; ItemSpace 2; ItemChar ord :: rlist],
-                len + 3) ]
+         let kind =
+           match rlist with
+           [ [(_, prev_ord, prev_elem) :: _] ->
+               if ord = prev_ord ||
+                  ord <> "" && prev_ord <> "" && ord.[0] = prev_ord.[0]
+               then Elem
+               else HeadElem
+           | [] -> HeadElem ]
          in
-         let rlist = [ItemElem elem :: rlist] in
-         (rlist, len + 1, Some ord))
-      ([], 0, None) list
+         [(ref kind, ord, elem) :: rlist])
+      [] list
   in
-  let list = List.rev rlist in
-  (* I am not happy at all of that code... too complicated *)
-  loop [] [] list len 0 ncol
-  where rec loop len_list rlist list len cum_len ncol =
-    if ncol = 1 then (List.rev [len :: len_list], List.rev_append rlist list)
-    else
-      let (len_i, rlist, list, len) =
-        let i = (2 * len + ncol) / (2 * ncol) in
-        loop i rlist len list where rec loop nth rlist len =
-          fun
-          [ [item :: list] ->
-              if nth = 0 then
-                match item with
-                [ ItemElem _ ->
-                    let rlist = [item :: rlist] in
-                    match list with
-                    [ [ItemElem _ :: _] ->
-                        (* not the last elem; add spaces for "continued" *)
-                        let list =
-                          [ItemSpace 4; ItemSpace 4; ItemSpace 4;
-                           ItemSpace 4 :: list]
-                        in
-                        (i, rlist, list, len + 3)
-                    | [ItemSpace 1 :: list] ->
-                        (* the last elem; remove the ending space *)
-                        (i, rlist, list, len - 1)
-                    | [] ->
-                        failwith "1"
-                    | _ ->
-                        failwith "2" ]
-                | ItemSpace 1 ->
-                    (* space ending an item; not necessary at end of column *)
-                    (i - 1, rlist, list, len - 1)
-                | ItemChar c ->
-                    match rlist with
-                    [ [ItemSpace 1 :: rlist] ->
-                        (* report to next column *)
-                        (i - 2, rlist, [item :: list], len)
-                    | _ -> assert False ]
-                | ItemSpace 2 ->
-                    match rlist with
-                    [ [ItemChar c; ItemSpace 1 :: rlist] ->
-                        (* report to next column *)
-                        let list = [ItemChar c; item :: list] in
-                        (i - 3, rlist, list, len + 1)
-                    | _ -> assert False ]
-                | ItemSpace 3 ->
-                    match list with
-                    [ [ItemElem elem :: _] ->
-                        (* add just the first element *)
-                        let (len_i, rlist, list, len) =
-                          loop 0 [item :: rlist] len list
-                        in
-                        (len_i + 1, rlist, list, len)
-                    | _ -> assert False ]
-                | _ -> assert False ]
-              else loop (nth - 1) [item :: rlist] (len - 1) list
-          | [] -> assert False ]
-      in
-      loop [len_i + 1 :: len_list] rlist list len (cum_len + len_i)
-        (ncol - 1)
+  let (ini_list, len) =
+    List.fold_left
+      (fun (list, len) ((kind, _, _) as elem) ->
+         ([elem :: list], len + kind_size kind.val))
+      ([], 0) rlist
+  in
+  let len_list =
+    loop [] 0 1 0 len ini_list
+    where rec loop rlen_list cnt col accu len list =
+      if col > ncol then List.rev rlen_list
+      else
+        let (list, kind, is_last) =
+          match list with
+          [ [(kind, _, _) :: list] -> (list, kind, False)
+          | [] -> ([], ref Elem, True) ]
+        in
+        let accu = accu + ncol * kind_size kind.val in
+        let cnt = cnt + 1 in
+        if accu > len && not is_last && kind.val = Elem then do {
+          (* put a new size and restart from zero *)
+          kind.val := ContElem;
+          loop [] 0 1 0 (len + kind_size ContElem - 1) ini_list
+        }
+        else
+          let (rlen_list, cnt, col, accu) =
+            if accu > len && cnt > 1 then
+              ([cnt - 1 :: rlen_list], 1, col + 1, accu - len)
+            else
+              (rlen_list, cnt, col, accu)
+          in
+          loop rlen_list cnt col accu len list
+  in
+  (len_list, ini_list)
 ;
 
 value print_in_columns conf len_list list wprint_elem = do {
@@ -2818,58 +2781,32 @@ value print_in_columns conf len_list list wprint_elem = do {
     tag "tr" "valign=\"top\"" begin
       let _ =
         List.fold_left
-          (fun (list, prev_char) len ->
-             loop prev_char True len list
-             where rec loop prev_char top n list =
+          (fun (list, first) len ->
+             loop len list where rec loop n list =
                if n = 0 then do {
                  Wserver.wprint "</ul>\n</td>\n";
-                 (list, prev_char)
+                 (list, False)
                }
-               else do {
-                 if top then Wserver.wprint "<td>\n" else ();
+               else
                  match list with
-                 [ [item :: list] -> do {
-                     match item with
-                     [ ItemChar c -> do {
-                         if not top then Wserver.wprint "</ul>\n" else ();
-                         Wserver.wprint "<h3 style=\"border-bottom: \
-                           dotted 1px\">%s</h3>\n"
-                           (if c = "" then "..." else String.make 1 c.[0]);
-                         Wserver.wprint "<ul>\n";
-                       }
-                     | ItemSpace 4 ->
-                         if top then do {
-                           Wserver.wprint "<h3 style=\"border-bottom: \
-                             dotted 1px\">%s (%s)</h3>\n"
-                             (if prev_char = "" then "..."
-                              else String.make 1 prev_char.[0])
-                             (transl conf "continued");
-                           Wserver.wprint "<ul>\n";
-                         }
-                         else ()
-                     | ItemSpace _ -> ()
-                     | ItemElem elem -> do {
-                         if top then do {
-                           Wserver.wprint "<h3 style=\"border-bottom: \
-                             dotted 1px\">%s (%s)</h3>\n"
-                             (if prev_char = "" then "..."
-                              else String.make 1 prev_char.[0])
-                             (transl conf "continued");
-                           Wserver.wprint "<ul>\n";
-                         }
-                         else ();
-                         stagn "li" begin wprint_elem elem; end
-                       } ];
-                     let prev_char =
-                       match item with
-                       [ ItemChar c -> c
-                       | _ -> prev_char ]
-                     in
-                     loop prev_char False (n - 1) list
+                 [ [(kind, ord, elem) :: list] -> do {
+                     if n = len then Wserver.wprint "<td>\n"
+                     else if kind.val <> Elem then Wserver.wprint "</ul>\n"
+                     else ();
+                     if kind.val <> Elem then do {
+                       Wserver.wprint "<h3 style=\"border-bottom: \
+                         dotted 1px\">%s%s</h3>\n"
+                         (if ord = "" then "..." else String.make 1 ord.[0])
+                         (if kind.val = HeadElem then ""
+                          else " (" ^ transl conf "continued" ^ ")");
+                       Wserver.wprint "<ul>\n";
+                     }
+                     else ();
+                     stagn "li" begin wprint_elem elem; end;
+                     loop (n - 1) list
                    }
-                 | [] -> ([], prev_char) ];
-               })
-          (list, " ") len_list
+                 | [] -> ([], False) ])
+          (list, True) len_list
       in
       ();
     end;
