@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.64 2006-12-08 15:22:20 ddr Exp $
+# $Id: lex_utf8.txt,v 5.65 2006-12-10 18:58:28 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1986,6 +1986,7 @@ fr: âge moyen de décès
 it: età media di morte
 nl: gemiddelde leeftijd bij overlijden
 pl: średni wiek śmierci
+pt: idade média ao morrer
 ro: virsta media la deces
 sv: medelålder vid dödstillfället
 
@@ -2794,6 +2795,7 @@ fr: connexions
 it: connessioni
 nl: connecties
 pl: połączenie
+pt: conexões
 sv: kopplingar
 
     consanguinity
@@ -2858,6 +2860,7 @@ en: continued
 fr: suite
 it: continua
 pl: ciąg dalszy
+pt: continuação
 sv: forts
 
     cousins
@@ -3219,7 +3222,9 @@ bg: да се прекъсне връзката
 de: abmelden
 en: disconnect
 fr: déconnecter
+pt: desconectar
 ro: deconectare
+sv: koppla från
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
@@ -3915,6 +3920,7 @@ en: for the list ordered by the date of the last modification
 fr: pour la liste par date de dernière modification
 it: per la lista ordinata secondo la data dell'ultima modifica
 pl: aby oglądać listę według daty ostatniej modyfikacji
+pt: para a lista ordenada por data da última modificação
 sv: för listan över sista ändringsdatum
 
     foster father/foster mother/foster parents
@@ -6334,7 +6340,9 @@ bg: брой на живите лица
 de: Anzahl der lebenden Personen:
 en: number of living persons:
 fr: nombre de personnes vivantes :
+pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
+sv: antal levande personer:
 
     occupation
 af: beroep
@@ -6834,7 +6842,9 @@ bg: възрастова пирамида
 de: Alterspyramide
 en: population pyramid
 fr: pyramide des âges
+pt: pirâmide populacional
 ro: piramida demografică
+sv: befolkningspyramid
 
     possibly (date)
 af: miskien
@@ -7597,6 +7607,7 @@ en: since the last click
 fr: depuis le dernier clic
 it: dall'ultimo click
 pl: od ostatniego kliknięcia
+pt: desde o último clique
 sv: från senaste klick
 
     son/daughter/child
