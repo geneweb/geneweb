@@ -1,8 +1,8 @@
-# $Id: Makefile.inc,v 5.6 2006-12-05 11:06:36 ddr Exp $
+# $Id: Makefile.inc.unix,v 1.1 2006-12-11 20:36:27 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh $(PPDEF)
-CAMLP4F=-DUNIX
+CAMLP4F=-DWIN95
 PPDEF=$(TOP)/src/ppdef.cmo
 CAMLP4D="$$(camlp4 -where)"
 LIBUNIX=-cclib -lunix
@@ -10,10 +10,9 @@ OCAMLC=ocamlc.opt -warn-error A
 OCAMLOPT=ocamlopt.opt -warn-error A
 OCAMLI=
 OCAMLD=
-STRIP=strip
-RM=/bin/rm -f
-EXE=
-STATIC=-ccopt -static
+STRIP=true
+RM=rm -f
+EXE=.exe
 STATIC=
 TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
 
