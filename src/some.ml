@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.23 2006-11-28 16:09:49 ddr Exp $ *)
+(* $Id: some.ml,v 5.24 2006-12-11 11:50:24 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -259,7 +259,6 @@ value child_has_children_with_that_name base des name =
 
 value print_branch conf base psn name =
   let unsel_list = Util.unselected_bullets conf in
-  let cln = Name.crush_lower name in
   loop True where rec loop is_first_lev lev p =
     do {
       let u = uget conf base (get_key_index p) in
@@ -269,18 +268,8 @@ value print_branch conf base psn name =
              let fam = foi base ifam in
              let des = doi base ifam in
              let c = spouse (get_key_index p) (coi base ifam) in
-             let el = get_children des in
              let c = pget conf base c in
-             let down =
-               get_sex p = Male &&
-               (Name.crush_lower (p_surname base p) = cln || is_first_lev) &&
-               Array.length (get_children des) <> 0 ||
-               get_sex p = Female &&
-               she_has_children_with_her_name conf base p c el ||
-               get_sex p = Male &&
-               (has_children_with_that_name base des name ||
-                child_has_children_with_that_name base des name)
-             in
+             let down = has_children_with_that_name base des name in
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.mem i unsel_list) in
              (fam, des, c, if down then Some (string_of_int i, sel) else None))
@@ -575,25 +564,10 @@ value select_ancestors conf base name_inj ipl =
               str_inj (get_surname moth) <> s &&
               not (List.mem ip ipl)
            then
-             if List.mem ifath ipl then ipl
-             else
-               let grandfath_same_surname =
-                 match get_parents (aoi base ifath) with
-                 [ Some igfam ->
-                     let gfath = poi base (get_father (coi base igfam)) in
-                     str_inj (get_surname gfath) = s
-                 | None -> False ]
-               in
-               if grandfath_same_surname then ipl
-               else if
-                 not (is_hidden fath) &&
-                 has_at_least_2_children_with_surname conf base
-                   (doi base ifam) (get_surname p)
-               then
-                 [ifath :: ipl]
-               else [ip :: ipl]
+             if List.mem ip ipl then ipl else [ip :: ipl]
            else ipl
-       | _ -> [ip :: ipl] ])
+       | _ ->
+           [ip :: ipl] ])
     [] ipl
 ;
 
