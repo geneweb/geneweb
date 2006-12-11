@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.17 2006-11-27 15:11:05 ddr Exp $ *)
+(* $Id: notes.ml,v 5.18 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -335,6 +335,7 @@ value update_notes_links_db conf fnotes s force =
               [(key, link) :: list_ind]
             in
             loop list_nt list_ind (pos + 1) j
+        | NotesLinks.WLwizard j _ _ -> loop list_nt list_ind pos j
         | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
   in
   if not force && list_nt = [] && list_ind = [] then ()

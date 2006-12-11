@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 5.1 2006-11-20 03:58:58 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 5.2 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -38,6 +38,7 @@ value check_file_name s =
 type wiki_link =
   [ WLpage of int and (list string * string) and string and string and string
   | WLperson of int and key and string and option string
+  | WLwizard of int and string and string
   | WLnone ]
 ;
 
@@ -76,6 +77,14 @@ value misc_notes_link s i =
           else loop (j + 1)
       in
       let b = String.sub s (i + 2) (j - i - 4) in
+      let (spe, b) =
+        try
+          let i = String.index b ':' in
+          (Some (String.sub b 0 i),
+           String.sub b (i + 1) (String.length b - i - 1))
+        with
+        [ Not_found -> (None, b) ]
+      in
       let (b, text) =
         try
           let i = String.rindex b ';' in
@@ -84,38 +93,50 @@ value misc_notes_link s i =
         with
         [ Not_found -> (b, None) ]
       in
-      try
-        let k = 0 in
-        let l = String.index_from b k '/' in
-        let fn = String.sub b k (l - k) in
-        let k = l + 1 in
-        let (fn, sn, oc, name) =
-          try
-            let l = String.index_from b k '/' in
-            let sn = String.sub b k (l - k) in
-            let (oc, name) =
-              try
-                let k = l + 1 in
-                let l = String.index_from b k '/' in
-                let x = String.sub b k (l - k) in
-                (x, String.sub b (l + 1) (String.length b - l - 1))
-              with
-              [ Not_found ->
-                  ("", String.sub b (l + 1) (String.length b - l - 1)) ]
-            in
-            let oc = try int_of_string oc with [ Failure _ -> 0 ] in
-            (fn, sn, oc, name)
+      if spe = Some "w" then
+        let (wiz, name) =
+          match
+            try (Some (String.index b '/')) with [ Not_found -> None ]
           with
-          [ Not_found ->
-              let sn = String.sub b k (String.length b - k) in
-              let name = fn ^ " " ^ sn in
-              (fn, sn, 0, name) ]
+          [ Some i ->
+              (String.sub b 0 i,
+               String.sub b (i + 1) (String.length b - i - 1))
+          | None -> (b, "") ]
         in
-        let fn = Name.lower fn in
-        let sn = Name.lower sn in
-        WLperson j (fn, sn, oc) name text
-      with
-      [ Not_found -> WLnone ]
+        WLwizard j wiz name
+      else
+        try
+          let k = 0 in
+          let l = String.index_from b k '/' in
+          let fn = String.sub b k (l - k) in
+          let k = l + 1 in
+          let (fn, sn, oc, name) =
+            try
+              let l = String.index_from b k '/' in
+              let sn = String.sub b k (l - k) in
+              let (oc, name) =
+                try
+                  let k = l + 1 in
+                  let l = String.index_from b k '/' in
+                  let x = String.sub b k (l - k) in
+                  (x, String.sub b (l + 1) (String.length b - l - 1))
+                with
+                [ Not_found ->
+                    ("", String.sub b (l + 1) (String.length b - l - 1)) ]
+              in
+              let oc = try int_of_string oc with [ Failure _ -> 0 ] in
+              (fn, sn, oc, name)
+            with
+            [ Not_found ->
+                let sn = String.sub b k (String.length b - k) in
+                let name = fn ^ " " ^ sn in
+                (fn, sn, 0, name) ]
+          in
+          let fn = Name.lower fn in
+          let sn = Name.lower sn in
+          WLperson j (fn, sn, oc) name text
+        with
+        [ Not_found -> WLnone ]
   else WLnone
 ;
 
