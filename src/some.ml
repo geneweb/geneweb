@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.25 2006-12-11 13:08:33 ddr Exp $ *)
+(* $Id: some.ml,v 5.26 2006-12-11 14:03:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -324,7 +324,9 @@ value alphabetic1 n1 n2 =
   else Gutil.alphabetic n1 n2
 ;
 
-value print_by_branch x conf base (pl, homonymes) =
+type branch_head 'a = { bh_ancestor : 'a; bh_well_named_ancestors : list 'a };
+
+value print_by_branch x conf base (bhl, homonymes) =
   let ancestors =
     match p_getenv conf.env "order" with
     [ Some "d" ->
@@ -336,12 +338,13 @@ value print_by_branch x conf base (pl, homonymes) =
           | (_, None) -> -1
           | (None, _) -> 1 ]
         in
-        List.sort born_before pl
+        List.sort (fun p1 p2 -> born_before p1.bh_ancestor p2.bh_ancestor) bhl
     | _ ->
         List.sort
           (fun p1 p2 ->
-             alphabetic1 (p_first_name base p1) (p_first_name base p2))
-          pl ]
+             alphabetic1 (p_first_name base p1.bh_ancestor)
+               (p_first_name base p2.bh_ancestor))
+          bhl ]
   in
   let len = List.length ancestors in
   let fx = x in
@@ -399,7 +402,8 @@ value print_by_branch x conf base (pl, homonymes) =
     else ();
     let _ =
       List.fold_left
-        (fun n p ->
+        (fun n bh ->
+           let p = bh.bh_ancestor in
            do {
              if len > 1 && br = None then do {
                Wserver.wprint "\n";
@@ -412,31 +416,25 @@ value print_by_branch x conf base (pl, homonymes) =
              }
              else ();
              if br = None || br = Some n then
-               match get_parents (aget conf base (get_key_index p)) with
-               [ Some ifam ->
-                   let cpl = coi base ifam in
+               match bh.bh_well_named_ancestors with
+               [ [] ->
+                   print_branch conf base psn x
+                     (if len > 1 && br = None then 1 else 0) p
+               | pl ->
                    tag "dd" begin
-                     let pp = pget conf base (get_father cpl) in
-                     if is_hidden pp then
+                     if is_hidden p then
                        Wserver.wprint "&lt;&lt;"
                      else
-                       let href = Util.acces conf base pp in
-                       wprint_geneweb_link conf href "&lt;&lt;";
-                     Wserver.wprint "\n&amp;\n";
-                     let pp = pget conf base (get_mother cpl) in
-                     if is_hidden pp then
-                       Wserver.wprint "&lt;&lt;"
-                     else
-                       let href = Util.acces conf base pp in
+                       let href = Util.acces conf base p in
                        wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n";
-                     tag "dl" begin
-                       print_branch conf base psn x 1 p;
-                     end;
-                   end
-               | None ->
-                   print_branch conf base psn x
-                     (if len > 1 && br = None then 1 else 0) p ]
+                     List.iter
+                       (fun p ->
+                          tag "dl" begin
+                            print_branch conf base psn x 1 p;
+                          end)
+                       bh.bh_well_named_ancestors;
+                   end ]
              else ();
              n + 1
            })
@@ -512,27 +510,57 @@ value print_family_alphabetic x conf base liste =
       } ]
 ;
 
+value insert_at_position_in_family children ip ipl =
+  loop (Array.to_list children) ipl where rec loop child_list ipl =
+    match (child_list, ipl) with
+    [ ([ip1 :: ipl1], [ip2 :: ipl2]) ->
+        if ip1 = ip2 then
+          if ip = ip1 then ipl else [ip2 :: loop ipl1 ipl2]
+        else
+          if ip = ip1 then [ip1 :: ipl] else loop ipl1 ipl
+    | ([_ :: _], []) -> [ip]
+    | ([], _) -> assert False ]
+;
+
 value select_ancestors conf base name_inj ipl =
   let str_inj s = name_inj (sou base s) in
   List.fold_left
-    (fun ipl ip ->
+    (fun bhl ip ->
        let p = pget conf base ip in
        let a = aget conf base ip in
        match get_parents a with
        [ Some ifam ->
            let cpl = coi base ifam in
            let ifath = get_father cpl in
+           let imoth = get_mother cpl in
            let fath = pget conf base ifath in
-           let moth = pget conf base (get_mother cpl) in
+           let moth = pget conf base imoth in
            let s = str_inj (get_surname p) in
            if str_inj (get_surname fath) <> s &&
-              str_inj (get_surname moth) <> s &&
-              not (List.mem ip ipl)
+              str_inj (get_surname moth) <> s
            then
-             if List.mem ip ipl then ipl else [ip :: ipl]
-           else ipl
+             loop bhl where rec loop =
+               fun
+               [ [bh :: bhl] ->
+                   if bh.bh_ancestor = ifath || bh.bh_ancestor = imoth then
+                     let bh =
+                       {(bh) with
+                        bh_well_named_ancestors =
+                          insert_at_position_in_family
+                            (get_children (doi base ifam))
+                            ip bh.bh_well_named_ancestors}
+                     in
+                     [bh :: bhl]
+                   else
+                     [bh :: loop bhl]
+               | [] ->
+                   [{bh_ancestor = ifath; bh_well_named_ancestors = [ip]}] ]
+           else bhl
        | _ ->
-           [ip :: ipl] ])
+           let bh =
+             {bh_ancestor = ip; bh_well_named_ancestors = []}
+           in
+           [bh :: bhl] ])
     [] ipl
 ;
 
@@ -600,8 +628,15 @@ value surname_print conf base not_found_fun x =
         List.sort (fun (_, len1) (_, len2) -> compare len2 len1) strl
       in
       let strl = List.map fst strl in
-      let iperl = select_ancestors conf base name_inj iperl in
-      let pl = List.map (pget conf base) iperl in
-      if pl = [] then not_found_fun conf x
-      else print_by_branch x conf base (pl, strl) ]
+      let bhl = select_ancestors conf base name_inj iperl in
+      let bhl =
+        List.map
+          (fun bh ->
+             {bh_ancestor = poi base bh.bh_ancestor;
+              bh_well_named_ancestors =
+                List.map (poi base) bh.bh_well_named_ancestors})
+          bhl
+      in
+      if bhl = [] then not_found_fun conf x
+      else print_by_branch x conf base (bhl, strl) ]
 ;
