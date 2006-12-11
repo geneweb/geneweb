@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo "print_endline Sys.os_type;;" > tools/tmp
+if [ "`ocaml tools/tmp`" = "Unix" ]; then
+  cp tools/Makefile.inc.unix tools/Makefile.inc
+else
+  cp tools/Makefile.inc.win tools/Makefile.inc
+fi
+rm tools/tmp
