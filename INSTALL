@@ -1,17 +1,15 @@
 INSTALLATIONS INSTRUCTIONS IN UNIX or MACOSX MACHINES
-[For Windows machines, look at the end of this file]
 
-For the compilation, you need the Objective Caml compiler version 3.06
-to 3.08 and Camlp4 same version installed in your computer.
+For the compilation, you need the Objective Caml compiler installed
+in your computer. The compilation works for several versions of ocaml.
 
 It is freely distributed at address:
      http://caml.inria.fr/ocaml/
 
-It may compile with other (older or newer) versions of OCaml and Camlp4,
-but no warranty: however, if you manage to compile, it has good chances
-to be correct.
+1- In the top directory, do:
+      . configure
 
-1- If the command ocamlc.opt is not installed, edit the file
+2- If the command ocamlc.opt is not installed, edit the file
    "tools/Makefile.inc" and change:
        OCAMLC=ocamlc.opt
        OCAMLOPT=ocamlopt.opt
@@ -19,12 +17,12 @@ to be correct.
        OCAMLC=ocamlc
        OCAMLOPT=ocamlopt
 
-2- If your platform has the command ocamlopt, do:
+3- If your platform has the command ocamlopt, do:
       make
    Otherwise do (warning: slower executables):
       make out
 
-3- Do:
+4- Do:
       make distrib
 
    This creates a directory "distribution" where all executables programs
@@ -33,7 +31,7 @@ to be correct.
    This can constitute a "distribution" directory if you want to distribute
    executables.
 
-4- To use GeneWeb, move the directory "distribution" to another place, or
+5- To use GeneWeb, move the directory "distribution" to another place, or
    rename it.
 
    Go to this directory and launch the command "./gwsetup".
@@ -56,10 +54,4 @@ You need:
 
 - The Objective Caml compiler, version 3.04
 
-In directory tools, move the file Makefile.inc as another name, and
-move the file Makefile.inc.win as Makefile.inc. Edit it and possibly
-change "CAMLP4D" and "LIBUNIX" to point file where the corresponding
-OCaml and Camlp4 files or directories are installed.
-
-Then follow the same instructions above than for the Unix installation,
-starting at point 2.
+Follow the same instructions above than for the Unix installation.

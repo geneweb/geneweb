@@ -13,6 +13,7 @@ CONTENTS:
 	CHANGES		changes (for genealogists non programmers)
 	ICHANGES	changes (for programmers)
 	LICENSE		license notice
+        configure       configure script
 	Makefile	main Makefile
 	README		this file
 	INSTALL		installation file
