@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.85 2006-12-10 12:25:23 ddr Exp $ *)
+(* $Id: util.ml,v 5.86 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2600,7 +2600,8 @@ value rec in_text case_sens s m =
     else if m.[i] = '[' && i + 1 < String.length m && m.[i+1] = '[' then
       match NotesLinks.misc_notes_link m i with
       [ NotesLinks.WLpage j _ _ _ text
-      | NotesLinks.WLperson j _ text _ ->
+      | NotesLinks.WLperson j _ text _
+      | NotesLinks.WLwizard j _ text ->
           if in_text case_sens s text then True else loop False j
       | NotesLinks.WLnone -> loop False (i + 1) ]
     else

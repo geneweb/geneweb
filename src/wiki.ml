@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.14 2006-10-31 05:56:01 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.15 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -175,9 +175,14 @@ use of database forum by ill-intentioned people to communicate)...
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
             sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
-              pos (commd conf)
-              (code_varenv fn) (code_varenv sn)
+              pos (commd conf) (code_varenv fn) (code_varenv sn)
               (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
+          in
+          loop quot_lev (pos + 1) j (Buff.mstore len t)
+      | NotesLinks.WLwizard j wiz name ->
+          let t =
+            sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
+              (if name <> "" then name else wiz)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone ->

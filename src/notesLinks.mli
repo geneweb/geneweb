@@ -1,4 +1,4 @@
-(* $Id: notesLinks.mli,v 5.1 2006-11-20 03:58:58 ddr Exp $ *)
+(* $Id: notesLinks.mli,v 5.2 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 type page =
@@ -13,6 +13,7 @@ type notes_links_db = list (page * (list string * list (key * ind_link)));
 type wiki_link =
   [ WLpage of int and (list string * string) and string and string and string
   | WLperson of int and key and string and option string
+  | WLwizard of int and string and string
   | WLnone ]
 ;
 

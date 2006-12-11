@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.15 2006-10-31 05:34:44 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.16 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -32,6 +32,7 @@ value notes_links s =
             [(key, link) :: list_ind]
           in
           loop list_nt list_ind (pos + 1) j
+      | NotesLinks.WLwizard j _ _ -> loop list_nt list_ind pos j
       | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
 ;
 

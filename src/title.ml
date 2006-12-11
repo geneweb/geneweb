@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.21 2006-12-09 21:30:44 ddr Exp $ *)
+(* $Id: title.ml,v 5.22 2006-12-11 04:07:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -599,7 +599,8 @@ value print_all_places conf base = do {
   trailer conf;
 };
 
-value print conf base =
+value print conf base = do {
+  Wserver.wrap_string.val := Util.xml_pretty_print;
   match
     (p_getenv conf.env "sm", p_getenv conf.env "t", p_getenv conf.env "p")
   with
@@ -612,4 +613,4 @@ value print conf base =
   | (_, Some "" | None, Some p) -> print_titles conf base p
   | (_, Some t, Some "" | None) -> print_places conf base t
   | (_, Some t, Some p) -> print_title_place conf base t p ]
-;
+};
