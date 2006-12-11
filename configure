@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if [ "`camlp4 -v 2>&1 | sed -e 's/+.*$//'`" = "Camlp4 version 3.10" ]; then
+  echo
+  echo "Not compatible with this version of camlp4."
+  echo "Please download and install camlp4s."
+  echo 
+  echo "Configuration failed"
+  exit 2
+fi
+
 echo "print_endline Sys.os_type;;" > tools/tmp
 if [ "`ocaml tools/tmp`" = "Unix" ]; then
   cp tools/Makefile.inc.unix tools/Makefile.inc
