@@ -7,7 +7,7 @@ It is freely distributed at address:
      http://caml.inria.fr/ocaml/
 
 1- In the top directory, do:
-      . configure
+      ./configure
 
 2- If the command ocamlc.opt is not installed, edit the file
    "tools/Makefile.inc" and change:
