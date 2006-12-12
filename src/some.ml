@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.26 2006-12-11 14:03:50 ddr Exp $ *)
+(* $Id: some.ml,v 5.27 2006-12-12 20:20:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -418,6 +418,7 @@ value print_by_branch x conf base (bhl, homonymes) =
              if br = None || br = Some n then
                match bh.bh_well_named_ancestors with
                [ [] ->
+                   let x = sou base (get_surname p) in
                    print_branch conf base psn x
                      (if len > 1 && br = None then 1 else 0) p
                | pl ->
@@ -430,6 +431,7 @@ value print_by_branch x conf base (bhl, homonymes) =
                      Wserver.wprint "\n";
                      List.iter
                        (fun p ->
+                          let x = sou base (get_surname p) in
                           tag "dl" begin
                             print_branch conf base psn x 1 p;
                           end)
