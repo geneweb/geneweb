@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.31 2006-11-27 09:57:41 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.32 2006-12-13 14:48:23 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -178,7 +178,10 @@ value digit =
   | _ -> failwith "digit" ]
 ;
 
-module G = Grammar.Make (struct value lexer = Plexer.make (); end);
+module G =
+  Grammar.GMake
+    (struct type te = (string * string); value lexer = Plexer.gmake (); end)
+;
 value date = G.Entry.create "date";
 GEXTEND G
   date:
