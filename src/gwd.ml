@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.41 2006-12-08 20:07:02 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.42 2006-12-13 14:48:23 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1716,7 +1716,10 @@ value arg_parse_in_file fname speclist anonfun errmsg =
   | _ -> () ]
 ;
 
-module G = Grammar.Make (struct value lexer = Plexer.make (); end);
+module G =
+  Grammar.GMake
+    (struct type te = (string * string); value lexer = Plexer.gmake (); end)
+;
 value robot_xcl_arg = G.Entry.create "robot_xcl arg";
 GEXTEND G
   robot_xcl_arg:
