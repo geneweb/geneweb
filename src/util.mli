@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.21 2006-12-09 04:24:21 ddr Exp $ *)
+(* $Id: util.mli,v 5.22 2006-12-14 06:51:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -216,11 +216,6 @@ value pre_text_size : string -> int;
 value print_pre_center : int -> string -> unit;
 value print_pre_left : int -> string -> unit;
 value print_pre_right : int -> string -> unit;
-
-(* List selection bullets *)
-
-value print_selection_bullet : config -> option (string * bool) -> unit;
-value unselected_bullets : config -> list int;
 
 value short_f_month : int -> string;
 

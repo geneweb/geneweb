@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.27 2006-12-12 20:20:17 ddr Exp $ *)
+(* $Id: some.ml,v 5.28 2006-12-14 06:51:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -232,8 +232,47 @@ value has_children_with_that_name base des name =
     (Array.to_list (get_children des))
 ;
 
+(* List selection bullets *)
+
+value bullet_sel_txt = "<tt>o</tt>";
+value bullet_unsel_txt = "<tt>+</tt>";
+value bullet_nosel_txt = "<tt>o</tt>";
+value print_selection_bullet conf =
+  fun
+  [ Some (txt, sel) ->
+      let req =
+        List.fold_left
+          (fun req (k, v) ->
+             if not sel && k = "u" && v = txt then req
+             else
+               let s = k ^ "=" ^ v in
+               if req = "" then s else req ^ ";" ^ s)
+          "" conf.env
+      in
+      do {
+        Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\">" txt (commd conf) req
+          (if sel then ";u=" ^ txt else "")
+          (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
+        Wserver.wprint "%s"
+          (if sel then bullet_sel_txt else bullet_unsel_txt);
+        Wserver.wprint "</a>\n";
+      }
+  | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
+;
+
+value unselected_bullets conf =
+  List.fold_left
+    (fun sl (k, v) ->
+       try
+         if k = "u" then [int_of_string v :: sl]
+         else sl
+       with
+       [ Failure _ -> sl ])
+    [] conf.env
+;
+
 value print_branch conf base psn name =
-  let unsel_list = Util.unselected_bullets conf in
+  let unsel_list = unselected_bullets conf in
   loop True where rec loop is_first_lev lev p =
     do {
       let u = uget conf base (get_key_index p) in
@@ -256,7 +295,7 @@ value print_branch conf base psn name =
         | _ -> None ]
       in
       if lev = 0 then () else Wserver.wprint "<dd>\n";
-      Util.print_selection_bullet conf first_select;
+      print_selection_bullet conf first_select;
       Wserver.wprint "<strong>";
       Wserver.wprint "%s"
         (Util.reference conf base p
@@ -276,7 +315,7 @@ value print_branch conf base psn name =
                  if not first then do {
                    if lev = 0 then Wserver.wprint "<br>\n"
                    else Wserver.wprint "</dd><dd>\n";
-                   Util.print_selection_bullet conf select;
+                   print_selection_bullet conf select;
                    Wserver.wprint "<em>";
                    Wserver.wprint "%s"
                      (if conf.hide_names && not (fast_auth_age conf p) then "x"
@@ -300,17 +339,22 @@ value print_branch conf base psn name =
                  Wserver.wprint "</strong>";
                  Wserver.wprint "%s" (Date.short_dates_text conf base c);
                  Wserver.wprint "\n";
+                 let children = get_children des in
                  match select with
                  [ Some (_, True) ->
-                     do {
+                     tag "dl" begin
+                       List.iter
+                         (fun e -> loop False (succ lev) (pget conf base e))
+                         (Array.to_list children);
+                     end
+                 | Some (_, False) -> ()
+                 | None ->
+                     if Array.length children <> 0 then
                        tag "dl" begin
-                         List.iter
-                           (fun e -> loop False (succ lev) (pget conf base e))
-                           (Array.to_list (get_children des));
-                       end;
-                       False
-                     }
-                 | Some (_, False) | None -> False ]
+                         tag "dd" begin Wserver.wprint "..."; end;
+                       end
+                     else () ];
+                 False
                })
             True family_list
         in
