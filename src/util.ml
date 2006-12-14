@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.86 2006-12-11 04:07:47 ddr Exp $ *)
+(* $Id: util.ml,v 5.87 2006-12-14 06:51:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2474,45 +2474,6 @@ value commit_patches conf base =
       else ()
     else ();
   }
-;
-
-(* List selection bullets *)
-
-value bullet_sel_txt = "<tt>o</tt>";
-value bullet_unsel_txt = "<tt>+</tt>";
-value bullet_nosel_txt = "<tt>o</tt>";
-value print_selection_bullet conf =
-  fun
-  [ Some (txt, sel) ->
-      let req =
-        List.fold_left
-          (fun req (k, v) ->
-             if not sel && k = "u" && v = txt then req
-             else
-               let s = k ^ "=" ^ v in
-               if req = "" then s else req ^ ";" ^ s)
-          "" conf.env
-      in
-      do {
-        Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\">" txt (commd conf) req
-          (if sel then ";u=" ^ txt else "")
-          (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
-        Wserver.wprint "%s"
-          (if sel then bullet_sel_txt else bullet_unsel_txt);
-        Wserver.wprint "</a>\n";
-      }
-  | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
-;
-
-value unselected_bullets conf =
-  List.fold_left
-    (fun sl (k, v) ->
-       try
-         if k = "u" then [int_of_string v :: sl]
-         else sl
-       with
-       [ Failure _ -> sl ])
-    [] conf.env
 ;
 
 value short_f_month m =
