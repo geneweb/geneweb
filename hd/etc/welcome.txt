@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.31 2006-12-03 21:49:33 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.32 2006-12-17 12:45:34 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -87,7 +87,7 @@ sv: Genealogi
 
 <div id="user-info">
   %if;(wizard and not friend)
-    <em>[wizard/wizards/friend/friends]0%sq;
+    <em>[wizard/wizards/friend/friends/exterior]0%sq;
     %if;((wizard or just_friend_wizard) and user.ident != "")
       : %user.ident;%sq;
     %end;</em>
@@ -99,7 +99,7 @@ sv: Genealogi
     %end;
   %end;
   %if;(friend and not wizard)
-    <em>[wizard/wizards/friend/friends]2</em>
+    <em>[wizard/wizards/friend/friends/exterior]2</em>
     %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
       <span style="font-size:70%%">(<a
        href="%prefix;w=">[disconnect]</a>)</span>
@@ -306,7 +306,8 @@ zh: 现有 %base.nb_persons; 人在数据库中。
   %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
        and (wizard or wiznotes_dir_exists))
     <div>
-      (<a href="%prefix;m=WIZNOTES">[wizard/wizards/friend/friends]1</a>)
+      (<a href="%prefix;m=WIZNOTES">%sq;
+      [wizard/wizards/friend/friends/exterior]1</a>)
     </div>
   %end;
   %if;has_misc_notes;
@@ -324,51 +325,68 @@ zh: 现有 %base.nb_persons; 人在数据库中。
       <tr style="display: table-row">
         <td style="display: table-cell; padding: 1em 100px">
           %apply;interp([
-af: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
+af: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> toegang<br%/> (password)
-bg: Достъп като <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+bg: Достъп като <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
     </em></a><br%/> (парола)
 br: mont e-barzh evel <a href="%prefix;w=w"><em>%sq;
-    [wizard/wizards/friend/friends]0</em></a><br%/> (ger-tremen)
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (ger-tremen)
 ca: accés <a href="%prefix;w=w"><em>%sq;
-    [wizard/wizards/friend/friends]0</em></a><br%/> (clau)
-cs: <a href="%prefix;w=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (clau)
+cs: <a href="%prefix;w=w">{<em>"%sq;
+    [wizard/wizards/friend/friends/exterior]0"</em></a>%sq;
     přístup<br%/> (heslo)
 da: <a href="%prefix;w=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
-de: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
+de: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a>-Zugang<br%/> (Passwort)
-en: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+en: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> access<br%/> (password)
-eo: <a href="%prefix;w=w">Aliro <em>[wizard/wizards/friend/friends]0</em>%sq;
+eo: <a href="%prefix;w=w">Aliro <em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a><br%/> (pasvorto)
-es: <a href="%prefix;w=w">Entrada <em>[wizard/wizards/friend/friends]0%sq;
+es: <a href="%prefix;w=w">Entrada <em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
     </em></a><br%/> (contraseña)
-et: Ligipääs: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+et: Ligipääs: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
     </em></a><br%/> (parool)
-fi: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+fi: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> kirjautuminen<br%/> (salasana)
 fr: accès <a href="%prefix;w=w"><em>%sq;
-    [wizard/wizards/friend/friends]0</em></a><br%/> (mot de passe).
-he: כניסה  <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (mot de passe).
+he: כניסה  <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
     </em></a>
 is: <a href="%prefix;w=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
-it: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+it: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> access<br%/> (password)
-lv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+lv: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> access<br%/> (password)
-nl: Toegang als <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+nl: Toegang als <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
     </em></a><br%/> (wachtwoord)
-no: <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0</em>%sq;
+no: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> adgang<br%/> (passord)
-pl: <a href="%prefix;w=w"><em>"[wizard/wizards/friend/friends]0"</em>%sq;
+pl: <a href="%prefix;w=w"><em>"%sq;
+    [wizard/wizards/friend/friends/exterior]0"</em>%sq;
     </a> dostęp<br%/> (hasło)
-pt: Entrada <a href="%prefix;w=w"><em>[wizard/wizards/friend/friends]0%sq;
+pt: Entrada <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
     </em></a><br%/> (palavra chave)
 ro: Acces pentru <a href="%prefix;w=w"><em>%sq;
-    [wizard/wizards/friend/friends]0</em></a><br%/> (parola)
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (parola)
 sl: Urejanje kot <a href="%prefix;w=w"><em>"%sq;
-    [wizard/wizards/friend/friends]0"</em></a> (geslo)
-sv: <a href="%prefix;w=w"><em>[*wizard/wizards/friend/friends]0</em>%sq;
+    [wizard/wizards/friend/friends/exterior]0"</em></a> (geslo)
+sv: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
     </a> tillträde<br%/> (passord)
 ])%nl;
         </td>

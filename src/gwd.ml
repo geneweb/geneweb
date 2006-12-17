@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.42 2006-12-13 14:48:23 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.43 2006-12-17 12:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -488,18 +488,37 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
     conf.bname ^ "?" ^
       List.fold_left
         (fun s (k, v) ->
-           if s = "" then k ^ "=" ^ v else s ^ "&" ^ k ^ "=" ^ v)
-        "" conf.env
+           if s = "" then k ^ "=" ^ v else s ^ ";" ^ k ^ "=" ^ v)
+        "" (conf.henv @ conf.senv @ conf.env)
   in
-  Wserver.wprint "\
-<html><head>
-<title>%s access failed for database %s</title>
-</head>
-" typ conf.bname;
-  Wserver.wprint "<body><h1>%s access failed for database %s</h1>"
-    typ conf.bname;
-  Wserver.wprint "Return to <a href=\"%s\">welcome page</a>\n" url;
-  Wserver.wprint "</body></html>\n";
+  let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
+  let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
+  let title h =
+    Wserver.wprint
+      (fcapitale (ftransl conf "%s access failed for database %s"))
+      (if not h then "<em>" ^ typ ^ "</em>" else typ)
+      ("\"" ^ conf.bname ^ "\"")
+  in
+  Util.header_without_http conf title;
+  tag "h1" begin title False; end;
+  tag "dl" begin
+    let (alt_bind, alt_access) =
+      if ar.ar_passwd = "w" then (";w=f", txt 2) else (";w=w", txt 0)
+    in
+    tag "dd" begin
+      tag "ul" begin
+        tag "li" begin
+          Wserver.wprint "%s : <a href=\"%s%s\">%s</a>"
+            (transl conf "access") url alt_bind alt_access;
+        end;
+        tag "li" begin
+          Wserver.wprint "%s : <a href=\"%s\">%s</a>"
+            (transl conf "access") url (txt 4);
+        end;
+      end;
+    end;
+  end;
+  Util.trailer conf;
 };
 
 value gen_match_auth_file test_user_and_password auth_file =

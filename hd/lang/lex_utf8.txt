@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.65 2006-12-10 18:58:28 ddr Exp $
+# $Id: lex_utf8.txt,v 5.66 2006-12-17 12:45:34 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -201,6 +201,10 @@ ro: de %d ani
 ru: %d лет назад
 sl: pred %d leti
 sv: %d år sedan
+
+    %s access failed for database %s
+en: %s access failed for database %s
+fr: échec de l'accès %s pour la base de données %s
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
@@ -9392,32 +9396,32 @@ ru: свидетель:g:-я:a:-я/свидетели
 sl: priča/priče
 sv: vittne/vittnen
 
-    wizard/wizards/friend/friends
-af: Medewerkers/Medewerkers/vriend/vriend
-bg: администратор/администратори/приятел/приятел
-br: strobineller/strobinellerien/mignon/mignon
-ca: administrador/administrador/amic/amic
-cs: wizard/wizards/friend/friends
-da: bidragyder/bidragydere/betroet/betroet
-de: Wizard/Wizards/Freund/Freunde
-en: wizard/wizards/friend/friends
-eo: sorĉisto/sorĉistoj/amiko/amikoj
-es: brujo/brujos/amigo/amigos
-et: teadmamees/teadmamehed/sõber/sõbrad
-fi: velho/velho/valittu/valittu
-fr: magicien/magiciens/ami/amis
-he:  כגאון / כגאון / מיוחסת / מיוחסת 
-is: uppfæra/uppfæra/vinur/vinur
-it: wizard/wizard/amico/amico
-lv: wizard/wizard/friend/friends
-nl: beheerder/beheerder/vriend/vrienden
-no: Oppdaterings/Oppdaterings/venner/venner
-pl: wizard/wizard/friend/friends
-pt: feiticeiro/feiticeiros/amigo/amigos
-ro: magician/magician/amic/amic
-ru: wizard/wizard/друг/друг
-sl: čarovnik/čarovnik/prijatelj/prijatelj
-sv: administratör/administratörer/vän/vän
+    wizard/wizards/friend/friends/exterior
+af: Medewerkers/Medewerkers/vriend/vriend/exterior
+bg: администратор/администратори/приятел/приятел/exterior
+br: strobineller/strobinellerien/mignon/mignon/exterior
+ca: administrador/administrador/amic/amic/exterior
+cs: wizard/wizards/friend/friends/exterior
+da: bidragyder/bidragydere/betroet/betroet/exterior
+de: Wizard/Wizards/Freund/Freunde/exterior
+en: wizard/wizards/friend/friends/exterior
+eo: sorĉisto/sorĉistoj/amiko/amikoj/exterior
+es: brujo/brujos/amigo/amigos/exterior
+et: teadmamees/teadmamehed/sõber/sõbrad/exterior
+fi: velho/velho/valittu/valittu/exterior
+fr: magicien/magiciens/ami/amis/extérieur
+he:  כגאון / כגאון / מיוחסת / מיוחסת /exterior
+is: uppfæra/uppfæra/vinur/vinur/exterior
+it: wizard/wizard/amico/amico/exterior
+lv: wizard/wizard/friend/friends/exterior
+nl: beheerder/beheerder/vriend/vrienden/exterior
+no: Oppdaterings/Oppdaterings/venner/venner/exterior
+pl: wizard/wizard/friend/friends/exterior
+pt: feiticeiro/feiticeiros/amigo/amigos/exterior
+ro: magician/magician/amic/amic/exterior
+ru: wizard/wizard/друг/друг/exterior
+sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
+sv: administratör/administratörer/vän/vän/exterior
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
