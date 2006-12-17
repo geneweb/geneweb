@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.146 2006-12-13 15:16:32 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.147 2006-12-17 21:13:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1518,19 +1518,33 @@ value nobtit conf base p =
   match Lazy.force conf.allowed_titles with
   [ [] -> list
   | allowed_titles ->
-      List.fold_right
-        (fun t l ->
-           let id = Name.lower (sou base t.t_ident) in
-           let pl = Name.lower (sou base t.t_place) in
-           if pl = "" then
-             if List.mem id allowed_titles then [t :: l] else l
-           else if
-             List.mem (id ^ "/" ^ pl) allowed_titles ||
-             List.mem (id ^ "/*") allowed_titles
-           then
-             [t :: l]
-           else l)
-        list [] ]
+      let list =
+        List.fold_right
+          (fun t l ->
+             let id = Name.lower (sou base t.t_ident) in
+             let pl = Name.lower (sou base t.t_place) in
+             if pl = "" then
+               if List.mem id allowed_titles then [t :: l] else l
+             else if
+               List.mem (id ^ "/" ^ pl) allowed_titles ||
+               List.mem (id ^ "/*") allowed_titles
+             then
+               [t :: l]
+             else l)
+          list []
+      in
+      match Lazy.force conf.denied_titles with
+      [ [] -> list
+      | denied_titles ->
+          List.filter
+            (fun t ->
+               let id = Name.lower (sou base t.t_ident) in
+               let pl = Name.lower (sou base t.t_place) in
+               if List.mem (id ^ "/" ^ pl) denied_titles ||
+                  List.mem ("*/" ^ pl) denied_titles
+               then False
+               else True)
+            list ] ]
 ;
 
 value husbands base p =

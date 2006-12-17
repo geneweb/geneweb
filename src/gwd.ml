@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.44 2006-12-17 12:46:11 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.45 2006-12-17 21:13:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -777,11 +777,11 @@ value http_preferred_language request =
     loop list
 ;
 
-value allowed_titles env base_env () =
+value allowed_denied_titles key extra_line env base_env () =
   if p_getenv env "all_titles" = Some "on" then []
   else
     try
-      let fname = List.assoc "allowed_titles_file" base_env in
+      let fname = List.assoc key base_env in
       if fname = "" then []
       else
         let ic = Secure.open_in (Filename.concat (Secure.base_dir ()) fname) in
@@ -790,12 +790,7 @@ value allowed_titles env base_env () =
             try (input_line ic, False) with [ End_of_file -> ("", True) ]
           in
           let set =
-            let line =
-              if eof then
-                try List.assoc "extra_title" env with
-                [ Not_found -> "" ]
-              else line
-            in
+            let line = if eof then extra_line else line in
             if line = "" || line.[0] = ' ' || line.[0] = '#' then set
             else
               let line =
@@ -821,6 +816,16 @@ value allowed_titles env base_env () =
     with
     [ Not_found | Sys_error _ -> [] ]
 ;
+
+value allowed_titles env =
+  let extra_line =
+    try List.assoc "extra_title" env with
+    [ Not_found -> "" ]
+  in
+  allowed_denied_titles "allowed_titles_file" extra_line env
+;
+
+value denied_titles = allowed_denied_titles "denied_titles_file" "";
 
 value start_with s i p =
   i + String.length p <= String.length s &&
@@ -1267,6 +1272,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
          (if from = "" then [] else [("opt", from)]);
      base_env = base_env;
      allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env);
+     denied_titles = Lazy.lazy_from_fun (denied_titles env base_env);
      request = request; lexicon = lexicon;
      xhs =
        match p_getenv base_env "doctype" with
