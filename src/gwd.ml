@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.43 2006-12-17 12:45:34 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.44 2006-12-17 12:46:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -809,7 +809,7 @@ value allowed_titles env base_env () =
                     let pla = String.sub line (i + 1) (len - i - 1) in
                     (if tit = "*" then tit else Name.lower tit) ^ "/" ^
                     (if pla = "*" then pla else Name.lower pla)
-                | None -> (Name.lower line ^ "/") ]
+                | None -> Name.lower line ]
               in
               StrSet.add line set
           in
