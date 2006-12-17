@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.41 2006-12-09 04:24:21 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.42 2006-12-17 12:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -292,7 +292,8 @@ value print_search_form conf from_wiz =
 
 value print_main conf base auth_file =
   let wiztxt =
-    Util.translate_eval (transl_nth conf "wizard/wizards/friend/friends" 1)
+    Util.translate_eval
+      (transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
   in
   let title _ =
     Wserver.wprint "%s - %s" (capitale wiztxt)
@@ -562,7 +563,7 @@ value wizard_denying wddir =
 value do_connected_wizards conf base (_, _, _, wl) = do {
   let title _ =
     Wserver.wprint "%s"
-      (capitale (transl_nth conf "wizard/wizards/friend/friends" 1))
+      (capitale (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
   in
   header conf title;
   print_link_to_welcome conf True;
