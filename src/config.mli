@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 5.15 2006-11-11 21:17:34 ddr Exp $ *)
+(* $Id: config.mli,v 5.16 2006-12-17 21:13:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -52,6 +52,7 @@ type config =
     henv : mutable list (string * string);
     base_env : list (string * string);
     allowed_titles : Lazy.t (list string);
+    denied_titles : Lazy.t (list string);
     xhs : string;
     request : list string;
     lexicon : Hashtbl.t string string;
