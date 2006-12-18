@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.66 2006-12-17 12:45:34 ddr Exp $
+# $Id: lex_utf8.txt,v 5.67 2006-12-18 13:06:10 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -3221,8 +3221,11 @@ ru: исчез/исчезла
 sl: izginil/izginila/izginil(a)
 sv: försvunnen
 
+# context: link to allow the user to disconnect his wizard or friend access
+
     disconnect
 bg: да се прекъсне връзката
+da: afbryd
 de: abmelden
 en: disconnect
 fr: déconnecter
@@ -6339,8 +6342,11 @@ ru: число ветвей
 sl: število vej
 sv: antal grenar
 
+# Context: display how many persons are still living in this database
+
     number of living persons:
-bg: брой на живите лица
+bg: брой на живите лица:
+da: antal nulevende personer:
 de: Anzahl der lebenden Personen:
 en: number of living persons:
 fr: nombre de personnes vivantes :
@@ -6841,8 +6847,13 @@ ru: место
 sl: kraj
 sv: plats
 
+# Context:
+#   - Title of a page displaying the population pyramid of the database
+#   - Link to that page    
+
     population pyramid
 bg: възрастова пирамида
+da: befolkningspyramide
 de: Alterspyramide
 en: population pyramid
 fr: pyramide des âges
