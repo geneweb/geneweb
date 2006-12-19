@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.148 2006-12-19 19:45:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.149 2006-12-19 22:41:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -98,7 +98,7 @@ type string_person_index =
   | Spi2 of db2 and string_person_index2 ]
 ;
 
-type base =
+type base_t =
   [ Base of Dbdisk.dsk_base
   | Base2 of db2 ]
 ;
@@ -1686,11 +1686,280 @@ value close_base base =
       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan ]
 ;
 
+(* Implementation by emulated objects *)
+
+type base =
+  { self : base_t;
+    close_base : unit -> unit;
+    person_of_gen_person : unit -> Def.gen_person iper istr -> person;
+    ascend_of_gen_ascend : unit -> Def.gen_ascend ifam -> ascend;
+    union_of_gen_union : unit -> Def.gen_union ifam -> union;
+    family_of_gen_family : unit -> Def.gen_family iper istr -> family;
+    couple_of_gen_couple : unit -> Def.gen_couple iper -> couple;
+    descend_of_gen_descend : unit -> Def.gen_descend iper -> descend;
+    poi : unit -> iper -> person;
+    aoi : unit -> iper -> ascend;
+    uoi : unit -> iper -> union;
+    foi : unit -> ifam -> family;
+    coi : unit -> ifam -> couple;
+    doi : unit -> ifam -> descend;
+    sou : unit -> istr -> string;
+    nb_of_persons : unit -> int;
+    nb_of_families : unit -> int;
+    patch_person : unit -> iper -> person -> unit;
+    patch_ascend : unit -> iper -> ascend -> unit;
+    patch_union : unit -> iper -> union -> unit;
+    patch_family : unit -> ifam -> family -> unit;
+    patch_descend : unit -> ifam -> descend -> unit;
+    patch_couple : unit -> ifam -> couple -> unit;
+    patch_key : unit -> iper -> string -> string -> int -> unit;
+    patch_name : unit -> string -> iper -> unit;
+    insert_string : unit -> string -> istr;
+    commit_patches : unit -> unit;
+    commit_notes : unit -> string -> string -> unit;
+    is_patched_person : unit -> iper -> bool;
+    patched_ascends : unit -> list iper;
+    output_consang_tab : unit -> array Adef.fix -> unit;
+    delete_family : unit -> ifam -> unit;
+    person_of_key : unit -> string -> string -> int -> option iper;
+    persons_of_name : unit -> string -> list iper;
+    persons_of_first_name : unit -> string_person_index;
+    persons_of_surname : unit -> string_person_index;
+    base_visible_get : unit -> (person -> bool) -> int -> bool;
+    base_visible_write : unit -> unit;
+    base_particles : unit -> list string;
+    base_strings_of_first_name : unit -> string -> list istr;
+    base_strings_of_surname : unit -> string -> list istr;
+    load_ascends_array : unit -> unit;
+    load_unions_array : unit -> unit;
+    load_couples_array : unit -> unit;
+    load_descends_array : unit -> unit;
+    load_strings_array : unit -> unit;
+    persons_array : unit -> (int -> person * int -> person -> unit);
+    ascends_array :
+      unit ->
+        (int -> option ifam *
+         int -> Adef.fix *
+         int -> Adef.fix -> unit *
+         option (array Adef.fix));
+    base_notes_read : unit -> string -> string;
+    base_notes_read_first_line : unit -> string -> string;
+    base_notes_are_empty : unit -> string -> bool;
+    base_notes_origin_file : unit -> string;
+    base_notes_dir : unit -> string;
+    base_wiznotes_dir : unit -> string;
+    person_misc_names :
+      unit -> person -> (person -> list title) -> list string;
+    nobtit : config -> unit -> person -> list title;
+    p_first_name : unit -> person -> string;
+    p_surname : unit -> person -> string;
+    date_of_last_change : string -> unit -> float }
+;
+
+value make_base1 b base =
+  {self = b;
+   close_base () = close_base b;
+   person_of_gen_person () = person_of_gen_person b;
+   ascend_of_gen_ascend () = ascend_of_gen_ascend b;
+   union_of_gen_union () = union_of_gen_union b;
+   family_of_gen_family () = family_of_gen_family b;
+   couple_of_gen_couple () = couple_of_gen_couple b;
+   descend_of_gen_descend () = descend_of_gen_descend b;
+   poi () = poi b;
+   aoi () = aoi b;
+   uoi () = uoi b;
+   foi () = foi b;
+   coi () = coi b;
+   doi () = doi b;
+   sou () = sou b;
+   nb_of_persons () = nb_of_persons b;
+   nb_of_families () = nb_of_families b;
+   patch_person () = patch_person b;
+   patch_ascend () = patch_ascend b;
+   patch_union () = patch_union b;
+   patch_family () = patch_family b;
+   patch_descend () = patch_descend b;
+   patch_couple () = patch_couple b;
+   patch_key () = patch_key b;
+   patch_name () = patch_name b;
+   insert_string () = insert_string b;
+   commit_patches () = commit_patches b;
+   commit_notes () = commit_notes b;
+   is_patched_person () = is_patched_person b;
+   patched_ascends () = patched_ascends b;
+   output_consang_tab () = output_consang_tab b;
+   delete_family () = delete_family b;
+   person_of_key () = person_of_key b;
+   persons_of_name () = persons_of_name b;
+   persons_of_first_name () = persons_of_first_name b;
+   persons_of_surname () = persons_of_surname b;
+   base_visible_get () = base_visible_get b;
+   base_visible_write () = base_visible_write b;
+   base_particles () = base_particles b;
+   base_strings_of_first_name () = base_strings_of_first_name b;
+   base_strings_of_surname () = base_strings_of_surname b;
+   load_ascends_array () = load_ascends_array b;
+   load_unions_array () = load_unions_array b;
+   load_couples_array () = load_couples_array b;
+   load_descends_array () = load_descends_array b;
+   load_strings_array () = load_strings_array b;
+   persons_array () = persons_array b;
+   ascends_array () = ascends_array b;
+   base_notes_read () = base_notes_read b;
+   base_notes_read_first_line () = base_notes_read_first_line b;
+   base_notes_are_empty () = base_notes_are_empty b;
+   base_notes_origin_file () = base_notes_origin_file b;
+   base_notes_dir () = base_notes_dir b;
+   base_wiznotes_dir () = base_wiznotes_dir b;
+   person_misc_names () = person_misc_names b;
+   nobtit conf () = nobtit conf b;
+   p_first_name () = p_first_name b;
+   p_surname () = p_surname b;
+   date_of_last_change x () = date_of_last_change x b}
+;
+
+value make_base2 b base =
+  {self = b;
+   close_base () = close_base b;
+   person_of_gen_person () = person_of_gen_person b;
+   ascend_of_gen_ascend () = ascend_of_gen_ascend b;
+   union_of_gen_union () = union_of_gen_union b;
+   family_of_gen_family () = family_of_gen_family b;
+   couple_of_gen_couple () = couple_of_gen_couple b;
+   descend_of_gen_descend () = descend_of_gen_descend b;
+   poi () = poi b;
+   aoi () = aoi b;
+   uoi () = uoi b;
+   foi () = foi b;
+   coi () = coi b;
+   doi () = doi b;
+   sou () = sou b;
+   nb_of_persons () = nb_of_persons b;
+   nb_of_families () = nb_of_families b;
+   patch_person () = patch_person b;
+   patch_ascend () = patch_ascend b;
+   patch_union () = patch_union b;
+   patch_family () = patch_family b;
+   patch_descend () = patch_descend b;
+   patch_couple () = patch_couple b;
+   patch_key () = patch_key b;
+   patch_name () = patch_name b;
+   insert_string () = insert_string b;
+   commit_patches () = commit_patches b;
+   commit_notes () = commit_notes b;
+   is_patched_person () = is_patched_person b;
+   patched_ascends () = patched_ascends b;
+   output_consang_tab () = output_consang_tab b;
+   delete_family () = delete_family b;
+   person_of_key () = person_of_key b;
+   persons_of_name () = persons_of_name b;
+   persons_of_first_name () = persons_of_first_name b;
+   persons_of_surname () = persons_of_surname b;
+   base_visible_get () = base_visible_get b;
+   base_visible_write () = base_visible_write b;
+   base_particles () = base_particles b;
+   base_strings_of_first_name () = base_strings_of_first_name b;
+   base_strings_of_surname () = base_strings_of_surname b;
+   load_ascends_array () = load_ascends_array b;
+   load_unions_array () = load_unions_array b;
+   load_couples_array () = load_couples_array b;
+   load_descends_array () = load_descends_array b;
+   load_strings_array () = load_strings_array b;
+   persons_array () = persons_array b;
+   ascends_array () = ascends_array b;
+   base_notes_read () = base_notes_read b;
+   base_notes_read_first_line () = base_notes_read_first_line b;
+   base_notes_are_empty () = base_notes_are_empty b;
+   base_notes_origin_file () = base_notes_origin_file b;
+   base_notes_dir () = base_notes_dir b;
+   base_wiznotes_dir () = base_wiznotes_dir b;
+   person_misc_names () = person_misc_names b;
+   nobtit conf () = nobtit conf b;
+   p_first_name () = p_first_name b;
+   p_surname () = p_surname b;
+   date_of_last_change x () = date_of_last_change x b}
+;
+
+value open_base bname =
+  let b = open_base bname in
+  match b with
+  [ Base base -> make_base1 b base
+  | Base2 db2 -> make_base2 b db2 ]
+;
+
+value close_base b = b.close_base ();
+value person_of_gen_person b = b.person_of_gen_person ();
+value ascend_of_gen_ascend b = b.ascend_of_gen_ascend ();
+value union_of_gen_union b = b.union_of_gen_union ();
+value family_of_gen_family b = b.family_of_gen_family ();
+value couple_of_gen_couple b = b.couple_of_gen_couple ();
+value descend_of_gen_descend b = b.descend_of_gen_descend ();
+value poi b = b.poi ();
+value aoi b = b.aoi ();
+value uoi b = b.uoi ();
+value foi b = b.foi ();
+value coi b = b.coi ();
+value doi b = b.doi ();
+value sou b = b.sou ();
+value nb_of_persons b = b.nb_of_persons ();
+value nb_of_families b = b.nb_of_families ();
+value patch_person b = b.patch_person ();
+value patch_ascend b = b.patch_ascend ();
+value patch_union b = b.patch_union ();
+value patch_family b = b.patch_family ();
+value patch_descend b = b.patch_descend ();
+value patch_couple b = b.patch_couple ();
+value patch_key b = b.patch_key ();
+value patch_name b = b.patch_name ();
+value insert_string b = b.insert_string ();
+value commit_patches b = b.commit_patches ();
+value commit_notes b = b.commit_notes ();
+value is_patched_person b = b.is_patched_person ();
+value patched_ascends b = b.patched_ascends ();
+value output_consang_tab b = b.output_consang_tab ();
+value delete_family b = b.delete_family ();
+value person_of_key b = b.person_of_key ();
+value persons_of_name b = b.persons_of_name ();
+value persons_of_first_name b = b.persons_of_first_name ();
+value persons_of_surname b = b.persons_of_surname ();
+value base_visible_get b = b.base_visible_get ();
+value base_visible_write b = b.base_visible_write ();
+value base_particles b = b.base_particles ();
+value base_strings_of_first_name b = b.base_strings_of_first_name ();
+value base_strings_of_surname b = b.base_strings_of_surname ();
+value load_ascends_array b = b.load_ascends_array ();
+value load_unions_array b = b.load_unions_array ();
+value load_couples_array b = b.load_couples_array ();
+value load_descends_array b = b.load_descends_array ();
+value load_strings_array b = b.load_strings_array ();
+value persons_array b = b.persons_array ();
+value ascends_array b = b.ascends_array ();
+value base_notes_read b = b.base_notes_read ();
+value base_notes_read_first_line b = b.base_notes_read_first_line ();
+value base_notes_are_empty b = b.base_notes_are_empty ();
+value base_notes_origin_file b = b.base_notes_origin_file ();
+value base_notes_dir b = b.base_notes_dir ();
+value base_wiznotes_dir b = b.base_wiznotes_dir ();
+value person_misc_names b = b.person_misc_names ();
+value nobtit conf b = b.nobtit conf ();
+value p_first_name b = b.p_first_name ();
+value p_surname b = b.p_surname ();
+value date_of_last_change s b = b.date_of_last_change s ();
+
+value base_of_dsk_base base = make_base1 (Base base) ();
+value apply_as_dsk_base f base = apply_as_dsk_base f base.self;
+
 (* Traces of changes; this is not correct because it supposes that calls
    to poi, aoi, etc concerns the modified persons. However the code is
-   useful for a good system later because it is able to display differences
-   in persons and in families. *)
+   just commented, not deleted because it can be reused later to display
+   changes in persons and in families. *)
 
+(* but... two functions kept to preserve interface: *)
+
+value record_changes_in_file v = ();
+value commit_patches _ base = commit_patches base;
+
+(*
 value trace_patches_file = ref "";
 value record_changes_in_file v = trace_patches_file.val := v;
 
@@ -2234,3 +2503,4 @@ value patch_couple base ifam c = do {
   if trace_patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
   patch_couple base ifam c;
 };
+*)
