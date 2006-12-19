@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.147 2006-12-17 21:13:38 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.148 2006-12-19 19:45:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1686,7 +1686,10 @@ value close_base base =
       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan ]
 ;
 
-(* Traces of changes *)
+(* Traces of changes; this is not correct because it supposes that calls
+   to poi, aoi, etc concerns the modified persons. However the code is
+   useful for a good system later because it is able to display differences
+   in persons and in families. *)
 
 value trace_patches_file = ref "";
 value record_changes_in_file v = trace_patches_file.val := v;
