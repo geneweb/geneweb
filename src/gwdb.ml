@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.160 2006-12-20 18:18:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.161 2006-12-20 18:51:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -897,7 +897,6 @@ value patch_key base ip fn sn occ =
       Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
     }]
 ;
-*)
 
 value insert_string base s =
   match base with
@@ -905,7 +904,6 @@ value insert_string base s =
   | Base2 db2 -> Istr2New db2 s ]
 ;
 
-(*
 value delete_family base ifam = do {
   let cpl =
     couple_of_gen_couple base
@@ -933,6 +931,7 @@ value is_deleted_family =
   | Family2Gen db2 f -> f.Def.fam_index = Adef.ifam_of_int (-1) ]
 ;
 
+(*
 value commit_patches base =
   match base with
   [ Base base -> base.func.commit_patches ()
@@ -953,8 +952,10 @@ value commit_notes base =
   [ Base base -> base.func.commit_notes
   | Base2 _ -> failwith "not impl commit_notes" ]
 ;
+*)
 
 value ok_I_know = ref False;
+(*
 value is_patched_person base ip =
   match base with
   [ Base base -> base.func.is_patched_person ip
@@ -977,6 +978,7 @@ value patched_ascends base =
       let _ = do { eprintf "not impl patched_ascends\n"; flush stderr; } in
       [] ]
 ;
+*)
 
 type key =
   [ Key of Adef.istr and Adef.istr and int
@@ -1065,6 +1067,7 @@ value persons2_of_name db2 s =
     (hashtbl_find_all dir "person_of_name.ht" s)
 ;
 
+(*
 value person_of_key base =
   match base with
   [ Base base -> base.func.person_of_key
@@ -1082,6 +1085,7 @@ value base_particles base =
   | Base2 db2 ->
       Mutil.input_particles (Filename.concat db2.bdir "particles.txt") ]
 ;
+*)
 
 value start_with s p =
   String.length p < String.length s &&
@@ -1101,6 +1105,7 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
      curr = 0}
 };
 
+(*
 value persons_of_first_name base =
   match base with
   [ Base base -> Spi base.func.persons_of_first_name
@@ -1112,6 +1117,7 @@ value persons_of_surname base =
   [ Base base -> Spi base.func.persons_of_surname
   | Base2 db2 -> persons_of_first_name_or_surname2 db2 False ]
 ;
+*)
 
 value spi_first spi s =
   match spi with
@@ -1212,6 +1218,7 @@ value spi_find spi s =
   | _ -> failwith "not impl spi_find" ]
 ;
 
+(*
 value base_visible_get base f =
   match base with
   [ Base base -> base.data.visible.v_get (fun p -> f (Person p))
@@ -1222,6 +1229,7 @@ value base_visible_write base =
   [ Base base -> base.data.visible.v_write ()
   | Base2 _ -> failwith "not impl visible_write" ]
 ;
+*)
 
 value base_strings_of_first_name_or_surname base field proj s =
   match base with
@@ -1244,6 +1252,7 @@ value base_strings_of_first_name_or_surname base field proj s =
         db2.patches.h_key istrl ]
 ;
 
+(*
 value base_strings_of_first_name base s =
   base_strings_of_first_name_or_surname base "first_name"
     (fun p -> p.first_name) s
@@ -1253,6 +1262,7 @@ value base_strings_of_surname base s =
   base_strings_of_first_name_or_surname base "surname"
     (fun p -> p.surname) s
 ;
+*)
 
 value load_array2 bdir nb_ini nb f1 f2 get =
   if nb = 0 then [| |]
@@ -1311,6 +1321,7 @@ value family_array2 db2 = do {
   tab
 };
 
+(*
 value load_ascends_array base =
   match base with
   [ Base base -> base.data.ascends.load_array ()
@@ -1338,6 +1349,7 @@ value load_unions_array base =
           db2.family_array := Some (family_array2 db2)
         } ] ]
 ;
+*)
 
 value load_couples_array base =
   match base with
@@ -1441,7 +1453,6 @@ value ascends_array base =
       let cset i v = cg_tab.(i) := v in
       (fget, cget, cset, Some cg_tab) ]
 ;
-*)
 
 value output_consang_tab base tab =
   match base with
@@ -1461,6 +1472,7 @@ value output_consang_tab base tab =
       close_out oc;
     } ]
 ;
+*)
 
 value read_notes bname fnotes rn_mode =
   let fname =
@@ -1923,8 +1935,14 @@ classe virtuelle base =
     methode base_visible_get : (person -> bool) -> int -> bool;
     methode base_visible_write : unit;
     methode base_particles : list string;
-    methode base_strings_of_first_name : string -> list istr;
-    methode base_strings_of_surname : string -> list istr;
+    methode base_strings_of_first_name s : string -> list istr =
+      base_strings_of_first_name_or_surname self.base_t "first_name"
+        (fun p -> p.first_name) s
+    ;
+    methode base_strings_of_surname s : string -> list istr =
+      base_strings_of_first_name_or_surname self.base_t "surname"
+        (fun p -> p.surname) s
+    ;
     methode load_ascends_array : unit;
     methode load_unions_array : unit;
     methode load_couples_array : unit;
@@ -2016,24 +2034,30 @@ classe base1 b base =
     ;
     methode patch_key ip fn sn occ = ();
     methode patch_name s ip = base.func.Dbdisk.patch_name s ip;
-    methode insert_string = insert_string b;
-    methode commit_patches = commit_patches b;
-    methode commit_notes = commit_notes b;
-    methode is_patched_person = is_patched_person b;
-    methode patched_ascends = patched_ascends b;
-    methode output_consang_tab = output_consang_tab b;
+    methode insert_string s = Istr (base.func.Dbdisk.insert_string s);
+    methode commit_patches = base.func.Dbdisk.commit_patches ();
+    methode commit_notes = base.func.Dbdisk.commit_notes;
+    methode is_patched_person ip = base.func.Dbdisk.is_patched_person ip;
+    methode patched_ascends = base.func.Dbdisk.patched_ascends ();
+    methode output_consang_tab tab = do {
+      eprintf "error Gwdb.output_consang_tab\n";
+      flush stdout
+    };
     heriter base..delete_family self;
-    methode person_of_key = person_of_key b;
-    methode persons_of_name = persons_of_name b;
-    methode persons_of_first_name = persons_of_first_name b;
-    methode persons_of_surname = persons_of_surname b;
-    methode base_visible_get = base_visible_get b;
-    methode base_visible_write = base_visible_write b;
-    methode base_particles = base_particles b;
-    methode base_strings_of_first_name = base_strings_of_first_name b;
-    methode base_strings_of_surname = base_strings_of_surname b;
-    methode load_ascends_array = load_ascends_array b;
-    methode load_unions_array = load_unions_array b;
+    methode person_of_key = base.func.Dbdisk.person_of_key;
+    methode persons_of_name = base.func.Dbdisk.persons_of_name;
+    methode persons_of_first_name =
+      Spi base.func.Dbdisk.persons_of_first_name;
+    methode persons_of_surname =
+      Spi base.func.Dbdisk.persons_of_surname;
+    methode base_visible_get f =
+      base.data.visible.v_get (fun p -> f (Person p));
+    methode base_visible_write = base.data.visible.v_write ();
+    methode base_particles = base.data.particles;
+    heriter base..base_strings_of_first_name self;
+    heriter base..base_strings_of_surname self;
+    methode load_ascends_array = base.data.ascends.load_array ();
+    methode load_unions_array = base.data.unions.load_array ();
     methode load_couples_array = load_couples_array b;
     methode load_descends_array = load_descends_array b;
     methode load_strings_array = load_strings_array b;
@@ -2173,24 +2197,79 @@ classe base2 b db2 =
       with
       [ Not_found -> Hashtbl.add ht s [ip] ]
     ;
-    methode insert_string = insert_string b;
-    methode commit_patches = commit_patches b;
-    methode commit_notes = commit_notes b;
-    methode is_patched_person = is_patched_person b;
-    methode patched_ascends = patched_ascends b;
-    methode output_consang_tab = output_consang_tab b;
+    methode insert_string s = Istr2New db2 s;
+    methode commit_patches = do {
+      let fname = Filename.concat db2.bdir "patches" in
+      let oc = open_out_bin (fname ^ "1") in
+      output_string oc magic_patch;
+      output_value oc db2.patches;
+      close_out oc;
+      remove_file (fname ^ "~");
+      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+      Sys.rename (fname ^ "1") fname
+    };
+    methode commit_notes = failwith "not impl commit_notes";
+    methode is_patched_person ip =
+      let _ =
+        if ok_I_know.val then ()
+        else do {
+          ok_I_know.val := True;
+          eprintf "not impl is_patched_person\n";
+          flush stderr;
+        }
+      in
+      False
+    ;
+    methode patched_ascends =
+      let _ = do { eprintf "not impl patched_ascends\n"; flush stderr; } in
+      []
+    ;
+    methode output_consang_tab tab = do {
+      let dir =
+        List.fold_left Filename.concat db2.bdir ["person"; "consang"]
+      in
+      Mutil.mkdir_p dir;
+      let oc = open_out_bin (Filename.concat dir "data") in
+      output_value oc tab;
+      close_out oc;
+      let oc = open_out_bin (Filename.concat dir "access") in
+      let _ : int =
+        Iovalue.output_array_access oc (Array.get tab) (Array.length tab) 0
+      in
+      close_out oc;
+    };
     heriter base..delete_family self;
-    methode person_of_key = person_of_key b;
-    methode persons_of_name = persons_of_name b;
-    methode persons_of_first_name = persons_of_first_name b;
-    methode persons_of_surname = persons_of_surname b;
-    methode base_visible_get = base_visible_get b;
-    methode base_visible_write = base_visible_write b;
-    methode base_particles = base_particles b;
-    methode base_strings_of_first_name = base_strings_of_first_name b;
-    methode base_strings_of_surname = base_strings_of_surname b;
-    methode load_ascends_array = load_ascends_array b;
-    methode load_unions_array = load_unions_array b;
+    methode person_of_key = person2_of_key db2;
+    methode persons_of_name = persons2_of_name db2;
+    methode persons_of_first_name =
+      persons_of_first_name_or_surname2 db2 True;
+    methode persons_of_surname =
+      persons_of_first_name_or_surname2 db2 False;
+    methode base_visible_get = failwith "not impl visible_get";
+    methode base_visible_write = failwith "not impl visible_write";
+    methode base_particles =
+      Mutil.input_particles (Filename.concat db2.bdir "particles.txt");
+    heriter base..base_strings_of_first_name self;
+    heriter base..base_strings_of_surname self;
+    methode load_ascends_array = do {
+      eprintf "*** loading ascends array\n"; flush stderr;
+      let nb = db2.patches.nb_per in
+      let nb_ini = db2.patches.nb_per_ini in
+      match db2.parents_array with
+      [ Some _ -> ()
+      | None -> db2.parents_array := Some (parents_array2 db2 nb_ini nb) ];
+      match db2.consang_array with
+      [ Some _ -> ()
+      | None -> db2.consang_array := Some (consang_array2 db2 nb) ];
+    };
+    methode load_unions_array =
+      match db2.family_array with
+      [ Some _ -> ()
+      | None -> do {
+          eprintf "*** loading unions array\n"; flush stderr;
+          db2.family_array := Some (family_array2 db2)
+        } ]
+    ;
     methode load_couples_array = load_couples_array b;
     methode load_descends_array = load_descends_array b;
     methode load_strings_array = load_strings_array b;
@@ -2363,6 +2442,8 @@ declare
   module C_base :
     sig
       value delete_family : unit -> base -> ifam -> unit;
+      value base_strings_of_first_name : unit -> base -> string -> list istr;
+      value base_strings_of_surname : unit -> base -> string -> list istr;
       value person_misc_names :
         unit -> base -> person -> (person -> list title) -> list string;
       value p_surname : unit -> base -> person -> string;
@@ -2408,6 +2489,14 @@ declare
           self.patch_couple () ifam cpl;
           self.patch_descend () ifam des
         }
+      ;
+      value base_strings_of_first_name () self s =
+        base_strings_of_first_name_or_surname self.base_t "first_name"
+          (fun p -> p.first_name) s
+      ;
+      value base_strings_of_surname () self s =
+        base_strings_of_first_name_or_surname self.base_t "surname"
+          (fun p -> p.surname) s
       ;
       value person_misc_names () self p tit =
         let sou = self.sou () in
@@ -2469,23 +2558,26 @@ value base1 () b base =
        | _ -> failwith "not impl patch_couple" ];
      patch_key () ip fn sn occ = ();
      patch_name () s ip = base.func.Dbdisk.patch_name s ip;
-     insert_string () = insert_string b; commit_patches () = commit_patches b;
-     commit_notes () = commit_notes b;
-     is_patched_person () = is_patched_person b;
-     patched_ascends () = patched_ascends b;
-     output_consang_tab () = output_consang_tab b;
+     insert_string () s = Istr (base.func.Dbdisk.insert_string s);
+     commit_patches () = base.func.Dbdisk.commit_patches ();
+     commit_notes () = base.func.Dbdisk.commit_notes;
+     is_patched_person () ip = base.func.Dbdisk.is_patched_person ip;
+     patched_ascends () = base.func.Dbdisk.patched_ascends ();
+     output_consang_tab () tab =
+       do { eprintf "error Gwdb.output_consang_tab\n"; flush stdout };
      delete_family () = C_base.delete_family () self;
-     person_of_key () = person_of_key b;
-     persons_of_name () = persons_of_name b;
-     persons_of_first_name () = persons_of_first_name b;
-     persons_of_surname () = persons_of_surname b;
-     base_visible_get () = base_visible_get b;
-     base_visible_write () = base_visible_write b;
-     base_particles () = base_particles b;
-     base_strings_of_first_name () = base_strings_of_first_name b;
-     base_strings_of_surname () = base_strings_of_surname b;
-     load_ascends_array () = load_ascends_array b;
-     load_unions_array () = load_unions_array b;
+     person_of_key () = base.func.Dbdisk.person_of_key;
+     persons_of_name () = base.func.Dbdisk.persons_of_name;
+     persons_of_first_name () = Spi base.func.Dbdisk.persons_of_first_name;
+     persons_of_surname () = Spi base.func.Dbdisk.persons_of_surname;
+     base_visible_get () f = base.data.visible.v_get (fun p -> f (Person p));
+     base_visible_write () = base.data.visible.v_write ();
+     base_particles () = base.data.particles;
+     base_strings_of_first_name () =
+       C_base.base_strings_of_first_name () self;
+     base_strings_of_surname () = C_base.base_strings_of_surname () self;
+     load_ascends_array () = base.data.ascends.load_array ();
+     load_unions_array () = base.data.unions.load_array ();
      load_couples_array () = load_couples_array b;
      load_descends_array () = load_descends_array b;
      load_strings_array () = load_strings_array b;
@@ -2616,23 +2708,81 @@ value base2 () b db2 =
          if List.mem ip ipl then () else Hashtbl.replace ht s [ip :: ipl]
        with
        [ Not_found -> Hashtbl.add ht s [ip] ];
-     insert_string () = insert_string b; commit_patches () = commit_patches b;
-     commit_notes () = commit_notes b;
-     is_patched_person () = is_patched_person b;
-     patched_ascends () = patched_ascends b;
-     output_consang_tab () = output_consang_tab b;
+     insert_string () s = Istr2New db2 s;
+     commit_patches () =
+       let fname = Filename.concat db2.bdir "patches" in
+       let oc = open_out_bin (fname ^ "1") in
+       do {
+         output_string oc magic_patch;
+         output_value oc db2.patches;
+         close_out oc;
+         remove_file (fname ^ "~");
+         try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+         Sys.rename (fname ^ "1") fname
+       };
+     commit_notes () = failwith "not impl commit_notes";
+     is_patched_person () ip =
+       let _ =
+         if ok_I_know.val then ()
+         else do {
+           ok_I_know.val := True;
+           eprintf "not impl is_patched_person\n";
+           flush stderr
+         }
+       in
+       False;
+     patched_ascends () =
+       let _ = do { eprintf "not impl patched_ascends\n"; flush stderr } in
+       [];
+     output_consang_tab () tab =
+       let dir =
+         List.fold_left Filename.concat db2.bdir ["person"; "consang"]
+       in
+       do {
+         Mutil.mkdir_p dir;
+         let oc = open_out_bin (Filename.concat dir "data") in
+         output_value oc tab;
+         close_out oc;
+         let oc = open_out_bin (Filename.concat dir "access") in
+         let _ : int =
+           Iovalue.output_array_access oc (Array.get tab) (Array.length tab) 0
+         in
+         close_out oc
+       };
      delete_family () = C_base.delete_family () self;
-     person_of_key () = person_of_key b;
-     persons_of_name () = persons_of_name b;
-     persons_of_first_name () = persons_of_first_name b;
-     persons_of_surname () = persons_of_surname b;
-     base_visible_get () = base_visible_get b;
-     base_visible_write () = base_visible_write b;
-     base_particles () = base_particles b;
-     base_strings_of_first_name () = base_strings_of_first_name b;
-     base_strings_of_surname () = base_strings_of_surname b;
-     load_ascends_array () = load_ascends_array b;
-     load_unions_array () = load_unions_array b;
+     person_of_key () = person2_of_key db2;
+     persons_of_name () = persons2_of_name db2;
+     persons_of_first_name () = persons_of_first_name_or_surname2 db2 True;
+     persons_of_surname () = persons_of_first_name_or_surname2 db2 False;
+     base_visible_get () = failwith "not impl visible_get";
+     base_visible_write () = failwith "not impl visible_write";
+     base_particles () =
+       Mutil.input_particles (Filename.concat db2.bdir "particles.txt");
+     base_strings_of_first_name () =
+       C_base.base_strings_of_first_name () self;
+     base_strings_of_surname () = C_base.base_strings_of_surname () self;
+     load_ascends_array () =
+       do {
+         eprintf "*** loading ascends array\n";
+         flush stderr;
+         let nb = db2.patches.nb_per in
+         let nb_ini = db2.patches.nb_per_ini in
+         match db2.parents_array with
+         [ Some _ -> ()
+         | None -> db2.parents_array := Some (parents_array2 db2 nb_ini nb) ];
+         match db2.consang_array with
+         [ Some _ -> ()
+         | None -> db2.consang_array := Some (consang_array2 db2 nb) ]
+       };
+     load_unions_array () =
+       match db2.family_array with
+       [ Some _ -> ()
+       | None ->
+           do {
+             eprintf "*** loading unions array\n";
+             flush stderr;
+             db2.family_array := Some (family_array2 db2)
+           } ];
      load_couples_array () = load_couples_array b;
      load_descends_array () = load_descends_array b;
      load_strings_array () = load_strings_array b;
