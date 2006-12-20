@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 5.2 2006-12-11 04:07:47 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 5.3 2006-12-20 17:21:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -190,18 +190,23 @@ value share_strings db =
 ;
 
 value update_db bdir who (list_nt, list_ind) =
-  let fname = Filename.concat bdir "notes_links" in
-  let notes_links_db = read_db_from_file fname in
+  let fname_tmp = Filename.concat bdir "1notes_links" in
+  let fname_def = Filename.concat bdir "notes_links" in
+  let fname_back = Filename.concat bdir "notes_links~" in
+  let notes_links_db = read_db_from_file fname_def in
   let db = List.remove_assoc who notes_links_db in
   let new_db =
     if list_nt = [] && list_ind = [] then db
     else [(who, (list_nt, list_ind)) :: db]
   in
   let new_db = share_strings new_db in
-  let oc = open_out_bin fname in
+  let oc = open_out_bin fname_tmp in
   do {
     output_string oc magic_notes_links;
     output_value oc (new_db : notes_links_db);
     close_out oc;
+    Mutil.remove_file fname_back;
+    try Sys.rename fname_def fname_back with [ Sys_error _ -> () ];
+    try Sys.rename fname_tmp fname_def with [ Sys_error _ -> () ];
   }
 ;
