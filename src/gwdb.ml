@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.158 2006-12-20 14:00:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.159 2006-12-20 14:59:15 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1525,7 +1525,9 @@ value base_wiznotes_dir base =
 ;
 
 value p_first_name base p = nominative (sou base (get_first_name p));
+(*
 value p_surname base p = nominative (sou base (get_surname p));
+*)
 
 value nobtit conf base p =
   let list = get_titles p in
@@ -1561,6 +1563,7 @@ value nobtit conf base p =
             list ] ]
 ;
 
+(*
 value husbands base p =
   let u = uoi base (get_key_index p) in
   List.map
@@ -1574,6 +1577,7 @@ value husbands base p =
        (husband_surname, husband_surnames_aliases))
     (Array.to_list (get_family u))
 ;
+*)
 
 value father_titles_places base p nobtit =
   match get_parents (aoi base (get_key_index p)) with
@@ -1728,39 +1732,52 @@ value close_base base =
           (so, ldel) = fonction_objet_virtuel ->
             let td =
               let ldl =
-                List.map (fun (loc, n, t, _) -> (loc, n, False, t)) ldel
+                List.fold_right
+                  (fun (loc, n, t_o, _) ldl ->
+                     if t_o = None then ldl
+                     else [(loc, n, False, match_with_some t_o) :: ldl])
+                  ldel []
               in
               <:str_item< type $n$ = { $list:ldl$ } >>
             in
             let lel =
               List.fold_right
-                (fun (loc, n, t, eo) lel ->
+                (fun (loc, n, _, eo) lel ->
                    if eo = None then lel
-                   else [(loc, n, t, match_with_some eo) :: lel])
+                   else [(loc, n, match_with_some eo) :: lel])
                 ldel []
             in
             if lel = [] then td
             else
               let stl =
                 List.map
-                  (fun (loc, lab, t, (e, te)) ->
-                     let e =
-                       if so = None then e
-                       else
-                         let s = match_with_some so in
-                         <:expr< fun $lid:s$ -> $e$ >>
-                     in
-                     <:str_item< value $lid:lab$ = fun () -> $e$ >>)
+                  (fun (loc, lab, (e, teo)) ->
+                     if teo = None then
+                       <:str_item< value $lid:lab$ = $e$ >>
+                     else
+                       let e =
+                         if so = None then e
+                         else
+                           let s = match_with_some so in
+                           <:expr< fun $lid:s$ -> $e$ >>
+                       in
+                       <:str_item< value $lid:lab$ = fun () -> $e$ >>)
                   lel
               in
               let sgl =
-                List.map
-                  (fun (loc, lab, _, (e, te)) ->
-                     let t =
-                       if so = None then te else <:ctyp< $lid:n$ -> $te$ >>
-                     in
-                     <:sig_item< value $lid:lab$ : unit -> $t$ >>)
-                  lel
+                List.fold_right
+                  (fun (loc, lab, (e, teo)) sgl ->
+                     if teo = None then sgl
+                     else
+                       let sg =
+                         let te = match_with_some teo in
+                         let t =
+                          if so = None then te else <:ctyp< $lid:n$ -> $te$ >>
+                         in
+                         <:sig_item< value $lid:lab$ : unit -> $t$ >>
+                       in
+                       [sg :: sgl])
+                  lel []
               in
               let md =
                 <:str_item<
@@ -1788,7 +1805,9 @@ value close_base base =
     ;
     champ_d_objet_virtuel:
       [ [ "valeur"; n = LIDENT; ":"; t = ctyp; ";" ->
-            (loc, n, t, None)
+            (loc, n, Some t, None)
+        | "valeur"; "privee"; n = LIDENT; e = fonction_methode; ";" ->
+            (loc, n, None, Some (e, None))
         | "methode"; n = LIDENT; pl = LIST0 LIDENT; ":"; t = ctyp;
           eo = OPT fonction_methode_virtuelle; ";" ->
             let eto =
@@ -1798,9 +1817,9 @@ value close_base base =
                   List.fold_right (fun p e -> <:expr< fun $lid:p$ -> $e$ >>)
                     pl (match_with_some eo)
                 in
-                Some (e, t)
+                Some (e, Some t)
             in
-            (loc, n, <:ctyp< unit -> $t$ >>, eto) ] ]
+            (loc, n, Some <:ctyp< unit -> $t$ >>, eto) ] ]
     ;
     fonction_methode_virtuelle:
       [ [ "="; e = expr -> e ] ]
@@ -1823,6 +1842,19 @@ value close_base base =
 
 classe virtuelle base =
   objet (self)
+    valeur privee husbands self p =
+      let u = self..uoi (get_key_index p) in
+      List.map
+        (fun ifam ->
+           let cpl = self..coi ifam in
+           let husband = self..poi (get_father cpl) in
+           let husband_surname = self..p_surname husband in
+           let husband_surnames_aliases =
+             List.map self..sou (get_surnames_aliases husband)
+           in
+           (husband_surname, husband_surnames_aliases))
+        (Array.to_list (get_family u))
+    ;
     valeur base_t : base_t;
     methode close_base : unit;
     methode person_of_gen_person : Def.gen_person iper istr -> person;
@@ -1901,19 +1933,20 @@ classe virtuelle base =
     methode person_misc_names p tit :
       person -> (person -> list title) -> list string
     =
-      let sou = sou self.base_t in
+      let sou = self..sou in
       Futil.gen_person_misc_names (sou (get_first_name p))
         (sou (get_surname p)) (sou (get_public_name p))
         (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
         (List.map sou (get_first_names_aliases p))
         (List.map sou (get_surnames_aliases p))
         (List.map (Futil.map_title_strings sou) (tit p))
-        (if get_sex p = Female then husbands self.base_t p else [])
+        (if get_sex p = Female then husbands self p else [])
         (father_titles_places self.base_t p tit)
     ;
     methode nobtit : config -> person -> list title;
     methode p_first_name : person -> string;
-    methode p_surname : person -> string;
+    methode p_surname p : person -> string =
+      nominative (self..sou (get_surname p));
     methode date_of_last_change : string -> float;
   fin
 ;
@@ -1979,7 +2012,7 @@ classe base1 b base =
     heriter base..person_misc_names self;
     methode nobtit conf = nobtit conf b;
     methode p_first_name = p_first_name b;
-    methode p_surname = p_surname b;
+    heriter base..p_surname self;
     methode date_of_last_change x = date_of_last_change x b;
   fin
 ;
@@ -2046,7 +2079,7 @@ classe base2 b db2 =
     heriter base..person_misc_names self;
     methode nobtit conf = nobtit conf b;
     methode p_first_name = p_first_name b;
-    methode p_surname = p_surname b;
+    heriter base..p_surname self;
     methode date_of_last_change x = date_of_last_change x b;
   fin
 ;
@@ -2195,8 +2228,22 @@ declare
       value delete_family : unit -> base -> ifam -> unit;
       value person_misc_names :
         unit -> base -> person -> (person -> list title) -> list string;
+      value p_surname : unit -> base -> person -> string;
     end =
     struct
+      value husbands self p =
+        let u = self.uoi () (get_key_index p) in
+        List.map
+          (fun ifam ->
+             let cpl = self.coi () ifam in
+             let husband = self.poi () (get_father cpl) in
+             let husband_surname = self.p_surname () husband in
+             let husband_surnames_aliases =
+               List.map (self.sou ()) (get_surnames_aliases husband)
+             in
+             (husband_surname, husband_surnames_aliases))
+          (Array.to_list (get_family u))
+      ;
       value delete_family () self ifam =
         let cpl =
           self.couple_of_gen_couple ()
@@ -2218,16 +2265,17 @@ declare
         }
       ;
       value person_misc_names () self p tit =
-        let sou = sou self.base_t in
+        let sou = self.sou () in
         Futil.gen_person_misc_names (sou (get_first_name p))
           (sou (get_surname p)) (sou (get_public_name p))
           (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
           (List.map sou (get_first_names_aliases p))
           (List.map sou (get_surnames_aliases p))
           (List.map (Futil.map_title_strings sou) (tit p))
-          (if get_sex p = Female then husbands self.base_t p else [])
+          (if get_sex p = Female then husbands self p else [])
           (father_titles_places self.base_t p tit)
       ;
+      value p_surname () self p = nominative (self.sou () (get_surname p));
     end
   ;
 end;
@@ -2277,7 +2325,7 @@ value base1 () b base =
      base_wiznotes_dir () = base_wiznotes_dir b;
      person_misc_names () = C_base.person_misc_names () self;
      nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
-     p_surname () = p_surname b;
+     p_surname () = C_base.p_surname () self;
      date_of_last_change () x = date_of_last_change x b}
   in
   self
@@ -2331,7 +2379,7 @@ value base2 () b db2 =
      base_wiznotes_dir () = base_wiznotes_dir b;
      person_misc_names () = C_base.person_misc_names () self;
      nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
-     p_surname () = p_surname b;
+     p_surname () = C_base.p_surname () self;
      date_of_last_change () x = date_of_last_change x b}
   in
   self
