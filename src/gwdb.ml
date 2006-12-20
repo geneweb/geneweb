@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.161 2006-12-20 18:51:06 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.162 2006-12-20 19:21:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1349,7 +1349,6 @@ value load_unions_array base =
           db2.family_array := Some (family_array2 db2)
         } ] ]
 ;
-*)
 
 value load_couples_array base =
   match base with
@@ -1387,6 +1386,7 @@ value load_couples_array base =
         } ]
     } ]
 ;
+*)
 
 value children_array2 db2 = do {
   let fname =
@@ -1398,6 +1398,7 @@ value children_array2 db2 = do {
   tab
 };
 
+(*
 value load_descends_array base =
   match base with
   [ Base base -> base.data.descends.load_array ()
@@ -1430,7 +1431,6 @@ value persons_array base =
   | Base2 _ -> failwith "not impl persons_array" ]
 ;
 
-(*
 value ascends_array base =
   match base with
   [ Base base ->
@@ -1500,6 +1500,7 @@ value read_notes bname fnotes rn_mode =
     }
   | None -> "" ]
 ;
+(*
 value base_notes_read base fnotes =
   match base with
   [ Base base -> base.data.bnotes.nread fnotes RnAll
@@ -1510,10 +1511,10 @@ value base_notes_read_first_line base fnotes =
   [ Base base -> base.data.bnotes.nread fnotes Rn1Ln
   | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes Rn1Ln ]
 ;
-value base_notes_are_empty base db2 =
+value base_notes_are_empty base fnotes =
   match base with
-  [ Base base -> base.data.bnotes.nread db2 RnDeg = ""
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) db2 RnDeg = "" ]
+  [ Base base -> base.data.bnotes.nread fnotes RnDeg = ""
+  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes RnDeg = "" ]
 ;
 
 value base_notes_origin_file base =
@@ -1543,9 +1544,7 @@ value base_wiznotes_dir base =
 ;
 
 value p_first_name base p = nominative (sou base (get_first_name p));
-(*
 value p_surname base p = nominative (sou base (get_surname p));
-*)
 
 value nobtit conf base p =
   let list = get_titles p in
@@ -1581,7 +1580,6 @@ value nobtit conf base p =
             list ] ]
 ;
 
-(*
 value husbands base p =
   let u = uoi base (get_key_index p) in
   List.map
@@ -1632,6 +1630,7 @@ value dsk_person_of_person =
   | Person2Gen _ _ -> failwith "not impl dsk_person_of_person (gen)" ]
 ;
 
+(*
 value date_of_last_change bname base =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1648,6 +1647,7 @@ value date_of_last_change bname base =
   in
   s.Unix.st_mtime
 ;
+*)
 
 value check_magic ic magic id = do {
   let b = String.create (String.length magic) in
@@ -1973,8 +1973,41 @@ classe virtuelle base =
         (if get_sex p = Female then husbands self p else [])
         (father_titles_places self p tit)
     ;
-    methode nobtit : config -> person -> list title;
-    methode p_first_name : person -> string;
+    methode nobtit conf p : config -> person -> list title =
+      let list = get_titles p in
+      match Lazy.force conf.allowed_titles with
+      [ [] -> list
+      | allowed_titles ->
+          let list =
+            List.fold_right
+              (fun t l ->
+                 let id = Name.lower (self..sou t.t_ident) in
+                 let pl = Name.lower (self..sou t.t_place) in
+                 if pl = "" then
+                   if List.mem id allowed_titles then [t :: l] else l
+                 else if
+                   List.mem (id ^ "/" ^ pl) allowed_titles ||
+                   List.mem (id ^ "/*") allowed_titles
+                 then
+                   [t :: l]
+                 else l)
+              list []
+          in
+          match Lazy.force conf.denied_titles with
+          [ [] -> list
+          | denied_titles ->
+              List.filter
+                (fun t ->
+                   let id = Name.lower (self..sou t.t_ident) in
+                   let pl = Name.lower (self..sou t.t_place) in
+                   if List.mem (id ^ "/" ^ pl) denied_titles ||
+                      List.mem ("*/" ^ pl) denied_titles
+                   then False
+                   else True)
+                list ] ]
+    ;
+    methode p_first_name p : person -> string =
+      nominative (self..sou (get_first_name p));
     methode p_surname p : person -> string =
       nominative (self..sou (get_surname p));
     methode date_of_last_change : string -> float;
@@ -2058,10 +2091,19 @@ classe base1 b base =
     heriter base..base_strings_of_surname self;
     methode load_ascends_array = base.data.ascends.load_array ();
     methode load_unions_array = base.data.unions.load_array ();
-    methode load_couples_array = load_couples_array b;
-    methode load_descends_array = load_descends_array b;
-    methode load_strings_array = load_strings_array b;
-    methode persons_array = persons_array b;
+    methode load_couples_array = base.data.couples.load_array ();
+    methode load_descends_array = base.data.descends.load_array ();
+    methode load_strings_array = base.data.strings.load_array ();
+    methode persons_array =
+      let get i = Person (base.data.persons.get i) in
+      let set i =
+        fun
+        [ Person p -> base.data.persons.set i p
+        | Person2 _ _ -> assert False
+        | Person2Gen _ _ -> assert False ]
+      in
+      (get, set)
+    ;
     methode ascends_array =
       let fget i = (base.data.ascends.get i).parents in
       let cget i = (base.data.ascends.get i).consang in
@@ -2071,17 +2113,28 @@ classe base1 b base =
       in
       (fget, cget, cset, None)
     ;
-    methode base_notes_read = base_notes_read b;
-    methode base_notes_read_first_line = base_notes_read_first_line b;
-    methode base_notes_are_empty = base_notes_are_empty b;
-    methode base_notes_origin_file = base_notes_origin_file b;
-    methode base_notes_dir = base_notes_dir b;
-    methode base_wiznotes_dir = base_wiznotes_dir b;
+    methode base_notes_read fnotes = base.data.bnotes.nread fnotes RnAll;
+    methode base_notes_read_first_line fnotes =
+      base.data.bnotes.nread fnotes Rn1Ln;
+    methode base_notes_are_empty fnotes =
+      base.data.bnotes.nread fnotes RnDeg = "";
+    methode base_notes_origin_file = base.data.bnotes.norigin_file;
+    methode base_notes_dir = "notes_d";
+    methode base_wiznotes_dir = "wiznotes";
     heriter base..person_misc_names self;
-    methode nobtit conf = nobtit conf b;
-    methode p_first_name = p_first_name b;
+    heriter base..nobtit self;
+    heriter base..p_first_name self;
     heriter base..p_surname self;
-    methode date_of_last_change x = date_of_last_change x b;
+    methode date_of_last_change bname =
+      let bdir =
+        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+      in
+      let s =
+        try Unix.stat (Filename.concat bdir "patches") with
+        [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
+      in
+      s.Unix.st_mtime
+    ;
   fin
 ;
 
@@ -2270,10 +2323,48 @@ classe base2 b db2 =
           db2.family_array := Some (family_array2 db2)
         } ]
     ;
-    methode load_couples_array = load_couples_array b;
-    methode load_descends_array = load_descends_array b;
-    methode load_strings_array = load_strings_array b;
-    methode persons_array = persons_array b;
+    methode load_couples_array = do {
+      eprintf "*** loading couples array\n"; flush stderr;
+      let nb = db2.patches.nb_fam in
+      match db2.father_array with
+      [ Some _ -> ()
+      | None -> do {
+          let tab =
+            load_array2 db2.bdir db2.patches.nb_fam_ini nb "family" "father"
+              (fun ic_dat pos -> do {
+                 seek_in ic_dat pos;
+                 Iovalue.input ic_dat
+               })
+          in
+          Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := father c)
+            db2.patches.h_couple;
+          db2.father_array := Some tab
+        } ];
+      match db2.mother_array with
+      [ Some _ -> ()
+      | None -> do {
+          let tab =
+            load_array2 db2.bdir db2.patches.nb_fam_ini nb "family" "mother"
+              (fun ic_dat pos -> do {
+                 seek_in ic_dat pos;
+                 Iovalue.input ic_dat
+               })
+          in
+          Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := mother c)
+            db2.patches.h_couple;
+          db2.mother_array := Some tab
+        } ]
+    };
+    methode load_descends_array =
+      match db2.children_array with
+      [ Some _ -> ()
+      | None -> do {
+          eprintf "*** loading descends array\n"; flush stderr;
+          db2.children_array := Some (children_array2 db2)
+        } ]
+    ;
+    methode load_strings_array = ();
+    methode persons_array = failwith "not impl persons_array";
     methode ascends_array =
       let nb = self..nb_of_persons in
       let cg_tab =
@@ -2286,17 +2377,39 @@ classe base2 b db2 =
       let cset i v = cg_tab.(i) := v in
       (fget, cget, cset, Some cg_tab)
     ;
-    methode base_notes_read = base_notes_read b;
-    methode base_notes_read_first_line = base_notes_read_first_line b;
-    methode base_notes_are_empty = base_notes_are_empty b;
-    methode base_notes_origin_file = base_notes_origin_file b;
-    methode base_notes_dir = base_notes_dir b;
-    methode base_wiznotes_dir = base_wiznotes_dir b;
+    methode base_notes_read fnotes =
+      read_notes (Filename.dirname db2.bdir) fnotes RnAll;
+    methode base_notes_read_first_line fnotes =
+      read_notes (Filename.dirname db2.bdir) fnotes Rn1Ln;
+    methode base_notes_are_empty fnotes =
+      read_notes (Filename.dirname db2.bdir) fnotes RnDeg = "";
+    methode base_notes_origin_file =
+      let fname = Filename.concat db2.bdir "notes_of.txt" in
+      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic -> do {
+          let r = input_line ic in
+          close_in ic;
+          r
+        }
+      | None -> "" ]
+    ;
+    methode base_notes_dir = Filename.concat "base_d" "notes_d";
+    methode base_wiznotes_dir = Filename.concat "base_d" "wiznotes_d";
     heriter base..person_misc_names self;
-    methode nobtit conf = nobtit conf b;
-    methode p_first_name = p_first_name b;
+    heriter base..nobtit self;
+    heriter base..p_first_name self;
     heriter base..p_surname self;
-    methode date_of_last_change x = date_of_last_change x b;
+    methode date_of_last_change bname =
+      let bdir =
+        if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+      in
+      let s =
+        let bdir = Filename.concat bdir "base_d" in
+        try Unix.stat (Filename.concat bdir "patches") with
+        [ Unix.Unix_error _ _ _ -> Unix.stat bdir ]
+      in
+      s.Unix.st_mtime
+    ;
   fin
 ;
 
@@ -2446,6 +2559,8 @@ declare
       value base_strings_of_surname : unit -> base -> string -> list istr;
       value person_misc_names :
         unit -> base -> person -> (person -> list title) -> list string;
+      value nobtit : unit -> base -> config -> person -> list title;
+      value p_first_name : unit -> base -> person -> string;
       value p_surname : unit -> base -> person -> string;
     end =
     struct
@@ -2508,6 +2623,43 @@ declare
           (List.map (Futil.map_title_strings sou) (tit p))
           (if get_sex p = Female then husbands self p else [])
           (father_titles_places self p tit)
+      ;
+      value nobtit () self conf p =
+        let list = get_titles p in
+        match Lazy.force conf.allowed_titles with
+        [ [] -> list
+        | allowed_titles ->
+            let list =
+              List.fold_right
+                (fun t l ->
+                   let id = Name.lower (self.sou () t.t_ident) in
+                   let pl = Name.lower (self.sou () t.t_place) in
+                   if pl = "" then
+                     if List.mem id allowed_titles then [t :: l] else l
+                   else if
+                     List.mem (id ^ "/" ^ pl) allowed_titles ||
+                     List.mem (id ^ "/*") allowed_titles
+                   then
+                     [t :: l]
+                   else l)
+                list []
+            in
+            match Lazy.force conf.denied_titles with
+            [ [] -> list
+            | denied_titles ->
+                List.filter
+                  (fun t ->
+                     let id = Name.lower (self.sou () t.t_ident) in
+                     let pl = Name.lower (self.sou () t.t_place) in
+                     if List.mem (id ^ "/" ^ pl) denied_titles ||
+                        List.mem ("*/" ^ pl) denied_titles
+                     then
+                       False
+                     else True)
+                  list ] ]
+      ;
+      value p_first_name () self p =
+        nominative (self.sou () (get_first_name p))
       ;
       value p_surname () self p = nominative (self.sou () (get_surname p));
     end
@@ -2578,10 +2730,18 @@ value base1 () b base =
      base_strings_of_surname () = C_base.base_strings_of_surname () self;
      load_ascends_array () = base.data.ascends.load_array ();
      load_unions_array () = base.data.unions.load_array ();
-     load_couples_array () = load_couples_array b;
-     load_descends_array () = load_descends_array b;
-     load_strings_array () = load_strings_array b;
-     persons_array () = persons_array b;
+     load_couples_array () = base.data.couples.load_array ();
+     load_descends_array () = base.data.descends.load_array ();
+     load_strings_array () = base.data.strings.load_array ();
+     persons_array () =
+       let get i = Person (base.data.persons.get i) in
+       let set i =
+         fun
+         [ Person p -> base.data.persons.set i p
+         | Person2 _ _ -> assert False
+         | Person2Gen _ _ -> assert False ]
+       in
+       (get, set);
      ascends_array () =
        let fget i = (base.data.ascends.get i).parents in
        let cget i = (base.data.ascends.get i).consang in
@@ -2589,16 +2749,26 @@ value base1 () b base =
          base.data.ascends.set i {(base.data.ascends.get i) with consang = v}
        in
        (fget, cget, cset, None);
-     base_notes_read () = base_notes_read b;
-     base_notes_read_first_line () = base_notes_read_first_line b;
-     base_notes_are_empty () = base_notes_are_empty b;
-     base_notes_origin_file () = base_notes_origin_file b;
-     base_notes_dir () = base_notes_dir b;
-     base_wiznotes_dir () = base_wiznotes_dir b;
+     base_notes_read () fnotes = base.data.bnotes.nread fnotes RnAll;
+     base_notes_read_first_line () fnotes =
+       base.data.bnotes.nread fnotes Rn1Ln;
+     base_notes_are_empty () fnotes =
+       base.data.bnotes.nread fnotes RnDeg = "";
+     base_notes_origin_file () = base.data.bnotes.norigin_file;
+     base_notes_dir () = "notes_d"; base_wiznotes_dir () = "wiznotes";
      person_misc_names () = C_base.person_misc_names () self;
-     nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
+     nobtit () = C_base.nobtit () self;
+     p_first_name () = C_base.p_first_name () self;
      p_surname () = C_base.p_surname () self;
-     date_of_last_change () x = date_of_last_change x b}
+     date_of_last_change () bname =
+       let bdir =
+         if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+       in
+       let s =
+         try Unix.stat (Filename.concat bdir "patches") with
+         [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
+       in
+       s.Unix.st_mtime}
   in
   self
 ;
@@ -2783,10 +2953,51 @@ value base2 () b db2 =
              flush stderr;
              db2.family_array := Some (family_array2 db2)
            } ];
-     load_couples_array () = load_couples_array b;
-     load_descends_array () = load_descends_array b;
-     load_strings_array () = load_strings_array b;
-     persons_array () = persons_array b;
+     load_couples_array () =
+       do {
+         eprintf "*** loading couples array\n";
+         flush stderr;
+         let nb = db2.patches.nb_fam in
+         match db2.father_array with
+         [ Some _ -> ()
+         | None ->
+             let tab =
+               load_array2 db2.bdir db2.patches.nb_fam_ini nb "family"
+                 "father"
+                 (fun ic_dat pos ->
+                    do { seek_in ic_dat pos; Iovalue.input ic_dat })
+             in
+             do {
+               Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := father c)
+                 db2.patches.h_couple;
+               db2.father_array := Some tab
+             } ];
+         match db2.mother_array with
+         [ Some _ -> ()
+         | None ->
+             let tab =
+               load_array2 db2.bdir db2.patches.nb_fam_ini nb "family"
+                 "mother"
+                 (fun ic_dat pos ->
+                    do { seek_in ic_dat pos; Iovalue.input ic_dat })
+             in
+             do {
+               Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := mother c)
+                 db2.patches.h_couple;
+               db2.mother_array := Some tab
+             } ]
+       };
+     load_descends_array () =
+       match db2.children_array with
+       [ Some _ -> ()
+       | None ->
+           do {
+             eprintf "*** loading descends array\n";
+             flush stderr;
+             db2.children_array := Some (children_array2 db2)
+           } ];
+     load_strings_array () = ();
+     persons_array () = failwith "not impl persons_array";
      ascends_array () =
        let nb = self.nb_of_persons () in
        let cg_tab =
@@ -2798,16 +3009,35 @@ value base2 () b db2 =
        let cget i = cg_tab.(i) in
        let cset i v = cg_tab.(i) := v in
        (fget, cget, cset, Some cg_tab);
-     base_notes_read () = base_notes_read b;
-     base_notes_read_first_line () = base_notes_read_first_line b;
-     base_notes_are_empty () = base_notes_are_empty b;
-     base_notes_origin_file () = base_notes_origin_file b;
-     base_notes_dir () = base_notes_dir b;
-     base_wiznotes_dir () = base_wiznotes_dir b;
+     base_notes_read () fnotes =
+       read_notes (Filename.dirname db2.bdir) fnotes RnAll;
+     base_notes_read_first_line () fnotes =
+       read_notes (Filename.dirname db2.bdir) fnotes Rn1Ln;
+     base_notes_are_empty () fnotes =
+       read_notes (Filename.dirname db2.bdir) fnotes RnDeg = "";
+     base_notes_origin_file () =
+       let fname = Filename.concat db2.bdir "notes_of.txt" in
+       match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+       [ Some ic ->
+           let r = input_line ic in
+           do { close_in ic; r }
+       | None -> "" ];
+     base_notes_dir () = Filename.concat "base_d" "notes_d";
+     base_wiznotes_dir () = Filename.concat "base_d" "wiznotes_d";
      person_misc_names () = C_base.person_misc_names () self;
-     nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
+     nobtit () = C_base.nobtit () self;
+     p_first_name () = C_base.p_first_name () self;
      p_surname () = C_base.p_surname () self;
-     date_of_last_change () x = date_of_last_change x b}
+     date_of_last_change () bname =
+       let bdir =
+         if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+       in
+       let s =
+         let bdir = Filename.concat bdir "base_d" in
+         try Unix.stat (Filename.concat bdir "patches") with
+         [ Unix.Unix_error _ _ _ -> Unix.stat bdir ]
+       in
+       s.Unix.st_mtime}
   in
   self
 ;
