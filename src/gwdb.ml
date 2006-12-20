@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.156 2006-12-20 11:01:38 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.157 2006-12-20 13:08:31 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1733,18 +1733,28 @@ value close_base base =
             in
             if lel = [] then td
             else
-              let sil =
+              let stl =
                 List.map
-                  (fun (loc, n, t, e) ->
+                  (fun (loc, lab, t, (e, te)) ->
                      let e =
                        if so = None then e
-                       else <:expr< fun $lid:match_with_some so$ -> $e$ >>
+                       else
+                         let s = match_with_some so in
+                         <:expr< fun $lid:s$ -> $e$ >>
                      in
-                     <:str_item< value $lid:n$ () = $e$ >>)
+                     <:str_item< value $lid:lab$ = fun () -> $e$ >>)
+                  lel
+              in
+              let sgl =
+                List.map
+                  (fun (loc, lab, t, (e, te)) ->
+                     <:sig_item< value $lid:lab$ : unit -> $lid:n$ -> $te$ >>)
                   lel
               in
               let md =
-                <:str_item< module $uid:"C_" ^ n$ = struct $list:sil$ end >>
+                <:str_item<
+                  module $uid:"C_" ^ n$ : sig $list:sgl$ end =
+                    struct $list:stl$ end >>
               in
               <:str_item< declare $td$; $md$; end >>
         | "classe"; n = LIDENT; e = fonction_objet ->
@@ -1775,7 +1785,7 @@ value close_base base =
             let e =
               List.fold_right (fun p e -> <:expr< fun $lid:p$ -> $e$ >>) pl e
             in
-            (loc, n, <:ctyp< unit -> $t$ >>, Some e) ] ]
+            (loc, n, <:ctyp< unit -> $t$ >>, Some (e, t)) ] ]
     ;
     champ_d_objet:
       [ [ "valeur"; n = LIDENT; "="; e = expr; ";" ->
@@ -2149,7 +2159,8 @@ declare
       p_surname : unit -> person -> string;
       date_of_last_change : unit -> string -> float }
   ;
-  module C_base =
+  module C_base :
+    sig value delete_family : unit -> base -> ifam -> unit; end =
     struct
       value delete_family () self ifam =
         let cpl =
