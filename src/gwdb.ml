@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.155 2006-12-20 09:07:22 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.156 2006-12-20 11:01:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1713,32 +1713,49 @@ value close_base base =
       [ [ e1 = SELF; ".."; e2 = SELF -> <:expr< $e1$ . $e2$ () >> ] ]
     ;
     expr: LEVEL "apply"
-      [ [ "nouvel_objet"; e = SELF -> <:expr< $e$ () >>
-        | "heriter"; n = LIDENT; ".."; m = LIDENT ->
-            <:expr< $uid:"C_" ^ n$ . $lid:m$ () >> ] ]
+      [ [ "nouvel_objet"; e = SELF -> <:expr< $e$ () >> ] ]
     ;
     str_item:
-      [ [ "classe"; "virtuelle"; n = LIDENT; t = fonction_objet_virtuel ->
-            <:str_item< type $n$ = $t$ >>
+      [ [ "classe"; "virtuelle"; n = LIDENT;
+          (so, ldel) = fonction_objet_virtuel ->
+            let td =
+              let ldl =
+                List.map (fun (loc, n, t, _) -> (loc, n, False, t)) ldel
+              in
+              <:str_item< type $n$ = { $list:ldl$ } >>
+            in
+            let lel =
+              List.fold_right
+                (fun (loc, n, t, eo) lel ->
+                   if eo = None then lel
+                   else [(loc, n, t, match_with_some eo) :: lel])
+                ldel []
+            in
+            if lel = [] then td
+            else
+              let sil =
+                List.map
+                  (fun (loc, n, t, e) ->
+                     let e =
+                       if so = None then e
+                       else <:expr< fun $lid:match_with_some so$ -> $e$ >>
+                     in
+                     <:str_item< value $lid:n$ () = $e$ >>)
+                  lel
+              in
+              let md =
+                <:str_item< module $uid:"C_" ^ n$ = struct $list:sil$ end >>
+              in
+              <:str_item< declare $td$; $md$; end >>
         | "classe"; n = LIDENT; e = fonction_objet ->
             <:str_item< value $lid:n$ () = $e$ >> ] ]
     ;
     fonction_objet_virtuel:
       [ [ "="; "objet"; "("; soi = LIDENT; ")";
           ldel = LIST0 champ_d_objet_virtuel; "fin" ->
-            let ldl =
-              List.map (fun (loc, n, t, _) -> (loc, n, False, t)) ldel
-            in
-            let lel =
-              List.fold_right
-                (fun (loc, n, t, e) lel ->
-                   if e = None then lel
-                   else [(loc, n, t, match_with_some e) :: lel])
-                ldel []
-            in
-            <:ctyp< { $list: ldl$ } >>
-        | "="; "objet"; ldl = LIST0 champ_d_objet_virtuel; "fin" ->
-            <:ctyp< { $list: ldl$ } >> ] ]
+            (Some soi, ldel)
+        | "="; "objet"; ldel = LIST0 champ_d_objet_virtuel; "fin" ->
+            (None, ldel) ] ]
     ;
     fonction_objet:
       [ [ p = LIDENT; e = fonction_objet -> <:expr< fun $lid:p$ -> $e$ >>
@@ -1753,13 +1770,21 @@ value close_base base =
             (loc, n, t, None)
         | "methode"; n = LIDENT; ":"; t = ctyp; ";" ->
             (loc, n, <:ctyp< unit -> $t$ >>, None)
-        | "methode"; n = LIDENT; ":"; t = ctyp; "="; e = expr; ";" ->
+        | "methode"; n = LIDENT; pl = LIST0 LIDENT; ":"; t = ctyp; "=";
+           e = expr; ";" ->
+            let e =
+              List.fold_right (fun p e -> <:expr< fun $lid:p$ -> $e$ >>) pl e
+            in
             (loc, n, <:ctyp< unit -> $t$ >>, Some e) ] ]
     ;
     champ_d_objet:
       [ [ "valeur"; n = LIDENT; "="; e = expr; ";" ->
             (<:patt< $lid:n$ >>, e)
         | "methode"; n = LIDENT; e = fonction_methode; ";" ->
+            (<:patt< $lid:n$ >>, <:expr< fun () -> $e$ >>)
+        | "heriter"; c = LIDENT; ".."; n = LIDENT; el = LIST0 expr; ";" ->
+            let f = <:expr< $uid:"C_" ^ c$ . $lid:n$ () >> in
+            let e = List.fold_left (fun f e -> <:expr< $f$ $e$ >>) f el in
             (<:patt< $lid:n$ >>, <:expr< fun () -> $e$ >>) ] ]
     ;
     fonction_methode:
@@ -1801,7 +1826,7 @@ classe virtuelle base =
     methode is_patched_person : iper -> bool;
     methode patched_ascends : list iper;
     methode output_consang_tab : array Adef.fix -> unit;
-    methode delete_family : ifam -> unit = do {
+    methode delete_family ifam : ifam -> unit = do {
       let cpl =
         self..couple_of_gen_couple
           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
@@ -1854,31 +1879,6 @@ classe virtuelle base =
   fin
 ;
 
-module C_base =
-  struct
-    value delete_family () self ifam =
-      let cpl =
-        self.couple_of_gen_couple ()
-          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-      in
-      let fam =
-        let empty = self.insert_string () "" in
-        self.family_of_gen_family ()
-          {marriage = codate_None; marriage_place = empty;
-           marriage_src = empty; relation = Married; divorce = NotDivorced;
-           witnesses = [| |]; comment = empty; origin_file = empty;
-           fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-      in
-      let des = self.descend_of_gen_descend () {children = [| |]} in
-      do {
-        self.patch_family () ifam fam;
-        self.patch_couple () ifam cpl;
-        self.patch_descend () ifam des
-      }
-    ;
-  end
-;
-
 classe base1 b base =
   objet (self)
     valeur base_t = b;
@@ -1913,7 +1913,7 @@ classe base1 b base =
     methode is_patched_person = is_patched_person b;
     methode patched_ascends = patched_ascends b;
     methode output_consang_tab = output_consang_tab b;
-    methode delete_family = heriter base..delete_family self;
+    heriter base..delete_family self;
     methode person_of_key = person_of_key b;
     methode persons_of_name = persons_of_name b;
     methode persons_of_first_name = persons_of_first_name b;
@@ -1979,7 +1979,7 @@ classe base2 b db2 =
     methode is_patched_person = is_patched_person b;
     methode patched_ascends = patched_ascends b;
     methode output_consang_tab = output_consang_tab b;
-    methode delete_family = heriter base..delete_family self;
+    heriter base..delete_family self;
     methode person_of_key = person_of_key b;
     methode persons_of_name = persons_of_name b;
     methode persons_of_first_name = persons_of_first_name b;
@@ -2083,96 +2083,97 @@ value apply_as_dsk_base f base = apply_as_dsk_base f base.base_t;
 
 (* This code is a pretty print of the code above from '#load "pragma.cmo"' *)
 
-type base =
-  { base_t : base_t;
-    close_base : unit -> unit;
-    person_of_gen_person : unit -> Def.gen_person iper istr -> person;
-    ascend_of_gen_ascend : unit -> Def.gen_ascend ifam -> ascend;
-    union_of_gen_union : unit -> Def.gen_union ifam -> union;
-    family_of_gen_family : unit -> Def.gen_family iper istr -> family;
-    couple_of_gen_couple : unit -> Def.gen_couple iper -> couple;
-    descend_of_gen_descend : unit -> Def.gen_descend iper -> descend;
-    poi : unit -> iper -> person;
-    aoi : unit -> iper -> ascend;
-    uoi : unit -> iper -> union;
-    foi : unit -> ifam -> family;
-    coi : unit -> ifam -> couple;
-    doi : unit -> ifam -> descend;
-    sou : unit -> istr -> string;
-    nb_of_persons : unit -> int;
-    nb_of_families : unit -> int;
-    patch_person : unit -> iper -> person -> unit;
-    patch_ascend : unit -> iper -> ascend -> unit;
-    patch_union : unit -> iper -> union -> unit;
-    patch_family : unit -> ifam -> family -> unit;
-    patch_descend : unit -> ifam -> descend -> unit;
-    patch_couple : unit -> ifam -> couple -> unit;
-    patch_key : unit -> iper -> string -> string -> int -> unit;
-    patch_name : unit -> string -> iper -> unit;
-    insert_string : unit -> string -> istr;
-    commit_patches : unit -> unit;
-    commit_notes : unit -> string -> string -> unit;
-    is_patched_person : unit -> iper -> bool;
-    patched_ascends : unit -> list iper;
-    output_consang_tab : unit -> array Adef.fix -> unit;
-    delete_family : unit -> ifam -> unit;
-    person_of_key : unit -> string -> string -> int -> option iper;
-    persons_of_name : unit -> string -> list iper;
-    persons_of_first_name : unit -> string_person_index;
-    persons_of_surname : unit -> string_person_index;
-    base_visible_get : unit -> (person -> bool) -> int -> bool;
-    base_visible_write : unit -> unit;
-    base_particles : unit -> list string;
-    base_strings_of_first_name : unit -> string -> list istr;
-    base_strings_of_surname : unit -> string -> list istr;
-    load_ascends_array : unit -> unit;
-    load_unions_array : unit -> unit;
-    load_couples_array : unit -> unit;
-    load_descends_array : unit -> unit;
-    load_strings_array : unit -> unit;
-    persons_array : unit -> (int -> person * int -> person -> unit);
-    ascends_array :
-      unit ->
-        (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit *
-         option (array Adef.fix));
-    base_notes_read : unit -> string -> string;
-    base_notes_read_first_line : unit -> string -> string;
-    base_notes_are_empty : unit -> string -> bool;
-    base_notes_origin_file : unit -> string;
-    base_notes_dir : unit -> string;
-    base_wiznotes_dir : unit -> string;
-    person_misc_names :
-      unit -> person -> (person -> list title) -> list string;
-    nobtit : unit -> config -> person -> list title;
-    p_first_name : unit -> person -> string;
-    p_surname : unit -> person -> string;
-    date_of_last_change : unit -> string -> float }
-;
-
-module C_base =
-  struct
-    value delete_family () self ifam =
-      let cpl =
-        self.couple_of_gen_couple ()
-          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-      in
-      let fam =
-        let empty = self.insert_string () "" in
-        self.family_of_gen_family ()
-          {marriage = codate_None; marriage_place = empty;
-           marriage_src = empty; relation = Married; divorce = NotDivorced;
-           witnesses = [| |]; comment = empty; origin_file = empty;
-           fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-      in
-      let des = self.descend_of_gen_descend () {children = [| |]} in
-      do {
-        self.patch_family () ifam fam;
-        self.patch_couple () ifam cpl;
-        self.patch_descend () ifam des
-      }
-    ;
-  end
-;
+declare
+  type base =
+    { base_t : base_t;
+      close_base : unit -> unit;
+      person_of_gen_person : unit -> Def.gen_person iper istr -> person;
+      ascend_of_gen_ascend : unit -> Def.gen_ascend ifam -> ascend;
+      union_of_gen_union : unit -> Def.gen_union ifam -> union;
+      family_of_gen_family : unit -> Def.gen_family iper istr -> family;
+      couple_of_gen_couple : unit -> Def.gen_couple iper -> couple;
+      descend_of_gen_descend : unit -> Def.gen_descend iper -> descend;
+      poi : unit -> iper -> person;
+      aoi : unit -> iper -> ascend;
+      uoi : unit -> iper -> union;
+      foi : unit -> ifam -> family;
+      coi : unit -> ifam -> couple;
+      doi : unit -> ifam -> descend;
+      sou : unit -> istr -> string;
+      nb_of_persons : unit -> int;
+      nb_of_families : unit -> int;
+      patch_person : unit -> iper -> person -> unit;
+      patch_ascend : unit -> iper -> ascend -> unit;
+      patch_union : unit -> iper -> union -> unit;
+      patch_family : unit -> ifam -> family -> unit;
+      patch_descend : unit -> ifam -> descend -> unit;
+      patch_couple : unit -> ifam -> couple -> unit;
+      patch_key : unit -> iper -> string -> string -> int -> unit;
+      patch_name : unit -> string -> iper -> unit;
+      insert_string : unit -> string -> istr;
+      commit_patches : unit -> unit;
+      commit_notes : unit -> string -> string -> unit;
+      is_patched_person : unit -> iper -> bool;
+      patched_ascends : unit -> list iper;
+      output_consang_tab : unit -> array Adef.fix -> unit;
+      delete_family : unit -> ifam -> unit;
+      person_of_key : unit -> string -> string -> int -> option iper;
+      persons_of_name : unit -> string -> list iper;
+      persons_of_first_name : unit -> string_person_index;
+      persons_of_surname : unit -> string_person_index;
+      base_visible_get : unit -> (person -> bool) -> int -> bool;
+      base_visible_write : unit -> unit;
+      base_particles : unit -> list string;
+      base_strings_of_first_name : unit -> string -> list istr;
+      base_strings_of_surname : unit -> string -> list istr;
+      load_ascends_array : unit -> unit;
+      load_unions_array : unit -> unit;
+      load_couples_array : unit -> unit;
+      load_descends_array : unit -> unit;
+      load_strings_array : unit -> unit;
+      persons_array : unit -> (int -> person * int -> person -> unit);
+      ascends_array :
+        unit ->
+          (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit *
+           option (array Adef.fix));
+      base_notes_read : unit -> string -> string;
+      base_notes_read_first_line : unit -> string -> string;
+      base_notes_are_empty : unit -> string -> bool;
+      base_notes_origin_file : unit -> string;
+      base_notes_dir : unit -> string;
+      base_wiznotes_dir : unit -> string;
+      person_misc_names :
+        unit -> person -> (person -> list title) -> list string;
+      nobtit : unit -> config -> person -> list title;
+      p_first_name : unit -> person -> string;
+      p_surname : unit -> person -> string;
+      date_of_last_change : unit -> string -> float }
+  ;
+  module C_base =
+    struct
+      value delete_family () self ifam =
+        let cpl =
+          self.couple_of_gen_couple ()
+            (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+        in
+        let fam =
+          let empty = self.insert_string () "" in
+          self.family_of_gen_family ()
+            {marriage = codate_None; marriage_place = empty;
+             marriage_src = empty; relation = Married; divorce = NotDivorced;
+             witnesses = [| |]; comment = empty; origin_file = empty;
+             fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+        in
+        let des = self.descend_of_gen_descend () {children = [| |]} in
+        do {
+          self.patch_family () ifam fam;
+          self.patch_couple () ifam cpl;
+          self.patch_descend () ifam des
+        }
+      ;
+    end
+  ;
+end;
 
 value base1 () b base =
   let rec self =
