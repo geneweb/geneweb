@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.153 2006-12-20 07:16:05 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.154 2006-12-20 07:30:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1722,6 +1722,9 @@ value close_base base =
     ;
     fonction_objet:
       [ [ p = LIDENT; e = fonction_objet -> <:expr< fun $lid:p$ -> $e$ >>
+        | "="; "objet"; "("; soi = LIDENT; ")"; lel = LIST0 champ_d_objet;
+          "fin" ->
+            <:expr< let rec $lid:soi$ = { $list:lel$ } in $lid:soi$ >>
         | "="; "objet"; lel = LIST0 champ_d_objet; "fin" ->
             <:expr< { $list:lel$ } >> ] ]
     ;
@@ -1813,7 +1816,7 @@ classe virtuelle base =
 ;
 
 classe base1 b base =
-  objet
+  objet (self)
     valeur base_t = b;
     methode close_base = base.func.cleanup ();
     methode person_of_gen_person p =
@@ -1848,21 +1851,21 @@ classe base1 b base =
     methode output_consang_tab = output_consang_tab b;
     methode delete_family ifam = do {
       let cpl =
-        couple_of_gen_couple b
+        self..couple_of_gen_couple
           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
       in
       let fam =
-        let empty = insert_string b "" in
-        family_of_gen_family b
+        let empty = self..insert_string "" in
+        self..family_of_gen_family
           {marriage = codate_None; marriage_place = empty; marriage_src = empty;
            relation = Married; divorce = NotDivorced; witnesses = [| |];
            comment = empty; origin_file = empty; fsources = empty;
            fam_index = Adef.ifam_of_int (-1)}
       in
-      let des = descend_of_gen_descend b {children = [| |]} in
-      patch_family b ifam fam;
-      patch_couple b ifam cpl;
-      patch_descend b ifam des
+      let des = self..descend_of_gen_descend {children = [| |]} in
+      self..patch_family ifam fam;
+      self..patch_couple ifam cpl;
+      self..patch_descend ifam des
     };
     methode person_of_key = person_of_key b;
     methode persons_of_name = persons_of_name b;
@@ -1895,7 +1898,7 @@ classe base1 b base =
 ;
 
 classe base2 b db2 =
-  objet
+  objet (self)
     valeur base_t = b;
     methode close_base =
       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
@@ -1931,21 +1934,21 @@ classe base2 b db2 =
     methode output_consang_tab = output_consang_tab b;
     methode delete_family ifam = do {
       let cpl =
-        couple_of_gen_couple b
+        self..couple_of_gen_couple
           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
       in
       let fam =
-        let empty = insert_string b "" in
-        family_of_gen_family b
+        let empty = self..insert_string "" in
+        self..family_of_gen_family
           {marriage = codate_None; marriage_place = empty; marriage_src = empty;
            relation = Married; divorce = NotDivorced; witnesses = [| |];
            comment = empty; origin_file = empty; fsources = empty;
            fam_index = Adef.ifam_of_int (-1)}
       in
-      let des = descend_of_gen_descend b {children = [| |]} in
-      patch_family b ifam fam;
-      patch_couple b ifam cpl;
-      patch_descend b ifam des
+      let des = self..descend_of_gen_descend {children = [| |]} in
+      self..patch_family ifam fam;
+      self..patch_couple ifam cpl;
+      self..patch_descend ifam des
     };
     methode person_of_key = person_of_key b;
     methode persons_of_name = persons_of_name b;
@@ -2115,131 +2118,142 @@ type base =
 ;
 
 value base1 () b base =
-  {base_t = b; close_base () = base.func.cleanup ();
-   person_of_gen_person () p = Person (map_person_ps (fun p -> p) un_istr p);
-   ascend_of_gen_ascend () a = Ascend a; union_of_gen_union () u = Union u;
-   family_of_gen_family () = family_of_gen_family b;
-   couple_of_gen_couple () = couple_of_gen_couple b;
-   descend_of_gen_descend () = descend_of_gen_descend b; poi () = poi b;
-   aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
-   doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
-   nb_of_families () = nb_of_families b; patch_person () = patch_person b;
-   patch_ascend () = patch_ascend b; patch_union () = patch_union b;
-   patch_family () = patch_family b; patch_descend () = patch_descend b;
-   patch_couple () = patch_couple b; patch_key () = patch_key b;
-   patch_name () = patch_name b; insert_string () = insert_string b;
-   commit_patches () = commit_patches b; commit_notes () = commit_notes b;
-   is_patched_person () = is_patched_person b;
-   patched_ascends () = patched_ascends b;
-   output_consang_tab () = output_consang_tab b;
-   delete_family () ifam =
-     let cpl =
-       couple_of_gen_couple b
-         (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-     in
-     let fam =
-       let empty = insert_string b "" in
-       family_of_gen_family b
-         {marriage = codate_None; marriage_place = empty;
-          marriage_src = empty; relation = Married; divorce = NotDivorced;
-          witnesses = [| |]; comment = empty; origin_file = empty;
-          fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-     in
-     let des = descend_of_gen_descend b {children = [| |]} in
-     do {
-       patch_family b ifam fam;
-       patch_couple b ifam cpl;
-       patch_descend b ifam des
-     };
-   person_of_key () = person_of_key b; persons_of_name () = persons_of_name b;
-   persons_of_first_name () = persons_of_first_name b;
-   persons_of_surname () = persons_of_surname b;
-   base_visible_get () = base_visible_get b;
-   base_visible_write () = base_visible_write b;
-   base_particles () = base_particles b;
-   base_strings_of_first_name () = base_strings_of_first_name b;
-   base_strings_of_surname () = base_strings_of_surname b;
-   load_ascends_array () = load_ascends_array b;
-   load_unions_array () = load_unions_array b;
-   load_couples_array () = load_couples_array b;
-   load_descends_array () = load_descends_array b;
-   load_strings_array () = load_strings_array b;
-   persons_array () = persons_array b; ascends_array () = ascends_array b;
-   base_notes_read () = base_notes_read b;
-   base_notes_read_first_line () = base_notes_read_first_line b;
-   base_notes_are_empty () = base_notes_are_empty b;
-   base_notes_origin_file () = base_notes_origin_file b;
-   base_notes_dir () = base_notes_dir b;
-   base_wiznotes_dir () = base_wiznotes_dir b;
-   person_misc_names () = person_misc_names b; nobtit () conf = nobtit conf b;
-   p_first_name () = p_first_name b; p_surname () = p_surname b;
-   date_of_last_change () x = date_of_last_change x b}
+  let rec self =
+    {base_t = b; close_base () = base.func.cleanup ();
+     person_of_gen_person () p =
+       Person (map_person_ps (fun p -> p) un_istr p);
+     ascend_of_gen_ascend () a = Ascend a; union_of_gen_union () u = Union u;
+     family_of_gen_family () = family_of_gen_family b;
+     couple_of_gen_couple () = couple_of_gen_couple b;
+     descend_of_gen_descend () = descend_of_gen_descend b; poi () = poi b;
+     aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
+     doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
+     nb_of_families () = nb_of_families b; patch_person () = patch_person b;
+     patch_ascend () = patch_ascend b; patch_union () = patch_union b;
+     patch_family () = patch_family b; patch_descend () = patch_descend b;
+     patch_couple () = patch_couple b; patch_key () = patch_key b;
+     patch_name () = patch_name b; insert_string () = insert_string b;
+     commit_patches () = commit_patches b; commit_notes () = commit_notes b;
+     is_patched_person () = is_patched_person b;
+     patched_ascends () = patched_ascends b;
+     output_consang_tab () = output_consang_tab b;
+     delete_family () ifam =
+       let cpl =
+         self.couple_of_gen_couple ()
+           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+       in
+       let fam =
+         let empty = self.insert_string () "" in
+         self.family_of_gen_family ()
+           {marriage = codate_None; marriage_place = empty;
+            marriage_src = empty; relation = Married; divorce = NotDivorced;
+            witnesses = [| |]; comment = empty; origin_file = empty;
+            fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+       in
+       let des = self.descend_of_gen_descend () {children = [| |]} in
+       do {
+         self.patch_family () ifam fam;
+         self.patch_couple () ifam cpl;
+         self.patch_descend () ifam des
+       };
+     person_of_key () = person_of_key b;
+     persons_of_name () = persons_of_name b;
+     persons_of_first_name () = persons_of_first_name b;
+     persons_of_surname () = persons_of_surname b;
+     base_visible_get () = base_visible_get b;
+     base_visible_write () = base_visible_write b;
+     base_particles () = base_particles b;
+     base_strings_of_first_name () = base_strings_of_first_name b;
+     base_strings_of_surname () = base_strings_of_surname b;
+     load_ascends_array () = load_ascends_array b;
+     load_unions_array () = load_unions_array b;
+     load_couples_array () = load_couples_array b;
+     load_descends_array () = load_descends_array b;
+     load_strings_array () = load_strings_array b;
+     persons_array () = persons_array b; ascends_array () = ascends_array b;
+     base_notes_read () = base_notes_read b;
+     base_notes_read_first_line () = base_notes_read_first_line b;
+     base_notes_are_empty () = base_notes_are_empty b;
+     base_notes_origin_file () = base_notes_origin_file b;
+     base_notes_dir () = base_notes_dir b;
+     base_wiznotes_dir () = base_wiznotes_dir b;
+     person_misc_names () = person_misc_names b;
+     nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
+     p_surname () = p_surname b;
+     date_of_last_change () x = date_of_last_change x b}
+  in
+  self
 ;
 
 value base2 () b db2 =
-  {base_t = b;
-   close_base () =
-     Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
-   person_of_gen_person () p =
-     Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
-   ascend_of_gen_ascend () a = Ascend2Gen db2 a;
-   union_of_gen_union () u = Union2Gen db2 u;
-   family_of_gen_family () = family_of_gen_family b;
-   couple_of_gen_couple () = couple_of_gen_couple b;
-   descend_of_gen_descend () = descend_of_gen_descend b; poi () = poi b;
-   aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
-   doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
-   nb_of_families () = nb_of_families b; patch_person () = patch_person b;
-   patch_ascend () = patch_ascend b; patch_union () = patch_union b;
-   patch_family () = patch_family b; patch_descend () = patch_descend b;
-   patch_couple () = patch_couple b; patch_key () = patch_key b;
-   patch_name () = patch_name b; insert_string () = insert_string b;
-   commit_patches () = commit_patches b; commit_notes () = commit_notes b;
-   is_patched_person () = is_patched_person b;
-   patched_ascends () = patched_ascends b;
-   output_consang_tab () = output_consang_tab b;
-   delete_family () ifam =
-     let cpl =
-       couple_of_gen_couple b
-         (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-     in
-     let fam =
-       let empty = insert_string b "" in
-       family_of_gen_family b
-         {marriage = codate_None; marriage_place = empty;
-          marriage_src = empty; relation = Married; divorce = NotDivorced;
-          witnesses = [| |]; comment = empty; origin_file = empty;
-          fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-     in
-     let des = descend_of_gen_descend b {children = [| |]} in
-     do {
-       patch_family b ifam fam;
-       patch_couple b ifam cpl;
-       patch_descend b ifam des
-     };
-   person_of_key () = person_of_key b; persons_of_name () = persons_of_name b;
-   persons_of_first_name () = persons_of_first_name b;
-   persons_of_surname () = persons_of_surname b;
-   base_visible_get () = base_visible_get b;
-   base_visible_write () = base_visible_write b;
-   base_particles () = base_particles b;
-   base_strings_of_first_name () = base_strings_of_first_name b;
-   base_strings_of_surname () = base_strings_of_surname b;
-   load_ascends_array () = load_ascends_array b;
-   load_unions_array () = load_unions_array b;
-   load_couples_array () = load_couples_array b;
-   load_descends_array () = load_descends_array b;
-   load_strings_array () = load_strings_array b;
-   persons_array () = persons_array b; ascends_array () = ascends_array b;
-   base_notes_read () = base_notes_read b;
-   base_notes_read_first_line () = base_notes_read_first_line b;
-   base_notes_are_empty () = base_notes_are_empty b;
-   base_notes_origin_file () = base_notes_origin_file b;
-   base_notes_dir () = base_notes_dir b;
-   base_wiznotes_dir () = base_wiznotes_dir b;
-   person_misc_names () = person_misc_names b; nobtit () conf = nobtit conf b;
-   p_first_name () = p_first_name b; p_surname () = p_surname b;
-   date_of_last_change () x = date_of_last_change x b}
+  let rec self =
+    {base_t = b;
+     close_base () =
+       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
+     person_of_gen_person () p =
+       Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
+     ascend_of_gen_ascend () a = Ascend2Gen db2 a;
+     union_of_gen_union () u = Union2Gen db2 u;
+     family_of_gen_family () = family_of_gen_family b;
+     couple_of_gen_couple () = couple_of_gen_couple b;
+     descend_of_gen_descend () = descend_of_gen_descend b; poi () = poi b;
+     aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
+     doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
+     nb_of_families () = nb_of_families b; patch_person () = patch_person b;
+     patch_ascend () = patch_ascend b; patch_union () = patch_union b;
+     patch_family () = patch_family b; patch_descend () = patch_descend b;
+     patch_couple () = patch_couple b; patch_key () = patch_key b;
+     patch_name () = patch_name b; insert_string () = insert_string b;
+     commit_patches () = commit_patches b; commit_notes () = commit_notes b;
+     is_patched_person () = is_patched_person b;
+     patched_ascends () = patched_ascends b;
+     output_consang_tab () = output_consang_tab b;
+     delete_family () ifam =
+       let cpl =
+         self.couple_of_gen_couple ()
+           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+       in
+       let fam =
+         let empty = self.insert_string () "" in
+         self.family_of_gen_family ()
+           {marriage = codate_None; marriage_place = empty;
+            marriage_src = empty; relation = Married; divorce = NotDivorced;
+            witnesses = [| |]; comment = empty; origin_file = empty;
+            fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+       in
+       let des = self.descend_of_gen_descend () {children = [| |]} in
+       do {
+         self.patch_family () ifam fam;
+         self.patch_couple () ifam cpl;
+         self.patch_descend () ifam des
+       };
+     person_of_key () = person_of_key b;
+     persons_of_name () = persons_of_name b;
+     persons_of_first_name () = persons_of_first_name b;
+     persons_of_surname () = persons_of_surname b;
+     base_visible_get () = base_visible_get b;
+     base_visible_write () = base_visible_write b;
+     base_particles () = base_particles b;
+     base_strings_of_first_name () = base_strings_of_first_name b;
+     base_strings_of_surname () = base_strings_of_surname b;
+     load_ascends_array () = load_ascends_array b;
+     load_unions_array () = load_unions_array b;
+     load_couples_array () = load_couples_array b;
+     load_descends_array () = load_descends_array b;
+     load_strings_array () = load_strings_array b;
+     persons_array () = persons_array b; ascends_array () = ascends_array b;
+     base_notes_read () = base_notes_read b;
+     base_notes_read_first_line () = base_notes_read_first_line b;
+     base_notes_are_empty () = base_notes_are_empty b;
+     base_notes_origin_file () = base_notes_origin_file b;
+     base_notes_dir () = base_notes_dir b;
+     base_wiznotes_dir () = base_wiznotes_dir b;
+     person_misc_names () = person_misc_names b;
+     nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
+     p_surname () = p_surname b;
+     date_of_last_change () x = date_of_last_change x b}
+  in
+  self
 ;
 
 value open_base bname =
