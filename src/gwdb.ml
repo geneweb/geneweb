@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.159 2006-12-20 14:59:15 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.160 2006-12-20 18:18:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -721,6 +721,7 @@ value gen_descend_of_descend =
   | Descend2Gen db2 d -> d ]
 ;
 
+(*
 value poi base i =
   match base with
   [ Base base -> Person (base.data.persons.get (Adef.int_of_iper i))
@@ -768,6 +769,7 @@ value doi base i =
       try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend i) with
       [ Not_found -> Descend2 db2 (Adef.int_of_ifam i) ] ]
 ;
+*)
 
 value sou base i =
   match (base, i) with
@@ -792,6 +794,7 @@ value person_with_key p fn sn oc =
   | _ -> failwith "not impl person_with_key 2" ]
 ;
 
+(*
 value nb_of_persons base =
   match base with
   [ Base base -> base.data.persons.len
@@ -894,6 +897,7 @@ value patch_key base ip fn sn occ =
       Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
     }]
 ;
+*)
 
 value insert_string base s =
   match base with
@@ -1414,6 +1418,7 @@ value persons_array base =
   | Base2 _ -> failwith "not impl persons_array" ]
 ;
 
+(*
 value ascends_array base =
   match base with
   [ Base base ->
@@ -1436,6 +1441,7 @@ value ascends_array base =
       let cset i v = cg_tab.(i) := v in
       (fget, cget, cset, Some cg_tab) ]
 ;
+*)
 
 value output_consang_tab base tab =
   match base with
@@ -1577,7 +1583,6 @@ value husbands base p =
        (husband_surname, husband_surnames_aliases))
     (Array.to_list (get_family u))
 ;
-*)
 
 value father_titles_places base p nobtit =
   match get_parents (aoi base (get_key_index p)) with
@@ -1588,7 +1593,6 @@ value father_titles_places base p nobtit =
   | None -> [] ]
 ;
 
-(*
 value person_misc_names base p tit =
   let sou = sou base in
   Futil.gen_person_misc_names (sou (get_first_name p))
@@ -1855,6 +1859,14 @@ classe virtuelle base =
            (husband_surname, husband_surnames_aliases))
         (Array.to_list (get_family u))
     ;
+    valeur privee father_titles_places self p nobtit =
+      match get_parents (self..aoi (get_key_index p)) with
+      [ Some ifam ->
+          let cpl = self..coi ifam in
+          let fath = self..poi (get_father cpl) in
+          List.map (fun t -> self..sou t.t_place) (nobtit fath)
+      | None -> [] ]
+    ;
     valeur base_t : base_t;
     methode close_base : unit;
     methode person_of_gen_person : Def.gen_person iper istr -> person;
@@ -1941,7 +1953,7 @@ classe virtuelle base =
         (List.map sou (get_surnames_aliases p))
         (List.map (Futil.map_title_strings sou) (tit p))
         (if get_sex p = Female then husbands self p else [])
-        (father_titles_places self.base_t p tit)
+        (father_titles_places self p tit)
     ;
     methode nobtit : config -> person -> list title;
     methode p_first_name : person -> string;
@@ -1963,23 +1975,47 @@ classe base1 b base =
       Family (map_family_ps (fun p -> p) un_istr f);
     methode couple_of_gen_couple c = Couple c;
     methode descend_of_gen_descend d = Descend d;
-    methode poi = poi b;
-    methode aoi = aoi b;
-    methode uoi = uoi b;
-    methode foi = foi b;
-    methode coi = coi b;
-    methode doi = doi b;
+    methode poi i = Person (base.data.persons.get (Adef.int_of_iper i));
+    methode aoi i = Ascend (base.data.ascends.get (Adef.int_of_iper i));
+    methode uoi i = Union (base.data.unions.get (Adef.int_of_iper i));
+    methode foi i = Family (base.data.families.get (Adef.int_of_ifam i));
+    methode coi i = Couple (base.data.couples.get (Adef.int_of_ifam i));
+    methode doi i = Descend (base.data.descends.get (Adef.int_of_ifam i));
     methode sou = sou b;
-    methode nb_of_persons = nb_of_persons b;
-    methode nb_of_families = nb_of_families b;
-    methode patch_person = patch_person b;
-    methode patch_ascend = patch_ascend b;
-    methode patch_union = patch_union b;
-    methode patch_family = patch_family b;
-    methode patch_descend = patch_descend b;
-    methode patch_couple = patch_couple b;
-    methode patch_key = patch_key b;
-    methode patch_name = patch_name b;
+    methode nb_of_persons = base.data.persons.len;
+    methode nb_of_families = base.data.families.len;
+    methode patch_person ip p =
+      match p with
+      [ Person p -> base.func.Dbdisk.patch_person ip p
+      | _ -> assert False ]
+    ;
+    methode patch_ascend ip a =
+      match a with
+      [ Ascend a -> base.func.Dbdisk.patch_ascend ip a
+      | _ -> assert False ]
+    ;
+    methode patch_union ip u =
+      match u with
+      [ Union u -> base.func.Dbdisk.patch_union ip u
+      | _ -> failwith "not impl patch_union" ]
+    ;
+    methode patch_family ifam f =
+      match f with
+      [ Family f -> base.func.Dbdisk.patch_family ifam f
+      | _ -> failwith "not impl patch_family" ]
+    ;
+    methode patch_descend ifam d =
+      match d with
+      [ Descend d -> base.func.Dbdisk.patch_descend ifam d
+      | _ -> failwith "not impl patch_descend" ]
+    ;
+    methode patch_couple ifam c =
+      match c with
+      [ Couple c -> base.func.Dbdisk.patch_couple ifam c
+      | _ -> failwith "not impl patch_couple" ]
+    ;
+    methode patch_key ip fn sn occ = ();
+    methode patch_name s ip = base.func.Dbdisk.patch_name s ip;
     methode insert_string = insert_string b;
     methode commit_patches = commit_patches b;
     methode commit_notes = commit_notes b;
@@ -2002,7 +2038,15 @@ classe base1 b base =
     methode load_descends_array = load_descends_array b;
     methode load_strings_array = load_strings_array b;
     methode persons_array = persons_array b;
-    methode ascends_array = ascends_array b;
+    methode ascends_array =
+      let fget i = (base.data.ascends.get i).parents in
+      let cget i = (base.data.ascends.get i).consang in
+      let cset i v =
+        base.data.ascends.set i
+          {(base.data.ascends.get i) with consang = v}
+      in
+      (fget, cget, cset, None)
+    ;
     methode base_notes_read = base_notes_read b;
     methode base_notes_read_first_line = base_notes_read_first_line b;
     methode base_notes_are_empty = base_notes_are_empty b;
@@ -2030,23 +2074,105 @@ classe base2 b db2 =
       Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f);
     methode couple_of_gen_couple c = Couple2Gen db2 c;
     methode descend_of_gen_descend d = Descend2Gen db2 d;
-    methode poi = poi b;
-    methode aoi = aoi b;
-    methode uoi = uoi b;
-    methode foi = foi b;
-    methode coi = coi b;
-    methode doi = doi b;
+    methode poi i =
+      try Person2Gen db2 (Hashtbl.find db2.patches.h_person i) with
+      [ Not_found -> Person2 db2 (Adef.int_of_iper i) ]
+    ;
+    methode aoi i =
+      try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend i) with
+      [ Not_found -> Ascend2 db2 (Adef.int_of_iper i) ]
+    ;
+    methode uoi i =
+      try Union2Gen db2 (Hashtbl.find db2.patches.h_union i) with
+      [ Not_found -> Union2 db2 (Adef.int_of_iper i) ]
+    ;
+    methode foi i =
+      try Family2Gen db2 (Hashtbl.find db2.patches.h_family i) with
+      [ Not_found -> Family2 db2 (Adef.int_of_ifam i) ]
+    ;
+    methode coi i =
+      try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple i) with
+      [ Not_found -> Couple2 db2 (Adef.int_of_ifam i) ]
+    ;
+    methode doi i =
+      try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend i) with
+      [ Not_found -> Descend2 db2 (Adef.int_of_ifam i) ]
+    ;
     methode sou = sou b;
-    methode nb_of_persons = nb_of_persons b;
-    methode nb_of_families = nb_of_families b;
-    methode patch_person = patch_person b;
-    methode patch_ascend = patch_ascend b;
-    methode patch_union = patch_union b;
-    methode patch_family = patch_family b;
-    methode patch_descend = patch_descend b;
-    methode patch_couple = patch_couple b;
-    methode patch_key = patch_key b;
-    methode patch_name = patch_name b;
+    methode nb_of_persons = db2.patches.nb_per;
+    methode nb_of_families = db2.patches.nb_fam;
+    methode patch_person ip p =
+      match p with
+      [ Person2Gen _ p -> do {
+          Hashtbl.replace db2.patches.h_person ip p;
+          db2.patches.nb_per :=
+            max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
+        }
+      | _ -> assert False ]
+    ;
+    methode patch_ascend ip a =
+      match a with
+      [ Ascend2Gen _ a -> do {
+          Hashtbl.replace db2.patches.h_ascend ip a;
+          db2.patches.nb_per :=
+            max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
+        }
+      | _ -> assert False ]
+    ;
+    methode patch_union ip u =
+      match u with
+      [ Union2Gen _ u -> do {
+          Hashtbl.replace db2.patches.h_union ip u;
+          db2.patches.nb_per :=
+            max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
+        }
+      | _ -> failwith "not impl patch_union" ]
+    ;
+    methode patch_family ifam f =
+      match f with
+      [ Family2Gen _ f -> do {
+          Hashtbl.replace db2.patches.h_family ifam f;
+          db2.patches.nb_fam :=
+            max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
+        }
+      | _ -> failwith "not impl patch_family" ]
+    ;
+    methode patch_descend ifam d =
+      match d with
+      [ Descend2Gen _ d -> do {
+          Hashtbl.replace db2.patches.h_descend ifam d;
+          db2.patches.nb_fam :=
+            max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
+        }
+      | _ -> failwith "not impl patch_descend" ]
+    ;
+    methode patch_couple ifam c =
+      match c with
+      [ Couple2Gen _ c -> do {
+          Hashtbl.replace db2.patches.h_couple ifam c;
+          db2.patches.nb_fam :=
+            max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
+        }
+      | _ -> failwith "not impl patch_couple" ]
+    ;
+    methode patch_key ip fn sn occ = do {
+      Hashtbl.iter
+        (fun key ip1 ->
+           if ip = ip1 then Hashtbl.remove db2.patches.h_key key else ())
+        db2.patches.h_key;
+      let fn = Name.lower (nominative fn) in
+      let sn = Name.lower (nominative sn) in
+      Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
+    };
+    methode patch_name s ip =
+      let s = Name.crush_lower s in
+      let ht = db2.patches.h_name in
+      try
+        let ipl = Hashtbl.find ht s in
+        if List.mem ip ipl then () else Hashtbl.replace ht s [ip :: ipl]
+      with
+      [ Not_found -> Hashtbl.add ht s [ip] ]
+    ;
     methode insert_string = insert_string b;
     methode commit_patches = commit_patches b;
     methode commit_notes = commit_notes b;
@@ -2069,7 +2195,18 @@ classe base2 b db2 =
     methode load_descends_array = load_descends_array b;
     methode load_strings_array = load_strings_array b;
     methode persons_array = persons_array b;
-    methode ascends_array = ascends_array b;
+    methode ascends_array =
+      let nb = self..nb_of_persons in
+      let cg_tab =
+        match db2.consang_array with
+        [ Some tab -> tab
+        | None -> consang_array2 db2 nb ]
+      in
+      let fget i = get_parents (Ascend2 db2 i) in
+      let cget i = cg_tab.(i) in
+      let cset i v = cg_tab.(i) := v in
+      (fget, cget, cset, Some cg_tab)
+    ;
     methode base_notes_read = base_notes_read b;
     methode base_notes_read_first_line = base_notes_read_first_line b;
     methode base_notes_are_empty = base_notes_are_empty b;
@@ -2244,6 +2381,14 @@ declare
              (husband_surname, husband_surnames_aliases))
           (Array.to_list (get_family u))
       ;
+      value father_titles_places self p nobtit =
+        match get_parents (self.aoi () (get_key_index p)) with
+        [ Some ifam ->
+            let cpl = self.coi () ifam in
+            let fath = self.poi () (get_father cpl) in
+            List.map (fun t -> self.sou () t.t_place) (nobtit fath)
+        | None -> [] ]
+      ;
       value delete_family () self ifam =
         let cpl =
           self.couple_of_gen_couple ()
@@ -2273,7 +2418,7 @@ declare
           (List.map sou (get_surnames_aliases p))
           (List.map (Futil.map_title_strings sou) (tit p))
           (if get_sex p = Female then husbands self p else [])
-          (father_titles_places self.base_t p tit)
+          (father_titles_places self p tit)
       ;
       value p_surname () self p = nominative (self.sou () (get_surname p));
     end
@@ -2289,15 +2434,43 @@ value base1 () b base =
      family_of_gen_family () f =
        Family (map_family_ps (fun p -> p) un_istr f);
      couple_of_gen_couple () c = Couple c;
-     descend_of_gen_descend () d = Descend d; poi () = poi b; aoi () = aoi b;
-     uoi () = uoi b; foi () = foi b; coi () = coi b; doi () = doi b;
-     sou () = sou b; nb_of_persons () = nb_of_persons b;
-     nb_of_families () = nb_of_families b; patch_person () = patch_person b;
-     patch_ascend () = patch_ascend b; patch_union () = patch_union b;
-     patch_family () = patch_family b; patch_descend () = patch_descend b;
-     patch_couple () = patch_couple b; patch_key () = patch_key b;
-     patch_name () = patch_name b; insert_string () = insert_string b;
-     commit_patches () = commit_patches b; commit_notes () = commit_notes b;
+     descend_of_gen_descend () d = Descend d;
+     poi () i = Person (base.data.persons.get (Adef.int_of_iper i));
+     aoi () i = Ascend (base.data.ascends.get (Adef.int_of_iper i));
+     uoi () i = Union (base.data.unions.get (Adef.int_of_iper i));
+     foi () i = Family (base.data.families.get (Adef.int_of_ifam i));
+     coi () i = Couple (base.data.couples.get (Adef.int_of_ifam i));
+     doi () i = Descend (base.data.descends.get (Adef.int_of_ifam i));
+     sou () = sou b; nb_of_persons () = base.data.persons.len;
+     nb_of_families () = base.data.families.len;
+     patch_person () ip p =
+       match p with
+       [ Person p -> base.func.Dbdisk.patch_person ip p
+       | _ -> assert False ];
+     patch_ascend () ip a =
+       match a with
+       [ Ascend a -> base.func.Dbdisk.patch_ascend ip a
+       | _ -> assert False ];
+     patch_union () ip u =
+       match u with
+       [ Union u -> base.func.Dbdisk.patch_union ip u
+       | _ -> failwith "not impl patch_union" ];
+     patch_family () ifam f =
+       match f with
+       [ Family f -> base.func.Dbdisk.patch_family ifam f
+       | _ -> failwith "not impl patch_family" ];
+     patch_descend () ifam d =
+       match d with
+       [ Descend d -> base.func.Dbdisk.patch_descend ifam d
+       | _ -> failwith "not impl patch_descend" ];
+     patch_couple () ifam c =
+       match c with
+       [ Couple c -> base.func.Dbdisk.patch_couple ifam c
+       | _ -> failwith "not impl patch_couple" ];
+     patch_key () ip fn sn occ = ();
+     patch_name () s ip = base.func.Dbdisk.patch_name s ip;
+     insert_string () = insert_string b; commit_patches () = commit_patches b;
+     commit_notes () = commit_notes b;
      is_patched_person () = is_patched_person b;
      patched_ascends () = patched_ascends b;
      output_consang_tab () = output_consang_tab b;
@@ -2316,7 +2489,14 @@ value base1 () b base =
      load_couples_array () = load_couples_array b;
      load_descends_array () = load_descends_array b;
      load_strings_array () = load_strings_array b;
-     persons_array () = persons_array b; ascends_array () = ascends_array b;
+     persons_array () = persons_array b;
+     ascends_array () =
+       let fget i = (base.data.ascends.get i).parents in
+       let cget i = (base.data.ascends.get i).consang in
+       let cset i v =
+         base.data.ascends.set i {(base.data.ascends.get i) with consang = v}
+       in
+       (fget, cget, cset, None);
      base_notes_read () = base_notes_read b;
      base_notes_read_first_line () = base_notes_read_first_line b;
      base_notes_are_empty () = base_notes_are_empty b;
@@ -2343,15 +2523,101 @@ value base2 () b db2 =
      family_of_gen_family () f =
        Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f);
      couple_of_gen_couple () c = Couple2Gen db2 c;
-     descend_of_gen_descend () d = Descend2Gen db2 d; poi () = poi b;
-     aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
-     doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
-     nb_of_families () = nb_of_families b; patch_person () = patch_person b;
-     patch_ascend () = patch_ascend b; patch_union () = patch_union b;
-     patch_family () = patch_family b; patch_descend () = patch_descend b;
-     patch_couple () = patch_couple b; patch_key () = patch_key b;
-     patch_name () = patch_name b; insert_string () = insert_string b;
-     commit_patches () = commit_patches b; commit_notes () = commit_notes b;
+     descend_of_gen_descend () d = Descend2Gen db2 d;
+     poi () i =
+       try Person2Gen db2 (Hashtbl.find db2.patches.h_person i) with
+       [ Not_found -> Person2 db2 (Adef.int_of_iper i) ];
+     aoi () i =
+       try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend i) with
+       [ Not_found -> Ascend2 db2 (Adef.int_of_iper i) ];
+     uoi () i =
+       try Union2Gen db2 (Hashtbl.find db2.patches.h_union i) with
+       [ Not_found -> Union2 db2 (Adef.int_of_iper i) ];
+     foi () i =
+       try Family2Gen db2 (Hashtbl.find db2.patches.h_family i) with
+       [ Not_found -> Family2 db2 (Adef.int_of_ifam i) ];
+     coi () i =
+       try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple i) with
+       [ Not_found -> Couple2 db2 (Adef.int_of_ifam i) ];
+     doi () i =
+       try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend i) with
+       [ Not_found -> Descend2 db2 (Adef.int_of_ifam i) ];
+     sou () = sou b; nb_of_persons () = db2.patches.nb_per;
+     nb_of_families () = db2.patches.nb_fam;
+     patch_person () ip p =
+       match p with
+       [ Person2Gen _ p ->
+           do {
+             Hashtbl.replace db2.patches.h_person ip p;
+             db2.patches.nb_per :=
+               max (Adef.int_of_iper ip + 1) db2.patches.nb_per
+           }
+       | _ -> assert False ];
+     patch_ascend () ip a =
+       match a with
+       [ Ascend2Gen _ a ->
+           do {
+             Hashtbl.replace db2.patches.h_ascend ip a;
+             db2.patches.nb_per :=
+               max (Adef.int_of_iper ip + 1) db2.patches.nb_per
+           }
+       | _ -> assert False ];
+     patch_union () ip u =
+       match u with
+       [ Union2Gen _ u ->
+           do {
+             Hashtbl.replace db2.patches.h_union ip u;
+             db2.patches.nb_per :=
+               max (Adef.int_of_iper ip + 1) db2.patches.nb_per
+           }
+       | _ -> failwith "not impl patch_union" ];
+     patch_family () ifam f =
+       match f with
+       [ Family2Gen _ f ->
+           do {
+             Hashtbl.replace db2.patches.h_family ifam f;
+             db2.patches.nb_fam :=
+               max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
+           }
+       | _ -> failwith "not impl patch_family" ];
+     patch_descend () ifam d =
+       match d with
+       [ Descend2Gen _ d ->
+           do {
+             Hashtbl.replace db2.patches.h_descend ifam d;
+             db2.patches.nb_fam :=
+               max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
+           }
+       | _ -> failwith "not impl patch_descend" ];
+     patch_couple () ifam c =
+       match c with
+       [ Couple2Gen _ c ->
+           do {
+             Hashtbl.replace db2.patches.h_couple ifam c;
+             db2.patches.nb_fam :=
+               max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
+           }
+       | _ -> failwith "not impl patch_couple" ];
+     patch_key () ip fn sn occ =
+       do {
+         Hashtbl.iter
+           (fun key ip1 ->
+              if ip = ip1 then Hashtbl.remove db2.patches.h_key key else ())
+           db2.patches.h_key;
+         let fn = Name.lower (nominative fn) in
+         let sn = Name.lower (nominative sn) in
+         Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
+       };
+     patch_name () s ip =
+       let s = Name.crush_lower s in
+       let ht = db2.patches.h_name in
+       try
+         let ipl = Hashtbl.find ht s in
+         if List.mem ip ipl then () else Hashtbl.replace ht s [ip :: ipl]
+       with
+       [ Not_found -> Hashtbl.add ht s [ip] ];
+     insert_string () = insert_string b; commit_patches () = commit_patches b;
+     commit_notes () = commit_notes b;
      is_patched_person () = is_patched_person b;
      patched_ascends () = patched_ascends b;
      output_consang_tab () = output_consang_tab b;
@@ -2370,7 +2636,18 @@ value base2 () b db2 =
      load_couples_array () = load_couples_array b;
      load_descends_array () = load_descends_array b;
      load_strings_array () = load_strings_array b;
-     persons_array () = persons_array b; ascends_array () = ascends_array b;
+     persons_array () = persons_array b;
+     ascends_array () =
+       let nb = self.nb_of_persons () in
+       let cg_tab =
+         match db2.consang_array with
+         [ Some tab -> tab
+         | None -> consang_array2 db2 nb ]
+       in
+       let fget i = get_parents (Ascend2 db2 i) in
+       let cget i = cg_tab.(i) in
+       let cset i v = cg_tab.(i) := v in
+       (fget, cget, cset, Some cg_tab);
      base_notes_read () = base_notes_read b;
      base_notes_read_first_line () = base_notes_read_first_line b;
      base_notes_are_empty () = base_notes_are_empty b;
