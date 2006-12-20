@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.162 2006-12-20 19:21:31 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.163 2006-12-20 19:28:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -450,14 +450,6 @@ value person_with_sex p s =
   | Person2Gen db2 p -> Person2Gen db2 {(p) with sex = s} ]
 ;
 
-(*
-value person_of_gen_person base p =
-  match base with
-  [ Base _ -> Person (map_person_ps (fun p -> p) un_istr p)
-  | Base2 db2 -> Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p) ]
-;
-*)
-
 value gen_person_of_person =
   fun
   [ Person p -> map_person_ps (fun p -> p) (fun s -> Istr s) p
@@ -508,14 +500,6 @@ value get_parents =
   | Ascend2Gen _ a -> a.Def.parents ]
 ;
 
-(*
-value ascend_of_gen_ascend base a =
-  match base with
-  [ Base _ -> Ascend a
-  | Base2 db2 -> Ascend2Gen db2 a ]
-;
-*)
-
 value empty_person ip =
   let empty_string = Adef.istr_of_int 0 in
   let p =
@@ -543,14 +527,6 @@ value get_family =
       | None -> get_field db2 i ("person", "family") ]
   | Union2Gen db2 u -> u.Def.family ]
 ;
-
-(*
-value union_of_gen_union base u =
-  match base with
-  [ Base _ -> Union u
-  | Base2 db2 -> Union2Gen db2 u ]
-;
-*)
 
 value gen_union_of_union =
   fun
@@ -630,14 +606,6 @@ value family_with_origin_file f orf fi =
   | _ -> assert False ]
 ;
 
-(*
-value family_of_gen_family base f =
-  match base with
-  [ Base _ -> Family (map_family_ps (fun p -> p) un_istr f)
-  | Base2 db2 -> Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f) ]
-;
-*)
-
 value gen_family_of_family =
   fun
   [ Family f -> map_family_ps (fun p -> p) (fun s -> Istr s) f
@@ -681,14 +649,6 @@ value get_parent_array =
   | Couple2Gen db2 c -> Adef.parent_array c ]
 ;
 
-(*
-value couple_of_gen_couple base c =
-  match base with
-  [ Base _ -> Couple c
-  | Base2 db2 -> Couple2Gen db2 c ]
-;
-*)
-
 value gen_couple_of_couple =
   fun
   [ Couple c -> c
@@ -706,70 +666,12 @@ value get_children =
   | Descend2Gen db2 d -> d.Def.children ]
 ;
 
-(*
-value descend_of_gen_descend base d =
-  match base with
-  [ Base _ -> Descend d
-  | Base2 db2 -> Descend2Gen db2 d ]
-;
-*)
-
 value gen_descend_of_descend =
   fun
   [ Descend d -> d
   | Descend2 _ _ as d -> {children = get_children d}
   | Descend2Gen db2 d -> d ]
 ;
-
-(*
-value poi base i =
-  match base with
-  [ Base base -> Person (base.data.persons.get (Adef.int_of_iper i))
-  | Base2 db2 ->
-      try Person2Gen db2 (Hashtbl.find db2.patches.h_person i) with
-      [ Not_found -> Person2 db2 (Adef.int_of_iper i) ] ]
-;
-
-value aoi base i =
-  match base with
-  [ Base base -> Ascend (base.data.ascends.get (Adef.int_of_iper i))
-  | Base2 db2 ->
-      try Ascend2Gen db2 (Hashtbl.find db2.patches.h_ascend i) with
-      [ Not_found -> Ascend2 db2 (Adef.int_of_iper i) ] ]
-;
-
-value uoi base i =
-  match base with
-  [ Base base -> Union (base.data.unions.get (Adef.int_of_iper i))
-  | Base2 db2 ->
-      try Union2Gen db2 (Hashtbl.find db2.patches.h_union i) with
-      [ Not_found -> Union2 db2 (Adef.int_of_iper i) ] ]
-;
-
-value foi base i =
-  match base with
-  [ Base base -> Family (base.data.families.get (Adef.int_of_ifam i))
-  | Base2 db2 ->
-      try Family2Gen db2 (Hashtbl.find db2.patches.h_family i) with
-      [ Not_found -> Family2 db2 (Adef.int_of_ifam i) ] ]
-;
-
-value coi base i =
-  match base with
-  [ Base base -> Couple (base.data.couples.get (Adef.int_of_ifam i))
-  | Base2 db2 ->
-      try Couple2Gen db2 (Hashtbl.find db2.patches.h_couple i) with
-      [ Not_found -> Couple2 db2 (Adef.int_of_ifam i) ] ]
-;
-
-value doi base i =
-  match base with
-  [ Base base -> Descend (base.data.descends.get (Adef.int_of_ifam i))
-  | Base2 db2 ->
-      try Descend2Gen db2 (Hashtbl.find db2.patches.h_descend i) with
-      [ Not_found -> Descend2 db2 (Adef.int_of_ifam i) ] ]
-;
-*)
 
 value sou base i =
   match (base, i) with
@@ -794,136 +696,6 @@ value person_with_key p fn sn oc =
   | _ -> failwith "not impl person_with_key 2" ]
 ;
 
-(*
-value nb_of_persons base =
-  match base with
-  [ Base base -> base.data.persons.len
-  | Base2 db2 -> db2.patches.nb_per ]
-;
-
-value nb_of_families base =
-  match base with
-  [ Base base -> base.data.families.len
-  | Base2 db2 -> db2.patches.nb_fam ]
-;
-
-value patch_person base ip p =
-  match (base, p) with
-  [ (Base base, Person p) -> base.func.patch_person ip p
-  | (Base2 _, Person2Gen db2 p) -> do {
-      Hashtbl.replace db2.patches.h_person ip p;
-      db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
-    }
-  | _ -> assert False ]
-;
-
-value patch_ascend base ip a =
-  match (base, a) with
-  [ (Base base, Ascend a) -> base.func.patch_ascend ip a
-  | (Base2 _, Ascend2Gen db2 a) -> do {
-      Hashtbl.replace db2.patches.h_ascend ip a;
-      db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
-    }
-  | _ -> assert False ]
-;
-
-value patch_union base ip u =
-  match (base, u) with
-  [ (Base base, Union u) -> base.func.patch_union ip u
-  | (Base2 _, Union2Gen db2 u) -> do {
-      Hashtbl.replace db2.patches.h_union ip u;
-      db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
-    }
-  | _ -> failwith "not impl patch_union" ]
-;
-
-value patch_family base ifam f =
-  match (base, f) with
-  [ (Base base, Family f) -> base.func.patch_family ifam f
-  | (Base2 _, Family2Gen db2 f) -> do {
-      Hashtbl.replace db2.patches.h_family ifam f;
-      db2.patches.nb_fam :=
-        max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
-    }
-  | _ -> failwith "not impl patch_family" ]
-;
-
-value patch_descend base ifam d =
-  match (base, d) with
-  [ (Base base, Descend d) -> base.func.patch_descend ifam d
-  | (Base2 _, Descend2Gen db2 d) -> do {
-      Hashtbl.replace db2.patches.h_descend ifam d;
-      db2.patches.nb_fam :=
-        max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
-    }
-  | _ -> failwith "not impl patch_descend" ]
-;
-
-value patch_couple base ifam c =
-  match (base, c) with
-  [ (Base base, Couple c) -> base.func.patch_couple ifam c
-  | (Base2 _, Couple2Gen db2 c) -> do {
-      Hashtbl.replace db2.patches.h_couple ifam c;
-      db2.patches.nb_fam :=
-        max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam;
-    }
-  | _ -> failwith "not impl patch_couple" ]
-;
-
-value patch_name base s ip =
-  match base with
-  [ Base base -> base.func.patch_name s ip
-  | Base2 db2 ->
-      let s = Name.crush_lower s in
-      let ht = db2.patches.h_name in
-      try
-        let ipl = Hashtbl.find ht s in
-        if List.mem ip ipl then () else Hashtbl.replace ht s [ip :: ipl]
-      with
-      [ Not_found -> Hashtbl.add ht s [ip] ] ]
-
-;
-
-value patch_key base ip fn sn occ =
-  match base with
-  [ Base _ -> ()
-  | Base2 db2 -> do {
-      Hashtbl.iter
-        (fun key ip1 ->
-           if ip = ip1 then Hashtbl.remove db2.patches.h_key key else ())
-        db2.patches.h_key;
-      let fn = Name.lower (nominative fn) in
-      let sn = Name.lower (nominative sn) in
-      Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
-    }]
-;
-
-value insert_string base s =
-  match base with
-  [ Base base -> Istr (base.func.insert_string s)
-  | Base2 db2 -> Istr2New db2 s ]
-;
-
-value delete_family base ifam = do {
-  let cpl =
-    couple_of_gen_couple base
-      (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-  in
-  let fam =
-    let empty = insert_string base "" in
-    family_of_gen_family base
-      {marriage = codate_None; marriage_place = empty; marriage_src = empty;
-       relation = Married; divorce = NotDivorced; witnesses = [| |];
-       comment = empty; origin_file = empty; fsources = empty;
-       fam_index = Adef.ifam_of_int (-1)}
-  in
-  let des = descend_of_gen_descend base {children = [| |]} in
-  patch_family base ifam fam;
-  patch_couple base ifam cpl;
-  patch_descend base ifam des
-};
-*)
-
 value is_deleted_family =
   fun
   [ Family f -> f.Def.fam_index = Adef.ifam_of_int (-1)
@@ -931,54 +703,7 @@ value is_deleted_family =
   | Family2Gen db2 f -> f.Def.fam_index = Adef.ifam_of_int (-1) ]
 ;
 
-(*
-value commit_patches base =
-  match base with
-  [ Base base -> base.func.commit_patches ()
-  | Base2 db2 -> do {
-      let fname = Filename.concat db2.bdir "patches" in
-      let oc = open_out_bin (fname ^ "1") in
-      output_string oc magic_patch;
-      output_value oc db2.patches;
-      close_out oc;
-      remove_file (fname ^ "~");
-      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
-      Sys.rename (fname ^ "1") fname
-    } ]
-;
-
-value commit_notes base =
-  match base with
-  [ Base base -> base.func.commit_notes
-  | Base2 _ -> failwith "not impl commit_notes" ]
-;
-*)
-
 value ok_I_know = ref False;
-(*
-value is_patched_person base ip =
-  match base with
-  [ Base base -> base.func.is_patched_person ip
-  | Base2 _ ->
-      let _ =
-        if ok_I_know.val then ()
-        else do {
-          ok_I_know.val := True;
-          eprintf "not impl is_patched_person\n";
-          flush stderr;
-        }
-      in
-      False ]
-;
-
-value patched_ascends base =
-  match base with
-  [ Base base -> base.func.patched_ascends ()
-  | Base2 _ ->
-      let _ = do { eprintf "not impl patched_ascends\n"; flush stderr; } in
-      [] ]
-;
-*)
 
 type key =
   [ Key of Adef.istr and Adef.istr and int
@@ -1067,26 +792,6 @@ value persons2_of_name db2 s =
     (hashtbl_find_all dir "person_of_name.ht" s)
 ;
 
-(*
-value person_of_key base =
-  match base with
-  [ Base base -> base.func.person_of_key
-  | Base2 db2 -> person2_of_key db2 ]
-;
-value persons_of_name base =
-  match base with
-  [ Base base -> base.func.persons_of_name
-  | Base2 db2 -> persons2_of_name db2 ]
-;
-
-value base_particles base =
-  match base with
-  [ Base base -> base.data.particles
-  | Base2 db2 ->
-      Mutil.input_particles (Filename.concat db2.bdir "particles.txt") ]
-;
-*)
-
 value start_with s p =
   String.length p < String.length s &&
   String.sub s 0 (String.length p) = p
@@ -1104,20 +809,6 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
     {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
      curr = 0}
 };
-
-(*
-value persons_of_first_name base =
-  match base with
-  [ Base base -> Spi base.func.persons_of_first_name
-  | Base2 db2 -> persons_of_first_name_or_surname2 db2 True ]
-;
-
-value persons_of_surname base =
-  match base with
-  [ Base base -> Spi base.func.persons_of_surname
-  | Base2 db2 -> persons_of_first_name_or_surname2 db2 False ]
-;
-*)
 
 value spi_first spi s =
   match spi with
@@ -1218,19 +909,6 @@ value spi_find spi s =
   | _ -> failwith "not impl spi_find" ]
 ;
 
-(*
-value base_visible_get base f =
-  match base with
-  [ Base base -> base.data.visible.v_get (fun p -> f (Person p))
-  | Base2 _ -> failwith "not impl visible_get" ]
-;
-value base_visible_write base =
-  match base with
-  [ Base base -> base.data.visible.v_write ()
-  | Base2 _ -> failwith "not impl visible_write" ]
-;
-*)
-
 value base_strings_of_first_name_or_surname base field proj s =
   match base with
   [ Base base -> List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
@@ -1251,18 +929,6 @@ value base_strings_of_first_name_or_surname base field proj s =
            [ Not_found -> istrl ])
         db2.patches.h_key istrl ]
 ;
-
-(*
-value base_strings_of_first_name base s =
-  base_strings_of_first_name_or_surname base "first_name"
-    (fun p -> p.first_name) s
-;
-
-value base_strings_of_surname base s =
-  base_strings_of_first_name_or_surname base "surname"
-    (fun p -> p.surname) s
-;
-*)
 
 value load_array2 bdir nb_ini nb f1 f2 get =
   if nb = 0 then [| |]
@@ -1321,73 +987,6 @@ value family_array2 db2 = do {
   tab
 };
 
-(*
-value load_ascends_array base =
-  match base with
-  [ Base base -> base.data.ascends.load_array ()
-  | Base2 db2 -> do {
-      eprintf "*** loading ascends array\n"; flush stderr;
-      let nb = db2.patches.nb_per in
-      let nb_ini = db2.patches.nb_per_ini in
-      match db2.parents_array with
-      [ Some _ -> ()
-      | None -> db2.parents_array := Some (parents_array2 db2 nb_ini nb) ];
-      match db2.consang_array with
-      [ Some _ -> ()
-      | None -> db2.consang_array := Some (consang_array2 db2 nb) ];
-    } ]
-;
-
-value load_unions_array base =
-  match base with
-  [ Base base -> base.data.unions.load_array ()
-  | Base2 db2 ->
-      match db2.family_array with
-      [ Some _ -> ()
-      | None -> do {
-          eprintf "*** loading unions array\n"; flush stderr;
-          db2.family_array := Some (family_array2 db2)
-        } ] ]
-;
-
-value load_couples_array base =
-  match base with
-  [ Base base -> base.data.couples.load_array ()
-  | Base2 db2 -> do {
-      eprintf "*** loading couples array\n"; flush stderr;
-      let nb = db2.patches.nb_fam in
-      match db2.father_array with
-      [ Some _ -> ()
-      | None -> do {
-          let tab =
-            load_array2 db2.bdir db2.patches.nb_fam_ini nb "family" "father"
-              (fun ic_dat pos -> do {
-                 seek_in ic_dat pos;
-                 Iovalue.input ic_dat
-               })
-          in
-          Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := father c)
-            db2.patches.h_couple;
-          db2.father_array := Some tab
-        } ];
-      match db2.mother_array with
-      [ Some _ -> ()
-      | None -> do {
-          let tab =
-            load_array2 db2.bdir db2.patches.nb_fam_ini nb "family" "mother"
-              (fun ic_dat pos -> do {
-                 seek_in ic_dat pos;
-                 Iovalue.input ic_dat
-               })
-          in
-          Hashtbl.iter (fun i c -> tab.(Adef.int_of_ifam i) := mother c)
-            db2.patches.h_couple;
-          db2.mother_array := Some tab
-        } ]
-    } ]
-;
-*)
-
 value children_array2 db2 = do {
   let fname =
     List.fold_left Filename.concat db2.bdir ["family"; "children"; "data"]
@@ -1397,82 +996,6 @@ value children_array2 db2 = do {
   close_in ic;
   tab
 };
-
-(*
-value load_descends_array base =
-  match base with
-  [ Base base -> base.data.descends.load_array ()
-  | Base2 db2 ->
-      match db2.children_array with
-      [ Some _ -> ()
-      | None -> do {
-          eprintf "*** loading descends array\n"; flush stderr;
-          db2.children_array := Some (children_array2 db2)
-        } ] ]
-;
-
-value load_strings_array base =
-  match base with
-  [ Base base -> base.data.strings.load_array ()
-  | Base2 _ -> () ]
-;
-
-value persons_array base =
-  match base with
-  [ Base base ->
-      let get i = Person (base.data.persons.get i) in
-      let set i =
-        fun
-        [ Person p -> base.data.persons.set i p
-        | Person2 _ _ -> assert False
-        | Person2Gen _ _ -> assert False ]
-      in
-      (get, set)
-  | Base2 _ -> failwith "not impl persons_array" ]
-;
-
-value ascends_array base =
-  match base with
-  [ Base base ->
-      let fget i = (base.data.ascends.get i).parents in
-      let cget i = (base.data.ascends.get i).consang in
-      let cset i v =
-        base.data.ascends.set i
-          {(base.data.ascends.get i) with consang = v}
-      in
-      (fget, cget, cset, None)
-  | Base2 db2 ->
-      let nb = nb_of_persons base in
-      let cg_tab =
-        match db2.consang_array with
-        [ Some tab -> tab
-        | None -> consang_array2 db2 nb ]
-      in
-      let fget i = get_parents (Ascend2 db2 i) in
-      let cget i = cg_tab.(i) in
-      let cset i v = cg_tab.(i) := v in
-      (fget, cget, cset, Some cg_tab) ]
-;
-
-value output_consang_tab base tab =
-  match base with
-  [ Base _ -> do { eprintf "error Gwdb.output_consang_tab\n"; flush stdout }
-  | Base2 db2 -> do {
-      let dir =
-        List.fold_left Filename.concat db2.bdir ["person"; "consang"]
-      in
-      Mutil.mkdir_p dir;
-      let oc = open_out_bin (Filename.concat dir "data") in
-      output_value oc tab;
-      close_out oc;
-      let oc = open_out_bin (Filename.concat dir "access") in
-      let _ : int =
-        Iovalue.output_array_access oc (Array.get tab) (Array.length tab) 0
-      in
-      close_out oc;
-    } ]
-;
-*)
 
 value read_notes bname fnotes rn_mode =
   let fname =
@@ -1500,121 +1023,6 @@ value read_notes bname fnotes rn_mode =
     }
   | None -> "" ]
 ;
-(*
-value base_notes_read base fnotes =
-  match base with
-  [ Base base -> base.data.bnotes.nread fnotes RnAll
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes RnAll ]
-;
-value base_notes_read_first_line base fnotes =
-  match base with
-  [ Base base -> base.data.bnotes.nread fnotes Rn1Ln
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes Rn1Ln ]
-;
-value base_notes_are_empty base fnotes =
-  match base with
-  [ Base base -> base.data.bnotes.nread fnotes RnDeg = ""
-  | Base2 {bdir = bn} -> read_notes (Filename.dirname bn) fnotes RnDeg = "" ]
-;
-
-value base_notes_origin_file base =
-  match base with
-  [ Base base -> base.data.bnotes.norigin_file
-  | Base2 db2 ->
-      let fname = Filename.concat db2.bdir "notes_of.txt" in
-      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
-      [ Some ic -> do {
-          let r = input_line ic in
-          close_in ic;
-          r
-        }
-      | None -> "" ] ]
-;
-
-value base_notes_dir base =
-  match base with
-  [ Base _ -> "notes_d"
-  | Base2 _ -> Filename.concat "base_d" "notes_d" ]
-;
-
-value base_wiznotes_dir base =
-  match base with
-  [ Base _ -> "wiznotes"
-  | Base2 _ -> Filename.concat "base_d" "wiznotes_d" ]
-;
-
-value p_first_name base p = nominative (sou base (get_first_name p));
-value p_surname base p = nominative (sou base (get_surname p));
-
-value nobtit conf base p =
-  let list = get_titles p in
-  match Lazy.force conf.allowed_titles with
-  [ [] -> list
-  | allowed_titles ->
-      let list =
-        List.fold_right
-          (fun t l ->
-             let id = Name.lower (sou base t.t_ident) in
-             let pl = Name.lower (sou base t.t_place) in
-             if pl = "" then
-               if List.mem id allowed_titles then [t :: l] else l
-             else if
-               List.mem (id ^ "/" ^ pl) allowed_titles ||
-               List.mem (id ^ "/*") allowed_titles
-             then
-               [t :: l]
-             else l)
-          list []
-      in
-      match Lazy.force conf.denied_titles with
-      [ [] -> list
-      | denied_titles ->
-          List.filter
-            (fun t ->
-               let id = Name.lower (sou base t.t_ident) in
-               let pl = Name.lower (sou base t.t_place) in
-               if List.mem (id ^ "/" ^ pl) denied_titles ||
-                  List.mem ("*/" ^ pl) denied_titles
-               then False
-               else True)
-            list ] ]
-;
-
-value husbands base p =
-  let u = uoi base (get_key_index p) in
-  List.map
-    (fun ifam ->
-       let cpl = coi base ifam in
-       let husband = poi base (get_father cpl) in
-       let husband_surname = p_surname base husband in
-       let husband_surnames_aliases =
-         List.map (sou base) (get_surnames_aliases husband)
-       in
-       (husband_surname, husband_surnames_aliases))
-    (Array.to_list (get_family u))
-;
-
-value father_titles_places base p nobtit =
-  match get_parents (aoi base (get_key_index p)) with
-  [ Some ifam ->
-      let cpl = coi base ifam in
-      let fath = poi base (get_father cpl) in
-      List.map (fun t -> sou base t.t_place) (nobtit fath)
-  | None -> [] ]
-;
-
-value person_misc_names base p tit =
-  let sou = sou base in
-  Futil.gen_person_misc_names (sou (get_first_name p))
-    (sou (get_surname p)) (sou (get_public_name p))
-    (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
-    (List.map sou (get_first_names_aliases p))
-    (List.map sou (get_surnames_aliases p))
-    (List.map (Futil.map_title_strings sou) (tit p))
-    (if get_sex p = Female then husbands base p else [])
-    (father_titles_places base p tit)
-;
-*)
 
 value base_of_dsk_base base = Base base;
 value apply_as_dsk_base f base =
@@ -1629,25 +1037,6 @@ value dsk_person_of_person =
   | Person2 _ _ -> failwith "not impl dsk_person_of_person"
   | Person2Gen _ _ -> failwith "not impl dsk_person_of_person (gen)" ]
 ;
-
-(*
-value date_of_last_change bname base =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
-  let s =
-    match base with
-    [ Base _ ->
-        try Unix.stat (Filename.concat bdir "patches") with
-        [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
-    | Base2 db2 ->
-        let bdir = Filename.concat bdir "base_d" in
-        try Unix.stat (Filename.concat bdir "patches") with
-        [ Unix.Unix_error _ _ _ -> Unix.stat bdir ] ]
-  in
-  s.Unix.st_mtime
-;
-*)
 
 value check_magic ic magic id = do {
   let b = String.create (String.length magic) in
@@ -1714,15 +1103,6 @@ value open_base bname =
   }
   else base_of_dsk_base (Database.opendb bname)
 ;
-
-(*
-value close_base base =
-  match base with
-  [ Base base -> base.func.cleanup ()
-  | Base2 db2 ->
-      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan ]
-;
-*)
 
 (* Implementation by emulated objects *)
 
