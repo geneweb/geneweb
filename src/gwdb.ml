@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.149 2006-12-19 22:41:52 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.150 2006-12-20 00:47:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -450,11 +450,13 @@ value person_with_sex p s =
   | Person2Gen db2 p -> Person2Gen db2 {(p) with sex = s} ]
 ;
 
+(*
 value person_of_gen_person base p =
   match base with
   [ Base _ -> Person (map_person_ps (fun p -> p) un_istr p)
   | Base2 db2 -> Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p) ]
 ;
+*)
 
 value gen_person_of_person =
   fun
@@ -1679,14 +1681,271 @@ value open_base bname =
   else base_of_dsk_base (Database.opendb bname)
 ;
 
+(*
 value close_base base =
   match base with
   [ Base base -> base.func.cleanup ()
   | Base2 db2 ->
       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan ]
 ;
+*)
 
 (* Implementation by emulated objects *)
+
+(*
+#load "pa_pragma.cmo";
+#load "pa_extend.cmo";
+#load "q_MLast.cmo";
+
+#pragma
+  EXTEND
+    GLOBAL: expr str_item;
+    expr: LEVEL "."
+      [ [ e1 = SELF; ".."; e2 = SELF -> <:expr< $e1$ . $e2$ () >> ] ]
+    ;
+    expr: LEVEL "apply"
+      [ [ "nouvelle"; e = SELF -> e ] ]
+    ;
+    str_item:
+      [ [ "classe"; "virtuelle"; n = LIDENT; "="; "objet";
+          ldl = LIST0 champ_d_objet_virtuel; "fin" ->
+            <:str_item< type $n$ = { $list: ldl$ } >>
+        | "classe"; n = LIDENT; e = fonction_objet ->
+            <:str_item< value $lid:n$ = $e$ >> ] ]
+    ;
+    fonction_objet:
+      [ [ p = LIDENT; e = fonction_objet -> <:expr< fun $lid:p$ -> $e$ >>
+        | "="; "objet"; lel = LIST0 champ_d_objet; "fin" ->
+            <:expr< { $list:lel$ } >> ] ]
+    ;
+    champ_d_objet_virtuel:
+      [ [ "valeur"; n = LIDENT; ":"; t = ctyp; ";" ->
+            (loc, n, False, t)
+        | "methode"; n = LIDENT; ":"; t = ctyp; ";" ->
+            (loc, n, False, <:ctyp< unit -> $t$ >>) ] ]
+    ;
+    champ_d_objet:
+      [ [ "valeur"; n = LIDENT; "="; e = expr; ";" ->
+            (<:patt< $lid:n$ >>, e)
+        | "methode"; n = LIDENT; e = fonction_methode; ";" ->
+            (<:patt< $lid:n$ >>, <:expr< fun () -> $e$ >>) ] ]
+    ;
+    fonction_methode:
+      [ [ p = LIDENT; e = fonction_methode -> <:expr< fun $lid:p$ -> $e$ >>
+        | "="; e = expr -> e ] ]
+    ;
+  END;
+
+classe virtuelle base =
+  objet
+    valeur self : base_t;
+    methode close_base : unit;
+    methode person_of_gen_person : Def.gen_person iper istr -> person;
+    methode ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
+    methode union_of_gen_union : Def.gen_union ifam -> union;
+    methode family_of_gen_family : Def.gen_family iper istr -> family;
+    methode couple_of_gen_couple : Def.gen_couple iper -> couple;
+    methode descend_of_gen_descend : Def.gen_descend iper -> descend;
+    methode poi : iper -> person;
+    methode aoi : iper -> ascend;
+    methode uoi : iper -> union;
+    methode foi : ifam -> family;
+    methode coi : ifam -> couple;
+    methode doi : ifam -> descend;
+    methode sou : istr -> string;
+    methode nb_of_persons : int;
+    methode nb_of_families : int;
+    methode patch_person : iper -> person -> unit;
+    methode patch_ascend : iper -> ascend -> unit;
+    methode patch_union : iper -> union -> unit;
+    methode patch_family : ifam -> family -> unit;
+    methode patch_descend : ifam -> descend -> unit;
+    methode patch_couple : ifam -> couple -> unit;
+    methode patch_key : iper -> string -> string -> int -> unit;
+    methode patch_name : string -> iper -> unit;
+    methode insert_string : string -> istr;
+    methode commit_patches : unit;
+    methode commit_notes : string -> string -> unit;
+    methode is_patched_person : iper -> bool;
+    methode patched_ascends : list iper;
+    methode output_consang_tab : array Adef.fix -> unit;
+    methode delete_family : ifam -> unit;
+    methode person_of_key : string -> string -> int -> option iper;
+    methode persons_of_name : string -> list iper;
+    methode persons_of_first_name : string_person_index;
+    methode persons_of_surname : string_person_index;
+    methode base_visible_get : (person -> bool) -> int -> bool;
+    methode base_visible_write : unit;
+    methode base_particles : list string;
+    methode base_strings_of_first_name : string -> list istr;
+    methode base_strings_of_surname : string -> list istr;
+    methode load_ascends_array : unit;
+    methode load_unions_array : unit;
+    methode load_couples_array : unit;
+    methode load_descends_array : unit;
+    methode load_strings_array : unit;
+    methode persons_array : (int -> person * int -> person -> unit);
+    methode ascends_array :
+      (int -> option ifam *
+       int -> Adef.fix *
+       int -> Adef.fix -> unit *
+       option (array Adef.fix));
+    methode base_notes_read : string -> string;
+    methode base_notes_read_first_line : string -> string;
+    methode base_notes_are_empty : string -> bool;
+    methode base_notes_origin_file : string;
+    methode base_notes_dir : string;
+    methode base_wiznotes_dir : string;
+    methode person_misc_names :
+      person -> (person -> list title) -> list string;
+    methode nobtit : config -> person -> list title;
+    methode p_first_name : person -> string;
+    methode p_surname : person -> string;
+    methode date_of_last_change : string -> float;
+  fin
+;
+
+classe make_base1 b base =
+  objet
+    valeur self = b;
+    methode close_base = base.func.cleanup ();
+    methode person_of_gen_person p =
+      Person (map_person_ps (fun p -> p) un_istr p);
+    methode ascend_of_gen_ascend = ascend_of_gen_ascend b;
+    methode union_of_gen_union = union_of_gen_union b;
+    methode family_of_gen_family = family_of_gen_family b;
+    methode couple_of_gen_couple = couple_of_gen_couple b;
+    methode descend_of_gen_descend = descend_of_gen_descend b;
+    methode poi = poi b;
+    methode aoi = aoi b;
+    methode uoi = uoi b;
+    methode foi = foi b;
+    methode coi = coi b;
+    methode doi = doi b;
+    methode sou = sou b;
+    methode nb_of_persons = nb_of_persons b;
+    methode nb_of_families = nb_of_families b;
+    methode patch_person = patch_person b;
+    methode patch_ascend = patch_ascend b;
+    methode patch_union = patch_union b;
+    methode patch_family = patch_family b;
+    methode patch_descend = patch_descend b;
+    methode patch_couple = patch_couple b;
+    methode patch_key = patch_key b;
+    methode patch_name = patch_name b;
+    methode insert_string = insert_string b;
+    methode commit_patches = commit_patches b;
+    methode commit_notes = commit_notes b;
+    methode is_patched_person = is_patched_person b;
+    methode patched_ascends = patched_ascends b;
+    methode output_consang_tab = output_consang_tab b;
+    methode delete_family = delete_family b;
+    methode person_of_key = person_of_key b;
+    methode persons_of_name = persons_of_name b;
+    methode persons_of_first_name = persons_of_first_name b;
+    methode persons_of_surname = persons_of_surname b;
+    methode base_visible_get = base_visible_get b;
+    methode base_visible_write = base_visible_write b;
+    methode base_particles = base_particles b;
+    methode base_strings_of_first_name = base_strings_of_first_name b;
+    methode base_strings_of_surname = base_strings_of_surname b;
+    methode load_ascends_array = load_ascends_array b;
+    methode load_unions_array = load_unions_array b;
+    methode load_couples_array = load_couples_array b;
+    methode load_descends_array = load_descends_array b;
+    methode load_strings_array = load_strings_array b;
+    methode persons_array = persons_array b;
+    methode ascends_array = ascends_array b;
+    methode base_notes_read = base_notes_read b;
+    methode base_notes_read_first_line = base_notes_read_first_line b;
+    methode base_notes_are_empty = base_notes_are_empty b;
+    methode base_notes_origin_file = base_notes_origin_file b;
+    methode base_notes_dir = base_notes_dir b;
+    methode base_wiznotes_dir = base_wiznotes_dir b;
+    methode person_misc_names = person_misc_names b;
+    methode nobtit conf = nobtit conf b;
+    methode p_first_name = p_first_name b;
+    methode p_surname = p_surname b;
+    methode date_of_last_change x = date_of_last_change x b;
+  fin
+;
+
+classe make_base2 b db2 =
+  objet
+    valeur self = b;
+    methode close_base =
+      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
+    methode person_of_gen_person p =
+      Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
+    methode ascend_of_gen_ascend = ascend_of_gen_ascend b;
+    methode union_of_gen_union = union_of_gen_union b;
+    methode family_of_gen_family = family_of_gen_family b;
+    methode couple_of_gen_couple = couple_of_gen_couple b;
+    methode descend_of_gen_descend = descend_of_gen_descend b;
+    methode poi = poi b;
+    methode aoi = aoi b;
+    methode uoi = uoi b;
+    methode foi = foi b;
+    methode coi = coi b;
+    methode doi = doi b;
+    methode sou = sou b;
+    methode nb_of_persons = nb_of_persons b;
+    methode nb_of_families = nb_of_families b;
+    methode patch_person = patch_person b;
+    methode patch_ascend = patch_ascend b;
+    methode patch_union = patch_union b;
+    methode patch_family = patch_family b;
+    methode patch_descend = patch_descend b;
+    methode patch_couple = patch_couple b;
+    methode patch_key = patch_key b;
+    methode patch_name = patch_name b;
+    methode insert_string = insert_string b;
+    methode commit_patches = commit_patches b;
+    methode commit_notes = commit_notes b;
+    methode is_patched_person = is_patched_person b;
+    methode patched_ascends = patched_ascends b;
+    methode output_consang_tab = output_consang_tab b;
+    methode delete_family = delete_family b;
+    methode person_of_key = person_of_key b;
+    methode persons_of_name = persons_of_name b;
+    methode persons_of_first_name = persons_of_first_name b;
+    methode persons_of_surname = persons_of_surname b;
+    methode base_visible_get = base_visible_get b;
+    methode base_visible_write = base_visible_write b;
+    methode base_particles = base_particles b;
+    methode base_strings_of_first_name = base_strings_of_first_name b;
+    methode base_strings_of_surname = base_strings_of_surname b;
+    methode load_ascends_array = load_ascends_array b;
+    methode load_unions_array = load_unions_array b;
+    methode load_couples_array = load_couples_array b;
+    methode load_descends_array = load_descends_array b;
+    methode load_strings_array = load_strings_array b;
+    methode persons_array = persons_array b;
+    methode ascends_array = ascends_array b;
+    methode base_notes_read = base_notes_read b;
+    methode base_notes_read_first_line = base_notes_read_first_line b;
+    methode base_notes_are_empty = base_notes_are_empty b;
+    methode base_notes_origin_file = base_notes_origin_file b;
+    methode base_notes_dir = base_notes_dir b;
+    methode base_wiznotes_dir = base_wiznotes_dir b;
+    methode person_misc_names = person_misc_names b;
+    methode nobtit conf = nobtit conf b;
+    methode p_first_name = p_first_name b;
+    methode p_surname = p_surname b;
+    methode date_of_last_change x = date_of_last_change x b;
+  fin
+;
+
+value open_base bname =
+  let b = open_base bname in
+  match b with
+  [ Base base -> nouvelle make_base1 b base
+  | Base2 db2 -> nouvelle make_base2 b db2 ]
+;
+
+value close_base b = b..close_base;
+value person_of_gen_person b = b..person_of_gen_person;
+*)
 
 type base =
   { self : base_t;
@@ -1750,16 +2009,16 @@ type base =
     base_wiznotes_dir : unit -> string;
     person_misc_names :
       unit -> person -> (person -> list title) -> list string;
-    nobtit : config -> unit -> person -> list title;
+    nobtit : unit -> config -> person -> list title;
     p_first_name : unit -> person -> string;
     p_surname : unit -> person -> string;
-    date_of_last_change : string -> unit -> float }
+    date_of_last_change : unit -> string -> float }
 ;
 
 value make_base1 b base =
   {self = b;
-   close_base () = close_base b;
-   person_of_gen_person () = person_of_gen_person b;
+   close_base () = base.func.cleanup ();
+   person_of_gen_person () p = Person (map_person_ps (fun p -> p) un_istr p);
    ascend_of_gen_ascend () = ascend_of_gen_ascend b;
    union_of_gen_union () = union_of_gen_union b;
    family_of_gen_family () = family_of_gen_family b;
@@ -1812,16 +2071,18 @@ value make_base1 b base =
    base_notes_dir () = base_notes_dir b;
    base_wiznotes_dir () = base_wiznotes_dir b;
    person_misc_names () = person_misc_names b;
-   nobtit conf () = nobtit conf b;
+   nobtit () conf = nobtit conf b;
    p_first_name () = p_first_name b;
    p_surname () = p_surname b;
-   date_of_last_change x () = date_of_last_change x b}
+   date_of_last_change () x = date_of_last_change x b}
 ;
 
-value make_base2 b base =
+value make_base2 b db2 =
   {self = b;
-   close_base () = close_base b;
-   person_of_gen_person () = person_of_gen_person b;
+   close_base () =
+     Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
+   person_of_gen_person () p =
+     Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
    ascend_of_gen_ascend () = ascend_of_gen_ascend b;
    union_of_gen_union () = union_of_gen_union b;
    family_of_gen_family () = family_of_gen_family b;
@@ -1874,10 +2135,10 @@ value make_base2 b base =
    base_notes_dir () = base_notes_dir b;
    base_wiznotes_dir () = base_wiznotes_dir b;
    person_misc_names () = person_misc_names b;
-   nobtit conf () = nobtit conf b;
+   nobtit () conf = nobtit conf b;
    p_first_name () = p_first_name b;
    p_surname () = p_surname b;
-   date_of_last_change x () = date_of_last_change x b}
+   date_of_last_change () x = date_of_last_change x b}
 ;
 
 value open_base bname =
@@ -1889,6 +2150,8 @@ value open_base bname =
 
 value close_base b = b.close_base ();
 value person_of_gen_person b = b.person_of_gen_person ();
+(**)
+
 value ascend_of_gen_ascend b = b.ascend_of_gen_ascend ();
 value union_of_gen_union b = b.union_of_gen_union ();
 value family_of_gen_family b = b.family_of_gen_family ();
@@ -1941,12 +2204,12 @@ value base_notes_origin_file b = b.base_notes_origin_file ();
 value base_notes_dir b = b.base_notes_dir ();
 value base_wiznotes_dir b = b.base_wiznotes_dir ();
 value person_misc_names b = b.person_misc_names ();
-value nobtit conf b = b.nobtit conf ();
+value nobtit conf b = b.nobtit () conf;
 value p_first_name b = b.p_first_name ();
 value p_surname b = b.p_surname ();
-value date_of_last_change s b = b.date_of_last_change s ();
+value date_of_last_change s b = b.date_of_last_change () s;
 
-value base_of_dsk_base base = make_base1 (Base base) ();
+value base_of_dsk_base base = make_base1 (Base base) base;
 value apply_as_dsk_base f base = apply_as_dsk_base f base.self;
 
 (* Traces of changes; this is not correct because it supposes that calls
