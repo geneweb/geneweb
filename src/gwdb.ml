@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.157 2006-12-20 13:08:31 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.158 2006-12-20 14:00:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -630,11 +630,13 @@ value family_with_origin_file f orf fi =
   | _ -> assert False ]
 ;
 
+(*
 value family_of_gen_family base f =
   match base with
   [ Base _ -> Family (map_family_ps (fun p -> p) un_istr f)
   | Base2 db2 -> Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f) ]
 ;
+*)
 
 value gen_family_of_family =
   fun
@@ -679,11 +681,13 @@ value get_parent_array =
   | Couple2Gen db2 c -> Adef.parent_array c ]
 ;
 
+(*
 value couple_of_gen_couple base c =
   match base with
   [ Base _ -> Couple c
   | Base2 db2 -> Couple2Gen db2 c ]
 ;
+*)
 
 value gen_couple_of_couple =
   fun
@@ -702,11 +706,13 @@ value get_children =
   | Descend2Gen db2 d -> d.Def.children ]
 ;
 
+(*
 value descend_of_gen_descend base d =
   match base with
   [ Base _ -> Descend d
   | Base2 db2 -> Descend2Gen db2 d ]
 ;
+*)
 
 value gen_descend_of_descend =
   fun
@@ -1578,6 +1584,7 @@ value father_titles_places base p nobtit =
   | None -> [] ]
 ;
 
+(*
 value person_misc_names base p tit =
   let sou = sou base in
   Futil.gen_person_misc_names (sou (get_first_name p))
@@ -1589,6 +1596,7 @@ value person_misc_names base p tit =
     (if get_sex p = Female then husbands base p else [])
     (father_titles_places base p tit)
 ;
+*)
 
 value base_of_dsk_base base = Base base;
 value apply_as_dsk_base f base =
@@ -1747,8 +1755,11 @@ value close_base base =
               in
               let sgl =
                 List.map
-                  (fun (loc, lab, t, (e, te)) ->
-                     <:sig_item< value $lid:lab$ : unit -> $lid:n$ -> $te$ >>)
+                  (fun (loc, lab, _, (e, te)) ->
+                     let t =
+                       if so = None then te else <:ctyp< $lid:n$ -> $te$ >>
+                     in
+                     <:sig_item< value $lid:lab$ : unit -> $t$ >>)
                   lel
               in
               let md =
@@ -1778,14 +1789,21 @@ value close_base base =
     champ_d_objet_virtuel:
       [ [ "valeur"; n = LIDENT; ":"; t = ctyp; ";" ->
             (loc, n, t, None)
-        | "methode"; n = LIDENT; ":"; t = ctyp; ";" ->
-            (loc, n, <:ctyp< unit -> $t$ >>, None)
-        | "methode"; n = LIDENT; pl = LIST0 LIDENT; ":"; t = ctyp; "=";
-           e = expr; ";" ->
-            let e =
-              List.fold_right (fun p e -> <:expr< fun $lid:p$ -> $e$ >>) pl e
+        | "methode"; n = LIDENT; pl = LIST0 LIDENT; ":"; t = ctyp;
+          eo = OPT fonction_methode_virtuelle; ";" ->
+            let eto =
+              if eo = None then None
+              else
+                let e =
+                  List.fold_right (fun p e -> <:expr< fun $lid:p$ -> $e$ >>)
+                    pl (match_with_some eo)
+                in
+                Some (e, t)
             in
-            (loc, n, <:ctyp< unit -> $t$ >>, Some (e, t)) ] ]
+            (loc, n, <:ctyp< unit -> $t$ >>, eto) ] ]
+    ;
+    fonction_methode_virtuelle:
+      [ [ "="; e = expr -> e ] ]
     ;
     champ_d_objet:
       [ [ "valeur"; n = LIDENT; "="; e = expr; ";" ->
@@ -1880,8 +1898,19 @@ classe virtuelle base =
     methode base_notes_origin_file : string;
     methode base_notes_dir : string;
     methode base_wiznotes_dir : string;
-    methode person_misc_names :
-      person -> (person -> list title) -> list string;
+    methode person_misc_names p tit :
+      person -> (person -> list title) -> list string
+    =
+      let sou = sou self.base_t in
+      Futil.gen_person_misc_names (sou (get_first_name p))
+        (sou (get_surname p)) (sou (get_public_name p))
+        (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
+        (List.map sou (get_first_names_aliases p))
+        (List.map sou (get_surnames_aliases p))
+        (List.map (Futil.map_title_strings sou) (tit p))
+        (if get_sex p = Female then husbands self.base_t p else [])
+        (father_titles_places self.base_t p tit)
+    ;
     methode nobtit : config -> person -> list title;
     methode p_first_name : person -> string;
     methode p_surname : person -> string;
@@ -1897,9 +1926,10 @@ classe base1 b base =
       Person (map_person_ps (fun p -> p) un_istr p);
     methode ascend_of_gen_ascend a = Ascend a;
     methode union_of_gen_union u = Union u;
-    methode family_of_gen_family = family_of_gen_family b;
-    methode couple_of_gen_couple = couple_of_gen_couple b;
-    methode descend_of_gen_descend = descend_of_gen_descend b;
+    methode family_of_gen_family f =
+      Family (map_family_ps (fun p -> p) un_istr f);
+    methode couple_of_gen_couple c = Couple c;
+    methode descend_of_gen_descend d = Descend d;
     methode poi = poi b;
     methode aoi = aoi b;
     methode uoi = uoi b;
@@ -1946,7 +1976,7 @@ classe base1 b base =
     methode base_notes_origin_file = base_notes_origin_file b;
     methode base_notes_dir = base_notes_dir b;
     methode base_wiznotes_dir = base_wiznotes_dir b;
-    methode person_misc_names = person_misc_names b;
+    heriter base..person_misc_names self;
     methode nobtit conf = nobtit conf b;
     methode p_first_name = p_first_name b;
     methode p_surname = p_surname b;
@@ -1963,9 +1993,10 @@ classe base2 b db2 =
       Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
     methode ascend_of_gen_ascend a = Ascend2Gen db2 a;
     methode union_of_gen_union u = Union2Gen db2 u;
-    methode family_of_gen_family = family_of_gen_family b;
-    methode couple_of_gen_couple = couple_of_gen_couple b;
-    methode descend_of_gen_descend = descend_of_gen_descend b;
+    methode family_of_gen_family f =
+      Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f);
+    methode couple_of_gen_couple c = Couple2Gen db2 c;
+    methode descend_of_gen_descend d = Descend2Gen db2 d;
     methode poi = poi b;
     methode aoi = aoi b;
     methode uoi = uoi b;
@@ -2012,7 +2043,7 @@ classe base2 b db2 =
     methode base_notes_origin_file = base_notes_origin_file b;
     methode base_notes_dir = base_notes_dir b;
     methode base_wiznotes_dir = base_wiznotes_dir b;
-    methode person_misc_names = person_misc_names b;
+    heriter base..person_misc_names self;
     methode nobtit conf = nobtit conf b;
     methode p_first_name = p_first_name b;
     methode p_surname = p_surname b;
@@ -2160,7 +2191,11 @@ declare
       date_of_last_change : unit -> string -> float }
   ;
   module C_base :
-    sig value delete_family : unit -> base -> ifam -> unit; end =
+    sig
+      value delete_family : unit -> base -> ifam -> unit;
+      value person_misc_names :
+        unit -> base -> person -> (person -> list title) -> list string;
+    end =
     struct
       value delete_family () self ifam =
         let cpl =
@@ -2182,6 +2217,17 @@ declare
           self.patch_descend () ifam des
         }
       ;
+      value person_misc_names () self p tit =
+        let sou = sou self.base_t in
+        Futil.gen_person_misc_names (sou (get_first_name p))
+          (sou (get_surname p)) (sou (get_public_name p))
+          (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
+          (List.map sou (get_first_names_aliases p))
+          (List.map sou (get_surnames_aliases p))
+          (List.map (Futil.map_title_strings sou) (tit p))
+          (if get_sex p = Female then husbands self.base_t p else [])
+          (father_titles_places self.base_t p tit)
+      ;
     end
   ;
 end;
@@ -2192,11 +2238,12 @@ value base1 () b base =
      person_of_gen_person () p =
        Person (map_person_ps (fun p -> p) un_istr p);
      ascend_of_gen_ascend () a = Ascend a; union_of_gen_union () u = Union u;
-     family_of_gen_family () = family_of_gen_family b;
-     couple_of_gen_couple () = couple_of_gen_couple b;
-     descend_of_gen_descend () = descend_of_gen_descend b; poi () = poi b;
-     aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
-     doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
+     family_of_gen_family () f =
+       Family (map_family_ps (fun p -> p) un_istr f);
+     couple_of_gen_couple () c = Couple c;
+     descend_of_gen_descend () d = Descend d; poi () = poi b; aoi () = aoi b;
+     uoi () = uoi b; foi () = foi b; coi () = coi b; doi () = doi b;
+     sou () = sou b; nb_of_persons () = nb_of_persons b;
      nb_of_families () = nb_of_families b; patch_person () = patch_person b;
      patch_ascend () = patch_ascend b; patch_union () = patch_union b;
      patch_family () = patch_family b; patch_descend () = patch_descend b;
@@ -2228,7 +2275,7 @@ value base1 () b base =
      base_notes_origin_file () = base_notes_origin_file b;
      base_notes_dir () = base_notes_dir b;
      base_wiznotes_dir () = base_wiznotes_dir b;
-     person_misc_names () = person_misc_names b;
+     person_misc_names () = C_base.person_misc_names () self;
      nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
      p_surname () = p_surname b;
      date_of_last_change () x = date_of_last_change x b}
@@ -2245,9 +2292,10 @@ value base2 () b db2 =
        Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
      ascend_of_gen_ascend () a = Ascend2Gen db2 a;
      union_of_gen_union () u = Union2Gen db2 u;
-     family_of_gen_family () = family_of_gen_family b;
-     couple_of_gen_couple () = couple_of_gen_couple b;
-     descend_of_gen_descend () = descend_of_gen_descend b; poi () = poi b;
+     family_of_gen_family () f =
+       Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f);
+     couple_of_gen_couple () c = Couple2Gen db2 c;
+     descend_of_gen_descend () d = Descend2Gen db2 d; poi () = poi b;
      aoi () = aoi b; uoi () = uoi b; foi () = foi b; coi () = coi b;
      doi () = doi b; sou () = sou b; nb_of_persons () = nb_of_persons b;
      nb_of_families () = nb_of_families b; patch_person () = patch_person b;
@@ -2281,7 +2329,7 @@ value base2 () b db2 =
      base_notes_origin_file () = base_notes_origin_file b;
      base_notes_dir () = base_notes_dir b;
      base_wiznotes_dir () = base_wiznotes_dir b;
-     person_misc_names () = person_misc_names b;
+     person_misc_names () = C_base.person_misc_names () self;
      nobtit () conf = nobtit conf b; p_first_name () = p_first_name b;
      p_surname () = p_surname b;
      date_of_last_change () x = date_of_last_change x b}
