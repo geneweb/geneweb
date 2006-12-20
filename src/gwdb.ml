@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.150 2006-12-20 00:47:05 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.151 2006-12-20 00:55:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1693,6 +1693,7 @@ value close_base base =
 (* Implementation by emulated objects *)
 
 (*
+
 #load "pa_pragma.cmo";
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -1704,14 +1705,14 @@ value close_base base =
       [ [ e1 = SELF; ".."; e2 = SELF -> <:expr< $e1$ . $e2$ () >> ] ]
     ;
     expr: LEVEL "apply"
-      [ [ "nouvelle"; e = SELF -> e ] ]
+      [ [ "nouvelle"; e = SELF -> <:expr< $e$ () >> ] ]
     ;
     str_item:
       [ [ "classe"; "virtuelle"; n = LIDENT; "="; "objet";
           ldl = LIST0 champ_d_objet_virtuel; "fin" ->
             <:str_item< type $n$ = { $list: ldl$ } >>
         | "classe"; n = LIDENT; e = fonction_objet ->
-            <:str_item< value $lid:n$ = $e$ >> ] ]
+            <:str_item< value $lid:n$ () = $e$ >> ] ]
     ;
     fonction_objet:
       [ [ p = LIDENT; e = fonction_objet -> <:expr< fun $lid:p$ -> $e$ >>
@@ -1945,6 +1946,7 @@ value open_base bname =
 
 value close_base b = b..close_base;
 value person_of_gen_person b = b..person_of_gen_person;
+
 *)
 
 type base =
@@ -2015,7 +2017,7 @@ type base =
     date_of_last_change : unit -> string -> float }
 ;
 
-value make_base1 b base =
+value make_base1 () b base =
   {self = b;
    close_base () = base.func.cleanup ();
    person_of_gen_person () p = Person (map_person_ps (fun p -> p) un_istr p);
@@ -2077,7 +2079,7 @@ value make_base1 b base =
    date_of_last_change () x = date_of_last_change x b}
 ;
 
-value make_base2 b db2 =
+value make_base2 () b db2 =
   {self = b;
    close_base () =
      Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
@@ -2144,12 +2146,13 @@ value make_base2 b db2 =
 value open_base bname =
   let b = open_base bname in
   match b with
-  [ Base base -> make_base1 b base
-  | Base2 db2 -> make_base2 b db2 ]
+  [ Base base -> make_base1 () b base
+  | Base2 db2 -> make_base2 () b db2 ]
 ;
 
 value close_base b = b.close_base ();
 value person_of_gen_person b = b.person_of_gen_person ();
+
 (**)
 
 value ascend_of_gen_ascend b = b.ascend_of_gen_ascend ();
@@ -2209,7 +2212,7 @@ value p_first_name b = b.p_first_name ();
 value p_surname b = b.p_surname ();
 value date_of_last_change s b = b.date_of_last_change () s;
 
-value base_of_dsk_base base = make_base1 (Base base) base;
+value base_of_dsk_base base = make_base1 () (Base base) base;
 value apply_as_dsk_base f base = apply_as_dsk_base f base.self;
 
 (* Traces of changes; this is not correct because it supposes that calls
