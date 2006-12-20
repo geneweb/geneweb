@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.154 2006-12-20 07:30:52 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.155 2006-12-20 09:07:22 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -1700,6 +1700,8 @@ value close_base base =
 
 (*
 
+(* This code works only with camlp4s *)
+
 #load "pa_pragma.cmo";
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -1711,14 +1713,32 @@ value close_base base =
       [ [ e1 = SELF; ".."; e2 = SELF -> <:expr< $e1$ . $e2$ () >> ] ]
     ;
     expr: LEVEL "apply"
-      [ [ "nouvel_objet"; e = SELF -> <:expr< $e$ () >> ] ]
+      [ [ "nouvel_objet"; e = SELF -> <:expr< $e$ () >>
+        | "heriter"; n = LIDENT; ".."; m = LIDENT ->
+            <:expr< $uid:"C_" ^ n$ . $lid:m$ () >> ] ]
     ;
     str_item:
-      [ [ "classe"; "virtuelle"; n = LIDENT; "="; "objet";
-          ldl = LIST0 champ_d_objet_virtuel; "fin" ->
-            <:str_item< type $n$ = { $list: ldl$ } >>
+      [ [ "classe"; "virtuelle"; n = LIDENT; t = fonction_objet_virtuel ->
+            <:str_item< type $n$ = $t$ >>
         | "classe"; n = LIDENT; e = fonction_objet ->
             <:str_item< value $lid:n$ () = $e$ >> ] ]
+    ;
+    fonction_objet_virtuel:
+      [ [ "="; "objet"; "("; soi = LIDENT; ")";
+          ldel = LIST0 champ_d_objet_virtuel; "fin" ->
+            let ldl =
+              List.map (fun (loc, n, t, _) -> (loc, n, False, t)) ldel
+            in
+            let lel =
+              List.fold_right
+                (fun (loc, n, t, e) lel ->
+                   if e = None then lel
+                   else [(loc, n, t, match_with_some e) :: lel])
+                ldel []
+            in
+            <:ctyp< { $list: ldl$ } >>
+        | "="; "objet"; ldl = LIST0 champ_d_objet_virtuel; "fin" ->
+            <:ctyp< { $list: ldl$ } >> ] ]
     ;
     fonction_objet:
       [ [ p = LIDENT; e = fonction_objet -> <:expr< fun $lid:p$ -> $e$ >>
@@ -1730,9 +1750,11 @@ value close_base base =
     ;
     champ_d_objet_virtuel:
       [ [ "valeur"; n = LIDENT; ":"; t = ctyp; ";" ->
-            (loc, n, False, t)
+            (loc, n, t, None)
         | "methode"; n = LIDENT; ":"; t = ctyp; ";" ->
-            (loc, n, False, <:ctyp< unit -> $t$ >>) ] ]
+            (loc, n, <:ctyp< unit -> $t$ >>, None)
+        | "methode"; n = LIDENT; ":"; t = ctyp; "="; e = expr; ";" ->
+            (loc, n, <:ctyp< unit -> $t$ >>, Some e) ] ]
     ;
     champ_d_objet:
       [ [ "valeur"; n = LIDENT; "="; e = expr; ";" ->
@@ -1747,7 +1769,7 @@ value close_base base =
   END;
 
 classe virtuelle base =
-  objet
+  objet (self)
     valeur base_t : base_t;
     methode close_base : unit;
     methode person_of_gen_person : Def.gen_person iper istr -> person;
@@ -1779,7 +1801,24 @@ classe virtuelle base =
     methode is_patched_person : iper -> bool;
     methode patched_ascends : list iper;
     methode output_consang_tab : array Adef.fix -> unit;
-    methode delete_family : ifam -> unit;
+    methode delete_family : ifam -> unit = do {
+      let cpl =
+        self..couple_of_gen_couple
+          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+      in
+      let fam =
+        let empty = self..insert_string "" in
+        self..family_of_gen_family
+          {marriage = codate_None; marriage_place = empty; marriage_src = empty;
+           relation = Married; divorce = NotDivorced; witnesses = [| |];
+           comment = empty; origin_file = empty; fsources = empty;
+           fam_index = Adef.ifam_of_int (-1)}
+      in
+      let des = self..descend_of_gen_descend {children = [| |]} in
+      self..patch_family ifam fam;
+      self..patch_couple ifam cpl;
+      self..patch_descend ifam des
+    };
     methode person_of_key : string -> string -> int -> option iper;
     methode persons_of_name : string -> list iper;
     methode persons_of_first_name : string_person_index;
@@ -1813,6 +1852,31 @@ classe virtuelle base =
     methode p_surname : person -> string;
     methode date_of_last_change : string -> float;
   fin
+;
+
+module C_base =
+  struct
+    value delete_family () self ifam =
+      let cpl =
+        self.couple_of_gen_couple ()
+          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+      in
+      let fam =
+        let empty = self.insert_string () "" in
+        self.family_of_gen_family ()
+          {marriage = codate_None; marriage_place = empty;
+           marriage_src = empty; relation = Married; divorce = NotDivorced;
+           witnesses = [| |]; comment = empty; origin_file = empty;
+           fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+      in
+      let des = self.descend_of_gen_descend () {children = [| |]} in
+      do {
+        self.patch_family () ifam fam;
+        self.patch_couple () ifam cpl;
+        self.patch_descend () ifam des
+      }
+    ;
+  end
 ;
 
 classe base1 b base =
@@ -1849,24 +1913,7 @@ classe base1 b base =
     methode is_patched_person = is_patched_person b;
     methode patched_ascends = patched_ascends b;
     methode output_consang_tab = output_consang_tab b;
-    methode delete_family ifam = do {
-      let cpl =
-        self..couple_of_gen_couple
-          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-      in
-      let fam =
-        let empty = self..insert_string "" in
-        self..family_of_gen_family
-          {marriage = codate_None; marriage_place = empty; marriage_src = empty;
-           relation = Married; divorce = NotDivorced; witnesses = [| |];
-           comment = empty; origin_file = empty; fsources = empty;
-           fam_index = Adef.ifam_of_int (-1)}
-      in
-      let des = self..descend_of_gen_descend {children = [| |]} in
-      self..patch_family ifam fam;
-      self..patch_couple ifam cpl;
-      self..patch_descend ifam des
-    };
+    methode delete_family = heriter base..delete_family self;
     methode person_of_key = person_of_key b;
     methode persons_of_name = persons_of_name b;
     methode persons_of_first_name = persons_of_first_name b;
@@ -1932,24 +1979,7 @@ classe base2 b db2 =
     methode is_patched_person = is_patched_person b;
     methode patched_ascends = patched_ascends b;
     methode output_consang_tab = output_consang_tab b;
-    methode delete_family ifam = do {
-      let cpl =
-        self..couple_of_gen_couple
-          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-      in
-      let fam =
-        let empty = self..insert_string "" in
-        self..family_of_gen_family
-          {marriage = codate_None; marriage_place = empty; marriage_src = empty;
-           relation = Married; divorce = NotDivorced; witnesses = [| |];
-           comment = empty; origin_file = empty; fsources = empty;
-           fam_index = Adef.ifam_of_int (-1)}
-      in
-      let des = self..descend_of_gen_descend {children = [| |]} in
-      self..patch_family ifam fam;
-      self..patch_couple ifam cpl;
-      self..patch_descend ifam des
-    };
+    methode delete_family = heriter base..delete_family self;
     methode person_of_key = person_of_key b;
     methode persons_of_name = persons_of_name b;
     methode persons_of_first_name = persons_of_first_name b;
@@ -2051,6 +2081,8 @@ value apply_as_dsk_base f base = apply_as_dsk_base f base.base_t;
 
 *)
 
+(* This code is a pretty print of the code above from '#load "pragma.cmo"' *)
+
 type base =
   { base_t : base_t;
     close_base : unit -> unit;
@@ -2117,6 +2149,31 @@ type base =
     date_of_last_change : unit -> string -> float }
 ;
 
+module C_base =
+  struct
+    value delete_family () self ifam =
+      let cpl =
+        self.couple_of_gen_couple ()
+          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+      in
+      let fam =
+        let empty = self.insert_string () "" in
+        self.family_of_gen_family ()
+          {marriage = codate_None; marriage_place = empty;
+           marriage_src = empty; relation = Married; divorce = NotDivorced;
+           witnesses = [| |]; comment = empty; origin_file = empty;
+           fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+      in
+      let des = self.descend_of_gen_descend () {children = [| |]} in
+      do {
+        self.patch_family () ifam fam;
+        self.patch_couple () ifam cpl;
+        self.patch_descend () ifam des
+      }
+    ;
+  end
+;
+
 value base1 () b base =
   let rec self =
     {base_t = b; close_base () = base.func.cleanup ();
@@ -2137,25 +2194,7 @@ value base1 () b base =
      is_patched_person () = is_patched_person b;
      patched_ascends () = patched_ascends b;
      output_consang_tab () = output_consang_tab b;
-     delete_family () ifam =
-       let cpl =
-         self.couple_of_gen_couple ()
-           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-       in
-       let fam =
-         let empty = self.insert_string () "" in
-         self.family_of_gen_family ()
-           {marriage = codate_None; marriage_place = empty;
-            marriage_src = empty; relation = Married; divorce = NotDivorced;
-            witnesses = [| |]; comment = empty; origin_file = empty;
-            fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-       in
-       let des = self.descend_of_gen_descend () {children = [| |]} in
-       do {
-         self.patch_family () ifam fam;
-         self.patch_couple () ifam cpl;
-         self.patch_descend () ifam des
-       };
+     delete_family () = C_base.delete_family () self;
      person_of_key () = person_of_key b;
      persons_of_name () = persons_of_name b;
      persons_of_first_name () = persons_of_first_name b;
@@ -2208,25 +2247,7 @@ value base2 () b db2 =
      is_patched_person () = is_patched_person b;
      patched_ascends () = patched_ascends b;
      output_consang_tab () = output_consang_tab b;
-     delete_family () ifam =
-       let cpl =
-         self.couple_of_gen_couple ()
-           (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-       in
-       let fam =
-         let empty = self.insert_string () "" in
-         self.family_of_gen_family ()
-           {marriage = codate_None; marriage_place = empty;
-            marriage_src = empty; relation = Married; divorce = NotDivorced;
-            witnesses = [| |]; comment = empty; origin_file = empty;
-            fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-       in
-       let des = self.descend_of_gen_descend () {children = [| |]} in
-       do {
-         self.patch_family () ifam fam;
-         self.patch_couple () ifam cpl;
-         self.patch_descend () ifam des
-       };
+     delete_family () = C_base.delete_family () self;
      person_of_key () = person_of_key b;
      persons_of_name () = persons_of_name b;
      persons_of_first_name () = persons_of_first_name b;
@@ -2324,6 +2345,8 @@ value date_of_last_change s b = b.date_of_last_change () s;
 
 value base_of_dsk_base base = base1 () (Base base) base;
 value apply_as_dsk_base f base = apply_as_dsk_base f base.base_t;
+
+(* end of pretty printed code *)
 
 (**)
 
