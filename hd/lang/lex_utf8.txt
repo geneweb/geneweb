@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.67 2006-12-18 13:06:10 ddr Exp $
+# $Id: lex_utf8.txt,v 5.68 2006-12-21 22:17:53 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -202,9 +202,9 @@ ru: %d лет назад
 sl: pred %d leti
 sv: %d år sedan
 
-    %s access failed for database %s
-en: %s access failed for database %s
-fr: échec de l'accès %s pour la base de données %s
+    %s access cancelled for that page
+en: %s access cancelled for that page
+fr: accès %s annulé pour cette page
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
