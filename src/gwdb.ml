@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.164 2006-12-21 02:46:22 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.165 2006-12-21 02:54:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -96,11 +96,6 @@ type string_person_index2 =
 type string_person_index =
   [ Spi of gen_string_person_index dsk_istr
   | Spi2 of db2 and string_person_index2 ]
-;
-
-type base_t =
-  [ Base of Dbdisk.dsk_base
-  | Base2 of db2 ]
 ;
 
 value fast_open_in_bin_and_seek db2 f1 f2 f pos = do {
@@ -673,11 +668,10 @@ value gen_descend_of_descend =
   | Descend2Gen db2 d -> d ]
 ;
 
-value sou base i =
-  match (base, i) with
-  [ (Base base, Istr i) -> base.data.strings.get (Adef.int_of_istr i)
-  | (Base2 _, Istr2 db2 f pos) -> string_of_istr2 db2 f pos
-  | (Base2 _, Istr2New db2 s) -> s
+value sou2 i =
+  match i with
+  [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
+  | Istr2New db2 s -> s
   | _ -> assert False ]
 ;
 
@@ -691,7 +685,7 @@ value person_with_key p fn sn oc =
       Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
   | (Person2 db2 i,  Istr2New _ fn, Istr2New _ sn) ->
       let p = gen_person_of_person (Person2 db2 i) in
-      let p = map_person_ps (fun ip -> ip) (sou (Base2 db2)) p in
+      let p = map_person_ps (fun ip -> ip) sou2 p in
       Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
   | _ -> failwith "not impl person_with_key 2" ]
 ;
