@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.45 2006-12-17 21:13:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.46 2006-12-21 22:17:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -495,9 +495,8 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
     Wserver.wprint
-      (fcapitale (ftransl conf "%s access failed for database %s"))
+      (fcapitale (ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
-      ("\"" ^ conf.bname ^ "\"")
   in
   Util.header_without_http conf title;
   tag "h1" begin title False; end;
