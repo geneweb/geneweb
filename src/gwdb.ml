@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.166 2006-12-21 14:59:52 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.167 2006-12-21 20:41:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -173,6 +173,7 @@ value get_access =
   | Person2 db2 i -> get_field db2 i ("person", "access")
   | Person2Gen db2 p -> p.Def.access ]
 ;
+
 value get_aliases =
   fun
   [ Person p -> List.map (fun i -> Istr i) p.Def.aliases
@@ -184,12 +185,14 @@ value get_aliases =
         List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list
   | Person2Gen db2 p -> List.map (fun s -> Istr2New db2 s) p.Def.aliases ]
 ;
+
 value get_baptism =
   fun
   [ Person p -> p.Def.baptism
   | Person2 db2 i -> get_field db2 i ("person", "baptism")
   | Person2Gen db2 p -> p.Def.baptism ]
 ;
+
 value get_baptism_place =
   fun
   [ Person p -> Istr p.Def.baptism_place
@@ -445,6 +448,7 @@ value person_with_sex p s =
   | Person2Gen db2 p -> Person2Gen db2 {(p) with sex = s} ]
 ;
 
+(*
 value gen_person_of_person =
   fun
   [ Person p -> map_person_ps (fun p -> p) (fun s -> Istr s) p
@@ -467,6 +471,7 @@ value gen_person_of_person =
   | Person2Gen db2 p ->
       map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p ]
 ;
+*)
 
 value no_consang = Adef.fix (-1);
 
@@ -671,6 +676,7 @@ value sou2 i =
   | _ -> assert False ]
 ;
 
+(*
 value person_with_key p fn sn oc =
   match (p, fn, sn) with
   [ (Person p, Istr fn, Istr sn) ->
@@ -685,6 +691,7 @@ value person_with_key p fn sn oc =
       Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
   | _ -> failwith "not impl person_with_key 2" ]
 ;
+*)
 
 value is_deleted_family =
   fun
@@ -1069,11 +1076,9 @@ value base_of_base2 bname =
     expr: LEVEL "."
       [ [ e1 = SELF; ".."; e2 = SELF -> <:expr< $e1$ . $e2$ () >> ] ]
     ;
-    expr: LEVEL "apply"
-      [ [ "nouvel_objet"; e = SELF -> <:expr< $e$ () >> ] ]
-    ;
     str_item:
       [ [ "classe"; "virtuelle"; n = LIDENT;
+          rtpl = parametres_de_type_de_classe;
           (so, ldel) = fonction_objet_virtuel ->
             let td =
               let ldl =
@@ -1083,7 +1088,7 @@ value base_of_base2 bname =
                      else [(loc, n, False, match_with_some t_o) :: ldl])
                   ldel []
               in
-              <:str_item< type $n$ = { $list:ldl$ } >>
+              <:str_item< type $n$ $list:rtpl$ = { $list:ldl$ } >>
             in
             let lel =
               List.fold_right
@@ -1131,7 +1136,12 @@ value base_of_base2 bname =
               in
               <:str_item< declare $td$; $md$; end >>
         | "classe"; n = LIDENT; e = fonction_objet ->
-            <:str_item< value $lid:n$ () = $e$ >> ] ]
+            <:str_item< value $lid:n$ = $e$ >> ] ]
+    ;
+    parametres_de_type_de_classe:
+      [ [ -> []
+        | tpl = parametres_de_type_de_classe; "'"; tp = LIDENT ->
+            [(tp, (False, False)) :: tpl] ] ]
     ;
     fonction_objet_virtuel:
       [ [ "="; "objet"; "("; soi = LIDENT; ")";
@@ -1203,10 +1213,120 @@ value base_of_base2 bname =
             (<:patt< $lid:n$ >>, False, <:expr< fun () -> $e$ >>) ] ]
     ;
     fonction_methode:
-      [ [ p = LIDENT; e = fonction_methode -> <:expr< fun $lid:p$ -> $e$ >>
+      [ [ p = ipatt; e = fonction_methode -> <:expr< fun $p$ -> $e$ >>
         | "="; e = expr -> e ] ]
     ;
+    ipatt:
+      [ [ s = LIDENT -> <:patt< $lid:s$ >>
+        | "("; ")" -> <:patt< () >>
+        | "("; p = ipatt; ","; pl = LIST1 ipatt SEP ","; ")" ->
+            <:patt< ( $list:[p :: pl]$ ) >> ] ]
+    ;
   END;
+
+classe virtuelle person_fun 'a =
+  objet
+    methode get_access : 'a -> access;
+    methode get_aliases : 'a -> list istr;
+    methode get_baptism : 'a -> codate;
+    methode person_with_key : 'a -> istr -> istr -> int -> person;
+    methode gen_person_of_person : 'a -> Def.gen_person iper istr;
+  fin
+;
+
+classe person1_fun =
+  objet
+    methode get_access p = p.Def.access;
+    methode get_aliases p = List.map (fun i -> Istr i) p.Def.aliases;
+    methode get_baptism p = p.Def.baptism;
+    methode person_with_key p fn sn oc =
+      match (fn, sn) with
+      [ (Istr fn, Istr sn) ->
+          Person {(p) with first_name = fn; surname = sn; occ = oc}
+      | _ -> assert False ]
+    ;
+    methode gen_person_of_person p =
+      map_person_ps (fun p -> p) (fun s -> Istr s) p;
+  fin
+;
+
+classe person2_fun =
+  objet (self)
+    methode get_access (db2, i) = get_field db2 i ("person", "access");
+    methode get_aliases (db2, i) =
+      let pos = get_field_acc db2 i ("person", "aliases") in
+      if pos = -1 then []
+      else
+        let list = get_field_data db2 pos ("person", "aliases") "data2.ext" in
+        List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list;
+    methode get_baptism (db2, i) = get_field db2 i ("person", "baptism");
+    methode person_with_key (db2, i) fn sn oc =
+      match (fn, sn) with
+      [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
+          failwith "not impl person_with_key 1"
+      | (Istr2New _ fn, Istr2New _ sn) ->
+          let p = self..gen_person_of_person (db2, i) in
+          let p = map_person_ps (fun ip -> ip) sou2 p in
+          Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+      | _ -> failwith "not impl person_with_key 2" ]
+    ;
+    methode gen_person_of_person (db2, i) =
+      let p = Person2 db2 i in
+      let pp = (db2, i) in
+      {first_name = get_first_name p; surname = get_surname p;
+       occ = get_occ p; image = get_image p; public_name = get_public_name p;
+       qualifiers = get_qualifiers p; aliases = self..get_aliases pp;
+       first_names_aliases = get_first_names_aliases p;
+       surnames_aliases = get_surnames_aliases p; titles = get_titles p;
+       rparents = get_rparents p; related = get_related p;
+       occupation = get_occupation p; sex = get_sex p;
+       access = self..get_access pp;
+       birth = get_birth p; birth_place = get_birth_place p;
+       birth_src = get_birth_src p; baptism = self..get_baptism pp;
+       baptism_place = get_baptism_place p; baptism_src = get_baptism_src p;
+       death = get_death p; death_place = get_death_place p;
+       death_src = get_death_src p; burial = get_burial p;
+       burial_place = get_burial_place p; burial_src = get_burial_src p;
+       notes = get_notes p; psources = get_psources p;
+       key_index = get_key_index p}
+    ;
+  fin
+;
+
+classe person2gen_fun =
+  objet
+    methode get_access (db2, p) = p.Def.access;
+    methode get_aliases (db2, p) =
+      List.map (fun s -> Istr2New db2 s) p.Def.aliases;
+    methode get_baptism (db2, p) = p.Def.baptism;
+    methode person_with_key (db2, p) fn sn oc =
+      match (fn, sn) with
+      [ (Istr2New _ fn, Istr2New _ sn) ->
+          Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+      | _ -> failwith "not impl person_with_key 3" ]
+    ;
+    methode gen_person_of_person (db2, p) =
+      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p
+    ;
+  fin
+;
+
+value wrap_person f g h p =
+  match p with
+  [ Person p -> f person1_fun p
+  | Person2 db2 i -> g person2_fun (db2, i)
+  | Person2Gen db2 p -> h person2gen_fun (db2, p) ]
+;
+
+value get_access = let f pf = pf..get_access in wrap_person f f f;
+value get_aliases = let f pf = pf..get_aliases in wrap_person f f f;
+value get_baptism = let f pf = pf..get_baptism in wrap_person f f f;
+
+value person_with_key = let f pf = pf..person_with_key in wrap_person f f f;
+value gen_person_of_person =
+  let f pf = pf..gen_person_of_person in
+  wrap_person f f f
+;
 
 classe virtuelle base =
   objet (self)
@@ -1808,9 +1928,9 @@ value open_base bname =
   if Sys.file_exists (Filename.concat bname "base_d") then do {
     Printf.eprintf "*** database new implementation\n";
     flush stderr; 
-    nouvel_objet base2 (base_of_base2 bname)
+    base2 (base_of_base2 bname)
   }
-  else nouvel_objet base1 (Database.opendb bname)
+  else base1 (Database.opendb bname)
 ;
 
 value close_base b = b..close_base;
@@ -1873,11 +1993,116 @@ value p_first_name b = b..p_first_name;
 value p_surname b = b..p_surname;
 value date_of_last_change s b = b..date_of_last_change s;
 value apply_as_dsk_base f b = b..apply_as_dsk_base f;
-value base_of_dsk_base b = nouvel_objet base1 b;
+value base_of_dsk_base b = base1 b;
 
 *)
 
 (* This code is a pretty print of the code above from '#load "pragma.cmo"' *)
+
+type person_fun 'a =
+  { get_access : unit -> 'a -> access;
+    get_aliases : unit -> 'a -> list istr;
+    get_baptism : unit -> 'a -> codate;
+    person_with_key : unit -> 'a -> istr -> istr -> int -> person;
+    gen_person_of_person : unit -> 'a -> Def.gen_person iper istr }
+;
+
+value person1_fun =
+  {get_access () p = p.Def.access;
+   get_aliases () p = List.map (fun i -> Istr i) p.Def.aliases;
+   get_baptism () p = p.Def.baptism;
+   person_with_key () p fn sn oc =
+     match (fn, sn) with
+     [ (Istr fn, Istr sn) ->
+         Person {(p) with first_name = fn; surname = sn; occ = oc}
+     | _ -> assert False ];
+   gen_person_of_person () p = map_person_ps (fun p -> p) (fun s -> Istr s) p}
+;
+
+value person2_fun =
+  let rec self =
+    {get_access () (db2, i) = get_field db2 i ("person", "access");
+     get_aliases () (db2, i) =
+       let pos = get_field_acc db2 i ("person", "aliases") in
+       if pos = -1 then []
+       else
+         let list =
+           get_field_data db2 pos ("person", "aliases") "data2.ext"
+         in
+         List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list;
+     get_baptism () (db2, i) = get_field db2 i ("person", "baptism");
+     person_with_key () (db2, i) fn sn oc =
+       match (fn, sn) with
+       [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
+           failwith "not impl person_with_key 1"
+       | (Istr2New _ fn, Istr2New _ sn) ->
+           let p = self.gen_person_of_person () (db2, i) in
+           let p = map_person_ps (fun ip -> ip) sou2 p in
+           Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+       | _ -> failwith "not impl person_with_key 2" ];
+     gen_person_of_person () (db2, i) =
+       let p = Person2 db2 i in
+       let pp = (db2, i) in
+       {first_name = get_first_name p; surname = get_surname p;
+        occ = get_occ p; image = get_image p; public_name = get_public_name p;
+        qualifiers = get_qualifiers p; aliases = self.get_aliases () pp;
+        first_names_aliases = get_first_names_aliases p;
+        surnames_aliases = get_surnames_aliases p; titles = get_titles p;
+        rparents = get_rparents p; related = get_related p;
+        occupation = get_occupation p; sex = get_sex p;
+        access = self.get_access () pp; birth = get_birth p;
+        birth_place = get_birth_place p; birth_src = get_birth_src p;
+        baptism = self.get_baptism () pp; baptism_place = get_baptism_place p;
+        baptism_src = get_baptism_src p; death = get_death p;
+        death_place = get_death_place p; death_src = get_death_src p;
+        burial = get_burial p; burial_place = get_burial_place p;
+        burial_src = get_burial_src p; notes = get_notes p;
+        psources = get_psources p; key_index = get_key_index p}}
+  in
+  self
+;
+
+value person2gen_fun =
+  {get_access () (db2, p) = p.Def.access;
+   get_aliases () (db2, p) = List.map (fun s -> Istr2New db2 s) p.Def.aliases;
+   get_baptism () (db2, p) = p.Def.baptism;
+   person_with_key () (db2, p) fn sn oc =
+     match (fn, sn) with
+     [ (Istr2New _ fn, Istr2New _ sn) ->
+         Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
+     | _ -> failwith "not impl person_with_key 3" ];
+   gen_person_of_person () (db2, p) =
+     map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p}
+;
+
+value wrap_person f g h p =
+  match p with
+  [ Person p -> f person1_fun p
+  | Person2 db2 i -> g person2_fun (db2, i)
+  | Person2Gen db2 p -> h person2gen_fun (db2, p) ]
+;
+
+value get_access =
+  let f pf = pf.get_access () in
+  wrap_person f f f
+;
+value get_aliases =
+  let f pf = pf.get_aliases () in
+  wrap_person f f f
+;
+value get_baptism =
+  let f pf = pf.get_baptism () in
+  wrap_person f f f
+;
+
+value person_with_key =
+  let f pf = pf.person_with_key () in
+  wrap_person f f f
+;
+value gen_person_of_person =
+  let f pf = pf.gen_person_of_person () in
+  wrap_person f f f
+;
 
 declare
   type base =
@@ -2050,7 +2275,7 @@ declare
   ;
 end;
 
-value base1 () base =
+value base1 base =
   let base_strings_of_first_name_or_surname s =
     List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
   in
@@ -2165,7 +2390,7 @@ value base1 () base =
   self
 ;
 
-value base2 () db2 =
+value base2 db2 =
   let base_strings_of_first_name_or_surname field proj s =
     let posl = strings2_of_fsname db2 field s in
     let istrl = List.map (fun pos -> Istr2 db2 ("person", field) pos) posl in
@@ -2464,9 +2689,9 @@ value open_base bname =
   if Sys.file_exists (Filename.concat bname "base_d") then do {
     Printf.eprintf "*** database new implementation\n";
     flush stderr;
-    base2 () (base_of_base2 bname)
+    base2 (base_of_base2 bname)
   }
-  else base1 () (Database.opendb bname)
+  else base1 (Database.opendb bname)
 ;
 
 value close_base b = b.close_base ();
@@ -2529,7 +2754,7 @@ value p_first_name b = b.p_first_name ();
 value p_surname b = b.p_surname ();
 value date_of_last_change s b = b.date_of_last_change () s;
 value apply_as_dsk_base f b = b.apply_as_dsk_base () f;
-value base_of_dsk_base b = base1 () b;
+value base_of_dsk_base b = base1 b;
 
 (* end of pretty printed code *)
 
