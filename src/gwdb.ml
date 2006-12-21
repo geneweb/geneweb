@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.169 2006-12-21 22:40:19 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.170 2006-12-21 23:37:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -167,24 +167,6 @@ value is_quest_string =
   | Istr2New db2 s -> s = "?" ]
 ;
 
-value get_burial =
-  fun
-  [ Person p -> p.Def.burial
-  | Person2 db2 i -> get_field db2 i ("person", "burial")
-  | Person2Gen db2 p -> p.Def.burial ]
-;
-value get_burial_place =
-  fun
-  [ Person p -> Istr p.Def.burial_place
-  | Person2 db2 i -> make_istr2 db2 ("person", "burial_place") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.burial_place ]
-;
-value get_burial_src =
-  fun
-  [ Person p -> Istr p.Def.burial_src
-  | Person2 db2 i -> make_istr2 db2 ("person", "burial_src") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.burial_src ]
-;
 value get_death =
   fun
   [ Person p -> p.Def.death
@@ -1171,6 +1153,9 @@ classe virtuelle person_fun 'a =
     methode get_birth : 'a -> codate;
     methode get_birth_place : 'a -> istr;
     methode get_birth_src : 'a -> istr;
+    methode get_burial : 'a -> Def.burial;
+    methode get_burial_place : 'a -> istr;
+    methode get_burial_src : 'a -> istr;
     methode person_with_key : 'a -> istr -> istr -> int -> person;
     methode gen_person_of_person : 'a -> Def.gen_person iper istr;
   fin
@@ -1186,6 +1171,9 @@ classe person1_fun =
     methode get_birth p = p.Def.birth;
     methode get_birth_place p = Istr p.Def.birth_place;
     methode get_birth_src p = Istr p.Def.birth_src;
+    methode get_burial p = p.Def.burial;
+    methode get_burial_place p = Istr p.Def.burial_place;
+    methode get_burial_src p = Istr p.Def.burial_src;
     methode person_with_key p fn sn oc =
       match (fn, sn) with
       [ (Istr fn, Istr sn) ->
@@ -1216,6 +1204,11 @@ classe person2_fun =
       make_istr2 db2 ("person", "birth_place") i;
     methode get_birth_src (db2, i) =
       make_istr2 db2 ("person", "birth_src") i;
+    methode get_burial (db2, i) = get_field db2 i ("person", "burial");
+    methode get_burial_place (db2, i) =
+      make_istr2 db2 ("person", "burial_place") i;
+    methode get_burial_src (db2, i) =
+      make_istr2 db2 ("person", "burial_src") i;
     methode person_with_key (db2, i) fn sn oc =
       match (fn, sn) with
       [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -1242,10 +1235,10 @@ classe person2_fun =
        baptism_place = self.get_baptism_place pp;
        baptism_src = self.get_baptism_src pp;
        death = get_death p; death_place = get_death_place p;
-       death_src = get_death_src p; burial = get_burial p;
-       burial_place = get_burial_place p; burial_src = get_burial_src p;
-       notes = get_notes p; psources = get_psources p;
-       key_index = get_key_index p}
+       death_src = get_death_src p; burial = self.get_burial pp;
+       burial_place = self.get_burial_place pp;
+       burial_src = self.get_burial_src pp; notes = get_notes p;
+       psources = get_psources p; key_index = get_key_index p}
     ;
   fin
 ;
@@ -1261,6 +1254,9 @@ classe person2gen_fun =
     methode get_birth (db2, p) = p.Def.birth;
     methode get_birth_place (db2, p) = Istr2New db2 p.Def.birth_place;
     methode get_birth_src (db2, p) = Istr2New db2 p.Def.birth_src;
+    methode get_burial (db2, p) = p.Def.burial;
+    methode get_burial_place (db2, p) = Istr2New db2 p.Def.burial_place;
+    methode get_burial_src (db2, p) = Istr2New db2 p.Def.burial_src;
     methode person_with_key (db2, p) fn sn oc =
       match (fn, sn) with
       [ (Istr2New _ fn, Istr2New _ sn) ->
@@ -1288,6 +1284,9 @@ value get_baptism_src = let f pf = pf.get_baptism_src in wrap_per f f f;
 value get_birth = let f pf = pf.get_birth in wrap_per f f f;
 value get_birth_place = let f pf = pf.get_birth_place in wrap_per f f f;
 value get_birth_src = let f pf = pf.get_birth_src in wrap_per f f f;
+value get_burial = let f pf = pf.get_burial in wrap_per f f f;
+value get_burial_place = let f pf = pf.get_burial_place in wrap_per f f f;
+value get_burial_src = let f pf = pf.get_burial_src in wrap_per f f f;
 
 value person_with_key = let f pf = pf.person_with_key in wrap_per f f f;
 value gen_person_of_person =
@@ -1976,6 +1975,9 @@ type person_fun 'a =
     get_birth : 'a -> codate;
     get_birth_place : 'a -> istr;
     get_birth_src : 'a -> istr;
+    get_burial : 'a -> Def.burial;
+    get_burial_place : 'a -> istr;
+    get_burial_src : 'a -> istr;
     person_with_key : 'a -> istr -> istr -> int -> person;
     gen_person_of_person : 'a -> Def.gen_person iper istr }
 ;
@@ -1987,7 +1989,9 @@ value person1_fun =
    get_baptism_place p = Istr p.Def.baptism_place;
    get_baptism_src p = Istr p.Def.baptism_src; get_birth p = p.Def.birth;
    get_birth_place p = Istr p.Def.birth_place;
-   get_birth_src p = Istr p.Def.birth_src;
+   get_birth_src p = Istr p.Def.birth_src; get_burial p = p.Def.burial;
+   get_burial_place p = Istr p.Def.burial_place;
+   get_burial_src p = Istr p.Def.burial_src;
    person_with_key p fn sn oc =
      match (fn, sn) with
      [ (Istr fn, Istr sn) ->
@@ -2014,6 +2018,9 @@ value person2_fun =
      get_birth (db2, i) = get_field db2 i ("person", "birth");
      get_birth_place (db2, i) = make_istr2 db2 ("person", "birth_place") i;
      get_birth_src (db2, i) = make_istr2 db2 ("person", "birth_src") i;
+     get_burial (db2, i) = get_field db2 i ("person", "burial");
+     get_burial_place (db2, i) = make_istr2 db2 ("person", "burial_place") i;
+     get_burial_src (db2, i) = make_istr2 db2 ("person", "burial_src") i;
      person_with_key (db2, i) fn sn oc =
        match (fn, sn) with
        [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -2039,8 +2046,8 @@ value person2_fun =
         baptism_place = self.get_baptism_place pp;
         baptism_src = self.get_baptism_src pp; death = get_death p;
         death_place = get_death_place p; death_src = get_death_src p;
-        burial = get_burial p; burial_place = get_burial_place p;
-        burial_src = get_burial_src p; notes = get_notes p;
+        burial = self.get_burial pp; burial_place = self.get_burial_place pp;
+        burial_src = self.get_burial_src pp; notes = get_notes p;
         psources = get_psources p; key_index = get_key_index p}}
   in
   self
@@ -2055,6 +2062,9 @@ value person2gen_fun =
    get_birth (db2, p) = p.Def.birth;
    get_birth_place (db2, p) = Istr2New db2 p.Def.birth_place;
    get_birth_src (db2, p) = Istr2New db2 p.Def.birth_src;
+   get_burial (db2, p) = p.Def.burial;
+   get_burial_place (db2, p) = Istr2New db2 p.Def.burial_place;
+   get_burial_src (db2, p) = Istr2New db2 p.Def.burial_src;
    person_with_key (db2, p) fn sn oc =
      match (fn, sn) with
      [ (Istr2New _ fn, Istr2New _ sn) ->
@@ -2101,6 +2111,18 @@ value get_birth_place =
 ;
 value get_birth_src =
   let f pf = pf.get_birth_src in
+  wrap_per f f f
+;
+value get_burial =
+  let f pf = pf.get_burial in
+  wrap_per f f f
+;
+value get_burial_place =
+  let f pf = pf.get_burial_place in
+  wrap_per f f f
+;
+value get_burial_src =
+  let f pf = pf.get_burial_src in
   wrap_per f f f
 ;
 
