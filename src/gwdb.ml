@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.168 2006-12-21 22:07:37 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.169 2006-12-21 22:40:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -167,62 +167,6 @@ value is_quest_string =
   | Istr2New db2 s -> s = "?" ]
 ;
 
-value get_access =
-  fun
-  [ Person p -> p.Def.access
-  | Person2 db2 i -> get_field db2 i ("person", "access")
-  | Person2Gen db2 p -> p.Def.access ]
-;
-
-value get_aliases =
-  fun
-  [ Person p -> List.map (fun i -> Istr i) p.Def.aliases
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "aliases") in
-      if pos = -1 then []
-      else
-        let list = get_field_data db2 pos ("person", "aliases") "data2.ext" in
-        List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list
-  | Person2Gen db2 p -> List.map (fun s -> Istr2New db2 s) p.Def.aliases ]
-;
-
-value get_baptism =
-  fun
-  [ Person p -> p.Def.baptism
-  | Person2 db2 i -> get_field db2 i ("person", "baptism")
-  | Person2Gen db2 p -> p.Def.baptism ]
-;
-
-value get_baptism_place =
-  fun
-  [ Person p -> Istr p.Def.baptism_place
-  | Person2 db2 i -> make_istr2 db2 ("person", "baptism_place") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.baptism_place ]
-;
-value get_baptism_src =
-  fun
-  [ Person p -> Istr p.Def.baptism_src
-  | Person2 db2 i -> make_istr2 db2 ("person", "baptism_src") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.baptism_src ]
-;
-value get_birth =
-  fun
-  [ Person p -> p.Def.birth
-  | Person2 db2 i -> get_field db2 i ("person", "birth")
-  | Person2Gen db2 p -> p.Def.birth ]
-;
-value get_birth_place =
-  fun
-  [ Person p -> Istr p.Def.birth_place
-  | Person2 db2 i -> make_istr2 db2 ("person", "birth_place") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.birth_place ]
-;
-value get_birth_src =
-  fun
-  [ Person p -> Istr p.Def.birth_src
-  | Person2 db2 i -> make_istr2 db2 ("person", "birth_src") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.birth_src ]
-;
 value get_burial =
   fun
   [ Person p -> p.Def.burial
@@ -1180,9 +1124,7 @@ value base_of_base2 bname =
             <:expr< { $list:pel$ } >> ] ]
     ;
     champ_d_objet_virtuel:
-      [ [ "valeur"; n = LIDENT; ":"; t = ctyp; ";" ->
-            (loc, n, Some t, None)
-        | "valeur"; "privee"; n = LIDENT; e = fonction_methode; ";" ->
+      [ [ "methode"; "privee"; n = LIDENT; e = fonction_methode; ";" ->
             (loc, n, None, Some (e, None))
         | "methode"; n = LIDENT; pl = LIST0 LIDENT; ":"; t = ctyp;
           eo = OPT fonction_methode_virtuelle; ";" ->
@@ -1201,9 +1143,7 @@ value base_of_base2 bname =
       [ [ "="; e = expr -> e ] ]
     ;
     champ_d_objet:
-      [ [ "valeur"; n = LIDENT; "="; e = expr; ";" ->
-            (<:patt< $lid:n$ >>, False, e)
-        | "valeur"; "privee"; n = LIDENT; e = fonction_methode; ";" ->
+      [ [ "methode"; "privee"; n = LIDENT; e = fonction_methode; ";" ->
             (<:patt< $lid:n$ >>, True, e)
         | "methode"; n = LIDENT; e = fonction_methode; ";" ->
             (<:patt< $lid:n$ >>, False, e) ] ]
@@ -1226,6 +1166,11 @@ classe virtuelle person_fun 'a =
     methode get_access : 'a -> access;
     methode get_aliases : 'a -> list istr;
     methode get_baptism : 'a -> codate;
+    methode get_baptism_place : 'a -> istr;
+    methode get_baptism_src : 'a -> istr;
+    methode get_birth : 'a -> codate;
+    methode get_birth_place : 'a -> istr;
+    methode get_birth_src : 'a -> istr;
     methode person_with_key : 'a -> istr -> istr -> int -> person;
     methode gen_person_of_person : 'a -> Def.gen_person iper istr;
   fin
@@ -1236,6 +1181,11 @@ classe person1_fun =
     methode get_access p = p.Def.access;
     methode get_aliases p = List.map (fun i -> Istr i) p.Def.aliases;
     methode get_baptism p = p.Def.baptism;
+    methode get_baptism_place p = Istr p.Def.baptism_place;
+    methode get_baptism_src p = Istr p.Def.baptism_src;
+    methode get_birth p = p.Def.birth;
+    methode get_birth_place p = Istr p.Def.birth_place;
+    methode get_birth_src p = Istr p.Def.birth_src;
     methode person_with_key p fn sn oc =
       match (fn, sn) with
       [ (Istr fn, Istr sn) ->
@@ -1257,6 +1207,15 @@ classe person2_fun =
         let list = get_field_data db2 pos ("person", "aliases") "data2.ext" in
         List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list;
     methode get_baptism (db2, i) = get_field db2 i ("person", "baptism");
+    methode get_baptism_place (db2, i) =
+      make_istr2 db2 ("person", "baptism_place") i;
+    methode get_baptism_src (db2, i) =
+      make_istr2 db2 ("person", "baptism_src") i;
+    methode get_birth (db2, i) = get_field db2 i ("person", "birth");
+    methode get_birth_place (db2, i) =
+      make_istr2 db2 ("person", "birth_place") i;
+    methode get_birth_src (db2, i) =
+      make_istr2 db2 ("person", "birth_src") i;
     methode person_with_key (db2, i) fn sn oc =
       match (fn, sn) with
       [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -1278,9 +1237,10 @@ classe person2_fun =
        rparents = get_rparents p; related = get_related p;
        occupation = get_occupation p; sex = get_sex p;
        access = self.get_access pp;
-       birth = get_birth p; birth_place = get_birth_place p;
-       birth_src = get_birth_src p; baptism = self.get_baptism pp;
-       baptism_place = get_baptism_place p; baptism_src = get_baptism_src p;
+       birth = self.get_birth pp; birth_place = self.get_birth_place pp;
+       birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
+       baptism_place = self.get_baptism_place pp;
+       baptism_src = self.get_baptism_src pp;
        death = get_death p; death_place = get_death_place p;
        death_src = get_death_src p; burial = get_burial p;
        burial_place = get_burial_place p; burial_src = get_burial_src p;
@@ -1296,6 +1256,11 @@ classe person2gen_fun =
     methode get_aliases (db2, p) =
       List.map (fun s -> Istr2New db2 s) p.Def.aliases;
     methode get_baptism (db2, p) = p.Def.baptism;
+    methode get_baptism_place (db2, p) = Istr2New db2 p.Def.baptism_place;
+    methode get_baptism_src (db2, p) = Istr2New db2 p.Def.baptism_src;
+    methode get_birth (db2, p) = p.Def.birth;
+    methode get_birth_place (db2, p) = Istr2New db2 p.Def.birth_place;
+    methode get_birth_src (db2, p) = Istr2New db2 p.Def.birth_src;
     methode person_with_key (db2, p) fn sn oc =
       match (fn, sn) with
       [ (Istr2New _ fn, Istr2New _ sn) ->
@@ -1308,26 +1273,31 @@ classe person2gen_fun =
   fin
 ;
 
-value wrap_person f g h p =
+value wrap_per f g h p =
   match p with
   [ Person p -> f person1_fun p
   | Person2 db2 i -> g person2_fun (db2, i)
   | Person2Gen db2 p -> h person2gen_fun (db2, p) ]
 ;
 
-value get_access = let f pf = pf.get_access in wrap_person f f f;
-value get_aliases = let f pf = pf.get_aliases in wrap_person f f f;
-value get_baptism = let f pf = pf.get_baptism in wrap_person f f f;
+value get_access = let f pf = pf.get_access in wrap_per f f f;
+value get_aliases = let f pf = pf.get_aliases in wrap_per f f f;
+value get_baptism = let f pf = pf.get_baptism in wrap_per f f f;
+value get_baptism_place = let f pf = pf.get_baptism_place in wrap_per f f f;
+value get_baptism_src = let f pf = pf.get_baptism_src in wrap_per f f f;
+value get_birth = let f pf = pf.get_birth in wrap_per f f f;
+value get_birth_place = let f pf = pf.get_birth_place in wrap_per f f f;
+value get_birth_src = let f pf = pf.get_birth_src in wrap_per f f f;
 
-value person_with_key = let f pf = pf.person_with_key in wrap_person f f f;
+value person_with_key = let f pf = pf.person_with_key in wrap_per f f f;
 value gen_person_of_person =
   let f pf = pf.gen_person_of_person in
-  wrap_person f f f
+  wrap_per f f f
 ;
 
 classe virtuelle base =
   objet (self)
-    valeur privee husbands self p =
+    methode privee husbands self p =
       let u = self.uoi (get_key_index p) in
       List.map
         (fun ifam ->
@@ -1340,7 +1310,7 @@ classe virtuelle base =
            (husband_surname, husband_surnames_aliases))
         (Array.to_list (get_family u))
     ;
-    valeur privee father_titles_places self p nobtit =
+    methode privee father_titles_places self p nobtit =
       match get_parents (self.aoi (get_key_index p)) with
       [ Some ifam ->
           let cpl = self.coi ifam in
@@ -1479,7 +1449,7 @@ classe virtuelle base =
 
 classe base1 base =
   objet (self)
-    valeur privee base_strings_of_first_name_or_surname s =
+    methode privee base_strings_of_first_name_or_surname s =
       List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
     ;
     methode close_base = base.func.cleanup;
@@ -1616,7 +1586,7 @@ classe base1 base =
 
 classe base2 db2 =
   objet (self)
-    valeur privee base_strings_of_first_name_or_surname field proj s =
+    methode privee base_strings_of_first_name_or_surname field proj s =
       let posl = strings2_of_fsname db2 field s in
       let istrl =
         List.map (fun pos -> Istr2 db2 ("person", field) pos) posl
@@ -2001,6 +1971,11 @@ type person_fun 'a =
   { get_access : 'a -> access;
     get_aliases : 'a -> list istr;
     get_baptism : 'a -> codate;
+    get_baptism_place : 'a -> istr;
+    get_baptism_src : 'a -> istr;
+    get_birth : 'a -> codate;
+    get_birth_place : 'a -> istr;
+    get_birth_src : 'a -> istr;
     person_with_key : 'a -> istr -> istr -> int -> person;
     gen_person_of_person : 'a -> Def.gen_person iper istr }
 ;
@@ -2009,6 +1984,10 @@ value person1_fun =
   {get_access p = p.Def.access;
    get_aliases p = List.map (fun i -> Istr i) p.Def.aliases;
    get_baptism p = p.Def.baptism;
+   get_baptism_place p = Istr p.Def.baptism_place;
+   get_baptism_src p = Istr p.Def.baptism_src; get_birth p = p.Def.birth;
+   get_birth_place p = Istr p.Def.birth_place;
+   get_birth_src p = Istr p.Def.birth_src;
    person_with_key p fn sn oc =
      match (fn, sn) with
      [ (Istr fn, Istr sn) ->
@@ -2029,6 +2008,12 @@ value person2_fun =
          in
          List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list;
      get_baptism (db2, i) = get_field db2 i ("person", "baptism");
+     get_baptism_place (db2, i) =
+       make_istr2 db2 ("person", "baptism_place") i;
+     get_baptism_src (db2, i) = make_istr2 db2 ("person", "baptism_src") i;
+     get_birth (db2, i) = get_field db2 i ("person", "birth");
+     get_birth_place (db2, i) = make_istr2 db2 ("person", "birth_place") i;
+     get_birth_src (db2, i) = make_istr2 db2 ("person", "birth_src") i;
      person_with_key (db2, i) fn sn oc =
        match (fn, sn) with
        [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -2048,10 +2033,11 @@ value person2_fun =
         surnames_aliases = get_surnames_aliases p; titles = get_titles p;
         rparents = get_rparents p; related = get_related p;
         occupation = get_occupation p; sex = get_sex p;
-        access = self.get_access pp; birth = get_birth p;
-        birth_place = get_birth_place p; birth_src = get_birth_src p;
-        baptism = self.get_baptism pp; baptism_place = get_baptism_place p;
-        baptism_src = get_baptism_src p; death = get_death p;
+        access = self.get_access pp; birth = self.get_birth pp;
+        birth_place = self.get_birth_place pp;
+        birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
+        baptism_place = self.get_baptism_place pp;
+        baptism_src = self.get_baptism_src pp; death = get_death p;
         death_place = get_death_place p; death_src = get_death_src p;
         burial = get_burial p; burial_place = get_burial_place p;
         burial_src = get_burial_src p; notes = get_notes p;
@@ -2064,6 +2050,11 @@ value person2gen_fun =
   {get_access (db2, p) = p.Def.access;
    get_aliases (db2, p) = List.map (fun s -> Istr2New db2 s) p.Def.aliases;
    get_baptism (db2, p) = p.Def.baptism;
+   get_baptism_place (db2, p) = Istr2New db2 p.Def.baptism_place;
+   get_baptism_src (db2, p) = Istr2New db2 p.Def.baptism_src;
+   get_birth (db2, p) = p.Def.birth;
+   get_birth_place (db2, p) = Istr2New db2 p.Def.birth_place;
+   get_birth_src (db2, p) = Istr2New db2 p.Def.birth_src;
    person_with_key (db2, p) fn sn oc =
      match (fn, sn) with
      [ (Istr2New _ fn, Istr2New _ sn) ->
@@ -2073,7 +2064,7 @@ value person2gen_fun =
      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p}
 ;
 
-value wrap_person f g h p =
+value wrap_per f g h p =
   match p with
   [ Person p -> f person1_fun p
   | Person2 db2 i -> g person2_fun (db2, i)
@@ -2082,24 +2073,44 @@ value wrap_person f g h p =
 
 value get_access =
   let f pf = pf.get_access in
-  wrap_person f f f
+  wrap_per f f f
 ;
 value get_aliases =
   let f pf = pf.get_aliases in
-  wrap_person f f f
+  wrap_per f f f
 ;
 value get_baptism =
   let f pf = pf.get_baptism in
-  wrap_person f f f
+  wrap_per f f f
+;
+value get_baptism_place =
+  let f pf = pf.get_baptism_place in
+  wrap_per f f f
+;
+value get_baptism_src =
+  let f pf = pf.get_baptism_src in
+  wrap_per f f f
+;
+value get_birth =
+  let f pf = pf.get_birth in
+  wrap_per f f f
+;
+value get_birth_place =
+  let f pf = pf.get_birth_place in
+  wrap_per f f f
+;
+value get_birth_src =
+  let f pf = pf.get_birth_src in
+  wrap_per f f f
 ;
 
 value person_with_key =
   let f pf = pf.person_with_key in
-  wrap_person f f f
+  wrap_per f f f
 ;
 value gen_person_of_person =
   let f pf = pf.gen_person_of_person in
-  wrap_person f f f
+  wrap_per f f f
 ;
 
 declare
