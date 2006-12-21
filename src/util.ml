@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.88 2006-12-17 12:45:34 ddr Exp $ *)
+(* $Id: util.ml,v 5.89 2006-12-21 14:59:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -589,7 +589,8 @@ value is_restricted (conf : config) base ip =
 value is_hidden p = is_empty_string (get_surname p);
 
 value pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person ip else poi base ip
+  if is_restricted conf base ip then Gwdb.empty_person base ip
+  else poi base ip
 ;
 
 value aget (conf : config) base ip =
