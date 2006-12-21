@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.165 2006-12-21 02:54:32 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.166 2006-12-21 14:59:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -495,22 +495,18 @@ value get_parents =
   | Ascend2Gen _ a -> a.Def.parents ]
 ;
 
-value empty_person ip =
-  let empty_string = Adef.istr_of_int 0 in
-  let p =
-    {first_name = empty_string; surname = empty_string; occ = 0;
-     image = empty_string; first_names_aliases = []; surnames_aliases = [];
-     public_name = empty_string; qualifiers = []; titles = []; rparents = [];
-     related = []; aliases = []; occupation = empty_string; sex = Neuter;
-     access = Private; birth = Adef.codate_None; birth_place = empty_string;
-     birth_src = empty_string; baptism = Adef.codate_None;
-     baptism_place = empty_string; baptism_src = empty_string;
-     death = DontKnowIfDead; death_place = empty_string;
-     death_src = empty_string; burial = UnknownBurial;
-     burial_place = empty_string; burial_src = empty_string;
-     notes = empty_string; psources = empty_string; key_index = ip}
-  in
-  Person p
+value empty_person empty_string ip =
+  {first_name = empty_string; surname = empty_string; occ = 0;
+   image = empty_string; first_names_aliases = []; surnames_aliases = [];
+   public_name = empty_string; qualifiers = []; titles = []; rparents = [];
+   related = []; aliases = []; occupation = empty_string; sex = Neuter;
+   access = Private; birth = Adef.codate_None; birth_place = empty_string;
+   birth_src = empty_string; baptism = Adef.codate_None;
+   baptism_place = empty_string; baptism_src = empty_string;
+   death = DontKnowIfDead; death_place = empty_string;
+   death_src = empty_string; burial = UnknownBurial;
+   burial_place = empty_string; burial_src = empty_string;
+   notes = empty_string; psources = empty_string; key_index = ip}
 ;
 
 value get_family =
@@ -1165,7 +1161,13 @@ value base_of_base2 bname =
             in
             if priv_pel = [] then e else <:expr< let $list:priv_pel$ in $e$ >>
         | "="; "objet"; lel = LIST0 champ_d_objet; "fin" ->
-            <:expr< { $list:lel$ } >> ] ]
+            let pel =
+              List.fold_right
+                (fun (p, priv, e) lel ->
+                   if priv then lel else [(p, e) :: lel])
+                lel []
+            in
+            <:expr< { $list:pel$ } >> ] ]
     ;
     champ_d_objet_virtuel:
       [ [ "valeur"; n = LIDENT; ":"; t = ctyp; ";" ->
@@ -1230,6 +1232,7 @@ classe virtuelle base =
       | None -> [] ]
     ;
     methode close_base : unit;
+    methode empty_person : iper -> person;
     methode person_of_gen_person : Def.gen_person iper istr -> person;
     methode ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
     methode union_of_gen_union : Def.gen_union ifam -> union;
@@ -1364,6 +1367,7 @@ classe base1 base =
       List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
     ;
     methode close_base = base.func.cleanup ();
+    methode empty_person ip = Person (empty_person (Adef.istr_of_int 0) ip);
     methode person_of_gen_person p =
       Person (map_person_ps (fun p -> p) un_istr p);
     methode ascend_of_gen_ascend a = Ascend a;
@@ -1514,6 +1518,7 @@ classe base2 db2 =
     ;
     methode close_base =
       Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
+    methode empty_person ip = Person2Gen db2 (empty_person "" ip);
     methode person_of_gen_person p =
       Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
     methode ascend_of_gen_ascend a = Ascend2Gen db2 a;
@@ -1809,6 +1814,7 @@ value open_base bname =
 ;
 
 value close_base b = b..close_base;
+value empty_person b = b..empty_person;
 value person_of_gen_person b = b..person_of_gen_person;
 value ascend_of_gen_ascend b = b..ascend_of_gen_ascend;
 value union_of_gen_union b = b..union_of_gen_union;
@@ -1876,6 +1882,7 @@ value base_of_dsk_base b = nouvel_objet base1 b;
 declare
   type base =
     { close_base : unit -> unit;
+      empty_person : unit -> iper -> person;
       person_of_gen_person : unit -> Def.gen_person iper istr -> person;
       ascend_of_gen_ascend : unit -> Def.gen_ascend ifam -> ascend;
       union_of_gen_union : unit -> Def.gen_union ifam -> union;
@@ -2049,6 +2056,7 @@ value base1 () base =
   in
   let rec self =
     {close_base () = base.func.cleanup ();
+     empty_person () ip = Person (empty_person (Adef.istr_of_int 0) ip);
      person_of_gen_person () p =
        Person (map_person_ps (fun p -> p) un_istr p);
      ascend_of_gen_ascend () a = Ascend a; union_of_gen_union () u = Union u;
@@ -2176,6 +2184,7 @@ value base2 () db2 =
   let rec self =
     {close_base () =
        Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
+     empty_person () ip = Person2Gen db2 (empty_person "" ip);
      person_of_gen_person () p =
        Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
      ascend_of_gen_ascend () a = Ascend2Gen db2 a;
@@ -2461,6 +2470,7 @@ value open_base bname =
 ;
 
 value close_base b = b.close_base ();
+value empty_person b = b.empty_person ();
 value person_of_gen_person b = b.person_of_gen_person ();
 value ascend_of_gen_ascend b = b.ascend_of_gen_ascend ();
 value union_of_gen_union b = b.union_of_gen_union ();
