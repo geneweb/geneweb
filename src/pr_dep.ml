@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 5.3 2006-10-17 12:51:41 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.4 2006-12-21 15:02:30 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 
@@ -86,7 +86,7 @@ value rec patt =
   | PaApp _ p1 p2 -> do { patt p1; patt p2; }
   | PaArr _ pl -> list patt pl
   | PaChr _ _ -> ()
-  | PaInt _ _ -> ()
+  | <:patt< $int:_$ >> -> ()
   | PaLab _ _ po -> option patt po
   | PaLid _ _ -> ()
   | PaOlb _ _ peoo ->
@@ -120,7 +120,7 @@ and expr =
   | ExFor _ _ e1 e2 _ el -> do { expr e1; expr e2; list expr el; }
   | ExFun _ pwel -> list match_case pwel
   | ExIfe _ e1 e2 e3 -> do { expr e1; expr e2; expr e3; }
-  | ExInt _ _ -> ()
+  | <:expr< $int:_$ >> -> ()
   | ExFlo _ _ -> ()
   | ExLab _ _ eo -> option expr eo
   | ExLaz _ e -> expr e
