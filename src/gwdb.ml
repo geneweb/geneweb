@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.170 2006-12-21 23:37:37 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.171 2006-12-22 06:39:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -167,87 +167,6 @@ value is_quest_string =
   | Istr2New db2 s -> s = "?" ]
 ;
 
-value get_death =
-  fun
-  [ Person p -> p.Def.death
-  | Person2 db2 i -> get_field db2 i ("person", "death")
-  | Person2Gen db2 p -> p.Def.death ]
-;
-value get_death_place =
-  fun
-  [ Person p -> Istr p.Def.death_place
-  | Person2 db2 i -> make_istr2 db2 ("person", "death_place") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.death_place ]
-;
-value get_death_src =
-  fun
-  [ Person p -> Istr p.Def.death_src
-  | Person2 db2 i -> make_istr2 db2 ("person", "death_src") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.death_src ]
-;
-value get_first_name =
-  fun
-  [ Person p -> Istr p.Def.first_name
-  | Person2 db2 i -> make_istr2 db2 ("person", "first_name") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.first_name ]
-;
-value get_first_names_aliases =
-  fun
-  [ Person p -> List.map (fun i -> Istr i) p.Def.first_names_aliases
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "first_names_aliases") in
-      if pos = -1 then []
-      else
-        let list =
-          get_field_data db2 pos ("person", "first_names_aliases") "data2.ext"
-        in
-        List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
-          list
-  | Person2Gen db2 p ->
-      List.map (fun s -> Istr2New db2 s) p.Def.first_names_aliases ]
-;
-value get_image =
-  fun
-  [ Person p -> Istr p.Def.image
-  | Person2 db2 i -> make_istr2 db2 ("person", "image") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.image ]
-;
-value get_key_index =
-  fun
-  [ Person p -> p.Def.key_index
-  | Person2 _ i -> Adef.iper_of_int i
-  | Person2Gen db2 p -> p.Def.key_index ]
-;
-value get_notes =
-  fun
-  [ Person p -> Istr p.Def.notes
-  | Person2 db2 i -> make_istr2 db2 ("person", "notes") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.notes ]
-;
-value get_occ =
-  fun
-  [ Person p -> p.Def.occ
-  | Person2 db2 i -> get_field db2 i ("person", "occ")
-  | Person2Gen db2 p -> p.Def.occ ]
-;
-value get_occupation =
-  fun
-  [ Person p -> Istr p.Def.occupation
-  | Person2 db2 i -> make_istr2 db2 ("person", "occupation") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.occupation ]
-;
-value get_psources =
-  fun
-  [ Person p -> Istr p.Def.psources
-  | Person2 db2 i -> make_istr2 db2 ("person", "psources") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.psources ]
-;
-value get_public_name =
-  fun
-  [ Person p -> Istr p.Def.public_name
-  | Person2 db2 i -> make_istr2 db2 ("person", "public_name") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.public_name ]
-;
 value get_qualifiers =
   fun
   [ Person p -> List.map (fun i -> Istr i) p.Def.qualifiers
@@ -1156,6 +1075,18 @@ classe virtuelle person_fun 'a =
     methode get_burial : 'a -> Def.burial;
     methode get_burial_place : 'a -> istr;
     methode get_burial_src : 'a -> istr;
+    methode get_death : 'a -> Def.death;
+    methode get_death_place : 'a -> istr;
+    methode get_death_src : 'a -> istr;
+    methode get_first_name : 'a -> istr;
+    methode get_first_names_aliases : 'a -> list istr;
+    methode get_image : 'a -> istr;
+    methode get_key_index : 'a -> iper;
+    methode get_notes : 'a -> istr;
+    methode get_occ : 'a -> int;
+    methode get_occupation : 'a -> istr;
+    methode get_psources : 'a -> istr;
+    methode get_public_name : 'a -> istr;
     methode person_with_key : 'a -> istr -> istr -> int -> person;
     methode gen_person_of_person : 'a -> Def.gen_person iper istr;
   fin
@@ -1174,6 +1105,19 @@ classe person1_fun =
     methode get_burial p = p.Def.burial;
     methode get_burial_place p = Istr p.Def.burial_place;
     methode get_burial_src p = Istr p.Def.burial_src;
+    methode get_death p = p.Def.death;
+    methode get_death_place p = Istr p.Def.death_place;
+    methode get_death_src p = Istr p.Def.death_src;
+    methode get_first_name p = Istr p.Def.first_name;
+    methode get_first_names_aliases p =
+      List.map (fun i -> Istr i) p.Def.first_names_aliases;
+    methode get_image p = Istr p.Def.image;
+    methode get_key_index p = p.Def.key_index;
+    methode get_notes p = Istr p.Def.notes;
+    methode get_occ p = p.Def.occ;
+    methode get_occupation p = Istr p.Def.occupation;
+    methode get_psources p = Istr p.Def.psources;
+    methode get_public_name p = Istr p.Def.public_name;
     methode person_with_key p fn sn oc =
       match (fn, sn) with
       [ (Istr fn, Istr sn) ->
@@ -1209,6 +1153,32 @@ classe person2_fun =
       make_istr2 db2 ("person", "burial_place") i;
     methode get_burial_src (db2, i) =
       make_istr2 db2 ("person", "burial_src") i;
+    methode get_death (db2, i) = get_field db2 i ("person", "death");
+    methode get_death_place (db2, i) =
+      make_istr2 db2 ("person", "death_place") i;
+    methode get_death_src (db2, i) = make_istr2 db2 ("person", "death_src") i;
+    methode get_first_name (db2, i) =
+      make_istr2 db2 ("person", "first_name") i;
+    methode get_first_names_aliases (db2, i) =
+      let pos = get_field_acc db2 i ("person", "first_names_aliases") in
+      if pos = -1 then []
+      else
+        let list =
+          get_field_data db2 pos ("person", "first_names_aliases") "data2.ext"
+        in
+        List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
+          list
+    ;
+    methode get_image (db2, i) = make_istr2 db2 ("person", "image") i;
+    methode get_key_index (db2, i) = Adef.iper_of_int i;
+    methode get_notes (db2, i) = make_istr2 db2 ("person", "notes") i;
+    methode get_occ (db2, i) = get_field db2 i ("person", "occ");
+    methode get_occupation (db2, i) =
+      make_istr2 db2 ("person", "occupation") i;
+    methode get_psources (db2, i) =
+      make_istr2 db2 ("person", "psources") i;
+    methode get_public_name (db2, i) =
+      make_istr2 db2 ("person", "public_name") i;
     methode person_with_key (db2, i) fn sn oc =
       match (fn, sn) with
       [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -1222,23 +1192,24 @@ classe person2_fun =
     methode gen_person_of_person (db2, i) =
       let p = Person2 db2 i in
       let pp = (db2, i) in
-      {first_name = get_first_name p; surname = get_surname p;
-       occ = get_occ p; image = get_image p; public_name = get_public_name p;
+      {first_name = self.get_first_name pp; surname = get_surname p;
+       occ = self.get_occ pp; image = self.get_image pp;
+       public_name = self.get_public_name pp;
        qualifiers = get_qualifiers p; aliases = self.get_aliases pp;
-       first_names_aliases = get_first_names_aliases p;
+       first_names_aliases = self.get_first_names_aliases pp;
        surnames_aliases = get_surnames_aliases p; titles = get_titles p;
        rparents = get_rparents p; related = get_related p;
-       occupation = get_occupation p; sex = get_sex p;
+       occupation = self.get_occupation pp; sex = get_sex p;
        access = self.get_access pp;
        birth = self.get_birth pp; birth_place = self.get_birth_place pp;
        birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
        baptism_place = self.get_baptism_place pp;
        baptism_src = self.get_baptism_src pp;
-       death = get_death p; death_place = get_death_place p;
-       death_src = get_death_src p; burial = self.get_burial pp;
+       death = self.get_death pp; death_place = self.get_death_place pp;
+       death_src = self.get_death_src pp; burial = self.get_burial pp;
        burial_place = self.get_burial_place pp;
-       burial_src = self.get_burial_src pp; notes = get_notes p;
-       psources = get_psources p; key_index = get_key_index p}
+       burial_src = self.get_burial_src pp; notes = self.get_notes pp;
+       psources = self.get_psources pp; key_index = self.get_key_index pp}
     ;
   fin
 ;
@@ -1257,6 +1228,19 @@ classe person2gen_fun =
     methode get_burial (db2, p) = p.Def.burial;
     methode get_burial_place (db2, p) = Istr2New db2 p.Def.burial_place;
     methode get_burial_src (db2, p) = Istr2New db2 p.Def.burial_src;
+    methode get_death (db2, p) = p.Def.death;
+    methode get_death_place (db2, p) = Istr2New db2 p.Def.death_place;
+    methode get_death_src (db2, p) = Istr2New db2 p.Def.death_src;
+    methode get_first_name (db2, p) = Istr2New db2 p.Def.first_name;
+    methode get_first_names_aliases (db2, p) =
+      List.map (fun s -> Istr2New db2 s) p.Def.first_names_aliases;
+    methode get_image (db2, p) = Istr2New db2 p.Def.image;
+    methode get_key_index (db2, p) = p.Def.key_index;
+    methode get_notes (db2, p) = Istr2New db2 p.Def.notes;
+    methode get_occ (db2, p) = p.Def.occ;
+    methode get_occupation (db2, p) = Istr2New db2 p.Def.occupation;
+    methode get_psources (db2, p) = Istr2New db2 p.Def.psources;
+    methode get_public_name (db2, p) = Istr2New db2 p.Def.public_name;
     methode person_with_key (db2, p) fn sn oc =
       match (fn, sn) with
       [ (Istr2New _ fn, Istr2New _ sn) ->
@@ -1287,6 +1271,21 @@ value get_birth_src = let f pf = pf.get_birth_src in wrap_per f f f;
 value get_burial = let f pf = pf.get_burial in wrap_per f f f;
 value get_burial_place = let f pf = pf.get_burial_place in wrap_per f f f;
 value get_burial_src = let f pf = pf.get_burial_src in wrap_per f f f;
+value get_death = let f pf = pf.get_death in wrap_per f f f;
+value get_death_place = let f pf = pf.get_death_place in wrap_per f f f;
+value get_death_src = let f pf = pf.get_death_src in wrap_per f f f;
+value get_first_name = let f pf = pf.get_first_name in wrap_per f f f;
+value get_first_names_aliases =
+  let f pf = pf.get_first_names_aliases in
+  wrap_per f f f
+;
+value get_image = let f pf = pf.get_image in wrap_per f f f;
+value get_key_index = let f pf = pf.get_key_index in wrap_per f f f;
+value get_notes = let f pf = pf.get_notes in wrap_per f f f;
+value get_occ = let f pf = pf.get_occ in wrap_per f f f;
+value get_occupation = let f pf = pf.get_occupation in wrap_per f f f;
+value get_psources = let f pf = pf.get_psources in wrap_per f f f;
+value get_public_name = let f pf = pf.get_public_name in wrap_per f f f;
 
 value person_with_key = let f pf = pf.person_with_key in wrap_per f f f;
 value gen_person_of_person =
@@ -1455,12 +1454,16 @@ classe base1 base =
     methode empty_person ip = Person (empty_person (Adef.istr_of_int 0) ip);
     methode person_of_gen_person p =
       Person (map_person_ps (fun p -> p) un_istr p);
-    methode ascend_of_gen_ascend a = Ascend a;
-    methode union_of_gen_union u = Union u;
+    methode ascend_of_gen_ascend a =
+      Ascend a;
+    methode union_of_gen_union u =
+      Union u;
     methode family_of_gen_family f =
       Family (map_family_ps (fun p -> p) un_istr f);
-    methode couple_of_gen_couple c = Couple c;
-    methode descend_of_gen_descend d = Descend d;
+    methode couple_of_gen_couple c =
+      Couple c;
+    methode descend_of_gen_descend d =
+      Descend d;
     methode poi i = Person (base.data.persons.get (Adef.int_of_iper i));
     methode aoi i = Ascend (base.data.ascends.get (Adef.int_of_iper i));
     methode uoi i = Union (base.data.unions.get (Adef.int_of_iper i));
@@ -1978,6 +1981,18 @@ type person_fun 'a =
     get_burial : 'a -> Def.burial;
     get_burial_place : 'a -> istr;
     get_burial_src : 'a -> istr;
+    get_death : 'a -> Def.death;
+    get_death_place : 'a -> istr;
+    get_death_src : 'a -> istr;
+    get_first_name : 'a -> istr;
+    get_first_names_aliases : 'a -> list istr;
+    get_image : 'a -> istr;
+    get_key_index : 'a -> iper;
+    get_notes : 'a -> istr;
+    get_occ : 'a -> int;
+    get_occupation : 'a -> istr;
+    get_psources : 'a -> istr;
+    get_public_name : 'a -> istr;
     person_with_key : 'a -> istr -> istr -> int -> person;
     gen_person_of_person : 'a -> Def.gen_person iper istr }
 ;
@@ -1991,7 +2006,17 @@ value person1_fun =
    get_birth_place p = Istr p.Def.birth_place;
    get_birth_src p = Istr p.Def.birth_src; get_burial p = p.Def.burial;
    get_burial_place p = Istr p.Def.burial_place;
-   get_burial_src p = Istr p.Def.burial_src;
+   get_burial_src p = Istr p.Def.burial_src; get_death p = p.Def.death;
+   get_death_place p = Istr p.Def.death_place;
+   get_death_src p = Istr p.Def.death_src;
+   get_first_name p = Istr p.Def.first_name;
+   get_first_names_aliases p =
+     List.map (fun i -> Istr i) p.Def.first_names_aliases;
+   get_image p = Istr p.Def.image; get_key_index p = p.Def.key_index;
+   get_notes p = Istr p.Def.notes; get_occ p = p.Def.occ;
+   get_occupation p = Istr p.Def.occupation;
+   get_psources p = Istr p.Def.psources;
+   get_public_name p = Istr p.Def.public_name;
    person_with_key p fn sn oc =
      match (fn, sn) with
      [ (Istr fn, Istr sn) ->
@@ -2021,6 +2046,27 @@ value person2_fun =
      get_burial (db2, i) = get_field db2 i ("person", "burial");
      get_burial_place (db2, i) = make_istr2 db2 ("person", "burial_place") i;
      get_burial_src (db2, i) = make_istr2 db2 ("person", "burial_src") i;
+     get_death (db2, i) = get_field db2 i ("person", "death");
+     get_death_place (db2, i) = make_istr2 db2 ("person", "death_place") i;
+     get_death_src (db2, i) = make_istr2 db2 ("person", "death_src") i;
+     get_first_name (db2, i) = make_istr2 db2 ("person", "first_name") i;
+     get_first_names_aliases (db2, i) =
+       let pos = get_field_acc db2 i ("person", "first_names_aliases") in
+       if pos = -1 then []
+       else
+         let list =
+           get_field_data db2 pos ("person", "first_names_aliases")
+             "data2.ext"
+         in
+         List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
+           list;
+     get_image (db2, i) = make_istr2 db2 ("person", "image") i;
+     get_key_index (db2, i) = Adef.iper_of_int i;
+     get_notes (db2, i) = make_istr2 db2 ("person", "notes") i;
+     get_occ (db2, i) = get_field db2 i ("person", "occ");
+     get_occupation (db2, i) = make_istr2 db2 ("person", "occupation") i;
+     get_psources (db2, i) = make_istr2 db2 ("person", "psources") i;
+     get_public_name (db2, i) = make_istr2 db2 ("person", "public_name") i;
      person_with_key (db2, i) fn sn oc =
        match (fn, sn) with
        [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -2033,22 +2079,24 @@ value person2_fun =
      gen_person_of_person (db2, i) =
        let p = Person2 db2 i in
        let pp = (db2, i) in
-       {first_name = get_first_name p; surname = get_surname p;
-        occ = get_occ p; image = get_image p; public_name = get_public_name p;
-        qualifiers = get_qualifiers p; aliases = self.get_aliases pp;
-        first_names_aliases = get_first_names_aliases p;
+       {first_name = self.get_first_name pp; surname = get_surname p;
+        occ = self.get_occ pp; image = self.get_image pp;
+        public_name = self.get_public_name pp; qualifiers = get_qualifiers p;
+        aliases = self.get_aliases pp;
+        first_names_aliases = self.get_first_names_aliases pp;
         surnames_aliases = get_surnames_aliases p; titles = get_titles p;
         rparents = get_rparents p; related = get_related p;
-        occupation = get_occupation p; sex = get_sex p;
+        occupation = self.get_occupation pp; sex = get_sex p;
         access = self.get_access pp; birth = self.get_birth pp;
         birth_place = self.get_birth_place pp;
         birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
         baptism_place = self.get_baptism_place pp;
-        baptism_src = self.get_baptism_src pp; death = get_death p;
-        death_place = get_death_place p; death_src = get_death_src p;
-        burial = self.get_burial pp; burial_place = self.get_burial_place pp;
-        burial_src = self.get_burial_src pp; notes = get_notes p;
-        psources = get_psources p; key_index = get_key_index p}}
+        baptism_src = self.get_baptism_src pp; death = self.get_death pp;
+        death_place = self.get_death_place pp;
+        death_src = self.get_death_src pp; burial = self.get_burial pp;
+        burial_place = self.get_burial_place pp;
+        burial_src = self.get_burial_src pp; notes = self.get_notes pp;
+        psources = self.get_psources pp; key_index = self.get_key_index pp}}
   in
   self
 ;
@@ -2065,6 +2113,19 @@ value person2gen_fun =
    get_burial (db2, p) = p.Def.burial;
    get_burial_place (db2, p) = Istr2New db2 p.Def.burial_place;
    get_burial_src (db2, p) = Istr2New db2 p.Def.burial_src;
+   get_death (db2, p) = p.Def.death;
+   get_death_place (db2, p) = Istr2New db2 p.Def.death_place;
+   get_death_src (db2, p) = Istr2New db2 p.Def.death_src;
+   get_first_name (db2, p) = Istr2New db2 p.Def.first_name;
+   get_first_names_aliases (db2, p) =
+     List.map (fun s -> Istr2New db2 s) p.Def.first_names_aliases;
+   get_image (db2, p) = Istr2New db2 p.Def.image;
+   get_key_index (db2, p) = p.Def.key_index;
+   get_notes (db2, p) = Istr2New db2 p.Def.notes;
+   get_occ (db2, p) = p.Def.occ;
+   get_occupation (db2, p) = Istr2New db2 p.Def.occupation;
+   get_psources (db2, p) = Istr2New db2 p.Def.psources;
+   get_public_name (db2, p) = Istr2New db2 p.Def.public_name;
    person_with_key (db2, p) fn sn oc =
      match (fn, sn) with
      [ (Istr2New _ fn, Istr2New _ sn) ->
@@ -2123,6 +2184,54 @@ value get_burial_place =
 ;
 value get_burial_src =
   let f pf = pf.get_burial_src in
+  wrap_per f f f
+;
+value get_death =
+  let f pf = pf.get_death in
+  wrap_per f f f
+;
+value get_death_place =
+  let f pf = pf.get_death_place in
+  wrap_per f f f
+;
+value get_death_src =
+  let f pf = pf.get_death_src in
+  wrap_per f f f
+;
+value get_first_name =
+  let f pf = pf.get_first_name in
+  wrap_per f f f
+;
+value get_first_names_aliases =
+  let f pf = pf.get_first_names_aliases in
+  wrap_per f f f
+;
+value get_image =
+  let f pf = pf.get_image in
+  wrap_per f f f
+;
+value get_key_index =
+  let f pf = pf.get_key_index in
+  wrap_per f f f
+;
+value get_notes =
+  let f pf = pf.get_notes in
+  wrap_per f f f
+;
+value get_occ =
+  let f pf = pf.get_occ in
+  wrap_per f f f
+;
+value get_occupation =
+  let f pf = pf.get_occupation in
+  wrap_per f f f
+;
+value get_psources =
+  let f pf = pf.get_psources in
+  wrap_per f f f
+;
+value get_public_name =
+  let f pf = pf.get_public_name in
   wrap_per f f f
 ;
 
@@ -2782,559 +2891,3 @@ value base_of_dsk_base b = base1 b;
 (* end of pretty printed code *)
 
 (**)
-
-(* Traces of changes; this is not correct because it supposes that calls
-   to poi, aoi, etc concerns the modified persons. However the code is
-   just commented, not deleted because it can be reused later to display
-   changes in persons and in families. *)
-
-(* but... two functions kept to preserve interface: *)
-
-value record_changes_in_file v = ();
-value commit_patches _ base = commit_patches base;
-
-(*
-value trace_patches_file = ref "";
-value record_changes_in_file v = trace_patches_file.val := v;
-
-value ini_per = Hashtbl.create 1;
-value ini_uni = Hashtbl.create 1;
-value ini_fam = Hashtbl.create 1;
-value ini_cpl = Hashtbl.create 1;
-value ini_des = Hashtbl.create 1;
-
-value res_per = Hashtbl.create 1;
-value res_uni = Hashtbl.create 1;
-value res_fam = Hashtbl.create 1;
-value res_cpl = Hashtbl.create 1;
-value res_des = Hashtbl.create 1;
-
-value string_escaped s =
-  let n = ref 0 in
-  do {
-    for i = 0 to String.length s - 1 do {
-      n.val :=
-        n.val +
-          (match String.unsafe_get s i with
-           [ '\\' | '\n' | '\t' -> 2
-           | c -> 1 ])
-    };
-    if n.val = String.length s then s
-    else do {
-      let s' = String.create n.val in
-      n.val := 0;
-      for i = 0 to String.length s - 1 do {
-        match String.unsafe_get s i with
-        [ '\\' as c -> do {
-            String.unsafe_set s' n.val '\\';
-            incr n;
-            String.unsafe_set s' n.val c
-          }
-        | '\n' -> do {
-            String.unsafe_set s' n.val '\\';
-            incr n;
-            String.unsafe_set s' n.val 'n'
-          }
-        | '\t' -> do {
-            String.unsafe_set s' n.val '\\';
-            incr n;
-            String.unsafe_set s' n.val 't'
-          }
-        | c ->
-            String.unsafe_set s' n.val c ];
-        incr n
-      };
-      s'
-    }
-  }
-;
-
-value code_dmy d =
-  if d.day = 0 then
-    if d.month = 0 then sprintf "%4d" d.year
-    else sprintf "%4d-%02d" d.year d.month
-  else sprintf "%4d-%02d-%02d" d.year d.month d.day
-;
-
-value string_of_prec_dmy s d =
-  match d.prec with
-  [ Sure -> s
-  | About -> "~" ^ s
-  | Before -> "<" ^ s
-  | After -> ">" ^ s
-  | Maybe -> "?" ^ s
-  | OrYear z -> s ^ " " ^ "or" ^ " " ^ string_of_int z
-  | YearInt z -> "bet " ^ s ^ " and " ^ string_of_int z ]
-;
-
-value string_of_dmy d = string_of_prec_dmy (code_dmy d) d;
-
-value string_of_date =
-  fun
-  [ Dgreg d _ -> string_of_dmy d
-  | Dtext t -> "(" ^ t ^ ")" ]
-;
-
-value string_of_codate if_d if_nd v =
-  match Adef.od_of_codate v with
-  [ Some d -> if_d ^ string_of_date d
-  | None -> if_nd ]
-;
-
-value string_of_per (fn, sn, occ, ip) =
-  if Adef.int_of_iper ip < 0 then "(nobody)"
-  else
-    sprintf "%s.%d %s" (if fn = "" then "?" else fn)
-      (if fn = "" || sn = "" then Adef.int_of_iper ip else occ)
-      (if sn = "" then "?" else sn)
-;
-
-value string_of_fam (fam, cpl, des) ifam =
-  if Adef.int_of_ifam ifam < 0 then "(deleted)"
-  else
-    let fath = Adef.father cpl in
-    let moth = Adef.mother cpl in
-    sprintf "%s + %s" (string_of_per fath) (string_of_per moth)
-;
-
-value fill_n = 21;
-
-value fill s =
-  let slen = String.length s in
-  let f = if slen < fill_n then String.make (fill_n - slen) '.' else "." in
-  s ^ f
-;
-
-value print_string_field oc tab name get ref v =
-  let ref = get ref in
-  let v = get v in
-  if v <> ref then fprintf oc "    %s%s%s\n" tab (fill name)
-    (string_escaped v)
-  else ()
-;
-
-value print_codate_field oc tab name get ref v =
-  let ref = get ref in
-  let v = get v in
-  if v <> ref then
-    fprintf oc "    %s%s%s\n" tab (fill name) (string_of_codate "" "" v)
-  else ()
-;
-
-value print_iper_field oc tab name get v = do {
-  let (fn, sn, occ, v) = get v in
-  fprintf oc "    %s%s" tab (fill name);
-  if Adef.int_of_iper v < 0 then fprintf oc ""
-  else fprintf oc "%s" (string_of_per (fn, sn, occ, v));
-  fprintf oc "\n";
-};
-
-type diff_kind = [ New | Bef | Aft ];
-
-value print_list_field print_item oc tab name1 name get ref v dk =
-  let ref = get ref in
-  let v = get v in
-  if v <> ref then
-    if v = [] then fprintf oc "    %s%s\n" tab (fill name1)
-    else
-      let name = if List.length v = 1 then name1 else name in
-      let a1 = Array.of_list ref in
-      let a2 = Array.of_list v in
-      let d2 =
-        match dk with
-        [ New -> [| |]
-        | Bef -> snd (Diff.f a1 a2)
-        | Aft -> fst (Diff.f a2 a1) ]
-      in
-      for i = 0 to Array.length a2 - 1 do {
-        fprintf oc "    %s%s" tab (fill (if i = 0 then name else ""));
-        print_item oc a2.(i);
-        match dk with
-        [ New -> ()
-        | Bef -> if d2.(i) then fprintf oc " -" else ()
-        | Aft -> if d2.(i) then fprintf oc " +" else () ];
-        fprintf oc "\n";
-      }
-  else ()
-;
-
-value print_string_list_field =
-  print_list_field (fun oc s -> fprintf oc "%s" (string_escaped s))
-;
-
-value print_iper_list_field =
-  print_list_field
-    (fun oc (fn, sn, occ, ip) ->
-       if Adef.int_of_iper ip < 0 then fprintf oc ""
-       else fprintf oc "%s" (string_of_per (fn, sn, occ, ip)))
-;
-
-value print_diff_per oc tab refpu pu dk = do {
-  let (ref, refu) = refpu in
-  let (p, u) = pu in
-  print_string_field oc tab "first_name" (fun p -> p.first_name) ref p;
-  print_string_field oc tab "surname" (fun p -> p.surname) ref p;
-  if p.occ <> ref.occ then fprintf oc "    %s%s%d\n" tab (fill "occ") p.occ
-  else ();
-  print_string_field oc tab "image" (fun p -> p.image) ref p;
-  print_string_field oc tab "public_name" (fun p -> p.public_name) ref p;
-  print_string_list_field oc tab "qualifier" "qualifiers"
-    (fun p -> p.qualifiers) ref p dk;
-  print_string_list_field oc tab "alias" "aliases" (fun p -> p.aliases) ref p
-    dk;
-  print_string_list_field oc tab "first_name_alias" "first_names_aliases"
-    (fun p -> p.first_names_aliases) ref p dk;
-  print_string_list_field oc tab "surname_alias" "surnames_aliases"
-    (fun p -> p.surnames_aliases) ref p dk;
-  print_list_field
-    (fun oc tit ->
-       fprintf oc "%s/%s/%s/%s/%s/%s"
-         tit.t_ident tit.t_place
-         (string_of_codate "" "" tit.t_date_start)
-         (string_of_codate "" "" tit.t_date_end)
-         (if tit.t_nth = 0 then "" else string_of_int tit.t_nth)
-         (match tit.t_name with
-          [ Tmain -> "*" | Tname n -> n | Tnone -> "" ]))
-    oc tab "title" "titles" (fun p -> p.titles) ref p dk;
-  print_list_field
-    (fun oc r ->
-       fprintf oc "%s/%s/%s/%s"
-         (match r.r_type with
-          [ Adoption -> "adop"
-          | Recognition -> "reco"
-          | CandidateParent -> "candp"
-          | GodParent -> "godp"
-          | FosterParent -> "fostp" ])
-         (match r.r_fath with
-          [ Some p -> string_of_per p
-          | None -> "" ])
-         (match r.r_moth with
-          [ Some p -> string_of_per p
-          | None -> "" ])
-         r.r_sources)
-    oc tab "relation" "relations" (fun p -> p.rparents) ref p dk;
-  print_string_field oc tab "occupation" (fun p -> p.occupation) ref p;
-  if p.sex <> ref.sex then
-    fprintf oc "    %s%s%s\n" tab (fill "sex")
-      (match p.sex with [ Male -> "M" | Female -> "F" | Neuter -> "?" ])
-  else ();
-  if p.access <> ref.access then
-    fprintf oc "    %s%s%s\n" tab (fill "access")
-      (match p.access with
-       [ IfTitles -> "if-titles" | Public -> "public" | Private -> "private" ])
-  else ();
-  print_codate_field oc tab "birth_date" (fun p -> p.birth) ref p;
-  print_string_field oc tab "birth_place" (fun p -> p.birth_place) ref p;
-  print_string_field oc tab "birth_src" (fun p -> p.birth_src) ref p;
-  print_codate_field oc tab "baptism_date" (fun p -> p.baptism) ref p;
-  print_string_field oc tab "baptism_place" (fun p -> p.baptism_place) ref p;
-  print_string_field oc tab "baptism_src" (fun p -> p.baptism_src) ref p;
-  if p.death <> ref.death then
-    fprintf oc "    %s%s%s\n" tab (fill "death")
-      (match p.death with
-       [ NotDead -> "not dead"
-       | Death dr cd ->
-           let drs =
-             match dr with
-             [ Killed -> " (killed)"
-             | Murdered -> " (murdered)"
-             | Executed -> " (executed)"
-             | Disappeared -> " (disappeared)"
-             | Unspecified -> "" ] 
-           in
-           string_of_date (Adef.date_of_cdate cd) ^ drs
-       | DeadYoung -> "dead young"
-       | DeadDontKnowWhen -> "dead"
-       | DontKnowIfDead -> "" ])
-  else ();
-  print_string_field oc tab "death_place" (fun p -> p.death_place) ref p;
-  print_string_field oc tab "death_src" (fun p -> p.death_src) ref p;
-  if p.burial <> ref.burial then
-    fprintf oc "    %s%s\n" tab
-      (match p.burial with
-       [ UnknownBurial -> fill "burial"
-       | Buried cd -> fill "buried" ^ string_of_codate " " "" cd
-       | Cremated cd -> fill "cremated" ^ string_of_codate " " "" cd ])
-  else ();
-  print_string_field oc tab "burial_place" (fun p -> p.burial_place) ref p;
-  print_string_field oc tab "burial_src" (fun p -> p.burial_src) ref p;
-  print_string_field oc tab "notes" (fun p -> p.notes) ref p;
-  print_string_field oc tab "sources" (fun p -> p.psources) ref p;
-  print_list_field (fun oc spouse -> fprintf oc "%s" (string_of_per spouse))
-    oc tab "union" "unions" (fun (_, u) -> Array.to_list u.family)
-    refpu pu dk;
-};
-
-value print_diff_fam oc tab parents_already_printed ref fam dk = do {
-  if parents_already_printed then ()
-  else do {
-    print_iper_field oc tab "father" (fun (_, c, _) -> Adef.father c) fam;
-    print_iper_field oc tab "mother" (fun (_, c, _) -> Adef.mother c) fam;
-  };
-  print_iper_list_field oc tab "child" "children"
-    (fun (_, _, d) -> Array.to_list d.children) ref fam dk;
-  print_codate_field oc tab "marriage_date" (fun (f, _, _) -> f.marriage)
-    ref fam;
-  print_string_field oc tab "marriage_place"
-    (fun (f, _, _) -> f.marriage_place) ref fam;
-  print_string_field oc tab "marriage_src"
-    (fun (f, _, _) -> f.marriage_src) ref fam;
-  let (f, _, _) = fam in
-  let (rf, _, _) = ref in
-  print_iper_list_field oc tab "witness" "witnesses"
-    (fun (f, _, _) -> Array.to_list f.witnesses) ref fam dk;
-  if f.relation <> rf.relation then
-    fprintf oc "    %s%s\n" tab
-      (match f.relation with
-       [ Married -> "married"
-       | NotMarried -> "not married"
-       | Engaged -> "engaged"
-       | NoSexesCheckNotMarried -> "not married (no sexes check)"
-       | NoMention -> "-"
-       | NoSexesCheckMarried -> "married (no sexes check)" ])
-  else ();
-  if f.divorce <> rf.divorce then
-    fprintf oc "    %s... (divorce)\n" tab
-  else ();
-  print_string_field oc tab "comment" (fun (f, _, _) -> f.comment) ref fam;
-  print_string_field oc tab "origin_file" (fun (f, _, _) -> f.origin_file)
-    ref fam;
-  print_string_field oc tab "sources" (fun (f, _, _) -> f.fsources) ref fam;
-};
-
-module IpSet = Set.Make (struct type t = iper; value compare = compare; end);
-module IfSet = Set.Make (struct type t = ifam; value compare = compare; end);
-
-value default_per =
-  {first_name = ""; surname = ""; occ = 0; image = "";
-   first_names_aliases = []; surnames_aliases = []; public_name = "";
-   qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
-   occupation = ""; sex = Neuter; access = IfTitles;
-   birth = Adef.codate_None; birth_place = ""; birth_src = "";
-   baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
-   death = DontKnowIfDead; death_place = ""; death_src = "";
-   burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
-   psources = ""; key_index = Adef.iper_of_int 0}
-;
-value default_uni = {family = [| |]};
-value default_pu = (default_per, default_uni);
-
-value default_fam =
-  {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
-   witnesses = [| |]; relation = Married; divorce = NotDivorced;
-   comment = ""; origin_file = ""; fsources = "";
-   fam_index = Adef.ifam_of_int 0}
-;
-value default_cpl =
-  couple (("", "", 0, Adef.iper_of_int (-1)))
-    (("", "", 0, Adef.iper_of_int (-1)))
-;
-value default_des = {children = [| |]};
-value default_fcd = (default_fam, default_cpl, default_des);
-
-value person_key base ht_per ip =
-  if Adef.int_of_iper ip < 0 then ("", "", 0, ip)
-  else
-    let p =
-      match try Some (Hashtbl.find ht_per ip) with [ Not_found -> None ] with
-      [ Some p -> p
-      | None -> poi base ip ]
-    in
-    (Name.lower (nominative (sou base (get_first_name p))),
-     Name.lower (nominative (sou base (get_surname p))),
-     get_occ p, ip)
-;
-
-value commit_patches confo base = do {
-  if trace_patches_file.val <> "" then do {
-    let oc =
-      open_out_gen [Open_wronly; Open_append; Open_creat] 0o666
-        trace_patches_file.val
-    in
-    match confo with
-    [ Some conf ->
-        let (hh, mm, ss) = conf.time in
-        fprintf oc "\ncommit %4d-%02d-%02d %02d:%02d:%02d \"%s\"%s\n"
-          conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-          (try " " ^ List.assoc "m" conf.env with [ Not_found -> "" ])
-    | None -> () ];
-    let per_set =
-      let set = IpSet.empty in
-      let set = Hashtbl.fold (fun ip _ -> IpSet.add ip) res_per set in
-      let set = Hashtbl.fold (fun ip _ -> IpSet.add ip) res_uni set in
-      set
-    in
-    let fam_set =
-      let set = IfSet.empty in
-      let set = Hashtbl.fold (fun ip _ -> IfSet.add ip) res_fam set in
-      let set = Hashtbl.fold (fun ip _ -> IfSet.add ip) res_cpl set in
-      let set = Hashtbl.fold (fun ip _ -> IfSet.add ip) res_des set in
-      set
-    in
-    IfSet.iter
-      (fun ifam -> do {
-         let is_new =
-           not
-             (Hashtbl.mem ini_fam ifam || Hashtbl.mem ini_cpl ifam ||
-              Hashtbl.mem ini_des ifam)
-         in
-         let fcd_from_ht (ht_fam, ht_cpl, ht_des) =
-           (try
-              map_family_ps (person_key base ini_per) (sou base)
-                (gen_family_of_family (Hashtbl.find ht_fam ifam))
-            with
-            [ Not_found -> default_fam ],
-            try
-              map_couple_p False (person_key base ini_per)
-                (gen_couple_of_couple (Hashtbl.find ht_cpl ifam))
-            with
-            [ Not_found -> default_cpl ],
-            try
-              map_descend_p (person_key base ini_per)
-                (gen_descend_of_descend (Hashtbl.find ht_des ifam))
-            with
-            [ Not_found -> default_des ])
-         in
-         let fcd2 = fcd_from_ht (res_fam, res_cpl, res_des) in
-         if is_new then do {
-           fprintf oc "\n  family = %s (new)\n" (string_of_fam fcd2 ifam);
-           print_diff_fam oc "" True default_fcd fcd2 New;
-         }
-         else do {
-           let fcd1 = fcd_from_ht (ini_fam, ini_cpl, ini_des) in
-           let s1 = string_of_fam fcd1 ifam in
-           let s2 = string_of_fam fcd2 ifam in
-           fprintf oc "\n  family%s\n" (if s1 = s2 then " = " ^ s1 else "");
-           fprintf oc "    before\n";
-           print_diff_fam oc "  " (s1 = s2) fcd2 fcd1 Bef;
-           fprintf oc "    after\n";
-           print_diff_fam oc "  " (s1 = s2) fcd1 fcd2 Aft;
-         }
-       })
-      fam_set;
-    IpSet.iter
-      (fun ip -> do {
-         let is_new =
-           not (Hashtbl.mem ini_per ip || Hashtbl.mem ini_uni ip)
-         in
-         let (fn, sn, occ, _) =
-           person_key base (if is_new then res_per else ini_per) ip
-         in
-         fprintf oc "\n  person = %s%s\n" (string_of_per (fn, sn, occ, ip))
-           (if is_new then " (new)" else "");
-         let spouse ip cpl =
-           let s = get_father cpl in
-           if ip = s then get_mother cpl else s
-         in
-         let pu_from_ht (ht_per, ht_uni) =
-           (try
-              map_person_ps (person_key base ini_per) (sou base)
-                (gen_person_of_person
-                   (try Hashtbl.find ht_per ip with
-                    [ Not_found ->
-                        if is_new then raise Not_found else poi base ip ]))
-            with
-            [ Not_found -> default_per ],
-            try
-              map_union_f
-                (fun ifam ->
-                   person_key base ini_per (spouse ip (coi base ifam)))
-                (gen_union_of_union
-                   (try Hashtbl.find ht_uni ip with
-                    [ Not_found ->
-                        if is_new then raise Not_found else uoi base ip ]))
-            with
-            [ Not_found -> default_uni ])
-         in
-         let pu2 = pu_from_ht (res_per, res_uni) in
-         if is_new then print_diff_per oc "" default_pu pu2 New
-         else do {
-           let pu1 = pu_from_ht (ini_per, ini_uni) in
-           fprintf oc "    before\n";
-           print_diff_per oc "  " pu2 pu1 Bef;
-           fprintf oc "    after\n";
-           print_diff_per oc "  " pu1 pu2 Aft;
-         }
-       })
-      per_set;
-    close_out oc;
-  }
-  else ();
-  commit_patches base;
-};
-
-value poi base i = do {
-  let p = poi base i in
-  if trace_patches_file.val <> "" then do {
-    if Hashtbl.mem ini_per i || Hashtbl.mem res_per i then ()
-    else Hashtbl.add ini_per i p;
-  }
-  else ();
-  p
-};
-
-value uoi base i = do {
-  let u = uoi base i in
-  if trace_patches_file.val <> "" then do {
-    if Hashtbl.mem ini_uni i || Hashtbl.mem res_uni i then ()
-    else Hashtbl.add ini_uni i u;
-  }
-  else ();
-  u
-};
-
-value foi base i = do {
-  let f = foi base i in
-  if trace_patches_file.val <> "" then do {
-    if Hashtbl.mem ini_fam i || Hashtbl.mem res_fam i then ()
-    else Hashtbl.add ini_fam i f;
-  }
-  else ();
-  f
-};
-
-value coi base i = do {
-  let c = coi base i in
-  if trace_patches_file.val <> "" then do {
-    if Hashtbl.mem ini_cpl i || Hashtbl.mem res_cpl i then ()
-    else Hashtbl.add ini_cpl i c;
-  }
-  else ();
-  c
-};
-
-value doi base i = do {
-  let d = doi base i in
-  if trace_patches_file.val <> "" then do {
-    if Hashtbl.mem ini_des i || Hashtbl.mem res_des i then ()
-    else Hashtbl.add ini_des i d;
-  }
-  else ();
-  d
-};
-
-value patch_person base ip p = do {
-  if trace_patches_file.val <> "" then Hashtbl.replace res_per ip p else ();
-  patch_person base ip p;
-};
-
-value patch_union base ip u = do {
-  if trace_patches_file.val <> "" then Hashtbl.replace res_uni ip u else ();
-  patch_union base ip u;
-};
-
-value patch_family base ifam f = do {
-  if trace_patches_file.val <> "" then Hashtbl.replace res_fam ifam f else ();
-  patch_family base ifam f;
-};
-
-value patch_descend base ifam d = do {
-  if trace_patches_file.val <> "" then Hashtbl.replace res_des ifam d else ();
-  patch_descend base ifam d;
-};
-
-value patch_couple base ifam c = do {
-  if trace_patches_file.val <> "" then Hashtbl.replace res_cpl ifam c else ();
-  patch_couple base ifam c;
-};
-*)
