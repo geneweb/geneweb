@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.89 2006-12-21 14:59:52 ddr Exp $ *)
+(* $Id: util.ml,v 5.90 2006-12-22 06:39:44 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2450,7 +2450,7 @@ value update_wf_trace conf fname =
 
 value commit_patches conf base =
   do {
-    commit_patches (Some conf) base;
+    Gwdb.commit_patches base;
     conf.henv :=
       List.map
         (fun (k, v) ->
