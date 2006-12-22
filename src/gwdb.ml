@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.172 2006-12-22 07:16:51 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.173 2006-12-22 07:37:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -45,11 +45,6 @@ type istr =
   | Istr2New of db2 and string ]
 ;
 
-type person =
-  [ Person of dsk_person
-  | Person2 of db2 and int
-  | Person2Gen of db2 and gen_person iper string ]
-;
 type ascend =
   [ Ascend of dsk_ascend
   | Ascend2 of db2 and int
@@ -179,21 +174,6 @@ value un_istr2 =
   [ Istr _ -> failwith "un_istr2 1"
   | Istr2 _ _ _ -> failwith "un_istr2 2"
   | Istr2New _ s -> s ]
-;
-
-value person_with_rparents p r =
-  match p with
-  [ Person p ->
-      let r = List.map (map_relation_ps (fun p -> p) un_istr) r in
-      Person {(p) with rparents = r}
-  | Person2 _ _ -> failwith "not impl person_with_rparents"
-  | Person2Gen _ _ -> failwith "not impl person_with_rparents (gen)" ]
-;
-value person_with_sex p s =
-  match p with
-  [ Person p -> Person {(p) with sex = s}
-  | Person2 _ _ -> failwith "not impl person_with_sex"
-  | Person2Gen db2 p -> Person2Gen db2 {(p) with sex = s} ]
 ;
 
 value no_consang = Adef.fix (-1);
@@ -706,13 +686,6 @@ value read_notes bname fnotes rn_mode =
   | None -> "" ]
 ;
 
-value dsk_person_of_person =
-  fun
-  [ Person p -> p
-  | Person2 _ _ -> failwith "not impl dsk_person_of_person"
-  | Person2Gen _ _ -> failwith "not impl dsk_person_of_person (gen)" ]
-;
-
 value check_magic ic magic id = do {
   let b = String.create (String.length magic) in
   really_input ic b 0 (String.length b);
@@ -923,6 +896,12 @@ value base_of_base2 bname =
     ;
   END;
 
+type person =
+  [ Person of dsk_person
+  | Person2 of db2 and int
+  | Person2Gen of db2 and gen_person iper string ]
+;
+
 classe virtuelle person_fun 'a =
   objet
     methode get_access : 'a -> access;
@@ -957,7 +936,10 @@ classe virtuelle person_fun 'a =
     methode get_titles : 'a -> list title;
     methode person_with_key : 'a -> istr -> istr -> int -> person;
     methode person_with_related : 'a -> list iper -> person;
+    methode person_with_rparents : 'a -> list relation -> person;
+    methode person_with_sex : 'a -> Def.sex -> person;
     methode gen_person_of_person : 'a -> Def.gen_person iper istr;
+    methode dsk_person_of_person : 'a -> Dbdisk.dsk_person;
   fin
 ;
 
@@ -1005,8 +987,14 @@ classe person1_fun =
       | _ -> assert False ]
     ;
     methode person_with_related p r = Person {(p) with related = r};
+    methode person_with_rparents p r =
+      let r = List.map (map_relation_ps (fun p -> p) un_istr) r in
+      Person {(p) with rparents = r}
+    ;
+    methode person_with_sex p s = Person {(p) with sex = s};
     methode gen_person_of_person p =
       map_person_ps (fun p -> p) (fun s -> Istr s) p;
+    methode dsk_person_of_person p = p;
   fin
 ;
 
@@ -1123,6 +1111,10 @@ classe person2_fun =
     ;
     methode person_with_related (db2, i) r =
       failwith "not impl person_with_related";
+    methode person_with_rparents (db2, i) r =
+      failwith "not impl person_with_rparents";
+    methode person_with_sex (db2, i) s =
+      failwith "not impl person_with_sex";
     methode gen_person_of_person pp =
       {first_name = self.get_first_name pp; surname = self.get_surname pp;
        occ = self.get_occ pp; image = self.get_image pp;
@@ -1143,6 +1135,8 @@ classe person2_fun =
        burial_src = self.get_burial_src pp; notes = self.get_notes pp;
        psources = self.get_psources pp; key_index = self.get_key_index pp}
     ;
+    methode dsk_person_of_person p =
+      failwith "not impl dsk_person_of_person";
   fin
 ;
 
@@ -1195,9 +1189,13 @@ classe person2gen_fun =
     ;
     methode person_with_related (db2, p) r =
       failwith "not impl person_with_related (gen)";
+    methode person_with_rparents (db2, p) r =
+      failwith "not impl person_with_rparents (gen)";
+    methode person_with_sex (db2, p) s = Person2Gen db2 {(p) with sex = s};
     methode gen_person_of_person (db2, p) =
-      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p
-    ;
+      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p;
+    methode dsk_person_of_person (db2, p) =
+      failwith "not impl dsk_person_of_person (gen)";
   fin
 ;
 
@@ -1250,8 +1248,17 @@ value person_with_related =
   let f pf = pf.person_with_related in
   wrap_per f f f
 ;
+value person_with_rparents =
+  let f pf = pf.person_with_rparents in
+  wrap_per f f f
+;
+value person_with_sex = let f pf = pf.person_with_sex in wrap_per f f f;
 value gen_person_of_person =
   let f pf = pf.gen_person_of_person in
+  wrap_per f f f
+;
+value dsk_person_of_person =
+  let f pf = pf.dsk_person_of_person in
   wrap_per f f f
 ;
 
@@ -1931,6 +1938,12 @@ value base_of_dsk_base b = base1 b;
 
 (* This code is a pretty print of the code above from '#load "pragma.cmo"' *)
 
+type person =
+  [ Person of dsk_person
+  | Person2 of db2 and int
+  | Person2Gen of db2 and gen_person iper string ]
+;
+
 type person_fun 'a =
   { get_access : 'a -> access;
     get_aliases : 'a -> list istr;
@@ -1964,7 +1977,10 @@ type person_fun 'a =
     get_titles : 'a -> list title;
     person_with_key : 'a -> istr -> istr -> int -> person;
     person_with_related : 'a -> list iper -> person;
-    gen_person_of_person : 'a -> Def.gen_person iper istr }
+    person_with_rparents : 'a -> list relation -> person;
+    person_with_sex : 'a -> Def.sex -> person;
+    gen_person_of_person : 'a -> Def.gen_person iper istr;
+    dsk_person_of_person : 'a -> Dbdisk.dsk_person }
 ;
 
 value person1_fun =
@@ -2001,7 +2017,12 @@ value person1_fun =
          Person {(p) with first_name = fn; surname = sn; occ = oc}
      | _ -> assert False ];
    person_with_related p r = Person {(p) with related = r};
-   gen_person_of_person p = map_person_ps (fun p -> p) (fun s -> Istr s) p}
+   person_with_rparents p r =
+     let r = List.map (map_relation_ps (fun p -> p) un_istr) r in
+     Person {(p) with rparents = r};
+   person_with_sex p s = Person {(p) with sex = s};
+   gen_person_of_person p = map_person_ps (fun p -> p) (fun s -> Istr s) p;
+   dsk_person_of_person p = p}
 ;
 
 value person2_fun =
@@ -2102,6 +2123,9 @@ value person2_fun =
            Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
        | _ -> failwith "not impl person_with_key 2" ];
      person_with_related (db2, i) r = failwith "not impl person_with_related";
+     person_with_rparents (db2, i) r =
+       failwith "not impl person_with_rparents";
+     person_with_sex (db2, i) s = failwith "not impl person_with_sex";
      gen_person_of_person pp =
        {first_name = self.get_first_name pp; surname = self.get_surname pp;
         occ = self.get_occ pp; image = self.get_image pp;
@@ -2120,7 +2144,8 @@ value person2_fun =
         death_src = self.get_death_src pp; burial = self.get_burial pp;
         burial_place = self.get_burial_place pp;
         burial_src = self.get_burial_src pp; notes = self.get_notes pp;
-        psources = self.get_psources pp; key_index = self.get_key_index pp}}
+        psources = self.get_psources pp; key_index = self.get_key_index pp};
+     dsk_person_of_person p = failwith "not impl dsk_person_of_person"}
   in
   self
 ;
@@ -2170,8 +2195,13 @@ value person2gen_fun =
      | _ -> failwith "not impl person_with_key 3" ];
    person_with_related (db2, p) r =
      failwith "not impl person_with_related (gen)";
+   person_with_rparents (db2, p) r =
+     failwith "not impl person_with_rparents (gen)";
+   person_with_sex (db2, p) s = Person2Gen db2 {(p) with sex = s};
    gen_person_of_person (db2, p) =
-     map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p}
+     map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p;
+   dsk_person_of_person (db2, p) =
+     failwith "not impl dsk_person_of_person (gen)"}
 ;
 
 value wrap_per f g h p =
@@ -2310,178 +2340,188 @@ value person_with_related =
   let f pf = pf.person_with_related in
   wrap_per f f f
 ;
+value person_with_rparents =
+  let f pf = pf.person_with_rparents in
+  wrap_per f f f
+;
+value person_with_sex =
+  let f pf = pf.person_with_sex in
+  wrap_per f f f
+;
 value gen_person_of_person =
   let f pf = pf.gen_person_of_person in
   wrap_per f f f
 ;
+value dsk_person_of_person =
+  let f pf = pf.dsk_person_of_person in
+  wrap_per f f f
+;
 
-declare
-  type base =
-    { close_base : unit -> unit;
-      empty_person : iper -> person;
-      person_of_gen_person : Def.gen_person iper istr -> person;
-      ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
-      union_of_gen_union : Def.gen_union ifam -> union;
-      family_of_gen_family : Def.gen_family iper istr -> family;
-      couple_of_gen_couple : Def.gen_couple iper -> couple;
-      descend_of_gen_descend : Def.gen_descend iper -> descend;
-      poi : iper -> person;
-      aoi : iper -> ascend;
-      uoi : iper -> union;
-      foi : ifam -> family;
-      coi : ifam -> couple;
-      doi : ifam -> descend;
-      sou : istr -> string;
-      nb_of_persons : unit -> int;
-      nb_of_families : unit -> int;
-      patch_person : iper -> person -> unit;
-      patch_ascend : iper -> ascend -> unit;
-      patch_union : iper -> union -> unit;
-      patch_family : ifam -> family -> unit;
-      patch_descend : ifam -> descend -> unit;
-      patch_couple : ifam -> couple -> unit;
-      patch_key : iper -> string -> string -> int -> unit;
-      patch_name : string -> iper -> unit;
-      insert_string : string -> istr;
-      commit_patches : unit -> unit;
-      commit_notes : string -> string -> unit;
-      is_patched_person : iper -> bool;
-      patched_ascends : unit -> list iper;
-      output_consang_tab : array Adef.fix -> unit;
-      delete_family : ifam -> unit;
-      person_of_key : string -> string -> int -> option iper;
-      persons_of_name : string -> list iper;
-      persons_of_first_name : unit -> string_person_index;
-      persons_of_surname : unit -> string_person_index;
-      base_visible_get : (person -> bool) -> int -> bool;
-      base_visible_write : unit -> unit;
-      base_particles : unit -> list string;
-      base_strings_of_first_name : string -> list istr;
-      base_strings_of_surname : string -> list istr;
-      load_ascends_array : unit -> unit;
-      load_unions_array : unit -> unit;
-      load_couples_array : unit -> unit;
-      load_descends_array : unit -> unit;
-      load_strings_array : unit -> unit;
-      persons_array : unit -> (int -> person * int -> person -> unit);
-      ascends_array :
-        unit ->
-          (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit *
-           option (array Adef.fix));
-      base_notes_read : string -> string;
-      base_notes_read_first_line : string -> string;
-      base_notes_are_empty : string -> bool;
-      base_notes_origin_file : unit -> string;
-      base_notes_dir : unit -> string;
-      base_wiznotes_dir : unit -> string;
-      person_misc_names : person -> (person -> list title) -> list string;
-      nobtit : config -> person -> list title;
-      p_first_name : person -> string;
-      p_surname : person -> string;
-      date_of_last_change : string -> float;
-      apply_as_dsk_base : (Dbdisk.dsk_base -> unit) -> unit }
-  ;
-  module C_base :
-    sig
-      value delete_family : base -> ifam -> unit;
-      value person_misc_names :
-        base -> person -> (person -> list title) -> list string;
-      value nobtit : base -> config -> person -> list title;
-      value p_first_name : base -> person -> string;
-      value p_surname : base -> person -> string;
-    end =
-    struct
-      value husbands self p =
-        let u = self.uoi (get_key_index p) in
-        List.map
-          (fun ifam ->
-             let cpl = self.coi ifam in
-             let husband = self.poi (get_father cpl) in
-             let husband_surname = self.p_surname husband in
-             let husband_surnames_aliases =
-               List.map self.sou (get_surnames_aliases husband)
-             in
-             (husband_surname, husband_surnames_aliases))
-          (Array.to_list (get_family u))
-      ;
-      value father_titles_places self p nobtit =
-        match get_parents (self.aoi (get_key_index p)) with
-        [ Some ifam ->
-            let cpl = self.coi ifam in
-            let fath = self.poi (get_father cpl) in
-            List.map (fun t -> self.sou t.t_place) (nobtit fath)
-        | None -> [] ]
-      ;
-      value delete_family self ifam =
-        let cpl =
-          self.couple_of_gen_couple
-            (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-        in
-        let fam =
-          let empty = self.insert_string "" in
-          self.family_of_gen_family
-            {marriage = codate_None; marriage_place = empty;
-             marriage_src = empty; relation = Married; divorce = NotDivorced;
-             witnesses = [| |]; comment = empty; origin_file = empty;
-             fsources = empty; fam_index = Adef.ifam_of_int (-1)}
-        in
-        let des = self.descend_of_gen_descend {children = [| |]} in
-        do {
-          self.patch_family ifam fam;
-          self.patch_couple ifam cpl;
-          self.patch_descend ifam des
-        }
-      ;
-      value person_misc_names self p tit =
-        let sou = self.sou in
-        Futil.gen_person_misc_names (sou (get_first_name p))
-          (sou (get_surname p)) (sou (get_public_name p))
-          (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
-          (List.map sou (get_first_names_aliases p))
-          (List.map sou (get_surnames_aliases p))
-          (List.map (Futil.map_title_strings sou) (tit p))
-          (if get_sex p = Female then husbands self p else [])
-          (father_titles_places self p tit)
-      ;
-      value nobtit self conf p =
-        let list = get_titles p in
-        match Lazy.force conf.allowed_titles with
-        [ [] -> list
-        | allowed_titles ->
-            let list =
-              List.fold_right
-                (fun t l ->
+type base =
+  { close_base : unit -> unit;
+    empty_person : iper -> person;
+    person_of_gen_person : Def.gen_person iper istr -> person;
+    ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
+    union_of_gen_union : Def.gen_union ifam -> union;
+    family_of_gen_family : Def.gen_family iper istr -> family;
+    couple_of_gen_couple : Def.gen_couple iper -> couple;
+    descend_of_gen_descend : Def.gen_descend iper -> descend;
+    poi : iper -> person;
+    aoi : iper -> ascend;
+    uoi : iper -> union;
+    foi : ifam -> family;
+    coi : ifam -> couple;
+    doi : ifam -> descend;
+    sou : istr -> string;
+    nb_of_persons : unit -> int;
+    nb_of_families : unit -> int;
+    patch_person : iper -> person -> unit;
+    patch_ascend : iper -> ascend -> unit;
+    patch_union : iper -> union -> unit;
+    patch_family : ifam -> family -> unit;
+    patch_descend : ifam -> descend -> unit;
+    patch_couple : ifam -> couple -> unit;
+    patch_key : iper -> string -> string -> int -> unit;
+    patch_name : string -> iper -> unit;
+    insert_string : string -> istr;
+    commit_patches : unit -> unit;
+    commit_notes : string -> string -> unit;
+    is_patched_person : iper -> bool;
+    patched_ascends : unit -> list iper;
+    output_consang_tab : array Adef.fix -> unit;
+    delete_family : ifam -> unit;
+    person_of_key : string -> string -> int -> option iper;
+    persons_of_name : string -> list iper;
+    persons_of_first_name : unit -> string_person_index;
+    persons_of_surname : unit -> string_person_index;
+    base_visible_get : (person -> bool) -> int -> bool;
+    base_visible_write : unit -> unit;
+    base_particles : unit -> list string;
+    base_strings_of_first_name : string -> list istr;
+    base_strings_of_surname : string -> list istr;
+    load_ascends_array : unit -> unit;
+    load_unions_array : unit -> unit;
+    load_couples_array : unit -> unit;
+    load_descends_array : unit -> unit;
+    load_strings_array : unit -> unit;
+    persons_array : unit -> (int -> person * int -> person -> unit);
+    ascends_array :
+      unit ->
+        (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit *
+         option (array Adef.fix));
+    base_notes_read : string -> string;
+    base_notes_read_first_line : string -> string;
+    base_notes_are_empty : string -> bool;
+    base_notes_origin_file : unit -> string;
+    base_notes_dir : unit -> string;
+    base_wiznotes_dir : unit -> string;
+    person_misc_names : person -> (person -> list title) -> list string;
+    nobtit : config -> person -> list title;
+    p_first_name : person -> string;
+    p_surname : person -> string;
+    date_of_last_change : string -> float;
+    apply_as_dsk_base : (Dbdisk.dsk_base -> unit) -> unit }
+;
+module C_base :
+  sig
+    value delete_family : base -> ifam -> unit;
+    value person_misc_names :
+      base -> person -> (person -> list title) -> list string;
+    value nobtit : base -> config -> person -> list title;
+    value p_first_name : base -> person -> string;
+    value p_surname : base -> person -> string;
+  end =
+  struct
+    value husbands self p =
+      let u = self.uoi (get_key_index p) in
+      List.map
+        (fun ifam ->
+           let cpl = self.coi ifam in
+           let husband = self.poi (get_father cpl) in
+           let husband_surname = self.p_surname husband in
+           let husband_surnames_aliases =
+             List.map self.sou (get_surnames_aliases husband)
+           in
+           (husband_surname, husband_surnames_aliases))
+        (Array.to_list (get_family u))
+    ;
+    value father_titles_places self p nobtit =
+      match get_parents (self.aoi (get_key_index p)) with
+      [ Some ifam ->
+          let cpl = self.coi ifam in
+          let fath = self.poi (get_father cpl) in
+          List.map (fun t -> self.sou t.t_place) (nobtit fath)
+      | None -> [] ]
+    ;
+    value delete_family self ifam =
+      let cpl =
+        self.couple_of_gen_couple
+          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+      in
+      let fam =
+        let empty = self.insert_string "" in
+        self.family_of_gen_family
+          {marriage = codate_None; marriage_place = empty;
+           marriage_src = empty; relation = Married; divorce = NotDivorced;
+           witnesses = [| |]; comment = empty; origin_file = empty;
+           fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+      in
+      let des = self.descend_of_gen_descend {children = [| |]} in
+      do {
+        self.patch_family ifam fam;
+        self.patch_couple ifam cpl;
+        self.patch_descend ifam des
+      }
+    ;
+    value person_misc_names self p tit =
+      let sou = self.sou in
+      Futil.gen_person_misc_names (sou (get_first_name p))
+        (sou (get_surname p)) (sou (get_public_name p))
+        (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
+        (List.map sou (get_first_names_aliases p))
+        (List.map sou (get_surnames_aliases p))
+        (List.map (Futil.map_title_strings sou) (tit p))
+        (if get_sex p = Female then husbands self p else [])
+        (father_titles_places self p tit)
+    ;
+    value nobtit self conf p =
+      let list = get_titles p in
+      match Lazy.force conf.allowed_titles with
+      [ [] -> list
+      | allowed_titles ->
+          let list =
+            List.fold_right
+              (fun t l ->
+                 let id = Name.lower (self.sou t.t_ident) in
+                 let pl = Name.lower (self.sou t.t_place) in
+                 if pl = "" then
+                   if List.mem id allowed_titles then [t :: l] else l
+                 else if
+                   List.mem (id ^ "/" ^ pl) allowed_titles ||
+                   List.mem (id ^ "/*") allowed_titles
+                 then
+                   [t :: l]
+                 else l)
+              list []
+          in
+          match Lazy.force conf.denied_titles with
+          [ [] -> list
+          | denied_titles ->
+              List.filter
+                (fun t ->
                    let id = Name.lower (self.sou t.t_ident) in
                    let pl = Name.lower (self.sou t.t_place) in
-                   if pl = "" then
-                     if List.mem id allowed_titles then [t :: l] else l
-                   else if
-                     List.mem (id ^ "/" ^ pl) allowed_titles ||
-                     List.mem (id ^ "/*") allowed_titles
+                   if List.mem (id ^ "/" ^ pl) denied_titles ||
+                      List.mem ("*/" ^ pl) denied_titles
                    then
-                     [t :: l]
-                   else l)
-                list []
-            in
-            match Lazy.force conf.denied_titles with
-            [ [] -> list
-            | denied_titles ->
-                List.filter
-                  (fun t ->
-                     let id = Name.lower (self.sou t.t_ident) in
-                     let pl = Name.lower (self.sou t.t_place) in
-                     if List.mem (id ^ "/" ^ pl) denied_titles ||
-                        List.mem ("*/" ^ pl) denied_titles
-                     then
-                       False
-                     else True)
-                  list ] ]
-      ;
-      value p_first_name self p = nominative (self.sou (get_first_name p));
-      value p_surname self p = nominative (self.sou (get_surname p));
-    end
-  ;
-end;
+                     False
+                   else True)
+                list ] ]
+    ;
+    value p_first_name self p = nominative (self.sou (get_first_name p));
+    value p_surname self p = nominative (self.sou (get_surname p));
+  end
+;
 
 value base1 base =
   let base_strings_of_first_name_or_surname s =
