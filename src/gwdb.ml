@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.173 2006-12-22 07:37:04 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.174 2006-12-22 17:05:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -45,11 +45,6 @@ type istr =
   | Istr2New of db2 and string ]
 ;
 
-type ascend =
-  [ Ascend of dsk_ascend
-  | Ascend2 of db2 and int
-  | Ascend2Gen of db2 and gen_ascend ifam ]
-;
 type union =
   [ Union of dsk_union
   | Union2 of db2 and int
@@ -177,31 +172,6 @@ value un_istr2 =
 ;
 
 value no_consang = Adef.fix (-1);
-
-value get_consang =
-  fun
-  [ Ascend a -> a.Def.consang
-  | Ascend2 db2 i ->
-      match db2.consang_array with
-      [ Some tab -> tab.(i)
-      | None ->
-          try get_field db2 i ("person", "consang") with
-          [ Sys_error _ -> no_consang ] ]
-  | Ascend2Gen _ a -> a.Def.consang ]
-;
-
-value get_parents =
-  fun
-  [ Ascend a -> a.Def.parents
-  | Ascend2 db2 i ->
-      match db2.parents_array with
-      [ Some tab -> tab.(i)
-      | None ->
-          let pos = get_field_acc db2 i ("person", "parents") in
-          if pos = -1 then None
-          else Some (get_field_data db2 pos ("person", "parents") "data") ]
-  | Ascend2Gen _ a -> a.Def.parents ]
-;
 
 value empty_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
@@ -1199,8 +1169,8 @@ classe person2gen_fun =
   fin
 ;
 
-value wrap_per f g h p =
-  match p with
+value wrap_per f g h =
+  fun
   [ Person p -> f person1_fun p
   | Person2 db2 i -> g person2_fun (db2, i)
   | Person2Gen db2 p -> h person2gen_fun (db2, p) ]
@@ -1261,6 +1231,63 @@ value dsk_person_of_person =
   let f pf = pf.dsk_person_of_person in
   wrap_per f f f
 ;
+
+classe virtuelle ascend_fun 'a =
+  objet
+    methode get_consang : 'a -> Adef.fix;
+    methode get_parents : 'a -> option ifam;
+  fin
+;
+
+classe ascend1_fun =
+  objet
+    methode get_consang a = a.Def.consang;
+    methode get_parents a = a.Def.parents;
+  fin
+;
+
+classe ascend2_fun =
+  objet
+    methode get_consang (db2, i) =
+      match db2.consang_array with
+      [ Some tab -> tab.(i)
+      | None ->
+          try get_field db2 i ("person", "consang") with
+          [ Sys_error _ -> no_consang ] ]
+    ;
+    methode get_parents (db2, i) =
+      match db2.parents_array with
+      [ Some tab -> tab.(i)
+      | None ->
+          let pos = get_field_acc db2 i ("person", "parents") in
+          if pos = -1 then None
+          else Some (get_field_data db2 pos ("person", "parents") "data") ]
+    ;
+  fin
+;
+
+classe ascend2gen_fun =
+  objet
+    methode get_consang (db2, a) = a.Def.consang;
+    methode get_parents (db2, a) = a.Def.parents;
+  fin
+;
+
+type ascend =
+  [ Ascend of dsk_ascend
+  | Ascend2 of db2 and int
+  | Ascend2Gen of db2 and gen_ascend ifam ]
+;
+
+value wrap_asc f g h =
+  fun
+  [ Ascend a -> f ascend1_fun a
+  | Ascend2 db2 i -> g ascend2_fun (db2, i)
+  | Ascend2Gen db2 a -> h ascend2gen_fun (db2, a) ]
+;
+
+value get_consang = let f pf = pf.get_consang in wrap_asc f f f;
+value get_parents = let f pf = pf.get_parents in wrap_asc f f f;
 
 classe virtuelle base =
   objet (self)
@@ -2204,8 +2231,8 @@ value person2gen_fun =
      failwith "not impl dsk_person_of_person (gen)"}
 ;
 
-value wrap_per f g h p =
-  match p with
+value wrap_per f g h =
+  fun
   [ Person p -> f person1_fun p
   | Person2 db2 i -> g person2_fun (db2, i)
   | Person2Gen db2 p -> h person2gen_fun (db2, p) ]
@@ -2355,6 +2382,56 @@ value gen_person_of_person =
 value dsk_person_of_person =
   let f pf = pf.dsk_person_of_person in
   wrap_per f f f
+;
+
+type ascend_fun 'a =
+  { get_consang : 'a -> Adef.fix; get_parents : 'a -> option ifam }
+;
+
+value ascend1_fun =
+  {get_consang a = a.Def.consang; get_parents a = a.Def.parents}
+;
+
+value ascend2_fun =
+  {get_consang (db2, i) =
+     match db2.consang_array with
+     [ Some tab -> tab.(i)
+     | None ->
+         try get_field db2 i ("person", "consang") with
+         [ Sys_error _ -> no_consang ] ];
+   get_parents (db2, i) =
+     match db2.parents_array with
+     [ Some tab -> tab.(i)
+     | None ->
+         let pos = get_field_acc db2 i ("person", "parents") in
+         if pos = -1 then None
+         else Some (get_field_data db2 pos ("person", "parents") "data") ]}
+;
+
+value ascend2gen_fun =
+  {get_consang (db2, a) = a.Def.consang; get_parents (db2, a) = a.Def.parents}
+;
+
+type ascend =
+  [ Ascend of dsk_ascend
+  | Ascend2 of db2 and int
+  | Ascend2Gen of db2 and gen_ascend ifam ]
+;
+
+value wrap_asc f g h =
+  fun
+  [ Ascend a -> f ascend1_fun a
+  | Ascend2 db2 i -> g ascend2_fun (db2, i)
+  | Ascend2Gen db2 a -> h ascend2gen_fun (db2, a) ]
+;
+
+value get_consang =
+  let f pf = pf.get_consang in
+  wrap_asc f f f
+;
+value get_parents =
+  let f pf = pf.get_parents in
+  wrap_asc f f f
 ;
 
 type base =
