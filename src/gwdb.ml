@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.171 2006-12-22 06:39:44 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.172 2006-12-22 07:16:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -167,103 +167,6 @@ value is_quest_string =
   | Istr2New db2 s -> s = "?" ]
 ;
 
-value get_qualifiers =
-  fun
-  [ Person p -> List.map (fun i -> Istr i) p.Def.qualifiers
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "qualifiers") in
-      if pos = -1 then []
-      else
-        let list =
-          get_field_data db2 pos ("person", "qualifiers") "data2.ext"
-        in
-        List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list
-  | Person2Gen db2 p -> List.map (fun s -> Istr2New db2 s) p.Def.qualifiers ]
-;
-value get_related =
-  fun
-  [ Person p -> p.Def.related
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "related") in
-      loop [] pos where rec loop list pos =
-        if pos = -1 then List.rev list
-        else
-          let (ip, pos) =
-            get_field_2_data db2 pos ("person", "related") "data"
-          in
-          loop [ip :: list] pos
-  | Person2Gen db2 p -> p.Def.related ]
-;
-value get_rparents =
-  fun
-  [ Person p ->
-      List.map (map_relation_ps (fun x -> x) (fun i -> Istr i)) p.Def.rparents
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "rparents") in
-      if pos = -1 then []
-      else
-        let rl = get_field_data db2 pos ("person", "rparents") "data" in
-        List.map (* field "r_sources" is actually unused *)
-          (map_relation_ps (fun x -> x) (fun _ -> Istr2 db2 ("", "") (-1)))
-          rl
-  | Person2Gen db2 p ->
-      List.map (map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s))
-        p.Def.rparents ]
-;
-value get_sex =
-  fun
-  [ Person p -> p.Def.sex
-  | Person2 db2 i -> get_field db2 i ("person", "sex")
-  | Person2Gen db2 p -> p.Def.sex ]
-;
-value get_surname =
-  fun
-  [ Person p -> Istr p.Def.surname
-  | Person2 db2 i -> make_istr2 db2 ("person", "surname") i
-  | Person2Gen db2 p -> Istr2New db2 p.Def.surname ]
-;
-value get_surnames_aliases =
-  fun
-  [ Person p -> List.map (fun i -> Istr i) p.Def.surnames_aliases
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "surnames_aliases") in
-      if pos = -1 then []
-      else
-        let list =
-          get_field_data db2 pos ("person", "surnames_aliases") "data2.ext"
-        in
-        List.map
-          (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos) list
-  | Person2Gen db2 p ->
-      List.map (fun s -> Istr2New db2 s) p.Def.surnames_aliases ]
-;
-value get_titles =
-  fun
-  [ Person p ->
-      List.map (fun t -> map_title_strings (fun i -> Istr i) t)
-        p.Def.titles
-  | Person2 db2 i ->
-      let pos = get_field_acc db2 i ("person", "titles") in
-      if pos = -1 then []
-      else
-        let list =
-          get_field_data db2 pos ("person", "titles") "data2.ext"
-        in
-        List.map
-          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
-          list
-  | Person2Gen db2 p ->
-      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
-        p.Def.titles ]
-;
-
-value person_with_related p r =
-  match p with
-  [ Person p -> Person {(p) with related = r}
-  | Person2 _ _ -> failwith "not impl person_with_related"
-  | Person2Gen _ _ -> failwith "not impl person_with_related (gen)" ]
-;
-
 value un_istr =
   fun
   [ Istr i -> i
@@ -292,31 +195,6 @@ value person_with_sex p s =
   | Person2 _ _ -> failwith "not impl person_with_sex"
   | Person2Gen db2 p -> Person2Gen db2 {(p) with sex = s} ]
 ;
-
-(*
-value gen_person_of_person =
-  fun
-  [ Person p -> map_person_ps (fun p -> p) (fun s -> Istr s) p
-  | Person2 _ _ as p ->
-      {first_name = get_first_name p; surname = get_surname p;
-       occ = get_occ p; image = get_image p; public_name = get_public_name p;
-       qualifiers = get_qualifiers p; aliases = get_aliases p;
-       first_names_aliases = get_first_names_aliases p;
-       surnames_aliases = get_surnames_aliases p; titles = get_titles p;
-       rparents = get_rparents p; related = get_related p;
-       occupation = get_occupation p; sex = get_sex p; access = get_access p;
-       birth = get_birth p; birth_place = get_birth_place p;
-       birth_src = get_birth_src p; baptism = get_baptism p;
-       baptism_place = get_baptism_place p; baptism_src = get_baptism_src p;
-       death = get_death p; death_place = get_death_place p;
-       death_src = get_death_src p; burial = get_burial p;
-       burial_place = get_burial_place p; burial_src = get_burial_src p;
-       notes = get_notes p; psources = get_psources p;
-       key_index = get_key_index p}
-  | Person2Gen db2 p ->
-      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p ]
-;
-*)
 
 value no_consang = Adef.fix (-1);
 
@@ -520,23 +398,6 @@ value sou2 i =
   | Istr2New db2 s -> s
   | _ -> assert False ]
 ;
-
-(*
-value person_with_key p fn sn oc =
-  match (p, fn, sn) with
-  [ (Person p, Istr fn, Istr sn) ->
-      Person {(p) with first_name = fn; surname = sn; occ = oc}
-  | (Person2 db2 i, Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
-      failwith "not impl person_with_key 1"
-  | (Person2Gen db2 p, Istr2New _ fn, Istr2New _ sn) ->
-      Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
-  | (Person2 db2 i,  Istr2New _ fn, Istr2New _ sn) ->
-      let p = gen_person_of_person (Person2 db2 i) in
-      let p = map_person_ps (fun ip -> ip) sou2 p in
-      Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
-  | _ -> failwith "not impl person_with_key 2" ]
-;
-*)
 
 value is_deleted_family =
   fun
@@ -1087,7 +948,15 @@ classe virtuelle person_fun 'a =
     methode get_occupation : 'a -> istr;
     methode get_psources : 'a -> istr;
     methode get_public_name : 'a -> istr;
+    methode get_qualifiers : 'a -> list istr;
+    methode get_related : 'a -> list iper;
+    methode get_rparents : 'a -> list relation;
+    methode get_sex : 'a -> Def.sex;
+    methode get_surname : 'a -> istr;
+    methode get_surnames_aliases : 'a -> list istr;
+    methode get_titles : 'a -> list title;
     methode person_with_key : 'a -> istr -> istr -> int -> person;
+    methode person_with_related : 'a -> list iper -> person;
     methode gen_person_of_person : 'a -> Def.gen_person iper istr;
   fin
 ;
@@ -1118,12 +987,24 @@ classe person1_fun =
     methode get_occupation p = Istr p.Def.occupation;
     methode get_psources p = Istr p.Def.psources;
     methode get_public_name p = Istr p.Def.public_name;
+    methode get_qualifiers p = List.map (fun i -> Istr i) p.Def.qualifiers;
+    methode get_related p = p.Def.related;
+    methode get_rparents p =
+      List.map (map_relation_ps (fun x -> x) (fun i -> Istr i))
+        p.Def.rparents;
+    methode get_sex p = p.Def.sex;
+    methode get_surname p = Istr p.Def.surname;
+    methode get_surnames_aliases p =
+      List.map (fun i -> Istr i) p.Def.surnames_aliases;
+    methode get_titles p =
+      List.map (fun t -> map_title_strings (fun i -> Istr i) t) p.Def.titles;
     methode person_with_key p fn sn oc =
       match (fn, sn) with
       [ (Istr fn, Istr sn) ->
           Person {(p) with first_name = fn; surname = sn; occ = oc}
       | _ -> assert False ]
     ;
+    methode person_with_related p r = Person {(p) with related = r};
     methode gen_person_of_person p =
       map_person_ps (fun p -> p) (fun s -> Istr s) p;
   fin
@@ -1179,6 +1060,57 @@ classe person2_fun =
       make_istr2 db2 ("person", "psources") i;
     methode get_public_name (db2, i) =
       make_istr2 db2 ("person", "public_name") i;
+    methode get_qualifiers (db2, i) =
+      let pos = get_field_acc db2 i ("person", "qualifiers") in
+      if pos = -1 then []
+      else
+        let list =
+          get_field_data db2 pos ("person", "qualifiers") "data2.ext"
+        in
+        List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list
+    ;
+    methode get_related (db2, i) =
+      let pos = get_field_acc db2 i ("person", "related") in
+      loop [] pos where rec loop list pos =
+        if pos = -1 then List.rev list
+        else
+          let (ip, pos) =
+            get_field_2_data db2 pos ("person", "related") "data"
+          in
+          loop [ip :: list] pos
+    ;
+    methode get_rparents (db2, i) =
+      let pos = get_field_acc db2 i ("person", "rparents") in
+      if pos = -1 then []
+      else
+        let rl = get_field_data db2 pos ("person", "rparents") "data" in
+        List.map
+          (map_relation_ps (fun x -> x) (fun _ -> Istr2 db2 ("", "") (-1)))
+          rl
+    ;
+    methode get_sex (db2, i) = get_field db2 i ("person", "sex");
+    methode get_surname (db2, i) = make_istr2 db2 ("person", "surname") i;
+    methode get_surnames_aliases (db2, i) =
+      let pos = get_field_acc db2 i ("person", "surnames_aliases") in
+      if pos = -1 then []
+      else
+        let list =
+          get_field_data db2 pos ("person", "surnames_aliases") "data2.ext"
+        in
+        List.map
+          (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos) list
+    ;
+    methode get_titles (db2, i) =
+      let pos = get_field_acc db2 i ("person", "titles") in
+      if pos = -1 then []
+      else
+        let list =
+          get_field_data db2 pos ("person", "titles") "data2.ext"
+        in
+        List.map
+          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
+          list
+    ;
     methode person_with_key (db2, i) fn sn oc =
       match (fn, sn) with
       [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -1189,18 +1121,18 @@ classe person2_fun =
           Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
       | _ -> failwith "not impl person_with_key 2" ]
     ;
-    methode gen_person_of_person (db2, i) =
-      let p = Person2 db2 i in
-      let pp = (db2, i) in
-      {first_name = self.get_first_name pp; surname = get_surname p;
+    methode person_with_related (db2, i) r =
+      failwith "not impl person_with_related";
+    methode gen_person_of_person pp =
+      {first_name = self.get_first_name pp; surname = self.get_surname pp;
        occ = self.get_occ pp; image = self.get_image pp;
        public_name = self.get_public_name pp;
-       qualifiers = get_qualifiers p; aliases = self.get_aliases pp;
+       qualifiers = self.get_qualifiers pp; aliases = self.get_aliases pp;
        first_names_aliases = self.get_first_names_aliases pp;
-       surnames_aliases = get_surnames_aliases p; titles = get_titles p;
-       rparents = get_rparents p; related = get_related p;
-       occupation = self.get_occupation pp; sex = get_sex p;
-       access = self.get_access pp;
+       surnames_aliases = self.get_surnames_aliases pp;
+       titles = self.get_titles pp; rparents = self.get_rparents pp;
+       related = self.get_related pp; occupation = self.get_occupation pp;
+       sex = self.get_sex pp; access = self.get_access pp;
        birth = self.get_birth pp; birth_place = self.get_birth_place pp;
        birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
        baptism_place = self.get_baptism_place pp;
@@ -1241,12 +1173,28 @@ classe person2gen_fun =
     methode get_occupation (db2, p) = Istr2New db2 p.Def.occupation;
     methode get_psources (db2, p) = Istr2New db2 p.Def.psources;
     methode get_public_name (db2, p) = Istr2New db2 p.Def.public_name;
+    methode get_qualifiers (db2, p) =
+      List.map (fun s -> Istr2New db2 s) p.Def.qualifiers;
+    methode get_related (db2, p) = p.Def.related;
+    methode get_rparents (db2, p) =
+      List.map (map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s))
+        p.Def.rparents;
+    methode get_sex (db2, p) = p.Def.sex;
+    methode get_surname (db2, p) = Istr2New db2 p.Def.surname;
+    methode get_surnames_aliases (db2, p) =
+      List.map (fun s -> Istr2New db2 s) p.Def.surnames_aliases;
+    methode get_titles (db2, p) =
+      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
+        p.Def.titles
+    ;
     methode person_with_key (db2, p) fn sn oc =
       match (fn, sn) with
       [ (Istr2New _ fn, Istr2New _ sn) ->
           Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
       | _ -> failwith "not impl person_with_key 3" ]
     ;
+    methode person_with_related (db2, p) r =
+      failwith "not impl person_with_related (gen)";
     methode gen_person_of_person (db2, p) =
       map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p
     ;
@@ -1286,8 +1234,22 @@ value get_occ = let f pf = pf.get_occ in wrap_per f f f;
 value get_occupation = let f pf = pf.get_occupation in wrap_per f f f;
 value get_psources = let f pf = pf.get_psources in wrap_per f f f;
 value get_public_name = let f pf = pf.get_public_name in wrap_per f f f;
+value get_qualifiers = let f pf = pf.get_qualifiers in wrap_per f f f;
+value get_related = let f pf = pf.get_related in wrap_per f f f;
+value get_rparents = let f pf = pf.get_rparents in wrap_per f f f;
+value get_sex = let f pf = pf.get_sex in wrap_per f f f;
+value get_surname = let f pf = pf.get_surname in wrap_per f f f;
+value get_surnames_aliases =
+  let f pf = pf.get_surnames_aliases in
+  wrap_per f f f
+;
+value get_titles = let f pf = pf.get_titles in wrap_per f f f;
 
 value person_with_key = let f pf = pf.person_with_key in wrap_per f f f;
+value person_with_related =
+  let f pf = pf.person_with_related in
+  wrap_per f f f
+;
 value gen_person_of_person =
   let f pf = pf.gen_person_of_person in
   wrap_per f f f
@@ -1993,7 +1955,15 @@ type person_fun 'a =
     get_occupation : 'a -> istr;
     get_psources : 'a -> istr;
     get_public_name : 'a -> istr;
+    get_qualifiers : 'a -> list istr;
+    get_related : 'a -> list iper;
+    get_rparents : 'a -> list relation;
+    get_sex : 'a -> Def.sex;
+    get_surname : 'a -> istr;
+    get_surnames_aliases : 'a -> list istr;
+    get_titles : 'a -> list title;
     person_with_key : 'a -> istr -> istr -> int -> person;
+    person_with_related : 'a -> list iper -> person;
     gen_person_of_person : 'a -> Def.gen_person iper istr }
 ;
 
@@ -2017,11 +1987,20 @@ value person1_fun =
    get_occupation p = Istr p.Def.occupation;
    get_psources p = Istr p.Def.psources;
    get_public_name p = Istr p.Def.public_name;
+   get_qualifiers p = List.map (fun i -> Istr i) p.Def.qualifiers;
+   get_related p = p.Def.related;
+   get_rparents p =
+     List.map (map_relation_ps (fun x -> x) (fun i -> Istr i)) p.Def.rparents;
+   get_sex p = p.Def.sex; get_surname p = Istr p.Def.surname;
+   get_surnames_aliases p = List.map (fun i -> Istr i) p.Def.surnames_aliases;
+   get_titles p =
+     List.map (fun t -> map_title_strings (fun i -> Istr i) t) p.Def.titles;
    person_with_key p fn sn oc =
      match (fn, sn) with
      [ (Istr fn, Istr sn) ->
          Person {(p) with first_name = fn; surname = sn; occ = oc}
      | _ -> assert False ];
+   person_with_related p r = Person {(p) with related = r};
    gen_person_of_person p = map_person_ps (fun p -> p) (fun s -> Istr s) p}
 ;
 
@@ -2067,6 +2046,52 @@ value person2_fun =
      get_occupation (db2, i) = make_istr2 db2 ("person", "occupation") i;
      get_psources (db2, i) = make_istr2 db2 ("person", "psources") i;
      get_public_name (db2, i) = make_istr2 db2 ("person", "public_name") i;
+     get_qualifiers (db2, i) =
+       let pos = get_field_acc db2 i ("person", "qualifiers") in
+       if pos = -1 then []
+       else
+         let list =
+           get_field_data db2 pos ("person", "qualifiers") "data2.ext"
+         in
+         List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list;
+     get_related (db2, i) =
+       let pos = get_field_acc db2 i ("person", "related") in
+       let rec loop list pos =
+         if pos = -1 then List.rev list
+         else
+           let (ip, pos) =
+             get_field_2_data db2 pos ("person", "related") "data"
+           in
+           loop [ip :: list] pos
+       in
+       loop [] pos;
+     get_rparents (db2, i) =
+       let pos = get_field_acc db2 i ("person", "rparents") in
+       if pos = -1 then []
+       else
+         let rl = get_field_data db2 pos ("person", "rparents") "data" in
+         List.map
+           (map_relation_ps (fun x -> x) (fun _ -> Istr2 db2 ("", "") (-1)))
+           rl;
+     get_sex (db2, i) = get_field db2 i ("person", "sex");
+     get_surname (db2, i) = make_istr2 db2 ("person", "surname") i;
+     get_surnames_aliases (db2, i) =
+       let pos = get_field_acc db2 i ("person", "surnames_aliases") in
+       if pos = -1 then []
+       else
+         let list =
+           get_field_data db2 pos ("person", "surnames_aliases") "data2.ext"
+         in
+         List.map (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos)
+           list;
+     get_titles (db2, i) =
+       let pos = get_field_acc db2 i ("person", "titles") in
+       if pos = -1 then []
+       else
+         let list = get_field_data db2 pos ("person", "titles") "data2.ext" in
+         List.map
+           (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
+           list;
      person_with_key (db2, i) fn sn oc =
        match (fn, sn) with
        [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
@@ -2076,19 +2101,18 @@ value person2_fun =
            let p = map_person_ps (fun ip -> ip) sou2 p in
            Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
        | _ -> failwith "not impl person_with_key 2" ];
-     gen_person_of_person (db2, i) =
-       let p = Person2 db2 i in
-       let pp = (db2, i) in
-       {first_name = self.get_first_name pp; surname = get_surname p;
+     person_with_related (db2, i) r = failwith "not impl person_with_related";
+     gen_person_of_person pp =
+       {first_name = self.get_first_name pp; surname = self.get_surname pp;
         occ = self.get_occ pp; image = self.get_image pp;
-        public_name = self.get_public_name pp; qualifiers = get_qualifiers p;
-        aliases = self.get_aliases pp;
+        public_name = self.get_public_name pp;
+        qualifiers = self.get_qualifiers pp; aliases = self.get_aliases pp;
         first_names_aliases = self.get_first_names_aliases pp;
-        surnames_aliases = get_surnames_aliases p; titles = get_titles p;
-        rparents = get_rparents p; related = get_related p;
-        occupation = self.get_occupation pp; sex = get_sex p;
-        access = self.get_access pp; birth = self.get_birth pp;
-        birth_place = self.get_birth_place pp;
+        surnames_aliases = self.get_surnames_aliases pp;
+        titles = self.get_titles pp; rparents = self.get_rparents pp;
+        related = self.get_related pp; occupation = self.get_occupation pp;
+        sex = self.get_sex pp; access = self.get_access pp;
+        birth = self.get_birth pp; birth_place = self.get_birth_place pp;
         birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
         baptism_place = self.get_baptism_place pp;
         baptism_src = self.get_baptism_src pp; death = self.get_death pp;
@@ -2126,11 +2150,26 @@ value person2gen_fun =
    get_occupation (db2, p) = Istr2New db2 p.Def.occupation;
    get_psources (db2, p) = Istr2New db2 p.Def.psources;
    get_public_name (db2, p) = Istr2New db2 p.Def.public_name;
+   get_qualifiers (db2, p) =
+     List.map (fun s -> Istr2New db2 s) p.Def.qualifiers;
+   get_related (db2, p) = p.Def.related;
+   get_rparents (db2, p) =
+     List.map (map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s))
+       p.Def.rparents;
+   get_sex (db2, p) = p.Def.sex;
+   get_surname (db2, p) = Istr2New db2 p.Def.surname;
+   get_surnames_aliases (db2, p) =
+     List.map (fun s -> Istr2New db2 s) p.Def.surnames_aliases;
+   get_titles (db2, p) =
+     List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
+       p.Def.titles;
    person_with_key (db2, p) fn sn oc =
      match (fn, sn) with
      [ (Istr2New _ fn, Istr2New _ sn) ->
          Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
      | _ -> failwith "not impl person_with_key 3" ];
+   person_with_related (db2, p) r =
+     failwith "not impl person_with_related (gen)";
    gen_person_of_person (db2, p) =
      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p}
 ;
@@ -2234,9 +2273,41 @@ value get_public_name =
   let f pf = pf.get_public_name in
   wrap_per f f f
 ;
+value get_qualifiers =
+  let f pf = pf.get_qualifiers in
+  wrap_per f f f
+;
+value get_related =
+  let f pf = pf.get_related in
+  wrap_per f f f
+;
+value get_rparents =
+  let f pf = pf.get_rparents in
+  wrap_per f f f
+;
+value get_sex =
+  let f pf = pf.get_sex in
+  wrap_per f f f
+;
+value get_surname =
+  let f pf = pf.get_surname in
+  wrap_per f f f
+;
+value get_surnames_aliases =
+  let f pf = pf.get_surnames_aliases in
+  wrap_per f f f
+;
+value get_titles =
+  let f pf = pf.get_titles in
+  wrap_per f f f
+;
 
 value person_with_key =
   let f pf = pf.person_with_key in
+  wrap_per f f f
+;
+value person_with_related =
+  let f pf = pf.person_with_related in
   wrap_per f f f
 ;
 value gen_person_of_person =
