@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.48 2006-12-13 14:48:23 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.49 2006-12-23 23:41:27 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -2432,7 +2432,7 @@ value record_access_of tab =
    len = Array.length tab; clear_array () = ()}
 ;
 
-value make_base (persons, families, strings, bnotes) =
+value make_base (persons, families, strings, bnotes) bdir =
   let (persons, ascends, unions) = persons in
   let (families, couples, descends) = families in
   let bnotes =
@@ -2444,7 +2444,8 @@ value make_base (persons, families, strings, bnotes) =
      unions = record_access_of unions; families = record_access_of families;
      visible = { v_write = fun []; v_get = fun [] };
      couples = record_access_of couples; descends = record_access_of descends;
-     strings = record_access_of strings; particles = []; bnotes = bnotes}
+     strings = record_access_of strings; particles = []; bnotes = bnotes;
+     bdir = bdir}
   in
   let base_func =
     {person_of_key = fun []; persons_of_name = fun [];
@@ -2947,7 +2948,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
     let arrays = make_arrays in_file.val in
     Gc.compact ();
     let arrays = make_subarrays arrays in
-    let base = make_base arrays in
+    let base = make_base arrays bdir in
     finish_base base arrays;
     lock Mutil.lock_file out_file.val with
     [ Accept ->

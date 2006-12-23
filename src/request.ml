@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.42 2006-12-22 06:39:44 ddr Exp $ *)
+(* $Id: request.ml,v 5.43 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -601,7 +601,7 @@ value extract_henv conf base =
     | Some s -> conf.henv := conf.henv @ [("templ", code_varenv s)] ];
     match p_getenv conf.env "escache" with
     [ Some _ ->
-        let v = escache_value conf base in
+        let v = escache_value base in
         conf.henv := conf.henv @ [("escache", v)]
     | None -> () ];
     match p_getenv conf.env "alwsurn" with

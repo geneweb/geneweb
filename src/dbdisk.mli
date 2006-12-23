@@ -1,4 +1,4 @@
-(* $Id: dbdisk.mli,v 5.13 2006-12-23 22:09:30 ddr Exp $ *)
+(* $Id: dbdisk.mli,v 5.14 2006-12-23 23:41:28 ddr Exp $ *)
 
 open Def;
 
@@ -49,7 +49,8 @@ type base_data =
     descends : record_access dsk_descend;
     strings : record_access string;
     particles : list string;
-    bnotes : notes }
+    bnotes : notes;
+    bdir : string }
 ;
 
 type base_func =

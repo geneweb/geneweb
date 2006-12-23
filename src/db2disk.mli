@@ -1,4 +1,4 @@
-(* $Id: db2disk.mli,v 5.1 2006-12-23 22:09:30 ddr Exp $ *)
+(* $Id: db2disk.mli,v 5.2 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -20,7 +20,7 @@ type patches =
 
 type db2 =
   { phony : unit -> unit;
-    bdir : string;
+    bdir2 : string;
     cache_chan : Hashtbl.t (string * string * string) in_channel;
     patches : patches;
     parents_array : mutable option (array (option ifam));

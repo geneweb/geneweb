@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.48 2006-10-23 20:06:31 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.49 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -803,7 +803,7 @@ value empty_base : cbase =
    c_bnotes = {nread = fun _ _ -> ""; norigin_file = ""; efiles _ = []}}
 ;
 
-value linked_base gen per_index_ic per_ic fam_index_ic fam_ic =
+value linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir =
 (**)
   let _ =
     do {
@@ -865,7 +865,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic =
      visible = { v_write = fun []; v_get = fun [] };
      couples = record_access_of couples; descends = record_access_of descends;
      strings = record_access_of strings; particles = particles;
-     bnotes = bnotes}
+     bnotes = bnotes; bdir = bdir}
   in
   let base_func =
     {person_of_key = fun [];
@@ -881,7 +881,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic =
   {data = base_data; func = base_func}
 ;
 
-value link gwo_list tmp_dir =
+value link gwo_list tmp_dir bdir =
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
@@ -936,7 +936,9 @@ value link gwo_list tmp_dir =
     Hashtbl.clear gen.g_names;
     Hashtbl.clear gen.g_local_names;
     Gc.compact ();
-    let dsk_base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
+    let dsk_base =
+      linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir
+    in
     Hashtbl.clear gen.g_patch_p;
     let base = Gwdb.base_of_dsk_base dsk_base in
     if do_check.val && gen.g_pcnt > 0 then do {
@@ -968,51 +970,35 @@ value write_file_contents fname text =
   }
 ;
 
-value output_wizard_notes bname wiznotes =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
+value output_wizard_notes bdir wiznotes = do {
   let wizdir = Filename.concat bdir "wiznotes" in
-  do {
-    Mutil.remove_dir wizdir;
-    if wiznotes = [] then ()
-    else
-      do {
-        try Unix.mkdir wizdir 0o755 with _ -> ();
-        List.iter
-          (fun (wizid, text) ->
-             let fname = Filename.concat wizdir wizid ^ ".txt" in
-             write_file_contents fname text)
-          wiznotes;
-      }
+  Mutil.remove_dir wizdir;
+  if wiznotes = [] then ()
+  else do {
+    try Unix.mkdir wizdir 0o755 with _ -> ();
+    List.iter
+      (fun (wizid, text) ->
+         let fname = Filename.concat wizdir wizid ^ ".txt" in
+         write_file_contents fname text)
+      wiznotes;
   }
-;
+};
 
-value output_command_line bname =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
+value output_command_line bdir = do {
   let oc = open_out (Filename.concat bdir "command.txt") in
-  do {
-    fprintf oc "%s" Sys.argv.(0);
-    for i = 1 to Array.length Sys.argv - 1 do {
-      fprintf oc " %s" Sys.argv.(i)
-    };
-    fprintf oc "\n";
-    close_out oc;
-  }
-;
+  fprintf oc "%s" Sys.argv.(0);
+  for i = 1 to Array.length Sys.argv - 1 do {
+    fprintf oc " %s" Sys.argv.(i)
+  };
+  fprintf oc "\n";
+  close_out oc;
+};
 
-value output_particles_file bname particles =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
+value output_particles_file bdir particles = do {
   let oc = open_out (Filename.concat bdir "particles.txt") in
-  do {
-    List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
-    close_out oc;
-  }
-;
+  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  close_out oc;
+};
 
 value separate = ref False;
 value shift = ref 0;
@@ -1091,32 +1077,29 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Mutil.lock_file out_file.val) with
       [ Accept -> do {
-          let tmp_dir =
-            let d =
-              let bname = out_file.val in
-              if Filename.check_suffix bname ".gwb" then bname
-              else bname ^ ".gwb"
-            in
-            Filename.concat "gw_tmp" d
+          let bdir =
+            let bname = out_file.val in
+            if Filename.check_suffix bname ".gwb" then bname
+            else bname ^ ".gwb"
           in
+          let tmp_dir = Filename.concat "gw_tmp" bdir in
           try Mutil.mkdir_p tmp_dir with _ -> ();
-          match link (List.rev gwo.val) tmp_dir with
+          match link (List.rev gwo.val) tmp_dir bdir with
           [ Some (dsk_base, wiznotes) ->
               do {
                 Gc.compact ();
-                Outbase.output out_file.val dsk_base;
-                output_wizard_notes out_file.val wiznotes;
-                output_command_line out_file.val;
-                output_particles_file out_file.val dsk_base.data.particles;
+                Outbase.output bdir dsk_base;
+                output_wizard_notes bdir wiznotes;
+                output_command_line bdir;
+                output_particles_file bdir dsk_base.data.particles;
                 try Mutil.remove_dir tmp_dir with _ -> ();
                 try Unix.rmdir "gw_tmp" with _ -> ();
               }
-          | None ->
-              do {
-                printf "Creation of database failed.\n";
-                flush stdout;
-                exit 2;
-              } ]
+          | None -> do {
+              printf "Creation of database failed.\n";
+              flush stdout;
+              exit 2;
+            } ]
         }
       | Refuse ->
           do {
