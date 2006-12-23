@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.182 2006-12-23 22:35:32 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.183 2006-12-23 23:18:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1492,12 +1492,9 @@ value base2 db2 =
      nobtit conf p = C_base.nobtit self conf p;
      p_first_name p = C_base.p_first_name self p;
      p_surname p = C_base.p_surname self p;
-     date_of_last_change bname =
-       let bdir =
-         if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-       in
+     date_of_last_change _ =
        let s =
-         let bdir = Filename.concat bdir "base_d" in
+         let bdir = db2.bdir in
          try Unix.stat (Filename.concat bdir "patches") with
          [ Unix.Unix_error _ _ _ -> Unix.stat bdir ]
        in
