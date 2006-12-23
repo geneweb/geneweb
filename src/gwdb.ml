@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.176 2006-12-23 04:03:33 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.177 2006-12-23 05:20:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -43,22 +43,6 @@ type istr =
   [ Istr of dsk_istr
   | Istr2 of db2 and (string * string) and int
   | Istr2New of db2 and string ]
-;
-
-type family =
-  [ Family of dsk_family
-  | Family2 of db2 and int
-  | Family2Gen of db2 and gen_family iper string ]
-;
-type couple =
-  [ Couple of dsk_couple
-  | Couple2 of db2 and int
-  | Couple2Gen of db2 and gen_couple iper ]
-;
-type descend =
-  [ Descend of dsk_descend
-  | Descend2 of db2 and int
-  | Descend2Gen of db2 and gen_descend iper ]
 ;
 
 type relation = Def.gen_relation iper istr;
@@ -181,144 +165,6 @@ value empty_person empty_string ip =
    notes = empty_string; psources = empty_string; key_index = ip}
 ;
 
-value get_comment =
-  fun
-  [ Family f -> Istr f.Def.comment
-  | Family2 db2 i -> make_istr2 db2 ("family", "comment") i
-  | Family2Gen db2 f -> Istr2New db2 f.Def.comment ]
-;
-value get_divorce =
-  fun
-  [ Family f -> f.Def.divorce
-  | Family2 db2 i -> get_field db2 i ("family", "divorce")
-  | Family2Gen db2 f -> f.Def.divorce ]
-;
-
-value get_fsources =
-  fun
-  [ Family f -> Istr f.Def.fsources
-  | Family2 db2 i -> make_istr2 db2 ("family", "fsources") i
-  | Family2Gen db2 f -> Istr2New db2 f.Def.fsources ]
-;
-value get_marriage =
-  fun
-  [ Family f -> f.Def.marriage
-  | Family2 db2 i -> get_field db2 i ("family", "marriage")
-  | Family2Gen db2 f -> f.Def.marriage ]
-;
-value get_marriage_place =
-  fun
-  [ Family f -> Istr f.Def.marriage_place
-  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_place") i
-  | Family2Gen db2 f -> Istr2New db2 f.Def.marriage_place ]
-;
-value get_marriage_src =
-  fun
-  [ Family f -> Istr f.Def.marriage_src
-  | Family2 db2 i -> make_istr2 db2 ("family", "marriage_src") i
-  | Family2Gen db2 f -> Istr2New db2 f.Def.marriage_src ]
-;
-value get_origin_file =
-  fun
-  [ Family f -> Istr f.Def.origin_file
-  | Family2 db2 i -> make_istr2 db2 ("family", "origin_file") i
-  | Family2Gen db2 f -> Istr2New db2 f.Def.origin_file ]
-;
-value get_relation =
-  fun
-  [ Family f -> f.Def.relation
-  | Family2 db2 i -> get_field db2 i ("family", "relation")
-  | Family2Gen db2 f -> f.Def.relation ]
-;
-value get_witnesses =
-  fun
-  [ Family f -> f.Def.witnesses
-  | Family2 db2 i -> get_field db2 i ("family", "witnesses")
-  | Family2Gen db2 f -> f.Def.witnesses ]
-;
-
-value family_with_origin_file f orf fi =
-  match (f, orf) with
-  [ (Family f, Istr orf) ->
-      Family {(f) with origin_file = orf; fam_index = fi}
-  | (Family2Gen db2 f, Istr2 _ path pos) ->
-      let orf =
-        if pos = -1 || pos = Db2.empty_string_pos then ""
-        else get_field_data db2 pos path "data"
-      in
-      Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
-  | (Family2Gen db2 f, Istr2New _ orf) ->
-      Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
-  | _ -> assert False ]
-;
-
-value gen_family_of_family =
-  fun
-  [ Family f -> map_family_ps (fun p -> p) (fun s -> Istr s) f
-  | Family2 _ i as f ->
-      {marriage = get_marriage f; marriage_place = get_marriage_place f;
-       marriage_src = get_marriage_src f; witnesses = get_witnesses f;
-       relation = get_relation f; divorce = get_divorce f;
-       comment = get_comment f; origin_file = get_origin_file f;
-       fsources = get_fsources f; fam_index = Adef.ifam_of_int i}
-  | Family2Gen db2 f ->
-      map_family_ps (fun p -> p) (fun s -> Istr2New db2 s) f ]
-;
-
-value get_father =
-  fun
-  [ Couple c -> Adef.father c
-  | Couple2 db2 i ->
-      match db2.father_array with
-      [ Some tab -> tab.(i)
-      | None -> get_field db2 i ("family", "father") ]
-  | Couple2Gen db2 c -> Adef.father c ]
-;
-
-value get_mother =
-  fun
-  [ Couple c -> Adef.mother c
-  | Couple2 db2 i ->
-      match db2.mother_array with
-      [ Some tab -> tab.(i)
-      | None -> get_field db2 i ("family", "mother") ]
-  | Couple2Gen db2 c -> Adef.mother c ]
-;
-
-value get_parent_array =
-  fun
-  [ Couple c -> Adef.parent_array c
-  | Couple2 db2 i ->
-      let p1 = get_field db2 i ("family", "father") in
-      let p2 = get_field db2 i ("family", "mother") in
-      [| p1; p2 |]
-  | Couple2Gen db2 c -> Adef.parent_array c ]
-;
-
-value gen_couple_of_couple =
-  fun
-  [ Couple c -> c
-  | Couple2 _ _ as c -> couple (get_father c) (get_mother c)
-  | Couple2Gen db2 c -> c ]
-;
-
-value get_children =
-  fun
-  [ Descend d -> d.Def.children
-  | Descend2 db2 i ->
-      match db2.children_array with
-      [ Some tab -> tab.(i)
-      | None -> get_field db2 i ("family", "children") ]
-  | Descend2Gen db2 d -> d.Def.children ]
-;
-
-value gen_descend_of_descend =
-  fun
-  [ Descend d -> d
-  | Descend2 _ _ as d -> {children = get_children d}
-  | Descend2Gen db2 d -> d ]
-;
-
 value sou2 i =
   match i with
   [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
@@ -326,14 +172,9 @@ value sou2 i =
   | _ -> assert False ]
 ;
 
-value is_deleted_family =
-  fun
-  [ Family f -> f.Def.fam_index = Adef.ifam_of_int (-1)
-  | Family2 _ i -> False (* not yet implemented *)
-  | Family2Gen db2 f -> f.Def.fam_index = Adef.ifam_of_int (-1) ]
-;
-
 value ok_I_know = ref False;
+
+(* hash tables in disk *)
 
 type key =
   [ Key of Adef.istr and Adef.istr and int
@@ -810,7 +651,7 @@ value union1_fun =
 (* Persons - implementation database 2 *)
 
 value person2_fun =
-  let rec self =
+  self where rec self =
     {get_access (db2, i) = get_field db2 i ("person", "access");
      get_aliases (db2, i) =
        let pos = get_field_acc db2 i ("person", "aliases") in
@@ -930,8 +771,6 @@ value person2_fun =
         burial_src = self.get_burial_src pp; notes = self.get_notes pp;
         psources = self.get_psources pp; key_index = self.get_key_index pp};
      dsk_person_of_person p = failwith "not impl dsk_person_of_person"}
-  in
-  self
 ;
 
 value person2gen_fun =
@@ -1203,7 +1042,276 @@ value get_family =
   wrap_uni f f f
 ;
 
-(* Database - common definitions *)
+(* Families - common definitions *)
+
+type family =
+  [ Family of dsk_family
+  | Family2 of db2 and int
+  | Family2Gen of db2 and gen_family iper string ]
+;
+
+type couple =
+  [ Couple of dsk_couple
+  | Couple2 of db2 and int
+  | Couple2Gen of db2 and gen_couple iper ]
+;
+
+type descend =
+  [ Descend of dsk_descend
+  | Descend2 of db2 and int
+  | Descend2Gen of db2 and gen_descend iper ]
+;
+
+type family_fun 'a =
+  { get_comment : 'a -> istr;
+    get_divorce : 'a -> Def.divorce;
+    get_fsources : 'a -> istr;
+    get_marriage : 'a -> codate;
+    get_marriage_place : 'a -> istr;
+    get_marriage_src : 'a -> istr;
+    get_origin_file : 'a -> istr;
+    get_relation : 'a -> Def.relation_kind;
+    get_witnesses : 'a -> array iper;
+    family_with_origin_file : 'a -> istr -> ifam -> family;
+    gen_family_of_family : 'a -> Def.gen_family iper istr;
+    is_deleted_family : 'a -> bool}
+;
+
+type couple_fun 'a =
+  { get_father : 'a -> iper;
+    get_mother : 'a -> iper;
+    get_parent_array : 'a -> array iper;
+    gen_couple_of_couple : 'a -> Def.gen_couple iper }
+;
+
+type descend_fun 'a =
+  { get_children : 'a -> array iper;
+    gen_descend_of_descend : 'a -> Def.gen_descend iper }
+;
+
+(* Families - implementation database 1 *)
+
+value family1_fun =
+  {get_comment f = Istr f.Def.comment;
+   get_divorce f = f.Def.divorce;
+   get_fsources f = Istr f.Def.fsources;
+   get_marriage f = f.Def.marriage;
+   get_marriage_place f = Istr f.Def.marriage_place;
+   get_marriage_src f = Istr f.Def.marriage_src;
+   get_origin_file f = Istr f.Def.origin_file;
+   get_relation f = f.Def.relation;
+   get_witnesses f = f.Def.witnesses;
+   family_with_origin_file f orf fi =
+     match orf with
+     [ Istr orf -> Family {(f) with origin_file = orf; fam_index = fi}
+     | _ -> assert False ];
+   gen_family_of_family f = map_family_ps (fun p -> p) (fun s -> Istr s) f;
+   is_deleted_family f = f.Def.fam_index = Adef.ifam_of_int (-1)}
+;
+
+value couple1_fun =
+  {get_father c = Adef.father c;
+   get_mother c = Adef.mother c;
+   get_parent_array c = Adef.parent_array c;
+   gen_couple_of_couple c = c}
+;
+
+value descend1_fun =
+  {get_children d = d.Def.children;
+   gen_descend_of_descend d = d}
+;
+
+(* Families - implementation database 2 *)
+
+value family2_fun =
+  self where rec self =
+    {get_comment (db2, i) = make_istr2 db2 ("family", "comment") i;
+     get_divorce (db2, i) = get_field db2 i ("family", "divorce");
+     get_fsources (db2, i) = make_istr2 db2 ("family", "fsources") i;
+     get_marriage (db2, i) = get_field db2 i ("family", "marriage");
+     get_marriage_place (db2, i) =
+       make_istr2 db2 ("family", "marriage_place") i;
+     get_marriage_src (db2, i) = make_istr2 db2 ("family", "marriage_src") i;
+     get_origin_file (db2, i) = make_istr2 db2 ("family", "origin_file") i;
+     get_relation (db2, i) = get_field db2 i ("family", "relation");
+     get_witnesses (db2, i) = get_field db2 i ("family", "witnesses");
+     family_with_origin_file (db2, i) orf fi = assert False;
+     gen_family_of_family ((db2, i) as f) =
+       {marriage = self.get_marriage f;
+        marriage_place = self.get_marriage_place f;
+        marriage_src = self.get_marriage_src f;
+        witnesses = self.get_witnesses f; relation = self.get_relation f;
+        divorce = self.get_divorce f; comment = self.get_comment f;
+        origin_file = self.get_origin_file f; fsources = self.get_fsources f;
+        fam_index = Adef.ifam_of_int i};
+      is_deleted_family (db2, f) = False (* not yet implemented *)}
+;
+
+value family2gen_fun =
+  {get_comment (db2, f) = Istr2New db2 f.Def.comment;
+   get_divorce (db2, f) = f.Def.divorce;
+   get_fsources (db2, f) = Istr2New db2 f.Def.fsources;
+   get_marriage (db2, f) = f.Def.marriage;
+   get_marriage_place (db2, f) = Istr2New db2 f.Def.marriage_place;
+   get_marriage_src (db2, f) = Istr2New db2 f.Def.marriage_src;
+   get_origin_file (db2, f) = Istr2New db2 f.Def.origin_file;
+   get_relation (db2, f) = f.Def.relation;
+   get_witnesses (db2, f) = f.Def.witnesses;
+   family_with_origin_file (db2, f) orf fi =
+      match orf with
+      [ Istr2 _ path pos ->
+          let orf =
+            if pos = -1 || pos = Db2.empty_string_pos then ""
+            else get_field_data db2 pos path "data"
+          in
+          Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
+      | Istr2New _ orf ->
+          Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
+      | _ -> assert False ]
+   ;
+   gen_family_of_family (db2, f) =
+      map_family_ps (fun p -> p) (fun s -> Istr2New db2 s) f;
+   is_deleted_family (db2, f) = f.Def.fam_index = Adef.ifam_of_int (-1)}
+;
+
+value couple2_fun =
+  self where rec self =
+    {get_father (db2, i) =
+       match db2.father_array with
+       [ Some tab -> tab.(i)
+       | None -> get_field db2 i ("family", "father") ];
+     get_mother (db2, i) =
+       match db2.mother_array with
+       [ Some tab -> tab.(i)
+       | None -> get_field db2 i ("family", "mother") ];
+     get_parent_array (db2, i) =
+       let p1 = get_field db2 i ("family", "father") in
+       let p2 = get_field db2 i ("family", "mother") in
+       [| p1; p2 |];
+     gen_couple_of_couple c =
+       couple (self.get_father c) (self.get_mother c)}
+;
+
+value couple2gen_fun =
+  {get_father (db2, c) = Adef.father c;
+   get_mother (db2, c) = Adef.mother c;
+   get_parent_array (db2, c) = Adef.parent_array c;
+   gen_couple_of_couple (db2, c) = c}
+;
+
+value descend2_fun =
+  self where rec self =
+    {get_children (db2, i) =
+       match db2.children_array with
+       [ Some tab -> tab.(i)
+       | None -> get_field db2 i ("family", "children") ];
+     gen_descend_of_descend d = {children = self.get_children d}}
+;
+
+value descend2gen_fun =
+  {get_children (db2, d) = d.Def.children;
+   gen_descend_of_descend (db2, d) = d}
+;
+
+(* Families - user functions *)
+
+value wrap_fam f g h =
+  fun
+  [ Family p -> f family1_fun p
+  | Family2 db2 i -> g family2_fun (db2, i)
+  | Family2Gen db2 p -> h family2gen_fun (db2, p) ]
+;
+
+value wrap_cpl f g h =
+  fun
+  [ Couple p -> f couple1_fun p
+  | Couple2 db2 i -> g couple2_fun (db2, i)
+  | Couple2Gen db2 p -> h couple2gen_fun (db2, p) ]
+;
+
+value wrap_des f g h =
+  fun
+  [ Descend p -> f descend1_fun p
+  | Descend2 db2 i -> g descend2_fun (db2, i)
+  | Descend2Gen db2 p -> h descend2gen_fun (db2, p) ]
+;
+
+value get_comment =
+  let f pf = pf.get_comment in
+  wrap_fam f f f
+;
+value get_divorce =
+  let f pf = pf.get_divorce in
+  wrap_fam f f f
+;
+value get_fsources =
+  let f pf = pf.get_fsources in
+  wrap_fam f f f
+;
+value get_marriage =
+  let f pf = pf.get_marriage in
+  wrap_fam f f f
+;
+value get_marriage_place =
+  let f pf = pf.get_marriage_place in
+  wrap_fam f f f
+;
+value get_marriage_src =
+  let f pf = pf.get_marriage_src in
+  wrap_fam f f f
+;
+value get_origin_file =
+  let f pf = pf.get_origin_file in
+  wrap_fam f f f
+;
+value get_relation =
+  let f pf = pf.get_relation in
+  wrap_fam f f f
+;
+value get_witnesses =
+  let f pf = pf.get_witnesses in
+  wrap_fam f f f
+;
+value family_with_origin_file =
+  let f pf = pf.family_with_origin_file in
+  wrap_fam f f f
+;
+value gen_family_of_family =
+  let f pf = pf.gen_family_of_family in
+  wrap_fam f f f
+;
+value is_deleted_family =
+  let f pf = pf.is_deleted_family in
+  wrap_fam f f f
+;
+
+value get_father =
+  let f pf = pf.get_father in
+  wrap_cpl f f f
+;
+value get_mother =
+  let f pf = pf.get_mother in
+  wrap_cpl f f f
+;
+value get_parent_array =
+  let f pf = pf.get_parent_array in
+  wrap_cpl f f f
+;
+value gen_couple_of_couple =
+  let f pf = pf.gen_couple_of_couple in
+  wrap_cpl f f f
+;
+
+value get_children =
+  let f pf = pf.get_children in
+  wrap_des f f f
+;
+value gen_descend_of_descend =
+  let f pf = pf.gen_descend_of_descend in
+  wrap_des f f f
+;
+
+(* Databases - common definitions *)
 
 type base =
   { close_base : unit -> unit;
@@ -1378,7 +1486,7 @@ value base1 base =
   let base_strings_of_first_name_or_surname s =
     List.map (fun s -> Istr s) (base.func.strings_of_fsname s)
   in
-  let rec self =
+  self where rec self =
     {close_base = base.func.cleanup;
      empty_person ip = Person (empty_person (Adef.istr_of_int 0) ip);
      person_of_gen_person p = Person (map_person_ps (fun p -> p) un_istr p);
@@ -1480,8 +1588,6 @@ value base1 base =
        in
        s.Unix.st_mtime;
      apply_as_dsk_base f = f base}
-  in
-  self
 ;
 
 (* Database - implementation 2 *)
@@ -1502,7 +1608,7 @@ value base2 db2 =
          [ Not_found -> istrl ])
       db2.patches.h_key istrl
   in
-  let rec self =
+  self where rec self =
     {close_base () =
        Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
      empty_person ip = Person2Gen db2 (empty_person "" ip);
@@ -1774,8 +1880,6 @@ value base2 db2 =
        in
        s.Unix.st_mtime;
      apply_as_dsk_base f = failwith "not impl apply_as_dsk_base"}
-  in
-  self
 ;
 
 (* Database - user functions *)
