@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.183 2006-12-23 23:18:08 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.184 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1036,7 +1036,7 @@ type base =
       Lazy.t (list string) -> Lazy.t (list string) ->  person -> list title;
     p_first_name : person -> string;
     p_surname : person -> string;
-    date_of_last_change : string -> float;
+    date_of_last_change : unit -> float;
     apply_as_dsk_base : (Dbdisk.dsk_base -> unit) -> unit }
 ;
 
@@ -1241,11 +1241,9 @@ value base1 base =
      nobtit conf p = C_base.nobtit self conf p;
      p_first_name p = C_base.p_first_name self p;
      p_surname p = C_base.p_surname self p;
-     date_of_last_change bname =
-       let bdir =
-         if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-       in
+     date_of_last_change () =
        let s =
+         let bdir = base.data.bdir in
          try Unix.stat (Filename.concat bdir "patches") with
          [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
        in
@@ -1399,7 +1397,7 @@ value base2 db2 =
        [];
      output_consang_tab tab =
        let dir =
-         List.fold_left Filename.concat db2.bdir ["person"; "consang"]
+         List.fold_left Filename.concat db2.bdir2 ["person"; "consang"]
        in
        do {
          Mutil.mkdir_p dir;
@@ -1422,7 +1420,7 @@ value base2 db2 =
      base_visible_get f = failwith "not impl visible_get";
      base_visible_write () = failwith "not impl visible_write";
      base_particles () =
-       Mutil.input_particles (Filename.concat db2.bdir "particles.txt");
+       Mutil.input_particles (Filename.concat db2.bdir2 "particles.txt");
      base_strings_of_first_name s =
        base_strings_of_first_name_or_surname "first_name"
          (fun p -> p.first_name) s;
@@ -1474,13 +1472,13 @@ value base2 db2 =
        let cset i v = cg_tab.(i) := v in
        (fget, cget, cset, Some cg_tab);
      base_notes_read fnotes =
-       read_notes (Filename.dirname db2.bdir) fnotes RnAll;
+       read_notes (Filename.dirname db2.bdir2) fnotes RnAll;
      base_notes_read_first_line fnotes =
-       read_notes (Filename.dirname db2.bdir) fnotes Rn1Ln;
+       read_notes (Filename.dirname db2.bdir2) fnotes Rn1Ln;
      base_notes_are_empty fnotes =
-       read_notes (Filename.dirname db2.bdir) fnotes RnDeg = "";
+       read_notes (Filename.dirname db2.bdir2) fnotes RnDeg = "";
      base_notes_origin_file () =
-       let fname = Filename.concat db2.bdir "notes_of.txt" in
+       let fname = Filename.concat db2.bdir2 "notes_of.txt" in
        match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
        [ Some ic ->
            let r = input_line ic in
@@ -1492,9 +1490,9 @@ value base2 db2 =
      nobtit conf p = C_base.nobtit self conf p;
      p_first_name p = C_base.p_first_name self p;
      p_surname p = C_base.p_surname self p;
-     date_of_last_change _ =
+     date_of_last_change () =
        let s =
-         let bdir = db2.bdir in
+         let bdir = db2.bdir2 in
          try Unix.stat (Filename.concat bdir "patches") with
          [ Unix.Unix_error _ _ _ -> Unix.stat bdir ]
        in
@@ -1574,6 +1572,6 @@ value person_misc_names b = b.person_misc_names;
 value nobtit b = b.nobtit;
 value p_first_name b = b.p_first_name;
 value p_surname b = b.p_surname;
-value date_of_last_change s b = b.date_of_last_change s;
+value date_of_last_change b = b.date_of_last_change ();
 value apply_as_dsk_base f b = b.apply_as_dsk_base f;
 value base_of_dsk_base = base1;

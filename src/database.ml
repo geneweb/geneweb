@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.16 2006-10-30 09:48:45 ddr Exp $ *)
+(* $Id: database.ml,v 5.17 2006-12-23 23:41:27 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1110,7 +1110,8 @@ value opendb bname =
     {persons = persons; ascends = ascends; unions = unions;
      visible = make_visible_record_access bname persons;
      families = families; couples = couples; descends = descends;
-     strings = strings; particles = particles; bnotes = bnotes}
+     strings = strings; particles = particles; bnotes = bnotes;
+     bdir = bname}
   in
   let persons_of_name = persons_of_name bname patches.h_name in
   let base_func =

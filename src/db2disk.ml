@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.1 2006-12-23 22:09:30 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.2 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -24,7 +24,7 @@ type patches =
 
 type db2 =
   { phony : unit -> unit; (* to prevent usage of "=" in the program *)
-    bdir : string;
+    bdir2 : string;
     cache_chan : Hashtbl.t (string * string * string) in_channel;
     patches : patches;
     parents_array : mutable option (array (option ifam));
@@ -43,7 +43,7 @@ value fast_open_in_bin_and_seek db2 f1 f2 f pos = do {
     [ Not_found -> do {
         let ic =
           open_in_bin
-            (List.fold_left Filename.concat db2.bdir [f1; f2; f])
+            (List.fold_left Filename.concat db2.bdir2 [f1; f2; f])
         in
         Hashtbl.add db2.cache_chan (f1, f2, f) ic;
         ic
@@ -222,7 +222,7 @@ value spi2_next db2 spi need_whole_list (f1, f2) =
 ;
 
 value spi2_find db2 (f1, f2) pos =
-  let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
+  let dir = List.fold_left Filename.concat db2.bdir2 [f1; f2] in
   hashtbl_find_all dir "person_of_string.ht" pos
 ;
 
@@ -248,7 +248,7 @@ value person2_of_key db2 fn sn oc =
   let sn = Name.lower (nominative sn) in
   try Some (Hashtbl.find db2.patches.h_key (fn, sn, oc)) with
   [ Not_found ->
-      let person_of_key_d = Filename.concat db2.bdir "person_of_key" in
+      let person_of_key_d = Filename.concat db2.bdir2 "person_of_key" in
       try do {
         let ifn = hashtbl_find person_of_key_d "istr_of_string.ht" fn in
         let isn = hashtbl_find person_of_key_d "istr_of_string.ht" sn in
@@ -261,13 +261,13 @@ value person2_of_key db2 fn sn oc =
 
 value strings2_of_fsname db2 f s =
   let k = Name.crush_lower s in
-  let dir = List.fold_left Filename.concat db2.bdir ["person"; f] in
+  let dir = List.fold_left Filename.concat db2.bdir2 ["person"; f] in
   hashtbl_find_all dir "string_of_crush.ht" k
 ;
 
 value persons2_of_name db2 s =
   let s = Name.crush_lower s in
-  let dir = Filename.concat db2.bdir "person_of_name" in
+  let dir = Filename.concat db2.bdir2 "person_of_name" in
   List.rev_append
     (try Hashtbl.find db2.patches.h_name s with [ Not_found -> [] ])
     (hashtbl_find_all dir "person_of_name.ht" s)
@@ -276,7 +276,7 @@ value persons2_of_name db2 s =
 value persons_of_first_name_or_surname2 db2 is_first_name = do {
   let f1 = "person" in
   let f2 = if is_first_name then "first_name" else "surname" in
-  let fdir = List.fold_left Filename.concat db2.bdir [f1; f2] in
+  let fdir = List.fold_left Filename.concat db2.bdir2 [f1; f2] in
   let index_ini_fname = Filename.concat fdir "index.ini" in
   let ic = open_in_bin index_ini_fname in
   let iofc : list (string * int) = input_value ic in
@@ -312,7 +312,7 @@ value load_couples_array2 db2 = do {
   [ Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir db2.patches.nb_fam_ini nb "family"
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family"
           "father"
           (fun ic_dat pos ->
              do { seek_in ic_dat pos; Iovalue.input ic_dat })
@@ -326,7 +326,7 @@ value load_couples_array2 db2 = do {
   [ Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir db2.patches.nb_fam_ini nb "family"
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family"
           "mother"
           (fun ic_dat pos ->
              do { seek_in ic_dat pos; Iovalue.input ic_dat })
@@ -340,7 +340,7 @@ value load_couples_array2 db2 = do {
 
 value parents_array2 db2 nb_ini nb = do {
   let arr =
-    load_array2 db2.bdir nb_ini nb "person" "parents"
+    load_array2 db2.bdir2 nb_ini nb "person" "parents"
       (fun ic_dat pos ->
          if pos = -1 then None
          else do {
@@ -357,7 +357,7 @@ value no_consang = Adef.fix (-1);
 
 value consang_array2 db2 nb =
   let cg_fname =
-    List.fold_left Filename.concat db2.bdir ["person"; "consang"; "data"]
+    List.fold_left Filename.concat db2.bdir2 ["person"; "consang"; "data"]
   in
   match try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ] with
   [ Some ic -> do {
@@ -370,7 +370,7 @@ value consang_array2 db2 nb =
 
 value family_array2 db2 = do {
   let fname =
-    List.fold_left Filename.concat db2.bdir ["person"; "family"; "data"]
+    List.fold_left Filename.concat db2.bdir2 ["person"; "family"; "data"]
   in
   let ic = open_in_bin fname in
   let tab = input_value ic in
@@ -380,7 +380,7 @@ value family_array2 db2 = do {
 
 value children_array2 db2 = do {
   let fname =
-    List.fold_left Filename.concat db2.bdir ["family"; "children"; "data"]
+    List.fold_left Filename.concat db2.bdir2 ["family"; "children"; "data"]
   in
   let ic = open_in_bin fname in
   let tab = input_value ic in
@@ -423,7 +423,7 @@ value check_magic ic magic id = do {
 };
 
 value commit_patches2 db2 = do {
-  let fname = Filename.concat db2.bdir "patches" in
+  let fname = Filename.concat db2.bdir2 "patches" in
   let oc = open_out_bin (fname ^ "1") in
   output_string oc magic_patch;
   output_value oc db2.patches;
@@ -473,7 +473,7 @@ value base_of_base2 bname =
          h_couple = empty_ht (); h_descend = empty_ht ();
          h_key = empty_ht (); h_name = empty_ht ()} ]
   in
-  {bdir = bdir; cache_chan = Hashtbl.create 1; patches = patches;
+  {bdir2 = bdir; cache_chan = Hashtbl.create 1; patches = patches;
    parents_array = None; consang_array = None; family_array = None;
    father_array = None; mother_array = None; children_array = None;
    phony () = ()}

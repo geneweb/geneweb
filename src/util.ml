@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.91 2006-12-23 22:35:32 ddr Exp $ *)
+(* $Id: util.ml,v 5.92 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2393,9 +2393,8 @@ value relation_txt conf sex fam =
       valid_format "%t" s ]
 ;
 
-value escache_value conf base =
-  let bname = base_path [] (conf.bname ^ ".gwb") in
-  let t = Gwdb.date_of_last_change bname base in
+value escache_value base =
+  let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in
   string_of_int v
 ;
@@ -2458,7 +2457,7 @@ value commit_patches conf base =
     conf.henv :=
       List.map
         (fun (k, v) ->
-           if k = "escache" then (k, escache_value conf base) else (k, v))
+           if k = "escache" then (k, escache_value base) else (k, v))
         conf.henv
     ;
     if conf.user <> "" then

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.24 2006-12-23 22:35:32 ddr Exp $ *)
+(* $Id: util.mli,v 5.25 2006-12-23 23:41:28 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -16,7 +16,7 @@ value base_path : list string -> string -> string;
 value search_in_lang_path : string -> string;
 value search_in_doc_path : string -> string;
 
-value escache_value : config -> base -> string;
+value escache_value : base -> string;
 value commit_patches : config -> base -> unit;
 value update_wf_trace : config -> string -> unit;
 
