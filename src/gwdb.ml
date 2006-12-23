@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.178 2006-12-23 16:27:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.179 2006-12-23 20:15:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -45,16 +45,13 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
     next : 'istr -> 'istr }
 ;
 
+(* string person index version 2 *)
+
 type string_person_index2 =
   { is_first_name : bool;
     index_of_first_char : list (string * int);
     ini : mutable string;
     curr : mutable int }
-;
-
-type string_person_index =
-  [ Spi of gen_string_person_index dsk_istr
-  | Spi2 of db2 and string_person_index2 ]
 ;
 
 (* reading in files style database 2 *)
@@ -117,8 +114,6 @@ value empty_person empty_string ip =
    burial_place = empty_string; burial_src = empty_string;
    notes = empty_string; psources = empty_string; key_index = ip}
 ;
-
-value ok_I_know = ref False;
 
 (* hash tables in disk *)
 
@@ -222,9 +217,8 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
   let ic = open_in_bin index_ini_fname in
   let iofc : list (string * int) = input_value ic in
   close_in ic;
-  Spi2 db2
-    {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
-     curr = 0}
+  {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
+   curr = 0}
 };
 
 value load_array2 bdir nb_ini nb f1 f2 get =
@@ -463,103 +457,145 @@ value un_istr2 i =
   wrap_istr f f f i
 ;
 
-value spi_first spi s =
-  match spi with
-  [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 db2 spi -> do {
-      let i =
-        (* to be faster, go directly to the first string starting with
-           the same char *)
-        if s = "" then 0
-        else
-          let nbc = Name.nbc s.[0] in
-          loop spi.index_of_first_char where rec loop =
-            fun
-            [ [(s1, i1) :: list] ->
-                if s1 = "" then loop list
-                else
-                  let nbc1 = Name.nbc s1.[0] in
-                  if nbc = nbc1 && nbc > 0 && nbc <= String.length s &&
-                     nbc <= String.length s1 &&
-                     String.sub s 0 nbc = String.sub s1 0 nbc
-                  then i1
-                  else loop list
-            | [] -> raise Not_found ]
-      in
-      let f1 = "person" in
-      let f2 = if spi.is_first_name then "first_name" else "surname" in
-      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
-      let pos = input_binary_int ic in
-      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
-      let (pos, i) =
-        try
-          loop i where rec loop i =
-            let (s1, pos) : (string * int) = Iovalue.input ic in
-            if start_with s1 s then (pos, i) else loop (i + 1)
+(* String person index - common definitions *)
+
+type string_person_index =
+  [ Spi of gen_string_person_index dsk_istr
+  | Spi2 of db2 and string_person_index2 ]
+;
+
+type spi 'a =
+  { spi_first : 'a -> string -> istr;
+    spi_next : 'a -> istr -> bool -> (istr * int);
+    spi_find : 'a -> istr -> list iper }
+;
+
+(* String person index - implementation database 1 *)
+
+value spi1_fun =
+  {spi_first spi s = Istr (spi.cursor s);
+   spi_next spi istr need_whole_list =
+     match istr with
+     [ Istr s -> (Istr (spi.next s), 1)
+     | _ -> failwith "not impl spi_next" ];
+   spi_find spi s =
+     match s with
+     [ Istr s -> spi.find s
+     | _ -> failwith "not impl spi_find" ]}
+;
+
+(* String person index - implementation database 2 *)
+
+value spi2_fun =
+  {spi_first (db2, spi) s = do {
+     let i =
+       (* to be faster, go directly to the first string starting with
+          the same char *)
+       if s = "" then 0
+       else
+         let nbc = Name.nbc s.[0] in
+         loop spi.index_of_first_char where rec loop =
+           fun
+           [ [(s1, i1) :: list] ->
+               if s1 = "" then loop list
+               else
+                 let nbc1 = Name.nbc s1.[0] in
+                 if nbc = nbc1 && nbc > 0 && nbc <= String.length s &&
+                    nbc <= String.length s1 &&
+                    String.sub s 0 nbc = String.sub s1 0 nbc
+                 then i1
+                 else loop list
+           | [] -> raise Not_found ]
+     in
+     let f1 = "person" in
+     let f2 = if spi.is_first_name then "first_name" else "surname" in
+     let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
+     let pos = input_binary_int ic in
+     let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
+     let (pos, i) =
+       try
+         loop i where rec loop i =
+           let (s1, pos) : (string * int) = Iovalue.input ic in
+           if start_with s1 s then (pos, i) else loop (i + 1)
+       with
+       [ End_of_file -> raise Not_found ]
+     in
+     spi.ini := s;
+     spi.curr := i;
+     Istr2 db2 (f1, f2) pos
+  };
+  spi_next (db2, spi) istr need_whole_list =
+    match istr with
+    [ Istr2 _ (f1, f2) _ ->
+        let i =
+          if spi.ini = "" && not need_whole_list then
+            loop spi.index_of_first_char where rec loop =
+              fun
+              [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
+                  if spi.curr = i1 then i2 else loop list
+              | [] | [_] -> raise Not_found ]
+          else spi.curr + 1
+        in
+        try do {
+          let ic =
+            if i = spi.curr + 1 then
+              Hashtbl.find db2.cache_chan (f1, f2, "index.dat")
+            else
+              let ic =
+                fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
+              in
+              let pos = input_binary_int ic in
+              fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
+          in
+          let (s, pos) : (string * int) = Iovalue.input ic in
+          let dlen = i - spi.curr in
+          spi.curr := i;
+          (Istr2 db2 (f1, f2) pos, dlen)
+        }
         with
         [ End_of_file -> raise Not_found ]
-      in
-      spi.ini := s;
-      spi.curr := i;
-      Istr2 db2 (f1, f2) pos
-    } ]
-;
-
-value spi_next spi istr need_whole_list =
-  match (spi, istr) with
-  [ (Spi spi, Istr s) -> (Istr (spi.next s), 1)
-  | (Spi2 db2 spi, Istr2 _ (f1, f2) _) ->
-      let i =
-        if spi.ini = "" && not need_whole_list then
-          loop spi.index_of_first_char where rec loop =
-            fun
-            [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
-                if spi.curr = i1 then i2 else loop list
-            | [] | [_] -> raise Not_found ]
-        else spi.curr + 1
-      in
-      try do {
-        let ic =
-          if i = spi.curr + 1 then
-            Hashtbl.find db2.cache_chan (f1, f2, "index.dat")
-          else
-            let ic =
-              fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
-            in
-            let pos = input_binary_int ic in
-            fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
-        in
-        let (s, pos) : (string * int) = Iovalue.input ic in
-        let dlen = i - spi.curr in
-        spi.curr := i;
-        (Istr2 db2 (f1, f2) pos, dlen)
+    | _ -> failwith "not impl spi_next" ];
+  spi_find (db2, spi) s =
+    match s with
+    [ Istr2 db2 (f1, f2) pos -> do {
+        let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
+        hashtbl_find_all dir "person_of_string.ht" pos
       }
-      with
-      [ End_of_file -> raise Not_found ]
-  | _ -> failwith "not impl spi_next" ]
+    | Istr2New db2 s ->
+        let proj =
+          if spi.is_first_name then fun p -> p.first_name
+          else fun p -> p.surname
+        in
+        Hashtbl.fold
+          (fun _ iper iperl ->
+             try
+               let p = Hashtbl.find db2.patches.h_person iper in
+               if proj p = s then [iper :: iperl] else iperl
+             with
+             [ Not_found -> iperl ])
+          db2.patches.h_key []
+    | _ -> failwith "not impl spi_find" ]}
 ;
 
-value spi_find spi s =
-  match (spi, s) with
-  [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2 _ _, Istr2 db2 (f1, f2) pos) -> do {
-      let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
-      hashtbl_find_all dir "person_of_string.ht" pos
-    }
-  | (Spi2 _ spi, Istr2New db2 s) ->
-      let proj =
-        if spi.is_first_name then fun p -> p.first_name
-        else fun p -> p.surname
-      in
-      Hashtbl.fold
-        (fun _ iper iperl ->
-           try
-             let p = Hashtbl.find db2.patches.h_person iper in
-             if proj p = s then [iper :: iperl] else iperl
-           with
-           [ Not_found -> iperl ])
-        db2.patches.h_key []
-  | _ -> failwith "not impl spi_find" ]
+(* String person index - user functions *)
+
+value wrap_spi f g =
+  fun
+  [ Spi spi -> f spi1_fun spi
+  | Spi2 db2 spi2 -> g spi2_fun (db2, spi2) ]
+;
+
+value spi_find =
+  let f pf = pf.spi_find in
+  wrap_spi f f
+;
+value spi_first =
+  let f pf = pf.spi_first in
+  wrap_spi f f
+;
+value spi_next =
+  let f pf = pf.spi_next in
+  wrap_spi f f
 ;
 
 (* Persons - common definitions *)
@@ -1627,6 +1663,7 @@ value base1 base =
 
 (* Database - implementation 2 *)
 
+value ok_I_know = ref False;
 value base2 db2 =
   let base_strings_of_first_name_or_surname field proj s =
     let posl = strings2_of_fsname db2 field s in
@@ -1796,8 +1833,10 @@ value base2 db2 =
      delete_family ifam = C_base.delete_family self ifam;
      person_of_key fn sn oc = person2_of_key db2 fn sn oc;
      persons_of_name s = persons2_of_name db2 s;
-     persons_of_first_name () = persons_of_first_name_or_surname2 db2 True;
-     persons_of_surname () = persons_of_first_name_or_surname2 db2 False;
+     persons_of_first_name () =
+       Spi2 db2 (persons_of_first_name_or_surname2 db2 True);
+     persons_of_surname () =
+       Spi2 db2 (persons_of_first_name_or_surname2 db2 False);
      base_visible_get f = failwith "not impl visible_get";
      base_visible_write () = failwith "not impl visible_write";
      base_particles () =
