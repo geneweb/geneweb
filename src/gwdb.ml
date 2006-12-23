@@ -1,7 +1,6 @@
-(* $Id: gwdb.ml,v 5.180 2006-12-23 22:09:30 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.181 2006-12-23 22:13:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Adef;
 open Config;
 open Dbdisk;
 open Db2disk;
@@ -856,7 +855,7 @@ value couple2_fun =
        let p2 = get_field db2 i ("family", "mother") in
        [| p1; p2 |];
      gen_couple_of_couple c =
-       couple (self.get_father c) (self.get_mother c)}
+       Adef.couple (self.get_father c) (self.get_mother c)}
 ;
 
 value couple2gen_fun =
@@ -1080,12 +1079,12 @@ module C_base :
     value delete_family self ifam =
       let cpl =
         self.couple_of_gen_couple
-          (couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
+          (Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
       in
       let fam =
         let empty = self.insert_string "" in
         self.family_of_gen_family
-          {marriage = codate_None; marriage_place = empty;
+          {marriage = Adef.codate_None; marriage_place = empty;
            marriage_src = empty; relation = Married; divorce = NotDivorced;
            witnesses = [| |]; comment = empty; origin_file = empty;
            fsources = empty; fam_index = Adef.ifam_of_int (-1)}
