@@ -129,11 +129,11 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx image.cmx lock.cmx mutil.cmx name.cmx relationLink.cmx \
     request.cmx robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi config.cmi database.cmi db2.cmo db2disk.cmi dbdisk.cmi \
-    def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
-gwdb.cmx: adef.cmx config.cmi database.cmx db2.cmx db2disk.cmx dbdisk.cmi \
-    def.cmi futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
-gwdb.cmi: adef.cmi config.cmi dbdisk.cmi def.cmi 
+gwdb.cmo: adef.cmi database.cmi db2.cmo db2disk.cmi dbdisk.cmi def.cmi \
+    futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
+gwdb.cmx: adef.cmx database.cmx db2.cmx db2disk.cmx dbdisk.cmi def.cmi \
+    futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
+gwdb.cmi: adef.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmi secure.cmi select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx gwdb.cmx \

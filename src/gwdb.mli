@@ -1,8 +1,7 @@
-(* $Id: gwdb.mli,v 5.75 2006-12-22 06:39:44 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.76 2006-12-23 22:35:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
-open Config;
 
 type istr = 'abstract;
 
@@ -172,9 +171,10 @@ value base_notes_dir : base -> string;
 value base_wiznotes_dir : base -> string;
 
 value person_misc_names :
-  base -> person -> (person -> list title) -> list string
-;
-value nobtit : config -> base -> person -> list title;
+  base -> person -> (person -> list title) -> list string;
+value nobtit :
+  base -> Lazy.t (list string) -> Lazy.t (list string) -> person ->
+    list title;
 
 value p_first_name : base -> person -> string;
 value p_surname : base -> person -> string;

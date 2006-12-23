@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.41 2006-12-08 13:16:19 ddr Exp $ *)
+(* $Id: perso.ml,v 5.42 2006-12-23 22:35:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -150,7 +150,7 @@ value nobility_titles_list conf base p =
              [(t.t_nth, t.t_name, t.t_ident, t.t_place,
                [(t_date_start, t_date_end)]) ::
               l] ])
-      (nobtit conf base p) []
+      (Util.nobtit conf base p) []
   in
   List.fold_right
     (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
@@ -1929,7 +1929,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother
   | "misc_names" ->
       if p_auth then
-        let list = Gwdb.person_misc_names base p (Gwdb.nobtit conf base) in
+        let list = Gwdb.person_misc_names base p (Util.nobtit conf base) in
         let list =
           let first_name = p_first_name base p in
           let surname = p_surname base p in
