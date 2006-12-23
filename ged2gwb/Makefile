@@ -1,9 +1,9 @@
-# $Id: Makefile,v 5.16 2006-11-03 10:31:18 ddr Exp $
+# $Id: Makefile,v 5.17 2006-12-23 22:09:30 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../src
-OBJS=../src/argl.cmo ../src/adef.cmo ../src/iovalue.cmo ../src/buff.cmo ../src/name.cmo ../src/ansel.cmo ../src/mutil.cmo ../src/futil.cmo ../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo ../src/database.cmo ../src/db2.cmo ../src/diff.cmo ../src/gwdb.cmo ../src/checkItem.cmo ../src/outbase.cmo ../src/calendar.cmo ../src/lock.cmo ../src/progrBar.cmo ../src/consang.cmo ../src/consangAll.cmo ../src/check.cmo ged2gwb.cmo
+OBJS=../src/argl.cmo ../src/adef.cmo ../src/iovalue.cmo ../src/buff.cmo ../src/name.cmo ../src/ansel.cmo ../src/mutil.cmo ../src/futil.cmo ../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo ../src/database.cmo ../src/db2.cmo ../src/db2disk.cmo ../src/diff.cmo ../src/gwdb.cmo ../src/checkItem.cmo ../src/outbase.cmo ../src/calendar.cmo ../src/lock.cmo ../src/progrBar.cmo ../src/consang.cmo ../src/consangAll.cmo ../src/check.cmo ged2gwb.cmo
 
 all:: out
 
