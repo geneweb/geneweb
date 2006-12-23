@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.175 2006-12-23 03:23:44 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.176 2006-12-23 04:03:33 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -43,12 +43,6 @@ type istr =
   [ Istr of dsk_istr
   | Istr2 of db2 and (string * string) and int
   | Istr2New of db2 and string ]
-;
-
-type union =
-  [ Union of dsk_union
-  | Union2 of db2 and int
-  | Union2Gen of db2 and gen_union ifam ]
 ;
 
 type family =
@@ -185,23 +179,6 @@ value empty_person empty_string ip =
    death_src = empty_string; burial = UnknownBurial;
    burial_place = empty_string; burial_src = empty_string;
    notes = empty_string; psources = empty_string; key_index = ip}
-;
-
-value get_family =
-  fun
-  [ Union u -> u.Def.family
-  | Union2 db2 i ->
-      match db2.family_array with
-      [ Some tab -> tab.(i)
-      | None -> get_field db2 i ("person", "family") ]
-  | Union2Gen db2 u -> u.Def.family ]
-;
-
-value gen_union_of_union =
-  fun
-  [ Union u -> u
-  | Union2 _ _ as u -> {family = get_family u}
-  | Union2Gen db2 u -> u ]
 ;
 
 value get_comment =
@@ -723,6 +700,12 @@ type ascend =
   | Ascend2Gen of db2 and gen_ascend ifam ]
 ;
 
+type union =
+  [ Union of dsk_union
+  | Union2 of db2 and int
+  | Union2Gen of db2 and gen_union ifam ]
+;
+
 type person_fun 'a =
   { get_access : 'a -> access;
     get_aliases : 'a -> list istr;
@@ -765,6 +748,10 @@ type person_fun 'a =
 type ascend_fun 'a =
   { get_consang : 'a -> Adef.fix;
     get_parents : 'a -> option ifam }
+;
+
+type union_fun 'a =
+  { get_family : 'a -> array ifam }
 ;
 
 (* Persons - implementation database 1 *)
@@ -814,6 +801,10 @@ value person1_fun =
 value ascend1_fun =
   {get_consang a = a.Def.consang;
    get_parents a = a.Def.parents}
+;
+
+value union1_fun =
+  { get_family u = u.Def.family }
 ;
 
 (* Persons - implementation database 2 *)
@@ -1018,6 +1009,17 @@ value ascend2gen_fun =
    get_parents (db2, a) = a.Def.parents}
 ;
 
+value union2_fun =
+  { get_family (db2, i) =
+      match db2.family_array with
+      [ Some tab -> tab.(i)
+      | None -> get_field db2 i ("person", "family") ] }
+;
+
+value union2gen_fun =
+  { get_family (db2, u) = u.Def.family }
+;
+
 (* Persons - user functions *)
 
 value wrap_per f g h =
@@ -1032,6 +1034,13 @@ value wrap_asc f g h =
   [ Ascend a -> f ascend1_fun a
   | Ascend2 db2 i -> g ascend2_fun (db2, i)
   | Ascend2Gen db2 a -> h ascend2gen_fun (db2, a) ]
+;
+
+value wrap_uni f g h =
+  fun
+  [ Union u -> f union1_fun u
+  | Union2 db2 i -> g union2_fun (db2, i)
+  | Union2Gen db2 u -> h union2gen_fun (db2, u) ]
 ;
 
 value get_access =
@@ -1187,6 +1196,11 @@ value get_consang =
 value get_parents =
   let f pf = pf.get_parents in
   wrap_asc f f f
+;
+
+value get_family =
+  let f pf = pf.get_family in
+  wrap_uni f f f
 ;
 
 (* Database - common definitions *)
