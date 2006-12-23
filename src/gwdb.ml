@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.177 2006-12-23 05:20:09 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.178 2006-12-23 16:27:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -39,15 +39,6 @@ type db2 =
     children_array : mutable option (array (array iper)) }
 ;
 
-type istr =
-  [ Istr of dsk_istr
-  | Istr2 of db2 and (string * string) and int
-  | Istr2New of db2 and string ]
-;
-
-type relation = Def.gen_relation iper istr;
-type title = Def.gen_title istr;
-
 type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
   { find : 'istr -> list iper;
     cursor : string -> 'istr;
@@ -65,6 +56,8 @@ type string_person_index =
   [ Spi of gen_string_person_index dsk_istr
   | Spi2 of db2 and string_person_index2 ]
 ;
+
+(* reading in files style database 2 *)
 
 value fast_open_in_bin_and_seek db2 f1 f2 f pos = do {
   let ic =
@@ -109,46 +102,6 @@ value string_of_istr2 db2 f pos =
   else get_field_data db2 pos f "data"
 ;
 
-value eq_istr i1 i2 =
-  match (i1, i2) with
-  [ (Istr i1, Istr i2) -> Adef.int_of_istr i1 = Adef.int_of_istr i2
-  | (Istr2 _ (f11, f12) i1, Istr2 _ (f21, f22) i2) ->
-      i1 = i2 && f11 = f21 && f12 = f22
-  | (Istr2New _ s1, Istr2New _ s2) -> s1 = s2
-  | (Istr2 db2 f pos, Istr2New _ s2) -> False (*string_of_istr2 db2 f pos = s2*)
-  | (Istr2New _ s1, Istr2 db2 f pos) -> False (*s1 = string_of_istr2 db2 f pos*)
-  | _ -> failwith "eq_istr" ]
-;
-
-value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
-
-value is_empty_string =
-  fun
-  [ Istr istr -> Adef.int_of_istr istr = 0
-  | Istr2 db2 path pos -> pos = Db2.empty_string_pos
-  | Istr2New db2 s -> s = "" ]
-;
-value is_quest_string =
-  fun
-  [ Istr istr -> Adef.int_of_istr istr = 1
-  | Istr2 db2 path pos -> failwith "not impl is_quest_string"
-  | Istr2New db2 s -> s = "?" ]
-;
-
-value un_istr =
-  fun
-  [ Istr i -> i
-  | Istr2 _ _ i -> failwith "un_istr"
-  | Istr2New _ _ -> failwith "un_istr" ]
-;
-
-value un_istr2 =
-  fun
-  [ Istr _ -> failwith "un_istr2 1"
-  | Istr2 _ _ _ -> failwith "un_istr2 2"
-  | Istr2New _ s -> s ]
-;
-
 value no_consang = Adef.fix (-1);
 
 value empty_person empty_string ip =
@@ -163,13 +116,6 @@ value empty_person empty_string ip =
    death_src = empty_string; burial = UnknownBurial;
    burial_place = empty_string; burial_src = empty_string;
    notes = empty_string; psources = empty_string; key_index = ip}
-;
-
-value sou2 i =
-  match i with
-  [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
-  | Istr2New db2 s -> s
-  | _ -> assert False ]
 ;
 
 value ok_I_know = ref False;
@@ -280,105 +226,6 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
     {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
      curr = 0}
 };
-
-value spi_first spi s =
-  match spi with
-  [ Spi spi -> Istr (spi.cursor s)
-  | Spi2 db2 spi -> do {
-      let i =
-        (* to be faster, go directly to the first string starting with
-           the same char *)
-        if s = "" then 0
-        else
-          let nbc = Name.nbc s.[0] in
-          loop spi.index_of_first_char where rec loop =
-            fun
-            [ [(s1, i1) :: list] ->
-                if s1 = "" then loop list
-                else
-                  let nbc1 = Name.nbc s1.[0] in
-                  if nbc = nbc1 && nbc > 0 && nbc <= String.length s &&
-                     nbc <= String.length s1 &&
-                     String.sub s 0 nbc = String.sub s1 0 nbc
-                  then i1
-                  else loop list
-            | [] -> raise Not_found ]
-      in
-      let f1 = "person" in
-      let f2 = if spi.is_first_name then "first_name" else "surname" in
-      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
-      let pos = input_binary_int ic in
-      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
-      let (pos, i) =
-        try
-          loop i where rec loop i =
-            let (s1, pos) : (string * int) = Iovalue.input ic in
-            if start_with s1 s then (pos, i) else loop (i + 1)
-        with
-        [ End_of_file -> raise Not_found ]
-      in
-      spi.ini := s;
-      spi.curr := i;
-      Istr2 db2 (f1, f2) pos
-    } ]
-;
-
-value spi_next spi istr need_whole_list =
-  match (spi, istr) with
-  [ (Spi spi, Istr s) -> (Istr (spi.next s), 1)
-  | (Spi2 db2 spi, Istr2 _ (f1, f2) _) ->
-      let i =
-        if spi.ini = "" && not need_whole_list then
-          loop spi.index_of_first_char where rec loop =
-            fun
-            [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
-                if spi.curr = i1 then i2 else loop list
-            | [] | [_] -> raise Not_found ]
-        else spi.curr + 1
-      in
-      try do {
-        let ic =
-          if i = spi.curr + 1 then
-            Hashtbl.find db2.cache_chan (f1, f2, "index.dat")
-          else
-            let ic =
-              fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
-            in
-            let pos = input_binary_int ic in
-            fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
-        in
-        let (s, pos) : (string * int) = Iovalue.input ic in
-        let dlen = i - spi.curr in
-        spi.curr := i;
-        (Istr2 db2 (f1, f2) pos, dlen)
-      }
-      with
-      [ End_of_file -> raise Not_found ]
-  | _ -> failwith "not impl spi_next" ]
-;
-
-value spi_find spi s =
-  match (spi, s) with
-  [ (Spi spi, Istr s) -> spi.find s
-  | (Spi2 _ _, Istr2 db2 (f1, f2) pos) -> do {
-      let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
-      hashtbl_find_all dir "person_of_string.ht" pos
-    }
-  | (Spi2 _ spi, Istr2New db2 s) ->
-      let proj =
-        if spi.is_first_name then fun p -> p.first_name
-        else fun p -> p.surname
-      in
-      Hashtbl.fold
-        (fun _ iper iperl ->
-           try
-             let p = Hashtbl.find db2.patches.h_person iper in
-             if proj p = s then [iper :: iperl] else iperl
-           with
-           [ Not_found -> iperl ])
-        db2.patches.h_key []
-  | _ -> failwith "not impl spi_find" ]
-;
 
 value load_array2 bdir nb_ini nb f1 f2 get =
   if nb = 0 then [| |]
@@ -525,6 +372,194 @@ value base_of_base2 bname =
    parents_array = None; consang_array = None; family_array = None;
    father_array = None; mother_array = None; children_array = None;
    phony () = ()}
+;
+
+(* Strings - common definitions *)
+
+type istr =
+  [ Istr of dsk_istr
+  | Istr2 of db2 and (string * string) and int
+  | Istr2New of db2 and string ]
+;
+
+type istr_fun 'a =
+  { is_empty_string : 'a -> bool;
+    is_quest_string : 'a -> bool;
+    un_istr : 'a -> Adef.istr;
+    un_istr2 : 'a -> string }
+;
+
+type relation = Def.gen_relation iper istr;
+type title = Def.gen_title istr;
+
+value eq_istr i1 i2 =
+  match (i1, i2) with
+  [ (Istr i1, Istr i2) -> Adef.int_of_istr i1 = Adef.int_of_istr i2
+  | (Istr2 _ (f11, f12) i1, Istr2 _ (f21, f22) i2) ->
+      i1 = i2 && f11 = f21 && f12 = f22
+  | (Istr2New _ s1, Istr2New _ s2) -> s1 = s2
+  | (Istr2 db2 f pos, Istr2New _ s2) -> False (*string_of_istr2 db2 f pos = s2*)
+  | (Istr2New _ s1, Istr2 db2 f pos) -> False (*s1 = string_of_istr2 db2 f pos*)
+  | _ -> failwith "eq_istr" ]
+;
+
+(* Strings - implementation database 1 *)
+
+value istr1_fun =
+  {is_empty_string istr = Adef.int_of_istr istr = 0;
+   is_quest_string istr = Adef.int_of_istr istr = 1;
+   un_istr i = i;
+   un_istr2 i = failwith "un_istr2 1"}
+;
+
+(* Strings - implementation database 2 *)
+
+value istr2_fun =
+  {is_empty_string (db2, path, pos) = pos = Db2.empty_string_pos;
+   is_quest_string (db2, path, pos) = failwith "not impl is_quest_string";
+   un_istr _ = failwith "un_istr";
+   un_istr2 _ = failwith "un_istr2 2"}
+;
+
+value istr2new_fun =
+  {is_empty_string (db2, s) = s = "";
+   is_quest_string (db2, s) = s = "?";
+   un_istr (db2, s) = failwith "un_istr";
+   un_istr2 (db2, s) = s}
+;
+
+value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
+
+value sou2 i =
+  match i with
+  [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
+  | Istr2New db2 s -> s
+  | _ -> assert False ]
+;
+
+(* Strings - user functions *)
+
+value wrap_istr f g h =
+  fun
+  [ Istr istr -> f istr1_fun istr
+  | Istr2 db2 path pos -> g istr2_fun (db2, path, pos)
+  | Istr2New db2 s -> h istr2new_fun (db2, s) ]
+;
+
+value is_empty_string i =
+  let f pf = pf.is_empty_string in
+  wrap_istr f f f i
+;
+value is_quest_string i =
+  let f pf = pf.is_quest_string in
+  wrap_istr f f f i
+;
+value un_istr i =
+  let f pf = pf.un_istr in
+  wrap_istr f f f i
+;
+value un_istr2 i =
+  let f pf = pf.un_istr2 in
+  wrap_istr f f f i
+;
+
+value spi_first spi s =
+  match spi with
+  [ Spi spi -> Istr (spi.cursor s)
+  | Spi2 db2 spi -> do {
+      let i =
+        (* to be faster, go directly to the first string starting with
+           the same char *)
+        if s = "" then 0
+        else
+          let nbc = Name.nbc s.[0] in
+          loop spi.index_of_first_char where rec loop =
+            fun
+            [ [(s1, i1) :: list] ->
+                if s1 = "" then loop list
+                else
+                  let nbc1 = Name.nbc s1.[0] in
+                  if nbc = nbc1 && nbc > 0 && nbc <= String.length s &&
+                     nbc <= String.length s1 &&
+                     String.sub s 0 nbc = String.sub s1 0 nbc
+                  then i1
+                  else loop list
+            | [] -> raise Not_found ]
+      in
+      let f1 = "person" in
+      let f2 = if spi.is_first_name then "first_name" else "surname" in
+      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
+      let pos = input_binary_int ic in
+      let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
+      let (pos, i) =
+        try
+          loop i where rec loop i =
+            let (s1, pos) : (string * int) = Iovalue.input ic in
+            if start_with s1 s then (pos, i) else loop (i + 1)
+        with
+        [ End_of_file -> raise Not_found ]
+      in
+      spi.ini := s;
+      spi.curr := i;
+      Istr2 db2 (f1, f2) pos
+    } ]
+;
+
+value spi_next spi istr need_whole_list =
+  match (spi, istr) with
+  [ (Spi spi, Istr s) -> (Istr (spi.next s), 1)
+  | (Spi2 db2 spi, Istr2 _ (f1, f2) _) ->
+      let i =
+        if spi.ini = "" && not need_whole_list then
+          loop spi.index_of_first_char where rec loop =
+            fun
+            [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
+                if spi.curr = i1 then i2 else loop list
+            | [] | [_] -> raise Not_found ]
+        else spi.curr + 1
+      in
+      try do {
+        let ic =
+          if i = spi.curr + 1 then
+            Hashtbl.find db2.cache_chan (f1, f2, "index.dat")
+          else
+            let ic =
+              fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
+            in
+            let pos = input_binary_int ic in
+            fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
+        in
+        let (s, pos) : (string * int) = Iovalue.input ic in
+        let dlen = i - spi.curr in
+        spi.curr := i;
+        (Istr2 db2 (f1, f2) pos, dlen)
+      }
+      with
+      [ End_of_file -> raise Not_found ]
+  | _ -> failwith "not impl spi_next" ]
+;
+
+value spi_find spi s =
+  match (spi, s) with
+  [ (Spi spi, Istr s) -> spi.find s
+  | (Spi2 _ _, Istr2 db2 (f1, f2) pos) -> do {
+      let dir = List.fold_left Filename.concat db2.bdir [f1; f2] in
+      hashtbl_find_all dir "person_of_string.ht" pos
+    }
+  | (Spi2 _ spi, Istr2New db2 s) ->
+      let proj =
+        if spi.is_first_name then fun p -> p.first_name
+        else fun p -> p.surname
+      in
+      Hashtbl.fold
+        (fun _ iper iperl ->
+           try
+             let p = Hashtbl.find db2.patches.h_person iper in
+             if proj p = s then [iper :: iperl] else iperl
+           with
+           [ Not_found -> iperl ])
+        db2.patches.h_key []
+  | _ -> failwith "not impl spi_find" ]
 ;
 
 (* Persons - common definitions *)
@@ -882,164 +917,164 @@ value wrap_uni f g h =
   | Union2Gen db2 u -> h union2gen_fun (db2, u) ]
 ;
 
-value get_access =
+value get_access p =
   let f pf = pf.get_access in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_aliases =
+value get_aliases p =
   let f pf = pf.get_aliases in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_baptism =
+value get_baptism p =
   let f pf = pf.get_baptism in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_baptism_place =
+value get_baptism_place p =
   let f pf = pf.get_baptism_place in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_baptism_src =
+value get_baptism_src p =
   let f pf = pf.get_baptism_src in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_birth =
+value get_birth p =
   let f pf = pf.get_birth in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_birth_place =
+value get_birth_place p =
   let f pf = pf.get_birth_place in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_birth_src =
+value get_birth_src p =
   let f pf = pf.get_birth_src in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_burial =
+value get_burial p =
   let f pf = pf.get_burial in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_burial_place =
+value get_burial_place p =
   let f pf = pf.get_burial_place in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_burial_src =
+value get_burial_src p =
   let f pf = pf.get_burial_src in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_death =
+value get_death p =
   let f pf = pf.get_death in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_death_place =
+value get_death_place p =
   let f pf = pf.get_death_place in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_death_src =
+value get_death_src p =
   let f pf = pf.get_death_src in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_first_name =
+value get_first_name p =
   let f pf = pf.get_first_name in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_first_names_aliases =
+value get_first_names_aliases p =
   let f pf = pf.get_first_names_aliases in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_image =
+value get_image p =
   let f pf = pf.get_image in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_key_index =
+value get_key_index p =
   let f pf = pf.get_key_index in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_notes =
+value get_notes p =
   let f pf = pf.get_notes in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_occ =
+value get_occ p =
   let f pf = pf.get_occ in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_occupation =
+value get_occupation p =
   let f pf = pf.get_occupation in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_psources =
+value get_psources p =
   let f pf = pf.get_psources in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_public_name =
+value get_public_name p =
   let f pf = pf.get_public_name in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_qualifiers =
+value get_qualifiers p =
   let f pf = pf.get_qualifiers in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_related =
+value get_related p =
   let f pf = pf.get_related in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_rparents =
+value get_rparents p =
   let f pf = pf.get_rparents in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_sex =
+value get_sex p =
   let f pf = pf.get_sex in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_surname =
+value get_surname p =
   let f pf = pf.get_surname in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_surnames_aliases =
+value get_surnames_aliases p =
   let f pf = pf.get_surnames_aliases in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value get_titles =
+value get_titles p =
   let f pf = pf.get_titles in
-  wrap_per f f f
+  wrap_per f f f p
 ;
 
-value person_with_key =
+value person_with_key p =
   let f pf = pf.person_with_key in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value person_with_related =
+value person_with_related p =
   let f pf = pf.person_with_related in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value person_with_rparents =
+value person_with_rparents p =
   let f pf = pf.person_with_rparents in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value person_with_sex =
+value person_with_sex p =
   let f pf = pf.person_with_sex in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value gen_person_of_person =
+value gen_person_of_person p =
   let f pf = pf.gen_person_of_person in
-  wrap_per f f f
+  wrap_per f f f p
 ;
-value dsk_person_of_person =
+value dsk_person_of_person p =
   let f pf = pf.dsk_person_of_person in
-  wrap_per f f f
+  wrap_per f f f p
 ;
 
-value get_consang =
+value get_consang a =
   let f pf = pf.get_consang in
-  wrap_asc f f f
+  wrap_asc f f f a
 ;
-value get_parents =
+value get_parents a =
   let f pf = pf.get_parents in
-  wrap_asc f f f
+  wrap_asc f f f a
 ;
 
-value get_family =
+value get_family u =
   let f pf = pf.get_family in
-  wrap_uni f f f
+  wrap_uni f f f u
 ;
 
 (* Families - common definitions *)
@@ -1236,79 +1271,79 @@ value wrap_des f g h =
   | Descend2Gen db2 p -> h descend2gen_fun (db2, p) ]
 ;
 
-value get_comment =
+value get_comment fam =
   let f pf = pf.get_comment in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_divorce =
+value get_divorce fam =
   let f pf = pf.get_divorce in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_fsources =
+value get_fsources fam =
   let f pf = pf.get_fsources in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_marriage =
+value get_marriage fam =
   let f pf = pf.get_marriage in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_marriage_place =
+value get_marriage_place fam =
   let f pf = pf.get_marriage_place in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_marriage_src =
+value get_marriage_src fam =
   let f pf = pf.get_marriage_src in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_origin_file =
+value get_origin_file fam =
   let f pf = pf.get_origin_file in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_relation =
+value get_relation fam =
   let f pf = pf.get_relation in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value get_witnesses =
+value get_witnesses fam =
   let f pf = pf.get_witnesses in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value family_with_origin_file =
+value family_with_origin_file fam =
   let f pf = pf.family_with_origin_file in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value gen_family_of_family =
+value gen_family_of_family fam =
   let f pf = pf.gen_family_of_family in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
-value is_deleted_family =
+value is_deleted_family fam =
   let f pf = pf.is_deleted_family in
-  wrap_fam f f f
+  wrap_fam f f f fam
 ;
 
-value get_father =
+value get_father cpl =
   let f pf = pf.get_father in
-  wrap_cpl f f f
+  wrap_cpl f f f cpl
 ;
-value get_mother =
+value get_mother cpl =
   let f pf = pf.get_mother in
-  wrap_cpl f f f
+  wrap_cpl f f f cpl
 ;
-value get_parent_array =
+value get_parent_array cpl =
   let f pf = pf.get_parent_array in
-  wrap_cpl f f f
+  wrap_cpl f f f cpl
 ;
-value gen_couple_of_couple =
+value gen_couple_of_couple cpl =
   let f pf = pf.gen_couple_of_couple in
-  wrap_cpl f f f
+  wrap_cpl f f f cpl
 ;
 
-value get_children =
+value get_children des =
   let f pf = pf.get_children in
-  wrap_des f f f
+  wrap_des f f f des
 ;
-value gen_descend_of_descend =
+value gen_descend_of_descend des =
   let f pf = pf.gen_descend_of_descend in
-  wrap_des f f f
+  wrap_des f f f des
 ;
 
 (* Databases - common definitions *)
