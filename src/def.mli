@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.17 2006-10-10 21:04:58 ddr Exp $ *)
+(* $Id: def.mli,v 5.18 2006-12-23 22:09:30 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -158,3 +158,5 @@ type warning 'person 'descend 'title =
   | UndefinedSex of 'person
   | YoungForMarriage of 'person and dmy ]
 ;
+
+type rn_mode = [ RnAll | Rn1Ln | RnDeg ];
