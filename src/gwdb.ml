@@ -1,7 +1,6 @@
-(* $Id: gwdb.ml,v 5.181 2006-12-23 22:13:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.182 2006-12-23 22:35:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Config;
 open Dbdisk;
 open Db2disk;
 open Def;
@@ -29,11 +28,6 @@ value empty_person empty_string ip =
    death_src = empty_string; burial = UnknownBurial;
    burial_place = empty_string; burial_src = empty_string;
    notes = empty_string; psources = empty_string; key_index = ip}
-;
-
-value start_with s p =
-  String.length p < String.length s &&
-  String.sub s 0 (String.length p) = p
 ;
 
 (* Strings - common definitions *)
@@ -1038,7 +1032,8 @@ type base =
     base_notes_dir : unit -> string;
     base_wiznotes_dir : unit -> string;
     person_misc_names : person -> (person -> list title) -> list string;
-    nobtit : config -> person -> list title;
+    nobtit :
+      Lazy.t (list string) -> Lazy.t (list string) ->  person -> list title;
     p_first_name : person -> string;
     p_surname : person -> string;
     date_of_last_change : string -> float;
@@ -1050,7 +1045,9 @@ module C_base :
     value delete_family : base -> ifam -> unit;
     value person_misc_names :
       base -> person -> (person -> list title) -> list string;
-    value nobtit : base -> config -> person -> list title;
+    value nobtit :
+      base -> Lazy.t (list string) -> Lazy.t (list string) -> person ->
+        list title;
     value p_first_name : base -> person -> string;
     value p_surname : base -> person -> string;
   end =
@@ -1107,9 +1104,9 @@ module C_base :
         (if get_sex p = Female then husbands self p else [])
         (father_titles_places self p tit)
     ;
-    value nobtit self conf p =
+    value nobtit self allowed_titles denied_titles p =
       let list = get_titles p in
-      match Lazy.force conf.allowed_titles with
+      match Lazy.force allowed_titles with
       [ [] -> list
       | allowed_titles ->
           let list =
@@ -1127,7 +1124,7 @@ module C_base :
                  else l)
               list []
           in
-          match Lazy.force conf.denied_titles with
+          match Lazy.force denied_titles with
           [ [] -> list
           | denied_titles ->
               List.filter
@@ -1577,7 +1574,7 @@ value base_notes_origin_file b = b.base_notes_origin_file ();
 value base_notes_dir b = b.base_notes_dir ();
 value base_wiznotes_dir b = b.base_wiznotes_dir ();
 value person_misc_names b = b.person_misc_names;
-value nobtit conf b = b.nobtit conf;
+value nobtit b = b.nobtit;
 value p_first_name b = b.p_first_name;
 value p_surname b = b.p_surname;
 value date_of_last_change s b = b.date_of_last_change s;

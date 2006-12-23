@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.38 2006-11-29 10:16:41 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.39 2006-12-23 22:35:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -742,7 +742,7 @@ value print_mod o_conf base =
         (sou base (get_notes p)) (not (eq_istr (get_notes p) (get_notes op)));
       if not (eq_istr (get_surname op) (get_surname p)) ||
          get_surnames_aliases op <> get_surnames_aliases p ||
-         nobtit conf base op <> nobtit conf base p
+         Util.nobtit conf base op <> nobtit conf base p
       then
         Update.update_misc_names_of_family conf base p u
       else ();

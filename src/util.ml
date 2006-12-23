@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.90 2006-12-22 06:39:44 ddr Exp $ *)
+(* $Id: util.ml,v 5.91 2006-12-23 22:35:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -495,6 +495,10 @@ value p_getint env label =
       try Some (int_of_string (strip_spaces s)) with
       [ Failure _ -> None ]
   | None -> None ]
+;
+
+value nobtit conf base p =
+  Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
 ;
 
 value parent_has_title conf base p =

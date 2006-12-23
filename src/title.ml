@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.22 2006-12-11 04:07:47 ddr Exp $ *)
+(* $Id: title.ml,v 5.23 2006-12-23 22:35:32 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -48,7 +48,7 @@ value date_interval conf base t x =
                [ Some (Dgreg d _) -> set d
                | _ -> () ];
              })
-          (nobtit conf base x);
+          (Util.nobtit conf base x);
         match t with
         [ JustSelf -> ()
         | _ ->
