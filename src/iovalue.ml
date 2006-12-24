@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 5.4 2006-10-23 20:06:31 ddr Exp $ *)
+(* $Id: iovalue.ml,v 5.5 2006-12-24 07:08:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -225,6 +225,8 @@ value rec digest_loop v =
   if not (Obj.is_block v) then
     let n = (Obj.magic v : int) in
     do { dput_char 'I'; dput_int n }
+  else if Obj.tag v = Obj.closure_tag then
+    invalid_arg "Iovalue.digest: closure"
   else if Obj.size v = 0 then
     do { dput_char 'T'; dput_int (Obj.tag v) }
   else if Obj.tag v = string_tag then do {

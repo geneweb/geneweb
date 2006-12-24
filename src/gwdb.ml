@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.184 2006-12-23 23:41:28 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.185 2006-12-24 07:08:09 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -310,17 +310,17 @@ value union1_fun =
 
 (* Persons - implementation database 2 *)
 
+value get_list_field db2 i f1f2 =
+  let pos = get_field_acc db2 i f1f2 in
+  if pos = -1 then [] else get_field_data db2 pos f1f2 "data2.ext"
+;
+
 value person2_fun =
   self where rec self =
     {get_access (db2, i) = get_field db2 i ("person", "access");
      get_aliases (db2, i) =
-       let pos = get_field_acc db2 i ("person", "aliases") in
-       if pos = -1 then []
-       else
-         let list =
-           get_field_data db2 pos ("person", "aliases") "data2.ext"
-         in
-         List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list;
+       let list = get_list_field db2 i ("person", "aliases") in
+       List.map (fun pos -> Istr2 db2 ("person", "aliases") pos) list;
      get_baptism (db2, i) = get_field db2 i ("person", "baptism");
      get_baptism_place (db2, i) =
        make_istr2 db2 ("person", "baptism_place") i;
@@ -336,15 +336,9 @@ value person2_fun =
      get_death_src (db2, i) = make_istr2 db2 ("person", "death_src") i;
      get_first_name (db2, i) = make_istr2 db2 ("person", "first_name") i;
      get_first_names_aliases (db2, i) =
-       let pos = get_field_acc db2 i ("person", "first_names_aliases") in
-       if pos = -1 then []
-       else
-         let list =
-           get_field_data db2 pos ("person", "first_names_aliases")
-             "data2.ext"
-         in
-         List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
-           list;
+       let list = get_list_field db2 i ("person", "first_names_aliases") in
+       List.map (fun pos -> Istr2 db2 ("person", "first_names_aliases") pos)
+         list;
      get_image (db2, i) = make_istr2 db2 ("person", "image") i;
      get_key_index (db2, i) = Adef.iper_of_int i;
      get_notes (db2, i) = make_istr2 db2 ("person", "notes") i;
@@ -353,13 +347,8 @@ value person2_fun =
      get_psources (db2, i) = make_istr2 db2 ("person", "psources") i;
      get_public_name (db2, i) = make_istr2 db2 ("person", "public_name") i;
      get_qualifiers (db2, i) =
-       let pos = get_field_acc db2 i ("person", "qualifiers") in
-       if pos = -1 then []
-       else
-         let list =
-           get_field_data db2 pos ("person", "qualifiers") "data2.ext"
-         in
-         List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list;
+       let list = get_list_field db2 i ("person", "qualifiers") in
+       List.map (fun pos -> Istr2 db2 ("person", "qualifiers") pos) list;
      get_related (db2, i) =
        let pos = get_field_acc db2 i ("person", "related") in
        let rec loop list pos =
@@ -382,22 +371,14 @@ value person2_fun =
      get_sex (db2, i) = get_field db2 i ("person", "sex");
      get_surname (db2, i) = make_istr2 db2 ("person", "surname") i;
      get_surnames_aliases (db2, i) =
-       let pos = get_field_acc db2 i ("person", "surnames_aliases") in
-       if pos = -1 then []
-       else
-         let list =
-           get_field_data db2 pos ("person", "surnames_aliases") "data2.ext"
-         in
-         List.map (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos)
-           list;
+       let list = get_list_field db2 i ("person", "surnames_aliases") in
+       List.map (fun pos -> Istr2 db2 ("person", "surnames_aliases") pos)
+         list;
      get_titles (db2, i) =
-       let pos = get_field_acc db2 i ("person", "titles") in
-       if pos = -1 then []
-       else
-         let list = get_field_data db2 pos ("person", "titles") "data2.ext" in
-         List.map
-           (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
-           list;
+       let list = get_list_field db2 i ("person", "titles") in
+       List.map
+         (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
+         list;
      person_with_key (db2, i) fn sn oc =
        match (fn, sn) with
        [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
