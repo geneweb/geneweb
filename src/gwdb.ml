@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.186 2006-12-24 15:10:07 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.187 2006-12-24 15:30:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -82,13 +82,6 @@ value istr2new_fun =
    is_quest_string (db2, s) = s = "?";
    un_istr (db2, s) = failwith "un_istr";
    un_istr2 (db2, s) = s}
-;
-
-value sou2 i =
-  match i with
-  [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
-  | Istr2New db2 s -> s
-  | _ -> assert False ]
 ;
 
 (* Strings - user functions *)
@@ -313,6 +306,13 @@ value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
 value get_list_field db2 i f1f2 =
   let pos = get_field_acc db2 i f1f2 in
   if pos = -1 then [] else get_field_data db2 pos f1f2 "data2.ext"
+;
+
+value sou2 i =
+  match i with
+  [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
+  | Istr2New db2 s -> s
+  | _ -> assert False ]
 ;
 
 value person2_fun =
