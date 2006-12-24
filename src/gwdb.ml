@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.185 2006-12-24 07:08:09 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.186 2006-12-24 15:10:07 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -83,8 +83,6 @@ value istr2new_fun =
    un_istr (db2, s) = failwith "un_istr";
    un_istr2 (db2, s) = s}
 ;
-
-value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
 
 value sou2 i =
   match i with
@@ -309,6 +307,8 @@ value union1_fun =
 ;
 
 (* Persons - implementation database 2 *)
+
+value make_istr2 db2 path i = Istr2 db2 path (get_field_acc db2 i path);
 
 value get_list_field db2 i f1f2 =
   let pos = get_field_acc db2 i f1f2 in
