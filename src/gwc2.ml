@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.29 2006-11-18 11:43:04 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.30 2006-12-24 08:18:45 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -221,8 +221,11 @@ value make_string_of_crush_index tmp_dir =
          List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
        in
        let ic_dat = open_in_bin (Filename.concat field_d "data") in
-       eprintf "string_of_crush %s..." field;
-       flush stderr;
+       if Mutil.verbose.val then do {
+         eprintf "string_of_crush %s..." field;
+         flush stderr;
+       }
+       else ();
        let ht = Hashtbl.create 1 in
        seek_in ic_dat Db2.empty_string_pos;
        loop Db2.empty_string_pos where rec loop pos =
@@ -238,8 +241,11 @@ value make_string_of_crush_index tmp_dir =
          | None -> () ];
        close_in ic_dat;
        output_hashtbl field_d "string_of_crush.ht" ht;
-       eprintf "\n";
-       flush stderr;
+       if Mutil.verbose.val then do {
+         eprintf "\n";
+         flush stderr;
+       }
+       else ();
     })
    ["first_name"; "surname"]
 ;
@@ -251,8 +257,11 @@ value make_person_of_string_index tmp_dir =
          List.fold_left Filename.concat tmp_dir ["base_d"; "person"; field]
        in
        let ic_acc = open_in_bin (Filename.concat field_d "access") in
-       eprintf "person_of_string %s..." field;
-       flush stderr;
+       if Mutil.verbose.val then do {
+         eprintf "person_of_string %s..." field;
+         flush stderr;
+       }
+       else ();
        let ht = Hashtbl.create 1 in
        loop 0 where rec loop i =
          match
@@ -262,8 +271,11 @@ value make_person_of_string_index tmp_dir =
          | None -> () ];
        close_in ic_acc;
        output_hashtbl field_d "person_of_string.ht" ht;
-       eprintf "\n";
-       flush stderr;
+       if Mutil.verbose.val then do {
+         eprintf "\n";
+         flush stderr;
+       }
+       else ();
      })
     ["first_name"; "surname"]
 ;
@@ -406,8 +418,11 @@ value compress_fields tmp_dir =
          List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
        in
        let ic = open_in_bin (Filename.concat field_d "data") in
-       eprintf "compressing %s..." f2;
-       flush stderr;
+       if Mutil.verbose.val then do {
+         eprintf "compressing %s..." f2;
+         flush stderr;
+       }
+       else ();
        let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
        let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
        let ht : Hashtbl.t string int = Hashtbl.create 1 in
@@ -425,7 +440,11 @@ value compress_fields tmp_dir =
             Sys.rename (Filename.concat field_d (n ^ "2")) f;
           })
          ["data"; "access"];
-       Printf.eprintf "\n"; flush stderr
+       if Mutil.verbose.val then do {
+         Printf.eprintf "\n";
+         flush stderr
+       }
+       else ();
      })
     [("person", "baptism_place", compress_type_string);
      ("person", "baptism_src", compress_type_string);
@@ -474,8 +493,11 @@ value reorder_fields tmp_dir =
        in
        let ic_acc = open_in_bin (Filename.concat field_d "access") in
        let ic_dat = open_in_bin (Filename.concat field_d "data") in
-       eprintf "reordering %s..." f2;
-       flush stderr;
+       if Mutil.verbose.val then do {
+         eprintf "reordering %s..." f2;
+         flush stderr;
+       }
+       else ();
        let ff = do {
          let oc_dat = open_out_bin (Filename.concat field_d "data2") in
          let oc_acc = open_out_bin (Filename.concat field_d "access2") in
@@ -499,14 +521,21 @@ value reorder_fields tmp_dir =
             Sys.rename (Filename.concat field_d (n ^ "2")) f;
           })
          ["data"; "access"];
-       Printf.eprintf "\n"; flush stderr
+       if Mutil.verbose.val then do {
+         Printf.eprintf "\n";
+         flush stderr
+       }
+       else ();
      })
     [("person", "family", reorder_type_list_int)]
 ;
 
 value make_name_index tmp_dir nbper = do {
-  eprintf "name index...\n";
-  flush stderr;
+  if Mutil.verbose.val then do {
+    eprintf "name index...\n";
+    flush stderr;
+  }
+  else ();        
   let base_d = Filename.concat tmp_dir "base_d" in
   let ic2_list =
     List.map
@@ -1136,13 +1165,13 @@ value link gwo_list bname =
        g_person_notes = person_notes}
     in
     let ngwo = List.length gwo_list in
-    if ngwo >= 10 then do {
+    if ngwo >= 10 && Mutil.verbose.val then do {
       eprintf "pass 1: creating persons...\n";
       flush stderr
     }
     else ();
     let run =
-      if ngwo < 10 then fun () -> ()
+      if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
       else if ngwo < 60 then
         fun () -> do { Printf.eprintf "."; flush stderr; }
       else do {
@@ -1156,19 +1185,19 @@ value link gwo_list bname =
     in
     List.iter (insert_comp_families1 gen run) gwo_list;
 
-    if ngwo < 10 then ()
+    if ngwo < 10 || not Mutil.verbose.val then ()
     else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
     else ProgrBar.finish ();
 
     Gc.compact ();
 
-    if ngwo >= 10 then do {
+    if ngwo >= 10 || not Mutil.verbose.val then do {
       eprintf "pass 2: creating families...\n";
       flush stderr
     }
     else ();
     let run =
-      if ngwo < 10 then fun () -> ()
+      if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
       else if ngwo < 60 then
         fun () -> do { Printf.eprintf "."; flush stderr; }
       else do {
@@ -1181,7 +1210,7 @@ value link gwo_list bname =
       }
     in
     List.iter (insert_comp_families2 gen run) gwo_list;
-    if ngwo < 10 then ()
+    if ngwo < 10 || not Mutil.verbose.val then ()
     else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
     else ProgrBar.finish ();
 
@@ -1223,10 +1252,13 @@ value link gwo_list bname =
 
     output_particles_file tmp_dir gen.g_particles;
 
-    Printf.eprintf "pcnt %d\n" gen.g_pcnt;
-    Printf.eprintf "fcnt %d\n" gen.g_fcnt;
-    Printf.eprintf "scnt %d\n" gen.g_scnt;
-    flush stderr;
+    if Mutil.verbose.val then do {
+      Printf.eprintf "pcnt %d\n" gen.g_pcnt;
+      Printf.eprintf "fcnt %d\n" gen.g_fcnt;
+      Printf.eprintf "scnt %d\n" gen.g_scnt;
+      flush stderr;
+    }
+    else ();
 
     Mutil.mkdir_p bdir;
     let dir = Filename.concat bdir "base_d" in
@@ -1276,7 +1308,8 @@ value speclist =
      <file> Particles file (default = predefined particles)");
    ("-mem", Arg.Unit (fun () -> ()), " (obsolete option)");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
-   ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.")]
+   ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.");
+   ("-q", Arg.Clear Mutil.verbose, " no verbose")]
 ;
 
 value anonfun x =
