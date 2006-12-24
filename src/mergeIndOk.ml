@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.22 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.23 2006-12-24 07:23:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -95,7 +95,8 @@ value print_merge conf base =
       let p1 = poi base (Adef.iper_of_int i1) in
       let p2 = poi base (Adef.iper_of_int i2) in
       let p = reconstitute conf base p1 p2 in
-      let digest = Update.digest_person p1 in
+      let sp = UpdateInd.string_person_of base p1 in
+      let digest = Update.digest_person sp in
       UpdateInd.print_update_ind conf base p digest
   | _ -> incorrect_request conf ]
 ;
