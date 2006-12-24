@@ -263,9 +263,11 @@ secure.cmx: secure.cmi
 select.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi name.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx name.cmx 
 sendImage.cmo: adef.cmi buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi \
-    history.cmi secure.cmi update.cmi util.cmi ../wserver/wserver.cmi 
+    history.cmi secure.cmi update.cmi updateInd.cmi util.cmi \
+    ../wserver/wserver.cmi 
 sendImage.cmx: adef.cmx buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx \
-    history.cmx secure.cmx update.cmx util.cmx ../wserver/wserver.cmx 
+    history.cmx secure.cmx update.cmx updateInd.cmx util.cmx \
+    ../wserver/wserver.cmx 
 some.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi mutil.cmi name.cmi util.cmi ../wserver/wserver.cmi 
 some.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \

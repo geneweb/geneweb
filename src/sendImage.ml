@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 5.4 2006-09-22 23:47:15 ddr Exp $ *)
+(* $Id: sendImage.ml,v 5.5 2006-12-24 07:23:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -64,7 +64,7 @@ value print_send_image conf base p =
       }
     }
   in
-  let digest = Update.digest_person p in
+  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   do {
     header conf title;
     tag "form" "method=\"post\" action=\"%s\" enctype=\"multipart/form-data\""
@@ -312,7 +312,7 @@ value print_send_ok conf base =
       try int_of_string s with [ Failure _ -> incorrect conf ]
     in
     let p = poi base (Adef.iper_of_int ip) in
-    let digest = Update.digest_person p in
+    let digest = Update.digest_person (UpdateInd.string_person_of base p) in
     if digest = raw_get conf "digest" then
       let file = raw_get conf "file" in
 let _ = do { Printf.eprintf "file size %d\n" (String.length file); flush stderr; } in
