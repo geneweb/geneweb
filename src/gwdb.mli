@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.78 2006-12-25 21:20:16 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.79 2006-12-25 22:56:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -59,8 +59,6 @@ value get_surname : person -> istr;
 value get_surnames_aliases : person -> list istr;
 value get_titles : person -> list title;
 
-value person_with_rparents : person -> list relation -> person;
-value person_with_sex : person -> Def.sex -> person;
 value person_of_gen_person : base -> Def.gen_person iper istr -> person;
 value gen_person_of_person : person -> Def.gen_person iper istr;
 

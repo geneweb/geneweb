@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.3 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.4 2006-12-25 22:56:03 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -210,7 +210,7 @@ value try_to_fix_relation_sex base warning p_ref = do {
          }
          in
          if changed > 0 then
-           let p = person_with_rparents p rparents in
+           let p = {(gen_person_of_person p) with rparents = rparents} in
            [(ip, p) :: changed_related]
          else changed_related)
       (get_related p_ref) []
@@ -249,7 +249,7 @@ value related_sex_is_coherent base warning p_ref =
   match new_sex with
   [ Some g ->
       if get_sex p_ref != g then
-        let p = person_with_sex p_ref g in
+        let p = {(gen_person_of_person p_ref) with sex = g} in
         Some [(get_key_index p_ref, p)]
       else None
   | None -> try_to_fix_relation_sex base warning p_ref ]

@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.189 2006-12-25 21:20:16 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.190 2006-12-25 22:56:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -229,8 +229,6 @@ type person_fun 'p 'a 'u =
     get_surname : 'p -> istr;
     get_surnames_aliases : 'p -> list istr;
     get_titles : 'p -> list title;
-    person_with_rparents : 'p -> list relation -> person;
-    person_with_sex : 'p -> Def.sex -> person;
     gen_person_of_person : 'p -> Def.gen_person iper istr;
     dsk_person_of_person : 'p -> Dbdisk.dsk_person;
     get_consang : 'a -> Adef.fix;
@@ -268,10 +266,6 @@ value person1_fun =
    get_surnames_aliases p = List.map (fun i -> Istr i) p.Def.surnames_aliases;
    get_titles p =
      List.map (fun t -> map_title_strings (fun i -> Istr i) t) p.Def.titles;
-   person_with_rparents p r =
-     let r = List.map (map_relation_ps (fun p -> p) un_istr) r in
-     Person {(p) with rparents = r};
-   person_with_sex p s = Person {(p) with sex = s};
    gen_person_of_person p = map_person_ps (fun p -> p) (fun s -> Istr s) p;
    dsk_person_of_person p = p;
    get_consang a = a.Def.consang;
@@ -359,9 +353,6 @@ value person2_fun =
        List.map
          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
          list;
-     person_with_rparents (db2, i) r =
-       failwith "not impl person_with_rparents";
-     person_with_sex (db2, i) s = failwith "not impl person_with_sex";
      gen_person_of_person pp =
        {first_name = self.get_first_name pp; surname = self.get_surname pp;
         occ = self.get_occ pp; image = self.get_image pp;
@@ -439,9 +430,6 @@ value person2gen_fun =
    get_titles (db2, p) =
      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
        p.Def.titles;
-   person_with_rparents (db2, p) r =
-     failwith "not impl person_with_rparents (gen)";
-   person_with_sex (db2, p) s = Person2Gen db2 {(p) with sex = s};
    gen_person_of_person (db2, p) =
      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p;
    dsk_person_of_person (db2, p) =
@@ -595,14 +583,6 @@ value get_titles p =
   wrap_per f f f p
 ;
 
-value person_with_rparents p =
-  let f pf = pf.person_with_rparents in
-  wrap_per f f f p
-;
-value person_with_sex p =
-  let f pf = pf.person_with_sex in
-  wrap_per f f f p
-;
 value gen_person_of_person p =
   let f pf = pf.gen_person_of_person in
   wrap_per f f f p
