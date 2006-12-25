@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.28 2006-11-20 23:20:31 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.29 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -321,57 +321,56 @@ value effective_merge_ind conf base p1 p2 =
     }
     else ();
     let p1 =
-      person_of_gen_person base
-        {(gen_person_of_person p1) with
-         sex = if get_sex p2 <> Neuter then get_sex p2 else get_sex p1;
-         birth =
-           if get_birth p1 = Adef.codate_None then get_birth p2
-           else get_birth p1;
-         birth_place =
-           if is_empty_string (get_birth_place p1) then get_birth_place p2
-           else get_birth_place p1;
-         birth_src =
-           if is_empty_string (get_birth_src p1) then get_birth_src p2
-           else get_birth_src p1;
-         baptism =
-           if get_baptism p1 = Adef.codate_None then get_baptism p2
-           else get_baptism p1;
-         baptism_place =
-           if is_empty_string (get_baptism_place p1) then get_baptism_place p2
-           else get_baptism_place p1;
-         baptism_src =
-           if is_empty_string (get_baptism_src p1) then get_baptism_src p2
-           else get_baptism_src p1;
-         death =
-           if get_death p1 = DontKnowIfDead then get_death p2
-           else get_death p1;
-         death_place =
-           if is_empty_string (get_death_place p1) then get_death_place p2
-           else get_death_place p1;
-         death_src =
-           if is_empty_string (get_death_src p1) then get_death_src p2
-           else get_death_src p1;
-         burial =
-           if get_burial p1 = UnknownBurial then get_burial p2
-           else get_burial p1;
-         burial_place =
-           if is_empty_string (get_burial_place p1) then get_burial_place p2
-           else get_burial_place p1;
-         burial_src =
-           if is_empty_string (get_burial_src p1) then get_burial_src p2
-           else get_burial_src p1;
-         occupation =
-           if is_empty_string (get_occupation p1) then get_occupation p2
-           else get_occupation p1;
-         notes =
-           if is_empty_string (get_notes p1) then get_notes p2
-           else get_notes p1}
+      {(gen_person_of_person p1) with
+       sex = if get_sex p2 <> Neuter then get_sex p2 else get_sex p1;
+       birth =
+         if get_birth p1 = Adef.codate_None then get_birth p2
+         else get_birth p1;
+       birth_place =
+         if is_empty_string (get_birth_place p1) then get_birth_place p2
+         else get_birth_place p1;
+       birth_src =
+         if is_empty_string (get_birth_src p1) then get_birth_src p2
+         else get_birth_src p1;
+       baptism =
+         if get_baptism p1 = Adef.codate_None then get_baptism p2
+         else get_baptism p1;
+       baptism_place =
+         if is_empty_string (get_baptism_place p1) then get_baptism_place p2
+         else get_baptism_place p1;
+       baptism_src =
+         if is_empty_string (get_baptism_src p1) then get_baptism_src p2
+         else get_baptism_src p1;
+       death =
+         if get_death p1 = DontKnowIfDead then get_death p2
+         else get_death p1;
+       death_place =
+         if is_empty_string (get_death_place p1) then get_death_place p2
+         else get_death_place p1;
+       death_src =
+         if is_empty_string (get_death_src p1) then get_death_src p2
+         else get_death_src p1;
+       burial =
+         if get_burial p1 = UnknownBurial then get_burial p2
+         else get_burial p1;
+       burial_place =
+         if is_empty_string (get_burial_place p1) then get_burial_place p2
+         else get_burial_place p1;
+       burial_src =
+         if is_empty_string (get_burial_src p1) then get_burial_src p2
+         else get_burial_src p1;
+       occupation =
+         if is_empty_string (get_occupation p1) then get_occupation p2
+         else get_occupation p1;
+       notes =
+         if is_empty_string (get_notes p1) then get_notes p2
+         else get_notes p1}
     in
+    patch_person base p1.key_index p1;
     let p2 = UpdateIndOk.effective_del conf base p2 in
-    patch_person base (get_key_index p1) p1;
-    patch_person base (get_key_index p2) p2;
-    Notes.update_notes_links_db conf (NotesLinks.PgInd (get_key_index p1))
-      (sou base (get_notes p1)) True;
+    patch_person base p2.key_index p2;
+    Notes.update_notes_links_db conf (NotesLinks.PgInd p1.key_index)
+      (sou base p1.notes) True;
   }
 ;
 

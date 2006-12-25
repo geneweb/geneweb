@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.77 2006-12-23 23:41:28 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.78 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -59,8 +59,6 @@ value get_surname : person -> istr;
 value get_surnames_aliases : person -> list istr;
 value get_titles : person -> list title;
 
-value person_with_key : person -> istr -> istr -> int -> person;
-value person_with_related : person -> list iper -> person;
 value person_with_rparents : person -> list relation -> person;
 value person_with_sex : person -> Def.sex -> person;
 value person_of_gen_person : base -> Def.gen_person iper istr -> person;
@@ -115,7 +113,8 @@ value sou : base -> istr -> string;
 value nb_of_persons : base -> int;
 value nb_of_families : base -> int;
 
-value patch_person : base -> iper -> person -> unit;
+value patch_person : base -> iper -> Def.gen_person iper istr -> unit;
+
 value patch_ascend : base -> iper -> ascend -> unit;
 value patch_union : base -> iper -> union -> unit;
 value patch_family : base -> ifam -> family -> unit;
@@ -169,6 +168,10 @@ value base_notes_are_empty : base -> string -> bool;
 value base_notes_origin_file : base -> string;
 value base_notes_dir : base -> string;
 value base_wiznotes_dir : base -> string;
+
+value gen_person_misc_names :
+  base -> Def.gen_person iper istr ->
+    (Def.gen_person iper istr -> list (Def.gen_title istr)) -> list string;
 
 value person_misc_names :
   base -> person -> (person -> list title) -> list string;

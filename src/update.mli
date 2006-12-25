@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 5.6 2006-12-24 07:23:21 ddr Exp $ *)
+(* $Id: update.mli,v 5.7 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -14,10 +14,13 @@ value infer_death : config -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 
 value insert_person :
-  config -> base -> string -> ref (list person) -> key -> Adef.iper
+  config -> base -> string -> ref (list (gen_person iper istr)) -> key ->
+    Adef.iper
 ;
-value add_misc_names_for_new_persons : config -> base -> list person -> unit;
-value update_misc_names_of_family : config -> base -> person -> union -> unit;
+value add_misc_names_for_new_persons :
+  base -> list (gen_person iper istr) -> unit
+;
+value update_misc_names_of_family : base -> sex -> union -> unit;
 value delete_topological_sort_v : config -> base -> unit;
 value delete_topological_sort : config -> base -> unit;
 

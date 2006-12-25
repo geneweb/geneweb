@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.31 2006-12-24 07:23:21 ddr Exp $ *)
+(* $Id: update.ml,v 5.32 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -94,8 +94,8 @@ value print_err_unknown conf base (f, s, o) =
   }
 ;
 
-value update_misc_names_of_family conf base p u =
-  match get_sex p with
+value update_misc_names_of_family base p_sex u =
+  match p_sex with
   [ Male ->
       List.iter
         (fun ifam ->
@@ -647,11 +647,11 @@ value print_create_conflict conf base p var =
   }
 ;
 
-value add_misc_names_for_new_persons conf base new_persons =
+value add_misc_names_for_new_persons base new_persons =
   List.iter
     (fun p ->
-       List.iter (fun n -> person_ht_add base n (get_key_index p))
-         (person_misc_names base p get_titles))
+       List.iter (fun n -> person_ht_add base n p.key_index)
+         (gen_person_misc_names base p (fun p -> p.titles)))
     new_persons
 ;
 
@@ -696,33 +696,32 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             | _ -> (infer_death conf birth, "") ]
           in
           let p =
-            person_of_gen_person base
-              {first_name = Gwdb.insert_string base f;
-               surname = Gwdb.insert_string base s; occ = o;
-               image = empty_string;
-               first_names_aliases = []; surnames_aliases = [];
-               public_name = empty_string; qualifiers = []; aliases = [];
-               titles = []; rparents = []; related = [];
-               occupation = empty_string; sex = sex; access = IfTitles;
-               birth = Adef.codate_of_od birth;
-               birth_place = Gwdb.insert_string base birth_place;
-               birth_src = empty_string; baptism = Adef.codate_of_od baptism;
-               baptism_place = Gwdb.insert_string base baptism_place;
-               baptism_src = empty_string; death = death;
-               death_place = Gwdb.insert_string base death_place;
-               death_src = empty_string; burial = UnknownBurial;
-               burial_place = empty_string; burial_src = empty_string;
-               notes = empty_string;
-               psources =
-                 if f = "?" || s = "?" then empty_string
-                 else Gwdb.insert_string base (only_printable src);
-               key_index = ip}
+            {first_name = Gwdb.insert_string base f;
+             surname = Gwdb.insert_string base s; occ = o;
+             image = empty_string;
+             first_names_aliases = []; surnames_aliases = [];
+             public_name = empty_string; qualifiers = []; aliases = [];
+             titles = []; rparents = []; related = [];
+             occupation = empty_string; sex = sex; access = IfTitles;
+             birth = Adef.codate_of_od birth;
+             birth_place = Gwdb.insert_string base birth_place;
+             birth_src = empty_string; baptism = Adef.codate_of_od baptism;
+             baptism_place = Gwdb.insert_string base baptism_place;
+             baptism_src = empty_string; death = death;
+             death_place = Gwdb.insert_string base death_place;
+             death_src = empty_string; burial = UnknownBurial;
+             burial_place = empty_string; burial_src = empty_string;
+             notes = empty_string;
+             psources =
+               if f = "?" || s = "?" then empty_string
+               else Gwdb.insert_string base (only_printable src);
+             key_index = ip}
           and a = no_ascend base
           and u = union_of_gen_union base {family = [| |]} in
           do {
-            patch_person base (get_key_index p) p;
-            patch_ascend base (get_key_index p) a;
-            patch_union base (get_key_index p) u;
+            patch_person base p.key_index p;
+            patch_ascend base p.key_index a;
+            patch_union base p.key_index u;
             if f <> "?" && s <> "?" then do {
               let fn = Util.translate_eval f in
               let sn = Util.translate_eval s in
