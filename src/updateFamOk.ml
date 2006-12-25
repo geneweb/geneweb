@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.32 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.33 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -387,11 +387,9 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
       (fun ippl ip ->
          if List.mem ip ofam_witn then ippl
          else
-           let p = poi base ip in
-           if not (List.mem (get_father ncpl) (get_related p)) then
-             let p =
-               person_with_related p [get_father ncpl :: get_related p]
-             in
+           let p = gen_person_of_person (poi base ip) in
+           if not (List.mem (get_father ncpl) p.related) then
+             let p = {(p) with related = [get_father ncpl :: p.related]} in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl nfam_witn
@@ -401,11 +399,14 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
       (fun ippl ip ->
          if List.mem ip nfam_witn then ippl
          else
-           let p = try List.assoc ip ippl with [ Not_found -> poi base ip ] in
-           if List.mem (get_father ncpl) (get_related p) then
+           let p =
+             try List.assoc ip ippl with
+             [ Not_found -> gen_person_of_person (poi base ip) ]
+           in
+           if List.mem (get_father ncpl) p.related then
              let p =
-               person_with_related p
-                 (List.filter ( \<> (get_father ncpl)) (get_related p))
+               {(p) with
+                related = (List.filter ( \<> (get_father ncpl)) p.related)}
              in
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
@@ -441,33 +442,23 @@ value effective_mod conf base sfam scpl sdes =
   let nfath = poi base (get_father ncpl) in
   let nmoth = poi base (get_mother ncpl) in
   let nfath_u = uoi base (get_father ncpl) in
-  let (nfath, nmoth) =
-    if sfam.relation <> NoSexesCheckNotMarried &&
-       sfam.relation <> NoSexesCheckMarried then
-      let nfath =
-        match get_sex nfath with
-        [ Female -> print_err_father_sex conf base nfath
-        | Male -> nfath
-        | Neuter -> do {
-            let nfath = person_with_sex nfath Male in
-            patch_person base (get_key_index nfath) nfath;
-            nfath
-          } ]
-      in
-      let nmoth =
-        match get_sex nmoth with
-        [ Male -> print_err_mother_sex conf base nmoth
-        | Female -> nmoth
-        | Neuter -> do {
-            let nmoth = person_with_sex nmoth Female in
-            patch_person base (get_key_index nmoth) nmoth;
-            nmoth
-          } ]
-      in
-      (nfath, nmoth)
-    else (nfath, nmoth)
-  in
   do {
+    if sfam.relation <> NoSexesCheckNotMarried &&
+       sfam.relation <> NoSexesCheckMarried then do {
+      match get_sex nfath with
+      [ Female -> print_err_father_sex conf base nfath
+      | Male -> ()
+      | Neuter ->
+          let nfath = {(gen_person_of_person nfath) with sex = Male} in
+          patch_person base nfath.key_index nfath ];
+      match get_sex nmoth with
+      [ Male -> print_err_mother_sex conf base nmoth
+      | Female -> ()
+      | Neuter ->
+          let nmoth = {(gen_person_of_person nmoth) with sex = Female} in
+          patch_person base nmoth.key_index nmoth ];
+    }
+    else ();
     if get_father ncpl = get_mother ncpl then print_err conf base else ();
     let nfam =
       let origin_file =
@@ -558,8 +549,8 @@ value effective_mod conf base sfam scpl sdes =
            patch_ascend base ip (find_asc ip)
          else ())
       (get_children ndes);
-    Update.add_misc_names_for_new_persons conf base created_p.val;
-    Update.update_misc_names_of_family conf base nfath nfath_u;
+    Update.add_misc_names_for_new_persons base created_p.val;
+    Update.update_misc_names_of_family base Male nfath_u;
     update_related_witnesses base (Array.to_list (get_witnesses ofam))
       (Array.to_list (get_witnesses nfam)) ncpl;
     (fi, nfam, ncpl, ndes)
@@ -592,37 +583,27 @@ value effective_add conf base sfam scpl sdes =
   let nmoth_p = poi base (get_mother ncpl) in
   let nfath_u = uoi base (get_father ncpl) in
   let nmoth_u = uoi base (get_mother ncpl) in
-  let (nfath_p, nmoth_p) =
-    if sfam.relation <> NoSexesCheckNotMarried &&
-       sfam.relation <> NoSexesCheckMarried then
-      let nfath_p =
-        match get_sex nfath_p with
-        [ Female -> print_err_father_sex conf base nfath_p
-        | Male -> nfath_p
-        | _ -> do {
-            let nfath_p = person_with_sex nfath_p Male in
-            patch_person base (get_father ncpl) nfath_p;
-            nfath_p
-          } ]
-      in
-      let nmoth_p =
-        match get_sex nmoth_p with
-        [ Male -> print_err_mother_sex conf base nmoth_p
-        | Female -> nmoth_p
-        | _ -> do {
-            let nmoth_p = person_with_sex nmoth_p Female in
-            patch_person base (get_mother ncpl) nmoth_p;
-            nmoth_p
-          } ]
-      in
-      (nfath_p, nmoth_p)
-    else if get_father ncpl = get_mother ncpl then print_err conf base
-    else (nfath_p, nmoth_p)
-  in
-  let nfam =
-    family_with_origin_file (family_of_gen_family base nfam) origin_file fi
-  in
   do {
+    if sfam.relation <> NoSexesCheckNotMarried &&
+       sfam.relation <> NoSexesCheckMarried then do {
+      match get_sex nfath_p with
+      [ Female -> print_err_father_sex conf base nfath_p
+      | Male -> ()
+      | _ ->
+          let nfath_p = {(gen_person_of_person nfath_p) with sex = Male} in
+          patch_person base nfath_p.key_index nfath_p ];
+      match get_sex nmoth_p with
+      [ Male -> print_err_mother_sex conf base nmoth_p
+      | Female -> ()
+      | _ ->
+          let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
+          patch_person base nmoth_p.key_index nmoth_p ];
+    }
+    else if get_father ncpl = get_mother ncpl then print_err conf base
+    else ();
+    let nfam =
+      family_with_origin_file (family_of_gen_family base nfam) origin_file fi
+    in
     patch_family base fi nfam;
     patch_couple base fi ncpl;
     patch_descend base fi ndes;
@@ -649,8 +630,8 @@ value effective_add conf base sfam scpl sdes =
              in
              patch_ascend base (get_key_index p) a ])
       (get_children ndes);
-    Update.add_misc_names_for_new_persons conf base created_p.val;
-    Update.update_misc_names_of_family conf base nfath_p nfath_u;
+    Update.add_misc_names_for_new_persons base created_p.val;
+    Update.update_misc_names_of_family base Male nfath_u;
     update_related_witnesses base [] (Array.to_list (get_witnesses nfam))
       ncpl;
     (fi, nfam, ncpl, ndes)

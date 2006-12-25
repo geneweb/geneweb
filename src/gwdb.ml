@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.188 2006-12-24 16:00:04 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.189 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -229,8 +229,6 @@ type person_fun 'p 'a 'u =
     get_surname : 'p -> istr;
     get_surnames_aliases : 'p -> list istr;
     get_titles : 'p -> list title;
-    person_with_key : 'p -> istr -> istr -> int -> person;
-    person_with_related : 'p -> list iper -> person;
     person_with_rparents : 'p -> list relation -> person;
     person_with_sex : 'p -> Def.sex -> person;
     gen_person_of_person : 'p -> Def.gen_person iper istr;
@@ -270,12 +268,6 @@ value person1_fun =
    get_surnames_aliases p = List.map (fun i -> Istr i) p.Def.surnames_aliases;
    get_titles p =
      List.map (fun t -> map_title_strings (fun i -> Istr i) t) p.Def.titles;
-   person_with_key p fn sn oc =
-     match (fn, sn) with
-     [ (Istr fn, Istr sn) ->
-         Person {(p) with first_name = fn; surname = sn; occ = oc}
-     | _ -> assert False ];
-   person_with_related p r = Person {(p) with related = r};
    person_with_rparents p r =
      let r = List.map (map_relation_ps (fun p -> p) un_istr) r in
      Person {(p) with rparents = r};
@@ -367,16 +359,6 @@ value person2_fun =
        List.map
          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
          list;
-     person_with_key (db2, i) fn sn oc =
-       match (fn, sn) with
-       [ (Istr2 _ (f1, f2) ifn, Istr2 _ (f3, f4) isn) ->
-           failwith "not impl person_with_key 1"
-       | (Istr2New _ fn, Istr2New _ sn) ->
-           let p = self.gen_person_of_person (db2, i) in
-           let p = map_person_ps (fun ip -> ip) sou2 p in
-           Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
-       | _ -> failwith "not impl person_with_key 2" ];
-     person_with_related (db2, i) r = failwith "not impl person_with_related";
      person_with_rparents (db2, i) r =
        failwith "not impl person_with_rparents";
      person_with_sex (db2, i) s = failwith "not impl person_with_sex";
@@ -457,13 +439,6 @@ value person2gen_fun =
    get_titles (db2, p) =
      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
        p.Def.titles;
-   person_with_key (db2, p) fn sn oc =
-     match (fn, sn) with
-     [ (Istr2New _ fn, Istr2New _ sn) ->
-         Person2Gen db2 {(p) with first_name = fn; surname = sn; occ = oc}
-     | _ -> failwith "not impl person_with_key 3" ];
-   person_with_related (db2, p) r =
-     failwith "not impl person_with_related (gen)";
    person_with_rparents (db2, p) r =
      failwith "not impl person_with_rparents (gen)";
    person_with_sex (db2, p) s = Person2Gen db2 {(p) with sex = s};
@@ -620,14 +595,6 @@ value get_titles p =
   wrap_per f f f p
 ;
 
-value person_with_key p =
-  let f pf = pf.person_with_key in
-  wrap_per f f f p
-;
-value person_with_related p =
-  let f pf = pf.person_with_related in
-  wrap_per f f f p
-;
 value person_with_rparents p =
   let f pf = pf.person_with_rparents in
   wrap_per f f f p
@@ -922,7 +889,7 @@ type base =
     sou : istr -> string;
     nb_of_persons : unit -> int;
     nb_of_families : unit -> int;
-    patch_person : iper -> person -> unit;
+    patch_person : iper -> Def.gen_person iper istr -> unit;
     patch_ascend : iper -> ascend -> unit;
     patch_union : iper -> union -> unit;
     patch_family : ifam -> family -> unit;
@@ -962,7 +929,6 @@ type base =
     base_notes_origin_file : unit -> string;
     base_notes_dir : unit -> string;
     base_wiznotes_dir : unit -> string;
-    person_misc_names : person -> (person -> list title) -> list string;
     nobtit :
       Lazy.t (list string) -> Lazy.t (list string) ->  person -> list title;
     p_first_name : person -> string;
@@ -974,8 +940,6 @@ type base =
 module C_base :
   sig
     value delete_family : base -> ifam -> unit;
-    value person_misc_names :
-      base -> person -> (person -> list title) -> list string;
     value nobtit :
       base -> Lazy.t (list string) -> Lazy.t (list string) -> person ->
         list title;
@@ -983,27 +947,6 @@ module C_base :
     value p_surname : base -> person -> string;
   end =
   struct
-    value husbands self p =
-      let u = self.uoi (get_key_index p) in
-      List.map
-        (fun ifam ->
-           let cpl = self.coi ifam in
-           let husband = self.poi (get_father cpl) in
-           let husband_surname = self.p_surname husband in
-           let husband_surnames_aliases =
-             List.map self.sou (get_surnames_aliases husband)
-           in
-           (husband_surname, husband_surnames_aliases))
-        (Array.to_list (get_family u))
-    ;
-    value father_titles_places self p nobtit =
-      match get_parents (self.aoi (get_key_index p)) with
-      [ Some ifam ->
-          let cpl = self.coi ifam in
-          let fath = self.poi (get_father cpl) in
-          List.map (fun t -> self.sou t.t_place) (nobtit fath)
-      | None -> [] ]
-    ;
     value delete_family self ifam =
       let cpl =
         self.couple_of_gen_couple
@@ -1023,17 +966,6 @@ module C_base :
         self.patch_couple ifam cpl;
         self.patch_descend ifam des
       }
-    ;
-    value person_misc_names self p tit =
-      let sou = self.sou in
-      Futil.gen_person_misc_names (sou (get_first_name p))
-        (sou (get_surname p)) (sou (get_public_name p))
-        (List.map sou (get_qualifiers p)) (List.map sou (get_aliases p))
-        (List.map sou (get_first_names_aliases p))
-        (List.map sou (get_surnames_aliases p))
-        (List.map (Futil.map_title_strings sou) (tit p))
-        (if get_sex p = Female then husbands self p else [])
-        (father_titles_places self p tit)
     ;
     value nobtit self allowed_titles denied_titles p =
       let list = get_titles p in
@@ -1100,9 +1032,8 @@ value base1 base =
      nb_of_persons () = base.data.persons.len;
      nb_of_families () = base.data.families.len;
      patch_person ip p =
-       match p with
-       [ Person p -> base.func.Dbdisk.patch_person ip p
-       | _ -> assert False ];
+       let p = map_person_ps (fun p -> p) un_istr p in
+       base.func.Dbdisk.patch_person ip p;
      patch_ascend ip a =
        match a with
        [ Ascend a -> base.func.Dbdisk.patch_ascend ip a
@@ -1168,7 +1099,6 @@ value base1 base =
      base_notes_are_empty fnotes = base.data.bnotes.nread fnotes RnDeg = "";
      base_notes_origin_file () = base.data.bnotes.norigin_file;
      base_notes_dir () = "notes_d"; base_wiznotes_dir () = "wiznotes";
-     person_misc_names p tit = C_base.person_misc_names self p tit;
      nobtit conf p = C_base.nobtit self conf p;
      p_first_name p = C_base.p_first_name self p;
      p_surname p = C_base.p_surname self p;
@@ -1238,15 +1168,11 @@ value base2 db2 =
        | _ -> assert False ];
      nb_of_persons () = db2.patches.nb_per;
      nb_of_families () = db2.patches.nb_fam;
-     patch_person ip p =
-       match p with
-       [ Person2Gen _ p ->
-           do {
-             Hashtbl.replace db2.patches.h_person ip p;
-             db2.patches.nb_per :=
-               max (Adef.int_of_iper ip + 1) db2.patches.nb_per
-           }
-       | _ -> assert False ];
+     patch_person ip p = do {
+       let p = map_person_ps (fun p -> p) un_istr2 p in
+       Hashtbl.replace db2.patches.h_person ip p;
+       db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
+     };
      patch_ascend ip a =
        match a with
        [ Ascend2Gen _ a ->
@@ -1417,7 +1343,6 @@ value base2 db2 =
        | None -> "" ];
      base_notes_dir () = Filename.concat "base_d" "notes_d";
      base_wiznotes_dir () = Filename.concat "base_d" "wiznotes_d";
-     person_misc_names p tit = C_base.person_misc_names self p tit;
      nobtit conf p = C_base.nobtit self conf p;
      p_first_name p = C_base.p_first_name self p;
      p_surname p = C_base.p_surname self p;
@@ -1499,10 +1424,51 @@ value base_notes_are_empty b = b.base_notes_are_empty;
 value base_notes_origin_file b = b.base_notes_origin_file ();
 value base_notes_dir b = b.base_notes_dir ();
 value base_wiznotes_dir b = b.base_wiznotes_dir ();
-value person_misc_names b = b.person_misc_names;
 value nobtit b = b.nobtit;
 value p_first_name b = b.p_first_name;
 value p_surname b = b.p_surname;
 value date_of_last_change b = b.date_of_last_change ();
 value apply_as_dsk_base f b = b.apply_as_dsk_base f;
 value base_of_dsk_base = base1;
+
+value husbands base p =
+  let u = uoi base p.key_index in
+  List.map
+    (fun ifam ->
+       let cpl = coi base ifam in
+       let husband = poi base (get_father cpl) in
+       let husband_surname = p_surname base husband in
+       let husband_surnames_aliases =
+         List.map (sou base) (get_surnames_aliases husband)
+       in
+       (husband_surname, husband_surnames_aliases))
+    (Array.to_list (get_family u))
+;
+
+value father_titles_places base p nobtit =
+  match get_parents (aoi base p.key_index) with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      let fath = poi base (get_father cpl) in
+      List.map (fun t -> sou base t.t_place) (nobtit fath)
+  | None -> [] ]
+;
+
+value gen_gen_person_misc_names base p nobtit nobtit_fun =
+  let sou = sou base in
+  Futil.gen_person_misc_names (sou p.first_name) (sou p.surname)
+    (sou p.public_name) (List.map sou p.qualifiers) (List.map sou p.aliases)
+    (List.map sou p.first_names_aliases) (List.map sou p.surnames_aliases)
+    (List.map (Futil.map_title_strings sou) nobtit)
+    (if p.sex = Female then husbands base p else [])
+    (father_titles_places base p nobtit_fun)
+;
+
+value gen_person_misc_names base p nobtit =
+  gen_gen_person_misc_names base p (nobtit p)
+    (fun p -> nobtit (gen_person_of_person p))
+;
+
+value person_misc_names base p nobtit =
+  gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
+;

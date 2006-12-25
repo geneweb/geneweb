@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.16 2006-11-28 18:46:22 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.17 2006-12-25 21:20:16 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -256,16 +256,16 @@ value change_child conf base parent_surname ip =
     check_conflict conf base p key new_occ ipl;
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     let p =
-      person_with_key p
-        (Gwdb.insert_string base new_first_name)
-        (Gwdb.insert_string base new_surname)
-        new_occ
+      {(gen_person_of_person p) with
+       first_name = Gwdb.insert_string base new_first_name;
+       surname = Gwdb.insert_string base new_surname;
+       occ = new_occ}
     in
     patch_person base ip p;
     patch_key base ip new_first_name new_surname new_occ;
     person_ht_add base key ip;
-    let np_misc_names = person_misc_names base p get_titles in
-    List.iter (fun key -> person_ht_add base key (get_key_index p))
+    let np_misc_names = gen_person_misc_names base p (fun p -> p.titles) in
+    List.iter (fun key -> person_ht_add base key p.key_index)
       np_misc_names;
   }
   else ()

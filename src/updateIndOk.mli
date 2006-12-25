@@ -1,12 +1,12 @@
-(* $Id: updateIndOk.mli,v 5.3 2006-10-04 14:17:54 ddr Exp $ *)
+(* $Id: updateIndOk.mli,v 5.4 2006-12-25 21:20:16 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gwdb;
 
-value effective_del : config -> base -> person -> person;
+value effective_del : config -> base -> person -> gen_person iper istr;
 value effective_mod :
-  config -> base -> gen_person Update.key string -> person;
+  config -> base -> gen_person Update.key string -> gen_person iper istr;
 value all_checks_person :
   config -> base -> person -> ascend -> union -> list CheckItem.base_warning;
 value print_mod_aux :
