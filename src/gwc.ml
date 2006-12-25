@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.49 2006-12-23 23:41:28 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.50 2006-12-25 22:56:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -943,6 +943,7 @@ value link gwo_list tmp_dir bdir =
     let base = Gwdb.base_of_dsk_base dsk_base in
     if do_check.val && gen.g_pcnt > 0 then do {
       let changed_p (ip, p) =
+        let p = Gwdb.person_of_gen_person base p in
         let p = Gwdb.dsk_person_of_person p in
         let i = Adef.int_of_iper ip in
         Hashtbl.replace gen.g_patch_p i p
