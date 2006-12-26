@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.45 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.46 2006-12-26 10:48:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -567,7 +567,8 @@ value print_mod_ok conf base wl p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "\n%s" (referenced_person_text conf base p);
+    Wserver.wprint "\n%s"
+      (referenced_person_text conf base (person_of_gen_person base p));
     Wserver.wprint "\n";
     Update.print_warnings conf base wl;
     trailer conf;
@@ -600,6 +601,9 @@ value relation_sex_is_coherent base warning p =
 ;
 
 value all_checks_person conf base p a u =
+  let p = person_of_gen_person base p in
+  let a = ascend_of_gen_ascend base a in
+  let u = union_of_gen_union base u in
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
@@ -673,11 +677,8 @@ value print_add o_conf base =
       [ Some err -> error_person conf base sp err
       | None ->
           let (p, a) = effective_add conf base sp in
-          let u = uoi base p.key_index in
-          let wl =
-            all_checks_person conf base (person_of_gen_person base p)
-              (ascend_of_gen_ascend base a) u
-          in
+          let u = {family = get_family (uoi base p.key_index)} in
+          let wl = all_checks_person conf base p a u in
           let k = (sp.first_name, sp.surname, sp.occ, p.key_index) in
           do {
             Util.commit_patches conf base;
@@ -758,7 +759,7 @@ value print_mod o_conf base =
   let callback sp =
     let p = effective_mod conf base sp in
     let op = poi base p.key_index in
-    let u = uoi base p.key_index in
+    let u = {family = get_family (uoi base p.key_index)} in
     do {
       patch_person base p.key_index p;
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index)
@@ -767,15 +768,18 @@ value print_mod o_conf base =
          not (eq_istr_list (get_surnames_aliases op) p.surnames_aliases) ||
          not (eq_titles (get_titles op) p.titles)
       then
-        Update.update_misc_names_of_family base p.sex {family = get_family u}
+        Update.update_misc_names_of_family base p.sex u
       else ();
-      let p = person_of_gen_person base p in
-      let wl = all_checks_person conf base p (aoi base (get_key_index p)) u in
+      let wl =
+        let a = aoi base p.key_index in
+        let a = {parents = get_parents a; consang = get_consang a} in
+        all_checks_person conf base p a u
+      in
       let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
       Util.commit_patches conf base;
       History.record conf base k "mp";
-      if not (is_quest_string (get_surname p)) &&
-         not (is_quest_string (get_first_name p)) &&
+      if not (is_quest_string p.surname) &&
+         not (is_quest_string p.first_name) &&
          not (is_old_person conf p)
       then
         Update.delete_topological_sort_v conf base
