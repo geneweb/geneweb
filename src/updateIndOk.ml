@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.44 2006-12-26 09:44:02 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.45 2006-12-26 10:14:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -515,7 +515,7 @@ value effective_add conf base sp =
     patch_person base pi np;
     let na = {parents = None; consang = Adef.fix (-1)} in
     patch_ascend base pi na;
-    let nu = union_of_gen_union base {family = [| |]} in
+    let nu = {family = [| |]} in
     patch_union base pi nu;
     let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
     List.iter (fun key -> person_ht_add base key pi) np_misc_names;
@@ -767,7 +767,7 @@ value print_mod o_conf base =
          not (eq_istr_list (get_surnames_aliases op) p.surnames_aliases) ||
          not (eq_titles (get_titles op) p.titles)
       then
-        Update.update_misc_names_of_family base p.sex u
+        Update.update_misc_names_of_family base p.sex {family = get_family u}
       else ();
       let p = person_of_gen_person base p in
       let wl = all_checks_person conf base p (aoi base (get_key_index p)) u in

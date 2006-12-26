@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.191 2006-12-26 09:44:02 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.192 2006-12-26 10:14:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -233,7 +233,6 @@ type person_fun 'p 'a 'u =
     dsk_person_of_person : 'p -> Dbdisk.dsk_person;
     get_consang : 'a -> Adef.fix;
     get_parents : 'a -> option ifam;
-    gen_ascend_of_ascend : 'a -> Def.gen_ascend ifam;
     get_family : 'u -> array ifam }
 ;
 
@@ -271,7 +270,6 @@ value person1_fun =
    dsk_person_of_person p = p;
    get_consang a = a.Def.consang;
    get_parents a = a.Def.parents;
-   gen_ascend_of_ascend a = a;
    get_family u = u.Def.family}
 ;
 
@@ -388,8 +386,6 @@ value person2_fun =
            let pos = get_field_acc db2 i ("person", "parents") in
            if pos = -1 then None
            else Some (get_field_data db2 pos ("person", "parents") "data") ];
-     gen_ascend_of_ascend aa =
-       {parents = self.get_parents aa; consang = self.get_consang aa};
      get_family (db2, i) =
        match db2.family_array with
        [ Some tab -> tab.(i)
@@ -440,7 +436,6 @@ value person2gen_fun =
      failwith "not impl dsk_person_of_person (gen)";
    get_consang (db2, a) = a.Def.consang;
    get_parents (db2, a) = a.Def.parents;
-   gen_ascend_of_ascend (db2, a) = a;
    get_family (db2, u) = u.Def.family}
 ;
 
@@ -604,10 +599,6 @@ value get_consang a =
 value get_parents a =
   let f pf = pf.get_parents in
   wrap_asc f f f a
-;
-value gen_ascend_of_ascend p =
-  let f pf = pf.gen_ascend_of_ascend in
-  wrap_asc f f f p
 ;
 
 value get_family u =
@@ -880,7 +871,7 @@ type base =
     nb_of_families : unit -> int;
     patch_person : iper -> Def.gen_person iper istr -> unit;
     patch_ascend : iper -> Def.gen_ascend ifam -> unit;
-    patch_union : iper -> union -> unit;
+    patch_union : iper -> Def.gen_union ifam -> unit;
     patch_family : ifam -> family -> unit;
     patch_descend : ifam -> descend -> unit;
     patch_couple : ifam -> couple -> unit;
@@ -1024,10 +1015,7 @@ value base1 base =
        let p = map_person_ps (fun p -> p) un_istr p in
        base.func.Dbdisk.patch_person ip p;
      patch_ascend ip a = base.func.Dbdisk.patch_ascend ip a;
-     patch_union ip u =
-       match u with
-       [ Union u -> base.func.Dbdisk.patch_union ip u
-       | _ -> failwith "not impl patch_union" ];
+     patch_union ip u = base.func.Dbdisk.patch_union ip u;
      patch_family ifam f =
        match f with
        [ Family f -> base.func.Dbdisk.patch_family ifam f
@@ -1163,15 +1151,10 @@ value base2 db2 =
        Hashtbl.replace db2.patches.h_ascend ip a;
        db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
      };
-     patch_union ip u =
-       match u with
-       [ Union2Gen _ u ->
-           do {
-             Hashtbl.replace db2.patches.h_union ip u;
-             db2.patches.nb_per :=
-               max (Adef.int_of_iper ip + 1) db2.patches.nb_per
-           }
-       | _ -> failwith "not impl patch_union" ];
+     patch_union ip u = do {
+       Hashtbl.replace db2.patches.h_union ip u;
+       db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
+     };
      patch_family ifam f =
        match f with
        [ Family2Gen _ f ->
