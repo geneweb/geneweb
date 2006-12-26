@@ -1,4 +1,4 @@
-(* $Id: checkItem.mli,v 1.3 2006-12-25 22:56:03 ddr Exp $ *)
+(* $Id: checkItem.mli,v 1.4 2006-12-26 11:44:57 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Gwdb;
@@ -16,8 +16,8 @@ value strictly_after : Def.date -> Def.date -> bool;
 value date_of_death : Def.death -> option Adef.date;
 
 value person :
-  base -> (base_error -> unit) -> (base_warning -> unit) ->
-    person -> option (list (Adef.iper * Def.gen_person Def.iper istr));
+  base -> (base_error -> unit) -> (base_warning -> unit) -> person ->
+    option (list (Adef.iper * Def.gen_person Def.iper istr));
 value family :
   base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
     family -> couple -> descend -> unit;

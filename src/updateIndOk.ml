@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.47 2006-12-26 11:11:35 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.48 2006-12-26 11:44:57 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -600,34 +600,30 @@ value relation_sex_is_coherent base warning p =
     (get_rparents p)
 ;
 
-value all_checks_person conf base p a u =
+value all_checks_person conf base p a u = do {
   let p = person_of_gen_person base p in
-  let a = ascend_of_gen_ascend base a in
-  let u = union_of_gen_union base u in
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
-  do {
-    let _ : option _ = CheckItem.person base error warning p in
-    relation_sex_is_coherent base warning p;
-    match get_parents a with
-    [ Some ifam ->
-        CheckItem.family base error warning ifam (foi base ifam)
-          (coi base ifam) (doi base ifam)
-    | _ -> () ];
-    Array.iter
-      (fun ifam ->
-         CheckItem.family base error warning ifam (foi base ifam)
-           (coi base ifam) (doi base ifam))
-      (get_family u);
-    List.iter
-      (fun
-       [ ChangedOrderOfChildren ifam des _ -> patch_descend base ifam des
-       | _ -> () ])
-      wl.val;
-    List.rev wl.val
-  }
-;
+  let _ : option _ = CheckItem.person base error warning p in
+  relation_sex_is_coherent base warning p;
+  match a.parents with
+  [ Some ifam ->
+      CheckItem.family base error warning ifam (foi base ifam)
+        (coi base ifam) (doi base ifam)
+  | _ -> () ];
+  Array.iter
+    (fun ifam ->
+       CheckItem.family base error warning ifam (foi base ifam)
+         (coi base ifam) (doi base ifam))
+    u.family;
+  List.iter
+    (fun
+     [ ChangedOrderOfChildren ifam des _ -> patch_descend base ifam des
+     | _ -> () ])
+    wl.val;
+  List.rev wl.val
+};
 
 value print_add_ok conf base wl p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "person added")) in
