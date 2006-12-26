@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.33 2006-12-26 09:44:02 ddr Exp $ *)
+(* $Id: update.ml,v 5.34 2006-12-26 10:14:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -110,7 +110,7 @@ value update_misc_names_of_family base p_sex u =
                      else ())
                   (person_misc_names base (poi base ip) get_titles))
              [get_mother cpl :: Array.to_list (get_children des)])
-        (Array.to_list (get_family u))
+        (Array.to_list u.family)
   | _ -> () ]
 ;
 
@@ -718,7 +718,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              key_index = ip}
           in
           let a = {parents = None; consang = Adef.fix (-1)} in
-          let u = union_of_gen_union base {family = [| |]} in
+          let u = {family = [| |]} in
           patch_person base p.key_index p;
           patch_ascend base p.key_index a;
           patch_union base p.key_index u;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.34 2006-12-26 09:44:02 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.35 2006-12-26 10:14:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -478,10 +478,7 @@ value effective_mod conf base sfam scpl sdes =
     for i = 0 to Array.length oarr - 1 do {
       if not (array_mem oarr.(i) narr) then do {
         let ou = uoi base oarr.(i) in
-        let ou =
-          union_of_gen_union base
-            {family = family_exclude (get_family ou) fi}
-        in
+        let ou = {family = family_exclude (get_family ou) fi} in
         patch_union base oarr.(i) ou
       }
       else ()
@@ -489,10 +486,7 @@ value effective_mod conf base sfam scpl sdes =
     for i = 0 to Array.length narr - 1 do {
       if not (array_mem narr.(i) oarr) then do {
         let nu = uoi base narr.(i) in
-        let nu =
-          union_of_gen_union base
-            {family = Array.append (get_family nu) [| fi |]}
-        in
+        let nu = {family = Array.append (get_family nu) [| fi |]} in
         patch_union base narr.(i) nu;
       }
       else ()
@@ -501,9 +495,12 @@ value effective_mod conf base sfam scpl sdes =
     let find_asc =
       fun ip ->
         try Hashtbl.find cache ip with
-        [ Not_found ->
-            let a = gen_ascend_of_ascend (aoi base ip) in
-            do { Hashtbl.add cache ip a; a } ]
+        [ Not_found -> do {
+            let a = aoi base ip in
+            let a = {parents = get_parents a; consang = get_consang a} in
+            Hashtbl.add cache ip a;
+            a
+          } ]
     in
     let same_parents =
       get_father ncpl = get_father ocpl && get_mother ncpl = get_mother ocpl
@@ -548,7 +545,8 @@ value effective_mod conf base sfam scpl sdes =
          else ())
       (get_children ndes);
     Update.add_misc_names_for_new_persons base created_p.val;
-    Update.update_misc_names_of_family base Male nfath_u;
+    Update.update_misc_names_of_family base Male
+      {family = get_family nfath_u};
     update_related_witnesses base (Array.to_list (get_witnesses ofam))
       (Array.to_list (get_witnesses nfam)) ncpl;
     (fi, nfam, ncpl, ndes)
@@ -605,14 +603,8 @@ value effective_add conf base sfam scpl sdes =
     patch_family base fi nfam;
     patch_couple base fi ncpl;
     patch_descend base fi ndes;
-    let nfath_u =
-      union_of_gen_union base
-        {family = Array.append (get_family nfath_u) [| fi |]}
-    in
-    let nmoth_u =
-      union_of_gen_union base
-        {family = Array.append (get_family nmoth_u) [| fi |]}
-    in
+    let nfath_u = {family = Array.append (get_family nfath_u) [| fi |]} in
+    let nmoth_u = {family = Array.append (get_family nmoth_u) [| fi |]} in
     patch_union base (get_father ncpl) nfath_u;
     patch_union base (get_mother ncpl) nmoth_u;
     Array.iter
@@ -641,10 +633,7 @@ value effective_inv conf base ip u ifam =
         else [ifam1 :: loop [ifam2 :: ifaml]]
     | _ -> do { incorrect_request conf; raise Update.ModErr } ]
   in
-  let u =
-    union_of_gen_union base
-      {family = Array.of_list (loop (Array.to_list (get_family u)))}
-  in
+  let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u
 ;
 
@@ -656,7 +645,7 @@ value kill_family base ifam1 ip =
          if ifam = ifam1 then ifaml else [ifam :: ifaml])
       (Array.to_list (get_family u)) []
   in
-  let u = union_of_gen_union base {family = Array.of_list l} in
+  let u = {family = Array.of_list l} in
   patch_union base ip u
 ;
 
