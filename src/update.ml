@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.32 2006-12-25 21:20:16 ddr Exp $ *)
+(* $Id: update.ml,v 5.33 2006-12-26 09:44:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -673,7 +673,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           [ Some ip -> print_create_conflict conf base (poi base ip) var
           | None -> raise Not_found ]
       with
-      [ Not_found ->
+      [ Not_found -> do {
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int (nb_of_persons base) in
           let empty_string = Gwdb.insert_string base "" in
@@ -716,22 +716,22 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                if f = "?" || s = "?" then empty_string
                else Gwdb.insert_string base (only_printable src);
              key_index = ip}
-          and a = no_ascend base
-          and u = union_of_gen_union base {family = [| |]} in
-          do {
-            patch_person base p.key_index p;
-            patch_ascend base p.key_index a;
-            patch_union base p.key_index u;
-            if f <> "?" && s <> "?" then do {
-              let fn = Util.translate_eval f in
-              let sn = Util.translate_eval s in
-              patch_key base ip fn sn o;
-              person_ht_add base (fn ^ " " ^ sn) ip;
-              new_persons.val := [p :: new_persons.val]
-            }
-            else ();
-            ip
-          } ]
+          in
+          let a = {parents = None; consang = Adef.fix (-1)} in
+          let u = union_of_gen_union base {family = [| |]} in
+          patch_person base p.key_index p;
+          patch_ascend base p.key_index a;
+          patch_union base p.key_index u;
+          if f <> "?" && s <> "?" then do {
+            let fn = Util.translate_eval f in
+            let sn = Util.translate_eval s in
+            patch_key base ip fn sn o;
+            person_ht_add base (fn ^ " " ^ sn) ip;
+            new_persons.val := [p :: new_persons.val]
+          }
+          else ();
+          ip
+        } ]
   | Link ->
       if f = "?" || s = "?" then
         if o < 0 || o >= nb_of_persons base then

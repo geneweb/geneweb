@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.43 2006-12-25 21:20:16 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.44 2006-12-26 09:44:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -513,9 +513,9 @@ value effective_add conf base sp =
         (Gwdb.insert_string base) {(sp) with key_index = pi}
     in
     patch_person base pi np;
-    let na = no_ascend base in
-    let nu = union_of_gen_union base {family = [| |]} in
+    let na = {parents = None; consang = Adef.fix (-1)} in
     patch_ascend base pi na;
+    let nu = union_of_gen_union base {family = [| |]} in
     patch_union base pi nu;
     let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
     List.iter (fun key -> person_ht_add base key pi) np_misc_names;
@@ -538,17 +538,16 @@ value effective_del conf base p = do {
   let ip = get_key_index p in
   let asc = aoi base ip in
   match get_parents asc with
-  [ Some ifam ->
+  [ Some ifam -> do {
       let des = doi base ifam in
       let des =
         descend_of_gen_descend base
           {children = array_except ip (get_children des)}
       in
-      let asc = Gutil.no_ascend base in
-      do {
-        patch_descend base ifam des;
-        patch_ascend base ip asc;
-      }
+      patch_descend base ifam des;
+      let asc = {parents = None; consang = Adef.fix (-1)} in
+      patch_ascend base ip asc;
+    }
   | None -> () ];
   {first_name = none; surname = none; occ = 0; image = empty;
    public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
@@ -676,7 +675,8 @@ value print_add o_conf base =
           let (p, a) = effective_add conf base sp in
           let u = uoi base p.key_index in
           let wl =
-            all_checks_person conf base (person_of_gen_person base p) a u
+            all_checks_person conf base (person_of_gen_person base p)
+              (ascend_of_gen_ascend base a) u
           in
           let k = (sp.first_name, sp.surname, sp.occ, p.key_index) in
           do {
