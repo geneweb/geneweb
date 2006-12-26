@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.93 2006-12-26 09:44:02 ddr Exp $ *)
+(* $Id: util.ml,v 5.94 2006-12-26 10:48:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -553,8 +553,8 @@ value authorized_age conf base p =
 
 value is_old_person conf p =
   match
-    (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-     get_death p, CheckItem.date_of_death (get_death p))
+    (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
+     p.death, CheckItem.date_of_death p.death)
   with
   [ (_, _, NotDead, _) when conf.private_years > 0 -> False
   | (Some (Dgreg d _), _, _, _) ->
@@ -567,7 +567,7 @@ value is_old_person conf p =
       let a = CheckItem.time_elapsed d conf.today in
       a.year > conf.private_years
   | (None, None, DontKnowIfDead, None) ->
-      get_access p <> Private && conf.public_if_no_date
+      p.access <> Private && conf.public_if_no_date
   | _ -> False ]
 ;
 
@@ -577,7 +577,7 @@ value fast_auth_age conf p =
     conf.public_if_titles && get_access p = IfTitles && get_titles p <> []
   then
     True
-  else is_old_person conf p
+  else is_old_person conf (gen_person_of_person p)
 ;
 
 value is_restricted (conf : config) base ip =
@@ -618,7 +618,7 @@ value is_public conf base p =
   get_access p = Public ||
   conf.public_if_titles && get_access p = IfTitles &&
     nobtit conf base p <> [] ||
-  is_old_person conf p
+  is_old_person conf (gen_person_of_person p)
 ;
 
 value accessible_by_key conf base p fn sn =

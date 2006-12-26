@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.25 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.26 2006-12-26 10:48:13 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -255,16 +255,14 @@ value effective_mod_merge conf base sp =
         };
         Update.update_misc_names_of_family base p.sex {family = get_family u};
         patch_person base p.key_index p;
-        if p2_family <> [| |] then do {
-          let u = {family = Array.append (get_family u) p2_family} in
-          patch_union base p.key_index u;
-        }
-        else ();
+        let u = {family = Array.append (get_family u) p2_family} in
+        if p2_family <> [| |] then patch_union base p.key_index u else ();
         Consang.check_noloop_for_person_list base (Update.error conf base)
           [p.key_index];
         let wl =
-          UpdateIndOk.all_checks_person conf base
-            (person_of_gen_person base p) (aoi base p.key_index) u
+          let a = aoi base p.key_index in
+          let a = {parents = get_parents a; consang = get_consang a} in
+          UpdateIndOk.all_checks_person conf base p a u
         in
         let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
         Util.commit_patches conf base;
