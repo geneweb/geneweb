@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 5.50 2006-11-20 11:41:55 ddr Exp $ *)
+(* $Id: gutil.ml,v 5.51 2006-12-26 09:44:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -26,10 +26,6 @@ value couple multi fath moth =
   if not multi then Adef.couple fath moth else Adef.multi_couple fath moth
 ;
 value parent_array = Adef.parent_array;
-
-value no_ascend base =
-  ascend_of_gen_ascend base {parents = None; consang = Adef.fix (-1)}
-;
 
 value spouse ip cpl =
   if ip = get_father cpl then get_mother cpl

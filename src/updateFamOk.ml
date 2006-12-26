@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.33 2006-12-25 21:20:16 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.34 2006-12-26 09:44:02 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -502,7 +502,7 @@ value effective_mod conf base sfam scpl sdes =
       fun ip ->
         try Hashtbl.find cache ip with
         [ Not_found ->
-            let a = aoi base ip in
+            let a = gen_ascend_of_ascend (aoi base ip) in
             do { Hashtbl.add cache ip a; a } ]
     in
     let same_parents =
@@ -512,28 +512,26 @@ value effective_mod conf base sfam scpl sdes =
       (fun ip ->
          let a = find_asc ip in
          let a =
-           ascend_of_gen_ascend base
-             {parents = None;
-              consang =
-                if not (array_mem ip (get_children ndes)) then Adef.fix (-1)
-                else get_consang a}
+           {parents = None;
+            consang =
+              if not (array_mem ip (get_children ndes)) then Adef.fix (-1)
+              else a.consang}
          in
          Hashtbl.replace cache ip a)
       (get_children odes);
     Array.iter
       (fun ip ->
          let a = find_asc ip in
-         match get_parents a with
+         match a.parents with
          [ Some _ -> print_err_parents conf base (poi base ip)
          | None ->
              let a =
-               ascend_of_gen_ascend base
-                 {parents = Some fi;
-                  consang =
-                    if not (array_mem ip (get_children odes)) ||
-                       not same_parents
-                    then Adef.fix (-1)
-                    else get_consang a}
+               {parents = Some fi;
+                consang =
+                  if not (array_mem ip (get_children odes)) ||
+                     not same_parents
+                  then Adef.fix (-1)
+                  else a.consang}
              in
              Hashtbl.replace cache ip a ])
       (get_children ndes);
@@ -624,10 +622,7 @@ value effective_add conf base sfam scpl sdes =
          match get_parents a with
          [ Some _ -> print_err_parents conf base p
          | None ->
-             let a =
-               ascend_of_gen_ascend base
-                 {parents = Some fi; consang = Adef.fix (-1)}
-             in
+             let a = {parents = Some fi; consang = Adef.fix (-1)} in
              patch_ascend base (get_key_index p) a ])
       (get_children ndes);
     Update.add_misc_names_for_new_persons base created_p.val;
@@ -666,7 +661,7 @@ value kill_family base ifam1 ip =
 ;
 
 value kill_parents base ip =
-  let a = no_ascend base in
+  let a = {parents = None; consang = Adef.fix (-1)} in
   patch_ascend base ip a
 ;
 
