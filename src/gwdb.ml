@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.192 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.193 2006-12-27 17:24:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -16,7 +16,7 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
 
 value no_consang = Adef.fix (-1);
 
-value empty_person empty_string ip =
+value no_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
@@ -29,6 +29,8 @@ value empty_person empty_string ip =
    burial_place = empty_string; burial_src = empty_string;
    notes = empty_string; psources = empty_string; key_index = ip}
 ;
+value no_ascend = {parents = None; consang = no_consang};
+value no_union = {family = [| |]};
 
 (* Strings - common definitions *)
 
@@ -854,9 +856,9 @@ value gen_descend_of_descend des =
 type base =
   { close_base : unit -> unit;
     empty_person : iper -> person;
+    empty_ascend : iper -> ascend;
+    empty_union : iper -> union;
     person_of_gen_person : Def.gen_person iper istr -> person;
-    ascend_of_gen_ascend : Def.gen_ascend ifam -> ascend;
-    union_of_gen_union : Def.gen_union ifam -> union;
     family_of_gen_family : Def.gen_family iper istr -> family;
     couple_of_gen_couple : Def.gen_couple iper -> couple;
     descend_of_gen_descend : Def.gen_descend iper -> descend;
@@ -994,9 +996,10 @@ value base1 base =
   in
   self where rec self =
     {close_base = base.func.cleanup;
-     empty_person ip = Person (empty_person (Adef.istr_of_int 0) ip);
+     empty_person ip = Person (no_person (Adef.istr_of_int 0) ip);
+     empty_ascend _ = Ascend no_ascend;
+     empty_union _ = Union no_union;
      person_of_gen_person p = Person (map_person_ps (fun p -> p) un_istr p);
-     ascend_of_gen_ascend a = Ascend a; union_of_gen_union u = Union u;
      family_of_gen_family f = Family (map_family_ps (fun p -> p) un_istr f);
      couple_of_gen_couple c = Couple c; descend_of_gen_descend d = Descend d;
      poi i = Person (base.data.persons.get (Adef.int_of_iper i));
@@ -1108,11 +1111,11 @@ value base2 db2 =
   self where rec self =
     {close_base () =
        Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
-     empty_person ip = Person2Gen db2 (empty_person "" ip);
+     empty_person ip = Person2Gen db2 (no_person "" ip);
+     empty_ascend ip = Ascend2Gen db2 no_ascend;
+     empty_union ip = Union2Gen db2 no_union;
      person_of_gen_person p =
        Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
-     ascend_of_gen_ascend a = Ascend2Gen db2 a;
-     union_of_gen_union u = Union2Gen db2 u;
      family_of_gen_family f =
        Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f);
      couple_of_gen_couple c = Couple2Gen db2 c;
@@ -1336,9 +1339,9 @@ value open_base bname =
 
 value close_base b = b.close_base ();
 value empty_person b = b.empty_person;
+value empty_ascend b = b.empty_ascend;
+value empty_union b = b.empty_union;
 value person_of_gen_person b = b.person_of_gen_person;
-value ascend_of_gen_ascend b = b.ascend_of_gen_ascend;
-value union_of_gen_union b = b.union_of_gen_union;
 value family_of_gen_family b = b.family_of_gen_family;
 value couple_of_gen_couple b = b.couple_of_gen_couple;
 value descend_of_gen_descend b = b.descend_of_gen_descend;

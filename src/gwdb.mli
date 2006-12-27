@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.81 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.82 2006-12-27 17:24:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -27,6 +27,8 @@ value eq_istr : istr -> istr -> bool;
 value is_empty_string : istr -> bool;
 value is_quest_string : istr -> bool;
 value empty_person : base -> iper -> person;
+value empty_ascend : base -> iper -> ascend;
+value empty_union : base -> iper -> union;
 
 value get_access : person -> Def.access;
 value get_aliases : person -> list istr;
@@ -65,11 +67,7 @@ value gen_person_of_person : person -> Def.gen_person iper istr;
 value get_parents : ascend -> option ifam;
 value get_consang : ascend -> Adef.fix;
 
-value ascend_of_gen_ascend : base -> Def.gen_ascend ifam -> ascend;
-
 value get_family : union -> array ifam;
-
-value union_of_gen_union : base -> Def.gen_union ifam -> union;
 
 value get_comment : family -> istr;
 value get_divorce : family -> Def.divorce;
