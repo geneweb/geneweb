@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.50 2006-12-25 22:56:03 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.51 2006-12-27 14:57:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -881,6 +881,12 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir =
   {data = base_data; func = base_func}
 ;
 
+value fold_option fsome vnone =
+  fun
+  [ Some v -> fsome v
+  | None -> vnone ]
+;
+
 value link gwo_list tmp_dir bdir =
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
@@ -942,9 +948,18 @@ value link gwo_list tmp_dir bdir =
     Hashtbl.clear gen.g_patch_p;
     let base = Gwdb.base_of_dsk_base dsk_base in
     if do_check.val && gen.g_pcnt > 0 then do {
-      let changed_p (ip, p) =
-        let p = Gwdb.person_of_gen_person base p in
+      let changed_p (ip, p, o_sex, o_rpar) =
         let p = Gwdb.dsk_person_of_person p in
+        let p =
+          {(p) with
+           sex = fold_option (fun s -> s) p.sex o_sex;
+           rparents =
+             fold_option
+               (List.map
+                  (Futil.map_relation_ps (fun p -> p)
+                     (fun s -> Adef.istr_of_int 0)))
+               p.rparents o_rpar}
+        in
         let i = Adef.int_of_iper ip in
         Hashtbl.replace gen.g_patch_p i p
       in
