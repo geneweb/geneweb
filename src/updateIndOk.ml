@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.48 2006-12-26 11:44:57 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.49 2006-12-27 17:24:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -597,15 +597,16 @@ value relation_sex_is_coherent base warning p =
              if get_sex p <> Female then warning (IncoherentSex p 0 0) else ()
          | None -> () ];
        })
-    (get_rparents p)
+    p.rparents
 ;
 
 value all_checks_person conf base p a u = do {
-  let p = person_of_gen_person base p in
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
-  let _ : option _ = CheckItem.person base error warning p in
+  let _ : option _ =
+    CheckItem.person base error warning (person_of_gen_person base p)
+  in
   relation_sex_is_coherent base warning p;
   match a.parents with
   [ Some ifam ->

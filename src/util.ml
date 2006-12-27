@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.94 2006-12-26 10:48:13 ddr Exp $ *)
+(* $Id: util.ml,v 5.95 2006-12-27 17:24:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -597,16 +597,13 @@ value pget (conf : config) base ip =
   else poi base ip
 ;
 
-value no_ascend base =
-  ascend_of_gen_ascend base {parents = None; consang = Adef.fix (-1)}
-;
-
 value aget (conf : config) base ip =
-  if is_restricted conf base ip then no_ascend base else aoi base ip
+  if is_restricted conf base ip then Gwdb.empty_ascend base ip
+  else aoi base ip
 ;
 
 value uget (conf : config) base ip =
-  if is_restricted conf base ip then union_of_gen_union base {family = [| |]}
+  if is_restricted conf base ip then Gwdb.empty_union base ip
   else uoi base ip
 ;
 
