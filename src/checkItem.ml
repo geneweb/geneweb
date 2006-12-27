@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.5 2006-12-27 14:57:47 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.6 2006-12-27 17:35:25 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -460,7 +460,7 @@ value child_has_sex warning child =
 
 (* main *)
 
-value person base error warning p = do {
+value person base warning p = do {
   birth_before_death base warning p;
   List.iter (titles_after_birth base warning p) (get_titles p);
   related_sex_is_coherent base warning p

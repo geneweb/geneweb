@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.15 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: check.ml,v 5.16 2006-12-27 17:35:25 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -188,7 +188,7 @@ value check_base_aux base error warning changed_p =
     for i = 0 to nb_of_persons base - 1 do {
       ProgrBar.run i (nb_of_persons base);
       let p = poi base (Adef.iper_of_int i) in
-      match CheckItem.person base error warning p with
+      match CheckItem.person base warning p with
       [ Some ippl -> List.iter changed_p ippl
       | None -> () ]
     };
