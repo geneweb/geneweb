@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.19 2006-12-17 12:45:34 ddr Exp $ *)
+(* $Id: notes.ml,v 5.20 2006-12-28 14:08:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -317,7 +317,7 @@ value print_mod conf base =
   Wiki.print_mod_view_page conf True "NOTES" fnotes title env s
 ;
 
-value update_notes_links_db conf fnotes s force =
+value update_notes_links_db conf fnotes s =
   let slen = String.length s in
   let (list_nt, list_ind) =
     loop [] [] 1 0 where rec loop list_nt list_ind pos i =
@@ -339,10 +339,8 @@ value update_notes_links_db conf fnotes s force =
         | NotesLinks.WLwizard j _ _ -> loop list_nt list_ind pos j
         | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1) ]
   in
-  if not force && list_nt = [] && list_ind = [] then ()
-  else
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-    NotesLinks.update_db bdir fnotes (list_nt, list_ind)
+  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  NotesLinks.update_db bdir fnotes (list_nt, list_ind)
 ;
 
 value commit_notes conf base fnotes s =  do {
@@ -360,7 +358,7 @@ value commit_notes conf base fnotes s =  do {
   try Gwdb.commit_notes base fname s with
   [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
   History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
-  update_notes_links_db conf pg s True;
+  update_notes_links_db conf pg s;
 };
 
 value print_mod_ok conf base =

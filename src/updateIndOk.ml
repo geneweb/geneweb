@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.51 2006-12-28 12:56:35 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.52 2006-12-28 14:08:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -696,8 +696,7 @@ value print_del conf base =
       do {
         let p = effective_del conf base p in
         patch_person base p.key_index p;
-        Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index)
-          "" True;
+        Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
         Util.commit_patches conf base;
         History.record conf base k "dp";
         print_del_ok conf base [];
@@ -757,8 +756,14 @@ value print_mod o_conf base =
     let u = {family = get_family (uoi base p.key_index)} in
     do {
       patch_person base p.key_index p;
-      Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index)
-        (sou base p.notes) (not (eq_istr p.notes (get_notes op)));
+      let s =
+        let sl =
+          [p.notes; p.birth_src; p.baptism_src; p.death_src; p.burial_src;
+           p.psources]
+        in
+        String.concat " " (List.map (sou base) sl)
+      in
+      Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
       if not (eq_istr (get_surname op) p.surname) ||
          not (eq_istr_list (get_surnames_aliases op) p.surnames_aliases) ||
          not (eq_titles (get_titles op) p.titles)
