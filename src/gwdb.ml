@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.197 2006-12-28 18:57:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.198 2006-12-28 20:41:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -833,9 +833,7 @@ value gen_descend_of_descend des =
 
 type base =
   { close_base : unit -> unit;
-    empty_person : iper -> person;
-    empty_ascend : iper -> ascend;
-    empty_union : iper -> union;
+    empty_person : iper -> (person * ascend * union);
     person_of_gen_person :
       (gen_person iper istr * gen_ascend ifam * gen_union ifam) ->
          (person * ascend * union);
@@ -970,9 +968,9 @@ value base1 base =
   in
   self where rec self =
     {close_base = base.func.cleanup;
-     empty_person ip = Person (no_person (Adef.istr_of_int 0) ip);
-     empty_ascend _ = Ascend no_ascend;
-     empty_union _ = Union no_union;
+     empty_person ip =
+       (Person (no_person (Adef.istr_of_int 0) ip), Ascend no_ascend,
+        Union no_union);
      person_of_gen_person (p, a, u) =
        (Person (map_person_ps (fun p -> p) un_istr p), Ascend a, Union u);
      family_of_gen_family (f, c, d) =
@@ -1079,9 +1077,9 @@ value base2 db2 =
   self where rec self =
     {close_base () =
        Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
-     empty_person ip = Person2Gen db2 (no_person "" ip);
-     empty_ascend ip = Ascend2Gen db2 no_ascend;
-     empty_union ip = Union2Gen db2 no_union;
+     empty_person ip =
+       (Person2Gen db2 (no_person "" ip), Ascend2Gen db2 no_ascend,
+        Union2Gen db2 no_union);
      person_of_gen_person (p, a, u) =
        (Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p),
         Ascend2Gen db2 a, Union2Gen db2 u);
@@ -1296,8 +1294,6 @@ value open_base bname =
 
 value close_base b = b.close_base ();
 value empty_person b = b.empty_person;
-value empty_ascend b = b.empty_ascend;
-value empty_union b = b.empty_union;
 value person_of_gen_person b = b.person_of_gen_person;
 value family_of_gen_family b = b.family_of_gen_family;
 value poi b = b.poi;
