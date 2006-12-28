@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.196 2006-12-28 17:53:24 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.197 2006-12-28 18:57:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -837,7 +837,7 @@ type base =
     empty_ascend : iper -> ascend;
     empty_union : iper -> union;
     person_of_gen_person :
-      (gen_person iper istr * gen_ascend ifam *gen_union ifam) ->
+      (gen_person iper istr * gen_ascend ifam * gen_union ifam) ->
          (person * ascend * union);
     family_of_gen_family :
       (gen_family iper istr * gen_couple iper * gen_descend iper) ->
