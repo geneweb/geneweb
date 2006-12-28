@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.42 2006-12-23 22:35:32 ddr Exp $ *)
+(* $Id: perso.ml,v 5.43 2006-12-28 13:23:21 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2038,6 +2038,11 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       match get_env "src" env with
       [ Vstring s ->
           let env = [('i', fun () -> Util.default_image_name base p)] in
+          let s =
+            let lines = Wiki.html_of_tlsw conf s in
+            Wiki.syntax_links conf "NOTES" (Notes.file_path conf base)
+              (String.concat "\n" lines)
+          in
           string_with_macros conf env s
       | _ -> raise Not_found ]
   | "surname" ->
