@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.82 2006-12-27 17:24:17 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.83 2006-12-28 12:29:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -79,8 +79,6 @@ value get_origin_file : family -> istr;
 value get_relation : family -> Def.relation_kind;
 value get_witnesses : family -> array iper;
 
-value family_with_origin_file : family -> istr -> ifam -> family;
-
 value family_of_gen_family : base -> Def.gen_family iper istr -> family;
 value gen_family_of_family : family -> Def.gen_family iper istr;
 
@@ -112,8 +110,8 @@ value nb_of_families : base -> int;
 value patch_person : base -> iper -> Def.gen_person iper istr -> unit;
 value patch_ascend : base -> iper -> Def.gen_ascend ifam -> unit;
 value patch_union : base -> iper -> Def.gen_union ifam -> unit;
+value patch_family : base -> ifam -> Def.gen_family iper istr -> unit;
 
-value patch_family : base -> ifam -> family -> unit;
 value patch_descend : base -> ifam -> descend -> unit;
 value patch_couple : base -> ifam -> couple -> unit;
 value patch_key : base -> iper -> string -> string -> int -> unit;

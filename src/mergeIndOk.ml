@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.27 2006-12-26 11:11:35 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.28 2006-12-28 12:29:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -194,20 +194,20 @@ value effective_mod_merge conf base sp =
                        (p_related, mod_p)
                      else
                        let ifam = (get_family uc).(i) in
-                       let fam = foi base ifam in
+                       let fam = gen_family_of_family (foi base ifam) in
                        let (p_related, mod_p) =
-                         if array_mem p2.key_index (get_witnesses fam)
+                         if array_mem p2.key_index fam.witnesses
                          then do {
                            let (p_related, mod_p) =
                              loop (p_related, mod_p) 0
                              where rec loop (p_related, mod_p) j =
-                               if j = Array.length (get_witnesses fam) then
+                               if j = Array.length fam.witnesses then
                                  (p_related, mod_p)
                                else
                                let (p_related, mod_p) =
-                                 if (get_witnesses fam).(j) = p2.key_index
+                                 if fam.witnesses.(j) = p2.key_index
                                  then do {
-                                   (get_witnesses fam).(j) := p.key_index;
+                                   fam.witnesses.(j) := p.key_index;
                                    if List.mem ipc p_related then
                                      (p_related, mod_p)
                                    else ([ipc :: p_related], True)

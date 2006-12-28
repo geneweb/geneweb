@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.31 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.32 2006-12-28 12:29:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -446,44 +446,41 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   }
 ;
 
-value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 =
+value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 = do {
   let des1 = doi base ifam1 in
   let des2 = doi base ifam2 in
   let fam1 =
-    family_of_gen_family base
-      {(gen_family_of_family fam1) with
-       marriage =
-         if get_marriage fam1 = Adef.codate_None then get_marriage fam2
-         else get_marriage fam1;
-       marriage_place =
-         if is_empty_string (get_marriage_place fam1) then
-           get_marriage_place fam2
-         else get_marriage_place fam1;
-       marriage_src =
-         if is_empty_string (get_marriage_src fam1) then
-           get_marriage_src fam2
-         else get_marriage_src fam1;
-       fsources =
-         if is_empty_string (get_fsources fam1) then get_fsources fam2
-         else get_fsources fam1}
+    {(gen_family_of_family fam1) with
+     marriage =
+       if get_marriage fam1 = Adef.codate_None then get_marriage fam2
+       else get_marriage fam1;
+     marriage_place =
+       if is_empty_string (get_marriage_place fam1) then
+         get_marriage_place fam2
+       else get_marriage_place fam1;
+     marriage_src =
+       if is_empty_string (get_marriage_src fam1) then
+         get_marriage_src fam2
+       else get_marriage_src fam1;
+     fsources =
+       if is_empty_string (get_fsources fam1) then get_fsources fam2
+       else get_fsources fam1}
   in
-  do {
-    patch_family base ifam1 fam1;
-    let des1 =
-      descend_of_gen_descend base
-        {children = Array.append (get_children des1) (get_children des2)}
-    in
-    patch_descend base ifam1 des1;
-    for i = 0 to Array.length (get_children des2) - 1 do {
-      let ip = (get_children des2).(i) in
-      let a = {parents = Some ifam1; consang = Adef.fix (-1)} in
-      patch_ascend base ip a;
-    };
-    let des2 = descend_of_gen_descend base {children = [| |]} in
-    patch_descend base ifam2 des2;
-    UpdateFamOk.effective_del conf base (ifam2, fam2);
-  }
-;
+  patch_family base ifam1 fam1;
+  let des1 =
+    descend_of_gen_descend base
+      {children = Array.append (get_children des1) (get_children des2)}
+  in
+  patch_descend base ifam1 des1;
+  for i = 0 to Array.length (get_children des2) - 1 do {
+    let ip = (get_children des2).(i) in
+    let a = {parents = Some ifam1; consang = Adef.fix (-1)} in
+    patch_ascend base ip a;
+  };
+  let des2 = descend_of_gen_descend base {children = [| |]} in
+  patch_descend base ifam2 des2;
+  UpdateFamOk.effective_del conf base (ifam2, fam2);
+};
 
 value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
   let p1 = poi base ip1 in
