@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.84 2006-12-28 12:56:35 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.85 2006-12-28 17:53:24 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -61,7 +61,6 @@ value get_surname : person -> istr;
 value get_surnames_aliases : person -> list istr;
 value get_titles : person -> list title;
 
-value person_of_gen_person : base -> Def.gen_person iper istr -> person;
 value gen_person_of_person : person -> Def.gen_person iper istr;
 
 value get_parents : ascend -> option ifam;
@@ -79,20 +78,27 @@ value get_origin_file : family -> istr;
 value get_relation : family -> Def.relation_kind;
 value get_witnesses : family -> array iper;
 
-value family_of_gen_family : base -> Def.gen_family iper istr -> family;
 value gen_family_of_family : family -> Def.gen_family iper istr;
 
 value get_father : couple -> iper;
 value get_mother : couple -> iper;
 value get_parent_array : couple -> array iper;
 
-value couple_of_gen_couple : base -> Def.gen_couple iper -> couple;
 value gen_couple_of_couple : couple -> Def.gen_couple iper;
 
 value get_children : descend -> array iper;
 
-value descend_of_gen_descend : base -> Def.gen_descend iper -> descend;
 value gen_descend_of_descend : descend -> Def.gen_descend iper;
+
+value person_of_gen_person :
+  base ->
+    (Def.gen_person iper istr * Def.gen_ascend ifam * Def.gen_union ifam) ->
+    (person * ascend * union);
+
+value family_of_gen_family :
+  base ->
+    (Def.gen_family iper istr * Def.gen_couple iper * Def.gen_descend iper) ->
+    (family * couple * descend);
 
 value poi : base -> iper -> person;
 value aoi : base -> iper -> ascend;

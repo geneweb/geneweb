@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.195 2006-12-28 12:56:35 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.196 2006-12-28 17:53:24 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -836,10 +836,12 @@ type base =
     empty_person : iper -> person;
     empty_ascend : iper -> ascend;
     empty_union : iper -> union;
-    person_of_gen_person : Def.gen_person iper istr -> person;
-    family_of_gen_family : Def.gen_family iper istr -> family;
-    couple_of_gen_couple : Def.gen_couple iper -> couple;
-    descend_of_gen_descend : Def.gen_descend iper -> descend;
+    person_of_gen_person :
+      (gen_person iper istr * gen_ascend ifam *gen_union ifam) ->
+         (person * ascend * union);
+    family_of_gen_family :
+      (gen_family iper istr * gen_couple iper * gen_descend iper) ->
+         (family * couple * descend);
     poi : iper -> person;
     aoi : iper -> ascend;
     uoi : iper -> union;
@@ -971,9 +973,10 @@ value base1 base =
      empty_person ip = Person (no_person (Adef.istr_of_int 0) ip);
      empty_ascend _ = Ascend no_ascend;
      empty_union _ = Union no_union;
-     person_of_gen_person p = Person (map_person_ps (fun p -> p) un_istr p);
-     family_of_gen_family f = Family (map_family_ps (fun p -> p) un_istr f);
-     couple_of_gen_couple c = Couple c; descend_of_gen_descend d = Descend d;
+     person_of_gen_person (p, a, u) =
+       (Person (map_person_ps (fun p -> p) un_istr p), Ascend a, Union u);
+     family_of_gen_family (f, c, d) =
+       (Family (map_family_ps (fun p -> p) un_istr f), Couple c, Descend d);
      poi i = Person (base.data.persons.get (Adef.int_of_iper i));
      aoi i = Ascend (base.data.ascends.get (Adef.int_of_iper i));
      uoi i = Union (base.data.unions.get (Adef.int_of_iper i));
@@ -1079,12 +1082,12 @@ value base2 db2 =
      empty_person ip = Person2Gen db2 (no_person "" ip);
      empty_ascend ip = Ascend2Gen db2 no_ascend;
      empty_union ip = Union2Gen db2 no_union;
-     person_of_gen_person p =
-       Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p);
-     family_of_gen_family f =
-       Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f);
-     couple_of_gen_couple c = Couple2Gen db2 c;
-     descend_of_gen_descend d = Descend2Gen db2 d;
+     person_of_gen_person (p, a, u) =
+       (Person2Gen db2 (map_person_ps (fun p -> p) un_istr2 p),
+        Ascend2Gen db2 a, Union2Gen db2 u);
+     family_of_gen_family (f, c, d) =
+       (Family2Gen db2 (map_family_ps (fun p -> p) un_istr2 f),
+        Couple2Gen db2 c, Descend2Gen db2 d);
      poi i =
        try Person2Gen db2 (Hashtbl.find db2.patches.h_person i) with
        [ Not_found -> Person2 db2 (Adef.int_of_iper i) ];
@@ -1297,8 +1300,6 @@ value empty_ascend b = b.empty_ascend;
 value empty_union b = b.empty_union;
 value person_of_gen_person b = b.person_of_gen_person;
 value family_of_gen_family b = b.family_of_gen_family;
-value couple_of_gen_couple b = b.couple_of_gen_couple;
-value descend_of_gen_descend b = b.descend_of_gen_descend;
 value poi b = b.poi;
 value aoi b = b.aoi;
 value uoi b = b.uoi;
