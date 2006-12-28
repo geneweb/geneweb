@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.35 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.36 2006-12-28 12:29:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -468,7 +468,7 @@ value effective_mod conf base sfam scpl sdes =
           else infer_origin_file conf base fi ncpl ndes
         else nfam.origin_file
       in
-      family_with_origin_file (family_of_gen_family base nfam) origin_file fi
+      {(nfam) with origin_file = origin_file; fam_index = fi}
     in
     patch_family base fi nfam;
     patch_couple base fi ncpl;
@@ -548,7 +548,7 @@ value effective_mod conf base sfam scpl sdes =
     Update.update_misc_names_of_family base Male
       {family = get_family nfath_u};
     update_related_witnesses base (Array.to_list (get_witnesses ofam))
-      (Array.to_list (get_witnesses nfam)) ncpl;
+      (Array.to_list nfam.witnesses) ncpl;
     (fi, nfam, ncpl, ndes)
   }
 ;
@@ -597,9 +597,7 @@ value effective_add conf base sfam scpl sdes =
     }
     else if get_father ncpl = get_mother ncpl then print_err conf base
     else ();
-    let nfam =
-      family_with_origin_file (family_of_gen_family base nfam) origin_file fi
-    in
+    let nfam = {(nfam) with origin_file = origin_file; fam_index = fi} in
     patch_family base fi nfam;
     patch_couple base fi ncpl;
     patch_descend base fi ndes;
@@ -619,8 +617,7 @@ value effective_add conf base sfam scpl sdes =
       (get_children ndes);
     Update.add_misc_names_for_new_persons base created_p.val;
     Update.update_misc_names_of_family base Male nfath_u;
-    update_related_witnesses base [] (Array.to_list (get_witnesses nfam))
-      ncpl;
+    update_related_witnesses base [] (Array.to_list nfam.witnesses) ncpl;
     (fi, nfam, ncpl, ndes)
   }
 ;
@@ -715,19 +712,18 @@ value need_check_noloop (scpl, sdes, onfs) =
   else False
 ;
 
-value all_checks_family conf base ifam fam cpl des scdo =
+value all_checks_family conf base ifam fam cpl des scdo = do {
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
-  do {
-    if need_check_noloop scdo then
-      Consang.check_noloop_for_person_list base error
-        (Array.to_list (get_parent_array cpl))
-    else ();
-    CheckItem.family base error warning ifam fam cpl des;
-    List.rev wl.val
-  }
-;
+  if need_check_noloop scdo then
+    Consang.check_noloop_for_person_list base error
+      (Array.to_list (get_parent_array cpl))
+  else ();
+  let fam = family_of_gen_family base fam in
+  CheckItem.family base error warning ifam fam cpl des;
+  List.rev wl.val
+};
 
 value print_family conf base wl cpl des =
   let rdsrc =

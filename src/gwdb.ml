@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.193 2006-12-27 17:24:17 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.194 2006-12-28 12:29:03 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -638,7 +638,6 @@ type family_fun 'f 'c 'd =
     get_origin_file : 'f -> istr;
     get_relation : 'f -> Def.relation_kind;
     get_witnesses : 'f -> array iper;
-    family_with_origin_file : 'f -> istr -> ifam -> family;
     gen_family_of_family : 'f -> Def.gen_family iper istr;
     is_deleted_family : 'f -> bool;
     get_father : 'c -> iper;
@@ -661,10 +660,6 @@ value family1_fun =
    get_origin_file f = Istr f.Def.origin_file;
    get_relation f = f.Def.relation;
    get_witnesses f = f.Def.witnesses;
-   family_with_origin_file f orf fi =
-     match orf with
-     [ Istr orf -> Family {(f) with origin_file = orf; fam_index = fi}
-     | _ -> assert False ];
    gen_family_of_family f = map_family_ps (fun p -> p) (fun s -> Istr s) f;
    is_deleted_family f = f.Def.fam_index = Adef.ifam_of_int (-1);
    get_father c = Adef.father c;
@@ -689,7 +684,6 @@ value family2_fun =
      get_origin_file (db2, i) = make_istr2 db2 ("family", "origin_file") i;
      get_relation (db2, i) = get_field db2 i ("family", "relation");
      get_witnesses (db2, i) = get_field db2 i ("family", "witnesses");
-     family_with_origin_file (db2, i) orf fi = assert False;
      gen_family_of_family ((db2, i) as f) =
        {marriage = self.get_marriage f;
         marriage_place = self.get_marriage_place f;
@@ -730,18 +724,6 @@ value family2gen_fun =
    get_origin_file (db2, f) = Istr2New db2 f.Def.origin_file;
    get_relation (db2, f) = f.Def.relation;
    get_witnesses (db2, f) = f.Def.witnesses;
-   family_with_origin_file (db2, f) orf fi =
-      match orf with
-      [ Istr2 _ path pos ->
-          let orf =
-            if pos = -1 || pos = Db2.empty_string_pos then ""
-            else get_field_data db2 pos path "data"
-          in
-          Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
-      | Istr2New _ orf ->
-          Family2Gen db2 {(f) with origin_file = orf; fam_index = fi}
-      | _ -> assert False ]
-   ;
    gen_family_of_family (db2, f) =
       map_family_ps (fun p -> p) (fun s -> Istr2New db2 s) f;
    is_deleted_family (db2, f) = f.Def.fam_index = Adef.ifam_of_int (-1);
@@ -812,10 +794,6 @@ value get_witnesses fam =
   let f pf = pf.get_witnesses in
   wrap_fam f f f fam
 ;
-value family_with_origin_file fam =
-  let f pf = pf.family_with_origin_file in
-  wrap_fam f f f fam
-;
 value gen_family_of_family fam =
   let f pf = pf.gen_family_of_family in
   wrap_fam f f f fam
@@ -874,7 +852,7 @@ type base =
     patch_person : iper -> Def.gen_person iper istr -> unit;
     patch_ascend : iper -> Def.gen_ascend ifam -> unit;
     patch_union : iper -> Def.gen_union ifam -> unit;
-    patch_family : ifam -> family -> unit;
+    patch_family : ifam -> Def.gen_family iper istr -> unit;
     patch_descend : ifam -> descend -> unit;
     patch_couple : ifam -> couple -> unit;
     patch_key : iper -> string -> string -> int -> unit;
@@ -929,26 +907,23 @@ module C_base :
     value p_surname : base -> person -> string;
   end =
   struct
-    value delete_family self ifam =
+    value delete_family self ifam = do {
       let cpl =
         self.couple_of_gen_couple
           (Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
       in
       let fam =
         let empty = self.insert_string "" in
-        self.family_of_gen_family
-          {marriage = Adef.codate_None; marriage_place = empty;
-           marriage_src = empty; relation = Married; divorce = NotDivorced;
-           witnesses = [| |]; comment = empty; origin_file = empty;
-           fsources = empty; fam_index = Adef.ifam_of_int (-1)}
+        {marriage = Adef.codate_None; marriage_place = empty;
+         marriage_src = empty; relation = Married; divorce = NotDivorced;
+         witnesses = [| |]; comment = empty; origin_file = empty;
+         fsources = empty; fam_index = Adef.ifam_of_int (-1)}
       in
       let des = self.descend_of_gen_descend {children = [| |]} in
-      do {
-        self.patch_family ifam fam;
-        self.patch_couple ifam cpl;
-        self.patch_descend ifam des
-      }
-    ;
+      self.patch_family ifam fam;
+      self.patch_couple ifam cpl;
+      self.patch_descend ifam des
+    };
     value nobtit self allowed_titles denied_titles p =
       let list = get_titles p in
       match Lazy.force allowed_titles with
@@ -1020,9 +995,8 @@ value base1 base =
      patch_ascend ip a = base.func.Dbdisk.patch_ascend ip a;
      patch_union ip u = base.func.Dbdisk.patch_union ip u;
      patch_family ifam f =
-       match f with
-       [ Family f -> base.func.Dbdisk.patch_family ifam f
-       | _ -> failwith "not impl patch_family" ];
+       let f = map_family_ps (fun p -> p) un_istr f in
+       base.func.Dbdisk.patch_family ifam f;
      patch_descend ifam d =
        match d with
        [ Descend d -> base.func.Dbdisk.patch_descend ifam d
@@ -1158,15 +1132,12 @@ value base2 db2 =
        Hashtbl.replace db2.patches.h_union ip u;
        db2.patches.nb_per := max (Adef.int_of_iper ip + 1) db2.patches.nb_per;
      };
-     patch_family ifam f =
-       match f with
-       [ Family2Gen _ f ->
-           do {
-             Hashtbl.replace db2.patches.h_family ifam f;
-             db2.patches.nb_fam :=
-               max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
-           }
-       | _ -> failwith "not impl patch_family" ];
+     patch_family ifam f = do {
+       let f = map_family_ps (fun p -> p) un_istr2 f in
+       Hashtbl.replace db2.patches.h_family ifam f;
+       db2.patches.nb_fam :=
+         max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
+     };
      patch_descend ifam d =
        match d with
        [ Descend2Gen _ d ->
