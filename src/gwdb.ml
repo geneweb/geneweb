@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.199 2006-12-28 23:07:41 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.200 2006-12-28 23:22:55 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -880,7 +880,10 @@ type base =
     load_couples_array : unit -> unit;
     load_descends_array : unit -> unit;
     load_strings_array : unit -> unit;
-    persons_array : unit -> (int -> person * int -> person -> unit);
+    persons_array :
+      unit ->
+        (int -> gen_person iper istr *
+         int -> gen_person iper istr -> unit);
     ascends_array :
       unit ->
         (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit *
@@ -1024,12 +1027,13 @@ value base1 base =
      load_descends_array = base.data.descends.load_array;
      load_strings_array = base.data.strings.load_array;
      persons_array () =
-       let get i = Person (base.data.persons.get i) in
-       let set i =
-         fun
-         [ Person p -> base.data.persons.set i p
-         | Person2 _ _ -> assert False
-         | Person2Gen _ _ -> assert False ]
+       let get i =
+         let p = base.data.persons.get i in
+         map_person_ps (fun p -> p) (fun i -> Istr i) p
+       in
+       let set i p =
+         let p = map_person_ps (fun p -> p) un_istr p in
+         base.data.persons.set i p
        in
        (get, set);
      ascends_array () =
