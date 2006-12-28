@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.194 2006-12-28 12:29:03 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.195 2006-12-28 12:56:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -853,8 +853,8 @@ type base =
     patch_ascend : iper -> Def.gen_ascend ifam -> unit;
     patch_union : iper -> Def.gen_union ifam -> unit;
     patch_family : ifam -> Def.gen_family iper istr -> unit;
-    patch_descend : ifam -> descend -> unit;
-    patch_couple : ifam -> couple -> unit;
+    patch_descend : ifam -> Def.gen_descend iper -> unit;
+    patch_couple : ifam -> Def.gen_couple iper -> unit;
     patch_key : iper -> string -> string -> int -> unit;
     patch_name : string -> iper -> unit;
     insert_string : string -> istr;
@@ -908,10 +908,7 @@ module C_base :
   end =
   struct
     value delete_family self ifam = do {
-      let cpl =
-        self.couple_of_gen_couple
-          (Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)))
-      in
+      let cpl = Adef.couple (Adef.iper_of_int (-1)) (Adef.iper_of_int (-1)) in
       let fam =
         let empty = self.insert_string "" in
         {marriage = Adef.codate_None; marriage_place = empty;
@@ -919,7 +916,7 @@ module C_base :
          witnesses = [| |]; comment = empty; origin_file = empty;
          fsources = empty; fam_index = Adef.ifam_of_int (-1)}
       in
-      let des = self.descend_of_gen_descend {children = [| |]} in
+      let des = {children = [| |]} in
       self.patch_family ifam fam;
       self.patch_couple ifam cpl;
       self.patch_descend ifam des
@@ -997,14 +994,8 @@ value base1 base =
      patch_family ifam f =
        let f = map_family_ps (fun p -> p) un_istr f in
        base.func.Dbdisk.patch_family ifam f;
-     patch_descend ifam d =
-       match d with
-       [ Descend d -> base.func.Dbdisk.patch_descend ifam d
-       | _ -> failwith "not impl patch_descend" ];
-     patch_couple ifam c =
-       match c with
-       [ Couple c -> base.func.Dbdisk.patch_couple ifam c
-       | _ -> failwith "not impl patch_couple" ];
+     patch_descend ifam d = base.func.Dbdisk.patch_descend ifam d;
+     patch_couple ifam c = base.func.Dbdisk.patch_couple ifam c;
      patch_key ip fn sn occ = ();
      patch_name s ip = base.func.Dbdisk.patch_name s ip;
      insert_string s = Istr (base.func.Dbdisk.insert_string s);
@@ -1138,24 +1129,16 @@ value base2 db2 =
        db2.patches.nb_fam :=
          max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
      };
-     patch_descend ifam d =
-       match d with
-       [ Descend2Gen _ d ->
-           do {
-             Hashtbl.replace db2.patches.h_descend ifam d;
-             db2.patches.nb_fam :=
-               max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
-           }
-       | _ -> failwith "not impl patch_descend" ];
-     patch_couple ifam c =
-       match c with
-       [ Couple2Gen _ c ->
-           do {
-             Hashtbl.replace db2.patches.h_couple ifam c;
-             db2.patches.nb_fam :=
-               max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
-           }
-       | _ -> failwith "not impl patch_couple" ];
+     patch_descend ifam d = do {
+       Hashtbl.replace db2.patches.h_descend ifam d;
+       db2.patches.nb_fam :=
+         max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
+     };
+     patch_couple ifam c = do {
+       Hashtbl.replace db2.patches.h_couple ifam c;
+       db2.patches.nb_fam :=
+         max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
+     };
      patch_key ip fn sn occ =
        do {
          Hashtbl.iter

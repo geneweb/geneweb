@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.32 2006-12-28 12:29:03 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.33 2006-12-28 12:56:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -275,18 +275,17 @@ value reparent_ind base ip1 ip2 =
   let a1 = aoi base ip1 in
   let a2 = aoi base ip2 in
   match (get_parents a1, get_parents a2) with
-  [ (None, Some ifam) ->
-      let des = doi base ifam in
-      do {
-        let rec replace i =
-          if (get_children des).(i) = ip2 then (get_children des).(i) := ip1
-          else replace (i + 1)
-        in
-        replace 0;
-        let a1 = {parents = Some ifam; consang = Adef.fix (-1)} in
-        patch_ascend base ip1 a1;
-        patch_descend base ifam des;
-      }
+  [ (None, Some ifam) -> do {
+      let des = gen_descend_of_descend (doi base ifam) in
+      let rec replace i =
+        if des.children.(i) = ip2 then des.children.(i) := ip1
+        else replace (i + 1)
+      in
+      replace 0;
+      let a1 = {parents = Some ifam; consang = Adef.fix (-1)} in
+      patch_ascend base ip1 a1;
+      patch_descend base ifam des;
+    }
   | _ -> () ]
 ;
 
@@ -305,7 +304,7 @@ value effective_merge_ind conf base p1 p2 =
             couple False (get_father cpl) (get_key_index p1)
           else assert False
         in
-        patch_couple base ifam (couple_of_gen_couple base cpl);
+        patch_couple base ifam cpl;
       };
       let u1 = uoi base (get_key_index p1) in
       let u1 = {family = Array.append (get_family u1) (get_family u2)} in
@@ -468,8 +467,7 @@ value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 = do {
   in
   patch_family base ifam1 fam1;
   let des1 =
-    descend_of_gen_descend base
-      {children = Array.append (get_children des1) (get_children des2)}
+    {children = Array.append (get_children des1) (get_children des2)}
   in
   patch_descend base ifam1 des1;
   for i = 0 to Array.length (get_children des2) - 1 do {
@@ -477,7 +475,7 @@ value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 = do {
     let a = {parents = Some ifam1; consang = Adef.fix (-1)} in
     patch_ascend base ip a;
   };
-  let des2 = descend_of_gen_descend base {children = [| |]} in
+  let des2 = {children = [| |]} in
   patch_descend base ifam2 des2;
   UpdateFamOk.effective_del conf base (ifam2, fam2);
 };

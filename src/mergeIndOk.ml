@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.28 2006-12-28 12:29:03 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.29 2006-12-28 12:56:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -251,7 +251,7 @@ value effective_mod_merge conf base sp =
               couple False (get_father cpl) p.key_index
             else assert False
           in
-          patch_couple base ifam (couple_of_gen_couple base cpl);
+          patch_couple base ifam cpl;
         };
         Update.update_misc_names_of_family base p.sex {family = get_family u};
         patch_person base p.key_index p;
