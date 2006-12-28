@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.33 2006-12-28 12:56:35 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.34 2006-12-28 14:08:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -362,8 +362,14 @@ value effective_merge_ind conf base p1 p2 =
     patch_person base p1.key_index p1;
     let p2 = UpdateIndOk.effective_del conf base p2 in
     patch_person base p2.key_index p2;
-    Notes.update_notes_links_db conf (NotesLinks.PgInd p1.key_index)
-      (sou base p1.notes) True;
+    let s =
+      let sl =
+        [p1.notes; p1.birth_src; p1.baptism_src; p1.death_src; p1.burial_src;
+         p1.psources]
+      in
+      String.concat " " (List.map (sou base) sl)
+    in
+    Notes.update_notes_links_db conf (NotesLinks.PgInd p1.key_index) s;
   }
 ;
 

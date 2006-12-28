@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.16 2006-12-11 04:07:47 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.17 2006-12-28 14:08:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -133,7 +133,14 @@ value compute base bdir =
     ProgrBar.start ();
     for i = 0 to len - 1 do {
       let p = poi base (Adef.iper_of_int i) in
-      let list = notes_links (sou base (get_notes p)) in
+      let s =
+        let sl =
+          [get_notes; get_birth_src; get_baptism_src; get_death_src;
+           get_burial_src; get_psources]
+        in
+        String.concat " " (List.map (fun f -> sou base (f p)) sl)
+      in
+      let list = notes_links s in
       if list = ([], []) then ()
       else
         let pg = NotesLinks.PgInd (Adef.iper_of_int i) in

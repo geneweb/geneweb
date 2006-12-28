@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.42 2006-12-17 12:45:34 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.43 2006-12-28 14:08:59 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -513,7 +513,7 @@ value commit_wiznotes conf base wz s =
     try Unix.mkdir wddir 0o755 with [ Unix.Unix_error _ _ _ -> () ];
     write_wizard_notes fname s;
     let pg = NotesLinks.PgWizard wz in
-    Notes.update_notes_links_db conf pg s True;
+    Notes.update_notes_links_db conf pg s;
   }
 ;
 
