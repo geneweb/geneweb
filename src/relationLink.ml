@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.13 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.14 2006-12-29 10:02:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -802,10 +802,11 @@ value print_relation conf base p1 p2 =
         (get_key_index p2) ]
 ;
 
-value print conf base =
+value print conf base = do {
+  Wserver.wrap_string.val := Util.xml_pretty_print;
   match
     (find_person_in_env conf base "1", find_person_in_env conf base "2")
   with
   [ (Some p1, Some p2) -> print_relation conf base p1 p2
   | _ -> incorrect_request conf ]
-;
+};
