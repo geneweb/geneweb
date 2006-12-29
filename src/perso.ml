@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.44 2006-12-28 13:28:34 ddr Exp $ *)
+(* $Id: perso.ml,v 5.45 2006-12-29 10:02:19 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2809,8 +2809,8 @@ value eval_predefined_apply conf env f vl =
   | _ -> raise Not_found ]
 ;
 
-value interp_templ templ_fname conf base p =
-  let _ = do { template_file.val := templ_fname ^ ".txt"; } in
+value interp_templ templ_fname conf base p = do {
+  template_file.val := templ_fname ^ ".txt";
   let a = aget conf base (get_key_index p) in
   let u = uget conf base (get_key_index p)in
   let ep = (p, a, u, authorized_age conf base p) in
@@ -2857,7 +2857,7 @@ value interp_templ templ_fname conf base p =
   Templ.interp conf base templ_fname (eval_var conf base) (eval_transl conf)
     (eval_predefined_apply conf) get_vother set_vother
     (print_foreach conf base) env ep
-;
+};
 
 (* Main *)
 
