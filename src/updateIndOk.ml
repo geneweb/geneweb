@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.53 2006-12-28 17:53:24 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.54 2006-12-29 19:38:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -497,31 +497,29 @@ value effective_mod conf base sp =
   }
 ;
 
-value effective_add conf base sp =
+value effective_add conf base sp = do {
   let pi = Adef.iper_of_int (nb_of_persons base) in
   let fn = Util.translate_eval sp.first_name in
   let sn = Util.translate_eval sp.surname in
   let key = fn ^ " " ^ sn in
   let ipl = person_ht_find_all base key in
-  do {
-    check_conflict conf base sp ipl;
-    patch_key base pi fn sn sp.occ;
-    person_ht_add base key pi;
-    let created_p = ref [] in
-    let np =
-      map_person_ps (Update.insert_person conf base sp.psources created_p)
-        (Gwdb.insert_string base) {(sp) with key_index = pi}
-    in
-    patch_person base pi np;
-    let na = {parents = None; consang = Adef.fix (-1)} in
-    patch_ascend base pi na;
-    let nu = {family = [| |]} in
-    patch_union base pi nu;
-    let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
-    List.iter (fun key -> person_ht_add base key pi) np_misc_names;
-    (np, na)
-  }
-;
+  check_conflict conf base sp ipl;
+  patch_key base pi fn sn sp.occ;
+  person_ht_add base key pi;
+  let created_p = ref [] in
+  let np =
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
+      (Gwdb.insert_string base) {(sp) with key_index = pi}
+  in
+  patch_person base pi np;
+  let na = {parents = None; consang = Adef.fix (-1)} in
+  patch_ascend base pi na;
+  let nu = {family = [| |]} in
+  patch_union base pi nu;
+  let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
+  List.iter (fun key -> person_ht_add base key pi) np_misc_names;
+  (np, na)
+};
 
 value array_except v a =
   loop 0 where rec loop i =
@@ -751,42 +749,41 @@ and eq_title t1 t2 =
 
 value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
-  let callback sp =
+  let callback sp = do {
     let p = effective_mod conf base sp in
     let op = poi base p.key_index in
     let u = {family = get_family (uoi base p.key_index)} in
-    do {
-      patch_person base p.key_index p;
-      let s =
-        let sl =
-          [p.notes; p.birth_src; p.baptism_src; p.death_src; p.burial_src;
-           p.psources]
-        in
-        String.concat " " (List.map (sou base) sl)
+    patch_person base p.key_index p;
+    let s =
+      let sl =
+        [p.notes; p.birth_src; p.baptism_src; p.death_src; p.burial_src;
+         p.psources]
       in
-      Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
-      if not (eq_istr (get_surname op) p.surname) ||
-         not (eq_istr_list (get_surnames_aliases op) p.surnames_aliases) ||
-         not (eq_titles (get_titles op) p.titles)
-      then
-        Update.update_misc_names_of_family base p.sex u
-      else ();
-      let wl =
-        let a = aoi base p.key_index in
-        let a = {parents = get_parents a; consang = get_consang a} in
-        all_checks_person conf base p a u
-      in
-      let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
-      Util.commit_patches conf base;
-      History.record conf base k "mp";
-      if not (is_quest_string p.surname) &&
-         not (is_quest_string p.first_name) &&
-         not (is_old_person conf p)
-      then
-        Update.delete_topological_sort_v conf base
-      else ();
-      print_mod_ok conf base wl p;
-    }
+      String.concat " " (List.map (sou base) sl)
+    in
+    Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
+    if not (eq_istr (get_surname op) p.surname) ||
+       not (eq_istr_list (get_surnames_aliases op) p.surnames_aliases) ||
+       not (eq_titles (get_titles op) p.titles)
+    then
+      Update.update_misc_names_of_family base p.sex u
+    else ();
+    let wl =
+      let a = aoi base p.key_index in
+      let a = {parents = get_parents a; consang = get_consang a} in
+      all_checks_person conf base p a u
+    in
+    let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
+    Util.commit_patches conf base;
+    History.record conf base k "mp";
+    if not (is_quest_string p.surname) &&
+       not (is_quest_string p.first_name) &&
+       not (is_old_person conf p)
+    then
+      Update.delete_topological_sort_v conf base
+    else ();
+    print_mod_ok conf base wl p;
+  }
   in
   print_mod_aux conf base callback
 ;
