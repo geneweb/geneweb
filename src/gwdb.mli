@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.88 2006-12-28 23:22:57 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.89 2006-12-29 19:38:04 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -162,7 +162,9 @@ value persons_array :
      int -> Def.gen_person iper istr -> unit);
 value ascends_array :
   base ->
-    (int -> option ifam * int -> Adef.fix * int -> Adef.fix -> unit *
+    (int -> option ifam *
+     int -> Adef.fix *
+     int -> Adef.fix -> unit *
      option (array Adef.fix));
 
 value base_notes_read : base -> string -> string;
