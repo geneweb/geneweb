@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.45 2006-12-29 10:02:19 ddr Exp $ *)
+(* $Id: perso.ml,v 5.46 2006-12-30 21:09:58 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -294,7 +294,13 @@ value limit_desc conf =
 
 value infinite = 10000;
 
-value make_desc_level_table conf base max_level p =
+value make_desc_level_table conf base max_level p = do {
+  let line =
+    match p_getenv conf.env "t" with
+    [ Some "M" -> Male
+    | Some "F" -> Female
+    | Some _ | None -> Neuter ]
+  in
   let levt = Array.create (nb_of_persons base) infinite in
   let get = uoi base in
   let rec fill lev =
@@ -310,7 +316,19 @@ value make_desc_level_table conf base max_level p =
                  Array.fold_left
                    (fun ipl ifam ->
                       let ipa = get_children (doi base ifam) in
-                      Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
+                      Array.fold_left
+                        (fun ipl ip ->
+                           match line with
+                           [ Male ->
+                               if get_sex (poi base ip) <> Female then
+                                 [ip :: ipl]
+                               else ipl
+                           | Female ->
+                               if get_sex (poi base ip) <> Male then
+                                 [ip :: ipl]
+                               else ipl
+                           | Neuter -> [ip :: ipl] ])
+                        ipl ipa)
                    ipl (get_family (get ip))
                }
                else ipl)
@@ -318,8 +336,9 @@ value make_desc_level_table conf base max_level p =
         in
         fill (succ lev) new_ipl ]
   in
-  do { fill 0 [get_key_index p]; levt }
-;
+  fill 0 [get_key_index p];
+  levt
+};
 
 value desc_level_max conf base desc_level_table_l =
   let levt = Lazy.force desc_level_table_l in
