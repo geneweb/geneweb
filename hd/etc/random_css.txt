@@ -1,4 +1,4 @@
-/* $Id: random_css.txt,v 1.8 2006-11-29 20:48:16 ddr Exp $ */
+/* $Id: random_css.txt,v 1.9 2006-12-31 10:14:36 ddr Exp $ */
 /* Copyright (c) 2006 INRIA */
 
 %define;bright_pastel_color()
@@ -34,7 +34,6 @@
 %in;
 
 #user-info { float: %right;; padding: 10px }
-#title-band { display: table; width: 100%%; background: %bg;; padding: 5px }
 %let;fs;%random.3;%in;
 %let;ph;%random.3;%in;
 %let;pv;%random.3;%in;

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.32 2006-12-17 12:45:34 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.33 2006-12-31 10:14:36 ddr Exp $ -->
   <!-- Copyright (c) 2006 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -40,9 +40,7 @@ sv: Genealogi
     %else;
       span.highlight { color: %highlight;; font-weight: bold }
       #user-info { float: %right; }
-      #title-band { display: table; width: 100%% }
-      #title-band > * { display: table-row }
-      #title-band > * > * { display: table-cell }
+      #title { padding-top: 1em }
       #title { text-align: center;; vertical-align: middle; width: 100%% }
       #title { color: %highlight; }
       #lang { text-align: center }
@@ -117,16 +115,14 @@ sv: Genealogi
   <a href="%prefix_base;suicide=x"> </a>
 </div>
 
-%( IE seems not to recognize style "display: table"; must use a table %)
-<table cellpadding="0" cellspacing="0" id="title-band">
-  <tr>
-    <td>
-      <a href="http://www.geneweb.org/"><img width="96" height="108"
-       src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
-       alt="GeneWeb"%/></a>
-    </td>
-    <td id="title">
-      <h1>[
+<div style="float: %left;">
+  <a href="http://www.geneweb.org/"><img width="96" height="108"
+   src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
+   alt="GeneWeb"%/></a>
+</div>
+
+<div id="title">
+  <h1>[
 af: Genealogiese databasis
 ar: قاعدة المعلومات العائلية (جينيالوجيا)
 bg: Родословна база от данни
@@ -155,9 +151,7 @@ sl: Genealoška baza podatkov
 sv: Genealogisk databas
 zh: 网络家谱
 ]</h1>
-    </td>
-  </tr>
-</table>
+</div>
 
 <div id="lang">
   <div class="title">
