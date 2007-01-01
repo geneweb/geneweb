@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.46 2006-12-30 21:09:58 ddr Exp $ *)
+(* $Id: perso.ml,v 5.47 2007-01-01 18:30:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -303,6 +303,7 @@ value make_desc_level_table conf base max_level p = do {
   in
   let levt = Array.create (nb_of_persons base) infinite in
   let get = uoi base in
+  let ini_ip = get_key_index p in
   let rec fill lev =
     fun
     [ [] -> ()
@@ -313,30 +314,28 @@ value make_desc_level_table conf base max_level p = do {
                if levt.(Adef.int_of_iper ip) <= lev then ipl
                else if lev <= max_level then do {
                  levt.(Adef.int_of_iper ip) := lev;
-                 Array.fold_left
-                   (fun ipl ifam ->
-                      let ipa = get_children (doi base ifam) in
-                      Array.fold_left
-                        (fun ipl ip ->
-                           match line with
-                           [ Male ->
-                               if get_sex (poi base ip) <> Female then
-                                 [ip :: ipl]
-                               else ipl
-                           | Female ->
-                               if get_sex (poi base ip) <> Male then
-                                 [ip :: ipl]
-                               else ipl
-                           | Neuter -> [ip :: ipl] ])
-                        ipl ipa)
-                   ipl (get_family (get ip))
+                 let down =
+                   if ip = ini_ip then True
+                   else
+                     match line with
+                     [ Male -> get_sex (poi base ip) <> Female
+                     | Female -> get_sex (poi base ip) <> Male
+                     | Neuter -> True ]
+                 in
+                 if down then
+                   Array.fold_left
+                     (fun ipl ifam ->
+                        let ipa = get_children (doi base ifam) in
+                        Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
+                     ipl (get_family (get ip))
+                  else ipl
                }
                else ipl)
             [] ipl
         in
         fill (succ lev) new_ipl ]
   in
-  fill 0 [get_key_index p];
+  fill 0 [ini_ip];
   levt
 };
 
