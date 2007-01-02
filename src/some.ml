@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.28 2006-12-14 06:51:50 ddr Exp $ *)
+(* $Id: some.ml,v 5.29 2007-01-02 06:54:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -284,6 +284,10 @@ value print_branch conf base psn name =
              let c = spouse (get_key_index p) (coi base ifam) in
              let c = pget conf base c in
              let down = has_children_with_that_name base des name in
+             let down =
+               if get_sex p = Female && p_surname base c = name then False
+               else down
+             in
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.mem i unsel_list) in
              (fam, des, c, if down then Some (string_of_int i, sel) else None))
