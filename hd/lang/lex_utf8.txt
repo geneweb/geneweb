@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.69 2007-01-05 01:39:35 ddr Exp $
+# $Id: lex_utf8.txt,v 5.70 2007-01-05 13:43:05 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -9435,7 +9435,7 @@ sv: vittne/vittnen
 
     wizard/wizards/friend/friends/exterior
 af: Medewerkers/Medewerkers/vriend/vriend/exterior
-bg: администратор/администратори/приятел/приятел/exterior
+bg: администратор/администратори/приятел/приятели/външни
 br: strobineller/strobinellerien/mignon/mignon/exterior
 ca: administrador/administrador/amic/amic/exterior
 cs: wizard/wizards/friend/friends/exterior
