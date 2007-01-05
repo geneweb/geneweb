@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.68 2006-12-21 22:17:53 ddr Exp $
+# $Id: lex_utf8.txt,v 5.69 2007-01-05 01:39:35 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -1985,6 +1985,7 @@ bg: средна продължителност на живота
 da: gennemsnitlig alder ved død
 de: Durchschnittliches Sterbealter
 en: average age at death
+es: edad promedio de deceso
 et: keskmine eluiga
 fr: âge moyen de décès
 it: età media di morte
@@ -1992,6 +1993,7 @@ nl: gemiddelde leeftijd bij overlijden
 pl: średni wiek śmierci
 pt: idade média ao morrer
 ro: virsta media la deces
+sl: povprečna starost ob smrti
 sv: medelålder vid dödstillfället
 
     back
@@ -2793,6 +2795,7 @@ bg: потребителски връзки
 da: forbindelser
 de: Verbindungen
 en: connections
+es: conexiones
 et: ühendused
 fi: yhteyksien määrä
 fr: connexions
@@ -2800,6 +2803,7 @@ it: connessioni
 nl: connecties
 pl: połączenie
 pt: conexões
+sl: povprečna starost ob smrti
 sv: kopplingar
 
     consanguinity
@@ -2861,10 +2865,13 @@ bg: следва
 da: fortsat
 de: fortgesetzt
 en: continued
+es: continúa
 fr: suite
 it: continua
+nl: vervolgd
 pl: ciąg dalszy
 pt: continuação
+sl: nadaljevano
 sv: forts
 
     cousins
@@ -3228,9 +3235,12 @@ bg: да се прекъсне връзката
 da: afbryd
 de: abmelden
 en: disconnect
+es: desconectar
 fr: déconnecter
+nl: ontkoppelen
 pt: desconectar
 ro: deconectare
+sl: prekinjeno
 sv: koppla från
 
     display by slices/slice width/overlap/total width
@@ -3924,10 +3934,13 @@ bg: за списъка по дати на последно изменение
 da: for en liste sorteret efter datoen for seneste ændring
 de: für eine, nach dem Datum der letzten Änderung geordnete Liste
 en: for the list ordered by the date of the last modification
+es: para la lista ordenada por fecha de la última modificación
 fr: pour la liste par date de dernière modification
 it: per la lista ordinata secondo la data dell'ultima modifica
+nl: voor de lijst, gesorteerd op datum van de laatste wijziging
 pl: aby oglądać listę według daty ostatniej modyfikacji
 pt: para a lista ordenada por data da última modificação
+sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 
     foster father/foster mother/foster parents
@@ -5120,6 +5133,7 @@ pt: páginas ligadas
 pt-br: página associadas
 ro: pagini legate
 ru: связанные страницы
+sl: povezane strani
 sv: länkade sidor
 
     list/list (ancestors)
@@ -5601,6 +5615,7 @@ pl: pozostałe uwagi
 pt: notas diversas
 ro: insemnari diverse
 ru: дополнительные заметки
+sl: razni zaznamki
 sv: blandade noteringar
 
     missing ancestors
@@ -6349,9 +6364,12 @@ bg: брой на живите лица:
 da: antal nulevende personer:
 de: Anzahl der lebenden Personen:
 en: number of living persons:
+es: número de personas vivas:
 fr: nombre de personnes vivantes :
+nl: aantal personen in leven:
 pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
+sl: število živih oseb
 sv: antal levande personer:
 
     occupation
@@ -6856,9 +6874,12 @@ bg: възрастова пирамида
 da: befolkningspyramide
 de: Alterspyramide
 en: population pyramid
+es: pirámide de población
 fr: pyramide des âges
+nl: bevolkingspiramide
 pt: pirâmide populacional
 ro: piramida demografică
+sl: populacijska piramida
 sv: befolkningspyramid
 
     possibly (date)
@@ -7287,6 +7308,7 @@ pt: pesquisar/sensível à capitulação
 pt-br: procurar/diferencia maiúsculas
 ro: cautare/sensibila la caz
 ru: поиск/регистрозависимый
+sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 
     see
@@ -7619,10 +7641,13 @@ bg: от последното щракване
 da: siden det sidste klik
 de: seit dem letzten click
 en: since the last click
+es: desde el último click
 fr: depuis le dernier clic
 it: dall'ultimo click
+nl: sinds de laatste klik
 pl: od ostatniego kliknięcia
 pt: desde o último clique
+sl: od zadnjega klika
 sv: från senaste klick
 
     son/daughter/child
@@ -8681,6 +8706,7 @@ pl: forum jest moderowane
 pt: este fórum é moderado
 ro: acest forum este moderat
 ru: этот форум модерируется
+sl: forum moderira
 sv: detta forum är ändrat
 
     title/titles
