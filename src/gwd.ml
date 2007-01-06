@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.46 2006-12-21 22:17:54 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.47 2007-01-06 04:48:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -126,12 +126,11 @@ value log_passwd_failed ar oc tm from request base_file = do {
   let tm = Unix.localtime tm in fprintf_date oc tm;
   fprintf oc " (%d)" (Unix.getpid ());
   fprintf oc " %s_%s" base_file ar.ar_passwd;
-  fprintf oc " => failed";
+  fprintf oc " => failed (%s)" ar.ar_user;
   if trace_failed_passwd.val then
     fprintf oc " (%s)" (String.escaped ar.ar_uauth)
   else ();
   fprintf oc "\n";
-  fprintf oc "  User: %s\n" ar.ar_user;
   fprintf oc "  From: %s\n" from;
   fprintf oc "  Agent: %s\n" user_agent;
   if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
