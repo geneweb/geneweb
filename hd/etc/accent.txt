@@ -1,4 +1,4 @@
-<!-- $Id: accent.txt,v 5.2 2007-01-06 19:12:10 ddr Exp $ -->
+<!-- $Id: accent.txt,v 5.3 2007-01-06 20:41:30 ddr Exp $ -->
 
 <script type="text/javascript"><!--
 function write_version_ie(t, v)
@@ -53,6 +53,7 @@ function write_ch(v) {
       <a onclick="write_ch('Ô');return false" href="#">Ô</a>
       <a onclick="write_ch('Õ');return false" href="#">Õ</a>
       <a onclick="write_ch('Ö');return false" href="#">Ö</a>
+      <a onclick="write_ch('Œ');return false" href="#">Œ</a>
       <a onclick="write_ch('×');return false" href="#">×</a>
       <a onclick="write_ch('Ø');return false" href="#">Ø</a>
       <a onclick="write_ch('Ù');return false" href="#">Ù</a>
@@ -86,6 +87,7 @@ function write_ch(v) {
       <a onclick="write_ch('ô');return false" href="#">ô</a>
       <a onclick="write_ch('õ');return false" href="#">õ</a>
       <a onclick="write_ch('ö');return false" href="#">ö</a>
+      <a onclick="write_ch('œ');return false" href="#">œ</a>
       <a onclick="write_ch('÷');return false" href="#">÷</a>
       <a onclick="write_ch('ø');return false" href="#">ø</a>
       <a onclick="write_ch('ù');return false" href="#">ù</a>
