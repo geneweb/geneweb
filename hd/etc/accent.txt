@@ -1,4 +1,4 @@
-<!-- $Id: accent.txt,v 5.1 2007-01-06 18:36:29 ddr Exp $ -->
+<!-- $Id: accent.txt,v 5.2 2007-01-06 19:12:10 ddr Exp $ -->
 
 <script type="text/javascript"><!--
 function write_version_ie(t, v)
@@ -95,6 +95,23 @@ function write_ch(v) {
       <a onclick="write_ch('ý');return false" href="#">ý</a>
       <a onclick="write_ch('þ');return false" href="#">þ</a>
       <a onclick="write_ch('ÿ');return false" href="#">ÿ</a>
+      <a onclick="write_ch('¿');return false" href="#">¿</a>
+      <a onclick="write_ch('¡');return false" href="#">¡</a>
+      <a onclick="write_ch('©');return false" href="#">©</a>
+      <a onclick="write_ch('®');return false" href="#">®</a>
+      <a onclick="write_ch('«');return false" href="#">«</a>
+      <a onclick="write_ch('»');return false" href="#">»</a>
+      <a onclick="write_ch('°');return false" href="#">°</a>
+      <a onclick="write_ch('¹');return false" href="#">¹</a>
+      <a onclick="write_ch('²');return false" href="#">²</a>
+      <a onclick="write_ch('³');return false" href="#">³</a>
+      <a onclick="write_ch('¼');return false" href="#">¼</a>
+      <a onclick="write_ch('½');return false" href="#">½</a>
+      <a onclick="write_ch('¾');return false" href="#">¾</a>
+      <a onclick="write_ch('€');return false" href="#">€</a>
+      <a onclick="write_ch('£');return false" href="#">£</a>
+      <a onclick="write_ch('$');return false" href="#">$</a>
+      <a onclick="write_ch('¥');return false" href="#">¥</a>
     </td>
   </tr>
 </table>
