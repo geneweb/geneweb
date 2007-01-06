@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.15 2006-12-11 04:07:47 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.16 2007-01-06 18:36:29 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -692,12 +692,17 @@ value print_mod_view_page conf can_edit mode fname title env s =
           xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
         else ();
         begin_centered conf;
-        stagn "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"%s"
-          (if can_edit then "" else " readonly=\"readonly\"")
-        begin
-          if sub_part <> "" then Wserver.wprint "%s" (quote_escaped sub_part)
-          else ();
-        end;
+        let s =
+          sprintf "<%s%s>%s</%s>"
+            "textarea name=\"notes\" rows=\"25\" cols=\"110\""
+            (if can_edit then "" else " readonly=\"readonly\"")
+            (quote_escaped sub_part)
+            "textarea"
+        in
+        match Util.open_etc_file "accent" with
+        [ Some ic ->
+            Templ.copy_from_templ conf [("area", s); ("name", "notes")] ic
+        | None -> Wserver.wprint "%s\n" s ];
         end_centered conf;
       end;
       if can_edit then
