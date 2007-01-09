@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.30 2006-12-24 08:18:45 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.31 2007-01-09 15:44:58 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -766,20 +766,28 @@ value insert_person1 gen so = do {
   if so.first_name <> "?" && so.surname <> "?" then do {
     let fn = unique_key_string gen so.first_name in
     let sn = unique_key_string gen so.surname in
-    key_hashtbl_add gen.g_index_of_key (fn, sn, so.occ)
-      (Adef.iper_of_int gen.g_pcnt);
-    List.iter (output_field so) gen.g_person_fields;
-    Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
-    Iochan.output_binary_int (fst gen.g_person_parents) (-1);
-    Iochan.seek (fst gen.g_person_unions) (int_size * gen.g_pcnt);
-    Iochan.output_binary_int (fst gen.g_person_unions) (-1);
-    Iochan.seek (fst gen.g_person_rparents) (int_size * gen.g_pcnt);
-    Iochan.output_binary_int (fst gen.g_person_rparents) (-1);
-    Iochan.seek (fst gen.g_person_related) (int_size * gen.g_pcnt);
-    Iochan.output_binary_int (fst gen.g_person_related) (-1);
-    Iochan.seek (fst gen.g_person_notes) (int_size * gen.g_pcnt);
-    Iochan.output_binary_int (fst gen.g_person_notes) (-1);
-    gen.g_pcnt := gen.g_pcnt + 1;
+    let k = (fn, sn, so.occ) in
+    try do {
+      let _ = key_hashtbl_find gen.g_index_of_key k in
+      eprintf "already defined %s.%d %s\n" so.first_name so.occ so.surname;
+      flush stderr;
+    }
+    with
+    [ Not_found -> do {
+        key_hashtbl_add gen.g_index_of_key k (Adef.iper_of_int gen.g_pcnt);
+        List.iter (output_field so) gen.g_person_fields;
+        Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
+        Iochan.output_binary_int (fst gen.g_person_parents) (-1);
+        Iochan.seek (fst gen.g_person_unions) (int_size * gen.g_pcnt);
+        Iochan.output_binary_int (fst gen.g_person_unions) (-1);
+        Iochan.seek (fst gen.g_person_rparents) (int_size * gen.g_pcnt);
+        Iochan.output_binary_int (fst gen.g_person_rparents) (-1);
+        Iochan.seek (fst gen.g_person_related) (int_size * gen.g_pcnt);
+        Iochan.output_binary_int (fst gen.g_person_related) (-1);
+        Iochan.seek (fst gen.g_person_notes) (int_size * gen.g_pcnt);
+        Iochan.output_binary_int (fst gen.g_person_notes) (-1);
+        gen.g_pcnt := gen.g_pcnt + 1;
+      } ]
   }
   else ();
 };
