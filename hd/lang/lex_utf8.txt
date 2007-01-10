@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.71 2007-01-05 19:54:17 ddr Exp $
+# $Id: lex_utf8.txt,v 5.72 2007-01-10 04:16:11 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -3236,6 +3236,7 @@ en: disconnect
 es: desconectar
 fr: déconnecter
 nl: ontkoppelen
+pl: rozłącz
 pt: desconectar
 ro: deconectare
 sl: prekinjeno
@@ -6363,6 +6364,7 @@ en: number of living persons:
 es: número de personas vivas:
 fr: nombre de personnes vivantes :
 nl: aantal personen in leven:
+pl: liczba osób żyjących
 pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
 sl: število živih oseb
