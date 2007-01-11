@@ -1,4 +1,4 @@
-(* $Id: perso.mli,v 5.3 2007-01-11 15:29:56 ddr Exp $ *)
+(* $Id: perso.mli,v 5.4 2007-01-11 18:00:17 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Gwdb;
@@ -18,8 +18,13 @@ value limit_desc : config -> int;
 value make_desc_level_table : config -> base -> int -> person -> array int;
 value default_max_cousin_lev : int;
 
-value excluded_mergeable_candidates : config -> list (Adef.iper * Adef.iper);
-value first_mergeable_candidates :
-  base -> Adef.iper -> list (Adef.iper * Adef.iper) ->
-    option ((Adef.iper * person) * (Adef.iper * person))
+type dup =
+  [ DupFam of Adef.ifam and Adef.ifam
+  | DupInd of Adef.iper and Adef.iper
+  | NoDup ]
 ;
+
+type excl_dup = (list (Adef.iper * Adef.iper) * list (Adef.ifam * Adef.ifam));
+
+value excluded_possible_duplications : config -> excl_dup;
+value first_possible_duplication : base -> Adef.iper -> excl_dup -> dup;

@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.73 2007-01-11 15:29:55 ddr Exp $
+# $Id: lex_utf8.txt,v 5.74 2007-01-11 18:00:17 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -6876,6 +6876,10 @@ ro: piramida demografică
 sl: populacijska piramida
 sv: befolkningspyramid
 
+    possible duplications
+en: possible duplications
+fr: doublons éventuels
+
     possibly (date)
 af: miskien
 bg: може би
@@ -7725,10 +7729,6 @@ ru: укажите
 sl: določi
 sv: välj
 zh:  从下列选取
-
-    spouse/spouses
-en: spouse/spouses
-fr: conjoint/conjoints
 
     spouses not included
 af: eggenote weggelaat

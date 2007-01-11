@@ -158,9 +158,9 @@ merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi util.cmi \
 merge.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx util.cmx \
     ../wserver/wserver.cmx merge.cmi 
 merge.cmi: config.cmi gwdb.cmi 
-mergeChil.cmo: adef.cmi config.cmi date.cmi gwdb.cmi mergeInd.cmo perso.cmi \
+mergeDup.cmo: adef.cmi config.cmi date.cmi gwdb.cmi mergeInd.cmo perso.cmi \
     util.cmi ../wserver/wserver.cmi 
-mergeChil.cmx: adef.cmx config.cmi date.cmx gwdb.cmx mergeInd.cmx perso.cmx \
+mergeDup.cmx: adef.cmx config.cmi date.cmx gwdb.cmx mergeInd.cmx perso.cmx \
     util.cmx ../wserver/wserver.cmx 
 mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gwdb.cmi mergeFamOk.cmo \
     util.cmi ../wserver/wserver.cmi 
@@ -244,7 +244,7 @@ relationLink.cmi: config.cmi def.cmi gwdb.cmi
 request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
     buff.cmo changeChildren.cmo config.cmi cousins.cmo dag.cmi date.cmi \
     def.cmi descend.cmo doc.cmo forum.cmo gutil.cmi gwdb.cmi history.cmi \
-    image.cmo lock.cmi merge.cmi mergeChil.cmo mergeFam.cmo mergeFamOk.cmo \
+    image.cmo lock.cmi merge.cmi mergeDup.cmo mergeFam.cmo mergeFamOk.cmo \
     mergeInd.cmo mergeIndOk.cmo mutil.cmi name.cmi notes.cmi num.cmi \
     perso.cmi place.cmo relation.cmo relationLink.cmi secure.cmi \
     sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
@@ -253,7 +253,7 @@ request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
 request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     buff.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx date.cmx \
     def.cmi descend.cmx doc.cmx forum.cmx gutil.cmx gwdb.cmx history.cmx \
-    image.cmx lock.cmx merge.cmx mergeChil.cmx mergeFam.cmx mergeFamOk.cmx \
+    image.cmx lock.cmx merge.cmx mergeDup.cmx mergeFam.cmx mergeFamOk.cmx \
     mergeInd.cmx mergeIndOk.cmx mutil.cmx name.cmx notes.cmx num.cmx \
     perso.cmx place.cmx relation.cmx relationLink.cmx secure.cmx \
     sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
@@ -372,7 +372,7 @@ gwc2.cmo gwc2.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
 iovalue.cmo iovalue.cmx: q_codes.cmo
 merge.cmo merge.cmx: pa_html.cmo
-mergeChil.cmo mergeChil.cmx: pa_html.cmo
+mergeDup.cmo mergeDup.cmx: pa_html.cmo
 mergeFam.cmo mergeFam.cmx: pa_html.cmo
 mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
 mergeInd.cmo mergeInd.cmx: pa_html.cmo pa_lock.cmo
