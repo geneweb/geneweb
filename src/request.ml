@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.44 2007-01-11 02:41:40 ddr Exp $ *)
+(* $Id: request.ml,v 5.45 2007-01-11 12:57:05 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -455,6 +455,8 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> Merge.print conf base p
       | _ -> very_unknown conf ]
+  | Some "MRG_CHN" when conf.wizard -> MergeChil.main_page conf base
+  | Some "MRG_CHN_Y_N" when conf.wizard -> MergeChil.answered_y_n conf base
   | Some "MRG_FAM" when conf.wizard -> MergeFam.print conf base
   | Some "MRG_FAM_OK" when conf.wizard -> MergeFamOk.print_merge conf base
   | Some "MRG_MOD_FAM_OK" when conf.wizard ->
@@ -741,11 +743,11 @@ value this_request_updates_database conf =
   [ Some ("FORUM_ADD_OK" | "FORUM_DEL" | "FORUM_VAL") -> True
   | Some x when conf.wizard ->
       match x with
-      [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
-        "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" | "KILL_ANC" |
-        "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" | "MOD_WIZNOTES_OK" |
-        "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK" |
-        "CHANGE_WIZ_VIS" -> True
+      [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHANGE_WIZ_VIS" | "CHG_CHN_OK" |
+        "DEL_FAM_OK" | "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" |
+        "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" |
+        "MOD_WIZNOTES_OK" | "MRG_CHN_Y_N" | "MRG_IND" | "MRG_MOD_FAM_OK" |
+        "MRG_MOD_IND_OK" | "SND_IMAGE_OK" -> True
       | _ -> False ]
   | _ -> False ]
 ;
