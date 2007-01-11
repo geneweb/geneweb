@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeDup.ml,v 5.1 2007-01-11 18:00:17 ddr Exp $ *)
+(* $Id: mergeDup.ml,v 5.2 2007-01-11 20:53:38 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -58,7 +58,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
   end;
   tag "p" begin
     Wserver.wprint "%s ?\n" (capitale (transl conf "merge"));
-    tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\"";
       xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\""
@@ -104,7 +104,7 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
   end;
   tag "p" begin
     Wserver.wprint "%s ?\n" (capitale (transl conf "merge"));
-    tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\"";
       xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\""
