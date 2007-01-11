@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeChil.ml,v 5.3 2007-01-11 15:31:00 ddr Exp $ *)
+(* $Id: mergeChil.ml,v 5.4 2007-01-11 15:40:52 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -54,7 +54,7 @@ value print_candidates conf base (ip, p) iexcl (ip1, p1) (ip2, p2) = do {
   end;
   tag "p" begin
     Wserver.wprint "%s ?\n" (capitale (transl conf "merge"));
-    tag "form" begin
+    tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_CHN_Y_N\"";
       xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\""

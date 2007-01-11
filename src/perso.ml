@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.48 2007-01-11 15:29:56 ddr Exp $ *)
+(* $Id: perso.ml,v 5.49 2007-01-11 15:37:36 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -705,13 +705,15 @@ value first_mergeable_candidates base ip iexcl =
             fun
             [ [ifam2 :: ifaml2] ->
                 let isp2 = Gutil.spouse ip (coi base ifam2) in
-                let sp2 = poi base isp2 in
-                if List.mem (isp1, isp2) iexcl then loop_same ifaml2
-                else if eq_istr (get_first_name sp2) fn1 &&
-                   eq_istr (get_surname sp2) sn1
-                then 
-                  Some ((isp1, sp1), (isp2, sp2))
-                else loop_same ifaml2
+                if isp2 = isp1 then loop_same ifaml2
+                else
+                  let sp2 = poi base isp2 in
+                  if List.mem (isp1, isp2) iexcl then loop_same ifaml2
+                  else if eq_istr (get_first_name sp2) fn1 &&
+                     eq_istr (get_surname sp2) sn1
+                  then 
+                    Some ((isp1, sp1), (isp2, sp2))
+                  else loop_same ifaml2
             | [] -> loop_spouse ifaml1 ]
       | [] -> None ]
   in
