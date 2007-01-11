@@ -158,10 +158,10 @@ merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi util.cmi \
 merge.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx util.cmx \
     ../wserver/wserver.cmx merge.cmi 
 merge.cmi: config.cmi gwdb.cmi 
-mergeChil.cmo: adef.cmi config.cmi date.cmi gwdb.cmi mergeInd.cmo util.cmi \
-    ../wserver/wserver.cmi 
-mergeChil.cmx: adef.cmx config.cmi date.cmx gwdb.cmx mergeInd.cmx util.cmx \
-    ../wserver/wserver.cmx 
+mergeChil.cmo: adef.cmi config.cmi date.cmi gwdb.cmi mergeInd.cmo perso.cmi \
+    util.cmi ../wserver/wserver.cmi 
+mergeChil.cmx: adef.cmx config.cmi date.cmx gwdb.cmx mergeInd.cmx perso.cmx \
+    util.cmx ../wserver/wserver.cmx 
 mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gwdb.cmi mergeFamOk.cmo \
     util.cmi ../wserver/wserver.cmi 
 mergeFam.cmx: adef.cmx config.cmi date.cmx def.cmi gwdb.cmx mergeFamOk.cmx \
@@ -219,7 +219,7 @@ perso.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi dag.cmi date.cmi \
 perso.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi dag.cmx date.cmx \
     def.cmi gutil.cmx gwdb.cmx mutil.cmx name.cmx notes.cmx notesLinks.cmx \
     num.cmx srcfile.cmx templ.cmx templAst.cmi util.cmx wiki.cmx perso.cmi 
-perso.cmi: config.cmi gwdb.cmi 
+perso.cmi: adef.cmi config.cmi gwdb.cmi 
 phonygwd.cmo: argl.cmo secure.cmi ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx secure.cmx ../wserver/wserver.cmx 
 place.cmo: adef.cmi config.cmi def.cmi gwdb.cmi mutil.cmi util.cmi \

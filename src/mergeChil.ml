@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeChil.ml,v 5.1 2007-01-11 12:57:05 ddr Exp $ *)
+(* $Id: mergeChil.ml,v 5.2 2007-01-11 15:29:56 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -21,7 +21,11 @@ value print_no_candidate conf base (ip, p) = do {
   let title _ =
     Wserver.wprint "%s\n"
       (capitale
-         (transl_decline conf "merge" (transl_nth conf "child/children" 1)))
+         (transl_decline conf "merge"
+            (sprintf "%s %s %s"
+               (transl_nth conf "spouse/spouses" 1)
+               (transl conf "or")
+               (transl_nth conf "child/children" 1))))
   in
   Util.header conf title;
   Util.print_link_to_welcome conf True;
@@ -36,7 +40,11 @@ value print_candidates conf base (ip, p) iexcl (ip1, p1) (ip2, p2) = do {
   let title _ =
     Wserver.wprint "%s\n"
       (capitale
-         (transl_decline conf "merge" (transl_nth conf "child/children" 1)))
+         (transl_decline conf "merge"
+            (sprintf "%s %s %s"
+               (transl_nth conf "spouse/spouses" 1)
+               (transl conf "or")
+               (transl_nth conf "child/children" 1))))
   in
   Util.header conf title;
   Util.print_link_to_welcome conf True;
@@ -82,65 +90,10 @@ value main_page conf base =
     [ Some i -> Some (Adef.iper_of_int i, poi base (Adef.iper_of_int i))
     | None -> None ]
   in
-  let iexcl =
-    match p_getenv conf.env "iexcl" with
-    [ Some s ->
-        loop [] 0 where rec loop ipl i =
-          if i >= String.length s then ipl
-          else
-            let j =
-              try String.index_from s i ',' with
-              [ Not_found -> String.length s ]
-            in
-            if j = String.length s then ipl
-            else
-              let k =
-                try String.index_from s (j + 1) ',' with
-                [ Not_found -> String.length s ]
-              in
-              let s1 = String.sub s i (j - i) in
-              let s2 = String.sub s (j + 1) (k - j - 1) in
-              let ipl =
-                match
-                  try Some (int_of_string s1, int_of_string s2) with
-                  [ Failure _ -> None ]
-                with
-                [ Some (i1, i2) ->
-                    [(Adef.iper_of_int i1, Adef.iper_of_int i2) :: ipl]
-                | None -> ipl ]
-              in
-              loop ipl (k + 1)
-    | None -> [] ]
-  in
+  let iexcl = Perso.excluded_mergeable_candidates conf in
   match ipp with
   [ Some (ip, p) ->
-      let u = uoi base ip in
-      let ipl =
-        loop (Array.to_list (get_family u)) where rec loop =
-          fun
-          [ [ifam :: ifaml] ->
-              let ipl = Array.to_list (get_children (doi base ifam)) in
-              ipl @ loop ifaml
-          | [] -> [] ]
-      in
-      let cand =
-        loop_chil ipl where rec loop_chil =
-          fun
-          [ [ip1 :: ipl1] ->
-              let p1 = poi base ip1 in
-              let fn1 = get_first_name p1 in
-              loop_same ipl1 where rec loop_same =
-                fun
-                [ [ip2 :: ipl2] ->
-                    let p2 = poi base ip2 in
-                    if get_first_name p2 = fn1 then
-                      if List.mem (ip1, ip2) iexcl then loop_same ipl2
-                      else Some ((ip1, p1), (ip2, p2))
-                    else loop_same ipl2
-                | [] -> loop_chil ipl1 ]
-          | [] -> None ]
-      in
-      match cand with
+      match Perso.first_mergeable_candidates base ip iexcl with
       [ Some (ipp1, ipp2) ->
           print_candidates conf base (ip, p) iexcl ipp1 ipp2
       | None -> 

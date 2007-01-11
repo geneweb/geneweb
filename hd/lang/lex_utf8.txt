@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.72 2007-01-10 04:16:11 ddr Exp $
+# $Id: lex_utf8.txt,v 5.73 2007-01-11 15:29:55 ddr Exp $
 # Copyright (c) 1998-2006 INRIA
 
      !dates order
@@ -7725,6 +7725,10 @@ ru: укажите
 sl: določi
 sv: välj
 zh:  从下列选取
+
+    spouse/spouses
+en: spouse/spouses
+fr: conjoint/conjoints
 
     spouses not included
 af: eggenote weggelaat
