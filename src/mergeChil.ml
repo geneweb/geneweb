@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeChil.ml,v 5.2 2007-01-11 15:29:56 ddr Exp $ *)
+(* $Id: mergeChil.ml,v 5.3 2007-01-11 15:31:00 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -22,7 +22,7 @@ value print_no_candidate conf base (ip, p) = do {
     Wserver.wprint "%s\n"
       (capitale
          (transl_decline conf "merge"
-            (sprintf "%s %s %s"
+            (Printf.sprintf "%s %s %s"
                (transl_nth conf "spouse/spouses" 1)
                (transl conf "or")
                (transl_nth conf "child/children" 1))))
@@ -41,7 +41,7 @@ value print_candidates conf base (ip, p) iexcl (ip1, p1) (ip2, p2) = do {
     Wserver.wprint "%s\n"
       (capitale
          (transl_decline conf "merge"
-            (sprintf "%s %s %s"
+            (Printf.sprintf "%s %s %s"
                (transl_nth conf "spouse/spouses" 1)
                (transl conf "or")
                (transl_nth conf "child/children" 1))))

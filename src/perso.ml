@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.47 2007-01-01 18:30:06 ddr Exp $ *)
+(* $Id: perso.ml,v 5.48 2007-01-11 15:29:56 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -658,6 +658,94 @@ value get_date_place conf base auth_for_all_anc p =
     in
     ((d1, d2, pl), auth_for_all_anc)
   else ((None, None, ""), False)
+;
+
+value excluded_mergeable_candidates conf =
+  match p_getenv conf.env "iexcl" with
+  [ Some s ->
+      loop [] 0 where rec loop ipl i =
+        if i >= String.length s then ipl
+        else
+          let j =
+            try String.index_from s i ',' with
+            [ Not_found -> String.length s ]
+          in
+          if j = String.length s then ipl
+          else
+            let k =
+              try String.index_from s (j + 1) ',' with
+              [ Not_found -> String.length s ]
+            in
+            let s1 = String.sub s i (j - i) in
+            let s2 = String.sub s (j + 1) (k - j - 1) in
+            let ipl =
+              match
+                try Some (int_of_string s1, int_of_string s2) with
+                [ Failure _ -> None ]
+              with
+              [ Some (i1, i2) ->
+                  [(Adef.iper_of_int i1, Adef.iper_of_int i2) :: ipl]
+              | None -> ipl ]
+            in
+            loop ipl (k + 1)
+  | None -> [] ]
+;
+
+value first_mergeable_candidates base ip iexcl =
+  let ifaml = Array.to_list (get_family (uoi base ip)) in
+  let cand_spouse =
+    loop_spouse ifaml where rec loop_spouse =
+      fun
+      [ [ifam1 :: ifaml1] ->
+          let isp1 = Gutil.spouse ip (coi base ifam1) in
+          let sp1 = poi base isp1 in
+          let fn1 = get_first_name sp1 in
+          let sn1 = get_surname sp1 in
+          loop_same ifaml1 where rec loop_same =
+            fun
+            [ [ifam2 :: ifaml2] ->
+                let isp2 = Gutil.spouse ip (coi base ifam2) in
+                let sp2 = poi base isp2 in
+                if List.mem (isp1, isp2) iexcl then loop_same ifaml2
+                else if eq_istr (get_first_name sp2) fn1 &&
+                   eq_istr (get_surname sp2) sn1
+                then 
+                  Some ((isp1, sp1), (isp2, sp2))
+                else loop_same ifaml2
+            | [] -> loop_spouse ifaml1 ]
+      | [] -> None ]
+  in
+  if cand_spouse <> None then cand_spouse
+  else
+    let ipl =
+      loop ifaml where rec loop =
+        fun
+        [ [ifam :: ifaml] ->
+            let ipl = Array.to_list (get_children (doi base ifam)) in
+            ipl @ loop ifaml
+        | [] -> [] ]
+    in
+    loop_chil ipl where rec loop_chil =
+      fun
+      [ [ip1 :: ipl1] ->
+          let p1 = poi base ip1 in
+          let fn1 = get_first_name p1 in
+          loop_same ipl1 where rec loop_same =
+            fun
+            [ [ip2 :: ipl2] ->
+                let p2 = poi base ip2 in
+                if List.mem (ip1, ip2) iexcl then loop_same ipl2
+                else if eq_istr (get_first_name p2) fn1 then
+                  Some ((ip1, p1), (ip2, p2))
+                else loop_same ipl2
+            | [] -> loop_chil ipl1 ]
+      | [] -> None ]
+;
+
+value has_mergeable_spouse_or_child conf base p =
+  let ip = get_key_index p in
+  let iexcl = excluded_mergeable_candidates conf in
+  first_mergeable_candidates base ip iexcl <> None
 ;
 
 value merge_date_place conf base surn ((d1, d2, pl), auth) p =
@@ -1754,6 +1842,8 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
   | "has_families" -> Array.length (get_family u) > 0
   | "has_first_names_aliases" -> get_first_names_aliases p <> []
   | "has_image" -> Util.has_image conf base p
+  | "has_mergeable_spouse_or_child" ->
+      has_mergeable_spouse_or_child conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
   | "has_notes" -> p_auth && sou base (get_notes p) <> ""
