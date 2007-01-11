@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updmenu.txt,v 5.4 2006-10-29 12:08:34 ddr Exp $ -->
+  <!-- $Id: updmenu.txt,v 5.5 2007-01-11 12:57:05 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <title>[*update]</title>
   <meta name="robots" content="none"%/>
@@ -107,6 +107,8 @@
     %if;(nb_children != 0)
       <br%/>
       <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
+      <br%/>
+      <a href="%prefix;m=MRG_CHN;ip=%index;">[*merge::child/children]1</a>
       <br%/>
     %end;      
   </td>
