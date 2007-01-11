@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.34 2006-12-28 14:08:59 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.35 2007-01-11 20:53:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -569,16 +569,26 @@ value rec try_merge conf base branches ip1 ip2 changes_done =
   else (False, changes_done)
 ;
 
-value print_merged conf base p =
+value print_merged conf base p = do {
   let title _ = Wserver.wprint "%s" (capitale (transl conf "merge done")) in
-  do {
-    header conf title;
-    print_link_to_welcome conf True;
-    Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Wserver.wprint "\n";
-    trailer conf;
-  }
-;
+  header conf title;
+  print_link_to_welcome conf True;
+  tag "p" begin
+    Wserver.wprint "%s\n" (referenced_person_text conf base p);
+  end;
+  match (p_getenv conf.env "m", p_getint conf.env "ip") with
+  [ (Some "MRG_DUP_IND_Y_N", Some ip) ->
+      tag "p" begin
+        Wserver.wprint "%s :\n" (capitale (transl conf "continue merging"));
+        stag "a" "href=%sm=MRG_DUP;ip=%d" (commd conf) ip begin
+          Wserver.wprint "%s" (transl conf "possible duplications");
+        end;
+        Wserver.wprint "\n(%s)\n"
+          (referenced_person_text conf base (poi base (Adef.iper_of_int ip)));
+      end
+  | _ -> () ];
+  trailer conf;
+};
 
 value print conf base =
   let p1 =
