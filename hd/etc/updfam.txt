@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 5.7 2006-12-03 10:31:35 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 5.8 2007-01-11 18:00:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -11,8 +11,8 @@
     %elseif;(evar_m = "ADD_PAR")[*add::family/families]0%nn;
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
       [*modify::family/families]0 # %evar_i;
-    %elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or
-             evar_m = "MRG_MOD_FAM_OK")
+    %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
+             evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
@@ -334,8 +334,8 @@ function changeCalendar(e,v,m,c) {
   [*add::family/families]0
 %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
   [*modify::family/families]0 # %evar_i;
-%elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or
-         evar_m = "MRG_MOD_FAM_OK")
+%elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
+         evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
   [*merge::family/families]1 # %evar_i;
 %end;
 </h1>
@@ -352,8 +352,8 @@ function changeCalendar(e,v,m,c) {
   <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
 %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
   <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
-%elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or
-         evar_m = "MRG_MOD_FAM_OK")
+%elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
+         evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
   <input type="hidden" name="i2" value="%evar_i2;"%/>
   %if;(evar_ini1 != "" and evar_ini2 != "")
     <input type="hidden" name="ini1" value="%evar_ini1;"%/>
