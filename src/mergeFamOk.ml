@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.12 2006-12-28 12:56:35 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.13 2007-01-12 03:21:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -112,7 +112,33 @@ value print_mod_merge_ok conf base wl cpl des =
           Merge.print_someone conf base p2;
           Wserver.wprint "\n";
         }
-    | _ -> () ];
+    | _ ->
+        match p_getint conf.env "ip" with
+        [ Some ip ->
+            let s1 =
+              match p_getenv conf.env "iexcl" with
+              [ Some "" | None -> ""
+              | Some s -> ";iexcl=" ^ s ]
+            in
+            let s2 =
+              match p_getenv conf.env "fexcl" with
+              [ Some "" | None -> ""
+              | Some s -> ";fexcl=" ^ s ]
+            in
+            if s1 <> "" || s2 <> "" then
+              tag "p" begin
+                Wserver.wprint "%s :\n"
+                  (capitale (transl conf "continue merging"));
+                stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2
+                begin
+                  Wserver.wprint "%s" (transl conf "possible duplications");
+                end;
+                Wserver.wprint "\n(%s)\n"
+                  (referenced_person_text conf base
+                     (poi base (Adef.iper_of_int ip)));
+              end
+            else ()
+        | None -> () ] ];
     trailer conf;
   }
 ;
