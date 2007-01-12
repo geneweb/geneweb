@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.37 2007-01-12 05:24:45 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.38 2007-01-12 19:56:08 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -486,7 +486,9 @@ value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 = do {
   in
   patch_family base ifam1 fam1;
   let des1 =
-    {children = Array.append (get_children des1) (get_children des2)}
+    let children = Array.append (get_children des1) (get_children des2) in
+    let _ : option _ = CheckItem.sort_children base children in
+    {children = children}
   in
   patch_descend base ifam1 des1;
   for i = 0 to Array.length (get_children des2) - 1 do {
