@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.7 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: merge.ml,v 5.8 2007-01-12 05:24:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -97,4 +97,50 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
     end;
     trailer conf;
   }
+;
+
+value print_possible_continue_merging conf base =
+  match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
+  [ (Some ini1, Some ini2) -> do {
+      let p1 = poi base (Adef.iper_of_int ini1) in
+      let p2 = poi base (Adef.iper_of_int ini2) in
+      Wserver.wprint "\n";
+      html_p conf;
+      stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2 begin
+        Wserver.wprint "%s" (capitale (transl conf "continue merging"));
+      end;
+      Wserver.wprint "\n";
+      print_someone conf base p1;
+      Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
+      print_someone conf base p2;
+      Wserver.wprint "\n";
+    }
+  | _ ->
+      match p_getint conf.env "ip" with
+      [ Some ip ->
+          let s1 =
+            match p_getenv conf.env "iexcl" with
+            [ Some "" | None -> ""
+            | Some s -> ";iexcl=" ^ s ]
+          in
+          let s2 =
+            match p_getenv conf.env "fexcl" with
+            [ Some "" | None -> ""
+            | Some s -> ";fexcl=" ^ s ]
+          in
+          if s1 <> "" || s2 <> "" then
+            tag "p" begin
+              stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2
+              begin
+                Wserver.wprint "%s"
+                  (capitale (transl conf "continue merging"));
+              end;
+              Wserver.wprint "\n(%s)\n"
+                (transl_a_of_b conf
+                   (transl conf "possible duplications")
+                   (referenced_person_text conf base
+                      (poi base (Adef.iper_of_int ip))));
+            end
+          else ()
+      | None -> () ] ]
 ;

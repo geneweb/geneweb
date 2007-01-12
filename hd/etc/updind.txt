@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 5.8 2007-01-06 18:36:29 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 5.9 2007-01-12 05:24:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -256,6 +256,15 @@ function changeCalendar(e,v,m,c) {
   %if;(evar_ini1 != "" and evar_ini2 != "")
     <input type="hidden" name="ini1" value="%evar_ini1;"%/>
     <input type="hidden" name="ini2" value="%evar_ini2;"%/>
+  %end;
+  %if;(evar.iexcl != "" or evar.fexcl != "")
+    <input type="hidden" name="ip" value="%evar.ip;"%/>
+    %if;(evar.iexcl != "")
+      <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
+    %end;
+    %if;(evar.fexcl != "")
+      <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
+    %end;
   %end;
   <input type="hidden" name="m" value="MRG_MOD_IND_OK"%/>
 %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
