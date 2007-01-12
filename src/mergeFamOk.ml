@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.13 2007-01-12 03:21:42 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.14 2007-01-12 05:24:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -90,58 +90,14 @@ value print_merge conf base =
   | _ -> incorrect_request conf ]
 ;
 
-value print_mod_merge_ok conf base wl cpl des =
+value print_mod_merge_ok conf base wl cpl des = do {
   let title _ = Wserver.wprint "%s" (capitale (transl conf "merge done")) in
-  do {
-    header conf title;
-    print_link_to_welcome conf True;
-    UpdateFamOk.print_family conf base wl cpl des;
-    match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
-    [ (Some ini1, Some ini2) ->
-        let p1 = poi base (Adef.iper_of_int ini1) in
-        let p2 = poi base (Adef.iper_of_int ini2) in
-        do {
-          Wserver.wprint "\n";
-          html_p conf;
-          stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2 begin
-            Wserver.wprint "%s" (capitale (transl conf "continue merging"));
-          end;
-          Wserver.wprint "\n";
-          Merge.print_someone conf base p1;
-          Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
-          Merge.print_someone conf base p2;
-          Wserver.wprint "\n";
-        }
-    | _ ->
-        match p_getint conf.env "ip" with
-        [ Some ip ->
-            let s1 =
-              match p_getenv conf.env "iexcl" with
-              [ Some "" | None -> ""
-              | Some s -> ";iexcl=" ^ s ]
-            in
-            let s2 =
-              match p_getenv conf.env "fexcl" with
-              [ Some "" | None -> ""
-              | Some s -> ";fexcl=" ^ s ]
-            in
-            if s1 <> "" || s2 <> "" then
-              tag "p" begin
-                Wserver.wprint "%s :\n"
-                  (capitale (transl conf "continue merging"));
-                stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2
-                begin
-                  Wserver.wprint "%s" (transl conf "possible duplications");
-                end;
-                Wserver.wprint "\n(%s)\n"
-                  (referenced_person_text conf base
-                     (poi base (Adef.iper_of_int ip)));
-              end
-            else ()
-        | None -> () ] ];
-    trailer conf;
-  }
-;
+  header conf title;
+   print_link_to_welcome conf True;
+  UpdateFamOk.print_family conf base wl cpl des;
+  Merge.print_possible_continue_merging conf base;
+  trailer conf;
+};
 
 value effective_mod_merge conf base sfam scpl sdes =
   match p_getint conf.env "i2" with

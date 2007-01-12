@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.36 2007-01-12 03:21:42 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.37 2007-01-12 05:24:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -46,6 +46,19 @@ value print_differences conf base branches p1 p2 =
                 (Adef.int_of_iper ip2);
             }
         | [_ :: branches] -> loop branches
+        | _ -> () ];
+        match (p_getenv conf.env "m", p_getint conf.env "ip") with
+        [ (Some "MRG_DUP_IND_Y_N", Some ip) -> do {
+            xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\"" ip;
+            List.iter
+              (fun excl_name ->
+                 match p_getenv conf.env excl_name with
+                 [ Some "" | None -> ()
+                 | Some s ->
+                     xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\""
+                       excl_name s ])
+              ["iexcl"; "fexcl"]
+          }
         | _ -> () ];
     end;
     html_p conf;
@@ -571,10 +584,13 @@ value rec try_merge conf base branches ip1 ip2 changes_done =
 
 value print_merged conf base p = do {
   let title _ = Wserver.wprint "%s" (capitale (transl conf "merge done")) in
+  Wserver.wrap_string.val := Util.xml_pretty_print;
   header conf title;
   print_link_to_welcome conf True;
-  tag "p" begin
-    Wserver.wprint "%s\n" (referenced_person_text conf base p);
+  tag "ul" begin
+    tag "li" begin
+      Wserver.wprint "%s\n" (referenced_person_text conf base p);
+    end;
   end;
   match (p_getenv conf.env "m", p_getint conf.env "ip") with
   [ (Some "MRG_DUP_IND_Y_N", Some ip) ->
@@ -589,12 +605,13 @@ value print_merged conf base p = do {
         | Some s -> ";fexcl=" ^ s ]
       in
       tag "p" begin
-        Wserver.wprint "%s :\n" (capitale (transl conf "continue merging"));
         stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2 begin
-          Wserver.wprint "%s" (transl conf "possible duplications");
+          Wserver.wprint "%s" (capitale (transl conf "continue merging"));
         end;
         Wserver.wprint "\n(%s)\n"
-          (referenced_person_text conf base (poi base (Adef.iper_of_int ip)));
+          (Util.transl_a_of_b conf (transl conf "possible duplications")
+             (referenced_person_text conf base
+                (poi base (Adef.iper_of_int ip))));
       end
   | _ -> () ];
   trailer conf;
