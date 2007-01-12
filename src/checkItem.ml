@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.6 2006-12-27 17:35:25 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.7 2007-01-12 19:56:08 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -369,16 +369,18 @@ value semi_sort base a before comp di =
       | None -> loop (i + di) ]
 ;
 
-value sort_children base warning ifam des =
+value sort_children base children = do {
   let before = ref None in
-  do {
-    semi_sort base (get_children des) before strictly_before 1 1;
-    semi_sort base (get_children des) before strictly_after ~-1 1;
-    semi_sort base (get_children des) before strictly_before 1 1;
-    match before.val with
-    [ None -> ()
-    | Some a -> warning (ChangedOrderOfChildren ifam des a) ];
-  }
+  semi_sort base children before strictly_before 1 1;
+  semi_sort base children before strictly_after ~-1 1;
+  semi_sort base children before strictly_before 1 1;
+  before.val
+};
+
+value sort_children2 base warning ifam des =
+  match sort_children base (get_children des) with
+  [ None -> ()
+  | Some a -> warning (ChangedOrderOfChildren ifam des a) ]
 ;
 
 value born_after_his_elder_sibling base error warning x np ifam des =
@@ -483,7 +485,7 @@ value family base error warning ifam fam cpl des =
            get_relation fam = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson moth) ];
     check_normal_marriage_date base error warning (ifam, fam);
-    sort_children base warning ifam des;
+    sort_children2 base warning ifam des;
     let _ =
       List.fold_left
         (fun np child ->
