@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.30 2007-01-12 05:24:45 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.31 2007-01-12 05:40:37 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -84,7 +84,7 @@ value reconstitute conf base p1 p2 =
      field "burial_place" (fun p -> sou base (get_burial_place p)) ( \= "");
    burial_src =
      merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
-   notes = cat_strings base (get_notes p1) "<br>\n" (get_notes p2);
+   notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
    psources = merge_strings base (get_psources p1) ", " (get_psources p2);
    key_index = get_key_index p1}
 ;
