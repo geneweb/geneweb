@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 5.8 2007-01-11 18:00:17 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 5.9 2007-01-12 03:21:40 ddr Exp $ -->
   <!-- Copyright (c) 1998-2006 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -358,6 +358,12 @@ function changeCalendar(e,v,m,c) {
   %if;(evar_ini1 != "" and evar_ini2 != "")
     <input type="hidden" name="ini1" value="%evar_ini1;"%/>
     <input type="hidden" name="ini2" value="%evar_ini2;"%/>
+  %end;
+  %if;(evar.iexcl != "")
+    <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
+  %end;
+  %if;(evar.fexcl != "")
+    <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
   %end;
   <input type="hidden" name="m" value="MRG_MOD_FAM_OK"%/>%nl;
 %end;

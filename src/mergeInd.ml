@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.35 2007-01-11 20:53:38 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.36 2007-01-12 03:21:42 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -578,9 +578,19 @@ value print_merged conf base p = do {
   end;
   match (p_getenv conf.env "m", p_getint conf.env "ip") with
   [ (Some "MRG_DUP_IND_Y_N", Some ip) ->
+      let s1 =
+        match p_getenv conf.env "iexcl" with
+        [ Some "" | None -> ""
+        | Some s -> ";iexcl=" ^ s ]
+      in
+      let s2 =
+        match p_getenv conf.env "fexcl" with
+        [ Some "" | None -> ""
+        | Some s -> ";fexcl=" ^ s ]
+      in
       tag "p" begin
         Wserver.wprint "%s :\n" (capitale (transl conf "continue merging"));
-        stag "a" "href=%sm=MRG_DUP;ip=%d" (commd conf) ip begin
+        stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2 begin
           Wserver.wprint "%s" (transl conf "possible duplications");
         end;
         Wserver.wprint "\n(%s)\n"

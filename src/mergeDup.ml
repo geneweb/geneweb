@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeDup.ml,v 5.2 2007-01-11 20:53:38 ddr Exp $ *)
+(* $Id: mergeDup.ml,v 5.3 2007-01-12 03:21:42 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -32,16 +32,18 @@ value print_no_candidate conf base (ip, p) = do {
   Util.trailer conf;
 };
 
+value input_excl int_of_i excl =
+  List.fold_left
+    (fun s (i1, i2) ->
+       let t =
+         string_of_int (int_of_i i1) ^ "," ^ string_of_int (int_of_i i2)
+       in
+       if s = "" then t else s ^ "," ^ t)
+    "" excl
+;
+
 value print_input_excl conf int_of_i excl excl_name =
-  let s =
-    List.fold_left
-      (fun s (i1, i2) ->
-         let t =
-           string_of_int (int_of_i i1) ^ "," ^ string_of_int (int_of_i i2)
-         in
-         if s = "" then t else s ^ "," ^ t)
-      "" excl
-  in
+  let s = input_excl int_of_i excl in
   if s = "" then ()
   else xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" excl_name s
 ;
