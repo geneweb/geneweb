@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.35 2007-01-13 01:24:41 ddr Exp $ *)
+(* $Id: update.ml,v 5.36 2007-01-13 01:32:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -229,15 +229,7 @@ value print_warning conf base =
       in
       let after = get_children des in
       let (bef_d, aft_d) = Diff.f before after in
-      tag "table" "style=\"margin-top:1em\"" begin
-        tag "tr" begin
-          tag "td" "style=\"text-align:center\"" begin
-            Wserver.wprint "%s" (capitale (transl conf "before"));
-          end;
-          tag "td" "style=\"text-align:center\"" begin
-            Wserver.wprint "%s" (capitale (transl conf "after"));
-          end;
-        end;
+      tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
           tag "td" begin
             tag "ul" "style=\"list-style-type:none\"" begin
