@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.200 2006-12-28 23:22:55 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.201 2007-01-13 10:25:43 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -56,8 +56,8 @@ value eq_istr i1 i2 =
   | (Istr2 _ (f11, f12) i1, Istr2 _ (f21, f22) i2) ->
       i1 = i2 && f11 = f21 && f12 = f22
   | (Istr2New _ s1, Istr2New _ s2) -> s1 = s2
-  | (Istr2 db2 f pos, Istr2New _ s2) -> False (*string_of_istr2 db2 f pos = s2*)
-  | (Istr2New _ s1, Istr2 db2 f pos) -> False (*s1 = string_of_istr2 db2 f pos*)
+  | (Istr2 db2 f pos, Istr2New _ s2) -> string_of_istr2 db2 f pos = s2
+  | (Istr2New _ s1, Istr2 db2 f pos) -> s1 = string_of_istr2 db2 f pos
   | _ -> failwith "eq_istr" ]
 ;
 
