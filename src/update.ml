@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.34 2006-12-26 10:14:19 ddr Exp $ *)
+(* $Id: update.ml,v 5.35 2007-01-13 01:24:41 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -202,54 +202,56 @@ value print_warning conf base =
         (fcapitale
            (ftransl conf "%t's sex is not coherent with his/her relations"))
         (fun _ -> print_someone_strong conf base p)
-  | ChangedOrderOfChildren ifam des before ->
+  | ChangedOrderOfChildren ifam des before -> do {
       let cpl = coi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
-      do {
-        Wserver.wprint "%s\n"
-          (capitale (transl conf "changed order of children"));
-        Wserver.wprint "-&gt;\n";
-        Wserver.wprint "%s"
-          (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
-             someone_ref_text conf base moth ^ "\n");
-        Wserver.wprint "\n<ul>\n";
-        html_li conf;
-        Wserver.wprint "%s:\n" (capitale (transl conf "before"));
-        Wserver.wprint "\n";
-        tag "ul" begin
-          Array.iter
-            (fun ip ->
-               let p = poi base ip in
-               do {
-                 html_li conf;
-                 if eq_istr (get_surname p) (get_surname fath) then
-                   print_first_name conf base p
-                 else print_someone conf base p;
-                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                 Wserver.wprint "\n"
-               })
-            before;
+      Wserver.wprint "%s\n"
+        (capitale (transl conf "changed order of children"));
+      Wserver.wprint "-&gt;\n";
+      Wserver.wprint "%s"
+        (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
+           someone_ref_text conf base moth ^ "\n");
+      let print_list arr diff_arr =
+        Array.iteri
+          (fun i ip ->
+             let p = poi base ip in
+             tag "li" "%s"
+               (if diff_arr.(i) then "style=\"background:pink\"" else "")
+             begin
+               if eq_istr (get_surname p) (get_surname fath) then
+                 print_first_name conf base p
+               else print_someone conf base p;
+               Wserver.wprint "%s" (Date.short_dates_text conf base p);
+               Wserver.wprint "\n";
+             end)
+          arr
+      in
+      let after = get_children des in
+      let (bef_d, aft_d) = Diff.f before after in
+      tag "table" "style=\"margin-top:1em\"" begin
+        tag "tr" begin
+          tag "td" "style=\"text-align:center\"" begin
+            Wserver.wprint "%s" (capitale (transl conf "before"));
+          end;
+          tag "td" "style=\"text-align:center\"" begin
+            Wserver.wprint "%s" (capitale (transl conf "after"));
+          end;
         end;
-        html_li conf;
-        Wserver.wprint "%s:\n" (capitale (transl conf "after"));
-        Wserver.wprint "\n";
-        tag "ul" begin
-          Array.iter
-            (fun ip ->
-               let p = poi base ip in
-               do {
-                 html_li conf;
-                 if eq_istr (get_surname p) (get_surname fath) then
-                   print_first_name_ref conf base p
-                 else print_someone_ref conf base p;
-                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                 Wserver.wprint "\n"
-               })
-            (get_children des);
+        tag "tr" begin
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list before bef_d;
+            end;
+          end;
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list after aft_d;
+            end;
+          end;
         end;
-        Wserver.wprint "</ul>"
-      }
+      end
+    }
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = coi base ifam in
       do {
