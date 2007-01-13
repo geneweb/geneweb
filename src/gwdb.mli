@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.89 2006-12-29 19:38:04 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.90 2007-01-13 18:10:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -26,9 +26,7 @@ value close_base : base -> unit;
 value eq_istr : istr -> istr -> bool;
 value is_empty_string : istr -> bool;
 value is_quest_string : istr -> bool;
-value empty_person : base -> iper -> person;
-value empty_ascend : base -> iper -> ascend;
-value empty_union : base -> iper -> union;
+value empty_person : base -> iper -> (person * ascend * union);
 
 value get_access : person -> Def.access;
 value get_aliases : person -> list istr;
