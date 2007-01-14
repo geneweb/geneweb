@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.39 2007-01-14 17:28:38 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.40 2007-01-14 19:40:18 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -417,8 +417,14 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
 
 value effective_mod conf base sfam scpl sdes = do {
   let fi = sfam.fam_index in
-  let ofam = foi base fi in
-  let ocpl = coi base fi in
+  let (oorigin, owitnesses) =
+    let ofam = foi base fi in
+    (get_origin_file ofam, get_witnesses ofam)
+  in
+  let (oarr, ofather, omother) =
+    let ocpl = coi base fi in
+    (get_parent_array ocpl, get_father ocpl, get_mother ocpl)
+  in
   let ochildren = get_children (doi base fi) in
   let created_p = ref [] in
   let psrc =
@@ -460,8 +466,7 @@ value effective_mod conf base sfam scpl sdes = do {
   let nfam =
     let origin_file =
       if sfam.origin_file = "" then 
-        if sou base (get_origin_file ofam) <> "" then
-          get_origin_file ofam
+        if sou base oorigin <> "" then oorigin
         else infer_origin_file conf base fi ncpl ndes
       else nfam.origin_file
     in
@@ -470,7 +475,6 @@ value effective_mod conf base sfam scpl sdes = do {
   patch_family base fi nfam;
   patch_couple base fi ncpl;
   patch_descend base fi ndes;
-  let oarr = get_parent_array ocpl in
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do {
     if not (array_mem oarr.(i) narr) then do {
@@ -500,7 +504,7 @@ value effective_mod conf base sfam scpl sdes = do {
         } ]
   in
   let same_parents =
-    Adef.father ncpl = get_father ocpl && Adef.mother ncpl = get_mother ocpl
+    Adef.father ncpl = ofather && Adef.mother ncpl = omother
   in
   Array.iter
     (fun ip ->
@@ -543,7 +547,7 @@ value effective_mod conf base sfam scpl sdes = do {
   Update.add_misc_names_for_new_persons base created_p.val;
   Update.update_misc_names_of_family base Male
     {family = get_family nfath_u};
-  update_related_witnesses base (Array.to_list (get_witnesses ofam))
+  update_related_witnesses base (Array.to_list owitnesses)
     (Array.to_list nfam.witnesses) ncpl;
   (fi, nfam, ncpl, ndes)
 };
