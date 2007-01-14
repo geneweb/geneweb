@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.38 2006-12-28 17:53:24 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.39 2007-01-14 17:28:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -419,7 +419,7 @@ value effective_mod conf base sfam scpl sdes = do {
   let fi = sfam.fam_index in
   let ofam = foi base fi in
   let ocpl = coi base fi in
-  let odes = doi base fi in
+  let ochildren = get_children (doi base fi) in
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with
@@ -512,7 +512,7 @@ value effective_mod conf base sfam scpl sdes = do {
             else a.consang}
        in
        Hashtbl.replace cache ip a)
-    (get_children odes);
+    ochildren;
   Array.iter
     (fun ip ->
        let a = find_asc ip in
@@ -522,9 +522,8 @@ value effective_mod conf base sfam scpl sdes = do {
            let a =
              {parents = Some fi;
               consang =
-                if not (array_mem ip (get_children odes)) ||
-                   not same_parents
-                then Adef.fix (-1)
+                if not (array_mem ip ochildren) || not same_parents then
+                  Adef.fix (-1)
                 else a.consang}
            in
            Hashtbl.replace cache ip a ])
@@ -534,10 +533,10 @@ value effective_mod conf base sfam scpl sdes = do {
        if not (array_mem ip ndes.children) then
          patch_ascend base ip (find_asc ip)
        else ())
-    (get_children odes);
+    ochildren;
   Array.iter
     (fun ip ->
-       if not (array_mem ip (get_children odes)) || not same_parents then
+       if not (array_mem ip ochildren) || not same_parents then
          patch_ascend base ip (find_asc ip)
        else ())
     ndes.children;
