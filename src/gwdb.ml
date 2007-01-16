@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.205 2007-01-15 18:50:59 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.206 2007-01-16 03:55:20 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -182,8 +182,14 @@ value spi_next =
 
 (* Persons - common definitions *)
 
+type person1_dat =
+ { per : mutable option dsk_person;
+   asc : mutable option dsk_ascend;
+   uni : mutable option dsk_union }
+;
+
 type person =
-  [ Person of Lazy.t dsk_person and Lazy.t dsk_ascend and Lazy.t dsk_union
+  [ Person of dsk_base and int and person1_dat
   | Person2 of db2 and int and option (gen_person iper string) and
       option (gen_ascend ifam) and option (gen_union ifam) ]
 ;
@@ -433,21 +439,36 @@ value person2gen_fun =
 
 value wrap_per f g h =
   fun
-  [ Person p _ _ -> f person1_fun (Lazy.force p)
+  [ Person _ _ {per = Some p} -> f person1_fun p
+  | Person base i p -> do {
+      let per = base.data.persons.get i in
+      p.per := Some per;
+      f person1_fun per
+    }
   | Person2 db2 i None _ _ -> g person2_fun (db2, i)
   | Person2 db2 _ (Some p) _ _ -> h person2gen_fun (db2, p) ]
 ;
 
 value wrap_asc f g h =
   fun
-  [ Person _ a _ -> f person1_fun (Lazy.force a)
+  [ Person _ _ {asc = Some a} -> f person1_fun a
+  | Person base i p -> do {
+      let asc = base.data.ascends.get i in
+      p.asc := Some asc;
+      f person1_fun asc
+    }
   | Person2 db2 i _ None _ -> g person2_fun (db2, i)
   | Person2 db2 _ _ (Some a) _ -> h person2gen_fun (db2, a) ]
 ;
 
 value wrap_uni f g h =
   fun
-  [ Person _ _ u -> f person1_fun (Lazy.force u)
+  [ Person _ _ {uni = Some u} -> f person1_fun u
+  | Person base i p -> do {
+      let uni = base.data.unions.get i in
+      p.uni := Some uni;
+      f person1_fun uni
+    }
   | Person2 db2 i _ _ None -> g person2_fun (db2, i)
   | Person2 db2 _ _ _ (Some u) -> h person2gen_fun (db2, u) ]
 ;
@@ -598,8 +619,15 @@ value get_family u =
 
 (* Families - common definitions *)
 
+
+type family1_dat =
+ { fam : mutable option dsk_family;
+   cpl : mutable option dsk_couple;
+   des : mutable option dsk_descend }
+;
+
 type family =
-  [ Family of Lazy.t dsk_family and Lazy.t dsk_couple and Lazy.t dsk_descend
+  [ Family of dsk_base and int and family1_dat
   | Family2 of db2 and int and option (gen_family iper string) and
       option (gen_couple iper) and option (gen_descend iper) ]
 ;
@@ -715,21 +743,36 @@ value family2gen_fun =
 
 value wrap_fam f g h =
   fun
-  [ Family p _ _ -> f family1_fun (Lazy.force p)
+  [ Family _ _ {fam = Some fam} -> f family1_fun fam
+  | Family base i d -> do {
+      let fam = base.data.families.get i in
+      d.fam := Some fam;
+      f family1_fun fam
+    }
   | Family2 db2 i None _ _ -> g family2_fun (db2, i)
   | Family2 db2 _ (Some p) _ _ -> h family2gen_fun (db2, p) ]
 ;
 
 value wrap_cpl f g h =
   fun
-  [ Family _ p _ -> f family1_fun (Lazy.force p)
+  [ Family _ _ {cpl = Some cpl} -> f family1_fun cpl
+  | Family base i d -> do {
+      let cpl = base.data.couples.get i in
+      d.cpl := Some cpl;
+      f family1_fun cpl
+    }
   | Family2 db2 i _ None _ -> g family2_fun (db2, i)
   | Family2 db2 _ _ (Some p) _ -> h family2gen_fun (db2, p) ]
 ;
 
 value wrap_des f g h =
   fun
-  [ Family _ _ p -> f family1_fun (Lazy.force p)
+  [ Family _ _ {des = Some des} -> f family1_fun des
+  | Family base i d -> do {
+      let des = base.data.descends.get i in
+      d.des := Some des;
+      f family1_fun des
+    }
   | Family2 db2 i _ _ None -> g family2_fun (db2, i)
   | Family2 db2 _ _ _ (Some p) -> h family2gen_fun (db2, p) ]
 ;
@@ -942,21 +985,21 @@ value base1 base =
   self where rec self =
     {close_base = base.func.cleanup;
      empty_person ip =
-       Person (lazy (no_person (Adef.istr_of_int 0) ip)) (lazy no_ascend)
-         (lazy no_union);
+       Person base (Adef.int_of_iper ip)
+         {per = Some (no_person (Adef.istr_of_int 0) ip);
+          asc = Some no_ascend; uni = Some no_union};
      person_of_gen_person (p, a, u) =
-       Person (lazy (map_person_ps (fun p -> p) un_istr p)) (lazy a)
-         (lazy u);
+       Person base 0
+         {per = Some (map_person_ps (fun p -> p) un_istr p);
+          asc = Some a; uni = Some u};
      family_of_gen_family (f, c, d) =
-       Family (lazy (map_family_ps (fun p -> p) un_istr f)) (lazy c) (lazy d);
+       Family base 0
+         {fam = Some (map_family_ps (fun p -> p) un_istr f); cpl = Some c;
+          des = Some d};
      poi i =
-       Person (lazy (base.data.persons.get (Adef.int_of_iper i)))
-         (lazy (base.data.ascends.get (Adef.int_of_iper i)))
-         (lazy (base.data.unions.get (Adef.int_of_iper i)));
+       Person base (Adef.int_of_iper i) {per = None; asc = None; uni = None};
      foi i =
-       Family (lazy (base.data.families.get (Adef.int_of_ifam i)))
-         (lazy (base.data.couples.get (Adef.int_of_ifam i)))
-         (lazy (base.data.descends.get (Adef.int_of_ifam i)));
+       Family base (Adef.int_of_ifam i) {fam = None; cpl = None; des = None};
      sou i =
        match i with
        [ Istr i -> base.data.strings.get (Adef.int_of_istr i)
@@ -989,9 +1032,7 @@ value base1 base =
      persons_of_surname () = Spi base.func.Dbdisk.persons_of_surname;
      base_visible_get f =
        base.data.visible.v_get
-         (fun p ->
-            f (Person (lazy p) (lazy (failwith "base_visible_get a"))
-                 (lazy (failwith "base_visible_get b"))));
+         (fun p -> f (Person base 0 {per = Some p; asc = None; uni = None}));
      base_visible_write = base.data.visible.v_write;
      base_particles () = base.data.particles;
      base_strings_of_first_name = base_strings_of_first_name_or_surname;
