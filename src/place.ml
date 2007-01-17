@@ -1,13 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.15 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: place.ml,v 5.16 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
-(*
-open Gutil;
-*)
 open Gwdb;
+open Hutil;
 open Util;
 
 value fold_place inverted s =

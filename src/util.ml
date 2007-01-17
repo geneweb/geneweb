@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.101 2007-01-17 14:46:50 ddr Exp $ *)
+(* $Id: util.ml,v 5.102 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -400,15 +400,6 @@ value commd conf =
   let c = conf.command ^ "?" in
   List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
     (conf.henv @ conf.senv)
-;
-
-value commd_no_params conf =
-  conf.command ^ "?" ^
-    List.fold_left
-      (fun c (k, v) ->
-         c ^ (if c = "" then "" else ";") ^ k ^
-           (if v = "" then "" else "=" ^ v))
-      "" conf.henv
 ;
 
 value code_varenv = Wserver.encode;
@@ -1779,52 +1770,6 @@ value limited_image_size max_wid max_hei fname size =
       Some (wid, hei)
   | None -> None ]
 ;
-
-value up_fname conf = "up.jpg";
-
-value link_to_referer conf =
-  let referer = Wserver.extract_param "referer: " '\n' conf.request in
-  if referer <> "" then
-    let fname = "left.jpg" in
-    let wid_hei =
-      match image_size (image_file_name fname) with
-      [ Some (wid, hei) ->
-          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
-          string_of_int hei ^ "\""
-      | None -> "" ]
-    in
-    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\"%s></a>\n"
-      referer (image_prefix conf) fname wid_hei conf.xhs
-  else ""
-;
-
-value gen_print_link_to_welcome f conf right_aligned =
-  if conf.cancel_links then ()
-  else do {
-    let fname = up_fname conf in
-    let wid_hei =
-      match image_size (image_file_name fname) with
-      [ Some (wid, hei) ->
-          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
-          string_of_int hei ^ "\""
-      | None -> "" ]
-    in
-    if right_aligned then
-      Wserver.wprint "<div style=\"float:%s\">\n" conf.right
-    else Wserver.wprint "<p>\n";
-    f ();
-    let str = link_to_referer conf in
-    if str = "" then () else Wserver.wprint "%s" str;
-    Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>" (image_prefix conf)
-      fname wid_hei conf.xhs;
-    Wserver.wprint "</a>\n";
-    if right_aligned then Wserver.wprint "</div>\n"
-    else Wserver.wprint "</p>\n"
-  }
-;
-
-value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 
 value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with

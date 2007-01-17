@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.36 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.37 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -271,7 +271,9 @@ value macro conf base =
         ": " ^ conf.user
       else ""
   | 'v' -> Version.txt
-  | 'w' -> let s = Util.link_to_referer conf in if s = "" then "&nbsp;" else s
+  | 'w' ->
+      let s = Hutil.link_to_referer conf in
+      if s = "" then "&nbsp;" else s
   | '/' -> conf.xhs
   | c -> "%" ^ String.make 1 c ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.13 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: relation.ml,v 5.14 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -509,7 +509,7 @@ value print_shortest_path conf base p1 p2 =
             Wserver.wprint "<center><h1><font color=\"%s\">" conf.highlight;
             title False;
             Wserver.wprint "</font></h1></center>\n";
-            Util.print_link_to_welcome conf True;
+            Hutil.print_link_to_welcome conf True;
             Wserver.wprint "%s\n"
               (capitale
                  (cftransl conf "no known relationship link between %s and %s"
