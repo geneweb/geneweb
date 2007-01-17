@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.18 2006-12-03 21:50:24 ddr Exp $ *)
+(* $Id: templ.ml,v 5.19 2007-01-17 03:09:25 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1029,34 +1029,7 @@ value rec print_var conf base eval_var sl =
     | VVbool False -> Wserver.wprint "0"
     | VVother f -> print_var conf base f [] ]
   with
-  [ Not_found -> print_variable conf (Some base) sl ]
-;
-
-value rec copy_from_templ conf env ic =
-  let astl = parse_templ conf (Stream.of_channel ic) in
-  do {
-    close_in ic;
-    List.iter (print_ast conf env) astl;
-  }
-and print_ast conf env =
-  fun
-  [ Avar _ s sl -> print_ast_var conf env [s :: sl]
-  | Aif a1 a2 a3 -> print_if conf env a1 a2 a3
-  | ast -> Wserver.wprint "%s" (eval_ast conf ast) ]
-and print_if conf env a1 a2 a3 =
-  let eval_var loc sl = VVstring (eval_variable conf env sl) in
-  let eval_apply _ = raise Not_found in
-  let test = eval_bool_expr conf (eval_var, eval_apply) a1 in
-  List.iter (print_ast conf env) (if test then a2 else a3)
-and print_ast_var conf env =
-  fun
-  [ ["include"; templ] ->
-      match Util.open_etc_file templ with
-      [ Some ic -> copy_from_templ conf env ic
-      | None -> () ]
-  | sl ->
-      try Wserver.wprint "%s" (eval_variable conf env sl) with
-      [ Not_found -> print_variable conf None sl ] ]
+  [ Not_found -> print_variable conf base sl ]
 ;
 
 type vother 'a =
@@ -1193,8 +1166,8 @@ value rgb_of_str_hsv h s v =
   rgb_of_hsv (ios h) (ios s) (ios v)
 ;
 
-value interp
-  conf base fname eval_var eval_transl eval_predefined_apply get_vother
+value interp_ast
+  conf base eval_var eval_transl eval_predefined_apply get_vother
   set_vother print_foreach
 =
   let eval_var env ep loc sl =
@@ -1374,21 +1347,48 @@ value interp
     in
     print_ast_list env ep al
   in
-  fun env ep ->
-    let v = template_file.val in
-    do {
-      template_file.val := fname;
-      try
-        match input conf fname with
-        [ Some astl -> do {
-            Util.html conf;
-            Util.nl ();
-            print_ast_list env ep astl;
-          }
-        | None ->
-            error_cannot_access conf fname ]
-      with e ->
-        do { template_file.val := v; raise e };
-      template_file.val := v;
-    }
+  print_ast_list
 ;
+
+value interp
+  conf base fname eval_var eval_transl eval_predefined_apply get_vother
+  set_vother print_foreach env ep
+= do {
+  let v = template_file.val in
+  template_file.val := fname;
+  try
+    match input conf fname with
+    [ Some astl -> do {
+        Util.html conf;
+        Util.nl ();
+        interp_ast conf (Some base) eval_var eval_transl
+         eval_predefined_apply get_vother set_vother print_foreach env ep astl
+      }
+    | None ->
+        error_cannot_access conf fname ]
+  with e ->
+    do { template_file.val := v; raise e };
+  template_file.val := v;
+};
+
+value copy_from_templ conf env ic = do {
+  let astl = parse_templ conf (Stream.of_channel ic) in
+  close_in ic;
+  let eval_var env accu loc =
+    fun
+    [ [s] -> VVstring (List.assoc s env)
+    | _ -> raise Not_found ]
+  in
+  let eval_transl env = eval_transl conf in
+  let eval_predefined_apply _ = raise Not_found in
+  let get_vother _ = None in
+  let set_vother _ = "" in
+  let print_foreach _ = raise Not_found in
+  let v = template_file.val in
+  template_file.val := "";
+  try
+    interp_ast conf None eval_var eval_transl eval_predefined_apply
+      get_vother set_vother print_foreach env () astl
+  with e -> do { template_file.val := v; raise e };
+  template_file.val := v;
+};
