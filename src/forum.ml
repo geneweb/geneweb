@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.11 2006-11-24 09:58:08 ddr Exp $ *)
+(* $Id: forum.ml,v 5.12 2007-01-17 04:07:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -607,9 +607,13 @@ value print_forum_message conf base r so =
         else [("pos", Vpos (ref MF.not_a_pos))]
     | None -> [("pos", Vpos (ref MF.not_a_pos))] ]
   in
-  Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf base) env ()
+  Templ.interp conf base "forum"
+    {Templ.eval_var = eval_var conf base;
+     Templ.eval_transl _ = Templ.eval_transl conf;
+     Templ.eval_predefined_apply _ = raise Not_found;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf base}
+    env ()
 ;
 
 value print conf base =
@@ -623,9 +627,13 @@ value print conf base =
 
 value print_forum_headers conf base =
   let env = [("pos", Vpos (ref MF.not_a_pos))] in
-  Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf base) env ()
+  Templ.interp conf base "forum"
+    {Templ.eval_var = eval_var conf base;
+     Templ.eval_transl _ = Templ.eval_transl conf;
+     Templ.eval_predefined_apply _ = raise Not_found;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf base}
+    env ()
 ;
 
 (* Send a message *)
@@ -695,9 +703,13 @@ value forum_add conf base moderated mess =
 value visualize conf base mess =
   let vmess = Vmess mess None MF.not_a_pos MF.not_a_pos None in
   let env = [("mess", vmess)] in
-  Templ.interp conf base "forum" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf base) env ()
+  Templ.interp conf base "forum"
+    {Templ.eval_var = eval_var conf base;
+     Templ.eval_transl _ = Templ.eval_transl conf;
+     Templ.eval_predefined_apply _ = raise Not_found;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf base}
+    env ()
 ;
 
 value print_add_ok conf base =

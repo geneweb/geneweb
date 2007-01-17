@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.10 2006-10-19 12:38:15 ddr Exp $ *)
+(* $Id: date.ml,v 5.11 2007-01-17 04:07:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -918,8 +918,12 @@ value print_calendar conf base =
 ;
 end ELSE declare
 value print_calendar conf base =
-  Templ.interp conf base "calendar" (eval_var conf)
-    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf) [] (eval_julian_day conf)
+  Templ.interp conf base "calendar"
+    {Templ.eval_var = eval_var conf;
+     Templ.eval_transl _ = Templ.eval_transl conf;
+     Templ.eval_predefined_apply _ = raise Not_found;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf}
+    [] (eval_julian_day conf)
 ;
 end END;

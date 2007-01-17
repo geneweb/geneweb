@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.19 2007-01-17 03:09:25 ddr Exp $ *)
+(* $Id: templ.ml,v 5.20 2007-01-17 04:07:38 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1039,6 +1039,19 @@ type vother 'a =
 ;
 type env 'a = list (string * 'a);
 
+type interp_fun 'a 'b =
+  { eval_var : env 'a -> 'b -> loc -> list string -> expr_val 'b;
+    eval_transl : env 'a -> bool -> string -> string -> string;
+    eval_predefined_apply : env 'a -> string -> list (expr_val 'b) -> string;
+    get_vother : 'a -> option (vother 'b);
+    set_vother : vother 'b -> 'a;
+    print_foreach : 
+      (env 'a -> 'b -> ast -> unit) ->
+         (env 'a -> 'b -> ast -> string) ->
+         env 'a -> 'b -> loc -> string -> list string ->
+         list (list ast) -> list ast -> unit }
+;
+
 value get_def get_vother k env =
   let k = "#" ^ k in
   try
@@ -1166,31 +1179,28 @@ value rgb_of_str_hsv h s v =
   rgb_of_hsv (ios h) (ios s) (ios v)
 ;
 
-value interp_ast
-  conf base eval_var eval_transl eval_predefined_apply get_vother
-  set_vother print_foreach
-=
+value interp_ast conf base ifun =
   let eval_var env ep loc sl =
     try
       match sl with
       [ ["env"; "key"] ->
-          match get_vother (List.assoc "binding" env) with
+          match ifun.get_vother (List.assoc "binding" env) with
           [ Some (Vbind k v) -> VVstring k
           | _ -> raise Not_found ]
       | ["env"; "val"] ->
-          match get_vother (List.assoc "binding" env) with
+          match ifun.get_vother (List.assoc "binding" env) with
           [ Some (Vbind k v) -> VVstring v
           | _ -> raise Not_found ]
       | ["env"; "val"; "decoded"] ->
-          match get_vother (List.assoc "binding" env) with
+          match ifun.get_vother (List.assoc "binding" env) with
           [ Some (Vbind k v) -> VVstring (Util.decode_varenv v)
           | _ -> raise Not_found ]
       | [s :: sl] ->
-          match (get_val get_vother s env, sl) with
+          match (get_val ifun.get_vother s env, sl) with
           [ (Some (VVother f), sl) -> f sl
           | (Some v, []) -> v
-          | (_, sl) -> eval_var env ep loc [s :: sl] ]
-      | _ -> eval_var env ep loc sl ]
+          | (_, sl) -> ifun.eval_var env ep loc [s :: sl] ]
+      | _ -> ifun.eval_var env ep loc sl ]
     with
     [ Not_found -> VVstring (eval_variable conf [] sl) ]
   in
@@ -1203,9 +1213,10 @@ value interp_ast
     | _ -> templ_print_var conf base (eval_var env ep loc) sl ]
   in
   let print_foreach print_ast eval_expr env ep loc s sl el al =
-    try print_foreach print_ast eval_expr env ep loc s sl el al with
+    try ifun.print_foreach print_ast eval_expr env ep loc s sl el al with
     [ Not_found ->
-        templ_print_foreach conf print_ast set_vother env ep loc s sl el al ]
+        templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl
+          el al ]
   in
   let print_wid_hei env fname =
     match Util.image_size (Util.image_file_name fname) with
@@ -1225,7 +1236,7 @@ value interp_ast
     fun
     [ Atext _ s -> VVstring s
     | Avar loc s sl -> eval_string_var conf (eval_var env ep loc) [s :: sl]
-    | Atransl _ upp s n -> VVstring (eval_transl env upp s n)
+    | Atransl _ upp s n -> VVstring (ifun.eval_transl env upp s n)
     | Aif e alt ale -> VVstring (eval_if env ep e alt ale)
     | Aapply loc f all ->
         let vl = List.map (eval_ast_expr_list env ep) all in
@@ -1250,12 +1261,12 @@ value interp_ast
     let eval_var = eval_var env ep in
     templ_eval_expr conf (eval_var, eval_apply) e
   and eval_apply env ep loc f vl =
-    match get_def get_vother f env with
+    match get_def ifun.get_vother f env with
     [ Some (xl, al) ->
         let (env, al) =
           List.fold_right
             (fun a (env, al) ->
-               let (env, a) = eval_subst loc f set_vother env xl vl a in
+               let (env, a) = eval_subst loc f ifun.set_vother env xl vl a in
                (env, [a :: al]))
           al (env, [])
         in
@@ -1291,7 +1302,7 @@ value interp_ast
             with
             [ Failure _ -> "blue_of_hsv bad params" ]
         | _ ->
-            try eval_predefined_apply env f vl with
+            try ifun.eval_predefined_apply env f vl with
             [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
   and eval_if env ep e alt ale =
     let eval_var = eval_var env ep in
@@ -1326,18 +1337,18 @@ value interp_ast
         print_ast_list env ep al
       } ]
   and print_define env ep f xl al alk =
-    let env = set_def set_vother f xl al env in
+    let env = set_def ifun.set_vother f xl al env in
     print_ast_list env ep alk
   and print_apply env ep loc f ell =
     let vl = List.map (eval_ast_expr_list env ep) ell in
-    match get_def get_vother f env with
+    match get_def ifun.get_vother f env with
     [ Some (xl, al) ->
-        templ_print_apply loc f set_vother print_ast env ep xl al vl
+        templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
     | None ->
         Wserver.wprint "%s" (eval_apply env ep loc f vl) ]
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
-    let env = set_val set_vother k v env in
+    let env = set_val ifun.set_vother k v env in
     print_ast_list env ep al
   and print_if env ep e alt ale =
     let eval_var = eval_var env ep in
@@ -1350,10 +1361,7 @@ value interp_ast
   print_ast_list
 ;
 
-value interp
-  conf base fname eval_var eval_transl eval_predefined_apply get_vother
-  set_vother print_foreach env ep
-= do {
+value interp conf base fname ifun env ep = do {
   let v = template_file.val in
   template_file.val := fname;
   try
@@ -1361,8 +1369,7 @@ value interp
     [ Some astl -> do {
         Util.html conf;
         Util.nl ();
-        interp_ast conf (Some base) eval_var eval_transl
-         eval_predefined_apply get_vother set_vother print_foreach env ep astl
+        interp_ast conf (Some base) ifun env ep astl
       }
     | None ->
         error_cannot_access conf fname ]
@@ -1374,21 +1381,20 @@ value interp
 value copy_from_templ conf env ic = do {
   let astl = parse_templ conf (Stream.of_channel ic) in
   close_in ic;
-  let eval_var env accu loc =
-    fun
-    [ [s] -> VVstring (List.assoc s env)
-    | _ -> raise Not_found ]
+  let ifun =
+    {eval_var env accu loc =
+       fun
+       [ [s] -> VVstring (List.assoc s env)
+       | _ -> raise Not_found ];
+     eval_transl env = eval_transl conf;
+     eval_predefined_apply _ = raise Not_found;
+     get_vother _ = None;
+     set_vother _ = "";
+     print_foreach _ = raise Not_found}
   in
-  let eval_transl env = eval_transl conf in
-  let eval_predefined_apply _ = raise Not_found in
-  let get_vother _ = None in
-  let set_vother _ = "" in
-  let print_foreach _ = raise Not_found in
   let v = template_file.val in
   template_file.val := "";
-  try
-    interp_ast conf None eval_var eval_transl eval_predefined_apply
-      get_vother set_vother print_foreach env () astl
-  with e -> do { template_file.val := v; raise e };
+  try interp_ast conf None ifun env () astl with e ->
+    do { template_file.val := v; raise e };
   template_file.val := v;
 };
