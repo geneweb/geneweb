@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.14 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: place.ml,v 5.15 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -247,7 +247,7 @@ value print_all_places_surnames_short conf list =
       (if add_marriage then ";ma=on" else "")
   in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     print_link_to_welcome conf True;
     stag "a" "href=\"%sm=PS%s;k=\"" (commd conf) opt begin
       Wserver.wprint "%s" (transl conf "long display");
@@ -281,7 +281,7 @@ value print_all_places_surnames_long conf base list =
       (capitale (transl_nth conf "surname/surnames" 0))
   in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     print_link_to_welcome conf True;
     if list = [] then () else print_html_places_surnames conf base list;
     Hutil.trailer conf

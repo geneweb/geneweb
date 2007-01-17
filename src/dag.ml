@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.12 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: dag.ml,v 5.13 2007-01-17 14:40:34 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -939,7 +939,7 @@ value print_slices_menu conf hts =
   in
   let title _ = Wserver.wprint "%s" (txt 0) in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     Util.print_link_to_welcome conf True;
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       html_p conf;
@@ -1010,7 +1010,7 @@ value print_dag_page conf base page_title hts next_txt =
   in
   let title _ = Wserver.wprint "%s" page_title in
   do {
-    Util.header_no_page_title conf title;
+    Hutil.header_no_page_title conf title;
     print_html_table conf hts;
     if next_txt <> "" then
       tag "p" begin

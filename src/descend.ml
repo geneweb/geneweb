@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.19 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: descend.ml,v 5.20 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -1172,7 +1172,7 @@ value print_tree conf base v p =
 value print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
   do {
-    Util.header conf (descendants_title conf base p);
+    Hutil.header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
     Wserver.wprint "%s.<br><p>" (capitale (text_to conf max_level));
     let rec loop_ind lev lab p =

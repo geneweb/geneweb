@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.48 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.49 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -339,7 +339,7 @@ value print_renamed conf new_n =
   | None ->
       let title _ = Wserver.wprint "%s -&gt; %s" conf.bname new_n in
       do {
-        Util.header conf title;
+        Hutil.header conf title;
         let link = link () in
         tag "ul" begin
           Util.html_li conf;
@@ -381,7 +381,7 @@ value print_redirected conf from request new_addr =
     | None ->
         let title _ = Wserver.wprint "Address changed" in
         do {
-          Util.header conf title;
+          Hutil.header conf title;
           Wserver.wprint "Use the following address:\n<p>\n";
           tag "ul" begin
             Util.html_li conf;
@@ -396,7 +396,7 @@ value print_redirected conf from request new_addr =
 value propose_base conf =
   let title _ = Wserver.wprint "Base" in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     tag "ul" begin
       Util.html_li conf;
       Wserver.wprint "<form method=\"get\" action=\"%s\">\n"
@@ -1374,7 +1374,7 @@ value auth_err request auth_file =
 value no_access conf =
   let title _ = Wserver.wprint "Error" in
   do {
-    Util.rheader conf title;
+    Hutil.rheader conf title;
     Wserver.wprint "No access to this database in CGI mode\n";
     Hutil.trailer conf;
   }

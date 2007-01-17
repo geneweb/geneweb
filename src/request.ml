@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.48 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: request.ml,v 5.49 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -656,7 +656,7 @@ value print_moved conf base s =
   | None ->
       let title _ = Wserver.wprint "%s -&gt; %s" conf.bname s in
       do {
-        Util.header_no_page_title conf title;
+        Hutil.header_no_page_title conf title;
         Wserver.wprint "The database %s has moved to:\n<dl><dt><dd>\n"
           conf.bname;
         stag "a" "href=\"%s\"" s begin Wserver.wprint "%s" s; end;
@@ -726,7 +726,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
         Wserver.wprint "%s" (Util.capitale (transl conf "error"))
       in
       do {
-        Util.rheader conf title;
+        Hutil.rheader conf title;
         Wserver.wprint "<ul>";
         Util.html_li conf;
         Wserver.wprint "%s"

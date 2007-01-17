@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.4 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: doc.ml,v 5.5 2007-01-17 14:40:34 ddr Exp $ *)
 
 open Config;
 
@@ -217,7 +217,7 @@ value print_whole_wdoc conf fdoc title s =
   | None ->
       let title _ = Wserver.wprint "Error" in
       do {
-        Util.header conf title;
+        Hutil.header conf title;
         Wserver.wprint "<ul>\n<li>\n";
         Wserver.wprint "Cannot access file \"wdoc.txt\".\n";
         Wserver.wprint "</li>\n</ul>\n";
@@ -228,7 +228,7 @@ value print_whole_wdoc conf fdoc title s =
 
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
-    Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    Hutil.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
     let s = Util.filter_html_tags s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in

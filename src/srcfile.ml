@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.35 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.36 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -502,7 +502,7 @@ value gen_print with_logo mode conf base fname =
   | _ ->
       let title _ = Wserver.wprint "Error" in
       do {
-        Util.header conf title;
+        Hutil.header conf title;
         tag "ul" begin
           html_li conf;
           Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
@@ -632,7 +632,7 @@ value print_lexicon conf base =
     search_in_lang_path (Filename.concat "lang" f)
   in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do {

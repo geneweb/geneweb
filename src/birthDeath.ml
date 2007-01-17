@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.29 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.30 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -625,7 +625,7 @@ value print_population_pyramid conf base = do {
       else Wserver.wprint "&nbsp;";
     end
   in
-  Util.header conf title;
+  Hutil.header conf title;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
     let max_wom = Array.fold_left max 0 wom in
