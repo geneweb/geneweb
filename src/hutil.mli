@@ -1,11 +1,15 @@
-(* $Id: hutil.mli,v 5.1 2007-01-17 14:27:24 ddr Exp $ *)
+(* $Id: hutil.mli,v 5.2 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
 open Gwdb;
 
-value gen_trailer : bool -> config -> unit;
+value header : config -> (bool -> unit) -> unit;
 value trailer : config -> unit;
+
+value header_no_page_title : config -> (bool -> unit) -> unit;
+value rheader : config -> (bool -> unit) -> unit;
+value gen_trailer : bool -> config -> unit;
 
 value incorrect_request : config -> unit;
 

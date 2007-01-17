@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeDup.ml,v 5.5 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: mergeDup.ml,v 5.6 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -25,7 +25,7 @@ value print_no_candidate conf base (ip, p) = do {
          (transl_decline conf "merge" (transl conf "possible duplications")))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
-  Util.header conf title;
+  Hutil.header conf title;
   Util.print_link_to_welcome conf True;
   Wserver.wprint "%s\n" (capitale (transl conf "not found"));
   tag "ul" begin
@@ -55,7 +55,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
     Wserver.wprint "%s\n" (capitale (transl conf "merge"))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
-  Util.header conf title;
+  Hutil.header conf title;
   Util.print_link_to_welcome conf True;
   tag "ul" begin
     tag "li" begin print_link conf base (poi base ip1); end;
@@ -90,7 +90,7 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
          (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
-  Util.header conf title;
+  Hutil.header conf title;
   Util.print_link_to_welcome conf True;
   let (ip1, ip2) =
     let cpl = coi base ifam1 in

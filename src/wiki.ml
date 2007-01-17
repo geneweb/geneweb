@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.17 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.18 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -808,7 +808,7 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
   in
   do {
-    Util.header_no_page_title conf title;
+    Hutil.header_no_page_title conf title;
     tag "div" "style=\"text-align:center\"" begin
       Wserver.wprint "--- ";
       title ();

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.27 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: util.mli,v 5.28 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -97,9 +97,6 @@ value capitale : string -> string;
 value index_of_next_char : string -> int -> int;
 
 value header_without_http : config -> (bool -> unit) -> unit;
-value header_no_page_title : config -> (bool -> unit) -> unit;
-value header : config -> (bool -> unit) -> unit;
-value rheader : config -> (bool -> unit) -> unit;
 
 value open_etc_file : string -> option in_channel;
 value copy_from_etc :
@@ -174,7 +171,6 @@ value sosa_of_branch : list (iper * sex) -> Num.t;
 value link_to_referer : config -> string;
 value print_link_to_welcome : config -> bool -> unit;
 value gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit;
-value header_link_welcome : config -> (bool -> unit) -> unit;
 
 value has_image : config -> base -> person -> bool;
 value image_file_name : string -> string;

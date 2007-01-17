@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.99 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: util.ml,v 5.100 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -904,7 +904,6 @@ value create_env s =
   List.map (separate 0) (get_assoc 0 0)
 ;
 
-value red_color = "red";
 value std_color conf s =
   "<span style=\"color:" ^ conf.highlight ^ "\">" ^ s ^ "</span>"
 ;
@@ -1251,44 +1250,6 @@ value header_without_http conf title = do {
   Wserver.wprint "\n";
   message_to_wizard conf;
 };
-
-value header_without_page_title conf title = do {
-  html conf;
-  nl ();
-  header_without_http conf title;
-};
-
-value header conf title =
-  do {
-    header_without_page_title conf title;
-    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
-    title False;
-    Wserver.wprint "</h1>\n";
-  }
-;
-
-value rheader conf title =
-  do {
-    header_without_page_title conf title;
-    Wserver.wprint "<center><h1><font color=%s>" red_color;
-    title False;
-    Wserver.wprint "</font></h1></center>\n";
-  }
-;
-
-value header_no_page_title conf title =
-  do {
-    header_without_page_title conf title;
-    match p_getenv conf.env "title" with
-    [ None | Some "" -> ()
-    | Some x ->
-        do {
-          Wserver.wprint "<h1 align=\"center\"><font color=%s>" conf.highlight;
-          Wserver.wprint "%s" x;
-          Wserver.wprint "</font></h1>\n"
-        } ];
-  }
-;
 
 value http_string conf s i =
   let http = "http://" in
@@ -1897,16 +1858,6 @@ value gen_print_link_to_welcome f conf right_aligned =
 ;
 
 value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
-
-value header_link_welcome conf title =
-  do {
-    header_without_page_title conf title;
-    print_link_to_welcome conf True;
-    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
-    title False;
-    Wserver.wprint "</h1>\n";
-  }
-;
 
 value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with

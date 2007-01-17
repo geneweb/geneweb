@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.39 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.40 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -701,7 +701,7 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
 value print_killed conf base p nb_ind nb_fam =
   let title _ = Wserver.wprint "Ancestors killed" in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     Wserver.wprint "%s's ancestors killed.<br>\n"
       (referenced_person_title_text conf base p);
     Wserver.wprint "%d persons and %d families deleted<p>\n" nb_ind nb_fam;

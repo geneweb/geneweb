@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.44 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.45 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -312,7 +312,7 @@ value print_main conf base auth_file =
   in
   let wddir = dir conf base in
   do {
-    Util.header_no_page_title conf title; (* mouais... *)
+    Hutil.header_no_page_title conf title; (* mouais... *)
     print_link_to_welcome conf True;
     Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
     title False;
@@ -416,7 +416,7 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
 value print_part_wiznote conf base wz s cnt0 =
   let title = wz in
   do {
-    Util.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    Hutil.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
     let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in

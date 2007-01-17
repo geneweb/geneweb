@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.21 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: notes.ml,v 5.22 2007-01-17 14:40:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -237,7 +237,7 @@ value print_what_links conf base fnotes =
   in
   let db = notes_links_db conf base False in
   do {
-    Util.header conf title;
+    Hutil.header conf title;
     Util.print_link_to_welcome conf True;
     try
       let pl = List.assoc fnotes db in
