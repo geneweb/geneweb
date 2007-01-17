@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.22 2007-01-17 04:39:50 ddr Exp $ *)
+(* $Id: templ.ml,v 5.23 2007-01-17 10:14:40 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -548,7 +548,7 @@ value open_templ conf name =
         else None ]
 ;
 
-value input conf fname =
+value input_templ conf fname =
   match open_templ conf fname with
   [ Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
@@ -1204,7 +1204,7 @@ value print_var print_ast conf base ifun env ep loc sl =
     [ Not_found ->
         match sl with
         [ ["include"; templ] ->
-            match input conf templ with
+            match input_templ conf templ with
             [ Some astl -> List.iter (print_ast env ep) astl
             | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
         | sl ->
@@ -1373,7 +1373,7 @@ value interp conf base fname ifun env ep = do {
   let v = template_file.val in
   template_file.val := fname;
   try
-    match input conf fname with
+    match input_templ conf fname with
     [ Some astl -> do {
         Util.html conf;
         Util.nl ();
