@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.49 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.50 2007-01-17 14:46:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -497,7 +497,7 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
       (fcapitale (ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
-  Util.header_without_http conf title;
+  Hutil.header_without_http conf title;
   tag "h1" begin title False; end;
   tag "dl" begin
     let (alt_bind, alt_access) =

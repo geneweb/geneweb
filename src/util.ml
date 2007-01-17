@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.100 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: util.ml,v 5.101 2007-01-17 14:46:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1217,39 +1217,6 @@ value doctype conf =
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" ]
 ;
-
-value header_without_http conf title = do {
-  Wserver.wprint "%s\n" (doctype conf);
-  Wserver.wprint "<html>\n<head>\n";
-  Wserver.wprint "  <title>";
-  title True;
-  Wserver.wprint "</title>\n";
-  Wserver.wprint "  <meta name=\"robots\" content=\"none\"%s>\n" conf.xhs;
-  Wserver.wprint "  <meta http-equiv=\"Content-Type\" \
-                    content=\"text/html; charset=%s\"%s>\n"
-    conf.charset conf.xhs;
-  Wserver.wprint
-    "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
-    conf.xhs;
-  Wserver.wprint "  \
-  <style type=\"text/css\"><!--
-    .highlight { color: %s; font-weight: bold }
-    .found { color: black; background-color: #afa;font-weight:bold }
-    hr { border: 0; border-bottom: 1px solid }
-    a.date { text-decoration: none; color: black }
-    div.summary ul { padding-left: 0; list-style-type: none }
-    div.summary ul ul { padding-left: 1.618em }
-  --></style>\n" conf.highlight;
-  include_hed_trl conf None ".hed";
-  Wserver.wprint "</head>\n";
-  let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
-    [ Not_found -> "" ]
-  in
-  let s = s ^ body_prop conf in Wserver.wprint "<body%s>" s;
-  Wserver.wprint "\n";
-  message_to_wizard conf;
-};
 
 value http_string conf s i =
   let http = "http://" in
