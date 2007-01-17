@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.12 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: forum.ml,v 5.13 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Util;
@@ -607,7 +607,7 @@ value print_forum_message conf base r so =
         else [("pos", Vpos (ref MF.not_a_pos))]
     | None -> [("pos", Vpos (ref MF.not_a_pos))] ]
   in
-  Templ.interp conf base "forum"
+  Hutil.interp conf base "forum"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;
@@ -627,7 +627,7 @@ value print conf base =
 
 value print_forum_headers conf base =
   let env = [("pos", Vpos (ref MF.not_a_pos))] in
-  Templ.interp conf base "forum"
+  Hutil.interp conf base "forum"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;
@@ -703,7 +703,7 @@ value forum_add conf base moderated mess =
 value visualize conf base mess =
   let vmess = Vmess mess None MF.not_a_pos MF.not_a_pos None in
   let env = [("mess", vmess)] in
-  Templ.interp conf base "forum"
+  Hutil.interp conf base "forum"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

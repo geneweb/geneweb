@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.10 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: dag.ml,v 5.11 2007-01-17 13:40:45 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -1316,7 +1316,7 @@ value print_slices_menu_or_dag_page conf base page_title hts next_txt =
     in
     [("dag", Vlazy (Lazy.lazy_from_fun table_pre_dim))]
   in
-  Templ.interp conf base "dag"
+  Hutil.interp conf base "dag"
     {Templ.eval_var = eval_var conf page_title next_txt;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.27 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.28 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -562,7 +562,7 @@ value set_vother x = Vother x;
 value print_statistics conf base =
   if p_getenv conf.env "old" = Some "on" then old_print_statistics conf base
   else
-  Templ.interp conf base "stats"
+  Hutil.interp conf base "stats"
     {Templ.eval_var _ = raise Not_found;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

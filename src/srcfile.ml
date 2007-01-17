@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.33 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.34 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -605,7 +605,7 @@ value print_start conf base =
       [("sosa_ref", Vsosa_ref sosa_ref_l)]
     in
     Wserver.wrap_string.val := Util.xml_pretty_print;
-    Templ.interp conf base "welcome"
+    Hutil.interp conf base "welcome"
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl env = Templ.eval_transl conf;
        Templ.eval_predefined_apply = eval_predefined_apply conf;

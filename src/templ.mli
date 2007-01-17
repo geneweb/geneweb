@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 5.4 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: templ.mli,v 5.5 2007-01-17 13:40:45 ddr Exp $ *)
 
 open Config;
 open Gwdb;
@@ -24,5 +24,11 @@ type interp_fun 'a 'b =
          list (list ast) -> list ast -> unit }
 ;
 
-value interp :
-  config -> base -> string -> interp_fun 'a 'b -> env 'a -> 'b -> unit;
+value interp_ast :
+  config -> option base -> interp_fun 'a 'b -> env 'a -> 'b -> list ast ->
+    unit;
+
+(**)
+
+value template_file : ref string;
+value input_templ : config -> string -> option (list ast);

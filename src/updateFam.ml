@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.14 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.15 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -395,7 +395,7 @@ value print_update_fam conf base fcd digest =
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let env = [("digest", Vstring digest)] in
-      Templ.interp conf base "updfam"
+      Hutil.interp conf base "updfam"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
          Templ.eval_predefined_apply _ = raise Not_found;
