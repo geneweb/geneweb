@@ -1,8 +1,64 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: hutil.ml,v 5.5 2007-01-17 14:46:50 ddr Exp $ *)
+(* $Id: hutil.ml,v 5.6 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
+open Printf;
+
+value up_fname conf = "up.jpg";
+
+value commd_no_params conf =
+  conf.command ^ "?" ^
+    List.fold_left
+      (fun c (k, v) ->
+         c ^ (if c = "" then "" else ";") ^ k ^
+           (if v = "" then "" else "=" ^ v))
+      "" conf.henv
+;
+
+value link_to_referer conf =
+  let referer = Wserver.extract_param "referer: " '\n' conf.request in
+  if referer <> "" then
+    let fname = "left.jpg" in
+    let wid_hei =
+      match Util.image_size (Util.image_file_name fname) with
+      [ Some (wid, hei) ->
+          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
+          string_of_int hei ^ "\""
+      | None -> "" ]
+    in
+    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\"%s></a>\n"
+      referer (Util.image_prefix conf) fname wid_hei conf.xhs
+  else ""
+;
+
+value gen_print_link_to_welcome f conf right_aligned =
+  if conf.cancel_links then ()
+  else do {
+    let fname = up_fname conf in
+    let wid_hei =
+      match Util.image_size (Util.image_file_name fname) with
+      [ Some (wid, hei) ->
+          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
+          string_of_int hei ^ "\""
+      | None -> "" ]
+    in
+    if right_aligned then
+      Wserver.wprint "<div style=\"float:%s\">\n" conf.right
+    else Wserver.wprint "<p>\n";
+    f ();
+    let str = link_to_referer conf in
+    if str = "" then () else Wserver.wprint "%s" str;
+    Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
+    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>"
+      (Util.image_prefix conf) fname wid_hei conf.xhs;
+    Wserver.wprint "</a>\n";
+    if right_aligned then Wserver.wprint "</div>\n"
+    else Wserver.wprint "</p>\n"
+  }
+;
+
+value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 
 value header_without_http conf title = do {
   Wserver.wprint "%s\n" (Util.doctype conf);
@@ -45,7 +101,7 @@ value header_without_page_title conf title = do {
 
 value header_link_welcome conf title = do {
   header_without_page_title conf title;
-  Util.print_link_to_welcome conf True;
+  print_link_to_welcome conf True;
   Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
   title False;
   Wserver.wprint "</h1>\n";
@@ -102,7 +158,7 @@ value incorrect_request conf = do {
   in
   header conf title;
   Wserver.wprint "<p>\n";
-  Util.print_link_to_welcome conf False;
+  print_link_to_welcome conf False;
   Wserver.wprint "</p>\n";
   trailer conf
 };

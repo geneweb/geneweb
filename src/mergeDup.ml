@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeDup.ml,v 5.6 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: mergeDup.ml,v 5.7 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -26,7 +26,7 @@ value print_no_candidate conf base (ip, p) = do {
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
-  Util.print_link_to_welcome conf True;
+  Hutil.print_link_to_welcome conf True;
   Wserver.wprint "%s\n" (capitale (transl conf "not found"));
   tag "ul" begin
     tag "li" begin print_link conf base p; end;
@@ -56,7 +56,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
-  Util.print_link_to_welcome conf True;
+  Hutil.print_link_to_welcome conf True;
   tag "ul" begin
     tag "li" begin print_link conf base (poi base ip1); end;
     tag "li" begin print_link conf base (poi base ip2); end;
@@ -91,7 +91,7 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
-  Util.print_link_to_welcome conf True;
+  Hutil.print_link_to_welcome conf True;
   let (ip1, ip2) =
     let cpl = coi base ifam1 in
     (Gwdb.get_father cpl, Gwdb.get_mother cpl)

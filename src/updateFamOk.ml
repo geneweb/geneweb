@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.41 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.42 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -299,7 +299,7 @@ value print_error_disconnected conf =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Util.print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     Wserver.wprint "\
 Sorry, you can add only families connected to the rest.<br>
 This restriction has been added by this database owner.

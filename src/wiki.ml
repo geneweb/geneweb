@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.18 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.19 2007-01-17 15:07:26 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -814,7 +814,7 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
       title ();
       Wserver.wprint " ---\n";
     end;
-    Util.print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     let get_v = Util.p_getint conf.env "v" in
     let v =
       match get_v with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.13 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: dag.ml,v 5.14 2007-01-17 15:07:25 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -940,7 +940,7 @@ value print_slices_menu conf hts =
   let title _ = Wserver.wprint "%s" (txt 0) in
   do {
     Hutil.header conf title;
-    Util.print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       html_p conf;
       hidden_env conf;
