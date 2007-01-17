@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.25 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: templ.ml,v 5.26 2007-01-17 17:56:45 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -637,6 +637,16 @@ value not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 ;
 
+value setup_link conf =
+  let s = Wserver.extract_param "host: " '\r' conf.request in
+  try
+    let i = String.rindex s ':' in
+    let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
+    "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
+  with
+  [ Not_found -> "" ]
+;
+
 value rec eval_variable conf =
   fun
   [ ["bvar"; v] ->
@@ -661,6 +671,29 @@ and eval_simple_variable conf =
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
   | "compilation_time" -> Util.compilation_time conf
+  | "connections" ->
+      match conf.n_connect with
+      [ Some (c, cw, cf, _) ->
+          if c > 0 then
+            "- " ^ sprintf "%s %d" (Util.transl conf "connections") c ^
+            (if cw > 0 then
+               sprintf ", %s %s"
+                 (Util.transl_nth conf
+                    "wizard/wizards/friend/friends/exterior" 1)
+                 (if conf.wizard then
+                    sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
+                       (Util.commd conf) cw
+                  else
+                    string_of_int cw)
+             else "") ^
+            (if cf > 0 then
+               sprintf ", %s %d"
+                 (Util.transl_nth conf
+                    "wizard/wizards/friend/friends/exterior" 3)
+                 cf
+             else "")
+          else ""
+      | None -> "" ]
   | "doctype" -> Util.doctype conf ^ "\n"
   | "doctype_transitional" ->
       let doctype =
@@ -682,6 +715,7 @@ and eval_simple_variable conf =
       conf.command ^ "?" ^ (if conf.cgi then "b=" ^ conf.bname ^ ";" else "")
   | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
   | "right" -> conf.right
+  | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
   | "version" -> Version.txt
   | "/" -> conf.xhs
@@ -1172,14 +1206,19 @@ value print_wid_hei env fname =
   | None -> () ]
 ;
 
-value setup_link conf =
-  let s = Wserver.extract_param "host: " '\r' conf.request in
-  try
-    let i = String.rindex s ':' in
-    let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
-    "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
-  with
-  [ Not_found -> "" ]
+value copy_from_templ_fwd = ref (fun []);
+value copy_from_templ conf env ic = copy_from_templ_fwd.val conf env ic;
+
+value print_copyright conf =
+  match Util.open_etc_file "copyr" with
+  [ Some ic -> copy_from_templ conf [] ic
+  | None -> do {
+      Util.html_p conf;
+      Wserver.wprint "
+<hr><font size=\"-1\"><em>Copyright (c) 1998-2007 INRIA -
+GeneWeb %s</em></font>" Version.txt;
+      Util.html_br conf;
+    } ]
 ;
 
 value rec interp_ast conf base ifun =
@@ -1276,7 +1315,8 @@ value rec interp_ast conf base ifun =
   in
   let rec print_ast env ep =
     fun
-    [ Avar loc s sl -> print_var print_ast conf base ifun env ep loc [s :: sl]
+    [ Avar loc s sl ->
+        print_var print_ast_list conf base ifun env ep loc [s :: sl]
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->
@@ -1322,7 +1362,7 @@ value rec interp_ast conf base ifun =
     print_ast_list env ep al
   in
   print_ast_list
-and print_var print_ast conf base ifun env ep loc sl =
+and print_var print_ast_list conf base ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
@@ -1335,7 +1375,7 @@ and print_var print_ast conf base ifun env ep loc sl =
         match sl with
         [ ["include"; templ] ->
             match input_templ conf templ with
-            [ Some astl -> List.iter (print_ast env ep) astl
+            [ Some astl -> print_ast_list env ep astl
             | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
         | sl ->
             print_variable conf base sl ] ]
@@ -1360,56 +1400,6 @@ and print_variable conf base_opt sl =
         | _ -> raise Not_found ]
       with
       [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ] ]
-and print_copyright conf =
-  let env =
-    [('s', fun _ -> Util.commd conf);
-     ('c', fun _ -> Util.compilation_time conf);
-     ('C', fun _ -> if Mutil.utf_8_db.val then "&copy;" else "(c)");
-     ('d',
-      fun _ ->
-        let s =
-          if conf.cancel_links then ""
-          else
-            sprintf " - <a href=\"%sm=DOC\">DOC</a>" (Util.commd conf)
-        in
-        if not conf.setup_link then s
-        else s ^ " - " ^ setup_link conf);
-     ('O',
-      fun _ ->
-        match conf.n_connect with
-        [ Some (c, cw, cf, _) ->
-            if c > 0 then
-              "- " ^ sprintf "%s %d" (Util.transl conf "connections") c ^
-              (if cw > 0 then
-                 sprintf ", %s %s"
-                   (Util.transl_nth conf
-                      "wizard/wizards/friend/friends/exterior" 1)
-                   (if conf.wizard then
-                      sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
-                         (Util.commd conf) cw
-                    else
-                      string_of_int cw)
-               else "") ^
-              (if cf > 0 then
-                 sprintf ", %s %d"
-                   (Util.transl_nth conf
-                      "wizard/wizards/friend/friends/exterior" 3)
-                   cf
-               else "")
-            else ""
-        | None -> "" ]);
-     ('/', fun _ -> conf.xhs)]
-  in
-  match Util.open_etc_file "copyr" with
-  [ Some ic -> Util.copy_from_etc env conf.lang conf.indep_command ic
-  | None ->
-      do {
-        Util.html_p conf;
-        Wserver.wprint "
-<hr><font size=\"-1\"><em>Copyright (c) 1998-2007 INRIA -
-GeneWeb %s</em></font>" Version.txt;
-        Util.html_br conf;
-      } ]
 ;
 
 value copy_from_templ conf env ic = do {
@@ -1432,3 +1422,5 @@ value copy_from_templ conf env ic = do {
     do { template_file.val := v; raise e };
   template_file.val := v;
 };
+
+copy_from_templ_fwd.val := copy_from_templ;

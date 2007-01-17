@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.29 2006-12-04 13:59:14 ddr Exp $ *)
+(* $Id: launch.ml,v 1.30 2007-01-17 17:56:45 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Camltk;
@@ -9,6 +9,7 @@ type state =
     config_env : mutable list (string * string);
     bin_dir : mutable string;
     sys_dir : mutable string;
+    doc_dir : mutable string;
     port : mutable int;
     browser : mutable option string;
     bases_dir : mutable string;
@@ -463,7 +464,7 @@ and launch_server state = do {
   let args =
     ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
      "127.0.0.1"; "-only"; only; "-hd"; state.sys_dir; "-bd";
-     state.bases_dir :: rest_of_args]
+     state.bases_dir; "-dd"; state.doc_dir :: rest_of_args]
   in
   eprintf "%s" comm;
   List.iter (fun a -> eprintf " %s" a) args;
@@ -769,6 +770,7 @@ and config_bin_dir state =
 
 value default_bin_dir = "../src";
 value default_sys_dir = "../hd";
+value default_doc_dir = "../doc";
 value default_port = 2317;
 value default_browser = None;
 value default_bases_dir = "../../gwbases";
@@ -785,10 +787,10 @@ value main () = do {
   let win = openTk () in
   let state =
     {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
-     sys_dir = default_sys_dir; port = default_port;
-     browser = default_browser; bases_dir = default_bases_dir;
-     browser_lang = True; digest_auth = False; server_running = None;
-     waiting_pids = []}
+     sys_dir = default_sys_dir; doc_dir = default_doc_dir;
+     port = default_port; browser = default_browser;
+     bases_dir = default_bases_dir; browser_lang = True; digest_auth = False;
+     server_running = None; waiting_pids = []}
   in
   Encoding.system_set "utf-8";
   Wm.minsize_set state.tk_win 400 300;
