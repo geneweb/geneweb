@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.21 2007-01-17 04:24:03 ddr Exp $ *)
+(* $Id: templ.ml,v 5.22 2007-01-17 04:39:50 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1021,17 +1021,6 @@ and print_simple_variable conf base_opt =
   | _ -> raise Not_found ]
 ;
 
-value rec print_var conf base eval_var sl =
-  try
-    match eval_var sl with
-    [ VVstring s -> Wserver.wprint "%s" s
-    | VVbool True -> Wserver.wprint "1"
-    | VVbool False -> Wserver.wprint "0"
-    | VVother f -> print_var conf base f [] ]
-  with
-  [ Not_found -> print_variable conf base sl ]
-;
-
 type vother 'a =
   [ Vdef of list string and list ast
   | Vval of expr_val 'a
@@ -1128,7 +1117,6 @@ value print_apply loc f set_vother print_ast env ep gxl al gvl =
 ;
 
 value templ_eval_expr = eval_string_expr;
-value templ_print_var = print_var;
 value templ_print_apply = print_apply;
 
 value rec templ_print_foreach conf print_ast set_vother env ep loc s sl el al =
@@ -1205,12 +1193,25 @@ value eval_var conf ifun env ep loc sl =
 ;
 
 value print_var print_ast conf base ifun env ep loc sl =
-  match sl with
-  [ ["include"; templ] ->
-      match input conf templ with
-      [ Some astl -> List.iter (print_ast env ep) astl
-      | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
-  | _ -> templ_print_var conf base (eval_var conf ifun env ep loc) sl ]
+  let rec print_var1 eval_var sl =
+    try
+      match eval_var sl with
+      [ VVstring s -> Wserver.wprint "%s" s
+      | VVbool True -> Wserver.wprint "1"
+      | VVbool False -> Wserver.wprint "0"
+      | VVother f -> print_var1 f [] ]
+    with
+    [ Not_found ->
+        match sl with
+        [ ["include"; templ] ->
+            match input conf templ with
+            [ Some astl -> List.iter (print_ast env ep) astl
+            | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
+        | sl ->
+            print_variable conf base sl ] ]
+  in
+  let eval_var = eval_var conf ifun env ep loc in
+  print_var1 eval_var sl
 ;
 
 value print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
