@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.27 2007-01-17 18:25:42 ddr Exp $ *)
+(* $Id: templ.ml,v 5.28 2007-01-17 18:37:54 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -1224,6 +1224,38 @@ value print_copyright conf =
     } ]
 ;
 
+value include_hed_trl conf base_opt suff =
+  let hed_fname =
+    let fname = Util.base_path ["lang"; conf.lang] (conf.bname ^ suff) in
+    if Sys.file_exists fname then fname
+    else Util.base_path ["lang"] (conf.bname ^ suff)
+  in
+  match try Some (Secure.open_in hed_fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let url () =
+        match base_opt with
+        [ Some base -> Util.url_no_index conf base
+        | None -> Util.get_server_string conf ^ Util.get_request_string conf ]
+      in
+      let pref () =
+        let s = url () in
+        match Mutil.rindex s '?' with
+        [ Some i -> String.sub s 0 (i + 1)
+        | None -> s ]
+      in
+      let suff () =
+        let s = url () in
+        match Mutil.rindex s '?' with
+        [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
+        | None -> "" ]
+      in
+      Util.copy_from_etc
+        [('p', pref); ('s', suff); ('t', fun _ -> Util.commd conf);
+          ('/', fun _ -> conf.xhs)]
+        conf.lang conf.indep_command ic
+  | None -> () ]
+;
+
 value rec interp_ast conf base ifun =
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
@@ -1387,8 +1419,8 @@ and print_var print_ast_list conf base ifun env ep loc sl =
   print_var1 eval_var sl
 and print_simple_variable conf base_opt =
   fun
-  [ "base_header" -> Util.include_hed_trl conf base_opt ".hed"
-  | "base_trailer" -> Util.include_hed_trl conf base_opt ".trl"
+  [ "base_header" -> include_hed_trl conf base_opt ".hed"
+  | "base_trailer" -> include_hed_trl conf base_opt ".trl"
   | "body_prop" -> print_body_prop conf
   | "copyright" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf

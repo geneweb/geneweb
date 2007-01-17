@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.30 2007-01-17 15:07:26 ddr Exp $ *)
+(* $Id: util.mli,v 5.31 2007-01-17 18:37:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -104,7 +104,6 @@ value string_with_macros :
 value filter_html_tags : string -> string;
 value allowed_tags_file : ref string;
 value body_prop : config -> string;
-value include_hed_trl : config -> option base -> string -> unit;
 value url_no_index : config -> base -> string;
 value message_to_wizard : config -> unit;
 

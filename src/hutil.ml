@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: hutil.ml,v 5.6 2007-01-17 15:07:26 ddr Exp $ *)
+(* $Id: hutil.ml,v 5.7 2007-01-17 18:37:54 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -82,7 +82,7 @@ value header_without_http conf title = do {
     div.summary ul { padding-left: 0; list-style-type: none }
     div.summary ul ul { padding-left: 1.618em }
   --></style>\n" conf.highlight;
-  Util.include_hed_trl conf None ".hed";
+  Templ.include_hed_trl conf None ".hed";
   Wserver.wprint "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
@@ -146,7 +146,7 @@ value gen_trailer with_logo conf = do {
 " (Util.commd conf) (Util.image_prefix conf) conf.right
     conf.xhs conf.xhs;
   Templ.print_copyright conf;
-  Util.include_hed_trl conf None ".trl";
+  Templ.include_hed_trl conf None ".trl";
   Wserver.wprint "</body>\n</html>\n";
 };
 
