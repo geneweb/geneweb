@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.28 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: util.mli,v 5.29 2007-01-17 14:46:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -95,8 +95,6 @@ value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
 value capitale : string -> string;
 value index_of_next_char : string -> int -> int;
-
-value header_without_http : config -> (bool -> unit) -> unit;
 
 value open_etc_file : string -> option in_channel;
 value copy_from_etc :

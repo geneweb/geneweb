@@ -1,13 +1,46 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: hutil.ml,v 5.4 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: hutil.ml,v 5.5 2007-01-17 14:46:50 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
 
+value header_without_http conf title = do {
+  Wserver.wprint "%s\n" (Util.doctype conf);
+  Wserver.wprint "<html>\n<head>\n";
+  Wserver.wprint "  <title>";
+  title True;
+  Wserver.wprint "</title>\n";
+  Wserver.wprint "  <meta name=\"robots\" content=\"none\"%s>\n" conf.xhs;
+  Wserver.wprint "  <meta http-equiv=\"Content-Type\" \
+                    content=\"text/html; charset=%s\"%s>\n"
+    conf.charset conf.xhs;
+  Wserver.wprint
+    "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
+    conf.xhs;
+  Wserver.wprint "  \
+  <style type=\"text/css\"><!--
+    .highlight { color: %s; font-weight: bold }
+    .found { color: black; background-color: #afa;font-weight:bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+    div.summary ul { padding-left: 0; list-style-type: none }
+    div.summary ul ul { padding-left: 1.618em }
+  --></style>\n" conf.highlight;
+  Util.include_hed_trl conf None ".hed";
+  Wserver.wprint "</head>\n";
+  let s =
+    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
+    [ Not_found -> "" ]
+  in
+  let s = s ^ Util.body_prop conf in Wserver.wprint "<body%s>" s;
+  Wserver.wprint "\n";
+  Util.message_to_wizard conf;
+};
+
 value header_without_page_title conf title = do {
   Util.html conf;
   Util.nl ();
-  Util.header_without_http conf title;
+  header_without_http conf title;
 };
 
 value header_link_welcome conf title = do {
