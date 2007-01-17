@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.50 2007-01-11 18:00:17 ddr Exp $ *)
+(* $Id: perso.ml,v 5.51 2007-01-17 04:07:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2975,9 +2975,13 @@ value interp_templ templ_fname conf base p = do {
      ("nldb", Vlazy (Lazy.lazy_from_fun nldb));
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
-  Templ.interp conf base templ_fname (eval_var conf base) (eval_transl conf)
-    (eval_predefined_apply conf) get_vother set_vother
-    (print_foreach conf base) env ep
+  Templ.interp conf base templ_fname
+    {Templ.eval_var = eval_var conf base;
+     Templ.eval_transl = eval_transl conf;
+     Templ.eval_predefined_apply = eval_predefined_apply conf;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf base}
+    env ep
 };
 
 (* Main *)

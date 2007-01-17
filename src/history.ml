@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: history.ml,v 5.10 2006-11-20 11:41:56 ddr Exp $ *)
+(* $Id: history.ml,v 5.11 2007-01-17 04:07:38 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -372,9 +372,13 @@ value gen_print conf base hoo =
     [ Some ho -> [("search", Vsearch ho) :: env]
     | None -> env ]
   in
-  Templ.interp conf base "updhist" (eval_var conf base)
-    (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
-    get_vother set_vother (print_foreach conf base) env ()
+  Templ.interp conf base "updhist"
+    {Templ.eval_var = eval_var conf base;
+     Templ.eval_transl _ = Templ.eval_transl conf;
+     Templ.eval_predefined_apply _ = raise Not_found;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf base}
+    env ()
 ;
 
 value print conf base = gen_print conf base None;
