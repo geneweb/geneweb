@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.13 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: place.ml,v 5.14 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -261,7 +261,7 @@ value print_all_places_surnames_short conf list =
            Wserver.wprint "%s</a> (%d),\n" s len;
          })
       list;
-    Util.trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -284,7 +284,7 @@ value print_all_places_surnames_long conf base list =
     Util.header conf title;
     print_link_to_welcome conf True;
     if list = [] then () else print_html_places_surnames conf base list;
-    Util.trailer conf
+    Hutil.trailer conf
   }
 ;
 

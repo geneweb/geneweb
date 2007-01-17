@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.8 2007-01-12 05:24:45 ddr Exp $ *)
+(* $Id: merge.ml,v 5.9 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value print_someone conf base p =

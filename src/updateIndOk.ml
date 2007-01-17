@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.54 2006-12-29 19:38:04 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.55 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -7,6 +7,7 @@ open Def;
 open Futil;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Mutil;
 open Util;
 

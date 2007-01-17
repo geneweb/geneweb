@@ -1,7 +1,8 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.24 2007-01-17 13:40:45 ddr Exp $ *)
+(* $Id: templ.ml,v 5.25 2007-01-17 14:07:00 ddr Exp $ *)
 
 open Config;
+open Printf;
 open TemplAst;
 
 (* Parsing *)
@@ -704,7 +705,7 @@ value eval_string_var conf eval_var sl =
 
 value eval_var_handled conf sl =
   try eval_variable conf sl with
-  [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
+  [ Not_found -> sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
 value apply_format conf nth s1 s2 =
@@ -714,14 +715,14 @@ value apply_format conf nth s1 s2 =
     | None -> Util.ftransl conf s ]
   in
   match Util.check_format "%t" s1 with
-  [ Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
+  [ Some s3 -> sprintf (transl_nth_format s3) (fun _ -> s2)
   | None ->
       match Util.check_format "%s" s1 with
-      [ Some s3 -> Printf.sprintf (transl_nth_format s3) s2
+      [ Some s3 -> sprintf (transl_nth_format s3) s2
       | None ->
           match Util.check_format "%d" s1 with
           [ Some s3 ->
-              Printf.sprintf (transl_nth_format s3) (int_of_string s2)
+              sprintf (transl_nth_format s3) (int_of_string s2)
           | None ->
               match Util.check_format "%s%s" s1 with
               [ Some s3 ->
@@ -730,7 +731,7 @@ value apply_format conf nth s1 s2 =
                     (String.sub s2 0 i,
                      String.sub s2 (i + 1) (String.length s2 - i - 1))
                   in
-                  Printf.sprintf (transl_nth_format s3) s21 s22
+                  sprintf (transl_nth_format s3) s21 s22
               | None -> raise Not_found ] ] ] ]
 ;
 
@@ -935,22 +936,22 @@ value print_error conf (bp, ep) exc =
     incr nb_errors;
     IFDEF UNIX THEN do {
       if nb_errors.val <= 10 then do {
-        if template_file.val = "" then Printf.eprintf "*** <W> template file"
-        else Printf.eprintf "File \"%s.txt\"" template_file.val;
+        if template_file.val = "" then eprintf "*** <W> template file"
+        else eprintf "File \"%s.txt\"" template_file.val;
         let line =
           if template_file.val = "" then None
           else line_of_loc conf template_file.val (bp, ep)
         in
-        Printf.eprintf ", ";
+        eprintf ", ";
         match line with
         [ Some (lin, col1, col2) ->
-            Printf.eprintf "line %d, characters %d-%d:\n" lin col1 col2
+            eprintf "line %d, characters %d-%d:\n" lin col1 col2
         | None ->
-            Printf.eprintf "characters %d-%d:\n" bp ep ];
+            eprintf "characters %d-%d:\n" bp ep ];
         match exc with
-        [ Failure s -> Printf.eprintf "Failed - %s" s
-        | _ -> Printf.eprintf "%s" (Printexc.to_string exc) ];
-        Printf.eprintf "\n\n";
+        [ Failure s -> eprintf "Failed - %s" s
+        | _ -> eprintf "%s" (Printexc.to_string exc) ];
+        eprintf "\n\n";
         flush stderr;
       }
       else ();
@@ -1068,7 +1069,7 @@ value print_apply loc f set_vother print_ast env ep gxl al gvl =
         | _ ->
             (env,
              Atext loc
-               (Printf.sprintf "%s: bad # of params (%d instead of %d)" f
+               (sprintf "%s: bad # of params (%d instead of %d)" f
                   (List.length gvl) (List.length gxl))) ]
     in
     print_ast env ep a
@@ -1171,6 +1172,16 @@ value print_wid_hei env fname =
   | None -> () ]
 ;
 
+value setup_link conf =
+  let s = Wserver.extract_param "host: " '\r' conf.request in
+  try
+    let i = String.rindex s ':' in
+    let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
+    "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
+  with
+  [ Not_found -> "" ]
+;
+
 value rec interp_ast conf base ifun =
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
@@ -1253,7 +1264,7 @@ value rec interp_ast conf base ifun =
             [ Failure _ -> "blue_of_hsv bad params" ]
         | _ ->
             try ifun.eval_predefined_apply env f vl with
-            [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
+            [ Not_found -> sprintf "%%apply;%s?" f ] ] ]
   and eval_if env ep e alt ale =
     let eval_var = eval_var conf ifun env ep in
     let eval_ast = eval_ast env ep in
@@ -1336,7 +1347,7 @@ and print_simple_variable conf base_opt =
   [ "base_header" -> Util.include_hed_trl conf base_opt ".hed"
   | "base_trailer" -> Util.include_hed_trl conf base_opt ".trl"
   | "body_prop" -> print_body_prop conf
-  | "copyright" -> Util.print_copyright conf
+  | "copyright" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found ]
@@ -1349,6 +1360,56 @@ and print_variable conf base_opt sl =
         | _ -> raise Not_found ]
       with
       [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ] ]
+and print_copyright conf =
+  let env =
+    [('s', fun _ -> Util.commd conf);
+     ('c', fun _ -> Util.compilation_time conf);
+     ('C', fun _ -> if Mutil.utf_8_db.val then "&copy;" else "(c)");
+     ('d',
+      fun _ ->
+        let s =
+          if conf.cancel_links then ""
+          else
+            sprintf " - <a href=\"%sm=DOC\">DOC</a>" (Util.commd conf)
+        in
+        if not conf.setup_link then s
+        else s ^ " - " ^ setup_link conf);
+     ('O',
+      fun _ ->
+        match conf.n_connect with
+        [ Some (c, cw, cf, _) ->
+            if c > 0 then
+              "- " ^ sprintf "%s %d" (Util.transl conf "connections") c ^
+              (if cw > 0 then
+                 sprintf ", %s %s"
+                   (Util.transl_nth conf
+                      "wizard/wizards/friend/friends/exterior" 1)
+                   (if conf.wizard then
+                      sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
+                         (Util.commd conf) cw
+                    else
+                      string_of_int cw)
+               else "") ^
+              (if cf > 0 then
+                 sprintf ", %s %d"
+                   (Util.transl_nth conf
+                      "wizard/wizards/friend/friends/exterior" 3)
+                   cf
+               else "")
+            else ""
+        | None -> "" ]);
+     ('/', fun _ -> conf.xhs)]
+  in
+  match Util.open_etc_file "copyr" with
+  [ Some ic -> Util.copy_from_etc env conf.lang conf.indep_command ic
+  | None ->
+      do {
+        Util.html_p conf;
+        Wserver.wprint "
+<hr><font size=\"-1\"><em>Copyright (c) 1998-2007 INRIA -
+GeneWeb %s</em></font>" Version.txt;
+        Util.html_br conf;
+      } ]
 ;
 
 value copy_from_templ conf env ic = do {

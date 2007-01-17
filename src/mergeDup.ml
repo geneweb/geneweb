@@ -1,9 +1,10 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeDup.ml,v 5.4 2007-01-12 05:24:45 ddr Exp $ *)
+(* $Id: mergeDup.ml,v 5.5 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
 open Gwdb;
+open Hutil;
 open Util;
 
 value print_link conf base p = do {
@@ -30,7 +31,7 @@ value print_no_candidate conf base (ip, p) = do {
   tag "ul" begin
     tag "li" begin print_link conf base p; end;
   end;
-  Util.trailer conf;
+  Hutil.trailer conf;
 };
 
 value input_excl int_of_i excl =
@@ -79,7 +80,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
         (transl_nth conf "Y/N" 1);
     end;
   end;
-  Util.trailer conf;
+  Hutil.trailer conf;
 };
 
 value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
@@ -127,7 +128,7 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
         (transl_nth conf "Y/N" 1);
     end;
   end;
-  Util.trailer conf;
+  Hutil.trailer conf;
 };
 
 value main_page conf base =

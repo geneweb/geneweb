@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.98 2007-01-13 18:10:51 ddr Exp $ *)
+(* $Id: util.ml,v 5.99 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1521,94 +1521,12 @@ value string_with_macros conf env s =
     else filter_html_tags (Buffer.contents buff)
 ;
 
-value setup_link conf =
-  let s = Wserver.extract_param "host: " '\r' conf.request in
-  try
-    let i = String.rindex s ':' in
-    let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
-    "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
-  with
-  [ Not_found -> "" ]
-;
-
 value compilation_time_hook = ref (fun _ -> "");
 value compilation_time conf =
   match p_getenv conf.base_env "display_compilation_time" with
   [ Some "on" -> compilation_time_hook.val conf
   | _ -> "" ]
 ;
-
-value print_copyright conf =
-  let env =
-    [('s', fun _ -> commd conf);
-     ('c', fun _ -> compilation_time conf);
-     ('C', fun _ -> if Mutil.utf_8_db.val then "&copy;" else "(c)");
-     ('d',
-      fun _ ->
-        let s =
-          if conf.cancel_links then ""
-          else
-            sprintf " - <a href=\"%sm=DOC\">DOC</a>" (commd conf)
-        in
-        if not conf.setup_link then s
-        else s ^ " - " ^ setup_link conf);
-     ('O',
-      fun _ ->
-        match conf.n_connect with
-        [ Some (c, cw, cf, _) ->
-            if c > 0 then
-              "- " ^ sprintf "%s %d" (transl conf "connections") c ^
-              (if cw > 0 then
-                 sprintf ", %s %s"
-                   (transl_nth conf "wizard/wizards/friend/friends/exterior"
-                      1)
-                   (if conf.wizard then
-                      sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>" (commd conf)
-                         cw
-                    else
-                      string_of_int cw)
-               else "") ^
-              (if cf > 0 then
-                 sprintf ", %s %d"
-                   (transl_nth conf "wizard/wizards/friend/friends/exterior"
-                      3)
-                   cf
-               else "")
-            else ""
-        | None -> "" ]);
-     ('/', fun _ -> conf.xhs)]
-  in
-  match open_etc_file "copyr" with
-  [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
-  | None ->
-      do {
-        html_p conf;
-        Wserver.wprint "
-<hr><font size=\"-1\"><em>Copyright (c) 1998-2006 INRIA -
-GeneWeb %s</em></font>" Version.txt;
-        html_br conf;
-      } ]
-;
-
-value gen_trailer with_logo conf =
-  do {
-    if not with_logo then ()
-    else
-      Wserver.wprint "\
-<div>
-<a href=\"%s\"><img src=\"%s/gwlogo.png\"
- alt=\"...\" width=\"64\" height=\"72\" style=\"border:0;float:%s\"%s></a>
-<br%s>
-</div>
-" (commd conf) (image_prefix conf) conf.right
-      conf.xhs conf.xhs;
-    print_copyright conf;
-    include_hed_trl conf None ".trl";
-    Wserver.wprint "</body>\n</html>\n";
-  }
-;
-
-value trailer = gen_trailer True;
 
 value menu_threshold = 20;
 
@@ -1987,19 +1905,6 @@ value header_link_welcome conf title =
     Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
     title False;
     Wserver.wprint "</h1>\n";
-  }
-;
-
-value incorrect_request conf =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "incorrect request"))
-  in
-  do {
-    header conf title;
-    Wserver.wprint "<p>\n";
-    print_link_to_welcome conf False;
-    Wserver.wprint "</p>\n";
-    trailer conf
   }
 ;
 

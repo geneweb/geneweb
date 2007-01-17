@@ -1,8 +1,9 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.16 2007-01-06 18:36:29 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.17 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
+open Hutil;
 open Printf;
 open Util;
 
@@ -836,7 +837,7 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
       else lines
     in
     print_sub_part conf conf.wizard file_path mode edit_mode fname v lines;
-    Util.trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -872,7 +873,7 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
             let sub_part = string_filter sub_part in
             print_ok conf file_path mode edit_mode fname title_is_1st sub_part;
           }
-    | None -> Util.incorrect_request conf ]
+    | None -> Hutil.incorrect_request conf ]
   with
   [ Update.ModErr -> () ]
 ;

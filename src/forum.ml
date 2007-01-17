@@ -1,12 +1,13 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.13 2007-01-17 13:40:45 ddr Exp $ *)
+(* $Id: forum.ml,v 5.14 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Util;
 open Config;
 open Def;
+open Hutil;
 open Printf;
 open TemplAst;
+open Util;
 
 type message =
   { m_time : string;

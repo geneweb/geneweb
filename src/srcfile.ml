@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.34 2007-01-17 13:40:45 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.35 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -497,7 +497,7 @@ value gen_print with_logo mode conf base fname =
         Util.html conf;
         Util.nl ();
         copy_from_channel conf base ic mode;
-        Util.gen_trailer with_logo conf;
+        Hutil.gen_trailer with_logo conf;
       }
   | _ ->
       let title _ = Wserver.wprint "Error" in
@@ -507,7 +507,7 @@ value gen_print with_logo mode conf base fname =
           html_li conf;
           Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
         end;
-        Util.gen_trailer with_logo conf;
+        Hutil.gen_trailer with_logo conf;
         raise Exit
       } ]
 ;
@@ -653,6 +653,6 @@ value print_lexicon conf base =
           Wserver.wprint "<em>... file not found: \"%s.txt\"</em>" "lexicon";
           html_br conf;
         } ];
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;

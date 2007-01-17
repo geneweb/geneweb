@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.43 2006-12-28 14:08:59 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.44 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
-open Util;
 open Def;
+open Hutil;
+open Util;
 
 value dir conf base =
   Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
@@ -423,7 +424,7 @@ value print_part_wiznote conf base wz s cnt0 =
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
     Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES"
       (code_varenv wz) cnt0 lines;
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;
 

@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 5.5 2006-12-24 07:23:21 ddr Exp $ *)
+(* $Id: sendImage.ml,v 5.6 2007-01-17 14:07:00 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value incorrect conf = do { incorrect_request conf; raise Update.ModErr };

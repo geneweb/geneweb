@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.38 2007-01-12 19:56:08 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.39 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value print_differences conf base branches p1 p2 =
@@ -704,7 +705,7 @@ value print_killed conf base p nb_ind nb_fam =
     Wserver.wprint "%s's ancestors killed.<br>\n"
       (referenced_person_title_text conf base p);
     Wserver.wprint "%d persons and %d families deleted<p>\n" nb_ind nb_fam;
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;
 

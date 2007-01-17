@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.47 2007-01-06 04:48:05 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.48 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -345,7 +345,7 @@ value print_renamed conf new_n =
           Util.html_li conf;
           tag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
         end;
-        Util.trailer conf;
+        Hutil.trailer conf;
       } ]
 ;
 
@@ -388,7 +388,7 @@ value print_redirected conf from request new_addr =
             stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
             Wserver.wprint "\n";
           end;
-          Util.trailer conf;
+          Hutil.trailer conf;
         } ]
   }
 ;
@@ -404,7 +404,7 @@ value propose_base conf =
       Wserver.wprint "<input name=\"b\" size=\"40\"> =&gt;\n";
       Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
@@ -516,7 +516,7 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
       end;
     end;
   end;
-  Util.trailer conf;
+  Hutil.trailer conf;
 };
 
 value gen_match_auth_file test_user_and_password auth_file =
@@ -1376,7 +1376,7 @@ value no_access conf =
   do {
     Util.rheader conf title;
     Wserver.wprint "No access to this database in CGI mode\n";
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;
 

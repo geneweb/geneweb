@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.20 2006-12-28 14:08:59 ddr Exp $ *)
+(* $Id: notes.ml,v 5.21 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Mutil;
 open Util;
 
@@ -282,7 +283,7 @@ value print_what_links conf base fnotes =
       end
     with
     [ Not_found -> () ];
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;
 
