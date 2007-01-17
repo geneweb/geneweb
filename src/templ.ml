@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.23 2007-01-17 10:14:40 ddr Exp $ *)
+(* $Id: templ.ml,v 5.24 2007-01-17 13:40:45 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -556,20 +556,6 @@ value input_templ conf fname =
   | None -> None ]
 ;
 
-value error_cannot_access conf fname =
-  let title _ = Wserver.wprint "Error" in
-  do {
-    Util.header conf title;
-    tag "ul" begin
-      tag "li" begin
-        Wserver.wprint "Cannot access file \"%s.txt\".\n"
-          fname;
-      end;
-    end;
-    Util.trailer conf;
-  }
-;
-
 (* Common evaluation functions *)
 
 value subst_text x v s =
@@ -650,7 +636,7 @@ value not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 ;
 
-value rec eval_variable conf env =
+value rec eval_variable conf =
   fun
   [ ["bvar"; v] ->
       try List.assoc v conf.base_env with [ Not_found -> "" ]
@@ -666,9 +652,9 @@ value rec eval_variable conf env =
       | None -> "" ]
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
-  | [s] -> eval_simple_variable conf env s
+  | [s] -> eval_simple_variable conf s
   | _ -> raise Not_found ]
-and eval_simple_variable conf env =
+and eval_simple_variable conf =
   fun 
   [ "action" -> conf.command
   | "border" -> string_of_int conf.border
@@ -698,7 +684,7 @@ and eval_simple_variable conf env =
   | "sp" -> " "
   | "version" -> Version.txt
   | "/" -> conf.xhs
-  | s -> List.assoc s env ]
+  | s -> raise Not_found ]
 ;
 
 value rec string_of_expr_val =
@@ -712,12 +698,12 @@ value rec string_of_expr_val =
 value eval_string_var conf eval_var sl =
   try eval_var sl with
   [ Not_found ->
-      try VVstring (eval_variable conf [] sl) with
+      try VVstring (eval_variable conf sl) with
       [ Not_found -> VVstring (" %" ^ String.concat "." sl ^ "?") ] ]
 ;
 
-value eval_var_handled conf env sl =
-  try eval_variable conf env sl with
+value eval_var_handled conf sl =
+  try eval_variable conf sl with
   [ Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl) ]
 ;
 
@@ -751,7 +737,7 @@ value apply_format conf nth s1 s2 =
 value rec eval_ast conf =
   fun
   [ Atext _ s -> s
-  | Avar _ s sl -> eval_var_handled conf [] [s :: sl]
+  | Avar _ s sl -> eval_var_handled conf [s :: sl]
   | Atransl _ upp s c -> eval_transl conf upp s c
   | ast -> not_impl "eval_ast" ast ]
 and eval_transl conf upp s c =
@@ -1001,26 +987,6 @@ value print_body_prop conf =
   Wserver.wprint "%s" (s ^ Util.body_prop conf)
 ;
 
-value rec print_variable conf base_opt sl =
-  try Wserver.wprint "%s" (eval_variable conf [] sl) with
-  [ Not_found ->
-      try
-        match sl with
-        [ [s] -> print_simple_variable conf base_opt s
-        | _ -> raise Not_found ]
-      with
-      [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ] ]
-and print_simple_variable conf base_opt =
-  fun
-  [ "base_header" -> Util.include_hed_trl conf base_opt ".hed"
-  | "base_trailer" -> Util.include_hed_trl conf base_opt ".trl"
-  | "body_prop" -> print_body_prop conf
-  | "copyright" -> Util.print_copyright conf
-  | "hidden" -> Util.hidden_env conf
-  | "message_to_wizard" -> Util.message_to_wizard conf
-  | _ -> raise Not_found ]
-;
-
 type vother 'a =
   [ Vdef of list string and list ast
   | Vval of expr_val 'a
@@ -1189,29 +1155,7 @@ value eval_var conf ifun env ep loc sl =
         | (_, sl) -> ifun.eval_var env ep loc [s :: sl] ]
     | _ -> ifun.eval_var env ep loc sl ]
   with
-  [ Not_found -> VVstring (eval_variable conf [] sl) ]
-;
-
-value print_var print_ast conf base ifun env ep loc sl =
-  let rec print_var1 eval_var sl =
-    try
-      match eval_var sl with
-      [ VVstring s -> Wserver.wprint "%s" s
-      | VVbool True -> Wserver.wprint "1"
-      | VVbool False -> Wserver.wprint "0"
-      | VVother f -> print_var1 f [] ]
-    with
-    [ Not_found ->
-        match sl with
-        [ ["include"; templ] ->
-            match input_templ conf templ with
-            [ Some astl -> List.iter (print_ast env ep) astl
-            | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
-        | sl ->
-            print_variable conf base sl ] ]
-  in
-  let eval_var = eval_var conf ifun env ep loc in
-  print_var1 eval_var sl
+  [ Not_found -> VVstring (eval_variable conf sl) ]
 ;
 
 value print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
@@ -1227,7 +1171,7 @@ value print_wid_hei env fname =
   | None -> () ]
 ;
 
-value interp_ast conf base ifun =
+value rec interp_ast conf base ifun =
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
   and eval_ast_list env ep =
@@ -1367,24 +1311,45 @@ value interp_ast conf base ifun =
     print_ast_list env ep al
   in
   print_ast_list
+and print_var print_ast conf base ifun env ep loc sl =
+  let rec print_var1 eval_var sl =
+    try
+      match eval_var sl with
+      [ VVstring s -> Wserver.wprint "%s" s
+      | VVbool True -> Wserver.wprint "1"
+      | VVbool False -> Wserver.wprint "0"
+      | VVother f -> print_var1 f [] ]
+    with
+    [ Not_found ->
+        match sl with
+        [ ["include"; templ] ->
+            match input_templ conf templ with
+            [ Some astl -> List.iter (print_ast env ep) astl
+            | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
+        | sl ->
+            print_variable conf base sl ] ]
+  in
+  let eval_var = eval_var conf ifun env ep loc in
+  print_var1 eval_var sl
+and print_simple_variable conf base_opt =
+  fun
+  [ "base_header" -> Util.include_hed_trl conf base_opt ".hed"
+  | "base_trailer" -> Util.include_hed_trl conf base_opt ".trl"
+  | "body_prop" -> print_body_prop conf
+  | "copyright" -> Util.print_copyright conf
+  | "hidden" -> Util.hidden_env conf
+  | "message_to_wizard" -> Util.message_to_wizard conf
+  | _ -> raise Not_found ]
+and print_variable conf base_opt sl =
+  try Wserver.wprint "%s" (eval_variable conf sl) with
+  [ Not_found ->
+      try
+        match sl with
+        [ [s] -> print_simple_variable conf base_opt s
+        | _ -> raise Not_found ]
+      with
+      [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ] ]
 ;
-
-value interp conf base fname ifun env ep = do {
-  let v = template_file.val in
-  template_file.val := fname;
-  try
-    match input_templ conf fname with
-    [ Some astl -> do {
-        Util.html conf;
-        Util.nl ();
-        interp_ast conf (Some base) ifun env ep astl
-      }
-    | None ->
-        error_cannot_access conf fname ]
-  with e ->
-    do { template_file.val := v; raise e };
-  template_file.val := v;
-};
 
 value copy_from_templ conf env ic = do {
   let astl = parse_templ conf (Stream.of_channel ic) in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.11 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: date.ml,v 5.12 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 UNDEF OLD;
@@ -918,7 +918,7 @@ value print_calendar conf base =
 ;
 end ELSE declare
 value print_calendar conf base =
-  Templ.interp conf base "calendar"
+  Hutil.interp conf base "calendar"
     {Templ.eval_var = eval_var conf;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

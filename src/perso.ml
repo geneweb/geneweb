@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.51 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: perso.ml,v 5.52 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -2975,7 +2975,7 @@ value interp_templ templ_fname conf base p = do {
      ("nldb", Vlazy (Lazy.lazy_from_fun nldb));
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
-  Templ.interp conf base templ_fname
+  Hutil.interp conf base templ_fname
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl = eval_transl conf;
      Templ.eval_predefined_apply = eval_predefined_apply conf;

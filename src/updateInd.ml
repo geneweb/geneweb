@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.10 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.11 2007-01-17 13:40:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -396,7 +396,7 @@ value print_update_ind conf base p digest =
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
       let env = [("digest", Vstring digest)] in
-      Templ.interp conf base "updind"
+      Hutil.interp conf base "updind"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
          Templ.eval_predefined_apply _ = raise Not_found;
