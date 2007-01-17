@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.102 2007-01-17 15:07:26 ddr Exp $ *)
+(* $Id: util.ml,v 5.103 2007-01-17 18:37:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1140,38 +1140,6 @@ value url_no_index conf base =
   in
   let suff = if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff in
   addr ^ "?" ^ suff
-;
-
-value include_hed_trl conf base_opt suff =
-  let hed_fname =
-    let fname = base_path ["lang"; conf.lang] (conf.bname ^ suff) in
-    if Sys.file_exists fname then fname
-    else base_path ["lang"] (conf.bname ^ suff)
-  in
-  match try Some (Secure.open_in hed_fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      let url () =
-        match base_opt with
-        [ Some base -> url_no_index conf base
-        | None -> get_server_string conf ^ get_request_string conf ]
-      in
-      let pref () =
-        let s = url () in
-        match rindex s '?' with
-        [ Some i -> String.sub s 0 (i + 1)
-        | None -> s ]
-      in
-      let suff () =
-        let s = url () in
-        match rindex s '?' with
-        [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
-        | None -> "" ]
-      in
-      copy_from_etc
-        [('p', pref); ('s', suff); ('t', fun _ -> commd conf);
-          ('/', fun _ -> conf.xhs)]
-        conf.lang conf.indep_command ic
-  | None -> () ]
 ;
 
 value message_to_wizard conf =

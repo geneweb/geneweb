@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templ.mli,v 5.6 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: templ.mli,v 5.7 2007-01-17 18:37:54 ddr Exp $ *)
 
 open Config;
 open Gwdb;
@@ -33,3 +33,4 @@ value interp_ast :
 value template_file : ref string;
 value input_templ : config -> string -> option (list ast);
 value print_copyright : config -> unit;
+value include_hed_trl : config -> option base -> string -> unit;

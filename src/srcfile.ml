@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 5.37 2007-01-17 15:07:26 ddr Exp $ *)
+(* $Id: srcfile.ml,v 5.38 2007-01-17 18:37:54 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -419,7 +419,7 @@ value rec copy_from_stream conf base strm mode =
           | '%' -> Wserver.wprint "%%"
           | '[' | ']' -> Wserver.wprint "%c" c
           | 'h' -> hidden_env conf
-          | 'j' -> include_hed_trl conf (Some base) ".hed"
+          | 'j' -> Templ.include_hed_trl conf (Some base) ".hed"
           | 'P' -> let _ = Stream.next strm in ()
           | 'r' -> copy_from_file conf base (stream_line strm) mode
           | 'u' ->
