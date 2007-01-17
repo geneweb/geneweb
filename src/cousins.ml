@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.11 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.12 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value default_max_cnt = 2000;

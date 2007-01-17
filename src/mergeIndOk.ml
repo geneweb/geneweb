@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.31 2007-01-12 05:40:37 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.32 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -7,6 +7,7 @@ open Def;
 open Futil;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Mutil;
 open Util;
 

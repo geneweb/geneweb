@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.18 2006-11-24 16:14:39 ddr Exp $ *)
+(* $Id: descend.ml,v 5.19 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -9,6 +9,7 @@ open Def;
 open Dag2html;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Mutil;
 open Util;
 
@@ -1223,7 +1224,7 @@ value print_aboville conf base max_level p =
       }
     in
     loop_ind 0 "" p;
-    Util.trailer conf
+    Hutil.trailer conf
   }
 ;
 

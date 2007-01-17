@@ -1,10 +1,11 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.28 2007-01-17 13:40:45 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.29 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 value get_k conf =
@@ -698,5 +699,5 @@ value print_population_pyramid conf base = do {
       (capitale (transl conf "number of living persons:"))
       (string_of_nb (sum_men + sum_wom));
   end;
-  Util.trailer conf;
+  Hutil.trailer conf;
 };

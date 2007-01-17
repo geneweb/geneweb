@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.3 2006-10-30 21:11:09 ddr Exp $ *)
+(* $Id: doc.ml,v 5.4 2007-01-17 14:07:00 ddr Exp $ *)
 
 open Config;
 
@@ -157,8 +157,8 @@ value print conf =
           in
           copy conf pref_doc pref_img s
         }
-    | None -> Util.incorrect_request conf ]
-  else Util.incorrect_request conf
+    | None -> Hutil.incorrect_request conf ]
+  else Hutil.incorrect_request conf
 ;
 
 (* Writable (ou Wiki) Doc *)
@@ -221,7 +221,7 @@ value print_whole_wdoc conf fdoc title s =
         Wserver.wprint "<ul>\n<li>\n";
         Wserver.wprint "Cannot access file \"wdoc.txt\".\n";
         Wserver.wprint "</li>\n</ul>\n";
-        Util.trailer conf;
+        Hutil.trailer conf;
         raise Exit
       } ]
 ;
@@ -235,7 +235,7 @@ value print_part_wdoc conf fdoc title s cnt0 =
     let mode = "WDOC" in
     let file_path = wdoc_file_path conf.lang in
     Wiki.print_sub_part conf conf.wizard file_path mode mode fdoc cnt0 lines;
-    Util.trailer conf;
+    Hutil.trailer conf;
   }
 ;
 

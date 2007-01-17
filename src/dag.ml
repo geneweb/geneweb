@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.11 2007-01-17 13:40:45 ddr Exp $ *)
+(* $Id: dag.ml,v 5.12 2007-01-17 14:07:00 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -993,7 +993,7 @@ value print_slices_menu conf hts =
       html_p conf;
       Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
-    Util.trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -1017,7 +1017,7 @@ value print_dag_page conf base page_title hts next_txt =
         Wserver.wprint "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
       end
     else ();
-    Util.trailer conf
+    Hutil.trailer conf
   }
 ;
 end END;

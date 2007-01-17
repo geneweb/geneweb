@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: advSearchOk.ml,v 5.10 2006-10-18 02:56:45 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 5.11 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value get_number var key env = p_getint env (var ^ "_" ^ key);

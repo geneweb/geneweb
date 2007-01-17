@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.14 2006-12-29 10:02:19 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.15 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 (* Algorithm *)
@@ -777,7 +778,7 @@ value print_relation_dag conf base a ip1 ip2 l1 l2 =
     Dag.make_and_print_dag conf base elem_txt vbar_txt invert set spl
       page_title ""
   with
-  [ Exit -> Util.incorrect_request conf ]
+  [ Exit -> Hutil.incorrect_request conf ]
 ;
 
 value int_list s =

@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 5.9 2007-01-11 18:00:17 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 5.10 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 value need_differences_selection conf base fam1 fam2 =

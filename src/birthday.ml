@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.13 2006-11-15 11:49:48 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.14 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gwdb;
+open Hutil;
 open Util;
 
 type date_event = [ DeBirth | DeDeath of death_reason ];

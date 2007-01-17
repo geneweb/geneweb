@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.12 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: relation.ml,v 5.13 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -8,6 +8,7 @@ open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;

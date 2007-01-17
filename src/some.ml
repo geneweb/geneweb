@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.29 2007-01-02 06:54:47 ddr Exp $ *)
+(* $Id: some.ml,v 5.30 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Mutil;
 open Util;
 

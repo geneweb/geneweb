@@ -1,9 +1,10 @@
 (* camlp4r *)
-(* $Id: image.ml,v 5.3 2006-11-01 16:59:59 ddr Exp $ *)
+(* $Id: image.ml,v 5.4 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
-open Util;
 open Config;
+open Hutil;
+open Util;
 
 value content cgi t len fname =
   do {

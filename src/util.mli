@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.26 2006-12-26 10:48:13 ddr Exp $ *)
+(* $Id: util.mli,v 5.27 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -100,8 +100,7 @@ value header_without_http : config -> (bool -> unit) -> unit;
 value header_no_page_title : config -> (bool -> unit) -> unit;
 value header : config -> (bool -> unit) -> unit;
 value rheader : config -> (bool -> unit) -> unit;
-value trailer : config -> unit;
-value gen_trailer : bool -> config -> unit;
+
 value open_etc_file : string -> option in_channel;
 value copy_from_etc :
   list (char * unit -> string) -> string -> string -> in_channel -> unit;
@@ -112,7 +111,6 @@ value allowed_tags_file : ref string;
 value body_prop : config -> string;
 value include_hed_trl : config -> option base -> string -> unit;
 value url_no_index : config -> base -> string;
-value print_copyright : config -> unit;
 value message_to_wizard : config -> unit;
 
 value print_alphab_list :
@@ -153,8 +151,6 @@ value index_of_sex : sex -> int;
 
 value relation_txt :
   config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b;
-
-value incorrect_request : config -> unit;
 
 value string_of_decimal_num : config -> float -> string;
 

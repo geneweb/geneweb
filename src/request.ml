@@ -1,11 +1,12 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.47 2007-01-12 05:24:45 ddr Exp $ *)
+(* $Id: request.ml,v 5.48 2007-01-17 14:07:00 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
+open Hutil;
 open Util;
 
 value person_is_std_key conf base p k =
@@ -423,7 +424,7 @@ value family_m conf base =
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
-      | None -> Util.incorrect_request conf ]
+      | None -> Hutil.incorrect_request conf ]
   | Some "HIST" -> History.print conf base
   | Some "HIST_SEARCH" -> History.print_search conf base
   | Some "IMH" -> Image.print_html conf base
@@ -541,7 +542,7 @@ value family_m conf base =
   | Some "SRC" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print_source conf base f
-      | _ -> Util.incorrect_request conf ]
+      | _ -> Hutil.incorrect_request conf ]
   | Some "STAT" -> BirthDeath.print_statistics conf base
   | Some "CHANGE_WIZ_VIS" when conf.wizard ->
       Wiznotes.change_wizard_visibility conf base
@@ -660,7 +661,7 @@ value print_moved conf base s =
           conf.bname;
         stag "a" "href=\"%s\"" s begin Wserver.wprint "%s" s; end;
         Wserver.wprint "\n</dd></dt></dl>\n";
-        Util.trailer conf;
+        Hutil.trailer conf;
       } ]
 ;
 
@@ -737,7 +738,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
             Wserver.wprint
               "<em><font size=\"-1\">Internal message: %s</font></em>\n"
               (Printexc.to_string e) ];
-        Util.trailer conf;
+        Hutil.trailer conf;
       } ]
 ;
 
