@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.28 2007-01-17 18:37:54 ddr Exp $ *)
+(* $Id: templ.ml,v 5.29 2007-01-17 19:19:26 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -1224,7 +1224,7 @@ value print_copyright conf =
     } ]
 ;
 
-value include_hed_trl conf base_opt suff =
+value old_include_hed_trl conf base_opt suff =
   let hed_fname =
     let fname = Util.base_path ["lang"; conf.lang] (conf.bname ^ suff) in
     if Sys.file_exists fname then fname
@@ -1254,6 +1254,15 @@ value include_hed_trl conf base_opt suff =
           ('/', fun _ -> conf.xhs)]
         conf.lang conf.indep_command ic
   | None -> () ]
+;
+
+value include_hed_trl conf base_opt name =
+  let fname =
+    Filename.concat (Util.base_path ["etc"] conf.bname) (name ^ ".txt")
+  in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic -> copy_from_templ conf [] ic
+  | None -> old_include_hed_trl conf base_opt ("." ^ name) ]
 ;
 
 value rec interp_ast conf base ifun =
@@ -1419,8 +1428,8 @@ and print_var print_ast_list conf base ifun env ep loc sl =
   print_var1 eval_var sl
 and print_simple_variable conf base_opt =
   fun
-  [ "base_header" -> include_hed_trl conf base_opt ".hed"
-  | "base_trailer" -> include_hed_trl conf base_opt ".trl"
+  [ "base_header" -> include_hed_trl conf base_opt "hed"
+  | "base_trailer" -> include_hed_trl conf base_opt "trl"
   | "body_prop" -> print_body_prop conf
   | "copyright" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf
