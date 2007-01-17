@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: hutil.ml,v 5.2 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: hutil.ml,v 5.3 2007-01-17 14:27:24 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -63,9 +63,3 @@ value interp conf base fname ifun env ep = do {
     do { Templ.template_file.val := v; raise e };
   Templ.template_file.val := v;
 };
-
-(*
-value incorrect_request : config -> unit;
-value gen_trailer : bool -> config -> unit;
-value trailer : config -> unit;
-*)
