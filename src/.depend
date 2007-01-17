@@ -1,28 +1,28 @@
 adef.cmo: adef.cmi 
 adef.cmx: adef.cmi 
 advSearchOk.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi \
-    gutil.cmi gwdb.cmi hutil.cmo name.cmi some.cmo util.cmi \
+    gutil.cmi gwdb.cmi hutil.cmi name.cmi some.cmo util.cmi \
     ../wserver/wserver.cmi 
 advSearchOk.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx name.cmx some.cmx util.cmx \
     ../wserver/wserver.cmx 
-alln.cmo: buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmo mutil.cmi \
+alln.cmo: buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmi mutil.cmi \
     name.cmi util.cmi ../wserver/wserver.cmi 
 alln.cmx: buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx hutil.cmx mutil.cmx \
     name.cmx util.cmx ../wserver/wserver.cmx 
 birthDeath.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi gwdb.cmi \
-    hutil.cmo num.cmi pqueue.cmi templ.cmi util.cmi ../wserver/wserver.cmi 
+    hutil.cmi num.cmi pqueue.cmi templ.cmi util.cmi ../wserver/wserver.cmi 
 birthDeath.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gwdb.cmx \
     hutil.cmx num.cmx pqueue.cmx templ.cmx util.cmx ../wserver/wserver.cmx 
 birthday.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi gwdb.cmi \
-    hutil.cmo util.cmi ../wserver/wserver.cmi 
+    hutil.cmi util.cmi ../wserver/wserver.cmi 
 birthday.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gwdb.cmx \
     hutil.cmx util.cmx ../wserver/wserver.cmx 
 calendar.cmo: def.cmi calendar.cmi 
 calendar.cmx: def.cmi calendar.cmi 
 calendar.cmi: def.cmi 
 changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
-    history.cmi hutil.cmo iovalue.cmi name.cmi update.cmi util.cmi \
+    history.cmi hutil.cmi iovalue.cmi name.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi 
 changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     history.cmx hutil.cmx iovalue.cmx name.cmx update.cmx util.cmx \
@@ -49,13 +49,13 @@ consangAll.cmx: adef.cmx consang.cmx def.cmi gwdb.cmx mutil.cmx progrBar.cmx \
     consangAll.cmi 
 consangAll.cmi: adef.cmi gwdb.cmi 
 cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \
-    gwdb.cmi hutil.cmo num.cmi perso.cmi pqueue.cmi util.cmi \
+    gwdb.cmi hutil.cmi num.cmi perso.cmi pqueue.cmi util.cmi \
     ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx birthday.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx hutil.cmx num.cmx perso.cmx pqueue.cmx util.cmx \
     ../wserver/wserver.cmx 
 dag.cmo: buff.cmo config.cmi ../dag2html/dag2html.cmi date.cmi def.cmi \
-    gutil.cmi gwdb.cmi hutil.cmo mutil.cmi name.cmi num.cmi templ.cmi \
+    gutil.cmi gwdb.cmi hutil.cmi mutil.cmi name.cmi num.cmi templ.cmi \
     templAst.cmi util.cmi ../wserver/wserver.cmi dag.cmi 
 dag.cmx: buff.cmx config.cmi ../dag2html/dag2html.cmx date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx name.cmx num.cmx templ.cmx \
@@ -67,7 +67,7 @@ database.cmx: adef.cmx btree.cmx buff.cmx dbdisk.cmi def.cmi dutil.cmx \
     iovalue.cmx mutil.cmx name.cmx secure.cmx database.cmi 
 database.cmi: dbdisk.cmi 
 date.cmo: adef.cmi buff.cmo calendar.cmi checkItem.cmi config.cmi def.cmi \
-    gutil.cmi gwdb.cmi hutil.cmo mutil.cmi num.cmi templ.cmi templAst.cmi \
+    gutil.cmi gwdb.cmi hutil.cmi mutil.cmi num.cmi templ.cmi templAst.cmi \
     util.cmi ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx buff.cmx calendar.cmx checkItem.cmx config.cmi def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx num.cmx templ.cmx templAst.cmi \
@@ -81,21 +81,21 @@ db2disk.cmi: adef.cmi def.cmi
 dbdisk.cmi: adef.cmi def.cmi 
 def.cmi: adef.cmi 
 descend.cmo: adef.cmi config.cmi dag.cmi ../dag2html/dag2html.cmi date.cmi \
-    def.cmi gutil.cmi gwdb.cmi hutil.cmo mutil.cmi perso.cmi util.cmi \
+    def.cmi gutil.cmi gwdb.cmi hutil.cmi mutil.cmi perso.cmi util.cmi \
     ../wserver/wserver.cmi 
 descend.cmx: adef.cmx config.cmi dag.cmx ../dag2html/dag2html.cmx date.cmx \
     def.cmi gutil.cmx gwdb.cmx hutil.cmx mutil.cmx perso.cmx util.cmx \
     ../wserver/wserver.cmx 
 diff.cmo: diff.cmi 
 diff.cmx: diff.cmi 
-doc.cmo: buff.cmo config.cmi hutil.cmo notesLinks.cmi secure.cmi templ.cmi \
+doc.cmo: buff.cmo config.cmi hutil.cmi notesLinks.cmi secure.cmi templ.cmi \
     templAst.cmi util.cmi wiki.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi hutil.cmx notesLinks.cmx secure.cmx templ.cmx \
     templAst.cmi util.cmx wiki.cmx ../wserver/wserver.cmx 
 dutil.cmo: adef.cmi dbdisk.cmi def.cmi futil.cmi mutil.cmi dutil.cmi 
 dutil.cmx: adef.cmx dbdisk.cmi def.cmi futil.cmx mutil.cmx dutil.cmi 
 dutil.cmi: dbdisk.cmi def.cmi 
-forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi hutil.cmo \
+forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi hutil.cmi \
     mutil.cmi notes.cmi secure.cmi templ.cmi templAst.cmi update.cmi \
     util.cmi wiki.cmi ../wserver/wserver.cmi 
 forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx hutil.cmx \
@@ -126,7 +126,7 @@ gwc2.cmx: adef.cmx argl.cmx db2.cmx def.cmi futil.cmx gwcomp.cmx iochan.cmx \
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi mutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi mutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
-    gutil.cmi hutil.cmo image.cmo lock.cmi mutil.cmi name.cmi \
+    gutil.cmi hutil.cmi image.cmo lock.cmi mutil.cmi name.cmi \
     relationLink.cmi request.cmi robot.cmo secure.cmi srcfile.cmi util.cmi \
     version.cmo ../wserver/wserver.cmi 
 gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
@@ -143,15 +143,16 @@ gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx gwdb.cmx \
     mutil.cmx notesLinks.cmx secure.cmx select.cmx 
 history.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi \
-    gwdb.cmi hutil.cmo mutil.cmi secure.cmi templ.cmi templAst.cmi util.cmi \
+    gwdb.cmi hutil.cmi mutil.cmi secure.cmi templ.cmi templAst.cmi util.cmi \
     ../wserver/wserver.cmi history.cmi 
 history.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx hutil.cmx mutil.cmx secure.cmx templ.cmx templAst.cmi util.cmx \
     ../wserver/wserver.cmx history.cmi 
 history.cmi: config.cmi def.cmi gwdb.cmi 
-hutil.cmo: config.cmi templ.cmi util.cmi ../wserver/wserver.cmi 
-hutil.cmx: config.cmi templ.cmx util.cmx ../wserver/wserver.cmx 
-image.cmo: config.cmi hutil.cmo mutil.cmi secure.cmi util.cmi \
+hutil.cmo: config.cmi templ.cmi util.cmi ../wserver/wserver.cmi hutil.cmi 
+hutil.cmx: config.cmi templ.cmx util.cmx ../wserver/wserver.cmx hutil.cmi 
+hutil.cmi: config.cmi gwdb.cmi templ.cmi 
+image.cmo: config.cmi hutil.cmi mutil.cmi secure.cmi util.cmi \
     ../wserver/wserver.cmi 
 image.cmx: config.cmi hutil.cmx mutil.cmx secure.cmx util.cmx \
     ../wserver/wserver.cmx 
@@ -161,27 +162,27 @@ iovalue.cmo: iovalue.cmi
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
-merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmo \
+merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmi \
     util.cmi ../wserver/wserver.cmi merge.cmi 
 merge.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx hutil.cmx \
     util.cmx ../wserver/wserver.cmx merge.cmi 
 merge.cmi: config.cmi gwdb.cmi 
-mergeDup.cmo: adef.cmi config.cmi date.cmi gwdb.cmi hutil.cmo mergeFam.cmo \
+mergeDup.cmo: adef.cmi config.cmi date.cmi gwdb.cmi hutil.cmi mergeFam.cmo \
     mergeInd.cmo perso.cmi util.cmi ../wserver/wserver.cmi 
 mergeDup.cmx: adef.cmx config.cmi date.cmx gwdb.cmx hutil.cmx mergeFam.cmx \
     mergeInd.cmx perso.cmx util.cmx ../wserver/wserver.cmx 
-mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gwdb.cmi hutil.cmo \
+mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gwdb.cmi hutil.cmi \
     mergeFamOk.cmo util.cmi ../wserver/wserver.cmi 
 mergeFam.cmx: adef.cmx config.cmi date.cmx def.cmi gwdb.cmx hutil.cmx \
     mergeFamOk.cmx util.cmx ../wserver/wserver.cmx 
 mergeFamOk.cmo: adef.cmi config.cmi def.cmi futil.cmi gutil.cmi gwdb.cmi \
-    history.cmi hutil.cmo merge.cmi update.cmi updateFam.cmi updateFamOk.cmo \
+    history.cmi hutil.cmi merge.cmi update.cmi updateFam.cmi updateFamOk.cmo \
     util.cmi ../wserver/wserver.cmi 
 mergeFamOk.cmx: adef.cmx config.cmi def.cmi futil.cmx gutil.cmx gwdb.cmx \
     history.cmx hutil.cmx merge.cmx update.cmx updateFam.cmx updateFamOk.cmx \
     util.cmx ../wserver/wserver.cmx 
 mergeInd.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi gutil.cmi \
-    gwdb.cmi history.cmi hutil.cmo merge.cmi mergeFam.cmo notes.cmi \
+    gwdb.cmi history.cmi hutil.cmi merge.cmi mergeFam.cmo notes.cmi \
     notesLinks.cmi update.cmi updateFamOk.cmo updateIndOk.cmi util.cmi \
     ../wserver/wserver.cmi 
 mergeInd.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \
@@ -189,7 +190,7 @@ mergeInd.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \
     notesLinks.cmx update.cmx updateFamOk.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
 mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi futil.cmi gutil.cmi \
-    gwdb.cmi history.cmi hutil.cmo merge.cmi mergeInd.cmo mutil.cmi \
+    gwdb.cmi history.cmi hutil.cmi merge.cmi mergeInd.cmo mutil.cmi \
     update.cmi updateInd.cmi updateIndOk.cmi util.cmi ../wserver/wserver.cmi 
 mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi futil.cmx gutil.cmx \
     gwdb.cmx history.cmx hutil.cmx merge.cmx mergeInd.cmx mutil.cmx \
@@ -207,7 +208,7 @@ mutil.cmx: buff.cmx iovalue.cmx name.cmx mutil.cmi
 name.cmo: buff.cmo name.cmi 
 name.cmx: buff.cmx name.cmi 
 notes.cmo: buff.cmo config.cmi date.cmi gutil.cmi gwdb.cmi history.cmi \
-    hutil.cmo mutil.cmi name.cmi notesLinks.cmi templ.cmi update.cmi \
+    hutil.cmi mutil.cmi name.cmi notesLinks.cmi templ.cmi update.cmi \
     util.cmi wiki.cmi ../wserver/wserver.cmi notes.cmi 
 notes.cmx: buff.cmx config.cmi date.cmx gutil.cmx gwdb.cmx history.cmx \
     hutil.cmx mutil.cmx name.cmx notesLinks.cmx templ.cmx update.cmx \
@@ -224,7 +225,7 @@ outbase.cmx: adef.cmx btree.cmx dbdisk.cmi def.cmi dutil.cmx iovalue.cmx \
     mutil.cmx name.cmx secure.cmx outbase.cmi 
 outbase.cmi: dbdisk.cmi 
 perso.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi dag.cmi date.cmi \
-    def.cmi gutil.cmi gwdb.cmi hutil.cmo mutil.cmi name.cmi notes.cmi \
+    def.cmi gutil.cmi gwdb.cmi hutil.cmi mutil.cmi name.cmi notes.cmi \
     notesLinks.cmi num.cmi srcfile.cmi templ.cmi templAst.cmi util.cmi \
     wiki.cmi perso.cmi 
 perso.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi dag.cmx date.cmx \
@@ -234,7 +235,7 @@ perso.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi dag.cmx date.cmx \
 perso.cmi: adef.cmi config.cmi gwdb.cmi 
 phonygwd.cmo: argl.cmo secure.cmi ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx secure.cmx ../wserver/wserver.cmx 
-place.cmo: adef.cmi config.cmi def.cmi gwdb.cmi hutil.cmo mutil.cmi util.cmi \
+place.cmo: adef.cmi config.cmi def.cmi gwdb.cmi hutil.cmi mutil.cmi util.cmi \
     ../wserver/wserver.cmi 
 place.cmx: adef.cmx config.cmi def.cmi gwdb.cmx hutil.cmx mutil.cmx util.cmx \
     ../wserver/wserver.cmx 
@@ -243,13 +244,13 @@ pqueue.cmx: pqueue.cmi
 progrBar.cmo: progrBar.cmi 
 progrBar.cmx: progrBar.cmi 
 relation.cmo: adef.cmi config.cmi consang.cmi dag.cmi \
-    ../dag2html/dag2html.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmo num.cmi \
+    ../dag2html/dag2html.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmi num.cmi \
     perso.cmi relationLink.cmi util.cmi ../wserver/wserver.cmi 
 relation.cmx: adef.cmx config.cmi consang.cmx dag.cmx \
     ../dag2html/dag2html.cmx def.cmi gutil.cmx gwdb.cmx hutil.cmx num.cmx \
     perso.cmx relationLink.cmx util.cmx ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi dag.cmi date.cmi def.cmi gwdb.cmi \
-    hutil.cmo num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi \
+    hutil.cmi num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi \
     relationLink.cmi 
 relationLink.cmx: adef.cmx config.cmi dag.cmx date.cmx def.cmi gwdb.cmx \
     hutil.cmx num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx \
@@ -258,7 +259,7 @@ relationLink.cmi: config.cmi def.cmi gwdb.cmi
 request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
     buff.cmo changeChildren.cmo config.cmi cousins.cmo dag.cmi date.cmi \
     def.cmi descend.cmo doc.cmo forum.cmo gutil.cmi gwdb.cmi history.cmi \
-    hutil.cmo image.cmo lock.cmi merge.cmi mergeDup.cmo mergeFam.cmo \
+    hutil.cmi image.cmo lock.cmi merge.cmi mergeDup.cmo mergeFam.cmo \
     mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo mutil.cmi name.cmi notes.cmi \
     num.cmi perso.cmi place.cmo relation.cmo relationLink.cmi secure.cmi \
     sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
@@ -281,17 +282,17 @@ secure.cmx: secure.cmi
 select.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi name.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx gwdb.cmx name.cmx 
 sendImage.cmo: adef.cmi buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi \
-    history.cmi hutil.cmo secure.cmi update.cmi updateInd.cmi util.cmi \
+    history.cmi hutil.cmi secure.cmi update.cmi updateInd.cmi util.cmi \
     ../wserver/wserver.cmi 
 sendImage.cmx: adef.cmx buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx \
     history.cmx hutil.cmx secure.cmx update.cmx updateInd.cmx util.cmx \
     ../wserver/wserver.cmx 
 some.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi gutil.cmi \
-    gwdb.cmi hutil.cmo mutil.cmi name.cmi util.cmi ../wserver/wserver.cmi 
+    gwdb.cmi hutil.cmi mutil.cmi name.cmi util.cmi ../wserver/wserver.cmi 
 some.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gwdb.cmi history.cmi \
-    hutil.cmo lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi templ.cmi \
+    hutil.cmi lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi templ.cmi \
     templAst.cmi translate.cmi util.cmi version.cmo wiznotes.cmi \
     ../wserver/wserver.cmi srcfile.cmi 
 srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gwdb.cmx history.cmx \
@@ -305,40 +306,40 @@ templ.cmx: buff.cmx config.cmi mutil.cmx secure.cmx templAst.cmi \
     translate.cmx util.cmx version.cmx ../wserver/wserver.cmx templ.cmi 
 templ.cmi: config.cmi gwdb.cmi templAst.cmi 
 title.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi gutil.cmi \
-    gwdb.cmi hutil.cmo mutil.cmi name.cmi util.cmi ../wserver/wserver.cmi 
+    gwdb.cmi hutil.cmi mutil.cmi name.cmi util.cmi ../wserver/wserver.cmi 
 title.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx ../wserver/wserver.cmx 
 translate.cmo: buff.cmo translate.cmi 
 translate.cmx: buff.cmx translate.cmi 
 update.cmo: adef.cmi calendar.cmi checkItem.cmi config.cmi date.cmi def.cmi \
-    diff.cmi gutil.cmi gwdb.cmi hutil.cmo iovalue.cmi util.cmi \
+    diff.cmi gutil.cmi gwdb.cmi hutil.cmi iovalue.cmi util.cmi \
     ../wserver/wserver.cmi update.cmi 
 update.cmx: adef.cmx calendar.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     diff.cmx gutil.cmx gwdb.cmx hutil.cmx iovalue.cmx util.cmx \
     ../wserver/wserver.cmx update.cmi 
 update.cmi: adef.cmi checkItem.cmi config.cmi def.cmi gwdb.cmi 
 updateFam.cmo: adef.cmi calendar.cmi config.cmi def.cmi futil.cmi gutil.cmi \
-    gwdb.cmi hutil.cmo templ.cmi templAst.cmi update.cmi util.cmi \
+    gwdb.cmi hutil.cmi templ.cmi templAst.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi updateFam.cmi 
 updateFam.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gutil.cmx \
     gwdb.cmx hutil.cmx templ.cmx templAst.cmi update.cmx util.cmx \
     ../wserver/wserver.cmx updateFam.cmi 
 updateFam.cmi: config.cmi def.cmi gwdb.cmi update.cmi 
 updateFamOk.cmo: adef.cmi checkItem.cmi config.cmi consang.cmi def.cmi \
-    futil.cmi gutil.cmi gwdb.cmi history.cmi hutil.cmo mutil.cmi update.cmi \
+    futil.cmi gutil.cmi gwdb.cmi history.cmi hutil.cmi mutil.cmi update.cmi \
     updateFam.cmi util.cmi ../wserver/wserver.cmi 
 updateFamOk.cmx: adef.cmx checkItem.cmx config.cmi consang.cmx def.cmi \
     futil.cmx gutil.cmx gwdb.cmx history.cmx hutil.cmx mutil.cmx update.cmx \
     updateFam.cmx util.cmx ../wserver/wserver.cmx 
 updateInd.cmo: adef.cmi calendar.cmi config.cmi def.cmi futil.cmi gwdb.cmi \
-    hutil.cmo templ.cmi templAst.cmi update.cmi util.cmi \
+    hutil.cmi templ.cmi templAst.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi updateInd.cmi 
 updateInd.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gwdb.cmx \
     hutil.cmx templ.cmx templAst.cmi update.cmx util.cmx \
     ../wserver/wserver.cmx updateInd.cmi 
 updateInd.cmi: config.cmi def.cmi gwdb.cmi update.cmi 
 updateIndOk.cmo: adef.cmi checkItem.cmi config.cmi def.cmi futil.cmi \
-    gutil.cmi gwdb.cmi history.cmi hutil.cmo mutil.cmi name.cmi notes.cmi \
+    gutil.cmi gwdb.cmi history.cmi hutil.cmi mutil.cmi name.cmi notes.cmi \
     notesLinks.cmi update.cmi updateInd.cmi util.cmi ../wserver/wserver.cmi \
     updateIndOk.cmi 
 updateIndOk.cmx: adef.cmx checkItem.cmx config.cmi def.cmi futil.cmx \
@@ -359,7 +360,7 @@ util.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi consang.cmx def.cmi \
     num.cmx secure.cmx translate.cmx version.cmx ../wserver/wserver.cmx \
     util.cmi 
 util.cmi: config.cmi def.cmi gwdb.cmi num.cmi 
-wiki.cmo: buff.cmo config.cmi gutil.cmi hutil.cmo iovalue.cmi mutil.cmi \
+wiki.cmo: buff.cmo config.cmi gutil.cmi hutil.cmi iovalue.cmi mutil.cmi \
     notesLinks.cmi secure.cmi templ.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi wiki.cmi 
 wiki.cmx: buff.cmx config.cmi gutil.cmx hutil.cmx iovalue.cmx mutil.cmx \
@@ -367,7 +368,7 @@ wiki.cmx: buff.cmx config.cmi gutil.cmx hutil.cmx iovalue.cmx mutil.cmx \
     ../wserver/wserver.cmx wiki.cmi 
 wiki.cmi: config.cmi 
 wiznotes.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi gwdb.cmi \
-    hutil.cmo mutil.cmi notes.cmi notesLinks.cmi secure.cmi templ.cmi \
+    hutil.cmi mutil.cmi notes.cmi notesLinks.cmi secure.cmi templ.cmi \
     util.cmi wiki.cmi ../wserver/wserver.cmi wiznotes.cmi 
 wiznotes.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
     hutil.cmx mutil.cmx notes.cmx notesLinks.cmx secure.cmx templ.cmx \
