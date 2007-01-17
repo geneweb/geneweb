@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.20 2007-01-17 04:07:38 ddr Exp $ *)
+(* $Id: templ.ml,v 5.21 2007-01-17 04:24:03 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -1179,50 +1179,54 @@ value rgb_of_str_hsv h s v =
   rgb_of_hsv (ios h) (ios s) (ios v)
 ;
 
-value interp_ast conf base ifun =
-  let eval_var env ep loc sl =
-    try
-      match sl with
-      [ ["env"; "key"] ->
-          match ifun.get_vother (List.assoc "binding" env) with
-          [ Some (Vbind k v) -> VVstring k
-          | _ -> raise Not_found ]
-      | ["env"; "val"] ->
-          match ifun.get_vother (List.assoc "binding" env) with
-          [ Some (Vbind k v) -> VVstring v
-          | _ -> raise Not_found ]
-      | ["env"; "val"; "decoded"] ->
-          match ifun.get_vother (List.assoc "binding" env) with
-          [ Some (Vbind k v) -> VVstring (Util.decode_varenv v)
-          | _ -> raise Not_found ]
-      | [s :: sl] ->
-          match (get_val ifun.get_vother s env, sl) with
-          [ (Some (VVother f), sl) -> f sl
-          | (Some v, []) -> v
-          | (_, sl) -> ifun.eval_var env ep loc [s :: sl] ]
-      | _ -> ifun.eval_var env ep loc sl ]
-    with
-    [ Not_found -> VVstring (eval_variable conf [] sl) ]
-  in
-  let print_var print_ast conf base env ep loc sl =
+value eval_var conf ifun env ep loc sl =
+  try
     match sl with
-    [ ["include"; templ] ->
-        match input conf templ with
-        [ Some astl -> List.iter (print_ast env ep) astl
-        | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
-    | _ -> templ_print_var conf base (eval_var env ep loc) sl ]
-  in
-  let print_foreach print_ast eval_expr env ep loc s sl el al =
-    try ifun.print_foreach print_ast eval_expr env ep loc s sl el al with
-    [ Not_found ->
-        templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl
-          el al ]
-  in
-  let print_wid_hei env fname =
-    match Util.image_size (Util.image_file_name fname) with
-    [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
-    | None -> () ]
-  in
+    [ ["env"; "key"] ->
+        match ifun.get_vother (List.assoc "binding" env) with
+        [ Some (Vbind k v) -> VVstring k
+        | _ -> raise Not_found ]
+    | ["env"; "val"] ->
+        match ifun.get_vother (List.assoc "binding" env) with
+        [ Some (Vbind k v) -> VVstring v
+        | _ -> raise Not_found ]
+    | ["env"; "val"; "decoded"] ->
+        match ifun.get_vother (List.assoc "binding" env) with
+        [ Some (Vbind k v) -> VVstring (Util.decode_varenv v)
+        | _ -> raise Not_found ]
+    | [s :: sl] ->
+        match (get_val ifun.get_vother s env, sl) with
+        [ (Some (VVother f), sl) -> f sl
+        | (Some v, []) -> v
+        | (_, sl) -> ifun.eval_var env ep loc [s :: sl] ]
+    | _ -> ifun.eval_var env ep loc sl ]
+  with
+  [ Not_found -> VVstring (eval_variable conf [] sl) ]
+;
+
+value print_var print_ast conf base ifun env ep loc sl =
+  match sl with
+  [ ["include"; templ] ->
+      match input conf templ with
+      [ Some astl -> List.iter (print_ast env ep) astl
+      | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
+  | _ -> templ_print_var conf base (eval_var conf ifun env ep loc) sl ]
+;
+
+value print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
+  try ifun.print_foreach print_ast eval_expr env ep loc s sl el al with
+  [ Not_found ->
+      templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl
+        el al ]
+;
+
+value print_wid_hei env fname =
+  match Util.image_size (Util.image_file_name fname) with
+  [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
+  | None -> () ]
+;
+
+value interp_ast conf base ifun =
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
   and eval_ast_list env ep =
@@ -1235,7 +1239,8 @@ value interp_ast conf base ifun =
   and eval_ast_expr env ep =
     fun
     [ Atext _ s -> VVstring s
-    | Avar loc s sl -> eval_string_var conf (eval_var env ep loc) [s :: sl]
+    | Avar loc s sl ->
+        eval_string_var conf (eval_var conf ifun env ep loc) [s :: sl]
     | Atransl _ upp s n -> VVstring (ifun.eval_transl env upp s n)
     | Aif e alt ale -> VVstring (eval_if env ep e alt ale)
     | Aapply loc f all ->
@@ -1258,7 +1263,7 @@ value interp_ast conf base ifun =
         VVstring (String.concat "" sl) ]
   and eval_expr env ep e =
     let eval_apply = eval_apply env ep in
-    let eval_var = eval_var env ep in
+    let eval_var = eval_var conf ifun env ep in
     templ_eval_expr conf (eval_var, eval_apply) e
   and eval_apply env ep loc f vl =
     match get_def ifun.get_vother f env with
@@ -1305,7 +1310,7 @@ value interp_ast conf base ifun =
             try ifun.eval_predefined_apply env f vl with
             [ Not_found -> Printf.sprintf "%%apply;%s?" f ] ] ]
   and eval_if env ep e alt ale =
-    let eval_var = eval_var env ep in
+    let eval_var = eval_var conf ifun env ep in
     let eval_ast = eval_ast env ep in
     let eval_apply = eval_apply env ep in
     let al =
@@ -1315,11 +1320,13 @@ value interp_ast conf base ifun =
   in
   let rec print_ast env ep =
     fun
-    [ Avar loc s sl -> print_var print_ast conf base env ep loc [s :: sl]
+    [ Avar loc s sl -> print_var print_ast conf base ifun env ep loc [s :: sl]
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->
-        try print_foreach print_ast eval_expr env ep loc s sl el al with
+        try
+          print_foreach conf ifun print_ast eval_expr env ep loc s sl el al
+        with
         [ Not_found ->
             Wserver.wprint " %%foreach;%s?" (String.concat "." [s :: sl]) ]
     | Adefine f xl al alk -> print_define env ep f xl al alk
@@ -1351,7 +1358,7 @@ value interp_ast conf base ifun =
     let env = set_val ifun.set_vother k v env in
     print_ast_list env ep al
   and print_if env ep e alt ale =
-    let eval_var = eval_var env ep in
+    let eval_var = eval_var conf ifun env ep in
     let eval_apply = eval_apply env ep in
     let al =
       if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
