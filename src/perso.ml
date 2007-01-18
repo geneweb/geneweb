@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.53 2007-01-18 05:04:11 ddr Exp $ *)
+(* $Id: perso.ml,v 5.54 2007-01-18 14:18:45 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -936,7 +936,7 @@ type env 'a =
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
-  | Vind of person and person and person
+  | Vind of person
   | Vfam of ifam and family and (iper * iper * iper) and family and bool
   | Vrel of relation and option person
   | Vbool of bool
@@ -1024,7 +1024,7 @@ value string_of_num sep num =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value gen_string_of_img_sz max_wid max_hei conf base env (p, _, _, p_auth) =
+value gen_string_of_img_sz max_wid max_hei conf base env (p, p_auth) =
   if p_auth then
     let v = image_and_size conf base p (limited_image_size max_wid max_hei) in
     match v with
@@ -1052,9 +1052,7 @@ value get_sosa conf base env r p =
 
 value make_ep conf base ip =
   let p = pget conf base ip in
-  let a = aget conf base ip in
-  let u = uget conf base ip in
-  let p_auth = authorized_age conf base p in (p, a, u, p_auth)
+  let p_auth = authorized_age conf base p in (p, p_auth)
 ;
 
 value make_efam conf base ip ifam =
@@ -1079,7 +1077,7 @@ and eval_simple_var conf base env ep =
       try bool_val (eval_simple_bool_var conf base env ep s) with
       [ Not_found -> str_val (eval_simple_str_var conf base env ep s) ]
   | _ -> raise Not_found ]
-and eval_simple_bool_var conf base env (_, _, _, p_auth) =
+and eval_simple_bool_var conf base env (_, p_auth) =
   fun
   [ "are_divorced" ->
       match get_env "fam" env with
@@ -1163,7 +1161,7 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
         let s = Srcfile.source_file_name conf v in
         Sys.file_exists s
       else raise Not_found ]
-and eval_simple_str_var conf base env (_, _, _, p_auth) =
+and eval_simple_str_var conf base env (_, p_auth) =
   fun
   [ "alias" ->
       match get_env "alias" env with
@@ -1324,7 +1322,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
             if v <> "" then f v
             else loop pfx_list
         | [] -> raise Not_found ] ]
-and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
+and eval_compound_var conf base env ((a, _) as ep) loc =
   fun 
   [ ["ancestor" :: sl] ->
       match get_env "ancestor" env with
@@ -1342,13 +1340,13 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       | _ -> raise Not_found ]
   | ["child" :: sl] ->
       match get_env "child" env with
-      [ Vind p a u ->
+      [ Vind p ->
           let auth =
             match get_env "auth" env with
             [ Vbool True -> authorized_age conf base p
             | _ -> False ]
           in
-          let ep = (p, a, u, auth) in
+          let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
@@ -1407,8 +1405,8 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       | _ -> raise Not_found ]  
   | ["parent" :: sl] ->
       match get_env "parent" env with
-      [ Vind p a u ->
-          let ep = (p, a, u, authorized_age conf base p) in
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["prev_item" :: sl] ->
@@ -1460,8 +1458,8 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) loc =
       | _ -> raise Not_found ]
   | ["witness" :: sl] ->
       match get_env "witness" env with
-      [ Vind p a u ->
-          let ep = (p, a, u, authorized_age conf base p) in
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["witness_relation" :: sl] ->
@@ -1636,7 +1634,7 @@ and eval_anc_by_surnl_field_var conf base env ep
              (str, n + 1))
           sosa_list ("", 1)
       in
-      let (p, _, _, _) = ep in
+      let (p, _) = ep in
       VVstring (acces_n conf base "1" p ^ str)
   | sl ->
       let ep = make_ep conf base (get_key_index p) in
@@ -1648,7 +1646,7 @@ and eval_num conf n =
   | ["v"] -> Num.to_string n
   | [] -> Num.to_string_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found ]
-and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
+and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   fun
   [ ["baptism_date" :: sl] ->
       match Adef.od_of_codate (get_baptism p) with
@@ -1677,7 +1675,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
       [ Death _ cd when p_auth -> eval_date_field_var (Adef.date_of_cdate cd) sl
       | _ -> VVstring "" ]
   | ["father" :: sl] ->
-      match get_parents a with
+      match get_parents p with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ep = make_ep conf base (get_father cpl) in
@@ -1733,7 +1731,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["mother" :: sl] ->
-      match get_parents a with
+      match get_parents p with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ep = make_ep conf base (get_mother cpl) in
@@ -1785,7 +1783,7 @@ and eval_nobility_title_field_var (id, pl) =
   | ["place_key"] -> VVstring (code_varenv pl)
   | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
   | _ -> raise Not_found ]
-and eval_bool_person_field conf base env (p, a, u, p_auth) =
+and eval_bool_person_field conf base env (p, p_auth) =
   fun
   [ "access_by_key" ->
       Util.accessible_by_key conf base p (p_first_name base p)
@@ -1838,9 +1836,9 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
           List.exists
             (fun ifam ->
              let des = doi base ifam in Array.length (get_children des) > 0)
-          (Array.to_list (get_family u)) ]
+          (Array.to_list (get_family p)) ]
   | "has_consanguinity" ->
-      p_auth && get_consang a != Adef.fix (-1) && get_consang a != Adef.fix 0
+      p_auth && get_consang p != Adef.fix (-1) && get_consang p != Adef.fix 0
   | "has_cremation_date" ->
       if p_auth then
         match get_burial p with
@@ -1853,14 +1851,14 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
       [ Death _ _ -> p_auth
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
-  | "has_families" -> Array.length (get_family u) > 0
+  | "has_families" -> Array.length (get_family p) > 0
   | "has_first_names_aliases" -> get_first_names_aliases p <> []
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
   | "has_notes" -> p_auth && sou base (get_notes p) <> ""
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
-  | "has_parents" -> get_parents a <> None
+  | "has_parents" -> get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_public_name" -> p_auth && sou base (get_public_name p) <> ""
   | "has_qualifiers" -> p_auth && get_qualifiers p <> []
@@ -1876,7 +1874,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
         get_rparents p <> [] || related <> []
       else p_auth && (get_rparents p <> [] || get_related p <> [])
   | "has_siblings" ->
-      match get_parents a with
+      match get_parents p with
       [ Some ifam -> Array.length (get_children (doi base ifam)) > 1
       | None -> False ]
   | "has_sources" ->
@@ -1895,7 +1893,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
              let fam = foi base ifam in
              p_auth && sou base (get_marriage_src fam) <> "" ||
              sou base (get_fsources fam) <> "")
-          (Array.to_list (get_family u))
+          (Array.to_list (get_family p))
   | "has_surnames_aliases" -> get_surnames_aliases p <> []
   | "is_buried" ->
       match get_burial p with
@@ -1922,7 +1920,7 @@ and eval_bool_person_field conf base env (p, a, u, p_auth) =
   | "is_public" -> get_access p = Public
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found ]
-and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
+and eval_str_person_field conf base env ((p, p_auth) as ep) =
   fun
   [ "access" -> acces conf base p
   | "age" ->
@@ -1947,7 +1945,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       if p_auth then string_of_place conf base (get_burial_place p) else ""
   | "child_name" ->
       let force_surname =
-        match get_parents a with
+        match get_parents p with
         [ None -> False
         | Some ifam ->
             p_surname base (pget conf base (get_father (coi base ifam))) <>
@@ -1959,7 +1957,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   | "consanguinity" ->
       if p_auth then
         string_of_decimal_num conf
-          (round_2_dec (Adef.float_of_fix (get_consang a) *. 100.0)) ^ "%"
+          (round_2_dec (Adef.float_of_fix (get_consang p) *. 100.0)) ^ "%"
       else ""
   | "cremation_place" ->
       if p_auth then string_of_place conf base (get_burial_place p) else ""
@@ -2072,10 +2070,10 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
             List.fold_left
               (fun n ifam ->
                  n + Array.length (get_children (doi base ifam)))
-              0 (Array.to_list (get_family u))
+              0 (Array.to_list (get_family p))
           in
           string_of_int n ]
-  | "nb_families" -> string_of_int (Array.length (get_family u))
+  | "nb_families" -> string_of_int (Array.length (get_family p))
   | "notes" ->
       if p_auth then
         let env = [('i', fun () -> Util.default_image_name base p)] in
@@ -2236,7 +2234,7 @@ and string_of_died conf base env p p_auth =
     | DeadDontKnowWhen -> transl_nth conf "died" is
     | _ -> "" ]
   else ""
-and string_of_image_url conf base env (p, _, _, p_auth) html =
+and string_of_image_url conf base env (p, p_auth) html =
   if p_auth then
     let v =
       image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
@@ -2254,8 +2252,8 @@ and string_of_image_url conf base env (p, _, _, p_auth) html =
     | Some (False, link, _) -> link
     | None -> "" ]
   else ""
-and string_of_parent_age conf base (p, a, _, p_auth) parent =
-  match get_parents a with
+and string_of_parent_age conf base (p, p_auth) parent =
+  match get_parents p with
   [ Some ifam ->
       let cpl = coi base ifam in
       let pp = pget conf base (parent cpl) in
@@ -2272,7 +2270,7 @@ and string_of_int_env var env =
   match get_env var env with
   [ Vint x -> string_of_int x
   | _ -> raise Not_found ]
-and obsolete_eval conf base env (p, a, u, p_auth) loc =
+and obsolete_eval conf base env (p, p_auth) loc =
   fun
   [ "married_to" ->
       let s =
@@ -2296,14 +2294,14 @@ value eval_transl conf env upp s c =
         [ "n" ->
             (* replaced by %apply;nth([...],sex) *)
             match get_env "p" env with
-            [ Vind p _ _ -> 1 - index_of_sex (get_sex p)
+            [ Vind p -> 1 - index_of_sex (get_sex p)
             | _ -> 2 ]
         | "s" ->
             match get_env "child" env with
-            [ Vind p _ _ -> index_of_sex (get_sex p)
+            [ Vind p -> index_of_sex (get_sex p)
             | _ ->
                 match get_env "p" env with
-                [ Vind p _ _ -> index_of_sex (get_sex p)
+                [ Vind p -> index_of_sex (get_sex p)
                 | _ -> 2 ] ]
         | "w" ->
             match get_env "fam" env with
@@ -2324,7 +2322,7 @@ value print_foreach conf base print_ast eval_expr =
     try int_of_string s with [ Failure _ -> raise Not_found ]
   in
   let rec print_foreach env ini_ep loc s sl ell al =
-    let rec loop ((_, a, _, _) as ep) efam =
+    let rec loop ((a, _) as ep) efam =
       fun 
       [ [s] -> print_simple_foreach env ell al ini_ep ep efam loc s
       | ["ancestor" :: sl] ->
@@ -2348,22 +2346,20 @@ value print_foreach conf base print_ast eval_expr =
           | _ -> raise Not_found ]
       | ["child" :: sl] ->
           match get_env "child" env with
-          [ Vind p a u ->
+          [ Vind p ->
               let auth =
                 match get_env "auth" env with
                 [ Vbool True -> authorized_age conf base p
                 | _ -> False ]
               in
-              let ep = (p, a, u, auth) in
+              let ep = (p, auth) in
               loop ep efam sl
           | _ -> raise Not_found ]
       | ["father" :: sl] ->
           match get_parents a with
           [ Some ifam ->
               let cpl = coi base ifam in
-              let ((_, _, _, p_auth) as ep) =
-                make_ep conf base (get_father cpl)
-              in
+              let ((_, p_auth) as ep) = make_ep conf base (get_father cpl) in
               let ifath = get_father cpl in
               let cpl = (ifath, get_mother cpl, ifath) in
               let m_auth =
@@ -2379,9 +2375,7 @@ value print_foreach conf base print_ast eval_expr =
           match get_parents a with
           [ Some ifam ->
               let cpl = coi base ifam in
-              let ((_, _, _, p_auth) as ep) =
-                make_ep conf base (get_mother cpl)
-              in
+              let ((_, p_auth) as ep) = make_ep conf base (get_mother cpl) in
               let ifath = get_father cpl in
               let cpl = (ifath, get_mother cpl, ifath) in
               let m_auth =
@@ -2429,7 +2423,7 @@ value print_foreach conf base print_ast eval_expr =
     | "witness" -> print_foreach_witness env al ep efam
     | "witness_relation" -> print_foreach_witness_relation env al ep
     | _ -> raise Not_found ]
-  and print_foreach_alias env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_alias env al ((p, p_auth) as ep) =
     if p_auth then
       List.iter
         (fun a ->
@@ -2437,7 +2431,7 @@ value print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         (get_aliases p)
     else ()
-  and print_foreach_ancestor env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_ancestor env al ((p, p_auth) as ep) =
     match get_env "gpl" env with
     [ Vgpl gpl ->
         List.iter
@@ -2449,7 +2443,7 @@ value print_foreach conf base print_ast eval_expr =
                  List.iter (print_ast env ep) al ])
           gpl
     | _ -> () ]
-  and print_foreach_ancestor_level env el al ((p, _, _, _) as ep) =
+  and print_foreach_ancestor_level env el al ((p, _) as ep) =
     let max_level =
       match el with
       [ [[e]] -> eval_int_expr env ep e
@@ -2479,7 +2473,7 @@ value print_foreach conf base print_ast eval_expr =
           let gpl = next_generation conf base mark gpl in
           loop gpl (succ i) n
         }
-  and print_foreach_ancestor_level2 env al ((p, _, _, _) as ep) =
+  and print_foreach_ancestor_level2 env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
     let max_level =
       match get_env max_lev env with
@@ -2497,7 +2491,7 @@ value print_foreach conf base print_ast eval_expr =
           let gpl = next_generation2 conf base mark gpl in
           loop gpl (succ i)
         }
-  and print_foreach_anc_surn env el al loc ((p, _, _, _) as ep) =
+  and print_foreach_anc_surn env el al loc ((p, _) as ep) =
     let max_level =
       match el with
       [ [[e]] -> eval_int_expr env ep e
@@ -2513,7 +2507,7 @@ value print_foreach conf base print_ast eval_expr =
          let env = [("ancestor", Vanc_surn (a, b, c, d, e, f, loc)) :: env] in
          List.iter (print_ast env ep) al)
       list
-  and print_foreach_ancestor_tree env el al ((p, _, _, _) as ep) =
+  and print_foreach_ancestor_tree env el al ((p, _) as ep) =
     let (p, max_level) =
       match el with
       [ [[e1]; [e2]] ->
@@ -2541,7 +2535,7 @@ value print_foreach conf base print_ast eval_expr =
             loop False gl
           }
       | [] -> () ]
-  and print_foreach_cell env el al ((p, _, _, _) as ep) =
+  and print_foreach_cell env el al ((p, _) as ep) =
     let celll =
       match get_env "celll" env with
       [ Vcelll celll -> celll
@@ -2564,7 +2558,7 @@ value print_foreach conf base print_ast eval_expr =
         let n =
           let p =
             match get_env "p" env with
-            [ Vind p _ _ -> p
+            [ Vind p -> p
             | _ -> assert False ]
           in
           let rec loop i =
@@ -2577,10 +2571,8 @@ value print_foreach conf base print_ast eval_expr =
         Array.iteri
           (fun i ip ->
              let p = pget conf base ip in
-             let a = aget conf base ip in
-             let u = uget conf base ip in
              let env = [("#loop", Vint 0) :: env] in
-             let env = [("child", Vind p a u) :: env] in
+             let env = [("child", Vind p) :: env] in
              let env = [("child_cnt", Vint (i + 1)) :: env] in
              let env =
                if i = n - 1 && not (is_hidden p) then
@@ -2590,10 +2582,7 @@ value print_foreach conf base print_ast eval_expr =
                  [("pos", Vstring "next") :: env]
                else env
              in
-             let ep =
-               let p_auth = authorized_age conf base p in
-               (p, a, u, p_auth)
-             in
+             let ep = (p, authorized_age conf base p) in
              List.iter (print_ast env ep) al)
           (get_children des)
     | _ -> () ]
@@ -2611,11 +2600,11 @@ value print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al;
           loop (succ i)
         }
-  and print_foreach_family env al ini_ep (p, _, u, _) =
+  and print_foreach_family env al ini_ep (p, _) =
     loop None 0 where rec loop prev i =
-      if i = Array.length (get_family u) then ()
+      if i = Array.length (get_family p) then ()
       else
-        let ifam = (get_family u).(i) in
+        let ifam = (get_family p).(i) in
         let fam = foi base ifam in
         let cpl = coi base ifam in
         let des = doi base ifam in
@@ -2640,7 +2629,7 @@ value print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ini_ep) al;
           loop (Some vfam) (i + 1);
         }
-  and print_foreach_first_name_alias env al ((p, _, _, p_auth) as ep)
+  and print_foreach_first_name_alias env al ((p, p_auth) as ep)
   =
     if p_auth then
       List.iter
@@ -2649,7 +2638,7 @@ value print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
     else ()
-  and print_foreach_level max_lev env al ((p, _, _, _) as ep) =
+  and print_foreach_level max_lev env al ((p, _) as ep) =
     let max_level =
       match get_env max_lev env with
       [ Vint n -> n
@@ -2663,7 +2652,7 @@ value print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al;
           loop (succ i)
         }
-  and print_foreach_nobility_title env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_nobility_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
       list_iter_first
@@ -2673,20 +2662,18 @@ value print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         titles
     else ()
-  and print_foreach_parent env al ((_, a, _, _) as ep) =
+  and print_foreach_parent env al ((a, _) as ep) =
     match get_parents a with
     [ Some ifam ->
         let cpl = coi base ifam in
         Array.iter
           (fun iper ->
              let p = pget conf base iper in
-             let a = aget conf base iper in
-             let u = uget conf base iper in
-             let env = [("parent", Vind p a u) :: env] in
+             let env = [("parent", Vind p) :: env] in
              List.iter (print_ast env ep) al)
           (get_parent_array cpl)
     | None -> () ]
-  and print_foreach_qualifier env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_qualifier env al ((p, p_auth) as ep) =
     if p_auth then
       list_iter_first
         (fun first nn ->
@@ -2695,7 +2682,7 @@ value print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         (get_qualifiers p)
     else ()
-  and print_foreach_relation env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
       List.iter
         (fun r ->
@@ -2703,7 +2690,7 @@ value print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         (get_rparents p)
     else ()
-  and print_foreach_related env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
       let list =
         List.fold_left
@@ -2764,7 +2751,7 @@ value print_foreach conf base print_ast eval_expr =
              loop item sll
            }
       | [] -> () ]
-  and print_foreach_source env al ((p, _, u, p_auth) as ep) =
+  and print_foreach_source env al ((p, p_auth) as ep) =
     let rec insert_loop typ src =
       fun
       [ [(typ1, src1) :: srcl] ->
@@ -2800,7 +2787,7 @@ value print_foreach conf base print_ast eval_expr =
         (fun (srcl, i) ifam ->
            let fam = foi base ifam in
            let lab =
-             if Array.length (get_family u) = 1 then ""
+             if Array.length (get_family p) = 1 then ""
              else " " ^ string_of_int i
            in
            let srcl =
@@ -2811,7 +2798,7 @@ value print_foreach conf base print_ast eval_expr =
            in
            let src_typ = transl_nth conf "family/families" 0 in
            (insert (src_typ ^ lab) (get_fsources fam) srcl, i + 1))
-        (srcl, 1) (get_family u)
+        (srcl, 1) (get_family p)
     in
     let print_src (src_typ, src) =
       let s = sou base src in
@@ -2821,7 +2808,7 @@ value print_foreach conf base print_ast eval_expr =
         List.iter (print_ast env ep) al
     in
     List.iter print_src srcl
-  and print_foreach_surname_alias env al ((p, _, _, p_auth) as ep) =
+  and print_foreach_surname_alias env al ((p, p_auth) as ep) =
     if p_auth then
       List.iter
         (fun s ->
@@ -2835,14 +2822,12 @@ value print_foreach conf base print_ast eval_expr =
         list_iter_first
           (fun first ip ->
              let p = pget conf base ip in
-             let a = aget conf base ip in
-             let u = uget conf base ip in
-             let env = [("witness", Vind p a u) :: env] in
+             let env = [("witness", Vind p) :: env] in
              let env = [("first", Vbool first) :: env] in
              List.iter (print_ast env ep) al)
           (Array.to_list (get_witnesses fam))
     | _ -> () ]
-  and print_foreach_witness_relation env al ((p, _, _, _) as ep) =
+  and print_foreach_witness_relation env al ((p, _) as ep) =
     let list =
       let list = ref [] in
       do {
@@ -2932,9 +2917,7 @@ value eval_predefined_apply conf env f vl =
 
 value interp_templ templ_fname conf base p = do {
   template_file.val := templ_fname ^ ".txt";
-  let a = aget conf base (get_key_index p) in
-  let u = uget conf base (get_key_index p)in
-  let ep = (p, a, u, authorized_age conf base p) in
+  let ep = (p, authorized_age conf base p) in
   let emal =
     match p_getint conf.env "v" with
     [ Some i -> i
@@ -2960,7 +2943,7 @@ value interp_templ templ_fname conf base p = do {
       Vnldb (NotesLinks.read_db_from_file fname)
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
-    [("p", Vind p a u);
+    [("p", Vind p);
      ("p_auth", Vbool (authorized_age conf base p));
      ("count", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
