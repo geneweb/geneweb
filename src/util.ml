@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.105 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: util.ml,v 5.106 2007-01-18 19:45:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -527,11 +527,10 @@ value authorized_age conf base p =
     | (None, None, DontKnowIfDead, None) ->
         get_access p <> Private && conf.public_if_no_date
     | _ ->
-        let u = uoi base (get_key_index p) in
         let rec loop i =
-          if i >= Array.length (get_family u) then False
+          if i >= Array.length (get_family p) then False
           else
-            let fam = foi base (get_family u).(i) in
+            let fam = foi base (get_family p).(i) in
             match Adef.od_of_codate (get_marriage fam) with
             [ Some (Dgreg d _) ->
                 let a = CheckItem.time_elapsed d conf.today in

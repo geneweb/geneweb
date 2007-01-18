@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.16 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.17 2007-01-18 19:45:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -492,10 +492,7 @@ value print_add conf base =
             person_key base (get_key_index p)
           else ("", "", 0, Update.Create Female None, "")
         in
-        let digest =
-          string_of_int
-            (Array.length (get_family (uoi base (get_key_index p))))
-        in
+        let digest = string_of_int (Array.length (get_family p)) in
         (fath, moth, digest)
     | None ->
         (("", "", 0, Update.Create Male None, ""),
@@ -559,7 +556,7 @@ value rec find_families ifam =
 value print_inv conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam) ->
-      let u = uoi base (Adef.iper_of_int ip) in
+      let u = poi base (Adef.iper_of_int ip) in
       match
         find_families (Adef.ifam_of_int ifam) (Array.to_list (get_family u))
       with

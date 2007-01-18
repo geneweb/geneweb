@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.92 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.93 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -96,8 +96,6 @@ value family_of_gen_family :
 value poi : base -> iper -> person;
 value foi : base -> ifam -> family;
 
-(* equivalent to poi; ought to be replaced in the code *)
-value uoi : base -> iper -> person;
 (* equivalent to foi; ought to be replaced in the code *)
 value coi : base -> ifam -> family;
 value doi : base -> ifam -> family;

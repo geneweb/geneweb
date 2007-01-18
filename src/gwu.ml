@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.35 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.36 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -628,7 +628,7 @@ value print_notes oc base gen ml =
 value is_isolated base p =
   match get_parents p with
   [ Some _ -> False
-  | None -> Array.length (get_family (uoi base (get_key_index p))) = 0 ]
+  | None -> Array.length (get_family p) = 0 ]
 ;
 
 value is_definition_for_parent base p =
@@ -862,7 +862,7 @@ value connected_families base fam_sel ifam cpl =
     [ [ip :: ipl] ->
         if List.mem ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
-          let u = uoi base ip in
+          let u = poi base ip in
           let ifaml1 = Array.to_list (get_family u) in
           let ifaml1 = filter fam_sel ifaml1 in
           let ifaml = merge_families ifaml ifaml1 in
@@ -936,9 +936,8 @@ value rec find_ancestors base surn p list =
 
 value mark_branch base mark surn p =
   loop True p where rec loop top p =
-    let u = uoi base (get_key_index p) in
-    for i = 0 to Array.length (get_family u) - 1 do {
-      let ifam = (get_family u).(i) in
+    for i = 0 to Array.length (get_family p) - 1 do {
+      let ifam = (get_family p).(i) in
       match mark.(Adef.int_of_ifam ifam) with
       [ NotScanned ->
           let ifaml =
@@ -993,13 +992,13 @@ value scan_connex_component base test_action len ifam =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family (uoi base (get_father cpl)))
+        len (get_family (poi base (get_father cpl)))
     in
     let len =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family (uoi base (get_mother cpl)))
+        len (get_family (poi base (get_mother cpl)))
     in
     let len =
       match get_parents (poi base (get_father cpl)) with
@@ -1015,7 +1014,7 @@ value scan_connex_component base test_action len ifam =
     let len =
       Array.fold_left
         (fun len ip ->
-           Array.fold_left (test_action loop) len (get_family (uoi base ip)))
+           Array.fold_left (test_action loop) len (get_family (poi base ip)))
         len children
     in
     len

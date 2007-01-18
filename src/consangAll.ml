@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.30 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.31 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -20,7 +20,7 @@ value rec clear_descend_consang base cset mark ifam =
        if not mark.(Adef.int_of_iper ip) then do {
          cset (Adef.int_of_iper ip) no_consang;
          mark.(Adef.int_of_iper ip) := True;
-         let u = uoi base ip in
+         let u = poi base ip in
          Array.iter (clear_descend_consang base cset mark) (get_family u)
        }
        else ())
@@ -59,7 +59,7 @@ value compute base from_scratch quiet = do {
       | list ->
           List.iter
             (fun ip ->
-               let u = uoi base ip in
+               let u = poi base ip in
                Array.iter (clear_descend_consang base cset mark)
                  (get_family u))
             list ]

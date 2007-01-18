@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.41 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.42 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -306,7 +306,7 @@ value reparent_ind base ip1 ip2 =
 value effective_merge_ind conf base p1 p2 =
   do {
     reparent_ind base (get_key_index p1) (get_key_index p2);
-    let u2 = uoi base (get_key_index p2) in
+    let u2 = poi base (get_key_index p2) in
     if Array.length (get_family u2) <> 0 then do {
       for i = 0 to Array.length (get_family u2) - 1 do {
         let ifam = (get_family u2).(i) in
@@ -320,8 +320,7 @@ value effective_merge_ind conf base p1 p2 =
         in
         patch_couple base ifam cpl;
       };
-      let u1 = uoi base (get_key_index p1) in
-      let u1 = {family = Array.append (get_family u1) (get_family u2)} in
+      let u1 = {family = Array.append (get_family p1) (get_family u2)} in
       patch_union base (get_key_index p1) u1;
       let u2 = {family = [| |]} in
       patch_union base (get_key_index p2) u2;

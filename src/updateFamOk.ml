@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.44 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.45 2007-01-18 19:45:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -324,7 +324,7 @@ value family_exclude pfams efam =
 ;
 
 value infer_origin_file_from_other_marriages conf base ifam ip =
-  let u = uoi base ip in
+  let u = poi base ip in
   let ufams = get_family u in
   let rec loop i =
     if i = Array.length ufams then None
@@ -363,7 +363,7 @@ value infer_origin_file conf base ifam ncpl ndes =
               if i = Array.length ndes.children then
                 Gwdb.insert_string base ""
               else
-                let cifams = get_family (uoi base ndes.children.(i)) in
+                let cifams = get_family (poi base ndes.children.(i)) in
                 if Array.length cifams = 0 then loop (i + 1)
                 else if
                   sou base (get_origin_file (foi base cifams.(0))) <> ""
@@ -446,7 +446,6 @@ value effective_mod conf base sfam scpl sdes = do {
   in
   let nfath = poi base (Adef.father ncpl) in
   let nmoth = poi base (Adef.mother ncpl) in
-  let nfath_u = uoi base (Adef.father ncpl) in
   if sfam.relation <> NoSexesCheckNotMarried &&
      sfam.relation <> NoSexesCheckMarried then do {
     match get_sex nfath with
@@ -479,7 +478,7 @@ value effective_mod conf base sfam scpl sdes = do {
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do {
     if not (array_mem oarr.(i) narr) then do {
-      let ou = uoi base oarr.(i) in
+      let ou = poi base oarr.(i) in
       let ou = {family = family_exclude (get_family ou) fi} in
       patch_union base oarr.(i) ou
     }
@@ -487,7 +486,7 @@ value effective_mod conf base sfam scpl sdes = do {
   };
   for i = 0 to Array.length narr - 1 do {
     if not (array_mem narr.(i) oarr) then do {
-      let nu = uoi base narr.(i) in
+      let nu = poi base narr.(i) in
       let nu = {family = Array.append (get_family nu) [| fi |]} in
       patch_union base narr.(i) nu;
     }
@@ -546,8 +545,7 @@ value effective_mod conf base sfam scpl sdes = do {
        else ())
     ndes.children;
   Update.add_misc_names_for_new_persons base created_p.val;
-  Update.update_misc_names_of_family base Male
-    {family = get_family nfath_u};
+  Update.update_misc_names_of_family base Male {family = get_family nfath};
   update_related_witnesses base (Array.to_list owitnesses)
     (Array.to_list nfam.witnesses) ncpl;
   (fi, nfam, ncpl, ndes)
@@ -575,8 +573,6 @@ value effective_add conf base sfam scpl sdes =
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
-  let nfath_u = uoi base (Adef.father ncpl) in
-  let nmoth_u = uoi base (Adef.mother ncpl) in
   do {
     if sfam.relation <> NoSexesCheckNotMarried &&
        sfam.relation <> NoSexesCheckMarried then do {
@@ -599,8 +595,8 @@ value effective_add conf base sfam scpl sdes =
     patch_family base fi nfam;
     patch_couple base fi ncpl;
     patch_descend base fi ndes;
-    let nfath_u = {family = Array.append (get_family nfath_u) [| fi |]} in
-    let nmoth_u = {family = Array.append (get_family nmoth_u) [| fi |]} in
+    let nfath_u = {family = Array.append (get_family nfath_p) [| fi |]} in
+    let nmoth_u = {family = Array.append (get_family nmoth_p) [| fi |]} in
     patch_union base (Adef.father ncpl) nfath_u;
     patch_union base (Adef.mother ncpl) nmoth_u;
     Array.iter
@@ -632,7 +628,7 @@ value effective_inv conf base ip u ifam =
 ;
 
 value kill_family base ifam1 ip =
-  let u = uoi base ip in
+  let u = poi base ip in
   let l =
     List.fold_right
       (fun ifam ifaml ->
@@ -848,7 +844,7 @@ value print_add o_conf base =
       match p_getint conf.env "ip" with
       [ Some ip ->
           string_of_int
-            (Array.length (get_family (uoi base (Adef.iper_of_int ip))))
+            (Array.length (get_family (poi base (Adef.iper_of_int ip))))
       | None -> "" ]
     in
     let sdigest = raw_get conf "digest" in
@@ -981,14 +977,13 @@ value print_inv conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam) ->
       let p = poi base (Adef.iper_of_int ip) in
-      let u = uoi base (Adef.iper_of_int ip) in
       let k =
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
          get_key_index p)
       in
       try
         do {
-          effective_inv conf base (get_key_index p) u (Adef.ifam_of_int ifam);
+          effective_inv conf base (get_key_index p) p (Adef.ifam_of_int ifam);
           Util.commit_patches conf base;
           History.record conf base k "if";
           print_inv_ok conf base p

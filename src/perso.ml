@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.56 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: perso.ml,v 5.57 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -302,7 +302,7 @@ value make_desc_level_table conf base max_level p = do {
     | Some _ | None -> Neuter ]
   in
   let levt = Array.create (nb_of_persons base) infinite in
-  let get = uoi base in
+  let get = poi base in
   let ini_ip = get_key_index p in
   let rec fill lev =
     fun
@@ -701,7 +701,7 @@ value excluded_possible_duplications conf =
 ;
 
 value first_possible_duplication base ip (iexcl, fexcl) =
-  let ifaml = Array.to_list (get_family (uoi base ip)) in
+  let ifaml = Array.to_list (get_family (poi base ip)) in
   let cand_spouse =
     loop_spouse ifaml where rec loop_spouse =
       fun
