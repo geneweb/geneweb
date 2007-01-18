@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.20 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: descend.ml,v 5.21 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -61,7 +61,7 @@ value named_like_father conf base ip =
   match get_parents a with
   [ Some ifam ->
       eq_istr (get_surname (pget conf base ip))
-        (get_surname (pget conf base (get_father (coi base ifam))))
+        (get_surname (pget conf base (get_father (foi base ifam))))
   | _ -> False ]
 ;
 
@@ -128,7 +128,7 @@ value
         list_iter_first
           (fun first ifam ->
              let fam = foi base ifam in
-             let c = spouse ix (coi base ifam) in
+             let c = spouse ix fam in
              let c = pget conf base c in
              if know base c then do {
                display_married conf base first fam x c;
@@ -162,15 +162,13 @@ value display_descendants_upto conf base max_level p line =
       list_iter_first
         (fun first ifam ->
            let fam = foi base ifam in
-           let cpl = coi base ifam in
-           let des = doi base ifam in
-           let conj = spouse (get_key_index p) cpl in
+           let conj = spouse (get_key_index p) fam in
            let conj = pget conf base conj in
            let children =
              if line = Neuter || line = Male && get_sex p <> Female ||
                 line = Female && get_sex p <> Male || level = 1
              then
-               List.map (pget conf base) (Array.to_list (get_children des))
+               List.map (pget conf base) (Array.to_list (get_children fam))
              else []
            in
            do {
@@ -179,7 +177,7 @@ value display_descendants_upto conf base max_level p line =
                if children <> [] then
                  Wserver.wprint ", <em>%s</em>"
                    (transl conf "having as children")
-               else if Array.length (get_children des) <> 0 then
+               else if Array.length (get_children fam) <> 0 then
                  Wserver.wprint ", ..."
                else Wserver.wprint ".";
                Wserver.wprint "\n";
@@ -341,9 +339,9 @@ value label_descendants conf base marks paths max_lev =
       let _ =
         List.fold_left
           (fun cnt ifam ->
-             let des = doi base ifam in
-             let c = spouse (get_key_index p) (coi base ifam) in
-             let el = get_children des in
+             let fam = foi base ifam in
+             let c = spouse (get_key_index p) fam in
+             let el = get_children fam in
              List.fold_left
                (fun cnt e ->
                   do {
@@ -372,9 +370,9 @@ value close_to_end conf base marks max_lev lev p =
       let u = uget conf base (get_key_index p) in
       List.for_all
         (fun ifam ->
-           let des = doi base ifam in
-           let c = spouse (get_key_index p) (coi base ifam) in
-           let el = get_children des in
+           let fam = foi base ifam in
+           let c = spouse (get_key_index p) fam in
+           let el = get_children fam in
            if get_sex p = Male || not marks.(Adef.int_of_iper c) then
              if dlev = close_lev then Array.length el = 0
              else
@@ -392,7 +390,7 @@ value labelled conf base marks max_lev lev ip =
   Array.length (get_family u) <> 0 &&
   (match get_parents a with
    [ Some ifam ->
-       let cpl = coi base ifam in
+       let cpl = foi base ifam in
        List.exists
          (fun ifam ->
             let el = get_children (doi base ifam) in
@@ -459,9 +457,8 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
         List.fold_left
           (fun (cnt, first, need_br) ifam ->
              let fam = foi base ifam in
-             let des = doi base ifam in
-             let c = spouse (get_key_index p) (coi base ifam) in
-             let el = get_children des in
+             let c = spouse (get_key_index p) fam in
+             let el = get_children fam in
              let c = pget conf base c in
              do {
                if need_br then html_br conf else ();
@@ -489,9 +486,8 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                             list_iter_first
                               (fun first ifam ->
                                  let fam = foi base ifam in
-                                 let des = doi base ifam in
-                                 let c1 = spouse ie (coi base ifam) in
-                                 let el = get_children des in
+                                 let c1 = spouse ie fam in
+                                 let el = get_children fam in
                                  let c1 = pget conf base c1 in
                                  do {
                                    if not first then do {
@@ -540,9 +536,8 @@ value print_family conf base marks paths max_lev lev p =
       List.fold_left
         (fun cnt ifam ->
            let fam = foi base ifam in
-           let des = doi base ifam in
-           let c = spouse (get_key_index p) (coi base ifam) in
-           let el = get_children des in
+           let c = spouse (get_key_index p) fam in
+           let el = get_children fam in
            let c = pget conf base c in
            do {
              stag "strong" begin
@@ -569,9 +564,8 @@ value print_family conf base marks paths max_lev lev p =
                           Array.iter
                             (fun ifam ->
                                let fam = foi base ifam in
-                               let des = doi base ifam in
-                               let c = spouse ie (coi base ifam) in
-                               let el = get_children des in
+                               let c = spouse ie fam in
+                               let el = get_children fam in
                                let c = pget conf base c in
                                do {
                                  display_spouse conf base marks paths fam e
@@ -606,9 +600,9 @@ value print_families conf base marks paths max_lev =
       print_family conf base marks paths max_lev lev p;
       Array.iter
         (fun ifam ->
-           let des = doi base ifam in
-           let c = spouse (get_key_index p) (coi base ifam) in
-           let el = get_children des in
+           let fam = doi base ifam in
+           let c = spouse (get_key_index p) fam in
+           let el = get_children fam in
            let c = pget conf base c in
            if get_sex p = Male ||
               not marks.(Adef.int_of_iper (get_key_index c))
@@ -676,7 +670,7 @@ value print_ref conf base paths p =
   else
     Array.iter
       (fun ifam ->
-         let c = spouse (get_key_index p) (coi base ifam) in
+         let c = spouse (get_key_index p) (foi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
            let c = pget conf base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
@@ -832,7 +826,7 @@ value display_spouse_index conf base max_level ancestor =
            p_first_name base p <> "x" then
           Array.iter
             (fun ifam ->
-               let c = spouse (get_key_index p) (coi base ifam) in
+               let c = spouse (get_key_index p) (foi base ifam) in
                if paths.(Adef.int_of_iper c) = [] then
                  let c = pget conf base c in
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
@@ -1072,12 +1066,9 @@ value make_tree_hts conf base gv p =
             in
             let td =
               let fam = foi base ifam in
-              let des = doi base ifam in
-              let ncol = fam_nb_column 0 (v - 1) des in
+              let ncol = fam_nb_column 0 (v - 1) fam in
               let s =
-                let sp =
-                  pget conf base (spouse (get_key_index p) (coi base ifam))
-                in
+                let sp = pget conf base (spouse (get_key_index p) fam) in
                 let txt = person_title_text conf base sp in
                 let txt = reference conf base sp txt in
                 let txt =
@@ -1183,7 +1174,7 @@ value print_aboville conf base max_level p =
         let u = uget conf base (get_key_index p) in
         if lev < max_level then
           for i = 0 to Array.length (get_family u) - 1 do {
-            let cpl = coi base (get_family u).(i) in
+            let cpl = foi base (get_family u).(i) in
             let spouse =
               pget conf base (Gutil.spouse (get_key_index p) cpl)
             in

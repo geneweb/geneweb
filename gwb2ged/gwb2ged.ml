@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.26 2007-01-18 19:45:34 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.27 2007-01-18 23:12:50 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -577,22 +577,20 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
   let fam = foi base (Adef.ifam_of_int i) in
   if is_deleted_family fam then ()
   else do {
-    let cpl = coi base (Adef.ifam_of_int i) in
-    let des = doi base (Adef.ifam_of_int i) in
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
     ged_marriage base oc fam;
     ged_divorce base oc fam;
-    if has_personal_infos base (poi base (get_father cpl)) &&
-       per_sel (get_father cpl)
+    if has_personal_infos base (poi base (get_father fam)) &&
+       per_sel (get_father fam)
     then
-      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father cpl) + 1)
+      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father fam) + 1)
     else ();
-    if has_personal_infos base (poi base (get_mother cpl)) &&
-       per_sel (get_mother cpl)
+    if has_personal_infos base (poi base (get_mother fam)) &&
+       per_sel (get_mother fam)
     then
-      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother cpl) + 1)
+      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother fam) + 1)
     else ();
-    Array.iter (ged_child base sel oc) (get_children des);
+    Array.iter (ged_child base sel oc) (get_children fam);
     ged_fsource base oc fam;
     ged_comment base oc fam;
   }

@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.10 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: consang.ml,v 5.11 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -51,20 +51,19 @@ value check_noloop base error =
   let tab = Array.create (nb_of_persons base) NotVisited in
   let rec noloop i =
     match tab.(i) with
-    [ NotVisited ->
-        do {
-          match get_parents (poi base (Adef.iper_of_int i)) with
-          [ Some fam ->
-              let fath = get_father (coi base fam) in
-              let moth = get_mother (coi base fam) in
-              do {
-                tab.(i) := BeingVisited;
-                noloop (Adef.int_of_iper fath);
-                noloop (Adef.int_of_iper moth);
-              }
-          | None -> () ];
-          tab.(i) := Visited;
-        }
+    [ NotVisited -> do {
+        match get_parents (poi base (Adef.iper_of_int i)) with
+        [ Some ifam -> do {
+            let fam = foi base ifam in
+            let fath = get_father fam in
+            let moth = get_mother fam in
+            tab.(i) := BeingVisited;
+            noloop (Adef.int_of_iper fath);
+            noloop (Adef.int_of_iper moth);
+          }
+        | None -> () ];
+        tab.(i) := Visited;
+      }
     | BeingVisited -> error (OwnAncestor (poi base (Adef.iper_of_int i)))
     | Visited -> () ]
   in
@@ -96,7 +95,7 @@ value topological_sort base poi =
       let a = poi base (Adef.iper_of_int i) in
       match get_parents a with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let ifath = Adef.int_of_iper (get_father cpl) in
           let imoth = Adef.int_of_iper (get_mother cpl) in
           do {
@@ -119,7 +118,7 @@ value topological_sort base poi =
                  incr cnt;
                  match get_parents a with
                  [ Some ifam ->
-                     let cpl = coi base ifam in
+                     let cpl = foi base ifam in
                      let ifath = Adef.int_of_iper (get_father cpl) in
                      let imoth = Adef.int_of_iper (get_mother cpl) in
                      do {
@@ -161,7 +160,7 @@ value check_noloop_for_person_list base error ipl =
         do {
           match get_parents (poi base ip) with
           [ Some ifam ->
-              let cpl = coi base ifam in
+              let cpl = foi base ifam in
               do {
                 tab.(i) := BeingVisited;
                 Array.iter noloop (get_parent_array cpl);
@@ -304,7 +303,7 @@ value relationship_and_links base ri b ip1 ip2 =
         else ();
         match get_parents a with
         [ Some ifam ->
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             do {
               treat_parent (Adef.iper_of_int u) tu
                 (Adef.int_of_iper (get_father cpl));

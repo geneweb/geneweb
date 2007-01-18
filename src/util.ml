@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.106 2007-01-18 19:45:35 ddr Exp $ *)
+(* $Id: util.ml,v 5.107 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -495,7 +495,7 @@ value nobtit conf base p =
 value parent_has_title conf base p =
   match get_parents p with
   [ Some ifam ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
       get_access fath <> Private && nobtit conf base fath <> [] ||
@@ -1060,16 +1060,16 @@ value url_no_index conf base =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
         if i >= 0 && i < nb_of_families base then
-          if is_deleted_family (foi base (Adef.ifam_of_int i)) then None
+          let fam = foi base (Adef.ifam_of_int i) in
+          if is_deleted_family fam then None
           else
-            let cpl = coi base (Adef.ifam_of_int i) in
-            let p = pget conf base (get_father cpl) in
+            let p = pget conf base (get_father fam) in
             let f = scratch (get_first_name p) in
             let s = scratch (get_surname p) in
             if f = "" || s = "" then None
             else
               let oc = string_of_int (get_occ p) in
-              let u = uget conf base (get_father cpl) in
+              let u = uget conf base (get_father fam) in
               let n =
                 loop 0 where rec loop k =
                   if (get_family u).(k) = Adef.ifam_of_int i then
@@ -1528,7 +1528,7 @@ value specify_homonymous conf base p =
       let ifam =
         match get_parents a with
         [ Some ifam ->
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             let fath =
               let fath = pget conf base (get_father cpl) in
               if p_first_name base fath = "?" then None else Some fath
@@ -1547,7 +1547,7 @@ value specify_homonymous conf base p =
             if i < Array.length (get_family u) then
               let des = doi base (get_family u).(i) in
               let conjoint =
-                spouse (get_key_index p) (coi base (get_family u).(i))
+                spouse (get_key_index p) (foi base (get_family u).(i))
               in
               let ct = get_children des in
               if Array.length ct > 0 then
@@ -1838,7 +1838,7 @@ value branch_of_sosa conf base ip n =
       | [goto_fath :: nl] ->
           match get_parents (aget conf base ip) with
           [ Some ifam ->
-              let cpl = coi base ifam in
+              let cpl = foi base ifam in
               if goto_fath then
                 loop [(ip, sp) :: ipl] (get_father cpl) Male nl
               else loop [(ip, sp) :: ipl] (get_mother cpl) Female nl

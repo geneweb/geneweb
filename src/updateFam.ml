@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.17 2007-01-18 19:45:35 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.18 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -36,7 +36,7 @@ value string_family_of conf base ifam =
   in
   let scpl =
     Futil.map_couple_p conf.multi_parents (person_key base)
-      (gen_couple_of_couple (coi base ifam))
+      (gen_couple_of_couple (foi base ifam))
   in
   let sdes =
     Futil.map_descend_p (person_key base)
@@ -438,8 +438,8 @@ value print_inv1 conf base p ifam1 ifam2 =
   let title _ =
     Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
   in
-  let cpl1 = coi base ifam1 in
-  let cpl2 = coi base ifam2 in
+  let cpl1 = foi base ifam1 in
+  let cpl2 = foi base ifam2 in
   do {
     header conf title;
     Wserver.wprint "%s:"

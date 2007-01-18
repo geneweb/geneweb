@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.49 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: request.ml,v 5.50 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -291,7 +291,7 @@ value specify conf base n pl =
            let spouses =
              List.fold_right
                (fun ifam spouses ->
-                  let cpl = coi base ifam in
+                  let cpl = foi base ifam in
                   let spouse =
                     pget conf base (spouse (get_key_index p) cpl)
                   in

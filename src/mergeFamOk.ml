@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.15 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.16 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -85,7 +85,7 @@ value print_merge conf base =
       in
       let scpl =
         Futil.map_couple_p conf.multi_parents (UpdateFam.person_key base)
-          (gen_couple_of_couple (coi base sfam.fam_index))
+          (gen_couple_of_couple (foi base sfam.fam_index))
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
   | _ -> incorrect_request conf ]

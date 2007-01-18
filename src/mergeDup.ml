@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeDup.ml,v 5.7 2007-01-17 15:07:26 ddr Exp $ *)
+(* $Id: mergeDup.ml,v 5.8 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -93,7 +93,7 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf True;
   let (ip1, ip2) =
-    let cpl = coi base ifam1 in
+    let cpl = foi base ifam1 in
     (Gwdb.get_father cpl, Gwdb.get_mother cpl)
   in
   tag "ul" begin

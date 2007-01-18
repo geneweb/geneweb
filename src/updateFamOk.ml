@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.45 2007-01-18 19:45:35 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.46 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -423,7 +423,7 @@ value effective_mod conf base sfam scpl sdes = do {
     (get_origin_file ofam, get_witnesses ofam)
   in
   let (oarr, ofather, omother) =
-    let ocpl = coi base fi in
+    let ocpl = foi base fi in
     (get_parent_array ocpl, get_father ocpl, get_mother ocpl)
   in
   let ochildren = get_children (doi base fi) in
@@ -645,11 +645,9 @@ value kill_parents base ip =
 ;
 
 value effective_del conf base (ifam, fam) = do {
-  let cpl = coi base ifam in
-  let des = doi base ifam in
-  kill_family base ifam (get_father cpl);
-  kill_family base ifam (get_mother cpl);
-  Array.iter (kill_parents base) (get_children des);
+  kill_family base ifam (get_father fam);
+  kill_family base ifam (get_mother fam);
+  Array.iter (kill_parents base) (get_children fam);
   delete_family base ifam;
 };
 
@@ -893,12 +891,11 @@ value print_del conf base =
       let ifam = Adef.ifam_of_int i in
       let fam = foi base ifam in
       let k =
-        let cpl = coi base ifam in
         let ip =
           match p_getint conf.env "ip" with
-          [ Some i when Adef.int_of_iper (get_mother cpl) = i ->
-              get_mother cpl
-          | _ -> get_father cpl ]
+          [ Some i when Adef.int_of_iper (get_mother fam) = i ->
+              get_mother fam
+          | _ -> get_father fam ]
         in
         let p = poi base ip in
         (sou base (get_first_name p), sou base (get_surname p), get_occ p,
@@ -941,9 +938,8 @@ value print_mod_aux conf base callback =
 ;
 
 value family_structure conf base ifam =
-  let cpl = coi base ifam in
-  let des = doi base ifam in
-  (get_parent_array cpl, get_children des)
+  let fam = foi base ifam in
+  (get_parent_array fam, get_children fam)
 ;
 
 value print_mod o_conf base =

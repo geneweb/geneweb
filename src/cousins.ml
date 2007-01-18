@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.12 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.13 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -55,7 +55,7 @@ value merge_siblings l1 l2 =
 value siblings conf base ip =
   match get_parents (aget conf base ip) with
   [ Some ifam ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       let fath_sib =
         List.map (fun ip -> (ip, (get_father cpl, Male)))
           (siblings_by conf base (get_father cpl) ip)
@@ -136,7 +136,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
         let _ =
           List.fold_left
             (fun a ifam ->
-               let cpl = coi base ifam in
+               let cpl = foi base ifam in
                let sp =
                  if get_sex p2 = Female then pget conf base (get_father cpl)
                  else pget conf base (get_mother cpl)
@@ -355,7 +355,7 @@ value print_anniv conf base p dead_people level =
           let a =
             match get_parents (aget conf base ip) with
             [ Some ifam ->
-                let cpl = coi base ifam in
+                let cpl = foi base ifam in
                 let n = n + 1 in
                 let up_sosa = 2 * up_sosa in
                 let a = P.add (get_father cpl, n, up_sosa) a in
@@ -376,7 +376,7 @@ value print_anniv conf base p dead_people level =
            let rec loop set i =
              if i = Array.length u then set
              else
-               let cpl = coi base u.(i) in
+               let cpl = foi base u.(i) in
                let c = spouse ip cpl in
                loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1)
            in

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.57 2007-01-18 19:45:34 ddr Exp $ *)
+(* $Id: perso.ml,v 5.58 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -195,7 +195,7 @@ value find_sosa_aux conf base a p =
             let asc = aget conf base ip in
             match get_parents asc with
             [ Some ifam ->
-                let cpl = coi base ifam in
+                let cpl = foi base ifam in
                 let z = Num.twice z in
                 match gene_find zil with
                 [ Left zil ->
@@ -259,7 +259,7 @@ value max_ancestor_level conf base ip max_lev =
       else
         match get_parents (aget conf base ip) with
         [ Some ifam ->
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             do {
               loop (succ level) (get_father cpl);
               loop (succ level) (get_mother cpl)
@@ -378,7 +378,7 @@ value next_generation conf base mark gpl =
              let a = aget conf base ip in
              match get_parents a with
              [ Some ifam ->
-                 let cpl = coi base ifam in
+                 let cpl = foi base ifam in
                  [GP_person n_fath (get_father cpl) (Some ifam);
                   GP_person n_moth (get_mother cpl) (Some ifam) :: gpl]
              | None -> [GP_missing n ip :: gpl] ]
@@ -464,7 +464,7 @@ value parent_sosa conf base ip all_gp n parent =
   else
     match get_parents (aget conf base ip) with
     [ Some ifam ->
-        match get_link all_gp (parent (coi base ifam)) with
+        match get_link all_gp (parent (foi base ifam)) with
         [ Some (GP_person n _ _) -> Num.to_string n
         | _ -> "" ]
     | None -> "" ]
@@ -571,7 +571,7 @@ value tree_generation_list conf base gv p =
          | Cell p _ _ _ _ ->
              match get_parents (aget conf base (get_key_index p)) with
              [ Some ifam ->
-                 let cpl = coi base ifam in
+                 let cpl = foi base ifam in
                  let fath =
                    let p = pget conf base (get_father cpl) in
                    if know base p then Some p else None
@@ -706,14 +706,14 @@ value first_possible_duplication base ip (iexcl, fexcl) =
     loop_spouse ifaml where rec loop_spouse =
       fun
       [ [ifam1 :: ifaml1] ->
-          let isp1 = Gutil.spouse ip (coi base ifam1) in
+          let isp1 = Gutil.spouse ip (foi base ifam1) in
           let sp1 = poi base isp1 in
           let fn1 = get_first_name sp1 in
           let sn1 = get_surname sp1 in
           loop_same ifaml1 where rec loop_same =
             fun
             [ [ifam2 :: ifaml2] ->
-                let isp2 = Gutil.spouse ip (coi base ifam2) in
+                let isp2 = Gutil.spouse ip (foi base ifam2) in
                 if isp2 = isp1 then
                   if not (List.mem (ifam1, ifam2) fexcl) then
                     DupFam ifam1 ifam2
@@ -809,7 +809,7 @@ value build_surnames_list conf base v p =
         mark.(Adef.int_of_iper (get_key_index p)) - 1;
       match get_parents (aget conf base (get_key_index p)) with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let fath = pget conf base (get_father cpl) in
           let moth = pget conf base (get_mother cpl) in
           do {
@@ -1366,7 +1366,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
   | ["father" :: sl] ->
       match get_parents a with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let ep = make_ep conf base (get_father cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
@@ -1378,7 +1378,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
   | ["mother" :: sl] ->
       match get_parents a with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let ep = make_ep conf base (get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
@@ -1534,9 +1534,8 @@ and eval_ancestor_field_var conf base env gp loc =
       match gp with
       [ GP_person _ ip (Some ifam) ->
           let f = foi base ifam in
-          let c = coi base ifam in
-          let ifath = get_father c in
-          let imoth = get_mother c in
+          let ifath = get_father f in
+          let imoth = get_mother f in
           let ispouse = if ip = ifath then imoth else ifath in
           let c = (ifath, imoth, ispouse) in
           let m_auth =
@@ -1550,7 +1549,7 @@ and eval_ancestor_field_var conf base env gp loc =
       [ GP_person _ ip _ ->
           match (get_parents (poi base ip), get_env "all_gp" env) with
           [ (Some ifam, Vallgp all_gp) ->
-              let cpl = coi base ifam in
+              let cpl = foi base ifam in
               match get_link all_gp (get_father cpl) with
               [ Some gp -> eval_ancestor_field_var conf base env gp loc sl
               | None -> raise Not_found ]
@@ -1600,7 +1599,7 @@ and eval_ancestor_field_var conf base env gp loc =
   | ["spouse" :: sl] ->
       match gp with
       [ GP_person _ ip (Some ifam) ->
-          let ip = Gutil.spouse ip (coi base ifam) in
+          let ip = Gutil.spouse ip (foi base ifam) in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
@@ -1676,7 +1675,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   | ["father" :: sl] ->
       match get_parents p with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let ep = make_ep conf base (get_father cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
@@ -1732,7 +1731,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   | ["mother" :: sl] ->
       match get_parents p with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let ep = make_ep conf base (get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
@@ -1756,7 +1755,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam ifam fam _ _ ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           let ip = Gutil.spouse (get_key_index p) cpl in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
@@ -1947,7 +1946,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         match get_parents p with
         [ None -> False
         | Some ifam ->
-            p_surname base (pget conf base (get_father (coi base ifam))) <>
+            p_surname base (pget conf base (get_father (foi base ifam))) <>
               p_surname base p ]
       in
       if not p_auth && conf.hide_names then "x x"
@@ -2254,7 +2253,7 @@ and string_of_image_url conf base env (p, p_auth) html =
 and string_of_parent_age conf base (p, p_auth) parent =
   match get_parents p with
   [ Some ifam ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       let pp = pget conf base (parent cpl) in
       if p_auth && authorized_age conf base pp then
         match
@@ -2357,7 +2356,7 @@ value print_foreach conf base print_ast eval_expr =
       | ["father" :: sl] ->
           match get_parents a with
           [ Some ifam ->
-              let cpl = coi base ifam in
+              let cpl = foi base ifam in
               let ((_, p_auth) as ep) = make_ep conf base (get_father cpl) in
               let ifath = get_father cpl in
               let cpl = (ifath, get_mother cpl, ifath) in
@@ -2371,7 +2370,7 @@ value print_foreach conf base print_ast eval_expr =
       | ["mother" :: sl] ->
           match get_parents a with
           [ Some ifam ->
-              let cpl = coi base ifam in
+              let cpl = foi base ifam in
               let ((_, p_auth) as ep) = make_ep conf base (get_mother cpl) in
               let ifath = get_father cpl in
               let cpl = (ifath, get_mother cpl, ifath) in
@@ -2601,10 +2600,9 @@ value print_foreach conf base print_ast eval_expr =
       else
         let ifam = (get_family p).(i) in
         let fam = foi base ifam in
-        let cpl = coi base ifam in
-        let ifath = get_father cpl in
-        let imoth = get_mother cpl in
-        let ispouse = spouse (get_key_index p) cpl in
+        let ifath = get_father fam in
+        let imoth = get_mother fam in
+        let ispouse = spouse (get_key_index p) fam in
         let cpl = (ifath, imoth, ispouse) in
         let m_auth =
            authorized_age conf base (poi base ifath) &&
@@ -2659,7 +2657,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_parent env al ((a, _) as ep) =
     match get_parents a with
     [ Some ifam ->
-        let cpl = coi base ifam in
+        let cpl = foi base ifam in
         Array.iter
           (fun iper ->
              let p = pget conf base iper in
@@ -2862,9 +2860,8 @@ value print_foreach conf base print_ast eval_expr =
     in
     List.iter
       (fun (ifam, fam) ->
-         let cpl = coi base ifam in
-         let ifath = get_father cpl in
-         let imoth = get_mother cpl in
+         let ifath = get_father fam in
+         let imoth = get_mother fam in
          let cpl = (ifath, imoth, imoth) in
          let m_auth =
            authorized_age conf base (poi base ifath) &&
@@ -2997,7 +2994,7 @@ value print_ancestors_dag conf base v p =
       else
         match get_parents (aget conf base ip) with
         [ Some ifam ->
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             let set = loop set (lev - 1) (get_mother cpl) in
             loop set (lev - 1) (get_father cpl)
         | None -> set ]
