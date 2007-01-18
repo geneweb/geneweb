@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.15 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: relation.ml,v 5.16 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -91,7 +91,7 @@ value add_missing_parents_of_siblings conf base indl =
                     [ Some ip ->
                         let ip =
                           match get_parents (aget conf base ip) with
-                          [ Some ifam -> get_father (coi base ifam)
+                          [ Some ifam -> get_father (foi base ifam)
                           | None -> assert False ]
                         in
                         if List.mem ip ipl then ipl else [ip :: ipl]
@@ -205,8 +205,8 @@ value add_common_parent base ip1 ip2 set =
   let a2 = poi base ip2 in
   match (get_parents a1, get_parents a2) with
   [ (Some ifam1, Some ifam2) ->
-      let cpl1 = coi base ifam1 in
-      let cpl2 = coi base ifam2 in
+      let cpl1 = foi base ifam1 in
+      let cpl2 = foi base ifam2 in
       if get_father cpl1 = get_father cpl2 then
         Dag.Pset.add (get_father cpl1) set
       else if get_mother cpl1 = get_mother cpl2 then
@@ -318,7 +318,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
     let parse_fam ifam =
       if mark_fam.(Adef.int_of_ifam ifam) then []
       else do {
-        let cpl = coi base ifam in
+        let cpl = foi base ifam in
         mark_fam.(Adef.int_of_ifam ifam) := True;
         let result =
           [(get_father cpl, Parent, ifam); (get_mother cpl, Parent, ifam)]
@@ -366,7 +366,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
           (fun ifam nb ->
              if mark_fam.(Adef.int_of_ifam ifam) then nb
              else do {
-               let cpl = coi base ifam in
+               let cpl = foi base ifam in
                mark_fam.(Adef.int_of_ifam ifam) := True;
                List.fold_right
                  (fun child children -> [(child, Child, ifam) :: children])
@@ -1217,7 +1217,7 @@ value known_spouses_list conf base p excl_p =
   let u = uget conf base (get_key_index p) in
   List.fold_left
     (fun spl ifam ->
-       let sp = pget conf base (spouse (get_key_index p) (coi base ifam)) in
+       let sp = pget conf base (spouse (get_key_index p) (foi base ifam)) in
        if sou base (get_first_name sp) <> "?" &&
           sou base (get_surname sp) <> "?" &&
           get_key_index sp <> get_key_index excl_p

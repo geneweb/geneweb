@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.34 2007-01-18 19:45:34 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.35 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -211,9 +211,8 @@ value effective_mod_merge conf base sp =
         for i = 0 to Array.length p2_family - 1 do {
           let ifam = p2_family.(i) in
           let fam = foi base ifam in
-          let cpl = coi base ifam in
           let cpl =
-            if p2.key_index = get_father cpl then do {
+            if p2.key_index = get_father fam then do {
               Array.iter
                 (fun ip ->
                    let w = poi base ip in
@@ -225,10 +224,10 @@ value effective_mod_merge conf base sp =
                      patch_person base ip w
                    else ())
                 (get_witnesses fam);
-              couple False p.key_index (get_mother cpl)
+              couple False p.key_index (get_mother fam)
             }
-            else if p2.key_index = get_mother cpl then
-              couple False (get_father cpl) p.key_index
+            else if p2.key_index = get_mother fam then
+              couple False (get_father fam) p.key_index
             else assert False
           in
           patch_couple base ifam cpl;

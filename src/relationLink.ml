@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.15 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.16 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -81,7 +81,7 @@ value make_dist_tab conf base ia maxlev =
         q.val := nq;
         match get_parents (aget conf base (Adef.iper_of_int k)) with
         [ Some ifam ->
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             let dfath = dist.(Adef.int_of_iper (get_father cpl)) in
             let dmoth = dist.(Adef.int_of_iper (get_mother cpl)) in
             do {
@@ -105,7 +105,7 @@ value find_first_branch conf base (dmin, dmax) ia =
     else
       match get_parents (aget conf base ip) with
       [ Some ifam ->
-          let cpl = coi base ifam in
+          let cpl = foi base ifam in
           match find [(ip, sp) :: br] (len - 1) (get_father cpl) Male with
           [ Some _ as r -> r
           | None -> find [(ip, sp) :: br] (len - 1) (get_mother cpl) Female ]
@@ -123,7 +123,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
         | Male ->
             match get_parents (aget conf base ip) with
             [ Some ifam ->
-                let cpl = coi base ifam in
+                let cpl = foi base ifam in
                 next_branch_same_len conf base dist False missing
                   (get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len" ]
@@ -134,7 +134,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
   else
     match get_parents (aget conf base ia) with
     [ Some ifam ->
-        let cpl = coi base ifam in
+        let cpl = foi base ifam in
         next_branch_same_len conf base dist False (missing - 1)
           (get_father cpl) Male [(ia, sa) :: ipl]
     | None -> next_branch_same_len conf base dist True missing ia sa ipl ]
@@ -158,7 +158,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
         | Female ->
             match get_parents (aget conf base ip) with
             [ Some ifam ->
-                let cpl = coi base ifam in
+                let cpl = foi base ifam in
                 prev_branch_same_len conf base dist False missing
                   (get_father cpl) Male ipl
             | _ -> failwith "prev_branch_same_len" ]
@@ -169,7 +169,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
   else
     match get_parents (aget conf base ia) with
     [ Some ifam ->
-        let cpl = coi base ifam in
+        let cpl = foi base ifam in
         prev_branch_same_len conf base dist False (missing - 1)
           (get_mother cpl) Female [(ia, sa) :: ipl]
     | None -> prev_branch_same_len conf base dist True missing ia sa ipl ]
@@ -195,12 +195,14 @@ value spouse_text conf base end_sp ip ipl =
       let a = aget conf base ips in
       match get_parents a with
       [ Some ifam ->
-          let c = coi base ifam in
           let fam = foi base ifam in
-          let sp = if ip = get_father c then get_mother c else get_father c in
+          let sp =
+            if ip = get_father fam then get_mother fam else get_father fam
+          in
           let d =
             Date.short_marriage_date_text conf base fam
-              (pget conf base (get_father c)) (pget conf base (get_mother c))
+              (pget conf base (get_father fam))
+              (pget conf base (get_mother fam))
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> ("", "", None) ]
@@ -419,8 +421,8 @@ value other_parent_text_if_same conf base info =
         (get_parents (aget conf base sib1), get_parents (aget conf base sib2))
       with
       [ (Some ifam1, Some ifam2) ->
-          let cpl1 = coi base ifam1 in
-          let cpl2 = coi base ifam2 in
+          let cpl1 = foi base ifam1 in
+          let cpl2 = foi base ifam2 in
           let other_parent =
             if get_father cpl1 = info.ip then
               if get_mother cpl1 = get_mother cpl2 then

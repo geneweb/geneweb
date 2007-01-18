@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.37 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: update.ml,v 5.38 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -101,7 +101,7 @@ value update_misc_names_of_family base p_sex u =
       List.iter
         (fun ifam ->
            let des = doi base ifam in
-           let cpl = coi base ifam in
+           let cpl = foi base ifam in
            List.iter
              (fun ip ->
                 List.iter
@@ -204,7 +204,7 @@ value print_warning conf base =
            (ftransl conf "%t's sex is not coherent with his/her relations"))
         (fun _ -> print_someone_strong conf base p)
   | ChangedOrderOfChildren ifam des before -> do {
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
       Wserver.wprint "%s\n"
@@ -246,7 +246,7 @@ value print_warning conf base =
       end
     }
   | ChildrenNotInOrder ifam des elder x ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       do {
         Wserver.wprint
           (fcapitale

@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.18 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: check.ml,v 5.19 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -42,12 +42,12 @@ value print_base_warning oc base =
         fprintf oc "\n";
       }
   | ChangedOrderOfChildren ifam des _ ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       fprintf oc "Changed order of children of %s and %s\n"
         (designation base (poi base (get_father cpl)))
         (designation base (poi base (get_mother cpl)))
   | ChildrenNotInOrder ifam des elder x ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       do {
         fprintf oc
           "The following children of\n  %s\nand\n  %s\nare not in order:\n"
@@ -149,7 +149,7 @@ value update_stats base current_year s p =
     | _ -> () ];
     match (birth_year p, get_parents p) with
     [ (Some y2, Some ifam) ->
-        let cpl = coi base ifam in
+        let cpl = foi base ifam in
         do {
           match birth_year (poi base (get_father cpl)) with
           [ Some y1 ->

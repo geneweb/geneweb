@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.36 2007-01-18 19:45:34 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.37 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -869,7 +869,7 @@ value connected_families base fam_sel ifam cpl =
           let ipl =
             List.fold_right
               (fun ifam ipl ->
-                 let cpl = coi base ifam in
+                 let cpl = foi base ifam in
                  [get_father cpl; get_mother cpl :: ipl])
               ifaml1 ipl
           in
@@ -913,7 +913,7 @@ type separate =
 value rec find_ancestors base surn p list =
   match get_parents p with
   [ Some ifam ->
-      let cpl = coi base ifam in
+      let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
       if not (eq_istr (get_surname fath) surn) &&
@@ -941,7 +941,7 @@ value mark_branch base mark surn p =
       match mark.(Adef.int_of_ifam ifam) with
       [ NotScanned ->
           let ifaml =
-            connected_families base (fun _ -> True) ifam (coi base ifam)
+            connected_families base (fun _ -> True) ifam (foi base ifam)
           in
           let children =
             List.fold_left
@@ -987,7 +987,7 @@ value separate_list = ref [];
 
 value scan_connex_component base test_action len ifam =
   loop len ifam where rec loop len ifam =
-    let cpl = coi base ifam in
+    let cpl = foi base ifam in
     let len =
       Array.fold_left
         (fun len ifam1 ->
@@ -1049,7 +1049,7 @@ value mark_one_connex_component base mark ifam =
     set_mark ToSeparate
   else do {
     eprintf "%s: group of size %d not included\n" origin_file len;
-    let cpl = coi base ifam in
+    let cpl = foi base ifam in
     eprintf "    %s + %s\n" (designation base (poi base (get_father cpl)))
       (designation base (poi base (get_mother cpl)));
     flush stderr;
@@ -1161,11 +1161,10 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
     for i = 0 to nb_of_families base - 1 do {
       let ifam = Adef.ifam_of_int i in
       let fam = foi base ifam in
-      let cpl = coi base ifam in
       if is_deleted_family fam then ()
       else if gen.fam_done.(i) then ()
       else if gen.fam_sel ifam then
-        let ifaml = connected_families base gen.fam_sel ifam cpl in
+        let ifaml = connected_families base gen.fam_sel ifam fam in
         let (oc, first) =
           if to_separate ifam then (out_oc, out_oc_first)
           else origin_file (sou base (get_origin_file fam))
@@ -1174,14 +1173,12 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
           List.fold_right
             (fun ifam ml ->
                let fam = foi base ifam in
-               let cpl = coi base ifam in
-               let des = doi base ifam in
                let m =
                  {m_ifam = ifam; m_fam = fam;
-                  m_fath = poi base (get_father cpl);
-                  m_moth = poi base (get_mother cpl);
+                  m_fath = poi base (get_father fam);
+                  m_moth = poi base (get_mother fam);
                   m_chil =
-                    Array.map (fun ip -> poi base ip) (get_children des)}
+                    Array.map (fun ip -> poi base ip) (get_children fam)}
                in
                if empty_family base m then do {
                  gen.fam_done.(Adef.int_of_ifam m.m_ifam) := True;

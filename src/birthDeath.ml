@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.30 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.31 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -410,7 +410,7 @@ value print_marr_or_eng conf base title list len =
              let d = {(d) with day = 0} in
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
-           let cpl = coi base ifam in
+           let cpl = foi base ifam in
            let future = CheckItem.strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
@@ -480,9 +480,8 @@ value print_oldest_engagements conf base =
     select_family conf base
       (fun ifam fam ->
          if get_relation fam = Engaged then
-           let cpl = coi base ifam in
-           let husb = poi base (get_father cpl) in
-           let wife = poi base (get_mother cpl) in
+           let husb = poi base (get_father fam) in
+           let wife = poi base (get_mother fam) in
            match (get_death husb, get_death wife) with
            [ (NotDead | DontKnowIfDead, NotDead | DontKnowIfDead) ->
                Adef.od_of_codate (get_marriage fam)

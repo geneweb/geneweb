@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 5.10 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 5.11 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -135,8 +135,8 @@ value merge_fam1 conf base fam1 fam2 =
 ;
 
 value merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
-  let cpl1 = coi base ifam1 in
-  let cpl2 = coi base ifam2 in
+  let cpl1 = foi base ifam1 in
+  let cpl2 = foi base ifam2 in
   if get_father cpl1 = get_father cpl2 && get_mother cpl1 = get_mother cpl2
   then
     if need_differences_selection conf base fam1 fam2 then

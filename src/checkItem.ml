@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.8 2007-01-18 05:04:11 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.9 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
@@ -274,7 +274,7 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
 ;
 
 value check_normal_marriage_date base error warning (ifam, fam) = do {
-  let cpl = coi base ifam in
+  let cpl = foi base ifam in
   check_normal_marriage_date_for_someone base error warning fam
     (get_father cpl);
   check_normal_marriage_date_for_someone base error warning fam

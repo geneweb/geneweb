@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.13 2007-01-18 19:45:35 ddr Exp $ *)
+(* $Id: select.ml,v 5.14 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -63,11 +63,10 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
     let fam = foi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
     else
-      let cpl = coi base (Adef.ifam_of_int i) in
-      if no_check || is_censored_couple base threshold cpl then do {
+      if no_check || is_censored_couple base threshold fam then do {
         fam_tab.(i) := fam_tab.(i) lor flag;
-        censor_spouse (get_father cpl);
-        censor_spouse (get_mother cpl);
+        censor_spouse (get_father fam);
+        censor_spouse (get_mother fam);
         censor_descendants i
       }
       else ()
@@ -93,16 +92,15 @@ value restrict_base base per_tab fam_tab flag =
       else ()
     };
     for i = 0 to nb_of_families base - 1 do {
-      let des = doi base (Adef.ifam_of_int i) in
-      let cpl = coi base (Adef.ifam_of_int i) in
+      let fam = doi base (Adef.ifam_of_int i) in
       let des_visible =
         Array.fold_left
           (fun check iper -> check || per_tab.(Adef.int_of_iper iper) = 0)
-          False (get_children des)
+          False (get_children fam)
       in
       let cpl_not_visible =
-        per_tab.(Adef.int_of_iper (get_father cpl)) <> 0 ||
-        per_tab.(Adef.int_of_iper (get_mother cpl)) <> 0
+        per_tab.(Adef.int_of_iper (get_father fam)) <> 0 ||
+        per_tab.(Adef.int_of_iper (get_mother fam)) <> 0
       in
       if not des_visible && cpl_not_visible then
         fam_tab.(i) := fam_tab.(i) lor flag
@@ -113,7 +111,7 @@ value restrict_base base per_tab fam_tab flag =
 
 value flag_family base per_tab fam_tab flag ifam =
   let i = Adef.int_of_ifam ifam in
-  let cpl = coi base ifam in
+  let cpl = foi base ifam in
   do {
     fam_tab.(i) := fam_tab.(i) lor flag;
     let i = Adef.int_of_iper (get_father cpl) in
@@ -135,7 +133,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
           if fam_tab.(i) land flag <> 0 then ()
           else do {
             fam_tab.(i) := fam_tab.(i) lor flag;
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             add_ancestors (get_father cpl);
             add_ancestors (get_mother cpl)
           }
@@ -160,7 +158,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
                Array.iter
                  (fun ifam ->
                     let i = Adef.int_of_ifam ifam in
-                    let cpl = coi base ifam in
+                    let cpl = foi base ifam in
                     do {
                       fam_tab.(i) := fam_tab.(i) lor flag;
                       List.iter
@@ -169,7 +167,6 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
                            do {
                              per_tab.(i) := per_tab.(i) lor flag;
                              add_sibling_spouse_parents ip;
-                             ()
                            })
                         [get_father cpl; get_mother cpl]
                     })
@@ -198,7 +195,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
               if fam_tab.(i) land anc_flag <> 0 then ()
               else do {
                 fam_tab.(i) := fam_tab.(i) lor anc_flag;
-                let cpl = coi base ifam in
+                let cpl = foi base ifam in
                 add_siblings (get_father cpl);
                 add_siblings (get_mother cpl);
                 ancestors_loop (get_father cpl);
@@ -216,7 +213,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
               let i = Adef.int_of_ifam ifam in
               if fam_tab.(i) land anc_flag <> 0 then do {
                 fam_tab.(i) := fam_tab.(i) land lnot anc_flag;
-                let cpl = coi base ifam in
+                let cpl = foi base ifam in
                 remove_anc_flag (get_father cpl);
                 remove_anc_flag (get_mother cpl)
               }
@@ -257,13 +254,13 @@ value select_descendants
              let i = Adef.int_of_ifam ifam in
              if mark.(i) then ()
              else do {
-               let cpl = coi base ifam in
+               let cpl = foi base ifam in
                mark.(i) := True;
                select_family ifam cpl;
                if not no_spouses_parents then
                  let sp = spouse iper cpl in
                  match get_parents (poi base sp) with
-                 [ Some ifam -> select_family ifam (coi base ifam)
+                 [ Some ifam -> select_family ifam (foi base ifam)
                  | None -> () ]
                else ();
                Array.iter (loop (succ lev)) (get_children (doi base ifam))
@@ -285,7 +282,7 @@ value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
         tab.(Adef.int_of_iper ip) := anc_mark;
         match get_parents (poi base ip) with
         [ Some ifam ->
-            let cpl = coi base ifam in
+            let cpl = foi base ifam in
             let list = loop list (get_father cpl) in
             loop list (get_mother cpl)
         | None ->
@@ -319,18 +316,16 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
   let surname = Name.strip_lower surname in
   for i = 0 to nb_of_families base - 1 do {
     let fam = foi base (Adef.ifam_of_int i) in
-    let cpl = coi base (Adef.ifam_of_int i) in
     if is_deleted_family fam then ()
     else
-      let des = doi base (Adef.ifam_of_int i) in
-      let fath = poi base (get_father cpl) in
-      let moth = poi base (get_mother cpl) in
+      let fath = poi base (get_father fam) in
+      let moth = poi base (get_mother fam) in
       if Name.strip_lower (sou base (get_surname fath)) = surname ||
          Name.strip_lower (sou base (get_surname moth)) = surname
       then do {
         fam_tab.(i) := True;
-        per_tab.(Adef.int_of_iper (get_father cpl)) := True;
-        per_tab.(Adef.int_of_iper (get_mother cpl)) := True;
+        per_tab.(Adef.int_of_iper (get_father fam)) := True;
+        per_tab.(Adef.int_of_iper (get_mother fam)) := True;
         Array.iter
           (fun ic ->
              let p = poi base ic in
@@ -339,21 +334,21 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
              then
                per_tab.(Adef.int_of_iper ic) := True
              else ())
-          (get_children des);
+          (get_children fam);
         if no_spouses_parents then ()
         else
           List.iter
             (fun x ->
                match get_parents (poi base x) with
                [ Some ifam when not fam_tab.(Adef.int_of_ifam ifam) ->
-                   let cpl = coi base ifam in
+                   let cpl = foi base ifam in
                    do {
                      fam_tab.(Adef.int_of_ifam ifam) := True;
                      per_tab.(Adef.int_of_iper (get_father cpl)) := True;
                      per_tab.(Adef.int_of_iper (get_mother cpl)) := True
                    }
                | _ -> () ])
-            [get_father cpl; get_mother cpl]
+            [get_father fam; get_mother fam]
       }
       else ()
   }

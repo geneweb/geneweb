@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 5.14 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: birthday.ml,v 5.15 2007-01-18 23:12:51 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -283,13 +283,12 @@ value print_marriage conf base month =
         match Adef.od_of_codate (get_marriage fam) with
         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _)
           when d <> 0 && m <> 0 ->
-            let cpl = coi base (Adef.ifam_of_int i) in
-            let father = pget conf base (get_father cpl) in
-            let mother = pget conf base (get_mother cpl) in
+            let father = pget conf base (get_father fam) in
+            let mother = pget conf base (get_mother fam) in
             if m = month &&
                authorized_age conf base father && not (is_hidden father) &&
                authorized_age conf base mother && not (is_hidden mother) then
-              tab.(pred d) := [(cpl, y) :: tab.(pred d)]
+              tab.(pred d) := [(fam, y) :: tab.(pred d)]
             else ()
         | _ -> () ]
     };
@@ -578,14 +577,13 @@ value print_menu_marriage conf base =
                 list_aft.val := [(cpl, d.year) :: list_aft.val]
               else ()
             in
-            let cpl = coi base (Adef.ifam_of_int i) in
             if conf.use_restrict then
-              let father = pget conf base (get_father cpl) in
-              let mother = pget conf base (get_mother cpl) in
+              let father = pget conf base (get_father fam) in
+              let mother = pget conf base (get_mother fam) in
               if not (is_hidden father) && not (is_hidden mother) then
-                update_list cpl
+                update_list fam
               else ()
-            else update_list cpl
+            else update_list fam
         | _ -> () ]
     };
     List.iter

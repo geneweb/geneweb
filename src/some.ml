@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.30 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: some.ml,v 5.31 2007-01-18 23:12:52 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -282,7 +282,7 @@ value print_branch conf base psn name =
           (fun ifam ->
              let fam = foi base ifam in
              let des = doi base ifam in
-             let c = spouse (get_key_index p) (coi base ifam) in
+             let c = spouse (get_key_index p) fam in
              let c = pget conf base c in
              let down = has_children_with_that_name base des name in
              let down =
@@ -581,7 +581,7 @@ value select_ancestors conf base name_inj ipl =
        let a = aget conf base ip in
        match get_parents a with
        [ Some ifam ->
-           let cpl = coi base ifam in
+           let cpl = foi base ifam in
            let ifath = get_father cpl in
            let imoth = get_mother cpl in
            let fath = pget conf base ifath in
