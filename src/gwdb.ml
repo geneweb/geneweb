@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.206 2007-01-16 03:55:20 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.207 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1414,21 +1414,7 @@ value person_misc_names base p nobtit =
 
 (**)
 
-type ascend = person;
-type union = person;
-
-type couple = family;
-type descend = family;
-
 value aoi = poi;
 value uoi = poi;
 value coi = foi;
 value doi = foi;
-
-value empty_person base iper = let p = empty_person base iper in (p, p, p);
-value person_of_gen_person base p =
-  let p = person_of_gen_person base p in (p, p, p)
-;
-value family_of_gen_family base f =
-  let f = family_of_gen_family base f in (f, f, f)
-;

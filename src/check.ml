@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.16 2006-12-27 17:35:25 ddr Exp $ *)
+(* $Id: check.ml,v 5.17 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -200,10 +200,7 @@ value check_base_aux base error warning changed_p =
       let ifam = Adef.ifam_of_int i in
       let fam = foi base ifam in
       if is_deleted_family fam then ()
-      else
-        let cpl = coi base ifam in
-        let des = doi base ifam in
-        CheckItem.family base error warning ifam fam cpl des
+      else CheckItem.family base error warning ifam fam
     };
     ProgrBar.finish ();
     Consang.check_noloop base error;

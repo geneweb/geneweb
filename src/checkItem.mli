@@ -1,10 +1,10 @@
-(* $Id: checkItem.mli,v 1.7 2007-01-12 19:56:08 ddr Exp $ *)
+(* $Id: checkItem.mli,v 1.8 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Gwdb;
 
 type base_error = Def.error person;
-type base_warning = Def.warning person descend title;
+type base_warning = Def.warning person family title;
 
 value leap_year : int -> bool;
 value nb_days_in_month : int -> int -> int;
@@ -21,6 +21,6 @@ value person :
       (list (Adef.iper * person * option Def.sex * option (list relation)));
 value family :
   base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
-    family -> couple -> descend -> unit;
+    family -> unit;
 
 value sort_children : base -> array Adef.iper -> option (array Adef.iper);

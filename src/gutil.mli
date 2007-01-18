@@ -1,10 +1,10 @@
-(* $Id: gutil.mli,v 5.32 2006-12-26 09:44:02 ddr Exp $ *)
+(* $Id: gutil.mli,v 5.33 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
 open Gwdb;
 
-value spouse : iper -> couple -> iper;
+value spouse : iper -> family -> iper;
 
 value person_ht_add : base -> string -> iper -> unit;
 value person_not_a_key_find_all : base -> string -> list iper;

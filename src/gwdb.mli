@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.90 2007-01-13 18:10:51 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.91 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -6,12 +6,7 @@ open Adef;
 type istr = 'abstract;
 
 type person = 'abstract;
-type ascend = 'abstract;
-type union = 'abstract;
-
 type family = 'abstract;
-type couple = 'abstract;
-type descend = 'abstract;
 
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
@@ -26,7 +21,7 @@ value close_base : base -> unit;
 value eq_istr : istr -> istr -> bool;
 value is_empty_string : istr -> bool;
 value is_quest_string : istr -> bool;
-value empty_person : base -> iper -> (person * ascend * union);
+value empty_person : base -> iper -> person;
 
 value get_access : person -> Def.access;
 value get_aliases : person -> list istr;
@@ -61,10 +56,10 @@ value get_titles : person -> list title;
 
 value gen_person_of_person : person -> Def.gen_person iper istr;
 
-value get_parents : ascend -> option ifam;
-value get_consang : ascend -> Adef.fix;
+value get_parents : person -> option ifam;
+value get_consang : person -> Adef.fix;
 
-value get_family : union -> array ifam;
+value get_family : person -> array ifam;
 
 value get_comment : family -> istr;
 value get_divorce : family -> Def.divorce;
@@ -78,33 +73,35 @@ value get_witnesses : family -> array iper;
 
 value gen_family_of_family : family -> Def.gen_family iper istr;
 
-value get_father : couple -> iper;
-value get_mother : couple -> iper;
-value get_parent_array : couple -> array iper;
+value get_father : family -> iper;
+value get_mother : family -> iper;
+value get_parent_array : family -> array iper;
 
-value gen_couple_of_couple : couple -> Def.gen_couple iper;
+value gen_couple_of_couple : family -> Def.gen_couple iper;
 
-value get_children : descend -> array iper;
+value get_children : family -> array iper;
 
-value gen_descend_of_descend : descend -> Def.gen_descend iper;
+value gen_descend_of_descend : family -> Def.gen_descend iper;
 
 value person_of_gen_person :
   base ->
     (Def.gen_person iper istr * Def.gen_ascend ifam * Def.gen_union ifam) ->
-    (person * ascend * union);
+    person;
 
 value family_of_gen_family :
   base ->
     (Def.gen_family iper istr * Def.gen_couple iper * Def.gen_descend iper) ->
-    (family * couple * descend);
+    family;
 
 value poi : base -> iper -> person;
-value aoi : base -> iper -> ascend;
-value uoi : base -> iper -> union;
-
 value foi : base -> ifam -> family;
-value coi : base -> ifam -> couple;
-value doi : base -> ifam -> descend;
+
+(* equivalent to poi; ought to be replaced in the code *)
+value aoi : base -> iper -> person;
+value uoi : base -> iper -> person;
+(* equivalent to foi; ought to be replaced in the code *)
+value coi : base -> ifam -> family;
+value doi : base -> ifam -> family;
 
 value sou : base -> istr -> string;
 

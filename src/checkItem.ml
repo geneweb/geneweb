@@ -1,11 +1,11 @@
-(* $Id: checkItem.ml,v 1.7 2007-01-12 19:56:08 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.8 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 2006 INRIA *)
 
 open Def;
 open Gwdb;
 
 type base_error = error person;
-type base_warning = warning person descend title;
+type base_warning = warning person family title;
 
 value common_prec p1 p2 =
   if p1 = p2 then p1
@@ -468,7 +468,9 @@ value person base warning p = do {
   related_sex_is_coherent base warning p
 };
 
-value family base error warning ifam fam cpl des =
+value family base error warning ifam fam =
+  let cpl = fam in
+  let des = fam in
   let fath = poi base (get_father cpl) in
   let moth = poi base (get_mother cpl) in
   do {
