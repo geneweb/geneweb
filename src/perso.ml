@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.52 2007-01-17 13:40:45 ddr Exp $ *)
+(* $Id: perso.ml,v 5.53 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -936,8 +936,8 @@ type env 'a =
   | Vdmark of ref (array bool)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
-  | Vind of person and ascend and union
-  | Vfam of ifam and family and (iper * iper * iper) and descend and bool
+  | Vind of person and person and person
+  | Vfam of ifam and family and (iper * iper * iper) and family and bool
   | Vrel of relation and option person
   | Vbool of bool
   | Vint of int

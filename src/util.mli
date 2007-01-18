@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.31 2007-01-17 18:37:54 ddr Exp $ *)
+(* $Id: util.mli,v 5.32 2007-01-18 05:04:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -55,8 +55,10 @@ value is_restricted : config -> base -> iper -> bool;
 value is_hidden : person -> bool;
 
 value pget : config -> base -> iper -> person;
-value aget : config -> base -> iper -> ascend;
-value uget : config -> base -> iper -> union;
+
+(* equivalent to pget: ought to be replaced in the code *)
+value aget : config -> base -> iper -> person;
+value uget : config -> base -> iper -> person;
 
 type p_access = (base -> person -> string * base -> person -> string);
 value std_access : p_access;
