@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.32 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.33 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -242,7 +242,7 @@ value effective_mod_merge conf base sp =
         Consang.check_noloop_for_person_list base (Update.error conf base)
           [p.key_index];
         let wl =
-          let a = aoi base p.key_index in
+          let a = poi base p.key_index in
           let a = {parents = get_parents a; consang = get_consang a} in
           UpdateIndOk.all_checks_person conf base p a u
         in

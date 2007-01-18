@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 5.9 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: merge.ml,v 5.10 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -73,7 +73,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
                match main_title conf base p with
                [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
                | None -> () ];
-               match get_parents (aoi base (get_key_index p)) with
+               match get_parents p with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    Wserver.wprint ",\n%s"

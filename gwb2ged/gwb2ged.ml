@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.24 2006-10-24 02:20:10 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.25 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -542,8 +542,8 @@ value ged_comment base oc fam =
   | s -> fprintf oc "1 NOTE %s\n" (encode s) ]
 ;
 
-value has_personal_infos base per asc =
-  if get_parents asc <> None then True
+value has_personal_infos base per =
+  if get_parents per <> None then True
   else if sou base (get_first_name per) <> "?" then True
   else if sou base (get_surname per) <> "?" then True
   else if get_birth per <> Adef.codate_None then True
@@ -557,15 +557,14 @@ value has_personal_infos base per asc =
 
 value ged_ind_record base sel oc i =
   let per = poi base (Adef.iper_of_int i) in
-  let asc = aoi base (Adef.iper_of_int i) in
   let uni = uoi base (Adef.iper_of_int i) in
-  if has_personal_infos base per asc then do {
+  if has_personal_infos base per then do {
     fprintf oc "0 @I%d@ INDI\n" (i + 1);
     ged_name base oc per;
     ged_sex base oc per;
     ged_ind_ev_str base sel oc per;
     ged_ind_attr_str base oc per;
-    ged_famc base sel oc asc;
+    ged_famc base sel oc per;
     Array.iter (ged_fams base sel oc) (get_family uni);
     ged_asso base sel oc per;
     ged_psource base oc per;
@@ -584,14 +583,12 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
     ged_marriage base oc fam;
     ged_divorce base oc fam;
-    if has_personal_infos base (poi base (get_father cpl))
-         (aoi base (get_father cpl)) &&
+    if has_personal_infos base (poi base (get_father cpl)) &&
        per_sel (get_father cpl)
     then
       fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (get_father cpl) + 1)
     else ();
-    if has_personal_infos base (poi base (get_mother cpl))
-         (aoi base (get_mother cpl)) &&
+    if has_personal_infos base (poi base (get_mother cpl)) &&
        per_sel (get_mother cpl)
     then
       fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (get_mother cpl) + 1)

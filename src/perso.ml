@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.55 2007-01-18 17:15:34 ddr Exp $ *)
+(* $Id: perso.ml,v 5.56 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -1548,7 +1548,7 @@ and eval_ancestor_field_var conf base env gp loc =
   | ["father" :: sl] ->
       match gp with
       [ GP_person _ ip _ ->
-          match (get_parents (aoi base ip), get_env "all_gp" env) with
+          match (get_parents (poi base ip), get_env "all_gp" env) with
           [ (Some ifam, Vallgp all_gp) ->
               let cpl = coi base ifam in
               match get_link all_gp (get_father cpl) with

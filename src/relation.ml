@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.14 2007-01-17 15:07:26 ddr Exp $ *)
+(* $Id: relation.ml,v 5.15 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -201,8 +201,8 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
 end END;
 
 value add_common_parent base ip1 ip2 set =
-  let a1 = aoi base ip1 in
-  let a2 = aoi base ip2 in
+  let a1 = poi base ip1 in
+  let a2 = poi base ip2 in
   match (get_parents a1, get_parents a2) with
   [ (Some ifam1, Some ifam2) ->
       let cpl1 = coi base ifam1 in
