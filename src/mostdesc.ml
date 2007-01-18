@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 5.7 2006-11-16 00:30:32 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 5.8 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -55,7 +55,7 @@ value print_result base tab =
 value most_desc base p =
   let _ = load_ascends_array base in
   let _ = load_couples_array base in
-  let id = Consang.topological_sort base aoi in
+  let id = Consang.topological_sort base poi in
   let module Pq =
     Pqueue.Make
       (struct

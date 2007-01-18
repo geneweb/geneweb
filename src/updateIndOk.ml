@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.56 2007-01-18 05:04:11 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.57 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -535,8 +535,7 @@ value effective_del conf base p = do {
   let none = Gwdb.insert_string base "?" in
   let empty = Gwdb.insert_string base "" in
   let ip = get_key_index p in
-  let asc = aoi base ip in
-  match get_parents asc with
+  match get_parents p with
   [ Some ifam -> do {
       let des = doi base ifam in
       let des = {children = array_except ip (get_children des)} in
@@ -766,7 +765,7 @@ value print_mod o_conf base =
       Update.update_misc_names_of_family base p.sex u
     else ();
     let wl =
-      let a = aoi base p.key_index in
+      let a = poi base p.key_index in
       let a = {parents = get_parents a; consang = get_consang a} in
       all_checks_person conf base p a u
     in

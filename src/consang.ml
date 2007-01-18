@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.9 2006-10-15 15:39:39 ddr Exp $ *)
+(* $Id: consang.ml,v 5.10 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -53,7 +53,7 @@ value check_noloop base error =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match get_parents (aoi base (Adef.iper_of_int i)) with
+          match get_parents (poi base (Adef.iper_of_int i)) with
           [ Some fam ->
               let fath = get_father (coi base fam) in
               let moth = get_mother (coi base fam) in
@@ -87,13 +87,13 @@ exception TopologicalSortError of person;
      list of one of the person is exhausted).
 *)
 
-value topological_sort base aoi =
+value topological_sort base poi =
   let tab = Array.create (nb_of_persons base) 0 in
   let todo = ref [] in
   let cnt = ref 0 in
   do {
     for i = 0 to nb_of_persons base - 1 do {
-      let a = aoi base (Adef.iper_of_int i) in
+      let a = poi base (Adef.iper_of_int i) in
       match get_parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
@@ -113,7 +113,7 @@ value topological_sort base aoi =
         let new_list =
           List.fold_left
             (fun new_list i ->
-               let a = aoi base (Adef.iper_of_int i) in
+               let a = poi base (Adef.iper_of_int i) in
                do {
                  tab.(i) := tval;
                  incr cnt;
@@ -159,7 +159,7 @@ value check_noloop_for_person_list base error ipl =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match get_parents (aoi base ip) with
+          match get_parents (poi base ip) with
           [ Some ifam ->
               let cpl = coi base ifam in
               do {
@@ -290,7 +290,7 @@ value relationship_and_links base ri b ip1 ip2 =
     in
     let treat_ancestor u =
       let tu = reltab.(u) in
-      let a = aoi base (Adef.iper_of_int u) in
+      let a = poi base (Adef.iper_of_int u) in
       let contribution =
         tu.weight1 *. tu.weight2 -. tu.relationship *. (1.0 +. consang_of a)
       in

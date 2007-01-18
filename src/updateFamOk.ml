@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.43 2007-01-18 05:04:11 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.44 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -349,8 +349,8 @@ value infer_origin_file conf base ifam ncpl ndes =
     match r with
     [ Some r -> r
     | None ->
-        let afath = aoi base (Adef.father ncpl) in
-        let amoth = aoi base (Adef.mother ncpl) in
+        let afath = poi base (Adef.father ncpl) in
+        let amoth = poi base (Adef.mother ncpl) in
         match (get_parents afath, get_parents amoth) with
         [ (Some if1, _)
           when sou base (get_origin_file (foi base if1)) <> "" ->
@@ -498,7 +498,7 @@ value effective_mod conf base sfam scpl sdes = do {
     fun ip ->
       try Hashtbl.find cache ip with
       [ Not_found -> do {
-          let a = aoi base ip in
+          let a = poi base ip in
           let a = {parents = get_parents a; consang = get_consang a} in
           Hashtbl.add cache ip a;
           a
@@ -605,9 +605,8 @@ value effective_add conf base sfam scpl sdes =
     patch_union base (Adef.mother ncpl) nmoth_u;
     Array.iter
       (fun ip ->
-         let a = aoi base ip in
          let p = poi base ip in
-         match get_parents a with
+         match get_parents p with
          [ Some _ -> print_err_parents conf base p
          | None ->
              let a = {parents = Some fi; consang = Adef.fix (-1)} in
@@ -871,7 +870,7 @@ value print_add o_conf base =
             if Adef.int_of_iper (Adef.mother cpl) = i then
               (mother scpl, i, "af")
             else
-              let a = aoi base (Adef.iper_of_int i) in
+              let a = poi base (Adef.iper_of_int i) in
               match get_parents a with
               [ Some x when x = ifam ->
                   let p = poi base (Adef.iper_of_int i) in

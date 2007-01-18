@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.29 2006-10-31 14:01:42 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.30 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -47,7 +47,7 @@ value compute base from_scratch quiet = do {
   let (fget, cget, cset, carray) = ascends_array base in
   try do {
     let tab =
-      let ts = Consang.topological_sort base aoi in
+      let ts = Consang.topological_sort base poi in
       Consang.make_relationship_info base ts
     in
     let consang_tab = Array.create (nb_of_families base) no_consang in

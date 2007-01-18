@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.104 2007-01-18 05:04:11 ddr Exp $ *)
+(* $Id: util.ml,v 5.105 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -493,8 +493,7 @@ value nobtit conf base p =
 ;
 
 value parent_has_title conf base p =
-  let a = aoi base (get_key_index p) in
-  match get_parents a with
+  match get_parents p with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (get_father cpl) in

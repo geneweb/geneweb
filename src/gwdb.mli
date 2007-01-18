@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.91 2007-01-18 05:04:11 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.92 2007-01-18 18:39:06 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Adef;
@@ -97,7 +97,6 @@ value poi : base -> iper -> person;
 value foi : base -> ifam -> family;
 
 (* equivalent to poi; ought to be replaced in the code *)
-value aoi : base -> iper -> person;
 value uoi : base -> iper -> person;
 (* equivalent to foi; ought to be replaced in the code *)
 value coi : base -> ifam -> family;
