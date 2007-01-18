@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.33 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.34 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -117,9 +117,8 @@ value effective_mod_merge conf base sp =
   match p_getint conf.env "i2" with
   [ Some i2 ->
       let p2 = poi base (Adef.iper_of_int i2) in
-      let u2 = uoi base (Adef.iper_of_int i2) in
       let rel_chil = get_related p2 in
-      let p2_family = get_family u2 in
+      let p2_family = get_family p2 in
       do {
         MergeInd.reparent_ind base sp.key_index (get_key_index p2);
         let p2 = UpdateIndOk.effective_del conf base p2 in
@@ -127,12 +126,11 @@ value effective_mod_merge conf base sp =
         let u2 = {family = [| |]} in
         patch_union base p2.key_index u2;
         let p = UpdateIndOk.effective_mod conf base sp in
-        let u = uoi base p.key_index in
+        let u = poi base p.key_index in
         let (p_related, mod_p) =
           List.fold_right
             (fun ipc (p_related, mod_p) ->
                let pc = poi base ipc in
-               let uc = uoi base ipc in
                let (pc_rparents, mod_pc, p_related, mod_p) =
                  List.fold_right
                    (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
@@ -172,10 +170,10 @@ value effective_mod_merge conf base sp =
                  let (p_related, mod_p) =
                    loop (p_related, mod_p) 0
                    where rec loop (p_related, mod_p) i =
-                     if i = Array.length (get_family uc) then
+                     if i = Array.length (get_family pc) then
                        (p_related, mod_p)
                      else
-                       let ifam = (get_family uc).(i) in
+                       let ifam = (get_family pc).(i) in
                        let fam = gen_family_of_family (foi base ifam) in
                        let (p_related, mod_p) =
                          if array_mem p2.key_index fam.witnesses

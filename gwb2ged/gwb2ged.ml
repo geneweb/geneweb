@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.25 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.26 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -466,7 +466,7 @@ value ged_asso base (per_sel, fam_sel) oc per =
                 if array_mem (get_key_index per) (get_witnesses fam) then
                   ged_witness fam_sel oc ifam
                 else ())
-             (Array.to_list (get_family (uoi base ic)))
+             (Array.to_list (get_family c))
          else ())
       (get_related per);
   }
@@ -557,7 +557,6 @@ value has_personal_infos base per =
 
 value ged_ind_record base sel oc i =
   let per = poi base (Adef.iper_of_int i) in
-  let uni = uoi base (Adef.iper_of_int i) in
   if has_personal_infos base per then do {
     fprintf oc "0 @I%d@ INDI\n" (i + 1);
     ged_name base oc per;
@@ -565,7 +564,7 @@ value ged_ind_record base sel oc i =
     ged_ind_ev_str base sel oc per;
     ged_ind_attr_str base oc per;
     ged_famc base sel oc per;
-    Array.iter (ged_fams base sel oc) (get_family uni);
+    Array.iter (ged_fams base sel oc) (get_family per);
     ged_asso base sel oc per;
     ged_psource base oc per;
     ged_multimedia_link base oc per;

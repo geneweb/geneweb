@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.18 2007-01-17 14:07:00 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.19 2007-01-18 19:45:34 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -93,12 +93,12 @@ value print_children conf base ipl =
   }
 ;
 
-value print_change conf base p u =
+value print_change conf base p =
   let title _ =
     let s = transl conf "change children's names" in
     Wserver.wprint "%s" (capitale s)
   in
-  let children = select_children_of base u in
+  let children = select_children_of base p in
   let digest = digest_children base children in
   do {
     header conf title;
@@ -129,8 +129,7 @@ value print conf base =
   match p_getint conf.env "ip" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      let u = uoi base (Adef.iper_of_int i) in
-      print_change conf base p u
+      print_change conf base p
   | _ -> incorrect_request conf ]
 ;
 
@@ -159,7 +158,7 @@ value print_children_list conf base u =
   }
 ;
 
-value print_change_done conf base p u =
+value print_change_done conf base p =
   let title _ =
     let s = transl conf "children's names changed" in
     Wserver.wprint "%s" (capitale s)
@@ -168,7 +167,7 @@ value print_change_done conf base p u =
     header conf title;
     Wserver.wprint "\n%s" (reference conf base p (person_text conf base p));
     Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
-    print_children_list conf base u;
+    print_children_list conf base p;
     trailer conf;
   }
 ;
@@ -272,9 +271,9 @@ value change_child conf base parent_surname ip =
   else ()
 ;
 
-value print_change_ok conf base p u =
+value print_change_ok conf base p =
   try
-    let ipl = select_children_of base u in
+    let ipl = select_children_of base p in
     let parent_surname = p_surname base p in
     do {
       check_digest conf base (digest_children base ipl);
@@ -285,7 +284,7 @@ value print_change_ok conf base p u =
          get_key_index p)
       in
       History.record conf base key "cn";
-      print_change_done conf base p u;
+      print_change_done conf base p;
     }
   with
   [ Update.ModErr -> () ]
@@ -295,7 +294,6 @@ value print_ok conf base =
   match p_getint conf.env "ip" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      let u = uoi base (Adef.iper_of_int i) in
-      print_change_ok conf base p u
+      print_change_ok conf base p
   | _ -> incorrect_request conf ]
 ;

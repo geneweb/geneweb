@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.57 2007-01-18 18:39:06 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.58 2007-01-18 19:45:35 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -379,13 +379,12 @@ value check_conflict conf base sp ipl =
 
 value check_sex_married conf base sp op =
   if sp.sex <> get_sex op then
-    let u = uoi base (get_key_index op) in
     let no_check =
       List.for_all
         (fun ifam ->
            let r = get_relation (foi base ifam) in
            r = NoSexesCheckNotMarried || r = NoSexesCheckMarried)
-        (Array.to_list (get_family u))
+        (Array.to_list (get_family op))
     in
     if no_check then () else print_cannot_change_sex conf base op
   else ()
@@ -415,7 +414,7 @@ value rparents_of rparents =
 ;
 
 value is_witness_at_marriage base ip p =
-  let u = uoi base ip in
+  let u = poi base ip in
   List.exists
     (fun ifam -> let fam = foi base ifam in array_mem ip (get_witnesses fam))
     (Array.to_list (get_family u))
@@ -667,7 +666,7 @@ value print_add o_conf base =
       [ Some err -> error_person conf base sp err
       | None ->
           let (p, a) = effective_add conf base sp in
-          let u = {family = get_family (uoi base p.key_index)} in
+          let u = {family = get_family (poi base p.key_index)} in
           let wl = all_checks_person conf base p a u in
           let k = (sp.first_name, sp.surname, sp.occ, p.key_index) in
           do {
@@ -748,7 +747,7 @@ value print_mod o_conf base =
   let callback sp = do {
     let p = effective_mod conf base sp in
     let op = poi base p.key_index in
-    let u = {family = get_family (uoi base p.key_index)} in
+    let u = {family = get_family op} in
     patch_person base p.key_index p;
     let s =
       let sl =
