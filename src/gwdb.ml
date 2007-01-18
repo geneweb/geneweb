@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.209 2007-01-18 19:45:34 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.210 2007-01-18 23:57:47 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Dbdisk;
@@ -1414,5 +1414,4 @@ value person_misc_names base p nobtit =
 
 (**)
 
-value coi = foi;
 value doi = foi;
