@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.212 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.213 2007-01-19 09:12:06 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -76,7 +76,7 @@ value istr2_fun =
   {is_empty_string (db2, path, pos) = pos = Db2.empty_string_pos;
    is_quest_string (db2, path, pos) = failwith "not impl is_quest_string";
    un_istr _ = failwith "un_istr";
-   un_istr2 _ = failwith "un_istr2 2"}
+   un_istr2 (db2, path, pos) = string_of_istr2 db2 path pos}
 ;
 
 value istr2new_fun =
