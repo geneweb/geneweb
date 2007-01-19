@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.13 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.14 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -31,7 +31,7 @@ value rec except x =
 value children_of base u =
   List.fold_right
     (fun ifam list ->
-       let des = doi base ifam in
+       let des = foi base ifam in
        Array.to_list (get_children des) @ list)
     (Array.to_list (get_family u)) []
 ;
@@ -73,7 +73,7 @@ value rec has_desc_lev conf base lev u =
   else
     List.exists
       (fun ifam ->
-         let des = doi base ifam in
+         let des = foi base ifam in
          List.exists
            (fun ip -> has_desc_lev conf base (lev - 1) (uget conf base ip))
            (Array.to_list (get_children des)))
@@ -322,7 +322,7 @@ value print_anniv conf base p dead_people level =
         let rec loop set i =
           if i = Array.length u then set
           else
-            let chil = get_children (doi base u.(i)) in
+            let chil = get_children (foi base u.(i)) in
             let set =
               loop set 0 where rec loop set i =
                 if i = Array.length chil then set

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.38 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: update.ml,v 5.39 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -100,8 +100,7 @@ value update_misc_names_of_family base p_sex u =
   [ Male ->
       List.iter
         (fun ifam ->
-           let des = doi base ifam in
-           let cpl = foi base ifam in
+           let fam = foi base ifam in
            List.iter
              (fun ip ->
                 List.iter
@@ -110,7 +109,7 @@ value update_misc_names_of_family base p_sex u =
                        person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip) get_titles))
-             [get_mother cpl :: Array.to_list (get_children des)])
+             [get_mother fam :: Array.to_list (get_children fam)])
         (Array.to_list u.family)
   | _ -> () ]
 ;

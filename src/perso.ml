@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.58 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: perso.ml,v 5.59 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -17,7 +17,7 @@ value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 value has_children base u =
   List.exists
     (fun ifam ->
-       let des = doi base ifam in
+       let des = foi base ifam in
        Array.length (get_children des) > 0)
     (Array.to_list (get_family u))
 ;
@@ -325,7 +325,7 @@ value make_desc_level_table conf base max_level p = do {
                  if down then
                    Array.fold_left
                      (fun ipl ifam ->
-                        let ipa = get_children (doi base ifam) in
+                        let ipa = get_children (foi base ifam) in
                         Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
                      ipl (get_family (get ip))
                   else ipl
@@ -735,7 +735,7 @@ value first_possible_duplication base ip (iexcl, fexcl) =
       loop ifaml where rec loop =
         fun
         [ [ifam :: ifaml] ->
-            let ipl = Array.to_list (get_children (doi base ifam)) in
+            let ipl = Array.to_list (get_children (foi base ifam)) in
             ipl @ loop ifaml
         | [] -> [] ]
     in
@@ -1833,7 +1833,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       | _ ->
           List.exists
             (fun ifam ->
-             let des = doi base ifam in Array.length (get_children des) > 0)
+             let des = foi base ifam in Array.length (get_children des) > 0)
           (Array.to_list (get_family p)) ]
   | "has_consanguinity" ->
       p_auth && get_consang p != Adef.fix (-1) && get_consang p != Adef.fix 0
@@ -1873,7 +1873,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else p_auth && (get_rparents p <> [] || get_related p <> [])
   | "has_siblings" ->
       match get_parents p with
-      [ Some ifam -> Array.length (get_children (doi base ifam)) > 1
+      [ Some ifam -> Array.length (get_children (foi base ifam)) > 1
       | None -> False ]
   | "has_sources" ->
       if conf.hide_names && not p_auth then False
@@ -2029,7 +2029,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
               tab.(i) := True;
               let u = uget conf base (get_key_index p) in
               for i = 0 to Array.length (get_family u) - 1 do {
-                let des = doi base (get_family u).(i) in
+                let des = foi base (get_family u).(i) in
                 for i = 0 to Array.length (get_children des) - 1 do {
                   mark_descendants (len + 1)
                   (pget conf base (get_children des).(i))
@@ -2067,7 +2067,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           let n =
             List.fold_left
               (fun n ifam ->
-                 n + Array.length (get_children (doi base ifam)))
+                 n + Array.length (get_children (foi base ifam)))
               0 (Array.to_list (get_family p))
           in
           string_of_int n ]

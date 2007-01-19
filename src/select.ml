@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 5.14 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: select.ml,v 5.15 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -40,7 +40,7 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
       (get_family uni)
   in
   let censor_descendants f =
-    let des = doi base (Adef.ifam_of_int f) in
+    let des = foi base (Adef.ifam_of_int f) in
     Array.iter
       (fun iper ->
          let ip = Adef.int_of_iper iper in
@@ -92,7 +92,7 @@ value restrict_base base per_tab fam_tab flag =
       else ()
     };
     for i = 0 to nb_of_families base - 1 do {
-      let fam = doi base (Adef.ifam_of_int i) in
+      let fam = foi base (Adef.ifam_of_int i) in
       let des_visible =
         Array.fold_left
           (fun check iper -> check || per_tab.(Adef.int_of_iper iper) = 0)
@@ -149,7 +149,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
         | None -> () ]
       in
       let add_siblings_marriages ifam =
-        let des = doi base ifam in
+        let des = foi base ifam in
         Array.iter
           (fun ip ->
              let i = Adef.int_of_iper ip in
@@ -254,16 +254,16 @@ value select_descendants
              let i = Adef.int_of_ifam ifam in
              if mark.(i) then ()
              else do {
-               let cpl = foi base ifam in
+               let fam = foi base ifam in
                mark.(i) := True;
-               select_family ifam cpl;
+               select_family ifam fam;
                if not no_spouses_parents then
-                 let sp = spouse iper cpl in
+                 let sp = spouse iper fam in
                  match get_parents (poi base sp) with
                  [ Some ifam -> select_family ifam (foi base ifam)
                  | None -> () ]
                else ();
-               Array.iter (loop (succ lev)) (get_children (doi base ifam))
+               Array.iter (loop (succ lev)) (get_children fam);
              })
           (get_family (poi base iper))
       }
@@ -300,7 +300,7 @@ value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
              let ifam = (get_family u).(i) in
              fam_tab.(Adef.int_of_ifam ifam) :=
                fam_tab.(Adef.int_of_ifam ifam) lor 1;
-             let des = doi base ifam in
+             let des = foi base ifam in
              for i = 0 to Array.length (get_children des) - 1 do {
                loop (get_children des).(i);
              };

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.32 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.33 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -14,7 +14,7 @@ value designation base p =
 ;
 
 value rec clear_descend_consang base cset mark ifam =
-  let des = doi base ifam in
+  let des = foi base ifam in
   Array.iter
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {

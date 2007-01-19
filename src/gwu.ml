@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.37 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.38 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Def;
@@ -946,7 +946,7 @@ value mark_branch base mark surn p =
           let children =
             List.fold_left
               (fun list ifam ->
-                 let desc = doi base ifam in
+                 let desc = foi base ifam in
                  Array.fold_left (fun list ip -> [poi base ip :: list]) list
                    (get_children desc))
               [] ifaml
@@ -987,30 +987,32 @@ value separate_list = ref [];
 
 value scan_connex_component base test_action len ifam =
   loop len ifam where rec loop len ifam =
-    let cpl = foi base ifam in
+    let fam = foi base ifam in
+    let fath = poi base (get_father fam) in
+    let moth = poi base (get_mother fam) in
     let len =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family (poi base (get_father cpl)))
+        len (get_family fath)
     in
     let len =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (get_family (poi base (get_mother cpl)))
+        len (get_family moth)
     in
     let len =
-      match get_parents (poi base (get_father cpl)) with
+      match get_parents fath with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
     let len =
-      match get_parents (poi base (get_mother cpl)) with
+      match get_parents moth with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
-    let children = get_children (doi base ifam) in
+    let children = get_children fam in
     let len =
       Array.fold_left
         (fun len ip ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.31 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: some.ml,v 5.32 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -281,22 +281,21 @@ value print_branch conf base psn name =
         List.map
           (fun ifam ->
              let fam = foi base ifam in
-             let des = doi base ifam in
              let c = spouse (get_key_index p) fam in
              let c = pget conf base c in
-             let down = has_children_with_that_name base des name in
+             let down = has_children_with_that_name base fam name in
              let down =
                if get_sex p = Female && p_surname base c = name then False
                else down
              in
              let i = Adef.int_of_ifam ifam in
              let sel = not (List.mem i unsel_list) in
-             (fam, des, c, if down then Some (string_of_int i, sel) else None))
+             (fam, c, if down then Some (string_of_int i, sel) else None))
           (Array.to_list (get_family u))
       in
       let first_select =
         match family_list with
-        [ [(_, _, _, select) :: _] -> select
+        [ [(_, _, select) :: _] -> select
         | _ -> None ]
       in
       if lev = 0 then () else Wserver.wprint "<dd>\n";
@@ -315,7 +314,7 @@ value print_branch conf base psn name =
       else
         let _ =
           List.fold_left
-            (fun first (fam, des, c, select) ->
+            (fun first (fam, c, select) ->
                do {
                  if not first then do {
                    if lev = 0 then Wserver.wprint "<br>\n"
@@ -344,7 +343,7 @@ value print_branch conf base psn name =
                  Wserver.wprint "</strong>";
                  Wserver.wprint "%s" (Date.short_dates_text conf base c);
                  Wserver.wprint "\n";
-                 let children = get_children des in
+                 let children = get_children fam in
                  match select with
                  [ Some (_, True) ->
                      tag "dl" begin
@@ -581,9 +580,9 @@ value select_ancestors conf base name_inj ipl =
        let a = aget conf base ip in
        match get_parents a with
        [ Some ifam ->
-           let cpl = foi base ifam in
-           let ifath = get_father cpl in
-           let imoth = get_mother cpl in
+           let fam = foi base ifam in
+           let ifath = get_father fam in
+           let imoth = get_mother fam in
            let fath = pget conf base ifath in
            let moth = pget conf base imoth in
            let s = str_inj (get_surname p) in
@@ -597,8 +596,7 @@ value select_ancestors conf base name_inj ipl =
                      let bh =
                        {(bh) with
                         bh_well_named_ancestors =
-                          insert_at_position_in_family
-                            (get_children (doi base ifam))
+                          insert_at_position_in_family (get_children fam)
                             ip bh.bh_well_named_ancestors}
                      in
                      [bh :: bhl]
