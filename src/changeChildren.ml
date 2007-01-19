@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 5.19 2007-01-18 19:45:34 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 5.20 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -49,7 +49,7 @@ value print_child_person conf base p =
 value select_children_of base u =
   List.fold_right
     (fun ifam ipl ->
-       let des = doi base ifam in
+       let des = foi base ifam in
        List.fold_right (fun ip ipl -> [ip :: ipl])
          (Array.to_list (get_children des)) ipl)
     (Array.to_list (get_family u)) []
@@ -142,7 +142,7 @@ value print_children_list conf base u =
     tag "ul" begin
       Array.iter
         (fun ifam ->
-           let des = doi base ifam in
+           let des = foi base ifam in
            Array.iter
              (fun ip ->
                 let p = poi base ip in

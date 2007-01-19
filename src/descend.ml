@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.21 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: descend.ml,v 5.22 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 DEFINE OLD;
@@ -247,7 +247,7 @@ value display_descendants_level conf base max_level ancestor =
   let rec get_level level u list =
     List.fold_left
       (fun list ifam ->
-         let des = doi base ifam in
+         let des = foi base ifam in
          let enfants = get_children des in
          List.fold_left
            (fun list ix ->
@@ -325,7 +325,7 @@ value mark_descendants conf base marks max_lev ip =
       marks.(Adef.int_of_iper ip) := True;
       Array.iter
         (fun ifam ->
-           let el = get_children (doi base ifam) in
+           let el = get_children (foi base ifam) in
            Array.iter (fun e -> loop (succ lev) e (uget conf base e)) el)
         (get_family u)
     }
@@ -390,10 +390,10 @@ value labelled conf base marks max_lev lev ip =
   Array.length (get_family u) <> 0 &&
   (match get_parents a with
    [ Some ifam ->
-       let cpl = foi base ifam in
+       let fam = foi base ifam in
        List.exists
          (fun ifam ->
-            let el = get_children (doi base ifam) in
+            let el = get_children fam in
             List.exists
               (fun ie ->
                  let e = pget conf base ie in
@@ -401,7 +401,7 @@ value labelled conf base marks max_lev lev ip =
                  Array.length (get_family u) <> 0 &&
                  not (close_to_end conf base marks max_lev lev e))
               (Array.to_list el))
-         (Array.to_list (get_family (uget conf base (get_father cpl))))
+         (Array.to_list (get_family (uget conf base (get_father fam))))
    | _ -> False ])
 ;
 
@@ -600,7 +600,7 @@ value print_families conf base marks paths max_lev =
       print_family conf base marks paths max_lev lev p;
       Array.iter
         (fun ifam ->
-           let fam = doi base ifam in
+           let fam = foi base ifam in
            let c = spouse (get_key_index p) fam in
            let el = get_children fam in
            let c = pget conf base c in
@@ -857,7 +857,7 @@ value print_someone conf base p =
 value children_of conf base ip =
   List.fold_right
     (fun ifam children ->
-       Array.to_list (get_children (doi base ifam)) @ children)
+       Array.to_list (get_children (foi base ifam)) @ children)
     (Array.to_list (get_family (uget conf base ip))) []
 ;
 
@@ -911,7 +911,7 @@ value make_tree_hts conf base gv p =
     if v = 0 then n + 1
     else if Array.length (get_family u) = 0 then n + 1
     else
-      List.fold_left (fun n ifam -> fam_nb_column n v (doi base ifam)) n
+      List.fold_left (fun n ifam -> fam_nb_column n v (foi base ifam)) n
         (Array.to_list (get_family u))
   and fam_nb_column n v des =
     if Array.length (get_children des) = 0 then n + 1
@@ -950,7 +950,7 @@ value make_tree_hts conf base gv p =
                   if first then tdl
                   else [(1, LeftA, TDnothing) :: tdl]
                 in
-                let des = doi base ifam in
+                let des = foi base ifam in
                 let td =
                   if Array.length (get_children des) = 0 then
                     (1, LeftA, TDnothing)
@@ -979,7 +979,7 @@ value make_tree_hts conf base gv p =
                   if first then tdl
                   else [(1, LeftA, TDnothing) :: tdl]
                 in
-                let des = doi base ifam in
+                let des = foi base ifam in
                 let tdl =
                   if Array.length (get_children des) = 0 then
                     [(1, LeftA, TDnothing) :: tdl]
@@ -1104,7 +1104,7 @@ value make_tree_hts conf base gv p =
              else
                List.fold_right
                  (fun ifam gen ->
-                    let des = doi base ifam in
+                    let des = foi base ifam in
                     if Array.length (get_children des) = 0 then [None :: gen]
                     else
                       let age_auth =
@@ -1198,7 +1198,7 @@ value print_aboville conf base max_level p =
           let rec loop_fam cnt_chil i =
             if i = Array.length (get_family u) then ()
             else
-              let des = doi base (get_family u).(i) in
+              let des = foi base (get_family u).(i) in
               let rec loop_chil cnt_chil j =
                 if j = Array.length (get_children des) then
                   loop_fam cnt_chil (i + 1)

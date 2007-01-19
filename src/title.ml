@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.25 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: title.ml,v 5.26 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -66,9 +66,8 @@ value date_interval conf base t x =
                    loop JustSelf (pget conf base conj);
                    match t with
                    [ AddChildren ->
-                       let des = doi base ifam in
                        Array.iter (fun e -> loop JustSelf (pget conf base e))
-                         (get_children des)
+                         (get_children fam)
                    | _ -> () ];
                  })
               (get_family u) ];

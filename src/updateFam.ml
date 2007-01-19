@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.18 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.19 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -30,17 +30,18 @@ value person_key base ip =
 ;
 
 value string_family_of conf base ifam =
+  let fam = foi base ifam in
   let sfam =
     Futil.map_family_ps (person_key base) (sou base)
-      (gen_family_of_family (foi base ifam))
+      (gen_family_of_family fam)
   in
   let scpl =
     Futil.map_couple_p conf.multi_parents (person_key base)
-      (gen_couple_of_couple (foi base ifam))
+      (gen_couple_of_couple fam)
   in
   let sdes =
     Futil.map_descend_p (person_key base)
-      (gen_descend_of_descend (doi base ifam))
+      (gen_descend_of_descend fam)
   in
   (sfam, scpl, sdes)
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.43 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.44 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -290,7 +290,7 @@ value reparent_ind base ip1 ip2 =
   let a2 = poi base ip2 in
   match (get_parents a1, get_parents a2) with
   [ (None, Some ifam) -> do {
-      let des = gen_descend_of_descend (doi base ifam) in
+      let des = gen_descend_of_descend (foi base ifam) in
       let rec replace i =
         if des.children.(i) = ip2 then des.children.(i) := ip1
         else replace (i + 1)
@@ -465,8 +465,8 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
 ;
 
 value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 = do {
-  let des1 = doi base ifam1 in
-  let des2 = doi base ifam2 in
+  let des1 = fam1 in
+  let des2 = fam2 in
   let fam1 =
     {(gen_family_of_family fam1) with
      marriage =

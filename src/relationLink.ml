@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.16 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.17 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -61,7 +61,7 @@ value make_dist_tab conf base ia maxlev =
     let add_children ip =
       let u = uget conf base ip in
       for i = 0 to Array.length (get_family u) - 1 do {
-        let des = doi base (get_family u).(i) in
+        let des = foi base (get_family u).(i) in
         for j = 0 to Array.length (get_children des) - 1 do {
           let k = Adef.int_of_iper (get_children des).(j) in
           let d = dist.(k) in

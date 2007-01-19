@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.46 2007-01-18 23:12:52 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.47 2007-01-19 00:41:12 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -426,7 +426,7 @@ value effective_mod conf base sfam scpl sdes = do {
     let ocpl = foi base fi in
     (get_parent_array ocpl, get_father ocpl, get_mother ocpl)
   in
-  let ochildren = get_children (doi base fi) in
+  let ochildren = get_children (foi base fi) in
   let created_p = ref [] in
   let psrc =
     match p_getenv conf.env "psrc" with

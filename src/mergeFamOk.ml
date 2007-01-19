@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 5.16 2007-01-18 23:12:51 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 5.17 2007-01-19 00:41:11 ddr Exp $ *)
 (* Copyright (c) 1998-2006 INRIA *)
 
 open Config;
@@ -35,7 +35,7 @@ value merge_witnesses base wit1 wit2 =
   Array.of_list list
 ;
 
-value reconstitute conf base ifam1 fam1 des1 fam2 des2 =
+value reconstitute conf base ifam1 fam1 fam2 =
   let field name proj null =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
@@ -65,7 +65,7 @@ value reconstitute conf base ifam1 fam1 des1 fam2 des2 =
   let des =
     {children =
        Array.map (UpdateFam.person_key base)
-         (Array.append (get_children des1) (get_children des2))}
+         (Array.append (get_children fam1) (get_children fam2))}
   in
   (fam, des)
 ;
@@ -75,10 +75,8 @@ value print_merge conf base =
   [ (Some f1, Some f2) ->
       let ifam1 = Adef.ifam_of_int f1 in
       let fam1 = foi base ifam1 in
-      let des1 = doi base ifam1 in
       let fam2 = foi base (Adef.ifam_of_int f2) in
-      let des2 = doi base (Adef.ifam_of_int f2) in
-      let (sfam, sdes) = reconstitute conf base ifam1 fam1 des1 fam2 des2 in
+      let (sfam, sdes) = reconstitute conf base ifam1 fam1 fam2 in
       let digest =
         let ini_sfam = UpdateFam.string_family_of conf base ifam1 in
         Update.digest_family ini_sfam
