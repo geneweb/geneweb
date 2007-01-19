@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <!--meta http-equiv="Content-Type" content="text/html; charset=%e"-->
   <title>[*advanced request]</title>

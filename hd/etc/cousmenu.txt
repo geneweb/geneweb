@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: cousmenu.txt,v 5.3 2006-10-29 12:08:34 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: cousmenu.txt,v 5.4 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*cousins (general term)]%nn;

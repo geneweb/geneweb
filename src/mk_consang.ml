@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.13 2006-10-24 02:20:10 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: mk_consang.ml,v 5.14 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
 value indexes = ref False;

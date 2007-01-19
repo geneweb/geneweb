@@ -1,5 +1,5 @@
-# $Id: lexicon.txt,v 5.1 2006-01-01 05:35:06 ddr Exp $
-# Copyright (c) 1998-2006 INRIA
+# $Id: lexicon.txt,v 5.2 2007-01-19 01:53:16 ddr Exp $
+# Copyright (c) 1998-2007 INRIA
 
      !languages
 af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/nl=Nederlands/no=Noorweegs/pl=Pools/pt=Portugees/pt-br=Portugees-in-Brazilië/ru=Russies/sv=Sweeds/zh=Chinees

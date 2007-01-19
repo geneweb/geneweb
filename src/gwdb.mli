@@ -1,5 +1,5 @@
-(* $Id: gwdb.mli,v 5.96 2007-01-19 00:46:23 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: gwdb.mli,v 5.97 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Adef;
 

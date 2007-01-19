@@ -1,5 +1,5 @@
-# $Id: lex_utf8.txt,v 5.74 2007-01-11 18:00:17 ddr Exp $
-# Copyright (c) 1998-2006 INRIA
+# $Id: lex_utf8.txt,v 5.75 2007-01-19 01:53:16 ddr Exp $
+# Copyright (c) 1998-2007 INRIA
 
      !dates order
 af: yymmdd

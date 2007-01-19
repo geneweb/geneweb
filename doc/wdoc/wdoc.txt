@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: wdoc.txt,v 5.2 2006-10-29 12:08:34 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: wdoc.txt,v 5.3 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%title;</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>

@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.23 2007-01-17 15:07:26 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: notes.ml,v 5.24 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
 open Gutil;

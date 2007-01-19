@@ -1,8 +1,8 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 5.23 2006-11-23 11:36:25 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: start_utf8.txt,v 5.24 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
 bg: Genealogy

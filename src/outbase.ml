@@ -1,5 +1,5 @@
-(* $Id: outbase.ml,v 5.20 2006-10-24 02:20:10 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: outbase.ml,v 5.21 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Dbdisk;
 open Dutil;

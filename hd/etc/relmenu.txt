@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: relmenu.txt,v 5.3 2006-10-29 12:08:34 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: relmenu.txt,v 5.4 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
     %else;%first_name; %surname;%end; [and]0...%nn;

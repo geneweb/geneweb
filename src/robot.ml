@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 5.15 2006-10-15 15:39:39 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: robot.ml,v 5.16 2007-01-19 01:53:17 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
 open Util;

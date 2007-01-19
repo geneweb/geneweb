@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 5.4 2006-10-29 12:08:34 ddr Exp $ *)
+(* $Id: setup.ml,v 5.5 2007-01-19 01:53:16 ddr Exp $ *)
 
 open Printf;
 
@@ -129,7 +129,7 @@ value trailer conf =
 <br />
 ";
     Wserver.wprint "
-<hr><font size=\"-1\"><em>Copyright (c) 1998-2006 INRIA -
+<hr><font size=\"-1\"><em>Copyright (c) 1998-2007 INRIA -
 GeneWeb %s</em></font>" Version.txt;
     Wserver.wprint "<br />";
     

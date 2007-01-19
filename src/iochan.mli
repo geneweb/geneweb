@@ -1,5 +1,5 @@
-(* $Id: iochan.mli,v 5.2 2006-10-22 09:42:39 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: iochan.mli,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 type t = 'abstract;
 

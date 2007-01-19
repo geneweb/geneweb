@@ -1,5 +1,5 @@
-(* $Id: mutil.ml,v 5.14 2006-11-20 13:31:36 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: mutil.ml,v 5.15 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 value int_size = 4;
 value verbose = ref True;

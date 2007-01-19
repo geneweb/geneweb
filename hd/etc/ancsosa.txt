@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.8 2006-11-14 08:37:30 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: ancsosa.txt,v 5.9 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] ... [up to] ...%nn;

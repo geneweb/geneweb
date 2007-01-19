@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.51 2006-12-27 14:57:47 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: gwc.ml,v 5.52 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
 open Def;

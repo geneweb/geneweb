@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.22 2007-01-19 00:41:11 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: descend.ml,v 5.23 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 DEFINE OLD;
 

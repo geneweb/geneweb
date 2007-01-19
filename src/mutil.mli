@@ -1,5 +1,5 @@
-(* $Id: mutil.mli,v 5.12 2006-11-20 11:41:56 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: mutil.mli,v 5.13 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 value int_size : int;
 value verbose : ref bool;
