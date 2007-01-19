@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.8 2007-01-06 18:36:29 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: forum.txt,v 5.9 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
       %if;can_post;

@@ -1,5 +1,5 @@
-(* $Id: checkItem.ml,v 1.9 2007-01-18 23:12:51 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: checkItem.ml,v 1.10 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
 open Gwdb;

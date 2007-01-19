@@ -1,5 +1,5 @@
-(* $Id: srcfile.mli,v 5.4 2006-11-23 18:54:12 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: srcfile.mli,v 5.5 2007-01-19 01:53:17 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Gwdb;
 open Config;

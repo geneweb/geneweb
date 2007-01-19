@@ -1,5 +1,5 @@
-(* $Id: secure.ml,v 5.1 2006-01-01 05:35:08 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: secure.ml,v 5.2 2007-01-19 01:53:17 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 (* secure open; forbids to access anywhere in the machine;
    this is an extra security: the program should check for

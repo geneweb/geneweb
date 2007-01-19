@@ -1,5 +1,5 @@
-(* $Id: checkItem.mli,v 1.8 2007-01-18 05:04:11 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: checkItem.mli,v 1.9 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Gwdb;
 

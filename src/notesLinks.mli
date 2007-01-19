@@ -1,5 +1,5 @@
-(* $Id: notesLinks.mli,v 5.2 2006-12-11 04:07:47 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: notesLinks.mli,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 type page =
   [ PgInd of Def.iper

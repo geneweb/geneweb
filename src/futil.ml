@@ -1,5 +1,5 @@
-(* $Id: futil.ml,v 5.3 2006-11-03 20:51:59 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: futil.ml,v 5.4 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Adef;
 open Def;

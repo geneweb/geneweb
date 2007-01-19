@@ -1,5 +1,5 @@
-(* $Id: dutil.ml,v 5.11 2006-11-17 02:36:18 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: dutil.ml,v 5.12 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Dbdisk;
 open Def;

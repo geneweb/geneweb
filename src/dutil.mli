@@ -1,5 +1,5 @@
-(* $Id: dutil.mli,v 5.7 2006-10-21 09:13:13 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: dutil.mli,v 5.8 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Dbdisk;
 

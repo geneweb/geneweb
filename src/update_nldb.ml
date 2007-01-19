@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.17 2006-12-28 14:08:59 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: update_nldb.ml,v 5.18 2007-01-19 01:53:17 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
 open Gwdb;

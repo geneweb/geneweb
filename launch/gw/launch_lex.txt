@@ -1,5 +1,5 @@
-# $Id: launch_lex.txt,v 1.1 2006-11-20 13:26:07 ddr Exp $
-# Copyright (c) 2006 INRIA
+# $Id: launch_lex.txt,v 1.2 2007-01-19 01:53:16 ddr Exp $
+# Copyright (c) 2006-2007 INRIA
 
     Apply
 en: Apply

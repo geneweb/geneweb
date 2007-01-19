@@ -1,5 +1,5 @@
-(* $Id: database.ml,v 5.17 2006-12-23 23:41:27 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: database.ml,v 5.18 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
 open Def;

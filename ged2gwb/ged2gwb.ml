@@ -1,6 +1,6 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.49 2006-12-23 23:41:27 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: ged2gwb.ml,v 5.50 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
 open Def;

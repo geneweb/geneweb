@@ -1,8 +1,8 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.7 2006-11-24 02:58:43 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2006 INRIA -->
+  <!-- $Id: perso.txt,v 5.8 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;

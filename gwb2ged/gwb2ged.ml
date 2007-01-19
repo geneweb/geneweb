@@ -1,5 +1,5 @@
-(* $Id: gwb2ged.ml,v 5.27 2007-01-18 23:12:50 ddr Exp $ *)
-(* Copyright (c) 1998-2006 INRIA *)
+(* $Id: gwb2ged.ml,v 5.28 2007-01-19 01:53:16 ddr Exp $ *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
 open Gutil;

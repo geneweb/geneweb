@@ -1,5 +1,5 @@
-# $Id: lexicon.txt,v 5.6 2007-01-05 20:27:21 ddr Exp $
-# Copyright (c) 1998-2006 INRIA
+# $Id: lexicon.txt,v 5.7 2007-01-19 01:53:16 ddr Exp $
+# Copyright (c) 1998-2007 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
 

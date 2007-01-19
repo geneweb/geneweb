@@ -1,5 +1,5 @@
-(* $Id: wiznotes.mli,v 5.2 2006-11-19 13:56:33 ddr Exp $ *)
-(* Copyright (c) 2006 INRIA *)
+(* $Id: wiznotes.mli,v 5.3 2007-01-19 01:53:17 ddr Exp $ *)
+(* Copyright (c) 2006-2007 INRIA *)
 
 open Config;
 open Gwdb;
