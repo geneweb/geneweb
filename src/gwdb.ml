@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.213 2007-01-19 09:12:06 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.214 2007-01-20 10:58:21 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -182,16 +182,17 @@ value spi_next =
 
 (* Persons - common definitions *)
 
-type person1_dat =
- { per : mutable option dsk_person;
-   asc : mutable option dsk_ascend;
-   uni : mutable option dsk_union }
-;
-
 type person =
   [ Person of dsk_base and int and person1_dat
-  | Person2 of db2 and int and option (gen_person iper string) and
-      option (gen_ascend ifam) and option (gen_union ifam) ]
+  | Person2 of db2 and int and person2_dat ]
+and person1_dat =
+  { per1 : mutable option dsk_person;
+    asc1 : mutable option dsk_ascend;
+    uni1 : mutable option dsk_union }
+and person2_dat =
+  { per2 : option (gen_person iper string);
+    asc2 : option (gen_ascend ifam);
+    uni2 : option (gen_union ifam) }
 ;
 
 type person_fun 'p 'a 'u =
@@ -439,38 +440,38 @@ value person2gen_fun =
 
 value wrap_per f g h =
   fun
-  [ Person _ _ {per = Some p} -> f person1_fun p
+  [ Person _ _ {per1 = Some p} -> f person1_fun p
   | Person base i p -> do {
       let per = base.data.persons.get i in
-      p.per := Some per;
+      p.per1 := Some per;
       f person1_fun per
     }
-  | Person2 db2 i None _ _ -> g person2_fun (db2, i)
-  | Person2 db2 _ (Some p) _ _ -> h person2gen_fun (db2, p) ]
+  | Person2 db2 i {per2 = Some p} -> h person2gen_fun (db2, p)
+  | Person2 db2 i {per2 = None} -> g person2_fun (db2, i) ]
 ;
 
 value wrap_asc f g h =
   fun
-  [ Person _ _ {asc = Some a} -> f person1_fun a
+  [ Person _ _ {asc1 = Some a} -> f person1_fun a
   | Person base i p -> do {
       let asc = base.data.ascends.get i in
-      p.asc := Some asc;
+      p.asc1 := Some asc;
       f person1_fun asc
     }
-  | Person2 db2 i _ None _ -> g person2_fun (db2, i)
-  | Person2 db2 _ _ (Some a) _ -> h person2gen_fun (db2, a) ]
+  | Person2 db2 i {asc2 = Some a} -> h person2gen_fun (db2, a)
+  | Person2 db2 i {asc2 = None} -> g person2_fun (db2, i) ]
 ;
 
 value wrap_uni f g h =
   fun
-  [ Person _ _ {uni = Some u} -> f person1_fun u
+  [ Person _ _ {uni1 = Some u} -> f person1_fun u
   | Person base i p -> do {
       let uni = base.data.unions.get i in
-      p.uni := Some uni;
+      p.uni1 := Some uni;
       f person1_fun uni
     }
-  | Person2 db2 i _ _ None -> g person2_fun (db2, i)
-  | Person2 db2 _ _ _ (Some u) -> h person2gen_fun (db2, u) ]
+  | Person2 db2 i {uni2 = Some u} -> h person2gen_fun (db2, u)
+  | Person2 db2 i {uni2 = None} -> g person2_fun (db2, i) ]
 ;
 
 value get_access p =
@@ -619,17 +620,17 @@ value get_family u =
 
 (* Families - common definitions *)
 
-
-type family1_dat =
- { fam : mutable option dsk_family;
-   cpl : mutable option dsk_couple;
-   des : mutable option dsk_descend }
-;
-
 type family =
   [ Family of dsk_base and int and family1_dat
-  | Family2 of db2 and int and option (gen_family iper string) and
-      option (gen_couple iper) and option (gen_descend iper) ]
+  | Family2 of db2 and int and family2_dat ]
+and family1_dat =
+  { fam1 : mutable option dsk_family;
+    cpl1 : mutable option dsk_couple;
+    des1 : mutable option dsk_descend }
+and family2_dat =
+  { fam2 : option (gen_family iper string);
+    cpl2 : option (gen_couple iper);
+    des2 : option (gen_descend iper) }
 ;
 
 type family_fun 'f 'c 'd =
@@ -743,38 +744,38 @@ value family2gen_fun =
 
 value wrap_fam f g h =
   fun
-  [ Family _ _ {fam = Some fam} -> f family1_fun fam
+  [ Family _ _ {fam1 = Some fam} -> f family1_fun fam
   | Family base i d -> do {
       let fam = base.data.families.get i in
-      d.fam := Some fam;
+      d.fam1 := Some fam;
       f family1_fun fam
     }
-  | Family2 db2 i None _ _ -> g family2_fun (db2, i)
-  | Family2 db2 _ (Some p) _ _ -> h family2gen_fun (db2, p) ]
+  | Family2 db2 i {fam2 = Some fam} -> h family2gen_fun (db2, fam)
+  | Family2 db2 i {fam2 = None} -> g family2_fun (db2, i) ]
 ;
 
 value wrap_cpl f g h =
   fun
-  [ Family _ _ {cpl = Some cpl} -> f family1_fun cpl
+  [ Family _ _ {cpl1 = Some cpl} -> f family1_fun cpl
   | Family base i d -> do {
       let cpl = base.data.couples.get i in
-      d.cpl := Some cpl;
+      d.cpl1 := Some cpl;
       f family1_fun cpl
     }
-  | Family2 db2 i _ None _ -> g family2_fun (db2, i)
-  | Family2 db2 _ _ (Some p) _ -> h family2gen_fun (db2, p) ]
+  | Family2 db2 i {cpl2 = Some cpl} -> h family2gen_fun (db2, cpl)
+  | Family2 db2 i {cpl2 = None} -> g family2_fun (db2, i) ]
 ;
 
 value wrap_des f g h =
   fun
-  [ Family _ _ {des = Some des} -> f family1_fun des
+  [ Family _ _ {des1 = Some des} -> f family1_fun des
   | Family base i d -> do {
       let des = base.data.descends.get i in
-      d.des := Some des;
+      d.des1 := Some des;
       f family1_fun des
     }
-  | Family2 db2 i _ _ None -> g family2_fun (db2, i)
-  | Family2 db2 _ _ _ (Some p) -> h family2gen_fun (db2, p) ]
+  | Family2 db2 i {des2 = Some des} -> h family2gen_fun (db2, des)
+  | Family2 db2 i {des2 = None} -> g family2_fun (db2, i) ]
 ;
 
 value get_comment fam =
@@ -986,20 +987,22 @@ value base1 base =
     {close_base = base.func.cleanup;
      empty_person ip =
        Person base (Adef.int_of_iper ip)
-         {per = Some (no_person (Adef.istr_of_int 0) ip);
-          asc = Some no_ascend; uni = Some no_union};
+         {per1 = Some (no_person (Adef.istr_of_int 0) ip);
+          asc1 = Some no_ascend; uni1 = Some no_union};
      person_of_gen_person (p, a, u) =
        Person base 0
-         {per = Some (map_person_ps (fun p -> p) un_istr p);
-          asc = Some a; uni = Some u};
+         {per1 = Some (map_person_ps (fun p -> p) un_istr p);
+          asc1 = Some a; uni1 = Some u};
      family_of_gen_family (f, c, d) =
        Family base 0
-         {fam = Some (map_family_ps (fun p -> p) un_istr f); cpl = Some c;
-          des = Some d};
+         {fam1 = Some (map_family_ps (fun p -> p) un_istr f); cpl1 = Some c;
+          des1 = Some d};
      poi i =
-       Person base (Adef.int_of_iper i) {per = None; asc = None; uni = None};
+       Person base (Adef.int_of_iper i)
+         {per1 = None; asc1 = None; uni1 = None};
      foi i =
-       Family base (Adef.int_of_ifam i) {fam = None; cpl = None; des = None};
+       Family base (Adef.int_of_ifam i)
+         {fam1 = None; cpl1 = None; des1 = None};
      sou i =
        match i with
        [ Istr i -> base.data.strings.get (Adef.int_of_istr i)
@@ -1032,7 +1035,8 @@ value base1 base =
      persons_of_surname () = Spi base.func.Dbdisk.persons_of_surname;
      base_visible_get f =
        base.data.visible.v_get
-         (fun p -> f (Person base 0 {per = Some p; asc = None; uni = None}));
+         (fun p ->
+            f (Person base 0 {per1 = Some p; asc1 = None; uni1 = None}));
      base_visible_write = base.data.visible.v_write;
      base_particles () = base.data.particles;
      base_strings_of_first_name = base_strings_of_first_name_or_surname;
@@ -1100,30 +1104,39 @@ value base2 db2 =
     {close_base () =
        Hashtbl.iter (fun (f1, f2, f) ic -> close_in ic) db2.cache_chan;
      empty_person ip =
-       Person2 db2 (Adef.int_of_iper ip) (Some (no_person "" ip))
-         (Some no_ascend) (Some no_union);
+       Person2 db2 (Adef.int_of_iper ip)
+         {per2 = Some (no_person "" ip); asc2 = Some no_ascend;
+          uni2 = Some no_union};
      person_of_gen_person (p, a, u) =
        Person2 db2 (Adef.int_of_iper p.key_index)
-         (Some (map_person_ps (fun p -> p) un_istr2 p)) (Some a) (Some u);
+         {per2 = Some (map_person_ps (fun p -> p) un_istr2 p); asc2 = Some a;
+          uni2 = Some u};
      family_of_gen_family (f, c, d) =
        Family2 db2 (Adef.int_of_ifam f.fam_index)
-         (Some (map_family_ps (fun p -> p) un_istr2 f)) (Some c) (Some d);
+         {fam2 = Some (map_family_ps (fun p -> p) un_istr2 f); cpl2 = Some c;
+          des2 = Some d};
      poi i =
        Person2 db2 (Adef.int_of_iper i)
-         (try Some (Hashtbl.find db2.patches.h_person i) with
-          [ Not_found -> None ])
-         (try Some (Hashtbl.find db2.patches.h_ascend i) with
-          [ Not_found -> None ])
-         (try Some (Hashtbl.find db2.patches.h_union i) with
-          [ Not_found -> None ]);
+         {per2 =
+            try Some (Hashtbl.find db2.patches.h_person i) with
+             [ Not_found -> None ];
+          asc2 =
+            try Some (Hashtbl.find db2.patches.h_ascend i) with
+            [ Not_found -> None ];
+          uni2 =
+            try Some (Hashtbl.find db2.patches.h_union i) with
+            [ Not_found -> None ]};
      foi i =
        Family2 db2 (Adef.int_of_ifam i)
-         (try Some (Hashtbl.find db2.patches.h_family i) with
-          [ Not_found -> None ])
-         (try Some (Hashtbl.find db2.patches.h_couple i) with
-          [ Not_found -> None ])
-         (try Some (Hashtbl.find db2.patches.h_descend i) with
-          [ Not_found -> None ]);
+         {fam2 =
+            try Some (Hashtbl.find db2.patches.h_family i) with
+            [ Not_found -> None ];
+          cpl2 =
+            try Some (Hashtbl.find db2.patches.h_couple i) with
+            [ Not_found -> None ];
+          des2 =
+            try Some (Hashtbl.find db2.patches.h_descend i) with
+            [ Not_found -> None ]};
      sou i =
        match i with
        [ Istr2 db2 f pos -> string_of_istr2 db2 f pos
@@ -1270,7 +1283,9 @@ value base2 db2 =
          try
            (Hashtbl.find db2.patches.h_ascend (Adef.iper_of_int i)).parents
          with
-         [ Not_found -> get_parents (Person2 db2 i None None None) ]
+         [ Not_found ->
+             get_parents
+               (Person2 db2 i {per2 = None; asc2 = None; uni2 = None}) ]
        in
        let cget i = cg_tab.(i) in
        let cset i v = cg_tab.(i) := v in
