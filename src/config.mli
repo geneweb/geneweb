@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 5.17 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: config.mli,v 5.18 2007-01-23 14:24:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -23,6 +23,7 @@ and digest_auth_scheme =
 type config =
   { from : string;
     manitou : bool;
+    supervisor : bool;
     wizard : bool;
     friend : bool;
     just_friend_wizard : bool;

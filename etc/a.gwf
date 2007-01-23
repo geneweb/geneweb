@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 5.11 2006-12-22 06:39:44 ddr Exp $
+# $Id: a.gwf,v 5.12 2007-01-23 14:24:10 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -77,6 +77,12 @@ wizard_passwd_file=
 # If empty or empty file, no moderation.
 # One wizard name by line.
 moderator_file=
+
+# Forum supervisor. The forum is not moderated but controlled afterwards.
+# This supervisor is a wizard who can delete any forum message. He can
+# see the real wizards or friend user names (since they can be hidden in
+# the "ident" area) and the IP address the message comes from.
+supervisor=
 
 # Notify change program (e.g. shell script) to be executed for each
 # database change.
