@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.52 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.53 2007-01-23 14:24:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1205,13 +1205,24 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
   in
   let manitou =
-    try ar.ar_user <> "" && List.assoc "manitou" base_env = ar.ar_user with
+    try
+      ar.ar_wizard && ar.ar_user <> "" &&
+      List.assoc "manitou" base_env = ar.ar_user
+    with
+    [ Not_found -> False ]
+  in
+  let supervisor =
+    try
+      ar.ar_wizard && ar.ar_user <> "" &&
+      List.assoc "supervisor" base_env = ar.ar_user
+    with
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
   let conf =
     {from = from_addr;
      manitou = manitou;
+     supervisor = supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;

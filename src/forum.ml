@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.15 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: forum.ml,v 5.16 2007-01-23 14:24:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -14,6 +14,7 @@ type message =
     m_date : date;
     m_hour : string;
     m_waiting : bool;
+    m_from : string;
     m_ident : string;
     m_wizard : string;
     m_friend : string;
@@ -280,7 +281,7 @@ value read_message conf ic =
       [ Failure _ | Invalid_argument _ -> Dtext date ]
     in
     let (moderator, s) = get_var ic "Moderator:" s in
-    let (_, s) = get_var ic "From:" s in
+    let (from, s) = get_var ic "From:" s in
     let (ident, s) = get_var ic "Ident:" s in
     let (wizard, s) = get_var ic "Wizard:" s in
     let (friend, s) = get_var ic "Friend:" s in
@@ -299,9 +300,10 @@ value read_message conf ic =
     in
     let waiting = String.length moderator > 0 && moderator.[0] = '.' in
     let mess =
-      {m_time = time; m_waiting = waiting; m_date = date; m_hour = hour;
-       m_ident = ident; m_wizard = wizard; m_friend = friend; m_email = email;
-       m_access = access; m_subject = subject; m_wiki = wiki; m_text = mess}
+      {m_time = time; m_waiting = waiting; m_from = from; m_date = date;
+       m_hour = hour; m_ident = ident; m_wizard = wizard; m_friend = friend;
+       m_email = email; m_access = access; m_subject = subject; m_wiki = wiki;
+       m_text = mess}
     in
     let accessible =
       if deleted then False
@@ -357,8 +359,8 @@ value backward_pos conf pos =
   | None -> pos ]
 ;
 
-value passwd_in_file conf =
-  match p_getenv conf.base_env "wizard_passwd_file" with
+value passwd_in_file conf kind =
+  match p_getenv conf.base_env (kind ^ "_passwd_file") with
   [ Some "" | None -> False
   | Some _ -> True ]
 ;
@@ -418,6 +420,16 @@ and eval_message_var conf base env =
   | ["email" :: sl] ->
       match get_env "mess" env with
       [ Vmess mess _ _ _ so -> eval_message_string_var conf mess.m_email so sl
+      | _ -> raise Not_found ]
+  | ["friend"] ->
+      if passwd_in_file conf "friend" then
+        match get_env "mess" env with
+        [ Vmess mess _ _ _ _ -> VVstring (mess.m_friend)
+        | _ -> raise Not_found ]
+      else VVstring ""
+  | ["from"] ->
+      match get_env "mess" env with
+      [ Vmess mess _ _ _ _ -> VVstring (mess.m_from)
       | _ -> raise Not_found ]
   | ["hour"] ->
       match get_env "mess" env with
@@ -484,7 +496,7 @@ and eval_message_var conf base env =
       [ Vmess mess _ _ _ _ -> VVstring mess.m_wiki
       | _ -> raise Not_found ]
   | ["wizard"] ->
-      if passwd_in_file conf then
+      if passwd_in_file conf "wizard" then
         match get_env "mess" env with
         [ Vmess mess _ _ _ _ -> VVstring (mess.m_wizard)
         | _ -> raise Not_found ]
@@ -725,8 +737,9 @@ value print_add_ok conf base =
     let subject = Gutil.strip_spaces (get conf "Subject") in
     let text = Gutil.gen_strip_spaces False (get1 conf "Text") in
     {m_time = time; m_date = Dtext ""; m_hour = ""; m_waiting = False;
-     m_ident = ident; m_wizard = ""; m_friend = ""; m_email = email;
-     m_access = ""; m_subject = subject; m_wiki = ""; m_text = text}
+     m_from = ""; m_ident = ident; m_wizard = ""; m_friend = "";
+     m_email = email; m_access = ""; m_subject = subject; m_wiki = "";
+     m_text = text}
   in
   if not (can_post conf) then incorrect_request conf
   else if
@@ -783,7 +796,7 @@ value delete_forum_message conf base pos =
   match get_message conf pos with
   [ Some (a, m, _, _) ->
       if a && conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
-        passwd_in_file conf || conf.manitou
+        passwd_in_file conf "wizard" || conf.manitou || conf.supervisor
       then
         try
           do {

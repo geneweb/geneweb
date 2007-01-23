@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.9 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.10 2007-01-23 14:24:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -233,7 +233,18 @@
   <p%col;>
   <b>%message.ident;</b>
   %if;(message.email != "")%nn;
-    <a href="mailto:%message.email.v;">%message.email;</a>%end;
+    <a href="mailto:%message.email.v;">%message.email;</a>
+  %end;
+  %if;supervisor;
+    <b style="color:#999">-%sp;
+    %if;(message.wizard != "")
+      [wizard/wizards/friend/friends/exterior]0: %message.wizard;%sp;
+    %end;
+    %if;(message.friend != "")
+      [wizard/wizards/friend/friends/exterior]2: %message.friend;%sp;
+    %end;
+    ... %message.from;</b>
+  %end;
   <br%/>
   %if;(message.subject != "")
     <b>[*ident/email/subject]2: %message.subject;</b>
@@ -253,7 +264,7 @@
     %else;%message.text.nowiki;%end;
   </dd></dl>
   %if;(message.wizard != "" and wizard and user.ident = message.wizard or
-       manitou)
+       manitou or supervisor)
     <form method="POST" action="%action;">
     <p>
     %hidden;
