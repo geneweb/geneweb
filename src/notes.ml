@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.25 2007-01-25 13:31:00 ddr Exp $ *)
+(* $Id: notes.ml,v 5.26 2007-01-25 15:44:24 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -130,14 +130,11 @@ value print_notes_part conf base fnotes title s cnt0 =
   }
 ;
 
-value notes_links_db conf base eliminate_unlinked = do {
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
+value merge_possible_aliases conf db =
+  let aliases = Wiki.notes_aliases conf in
   let db =
-    let aliases = Wiki.notes_aliases conf in
-    List.fold_left
-      (fun list (pg, (sl, il)) ->
+    List.map
+      (fun (pg, (sl, il)) ->
          let pg =
            match pg with
            [ NotesLinks.PgMisc f ->
@@ -145,26 +142,41 @@ value notes_links_db conf base eliminate_unlinked = do {
            | x -> x ]
          in
          let sl = List.map (Wiki.map_notes aliases) sl in
-         let (sl, il1, list) =
-           let (list1, list2) =
-             List.partition (fun (pg1, _) -> pg = pg1) list
-           in
-           match list1 with
-           [ [(_, (sl1, il1))] ->
-               let sl =
-                 List.fold_left
-                   (fun sl s -> if List.mem s sl then sl else [s :: sl]) sl sl1
-               in
-               let il =
-                 List.fold_left
-                   (fun il i -> if List.mem i il then il else [i :: il]) il il1
-               in
-               (sl, il, list2)
-           | _ -> (sl, il, list) ]
-         in
-         [(pg, (sl, il)) :: list])
-      [] db
+         (pg, (sl, il)))
+      db
   in
+  let db = List.sort (fun (pg1, _) (pg2, _) -> compare pg1 pg2) db in
+  List.fold_left
+    (fun list (pg, (sl, il)) ->
+       let (sl, il1, list) =
+         let (list1, list2) =
+           match list with
+           [ [((pg1, _) as x) :: l] ->
+               if pg = pg1 then ([x], l) else ([], list)
+           | [] -> ([], list) ]
+         in
+         match list1 with
+         [ [(_, (sl1, il1))] ->
+             let sl =
+               List.fold_left
+                 (fun sl s -> if List.mem s sl then sl else [s :: sl]) sl sl1
+             in
+             let il =
+               List.fold_left
+                 (fun il i -> if List.mem i il then il else [i :: il]) il il1
+             in
+             (sl, il, list2)
+         | _ -> (sl, il, list) ]
+       in
+       [(pg, (sl, il)) :: list])
+    [] db
+;
+
+value notes_links_db conf base eliminate_unlinked = do {
+  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let fname = Filename.concat bdir "notes_links" in
+  let db = NotesLinks.read_db_from_file fname in
+  let db = merge_possible_aliases conf db in
   let db2 =
     List.fold_left
       (fun db2 (pg, (sl, il)) ->
