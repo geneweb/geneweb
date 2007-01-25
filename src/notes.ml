@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.24 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: notes.ml,v 5.25 2007-01-25 13:31:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -130,7 +130,7 @@ value print_notes_part conf base fnotes title s cnt0 =
   }
 ;
 
-value notes_links_db conf base eliminate_unlinked =
+value notes_links_db conf base eliminate_unlinked = do {
   let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
   let fname = Filename.concat bdir "notes_links" in
   let db = NotesLinks.read_db_from_file fname in
@@ -187,30 +187,34 @@ value notes_links_db conf base eliminate_unlinked =
       [] db
   in
   (* some kind of basic gc... *)
-  let is_referenced s db =
-    let mark = Hashtbl.create 1 in
-    loop s db where rec loop s db =
-      if Hashtbl.mem mark s then False
-      else
-        match db with
-        [ [(NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _,
-            (sl, il)) ::
-           pgsll] ->
-            if List.mem s sl then True else loop s pgsll
-        | [(NotesLinks.PgMisc s1, (sl, il)) :: pgsll] ->
-            if loop s pgsll then True
-            else if List.mem s sl then do {
-              Hashtbl.add mark s True;
-              loop s1 db
-            }
-            else False
-        | [] -> False ]
+  let misc = Hashtbl.create 1 in
+  let set =
+    List.fold_left
+      (fun set (pg, (sl, il)) ->
+         match pg with
+         [ NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _ ->
+             List.fold_left (fun set s -> StrSet.add s set) set sl
+         | NotesLinks.PgMisc s ->
+             do { Hashtbl.add misc s sl; set } ])
+      StrSet.empty db
   in
+  let mark = Hashtbl.create 1 in
+  loop (StrSet.elements set) where rec loop =
+    fun
+    [ [s :: sl] ->
+        if Hashtbl.mem mark s then loop sl
+        else do {
+          Hashtbl.add mark s ();
+          let sl1 = try Hashtbl.find misc s with [ Not_found -> [] ] in
+          loop (List.rev_append sl1 sl)
+        }
+    | [] -> () ];
+  let is_referenced s = Hashtbl.mem mark s in
   let db2 =
     if eliminate_unlinked then
       List.fold_right
         (fun (s, list) db2 ->
-           if is_referenced s db then [(s, list) :: db2]
+           if is_referenced s then [(s, list) :: db2]
            else db2)
         db2 []
     else db2
@@ -218,7 +222,7 @@ value notes_links_db conf base eliminate_unlinked =
   List.sort
     (fun (s1, _) (s2, _) -> alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
-;
+};
 
 value print_what_links conf base fnotes =
   let title h =
