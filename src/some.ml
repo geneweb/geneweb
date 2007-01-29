@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.33 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: some.ml,v 5.34 2007-01-29 14:09:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -374,7 +374,7 @@ value alphabetic1 n1 n2 =
 
 type branch_head 'a = { bh_ancestor : 'a; bh_well_named_ancestors : list 'a };
 
-value print_by_branch x conf base (bhl, homonymes) =
+value print_one_surname_by_branch conf base (bhl, str) =
   let ancestors =
     match p_getenv conf.env "order" with
     [ Some "d" ->
@@ -395,34 +395,14 @@ value print_by_branch x conf base (bhl, homonymes) =
           bhl ]
   in
   let len = List.length ancestors in
-  let fx = x in
-  let x =
-    match homonymes with
-    [ [x :: _] -> x
-    | _ -> x ]
-  in
   let psn =
-    match homonymes with
-    [ [_] ->
-        match p_getenv conf.env "alwsurn" with
-        [ Some x -> x = "yes"
-        | None ->
-            try List.assoc "always_surname" conf.base_env = "yes" with
-            [ Not_found -> False ] ]
-    | _ -> True ]
+    match p_getenv conf.env "alwsurn" with
+    [ Some x -> x = "yes"
+    | None ->
+        try List.assoc "always_surname" conf.base_env = "yes" with
+        [ Not_found -> False ] ]
   in
-  let title h =
-    let access x =
-      if h || List.length homonymes = 1 then x
-      else geneweb_link conf ("m=N;v=" ^ code_varenv x ^ ";t=A") x
-    in
-    do {
-      let homonymes = List.sort compare homonymes in
-      Wserver.wprint "%s" (access (List.hd homonymes));
-      List.iter (fun x -> Wserver.wprint ", %s" (access x))
-        (List.tl homonymes);
-    }
-  in
+  let title _ = Wserver.wprint "%s" str in
   let br = p_getint conf.env "br" in
   do {
     header conf title;
@@ -432,9 +412,7 @@ value print_by_branch x conf base (bhl, homonymes) =
         Wserver.wprint "<em style=\"font-size:80%%\">\n";
         Wserver.wprint "%s " (capitale (transl conf "click"));
         Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-          (if List.length homonymes = 1 then code_varenv x ^ ";t=A"
-           else code_varenv fx)
-          (transl conf "here");
+          (code_varenv str ^ ";t=A") (transl conf "here");
         Wserver.wprint "%s"
           (transl conf "for the first names by alphabetic order");
         Wserver.wprint ".</em>\n";
@@ -457,7 +435,7 @@ value print_by_branch x conf base (bhl, homonymes) =
                Wserver.wprint "\n";
                stagn "dt" begin
                  stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
-                     (Util.code_varenv fx) n begin
+                     (Util.code_varenv str) n begin
                    Wserver.wprint "%d." n;
                  end;
                end;
@@ -495,6 +473,48 @@ value print_by_branch x conf base (bhl, homonymes) =
     trailer conf;
   }
 ;
+
+value print_several_possible_surnames x conf base (bhl, homonymes) = do {
+  let fx = x in
+  let x =
+    match homonymes with
+    [ [x :: _] -> x
+    | _ -> x ]
+  in
+  let title h =
+    Wserver.wprint "%s \"%s\" : %s"
+      (capitale (transl_nth conf "surname/surnames" 0)) fx
+      (transl conf "specify")
+  in
+  header conf title;
+  print_link_to_welcome conf True;
+  let list =
+    List.map
+      (fun sn ->
+         let v = Util.surname_end base sn ^ Util.surname_begin base sn in
+         (v, sn))
+      homonymes
+  in
+  let list = List.sort compare list in
+  let access txt sn =
+    geneweb_link conf ("m=N;v=" ^ code_varenv sn ^ ";t=A") txt
+  in
+  Util.wprint_in_columns conf
+    (fun (ord, _) -> ord)
+    (fun (txt, sn) -> Wserver.wprint "%s" (access txt sn)) list;
+  tag "p" begin
+    Wserver.wprint "<em style=\"font-size:80%%\">\n";
+    Wserver.wprint "%s " (capitale (transl conf "click"));
+    Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+      (if List.length homonymes = 1 then code_varenv x ^ ";t=A"
+       else code_varenv fx)
+      (transl conf "here");
+    Wserver.wprint "%s"
+      (transl conf "for the first names by alphabetic order");
+    Wserver.wprint ".</em>\n";
+  end;
+  trailer conf;
+};
 
 value first_char s =
   if Mutil.utf_8_db.val then
@@ -686,6 +706,8 @@ value surname_print conf base not_found_fun x =
                 List.map (poi base) bh.bh_well_named_ancestors})
           bhl
       in
-      if bhl = [] then not_found_fun conf x
-      else print_by_branch x conf base (bhl, strl) ]
+      match (bhl, strl) with
+      [ ([], _) -> not_found_fun conf x
+      | (_, [str]) -> print_one_surname_by_branch conf base (bhl, str)
+      | _ -> print_several_possible_surnames x conf base (bhl, strl) ] ]
 ;
