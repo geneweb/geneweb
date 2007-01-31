@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.34 2007-01-29 14:09:55 ddr Exp $ *)
+(* $Id: some.ml,v 5.35 2007-01-31 10:05:21 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -474,6 +474,14 @@ value print_one_surname_by_branch conf base (bhl, str) =
   }
 ;
 
+value name_unaccent s =
+  copy 0 0 where rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let (t, j) = Name.unaccent_utf_8 False s i in
+      copy j (Buff.mstore len t)
+;
+
 value print_several_possible_surnames x conf base (bhl, homonymes) = do {
   let fx = x in
   let x =
@@ -491,8 +499,9 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
   let list =
     List.map
       (fun sn ->
-         let v = Util.surname_end base sn ^ Util.surname_begin base sn in
-         (v, sn))
+         let txt = Util.surname_end base sn ^ Util.surname_begin base sn in
+         let ord = name_unaccent txt in
+         (ord, txt, sn))
       homonymes
   in
   let list = List.sort compare list in
@@ -500,8 +509,8 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
     geneweb_link conf ("m=N;v=" ^ code_varenv sn ^ ";t=A") txt
   in
   Util.wprint_in_columns conf
-    (fun (ord, _) -> ord)
-    (fun (txt, sn) -> Wserver.wprint "%s" (access txt sn)) list;
+    (fun (ord, _, _) -> ord)
+    (fun (_, txt, sn) -> Wserver.wprint "%s" (access txt sn)) list;
   tag "p" begin
     Wserver.wprint "<em style=\"font-size:80%%\">\n";
     Wserver.wprint "%s " (capitale (transl conf "click"));
