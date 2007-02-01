@@ -1,4 +1,4 @@
-(* $Id: progrBar.ml,v 5.3 2006-09-10 08:22:14 ddr Exp $ *)
+(* $Id: progrBar.ml,v 5.4 2007-02-01 10:28:55 ddr Exp $ *)
 
 value size = 60;
 value draw_rep = 5;
@@ -38,9 +38,17 @@ value run cnt max_cnt =
   }
 ;
 
-value finish () =
-  do {
-    Printf.eprintf "\n";
-    flush stderr;
-  }
-;
+value suspend () = do {
+  Printf.eprintf "%c\n" full.val;
+  flush stderr;
+};
+
+value restart cnt max_cnt = do {
+  start ();
+  for i = 0 to cnt do { run i max_cnt };
+};
+
+value finish () = do {
+  Printf.eprintf "\n";
+  flush stderr;
+};
