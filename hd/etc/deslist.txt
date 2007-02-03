@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.10 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.11 2007-02-03 20:07:56 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -125,7 +125,29 @@
   %apply;somebody_long_info("xx")
   %if;(xx.desc_level > curlev and evar.t = "L")<i>, [see above]</i>%nn;
   %elseif;(xx.desc_level < curlev and evar.t = "L")<i>, [see further]</i>%nn;
-  %else;%incr_count;%end;.
+  %else;%incr_count;%end;
+  %if;(evar.rel = "on" and has_relations)
+    %foreach;relation;%nl;
+      (%relation_type;:
+      %if;has_relation_him;
+        %if;(evar.cgl = "on")%relation_him;
+        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
+        %relation_him.dates;
+      %end;
+      %if;has_relation_her;
+        %if;has_relation_him;,%nl;%end;
+        %if;(evar.cgl = "on")%relation_her;
+        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
+        %relation_her.dates;
+      %end;)%nn;
+    %end;
+    %foreach;related;%nl;
+      (%related_type;:
+       %if;(evar.cgl = "on")%related;
+       %else;<a href="%prefix;%related.access;">%related;</a>%end;
+       %related.dates;)%nn;
+    %end;
+  %end;.
   %apply;lazy_print%with;<br%/>%nl;%end;
   %if;(xx.desc_level = curlev)
     %xx.set_infinite_desc_level;
@@ -143,6 +165,14 @@
       <b>%if;(evar.cgl = "on" or spouse.is_restricted)%spouse;%else;
       <a href="%prefix;%spouse.access;">%spouse;</a>%end;</b>%nn;
       %apply;somebody_long_info("spouse")
+      %if;(evar.witn = "on" and has_witnesses)%nl;([witness/witnesses]1:
+        %foreach;witness;
+          %if;(not is_first),%nl;%end;
+          %if;(evar.cgl = "on")%witness;
+          %else;<a href="%prefix;%witness.access;">%witness;</a>%end;
+        %end;)%sq;
+      %end;
+      %if;(evar.comm = "on" and has_comment)%nl;(%comment;)%end;
       %if;are_divorced;, <i>[divorced]</i>%end;
       %if;(curlev < maxlev)
         %if;(curlev = 0 or

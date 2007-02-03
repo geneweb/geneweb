@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: desmenu.txt,v 5.5 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: desmenu.txt,v 5.6 2007-02-03 20:07:56 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -116,7 +116,22 @@
             <input type="checkbox" name="alwsurn" value="yes"%>
           </label>
           <br%/>
+          <label>
+            - [witness/witnesses]1 ([marriage/marriages]0)
+            <input type="checkbox" name="witn" value="on"%>
+          </label>
           <br%/>
+          <label>
+            - [comment] ([marriage/marriages]0)
+            <input type="checkbox" name="comm" value="on"%>
+          </label>
+          <br%/>
+          <label>
+            - [relation/relations]1
+            <input type="checkbox" name="rel" value="on"%>
+          </label>
+        </td>
+        <td align="%left;" valign="top">
           <label>
             <input type="radio" name="t" value="T"%/>
             [*tree]
@@ -166,7 +181,7 @@
             </tr>
           </table>
         </td>
-        <td align="%left;">
+        <td align="%left;" valign="top">
           <label>
             <input type="radio" name="t" value="S"%/>
             [*only the generation selected]

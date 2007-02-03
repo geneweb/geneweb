@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.60 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: perso.ml,v 5.61 2007-02-03 20:07:56 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2676,9 +2676,10 @@ value print_foreach conf base print_ast eval_expr =
     else ()
   and print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
-      List.iter
-        (fun r ->
+      list_iter_first
+        (fun first r ->
            let env = [("rel", Vrel r None) :: env] in
+           let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_rparents p)
     else ()
