@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.9 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.10 2007-02-04 04:59:52 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -271,7 +271,31 @@
 %end;
 
 %define;long_display_ancestor_personal()
-  %apply;somebody("ancestor").
+  %apply;somebody("ancestor")
+
+  %if;(evar.rel = "on" and ancestor.has_relations)
+    %foreach;ancestor.relation;%nl;
+      (%relation_type;:
+      %if;has_relation_him;
+        %if;(evar.cgl = "on")%relation_him;
+        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
+        %relation_him.dates;
+      %end;
+      %if;has_relation_her;
+        %if;has_relation_him;,%nl;%end;
+        %if;(evar.cgl = "on")%relation_her;
+        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
+        %relation_her.dates;
+      %end;)%nn;
+    %end;
+    %foreach;ancestor.related;%nl;
+      (%related_type;:
+       %if;(evar.cgl = "on")%related;
+       %else;<a href="%prefix;%related.access;">%related;</a>%end;
+       %related.dates;)%nn;
+    %end;
+  %end;.
+
   %if;(evar.only != "on" and ancestor.father_sosa != "")
     [*parents]:%sp;
     <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;
