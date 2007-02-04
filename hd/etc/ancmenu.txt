@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 5.6 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 5.7 2007-02-04 04:59:52 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -93,9 +93,9 @@
       </select>
       <input type="submit" value="Ok"%/>
     </div>
-    <table border="%border;" width="100%%">
+    <table border="%border;" width="100%%" style="margin-top:1em">
       <tr>
-        <td align="%left;">
+        <td align="%left;" valign="top">
           <label>
             <input type="radio" name="t" value="N" checked="checked"%/>
             [*short display] (*)
@@ -114,21 +114,27 @@
           </label>
           <br%/>
           <label>
-            - [*siblings]
+            - [siblings]
             <input type="checkbox" name="siblings" value="on"%sp;
              checked="checked"%/>
           </label>
           <br%/>
           <label>
-            - [*note/notes]1
+            - [note/notes]1
             <input type="checkbox" name="notes" value="on" checked="checked"%/>
           </label>
           <br%/>
           <label>
-            - [*source/sources]1
+            - [source/sources]1
             <input type="checkbox" name="src" value="on" checked="checked"%/>
           </label>
-          <br%/><br%/>
+          <br%/>
+          <label>
+            - [relation/relations]1
+            <input type="checkbox" name="rel" value="on"%>
+          </label>
+        </td>
+        <td align="%left;" valign="top">
           <label>
             <input type="radio" name="t" value="T"%/>
             [*tree]
@@ -251,8 +257,9 @@
           <br%/>
         </td>
       </tr>
+      <tr><td colspan="3">&nbsp;</td></tr>
       <tr>
-        <td colspan="2" align="center">
+        <td colspan="3" align="center">
           <label>
             [*cancel GeneWeb links]
             <input type="checkbox" name="cgl" value="on"%/>
@@ -260,7 +267,7 @@
         </td>
       </tr>
       <tr>
-        <td colspan="2" align="center">
+        <td colspan="3" align="center">
           <label>
             (*) [*only the generation selected]
             <input type="checkbox" name="only" value="on"%/>
