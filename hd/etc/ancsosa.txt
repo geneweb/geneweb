@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.10 2007-02-04 04:59:52 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.11 2007-02-04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -272,7 +272,6 @@
 
 %define;long_display_ancestor_personal()
   %apply;somebody("ancestor")
-
   %if;(evar.rel = "on" and ancestor.has_relations)
     %foreach;ancestor.relation;%nl;
       (%relation_type;:
@@ -295,7 +294,6 @@
        %related.dates;)%nn;
     %end;
   %end;.
-
   %if;(evar.only != "on" and ancestor.father_sosa != "")
     [*parents]:%sp;
     <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;
@@ -397,20 +395,30 @@
       %end;
     %end;
   %else;
-    ... [having as children]:
-    <p>
     %foreach;ancestor.family;
       %if;(family.index = ancestor.family.index)
-        <ol style="list-style-type:lower-latin">
-        %foreach;child;
-          %if;(evar.siblings = "on" or child.sosa_in_list != "")
-            <li>%apply;child_long_info("")</li>
-          %end;
+        ...
+        %if;(evar.witn = "on" and has_witnesses)([witness/witnesses]1:
+          %foreach;witness;
+            %if;(not is_first),%nl;%end;
+            %if;(evar.cgl = "on")%witness;
+            %else;<a href="%prefix;%witness.access;">%witness;</a>%end;
+            %witness.dates;
+          %end;),
         %end;
-        </ol>
+        %if;(evar.comm = "on" and has_comment)(%comment;)%nl;%end;
+        [having as children]:
+        <p>
+          <ol style="list-style-type:lower-latin">
+          %foreach;child;
+            %if;(evar.siblings = "on" or child.sosa_in_list != "")
+              <li>%apply;child_long_info("")</li>
+            %end;
+          %end;
+          </ol>
+        </p>
       %end;
     %end;
-    </p>
     %if;(evar.siblings = "on")
       %( father's other children %)
       %foreach;ancestor.spouse.family;

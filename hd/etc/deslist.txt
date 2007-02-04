@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.11 2007-02-03 20:07:56 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.12 2007-02-04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -170,6 +170,7 @@
           %if;(not is_first),%nl;%end;
           %if;(evar.cgl = "on")%witness;
           %else;<a href="%prefix;%witness.access;">%witness;</a>%end;
+          %witness.dates;
         %end;)%sq;
       %end;
       %if;(evar.comm = "on" and has_comment)%nl;(%comment;)%end;
