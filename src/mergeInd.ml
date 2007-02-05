@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.45 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.46 2007-02-05 10:40:28 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -484,21 +484,19 @@ value effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 = do {
        if is_empty_string (get_fsources fam1) then get_fsources fam2
        else get_fsources fam1}
   in
-  patch_family base ifam1 fam1;
   let des1 =
     let children = Array.append (get_children des1) (get_children des2) in
     let _ : option _ = CheckItem.sort_children base children in
     {children = children}
   in
-  patch_descend base ifam1 des1;
+  UpdateFamOk.effective_del conf base (ifam2, fam2);
   for i = 0 to Array.length (get_children des2) - 1 do {
     let ip = (get_children des2).(i) in
     let a = {parents = Some ifam1; consang = Adef.fix (-1)} in
     patch_ascend base ip a;
   };
-  let des2 = {children = [| |]} in
-  patch_descend base ifam2 des2;
-  UpdateFamOk.effective_del conf base (ifam2, fam2);
+  patch_family base ifam1 fam1;
+  patch_descend base ifam1 des1;
 };
 
 value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
