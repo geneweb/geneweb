@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.35 2007-01-31 10:05:21 ddr Exp $ *)
+(* $Id: some.ml,v 5.36 2007-02-05 18:20:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -240,7 +240,7 @@ value bullet_unsel_txt = "<tt>+</tt>";
 value bullet_nosel_txt = "<tt>o</tt>";
 value print_selection_bullet conf =
   fun
-  [ Some (txt, sel) ->
+  [ Some (txt, sel) -> do {
       let req =
         List.fold_left
           (fun req (k, v) ->
@@ -250,14 +250,15 @@ value print_selection_bullet conf =
                if req = "" then s else req ^ ";" ^ s)
           "" conf.env
       in
-      do {
+      if conf.cancel_links then ()
+      else
         Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\">" txt (commd conf) req
           (if sel then ";u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
-        Wserver.wprint "%s"
-          (if sel then bullet_sel_txt else bullet_unsel_txt);
-        Wserver.wprint "</a>\n";
-      }
+      Wserver.wprint "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
+      if conf.cancel_links then () else Wserver.wprint "</a>";
+      Wserver.wprint "\n";
+    }
   | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
 ;
 
@@ -434,10 +435,12 @@ value print_one_surname_by_branch conf base (bhl, str) =
              if len > 1 && br = None then do {
                Wserver.wprint "\n";
                stagn "dt" begin
-                 stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
-                     (Util.code_varenv str) n begin
-                   Wserver.wprint "%d." n;
-                 end;
+                 if conf.cancel_links then Wserver.wprint "%d." n
+                 else
+                   stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                       (Util.code_varenv str) n begin
+                     Wserver.wprint "%d." n;
+                   end;
                end;
              }
              else ();
