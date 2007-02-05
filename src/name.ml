@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.8 2007-01-31 02:27:52 ddr Exp $ *)
+(* $Id: name.ml,v 5.9 2007-02-05 12:53:42 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value utf_8_db = ref True;
@@ -54,7 +54,7 @@ value unaccent_utf_8 lower s i =
           | 0x92 | 0x93 | 0x94 | 0x95 | 0x96 | 0x98 -> f "O"
           | 0x99 | 0x9A | 0x9B | 0x9C -> f "U"
           | 0x9D -> f "Y"
-          | 0x9E -> f "P"
+          | 0x9E -> f "TH"
           | 0x9F -> "sz"
           | 0xA0 | 0xA1 | 0xA2 | 0xA3 | 0xA4 | 0xA5 -> "a"
           | 0xA6 -> "ae"
@@ -66,7 +66,7 @@ value unaccent_utf_8 lower s i =
           | 0xB2 | 0xB3 | 0xB4 | 0xB5 | 0xB6 | 0xB8 -> "o"
           | 0xB9 | 0xBA | 0xBB | 0xBC -> "u"
           | 0xBD | 0xBF -> "y"
-          | 0xBE -> "p"
+          | 0xBE -> "th"
           | _ ->
               let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
               String.make 1 c ]
@@ -178,7 +178,8 @@ value unaccent_utf_8 lower s i =
       | 0xD0 ->
           (* Cyrillic *)
           match Char.code s.[i+1] with
-          [ 0x90 -> f "A"
+          [ 0x81 -> f "E"
+          | 0x90 -> f "A"
           | 0x91 -> f "B"
           | 0x92 -> f "V"
           | 0x93 -> f "G"
@@ -198,11 +199,14 @@ value unaccent_utf_8 lower s i =
           | 0xA2 -> f "T"
           | 0xA3 -> f "U"
           | 0xA4 -> f "F"
+          | D0A5 -> f "KH"
           | 0xA6 -> f "TS"
           | 0xA7 -> f "TCH"
           | 0xA8 -> f "CH"
+          | 0xA9 -> f "CHT"
           | 0xAB -> f "Y"
           | 0xAC -> f ""
+          | 0xAD -> f "E"
           | 0xAE -> f "YOU"
           | 0xAF -> f "YA"
           | 0xB0 -> "a"
@@ -228,13 +232,17 @@ value unaccent_utf_8 lower s i =
           | 0x82 -> "t"
           | 0x83 -> "u"
           | 0x84 -> "f"
+          | 0x85 -> "kh"
           | 0x86 -> "ts"
           | 0x87 -> "tch"
           | 0x88 -> "ch"
+          | 0x89 -> "cht"
           | 0x8B -> "y"
           | 0x8C -> ""
+          | 0x8D -> "e"
           | 0x8E -> "you"
           | 0x8F -> "ya"
+          | 0x91 -> "e"
           | _ -> String.sub s i nbc ]
       | 0xD4 ->
           (* Armenian *)
