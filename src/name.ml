@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.10 2007-02-05 12:54:13 ddr Exp $ *)
+(* $Id: name.ml,v 5.11 2007-02-05 12:57:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value utf_8_db = ref True;
@@ -197,7 +197,7 @@ value unaccent_utf_8 lower s i =
           | 0xA0 -> f "R"
           | 0xA1 -> f "S"
           | 0xA2 -> f "T"
-          | 0xA3 -> f "U"
+          | 0xA3 -> f "OU"
           | 0xA4 -> f "F"
           | 0xA5 -> f "KH"
           | 0xA6 -> f "TS"
@@ -230,7 +230,7 @@ value unaccent_utf_8 lower s i =
           [ 0x80 -> "r"
           | 0x81 -> "s"
           | 0x82 -> "t"
-          | 0x83 -> "u"
+          | 0x83 -> "ou"
           | 0x84 -> "f"
           | 0x85 -> "kh"
           | 0x86 -> "ts"
