@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.53 2007-01-23 14:24:10 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.54 2007-02-06 14:03:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1207,6 +1207,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
   let manitou =
     try
       ar.ar_wizard && ar.ar_user <> "" &&
+      p_getenv env "manitou" <> Some "off" &&
       List.assoc "manitou" base_env = ar.ar_user
     with
     [ Not_found -> False ]
