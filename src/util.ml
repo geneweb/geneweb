@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.109 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: util.ml,v 5.110 2007-02-07 01:30:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1172,15 +1172,17 @@ value http_string conf s i =
       loop (i + String.length http) where rec loop j =
         if j < String.length s then
           match s.[j] with
-          [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '/' | ':' |
-            '?' | '%' | ';' | '=' | '_' | '-' | '&' | '.' | '~' | '#' | '+' ->
-              loop (j + 1)
+          [ 'a'..'z' | 'A'..'Z' | '\128' .. '\255' | '0'..'9' | '!' | '#' |
+            '$' | '%' | '&' | '(' | ')' | '*' | '+' | ',' | '-' | '.' | '/' |
+            ':' | ';' | '=' | '?' | '@' | '\\' | '_' | '~' -> loop (j + 1)
+          | '[' | '^' | '{' | '|' -> j + 1
+          | ']' | '}' -> j
           | _ -> j ]
         else j
     in
     let j =
       match s.[j - 1] with
-      [ ':' | ';' | '.' -> j - 1
+      [ ')' | ',' |  '.' |  ':' | ';' -> j - 1
       | _ -> j ]
     in
     let s = String.sub s i (j - i) in
