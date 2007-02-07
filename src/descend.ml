@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 5.24 2007-02-07 10:39:50 ddr Exp $ *)
+(* $Id: descend.ml,v 5.25 2007-02-07 11:39:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -55,7 +55,7 @@ value descendants_title conf base p h =
 
 value display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
-  let levt = Perso.make_desc_level_table conf base max_level ancestor in
+  let (levt, _) = Perso.make_desc_level_table conf base max_level ancestor in
   let mark = Array.make (Array.length levt) False in
   let rec get_level level u list =
     List.fold_left
