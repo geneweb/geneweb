@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.15 2007-02-07 11:39:55 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.16 2007-02-07 11:46:39 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -176,8 +176,12 @@
            evar.t = "M" and xx.is_male or
            evar.t = "F" and xx.is_female or
            evar.t = "L")
-       %if;(family.desc_level < famlev)<i>, [see further]</i>
-       %elseif;(family.desc_level > famlev)<i>, [see above]</i>
+      %if;(family.desc_level < famlev)
+        <i>, [see further]</i>.
+        %apply;lazy_print%with;<br%/>%nl;%end;
+      %elseif;(family.desc_level > famlev)
+        <i>, [see above]</i>.
+        %apply;lazy_print%with;<br%/>%nl;%end;
       %elseif;has_children;, <i>[having as children]</i>
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</p>%nl;%end;
