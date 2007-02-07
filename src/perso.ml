@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.62 2007-02-07 10:39:51 ddr Exp $ *)
+(* $Id: perso.ml,v 5.63 2007-02-07 11:39:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -301,7 +301,10 @@ value make_desc_level_table conf base max_level p = do {
     | Some "F" -> Female
     | Some _ | None -> Neuter ]
   in
+  (* the table 'levt' may be not necessary, since I added 'flevt'; kept
+     because '%max_desc_level;' is still used... *)
   let levt = Array.create (nb_of_persons base) infinite in
+  let flevt = Array.create (nb_of_families base) infinite in
   let get = poi base in
   let ini_ip = get_key_index p in
   let rec fill lev =
@@ -324,9 +327,12 @@ value make_desc_level_table conf base max_level p = do {
                  in
                  if down then
                    Array.fold_left
-                     (fun ipl ifam ->
+                     (fun ipl ifam -> do {
+                        if flevt.(Adef.int_of_ifam ifam) <= lev then ()
+                        else flevt.(Adef.int_of_ifam ifam) := lev;
                         let ipa = get_children (foi base ifam) in
-                        Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa)
+                        Array.fold_left (fun ipl ip -> [ip :: ipl]) ipl ipa
+                      })
                      ipl (get_family (get ip))
                   else ipl
                }
@@ -336,11 +342,11 @@ value make_desc_level_table conf base max_level p = do {
         fill (succ lev) new_ipl ]
   in
   fill 0 [ini_ip];
-  levt
+  (levt, flevt)
 };
 
 value desc_level_max conf base desc_level_table_l =
-  let levt = Lazy.force desc_level_table_l in
+  let (levt, _) = Lazy.force desc_level_table_l in
   let x = ref 0 in
   do {
     for i = 0 to Array.length levt - 1 do {
@@ -932,9 +938,8 @@ type env 'a =
   | Vcell of cell
   | Vcelll of list cell
   | Vcnt of ref int
-  | Vdesclevtab of Lazy.t (array int)
+  | Vdesclevtab of Lazy.t (array int * array int)
   | Vdmark of ref (array bool)
-  | Vfmark of ref (list ifam)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
   | Vind of person
@@ -1399,7 +1404,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
           [ Vdesclevtab t ->
               let cnt =
                 Array.fold_left (fun cnt v -> if v <= i then cnt + 1 else cnt)
-                  0 (Lazy.force t)
+                  0 (fst (Lazy.force t))
               in
               VVstring (eval_num conf (Num.of_int (cnt - 1)) sl)
           | _ -> raise Not_found ]
@@ -1978,21 +1983,6 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       else ""
   | "death_place" ->
       if p_auth then string_of_place conf base (get_death_place p) else ""
-  | "desc_level" ->
-      match get_env "desc_level_table" env with
-      [ Vdesclevtab levt ->
-          let levt = Lazy.force levt in
-          string_of_int (levt.(Adef.int_of_iper (get_key_index p)))
-      | _ -> raise Not_found ]
-  | "set_infinite_desc_level" ->
-      match get_env "desc_level_table" env with
-      [ Vdesclevtab levt ->
-          let levt = Lazy.force levt in
-          do {
-            levt.(Adef.int_of_iper (get_key_index p)) := infinite;
-            ""
-          }
-      | _ -> raise Not_found ]
   | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
       (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)
@@ -2198,20 +2188,10 @@ and eval_family_field_var conf base env
   [ ["father" :: sl] ->
       let ep = make_ep conf base ifath in
       eval_person_field_var conf base env ep loc sl
-  | ["is_marked"] ->
-      match get_env "fam_mark" env with
-      [ Vfmark famlr -> VVbool (List.mem ifam famlr.val)
-      | _ -> VVbool False ]
   | ["marriage_date" :: sl] ->
       match Adef.od_of_codate (get_marriage fam) with
       [ Some d when m_auth -> eval_date_field_var d sl
       | _ -> VVstring "" ]
-  | ["mark"] -> do {
-      match get_env "fam_mark" env with
-      [ Vfmark famlr -> famlr.val := [ifam :: famlr.val]
-      | _ -> () ];
-      VVstring ""
-    }
   | ["mother" :: sl] ->
       let ep = make_ep conf base imoth in
       eval_person_field_var conf base env ep loc sl
@@ -2219,7 +2199,21 @@ and eval_family_field_var conf base env
   | _ -> raise Not_found ]
 and eval_str_family_field conf base env (ifam, _, _, _) loc =
   fun
-  [ "index" -> string_of_int (Adef.int_of_ifam ifam)
+  [ "desc_level" ->
+      match get_env "desc_level_table" env with
+      [ Vdesclevtab levt ->
+          let (_, flevt) = Lazy.force levt in
+          string_of_int (flevt.(Adef.int_of_ifam ifam))
+      | _ -> raise Not_found ]
+  | "index" -> string_of_int (Adef.int_of_ifam ifam)
+  | "set_infinite_desc_level" ->
+      match get_env "desc_level_table" env with
+      [ Vdesclevtab levt -> do {
+          let (_, flevt) = Lazy.force levt in
+          flevt.(Adef.int_of_ifam ifam) := infinite;
+          ""
+        }
+      | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
   if p_auth then
@@ -2950,7 +2944,6 @@ value interp_templ templ_fname conf base p = do {
      ("count", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
-     ("fam_mark", Vfmark (ref []));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
      ("sosa_ref", Vsosa_ref sosa_ref_l);

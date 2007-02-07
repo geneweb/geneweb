@@ -1,4 +1,4 @@
-(* $Id: perso.mli,v 5.5 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: perso.mli,v 5.6 2007-02-07 11:39:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwdb;
@@ -15,7 +15,8 @@ value print_ascend : config -> base -> person -> unit;
 
 value infinite : int;
 value limit_desc : config -> int;
-value make_desc_level_table : config -> base -> int -> person -> array int;
+value make_desc_level_table :
+  config -> base -> int -> person -> (array int * array int);
 value default_max_cousin_lev : int;
 
 type dup =
