@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.61 2007-02-03 20:07:56 ddr Exp $ *)
+(* $Id: perso.ml,v 5.62 2007-02-07 10:39:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -934,6 +934,7 @@ type env 'a =
   | Vcnt of ref int
   | Vdesclevtab of Lazy.t (array int)
   | Vdmark of ref (array bool)
+  | Vfmark of ref (list ifam)
   | Vslist of ref SortedList.t
   | Vslistlm of list (list string)
   | Vind of person
@@ -2191,16 +2192,26 @@ and eval_witness_relation_var conf base env
         VVstring s
   | sl -> eval_family_field_var conf base env fcd loc sl ]
 and eval_family_field_var conf base env
-  ((_, fam, (ifath, imoth, _), m_auth) as fcd) loc
+  ((ifam, fam, (ifath, imoth, _), m_auth) as fcd) loc
 =
   fun
   [ ["father" :: sl] ->
       let ep = make_ep conf base ifath in
       eval_person_field_var conf base env ep loc sl
+  | ["is_marked"] ->
+      match get_env "fam_mark" env with
+      [ Vfmark famlr -> VVbool (List.mem ifam famlr.val)
+      | _ -> VVbool False ]
   | ["marriage_date" :: sl] ->
       match Adef.od_of_codate (get_marriage fam) with
       [ Some d when m_auth -> eval_date_field_var d sl
       | _ -> VVstring "" ]
+  | ["mark"] -> do {
+      match get_env "fam_mark" env with
+      [ Vfmark famlr -> famlr.val := [ifam :: famlr.val]
+      | _ -> () ];
+      VVstring ""
+    }
   | ["mother" :: sl] ->
       let ep = make_ep conf base imoth in
       eval_person_field_var conf base env ep loc sl
@@ -2939,6 +2950,7 @@ value interp_templ templ_fname conf base p = do {
      ("count", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
+     ("fam_mark", Vfmark (ref []));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
      ("sosa_ref", Vsosa_ref sosa_ref_l);
