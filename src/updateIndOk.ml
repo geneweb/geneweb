@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.60 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.61 2007-02-09 14:37:30 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -537,7 +537,11 @@ value effective_del conf base p = do {
   match get_parents p with
   [ Some ifam -> do {
       let des = foi base ifam in
-      let des = {children = array_except ip (get_children des)} in
+      let des =
+        let children = array_except ip (get_children des) in
+        let _ : option _ = CheckItem.sort_children base children in
+        {children = children}
+      in
       patch_descend base ifam des;
       let asc = {parents = None; consang = Adef.fix (-1)} in
       patch_ascend base ip asc;
