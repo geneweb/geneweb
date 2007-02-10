@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.63 2007-02-07 11:39:55 ddr Exp $ *)
+(* $Id: perso.ml,v 5.64 2007-02-10 05:23:29 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -486,7 +486,7 @@ value will_print =
 value get_all_generations conf base p =
   let max_level =
     match p_getint conf.env "v" with
-    [ Some v -> v + 1
+    [ Some v -> v (* + 1 *)
     | None -> 0 ]
   in
   let mark = Array.create (nb_of_persons base) Num.zero in

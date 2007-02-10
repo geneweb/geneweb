@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.16 2007-02-07 11:46:39 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.17 2007-02-10 05:23:29 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -98,6 +98,28 @@
     ([age at death:] %xx.death_age;)%nn;
   %end;
   %if;xx.has_occupation;, %xx.occupation;%end;
+  %if;(evar.rel = "on" and xx.has_relations)
+    %foreach;xx.relation;%nl;
+      (%relation_type;:
+      %if;has_relation_him;
+        %if;(evar.cgl = "on")%relation_him;
+        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
+        %relation_him.dates;
+      %end;
+      %if;has_relation_her;
+        %if;has_relation_him;,%nl;%end;
+        %if;(evar.cgl = "on")%relation_her;
+        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
+        %relation_her.dates;
+      %end;)%nn;
+    %end;
+    %foreach;xx.related;%nl;
+      (%related_type;:
+       %if;(evar.cgl = "on")%related;
+       %else;<a href="%prefix;%related.access;">%related;</a>%end;
+       %related.dates;)%nn;
+    %end;
+  %end;
 %end;
 
 %define;married_to(is_male, date_place)
@@ -122,30 +144,8 @@
   %if;(curlev = 0)<p>%nl;%end;
   <b>%if;(evar.cgl = "on" or xx.is_restricted)%yy;%else;
   <a href="%prefix;%xx.access;">%yy;</a>%end;</b>%nn;
-  %apply;somebody_long_info("xx")
+  %apply;somebody_long_info("xx").
   %incr_count;
-  %if;(evar.rel = "on" and has_relations)
-    %foreach;relation;%nl;
-      (%relation_type;:
-      %if;has_relation_him;
-        %if;(evar.cgl = "on")%relation_him;
-        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
-        %relation_him.dates;
-      %end;
-      %if;has_relation_her;
-        %if;has_relation_him;,%nl;%end;
-        %if;(evar.cgl = "on")%relation_her;
-        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
-        %relation_her.dates;
-      %end;)%nn;
-    %end;
-    %foreach;related;%nl;
-      (%related_type;:
-       %if;(evar.cgl = "on")%related;
-       %else;<a href="%prefix;%related.access;">%related;</a>%end;
-       %related.dates;)%nn;
-    %end;
-  %end;.
   %apply;lazy_print%with;<br%/>%nl;%end;
   %foreach;xx.family;
     %if;(family_cnt != 1 and curlev = 0)<p>%nl;%end;
