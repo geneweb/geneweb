@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.11 2007-02-04 11:50:36 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.12 2007-02-10 05:23:29 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -139,10 +139,48 @@
   %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;	
 %end;
 
-%define;somebody(xx)
-  <b>%apply;my_link(xx.access, xx, xx.is_restricted)</b>%nn;
+%define;somebody_extra_info(xx)
   %apply;somebody_long_info("xx")
   %if;xx.has_occupation;, %xx.occupation;%end;
+  %if;(evar.rel = "on" and xx.has_relations)
+    %foreach;xx.relation;%nl;
+      (%relation_type;:
+      %if;has_relation_him;
+        %if;(evar.cgl = "on")%relation_him;
+        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
+        %relation_him.dates;
+        %if;(relation_him.sosa_in_list != ""),
+          [see] <a href="#%relation_him.sosa_in_list;">%nn;
+          %relation_him.sosa_in_list;</a>%nn;
+        %end;
+      %end;
+      %if;has_relation_her;
+        %if;has_relation_him;,%nl;%end;
+        %if;(evar.cgl = "on")%relation_her;
+        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
+        %relation_her.dates;
+        %if;(relation_her.sosa_in_list != ""),
+          [see] <a href="#%relation_her.sosa_in_list;">%nn;
+          %relation_her.sosa_in_list;</a>%nn;
+        %end;
+      %end;)%nn;
+    %end;
+    %foreach;xx.related;%nl;
+      (%related_type;:
+       %if;(evar.cgl = "on")%related;
+       %else;<a href="%prefix;%related.access;">%related;</a>%end;
+       %related.dates;
+       %if;(related.sosa_in_list != ""),
+         [see] <a href="#%related.sosa_in_list;">%nn;
+         %related.sosa_in_list;</a>%nn;
+       %end;)%nn;
+    %end;
+  %end;
+%end;
+
+%define;somebody(xx)
+  <b>%apply;my_link(xx.access, xx, xx.is_restricted)</b>%nn;
+  %apply;somebody_extra_info("xx")
 %end;
 
 %define;somebody_spouse_parent(xx)
@@ -271,29 +309,7 @@
 %end;
 
 %define;long_display_ancestor_personal()
-  %apply;somebody("ancestor")
-  %if;(evar.rel = "on" and ancestor.has_relations)
-    %foreach;ancestor.relation;%nl;
-      (%relation_type;:
-      %if;has_relation_him;
-        %if;(evar.cgl = "on")%relation_him;
-        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
-        %relation_him.dates;
-      %end;
-      %if;has_relation_her;
-        %if;has_relation_him;,%nl;%end;
-        %if;(evar.cgl = "on")%relation_her;
-        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
-        %relation_her.dates;
-      %end;)%nn;
-    %end;
-    %foreach;ancestor.related;%nl;
-      (%related_type;:
-       %if;(evar.cgl = "on")%related;
-       %else;<a href="%prefix;%related.access;">%related;</a>%end;
-       %related.dates;)%nn;
-    %end;
-  %end;.
+  %apply;somebody("ancestor").
   %if;(evar.only != "on" and ancestor.father_sosa != "")
     [*parents]:%sp;
     <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;
@@ -345,7 +361,7 @@
       </b></a>.
     %end;
   %else;
-    %if;child.has_occupation;, %child.occupation;%end;.
+    %apply;somebody_extra_info("child").
     %foreach;child.family;
       %apply;capitalize%with;
         %apply;married_to%with;
