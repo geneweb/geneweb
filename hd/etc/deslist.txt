@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: deslist.txt,v 5.17 2007-02-10 05:23:29 ddr Exp $ -->
+  <!-- $Id: deslist.txt,v 5.18 2007-02-10 15:48:28 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -63,6 +63,11 @@
   %end;
 %end;
 
+%define;link(xx)
+  %if;(evar.cgl = "on")%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %xx.title;%xx.dates;
+%end;
+
 %define;somebody_long_info(xx)
   %if;xx.has_nobility_titles;
     <em>%nn;
@@ -101,23 +106,11 @@
   %if;(evar.rel = "on" and xx.has_relations)
     %foreach;xx.relation;%nl;
       (%relation_type;:
-      %if;has_relation_him;
-        %if;(evar.cgl = "on")%relation_him;
-        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
-        %relation_him.dates;
-      %end;
-      %if;has_relation_her;
-        %if;has_relation_him;,%nl;%end;
-        %if;(evar.cgl = "on")%relation_her;
-        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
-        %relation_her.dates;
-      %end;)%nn;
+      %if;has_relation_him;%apply;link(relation_him.var)%end;%nl;
+      %if;has_relation_her;%apply;link(relation_her.var)%end;)%nn;
     %end;
     %foreach;xx.related;%nl;
-      (%related_type;:
-       %if;(evar.cgl = "on")%related;
-       %else;<a href="%prefix;%related.access;">%related;</a>%end;
-       %related.dates;)%nn;
+      (%related_type;: %apply;link(related.var))%nn;
     %end;
   %end;
 %end;
@@ -164,9 +157,7 @@
     %if;(evar.witn = "on" and has_witnesses)%nl;([witness/witnesses]1:
       %foreach;witness;
         %if;(not is_first),%nl;%end;
-        %if;(evar.cgl = "on")%witness;
-        %else;<a href="%prefix;%witness.access;">%witness;</a>%end;
-        %witness.dates;
+        %apply;link(witness.var)
       %end;)%sq;
     %end;
     %if;(evar.comm = "on" and has_comment)%nl;(%comment;)%end;

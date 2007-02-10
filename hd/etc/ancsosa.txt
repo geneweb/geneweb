@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.12 2007-02-10 05:23:29 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.13 2007-02-10 15:48:28 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -135,6 +135,11 @@
   %if;(evar.cgl = "on")xx%else;<a href="%prefix;aa">xx</a>%end;
 %end;
 
+%define;link2(xx)
+  %if;(evar.cgl = "on")%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %xx.title;%xx.dates;
+%end;
+
 %define;my_link(aa, xx, rr)	
   %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;	
 %end;
@@ -146,9 +151,7 @@
     %foreach;xx.relation;%nl;
       (%relation_type;:
       %if;has_relation_him;
-        %if;(evar.cgl = "on")%relation_him;
-        %else;<a href="%prefix;%relation_him.access;">%relation_him;</a>%end;
-        %relation_him.dates;
+        %apply;link2(relation_him.var)
         %if;(relation_him.sosa_in_list != ""),
           [see] <a href="#%relation_him.sosa_in_list;">%nn;
           %relation_him.sosa_in_list;</a>%nn;
@@ -156,9 +159,7 @@
       %end;
       %if;has_relation_her;
         %if;has_relation_him;,%nl;%end;
-        %if;(evar.cgl = "on")%relation_her;
-        %else;<a href="%prefix;%relation_her.access;">%relation_her;</a>%end;
-        %relation_her.dates;
+        %apply;link2(relation_her.var)
         %if;(relation_her.sosa_in_list != ""),
           [see] <a href="#%relation_her.sosa_in_list;">%nn;
           %relation_her.sosa_in_list;</a>%nn;
@@ -167,9 +168,7 @@
     %end;
     %foreach;xx.related;%nl;
       (%related_type;:
-       %if;(evar.cgl = "on")%related;
-       %else;<a href="%prefix;%related.access;">%related;</a>%end;
-       %related.dates;
+       %apply;link2(related.var)
        %if;(related.sosa_in_list != ""),
          [see] <a href="#%related.sosa_in_list;">%nn;
          %related.sosa_in_list;</a>%nn;
@@ -417,9 +416,7 @@
         %if;(evar.witn = "on" and has_witnesses)([witness/witnesses]1:
           %foreach;witness;
             %if;(not is_first),%nl;%end;
-            %if;(evar.cgl = "on")%witness;
-            %else;<a href="%prefix;%witness.access;">%witness;</a>%end;
-            %witness.dates;
+            %apply;link2(witness.var)
           %end;),
         %end;
         %if;(evar.comm = "on" and has_comment)(%comment;)%nl;%end;
@@ -524,8 +521,8 @@
           %ancestor.anc_sosa;%sp;
           %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
           %apply;link%with;%ancestor.access;%and;
-             %if;(ancestor.same != "")%ancestor.same;
-             %else;%ancestor;%end;
+            %if;(ancestor.same != "")%ancestor.same;
+            %else;%ancestor;%end;
           %end;
           </a>%nn;
           %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
