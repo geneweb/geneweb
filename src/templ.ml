@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.30 2007-01-23 14:24:10 ddr Exp $ *)
+(* $Id: templ.ml,v 5.31 2007-02-12 11:47:59 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -1184,6 +1184,9 @@ value eval_var conf ifun env ep loc sl =
         match ifun.get_vother (List.assoc "binding" env) with
         [ Some (Vbind k v) -> VVstring (Util.decode_varenv v)
         | _ -> raise Not_found ]
+    | ["today" :: sl] ->
+        TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today)
+          sl
     | [s :: sl] ->
         match (get_val ifun.get_vother s env, sl) with
         [ (Some (VVother f), sl) -> f sl

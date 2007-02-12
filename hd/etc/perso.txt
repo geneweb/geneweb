@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.9 2007-02-12 11:47:59 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.10 2007-02-12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -23,8 +23,6 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
-%today.gregorian;
 
 %if;(is_male or is_female or
      bvar.show_invisible = "on" and wizard and is_invisible)
