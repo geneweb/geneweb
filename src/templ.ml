@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.31 2007-02-12 11:47:59 ddr Exp $ *)
+(* $Id: templ.ml,v 5.32 2007-02-12 22:07:34 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -661,10 +661,26 @@ value rec eval_variable conf =
       match Util.p_getenv (conf.env @ conf.henv) v with
       [ Some vv -> Util.quote_escaped vv
       | None -> "" ]
+  | ["time" :: sl] -> eval_time_var conf sl
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
   | [s] -> eval_simple_variable conf s
   | _ -> raise Not_found ]
+and eval_time_var conf =
+  fun
+  [ ["hours"] ->
+      let (hh, mm, ss) = conf.time in
+      sprintf "%02d" hh
+  | ["minutes"] ->
+      let (hh, mm, ss) = conf.time in
+      sprintf "%02d" mm
+  | ["seconds"] ->
+      let (hh, mm, ss) = conf.time in
+      sprintf "%02d" ss
+  | [] ->
+      let (hh, mm, ss) = conf.time in
+      sprintf "%02d:%02d:%02d" hh mm ss
+| _ -> raise Not_found ]
 and eval_simple_variable conf =
   fun 
   [ "action" -> conf.command
