@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templDate.ml,v 5.1 2007-02-12 11:47:59 ddr Exp $ *)
+(* $Id: templDate.ml,v 5.2 2007-02-12 13:55:52 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -37,7 +37,7 @@ value rec eval_date_var conf jd =
         if x < 0 then 6 + (x + 1) mod 7 else x mod 7
       in
       VVstring (string_of_int wday)
-  | _ -> raise Not_found ]
+  | sl -> eval_dmy_var (Calendar.gregorian_of_sdn Sure jd) sl ]
 and eval_moon_phase_var mp =
   fun
   [ ["hour"] ->
