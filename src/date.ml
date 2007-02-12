@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.14 2007-02-12 11:47:59 ddr Exp $ *)
+(* $Id: date.ml,v 5.15 2007-02-12 22:07:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 UNDEF OLD;
@@ -811,9 +811,6 @@ value eval_var conf env jd loc =
       [ Vint i -> VVstring (string_of_int i)
       | _ -> raise Not_found ]
   | ["date" :: sl] -> TemplDate.eval_date_var conf jd sl
-  | ["time"] ->
-      let (hh, mm, ss) = conf.time in
-      VVstring (sprintf "%02d:%02d:%02d" hh mm ss)
   | ["today" :: sl] ->
       TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
   | _ -> raise Not_found ]
