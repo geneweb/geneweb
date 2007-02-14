@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.15 2007-02-14 10:14:36 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.16 2007-02-14 14:24:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -22,17 +22,7 @@ value anonfun s =
 ;
 
 value simple_output bname base carray =
-  match carray with
-  [ Some tab -> Gwdb.output_consang_tab base tab
-  | None ->
-      let no_patches =
-        let bname =
-          if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-        in
-        not (Sys.file_exists (Filename.concat bname "patches"))
-      in
-      Gwdb.apply_as_base1
-        (Outbase.gen_output (no_patches && not indexes.val) bname) base ]
+  Gwdb.output_base base carray indexes.val
 ;
 
 value designation base p =

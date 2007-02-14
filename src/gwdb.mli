@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.99 2007-02-14 10:14:36 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.100 2007-02-14 14:24:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Adef;
@@ -113,7 +113,7 @@ value commit_patches : base -> unit;
 value commit_notes : base -> string -> string -> unit;
 value is_patched_person : base -> iper -> bool;
 value patched_ascends : base -> list iper;
-value output_consang_tab : base -> consang_tab -> unit;
+value output_base : base -> option consang_tab -> bool -> unit;
 
 value delete_family : base -> ifam -> unit;
 value is_deleted_family : family -> bool;
@@ -179,5 +179,4 @@ value date_of_last_change : base -> float;
 (** For database builders *)
 
 value base_of_base1 : Dbdisk.dsk_base -> base;
-value apply_as_base1 : (Dbdisk.dsk_base -> unit) -> base -> unit;
 value dsk_person_of_person : person -> Dbdisk.dsk_person;

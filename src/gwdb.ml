@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.216 2007-02-14 10:14:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.217 2007-02-14 14:24:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -878,7 +878,7 @@ type base =
     commit_notes : string -> string -> unit;
     is_patched_person : iper -> bool;
     patched_ascends : unit -> list iper;
-    output_consang_tab : array Adef.fix -> unit;
+    output_base : option (array Adef.fix) -> bool -> unit;
     delete_family : ifam -> unit;
     person_of_key : string -> string -> int -> option iper;
     persons_of_name : string -> list iper;
@@ -1028,8 +1028,12 @@ value base1 base =
      commit_notes = base.func.Dbdisk.commit_notes;
      is_patched_person ip = base.func.Dbdisk.is_patched_person ip;
      patched_ascends = base.func.Dbdisk.patched_ascends;
-     output_consang_tab tab =
-       do { eprintf "error Gwdb.output_consang_tab\n"; flush stdout };
+     output_base carray indexes =
+       let bname = base.data.bdir in
+       let no_patches =
+         not (Sys.file_exists (Filename.concat bname "patches"))
+       in
+       Outbase.gen_output (no_patches && not indexes) bname base;
      delete_family ifam = C_base.delete_family self ifam;
      person_of_key = base.func.Dbdisk.person_of_key;
      persons_of_name = base.func.Dbdisk.persons_of_name;
@@ -1209,21 +1213,24 @@ value base2 db2 =
      patched_ascends () =
        let _ = do { eprintf "not impl patched_ascends\n"; flush stderr } in
        [];
-     output_consang_tab tab =
-       let dir =
-         List.fold_left Filename.concat db2.bdir2 ["person"; "consang"]
-       in
-       do {
-         Mutil.mkdir_p dir;
-         let oc = open_out_bin (Filename.concat dir "data") in
-         output_value oc tab;
-         close_out oc;
-         let oc = open_out_bin (Filename.concat dir "access") in
-         let _ : int =
-           Iovalue.output_array_access oc (Array.get tab) (Array.length tab) 0
-         in
-         close_out oc
-       };
+     output_base carray indexes =
+       match carray with
+       [ Some tab -> do {
+           let dir =
+             List.fold_left Filename.concat db2.bdir2 ["person"; "consang"]
+           in
+           Mutil.mkdir_p dir;
+           let oc = open_out_bin (Filename.concat dir "data") in
+           output_value oc tab;
+           close_out oc;
+           let oc = open_out_bin (Filename.concat dir "access") in
+           let _ : int =
+             Iovalue.output_array_access oc (Array.get tab) (Array.length tab)
+               0
+           in
+           close_out oc
+         }
+       | None -> () ];
      delete_family ifam = C_base.delete_family self ifam;
      person_of_key fn sn oc = person2_of_key db2 fn sn oc;
      persons_of_name s = persons2_of_name db2 s;
@@ -1356,7 +1363,7 @@ value commit_patches b = b.commit_patches ();
 value commit_notes b = b.commit_notes;
 value is_patched_person b = b.is_patched_person;
 value patched_ascends b = b.patched_ascends ();
-value output_consang_tab b = b.output_consang_tab;
+value output_base b = b.output_base;
 value delete_family b = b.delete_family;
 value person_of_key b = b.person_of_key;
 value persons_of_name b = b.persons_of_name;
@@ -1384,7 +1391,6 @@ value nobtit b = b.nobtit;
 value p_first_name b = b.p_first_name;
 value p_surname b = b.p_surname;
 value date_of_last_change b = b.date_of_last_change ();
-value apply_as_base1 f b = b.apply_as_base1 f;
 value base_of_base1 = base1;
 
 value husbands base gp =
