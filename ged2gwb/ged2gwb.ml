@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.50 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.51 2007-02-14 10:14:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -2774,7 +2774,7 @@ value finish_base base (persons, families, _, _) = do {
   check_parents_children base ascends unions couples descends;
   if try_negative_dates.val then negative_dates base persons families
   else ();
-  let base = Gwdb.base_of_dsk_base base in
+  let base = Gwdb.base_of_base1 base in
   Check.check_base base
      (fun x ->
         do {

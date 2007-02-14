@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.52 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.53 2007-02-14 10:14:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -946,7 +946,7 @@ value link gwo_list tmp_dir bdir =
       linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir
     in
     Hashtbl.clear gen.g_patch_p;
-    let base = Gwdb.base_of_dsk_base dsk_base in
+    let base = Gwdb.base_of_base1 dsk_base in
     if do_check.val && gen.g_pcnt > 0 then do {
       let changed_p (ip, p, o_sex, o_rpar) =
         let p = Gwdb.dsk_person_of_person p in

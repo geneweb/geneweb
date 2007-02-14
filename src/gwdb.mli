@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.98 2007-02-14 09:23:13 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.99 2007-02-14 10:14:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Adef;
@@ -178,6 +178,6 @@ value date_of_last_change : base -> float;
 (**/**)
 (** For database builders *)
 
-value base_of_dsk_base : Dbdisk.dsk_base -> base;
-value apply_as_dsk_base : (Dbdisk.dsk_base -> unit) -> base -> unit;
+value base_of_base1 : Dbdisk.dsk_base -> base;
+value apply_as_base1 : (Dbdisk.dsk_base -> unit) -> base -> unit;
 value dsk_person_of_person : person -> Dbdisk.dsk_person;
