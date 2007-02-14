@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.214 2007-01-20 10:58:21 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.215 2007-02-14 09:23:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -31,6 +31,8 @@ value no_person empty_string ip =
 ;
 value no_ascend = {parents = None; consang = no_consang};
 value no_union = {family = [| |]};
+
+type consang_tab = array Adef.fix;
 
 (* Strings - common definitions *)
 
