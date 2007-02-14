@@ -47,7 +47,7 @@ consangAll.cmo: adef.cmi consang.cmi def.cmi gwdb.cmi mutil.cmi progrBar.cmi \
     consangAll.cmi 
 consangAll.cmx: adef.cmx consang.cmx def.cmi gwdb.cmx mutil.cmx progrBar.cmx \
     consangAll.cmi 
-consangAll.cmi: adef.cmi gwdb.cmi 
+consangAll.cmi: gwdb.cmi 
 cousins.cmo: adef.cmi birthday.cmo config.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi hutil.cmi num.cmi perso.cmi pqueue.cmi util.cmi \
     ../wserver/wserver.cmi 
@@ -134,9 +134,9 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     relationLink.cmx request.cmx robot.cmx secure.cmx srcfile.cmx util.cmx \
     version.cmx ../wserver/wserver.cmx 
 gwdb.cmo: adef.cmi database.cmi db2.cmo db2disk.cmi dbdisk.cmi def.cmi \
-    futil.cmi iovalue.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
+    futil.cmi iovalue.cmi mutil.cmi name.cmi outbase.cmi secure.cmi gwdb.cmi 
 gwdb.cmx: adef.cmx database.cmx db2.cmx db2disk.cmx dbdisk.cmi def.cmi \
-    futil.cmx iovalue.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
+    futil.cmx iovalue.cmx mutil.cmx name.cmx outbase.cmx secure.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
     mutil.cmi notesLinks.cmi secure.cmi select.cmo 
