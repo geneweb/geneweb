@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.215 2007-02-14 09:23:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.216 2007-02-14 10:14:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -913,7 +913,7 @@ type base =
     p_first_name : person -> string;
     p_surname : person -> string;
     date_of_last_change : unit -> float;
-    apply_as_dsk_base : (Dbdisk.dsk_base -> unit) -> unit }
+    apply_as_base1 : (Dbdisk.dsk_base -> unit) -> unit }
 ;
 
 module C_base :
@@ -1080,7 +1080,7 @@ value base1 base =
          [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
        in
        s.Unix.st_mtime;
-     apply_as_dsk_base f = f base}
+     apply_as_base1 f = f base}
 ;
 
 (* Database - implementation 2 *)
@@ -1317,7 +1317,7 @@ value base2 db2 =
          [ Unix.Unix_error _ _ _ -> Unix.stat bdir ]
        in
        s.Unix.st_mtime;
-     apply_as_dsk_base f = failwith "not impl apply_as_dsk_base"}
+     apply_as_base1 f = failwith "not impl apply_as_base1"}
 ;
 
 (* Database - user functions *)
@@ -1384,8 +1384,8 @@ value nobtit b = b.nobtit;
 value p_first_name b = b.p_first_name;
 value p_surname b = b.p_surname;
 value date_of_last_change b = b.date_of_last_change ();
-value apply_as_dsk_base f b = b.apply_as_dsk_base f;
-value base_of_dsk_base = base1;
+value apply_as_base1 f b = b.apply_as_base1 f;
+value base_of_base1 = base1;
 
 value husbands base gp =
   let p = poi base gp.key_index in

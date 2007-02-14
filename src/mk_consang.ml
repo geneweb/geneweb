@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.14 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.15 2007-02-14 10:14:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -31,7 +31,7 @@ value simple_output bname base carray =
         in
         not (Sys.file_exists (Filename.concat bname "patches"))
       in
-      Gwdb.apply_as_dsk_base
+      Gwdb.apply_as_base1
         (Outbase.gen_output (no_patches && not indexes.val) bname) base ]
 ;
 
