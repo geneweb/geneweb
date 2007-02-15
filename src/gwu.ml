@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.40 2007-02-15 03:22:44 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.41 2007-02-15 03:37:30 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -297,6 +297,54 @@ type gen =
     notes_alias : mutable list (string * string) }
 ;
 
+value map_notes aliases f =
+  try List.assoc f aliases with [ Not_found -> f ]
+;
+
+value add_linked_files gen from s some_linked_files =
+  let slen = String.length s in
+  loop some_linked_files 0 where rec loop new_linked_files i =
+    if i = slen then new_linked_files
+    else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
+      let j =
+        loop (i + 3) where rec loop j =
+          if j = slen then j
+          else if
+            j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
+          then j + 3
+          else loop (j + 1)
+      in
+      if j > i + 6 then
+        let b = String.sub s (i + 3) (j - i - 6) in
+        let fname =
+          try
+            let k = String.index b '/' in
+            String.sub b 0 k
+          with
+          [ Not_found -> b ]
+        in
+        let fname = map_notes gen.notes_alias fname in
+        let f = from () in
+        let new_linked_files =
+          try
+            let r = List.assoc fname gen.ext_files in
+            do {
+              if List.mem f r.val then () else r.val := [f :: r.val];
+              new_linked_files
+            }
+          with
+          [ Not_found ->
+              let lf = (fname, ref [f]) in
+              do {
+                gen.ext_files := [lf :: gen.ext_files];
+                [lf :: new_linked_files];
+              } ]
+        in
+        loop new_linked_files j
+      else loop new_linked_files (i + 1)
+    else loop new_linked_files (i + 1)
+;
+
 value print_parent oc base gen fam p =
   let has_printed_parents =
     match get_parents p with
@@ -458,7 +506,8 @@ value print_family oc base gen m =
          }
          else ())
       (get_witnesses fam);
-    match sou base (get_fsources fam) with
+    let fsources = sou base (get_fsources fam) in
+    match fsources with
     [ "" -> ()
     | s -> fprintf oc "src %s\n" (correct_string base (get_fsources fam)) ];
     let csrc =
@@ -489,7 +538,14 @@ value print_family oc base gen m =
             m.m_chil;
           fprintf oc "end\n"
         } ];
-    gen.fam_done.(Adef.int_of_ifam m.m_ifam) := True
+    gen.fam_done.(Adef.int_of_ifam m.m_ifam) := True;
+    let f _ =
+      sprintf "family \"%s.%d %s\" & \"%s.%d %s\"" (p_first_name base m.m_fath)
+        (get_occ m.m_fath) (p_surname base m.m_fath)
+        (p_first_name base m.m_moth) (get_occ m.m_moth)
+        (p_surname base m.m_moth)
+    in
+    ignore (add_linked_files gen f fsources [] : list _);
   }
 ;
 
@@ -532,54 +588,6 @@ value notes_aliases bdir =
             loop list
         | None -> do { close_in ic; list } ]
   | None -> [] ]
-;
-
-value map_notes aliases f =
-  try List.assoc f aliases with [ Not_found -> f ]
-;
-
-value add_linked_files gen from s some_linked_files =
-  let slen = String.length s in
-  loop some_linked_files 0 where rec loop new_linked_files i =
-    if i = slen then new_linked_files
-    else if i < slen - 2 && s.[i] = '[' && s.[i+1] = '[' && s.[i+2] = '[' then
-      let j =
-        loop (i + 3) where rec loop j =
-          if j = slen then j
-          else if
-            j < slen - 2 && s.[j] = ']' && s.[j+1] = ']' && s.[j+2] = ']'
-          then j + 3
-          else loop (j + 1)
-      in
-      if j > i + 6 then
-        let b = String.sub s (i + 3) (j - i - 6) in
-        let fname =
-          try
-            let k = String.index b '/' in
-            String.sub b 0 k
-          with
-          [ Not_found -> b ]
-        in
-        let fname = map_notes gen.notes_alias fname in
-        let f = from () in
-        let new_linked_files =
-          try
-            let r = List.assoc fname gen.ext_files in
-            do {
-              if List.mem f r.val then () else r.val := [f :: r.val];
-              new_linked_files
-            }
-          with
-          [ Not_found ->
-              let lf = (fname, ref [f]) in
-              do {
-                gen.ext_files := [lf :: gen.ext_files];
-                [lf :: new_linked_files];
-              } ]
-        in
-        loop new_linked_files j
-      else loop new_linked_files (i + 1)
-    else loop new_linked_files (i + 1)
 ;
 
 value print_notes_for_person oc base gen p = do {
