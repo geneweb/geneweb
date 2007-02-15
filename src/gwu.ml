@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.39 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.40 2007-02-15 03:22:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -582,7 +582,7 @@ value add_linked_files gen from s some_linked_files =
     else loop new_linked_files (i + 1)
 ;
 
-value print_notes_for_person oc base gen p =
+value print_notes_for_person oc base gen p = do {
   let notes = sou base (get_notes p) in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
@@ -593,14 +593,22 @@ value print_notes_for_person oc base gen p =
     fprintf oc "beg\n";
     fprintf oc "%s\n" notes;
     fprintf oc "end notes\n";
-    let f _ =
-      sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_occ p)
-        (p_surname base p)
-    in
-    ignore (add_linked_files gen f notes [] : list _)
   }
-  else ()
-;
+  else ();
+  let f _ =
+    sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_occ p)
+      (p_surname base p)
+  in
+  ignore (add_linked_files gen f notes [] : list _);
+  let s =
+    let sl =
+      [get_notes; get_birth_src; get_baptism_src; get_death_src;
+       get_burial_src; get_psources]
+    in
+    String.concat " " (List.map (fun f -> sou base (f p)) sl)
+  in
+  ignore (add_linked_files gen f s [] : list _);
+};
 
 value rec list_memf f x =
   fun
