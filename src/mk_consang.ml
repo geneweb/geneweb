@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.17 2007-02-16 10:38:36 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.18 2007-02-16 11:31:15 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -39,7 +39,13 @@ value simple_output bname base carray =
              Iovalue.output_array_access oc (Array.get tab) (Array.length tab)
                0
            in
-           close_out oc
+           close_out oc;
+           let bdir = db2.Db2disk.bdir2 in
+           let has_patches =
+             Sys.file_exists (Filename.concat bdir "patches")
+           in
+           Printf.eprintf "has_patches %b\n" has_patches;
+           flush stderr;
          })
   | None ->
       Gwdb.apply_base1 base
