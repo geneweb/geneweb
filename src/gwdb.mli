@@ -1,4 +1,4 @@
-(* $Id: gwdb.mli,v 5.100 2007-02-14 14:24:46 ddr Exp $ *)
+(* $Id: gwdb.mli,v 5.101 2007-02-16 10:38:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Adef;
@@ -12,7 +12,6 @@ type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
 
 type string_person_index = 'abstract;
-type consang_tab = 'abstract;
 
 type base = 'abstract;
 
@@ -113,7 +112,6 @@ value commit_patches : base -> unit;
 value commit_notes : base -> string -> string -> unit;
 value is_patched_person : base -> iper -> bool;
 value patched_ascends : base -> list iper;
-value output_base : base -> option consang_tab -> bool -> unit;
 
 value delete_family : base -> ifam -> unit;
 value is_deleted_family : family -> bool;
@@ -151,7 +149,7 @@ value ascends_array :
     (int -> option ifam *
      int -> Adef.fix *
      int -> Adef.fix -> unit *
-     option consang_tab);
+     option (array Adef.fix));
 
 value base_notes_read : base -> string -> string;
 value base_notes_read_first_line : base -> string -> string;
@@ -180,3 +178,6 @@ value date_of_last_change : base -> float;
 
 value base_of_base1 : Dbdisk.dsk_base -> base;
 value dsk_person_of_person : person -> Dbdisk.dsk_person;
+
+value apply_base1 : base -> (Dbdisk.dsk_base -> unit) -> unit;
+value apply_base2 : base -> (Db2disk.db2 -> unit) -> unit;

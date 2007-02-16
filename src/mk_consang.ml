@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.16 2007-02-14 14:24:46 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.17 2007-02-16 10:38:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -22,7 +22,33 @@ value anonfun s =
 ;
 
 value simple_output bname base carray =
-  Gwdb.output_base base carray indexes.val
+  match carray with
+  [ Some tab ->
+      Gwdb.apply_base2 base
+        (fun db2 -> do {
+           let dir =
+             List.fold_left Filename.concat db2.Db2disk.bdir2
+               ["person"; "consang"]
+           in
+           Mutil.mkdir_p dir;
+           let oc = open_out_bin (Filename.concat dir "data") in
+           output_value oc tab;
+           close_out oc;
+           let oc = open_out_bin (Filename.concat dir "access") in
+           let _ : int =
+             Iovalue.output_array_access oc (Array.get tab) (Array.length tab)
+               0
+           in
+           close_out oc
+         })
+  | None ->
+      Gwdb.apply_base1 base
+        (fun base ->
+           let bname = base.Dbdisk.data.Dbdisk.bdir in
+           let no_patches =
+             not (Sys.file_exists (Filename.concat bname "patches"))
+           in
+           Outbase.gen_output (no_patches && not indexes.val) bname base) ]
 ;
 
 value designation base p =
