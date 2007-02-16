@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.4 2007-02-16 11:31:15 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -312,8 +312,7 @@ value load_couples_array2 db2 = do {
   [ Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family"
-          "father"
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family" "father"
           (fun ic_dat pos ->
              do { seek_in ic_dat pos; Iovalue.input ic_dat })
       in
@@ -326,8 +325,7 @@ value load_couples_array2 db2 = do {
   [ Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family"
-          "mother"
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family" "mother"
           (fun ic_dat pos ->
              do { seek_in ic_dat pos; Iovalue.input ic_dat })
       in
@@ -363,7 +361,9 @@ value consang_array2 db2 nb =
   [ Some ic -> do {
       let tab = input_value ic in
       close_in ic;
-      tab
+      if nb > Array.length tab then
+        Array.append tab (Array.make (nb - Array.length tab) no_consang)
+      else tab
     }
   | None -> Array.make nb no_consang ]
 ;
