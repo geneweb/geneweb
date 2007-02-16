@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.36 2007-02-05 18:20:55 ddr Exp $ *)
+(* $Id: some.ml,v 5.37 2007-02-16 10:11:29 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -375,7 +375,7 @@ value alphabetic1 n1 n2 =
 
 type branch_head 'a = { bh_ancestor : 'a; bh_well_named_ancestors : list 'a };
 
-value print_one_surname_by_branch conf base (bhl, str) =
+value print_one_surname_by_branch conf base (bhl, str) = do {
   let ancestors =
     match p_getenv conf.env "order" with
     [ Some "d" ->
@@ -405,35 +405,32 @@ value print_one_surname_by_branch conf base (bhl, str) =
   in
   let title _ = Wserver.wprint "%s" str in
   let br = p_getint conf.env "br" in
-  do {
-    header conf title;
-    print_link_to_welcome conf True;
-    if br = None then do {
-      tag "p" begin
-        Wserver.wprint "<em style=\"font-size:80%%\">\n";
-        Wserver.wprint "%s " (capitale (transl conf "click"));
-        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-          (code_varenv str ^ ";t=A") (transl conf "here");
-        Wserver.wprint "%s"
-          (transl conf "for the first names by alphabetic order");
-        Wserver.wprint ".</em>\n";
-      end;
-    }
-    else ();
-    Wserver.wprint "<div style=\"white-space:nowrap\">\n";
-    if len > 1 && br = None then do {
+  Wserver.wrap_string.val := Util.xml_pretty_print;
+  header conf title;
+  print_link_to_welcome conf True;
+  if br = None then do {
+    tag "p" begin
+      Wserver.wprint "<em style=\"font-size:80%%\">\n";
+      Wserver.wprint "%s " (capitale (transl conf "click"));
+      Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+        (code_varenv str ^ ";t=A") (transl conf "here");
+      Wserver.wprint "%s"
+        (transl conf "for the first names by alphabetic order");
+      Wserver.wprint ".</em>\n";
+    end;
+  }
+  else ();
+  tag "div" "style=\"white-space:nowrap\"" begin
+    if len > 1 && br = None then
       Wserver.wprint "%s: %d\n" (capitale (transl conf "number of branches"))
-        len;
-      Wserver.wprint "<dl>\n";
-    }
+        len
     else ();
-    let _ =
-      List.fold_left
-        (fun n bh ->
-           let p = bh.bh_ancestor in
-           do {
-             if len > 1 && br = None then do {
-               Wserver.wprint "\n";
+    tag "dl" begin
+      let _ =
+        List.fold_left
+          (fun n bh -> do {
+             let p = bh.bh_ancestor in
+             if len > 1 && br = None then
                stagn "dt" begin
                  if conf.cancel_links then Wserver.wprint "%d." n
                  else
@@ -441,8 +438,7 @@ value print_one_surname_by_branch conf base (bhl, str) =
                        (Util.code_varenv str) n begin
                      Wserver.wprint "%d." n;
                    end;
-               end;
-             }
+               end
              else ();
              if br = None || br = Some n then
                match bh.bh_well_named_ancestors with
@@ -469,13 +465,13 @@ value print_one_surname_by_branch conf base (bhl, str) =
              else ();
              n + 1
            })
-        1 ancestors
-    in
-    if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
-    Wserver.wprint "</div>\n";
-    trailer conf;
-  }
-;
+          1 ancestors
+      in
+      ();
+    end;
+  end;
+  trailer conf;
+};
 
 value name_unaccent s =
   copy 0 0 where rec copy i len =
