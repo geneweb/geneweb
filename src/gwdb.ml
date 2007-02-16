@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.217 2007-02-14 14:24:46 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.218 2007-02-16 10:38:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -31,8 +31,6 @@ value no_person empty_string ip =
 ;
 value no_ascend = {parents = None; consang = no_consang};
 value no_union = {family = [| |]};
-
-type consang_tab = array Adef.fix;
 
 (* Strings - common definitions *)
 
@@ -878,7 +876,6 @@ type base =
     commit_notes : string -> string -> unit;
     is_patched_person : iper -> bool;
     patched_ascends : unit -> list iper;
-    output_base : option (array Adef.fix) -> bool -> unit;
     delete_family : ifam -> unit;
     person_of_key : string -> string -> int -> option iper;
     persons_of_name : string -> list iper;
@@ -913,7 +910,8 @@ type base =
     p_first_name : person -> string;
     p_surname : person -> string;
     date_of_last_change : unit -> float;
-    apply_as_base1 : (Dbdisk.dsk_base -> unit) -> unit }
+    apply_base1 : (Dbdisk.dsk_base -> unit) -> unit;
+    apply_base2 : (Db2disk.db2 -> unit) -> unit }
 ;
 
 module C_base :
@@ -1028,12 +1026,6 @@ value base1 base =
      commit_notes = base.func.Dbdisk.commit_notes;
      is_patched_person ip = base.func.Dbdisk.is_patched_person ip;
      patched_ascends = base.func.Dbdisk.patched_ascends;
-     output_base carray indexes =
-       let bname = base.data.bdir in
-       let no_patches =
-         not (Sys.file_exists (Filename.concat bname "patches"))
-       in
-       Outbase.gen_output (no_patches && not indexes) bname base;
      delete_family ifam = C_base.delete_family self ifam;
      person_of_key = base.func.Dbdisk.person_of_key;
      persons_of_name = base.func.Dbdisk.persons_of_name;
@@ -1084,7 +1076,8 @@ value base1 base =
          [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
        in
        s.Unix.st_mtime;
-     apply_as_base1 f = f base}
+     apply_base1 f = f base;
+     apply_base2 f = invalid_arg "apply_base2"}
 ;
 
 (* Database - implementation 2 *)
@@ -1213,24 +1206,6 @@ value base2 db2 =
      patched_ascends () =
        let _ = do { eprintf "not impl patched_ascends\n"; flush stderr } in
        [];
-     output_base carray indexes =
-       match carray with
-       [ Some tab -> do {
-           let dir =
-             List.fold_left Filename.concat db2.bdir2 ["person"; "consang"]
-           in
-           Mutil.mkdir_p dir;
-           let oc = open_out_bin (Filename.concat dir "data") in
-           output_value oc tab;
-           close_out oc;
-           let oc = open_out_bin (Filename.concat dir "access") in
-           let _ : int =
-             Iovalue.output_array_access oc (Array.get tab) (Array.length tab)
-               0
-           in
-           close_out oc
-         }
-       | None -> () ];
      delete_family ifam = C_base.delete_family self ifam;
      person_of_key fn sn oc = person2_of_key db2 fn sn oc;
      persons_of_name s = persons2_of_name db2 s;
@@ -1324,7 +1299,8 @@ value base2 db2 =
          [ Unix.Unix_error _ _ _ -> Unix.stat bdir ]
        in
        s.Unix.st_mtime;
-     apply_as_base1 f = failwith "not impl apply_as_base1"}
+     apply_base1 f = invalid_arg "apply_base1";
+     apply_base2 f = f db2}
 ;
 
 (* Database - user functions *)
@@ -1363,7 +1339,6 @@ value commit_patches b = b.commit_patches ();
 value commit_notes b = b.commit_notes;
 value is_patched_person b = b.is_patched_person;
 value patched_ascends b = b.patched_ascends ();
-value output_base b = b.output_base;
 value delete_family b = b.delete_family;
 value person_of_key b = b.person_of_key;
 value persons_of_name b = b.persons_of_name;
@@ -1392,6 +1367,8 @@ value p_first_name b = b.p_first_name;
 value p_surname b = b.p_surname;
 value date_of_last_change b = b.date_of_last_change ();
 value base_of_base1 = base1;
+value apply_base1 b = b.apply_base1;
+value apply_base2 b = b.apply_base2;
 
 value husbands base gp =
   let p = poi base gp.key_index in
