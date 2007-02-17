@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.218 2007-02-16 10:38:36 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.219 2007-02-17 16:00:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -390,50 +390,50 @@ value person2_fun =
 ;
 
 value person2gen_fun =
-  {get_access (db2, p) = p.Def.access;
-   get_aliases (db2, p) = List.map (fun s -> Istr2New db2 s) p.Def.aliases;
-   get_baptism (db2, p) = p.Def.baptism;
-   get_baptism_place (db2, p) = Istr2New db2 p.Def.baptism_place;
-   get_baptism_src (db2, p) = Istr2New db2 p.Def.baptism_src;
-   get_birth (db2, p) = p.Def.birth;
-   get_birth_place (db2, p) = Istr2New db2 p.Def.birth_place;
-   get_birth_src (db2, p) = Istr2New db2 p.Def.birth_src;
-   get_burial (db2, p) = p.Def.burial;
-   get_burial_place (db2, p) = Istr2New db2 p.Def.burial_place;
-   get_burial_src (db2, p) = Istr2New db2 p.Def.burial_src;
-   get_death (db2, p) = p.Def.death;
-   get_death_place (db2, p) = Istr2New db2 p.Def.death_place;
-   get_death_src (db2, p) = Istr2New db2 p.Def.death_src;
-   get_first_name (db2, p) = Istr2New db2 p.Def.first_name;
-   get_first_names_aliases (db2, p) =
+  {get_access (db2, i, p) = p.Def.access;
+   get_aliases (db2, i, p) = List.map (fun s -> Istr2New db2 s) p.Def.aliases;
+   get_baptism (db2, i, p) = p.Def.baptism;
+   get_baptism_place (db2, i, p) = Istr2New db2 p.Def.baptism_place;
+   get_baptism_src (db2, i, p) = Istr2New db2 p.Def.baptism_src;
+   get_birth (db2, i, p) = p.Def.birth;
+   get_birth_place (db2, i, p) = Istr2New db2 p.Def.birth_place;
+   get_birth_src (db2, i, p) = Istr2New db2 p.Def.birth_src;
+   get_burial (db2, i, p) = p.Def.burial;
+   get_burial_place (db2, i, p) = Istr2New db2 p.Def.burial_place;
+   get_burial_src (db2, i, p) = Istr2New db2 p.Def.burial_src;
+   get_death (db2, i, p) = p.Def.death;
+   get_death_place (db2, i, p) = Istr2New db2 p.Def.death_place;
+   get_death_src (db2, i, p) = Istr2New db2 p.Def.death_src;
+   get_first_name (db2, i, p) = Istr2New db2 p.Def.first_name;
+   get_first_names_aliases (db2, i, p) =
      List.map (fun s -> Istr2New db2 s) p.Def.first_names_aliases;
-   get_image (db2, p) = Istr2New db2 p.Def.image;
-   get_key_index (db2, p) = p.Def.key_index;
-   get_notes (db2, p) = Istr2New db2 p.Def.notes;
-   get_occ (db2, p) = p.Def.occ;
-   get_occupation (db2, p) = Istr2New db2 p.Def.occupation;
-   get_psources (db2, p) = Istr2New db2 p.Def.psources;
-   get_public_name (db2, p) = Istr2New db2 p.Def.public_name;
-   get_qualifiers (db2, p) =
+   get_image (db2, i, p) = Istr2New db2 p.Def.image;
+   get_key_index (db2, i, p) = p.Def.key_index;
+   get_notes (db2, i, p) = Istr2New db2 p.Def.notes;
+   get_occ (db2, i, p) = p.Def.occ;
+   get_occupation (db2, i, p) = Istr2New db2 p.Def.occupation;
+   get_psources (db2, i, p) = Istr2New db2 p.Def.psources;
+   get_public_name (db2, i, p) = Istr2New db2 p.Def.public_name;
+   get_qualifiers (db2, i, p) =
      List.map (fun s -> Istr2New db2 s) p.Def.qualifiers;
-   get_related (db2, p) = p.Def.related;
-   get_rparents (db2, p) =
+   get_related (db2, i, p) = p.Def.related;
+   get_rparents (db2, i, p) =
      List.map (map_relation_ps (fun x -> x) (fun s -> Istr2New db2 s))
        p.Def.rparents;
-   get_sex (db2, p) = p.Def.sex;
-   get_surname (db2, p) = Istr2New db2 p.Def.surname;
-   get_surnames_aliases (db2, p) =
+   get_sex (db2, i, p) = p.Def.sex;
+   get_surname (db2, i, p) = Istr2New db2 p.Def.surname;
+   get_surnames_aliases (db2, i, p) =
      List.map (fun s -> Istr2New db2 s) p.Def.surnames_aliases;
-   get_titles (db2, p) =
+   get_titles (db2, i, p) =
      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
        p.Def.titles;
-   gen_person_of_person (db2, p) =
+   gen_person_of_person (db2, i, p) =
      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p;
-   dsk_person_of_person (db2, p) =
+   dsk_person_of_person (db2, i, p) =
      failwith "not impl dsk_person_of_person (gen)";
-   get_consang (db2, a) = a.Def.consang;
-   get_parents (db2, a) = a.Def.parents;
-   get_family (db2, u) = u.Def.family}
+   get_consang (db2, i, a) = person2_fun.get_consang (db2, i);
+   get_parents (db2, i, a) = a.Def.parents;
+   get_family (db2, i, u) = u.Def.family}
 ;
 
 (* Persons - user functions *)
@@ -446,7 +446,7 @@ value wrap_per f g h =
       p.per1 := Some per;
       f person1_fun per
     }
-  | Person2 db2 i {per2 = Some p} -> h person2gen_fun (db2, p)
+  | Person2 db2 i {per2 = Some p} -> h person2gen_fun (db2, i, p)
   | Person2 db2 i {per2 = None} -> g person2_fun (db2, i) ]
 ;
 
@@ -458,7 +458,7 @@ value wrap_asc f g h =
       p.asc1 := Some asc;
       f person1_fun asc
     }
-  | Person2 db2 i {asc2 = Some a} -> h person2gen_fun (db2, a)
+  | Person2 db2 i {asc2 = Some a} -> h person2gen_fun (db2, i, a)
   | Person2 db2 i {asc2 = None} -> g person2_fun (db2, i) ]
 ;
 
@@ -470,7 +470,7 @@ value wrap_uni f g h =
       p.uni1 := Some uni;
       f person1_fun uni
     }
-  | Person2 db2 i {uni2 = Some u} -> h person2gen_fun (db2, u)
+  | Person2 db2 i {uni2 = Some u} -> h person2gen_fun (db2, i, u)
   | Person2 db2 i {uni2 = None} -> g person2_fun (db2, i) ]
 ;
 
@@ -1203,9 +1203,11 @@ value base2 db2 =
          }
        in
        False;
-     patched_ascends () =
-       let _ = do { eprintf "not impl patched_ascends\n"; flush stderr } in
-       [];
+     patched_ascends () = do {
+       let r = ref [] in
+       Hashtbl.iter (fun ip _ -> r.val := [ip :: r.val]) db2.patches.h_ascend;
+       r.val
+     };
      delete_family ifam = C_base.delete_family self ifam;
      person_of_key fn sn oc = person2_of_key db2 fn sn oc;
      persons_of_name s = persons2_of_name db2 s;
