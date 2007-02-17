@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.37 2007-02-16 10:11:29 ddr Exp $ *)
+(* $Id: some.ml,v 5.38 2007-02-17 03:03:22 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -275,97 +275,98 @@ value unselected_bullets conf =
 
 value print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
-  loop True where rec loop is_first_lev lev p =
-    do {
-      let u = uget conf base (get_key_index p) in
-      let family_list =
-        List.map
-          (fun ifam ->
-             let fam = foi base ifam in
-             let c = spouse (get_key_index p) fam in
-             let c = pget conf base c in
-             let down = has_children_with_that_name base fam name in
-             let down =
-               if get_sex p = Female && p_surname base c = name then False
-               else down
-             in
-             let i = Adef.int_of_ifam ifam in
-             let sel = not (List.mem i unsel_list) in
-             (fam, c, if down then Some (string_of_int i, sel) else None))
-          (Array.to_list (get_family u))
-      in
-      let first_select =
-        match family_list with
-        [ [(_, _, select) :: _] -> select
-        | _ -> None ]
-      in
-      if lev = 0 then () else Wserver.wprint "<dd>\n";
-      print_selection_bullet conf first_select;
-      Wserver.wprint "<strong>";
+  loop True where rec loop is_first_lev lev p = do {
+    let u = uget conf base (get_key_index p) in
+    let family_list =
+      List.map
+        (fun ifam ->
+           let fam = foi base ifam in
+           let c = spouse (get_key_index p) fam in
+           let c = pget conf base c in
+           let down = has_children_with_that_name base fam name in
+           let down =
+             if get_sex p = Female && p_surname base c = name then False
+             else down
+           in
+           let i = Adef.int_of_ifam ifam in
+           let sel = not (List.mem i unsel_list) in
+           (fam, c, if down then Some (string_of_int i, sel) else None))
+        (Array.to_list (get_family u))
+    in
+    let first_select =
+      match family_list with
+      [ [(_, _, select) :: _] -> select
+      | _ -> None ]
+    in
+    print_selection_bullet conf first_select;
+    stag "strong" begin
       Wserver.wprint "%s"
         (Util.reference conf base p
            (if conf.hide_names && not (fast_auth_age conf p) then "x"
             else if not psn && p_surname base p = name then
               person_text_without_surname conf base p
             else person_text conf base p));
-      Wserver.wprint "</strong>";
-      Wserver.wprint "%s" (Date.short_dates_text conf base p);
-      Wserver.wprint "\n";
-      if Array.length (get_family u) = 0 then ()
-      else
-        let _ =
-          List.fold_left
-            (fun first (fam, c, select) ->
-               do {
-                 if not first then do {
-                   if lev = 0 then Wserver.wprint "<br>\n"
-                   else Wserver.wprint "</dd><dd>\n";
-                   print_selection_bullet conf select;
-                   Wserver.wprint "<em>";
+    end;
+    Wserver.wprint "%s" (Date.short_dates_text conf base p);
+    Wserver.wprint "\n";
+    if Array.length (get_family u) = 0 then ()
+    else
+      let _ =
+        List.fold_left
+          (fun first (fam, c, select) ->
+             do {
+               if not first then do {
+                 if lev = 0 then Wserver.wprint "<br>\n"
+                 else Wserver.wprint "</dd>\n<dd>\n";
+                 print_selection_bullet conf select;
+                 stag "em" begin
                    Wserver.wprint "%s"
-                     (if conf.hide_names && not (fast_auth_age conf p) then "x"
+                     (if conf.hide_names && not (fast_auth_age conf p) then
+                        "x"
                       else if not psn && p_surname base p = name then
                         person_text_without_surname conf base p
                       else person_text conf base p);
-                   Wserver.wprint "</em>";
-                   Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                   Wserver.wprint "\n";
-                 }
-                 else ();
-                 Wserver.wprint "  &amp;";
-                 Wserver.wprint "%s"
-                   (Date.short_marriage_date_text conf base fam p c);
-                 Wserver.wprint " <strong>";
+                 end;
+                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
+                 Wserver.wprint "\n";
+               }
+               else ();
+               Wserver.wprint "  &amp;";
+               Wserver.wprint "%s"
+                 (Date.short_marriage_date_text conf base fam p c);
+               stag "strong" begin
                  Wserver.wprint "%s"
                    (reference conf base c
                       (if conf.hide_names && not (fast_auth_age conf c) then
                          "x"
                        else person_text conf base c));
-                 Wserver.wprint "</strong>";
-                 Wserver.wprint "%s" (Date.short_dates_text conf base c);
-                 Wserver.wprint "\n";
-                 let children = get_children fam in
-                 match select with
-                 [ Some (_, True) ->
-                     tag "dl" begin
-                       List.iter
-                         (fun e -> loop False (succ lev) (pget conf base e))
-                         (Array.to_list children);
+               end;
+               Wserver.wprint "%s" (Date.short_dates_text conf base c);
+               Wserver.wprint "\n";
+               let children = get_children fam in
+               match select with
+               [ Some (_, True) ->
+                   tag "dl" begin
+                     List.iter
+                       (fun e ->
+                          tag "dd" begin
+                            loop False (succ lev) (pget conf base e);
+                          end)
+                       (Array.to_list children);
+                   end
+               | Some (_, False) -> ()
+               | None ->
+                   if Array.length children <> 0 then
+                     stagn "dl" begin
+                       stag "dd" begin Wserver.wprint "..."; end;
                      end
-                 | Some (_, False) -> ()
-                 | None ->
-                     if Array.length children <> 0 then
-                       tag "dl" begin
-                         tag "dd" begin Wserver.wprint "..."; end;
-                       end
-                     else () ];
-                 False
-               })
-            True family_list
-        in
-        ();
-      if lev = 0 then () else Wserver.wprint "</dd>\n";
-    }
+                   else () ];
+               False
+             })
+          True family_list
+      in
+      ();
+  }
 ;
 
 value alphabetic1 n1 n2 =
@@ -420,55 +421,59 @@ value print_one_surname_by_branch conf base (bhl, str) = do {
     end;
   }
   else ();
+  let with_branch_numbers = len > 1 && br = None in
   tag "div" "style=\"white-space:nowrap\"" begin
     if len > 1 && br = None then
       Wserver.wprint "%s: %d\n" (capitale (transl conf "number of branches"))
         len
     else ();
-    tag "dl" begin
-      let _ =
-        List.fold_left
-          (fun n bh -> do {
-             let p = bh.bh_ancestor in
-             if len > 1 && br = None then
-               stagn "dt" begin
-                 if conf.cancel_links then Wserver.wprint "%d." n
+    if with_branch_numbers then Wserver.wprint "<dl>\n" else ();
+    let _ =
+      List.fold_left
+        (fun n bh -> do {
+           let p = bh.bh_ancestor in
+           if with_branch_numbers then
+             stagn "dt" begin
+               if conf.cancel_links then Wserver.wprint "%d." n
+               else
+                 stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                     (Util.code_varenv str) n begin
+                   Wserver.wprint "%d." n;
+                 end;
+             end
+           else ();
+           if with_branch_numbers then Wserver.wprint "<dd>\n" else ();
+           if br = None || br = Some n then
+             match bh.bh_well_named_ancestors with
+             [ [] ->
+                 let x = sou base (get_surname p) in
+                 print_branch conf base psn x
+                   (if len > 1 && br = None then 1 else 0) p
+             | pl -> do {
+                 if is_hidden p then
+                   Wserver.wprint "&lt;&lt;"
                  else
-                   stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
-                       (Util.code_varenv str) n begin
-                     Wserver.wprint "%d." n;
-                   end;
-               end
-             else ();
-             if br = None || br = Some n then
-               match bh.bh_well_named_ancestors with
-               [ [] ->
-                   let x = sou base (get_surname p) in
-                   print_branch conf base psn x
-                     (if len > 1 && br = None then 1 else 0) p
-               | pl ->
-                   tag "dd" begin
-                     if is_hidden p then
-                       Wserver.wprint "&lt;&lt;"
-                     else
-                       let href = Util.acces conf base p in
-                       wprint_geneweb_link conf href "&lt;&lt;";
-                     Wserver.wprint "\n";
-                     List.iter
-                       (fun p ->
-                          let x = sou base (get_surname p) in
-                          tag "dl" begin
-                            print_branch conf base psn x 1 p;
-                          end)
-                       bh.bh_well_named_ancestors;
-                   end ]
-             else ();
-             n + 1
-           })
-          1 ancestors
-      in
-      ();
-    end;
+                   let href = Util.acces conf base p in
+                   wprint_geneweb_link conf href "&lt;&lt;";
+                 Wserver.wprint "\n";
+                 List.iter
+                   (fun p ->
+                      let x = sou base (get_surname p) in
+                      tag "dl" begin
+                        tag "dd" begin
+                          print_branch conf base psn x 1 p;
+                        end;
+                      end)
+                   bh.bh_well_named_ancestors;
+               } ]
+           else ();
+           if with_branch_numbers then Wserver.wprint "</dd>\n" else ();
+           n + 1
+         })
+        1 ancestors
+    in
+    ();
+    if with_branch_numbers then Wserver.wprint "</dl>\n" else ();
   end;
   trailer conf;
 };
