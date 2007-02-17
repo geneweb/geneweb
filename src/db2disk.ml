@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.4 2007-02-16 11:31:15 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.5 2007-02-17 16:00:39 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -54,8 +54,14 @@ value fast_open_in_bin_and_seek db2 f1 f2 f pos = do {
 };
 
 value get_field_acc db2 i (f1, f2) =
-  let ic = fast_open_in_bin_and_seek db2 f1 f2 "access" (4 * i) in
-  input_binary_int ic
+  try
+    let ic = fast_open_in_bin_and_seek db2 f1 f2 "access" (4 * i) in
+    input_binary_int ic
+  with e -> do {
+    eprintf "Error get_field_acc \"%s/%s/access\" i = %d\n" f1 f2 i;
+    flush stderr;
+    raise e;
+  }
 ;
 
 value get_field_data db2 pos (f1, f2) data =
