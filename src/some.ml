@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.38 2007-02-17 03:03:22 ddr Exp $ *)
+(* $Id: some.ml,v 5.39 2007-02-17 09:19:59 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -273,9 +273,16 @@ value unselected_bullets conf =
     [] conf.env
 ;
 
+value alphabetic1 n1 n2 =
+  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2
+  else Gutil.alphabetic n1 n2
+;
+
+type branch_head 'a = { bh_ancestor : 'a; bh_well_named_ancestors : list 'a };
+
 value print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
-  loop True where rec loop is_first_lev lev p = do {
+  loop where rec loop is_first_level p = do {
     let u = uget conf base (get_key_index p) in
     let family_list =
       List.map
@@ -316,7 +323,7 @@ value print_branch conf base psn name =
           (fun first (fam, c, select) ->
              do {
                if not first then do {
-                 if lev = 0 then Wserver.wprint "<br>\n"
+                 if is_first_level then Wserver.wprint "<br%s>\n" conf.xhs
                  else Wserver.wprint "</dd>\n<dd>\n";
                  print_selection_bullet conf select;
                  stag "em" begin
@@ -332,7 +339,7 @@ value print_branch conf base psn name =
                }
                else ();
                Wserver.wprint "  &amp;";
-               Wserver.wprint "%s"
+               Wserver.wprint "%s\n"
                  (Date.short_marriage_date_text conf base fam p c);
                stag "strong" begin
                  Wserver.wprint "%s"
@@ -349,9 +356,7 @@ value print_branch conf base psn name =
                    tag "dl" begin
                      List.iter
                        (fun e ->
-                          tag "dd" begin
-                            loop False (succ lev) (pget conf base e);
-                          end)
+                          tag "dd" begin loop False (pget conf base e); end)
                        (Array.to_list children);
                    end
                | Some (_, False) -> ()
@@ -369,12 +374,29 @@ value print_branch conf base psn name =
   }
 ;
 
-value alphabetic1 n1 n2 =
-  if utf_8_db.val then Gutil.alphabetic_utf_8 n1 n2
-  else Gutil.alphabetic n1 n2
+value print_one_branch conf base bh psn lev =
+  let p = bh.bh_ancestor in
+  match bh.bh_well_named_ancestors with
+  [ [] ->
+      let x = sou base (get_surname p) in
+      print_branch conf base psn x lev p
+  | pl -> do {
+      if is_hidden p then Wserver.wprint "&lt;&lt;"
+      else
+        let href = Util.acces conf base p in
+        wprint_geneweb_link conf href "&lt;&lt;";
+      Wserver.wprint "\n";
+      List.iter
+        (fun p ->
+           let x = sou base (get_surname p) in
+           tag "dl" begin
+             tag "dd" begin
+               print_branch conf base psn x False p;
+             end;
+           end)
+        bh.bh_well_named_ancestors;
+    } ]
 ;
-
-type branch_head 'a = { bh_ancestor : 'a; bh_well_named_ancestors : list 'a };
 
 value print_one_surname_by_branch conf base (bhl, str) = do {
   let ancestors =
@@ -421,59 +443,44 @@ value print_one_surname_by_branch conf base (bhl, str) = do {
     end;
   }
   else ();
-  let with_branch_numbers = len > 1 && br = None in
   tag "div" "style=\"white-space:nowrap\"" begin
-    if len > 1 && br = None then
+    if len > 1 && br = None then do {
       Wserver.wprint "%s: %d\n" (capitale (transl conf "number of branches"))
-        len
-    else ();
-    if with_branch_numbers then Wserver.wprint "<dl>\n" else ();
-    let _ =
-      List.fold_left
-        (fun n bh -> do {
-           let p = bh.bh_ancestor in
-           if with_branch_numbers then
-             stagn "dt" begin
-               if conf.cancel_links then Wserver.wprint "%d." n
-               else
-                 stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
-                     (Util.code_varenv str) n begin
-                   Wserver.wprint "%d." n;
-                 end;
-             end
-           else ();
-           if with_branch_numbers then Wserver.wprint "<dd>\n" else ();
-           if br = None || br = Some n then
-             match bh.bh_well_named_ancestors with
-             [ [] ->
-                 let x = sou base (get_surname p) in
-                 print_branch conf base psn x
-                   (if len > 1 && br = None then 1 else 0) p
-             | pl -> do {
-                 if is_hidden p then
-                   Wserver.wprint "&lt;&lt;"
+        len;
+      tag "dl" begin
+        let _ =
+          List.fold_left
+            (fun n bh -> do {
+               stagn "dt" begin
+                 if conf.cancel_links then Wserver.wprint "%d." n
                  else
-                   let href = Util.acces conf base p in
-                   wprint_geneweb_link conf href "&lt;&lt;";
-                 Wserver.wprint "\n";
-                 List.iter
-                   (fun p ->
-                      let x = sou base (get_surname p) in
-                      tag "dl" begin
-                        tag "dd" begin
-                          print_branch conf base psn x 1 p;
-                        end;
-                      end)
-                   bh.bh_well_named_ancestors;
-               } ]
-           else ();
-           if with_branch_numbers then Wserver.wprint "</dd>\n" else ();
-           n + 1
-         })
-        1 ancestors
-    in
-    ();
-    if with_branch_numbers then Wserver.wprint "</dl>\n" else ();
+                   stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                       (Util.code_varenv str) n begin
+                     Wserver.wprint "%d." n;
+                   end;
+               end;
+               tag "dd" begin
+                 print_one_branch conf base bh psn False;
+               end;
+               n + 1
+             })
+            1 ancestors
+        in
+        ();
+      end;
+    }
+    else
+      let _ =
+        List.fold_left
+          (fun n bh -> do {
+             if br = None || br = Some n then
+               print_one_branch conf base bh psn True
+             else ();
+             n + 1
+           })
+          1 ancestors
+      in
+      ();
   end;
   trailer conf;
 };
