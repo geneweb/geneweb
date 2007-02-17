@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.219 2007-02-17 16:00:39 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.220 2007-02-17 18:31:47 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -431,7 +431,7 @@ value person2gen_fun =
      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p;
    dsk_person_of_person (db2, i, p) =
      failwith "not impl dsk_person_of_person (gen)";
-   get_consang (db2, i, a) = person2_fun.get_consang (db2, i);
+   get_consang (db2, i, a) = a.Def.consang;
    get_parents (db2, i, a) = a.Def.parents;
    get_family (db2, i, u) = u.Def.family}
 ;
@@ -1273,7 +1273,13 @@ value base2 db2 =
              get_parents
                (Person2 db2 i {per2 = None; asc2 = None; uni2 = None}) ]
        in
-       let cget i = cg_tab.(i) in
+       let cget i =
+         try
+           (Hashtbl.find db2.patches.h_ascend (Adef.iper_of_int i)).consang
+         with
+         [ Not_found ->
+             cg_tab.(i) ]
+       in
        let cset i v = cg_tab.(i) := v in
        (fget, cget, cset, Some cg_tab);
      base_notes_read fnotes =
