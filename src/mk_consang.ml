@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.18 2007-02-16 11:31:15 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.19 2007-02-17 18:31:47 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -46,6 +46,23 @@ value simple_output bname base carray =
            in
            Printf.eprintf "has_patches %b\n" has_patches;
            flush stderr;
+           if has_patches then do {
+             let list =
+               Hashtbl.fold
+                 (fun ip a list ->
+                    let a =
+                      {(a) with Def.consang = tab.(Adef.int_of_iper ip)}
+                    in
+                    [(ip, a) :: list])
+                 db2.Db2disk.patches.Db2disk.h_ascend []
+             in
+             List.iter
+               (fun (ip, a) ->
+                  Hashtbl.replace db2.Db2disk.patches.Db2disk.h_ascend ip a)
+               list;
+           }
+           else ();
+           Db2disk.commit_patches2 db2;
          })
   | None ->
       Gwdb.apply_base1 base
