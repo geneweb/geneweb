@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.33 2007-02-18 15:58:27 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.34 2007-02-18 18:35:24 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -16,7 +16,7 @@ type family =
 type file_field 'a =
   { oc_dat : out_channel;
     oc_acc : out_channel;
-    start_pos : (int * int);
+    start_pos : Mutil.header_pos;
     sz32 : mutable int;
     sz64 : mutable int;
     item_cnt : mutable int;
@@ -80,7 +80,6 @@ value check_magic =
     }
 ;
 
-value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
 value phony_min_size = 8;
 
 type hashtbl_t 'a 'b =
@@ -90,27 +89,6 @@ and bucketlist 'a 'b =
   [ Empty
   | Cons of 'a and 'b and bucketlist 'a 'b ]
 ;
-
-value create_output_value_header oc = do {
-  for i = 0 to 3 do { output_byte oc intext_magic_number.(i); };
-  let pos_header = pos_out oc in
-  output_binary_int oc 0;
-  output_binary_int oc 0;
-  output_binary_int oc 0;
-  output_binary_int oc 0;
-  Iovalue.size_32.val := 0;
-  Iovalue.size_64.val := 0;
-  (pos_header, pos_out oc)
-};
-
-value patch_output_value_header oc (pos_header, pos_start) = do {
-  let pos_end = pos_out oc in
-  seek_out oc pos_header;
-  output_binary_int oc (pos_end - pos_start);
-  output_binary_int oc 0;
-  output_binary_int oc Iovalue.size_32.val;
-  output_binary_int oc Iovalue.size_64.val;
-};
 
 value output_hashtbl dir file ht = do {
   let oc_ht = open_out_bin (Filename.concat dir file) in
@@ -123,7 +101,7 @@ value output_hashtbl dir file ht = do {
      file .ht and making the access into the second file .hta, this is
      probably faster, but the drawback is that we must know exactly
      where the array starts *)
-  let pos_start = create_output_value_header oc_ht in
+  let pos_start = Mutil.create_output_value_header oc_ht in
   Iovalue.output_block_header oc_ht 0 2;
   Iovalue.output oc_ht ht.size;
   Iovalue.output_block_header oc_ht 0 (Array.length ht.data);
@@ -131,7 +109,7 @@ value output_hashtbl dir file ht = do {
     output_binary_int oc_hta (pos_out oc_ht);
     Iovalue.output oc_ht ht.data.(i);
   };
-  patch_output_value_header oc_ht pos_start;
+  ignore (Mutil.patch_output_value_header oc_ht pos_start : int);
 
   close_out oc_hta;
   close_out oc_ht;
@@ -143,7 +121,7 @@ value open_out_field tmp_dir (name, valu) = do {
 
   let oc_dat = open_out_bin (Filename.concat d "data") in
   let oc_acc = open_out_bin (Filename.concat d "access") in
-  let start_pos = create_output_value_header oc_dat in
+  let start_pos = Mutil.create_output_value_header oc_dat in
   Iovalue.output_block_header oc_dat 0 phony_min_size;
   assert (pos_out oc_dat = Db2.first_item_pos);
   {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
@@ -165,7 +143,7 @@ value close_out_field ff = do {
   close_out ff.oc_acc;
   Iovalue.size_32.val := ff.sz32 - phony_min_size + ff.item_cnt;
   Iovalue.size_64.val := ff.sz64 - phony_min_size + ff.item_cnt;
-  patch_output_value_header ff.oc_dat ff.start_pos;
+  ignore (Mutil.patch_output_value_header ff.oc_dat ff.start_pos : int);
   Iovalue.output_block_header ff.oc_dat 0 ff.item_cnt;
   close_out ff.oc_dat;
 };
@@ -348,7 +326,7 @@ value str_pos oc_str ht item_cnt s =
 ;
 
 value compress_type_string field_d ic oc oc_str ht = do {
-  let header_pos = create_output_value_header oc_str in
+  let header_pos = Mutil.create_output_value_header oc_str in
   Iovalue.output_block_header oc_str 0 phony_min_size;
   let nb_items = ref 0 in
   let istr_empty = str_pos oc_str ht nb_items "" in
@@ -364,13 +342,13 @@ value compress_type_string field_d ic oc oc_str ht = do {
   with
   [ End_of_file -> () ];
   (* padding to at least 8 items to allow correct read by input_value *)
-  for i = nb_items.val + 1 to 8 do {
+  for i = nb_items.val + 1 to phony_min_size do {
     incr nb_items;
     Iovalue.output oc_str "";
   };
   Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
   Iovalue.size_64.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
-  patch_output_value_header oc_str header_pos;
+  ignore (Mutil.patch_output_value_header oc_str header_pos : int);
   Iovalue.output_block_header oc_str 0 nb_items.val;
 };
 
@@ -506,7 +484,7 @@ value reorder_fields tmp_dir =
        let ff = do {
          let oc_dat = open_out_bin (Filename.concat field_d "data2") in
          let oc_acc = open_out_bin (Filename.concat field_d "access2") in
-         let start_pos = create_output_value_header oc_dat in
+         let start_pos = Mutil.create_output_value_header oc_dat in
          Iovalue.output_block_header oc_dat 0 phony_min_size;
          assert (pos_out oc_dat = Db2.first_item_pos);
          {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;

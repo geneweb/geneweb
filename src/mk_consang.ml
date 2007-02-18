@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.20 2007-02-18 15:58:27 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.21 2007-02-18 18:35:24 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -19,6 +19,20 @@ value speclist =
 value anonfun s =
   if fname.val = "" then fname.val := s
   else raise (Arg.Bad "Cannot treat several databases")
+;
+
+value phony_min_size = 8;
+
+(* copied from gwc2.ml... library function has to be added *)
+value str_pos oc_dat ht item_cnt s =
+  try Hashtbl.find ht s with
+  [ Not_found -> do {
+      incr item_cnt;
+      let pos = pos_out oc_dat in
+      Iovalue.output oc_dat s;
+      Hashtbl.add ht s pos;
+      pos
+    } ]
 ;
 
 value simple_output bname base carray =
@@ -61,6 +75,53 @@ value simple_output bname base carray =
                   Hashtbl.replace db2.Db2disk.patches.Db2disk.h_ascend ip a)
                list;
              Db2disk.commit_patches2 db2;
+
+             (* start of implementation of saving fields...
+                this code is going to evoluate much...
+                testing the saving of "first_name" field *)
+             let bdir = db2.Db2disk.bdir2 in
+             let nb_per = Gwdb.nb_of_persons base in
+             let ht = Hashtbl.create 1 in
+             let bdir =
+               List.fold_left Filename.concat bdir ["person"; "first_name"]
+             in
+             let oc_dat = open_out_bin (Filename.concat bdir "1data") in
+             let oc_acc = open_out_bin (Filename.concat bdir "1access") in
+
+             let header_pos = Mutil.create_output_value_header oc_dat in
+
+             Iovalue.output_block_header oc_dat 0 phony_min_size;
+             assert (pos_out oc_dat = Db2.first_item_pos);
+             let nb_items = ref 0 in
+             let istr_empty = str_pos oc_dat ht nb_items "" in
+             let istr_quest = str_pos oc_dat ht nb_items "?" in
+             assert (istr_empty = Db2.empty_string_pos);
+             assert (istr_quest = Db2.quest_string_pos);
+             for i = 0 to nb_per - 1 do {
+               let fn =
+                 Gwdb.sou base
+                   (Gwdb.get_first_name (Gwdb.poi base (Adef.iper_of_int i)))
+               in
+               let pos = str_pos oc_dat ht nb_items fn in
+               output_binary_int oc_acc pos;
+             };
+             for i = nb_items.val + 1 to phony_min_size do {
+               incr nb_items;
+               Iovalue.output oc_dat "";
+             };
+             Iovalue.size_32.val :=
+               Iovalue.size_32.val - phony_min_size + nb_items.val;
+             Iovalue.size_64.val :=
+               Iovalue.size_32.val - phony_min_size + nb_items.val;
+
+             let _ : int =
+               Mutil.patch_output_value_header oc_dat header_pos
+             in
+             Iovalue.output_block_header oc_dat 0 nb_items.val;
+
+             close_out oc_acc;
+             close_out oc_dat;
+             (* end saving "first_name" field *)
            }
            else ();
          })
