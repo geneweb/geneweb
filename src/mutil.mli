@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.14 2007-02-18 18:35:24 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.15 2007-02-18 19:26:34 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 value int_size : int;
@@ -19,11 +19,6 @@ value remove_file : string -> unit;
 value mkdir_p : string -> unit;
 value remove_dir : string -> unit;
 value lock_file : string -> string;
-
-type header_pos = 'abstract;
-
-value create_output_value_header : out_channel -> header_pos;
-value patch_output_value_header : out_channel -> header_pos -> int;
 
 value output_value_no_sharing : out_channel -> _ -> unit;
 value output_array_no_sharing : out_channel -> (int -> _) -> int -> unit;

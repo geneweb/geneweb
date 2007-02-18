@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.21 2007-02-18 18:35:24 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.22 2007-02-18 19:26:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -88,7 +88,7 @@ value simple_output bname base carray =
              let oc_dat = open_out_bin (Filename.concat bdir "1data") in
              let oc_acc = open_out_bin (Filename.concat bdir "1access") in
 
-             let header_pos = Mutil.create_output_value_header oc_dat in
+             let header_pos = Iovalue.create_output_value_header oc_dat in
 
              Iovalue.output_block_header oc_dat 0 phony_min_size;
              assert (pos_out oc_dat = Db2.first_item_pos);
@@ -115,7 +115,7 @@ value simple_output bname base carray =
                Iovalue.size_32.val - phony_min_size + nb_items.val;
 
              let _ : int =
-               Mutil.patch_output_value_header oc_dat header_pos
+               Iovalue.patch_output_value_header oc_dat header_pos
              in
              Iovalue.output_block_header oc_dat 0 nb_items.val;
 
