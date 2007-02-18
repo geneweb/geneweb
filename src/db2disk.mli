@@ -1,4 +1,4 @@
-(* $Id: db2disk.mli,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: db2disk.mli,v 5.4 2007-02-18 10:42:13 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -38,6 +38,7 @@ type string_person_index2 =
     curr : mutable int }
 ;
 
+value field_exists : db2 -> (string * string) -> bool;
 value get_field_acc : db2 -> int -> (string * string) -> int;
 value get_field_data :
   db2 -> int -> (string * string) -> string -> 'a;

@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.5 2007-02-17 16:00:39 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.6 2007-02-18 10:42:13 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -52,6 +52,11 @@ value fast_open_in_bin_and_seek db2 f1 f2 f pos = do {
   seek_in ic pos;
   ic
 };
+
+value field_exists db2 (f1, f2) =
+  let fname = List.fold_left Filename.concat db2.bdir2 [f1; f2; "access"] in
+  Sys.file_exists fname
+;
 
 value get_field_acc db2 i (f1, f2) =
   try
@@ -291,7 +296,7 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
    curr = 0}
 };
 
-value load_array2 bdir nb_ini nb f1 f2 get =
+value load_array2 bdir nb_ini nb def f1 f2 get =
   if nb = 0 then [| |]
   else do {
     let ic_acc =
@@ -300,8 +305,8 @@ value load_array2 bdir nb_ini nb f1 f2 get =
     let ic_dat =
       open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "data"])
     in
-    let tab = Array.create nb (get ic_dat (input_binary_int ic_acc)) in
-    for i = 1 to nb_ini - 1 do {
+    let tab = Array.create nb def in
+    for i = 0 to nb_ini - 1 do {
       tab.(i) := get ic_dat (input_binary_int ic_acc);
     };
     close_in ic_dat;
@@ -318,7 +323,8 @@ value load_couples_array2 db2 = do {
   [ Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family" "father"
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb (Adef.iper_of_int 0)
+          "family" "father"
           (fun ic_dat pos ->
              do { seek_in ic_dat pos; Iovalue.input ic_dat })
       in
@@ -331,7 +337,8 @@ value load_couples_array2 db2 = do {
   [ Some _ -> ()
   | None ->
       let tab =
-        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb "family" "mother"
+        load_array2 db2.bdir2 db2.patches.nb_fam_ini nb (Adef.iper_of_int 0)
+          "family" "mother"
           (fun ic_dat pos ->
              do { seek_in ic_dat pos; Iovalue.input ic_dat })
       in
@@ -344,13 +351,15 @@ value load_couples_array2 db2 = do {
 
 value parents_array2 db2 nb_ini nb = do {
   let arr =
-    load_array2 db2.bdir2 nb_ini nb "person" "parents"
-      (fun ic_dat pos ->
-         if pos = -1 then None
-         else do {
-           seek_in ic_dat pos;
-           Some (Iovalue.input ic_dat : ifam)
-         })
+    if nb_ini = 0 then Array.create nb None
+    else
+      load_array2 db2.bdir2 nb_ini nb None "person" "parents"
+        (fun ic_dat pos ->
+           if pos = -1 then None
+           else do {
+             seek_in ic_dat pos;
+             Some (Iovalue.input ic_dat : ifam)
+           })
   in
   Hashtbl.iter (fun i a -> arr.(Adef.int_of_iper i) := a.parents)
     db2.patches.h_ascend;
@@ -359,20 +368,25 @@ value parents_array2 db2 nb_ini nb = do {
 
 value no_consang = Adef.fix (-1);
 
-value consang_array2 db2 nb =
-  let cg_fname =
-    List.fold_left Filename.concat db2.bdir2 ["person"; "consang"; "data"]
+value consang_array2 db2 nb = do {
+  let arr =
+    let cg_fname =
+      List.fold_left Filename.concat db2.bdir2 ["person"; "consang"; "data"]
+    in
+    match try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ] with
+    [ Some ic -> do {
+        let tab = input_value ic in
+        close_in ic;
+        if nb > Array.length tab then
+          Array.append tab (Array.make (nb - Array.length tab) no_consang)
+        else tab
+      }
+    | None -> Array.make nb no_consang ]
   in
-  match try Some (open_in_bin cg_fname) with [ Sys_error _ -> None ] with
-  [ Some ic -> do {
-      let tab = input_value ic in
-      close_in ic;
-      if nb > Array.length tab then
-        Array.append tab (Array.make (nb - Array.length tab) no_consang)
-      else tab
-    }
-  | None -> Array.make nb no_consang ]
-;
+  Hashtbl.iter (fun i a -> arr.(Adef.int_of_iper i) := a.consang)
+    db2.patches.h_ascend;
+  arr
+};
 
 value family_array2 db2 = do {
   let fname =
