@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.220 2007-02-17 18:31:47 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.221 2007-02-18 01:47:49 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -380,9 +380,15 @@ value person2_fun =
        match db2.parents_array with
        [ Some tab -> tab.(i)
        | None ->
-           let pos = get_field_acc db2 i ("person", "parents") in
-           if pos = -1 then None
-           else Some (get_field_data db2 pos ("person", "parents") "data") ];
+           try
+             (Hashtbl.find db2.patches.h_ascend (Adef.iper_of_int i)).parents
+           with
+           [ Not_found ->
+               let pos = get_field_acc db2 i ("person", "parents") in
+               if pos = -1 then None
+               else
+                 Some
+                   (get_field_data db2 pos ("person", "parents") "data") ] ];
      get_family (db2, i) =
        match db2.family_array with
        [ Some tab -> tab.(i)
@@ -1266,12 +1272,7 @@ value base2 db2 =
          | None -> consang_array2 db2 nb ]
        in
        let fget i =
-         try
-           (Hashtbl.find db2.patches.h_ascend (Adef.iper_of_int i)).parents
-         with
-         [ Not_found ->
-             get_parents
-               (Person2 db2 i {per2 = None; asc2 = None; uni2 = None}) ]
+         get_parents (Person2 db2 i {per2 = None; asc2 = None; uni2 = None})
        in
        let cget i =
          try
