@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.19 2007-02-17 18:31:47 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.20 2007-02-18 15:58:27 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -60,9 +60,9 @@ value simple_output bname base carray =
                (fun (ip, a) ->
                   Hashtbl.replace db2.Db2disk.patches.Db2disk.h_ascend ip a)
                list;
+             Db2disk.commit_patches2 db2;
            }
            else ();
-           Db2disk.commit_patches2 db2;
          })
   | None ->
       Gwdb.apply_base1 base

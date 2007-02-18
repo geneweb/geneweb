@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.32 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.33 2007-02-18 15:58:27 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -363,6 +363,11 @@ value compress_type_string field_d ic oc oc_str ht = do {
     }
   with
   [ End_of_file -> () ];
+  (* padding to at least 8 items to allow correct read by input_value *)
+  for i = nb_items.val + 1 to 8 do {
+    incr nb_items;
+    Iovalue.output oc_str "";
+  };
   Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
   Iovalue.size_64.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
   patch_output_value_header oc_str header_pos;
