@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 5.6 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: iovalue.ml,v 5.7 2007-02-18 19:26:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -264,3 +264,40 @@ value output_array_access oc arr_get arr_len pos =
       loop (pos + size (arr_get i)) (i + 1)
     }
 ;
+
+(* *)
+
+type header_pos = (int * int);
+
+value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
+
+value create_output_value_header oc = do {
+  (* magic number *)
+  for i = 0 to 3 do { output_byte oc intext_magic_number.(i); };
+  let pos_header = pos_out oc in
+  (* room for block length *)
+  output_binary_int oc 0;
+  (* room for obj counter *)
+  output_binary_int oc 0;
+  (* room for size_32 *)
+  output_binary_int oc 0;
+  (* room for size_64 *)
+  output_binary_int oc 0;
+  size_32.val := 0;
+  size_64.val := 0;
+  (pos_header, pos_out oc)
+};
+
+value patch_output_value_header oc (pos_header, pos_start) = do {
+  let pos_end = pos_out oc in
+  (* block_length *)
+  seek_out oc pos_header;
+  output_binary_int oc (pos_end - pos_start);
+  (* obj counter is zero because no_sharing *)
+  output_binary_int oc 0;
+  (* size_32 *)
+  output_binary_int oc size_32.val;
+  (* size_64 *)
+  output_binary_int oc size_64.val;
+  pos_end;
+};

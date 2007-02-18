@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.16 2007-02-18 18:35:24 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.17 2007-02-18 19:26:34 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 value int_size = 4;
@@ -317,48 +317,13 @@ value strip_all_trailing_spaces s =
       | c -> do { Buffer.add_char b c; loop (i + 1) } ]
 ;
 
-value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
-
-type header_pos = (int * int);
-
-value create_output_value_header oc = do {
-  (* magic number *)
-  for i = 0 to 3 do { output_byte oc intext_magic_number.(i); };
-  let pos_header = pos_out oc in
-  (* room for block length *)
-  output_binary_int oc 0;
-  (* room for obj counter *)
-  output_binary_int oc 0;
-  (* room for size_32 *)
-  output_binary_int oc 0;
-  (* room for size_64 *)
-  output_binary_int oc 0;
-  Iovalue.size_32.val := 0;
-  Iovalue.size_64.val := 0;
-  (pos_header, pos_out oc)
-};
-
-value patch_output_value_header oc (pos_header, pos_start) = do {
-  let pos_end = pos_out oc in
-  (* block_length *)
-  seek_out oc pos_header;
-  output_binary_int oc (pos_end - pos_start);
-  (* obj counter is zero because no_sharing *)
-  output_binary_int oc 0;
-  (* size_32 *)
-  output_binary_int oc Iovalue.size_32.val;
-  (* size_64 *)
-  output_binary_int oc Iovalue.size_64.val;
-  pos_end;
-};
-
 value output_array_no_sharing oc arr_get arr_len = do {
-  let header_pos = create_output_value_header oc in
+  let header_pos = Iovalue.create_output_value_header oc in
   Iovalue.output_block_header oc 0 arr_len;
   for i = 0 to arr_len - 1 do {
     Iovalue.output oc (arr_get i);
   };
-  let pos_end = patch_output_value_header oc header_pos in
+  let pos_end = Iovalue.patch_output_value_header oc header_pos in
   seek_out oc pos_end;
 };
 

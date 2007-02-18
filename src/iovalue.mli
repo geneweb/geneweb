@@ -1,4 +1,4 @@
-(* $Id: iovalue.mli,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: iovalue.mli,v 5.4 2007-02-18 19:26:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value input : in_channel -> 'a;
@@ -8,6 +8,13 @@ value size : 'a -> int;
 value digest : 'a -> Digest.t;
 
 value sizeof_long : int;
+
+(* making a header for input_value like output_value does *)
+
+type header_pos = 'abstract;
+
+value create_output_value_header : out_channel -> header_pos;
+value patch_output_value_header : out_channel -> header_pos -> int;
 
 (* generic functions *)
 
