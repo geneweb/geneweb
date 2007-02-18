@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.221 2007-02-18 01:47:49 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.222 2007-02-18 10:42:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -374,8 +374,8 @@ value person2_fun =
        match db2.consang_array with
        [ Some tab -> tab.(i)
        | None ->
-           try get_field db2 i ("person", "consang") with
-           [ Sys_error _ -> no_consang ] ];
+           let f = ("person", "consang") in
+           if field_exists db2 f then get_field db2 i f else no_consang ];
      get_parents (db2, i) =
        match db2.parents_array with
        [ Some tab -> tab.(i)
@@ -1241,7 +1241,7 @@ value base2 db2 =
          | None -> db2.parents_array := Some (parents_array2 db2 nb_ini nb) ];
          match db2.consang_array with
          [ Some _ -> ()
-         | None -> db2.consang_array := Some (consang_array2 db2 nb) ]
+         | None -> db2.consang_array := Some (consang_array2 db2 nb) ];
        };
      load_unions_array () =
        match db2.family_array with
@@ -1274,13 +1274,7 @@ value base2 db2 =
        let fget i =
          get_parents (Person2 db2 i {per2 = None; asc2 = None; uni2 = None})
        in
-       let cget i =
-         try
-           (Hashtbl.find db2.patches.h_ascend (Adef.iper_of_int i)).consang
-         with
-         [ Not_found ->
-             cg_tab.(i) ]
-       in
+       let cget i = cg_tab.(i) in
        let cset i v = cg_tab.(i) := v in
        (fget, cget, cset, Some cg_tab);
      base_notes_read fnotes =
