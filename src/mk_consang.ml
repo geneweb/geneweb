@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.26 2007-02-19 17:25:44 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.27 2007-02-19 19:25:59 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -21,11 +21,16 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 ;
 
-value rebuild_fields2 base db2 = do {
+value rebuild_string_fields db2 patches_ht f1 nb item_of_int list =
   let bdir = db2.Db2disk.bdir2 in
-  let nb_per = db2.Db2disk.patches.Db2disk.nb_per in
   List.iter
-    (fun (f1, f2, get_field) -> do {
+    (fun (f2, get_field) -> do {
+       let get_field item =
+         try get_field (Hashtbl.find patches_ht (item_of_int item)) with
+         [ Not_found ->
+             Db2disk.string_of_istr2 db2 (f1, f2)
+               (Db2disk.get_field_acc db2 item (f1, f2)) ]
+       in
        if Mutil.verbose.val then do {
          Printf.eprintf "rebuilding %s..." f2;
          flush stderr;
@@ -33,16 +38,11 @@ value rebuild_fields2 base db2 = do {
        else ();
        let bdir =  List.fold_left Filename.concat bdir [f1; f2] in
        let oc_dat = open_out_bin (Filename.concat bdir "1data") in
-       let oc_acc =
-         open_out_bin (Filename.concat bdir "1access")
-       in
+       let oc_acc = open_out_bin (Filename.concat bdir "1access") in
        Db2out.output_value_array_string oc_dat
          (fun output_item ->
-            for i = 0 to nb_per - 1 do {
-              let fn =
-                Gwdb.sou base
-                  (get_field (Gwdb.poi base (Adef.iper_of_int i)))
-              in
+            for i = 0 to nb - 1 do {
+              let fn = get_field i in
               let pos = output_item fn in
               output_binary_int oc_acc pos;
             });
@@ -54,21 +54,37 @@ value rebuild_fields2 base db2 = do {
        }
        else ()
      })
-    [("person", "baptism_place", Gwdb.get_baptism_place);
-     ("person", "baptism_src", Gwdb.get_baptism_src);
-     ("person", "birth_place", Gwdb.get_birth_place);
-     ("person", "birth_src", Gwdb.get_birth_src);
-     ("person", "burial_place", Gwdb.get_burial_place);
-     ("person", "burial_src", Gwdb.get_burial_src);
-     ("person", "death_place", Gwdb.get_death_place);
-     ("person", "death_src", Gwdb.get_death_src);
-     ("person", "first_name", Gwdb.get_first_name);
-     ("person", "image", Gwdb.get_image);
-     ("person", "notes", Gwdb.get_notes);
-     ("person", "occupation", Gwdb.get_occupation);
-     ("person", "psources", Gwdb.get_psources);
-     ("person", "public_name", Gwdb.get_public_name);
-     ("person", "surname", Gwdb.get_surname)]
+    list
+;
+
+value rebuild_fields2 db2 = do {
+  let patches = db2.Db2disk.patches in
+  let nb_per = patches.Db2disk.nb_per in
+  rebuild_string_fields db2 patches.Db2disk.h_person "person" nb_per
+    Adef.iper_of_int
+    [("baptism_place", fun p -> p.Def.baptism_place);
+     ("baptism_src", fun p -> p.Def.baptism_src);
+     ("birth_place", fun p -> p.Def.birth_place);
+     ("birth_src", fun p -> p.Def.birth_src);
+     ("burial_place", fun p -> p.Def.burial_place);
+     ("burial_src", fun p -> p.Def.burial_src);
+     ("death_place", fun p -> p.Def.death_place);
+     ("death_src", fun p -> p.Def.death_src);
+     ("first_name", fun p -> p.Def.first_name);
+     ("image", fun p -> p.Def.image);
+     ("notes", fun p -> p.Def.notes);
+     ("occupation", fun p -> p.Def.occupation);
+     ("psources", fun p -> p.Def.psources);
+     ("public_name", fun p -> p.Def.public_name);
+     ("surname", fun p -> p.Def.surname)];
+  let nb_fam = patches.Db2disk.nb_fam in
+  rebuild_string_fields db2 patches.Db2disk.h_family "family" nb_fam
+    Adef.ifam_of_int
+    [("comment", fun f -> f.Def.comment);
+     ("fsources", fun f -> f.Def.fsources);
+     ("marriage_place", fun f -> f.Def.marriage_place);
+     ("marriage_src", fun f -> f.Def.marriage_src);
+     ("origin_file", fun f -> f.Def.origin_file)]
 };
 
 value simple_output bname base carray =
@@ -111,7 +127,7 @@ value simple_output bname base carray =
                   Hashtbl.replace db2.Db2disk.patches.Db2disk.h_ascend ip a)
                list;
              Db2disk.commit_patches2 db2;
-             rebuild_fields2 base db2;
+             rebuild_fields2 db2;
            }
            else ();
          })
