@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.35 2007-02-18 19:26:34 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.36 2007-02-19 02:20:58 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -325,22 +325,17 @@ value str_pos oc_str ht item_cnt s =
     } ]
 ;
 
-value compress_type_string field_d ic oc oc_str ht = do {
+value output_value_array_string oc_str f = do {
+  let ht = Hashtbl.create 1 in
   let header_pos = Iovalue.create_output_value_header oc_str in
   Iovalue.output_block_header oc_str 0 phony_min_size;
+  assert (pos_out oc_str = Db2.first_item_pos);
   let nb_items = ref 0 in
   let istr_empty = str_pos oc_str ht nb_items "" in
   let istr_quest = str_pos oc_str ht nb_items "?" in
   assert (istr_empty = Db2.empty_string_pos);
   assert (istr_quest = Db2.quest_string_pos);
-  try
-    while True do {
-      let s : string = Iovalue.input ic in
-      let pos = str_pos oc_str ht nb_items s in
-      output_binary_int oc pos
-    }
-  with
-  [ End_of_file -> () ];
+  f (str_pos oc_str ht nb_items);
   (* padding to at least 8 items to allow correct read by input_value *)
   for i = nb_items.val + 1 to phony_min_size do {
     incr nb_items;
@@ -352,7 +347,21 @@ value compress_type_string field_d ic oc oc_str ht = do {
   Iovalue.output_block_header oc_str 0 nb_items.val;
 };
 
-value compress_type_list_string field_d ic oc oc_str ht = do {
+value compress_type_string field_d ic oc oc_str =
+  output_value_array_string oc_str
+    (fun output_string ->
+       try
+         while True do {
+           let s : string = Iovalue.input ic in
+           let pos = output_string s in
+           output_binary_int oc pos
+         }
+       with
+       [ End_of_file -> () ])
+;
+
+value compress_type_list_string field_d ic oc oc_str = do {
+  let ht = Hashtbl.create 1 in
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
   try
     let items_cnt = ref 0 in
@@ -372,7 +381,8 @@ value compress_type_list_string field_d ic oc oc_str ht = do {
   close_out oc_ext;
 };
 
-value compress_type_list_title field_d ic oc oc_str ht = do {
+value compress_type_list_title field_d ic oc oc_str = do {
+  let ht = Hashtbl.create 1 in
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
   try
     let items_cnt = ref 0 in
@@ -408,10 +418,9 @@ value compress_fields tmp_dir =
        else ();
        let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
        let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
-       let ht : Hashtbl.t string int = Hashtbl.create 1 in
        seek_in ic Db2.first_item_pos;
 
-       compress_type field_d ic oc_acc2 oc_dat2 ht;
+       compress_type field_d ic oc_acc2 oc_dat2;
 
        close_out oc_dat2;
        close_out oc_acc2;

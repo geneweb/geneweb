@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.22 2007-02-18 19:26:34 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.23 2007-02-19 02:20:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -34,6 +34,29 @@ value str_pos oc_dat ht item_cnt s =
       pos
     } ]
 ;
+
+(* copied from gwc2.ml... library function has to be added *)
+value output_value_array_string oc_str f = do {
+  let ht = Hashtbl.create 1 in
+  let header_pos = Iovalue.create_output_value_header oc_str in
+  Iovalue.output_block_header oc_str 0 phony_min_size;
+  assert (pos_out oc_str = Db2.first_item_pos);
+  let nb_items = ref 0 in
+  let istr_empty = str_pos oc_str ht nb_items "" in
+  let istr_quest = str_pos oc_str ht nb_items "?" in
+  assert (istr_empty = Db2.empty_string_pos);
+  assert (istr_quest = Db2.quest_string_pos);
+  f (str_pos oc_str ht nb_items);
+  (* padding to at least 8 items to allow correct read by input_value *)
+  for i = nb_items.val + 1 to phony_min_size do {
+    incr nb_items;
+    Iovalue.output oc_str "";
+  };
+  Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
+  Iovalue.size_64.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
+  ignore (Iovalue.patch_output_value_header oc_str header_pos : int);
+  Iovalue.output_block_header oc_str 0 nb_items.val;
+};
 
 value simple_output bname base carray =
   match carray with
@@ -81,43 +104,23 @@ value simple_output bname base carray =
                 testing the saving of "first_name" field *)
              let bdir = db2.Db2disk.bdir2 in
              let nb_per = Gwdb.nb_of_persons base in
-             let ht = Hashtbl.create 1 in
              let bdir =
                List.fold_left Filename.concat bdir ["person"; "first_name"]
              in
              let oc_dat = open_out_bin (Filename.concat bdir "1data") in
              let oc_acc = open_out_bin (Filename.concat bdir "1access") in
 
-             let header_pos = Iovalue.create_output_value_header oc_dat in
-
-             Iovalue.output_block_header oc_dat 0 phony_min_size;
-             assert (pos_out oc_dat = Db2.first_item_pos);
-             let nb_items = ref 0 in
-             let istr_empty = str_pos oc_dat ht nb_items "" in
-             let istr_quest = str_pos oc_dat ht nb_items "?" in
-             assert (istr_empty = Db2.empty_string_pos);
-             assert (istr_quest = Db2.quest_string_pos);
-             for i = 0 to nb_per - 1 do {
-               let fn =
-                 Gwdb.sou base
-                   (Gwdb.get_first_name (Gwdb.poi base (Adef.iper_of_int i)))
-               in
-               let pos = str_pos oc_dat ht nb_items fn in
-               output_binary_int oc_acc pos;
-             };
-             for i = nb_items.val + 1 to phony_min_size do {
-               incr nb_items;
-               Iovalue.output oc_dat "";
-             };
-             Iovalue.size_32.val :=
-               Iovalue.size_32.val - phony_min_size + nb_items.val;
-             Iovalue.size_64.val :=
-               Iovalue.size_32.val - phony_min_size + nb_items.val;
-
-             let _ : int =
-               Iovalue.patch_output_value_header oc_dat header_pos
-             in
-             Iovalue.output_block_header oc_dat 0 nb_items.val;
+             output_value_array_string oc_dat
+               (fun output_string ->
+                  for i = 0 to nb_per - 1 do {
+                    let fn =
+                      Gwdb.sou base
+                        (Gwdb.get_first_name
+                           (Gwdb.poi base (Adef.iper_of_int i)))
+                    in
+                    let pos = output_string fn in
+                    output_binary_int oc_acc pos;
+                  });
 
              close_out oc_acc;
              close_out oc_dat;
