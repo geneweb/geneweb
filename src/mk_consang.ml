@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.25 2007-02-19 11:15:34 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.26 2007-02-19 17:25:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -20,6 +20,56 @@ value anonfun s =
   if fname.val = "" then fname.val := s
   else raise (Arg.Bad "Cannot treat several databases")
 ;
+
+value rebuild_fields2 base db2 = do {
+  let bdir = db2.Db2disk.bdir2 in
+  let nb_per = db2.Db2disk.patches.Db2disk.nb_per in
+  List.iter
+    (fun (f1, f2, get_field) -> do {
+       if Mutil.verbose.val then do {
+         Printf.eprintf "rebuilding %s..." f2;
+         flush stderr;
+       }
+       else ();
+       let bdir =  List.fold_left Filename.concat bdir [f1; f2] in
+       let oc_dat = open_out_bin (Filename.concat bdir "1data") in
+       let oc_acc =
+         open_out_bin (Filename.concat bdir "1access")
+       in
+       Db2out.output_value_array_string oc_dat
+         (fun output_item ->
+            for i = 0 to nb_per - 1 do {
+              let fn =
+                Gwdb.sou base
+                  (get_field (Gwdb.poi base (Adef.iper_of_int i)))
+              in
+              let pos = output_item fn in
+              output_binary_int oc_acc pos;
+            });
+       close_out oc_acc;
+       close_out oc_dat;
+       if Mutil.verbose.val then do {
+         Printf.eprintf "\n";
+         flush stderr
+       }
+       else ()
+     })
+    [("person", "baptism_place", Gwdb.get_baptism_place);
+     ("person", "baptism_src", Gwdb.get_baptism_src);
+     ("person", "birth_place", Gwdb.get_birth_place);
+     ("person", "birth_src", Gwdb.get_birth_src);
+     ("person", "burial_place", Gwdb.get_burial_place);
+     ("person", "burial_src", Gwdb.get_burial_src);
+     ("person", "death_place", Gwdb.get_death_place);
+     ("person", "death_src", Gwdb.get_death_src);
+     ("person", "first_name", Gwdb.get_first_name);
+     ("person", "image", Gwdb.get_image);
+     ("person", "notes", Gwdb.get_notes);
+     ("person", "occupation", Gwdb.get_occupation);
+     ("person", "psources", Gwdb.get_psources);
+     ("person", "public_name", Gwdb.get_public_name);
+     ("person", "surname", Gwdb.get_surname)]
+};
 
 value simple_output bname base carray =
   match carray with
@@ -61,43 +111,7 @@ value simple_output bname base carray =
                   Hashtbl.replace db2.Db2disk.patches.Db2disk.h_ascend ip a)
                list;
              Db2disk.commit_patches2 db2;
-
-             (* start of implementation of saving fields...
-                this code is going to evoluate much...
-                testing the saving of "first_name" field *)
-             let bdir = db2.Db2disk.bdir2 in
-             let nb_per = Gwdb.nb_of_persons base in
-             let f1 = "person" in
-             let f2 = "first_name" in
-             if Mutil.verbose.val then do {
-               Printf.eprintf "rebuilding %s..." f2;
-               flush stderr;
-             }
-             else ();
-             let bdir = List.fold_left Filename.concat bdir [f1; f2] in
-             let oc_dat = open_out_bin (Filename.concat bdir "1data") in
-             let oc_acc = open_out_bin (Filename.concat bdir "1access") in
-
-             Db2out.output_value_array_string oc_dat
-               (fun output_item ->
-                  for i = 0 to nb_per - 1 do {
-                    let fn =
-                      Gwdb.sou base
-                        (Gwdb.get_first_name
-                           (Gwdb.poi base (Adef.iper_of_int i)))
-                    in
-                    let pos = output_item fn in
-                    output_binary_int oc_acc pos;
-                  });
-
-             close_out oc_acc;
-             close_out oc_dat;
-             if Mutil.verbose.val then do {
-               Printf.eprintf "\n";
-               flush stderr
-             }
-             else ();
-             (* end saving "first_name" field *)
+             rebuild_fields2 base db2;
            }
            else ();
          })
