@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.36 2007-02-19 02:20:58 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.37 2007-02-19 10:35:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -80,8 +80,6 @@ value check_magic =
     }
 ;
 
-value phony_min_size = 8;
-
 type hashtbl_t 'a 'b =
   { size: mutable int;
     data: mutable array (bucketlist 'a 'b) }
@@ -122,7 +120,7 @@ value open_out_field tmp_dir (name, valu) = do {
   let oc_dat = open_out_bin (Filename.concat d "data") in
   let oc_acc = open_out_bin (Filename.concat d "access") in
   let start_pos = Iovalue.create_output_value_header oc_dat in
-  Iovalue.output_block_header oc_dat 0 phony_min_size;
+  Iovalue.output_block_header oc_dat 0 Db2out.phony_min_size;
   assert (pos_out oc_dat = Db2.first_item_pos);
   {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
    sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
@@ -141,8 +139,8 @@ value output_field so ff = do {
 
 value close_out_field ff = do {
   close_out ff.oc_acc;
-  Iovalue.size_32.val := ff.sz32 - phony_min_size + ff.item_cnt;
-  Iovalue.size_64.val := ff.sz64 - phony_min_size + ff.item_cnt;
+  Iovalue.size_32.val := ff.sz32 - Db2out.phony_min_size + ff.item_cnt;
+  Iovalue.size_64.val := ff.sz64 - Db2out.phony_min_size + ff.item_cnt;
   ignore (Iovalue.patch_output_value_header ff.oc_dat ff.start_pos : int);
   Iovalue.output_block_header ff.oc_dat 0 ff.item_cnt;
   close_out ff.oc_dat;
@@ -314,41 +312,8 @@ value read_title_list_field (ic_acc, ic_dat, ic_str) i = do {
   }
 };
 
-value str_pos oc_str ht item_cnt s =
-  try Hashtbl.find ht s with
-  [ Not_found -> do {
-      incr item_cnt;
-      let pos = pos_out oc_str in
-      Iovalue.output oc_str s;
-      Hashtbl.add ht s pos;
-      pos
-    } ]
-;
-
-value output_value_array_string oc_str f = do {
-  let ht = Hashtbl.create 1 in
-  let header_pos = Iovalue.create_output_value_header oc_str in
-  Iovalue.output_block_header oc_str 0 phony_min_size;
-  assert (pos_out oc_str = Db2.first_item_pos);
-  let nb_items = ref 0 in
-  let istr_empty = str_pos oc_str ht nb_items "" in
-  let istr_quest = str_pos oc_str ht nb_items "?" in
-  assert (istr_empty = Db2.empty_string_pos);
-  assert (istr_quest = Db2.quest_string_pos);
-  f (str_pos oc_str ht nb_items);
-  (* padding to at least 8 items to allow correct read by input_value *)
-  for i = nb_items.val + 1 to phony_min_size do {
-    incr nb_items;
-    Iovalue.output oc_str "";
-  };
-  Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
-  Iovalue.size_64.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
-  ignore (Iovalue.patch_output_value_header oc_str header_pos : int);
-  Iovalue.output_block_header oc_str 0 nb_items.val;
-};
-
 value compress_type_string field_d ic oc oc_str =
-  output_value_array_string oc_str
+  Db2out.output_value_array_string oc_str
     (fun output_string ->
        try
          while True do {
@@ -370,7 +335,7 @@ value compress_type_list_string field_d ic oc oc_str = do {
       match sl with
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
-          let sl = List.map (str_pos oc_str ht items_cnt) sl in
+          let sl = List.map (Db2out.str_pos oc_str ht items_cnt) sl in
           Iovalue.output oc_ext (sl : list int)
         }
       | [] ->
@@ -392,7 +357,8 @@ value compress_type_list_title field_d ic oc oc_str = do {
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
           let tl =
-            List.map (map_title_strings (str_pos oc_str ht items_cnt)) tl
+            List.map (map_title_strings (Db2out.str_pos oc_str ht items_cnt))
+              tl
           in
           Iovalue.output oc_ext (tl : list (gen_title int))
         }
@@ -494,7 +460,7 @@ value reorder_fields tmp_dir =
          let oc_dat = open_out_bin (Filename.concat field_d "data2") in
          let oc_acc = open_out_bin (Filename.concat field_d "access2") in
          let start_pos = Iovalue.create_output_value_header oc_dat in
-         Iovalue.output_block_header oc_dat 0 phony_min_size;
+         Iovalue.output_block_header oc_dat 0 Db2out.phony_min_size;
          assert (pos_out oc_dat = Db2.first_item_pos);
          {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
           sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
