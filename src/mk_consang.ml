@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.24 2007-02-19 10:35:57 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.25 2007-02-19 11:15:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -67,26 +67,36 @@ value simple_output bname base carray =
                 testing the saving of "first_name" field *)
              let bdir = db2.Db2disk.bdir2 in
              let nb_per = Gwdb.nb_of_persons base in
-             let bdir =
-               List.fold_left Filename.concat bdir ["person"; "first_name"]
-             in
+             let f1 = "person" in
+             let f2 = "first_name" in
+             if Mutil.verbose.val then do {
+               Printf.eprintf "rebuilding %s..." f2;
+               flush stderr;
+             }
+             else ();
+             let bdir = List.fold_left Filename.concat bdir [f1; f2] in
              let oc_dat = open_out_bin (Filename.concat bdir "1data") in
              let oc_acc = open_out_bin (Filename.concat bdir "1access") in
 
              Db2out.output_value_array_string oc_dat
-               (fun output_string ->
+               (fun output_item ->
                   for i = 0 to nb_per - 1 do {
                     let fn =
                       Gwdb.sou base
                         (Gwdb.get_first_name
                            (Gwdb.poi base (Adef.iper_of_int i)))
                     in
-                    let pos = output_string fn in
+                    let pos = output_item fn in
                     output_binary_int oc_acc pos;
                   });
 
              close_out oc_acc;
              close_out oc_dat;
+             if Mutil.verbose.val then do {
+               Printf.eprintf "\n";
+               flush stderr
+             }
+             else ();
              (* end saving "first_name" field *)
            }
            else ();
