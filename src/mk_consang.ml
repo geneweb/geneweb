@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.28 2007-02-20 00:40:05 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.29 2007-02-20 02:54:53 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -21,46 +21,65 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 ;
 
-value rebuild_string_fields db2 patches_ht f1 nb item_of_int list =
-  let bdir = Filename.concat db2.Db2disk.bdir2 f1 in
-  List.iter
-    (fun (f2, get_field) -> do {
-       if Mutil.verbose.val then do {
-         Printf.eprintf "rebuilding %s..." f2;
-         flush stderr;
-       }
-       else ();
-       let bdir = Filename.concat bdir f2 in
-       let oc_dat = open_out_bin (Filename.concat bdir "1data") in
-       let oc_acc = open_out_bin (Filename.concat bdir "1access") in
-       Db2out.output_value_array_string oc_dat
-         (fun output_item ->
-            for i = 0 to nb - 1 do {
-              let fn =
-                try get_field (Hashtbl.find patches_ht (item_of_int i)) with
-                [ Not_found ->
-                    Db2disk.string_of_istr2 db2 (f1, f2)
-                      (Db2disk.get_field_acc db2 i (f1, f2)) ]
-              in
-              let pos = output_item fn in
-              output_binary_int oc_acc pos;
-            });
-       close_out oc_acc;
-       close_out oc_dat;
-       if Mutil.verbose.val then do {
-         Printf.eprintf "\n";
-         flush stderr
-       }
-       else ()
+value rebuild_field_array db2 pad f1 f2 f = do {
+  if Mutil.verbose.val then do {
+    Printf.eprintf "rebuilding %s..." f2;
+    flush stderr;
+  }
+  else ();
+  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f1; f2] in
+  let oc_dat = open_out_bin (Filename.concat bdir "1data") in
+  let oc_acc = open_out_bin (Filename.concat bdir "1access") in
+  Db2out.output_value_array oc_dat pad (f oc_acc);
+  close_out oc_acc;
+  close_out oc_dat;
+  if Mutil.verbose.val then do {
+    Printf.eprintf "\n";
+    flush stderr
+  }
+  else ()
+};
+
+value rebuild_any_field_array db2 ht nb item_of_int f1 (f2, get) =
+  rebuild_field_array db2 0 f1 f2
+    (fun oc_acc output_item ->
+       for i = 0 to nb - 1 do {
+         let x =
+           try get (Hashtbl.find ht (item_of_int i)) with
+           [ Not_found ->
+               let pos = Db2disk.get_field_acc db2 i (f1, f2) in
+               Db2disk.get_field_data db2 pos (f1, f2) "data" ]
+         in
+         let pos = output_item x in
+         output_binary_int oc_acc pos;
+       })
+;
+
+value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) =
+  rebuild_field_array db2 "" f1 f2
+    (fun oc_acc output_item -> do {
+       let istr_empty = output_item "" in
+       let istr_quest = output_item "?" in
+       assert (istr_empty = Db2.empty_string_pos);
+       assert (istr_quest = Db2.quest_string_pos);
+       for i = 0 to nb - 1 do {
+         let s =
+           try get (Hashtbl.find ht (item_of_int i)) with
+           [ Not_found ->
+               let pos = Db2disk.get_field_acc db2 i (f1, f2) in
+               Db2disk.string_of_istr2 db2 (f1, f2) pos ]
+         in
+         let pos = output_item s in
+         output_binary_int oc_acc pos;
+       };
      })
-    list
 ;
 
 value rebuild_fields2 db2 = do {
   let patches = db2.Db2disk.patches in
   let nb_per = patches.Db2disk.nb_per in
-  rebuild_string_fields db2 patches.Db2disk.h_person "person" nb_per
-    Adef.iper_of_int
+  let ht_per = patches.Db2disk.h_person in
+  List.iter (rebuild_string_field db2 ht_per nb_per Adef.iper_of_int "person")
     [("baptism_place", fun p -> p.Def.baptism_place);
      ("baptism_src", fun p -> p.Def.baptism_src);
      ("birth_place", fun p -> p.Def.birth_place);
@@ -76,9 +95,11 @@ value rebuild_fields2 db2 = do {
      ("psources", fun p -> p.Def.psources);
      ("public_name", fun p -> p.Def.public_name);
      ("surname", fun p -> p.Def.surname)];
+  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
+    ("occ", fun f -> f.Def.occ);
   let nb_fam = patches.Db2disk.nb_fam in
-  rebuild_string_fields db2 patches.Db2disk.h_family "family" nb_fam
-    Adef.ifam_of_int
+  let ht_fam = patches.Db2disk.h_family in
+  List.iter (rebuild_string_field db2 ht_fam nb_fam Adef.ifam_of_int "family")
     [("comment", fun f -> f.Def.comment);
      ("fsources", fun f -> f.Def.fsources);
      ("marriage_place", fun f -> f.Def.marriage_place);
