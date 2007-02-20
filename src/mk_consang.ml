@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.29 2007-02-20 02:54:53 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.30 2007-02-20 09:50:18 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -40,9 +40,11 @@ value rebuild_field_array db2 pad f1 f2 f = do {
   else ()
 };
 
-value rebuild_any_field_array db2 ht nb item_of_int f1 (f2, get) =
-  rebuild_field_array db2 0 f1 f2
-    (fun oc_acc output_item ->
+value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) =
+  rebuild_field_array db2 pad f1 f2
+    (fun oc_acc output_item -> do {
+       (* put pad as 1st elem; not necessary, just for beauty *)
+       ignore (output_item pad : int);
        for i = 0 to nb - 1 do {
          let x =
            try get (Hashtbl.find ht (item_of_int i)) with
@@ -52,7 +54,8 @@ value rebuild_any_field_array db2 ht nb item_of_int f1 (f2, get) =
          in
          let pos = output_item x in
          output_binary_int oc_acc pos;
-       })
+       }
+     })
 ;
 
 value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) =
@@ -95,7 +98,7 @@ value rebuild_fields2 db2 = do {
      ("psources", fun p -> p.Def.psources);
      ("public_name", fun p -> p.Def.public_name);
      ("surname", fun p -> p.Def.surname)];
-  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
+  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person" 0
     ("occ", fun f -> f.Def.occ);
   let nb_fam = patches.Db2disk.nb_fam in
   let ht_fam = patches.Db2disk.h_family in
