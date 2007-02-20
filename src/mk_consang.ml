@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.30 2007-02-20 09:50:18 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.31 2007-02-20 10:24:40 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -83,31 +83,43 @@ value rebuild_fields2 db2 = do {
   let nb_per = patches.Db2disk.nb_per in
   let ht_per = patches.Db2disk.h_person in
   List.iter (rebuild_string_field db2 ht_per nb_per Adef.iper_of_int "person")
-    [("baptism_place", fun p -> p.Def.baptism_place);
-     ("baptism_src", fun p -> p.Def.baptism_src);
+    [("first_name", fun p -> p.Def.first_name);
+     ("surname", fun p -> p.Def.surname);
+     ("image", fun p -> p.Def.image);
+     ("public_name", fun p -> p.Def.public_name);
+     ("occupation", fun p -> p.Def.occupation);
      ("birth_place", fun p -> p.Def.birth_place);
      ("birth_src", fun p -> p.Def.birth_src);
-     ("burial_place", fun p -> p.Def.burial_place);
-     ("burial_src", fun p -> p.Def.burial_src);
+     ("baptism_place", fun p -> p.Def.baptism_place);
+     ("baptism_src", fun p -> p.Def.baptism_src);
      ("death_place", fun p -> p.Def.death_place);
      ("death_src", fun p -> p.Def.death_src);
-     ("first_name", fun p -> p.Def.first_name);
-     ("image", fun p -> p.Def.image);
+     ("burial_place", fun p -> p.Def.burial_place);
+     ("burial_src", fun p -> p.Def.burial_src);
      ("notes", fun p -> p.Def.notes);
-     ("occupation", fun p -> p.Def.occupation);
-     ("psources", fun p -> p.Def.psources);
-     ("public_name", fun p -> p.Def.public_name);
-     ("surname", fun p -> p.Def.surname)];
+     ("psources", fun p -> p.Def.psources)];
   rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person" 0
-    ("occ", fun f -> f.Def.occ);
+    ("occ", fun p -> p.Def.occ);
+  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
+    Def.Neuter ("sex", fun p -> p.Def.sex);
+  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
+    Def.IfTitles ("access", fun p -> p.Def.access);
+  List.iter
+    (rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
+     Adef.codate_None)
+    [("birth", fun p -> p.Def.birth);
+     ("baptism", fun p -> p.Def.baptism)];
+
   let nb_fam = patches.Db2disk.nb_fam in
   let ht_fam = patches.Db2disk.h_family in
   List.iter (rebuild_string_field db2 ht_fam nb_fam Adef.ifam_of_int "family")
-    [("comment", fun f -> f.Def.comment);
-     ("fsources", fun f -> f.Def.fsources);
-     ("marriage_place", fun f -> f.Def.marriage_place);
+    [("marriage_place", fun f -> f.Def.marriage_place);
      ("marriage_src", fun f -> f.Def.marriage_src);
-     ("origin_file", fun f -> f.Def.origin_file)]
+     ("comment", fun f -> f.Def.comment);
+     ("origin_file", fun f -> f.Def.origin_file);
+     ("fsources", fun f -> f.Def.fsources)];
+  rebuild_any_field_array db2 ht_fam nb_fam Adef.ifam_of_int "family"
+    Adef.codate_None ("marriage", fun f -> f.Def.marriage);
 };
 
 value simple_output bname base carray =
