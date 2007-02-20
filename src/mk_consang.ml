@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.32 2007-02-20 13:42:20 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.33 2007-02-20 19:30:25 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -21,24 +21,17 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 ;
 
-value rebuild_field_array db2 pad f1 f2 f = do {
+value rebuild_field_array db2 pad bdir f = do {
   if Mutil.verbose.val then do {
-    Printf.eprintf "rebuilding %s..." f2;
+    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f1; f2] in
-  let oc_dat = open_out_bin (Filename.concat bdir "1data") in
-  let oc_acc = open_out_bin (Filename.concat bdir "1access") in
+  let oc_dat = open_out_bin (Filename.concat bdir "data") in
+  let oc_acc = open_out_bin (Filename.concat bdir "access") in
   Db2out.output_value_array oc_dat pad (f oc_acc);
   close_out oc_acc;
   close_out oc_dat;
-(*
-  Sys.remove (Filename.concat bdir "access");
-  Sys.remove (Filename.concat bdir "data");
-  Sys.rename (Filename.concat bdir "1access") (Filename.concat bdir "access");
-  Sys.rename (Filename.concat bdir "1data") (Filename.concat bdir "data");
-*)
   if Mutil.verbose.val then do {
     Printf.eprintf "\n";
     flush stderr
@@ -46,8 +39,11 @@ value rebuild_field_array db2 pad f1 f2 f = do {
   else ()
 };
 
-value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) =
-  rebuild_field_array db2 pad f1 f2
+value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) = do {
+  let f3 = "1" ^ f1 in
+  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  Mutil.mkdir_p bdir;
+  rebuild_field_array db2 pad bdir
     (fun oc_acc output_item -> do {
        (* put pad as 1st elem; not necessary, just for beauty *)
        ignore (output_item pad : int);
@@ -62,10 +58,13 @@ value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) =
          output_binary_int oc_acc pos;
        }
      })
-;
+};
 
-value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) =
-  rebuild_field_array db2 "" f1 f2
+value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) = do {
+  let f3 = "1" ^ f1 in
+  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  Mutil.mkdir_p bdir;
+  rebuild_field_array db2 "" bdir
     (fun oc_acc output_item -> do {
        let istr_empty = output_item "" in
        let istr_quest = output_item "?" in
@@ -82,12 +81,37 @@ value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) =
          output_binary_int oc_acc pos;
        };
      })
-;
+};
 
-value rebuild_list_string_field_array  db2 ht nb item_of_int f1 (f2, get) =
-do {
-  Printf.eprintf "rebuild_list_string_field not implemented\n";
-  flush stderr;
+value rebuild_list_string_field_arr db2 ht nb item_of_int f1 (f2, get) = do {
+  let f3 = "1" ^ f1 in
+  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  Mutil.mkdir_p bdir;
+  let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
+  rebuild_field_array db2 "" bdir
+    (fun oc_acc output_item ->
+       for i = 0 to nb - 1 do {
+         let sl =
+           try get (Hashtbl.find ht (item_of_int i)) with
+           [ Not_found ->
+               let list =
+                 let pos = Db2disk.get_field_acc db2 i (f1, f2) in
+                 if pos = -1 then []
+                 else Db2disk.get_field_data db2 pos (f1, f2) "data2.ext"
+               in
+               List.map (Db2disk.string_of_istr2 db2 (f1, f2)) list ]
+         in
+         let pl = List.map output_item sl in
+         if pl = [] then output_binary_int oc_acc (-1)
+         else do {
+           output_binary_int oc_acc (pos_out oc_ext);
+           let (s32, s64) = (Iovalue.size_32.val, Iovalue.size_64.val) in
+           Iovalue.output oc_ext (pl : list int);
+           Iovalue.size_32.val := s32;
+           Iovalue.size_64.val := s64;
+         }
+       });
+  close_out oc_ext;
 };
 
 value rebuild_fields2 db2 = do {
@@ -114,7 +138,7 @@ value rebuild_fields2 db2 = do {
   rebuild_any_field_array db2 ht_per nb_per per_int "person" 0
     ("occ", fun p -> p.Def.occ);
   List.iter
-    (rebuild_list_string_field_array db2 ht_per nb_per per_int "person")
+    (rebuild_list_string_field_arr db2 ht_per nb_per per_int "person")
     [("qualifiers", fun p -> p.Def.qualifiers)];
   rebuild_any_field_array db2 ht_per nb_per per_int "person" Def.Neuter
     ("sex", fun p -> p.Def.sex);
