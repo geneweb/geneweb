@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.31 2007-02-20 10:24:40 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.32 2007-02-20 13:42:20 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -33,6 +33,12 @@ value rebuild_field_array db2 pad f1 f2 f = do {
   Db2out.output_value_array oc_dat pad (f oc_acc);
   close_out oc_acc;
   close_out oc_dat;
+(*
+  Sys.remove (Filename.concat bdir "access");
+  Sys.remove (Filename.concat bdir "data");
+  Sys.rename (Filename.concat bdir "1access") (Filename.concat bdir "access");
+  Sys.rename (Filename.concat bdir "1data") (Filename.concat bdir "data");
+*)
   if Mutil.verbose.val then do {
     Printf.eprintf "\n";
     flush stderr
@@ -78,11 +84,18 @@ value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) =
      })
 ;
 
+value rebuild_list_string_field_array  db2 ht nb item_of_int f1 (f2, get) =
+do {
+  Printf.eprintf "rebuild_list_string_field not implemented\n";
+  flush stderr;
+};
+
 value rebuild_fields2 db2 = do {
   let patches = db2.Db2disk.patches in
   let nb_per = patches.Db2disk.nb_per in
   let ht_per = patches.Db2disk.h_person in
-  List.iter (rebuild_string_field db2 ht_per nb_per Adef.iper_of_int "person")
+  let per_int = Adef.iper_of_int in
+  List.iter (rebuild_string_field db2 ht_per nb_per per_int "person")
     [("first_name", fun p -> p.Def.first_name);
      ("surname", fun p -> p.Def.surname);
      ("image", fun p -> p.Def.image);
@@ -98,28 +111,32 @@ value rebuild_fields2 db2 = do {
      ("burial_src", fun p -> p.Def.burial_src);
      ("notes", fun p -> p.Def.notes);
      ("psources", fun p -> p.Def.psources)];
-  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person" 0
+  rebuild_any_field_array db2 ht_per nb_per per_int "person" 0
     ("occ", fun p -> p.Def.occ);
-  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
-    Def.Neuter ("sex", fun p -> p.Def.sex);
-  rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
-    Def.IfTitles ("access", fun p -> p.Def.access);
   List.iter
-    (rebuild_any_field_array db2 ht_per nb_per Adef.iper_of_int "person"
+    (rebuild_list_string_field_array db2 ht_per nb_per per_int "person")
+    [("qualifiers", fun p -> p.Def.qualifiers)];
+  rebuild_any_field_array db2 ht_per nb_per per_int "person" Def.Neuter
+    ("sex", fun p -> p.Def.sex);
+  rebuild_any_field_array db2 ht_per nb_per per_int "person" Def.IfTitles
+    ("access", fun p -> p.Def.access);
+  List.iter
+    (rebuild_any_field_array db2 ht_per nb_per per_int "person"
      Adef.codate_None)
     [("birth", fun p -> p.Def.birth);
      ("baptism", fun p -> p.Def.baptism)];
 
   let nb_fam = patches.Db2disk.nb_fam in
   let ht_fam = patches.Db2disk.h_family in
-  List.iter (rebuild_string_field db2 ht_fam nb_fam Adef.ifam_of_int "family")
+  let fam_int = Adef.ifam_of_int in
+  List.iter (rebuild_string_field db2 ht_fam nb_fam fam_int "family")
     [("marriage_place", fun f -> f.Def.marriage_place);
      ("marriage_src", fun f -> f.Def.marriage_src);
      ("comment", fun f -> f.Def.comment);
      ("origin_file", fun f -> f.Def.origin_file);
      ("fsources", fun f -> f.Def.fsources)];
-  rebuild_any_field_array db2 ht_fam nb_fam Adef.ifam_of_int "family"
-    Adef.codate_None ("marriage", fun f -> f.Def.marriage);
+  rebuild_any_field_array db2 ht_fam nb_fam fam_int "family" Adef.codate_None
+    ("marriage", fun f -> f.Def.marriage);
 };
 
 value simple_output bname base carray =
