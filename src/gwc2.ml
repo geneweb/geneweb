@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.37 2007-02-19 10:35:57 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.38 2007-02-20 02:54:53 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -313,16 +313,21 @@ value read_title_list_field (ic_acc, ic_dat, ic_str) i = do {
 };
 
 value compress_type_string field_d ic oc oc_str =
-  Db2out.output_value_array_string oc_str
-    (fun output_string ->
+  Db2out.output_value_array oc_str ""
+    (fun output_item -> do {
+       let istr_empty = output_item "" in
+       let istr_quest = output_item "?" in
+       assert (istr_empty = Db2.empty_string_pos);
+       assert (istr_quest = Db2.quest_string_pos);
        try
          while True do {
            let s : string = Iovalue.input ic in
-           let pos = output_string s in
+           let pos = output_item s in
            output_binary_int oc pos
          }
        with
-       [ End_of_file -> () ])
+       [ End_of_file -> () ]
+     })
 ;
 
 value compress_type_list_string field_d ic oc oc_str = do {
@@ -335,7 +340,9 @@ value compress_type_list_string field_d ic oc oc_str = do {
       match sl with
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
-          let sl = List.map (Db2out.str_pos oc_str ht items_cnt) sl in
+          let sl =
+            List.map (Db2out.output_item_and_its_pos oc_str ht items_cnt) sl
+          in
           Iovalue.output oc_ext (sl : list int)
         }
       | [] ->
@@ -357,7 +364,9 @@ value compress_type_list_title field_d ic oc oc_str = do {
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
           let tl =
-            List.map (map_title_strings (Db2out.str_pos oc_str ht items_cnt))
+            List.map
+              (map_title_strings
+                 (Db2out.output_item_and_its_pos oc_str ht items_cnt))
               tl
           in
           Iovalue.output oc_ext (tl : list (gen_title int))
