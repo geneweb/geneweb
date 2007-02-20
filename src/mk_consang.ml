@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.27 2007-02-19 19:25:59 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.28 2007-02-20 00:40:05 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -22,27 +22,26 @@ value anonfun s =
 ;
 
 value rebuild_string_fields db2 patches_ht f1 nb item_of_int list =
-  let bdir = db2.Db2disk.bdir2 in
+  let bdir = Filename.concat db2.Db2disk.bdir2 f1 in
   List.iter
     (fun (f2, get_field) -> do {
-       let get_field item =
-         try get_field (Hashtbl.find patches_ht (item_of_int item)) with
-         [ Not_found ->
-             Db2disk.string_of_istr2 db2 (f1, f2)
-               (Db2disk.get_field_acc db2 item (f1, f2)) ]
-       in
        if Mutil.verbose.val then do {
          Printf.eprintf "rebuilding %s..." f2;
          flush stderr;
        }
        else ();
-       let bdir =  List.fold_left Filename.concat bdir [f1; f2] in
+       let bdir = Filename.concat bdir f2 in
        let oc_dat = open_out_bin (Filename.concat bdir "1data") in
        let oc_acc = open_out_bin (Filename.concat bdir "1access") in
        Db2out.output_value_array_string oc_dat
          (fun output_item ->
             for i = 0 to nb - 1 do {
-              let fn = get_field i in
+              let fn =
+                try get_field (Hashtbl.find patches_ht (item_of_int i)) with
+                [ Not_found ->
+                    Db2disk.string_of_istr2 db2 (f1, f2)
+                      (Db2disk.get_field_acc db2 i (f1, f2)) ]
+              in
               let pos = output_item fn in
               output_binary_int oc_acc pos;
             });
