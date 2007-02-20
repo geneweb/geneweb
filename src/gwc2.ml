@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.38 2007-02-20 02:54:53 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.39 2007-02-20 19:30:25 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -341,7 +341,7 @@ value compress_type_list_string field_d ic oc oc_str = do {
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
           let sl =
-            List.map (Db2out.output_item_and_its_pos oc_str ht items_cnt) sl
+            List.map (Db2out.output_item_return_pos oc_str ht items_cnt) sl
           in
           Iovalue.output oc_ext (sl : list int)
         }
@@ -366,7 +366,7 @@ value compress_type_list_title field_d ic oc oc_str = do {
           let tl =
             List.map
               (map_title_strings
-                 (Db2out.output_item_and_its_pos oc_str ht items_cnt))
+                 (Db2out.output_item_return_pos oc_str ht items_cnt))
               tl
           in
           Iovalue.output oc_ext (tl : list (gen_title int))
