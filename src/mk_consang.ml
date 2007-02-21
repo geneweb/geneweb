@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.33 2007-02-20 19:30:25 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.34 2007-02-21 03:33:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -39,7 +39,15 @@ value rebuild_field_array db2 pad bdir f = do {
   else ()
 };
 
-value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) = do {
+type field_info 'index 'item =
+  { fi_nb : int;
+    fi_ht : Hashtbl.t 'index 'item;
+    fi_index_of_int : int -> 'index;
+    fi_dir : string }
+;
+
+value rebuild_any_field_array db2 fi pad (f2, get) = do {
+  let f1 = fi.fi_dir in
   let f3 = "1" ^ f1 in
   let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
   Mutil.mkdir_p bdir;
@@ -47,9 +55,9 @@ value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) = do {
     (fun oc_acc output_item -> do {
        (* put pad as 1st elem; not necessary, just for beauty *)
        ignore (output_item pad : int);
-       for i = 0 to nb - 1 do {
+       for i = 0 to fi.fi_nb - 1 do {
          let x =
-           try get (Hashtbl.find ht (item_of_int i)) with
+           try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
            [ Not_found ->
                let pos = Db2disk.get_field_acc db2 i (f1, f2) in
                Db2disk.get_field_data db2 pos (f1, f2) "data" ]
@@ -60,7 +68,8 @@ value rebuild_any_field_array db2 ht nb item_of_int f1 pad (f2, get) = do {
      })
 };
 
-value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) = do {
+value rebuild_string_field db2 fi (f2, get) = do {
+  let f1 = fi.fi_dir in
   let f3 = "1" ^ f1 in
   let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
   Mutil.mkdir_p bdir;
@@ -70,9 +79,9 @@ value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) = do {
        let istr_quest = output_item "?" in
        assert (istr_empty = Db2.empty_string_pos);
        assert (istr_quest = Db2.quest_string_pos);
-       for i = 0 to nb - 1 do {
+       for i = 0 to fi.fi_nb - 1 do {
          let s =
-           try get (Hashtbl.find ht (item_of_int i)) with
+           try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
            [ Not_found ->
                let pos = Db2disk.get_field_acc db2 i (f1, f2) in
                Db2disk.string_of_istr2 db2 (f1, f2) pos ]
@@ -83,30 +92,31 @@ value rebuild_string_field db2 ht nb item_of_int f1 (f2, get) = do {
      })
 };
 
-value rebuild_list_string_field_arr db2 ht nb item_of_int f1 (f2, get) = do {
+value rebuild_list_field_array g h db2 fi (f2, get) = do {
+  let f1 = fi.fi_dir in
   let f3 = "1" ^ f1 in
   let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
   Mutil.mkdir_p bdir;
   let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
   rebuild_field_array db2 "" bdir
     (fun oc_acc output_item ->
-       for i = 0 to nb - 1 do {
+       for i = 0 to fi.fi_nb - 1 do {
          let sl =
-           try get (Hashtbl.find ht (item_of_int i)) with
+           try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
            [ Not_found ->
-               let list =
+               let list : list 'a =
                  let pos = Db2disk.get_field_acc db2 i (f1, f2) in
                  if pos = -1 then []
                  else Db2disk.get_field_data db2 pos (f1, f2) "data2.ext"
                in
-               List.map (Db2disk.string_of_istr2 db2 (f1, f2)) list ]
+               List.map (g (Db2disk.string_of_istr2 db2 (f1, f2))) list ]
          in
-         let pl = List.map output_item sl in
+         let pl = List.map (h output_item) sl in
          if pl = [] then output_binary_int oc_acc (-1)
          else do {
            output_binary_int oc_acc (pos_out oc_ext);
            let (s32, s64) = (Iovalue.size_32.val, Iovalue.size_64.val) in
-           Iovalue.output oc_ext (pl : list int);
+           Iovalue.output oc_ext (pl : list 'a);
            Iovalue.size_32.val := s32;
            Iovalue.size_64.val := s64;
          }
@@ -115,11 +125,12 @@ value rebuild_list_string_field_arr db2 ht nb item_of_int f1 (f2, get) = do {
 };
 
 value rebuild_fields2 db2 = do {
-  let patches = db2.Db2disk.patches in
-  let nb_per = patches.Db2disk.nb_per in
-  let ht_per = patches.Db2disk.h_person in
-  let per_int = Adef.iper_of_int in
-  List.iter (rebuild_string_field db2 ht_per nb_per per_int "person")
+  let fi_per =
+    {fi_nb = db2.Db2disk.patches.Db2disk.nb_per;
+     fi_ht = db2.Db2disk.patches.Db2disk.h_person;
+     fi_index_of_int = Adef.iper_of_int; fi_dir = "person"}
+  in
+  List.iter (rebuild_string_field db2 fi_per)
     [("first_name", fun p -> p.Def.first_name);
      ("surname", fun p -> p.Def.surname);
      ("image", fun p -> p.Def.image);
@@ -135,31 +146,35 @@ value rebuild_fields2 db2 = do {
      ("burial_src", fun p -> p.Def.burial_src);
      ("notes", fun p -> p.Def.notes);
      ("psources", fun p -> p.Def.psources)];
-  rebuild_any_field_array db2 ht_per nb_per per_int "person" 0
+  rebuild_any_field_array db2 fi_per 0
     ("occ", fun p -> p.Def.occ);
-  List.iter
-    (rebuild_list_string_field_arr db2 ht_per nb_per per_int "person")
-    [("qualifiers", fun p -> p.Def.qualifiers)];
-  rebuild_any_field_array db2 ht_per nb_per per_int "person" Def.Neuter
+  List.iter (rebuild_list_field_array (fun f -> f) (fun f -> f) db2 fi_per)
+    [("qualifiers", fun p -> p.Def.qualifiers);
+     ("aliases", fun p -> p.Def.aliases);
+     ("first_names_aliases", fun p -> p.Def.first_names_aliases);
+     ("surnames_aliases", fun p -> p.Def.surnames_aliases)];
+  rebuild_list_field_array Futil.map_title_strings Futil.map_title_strings
+    db2 fi_per
+    ("titles", fun p -> p.Def.titles);
+  rebuild_any_field_array db2 fi_per Def.Neuter
     ("sex", fun p -> p.Def.sex);
-  rebuild_any_field_array db2 ht_per nb_per per_int "person" Def.IfTitles
+  rebuild_any_field_array db2 fi_per Def.IfTitles
     ("access", fun p -> p.Def.access);
-  List.iter
-    (rebuild_any_field_array db2 ht_per nb_per per_int "person"
-     Adef.codate_None)
+  List.iter (rebuild_any_field_array db2 fi_per Adef.codate_None)
     [("birth", fun p -> p.Def.birth);
      ("baptism", fun p -> p.Def.baptism)];
-
-  let nb_fam = patches.Db2disk.nb_fam in
-  let ht_fam = patches.Db2disk.h_family in
-  let fam_int = Adef.ifam_of_int in
-  List.iter (rebuild_string_field db2 ht_fam nb_fam fam_int "family")
+  let fi_fam =
+    {fi_nb = db2.Db2disk.patches.Db2disk.nb_fam;
+     fi_ht = db2.Db2disk.patches.Db2disk.h_family;
+     fi_index_of_int = Adef.ifam_of_int; fi_dir = "family"}
+  in
+  List.iter (rebuild_string_field db2 fi_fam)
     [("marriage_place", fun f -> f.Def.marriage_place);
      ("marriage_src", fun f -> f.Def.marriage_src);
      ("comment", fun f -> f.Def.comment);
      ("origin_file", fun f -> f.Def.origin_file);
      ("fsources", fun f -> f.Def.fsources)];
-  rebuild_any_field_array db2 ht_fam nb_fam fam_int "family" Adef.codate_None
+  rebuild_any_field_array db2 fi_fam Adef.codate_None
     ("marriage", fun f -> f.Def.marriage);
 };
 
