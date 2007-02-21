@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.34 2007-02-21 03:33:04 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.35 2007-02-21 10:25:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -99,7 +99,11 @@ value rebuild_list_field_array g h db2 fi (f2, get) = do {
   Mutil.mkdir_p bdir;
   let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
   rebuild_field_array db2 "" bdir
-    (fun oc_acc output_item ->
+    (fun oc_acc output_item -> do {
+       let istr_empty = output_item "" in
+       let istr_quest = output_item "?" in
+       assert (istr_empty = Db2.empty_string_pos);
+       assert (istr_quest = Db2.quest_string_pos);
        for i = 0 to fi.fi_nb - 1 do {
          let sl =
            try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
@@ -120,7 +124,8 @@ value rebuild_list_field_array g h db2 fi (f2, get) = do {
            Iovalue.size_32.val := s32;
            Iovalue.size_64.val := s64;
          }
-       });
+       }
+     });
   close_out oc_ext;
 };
 
