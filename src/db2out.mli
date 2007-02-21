@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: db2out.mli,v 5.4 2007-02-21 19:40:40 ddr Exp $ *)
+(* $Id: db2out.mli,v 5.5 2007-02-21 20:44:04 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size : int;
@@ -14,3 +14,4 @@ value output_hashtbl : string -> string -> Hashtbl.t _ _ -> unit;
 value make_string_of_crush_index : string -> unit;
 value make_person_of_string_index : string -> unit;
 value make_name_index : string -> int -> unit;
+value make_index : string -> list string -> string -> unit;
