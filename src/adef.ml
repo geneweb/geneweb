@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 5.5 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: adef.ml,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type iper = int;
@@ -10,6 +10,8 @@ value float_of_fix x = float x /. 1000000.0;
 value fix_of_float x = truncate (x *. 1000000.0 +. 0.5);
 external fix : int -> fix = "%identity";
 external fix_repr : fix -> int = "%identity";
+
+value no_consang = fix (-1);
 
 external int_of_iper : iper -> int = "%identity";
 external iper_of_int : int -> iper = "%identity";

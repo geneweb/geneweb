@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.7 2007-02-21 10:40:10 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.8 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -372,8 +372,6 @@ value parents_array2 db2 nb_ini nb = do {
   arr
 };
 
-value no_consang = Adef.fix (-1);
-
 value consang_array2 db2 nb = do {
   let arr =
     let cg_fname =
@@ -384,10 +382,11 @@ value consang_array2 db2 nb = do {
         let tab = input_value ic in
         close_in ic;
         if nb > Array.length tab then
-          Array.append tab (Array.make (nb - Array.length tab) no_consang)
+          Array.append tab
+            (Array.make (nb - Array.length tab) Adef.no_consang)
         else tab
       }
-    | None -> Array.make nb no_consang ]
+    | None -> Array.make nb Adef.no_consang ]
   in
   Hashtbl.iter (fun i a -> arr.(Adef.int_of_iper i) := a.consang)
     db2.patches.h_ascend;

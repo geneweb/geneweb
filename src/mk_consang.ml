@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.37 2007-02-21 14:37:06 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.38 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -68,6 +68,30 @@ value rebuild_any_field_array db2 fi pad (f2, get) = do {
      })
 };
 
+value rebuild_option_field_array db2 fi pad (f2, get) = do {
+  let f1 = fi.fi_dir in
+  let f3 = "1" ^ f1 in
+  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  Mutil.mkdir_p bdir;
+  rebuild_field_array db2 pad bdir
+    (fun oc_acc output_item ->
+        for i = 0 to fi.fi_nb - 1 do {
+          let x =
+            try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
+            [ Not_found ->
+                let pos = Db2disk.get_field_acc db2 i (f1, f2) in
+                if pos = -1 then None
+                else Some (Db2disk.get_field_data db2 pos (f1, f2) "data") ]
+          in
+          match x with
+          [ None -> output_binary_int oc_acc (-1)
+          | Some x -> do {
+              let pos = output_item x in
+              output_binary_int oc_acc pos
+            } ];
+        })
+};
+
 value rebuild_list_field_array db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
   let f3 = "1" ^ f1 in
@@ -106,7 +130,6 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
     flush stderr
   }
   else ()
-
 };
 
 value rebuild_list2_field_array db2 fi (f2, get) = do {
@@ -228,6 +251,16 @@ value rebuild_fields2 db2 = do {
      fi_ht = db2.Db2disk.patches.Db2disk.h_person;
      fi_index_of_int = Adef.iper_of_int; fi_dir = "person"}
   in
+  let fi_asc =
+    {fi_nb = db2.Db2disk.patches.Db2disk.nb_per;
+     fi_ht = db2.Db2disk.patches.Db2disk.h_ascend;
+     fi_index_of_int = Adef.iper_of_int; fi_dir = "person"}
+  in
+  let fi_uni =
+    {fi_nb = db2.Db2disk.patches.Db2disk.nb_per;
+     fi_ht = db2.Db2disk.patches.Db2disk.h_union;
+     fi_index_of_int = Adef.iper_of_int; fi_dir = "person"}
+  in
   List.iter (rebuild_string_field db2 fi_per)
     [("first_name", fun p -> p.Def.first_name);
      ("surname", fun p -> p.Def.surname);
@@ -269,20 +302,47 @@ value rebuild_fields2 db2 = do {
     ("death", fun p -> p.Def.death);
   rebuild_any_field_array db2 fi_per Def.UnknownBurial
     ("burial", fun p -> p.Def.burial);
+  rebuild_option_field_array db2 fi_asc (Adef.ifam_of_int (-1))
+    ("parents", fun p -> p.Def.parents);
+  rebuild_any_field_array db2 fi_asc Adef.no_consang
+    ("consang", fun p -> p.Def.consang);
+  rebuild_any_field_array db2 fi_uni [| |]
+    ("family", fun p -> p.Def.family);
 
   let fi_fam =
     {fi_nb = db2.Db2disk.patches.Db2disk.nb_fam;
      fi_ht = db2.Db2disk.patches.Db2disk.h_family;
      fi_index_of_int = Adef.ifam_of_int; fi_dir = "family"}
   in
+  let fi_cpl =
+    {fi_nb = db2.Db2disk.patches.Db2disk.nb_fam;
+     fi_ht = db2.Db2disk.patches.Db2disk.h_couple;
+     fi_index_of_int = Adef.ifam_of_int; fi_dir = "family"}
+  in
+  let fi_des =
+    {fi_nb = db2.Db2disk.patches.Db2disk.nb_fam;
+     fi_ht = db2.Db2disk.patches.Db2disk.h_descend;
+     fi_index_of_int = Adef.ifam_of_int; fi_dir = "family"}
+  in
+  rebuild_any_field_array db2 fi_fam Adef.codate_None
+    ("marriage", fun f -> f.Def.marriage);
   List.iter (rebuild_string_field db2 fi_fam)
     [("marriage_place", fun f -> f.Def.marriage_place);
      ("marriage_src", fun f -> f.Def.marriage_src);
      ("comment", fun f -> f.Def.comment);
      ("origin_file", fun f -> f.Def.origin_file);
      ("fsources", fun f -> f.Def.fsources)];
-  rebuild_any_field_array db2 fi_fam Adef.codate_None
-    ("marriage", fun f -> f.Def.marriage);
+  rebuild_any_field_array db2 fi_fam [| |]
+    ("witnesses", fun f -> f.Def.witnesses);
+  rebuild_any_field_array db2 fi_fam Def.Married
+    ("relation", fun f -> f.Def.relation);
+  rebuild_any_field_array db2 fi_fam Def.NotDivorced
+    ("divorce", fun f -> f.Def.divorce);
+  List.iter (rebuild_any_field_array db2 fi_cpl (Adef.iper_of_int (-1)))
+    [("father", fun f -> Adef.father f);
+     ("mother", fun f -> Adef.mother f)];
+  rebuild_any_field_array db2 fi_des [| |]
+    ("children", fun f -> f.Def.children);
 };
 
 value simple_output bname base carray =

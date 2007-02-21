@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 5.5 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: adef.mli,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type iper = 'a;
@@ -31,6 +31,8 @@ value float_of_fix : fix -> float;
 value fix_of_float : float -> fix;
 external fix : int -> fix = "%identity";
 external fix_repr : fix -> int = "%identity";
+
+value no_consang : fix;
 
 value date_of_cdate : cdate -> date;
 value cdate_of_date : date -> cdate;

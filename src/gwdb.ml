@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.224 2007-02-21 14:37:06 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.225 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -14,8 +14,6 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
     next : 'istr -> 'istr }
 ;
 
-value no_consang = Adef.fix (-1);
-
 value no_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
@@ -29,7 +27,7 @@ value no_person empty_string ip =
    burial_place = empty_string; burial_src = empty_string;
    notes = empty_string; psources = empty_string; key_index = ip}
 ;
-value no_ascend = {parents = None; consang = no_consang};
+value no_ascend = {parents = None; consang = Adef.no_consang};
 value no_union = {family = [| |]};
 
 (* Strings - common definitions *)
@@ -375,7 +373,8 @@ value person2_fun =
        [ Some tab -> tab.(i)
        | None ->
            let f = ("person", "consang") in
-           if field_exists db2 f then get_field db2 i f else no_consang ];
+           if field_exists db2 f then get_field db2 i f
+           else Adef.no_consang ];
      get_parents (db2, i) =
        match db2.parents_array with
        [ Some tab -> tab.(i)

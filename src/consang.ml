@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 5.12 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: consang.ml,v 5.13 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -37,8 +37,6 @@ type relationship_info =
     reltab : array relationship;
     queue : mutable array (list int) }
 ;
-
-value no_consang = Adef.fix (-1);
 
 value half x = x *. 0.5;
 
@@ -201,7 +199,7 @@ value insert_branch_len ip lens (len, n, ipl) =
 ;
 
 value consang_of p =
-  if get_consang p = no_consang then 0.0
+  if get_consang p = Adef.no_consang then 0.0
   else Adef.float_of_fix (get_consang p)
 ;
 
