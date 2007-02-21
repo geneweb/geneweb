@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.38 2007-02-21 18:14:01 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.39 2007-02-21 19:40:40 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -343,6 +343,10 @@ value rebuild_fields2 db2 = do {
      ("mother", fun f -> Adef.mother f)];
   rebuild_any_field_array db2 fi_des [| |]
     ("children", fun f -> f.Def.children);
+
+  let bpdir = Filename.concat db2.Db2disk.bdir2 "1person" in
+  Db2out.make_string_of_crush_index bpdir;
+  Db2out.make_person_of_string_index bpdir;
 };
 
 value simple_output bname base carray =
