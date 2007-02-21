@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.40 2007-02-21 19:40:40 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.41 2007-02-21 20:44:04 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -353,81 +353,6 @@ value reorder_fields tmp_dir =
      })
     [("person", "family", reorder_type_list_int)]
 ;
-
-value start_with s p =
-  String.length p < String.length s &&
-  String.sub s 0 (String.length p) = p
-;
-
-value make_index gen f2 = do {
-  let f1 = "person" in
-  let bdir = Filename.concat gen.g_tmp_dir "base_d" in
-  let fdir = List.fold_left Filename.concat bdir [f1; f2] in
-  let index_dat_fname = Filename.concat fdir "index.dat" in
-  let index_ini_fname = Filename.concat fdir "index.ini" in
-  let data_fname = Filename.concat fdir "data" in
-  let ic = open_in_bin data_fname in
-  seek_in ic Db2.first_item_pos;
-  let (list, len) =
-    loop [] 0 Db2.first_item_pos where rec loop list len pos =
-      match
-        try Some (Iovalue.input ic : string) with
-        [ End_of_file -> None ]
-      with
-      [ Some s ->
-          let s =
-            try
-              let part = List.find (start_with s) gen.g_particles in
-              let plen = String.length part in
-              String.sub s plen (String.length s - plen) ^ " (" ^
-              part ^ ")"
-            with
-            [ Not_found -> s ]
-          in
-          let list = [(s, pos) :: list] in
-          loop list (len + 1) (pos_in ic)
-      | None -> (list, len) ]
-  in
-  let list = List.sort compare list in
-  let a = Array.make len ("", 0) in
-  let iofc =
-    loop [] 0 list where rec loop rev_iofc i =
-      fun
-      [ [] -> List.rev rev_iofc
-      | [((s, _) as s_pos) :: list] -> do {
-          a.(i) := s_pos;
-          let rev_iofc =
-            match rev_iofc with
-            [ [(prev_s, _) :: _] ->
-                if prev_s = "" then [(s, i) :: rev_iofc]
-                else
-                  let prev_nbc = Name.nbc prev_s.[0] in
-                  let nbc = Name.nbc s.[0] in
-                  if prev_nbc = nbc && nbc > 0 &&
-                     nbc <= String.length prev_s &&
-                     nbc <= String.length s &&
-                     String.sub prev_s 0 nbc = String.sub s 0 nbc
-                  then
-                    rev_iofc
-                  else
-                    [(s, i) :: rev_iofc]
-            | [] -> [s_pos] ]
-          in
-          loop rev_iofc (i + 1) list
-        } ]
-  in
-  let oc = open_out_bin index_dat_fname in
-  output_value oc (a : array (string * int));
-  close_out oc;
-  let oc = open_out_bin (Filename.concat fdir "index.acc") in
-  let _ : int =
-    Iovalue.output_array_access oc (Array.get a) (Array.length a) 0
-  in
-  close_out oc;
-  let oc = open_out_bin index_ini_fname in
-  output_value oc (iofc : list (string * int));
-  close_out oc;
-};
 
 value unique_key_string gen s =
   let s = Name.lower (Mutil.nominative s) in
@@ -951,12 +876,13 @@ value link gwo_list bname =
 
     compress_fields tmp_dir;
     reorder_fields tmp_dir;
-    let bpdir = List.fold_left Filename.concat tmp_dir ["base_d"; "person"] in
+    let bbdir = Filename.concat tmp_dir "base_d" in
+    let bpdir = Filename.concat bbdir "person" in
     Db2out.make_string_of_crush_index bpdir;
     Db2out.make_person_of_string_index bpdir;
-    Db2out.make_name_index tmp_dir gen.g_pcnt;
-    make_index gen "first_name";
-    make_index gen "surname";
+    Db2out.make_name_index bbdir gen.g_pcnt;
+    Db2out.make_index bbdir gen.g_particles "first_name";
+    Db2out.make_index bbdir gen.g_particles "surname";
 
     output_particles_file tmp_dir gen.g_particles;
 

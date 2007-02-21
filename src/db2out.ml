@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: db2out.ml,v 5.4 2007-02-21 19:40:40 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.5 2007-02-21 20:44:04 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -172,13 +172,12 @@ value read_title_list_field (ic_acc, ic_dat, ic_str) i = do {
   }
 };
 
-value make_name_index tmp_dir nbper = do {
+value make_name_index base_d nbper = do {
   if Mutil.verbose.val then do {
     Printf.eprintf "name index...\n";
     flush stderr;
   }
   else ();        
-  let base_d = Filename.concat tmp_dir "base_d" in
   let ic2_list =
     List.map
       (fun (d, f) ->
@@ -290,9 +289,81 @@ value make_name_index tmp_dir nbper = do {
        close_in ic_str
      })
     ic3_list;
-  let dir =
-    List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_name"]
-  in
+  let dir = Filename.concat base_d "person_of_name" in
   Mutil.mkdir_p dir;
   output_hashtbl dir "person_of_name.ht" ht;
+};
+
+value start_with s p =
+  String.length p < String.length s &&
+  String.sub s 0 (String.length p) = p
+;
+
+value make_index bdir particles f2 = do {
+  let f1 = "person" in
+  let fdir = List.fold_left Filename.concat bdir [f1; f2] in
+  let index_dat_fname = Filename.concat fdir "index.dat" in
+  let index_ini_fname = Filename.concat fdir "index.ini" in
+  let data_fname = Filename.concat fdir "data" in
+  let ic = open_in_bin data_fname in
+  seek_in ic Db2.first_item_pos;
+  let (list, len) =
+    loop [] 0 Db2.first_item_pos where rec loop list len pos =
+      match
+        try Some (Iovalue.input ic : string) with
+        [ End_of_file -> None ]
+      with
+      [ Some s ->
+          let s =
+            try
+              let part = List.find (start_with s) particles in
+              let plen = String.length part in
+              String.sub s plen (String.length s - plen) ^ " (" ^
+              part ^ ")"
+            with
+            [ Not_found -> s ]
+          in
+          let list = [(s, pos) :: list] in
+          loop list (len + 1) (pos_in ic)
+      | None -> (list, len) ]
+  in
+  let list = List.sort compare list in
+  let a = Array.make len ("", 0) in
+  let iofc =
+    loop [] 0 list where rec loop rev_iofc i =
+      fun
+      [ [] -> List.rev rev_iofc
+      | [((s, _) as s_pos) :: list] -> do {
+          a.(i) := s_pos;
+          let rev_iofc =
+            match rev_iofc with
+            [ [(prev_s, _) :: _] ->
+                if prev_s = "" then [(s, i) :: rev_iofc]
+                else
+                  let prev_nbc = Name.nbc prev_s.[0] in
+                  let nbc = Name.nbc s.[0] in
+                  if prev_nbc = nbc && nbc > 0 &&
+                     nbc <= String.length prev_s &&
+                     nbc <= String.length s &&
+                     String.sub prev_s 0 nbc = String.sub s 0 nbc
+                  then
+                    rev_iofc
+                  else
+                    [(s, i) :: rev_iofc]
+            | [] -> [s_pos] ]
+          in
+          loop rev_iofc (i + 1) list
+        } ]
+  in
+  let oc = open_out_bin index_dat_fname in
+  output_value oc (a : array (string * int));
+  close_out oc;
+  let oc = open_out_bin (Filename.concat fdir "index.acc") in
+  let _ : int =
+    Iovalue.output_array_access oc (Array.get a) (Array.length a) 0
+  in
+  close_out oc;
+  let oc = open_out_bin index_ini_fname in
+  output_value oc (iofc : list (string * int));
+  close_out oc;
 };

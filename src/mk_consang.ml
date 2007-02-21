@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.39 2007-02-21 19:40:40 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.40 2007-02-21 20:44:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -48,8 +48,9 @@ type field_info 'index 'item =
 
 value rebuild_any_field_array db2 fi pad (f2, get) = do {
   let f1 = fi.fi_dir in
-  let f3 = "1" ^ f1 in
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  let bdir =
+    List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
+  in
   Mutil.mkdir_p bdir;
   rebuild_field_array db2 pad bdir
     (fun oc_acc output_item -> do {
@@ -70,8 +71,9 @@ value rebuild_any_field_array db2 fi pad (f2, get) = do {
 
 value rebuild_option_field_array db2 fi pad (f2, get) = do {
   let f1 = fi.fi_dir in
-  let f3 = "1" ^ f1 in
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  let bdir =
+    List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
+  in
   Mutil.mkdir_p bdir;
   rebuild_field_array db2 pad bdir
     (fun oc_acc output_item ->
@@ -94,7 +96,6 @@ value rebuild_option_field_array db2 fi pad (f2, get) = do {
 
 value rebuild_list_field_array db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
-  let f3 = "1" ^ f1 in
   let f oc_acc oc_dat =
     for i = 0 to fi.fi_nb - 1 do {
       let x =
@@ -112,7 +113,9 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
       }
     }
   in
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  let bdir =
+    List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
+  in
   Mutil.mkdir_p bdir;
 
   if Mutil.verbose.val then do {
@@ -134,7 +137,6 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
 
 value rebuild_list2_field_array db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
-  let f3 = "1" ^ f1 in
   let f oc_acc oc_dat =
     for i = 0 to fi.fi_nb - 1 do {
       let xl =
@@ -163,7 +165,9 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
       output_binary_int oc_acc pos;
     }
   in
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  let bdir =
+    List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
+  in
   Mutil.mkdir_p bdir;
 
   if Mutil.verbose.val then do {
@@ -186,8 +190,9 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
 
 value rebuild_string_field db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
-  let f3 = "1" ^ f1 in
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  let bdir =
+    List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
+  in
   Mutil.mkdir_p bdir;
   rebuild_field_array db2 "" bdir
     (fun oc_acc output_item -> do {
@@ -210,8 +215,9 @@ value rebuild_string_field db2 fi (f2, get) = do {
 
 value rebuild_list_with_string_field_array g h db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
-  let f3 = "1" ^ f1 in
-  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  let bdir =
+    List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
+  in
   Mutil.mkdir_p bdir;
   let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
   rebuild_field_array db2 "" bdir
@@ -344,9 +350,16 @@ value rebuild_fields2 db2 = do {
   rebuild_any_field_array db2 fi_des [| |]
     ("children", fun f -> f.Def.children);
 
-  let bpdir = Filename.concat db2.Db2disk.bdir2 "1person" in
+  let new_d = Filename.concat db2.Db2disk.bdir2 "new_d" in
+  let bpdir = Filename.concat new_d "person" in
+  let particles =
+    Mutil.input_particles (Filename.concat db2.Db2disk.bdir2 "particles.txt")
+  in
   Db2out.make_string_of_crush_index bpdir;
   Db2out.make_person_of_string_index bpdir;
+  Db2out.make_name_index new_d fi_per.fi_nb;
+  Db2out.make_index new_d particles "first_name";
+  Db2out.make_index new_d particles "surname";
 };
 
 value simple_output bname base carray =
