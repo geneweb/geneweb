@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.6 2007-02-18 10:42:13 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.7 2007-02-21 10:40:10 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -298,21 +298,27 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
 
 value load_array2 bdir nb_ini nb def f1 f2 get =
   if nb = 0 then [| |]
-  else do {
-    let ic_acc =
-      open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "access"])
-    in
-    let ic_dat =
-      open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "data"])
-    in
-    let tab = Array.create nb def in
-    for i = 0 to nb_ini - 1 do {
-      tab.(i) := get ic_dat (input_binary_int ic_acc);
-    };
-    close_in ic_dat;
-    close_in ic_acc;
-    tab
-  }
+  else
+    try do {
+      let ic_acc =
+        open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "access"])
+      in
+      let ic_dat =
+        open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "data"])
+      in
+      let tab = Array.create nb def in
+      for i = 0 to nb_ini - 1 do {
+        tab.(i) := get ic_dat (input_binary_int ic_acc);
+      };
+      close_in ic_dat;
+      close_in ic_acc;
+      tab
+    }
+    with e -> do {
+      eprintf "Error load_array2 %s/%s nb_ini %d nb %d\n" f1 f2 nb_ini nb;
+      flush stderr;
+      raise e;
+    }
 ;
 
 value load_couples_array2 db2 = do {
