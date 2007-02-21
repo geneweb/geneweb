@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.223 2007-02-21 09:17:28 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.224 2007-02-21 14:37:06 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -380,15 +380,9 @@ value person2_fun =
        match db2.parents_array with
        [ Some tab -> tab.(i)
        | None ->
-           try
-             (Hashtbl.find db2.patches.h_ascend (Adef.iper_of_int i)).parents
-           with
-           [ Not_found ->
-               let pos = get_field_acc db2 i ("person", "parents") in
-               if pos = -1 then None
-               else
-                 Some
-                   (get_field_data db2 pos ("person", "parents") "data") ] ];
+           let pos = get_field_acc db2 i ("person", "parents") in
+           if pos = -1 then None
+           else Some (get_field_data db2 pos ("person", "parents") "data") ];
      get_family (db2, i) =
        match db2.family_array with
        [ Some tab -> tab.(i)
