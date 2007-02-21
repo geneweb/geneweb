@@ -1,10 +1,8 @@
-(* $Id: consangAll.ml,v 5.34 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.35 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
 open Gwdb;
-
-value no_consang = Adef.fix (-1);
 
 value designation base p =
   let first_name = p_first_name base p in
@@ -18,7 +16,7 @@ value rec clear_descend_consang base cset mark ifam =
   Array.iter
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
-         cset (Adef.int_of_iper ip) no_consang;
+         cset (Adef.int_of_iper ip) Adef.no_consang;
          mark.(Adef.int_of_iper ip) := True;
          let u = poi base ip in
          Array.iter (clear_descend_consang base cset mark) (get_family u)
@@ -50,7 +48,7 @@ value compute base from_scratch quiet = do {
       let ts = Consang.topological_sort base poi in
       Consang.make_relationship_info base ts
     in
-    let consang_tab = Array.create (nb_of_families base) no_consang in
+    let consang_tab = Array.create (nb_of_families base) Adef.no_consang in
     let cnt = ref 0 in
     if not from_scratch then
       let mark = Array.create (nb_of_persons base) False in
@@ -66,7 +64,7 @@ value compute base from_scratch quiet = do {
     else ();
     for i = 0 to nb_of_persons base - 1 do {
       if from_scratch then do {
-        cset i no_consang;
+        cset i Adef.no_consang;
         incr cnt;
       }
       else do {
@@ -74,7 +72,7 @@ value compute base from_scratch quiet = do {
         match fget i with
         [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := cg
         | None -> () ];
-        if cg = no_consang then incr cnt else ()
+        if cg = Adef.no_consang then incr cnt else ()
       };
     };
     let max_cnt = cnt.val in
@@ -88,16 +86,16 @@ value compute base from_scratch quiet = do {
     while running.val do {
       running.val := False;
       for i = 0 to nb_of_persons base - 1 do {
-        if cget i = no_consang then
+        if cget i = Adef.no_consang then
           match fget i with
           [ Some ifam ->
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
-              if pconsang = no_consang then
+              if pconsang = Adef.no_consang then
                 let cpl = foi base ifam in
                 let ifath = get_father cpl in
                 let imoth = get_mother cpl in
-                if cget (Adef.int_of_iper ifath) != no_consang &&
-                   cget (Adef.int_of_iper imoth) != no_consang
+                if cget (Adef.int_of_iper ifath) != Adef.no_consang &&
+                   cget (Adef.int_of_iper imoth) != Adef.no_consang
                 then do {
                   let consang = relationship base tab ifath imoth in
                   trace quiet cnt.val max_cnt;
