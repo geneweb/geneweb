@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.35 2007-02-21 10:25:04 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.36 2007-02-21 11:48:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -68,6 +68,44 @@ value rebuild_any_field_array db2 fi pad (f2, get) = do {
      })
 };
 
+value rebuild_list_field_array db2 fi (f2, get) = do {
+  let f1 = fi.fi_dir in
+  let f3 = "1" ^ f1 in
+  let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
+  Mutil.mkdir_p bdir;
+  if Mutil.verbose.val then do {
+    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
+    flush stderr;
+  }
+  else ();
+  let oc_dat = open_out_bin (Filename.concat bdir "data") in
+  let oc_acc = open_out_bin (Filename.concat bdir "access") in
+
+  for i = 0 to fi.fi_nb - 1 do {
+    let x =
+      try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
+      [ Not_found ->
+          let pos = Db2disk.get_field_acc db2 i (f1, f2) in
+          if pos = -1 then []
+          else Db2disk.get_field_data db2 pos (f1, f2) "data" ]
+    in
+    if x = [] then output_binary_int oc_acc (-1)
+    else do {
+      let pos = pos_out oc_dat in
+      Iovalue.output oc_dat x;
+      output_binary_int oc_acc pos
+    }
+  };
+
+  close_out oc_acc;
+  close_out oc_dat;
+  if Mutil.verbose.val then do {
+    Printf.eprintf "\n";
+    flush stderr
+  }
+  else ()
+};
+
 value rebuild_string_field db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
   let f3 = "1" ^ f1 in
@@ -92,7 +130,7 @@ value rebuild_string_field db2 fi (f2, get) = do {
      })
 };
 
-value rebuild_list_field_array g h db2 fi (f2, get) = do {
+value rebuild_list_with_string_field_array g h db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
   let f3 = "1" ^ f1 in
   let bdir = List.fold_left Filename.concat db2.Db2disk.bdir2 [f3; f2] in
@@ -153,14 +191,18 @@ value rebuild_fields2 db2 = do {
      ("psources", fun p -> p.Def.psources)];
   rebuild_any_field_array db2 fi_per 0
     ("occ", fun p -> p.Def.occ);
-  List.iter (rebuild_list_field_array (fun f -> f) (fun f -> f) db2 fi_per)
+  List.iter
+    (rebuild_list_with_string_field_array (fun f -> f) (fun f -> f) db2
+       fi_per)
     [("qualifiers", fun p -> p.Def.qualifiers);
      ("aliases", fun p -> p.Def.aliases);
      ("first_names_aliases", fun p -> p.Def.first_names_aliases);
      ("surnames_aliases", fun p -> p.Def.surnames_aliases)];
-  rebuild_list_field_array Futil.map_title_strings Futil.map_title_strings
-    db2 fi_per
+  rebuild_list_with_string_field_array Futil.map_title_strings
+    Futil.map_title_strings db2 fi_per
     ("titles", fun p -> p.Def.titles);
+  rebuild_list_field_array db2 fi_per ("rparents", fun p -> p.Def.rparents);
+
   rebuild_any_field_array db2 fi_per Def.Neuter
     ("sex", fun p -> p.Def.sex);
   rebuild_any_field_array db2 fi_per Def.IfTitles
