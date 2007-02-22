@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.8 2007-02-21 18:14:01 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.9 2007-02-22 03:50:29 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -93,11 +93,6 @@ value string_of_istr2 db2 f pos =
 
 (* hash tables in disk *)
 
-type key =
-  [ Key of Adef.istr and Adef.istr and int
-  | Key0 of Adef.istr and Adef.istr (* to save memory space *) ]
-;
-
 type bucketlist 'a 'b =
   [ Empty
   | Cons of 'a and 'b and bucketlist 'a 'b ]
@@ -145,10 +140,7 @@ value hashtbl_find_all dir file key = do {
   find_in_bucket bl
 };
 
-value key_hashtbl_find dir file (fn, sn, oc) =
-  let key = if oc = 0 then Key0 fn sn else Key fn sn oc in
-  hashtbl_find dir file key
-;
+value key_hashtbl_find dir file k = hashtbl_find dir file (Db2.key2_of_key k);
 
 (* string person index version 2 *)
 

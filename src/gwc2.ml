@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.42 2007-02-22 02:13:17 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.43 2007-02-22 03:50:29 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -23,11 +23,6 @@ type file_field 'a =
     valu : 'a -> Obj.t }
 ;
 
-type key =
-  [ Key of Adef.istr and Adef.istr and int
-  | Key0 of Adef.istr and Adef.istr (* to save memory space *) ]
-;
-
 type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
@@ -36,7 +31,7 @@ type gen =
     g_particles : list string;
 
     g_strings : Hashtbl.t string Adef.istr;
-    g_index_of_key : Hashtbl.t key iper;
+    g_index_of_key : Hashtbl.t Db2.key2 iper;
     g_person_fields : list (file_field (gen_person iper string));
     g_family_fields : list (file_field family);
     g_person_parents : (Iochan.t * out_channel);
@@ -377,14 +372,8 @@ value empty_person =
    psources = ""; key_index = Adef.iper_of_int 0}
 ;
 
-value key_hashtbl_add ht (fn, sn, oc) v =
-  let k = if oc = 0 then Key0 fn sn else Key fn sn oc in
-  Hashtbl.add ht k v
-;
-value key_hashtbl_find ht (fn, sn, oc) =
-  let k = if oc = 0 then Key0 fn sn else Key fn sn oc in
-  Hashtbl.find ht k
-;
+value key_hashtbl_add ht k v = Hashtbl.add ht (Db2.key2_of_key k) v;
+value key_hashtbl_find ht k = Hashtbl.find ht (Db2.key2_of_key k);
 
 value insert_person1 gen so = do {
   if so.first_name <> "?" && so.surname <> "?" then do {
@@ -866,7 +855,7 @@ value link gwo_list bname =
     try Mutil.mkdir_p person_of_key_d with _ -> ();
 
     Db2out.output_hashtbl person_of_key_d "iper_of_key.ht"
-      (gen.g_index_of_key : Hashtbl.t key iper);
+      (gen.g_index_of_key : Hashtbl.t Db2.key2 iper);
     Hashtbl.clear gen.g_index_of_key;
 
     Db2out.output_hashtbl person_of_key_d "istr_of_string.ht"
