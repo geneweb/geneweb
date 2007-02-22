@@ -1,6 +1,8 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.41 2007-02-22 02:13:17 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.42 2007-02-22 03:50:29 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+open Printf;
 
 value fname = ref "";
 value indexes = ref False;
@@ -23,7 +25,7 @@ value anonfun s =
 
 value rebuild_field_array db2 pad bdir f = do {
   if Mutil.verbose.val then do {
-    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
+    eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
@@ -33,7 +35,7 @@ value rebuild_field_array db2 pad bdir f = do {
   close_out oc_acc;
   close_out oc_dat;
   if Mutil.verbose.val then do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr
   }
   else ()
@@ -119,7 +121,7 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
   Mutil.mkdir_p bdir;
 
   if Mutil.verbose.val then do {
-    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
+    eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
@@ -129,7 +131,7 @@ value rebuild_list_field_array db2 fi (f2, get) = do {
   close_out oc_acc;
   close_out oc_dat;
   if Mutil.verbose.val then do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr
   }
   else ()
@@ -171,7 +173,7 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
   Mutil.mkdir_p bdir;
 
   if Mutil.verbose.val then do {
-    Printf.eprintf "rebuilding %s..." (Filename.basename bdir);
+    eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
   }
   else ();
@@ -181,7 +183,7 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
   close_out oc_acc;
   close_out oc_dat;
   if Mutil.verbose.val then do {
-    Printf.eprintf "\n";
+    eprintf "\n";
     flush stderr
   }
   else ()
@@ -249,6 +251,65 @@ value rebuild_list_with_string_field_array g h db2 fi (f2, get) = do {
        }
      });
   close_out oc_ext;
+};
+
+value unique_key_string (ht, scnt) s =
+  let s = Name.lower (Mutil.nominative s) in
+  try Hashtbl.find ht s with
+  [ Not_found -> do {
+      let istr = Adef.istr_of_int scnt.val in
+      Hashtbl.add ht s istr;
+      incr scnt;
+      istr
+    } ]
+;
+
+value make_key_index db2 nb_per bdir = do {
+  if Mutil.verbose.val then do {
+    eprintf "key index...";
+    flush stderr;
+  }
+  else ();
+
+  let person_of_key_d = Filename.concat bdir "person_of_key" in
+  try Mutil.mkdir_p person_of_key_d with _ -> ();
+  let ht_index_of_key = Hashtbl.create 1 in
+  let ht_strings = (Hashtbl.create 1, ref 0) in
+
+  let f1f2_fn = (Filename.concat "new_d" "person", "first_name") in
+  let f1f2_sn = (Filename.concat "new_d" "person", "surname") in
+  let f1f2_oc = (Filename.concat "new_d" "person", "occ") in
+  for i = 0 to nb_per - 1 do {
+    let fn =
+      let pos = Db2disk.get_field_acc db2 i f1f2_fn in
+      Db2disk.string_of_istr2 db2 f1f2_fn pos
+    in
+    let sn =
+      let pos = Db2disk.get_field_acc db2 i f1f2_sn in
+      Db2disk.string_of_istr2 db2 f1f2_sn pos
+    in
+    if fn = "?" || sn = "?" then ()
+    else
+      let fn = unique_key_string ht_strings fn in
+      let sn = unique_key_string ht_strings sn in
+      let oc = Db2disk.get_field db2 i f1f2_oc in
+      Hashtbl.add ht_index_of_key (Db2.key2_of_key (fn, sn, oc))
+        (Adef.iper_of_int i);
+  };
+
+  Db2out.output_hashtbl person_of_key_d "iper_of_key.ht"
+    (ht_index_of_key : Hashtbl.t Db2.key2 Def.iper);
+  Hashtbl.clear ht_index_of_key;
+
+  Db2out.output_hashtbl person_of_key_d "istr_of_string.ht"
+    (fst ht_strings : Hashtbl.t string Adef.istr);
+  Hashtbl.clear (fst ht_strings);
+
+  if Mutil.verbose.val then do {
+    eprintf "\n";
+    flush stderr
+  }
+  else ();
 };
 
 value rebuild_fields2 db2 = do {
@@ -351,11 +412,15 @@ value rebuild_fields2 db2 = do {
     ("children", fun f -> f.Def.children);
 
   let nb_per = fi_per.fi_nb in
+
+  let new_d = Filename.concat db2.Db2disk.bdir2 "new_d" in
+  make_key_index db2 nb_per new_d;
+  Gc.compact ();
+
   let particles =
     Mutil.input_particles (Filename.concat db2.Db2disk.bdir2 "particles.txt")
   in
-  Db2out.make_indexes (Filename.concat db2.Db2disk.bdir2 "new_d") nb_per
-    particles;
+  Db2out.make_indexes new_d nb_per particles;
 };
 
 value simple_output bname base carray =
@@ -381,7 +446,7 @@ value simple_output bname base carray =
            let has_patches =
              Sys.file_exists (Filename.concat bdir "patches")
            in
-           Printf.eprintf "has_patches %b\n" has_patches;
+           eprintf "has_patches %b\n" has_patches;
            flush stderr;
            if has_patches then do {
              let list =
@@ -423,8 +488,8 @@ value main () =
   do {
     Argl.parse speclist anonfun errmsg;
     if fname.val = "" then do {
-      Printf.eprintf "Missing file name\n";
-      Printf.eprintf "Use option -help for usage\n";
+      eprintf "Missing file name\n";
+      eprintf "Use option -help for usage\n";
       flush stderr;
       exit 2;
     }
@@ -441,7 +506,7 @@ value main () =
       with
       [ Consang.TopologicalSortError p ->
           do {
-            Printf.printf
+            printf
               "\nError: loop in database, %s is his/her own ancestor.\n"
               (designation base p);
             flush stdout;
@@ -452,13 +517,13 @@ value main () =
     [ Accept -> f ()
     | Refuse ->
         do {
-          Printf.eprintf "Base is locked. Waiting... ";
+          eprintf "Base is locked. Waiting... ";
           flush stderr;
           lock_wait (Mutil.lock_file fname.val) with
-          [ Accept -> do { Printf.eprintf "Ok\n"; flush stderr; f () }
+          [ Accept -> do { eprintf "Ok\n"; flush stderr; f () }
           | Refuse ->
               do {
-                Printf.printf "\nSorry. Impossible to lock base.\n";
+                printf "\nSorry. Impossible to lock base.\n";
                 flush stdout;
                 exit 2
               } ]

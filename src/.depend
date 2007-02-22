@@ -73,12 +73,15 @@ date.cmx: adef.cmx buff.cmx calendar.cmx checkItem.cmx config.cmi def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx templ.cmx templAst.cmi \
     templDate.cmx util.cmx ../wserver/wserver.cmx date.cmi 
 date.cmi: config.cmi def.cmi gwdb.cmi 
-db2disk.cmo: adef.cmi buff.cmo db2.cmo def.cmi iovalue.cmi mutil.cmi \
+db2.cmo: adef.cmi db2.cmi 
+db2.cmx: adef.cmx db2.cmi 
+db2.cmi: adef.cmi 
+db2disk.cmo: adef.cmi buff.cmo db2.cmi def.cmi iovalue.cmi mutil.cmi \
     name.cmi secure.cmi db2disk.cmi 
 db2disk.cmx: adef.cmx buff.cmx db2.cmx def.cmi iovalue.cmx mutil.cmx \
     name.cmx secure.cmx db2disk.cmi 
 db2disk.cmi: adef.cmi def.cmi 
-db2out.cmo: db2.cmo def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi \
+db2out.cmo: db2.cmi def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi \
     progrBar.cmi db2out.cmi 
 db2out.cmx: db2.cmx def.cmi futil.cmx iovalue.cmx mutil.cmx name.cmx \
     progrBar.cmx db2out.cmi 
@@ -121,7 +124,7 @@ gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
     futil.cmx gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
     notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
-gwc2.cmo: adef.cmi argl.cmo db2.cmo db2out.cmi def.cmi futil.cmi gwcomp.cmo \
+gwc2.cmo: adef.cmi argl.cmo db2.cmi db2out.cmi def.cmi futil.cmi gwcomp.cmo \
     iochan.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi notesLinks.cmi \
     progrBar.cmi secure.cmi 
 gwc2.cmx: adef.cmx argl.cmx db2.cmx db2out.cmx def.cmi futil.cmx gwcomp.cmx \
@@ -137,7 +140,7 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx hutil.cmx image.cmx lock.cmx mutil.cmx name.cmx \
     relationLink.cmx request.cmx robot.cmx secure.cmx srcfile.cmx util.cmx \
     version.cmx ../wserver/wserver.cmx 
-gwdb.cmo: adef.cmi database.cmi db2.cmo db2disk.cmi dbdisk.cmi def.cmi \
+gwdb.cmo: adef.cmi database.cmi db2.cmi db2disk.cmi dbdisk.cmi def.cmi \
     futil.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
 gwdb.cmx: adef.cmx database.cmx db2.cmx db2disk.cmx dbdisk.cmi def.cmi \
     futil.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
@@ -199,7 +202,7 @@ mergeIndOk.cmo: adef.cmi config.cmi consang.cmi def.cmi futil.cmi gutil.cmi \
 mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi futil.cmx gutil.cmx \
     gwdb.cmx history.cmx hutil.cmx merge.cmx mergeInd.cmx mutil.cmx \
     update.cmx updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
-mk_consang.cmo: adef.cmi argl.cmo consang.cmi consangAll.cmi db2.cmo \
+mk_consang.cmo: adef.cmi argl.cmo consang.cmi consangAll.cmi db2.cmi \
     db2disk.cmi db2out.cmi dbdisk.cmi def.cmi futil.cmi gwdb.cmi iovalue.cmi \
     lock.cmi mutil.cmi outbase.cmi secure.cmi 
 mk_consang.cmx: adef.cmx argl.cmx consang.cmx consangAll.cmx db2.cmx \
