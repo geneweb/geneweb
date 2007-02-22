@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.44 2007-02-22 11:39:45 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.45 2007-02-22 18:16:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -421,6 +421,20 @@ value rebuild_fields2 db2 = do {
     Mutil.input_particles (Filename.concat db2.Db2disk.bdir2 "particles.txt")
   in
   Db2out.make_indexes new_d nb_per particles;
+
+  let old_d = Filename.concat db2.Db2disk.bdir2 "old_d" in
+  Mutil.remove_dir old_d;
+  Mutil.mkdir_p old_d;
+  List.iter
+    (fun f ->
+       Sys.rename (Filename.concat db2.Db2disk.bdir2 f)
+         (Filename.concat old_d f))
+    ["family"; "person"; "person_of_key"; "person_of_name"; "patches"];
+  List.iter
+    (fun f ->
+       Sys.rename (Filename.concat new_d f)
+         (Filename.concat db2.Db2disk.bdir2 f))
+    ["family"; "person"; "person_of_key"; "person_of_name"];
 };
 
 value simple_output bname base carray =
