@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.41 2007-02-21 20:44:04 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.42 2007-02-22 02:13:17 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -876,13 +876,9 @@ value link gwo_list bname =
 
     compress_fields tmp_dir;
     reorder_fields tmp_dir;
-    let bbdir = Filename.concat tmp_dir "base_d" in
-    let bpdir = Filename.concat bbdir "person" in
-    Db2out.make_string_of_crush_index bpdir;
-    Db2out.make_person_of_string_index bpdir;
-    Db2out.make_name_index bbdir gen.g_pcnt;
-    Db2out.make_index bbdir gen.g_particles "first_name";
-    Db2out.make_index bbdir gen.g_particles "surname";
+
+    Db2out.make_indexes (Filename.concat tmp_dir "base_d") gen.g_pcnt
+      gen.g_particles;
 
     output_particles_file tmp_dir gen.g_particles;
 

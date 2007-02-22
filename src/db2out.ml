@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: db2out.ml,v 5.5 2007-02-21 20:44:04 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.6 2007-02-22 02:13:17 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -366,4 +366,13 @@ value make_index bdir particles f2 = do {
   let oc = open_out_bin index_ini_fname in
   output_value oc (iofc : list (string * int));
   close_out oc;
+};
+
+value make_indexes bbdir nb_per particles = do {
+  let bpdir = Filename.concat bbdir "person" in
+  make_string_of_crush_index bpdir;
+  make_person_of_string_index bpdir;
+  make_name_index bbdir nb_per;
+  make_index bbdir particles "first_name";
+  make_index bbdir particles "surname";
 };
