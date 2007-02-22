@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.40 2007-02-21 20:44:04 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.41 2007-02-22 02:13:17 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value fname = ref "";
@@ -350,16 +350,12 @@ value rebuild_fields2 db2 = do {
   rebuild_any_field_array db2 fi_des [| |]
     ("children", fun f -> f.Def.children);
 
-  let new_d = Filename.concat db2.Db2disk.bdir2 "new_d" in
-  let bpdir = Filename.concat new_d "person" in
+  let nb_per = fi_per.fi_nb in
   let particles =
     Mutil.input_particles (Filename.concat db2.Db2disk.bdir2 "particles.txt")
   in
-  Db2out.make_string_of_crush_index bpdir;
-  Db2out.make_person_of_string_index bpdir;
-  Db2out.make_name_index new_d fi_per.fi_nb;
-  Db2out.make_index new_d particles "first_name";
-  Db2out.make_index new_d particles "surname";
+  Db2out.make_indexes (Filename.concat db2.Db2disk.bdir2 "new_d") nb_per
+    particles;
 };
 
 value simple_output bname base carray =
