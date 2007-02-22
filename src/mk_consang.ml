@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.43 2007-02-22 10:46:26 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.44 2007-02-22 11:39:45 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -141,12 +141,12 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
   let f1 = fi.fi_dir in
   let f oc_acc oc_dat =
     for i = 0 to fi.fi_nb - 1 do {
-      let xl =
+      let rxl =
         try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
         [ Not_found ->
             let pos = Db2disk.get_field_acc db2 i (f1, f2) in
             loop [] pos where rec loop list pos =
-              if pos = -1 then List.rev list
+              if pos = -1 then list
               else
                 let (x, pos) =
                   Db2disk.get_field_2_data db2 pos (f1, f2) "data"
@@ -154,7 +154,7 @@ value rebuild_list2_field_array db2 fi (f2, get) = do {
                 loop [x :: list] pos ]
       in
       let pos =
-        loop (-1) xl where rec loop pos =
+        loop (-1) rxl where rec loop pos =
           fun
           [ [] -> pos
           | [x :: xl] -> do {
