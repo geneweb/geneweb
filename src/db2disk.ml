@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.9 2007-02-22 03:50:29 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.10 2007-02-22 10:46:26 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -373,6 +373,11 @@ value consang_array2 db2 nb = do {
     [ Some ic -> do {
         let tab = input_value ic in
         close_in ic;
+        if Array.length tab < db2.patches.nb_per_ini then
+          failwith
+            (sprintf "consang_array2 array length = %d < %d"
+               (Array.length tab) db2.patches.nb_per_ini)
+        else ();
         if nb > Array.length tab then
           Array.append tab
             (Array.make (nb - Array.length tab) Adef.no_consang)
@@ -392,6 +397,11 @@ value family_array2 db2 = do {
   let ic = open_in_bin fname in
   let tab = input_value ic in
   close_in ic;
+  if Array.length tab < db2.patches.nb_per_ini then
+    failwith
+      (sprintf "family_array2 array length = %d < %d"
+         (Array.length tab) db2.patches.nb_per_ini)
+  else ();
   tab
 };
 
@@ -402,6 +412,11 @@ value children_array2 db2 = do {
   let ic = open_in_bin fname in
   let tab = input_value ic in
   close_in ic;
+  if Array.length tab < db2.patches.nb_fam_ini then
+    failwith
+      (sprintf "children_array2 array length = %d < %d"
+         (Array.length tab) db2.patches.nb_fam_ini)
+  else ();
   tab
 };
 
