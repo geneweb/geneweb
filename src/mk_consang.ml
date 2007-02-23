@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.45 2007-02-22 18:16:04 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.46 2007-02-23 16:07:09 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -501,6 +501,7 @@ value designation base p =
 value main () =
   do {
     Argl.parse speclist anonfun errmsg;
+    Mutil.verbose.val := not quiet.val;
     if fname.val = "" then do {
       eprintf "Missing file name\n";
       eprintf "Use option -help for usage\n";
