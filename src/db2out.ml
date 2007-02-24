@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: db2out.ml,v 5.7 2007-02-22 10:46:26 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.8 2007-02-24 07:41:16 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -338,7 +338,8 @@ value make_index bdir particles f2 = do {
           let rev_iofc =
             match rev_iofc with
             [ [(prev_s, _) :: _] ->
-                if prev_s = "" then [(s, i) :: rev_iofc]
+                if s = "" && i <> 0 then (* pad *) rev_iofc
+                else if prev_s = "" then [(s, i) :: rev_iofc]
                 else
                   let prev_nbc = Name.nbc prev_s.[0] in
                   let nbc = Name.nbc s.[0] in
@@ -350,7 +351,7 @@ value make_index bdir particles f2 = do {
                     rev_iofc
                   else
                     [(s, i) :: rev_iofc]
-            | [] -> [s_pos] ]
+            | [] -> [(s, i)] ]
           in
           loop rev_iofc (i + 1) list
         } ]
