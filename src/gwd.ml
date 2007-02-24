@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.54 2007-02-06 14:03:58 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.55 2007-02-24 20:08:15 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1689,8 +1689,34 @@ Type %s to stop the service
   }
 ;
 
+IFDEF UNIX THEN
+value cgi_timeout tmout _ =
+  let nl () = Wserver.wprint "\013\010" in
+  do {
+    Wserver.wprint "HTTP/1.0 200 OK"; nl ();
+    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
+    nl (); nl ();
+    Wserver.wprint "<head><title>Time out</title></head>\n";
+    Wserver.wprint "<body><h1>Time out</h1>\n";
+    Wserver.wprint "Computation time > %d second(s)\n" tmout;
+    Wserver.wprint "</body>\n";
+    Wserver.wflush ();
+    exit 0;
+  }
+END;
+
+IFDEF UNIX THEN
+value manage_cgi_timeout tmout =
+  if tmout > 0 then
+    let _ = Sys.signal Sys.sigalrm (Sys.Signal_handle (cgi_timeout tmout)) in
+    let _ = Unix.alarm tmout in
+    ()
+  else ()
+END;
+
 value geneweb_cgi addr script_name contents =
   do {
+    IFDEF UNIX THEN manage_cgi_timeout conn_timeout.val ELSE () END;
     try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755 with
     [ Unix.Unix_error _ _ _ -> () ];
     let add k x request =
