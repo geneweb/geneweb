@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.10 2007-02-22 10:46:26 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.11 2007-02-24 10:54:45 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -156,11 +156,38 @@ value start_with s p =
   String.sub s 0 (String.length p) = p
 ;
 
+type string_person =
+  [ Sp of string and string and int
+  | SpNew of string ]
+;
+
+value list_uniq =
+  fun
+  [ [_] | [] as l -> l
+  | [x :: l] ->
+      loop [] x l where rec loop rl x =
+        fun
+        [ [y :: l] -> if y = x then loop rl x l else loop [x :: rl] y l
+        | [] -> List.rev [x :: rl] ] ]
+;
+
+value sorted_patched_person_strings db2 is_first_name =
+  let sl =
+    Hashtbl.fold
+      (fun ip p sl ->
+         if is_first_name then [p.first_name :: sl] else [p.surname :: sl])
+    db2.patches.h_person []
+  in
+  list_uniq (List.sort compare sl)
+;
+
 value spi2_first db2 spi s = do {
-  let i =
+  let f1 = "person" in
+  let f2 = if spi.is_first_name then "first_name" else "surname" in
+  let i_opt =
     (* to be faster, go directly to the first string starting with
        the same char *)
-    if s = "" then 0
+    if s = "" then Some 0
     else
       let nbc = Name.nbc s.[0] in
       loop spi.index_of_first_char where rec loop =
@@ -172,26 +199,43 @@ value spi2_first db2 spi s = do {
               if nbc = nbc1 && nbc > 0 && nbc <= String.length s &&
                  nbc <= String.length s1 &&
                  String.sub s 0 nbc = String.sub s1 0 nbc
-              then i1
+              then Some i1
               else loop list
-        | [] -> raise Not_found ]
+        | [] -> None ]
   in
-  let f1 = "person" in
-  let f2 = if spi.is_first_name then "first_name" else "surname" in
-  let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
-  let pos = input_binary_int ic in
-  let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
-  let (pos, i) =
-    try
-      loop i where rec loop i =
-        let (s1, pos) : (string * int) = Iovalue.input ic in
-        if start_with s1 s then (pos, i) else loop (i + 1)
-    with
-    [ End_of_file -> raise Not_found ]
+  let pos_i_opt =
+    match i_opt with
+    [ Some i ->
+        let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
+        let pos = input_binary_int ic in
+        let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos in
+        try
+          loop i where rec loop i =
+            let (s1, pos) : (string * int) = Iovalue.input ic in
+            if start_with s1 s then Some (s1, pos, i) else loop (i + 1)
+        with
+        [ End_of_file -> None ]
+    | None -> None ]
   in
-  spi.ini := s;
-  spi.curr := i;
-  (f1, f2, pos)
+  let first_patched =
+    let patched_sl = sorted_patched_person_strings db2 spi.is_first_name in
+    loop patched_sl where rec loop =
+      fun
+      [ [s2 :: sl] ->
+          if s2 < s then loop sl
+          else if start_with s2 s then Some s2
+          else loop sl
+      | [] -> None ]
+  in
+  match (pos_i_opt, first_patched) with
+  [ (Some (s1, _, _), Some s2) when s2 < s1 -> SpNew s2
+  | (Some (s1, pos, i), _) -> do {
+      spi.ini := s;
+      spi.curr := i;
+      Sp f1 f2 pos
+    }
+  | (None, Some s2) -> SpNew s2
+  | (None, None) -> raise Not_found ]
 };
 
 value spi2_next db2 spi need_whole_list (f1, f2) =
