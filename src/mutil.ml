@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.17 2007-02-18 19:26:34 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.18 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 value int_size = 4;
@@ -29,6 +29,16 @@ value list_iter_first f al =
     List.fold_left (fun first a -> let () = f first a in False) True al
   in
   ()
+;
+
+value list_uniq =
+  fun
+  [ [_] | [] as l -> l
+  | [x :: l] ->
+      loop [] x l where rec loop rl x =
+        fun
+        [ [y :: l] -> if y = x then loop rl x l else loop [x :: rl] y l
+        | [] -> List.rev [x :: rl] ] ]
 ;
 
 IFDEF OLD THEN declare

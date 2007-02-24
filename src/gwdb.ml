@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.226 2007-02-24 10:54:45 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.227 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -141,16 +141,22 @@ value spi1_fun =
 
 value spi2_fun =
   {spi_first (db2, spi) s =
-     match spi2_first db2 spi s with
-     [ Sp f1 f2 pos -> Istr2 db2 (f1, f2) pos
-     | SpNew s2 -> Istr2New db2 s ]
+     let f1 = "person" in
+     let f2 = if spi.is_first_name then "first_name" else "surname" in
+     match spi2_first db2 spi s (f1, f2) with
+     [ Sp pos -> Istr2 db2 (f1, f2) pos
+     | SpNew s2 -> Istr2New db2 s2 ]
    ;
    spi_next (db2, spi) istr need_whole_list =
-     match istr with
-     [ Istr2 _ (f1, f2) _ ->
-         let (pos, dlen) = spi2_next db2 spi need_whole_list (f1, f2) in
-         (Istr2 db2 (f1, f2) pos, dlen)
-     | _ -> failwith "not impl spi_next" ];
+     let f1 = "person" in
+     let f2 = if spi.is_first_name then "first_name" else "surname" in
+     let (sp, dlen) = spi2_next db2 spi need_whole_list (f1, f2) in
+     let r =
+       match sp with
+       [ Sp pos -> Istr2 db2 (f1, f2) pos
+       | SpNew s2 -> Istr2New db2 s2 ]
+     in
+     (r, dlen);
    spi_find (db2, spi) s =
      match s with
      [ Istr2 db2 (f1, f2) pos -> spi2_find db2 (f1, f2) pos
@@ -1082,22 +1088,24 @@ value base1 base =
 
 (* Database - implementation 2 *)
 
-value ok_I_know = ref False;
 value base2 db2 =
   let base_strings_of_first_name_or_surname field proj s =
     let posl = strings2_of_fsname db2 field s in
     let istrl = List.map (fun pos -> Istr2 db2 ("person", field) pos) posl in
     let s = Name.crush_lower s in
-    Hashtbl.fold
-      (fun _ iper istrl ->
-         try
-           let p = Hashtbl.find db2.patches.h_person iper in
-           if Name.crush_lower (proj p) = s then
-             [Istr2New db2 (proj p) :: istrl]
-           else istrl
-         with
-         [ Not_found -> istrl ])
-      db2.patches.h_key istrl
+    let sl =
+      Hashtbl.fold
+        (fun _ iper sl ->
+           try
+             let p = Hashtbl.find db2.patches.h_person iper in
+             if Name.crush_lower (proj p) = s then [proj p :: sl]
+             else sl
+           with
+           [ Not_found -> sl ])
+        db2.patches.h_key []
+    in
+    let sl = list_uniq (List.sort compare sl) in
+    List.fold_left (fun istrl s -> [Istr2New db2 s :: istrl]) istrl sl
   in
   self where rec self =
     {close_base () =
@@ -1193,16 +1201,7 @@ value base2 db2 =
      insert_string s = Istr2New db2 s;
      commit_patches () = commit_patches2 db2;
      commit_notes _ = failwith "not impl commit_notes";
-     is_patched_person ip =
-       let _ =
-         if ok_I_know.val then ()
-         else do {
-           ok_I_know.val := True;
-           eprintf "not impl is_patched_person\n";
-           flush stderr
-         }
-       in
-       False;
+     is_patched_person ip = Hashtbl.mem db2.patches.h_person ip;
      patched_ascends () = do {
        let r = ref [] in
        Hashtbl.iter (fun ip _ -> r.val := [ip :: r.val]) db2.patches.h_ascend;

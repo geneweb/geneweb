@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.11 2007-02-24 10:54:45 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.12 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -148,7 +148,8 @@ type string_person_index2 =
   { is_first_name : bool;
     index_of_first_char : list (string * int);
     ini : mutable string;
-    curr : mutable int }
+    curr_i : mutable int;
+    curr_s : mutable string }
 ;
 
 value start_with s p =
@@ -157,33 +158,42 @@ value start_with s p =
 ;
 
 type string_person =
-  [ Sp of string and string and int
+  [ Sp of int
   | SpNew of string ]
 ;
 
-value list_uniq =
-  fun
-  [ [_] | [] as l -> l
-  | [x :: l] ->
-      loop [] x l where rec loop rl x =
-        fun
-        [ [y :: l] -> if y = x then loop rl x l else loop [x :: rl] y l
-        | [] -> List.rev [x :: rl] ] ]
-;
-
 value sorted_patched_person_strings db2 is_first_name =
+  let particles =
+    Mutil.input_particles (Filename.concat db2.bdir2 "particles.txt")
+  in
   let sl =
     Hashtbl.fold
       (fun ip p sl ->
-         if is_first_name then [p.first_name :: sl] else [p.surname :: sl])
+         let s = if is_first_name then p.first_name else p.surname in
+         [s :: sl])
     db2.patches.h_person []
   in
-  list_uniq (List.sort compare sl)
+  let sl = list_uniq (List.sort compare sl) in
+  let sl =
+    List.map
+      (fun s ->
+         let s_ord =
+           try
+             let part = List.find (start_with s) particles in
+             let plen = String.length part in
+             String.sub s plen (String.length s - plen) ^ " (" ^
+             part ^ ")"
+           with
+           [ Not_found -> s ]
+         in
+         (s_ord, s))
+       sl
+  in
+  List.sort compare sl
 ;
 
-value spi2_first db2 spi s = do {
-  let f1 = "person" in
-  let f2 = if spi.is_first_name then "first_name" else "surname" in
+value spi2_first db2 spi s (f1, f2) = do {
+  spi.ini := s;
   let i_opt =
     (* to be faster, go directly to the first string starting with
        the same char *)
@@ -203,7 +213,7 @@ value spi2_first db2 spi s = do {
               else loop list
         | [] -> None ]
   in
-  let pos_i_opt =
+  let first_in_disk =
     match i_opt with
     [ Some i ->
         let ic = fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (4 * i) in
@@ -221,51 +231,80 @@ value spi2_first db2 spi s = do {
     let patched_sl = sorted_patched_person_strings db2 spi.is_first_name in
     loop patched_sl where rec loop =
       fun
-      [ [s2 :: sl] ->
-          if s2 < s then loop sl
-          else if start_with s2 s then Some s2
+      [ [(s2_ord, s2) :: sl] ->
+          if s2_ord < s then loop sl
+          else if start_with s2_ord s then Some (s2_ord, s2)
           else loop sl
       | [] -> None ]
   in
-  match (pos_i_opt, first_patched) with
-  [ (Some (s1, _, _), Some s2) when s2 < s1 -> SpNew s2
+  match (first_in_disk, first_patched) with
+  [ (Some (s1, _, _), Some (s2_ord, s2)) when s2_ord < s1 -> do {
+      spi.curr_s := s2_ord;
+      SpNew s2
+   }
   | (Some (s1, pos, i), _) -> do {
-      spi.ini := s;
-      spi.curr := i;
-      Sp f1 f2 pos
+      spi.curr_i := i;
+      spi.curr_s := s1;
+      Sp pos;
     }
-  | (None, Some s2) -> SpNew s2
+  | (None, Some (s2_ord, s2)) -> do {
+      spi.curr_s := s2_ord;
+      SpNew s2
+    }
   | (None, None) -> raise Not_found ]
 };
 
 value spi2_next db2 spi need_whole_list (f1, f2) =
-  let i =
+  let i_opt =
     if spi.ini = "" && not need_whole_list then
       loop spi.index_of_first_char where rec loop =
         fun
         [ [(_, i1) :: ([(_, i2) :: _] as list)] ->
-            if spi.curr = i1 then i2 else loop list
-        | [] | [_] -> raise Not_found ]
-    else spi.curr + 1
+            if spi.curr_i = i1 then Some i2 else loop list
+        | [] | [_] -> None ]
+    else Some (spi.curr_i + 1)
   in
-  try do {
-    let ic =
-      if i = spi.curr + 1 then
-        Hashtbl.find db2.cache_chan (f1, f2, "index.dat")
-      else
-        let ic =
-          fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
-        in
-        let pos = input_binary_int ic in
-        fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
-    in
-    let (s, pos) : (string * int) = Iovalue.input ic in
-    let dlen = i - spi.curr in
-    spi.curr := i;
-    (pos, dlen)
-  }
-  with
-  [ End_of_file -> raise Not_found ]
+  let next_in_disk =
+    match i_opt with
+    [ Some i ->
+        try
+          let ic =
+            let ic =
+              fast_open_in_bin_and_seek db2 f1 f2 "index.acc" (i * 4)
+            in
+            let pos = input_binary_int ic in
+            fast_open_in_bin_and_seek db2 f1 f2 "index.dat" pos
+          in
+          let (s, pos) : (string * int) = Iovalue.input ic in
+          let dlen = i - spi.curr_i in
+          Some (i, s, pos, dlen)
+        with
+        [ End_of_file -> None ]
+    | None -> None ]
+  in
+  let next_patched =
+    let patched_sl = sorted_patched_person_strings db2 spi.is_first_name in
+    loop patched_sl where rec loop =
+      fun
+      [ [(s2_ord, s2) :: sl] ->
+          if s2_ord <= spi.curr_s then loop sl else Some (s2_ord, s2)
+      | [] -> None ]
+  in
+  match (next_in_disk, next_patched) with
+  [ (Some (_, s1, _, _), Some (s2_ord, s2)) when s2_ord < s1 -> do {
+      spi.curr_s := s2_ord;
+      (SpNew s2, 1)
+    }
+  | (Some (i, s1, pos, dlen), _) -> do {
+      spi.curr_i := i;
+      spi.curr_s := s1;
+      (Sp pos, dlen)
+    }
+  | (None, Some (s2_ord, s2)) -> do {
+      spi.curr_s := s2_ord;
+      (SpNew s2, 1)
+    }
+  | (None, None) -> raise Not_found ]
 ;
 
 value spi2_find db2 (f1, f2) pos =
@@ -329,7 +368,7 @@ value persons_of_first_name_or_surname2 db2 is_first_name = do {
   let iofc : list (string * int) = input_value ic in
   close_in ic;
   {is_first_name = is_first_name; index_of_first_char = iofc; ini = "";
-   curr = 0}
+   curr_i = 0; curr_s = ""}
 };
 
 value load_array2 bdir nb_ini nb def f1 f2 get =
