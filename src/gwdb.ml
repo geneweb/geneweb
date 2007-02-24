@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.227 2007-02-24 16:16:57 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.228 2007-02-24 19:46:21 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -143,14 +143,14 @@ value spi2_fun =
   {spi_first (db2, spi) s =
      let f1 = "person" in
      let f2 = if spi.is_first_name then "first_name" else "surname" in
-     match spi2_first db2 spi s (f1, f2) with
+     match spi2_first db2 spi (f1, f2) s with
      [ Sp pos -> Istr2 db2 (f1, f2) pos
      | SpNew s2 -> Istr2New db2 s2 ]
    ;
    spi_next (db2, spi) istr need_whole_list =
      let f1 = "person" in
      let f2 = if spi.is_first_name then "first_name" else "surname" in
-     let (sp, dlen) = spi2_next db2 spi need_whole_list (f1, f2) in
+     let (sp, dlen) = spi2_next db2 spi (f1, f2) need_whole_list in
      let r =
        match sp with
        [ Sp pos -> Istr2 db2 (f1, f2) pos
@@ -159,7 +159,7 @@ value spi2_fun =
      (r, dlen);
    spi_find (db2, spi) s =
      match s with
-     [ Istr2 db2 (f1, f2) pos -> spi2_find db2 (f1, f2) pos
+     [ Istr2 db2 (f1, f2) pos -> spi2_find db2 spi (f1, f2) pos
      | Istr2New db2 s -> spi2gen_find db2 spi s
      | _ -> failwith "not impl spi_find" ]}
 ;
