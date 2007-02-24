@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.44 2007-02-22 10:46:26 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.45 2007-02-24 20:44:10 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -609,7 +609,7 @@ value insert_bnotes1 gen srcfile notesname str = do {
     List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; nfname ^ ".txt"]
   in
   Mutil.mkdir_p (Filename.dirname fname);
-  let oc = Secure.open_out fname in
+  let oc = open_out fname in
   output_string oc str;
   close_out oc;
   if notesname = "" then do {
@@ -617,7 +617,7 @@ value insert_bnotes1 gen srcfile notesname str = do {
       List.fold_left Filename.concat gen.g_tmp_dir
         ["base_d"; "notes_of.txt"]
     in
-    let oc = Secure.open_out fname in
+    let oc = open_out fname in
     fprintf oc "%s\n" srcfile;
     close_out oc;
   }
