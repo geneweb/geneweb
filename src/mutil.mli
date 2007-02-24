@@ -1,4 +1,4 @@
-(* $Id: mutil.mli,v 5.15 2007-02-18 19:26:34 ddr Exp $ *)
+(* $Id: mutil.mli,v 5.16 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 value int_size : int;
@@ -9,6 +9,7 @@ value lindex : string -> char -> option int;
 value rindex : string -> char -> option int;
 value array_mem : 'a -> array 'a -> bool;
 value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
+value list_uniq : list 'a -> list 'a;
 value tr : char -> char -> string -> string;
 value strip_all_trailing_spaces : string -> string;
 

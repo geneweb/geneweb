@@ -1,4 +1,4 @@
-(* $Id: db2disk.mli,v 5.5 2007-02-24 10:54:45 ddr Exp $ *)
+(* $Id: db2disk.mli,v 5.6 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -32,7 +32,7 @@ type db2 =
 ;
 
 type string_person =
-  [ Sp of string and string and int
+  [ Sp of int
   | SpNew of string ]
 ;
 
@@ -40,7 +40,8 @@ type string_person_index2 =
   { is_first_name : bool;
     index_of_first_char : list (string * int);
     ini : mutable string;
-    curr : mutable int }
+    curr_i : mutable int;
+    curr_s : mutable string }
 ;
 
 value field_exists : db2 -> (string * string) -> bool;
@@ -53,9 +54,10 @@ value get_field : db2 -> int -> (string * string) -> 'a;
 value string_of_istr2 : db2 -> (string * string) -> int -> string;
 
 value spi2_first :
-  db2 -> string_person_index2 -> string -> string_person;
+  db2 -> string_person_index2 -> string -> (string * string) -> string_person;
 value spi2_next :
-  db2 -> string_person_index2 -> bool -> (string * string) -> (int * int);
+  db2 -> string_person_index2 -> bool -> (string * string) ->
+    (string_person * int);
 value spi2_find :
   db2 -> (string * string) -> int -> list iper;
 value spi2gen_find :
