@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.39 2007-02-17 09:19:59 ddr Exp $ *)
+(* $Id: some.ml,v 5.40 2007-02-24 19:46:21 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -216,6 +216,7 @@ value first_name_print conf base x =
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
+      let iperl = list_uniq (List.sort compare iperl) in
       let pl = List.map (pget conf base) iperl in
       let pl =
         if conf.hide_names then

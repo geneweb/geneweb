@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.21 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: alln.ml,v 5.22 2007-02-24 19:46:21 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -410,9 +410,7 @@ value print_alphabetic conf base is_surnames =
         if c = 'A' then (list, len)
         else loop list (len + 1) (Char.chr (Char.code c - 1))
     else
-      let (list, sorted, len) =
-        select_names conf base is_surnames ini all
-      in
+      let (list, sorted, len) = select_names conf base is_surnames ini all in
       let list =
         if sorted then list
         else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list

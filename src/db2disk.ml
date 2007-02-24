@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.12 2007-02-24 16:16:57 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.13 2007-02-24 19:46:21 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -192,7 +192,7 @@ value sorted_patched_person_strings db2 is_first_name =
   List.sort compare sl
 ;
 
-value spi2_first db2 spi s (f1, f2) = do {
+value spi2_first db2 spi (f1, f2) s = do {
   spi.ini := s;
   let i_opt =
     (* to be faster, go directly to the first string starting with
@@ -241,7 +241,7 @@ value spi2_first db2 spi s (f1, f2) = do {
   [ (Some (s1, _, _), Some (s2_ord, s2)) when s2_ord < s1 -> do {
       spi.curr_s := s2_ord;
       SpNew s2
-   }
+    }
   | (Some (s1, pos, i), _) -> do {
       spi.curr_i := i;
       spi.curr_s := s1;
@@ -254,7 +254,7 @@ value spi2_first db2 spi s (f1, f2) = do {
   | (None, None) -> raise Not_found ]
 };
 
-value spi2_next db2 spi need_whole_list (f1, f2) =
+value spi2_next db2 spi (f1, f2) need_whole_list =
   let i_opt =
     if spi.ini = "" && not need_whole_list then
       loop spi.index_of_first_char where rec loop =
@@ -307,12 +307,7 @@ value spi2_next db2 spi need_whole_list (f1, f2) =
   | (None, None) -> raise Not_found ]
 ;
 
-value spi2_find db2 (f1, f2) pos =
-  let dir = List.fold_left Filename.concat db2.bdir2 [f1; f2] in
-  hashtbl_find_all dir "person_of_string.ht" pos
-;
-
-value spi2gen_find db2 spi s =
+value spi2gen_add pl db2 spi s =
   let proj =
     if spi.is_first_name then fun p -> p.first_name
     else fun p -> p.surname
@@ -324,8 +319,17 @@ value spi2gen_find db2 spi s =
          if proj p = s then [iper :: iperl] else iperl
        with
        [ Not_found -> iperl ])
-    db2.patches.h_key []
+    db2.patches.h_key pl
 ;
+
+value spi2_find db2 spi (f1, f2) pos =
+  let dir = List.fold_left Filename.concat db2.bdir2 [f1; f2] in
+  let pl = hashtbl_find_all dir "person_of_string.ht" pos in
+  let s = string_of_istr2 db2 (f1, f2) pos in
+  spi2gen_add pl db2 spi s
+;
+
+value spi2gen_find = spi2gen_add [];
 
 (* *)
 
