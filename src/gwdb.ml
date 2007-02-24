@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.225 2007-02-21 18:14:01 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.226 2007-02-24 10:54:45 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -141,8 +141,9 @@ value spi1_fun =
 
 value spi2_fun =
   {spi_first (db2, spi) s =
-     let (f1, f2, pos) = spi2_first db2 spi s in
-     Istr2 db2 (f1, f2) pos
+     match spi2_first db2 spi s with
+     [ Sp f1 f2 pos -> Istr2 db2 (f1, f2) pos
+     | SpNew s2 -> Istr2New db2 s ]
    ;
    spi_next (db2, spi) istr need_whole_list =
      match istr with
