@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.32 2007-02-12 22:07:34 ddr Exp $ *)
+(* $Id: templ.ml,v 5.33 2007-02-25 01:34:39 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -691,7 +691,7 @@ and eval_simple_variable conf =
       match conf.n_connect with
       [ Some (c, cw, cf, _) ->
           if c > 0 then
-            "- " ^ sprintf "%s %d" (Util.transl conf "connections") c ^
+            " - " ^ sprintf "%s %d" (Util.transl conf "connections") c ^
             (if cw > 0 then
                sprintf ", %s %s"
                  (Util.transl_nth conf
