@@ -5,6 +5,7 @@
  to try again with this number
 %1 of %2
 %d years ago
+%s access cancelled for that page
 %s cousins
 %s, it is %s of
 %s, it will be %s of
@@ -253,6 +254,7 @@ person/persons
 persons having the same name
 place
 population pyramid
+possible duplications
 possibly (date)
 precision
 previous sibling
@@ -352,6 +354,7 @@ with
 witness at marriage of %s and %s
 witness/witnesses
 wizard/wizards/friend/friends
+wizard/wizards/friend/friends/exterior
 would be his/her own ancestor
 year/month/day
 years old
