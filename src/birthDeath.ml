@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.33 2007-02-25 10:04:52 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.34 2007-02-25 12:02:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -627,9 +627,9 @@ value print_population_pyramid conf base = do {
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "population pyramid"))
   in
-  let print_image i iname =
-    tag "td" begin
-      if i = 0 then
+  let print_image doit sex iname =
+    stagn "td" begin
+      if doit then
         let wid_hei =
           match Util.image_size (Util.image_file_name iname) with
           [ Some (wid, hei) ->
@@ -638,10 +638,11 @@ value print_population_pyramid conf base = do {
         in
         xtag "img" "src=\"%s/%s\"%s alt=\"%s\"%s"
           (Util.image_prefix conf) iname wid_hei
-          (transl_nth conf "M/F" 1) conf.xhs
+          (transl_nth conf "M/F" sex) conf.xhs
       else Wserver.wprint "&nbsp;";
     end
   in
+  Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
@@ -665,7 +666,12 @@ value print_population_pyramid conf base = do {
         let nb_men = men.(i) in
         let nb_wom = wom.(i) in
         tag "tr" begin
-          print_image i "male.png";
+          stagn "td" "style=\"font-size:60%%; font-style:italic\"" begin
+            Wserver.wprint "%d" (at_date.year - i * interval);
+          end;
+          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          print_image (i = 0) 0 "male.png";
+          stagn "td" begin Wserver.wprint "&nbsp;"; end;
           tag "td" "align=\"right\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
@@ -704,7 +710,12 @@ value print_population_pyramid conf base = do {
               end;
             end;
           end;
-          print_image i "female.png";
+          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          print_image (i = 0) 1 "female.png";
+          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          stagn "td" "style=\"font-size:60%%; font-style:italic\"" begin
+            Wserver.wprint "%d" (at_date.year - i * interval);
+          end;
         end;
       };
     end;
@@ -715,6 +726,16 @@ value print_population_pyramid conf base = do {
     Wserver.wprint "%s %s"
       (capitale (transl conf "number of living persons:"))
       (string_of_nb (sum_men + sum_wom));
+  end;
+  tag "p" begin
+    tag "form" "method=\"get\" action=\"%s\"" (commd conf) begin
+      hidden_env conf;
+      xtag "input" "type=\"hidden\" name=\"m\" value=\"POP_PYR\"";
+      xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\"" interval;
+      xtag "input" "type=\"hidden\" name=\"lim\" value=\"%d\"" limit;
+      Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 0);
+      xtag "input" "name=\"y\" value=\"%d\" size=\"5\"" at_date.year;
+    end;
   end;
   Hutil.trailer conf;
 };
