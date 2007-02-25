@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.33 2007-02-25 01:34:39 ddr Exp $ *)
+(* $Id: templ.ml,v 5.34 2007-02-25 02:05:44 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -904,6 +904,17 @@ value int_of e =
       raise_with_loc (loc_of_expr e) (Failure "int value expected") ]
 ;
 
+value num_of e =
+  fun
+  [ VVstring s ->
+      try Num.of_string s with
+      [ Failure _ ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("num value expected\nFound = " ^ s)) ]
+  | VVbool _ | VVother _ ->
+      raise_with_loc (loc_of_expr e) (Failure "num value expected") ]
+;
+
 value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
   fun
   [ Atext _ s -> VVstring s
@@ -939,6 +950,7 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")) ]
   | Aop2 loc op e1 e2 ->
       let int e = int_of e (eval_expr ceva e) in
+      let num e = num_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
       match op with
       [ "and" -> VVbool (if bool e1 then bool e2 else False)
@@ -949,11 +961,11 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       | "!=" -> VVbool (eval_expr ceva e1 <> eval_expr ceva e2)
       | "<=" -> VVbool (int e1 <= int e2)
       | ">=" -> VVbool (int e1 >= int e2)
-      | "+" -> VVstring (string_of_int (int e1 + int e2))
-      | "-" -> VVstring (string_of_int (int e1 - int e2))
-      | "*" -> VVstring (string_of_int (int e1 * int e2))
-      | "/" -> VVstring (string_of_int (int e1 / int e2))
-      | "%" -> VVstring (string_of_int (int e1 mod int e2))
+      | "+" -> VVstring (Num.to_string (Num.add (num e1) (num e2)))
+      | "-" -> VVstring (Num.to_string (Num.sub (num e1) (num e2)))
+      | "*" -> VVstring (Num.to_string (Num.mul (num e1) (int e2)))
+      | "/" -> VVstring (Num.to_string (Num.div (num e1) (int e2)))
+      | "%" -> VVstring (string_of_int (Num.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")) ]
   | Aint loc s -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e)) ]
