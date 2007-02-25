@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.75 2007-01-19 01:53:16 ddr Exp $
+# $Id: lex_utf8.txt,v 5.76 2007-02-25 18:06:26 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -64,6 +64,7 @@ zh: fr=法语/zh=中文
 
     to change
 en: to change
+et: muutmiseks
 fr: pour changer
 it: per cambiare
 
@@ -204,6 +205,7 @@ sv: %d år sedan
 
     %s access cancelled for that page
 en: %s access cancelled for that page
+et: %s: ligipääs sellele lehele on keelatud
 fr: accès %s annulé pour cette page
 
     %s cousins
@@ -2866,6 +2868,7 @@ da: fortsat
 de: fortgesetzt
 en: continued
 es: continúa
+et: jätkub
 fr: suite
 it: continua
 nl: vervolgd
@@ -3234,6 +3237,7 @@ da: afbryd
 de: abmelden
 en: disconnect
 es: desconectar
+et: logi välja
 fr: déconnecter
 nl: ontkoppelen
 pl: rozłącz
@@ -3934,6 +3938,7 @@ da: for en liste sorteret efter datoen for seneste ændring
 de: für eine, nach dem Datum der letzten Änderung geordnete Liste
 en: for the list ordered by the date of the last modification
 es: para la lista ordenada por fecha de la última modificación
+et: sorteerimaks nimekirja viimase muudatuse tegemise aja järgi
 fr: pour la liste par date de dernière modification
 it: per la lista ordinata secondo la data dell'ultima modifica
 nl: voor de lijst, gesorteerd op datum van de laatste wijziging
@@ -6362,6 +6367,7 @@ da: antal nulevende personer:
 de: Anzahl der lebenden Personen:
 en: number of living persons:
 es: número de personas vivas:
+et: elavaid inimesi:
 fr: nombre de personnes vivantes :
 nl: aantal personen in leven:
 pl: liczba osób żyjących
@@ -6869,6 +6875,7 @@ da: befolkningspyramide
 de: Alterspyramide
 en: population pyramid
 es: pirámide de población
+et: rahvastikupüramiid
 fr: pyramide des âges
 nl: bevolkingspiramide
 pt: pirâmide populacional
@@ -6878,6 +6885,7 @@ sv: befolkningspyramid
 
     possible duplications
 en: possible duplications
+et: võimalikud duplikaadid
 fr: doublons éventuels
 
     possibly (date)
@@ -7640,6 +7648,7 @@ da: siden det sidste klik
 de: seit dem letzten click
 en: since the last click
 es: desde el último click
+et: alates viimasest klõpsust
 fr: depuis le dernier clic
 it: dall'ultimo click
 nl: sinds de laatste klik
@@ -9301,6 +9310,7 @@ sv: giltligt/tas bort
 
     view source
 en: view source
+et: vaata lähteteksti
 fr: voir source
 
     visualize/show/hide/summary
@@ -9442,7 +9452,7 @@ de: Wizard/Wizards/Freund/Freunde/exterior
 en: wizard/wizards/friend/friends/exterior
 eo: sorĉisto/sorĉistoj/amiko/amikoj/exterior
 es: brujo/brujos/amigo/amigos/exterior
-et: teadmamees/teadmamehed/sõber/sõbrad/exterior
+et: teadmamees/teadmamehed/sõber/sõbrad/tavakasutaja
 fi: velho/velho/valittu/valittu/exterior
 fr: magicien/magiciens/ami/amis/extérieur
 he:  כגאון / כגאון / מיוחסת / מיוחסת /exterior
@@ -9545,6 +9555,7 @@ zh:  岁
     you are visible/you are not visible
 de: du bist sichtbar/du bist nicht sichtbar
 en: you are visible/you are not visible
+et: sa oled nähtav/sa ei ole nähtav
 fr: vous êtes visible/vous n'êtes pas visible
 ro: tu esti vizibil/tu nu esti vizibil
 
