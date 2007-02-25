@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 5.5 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: setup.ml,v 5.6 2007-02-25 02:32:19 ddr Exp $ *)
 
 open Printf;
 
@@ -327,7 +327,7 @@ value macro conf =
   fun
   [ '/' -> IFDEF UNIX THEN "/" ELSE "\\" END
   | 'a' -> strip_spaces (s_getenv conf.env "anon")
-  | 'c' -> stringify (Filename.concat setup_dir.val conf.comm)
+  | 'c' -> stringify setup_dir.val
   | 'd' -> conf.comm
   | 'i' -> strip_spaces (s_getenv conf.env "i")
   | 'l' -> conf.lang
@@ -337,7 +337,7 @@ value macro conf =
   | 'p' -> parameters conf.env
   | 'q' -> Version.txt
   | 'u' -> Filename.dirname (abs_setup_dir ())
-  | 'x' -> stringify (Filename.concat bin_dir.val conf.comm)
+  | 'x' -> stringify bin_dir.val
   | 'w' -> slashify (Sys.getcwd ())
   | 'y' -> Filename.basename (only_file_name ())
   | '%' -> "%"
