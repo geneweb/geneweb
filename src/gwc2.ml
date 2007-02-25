@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.45 2007-02-24 20:44:10 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.46 2007-02-25 01:25:48 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -813,7 +813,7 @@ value link gwo_list bname =
 
     Gc.compact ();
 
-    if ngwo >= 10 || not Mutil.verbose.val then do {
+    if ngwo >= 10 && Mutil.verbose.val then do {
       eprintf "pass 2: creating families...\n";
       flush stderr
     }
@@ -929,7 +929,8 @@ value speclist =
    ("-mem", Arg.Unit (fun () -> ()), " (obsolete option)");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
    ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.");
-   ("-q", Arg.Clear Mutil.verbose, " no verbose")]
+   ("-q", Arg.Clear Mutil.verbose, " no verbose");
+   ("-v", Arg.Set Mutil.verbose, " verbose")]
 ;
 
 value anonfun x =
@@ -954,6 +955,7 @@ and [options] are:"
 
 value main () =
   do {
+    Mutil.verbose.val := False;
     Argl.parse speclist anonfun errmsg;
     Secure.set_base_dir (Filename.dirname out_file.val);
     let gwo = ref [] in

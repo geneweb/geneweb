@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: db2out.ml,v 5.8 2007-02-24 07:41:16 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.9 2007-02-25 01:25:48 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -262,9 +262,9 @@ value make_name_index base_d nbper = do {
   }
   in
   let ht = Hashtbl.create 1 in
-  ProgrBar.start ();
+  if nbper > 0 && Mutil.verbose.val then ProgrBar.start () else ();
   for i = 0 to nbper - 1 do {
-    ProgrBar.run i nbper;
+    if Mutil.verbose.val then ProgrBar.run i nbper else ();
     let first_name = get_first_name i in
     let surname = get_surname i in
     let names =
@@ -278,7 +278,7 @@ value make_name_index base_d nbper = do {
     in
     List.iter (fun s -> Hashtbl.add ht (Name.crush_lower s) i) names;
   };
-  ProgrBar.finish ();
+  if nbper > 0 && Mutil.verbose.val then ProgrBar.finish () else ();
   List.iter
     (fun (_, (ic_acc, ic_dat)) -> do { close_in ic_acc; close_in ic_dat })
     ic2_list;
