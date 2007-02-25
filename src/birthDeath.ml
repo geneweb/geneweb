@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.32 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.33 2007-02-25 10:04:52 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -582,6 +582,11 @@ value print_population_pyramid conf base = do {
     [ Some x -> x
     | _ -> 0 ]
   in
+  let at_date =
+    match p_getint conf.env "y" with
+    [ Some i -> {year = i; month = 0; day = 0; prec = Sure; delta = 0}
+    | None -> conf.today ]
+  in
   let nb_intervals = 150 /interval in
   let men = Array.create (nb_intervals + 1) 0 in
   let wom = Array.create (nb_intervals + 1) 0 in
@@ -592,11 +597,24 @@ value print_population_pyramid conf base = do {
     if sex <> Neuter then do {
       match Adef.od_of_codate (get_birth p) with
       [ Some (Dgreg dmy _) ->
-          let a = CheckItem.time_elapsed dmy conf.today in
-          let j = min nb_intervals (a.year / interval) in
-          if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
-            if sex = Male then men.(j) := men.(j) + 1
-            else wom.(j) := wom.(j) + 1
+          if Date.before_date at_date dmy then
+            let a = CheckItem.time_elapsed dmy at_date in
+            let j = min nb_intervals (a.year / interval) in
+            let ok =
+              if dea = NotDead || dea = DontKnowIfDead && a.year < limit then
+                True
+              else
+                match dea with
+                [ Death _ cd ->
+                    match Adef.date_of_cdate cd with
+                    [ Dgreg d _ -> Date.before_date d at_date
+                    | _ -> False ]
+                | _ -> False ]
+            in
+            if ok then
+              if sex = Male then men.(j) := men.(j) + 1
+              else wom.(j) := wom.(j) + 1
+            else ()
           else ()
       | Some (Dtext _) | None -> () ];
     }
