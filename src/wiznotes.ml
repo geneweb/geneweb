@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.46 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.47 2007-02-25 12:17:38 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -330,6 +330,7 @@ value print_main conf base auth_file =
     in
     if by_alphab_order then do {
       tag "p" begin
+        Wserver.wprint "%d %s<br%s>\n" (List.length wizdata) wiztxt conf.xhs;
         Wserver.wprint "<em style=\"font-size:80%%\">\n";
         Wserver.wprint "%s " (capitale (transl conf "click"));
         Wserver.wprint "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
@@ -341,10 +342,12 @@ value print_main conf base auth_file =
       end;
       print_wizards_by_alphabetic_order conf list;
     }
-    else print_wizards_by_date conf list;
-    tag "p" begin
-      Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
-    end;
+    else do {
+      tag "p" begin
+        Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
+      end;
+      print_wizards_by_date conf list;
+    };
     if by_alphab_order then do {
       print_old_wizards conf old_list;
       print_search_form conf "";
