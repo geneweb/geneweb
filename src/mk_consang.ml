@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.46 2007-02-23 16:07:09 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.47 2007-02-26 20:07:49 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -442,9 +442,9 @@ value simple_output bname base carray =
   [ Some tab ->
       Gwdb.apply_base2 base
         (fun db2 -> do {
+           let bdir = db2.Db2disk.bdir2 in
            let dir =
-             List.fold_left Filename.concat db2.Db2disk.bdir2
-               ["person"; "consang"]
+             List.fold_left Filename.concat bdir ["person"; "consang"]
            in
            Mutil.mkdir_p dir;
            let oc = open_out_bin (Filename.concat dir "data") in
@@ -456,12 +456,9 @@ value simple_output bname base carray =
                0
            in
            close_out oc;
-           let bdir = db2.Db2disk.bdir2 in
            let has_patches =
              Sys.file_exists (Filename.concat bdir "patches")
            in
-           eprintf "has_patches %b\n" has_patches;
-           flush stderr;
            if has_patches then do {
              let list =
                Hashtbl.fold
