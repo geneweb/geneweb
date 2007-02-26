@@ -5,6 +5,9 @@ Preliminary remark: I neglected to record the changes between January
 2005 and July 2005, but there are a lot of them... I complete the
 missing part when I have some time (and some courage).
 
+Feb 2007 : the courage have not continued... the changes done since
+several months have not been recorded.
+
 This Version allows to mix pages in different languages (using utf-8
 encoding). Databases version <= 4.10 can be read but still in old
 encoding. By re-creating the database, the new encoding is set.

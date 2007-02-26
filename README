@@ -24,6 +24,7 @@ CONTENTS:
 	ged2gwb		converter GEDCOM -> GeneWeb
 	gwb2ged		converter GeneWeb -> GEDCOM
 	gwtp		CGI to upload and download databases
+        launch          a launcher of the geneweb server
 	hd		html and image files for GeneWeb program
 	rpm		files to create Linux rpm packages
 	setup		service (gwsetup) to launch commands in a Web navigator
