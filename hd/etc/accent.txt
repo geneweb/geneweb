@@ -1,4 +1,4 @@
-<!-- $Id: accent.txt,v 5.4 2007-01-07 01:31:43 ddr Exp $ -->
+<!-- $Id: accent.txt,v 5.5 2007-02-26 01:14:26 ddr Exp $ -->
 
 <script type="text/javascript"><!--
 function write_version_ie(t, v)
@@ -17,7 +17,7 @@ function write_version_netscape(t, v)
    t.selectionEnd = t.selectionStart;
 }
 function write_ch(v) {
-   var t = document.forms[0].%name;;
+   var t = document.forms%[0].%name;;
    t.focus();
    if (document.selection) write_version_ie(t, v)
    else write_version_netscape(t, v);
