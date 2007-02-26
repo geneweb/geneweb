@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.31 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: launch.ml,v 1.32 2007-02-26 20:57:58 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Camltk;
@@ -789,7 +789,7 @@ value main () = do {
     {config_env = config_env; tk_win = win; bin_dir = default_bin_dir;
      sys_dir = default_sys_dir; doc_dir = default_doc_dir;
      port = default_port; browser = default_browser;
-     bases_dir = default_bases_dir; browser_lang = True; digest_auth = False;
+     bases_dir = default_bases_dir; browser_lang = True; digest_auth = True;
      server_running = None; waiting_pids = []}
   in
   Encoding.system_set "utf-8";
