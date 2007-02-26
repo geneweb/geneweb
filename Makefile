@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.0 2005-12-13 11:51:26 ddr Exp $
+# $Id: Makefile,v 5.1 2007-02-26 10:33:04 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -150,6 +150,15 @@ classical_distrib:
 	cp hd/images/*.jpg hd/images/*.png $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
+
+windows_files:
+	@for i in distribution/*.txt distribution/gw/*.txt; do \
+	  echo "========================================="; \
+	  echo $$i; \
+	  cp $$i $$i~; \
+	  sed -e 's/$$/\r/' $$i~ > $$i; \
+	  rm $$i~; \
+	done
 
 clean::
 	cd wserver; $(MAKE) clean
