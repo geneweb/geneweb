@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.76 2007-02-25 18:06:26 ddr Exp $
+# $Id: lex_utf8.txt,v 5.77 2007-02-27 03:38:51 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -204,6 +204,7 @@ sl: pred %d leti
 sv: %d år sedan
 
     %s access cancelled for that page
+de: Zugang zu dieser Seite gesperrt
 en: %s access cancelled for that page
 et: %s: ligipääs sellele lehele on keelatud
 fr: accès %s annulé pour cette page
@@ -6884,6 +6885,7 @@ sl: populacijska piramida
 sv: befolkningspyramid
 
     possible duplications
+de: mögliche Duplikate
 en: possible duplications
 et: võimalikud duplikaadid
 fr: doublons éventuels
