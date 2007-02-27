@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.34 2007-02-25 12:02:26 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.35 2007-02-27 03:53:52 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -294,7 +294,7 @@ value print_death conf base =
           xtag "input" "type=\"hidden\" name=\"m\" value=\"LD\"";
           let ds =
             Printf.sprintf
-              "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s"
+              "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s>"
               len conf.xhs
           in
           Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
