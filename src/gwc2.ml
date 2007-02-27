@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.46 2007-02-25 01:25:48 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.47 2007-02-27 15:34:46 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -493,13 +493,41 @@ value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
   List.iter (fun (so, sex) -> insert_somebody1 gen sex so) witl;
 };
 
+value insert_related gen irp ip = do {
+  let (ioc_acc, ioc_dat) = gen.g_person_related in
+  Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
+  let pos1 = Iochan.input_binary_int ioc_acc in
+  loop pos1 where rec loop pos =
+    if pos = -1 then do {
+      let pos2 = Iochan.seek_end ioc_dat in
+      Iochan.output_value_no_header ioc_dat (Adef.int_of_iper ip);
+      Iochan.output_value_no_header ioc_dat pos1;
+      Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
+      Iochan.output_binary_int ioc_acc pos2;
+    }
+    else do {
+      Iochan.seek ioc_dat pos;
+      let i = Iochan.input_value_no_header ioc_dat in
+      if i = Adef.int_of_iper ip then ()
+      else loop (Iochan.input_value_no_header ioc_dat)
+    };
+};
+
 value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
   let ifath = get_somebody2 gen fath_sex (Adef.father co) in
   let imoth = get_somebody2 gen moth_sex (Adef.mother co) in
   let children =
     Array.map (fun key -> get_person2 gen key Neuter) deo.children
   in
-  let witn = List.map (fun (so, sex) -> get_somebody2 gen sex so) witl in
+  let witn =
+    List.map
+      (fun (so, sex) -> do {
+         let ip = get_somebody2 gen sex so in
+         insert_related gen ip ifath;
+         ip
+       })
+      witl
+  in
   let fam =
     {fam ={(fo) with witnesses = Array.of_list witn};
      cpl = Adef.couple ifath imoth;
@@ -558,23 +586,7 @@ value insert_rparents1 gen sb sex rl = do {
 
 value insert_relation_parent2 gen ip sex k = do {
   let irp = get_somebody2 gen sex k in
-  let (ioc_acc, ioc_dat) = gen.g_person_related in
-  Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
-  let pos1 = Iochan.input_binary_int ioc_acc in
-  loop pos1 where rec loop pos =
-    if pos = -1 then do {
-      let pos2 = Iochan.seek_end ioc_dat in
-      Iochan.output_value_no_header ioc_dat (Adef.int_of_iper ip);
-      Iochan.output_value_no_header ioc_dat pos1;
-      Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
-      Iochan.output_binary_int ioc_acc pos2;
-    }
-    else do {
-      Iochan.seek ioc_dat pos;
-      let i = Iochan.input_value_no_header ioc_dat in
-      if i = Adef.int_of_iper ip then ()
-      else loop (Iochan.input_value_no_header ioc_dat)
-    };
+  insert_related gen irp ip;
   irp
 };
 
