@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.230 2007-02-27 14:47:25 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.231 2007-02-27 20:31:05 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1187,15 +1187,9 @@ value base2 db2 =
          max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
      };
      patch_key ip fn sn occ =
-       do {
-         Hashtbl.iter
-           (fun key ip1 ->
-              if ip = ip1 then Hashtbl.remove db2.patches.h_key key else ())
-           db2.patches.h_key;
-         let fn = Name.lower (nominative fn) in
-         let sn = Name.lower (nominative sn) in
-         Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip
-       };
+       let fn = Name.lower (nominative fn) in
+       let sn = Name.lower (nominative sn) in
+       Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip;
      patch_name s ip =
        let s = Name.crush_lower s in
        let ht = db2.patches.h_name in

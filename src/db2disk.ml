@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.14 2007-02-27 09:03:41 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.15 2007-02-27 20:31:05 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -336,7 +336,10 @@ value spi2gen_find = spi2gen_add [];
 value person2_of_key db2 fn sn oc =
   let fn = Name.lower (nominative fn) in
   let sn = Name.lower (nominative sn) in
-  try Some (Hashtbl.find db2.patches.h_key (fn, sn, oc)) with
+  try
+    let ip = Hashtbl.find db2.patches.h_key (fn, sn, oc) in
+    if Adef.int_of_iper ip < 0 then None else Some ip
+  with
   [ Not_found ->
       let person_of_key_d = Filename.concat db2.bdir2 "person_of_key" in
       try do {

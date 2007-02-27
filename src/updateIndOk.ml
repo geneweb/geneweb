@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.61 2007-02-09 14:37:30 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.62 2007-02-27 20:31:05 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -687,13 +687,15 @@ value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      let k =
-        (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_key_index p)
-      in
+      let fn = sou base (get_first_name p) in
+      let sn = sou base (get_surname p) in
+      let occ = get_occ p in
+      let ip = get_key_index p in
+      let k = (fn, sn, occ, ip) in
       do {
         let p = effective_del conf base p in
-        patch_person base p.key_index p;
+        patch_person base ip p;
+        patch_key base (Adef.iper_of_int (-1)) fn sn occ;
         Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
         Util.commit_patches conf base;
         History.record conf base k "dp";
