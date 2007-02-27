@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.229 2007-02-27 09:03:41 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.230 2007-02-27 14:47:25 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -703,7 +703,13 @@ value family2_fun =
         divorce = self.get_divorce f; comment = self.get_comment f;
         origin_file = self.get_origin_file f; fsources = self.get_fsources f;
         fam_index = Adef.ifam_of_int i};
-     is_deleted_family (db2, f) = False (* not yet implemented *);
+     is_deleted_family (db2, i) =
+       let fath =
+         match db2.father_array with
+         [ Some tab -> tab.(i)
+         | None -> get_field db2 i ("family", "father") ]
+       in
+       Adef.int_of_iper fath < 0;
      get_father (db2, i) =
        match db2.father_array with
        [ Some tab -> tab.(i)
