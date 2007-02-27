@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.13 2007-02-24 19:46:21 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.14 2007-02-27 09:03:41 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -507,14 +507,14 @@ value children_array2 db2 = do {
   tab
 };
 
-value read_notes bname fnotes rn_mode =
+value read_notes db2 fnotes rn_mode =
+  let bdir = db2.bdir2 in
   let fname =
     if fnotes = "" then "notes.txt"
     else Filename.concat "notes_d" (fnotes ^ ".txt")
   in
-  let fname = Filename.concat "base_d" fname in
   match
-    try Some (Secure.open_in (Filename.concat bname fname)) with
+    try Some (Secure.open_in (Filename.concat bdir fname)) with
     [ Sys_error _ -> None ]
   with
   [ Some ic -> do {
@@ -550,6 +550,26 @@ value commit_patches2 db2 = do {
   remove_file (fname ^ "~");
   try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
   Sys.rename (fname ^ "1") fname
+};
+
+value commit_notes2 db2 fnotes s = do {
+  let bdir = db2.bdir2 in
+  if fnotes <> "" then
+    try Unix.mkdir (Filename.concat bdir "notes_d") 0o755 with _ -> ()
+  else ();
+  let fname =
+    if fnotes = "" then "notes.txt"
+    else Filename.concat "notes_d" (fnotes ^ ".txt")
+  in
+  let fname = Filename.concat bdir fname in
+  try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+  try Sys.rename fname (fname ^ "~") with _ -> ();
+  if s = "" then ()
+  else do {
+    let oc = Secure.open_out fname in
+    output_string oc s;
+    close_out oc;
+  }
 };
 
 value base_of_base2 bname =

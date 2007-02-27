@@ -1,4 +1,4 @@
-(* $Id: db2disk.mli,v 5.7 2007-02-24 19:46:21 ddr Exp $ *)
+(* $Id: db2disk.mli,v 5.8 2007-02-27 09:03:41 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -74,7 +74,8 @@ value parents_array2 : db2 -> int -> int -> array (option ifam);
 value consang_array2 : db2 -> int -> array Adef.fix;
 value family_array2 : db2 -> array (array ifam);
 value children_array2 : db2 -> array (array iper);
-value read_notes : string -> string -> rn_mode -> string;
+value read_notes : db2 -> string -> rn_mode -> string;
 
 value commit_patches2 : db2 -> unit;
+value commit_notes2 : db2 -> string -> string -> unit;
 value base_of_base2 : string -> db2;

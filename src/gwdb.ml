@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.228 2007-02-24 19:46:21 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.229 2007-02-27 09:03:41 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1200,7 +1200,7 @@ value base2 db2 =
        [ Not_found -> Hashtbl.add ht s [ip] ];
      insert_string s = Istr2New db2 s;
      commit_patches () = commit_patches2 db2;
-     commit_notes _ = failwith "not impl commit_notes";
+     commit_notes fnotes s = commit_notes2 db2 fnotes s;
      is_patched_person ip = Hashtbl.mem db2.patches.h_person ip;
      patched_ascends () = do {
        let r = ref [] in
@@ -1270,12 +1270,9 @@ value base2 db2 =
        let cget i = cg_tab.(i) in
        let cset i v = cg_tab.(i) := v in
        (fget, cget, cset, Some cg_tab);
-     base_notes_read fnotes =
-       read_notes (Filename.dirname db2.bdir2) fnotes RnAll;
-     base_notes_read_first_line fnotes =
-       read_notes (Filename.dirname db2.bdir2) fnotes Rn1Ln;
-     base_notes_are_empty fnotes =
-       read_notes (Filename.dirname db2.bdir2) fnotes RnDeg = "";
+     base_notes_read fnotes = read_notes db2 fnotes RnAll;
+     base_notes_read_first_line fnotes = read_notes db2 fnotes Rn1Ln;
+     base_notes_are_empty fnotes = read_notes db2 fnotes RnDeg = "";
      base_notes_origin_file () =
        let fname = Filename.concat db2.bdir2 "notes_of.txt" in
        match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
