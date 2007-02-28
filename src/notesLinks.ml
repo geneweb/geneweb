@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 5.4 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 5.5 2007-02-28 11:50:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -189,24 +189,42 @@ value share_strings db =
     db
 ;
 
-value update_db bdir who (list_nt, list_ind) =
-  let fname_tmp = Filename.concat bdir "1notes_links" in
-  let fname_def = Filename.concat bdir "notes_links" in
-  let fname_back = Filename.concat bdir "notes_links~" in
-  let notes_links_db = read_db_from_file fname_def in
-  let db = List.remove_assoc who notes_links_db in
+value update_db_list db who (list_nt, list_ind) =
+  let db = List.remove_assoc who db in
   let new_db =
     if list_nt = [] && list_ind = [] then db
     else [(who, (list_nt, list_ind)) :: db]
   in
-  let new_db = share_strings new_db in
+  share_strings new_db
+;
+
+value read_db bdir =
+  let fname_def = Filename.concat bdir "notes_links" in
+  read_db_from_file fname_def
+;
+
+value write_db bdir db = do {
+  let db = share_strings db in
+  let fname_tmp = Filename.concat bdir "1notes_links" in
+  let fname_def = Filename.concat bdir "notes_links" in
+  let fname_back = Filename.concat bdir "notes_links~" in
   let oc = open_out_bin fname_tmp in
-  do {
-    output_string oc magic_notes_links;
-    output_value oc (new_db : notes_links_db);
-    close_out oc;
-    Mutil.remove_file fname_back;
-    try Sys.rename fname_def fname_back with [ Sys_error _ -> () ];
-    try Sys.rename fname_tmp fname_def with [ Sys_error _ -> () ];
-  }
+  output_string oc magic_notes_links;
+  output_value oc (db : notes_links_db);
+  close_out oc;
+  Mutil.remove_file fname_back;
+  try Sys.rename fname_def fname_back with [ Sys_error _ -> () ];
+  try Sys.rename fname_tmp fname_def with [ Sys_error _ -> () ];
+};
+
+value add_in_db db who (list_nt, list_ind) =
+  let db = List.remove_assoc who db in
+  if list_nt = [] && list_ind = [] then db
+  else [(who, (list_nt, list_ind)) :: db]
+;
+
+value update_db bdir who list =
+  let db = read_db bdir in
+  let new_db = add_in_db db who list in
+  write_db bdir new_db
 ;

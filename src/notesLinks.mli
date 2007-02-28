@@ -1,4 +1,4 @@
-(* $Id: notesLinks.mli,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: notesLinks.mli,v 5.4 2007-02-28 11:50:39 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 type page =
@@ -25,3 +25,9 @@ value misc_notes_link : string -> int -> wiki_link;
 value read_db_from_file : string -> notes_links_db;
 value update_db :
   string -> page -> (list string * list (key * ind_link)) -> unit;
+
+value read_db : string -> notes_links_db;
+value write_db : string -> notes_links_db -> unit;
+value add_in_db :
+  notes_links_db -> page -> (list string * list (key * ind_link)) ->
+    notes_links_db;

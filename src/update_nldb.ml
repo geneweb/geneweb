@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.18 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.19 2007-02-28 11:50:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -88,6 +88,7 @@ value compute base bdir =
       }
     with
     [ Sys_error _ -> () ];
+    let db = ref (NotesLinks.read_db bdir) in
     Printf.eprintf "--- misc notes\n";
     flush stderr;
     let ndir = Filename.concat bdir (base_notes_dir base) in
@@ -112,7 +113,7 @@ value compute base bdir =
                 in
                 Printf.eprintf "%s...\n" fnotes; flush stderr;
                 let pg = NotesLinks.PgMisc fnotes in
-                NotesLinks.update_db bdir pg list
+                db.val := NotesLinks.add_in_db db.val pg list;
               }
             }
             else
@@ -144,10 +145,11 @@ value compute base bdir =
       if list = ([], []) then ()
       else
         let pg = NotesLinks.PgInd (Adef.iper_of_int i) in
-        NotesLinks.update_db bdir pg list;
+        db.val := NotesLinks.add_in_db db.val pg list;
       ProgrBar.run i len
     };
     ProgrBar.finish ();
+    NotesLinks.write_db bdir db.val;
   }
 ;
 
