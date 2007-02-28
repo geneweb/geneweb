@@ -146,9 +146,9 @@ gwdb.cmx: adef.cmx database.cmx db2.cmx db2disk.cmx dbdisk.cmi def.cmi \
     futil.cmx mutil.cmx name.cmx secure.cmx gwdb.cmi 
 gwdb.cmi: adef.cmi db2disk.cmi dbdisk.cmi def.cmi 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi gwdb.cmi \
-    mutil.cmi notesLinks.cmi secure.cmi select.cmo 
+    mutil.cmi notesLinks.cmi progrBar.cmi secure.cmi select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx gwdb.cmx \
-    mutil.cmx notesLinks.cmx secure.cmx select.cmx 
+    mutil.cmx notesLinks.cmx progrBar.cmx secure.cmx select.cmx 
 history.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi hutil.cmi mutil.cmi secure.cmi templ.cmi templAst.cmi util.cmi \
     ../wserver/wserver.cmi history.cmi 

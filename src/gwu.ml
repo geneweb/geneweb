@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.41 2007-02-15 03:37:30 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.42 2007-02-28 09:29:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -1175,8 +1175,11 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
      fam_done = fam_done; notes_pl_p = []; ext_files = [];
      notes_alias = notes_aliases in_dir}
   in
+  let nb_fam = nb_of_families base in
   do {
-    for i = 0 to nb_of_families base - 1 do {
+    if Mutil.verbose.val then ProgrBar.start () else ();
+    for i = 0 to nb_fam - 1 do {
+      if Mutil.verbose.val then ProgrBar.run i nb_fam else ();
       let ifam = Adef.ifam_of_int i in
       let fam = foi base ifam in
       if is_deleted_family fam then ()
@@ -1216,6 +1219,7 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
         else ()
       else ()
     };
+    if Mutil.verbose.val then ProgrBar.finish () else ();
     if not no_notes.val then do {
       let s = base_notes_read base "" in
       let (oc, first) = origin_file (base_notes_origin_file base) in
@@ -1386,6 +1390,7 @@ value speclist =
      it is Public. All the spouses and descendants are also censored.");
    ("-raw", Arg.Set raw_output,
     "raw output (without possible utf-8 conversion)");
+   ("-v", Arg.Set Mutil.verbose, "verbose");
    ("-sep",
     Arg.String (fun s -> separate_list.val := [s :: separate_list.val]), "\
 \"1st_name.num surname\" :
@@ -1455,6 +1460,7 @@ Options are:"
 
 value main () =
   do {
+    Mutil.verbose.val := False;
     Argl.parse speclist anonfun errmsg;
     if in_file.val = "" then do {
       printf "Missing base\n";
