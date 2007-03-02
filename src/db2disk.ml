@@ -1,11 +1,11 @@
-(* $Id: db2disk.ml,v 5.15 2007-02-27 20:31:05 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.16 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
 open Mutil;
 open Printf;
 
-value magic_patch = "GwPt0001";
+value magic_patch = "GwPt0002";
 
 type patches =
   { nb_per : mutable int;
@@ -18,7 +18,7 @@ type patches =
     h_family : Hashtbl.t ifam (gen_family iper string);
     h_couple : Hashtbl.t ifam (gen_couple iper);
     h_descend : Hashtbl.t ifam (gen_descend iper);
-    h_key : Hashtbl.t (string * string * int) iper;
+    h_key : Hashtbl.t (string * string * int) (option iper);
     h_name : Hashtbl.t string (list iper) }
 ;
 
@@ -313,12 +313,15 @@ value spi2gen_add pl db2 spi s =
     else fun p -> p.surname
   in
   Hashtbl.fold
-    (fun _ iper iperl ->
-       try
-         let p = Hashtbl.find db2.patches.h_person iper in
-         if proj p = s then [iper :: iperl] else iperl
-       with
-       [ Not_found -> iperl ])
+    (fun _ ipero iperl ->
+       match ipero with
+       [ Some iper ->
+           try
+             let p = Hashtbl.find db2.patches.h_person iper in
+             if proj p = s then [iper :: iperl] else iperl
+           with
+           [ Not_found -> iperl ]
+       | None -> iperl ])
     db2.patches.h_key pl
 ;
 
@@ -336,10 +339,7 @@ value spi2gen_find = spi2gen_add [];
 value person2_of_key db2 fn sn oc =
   let fn = Name.lower (nominative fn) in
   let sn = Name.lower (nominative sn) in
-  try
-    let ip = Hashtbl.find db2.patches.h_key (fn, sn, oc) in
-    if Adef.int_of_iper ip < 0 then None else Some ip
-  with
+  try Hashtbl.find db2.patches.h_key (fn, sn, oc) with
   [ Not_found ->
       let person_of_key_d = Filename.concat db2.bdir2 "person_of_key" in
       try do {
@@ -620,3 +620,5 @@ value base_of_base2 bname =
    father_array = None; mother_array = None; children_array = None;
    phony () = ()}
 ;
+
+value iter_patched_keys db2 f = Hashtbl.iter f db2.patches.h_key;

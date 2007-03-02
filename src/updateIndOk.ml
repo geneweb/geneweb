@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.63 2007-03-02 11:04:17 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.64 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -478,7 +478,7 @@ value effective_mod conf base sp = do {
   if sp.first_name <> "?" && sp.surname <> "?" &&
      (not same_fn_sn || oocc <> sp.occ)
   then do {
-    patch_key base (Adef.iper_of_int (-1)) ofn osn oocc;
+    delete_key base ofn osn oocc;
     patch_key base pi sp.first_name sp.surname sp.occ;
     if not same_fn_sn then patch_name base key pi else ();
   }
@@ -698,7 +698,7 @@ value print_del conf base =
       do {
         let p = effective_del conf base p in
         patch_person base ip p;
-        patch_key base (Adef.iper_of_int (-1)) fn sn occ;
+        delete_key base fn sn occ;
         Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
         Util.commit_patches conf base;
         History.record conf base k "dp";
