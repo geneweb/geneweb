@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.62 2007-02-27 20:31:05 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.63 2007-03-02 11:04:17 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -458,44 +458,47 @@ value update_relation_parents base op np =
   List.iter (fun (ip, p) -> patch_person base ip p) mod_ippl
 ;
 
-value effective_mod conf base sp =
+value effective_mod conf base sp = do {
   let pi = sp.key_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
   let ofn = p_first_name base op in
   let osn = p_surname base op in
-  do {
-    if ofn = sp.first_name && osn = sp.surname && get_occ op = sp.occ then ()
-    else do {
-      let ipl = person_ht_find_all base key in
-      check_conflict conf base sp ipl;
-      rename_image_file conf base op sp;
-    };
-    if sp.first_name <> "?" && sp.surname <> "?" &&
-       (Name.lower (nominative sp.first_name) <> Name.lower ofn ||
-        Name.lower (nominative sp.surname) <> Name.lower osn)
-    then do {
-      patch_key base pi sp.first_name sp.surname sp.occ;
-      person_ht_add base key pi
-    }
-    else ();
-    check_sex_married conf base sp op;
-    let created_p = ref [] in
-    let np =
-      map_person_ps (Update.insert_person conf base sp.psources created_p)
-        (Gwdb.insert_string base) sp
-    in
-    let op_misc_names = person_misc_names base op get_titles in
-    let np = {(np) with related = get_related op} in
-    let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
-    List.iter
-      (fun key ->
-         if List.mem key op_misc_names then () else person_ht_add base key pi)
-      np_misc_names;
-    update_relation_parents base op np;
-    np
+  let oocc = get_occ op in
+  if ofn = sp.first_name && osn = sp.surname && oocc = sp.occ then ()
+  else do {
+    let ipl = person_ht_find_all base key in
+    check_conflict conf base sp ipl;
+    rename_image_file conf base op sp;
+  };
+  let same_fn_sn =
+    Name.lower (nominative sp.first_name) = Name.lower ofn ||
+    Name.lower (nominative sp.surname) = Name.lower osn
+  in
+  if sp.first_name <> "?" && sp.surname <> "?" &&
+     (not same_fn_sn || oocc <> sp.occ)
+  then do {
+    patch_key base (Adef.iper_of_int (-1)) ofn osn oocc;
+    patch_key base pi sp.first_name sp.surname sp.occ;
+    if not same_fn_sn then patch_name base key pi else ();
   }
-;
+  else ();
+  check_sex_married conf base sp op;
+  let created_p = ref [] in
+  let np =
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
+      (Gwdb.insert_string base) sp
+  in
+  let op_misc_names = person_misc_names base op get_titles in
+  let np = {(np) with related = get_related op} in
+  let np_misc_names = gen_person_misc_names base np (fun p -> p.titles) in
+  List.iter
+    (fun key ->
+       if List.mem key op_misc_names then () else person_ht_add base key pi)
+    np_misc_names;
+  update_relation_parents base op np;
+  np
+};
 
 value effective_add conf base sp = do {
   let pi = Adef.iper_of_int (nb_of_persons base) in
