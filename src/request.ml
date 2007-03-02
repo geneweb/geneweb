@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.53 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: request.ml,v 5.54 2007-03-02 13:15:24 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -703,8 +703,8 @@ value treat_request conf base log = do {
   Gwdb.apply_base2 base
     (fun db2 -> Db2disk.iter_patched_keys db2 (trace_keys base));
 *)
-  match (
-     p_getenv conf.base_env "moved",
+  match
+    (p_getenv conf.base_env "moved",
      p_getenv conf.env "opt",
      p_getenv conf.env "m")
   with
