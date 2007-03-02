@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.52 2007-02-06 14:03:58 ddr Exp $ *)
+(* $Id: request.ml,v 5.53 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -668,40 +668,72 @@ value print_moved conf base s =
       } ]
 ;
 
-value treat_request conf base log =
-  do {
-    match (
-      p_getenv conf.base_env "moved",
-      p_getenv conf.env "opt",
-      p_getenv conf.env "m")
-   with
-   [ (Some s, _, _) -> print_moved conf base s
-   | (_, Some "no_index", _) -> print_no_index conf base
-   | (_, _, Some "IM") -> Image.print conf base
-   | _ ->
-       do {
-         set_owner conf;
-         extract_henv conf base;
-         make_senv conf base;
-         if only_special_env conf.env then do {
-           let r = Srcfile.incr_welcome_counter conf in
-           log_count conf log r;
-           Srcfile.print_start conf base
-         }
-         else do {
-           let r = Srcfile.incr_request_counter conf in
-           log_count conf log r;
-           match p_getenv conf.env "ptempl" with
-           [ Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
-               match find_person_in_env conf base "" with
-               [ Some p -> Perso.interp_templ tname conf base p
-               | None -> family_m conf base ]
-           | _ -> family_m conf base ];
-         };
-       } ];
-    Wserver.wflush ();
-  }
-;
+value cnt_trace = ref 50;
+value trace_keys base (fn, sn, occ) ipo = do {
+  if cnt_trace.val < 0 then ()
+  else
+    match ipo with
+    [ None -> do {
+        Printf.eprintf "(\"%s\", \"%s\", \"%d\") deleted\n" fn sn occ;
+        flush stderr;
+      }
+    | Some ip -> do {
+        decr cnt_trace;
+        let p = poi base ip in
+        let fn1 = sou base (get_first_name p) in
+        let sn1 = sou base (get_surname p) in
+        let occ1 = get_occ p in
+        if Name.lower (Mutil.nominative fn1) = fn &&
+           Name.lower (Mutil.nominative sn1) = sn &&
+           occ1 = occ
+        then do {
+          Printf.eprintf "(\"%s\", \"%s\", \"%d\") ok\n" fn sn occ;
+          flush stderr;
+        }
+        else do {
+          Printf.eprintf "Error %s.%d %s with key = (\"%s\", \"%s\", \"%d\")\n"
+            fn1 occ1 sn1 fn sn occ;
+          flush stderr;
+        }
+      } ];
+};
+
+value treat_request conf base log = do {
+(*
+  Gwdb.apply_base2 base
+    (fun db2 -> Db2disk.iter_patched_keys db2 (trace_keys base));
+*)
+  match (
+     p_getenv conf.base_env "moved",
+     p_getenv conf.env "opt",
+     p_getenv conf.env "m")
+  with
+  [ (Some s, _, _) -> print_moved conf base s
+  | (_, Some "no_index", _) -> print_no_index conf base
+  | (_, _, Some "IM") -> Image.print conf base
+  | _ ->
+      do {
+        set_owner conf;
+        extract_henv conf base;
+        make_senv conf base;
+        if only_special_env conf.env then do {
+          let r = Srcfile.incr_welcome_counter conf in
+          log_count conf log r;
+          Srcfile.print_start conf base
+        }
+        else do {
+          let r = Srcfile.incr_request_counter conf in
+          log_count conf log r;
+          match p_getenv conf.env "ptempl" with
+          [ Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
+              match find_person_in_env conf base "" with
+              [ Some p -> Perso.interp_templ tname conf base p
+              | None -> family_m conf base ]
+          | _ -> family_m conf base ];
+        };
+      } ];
+   Wserver.wflush ();
+};
 
 value treat_request_on_possibly_locked_base conf bfile log =
   match try Left (Gwdb.open_base bfile) with e -> Right e with

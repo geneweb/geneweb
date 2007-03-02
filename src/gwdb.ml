@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.231 2007-02-27 20:31:05 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.232 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -881,8 +881,9 @@ type base =
     patch_family : ifam -> Def.gen_family iper istr -> unit;
     patch_descend : ifam -> Def.gen_descend iper -> unit;
     patch_couple : ifam -> Def.gen_couple iper -> unit;
-    patch_key : iper -> string -> string -> int -> unit;
     patch_name : string -> iper -> unit;
+    patch_key : iper -> string -> string -> int -> unit;
+    delete_key : string -> string -> int -> unit;
     insert_string : string -> istr;
     commit_patches : unit -> unit;
     commit_notes : string -> string -> unit;
@@ -1031,8 +1032,9 @@ value base1 base =
        base.func.Dbdisk.patch_family ifam f;
      patch_descend ifam d = base.func.Dbdisk.patch_descend ifam d;
      patch_couple ifam c = base.func.Dbdisk.patch_couple ifam c;
-     patch_key ip fn sn occ = ();
      patch_name s ip = base.func.Dbdisk.patch_name s ip;
+     patch_key ip fn sn occ = ();
+     delete_key fn sn occ = ();
      insert_string s = Istr (base.func.Dbdisk.insert_string s);
      commit_patches = base.func.Dbdisk.commit_patches;
      commit_notes = base.func.Dbdisk.commit_notes;
@@ -1101,13 +1103,16 @@ value base2 db2 =
     let s = Name.crush_lower s in
     let sl =
       Hashtbl.fold
-        (fun _ iper sl ->
-           try
-             let p = Hashtbl.find db2.patches.h_person iper in
-             if Name.crush_lower (proj p) = s then [proj p :: sl]
-             else sl
-           with
-           [ Not_found -> sl ])
+        (fun _ ipero sl ->
+           match ipero with
+           [ Some iper ->
+               try
+                 let p = Hashtbl.find db2.patches.h_person iper in
+                 if Name.crush_lower (proj p) = s then [proj p :: sl]
+                 else sl
+               with
+               [ Not_found -> sl ]
+           | None -> sl ])
         db2.patches.h_key []
     in
     let sl = list_uniq (List.sort compare sl) in
@@ -1186,10 +1191,6 @@ value base2 db2 =
        db2.patches.nb_fam :=
          max (Adef.int_of_ifam ifam + 1) db2.patches.nb_fam
      };
-     patch_key ip fn sn occ =
-       let fn = Name.lower (nominative fn) in
-       let sn = Name.lower (nominative sn) in
-       Hashtbl.replace db2.patches.h_key (fn, sn, occ) ip;
      patch_name s ip =
        let s = Name.crush_lower s in
        let ht = db2.patches.h_name in
@@ -1198,6 +1199,14 @@ value base2 db2 =
          if List.mem ip ipl then () else Hashtbl.replace ht s [ip :: ipl]
        with
        [ Not_found -> Hashtbl.add ht s [ip] ];
+     patch_key ip fn sn occ =
+       let fn = Name.lower (nominative fn) in
+       let sn = Name.lower (nominative sn) in
+       Hashtbl.replace db2.patches.h_key (fn, sn, occ) (Some ip);
+     delete_key fn sn occ =
+       let fn = Name.lower (nominative fn) in
+       let sn = Name.lower (nominative sn) in
+       Hashtbl.replace db2.patches.h_key (fn, sn, occ) None;
      insert_string s = Istr2New db2 s;
      commit_patches () = commit_patches2 db2;
      commit_notes fnotes s = commit_notes2 db2 fnotes s;
@@ -1325,8 +1334,9 @@ value patch_union b = b.patch_union;
 value patch_family b = b.patch_family;
 value patch_descend b = b.patch_descend;
 value patch_couple b = b.patch_couple;
-value patch_key b = b.patch_key;
 value patch_name b = b.patch_name;
+value patch_key b = b.patch_key;
+value delete_key b = b.delete_key;
 value insert_string b = b.insert_string;
 value commit_patches b = b.commit_patches ();
 value commit_notes b = b.commit_notes;

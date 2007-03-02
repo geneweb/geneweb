@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.47 2007-02-28 12:43:50 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.48 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -373,8 +373,7 @@ value effective_merge_ind conf base p1 p2 =
          else get_notes p1}
     in
     patch_person base p1.key_index p1;
-    patch_key base (Adef.iper_of_int (-1))
-      (sou base (get_first_name p2)) (sou base (get_surname p2))
+    delete_key base (sou base (get_first_name p2)) (sou base (get_surname p2))
       (get_occ p2);
     let p2 = UpdateIndOk.effective_del conf base p2 in
     patch_person base p2.key_index p2;

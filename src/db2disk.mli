@@ -1,4 +1,4 @@
-(* $Id: db2disk.mli,v 5.8 2007-02-27 09:03:41 ddr Exp $ *)
+(* $Id: db2disk.mli,v 5.9 2007-03-02 11:44:13 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -14,7 +14,7 @@ type patches =
     h_family : Hashtbl.t ifam (gen_family iper string);
     h_couple : Hashtbl.t ifam (gen_couple iper);
     h_descend : Hashtbl.t ifam (gen_descend iper);
-    h_key : Hashtbl.t (string * string * int) iper;
+    h_key : Hashtbl.t (string * string * int) (option iper);
     h_name : Hashtbl.t string (list iper) }
 ;
 
@@ -79,3 +79,6 @@ value read_notes : db2 -> string -> rn_mode -> string;
 value commit_patches2 : db2 -> unit;
 value commit_notes2 : db2 -> string -> string -> unit;
 value base_of_base2 : string -> db2;
+
+value iter_patched_keys :
+  db2 -> ((string * string * int) -> option iper -> unit) -> unit;
