@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.16 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.17 2007-03-03 05:27:21 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -336,20 +336,23 @@ value spi2gen_find = spi2gen_add [];
 
 (* *)
 
+value disk_person2_of_key db2 fn sn oc =
+  let person_of_key_d = Filename.concat db2.bdir2 "person_of_key" in
+  try do {
+    let ifn = hashtbl_find person_of_key_d "istr_of_string.ht" fn in
+    let isn = hashtbl_find person_of_key_d "istr_of_string.ht" sn in
+    let key = (ifn, isn, oc) in
+    Some (key_hashtbl_find person_of_key_d "iper_of_key.ht" key : iper)
+  }
+  with
+  [ Not_found -> None ]
+;
+
 value person2_of_key db2 fn sn oc =
   let fn = Name.lower (nominative fn) in
   let sn = Name.lower (nominative sn) in
   try Hashtbl.find db2.patches.h_key (fn, sn, oc) with
-  [ Not_found ->
-      let person_of_key_d = Filename.concat db2.bdir2 "person_of_key" in
-      try do {
-        let ifn = hashtbl_find person_of_key_d "istr_of_string.ht" fn in
-        let isn = hashtbl_find person_of_key_d "istr_of_string.ht" sn in
-        let key = (ifn, isn, oc) in
-        Some (key_hashtbl_find person_of_key_d "iper_of_key.ht" key : iper)
-      }
-      with
-      [ Not_found -> None ] ]
+  [ Not_found -> disk_person2_of_key db2 fn sn oc ]
 ;
 
 value strings2_of_fsname db2 f s =

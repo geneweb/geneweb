@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.232 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.233 2007-03-03 05:27:21 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1206,7 +1206,9 @@ value base2 db2 =
      delete_key fn sn occ =
        let fn = Name.lower (nominative fn) in
        let sn = Name.lower (nominative sn) in
-       Hashtbl.replace db2.patches.h_key (fn, sn, occ) None;
+       match disk_person2_of_key db2 fn sn occ with
+       [ Some _ -> Hashtbl.replace db2.patches.h_key (fn, sn, occ) None
+       | None -> Hashtbl.remove db2.patches.h_key (fn, sn, occ) ];
      insert_string s = Istr2New db2 s;
      commit_patches () = commit_patches2 db2;
      commit_notes fnotes s = commit_notes2 db2 fnotes s;
