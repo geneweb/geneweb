@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.64 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.65 2007-03-03 15:14:16 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -472,7 +472,7 @@ value effective_mod conf base sp = do {
     rename_image_file conf base op sp;
   };
   let same_fn_sn =
-    Name.lower (nominative sp.first_name) = Name.lower ofn ||
+    Name.lower (nominative sp.first_name) = Name.lower ofn &&
     Name.lower (nominative sp.surname) = Name.lower osn
   in
   if sp.first_name <> "?" && sp.surname <> "?" &&
