@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.47 2007-02-27 15:34:46 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.48 2007-03-03 12:02:45 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -27,6 +27,7 @@ type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
+    g_error : mutable bool;
     g_tmp_dir : string;
     g_particles : list string;
 
@@ -385,6 +386,7 @@ value insert_person1 gen so = do {
       let _ = key_hashtbl_find gen.g_index_of_key k in
       eprintf "already defined %s.%d %s\n" so.first_name so.occ so.surname;
       flush stderr;
+      gen.g_error := True;
     }
     with
     [ Not_found -> do {
@@ -727,171 +729,172 @@ value output_particles_file tmp_dir particles = do {
   close_out oc;
 };
 
-value link gwo_list bname =
+value link gwo_list bname = do {
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let tmp_dir = Filename.concat "gw_tmp" bdir in
-  do {
-    Mutil.remove_dir tmp_dir;
-    try Mutil.mkdir_p tmp_dir with _ -> ();
-    let person_d =
-      List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
+  Mutil.remove_dir tmp_dir;
+  try Mutil.mkdir_p tmp_dir with _ -> ();
+  let person_d =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
+  in
+  try Mutil.mkdir_p person_d with _ -> ();
+  let person_fields =
+    List.map (open_out_field person_d) person_fields_arr
+  in
+  let family_fields = do {
+    let family_d =
+      List.fold_left Filename.concat tmp_dir ["base_d"; "family"]
     in
-    try Mutil.mkdir_p person_d with _ -> ();
-    let person_fields =
-      List.map (open_out_field person_d) person_fields_arr
-    in
-    let family_fields = do {
-      let family_d =
-        List.fold_left Filename.concat tmp_dir ["base_d"; "family"]
-      in
-      try Mutil.mkdir_p family_d with _ -> ();
-      List.map (open_out_field family_d) family_fields_arr
+    try Mutil.mkdir_p family_d with _ -> ();
+    List.map (open_out_field family_d) family_fields_arr
+  }
+  in
+  let person_parents = do {
+    let d = Filename.concat person_d "parents" in
+    try Mutil.mkdir_p d with _ -> ();
+    (Iochan.openfile (Filename.concat d "access") True,
+     open_out_bin (Filename.concat d "data"))
+  }
+  in
+  let person_unions = do {
+    let d = Filename.concat person_d "family" in
+    try Mutil.mkdir_p d with _ -> ();
+    (Iochan.openfile (Filename.concat d "access") True,
+     open_out_bin (Filename.concat d "data"))
+  }
+  in
+  let person_rparents = do {
+    let d = Filename.concat person_d "rparents" in
+    try Mutil.mkdir_p d with _ -> ();
+    (Iochan.openfile (Filename.concat d "access") True,
+     open_out_bin (Filename.concat d "data"))
+  }
+  in
+  let person_related = do {
+    let d = Filename.concat person_d "related" in
+    try Mutil.mkdir_p d with _ -> ();
+    (Iochan.openfile (Filename.concat d "access") True,
+     Iochan.openfile (Filename.concat d "data") True)
+  }
+  in
+  let person_notes = do {
+    let d = Filename.concat person_d "notes" in
+    try Mutil.mkdir_p d with _ -> ();
+    (Iochan.openfile (Filename.concat d "access") True,
+     open_out_bin (Filename.concat d "data"))
+  }
+  in
+  let gen =
+    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
+     g_error = False; g_tmp_dir = tmp_dir;
+     g_particles = input_particles part_file.val;
+     g_strings = Hashtbl.create 1;
+     g_index_of_key = Hashtbl.create 1;
+     g_person_fields = person_fields;
+     g_family_fields = family_fields;
+     g_person_parents = person_parents;
+     g_person_unions = person_unions;
+     g_person_rparents = person_rparents;
+     g_person_related = person_related;
+     g_person_notes = person_notes}
+  in
+  let ngwo = List.length gwo_list in
+  if ngwo >= 10 && Mutil.verbose.val then do {
+    eprintf "pass 1: creating persons...\n";
+    flush stderr
+  }
+  else ();
+  let run =
+    if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
+    else if ngwo < 60 then
+      fun () -> do { Printf.eprintf "."; flush stderr; }
+    else do {
+      let bar_cnt = ref 0 in
+      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
+      ProgrBar.empty.val := 'o';
+      ProgrBar.full.val := '*';
+      ProgrBar.start ();
+      run
     }
-    in
-    let person_parents = do {
-      let d = Filename.concat person_d "parents" in
-      try Mutil.mkdir_p d with _ -> ();
-      (Iochan.openfile (Filename.concat d "access") True,
-       open_out_bin (Filename.concat d "data"))
+  in
+  List.iter (insert_comp_families1 gen run) gwo_list;
+
+  if ngwo < 10 || not Mutil.verbose.val then ()
+  else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
+  else ProgrBar.finish ();
+
+  Gc.compact ();
+
+  if ngwo >= 10 && Mutil.verbose.val then do {
+    eprintf "pass 2: creating families...\n";
+    flush stderr
+  }
+  else ();
+  let run =
+    if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
+    else if ngwo < 60 then
+      fun () -> do { Printf.eprintf "."; flush stderr; }
+    else do {
+      let bar_cnt = ref 0 in
+      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
+      ProgrBar.empty.val := 'o';
+      ProgrBar.full.val := '*';
+      ProgrBar.start ();
+      run
     }
-    in
-    let person_unions = do {
-      let d = Filename.concat person_d "family" in
-      try Mutil.mkdir_p d with _ -> ();
-      (Iochan.openfile (Filename.concat d "access") True,
-       open_out_bin (Filename.concat d "data"))
-    }
-    in
-    let person_rparents = do {
-      let d = Filename.concat person_d "rparents" in
-      try Mutil.mkdir_p d with _ -> ();
-      (Iochan.openfile (Filename.concat d "access") True,
-       open_out_bin (Filename.concat d "data"))
-    }
-    in
-    let person_related = do {
-      let d = Filename.concat person_d "related" in
-      try Mutil.mkdir_p d with _ -> ();
-      (Iochan.openfile (Filename.concat d "access") True,
-       Iochan.openfile (Filename.concat d "data") True)
-    }
-    in
-    let person_notes = do {
-      let d = Filename.concat person_d "notes" in
-      try Mutil.mkdir_p d with _ -> ();
-      (Iochan.openfile (Filename.concat d "access") True,
-       open_out_bin (Filename.concat d "data"))
-    }
-    in
-    let gen =
-      {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_tmp_dir = tmp_dir;
-       g_particles = input_particles part_file.val;
-       g_strings = Hashtbl.create 1;
-       g_index_of_key = Hashtbl.create 1;
-       g_person_fields = person_fields;
-       g_family_fields = family_fields;
-       g_person_parents = person_parents;
-       g_person_unions = person_unions;
-       g_person_rparents = person_rparents;
-       g_person_related = person_related;
-       g_person_notes = person_notes}
-    in
-    let ngwo = List.length gwo_list in
-    if ngwo >= 10 && Mutil.verbose.val then do {
-      eprintf "pass 1: creating persons...\n";
-      flush stderr
-    }
-    else ();
-    let run =
-      if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
-      else if ngwo < 60 then
-        fun () -> do { Printf.eprintf "."; flush stderr; }
-      else do {
-        let bar_cnt = ref 0 in
-        let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
-        ProgrBar.empty.val := 'o';
-        ProgrBar.full.val := '*';
-        ProgrBar.start ();
-        run
-      }
-    in
-    List.iter (insert_comp_families1 gen run) gwo_list;
+  in
+  List.iter (insert_comp_families2 gen run) gwo_list;
+  if ngwo < 10 || not Mutil.verbose.val then ()
+  else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
+  else ProgrBar.finish ();
 
-    if ngwo < 10 || not Mutil.verbose.val then ()
-    else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
-    else ProgrBar.finish ();
+  List.iter close_out_field person_fields;
+  List.iter close_out_field family_fields;
+  Iochan.close (fst person_notes);
+  close_out (snd person_notes);
+  Iochan.close (fst person_related);
+  Iochan.close (snd person_related);
+  Iochan.close (fst person_rparents);
+  close_out (snd person_rparents);
+  Iochan.close (fst person_unions);
+  close_out (snd person_unions);
+  Iochan.close (fst person_parents);
+  close_out (snd person_parents);
+  Gc.compact ();
 
-    Gc.compact ();
+  let person_of_key_d = 
+    List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_key"]
+  in
+  try Mutil.mkdir_p person_of_key_d with _ -> ();
 
-    if ngwo >= 10 && Mutil.verbose.val then do {
-      eprintf "pass 2: creating families...\n";
-      flush stderr
-    }
-    else ();
-    let run =
-      if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
-      else if ngwo < 60 then
-        fun () -> do { Printf.eprintf "."; flush stderr; }
-      else do {
-        let bar_cnt = ref 0 in
-        let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
-        ProgrBar.empty.val := 'o';
-        ProgrBar.full.val := '*';
-        ProgrBar.start ();
-        run
-      }
-    in
-    List.iter (insert_comp_families2 gen run) gwo_list;
-    if ngwo < 10 || not Mutil.verbose.val then ()
-    else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
-    else ProgrBar.finish ();
+  Db2out.output_hashtbl person_of_key_d "iper_of_key.ht"
+    (gen.g_index_of_key : Hashtbl.t Db2.key2 iper);
+  Hashtbl.clear gen.g_index_of_key;
 
-    List.iter close_out_field person_fields;
-    List.iter close_out_field family_fields;
-    Iochan.close (fst person_notes);
-    close_out (snd person_notes);
-    Iochan.close (fst person_related);
-    Iochan.close (snd person_related);
-    Iochan.close (fst person_rparents);
-    close_out (snd person_rparents);
-    Iochan.close (fst person_unions);
-    close_out (snd person_unions);
-    Iochan.close (fst person_parents);
-    close_out (snd person_parents);
-    Gc.compact ();
+  Db2out.output_hashtbl person_of_key_d "istr_of_string.ht"
+    (gen.g_strings : Hashtbl.t string Adef.istr);
+  Hashtbl.clear gen.g_strings;
+  Gc.compact ();
 
-    let person_of_key_d = 
-      List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_key"]
-    in
-    try Mutil.mkdir_p person_of_key_d with _ -> ();
+  compress_fields tmp_dir;
+  reorder_fields tmp_dir;
 
-    Db2out.output_hashtbl person_of_key_d "iper_of_key.ht"
-      (gen.g_index_of_key : Hashtbl.t Db2.key2 iper);
-    Hashtbl.clear gen.g_index_of_key;
+  Db2out.make_indexes (Filename.concat tmp_dir "base_d") gen.g_pcnt
+    gen.g_particles;
 
-    Db2out.output_hashtbl person_of_key_d "istr_of_string.ht"
-      (gen.g_strings : Hashtbl.t string Adef.istr);
-    Hashtbl.clear gen.g_strings;
-    Gc.compact ();
+  output_particles_file tmp_dir gen.g_particles;
 
-    compress_fields tmp_dir;
-    reorder_fields tmp_dir;
+  if Mutil.verbose.val then do {
+    Printf.eprintf "pcnt %d\n" gen.g_pcnt;
+    Printf.eprintf "fcnt %d\n" gen.g_fcnt;
+    Printf.eprintf "scnt %d\n" gen.g_scnt;
+    flush stderr;
+  }
+  else ();
 
-    Db2out.make_indexes (Filename.concat tmp_dir "base_d") gen.g_pcnt
-      gen.g_particles;
-
-    output_particles_file tmp_dir gen.g_particles;
-
-    if Mutil.verbose.val then do {
-      Printf.eprintf "pcnt %d\n" gen.g_pcnt;
-      Printf.eprintf "fcnt %d\n" gen.g_fcnt;
-      Printf.eprintf "scnt %d\n" gen.g_scnt;
-      flush stderr;
-    }
-    else ();
-
+  if not gen.g_error then do {
     Mutil.mkdir_p bdir;
     let dir = Filename.concat bdir "base_d" in
     let old_dir = Filename.concat bdir "base_d~" in
@@ -902,7 +905,9 @@ value link gwo_list bname =
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rmdir "gw_tmp" with [ Unix.Unix_error _ _ _ -> () ];
   }
-;
+  else ();
+  not gen.g_error;
+};
 
 value output_command_line bname =
   let bdir =
@@ -998,16 +1003,19 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       }
       else ();
       lock (Mutil.lock_file out_file.val) with
-      [ Accept -> do {
-          link (List.rev gwo.val) out_file.val;
-          output_command_line out_file.val;
-        }
-      | Refuse ->
-          do {
-            printf "Base is locked: cannot write it\n";
-            flush stdout;
+      [ Accept ->
+          if link (List.rev gwo.val) out_file.val then
+            output_command_line out_file.val
+          else do {
+            eprintf "*** database not created\n";
+            flush stderr;
             exit 2
-          } ];
+          }
+      | Refuse -> do {
+          printf "Base is locked: cannot write it\n";
+          flush stdout;
+          exit 2
+        } ];
     }
     else ();
   }
