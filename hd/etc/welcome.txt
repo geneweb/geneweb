@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: welcome.txt,v 1.35 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.36 2007-03-03 15:19:02 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -221,9 +221,9 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
   </div>
 %end;
 
-%if;(bvar.motd2 != "")
+%if;(bvar.motd != "")
   <div>
-    %apply;interp(bvar.motd2)
+    %apply;interp(bvar.motd)
   </div>
 %end;
 
