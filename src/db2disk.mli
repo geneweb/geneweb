@@ -1,4 +1,4 @@
-(* $Id: db2disk.mli,v 5.9 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: db2disk.mli,v 5.10 2007-03-03 05:27:21 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -63,6 +63,7 @@ value spi2_find :
 value spi2gen_find :
   db2 -> string_person_index2 -> string -> list iper;
 
+value disk_person2_of_key : db2 -> string -> string -> int -> option iper;
 value person2_of_key : db2 -> string -> string -> int -> option iper;
 value strings2_of_fsname : db2 -> string -> string -> list int;
 value persons2_of_name : db2 -> string -> list iper;
