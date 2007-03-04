@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.48 2007-03-03 12:02:45 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.49 2007-03-04 20:48:07 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -27,12 +27,16 @@ type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
+    g_current_file : mutable string;
     g_error : mutable bool;
+    g_separate : mutable bool;
+    g_sep_file_inx : mutable int;
     g_tmp_dir : string;
     g_particles : list string;
 
     g_strings : Hashtbl.t string Adef.istr;
     g_index_of_key : Hashtbl.t Db2.key2 iper;
+    g_occ_of_key : array (Hashtbl.t Db2.key2 int);
     g_person_fields : list (file_field (gen_person iper string));
     g_family_fields : list (file_field family);
     g_person_parents : (Iochan.t * out_channel);
@@ -90,18 +94,25 @@ value open_out_field tmp_dir (name, valu) = do {
    item_cnt = 0; valu = valu}
 };
 
-value output_field so ff = do {
-  output_binary_int ff.oc_acc (pos_out ff.oc_dat);
+value output_item v ff = do {
   Iovalue.size_32.val := ff.sz32;
   Iovalue.size_64.val := ff.sz64;
-  Iovalue.output ff.oc_dat (ff.valu so);
+  Iovalue.output ff.oc_dat v;
   ff.sz32 := Iovalue.size_32.val;
   ff.sz64 := Iovalue.size_64.val;
   ff.item_cnt := ff.item_cnt + 1;
 };
 
-value close_out_field ff = do {
+value output_field so ff = do {
+  output_binary_int ff.oc_acc (pos_out ff.oc_dat);
+  output_item (ff.valu so) ff;
+};
+
+value close_out_field pad ff = do {
   close_out ff.oc_acc;
+  for i = ff.item_cnt + 1 to Db2out.phony_min_size do {
+    output_item (ff.valu pad) ff;
+  };
   Iovalue.size_32.val := ff.sz32 - Db2out.phony_min_size + ff.item_cnt;
   Iovalue.size_64.val := ff.sz64 - Db2out.phony_min_size + ff.item_cnt;
   ignore (Iovalue.patch_output_value_header ff.oc_dat ff.start_pos : int);
@@ -306,6 +317,31 @@ value reorder_type_list_int field_d ic_acc ic_dat ff = do {
   [ End_of_file -> () ];
 };
 
+value no_person empty_string ip =
+  {first_name = empty_string; surname = empty_string; occ = 0;
+   image = empty_string; first_names_aliases = []; surnames_aliases = [];
+   public_name = empty_string; qualifiers = []; titles = []; rparents = [];
+   related = []; aliases = []; occupation = empty_string; sex = Neuter;
+   access = Private; birth = Adef.codate_None; birth_place = empty_string;
+   birth_src = empty_string; baptism = Adef.codate_None;
+   baptism_place = empty_string; baptism_src = empty_string;
+   death = DontKnowIfDead; death_place = empty_string;
+   death_src = empty_string; burial = UnknownBurial;
+   burial_place = empty_string; burial_src = empty_string;
+   notes = empty_string; psources = empty_string; key_index = ip}
+;
+value no_family empty_string ifam =
+  {fam =
+     {marriage = Adef.codate_None; marriage_place = empty_string;
+      marriage_src = empty_string; witnesses = [| |]; relation = Married;
+      divorce = NotDivorced; comment = empty_string;
+      origin_file = empty_string; fsources = empty_string; fam_index = ifam};
+   cpl = Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0);
+   des = {children = [| |]}}
+;
+value pad_per = no_person "" (Adef.iper_of_int 0);
+value pad_fam = no_family "" (Adef.ifam_of_int 0);
+
 value reorder_fields tmp_dir =
   List.iter
     (fun (f1, f2, reorder_type) -> do {
@@ -332,7 +368,7 @@ value reorder_fields tmp_dir =
        in
        reorder_type field_d ic_acc ic_dat ff;
 
-       close_out_field ff;
+       close_out_field [| |] ff;
        close_in ic_dat;
        close_in ic_acc;
        List.iter
@@ -383,13 +419,35 @@ value insert_person1 gen so = do {
     let sn = unique_key_string gen so.surname in
     let k = (fn, sn, so.occ) in
     try do {
-      let _ = key_hashtbl_find gen.g_index_of_key k in
+      if gen.g_separate then
+        ignore
+          (key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx) k : int)
+      else
+        ignore (key_hashtbl_find gen.g_index_of_key k : iper);
       eprintf "already defined %s.%d %s\n" so.first_name so.occ so.surname;
       flush stderr;
       gen.g_error := True;
     }
     with
     [ Not_found -> do {
+        let (k, so) =
+          if gen.g_separate then
+            loop 0 where rec loop occ =
+              let k1 = (fn, sn, occ) in
+              match
+                try Some (key_hashtbl_find gen.g_index_of_key k1) with
+                [ Not_found -> None ]
+              with
+              [ Some _ -> loop (occ + 1)
+              | None -> do {
+Printf.eprintf "%s: renumbering %s.%d %s as occ %d\n" gen.g_current_file
+  so.first_name so.occ so.surname occ;
+flush stderr;
+                  key_hashtbl_add gen.g_occ_of_key.(gen.g_sep_file_inx) k occ;
+                  (k1, {(so) with occ = occ})
+                } ]
+          else (k, so)
+        in
         key_hashtbl_add gen.g_index_of_key k (Adef.iper_of_int gen.g_pcnt);
         List.iter (output_field so) gen.g_person_fields;
         Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
@@ -443,7 +501,16 @@ value get_person2 gen so sex =
   if so.first_name <> "?" && so.surname <> "?" then do {
     let fn = unique_key_string gen so.first_name in
     let sn = unique_key_string gen so.surname in
-    try key_hashtbl_find gen.g_index_of_key (fn, sn, so.occ) with
+    let occ =
+      if gen.g_separate then
+        try
+          key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx)
+            (fn, sn, so.occ)
+        with
+        [ Not_found -> so.occ ]
+      else so.occ
+    in
+    try key_hashtbl_find gen.g_index_of_key (fn, sn, occ) with
     [ Not_found ->
         failwith
           (sprintf "*** bug not found %s.%d %s" so.first_name so.occ
@@ -470,7 +537,16 @@ value get_person2 gen so sex =
 value get_undefined2 gen key sex =
   let fn = unique_key_string gen key.pk_first_name in
   let sn = unique_key_string gen key.pk_surname in
-  try key_hashtbl_find gen.g_index_of_key (fn, sn, key.pk_occ) with
+  let occ =
+    if gen.g_separate then
+      try
+        key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx)
+          (fn, sn, key.pk_occ)
+      with
+      [ Not_found -> key.pk_occ ]
+    else key.pk_occ
+  in
+  try key_hashtbl_find gen.g_index_of_key (fn, sn, occ) with
   [ Not_found -> insert_undefined2 gen key fn sn sex ]
 ;
 
@@ -671,37 +747,39 @@ value insert_gwo_2 gen =
   | Wnotes wizid str -> () ]
 ;
 
-value insert_comp_families1 gen run (x, separate, shift) =
-  do {
-    run ();
-    let ic = open_in_bin x in
-    check_magic x ic;
-    let srcfile : string = input_value ic in
-    try
-      while True do {
-        let fam : syntax_o = input_value ic in
-        insert_gwo_1 gen srcfile fam
-      }
-    with
-    [ End_of_file -> close_in ic ]
-  }
-;
+value insert_comp_families1 gen run (x, separate, shift) = do {
+  run ();
+  gen.g_current_file := x;
+  gen.g_separate := separate;
+  let ic = open_in_bin x in
+  check_magic x ic;
+  let srcfile : string = input_value ic in
+  try
+    while True do {
+      let fam : syntax_o = input_value ic in
+      insert_gwo_1 gen srcfile fam
+    }
+  with
+  [ End_of_file -> close_in ic ];
+  gen.g_sep_file_inx := gen.g_sep_file_inx + 1;
+};
 
-value insert_comp_families2 gen run (x, separate, shift) =
-  do {
-    run ();
-    let ic = open_in_bin x in
-    check_magic x ic;
-    let _ : string = input_value ic in
-    try
-      while True do {
-        let fam : syntax_o = input_value ic in
-        insert_gwo_2 gen fam
-      }
-    with
-    [ End_of_file -> close_in ic ]
-  }
-;
+value insert_comp_families2 gen run (x, separate, shift) = do {
+  run ();
+  gen.g_current_file := x;
+  gen.g_separate := separate;
+  let ic = open_in_bin x in
+  check_magic x ic;
+  let _ : string = input_value ic in
+  try
+    while True do {
+      let fam : syntax_o = input_value ic in
+      insert_gwo_2 gen fam
+    }
+  with
+  [ End_of_file -> close_in ic ];
+  gen.g_sep_file_inx := gen.g_sep_file_inx + 1;
+};
 
 value just_comp = ref False;
 value out_file = ref (Filename.concat Filename.current_dir_name "a");
@@ -787,11 +865,13 @@ value link gwo_list bname = do {
   }
   in
   let gen =
-    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
-     g_error = False; g_tmp_dir = tmp_dir;
-     g_particles = input_particles part_file.val;
+    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_current_file = "";
+     g_error = False; g_separate = False; g_sep_file_inx = 0;
+     g_tmp_dir = tmp_dir; g_particles = input_particles part_file.val;
      g_strings = Hashtbl.create 1;
      g_index_of_key = Hashtbl.create 1;
+     g_occ_of_key =
+       Array.init (List.length gwo_list) (fun _ -> Hashtbl.create 1);
      g_person_fields = person_fields;
      g_family_fields = family_fields;
      g_person_parents = person_parents;
@@ -819,6 +899,7 @@ value link gwo_list bname = do {
       run
     }
   in
+  gen.g_sep_file_inx := 0;
   List.iter (insert_comp_families1 gen run) gwo_list;
 
   if ngwo < 10 || not Mutil.verbose.val then ()
@@ -845,13 +926,14 @@ value link gwo_list bname = do {
       run
     }
   in
+  gen.g_sep_file_inx := 0;
   List.iter (insert_comp_families2 gen run) gwo_list;
   if ngwo < 10 || not Mutil.verbose.val then ()
   else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
   else ProgrBar.finish ();
 
-  List.iter close_out_field person_fields;
-  List.iter close_out_field family_fields;
+  List.iter (close_out_field pad_per) person_fields;
+  List.iter (close_out_field pad_fam) family_fields;
   Iochan.close (fst person_notes);
   close_out (snd person_notes);
   Iochan.close (fst person_related);
