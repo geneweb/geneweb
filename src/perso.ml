@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.65 2007-03-05 05:18:23 ddr Exp $ *)
+(* $Id: perso.ml,v 5.66 2007-03-05 18:32:25 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2685,6 +2685,7 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
       let list =
+        let list = list_uniq (List.sort compare (get_related p)) in
         List.fold_left
           (fun list ic ->
              let c = pget conf base ic in
@@ -2700,7 +2701,7 @@ value print_foreach conf base print_ast eval_expr =
                            loop [(c, r) :: list] rl
                        | _ -> loop list rl ] ]
                | [] -> list ])
-          [] (get_related p)
+          [] list
       in
       let list =
         List.sort
