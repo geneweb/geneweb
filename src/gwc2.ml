@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.53 2007-03-05 11:21:09 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.54 2007-03-05 18:32:25 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -603,20 +603,11 @@ value insert_related gen irp ip = do {
   let (ioc_acc, ioc_dat) = gen.g_person_related in
   Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
   let pos1 = Iochan.input_binary_int ioc_acc in
-  loop pos1 where rec loop pos =
-    if pos = -1 then do {
-      let pos2 = Iochan.seek_end ioc_dat in
-      Iochan.output_value_no_header ioc_dat (Adef.int_of_iper ip);
-      Iochan.output_value_no_header ioc_dat pos1;
-      Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
-      Iochan.output_binary_int ioc_acc pos2;
-    }
-    else do {
-      Iochan.seek ioc_dat pos;
-      let i = Iochan.input_value_no_header ioc_dat in
-      if i = Adef.int_of_iper ip then ()
-      else loop (Iochan.input_value_no_header ioc_dat)
-    };
+  let pos2 = Iochan.seek_end ioc_dat in
+  Iochan.output_value_no_header ioc_dat (Adef.int_of_iper ip);
+  Iochan.output_value_no_header ioc_dat pos1;
+  Iochan.seek ioc_acc (int_size * Adef.int_of_iper irp);
+  Iochan.output_binary_int ioc_acc pos2;
 };
 
 value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
