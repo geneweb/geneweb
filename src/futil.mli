@@ -1,4 +1,4 @@
-(* $Id: futil.mli,v 5.4 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: futil.mli,v 5.5 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -18,6 +18,11 @@ value map_family_ps :
 ;
 value map_couple_p : bool -> ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
 value map_descend_p : ('a -> 'b) -> gen_descend 'a -> gen_descend 'b;
+
+value eq_lists : ('a -> 'b -> bool) -> list 'a -> list 'b -> bool;
+value eq_titles : ('a -> 'b -> bool) -> gen_title 'a -> gen_title 'b -> bool;
+value eq_title_names :
+  ('a -> 'b -> bool) -> gen_title_name 'a -> gen_title_name 'b -> bool;
 
 value parent : bool -> array 'a -> gen_couple 'a;
 
