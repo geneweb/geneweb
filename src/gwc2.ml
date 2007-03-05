@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.49 2007-03-04 20:48:07 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.50 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -424,7 +424,8 @@ value insert_person1 gen so = do {
           (key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx) k : int)
       else
         ignore (key_hashtbl_find gen.g_index_of_key k : iper);
-      eprintf "already defined %s.%d %s\n" so.first_name so.occ so.surname;
+      eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
+        so.surname;
       flush stderr;
       gen.g_error := True;
     }
@@ -472,8 +473,8 @@ value insert_undefined2 gen key fn sn sex = do {
       (Adef.iper_of_int gen.g_pcnt)
   else ();
   if do_check.val then do {
-    eprintf "Adding undefined %s.%d %s\n" (Name.lower key.pk_first_name)
-      key.pk_occ (Name.lower key.pk_surname);
+    eprintf "Warning: adding undefined %s.%d %s\n"
+      (Name.lower key.pk_first_name) key.pk_occ (Name.lower key.pk_surname);
     flush stderr;
   }
   else ();

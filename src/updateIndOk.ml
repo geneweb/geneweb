@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.65 2007-03-03 15:14:16 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.66 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -730,27 +730,6 @@ value print_mod_aux conf base callback =
   [ Update.ModErr -> () ]
 ;
 
-value rec eq_istr_list l1 l2 =
-  match (l1, l2) with
-  [ ([i1 :: l1], [i2 :: l2]) -> eq_istr i1 i2 && eq_istr_list l1 l2
-  | ([], []) -> True
-  | _ -> False ]
-;
-
-value rec eq_titles tl1 tl2 =
-  match (tl1, tl2) with
-  [ ([t1 :: tl1], [t2 :: tl2]) -> eq_title t1 t2 && eq_titles tl1 tl2
-  | ([], []) -> True
-  | _ -> False ]
-and eq_title t1 t2 =
-  match (t1.t_name, t2.t_name) with
-  [ (Tname i1, Tname i2) -> eq_istr i1 i2
-  | _ ->
-      t1.t_name = t2.t_name && eq_istr t1.t_ident t2.t_ident &&
-      eq_istr t1.t_place t2.t_place && t1.t_date_start = t2.t_date_start &&
-      t1.t_date_end = t2.t_date_end && t1.t_nth = t2.t_nth ]
-;
-
 value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
   let callback sp = do {
@@ -767,8 +746,8 @@ value print_mod o_conf base =
     in
     Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) s;
     if not (eq_istr (get_surname op) p.surname) ||
-       not (eq_istr_list (get_surnames_aliases op) p.surnames_aliases) ||
-       not (eq_titles (get_titles op) p.titles)
+       not (eq_lists eq_istr (get_surnames_aliases op) p.surnames_aliases) ||
+       not (eq_lists (eq_titles eq_istr) (get_titles op) p.titles)
     then
       Update.update_misc_names_of_family base p.sex u
     else ();

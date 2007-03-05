@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.38 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.39 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -25,7 +25,12 @@ value cat_strings base is1 sep is2 =
 ;
 
 value merge_strings base is1 sep is2 =
-  if eq_istr is1 is2 then sou base is1 else cat_strings base is1 sep is2
+  let n1 = sou base is1 in
+  let n2 = sou base is2 in
+  if n1 = n2 then n1
+  else if n1 = "" then n2
+  else if n2 = "" then n1
+  else n1 ^ sep ^ n2
 ;
 
 value sorp base ip =

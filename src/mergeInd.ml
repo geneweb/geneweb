@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.48 2007-03-02 11:44:13 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.49 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -191,9 +191,11 @@ value compatible_relation_kinds rk1 rk2 = rk1 = rk2;
 
 value compatible_accesses a1 a2 = (*a1 = a2*)True;
 
-value compatible_titles t1 t2 = t1 = t2 || t2 = [];
+value compatible_titles t1 t2 =
+  Futil.eq_lists (Futil.eq_titles eq_istr) t1 t2 || t2 = [];
 
-value compatible_strings_lists sl1 sl2 = sl2 = [] || sl1 = sl2;
+value compatible_strings_lists sl1 sl2 =
+  sl2 = [] || Futil.eq_lists eq_istr sl1 sl2;
 
 value compatible_ind base p1 p2 =
   eq_istr (get_first_name p1) (get_first_name p2) &&

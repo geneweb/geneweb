@@ -1,4 +1,4 @@
-(* $Id: futil.ml,v 5.4 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: futil.ml,v 5.5 2007-03-05 05:18:23 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Adef;
@@ -158,4 +158,24 @@ value gen_person_misc_names first_name surname public_name qualifiers aliases
          let s = Name.lower s in
          if s = fn || List.mem s list then list else [s :: list])
       [] list
+;
+
+value rec eq_lists eq l1 l2 =
+  match (l1, l2) with
+  [ ([x1 :: l1], [x2 :: l2]) -> eq x1 x2 && eq_lists eq l1 l2
+  | ([], []) -> True
+  | _ -> False ]
+;
+
+value eq_title_names eq tn1 tn2 =
+  match (tn1, tn2) with
+  [ (Tname i1, Tname i2) -> eq i1 i2
+  | (Tmain, Tmain) | (Tnone, Tnone) -> True
+  | _ -> False ]
+;
+
+value eq_titles eq t1 t2 =
+  eq_title_names eq t1.t_name t2.t_name && eq t1.t_ident t2.t_ident &&
+  eq t1.t_place t2.t_place && t1.t_date_start = t2.t_date_start &&
+  t1.t_date_end = t2.t_date_end && t1.t_nth = t2.t_nth
 ;
