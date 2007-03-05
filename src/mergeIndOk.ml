@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.39 2007-03-05 05:18:23 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.40 2007-03-05 14:45:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -118,144 +118,150 @@ value print_mod_merge_ok conf base wl p = do {
   trailer conf;
 };
 
-value effective_mod_merge conf base sp =
-  match p_getint conf.env "i2" with
-  [ Some i2 ->
-      let p2 = poi base (Adef.iper_of_int i2) in
-      let rel_chil = get_related p2 in
-      let p2_family = get_family p2 in
-      do {
-        MergeInd.reparent_ind base sp.key_index (get_key_index p2);
-        delete_key base (sou base (get_first_name p2))
-          (sou base (get_surname p2)) (get_occ p2);
-        let p2 = UpdateIndOk.effective_del conf base p2 in
-        patch_person base p2.key_index p2;
-        let u2 = {family = [| |]} in
-        patch_union base p2.key_index u2;
-        let p = UpdateIndOk.effective_mod conf base sp in
-        let u = poi base p.key_index in
-        let (p_related, mod_p) =
-          List.fold_right
-            (fun ipc (p_related, mod_p) ->
-               let pc = poi base ipc in
-               let (pc_rparents, mod_pc, p_related, mod_p) =
-                 List.fold_right
-                   (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
-                      let (r, mod_pc, p_related, mod_p) =
-                        match r.r_fath with
-                        [ Some ip when ip = p2.key_index ->
-                            let (p_related, mod_p) =
-                              if List.mem ipc p_related then
-                                (p_related, mod_p)
-                              else ([ipc :: p_related], True)
-                            in
-                            let r = {(r) with r_fath = Some p.key_index} in
-                            (r, True, p_related, mod_p)
-                        | _ -> (r, mod_pc, p_related, mod_p) ]
+value redirect_relations_of_added_related base p p2 rel_chil =
+  let (p_related, mod_p) =
+    List.fold_right
+      (fun ipc (p_related, mod_p) -> do {
+         let pc = poi base ipc in
+         let (pc_rparents, mod_pc, p_related, mod_p) =
+           List.fold_right
+             (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
+                let (r, mod_pc, p_related, mod_p) =
+                  match r.r_fath with
+                  [ Some ip when ip = p2.key_index ->
+                      let (p_related, mod_p) =
+                        if List.mem ipc p_related then
+                          (p_related, mod_p)
+                        else ([ipc :: p_related], True)
                       in
-                      let (r, mod_pc, p_related, mod_p) =
-                        match r.r_moth with
-                        [ Some ip when ip = p2.key_index ->
-                            let (p_related, mod_p) =
-                              if List.mem ipc p_related then
-                                (p_related, mod_p)
-                              else ([ipc :: p_related], True)
-                            in
-                            let r = {(r) with r_moth = Some p.key_index} in
-                            (r, True, p_related, mod_p)
-                        | _ -> (r, mod_pc, p_related, mod_p) ]
+                      let r = {(r) with r_fath = Some p.key_index} in
+                      (r, True, p_related, mod_p)
+                  | _ -> (r, mod_pc, p_related, mod_p) ]
+                in
+                let (r, mod_pc, p_related, mod_p) =
+                  match r.r_moth with
+                  [ Some ip when ip = p2.key_index ->
+                      let (p_related, mod_p) =
+                        if List.mem ipc p_related then
+                          (p_related, mod_p)
+                        else ([ipc :: p_related], True)
                       in
-                      ([r :: pc_rparents], mod_pc, p_related, mod_p))
-                   (get_rparents pc) ([], False, p_related, mod_p)
-               in
-               do {
-                 if mod_pc then
-                   let pc = gen_person_of_person pc in
-                   let pc = {(pc) with rparents = pc_rparents} in
-                   patch_person base ipc pc
-                 else ();
-                 let (p_related, mod_p) =
-                   loop (p_related, mod_p) 0
-                   where rec loop (p_related, mod_p) i =
-                     if i = Array.length (get_family pc) then
-                       (p_related, mod_p)
-                     else
-                       let ifam = (get_family pc).(i) in
-                       let fam = gen_family_of_family (foi base ifam) in
+                      let r = {(r) with r_moth = Some p.key_index} in
+                      (r, True, p_related, mod_p)
+                  | _ -> (r, mod_pc, p_related, mod_p) ]
+                in
+                ([r :: pc_rparents], mod_pc, p_related, mod_p))
+             (get_rparents pc) ([], False, p_related, mod_p)
+         in
+         if mod_pc then
+           let pc = gen_person_of_person pc in
+           let pc = {(pc) with rparents = pc_rparents} in
+           patch_person base ipc pc
+         else ();
+         let (p_related, mod_p) =
+           loop (p_related, mod_p) 0
+           where rec loop (p_related, mod_p) i =
+             if i = Array.length (get_family pc) then
+               (p_related, mod_p)
+             else
+               let ifam = (get_family pc).(i) in
+               let fam = gen_family_of_family (foi base ifam) in
+               let (p_related, mod_p) =
+                 if array_mem p2.key_index fam.witnesses
+                 then do {
+                   let (p_related, mod_p) =
+                     loop (p_related, mod_p) 0
+                     where rec loop (p_related, mod_p) j =
+                       if j = Array.length fam.witnesses then
+                         (p_related, mod_p)
+                       else
                        let (p_related, mod_p) =
-                         if array_mem p2.key_index fam.witnesses
+                         if fam.witnesses.(j) = p2.key_index
                          then do {
-                           let (p_related, mod_p) =
-                             loop (p_related, mod_p) 0
-                             where rec loop (p_related, mod_p) j =
-                               if j = Array.length fam.witnesses then
-                                 (p_related, mod_p)
-                               else
-                               let (p_related, mod_p) =
-                                 if fam.witnesses.(j) = p2.key_index
-                                 then do {
-                                   fam.witnesses.(j) := p.key_index;
-                                   if List.mem ipc p_related then
-                                     (p_related, mod_p)
-                                   else ([ipc :: p_related], True)
-                                 }
-                                 else (p_related, mod_p)
-                               in
-                               loop (p_related, mod_p) (j + 1)
-                           in
-                           patch_family base ifam fam;
-                           (p_related, mod_p)
+                           fam.witnesses.(j) := p.key_index;
+                           if List.mem ipc p_related then
+                             (p_related, mod_p)
+                           else ([ipc :: p_related], True)
                          }
                          else (p_related, mod_p)
                        in
-                       loop (p_related, mod_p) (i + 1)
-                 in
-                 (p_related, mod_p)
-               })
-            rel_chil (p.related, False)
-        in
-        let p = if mod_p then {(p) with related = p_related} else p in
-        for i = 0 to Array.length p2_family - 1 do {
-          let ifam = p2_family.(i) in
-          let fam = foi base ifam in
-          let cpl =
-            if p2.key_index = get_father fam then do {
-              Array.iter
-                (fun ip ->
-                   let w = poi base ip in
-                   if not (List.mem p.key_index (get_related w)) then
-                     let w = gen_person_of_person w in
-                     let w =
-                       {(w) with related = [p.key_index :: w.related]}
-                     in
-                     patch_person base ip w
-                   else ())
-                (get_witnesses fam);
-              couple False p.key_index (get_mother fam)
-            }
-            else if p2.key_index = get_mother fam then
-              couple False (get_father fam) p.key_index
-            else assert False
-          in
-          patch_couple base ifam cpl;
-        };
-        Update.update_misc_names_of_family base p.sex {family = get_family u};
-        patch_person base p.key_index p;
-        let u = {family = Array.append (get_family u) p2_family} in
-        if p2_family <> [| |] then patch_union base p.key_index u else ();
-        Consang.check_noloop_for_person_list base (Update.error conf base)
-          [p.key_index];
-        let wl =
-          let a = poi base p.key_index in
-          let a = {parents = get_parents a; consang = get_consang a} in
-          UpdateIndOk.all_checks_person conf base p a u
-        in
-        let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
-        Util.commit_patches conf base;
-        History.record conf base key "fp";
-        Update.delete_topological_sort conf base;
-        print_mod_merge_ok conf base wl p;
+                       loop (p_related, mod_p) (j + 1)
+                   in
+                   patch_family base ifam fam;
+                   (p_related, mod_p)
+                 }
+                 else (p_related, mod_p)
+               in
+               loop (p_related, mod_p) (i + 1)
+         in
+         (p_related, mod_p)
+       })
+      rel_chil (p.related, False)
+  in
+  if mod_p then {(p) with related = p_related} else p
+;
+
+value redirect_added_families base p p2 p2_family =
+  for i = 0 to Array.length p2_family - 1 do {
+    let ifam = p2_family.(i) in
+    let fam = foi base ifam in
+    let cpl =
+      if p2.key_index = get_father fam then do {
+        Array.iter
+          (fun ip ->
+             let w = poi base ip in
+             if not (List.mem p.key_index (get_related w)) then
+               let w = gen_person_of_person w in
+               let w =
+                 {(w) with related = [p.key_index :: w.related]}
+               in
+               patch_person base ip w
+             else ())
+          (get_witnesses fam);
+        couple False p.key_index (get_mother fam)
       }
+      else if p2.key_index = get_mother fam then
+        couple False (get_father fam) p.key_index
+      else assert False
+    in
+    patch_couple base ifam cpl;
+  }
+;
+
+value effective_mod_merge conf base sp =
+  match p_getint conf.env "i2" with
+  [ Some i2 -> do {
+      let p2 = poi base (Adef.iper_of_int i2) in
+      let rel_chil = get_related p2 in
+      let p_family = get_family (poi base sp.key_index) in
+      let p2_family = get_family p2 in
+      MergeInd.reparent_ind base sp.key_index (get_key_index p2);
+      delete_key base (sou base (get_first_name p2))
+        (sou base (get_surname p2)) (get_occ p2);
+      let p2 = UpdateIndOk.effective_del conf base p2 in
+      patch_person base p2.key_index p2;
+      let u2 = {family = [| |]} in
+      patch_union base p2.key_index u2;
+      let p = UpdateIndOk.effective_mod conf base sp in
+      let p = redirect_relations_of_added_related base p p2 rel_chil in
+      redirect_added_families base p p2 p2_family;
+      Update.update_misc_names_of_family base p.sex {family = p_family};
+      patch_person base p.key_index p;
+      let u = {family = Array.append p_family p2_family} in
+      if p2_family <> [| |] then patch_union base p.key_index u else ();
+      Consang.check_noloop_for_person_list base (Update.error conf base)
+        [p.key_index];
+      let wl =
+        let a = poi base p.key_index in
+        let a = {parents = get_parents a; consang = get_consang a} in
+        UpdateIndOk.all_checks_person conf base p a u
+      in
+      let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
+      Util.commit_patches conf base;
+      History.record conf base key "fp";
+      Update.delete_topological_sort conf base;
+      print_mod_merge_ok conf base wl p;
+    }
   | _ -> incorrect_request conf ]
 ;
 
