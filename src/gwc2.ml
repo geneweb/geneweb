@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.50 2007-03-05 05:18:23 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.51 2007-03-05 05:55:45 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -31,6 +31,7 @@ type gen =
     g_error : mutable bool;
     g_separate : mutable bool;
     g_sep_file_inx : mutable int;
+    g_has_separates : bool;
     g_tmp_dir : string;
     g_particles : list string;
 
@@ -472,7 +473,13 @@ value insert_undefined2 gen key fn sn sex = do {
     key_hashtbl_add gen.g_index_of_key (fn, sn, key.pk_occ)
       (Adef.iper_of_int gen.g_pcnt)
   else ();
-  if do_check.val then do {
+  if gen.g_has_separates then do {
+    eprintf
+      "Error: option -sep does not work when there are undefined persons\n";
+    flush stderr;
+    gen.g_error := True;
+  }
+  else if do_check.val then do {
     eprintf "Warning: adding undefined %s.%d %s\n"
       (Name.lower key.pk_first_name) key.pk_occ (Name.lower key.pk_surname);
     flush stderr;
@@ -809,6 +816,7 @@ value output_particles_file tmp_dir particles = do {
 };
 
 value link gwo_list bname = do {
+  let has_separates = List.exists (fun (_, sep, _) -> sep) gwo_list in
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
@@ -868,7 +876,8 @@ value link gwo_list bname = do {
   let gen =
     {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_current_file = "";
      g_error = False; g_separate = False; g_sep_file_inx = 0;
-     g_tmp_dir = tmp_dir; g_particles = input_particles part_file.val;
+     g_has_separates = has_separates; g_tmp_dir = tmp_dir;
+     g_particles = input_particles part_file.val;
      g_strings = Hashtbl.create 1;
      g_index_of_key = Hashtbl.create 1;
      g_occ_of_key =
