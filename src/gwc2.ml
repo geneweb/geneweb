@@ -1,11 +1,14 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.51 2007-03-05 05:55:45 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.52 2007-03-05 10:53:00 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
 open Futil;
 open Gwcomp;
 open Printf;
+
+value max_warnings = 10;
+value max_errors = 10;
 
 type family =
   { fam : gen_family iper string;
@@ -29,6 +32,8 @@ type gen =
     g_scnt : mutable int;
     g_current_file : mutable string;
     g_error : mutable bool;
+    g_error_cnt : mutable int;
+    g_warning_cnt : mutable int;
     g_separate : mutable bool;
     g_sep_file_inx : mutable int;
     g_has_separates : bool;
@@ -425,8 +430,11 @@ value insert_person1 gen so = do {
           (key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx) k : int)
       else
         ignore (key_hashtbl_find gen.g_index_of_key k : iper);
-      eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
-        so.surname;
+      gen.g_error_cnt := gen.g_error_cnt - 1;
+      if gen.g_error_cnt > 0 then
+        eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
+          so.surname
+      else ();
       flush stderr;
       gen.g_error := True;
     }
@@ -480,8 +488,11 @@ value insert_undefined2 gen key fn sn sex = do {
     gen.g_error := True;
   }
   else if do_check.val then do {
-    eprintf "Warning: adding undefined %s.%d %s\n"
-      (Name.lower key.pk_first_name) key.pk_occ (Name.lower key.pk_surname);
+    gen.g_warning_cnt := gen.g_warning_cnt - 1;
+    if gen.g_warning_cnt > 0 then
+      eprintf "Warning: adding undefined %s.%d %s\n"
+        (Name.lower key.pk_first_name) key.pk_occ (Name.lower key.pk_surname)
+    else ();
     flush stderr;
   }
   else ();
@@ -875,7 +886,9 @@ value link gwo_list bname = do {
   in
   let gen =
     {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_current_file = "";
-     g_error = False; g_separate = False; g_sep_file_inx = 0;
+     g_error = False; g_error_cnt = max_errors + 1;
+     g_warning_cnt = max_warnings + 1;
+     g_separate = False; g_sep_file_inx = 0;
      g_has_separates = has_separates; g_tmp_dir = tmp_dir;
      g_particles = input_particles part_file.val;
      g_strings = Hashtbl.create 1;
@@ -982,6 +995,17 @@ value link gwo_list bname = do {
     Printf.eprintf "pcnt %d\n" gen.g_pcnt;
     Printf.eprintf "fcnt %d\n" gen.g_fcnt;
     Printf.eprintf "scnt %d\n" gen.g_scnt;
+    flush stderr;
+  }
+  else ();
+
+  if gen.g_warning_cnt < 0 then do {
+    eprintf "Warning: %d warnings more...\n" (-gen.g_warning_cnt);
+    flush stderr;
+  }
+  else ();
+  if gen.g_error_cnt < 0 then do {
+    eprintf "Error: %d errors more...\n" (-gen.g_error_cnt);
     flush stderr;
   }
   else ();
