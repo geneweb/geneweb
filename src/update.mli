@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 5.9 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: update.mli,v 5.10 2007-03-05 20:23:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -23,6 +23,9 @@ value add_misc_names_for_new_persons :
 value update_misc_names_of_family : base -> sex -> gen_union ifam -> unit;
 value delete_topological_sort_v : config -> base -> unit;
 value delete_topological_sort : config -> base -> unit;
+
+value update_related_pointers :
+  base -> iper -> list iper -> list iper -> unit;
 
 value print_return : config -> unit;
 value print_error : config -> base -> CheckItem.base_error -> unit;

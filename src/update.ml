@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.40 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: update.ml,v 5.41 2007-03-05 20:23:50 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -794,3 +794,36 @@ value update_conf conf =
       [ Some _ -> update_conf_create conf
       | None -> conf ] ]
 ;
+
+value rec list_except x =
+  fun
+  [ [y :: l] -> if x = y then l else [y :: list_except x l]
+  | [] -> invalid_arg "list_except" ]
+;
+
+value update_related_pointers base pi ol nl = do {
+  let ol = List.sort compare ol in
+  let nl = List.sort compare nl in
+  let (added_rel, removed_rel) =
+    loop ([], []) ol nl where rec loop (added_rel, removed_rel) ol nl =
+      match (ol, nl) with
+      [ ([oip :: orl], [nip :: nrl]) ->
+          if oip < nip then
+            loop (added_rel, [oip :: removed_rel]) orl nl
+          else if oip > nip then
+            loop ([nip :: added_rel], removed_rel) ol nrl
+          else loop (added_rel, removed_rel) orl nrl
+      | ([], _) -> (nl @ added_rel, removed_rel)
+      | (_, []) -> (added_rel, ol @ removed_rel) ]
+  in
+  List.iter
+    (fun ip ->
+       let p = gen_person_of_person (poi base ip) in
+       patch_person base ip {(p) with related = [pi :: p.related]})
+    added_rel;
+  List.iter
+    (fun ip ->
+       let p = gen_person_of_person (poi base ip) in
+       patch_person base ip {(p) with related = list_except pi p.related})
+    removed_rel;
+};

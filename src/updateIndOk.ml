@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.66 2007-03-05 05:18:23 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.67 2007-03-05 20:23:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -420,44 +420,6 @@ value is_witness_at_marriage base ip p =
     (Array.to_list (get_family u))
 ;
 
-value update_relation_parents base op np =
-  let op_rparents = rparents_of (get_rparents op) in
-  let np_rparents = rparents_of np.rparents in
-  let pi = np.key_index in
-  let mod_ippl = [] in
-  let mod_ippl =
-    List.fold_left
-      (fun ippl ip ->
-         if List.mem ip op_rparents then ippl
-         else
-           let p = poi base ip in
-           if not (List.mem pi (get_related p)) then
-             let p = gen_person_of_person (poi base ip) in
-             let p = {(p) with related = [pi :: p.related]} in
-             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           else ippl)
-      mod_ippl np_rparents
-  in
-  let mod_ippl =
-    List.fold_left
-      (fun ippl ip ->
-         if List.mem ip np_rparents ||
-            np.sex = Male && is_witness_at_marriage base ip np then
-           ippl
-         else
-           let p =
-             try List.assoc ip ippl with
-             [ Not_found -> gen_person_of_person (poi base ip) ]
-           in
-           if List.mem pi p.related then
-             let p = {(p) with related = List.filter ( \<> pi) p.related} in
-             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           else ippl)
-      mod_ippl op_rparents
-  in
-  List.iter (fun (ip, p) -> patch_person base ip p) mod_ippl
-;
-
 value effective_mod conf base sp = do {
   let pi = sp.key_index in
   let op = poi base pi in
@@ -496,7 +458,10 @@ value effective_mod conf base sp = do {
     (fun key ->
        if List.mem key op_misc_names then () else person_ht_add base key pi)
     np_misc_names;
-  update_relation_parents base op np;
+  let ol = rparents_of (get_rparents op) in
+  let nl = rparents_of np.rparents in
+  let pi = np.key_index in
+  Update.update_related_pointers base pi ol nl;
   np
 };
 
