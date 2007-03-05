@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.66 2007-03-05 18:32:25 ddr Exp $ *)
+(* $Id: perso.ml,v 5.67 2007-03-05 19:01:22 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2821,29 +2821,29 @@ value print_foreach conf base print_ast eval_expr =
           (Array.to_list (get_witnesses fam))
     | _ -> () ]
   and print_foreach_witness_relation env al ((p, _) as ep) =
-    let list =
+    let list = do {
       let list = ref [] in
-      do {
-        make_list (get_related p) where rec make_list =
-          fun
-          [ [ic :: icl] ->
-              do {
-                let c = pget conf base ic in
-                if get_sex c = Male then
-                  Array.iter
-                    (fun ifam ->
-                       let fam = foi base ifam in
-                       if array_mem (get_key_index p) (get_witnesses fam)
-                       then
-                         list.val := [(ifam, fam) :: list.val]
-                       else ())
-                    (get_family (uget conf base ic))
-                else ();
-                make_list icl
-              }
-          | [] -> () ];
-        list.val
-      }
+      let related = list_uniq (List.sort compare (get_related p)) in
+      make_list related where rec make_list =
+        fun
+        [ [ic :: icl] ->
+            do {
+              let c = pget conf base ic in
+              if get_sex c = Male then
+                Array.iter
+                  (fun ifam ->
+                     let fam = foi base ifam in
+                     if array_mem (get_key_index p) (get_witnesses fam)
+                     then
+                       list.val := [(ifam, fam) :: list.val]
+                     else ())
+                  (get_family (uget conf base ic))
+              else ();
+              make_list icl
+            }
+        | [] -> () ];
+      list.val
+    }
     in
     let list =
       List.sort
