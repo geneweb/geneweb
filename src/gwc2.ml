@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.52 2007-03-05 10:53:00 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.53 2007-03-05 11:21:09 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -450,9 +450,13 @@ value insert_person1 gen so = do {
               with
               [ Some _ -> loop (occ + 1)
               | None -> do {
-Printf.eprintf "%s: renumbering %s.%d %s as occ %d\n" gen.g_current_file
-  so.first_name so.occ so.surname occ;
-flush stderr;
+                  gen.g_warning_cnt := gen.g_warning_cnt - 1;
+                  if gen.g_warning_cnt > 0 then do {
+                    eprintf "Warning: %s: %s.%d %s renumbered %d\n"
+                      gen.g_current_file so.first_name so.occ so.surname occ;
+                    flush stderr;
+                  }
+                  else ();
                   key_hashtbl_add gen.g_occ_of_key.(gen.g_sep_file_inx) k occ;
                   (k1, {(so) with occ = occ})
                 } ]
@@ -482,9 +486,14 @@ value insert_undefined2 gen key fn sn sex = do {
       (Adef.iper_of_int gen.g_pcnt)
   else ();
   if gen.g_has_separates then do {
-    eprintf
-      "Error: option -sep does not work when there are undefined persons\n";
-    flush stderr;
+    gen.g_error_cnt := gen.g_error_cnt - 1;
+    if gen.g_error_cnt > 0 then do {
+      gen.g_error_cnt := -1;
+      eprintf
+        "Error: option -sep does not work when there are undefined persons\n";
+      flush stderr;
+    }
+    else ();
     gen.g_error := True;
   }
   else if do_check.val then do {
