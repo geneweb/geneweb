@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.77 2007-02-27 03:38:51 ddr Exp $
+# $Id: lex_utf8.txt,v 5.78 2007-03-06 08:59:13 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -3240,6 +3240,7 @@ en: disconnect
 es: desconectar
 et: logi välja
 fr: déconnecter
+it: disconnettersi
 nl: ontkoppelen
 pl: rozłącz
 pt: desconectar
@@ -6370,6 +6371,7 @@ en: number of living persons:
 es: número de personas vivas:
 et: elavaid inimesi:
 fr: nombre de personnes vivantes :
+it: numero di persone viventi:
 nl: aantal personen in leven:
 pl: liczba osób żyjących
 pt: número de pessoas vivas :
@@ -6878,6 +6880,7 @@ en: population pyramid
 es: pirámide de población
 et: rahvastikupüramiid
 fr: pyramide des âges
+it: piramide della popolazione
 nl: bevolkingspiramide
 pt: pirâmide populacional
 ro: piramida demografică
@@ -6889,6 +6892,7 @@ de: mögliche Duplikate
 en: possible duplications
 et: võimalikud duplikaadid
 fr: doublons éventuels
+it: possibile doppione
 
     possibly (date)
 af: miskien
