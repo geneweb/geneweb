@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.68 2007-03-06 14:21:56 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.69 2007-03-06 20:18:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -498,8 +498,7 @@ value array_except v a =
     else loop (i + 1)
 ;
 
-value update_relations_of_related base ip p =
-  let old_related = get_related p in
+value update_relations_of_related base ip old_related =
   List.iter
     (fun ip1 -> do {
        let p1 = poi base ip1 in
@@ -561,9 +560,8 @@ value effective_del conf base p = do {
       patch_ascend base ip asc;
     }
   | None -> () ];
-  let ol = rparents_of (get_rparents p) in
-  Update.update_related_pointers base ip ol [];
-  update_relations_of_related base ip p;
+  let old_rparents = rparents_of (get_rparents p) in
+  Update.update_related_pointers base ip old_rparents [];
   {first_name = none; surname = none; occ = 0; image = empty;
    public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
    first_names_aliases = []; surnames_aliases = []; titles = [];
@@ -702,22 +700,23 @@ value print_add o_conf base =
 
 value print_del conf base =
   match p_getint conf.env "i" with
-  [ Some i ->
+  [ Some i -> do {
       let p = poi base (Adef.iper_of_int i) in
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
       let occ = get_occ p in
       let ip = get_key_index p in
       let k = (fn, sn, occ, ip) in
-      do {
-        let p = effective_del conf base p in
-        patch_person base ip p;
-        delete_key base fn sn occ;
-        Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
-        Util.commit_patches conf base;
-        History.record conf base k "dp";
-        print_del_ok conf base [];
-      }
+      let old_related = get_related p in
+      update_relations_of_related base ip old_related;
+      let p = effective_del conf base p in
+      patch_person base ip p;
+      delete_key base fn sn occ;
+      Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
+      Util.commit_patches conf base;
+      History.record conf base k "dp";
+      print_del_ok conf base [];
+    }
   | _ -> incorrect_request conf ]
 ;
 
