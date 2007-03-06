@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.67 2007-03-05 20:23:51 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.68 2007-03-06 14:21:56 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -498,6 +498,52 @@ value array_except v a =
     else loop (i + 1)
 ;
 
+value update_relations_of_related base ip p =
+  let old_related = get_related p in
+  List.iter
+    (fun ip1 -> do {
+       let p1 = poi base ip1 in
+       let (rparents, rparents_are_different) =
+         List.fold_right
+           (fun rel (list, rad) ->
+              let (rfath, rad) =
+                match rel.r_fath with
+                [ Some ip2 ->
+                    if ip2 = ip then (None, True) else (Some ip2, rad)
+                | None -> (None, rad) ]
+              in
+              let (rmoth, rad) =
+                match rel.r_moth with
+                [ Some ip2 ->
+                    if ip2 = ip then (None, True) else (Some ip2, rad)
+                | None -> (None, rad) ]
+              in
+              if rfath = None && rmoth = None then (list, True)
+              else
+                let rel = {(rel) with r_fath = rfath; r_moth = rmoth} in
+                ([rel :: list], rad))
+           (get_rparents p1) ([], False)
+       in
+       if rparents_are_different then
+         let p = gen_person_of_person p1 in
+         patch_person base ip1 {(p) with rparents = rparents}
+       else ();
+       let families = get_family p1 in
+       for i = 0 to Array.length families - 1 do {
+         let ifam = families.(i) in
+         let fam = foi base ifam in
+         let old_witnesses = Array.to_list (get_witnesses fam) in
+         let new_witnesses = List.filter (\<> ip) old_witnesses in
+         if new_witnesses <> old_witnesses then
+           let fam = gen_family_of_family fam in
+           patch_family base ifam
+             {(fam) with witnesses = Array.of_list new_witnesses}
+         else ();
+       };
+     })
+    old_related
+;
+
 value effective_del conf base p = do {
   let none = Gwdb.insert_string base "?" in
   let empty = Gwdb.insert_string base "" in
@@ -515,6 +561,9 @@ value effective_del conf base p = do {
       patch_ascend base ip asc;
     }
   | None -> () ];
+  let ol = rparents_of (get_rparents p) in
+  Update.update_related_pointers base ip ol [];
+  update_relations_of_related base ip p;
   {first_name = none; surname = none; occ = 0; image = empty;
    public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
    first_names_aliases = []; surnames_aliases = []; titles = [];
