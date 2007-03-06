@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.54 2007-03-05 18:32:25 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.55 2007-03-06 15:46:56 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -1000,12 +1000,12 @@ value link gwo_list bname = do {
   else ();
 
   if gen.g_warning_cnt < 0 then do {
-    eprintf "Warning: %d warnings more...\n" (-gen.g_warning_cnt);
+    eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
     flush stderr;
   }
   else ();
   if gen.g_error_cnt < 0 then do {
-    eprintf "Error: %d errors more...\n" (-gen.g_error_cnt);
+    eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
     flush stderr;
   }
   else ();
