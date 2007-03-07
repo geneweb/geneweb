@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.41 2007-03-05 20:23:50 ddr Exp $ *)
+(* $Id: update.ml,v 5.42 2007-03-07 04:11:41 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -824,6 +824,14 @@ value update_related_pointers base pi ol nl = do {
   List.iter
     (fun ip ->
        let p = gen_person_of_person (poi base ip) in
-       patch_person base ip {(p) with related = list_except pi p.related})
+       let related =
+         if List.mem pi p.related then list_except pi p.related
+         else do {
+           Printf.eprintf "Warning: related pointer was missing\n";
+           flush stderr;
+           p.related
+         }
+       in
+       patch_person base ip {(p) with related = related})
     removed_rel;
 };
