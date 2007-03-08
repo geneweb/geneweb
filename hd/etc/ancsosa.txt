@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancsosa.txt,v 5.13 2007-02-10 15:48:28 ddr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 5.14 2007-03-08 18:46:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -145,7 +145,6 @@
 %end;
 
 %define;somebody_extra_info(xx)
-  %apply;somebody_long_info("xx")
   %if;xx.has_occupation;, %xx.occupation;%end;
   %if;(evar.rel = "on" and xx.has_relations)
     %foreach;xx.relation;%nl;
@@ -179,6 +178,7 @@
 
 %define;somebody(xx)
   <b>%apply;my_link(xx.access, xx, xx.is_restricted)</b>%nn;
+  %apply;somebody_long_info("xx")
   %apply;somebody_extra_info("xx")
 %end;
 
