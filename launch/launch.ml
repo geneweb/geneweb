@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.32 2007-02-26 20:57:58 ddr Exp $ *)
+(* $Id: launch.ml,v 1.33 2007-03-14 10:48:15 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Camltk;
@@ -320,37 +320,45 @@ and change_options state = do {
   clean_waiting_pids state;
   let (frame, gframe) = window_centering state.tk_win in
 
-  let opt2 = Frame.create frame [] in
-  let lab2 =
-    Label.create opt2 [Text (transl "Select browser language if any:")]
+  let tv2 = do {
+    let opt = Frame.create frame [] in
+    let tv = Textvariable.create () in
+    let lab =
+      Label.create opt [Text (transl "Select browser language if any:")]
+    in
+    let val1 =
+      Radiobutton.create opt [Text (transl "yes"); Value "yes"; Variable tv]
+    in
+    let val2 =
+      Radiobutton.create opt [Text (transl "no"); Value "no"; Variable tv]
+    in
+    Textvariable.set tv (if state.browser_lang then "yes" else "no");
+    pack [lab] [Side Side_Left];
+    pack [val1; val2] [Side Side_Right];
+    pack [opt] [Fill Fill_X];
+    tv
+  }
   in
-  let tv2 = Textvariable.create () in
-  let val21 =
-    Radiobutton.create opt2 [Text (transl "yes"); Value "yes"; Variable tv2]
-  in
-  let val22 =
-    Radiobutton.create opt2 [Text (transl "no"); Value "no"; Variable tv2]
-  in
-  Textvariable.set tv2 (if state.browser_lang then "yes" else "no");
-  pack [lab2] [Side Side_Left];
-  pack [val21; val22] [Side Side_Right];
-  pack [opt2] [Fill Fill_X];
 
-  let opt3 = Frame.create frame [] in
-  let lab3 = Label.create opt3 [Text (transl "HTTP Authentication:")] in
-  let tv3 = Textvariable.create () in
-  let val31 =
-    Radiobutton.create opt3
-      [Text (transl "basic"); Value "basic"; Variable tv3]
+  let tv3 = do {
+    let opt = Frame.create frame [] in
+    let lab = Label.create opt [Text (transl "HTTP Authentication:")] in
+    let tv = Textvariable.create () in
+    let val1 =
+      Radiobutton.create opt
+        [Text (transl "basic"); Value "basic"; Variable tv]
+    in
+    let val2 =
+      Radiobutton.create opt
+        [Text (transl "digest"); Value "digest"; Variable tv]
+    in
+    Textvariable.set tv (if state.digest_auth then "digest" else "basic");
+    pack [lab] [Side Side_Left];
+    pack [val1; val2] [Side Side_Right];
+    pack [opt] [Fill Fill_X];
+    tv
+  }
   in
-  let val32 =
-    Radiobutton.create opt3
-      [Text (transl "digest"); Value "digest"; Variable tv3]
-  in
-  Textvariable.set tv3 (if state.digest_auth then "digest" else "basic");
-  pack [lab3] [Side Side_Left];
-  pack [val31; val32] [Side Side_Right];
-  pack [opt3] [Fill Fill_X];
 
   let buts = do {
     let buts = Frame.create frame [] in
