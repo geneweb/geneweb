@@ -1,4 +1,4 @@
-(* $Id: date.mli,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: date.mli,v 5.4 2007-03-14 00:39:57 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -18,3 +18,4 @@ value print_calendar : config -> base -> unit;
 value get_birth_death_date : person -> (option date * option date * bool);
 
 value before_date : dmy -> dmy -> bool;
+  (* [before_date d1 d2] = True if d2 before d1; I know, it is not logical *)
