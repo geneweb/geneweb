@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.21 2007-03-15 09:36:56 ddr Exp $ *)
+(* $Id: check.ml,v 5.22 2007-03-15 09:37:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -169,7 +169,7 @@ value update_stats base current_year s p = do {
 };
 
 value check_base_aux base error warning changed_p = do {
-  Printf.eprintf "check persons\n";
+  eprintf "check persons\n";
   ProgrBar.start ();
   for i = 0 to nb_of_persons base - 1 do {
     ProgrBar.run i (nb_of_persons base);
@@ -179,7 +179,7 @@ value check_base_aux base error warning changed_p = do {
     | None -> () ]
   };
   ProgrBar.finish ();
-  Printf.eprintf "check families\n";
+  eprintf "check families\n";
   ProgrBar.start ();
   for i = 0 to nb_of_families base - 1 do {
     ProgrBar.run i (nb_of_families base);
