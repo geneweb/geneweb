@@ -1,4 +1,4 @@
-(* $Id: check_base.ml,v 5.3 2006-12-27 14:57:47 ddr Exp $ *)
+(* $Id: check_base.ml,v 5.4 2007-03-15 10:01:24 ddr Exp $ *)
 
 open Printf;
 
@@ -17,6 +17,7 @@ value set_warning base =
 ;
 
 value check_base bname = do {
+  Secure.set_base_dir (Filename.dirname bname);
   let base = Gwdb.open_base bname in
   let changed_p (ip, p, o_sex, o_rpar) = do {
     let fn = Gwdb.p_first_name base p in
