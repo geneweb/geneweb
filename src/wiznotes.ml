@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.47 2007-02-25 12:17:38 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.48 2007-03-16 22:03:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -595,25 +595,31 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
                 then "circle"
                 else "disc")
              begin
-               let sec =
-                 let d = tm_now -. tm_user in
-                 if d = 0.0 then "" else Printf.sprintf " - %.0f s" d
-               in
                if wfile <> "" then
-                 Wserver.wprint
-                   "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>%s%s"
+                 stag "a" "href=\"%sm=WIZNOTES;f=%s%t\""
                    (commd conf) (Util.code_varenv wz)
                    (fun _ ->
                       Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
                         (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
                         tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
                         tm.Unix.tm_sec)
-                   wz sec
-                   (if first then
-                      " <span style=\"font-size:80%\">(" ^
-                      transl conf "since the last click" ^ ")</span>"
-                    else "")
-               else Wserver.wprint "%s%s" wz sec;
+                 begin
+                   Wserver.wprint "%s" wz;
+                 end
+               else Wserver.wprint "%s" wz;
+               let d = tm_now -. tm_user in
+               if d = 0.0 then ()
+               else do {
+                 Wserver.wprint " - %.0f s" d;
+                 if first then do {
+                   Wserver.wprint " ";
+                   stag "span" "style=\"font-size:80%%\"" begin
+                     Wserver.wprint "(%s)"
+                       (transl conf "since the last click");
+                   end;
+                 }
+                 else ();
+               };
                if wz = conf.user then do {
                  Wserver.wprint " :\n%s;"
                    (transl_nth conf "you are visible/you are not visible"
