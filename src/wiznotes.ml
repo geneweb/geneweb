@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.48 2007-03-16 22:03:58 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.49 2007-03-16 22:34:31 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -564,6 +564,41 @@ value wizard_denying wddir =
   | None -> [] ]
 ;
 
+value print_connected_wizard conf first wddir wz tm_user = do {
+  let (wfile, stm) = wiznote_date (wzfile wddir wz) in
+  let tm = Unix.localtime stm in
+  if wfile <> "" then
+    stag "a" "href=\"%sm=WIZNOTES;f=%s%t\""
+      (commd conf) (Util.code_varenv wz)
+      (fun _ ->
+         Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
+           (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+           tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+           tm.Unix.tm_sec)
+    begin
+      Wserver.wprint "%s" wz;
+    end
+  else Wserver.wprint "%s" wz;
+  Wserver.wprint " ";
+  stag "a" "href=\"%sm=HIST;k=20;wiz=%s\" style=\"text-decoration:none\""
+    (commd conf) (Util.code_varenv wz)
+  begin
+    Wserver.wprint "(*)";
+  end;
+  let d = conf.ctime -. tm_user in
+  if d = 0.0 then ()
+  else do {
+    Wserver.wprint " - %.0f s" d;
+    if first then do {
+      Wserver.wprint " ";
+      stag "span" "style=\"font-size:80%%\"" begin
+        Wserver.wprint "(%s)" (transl conf "since the last click");
+      end;
+    }
+    else ();
+  };
+};
+
 value do_connected_wizards conf base (_, _, _, wl) = do {
   let title _ =
     Wserver.wprint "%s"
@@ -571,11 +606,10 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
   in
   header conf title;
   print_link_to_welcome conf True;
-  let tm_now = Unix.time () in
   let wddir = dir conf base in
   let denying = wizard_denying wddir in
   let wl =
-    if not (List.mem_assoc conf.user wl) then [(conf.user, tm_now) :: wl]
+    if not (List.mem_assoc conf.user wl) then [(conf.user, conf.ctime) :: wl]
     else wl
   in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
@@ -587,45 +621,18 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
            if wz <> conf.user && List.mem wz denying && not conf.manitou
            then (True, first)
            else do {
-             let (wfile, stm) = wiznote_date (wzfile wddir wz) in
-             let tm = Unix.localtime stm in
              tag "li" "style=\"list-style-type:%s\""
                (if wz = conf.user && not is_visible ||
                    conf.manitou && List.mem wz denying
                 then "circle"
                 else "disc")
              begin
-               if wfile <> "" then
-                 stag "a" "href=\"%sm=WIZNOTES;f=%s%t\""
-                   (commd conf) (Util.code_varenv wz)
-                   (fun _ ->
-                      Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                        tm.Unix.tm_sec)
-                 begin
-                   Wserver.wprint "%s" wz;
-                 end
-               else Wserver.wprint "%s" wz;
-               let d = tm_now -. tm_user in
-               if d = 0.0 then ()
-               else do {
-                 Wserver.wprint " - %.0f s" d;
-                 if first then do {
-                   Wserver.wprint " ";
-                   stag "span" "style=\"font-size:80%%\"" begin
-                     Wserver.wprint "(%s)"
-                       (transl conf "since the last click");
-                   end;
-                 }
-                 else ();
-               };
+               print_connected_wizard conf first wddir wz tm_user;
                if wz = conf.user then do {
                  Wserver.wprint " :\n%s;"
                    (transl_nth conf "you are visible/you are not visible"
                       (if is_visible then 0 else 1));
-                 Wserver.wprint
-                   " %s %s%s%s %s" (transl conf "click")
+                 Wserver.wprint " %s %s%s%s %s" (transl conf "click")
                    (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS;v=%d\">"
                       (commd conf) (if is_visible then 0 else 1))
                    (transl conf "here") "</a>" (transl conf "to change");
