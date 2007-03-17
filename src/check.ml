@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.22 2007-03-15 09:37:26 ddr Exp $ *)
+(* $Id: check.ml,v 5.23 2007-03-17 22:08:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -168,21 +168,74 @@ value update_stats base current_year s p = do {
   | _ -> () ];
 };
 
+value min_year_of base p =
+  match Adef.od_of_codate (get_birth p) with
+  [ Some (Dgreg d _) -> Some d.year
+  | Some (Dtext _) | None -> None ]
+;
+
+value rec check_ancestors base year year_tab ip ini_p =
+  if year_tab.(Adef.int_of_iper ip) = max_int then do {
+    let p = poi base ip in
+    let new_year_o = min_year_of base p in
+    let (new_year, new_ini_p) =
+      match new_year_o with
+      [ Some y -> (y, p)
+      | None -> (year - 1, ini_p) ]
+    in
+    year_tab.(Adef.int_of_iper ip) := new_year;
+    if new_year >= year then do {
+(**)
+      printf "\nerror:\n  %s\n" (designation base ini_p);
+      printf "has a younger ancestor:\n  %s\n" (designation base p);
+(*
+      let code_varenv x = x in
+      printf
+        "<a href=\"%%sem=R;ep=%s;en=%s;eoc=%d;spouse=on;et=A;color=;p=%s;n=%s;oc=%d\">%s.%d %s et %s.%d %s</a><br/>\n"
+        (code_varenv (Name.lower (p_first_name base ini_p)))
+        (code_varenv (Name.lower (p_surname base ini_p))) (get_occ ini_p)
+        (code_varenv (Name.lower (p_first_name base p)))
+        (code_varenv (Name.lower (p_surname base p))) (get_occ p)
+        (code_varenv (Name.lower (p_first_name base ini_p))) (get_occ ini_p)
+        (code_varenv (Name.lower (p_surname base ini_p)))
+        (code_varenv (Name.lower (p_first_name base p))) (get_occ p)
+        (code_varenv (Name.lower (p_surname base p)));
+*)
+      flush stdout;
+    }
+    else ();
+    match get_parents p with
+    [ Some ifam -> do {
+        let fam = foi base ifam in
+        check_ancestors base new_year year_tab (get_father fam) new_ini_p;
+        check_ancestors base new_year year_tab (get_mother fam) new_ini_p;
+      }
+    | None -> () ];
+  }
+  else ()
+;
+
 value check_base_aux base error warning changed_p = do {
   eprintf "check persons\n";
+  let nb_ind = nb_of_persons base in
+  let year_tab = Array.create nb_ind max_int in
   ProgrBar.start ();
-  for i = 0 to nb_of_persons base - 1 do {
-    ProgrBar.run i (nb_of_persons base);
+  for i = 0 to nb_ind - 1 do {
+    ProgrBar.run i nb_ind;
     let p = poi base (Adef.iper_of_int i) in
+    if year_tab.(i) = max_int then
+      check_ancestors base max_int year_tab (Adef.iper_of_int i) p
+    else ();
     match CheckItem.person base warning p with
     [ Some ippl -> List.iter changed_p ippl
     | None -> () ]
   };
   ProgrBar.finish ();
   eprintf "check families\n";
+  let nb_fam = nb_of_families base in
   ProgrBar.start ();
-  for i = 0 to nb_of_families base - 1 do {
-    ProgrBar.run i (nb_of_families base);
+  for i = 0 to nb_fam - 1 do {
+    ProgrBar.run i nb_fam;
     let ifam = Adef.ifam_of_int i in
     let fam = foi base ifam in
     if is_deleted_family fam then ()
