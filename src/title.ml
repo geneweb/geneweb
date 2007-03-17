@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.27 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: title.ml,v 5.28 2007-03-17 17:05:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -95,12 +95,12 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
             if not (CheckItem.strictly_after d1 d2) then -1 else 1
         | _ -> -1 ]
       else 1
-  | ((_, _, Some d1, _), (_, _, Some d2, _)) ->
+  | ((_, _, Some (Dgreg _ _ as d1), _), (_, _, Some (Dgreg _ _ as d2), _)) ->
       if not (CheckItem.strictly_before d2 d1) then -1 else 1
   | ((_, _, _, Death _ d1), (_, Some d2, _, _))
     when not (CheckItem.strictly_before d2 (Adef.date_of_cdate d1)) ->
       -1
-  | ((_, Some d1, _, _), (_, _, _, Death _ d2))
+  | ((_, Some (Dgreg _ _ as d1), _, _), (_, _, _, Death _ d2))
     when not (CheckItem.strictly_before d1 (Adef.date_of_cdate d2)) ->
       1
   | _ ->
