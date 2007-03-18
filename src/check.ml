@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.23 2007-03-17 22:08:26 ddr Exp $ *)
+(* $Id: check.ml,v 5.24 2007-03-18 13:08:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -191,7 +191,7 @@ value rec check_ancestors base year year_tab ip ini_p =
 (*
       let code_varenv x = x in
       printf
-        "<a href=\"%%sem=R;ep=%s;en=%s;eoc=%d;spouse=on;et=A;color=;p=%s;n=%s;oc=%d\">%s.%d %s et %s.%d %s</a><br/>\n"
+        "# <a href=\"%%sem=R;ep=%s;en=%s;eoc=%d;spouse=on;et=A;color=;p=%s;n=%s;oc=%d\">%s.%d %s et %s.%d %s</a><br/>\n"
         (code_varenv (Name.lower (p_first_name base ini_p)))
         (code_varenv (Name.lower (p_surname base ini_p))) (get_occ ini_p)
         (code_varenv (Name.lower (p_first_name base p)))
