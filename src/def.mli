@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.19 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: def.mli,v 5.20 2007-03-19 10:59:31 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -149,6 +149,7 @@ type warning 'person 'descend 'title =
   | ChangedOrderOfChildren of ifam and 'descend and array iper
   | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
+  | IncoherentAncestorDate of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person

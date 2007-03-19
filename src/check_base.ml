@@ -1,20 +1,35 @@
-(* $Id: check_base.ml,v 5.4 2007-03-15 10:01:24 ddr Exp $ *)
+(* $Id: check_base.ml,v 5.5 2007-03-19 10:59:31 ddr Exp $ *)
 
 open Printf;
 
-value set_error base x = do {
+value print_error base x = do {
   printf "\nError: ";
   Check.print_base_error stdout base x;
 };
 
-value set_warning base =
+value print_warning base =
   fun
   [ Def.UndefinedSex _ -> ()
+(*
+  | Def. IncoherentAncestorDate anc p ->
+      fprintf stdout
+        "# <a href=\"%%sem=R;ep=%s;en=%s;eoc=%d;spouse=on;et=A;color=;p=%s;n=%s;oc=%d\">%s.%d %s &amp; %s.%d %s</a>\n"
+        (Name.lower (Gwdb.p_first_name base p))
+        (Name.lower (Gwdb.p_surname base p)) (Gwdb.get_occ p)
+        (Name.lower (Gwdb.p_first_name base anc))
+        (Name.lower (Gwdb.p_surname base anc)) (Gwdb.get_occ anc)
+        (Name.lower (Gwdb.p_first_name base p)) (Gwdb.get_occ p)
+        (Name.lower (Gwdb.p_surname base p))
+        (Name.lower (Gwdb.p_first_name base anc)) (Gwdb.get_occ anc)
+        (Name.lower (Gwdb.p_surname base anc))
+*)
   | x -> do {
       printf "\nWarning: ";
       Check.print_base_warning stdout base x;
     } ]
 ;
+
+value set_list l v = l.val := [v :: l.val];
 
 value check_base bname = do {
   Secure.set_base_dir (Filename.dirname bname);
@@ -25,8 +40,12 @@ value check_base bname = do {
     printf "%s.%d %s not changed" fn (Gwdb.get_occ p) sn;
   }
   in
-  Check.check_base base (set_error base) (set_warning base)
+  let errors = ref [] in
+  let warnings = ref [] in
+  Check.check_base base (set_list errors) (set_list warnings)
     (fun _ -> True) changed_p False;
+  List.iter (print_error base) (List.rev errors.val);
+  List.iter (print_warning base) (List.rev warnings.val);
   flush stdout;
 };
 
