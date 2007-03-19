@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.42 2007-03-07 04:11:41 ddr Exp $ *)
+(* $Id: update.ml,v 5.43 2007-03-19 10:59:31 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -197,11 +197,6 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
-  | IncoherentSex p _ _ ->
-      Wserver.wprint
-        (fcapitale
-           (ftransl conf "%t's sex is not coherent with his/her relations"))
-        (fun _ -> print_someone_strong conf base p)
   | ChangedOrderOfChildren ifam des before -> do {
       let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
@@ -276,6 +271,15 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base father)
              (Date.short_dates_text conf base father))
+  | IncoherentSex p _ _ ->
+      Wserver.wprint
+        (fcapitale
+           (ftransl conf "%t's sex is not coherent with his/her relations"))
+        (fun _ -> print_someone_strong conf base p)
+  | IncoherentAncestorDate anc p ->
+      Wserver.wprint "%s has a younger ancestor %s"
+        (print_someone_strong conf base p)
+        (print_someone_strong conf base anc)
   | MarriageDateAfterDeath p ->
       Wserver.wprint
         (fcapitale (ftransl conf "marriage of %t after his/her death"))

@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.24 2007-03-18 13:08:55 ddr Exp $ *)
+(* $Id: check.ml,v 5.25 2007-03-19 10:59:31 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -28,18 +28,6 @@ value print_base_warning oc base =
   fun
   [ BirthAfterDeath p ->
       fprintf oc "%s\n  born after his/her death\n" (designation base p)
-  | IncoherentSex p fixed not_fixed -> do {
-      fprintf oc "%s\n  sex not coherent with relations"
-        (designation base p);
-      if fixed > 0 then
-        if not_fixed > 0 then
-          fprintf oc " (fixed in %d of the %d cases)" fixed
-            (fixed + not_fixed)
-        else
-          fprintf oc " (fixed)"
-      else ();
-      fprintf oc "\n";
-    }
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = foi base ifam in
       fprintf oc "Changed order of children of %s and %s\n"
@@ -59,6 +47,23 @@ value print_base_warning oc base =
       fprintf oc
         "  is born more than 2 years after the death of his/her father\n";
       fprintf oc "%s\n" (designation base father)
+    }
+  | IncoherentSex p fixed not_fixed -> do {
+      fprintf oc "%s\n  sex not coherent with relations"
+        (designation base p);
+      if fixed > 0 then
+        if not_fixed > 0 then
+          fprintf oc " (fixed in %d of the %d cases)" fixed
+            (fixed + not_fixed)
+        else
+          fprintf oc " (fixed)"
+      else ();
+      fprintf oc "\n";
+    }
+  | IncoherentAncestorDate anc p -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "  has a younger ancestor:\n";
+      fprintf oc "%s\n" (designation base anc);
     }
   | MarriageDateAfterDeath p -> do {
       fprintf oc "%s\n" (designation base p);
@@ -174,7 +179,7 @@ value min_year_of base p =
   | Some (Dtext _) | None -> None ]
 ;
 
-value rec check_ancestors base year year_tab ip ini_p =
+value rec check_ancestors base warning year year_tab ip ini_p =
   if year_tab.(Adef.int_of_iper ip) = max_int then do {
     let p = poi base ip in
     let new_year_o = min_year_of base p in
@@ -184,31 +189,14 @@ value rec check_ancestors base year year_tab ip ini_p =
       | None -> (year - 1, ini_p) ]
     in
     year_tab.(Adef.int_of_iper ip) := new_year;
-    if new_year >= year then do {
-(**)
-      printf "\nerror:\n  %s\n" (designation base ini_p);
-      printf "has a younger ancestor:\n  %s\n" (designation base p);
-(*
-      let code_varenv x = x in
-      printf
-        "# <a href=\"%%sem=R;ep=%s;en=%s;eoc=%d;spouse=on;et=A;color=;p=%s;n=%s;oc=%d\">%s.%d %s et %s.%d %s</a><br/>\n"
-        (code_varenv (Name.lower (p_first_name base ini_p)))
-        (code_varenv (Name.lower (p_surname base ini_p))) (get_occ ini_p)
-        (code_varenv (Name.lower (p_first_name base p)))
-        (code_varenv (Name.lower (p_surname base p))) (get_occ p)
-        (code_varenv (Name.lower (p_first_name base ini_p))) (get_occ ini_p)
-        (code_varenv (Name.lower (p_surname base ini_p)))
-        (code_varenv (Name.lower (p_first_name base p))) (get_occ p)
-        (code_varenv (Name.lower (p_surname base p)));
-*)
-      flush stdout;
-    }
-    else ();
+    if new_year >= year then warning (IncoherentAncestorDate p ini_p) else ();
     match get_parents p with
     [ Some ifam -> do {
         let fam = foi base ifam in
-        check_ancestors base new_year year_tab (get_father fam) new_ini_p;
-        check_ancestors base new_year year_tab (get_mother fam) new_ini_p;
+        check_ancestors base warning new_year year_tab (get_father fam)
+          new_ini_p;
+        check_ancestors base warning new_year year_tab (get_mother fam)
+          new_ini_p;
       }
     | None -> () ];
   }
@@ -224,7 +212,7 @@ value check_base_aux base error warning changed_p = do {
     ProgrBar.run i nb_ind;
     let p = poi base (Adef.iper_of_int i) in
     if year_tab.(i) = max_int then
-      check_ancestors base max_int year_tab (Adef.iper_of_int i) p
+      check_ancestors base warning max_int year_tab (Adef.iper_of_int i) p
     else ();
     match CheckItem.person base warning p with
     [ Some ippl -> List.iter changed_p ippl
