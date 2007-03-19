@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.25 2007-03-19 10:59:31 ddr Exp $ *)
+(* $Id: check.ml,v 5.26 2007-03-19 16:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -180,24 +180,29 @@ value min_year_of base p =
 ;
 
 value rec check_ancestors base warning year year_tab ip ini_p =
-  if year_tab.(Adef.int_of_iper ip) = max_int then do {
+  if fst year_tab.(Adef.int_of_iper ip) = max_int then do {
     let p = poi base ip in
     let new_year_o = min_year_of base p in
-    let (new_year, new_ini_p) =
+    let (new_year, new_ini_p, own_year) =
       match new_year_o with
-      [ Some y -> (y, p)
-      | None -> (year - 1, ini_p) ]
+      [ Some y -> (y, p, True)
+      | None -> (year - 1, ini_p, False) ]
     in
-    year_tab.(Adef.int_of_iper ip) := new_year;
+    year_tab.(Adef.int_of_iper ip) := (new_year, own_year);
     if new_year >= year then warning (IncoherentAncestorDate p ini_p) else ();
     match get_parents p with
-    [ Some ifam -> do {
+    [ Some ifam ->
         let fam = foi base ifam in
-        check_ancestors base warning new_year year_tab (get_father fam)
-          new_ini_p;
-        check_ancestors base warning new_year year_tab (get_mother fam)
-          new_ini_p;
-      }
+        List.iter
+          (fun get ->
+             let ip = get fam in
+             let year = year_tab.(Adef.int_of_iper ip) in
+             if fst year = max_int then
+               check_ancestors base warning new_year year_tab ip new_ini_p
+             else if snd year && fst year >= new_year then
+               warning (IncoherentAncestorDate (poi base ip) new_ini_p)
+             else ())
+          [get_father; get_mother]
     | None -> () ];
   }
   else ()
@@ -206,12 +211,12 @@ value rec check_ancestors base warning year year_tab ip ini_p =
 value check_base_aux base error warning changed_p = do {
   eprintf "check persons\n";
   let nb_ind = nb_of_persons base in
-  let year_tab = Array.create nb_ind max_int in
+  let year_tab = Array.create nb_ind (max_int, False) in
   ProgrBar.start ();
   for i = 0 to nb_ind - 1 do {
     ProgrBar.run i nb_ind;
     let p = poi base (Adef.iper_of_int i) in
-    if year_tab.(i) = max_int then
+    if fst year_tab.(i) = max_int then
       check_ancestors base warning max_int year_tab (Adef.iper_of_int i) p
     else ();
     match CheckItem.person base warning p with
