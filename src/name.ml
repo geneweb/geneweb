@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 5.11 2007-02-05 12:57:04 ddr Exp $ *)
+(* $Id: name.ml,v 5.12 2007-03-20 10:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value utf_8_db = ref True;
@@ -23,7 +23,7 @@ value unaccent_iso_8859_1 =
 
 value nbc c =
   if Char.code c < 0b10000000 then 1
-  else if Char.code c < 0b10000000 then -1
+  else if Char.code c < 0b11000000 then -1
   else if Char.code c < 0b11100000 then 2
   else if Char.code c < 0b11110000 then 3
   else if Char.code c < 0b11111000 then 4
