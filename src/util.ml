@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.110 2007-02-07 01:30:16 ddr Exp $ *)
+(* $Id: util.ml,v 5.111 2007-03-25 13:03:53 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1292,13 +1292,22 @@ value filter_html_tags s =
 
 value get_variable s i =
   loop 0 i where rec loop len i =
-    if i = String.length s then (Buff.get len, i)
+    if i = String.length s then (Buff.get len, [], i)
     else
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c ->
           loop (Buff.store len c) (i + 1)
-      | ';' -> (Buff.get len, i + 1)
-      | _ -> (Buff.get len, i) ]
+      | ':' ->
+          let v = Buff.get len in
+          loop [] 0 (i + 1) where rec loop vl len i =
+            if i = String.length s then (v, List.rev [Buff.get len :: vl], i)
+            else
+              match s.[i] with
+              [ ':' -> loop [Buff.get len :: vl] 0 (i + 1)
+              | ';' -> (v, List.rev [Buff.get len :: vl], i + 1)
+              | c -> loop vl (Buff.store len c) (i + 1) ]
+      | ';' -> (Buff.get len, [], i + 1)
+      | _ -> (Buff.get len, [], i) ]
 ;
 
 type tag_type = [ In_a_href | In_norm | Out ];
@@ -1336,7 +1345,7 @@ value string_with_macros conf env s =
               match s.[i + 1] with
               [ 's' -> do { Buffer.add_string buff (commd conf); i + 2 }
               | 'v' ->
-                  let (k, j) = get_variable s (i + 2) in
+                  let (k, vl, j) = get_variable s (i + 2) in
                   let (v, i) =
                     let v =
                       try
@@ -1346,7 +1355,24 @@ value string_with_macros conf env s =
                       [ Not_found -> None ]
                     in
                     match v with
-                    [ Some v -> (v, j)
+                    [ Some s ->
+                        let s =
+                          loop vl 0 0 where rec loop vl len i =
+                            if i = String.length s then Buff.get len
+                            else if
+                              i + 1 < String.length s && s.[i] = '%' &&
+                              s.[i+1] = 's'
+                            then
+                              match vl with
+                              [ [v :: vl] ->
+                                  loop vl (Buff.mstore len v) (i + 2)
+                              | [] ->
+                                  Buff.get len ^
+                                    String.sub s i (String.length s - i) ]
+                            else
+                              loop vl (Buff.store len s.[i]) (i + 1)
+                        in
+                        (s, j)
                     | None -> ("%", i + 1) ]
                   in
                   do { Buffer.add_string buff v; i }
