@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.26 2007-01-25 15:44:24 ddr Exp $ *)
+(* $Id: notes.ml,v 5.27 2007-03-25 11:30:05 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -183,6 +183,10 @@ value notes_links_db conf base eliminate_unlinked = do {
          let record_it =
            match pg with
            [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
+           | NotesLinks.PgFam ifam ->
+               let fam = foi base ifam in
+               if is_deleted_family fam then False
+               else authorized_age conf base (poi base (get_father fam))
            | NotesLinks.PgNotes | NotesLinks.PgMisc _
            | NotesLinks.PgWizard _ -> True ]
          in
@@ -204,7 +208,8 @@ value notes_links_db conf base eliminate_unlinked = do {
     List.fold_left
       (fun set (pg, (sl, il)) ->
          match pg with
-         [ NotesLinks.PgInd _ | NotesLinks.PgNotes | NotesLinks.PgWizard _ ->
+         [ NotesLinks.PgInd _ | NotesLinks.PgFam _ | NotesLinks.PgNotes |
+           NotesLinks.PgWizard _ ->
              List.fold_left (fun set s -> StrSet.add s set) set sl
          | NotesLinks.PgMisc s ->
              do { Hashtbl.add misc s sl; set } ])
@@ -267,6 +272,15 @@ value print_what_links conf base fnotes =
                    Wserver.wprint "%s%s"
                      (Util.referenced_person_title_text conf base p)
                      (Date.short_dates_text conf base p)
+               | NotesLinks.PgFam ifam ->
+                   let fam = foi base ifam in
+                   let fath = poi base (get_father fam) in
+                   let moth = poi base (get_mother fam) in
+                   Wserver.wprint "%s%s &amp; %s %s"
+                     (Util.referenced_person_title_text conf base fath)
+                     (Date.short_dates_text conf base fath)
+                     (Util.referenced_person_title_text conf base moth)
+                     (Date.short_dates_text conf base moth)
                | NotesLinks.PgNotes ->
                    stagn "a" "href=\"%sm=NOTES\"" (commd conf) begin
                      Wserver.wprint "%s" (transl_nth conf "note/notes" 1);

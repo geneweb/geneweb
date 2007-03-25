@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.49 2007-03-05 20:23:51 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.50 2007-03-25 11:30:06 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -910,9 +910,14 @@ value family_structure conf base ifam =
 
 value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
-  let callback sfam scpl sdes =
+  let callback sfam scpl sdes = do {
     let ofs = family_structure conf base sfam.fam_index in
     let (ifam, fam, cpl, des) = effective_mod conf base sfam scpl sdes in
+    let s =
+      let sl = [fam.comment; fam.fsources] in
+      String.concat " " (List.map (sou base) sl)
+    in
+    Notes.update_notes_links_db conf (NotesLinks.PgFam ifam) s;
     let nfs = (Adef.parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in
     let wl =
@@ -925,12 +930,11 @@ value print_mod o_conf base =
           (if Adef.mother cpl = ip then mother scpl else father scpl, ip)
       | None -> (father scpl, Adef.iper_of_int (-1)) ]
     in
-    do {
-      Util.commit_patches conf base;
-      History.record conf base (fn, sn, occ, ip) "mf";
-      Update.delete_topological_sort conf base;
-      print_mod_ok conf base wl cpl des
-    }
+    Util.commit_patches conf base;
+    History.record conf base (fn, sn, occ, ip) "mf";
+    Update.delete_topological_sort conf base;
+    print_mod_ok conf base wl cpl des
+  }
   in
   print_mod_aux conf base callback
 ;

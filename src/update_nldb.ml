@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.19 2007-02-28 11:50:39 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.20 2007-03-25 11:30:06 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -52,7 +52,8 @@ value compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
   in
-  let len = nb_of_persons base in
+  let nb_ind = nb_of_persons base in
+  let nb_fam = nb_of_families base in
   do {
     Printf.eprintf "--- database notes\n";
     flush stderr;
@@ -132,7 +133,7 @@ value compute base bdir =
     flush stderr;
     ProgrBar.full.val := '*';
     ProgrBar.start ();
-    for i = 0 to len - 1 do {
+    for i = 0 to nb_ind - 1 do {
       let p = poi base (Adef.iper_of_int i) in
       let s =
         let sl =
@@ -146,7 +147,28 @@ value compute base bdir =
       else
         let pg = NotesLinks.PgInd (Adef.iper_of_int i) in
         db.val := NotesLinks.add_in_db db.val pg list;
-      ProgrBar.run i len
+      ProgrBar.run i nb_ind
+    };
+    ProgrBar.finish ();
+    Printf.eprintf "--- families notes\n";
+    flush stderr;
+    ProgrBar.full.val := '*';
+    ProgrBar.start ();
+    for i = 0 to nb_fam - 1 do {
+      let fam = foi base (Adef.ifam_of_int i) in
+      if not (is_deleted_family fam) then do {
+        let s =
+          let sl = [get_comment; get_fsources] in
+          String.concat " " (List.map (fun f -> sou base (f fam)) sl)
+        in
+        let list = notes_links s in
+        if list = ([], []) then ()
+        else
+          let pg = NotesLinks.PgFam (Adef.ifam_of_int i) in
+          db.val := NotesLinks.add_in_db db.val pg list;
+      }
+      else ();
+      ProgrBar.run i nb_fam
     };
     ProgrBar.finish ();
     NotesLinks.write_db bdir db.val;
