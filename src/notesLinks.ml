@@ -1,12 +1,13 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 5.5 2007-02-28 11:50:39 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 5.6 2007-03-25 11:30:05 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
 
-value magic_notes_links = "GWNL0009";
+value magic_notes_links = "GWNL0010";
 type page =
   [ PgInd of iper
+  | PgFam of ifam
   | PgNotes
   | PgMisc of string
   | PgWizard of string ]

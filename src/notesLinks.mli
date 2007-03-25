@@ -1,8 +1,9 @@
-(* $Id: notesLinks.mli,v 5.4 2007-02-28 11:50:39 ddr Exp $ *)
+(* $Id: notesLinks.mli,v 5.5 2007-03-25 11:30:05 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 type page =
   [ PgInd of Def.iper
+  | PgFam of Def.ifam
   | PgNotes
   | PgMisc of string
   | PgWizard of string ]

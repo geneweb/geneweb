@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.68 2007-03-05 20:06:51 ddr Exp $ *)
+(* $Id: perso.ml,v 5.69 2007-03-25 11:30:05 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1172,7 +1172,11 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           if m_auth then
-            string_with_macros conf [] (sou base (get_comment fam))
+            let s =
+              Wiki.syntax_links conf "NOTES" (Notes.file_path conf base)
+                (sou base (get_comment fam))
+            in
+            string_with_macros conf [] s
           else ""
       | _ -> raise Not_found ]
   | "count" ->
