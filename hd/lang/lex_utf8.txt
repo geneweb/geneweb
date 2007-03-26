@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.81 2007-03-17 17:05:34 ddr Exp $
+# $Id: lex_utf8.txt,v 5.82 2007-03-26 10:23:41 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -210,6 +210,7 @@ en: %s access cancelled for that page
 et: %s: ligipääs sellele lehele on keelatud
 fr: accès %s annulé pour cette page
 nl: toegang tot %s is afgebroken
+pl: dostęp %s anulowany dla tej strony
 sv: %s åtkomst ogiltig för den sidan
 
     %s cousins
@@ -6885,6 +6886,7 @@ et: rahvastikupüramiid
 fr: pyramide des âges
 it: piramide della popolazione
 nl: bevolkingspiramide
+pl: piramida wieku
 pt: pirâmide populacional
 ro: piramida demografică
 sl: populacijska piramida
@@ -6898,6 +6900,7 @@ et: võimalikud duplikaadid
 fr: doublons éventuels
 it: possibile doppione
 nl: mogelijke dubbele vermeldingen
+pl: możliwe duplikaty
 sv: eventuellt dublett
 
     possibly (date)
