@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.82 2007-03-26 10:23:41 ddr Exp $
+# $Id: lex_utf8.txt,v 5.83 2007-03-28 14:19:12 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -7459,7 +7459,7 @@ he:  נפרדו
 is: skilin
 it: separati
 lv: nedzīvo kopā
-nl: gescheiden
+nl: gescheiden van tafel en bed
 no: separert
 pl: w separacji
 pt: separados
