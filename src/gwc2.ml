@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.55 2007-03-06 15:46:56 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.56 2007-03-29 12:30:19 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -37,6 +37,8 @@ type gen =
     g_separate : mutable bool;
     g_sep_file_inx : mutable int;
     g_has_separates : bool;
+    g_first_av_occ : Hashtbl.t (Adef.istr * Adef.istr) int;
+
     g_tmp_dir : string;
     g_particles : list string;
 
@@ -419,6 +421,33 @@ value empty_person =
 value key_hashtbl_add ht k v = Hashtbl.add ht (Db2.key2_of_key k) v;
 value key_hashtbl_find ht k = Hashtbl.find ht (Db2.key2_of_key k);
 
+value find_first_available_occ gen so fn sn =
+  let occ =
+    try Hashtbl.find gen.g_first_av_occ (fn, sn) with
+    [ Not_found -> 0 ]
+  in
+  loop occ where rec loop occ =
+    let k1 = (fn, sn, occ) in
+    match
+      try Some (key_hashtbl_find gen.g_index_of_key k1) with
+      [ Not_found -> None ]
+    with
+    [ Some _ -> loop (occ + 1)
+    | None -> do {
+        gen.g_warning_cnt := gen.g_warning_cnt - 1;
+        if gen.g_warning_cnt > 0 then do {
+          eprintf "Warning: %s: %s.%d %s renumbered %d\n"
+            gen.g_current_file so.first_name so.occ so.surname occ;
+          flush stderr;
+        }
+        else ();
+        key_hashtbl_add gen.g_occ_of_key.(gen.g_sep_file_inx)
+          (fn, sn, so.occ) occ;
+        Hashtbl.replace gen.g_first_av_occ (fn, sn) occ;
+        occ;
+      } ]
+;
+
 value insert_person1 gen so = do {
   if so.first_name <> "?" && so.surname <> "?" then do {
     let fn = unique_key_string gen so.first_name in
@@ -442,24 +471,8 @@ value insert_person1 gen so = do {
     [ Not_found -> do {
         let (k, so) =
           if gen.g_separate then
-            loop 0 where rec loop occ =
-              let k1 = (fn, sn, occ) in
-              match
-                try Some (key_hashtbl_find gen.g_index_of_key k1) with
-                [ Not_found -> None ]
-              with
-              [ Some _ -> loop (occ + 1)
-              | None -> do {
-                  gen.g_warning_cnt := gen.g_warning_cnt - 1;
-                  if gen.g_warning_cnt > 0 then do {
-                    eprintf "Warning: %s: %s.%d %s renumbered %d\n"
-                      gen.g_current_file so.first_name so.occ so.surname occ;
-                    flush stderr;
-                  }
-                  else ();
-                  key_hashtbl_add gen.g_occ_of_key.(gen.g_sep_file_inx) k occ;
-                  (k1, {(so) with occ = occ})
-                } ]
+            let occ = find_first_available_occ gen so fn sn in
+            ((fn, sn, occ), {(so) with occ = occ})
           else (k, so)
         in
         key_hashtbl_add gen.g_index_of_key k (Adef.iper_of_int gen.g_pcnt);
@@ -889,7 +902,9 @@ value link gwo_list bname = do {
      g_error = False; g_error_cnt = max_errors + 1;
      g_warning_cnt = max_warnings + 1;
      g_separate = False; g_sep_file_inx = 0;
-     g_has_separates = has_separates; g_tmp_dir = tmp_dir;
+     g_has_separates = has_separates;
+     g_first_av_occ = Hashtbl.create 1;
+     g_tmp_dir = tmp_dir;
      g_particles = input_particles part_file.val;
      g_strings = Hashtbl.create 1;
      g_index_of_key = Hashtbl.create 1;
