@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.16 2007-01-23 14:24:10 ddr Exp $ *)
+(* $Id: forum.ml,v 5.17 2007-03-30 21:08:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -516,7 +516,14 @@ and eval_message_text_var conf base str so =
       let s = string_with_macros conf [] str in
       let lines = Wiki.html_of_tlsw conf s in
       let s = String.concat "\n" lines in
-      let s = Wiki.syntax_links conf "NOTES" (Notes.file_path conf base) s in
+      let s =
+        let wi =
+          {Wiki.wi_mode = "NOTES";
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base}
+        in
+        Wiki.syntax_links conf wi s
+      in
       let s =
         match so with
         [ Some h ->
