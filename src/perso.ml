@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.69 2007-03-25 11:30:05 ddr Exp $ *)
+(* $Id: perso.ml,v 5.70 2007-03-30 12:38:20 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1219,7 +1219,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]  
- | "marriage_place" ->
+  | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           if m_auth then string_of_place conf base (get_marriage_place fam)
@@ -1692,23 +1692,19 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
             let sn = Name.lower (sou base (get_surname p)) in
             (fn, sn, get_occ p)
           in
-          try
-            do {
-              List.iter
-                (fun (pg, (_, il)) ->
-                   match pg with
-                   [ NotesLinks.PgMisc pg ->
-                       if List.mem_assoc key il then
-                         let (nenv, _) = Notes.read_notes base pg in
-                         try let _ = List.assoc s nenv in raise Exit
-                         with [ Not_found -> () ]
-                       else ()
-                   | _ -> () ])
-                db;
-              VVbool False
-            }
-          with
-          [ Exit -> VVbool True ]
+          let r =
+            List.exists
+              (fun (pg, (_, il)) ->
+                 match pg with
+                 [ NotesLinks.PgMisc pg ->
+                     if List.mem_assoc key il then
+                       let (nenv, _) = Notes.read_notes base pg in
+                       List.mem_assoc s nenv
+                     else False
+                 | _ -> False ])
+              db
+          in
+          VVbool r
       | _ -> raise Not_found ]
   | ["has_sosa"] ->
       match get_env "sosa" env with
