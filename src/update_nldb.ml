@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.20 2007-03-25 11:30:06 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.21 2007-03-30 19:38:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -65,7 +65,9 @@ value compute base bdir =
     Printf.eprintf "--- wizard notes\n";
     flush stderr;
     try
-      let files = Sys.readdir (base_wiznotes_dir base) in
+      let files =
+        Sys.readdir (Filename.concat bdir (base_wiznotes_dir base))
+      in
       do {
         for i = 0 to Array.length files - 1 do {
           let file = files.(i) in
