@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.49 2007-03-16 22:34:31 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.50 2007-03-30 21:08:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -385,8 +385,12 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
       tag "td" begin
         let s = string_with_macros conf [] s in
         let s =
-          Wiki.html_with_summary_of_tlsw conf "NOTES"
-            (Notes.file_path conf base) edit_opt s
+          let wi =
+            {Wiki.wi_mode = "NOTES";
+             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_person_exists = person_exists conf base}
+          in
+          Wiki.html_with_summary_of_tlsw conf wi edit_opt s
         in
         let s =
           match ho with
@@ -425,8 +429,12 @@ value print_part_wiznote conf base wz s cnt0 =
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
     let file_path = Notes.file_path conf base in
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-    Wiki.print_sub_part conf can_edit file_path "NOTES" "WIZNOTES"
-      (code_varenv wz) cnt0 lines;
+    let wi =
+      {Wiki.wi_mode = "NOTES"; Wiki.wi_file_path = file_path;
+       Wiki.wi_person_exists = person_exists conf base}
+    in
+    Wiki.print_sub_part conf wi can_edit "WIZNOTES" (code_varenv wz) cnt0
+      lines;
     Hutil.trailer conf;
   }
 ;
@@ -549,8 +557,12 @@ value print_mod_ok conf base =
     let commit = commit_wiznotes conf base in
     let string_filter = string_with_macros conf [] in
     let file_path = Notes.file_path conf base in
-    Wiki.print_mod_ok conf edit_mode mode fname read_string commit
-      string_filter file_path False
+    let wi =
+      {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
+       Wiki.wi_person_exists = person_exists conf base}
+    in
+    Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
+      False
 ;
 
 value wizard_denying wddir =

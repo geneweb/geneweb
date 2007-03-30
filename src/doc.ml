@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.5 2007-01-17 14:40:34 ddr Exp $ *)
+(* $Id: doc.ml,v 5.6 2007-03-30 21:08:58 ddr Exp $ *)
 
 open Config;
 
@@ -199,8 +199,12 @@ value print_whole_wdoc conf fdoc title s =
   let s = "<br /><br />\n" ^ s in
   let s =
     let edit_opt = Some (conf.wizard, "WDOC", fdoc) in
-    Wiki.html_with_summary_of_tlsw conf "WDOC" (wdoc_file_path conf.lang)
-      edit_opt s
+    let wi =
+      {Wiki.wi_mode = "WDOC";
+       Wiki.wi_file_path = wdoc_file_path conf.lang;
+       Wiki.wi_person_exists _ = True}
+    in
+    Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
   let fname =
     let f = Filename.concat "wdoc" "wdoc.txt" in
@@ -234,7 +238,11 @@ value print_part_wdoc conf fdoc title s cnt0 =
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
     let mode = "WDOC" in
     let file_path = wdoc_file_path conf.lang in
-    Wiki.print_sub_part conf conf.wizard file_path mode mode fdoc cnt0 lines;
+    let wi =
+      {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
+       Wiki.wi_person_exists _ = True}
+    in
+    Wiki.print_sub_part conf wi conf.wizard mode fdoc cnt0 lines;
     Hutil.trailer conf;
   }
 ;
@@ -355,6 +363,10 @@ value print_mod_wdoc_ok conf base =
   let commit = commit_wdoc conf base in
   let string_filter = Util.filter_html_tags in
   let file_path = wdoc_file_path conf.lang in
-  Wiki.print_mod_ok conf edit_mode mode fname read_string commit string_filter
-    file_path True
+  let wi =
+    {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
+     Wiki.wi_person_exists _ = True}
+  in
+  Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
+    True
 ;

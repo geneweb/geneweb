@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.111 2007-03-25 13:03:53 ddr Exp $ *)
+(* $Id: util.ml,v 5.112 2007-03-30 21:08:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1778,6 +1778,12 @@ value find_person_in_env conf base suff =
               else None
           | None -> None ]
       | _ -> None ] ]
+;
+
+value person_exists conf base (fn, sn, oc) =
+  match person_of_key base fn sn oc with
+  [ Some ip -> authorized_age conf base (poi base ip)
+  | None -> False ]
 ;
 
 value find_sosa_ref conf base =

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.33 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: util.mli,v 5.34 2007-03-30 21:08:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -149,6 +149,8 @@ value relation_txt :
   config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b;
 
 value string_of_decimal_num : config -> float -> string;
+
+value person_exists : config -> base -> (string * string * int) -> bool;
 
 value find_person_in_env : config -> base -> string -> option person;
 value find_sosa_ref : config -> base -> option person;

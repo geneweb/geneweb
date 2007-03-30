@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.72 2007-03-30 19:12:19 ddr Exp $ *)
+(* $Id: perso.ml,v 5.73 2007-03-30 21:08:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1197,8 +1197,12 @@ and eval_simple_str_var conf base env (_, p_auth) =
       [ Vfam _ fam _ m_auth ->
           if m_auth then
             let s =
-              Wiki.syntax_links conf "NOTES" (Notes.file_path conf base)
-                (sou base (get_comment fam))
+              let wi =
+                {Wiki.wi_mode = "NOTES";
+                 Wiki.wi_file_path = Notes.file_path conf base;
+                 Wiki.wi_person_exists = person_exists conf base}
+              in
+              Wiki.syntax_links conf wi (sou base (get_comment fam))
             in
             string_with_macros conf [] s
           else ""
@@ -2097,8 +2101,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         let s = sou base (get_notes p) in
         let s =
           let lines = Wiki.html_of_tlsw conf s in
-          Wiki.syntax_links conf "NOTES" (Notes.file_path conf base)
-            (String.concat "\n" lines)
+          let wi =
+            {Wiki.wi_mode = "NOTES";
+             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_person_exists = person_exists conf base}
+          in
+          Wiki.syntax_links conf wi (String.concat "\n" lines)
         in
         string_with_macros conf env s
       else ""
@@ -2175,7 +2183,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       [ Vstring s ->
           let env = [('i', fun () -> Util.default_image_name base p)] in
           let s =
-            Wiki.syntax_links conf "NOTES" (Notes.file_path conf base) s
+            let wi =
+              {Wiki.wi_mode = "NOTES";
+               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_person_exists = person_exists conf base}
+            in
+            Wiki.syntax_links conf wi s
           in
           string_with_macros conf env s
       | _ -> raise Not_found ]

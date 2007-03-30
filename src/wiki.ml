@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.20 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.21 2007-03-30 21:08:58 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -91,7 +91,15 @@ value str_start_with str i x =
     else False
 ;
 
-value syntax_links conf mode file_path s =
+type wiki_info =
+  { wi_mode : string;
+    wi_file_path : string -> string;
+    wi_person_exists : (string * string * int) -> bool }
+;
+
+value syntax_links conf wi s =
+  let mode = wi.wi_mode in
+  let file_path = wi.wi_file_path in
   let slen = String.length s in
   loop 0 1 0 0 where rec loop quot_lev pos i len =
     let (len, quot_lev) =
@@ -175,9 +183,13 @@ use of database forum by ill-intentioned people to communicate)...
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
-            sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+            let c =
+              if wi.wi_person_exists (fn, sn, oc) then ""
+              else " style=\"color:red\""
+            in
+            sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
               pos (commd conf) (code_varenv fn) (code_varenv sn)
-              (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
+              (if oc = 0 then "" else ";oc=" ^ string_of_int oc) c name
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard j wiz name ->
@@ -537,7 +549,7 @@ value html_of_tlsw conf s =
   hotl conf (Some lines) first_cnt None sections_nums [] ["" :: lines]
 ;
 
-value html_with_summary_of_tlsw conf mode file_path edit_opt s =
+value html_with_summary_of_tlsw conf wi edit_opt s =
   let (lines, no_toc) = lines_list_of_string s in
   let (summary, sections_nums) =
     if no_toc then ([], []) else summary_of_tlsw_lines conf False lines
@@ -558,7 +570,7 @@ value html_with_summary_of_tlsw conf mode file_path edit_opt s =
     hotl conf (Some lines) first_cnt edit_opt sections_nums [] lines
   in
   let s =
-    syntax_links conf mode file_path
+    syntax_links conf wi
       (String.concat "\n"
         (lines_before_summary @ summary @ lines_after_summary))
   in
@@ -610,7 +622,7 @@ value print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   end
 ;
 
-value print_sub_part_text conf file_path mode edit_opt cnt0 lines =
+value print_sub_part_text conf wi edit_opt cnt0 lines =
   let lines =
     List.map
       (fun
@@ -622,7 +634,7 @@ value print_sub_part_text conf file_path mode edit_opt cnt0 lines =
   in
   let lines = hotl conf None cnt0 edit_opt [] [] lines in
   let s = String.concat "\n" lines in
-  let s = syntax_links conf mode file_path s in
+  let s = syntax_links conf wi s in
   let s =
     if cnt0 < first_cnt then
       let s2 = string_of_modify_link conf 0 (s = "") edit_opt in
@@ -632,13 +644,13 @@ value print_sub_part_text conf file_path mode edit_opt cnt0 lines =
   Wserver.wprint "%s\n" s
 ;
 
-value print_sub_part conf can_edit file_path mode edit_mode sub_fname cnt0
+value print_sub_part conf wi can_edit edit_mode sub_fname cnt0
     lines =
   let edit_opt = Some (can_edit, edit_mode, sub_fname) in
   let sfn = if sub_fname = "" then "" else ";f=" ^ sub_fname in
   do {
     print_sub_part_links conf edit_mode sfn cnt0 (lines = []);
-    print_sub_part_text conf file_path mode edit_opt cnt0 lines;
+    print_sub_part_text conf wi edit_opt cnt0 lines;
   }
 ;
 
@@ -803,7 +815,7 @@ value split_title_and_text s =
     (env, s)
 ;
 
-value print_ok conf file_path mode edit_mode fname title_is_1st s =
+value print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
   in
@@ -836,13 +848,13 @@ value print_ok conf file_path mode edit_mode fname title_is_1st s =
         [title :: lines]
       else lines
     in
-    print_sub_part conf conf.wizard file_path mode edit_mode fname v lines;
+    print_sub_part conf wi conf.wizard edit_mode fname v lines;
     Hutil.trailer conf
   }
 ;
 
-value print_mod_ok conf edit_mode mode fname read_string commit string_filter
-    file_path title_is_1st =
+value print_mod_ok conf wi edit_mode fname read_string commit string_filter
+    title_is_1st =
   let fname = fname (Util.p_getenv conf.env "f") in
   try
     match edit_mode fname with
@@ -871,7 +883,7 @@ value print_mod_ok conf edit_mode mode fname read_string commit string_filter
           do {
             if s <> old_string then commit fname s else ();
             let sub_part = string_filter sub_part in
-            print_ok conf file_path mode edit_mode fname title_is_1st sub_part;
+            print_ok conf wi edit_mode fname title_is_1st sub_part;
           }
     | None -> Hutil.incorrect_request conf ]
   with
