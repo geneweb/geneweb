@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.71 2007-03-30 18:57:19 ddr Exp $ *)
+(* $Id: perso.ml,v 5.72 2007-03-30 19:12:19 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -906,24 +906,27 @@ value linked_page_text conf base p s key str (pg, (_, il)) =
 ;
 
 value links_to_ind conf base db key =
-  List.fold_left
-    (fun pgl (pg, (_, il)) ->
-       let record_it =
-         match pg with
-         [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
-         | NotesLinks.PgFam ifam ->
-             let fam = foi base ifam in
-             if is_deleted_family fam then False
-             else authorized_age conf base (poi base (get_father fam))
-         | NotesLinks.PgNotes | NotesLinks.PgMisc _
-         | NotesLinks.PgWizard _ -> True ]
-       in
-       if record_it then
-         List.fold_left
-           (fun pgl (k, _) -> if k = key then [pg :: pgl] else pgl)
-           pgl il
-       else pgl)
-    [] db
+  let list =
+    List.fold_left
+      (fun pgl (pg, (_, il)) ->
+         let record_it =
+           match pg with
+           [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
+           | NotesLinks.PgFam ifam ->
+               let fam = foi base ifam in
+               if is_deleted_family fam then False
+               else authorized_age conf base (poi base (get_father fam))
+           | NotesLinks.PgNotes | NotesLinks.PgMisc _
+           | NotesLinks.PgWizard _ -> True ]
+         in
+         if record_it then
+           List.fold_left
+             (fun pgl (k, _) -> if k = key then [pg :: pgl] else pgl)
+             pgl il
+         else pgl)
+      [] db
+  in
+  list_uniq (List.sort compare list)
 ;
 
 (* Interpretation of template file *)
@@ -1729,7 +1732,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
       | _ -> raise Not_found ]
   | ["has_linked_pages"] ->
       match get_env "nldb" env with
-      [ Vnldb db ->
+      [ Vnldb db when p_auth ->
           let key =
             let fn = Name.lower (sou base (get_first_name p)) in
             let sn = Name.lower (sou base (get_surname p)) in
@@ -3058,34 +3061,30 @@ value print_ascend conf base p =
       interp_templ templ conf base p ]
 ;
 
-#load "./pa_html.cmo";
-
-value print_what_links conf base p = do {
-  let key =
-    let fn = Name.lower (sou base (get_first_name p)) in
-    let sn = Name.lower (sou base (get_surname p)) in
-    (fn, sn, get_occ p)
-  in
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
-  let db = NotesLinks.read_db_from_file fname in
-  let db = Notes.merge_possible_aliases conf db in
-  let pgl = links_to_ind conf base db key in
-  let title h = do {
-    Wserver.wprint "%s " (capitale (transl conf "linked pages"));
-    if h then Wserver.wprint "%s" "glop-glop"
-    else
-      stag "tt" begin
-        Wserver.wprint "[";
-        stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) "glop-glop" begin
-          Wserver.wprint "%s" "glop-glop";
-        end;
-        Wserver.wprint "]";
-      end
+value print_what_links conf base p =
+  if authorized_age conf base p then do {
+    let key =
+      let fn = Name.lower (sou base (get_first_name p)) in
+      let sn = Name.lower (sou base (get_surname p)) in
+      (fn, sn, get_occ p)
+    in
+    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let fname = Filename.concat bdir "notes_links" in
+    let db = NotesLinks.read_db_from_file fname in
+    let db = Notes.merge_possible_aliases conf db in
+    let pgl = links_to_ind conf base db key in
+    let title h = do {
+      Wserver.wprint "%s: " (capitale (transl conf "linked pages"));
+      if h then Wserver.wprint "%s" (simple_person_text conf base p True)
+      else
+        Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
+          (acces conf base p) (simple_person_text conf base p True)
+    }
+    in
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
+    Notes.print_linked_list conf base pgl;
+    Hutil.trailer conf;
   }
-  in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf True;
-  Notes.print_linked_list conf base pgl;
-  Hutil.trailer conf;
-};
+  else Hutil.incorrect_request conf
+;
