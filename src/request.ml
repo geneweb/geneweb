@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.54 2007-03-02 13:15:24 ddr Exp $ *)
+(* $Id: request.ml,v 5.55 2007-03-30 12:38:20 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -469,7 +469,6 @@ value family_m conf base =
   | Some "MRG_IND_OK" when conf.wizard -> MergeIndOk.print_merge conf base
   | Some "MRG_MOD_IND_OK" when conf.wizard ->
       MergeIndOk.print_mod_merge conf base
-  | Some "RLM" -> Relation.print_multi conf base
   | Some "N" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.surname_print conf base Some.surname_not_found v
@@ -535,6 +534,7 @@ value family_m conf base =
         trailer conf;
       }
   | Some "RL" -> RelationLink.print conf base
+  | Some "RLM" -> Relation.print_multi conf base
   | Some "SND_IMAGE" when conf.wizard && conf.can_send_image ->
       SendImage.print conf base
   | Some "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->
