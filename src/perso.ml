@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.70 2007-03-30 12:38:20 ddr Exp $ *)
+(* $Id: perso.ml,v 5.71 2007-03-30 18:57:19 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -905,6 +905,27 @@ value linked_page_text conf base p s key str (pg, (_, il)) =
   | _ -> str ]
 ;
 
+value links_to_ind conf base db key =
+  List.fold_left
+    (fun pgl (pg, (_, il)) ->
+       let record_it =
+         match pg with
+         [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
+         | NotesLinks.PgFam ifam ->
+             let fam = foi base ifam in
+             if is_deleted_family fam then False
+             else authorized_age conf base (poi base (get_father fam))
+         | NotesLinks.PgNotes | NotesLinks.PgMisc _
+         | NotesLinks.PgWizard _ -> True ]
+       in
+       if record_it then
+         List.fold_left
+           (fun pgl (k, _) -> if k = key then [pg :: pgl] else pgl)
+           pgl il
+       else pgl)
+    [] db
+;
+
 (* Interpretation of template file *)
 
 value rec compare_ls sl1 sl2 =
@@ -1705,6 +1726,16 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
               db
           in
           VVbool r
+      | _ -> raise Not_found ]
+  | ["has_linked_pages"] ->
+      match get_env "nldb" env with
+      [ Vnldb db ->
+          let key =
+            let fn = Name.lower (sou base (get_first_name p)) in
+            let sn = Name.lower (sou base (get_surname p)) in
+            (fn, sn, get_occ p)
+          in
+          VVbool (links_to_ind conf base db key <> [])
       | _ -> raise Not_found ]
   | ["has_sosa"] ->
       match get_env "sosa" env with
@@ -2930,7 +2961,9 @@ value interp_templ templ_fname conf base p = do {
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
       let fname = Filename.concat bdir "notes_links" in
-      Vnldb (NotesLinks.read_db_from_file fname)
+      let db = NotesLinks.read_db_from_file fname in
+      let db = Notes.merge_possible_aliases conf db in
+      Vnldb db
     in
     let all_gp () = Vallgp (get_all_generations conf base p) in
     [("p", Vind p);
@@ -3024,3 +3057,35 @@ value print_ascend conf base p =
       in
       interp_templ templ conf base p ]
 ;
+
+#load "./pa_html.cmo";
+
+value print_what_links conf base p = do {
+  let key =
+    let fn = Name.lower (sou base (get_first_name p)) in
+    let sn = Name.lower (sou base (get_surname p)) in
+    (fn, sn, get_occ p)
+  in
+  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let fname = Filename.concat bdir "notes_links" in
+  let db = NotesLinks.read_db_from_file fname in
+  let db = Notes.merge_possible_aliases conf db in
+  let pgl = links_to_ind conf base db key in
+  let title h = do {
+    Wserver.wprint "%s " (capitale (transl conf "linked pages"));
+    if h then Wserver.wprint "%s" "glop-glop"
+    else
+      stag "tt" begin
+        Wserver.wprint "[";
+        stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) "glop-glop" begin
+          Wserver.wprint "%s" "glop-glop";
+        end;
+        Wserver.wprint "]";
+      end
+  }
+  in
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf True;
+  Notes.print_linked_list conf base pgl;
+  Hutil.trailer conf;
+};
