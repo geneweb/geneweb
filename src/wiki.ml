@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.21 2007-03-30 21:08:58 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.22 2007-03-30 21:30:25 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -98,8 +98,6 @@ type wiki_info =
 ;
 
 value syntax_links conf wi s =
-  let mode = wi.wi_mode in
-  let file_path = wi.wi_file_path in
   let slen = String.length s in
   loop 0 1 0 0 where rec loop quot_lev pos i len =
     let (len, quot_lev) =
@@ -173,12 +171,12 @@ use of database forum by ill-intentioned people to communicate)...
             | None -> (fpath1, fname1) ]
           in
           let c =
-            let f = file_path (fname_of_path fpath) in
+            let f = wi.wi_file_path (fname_of_path fpath) in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
             sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
-              (commd conf) mode fname anchor c text
+              (commd conf) wi.wi_mode fname anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
