@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 5.10 2007-02-12 11:48:24 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.11 2007-03-30 18:57:18 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -313,6 +313,12 @@
       </li>%nl;
     %end;
   </ul>
+%end;
+
+%if;(not cancel_links and has_linked_pages)
+  <table style="float:%right;"><tr><td>
+    (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+  </td></tr></table>
 %end;
 
 %if;(has_notes or has_linked_page.BNOTE or has_linked_page.NOTE)

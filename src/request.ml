@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.55 2007-03-30 12:38:20 ddr Exp $ *)
+(* $Id: request.ml,v 5.56 2007-03-30 18:57:19 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -436,6 +436,10 @@ value family_m conf base =
       BirthDeath.print_birth conf base
   | Some "LD" when conf.wizard || conf.friend ->
       BirthDeath.print_death conf base
+  | Some "LINKED" ->
+      match find_person_in_env conf base "" with
+      [ Some p -> Perso.print_what_links conf base p
+      | _ -> very_unknown conf ]
   | Some "LL" -> BirthDeath.print_longest_lived conf base
   | Some "LM" when conf.wizard || conf.friend ->
       BirthDeath.print_marriage conf base

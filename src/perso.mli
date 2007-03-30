@@ -1,4 +1,4 @@
-(* $Id: perso.mli,v 5.6 2007-02-07 11:39:55 ddr Exp $ *)
+(* $Id: perso.mli,v 5.7 2007-03-30 18:57:19 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwdb;
@@ -10,6 +10,7 @@ value interp_templ : string -> config -> base -> person -> unit;
 
 value print : config -> base -> person -> unit;
 value print_ascend : config -> base -> person -> unit;
+value print_what_links : config -> base -> person -> unit;
 
 (**)
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.56 2007-03-29 12:30:19 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.57 2007-03-30 18:57:19 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -970,6 +970,17 @@ value link gwo_list bname = do {
   else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
   else ProgrBar.finish ();
 
+  if gen.g_warning_cnt < 0 then do {
+    eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
+    flush stderr;
+  }
+  else ();
+  if gen.g_error_cnt < 0 then do {
+    eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
+    flush stderr;
+  }
+  else ();
+
   List.iter (close_out_field pad_per) person_fields;
   List.iter (close_out_field pad_fam) family_fields;
   Iochan.close (fst person_notes);
@@ -1010,17 +1021,6 @@ value link gwo_list bname = do {
     Printf.eprintf "pcnt %d\n" gen.g_pcnt;
     Printf.eprintf "fcnt %d\n" gen.g_fcnt;
     Printf.eprintf "scnt %d\n" gen.g_scnt;
-    flush stderr;
-  }
-  else ();
-
-  if gen.g_warning_cnt < 0 then do {
-    eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
-    flush stderr;
-  }
-  else ();
-  if gen.g_error_cnt < 0 then do {
-    eprintf "Error: %d more errors...\n" (-gen.g_error_cnt);
     flush stderr;
   }
   else ();
