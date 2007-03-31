@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.17 2007-01-19 00:41:11 ddr Exp $ *)
+(* $Id: dag.ml,v 5.18 2007-03-31 08:04:23 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -95,7 +95,7 @@ value make_dag conf base set =
     Array.map
       (fun ip ->
          let pare =
-           match get_parents (aget conf base ip) with
+           match get_parents (pget conf base ip) with
            [ Some ifam ->
                let c = foi base ifam in
                let l =
@@ -105,7 +105,7 @@ value make_dag conf base set =
            | None -> [] ]
          in
          let chil =
-           let u = uget conf base ip in
+           let u = pget conf base ip in
            Array.fold_left
              (fun chil ifam ->
                 let des = foi base ifam in
@@ -868,7 +868,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                 (fun list id ->
                    match d.dag.(int_of_idag id).valu with
                    [ Left cip ->
-                       match get_parents (aget conf base cip) with
+                       match get_parents (pget conf base cip) with
                        [ Some ifam ->
                            let cpl = foi base ifam in
                            if ip = get_father cpl then

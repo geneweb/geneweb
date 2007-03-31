@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 5.18 2007-01-19 01:53:17 ddr Exp $ *)
+(* $Id: relationLink.ml,v 5.19 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -59,7 +59,7 @@ value make_dist_tab conf base ia maxlev =
     let dist = Array.create (nb_of_persons base) default in
     let q = ref Pq.empty in
     let add_children ip =
-      let u = uget conf base ip in
+      let u = pget conf base ip in
       for i = 0 to Array.length (get_family u) - 1 do {
         let des = foi base (get_family u).(i) in
         for j = 0 to Array.length (get_children des) - 1 do {
@@ -79,7 +79,7 @@ value make_dist_tab conf base ia maxlev =
       while not (Pq.is_empty q.val) do {
         let (k, nq) = Pq.take q.val in
         q.val := nq;
-        match get_parents (aget conf base (Adef.iper_of_int k)) with
+        match get_parents (pget conf base (Adef.iper_of_int k)) with
         [ Some ifam ->
             let cpl = foi base ifam in
             let dfath = dist.(Adef.int_of_iper (get_father cpl)) in
@@ -103,7 +103,7 @@ value find_first_branch conf base (dmin, dmax) ia =
     else if len = 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
-      match get_parents (aget conf base ip) with
+      match get_parents (pget conf base ip) with
       [ Some ifam ->
           let cpl = foi base ifam in
           match find [(ip, sp) :: br] (len - 1) (get_father cpl) Male with
@@ -121,7 +121,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
         [ Female ->
             next_branch_same_len conf base dist True (missing + 1) ip sp ipl1
         | Male ->
-            match get_parents (aget conf base ip) with
+            match get_parents (pget conf base ip) with
             [ Some ifam ->
                 let cpl = foi base ifam in
                 next_branch_same_len conf base dist False missing
@@ -132,7 +132,7 @@ value rec next_branch_same_len conf base dist backward missing ia sa ipl =
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist True missing ia sa ipl
   else
-    match get_parents (aget conf base ia) with
+    match get_parents (pget conf base ia) with
     [ Some ifam ->
         let cpl = foi base ifam in
         next_branch_same_len conf base dist False (missing - 1)
@@ -156,7 +156,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
         [ Male ->
             prev_branch_same_len conf base dist True (missing + 1) ip sp ipl1
         | Female ->
-            match get_parents (aget conf base ip) with
+            match get_parents (pget conf base ip) with
             [ Some ifam ->
                 let cpl = foi base ifam in
                 prev_branch_same_len conf base dist False missing
@@ -167,7 +167,7 @@ value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist True missing ia sa ipl
   else
-    match get_parents (aget conf base ia) with
+    match get_parents (pget conf base ia) with
     [ Some ifam ->
         let cpl = foi base ifam in
         prev_branch_same_len conf base dist False (missing - 1)
@@ -192,7 +192,7 @@ value someone_text conf base ip =
 value spouse_text conf base end_sp ip ipl =
   match (ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt")) with
   [ ([(ips, _) :: _], (Some "on", _) | (_, Some "spouse")) ->
-      let a = aget conf base ips in
+      let a = pget conf base ips in
       match get_parents a with
       [ Some ifam ->
           let fam = foi base ifam in
@@ -418,7 +418,7 @@ value other_parent_text_if_same conf base info =
   match (info.b1, info.b2) with
   [ ([(sib1, _) :: _], [(sib2, _) :: _]) ->
       match
-        (get_parents (aget conf base sib1), get_parents (aget conf base sib2))
+        (get_parents (pget conf base sib1), get_parents (pget conf base sib2))
       with
       [ (Some ifam1, Some ifam2) ->
           let cpl1 = foi base ifam1 in

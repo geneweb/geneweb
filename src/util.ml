@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.112 2007-03-30 21:08:58 ddr Exp $ *)
+(* $Id: util.ml,v 5.113 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -586,9 +586,6 @@ value pget (conf : config) base ip =
   else poi base ip
 ;
 
-value aget = pget;
-value uget = pget;
-
 value know base p =
   sou base (get_first_name p) <> "?" || sou base (get_surname p) <> "?"
 ;
@@ -1069,7 +1066,7 @@ value url_no_index conf base =
             if f = "" || s = "" then None
             else
               let oc = string_of_int (get_occ p) in
-              let u = uget conf base (get_father fam) in
+              let u = pget conf base (get_father fam) in
               let n =
                 loop 0 where rec loop k =
                   if (get_family u).(k) = Adef.ifam_of_int i then
@@ -1552,7 +1549,7 @@ value specify_homonymous conf base p =
       Wserver.wprint "%s <em>%s</em>" (p_first_name base p) (sou base nn)
   | (n, []) when sou base n <> "" -> Wserver.wprint "%s" (sou base n)
   | (_, []) ->
-      let a = aget conf base (get_key_index p) in
+      let a = pget conf base (get_key_index p) in
       let ifam =
         match get_parents a with
         [ Some ifam ->
@@ -1570,10 +1567,9 @@ value specify_homonymous conf base p =
       in
       match ifam with
       [ Some (None, None) | None ->
-          let u = uget conf base (get_key_index p) in
           let rec loop i =
-            if i < Array.length (get_family u) then
-              let fam = foi base (get_family u).(i) in
+            if i < Array.length (get_family p) then
+              let fam = foi base (get_family p).(i) in
               let conjoint = spouse (get_key_index p) fam in
               let ct = get_children fam in
               if Array.length ct > 0 then
@@ -1808,7 +1804,7 @@ value create_topological_sort conf base =
   [ Some "no_tsfile" ->
       let () = load_ascends_array base in
       let () = load_couples_array base in
-      Consang.topological_sort base (aget conf)
+      Consang.topological_sort base (pget conf)
   | Some "no_tstab" -> Array.create (nb_of_persons base) 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
@@ -1837,7 +1833,7 @@ value create_topological_sort conf base =
           | None ->
               let () = load_ascends_array base in
               let () = load_couples_array base in
-              let tstab = Consang.topological_sort base (aget conf) in
+              let tstab = Consang.topological_sort base (pget conf) in
               do {
                 if conf.use_restrict then base_visible_write base else ();
                 match
@@ -1855,7 +1851,7 @@ value create_topological_sort conf base =
       | Refuse ->
           let () = load_ascends_array base in
           let () = load_couples_array base in
-          Consang.topological_sort base (aget conf) ] ]
+          Consang.topological_sort base (pget conf) ] ]
 ;
 
 value branch_of_sosa conf base ip n =
@@ -1868,7 +1864,7 @@ value branch_of_sosa conf base ip n =
       fun
       [ [] -> Some [(ip, sp) :: ipl]
       | [goto_fath :: nl] ->
-          match get_parents (aget conf base ip) with
+          match get_parents (pget conf base ip) with
           [ Some ifam ->
               let cpl = foi base ifam in
               if goto_fath then
@@ -2034,7 +2030,7 @@ exception Ok;
 
 value has_nephews_or_nieces conf base p =
   try
-    let a = aget conf base (get_key_index p) in
+    let a = p in
     match get_parents a with
     [ Some ifam ->
         let fam = foi base ifam in
@@ -2048,7 +2044,7 @@ value has_nephews_or_nieces conf base p =
                       if Array.length (get_children (foi base ifam)) > 0 then
                         raise Ok
                       else ())
-                   (get_family (uget conf base ip)))
+                   (get_family (pget conf base ip)))
             (get_children fam);
           False
         }

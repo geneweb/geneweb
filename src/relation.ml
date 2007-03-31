@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.18 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: relation.ml,v 5.19 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 DEFINE OLD;
@@ -90,7 +90,7 @@ value add_missing_parents_of_siblings conf base indl =
                     match ind.di_val with
                     [ Some ip ->
                         let ip =
-                          match get_parents (aget conf base ip) with
+                          match get_parents (pget conf base ip) with
                           [ Some ifam -> get_father (foi base ifam)
                           | None -> assert False ]
                         in
@@ -294,7 +294,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let next_txt = next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml] in
     let elem_txt p = Dag.Item p "" in
     let vbar_txt ip =
-      let u = uget conf base ip in
+      let u = pget conf base ip in
       let excl_faml = Array.to_list (get_family u) @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
@@ -340,7 +340,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (get_children (foi base fam))) children)
-              (Array.to_list (get_family (uget conf base (get_father fam))))
+              (Array.to_list (get_family (pget conf base (get_father fam))))
               []
         in
         let result =
@@ -354,7 +354,7 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (get_children (foi base fam))) children)
-              (Array.to_list (get_family (uget conf base (get_mother fam))))
+              (Array.to_list (get_family (pget conf base (get_mother fam))))
               []
         in
         result
@@ -375,11 +375,11 @@ value get_shortest_path_relation conf base ip1 ip2 excl_faml =
                   (get_mother fam, Mate, ifam)] @
                  nb
              })
-          (Array.to_list (get_family (uget conf base iper))) []
+          (Array.to_list (get_family (pget conf base iper))) []
       in
       let result =
         result @
-          (match get_parents (aget conf base iper) with
+          (match get_parents (pget conf base iper) with
            [ Some ifam -> parse_fam ifam
            | _ -> [] ])
       in
@@ -485,7 +485,7 @@ value print_shortest_path conf base p1 p2 =
                   [ Some n -> n
                   | None -> 0 ]
                 in
-                let u = uget conf base (get_key_index p) in
+                let u = p in
                 let list =
                   if n < Array.length (get_family u) then
                     [(get_family u).(n) :: list]
@@ -562,7 +562,7 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
             loop2 (Array.to_list (get_children (foi base ifam)))
         | [] -> [] ]
       in
-      loop1 (Array.to_list (get_family (uget conf base ip)))
+      loop1 (Array.to_list (get_family (pget conf base ip)))
   in
   loop (get_key_index anc) x
 ;
@@ -754,8 +754,8 @@ value nephew_label conf x p =
 ;
 
 value same_parents conf base p1 p2 =
-  get_parents (aget conf base (get_key_index p1)) =
-  get_parents (aget conf base (get_key_index p2))
+  get_parents (pget conf base (get_key_index p1)) =
+  get_parents (pget conf base (get_key_index p2))
 ;
 
 value print_link_name conf base n p1 p2 sol =
@@ -1214,7 +1214,7 @@ value compute_simple_relationship conf base tstab ip1 ip2 =
 ;
 
 value known_spouses_list conf base p excl_p =
-  let u = uget conf base (get_key_index p) in
+  let u = p in
   List.fold_left
     (fun spl ifam ->
        let sp = pget conf base (spouse (get_key_index p) (foi base ifam)) in
@@ -1430,8 +1430,8 @@ value print_main_relationship conf base long p1 p2 rel =
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]))
     | Some (rl, total, relationship) ->
-        let a1 = aget conf base (get_key_index p1) in
-        let a2 = aget conf base (get_key_index p2) in
+        let a1 = p1 in
+        let a2 = p2 in
         let all_by_marr =
           List.for_all
             (fun

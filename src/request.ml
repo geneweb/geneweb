@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.56 2007-03-30 18:57:19 ddr Exp $ *)
+(* $Id: request.ml,v 5.57 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -297,8 +297,7 @@ value specify conf base n pl =
                   in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)
-               (Array.to_list (get_family (uget conf base (get_key_index p))))
-               []
+               (Array.to_list (get_family p)) []
            in
            match spouses with
            [ [] -> ()
