@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.74 2007-03-31 08:04:23 ddr Exp $ *)
+(* $Id: perso.ml,v 5.75 2007-03-31 08:18:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -299,7 +299,7 @@ value make_desc_level_table conf base max_level p = do {
      because '%max_desc_level;' is still used... *)
   let levt = Array.create (nb_of_persons base) infinite in
   let flevt = Array.create (nb_of_families base) infinite in
-  let get = poi base in
+  let get = pget conf base in
   let ini_ip = get_key_index p in
   let rec fill lev =
     fun
@@ -315,8 +315,8 @@ value make_desc_level_table conf base max_level p = do {
                    if ip = ini_ip then True
                    else
                      match line with
-                     [ Male -> get_sex (poi base ip) <> Female
-                     | Female -> get_sex (poi base ip) <> Male
+                     [ Male -> get_sex (pget conf base ip) <> Female
+                     | Female -> get_sex (pget conf base ip) <> Male
                      | Neuter -> True ]
                  in
                  if down then
@@ -911,11 +911,11 @@ value links_to_ind conf base db key =
       (fun pgl (pg, (_, il)) ->
          let record_it =
            match pg with
-           [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
+           [ NotesLinks.PgInd ip -> authorized_age conf base (pget conf base ip)
            | NotesLinks.PgFam ifam ->
                let fam = foi base ifam in
                if is_deleted_family fam then False
-               else authorized_age conf base (poi base (get_father fam))
+               else authorized_age conf base (pget conf base (get_father fam))
            | NotesLinks.PgNotes | NotesLinks.PgMisc _
            | NotesLinks.PgWizard _ -> True ]
          in
@@ -1086,8 +1086,8 @@ value make_efam conf base ip ifam =
   let ispouse = if ip = ifath then imoth else ifath in
   let cpl = (ifath, imoth, ispouse) in
   let m_auth =
-    authorized_age conf base (poi base ifath) &&
-    authorized_age conf base (poi base imoth)
+    authorized_age conf base (pget conf base ifath) &&
+    authorized_age conf base (pget conf base imoth)
   in
   (fam, cpl, m_auth)
 ;
@@ -1571,15 +1571,15 @@ and eval_ancestor_field_var conf base env gp loc =
           let ispouse = if ip = ifath then imoth else ifath in
           let c = (ifath, imoth, ispouse) in
           let m_auth =
-            authorized_age conf base (poi base ifath) &&
-            authorized_age conf base (poi base imoth)
+            authorized_age conf base (pget conf base ifath) &&
+            authorized_age conf base (pget conf base imoth)
           in
           eval_family_field_var conf base env (ifam, f, c, m_auth) loc sl
       | _ -> raise Not_found ]
   | ["father" :: sl] ->
       match gp with
       [ GP_person _ ip _ ->
-          match (get_parents (poi base ip), get_env "all_gp" env) with
+          match (get_parents (pget conf base ip), get_env "all_gp" env) with
           [ (Some ifam, Vallgp all_gp) ->
               let cpl = foi base ifam in
               match get_link all_gp (get_father cpl) with
@@ -2407,7 +2407,7 @@ value print_foreach conf base print_ast eval_expr =
               let ifath = get_father cpl in
               let cpl = (ifath, get_mother cpl, ifath) in
               let m_auth =
-                p_auth && authorized_age conf base (poi base ifath)
+                p_auth && authorized_age conf base (pget conf base ifath)
               in
               let efam = Vfam ifam (foi base ifam) cpl m_auth in
               loop ep efam sl
@@ -2421,7 +2421,7 @@ value print_foreach conf base print_ast eval_expr =
               let ifath = get_father cpl in
               let cpl = (ifath, get_mother cpl, ifath) in
               let m_auth =
-                p_auth && authorized_age conf base (poi base ifath)
+                p_auth && authorized_age conf base (pget conf base ifath)
               in
               let efam = Vfam ifam (foi base ifam) cpl m_auth in
               loop ep efam sl
@@ -2651,8 +2651,8 @@ value print_foreach conf base print_ast eval_expr =
         let ispouse = spouse (get_key_index p) fam in
         let cpl = (ifath, imoth, ispouse) in
         let m_auth =
-           authorized_age conf base (poi base ifath) &&
-           authorized_age conf base (poi base imoth)
+           authorized_age conf base (pget conf base ifath) &&
+           authorized_age conf base (pget conf base imoth)
         in
         let vfam = Vfam ifam fam cpl m_auth in
         let env = [("#loop", Vint 0) :: env] in
@@ -2911,8 +2911,8 @@ value print_foreach conf base print_ast eval_expr =
          let imoth = get_mother fam in
          let cpl = (ifath, imoth, imoth) in
          let m_auth =
-           authorized_age conf base (poi base ifath) &&
-           authorized_age conf base (poi base imoth)
+           authorized_age conf base (pget conf base ifath) &&
+           authorized_age conf base (pget conf base imoth)
          in
          if m_auth then
            let env = [("fam", Vfam ifam fam cpl True) :: env] in
@@ -3050,7 +3050,7 @@ value print_ancestors_dag conf base v p =
   in
   let elem_txt p = Dag.Item p "" in
   let vbar_txt ip =
-    let p = poi base ip in
+    let p = pget conf base ip in
     Printf.sprintf "%sm=A;t=T;v=%d;%s;dag=on" (commd conf) v
       (acces conf base p)
   in

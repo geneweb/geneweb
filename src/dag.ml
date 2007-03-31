@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 5.18 2007-03-31 08:04:23 ddr Exp $ *)
+(* $Id: dag.ml,v 5.19 2007-03-31 08:18:35 ddr Exp $ *)
 
 DEFINE OLD;
 
@@ -125,7 +125,7 @@ value make_dag conf base set =
       else
         match nodes.(i) with
         [ {valu = Left ip; chil = chil} ->
-            let ifaml = Array.to_list (get_family (poi base ip)) in
+            let ifaml = Array.to_list (get_family (pget conf base ip)) in
             let (nodes, n) =
               loop nodes ifaml where rec loop nodes =
                 fun
