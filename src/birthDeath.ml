@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.36 2007-03-14 01:20:21 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.37 2007-03-31 08:18:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -480,8 +480,8 @@ value print_oldest_engagements conf base =
     select_family conf base
       (fun ifam fam ->
          if get_relation fam = Engaged then
-           let husb = poi base (get_father fam) in
-           let wife = poi base (get_mother fam) in
+           let husb = pget conf base (get_father fam) in
+           let wife = pget conf base (get_mother fam) in
            match (get_death husb, get_death wife) with
            [ (NotDead | DontKnowIfDead, NotDead | DontKnowIfDead) ->
                Adef.od_of_codate (get_marriage fam)
@@ -592,7 +592,7 @@ value print_population_pyramid conf base = do {
   let men = Array.create (nb_intervals + 1) 0 in
   let wom = Array.create (nb_intervals + 1) 0 in
   for i = 0 to nb_of_persons base - 1 do {
-    let p = poi base (Adef.iper_of_int i) in
+    let p = pget conf base (Adef.iper_of_int i) in
     let sex = get_sex p in
     let dea = get_death p in
     if sex <> Neuter then do {

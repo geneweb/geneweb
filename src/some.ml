@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.41 2007-03-31 08:04:23 ddr Exp $ *)
+(* $Id: some.ml,v 5.42 2007-03-31 08:18:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -229,8 +229,8 @@ value first_name_print conf base x =
   | _ -> select_first_name conf base x list ]
 ;
 
-value has_children_with_that_name base des name =
-  List.exists (fun ip -> p_surname base (poi base ip) = name)
+value has_children_with_that_name conf base des name =
+  List.exists (fun ip -> p_surname base (pget conf base ip) = name)
     (Array.to_list (get_children des))
 ;
 
@@ -291,7 +291,7 @@ value print_branch conf base psn name =
            let fam = foi base ifam in
            let c = spouse (get_key_index p) fam in
            let c = pget conf base c in
-           let down = has_children_with_that_name base fam name in
+           let down = has_children_with_that_name conf base fam name in
            let down =
              if get_sex p = Female && p_surname base c = name then False
              else down
@@ -721,9 +721,9 @@ value surname_print conf base not_found_fun x =
       let bhl =
         List.map
           (fun bh ->
-             {bh_ancestor = poi base bh.bh_ancestor;
+             {bh_ancestor = pget conf base bh.bh_ancestor;
               bh_well_named_ancestors =
-                List.map (poi base) bh.bh_well_named_ancestors})
+                List.map (pget conf base) bh.bh_well_named_ancestors})
           bhl
       in
       match (bhl, strl) with

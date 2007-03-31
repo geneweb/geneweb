@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.29 2007-03-30 21:08:58 ddr Exp $ *)
+(* $Id: notes.ml,v 5.30 2007-03-31 08:21:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -189,11 +189,12 @@ value notes_links_db conf base eliminate_unlinked = do {
       (fun db2 (pg, (sl, il)) ->
          let record_it =
            match pg with
-           [ NotesLinks.PgInd ip -> authorized_age conf base (poi base ip)
+           [ NotesLinks.PgInd ip ->
+               authorized_age conf base (pget conf base ip)
            | NotesLinks.PgFam ifam ->
                let fam = foi base ifam in
                if is_deleted_family fam then False
-               else authorized_age conf base (poi base (get_father fam))
+               else authorized_age conf base (pget conf base (get_father fam))
            | NotesLinks.PgNotes | NotesLinks.PgMisc _
            | NotesLinks.PgWizard _ -> True ]
          in
@@ -255,14 +256,14 @@ value print_linked_list conf base pgl =
          stagn "li" begin
            match pg with
            [ NotesLinks.PgInd ip ->
-               let p = poi base ip in
+               let p = pget conf base ip in
                Wserver.wprint "%s%s"
                  (Util.referenced_person_title_text conf base p)
                  (Date.short_dates_text conf base p)
            | NotesLinks.PgFam ifam ->
                let fam = foi base ifam in
-               let fath = poi base (get_father fam) in
-               let moth = poi base (get_mother fam) in
+               let fath = pget conf base (get_father fam) in
+               let moth = pget conf base (get_mother fam) in
                Wserver.wprint "%s%s &amp; %s %s"
                  (Util.referenced_person_title_text conf base fath)
                  (Date.short_dates_text conf base fath)

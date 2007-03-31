@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.113 2007-03-31 08:04:23 ddr Exp $ *)
+(* $Id: util.ml,v 5.114 2007-03-31 08:18:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -492,12 +492,56 @@ value nobtit conf base p =
   Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
 ;
 
+value is_old_person conf p =
+  match
+    (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
+     p.death, CheckItem.date_of_death p.death)
+  with
+  [ (_, _, NotDead, _) when conf.private_years > 0 -> False
+  | (Some (Dgreg d _), _, _, _) ->
+      let a = CheckItem.time_elapsed d conf.today in
+      a.year > conf.private_years
+  | (_, Some (Dgreg d _), _, _) ->
+      let a = CheckItem.time_elapsed d conf.today in
+      a.year > conf.private_years
+  | (_, _, _, Some (Dgreg d _)) ->
+      let a = CheckItem.time_elapsed d conf.today in
+      a.year > conf.private_years
+  | (None, None, DontKnowIfDead, None) ->
+      p.access <> Private && conf.public_if_no_date
+  | _ -> False ]
+;
+
+value fast_auth_age conf p =
+  if conf.friend || conf.wizard || get_access p = Public then True
+  else if
+    conf.public_if_titles && get_access p = IfTitles && get_titles p <> []
+  then
+    True
+  else is_old_person conf (gen_person_of_person p)
+;
+
+value is_restricted (conf : config) base ip =
+  let fct p =
+    not (is_quest_string (get_surname p)) &&
+    not (is_quest_string (get_first_name p)) &&
+    not (fast_auth_age conf p)
+  in  
+  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
+  else False 
+;
+
+value pget (conf : config) base ip =
+  if is_restricted conf base ip then Gwdb.empty_person base ip
+  else poi base ip
+;
+
 value parent_has_title conf base p =
   match get_parents p with
   [ Some ifam ->
       let cpl = foi base ifam in
-      let fath = poi base (get_father cpl) in
-      let moth = poi base (get_mother cpl) in
+      let fath = pget conf base (get_father cpl) in
+      let moth = pget conf base (get_mother cpl) in
       get_access fath <> Private && nobtit conf base fath <> [] ||
       get_access moth <> Private && nobtit conf base moth <> []
   | _ -> False ]
@@ -540,51 +584,7 @@ value authorized_age conf base p =
         loop 0 ]
 ;
 
-value is_old_person conf p =
-  match
-    (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
-     p.death, CheckItem.date_of_death p.death)
-  with
-  [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-  | (Some (Dgreg d _), _, _, _) ->
-      let a = CheckItem.time_elapsed d conf.today in
-      a.year > conf.private_years
-  | (_, Some (Dgreg d _), _, _) ->
-      let a = CheckItem.time_elapsed d conf.today in
-      a.year > conf.private_years
-  | (_, _, _, Some (Dgreg d _)) ->
-      let a = CheckItem.time_elapsed d conf.today in
-      a.year > conf.private_years
-  | (None, None, DontKnowIfDead, None) ->
-      p.access <> Private && conf.public_if_no_date
-  | _ -> False ]
-;
-
-value fast_auth_age conf p =
-  if conf.friend || conf.wizard || get_access p = Public then True
-  else if
-    conf.public_if_titles && get_access p = IfTitles && get_titles p <> []
-  then
-    True
-  else is_old_person conf (gen_person_of_person p)
-;
-
-value is_restricted (conf : config) base ip =
-  let fct p =
-    not (is_quest_string (get_surname p)) &&
-    not (is_quest_string (get_first_name p)) &&
-    not (fast_auth_age conf p)
-  in  
-  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
-  else False 
-;
-
 value is_hidden p = is_empty_string (get_surname p);
-
-value pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person base ip
-  else poi base ip
-;
 
 value know base p =
   sou base (get_first_name p) <> "?" || sou base (get_surname p) <> "?"
@@ -1769,7 +1769,7 @@ value find_person_in_env conf base suff =
           in
           match person_of_key base p n occ with
           [ Some ip ->
-              let p = poi base ip in
+              let p = pget conf base ip in
               if not conf.hide_names || authorized_age conf base p then Some p
               else None
           | None -> None ]
@@ -1778,7 +1778,7 @@ value find_person_in_env conf base suff =
 
 value person_exists conf base (fn, sn, oc) =
   match person_of_key base fn sn oc with
-  [ Some ip -> authorized_age conf base (poi base ip)
+  [ Some ip -> authorized_age conf base (pget conf base ip)
   | None -> False ]
 ;
 
