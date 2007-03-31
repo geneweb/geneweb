@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.73 2007-03-30 21:08:58 ddr Exp $ *)
+(* $Id: perso.ml,v 5.74 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -186,7 +186,7 @@ value find_sosa_aux conf base a p =
                tstab.(Adef.int_of_iper ip) then
             gene_find zil
           else
-            let asc = aget conf base ip in
+            let asc = pget conf base ip in
             match get_parents asc with
             [ Some ifam ->
                 let cpl = foi base ifam in
@@ -236,7 +236,7 @@ value find_sosa conf base a sosa_ref_l =
   [ Some p ->
       if get_key_index a = get_key_index p then Some (Num.one, p)
       else
-        let u = uget conf base (get_key_index a) in
+        let u = pget conf base (get_key_index a) in
         if has_children base u then find_sosa_aux conf base a p else None
   | None -> None ]
 ;
@@ -251,7 +251,7 @@ value max_ancestor_level conf base ip max_lev =
       x.val := max x.val level;
       if x.val = max_lev then ()
       else
-        match get_parents (aget conf base ip) with
+        match get_parents (pget conf base ip) with
         [ Some ifam ->
             let cpl = foi base ifam in
             do {
@@ -375,7 +375,7 @@ value next_generation conf base mark gpl =
          [ GP_person n ip _ ->
              let n_fath = Num.twice n in
              let n_moth = Num.inc n_fath 1 in
-             let a = aget conf base ip in
+             let a = pget conf base ip in
              match get_parents a with
              [ Some ifam ->
                  let cpl = foi base ifam in
@@ -462,7 +462,7 @@ value get_link all_gp ip =
 value parent_sosa conf base ip all_gp n parent =
   if sosa_is_present all_gp n then Num.to_string n
   else
-    match get_parents (aget conf base ip) with
+    match get_parents (pget conf base ip) with
     [ Some ifam ->
         match get_link all_gp (parent (foi base ifam)) with
         [ Some (GP_person n _ _) -> Num.to_string n
@@ -569,7 +569,7 @@ value tree_generation_list conf base gv p =
          match po with
          [ Empty -> [Empty :: list]
          | Cell p _ _ _ _ ->
-             match get_parents (aget conf base (get_key_index p)) with
+             match get_parents p with
              [ Some ifam ->
                  let cpl = foi base ifam in
                  let fath =
@@ -618,7 +618,7 @@ value get_date_place conf base auth_for_all_anc p =
           (fun d ifam ->
              if d <> None then d
              else Adef.od_of_codate (get_marriage (foi base ifam)))
-          d1 (Array.to_list (get_family (uget conf base (get_key_index p))))
+          d1 (Array.to_list (get_family p))
     in
     let d2 =
       match get_death p with
@@ -652,7 +652,7 @@ value get_date_place conf base auth_for_all_anc p =
             (fun pl ifam ->
                if pl <> "" then pl
                else sou base (get_marriage_place (foi base ifam)))
-            pl (Array.to_list (get_family (uget conf base (get_key_index p))))
+            pl (Array.to_list (get_family p))
       in
       pl
     in
@@ -807,7 +807,7 @@ value build_surnames_list conf base v p =
     else do {
       mark.(Adef.int_of_iper (get_key_index p)) :=
         mark.(Adef.int_of_iper (get_key_index p)) - 1;
-      match get_parents (aget conf base (get_key_index p)) with
+      match get_parents p with
       [ Some ifam ->
           let cpl = foi base ifam in
           let fath = pget conf base (get_father cpl) in
@@ -2050,7 +2050,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
             if tab.(i) then ()
             else do {
               tab.(i) := True;
-              let u = uget conf base (get_key_index p) in
+              let u = p in
               for i = 0 to Array.length (get_family u) - 1 do {
                 let des = foi base (get_family u).(i) in
                 for i = 0 to Array.length (get_children des) - 1 do {
@@ -2883,7 +2883,7 @@ value print_foreach conf base print_ast eval_expr =
                    then
                      list.val := [(ifam, fam) :: list.val]
                    else ())
-                (get_family (uget conf base ic))
+                (get_family (pget conf base ic))
             else ();
             make_list icl
           }
@@ -3013,7 +3013,7 @@ value print conf base p =
     if conf.wizard || conf.friend then None
     else
       let src =
-        match get_parents (aget conf base (get_key_index p)) with
+        match get_parents p with
         [ Some ifam -> sou base (get_origin_file (foi base ifam))
         | None -> "" ]
       in
@@ -3041,7 +3041,7 @@ value print_ancestors_dag conf base v p =
       let set = Dag.Pset.add ip set in
       if lev <= 1 then set
       else
-        match get_parents (aget conf base ip) with
+        match get_parents (pget conf base ip) with
         [ Some ifam ->
             let cpl = foi base ifam in
             let set = loop set (lev - 1) (get_mother cpl) in

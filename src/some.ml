@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.40 2007-02-24 19:46:21 ddr Exp $ *)
+(* $Id: some.ml,v 5.41 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -284,7 +284,7 @@ type branch_head 'a = { bh_ancestor : 'a; bh_well_named_ancestors : list 'a };
 value print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
   loop where rec loop is_first_level p = do {
-    let u = uget conf base (get_key_index p) in
+    let u = pget conf base (get_key_index p) in
     let family_list =
       List.map
         (fun ifam ->
@@ -618,8 +618,7 @@ value select_ancestors conf base name_inj ipl =
   List.fold_left
     (fun bhl ip ->
        let p = pget conf base ip in
-       let a = aget conf base ip in
-       match get_parents a with
+       match get_parents p with
        [ Some ifam ->
            let fam = foi base ifam in
            let ifath = get_father fam in

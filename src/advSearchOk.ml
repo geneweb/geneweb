@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: advSearchOk.ml,v 5.12 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 5.13 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -124,7 +124,7 @@ value advanced_search conf base max_answers =
   in
   let list = ref [] in
   let len = ref 0 in
-  let test_person p u =
+  let test_person p =
     if test "sex"
          (fun
           [ "M" -> get_sex p = Male
@@ -155,8 +155,8 @@ value advanced_search conf base max_answers =
        test "surname" (fun x -> name_eq x (p_surname base p)) &&
        test "married"
          (fun
-          [ "Y" -> get_family u <> [| |]
-          | "N" -> get_family u = [| |]
+          [ "Y" -> get_family p <> [| |]
+          | "N" -> get_family p = [| |]
           | _ -> True ]) &&
        test_auth p "birth_place"
          (fun x -> name_incl x (sou base (get_birth_place p))) &&
@@ -185,14 +185,11 @@ value advanced_search conf base max_answers =
             (gets "surname")
       in
       let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-      List.iter
-        (fun ip -> test_person (pget conf base ip) (uget conf base ip)) slist
+      List.iter (fun ip -> test_person (pget conf base ip)) slist
     else
       for i = 0 to nb_of_persons base - 1 do {
         if len.val > max_answers then ()
-        else
-          test_person (pget conf base (Adef.iper_of_int i))
-            (uget conf base (Adef.iper_of_int i))
+        else test_person (pget conf base (Adef.iper_of_int i))
       };
     (List.rev list.val, len.val)
   }

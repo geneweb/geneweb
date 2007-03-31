@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: title.ml,v 5.28 2007-03-17 17:05:34 ddr Exp $ *)
+(* $Id: title.ml,v 5.29 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -53,7 +53,7 @@ value date_interval conf base t x =
         match t with
         [ JustSelf -> ()
         | _ ->
-            let u = uget conf base (get_key_index x) in
+            let u = pget conf base (get_key_index x) in
             Array.iter
               (fun ifam ->
                  let fam = foi base ifam in

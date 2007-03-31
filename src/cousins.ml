@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 5.15 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: cousins.ml,v 5.16 2007-03-31 08:04:23 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -37,7 +37,7 @@ value children_of base u =
 ;
 
 value siblings_by conf base iparent ip =
-  let list = children_of base (uget conf base iparent) in
+  let list = children_of base (pget conf base iparent) in
   except ip list
 ;
 
@@ -53,7 +53,7 @@ value merge_siblings l1 l2 =
 ;
 
 value siblings conf base ip =
-  match get_parents (aget conf base ip) with
+  match get_parents (pget conf base ip) with
   [ Some ifam ->
       let cpl = foi base ifam in
       let fath_sib =
@@ -75,7 +75,7 @@ value rec has_desc_lev conf base lev u =
       (fun ifam ->
          let des = foi base ifam in
          List.exists
-           (fun ip -> has_desc_lev conf base (lev - 1) (uget conf base ip))
+           (fun ip -> has_desc_lev conf base (lev - 1) (pget conf base ip))
            (Array.to_list (get_children des)))
       (Array.to_list (get_family u))
 ;
@@ -129,7 +129,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   then
     print_nospouse ()
   else
-    let u = Array.to_list (get_family (uget conf base (get_key_index p2))) in
+    let u = Array.to_list (get_family p2) in
     match u with
     [ [] -> print_nospouse ()
     | _ ->
@@ -154,10 +154,9 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
     List.iter
       (fun (ip, ia_asex, rev_br) ->
          let p = pget conf base ip in
-         let u = uget conf base ip in
          let br = List.rev [(ip, get_sex p) :: rev_br] in
          let is_valid_rel = br_inter_is_empty ini_br br in
-         if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev u
+         if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev p
          then do {
            if lev <= 2 then do {
              Wserver.wprint "<li>\n";
@@ -179,7 +178,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
              List.map
                (fun ip ->
                   (ip, ia_asex, [(get_key_index p, get_sex p) :: rev_br]))
-               (children_of base u)
+               (children_of base p)
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
              children;
@@ -193,7 +192,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
 ;
 
 value sibling_has_desc_lev conf base lev (ip, _) =
-  has_desc_lev conf base lev (uget conf base ip)
+  has_desc_lev conf base lev (pget conf base ip)
 ;
 
 value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
@@ -317,7 +316,7 @@ value print_anniv conf base p dead_people level =
       let set = S.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
-        let u = get_family (uget conf base ip) in
+        let u = get_family (pget conf base ip) in
         let down_br = [ip :: down_br] in
         let rec loop set i =
           if i = Array.length u then set
@@ -353,7 +352,7 @@ value print_anniv conf base p dead_people level =
         if n >= level then set
         else
           let a =
-            match get_parents (aget conf base ip) with
+            match get_parents (pget conf base ip) with
             [ Some ifam ->
                 let cpl = foi base ifam in
                 let n = n + 1 in
@@ -369,7 +368,7 @@ value print_anniv conf base p dead_people level =
   let set =
     S.fold
       (fun ip (up_sosa, down_br) set ->
-         let u = get_family (uget conf base ip) in
+         let u = get_family (pget conf base ip) in
          let set = S.add ip (up_sosa, down_br, None) set in
          if Array.length u = 0 then set
          else
