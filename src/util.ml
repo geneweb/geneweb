@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.114 2007-03-31 08:18:35 ddr Exp $ *)
+(* $Id: util.ml,v 5.115 2007-03-31 16:48:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1770,6 +1770,7 @@ value find_person_in_env conf base suff =
           match person_of_key base p n occ with
           [ Some ip ->
               let p = pget conf base ip in
+              if is_hidden p then None else
               if not conf.hide_names || authorized_age conf base p then Some p
               else None
           | None -> None ]
