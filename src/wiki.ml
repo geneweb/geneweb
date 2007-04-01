@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.22 2007-03-30 21:30:25 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.23 2007-04-01 05:56:07 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -181,13 +181,13 @@ use of database forum by ill-intentioned people to communicate)...
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
-            let c =
-              if wi.wi_person_exists (fn, sn, oc) then ""
-              else " style=\"color:red\""
-            in
-            sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
-              pos (commd conf) (code_varenv fn) (code_varenv sn)
-              (if oc = 0 then "" else ";oc=" ^ string_of_int oc) c name
+            if wi.wi_person_exists (fn, sn, oc) then
+              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+                pos (commd conf) (code_varenv fn) (code_varenv sn)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
+            else
+              sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
+                name
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard j wiz name ->
