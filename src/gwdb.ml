@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.233 2007-03-03 05:27:21 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.234 2007-04-01 10:05:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1313,11 +1313,8 @@ value open_base bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  if Sys.file_exists (Filename.concat bname "base_d") then do {
-    Printf.eprintf "*** database new implementation\n";
-    flush stderr;
+  if Sys.file_exists (Filename.concat bname "base_d") then
     base2 (base_of_base2 bname)
-  }
   else base1 (Database.opendb bname)
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.75 2007-03-31 08:18:35 ddr Exp $ *)
+(* $Id: perso.ml,v 5.76 2007-04-01 10:05:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1736,13 +1736,18 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
       | _ -> raise Not_found ]
   | ["has_linked_pages"] ->
       match get_env "nldb" env with
-      [ Vnldb db when p_auth ->
-          let key =
-            let fn = Name.lower (sou base (get_first_name p)) in
-            let sn = Name.lower (sou base (get_surname p)) in
-            (fn, sn, get_occ p)
+      [ Vnldb db ->
+          let r =
+            if p_auth then
+              let key =
+                let fn = Name.lower (sou base (get_first_name p)) in
+                let sn = Name.lower (sou base (get_surname p)) in
+                (fn, sn, get_occ p)
+              in
+              links_to_ind conf base db key <> []
+            else False
           in
-          VVbool (links_to_ind conf base db key <> [])
+          VVbool r
       | _ -> raise Not_found ]
   | ["has_sosa"] ->
       match get_env "sosa" env with
