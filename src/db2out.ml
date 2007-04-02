@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: db2out.ml,v 5.9 2007-02-25 01:25:48 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.10 2007-04-02 01:23:10 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -66,9 +66,15 @@ value output_hashtbl dir file ht = do {
   close_out oc_ht;
 };
 
+value add_name ht s pos =
+  let k = Name.crush_lower s in
+  let posl = Hashtbl.find_all ht k in
+  if List.mem pos posl then () else Hashtbl.add ht k pos
+;
+
 value make_string_of_crush_index bpdir =
   List.iter
-    (fun field -> do {
+    (fun (field, is_surname) -> do {
        let field_d = Filename.concat bpdir field in
        let ic_dat = open_in_bin (Filename.concat field_d "data") in
        if Mutil.verbose.val then do {
@@ -83,9 +89,14 @@ value make_string_of_crush_index bpdir =
            try Some (Iovalue.input ic_dat) with [ End_of_file -> None ]
          with
          [ Some s -> do {
-             let k = Name.crush_lower s in
-             let posl = Hashtbl.find_all ht k in
-             if List.mem pos posl then () else Hashtbl.add ht k pos;
+             if s <> "?" then do {
+               add_name ht s pos;
+               if is_surname then
+                 List.iter (fun s -> add_name ht s pos)
+                   (Mutil.surnames_pieces s)
+               else ();
+             }
+             else ();
              loop (pos_in ic_dat)
            }
          | None -> () ];
@@ -97,7 +108,7 @@ value make_string_of_crush_index bpdir =
        }
        else ();
     })
-   ["first_name"; "surname"]
+   [("first_name", False); ("surname", True)]
 ;
 
 value make_person_of_string_index bpdir =
