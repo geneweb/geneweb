@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: some.ml,v 5.42 2007-03-31 08:18:35 ddr Exp $ *)
+(* $Id: some.ml,v 5.43 2007-04-02 20:01:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -96,7 +96,23 @@ value print_elem conf base is_surname (p, xl) =
     xl
 ;
 
-value first_name_print_list conf base x1 xl liste =
+value first_char s =
+  if Mutil.utf_8_db.val then
+    let len = Name.nbc s.[0] in
+    if len < String.length s then String.sub s 0 len
+    else s
+  else String.sub s (initial s) 1
+;
+
+value name_unaccent s =
+  copy 0 0 where rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let (t, j) = Name.unaccent_utf_8 False s i in
+      copy j (Buff.mstore len t)
+;
+
+value first_name_print_list conf base x1 xl liste = do {
   let liste =
     let l =
       List.sort
@@ -131,14 +147,21 @@ value first_name_print_list conf base x1 xl liste =
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
         (StrSet.elements xl)
   in
-  do {
-    header conf title;
-    print_link_to_welcome conf True;
-    print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
-      (print_elem conf base True) liste;
-    trailer conf;
-  }
-;
+  header conf title;
+  print_link_to_welcome conf True;
+  let list =
+    List.map
+      (fun (sn, ipl) ->
+         let txt = Util.surname_end base sn ^ Util.surname_begin base sn in
+         let ord = name_unaccent txt in
+         (ord, txt, ipl))
+      liste
+  in
+  let list = List.sort compare list in
+  print_alphab_list conf (fun (ord, txt, _) -> first_char ord)
+    (fun (_, txt, ipl) -> print_elem conf base True (txt, ipl)) list;
+  trailer conf;
+};
 
 value select_first_name conf base n list =
   let title _ =
@@ -486,14 +509,6 @@ value print_one_surname_by_branch conf base (bhl, str) = do {
   trailer conf;
 };
 
-value name_unaccent s =
-  copy 0 0 where rec copy i len =
-    if i = String.length s then Buff.get len
-    else
-      let (t, j) = Name.unaccent_utf_8 False s i in
-      copy j (Buff.mstore len t)
-;
-
 value print_several_possible_surnames x conf base (bhl, homonymes) = do {
   let fx = x in
   let x =
@@ -536,14 +551,6 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
   end;
   trailer conf;
 };
-
-value first_char s =
-  if Mutil.utf_8_db.val then
-    let len = Name.nbc s.[0] in
-    if len < String.length s then String.sub s 0 len
-    else s
-  else String.sub s (initial s) 1
-;
 
 value print_family_alphabetic x conf base liste =
   let homonymes =
