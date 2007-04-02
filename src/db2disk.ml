@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.17 2007-03-03 05:27:21 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.18 2007-04-02 19:14:27 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -313,16 +313,8 @@ value spi2gen_add pl db2 spi s =
     else fun p -> p.surname
   in
   Hashtbl.fold
-    (fun _ ipero iperl ->
-       match ipero with
-       [ Some iper ->
-           try
-             let p = Hashtbl.find db2.patches.h_person iper in
-             if proj p = s then [iper :: iperl] else iperl
-           with
-           [ Not_found -> iperl ]
-       | None -> iperl ])
-    db2.patches.h_key pl
+    (fun _ p iperl -> if proj p = s then [p.key_index :: iperl] else iperl)
+    db2.patches.h_person pl
 ;
 
 value spi2_find db2 spi (f1, f2) pos =
