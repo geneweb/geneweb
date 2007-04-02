@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.234 2007-04-01 10:05:51 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.235 2007-04-02 19:14:27 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1103,17 +1103,9 @@ value base2 db2 =
     let s = Name.crush_lower s in
     let sl =
       Hashtbl.fold
-        (fun _ ipero sl ->
-           match ipero with
-           [ Some iper ->
-               try
-                 let p = Hashtbl.find db2.patches.h_person iper in
-                 if Name.crush_lower (proj p) = s then [proj p :: sl]
-                 else sl
-               with
-               [ Not_found -> sl ]
-           | None -> sl ])
-        db2.patches.h_key []
+        (fun _ p sl ->
+           if Name.crush_lower (proj p) = s then [proj p :: sl] else sl)
+        db2.patches.h_person []
     in
     let sl = list_uniq (List.sort compare sl) in
     List.fold_left (fun istrl s -> [Istr2New db2 s :: istrl]) istrl sl
