@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.1 2007-02-26 10:33:04 ddr Exp $
+# $Id: Makefile,v 5.2 2007-04-02 18:04:44 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -121,6 +121,7 @@ classical_distrib:
 	cp src/consang $(DESTDIR)/consang$(EXE)
 	cp src/gwd $(DESTDIR)/gwd$(EXE)
 	cp src/gwu $(DESTDIR)/gwu$(EXE)
+	cp src/update_nldb $(DESTDIR)/update_nldb$(EXE)
 	cp ged2gwb/ged2gwb $(DESTDIR)/ged2gwb$(EXE)
 	cp gwb2ged/gwb2ged $(DESTDIR)/gwb2ged$(EXE)
 	mkdir $(DESTDIR)/gwtp_tmp
