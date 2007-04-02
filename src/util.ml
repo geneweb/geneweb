@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.117 2007-04-01 05:56:07 ddr Exp $ *)
+(* $Id: util.ml,v 5.118 2007-04-02 20:01:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1447,11 +1447,10 @@ value hexa_string s =
   }
 ;
 
-value print_alphab_list conf crit print_elem liste =
+value print_alphab_list conf crit print_elem liste = do {
   let len = List.length liste in
-  do {
-    if len > menu_threshold then do {
-      Wserver.wprint "<p>\n";
+  if len > menu_threshold then
+    tag "p" begin
       let _ =
         List.fold_left
           (fun last e ->
@@ -1470,46 +1469,43 @@ value print_alphab_list conf crit print_elem liste =
           None liste
       in
       ();
-      Wserver.wprint "</p>\n";
-    }
-    else ();
-    Wserver.wprint "<ul>\n";
+    end
+  else ();
+  tag "ul" begin
     let _ =
       List.fold_left
-        (fun last e ->
+        (fun last e -> do {
            let t = crit e in
            let same_than_last =
              match last with
              [ Some t1 -> t = t1
              | _ -> False ]
            in
-           do {
-             if len > menu_threshold || is_number t then do {
-               match last with
-               [ Some _ ->
-                   if not same_than_last then Wserver.wprint "</ul>\n</li>\n"
-                   else ()
-               | _ -> () ];
-               if not same_than_last then do {
-                 Wserver.wprint "<li>\n";
-                 Wserver.wprint "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
-                 Wserver.wprint "<ul>\n";
-               }
-               else ();
+           if len > menu_threshold || is_number t then do {
+             match last with
+             [ Some _ ->
+                 if not same_than_last then Wserver.wprint "</ul>\n</li>\n"
+                 else ()
+             | _ -> () ];
+             if not same_than_last then do {
+               Wserver.wprint "<li>\n";
+               Wserver.wprint "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
+               Wserver.wprint "<ul>\n";
              }
              else ();
-             Wserver.wprint "<li>\n  ";
-             print_elem e;
-             Wserver.wprint "</li>\n";
-             Some t
-           })
+           }
+           else ();
+           Wserver.wprint "<li>\n  ";
+           print_elem e;
+           Wserver.wprint "</li>\n";
+           Some t
+         })
         None liste
     in
     ();
     if len > menu_threshold then Wserver.wprint "</ul>\n</li>\n" else ();
-    Wserver.wprint "</ul>\n";
-  }
-;
+  end;
+};
 
 value parent conf base p a =
   match get_public_name a with
