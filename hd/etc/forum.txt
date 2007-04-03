@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.11 2007-01-23 14:31:58 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.12 2007-04-03 12:48:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -81,15 +81,15 @@
         <td>[*ident/email/subject]0</td>
         <td><input name="Ident" size="60" maxlength="200"%sp;
              value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/
-             ><td>
+             ></td>
       </tr>
       <tr align="%left;">
         <td>[*ident/email/subject]1 ([optional])</td>
-        <td><input name="Email" size="60" maxlength="200" value=""%/><td>
+        <td><input name="Email" size="60" maxlength="200" value=""%/></td>
       </tr>
       <tr align="%left;">
         <td>[*ident/email/subject]2 ([optional])</td>
-        <td><input name="Subject" size="60" maxlength="200" value=""%/><td>
+        <td><input name="Subject" size="60" maxlength="200" value=""%/></td>
       </tr>
       </table>
       <p>
