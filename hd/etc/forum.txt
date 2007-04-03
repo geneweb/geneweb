@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.12 2007-04-03 12:48:10 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.13 2007-04-03 13:07:32 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -116,7 +116,6 @@
     <h1 style="text-align:center" class="highlight">%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
-    <p>
     %if;(message.ident != "" and message.text != "")
       <b>%message.ident;</b>
       %if;(message.email != "")%nn;
@@ -131,7 +130,6 @@
         <br%/>
       %end;
       <i>%message.time;</i>
-      </p>
       <dl><dd>
         %message.text.wiki;
       </dd></dl>
@@ -148,17 +146,17 @@
         <td%if;(message.ident = "") style="color:red"%end;
         >[*ident/email/subject]0</td>
         <td><input name="Ident" size="60" maxlength="200"%sp;
-             value="%message.ident;"%/><td>
+             value="%message.ident;"%/></td>
       </tr>
       <tr align="%left;">
         <td>[*ident/email/subject]1 ([optional])</td>
         <td><input name="Email" size="60" maxlength="200" value="%nn;
-             %message.email;"%/><td>
+             %message.email;"%/></td>
       </tr>
       <tr align="%left;">
         <td>[*ident/email/subject]2 ([optional])</td>
         <td><input name="Subject" size="60" maxlength="200" value="%nn;
-             %message.subject;"%/><td>
+             %message.subject;"%/></td>
       </tr>
       </table>
       <p>
