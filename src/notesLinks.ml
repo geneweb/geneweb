@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: notesLinks.ml,v 5.6 2007-03-25 11:30:05 ddr Exp $ *)
+(* $Id: notesLinks.ml,v 5.7 2007-04-03 09:55:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -27,7 +27,8 @@ value check_file_name s =
       else None
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' -> loop path ibeg (i + 1)
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '-' | '.' ->
+          loop path ibeg (i + 1)
       | c ->
           if c = char_dir_sep then
             if i > ibeg then
