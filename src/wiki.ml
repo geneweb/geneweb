@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.23 2007-04-01 05:56:07 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.24 2007-04-03 13:24:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -652,7 +652,7 @@ value print_sub_part conf wi can_edit edit_mode sub_fname cnt0
   }
 ;
 
-value print_mod_view_page conf can_edit mode fname title env s =
+value print_mod_view_page conf can_edit mode fname title env s = do {
   let s =
     List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" env ^ s
   in
@@ -667,64 +667,62 @@ value print_mod_view_page conf can_edit mode fname title env s =
   in
   let is_empty = sub_part = "" in
   let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
-  do {
-    header conf title;
-    if can_edit then
-      tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
-        conf.left
+  header conf title;
+  if can_edit then
+    tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
+      conf.left
+    begin
+      Wserver.wprint "(";
+      stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
+        (if has_v then ";v=" ^ string_of_int v else "") sfn
       begin
-        Wserver.wprint "(";
-        stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
-          (if has_v then ";v=" ^ string_of_int v else "") sfn
-        begin
-          Wserver.wprint "%s" (message_txt conf 0);
-        end;
-        Wserver.wprint ")\n";
+        Wserver.wprint "%s" (message_txt conf 0);
+      end;
+      Wserver.wprint ")\n";
+    end
+  else ();
+  print_link_to_welcome conf (if can_edit then False else True);
+  if can_edit && has_v then
+    print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
+  else ();
+  tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+    tag "p" begin
+      Util.hidden_env conf;
+      if can_edit then
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"" mode
+      else ();
+      if has_v then
+        xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
+      else ();
+      if fname <> "" then
+        xtag "input" "type=\"hidden\" name=\"f\" value=\"%s\"" fname
+      else ();
+      if can_edit then
+        let digest = Iovalue.digest s in
+        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
+      else ();
+      begin_centered conf;
+      let s =
+        sprintf "<%s%s>%s</%s>"
+          "textarea name=\"notes\" rows=\"25\" cols=\"110\""
+          (if can_edit then "" else " readonly=\"readonly\"")
+          (quote_escaped sub_part)
+          "textarea"
+      in
+      match Util.open_etc_file "accent" with
+      [ Some ic ->
+          Templ.copy_from_templ conf [("area", s); ("name", "notes")] ic
+      | None -> Wserver.wprint "%s\n" s ];
+      end_centered conf;
+    end;
+    if can_edit then
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
       end
     else ();
-    print_link_to_welcome conf (if can_edit then False else True);
-    if can_edit && has_v then
-      print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
-    else ();
-    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      tag "p" begin
-        Util.hidden_env conf;
-        if can_edit then
-          xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_%s_OK\"" mode
-        else ();
-        if has_v then
-          xtag "input" "type=\"hidden\" name=\"v\" value=\"%d\"" v
-        else ();
-        if fname <> "" then
-          xtag "input" "type=\"hidden\" name=\"f\" value=\"%s\"" fname
-        else ();
-        if can_edit then
-          let digest = Iovalue.digest s in
-          xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
-        else ();
-        begin_centered conf;
-        let s =
-          sprintf "<%s%s>%s</%s>"
-            "textarea name=\"notes\" rows=\"25\" cols=\"110\""
-            (if can_edit then "" else " readonly=\"readonly\"")
-            (quote_escaped sub_part)
-            "textarea"
-        in
-        match Util.open_etc_file "accent" with
-        [ Some ic ->
-            Templ.copy_from_templ conf [("area", s); ("name", "notes")] ic
-        | None -> Wserver.wprint "%s\n" s ];
-        end_centered conf;
-      end;
-      if can_edit then
-        tag "p" begin
-          xtag "input" "type=\"submit\" value=\"Ok\"";
-        end
-      else ();
-    end;
-    trailer conf;
-  }
-;
+  end;
+  trailer conf;
+};
 
 value insert_sub_part s v sub_part =
   let (lines, _) = lines_list_of_string s in
