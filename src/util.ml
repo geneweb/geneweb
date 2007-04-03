@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.118 2007-04-02 20:01:44 ddr Exp $ *)
+(* $Id: util.ml,v 5.119 2007-04-03 11:56:53 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2475,9 +2475,9 @@ value dispatch_in_columns ncol list order =
         let accu = accu + ncol * kind_size kind.val in
         let cnt = cnt + 1 in
         if accu > len && not is_last && kind.val = Elem then do {
-          (* put a new size and restart from zero *)
+          (* restart from zero *)
           kind.val := ContElem;
-          loop [] 0 1 0 (len + kind_size ContElem - 1) ini_list
+          loop [] 0 1 0 len ini_list
         }
         else
           let (rlen_list, cnt, col, accu) =
