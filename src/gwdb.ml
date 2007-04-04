@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.235 2007-04-02 19:14:27 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.236 2007-04-04 12:54:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1261,15 +1261,19 @@ value base2 db2 =
      load_strings_array () = ();
      persons_array () = failwith "not impl persons_array";
      ascends_array () =
-       let nb = self.nb_of_persons () in
+       let nb = db2.patches.nb_per in
+       let nb_ini = db2.patches.nb_per_ini in
+       let ptab =
+         match db2.parents_array with
+         [ Some tab -> tab
+         | None -> parents_array2 db2 nb_ini nb ]
+       in
        let cg_tab =
          match db2.consang_array with
          [ Some tab -> tab
          | None -> consang_array2 db2 nb ]
        in
-       let fget i =
-         get_parents (Person2 db2 i {per2 = None; asc2 = None; uni2 = None})
-       in
+       let fget i = ptab.(i) in
        let cget i = cg_tab.(i) in
        let cset i v = cg_tab.(i) := v in
        (fget, cget, cset, Some cg_tab);
