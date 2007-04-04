@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 5.10 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 5.11 2007-04-04 02:17:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -708,11 +708,21 @@ function changeCalendar(e,v,m,c) {
 <h4><label for="notes">[*note/notes]1</label></h4>
 
 <p>
-%let;area;%sq;
-  <textarea name="notes" rows="12" cols="80" id="notes">%notes;</textarea>%sq;
-%in;
-%let;name;notes%in;
-%include.accent;
+<table>
+  <tr>
+    <td>
+      <textarea name="notes" rows="12" cols="80" id="notes">%sq;
+        %notes;%sq;
+      </textarea>%sq;
+    </td>
+  </tr>
+  <tr>
+    <td>
+      %let;name;notes%in;
+      %include.accent;
+    </td>
+  </tr>
+</table>
 </p>
 
 <h4><label for="src">[*source/sources]0</label></h4>

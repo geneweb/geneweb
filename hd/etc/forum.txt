@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: forum.txt,v 5.13 2007-04-03 13:07:32 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.14 2007-04-04 02:17:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -95,9 +95,19 @@
       <p>
       [*message/previous message/previous messages/next message]0
       <br%/>
-      %let;area;<textarea name="Text" rows="15" cols="100"></textarea>%in;
-      %let;name;Text%in;
-      %include.accent;
+      <table>
+        <tr>
+          <td>
+            <textarea name="Text" rows="15" cols="100"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            %let;name;Text%in;
+            %include.accent;
+          </td>
+        </tr>
+      </table>
       <br%/>
       <input type="submit" name="visu"%sp;
        value="[visualize/show/hide/summary]0"%/>
@@ -163,12 +173,20 @@
       <span%if;(message.text = "") style="color:red"%end;>
       [*message/previous message/previous messages/next message]0</span>
       <br%/>
-      %let;area;%sq;
-        <textarea name="Text" rows="15" cols="100">%message.text;%sq;
-        </textarea>%sq;
-      %in;
-      %let;name;Text%in;
-      %include.accent;
+      <table>
+        <tr>
+          <td>
+            <textarea name="Text" rows="15" cols="100">%message.text;%sq;
+            </textarea>%sq;
+          </td>
+        </tr>
+        <tr>
+          <td>
+            %let;name;Text%in;
+            %include.accent;
+          </td>
+        </tr>
+      </table>
       <br%/>
       <input type="submit" name="visu"%sp;
        value="[visualize/show/hide/summary]0"%/>
