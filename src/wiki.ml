@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.25 2007-04-03 13:48:23 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.26 2007-04-04 02:17:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -705,17 +705,25 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       tag "table" "border=\"1\"" begin
         tag "tr" begin
           tag "td" begin
-            let s =
-              sprintf "<%s%s>%s</%s>"
-                "textarea name=\"notes\" rows=\"25\" cols=\"110\""
-                (if can_edit then "" else " readonly=\"readonly\"")
-                (quote_escaped sub_part)
-                "textarea"
-            in
-            match Util.open_etc_file "accent" with
-            [ Some ic ->
-                Templ.copy_from_templ conf [("area", s); ("name", "notes")] ic
-            | None -> Wserver.wprint "%s\n" s ];
+            tag "table" begin
+              tag "tr" begin
+                tag "td" begin
+                  stag "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"%s"
+                    (if can_edit then "" else " readonly=\"readonly\"")
+                  begin
+                    Wserver.wprint "%s" (quote_escaped sub_part);
+                  end;
+                end;
+              end;
+              match Util.open_etc_file "accent" with
+              [ Some ic ->
+                  tag "tr" begin
+                    tag "td" begin
+                      Templ.copy_from_templ conf [("name", "notes")] ic;
+                    end;
+                  end
+              | None -> () ];
+            end;
             if can_edit then do {
               xtag "br";
               xtag "input" "type=\"submit\" value=\"Ok\"";
