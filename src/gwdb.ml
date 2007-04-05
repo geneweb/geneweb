@@ -1,4 +1,4 @@
-(* $Id: gwdb.ml,v 5.237 2007-04-04 17:59:29 ddr Exp $ *)
+(* $Id: gwdb.ml,v 5.238 2007-04-05 09:22:53 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -14,15 +14,17 @@ type gen_string_person_index 'istr = Dbdisk.string_person_index 'istr ==
     next : 'istr -> 'istr }
 ;
 
-value milazy_force ht i (get, set) p =
+value milazy_force f a (get, set) p =
   match get p with
   [ Some v -> v
   | None -> do {
-      let v = try Some (Hashtbl.find ht i) with [ Not_found -> None ] in
+      let v = f a in
       set p (Some v);
       v
     } ]
 ;
+
+value ht_find ht i = try Some (Hashtbl.find ht i) with [ Not_found -> None ];
 
 value no_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
@@ -454,21 +456,23 @@ value person2gen_fun =
 
 (* Persons - user functions *)
 
+value get_set_per1 = (fun p -> p.per1, fun p v -> p.per1 := v);
+value get_set_asc1 = (fun p -> p.asc1, fun p v -> p.asc1 := v);
+value get_set_uni1 = (fun p -> p.uni1, fun p v -> p.uni1 := v);
+
 value get_set_per2 = (fun p -> p.per2, fun p v -> p.per2 := v);
 value get_set_asc2 = (fun p -> p.asc2, fun p v -> p.asc2 := v);
 value get_set_uni2 = (fun p -> p.uni2, fun p v -> p.uni2 := v);
 
 value wrap_per f g h =
   fun
-  [ Person _ _ {per1 = Some p} -> f person1_fun p
-  | Person base i p -> do {
-      let per = base.data.persons.get i in
-      p.per1 := Some per;
+  [ Person base i p ->
+      let per = milazy_force base.data.persons.get i get_set_per1 p in
       f person1_fun per
-    }
   | Person2 db2 i p ->
       let per =
-        milazy_force db2.patches.h_person (Adef.iper_of_int i) get_set_per2 p
+        milazy_force (ht_find db2.patches.h_person) (Adef.iper_of_int i)
+          get_set_per2 p
       in
       match per with
       [ Some p -> h person2gen_fun (db2, i, p)
@@ -477,15 +481,13 @@ value wrap_per f g h =
 
 value wrap_asc f g h =
   fun
-  [ Person _ _ {asc1 = Some a} -> f person1_fun a
-  | Person base i p -> do {
-      let asc = base.data.ascends.get i in
-      p.asc1 := Some asc;
+  [ Person base i p ->
+      let asc = milazy_force base.data.ascends.get i get_set_asc1 p in
       f person1_fun asc
-    }
   | Person2 db2 i p ->
       let asc =
-        milazy_force db2.patches.h_ascend (Adef.iper_of_int i) get_set_asc2 p
+        milazy_force (ht_find db2.patches.h_ascend) (Adef.iper_of_int i)
+          get_set_asc2 p
       in
       match asc with
       [ Some a -> h person2gen_fun (db2, i, a)
@@ -494,15 +496,13 @@ value wrap_asc f g h =
 
 value wrap_uni f g h =
   fun
-  [ Person _ _ {uni1 = Some u} -> f person1_fun u
-  | Person base i p -> do {
-      let uni = base.data.unions.get i in
-      p.uni1 := Some uni;
+  [ Person base i p ->
+      let uni = milazy_force base.data.unions.get i get_set_uni1 p in
       f person1_fun uni
-    }
   | Person2 db2 i p ->
       let uni =
-        milazy_force db2.patches.h_union (Adef.iper_of_int i) get_set_uni2 p
+        milazy_force (ht_find db2.patches.h_union) (Adef.iper_of_int i)
+          get_set_uni2 p
       in
       match uni with
       [ Some u -> h person2gen_fun (db2, i, u)
@@ -793,21 +793,23 @@ value family2gen_fun =
 
 (* Families - user functions *)
 
+value get_set_fam1 = (fun p -> p.fam1, fun p v -> p.fam1 := v);
+value get_set_cpl1 = (fun p -> p.cpl1, fun p v -> p.cpl1 := v);
+value get_set_des1 = (fun p -> p.des1, fun p v -> p.des1 := v);
+
 value get_set_fam2 = (fun p -> p.fam2, fun p v -> p.fam2 := v);
 value get_set_cpl2 = (fun p -> p.cpl2, fun p v -> p.cpl2 := v);
 value get_set_des2 = (fun p -> p.des2, fun p v -> p.des2 := v);
 
 value wrap_fam f g h =
   fun
-  [ Family _ _ {fam1 = Some fam} -> f family1_fun fam
-  | Family base i d -> do {
-      let fam = base.data.families.get i in
-      d.fam1 := Some fam;
+  [ Family base i d ->
+      let fam = milazy_force base.data.families.get i get_set_fam1 d in
       f family1_fun fam
-    }
   | Family2 db2 i d ->
       let fam =
-        milazy_force db2.patches.h_family (Adef.ifam_of_int i) get_set_fam2 d
+        milazy_force (ht_find db2.patches.h_family) (Adef.ifam_of_int i)
+          get_set_fam2 d
       in
       match fam with
       [ Some fam -> h family2gen_fun (db2, fam)
@@ -816,15 +818,13 @@ value wrap_fam f g h =
 
 value wrap_cpl f g h =
   fun
-  [ Family _ _ {cpl1 = Some cpl} -> f family1_fun cpl
-  | Family base i d -> do {
-      let cpl = base.data.couples.get i in
-      d.cpl1 := Some cpl;
+  [ Family base i d ->
+      let cpl = milazy_force base.data.couples.get i get_set_cpl1 d in
       f family1_fun cpl
-    }
   | Family2 db2 i d ->
       let cpl =
-        milazy_force db2.patches.h_couple (Adef.ifam_of_int i) get_set_cpl2 d
+        milazy_force (ht_find db2.patches.h_couple) (Adef.ifam_of_int i)
+          get_set_cpl2 d
       in
       match cpl with
       [ Some cpl -> h family2gen_fun (db2, cpl)
@@ -833,15 +833,13 @@ value wrap_cpl f g h =
 
 value wrap_des f g h =
   fun
-  [ Family _ _ {des1 = Some des} -> f family1_fun des
-  | Family base i d -> do {
-      let des = base.data.descends.get i in
-      d.des1 := Some des;
+  [ Family base i d ->
+      let des = milazy_force base.data.descends.get i get_set_des1 d in
       f family1_fun des
-    }
   | Family2 db2 i d ->
       let des =
-        milazy_force db2.patches.h_descend (Adef.ifam_of_int i) get_set_des2 d
+        milazy_force (ht_find db2.patches.h_descend) (Adef.ifam_of_int i)
+          get_set_des2 d
       in
       match des with
       [ Some des -> h family2gen_fun (db2, des)
