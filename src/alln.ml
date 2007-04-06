@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 5.22 2007-02-24 19:46:21 ddr Exp $ *)
+(* $Id: alln.ml,v 5.23 2007-04-06 12:54:47 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -29,27 +29,26 @@ value combine_by_ini ini list =
     loop [] list where rec loop new_list =
       fun
       [ [] -> new_list
-      | [(k, s, cnt) :: list] ->
+      | [(k, s, cnt) :: list] -> do {
           let ini_k =
             if String.length k > String.length ini then
               String.sub k 0 (index_of_next_char k (String.length ini))
             else k ^ String.make (String.length ini + 1 - String.length k) '_'
           in
-          do {
-            for i = 0 to String.length ini_k - 1 do {
-              if ini_k.[i] = ' ' then ini_k.[i] := '_' else ()
-            };
-            let new_list =
-              if ini_k = "_" then new_list
-              else
-                match new_list with
-                [ [] -> [(ini_k, [(s, cnt)])]
-                | [(ini_k1, l) :: ll] ->
-                    if ini_k1 = ini_k then [(ini_k1, [(s, cnt) :: l]) :: ll]
-                    else [(ini_k, [(s, cnt)]); (ini_k1, l) :: ll] ]
-            in
-            loop new_list list
-          } ]
+          for i = 0 to String.length ini_k - 1 do {
+            if ini_k.[i] = ' ' then ini_k.[i] := '_' else ()
+          };
+          let new_list =
+            if ini_k = "_" then new_list
+            else
+              match new_list with
+              [ [] -> [(ini_k, [(s, cnt)])]
+              | [(ini_k1, l) :: ll] ->
+                  if ini_k1 = ini_k then [(ini_k1, [(s, cnt) :: l]) :: ll]
+                  else [(ini_k, [(s, cnt)]); (ini_k1, l) :: ll] ]
+          in
+          loop new_list list
+        } ]
   in
   List.fold_left (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) []
     list
@@ -107,25 +106,23 @@ value name_key_compatible base s =
 
 (* print *)
 
-value print_title conf base is_surnames ini len =
-  do {
-    if len >= 2 then
-      if is_surnames then
-        Wserver.wprint (fcapitale (ftransl conf "the %d surnames")) len
-      else Wserver.wprint (fcapitale (ftransl conf "the %d first names")) len
-    else if is_surnames then
-      Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0))
-    else
-      Wserver.wprint "%s"
-        (capitale (transl_nth conf "first name/first names" 0));
-    if ini <> "" then
-      Wserver.wprint " %s %s" (transl conf "starting with")
-        (capitalize_if_not_utf8 ini)
-    else
-      Wserver.wprint " (%d %s)" (nb_of_persons base)
-        (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
-  }
-;
+value print_title conf base is_surnames ini len = do {
+  if len >= 2 then
+    if is_surnames then
+      Wserver.wprint (fcapitale (ftransl conf "the %d surnames")) len
+    else Wserver.wprint (fcapitale (ftransl conf "the %d first names")) len
+  else if is_surnames then
+    Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0))
+  else
+    Wserver.wprint "%s"
+      (capitale (transl_nth conf "first name/first names" 0));
+  if ini <> "" then
+    Wserver.wprint " %s %s" (transl conf "starting with")
+      (capitalize_if_not_utf8 ini)
+  else
+    Wserver.wprint " (%d %s)" (nb_of_persons base)
+      (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
+};
 
 value displayify s =
   if Mutil.utf_8_db.val then
@@ -146,149 +143,141 @@ value tr c1 s2 s =
     else loop (i + 1) (Buff.store len (String.unsafe_get s i))
 ;
 
-value print_alphabetic_big conf base is_surnames ini list len too_big =
+value print_alphabetic_big conf base is_surnames ini list len too_big = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
-  do {
-    header conf title;
-    tag "p" begin
+  header conf title;
+  tag "p" begin
+    List.iter
+      (fun (ini_k, _) ->
+         stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
+           (Util.code_varenv ini_k)
+         begin
+           Wserver.wprint "%s" (tr '_' "&nbsp;" (displayify ini_k));
+         end)
+      list;
+  end;
+  if len <= default_max_cnt && not too_big then do {
+    stagn "p" begin
+      Wserver.wprint "%s:" (capitale (transl conf "the whole list"));
+    end;
+    tag "ul" begin
+      stagn "li" begin
+        stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
+          Wserver.wprint "%s" (transl conf "long display");
+        end;
+      end;
+      stagn "li" begin
+        stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
+          Wserver.wprint "%s" (transl conf "short display");
+        end;
+      end;
+      stagn "li" begin
+        stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
+            begin
+          Wserver.wprint "%s + %s" (transl conf "short display")
+            (transl conf "cancel GeneWeb links");
+        end;
+      end;
+    end;
+  }
+  else ();
+  trailer conf;
+};
+
+value print_alphabetic_all conf base is_surnames ini list len = do {
+  let title _ = print_title conf base is_surnames ini len in
+  let mode = if is_surnames then "N" else "P" in
+  header conf title;
+  tag "p" begin
+    List.iter
+      (fun (ini_k, _) ->
+         let ini = capitalize_if_not_utf8 ini_k in
+         stagn "a" "href=\"#%s\"" ini begin
+           Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
+         end)
+    list;
+  end;
+  tag "ul" begin
+    List.iter
+      (fun (ini_k, l) ->
+         let ini = capitalize_if_not_utf8 ini_k in
+         tag "li" begin
+           stagn "a" "id=\"%s\"" ini_k begin
+             Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
+           end;
+           tag "ul" begin
+             List.iter
+               (fun (s, cnt) ->
+                  stagn "li" begin
+                    let href =
+                      "m=" ^ mode ^ ";v=" ^
+                      code_varenv (lower_if_not_utf8 s) ^ ";t=A"
+                    in
+                    wprint_geneweb_link conf href
+                      (alphab_string conf base is_surnames s);
+                    Wserver.wprint " (%d)" cnt;
+                  end)
+               l;
+           end;
+         end)
+      list;
+  end;
+  trailer conf;
+};
+
+value print_alphabetic_small conf base is_surnames ini list len = do {
+  let title _ = print_title conf base is_surnames ini len in
+  let mode = if is_surnames then "N" else "P" in
+  header conf title;
+  if list = [] then ()
+  else
+    tag "ul" begin
       List.iter
-        (fun (ini_k, _) ->
-           stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
-             (Util.code_varenv ini_k)
-           begin
-             Wserver.wprint "%s" (tr '_' "&nbsp;" (displayify ini_k));
+        (fun (_, s, cnt) ->
+           stagn "li" begin
+             stag "a" "href=\"%sm=%s;v=%s;t=A\"" (commd conf) mode
+               (code_varenv (lower_if_not_utf8 s))
+             begin
+               Wserver.wprint "%s" (alphab_string conf base is_surnames s);
+             end;
+             Wserver.wprint " (%d)" cnt;
            end)
         list;
     end;
-    if len <= default_max_cnt && not too_big then do {
-      stagn "p" begin
-        Wserver.wprint "%s:" (capitale (transl conf "the whole list"));
-      end;
-      tag "ul" begin
-        stagn "li" begin
-          stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
-            Wserver.wprint "%s" (transl conf "long display");
-          end;
-        end;
-        stagn "li" begin
-          stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
-            Wserver.wprint "%s" (transl conf "short display");
-          end;
-        end;
-        stagn "li" begin
-          stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
-              begin
-            Wserver.wprint "%s + %s" (transl conf "short display")
-              (transl conf "cancel GeneWeb links");
-          end;
-        end;
-      end;
-    }
-    else ();
-    trailer conf;
-  }
-;
+  trailer conf;
+};
 
-value print_alphabetic_all conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
+value print_frequency_any conf base is_surnames list len = do {
+  let title _ = print_title conf base is_surnames "" len in
   let mode = if is_surnames then "N" else "P" in
-  do {
-    header conf title;
-    tag "p" begin
-      List.iter
-        (fun (ini_k, _) ->
-           let ini = capitalize_if_not_utf8 ini_k in
-           stagn "a" "href=\"#%s\"" ini begin
-             Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
-           end)
-      list;
-    end;
-    tag "ul" begin
-      List.iter
-        (fun (ini_k, l) ->
-           let ini = capitalize_if_not_utf8 ini_k in
+  let n = ref 0 in
+  header conf title;
+  tag "ul" begin
+    List.iter
+      (fun (cnt, l) ->
+         if n.val > default_max_cnt then ()
+         else
            tag "li" begin
-             stagn "a" "id=\"%s\"" ini_k begin
-               Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
-             end;
+             Wserver.wprint "%d\n" cnt;
              tag "ul" begin
                List.iter
-                 (fun (s, cnt) ->
+                 (fun s ->
                     stagn "li" begin
-                      let href =
-                        "m=" ^ mode ^ ";v=" ^
-                        code_varenv (lower_if_not_utf8 s) ^ ";t=A"
-                      in
-                      wprint_geneweb_link conf href
-                        (alphab_string conf base is_surnames s);
-                      Wserver.wprint " (%d)" cnt;
+                      stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+                          (code_varenv (Name.lower s)) begin
+                        Wserver.wprint "%s"
+                          (alphab_string conf base is_surnames s);
+                      end;
+                      incr n;
                     end)
                  l;
              end;
            end)
-        list;
-    end;
-    trailer conf;
-  }
-;
-
-value print_alphabetic_small conf base is_surnames ini list len =
-  let title _ = print_title conf base is_surnames ini len in
-  let mode = if is_surnames then "N" else "P" in
-  do {
-    header conf title;
-    if list = [] then ()
-    else
-      tag "ul" begin
-        List.iter
-          (fun (_, s, cnt) ->
-             stagn "li" begin
-               stag "a" "href=\"%sm=%s;v=%s;t=A\"" (commd conf) mode
-                 (code_varenv (lower_if_not_utf8 s))
-               begin
-                 Wserver.wprint "%s" (alphab_string conf base is_surnames s);
-               end;
-               Wserver.wprint " (%d)" cnt;
-             end)
-          list;
-      end;
-    trailer conf;
-  }
-;
-
-value print_frequency_any conf base is_surnames list len =
-  let title _ = print_title conf base is_surnames "" len in
-  let mode = if is_surnames then "N" else "P" in
-  let n = ref 0 in
-  do {
-    header conf title;
-    tag "ul" begin
-      List.iter
-        (fun (cnt, l) ->
-           if n.val > default_max_cnt then ()
-           else
-             tag "li" begin
-               Wserver.wprint "%d\n" cnt;
-               tag "ul" begin
-                 List.iter
-                   (fun s ->
-                      stagn "li" begin
-                        stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
-                            (code_varenv (Name.lower s)) begin
-                          Wserver.wprint "%s"
-                            (alphab_string conf base is_surnames s);
-                        end;
-                        incr n;
-                      end)
-                   l;
-               end;
-             end)
-        list;
-    end;
-    trailer conf;
-  }
-;
+      list;
+  end;
+  trailer conf;
+};
 
 (* selection *)
 
@@ -431,55 +420,52 @@ value print_alphabetic conf base is_surnames =
 
 (* short print *)
 
-value print_alphabetic_short conf base is_surnames ini list len =
+value print_alphabetic_short conf base is_surnames ini list len = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   let need_ref = len >= 250 in
-  do {
-    header conf title;
-    if need_ref then
-      tag "p" begin
-        List.iter
-          (fun (ini_k, _) ->
-             let ini = capitalize_if_not_utf8 ini_k in
-             stagn "a" "href=\"#%s\"" ini begin
-               Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
-             end)
-        list;
-      end
-    else ();
-    List.iter
-      (fun (ini_k, l) ->
-         let ini = capitalize_if_not_utf8 ini_k in
-         tag "p" begin
-           list_iter_first
-             (fun first (s, cnt) ->
-                let href =
-                  if not conf.cancel_links then
-                    " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
-                      code_varenv (lower_if_not_utf8 s) ^ ";t=A\""
-                  else ""
-                in
-                let name =
-                  if first && need_ref then " id=\"" ^ ini ^ "\"" else ""
-                in
-                do {
-                  if not first then Wserver.wprint ",\n" else ();
-                  if href <> "" || name <> "" then
-                    Wserver.wprint "<a%s%s>" href name
-                  else ();
-                  Wserver.wprint "%s" (alphab_string conf base is_surnames s);
-                  if href <> "" || name <> "" then Wserver.wprint "</a>"
-                  else ();
-                  Wserver.wprint " (%d)" cnt;
-                })
-             l;
-           Wserver.wprint "\n";
-         end)
+  header conf title;
+  if need_ref then
+    tag "p" begin
+      List.iter
+        (fun (ini_k, _) ->
+           let ini = capitalize_if_not_utf8 ini_k in
+           stagn "a" "href=\"#%s\"" ini begin
+             Wserver.wprint "%s" (Mutil.tr '_' ' ' ini);
+           end)
       list;
-    trailer conf;
-  }
-;
+    end
+  else ();
+  List.iter
+    (fun (ini_k, l) ->
+       let ini = capitalize_if_not_utf8 ini_k in
+       tag "p" begin
+         list_iter_first
+           (fun first (s, cnt) -> do {
+              let href =
+                if not conf.cancel_links then
+                  " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
+                    code_varenv (lower_if_not_utf8 s) ^ ";t=A\""
+                else ""
+              in
+              let name =
+                if first && need_ref then " id=\"" ^ ini ^ "\"" else ""
+              in
+              if not first then Wserver.wprint ",\n" else ();
+              if href <> "" || name <> "" then
+                Wserver.wprint "<a%s%s>" href name
+              else ();
+              Wserver.wprint "%s" (alphab_string conf base is_surnames s);
+              if href <> "" || name <> "" then Wserver.wprint "</a>"
+              else ();
+              Wserver.wprint " (%d)" cnt;
+            })
+           l;
+         Wserver.wprint "\n";
+       end)
+    list;
+  trailer conf;
+};
 
 value print_short conf base is_surnames =
   let ini =
@@ -487,9 +473,7 @@ value print_short conf base is_surnames =
     [ Some k -> lowercase_if_not_utf8 k
     | _ -> "" ]
   in
-  let _ =
-    if String.length ini < 2 then load_strings_array base else ()
-  in
+  let _ = if String.length ini < 2 then load_strings_array base else () in
   let (list, sorted, len) = select_names conf base is_surnames ini True in
   if len > default_max_cnt then incorrect_request conf
   else
