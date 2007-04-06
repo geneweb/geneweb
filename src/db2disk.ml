@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.18 2007-04-02 19:14:27 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.19 2007-04-06 09:51:29 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -153,7 +153,7 @@ type string_person_index2 =
 ;
 
 value start_with s p =
-  String.length p < String.length s &&
+  String.length p <= String.length s &&
   String.sub s 0 (String.length p) = p
 ;
 
