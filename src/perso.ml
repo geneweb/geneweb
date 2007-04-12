@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.76 2007-04-01 10:05:51 ddr Exp $ *)
+(* $Id: perso.ml,v 5.77 2007-04-12 13:14:12 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2104,16 +2104,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       if p_auth then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = sou base (get_notes p) in
-        let s =
-          let lines = Wiki.html_of_tlsw conf s in
-          let wi =
-            {Wiki.wi_mode = "NOTES";
-             Wiki.wi_file_path = Notes.file_path conf base;
-             Wiki.wi_person_exists = person_exists conf base}
-          in
-          Wiki.syntax_links conf wi (String.concat "\n" lines)
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES";
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base}
         in
-        string_with_macros conf env s
+        Wiki.syntax_links conf wi (String.concat "\n" lines)
       else ""
   | "occ" -> if p_auth then string_of_int (get_occ p) else ""
   | "occupation" ->
