@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.85 2007-04-17 09:22:25 ddr Exp $
+# $Id: lex_utf8.txt,v 5.86 2007-04-23 08:25:32 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -211,6 +211,7 @@ eo: %s aliro ne estas ebla por la paĝo
 et: %s: ligipääs sellele lehele on keelatud
 fr: accès %s annulé pour cette page
 nl: toegang tot %s is afgebroken
+no: %s adgang til siden er sperret
 pl: dostęp %s anulowany dla tej strony
 pt: acesso %s cancelado para aquela página
 ro: %s acces anulat la această pagină
@@ -2001,6 +2002,7 @@ et: keskmine eluiga
 fr: âge moyen de décès
 it: età media di morte
 nl: gemiddelde leeftijd bij overlijden
+no: gennemsnitlig alder ved død
 pl: średni wiek śmierci
 pt: idade média ao morrer
 ro: virsta media la deces
@@ -2813,6 +2815,7 @@ fi: yhteyksien määrä
 fr: connexions
 it: connessioni
 nl: connecties
+no: forbindelser
 pl: połączenie
 pt: conexões
 ro: conexiuni
@@ -2884,6 +2887,7 @@ et: jätkub
 fr: suite
 it: continua
 nl: vervolgd
+no: fortsatt
 pl: ciąg dalszy
 pt: continuação
 ro: continuare
@@ -3255,6 +3259,7 @@ et: logi välja
 fr: déconnecter
 it: disconnettersi
 nl: ontkoppelen
+no: avbryt
 pl: rozłącz
 pt: desconectar
 ro: deconectare
@@ -3958,6 +3963,7 @@ et: sorteerimaks nimekirja viimase muudatuse tegemise aja järgi
 fr: pour la liste par date de dernière modification
 it: per la lista ordinata secondo la data dell'ultima modifica
 nl: voor de lijst, gesorteerd op datum van de laatste wijziging
+no: for en liste sortert etter siste endringsdato
 pl: aby oglądać listę według daty ostatniej modyfikacji
 pt: para a lista ordenada por data da última modificação
 ro: pentru listă, după data ultimei modificări
@@ -6391,7 +6397,8 @@ et: elavaid inimesi:
 fr: nombre de personnes vivantes :
 it: numero di persone viventi:
 nl: aantal personen in leven:
-pl: liczba osób żyjących
+no: antall nålevende personer:
+pl: liczba osób żyjących:
 pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
 sl: število živih oseb
@@ -6901,6 +6908,7 @@ et: rahvastikupüramiid
 fr: pyramide des âges
 it: piramide della popolazione
 nl: bevolkingspiramide
+no: befolkningspyramide
 pl: piramida wieku
 pt: pirâmide populacional
 ro: piramida demografică
@@ -6916,6 +6924,7 @@ et: võimalikud duplikaadid
 fr: doublons éventuels
 it: possibile doppione
 nl: mogelijke dubbele vermeldingen
+no: mulig dublett
 pl: możliwe duplikaty
 pt: eventual duplicidade
 ro: posibile dublete
@@ -7687,6 +7696,7 @@ et: alates viimasest klõpsust
 fr: depuis le dernier clic
 it: dall'ultimo click
 nl: sinds de laatste klik
+no: siden siste klikk
 pl: od ostatniego kliknięcia
 pt: desde o último clique
 ro: de la ultimul click
