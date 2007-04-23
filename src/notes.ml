@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.30 2007-03-31 08:21:10 ddr Exp $ *)
+(* $Id: notes.ml,v 5.31 2007-04-23 00:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -95,7 +95,8 @@ value print_whole_notes conf base fnotes title s ho = do {
   let s =
     let wi =
       {Wiki.wi_mode = "NOTES"; Wiki.wi_file_path = file_path;
-       Wiki.wi_person_exists = person_exists conf base}
+       Wiki.wi_person_exists = person_exists conf base;
+       Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
@@ -130,7 +131,8 @@ value print_notes_part conf base fnotes title s cnt0 =
     let mode = "NOTES" in
     let wi =
       {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path conf base;
-       Wiki.wi_person_exists = person_exists conf base}
+       Wiki.wi_person_exists = person_exists conf base;
+       Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
     trailer conf;
@@ -414,7 +416,8 @@ value print_mod_ok conf base =
   let file_path = file_path conf base in
   let wi =
     {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
-     Wiki.wi_person_exists = person_exists conf base}
+     Wiki.wi_person_exists = person_exists conf base;
+     Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
   Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
     True

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.26 2007-04-04 02:17:36 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.27 2007-04-23 00:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -94,7 +94,8 @@ value str_start_with str i x =
 type wiki_info =
   { wi_mode : string;
     wi_file_path : string -> string;
-    wi_person_exists : (string * string * int) -> bool }
+    wi_person_exists : (string * string * int) -> bool;
+    wi_always_show_link : bool }
 ;
 
 value syntax_links conf wi s =
@@ -183,6 +184,10 @@ use of database forum by ill-intentioned people to communicate)...
           let t =
             if wi.wi_person_exists (fn, sn, oc) then
               sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+                pos (commd conf) (code_varenv fn) (code_varenv sn)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
+            else if wi.wi_always_show_link then
+              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\" style=\"color:red\">%s</a>"
                 pos (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
             else
