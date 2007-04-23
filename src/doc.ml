@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.6 2007-03-30 21:08:58 ddr Exp $ *)
+(* $Id: doc.ml,v 5.7 2007-04-23 00:39:40 ddr Exp $ *)
 
 open Config;
 
@@ -202,7 +202,8 @@ value print_whole_wdoc conf fdoc title s =
     let wi =
       {Wiki.wi_mode = "WDOC";
        Wiki.wi_file_path = wdoc_file_path conf.lang;
-       Wiki.wi_person_exists _ = True}
+       Wiki.wi_person_exists _ = True;
+       Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     Wiki.html_with_summary_of_tlsw conf wi edit_opt s
   in
@@ -240,7 +241,8 @@ value print_part_wdoc conf fdoc title s cnt0 =
     let file_path = wdoc_file_path conf.lang in
     let wi =
       {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
-       Wiki.wi_person_exists _ = True}
+       Wiki.wi_person_exists _ = True;
+       Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
     Wiki.print_sub_part conf wi conf.wizard mode fdoc cnt0 lines;
     Hutil.trailer conf;
@@ -365,7 +367,8 @@ value print_mod_wdoc_ok conf base =
   let file_path = wdoc_file_path conf.lang in
   let wi =
     {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
-     Wiki.wi_person_exists _ = True}
+     Wiki.wi_person_exists _ = True;
+     Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
   Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
     True

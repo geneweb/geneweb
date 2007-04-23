@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: wiki.mli,v 5.5 2007-03-30 21:08:58 ddr Exp $ *)
+(* $Id: wiki.mli,v 5.6 2007-04-23 00:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -7,7 +7,8 @@ open Config;
 type wiki_info =
   { wi_mode : string;
     wi_file_path : string -> string;
-    wi_person_exists : (string * string * int) -> bool }
+    wi_person_exists : (string * string * int) -> bool;
+    wi_always_show_link : bool }
 ;
 
 value syntax_links : config -> wiki_info -> string -> string;

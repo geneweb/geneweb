@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.77 2007-04-12 13:14:12 ddr Exp $ *)
+(* $Id: perso.ml,v 5.78 2007-04-23 00:39:40 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1200,7 +1200,8 @@ and eval_simple_str_var conf base env (_, p_auth) =
               let wi =
                 {Wiki.wi_mode = "NOTES";
                  Wiki.wi_file_path = Notes.file_path conf base;
-                 Wiki.wi_person_exists = person_exists conf base}
+                 Wiki.wi_person_exists = person_exists conf base;
+                 Wiki.wi_always_show_link = conf.wizard || conf.friend}
               in
               Wiki.syntax_links conf wi (sou base (get_comment fam))
             in
@@ -2109,7 +2110,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         let wi =
           {Wiki.wi_mode = "NOTES";
            Wiki.wi_file_path = Notes.file_path conf base;
-           Wiki.wi_person_exists = person_exists conf base}
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         Wiki.syntax_links conf wi (String.concat "\n" lines)
       else ""
@@ -2189,7 +2191,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
             let wi =
               {Wiki.wi_mode = "NOTES";
                Wiki.wi_file_path = Notes.file_path conf base;
-               Wiki.wi_person_exists = person_exists conf base}
+               Wiki.wi_person_exists = person_exists conf base;
+               Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
             Wiki.syntax_links conf wi s
           in
