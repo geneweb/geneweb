@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.86 2007-04-23 08:25:32 ddr Exp $
+# $Id: lex_utf8.txt,v 5.87 2007-04-24 07:07:58 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -210,6 +210,7 @@ en: %s access cancelled for that page
 eo: %s aliro ne estas ebla por la paĝo
 et: %s: ligipääs sellele lehele on keelatud
 fr: accès %s annulé pour cette page
+lv: %s piekļuve šai lapai ir pārtraukta
 nl: toegang tot %s is afgebroken
 no: %s adgang til siden er sperret
 pl: dostęp %s anulowany dla tej strony
@@ -2001,6 +2002,7 @@ es: edad promedio de deceso
 et: keskmine eluiga
 fr: âge moyen de décès
 it: età media di morte
+lv: vidējais dzīves ilgums
 nl: gemiddelde leeftijd bij overlijden
 no: gennemsnitlig alder ved død
 pl: średni wiek śmierci
@@ -2814,6 +2816,7 @@ et: ühendused
 fi: yhteyksien määrä
 fr: connexions
 it: connessioni
+lv: radniecība
 nl: connecties
 no: forbindelser
 pl: połączenie
@@ -2886,6 +2889,7 @@ es: continúa
 et: jätkub
 fr: suite
 it: continua
+lv: nepārtraukts
 nl: vervolgd
 no: fortsatt
 pl: ciąg dalszy
@@ -3258,6 +3262,7 @@ es: desconectar
 et: logi välja
 fr: déconnecter
 it: disconnettersi
+lv: atvienot
 nl: ontkoppelen
 no: avbryt
 pl: rozłącz
@@ -3962,6 +3967,7 @@ es: para la lista ordenada por fecha de la última modificación
 et: sorteerimaks nimekirja viimase muudatuse tegemise aja järgi
 fr: pour la liste par date de dernière modification
 it: per la lista ordinata secondo la data dell'ultima modifica
+lv: sarakstam, kas sakārtots pēc pēdējo izmaiņu datumiem
 nl: voor de lijst, gesorteerd op datum van de laatste wijziging
 no: for en liste sortert etter siste endringsdato
 pl: aby oglądać listę według daty ostatniej modyfikacji
@@ -5154,6 +5160,7 @@ et: seotud leheküljed
 fi: linkkisivuja
 fr: pages liées
 it: pagine collegate
+lv: saistītās lapas
 nl: verbonden pagina's
 no: linkede sider
 pl: linki
@@ -5638,6 +5645,7 @@ et: mitmesugused märkused
 fi: sekalaisia huomautuksia
 fr: notes diverses
 it: note varie
+lv: dažādas piezīmes
 nl: diverse aantekeningen
 no: diverse notater
 pl: pozostałe uwagi
@@ -6396,6 +6404,7 @@ es: número de personas vivas:
 et: elavaid inimesi:
 fr: nombre de personnes vivantes :
 it: numero di persone viventi:
+lv: dzīvo personu skaits:
 nl: aantal personen in leven:
 no: antall nålevende personer:
 pl: liczba osób żyjących:
@@ -6907,6 +6916,7 @@ es: pirámide de población
 et: rahvastikupüramiid
 fr: pyramide des âges
 it: piramide della popolazione
+lv: paaudžu piramīda
 nl: bevolkingspiramide
 no: befolkningspyramide
 pl: piramida wieku
@@ -6923,6 +6933,7 @@ eo: ebla duobligo
 et: võimalikud duplikaadid
 fr: doublons éventuels
 it: possibile doppione
+lv: iespējama dublēšanās
 nl: mogelijke dubbele vermeldingen
 no: mulig dublett
 pl: możliwe duplikaty
@@ -7350,6 +7361,7 @@ et: otsi/tõstutundlik
 fi: haku/tunnistaa merkkikoon
 fr: rechercher/sensible à la casse
 it: ricerca/sensibile a maiuscole e minuscole
+lv: meklēšana/reģistrjūtīga
 nl: zoeken/hoofdlettergevoelig
 no: søk/skiller mellom store og små bokstaver
 pl: szukaj/wielkość liter ma znaczenie
@@ -7695,6 +7707,7 @@ es: desde el último click
 et: alates viimasest klõpsust
 fr: depuis le dernier clic
 it: dall'ultimo click
+lv: kopš pēdējā klikšķa
 nl: sinds de laatste klik
 no: siden siste klikk
 pl: od ostatniego kliknięcia
@@ -8754,6 +8767,7 @@ et: see foorum on modereeritav
 fi: tämä foorumi on valvottu
 fr: ce forum est modéré
 it: questo forum è moderato
+lv: šis forums tiek kontrolēts
 nl: dit forum wordt gemodereerd
 no: dette forumet er endret
 pl: forum jest moderowane
