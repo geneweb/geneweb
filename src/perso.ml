@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.78 2007-04-23 00:39:40 ddr Exp $ *)
+(* $Id: perso.ml,v 5.79 2007-04-25 23:26:17 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2117,7 +2117,18 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       else ""
   | "occ" -> if p_auth then string_of_int (get_occ p) else ""
   | "occupation" ->
-      if p_auth then string_with_macros conf [] (sou base (get_occupation p))
+      if p_auth then
+        let s = sou base (get_occupation p) in
+        let s =
+          let wi =
+            {Wiki.wi_mode = "NOTES";
+             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_person_exists = person_exists conf base;
+             Wiki.wi_always_show_link = conf.wizard || conf.friend}
+          in
+          Wiki.syntax_links conf wi s
+        in
+        string_with_macros conf [] s
       else ""
   | "on_baptism_date" ->
       match (p_auth, Adef.od_of_codate (get_baptism p)) with
