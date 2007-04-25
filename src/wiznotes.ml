@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.51 2007-04-23 00:39:40 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.52 2007-04-25 23:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -387,6 +387,7 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES";
+             Wiki.wi_cancel_links = conf.cancel_links;
              Wiki.wi_file_path = Notes.file_path conf base;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -431,7 +432,8 @@ value print_part_wiznote conf base wz s cnt0 =
     let file_path = Notes.file_path conf base in
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
     let wi =
-      {Wiki.wi_mode = "NOTES"; Wiki.wi_file_path = file_path;
+      {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+       Wiki.wi_file_path = file_path;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
@@ -560,7 +562,8 @@ value print_mod_ok conf base =
     let string_filter = string_with_macros conf [] in
     let file_path = Notes.file_path conf base in
     let wi =
-      {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
+      {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+       Wiki.wi_file_path = file_path;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in

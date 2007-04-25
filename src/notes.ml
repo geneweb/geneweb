@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.31 2007-04-23 00:39:40 ddr Exp $ *)
+(* $Id: notes.ml,v 5.32 2007-04-25 23:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -95,6 +95,7 @@ value print_whole_notes conf base fnotes title s ho = do {
   let s =
     let wi =
       {Wiki.wi_mode = "NOTES"; Wiki.wi_file_path = file_path;
+       Wiki.wi_cancel_links = conf.cancel_links;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
@@ -130,7 +131,8 @@ value print_notes_part conf base fnotes title s cnt0 =
     let lines = Wiki.extract_sub_part s cnt0 in
     let mode = "NOTES" in
     let wi =
-      {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path conf base;
+      {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+       Wiki.wi_file_path = file_path conf base;
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
@@ -415,7 +417,8 @@ value print_mod_ok conf base =
   let string_filter = string_with_macros conf [] in
   let file_path = file_path conf base in
   let wi =
-    {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
+    {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+     Wiki.wi_file_path = file_path;
      Wiki.wi_person_exists = person_exists conf base;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
