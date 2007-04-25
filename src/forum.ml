@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: forum.ml,v 5.19 2007-04-23 00:39:40 ddr Exp $ *)
+(* $Id: forum.ml,v 5.20 2007-04-25 23:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -518,7 +518,7 @@ and eval_message_text_var conf base str so =
       let s = String.concat "\n" lines in
       let s =
         let wi =
-          {Wiki.wi_mode = "NOTES";
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
            Wiki.wi_file_path = Notes.file_path conf base;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}

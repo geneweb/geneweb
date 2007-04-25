@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: doc.ml,v 5.7 2007-04-23 00:39:40 ddr Exp $ *)
+(* $Id: doc.ml,v 5.8 2007-04-25 23:34:14 ddr Exp $ *)
 
 open Config;
 
@@ -200,7 +200,7 @@ value print_whole_wdoc conf fdoc title s =
   let s =
     let edit_opt = Some (conf.wizard, "WDOC", fdoc) in
     let wi =
-      {Wiki.wi_mode = "WDOC";
+      {Wiki.wi_mode = "WDOC"; Wiki.wi_cancel_links = conf.cancel_links;
        Wiki.wi_file_path = wdoc_file_path conf.lang;
        Wiki.wi_person_exists _ = True;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -240,7 +240,8 @@ value print_part_wdoc conf fdoc title s cnt0 =
     let mode = "WDOC" in
     let file_path = wdoc_file_path conf.lang in
     let wi =
-      {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
+      {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+       Wiki.wi_file_path = file_path;
        Wiki.wi_person_exists _ = True;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
@@ -366,8 +367,8 @@ value print_mod_wdoc_ok conf base =
   let string_filter = Util.filter_html_tags in
   let file_path = wdoc_file_path conf.lang in
   let wi =
-    {Wiki.wi_mode = mode; Wiki.wi_file_path = file_path;
-     Wiki.wi_person_exists _ = True;
+    {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+     Wiki.wi_file_path = file_path; Wiki.wi_person_exists _ = True;
      Wiki.wi_always_show_link = conf.wizard || conf.friend}
   in
   Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter

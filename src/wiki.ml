@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.27 2007-04-23 00:39:40 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.28 2007-04-25 23:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -94,6 +94,7 @@ value str_start_with str i x =
 type wiki_info =
   { wi_mode : string;
     wi_file_path : string -> string;
+    wi_cancel_links : bool;
     wi_person_exists : (string * string * int) -> bool;
     wi_always_show_link : bool }
 ;
@@ -176,20 +177,24 @@ use of database forum by ill-intentioned people to communicate)...
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =
-            sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
-              (commd conf) wi.wi_mode fname anchor c text
+            if wi.wi_cancel_links then text
+            else
+              sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
+                (commd conf) wi.wi_mode fname anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
-            if wi.wi_person_exists (fn, sn, oc) then
+            if wi.wi_cancel_links then name
+            else if wi.wi_person_exists (fn, sn, oc) then
               sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
                 pos (commd conf) (code_varenv fn) (code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
             else if wi.wi_always_show_link then
-              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\" style=\"color:red\">%s</a>"
+              let s = " style=\"color:red\"" in
+              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
                 pos (commd conf) (code_varenv fn) (code_varenv sn)
-                (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc) s name
             else
               sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
                 name
@@ -197,8 +202,11 @@ use of database forum by ill-intentioned people to communicate)...
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard j wiz name ->
           let t =
-            sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
-              (if name <> "" then name else wiz)
+            let s = if name <> "" then name else wiz in
+            if wi.wi_cancel_links then s
+            else
+              sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
+                s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone ->

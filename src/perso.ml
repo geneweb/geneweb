@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.79 2007-04-25 23:26:17 ddr Exp $ *)
+(* $Id: perso.ml,v 5.80 2007-04-25 23:34:14 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1199,6 +1199,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
             let s =
               let wi =
                 {Wiki.wi_mode = "NOTES";
+                 Wiki.wi_cancel_links = conf.cancel_links;
                  Wiki.wi_file_path = Notes.file_path conf base;
                  Wiki.wi_person_exists = person_exists conf base;
                  Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -2108,7 +2109,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         let s = string_with_macros conf env s in
         let lines = Wiki.html_of_tlsw conf s in
         let wi =
-          {Wiki.wi_mode = "NOTES";
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
            Wiki.wi_file_path = Notes.file_path conf base;
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -2121,7 +2122,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         let s = sou base (get_occupation p) in
         let s =
           let wi =
-            {Wiki.wi_mode = "NOTES";
+            {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
              Wiki.wi_file_path = Notes.file_path conf base;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
@@ -2201,6 +2202,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           let s =
             let wi =
               {Wiki.wi_mode = "NOTES";
+               Wiki.wi_cancel_links = conf.cancel_links;
                Wiki.wi_file_path = Notes.file_path conf base;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
