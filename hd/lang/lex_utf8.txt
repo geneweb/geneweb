@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.88 2007-04-24 07:17:16 ddr Exp $
+# $Id: lex_utf8.txt,v 5.89 2007-04-29 22:29:00 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -2805,6 +2805,10 @@ ro: comentar
 ru: комментарий
 sl: komentar
 sv: kommentar
+
+    compiled
+en: compiled
+fr: compilé
 
     connections
 bg: потребителски връзки
