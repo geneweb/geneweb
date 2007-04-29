@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.42 2007-04-29 22:29:01 ddr Exp $
+# $Id: Makefile,v 5.43 2007-04-29 22:48:08 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -60,7 +60,7 @@ compilation.ml: always
 	> compilation.ml
 	echo "open Def;" >> compilation.ml
 	echo "value (wd, d, h) = ($$(date "+%u, {day=%d;month=%m;year=%Y;prec=Sure;delta=0}, \"%T %Z\""));" >> compilation.ml
-	echo "value ct conf = Printf.sprintf \" (%s: %s %s)\" (Util.transl conf \"compiled\") (Util.transl_decline conf \"on (weekday day month year)\" (Util.transl_nth conf \"(week day)\" wd ^ \" \" ^ Date.code_dmy conf d)) h;" >> compilation.ml
+	echo "value ct conf = Printf.sprintf \" (%s %4d-%02d-%02d %s)\" (Util.transl conf \"version\") d.year d.month d.day h;" >> compilation.ml
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
 
 clean::
