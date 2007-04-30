@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.120 2007-04-03 12:21:14 ddr Exp $ *)
+(* $Id: util.ml,v 5.121 2007-04-30 22:42:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2459,14 +2459,14 @@ value dispatch_in_columns ncol list order =
          [(ref kind, ord, elem) :: rlist])
       [] list
   in
-  let (ini_list, len) =
+  let (ini_list, ini_len) =
     List.fold_left
       (fun (list, len) ((kind, _, _) as elem) ->
          ([elem :: list], len + kind_size kind.val))
       ([], 0) rlist
   in
   let len_list =
-    loop [] 0 1 0 len ini_list
+    loop [] 0 1 0 ini_len ini_list
     where rec loop rlen_list cnt col accu len list =
       if col > ncol then List.rev rlen_list
       else
@@ -2478,9 +2478,9 @@ value dispatch_in_columns ncol list order =
         let accu = accu + ncol * kind_size kind.val in
         let cnt = cnt + 1 in
         if accu > len && not is_last && kind.val = Elem then do {
-          (* restart from zero *)
+          (* put a new size and restart from zero *)
           kind.val := ContElem;
-          loop [] 0 1 0 len ini_list
+          loop [] 0 1 0 (len + kind_size ContElem - 1) ini_list
         }
         else
           let (rlen_list, cnt, col, accu) =
