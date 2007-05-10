@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.91 2007-05-10 10:19:56 ddr Exp $
+# $Id: lex_utf8.txt,v 5.92 2007-05-10 10:36:59 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -6952,7 +6952,7 @@ no: mulig dublett
 pl: możliwe duplikaty
 pt: eventual duplicidade
 ro: posibile dublete
-sv: eventuellt dublett
+sv: eventuellt dubblett
 
     possibly (date)
 af: miskien
