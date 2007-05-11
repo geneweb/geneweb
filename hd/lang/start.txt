@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 5.4 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: start.txt,v 5.5 2007-05-11 10:02:15 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- This file is kept by compatibility to allow displaying databases
        created before version 5.00. -->
@@ -38,6 +38,11 @@ sv: Genealogi
   <link rel="shortcut icon" href="%o/gwlogo.png"%/>
   <style type="text/css"><!--
     span.highlight { color: %i; font-weight: bold }
+    #lang .title { display: none }
+    #lang .content { width: 100%% }
+    #lang ul { margin: 0 }
+    #lang li { display: inline }
+    #lang li span { display: none }
   --></style>
 %j</head>
 <body%b>
