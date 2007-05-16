@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.28 2007-04-25 23:34:14 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.29 2007-05-16 11:33:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -161,7 +161,6 @@ use of database forum by ill-intentioned people to communicate)...
     then
       let s = if quot_lev = 0 then "<i>" else "</i>" in
       loop (1 - quot_lev) pos (i + 2) (Buff.mstore len s)
-
     else
       match NotesLinks.misc_notes_link s i with
       [ NotesLinks.WLpage j fpath1 fname1 anchor text ->
@@ -281,11 +280,32 @@ value sections_nums_of_tlsw_lines lines =
   List.rev rev_sections_nums
 ;
 
+value remove_links s =
+  loop 0 0 where rec loop len i =
+    if i = String.length s then Buff.get len
+    else
+      let (len, i) =
+        match NotesLinks.misc_notes_link s i with
+        [ NotesLinks.WLpage j _ _ _ text -> (Buff.mstore len text, j)
+        | NotesLinks.WLperson j k name text ->
+            let text =
+              match text with
+              [ Some text -> if text = "" then name else text
+              | None -> name ]
+            in
+            (Buff.mstore len text, j)
+        | NotesLinks.WLwizard j _ text -> (Buff.mstore len text, j)
+        | NotesLinks.WLnone -> (Buff.store len s.[i], i + 1) ]
+      in
+      loop len i
+;
+
 value summary_of_tlsw_lines conf short lines =
   let sections_nums = sections_nums_of_tlsw_lines lines in
   let (rev_summary, lev, cnt, _) =
     List.fold_left
       (fun (summary, prev_lev, cnt, sections_nums) s ->
+        let s = remove_links s in
         let len = String.length s in
         if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
           let slev = section_level s len in
