@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.70 2007-03-06 21:30:01 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.71 2007-05-23 09:06:28 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -752,8 +752,8 @@ value print_mod o_conf base =
     patch_person base p.key_index p;
     let s =
       let sl =
-        [p.notes; p.birth_src; p.baptism_src; p.death_src; p.burial_src;
-         p.psources]
+        [p.notes; p.occupation; p.birth_src; p.baptism_src; p.death_src;
+         p.burial_src; p.psources]
       in
       String.concat " " (List.map (sou base) sl)
     in

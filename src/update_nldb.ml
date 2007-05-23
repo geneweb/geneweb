@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: update_nldb.ml,v 5.21 2007-03-30 19:38:34 ddr Exp $ *)
+(* $Id: update_nldb.ml,v 5.22 2007-05-23 09:06:28 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -139,8 +139,8 @@ value compute base bdir =
       let p = poi base (Adef.iper_of_int i) in
       let s =
         let sl =
-          [get_notes; get_birth_src; get_baptism_src; get_death_src;
-           get_burial_src; get_psources]
+          [get_notes; get_occupation; get_birth_src; get_baptism_src;
+           get_death_src; get_burial_src; get_psources]
         in
         String.concat " " (List.map (fun f -> sou base (f p)) sl)
       in
