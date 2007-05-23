@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.50 2007-03-05 05:55:45 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.51 2007-05-23 09:06:28 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -384,8 +384,8 @@ value effective_merge_ind conf base p1 p2 =
     patch_person base p2.key_index p2;
     let s =
       let sl =
-        [p1.notes; p1.birth_src; p1.baptism_src; p1.death_src; p1.burial_src;
-         p1.psources]
+        [p1.notes; p1.occupation; p1.birth_src; p1.baptism_src; p1.death_src;
+         p1.burial_src; p1.psources]
       in
       String.concat " " (List.map (sou base) sl)
     in
