@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 5.4 2007-01-19 01:53:18 ddr Exp $ *)
+(* $Id: wserver.mli,v 5.5 2007-05-24 15:03:22 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -58,6 +58,8 @@ value extract_param : string -> char -> list string -> string;
        Answers the empty string if the parameter is not found. *)
 
 value get_request_and_content : Stream.t char -> (list string * string);
+
+value wsocket : unit -> Unix.file_descr;
 
 value sock_in : ref string;
 value sock_out : ref string;

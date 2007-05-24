@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.12 2007-01-19 01:53:18 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.13 2007-05-24 15:03:22 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -7,6 +7,9 @@ value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
 value stop_server = ref "STOP_SERVER";
 value noproc = ref False;
+
+value wserver_sock = ref Unix.stdout;
+value wsocket () = wserver_sock.val;
 
 value wserver_oc = ref stdout;
 
@@ -495,6 +498,7 @@ value accept_connection tmout max_clients callback s =
         }
       in
       do {
+        wserver_sock.val := t;
         wserver_oc.val := Unix.out_channel_of_descr t;
         treat_connection tmout callback addr t;
         cleanup ();
@@ -506,6 +510,7 @@ value accept_connection tmout max_clients callback s =
             try do {
               if max_clients = None && Unix.fork () <> 0 then exit 0 else ();
               Unix.close s;
+              wserver_sock.val := t;
               wserver_oc.val := Unix.out_channel_of_descr t;
 (*  
    j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
