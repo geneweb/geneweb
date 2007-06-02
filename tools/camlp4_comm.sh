@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_comm.sh,v 5.1 2006-09-16 10:08:20 ddr Exp $
+# $Id: camlp4_comm.sh,v 5.2 2007-06-02 19:48:47 ddr Exp $
 
 ARGS1=
 FILE=
@@ -23,5 +23,5 @@ else
 	ARGS2=
 fi
 
-echo $COMM $ARGS2 $ARGS1 $FILE
+echo $COMM $ARGS2 $ARGS1 $FILE 1>&2
 $COMM $ARGS2 $ARGS1 $FILE
