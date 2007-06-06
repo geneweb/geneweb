@@ -1,4 +1,4 @@
-(* $Id: launch.ml,v 1.33 2007-03-14 10:48:15 ddr Exp $ *)
+(* $Id: launch.ml,v 1.34 2007-06-06 15:22:35 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Camltk;
@@ -91,7 +91,7 @@ value read_config_env () =
 value mkdir_p x =
   loop x where rec loop x =
     do  {
-      let y = Filename.dirname x;
+      let y = Filename.dirname x in
       if y <> x && String.length y < String.length x then loop y else ();
       try Unix.mkdir x 0o777 with [ Unix.Unix_error _ _ _ -> () ];
     }

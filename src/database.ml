@@ -1,4 +1,4 @@
-(* $Id: database.ml,v 5.18 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: database.ml,v 5.19 2007-06-06 15:22:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -514,7 +514,7 @@ value make_visible_record_access bname persons =
               }
               else ()
             ELSE () END;
-            let visible = input_value ic;
+            let visible = input_value ic in
             close_in ic;
             visible
           }
@@ -526,7 +526,7 @@ value make_visible_record_access bname persons =
     match visible_ref.val with
     [ Some visible ->
         try do {
-          let oc = Secure.open_out fname;
+          let oc = Secure.open_out fname in
           IFDEF UNIX THEN
             if verbose.val then do {
               Printf.eprintf "*** write restrict file\n";
