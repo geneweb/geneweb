@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.29 2007-05-16 11:33:26 ddr Exp $ *)
+(* $Id: wiki.ml,v 5.30 2007-07-01 07:39:32 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -196,7 +196,7 @@ use of database forum by ill-intentioned people to communicate)...
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) s name
             else
               sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
-                name
+                (if conf.hide_names then "x x" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard j wiz name ->
