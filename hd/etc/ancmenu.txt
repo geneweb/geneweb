@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: ancmenu.txt,v 5.8 2007-02-04 11:50:36 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 5.9 2007-07-05 10:02:10 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -253,16 +253,6 @@
           <label>
             - [*include missing spouses]
             <input type="checkbox" name="ms" value="on"%/>
-          </label>
-          <br%/>
-          -
-          <label>
-            [*after]
-            <input name="after" size="5" maxlength="5"%/>
-          </label>
-          <label>
-            [*before]
-            <input name="before" size="5" maxlength="5"%/>
           </label>
           <br%/>
         </td>
