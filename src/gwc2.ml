@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.57 2007-03-30 18:57:19 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.58 2007-07-05 10:02:10 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -460,9 +460,11 @@ value insert_person1 gen so = do {
       else
         ignore (key_hashtbl_find gen.g_index_of_key k : iper);
       gen.g_error_cnt := gen.g_error_cnt - 1;
-      if gen.g_error_cnt > 0 then
+      if gen.g_error_cnt > 0 then do {
+        eprintf "File \"%s\"\n" gen.g_current_file;
         eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
           so.surname
+      }
       else ();
       flush stderr;
       gen.g_error := True;
