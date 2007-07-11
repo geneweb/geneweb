@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 5.6 2006-12-06 13:52:43 ddr Exp $ *)
+(* $Id: ppdef.ml,v 5.7 2007-07-11 16:15:21 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
@@ -22,7 +22,7 @@ value rec list_remove x =
   | [] -> [] ]
 ;
 
-value defined = ref (IFDEF CAMLP4S THEN [("CAMLP4S", None)] ELSE [] END);
+value defined = ref (IFDEF CAMLP5 THEN [("CAMLP5", None)] ELSE [] END);
 
 value is_defined i = List.mem_assoc i defined.val;
 
@@ -129,7 +129,7 @@ value incorrect_number loc l1 l2 =
           (List.length l2) (List.length l1)))
 ;
 
-value first_pos = IFDEF CAMLP4S THEN Stdpp.first_pos ELSE fst END;
+value first_pos = IFDEF CAMLP5 THEN Stdpp.first_pos ELSE fst END;
 
 value define eo x =
   do {

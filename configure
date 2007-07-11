@@ -1,12 +1,17 @@
 #!/bin/sh
 
-if [ "`camlp4 -v 2>&1 | sed -e 's/+.*$//'`" = "Camlp4 version 3.10" ]; then
-  echo
-  echo "Not compatible with this version of camlp4."
-  echo "Please download and install camlp4s."
-  echo 
-  echo "Configuration failed"
-  exit 2
+if ocamlc -v >/dev/null 2>&1; then :
+else
+    echo "You need the command ocamlc accessible in the path!"
+    echo "Configuration script failed!"
+    exit 1
+fi
+
+if camlp5 -v >/dev/null 2>&1; then :
+else
+    echo "You need the command camlp5 accessible in the path!"
+    echo "Configuration script failed!"
+    exit 1
 fi
 
 echo "print_endline Sys.os_type;;" > tools/tmp

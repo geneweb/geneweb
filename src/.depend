@@ -37,8 +37,8 @@ checkItem.cmx: adef.cmx def.cmi gwdb.cmx checkItem.cmi
 checkItem.cmi: adef.cmi def.cmi gwdb.cmi 
 check_base.cmo: check.cmi def.cmi gwdb.cmi secure.cmi 
 check_base.cmx: check.cmx def.cmi gwdb.cmx secure.cmx 
-compilation.cmo: date.cmi def.cmi util.cmi 
-compilation.cmx: date.cmx def.cmi util.cmx 
+compilation.cmo: def.cmi util.cmi 
+compilation.cmx: def.cmi util.cmx 
 config.cmi: def.cmi 
 consang.cmo: adef.cmi def.cmi gwdb.cmi consang.cmi 
 consang.cmx: adef.cmx def.cmi gwdb.cmx consang.cmi 

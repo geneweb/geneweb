@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.0 2005-12-13 11:51:26 ddr Exp $
+# $Id: Makefile,v 5.1 2007-07-11 16:15:21 ddr Exp $
 
 BINDIR=/usr/local/bin
 MANDIR=/usr/local/share/man/man1
@@ -25,17 +25,17 @@ clean:
 .SUFFIXES: .ml .mli .cmo .cmx .cmi
 
 .ml.cmo:
-	camlp4r $< -o $*.ppo
+	camlp5r $< -o $*.ppo
 	$(OCAMLC) $(OCARGS) -c -impl $*.ppo
 	rm -f $*.ppo
 
 .ml.cmx:
-	camlp4r $< -o $*.ppo
+	camlp5r $< -o $*.ppo
 	$(OCAMLOPT) $(OCARGS) -c -impl $*.ppo
 	rm -f $*.ppo
 
 .mli.cmi:
-	camlp4r $< -o $*.ppi
+	camlp5r $< -o $*.ppi
 	$(OCAMLC) $(OCARGS) -c -intf $*.ppi
 	rm -f $*.ppi
 

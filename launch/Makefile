@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2007-01-19 01:53:16 ddr Exp $
+# $Id: Makefile,v 1.5 2007-07-11 16:15:21 ddr Exp $
 # Copyright (c) 2006-2007 INRIA
 
 EXE=.out
@@ -22,6 +22,6 @@ depend:
 
 %.cmo: %.ml
 	@$(TEST_DIR)
-	ocamlc -pp camlp4r $(OCAMLI) -I +labltk -c $<
+	ocamlc -pp camlp5r $(OCAMLI) -I +labltk -c $<
 
 include .depend

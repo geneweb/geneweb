@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 5.4 2006-12-21 15:02:30 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.5 2007-07-11 16:15:21 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 
@@ -68,8 +68,8 @@ and constr_decl (_, _, tl) = list ctyp tl
 and label_decl (_, _, _, t) = ctyp t
 and variant =
   fun
-  [ RfTag _ _ tl -> list ctyp tl
-  | RfInh t -> ctyp t ]
+  [ PvTag _ _ tl -> list ctyp tl
+  | PvInh t -> ctyp t ]
 and ctyp_module =
   fun
   [ TyAcc _ t _ -> ctyp_module t
@@ -159,7 +159,7 @@ and module_type =
   | x -> not_impl "module_type" x ]
 and with_constr =
   fun
-  [ WcTyp _ _ _ t -> ctyp t
+  [ WcTyp _ _ _ _ t -> ctyp t
   | x -> not_impl "with_constr" x ]
 and sig_item =
   fun
@@ -167,7 +167,7 @@ and sig_item =
   | SgExc _ _ tl -> list ctyp tl
   | SgExt _ _ t _ -> ctyp t
   | SgMod _ _ x ->
-      IFDEF CAMLP4S THEN
+      IFDEF CAMLP5 THEN
         list (fun (_, mt) -> module_type mt) x
       ELSE
         module_type x
@@ -195,7 +195,7 @@ and str_item =
   | StExp _ e -> expr e
   | StExt _ _ t _ -> ctyp t
   | StMod _ _ x ->
-      IFDEF CAMLP4S THEN
+      IFDEF CAMLP5 THEN
         list (fun (_, me) -> module_expr me) x
       ELSE
         module_expr x
@@ -206,7 +206,7 @@ and str_item =
   | StUse _ _ _ -> ()
   | StVal _ _ pel -> list let_binding pel
   | x -> not_impl "str_item" x ]
-and type_decl (_, _, t, _) = ctyp t
+and type_decl td = ctyp td.tdDef
 and class_expr =
   fun
   [ CeApp _ ce e -> do { class_expr ce; expr e; }
