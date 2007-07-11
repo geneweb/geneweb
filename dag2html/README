@@ -13,6 +13,8 @@ This is the version 1.02.
 
 To compile, you need the Objective Caml compiler which can be found at:
    http://caml.inria.fr/ocaml/
+and Camlp5 at:
+   http://pauillac.inria.fr/~ddr/camlp5/
 
 COPYRIGHT:
 

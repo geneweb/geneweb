@@ -2,9 +2,11 @@ INSTALLATIONS INSTRUCTIONS IN UNIX or MACOSX MACHINES
 
 For the compilation, you need the Objective Caml compiler installed
 in your computer. The compilation works for several versions of ocaml.
+You also need the preprocessor camlp5.
 
-It is freely distributed at address:
+They freely distributed at address:
      http://caml.inria.fr/ocaml/
+     http://pauillac.inria.fr/~ddr/camlp5/
 
 1- In the top directory, do:
       ./configure
