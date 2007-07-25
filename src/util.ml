@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.123 2007-07-25 15:01:02 ddr Exp $ *)
+(* $Id: util.ml,v 5.124 2007-07-25 19:20:29 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1337,7 +1337,7 @@ value expand_env =
    | _ -> s ]
 ;
 
-value string_with_macros conf env s =
+value string_with_macros_aux conf env s =
   let buff = Buffer.create 1000 in
   loop Out 0 where rec loop tt i =
     if i < String.length s then
@@ -1427,6 +1427,101 @@ value string_with_macros conf env s =
                       loop tt (i + 1)
                     } ] ] ]
     else filter_html_tags (Buffer.contents buff)
+;
+
+type xhtml_tag =
+  [ Btag of string and string
+  | Etag of string
+  | Atag of string ]
+;
+
+value xhtml_tag s i =
+  if s.[i] = '<' then
+    if i = String.length s - 1 then Some (Btag "" "", i + 1)
+    else if s.[i+1] = '!' then None
+    else
+      let k =
+        try String.index_from s i '>' with [ Not_found -> String.length s ]
+      in
+      let j =
+        loop i where rec loop i =
+          if i = k then k
+          else
+            match s.[i] with
+            [ ' ' | '\n' -> i
+            | _ -> loop (i + 1) ]
+      in
+      if i + 1 = String.length s then Some (Atag "br", i + 1)
+      else
+        let next_i = min (k + 1) (String.length s) in
+        if s.[i+1] = '/' then
+          Some (Etag (String.sub s (i + 2) (k - i - 2)), next_i)
+        else if s.[k-1] = '/' then
+          Some (Atag (String.sub s (i + 1) (k - i - 2)), next_i)
+        else
+          let t = String.sub s (i + 1) (j - i - 1) in
+          let a = String.sub s j (k - j) in
+          Some (Btag t a, next_i)
+  else None
+;
+
+value bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s;
+
+value check_xhtml s =
+  let b = Buffer.create (String.length s) in
+  loop [] 0 where rec loop tag_stack i =
+    if i = String.length s then do {
+      List.iter
+        (fun (pos, txt, t) -> do {
+           let s = Buffer.contents b in
+           let s_bef = String.sub s 0 pos in
+           let pos_aft = pos + String.length txt + 2 in
+           let s_aft = String.sub s pos_aft (String.length s - pos_aft) in
+           Buffer.clear b;
+           Buffer.add_string b s_bef;
+           Buffer.add_string b (bad "red" (sprintf "&lt;%s&gt;" txt));
+           Buffer.add_string b s_aft
+         })
+        tag_stack;
+      Buffer.contents b
+    }
+    else
+      match xhtml_tag s i with
+      [ Some (Btag t a, i) ->
+          if t = "br" && a = "" then do {
+            (* frequent error *)
+            Buffer.add_string b (sprintf "<%s/>" t);
+            loop tag_stack i
+          }
+          else do {
+            let pos = Buffer.length b in
+            let txt = sprintf "%s%s" t a in
+            Buffer.add_string b (sprintf "<%s>" txt);
+            loop [(pos, txt, t) :: tag_stack] i
+          }
+      | Some (Etag t, i) ->
+          match tag_stack with
+          [ [(_, _, bt) :: rest] when t = bt -> do {
+              Buffer.add_string b (sprintf "</%s>" t);
+              loop rest i
+            }
+          | _ -> do {
+              Buffer.add_string b (bad "red" (sprintf "&lt;/%s&gt;" t));
+              loop tag_stack i
+            } ]
+      | Some (Atag t, i) -> do {
+          Buffer.add_string b (sprintf "<%s/>" t);
+          loop tag_stack i
+        }
+      | None -> do {
+          Buffer.add_char b s.[i];
+          loop tag_stack (i + 1)
+        } ]
+;
+
+value string_with_macros conf env s =
+  let s = string_with_macros_aux conf env s in
+  check_xhtml s
 ;
 
 value compilation_time_hook = ref (fun _ -> "");
