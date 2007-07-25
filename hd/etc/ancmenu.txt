@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancmenu.txt,v 5.10 2007-07-25 13:15:19 ddr Exp $ -->
+  <!-- $Id: ancmenu.txt,v 5.11 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
@@ -15,11 +15,12 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <style type="text/css"><!--
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
     .highlight { color: %highlight;; font-weight: bold }
     hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
-  --></style>
+  </style>
 %base_header;
 </head>
 <body%body_prop;>
@@ -131,17 +132,17 @@
           <br%/>
           <label>
             - [relation/relations]1
-            <input type="checkbox" name="rel" value="on"%>
+            <input type="checkbox" name="rel" value="on"%/>
           </label>
           <br%/>
           <label>
             - [witness/witnesses]1 ([marriage/marriages]1)
-            <input type="checkbox" name="witn" value="on"%>
+            <input type="checkbox" name="witn" value="on"%/>
           </label>
           <br%/>
           <label>
             - [comment] ([marriage/marriages]1)
-            <input type="checkbox" name="comm" value="on"%>
+            <input type="checkbox" name="comm" value="on"%/>
           </label>
         </td>
         <td align="%left;" valign="top">

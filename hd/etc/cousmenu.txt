@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: cousmenu.txt,v 5.5 2007-07-25 13:15:19 ddr Exp $ -->
+  <!-- $Id: cousmenu.txt,v 5.6 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -15,11 +15,12 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <style type="text/css"><!--
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
     .highlight { color: %highlight;; font-weight: bold }
     hr { border: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
-  --></style>
+  </style>
 %base_header;
 </head>
 <body%body_prop;>

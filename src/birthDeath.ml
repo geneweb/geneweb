@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 5.37 2007-03-31 08:18:35 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 5.38 2007-07-25 15:01:02 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -384,14 +384,13 @@ value print_longest_lived conf base =
     Wserver.wprint "<ul>\n";
     List.iter
       (fun (p, d, cal) ->
-         do {
-           Wserver.wprint "<li>\n";
+         tag "li" begin
            Wserver.wprint "<strong>\n";
            Wserver.wprint "%s" (referenced_person_text conf base p);
            Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
            Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
-           Wserver.wprint ".\n";
-         })
+           Wserver.wprint ".";
+         end)
       list;
     Wserver.wprint "</ul>\n\n";
     trailer conf;
@@ -638,9 +637,8 @@ value print_population_pyramid conf base = do {
               Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei
           | None -> "" ]
         in
-        xtag "img" "src=\"%s/%s\"%s alt=\"%s\"%s"
-          (Util.image_prefix conf) iname wid_hei
-          (transl_nth conf "M/F" sex) conf.xhs
+        xtag "img" "src=\"%s/%s\"%s alt=\"%s\""
+          (Util.image_prefix conf) iname wid_hei (transl_nth conf "M/F" sex)
       else Wserver.wprint "&nbsp;";
     end
   in
@@ -660,7 +658,7 @@ value print_population_pyramid conf base = do {
       else loop (i - 1)
   in
   tag "div" begin
-    let c = "cellspacing=\"0\" cellpadding=\"0\"" in
+    let c = " cellspacing=\"0\" cellpadding=\"0\"" in
     tag "table"
       "border=\"%d\"%s width=\"50%%\" style=\"margin: auto\"" conf.border c
     begin

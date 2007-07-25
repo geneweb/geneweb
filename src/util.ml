@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.122 2007-07-25 14:19:55 ddr Exp $ *)
+(* $Id: util.ml,v 5.123 2007-07-25 15:01:02 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -997,15 +997,17 @@ value image_prefix conf =
   else "images"
 ;
 
+value default_background conf =
+  sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
+;
+
 value default_body_prop conf =
   let style =
     match p_getenv conf.env "size" with
     [ Some v -> "font-size:" ^ v ^ ";"
     | None -> "" ]
   in
-  let style =
-    sprintf "%sbackground:url('%s/gwback.jpg')" style (image_prefix conf)
-  in
+  let style = sprintf "%s%s" style (default_background conf) in
   " style=\"" ^ style ^ "\""
 ;
 
