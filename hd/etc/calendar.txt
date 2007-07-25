@@ -1,7 +1,7 @@
 %doctype;
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: calendar.txt,v 5.7 2007-01-19 01:53:16 ddr Exp $ -->
+  <!-- $Id: calendar.txt,v 5.8 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
