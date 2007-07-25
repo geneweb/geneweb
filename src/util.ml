@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.121 2007-04-30 22:42:01 ddr Exp $ *)
+(* $Id: util.ml,v 5.122 2007-07-25 14:19:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -374,7 +374,10 @@ value html conf =
     else ();
     Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
     Wserver.wprint "Connection: close"; nl ();
-    Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
+    Wserver.wprint "Content-type: %s; charset=%s"
+      (if conf.pure_xhtml then "application/xhtml+xml" else "text/html")
+      charset;
+    nl ();
   }
 ;
 

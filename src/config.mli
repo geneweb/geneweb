@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 5.18 2007-01-23 14:24:10 ddr Exp $ *)
+(* $Id: config.mli,v 5.19 2007-07-25 14:19:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -31,6 +31,7 @@ type config =
     username : string;
     auth_scheme : auth_scheme_kind;
     cgi : bool;
+    pure_xhtml : bool;
     command : string;
     indep_command : string;
     highlight : string;
