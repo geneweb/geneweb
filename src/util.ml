@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.124 2007-07-25 19:20:29 ddr Exp $ *)
+(* $Id: util.ml,v 5.125 2007-07-25 20:05:09 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1521,7 +1521,7 @@ value check_xhtml s =
 
 value string_with_macros conf env s =
   let s = string_with_macros_aux conf env s in
-  check_xhtml s
+  if conf.pure_xhtml then check_xhtml s else s
 ;
 
 value compilation_time_hook = ref (fun _ -> "");
