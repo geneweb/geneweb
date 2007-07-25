@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: hutil.ml,v 5.8 2007-01-17 19:19:26 ddr Exp $ *)
+(* $Id: hutil.ml,v 5.9 2007-07-25 13:43:21 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
@@ -62,7 +62,8 @@ value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 
 value header_without_http conf title = do {
   Wserver.wprint "%s\n" (Util.doctype conf);
-  Wserver.wprint "<html>\n<head>\n";
+  Wserver.wprint "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
+  Wserver.wprint "<head>\n";
   Wserver.wprint "  <title>";
   title True;
   Wserver.wprint "</title>\n";
