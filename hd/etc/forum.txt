@@ -1,7 +1,7 @@
 %doctype;
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: forum.txt,v 5.14 2007-04-04 02:17:36 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
