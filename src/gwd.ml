@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.56 2007-04-05 12:21:28 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.57 2007-07-25 14:19:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1231,6 +1231,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      user = ar.ar_user; username = ar.ar_name;
      auth_scheme = ar.ar_scheme; cgi = cgi; command = ar.ar_command;
      indep_command = (if cgi then ar.ar_command else "geneweb") ^ "?";
+     pure_xhtml =
+       try List.assoc "pure_xhtml" base_env = "yes" with
+       [ Not_found -> False ];
      highlight =
        try List.assoc "highlight_color" base_env with
        [ Not_found -> green_color ];

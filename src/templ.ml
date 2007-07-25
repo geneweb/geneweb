@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 5.34 2007-02-25 02:05:44 ddr Exp $ *)
+(* $Id: templ.ml,v 5.35 2007-07-25 14:19:55 ddr Exp $ *)
 
 open Config;
 open Printf;
@@ -729,7 +729,13 @@ and eval_simple_variable conf =
   | "prefix" -> Util.commd conf
   | "prefix_base" ->
       conf.command ^ "?" ^ (if conf.cgi then "b=" ^ conf.bname ^ ";" else "")
-  | "referer" -> Wserver.extract_param "referer: " '\n' conf.request
+  | "referer" -> do {
+      let s = Wserver.extract_param "referer: " '\n' conf.request in
+      for i = 0 to String.length s - 1 do {
+        if s.[i] = '&' then s.[i] := ';' else ();
+      };
+      s
+    }
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
