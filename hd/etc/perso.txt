@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt,v 5.14 2007-07-25 14:19:55 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 5.15 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -16,6 +16,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta name="robots" content="none"%/>
   <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
     .highlight { color: %highlight;; font-weight: bold }
     a.date { text-decoration: none; color: black }
   </style>

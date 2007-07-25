@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: welcome.txt,v 1.38 2007-07-25 13:15:19 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.39 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -34,10 +34,11 @@ sv: Genealogi
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
-  <style type="text/css"><!--
+  <style type="text/css">
     %if;(evar.templ = "random")
       %include.random_css;
     %else;
+      html { background:url('%image_prefix;/gwback.jpg') }
       span.highlight { color: %highlight;; font-weight: bold }
       #user-info { float: %right; }
       #title { padding-top: 1em }
@@ -50,7 +51,7 @@ sv: Genealogi
       #lang .item span { display: none }
       #content .subtitle { text-align: center }
     %end;
-  --></style>
+  </style>
 %base_header;
 </head>
 <body%if;(evar.templ != "random")%body_prop;%end;>
