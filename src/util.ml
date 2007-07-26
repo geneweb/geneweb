@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.126 2007-07-26 01:57:42 ddr Exp $ *)
+(* $Id: util.ml,v 5.127 2007-07-26 10:42:37 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1493,6 +1493,54 @@ value xhtml_tag s i =
 
 value bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s;
 
+value check_ampersand s =
+  let b = Buffer.create (String.length s) in
+  loop False 0 where rec loop error i =
+    if i = String.length s then
+      if error then Some (Buffer.contents b)
+      else None
+    else
+      match s.[i] with
+      [ '&' -> do {
+          let i = i + 1 in
+          if i = String.length s then do {
+            Buffer.add_string b (bad "red" "&amp;");
+            Some (Buffer.contents b)
+          }
+          else
+            match s.[i] with
+            [ 'a'..'z' ->
+                loop_id i where rec loop_id j =
+                  if j = String.length s then do {
+                    let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+                    Buffer.add_string b (bad "red" a);
+                    Some (Buffer.contents b)
+                  }
+                  else
+                    match s.[j] with
+                    [ 'a'..'z' -> loop_id (j + 1)
+                    | ';' -> do {
+                        Buffer.add_string b "&";
+                        Buffer.add_string b (String.sub s i (j - i));
+                        Buffer.add_char b ';';
+                        loop error (j + 1)
+                      }
+                    | _ -> do {
+                        let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+                        Buffer.add_string b (bad "red" a);
+                        loop True j
+                      } ]
+            | _ -> do {
+                Buffer.add_string b (bad "red" "&amp;");
+                loop True i
+              } ]
+        }
+      | c -> do {
+          Buffer.add_char b c;
+          loop error (i + 1)
+        } ]
+;
+
 value check_xhtml s =
   let b = Buffer.create (String.length s) in
   loop [] 0 where rec loop tag_stack i =
@@ -1520,10 +1568,17 @@ value check_xhtml s =
             loop tag_stack i
           }
           else do {
-            let pos = Buffer.length b in
-            let txt = sprintf "%s%s" t a in
-            Buffer.add_string b (sprintf "<%s>" txt);
-            loop [(pos, txt, t) :: tag_stack] i
+            match check_ampersand a with
+            [ Some a -> do {
+                Buffer.add_string b (sprintf "&lt;%s%s&gt;" t a);
+                loop tag_stack i;
+              }
+            | None -> do {
+                let pos = Buffer.length b in
+                let txt = sprintf "%s%s" t a in
+                Buffer.add_string b (sprintf "<%s>" txt);
+                loop [(pos, txt, t) :: tag_stack] i
+              } ]
           }
       | Some (Etag t, i) ->
           match tag_stack with
@@ -1540,7 +1595,8 @@ value check_xhtml s =
           loop tag_stack i
         }
       | None -> do {
-          if s.[i] = '<' then Buffer.add_string b "&lt;"
+          if s.[i] = '<' && (i < String.length s - 1 || s.[i+1] <> '!') then
+            Buffer.add_string b "&lt;"
           else Buffer.add_char b s.[i];
           loop tag_stack (i + 1)
         } ]
