@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 5.35 2007-03-31 08:04:24 ddr Exp $ *)
+(* $Id: util.mli,v 5.36 2007-07-26 01:57:42 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -104,6 +104,7 @@ value allowed_tags_file : ref string;
 value body_prop : config -> string;
 value url_no_index : config -> base -> string;
 value message_to_wizard : config -> unit;
+value check_xhtml : string -> string;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;

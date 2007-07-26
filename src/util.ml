@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.125 2007-07-25 20:05:09 ddr Exp $ *)
+(* $Id: util.ml,v 5.126 2007-07-26 01:57:42 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1337,7 +1337,7 @@ value expand_env =
    | _ -> s ]
 ;
 
-value string_with_macros_aux conf env s =
+value string_with_macros conf env s =
   let buff = Buffer.create 1000 in
   loop Out 0 where rec loop tt i =
     if i < String.length s then
@@ -1435,6 +1435,31 @@ type xhtml_tag =
   | Atag of string ]
 ;
 
+value tag_params_ok s =
+  loop 0 where rec loop i =
+    if i = String.length s then True
+    else
+      match s.[i] with
+      [ ' ' | '\n' -> loop (i+1)
+      | 'a'..'z' ->
+          loop_id (i+1) where rec loop_id i =
+            if i = String.length s then False
+            else
+              match s.[i] with
+              [ 'a'..'z' -> loop_id (i+1)
+              | '=' ->
+                  let i = i + 1 in
+                  if i = String.length s then False
+                  else if s.[i] = '"' then
+                    loop_str (i+1) where rec loop_str i =
+                      if i = String.length s then False
+                      else if s.[i] = '"' then loop (i+1)
+                      else loop_str (i+1)
+                  else False
+              | _ -> False ]
+      | _ -> False ]
+;
+
 value xhtml_tag s i =
   if s.[i] = '<' then
     if i = String.length s - 1 then Some (Btag "" "", i + 1)
@@ -1451,7 +1476,7 @@ value xhtml_tag s i =
             [ ' ' | '\n' -> i
             | _ -> loop (i + 1) ]
       in
-      if i + 1 = String.length s then Some (Atag "br", i + 1)
+      if i + 1 = String.length s then None
       else
         let next_i = min (k + 1) (String.length s) in
         if s.[i+1] = '/' then
@@ -1461,7 +1486,8 @@ value xhtml_tag s i =
         else
           let t = String.sub s (i + 1) (j - i - 1) in
           let a = String.sub s j (k - j) in
-          Some (Btag t a, next_i)
+          if tag_params_ok a then Some (Btag t a, next_i)
+          else None
   else None
 ;
 
@@ -1514,14 +1540,10 @@ value check_xhtml s =
           loop tag_stack i
         }
       | None -> do {
-          Buffer.add_char b s.[i];
+          if s.[i] = '<' then Buffer.add_string b "&lt;"
+          else Buffer.add_char b s.[i];
           loop tag_stack (i + 1)
         } ]
-;
-
-value string_with_macros conf env s =
-  let s = string_with_macros_aux conf env s in
-  if conf.pure_xhtml then check_xhtml s else s
 ;
 
 value compilation_time_hook = ref (fun _ -> "");
