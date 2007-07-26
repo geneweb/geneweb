@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.127 2007-07-26 10:42:37 ddr Exp $ *)
+(* $Id: util.ml,v 5.128 2007-07-26 11:57:25 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -1462,7 +1462,7 @@ value tag_params_ok s =
 
 value xhtml_tag s i =
   if s.[i] = '<' then
-    if i = String.length s - 1 then Some (Btag "" "", i + 1)
+    if i = String.length s - 1 then None
     else if s.[i+1] = '!' then None
     else
       let k =
@@ -1480,9 +1480,11 @@ value xhtml_tag s i =
       else
         let next_i = min (k + 1) (String.length s) in
         if s.[i+1] = '/' then
-          Some (Etag (String.sub s (i + 2) (k - i - 2)), next_i)
+          let t = String.sub s (i + 2) (k - i - 2) in
+          if j = k then Some (Etag t, next_i) else None
         else if s.[k-1] = '/' then
-          Some (Atag (String.sub s (i + 1) (k - i - 2)), next_i)
+          let t = String.sub s (i + 1) (k - i - 2) in
+          Some (Atag t, next_i)
         else
           let t = String.sub s (i + 1) (j - i - 1) in
           let a = String.sub s j (k - j) in
@@ -1491,9 +1493,29 @@ value xhtml_tag s i =
   else None
 ;
 
+value check_ampersand s i =
+  if i = String.length s then Some ("&amp;", i)
+  else
+    match s.[i] with
+    [ 'a'..'z' ->
+        loop_id i where rec loop_id j =
+          if j = String.length s then do {
+            let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+            Some (a, j)
+          }
+          else
+            match s.[j] with
+            [ 'a'..'z' -> loop_id (j + 1)
+            | ';' -> None
+            | _ ->
+                let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+                Some (a, j) ]
+    | _ -> Some ("&amp;", i) ]
+;
+
 value bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s;
 
-value check_ampersand s =
+value check_ampersands s =
   let b = Buffer.create (String.length s) in
   loop False 0 where rec loop error i =
     if i = String.length s then
@@ -1501,40 +1523,16 @@ value check_ampersand s =
       else None
     else
       match s.[i] with
-      [ '&' -> do {
-          let i = i + 1 in
-          if i = String.length s then do {
-            Buffer.add_string b (bad "red" "&amp;");
-            Some (Buffer.contents b)
-          }
-          else
-            match s.[i] with
-            [ 'a'..'z' ->
-                loop_id i where rec loop_id j =
-                  if j = String.length s then do {
-                    let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
-                    Buffer.add_string b (bad "red" a);
-                    Some (Buffer.contents b)
-                  }
-                  else
-                    match s.[j] with
-                    [ 'a'..'z' -> loop_id (j + 1)
-                    | ';' -> do {
-                        Buffer.add_string b "&";
-                        Buffer.add_string b (String.sub s i (j - i));
-                        Buffer.add_char b ';';
-                        loop error (j + 1)
-                      }
-                    | _ -> do {
-                        let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
-                        Buffer.add_string b (bad "red" a);
-                        loop True j
-                      } ]
-            | _ -> do {
-                Buffer.add_string b (bad "red" "&amp;");
-                loop True i
-              } ]
-        }
+      [ '&' ->
+          match check_ampersand s (i + 1) with
+          [ Some (txt, j) -> do {
+              Buffer.add_string b (bad "red" txt);
+              loop True j
+            }
+          | None -> do {
+              Buffer.add_char b '&';
+              loop error (i + 1)
+            } ]
       | c -> do {
           Buffer.add_char b c;
           loop error (i + 1)
@@ -1568,7 +1566,7 @@ value check_xhtml s =
             loop tag_stack i
           }
           else do {
-            match check_ampersand a with
+            match check_ampersands a with
             [ Some a -> do {
                 Buffer.add_string b (sprintf "&lt;%s%s&gt;" t a);
                 loop tag_stack i;
@@ -1594,12 +1592,24 @@ value check_xhtml s =
           Buffer.add_string b (sprintf "<%s/>" t);
           loop tag_stack i
         }
-      | None -> do {
-          if s.[i] = '<' && (i < String.length s - 1 || s.[i+1] <> '!') then
-            Buffer.add_string b "&lt;"
-          else Buffer.add_char b s.[i];
-          loop tag_stack (i + 1)
-        } ]
+      | None ->
+          if s.[i] = '&' then
+            match check_ampersand s (i + 1) with
+            [ Some (txt, j) -> do {
+                Buffer.add_string b (bad "red" txt);
+                loop tag_stack j
+              }
+            | None -> do {
+                Buffer.add_char b '&';
+                loop tag_stack (i + 1)
+              } ]
+          else do {
+            if s.[i] = '<' && (i + 1 = String.length s || s.[i+1] <> '!')
+            then
+              Buffer.add_string b (bad "red" "&lt;")
+            else Buffer.add_char b s.[i];
+            loop tag_stack (i + 1)
+          } ]
 ;
 
 value compilation_time_hook = ref (fun _ -> "");
