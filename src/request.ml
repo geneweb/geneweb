@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.58 2007-07-25 17:19:35 ddr Exp $ *)
+(* $Id: request.ml,v 5.59 2007-07-26 09:02:28 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -582,7 +582,7 @@ value print_no_index conf base =
 value special_vars =
   ["alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
    "iz"; "log_cnl"; "log_pwd"; "log_uid"; "long"; "manitou"; "nz"; "ocz";
-   "pz"; "size"; "spouse"; "templ"]
+   "pz"; "pure_xhtml"; "size"; "spouse"; "templ"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
@@ -615,6 +615,9 @@ value extract_henv conf base =
     | None -> () ];
     match p_getenv conf.env "alwsurn" with
     [ Some x -> conf.henv := conf.henv @ [("alwsurn", x)]
+    | None -> () ];
+    match p_getenv conf.env "pure_xhtml" with
+    [ Some x -> conf.henv := conf.henv @ [("pure_xhtml", x)]
     | None -> () ];
     match p_getenv conf.env "size" with
     [ Some x -> conf.henv := conf.henv @ [("size", x)]

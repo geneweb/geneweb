@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 5.80 2007-04-25 23:34:14 ddr Exp $ *)
+(* $Id: perso.ml,v 5.81 2007-07-26 09:02:28 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2114,7 +2114,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_person_exists = person_exists conf base;
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
-        Wiki.syntax_links conf wi (String.concat "\n" lines)
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "occ" -> if p_auth then string_of_int (get_occ p) else ""
   | "occupation" ->
