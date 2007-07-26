@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 5.52 2007-04-25 23:34:14 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 5.53 2007-07-26 01:57:42 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -399,7 +399,8 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
           [ Some (case_sens, h) -> html_highlight case_sens h s
           | None -> s ]
         in
-        Wserver.wprint "%s\n" s;
+        Wserver.wprint "%s\n"
+          (if conf.pure_xhtml then Util.check_xhtml s else s);
       end;
     end;
   end;

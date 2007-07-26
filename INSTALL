@@ -47,13 +47,14 @@ INSTALLATIONS INSTRUCTIONS IN WINDOWS NT/95/98
 
 You need:
 
-- The Cygnus GNU-Win32 development tool, free, available at:
-      http://www.cygnus.com/misc/gnu-win32/
+- The Cygnus GNU-Win32 development tool, free (search in the Web)
 
 - The Microsoft Visual C++ compiler.
 
 - The Microsoft Assembler masm.
 
-- The Objective Caml compiler, version 3.04
+- The Objective Caml compiler.
+
+- The Camlp5 preprocessor.
 
 Follow the same instructions above than for the Unix installation.
