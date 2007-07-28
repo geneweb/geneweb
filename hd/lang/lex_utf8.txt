@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.93 2007-06-04 08:12:51 ddr Exp $
+# $Id: lex_utf8.txt,v 5.94 2007-07-28 10:13:42 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -219,6 +219,7 @@ no: %s adgang til siden er sperret
 pl: dostęp %s anulowany dla tej strony
 pt: acesso %s cancelado para aquela página
 ro: %s acces anulat la această pagină
+ru: доступ %s к этой странице запрещён
 sv: %s åtkomst ogiltig för den sidan
 
     %s cousins
@@ -2012,6 +2013,7 @@ no: gennemsnitlig alder ved død
 pl: średni wiek śmierci
 pt: idade média ao morrer
 ro: virsta media la deces
+ru: примерный возраст смерти
 sl: povprečna starost ob smrti
 sv: medelålder vid dödstillfället
 
@@ -2827,6 +2829,7 @@ no: forbindelser
 pl: połączenie
 pt: conexões
 ro: conexiuni
+ru: связи
 sl: povprečna starost ob smrti
 sv: kopplingar
 
@@ -2901,6 +2904,7 @@ no: fortsatt
 pl: ciąg dalszy
 pt: continuação
 ro: continuare
+ru: продолжено
 sl: nadaljevano
 sv: forts
 
@@ -3275,6 +3279,7 @@ no: avbryt
 pl: rozłącz
 pt: desconectar
 ro: deconectare
+ru: отключить
 sl: prekinjeno
 sv: koppla från
 
@@ -3981,6 +3986,7 @@ no: for en liste sortert etter siste endringsdato
 pl: aby oglądać listę według daty ostatniej modyfikacji
 pt: para a lista ordenada por data da última modificação
 ro: pentru listă, după data ultimei modificări
+ru: для списка отсортированного по дате последнего изменения
 sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 
@@ -6421,6 +6427,7 @@ no: antall nålevende personer:
 pl: liczba osób żyjących:
 pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
+ru: количество живых персон
 sl: število živih oseb
 sv: antal levande personer:
 
@@ -6934,6 +6941,7 @@ no: befolkningspyramide
 pl: piramida wieku
 pt: pirâmide populacional
 ro: piramida demografică
+ru: пирамида популяции
 sl: populacijska piramida
 sv: befolkningspyramid
 
@@ -6953,6 +6961,7 @@ no: mulig dublett
 pl: możliwe duplikaty
 pt: eventual duplicidade
 ro: posibile dublete
+ru: возможные дубликаты
 sv: eventuellt dubblett
 
     possibly (date)
@@ -7729,6 +7738,7 @@ no: siden siste klikk
 pl: od ostatniego kliknięcia
 pt: desde o último clique
 ro: de la ultimul click
+ru: с момента последнего щелчка
 sl: od zadnjega klika
 sv: från senaste klick
 
