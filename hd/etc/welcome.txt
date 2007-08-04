@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: welcome.txt,v 1.39 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -42,7 +42,7 @@ sv: Genealogi
       span.highlight { color: %highlight;; font-weight: bold }
       #user-info { float: %right; }
       #title { padding-top: 1em }
-      #title { text-align: center;; vertical-align: middle; width: 100%% }
+      #title { text-align: center; vertical-align: middle; width: 100%% }
       #title { color: %highlight; }
       #lang { text-align: center }
       #lang .title { font-size: 80%% }

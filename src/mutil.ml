@@ -1,4 +1,4 @@
-(* $Id: mutil.ml,v 5.18 2007-02-24 16:16:57 ddr Exp $ *)
+(* $Id: mutil.ml,v 5.19 2007-08-04 07:22:30 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 value int_size = 4;
@@ -410,6 +410,11 @@ value compare_after_particle particles s1 s2 =
 value input_lexicon lang ht open_fname =
   try
     let ic = open_fname () in
+    let lang =
+      match lindex lang '.' with
+      [ Some i -> String.sub lang 0 i
+      | None -> lang ]
+    in
     let derived_lang =
       match lindex lang '-' with
       [ Some i -> String.sub lang 0 i
