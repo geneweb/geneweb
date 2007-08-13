@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.43 2007-04-29 22:48:08 ddr Exp $
+# $Id: Makefile,v 5.44 2007-08-13 08:00:31 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -92,12 +92,12 @@ consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
 
 gwd.out: $(GWD_OBJS)
-	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma $(CAMLP4D)/gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
+	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma -I $(CAMLP4D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
 	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-	$(OCAMLOPT) $(STATIC) unix.cmxa $(CAMLP4D)/gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa -I $(CAMLP4D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
