@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.94 2007-07-28 10:13:42 ddr Exp $
+# $Id: lex_utf8.txt,v 5.95 2007-08-17 02:05:32 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -205,6 +205,7 @@ sv: %d år sedan
 
     %s access cancelled for that page
 bg: отменен достъп като %s за тази страница
+cs: pristup pre tuto stranku bol zruseny
 de: Zugang zu dieser Seite gesperrt
 en: %s access cancelled for that page
 eo: %s aliro ne estas ebla por la paĝo
@@ -1998,6 +1999,7 @@ sv: samtidigt
 
     average age at death
 bg: средна продължителност на живота
+cs: priemerny vek umrtia
 da: gennemsnitlig alder ved død
 de: Durchschnittliches Sterbealter
 en: average age at death
@@ -2813,6 +2815,7 @@ sv: kommentar
 
     connections
 bg: потребителски връзки
+cs: spojenia
 da: forbindelser
 de: Verbindungen
 en: connections
@@ -2889,6 +2892,7 @@ sv: fortsätt slå samman
 
     continued
 bg: следва
+cs: pokracuje
 da: fortsat
 de: fortgesetzt
 en: continued
@@ -3264,6 +3268,7 @@ sv: försvunnen
 
     disconnect
 bg: да се прекъсне връзката
+cs: odpojene
 da: afbryd
 de: abmelden
 en: disconnect
@@ -3971,6 +3976,7 @@ sv: för förnamnen i bokstavsordning
 
     for the list ordered by the date of the last modification
 bg: за списъка по дати на последно изменение
+cs: pre vypis podla datumu poslednej zmeny
 da: for en liste sorteret efter datoen for seneste ændring
 de: für eine, nach dem Datum der letzten Änderung geordnete Liste
 en: for the list ordered by the date of the last modification
@@ -6412,6 +6418,7 @@ sv: antal grenar
 
     number of living persons:
 bg: брой на живите лица:
+cs: pocet zijucich osob:
 da: antal nulevende personer:
 de: Anzahl der lebenden Personen:
 en: number of living persons:
@@ -6926,6 +6933,7 @@ sv: plats
 
     population pyramid
 bg: възрастова пирамида
+cs: populacna pyramida
 da: befolkningspyramide
 de: Alterspyramide
 en: population pyramid
@@ -6947,6 +6955,7 @@ sv: befolkningspyramid
 
     possible duplications
 bg: възможни дублирания
+cs: mozna duplikacia
 de: mögliche Duplikate
 en: possible duplications
 eo: ebla duobligo
@@ -7723,6 +7732,7 @@ sv: syskon
 
     since the last click
 bg: от последното щракване
+cs: este posledne kliknutie
 da: siden det sidste klik
 de: seit dem letzten click
 en: since the last click
