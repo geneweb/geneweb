@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 5.128 2007-07-26 11:57:25 ddr Exp $ *)
+(* $Id: util.ml,v 5.129 2007-09-04 16:25:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -2685,7 +2685,7 @@ value dispatch_in_columns ncol list order =
 value print_in_columns conf len_list list wprint_elem = do {
   begin_centered conf;
   tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
-    tag "tr" "valign=\"top\"" begin
+    tag "tr" "align=\"%s\" valign=\"top\"" conf.left begin
       let _ =
         List.fold_left
           (fun (list, first) len ->
