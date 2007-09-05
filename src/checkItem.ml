@@ -1,4 +1,4 @@
-(* $Id: checkItem.ml,v 1.10 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: checkItem.ml,v 1.11 2007-09-05 13:16:45 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -374,13 +374,19 @@ value sort_children base children = do {
   semi_sort base children before strictly_before 1 1;
   semi_sort base children before strictly_after ~-1 1;
   semi_sort base children before strictly_before 1 1;
-  before.val
+  match before.val with
+  [ Some b -> Some (b, children)
+  | None -> None ]
 };
 
 value sort_children2 base warning ifam des =
-  match sort_children base (get_children des) with
-  [ None -> ()
-  | Some a -> warning (ChangedOrderOfChildren ifam des a) ]
+  let b = get_children des in
+  match sort_children base b with
+  [ None -> b
+  | Some (b, a) -> do {
+      warning (ChangedOrderOfChildren ifam des b a);
+      a
+    } ]
 ;
 
 value born_after_his_elder_sibling base error warning x np ifam des =
@@ -487,7 +493,7 @@ value family base error warning ifam fam =
            get_relation fam = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson moth) ];
     check_normal_marriage_date base error warning (ifam, fam);
-    sort_children2 base warning ifam des;
+    let after = sort_children2 base warning ifam des in
     let _ =
       List.fold_left
         (fun np child ->
@@ -508,7 +514,7 @@ value family base error warning ifam fam =
              [ Some d -> Some (child, d)
              | _ -> np ]
            })
-        None (Array.to_list (get_children des))
+        None (Array.to_list after)
     in
     ();
   }
