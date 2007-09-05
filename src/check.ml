@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.26 2007-03-19 16:03:34 ddr Exp $ *)
+(* $Id: check.ml,v 5.27 2007-09-05 13:16:45 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -28,7 +28,7 @@ value print_base_warning oc base =
   fun
   [ BirthAfterDeath p ->
       fprintf oc "%s\n  born after his/her death\n" (designation base p)
-  | ChangedOrderOfChildren ifam des _ ->
+  | ChangedOrderOfChildren ifam des _ _ ->
       let cpl = foi base ifam in
       fprintf oc "Changed order of children of %s and %s\n"
         (designation base (poi base (get_father cpl)))

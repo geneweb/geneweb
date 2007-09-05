@@ -1,4 +1,4 @@
-(* $Id: checkItem.mli,v 1.9 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: checkItem.mli,v 1.10 2007-09-05 13:16:45 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Gwdb;
@@ -22,5 +22,3 @@ value person :
 value family :
   base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
     family -> unit;
-
-value sort_children : base -> array Adef.iper -> option (array Adef.iper);
