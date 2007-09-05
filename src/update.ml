@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.43 2007-03-19 10:59:31 ddr Exp $ *)
+(* $Id: update.ml,v 5.44 2007-09-05 13:16:45 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -197,7 +197,7 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
-  | ChangedOrderOfChildren ifam des before -> do {
+  | ChangedOrderOfChildren ifam des before after -> do {
       let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
@@ -222,7 +222,6 @@ value print_warning conf base =
              end)
           arr
       in
-      let after = get_children des in
       let (bef_d, aft_d) = Diff.f before after in
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin

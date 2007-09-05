@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.71 2007-05-23 09:06:28 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.72 2007-09-05 13:16:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -630,8 +630,8 @@ value all_checks_person conf base p a u = do {
     u.family;
   List.iter
     (fun
-     [ ChangedOrderOfChildren ifam des _ ->
-         patch_descend base ifam (gen_descend_of_descend des)
+     [ ChangedOrderOfChildren ifam des _ after ->
+         patch_descend base ifam {children = after}
      | _ -> () ])
     wl.val;
   List.rev wl.val

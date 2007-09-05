@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.20 2007-03-19 10:59:31 ddr Exp $ *)
+(* $Id: def.mli,v 5.21 2007-09-05 13:16:45 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -146,7 +146,7 @@ type error 'person =
 type warning 'person 'descend 'title =
   [ BirthAfterDeath of 'person
   | IncoherentSex of 'person and int and int
-  | ChangedOrderOfChildren of ifam and 'descend and array iper
+  | ChangedOrderOfChildren of ifam and 'descend and array iper and array iper
   | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
   | IncoherentAncestorDate of 'person and 'person
