@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: forum.txt,v 5.17 2007-09-09 19:45:34 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.18 2007-09-10 12:56:20 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -96,10 +96,6 @@
       <p>
       [*message/previous message/previous messages/next message]0
       <br%/>
-      %if;is_moderated_forum;
-        <span style="color:green">([this forum is moderated])</span>
-        <br%/>
-      %end;
       <table>
         <tr>
           <td>
@@ -116,6 +112,10 @@
       <br%/>
       <input type="submit" name="visu"%sp;
        value="[visualize/show/hide/summary]0"%/>
+      %if;is_moderated_forum;
+	<br%/>
+        <span style="color:green">([this forum is moderated])</span>
+      %end;
       </p>
       </form>
     </td></tr></table>
@@ -178,10 +178,6 @@
       <span%if;(message.text = "") style="color:red"%end;>
       [*message/previous message/previous messages/next message]0</span>
       <br%/>
-      %if;is_moderated_forum;
-        <span style="color:green">([this forum is moderated])</span>
-        <br%/>
-      %end;
       <table>
         <tr>
           <td>
@@ -206,6 +202,10 @@
         %else;
           <input type="submit" value="ok">
         %end;
+      %end;
+      %if;is_moderated_forum;
+        <br%/>
+        <span style="color:green">([this forum is moderated])</span>
       %end;
       </p>
       </form>
