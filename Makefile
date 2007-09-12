@@ -1,11 +1,11 @@
-# $Id: Makefile,v 5.2 2007-04-02 18:04:44 ddr Exp $
+# $Id: Makefile,v 5.3 2007-09-12 00:54:46 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
 DOCDIR=$(PREFIX)/share/geneweb/doc
 MANDIR=$(PREFIX)/man/man1
 DESTDIR=distribution
-MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwu.1 gwd.1 consang.1 gwsetup.1
+MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwc2.1 gwu.1 gwd.1 consang.1 gwsetup.1
 
 include tools/Makefile.inc
 
@@ -36,6 +36,7 @@ opt::
 install:
 	mkdir -p $(PREFIX)/bin
 	cp src/gwc $(PREFIX)/bin/gwc$(EXE)
+	cp src/gwc2 $(PREFIX)/bin/gwc2$(EXE)
 	cp src/consang $(PREFIX)/bin/consang$(EXE)
 	cp src/gwd $(PREFIX)/bin/gwd$(EXE)
 	cp src/gwu $(PREFIX)/bin/gwu$(EXE)
@@ -60,6 +61,7 @@ install:
 
 uninstall:
 	rm -f $(PREFIX)/bin/gwc$(EXE)
+	rm -f $(PREFIX)/bin/gwc2$(EXE)
 	rm -f $(PREFIX)/bin/consang$(EXE)
 	rm -f $(PREFIX)/bin/gwd$(EXE)
 	rm -f $(PREFIX)/bin/gwu$(EXE)
@@ -118,6 +120,7 @@ classical_distrib:
 	cp CHANGES $(DESTDIR)/CHANGES.txt
 	cp LICENSE $(DESTDIR)/LICENSE.txt
 	cp src/gwc $(DESTDIR)/gwc$(EXE)
+	cp src/gwc2 $(DESTDIR)/gwc2$(EXE)
 	cp src/consang $(DESTDIR)/consang$(EXE)
 	cp src/gwd $(DESTDIR)/gwd$(EXE)
 	cp src/gwu $(DESTDIR)/gwu$(EXE)
