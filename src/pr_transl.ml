@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 5.4 2007-09-12 09:42:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open MLast;
@@ -18,10 +18,8 @@ value trace =
    "ftransl"; "ftransl_nth"]
 ;
 
-value loc = IFDEF OCAML_308 THEN Token.dummy_loc ELSE (0, 0) END;
-value token_eval_string loc s =
-  IFDEF OCAML_308 THEN Token.eval_string loc s ELSE Token.eval_string s END
-;
+value loc = Token.dummy_loc;
+value token_eval_string loc s = Token.eval_string loc s;
 
 value rec expr e =
   match e with

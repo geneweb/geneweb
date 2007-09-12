@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.44 2007-08-13 08:00:31 ddr Exp $
+# $Id: Makefile,v 5.45 2007-09-12 09:42:26 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -145,19 +145,16 @@ i18n: pr_transl.cmo always
 	( \
 	  for i in $$OBJS; do \
 	    echo $$i 1>&2; \
-	    camlp4r ./ppdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; \
+	    camlp5r pa_macro.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; \
 	  done; \
 	  cat ../hd/etc/*.txt ../hd/lang/start_utf8.txt ../hd/lang/advanced.txt | sed -e 's/%\[//g' -e 's/%]//g' -e 's/\]/\]\n/g' | grep "\[" | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//" \
 	) | \
 	sort | uniq | grep -v '^$$' > i18n
 
-ppdef:
-	$(MAKE) ppdef.cmo CAMLP4F="-loc loc" PPDEF=pa_macro.cmo
-
 always:
 
 depend:
-	$(MAKE) ppdef pr_dep.cmo def.syn.cmo gwlib.ml
+	$(MAKE) pr_dep.cmo def.syn.cmo gwlib.ml
 	$(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	export LC_ALL=C; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
 	mv .depend.new .depend

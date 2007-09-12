@@ -203,11 +203,11 @@ mergeIndOk.cmx: adef.cmx config.cmi consang.cmx def.cmi futil.cmx gutil.cmx \
     gwdb.cmx history.cmx hutil.cmx merge.cmx mergeInd.cmx mutil.cmx \
     update.cmx updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
 mk_consang.cmo: adef.cmi argl.cmo consang.cmi consangAll.cmi db2.cmi \
-    db2disk.cmi db2out.cmi dbdisk.cmi def.cmi futil.cmi gwdb.cmi iovalue.cmi \
-    lock.cmi mutil.cmi name.cmi outbase.cmi secure.cmi 
+    db2disk.cmi db2out.cmi def.cmi futil.cmi gwdb.cmi iovalue.cmi lock.cmi \
+    mutil.cmi name.cmi outbase.cmi secure.cmi 
 mk_consang.cmx: adef.cmx argl.cmx consang.cmx consangAll.cmx db2.cmx \
-    db2disk.cmx db2out.cmx dbdisk.cmi def.cmi futil.cmx gwdb.cmx iovalue.cmx \
-    lock.cmx mutil.cmx name.cmx outbase.cmx secure.cmx 
+    db2disk.cmx db2out.cmx def.cmi futil.cmx gwdb.cmx iovalue.cmx lock.cmx \
+    mutil.cmx name.cmx outbase.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gwdb.cmi name.cmi \
     num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gwdb.cmx name.cmx \

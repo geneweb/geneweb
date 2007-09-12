@@ -347,6 +347,7 @@ update
 use "link" instead of "create"
 user/password/cancel
 validate/delete
+version
 view source
 visualize/show/hide/summary
 warnings
