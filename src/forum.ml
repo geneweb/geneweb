@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: forum.ml,v 5.20 2007-04-25 23:34:14 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: forum.ml,v 5.21 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;

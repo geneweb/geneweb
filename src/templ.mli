@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: templ.mli,v 5.7 2007-01-17 18:37:54 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: templ.mli,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 
 open Config;
 open Gwdb;

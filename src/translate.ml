@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: translate.ml,v 5.8 2007-01-19 01:53:17 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: translate.ml,v 5.9 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 module Buff = Buff.Make (struct value buff = ref (String.create 80); end);

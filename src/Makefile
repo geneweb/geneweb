@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.45 2007-09-12 09:42:26 ddr Exp $
+# $Id: Makefile,v 5.46 2007-09-12 09:58:44 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -46,13 +46,13 @@ opt:: def.syn.cmo ansel.cmx gwc.opt gwc2.opt consang.opt gwd.opt gwu.opt update_
 
 compilation.cmo: $(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 	$(MAKE) compilation.ml
-	@$(CAMLP4_COMM) compilation.ml -o compilation.ppo
+	@$(CAMLP5_COMM) compilation.ml -o compilation.ppo
 	$(OCAMLC) -c -impl compilation.ppo
 	$(RM) compilation.ppo
 
 compilation.cmx: $(GWD_OBJS1:.cmo=.cmx) $(GWD_OBJS2.cmo=.cmx) gwd.cmx
 	$(MAKE) compilation.ml
-	@$(CAMLP4_COMM) compilation.ml -o compilation.ppo
+	@$(CAMLP5_COMM) compilation.ml -o compilation.ppo
 	$(OCAMLOPT) -c -impl compilation.ppo
 	$(RM) compilation.ppo
 
@@ -92,12 +92,12 @@ consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
 
 gwd.out: $(GWD_OBJS)
-	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma -I $(CAMLP4D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
+	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma -I $(CAMLP5D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
 	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-	$(OCAMLOPT) $(STATIC) unix.cmxa -I $(CAMLP4D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
@@ -156,7 +156,7 @@ always:
 depend:
 	$(MAKE) pr_dep.cmo def.syn.cmo gwlib.ml
 	$(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
-	export LC_ALL=C; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
+	export LC_ALL=C; TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
 	mv .depend.new .depend
 
 include .depend

@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: request.ml,v 5.59 2007-07-26 09:02:28 ddr Exp $ *)
+(* camlp5r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: request.ml,v 5.60 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;

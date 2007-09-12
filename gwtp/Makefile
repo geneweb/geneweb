@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.17 2007-02-14 20:33:58 ddr Exp $
+# $Id: Makefile,v 5.18 2007-09-12 09:58:44 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -34,7 +34,7 @@ recover.out: $(RECOVER_OBJS)
 	$(OCAMLC) unix.cma $(RECOVER_OBJS) $(LIBUNIX) -o $@
 
 depend:
-	TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) *.ml > .depend.new
+	TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) *.ml > .depend.new
 	mv .depend.new .depend
 
 include .depend

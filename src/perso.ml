@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: perso.ml,v 5.81 2007-07-26 09:02:28 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: perso.ml,v 5.82 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;

@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: update_nldb.ml,v 5.22 2007-05-23 09:06:28 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: update_nldb.ml,v 5.23 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;

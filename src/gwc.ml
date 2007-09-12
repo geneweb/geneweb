@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.55 2007-03-29 12:30:19 ddr Exp $ *)
+(* camlp5r ./pa_lock.cmo *)
+(* $Id: gwc.ml,v 5.56 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;

@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: ppdef.ml,v 5.7 2007-07-11 16:15:21 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: ppdef.ml,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
