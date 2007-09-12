@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: pr_dep.ml,v 5.7 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.8 2007-09-12 17:04:07 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 
@@ -212,17 +212,17 @@ and str_item =
   | <:str_item< exception $_$ of $list:tl$ = $_$ >> -> list ctyp tl
   | StExp _ e -> expr e
   | StExt _ _ t _ -> ctyp t
-  | StMod _ _ x ->
+  | <:str_item< module $flag:_$ $list:x$ >> ->
       IFDEF CAMLP5 THEN
         list (fun (_, me) -> module_expr me) x
       ELSE
         module_expr x
       END
   | StMty _ _ mt -> module_type mt
-  | StOpn _ [s :: _] -> addmodule s
-  | StTyp _ tdl -> list type_decl tdl
+  | <:str_item< open $[s ::_]$ >> -> addmodule s
+  | <:str_item< type $list:tdl$ >> -> list type_decl tdl
   | StUse _ _ _ -> ()
-  | StVal _ _ pel -> list let_binding pel
+  | <:str_item< value $flag:_$ $list:pel$ >> -> list let_binding pel
   | x -> not_impl "str_item" x ]
 and type_decl td = ctyp td.tdDef
 and class_expr =
