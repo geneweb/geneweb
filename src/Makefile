@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.46 2007-09-12 09:58:44 ddr Exp $
+# $Id: Makefile,v 5.47 2007-09-12 17:04:07 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -141,7 +141,7 @@ i18n_check.out: i18n_check.cmo
 i18n: pr_transl.cmo always
 	if test -f i18n; then mv i18n i18n.bak; fi
 	export LC_ALL=C; \
-	OBJS=$$((grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq); \
+	OBJS=`(grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; \
 	( \
 	  for i in $$OBJS; do \
 	    echo $$i 1>&2; \
