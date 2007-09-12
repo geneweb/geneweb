@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: notes.mli,v 5.5 2007-03-30 18:57:19 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: notes.mli,v 5.6 2007-09-12 09:58:44 ddr Exp $ *)
 
 open Config;
 open Gwdb;

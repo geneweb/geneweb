@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 5.6 2007-01-17 14:07:00 ddr Exp $ *)
+(* camlp5r ./pa_html.cmo *)
+(* $Id: sendImage.ml,v 5.7 2007-09-12 09:58:44 ddr Exp $ *)
 
 open Config;
 open Def;

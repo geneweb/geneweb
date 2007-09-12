@@ -1,9 +1,9 @@
-# $Id: Makefile.inc.win,v 5.6 2007-09-12 09:42:26 ddr Exp $
+# $Id: Makefile.inc.win,v 5.7 2007-09-12 09:58:44 ddr Exp $
 
 TOP=..
-CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh
-CAMLP4F=-DWIN95
-CAMLP4D=+camlp5
+CAMLP5_COMM=TOP=$(TOP) $(TOP)/tools/camlp5_comm.sh
+CAMLP5F=-DWIN95
+CAMLP5D=+camlp5
 LIBUNIX=-cclib -lunix
 OCAMLC=ocamlc.opt -warn-error A
 OCAMLOPT=ocamlopt.opt -warn-error A
@@ -25,18 +25,18 @@ clean::
 
 .mli.cmi:
 	@$(TEST_DIR)
-	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppi
-	$(OCAMLC) $(OCAMLI) -I $(CAMLP4D) -c -intf $*.ppi
+	@$(CAMLP5_COMM) $(CAMLP5F) $< -o $*.ppi
+	$(OCAMLC) $(OCAMLI) -I $(CAMLP5D) -c -intf $*.ppi
 	$(RM) $*.ppi
 
 .ml.cmo:
 	@$(TEST_DIR)
-	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I $(CAMLP4D) -c -impl $*.ppo
+	@$(CAMLP5_COMM) $(CAMLP5F) $< -o $*.ppo
+	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I $(CAMLP5D) -c -impl $*.ppo
 	$(RM) $*.ppo
 
 .ml.cmx:
 	@$(TEST_DIR)
-	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLOPT) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
+	@$(CAMLP5_COMM) $(CAMLP5F) $< -o $*.ppo
+	$(OCAMLOPT) $(OCAMLI) -I $(CAMLP5D) -c -impl $*.ppo
 	$(RM) $*.ppo

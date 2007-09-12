@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: wiki.ml,v 5.30 2007-07-01 07:39:32 ddr Exp $ *)
+(* camlp5r ./pa_html.cmo *)
+(* $Id: wiki.ml,v 5.31 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;

@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: hutil.ml,v 5.10 2007-07-25 15:01:02 ddr Exp $ *)
+(* camlp5r ./pa_html.cmo *)
+(* $Id: hutil.ml,v 5.11 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 open Config;

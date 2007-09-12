@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.48 2007-04-04 21:13:30 ddr Exp $ *)
+(* camlp5r ./pa_lock.cmo *)
+(* $Id: mk_consang.ml,v 5.49 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;

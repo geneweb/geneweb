@@ -1,5 +1,5 @@
-(* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 5.32 2007-04-25 23:34:14 ddr Exp $ *)
+(* camlp5r ./pa_html.cmo *)
+(* $Id: notes.ml,v 5.33 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;

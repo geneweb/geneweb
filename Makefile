@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.4 2007-09-12 09:42:26 ddr Exp $
+# $Id: Makefile,v 5.5 2007-09-12 09:58:44 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -71,7 +71,7 @@ uninstall:
 distrib: new_distrib wrappers
 
 wrappers:
-	if test "$(CAMLP4F)" = "-DWIN95"; then \
+	if test "$(CAMLP5F)" = "-DWIN95"; then \
 	  echo 'cd gw' > $(DESTDIR)/gwd.bat; \
 	  echo 'gwd' >> $(DESTDIR)/gwd.bat; \
 	  echo 'cd gw' > $(DESTDIR)/gwsetup.bat; \
@@ -96,7 +96,7 @@ new_distrib: classical_distrib
 	mkdir $(DESTDIR)/gw/setup
 	cp setup/intro.txt $(DESTDIR)/gw/setup/.
 	mkdir $(DESTDIR)/gw/setup/lang
-	if test "$(CAMLP4F)" = "-DWIN95"; then \
+	if test "$(CAMLP5F)" = "-DWIN95"; then \
 	  cp setup/lang/intro.txt.dos $(DESTDIR)/gw/setup/lang/intro.txt; \
 	else \
 	  cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/intro.txt; \

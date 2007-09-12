@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: pr_dep.ml,v 5.6 2007-09-12 09:42:26 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: pr_dep.ml,v 5.7 2007-09-12 09:58:44 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 

@@ -1,5 +1,5 @@
-(* camlp4r *)
-(* $Id: db2out.ml,v 5.10 2007-04-02 01:23:10 ddr Exp $ *)
+(* camlp5r *)
+(* $Id: db2out.ml,v 5.11 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
