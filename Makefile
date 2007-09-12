@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.3 2007-09-12 00:54:46 ddr Exp $
+# $Id: Makefile,v 5.4 2007-09-12 09:42:26 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -12,7 +12,6 @@ include tools/Makefile.inc
 all:: opt
 
 out::
-	cd src; $(MAKE) ppdef
 	cd wserver; $(MAKE) all
 	cd dag2html; $(MAKE) out
 	cd src; $(MAKE) PREFIX=$(PREFIX) all
@@ -23,7 +22,6 @@ out::
 	cd gwtp; $(MAKE) all
 
 opt::
-	cd src; $(MAKE) ppdef
 	cd wserver; $(MAKE) opt
 	cd dag2html; $(MAKE) opt
 	cd src; $(MAKE) PREFIX=$(PREFIX) opt
@@ -180,7 +178,7 @@ clean_mismatch:
 	rm src/pa_lock.cmo src/pa_html.cmo src/def.syn.cmo
 
 depend:
-	cd src; $(MAKE) ppdef pr_dep.cmo def.syn.cmo gwlib.ml
+	cd src; $(MAKE) pr_dep.cmo def.syn.cmo gwlib.ml
 	cd src; $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	cd wserver; $(MAKE) depend
 	cd src; $(MAKE) depend

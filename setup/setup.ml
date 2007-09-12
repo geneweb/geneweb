@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 5.6 2007-02-25 02:32:19 ddr Exp $ *)
+(* $Id: setup.ml,v 5.7 2007-09-12 09:42:26 ddr Exp $ *)
 
 open Printf;
 
@@ -1871,12 +1871,12 @@ value intro () =
 value main () =
   do {
     IFDEF UNIX THEN intro ()
-    ELSIFDEF SYS_COMMAND THEN
+    ELSE IFDEF SYS_COMMAND THEN
       let len = Array.length Sys.argv in
       if len > 2 && Sys.argv.(len - 2) = "-wserver" then () else intro ()
     ELSE
       try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ]
-    END;
+    END END;
     Wserver.f None port.val 0 None wrap_setup
   }
 ;

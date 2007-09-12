@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: pr_dep.ml,v 5.5 2007-07-11 16:15:21 ddr Exp $ *)
+(* $Id: pr_dep.ml,v 5.6 2007-09-12 09:42:26 ddr Exp $ *)
 
 #load "q_MLast.cmo";
 
@@ -50,21 +50,28 @@ value rec ctyp =
   | TyMan _ t1 t2 -> do { ctyp t1; ctyp t2; }
   | TyOlb _ _ t -> ctyp t
   | TyQuo _ _ -> ()
-  | TyTup _ tl -> list ctyp tl
+  | <:ctyp< ($list:tl$) >> -> list ctyp tl
   | TyVrn _ sbtll _ -> list variant sbtll
   | x ->
       IFDEF OCAML_309 THEN
         match x with
         [ TyRec _ ldl -> list label_decl ldl
-        | TySum _ cdl -> list constr_decl cdl
+        | <:ctyp< [ $list:cdl$ ] >> -> list constr_decl cdl
         | x -> not_impl "ctyp" x ]
       ELSE
         match x with
-        [ TyRec _ _ ldl -> list label_decl ldl
-        | TySum _ _ cdl -> list constr_decl cdl
+        [ <:ctyp< { $list:ldl$ } >> -> list label_decl ldl
+        | <:ctyp< [ $list:cdl$ ] >> -> list constr_decl cdl
         | x -> not_impl "ctyp" x ]
       END ]
-and constr_decl (_, _, tl) = list ctyp tl
+and constr_decl (_, _, tl) =
+  IFDEF CAMLP5_4_09 AND STRICT THEN
+    match tl with
+    [ <:vala< tl >> -> list ctyp tl
+    | _ -> failwith "constr_decl" ]
+  ELSE
+    list ctyp tl
+  END
 and label_decl (_, _, _, t) = ctyp t
 and variant =
   fun
@@ -74,7 +81,7 @@ and ctyp_module =
   fun
   [ TyAcc _ t _ -> ctyp_module t
   | TyApp _ t1 t2 -> do { ctyp t1; ctyp t2; }
-  | TyUid _ m -> addmodule m
+  | <:ctyp< $uid:m$ >> -> addmodule m
   | x -> not_impl "ctyp_module" x ]
 ;
 
@@ -92,17 +99,17 @@ value rec patt =
   | PaOlb _ _ peoo ->
       option (fun (p, eo) -> do { patt p; option expr eo }) peoo
   | PaOrp _ p1 p2 -> do { patt p1; patt p2; }
-  | PaRec _ lpl -> list label_patt lpl
+  | <:patt< { $list:lpl$ } >> -> list label_patt lpl
   | PaRng _ p1 p2 -> do { patt p1; patt p2; }
   | PaStr _ _ -> ()
-  | PaTup _ pl -> list patt pl
+  | <:patt< ($list:pl$) >> -> list patt pl
   | PaTyc _ p t -> do { patt p; ctyp t; }
   | PaUid _ _ -> ()
   | PaVrn _ _ -> ()
   | x -> not_impl "patt" x ]
 and patt_module =
   fun
-  [ PaUid _ m -> addmodule m
+  [ <:patt< $uid:m$ >> -> addmodule m
   | PaAcc _ p _ -> patt_module p
   | x -> not_impl "patt_module" x ]
 and label_patt (p1, p2) = do { patt p1; patt p2; }
@@ -117,34 +124,45 @@ and expr =
   | ExAss _ e1 e2 -> do { expr e1; expr e2; }
   | ExChr _ _ -> ()
   | ExCoe _ e t1 t2 -> do { expr e; option ctyp t1; ctyp t2 }
-  | ExFor _ _ e1 e2 _ el -> do { expr e1; expr e2; list expr el; }
+  | <:expr< for $_$ = $e1$ $to:_$ $e2$ do { $list:el$ } >> -> do {
+      expr e1;
+      expr e2;
+      list expr el;
+    }
   | ExFun _ pwel -> list match_case pwel
   | ExIfe _ e1 e2 e3 -> do { expr e1; expr e2; expr e3; }
   | <:expr< $int:_$ >> -> ()
   | ExFlo _ _ -> ()
   | ExLab _ _ eo -> option expr eo
   | ExLaz _ e -> expr e
-  | ExLet _ _ pel e -> do { list let_binding pel; expr e; }
+  | <:expr< let $flag:_$ $list:pel$ in $e$ >> -> do {
+      list let_binding pel;
+      expr e;
+    }
   | ExLid _ _ -> ()
   | ExLmd _ _ me e -> do { module_expr me; expr e; }
   | ExMat _ e pwel -> do { expr e; list match_case pwel; }
   | ExNew _ li -> longident li
   | ExOlb _ _ eo -> option expr eo
-  | ExRec _ lel w -> do { list label_expr lel; option expr w; }
-  | ExSeq _ el -> list expr el
+  | <:expr< { $list:lel$ } >> -> list label_expr lel
+  | <:expr< { ($w$) with $list:lel$ } >> -> do {
+      list label_expr lel;
+      expr w;
+    }
+  | <:expr< do { $list:el$ } >> -> list expr el
   | ExSnd _ e _ -> expr e
   | ExSte _ e1 e2 -> do { expr e1; expr e2; }
   | ExStr _ _ -> ()
   | ExTry _ e pwel -> do { expr e; list match_case pwel; }
-  | ExTup _ el -> list expr el
+  | <:expr< ($list:el$) >> -> list expr el
   | ExTyc _ e t -> do { expr e; ctyp t; }
   | ExUid _ _ -> ()
   | ExVrn _ _ -> ()
-  | ExWhi _ e el -> do { expr e; list expr el; }
+  | <:expr< while $e$ do { $list:el$ } >> -> do { expr e; list expr el; }
   | x -> not_impl "expr" x ]
 and expr_module =
   fun
-  [ ExUid _ m -> addmodule m
+  [ <:expr< $uid:m$ >> -> addmodule m
   | e -> expr e ]
 and let_binding (p, e) = do { patt p; expr e }
 and label_expr (p, e) = do { patt p; expr e }
@@ -163,8 +181,8 @@ and with_constr =
   | x -> not_impl "with_constr" x ]
 and sig_item =
   fun
-  [ SgDcl _ sil -> list sig_item sil
-  | SgExc _ _ tl -> list ctyp tl
+  [ <:sig_item< declare $list:sil$ end >> -> list sig_item sil
+  | <:sig_item< exception $_$ of $list:tl$ >> -> list ctyp tl
   | SgExt _ _ t _ -> ctyp t
   | SgMod _ _ x ->
       IFDEF CAMLP5 THEN
@@ -179,19 +197,19 @@ and sig_item =
   | x -> not_impl "sig_item" x ]
 and module_expr =
   fun
-  [ MeAcc _ (MeUid _ m) _ -> addmodule m
+  [ <:module_expr< $uid:m$ . $_$ >> -> addmodule m
   | MeApp _ me1 me2 -> do { module_expr me1; module_expr me2; }
   | MeFun _ _ mt me -> do { module_type mt; module_expr me; }
-  | MeStr _ sil -> list str_item sil
+  | <:module_expr< struct $list:sil$ end >> -> list str_item sil
   | MeTyc _ me mt -> do { module_expr me; module_type mt; }
   | MeUid _ _ -> ()
   | x -> not_impl "module_expr" x ]
 and str_item =
   fun
   [ StCls _ cil -> list (fun ci -> class_expr ci.ciExp) cil
-  | StDcl _ sil -> list str_item sil
+  | <:str_item< declare $list:sil$ end >> -> list str_item sil
   | StDir _ _ _ -> ()
-  | StExc _ _ tl _ -> list ctyp tl
+  | <:str_item< exception $_$ of $list:tl$ = $_$ >> -> list ctyp tl
   | StExp _ e -> expr e
   | StExt _ _ t _ -> ctyp t
   | StMod _ _ x ->

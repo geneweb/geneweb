@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 5.51 2007-02-14 10:14:36 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 5.52 2007-09-12 09:42:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -600,9 +600,7 @@ value using_token (p_con, p_prm) =
 ;
 
 value date_lexer =
-  {Token.tok_func s =
-     (make_date_lexing s,
-      fun _ -> IFDEF OCAML_308 THEN Token.dummy_loc ELSE (0, 0) END);
+  {Token.tok_func s = (make_date_lexing s, fun _ -> Token.dummy_loc);
    Token.tok_using = using_token; Token.tok_removing _ = ();
    Token.tok_match = tparse; Token.tok_text _ = "<tok>";
    Token.tok_comm = None}

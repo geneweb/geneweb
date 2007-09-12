@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 5.14 2007-06-17 03:21:14 ddr Exp $ *)
+(* $Id: wserver.ml,v 5.15 2007-09-12 09:42:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -294,7 +294,7 @@ value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr fd = do {
   IFDEF NOFORK THEN ()
-  ELSIFDEF UNIX THEN
+  ELSE IFDEF UNIX THEN
     if tmout > 0 then
       let spid = Unix.fork () in
       if spid > 0 then do {
@@ -311,7 +311,7 @@ value treat_connection tmout callback addr fd = do {
       }
       else ()
     else ()
-  ELSE () END;
+  ELSE () END END;
   let (request, script_name, contents) =
     let (request, contents) =
       let strm =
@@ -495,7 +495,7 @@ value accept_connection tmout max_clients callback s =
         treat_connection tmout callback addr t;
         cleanup ();
       }
-    ELSIFDEF UNIX THEN
+    ELSE IFDEF UNIX THEN
       match try Some (Unix.fork ()) with _ -> None with
       [ Some 0 ->
           do {
@@ -607,14 +607,14 @@ let args = Sys.argv in
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
     }
-    END
+    END END
   }
 ;
 
 value f addr_opt port tmout max_clients g =
   match
     IFDEF NOFORK THEN None
-    ELSIFDEF WIN95 THEN
+    ELSE IFDEF WIN95 THEN
       IFDEF SYS_COMMAND THEN
         let len = Array.length Sys.argv in
         if len > 2 && Sys.argv.(len - 2) = "-wserver" then
@@ -623,11 +623,11 @@ value f addr_opt port tmout max_clients g =
       ELSE
         try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
       END
-    ELSE None END
+    ELSE None END END
   with
   [ Some s ->
       IFDEF NOFORK THEN ()
-      ELSIFDEF WIN95 THEN do {
+      ELSE IFDEF WIN95 THEN do {
         let addr = sockaddr_of_string s in
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
@@ -635,7 +635,7 @@ value f addr_opt port tmout max_clients g =
         ignore (treat_connection tmout g addr fd);
         exit 0
       }
-      ELSE () END
+      ELSE () END END
   | None ->
       do {
         check_stopping ();
@@ -651,8 +651,8 @@ value f addr_opt port tmout max_clients g =
         Unix.bind s (Unix.ADDR_INET addr port);
         Unix.listen s 4;
         IFDEF NOFORK THEN Sys.set_signal Sys.sigpipe Sys.Signal_ignore
-        ELSIFDEF UNIX THEN let _ = Unix.nice 1 in ()
-        ELSE () END;
+        ELSE IFDEF UNIX THEN let _ = Unix.nice 1 in ()
+        ELSE () END END;
         let tm = Unix.localtime (Unix.time ()) in
         eprintf "Ready %4d-%02d-%02d %02d:%02d port"
           (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday

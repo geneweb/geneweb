@@ -1,5 +1,5 @@
 #!/bin/sh -e
-# $Id: camlp4_depend.sh,v 5.3 2007-07-11 16:15:21 ddr Exp $
+# $Id: camlp4_depend.sh,v 5.4 2007-09-12 09:42:26 ddr Exp $
 
 FILES=
 DEPARGS=
@@ -23,8 +23,8 @@ for FILE in $FILES; do
         ARGS=
     fi
     ARGS2="$DEPARGS"
-    echo $COMM $PR_DEP $TOP/src/ppdef.cmo $ARGS -- $ARGS2 $FILE >&2
-    $COMM $PR_DEP $TOP/src/ppdef.cmo $ARGS -- $ARGS2 $FILE
+    echo $COMM $PR_DEP pa_macro.cmo $ARGS -- $ARGS2 $FILE >&2
+    $COMM $PR_DEP pa_macro.cmo $ARGS -- $ARGS2 $FILE
 done
 
 for FILE in $FILES; do
