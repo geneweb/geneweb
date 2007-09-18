@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: place.ml,v 5.20 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: place.ml,v 5.21 2007-09-18 19:12:08 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -82,10 +82,14 @@ value get_all conf base =
           then
             ()
           else do {
-            if not (is_empty_string pl_bi) then ht_add pl_bi p else ();
-            if not (is_empty_string pl_bp) then ht_add pl_bp p else ();
-            if not (is_empty_string pl_de) then ht_add pl_de p else ();
-            if not (is_empty_string pl_bu) then ht_add pl_bu p else ()
+            if add_birth && not (is_empty_string pl_bi) then ht_add pl_bi p
+            else ();
+            if add_birth && not (is_empty_string pl_bp) then ht_add pl_bp p
+            else ();
+            if add_death && not (is_empty_string pl_de) then ht_add pl_de p
+            else ();
+            if add_death && not (is_empty_string pl_bu) then ht_add pl_bu p
+            else ()
           };
           loop (i + 1)
         }
