@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: forum.ml,v 5.21 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: forum.ml,v 5.22 2008-01-07 13:29:47 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -397,10 +397,16 @@ value is_moderator conf =
   conf.wizard && List.mem conf.user (moderators conf)
 ;
 
+value is_visible conf mess =
+  not mess.m_waiting || is_moderator conf ||
+  conf.wizard && mess.m_wizard <> "" && mess.m_wizard = conf.user
+;
+
 value rec eval_var conf base env xx loc =
   fun
   [ ["can_post"] -> VVbool (can_post conf)
   | ["is_moderated_forum"] -> VVbool (moderators conf <> [])
+  | ["is_moderator"] -> VVbool (is_moderator conf)
   | ["message" :: sl] -> eval_message_var conf base env sl
   | ["pos"] ->
       match get_env "pos" env with
@@ -451,7 +457,7 @@ and eval_message_var conf base env =
             match get_message conf back_pos with
             [ Some (acc, mess, _, _) ->
                 if back_pos = pos then VVstring ""
-                else if acc && (not mess.m_waiting || is_moderator conf) then
+                else if acc && is_visible conf mess then
                   VVstring (MF.string_of_pos back_pos)
                 else
                   loop back_pos
@@ -474,9 +480,10 @@ and eval_message_var conf base env =
           loop next_pos where rec loop next_pos =
             match get_message conf next_pos with
             [ Some (acc, mess, next_pos, next_next_pos) ->
-                if acc && (not mess.m_waiting || is_moderator conf) then
+                if acc && is_visible conf mess then
                   VVstring (MF.string_of_pos next_pos)
-                else loop next_next_pos
+                else
+                  loop next_next_pos
             | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["subject" :: sl] ->
@@ -592,8 +599,7 @@ value print_foreach conf base print_ast eval_expr =
             let pos = MF.rpos_in ic in
             match read_message conf ic with
             [ Some (mess, accessible) ->
-                if accessible && (not mess.m_waiting || is_moderator conf)
-                then
+                if accessible && is_visible conf mess then
                   let next_pos = MF.rpos_in ic in
                   let vmess = Vmess mess prev_mess pos next_pos None in
                   let env = [("mess", vmess) :: env] in
@@ -601,7 +607,8 @@ value print_foreach conf base print_ast eval_expr =
                     List.iter (print_ast env ()) al;
                     loop (Some mess) (i + 1);
                   }
-                else loop prev_mess i
+                else
+                  loop prev_mess i
             | None -> MF.not_a_pos ]
         in
         do {
@@ -622,10 +629,11 @@ value print_forum_message conf base r so =
   let env =
     match r with
     [ Some (acc, mess, pos, next_pos) ->
-        if acc && (not mess.m_waiting || is_moderator conf) then
+        if acc && is_visible conf mess then
           [("mess", Vmess mess None pos next_pos so);
            ("pos", Vpos (ref pos))]
-        else [("pos", Vpos (ref MF.not_a_pos))]
+        else
+          [("pos", Vpos (ref MF.not_a_pos))]
     | None -> [("pos", Vpos (ref MF.not_a_pos))] ]
   in
   Hutil.interp conf base "forum"

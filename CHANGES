@@ -1,6 +1,11 @@
 GeneWeb version 5.02
 --------------------
 
+* [07 Jan 2008] In forum, when moderated, added displaying of wizard's
+  messages not yet validated (in red) to allow them to possibly delete
+  them.
+* ... other things added, modified or fixed not commented here
+
 GeneWeb version 5.01
 --------------------
 
