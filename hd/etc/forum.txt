@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: forum.txt,v 5.18 2007-09-10 12:56:20 ddr Exp $ -->
+  <!-- $Id: forum.txt,v 5.19 2008-01-07 13:29:47 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
@@ -241,14 +241,19 @@
   %let;col;%if;message.is_waiting; style="color:red"%end;%in;
   %if;message.is_waiting;
     <p>
-    <form method="POST" action="%action;">
-    %hidden;
-    <input type="hidden" name="m" value="FORUM_VAL"%/>
-    <input type="hidden" name="p" value="%pos;"%/>
-    <input type="submit" name="v" value="%nn;[*validate/delete]0"%>
-    <input type="submit" name="d" value="%nn;[*validate/delete]1"%/>
-    </p>
-    </form>
+    %if;is_moderator;
+      <form method="POST" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="FORUM_VAL"%/>
+      <input type="hidden" name="p" value="%pos;"%/>
+      <input type="submit" name="v" value="%nn;[*validate/delete]0"%>
+      <input type="submit" name="d" value="%nn;[*validate/delete]1"%/>
+      </p>
+      </form>
+    %else;
+      <span style="color:green">[*your message is waiting for validation]%nn;
+      </span>
+    %end;
     </p>
   %end;
   %if;(evar.m != "FORUM_VIEW")
