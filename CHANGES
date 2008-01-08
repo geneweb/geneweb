@@ -1,6 +1,8 @@
 GeneWeb version 5.02
 --------------------
 
+* [08 Jan 2008] In update family form, added ability to put "p" in the
+  birth year field to specify "public".
 * [07 Jan 2008] In forum, when moderated, added displaying of wizard's
   messages not yet validated (in red) to allow them to possibly delete
   them.

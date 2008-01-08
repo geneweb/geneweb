@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 5.11 2008-01-08 01:56:37 ddr Exp $ *)
+(* $Id: update.mli,v 5.12 2008-01-08 02:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -11,7 +11,8 @@ type create_info =
     ci_birth_place : string;
     ci_death : death;
     ci_death_date : option date;
-    ci_death_place : string }
+    ci_death_place : string;
+    ci_public : bool }
 ;
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
